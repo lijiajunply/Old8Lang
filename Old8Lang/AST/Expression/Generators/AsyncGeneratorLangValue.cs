@@ -81,7 +81,7 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     public TaskLangValue RunAsync(VariateManager manager)
     {
         // 如果状态机还未初始化，则创建它
-        if (StateMachine == null)
+        if (StateMachine is null)
         {
             // 优先使用AsyncFunc捕获的闭包，如果没有则使用传入的manager
             var baseManager = AsyncFunc.CapturedScope ?? manager;

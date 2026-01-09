@@ -99,7 +99,7 @@ public partial class SelectStatement(
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -153,7 +153,7 @@ public partial class SelectStatement(
                     if (receiveResult.Success)
                     {
                         // 接收成功
-                        if (selectCase.VariableName != null)
+                        if (selectCase.VariableName is not null)
                         {
                             manager.Set(new LangId(selectCase.VariableName), LangValueType.ObjToValue(receiveResult.Value));
                         }
@@ -181,7 +181,7 @@ public partial class SelectStatement(
             }
 
             // 如果有default分支，立即执行
-            if (defaultCase != null)
+            if (defaultCase is not null)
             {
                 defaultCase.Run(manager);
                 return;
@@ -278,7 +278,7 @@ public partial class SelectStatement(
                 ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
 
                 // Success == true: 设置变量（如果有）并执行块
-                if (selectCase.VariableName != null)
+                if (selectCase.VariableName is not null)
                 {
                     // 获取 receiveResult.Value
                     ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
@@ -342,7 +342,7 @@ public partial class SelectStatement(
         }
 
         // 所有 case 都未就绪
-        if (defaultCase != null)
+        if (defaultCase is not null)
         {
             // 有 default 分支：执行 default 并退出
             ilGenerator.MarkLabel(defaultLabel);
@@ -379,7 +379,7 @@ public partial class SelectStatement(
                 return cases[index].BlockStatement;
             }
 
-            if (defaultCase != null && index == cases.Count)
+            if (defaultCase is not null && index == cases.Count)
             {
                 return defaultCase;
             }
@@ -394,7 +394,7 @@ public partial class SelectStatement(
         get
         {
             // case数量 + default块（如果有）
-            return cases.Count + (defaultCase != null ? 1 : 0);
+            return cases.Count + (defaultCase is not null ? 1 : 0);
         }
     }
 

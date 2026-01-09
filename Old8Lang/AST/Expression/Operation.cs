@@ -114,7 +114,7 @@ public partial class Operation(
     public override LangValueType Run(VariateManager manager)
     {
         // 处理一元运算符
-        if (Left == null)
+        if (Left is null)
         {
             if (Opera == LangTokenType.Exclamation)
             {
@@ -137,7 +137,7 @@ public partial class Operation(
         }
 
         // 处理this.id => dot_value
-        if (Opera == LangTokenType.Dot && Left is LangId { IdName: "this" } && Right != null)
+        if (Opera == LangTokenType.Dot && Left is LangId { IdName: "this" } && Right is not null)
         {
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
@@ -191,7 +191,7 @@ public partial class Operation(
                     return any.Dot(newInstance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     return any.Dot(Right, manager);
                 }
@@ -205,7 +205,7 @@ public partial class Operation(
                     return list.Dot(newInstance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     // 先尝试将 Right 作为属性或方法调用传递给 Dot 方法
                     // 这样可以处理像 .Count 这样的属性访问
@@ -241,7 +241,7 @@ public partial class Operation(
                     return typeTemplate.Dot(newInstance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     // 处理静态成员访问
                     return typeTemplate.Dot(Right, manager);
@@ -269,7 +269,7 @@ public partial class Operation(
                 }
 
                 // 处理数组索引访问，需要先运行Right表达式
-                if (Right != null)
+                if (Right is not null)
                 {
                     var arrayIndexResult = Right.Run(manager);
                     if (arrayIndexResult is IntLangValue intValue)
@@ -292,7 +292,7 @@ public partial class Operation(
                 }
 
                 // 处理字典属性访问和方法调用
-                if (Right != null)
+                if (Right is not null)
                 {
                     return dict.Dot(Right, manager);
                 }
@@ -306,7 +306,7 @@ public partial class Operation(
                     return taskClassValue.Dot(instance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     taskClassValue.ExternalManager = manager;
@@ -364,7 +364,7 @@ public partial class Operation(
                     return taskValue.Dot(instance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     return taskValue.Dot(Right, manager);
                 }
@@ -420,12 +420,12 @@ public partial class Operation(
                     return threadValue.Dot(instance, manager);
                 }
 
-                if (Right != null)
+                if (Right is not null)
                 {
                     return threadValue.Dot(Right, manager);
                 }
             }
-            else if (dotLeftResult != null! && Right != null)
+            else if (dotLeftResult is not null && Right is not null)
             {
                 return dotLeftResult.Dot(Right, manager);
                 // throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
@@ -583,7 +583,7 @@ public partial class Operation(
         }
 
         // == , < , >
-        if (leftResult != null! && rightResult != null!)
+        if (leftResult is not null && rightResult is not null)
         {
             switch (Opera)
             {
@@ -648,10 +648,10 @@ public partial class Operation(
         LoadIlValue(ilGenerator, local);
         // 然后获取结果类型
         var type = OutputType(local);
-        if (type == null) return;
+        if (type is null) return;
         // 声明局部变量或使用已存在的
         var existingLocal = local.GetLocalVar(idName);
-        if (existingLocal != null)
+        if (existingLocal is not null)
         {
             if (existingLocal.LocalType != type)
             {
@@ -703,7 +703,7 @@ public partial class Operation(
     /// </remarks>
     public override Type? OutputType(LocalManager local)
     {
-        if (Type != null) return Type;
+        if (Type is not null) return Type;
         // 直接返回类型信息，不创建临时方法
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
@@ -721,14 +721,14 @@ public partial class Operation(
         // 处理成员访问（Dot操作符）
         if (Opera == LangTokenType.Dot && Right is LangId rightId)
         {
-            if (leftType != null)
+            if (leftType is not null)
             {
                 // 检查是否是枚举类型的成员访问
                 if (leftType.IsEnum)
                 {
                     // 枚举成员访问返回枚举类型本身
                     var enumField = leftType.GetField(rightId.IdName);
-                    if (enumField != null)
+                    if (enumField is not null)
                     {
                         return leftType; // 返回枚举类型
                     }
@@ -736,14 +736,14 @@ public partial class Operation(
 
                 // 尝试获取字段类型
                 var field = leftType.GetField(rightId.IdName);
-                if (field != null)
+                if (field is not null)
                 {
                     return field.FieldType;
                 }
 
                 // 尝试获取属性类型
                 var property = leftType.GetProperty(rightId.IdName);
-                if (property != null)
+                if (property is not null)
                 {
                     return property.PropertyType;
                 }
@@ -768,11 +768,11 @@ public partial class Operation(
             }
 
             // 对于其他方法调用，尝试查找方法并返回其返回类型
-            if (leftType != null)
+            if (leftType is not null)
             {
                 var paramTypes = instance.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
                 var method = leftType.GetMethod(instance.Id.IdName, paramTypes);
-                if (method != null)
+                if (method is not null)
                 {
                     return method.ReturnType;
                 }
@@ -830,7 +830,7 @@ public partial class Operation(
                 : typeof(object); // 如果找不到对应的类型，说明类还在编译中，返回object
         }
 
-        if (Left == null)
+        if (Left is null)
         {
             // 处理单目运算符
             switch (Opera)
@@ -1369,7 +1369,7 @@ public partial class Operation(
                 {
                     // 默认情况，尝试调用 Contains 方法，参数类型为 object
                     var containsMethod = rightType.GetMethod("Contains", [typeof(object)]);
-                    if (containsMethod != null)
+                    if (containsMethod is not null)
                     {
                         // 非静态方法需要交换栈顺序
                         if (!containsMethod.IsStatic)
@@ -1389,7 +1389,7 @@ public partial class Operation(
                         // 尝试调用 Contains 方法，参数类型为左侧值的类型
                         var leftOperandType = Left?.OutputType(local);
                         containsMethod = rightType.GetMethod("Contains", [leftOperandType!]);
-                        if (containsMethod != null)
+                        if (containsMethod is not null)
                         {
                             // 非静态方法需要交换栈顺序
                             if (!containsMethod.IsStatic)
@@ -1492,16 +1492,16 @@ public partial class Operation(
                     // 加载左侧值
                     Left!.LoadIlValue(ilGenerator, local);
 
-                    if (targetType == null && typeName == "null")
+                    if (targetType is null && typeName == "null")
                     {
                         // 检查是否为 null
                         ilGenerator.Emit(OpCodes.Ldnull);
                         ilGenerator.Emit(OpCodes.Ceq);
                     }
-                    else if (targetType != null)
+                    else if (targetType is not null)
                     {
                         // 确保左侧值是 object 类型以便进行类型检查
-                        if (leftType != null && leftType.IsValueType)
+                        if (leftType is not null && leftType.IsValueType)
                         {
                             ilGenerator.Emit(OpCodes.Box, leftType);
                         }
@@ -1519,7 +1519,7 @@ public partial class Operation(
                             // 不是 null，检查具体类型
                             ilGenerator.Emit(OpCodes.Pop); // 弹出栈顶
                             Left!.LoadIlValue(ilGenerator, local);
-                            if (leftType != null && leftType.IsValueType)
+                            if (leftType is not null && leftType.IsValueType)
                             {
                                 ilGenerator.Emit(OpCodes.Box, leftType);
                             }
@@ -1582,7 +1582,7 @@ public partial class Operation(
                     // 加载左侧值
                     Left!.LoadIlValue(ilGenerator, local);
 
-                    if (targetType == null && typeName == "null")
+                    if (targetType is null && typeName == "null")
                     {
                         // 检查是否不为 null
                         ilGenerator.Emit(OpCodes.Ldnull);
@@ -1590,10 +1590,10 @@ public partial class Operation(
                         ilGenerator.Emit(OpCodes.Ldc_I4_1);
                         ilGenerator.Emit(OpCodes.Xor); // 取反
                     }
-                    else if (targetType != null)
+                    else if (targetType is not null)
                     {
                         // 确保左侧值是 object 类型以便进行类型检查
-                        if (leftType != null && leftType.IsValueType)
+                        if (leftType is not null && leftType.IsValueType)
                         {
                             ilGenerator.Emit(OpCodes.Box, leftType);
                         }
@@ -1611,7 +1611,7 @@ public partial class Operation(
                             // 不是 null，检查具体类型
                             ilGenerator.Emit(OpCodes.Pop); // 弹出栈顶
                             Left!.LoadIlValue(ilGenerator, local);
-                            if (leftType != null && leftType.IsValueType)
+                            if (leftType is not null && leftType.IsValueType)
                             {
                                 ilGenerator.Emit(OpCodes.Box, leftType);
                             }
@@ -1693,7 +1693,7 @@ public partial class Operation(
             }
             case LangTokenType.Dot:
             {
-                if (local.InClassEnv != null && Left is LangId { IdName: "this" })
+                if (local.InClassEnv is not null && Left is LangId { IdName: "this" })
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                     if (Right is not LangId rightId) return local.InClassEnv;
@@ -1708,10 +1708,10 @@ public partial class Operation(
                     {
                         // 对于 TypeBuilder，尝试从基类中查找字段
                         var baseType = classTypeBuilder.BaseType;
-                        while (baseType != null && baseType != typeof(object))
+                        while (baseType is not null && baseType != typeof(object))
                         {
                             fieldInfo = baseType.GetField(rightId.IdName, BindingFlags.Public | BindingFlags.Instance);
-                            if (fieldInfo != null) break;
+                            if (fieldInfo is not null) break;
                             baseType = baseType.BaseType;
                         }
                     }
@@ -1722,7 +1722,7 @@ public partial class Operation(
                             BindingFlags.Public | BindingFlags.Instance);
                     }
 
-                    if (fieldInfo != null)
+                    if (fieldInfo is not null)
                     {
                         ilGenerator.Emit(OpCodes.Ldfld, fieldInfo);
                         return fieldInfo.FieldType;
@@ -1732,7 +1732,7 @@ public partial class Operation(
                     if (local.InClassEnv is not TypeBuilder)
                     {
                         var p = local.InClassEnv.GetProperty(rightId.IdName);
-                        if (p != null && p.GetGetMethod() != null)
+                        if (p is not null && p.GetGetMethod() is not null)
                         {
                             ilGenerator.Emit(OpCodes.Call, p.GetGetMethod()!);
                             return p.PropertyType;
@@ -1818,7 +1818,7 @@ public partial class Operation(
                                 return true;
                             });
 
-                        if (assertMethod != null)
+                        if (assertMethod is not null)
                         {
                             // 加载参数,根据方法签名决定是否装箱
                             var parameters = assertMethod.GetParameters();
@@ -1829,7 +1829,7 @@ public partial class Operation(
                                 var paramType = parameters[i].ParameterType;
 
                                 // 如果参数类型是 object,且值是值类型,需要装箱
-                                if (paramType == typeof(object) && idType != null && idType.IsValueType)
+                                if (paramType == typeof(object) && idType is not null && idType.IsValueType)
                                 {
                                     ilGenerator.Emit(OpCodes.Box, idType);
                                 }
@@ -2080,7 +2080,7 @@ public partial class Operation(
                     var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
 
                     // 如果没有找到精确匹配，尝试查找参数数量匹配的方法
-                    if (m == null)
+                    if (m is null)
                     {
                         m = leftType.GetMethods()
                             .FirstOrDefault(method =>
@@ -2088,7 +2088,7 @@ public partial class Operation(
                                 method.GetParameters().Length == instance.Ids.Count);
                     }
 
-                    if (m == null)
+                    if (m is null)
                     {
                         // 方法未找到，抛出异常
                         throw new InvalidOperationError(this, $"方法 '{instance.Id.IdName}' 未找到",
@@ -2104,11 +2104,11 @@ public partial class Operation(
                 if (Right is LangId id)
                 {
                     // 检查是否是枚举类型的静态成员访问
-                    if (leftType != null && leftType.IsEnum)
+                    if (leftType is not null && leftType.IsEnum)
                     {
                         // 枚举成员访问：直接加载枚举值（整数）
                         var field = leftType.GetField(id.IdName);
-                        if (field == null)
+                        if (field is null)
                         {
                             throw new InvalidOperationError(this, $"枚举 {leftType.Name} 没有成员 {id.IdName}");
                         }
@@ -2131,16 +2131,16 @@ public partial class Operation(
                     // 普通实例成员访问
                     Left!.LoadIlValue(ilGenerator, local);
                     var instanceField = leftType!.GetField(id.IdName);
-                    if (instanceField == null)
+                    if (instanceField is null)
                     {
                         var p = leftType.GetProperty(id.IdName);
-                        if (p == null)
+                        if (p is null)
                         {
                             throw new InvalidOperationError(this, $"类型 {leftType.Name} 没有属性 {id.IdName}");
                         }
 
                         var getMethod = p.GetGetMethod();
-                        if (getMethod == null)
+                        if (getMethod is null)
                         {
                             throw new InvalidOperationError(this, $"属性 {id.IdName} 没有公开的 getter 方法");
                         }
@@ -2154,7 +2154,7 @@ public partial class Operation(
                 }
 
                 // 处理索引访问: left[right]，例如 array[0], list[1], dict["key"]
-                if (rightType != null)
+                if (rightType is not null)
                 {
                     Left!.LoadIlValue(ilGenerator, local);
                     Right!.LoadIlValue(ilGenerator, local);
@@ -2257,7 +2257,7 @@ public partial class Operation(
                     }
 
                     var defaultIndexer = leftType!.GetProperty("Item");
-                    if (defaultIndexer == null) throw new InvalidOperationError(this, $"类型 '{leftType.Name}' 不支持索引访问");
+                    if (defaultIndexer is null) throw new InvalidOperationError(this, $"类型 '{leftType.Name}' 不支持索引访问");
                     ilGenerator.Emit(OpCodes.Callvirt, defaultIndexer.GetGetMethod()!);
                     return typeof(object);
                 }

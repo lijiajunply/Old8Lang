@@ -110,7 +110,7 @@ public class GeneratorAstScanner
                     .FirstOrDefault(f => f.Name.Contains("id", StringComparison.OrdinalIgnoreCase) &&
                                        f.FieldType == typeof(LangId));
 
-                if (idField != null && idField.GetValue(forIn) is LangId loopVar)
+                if (idField is not null && idField.GetValue(forIn) is LangId loopVar)
                 {
                     result.LocalVariables.Add(loopVar.IdName);
                 }
@@ -121,7 +121,7 @@ public class GeneratorAstScanner
                     System.Reflection.BindingFlags.Instance)
                     .FirstOrDefault(f => f.Name.Contains("additionalIds", StringComparison.OrdinalIgnoreCase));
 
-                if (additionalIdsField != null && additionalIdsField.GetValue(forIn) is List<LangId> additionalIds)
+                if (additionalIdsField is not null && additionalIdsField.GetValue(forIn) is List<LangId> additionalIds)
                 {
                     foreach (var additionalId in additionalIds)
                     {
@@ -142,7 +142,7 @@ public class GeneratorAstScanner
                     f.Name.Contains("body", StringComparison.OrdinalIgnoreCase) &&
                     f.FieldType == typeof(OldStatement));
 
-                if (bodyField != null)
+                if (bodyField is not null)
                 {
                     if (bodyField.GetValue(forIn) is OldStatement body)
                     {
@@ -168,7 +168,7 @@ public class GeneratorAstScanner
                     .FirstOrDefault(f => f.Name.Contains("id", StringComparison.OrdinalIgnoreCase) &&
                                        f.FieldType == typeof(LangId));
 
-                if (asyncIdField != null && asyncIdField.GetValue(asyncForIn) is LangId asyncLoopVar)
+                if (asyncIdField is not null && asyncIdField.GetValue(asyncForIn) is LangId asyncLoopVar)
                 {
                     result.LocalVariables.Add(asyncLoopVar.IdName);
                 }
@@ -179,7 +179,7 @@ public class GeneratorAstScanner
                     System.Reflection.BindingFlags.Instance)
                     .FirstOrDefault(f => f.Name.Contains("additionalIds", StringComparison.OrdinalIgnoreCase));
 
-                if (asyncAdditionalIdsField != null && asyncAdditionalIdsField.GetValue(asyncForIn) is List<LangId> asyncAdditionalIds)
+                if (asyncAdditionalIdsField is not null && asyncAdditionalIdsField.GetValue(asyncForIn) is List<LangId> asyncAdditionalIds)
                 {
                     foreach (var additionalId in asyncAdditionalIds)
                     {
@@ -197,7 +197,7 @@ public class GeneratorAstScanner
                     f.Name.Contains("body", StringComparison.OrdinalIgnoreCase) &&
                     f.FieldType == typeof(OldStatement));
 
-                if (asyncBodyField != null)
+                if (asyncBodyField is not null)
                 {
                     if (asyncBodyField.GetValue(asyncForIn) is OldStatement asyncBody)
                     {
@@ -240,7 +240,7 @@ public class GeneratorAstScanner
                 for (int i = 0; i < ifStmt.Count; i++)
                 {
                     var child = ifStmt[i];
-                    if (child != null)
+                    if (child is not null)
                     {
                         ScanStatement(child, result, ref yieldCounter, $"{path}/if[{i}]");
                     }
@@ -273,7 +273,7 @@ public class GeneratorAstScanner
                 for (int i = 0; i < statement.Count; i++)
                 {
                     var child = statement[i];
-                    if (child != null)
+                    if (child is not null)
                     {
                         ScanStatement(child, result, ref yieldCounter, $"{path}/[{i}]");
                     }

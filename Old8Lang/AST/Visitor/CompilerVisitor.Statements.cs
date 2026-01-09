@@ -56,7 +56,7 @@ public partial class CompilerVisitor
 
         // 处理 if 块
         var ifChild = node[0] as IfChild;
-        if (ifChild != null)
+        if (ifChild is not null)
         {
             ifChild.GenerateConditionIl(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Brfalse, labelElse);
@@ -71,7 +71,7 @@ public partial class CompilerVisitor
         for (int i = 1; i < node.Count; i++)
         {
             var elifChild = node[i] as IfChild;
-            if (elifChild != null)
+            if (elifChild is not null)
             {
                 var nextElif = ilGenerator.DefineLabel();
                 elifChild.GenerateConditionIl(ilGenerator, local);
@@ -108,7 +108,7 @@ public partial class CompilerVisitor
         for (int i = 0; i < node.Count; i++)
         {
             var statement = node[i];
-            if (statement != null)
+            if (statement is not null)
             {
                 statement.Accept(this);
             }

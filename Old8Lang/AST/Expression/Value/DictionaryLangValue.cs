@@ -105,10 +105,10 @@ public partial class DictionaryLangValue : LangValueType, ILangList
                     // 首先检查是否是扩展方法调用
                     var extensionType =
                         Type.GetType("Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic");
-                    if (extensionType != null)
+                    if (extensionType is not null)
                     {
                         var method = extensionType.GetMethod(langId.IdName);
-                        if (method != null)
+                        if (method is not null)
                         {
                             // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
                             ValueFunctions.ExecutionContext.SetCurrentManager(manager);
@@ -167,7 +167,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
                 method = extensionType.GetMethod(methodName);
             }
 
-            if (method != null)
+            if (method is not null)
             {
                 // 对于 Merge 和 Update 方法，需要特殊处理参数
                 if (methodName == "Merge" || methodName == "Update")

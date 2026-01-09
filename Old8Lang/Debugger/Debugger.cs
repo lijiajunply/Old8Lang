@@ -232,7 +232,7 @@ public class Debugger
         var shouldPause = false;
 
         var hitBreakpoint = _breakpointManager.CheckBreakpoint(position, filePath, currentFunction, manager); // 检查断点
-        if (hitBreakpoint != null)
+        if (hitBreakpoint is not null)
         {
             shouldPause = true;
             RaiseBreakpointHit(hitBreakpoint, position, currentFunction);
@@ -269,7 +269,7 @@ public class Debugger
     {
         // 检查函数断点
         var breakpoint = _breakpointManager.CheckBreakpoint(position, filePath, functionName, manager);
-        if (breakpoint != null)
+        if (breakpoint is not null)
         {
             RaiseBreakpointHit(breakpoint, position, functionName);
             State = DebuggerState.Paused;
@@ -377,7 +377,7 @@ public class Debugger
         _variableWatcher.UpdateAllWatches(manager);
 
         // 更新当前栈帧的变量信息
-        if (_callStack.CurrentFrame != null)
+        if (_callStack.CurrentFrame is not null)
         {
             _callStack.CurrentFrame.LocalVariables = GetLocalVariables(manager);
         }

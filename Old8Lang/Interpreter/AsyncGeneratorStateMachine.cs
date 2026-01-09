@@ -173,7 +173,7 @@ public class AsyncGeneratorStateMachine
             Locals[stream.Key] = stream.Value;
         }
 
-        if (yieldPath != null)
+        if (yieldPath is not null)
         {
             Locals["__last_yield_path__"] = yieldPath;
         }
@@ -182,7 +182,7 @@ public class AsyncGeneratorStateMachine
         foreach (var varName in ScanResult.LocalVariables)
         {
             var value = Manager.GetAny(new LangId(varName));
-            if (value != null)
+            if (value is not null)
             {
                 Locals[varName] = value;
             }

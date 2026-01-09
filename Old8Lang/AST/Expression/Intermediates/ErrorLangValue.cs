@@ -140,7 +140,7 @@ public partial class ErrorLangValue(Old8Exception value) : LangValueType
                 case "Position":
                     return new StringLangValue(Position);
                 case "Suggestion":
-                    return Suggestion != null ? new StringLangValue(Suggestion) : new NullLangValue();
+                    return Suggestion is not null ? new StringLangValue(Suggestion) : new NullLangValue();
                 case "Timestamp":
                     return new StringLangValue(Timestamp.ToString(CultureInfo.InvariantCulture));
                 case "RequestId":

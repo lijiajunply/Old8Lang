@@ -18,7 +18,7 @@ public static class ThreadValueFuncStatic
         /// <returns>新的 ThreadLangValue</returns>
         public ThreadLangValue Then(FuncLangValue continuation)
         {
-            if (thread.ExternalManager == null)
+            if (thread.ExternalManager is null)
             {
                 throw new InvalidOperationError(thread.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
             }

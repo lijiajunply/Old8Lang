@@ -85,7 +85,7 @@ public class VariableWatcher
     public bool RemoveWatch(string expression)
     {
         var watch = WatchedVariables.FirstOrDefault(w => w.Expression == expression);
-        if (watch != null)
+        if (watch is not null)
         {
             return WatchedVariables.Remove(watch);
         }
@@ -123,7 +123,7 @@ public class VariableWatcher
     public bool SetWatchEnabled(string expression, bool enabled)
     {
         var watch = WatchedVariables.FirstOrDefault(w => w.Expression == expression);
-        if (watch != null)
+        if (watch is not null)
         {
             watch.IsEnabled = enabled;
             return true;

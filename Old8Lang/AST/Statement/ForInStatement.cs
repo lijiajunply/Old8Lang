@@ -27,7 +27,7 @@ public partial class ForInStatement(
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -74,7 +74,7 @@ public partial class ForInStatement(
                         // 使用asyncGenerator.NextValue作为当前值
                         var currentValue = asyncGenerator.NextValue;
 
-                        if (currentValue != null && currentValue is not VoidLangValue)
+                        if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
                             manager.Set(id, currentValue);
@@ -123,7 +123,7 @@ public partial class ForInStatement(
                         // 使用asyncStream.NextValue作为当前值
                         var currentValue = asyncStream.NextValue;
 
-                        if (currentValue != null && currentValue is not VoidLangValue)
+                        if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
                             manager.Set(id, currentValue);
@@ -172,7 +172,7 @@ public partial class ForInStatement(
                         // 使用generator.NextValue作为当前值
                         var currentValue = generator.NextValue;
 
-                        if (currentValue != null && currentValue is not VoidLangValue)
+                        if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
                             // 多个标识符的情况，只赋值给第一个
@@ -472,7 +472,7 @@ public partial class ForInStatement(
             {
                 var currentValue = asyncGenerator.NextValue;
 
-                if (currentValue != null && currentValue is not VoidLangValue)
+                if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(id, currentValue);
                     body.Run(manager);
@@ -512,7 +512,7 @@ public partial class ForInStatement(
             {
                 var currentValue = asyncStream.NextValue;
 
-                if (currentValue != null && currentValue is not VoidLangValue)
+                if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(id, currentValue);
                     body.Run(manager);
@@ -586,7 +586,7 @@ public partial class ForInStatement(
                 {
                     var currentValue = generator.NextValue;
 
-                    if (currentValue != null && currentValue is not VoidLangValue)
+                    if (currentValue is not null && currentValue is not VoidLangValue)
                     {
                         manager.Set(id, currentValue);
                         body.Run(manager);
@@ -686,7 +686,7 @@ public partial class ForInStatement(
 
         // 尝试确定元素类型并进行类型转换
         var exprType = expression.OutputType(local);
-        if (exprType != null)
+        if (exprType is not null)
         {
             // 如果是数组类型
             if (exprType.IsArray && exprType.GetElementType() == typeof(int))

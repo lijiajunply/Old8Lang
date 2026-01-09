@@ -15,7 +15,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
     public override void Run(VariateManager manager)
     {
         // 检查是否使用新的生成器架构
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             // 新架构：标准 while 循环，生成器断点由 BlockStatement 处理
             RunWithGeneratorContext(manager);

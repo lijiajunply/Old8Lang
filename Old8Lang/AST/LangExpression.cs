@@ -77,7 +77,7 @@ public abstract class LangExpression : IOldLangTree
 
         // 先声明变量，确保在使用前已经存在
         var localVar = local.GetLocalVar(idName);
-        if (localVar != null)
+        if (localVar is not null)
         {
             if (localVar.LocalType != valueType)
             {

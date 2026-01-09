@@ -329,7 +329,7 @@ public class ProfilingSession
     /// <summary>
     /// 是否正在运行
     /// </summary>
-    public bool IsActive => EndTime == null;
+    public bool IsActive => EndTime is null;
     
     /// <summary>
     /// 结束会话

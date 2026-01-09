@@ -23,14 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/ILGenerationCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/SymbolTableCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/TokenIndexCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/性能优化报告-2026-01-09.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -910,7 +906,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="571" />
+    <option name="localTasksCounter" value="572" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -937,7 +933,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
     <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
     <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
     <MESSAGE value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
@@ -962,7 +957,8 @@
     <MESSAGE value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
     <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
     <MESSAGE value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
+    <MESSAGE value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

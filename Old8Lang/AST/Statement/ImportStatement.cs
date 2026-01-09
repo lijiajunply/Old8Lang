@@ -144,13 +144,13 @@ public partial class ImportStatement(
 
         if (!result.IsSuccess)
         {
-            if (result.Error != null)
+            if (result.Error is not null)
             {
                 throw result.Error;
             }
 
             // 使用 ModuleResolutionResult 提供详细错误信息
-            if (result.ResolutionResult != null)
+            if (result.ResolutionResult is not null)
             {
                 throw new ImportError(this, moduleName, result.ResolutionResult);
             }
@@ -199,13 +199,13 @@ public partial class ImportStatement(
                 parentScope[specifier.Alias] = value;
             }
             // 尝试从模块的导入信息中查找函数和类（优先使用）
-            else if (moduleImportInfos != null && TryFindInImportInfos(moduleImportInfos, specifier.Name, out value))
+            else if (moduleImportInfos is not null && TryFindInImportInfos(moduleImportInfos, specifier.Name, out value))
             {
                 // 将指定成员添加到父作用域，支持重命名
                 parentScope[specifier.Alias] = value!;
             }
             // 最后从全局导入信息中查找
-            else if ((value = manager.GetValue(new LangId(specifier.Name))) != null)
+            else if ((value = manager.GetValue(new LangId(specifier.Name))) is not null)
             {
                 // 将指定成员添加到父作用域，支持重命名
                 parentScope[specifier.Alias] = value;
@@ -242,7 +242,7 @@ public partial class ImportStatement(
                 _ => false
             };
         });
-        return value != null;
+        return value is not null;
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class ImportStatement(
     /// <param name="module">模块对象</param>
     private void RegisterModule(VariateManager manager, string moduleName, LangValueType? module)
     {
-        if (module == null)
+        if (module is null)
             return;
 
         if (FromClause)
@@ -268,7 +268,7 @@ public partial class ImportStatement(
                 foreach (var symbolName in symbolNames)
                 {
                     var symbolValue = moduleValue.GetSymbol(symbolName);
-                    if (symbolValue != null)
+                    if (symbolValue is not null)
                     {
                         manager.Scopes[^1][symbolName] = symbolValue;
                     }
@@ -279,7 +279,7 @@ public partial class ImportStatement(
                 manager.RemoveChildren();
             }
         }
-        else if (ModuleAlias != null)
+        else if (ModuleAlias is not null)
         {
             // 带别名的导入：import Module as Alias
             manager.Scopes[^1][ModuleAlias] = module;
@@ -366,7 +366,7 @@ public partial class ImportStatement(
         var block = local.Interpreter?.Build(code: code);
 
         // 缓存模块
-        if (block != null && local.Interpreter != null)
+        if (block is not null && local.Interpreter is not null)
         {
             local.Interpreter.ModuleCache[moduleAbsolutePath] = block;
         }
@@ -422,7 +422,7 @@ public partial class ImportStatement(
     private void RegisterModuleValue(UnifiedModule moduleValue, VariateManager manager)
     {
         ArgumentNullException.ThrowIfNull(moduleValue);
-        if (ModuleAlias != null)
+        if (ModuleAlias is not null)
         {
             manager.Scopes[^1][ModuleAlias] = moduleValue; // 带别名的导入：使用别名注册
         }
@@ -449,7 +449,7 @@ public partial class ImportStatement(
                 {
                     var symbolName = specifier.Alias;
                     var symbol = moduleValue.GetSymbol(specifier.Name);
-                    if (symbol != null)
+                    if (symbol is not null)
                     {
                         manager.Scopes[^1][symbolName] = symbol;
                     }
@@ -461,7 +461,7 @@ public partial class ImportStatement(
                 }
             }
         }
-        else if (!FromClause && ModuleAlias == null && IsLazy)
+        else if (!FromClause && ModuleAlias is null && IsLazy)
         {
             // 通配符懒导入：lazy import "module" (无别名、无 from 子句)
             // 将所有符号以代理形式注册到当前作用域
@@ -595,7 +595,7 @@ public partial class ImportStatement(
             }
             else
             {
-                if (alias != null)
+                if (alias is not null)
                 {
                     var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
                     manager.Scopes[^1][alias] = moduleObj;
@@ -637,7 +637,7 @@ public partial class ImportStatement(
             {
                 block.Run(manager);
 
-                if (alias != null)
+                if (alias is not null)
                 {
                     var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
                     manager.Scopes[^1][alias] = moduleObj;
@@ -679,7 +679,7 @@ public partial class ImportStatement(
             return $"{prefix}{(IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString)}";
         }
 
-        if (ModuleAlias != null)
+        if (ModuleAlias is not null)
         {
             var prefix = IsDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
             var modulePart = IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString;
@@ -698,7 +698,7 @@ public partial class ImportStatement(
     /// <exception cref="ImportError">当动态导入失败时抛出</exception>
     private void HandleDynamicImport(VariateManager manager)
     {
-        if (DynamicModuleExpression == null)
+        if (DynamicModuleExpression is null)
         {
             throw new ImportError(this, ImportString, "Dynamic import expression is null");
         }

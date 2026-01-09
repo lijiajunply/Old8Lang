@@ -16,7 +16,7 @@ public class ModuleLoadResult
     /// <summary>
     /// 是否成功
     /// </summary>
-    public bool IsSuccess => Block != null && Error == null;
+    public bool IsSuccess => Block is not null && Error is null;
 
     /// <summary>
     /// 错误信息（如果加载失败）
@@ -129,7 +129,7 @@ public class ModuleLoader(CacheManager? cacheManager = null)
 
             // 查找入口文件
             var entryFile = FindDirectoryEntryFile(directoryPath);
-            if (entryFile != null)
+            if (entryFile is not null)
             {
                 return LoadModule(entryFile, manager);
             }

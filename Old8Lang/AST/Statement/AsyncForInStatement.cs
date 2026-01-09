@@ -32,7 +32,7 @@ public partial class AsyncForInStatement(
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -86,7 +86,7 @@ public partial class AsyncForInStatement(
                         // 使用asyncStream.NextValue作为当前值
                         var currentValue = asyncStream.NextValue;
 
-                        if (currentValue != null && !(currentValue is VoidLangValue))
+                        if (currentValue is not null && !(currentValue is VoidLangValue))
                         {
                             // 赋值给标识符
                             if (AllIds.Count == 1)
@@ -164,7 +164,7 @@ public partial class AsyncForInStatement(
                         // 使用asyncGenerator.NextValue作为当前值
                         var currentValue = asyncGenerator.NextValue;
 
-                        if (currentValue != null && !(currentValue is VoidLangValue))
+                        if (currentValue is not null && !(currentValue is VoidLangValue))
                         {
                             // 赋值给标识符
                             if (AllIds.Count == 1)
@@ -226,7 +226,7 @@ public partial class AsyncForInStatement(
                     {
                         var currentValue = generator.NextValue;
 
-                        if (currentValue != null && !(currentValue is VoidLangValue))
+                        if (currentValue is not null && !(currentValue is VoidLangValue))
                         {
                             if (AllIds.Count == 1)
                             {
@@ -337,7 +337,7 @@ public partial class AsyncForInStatement(
             }
 
             // 如果缓存中没有，则evaluate表达式并缓存
-            if (value == null)
+            if (value is null)
             {
                 value = expression.Run(manager);
 
@@ -441,7 +441,7 @@ public partial class AsyncForInStatement(
                 {
                     var currentValue = asyncStream.NextValue;
 
-                    if (currentValue != null && !(currentValue is VoidLangValue))
+                    if (currentValue is not null && !(currentValue is VoidLangValue))
                     {
                         // 设置循环变量
                         if (AllIds.Count == 1)
@@ -566,7 +566,7 @@ public partial class AsyncForInStatement(
                 {
                     var currentValue = asyncGenerator.NextValue;
 
-                    if (currentValue != null && !(currentValue is VoidLangValue))
+                    if (currentValue is not null && !(currentValue is VoidLangValue))
                     {
                         // 恢复外层的 GeneratorContext，以便执行循环体
                         manager.GeneratorContext = outerContext;

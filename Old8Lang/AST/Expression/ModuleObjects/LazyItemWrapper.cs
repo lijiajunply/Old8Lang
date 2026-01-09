@@ -71,7 +71,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <returns>是否包含符号</returns>
     public bool HasSymbol(string symbolName)
     {
-        return string.Equals(symbolName, itemName, StringComparison.OrdinalIgnoreCase) && GetSymbol(symbolName) != null;
+        return string.Equals(symbolName, itemName, StringComparison.OrdinalIgnoreCase) && GetSymbol(symbolName) is not null;
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
             LoadItem();
         }
 
-        return LoadedItem != null ? [itemName] : [];
+        return LoadedItem is not null ? [itemName] : [];
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
             LoadItem();
         }
 
-        if (LoadedItem != null)
+        if (LoadedItem is not null)
         {
             return LoadedItem.Dot(dotExpression, currentManager);
         }

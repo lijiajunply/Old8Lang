@@ -118,7 +118,7 @@ public class ScopeLayer
         var result = new Dictionary<string, LangValueType>();
 
         // 先复制基础作用域
-        if (BaseScope != null)
+        if (BaseScope is not null)
         {
             foreach (var (key, value) in BaseScope)
             {
@@ -127,7 +127,7 @@ public class ScopeLayer
         }
 
         // 再应用差异层（覆盖同名变量）
-        if (DeltaScope != null)
+        if (DeltaScope is not null)
         {
             foreach (var (key, value) in DeltaScope)
             {
@@ -154,7 +154,7 @@ public class ScopeLayer
     /// <summary>
     /// 是否有写入操作（差异层是否非空）
     /// </summary>
-    public bool HasWrites => DeltaScope != null && DeltaScope.Count > 0;
+    public bool HasWrites => DeltaScope is not null && DeltaScope.Count > 0;
 
     /// <summary>
     /// 扁平化：将差异层合并到基础作用域，返回新的独立字典

@@ -68,7 +68,7 @@ public partial class SwitchStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var labelEnd = ilGenerator.DefineLabel();
-        var defaultLabel = defaultBlockStatement != null ? ilGenerator.DefineLabel() : labelEnd;
+        var defaultLabel = defaultBlockStatement is not null ? ilGenerator.DefineLabel() : labelEnd;
 
         // 保存switch表达式的值到局部变量
         switchExpression.LoadIlValue(ilGenerator, local);
@@ -145,12 +145,12 @@ public partial class SwitchStatement(
                     var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]);
 
                     // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
-                    if (equalsMethod == null)
+                    if (equalsMethod is null)
                     {
                         equalsMethod = switchValueType.GetMethod("Equals", [typeof(object)]);
                     }
 
-                    if (equalsMethod != null)
+                    if (equalsMethod is not null)
                     {
                         ilGenerator.Emit(OpCodes.Call, equalsMethod);
                     }
@@ -195,7 +195,7 @@ public partial class SwitchStatement(
         }
 
         // 生成default块
-        if (defaultBlockStatement != null)
+        if (defaultBlockStatement is not null)
         {
             ilGenerator.MarkLabel(defaultLabel);
             defaultBlockStatement.GenerateIl(ilGenerator, local);

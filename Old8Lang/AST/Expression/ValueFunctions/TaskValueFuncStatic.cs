@@ -18,7 +18,7 @@ public static class TaskValueFuncStatic
         /// <returns>新的 TaskLangValue</returns>
         public TaskLangValue Then(FuncLangValue continuation)
         {
-            if (task.ExternalManager == null)
+            if (task.ExternalManager is null)
             {
                 throw new InvalidOperationError(task.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
             }
@@ -61,7 +61,7 @@ public static class TaskValueFuncStatic
         /// <returns>带重试机制的 TaskLangValue</returns>
         public TaskLangValue Retry(IntLangValue retryCount, IntLangValue? delayMs = null)
         {
-            if (task.ExternalManager == null)
+            if (task.ExternalManager is null)
             {
                 throw new InvalidOperationError(task.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
             }
@@ -76,7 +76,7 @@ public static class TaskValueFuncStatic
         /// <returns>新的 TaskLangValue</returns>
         public TaskLangValue ContinueWith(FuncLangValue continuation)
         {
-            if (task.ExternalManager == null)
+            if (task.ExternalManager is null)
             {
                 throw new InvalidOperationError(task.Position, "ContinueWith 方法需要有效的执行上下文（ExternalManager）");
             }

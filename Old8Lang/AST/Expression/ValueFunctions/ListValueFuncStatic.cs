@@ -435,7 +435,7 @@ public static class ListValueFuncStatic
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
-            var isLambda = action.Id == null && action.Method == null;
+            var isLambda = action.Id is null && action.Method is null;
 
             if (isLambda)
             {
@@ -457,7 +457,7 @@ public static class ListValueFuncStatic
                         if (action.Ids?.Count == 1)
                         {
                             var paramId = action.Ids[0];
-                            if (paramId != null)
+                            if (paramId is not null)
                             {
                                 manager.Set(paramId, item);
                             }
@@ -466,7 +466,7 @@ public static class ListValueFuncStatic
                         {
                             // 如果有多个参数，将 item 作为第一个参数
                             var firstParamId = action.Ids[0];
-                            if (firstParamId != null)
+                            if (firstParamId is not null)
                             {
                                 manager.Set(firstParamId, item);
                             }
@@ -586,7 +586,7 @@ public static class ListValueFuncStatic
         /// <returns>连接后的字符串</returns>
         public StringLangValue Join(StringLangValue separator)
         {
-            if (langValue == null)
+            if (langValue is null)
             {
                 throw new ArgumentNullException(nameof(langValue), "字符串数组不能为空");
             }

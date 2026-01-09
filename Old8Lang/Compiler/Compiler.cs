@@ -267,7 +267,7 @@ public static class Compiler
             // 仅在调试模式下输出完整堆栈跟踪
             if (CurrentLogLevel >= LogLevel.Debug)
             {
-                if (ex.StackTrace != null)
+                if (ex.StackTrace is not null)
                 {
                     LogFormat("堆栈跟踪: {0}", LogLevel.Error, ex.StackTrace);
                 }
@@ -286,7 +286,7 @@ public static class Compiler
                     }
                 }
 
-                if (invalidOpError.Suggestion != null)
+                if (invalidOpError.Suggestion is not null)
                 {
                     LogFormat("建议: {0}", LogLevel.Error, invalidOpError.Suggestion);
                 }
@@ -337,7 +337,7 @@ public static class Compiler
             // 仅在调试模式下输出完整堆栈跟踪
             if (CurrentLogLevel >= LogLevel.Debug)
             {
-                if (ex.StackTrace != null)
+                if (ex.StackTrace is not null)
                 {
                     LogFormat("堆栈跟踪: {0}", LogLevel.Error, ex.StackTrace);
                 }
@@ -356,7 +356,7 @@ public static class Compiler
                     }
                 }
 
-                if (syntaxError.Suggestion != null)
+                if (syntaxError.Suggestion is not null)
                 {
                     LogFormat("建议: {0}", LogLevel.Error, syntaxError.Suggestion);
                 }

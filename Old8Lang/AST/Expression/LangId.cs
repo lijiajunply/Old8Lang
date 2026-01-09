@@ -89,13 +89,13 @@ public partial class LangId(
         if (IdName == "this")
         {
             // 直接从变量储存器中获取名为"this"的变量
-            if (manager == null)
+            if (manager is null)
             {
                 throw new NameError(this, "this");
             }
 
             var thisValue = manager.GetValue(new LangId("this"));
-            if (thisValue != null)
+            if (thisValue is not null)
             {
                 return thisValue;
             }
@@ -105,17 +105,17 @@ public partial class LangId(
         }
 
         // 先尝试获取普通变量
-        if (manager != null!)
+        if (manager is not null)
         {
             var value = manager.GetValue(this);
-            if (value != null)
+            if (value is not null)
             {
                 return value;
             }
 
             // 如果不是普通变量，尝试获取类或函数
             var anyValue = manager.GetAny(this);
-            if (anyValue != null)
+            if (anyValue is not null)
             {
                 return anyValue as LangValueType ?? throw new NameError(this, IdName);
             }
@@ -205,10 +205,10 @@ public partial class LangId(
 
                 // 首先尝试使用泛型类型解析器解析泛型参数
                 Type argType;
-                if (local.CurrentGenericTypeResolver != null)
+                if (local.CurrentGenericTypeResolver is not null)
                 {
                     var resolvedType = local.CurrentGenericTypeResolver.ResolveType(genericArg);
-                    if (resolvedType != null)
+                    if (resolvedType is not null)
                     {
                         argType = resolvedType;
                     }
@@ -253,10 +253,10 @@ public partial class LangId(
             }
 
             // 首先尝试使用泛型类型解析器
-            if (local.CurrentGenericTypeResolver != null)
+            if (local.CurrentGenericTypeResolver is not null)
             {
                 var resolvedType = local.CurrentGenericTypeResolver.ResolveType(typeName);
-                if (resolvedType != null)
+                if (resolvedType is not null)
                 {
                     return resolvedType;
                 }
@@ -280,19 +280,19 @@ public partial class LangId(
         }
 
         // 如果没有显式类型注解，但有默认值，从默认值推断类型
-        if (DefaultValue != null)
+        if (DefaultValue is not null)
         {
             return DefaultValue.OutputType(local) ?? typeof(object);
         }
 
-        if (local.InClassEnv != null && IdName == "this")
+        if (local.InClassEnv is not null && IdName == "this")
         {
             // 如果InClassEnv是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
             return local.InClassEnv is TypeBuilder ? typeof(object) : local.InClassEnv;
         }
 
         var value = local.GetLocalVar(IdName);
-        if (value != null)
+        if (value is not null)
         {
             return value.LocalType;
         }

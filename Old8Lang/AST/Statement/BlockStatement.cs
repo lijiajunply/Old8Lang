@@ -55,7 +55,7 @@ public partial class BlockStatement : OldStatement
     public override void Run(VariateManager manager)
     {
         // 检查是否有生成器上下文，决定执行模式
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -306,7 +306,7 @@ public partial class BlockStatement : OldStatement
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
-            if (id == null! || expr == null!) continue;
+            if (id is null || expr is null) continue;
             // 只添加非静态成员
             if (!id.HasModifier(AccessModifierType.Static))
             {
@@ -353,7 +353,7 @@ public partial class BlockStatement : OldStatement
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
-            if (id == null! || expr == null!) continue;
+            if (id is null || expr is null) continue;
             // 只添加静态成员
             if (id.HasModifier(AccessModifierType.Static))
             {
@@ -393,7 +393,7 @@ public partial class BlockStatement : OldStatement
         switch (a)
         {
             case SetStatement statement:
-                if (statement.Id == null) return (null, null);
+                if (statement.Id is null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
                 var memberId1 = statement.Id as ClassMemberId ?? new ClassMemberId(statement.Id);
                 return (id: memberId1, Expr: statement.Value);
@@ -401,7 +401,7 @@ public partial class BlockStatement : OldStatement
                 // 直接使用 ClassFieldSetStatement 中的 ClassMemberId
                 return (id: classFieldSet.Id, Expr: classFieldSet.Value);
             case FuncInit init:
-                if (init.FuncLangValue.Id == null) return (null, null);
+                if (init.FuncLangValue.Id is null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
                 var memberId2 = init.FuncLangValue.Id as ClassMemberId ?? new ClassMemberId(init.FuncLangValue.Id);
                 return (memberId2, Expr: init.FuncLangValue);

@@ -147,7 +147,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
 
     public override string ToString() =>
         RunResult.Length == 0 ? "[]" :
-        RunResult.Length > 0 && RunResult[0] == null! ? $"[{string.Join(", ", Values)}]" :
+        RunResult.Length > 0 && RunResult[0] is null ? $"[{string.Join(", ", Values)}]" :
         $"[{string.Join(", ", RunResult)}]"; // Old8Lang 风格的数组，使用 [ ] 包裹
 
     public override object GetValue() => Apis.ListToObjects(RunResult.ToList());
@@ -262,7 +262,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
             {
                 // 否则，使用RunResult[i]，但要确保它不为null
                 var item = RunResult[i];
-                if (item == null!)
+                if (item is null)
                 {
                     // 如果item为null，加载一个null值
                     ilGenerator.Emit(OpCodes.Ldnull);

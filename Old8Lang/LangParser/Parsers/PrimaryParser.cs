@@ -873,7 +873,7 @@ public class PrimaryParser(
         var firstElement = ParseTupleElementWithOptionalName(out string? firstName);
         elements.Add(firstElement);
         fieldNames.Add(firstName);
-        if (firstName != null) hasAnyFieldName = true;
+        if (firstName is not null) hasAnyFieldName = true;
 
         // 检查是否有逗号
         bool hasComma = CurrentToken.Type == LangTokenType.Comma;
@@ -893,7 +893,7 @@ public class PrimaryParser(
             var element = ParseTupleElementWithOptionalName(out string? fieldName);
             elements.Add(element);
             fieldNames.Add(fieldName);
-            if (fieldName != null) hasAnyFieldName = true;
+            if (fieldName is not null) hasAnyFieldName = true;
         }
 
         // 必须是右括号，否则抛出语法错误
@@ -1005,9 +1005,6 @@ public class PrimaryParser(
                 var i = 0;
                 var len = stringValue.Length;
 
-                // Debug: 打印完整的字符串内容
-                // System.Console.WriteLine($"Debug: 字符串模板完整内容: '{stringValue}', 长度: {len}");
-
                 while (i < len)
                 {
                     var c = stringValue[i];
@@ -1037,15 +1034,11 @@ public class PrimaryParser(
                             {
                                 c = stringValue[i];
 
-                                // Debug: 详细跟踪
-                                // System.Console.WriteLine($"Debug: i={i}, c='{c}', braceCount={braceCount}, inString={inString}");
-
                                 // 处理字符串中的引号
                                 if (!inString && (c == '"' || c == '\''))
                                 {
                                     inString = true;
                                     stringChar = c;
-                                    // System.Console.WriteLine($"Debug: 进入字符串模式, stringChar='{stringChar}'");
                                     i++;
                                     continue;
                                 }
@@ -1099,8 +1092,6 @@ public class PrimaryParser(
                             {
                                 // 提取表达式字符串
                                 var exprStr = stringValue.Substring(exprStart, i - exprStart).Trim();
-                                // Debug: 打印提取的表达式
-                                // System.Console.WriteLine($"Debug: 提取到表达式: '{exprStr}'");
 
                                 // 检查表达式是否为空
                                 if (string.IsNullOrWhiteSpace(exprStr))
@@ -1136,9 +1127,6 @@ public class PrimaryParser(
                             else
                             {
                                 // 未找到匹配的 }，抛出语法错误
-                                // Debug: 打印详细信息
-                                // System.Console.WriteLine($"Debug: 未找到匹配的大括号, exprStart={exprStart}, i={i}, len={len}, braceCount={braceCount}");
-                                // System.Console.WriteLine($"Debug: 字符串片段: '{stringValue.Substring(exprStart, Math.Min(i - exprStart + 20, stringValue.Length - exprStart))}'");
                                 throw CreateSyntaxError("字符串模板中缺少匹配的右大括号 '}'");
                             }
                         }
@@ -1864,7 +1852,7 @@ public class PrimaryParser(
             var nextTokenType = CurrentToken.Type;
 
             // 检查外层标识符是否是明确的类型名
-            var outerIsTypeName = outerIdentifier != null &&
+            var outerIsTypeName = outerIdentifier is not null &&
                                   (char.IsUpper(outerIdentifier[0]) || IsBuiltInTypeName(outerIdentifier));
 
             // 强泛型证据：这些模式只能是泛型，不可能是比较运算符

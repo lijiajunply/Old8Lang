@@ -104,7 +104,7 @@ public class FileHeaderDirectives
     public bool GetBoolDirective(string name, bool defaultValue = false)
     {
         var value = GetDirective(name);
-        if (value == null) return defaultValue;
+        if (value is null) return defaultValue;
 
         return value.ToLower() switch
         {
@@ -124,7 +124,7 @@ public class FileHeaderDirectives
     public int GetIntDirective(string name, int defaultValue = 0)
     {
         var value = GetDirective(name);
-        if (value == null) return defaultValue;
+        if (value is null) return defaultValue;
 
         return int.TryParse(value, out var result) ? result : defaultValue;
     }

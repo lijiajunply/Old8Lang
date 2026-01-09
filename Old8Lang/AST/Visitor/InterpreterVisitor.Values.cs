@@ -105,7 +105,7 @@ public partial class InterpreterVisitor
     {
         var field = typeof(ListLangValue).GetField("HasBeenCleared",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        return field != null && (bool)field.GetValue(list)!;
+        return field is not null && (bool)field.GetValue(list)!;
     }
 
     /// <summary>

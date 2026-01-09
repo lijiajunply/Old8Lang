@@ -86,7 +86,7 @@ public class ModuleSystemService
             result.IsSuccess = true;
 
             // 注册到作用域
-            if (options.ModuleAlias != null)
+            if (options.ModuleAlias is not null)
             {
                 _symbolRegistry.RegisterModule(manager, options.ModuleAlias, stdModule);
             }
@@ -114,7 +114,7 @@ public class ModuleSystemService
     {
         // 下载模块
         var localPath = _networkLoader.DownloadModule(url);
-        if (localPath == null)
+        if (localPath is null)
         {
             result.Error = new ImportError(default, url, "网络模块下载失败");
             return result;
@@ -145,7 +145,7 @@ public class ModuleSystemService
 
         // 加载模块（不会执行，只解析）
         var loadResult = _loader.LoadModule(modulePath, manager);
-        if (!loadResult.IsSuccess || loadResult.Block == null)
+        if (!loadResult.IsSuccess || loadResult.Block is null)
         {
             result.Error = loadResult.Error ?? new ImportError(default, modulePath, "模块加载失败");
             return result;
@@ -158,7 +158,7 @@ public class ModuleSystemService
         if (loadResult.IsFromCache && manager.Interpreter.ModuleCache.ContainsKey(absolutePath))
         {
             // 缓存的模块已经执行过，只需要注册符号
-            if (options.ModuleAlias != null)
+            if (options.ModuleAlias is not null)
             {
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                 var cachedSymbols = _symbolExtractor.ExtractSymbols(manager);
@@ -191,7 +191,7 @@ public class ModuleSystemService
                     var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
 
                     // 判断是否是通配符导入（没有指定导入符号列表）
-                    var isWildcardImport = options.ImportSpecifiers == null || options.ImportSpecifiers.Count == 0;
+                    var isWildcardImport = options.ImportSpecifiers is null || options.ImportSpecifiers.Count == 0;
 
                     // 如果是通配符导入，将作用域中的常量包装为 ConstantLangValue 并添加到 ImportInfos
                     if (isWildcardImport)
@@ -201,7 +201,7 @@ public class ModuleSystemService
 
                     // 提取符号 - 使用限定范围的 ImportInfos
                     var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                    var symbols = options.ImportSpecifiers != null && options.ImportSpecifiers.Count > 0
+                    var symbols = options.ImportSpecifiers is not null && options.ImportSpecifiers.Count > 0
                         ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName,
                             newImportInfos)
                         : _symbolExtractor.ExtractSymbols(manager);
@@ -231,7 +231,7 @@ public class ModuleSystemService
                     manager.RemoveChildren();
                 }
             }
-            else if (options.ModuleAlias != null)
+            else if (options.ModuleAlias is not null)
             {
                 // 带别名的导入: import "module" as alias
                 // 直接在当前作用域执行模块代码，这样函数可以访问模块变量

@@ -28,19 +28,19 @@ public class FuncRunStatement : OldStatement
 
     public override void Run(VariateManager manager)
     {
-        if (AwaitExpr != null)
+        if (AwaitExpr is not null)
         {
             AwaitExpr.Run(manager);
             return;
         }
 
-        if (GenericInstance != null)
+        if (GenericInstance is not null)
         {
             GenericInstance.Run(manager);
             return;
         }
 
-        if (Operation == null)
+        if (Operation is null)
         {
             Instance?.Run(manager);
             return;
@@ -51,7 +51,7 @@ public class FuncRunStatement : OldStatement
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        if (AwaitExpr != null)
+        if (AwaitExpr is not null)
         {
             AwaitExpr.LoadIlValue(ilGenerator, local);
             // 销毁栈上的值
@@ -60,9 +60,9 @@ public class FuncRunStatement : OldStatement
             return;
         }
 
-        if (Operation == null)
+        if (Operation is null)
         {
-            if (Instance == null) return;
+            if (Instance is null) return;
             var outputType = Instance.OutputType(local);
             Instance.LoadIlValue(ilGenerator, local);
             // 销毁栈上的值
@@ -81,9 +81,9 @@ public class FuncRunStatement : OldStatement
     public override int Count => 0;
 
     public override string? ToString() =>
-        AwaitExpr != null ? AwaitExpr.ToString() :
-        GenericInstance != null ? GenericInstance.ToString() :
-        Instance == null ? Operation == null ? "" : Operation.ToString() : Instance.ToString();
+        AwaitExpr is not null ? AwaitExpr.ToString() :
+        GenericInstance is not null ? GenericInstance.ToString() :
+        Instance is null ? Operation is null ? "" : Operation.ToString() : Instance.ToString();
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {

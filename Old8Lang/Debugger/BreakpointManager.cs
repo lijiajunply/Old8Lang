@@ -185,7 +185,7 @@ public class BreakpointManager
                         if (breakpoint.Type == BreakpointType.Conditional &&
                             !string.IsNullOrEmpty(breakpoint.Condition))
                         {
-                            if (manager != null && EvaluateCondition(breakpoint.Condition, manager))
+                            if (manager is not null && EvaluateCondition(breakpoint.Condition, manager))
                             {
                                 breakpoint.HitCount++;
                                 return breakpoint;
@@ -231,12 +231,12 @@ public class BreakpointManager
             {
                 var varName = condition[1..].Trim();
                 var value = manager.GetValue(new LangId(varName));
-                return value == null || value.ToString() == "false" || value.ToString() == "";
+                return value is null || value.ToString() == "false" || value.ToString() == "";
             }
             else
             {
                 var value = manager.GetValue(new LangId(condition));
-                return value != null && value.ToString() != "false" && value.ToString() != "";
+                return value is not null && value.ToString() != "false" && value.ToString() != "";
             }
         }
         catch

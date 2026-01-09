@@ -91,12 +91,12 @@ public static class StandardLibraryLoader
             var assembly = libInfo.GetAssembly();
 
             // 验证类型是否存在
-            if (libInfo.ImportMode == StandardLibraryImportMode.Types && libInfo.TypeConfigs != null)
+            if (libInfo.ImportMode == StandardLibraryImportMode.Types && libInfo.TypeConfigs is not null)
             {
                 foreach (var typeConfig in libInfo.TypeConfigs)
                 {
                     var type = typeConfig.Type;
-                    if (type == null)
+                    if (type is null)
                     {
                         errorMessage = $"标准库 '{libraryName}' 中找不到指定的类型";
                         return false;
@@ -132,7 +132,7 @@ public static class StandardLibraryLoader
             var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies()
                 .FirstOrDefault(a => a.GetName().Name == assemblyName);
 
-            if (loadedAssembly != null)
+            if (loadedAssembly is not null)
             {
                 LoadedAssemblies[assemblyName] = loadedAssembly;
                 return loadedAssembly;
@@ -169,7 +169,7 @@ public static class StandardLibraryLoader
 
         // 获取程序集中所有公共类型
         var types = assembly.GetExportedTypes()
-            .Where(t => t.Namespace != null && t.Namespace.StartsWith(rootNamespace!))
+            .Where(t => t.Namespace is not null && t.Namespace.StartsWith(rootNamespace!))
             .ToList();
 
         if (libInfo.EnableSubNamespaceImport)
@@ -257,7 +257,7 @@ public static class StandardLibraryLoader
     {
         var symbols = new Dictionary<string, LangValueType>();
 
-        if (libInfo.TypeConfigs == null)
+        if (libInfo.TypeConfigs is null)
             return symbols;
 
         foreach (var typeConfig in libInfo.TypeConfigs)

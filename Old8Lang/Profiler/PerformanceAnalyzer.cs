@@ -109,7 +109,7 @@ public class PerformanceAnalyzer
     /// <returns>性能瓶颈列表</returns>
     public List<PerformanceBottleneck> AnalyzeSession(ProfilingSession session)
     {
-        if (session == null)
+        if (session is null)
             throw new ArgumentNullException(nameof(session));
 
         var bottlenecks = new List<PerformanceBottleneck>();

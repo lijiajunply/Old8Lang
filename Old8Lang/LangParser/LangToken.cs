@@ -124,7 +124,7 @@ public static class LangTokenizer
         TokenizeWithDirectivesAndDocs(string code, PreprocessorSymbols? preprocessorSymbols)
     {
         // 0. 如果提供了预编译符号管理器，先处理预编译指令
-        if (preprocessorSymbols != null)
+        if (preprocessorSymbols is not null)
         {
             var preprocessor = new PreprocessorTokenizer(code, preprocessorSymbols);
             code = preprocessor.Process();

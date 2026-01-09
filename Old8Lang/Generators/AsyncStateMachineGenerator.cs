@@ -79,12 +79,12 @@ public class AsyncStateMachineGenerator
         else if (expression is Operation op)
         {
             // 递归检查操作符表达式的左右操作数
-            if (op.Left != null)
+            if (op.Left is not null)
             {
                 IdentifyAwaitInExpression(op.Left, position);
             }
 
-            if (op.Right != null)
+            if (op.Right is not null)
             {
                 IdentifyAwaitInExpression(op.Right, position);
             }

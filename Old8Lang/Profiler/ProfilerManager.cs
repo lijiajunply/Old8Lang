@@ -61,7 +61,7 @@ public class ProfilerManager
     {
         lock (_lockObject)
         {
-            if (!IsProfiling || Collector == null || _currentSession == null)
+            if (!IsProfiling || Collector is null || _currentSession is null)
             {
                 throw new InvalidOperationException("当前没有正在进行的性能分析会话");
             }
@@ -84,7 +84,7 @@ public class ProfilerManager
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionStart(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordFunctionStart(functionName, sourceFile, lineNumber);
         }
@@ -98,7 +98,7 @@ public class ProfilerManager
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionEnd(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordFunctionEnd(functionName, sourceFile, lineNumber);
         }
@@ -114,7 +114,7 @@ public class ProfilerManager
     public void RecordStatementExecution(string statementType, double executionTimeMs, string? sourceFile = null,
         int? lineNumber = null)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordStatementExecution(statementType, executionTimeMs, sourceFile, lineNumber);
         }
@@ -126,7 +126,7 @@ public class ProfilerManager
     /// <param name="parseTimeMs">解析时间（毫秒）</param>
     public void RecordParsingTime(double parseTimeMs)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordParsingTime(parseTimeMs);
         }
@@ -138,7 +138,7 @@ public class ProfilerManager
     /// <param name="compilationTimeMs">编译时间（毫秒）</param>
     public void RecordCompilationTime(double compilationTimeMs)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordCompilationTime(compilationTimeMs);
         }
@@ -153,7 +153,7 @@ public class ProfilerManager
     /// <param name="tags">标签</param>
     public void RecordCustomData(string name, double value, string unit = "", Dictionary<string, string>? tags = null)
     {
-        if (Collector != null)
+        if (Collector is not null)
         {
             Collector.RecordCustomData(name, value, unit, tags);
         }
@@ -166,7 +166,7 @@ public class ProfilerManager
     /// <returns>报告文本</returns>
     public string GenerateReport(ReportFormat format = ReportFormat.Text)
     {
-        if (_currentSession == null)
+        if (_currentSession is null)
         {
             throw new InvalidOperationException("当前没有性能分析会话");
         }
@@ -182,7 +182,7 @@ public class ProfilerManager
     /// <param name="format">报告格式</param>
     public async Task SaveReportAsync(string filePath, ReportFormat format = ReportFormat.Text)
     {
-        if (_currentSession == null)
+        if (_currentSession is null)
         {
             throw new InvalidOperationException("当前没有性能分析会话");
         }
@@ -202,10 +202,10 @@ public class ProfilerManager
             var status = new Dictionary<string, object>
             {
                 ["isProfiling"] = IsProfiling,
-                ["hasSession"] = _currentSession != null
+                ["hasSession"] = _currentSession is not null
             };
 
-            if (_currentSession != null)
+            if (_currentSession is not null)
             {
                 status["sessionId"] = _currentSession.SessionId.ToString();
                 status["sessionName"] = _currentSession.Name;
@@ -215,7 +215,7 @@ public class ProfilerManager
                 status["memorySnapshotCount"] = _currentSession.MemoryHistory.Count;
             }
 
-            if (Collector != null)
+            if (Collector is not null)
             {
                 var collectorStats = Collector.GetCollectorStats();
                 foreach (var kvp in collectorStats)
@@ -235,7 +235,7 @@ public class ProfilerManager
     {
         lock (_lockObject)
         {
-            if (Collector != null)
+            if (Collector is not null)
             {
                 try
                 {

@@ -156,7 +156,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
             var num = jsValue.AsNumber();
 
             // 如果函数声明了 double 返回类型,始终返回 DoubleLangValue
-            if (_returnType != null && _returnType.Equals("double", StringComparison.OrdinalIgnoreCase))
+            if (_returnType is not null && _returnType.Equals("double", StringComparison.OrdinalIgnoreCase))
             {
                 return new DoubleLangValue(num);
             }

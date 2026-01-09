@@ -21,7 +21,7 @@ public class ModuleResolutionResult
     /// <summary>
     /// 是否解析成功
     /// </summary>
-    public bool IsSuccess => ResolvedPath != null;
+    public bool IsSuccess => ResolvedPath is not null;
 
     /// <summary>
     /// 尝试过的路径列表（用于错误报告）
@@ -284,7 +284,7 @@ public class ModuleResolver
             result.ModuleType = ModuleType.Submodule;
             var submodulePath = ResolveSubmodule(moduleName, currentFilePath, manager);
             result.ResolvedPath = submodulePath;
-            if (submodulePath != null)
+            if (submodulePath is not null)
             {
                 result.AttemptedPaths.Add(submodulePath);
                 result.ResolutionAttempts[^1].Result = $"找到子模块: {submodulePath}";
@@ -331,14 +331,14 @@ public class ModuleResolver
             {
                 StepNumber = stepNumber,
                 Description = $"在包目录中搜索第三方包 '{packageName}'" +
-                             (versionSpec != null ? $" (版本: {versionSpec})" : ""),
+                             (versionSpec is not null ? $" (版本: {versionSpec})" : ""),
                 SearchPath = string.Join(", ", packageSearchPaths),
                 Result = "正在搜索...",
                 Success = false
             });
 
             var packagePath = ResolvePackage(packageName, versionSpec, currentFilePath);
-            if (packagePath != null)
+            if (packagePath is not null)
             {
                 result.ModuleType = ModuleType.ThirdPartyPackage;
                 result.ResolvedPath = packagePath;
@@ -365,7 +365,7 @@ public class ModuleResolver
         {
             StepNumber = stepNumber,
             Description = "尝试解析为本地文件",
-            SearchPath = currentFilePath != null
+            SearchPath = currentFilePath is not null
                 ? $"相对于: {Path.GetDirectoryName(currentFilePath) ?? "当前目录"}"
                 : "相对于: 当前工作目录",
             Result = "正在搜索...",
@@ -373,7 +373,7 @@ public class ModuleResolver
         });
 
         var localPath = ResolveLocalFile(moduleName, currentFilePath, result.AttemptedPaths);
-        if (localPath != null)
+        if (localPath is not null)
         {
             result.ModuleType = ModuleType.LocalFile;
             result.ResolvedPath = localPath;
@@ -488,7 +488,7 @@ public class ModuleResolver
                 // 策略 1: 精确目录名（无版本）
                 var packagePath = Path.Combine(searchPath, packageName);
                 var entryFile = FindPackageEntryFile(packagePath, packageName);
-                if (entryFile != null)
+                if (entryFile is not null)
                 {
                     return entryFile;
                 }
@@ -499,15 +499,15 @@ public class ModuleResolver
                 {
                     // 选择最佳匹配版本
                     var bestMatch = VersionResolver.SelectBestVersion(
-                        versionedDirs.Select(Path.GetFileName).Where(x => x != null).Cast<string>(),
+                        versionedDirs.Select(Path.GetFileName).Where(x => x is not null).Cast<string>(),
                         versionSpec
                     );
 
-                    if (bestMatch != null)
+                    if (bestMatch is not null)
                     {
                         var versionedPath = Path.Combine(searchPath, bestMatch);
                         entryFile = FindPackageEntryFile(versionedPath, packageName);
-                        if (entryFile != null)
+                        if (entryFile is not null)
                         {
                             return entryFile;
                         }

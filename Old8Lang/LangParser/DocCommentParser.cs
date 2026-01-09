@@ -343,7 +343,7 @@ public static class DocCommentParser
         }
 
         // 处理返回值
-        if (returnDescription != null || returnType != null)
+        if (returnDescription is not null || returnType is not null)
         {
             docInfo.Returns = new ReturnDoc(returnType, returnDescription ?? string.Empty);
         }

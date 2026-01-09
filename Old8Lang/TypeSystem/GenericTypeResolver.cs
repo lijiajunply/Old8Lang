@@ -34,10 +34,10 @@ public class GenericTypeResolver
         }
 
         // 否则尝试从类型注解管理器获取
-        if (_interpreter?.TypeAnnotationManager != null)
+        if (_interpreter?.TypeAnnotationManager is not null)
         {
             var typeInfo = _interpreter.TypeAnnotationManager.GetTypeFamily().GetType(typeName);
-            if (typeInfo != null)
+            if (typeInfo is not null)
             {
                 // 这里需要将ITypeInfo转换为System.Type
                 // 暂时使用基本的类型映射

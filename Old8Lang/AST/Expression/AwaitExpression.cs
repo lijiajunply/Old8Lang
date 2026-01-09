@@ -42,7 +42,7 @@ public partial class AwaitExpression : LangExpression
         // 检查任务是否已完成，如果已完成直接返回结果
         if (taskValue.IsCompleted)
         {
-            if (taskValue.Exception != null)
+            if (taskValue.Exception is not null)
             {
                 throw taskValue.Exception;
             }

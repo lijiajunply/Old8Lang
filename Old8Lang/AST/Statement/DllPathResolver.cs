@@ -120,7 +120,7 @@ public static class DllPathResolver
         foreach (var strategy in SearchStrategies)
         {
             var path = strategy(dllName, importPath ?? "");
-            if (path == null) continue;
+            if (path is null) continue;
 
             attemptedPaths.Add(path);
 
@@ -179,7 +179,7 @@ public static class DllPathResolver
         foreach (var strategy in SearchStrategies)
         {
             var path = strategy(dllName, importPath ?? "");
-            if (path != null)
+            if (path is not null)
             {
                 paths.Add(path);
             }

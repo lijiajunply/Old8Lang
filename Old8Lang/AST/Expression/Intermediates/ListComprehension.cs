@@ -233,7 +233,7 @@ public partial class ListComprehension : LangValueType
 
                 // 检查所有外层循环的条件（如果有）
                 var outerLoop = this;
-                while (outerLoop != null)
+                while (outerLoop is not null)
                 {
                     if (!outerLoop.CheckCondition(newManager))
                     {
@@ -265,7 +265,7 @@ public partial class ListComprehension : LangValueType
     private bool CheckCondition(VariateManager manager)
     {
         // 如果没有条件，直接返回true
-        if (Condition == null)
+        if (Condition is null)
         {
             return true;
         }
@@ -303,6 +303,6 @@ public partial class ListComprehension : LangValueType
     {
         var s = NestedLoops?.Count > 0 ? " " + string.Join(" ", NestedLoops.Select(loop => loop.ToString())) : "";
         return
-            $"[{Expression} for {Variable} in {Iterable} {(Condition != null ? "if " + Condition : "")} {s}]";
+            $"[{Expression} for {Variable} in {Iterable} {(Condition is not null ? "if " + Condition : "")} {s}]";
     }
 }

@@ -38,7 +38,7 @@ public partial class TryStatement(
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -68,11 +68,11 @@ public partial class TryStatement(
             foreach (var (exceptionType, exceptionVar, catchBlock) in catchBlocks)
             {
                 // 如果异常类型为null，则匹配所有异常
-                if (exceptionType == null ||
+                if (exceptionType is null ||
                     IsMatch(ex, exceptionType))
                 {
                     // 如果有异常变量，则将异常赋值给该变量
-                    if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+                    if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
                         // 创建一个包含异常信息的值类型
                         manager.Set(exceptionVar, new ErrorLangValue(ex));
@@ -180,10 +180,10 @@ public partial class TryStatement(
                     foreach (var (exceptionType, exceptionVar, catchBlock) in catchBlocks)
                     {
                         // 如果异常类型为null，则匹配所有异常
-                        if (exceptionType == null || IsMatch(ex, exceptionType))
+                        if (exceptionType is null || IsMatch(ex, exceptionType))
                         {
                             // 如果有异常变量，则将异常赋值给该变量
-                            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+                            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                             {
                                 manager.Set(exceptionVar, new ErrorLangValue(ex));
                             }
@@ -248,7 +248,7 @@ public partial class TryStatement(
     {
         // 检查如果有finally块，那么try块和catch块中不能包含return语句
         // 这是因为在.NET IL中，try块或catch块中的return语句与finally块一起使用会导致无效的IL代码
-        if (finallyBlock != null)
+        if (finallyBlock is not null)
         {
             // 检查try块中是否包含return语句
             if (ContainsReturnStatement(tryBlock))
@@ -279,7 +279,7 @@ public partial class TryStatement(
             ilGenerator.BeginCatchBlock(typeof(Exception));
 
             // 如果有异常变量，将其添加到局部变量管理器
-            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
             {
                 // 直接使用捕获到的异常对象
                 var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
@@ -298,14 +298,14 @@ public partial class TryStatement(
             catchBlock.GenerateIl(ilGenerator, local);
 
             // 如果添加了异常变量，移除它
-            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
             {
                 local.RemoveLocalVar(exceptionVar.IdName);
             }
         }
 
         // 如果有finally块，生成finally块的IL代码
-        if (finallyBlock != null)
+        if (finallyBlock is not null)
         {
             // 开始finally块
             ilGenerator.BeginFinallyBlock();
@@ -339,7 +339,7 @@ public partial class TryStatement(
         for (int i = 0; i < statement.Count; i++)
         {
             var child = statement[i];
-            if (child == null) continue;
+            if (child is null) continue;
             if (ContainsReturnStatement(child))
             {
                 return true;
@@ -357,7 +357,7 @@ public partial class TryStatement(
         }
 
         var currentType = exception.GetType();
-        while (currentType != null)
+        while (currentType is not null)
         {
             // 精确匹配类型名称
             if (currentType.Name == exceptionType)
@@ -404,7 +404,7 @@ public partial class TryStatement(
             }
 
             // finally 块
-            if (index == catchCount + 1 && finallyBlock != null)
+            if (index == catchCount + 1 && finallyBlock is not null)
             {
                 return finallyBlock;
             }
@@ -420,7 +420,7 @@ public partial class TryStatement(
         {
             int count = 1; // try 块
             count += catchBlocks.Count; // catch 块
-            if (finallyBlock != null)
+            if (finallyBlock is not null)
             {
                 count++; // finally 块
             }

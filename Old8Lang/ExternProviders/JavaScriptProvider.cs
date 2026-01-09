@@ -51,7 +51,7 @@ public class JavaScriptProvider : IExternProvider
             else
             {
                 // 如果当前目录找不到,尝试从脚本文件所在目录解析
-                var baseDir = manager.Path != null && File.Exists(manager.Path)
+                var baseDir = manager.Path is not null && File.Exists(manager.Path)
                     ? Path.GetDirectoryName(manager.Path) ?? Directory.GetCurrentDirectory()
                     : manager.Path ?? Directory.GetCurrentDirectory();
 

@@ -44,7 +44,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         // 检查类是否已存在
         var existingClass = manager.GetAny(new LangId(anyLangValue.ClassName));
 
-        if (existingClass != null)
+        if (existingClass is not null)
         {
             throw new DuplicateNameError(this, anyLangValue.ClassName, "类");
         }
@@ -141,7 +141,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         AssemblyBuilder assemblyBuilder;
         ModuleBuilder moduleBuilder;
         
-        if (local.DynamicAssembly == null || local.DynamicModule == null)
+        if (local.DynamicAssembly is null || local.DynamicModule is null)
         {
             var assemblyName = new AssemblyName("Old8LangDynamicAssembly");
             assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
@@ -173,7 +173,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
             
             // 定义基类
-            if (anyLangValue.ParentClassName != null &&
+            if (anyLangValue.ParentClassName is not null &&
                 local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
             {
                 baseType = parentType;
@@ -236,7 +236,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
-        if (anyLangValue.ParentClassName != null &&
+        if (anyLangValue.ParentClassName is not null &&
             local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
         {
             // 获取父类的所有公共字段
@@ -378,7 +378,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var parameterTypes = new List<Type>();
 
         // 添加方法参数，并将它们添加到LocalVarTypes中，以便OutputType能正确推断类型
-        if (funcValue.Ids != null)
+        if (funcValue.Ids is not null)
         {
             foreach (var paramId in funcValue.Ids)
             {
@@ -525,7 +525,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var parameterTypes = new List<Type>();
 
         // 添加方法参数，并将它们添加到LocalVarTypes中，以便OutputType能正确推断类型
-        if (funcValue.Ids != null)
+        if (funcValue.Ids is not null)
         {
             foreach (var paramId in funcValue.Ids)
             {
@@ -570,7 +570,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         // 对于实例方法，参数索引从 1 开始（0 是 this）
         // 对于静态方法，参数索引从 0 开始
         int paramIndex = (attributes & MethodAttributes.Static) == 0 ? 1 : 0;
-        if (funcValue.Ids != null)
+        if (funcValue.Ids is not null)
         {
             int paramTypeIndex = 0;
             foreach (var paramId in funcValue.Ids)
@@ -632,7 +632,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
                        baseType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                            .FirstOrDefault(ctor => ctor.GetParameters().Length == 0);
 
-        if (baseCtor != null)
+        if (baseCtor is not null)
         {
             ctorIl.Emit(OpCodes.Call, baseCtor);
         }
@@ -693,7 +693,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             if (variate.Value is FuncLangValue funcValue)
             {
                 // 方法定义
-                var paramList = funcValue.Ids != null ? string.Join(", ", funcValue.Ids) : string.Empty;
+                var paramList = funcValue.Ids is not null ? string.Join(", ", funcValue.Ids) : string.Empty;
                 sb.AppendLine($"    func {funcValue.Id}({paramList}) {{");
                 sb.AppendLine($"        {funcValue.BlockStatement}");
                 sb.AppendLine("    }");

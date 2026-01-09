@@ -41,7 +41,7 @@ public class NativeDelegateFuncLangValue(
             // 重要: 传递委托实例作为 instance 参数
             result = MethodInvokerCache.Invoke(DelegateInstance.Method, DelegateInstance, convertedValues);
         }
-        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
         {
             // 转换 .NET 异常为 Old8Lang 异常
             var innerException = ex.InnerException;

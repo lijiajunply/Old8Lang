@@ -143,7 +143,7 @@ public partial class AnyLangValue : LangValueType
         {
             // 检查字段访问权限
             var fieldDef = Metadata.FieldTable.LookupField(memberName);
-            if (fieldDef != null && !fieldDef.IsAccessibleFrom(isInternalAccess))
+            if (fieldDef is not null && !fieldDef.IsAccessibleFrom(isInternalAccess))
             {
                 throw new AttributeError(this, memberName, ClassId.IdName);
             }
@@ -181,12 +181,12 @@ public partial class AnyLangValue : LangValueType
 
         // 从 MethodTable 查找方法
         var methods = Metadata.MethodTable.LookupMethod(methodName);
-        if (methods == null || methods.Count == 0)
+        if (methods is null || methods.Count == 0)
         {
             // 如果找不到方法，检查是否是嵌套类的实例化
             // 这支持 Level1().Level2() 这样的语法
             var nestedClassInstance = TryInstantiateNestedClass(instance, manager);
-            if (nestedClassInstance != null)
+            if (nestedClassInstance is not null)
             {
                 return nestedClassInstance;
             }
@@ -282,7 +282,7 @@ public partial class AnyLangValue : LangValueType
 
         // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
         //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping != null)
+        if (TypeArgumentMapping is not null)
         {
             executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
         }
@@ -322,7 +322,7 @@ public partial class AnyLangValue : LangValueType
             try
             {
                 var updatedValue = executionManager.GetValue(new LangId(fieldName));
-                if (updatedValue != null)
+                if (updatedValue is not null)
                 {
                     // 直接同步值，不需要比较
                     InstanceData[fieldName] = updatedValue;
@@ -348,7 +348,7 @@ public partial class AnyLangValue : LangValueType
 
         // 检查访问权限
         var fieldDef = Metadata.FieldTable.LookupField(collectionName);
-        if (fieldDef != null && !fieldDef.IsAccessibleFrom(isInternalAccess))
+        if (fieldDef is not null && !fieldDef.IsAccessibleFrom(isInternalAccess))
         {
             throw new AttributeError(this, collectionName, ClassId.IdName);
         }
@@ -419,7 +419,7 @@ public partial class AnyLangValue : LangValueType
             int score = 0;
             var funcValue = candidate.Implementation;
 
-            if (funcValue.Ids != null)
+            if (funcValue.Ids is not null)
             {
                 // 只对位置参数进行类型匹配评分（命名参数会被重新排序，所以暂时不评分）
                 for (int i = 0; i < positionalArgs.Count && i < funcValue.Ids.Count; i++)
@@ -475,7 +475,7 @@ public partial class AnyLangValue : LangValueType
         if (actualParams < expectedParams)
         {
             var func = method.Implementation;
-            if (func.Ids == null) return true;
+            if (func.Ids is null) return true;
 
             // 检查哪些参数已经通过位置参数或命名参数提供
             var providedParams = new HashSet<string>();
@@ -487,7 +487,7 @@ public partial class AnyLangValue : LangValueType
             }
 
             // 命名参数覆盖指定的参数
-            if (namedArgs != null)
+            if (namedArgs is not null)
             {
                 foreach (var namedArg in namedArgs)
                 {
@@ -498,7 +498,7 @@ public partial class AnyLangValue : LangValueType
             // 检查未提供的参数是否都有默认值
             for (int i = 0; i < func.Ids.Count; i++)
             {
-                if (!providedParams.Contains(func.Ids[i].IdName) && func.Ids[i].DefaultValue == null)
+                if (!providedParams.Contains(func.Ids[i].IdName) && func.Ids[i].DefaultValue is null)
                 {
                     return false; // 缺失的参数没有默认值
                 }
@@ -574,7 +574,7 @@ public partial class AnyLangValue : LangValueType
         // 首先查找名为 "init" 的方法
         var methods = Metadata.MethodTable.LookupMethod("init");
 
-        if (methods == null || methods.Count == 0)
+        if (methods is null || methods.Count == 0)
             return null;
 
         // 如果只有一个 init 方法，直接返回
@@ -598,7 +598,7 @@ public partial class AnyLangValue : LangValueType
         FieldsModifiedBySetField.Clear();
 
         var initMethod = GetInitMethod(arguments, manager);
-        if (initMethod == null)
+        if (initMethod is null)
         {
             return;
         }
@@ -647,7 +647,7 @@ public partial class AnyLangValue : LangValueType
 
         // 5.5 设置泛型类型参数映射（如果是泛型类实例）
         //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping != null)
+        if (TypeArgumentMapping is not null)
         {
             initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
         }
@@ -676,7 +676,7 @@ public partial class AnyLangValue : LangValueType
 
         // 检查字段是否存在
         var fieldDef = Metadata.FieldTable.LookupField(fieldName);
-        if (fieldDef == null)
+        if (fieldDef is null)
         {
             throw new AttributeError(this, fieldName, ClassId.IdName);
         }
@@ -715,7 +715,7 @@ public partial class AnyLangValue : LangValueType
 
         // 检查访问权限
         var fieldDef = Metadata.FieldTable.LookupField(fieldName);
-        if (fieldDef != null && !fieldDef.IsAccessibleFrom(isInternalAccess))
+        if (fieldDef is not null && !fieldDef.IsAccessibleFrom(isInternalAccess))
         {
             throw new AttributeError(this, fieldName, ClassId.IdName);
         }
@@ -748,7 +748,7 @@ public partial class AnyLangValue : LangValueType
         }
 
         // 检查类型是否兼容
-        if (targetTypeTemplate.Metadata != null &&
+        if (targetTypeTemplate.Metadata is not null &&
             !Metadata.IsAssignableTo(targetTypeTemplate.Metadata, manager))
         {
             throw new TypeError(this, type.Value ?? "", ClassId.IdName,
@@ -758,7 +758,7 @@ public partial class AnyLangValue : LangValueType
 
         // 对于接口类型转换，返回当前实例但更新类型标识
         // 保持原始的方法实现和字段数据不变
-        if (targetTypeTemplate.Metadata == null)
+        if (targetTypeTemplate.Metadata is null)
         {
             // 如果元数据为空，很可能是接口类型
             // 创建一个临时的接口元数据进行兼容性检查
@@ -871,13 +871,13 @@ public partial class AnyLangValue : LangValueType
 
         // 2. 查找 dispose 方法
         var disposeMethods = Metadata.MethodTable.LookupMethod("dispose");
-        if (disposeMethods == null || disposeMethods.Count == 0)
+        if (disposeMethods is null || disposeMethods.Count == 0)
             return;
 
         var disposeMethod = disposeMethods[0];
 
         // 3. 验证签名：dispose 方法不能有参数
-        if (disposeMethod.Implementation.Ids != null && disposeMethod.Implementation.Ids.Count > 0)
+        if (disposeMethod.Implementation.Ids is not null && disposeMethod.Implementation.Ids.Count > 0)
         {
             throw new InvalidOperationError(
                 this,
@@ -905,7 +905,7 @@ public partial class AnyLangValue : LangValueType
                 try
                 {
                     var updatedValue = InstanceScope.GetValue(new LangId(fieldName));
-                    if (updatedValue != null)
+                    if (updatedValue is not null)
                     {
                         InstanceData[fieldName] = updatedValue;
                     }

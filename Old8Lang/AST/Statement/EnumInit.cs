@@ -51,7 +51,7 @@ public partial class EnumInit(
     {
         // 检查枚举是否已存在
         var existingEnum = manager.GetAny(new LangId(enumName));
-        if (existingEnum != null)
+        if (existingEnum is not null)
         {
             throw new DuplicateNameError(this, enumName, "枚举");
         }
@@ -62,7 +62,7 @@ public partial class EnumInit(
 
         foreach (var (memberName, memberValueExpr) in members)
         {
-            if (memberValueExpr != null)
+            if (memberValueExpr is not null)
             {
                 // 有显式赋值，计算表达式的值
                 var result = memberValueExpr.Run(manager);
@@ -114,7 +114,7 @@ public partial class EnumInit(
         }
 
         // 确保有动态程序集和模块
-        if (local.DynamicAssembly == null || local.DynamicModule == null)
+        if (local.DynamicAssembly is null || local.DynamicModule is null)
         {
             var assemblyName = new AssemblyName("Old8LangDynamicAssembly");
             local.DynamicAssembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
@@ -135,7 +135,7 @@ public partial class EnumInit(
 
         foreach (var (memberName, memberValueExpr) in members)
         {
-            if (memberValueExpr != null)
+            if (memberValueExpr is not null)
             {
                 // 有显式赋值，计算表达式的值
                 // 注意：编译模式下，表达式必须是常量
@@ -188,7 +188,7 @@ public partial class EnumInit(
     {
         var memberStrings = members.Select(m =>
         {
-            if (m.value != null)
+            if (m.value is not null)
             {
                 return $"{m.name} = {m.value}";
             }

@@ -55,7 +55,7 @@ public class StatementParser(
             var parsedModifiers = classParser.ParseAccessModifiers();
 
             // 合并修饰符
-            var combinedModifiers = modifiers != null
+            var combinedModifiers = modifiers is not null
                 ? new List<AccessModifierType>(modifiers)
                 : new List<AccessModifierType>();
             combinedModifiers.AddRange(parsedModifiers);
@@ -470,7 +470,7 @@ public class StatementParser(
         {
             // 尝试解析为表达式
             var expr = expressionParser.ParseExpression();
-            if (expr != null!)
+            if (expr is not null)
             {
                 // 如果是函数调用表达式（Instance），返回 FuncRunStatement
                 if (expr is Instance instance)

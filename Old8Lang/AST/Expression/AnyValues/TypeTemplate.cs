@@ -110,7 +110,7 @@ public class TypeTemplate(
         }
 
         // 检查父类的静态成员
-        if (!memberExists && ParentClassName != null)
+        if (!memberExists && ParentClassName is not null)
         {
             if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
@@ -128,7 +128,7 @@ public class TypeTemplate(
         StaticVariableValues[memberName] = value;
 
         // 同时更新到元数据缓存中，确保其他访问能获取到最新值（如果元数据已构建）
-        if (MetadataCache != null)
+        if (MetadataCache is not null)
         {
             MetadataCache.StaticMembers[memberName] = value;
         }
@@ -136,7 +136,7 @@ public class TypeTemplate(
         // 同时更新到当前管理器中的局部变量（如果在静态方法执行上下文中）
         // 这样可以确保静态方法执行完成后，CallStaticMethod 能够获取到正确的更新值
         var existingValue = manager.GetValue(new LangId(memberName));
-        if (existingValue != null)
+        if (existingValue is not null)
         {
             manager.Set(new LangId(memberName), value);
         }
@@ -148,7 +148,7 @@ public class TypeTemplate(
             IsMixin ? $"MixinTemplate({ClassName})" :
             IsAbstract ? $"AbstractTypeTemplate({ClassName})" : $"TypeTemplate({ClassName})";
 
-        if (ParentClassName != null)
+        if (ParentClassName is not null)
         {
             baseStr += $" extends {ParentClassName}";
         }
@@ -176,7 +176,7 @@ public class TypeTemplate(
         Dictionary<ClassMemberId, LangExpression> allVariates)
     {
         // 如果有父类，递归获取父类的所有成员
-        if (type.ParentClassName != null)
+        if (type.ParentClassName is not null)
         {
             if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
             {
@@ -282,7 +282,7 @@ public class TypeTemplate(
         }
 
         // 2. 如果没找到，查找父类的静态成员
-        if (actualMemberId == null && ParentClassName != null)
+        if (actualMemberId is null && ParentClassName is not null)
         {
             if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
@@ -291,7 +291,7 @@ public class TypeTemplate(
         }
 
         // 3. 如果没找到，查找嵌套类
-        if (actualMemberId == null)
+        if (actualMemberId is null)
         {
             foreach (var (memberId, memberExpr) in Variates)
             {
@@ -304,7 +304,7 @@ public class TypeTemplate(
         }
 
         // 4. 如果没找到，查找当前类的实例成员
-        if (actualMemberId == null)
+        if (actualMemberId is null)
         {
             foreach (var (memberId, memberExpr) in Variates)
             {
@@ -318,7 +318,7 @@ public class TypeTemplate(
         }
 
         // 4. 检查是否找到成员
-        if (actualMemberId == null || expr == null)
+        if (actualMemberId is null || expr is null)
         {
             throw new NameError(this, id.IdName);
         }
@@ -388,17 +388,17 @@ public class TypeTemplate(
                         var variableName = staticKey.IdName;
                         // 尝试从tempManager中获取局部变量形式的更新值
                         var tempValue = tempManager.GetValue(new LangId(variableName));
-                        if (tempValue != null)
+                        if (tempValue is not null)
                         {
                             // 只有当tempManager中的值与StaticVariableValues中的值不同时才更新
                             // 这样可以避免覆盖通过 SetStaticMember 已经更新的值
                             var currentStoredValue = StaticVariableValues.GetValueOrDefault(variableName);
-                            if (currentStoredValue == null || !ReferenceEquals(tempValue, currentStoredValue))
+                            if (currentStoredValue is null || !ReferenceEquals(tempValue, currentStoredValue))
                             {
                                 // 保存到 StaticVariableValues（TypeTemplate 的实例字段）
                                 StaticVariableValues[variableName] = tempValue;
                                 // 同时保存到元数据缓存（如果存在）
-                                if (MetadataCache != null && MetadataCache.StaticMembers.ContainsKey(variableName))
+                                if (MetadataCache is not null && MetadataCache.StaticMembers.ContainsKey(variableName))
                                 {
                                     MetadataCache.StaticMembers[variableName] = tempValue;
                                 }
@@ -412,7 +412,7 @@ public class TypeTemplate(
         }
 
         // 查找父类的静态方法
-        if (ParentClassName != null)
+        if (ParentClassName is not null)
         {
             if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
@@ -494,7 +494,7 @@ public class TypeTemplate(
     /// </summary>
     public ClassMetadata BuildMetadata(VariateManager manager)
     {
-        if (MetadataCache != null)
+        if (MetadataCache is not null)
             return MetadataCache;
 
         // 创建 ClassMetadata
@@ -534,7 +534,7 @@ public class TypeTemplate(
         FieldDefinitionTable fieldTable)
     {
         // 1. 先递归处理父类
-        if (type.ParentClassName != null)
+        if (type.ParentClassName is not null)
         {
             if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
             {
@@ -654,7 +654,7 @@ public class TypeTemplate(
                 foreach (var constraintName in genericParam.Constraints!)
                 {
                     var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
-                    if (constraintType != null && !actualType.IsCompatibleWith(constraintType))
+                    if (constraintType is not null && !actualType.IsCompatibleWith(constraintType))
                     {
                         throw new ArgumentException(
                             $"类型 {actualType.Name} 不满足约束 {constraintName}");
@@ -701,7 +701,7 @@ public class TypeTemplate(
         );
 
         // 如果是泛型实例，传递类型参数映射
-        if (TypeArgumentMapping != null)
+        if (TypeArgumentMapping is not null)
         {
             instance.TypeArgumentMapping = TypeArgumentMapping;
         }
@@ -798,7 +798,7 @@ public partial class MethodOverloadList : LangValueType
         foreach (var candidate in candidates)
         {
             int score = 0;
-            if (candidate.Ids != null)
+            if (candidate.Ids is not null)
             {
                 for (int i = 0; i < args.Count && i < candidate.Ids.Count; i++)
                 {
@@ -848,12 +848,12 @@ public partial class MethodOverloadList : LangValueType
         }
 
         // 如果实际参数数量小于期望参数数量，检查缺失的参数是否都有默认值
-        if (actualParams < expectedParams && overload.Ids != null)
+        if (actualParams < expectedParams && overload.Ids is not null)
         {
             for (int i = actualParams; i < expectedParams; i++)
             {
                 var parameter = overload.Ids[i];
-                if (parameter.DefaultValue == null)
+                if (parameter.DefaultValue is null)
                 {
                     return false; // 缺失的参数没有默认值
                 }

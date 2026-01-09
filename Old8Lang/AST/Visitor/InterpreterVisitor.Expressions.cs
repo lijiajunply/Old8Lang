@@ -18,13 +18,13 @@ public partial class InterpreterVisitor
         if (node.IdName == "this")
         {
             // 直接从变量储存器中获取名为"this"的变量
-            if (manager == null)
+            if (manager is null)
             {
                 throw new NameError(node.Position, "this");
             }
 
             var thisValue = manager.GetValue(new LangId("this"));
-            if (thisValue != null)
+            if (thisValue is not null)
             {
                 return thisValue;
             }
@@ -34,17 +34,17 @@ public partial class InterpreterVisitor
         }
 
         // 先尝试获取普通变量
-        if (manager != null!)
+        if (manager is not null)
         {
             var value = manager.GetValue(node);
-            if (value != null)
+            if (value is not null)
             {
                 return value;
             }
 
             // 如果不是普通变量，尝试获取类或函数
             var anyValue = manager.GetAny(node);
-            if (anyValue != null)
+            if (anyValue is not null)
             {
                 return anyValue as LangValueType ?? throw new NameError(node.Position, node.IdName);
             }

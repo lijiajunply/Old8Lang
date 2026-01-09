@@ -19,7 +19,7 @@ public partial class AsyncFuncInit : OldStatement
     /// <summary>
     /// 判断是否为 Lambda 表达式
     /// </summary>
-    public bool IsLambda => AsyncFuncValue.Id == null;
+    public bool IsLambda => AsyncFuncValue.Id is null;
 
     /// <summary>
     /// 构造函数
@@ -36,14 +36,14 @@ public partial class AsyncFuncInit : OldStatement
     public override void Run(VariateManager manager)
     {
         // 检查函数重复声明
-        if (AsyncFuncValue.Id != null)
+        if (AsyncFuncValue.Id is not null)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is AsyncFuncLangValue func &&
                 func.Id?.IdName == AsyncFuncValue.Id.IdName &&
                 func.Ids?.Count == AsyncFuncValue.Ids?.Count);
 
-            if (existingFunc != null)
+            if (existingFunc is not null)
             {
                 throw new DuplicateNameError(
                     this,
@@ -120,7 +120,7 @@ public partial class AsyncFuncInit : OldStatement
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
         // 同时存储函数的参数列表信息
-        if (AsyncFuncValue.Ids != null)
+        if (AsyncFuncValue.Ids is not null)
         {
             local.FuncParameters.TryAdd(delegateKey, AsyncFuncValue.Ids);
         }

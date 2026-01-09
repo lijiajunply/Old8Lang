@@ -92,7 +92,7 @@ public class SymbolExtractor
         {
             string? symbolName = GetSymbolName(importInfo);
 
-            if (symbolName != null)
+            if (symbolName is not null)
             {
                 // 跳过模块自身引用
                 if (!string.IsNullOrEmpty(moduleBaseName) &&
@@ -160,7 +160,7 @@ public class SymbolExtractor
         foreach (var symbolName in symbolNames)
         {
             // 1. 从当前作用域查找
-            if (currentScope != null && currentScope.TryGetValue(symbolName, out var value))
+            if (currentScope is not null && currentScope.TryGetValue(symbolName, out var value))
             {
                 symbols[symbolName] = value;
                 continue;
@@ -173,7 +173,7 @@ public class SymbolExtractor
                 return name == symbolName;
             });
 
-            if (importInfo != null)
+            if (importInfo is not null)
             {
                 symbols[symbolName] = importInfo;
                 continue;
@@ -181,10 +181,10 @@ public class SymbolExtractor
 
             // 3. 仅在没有提供 scopedImportInfos 时才从全局作用域查找
             // 如果提供了 scopedImportInfos，说明我们要限定在特定模块的符号中查找
-            if (scopedImportInfos == null)
+            if (scopedImportInfos is null)
             {
                 var globalValue = manager.GetValue(new LangId(symbolName));
-                if (globalValue != null)
+                if (globalValue is not null)
                 {
                     symbols[symbolName] = globalValue;
                     continue;
@@ -218,7 +218,7 @@ public class SymbolExtractor
     public void WrapConstantsAsImportInfo(VariateManager manager, List<ImportInfo> newImportInfos)
     {
         var currentScope = manager.Scopes.Count > 0 ? manager.Scopes[^1] : null;
-        if (currentScope == null) return;
+        if (currentScope is null) return;
 
         foreach (var (symbolName, symbolValue) in currentScope)
         {

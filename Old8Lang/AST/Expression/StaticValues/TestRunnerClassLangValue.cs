@@ -72,7 +72,7 @@ public class TestRunnerClassLangValue : LangValueType
                 _ => null
             };
 
-            if (method == null)
+            if (method is null)
             {
                 throw new AttributeError(dotExpression.Position, methodName, "TestRunner");
             }
@@ -452,7 +452,7 @@ public class TestRunnerClassLangValue : LangValueType
             new(new StringLangValue("elapsedMilliseconds"), new DoubleLangValue(result.ElapsedMilliseconds))
         };
 
-        if (result.ErrorMessage != null)
+        if (result.ErrorMessage is not null)
         {
             tupleList.Add(new(new StringLangValue("errorMessage"), new StringLangValue(result.ErrorMessage)));
         }

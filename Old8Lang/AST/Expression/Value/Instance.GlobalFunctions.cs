@@ -21,7 +21,7 @@ public partial class Instance
 
         // 查找全局函数
         var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
-        if (globalFunc != null)
+        if (globalFunc is not null)
         {
             result = globalFunc.Execute(Ids, manager, Position);
             return true;
@@ -42,7 +42,7 @@ public partial class Instance
 
         // 查找全局函数
         var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
-        if (globalFunc != null)
+        if (globalFunc is not null)
         {
             globalFunc.GenerateIl(Ids, ilGenerator, local, Position);
             return true;
@@ -62,7 +62,7 @@ public partial class Instance
 
         // 查找全局函数
         var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
-        if (globalFunc != null)
+        if (globalFunc is not null)
         {
             return globalFunc.GetReturnType(Ids, local);
         }

@@ -228,7 +228,7 @@ public partial class ExternStatement : OldStatement
             var convOverrideStr = func.CallingConvention != DefaultCallingConvention
                 ? $"{func.CallingConvention.ToString().ToLower()} "
                 : "";
-            var aliasStr = func.Alias != null ? $" as {func.Alias}" : "";
+            var aliasStr = func.Alias is not null ? $" as {func.Alias}" : "";
             var signature = FormatFunctionSignature(func);
             return
                 $"native extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
@@ -239,7 +239,7 @@ public partial class ExternStatement : OldStatement
             var convOverrideStr = f.CallingConvention != DefaultCallingConvention
                 ? $"{f.CallingConvention.ToString().ToLower()} "
                 : "";
-            var aliasStr = f.Alias != null ? $" as {f.Alias}" : "";
+            var aliasStr = f.Alias is not null ? $" as {f.Alias}" : "";
             var signature = FormatFunctionSignature(f);
             return $"{convOverrideStr}func {f.FunctionName}{signature}{aliasStr}";
         }));
@@ -252,11 +252,11 @@ public partial class ExternStatement : OldStatement
     /// </summary>
     private string FormatFunctionSignature(ExternFunctionDeclaration func)
     {
-        if (func.FunctionSignature == null)
+        if (func.FunctionSignature is null)
             return "()";
 
         var funcValue = func.FunctionSignature.FuncLangValue;
-        var parameters = funcValue.Ids != null
+        var parameters = funcValue.Ids is not null
             ? string.Join(", ", funcValue.Ids.Select(p =>
             {
                 var type = !string.IsNullOrEmpty(p.AssumptionType) ? $":{p.AssumptionType}" : "";

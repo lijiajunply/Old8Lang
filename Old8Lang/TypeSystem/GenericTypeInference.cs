@@ -30,7 +30,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         }
 
         // 检查参数数量是否匹配（考虑默认参数）
-        var requiredParamCount = funcValue.Ids?.Count(id => id.DefaultValue == null) ?? 0;
+        var requiredParamCount = funcValue.Ids?.Count(id => id.DefaultValue is null) ?? 0;
         var totalParamCount = funcValue.Ids?.Count ?? 0;
 
         if (callArguments.Count < requiredParamCount || callArguments.Count > totalParamCount)
@@ -63,7 +63,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
 
             // 推断调用参数的类型
             var argType = InferArgumentType(callArg, manager);
-            if (argType == null)
+            if (argType is null)
             {
                 continue; // 无法推断参数类型，跳过
             }
@@ -204,7 +204,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                 case LangId id:
                     // 查找变量类型
                     var value = manager.GetValue(id);
-                    if (value != null)
+                    if (value is not null)
                     {
                         return GetTypeInfoFromValue(value);
                     }
@@ -235,7 +235,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                                 {
                                     var returnTypePart = returnTypeAnnotation.Substring(arrowIndex + 2).Trim();
                                     var returnType = typeAnnotationManager.GetTypeFamily().GetType(returnTypePart);
-                                    if (returnType != null)
+                                    if (returnType is not null)
                                     {
                                         return returnType;
                                     }
@@ -323,7 +323,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
 
             // 从实际类型中提取泛型参数进行匹配
             var actualGenericArgs = ExtractGenericArgumentsFromType(actualType);
-            if (actualGenericArgs == null || actualGenericArgs.Count != patternArgs.Count)
+            if (actualGenericArgs is null || actualGenericArgs.Count != patternArgs.Count)
             {
                 return false; // 泛型参数数量不匹配
             }
@@ -380,7 +380,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         // 如果是 GenericTypeInfo 实例，直接从 TypeArguments 中提取
         if (typeInfo is GenericTypeInfo genericTypeInfo)
         {
-            if (genericTypeInfo.IsGenericInstance && genericTypeInfo.TypeArguments != null)
+            if (genericTypeInfo.IsGenericInstance && genericTypeInfo.TypeArguments is not null)
             {
                 // 返回泛型参数列表（按照 TypeParameters 的顺序）
                 var result = new List<ITypeInfo>();
@@ -417,7 +417,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                     var trimmedName = argName.Trim();
                     // 尝试从 TypeFamily 获取类型
                     var argType = typeAnnotationManager.GetTypeFamily().GetType(trimmedName);
-                    if (argType != null)
+                    if (argType is not null)
                     {
                         result.Add(argType);
                     }

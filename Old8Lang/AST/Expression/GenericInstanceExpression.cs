@@ -64,7 +64,7 @@ public class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 是否为函数调用
     /// </summary>
-    public bool IsFunctionCall => CallArguments != null;
+    public bool IsFunctionCall => CallArguments is not null;
 
     public override LangValueType Run(VariateManager manager)
     {
@@ -72,7 +72,7 @@ public class GenericInstanceExpression : LangExpression
         var baseValue = BaseExpression.Run(manager);
 
         // 从解释器获取类型注解管理器
-        if (manager.Interpreter == null)
+        if (manager.Interpreter is null)
         {
             throw new InvalidOperationError(this, "无法获取 TypeAnnotationManager：解释器未初始化");
         }
@@ -84,7 +84,7 @@ public class GenericInstanceExpression : LangExpression
         // 处理泛型类
         if (baseValue is TypeTemplate typeTemplate)
         {
-            if (typeTemplate.GenericParameters == null || typeTemplate.GenericParameters.Count == 0)
+            if (typeTemplate.GenericParameters is null || typeTemplate.GenericParameters.Count == 0)
             {
                 throw new InvalidOperationError(this, $"类型 {typeTemplate.ClassName} 不是泛型类");
             }
@@ -103,7 +103,7 @@ public class GenericInstanceExpression : LangExpression
                 var typeArgName = TypeArguments[i];
 
                 var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
-                if (typeInfo == null)
+                if (typeInfo is null)
                 {
                     throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
                 }
@@ -133,7 +133,7 @@ public class GenericInstanceExpression : LangExpression
         // 处理泛型函数
         if (baseValue is FuncLangValue funcValue)
         {
-            if (funcValue.GenericParameters == null || funcValue.GenericParameters.Count == 0)
+            if (funcValue.GenericParameters is null || funcValue.GenericParameters.Count == 0)
             {
                 throw new InvalidOperationError(this, $"函数 {funcValue.Id?.IdName} 不是泛型函数");
             }
@@ -152,7 +152,7 @@ public class GenericInstanceExpression : LangExpression
                 var typeArgName = TypeArguments[i];
 
                 var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
-                if (typeInfo == null)
+                if (typeInfo is null)
                 {
                     throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
                 }
@@ -245,7 +245,7 @@ public class GenericInstanceExpression : LangExpression
         var typeMapping = new Dictionary<string, Type>();
         
         // 解析类型参数并映射到泛型参数名
-        if (genericFunc.GenericParameters != null)
+        if (genericFunc.GenericParameters is not null)
         {
             for (int i = 0; i < Math.Min(TypeArguments.Count, genericFunc.GenericParameters.Count); i++)
             {

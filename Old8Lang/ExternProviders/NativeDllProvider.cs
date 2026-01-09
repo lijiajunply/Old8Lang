@@ -92,7 +92,7 @@ public class NativeDllProvider : IExternProvider
     /// </summary>
     private Type CreateDelegateType(ExternFunctionDeclaration funcDecl, CallingConventionType callingConv)
     {
-        if (funcDecl.FunctionSignature == null)
+        if (funcDecl.FunctionSignature is null)
         {
             throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
@@ -144,7 +144,7 @@ public class NativeDllProvider : IExternProvider
     /// </summary>
     private MethodInfo CreatePInvokeMethod(string dllName, ExternFunctionDeclaration funcDecl, CallingConventionType callingConv)
     {
-        if (funcDecl.FunctionSignature == null)
+        if (funcDecl.FunctionSignature is null)
         {
             throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }

@@ -108,7 +108,7 @@ public class FunctionParser(
         var funcLangValue = new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false);
 
         // 设置文档注释
-        if (docComment != null)
+        if (docComment is not null)
         {
             funcLangValue.DocComment = docComment;
         }
@@ -190,7 +190,7 @@ public class FunctionParser(
         var asyncFuncLangValue = new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position);
 
         // 设置文档注释
-        if (docComment != null)
+        if (docComment is not null)
         {
             asyncFuncLangValue.DocComment = docComment;
         }
@@ -696,7 +696,7 @@ public class FunctionParser(
     /// <param name="genericParameters">泛型参数列表的引用，将在其中更新约束</param>
     private void ParseWhereClause(ref List<GenericParameter>? genericParameters)
     {
-        if (genericParameters == null || genericParameters.Count == 0)
+        if (genericParameters is null || genericParameters.Count == 0)
         {
             throw CreateSyntaxError("where 子句只能用于泛型函数");
         }
@@ -718,7 +718,7 @@ public class FunctionParser(
 
             // 查找对应的泛型参数
             var genericParam = genericParameters.FirstOrDefault(p => p.Name == typeParamName);
-            if (genericParam == null)
+            if (genericParam is null)
             {
                 throw CreateSyntaxError($"未定义的类型参数 '{typeParamName}'");
             }

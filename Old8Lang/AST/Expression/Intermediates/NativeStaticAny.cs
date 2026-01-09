@@ -32,10 +32,10 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
         {
             // 依次尝试：属性 -> 字段 -> 方法
             MemberInfo? member = classType.GetProperty(name);
-            if (member != null) return member;
+            if (member is not null) return member;
 
             member = classType.GetField(name);
-            if (member != null) return member;
+            if (member is not null) return member;
 
             member = classType.GetMethod(name);
             return member; // 如果都找不到，返回 null

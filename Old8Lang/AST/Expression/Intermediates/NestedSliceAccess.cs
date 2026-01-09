@@ -51,9 +51,9 @@ public partial class NestedSliceAccess(
 
     public override string ToString()
     {
-        var sliceStr = SliceEnd != null
-            ? (SliceStep != null ? $"{SliceStart}:{SliceEnd}:{SliceStep}" : $"{SliceStart}:{SliceEnd}")
-            : (SliceStep != null ? $"{SliceStart}::{SliceStep}" : $"{SliceStart}:");
+        var sliceStr = SliceEnd is not null
+            ? (SliceStep is not null ? $"{SliceStart}:{SliceEnd}:{SliceStep}" : $"{SliceStart}:{SliceEnd}")
+            : (SliceStep is not null ? $"{SliceStart}::{SliceStep}" : $"{SliceStart}:");
         return $"{BaseExpression}[{sliceStr}]";
     }
 
@@ -64,7 +64,7 @@ public partial class NestedSliceAccess(
 
         // 如果基础表达式不是object类型，需要装箱
         var baseType = BaseExpression.OutputType(local);
-        if (baseType != null && baseType.IsValueType)
+        if (baseType is not null && baseType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, baseType);
         }
@@ -73,18 +73,18 @@ public partial class NestedSliceAccess(
         SliceStart.LoadIlValue(ilGenerator, local);
         var startType = SliceStart.OutputType(local);
         // 转换为int
-        if (startType != null && startType != typeof(int))
+        if (startType is not null && startType != typeof(int))
         {
             Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), SliceStart);
         }
 
         // 处理结束索引（可能为null）
-        if (SliceEnd != null)
+        if (SliceEnd is not null)
         {
             SliceEnd.LoadIlValue(ilGenerator, local);
             var endType = SliceEnd.OutputType(local);
             // 转换为int
-            if (endType != null && endType != typeof(int))
+            if (endType is not null && endType != typeof(int))
             {
                 Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), SliceEnd);
             }
@@ -96,12 +96,12 @@ public partial class NestedSliceAccess(
         }
 
         // 处理步长（可能为null）
-        if (SliceStep != null)
+        if (SliceStep is not null)
         {
             SliceStep.LoadIlValue(ilGenerator, local);
             var stepType = SliceStep.OutputType(local);
             // 转换为int
-            if (stepType != null && stepType != typeof(int))
+            if (stepType is not null && stepType != typeof(int))
             {
                 Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), SliceStep);
             }
@@ -117,7 +117,7 @@ public partial class NestedSliceAccess(
             nameof(Old8Lang.Compiler.CollectionHelper.Slice),
             [typeof(object), typeof(int), typeof(int), typeof(int)]);
 
-        if (sliceMethod == null)
+        if (sliceMethod is null)
         {
             throw new InvalidOperationError(this, "无法找到CollectionHelper.Slice方法");
         }
@@ -130,7 +130,7 @@ public partial class NestedSliceAccess(
         var baseType = BaseExpression.OutputType(local);
 
         // 如果基础类型为null，返回object类型
-        if (baseType == null)
+        if (baseType is null)
         {
             return typeof(object);
         }

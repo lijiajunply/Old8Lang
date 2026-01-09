@@ -82,7 +82,7 @@ public class ClassMetadata(
         if (InheritanceDepth.HasValue)
             return InheritanceDepth.Value;
 
-        if (ParentClassName == null)
+        if (ParentClassName is null)
         {
             InheritanceDepth = 0;
             return 0;
@@ -90,7 +90,7 @@ public class ClassMetadata(
 
         // 递归计算继承深度
         if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentTemplate &&
-            parentTemplate.Metadata != null)
+            parentTemplate.Metadata is not null)
         {
             InheritanceDepth = 1 + parentTemplate.Metadata.GetInheritanceDepth(manager);
             return InheritanceDepth.Value;
@@ -110,14 +110,14 @@ public class ClassMetadata(
             return true;
 
         // 检查父类
-        if (ParentClassName != null)
+        if (ParentClassName is not null)
         {
             if (ParentClassName == targetType.ClassName)
                 return true;
 
             // 递归检查祖先类
             if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentTemplate &&
-                parentTemplate.Metadata != null)
+                parentTemplate.Metadata is not null)
             {
                 return parentTemplate.Metadata.IsAssignableTo(targetType, manager);
             }

@@ -76,7 +76,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     public override LangValueType Run(VariateManager manager)
     {
         // 如果状态机尚未创建，创建新状态机
-        if (StateMachine == null)
+        if (StateMachine is null)
         {
             // 为生成器创建独立的变量环境
             var generatorManager = manager.CloneForGenerator();

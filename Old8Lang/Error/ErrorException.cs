@@ -113,7 +113,7 @@ public class Old8Exception : Exception
     {
         get
         {
-            if (_asyncCallStack.Value == null)
+            if (_asyncCallStack.Value is null)
             {
                 _asyncCallStack.Value = new List<CallStackFrame>();
             }

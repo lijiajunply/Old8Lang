@@ -145,7 +145,7 @@ public class MatchCase
 
             case PatternType.VariableBinding:
                 // 变量绑定匹配所有值，并绑定变量
-                if (BindingVariable != null)
+                if (BindingVariable is not null)
                 {
                     boundValues = new Dictionary<string, LangValueType>
                     {
@@ -156,7 +156,7 @@ public class MatchCase
 
             case PatternType.Value:
                 // 值匹配：计算 pattern 表达式并比较
-                if (Pattern != null)
+                if (Pattern is not null)
                 {
                     var patternValue = Pattern.Run(manager);
                     return value.Equal(patternValue);
@@ -187,7 +187,7 @@ public class MatchCase
     {
         boundValues = null;
 
-        if (TuplePattern == null)
+        if (TuplePattern is null)
             return false;
 
         // 检查值是否是元组类型
@@ -216,14 +216,14 @@ public class MatchCase
             }
 
             // 变量绑定：绑定值到变量
-            if (patternElement.Variable != null)
+            if (patternElement.Variable is not null)
             {
                 boundValues[patternElement.Variable] = tupleElement;
                 continue;
             }
 
             // 值匹配：比较值是否相等
-            if (patternElement.Value != null)
+            if (patternElement.Value is not null)
             {
                 var patternValue = patternElement.Value.Run(manager);
                 if (!tupleElement.Equal(patternValue))
@@ -243,7 +243,7 @@ public class MatchCase
     {
         boundValues = null;
 
-        if (TypeAnnotation == null || BindingVariable == null)
+        if (TypeAnnotation is null || BindingVariable is null)
             return false;
 
         // 检查类型是否匹配
@@ -257,7 +257,7 @@ public class MatchCase
         };
 
         // 如果有守卫条件，需要在绑定变量后评估守卫条件
-        if (GuardCondition != null)
+        if (GuardCondition is not null)
         {
             // 添加新的子作用域并绑定变量
             manager.AddChildren();
@@ -292,7 +292,7 @@ public class MatchCase
     /// </summary>
     private bool MatchRange(LangValueType value, VariateManager manager)
     {
-        if (RangePattern == null)
+        if (RangePattern is null)
             return false;
 
         // 计算范围的起始值和结束值

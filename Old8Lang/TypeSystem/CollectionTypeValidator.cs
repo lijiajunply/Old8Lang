@@ -255,9 +255,9 @@ public static class CollectionTypeValidator
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
-            ListLangValue list => list.ElementType != null ? $"list<{list.ElementType}>" : "list",
-            ArrayLangValue array => array.ElementType != null ? $"array<{array.ElementType}>" : "array",
-            DictionaryLangValue dict => dict.KeyType != null && dict.ValueType != null
+            ListLangValue list => list.ElementType is not null ? $"list<{list.ElementType}>" : "list",
+            ArrayLangValue array => array.ElementType is not null ? $"array<{array.ElementType}>" : "array",
+            DictionaryLangValue dict => dict.KeyType is not null && dict.ValueType is not null
                 ? $"dict<{dict.KeyType},{dict.ValueType}>"
                 : "dict",
             NullLangValue => "null",

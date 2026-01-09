@@ -22,7 +22,7 @@ public static class GenericMethodSpecializer
         Dictionary<string, Type> typeArguments, 
         LocalManager local)
     {
-        if (!funcValue.IsGeneric || funcValue.GenericParameters == null)
+        if (!funcValue.IsGeneric || funcValue.GenericParameters is null)
         {
             throw new ArgumentException("函数必须是泛型函数");
         }

@@ -160,7 +160,7 @@ public class TypeInferenceEngine
             funcName = langId.IdName;
         }
 
-        if (funcName != null && FunctionRegistry.ContainsKey(funcName))
+        if (funcName is not null && FunctionRegistry.ContainsKey(funcName))
         {
             // 从调用处收集参数类型约束
             Collector.CollectFromFunctionCall(callExpr, funcName);
@@ -224,7 +224,7 @@ public class TypeInferenceEngine
         // 查找函数并更新参数类型
         if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (funcInit.FuncLangValue.Ids != null &&
+            if (funcInit.FuncLangValue.Ids is not null &&
                 paramIndex < funcInit.FuncLangValue.Ids.Count)
             {
                 var param = funcInit.FuncLangValue.Ids[paramIndex];
@@ -327,11 +327,11 @@ public class TypeInferenceEngine
             return false;
 
         // 检查是否有参数缺少类型注解
-        if (funcInit.FuncLangValue.Ids != null)
+        if (funcInit.FuncLangValue.Ids is not null)
         {
             foreach (var param in funcInit.FuncLangValue.Ids)
             {
-                if (string.IsNullOrEmpty(param.AssumptionType) && param.DefaultValue == null)
+                if (string.IsNullOrEmpty(param.AssumptionType) && param.DefaultValue is null)
                 {
                     return true;
                 }
@@ -355,7 +355,7 @@ public class TypeInferenceEngine
         var totalConstraints = Context.Constraints.Count;
         var resolvedTypes = Context.TypeVariableBindings.Count;
         var unresolvedTypes = Context.Constraints
-            .Where(c => Context.GetTypeBinding(c.TypeVariable) == null)
+            .Where(c => Context.GetTypeBinding(c.TypeVariable) is null)
             .Select(c => c.TypeVariable)
             .Distinct()
             .Count();
@@ -375,9 +375,9 @@ public class TypeInferenceEngine
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
-            ListLangValue list => list.ElementType != null ? $"list<{list.ElementType}>" : "list",
-            ArrayLangValue array => array.ElementType != null ? $"array<{array.ElementType}>" : "array",
-            DictionaryLangValue dict => dict.KeyType != null && dict.ValueType != null
+            ListLangValue list => list.ElementType is not null ? $"list<{list.ElementType}>" : "list",
+            ArrayLangValue array => array.ElementType is not null ? $"array<{array.ElementType}>" : "array",
+            DictionaryLangValue dict => dict.KeyType is not null && dict.ValueType is not null
                 ? $"dict<{dict.KeyType},{dict.ValueType}>"
                 : "dict",
             _ => "any"

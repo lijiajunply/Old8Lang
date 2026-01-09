@@ -74,11 +74,11 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         Id.LoadIlValue(ilGenerator, local);
 
         // 加载起始索引
-        if (Start != null)
+        if (Start is not null)
         {
             Start.LoadIlValue(ilGenerator, local);
             var startType = Start.OutputType(local);
-            if (startType != null && startType != typeof(int))
+            if (startType is not null && startType != typeof(int))
             {
                 Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), Start);
             }
@@ -90,11 +90,11 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         }
 
         // 加载结束索引
-        if (End != null)
+        if (End is not null)
         {
             End.LoadIlValue(ilGenerator, local);
             var endType = End.OutputType(local);
-            if (endType != null && endType != typeof(int))
+            if (endType is not null && endType != typeof(int))
             {
                 Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), End);
             }
@@ -106,11 +106,11 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         }
 
         // 加载步长
-        if (Step != null)
+        if (Step is not null)
         {
             Step.LoadIlValue(ilGenerator, local);
             var stepType = Step.OutputType(local);
-            if (stepType != null && stepType != typeof(int))
+            if (stepType is not null && stepType != typeof(int))
             {
                 Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), Step);
             }
@@ -126,7 +126,7 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
             nameof(Old8Lang.Compiler.CollectionHelper.Slice),
             [typeof(object), typeof(int), typeof(int), typeof(int)]);
 
-        if (sliceMethod == null)
+        if (sliceMethod is null)
         {
             throw new InvalidOperationError(this, "无法找到CollectionHelper.Slice方法");
         }
@@ -140,7 +140,7 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         var idType = Id.OutputType(local);
 
         // 如果类型为 null，返回 object 类型
-        if (idType == null)
+        if (idType is null)
         {
             return typeof(object);
         }
@@ -151,13 +151,13 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
 
     public override string ToString()
     {
-        if (Start != null && End != null && Step != null)
+        if (Start is not null && End is not null && Step is not null)
             return $"{Id}[{Start}:{End}:{Step}]";
-        if (Start != null && End != null)
+        if (Start is not null && End is not null)
             return $"{Id}[{Start}:{End}]";
-        if (Start != null)
+        if (Start is not null)
             return $"{Id}[{Start}:]";
-        if (End != null)
+        if (End is not null)
             return $"{Id}[:{End}]";
         return $"{Id}[:]"; // Old8Lang 风格的切片表达式
     }

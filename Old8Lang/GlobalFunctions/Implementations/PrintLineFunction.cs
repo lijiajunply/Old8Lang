@@ -44,7 +44,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
         {
             // 没有参数，调用 Console.WriteLine()
             var writeLineNoArg = typeof(Console).GetMethod("WriteLine", Type.EmptyTypes);
-            if (writeLineNoArg != null)
+            if (writeLineNoArg is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
             }
@@ -58,7 +58,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
 
         // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
         var writeLineObject = typeof(Console).GetMethod("WriteLine", [typeof(object)]);
-        if (writeLineObject != null)
+        if (writeLineObject is not null)
         {
             // 如果是值类型，先装箱
             if (printLineType is { IsValueType: true })

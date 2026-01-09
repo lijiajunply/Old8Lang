@@ -40,7 +40,7 @@ public class ClassMemberId : LangId
     public ClassMemberId(LangId id, IEnumerable<AccessModifierType>? modifiers = null)
         : base(id.IdName, id.AssumptionType, position: id.Position)
     {
-        Modifiers = modifiers != null ? [..modifiers] : [];
+        Modifiers = modifiers is not null ? [..modifiers] : [];
         ValidateModifiers();
     }
 
@@ -53,7 +53,7 @@ public class ClassMemberId : LangId
     public ClassMemberId(string name, string assumptionType = "", IEnumerable<AccessModifierType>? modifiers = null)
         : base(name, assumptionType)
     {
-        Modifiers = modifiers != null ? [..modifiers] : [];
+        Modifiers = modifiers is not null ? [..modifiers] : [];
         ValidateModifiers();
     }
 
@@ -68,7 +68,7 @@ public class ClassMemberId : LangId
         SourcePosition position)
         : base(name, assumptionType, position: position)
     {
-        Modifiers = modifiers != null ? [..modifiers] : [];
+        Modifiers = modifiers is not null ? [..modifiers] : [];
         ValidateModifiers();
     }
 

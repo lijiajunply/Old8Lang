@@ -113,7 +113,7 @@ public class FuncLangValue : ImportInfo
             }
 
             // 检查 finally 块
-            if (tryStmt.FinallyBlock != null && ContainsYieldStatement(tryStmt.FinallyBlock))
+            if (tryStmt.FinallyBlock is not null && ContainsYieldStatement(tryStmt.FinallyBlock))
                 return true;
 
             return false;
@@ -123,7 +123,7 @@ public class FuncLangValue : ImportInfo
         for (int i = 0; i < stmt.Count; i++)
         {
             var child = stmt[i];
-            if (child != null && ContainsYieldStatement(child))
+            if (child is not null && ContainsYieldStatement(child))
                 return true;
         }
 
@@ -133,7 +133,7 @@ public class FuncLangValue : ImportInfo
     public override LangValueType Run(VariateManager manager)
     {
         // 如果这个函数没有方法引用（即是 Old8Lang 函数而非原生方法）
-        if (Method == null && Ids != null)
+        if (Method is null && Ids is not null)
         {
             // 对于生成器函数，我们需要特殊处理
             if (ContainsYieldStatement(BlockStatement))
@@ -184,7 +184,7 @@ public class FuncLangValue : ImportInfo
     public FuncLangValue CreateWithCapturedScope(VariateManager manager)
     {
         // 如果是原生方法，直接返回自身（原生方法不需要捕获作用域）
-        if (Method != null)
+        if (Method is not null)
         {
             return this;
         }
@@ -215,7 +215,7 @@ public class FuncLangValue : ImportInfo
         };
 
         // 处理参数
-        if (Ids != null && Ids.Count != 0)
+        if (Ids is not null && Ids.Count != 0)
         {
             var paramValues = ProcessAndValidateParameters(ids, variateManagerFunc);
 
@@ -246,7 +246,7 @@ public class FuncLangValue : ImportInfo
         List<NamedArgument>? namedArgs, SourcePosition callPosition, object? obj = null)
     {
         // 如果没有命名参数，使用原有的逻辑
-        if (namedArgs == null || namedArgs.Count == 0)
+        if (namedArgs is null || namedArgs.Count == 0)
         {
             return Run(variateManagerFunc, positionalArgs, obj);
         }
@@ -272,7 +272,7 @@ public class FuncLangValue : ImportInfo
         SourcePosition callPosition,
         VariateManager manager)
     {
-        if (Ids == null || Ids.Count == 0)
+        if (Ids is null || Ids.Count == 0)
         {
             if (namedArgs.Count > 0)
             {
@@ -338,7 +338,7 @@ public class FuncLangValue : ImportInfo
             if (!parameterFilled[i])
             {
                 // 检查是否有默认值
-                if (Ids[i].DefaultValue != null)
+                if (Ids[i].DefaultValue is not null)
                 {
                     // 使用默认值
                     paramSlots[i] = Ids[i].DefaultValue;
@@ -361,7 +361,7 @@ public class FuncLangValue : ImportInfo
         var result = new List<LangExpression>(paramSlots.Length);
         for (int i = 0; i < paramSlots.Length; i++)
         {
-            if (paramSlots[i] == null)
+            if (paramSlots[i] is null)
             {
                 throw new ArgumentError(callPosition,
                     $"内部错误：函数 '{Id?.IdName}' 的参数槽位 {i} 未被填充");
@@ -391,7 +391,7 @@ public class FuncLangValue : ImportInfo
         }
 
         // 检查是否尝试对 params 参数使用命名参数
-        if (Ids != null)
+        if (Ids is not null)
         {
             for (int i = 0; i < Ids.Count; i++)
             {
@@ -410,12 +410,12 @@ public class FuncLangValue : ImportInfo
 
     public virtual LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
-        if (Method != null)
+        if (Method is not null)
         {
             // 获取方法的所有参数
             var methodParams = Method.GetParameters();
             var expectedParams = methodParams.Length;
-            if (obj != null) expectedParams--; // 如果有this参数，减去1
+            if (obj is not null) expectedParams--; // 如果有this参数，减去1
             var actualParams = ids.Count;
 
             // 检查参数数量是否匹配，考虑可选参数
@@ -429,7 +429,7 @@ public class FuncLangValue : ImportInfo
             if (actualParams < expectedParams)
             {
                 // 计算缺失参数的起始索引（考虑 this 参数）
-                var startIndex = obj != null ? actualParams + 1 : actualParams;
+                var startIndex = obj is not null ? actualParams + 1 : actualParams;
 
                 // 检查从 actualParams 开始的所有参数是否都有默认值
                 for (int i = startIndex; i < methodParams.Length; i++)
@@ -447,7 +447,7 @@ public class FuncLangValue : ImportInfo
 
             // 根据目标参数类型转换参数
             var adjustedParams = new object?[convertedValues.Length];
-            var paramStartIndex = obj != null ? 1 : 0; // 如果有 this 参数，跳过第一个参数
+            var paramStartIndex = obj is not null ? 1 : 0; // 如果有 this 参数，跳过第一个参数
 
             for (int i = 0; i < convertedValues.Length; i++)
             {
@@ -468,12 +468,12 @@ public class FuncLangValue : ImportInfo
                     adjustedParams[i] = array;
                 }
                 // 如果值为 null 且目标是可空类型，直接赋 null
-                else if (value == null && targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                else if (value is null && targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     adjustedParams[i] = null;
                 }
                 // 如果值不为 null 且类型不匹配，尝试类型转换
-                else if (value != null && !targetType.IsAssignableFrom(value.GetType()))
+                else if (value is not null && !targetType.IsAssignableFrom(value.GetType()))
                 {
                     try
                     {
@@ -501,10 +501,10 @@ public class FuncLangValue : ImportInfo
                 Array.Copy(adjustedParams, finalParams, actualParams);
 
                 // 填充默认值
-                var startIndex = obj != null ? actualParams + 1 : actualParams;
+                var startIndex = obj is not null ? actualParams + 1 : actualParams;
                 for (int i = startIndex; i < methodParams.Length; i++)
                 {
-                    var targetIndex = obj != null ? i - 1 : i;
+                    var targetIndex = obj is not null ? i - 1 : i;
                     finalParams[targetIndex] = methodParams[i].DefaultValue;
                 }
             }
@@ -520,7 +520,7 @@ public class FuncLangValue : ImportInfo
                 Old8Exception.PushCallStack(Method?.Name ?? "Unknown", Position);
 
                 // 使用委托缓存优化反射调用性能
-                if (Method != null)
+                if (Method is not null)
                 {
                     invoke = MethodInvokerCache.Invoke(Method, obj, finalParams);
                 }
@@ -529,7 +529,7 @@ public class FuncLangValue : ImportInfo
                     invoke = null;
                 }
             }
-            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 // 转换 .NET 异常为 Old8Lang 异常
                 var innerException = ex.InnerException;
@@ -571,7 +571,7 @@ public class FuncLangValue : ImportInfo
         }
 
         // 检查参数数量是否匹配，但允许省略带默认参数的实参
-        if (Ids != null)
+        if (Ids is not null)
         {
             var expectedParams = Ids.Count;
             var actualParams = ids.Count;
@@ -632,7 +632,7 @@ public class FuncLangValue : ImportInfo
 
             // 如果有捕获的作用域（闭包），使用捕获的作用域而不是调用时的作用域
             // 这样函数体就能访问定义时的外部变量
-            if (CapturedScope != null)
+            if (CapturedScope is not null)
             {
                 // 使用捕获的作用域作为基础
                 executionManager = CapturedScope;
@@ -664,7 +664,7 @@ public class FuncLangValue : ImportInfo
 
             // 设置当前函数的泛型类型参数映射
             // 优先使用已有的映射（从泛型类实例传递过来），否则使用函数自己的泛型参数映射（泛型函数）
-            if (originalTypeArgumentMapping == null && TypeArgumentMapping != null)
+            if (originalTypeArgumentMapping is null && TypeArgumentMapping is not null)
             {
                 executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
             }
@@ -686,10 +686,10 @@ public class FuncLangValue : ImportInfo
                 }
             }
 
-            if (Ids != null && Ids.Count != 0)
+            if (Ids is not null && Ids.Count != 0)
             {
                 // 首次调用时初始化默认参数值缓存
-                if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
+                if (CachedDefaultValues is null && Ids.Any(id => id.DefaultValue is not null))
                 {
                     InitializeDefaultValueCache(executionManager);
                 }
@@ -731,7 +731,7 @@ public class FuncLangValue : ImportInfo
         {
             // 在移除子作用域之前执行所有defer语句（此时变量仍然可见）
             // 必须在finally块中执行，以确保即使函数抛出异常，defer也能执行
-            if (executionManager != null)
+            if (executionManager is not null)
             {
                 executionManager.ExecuteDefers();
 
@@ -750,7 +750,7 @@ public class FuncLangValue : ImportInfo
     public override Type OutputType(LocalManager local)
     {
         var idType = Id?.OutputType(local);
-        if (idType != null && idType != typeof(object)) return idType;
+        if (idType is not null && idType != typeof(object)) return idType;
         var a = GetItemType(BlockStatement, local);
         return a;
     }
@@ -765,7 +765,7 @@ public class FuncLangValue : ImportInfo
             if (item is SetStatement { Id: not null } setStatement)
             {
                 var varType = setStatement.Value.OutputType(local);
-                if (varType != null)
+                if (varType is not null)
                 {
                     local.LocalVarTypes[setStatement.Id.IdName] = varType;
                 }
@@ -776,7 +776,7 @@ public class FuncLangValue : ImportInfo
                 return returnStatement.OutputType(local);
             }
 
-            if (item == null || item.Count == 0)
+            if (item is null || item.Count == 0)
             {
                 continue;
             }
@@ -793,19 +793,19 @@ public class FuncLangValue : ImportInfo
 
     public override string ToString()
     {
-        if (Method != null)
+        if (Method is not null)
         {
             return $"{Method}";
         }
 
-        var paramList = Ids != null ? string.Join(", ", Ids) : string.Empty;
+        var paramList = Ids is not null ? string.Join(", ", Ids) : string.Empty;
         return $"func {Id}({paramList}) \n {{ {BlockStatement} }}";
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 如果是.NET方法，直接加载方法引用
-        if (Method != null)
+        if (Method is not null)
         {
             // 对于实例方法，需要先加载对象实例到堆栈上
             // 这里假设Method已经是正确的委托类型
@@ -818,7 +818,7 @@ public class FuncLangValue : ImportInfo
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 【新增】Lambda表达式类型注解验证
-        if (IsLambda || Id == null)
+        if (IsLambda || Id is null)
         {
             ValidateLambdaTypeAnnotations(local, idName);
         }
@@ -826,11 +826,11 @@ public class FuncLangValue : ImportInfo
         // Lambda表达式需要特殊处理：编译成Delegate
         // 普通方法：编译成DynamicMethod
 
-        // Lambda表达式没有函数名(Id == null)，使用变量名作为方法名
+        // Lambda表达式没有函数名(Id is null)，使用变量名作为方法名
         var methodName = Id?.IdName ?? idName;
 
         // 如果已经是编译好的方法，直接注册
-        if (Method != null)
+        if (Method is not null)
         {
             local.DelegateVar.Add(methodName, Method);
             return;
@@ -854,7 +854,7 @@ public class FuncLangValue : ImportInfo
         var returnType = GetItemType(BlockStatement, funcLocal);
 
         // 根据函数类型选择不同的处理方式
-        if (IsLambda || Id == null)
+        if (IsLambda || Id is null)
         {
             // Lambda表达式处理：编译成Delegate
 
@@ -1036,7 +1036,7 @@ public class FuncLangValue : ImportInfo
             }
 
             // 同时存储函数的参数列表信息，用于支持默认参数
-            if (Ids != null)
+            if (Ids is not null)
             {
                 var delegateKey = $"{methodName}${paramTypeNames}";
                 local.FuncParameters.TryAdd(delegateKey, Ids);
@@ -1049,7 +1049,7 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     private static bool IsConstantExpression(LangExpression? expr)
     {
-        if (expr == null) return false;
+        if (expr is null) return false;
 
         return expr switch
         {
@@ -1074,12 +1074,12 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     private void InitializeDefaultValueCache(VariateManager manager)
     {
-        if (Ids == null || Ids.Count == 0) return;
+        if (Ids is null || Ids.Count == 0) return;
 
         for (int i = 0; i < Ids.Count; i++)
         {
             var param = Ids[i];
-            if (param.DefaultValue != null && IsConstantExpression(param.DefaultValue))
+            if (param.DefaultValue is not null && IsConstantExpression(param.DefaultValue))
             {
                 // 延迟初始化缓存字典
                 CachedDefaultValues ??= new Dictionary<int, LangValueType>();
@@ -1097,7 +1097,7 @@ public class FuncLangValue : ImportInfo
     private void ValidateLambdaTypeAnnotations(LocalManager local, string variableName)
     {
         // 验证Lambda参数的类型注解
-        if (Ids != null)
+        if (Ids is not null)
         {
             for (int i = 0; i < Ids.Count; i++)
             {
@@ -1130,7 +1130,7 @@ public class FuncLangValue : ImportInfo
         List<LangValueType> argumentValues,
         VariateManager? executionManager = null)
     {
-        if (Ids == null) return;
+        if (Ids is null) return;
 
         // 从执行管理器获取泛型类型映射（泛型类的方法）
         // 如果没有，则使用函数自身的泛型映射（泛型函数）
@@ -1156,7 +1156,7 @@ public class FuncLangValue : ImportInfo
         VariateManager variManager,
         VariateManager? executionManager = null)
     {
-        if (Ids == null) return new List<LangValueType>();
+        if (Ids is null) return new List<LangValueType>();
 
         // 1. 计算所有传入参数的值
         var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
@@ -1214,10 +1214,10 @@ public class FuncLangValue : ImportInfo
         for (var i = paramValues.Count; i < Ids.Count; i++)
         {
             var parameter = Ids[i];
-            if (parameter.DefaultValue != null)
+            if (parameter.DefaultValue is not null)
             {
                 // 优先使用缓存的默认值（如果提供了执行管理器）
-                if (executionManager != null && CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
+                if (executionManager is not null && CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
                 {
                     paramValues.Add(cachedValue);
                 }
@@ -1267,7 +1267,7 @@ public class FuncLangValue : ImportInfo
                 foreach (var constraintName in genericParam.Constraints!)
                 {
                     var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
-                    if (constraintType != null && !actualType.IsCompatibleWith(constraintType))
+                    if (constraintType is not null && !actualType.IsCompatibleWith(constraintType))
                     {
                         throw new ArgumentException(
                             $"类型 {actualType.Name} 不满足约束 {constraintName}");
@@ -1290,7 +1290,7 @@ public class FuncLangValue : ImportInfo
         instantiated.TypeArgumentMapping = typeArguments;
 
         // 复制闭包环境（如果有）
-        if (CapturedScope != null)
+        if (CapturedScope is not null)
         {
             typeof(FuncLangValue)
                 .GetProperty("CapturedScope", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?

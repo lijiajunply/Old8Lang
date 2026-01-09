@@ -31,7 +31,7 @@ public partial class TaskFactoryClassLangValue : LangValueType
                 _ => null
             };
 
-            if (method == null)
+            if (method is null)
             {
                 throw new AttributeError(dotExpression.Position, methodName, "TaskFactory");
             }

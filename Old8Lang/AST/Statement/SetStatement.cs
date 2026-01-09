@@ -71,10 +71,10 @@ public partial class SetStatement : OldStatement
         var result = Value.Run(manager);
 
         // 检查是否为首次赋值
-        if (Id != null)
+        if (Id is not null)
         {
             var existingVariable = manager.GetValue(Id);
-            var isInitialAssignment = existingVariable == null;
+            var isInitialAssignment = existingVariable is null;
 
             // 如果有类型注解，进行类型检查
             if (!string.IsNullOrEmpty(Id.AssumptionType))
@@ -431,7 +431,7 @@ public partial class SetStatement : OldStatement
         }
 
         // 处理普通变量赋值：name <- value
-        if (Id != null && !string.IsNullOrEmpty(Id.IdName))
+        if (Id is not null && !string.IsNullOrEmpty(Id.IdName))
         {
             manager.Set(Id, result);
         }
@@ -445,7 +445,7 @@ public partial class SetStatement : OldStatement
     /// <exception cref="InvalidOperationError">当尝试对字符串进行索引赋值时抛出</exception>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        if (Id != null && !string.IsNullOrEmpty(Id.IdName))
+        if (Id is not null && !string.IsNullOrEmpty(Id.IdName))
         {
             // 如果有类型注解,进行编译时类型检查
             if (!string.IsNullOrEmpty(Id.AssumptionType))
@@ -462,7 +462,7 @@ public partial class SetStatement : OldStatement
             // 普通变量赋值: name <- value
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
-        else if (LeftExpression != null)
+        else if (LeftExpression is not null)
         {
             if (LeftExpression is Operation operation)
             {
@@ -569,7 +569,7 @@ public partial class SetStatement : OldStatement
                     // 成员访问赋值: left.right <- value
 
                     // 检查是否是this访问（如this.name <- value）
-                    if (operation.Left is LangId { IdName: "this" } && local.InClassEnv != null)
+                    if (operation.Left is LangId { IdName: "this" } && local.InClassEnv is not null)
                     {
                         // 加载 this（参数0）
                         ilGenerator.Emit(OpCodes.Ldarg_0);
@@ -584,11 +584,11 @@ public partial class SetStatement : OldStatement
                         {
                             // 对于 TypeBuilder，尝试从基类中查找字段
                             var baseType = typeBuilder.BaseType;
-                            while (baseType != null && baseType != typeof(object))
+                            while (baseType is not null && baseType != typeof(object))
                             {
                                 fieldInfo = baseType.GetField(memberId.IdName,
                                     BindingFlags.Public | BindingFlags.Instance);
-                                if (fieldInfo != null) break;
+                                if (fieldInfo is not null) break;
                                 baseType = baseType.BaseType;
                             }
                         }
@@ -599,14 +599,14 @@ public partial class SetStatement : OldStatement
                                 BindingFlags.Public | BindingFlags.Instance);
                         }
 
-                        if (fieldInfo != null)
+                        if (fieldInfo is not null)
                         {
                             // 加载右值
                             Value.LoadIlValue(ilGenerator, local);
 
                             // 检查值类型是否与字段类型匹配
                             var valueType = Value.OutputType(local);
-                            if (valueType != null && fieldInfo.FieldType != valueType)
+                            if (valueType is not null && fieldInfo.FieldType != valueType)
                             {
                                 // 如果值类型与字段类型不匹配，进行类型转换
                                 if (fieldInfo.FieldType == typeof(object) && valueType.IsValueType)
@@ -639,14 +639,14 @@ public partial class SetStatement : OldStatement
                     if (leftType is not TypeBuilder && leftType != typeof(object))
                     {
                         var field = leftType.GetField(memberId.IdName);
-                        if (field != null)
+                        if (field is not null)
                         {
                             ilGenerator.Emit(OpCodes.Stfld, field);
                         }
                         else
                         {
                             var property = leftType.GetProperty(memberId.IdName);
-                            if (property != null && property.GetSetMethod() != null)
+                            if (property is not null && property.GetSetMethod() is not null)
                             {
                                 ilGenerator.Emit(OpCodes.Callvirt, property.GetSetMethod()!);
                             }
@@ -891,13 +891,13 @@ public partial class SetStatement : OldStatement
     /// <returns>赋值语句的字符串表示</returns>
     public override string ToString()
     {
-        if (LeftExpression != null)
+        if (LeftExpression is not null)
         {
             return $"{LeftExpression} <- {Value}";
         }
 
         // 如果 Id 为空或 IdName 为空，只显示右值（用于块表达式的返回值）
-        if (Id == null || string.IsNullOrEmpty(Id.IdName))
+        if (Id is null || string.IsNullOrEmpty(Id.IdName))
         {
             return $" <- {Value}";
         }

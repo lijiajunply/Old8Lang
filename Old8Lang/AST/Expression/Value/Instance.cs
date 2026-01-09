@@ -113,7 +113,7 @@ public partial class Instance : LangValueType
                                 bestMatch = funcValue;
                                 break;
                             }
-                            else if (bestMatch == null)
+                            else if (bestMatch is null)
                             {
                                 // 记录第一个匹配的函数
                                 bestMatch = funcValue;
@@ -129,7 +129,7 @@ public partial class Instance : LangValueType
                 }
 
                 // 如果没有找到匹配的，使用第一个
-                if (bestMatch == null && matchingFunctions.Count > 0)
+                if (bestMatch is null && matchingFunctions.Count > 0)
                 {
                     bestMatch = matchingFunctions[0];
                 }
@@ -141,7 +141,7 @@ public partial class Instance : LangValueType
             }
 
             // 如果找到匹配的函数，调用它
-            if (bestMatch != null)
+            if (bestMatch is not null)
             {
                 if (bestMatch is AsyncFuncLangValue asyncFunc)
                 {
@@ -160,7 +160,7 @@ public partial class Instance : LangValueType
                             for (var i = paramValuesCopy.Count; i < asyncFunc.Ids.Count; i++)
                             {
                                 var id = asyncFunc.Ids[i];
-                                if (id.DefaultValue != null)
+                                if (id.DefaultValue is not null)
                                 {
                                     var defaultValue = id.DefaultValue.Run(manager);
                                     paramValuesCopy.Add(defaultValue);
@@ -195,9 +195,9 @@ public partial class Instance : LangValueType
                 else if (bestMatch is FuncLangValue funcValue)
                 {
                     // 如果是泛型函数且未实例化，尝试自动推断类型参数
-                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
                     {
-                        if (manager.Interpreter == null)
+                        if (manager.Interpreter is null)
                         {
                             throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
                         }
@@ -206,7 +206,7 @@ public partial class Instance : LangValueType
                         var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
                         var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
-                        if (inferredTypes != null)
+                        if (inferredTypes is not null)
                         {
                             // 使用推断出的类型实例化泛型函数
                             var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
@@ -255,9 +255,9 @@ public partial class Instance : LangValueType
                 else if (idResult is FuncLangValue funcValue)
                 {
                     // 如果是泛型函数且未实例化，尝试自动推断类型参数
-                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
                     {
-                        if (manager.Interpreter == null)
+                        if (manager.Interpreter is null)
                         {
                             throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
                         }
@@ -266,7 +266,7 @@ public partial class Instance : LangValueType
                         var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
                         var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
-                        if (inferredTypes != null)
+                        if (inferredTypes is not null)
                         {
                             // 使用推断出的类型实例化泛型函数
                             var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
@@ -332,9 +332,9 @@ public partial class Instance : LangValueType
             else if (idResult is FuncLangValue funcValue)
             {
                 // 如果是泛型函数且未实例化,尝试自动推断类型参数
-                if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
                 {
-                    if (manager.Interpreter == null)
+                    if (manager.Interpreter is null)
                     {
                         throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
                     }
@@ -343,7 +343,7 @@ public partial class Instance : LangValueType
                     var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
                     var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
-                    if (inferredTypes != null)
+                    if (inferredTypes is not null)
                     {
                         // 使用推断出的类型实例化泛型函数
                         var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
@@ -410,7 +410,7 @@ public partial class Instance : LangValueType
         MethodInfo? m = null;
 
         // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
-        if (manager != null)
+        if (manager is not null)
         {
             ValueFunctions.ExecutionContext.SetCurrentManager(manager);
         }
@@ -444,7 +444,7 @@ public partial class Instance : LangValueType
                 m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount);
 
                 // 如果没找到，查找有可选参数的方法
-                if (m == null)
+                if (m is null)
                 {
                     m = allMethods.FirstOrDefault(x =>
                     {
@@ -468,7 +468,7 @@ public partial class Instance : LangValueType
         }
 
         // 如果没有找到扩展方法，尝试在类型本身上查找
-        if (m == null)
+        if (m is null)
         {
             type = baseLangValue.GetType();
             // 根据参数数量查找正确的重载
@@ -483,14 +483,14 @@ public partial class Instance : LangValueType
         }
 
         // 如果还是没找到，尝试 ValueTypeFuncStatic
-        if (m == null)
+        if (m is null)
         {
             type = Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ValueTypeFuncStatic");
             m = type?.GetMethod(Id.IdName);
         }
 
         // 如果找不到方法，抛出异常
-        if (m == null)
+        if (m is null)
         {
             throw new AttributeError(baseLangValue, Id.IdName, baseLangValue.GetType().Name);
         }
@@ -609,7 +609,7 @@ public partial class Instance : LangValueType
         {
             // 如果精确匹配失败，尝试查找参数数量匹配的方法（支持默认参数）
             // 对于带默认参数的情况，从实际参数数量开始，逐步增加参数数量尝试匹配
-            for (int paramCount = Ids.Count; matchingMethod == null && paramCount <= Ids.Count + 10; paramCount++)
+            for (int paramCount = Ids.Count; matchingMethod is null && paramCount <= Ids.Count + 10; paramCount++)
             {
                 // 遍历所有委托变量，查找参数数量匹配的方法
                 foreach (var (key, result) in local.DelegateVar)
@@ -627,10 +627,10 @@ public partial class Instance : LangValueType
                         local.FuncParameters.TryGetValue(key, out funcParams);
 
                         // 检查是否有默认参数可以补充
-                        if (funcParams != null && Ids.Count <= methodParams.Length)
+                        if (funcParams is not null && Ids.Count <= methodParams.Length)
                         {
                             // 计算必需参数的数量（没有默认值的参数）
-                            int requiredParamsCount = funcParams.Count(t => t.DefaultValue == null);
+                            int requiredParamsCount = funcParams.Count(t => t.DefaultValue is null);
 
                             // 如果实际参数数量大于等于必需参数数量，则可以匹配
                             if (Ids.Count >= requiredParamsCount)
@@ -650,10 +650,10 @@ public partial class Instance : LangValueType
             }
         }
 
-        if (matchingMethod == null)
+        if (matchingMethod is null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
-            if (classType == null)
+            if (classType is null)
             {
                 // 如果找不到类类型，可能是因为类还在编译中
                 // 检查是否有对应的TypeBuilder
@@ -673,7 +673,7 @@ public partial class Instance : LangValueType
                         }
                     }
 
-                    if (classType == null)
+                    if (classType is null)
                     {
                         // 创建一个临时的object类型引用，允许编译继续进行
                         // 这是一个临时解决方案，编译器模式下类前向引用的处理需要改进
@@ -688,7 +688,7 @@ public partial class Instance : LangValueType
 
             // 获取默认构造函数
             var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
-            if (constructorInfo != null)
+            if (constructorInfo is not null)
             {
                 ilGenerator.Emit(OpCodes.Newobj, constructorInfo);
             }
@@ -701,7 +701,7 @@ public partial class Instance : LangValueType
                 BindingFlags.Public |
                 BindingFlags.Instance |
                 BindingFlags.DeclaredOnly);
-            if (initFunc != null)
+            if (initFunc is not null)
             {
                 // 加载 this 指针
                 ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
@@ -734,7 +734,7 @@ public partial class Instance : LangValueType
 
         // 检查是否有 params 参数
         int paramsIndex = -1;
-        if (funcParams != null)
+        if (funcParams is not null)
         {
             for (int i = 0; i < funcParams.Count; i++)
             {
@@ -791,7 +791,7 @@ public partial class Instance : LangValueType
 
                 // 类型转换
                 var idType = id.OutputType(local);
-                if (idType != null && arrayElementType != idType)
+                if (idType is not null && arrayElementType != idType)
                 {
                     if (arrayElementType == typeof(object) && idType.IsValueType)
                     {
@@ -847,13 +847,13 @@ public partial class Instance : LangValueType
         }
 
         // 如果有默认参数需要补充
-        if (funcParams != null && Ids.Count < matchingParams.Length)
+        if (funcParams is not null && Ids.Count < matchingParams.Length)
         {
             // 补充默认参数值
             for (var i = Ids.Count; i < funcParams.Count; i++)
             {
                 var param = funcParams[i];
-                if (param.DefaultValue != null)
+                if (param.DefaultValue is not null)
                 {
                     // 加载默认参数值
                     param.DefaultValue.LoadIlValue(ilGenerator, local);
@@ -863,13 +863,13 @@ public partial class Instance : LangValueType
                     var defaultType = param.DefaultValue.OutputType(local);
 
                     // 使用LocalManager的ValidateType方法验证默认参数类型
-                    if (defaultType != null)
+                    if (defaultType is not null)
                     {
                         local.ValidateType(paramType, defaultType, param.Position);
                     }
 
                     // 处理必要的类型转换
-                    if (defaultType != null && paramType != defaultType)
+                    if (defaultType is not null && paramType != defaultType)
                     {
                         if (paramType == typeof(object) && defaultType.IsValueType)
                         {
@@ -913,7 +913,7 @@ public partial class Instance : LangValueType
     {
         // 首先尝试通过全局函数注册器获取返回类型
         var globalFuncReturnType = TryGetGlobalFunctionReturnType(local);
-        if (globalFuncReturnType != null)
+        if (globalFuncReturnType is not null)
         {
             return globalFuncReturnType;
         }
@@ -926,7 +926,7 @@ public partial class Instance : LangValueType
         var result = local.DelegateVar.GetValueOrDefault(exactDelegateKey);
 
         // 如果找不到，可能是带默认参数的函数，尝试查找参数数量匹配的方法
-        if (result == null)
+        if (result is null)
         {
             // 遍历所有委托变量，查找参数数量匹配的方法
             foreach (var (key, method) in local.DelegateVar)
@@ -944,7 +944,7 @@ public partial class Instance : LangValueType
                     if (local.FuncParameters.TryGetValue(key, out var funcParams))
                     {
                         // 计算必需参数的数量（没有默认值的参数）
-                        int requiredParamsCount = funcParams.Count(t => t.DefaultValue == null);
+                        int requiredParamsCount = funcParams.Count(t => t.DefaultValue is null);
 
                         // 如果实际参数数量大于等于必需参数数量，则可以匹配
                         if (Ids.Count >= requiredParamsCount)
@@ -963,10 +963,10 @@ public partial class Instance : LangValueType
             }
         }
 
-        if (result != null) return result.ReturnType;
+        if (result is not null) return result.ReturnType;
 
         var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
-        if (classType == null)
+        if (classType is null)
         {
             // 如果找不到类类型，尝试从ClassVar中查找TypeBuilder
             foreach (var kv in local.ClassVar)
@@ -988,14 +988,14 @@ public partial class Instance : LangValueType
     private void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id, Type? idType, Type paramType)
     {
         // 使用LocalManager的ValidateType方法验证参数类型
-        if (idType != null)
+        if (idType is not null)
         {
             // 执行类型验证，确保参数类型与方法期望的类型兼容
             local.ValidateType(paramType, idType, id.Position);
         }
 
         // 处理必要的类型转换
-        if (idType != null && paramType != idType)
+        if (idType is not null && paramType != idType)
         {
             if (paramType == typeof(object) && idType.IsValueType)
             {

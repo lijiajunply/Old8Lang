@@ -96,14 +96,14 @@ public class LinqQueryExecutor(VariateManager manager)
             finally
             {
                 // 恢复范围变量
-                if (oldRangeValue != null)
+                if (oldRangeValue is not null)
                     manager.Set(rangeLangId, oldRangeValue);
             }
         }
 
         // 处理 OrderBy 子句（如果有）
         var orderByClause = linqExpr.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
-        if (orderByClause != null)
+        if (orderByClause is not null)
         {
             // 在排序后执行 select
             var sortedResults = ExecuteOrderByOnIntermediateResults(
@@ -139,14 +139,14 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldRangeValue != null)
+                    if (oldRangeValue is not null)
                         manager.Set(rangeLangId, oldRangeValue);
                 }
             }
         }
 
         // 处理查询延续（into）
-        if (linqExpr.Continuation != null)
+        if (linqExpr.Continuation is not null)
         {
             result = ExecuteContinuation(linqExpr.Continuation, result).Cast<object?>().ToList();
         }
@@ -192,7 +192,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -217,7 +217,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -247,7 +247,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -272,7 +272,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -309,7 +309,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -327,7 +327,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -350,7 +350,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -368,7 +368,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -444,7 +444,7 @@ public class LinqQueryExecutor(VariateManager manager)
             finally
             {
                 // 恢复范围变量
-                if (oldValue != null)
+                if (oldValue is not null)
                     manager.Set(rangeLangId, oldValue);
             }
         }
@@ -475,7 +475,7 @@ public class LinqQueryExecutor(VariateManager manager)
             finally
             {
                 // 恢复范围变量
-                if (oldValue != null)
+                if (oldValue is not null)
                     manager.Set(rangeLangId, oldValue);
             }
         }
@@ -511,7 +511,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -529,7 +529,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
                 finally
                 {
-                    if (oldValue != null)
+                    if (oldValue is not null)
                         manager.Set(rangeLangId, oldValue);
                 }
             });
@@ -552,7 +552,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -570,7 +570,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     finally
                     {
-                        if (oldValue != null)
+                        if (oldValue is not null)
                             manager.Set(rangeLangId, oldValue);
                     }
                 });
@@ -611,7 +611,7 @@ public class LinqQueryExecutor(VariateManager manager)
             }
             finally
             {
-                if (oldValue != null)
+                if (oldValue is not null)
                     manager.Set(rangeLangId, oldValue);
             }
         }
@@ -649,7 +649,7 @@ public class LinqQueryExecutor(VariateManager manager)
             }
             finally
             {
-                if (oldRangeValue != null)
+                if (oldRangeValue is not null)
                     manager.Set(rangeLangId, oldRangeValue);
             }
         }

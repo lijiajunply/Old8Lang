@@ -263,7 +263,7 @@ public class LocalManager
     /// <returns>如果类型兼容返回true，否则报告错误</returns>
     public bool ValidateType(Type? expected, Type? actual, SourcePosition position)
     {
-        if (expected == null || actual == null)
+        if (expected is null || actual is null)
         {
             ReportError("类型无效: 预期类型或实际类型为null", position);
             return false;
@@ -617,7 +617,7 @@ public class LocalManager
         foreach (var (funcKey, paramList) in FuncParameters)
         {
             var param = paramList.FirstOrDefault(p => p.IdName == variableName);
-            if (param != null)
+            if (param is not null)
             {
                 return param.OutputType(this);
             }

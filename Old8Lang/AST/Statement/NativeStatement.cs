@@ -208,7 +208,7 @@ public partial class NativeStatement : OldStatement
         if (!string.IsNullOrEmpty(MethodName))
         {
             var methodInfo = type?.GetMethod(MethodName);
-            if (methodInfo == null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
+            if (methodInfo is null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             var func = new FuncLangValue(NativeName, methodInfo, FuncValue);
@@ -220,7 +220,7 @@ public partial class NativeStatement : OldStatement
         if (ImportAll)
         {
             var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            if (methods == null || methods.Length == 0)
+            if (methods is null || methods.Length == 0)
             {
                 throw new InvalidOperationError(this, $"类 {ClassName} 中没有找到公共静态方法");
             }
@@ -244,7 +244,7 @@ public partial class NativeStatement : OldStatement
             foreach (var methodName in MethodList)
             {
                 var methodInfo = type?.GetMethod(methodName);
-                if (methodInfo == null)
+                if (methodInfo is null)
                 {
                     throw new InvalidOperationError(this, $"找不到方法 {methodName} 在 {ClassName} 类中");
                 }
@@ -316,7 +316,7 @@ public partial class NativeStatement : OldStatement
         if (!string.IsNullOrEmpty(MethodName))
         {
             var methodInfo = type?.GetMethod(MethodName);
-            if (methodInfo == null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
+            if (methodInfo is null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             local.DelegateVar.Add(NativeName, methodInfo);
@@ -327,7 +327,7 @@ public partial class NativeStatement : OldStatement
         if (ImportAll)
         {
             var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            if (methods == null || methods.Length == 0)
+            if (methods is null || methods.Length == 0)
             {
                 throw new InvalidOperationError(this, $"类 {ClassName} 中没有找到公共静态方法");
             }
@@ -350,7 +350,7 @@ public partial class NativeStatement : OldStatement
             foreach (var methodName in MethodList)
             {
                 var methodInfo = type?.GetMethod(methodName);
-                if (methodInfo == null)
+                if (methodInfo is null)
                 {
                     throw new InvalidOperationError(this, $"找不到方法 {methodName} 在 {ClassName} 类中");
                 }

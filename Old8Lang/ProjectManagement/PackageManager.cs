@@ -131,7 +131,7 @@ public class PackageManager
                 var packagePath = Path.Combine(searchPath, packageName);
                 LogDebug($"  Checking exact match: {packagePath}");
 
-                if (TryLoadPackageFromPath(packagePath, packageName, manager, out module) && module != null)
+                if (TryLoadPackageFromPath(packagePath, packageName, manager, out module) && module is not null)
                 {
                     LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {packagePath}");
                     PackageCache[packageName] = module;
@@ -147,7 +147,7 @@ public class PackageManager
                 LogDebug($"  Found versioned directory: {versionedPath}");
 
                 if (!TryLoadPackageFromPath(versionedPath, packageName, manager, out module) ||
-                    module == null) continue;
+                    module is null) continue;
                 LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {versionedPath}");
                 PackageCache[packageName] = module;
                 return true;
@@ -182,7 +182,7 @@ public class PackageManager
             // 查找包的入口文件
             var entryFile = FindPackageEntryFile(packagePath, packageName);
 
-            if (entryFile == null)
+            if (entryFile is null)
             {
                 LogDebug($"    No entry file found in: {packagePath}");
                 module = null;

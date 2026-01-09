@@ -41,7 +41,7 @@ public static class TypeChecker
     /// </summary>
     public static TypeAnnotationManager GetAnnotationManager()
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
         return _annotationManager;
     }
@@ -71,7 +71,7 @@ public static class TypeChecker
                 var expectedType = parameter.AssumptionType;
 
                 // 如果是泛型类型参数，尝试解析为实际类型
-                if (typeArgumentMapping != null && typeArgumentMapping.TryGetValue(expectedType, out var value))
+                if (typeArgumentMapping is not null && typeArgumentMapping.TryGetValue(expectedType, out var value))
                 {
                     expectedType = value.Name;
                 }
@@ -108,9 +108,9 @@ public static class TypeChecker
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
-            ArrayLangValue array => array.ElementType != null ? $"array<{array.ElementType}>" : "array",
-            ListLangValue list => list.ElementType != null ? $"list<{list.ElementType}>" : "list",
-            DictionaryLangValue dict => (dict.KeyType != null && dict.ValueType != null)
+            ArrayLangValue array => array.ElementType is not null ? $"array<{array.ElementType}>" : "array",
+            ListLangValue list => list.ElementType is not null ? $"list<{list.ElementType}>" : "list",
+            DictionaryLangValue dict => (dict.KeyType is not null && dict.ValueType is not null)
                 ? $"dict<{dict.KeyType}, {dict.ValueType}>"
                 : "dict",
             FuncLangValue => "function",
@@ -181,7 +181,7 @@ public static class TypeChecker
 
         // 检查接口实现兼容性
         // 只在明确知道这是一个类型检查的上下文中才进行接口检查
-        if (_annotationManager != null && expectedType != actualType &&
+        if (_annotationManager is not null && expectedType != actualType &&
             IsInterfaceImplementation(expectedType, actualType))
         {
             return true;
@@ -255,7 +255,7 @@ public static class TypeChecker
     /// <returns>是否实现该接口</returns>
     private static bool IsInterfaceImplementation(string interfaceName, string className)
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             return false;
 
         try
@@ -265,7 +265,7 @@ public static class TypeChecker
             var classType = _annotationManager.GetGlobalManager().GetAny(new LangId(className)) as TypeTemplate;
 
             // 确保接口确实是一个接口，类确实是一个类
-            if (interfaceType == null || !interfaceType.IsInterface || classType == null || classType.IsInterface)
+            if (interfaceType is null || !interfaceType.IsInterface || classType is null || classType.IsInterface)
                 return false;
 
             // 检查类是否直接实现了该接口
@@ -403,7 +403,7 @@ public static class TypeChecker
         if (string.IsNullOrEmpty(expectedReturnType)) return actualReturnValue; // 没有返回类型注解，跳过检查
 
         // 如果是泛型类型参数，尝试解析为实际类型
-        if (typeArgumentMapping != null && typeArgumentMapping.TryGetValue(expectedReturnType, out var value))
+        if (typeArgumentMapping is not null && typeArgumentMapping.TryGetValue(expectedReturnType, out var value))
         {
             expectedReturnType = value.Name;
         }
@@ -419,7 +419,7 @@ public static class TypeChecker
 
         // 尝试类型转换
         var convertedValue = TryConvertType(actualReturnValue, expectedReturnType);
-        if (convertedValue != null)
+        if (convertedValue is not null)
         {
             return convertedValue; // 转换成功
         }
@@ -525,7 +525,7 @@ public static class TypeChecker
     /// <param name="interfaceNames">实现的接口列表（可选）</param>
     public static void RegisterClassType(string className, string? baseClassName = null, List<string>? interfaceNames = null)
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
 
         _annotationManager.RegisterClassType(className, baseClassName, interfaceNames);
@@ -538,7 +538,7 @@ public static class TypeChecker
     /// <param name="parentInterfaceNames">父接口列表（可选）</param>
     public static void RegisterInterfaceType(string interfaceName, List<string>? parentInterfaceNames = null)
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
 
         _annotationManager.RegisterInterfaceType(interfaceName, parentInterfaceNames);
@@ -551,7 +551,7 @@ public static class TypeChecker
     /// <param name="members">枚举成员名称列表</param>
     public static void RegisterEnumType(string enumName, List<string> members)
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
 
         _annotationManager.RegisterEnumType(enumName, members);
@@ -572,7 +572,7 @@ public static class TypeChecker
             return IsTypeCompatible(sourceTypeName, targetTypeName);
         }
 
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             return IsTypeCompatible(sourceTypeName, targetTypeName); // 回退到基本兼容性检查
 
         return _annotationManager.IsTypeCompatible(sourceTypeName, targetTypeName);
@@ -586,7 +586,7 @@ public static class TypeChecker
     /// <returns>成员字典</returns>
     public static ConcurrentDictionary<string, LangValueType> GetTypeMembers(string typeName, VariateManager manager)
     {
-        if (_annotationManager == null)
+        if (_annotationManager is null)
             return new ConcurrentDictionary<string, LangValueType>();
 
         return _annotationManager.GetTypeMembers(typeName, manager);

@@ -41,7 +41,7 @@ public partial class MatchExpression(
             if (matchCase.IsMatch(matchValue, manager, out var boundValues))
             {
                 // 如果有变量绑定，将值绑定到新的作用域
-                if (boundValues != null && boundValues.Count > 0)
+                if (boundValues is not null && boundValues.Count > 0)
                 {
                     // 添加新的子作用域
                     manager.AddChildren();
@@ -62,7 +62,7 @@ public partial class MatchExpression(
                 finally
                 {
                     // 清理变量绑定的作用域
-                    if (boundValues != null && boundValues.Count > 0)
+                    if (boundValues is not null && boundValues.Count > 0)
                     {
                         manager.RemoveChildren();
                     }
@@ -134,7 +134,7 @@ public partial class MatchExpression(
                     ilGenerator.Emit(OpCodes.Box, matchValueType);
 
                 var patternType = matchCase.Pattern.OutputType(local);
-                if (patternType != null && patternType.IsValueType)
+                if (patternType is not null && patternType.IsValueType)
                     ilGenerator.Emit(OpCodes.Box, patternType);
 
                 var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
@@ -162,7 +162,7 @@ public partial class MatchExpression(
             ilGenerator.MarkLabel(caseLabel);
 
             // 如果有变量绑定，将 match 值赋给变量
-            if (matchCase.BindingVariable != null)
+            if (matchCase.BindingVariable is not null)
             {
                 ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal.LocalIndex);
                 if (matchValueType.IsValueType)
@@ -176,7 +176,7 @@ public partial class MatchExpression(
             // 计算并存储结果
             matchCase.ResultExpression.LoadIlValue(ilGenerator, local);
             var resultType = matchCase.ResultExpression.OutputType(local);
-            if (resultType != null && resultType.IsValueType)
+            if (resultType is not null && resultType.IsValueType)
                 ilGenerator.Emit(OpCodes.Box, resultType);
 
             ilGenerator.Emit(OpCodes.Stloc, resultLocal.LocalIndex);

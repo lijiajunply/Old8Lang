@@ -70,7 +70,7 @@ public class DocCommentInfo
                string.IsNullOrWhiteSpace(Summary) &&
                string.IsNullOrWhiteSpace(Description) &&
                Parameters.Count == 0 &&
-               Returns == null &&
+               Returns is null &&
                Throws.Count == 0;
     }
 }

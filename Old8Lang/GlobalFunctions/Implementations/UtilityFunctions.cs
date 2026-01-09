@@ -37,7 +37,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
         // 尝试获取Length属性，适用于数组、字符串等
         var lengthProp = lenType.GetProperty("Length");
-        if (lengthProp != null)
+        if (lengthProp is not null)
         {
             ilGenerator.Emit(OpCodes.Call, lengthProp.GetGetMethod()!);
             return;
@@ -45,7 +45,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
         // 尝试获取Count属性，适用于集合类
         var countProp = lenType.GetProperty("Count");
-        if (countProp != null)
+        if (countProp is not null)
         {
             ilGenerator.Emit(OpCodes.Call, countProp.GetGetMethod()!);
             return;
@@ -53,7 +53,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
         // 尝试获取Length字段
         var lengthField = lenType.GetField("Length");
-        if (lengthField != null)
+        if (lengthField is not null)
         {
             ilGenerator.Emit(OpCodes.Ldfld, lengthField);
             return;
@@ -61,7 +61,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
         // 尝试获取Count字段
         var countField = lenType.GetField("Count");
-        if (countField != null)
+        if (countField is not null)
         {
             ilGenerator.Emit(OpCodes.Ldfld, countField);
             return;
@@ -103,7 +103,7 @@ public sealed class TypeFunction : BaseGlobalFunction
         var typeId = parameters[0];
         var typeIdType = typeId.OutputType(local);
         // 直接返回类型名称字符串，不调用GetType()
-        ilGenerator.Emit(OpCodes.Ldstr, typeIdType != null ? typeIdType.Name : "object");
+        ilGenerator.Emit(OpCodes.Ldstr, typeIdType is not null ? typeIdType.Name : "object");
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

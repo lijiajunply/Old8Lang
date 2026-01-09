@@ -25,7 +25,7 @@ public partial class YieldStatement(LangExpression yieldExpression, SourcePositi
 
         // 通过生成器上下文设置yield值和标志
         var genContext = manager.GeneratorContext;
-        if (genContext != null)
+        if (genContext is not null)
         {
             genContext.CurrentValue = yieldValue;
             genContext.HasYielded = true;

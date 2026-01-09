@@ -242,7 +242,7 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
         int channelId = ((IntLangValue)results[0]).Value;
         int timeoutMs = ((IntLangValue)results[1]).Value;
         object? value = ResourceManager.TryReceiveChannel(channelId, timeoutMs);
-        return value == null ? new VoidLangValue() : LangValueType.ObjToValue(value);
+        return value is null ? new VoidLangValue() : LangValueType.ObjToValue(value);
     }
 
     protected override void GenerateIlInternal(

@@ -69,7 +69,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         var threadManager = manager.Clone();
 
         // 如果有实例上下文，需要在线程管理器中设置this
-        if (instanceContext != null)
+        if (instanceContext is not null)
         {
             threadManager.Set(new LangId("this"), instanceContext);
         }
@@ -101,14 +101,14 @@ public sealed class SpawnFunction : BaseGlobalFunction
             {
                 LangValueType funcResult;
 
-                if (asyncSpawnFunc != null)
+                if (asyncSpawnFunc is not null)
                 {
                     // 异步函数：调用 RunAsync 并等待完成
                     var taskValue = asyncSpawnFunc.RunAsync(threadManager, threadArgs, cts.Token);
                     // 等待任务完成并获取结果
                     funcResult = taskValue.Await();
                 }
-                else if (spawnFunc != null)
+                else if (spawnFunc is not null)
                 {
                     // 普通函数：直接调用
                     funcResult = spawnFunc.Run(threadManager, threadArgs, instanceContext);

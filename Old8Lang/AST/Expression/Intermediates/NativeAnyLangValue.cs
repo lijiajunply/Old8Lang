@@ -36,7 +36,7 @@ public class NativeAnyLangValue : ImportInfo
     /// </summary>
     private MemberInfo? GetCachedMember(string memberName)
     {
-        if (ClassType == null) return null;
+        if (ClassType is null) return null;
 
         // 获取或创建该类型的缓存字典
         var typeCache = MemberCache.GetOrAdd(ClassType, _ => new ConcurrentDictionary<string, MemberInfo?>());
@@ -46,10 +46,10 @@ public class NativeAnyLangValue : ImportInfo
         {
             // 依次尝试：属性 -> 字段 -> 方法
             MemberInfo? member = ClassType.GetProperty(name);
-            if (member != null) return member;
+            if (member is not null) return member;
 
             member = ClassType.GetField(name);
-            if (member != null) return member;
+            if (member is not null) return member;
 
             member = ClassType.GetMethod(name);
             return member; // 如果都找不到，返回 null
@@ -157,14 +157,14 @@ public class NativeAnyLangValue : ImportInfo
     public override LangValueType Run(VariateManager manager)
     {
         // 如果已经有实例对象（通过第二个构造函数创建），则直接返回
-        if (InstanceObj != null && ClassType != null)
+        if (InstanceObj is not null && ClassType is not null)
         {
             Manager = manager.Clone();
             return this;
         }
 
         // 否则从 DLL 加载类型
-        if (Path == null || DllName == null)
+        if (Path is null || DllName is null)
         {
             throw new InvalidOperationError(this, "无法加载类型：缺少 DLL 路径或名称");
         }
@@ -176,12 +176,12 @@ public class NativeAnyLangValue : ImportInfo
         ClassType = assembly.GetType(ClassName);
 
         // 如果失败，尝试拼接 DllName 和 ClassName
-        if (ClassType == null && DllName != null)
+        if (ClassType is null && DllName is not null)
         {
             ClassType = assembly.GetType($"{DllName}.{ClassName}");
         }
 
-        if (ClassType == null)
+        if (ClassType is null)
         {
             throw new InvalidOperationError(this, $"无法加载类型：在程序集中找不到类型 '{ClassName}' 或 '{DllName}.{ClassName}'");
         }
@@ -195,7 +195,7 @@ public class NativeAnyLangValue : ImportInfo
 
     public void New(object[] pa)
     {
-        InstanceObj = Constructor != null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType!)!;
+        InstanceObj = Constructor is not null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType!)!;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public class NativeAnyLangValue : ImportInfo
     /// </summary>
     public override string TypeToString()
     {
-        return InstanceObj != null
+        return InstanceObj is not null
             ? $"NativeObject<{ClassName}>"
             : $"NativeType<{ClassName}>";
     }
@@ -223,7 +223,7 @@ public class NativeAnyLangValue : ImportInfo
     /// </summary>
     public override string ToDisplayString()
     {
-        return InstanceObj != null
+        return InstanceObj is not null
             ? $"NativeObject({InstanceObj})"
             : $"NativeType({ClassName})";
     }
@@ -252,12 +252,12 @@ public class NativeAnyLangValue : ImportInfo
         if (otherValueType is NativeAnyLangValue other)
         {
             // 如果都有实例对象，比较实例
-            if (InstanceObj != null && other.InstanceObj != null)
+            if (InstanceObj is not null && other.InstanceObj is not null)
             {
                 return InstanceObj.Equals(other.InstanceObj);
             }
             // 如果都是类型引用，比较类型
-            if (InstanceObj == null && other.InstanceObj == null)
+            if (InstanceObj is null && other.InstanceObj is null)
             {
                 return ClassName == other.ClassName;
             }

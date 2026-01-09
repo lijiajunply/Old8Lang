@@ -28,7 +28,7 @@ public partial class SuperExpression(SourcePosition position = default) : LangEx
         // 获取当前实例（this）
         var currentInstance = manager.GetCurrentInstance();
 
-        if (currentInstance == null)
+        if (currentInstance is null)
         {
             throw new InvalidOperationError(Position, "super只能在类实例方法中使用");
         }
@@ -74,19 +74,19 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     {
         // 获取父类元数据（使用当前实例的直接父类）
         var parentMetadata = GetDirectParentMetadata();
-        if (parentMetadata == null)
+        if (parentMetadata is null)
         {
             throw new InvalidOperationError(this, "当前类没有父类");
         }
 
         // 查找父类的构造函数（init 或与类名相同的方法）
         var initMethods = parentMetadata.MethodTable.LookupMethod("init");
-        if (initMethods == null || initMethods.Count == 0)
+        if (initMethods is null || initMethods.Count == 0)
         {
             initMethods = parentMetadata.MethodTable.LookupMethod(parentMetadata.ClassName);
         }
 
-        if (initMethods == null || initMethods.Count == 0)
+        if (initMethods is null || initMethods.Count == 0)
         {
             // 如果父类没有构造函数，返回 null（不返回 VoidLangValue）
             return new NullLangValue();
@@ -107,7 +107,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
         var memberName = id.IdName;
         var parentMetadata = GetDirectParentMetadata();
 
-        if (parentMetadata == null)
+        if (parentMetadata is null)
         {
             throw new InvalidOperationError(this, "当前类没有父类");
         }
@@ -124,7 +124,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
         if (currentInstance.InstanceData.TryGetValue(memberName, out var fieldValue))
         {
             var fieldDef = parentMetadata.FieldTable.LookupField(memberName);
-            if (fieldDef != null && fieldDef.OriginClassName == parentMetadata.ClassName)
+            if (fieldDef is not null && fieldDef.OriginClassName == parentMetadata.ClassName)
             {
                 return fieldValue;
             }
@@ -238,7 +238,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
             try
             {
                 var updatedValue = executionManager.GetValue(new LangId(fieldName));
-                if (updatedValue != null)
+                if (updatedValue is not null)
                 {
                     currentInstance.InstanceData[fieldName] = updatedValue;
                 }

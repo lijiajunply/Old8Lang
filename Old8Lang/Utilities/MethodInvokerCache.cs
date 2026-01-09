@@ -49,7 +49,7 @@ public static class MethodInvokerCache
             // 如果参数是可选的且 args 数组不够长，使用默认值
             if (isOptional)
             {
-                // args != null && args.Length > i ? args[i] : defaultValue
+                // args is not null && args.Length > i ? args[i] : defaultValue
                 var argsNotNull = Expression.NotEqual(argsParam, Expression.Constant(null, typeof(object?[])));
                 var argsLength = Expression.Property(argsParam, "Length");
                 var indexInBounds = Expression.GreaterThan(argsLength, Expression.Constant(i));
@@ -104,7 +104,7 @@ public static class MethodInvokerCache
                 if (paramType.IsGenericType && paramType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     // 可空类型：使用 ConvertChecked 并添加 null 检查
-                    // argAccess == null ? default(T?) : new T?((T)argAccess)
+                    // argAccess is null ? default(T?) : new T?((T)argAccess)
                     var underlyingType = Nullable.GetUnderlyingType(paramType)!;
                     var nullCheck = Expression.Equal(argAccess, Expression.Constant(null, typeof(object)));
 

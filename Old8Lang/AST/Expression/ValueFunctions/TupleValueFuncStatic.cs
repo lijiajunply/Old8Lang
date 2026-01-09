@@ -207,7 +207,7 @@ public static class TupleValueFuncStatic
         {
             var elements = TupleLangValue.GetAllElements(tuple);
 
-            if (comparer != null)
+            if (comparer is not null)
             {
                 // 尝试获取当前的 VariateManager，如果没有则创建新的
                 var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();

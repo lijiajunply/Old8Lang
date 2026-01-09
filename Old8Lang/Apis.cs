@@ -22,7 +22,7 @@ public static class Apis
     /// <returns>逗号分隔的字符串表示，空列表返回空字符串</returns>
     public static string ListToString<T>(List<T>? a)
     {
-        if (a == null)
+        if (a is null)
             return "";
         var builder = new StringBuilder();
         for (var i = 0; i < a.Count; i++)
@@ -56,11 +56,11 @@ public static class Apis
     /// <returns>.NET 对象列表</returns>
     public static List<object> ListToObjects(List<LangValueType>? a)
     {
-        if (a == null)
+        if (a is null)
             return [];
         if (a.Count == 0)
             return [];
-        return a[0] == null! ? [] : [.. a.Select(x => x.GetValue())];
+        return a[0] is null ? [] : [.. a.Select(x => x.GetValue())];
     }
 
     #endregion

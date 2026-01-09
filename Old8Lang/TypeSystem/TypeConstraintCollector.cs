@@ -16,7 +16,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromFunction(FuncInit funcInit)
     {
-        if (funcInit.FuncLangValue.Ids == null)
+        if (funcInit.FuncLangValue.Ids is null)
             return;
 
         var funcName = funcInit.FuncLangValue.Id?.IdName ?? "anonymous";
@@ -32,7 +32,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
             if (!string.IsNullOrEmpty(param.AssumptionType))
             {
                 var paramType = ParseTypeAnnotation(param.AssumptionType);
-                if (paramType != null)
+                if (paramType is not null)
                 {
                     context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
@@ -44,10 +44,10 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
                 }
             }
             // 情况2：默认值推断
-            else if (param.DefaultValue != null)
+            else if (param.DefaultValue is not null)
             {
                 var defaultType = param.DefaultValue.OutputType(localManager);
-                if (defaultType != null && defaultType != typeof(object))
+                if (defaultType is not null && defaultType != typeof(object))
                 {
                     context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
@@ -78,7 +78,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         if (!string.IsNullOrEmpty(funcInit.FuncLangValue.Id?.AssumptionType))
         {
             var returnType = ParseTypeAnnotation(funcInit.FuncLangValue.Id.AssumptionType);
-            if (returnType != null)
+            if (returnType is not null)
             {
                 context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Equality,
@@ -169,7 +169,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromFunctionCall(FunctionCallExpression callExpr, string targetFuncName)
     {
-        if (callExpr.Arguments == null!)
+        if (callExpr.Arguments is null)
             return;
 
         // 记录调用信息，用于反向推断参数类型
@@ -180,7 +180,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
             var arg = callExpr.Arguments[i];
             var argType = arg.OutputType(localManager);
 
-            if (argType != null)
+            if (argType is not null)
             {
                 argTypes.Add(argType);
 
@@ -211,13 +211,13 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         var varName = setStmt.Id?.IdName;
         var valueType = setStmt.Value.OutputType(localManager);
 
-        if (valueType != null)
+        if (valueType is not null)
         {
             // 如果变量有显式类型注解，验证兼容性
             if (!string.IsNullOrEmpty(setStmt.Id?.AssumptionType))
             {
                 var declaredType = ParseTypeAnnotation(setStmt.Id.AssumptionType);
-                if (declaredType != null)
+                if (declaredType is not null)
                 {
                     context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
@@ -286,7 +286,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         var innerType = typeAnnotation.Substring(startIndex + 1, endIndex - startIndex - 1).Trim();
         var elementType = ParseTypeAnnotation(innerType);
 
-        if (elementType != null)
+        if (elementType is not null)
         {
             return genericTypeDefinition.MakeGenericType(elementType);
         }
@@ -354,7 +354,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
 
     private Type FindCommonBaseClass(Type? type1, Type type2)
     {
-        if (type1 == null)
+        if (type1 is null)
             return type2;
 
         if (type1 == type2)
@@ -368,7 +368,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
 
         // 向上查找基类
         var current = type1.BaseType;
-        while (current != null)
+        while (current is not null)
         {
             if (current.IsAssignableFrom(type2))
                 return current;

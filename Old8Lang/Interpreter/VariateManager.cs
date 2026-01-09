@@ -64,7 +64,7 @@ public class VariateManager
     /// </summary>
     public ProjectManagement.PackageManager GetPackageManager()
     {
-        if (PackageManager == null)
+        if (PackageManager is null)
         {
             // 尝试从当前执行文件路径检测项目根目录
             var projectRoot = !string.IsNullOrEmpty(Path)
@@ -666,7 +666,7 @@ public class VariateManager
         foreach (var lazyModule in LazyWildcardModules)
         {
             var symbol = lazyModule.GetSymbol(id.IdName);
-            if (symbol != null)
+            if (symbol is not null)
             {
                 // 将符号缓存到当前作用域，避免下次再查找
                 Scopes[^1][id.IdName] = symbol;

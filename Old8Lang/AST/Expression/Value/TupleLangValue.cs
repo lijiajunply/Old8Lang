@@ -25,7 +25,7 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
     private readonly Dictionary<string, int>? _fieldNames = null;
 
     // 标记是否有命名字段
-    public bool HasNamedFields => _fieldNames != null && _fieldNames.Count > 0;
+    public bool HasNamedFields => _fieldNames is not null && _fieldNames.Count > 0;
 
     public override LangValueType Run(VariateManager manager)
     {
@@ -122,7 +122,7 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
         }
 
         // 设置字段名称映射
-        if (fieldNames != null && fieldNames.Count > 0)
+        if (fieldNames is not null && fieldNames.Count > 0)
         {
             _fieldNames = new Dictionary<string, int>();
             for (int i = 0; i < fieldNames.Count && i < elements.Count; i++)
@@ -240,7 +240,7 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
             }
 
             // 2. 支持命名字段访问：tuple.x, tuple.name 等
-            if (_fieldNames != null && _fieldNames.ContainsKey(id.IdName))
+            if (_fieldNames is not null && _fieldNames.ContainsKey(id.IdName))
             {
                 int fieldIndex = _fieldNames[id.IdName];
                 return Get(fieldIndex);
@@ -358,7 +358,7 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
         var type2 = V2.OutputType(local);
 
         // 确保类型不为空
-        if (type1 == null || type2 == null)
+        if (type1 is null || type2 is null)
         {
             return typeof(ValueTuple<object, object>);
         }

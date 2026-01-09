@@ -143,7 +143,7 @@ public static class TypeConversion
         if (sourceType.IsValueType && targetType.IsValueType)
         {
             var convertMethod = typeof(Convert).GetMethod($"To{targetType.Name}", [sourceType]);
-            if (convertMethod != null)
+            if (convertMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, convertMethod);
                 return;
@@ -298,7 +298,7 @@ public static class TypeConversion
         {
             // 其他数值类型转换，使用Convert类
             var convertMethod = typeof(Convert).GetMethod($"To{targetType.Name}", [sourceType]);
-            if (convertMethod != null)
+            if (convertMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, convertMethod);
             }

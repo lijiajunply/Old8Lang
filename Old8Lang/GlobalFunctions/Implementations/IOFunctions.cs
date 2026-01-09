@@ -172,7 +172,7 @@ public sealed class ClearFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var clearMethod = typeof(Console).GetMethod("Clear", Type.EmptyTypes);
-        if (clearMethod != null)
+        if (clearMethod is not null)
         {
             ilGenerator.Emit(OpCodes.Call, clearMethod);
         }

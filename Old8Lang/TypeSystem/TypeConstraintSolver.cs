@@ -69,10 +69,10 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
         // 如果已经有绑定，检查是否一致
         var existingBinding = context.GetTypeBinding(typeVar);
 
-        if (existingBinding != null)
+        if (existingBinding is not null)
         {
             // 已经有绑定，检查新约束是否兼容
-            if (constraint.TargetType != null)
+            if (constraint.TargetType is not null)
             {
                 if (!AreTypesCompatible(existingBinding, constraint.TargetType, constraint.Kind))
                 {
@@ -99,7 +99,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
         }
 
         // 新绑定
-        if (constraint.TargetType != null)
+        if (constraint.TargetType is not null)
         {
             // 检查置信度阈值
             if (constraint.Confidence >= config.MinimumConfidence)
@@ -130,7 +130,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
 
         // 按类型变量分组约束
         var constraintsByVar = context.Constraints
-            .Where(c => c.TargetType != null)
+            .Where(c => c.TargetType is not null)
             .GroupBy(c => c.TypeVariable)
             .ToList();
 
@@ -140,11 +140,11 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
             var constraints = group.ToList();
 
             // 如果该变量还没有绑定
-            if (context.GetTypeBinding(typeVar) == null)
+            if (context.GetTypeBinding(typeVar) is null)
             {
                 // 尝试从多个约束推断
                 var inferredType = InferFromMultipleConstraints(constraints);
-                if (inferredType != null)
+                if (inferredType is not null)
                 {
                     context.BindTypeVariable(typeVar, inferredType);
                     changed = true;
@@ -201,7 +201,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
 
         // 3. 处理调用约束和赋值约束
         var otherConstraints = constraints
-            .Where(c => c.TargetType != null)
+            .Where(c => c.TargetType is not null)
             .OrderByDescending(c => c.Confidence)
             .ToList();
 
@@ -362,7 +362,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
 
     private Type FindCommonBaseClass(Type? type1, Type type2)
     {
-        if (type1 == null)
+        if (type1 is null)
             return type2;
 
         if (type1 == type2)
@@ -375,7 +375,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
             return type2;
 
         var current = type1.BaseType;
-        while (current != null)
+        while (current is not null)
         {
             if (current.IsAssignableFrom(type2))
                 return current;
@@ -402,7 +402,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
     private bool ValidateSolution()
     {
         var unresolvedConstraints = context.Constraints
-            .Where(c => c.TargetType == null || context.GetTypeBinding(c.TypeVariable) == null)
+            .Where(c => c.TargetType is null || context.GetTypeBinding(c.TypeVariable) is null)
             .ToList();
 
         if (unresolvedConstraints.Count > 0)
@@ -421,7 +421,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
             {
                 foreach (var constraint in unresolvedConstraints)
                 {
-                    if (context.GetTypeBinding(constraint.TypeVariable) == null)
+                    if (context.GetTypeBinding(constraint.TypeVariable) is null)
                     {
                         context.BindTypeVariable(constraint.TypeVariable, typeof(object));
                         if (config.DebugOutput)

@@ -184,7 +184,7 @@ public class StandardLibraryInfo
     /// </summary>
     public Assembly GetAssembly()
     {
-        if (Assembly != null)
+        if (Assembly is not null)
             return Assembly;
 
         if (string.IsNullOrEmpty(AssemblyName))

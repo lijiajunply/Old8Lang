@@ -23,7 +23,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <summary>
     /// 检查函数是否为Lambda表达式（通过检查Id是否为null）
     /// </summary>
-    public bool IsLambda => FuncLangValue.Id == null;
+    public bool IsLambda => FuncLangValue.Id is null;
 
     /// <summary>
     /// 在解释模式下执行函数初始化
@@ -37,7 +37,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
         // 但对于来自不同模块的函数，允许重复（它们可能通过别名导入）
-        if (FuncLangValue.Id != null)
+        if (FuncLangValue.Id is not null)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is FuncLangValue func &&
@@ -48,7 +48,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
             // 只有当存在完全相同的函数，并且正在导入栈为空时（即在主文件中重复定义），才报错
             // 如果导入栈不为空，说明是在导入的模块中定义函数，允许不同模块的同名函数共存
-            if (existingFunc != null && manager.ImportStack.Count == 0)
+            if (existingFunc is not null && manager.ImportStack.Count == 0)
             {
                 throw new DuplicateNameError(this, FuncLangValue.Id.IdName, "函数");
             }
@@ -89,7 +89,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 获取方法的名称
         var methodName = FuncLangValue.Id!.IdName;
-        if (FuncLangValue.Method != null)
+        if (FuncLangValue.Method is not null)
         {
             local.DelegateVar.Add(methodName, FuncLangValue.Method);
             return;
@@ -140,7 +140,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 优先使用显式声明的返回类型
         // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
         var returnType = FuncLangValue.Id?.OutputType(local);
-        if (returnType == null || returnType == typeof(object))
+        if (returnType is null || returnType == typeof(object))
         {
             // 如果OutputType无法解析，尝试从函数体推断
             returnType = GetItemType(FuncLangValue.BlockStatement, funcLocal);
@@ -251,7 +251,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 对于用户定义的函数，我们需要保留原始方法名以便调用
         // 对于重载函数，使用函数名+参数类型组合作为键，支持更准确的函数重载
         var delegateKey = methodName;
-        if (FuncLangValue.Ids != null)
+        if (FuncLangValue.Ids is not null)
         {
             // 使用函数名+参数类型作为键，支持更准确的函数重载
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
@@ -271,7 +271,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
         // 同时存储函数的参数列表信息，用于支持默认参数
-        if (FuncLangValue.Ids != null)
+        if (FuncLangValue.Ids is not null)
         {
             local.FuncParameters.TryAdd(delegateKey, FuncLangValue.Ids);
             
@@ -292,7 +292,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         var inferenceEnabled = TypeInferenceConfig.Instance.EnableTypeInference;
 
         // 1. 验证所有参数的类型注解
-        if (FuncLangValue.Ids != null)
+        if (FuncLangValue.Ids is not null)
         {
             for (int i = 0; i < FuncLangValue.Ids.Count; i++)
             {
@@ -302,10 +302,10 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 if (string.IsNullOrEmpty(param.AssumptionType))
                 {
                     // 如果有默认值，可以从默认值推断类型，不报错
-                    if (param.DefaultValue != null)
+                    if (param.DefaultValue is not null)
                     {
                         // 验证默认值的类型有效性
-                        if (param.DefaultValue.OutputType(local) == null)
+                        if (param.DefaultValue.OutputType(local) is null)
                         {
                             var defaultErrorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id?.IdName}' 的参数 '{param.IdName}' 的默认值类型无效\n\n" +
                                                $"默认值必须是一个有效的表达式，可以推断出具体类型。\n\n" +
@@ -343,7 +343,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
 
         // 2. 验证返回值类型注解
-        if (FuncLangValue.Id != null && string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
+        if (FuncLangValue.Id is not null && string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
         {
             // 对于Lambda表达式，如果没有显式的返回类型注解，尝试从函数体推断
             if (!IsLambda)
@@ -369,11 +369,11 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 local.ReportError(errorMsg, FuncLangValue.Id.Position);
             }
         }
-        else if (FuncLangValue.Id != null && !string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
+        else if (FuncLangValue.Id is not null && !string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
         {
             // 验证返回类型注解的有效性
             var returnType = FuncLangValue.Id.OutputType(local);
-            if (returnType == null!)
+            if (returnType is null)
             {
                 var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 的返回类型注解 '{FuncLangValue.Id.AssumptionType}' 无效\n\n" +
                               $"请使用有效的类型注解，如：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>\n\n" +
@@ -401,7 +401,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             if (item is SetStatement { Id: not null } setStatement)
             {
                 var varType = setStatement.Value.OutputType(local);
-                if (varType != null)
+                if (varType is not null)
                 {
                     local.LocalVarTypes[setStatement.Id.IdName] = varType;
                 }
@@ -414,7 +414,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 return returnType;
             }
 
-            if (item == null || item.Count == 0)
+            if (item is null || item.Count == 0)
             {
                 continue;
             }
@@ -449,7 +449,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     public override string ToString()
     {
         var sb = new StringBuilder();
-        var paramList = FuncLangValue.Ids != null ? string.Join(", ", FuncLangValue.Ids) : string.Empty;
+        var paramList = FuncLangValue.Ids is not null ? string.Join(", ", FuncLangValue.Ids) : string.Empty;
         sb.AppendLine($"func {FuncLangValue.Id}({paramList})");
         sb.AppendLine($"{{ {FuncLangValue.BlockStatement} }}");
         return sb.ToString();
@@ -461,7 +461,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <exception cref="SyntaxError">当 params 参数使用不当时抛出</exception>
     private void ValidateParamsParameter()
     {
-        if (FuncLangValue.Ids == null || FuncLangValue.Ids.Count == 0)
+        if (FuncLangValue.Ids is null || FuncLangValue.Ids.Count == 0)
         {
             return;
         }
@@ -520,7 +520,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
 
         // 规则4: params 参数不能有默认值
-        if (paramsId.DefaultValue != null)
+        if (paramsId.DefaultValue is not null)
         {
             throw new SyntaxError(
                 paramsId.Position,

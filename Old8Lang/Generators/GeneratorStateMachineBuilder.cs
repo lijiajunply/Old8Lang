@@ -178,7 +178,7 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
             locals[cacheEntry.Key] = cacheEntry.Value;
         }
 
-        if (yieldPath != null)
+        if (yieldPath is not null)
         {
             locals["__last_yield_path__"] = yieldPath;
         }
@@ -187,7 +187,7 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
         foreach (var varName in scanResult.LocalVariables)
         {
             var value = manager.GetValue(new LangId(varName));
-            if (value != null)
+            if (value is not null)
             {
                 locals[varName] = value;
             }

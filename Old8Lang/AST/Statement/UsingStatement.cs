@@ -40,7 +40,7 @@ public partial class UsingStatement(
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             RunWithGeneratorContext(manager);
         }
@@ -59,7 +59,7 @@ public partial class UsingStatement(
         var resource = resourceExpression.Run(manager);
 
         // 2. 如果有变量名，注册到作用域
-        if (variableName != null)
+        if (variableName is not null)
         {
             manager.Set(new LangId(variableName), resource);
         }
@@ -97,7 +97,7 @@ public partial class UsingStatement(
             finally
             {
                 // 清理资源
-                if (variableName != null)
+                if (variableName is not null)
                 {
                     var resource = manager.GetValue(new LangId(variableName));
                     DisposeResource(resource);
@@ -109,7 +109,7 @@ public partial class UsingStatement(
             // 首次进入using语句
             var resource = resourceExpression.Run(manager);
 
-            if (variableName != null)
+            if (variableName is not null)
             {
                 manager.Set(new LangId(variableName), resource);
             }
@@ -164,7 +164,7 @@ public partial class UsingStatement(
         ilGenerator.Emit(OpCodes.Stloc, resourceLocal);
 
         // 2. 如果有变量名，添加到局部变量
-        if (variableName != null)
+        if (variableName is not null)
         {
             local.AddLocalVar(variableName, resourceLocal);
             local.LocalVarTypes[variableName] = resourceType;
@@ -195,7 +195,7 @@ public partial class UsingStatement(
             var tryDisposeMethod = typeof(AnyLangValue).GetMethod(
                 nameof(AnyLangValue.TryDispose),
                 Type.EmptyTypes);
-            if (tryDisposeMethod != null)
+            if (tryDisposeMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Callvirt, tryDisposeMethod);
             }
@@ -211,7 +211,7 @@ public partial class UsingStatement(
             if (disposableType.IsAssignableFrom(resourceType))
             {
                 var disposeMethod = disposableType.GetMethod(nameof(IDisposable.Dispose));
-                if (disposeMethod != null)
+                if (disposeMethod is not null)
                 {
                     if (resourceType.IsValueType)
                     {

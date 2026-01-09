@@ -103,7 +103,7 @@ public class UnifiedModule(
     /// <returns>是否包含符号</returns>
     public bool HasSymbol(string symbolName)
     {
-        return GetSymbol(symbolName) != null;
+        return GetSymbol(symbolName) is not null;
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public class UnifiedModule(
         }
 
         // 如果已经失败，抛出之前的异常
-        if (_loadingState == ModuleLoadingState.LoadFailed && _loadException != null)
+        if (_loadingState == ModuleLoadingState.LoadFailed && _loadException is not null)
         {
             throw new ImportError(this, ModuleName, $"模块之前加载失败: {_loadException.Message}");
         }
@@ -278,7 +278,7 @@ public class UnifiedModule(
         var resolver = new ModuleResolver();
         var resolutionResult = resolver.ResolveModule(ModuleName, manager.Path, manager);
 
-        if (!resolutionResult.IsSuccess || resolutionResult.ResolvedPath == null)
+        if (!resolutionResult.IsSuccess || resolutionResult.ResolvedPath is null)
         {
             throw new ImportError(this, ModuleName, resolutionResult.AttemptedPaths);
         }
@@ -286,7 +286,7 @@ public class UnifiedModule(
         // 2. 加载模块
         var loadResult = ModuleLoaderInstance.LoadModule(resolutionResult.ResolvedPath, manager);
 
-        if (!loadResult.IsSuccess || loadResult.Block == null)
+        if (!loadResult.IsSuccess || loadResult.Block is null)
         {
             throw new ImportError(this, ModuleName,
                 loadResult.Error?.Message ?? "模块加载失败");
@@ -344,7 +344,7 @@ public class UnifiedModule(
         var symbolName = langId.IdName;
         var symbol = GetSymbol(symbolName);
 
-        if (symbol == null)
+        if (symbol is null)
         {
             throw new AttributeError(this, symbolName, ModuleName);
         }

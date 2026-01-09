@@ -49,7 +49,7 @@ public static class PropertyAccessorCache
         }
 
         var getMethod = property.GetGetMethod(true);
-        if (getMethod == null)
+        if (getMethod is null)
         {
             throw new InvalidOperationException($"无法获取属性 {property.Name} 的 Get 方法");
         }
@@ -98,7 +98,7 @@ public static class PropertyAccessorCache
         }
 
         var setMethod = property.GetSetMethod(true);
-        if (setMethod == null)
+        if (setMethod is null)
         {
             throw new InvalidOperationException($"无法获取属性 {property.Name} 的 Set 方法");
         }

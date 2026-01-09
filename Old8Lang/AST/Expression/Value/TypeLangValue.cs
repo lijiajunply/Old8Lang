@@ -19,7 +19,7 @@ public partial class TypeLangValue : LangValueType
     public override LangValueType Run(VariateManager manager)
     {
         var result = Expression?.Run(manager);
-        if (result == null) throw new InvalidOperationError(this, "类型表达式求值失败");
+        if (result is null) throw new InvalidOperationError(this, "类型表达式求值失败");
         Value = result.TypeToString();
         return this;
     }

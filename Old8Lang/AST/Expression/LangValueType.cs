@@ -244,7 +244,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <returns>转换后的 Old8Lang 值</returns>
     public static LangValueType ObjToValue(object? value, SourcePosition position)
     {
-        if (value == null)
+        if (value is null)
         {
             return NullLangValue.Instance;
         }
@@ -252,7 +252,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         var valueType = value.GetType();
 
         // 处理可空类型
-        if (Nullable.GetUnderlyingType(valueType) != null)
+        if (Nullable.GetUnderlyingType(valueType) is not null)
         {
             return value switch
             {
@@ -352,7 +352,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             var taskType = task.GetType();
             var resultProperty = taskType.GetProperty("Result");
 
-            if (resultProperty != null)
+            if (resultProperty is not null)
             {
                 var taskResult = resultProperty.GetValue(task);
                 return ObjToValue(taskResult, position);
@@ -552,7 +552,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         }
 
         var enumerableInterface = type.GetInterface("System.Collections.Generic.IEnumerable`1");
-        if (enumerableInterface != null)
+        if (enumerableInterface is not null)
         {
             var args = enumerableInterface.GetGenericArguments();
             if (args.Length > 0)
@@ -582,7 +582,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         }
 
         var dictionaryInterface = type.GetInterface("System.Collections.Generic.IDictionary`2");
-        if (dictionaryInterface != null)
+        if (dictionaryInterface is not null)
         {
             var args = dictionaryInterface.GetGenericArguments();
             if (args.Length >= 2)
@@ -632,7 +632,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// </remarks>
     public static object? ValueToObj(LangValueType? value)
     {
-        if (value == null)
+        if (value is null)
         {
             return null;
         }
@@ -745,12 +745,12 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
         // 检查 Value 是否已初始化（Run() 是否已被调用）
         // 如果 Value.Item1 或 Item2 为 null，尝试从 V1, V2 字段获取值
-        if (key == null! && tupleVal.V1 is LangValueType v1)
+        if (key is null && tupleVal.V1 is LangValueType v1)
         {
             key = v1;
         }
 
-        if (value == null! && tupleVal.V2 is LangValueType v2)
+        if (value is null && tupleVal.V2 is LangValueType v2)
         {
             value = v2;
         }

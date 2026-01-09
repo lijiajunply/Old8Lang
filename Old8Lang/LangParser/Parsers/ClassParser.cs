@@ -133,7 +133,7 @@ public class ClassParser(
             genericParameters: genericParameters);
 
         // 设置文档注释
-        if (docComment != null)
+        if (docComment is not null)
         {
             typeTemplate.DocComment = docComment;
         }
@@ -204,7 +204,7 @@ public class ClassParser(
             null, false, new List<string>(), extendsNames, true, genericParameters: genericParameters);
 
         // 设置文档注释
-        if (docComment != null)
+        if (docComment is not null)
         {
             typeTemplate.DocComment = docComment;
         }

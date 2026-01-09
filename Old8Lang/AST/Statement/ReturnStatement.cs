@@ -50,10 +50,10 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         returnExpression.LoadIlValue(ilGenerator, local);
 
         // 如果函数使用了try-finally结构（ReturnLabel不为null），必须使用Leave指令
-        if (local.ReturnLabel != null)
+        if (local.ReturnLabel is not null)
         {
             // 如果有返回值局部变量（非void函数），存储返回值
-            if (local.ReturnValueLocal != null)
+            if (local.ReturnValueLocal is not null)
             {
                 // 存储返回值到局部变量
                 ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);

@@ -28,7 +28,7 @@ public class LazySymbolProxy(
         {
             if (IsResolved) return CachedSymbol!;
             CachedSymbol = module.GetSymbol(symbolName);
-            if (CachedSymbol == null)
+            if (CachedSymbol is null)
             {
                 throw new AttributeError(this, symbolName, module.ModuleName);
             }
@@ -61,7 +61,7 @@ public class LazySymbolProxy(
     /// </summary>
     public override string ToString()
     {
-        if (IsResolved && CachedSymbol != null)
+        if (IsResolved && CachedSymbol is not null)
         {
             return CachedSymbol.ToString();
         }

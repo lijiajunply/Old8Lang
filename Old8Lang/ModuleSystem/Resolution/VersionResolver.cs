@@ -48,7 +48,7 @@ public partial class VersionResolver
         }
 
         var parsedVersion = ParseVersion(version);
-        if (parsedVersion == null)
+        if (parsedVersion is null)
         {
             return false;
         }
@@ -58,7 +58,7 @@ public partial class VersionResolver
         {
             // 兼容版本（主版本相同）
             var requiredVersion = ParseVersion(versionSpec[1..]);
-            return requiredVersion != null &&
+            return requiredVersion is not null &&
                    parsedVersion.Major == requiredVersion.Major &&
                    parsedVersion >= requiredVersion;
         }
@@ -67,7 +67,7 @@ public partial class VersionResolver
         {
             // 次版本兼容（主版本和次版本相同）
             var requiredVersion = ParseVersion(versionSpec[1..]);
-            return requiredVersion != null &&
+            return requiredVersion is not null &&
                    parsedVersion.Major == requiredVersion.Major &&
                    parsedVersion.Minor == requiredVersion.Minor &&
                    parsedVersion >= requiredVersion;
@@ -76,30 +76,30 @@ public partial class VersionResolver
         if (versionSpec.StartsWith(">="))
         {
             var requiredVersion = ParseVersion(versionSpec[2..].Trim());
-            return requiredVersion != null && parsedVersion >= requiredVersion;
+            return requiredVersion is not null && parsedVersion >= requiredVersion;
         }
 
         if (versionSpec.StartsWith("<="))
         {
             var requiredVersion = ParseVersion(versionSpec[2..].Trim());
-            return requiredVersion != null && parsedVersion <= requiredVersion;
+            return requiredVersion is not null && parsedVersion <= requiredVersion;
         }
 
         if (versionSpec.StartsWith(">"))
         {
             var requiredVersion = ParseVersion(versionSpec[1..].Trim());
-            return requiredVersion != null && parsedVersion > requiredVersion;
+            return requiredVersion is not null && parsedVersion > requiredVersion;
         }
 
         if (versionSpec.StartsWith("<"))
         {
             var requiredVersion = ParseVersion(versionSpec[1..].Trim());
-            return requiredVersion != null && parsedVersion < requiredVersion;
+            return requiredVersion is not null && parsedVersion < requiredVersion;
         }
 
         // 精确版本匹配
         var exactVersion = ParseVersion(versionSpec);
-        return exactVersion != null && parsedVersion == exactVersion;
+        return exactVersion is not null && parsedVersion == exactVersion;
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public partial class VersionResolver
 
             var versionString = dir[(atIndex + 1)..];
             var version = ParseVersion(versionString);
-            if (version == null)
+            if (version is null)
             {
                 continue;
             }
@@ -182,7 +182,7 @@ public class SemanticVersion(int major, int minor, int patch)
 
     public int CompareTo(SemanticVersion? other)
     {
-        if (other == null)
+        if (other is null)
         {
             return 1;
         }
@@ -202,7 +202,7 @@ public class SemanticVersion(int major, int minor, int patch)
 
     public bool Equals(SemanticVersion? other)
     {
-        return other != null &&
+        return other is not null &&
                Major == other.Major &&
                Minor == other.Minor &&
                Patch == other.Patch;

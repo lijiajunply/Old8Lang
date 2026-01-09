@@ -102,7 +102,7 @@ public class LangInterpreter
 
         // 词法分析：将代码转换为标记流和文件头指令（支持预编译指令）
         var (tokens, headerDirectives) = LangTokenizer.TokenizeWithDirectives(code, preprocessorSymbols);
-        if (tokens == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
+        if (tokens is null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
 
         // 语法分析：将标记流转换为抽象语法树
         var langParser = new LangParser.LangParser(tokens, headerDirectives, code, fileName);

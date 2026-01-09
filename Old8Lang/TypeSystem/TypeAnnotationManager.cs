@@ -83,7 +83,7 @@ public class TypeAnnotationManager
         if (!string.IsNullOrEmpty(baseClassName))
         {
             baseType = TypeFamily.GetType(baseClassName);
-            if (baseType == null)
+            if (baseType is null)
             {
                 // 如果父类还没有注册，先创建一个占位符
                 baseType = new ClassTypeInfo(baseClassName);
@@ -341,7 +341,7 @@ public class TypeAnnotationManager
         var expectedTypeInfo = TypeFamily.GetType(expected.BaseType);
         var actualTypeInfo = TypeFamily.GetType(actual.BaseType);
 
-        if (expectedTypeInfo != null && actualTypeInfo != null)
+        if (expectedTypeInfo is not null && actualTypeInfo is not null)
         {
             // 两个类型都已注册，使用 TypeFamily 的兼容性检查
             return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
@@ -441,7 +441,7 @@ public class TypeAnnotationManager
         var sourceType = TypeFamily.GetType(sourceTypeName);
         var targetType = TypeFamily.GetType(targetTypeName);
 
-        if (sourceType != null && targetType != null)
+        if (sourceType is not null && targetType is not null)
         {
             return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
         }
@@ -456,7 +456,7 @@ public class TypeAnnotationManager
     public ConcurrentDictionary<string, LangValueType> GetTypeMembers(string typeName, VariateManager manager)
     {
         var typeInfo = TypeFamily.GetType(typeName);
-        if (typeInfo == null)
+        if (typeInfo is null)
             return new ConcurrentDictionary<string, LangValueType>();
 
         return typeInfo.GetMembers(manager);
@@ -501,7 +501,7 @@ public class TypeAnnotationManager
     public ITypeInfo? ResolveTypeAnnotation(ParsedTypeAnnotation annotation)
     {
         // 处理泛型类型
-        if (annotation.IsGeneric && annotation.GenericArguments != null)
+        if (annotation.IsGeneric && annotation.GenericArguments is not null)
         {
             var baseTypeInfo = TypeFamily.GetType(annotation.BaseType);
             if (baseTypeInfo is GenericTypeInfo genericType)
@@ -512,7 +512,7 @@ public class TypeAnnotationManager
                 {
                     var argAnnotation = annotation.GenericArguments[i];
                     var argType = ResolveTypeAnnotation(argAnnotation);
-                    if (argType != null)
+                    if (argType is not null)
                     {
                         typeArgs[genericType.TypeParameters[i]] = argType;
                     }
@@ -531,7 +531,7 @@ public class TypeAnnotationManager
     /// </summary>
     public bool ValidateGenericConstraints(GenericTypeInfo genericType, Dictionary<string, ITypeInfo> typeArguments)
     {
-        if (genericType.Constraints == null) return true;
+        if (genericType.Constraints is null) return true;
 
         foreach (var (paramName, constraintTypes) in genericType.Constraints)
         {
@@ -599,12 +599,12 @@ public class ParsedTypeAnnotation
     /// </summary>
     public string GetFullName()
     {
-        if (IsUnion && GenericArguments != null)
+        if (IsUnion && GenericArguments is not null)
         {
             return string.Join(" | ", GenericArguments.Select(arg => arg.GetFullName()));
         }
 
-        if (IsIntersection && GenericArguments != null)
+        if (IsIntersection && GenericArguments is not null)
         {
             return string.Join(" & ", GenericArguments.Select(arg => arg.GetFullName()));
         }
@@ -614,14 +614,14 @@ public class ParsedTypeAnnotation
             return BaseType + (IsNullable ? "?" : "");
         }
 
-        if (GenericArguments != null)
+        if (GenericArguments is not null)
         {
             var args = string.Join(", ", GenericArguments.Select(arg => arg.GetFullName()));
             return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");
         }
 
         // 兼容旧格式
-        if (TypeParameters != null)
+        if (TypeParameters is not null)
         {
             var args = string.Join(", ", TypeParameters);
             return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");

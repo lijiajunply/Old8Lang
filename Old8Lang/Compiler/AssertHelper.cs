@@ -62,7 +62,7 @@ public static class AssertHelper
     /// </summary>
     public static void AssertNull(object? value, string? message = null)
     {
-        if (value != null)
+        if (value is not null)
         {
             var msg = message ?? $"断言失败: 期望为 null 但实际为 '{value}'";
             throw new Exception(msg);
@@ -74,7 +74,7 @@ public static class AssertHelper
     /// </summary>
     public static void AssertNotNull(object? value, string? message = null)
     {
-        if (value == null)
+        if (value is null)
         {
             var msg = message ?? "断言失败: 期望不为 null 但实际为 null";
             throw new Exception(msg);
@@ -185,7 +185,7 @@ public static class AssertHelper
     private static bool AreEqual(object? a, object? b)
     {
         if (ReferenceEquals(a, b)) return true;
-        if (a == null || b == null) return false;
+        if (a is null || b is null) return false;
 
         // 处理字符串比较
         if (a is string strA && b is string strB)

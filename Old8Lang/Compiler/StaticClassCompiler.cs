@@ -101,51 +101,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertEqual(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        // 参数数量检查（2-3个参数）
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        // 获取AssertEqual方法
-        var assertHelperType = typeof(AssertHelper);
-        var assertEqualMethod = assertHelperType.GetMethod("AssertEqual",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertEqual", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (assertEqualMethod == null)
-        {
-            return false;
-        }
-
-        ilGenerator.Emit(OpCodes.Call, assertEqualMethod);
-        return true;
     }
 
     /// <summary>
@@ -153,46 +110,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertNotEqual(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertNotEqual",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertNotEqual", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
     }
 
     /// <summary>
@@ -200,33 +119,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertTrue(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 1 or > 2)
-        {
-            return false;
-        }
-
-        // 加载第一个参数（bool类型，不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-
-        // 如果有第二个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 2)
-        {
-            instance.Ids[1].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        // 始终查找带两个参数的方法签名
-        var method = assertHelperType.GetMethod("AssertTrue", [typeof(bool), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertTrue", 1,
+            [typeof(bool), typeof(string)], shouldBoxParams: false);
     }
 
     /// <summary>
@@ -234,33 +128,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertFalse(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 1 or > 2)
-        {
-            return false;
-        }
-
-        // 加载第一个参数（bool类型，不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-
-        // 如果有第二个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 2)
-        {
-            instance.Ids[1].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        // 始终查找带两个参数的方法签名
-        var method = assertHelperType.GetMethod("AssertFalse", [typeof(bool), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertFalse", 1,
+            [typeof(bool), typeof(string)], shouldBoxParams: false);
     }
 
     /// <summary>
@@ -268,38 +137,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertNull(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 1 or > 2)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var paramType = instance.Ids[0].OutputType(local);
-        if (paramType != null && paramType.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, paramType);
-        }
-
-        // 如果有第二个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 2)
-        {
-            instance.Ids[1].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        // 始终查找带两个参数的方法签名
-        var method = assertHelperType.GetMethod("AssertNull", [typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertNull", 1,
+            [typeof(object), typeof(string)]);
     }
 
     /// <summary>
@@ -307,38 +146,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertNotNull(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 1 or > 2)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var paramType = instance.Ids[0].OutputType(local);
-        if (paramType != null && paramType.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, paramType);
-        }
-
-        // 如果有第二个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 2)
-        {
-            instance.Ids[1].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        // 始终查找带两个参数的方法签名
-        var method = assertHelperType.GetMethod("AssertNotNull", [typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertNotNull", 1,
+            [typeof(object), typeof(string)]);
     }
 
     /// <summary>
@@ -346,46 +155,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertGreater(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertGreater",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertGreater", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
     }
 
     /// <summary>
@@ -393,46 +164,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertGreaterOrEqual(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertGreaterOrEqual",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertGreaterOrEqual", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
     }
 
     /// <summary>
@@ -440,46 +173,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertLess(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertLess",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertLess", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
     }
 
     /// <summary>
@@ -487,46 +182,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertLessOrEqual(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载第一个参数并装箱为 object
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var param1Type = instance.Ids[0].OutputType(local);
-        if (param1Type != null && param1Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param1Type);
-        }
-
-        // 加载第二个参数并装箱为 object
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-        var param2Type = instance.Ids[1].OutputType(local);
-        if (param2Type != null && param2Type.IsValueType)
-        {
-            ilGenerator.Emit(OpCodes.Box, param2Type);
-        }
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertLessOrEqual",
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertLessOrEqual", 2,
             [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
     }
 
     /// <summary>
@@ -534,34 +191,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertContains(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载字符串参数（不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertContains",
-            [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertContains", 2,
+            [typeof(string), typeof(string), typeof(string)], shouldBoxParams: false);
     }
 
     /// <summary>
@@ -569,34 +200,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertNotContains(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载字符串参数（不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertNotContains",
-            [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertNotContains", 2,
+            [typeof(string), typeof(string), typeof(string)], shouldBoxParams: false);
     }
 
     /// <summary>
@@ -604,34 +209,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertStartsWith(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载字符串参数（不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertStartsWith",
-            [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertStartsWith", 2,
+            [typeof(string), typeof(string), typeof(string)], shouldBoxParams: false);
     }
 
     /// <summary>
@@ -639,34 +218,8 @@ public static class StaticClassCompiler
     /// </summary>
     private static bool CompileAssertEndsWith(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        if (instance.Ids.Count is < 2 or > 3)
-        {
-            return false;
-        }
-
-        // 加载字符串参数（不装箱）
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        instance.Ids[1].LoadIlValue(ilGenerator, local);
-
-        // 如果有第三个参数（message），加载它；否则加载null
-        if (instance.Ids.Count == 3)
-        {
-            instance.Ids[2].LoadIlValue(ilGenerator, local);
-        }
-        else
-        {
-            // 对于可选参数，加载null
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
-
-        var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertEndsWith",
-            [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null) return false;
-
-        ilGenerator.Emit(OpCodes.Call, method);
-        return true;
+        return CompileAssertMethod(instance, ilGenerator, local, "AssertEndsWith", 2,
+            [typeof(string), typeof(string), typeof(string)], shouldBoxParams: false);
     }
 
     #endregion
@@ -727,7 +280,7 @@ public static class StaticClassCompiler
                 m.GetParameters().Length == 1 &&
                 m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
 
-        if (continueWithMethod == null)
+        if (continueWithMethod is null)
         {
             return false;
         }
@@ -765,7 +318,7 @@ public static class StaticClassCompiler
         var paramType = instance.Ids[0].OutputType(local);
 
         // 如果是值类型，装箱为object
-        if (paramType != null && paramType.IsValueType)
+        if (paramType is not null && paramType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, paramType);
         }
@@ -830,7 +383,7 @@ public static class StaticClassCompiler
                     m.GetParameters().Length == 1 &&
                     m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
 
-            if (continueWithMethod != null)
+            if (continueWithMethod is not null)
             {
                 continueWithMethod = continueWithMethod.MakeGenericMethod(typeof(object));
 
@@ -882,7 +435,7 @@ public static class StaticClassCompiler
                 .FirstOrDefault(m => m.Name == "WhenAll" &&
                                     m.GetParameters()[0].ParameterType == typeof(Task<object>[]));
 
-            if (whenAllMethod != null)
+            if (whenAllMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, whenAllMethod);
                 return true;
@@ -897,7 +450,7 @@ public static class StaticClassCompiler
                                     m.GetParameters().Length == 1 &&
                                     m.GetParameters()[0].ParameterType.IsArray);
 
-            if (whenAllMethod != null)
+            if (whenAllMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, whenAllMethod);
                 returnType = typeof(Task);
@@ -939,7 +492,7 @@ public static class StaticClassCompiler
                 .FirstOrDefault(m => m.Name == "WhenAny" &&
                                     m.GetParameters()[0].ParameterType == typeof(Task<object>[]));
 
-            if (whenAnyMethod != null)
+            if (whenAnyMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
                 returnType = typeof(Task<Task<object>>);
@@ -955,7 +508,7 @@ public static class StaticClassCompiler
                                     m.GetParameters().Length == 1 &&
                                     m.GetParameters()[0].ParameterType.IsArray);
 
-            if (whenAnyMethod != null)
+            if (whenAnyMethod is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
                 returnType = typeof(Task<Task>);
@@ -1029,7 +582,7 @@ public static class StaticClassCompiler
             var paramType = param.OutputType(local);
 
             // 如果是值类型，需要装箱
-            if (paramType != null && paramType.IsValueType)
+            if (paramType is not null && paramType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, paramType);
                 paramTypes.Add(typeof(object));
@@ -1041,6 +594,73 @@ public static class StaticClassCompiler
         }
 
         return paramTypes;
+    }
+
+    /// <summary>
+    /// 通用的 Assert 方法编译器，用于减少代码重复
+    /// </summary>
+    /// <param name="instance">方法调用实例</param>
+    /// <param name="ilGenerator">IL生成器</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <param name="methodName">Assert 方法名（如 "AssertEqual"）</param>
+    /// <param name="requiredParamCount">必需参数数量（1 或 2）</param>
+    /// <param name="parameterTypes">方法参数类型数组</param>
+    /// <param name="shouldBoxParams">是否需要装箱参数（默认为 true）</param>
+    /// <returns>如果成功生成IL代码返回true，否则返回false</returns>
+    private static bool CompileAssertMethod(
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        string methodName,
+        int requiredParamCount,
+        Type[] parameterTypes,
+        bool shouldBoxParams = true)
+    {
+        // 1. 验证参数数量（必需参数 + 可选的 message 参数）
+        var minCount = requiredParamCount;
+        var maxCount = requiredParamCount + 1;
+        if (instance.Ids.Count < minCount || instance.Ids.Count > maxCount)
+        {
+            return false;
+        }
+
+        // 2. 加载参数并装箱（如果需要）
+        for (var i = 0; i < requiredParamCount; i++)
+        {
+            instance.Ids[i].LoadIlValue(ilGenerator, local);
+
+            if (shouldBoxParams)
+            {
+                var paramType = instance.Ids[i].OutputType(local);
+                if (paramType is not null && paramType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, paramType);
+                }
+            }
+        }
+
+        // 3. 处理可选的 message 参数
+        if (instance.Ids.Count == requiredParamCount + 1)
+        {
+            instance.Ids[requiredParamCount].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
+
+        // 4. 查找并调用 AssertHelper 方法
+        var assertHelperType = typeof(AssertHelper);
+        var method = assertHelperType.GetMethod(methodName, parameterTypes);
+
+        if (method is null)
+        {
+            return false;
+        }
+
+        ilGenerator.Emit(OpCodes.Call, method);
+        return true;
     }
 
     #endregion

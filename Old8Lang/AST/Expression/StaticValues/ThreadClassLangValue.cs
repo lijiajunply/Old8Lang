@@ -41,14 +41,14 @@ public partial class ThreadClassLangValue : LangValueType
                 _ => null
             };
 
-            if (method == null)
+            if (method is null)
             {
                 throw new AttributeError(dotExpression.Position, methodName, "Thread");
             }
 
             // 执行参数
             List<LangValueType> args;
-            if (ExternalManager != null)
+            if (ExternalManager is not null)
             {
                 // 使用 ExternalManager 执行参数
                 args = instance.Ids.Select(id => id.Run(ExternalManager)).ToList();

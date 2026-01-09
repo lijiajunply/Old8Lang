@@ -49,7 +49,7 @@ public partial class InterpreterVisitor
 
         // 访问 ifChildBlock（直接调用其逻辑，因为 IfChild 不支持 Visitor）
         var ifChild = node[0] as IfChild;
-        if (ifChild != null)
+        if (ifChild is not null)
         {
             ifChild.Run(manager, ref r);
         }
@@ -60,7 +60,7 @@ public partial class InterpreterVisitor
         for (int i = 1; i < node.Count; i++)
         {
             var elifChild = node[i] as IfChild;
-            if (elifChild != null)
+            if (elifChild is not null)
             {
                 manager.AddChildren();
                 // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
@@ -91,7 +91,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 BlockStatement.Run()
         // 检查是否有生成器上下文，决定执行模式
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             // 生成器模式需要调用原方法（暂不迁移复杂逻辑）
             node.Run(manager);
@@ -106,7 +106,7 @@ public partial class InterpreterVisitor
             for (int i = 0; i < node.Count; i++)
             {
                 var statement = node[i];
-                if (statement != null)
+                if (statement is not null)
                 {
                     statement.Accept(this);
 
@@ -134,7 +134,7 @@ public partial class InterpreterVisitor
     public LangValueType VisitWhileStatement(WhileStatement node)
     {
         // 迁移自 WhileStatement.Run()
-        if (manager.GeneratorContext != null)
+        if (manager.GeneratorContext is not null)
         {
             // 生成器模式：调用原方法（暂不迁移复杂逻辑）
             node.Run(manager);

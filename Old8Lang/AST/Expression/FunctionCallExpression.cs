@@ -71,10 +71,10 @@ public partial class FunctionCallExpression : LangExpression
         }
 
         // 3. 如果是泛型函数且未实例化，尝试自动推断类型参数
-        if (func.IsGeneric && func.TypeArgumentMapping == null)
+        if (func.IsGeneric && func.TypeArgumentMapping is null)
         {
             // 尝试从参数推断类型
-            if (manager.Interpreter == null)
+            if (manager.Interpreter is null)
             {
                 throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
             }
@@ -83,7 +83,7 @@ public partial class FunctionCallExpression : LangExpression
             var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
             var inferredTypes = inference.InferFunctionTypeArguments(func, Arguments, manager, Position);
 
-            if (inferredTypes != null)
+            if (inferredTypes is not null)
             {
                 // 使用推断出的类型实例化泛型函数
                 var instantiatedFunc = func.InstantiateGeneric(inferredTypes, typeAnnotationManager);

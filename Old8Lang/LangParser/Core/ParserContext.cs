@@ -44,7 +44,7 @@ public class ParserContext
     {
         get
         {
-            if (_cachedSourceLines == null && !string.IsNullOrEmpty(SourceCode))
+            if (_cachedSourceLines is null && !string.IsNullOrEmpty(SourceCode))
             {
                 // 使用 '\n' 分割并保留空行，确保行号正确对应
                 // 注意：Split by '\n' 会保留 '\r'，所以需要在使用时 Trim
@@ -104,7 +104,7 @@ public class ParserContext
             return new TokenIndexCache(_tokens);
         }
 
-        if (_tokenIndexCache == null)
+        if (_tokenIndexCache is null)
         {
             _tokenIndexCache = new TokenIndexCache(_tokens);
             _tokenIndexCache.BuildIndex();

@@ -56,7 +56,7 @@ public class ILGenerationCache
         }
 
         var method = type.GetMethod(methodName, types);
-        if (method != null)
+        if (method is not null)
         {
             _methodInfoCache[key] = method;
         }
@@ -80,7 +80,7 @@ public class ILGenerationCache
         }
 
         var ctor = type.GetConstructor(types);
-        if (ctor != null)
+        if (ctor is not null)
         {
             _constructorInfoCache[key] = ctor;
         }

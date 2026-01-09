@@ -118,7 +118,7 @@ public class PythonProvider : IExternProvider
                     else
                     {
                         // 如果当前目录找不到,尝试从脚本文件所在目录解析
-                        var baseDir = manager.Path != null && File.Exists(manager.Path)
+                        var baseDir = manager.Path is not null && File.Exists(manager.Path)
                             ? Path.GetDirectoryName(manager.Path) ?? Directory.GetCurrentDirectory()
                             : manager.Path ?? Directory.GetCurrentDirectory();
 
@@ -273,7 +273,7 @@ public class PythonProvider : IExternProvider
             };
 
             using var process = Process.Start(processInfo);
-            if (process != null)
+            if (process is not null)
             {
                 var basePath = process.StandardOutput.ReadToEnd().Trim();
                 process.WaitForExit();
@@ -291,7 +291,7 @@ public class PythonProvider : IExternProvider
                     };
 
                     using var versionProcess = Process.Start(versionInfo);
-                    if (versionProcess != null)
+                    if (versionProcess is not null)
                     {
                         var version = versionProcess.StandardOutput.ReadToEnd().Trim();
                         versionProcess.WaitForExit();
@@ -365,7 +365,7 @@ public class PythonProvider : IExternProvider
         try
         {
             var fileInfo = new FileInfo(path);
-            if (fileInfo.LinkTarget != null)
+            if (fileInfo.LinkTarget is not null)
             {
                 // 处理相对路径
                 var targetPath = Path.IsPathRooted(fileInfo.LinkTarget)
@@ -401,7 +401,7 @@ public class PythonProvider : IExternProvider
             };
 
             using var process = Process.Start(processInfo);
-            if (process != null)
+            if (process is not null)
             {
                 var output = process.StandardOutput.ReadToEnd().Trim();
                 process.WaitForExit();

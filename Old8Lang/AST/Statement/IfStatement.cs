@@ -101,7 +101,7 @@ public partial class IfStatement(
         }
     }
 
-    public override int Count => 1 + elifBlock.Count + (elseBlockStatement == null ? 0 : 1);
+    public override int Count => 1 + elifBlock.Count + (elseBlockStatement is null ? 0 : 1);
 
     public override string ToString()
     {
@@ -112,7 +112,7 @@ public partial class IfStatement(
             sb.AppendLine($"elif {elif}");
         }
 
-        if (elseBlockStatement != null)
+        if (elseBlockStatement is not null)
         {
             sb.AppendLine($"else {elseBlockStatement}");
         }

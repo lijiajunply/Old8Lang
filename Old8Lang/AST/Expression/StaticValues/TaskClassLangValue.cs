@@ -67,7 +67,7 @@ public partial class TaskClassLangValue : LangValueType
                 _ => null
             };
 
-            if (method == null)
+            if (method is null)
             {
                 throw new AttributeError(dotExpression.Position, methodName, "Task");
             }

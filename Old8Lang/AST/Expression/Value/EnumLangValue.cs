@@ -97,7 +97,7 @@ public partial class EnumLangValue(
 
     public override bool Equal(LangValueType? otherLangValueType)
     {
-        if (otherLangValueType == null)
+        if (otherLangValueType is null)
             return false;
 
         // 枚举值相等性判断
@@ -123,7 +123,7 @@ public partial class EnumLangValue(
 
     public override bool Less(LangValueType? otherLangValueType)
     {
-        if (otherLangValueType == null)
+        if (otherLangValueType is null)
             throw new InvalidOperationError(this, "不能与 null 进行比较");
 
         if (otherLangValueType is EnumLangValue otherEnum)
@@ -146,7 +146,7 @@ public partial class EnumLangValue(
 
     public override bool LessEqual(LangValueType? otherLangValueType)
     {
-        if (otherLangValueType == null)
+        if (otherLangValueType is null)
             throw new InvalidOperationError(this, "不能与 null 进行比较");
 
         if (otherLangValueType is EnumLangValue otherEnum)
@@ -168,7 +168,7 @@ public partial class EnumLangValue(
 
     public override bool Greater(LangValueType? otherLangValueType)
     {
-        if (otherLangValueType == null)
+        if (otherLangValueType is null)
             throw new InvalidOperationError(this, "不能与 null 进行比较");
 
         if (otherLangValueType is EnumLangValue otherEnum)
@@ -190,7 +190,7 @@ public partial class EnumLangValue(
 
     public override bool GreaterEqual(LangValueType? otherLangValueType)
     {
-        if (otherLangValueType == null)
+        if (otherLangValueType is null)
             throw new InvalidOperationError(this, "不能与 null 进行比较");
 
         if (otherLangValueType is EnumLangValue otherEnum)

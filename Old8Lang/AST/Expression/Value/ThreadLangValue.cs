@@ -48,13 +48,13 @@ public partial class ThreadLangValue : LangValueType
 
             lock (Lock)
             {
-                if (Exception != null)
+                if (Exception is not null)
                 {
                     throw new InvalidOperationError(this, "线程执行异常: " + Exception);
                 }
 
                 // 如果 _result 为 null，返回 VoidLangValue
-                if (_result == null)
+                if (_result is null)
                 {
                     return new VoidLangValue();
                 }
@@ -199,7 +199,7 @@ public partial class ThreadLangValue : LangValueType
     public LangValueType Join(IntLangValue? timeout = null)
     {
         bool joined;
-        if (timeout != null)
+        if (timeout is not null)
         {
             joined = Thread.Join(timeout.GetValue<int>());
             return new BoolLangValue(joined);
@@ -211,13 +211,13 @@ public partial class ThreadLangValue : LangValueType
 
         lock (Lock)
         {
-            if (Exception != null)
+            if (Exception is not null)
             {
                 throw new InvalidOperationError(this, "线程执行异常: " + Exception);
             }
 
             // 如果 _result 为 null，返回 VoidLangValue
-            if (_result == null)
+            if (_result is null)
             {
                 return new VoidLangValue();
             }
@@ -232,7 +232,7 @@ public partial class ThreadLangValue : LangValueType
     /// <param name="parameter">可选的线程参数</param>
     public void Start(object? parameter = null)
     {
-        if (_parameterizedThreadStart != null && parameter != null)
+        if (_parameterizedThreadStart is not null && parameter is not null)
         {
             Thread.Start(parameter);
         }
@@ -468,7 +468,7 @@ public partial class ThreadLangValue : LangValueType
                 case "IsBackground":
                     return new BoolLangValue(IsBackground);
                 case "Name":
-                    return Name != null ? new StringLangValue(Name) : new NullLangValue(Position);
+                    return Name is not null ? new StringLangValue(Name) : new NullLangValue(Position);
                 case "Priority":
                     return new IntLangValue(Priority);
             }
@@ -482,7 +482,7 @@ public partial class ThreadLangValue : LangValueType
                 case "IsBackground":
                     return new BoolLangValue(IsBackground);
                 case "Name":
-                    return Name != null ? new StringLangValue(Name) : new NullLangValue(Position);
+                    return Name is not null ? new StringLangValue(Name) : new NullLangValue(Position);
                 case "Priority":
                     return new IntLangValue(Priority);
             }
@@ -613,7 +613,7 @@ public partial class ThreadLangValue : LangValueType
         }, Position, tcs.Token);
 
         // 设置外部管理器
-        if (thenThread != null)
+        if (thenThread is not null)
         {
             thenThread.ExternalManager = ExternalManager;
         }

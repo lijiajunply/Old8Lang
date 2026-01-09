@@ -132,7 +132,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
 
         // 支持继承多态：子类可以赋值给父类类型
         var current = this;
-        while (current.BaseType != null)
+        while (current.BaseType is not null)
         {
             if (current.BaseType.Name == other.Name) return true;
             current = (ClassTypeInfo)current.BaseType;
@@ -208,12 +208,12 @@ public class GenericTypeInfo : ITypeInfo
     /// <summary>
     /// 判断是否为泛型定义（未实例化）
     /// </summary>
-    public bool IsGenericDefinition => TypeArguments == null;
+    public bool IsGenericDefinition => TypeArguments is null;
 
     /// <summary>
     /// 判断是否为泛型实例（已实例化）
     /// </summary>
-    public bool IsGenericInstance => TypeArguments != null;
+    public bool IsGenericInstance => TypeArguments is not null;
 
     private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
 
@@ -268,7 +268,7 @@ public class GenericTypeInfo : ITypeInfo
         }
 
         // 验证类型参数约束
-        if (Constraints != null)
+        if (Constraints is not null)
         {
             foreach (var (paramName, constraintTypes) in Constraints)
             {
@@ -355,7 +355,7 @@ public class GenericTypeInfo : ITypeInfo
 
         // 支持继承多态
         var current = this;
-        while (current.BaseType != null)
+        while (current.BaseType is not null)
         {
             if (current.BaseType.Name == other.Name) return true;
             if (current.BaseType is GenericTypeInfo genericBase)
@@ -441,7 +441,7 @@ public class TypeFamily
         var sourceType = GetType(sourceTypeName);
         var targetType = GetType(targetTypeName);
 
-        if (sourceType == null || targetType == null) return false;
+        if (sourceType is null || targetType is null) return false;
 
         return sourceType.IsCompatibleWith(targetType);
     }

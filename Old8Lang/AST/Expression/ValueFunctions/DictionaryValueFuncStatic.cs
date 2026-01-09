@@ -342,7 +342,7 @@ public static class DictionaryValueFuncStatic
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
-            bool isLambda = action.Id == null && action.Method == null;
+            bool isLambda = action.Id is null && action.Method is null;
 
             if (isLambda)
             {
@@ -368,7 +368,7 @@ public static class DictionaryValueFuncStatic
                                 // 两个参数：键和值
                                 var keyId = action.Ids[0];
                                 var valueId = action.Ids[1];
-                                if (keyId != null! && valueId != null!)
+                                if (keyId is not null && valueId is not null)
                                 {
                                     manager.Set(keyId, key);
                                     manager.Set(valueId, value);
@@ -378,7 +378,7 @@ public static class DictionaryValueFuncStatic
                             {
                                 // 一个参数：只传递值
                                 var valueId = action.Ids[0];
-                                if (valueId != null!)
+                                if (valueId is not null)
                                 {
                                     manager.Set(valueId, value);
                                 }

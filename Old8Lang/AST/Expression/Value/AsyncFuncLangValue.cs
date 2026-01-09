@@ -63,7 +63,7 @@ public class AsyncFuncLangValue : ImportInfo
         for (int i = 0; i < stmt.Count; i++)
         {
             var child = stmt[i];
-            if (child != null && ContainsYieldStatement(child))
+            if (child is not null && ContainsYieldStatement(child))
                 return true;
         }
 
@@ -117,7 +117,7 @@ public class AsyncFuncLangValue : ImportInfo
             cancellationToken.ThrowIfCancellationRequested();
 
             // 参数数量检查
-            if (Ids != null && ids.Count > Ids.Count)
+            if (Ids is not null && ids.Count > Ids.Count)
             {
                 throw new ArgumentError(
                     Position,
@@ -151,10 +151,10 @@ public class AsyncFuncLangValue : ImportInfo
                 try
                 {
                     // 处理参数
-                    if (Ids != null && Ids.Count != 0)
+                    if (Ids is not null && Ids.Count != 0)
                     {
                         // 初始化默认参数值缓存（仅在首次调用时）
-                        if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
+                        if (CachedDefaultValues is null && Ids.Any(id => id.DefaultValue is not null))
                         {
                             InitializeDefaultValueCache(executionManager);
                         }
@@ -169,7 +169,7 @@ public class AsyncFuncLangValue : ImportInfo
                             cancellationToken.ThrowIfCancellationRequested();
 
                             var id = Ids[i];
-                            if (id.DefaultValue != null)
+                            if (id.DefaultValue is not null)
                             {
                                 // 优先使用缓存值（常量表达式）
                                 paramValues.Add(CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true
@@ -239,7 +239,7 @@ public class AsyncFuncLangValue : ImportInfo
         for (int i = 0; i < Ids!.Count; i++)
         {
             var param = Ids[i];
-            if (param.DefaultValue != null && IsConstantExpression(param.DefaultValue))
+            if (param.DefaultValue is not null && IsConstantExpression(param.DefaultValue))
             {
                 var defaultValue = param.DefaultValue.Run(manager);
                 CachedDefaultValues[i] = defaultValue;

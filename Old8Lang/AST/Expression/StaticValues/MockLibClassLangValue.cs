@@ -71,7 +71,7 @@ public class MockLibClassLangValue : LangValueType
                 _ => null
             };
 
-            if (method == null)
+            if (method is null)
             {
                 throw new AttributeError(dotExpression.Position, methodName, "MockLib");
             }
