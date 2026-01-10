@@ -241,7 +241,9 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     /// </summary>
     private static IEnumerable<CompletionItem> GetBuiltInFunctionCompletions()
     {
-        // 全局函数已在 Program.cs 启动时初始化，这里直接获取即可
+        // 确保全局函数已初始化（对于测试环境尤为重要）
+        GlobalFunctionInitializer.EnsureInitialized();
+
         var functionNames = GlobalFunctionRegistry.Instance.GetAllFunctionNames();
 
         return functionNames.Select(name => new CompletionItem
