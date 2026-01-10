@@ -23,16 +23,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_BoundaryTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_ConcurrencyTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_KeywordsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_SnippetsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_SpecialSyntaxTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_TypesTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/ComprehensiveTestPlan.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/NewTestsSummary.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_AsyncFuncTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_BuiltInFunctionsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_ContextAwareTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_DirectivesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_ExpressionsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_ExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_GenericsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_LspProtocolTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_MemberChainTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_SnippetsExtendedTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandler_UnionTypesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/test_results.trx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2026-01-10-19-10-CompletionHandler-Test-Report.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/SyntaxTests/test_generics.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -915,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="581" />
+    <option name="localTasksCounter" value="582" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,7 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
     <MESSAGE value="fix(parser): 修复预处理器指令中#define的位置敏感性问题&#10;&#10;- 修复PreprocessorTokenizer中conditionStack的数据结构，从Stack&lt;bool&gt;改为Stack&lt;(bool isActive, bool anyBranchTaken)&gt;&#10;- 更新所有条件判断逻辑以使用新的元组结构中的isActive字段&#10;- 修正ProcessIf、ProcessElif、ProcessElse方法中的分支激活逻辑&#10;- 更新预处理器指令处理方法的参数类型签名&#10;- 修改测试用例Preprocessor_DefineNotAtLineStart_DoesNotDefineSymbol以正确验证异常情况&#10;- 添加调试断点配置以支持预处理器边缘情况测试" />
     <MESSAGE value="test(language-server): 更新文档解析结果测试用例&#10;&#10;- 修改TestClass中value属性的字符串字面量为多行字符串格式&#10;- 将诊断计数断言从2改为1，使用Assert.Single进行验证&#10;- 更新属性相等性测试为不等性测试，并修改URI比较逻辑&#10;- 添加不同的URI值以正确测试属性不等性场景" />
     <MESSAGE value="fix(parser): 修复列号计算和符号查找问题&#10;&#10;- 修正了换行符后的列号计算，从 column = i 改为 column = i + 1&#10;- 添加了数字和标识符的起始位置记录用于准确的列号计算&#10;- 修复了符号查找器中基于位置的token查找逻辑&#10;- 更新了测试用例中的位置参数以匹配正确的行列计算&#10;- 移除了旧的基于源代码的token查找实现&#10;- 添加了符号查找相关的调试输出功能" />
@@ -967,7 +971,8 @@
     <MESSAGE value="fix(semantic-tokens): 解决测试环境中 RegistrationOptions 未初始化问题&#10;&#10;- 添加空值检查避免 RegistrationOptions 为 null 时的异常&#10;- 创建默认的 SemanticTokensLegend 作为后备方案&#10;- 确保 TokenTypes 和 TokenModifiers 的正确初始化&#10;- 保持原有功能完整性的同时提高代码健壮性" />
     <MESSAGE value="docs(guidelines): 添加 Old8Lang API 参考文档和贡献者指南&#10;&#10;- 创建完整的 API 参考文档，涵盖基础函数、数学函数、字符串处理等功能模块&#10;- 添加详细的并发原语文档，包括互斥锁、信号量、原子整数、通道等&#10;- 编写全面的贡献者指南，包含开发环境设置、代码规范、提交规范等内容&#10;- 提供测试要求和文档贡献指导，帮助开发者参与项目&#10;- 包含问题报告和功能请求的模板，规范社区交互流程" />
     <MESSAGE value="docs(guides): 添加高级主题文档并整合开发工具指南&#10;&#10;- 新增 ADVANCED_TOPICS.md 包含 Extern 功能工厂架构详解&#10;- 新增 DEVELOPER_TOOLS.md 整合 Language Server 和 VSCode 扩展开发指南&#10;- 移除过时的 DEBUGGER_GUIDE.md 文档&#10;- 更新高级主题涵盖渐进式类型推断系统和包开发指南&#10;- 完善开发工具文档包含调试器和性能分析工具说明" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(guides): 添加高级主题文档并整合开发工具指南&#10;&#10;- 新增 ADVANCED_TOPICS.md 包含 Extern 功能工厂架构详解&#10;- 新增 DEVELOPER_TOOLS.md 整合 Language Server 和 VSCode 扩展开发指南&#10;- 移除过时的 DEBUGGER_GUIDE.md 文档&#10;- 更新高级主题涵盖渐进式类型推断系统和包开发指南&#10;- 完善开发工具文档包含调试器和性能分析工具说明" />
+    <MESSAGE value="test(completion): 添加补全处理器的边界测试和并发原语测试&#10;&#10;- 在CompletionHandler中确保全局函数初始化以支持测试环境&#10;- 添加边界测试覆盖空文档、语法错误、越界位置等极端情况&#10;- 添加并发原语函数的完整补全测试包括Mutex、Semaphore、Channel等&#10;- 添加关键字补全测试覆盖控制流、函数、异步、面向对象等关键字&#10;- 实现大量符号表的性能测试确保补全响应时间在1秒内&#10;- 验证所有并发原语函数的补全完整性和详细信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(completion): 添加补全处理器的边界测试和并发原语测试&#10;&#10;- 在CompletionHandler中确保全局函数初始化以支持测试环境&#10;- 添加边界测试覆盖空文档、语法错误、越界位置等极端情况&#10;- 添加并发原语函数的完整补全测试包括Mutex、Semaphore、Channel等&#10;- 添加关键字补全测试覆盖控制流、函数、异步、面向对象等关键字&#10;- 实现大量符号表的性能测试确保补全响应时间在1秒内&#10;- 验证所有并发原语函数的补全完整性和详细信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

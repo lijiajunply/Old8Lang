@@ -1,0 +1,477 @@
+using Old8Lang.LanguageServer.Services;
+using Old8Lang.LanguageServer.Handlers;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using Xunit.Abstractions;
+
+namespace Old8Lang.Tests.LanguageServer;
+
+/// <summary>
+/// 成员访问链补全功能测试
+/// 测试多级成员访问（obj.prop.method().nested）的补全
+/// </summary>
+public class CompletionHandler_MemberChainTests(ITestOutputHelper output)
+{
+    private readonly ITestOutputHelper _output = output;
+
+    [Fact]
+    public async Task ThreeLevelMemberAccess_ShouldComplete()
+    {
+        var code = @"class A {
+    func getB() -> B {
+        return new B()
+    }
+}
+
+class B {
+    func getC() -> C {
+        return new C()
+    }
+}
+
+class C {
+    public value <- 0
+    func getValue() -> int {
+        return value
+    }
+}
+
+func main() -> void {
+    obj <- new A()
+    result <- obj.getB().getC().$1getValue()
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(27, 10)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
+        Assert.NotNull(getValueMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+        foreach (var item in items)
+        {
+            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+        }
+    }
+
+    [Fact]
+    public async Task NestedClassMethodCalls_ShouldComplete()
+    {
+        var code = @"class Outer {
+    public inner <- null
+    func init() {
+        inner <- new Inner()
+    }
+}
+
+class Inner {
+    private nested <- null
+    func init() {
+        nested <- new Nested()
+    }
+}
+
+class Nested {
+    public value <- 0
+    func getValue() -> int {
+        return value
+    }
+}
+
+func main() -> void {
+    outer <- new Outer()
+    result <- outer.inner.$1nested.getValue()
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(25, 14)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
+        Assert.NotNull(getValueMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+        foreach (var item in items)
+        {
+            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+        }
+    }
+
+    [Fact]
+    public async Task ChainOfPropertyAccess_ShouldComplete()
+    {
+        var code = @"class A {
+    public b <- null
+    func init() {
+        b <- new B()
+    }
+}
+
+class B {
+    public c <- null
+    func init() {
+        c <- new C()
+    }
+}
+
+class C {
+    public value <- 0
+}
+
+func main() -> void {
+    obj <- new A()
+    result <- obj.b.$1c.$2value
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(22, 5)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var valueField = items.FirstOrDefault(i => i.Label == "value");
+        Assert.NotNull(valueField);
+
+        _output.WriteLine($"Found {items.Count} member items");
+    }
+
+    [Fact]
+    public async Task MethodCallAfterMethodCall_ShouldComplete()
+    {
+        var code = @"class Calculator {
+    public value <- 0
+
+    func add(x:int) -> void {
+        this.value <- this.value + x
+    }
+
+    func multiply(x:int) -> int {
+        return this.value * x
+    }
+}
+
+func main() -> void {
+    calc <- new Calculator()
+    calc.add(10)
+    result <- calc.$1multiply(2)
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(18, 10)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var multiplyMethod = items.FirstOrDefault(i => i.Label == "multiply");
+        Assert.NotNull(multiplyMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+    }
+
+    [Fact]
+    public async Task MemberAccessInExpression_ShouldComplete()
+    {
+        var code = @"class Person {
+    public name <- ""
+    public age <- 0
+}
+
+func getFullName(person:Person) -> string {
+    return person.name + "" ("" + person.age.ToStr() + "")""
+}
+
+func main() -> void {
+    p <- new Person()
+    p.name <- ""Alice""
+    p.age <- 30
+    result <- getFullName(p.$1name)
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(17, 15)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var nameField = items.FirstOrDefault(i => i.Label == "name");
+        Assert.NotNull(nameField);
+
+        _output.WriteLine($"Found {items.Count} items");
+    }
+
+    [Fact]
+    public async Task ChainWithMethodParameters_ShouldComplete()
+    {
+        var code = @"class Container {
+    public item <- null
+    func init() {
+        item <- new Item()
+    }
+}
+
+class Item {
+    public name <- ""
+    func process(input:string) -> void {
+        PrintLine(""Processing: "" + input)
+    }
+}
+
+func main() -> void {
+    container <- new Container()
+    container.item.$1process($1""test"")
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(17, 15)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var processMethod = items.FirstOrDefault(i => i.Label == "process");
+        Assert.NotNull(processMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+    }
+
+    [Fact]
+    public async Task FourLevelDeepChain_ShouldComplete()
+    {
+        var code = @"class Level1 {
+    public level2 <- null
+    func init() {
+        level2 <- new Level2()
+    }
+}
+
+class Level2 {
+    public level3 <- null
+    func init() {
+        level3 <- new Level3()
+    }
+}
+
+class Level3 {
+    public level4 <- null
+    func init() {
+        level4 <- new Level4()
+    }
+}
+
+class Level4 {
+    public result <- 0
+    func getValue() -> int {
+        return result
+    }
+}
+
+func main() -> void {
+    obj <- new Level1()
+    value <- obj.level2.level3.$1level4.getValue()
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(29, 12)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
+        Assert.NotNull(getValueMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+    }
+
+    [Fact]
+    public async Task StaticMethodChain_ShouldComplete()
+    {
+        var code = @"class MathHelper {
+    public static func add(a:int, b:int) -> int {
+        return a + b
+    }
+
+    public static func multiply(a:int, b:int) -> int {
+        return a * b
+    }
+}
+
+func main() -> void {
+    sum <- MathHelper.$1add(10, 20)
+    product <- MathHelper.$1multiply(5, 6)
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(16, 15)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var multiplyMethod = items.FirstOrDefault(i => i.Label == "multiply");
+        Assert.NotNull(multiplyMethod);
+
+        _output.WriteLine($"Found {items.Count} member items");
+    }
+
+    [Fact]
+    public async Task ThisInChain_ShouldComplete()
+    {
+        var code = @"class Outer {
+    public inner <- null
+    func init() {
+        inner <- new Inner()
+    }
+
+    func process() -> void {
+        inner.value <- 10
+    }
+}
+
+class Inner {
+    public value <- 0
+}
+
+func main() -> void {
+    obj <- new Outer()
+    obj.$1process()
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(13, 5)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var processMethod = items.FirstOrDefault(i => i.Label == "process");
+        Assert.NotNull(processMethod);
+
+        _output.WriteLine($"Found {items.Count} items");
+    }
+
+    [Fact]
+    public async Task SuperInChain_ShouldComplete()
+    {
+        var code = @"class Base {
+    public value <- 0
+    func getValue() -> int {
+        return value
+    }
+}
+
+class Derived extends Base {
+    public extra <- 0
+    func getSum() -> int {
+        return this.value + this.extra
+    }
+}
+
+func main() -> void {
+    obj <- new Derived()
+    baseValue <- super.$1getValue()
+    sum <- obj.$1getSum()
+}
+";
+        var uri = "file:///test.old8";
+        var documentManager = new DocumentManager();
+        documentManager.UpdateDocument(uri, code);
+
+        var handler = new CompletionHandler(documentManager);
+        var request = new CompletionParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
+            Position = new Position(20, 9)
+        };
+
+        var result = await handler.Handle(request, CancellationToken.None);
+        Assert.NotNull(result);
+
+        var items = result.Items.ToList();
+        var getSumMethod = items.FirstOrDefault(i => i.Label == "getSum");
+        Assert.NotNull(getSumMethod);
+
+        _output.WriteLine($"Found {items.Count} items");
+    }
+}

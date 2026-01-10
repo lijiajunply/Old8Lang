@@ -1,0 +1,13 @@
+# Test generic syntax
+func identity<T>(value:T) -> T {
+    return value
+}
+
+class Box<T> {
+    private value:T
+}
+
+func main() -> void {
+    result <- identity<int>(42)
+    box <- Box<int>()
+}
