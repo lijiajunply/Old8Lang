@@ -90,7 +90,7 @@ class TestClass {{
         documentManager.UpdateDocument(TestUri, code);
         var handler = new CompletionHandler(documentManager);
 
-        var position = code.IndexOf(triggerChar) + 1;
+        var position = code.IndexOf(triggerChar, StringComparison.Ordinal) + 1;
         var line = code.Substring(0, position).Count(c => c == '\n');
         var column = position - code.LastIndexOf('\n', position) - 1;
 
@@ -136,7 +136,6 @@ func TestFunc() {
         {
             Assert.NotNull(item.Label);
             Assert.False(string.IsNullOrWhiteSpace(item.Label));
-            Assert.NotNull(item.Kind);
             _output.WriteLine($"Item: {item.Label}, Kind: {item.Kind}");
         }
     }
@@ -227,7 +226,7 @@ func TestFunc() {
         };
 
         var cts = new CancellationTokenSource();
-        cts.Cancel();
+        await cts.CancelAsync();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {

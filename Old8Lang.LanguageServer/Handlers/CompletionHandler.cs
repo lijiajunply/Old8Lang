@@ -26,6 +26,9 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
     public Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
     {
+        // 检查取消令牌
+        cancellationToken.ThrowIfCancellationRequested();
+
         var uri = request.TextDocument.Uri.ToString();
         var document = documentManager.GetDocument(uri);
 

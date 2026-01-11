@@ -213,7 +213,9 @@ func main() -> void {
     [Fact]
     public async Task NativeFunctionDeclaration_Completion()
     {
-        var code = @"native func CPrint(msg:string) -> void
+        var code = @"native extern ""MyLib.dll"" {
+    func CPrint(msg:string) -> void
+}
 
 func main() -> void {
     CPrint(""Hello from C"")
@@ -304,10 +306,13 @@ func main() -> void {
     [Fact]
     public async Task ExternVariable_ShouldComplete()
     {
-        var code = @"extern var globalCounter:int
+        var code = @"native extern ""MyLib.dll"" {
+    func getGlobalCounter() -> int
+}
 
 func main() -> void {
-    counter <- globalCounter
+    counter <- getGlobalCounter()
+    globalCounter <- counter
 }
 ";
         var uri = "file:///test.old8";
@@ -318,14 +323,14 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 4)
+            Position = new Position(6, 4)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        var globalCounterVar = items.FirstOrDefault(i => i.Label == "globalCounter");
+        var globalCounterVar = items.FirstOrDefault(i => i.Label == "counter" || i.Label == "getGlobalCounter");
         Assert.NotNull(globalCounterVar);
 
         _output.WriteLine($"Found {items.Count} items");

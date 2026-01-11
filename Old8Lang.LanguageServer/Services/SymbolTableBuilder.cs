@@ -69,6 +69,15 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             case SetStatement setStatement:
                 VisitVariable(setStatement);
                 break;
+            case NativeStatement nativeStatement:
+                VisitNativeStatement(nativeStatement);
+                break;
+            case ExternStatement externStatement:
+                VisitExternStatement(externStatement);
+                break;
+            case ImportStatement importStatement:
+                VisitImportStatement(importStatement);
+                break;
         }
     }
 
@@ -1019,5 +1028,160 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         // 没找到类定义，使用默认值
         _currentClassStartTokenIndex = -1;
         _currentClassEndTokenIndex = -1;
+    }
+
+    /// <summary>
+    /// 访问 native 函数声明
+    /// </summary>
+    private void VisitNativeStatement(NativeStatement nativeStatement)
+    {
+        // native 语句可以导入函数、类或方法
+        // 我们需要从 NativeStatement 的内部字段中提取信息
+        // 由于这些字段是私有的，我们需要通过反射或其他方式获取
+
+        // 使用反射获取私有字段
+        var type = nativeStatement.GetType();
+        var methodNameField = type.GetField("MethodName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var nativeNameField = type.GetField("NativeName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var funcValueField = type.GetField("FuncValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var classNameField = type.GetField("ClassName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        var methodName = methodNameField?.GetValue(nativeStatement) as string;
+        var nativeName = nativeNameField?.GetValue(nativeStatement) as string;
+        var funcValue = funcValueField?.GetValue(nativeStatement) as FuncLangValue;
+        var className = classNameField?.GetValue(nativeStatement) as string;
+
+        // 如果有方法名，说明这是一个 native 函数导入
+        if (!string.IsNullOrEmpty(methodName))
+        {
+            var functionName = !string.IsNullOrEmpty(nativeName) ? nativeName : methodName;
+
+            // 构建函数签名
+            string funcSignature;
+            if (funcValue?.Id != null)
+            {
+                var paramList = funcValue.Ids != null
+                    ? string.Join(", ",
+                        funcValue.Ids.Select(p =>
+                            $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
+                    : "";
+                var returnType = funcValue.Id.AssumptionType ?? "void";
+                funcSignature = $"native func {functionName}({paramList}) -> {returnType}";
+            }
+            else
+            {
+                funcSignature = $"native func {functionName}(...)";
+            }
+
+            var location = new SourceLocation
+            {
+                Uri = uri,
+                Line = nativeStatement.Position.Line,
+                Column = nativeStatement.Position.Column,
+                EndLine = nativeStatement.Position.Line,
+                EndColumn = nativeStatement.Position.Column + functionName.Length
+            };
+
+            _symbolTable[functionName] = new SymbolInfo
+            {
+                Name = functionName,
+                Kind = SymbolKind.Function,
+                Type = funcSignature,
+                Location = location,
+                Documentation = $"Native function from {className}"
+            };
+        }
+    }
+
+    /// <summary>
+    /// 访问 extern 语句
+    /// </summary>
+    private void VisitExternStatement(ExternStatement externStatement)
+    {
+        // extern 语句声明外部函数或变量
+        // 使用反射获取私有字段
+        var type = externStatement.GetType();
+        var functionsField = type.GetField("Functions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (functionsField?.GetValue(externStatement) is List<ExternFunctionDeclaration> functions)
+        {
+            foreach (var func in functions)
+            {
+                var functionName = func.Alias ?? func.FunctionName;
+
+                // 构建函数签名
+                string funcSignature;
+                if (func.FunctionSignature != null)
+                {
+                    var funcValue = func.FunctionSignature.FuncLangValue;
+                    var paramList = funcValue.Ids != null
+                        ? string.Join(", ",
+                            funcValue.Ids.Select(p =>
+                                $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
+                        : "";
+                    var returnType = funcValue.Id?.AssumptionType ?? "void";
+                    funcSignature = $"extern func {functionName}({paramList}) -> {returnType}";
+                }
+                else
+                {
+                    funcSignature = $"extern func {functionName}(...)";
+                }
+
+                var location = new SourceLocation
+                {
+                    Uri = uri,
+                    Line = externStatement.Position.Line,
+                    Column = externStatement.Position.Column,
+                    EndLine = externStatement.Position.Line,
+                    EndColumn = externStatement.Position.Column + functionName.Length
+                };
+
+                _symbolTable[functionName] = new SymbolInfo
+                {
+                    Name = functionName,
+                    Kind = SymbolKind.Function,
+                    Type = funcSignature,
+                    Location = location,
+                    Documentation = "External function"
+                };
+            }
+        }
+    }
+
+    /// <summary>
+    /// 访问 import 语句
+    /// </summary>
+    private void VisitImportStatement(ImportStatement importStatement)
+    {
+        // import 语句可能有别名
+        // 使用反射获取私有字段
+        var type = importStatement.GetType();
+        var moduleAliasField = type.GetField("ModuleAlias", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var importStringField = type.GetField("ImportString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        var moduleAlias = moduleAliasField?.GetValue(importStatement) as string;
+        var importString = importStringField?.GetValue(importStatement) as string;
+
+        // 如果有模块别名，添加到符号表
+        if (!string.IsNullOrEmpty(moduleAlias))
+        {
+            var location = new SourceLocation
+            {
+                Uri = uri,
+                Line = importStatement.Position.Line,
+                Column = importStatement.Position.Column,
+                EndLine = importStatement.Position.Line,
+                EndColumn = importStatement.Position.Column + moduleAlias.Length
+            };
+
+            _symbolTable[moduleAlias] = new SymbolInfo
+            {
+                Name = moduleAlias,
+                Kind = SymbolKind.Variable, // 模块作为变量
+                Type = "module",
+                Location = location,
+                Documentation = $"Imported module: {importString}"
+            };
+        }
     }
 }
