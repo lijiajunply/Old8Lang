@@ -902,52 +902,11 @@ public partial class Operation(
             case LangTokenType.NotEquals:
                 return ComparisonOpHelper.GenerateNotEquals(Left, Right, ilGenerator, local);
             case LangTokenType.And:
-            {
-                // 实现短路求值：如果左操作数为false，则跳过右操作数
-                var endLabel = ilGenerator.DefineLabel();
-                var falseLabel = ilGenerator.DefineLabel();
-
-                // 加载左操作数
-                Left?.LoadIlValue(ilGenerator, local);
-                // 如果左操作数为false，跳转到falseLabel
-                ilGenerator.Emit(OpCodes.Brfalse, falseLabel);
-                // 加载右操作数
-                Right?.LoadIlValue(ilGenerator, local);
-                // 右操作数已经在栈上，直接跳转到endLabel
-                ilGenerator.Emit(OpCodes.Br, endLabel);
-                // 左操作数为false的情况
-                ilGenerator.MarkLabel(falseLabel);
-                ilGenerator.Emit(OpCodes.Ldc_I4_0); // 加载false
-                // 结果为true或false的情况
-                ilGenerator.MarkLabel(endLabel);
-                return typeof(bool);
-            }
+                return LogicalOpILHelper.GenerateAnd(Left!, Right!, ilGenerator, local);
             case LangTokenType.Or:
-            {
-                // 实现短路求值：如果左操作数为true，则跳过右操作数
-                var endLabel = ilGenerator.DefineLabel();
-                var trueLabel = ilGenerator.DefineLabel();
-
-                // 加载左操作数
-                Left?.LoadIlValue(ilGenerator, local);
-                // 如果左操作数为true，跳转到trueLabel
-                ilGenerator.Emit(OpCodes.Brtrue, trueLabel);
-                // 加载右操作数
-                Right?.LoadIlValue(ilGenerator, local);
-                // 右操作数已经在栈上，直接跳转到endLabel
-                ilGenerator.Emit(OpCodes.Br, endLabel);
-                // 左操作数为true的情况
-                ilGenerator.MarkLabel(trueLabel);
-                ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载true
-                // 结果为true或false的情况
-                ilGenerator.MarkLabel(endLabel);
-                return typeof(bool);
-            }
+                return LogicalOpILHelper.GenerateOr(Left!, Right!, ilGenerator, local);
             case LangTokenType.Xor:
-                Left?.LoadIlValue(ilGenerator, local);
-                Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Xor);
-                return typeof(bool);
+                return LogicalOpILHelper.GenerateXor(Left!, Right!, ilGenerator, local);
             case LangTokenType.LessThanEquals:
                 return ComparisonOpHelper.GenerateLessThanEquals(Left, Right, ilGenerator, local);
             case LangTokenType.GreaterThanEquals:
@@ -1177,42 +1136,7 @@ public partial class Operation(
                 return typeof(bool);
             }
             case LangTokenType.NullishCoalescing:
-            {
-                // 处理空值合并运算符 ??
-                if (leftType!.IsValueType)
-                {
-                    // 值类型不能为null，直接返回左侧值
-                    Left!.LoadIlValue(ilGenerator, local);
-                    return leftType;
-                }
-
-                // 引用类型，加载左侧值
-                Left!.LoadIlValue(ilGenerator, local);
-
-                // 检查左侧值是否为null
-                ilGenerator.Emit(OpCodes.Dup); // 复制左侧值到栈顶
-                ilGenerator.Emit(OpCodes.Ldnull);
-                ilGenerator.Emit(OpCodes.Ceq);
-
-                // 如果左侧值为null，跳转到加载右侧值的标签
-                var rightLabel = ilGenerator.DefineLabel();
-                var endLabel = ilGenerator.DefineLabel();
-                ilGenerator.Emit(OpCodes.Brtrue, rightLabel);
-
-                // 左侧值不为null，直接返回（栈上已有左侧值）
-                ilGenerator.Emit(OpCodes.Br, endLabel);
-
-                // 左侧值为null，弹出栈上的左侧值，加载右侧值
-                ilGenerator.MarkLabel(rightLabel);
-                ilGenerator.Emit(OpCodes.Pop); // 弹出栈上的左侧值
-                Right!.LoadIlValue(ilGenerator, local);
-
-                // 结束标签
-                ilGenerator.MarkLabel(endLabel);
-
-                // 返回左侧值或右侧值的类型
-                return leftType;
-            }
+                return NullishCoalescingILHelper.GenerateNullishCoalescing(Left!, Right!, ilGenerator, local, leftType!);
             case LangTokenType.Dot:
             {
                 if (local.InClassEnv is not null && Left is LangId { IdName: "this" })
