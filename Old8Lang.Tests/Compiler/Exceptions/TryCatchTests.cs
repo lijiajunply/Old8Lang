@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Exceptions;
 /// <summary>
 /// 编译器模式下的异常处理测试 - Try-Catch 语句
 /// </summary>
-public class TryCatchTests
+public class TryCatchTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public TryCatchTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicTryCatch_CompilesAndExecutesCorrectly()

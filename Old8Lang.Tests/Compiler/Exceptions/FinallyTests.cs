@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Exceptions;
 /// <summary>
 /// 编译器模式下的异常处理测试 - Finally 块
 /// </summary>
-public class FinallyTests
+public class FinallyTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public FinallyTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void FinallyWithoutException_CompilesAndExecutesCorrectly()

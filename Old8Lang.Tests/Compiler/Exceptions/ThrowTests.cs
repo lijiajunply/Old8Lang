@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Exceptions;
 /// <summary>
 /// 编译器模式下的异常处理测试 - Throw 语句
 /// </summary>
-public class ThrowTests
+public class ThrowTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ThrowTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void ThrowString_CompilesAndExecutesCorrectly()

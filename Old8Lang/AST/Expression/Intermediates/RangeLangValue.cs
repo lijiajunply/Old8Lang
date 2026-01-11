@@ -75,30 +75,67 @@ public partial class RangeLangValue(
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 我们需要生成与解释器相同的行为：
+        // 1. 根据 includeStart 和 includeEnd 调整范围
+        // 2. 检查是正向还是反向
+        // 3. 生成相应的数组
+
+        // 为了简化，我们直接调用一个辅助方法来生成范围数组
         // 加载起始值
         start?.LoadIlValue(ilGenerator, local);
 
         // 加载结束值
         end?.LoadIlValue(ilGenerator, local);
 
-        // 获取 Enumerable.Range 方法
-        var rangeMethod = typeof(Enumerable).GetMethod("Range", [typeof(int), typeof(int)])!;
+        // 加载 includeStart
+        ilGenerator.Emit(IncludeStart ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 
-        // 调用 Enumerable.Range 方法
-        ilGenerator.Emit(OpCodes.Call, rangeMethod);
+        // 加载 includeEnd
+        ilGenerator.Emit(IncludeEnd ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 
-        // 获取 Enumerable.ToArray<T> 泛型方法定义
-        var toArrayMethod = typeof(Enumerable).GetMethods()
-            .First(m => m is { Name: "ToArray", IsGenericMethod: true });
+        // 调用辅助方法 CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
+        var createRangeMethod = typeof(RangeLangValue).GetMethod(nameof(CreateRangeArray),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!;
 
-        // 为 int 类型创建泛型方法实例
-        var toArrayIntMethod = toArrayMethod.MakeGenericMethod(typeof(int));
-
-        // 调用 ToArray<int> 方法
-        ilGenerator.Emit(OpCodes.Call, toArrayIntMethod);
+        ilGenerator.Emit(OpCodes.Call, createRangeMethod);
     }
 
-    public override Type OutputType(LocalManager local) => typeof(IEnumerable<int>);
+    /// <summary>
+    /// 创建范围数组的辅助方法(用于编译模式)
+    /// </summary>
+    public static int[] CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
+    {
+        var results = new List<int>();
+
+        // 根据包含规则调整起始值
+        var startNum = start;
+        var endNum = end;
+
+        if (!includeStart)
+            startNum++;
+        if (!includeEnd)
+            endNum--;
+
+        // 检查范围是否有效
+        if (startNum > endNum)
+        {
+            for (var i = startNum; i >= endNum; i--)
+            {
+                results.Add(i);
+            }
+        }
+        else
+        {
+            for (var i = startNum; i <= endNum; i++)
+            {
+                results.Add(i);
+            }
+        }
+
+        return results.ToArray();
+    }
+
+    public override Type OutputType(LocalManager local) => typeof(int[]);
 
     public override string ToString()
     {
