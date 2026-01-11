@@ -201,6 +201,16 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
     // 处理幂运算（右结合）
     public LangExpression ParsePower()
     {
+        // 处理一元运算符（! 和 -）
+        if (CurrentToken.Type == LangTokenType.Exclamation || CurrentToken.Type == LangTokenType.Minus)
+        {
+            var operatorToken = CurrentToken;
+            var position = CreateSourcePosition(operatorToken);
+            Expect(operatorToken.Type);
+            var operand = ParsePower(); // 递归调用以支持多个一元运算符，如 !!a
+            return new Operation(null, operatorToken.Type, operand, position);
+        }
+
         var left = primaryParser.ParsePrimary();
 
         // 处理点运算符（最高优先级）

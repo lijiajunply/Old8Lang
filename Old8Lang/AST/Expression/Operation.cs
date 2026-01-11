@@ -83,6 +83,10 @@ public partial class Operation(
             return "is not";
         if (Opera == LangTokenType.In)
             return "in";
+        if (Opera == LangTokenType.NullishCoalescing)
+            return "??";
+        if (Opera == LangTokenType.Not)
+            return "not";
         return "";
     }
 

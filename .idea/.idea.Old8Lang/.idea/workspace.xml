@@ -23,12 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/ComparisonOpHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/InOperatorHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ExpressionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/UnaryOperatorsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/UnaryOperatorsTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -911,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="592" />
+    <option name="localTasksCounter" value="593" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -938,7 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lsp): 添加高优先级 LSP 功能增强&#10;&#10;- 实现文档符号大纲功能，提供代码结构视图和层级关系导航&#10;- 添加签名帮助功能，支持自定义和内置函数的参数提示和实时高亮&#10;- 集成代码格式化功能，支持文档和选定范围的自动格式化和缩进调整&#10;- 实现代码操作功能，提供快速修复和重构建议如变量定义和函数提取&#10;- 在 Program.cs 中注册新的处理器并添加 FormattingService 依赖注入&#10;- 更新 CHANGELOG.md 记录 Old8Lang 1.0.0 rc6 版本的 LSP 功能增强" />
     <MESSAGE value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
     <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
     <MESSAGE value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
@@ -963,7 +962,8 @@
     <MESSAGE value="feat(language-server): 实现 native extern import 语句的符号表构建支持&#10;&#10;- 在 CompletionHandler 中添加取消令牌检查防止长时间运行&#10;- 扩展 SymbolTableBuilder 支持 native statement 的符号解析和存储&#10;- 添加对 extern statement 外部函数声明的符号表构建支持&#10;- 实现 import statement 模块导入的符号表处理逻辑&#10;- 更新 CompletionHandler_ExternTests 测试用例适配新的 extern 语法&#10;- 修改 LSP 协议测试中的字符串比较方法提升兼容性&#10;- 优化取消令牌处理使用 CancelAsync 替代 Cancel 方法" />
     <MESSAGE value="fix(compiler): 修复IL代码生成中的局部变量引用问题&#10;&#10;- 修正所有OpCodes.Ldloc和OpCodes.Stloc指令使用局部变量对象而非LocalIndex属性&#10;- 添加对object类型数组索引访问的动态处理支持&#10;- 修复成员链分析器中光标位置判断逻辑，正确处理点号位置边界情况&#10;- 更新类型注解管理器支持数组类型解析和泛型参数兼容性验证&#10;- 修改测试用例适配对象创建语法从new Class()到Class()的变化&#10;- 修正match表达式和switch语句中的局部变量引用方式&#10;- 更新类型系统测试中数组类型注解语法从int[]到array&lt;int&gt;的表示方法" />
     <MESSAGE value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
+    <MESSAGE value="refactor(compiler): 重构Operation.cs文件优化编译器架构&#10;&#10;- 提取数值运算助手类NumericBinaryOpHelper处理+、-、*、/、%、^运算符&#10;- 提取比较运算助手类ComparisonOpHelper处理&gt;、&lt;、==、!=、&lt;=、&gt;=运算符&#10;- 提取in操作符助手类InOperatorHelper支持List、Array、Dictionary、String等集合类型&#10;- Operation.cs从2335行减少到1850行，消除约500行重复代码&#10;- 统一处理类型转换包括int/double混合运算和object vs int特殊情况&#10;- 优化栈操作通过SwapStackOrder方法处理IL栈顺序&#10;- 支持编译器模式和解释器模式的所有测试通过" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(compiler): 重构Operation.cs文件优化编译器架构&#10;&#10;- 提取数值运算助手类NumericBinaryOpHelper处理+、-、*、/、%、^运算符&#10;- 提取比较运算助手类ComparisonOpHelper处理&gt;、&lt;、==、!=、&lt;=、&gt;=运算符&#10;- 提取in操作符助手类InOperatorHelper支持List、Array、Dictionary、String等集合类型&#10;- Operation.cs从2335行减少到1850行，消除约500行重复代码&#10;- 统一处理类型转换包括int/double混合运算和object vs int特殊情况&#10;- 优化栈操作通过SwapStackOrder方法处理IL栈顺序&#10;- 支持编译器模式和解释器模式的所有测试通过" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

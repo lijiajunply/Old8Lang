@@ -60,6 +60,54 @@ public class UnaryOperatorsTests
     }
 
     /// <summary>
+    /// 测试感叹号一元 NOT 运算符
+    /// </summary>
+    [Fact]
+    public void ParseProgram_ExclamationNot_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- !a";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试双重感叹号一元 NOT 运算符
+    /// </summary>
+    [Fact]
+    public void ParseProgram_DoubleExclamationNot_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- !!a";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试感叹号运算符作用于比较表达式
+    /// </summary>
+    [Fact]
+    public void ParseProgram_ExclamationNotOnComparison_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- !(a > b)";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
     /// 测试自增运算符（前缀）
     /// </summary>
     [Fact]

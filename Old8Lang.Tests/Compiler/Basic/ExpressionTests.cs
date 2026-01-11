@@ -101,6 +101,121 @@ public class ExpressionTests
 
     #endregion
 
+    #region 一元运算符表达式测试
+
+    [Fact]
+    public void UnaryExpression_NotOperator_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            func main() -> int {
+                a <- true
+                b <- !a
+                if b == false {
+                    return 0
+                } else {
+                    return 1
+                }
+            }
+
+            result <- main()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void UnaryExpression_DoubleNotOperator_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            func main() -> int {
+                a <- true
+                b <- !!a
+                if b == true {
+                    return 0
+                } else {
+                    return 1
+                }
+            }
+
+            result <- main()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void UnaryExpression_NotOnComparison_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            func main() -> int {
+                e <- !(10 > 5)
+                if e == false {
+                    return 0
+                } else {
+                    return 1
+                }
+            }
+
+            result <- main()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void UnaryExpression_MinusOperator_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            func main() -> int {
+                c <- 5
+                d <- -c
+                if d == -5 {
+                    return 0
+                } else {
+                    return 1
+                }
+            }
+
+            result <- main()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    #endregion
+
     #region 变量表达式测试
 
     [Fact]
