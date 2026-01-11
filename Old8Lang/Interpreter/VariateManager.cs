@@ -280,13 +280,19 @@ public class VariateManager
     public GeneratorExecutionContext? GeneratorContext { get; set; }
 
     /// <summary>
+    /// Defer条目，包含语句和捕获的局部作用域
+    /// </summary>
+    private record DeferEntry(OldStatement Statement, List<Dictionary<string, LangValueType>> CapturedScopes);
+
+    /// <summary>
     /// defer语句栈，用于延迟执行（后进先出LIFO）
     /// </summary>
     /// <remarks>
     /// defer语句在函数返回前执行，多个defer按后进先出顺序执行
     /// 每个函数有独立的defer栈
+    /// 每个defer条目包含语句和捕获的作用域快照
     /// </remarks>
-    private readonly Stack<OldStatement> DeferStack = new();
+    private readonly Stack<DeferEntry> DeferStack = new();
 
     /// <summary>
     /// 注册一个defer语句
@@ -294,7 +300,16 @@ public class VariateManager
     /// <param name="statement">要延迟执行的语句</param>
     public void RegisterDefer(OldStatement statement)
     {
-        DeferStack.Push(statement);
+        // 捕获当前的局部作用域（不包括全局作用域）
+        // 这样defer可以访问注册时的局部变量（如循环变量）
+        var capturedScopes = new List<Dictionary<string, LangValueType>>();
+        for (int i = 0; i < Scopes.Count; i++)
+        {
+            // 深拷贝每个作用域，保存变量的当前值
+            capturedScopes.Add(new Dictionary<string, LangValueType>(Scopes[i]));
+        }
+
+        DeferStack.Push(new DeferEntry(statement, capturedScopes));
     }
 
     /// <summary>
@@ -303,15 +318,79 @@ public class VariateManager
     /// <remarks>
     /// 在函数返回前调用此方法
     /// defer中的异常会被捕获，确保所有defer都能执行
+    /// defer使用当前VariateManager执行，但临时恢复捕获的作用域
     /// </remarks>
     public void ExecuteDefers()
     {
         while (DeferStack.Count > 0)
         {
-            var deferStatement = DeferStack.Pop();
+            var deferEntry = DeferStack.Pop();
             try
             {
-                deferStatement.Run(this);
+                // 创建一个混合的作用域：
+                // 1. 使用捕获的作用域（包含defer注册时的局部变量，如循环变量）
+                // 2. 但是用当前作用域的值更新共享变量（如全局变量和函数参数）
+                var mergedScopes = new List<Dictionary<string, LangValueType>>();
+                for (int i = 0; i < deferEntry.CapturedScopes.Count; i++)
+                {
+                    var capturedScope = new Dictionary<string, LangValueType>(deferEntry.CapturedScopes[i]);
+
+                    // 如果当前Scopes中也有对应的作用域，用当前值更新捕获的作用域
+                    if (i < Scopes.Count)
+                    {
+                        foreach (var (varName, varValue) in Scopes[i])
+                        {
+                            // 更新捕获的作用域中的变量值为最新值
+                            if (capturedScope.ContainsKey(varName))
+                            {
+                                capturedScope[varName] = varValue;
+                            }
+                        }
+                    }
+
+                    mergedScopes.Add(capturedScope);
+                }
+
+                // 保存当前作用域栈
+                var currentScopes = Scopes.ToList();
+
+                // 临时替换为混合的作用域
+                Scopes.Clear();
+                Scopes.AddRange(mergedScopes);
+
+                // 清除缓存，因为作用域已改变
+                _lookupCache?.Clear();
+
+                try
+                {
+                    // 在混合的作用域上执行defer语句
+                    deferEntry.Statement.Run(this);
+                }
+                finally
+                {
+                    // 同步defer对变量的修改回当前作用域
+                    for (int i = 0; i < Scopes.Count && i < currentScopes.Count; i++)
+                    {
+                        var mergedScope = Scopes[i];
+                        var currentScope = currentScopes[i];
+
+                        foreach (var (varName, varValue) in mergedScope)
+                        {
+                            // 更新当前作用域中的变量
+                            if (currentScope.ContainsKey(varName))
+                            {
+                                currentScope[varName] = varValue;
+                            }
+                        }
+                    }
+
+                    // 恢复当前作用域栈（包含了defer的修改）
+                    Scopes.Clear();
+                    Scopes.AddRange(currentScopes);
+
+                    // 清除缓存
+                    _lookupCache?.Clear();
+                }
             }
             catch (Exception ex)
             {
