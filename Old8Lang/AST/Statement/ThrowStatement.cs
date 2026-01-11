@@ -33,6 +33,24 @@ public partial class ThrowStatement(LangExpression expression, SourcePosition po
         // 获取表达式的类型
         var exprType = expression.OutputType(local);
 
+        // 如果表达式是ExceptionWrapper类型,提取内部的Exception并重新抛出
+        if (exprType == typeof(Old8Lang.Compiler.ExceptionWrapper))
+        {
+            // 调用ExceptionWrapper.Exception属性获取内部异常
+            var exceptionProperty = typeof(Old8Lang.Compiler.ExceptionWrapper).GetProperty("Exception")!;
+            var getMethod = exceptionProperty.GetGetMethod()!;
+            ilGenerator.Emit(OpCodes.Callvirt, getMethod);
+            ilGenerator.Emit(OpCodes.Throw);
+            return;
+        }
+
+        // 如果是Exception类型,直接抛出
+        if (exprType == typeof(Exception) || (exprType != null && exprType.IsSubclassOf(typeof(Exception))))
+        {
+            ilGenerator.Emit(OpCodes.Throw);
+            return;
+        }
+
         // 如果是值类型，需要装箱后才能调用ToString()
         if (exprType is { IsValueType: true })
         {

@@ -111,7 +111,7 @@ public class NestedExceptionTests(ITestOutputHelper output)
                     result <- result + ""inner try;""
                     throw ""inner error""
                 } catch (inner) {
-                    result <- result + ""inner catch: "" + inner
+                    result <- result + ""inner catch: "" + inner + "";""
                 } finally {
                     result <- result + ""inner finally;""
                 }

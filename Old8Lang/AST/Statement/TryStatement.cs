@@ -281,8 +281,12 @@ public partial class TryStatement(
             // 如果有异常变量，将其添加到局部变量管理器
             if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
             {
-                // 直接使用捕获到的异常对象
-                var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
+                // 将异常对象包装为ExceptionWrapper,以便ToString()只返回消息
+                // 栈顶是捕获到的Exception对象
+                // 调用 new ExceptionWrapper(exception)
+                ilGenerator.Emit(OpCodes.Newobj, typeof(Old8Lang.Compiler.ExceptionWrapper).GetConstructor([typeof(Exception)])!);
+
+                var exceptionLocal = ilGenerator.DeclareLocal(typeof(Old8Lang.Compiler.ExceptionWrapper));
                 ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
 
                 // 将异常变量添加到局部变量管理器
