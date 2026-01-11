@@ -1,0 +1,35 @@
+// VM基本功能测试
+
+// 1. 三元运算符
+a <- 5
+b <- 3
+max <- a > b ? a : b
+PrintLine("三元运算符测试: " + max.ToStr())
+
+// 2. 字典字面量
+dict <- {"name": "测试", "value": 123}
+PrintLine("字典测试: " + dict.ToStr())
+
+// 3. 异常处理
+try {
+    PrintLine("Try块执行")
+    throw "测试异常"
+} catch (ex) {
+    PrintLine("Catch块: " + ex.ToStr())
+}
+
+// 4. Switch语句
+num <- 2
+switch num {
+    case 1 {
+        PrintLine("Case 1")
+    }
+    case 2 {
+        PrintLine("Case 2")
+    }
+    default {
+        PrintLine("Default")
+    }
+}
+
+PrintLine("VM基本测试完成")

@@ -92,8 +92,15 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitDictionaryLangValue(DictionaryLangValue node)
     {
-        // TODO: 实现字典创建
-        Emit(OpCode.Nop); // 占位符
+        // 生成所有键值对的代码
+        foreach (var tuple in node.Tuples)
+        {
+            // 访问元组，会生成键和值的代码
+            tuple.Accept(this);
+        }
+
+        // 创建字典，参数是键值对的数量
+        Emit(OpCode.NewDict, node.Tuples.Count);
         return null;
     }
 
@@ -117,7 +124,35 @@ public partial class BytecodeVisitor
     public Instruction? VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node) => null;
     public Instruction? VisitErrorLangValue(ErrorLangValue node) => null;
     public Instruction? VisitGeneratorLangValue(GeneratorLangValue node) => null;
-    public Instruction? VisitInstance(Instance node) => null;
+    public Instruction? VisitInstance(Instance node)
+    {
+        // Instance 是函数调用表达式 a(b, c)
+        // 生成参数代码（位置参数 + 命名参数）
+
+        // 先生成位置参数
+        foreach (var arg in node.Ids)
+        {
+            arg.Accept(this);
+        }
+
+        // TODO: 处理命名参数
+        // 命名参数暂时不支持，需要在VM中添加命名参数支持
+
+        string funcName = node.Id.IdName;
+        int argCount = node.Ids.Count;
+
+        // 检查是否是原生函数
+        if (_compiler.IsNativeFunction(funcName))
+        {
+            Emit(OpCode.CallNative, new object[] { argCount, funcName });
+        }
+        else
+        {
+            Emit(OpCode.Call, new object[] { argCount, funcName });
+        }
+
+        return null;
+    }
     public Instruction? VisitLangListItem(LangListItem node) => null;
     public Instruction? VisitListComprehension(ListComprehension node) => null;
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;

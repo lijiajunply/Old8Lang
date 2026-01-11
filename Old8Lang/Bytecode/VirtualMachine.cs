@@ -401,6 +401,31 @@ public class VirtualMachine
                 }
                 break;
 
+            case OpCode.NewDict:
+                {
+                    int pairCount = (int)instruction.Operand!;
+                    var dict = new Dictionary<object, object?>();
+                    // 每个键值对作为一个元组在栈上
+                    for (int i = 0; i < pairCount; i++)
+                    {
+                        var tuple = _stack.Pop() as Tuple<object?, object?>;
+                        if (tuple != null && tuple.Item1 != null)
+                        {
+                            dict[tuple.Item1] = tuple.Item2;
+                        }
+                    }
+                    _stack.Push(dict);
+                }
+                break;
+
+            // === 异常处理 ===
+            case OpCode.Throw:
+                {
+                    var exceptionValue = _stack.Pop();
+                    var message = ToString(exceptionValue);
+                    throw new Exception(message);
+                }
+
             default:
                 throw new Exception($"未实现的操作码: {instruction.OpCode}");
         }

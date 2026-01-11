@@ -1,3 +1,4 @@
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.LangParser;
@@ -125,25 +126,83 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitClassMemberId(ClassMemberId node)
     {
-        // TODO: 实现成员访问
-        Emit(OpCode.Nop);
+        // ClassMemberId 是带访问修饰符的成员ID
+        // 在字节码层面，它和普通的 LangId 类似
+        // 加载成员的值
+        string varName = node.IdName;
+
+        // 检查是否是局部变量
+        if (_compiler.IsLocalVariable(varName))
+        {
+            int localIndex = _compiler.GetLocalIndex(varName);
+            Emit(OpCode.LoadLocal, localIndex);
+        }
+        else
+        {
+            // 全局变量或类成员
+            Emit(OpCode.LoadGlobal, varName);
+        }
+
         return null;
     }
 
     public Instruction? VisitAwaitExpression(AwaitExpression node)
     {
-        // TODO: 实现await表达式
-        node.Expression.Accept(this);
-        Emit(OpCode.Await);
+        // Await 表达式
+        // TODO: 完整的 await 支持需要：
+        // 1. 异步状态机
+        // 2. Task/Promise 机制
+        // 3. 暂停和恢复执行
+        //
+        // 简化实现：暂时只生成表达式的代码，不实际等待
+
+        // 获取 expression 属性
+        var expression = node.GetType().GetProperty("Expression")?.GetValue(node) as LangExpression;
+        expression?.Accept(this);
+
+        // TODO: 添加 Await 指令支持
+        // Emit(OpCode.Await);
+
         return null;
     }
 
-    public Instruction? VisitAsyncStreamExpression(AsyncStreamExpression node) => null;
-    public Instruction? VisitSuperExpression(SuperExpression node) => null;
+    public Instruction? VisitAsyncStreamExpression(AsyncStreamExpression node)
+    {
+        // 异步流表达式
+        // TODO: 完整的异步流支持需要异步迭代器机制
+        // 简化实现：暂时不支持
+        return null;
+    }
+
+    public Instruction? VisitSuperExpression(SuperExpression node)
+    {
+        // Super 表达式（调用父类方法）
+        // TODO: 完整的继承支持需要类层次结构
+        // 简化实现：暂时不支持
+        return null;
+    }
     public Instruction? VisitTernaryExpression(TernaryExpression node)
     {
-        // TODO: 实现三元运算符
-        Emit(OpCode.Nop);
+        // 三元运算符: condition ? trueExpr : falseExpr
+        // 生成条件表达式代码
+        node.Condition.Accept(this);
+
+        // 如果条件为false，跳转到false分支
+        int jumpIfFalseIndex = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1);
+
+        // True分支
+        node.TrueExpression.Accept(this);
+        int jumpToEndIndex = GetCurrentPosition();
+        Emit(OpCode.Jump, -1); // 跳转到结束
+
+        // False分支
+        PatchJump(jumpIfFalseIndex, GetCurrentPosition());
+        node.FalseExpression.Accept(this);
+
+        // 结束
+        PatchJump(jumpToEndIndex, GetCurrentPosition());
+
         return null;
     }
 }
