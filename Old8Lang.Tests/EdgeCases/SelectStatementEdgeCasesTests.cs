@@ -259,7 +259,7 @@ select {
 result <- 0
 ch <- ChannelCreate()
 select {
-    case val <- ChannelReceive(ch) -> {
+    case val from ch -> {
         result <- 1
     }
     default -> {
@@ -543,7 +543,7 @@ result <- 0
 ch <- ChannelCreate()
 ChannelSend(ch, 42)
 select {
-    case val <- ChannelReceive(ch) -> {
+    case val from ch -> {
         result <- val
     }
 }";
@@ -574,10 +574,10 @@ ch2 <- ChannelCreate()
 ChannelSend(ch1, 10)
 ChannelSend(ch2, 20)
 select {
-    case val <- ChannelReceive(ch1) -> {
+    case val from ch1 -> {
         result <- val
     }
-    case val <- ChannelReceive(ch2) -> {
+    case val from ch2 -> {
         result <- val * 2
     }
 }";
@@ -648,7 +648,7 @@ result <- -1
 ch <- ChannelCreate()
 ChannelSend(ch, null)
 select {
-    case val <- ChannelReceive(ch) -> {
+    case val from ch -> {
         if val == null {
             result <- 0
         } else {
@@ -682,7 +682,7 @@ ch <- ChannelCreate()
 data <- {1, 2, 3, 4, 5}
 ChannelSend(ch, data)
 select {
-    case lst <- ChannelReceive(ch) -> {
+    case lst from ch -> {
         result <- len(lst)
     }
 }";
@@ -712,7 +712,7 @@ ch <- ChannelCreate()
 data <- {""a"": 1, ""b"": 2, ""c"": 3}
 ChannelSend(ch, data)
 select {
-    case dict <- ChannelReceive(ch) -> {
+    case dict from ch -> {
         result <- dict[""a""] + dict[""b""] + dict[""c""]
     }
 }";
