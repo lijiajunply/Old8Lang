@@ -88,6 +88,22 @@ public static class TypeCheckILHelper
             // 确保leftType不为null
             leftType ??= typeof(object);
 
+            // 特殊处理：List<T> as array 应该返回 T[] 而不是 object[]
+            if (typeName == "array" &&
+                leftType.IsGenericType &&
+                leftType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                // 获取List的元素类型
+                var elementType = leftType.GetGenericArguments()[0];
+                var arrayType = elementType.MakeArrayType();
+
+                // 统一处理类型转换
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, leftType, targetType, operation);
+
+                // 返回实际的数组类型
+                return arrayType;
+            }
+
             // 统一处理类型转换
             TypeConversion.GenerateTypeConversionIl(ilGenerator, leftType, targetType, operation);
 

@@ -84,10 +84,17 @@ public static class TypeConversion
         }
 
         // 处理复杂类型转换：列表转数组
-        if (sourceType == typeof(List<object>) && targetType.IsArray)
+        if (sourceType.IsGenericType &&
+            sourceType.GetGenericTypeDefinition() == typeof(List<>) &&
+            targetType.IsArray)
         {
-            ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("ToArray")!);
-            return;
+            // 获取List<T>的ToArray方法
+            var toArrayMethod = sourceType.GetMethod("ToArray");
+            if (toArrayMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
+                return;
+            }
         }
 
         // 处理值类型到引用类型的转换（装箱）
@@ -209,6 +216,27 @@ public static class TypeConversion
     /// </remarks>
     private static void GenerateToFromStringConversionIl(ILGenerator ilGenerator, Type sourceType)
     {
+        Label? endLabel = null;
+
+        // 对于引用类型（或object），需要处理null值
+        if (!sourceType.IsValueType || sourceType == typeof(object))
+        {
+            var notNullLabel = ilGenerator.DefineLabel();
+            endLabel = ilGenerator.DefineLabel();
+
+            // 复制栈顶值用于null检查
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Brtrue, notNullLabel);
+
+            // 值为null，返回null（字符串）
+            ilGenerator.Emit(OpCodes.Pop); // 弹出null
+            ilGenerator.Emit(OpCodes.Ldnull); // 加载null作为字符串
+            ilGenerator.Emit(OpCodes.Br, endLabel.Value);
+
+            // 值不为null，执行正常转换
+            ilGenerator.MarkLabel(notNullLabel);
+        }
+
         var toStringMethod = sourceType switch
         {
             { } t when t == typeof(int) => typeof(Convert).GetMethod("ToString", [typeof(int)])!,
@@ -222,9 +250,24 @@ public static class TypeConversion
         {
             // 值类型调用object.ToString()需要先装箱
             ilGenerator.Emit(OpCodes.Box, sourceType);
+            ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+        }
+        else if (toStringMethod.DeclaringType == typeof(Convert))
+        {
+            // Convert.ToString是静态方法，使用Call指令
+            ilGenerator.Emit(OpCodes.Call, toStringMethod);
+        }
+        else
+        {
+            // 其他情况使用Callvirt
+            ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
         }
 
-        ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+        // 如果添加了null检查，标记结束标签
+        if (endLabel.HasValue)
+        {
+            ilGenerator.MarkLabel(endLabel.Value);
+        }
     }
 
     /// <summary>

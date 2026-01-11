@@ -793,6 +793,33 @@ public partial class Operation(
             return leftType ?? rightType;
         }
 
+        // 处理类型转换运算符 as
+        if (Opera == LangTokenType.As && Right is LangId rightAsId)
+        {
+            // 返回目标类型
+            var typeName = rightAsId.IdName;
+            return typeName.ToLower() switch
+            {
+                "int" => typeof(int),
+                "double" => typeof(double),
+                "string" => typeof(string),
+                "bool" => typeof(bool),
+                "char" => typeof(char),
+                "list" => typeof(List<object>),
+                "array" => leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>)
+                    ? leftType.GetGenericArguments()[0].MakeArrayType()
+                    : typeof(object[]),
+                "dictionary" => typeof(Dictionary<object, object>),
+                _ => typeof(object)
+            };
+        }
+
+        // 处理类型检查运算符 is 和 is not
+        if (Opera == LangTokenType.Is || Opera == LangTokenType.IsNot)
+        {
+            return typeof(bool);
+        }
+
         // 对于加法运算，如果任一操作数是字符串，则返回字符串类型
         if (Opera == LangTokenType.Plus && (leftType == typeof(string) || rightType == typeof(string)))
         {

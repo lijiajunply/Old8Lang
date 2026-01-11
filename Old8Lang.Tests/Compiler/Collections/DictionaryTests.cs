@@ -41,7 +41,7 @@ public class DictionaryTests
         // Arrange
         var code = @"
             func test() -> int {
-                dict <- {}
+                dict <- dict()
                 dict[""key""] <- 42
                 return dict[""key""]
             }

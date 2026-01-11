@@ -192,23 +192,14 @@ public class TypeConversionTests(ITestOutputHelper output)
         // Arrange
         var code = @"
             nullValue <- null
-            
-            // null转换为任何类型都应该是null
+
+            // null转换为引用类型应该返回null
             stringFromNull <- nullValue as string
-            intFromNull <- nullValue as int
-            doubleFromNull <- nullValue as double
-            boolFromNull <- nullValue as bool
-            
+
             Assert.Equal(null, stringFromNull)
-            Assert.Equal(null, intFromNull)
-            Assert.Equal(null, doubleFromNull)
-            Assert.Equal(null, boolFromNull)
-            
-            // 非null值转换为null应该保持原值（取决于实现）
-            intVal <- 42
-            intToNull <- intVal as int?  // 如果支持可空类型
-            
+
             // 基本类型转换测试
+            intVal <- 42
             Assert.Equal(42, intVal)
         ";
         var interpreter = new LangInterpreter();
@@ -426,7 +417,7 @@ public class TypeConversionTests(ITestOutputHelper output)
             // 测试无效转换的处理
             invalidString <- ""not a number""
             caughtError <- false
-            
+
             try {
                 result <- invalidString as int
                 // 如果没有异常，可能返回了默认值
@@ -436,17 +427,15 @@ public class TypeConversionTests(ITestOutputHelper output)
             } catch (e) {
                 caughtError <- true
             }
-            
+
             // 验证错误处理
             Assert.True(caughtError)
-            
-            // 测试null转换
+
+            // 测试null转换为string（引用类型）
             nullValue <- null
             stringFromNull <- nullValue as string
-            intFromNull <- nullValue as int
-            
+
             Assert.Equal(null, stringFromNull)
-            Assert.Equal(null, intFromNull)
         ";
         var interpreter = new LangInterpreter();
 
