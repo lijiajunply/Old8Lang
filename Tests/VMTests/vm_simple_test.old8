@@ -1,0 +1,34 @@
+// 测试VM基本功能（不使用成员方法）
+
+// 1. 算术运算
+a <- 10
+b <- 20
+c <- a + b
+PrintLine("加法")
+PrintLine(c.ToStr())
+
+// 2. 条件判断
+if a < b {
+    PrintLine("a小于b")
+} else {
+    PrintLine("a大于等于b")
+}
+
+// 3. 循环
+i <- 0
+while i < 3 {
+    PrintLine("循环")
+    PrintLine(i.ToStr())
+    i <- i + 1
+}
+
+// 4. 函数定义和调用
+func add(x:int, y:int) -> int {
+    return x + y
+}
+
+result <- add(5, 7)
+PrintLine("函数结果")
+PrintLine(result.ToStr())
+
+PrintLine("测试完成")

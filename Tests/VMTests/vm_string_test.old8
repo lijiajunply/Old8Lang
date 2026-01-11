@@ -1,0 +1,11 @@
+// 简单字符串拼接测试
+
+s1 <- "Hello"
+s2 <- "World"
+result <- s1 + " " + s2
+PrintLine(result)
+
+// 数字转字符串拼接
+n <- 123
+text <- "数字: " + n.ToStr()
+PrintLine(text)

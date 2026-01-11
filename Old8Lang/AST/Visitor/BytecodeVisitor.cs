@@ -115,6 +115,17 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
     protected int GetCurrentPosition() => _instructions.Count;
 
     /// <summary>
+    /// 从主构造函数参数字段获取值的辅助方法
+    /// C#主构造函数参数被编译为<paramName>P格式的字段
+    /// </summary>
+    protected T? GetPrimaryConstructorParameter<T>(object node, string paramName) where T : class
+    {
+        var fieldName = $"<{paramName}>P";
+        var field = node.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        return field?.GetValue(node) as T;
+    }
+
+    /// <summary>
     /// 在指定位置插入跳转指令
     /// </summary>
     protected void PatchJump(int instructionIndex, int targetPosition)

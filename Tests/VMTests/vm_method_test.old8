@@ -1,0 +1,5 @@
+// 测试成员方法调用
+
+n <- 123
+result <- n.ToStr()
+PrintLine(result)

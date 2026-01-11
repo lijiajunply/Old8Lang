@@ -1,0 +1,17 @@
+// 测试三元运算符
+
+a <- 5
+b <- 3
+
+// 基本测试
+max <- a > b ? a : b
+PrintLine("最大值: " + max.ToStr())
+
+min <- a < b ? a : b
+PrintLine("最小值: " + min.ToStr())
+
+// 嵌套三元运算符
+result <- a > b ? (a > 10 ? "很大" : "中等") : "很小"
+PrintLine("结果: " + result)
+
+PrintLine("三元运算符测试完成")

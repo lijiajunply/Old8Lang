@@ -1,0 +1,13 @@
+// ToStr测试
+
+n <- 123
+PrintLine(n.ToStr())
+
+s <- n.ToStr()
+PrintLine(s)
+
+// 复杂拼接
+prefix <- "值是: "
+numStr <- n.ToStr()
+result <- prefix + numStr
+PrintLine(result)

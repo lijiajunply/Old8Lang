@@ -128,13 +128,21 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitWhileStatement(WhileStatement node)
     {
-        // 获取expression和blockStatement属性
-        var expression = node.GetType().GetProperty("expression")?.GetValue(node) as LangExpression;
-        var blockStatement = node.GetType().GetProperty("blockStatement")?.GetValue(node) as OldStatement;
+        // 获取expression和blockStatement字段（主构造函数参数，字段名为<expression>P和<blockStatement>P）
+        var expressionField = node.GetType().GetField("<expression>P", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var blockStatementField = node.GetType().GetField("<blockStatement>P", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (expressionField == null || blockStatementField == null)
+        {
+            throw new Exception("WhileStatement节点缺少必要的字段");
+        }
+
+        var expression = expressionField.GetValue(node) as LangExpression;
+        var blockStatement = blockStatementField.GetValue(node) as OldStatement;
 
         if (expression == null || blockStatement == null)
         {
-            throw new Exception("WhileStatement节点缺少必要的属性");
+            throw new Exception("WhileStatement节点缺少必要的字段值");
         }
 
         int loopStart = GetCurrentPosition();
