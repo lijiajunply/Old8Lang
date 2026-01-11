@@ -18,13 +18,13 @@ public class CompletionHandler_MemberChainTests(ITestOutputHelper output)
     {
         var code = @"class A {
     func getB() -> B {
-        return new B()
+        return B()
     }
 }
 
 class B {
     func getC() -> C {
-        return new C()
+        return C()
     }
 }
 
@@ -36,7 +36,7 @@ class C {
 }
 
 func main() -> void {
-    obj <- new A()
+    obj <- A()
     result <- obj.getB().getC().$1getValue()
 }
 ";
@@ -69,16 +69,16 @@ func main() -> void {
     public async Task NestedClassMethodCalls_ShouldComplete()
     {
         var code = @"class Outer {
-    public inner <- null
+    public inner:Inner <- null
     func init() {
-        inner <- new Inner()
+        inner <- Inner()
     }
 }
 
 class Inner {
-    private nested <- null
+    private nested:Nested <- null
     func init() {
-        nested <- new Nested()
+        nested <- Nested()
     }
 }
 
@@ -90,7 +90,7 @@ class Nested {
 }
 
 func main() -> void {
-    outer <- new Outer()
+    outer <- Outer()
     result <- outer.inner.$1nested.getValue()
 }
 ";
@@ -123,16 +123,16 @@ func main() -> void {
     public async Task ChainOfPropertyAccess_ShouldComplete()
     {
         var code = @"class A {
-    public b <- null
+    public b:B <- null
     func init() {
-        b <- new B()
+        b <- B()
     }
 }
 
 class B {
-    public c <- null
+    public c:C <- null
     func init() {
-        c <- new C()
+        c <- C()
     }
 }
 
@@ -141,7 +141,7 @@ class C {
 }
 
 func main() -> void {
-    obj <- new A()
+    obj <- A()
     result <- obj.b.$1c.$2value
 }
 ";
@@ -182,7 +182,7 @@ func main() -> void {
 }
 
 func main() -> void {
-    calc <- new Calculator()
+    calc <- Calculator()
     calc.add(10)
     result <- calc.$1multiply(2)
 }
@@ -221,7 +221,7 @@ func getFullName(person:Person) -> string {
 }
 
 func main() -> void {
-    p <- new Person()
+    p <- Person()
     p.name <- ""Alice""
     p.age <- 30
     result <- getFullName(p.$1name)
@@ -252,9 +252,9 @@ func main() -> void {
     public async Task ChainWithMethodParameters_ShouldComplete()
     {
         var code = @"class Container {
-    public item <- null
+    public item:Item <- null
     func init() {
-        item <- new Item()
+        item <- Item()
     }
 }
 
@@ -266,7 +266,7 @@ class Item {
 }
 
 func main() -> void {
-    container <- new Container()
+    container <- Container()
     container.item.$1process($1""test"")
 }
 ";
@@ -295,23 +295,23 @@ func main() -> void {
     public async Task FourLevelDeepChain_ShouldComplete()
     {
         var code = @"class Level1 {
-    public level2 <- null
+    public level2:Level2 <- null
     func init() {
-        level2 <- new Level2()
+        level2 <- Level2()
     }
 }
 
 class Level2 {
-    public level3 <- null
+    public level3:Level3 <- null
     func init() {
-        level3 <- new Level3()
+        level3 <- Level3()
     }
 }
 
 class Level3 {
-    public level4 <- null
+    public level4:Level4 <- null
     func init() {
-        level4 <- new Level4()
+        level4 <- Level4()
     }
 }
 
@@ -323,7 +323,7 @@ class Level4 {
 }
 
 func main() -> void {
-    obj <- new Level1()
+    obj <- Level1()
     value <- obj.level2.level3.$1level4.getValue()
 }
 ";
@@ -391,9 +391,9 @@ func main() -> void {
     public async Task ThisInChain_ShouldComplete()
     {
         var code = @"class Outer {
-    public inner <- null
+    public inner:Inner <- null
     func init() {
-        inner <- new Inner()
+        inner <- Inner()
     }
 
     func process() -> void {
@@ -406,7 +406,7 @@ class Inner {
 }
 
 func main() -> void {
-    obj <- new Outer()
+    obj <- Outer()
     obj.$1process()
 }
 ";
@@ -449,7 +449,7 @@ class Derived extends Base {
 }
 
 func main() -> void {
-    obj <- new Derived()
+    obj <- Derived()
     baseValue <- super.$1getValue()
     sum <- obj.$1getSum()
 }

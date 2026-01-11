@@ -228,6 +228,10 @@ public class ScopeAnalyzer
         var typeTemplate = classInit.AnyLangValue;
         var cursorLine = _position.Line + 1;
 
+        // 检查是否在类的某个方法内
+        bool isInsideInstanceMethod = false;
+        bool isInsideStaticMethod = false;
+
         // 检查实例方法
         foreach (var (_, memberExpr) in typeTemplate.Variates)
         {
@@ -238,6 +242,8 @@ public class ScopeAnalyzer
                 // 如果光标在方法范围内
                 if (cursorLine >= methodStartLine)
                 {
+                    isInsideInstanceMethod = true;
+
                     // 添加方法参数
                     if (funcValue.Ids != null)
                     {
@@ -277,6 +283,8 @@ public class ScopeAnalyzer
                 // 如果光标在方法范围内
                 if (cursorLine >= methodStartLine)
                 {
+                    isInsideStaticMethod = true;
+
                     // 添加方法参数
                     if (funcValue.Ids != null)
                     {
@@ -303,6 +311,85 @@ public class ScopeAnalyzer
                     // 递归处理方法体
                     FindLocalSymbols(funcValue.BlockStatement);
                 }
+            }
+        }
+
+        // 如果在实例方法内，添加 this 关键字
+        if (isInsideInstanceMethod)
+        {
+            var thisSymbol = new SymbolInfo
+            {
+                Name = "this",
+                Kind = SymbolKind.Keyword,
+                Type = typeTemplate.ClassName,
+                Location = new SourceLocation
+                {
+                    Uri = _uri,
+                    Line = classInit.Position.Line - 1,
+                    Column = classInit.Position.Column - 1,
+                    EndLine = classInit.Position.Line - 1,
+                    EndColumn = classInit.Position.Column - 1 + 4 // "this" length
+                }
+            };
+            _visibleSymbols.Add(thisSymbol);
+        }
+
+        // 如果在任何方法内（实例或静态），添加类字段
+        if (isInsideInstanceMethod || isInsideStaticMethod)
+        {
+            // 添加实例字段（只在实例方法内可见）
+            if (isInsideInstanceMethod)
+            {
+                foreach (var (memberId, fieldExpr) in typeTemplate.Variates)
+                {
+                    // 跳过方法（只添加字段）
+                    if (fieldExpr is FuncLangValue)
+                    {
+                        continue;
+                    }
+
+                    var fieldSymbol = new SymbolInfo
+                    {
+                        Name = memberId.IdName,
+                        Kind = SymbolKind.Field,
+                        Type = "var", // 可以通过分析 fieldExpr 推断类型
+                        Location = new SourceLocation
+                        {
+                            Uri = _uri,
+                            Line = classInit.Position.Line - 1,
+                            Column = classInit.Position.Column - 1,
+                            EndLine = classInit.Position.Line - 1,
+                            EndColumn = classInit.Position.Column - 1 + memberId.IdName.Length
+                        }
+                    };
+                    _visibleSymbols.Add(fieldSymbol);
+                }
+            }
+
+            // 添加静态字段（在实例和静态方法内都可见）
+            foreach (var (memberId, fieldExpr) in typeTemplate.StaticVariates)
+            {
+                // 跳过方法（只添加字段）
+                if (fieldExpr is FuncLangValue)
+                {
+                    continue;
+                }
+
+                var fieldSymbol = new SymbolInfo
+                {
+                    Name = memberId.IdName,
+                    Kind = SymbolKind.Field,
+                    Type = "var",
+                    Location = new SourceLocation
+                    {
+                        Uri = _uri,
+                        Line = classInit.Position.Line - 1,
+                        Column = classInit.Position.Column - 1,
+                        EndLine = classInit.Position.Line - 1,
+                        EndColumn = classInit.Position.Column - 1 + memberId.IdName.Length
+                    }
+                };
+                _visibleSymbols.Add(fieldSymbol);
             }
         }
     }

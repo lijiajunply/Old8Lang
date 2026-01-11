@@ -96,100 +96,24 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
     /// <summary>
     /// 获取成员补全（obj. 后面的补全）
+    /// 支持成员链：obj.getB().getC().
     /// </summary>
     private static List<CompletionItem>? GetMemberCompletions(
         Models.DocumentParseResult document,
         Position position)
     {
         var tokens = document.Tokens!;
-        var line = position.Line + 1; // LSP 从 0 开始，token 从 1 开始
-        var column = position.Character + 1;
+        var symbolTable = document.SymbolTable!;
 
-        Console.WriteLine($"[GetMemberCompletions] Looking for dot at Line={line}, Column={column}");
-        Console.WriteLine($"[GetMemberCompletions] Total tokens: {tokens.Count}");
+        Console.WriteLine($"[GetMemberCompletions] Analyzing member chain at position Line={position.Line}, Column={position.Character}");
 
-        // 查找光标前的 token
-        LangToken? dotToken = null;
-        LangToken? objectToken = null;
+        // 使用成员链分析器来推断类型
+        var analyzer = new MemberChainAnalyzer(tokens, symbolTable, position);
+        var classSymbol = analyzer.AnalyzeChain();
 
-        // 输出最后10个 tokens 用于调试
-        Console.WriteLine($"[GetMemberCompletions] Last 10 tokens:");
-        foreach (var token in tokens.Skip(Math.Max(0, tokens.Count - 10)))
+        if (classSymbol == null)
         {
-            Console.WriteLine($"[GetMemberCompletions]   Token: '{token.Value}' Type={token.Type} Line={token.Line} Column={token.Column}");
-        }
-
-        for (int i = tokens.Count - 1; i >= 1; i--)
-        {
-            var token = tokens[i];
-            var prevToken = tokens[i - 1];
-
-            // 查找光标位置附近的 dot token
-            if (token.Line == line && token.Type == LangTokenType.Dot)
-            {
-                Console.WriteLine($"[GetMemberCompletions] Found dot at Line={token.Line}, Column={token.Column}");
-                if (column >= token.Column)
-                {
-                    dotToken = token;
-                    objectToken = prevToken;
-                    Console.WriteLine($"[GetMemberCompletions] Object token: {prevToken.Value} (Type={prevToken.Type})");
-                    break;
-                }
-            }
-        }
-
-        // 如果没找到点号，说明不是成员访问
-        if (dotToken == null || objectToken == null ||
-            objectToken.Value.Type != LangTokenType.Identifier)
-        {
-            Console.WriteLine($"[GetMemberCompletions] Not a member access (dotToken={dotToken != null}, objectToken={objectToken != null})");
-            return null;
-        }
-
-        var objectName = objectToken.Value.Value;
-        if (objectName == null || document.SymbolTable == null)
-        {
-            Console.WriteLine($"[GetMemberCompletions] objectName or SymbolTable is null");
-            return null;
-        }
-
-        Console.WriteLine($"[GetMemberCompletions] Looking for object: {objectName}");
-
-        // 查找对象的符号
-        if (!document.SymbolTable.TryGetValue(objectName, out var objectSymbol))
-        {
-            Console.WriteLine($"[GetMemberCompletions] Object '{objectName}' not found in symbol table");
-            return null;
-        }
-
-        Console.WriteLine($"[GetMemberCompletions] Object symbol found: Kind={objectSymbol.Kind}, Type={objectSymbol.Type}");
-
-        // 获取类符号
-        Models.SymbolInfo? classSymbol = null;
-
-        if (objectSymbol.Kind == Models.SymbolKind.Class)
-        {
-            // 如果对象本身就是类（例如静态成员访问 User.create()）
-            classSymbol = objectSymbol;
-        }
-        else if (objectSymbol.Kind == Models.SymbolKind.Variable && !string.IsNullOrEmpty(objectSymbol.Type))
-        {
-            // 如果对象是变量，尝试根据类型查找类符号
-            if (document.SymbolTable.TryGetValue(objectSymbol.Type, out var typeSymbol) &&
-                typeSymbol.Kind == Models.SymbolKind.Class)
-            {
-                classSymbol = typeSymbol;
-                Console.WriteLine($"[GetMemberCompletions] Found class '{objectSymbol.Type}' for variable '{objectName}'");
-            }
-            else
-            {
-                Console.WriteLine($"[GetMemberCompletions] Type '{objectSymbol.Type}' not found or not a class");
-                return null;
-            }
-        }
-        else
-        {
-            Console.WriteLine($"[GetMemberCompletions] Object '{objectName}' is not a class or typed variable (Kind={objectSymbol.Kind})");
+            Console.WriteLine($"[GetMemberCompletions] Failed to analyze member chain");
             return null;
         }
 
@@ -247,20 +171,36 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     /// </summary>
     private static IEnumerable<CompletionItem> GetBuiltInFunctionCompletions()
     {
-        // 确保全局函数已初始化（对于测试环境尤为重要）
+        var completions = new List<CompletionItem>();
+
+        // 1. 添加全局函数注册表中的函数
         GlobalFunctionInitializer.EnsureInitialized();
+        var globalFunctions = GlobalFunctionRegistry.Instance.GetAllFunctionNames();
 
-        var functionNames = GlobalFunctionRegistry.Instance.GetAllFunctionNames();
-
-        return functionNames.Select(name => new CompletionItem
+        completions.AddRange(globalFunctions.Select(name => new CompletionItem
         {
             Label = name,
             Kind = CompletionItemKind.Function,
-            Detail = "内置函数",
+            Detail = "全局函数",
             Documentation = $"Old8Lang 内置全局函数：{name}",
             InsertText = $"{name}($0)",
             InsertTextFormat = InsertTextFormat.Snippet
-        });
+        }));
+
+        // 2. 添加原生库函数（Old8LangLib）
+        var nativeFunctions = NativeLibraryRegistry.GetAllFunctionNames();
+
+        completions.AddRange(nativeFunctions.Select(name => new CompletionItem
+        {
+            Label = name,
+            Kind = CompletionItemKind.Function,
+            Detail = "原生库函数",
+            Documentation = $"Old8LangLib 原生函数：{name}",
+            InsertText = $"{name}($0)",
+            InsertTextFormat = InsertTextFormat.Snippet
+        }));
+
+        return completions;
     }
 
     private static IEnumerable<CompletionItem> GetKeywordCompletions()
@@ -271,7 +211,7 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             .ToList();
 
         // 添加类型关键字（不在 KeywordType 中但是语言的关键字）
-        var typeKeywords = new[] { "int", "double", "string", "bool", "char", "void", "var" };
+        var typeKeywords = new[] { "int", "double", "string", "bool", "char", "void", "var", "any" };
         keywords.AddRange(typeKeywords);
 
         return keywords.Distinct().Select(keyword => new CompletionItem
@@ -554,6 +494,8 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             Models.SymbolKind.Property => CompletionItemKind.Property,
             Models.SymbolKind.Parameter => CompletionItemKind.Variable,
             Models.SymbolKind.Constant => CompletionItemKind.Constant,
+            Models.SymbolKind.Field => CompletionItemKind.Field,
+            Models.SymbolKind.Keyword => CompletionItemKind.Keyword,
             _ => CompletionItemKind.Text
         };
     }

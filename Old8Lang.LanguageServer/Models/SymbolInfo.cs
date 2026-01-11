@@ -102,7 +102,9 @@ public enum SymbolKind
     Method,
     Property,
     Parameter,
-    Constant
+    Constant,
+    Field,
+    Keyword
 }
 
 /// <summary>
