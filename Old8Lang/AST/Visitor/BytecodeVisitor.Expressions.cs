@@ -156,8 +156,9 @@ public partial class BytecodeVisitor
         //
         // 简化实现：暂时只生成表达式的代码，不实际等待
 
-        // 获取 expression 属性
-        var expression = node.GetType().GetProperty("Expression")?.GetValue(node) as LangExpression;
+        // 获取 Expression 字段（主构造函数参数）
+        // 注意：AwaitExpression的参数名是"Expression"（大写E）
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "Expression");
         expression?.Accept(this);
 
         // TODO: 添加 Await 指令支持

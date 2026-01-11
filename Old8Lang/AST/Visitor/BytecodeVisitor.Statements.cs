@@ -49,43 +49,68 @@ public partial class BytecodeVisitor
         var elseLabel = new List<int>();
         var endLabel = -1;
 
-        // 处理第一个if分支
-        var ifChild = node.GetType().GetProperty("ifChildBlock")?.GetValue(node) as IfChild;
+        // 处理第一个if分支（主构造函数参数）
+        var ifChild = GetPrimaryConstructorParameter<IfChild>(node, "ifChildBlock");
         if (ifChild != null)
         {
-            ifChild.Accept(this);
-            elseLabel.Add(GetCurrentPosition());
-            Emit(OpCode.Jump, -1); // 跳转到结束,稍后修补
+            // 手动处理IfChild（不使用Accept，因为IfChild不支持Visitor）
+            var expression = GetPrimaryConstructorParameter<LangExpression>(ifChild, "expression");
+            var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(ifChild, "blockStatement");
+
+            if (expression != null && blockStatement != null)
+            {
+                // 生成条件表达式代码
+                expression.Accept(this);
+
+                // 如果条件为false,跳转到下一个分支
+                int jumpIfFalseIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                // 生成if块代码
+                blockStatement.Accept(this);
+
+                // 跳转到结束
+                elseLabel.Add(GetCurrentPosition());
+                Emit(OpCode.Jump, -1);
+
+                // 修补跳转目标（跳到下一个分支）
+                PatchJump(jumpIfFalseIndex, GetCurrentPosition());
+            }
         }
 
-        // 处理elif分支
-        var elifBlocks = node.GetType().GetProperty("elifBlock")?.GetValue(node) as List<IfChild?> ?? new List<IfChild?>();
+        // 处理elif分支（主构造函数参数）
+        var elifBlocks = GetPrimaryConstructorParameter<List<IfChild?>>(node, "elifBlock") ?? new List<IfChild?>();
         foreach (var elif in elifBlocks.OfType<IfChild>())
         {
-            // 修补上一个分支的跳转目标
-            if (elseLabel.Count > 0)
-            {
-                int lastJump = elseLabel[elseLabel.Count - 1];
-                PatchJump(lastJump, GetCurrentPosition());
-            }
+            // 手动处理IfChild
+            var expression = GetPrimaryConstructorParameter<LangExpression>(elif, "expression");
+            var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(elif, "blockStatement");
 
-            elif.Accept(this);
-            elseLabel.Add(GetCurrentPosition());
-            Emit(OpCode.Jump, -1); // 跳转到结束
+            if (expression != null && blockStatement != null)
+            {
+                // 生成条件表达式代码
+                expression.Accept(this);
+
+                // 如果条件为false,跳转到下一个分支
+                int jumpIfFalseIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                // 生成elif块代码
+                blockStatement.Accept(this);
+
+                // 跳转到结束
+                elseLabel.Add(GetCurrentPosition());
+                Emit(OpCode.Jump, -1);
+
+                // 修补跳转目标（跳到下一个分支）
+                PatchJump(jumpIfFalseIndex, GetCurrentPosition());
+            }
         }
 
-        // 处理else分支
-        var elseBlock = node.GetType().GetProperty("elseBlockStatement")?.GetValue(node) as BlockStatement;
+        // 处理else分支（主构造函数参数）
+        var elseBlock = GetPrimaryConstructorParameter<BlockStatement>(node, "elseBlockStatement");
         if (elseBlock != null)
         {
-            // 修补最后一个分支的跳转
-            if (elseLabel.Count > 0)
-            {
-                int lastJump = elseLabel[elseLabel.Count - 1];
-                PatchJump(lastJump, GetCurrentPosition());
-                elseLabel.RemoveAt(elseLabel.Count - 1);
-            }
-
             elseBlock.Accept(this);
         }
 
@@ -101,13 +126,13 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitIfChild(IfChild node)
     {
-        // 获取expression和blockStatement属性
-        var expression = node.GetType().GetProperty("expression")?.GetValue(node) as LangExpression;
-        var blockStatement = node.GetType().GetProperty("blockStatement")?.GetValue(node) as BlockStatement;
+        // 获取expression和blockStatement字段（主构造函数参数）
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
+        var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "blockStatement");
 
         if (expression == null || blockStatement == null)
         {
-            throw new Exception("IfChild节点缺少必要的属性");
+            throw new Exception("IfChild节点缺少必要的字段");
         }
 
         // 生成条件表达式代码
@@ -128,21 +153,13 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitWhileStatement(WhileStatement node)
     {
-        // 获取expression和blockStatement字段（主构造函数参数，字段名为<expression>P和<blockStatement>P）
-        var expressionField = node.GetType().GetField("<expression>P", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var blockStatementField = node.GetType().GetField("<blockStatement>P", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        if (expressionField == null || blockStatementField == null)
-        {
-            throw new Exception("WhileStatement节点缺少必要的字段");
-        }
-
-        var expression = expressionField.GetValue(node) as LangExpression;
-        var blockStatement = blockStatementField.GetValue(node) as OldStatement;
+        // 获取expression和blockStatement字段（主构造函数参数）
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
+        var blockStatement = GetPrimaryConstructorParameter<OldStatement>(node, "blockStatement");
 
         if (expression == null || blockStatement == null)
         {
-            throw new Exception("WhileStatement节点缺少必要的字段值");
+            throw new Exception("WhileStatement节点缺少必要的字段");
         }
 
         int loopStart = GetCurrentPosition();
@@ -168,11 +185,11 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitForStatement(ForStatement node)
     {
-        // 获取ForStatement的属性(主构造函数参数)
-        var setStatement = node.GetType().GetProperty("setStatement")?.GetValue(node) as SetStatement;
-        var expression = node.GetType().GetProperty("expression")?.GetValue(node) as LangExpression;
-        var statement = node.GetType().GetProperty("statement")?.GetValue(node) as OldStatement;
-        var blockStatement = node.GetType().GetProperty("blockStatement")?.GetValue(node) as BlockStatement;
+        // 获取ForStatement的字段（主构造函数参数）
+        var setStatement = GetPrimaryConstructorParameter<SetStatement>(node, "setStatement");
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
+        var statement = GetPrimaryConstructorParameter<OldStatement>(node, "statement");
+        var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "blockStatement");
 
         // 初始化
         if (setStatement != null)
@@ -217,8 +234,8 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitReturnStatement(ReturnStatement node)
     {
-        // 获取returnExpression属性(主构造函数参数)
-        var returnExpression = node.GetType().GetProperty("returnExpression")?.GetValue(node) as LangExpression;
+        // 获取returnExpression字段（主构造函数参数）
+        var returnExpression = GetPrimaryConstructorParameter<LangExpression>(node, "returnExpression");
 
         if (returnExpression != null)
         {
@@ -263,10 +280,10 @@ public partial class BytecodeVisitor
     public Instruction? VisitForInStatement(ForInStatement node)
     {
         // For-in 循环：for item in collection { ... }
-        // 获取属性
-        var id = node.GetType().GetProperty("id", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as LangId;
-        var expression = node.GetType().GetProperty("expression", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as LangExpression;
-        var body = node.GetType().GetProperty("body", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as OldStatement;
+        // 获取字段（主构造函数参数）
+        var id = GetPrimaryConstructorParameter<LangId>(node, "id");
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
+        var body = GetPrimaryConstructorParameter<OldStatement>(node, "body");
 
         if (id == null || expression == null || body == null)
         {
@@ -293,10 +310,10 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitSwitchStatement(SwitchStatement node)
     {
-        // 获取属性
-        var switchExpression = node.GetType().GetProperty("switchExpression", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as LangExpression;
-        var switchCaseList = node.GetType().GetProperty("switchCaseList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as List<CaseStatement>;
-        var defaultBlockStatement = node.GetType().GetProperty("defaultBlockStatement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as BlockStatement;
+        // 获取字段（主构造函数参数）
+        var switchExpression = GetPrimaryConstructorParameter<LangExpression>(node, "switchExpression");
+        var switchCaseList = GetPrimaryConstructorParameter<List<CaseStatement>>(node, "switchCaseList");
+        var defaultBlockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "defaultBlockStatement");
 
         if (switchExpression == null || switchCaseList == null)
         {
@@ -329,8 +346,8 @@ public partial class BytecodeVisitor
             // 弹出 switch 值（已经匹配成功）
             Emit(OpCode.Pop);
 
-            // 执行 case 块
-            var blockStmt = caseStmt.GetType().GetProperty("BlockStatement")?.GetValue(caseStmt) as BlockStatement;
+            // 执行 case 块（主构造函数参数，注意大写B）
+            var blockStmt = GetPrimaryConstructorParameter<BlockStatement>(caseStmt, "BlockStatement");
             blockStmt?.Accept(this);
 
             // 跳转到 switch 结束
@@ -371,7 +388,7 @@ public partial class BytecodeVisitor
     {
         // CaseStatement 的表达式在 SwitchStatement 中处理
         // 这里只需要生成 case 表达式的代码
-        var expression = node.GetType().GetProperty("expression", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as LangExpression;
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         expression?.Accept(this);
         return null;
     }
@@ -427,8 +444,8 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitThrowStatement(ThrowStatement node)
     {
-        // 获取 expression 属性
-        var expression = node.GetType().GetProperty("expression", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(node) as LangExpression;
+        // 获取 expression 字段（主构造函数参数）
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
 
         if (expression != null)
         {

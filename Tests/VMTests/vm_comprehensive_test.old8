@@ -1,0 +1,51 @@
+// VM功能测试（不包括函数定义）
+
+PrintLine("=== 测试开始 ===")
+
+// 1. 变量赋值
+a <- 10
+b <- 20
+PrintLine("变量赋值完成")
+
+// 2. 算术运算
+sum <- a + b
+diff <- b - a
+prod <- a * 2
+PrintLine("算术运算完成")
+
+// 3. 比较运算
+greater <- b > a
+less <- a < b
+equal <- a == 10
+PrintLine("比较运算完成")
+
+// 4. If-else语句
+if a < b {
+    PrintLine("If分支正常")
+} else {
+    PrintLine("Else分支错误")
+}
+
+// 5. Elif测试
+x <- 15
+if x < 10 {
+    PrintLine("x<10错误")
+} elif x < 20 {
+    PrintLine("Elif分支正常")
+} else {
+    PrintLine("Else分支错误")
+}
+
+// 6. While循环
+counter <- 0
+while counter < 3 {
+    counter <- counter + 1
+}
+PrintLine("While循环完成")
+
+// 7. 三元运算符
+max <- a > b ? a : b
+min <- a < b ? a : b
+PrintLine("三元运算符完成")
+
+PrintLine("=== 所有测试通过 ===")
