@@ -1022,16 +1022,16 @@ public partial class Operation(
                     return typeof(int);
                 }
             case LangTokenType.Slash:
-                Left?.LoadIlValue(ilGenerator, local);
-                Right?.LoadIlValue(ilGenerator, local);
                 if (leftType == typeof(double) || rightType == typeof(double))
                 {
                     // 确保两个操作数都是double类型
+                    Left?.LoadIlValue(ilGenerator, local);
                     if (leftType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
 
+                    Right?.LoadIlValue(ilGenerator, local);
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
@@ -1041,6 +1041,8 @@ public partial class Operation(
                     return typeof(double);
                 }
 
+                Left?.LoadIlValue(ilGenerator, local);
+                Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Div);
                 return typeof(int);
             case LangTokenType.Percent:
