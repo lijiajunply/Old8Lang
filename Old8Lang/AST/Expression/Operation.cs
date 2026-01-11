@@ -659,12 +659,12 @@ public partial class Operation(
                 local.RemoveLocalVar(idName);
                 var newLocal = ilGenerator.DeclareLocal(type);
                 local.AddLocalVar(idName, newLocal);
-                ilGenerator.Emit(OpCodes.Stloc, newLocal.LocalIndex);
+                ilGenerator.Emit(OpCodes.Stloc, newLocal);
             }
             else
             {
                 // 类型匹配，直接存储
-                ilGenerator.Emit(OpCodes.Stloc, existingLocal.LocalIndex);
+                ilGenerator.Emit(OpCodes.Stloc, existingLocal);
             }
         }
         else
@@ -672,7 +672,7 @@ public partial class Operation(
             // 首次声明变量
             var newLocal = ilGenerator.DeclareLocal(type);
             local.AddLocalVar(idName, newLocal);
-            ilGenerator.Emit(OpCodes.Stloc, newLocal.LocalIndex);
+            ilGenerator.Emit(OpCodes.Stloc, newLocal);
         }
     }
 

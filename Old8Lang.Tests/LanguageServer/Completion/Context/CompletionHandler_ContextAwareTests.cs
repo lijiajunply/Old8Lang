@@ -62,7 +62,7 @@ globalConst <- ""constant""
 }
 
 func test() -> void {
-    calc <- new Calculator()
+    calc <- Calculator()
     calc.add(10)
     result <- calc.$1getValue()
 }
@@ -174,7 +174,7 @@ func getData() -> string {
 }
 
 func main() -> void {
-    obj <- new Test()
+    obj <- Test()
     secret <- obj.$1getData()
 }
 ";
@@ -458,19 +458,19 @@ func main() -> void {
     public async Task InheritanceScope_ShouldShowBaseClassMembers()
     {
         var code = @"class Base {
-    public baseMethod() -> void {
+    public func baseMethod() -> void {
         PrintLine(""Base method"")
     }
 }
 
 class Derived extends Base {
-    public override baseMethod() -> void {
+    public func derivedMethod() -> void {
         PrintLine(""Derived method"")
     }
 }
 
 func main() -> void {
-    obj <- new Derived()
+    obj <- Derived()
     obj.$1baseMethod()
 }
 ";
@@ -490,8 +490,10 @@ func main() -> void {
 
         var items = result.Items.ToList();
         var baseMethod = items.FirstOrDefault(i => i.Label == "baseMethod");
+        var derivedMethod = items.FirstOrDefault(i => i.Label == "derivedMethod");
+
         Assert.NotNull(baseMethod);
-        Assert.Contains(items, i => i.Label == "overrideMethod");
+        Assert.NotNull(derivedMethod);
 
         _output.WriteLine($"Found {items.Count} items");
     }
@@ -539,7 +541,7 @@ func methodB() -> void {
         var code = @"class Container {
     public static instance <- null
     func init() {
-        instance <- new Container()
+        instance <- Container()
     }
 
     public static func processData() -> void {

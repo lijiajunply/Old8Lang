@@ -164,7 +164,7 @@ public partial class LangId(
         }
         else
         {
-            ilGenerator.Emit(OpCodes.Ldloc, value.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, value);
         }
     }
 

@@ -134,6 +134,19 @@ public class TypeAnnotationManager
     /// </summary>
     private ParsedTypeAnnotation ParseTypeAnnotationRecursive(string typeAnnotation)
     {
+        // 处理数组类型（例如 "int[]", "string[]"）
+        // 需要在处理联合类型之前处理，因为可能有 "int[] | string[]" 这样的联合类型
+        if (typeAnnotation.EndsWith("[]"))
+        {
+            var elementTypeStr = typeAnnotation.Substring(0, typeAnnotation.Length - 2).Trim();
+            var elementType = ParseTypeAnnotationRecursive(elementTypeStr);
+            return new ParsedTypeAnnotation
+            {
+                BaseType = "array",
+                GenericArguments = [elementType]
+            };
+        }
+
         // 处理联合类型（检查顶层的 |，不检查泛型内部的）
         // 优先处理联合类型，因为 "int? | string?" 中的 ? 是属于各个成员的
         var unionIndex = FindTopLevelSeparator(typeAnnotation, '|');
@@ -347,11 +360,39 @@ public class TypeAnnotationManager
             return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
         }
 
-        // 如果有类型未注册，使用名称匹配作为后备方案
+        // 如果有类型未注册,使用名称匹配作为后备方案
         // 这允许对未注册的接口类型（如 IComparable）进行基本的类型检查
-        return expected.BaseType == actual.BaseType ||
-               expected.BaseType == "any" ||
-               actual.BaseType == "any";
+        if (expected.BaseType != actual.BaseType &&
+            expected.BaseType != "any" &&
+            actual.BaseType != "any")
+        {
+            return false;
+        }
+
+        // 基类型匹配，检查泛型参数
+        if (expected.GenericArguments is not null && actual.GenericArguments is not null)
+        {
+            if (expected.GenericArguments.Count != actual.GenericArguments.Count)
+            {
+                return false;
+            }
+
+            // 递归检查每个泛型参数
+            for (int i = 0; i < expected.GenericArguments.Count; i++)
+            {
+                if (!ValidateParsedTypeCompatibility(expected.GenericArguments[i], actual.GenericArguments[i]))
+                {
+                    return false;
+                }
+            }
+        }
+        else if (expected.GenericArguments is not null || actual.GenericArguments is not null)
+        {
+            // 一个有泛型参数，一个没有
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>

@@ -353,13 +353,13 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
 
         var l = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
-        ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, l);
 
         // 向 List<int> 中添加元素
         var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
         foreach (var expr in Tuples)
         {
-            ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, l);
             expr.V1.LoadIlValue(ilGenerator, local);
             var t = expr.V1.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
@@ -369,7 +369,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
         }
 
-        ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+        ilGenerator.Emit(OpCodes.Ldloc, l);
     }
 
     /// <summary>

@@ -88,7 +88,7 @@ public partial class MatchExpression(
         MatchValue.LoadIlValue(ilGenerator, local);
         var matchValueType = MatchValue.OutputType(local) ?? typeof(object);
         var matchValueLocal = ilGenerator.DeclareLocal(matchValueType);
-        ilGenerator.Emit(OpCodes.Stloc, matchValueLocal.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, matchValueLocal);
 
         // 生成每个 case 的匹配判断
         for (int i = 0; i < Cases.Count; i++)
@@ -113,7 +113,7 @@ public partial class MatchExpression(
             }
 
             // 普通值匹配：比较 match 值和 case 值
-            ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
             matchCase.Pattern!.LoadIlValue(ilGenerator, local);
 
             // 根据类型选择合适的比较指令
@@ -164,13 +164,13 @@ public partial class MatchExpression(
             // 如果有变量绑定，将 match 值赋给变量
             if (matchCase.BindingVariable is not null)
             {
-                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal.LocalIndex);
+                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
                 if (matchValueType.IsValueType)
                     ilGenerator.Emit(OpCodes.Box, matchValueType);
 
                 var localVar = ilGenerator.DeclareLocal(typeof(object));
                 local.AddLocalVar(matchCase.BindingVariable, localVar);
-                ilGenerator.Emit(OpCodes.Stloc, localVar.LocalIndex);
+                ilGenerator.Emit(OpCodes.Stloc, localVar);
             }
 
             // 计算并存储结果
@@ -179,7 +179,7 @@ public partial class MatchExpression(
             if (resultType is not null && resultType.IsValueType)
                 ilGenerator.Emit(OpCodes.Box, resultType);
 
-            ilGenerator.Emit(OpCodes.Stloc, resultLocal.LocalIndex);
+            ilGenerator.Emit(OpCodes.Stloc, resultLocal);
 
             // 跳转到结束
             ilGenerator.Emit(OpCodes.Br, endLabel);
@@ -189,7 +189,7 @@ public partial class MatchExpression(
         ilGenerator.MarkLabel(endLabel);
 
         // 加载结果
-        ilGenerator.Emit(OpCodes.Ldloc, resultLocal.LocalIndex);
+        ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
     }
 
     /// <summary>

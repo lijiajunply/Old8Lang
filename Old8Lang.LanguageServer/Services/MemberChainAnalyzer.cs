@@ -90,15 +90,16 @@ public class MemberChainAnalyzer
             Console.WriteLine($"[FindDotAtPosition]   [{j}] '{t.Value}' Type={t.Type} Line={t.Line} Column={t.Column}");
         }
 
-        // 从后向前查找，找到光标位置之前的最近一个点号
+        // 从后向前查找，找到光标位置之前或所在位置的最近一个点号
         for (int i = _tokens.Count - 1; i >= 0; i--)
         {
             var token = _tokens[i];
 
             // 如果 token 在光标位置之后，跳过
-            if (token.Line > line || (token.Line == line && token.Column > column))
+            // 注意：点号占一个字符，光标可能在点号后面（column = token.Column + 1）
+            if (token.Line > line || (token.Line == line && token.Column >= column))
             {
-                Console.WriteLine($"[FindDotAtPosition] Skipping token after cursor: {token.Value} at Line={token.Line}, Column={token.Column}");
+                Console.WriteLine($"[FindDotAtPosition] Skipping token at/after cursor: {token.Value} at Line={token.Line}, Column={token.Column}");
                 continue;
             }
 

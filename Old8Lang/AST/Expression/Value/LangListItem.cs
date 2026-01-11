@@ -152,6 +152,24 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
             var listItemMethod = listType.GetMethod("get_Item", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Callvirt, listItemMethod);
         }
+        else if (listType == typeof(object))
+        {
+            // 处理object类型的索引访问（运行时动态处理）
+            // 这种情况通常发生在嵌套数组或动态类型的场景中
+            ListId.LoadIlValue(ilGenerator, local); // 加载对象
+
+            // 尝试将object转换为数组
+            var objectArrayLocal = ilGenerator.DeclareLocal(typeof(object[]));
+            ilGenerator.Emit(OpCodes.Isinst, typeof(object[]));
+            ilGenerator.Emit(OpCodes.Stloc, objectArrayLocal);
+            ilGenerator.Emit(OpCodes.Ldloc, objectArrayLocal);
+
+            // 加载索引
+            Key.LoadIlValue(ilGenerator, local);
+
+            // 从数组中获取元素
+            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+        }
         else
         {
             throw new InvalidOperationError(this, "不支持的集合类型: " + listType.Name);

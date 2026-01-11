@@ -23,7 +23,7 @@ public partial class CompilerVisitor
         }
         else
         {
-            ilGenerator.Emit(OpCodes.Ldloc, value.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, value);
         }
         return null;
     }

@@ -319,13 +319,13 @@ public partial class ListLangValue : LangValueType, ILangList
 
         // 否则，将List实例存储到局部变量
         var l = ilGenerator.DeclareLocal(listType);
-        ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, l);
 
         // 向List中添加元素
         var addMethod = listType.GetMethod("Add", [itemType ?? typeof(object)])!;
         foreach (var expr in Value)
         {
-            ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, l);
             expr.LoadIlValue(ilGenerator, local);
             var t = expr.OutputType(local);
             if (t != itemType)
@@ -337,7 +337,7 @@ public partial class ListLangValue : LangValueType, ILangList
         }
 
         // 将填充好的List实例加载到堆栈
-        ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+        ilGenerator.Emit(OpCodes.Ldloc, l);
     }
 
     public override Type OutputType(LocalManager local)

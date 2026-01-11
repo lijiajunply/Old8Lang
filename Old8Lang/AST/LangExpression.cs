@@ -98,7 +98,7 @@ public abstract class LangExpression : IOldLangTree
         LoadIlValue(ilGenerator, local);
 
         // 最后存储到变量
-        ilGenerator.Emit(OpCodes.Stloc, localVar.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, localVar);
     }
 
     /// <summary>

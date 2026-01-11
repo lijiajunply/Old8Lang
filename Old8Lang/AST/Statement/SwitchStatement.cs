@@ -74,7 +74,7 @@ public partial class SwitchStatement(
         switchExpression.LoadIlValue(ilGenerator, local);
         var switchValueType = switchExpression.OutputType(local) ?? typeof(object);
         var switchValueLocal = ilGenerator.DeclareLocal(switchValueType);
-        ilGenerator.Emit(OpCodes.Stloc, switchValueLocal.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, switchValueLocal);
 
         // 为每个case创建标签
         var caseLabels = switchCaseList.Select(_ => ilGenerator.DefineLabel()).ToList();
@@ -93,7 +93,7 @@ public partial class SwitchStatement(
                 oldCase.expression.LoadIlValue(ilGenerator, local);
 
                 // 加载switch值
-                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
+                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
 
                 // 装箱 switch 值（因为 Array.IndexOf 需要 object 参数）
                 if (switchValueType.IsValueType)
@@ -116,7 +116,7 @@ public partial class SwitchStatement(
             {
                 // 普通匹配
                 // 重新加载switch值
-                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
+                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
 
                 // 加载case值并比较
                 oldCase.expression.LoadIlValue(ilGenerator, local);

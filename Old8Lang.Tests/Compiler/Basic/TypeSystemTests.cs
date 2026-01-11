@@ -224,8 +224,8 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            numbers:int[] <- [1, 2, 3, 4, 5]
-            strings:string[] <- [""hello"", ""world"", ""test""]
+            numbers:array<int> <- [1, 2, 3, 4, 5]
+            strings:array<string> <- [""hello"", ""world"", ""test""]
         ";
         var interpreter = new LangInterpreter();
 
@@ -244,7 +244,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            numbers:int[] <- [1, 2, 3, 4, 5]
+            numbers:array<int> <- [1, 2, 3, 4, 5]
             sum:int <- 0
             for num in numbers {
                 sum <- sum + num

@@ -694,7 +694,7 @@ public partial class Instance : LangValueType
             }
 
             var localA = ilGenerator.DeclareLocal(classType);
-            ilGenerator.Emit(OpCodes.Stloc, localA.LocalIndex);
+            ilGenerator.Emit(OpCodes.Stloc, localA);
 
             // 使用BindingFlags.DeclaredOnly来只查找当前类声明的方法，避免与继承的方法冲突
             var initFunc = classType.GetMethod("init",
@@ -704,7 +704,7 @@ public partial class Instance : LangValueType
             if (initFunc is not null)
             {
                 // 加载 this 指针
-                ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
+                ilGenerator.Emit(OpCodes.Ldloc, localA);
 
                 // 加载参数
                 var a = initFunc.GetParameters();
@@ -724,7 +724,7 @@ public partial class Instance : LangValueType
             }
 
             // 加载对象实例作为返回值
-            ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, localA);
 
             return;
         }
