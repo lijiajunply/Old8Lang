@@ -117,20 +117,24 @@ public partial class RangeLangValue(
             endNum--;
 
         // 检查范围是否有效
-        if (startNum > endNum)
+        // 如果start原本就大于end,说明是反向范围
+        if (start > end)
         {
+            // 反向范围:从大到小
             for (var i = startNum; i >= endNum; i--)
             {
                 results.Add(i);
             }
         }
-        else
+        else if (startNum <= endNum)
         {
+            // 正向范围:从小到大
             for (var i = startNum; i <= endNum; i++)
             {
                 results.Add(i);
             }
         }
+        // 如果调整后startNum > endNum但原本start <= end,说明排除导致范围为空,返回空数组
 
         return results.ToArray();
     }
