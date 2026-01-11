@@ -100,6 +100,13 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             var getItemMethod = baseType.GetMethod("get_Item", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
         }
+        else if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            // Dictionary<TKey, TValue> 索引访问
+            var keyType = baseType.GetGenericArguments()[0];
+            var getItemMethod = baseType.GetMethod("get_Item", [keyType])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
+        }
         else
         {
             throw new InvalidOperationError(this, "不支持的嵌套索引访问类型: " + baseType.Name);

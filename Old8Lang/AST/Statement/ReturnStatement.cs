@@ -55,6 +55,24 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
             // 如果有返回值局部变量（非void函数），存储返回值
             if (local.ReturnValueLocal is not null)
             {
+                // 获取返回值局部变量的类型
+                var returnValueType = local.ReturnValueLocal.LocalType;
+
+                // 如果返回表达式的类型与返回值局部变量的类型不匹配，进行类型转换
+                if (returnType != returnValueType)
+                {
+                    if (returnValueType.IsValueType && returnType == typeof(object))
+                    {
+                        // object 到值类型，需要拆箱
+                        ilGenerator.Emit(OpCodes.Unbox_Any, returnValueType);
+                    }
+                    else if (!returnValueType.IsValueType && returnType!.IsValueType)
+                    {
+                        // 值类型到引用类型，需要装箱
+                        ilGenerator.Emit(OpCodes.Box, returnType);
+                    }
+                }
+
                 // 存储返回值到局部变量
                 ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);
             }

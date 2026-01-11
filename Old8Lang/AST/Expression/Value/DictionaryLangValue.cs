@@ -355,17 +355,25 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         var l = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, l);
 
-        // 向 List<int> 中添加元素
+        // 向 Dictionary<object, object> 中添加元素
         var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
         foreach (var expr in Tuples)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l);
             expr.V1.LoadIlValue(ilGenerator, local);
-            var t = expr.V1.OutputType(local);
-            ilGenerator.Emit(OpCodes.Box, t!);
+            var keyType = expr.V1.OutputType(local);
+            // 只有值类型才需要装箱
+            if (keyType!.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType);
+            }
             expr.V2.LoadIlValue(ilGenerator, local);
-            t = expr.V2.OutputType(local);
-            ilGenerator.Emit(OpCodes.Box, t!);
+            var valueType = expr.V2.OutputType(local);
+            // 只有值类型才需要装箱
+            if (valueType!.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
         }
 
