@@ -1,7 +1,7 @@
 using Old8Lang.LanguageServer.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Services;
 
 public partial class SymbolInfoTests(ITestOutputHelper testOutputHelper)
 {

@@ -1,10 +1,10 @@
-using Old8Lang.LanguageServer.Services;
-using Old8Lang.Interpreter;
 using Old8Lang.AST.Statement;
+using Old8Lang.Interpreter;
+using Old8Lang.LanguageServer.Services;
 using Old8Lang.Profiler;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Services;
 
 public class DebugProfilerServiceTests(ITestOutputHelper testOutputHelper)
 {

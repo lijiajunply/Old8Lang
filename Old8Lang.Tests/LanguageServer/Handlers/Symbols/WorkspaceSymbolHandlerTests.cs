@@ -1,9 +1,9 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
+using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Handlers.Symbols;
 
 /// <summary>
 /// 测试 WorkspaceSymbolHandler - 工作区符号搜索功能

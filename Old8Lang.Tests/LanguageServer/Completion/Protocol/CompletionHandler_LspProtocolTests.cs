@@ -1,14 +1,9 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Completion.Protocol;
 
 public class CompletionHandler_LspProtocolTests(ITestOutputHelper output)
 {

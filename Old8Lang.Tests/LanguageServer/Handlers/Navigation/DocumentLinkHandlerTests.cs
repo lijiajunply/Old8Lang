@@ -1,10 +1,10 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
+using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Handlers.Navigation;
 
 /// <summary>
 /// 测试 DocumentLinkHandler - 导入链接功能

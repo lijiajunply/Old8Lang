@@ -1,10 +1,9 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
-using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Handlers.Visualization;
 
 /// <summary>
 /// 测试 SemanticTokensHandler - 语义高亮功能

@@ -2,7 +2,7 @@ using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Services;
 
 /// <summary>
 /// 测试 FormattingService - 代码格式化服务

@@ -1,8 +1,8 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Models;
+using Old8Lang.LanguageServer.Services;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Services;
 
 public class DocumentManagerTests(ITestOutputHelper testOutputHelper)
 {

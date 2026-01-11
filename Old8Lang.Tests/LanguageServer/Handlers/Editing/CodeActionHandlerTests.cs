@@ -1,11 +1,11 @@
-using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
+using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.LanguageServer;
+namespace Old8Lang.Tests.LanguageServer.Handlers.Editing;
 
 /// <summary>
 /// 测试 CodeActionHandler - 快速修复和重构功能
