@@ -1,0 +1,32 @@
+// 虚拟机基础测试 - 算术运算和变量赋值
+
+a <- 10
+b <- 20
+c <- a + b
+
+PrintLine("a = " + a.ToStr())
+PrintLine("b = " + b.ToStr())
+PrintLine("c = a + b = " + c.ToStr())
+
+// 测试乘法和减法
+d <- c * 2
+e <- d - 10
+
+PrintLine("d = c * 2 = " + d.ToStr())
+PrintLine("e = d - 10 = " + e.ToStr())
+
+// 测试除法和取模
+f <- 100 / 5
+g <- 100 % 7
+
+PrintLine("f = 100 / 5 = " + f.ToStr())
+PrintLine("g = 100 % 7 = " + g.ToStr())
+
+// 测试比较运算
+PrintLine("\n比较运算测试:")
+PrintLine("10 == 10: " + (10 == 10).ToStr())
+PrintLine("10 != 20: " + (10 != 20).ToStr())
+PrintLine("30 > 20: " + (30 > 20).ToStr())
+PrintLine("15 < 10: " + (15 < 10).ToStr())
+
+PrintLine("\nVM基础测试完成!")

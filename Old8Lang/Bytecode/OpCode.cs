@@ -1,0 +1,241 @@
+namespace Old8Lang.Bytecode;
+
+/// <summary>
+/// 字节码操作码枚举
+/// </summary>
+public enum OpCode : byte
+{
+    // ===== 栈操作 (0x00-0x0F) =====
+    /// <summary>无操作</summary>
+    Nop = 0x00,
+
+    /// <summary>从常量池加载常量到栈 (操作数: constantIndex)</summary>
+    LoadConst = 0x01,
+
+    /// <summary>加载局部变量到栈 (操作数: localIndex)</summary>
+    LoadLocal = 0x02,
+
+    /// <summary>存储栈顶值到局部变量 (操作数: localIndex)</summary>
+    StoreLocal = 0x03,
+
+    /// <summary>加载全局变量到栈 (操作数: nameIndex)</summary>
+    LoadGlobal = 0x04,
+
+    /// <summary>存储栈顶值到全局变量 (操作数: nameIndex)</summary>
+    StoreGlobal = 0x05,
+
+    /// <summary>弹出栈顶元素</summary>
+    Pop = 0x06,
+
+    /// <summary>复制栈顶元素</summary>
+    Dup = 0x07,
+
+    /// <summary>加载null值</summary>
+    LoadNull = 0x08,
+
+    /// <summary>加载true值</summary>
+    LoadTrue = 0x09,
+
+    /// <summary>加载false值</summary>
+    LoadFalse = 0x0A,
+
+    // ===== 算术运算 (0x10-0x1F) =====
+    /// <summary>加法: b, a → (a + b)</summary>
+    Add = 0x10,
+
+    /// <summary>减法: b, a → (a - b)</summary>
+    Sub = 0x11,
+
+    /// <summary>乘法: b, a → (a * b)</summary>
+    Mul = 0x12,
+
+    /// <summary>除法: b, a → (a / b)</summary>
+    Div = 0x13,
+
+    /// <summary>取模: b, a → (a % b)</summary>
+    Mod = 0x14,
+
+    /// <summary>取反: a → (-a)</summary>
+    Neg = 0x15,
+
+    /// <summary>幂运算: b, a → (a ** b)</summary>
+    Pow = 0x16,
+
+    // ===== 比较运算 (0x20-0x2F) =====
+    /// <summary>等于: b, a → (a == b)</summary>
+    Equal = 0x20,
+
+    /// <summary>不等于: b, a → (a != b)</summary>
+    NotEqual = 0x21,
+
+    /// <summary>大于: b, a → (a > b)</summary>
+    Greater = 0x22,
+
+    /// <summary>小于: b, a → (a < b)</summary>
+    Less = 0x23,
+
+    /// <summary>大于等于: b, a → (a >= b)</summary>
+    GreaterEqual = 0x24,
+
+    /// <summary>小于等于: b, a → (a <= b)</summary>
+    LessEqual = 0x25,
+
+    // ===== 逻辑运算 (0x30-0x3F) =====
+    /// <summary>逻辑与: b, a → (a && b)</summary>
+    And = 0x30,
+
+    /// <summary>逻辑或: b, a → (a || b)</summary>
+    Or = 0x31,
+
+    /// <summary>逻辑非: a → (!a)</summary>
+    Not = 0x32,
+
+    // ===== 控制流 (0x40-0x4F) =====
+    /// <summary>无条件跳转 (操作数: offset)</summary>
+    Jump = 0x40,
+
+    /// <summary>条件跳转(false) (操作数: offset)</summary>
+    JumpIfFalse = 0x41,
+
+    /// <summary>条件跳转(true) (操作数: offset)</summary>
+    JumpIfTrue = 0x42,
+
+    /// <summary>函数调用 (操作数: argCount, funcNameIndex)</summary>
+    Call = 0x43,
+
+    /// <summary>原生函数调用 (操作数: argCount, nativeFuncNameIndex)</summary>
+    CallNative = 0x44,
+
+    /// <summary>返回 (返回栈顶值)</summary>
+    Return = 0x45,
+
+    /// <summary>返回void</summary>
+    ReturnVoid = 0x46,
+
+    // ===== 对象操作 (0x50-0x5F) =====
+    /// <summary>创建新对象 (操作数: classNameIndex)</summary>
+    NewObject = 0x50,
+
+    /// <summary>获取字段 (操作数: fieldNameIndex)</summary>
+    GetField = 0x51,
+
+    /// <summary>设置字段 (操作数: fieldNameIndex)</summary>
+    SetField = 0x52,
+
+    /// <summary>获取索引元素 (array[index])</summary>
+    GetIndex = 0x53,
+
+    /// <summary>设置索引元素 (array[index] = value)</summary>
+    SetIndex = 0x54,
+
+    /// <summary>调用方法 (操作数: argCount, methodNameIndex)</summary>
+    CallMethod = 0x55,
+
+    // ===== 容器操作 (0x60-0x6F) =====
+    /// <summary>创建数组 (操作数: elementCount)</summary>
+    NewArray = 0x60,
+
+    /// <summary>创建列表 (操作数: elementCount)</summary>
+    NewList = 0x61,
+
+    /// <summary>创建字典 (操作数: pairCount)</summary>
+    NewDict = 0x62,
+
+    /// <summary>获取数组长度</summary>
+    ArrayLength = 0x63,
+
+    /// <summary>创建元组 (操作数: elementCount)</summary>
+    NewTuple = 0x64,
+
+    /// <summary>创建范围 (start, end, step)</summary>
+    NewRange = 0x65,
+
+    // ===== 类型操作 (0x70-0x7F) =====
+    /// <summary>类型转换 (操作数: targetTypeIndex)</summary>
+    Cast = 0x70,
+
+    /// <summary>类型检查 (操作数: typeNameIndex)</summary>
+    IsType = 0x71,
+
+    /// <summary>获取类型</summary>
+    TypeOf = 0x72,
+
+    // ===== 并发原语 (0x80-0x9F) =====
+    /// <summary>创建互斥锁</summary>
+    MutexCreate = 0x80,
+
+    /// <summary>锁定互斥锁 (操作数: mutexId)</summary>
+    MutexLock = 0x81,
+
+    /// <summary>解锁互斥锁 (操作数: mutexId)</summary>
+    MutexUnlock = 0x82,
+
+    /// <summary>释放互斥锁 (操作数: mutexId)</summary>
+    MutexDispose = 0x83,
+
+    /// <summary>创建通道</summary>
+    ChannelCreate = 0x84,
+
+    /// <summary>通道发送 (操作数: channelId, value)</summary>
+    ChannelSend = 0x85,
+
+    /// <summary>通道接收 (操作数: channelId)</summary>
+    ChannelReceive = 0x86,
+
+    /// <summary>关闭通道 (操作数: channelId)</summary>
+    ChannelClose = 0x87,
+
+    /// <summary>创建信号量 (操作数: initialCount, maxCount)</summary>
+    SemaphoreCreate = 0x88,
+
+    /// <summary>获取信号量 (操作数: semaphoreId)</summary>
+    SemaphoreAcquire = 0x89,
+
+    /// <summary>释放信号量 (操作数: semaphoreId)</summary>
+    SemaphoreRelease = 0x8A,
+
+    // ===== 异步支持 (0xA0-0xAF) =====
+    /// <summary>等待异步操作</summary>
+    Await = 0xA0,
+
+    /// <summary>生成器yield</summary>
+    Yield = 0xA1,
+
+    /// <summary>创建Task</summary>
+    NewTask = 0xA2,
+
+    // ===== 异常处理 (0xB0-0xBF) =====
+    /// <summary>抛出异常</summary>
+    Throw = 0xB0,
+
+    /// <summary>开始try块 (操作数: catchOffset, finallyOffset)</summary>
+    TryBegin = 0xB1,
+
+    /// <summary>结束try块</summary>
+    TryEnd = 0xB2,
+
+    /// <summary>开始catch块</summary>
+    CatchBegin = 0xB3,
+
+    /// <summary>结束catch块</summary>
+    CatchEnd = 0xB4,
+
+    /// <summary>开始finally块</summary>
+    FinallyBegin = 0xB5,
+
+    /// <summary>结束finally块</summary>
+    FinallyEnd = 0xB6,
+
+    // ===== 特殊指令 (0xC0-0xFF) =====
+    /// <summary>defer语句 (延迟执行)</summary>
+    Defer = 0xC0,
+
+    /// <summary>执行所有defer</summary>
+    ExecuteDefers = 0xC1,
+
+    /// <summary>打印调试信息 (操作数: messageIndex)</summary>
+    DebugPrint = 0xF0,
+
+    /// <summary>断点</summary>
+    Breakpoint = 0xF1,
+}

@@ -87,6 +87,26 @@ public class FuncRunStatement : OldStatement
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotSupportedException("FuncRunStatement 暂不支持 Visitor 模式访问");
+        // FuncRunStatement 是一个包装表达式作为语句的节点
+        // 它内部只包含一个表达式,我们让这个表达式接受visitor,然后丢弃结果
+        if (Instance != null)
+        {
+            return Instance.Accept(visitor);
+        }
+        if (Operation != null)
+        {
+            return Operation.Accept(visitor);
+        }
+        if (AwaitExpr != null)
+        {
+            return AwaitExpr.Accept(visitor);
+        }
+        if (GenericInstance != null)
+        {
+            return GenericInstance.Accept(visitor);
+        }
+
+        // 如果都为空,返回默认值
+        return default(TResult)!;
     }
 }

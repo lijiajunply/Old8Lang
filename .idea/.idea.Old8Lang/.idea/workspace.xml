@@ -23,12 +23,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompileBytecodeCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ExecuteBytecodeCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VMCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/CallFrame.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ConstantPool.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Instruction.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VMTests/basic_arithmetic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VMTests/control_flow.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VMTests/function_calls.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/DictionaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/DictionaryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/TypeConversionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/TypeCheckILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/TypeCheckILHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -567,6 +582,7 @@
       <workItem from="1767865400494" duration="19888000" />
       <workItem from="1767985358686" duration="156000" />
       <workItem from="1767985518540" duration="4807000" />
+      <workItem from="1768162238074" duration="337000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -911,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="604" />
+    <option name="localTasksCounter" value="605" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -938,7 +954,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(semantic-tokens): 解决测试环境中 RegistrationOptions 未初始化问题&#10;&#10;- 添加空值检查避免 RegistrationOptions 为 null 时的异常&#10;- 创建默认的 SemanticTokensLegend 作为后备方案&#10;- 确保 TokenTypes 和 TokenModifiers 的正确初始化&#10;- 保持原有功能完整性的同时提高代码健壮性" />
     <MESSAGE value="docs(guidelines): 添加 Old8Lang API 参考文档和贡献者指南&#10;&#10;- 创建完整的 API 参考文档，涵盖基础函数、数学函数、字符串处理等功能模块&#10;- 添加详细的并发原语文档，包括互斥锁、信号量、原子整数、通道等&#10;- 编写全面的贡献者指南，包含开发环境设置、代码规范、提交规范等内容&#10;- 提供测试要求和文档贡献指导，帮助开发者参与项目&#10;- 包含问题报告和功能请求的模板，规范社区交互流程" />
     <MESSAGE value="docs(guides): 添加高级主题文档并整合开发工具指南&#10;&#10;- 新增 ADVANCED_TOPICS.md 包含 Extern 功能工厂架构详解&#10;- 新增 DEVELOPER_TOOLS.md 整合 Language Server 和 VSCode 扩展开发指南&#10;- 移除过时的 DEBUGGER_GUIDE.md 文档&#10;- 更新高级主题涵盖渐进式类型推断系统和包开发指南&#10;- 完善开发工具文档包含调试器和性能分析工具说明" />
     <MESSAGE value="test(completion): 添加补全处理器的边界测试和并发原语测试&#10;&#10;- 在CompletionHandler中确保全局函数初始化以支持测试环境&#10;- 添加边界测试覆盖空文档、语法错误、越界位置等极端情况&#10;- 添加并发原语函数的完整补全测试包括Mutex、Semaphore、Channel等&#10;- 添加关键字补全测试覆盖控制流、函数、异步、面向对象等关键字&#10;- 实现大量符号表的性能测试确保补全响应时间在1秒内&#10;- 验证所有并发原语函数的补全完整性和详细信息" />
@@ -963,7 +978,8 @@
     <MESSAGE value="fix(compiler): 修复编译器模式下范围表达式实现&#10;&#10;- 修改 RangeLangValue 生成实际数组而不是 IEnumerable&#10;- 添加 CreateRangeArray 辅助方法处理包含/排除逻辑&#10;- 更新 ExtendedRangeTests 使用数组索引而非 Length() 方法&#10;- 调整范围测试用例适配编译器模式行为&#10;- 修复负数范围和混合排除范围的处理逻辑&#10;- 统一异常测试类构造函数注入 ITestOutputHelper" />
     <MESSAGE value="feat(compiler): 添加异常包装和范围表达式支持&#10;&#10;- 实现 ExceptionWrapper 类用于编译器模式下异常处理&#10;- 在 TryStatement 中包装异常对象以便只显示消息&#10;- 在 ThrowStatement 中处理 ExceptionWrapper 类型异常&#10;- 添加对数组和 List&lt;T&gt; 类型 Length/Count 属性的支持&#10;- 修改范围表达式测试使用数组属性和索引访问&#10;- 更新范围表达式语法和相关测试用例&#10;- 调整嵌套异常测试的输出格式处理" />
     <MESSAGE value="feat(lang): 添加字典类型支持和优化IL代码生成&#10;&#10;- 在DictionaryLangValue中实现值类型的条件装箱以避免不必要的装箱操作&#10;- 扩展NestedIndexAccess支持Dictionary&lt;TKey, TValue&gt;类型的索引访问&#10;- 在ReturnStatement中添加返回值类型转换逻辑处理值类型与引用类型间的转换&#10;- 修复object到值类型的拆箱和值类型到引用类型的装箱操作" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加字典类型支持和优化IL代码生成&#10;&#10;- 在DictionaryLangValue中实现值类型的条件装箱以避免不必要的装箱操作&#10;- 扩展NestedIndexAccess支持Dictionary&lt;TKey, TValue&gt;类型的索引访问&#10;- 在ReturnStatement中添加返回值类型转换逻辑处理值类型与引用类型间的转换&#10;- 修复object到值类型的拆箱和值类型到引用类型的装箱操作" />
+    <MESSAGE value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -114,6 +114,11 @@ public abstract class Program
         CommandRegistry.Register(new SyntaxTestCommand());
         CommandRegistry.Register(new RunCommand());
 
+        // 虚拟机命令
+        CommandRegistry.Register(new VMCommand());
+        CommandRegistry.Register(new CompileBytecodeCommand());
+        CommandRegistry.Register(new ExecuteBytecodeCommand());
+
         // 信息命令
         CommandRegistry.Register(new HelpCommand());
         CommandRegistry.Register(new VersionCommand());
