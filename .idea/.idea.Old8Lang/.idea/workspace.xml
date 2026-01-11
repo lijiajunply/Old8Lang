@@ -23,10 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs.bak" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -909,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="596" />
+    <option name="localTasksCounter" value="597" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
     <MESSAGE value="refactor(core): 将 null 检查从传统语法转换为现代 C# 模式匹配语法&#10;&#10;- 将所有 != null 检查替换为 is not null 模式匹配&#10;- 将所有 == null 检查替换为 is null 模式匹配&#10;- 统一代码库中的空值检查风格以提高可读性&#10;- 修复 Apis.ListToObjects 方法中的空值检查逻辑&#10;- 更新 ArrayLangValue 类中的空值检查实现&#10;- 修改 AssertHelper 类中的断言方法空值检查方式&#10;- 更新 AsyncForInStatement 中的生成器上下文检查&#10;- 调整 BlockStatement 中的语句处理空值检查逻辑&#10;- 优化 BreakpointManager 中的条件评估空值检查&#10;- 改进 ClassInit 中的类存在性检查方式&#10;- 调整 DocCommentInfo 中的返回值空值判断&#10;- 优化 DllPathResolver 中的路径解析空值检查&#10;- 更新 EnumInit 中的枚举成员值检查方式&#10;- 改进 ErrorLangValue 中的建议消息空值检查&#10;- 优化 ExternStatement 中的别名处理空值检查逻辑" />
     <MESSAGE value="feat(language-server): 增强模块解析和转义序列处理功能&#10;&#10;- 实现 ModuleResolver 统一解析各种模块类型（标准库、第三方包、本地文件等）&#10;- 添加标准库源代码路径定位功能，支持 Old8LangLib 和 Old8Lang.NetLib&#10;- 引入 EscapeSequenceHelper 辅助类处理 Unicode 和十六进制转义序列&#10;- 重构字符串值函数中的空值检查，使用统一的 ThrowIfNullOrEmpty 方法&#10;- 优化 DocumentLinkHandler 中的模块路径解析逻辑&#10;- 改进 LangToken 中的转义序列解析算法，增强错误处理能力&#10;- 简化 PrimaryParser 中的转义序列处理代码，提高解析效率" />
     <MESSAGE value="test(parser): 添加转义序列解析器单元测试&#10;&#10;- 实现了Unicode转义序列(\u)的完整测试覆盖&#10;- 添加了十六进制转义序列(\x)的全面测试用例&#10;- 包含边界条件和异常情况的测试验证&#10;- 新增字符串值函数的单元测试确保功能正确性&#10;- 验证了字符串操作方法如StartsWith、EndsWith等的行为&#10;- 补充了Base64编码解码功能的测试用例" />
@@ -961,7 +959,8 @@
     <MESSAGE value="feat(parser): 添加一元运算符支持&#10;&#10;- 在ExpressionParser.ParsePower方法中实现一元NOT(!)和负号(-)运算符解析&#10;- 支持多重一元运算符嵌套如!!a和!!(10 &gt; 5)的语法&#10;- 修正Operation节点创建时左操作数为null表示一元运算的情况&#10;- 添加一元运算符相关的编译器和解释器测试用例&#10;- 更新Operation.cs添加NOT运算符的字符串表示&#10;- 为一元运算符表达式添加完整的单元测试覆盖" />
     <MESSAGE value="refactor(compiler): 重构逻辑运算符和空值合并运算符的IL代码生成&#10;&#10;- 提取逻辑运算符代码生成到LogicalOpILHelper类&#10;- 提取空值合并运算符代码生成到NullishCoalescingILHelper类&#10;- 移除Operation.cs中的内联IL生成代码&#10;- 统一逻辑AND、OR、XOR运算符的短路求值实现&#10;- 优化空值合并运算符对值类型和引用类型的处理逻辑&#10;- 减少Operation.cs文件大小提升代码可维护性" />
     <MESSAGE value="refactor(compiler): 重构类型检查和转换操作的IL代码生成&#10;&#10;- 将 as、is 和 is not 运算符的IL生成逻辑提取到独立的 TypeCheckILHelper 类中&#10;- 移除 Operation.cs 中的大段内联类型检查和转换实现代码&#10;- 添加统一的类型名称到 .NET 类型映射字典&#10;- 实现统一的值类型和引用类型检查逻辑&#10;- 优化 null 类型检查的特殊处理&#10;- 提供更清晰的 IL 代码生成注释和文档说明" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(compiler): 重构类型检查和转换操作的IL代码生成&#10;&#10;- 将 as、is 和 is not 运算符的IL生成逻辑提取到独立的 TypeCheckILHelper 类中&#10;- 移除 Operation.cs 中的大段内联类型检查和转换实现代码&#10;- 添加统一的类型名称到 .NET 类型映射字典&#10;- 实现统一的值类型和引用类型检查逻辑&#10;- 优化 null 类型检查的特殊处理&#10;- 提供更清晰的 IL 代码生成注释和文档说明" />
+    <MESSAGE value="refactor(Operation): 提取Dot操作符IL代码生成逻辑到独立助手类&#10;&#10;- 将DotOperatorILHelper从Operation.cs中分离出来，处理this.member访问&#10;- 实现静态类方法调用、Assert和Task静态方法的独立处理逻辑&#10;- 添加实例方法调用、字段属性访问和索引访问的专用助手方法&#10;- 支持枚举成员访问、特殊方法映射等功能的代码组织优化&#10;- 减少Operation.cs代码量57.6%，提升整体可维护性&#10;- 保持原有IL代码生成功能完全兼容，无性能损耗" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(Operation): 提取Dot操作符IL代码生成逻辑到独立助手类&#10;&#10;- 将DotOperatorILHelper从Operation.cs中分离出来，处理this.member访问&#10;- 实现静态类方法调用、Assert和Task静态方法的独立处理逻辑&#10;- 添加实例方法调用、字段属性访问和索引访问的专用助手方法&#10;- 支持枚举成员访问、特殊方法映射等功能的代码组织优化&#10;- 减少Operation.cs代码量57.6%，提升整体可维护性&#10;- 保持原有IL代码生成功能完全兼容，无性能损耗" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

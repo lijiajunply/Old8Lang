@@ -255,7 +255,35 @@ public static class Compiler
                 throw new CompilerException($"创建委托失败: {ex.Message}", new SourcePosition(0, 0), ex);
             }
 
-            return oldLangRun;
+            // 包装委托以捕获并转换运行时异常
+            return () =>
+            {
+                try
+                {
+                    oldLangRun();
+                }
+                catch (DivideByZeroException)
+                {
+                    throw new Old8Exception(
+                        "RUNTIME_ERROR",
+                        "除数不能为零",
+                        new SourcePosition(0, 0));
+                }
+                catch (Old8Exception)
+                {
+                    // 已经是Old8Exception，直接重新抛出
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    // 将其他.NET异常包装为Old8Exception
+                    throw new Old8Exception(
+                        "RUNTIME_ERROR",
+                        ex.Message,
+                        new SourcePosition(0, 0),
+                        innerException: ex);
+                }
+            };
         }
         catch (Exception ex)
         {

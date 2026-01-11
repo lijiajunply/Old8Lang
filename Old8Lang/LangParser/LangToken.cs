@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Text;
+using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
 
@@ -369,6 +370,16 @@ public static class LangTokenizer
                     }
 
                     i++;
+                }
+
+                // 检查字符串是否正确闭合
+                if (i >= code.Length || code[i] != '"')
+                {
+                    throw new SyntaxError(
+                        sb.ToString(),
+                        line,
+                        i - column,
+                        "语法错误：未闭合的字符串字面量，缺少结束引号");
                 }
 
                 tokens.Add(new LangToken(sb.ToString(), LangTokenType.String, line, i - column));
