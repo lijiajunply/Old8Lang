@@ -20,8 +20,8 @@ public class CompletionHandler_ContextAwareTests(ITestOutputHelper output)
     PrintLine(""global"")
 }
 
-var globalVar <- 123
-var globalConst <- ""constant""
+globalVar <- 123
+globalConst <- ""constant""
 ";
         var uri = "file:///test.old8";
         var documentManager = new DocumentManager();
@@ -98,9 +98,9 @@ func test() -> void {
     public async Task LocalVariableScope_ShouldShadowGlobalVariable()
     {
         var code = @"
-var global <- ""hello""
+global <- ""hello""
 func test() -> void {
-    var global <- ""world""
+    global <- ""world""
     PrintLine(global + "" + global)
 }
 ";
@@ -354,7 +354,7 @@ func main() -> void {
     public async Task MixinGlobalAndLocal_ShouldPrioritizeLocal()
     {
         var code = @"
-var data <- ""global data""
+data <- ""global data""
 
 func main() -> void {
     data <- ""local data""
@@ -648,7 +648,7 @@ func outer() -> void {
     public async Task CommentInCode_ShouldNotAffectCompletion()
     {
         var code = @"
-var x <- 10
+x <- 10
 
 // x: 这是变量，不是函数
 x <- x + 1
@@ -749,8 +749,8 @@ func main() -> void {
     public async Task ContextPriority_GlobalVsLocal_ShouldPrioritizeLocal()
     {
         var code = @"
-var globalVar <- ""global""
-var localVar <- ""local""
+globalVar <- ""global""
+localVar <- ""local""
 
 func test() -> void {
     localVar <- localVar + 1

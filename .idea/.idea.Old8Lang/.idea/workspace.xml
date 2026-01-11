@@ -23,7 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/SelectStatementEdgeCasesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/SelectStatementEdgeCasesTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Context/CompletionHandler_ContextAwareTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Context/CompletionHandler_ContextAwareTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -906,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="586" />
+    <option name="localTasksCounter" value="587" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(language-server): 实现类成员文档注释查找功能&#10;&#10;- 在ClassParser中跳过文档注释以避免重复处理&#10;- 添加_currentClassStartTokenIndex和_currentClassEndTokenIndex字段追踪类范围&#10;- 实现FindClassTokenRange方法查找类的token范围&#10;- 实现FindDocCommentForMember方法在类范围内查找成员文档注释&#10;- 在函数和属性解析中集成文档注释查找逻辑&#10;- 更新符号表构建器在类解析前后设置和重置类范围" />
     <MESSAGE value="fix(language-server): 修复定义处理器返回值问题&#10;&#10;- 修正 DefinitionHandler 中 symbol 为空时的返回值，从返回 null 改为返回新的 LocationContainer()&#10;- 更新 workspace.xml 中的变更列表记录，移除多余条目并添加 DefinitionHandler 的变更&#10;- 修正工作项持续时间计数和本地任务计数器&#10;- 清理 VcsManagerConfiguration 中的旧提交消息记录&#10;- 更新最后提交消息为类成员文档注释查找功能的实现" />
     <MESSAGE value="fix(language-server): 修复符号表构建和测试用例中的位置定位问题&#10;&#10;- 修复了符号表构建中类型推断的空值检查逻辑&#10;- 添加了对成员方法调用的类型推断支持，处理 instance.method() 形式的表达式&#10;- 实现了从函数/方法签名中提取返回类型的功能&#10;- 修正了测试用例中代码位置的断言，确保测试准确性&#10;- 增加了对操作表达式中点操作符的处理逻辑" />
     <MESSAGE value="fix(profiler): 修复性能分析会话状态检查逻辑&#10;&#10;- 修正 GenerateReport 方法中的会话状态检查条件&#10;- 修正 SaveReportAsync 方法中的会话状态检查条件&#10;- 更新异常消息内容从&quot;请先停止性能分析会话&quot;改为&quot;当前没有性能分析会话&quot;&#10;- 清理 IDE 工作空间配置文件中的变更列表记录&#10;- 修正工作项持续时间和本地任务计数器统计&#10;- 移除旧的提交消息记录并更新最后提交消息内容" />
@@ -958,7 +959,8 @@
     <MESSAGE value="docs(tests): 更新语言服务器测试目录重组总结文档&#10;&#10;- 添加了完整的测试目录重组概览和前后对比&#10;- 记录了39个文件从扁平化结构到分层结构的详细分类&#10;- 提供了各个子目录的功能说明和测试统计信息&#10;- 包含了技术实现细节和Git命令使用说明&#10;- 记录了重组效果验证和后续改进建议&#10;- 保留了完整的文件移动历史和向后兼容性说明" />
     <MESSAGE value="refactor(tests): 重构语言服务器测试目录结构&#10;&#10;- 将扁平化的测试文件重新组织到分层目录结构中&#10;- 按功能模块分类测试文件：Completion、Handlers、Services等&#10;- 更新所有测试文件的命名空间以匹配新的目录结构&#10;- 调整using语句顺序保持代码风格一致性&#10;- 删除不必要的using引用减少代码冗余&#10;- 保持所有测试功能完整性的同时改善代码可维护性" />
     <MESSAGE value="feat(interpreter): 实现defer语句的作用域捕获和恢复机制&#10;&#10;- 重构DeferStack数据结构，从OldStatement改为DeferEntry记录类型&#10;- 添加作用域快照捕获功能，在注册defer时保存当前局部变量状态&#10;- 实现混合作用域执行机制，合并捕获作用域和当前作用域&#10;- 添加作用域同步逻辑，将defer执行的变量修改回传到当前作用域&#10;- 改进异常处理确保所有defer语句都能按LIFO顺序执行&#10;- 更新作用域缓存管理机制，适应动态作用域切换需求" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 实现defer语句的作用域捕获和恢复机制&#10;&#10;- 重构DeferStack数据结构，从OldStatement改为DeferEntry记录类型&#10;- 添加作用域快照捕获功能，在注册defer时保存当前局部变量状态&#10;- 实现混合作用域执行机制，合并捕获作用域和当前作用域&#10;- 添加作用域同步逻辑，将defer执行的变量修改回传到当前作用域&#10;- 改进异常处理确保所有defer语句都能按LIFO顺序执行&#10;- 更新作用域缓存管理机制，适应动态作用域切换需求" />
+    <MESSAGE value="fix(tests): 修复通道接收语法的测试用例&#10;&#10;- 更新SelectStatementEdgeCasesTests中的通道接收语法从case val &lt;- ChannelReceive(ch)改为case val from ch&#10;- 移除workspace.xml中多余的变更记录条目&#10;- 更新本地任务计数器数值&#10;- 清理VcsManagerConfiguration中的旧提交消息记录&#10;- 更新最后提交消息为解释器defer语句功能实现内容" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复通道接收语法的测试用例&#10;&#10;- 更新SelectStatementEdgeCasesTests中的通道接收语法从case val &lt;- ChannelReceive(ch)改为case val from ch&#10;- 移除workspace.xml中多余的变更记录条目&#10;- 更新本地任务计数器数值&#10;- 清理VcsManagerConfiguration中的旧提交消息记录&#10;- 更新最后提交消息为解释器defer语句功能实现内容" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -70,16 +70,22 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
         // 添加内置函数补全（所有70+个全局函数）
         completionItems.AddRange(GetBuiltInFunctionCompletions());
 
-        // 添加符号补全
-        if (document?.SymbolTable != null)
+        // 添加符号补全（使用作用域感知）
+        if (document?.SymbolTable != null && document.Ast != null)
         {
-            var symbols = GetSymbolCompletions(document.SymbolTable).ToList();
-            Console.WriteLine($"[CompletionHandler] Symbol completions count: {symbols.Count}");
-            completionItems.AddRange(symbols);
+            // 使用作用域分析器获取当前位置可见的符号
+            var scopeAnalyzer = new ScopeAnalyzer(document.Ast, request.Position, document.SymbolTable, uri);
+            var visibleSymbols = scopeAnalyzer.GetVisibleSymbols();
+
+            Console.WriteLine($"[CompletionHandler] Visible symbols count: {visibleSymbols.Count}");
+
+            // 将符号转换为补全项
+            var symbolCompletions = ConvertSymbolsToCompletionItems(visibleSymbols);
+            completionItems.AddRange(symbolCompletions);
         }
         else
         {
-            Console.WriteLine($"[CompletionHandler] Skipping symbol completions (document or SymbolTable is null)");
+            Console.WriteLine($"[CompletionHandler] Skipping symbol completions (document, SymbolTable, or Ast is null)");
         }
 
         // 智能排序：设置排序优先级
@@ -274,6 +280,54 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             Kind = CompletionItemKind.Keyword,
             Detail = "Old8Lang 关键字",
             InsertText = keyword
+        });
+    }
+
+    /// <summary>
+    /// 将符号列表转换为补全项（替换原来的 GetSymbolCompletions）
+    /// </summary>
+    private static IEnumerable<CompletionItem> ConvertSymbolsToCompletionItems(List<Models.SymbolInfo> symbols)
+    {
+        return symbols.Select(symbol =>
+        {
+            // 根据符号类型构建不同的 CompletionItem
+            if (symbol.Kind == Models.SymbolKind.Function || symbol.Kind == Models.SymbolKind.Method)
+            {
+                // 函数/方法：使用 Snippet 格式
+                return new CompletionItem
+                {
+                    Label = symbol.Name,
+                    Kind = ConvertSymbolKind(symbol.Kind),
+                    Detail = BuildSimpleFunctionSignature(symbol),
+                    Documentation = symbol.Documentation,
+                    InsertText = $"{symbol.Name}($0)",
+                    InsertTextFormat = InsertTextFormat.Snippet
+                };
+            }
+            else if (symbol.Kind == Models.SymbolKind.Class)
+            {
+                // 类：普通文本
+                return new CompletionItem
+                {
+                    Label = symbol.Name,
+                    Kind = ConvertSymbolKind(symbol.Kind),
+                    Detail = $"class {symbol.Name}",
+                    Documentation = symbol.Documentation,
+                    InsertText = symbol.Name
+                };
+            }
+            else
+            {
+                // 其他符号（变量、常量、参数等）：普通文本
+                return new CompletionItem
+                {
+                    Label = symbol.Name,
+                    Kind = ConvertSymbolKind(symbol.Kind),
+                    Detail = symbol.Type ?? symbol.Kind.ToString(),
+                    Documentation = symbol.Documentation,
+                    InsertText = symbol.Name
+                };
+            }
         });
     }
 
