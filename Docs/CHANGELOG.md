@@ -1,5 +1,26 @@
 # 更新记录
 
+## Old8Lang 1.0.0 rc7
+
+### 编译器架构优化
+
+#### Operation.cs 代码重构
+- **重构背景**: Operation.cs 文件过于庞大（2335 行），包含大量重复代码，影响可维护性
+- **重构内容**:
+  - 提取数值运算助手类 `NumericBinaryOpHelper`（支持 +、-、*、/、%、^ 运算符）
+  - 提取比较运算助手类 `ComparisonOpHelper`（支持 >、<、==、!=、<=、>= 运算符）
+  - 提取 in 操作符助手类 `InOperatorHelper`（支持 List、Array、Dictionary、String 等集合类型）
+- **重构效果**:
+  - Operation.cs 从 2335 行减少到 1850 行，**减少 485 行代码（21%）**
+  - 消除约 500 行重复代码
+  - 创建 3 个专用助手类，23 个助手方法
+  - 代码可维护性和可读性大幅提升
+  - 所有测试通过，无功能影响
+- **技术细节**:
+  - 统一处理类型转换（int/double 混合运算、object vs int 特殊情况）
+  - 优化栈操作（SwapStackOrder 方法处理 IL 栈顺序）
+  - 支持编译器模式和解释器模式
+
 ## Old8Lang 1.0.0 rc6
 
 ### LSP (语言服务器) 功能增强

@@ -23,8 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/ComparisonOpHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/InOperatorHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/BoundaryConditionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/BoundaryConditionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -908,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="591" />
+    <option name="localTasksCounter" value="592" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(language-server): 修复定义处理器中的位置计算问题&#10;&#10;- 使用 token 的实际位置替换 FindColumnInLine 方法&#10;- 统一将行号和列号转换为 0-based 索引&#10;- 修正测试用例中的行号断言以匹配新的位置计算逻辑&#10;- 更新诊断信息集合的初始化语法为集合表达式&#10;- 修正集成测试中的位置参数以匹配实际代码行号" />
     <MESSAGE value="feat(lsp): 添加高优先级 LSP 功能增强&#10;&#10;- 实现文档符号大纲功能，提供代码结构视图和层级关系导航&#10;- 添加签名帮助功能，支持自定义和内置函数的参数提示和实时高亮&#10;- 集成代码格式化功能，支持文档和选定范围的自动格式化和缩进调整&#10;- 实现代码操作功能，提供快速修复和重构建议如变量定义和函数提取&#10;- 在 Program.cs 中注册新的处理器并添加 FormattingService 依赖注入&#10;- 更新 CHANGELOG.md 记录 Old8Lang 1.0.0 rc6 版本的 LSP 功能增强" />
     <MESSAGE value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
     <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
@@ -960,7 +962,8 @@
     <MESSAGE value="feat(language-server): 实现成员链补全和符号分析功能&#10;&#10;- 添加 MemberChainAnalyzer 服务来解析和推断成员访问链类型&#10;- 支持多层级成员访问如 obj.getMethod().getProperty().value&#10;- 重构 CompletionHandler 使用新的成员链分析器替代原有简单查找&#10;- 添加原生库函数注册表 NativeLibraryRegistry 提供完整函数列表&#10;- 扩展类型关键字支持，添加 any 类型到补全列表&#10;- 改进内置函数补全显示全局函数和原生库函数分类&#10;- 扩展符号种类枚举，添加 Field 和 Keyword 类型支持&#10;- 在 ScopeAnalyzer 中实现 this 关键字和类字段的符号补全&#10;- 添加类字段和静态字段在方法内的可见性分析&#10;- 更新测试用例适配新的成员链分析功能和类型系统&#10;- 修正对象创建语法从 new Class() 到 Class() 的变化" />
     <MESSAGE value="feat(language-server): 实现 native extern import 语句的符号表构建支持&#10;&#10;- 在 CompletionHandler 中添加取消令牌检查防止长时间运行&#10;- 扩展 SymbolTableBuilder 支持 native statement 的符号解析和存储&#10;- 添加对 extern statement 外部函数声明的符号表构建支持&#10;- 实现 import statement 模块导入的符号表处理逻辑&#10;- 更新 CompletionHandler_ExternTests 测试用例适配新的 extern 语法&#10;- 修改 LSP 协议测试中的字符串比较方法提升兼容性&#10;- 优化取消令牌处理使用 CancelAsync 替代 Cancel 方法" />
     <MESSAGE value="fix(compiler): 修复IL代码生成中的局部变量引用问题&#10;&#10;- 修正所有OpCodes.Ldloc和OpCodes.Stloc指令使用局部变量对象而非LocalIndex属性&#10;- 添加对object类型数组索引访问的动态处理支持&#10;- 修复成员链分析器中光标位置判断逻辑，正确处理点号位置边界情况&#10;- 更新类型注解管理器支持数组类型解析和泛型参数兼容性验证&#10;- 修改测试用例适配对象创建语法从new Class()到Class()的变化&#10;- 修正match表达式和switch语句中的局部变量引用方式&#10;- 更新类型系统测试中数组类型注解语法从int[]到array&lt;int&gt;的表示方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复IL代码生成中的局部变量引用问题&#10;&#10;- 修正所有OpCodes.Ldloc和OpCodes.Stloc指令使用局部变量对象而非LocalIndex属性&#10;- 添加对object类型数组索引访问的动态处理支持&#10;- 修复成员链分析器中光标位置判断逻辑，正确处理点号位置边界情况&#10;- 更新类型注解管理器支持数组类型解析和泛型参数兼容性验证&#10;- 修改测试用例适配对象创建语法从new Class()到Class()的变化&#10;- 修正match表达式和switch语句中的局部变量引用方式&#10;- 更新类型系统测试中数组类型注解语法从int[]到array&lt;int&gt;的表示方法" />
+    <MESSAGE value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
