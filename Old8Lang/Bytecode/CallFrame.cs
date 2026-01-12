@@ -3,29 +3,22 @@ namespace Old8Lang.Bytecode;
 /// <summary>
 /// 调用栈帧
 /// </summary>
-public class CallFrame
+public class CallFrame(FunctionMetadata function, int localCount)
 {
     /// <summary>当前执行的函数</summary>
-    public FunctionMetadata Function { get; }
+    public FunctionMetadata Function { get; } = function;
 
     /// <summary>局部变量数组</summary>
-    public object?[] Locals { get; }
+    public object?[] Locals { get; } = new object?[localCount];
 
     /// <summary>指令指针(Instruction Pointer)</summary>
-    public int IP { get; set; }
+    public int IP { get; set; } = 0;
 
     /// <summary>返回地址(调用者的栈帧)</summary>
     public CallFrame? Caller { get; set; }
 
     /// <summary>函数参数(用于调试)</summary>
     public object?[]? Arguments { get; set; }
-
-    public CallFrame(FunctionMetadata function, int localCount)
-    {
-        Function = function;
-        Locals = new object?[localCount];
-        IP = 0;
-    }
 
     /// <summary>
     /// 获取当前指令

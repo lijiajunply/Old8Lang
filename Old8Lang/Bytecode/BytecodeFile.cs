@@ -16,10 +16,10 @@ public class BytecodeFile
     public ConstantPool ConstantPool { get; set; } = new();
 
     /// <summary>全局变量名称列表</summary>
-    public List<string> GlobalVariables { get; set; } = new();
+    public List<string> GlobalVariables { get; set; } = [];
 
     /// <summary>函数列表</summary>
-    public List<FunctionMetadata> Functions { get; set; } = new();
+    public List<FunctionMetadata> Functions { get; set; } = [];
 
     /// <summary>入口点函数索引</summary>
     public int EntryPointIndex { get; set; } = -1;
@@ -93,12 +93,14 @@ public class BytecodeFile
         ushort minorVersion = reader.ReadUInt16();
 
         if (majorVersion != MAJOR_VERSION)
-            throw new InvalidDataException($"不兼容的字节码版本: {majorVersion}.{minorVersion} (当前支持: {MAJOR_VERSION}.{MINOR_VERSION})");
+            throw new InvalidDataException(
+                $"不兼容的字节码版本: {majorVersion}.{minorVersion} (当前支持: {MAJOR_VERSION}.{MINOR_VERSION})");
 
-        var bytecodeFile = new BytecodeFile();
-
-        // 常量池
-        bytecodeFile.ConstantPool = ConstantPool.ReadFrom(reader);
+        var bytecodeFile = new BytecodeFile
+        {
+            // 常量池
+            ConstantPool = ConstantPool.ReadFrom(reader)
+        };
 
         // 全局变量
         int globalCount = reader.ReadInt32();
@@ -137,6 +139,7 @@ public class BytecodeFile
 
     public override string ToString()
     {
-        return $"BytecodeFile[{Functions.Count} functions, {ConstantPool.Count} constants, {GlobalVariables.Count} globals]";
+        return
+            $"BytecodeFile[{Functions.Count} functions, {ConstantPool.Count} constants, {GlobalVariables.Count} globals]";
     }
 }

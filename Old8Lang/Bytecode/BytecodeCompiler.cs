@@ -134,13 +134,13 @@ public class BytecodeCompiler
         {
             // 基础IO
             "PrintLine" or "Print" or "ReadLine" or
-            // 类型转换
-            "ToStr" or "ToInt" or "ToDouble" or "ToBool" or
-            // 并发原语
-            "Sleep" or "GetCurrentThreadId" or
-            "MutexCreate" or "MutexLock" or "MutexUnlock" or "MutexDispose" or
-            "ChannelCreate" or "ChannelSend" or "ChannelReceive" or "ChannelClose" or
-            "SemaphoreCreate" or "SemaphoreAcquire" or "SemaphoreRelease" => true,
+                // 类型转换
+                "ToStr" or "ToInt" or "ToDouble" or "ToBool" or
+                // 并发原语
+                "Sleep" or "GetCurrentThreadId" or
+                "MutexCreate" or "MutexLock" or "MutexUnlock" or "MutexDispose" or
+                "ChannelCreate" or "ChannelSend" or "ChannelReceive" or "ChannelClose" or
+                "SemaphoreCreate" or "SemaphoreAcquire" or "SemaphoreRelease" => true,
             _ => false
         };
     }
@@ -162,8 +162,8 @@ public class BytecodeCompiler
 
         public int DeclareLocal(string name)
         {
-            if (_locals.ContainsKey(name))
-                return _locals[name];
+            if (_locals.TryGetValue(name, out var local))
+                return local;
 
             int index = _nextIndex++;
             _locals[name] = index;

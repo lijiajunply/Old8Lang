@@ -9,10 +9,10 @@ public class FunctionMetadata
     public string Name { get; set; } = "";
 
     /// <summary>参数名称列表</summary>
-    public List<string> Parameters { get; set; } = new();
+    public List<string> Parameters { get; set; } = [];
 
     /// <summary>字节码指令列表</summary>
-    public List<Instruction> Instructions { get; set; } = new();
+    public List<Instruction> Instructions { get; set; } = [];
 
     /// <summary>局部变量数量</summary>
     public int LocalCount { get; set; }

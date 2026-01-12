@@ -3,13 +3,13 @@ namespace Old8Lang.Bytecode;
 /// <summary>
 /// 字节码指令
 /// </summary>
-public class Instruction
+public class Instruction(OpCode opCode, object? operand = null)
 {
     /// <summary>操作码</summary>
-    public OpCode OpCode { get; set; }
+    public OpCode OpCode { get; set; } = opCode;
 
     /// <summary>操作数(可选)</summary>
-    public object? Operand { get; set; }
+    public object? Operand { get; set; } = operand;
 
     /// <summary>源文件路径(用于调试)</summary>
     public string? SourceFile { get; set; }
@@ -19,12 +19,6 @@ public class Instruction
 
     /// <summary>源代码列号(用于调试)</summary>
     public int? ColumnNumber { get; set; }
-
-    public Instruction(OpCode opCode, object? operand = null)
-    {
-        OpCode = opCode;
-        Operand = operand;
-    }
 
     /// <summary>
     /// 设置调试信息

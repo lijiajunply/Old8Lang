@@ -7,7 +7,7 @@ namespace Old8Lang.Bytecode;
 /// </summary>
 public class ConstantPool : IEnumerable<object>
 {
-    private readonly List<object> _constants = new();
+    private readonly List<object> _constants = [];
     private readonly Dictionary<object, int> _constantIndexMap = new();
 
     /// <summary>常量数量</summary>
@@ -22,7 +22,7 @@ public class ConstantPool : IEnumerable<object>
             throw new ArgumentNullException(nameof(value));
 
         // 检查是否已存在
-        if (_constantIndexMap.TryGetValue(value, out int existingIndex))
+        if (_constantIndexMap.TryGetValue(value, out var existingIndex))
             return existingIndex;
 
         // 添加新常量

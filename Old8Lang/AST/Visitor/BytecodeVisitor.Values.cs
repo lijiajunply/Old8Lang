@@ -153,11 +153,71 @@ public partial class BytecodeVisitor
 
         return null;
     }
-    public Instruction? VisitLangListItem(LangListItem node) => null;
+    public Instruction? VisitLangListItem(LangListItem node)
+    {
+        // 访问列表/数组/字典变量
+        node.ListId.Accept(this);
+
+        // 访问索引/键
+        node.Key.Accept(this);
+
+        // 发出GetIndex指令来执行索引访问
+        Emit(OpCode.GetIndex);
+
+        return null;
+    }
     public Instruction? VisitListComprehension(ListComprehension node) => null;
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;
-    public Instruction? VisitNestedIndexAccess(NestedIndexAccess node) => null;
-    public Instruction? VisitNestedSliceAccess(NestedSliceAccess node) => null;
+    public Instruction? VisitNestedIndexAccess(NestedIndexAccess node)
+    {
+        // 访问基础索引访问 (例如 array[index1])
+        node.BaseIndex.Accept(this);
+
+        // 访问嵌套索引 (例如 index2)
+        node.NestedIndex.Accept(this);
+
+        // 发出GetIndex指令来执行嵌套索引访问
+        Emit(OpCode.GetIndex);
+
+        return null;
+    }
+    public Instruction? VisitNestedSliceAccess(NestedSliceAccess node)
+    {
+        // 访问基础表达式
+        node.BaseExpression.Accept(this);
+
+        // 访问切片起始索引
+        node.SliceStart.Accept(this);
+
+        // 访问切片结束索引(如果有)
+        if (node.SliceEnd != null)
+        {
+            node.SliceEnd.Accept(this);
+        }
+        else
+        {
+            // 如果没有结束索引,使用int.MaxValue表示到末尾
+            int constIndex = _compiler.ConstantPool.AddConstant(int.MaxValue);
+            Emit(OpCode.LoadConst, constIndex);
+        }
+
+        // 访问切片步长(如果有)
+        if (node.SliceStep != null)
+        {
+            node.SliceStep.Accept(this);
+        }
+        else
+        {
+            // 如果没有步长,默认为1
+            int constIndex = _compiler.ConstantPool.AddConstant(1);
+            Emit(OpCode.LoadConst, constIndex);
+        }
+
+        // 发出Slice指令
+        Emit(OpCode.Slice);
+
+        return null;
+    }
     public Instruction? VisitRangeLangValue(RangeLangValue node)
     {
         // 访问start表达式
@@ -194,7 +254,52 @@ public partial class BytecodeVisitor
 
         return null;
     }
-    public Instruction? VisitSliceLangValue(SliceLangValue node) => null;
+    public Instruction? VisitSliceLangValue(SliceLangValue node)
+    {
+        // 访问集合变量
+        node.Id.Accept(this);
+
+        // 访问起始索引(如果有)
+        if (node.Start != null)
+        {
+            node.Start.Accept(this);
+        }
+        else
+        {
+            // 默认起始索引为0
+            int constIndex = _compiler.ConstantPool.AddConstant(0);
+            Emit(OpCode.LoadConst, constIndex);
+        }
+
+        // 访问结束索引(如果有)
+        if (node.End != null)
+        {
+            node.End.Accept(this);
+        }
+        else
+        {
+            // 默认结束索引为int.MaxValue(表示到末尾)
+            int constIndex = _compiler.ConstantPool.AddConstant(int.MaxValue);
+            Emit(OpCode.LoadConst, constIndex);
+        }
+
+        // 访问步长(如果有)
+        if (node.Step != null)
+        {
+            node.Step.Accept(this);
+        }
+        else
+        {
+            // 默认步长为1
+            int constIndex = _compiler.ConstantPool.AddConstant(1);
+            Emit(OpCode.LoadConst, constIndex);
+        }
+
+        // 发出Slice指令
+        Emit(OpCode.Slice);
+
+        return null;
+    }
     public Instruction? VisitStringTemplateValue(StringTemplateValue node)
     {
         // 字符串模板: $"Hello {name}, you are {age} years old"

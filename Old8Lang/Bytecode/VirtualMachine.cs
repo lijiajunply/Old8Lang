@@ -1,3 +1,4 @@
+using System.Collections;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
@@ -38,7 +39,7 @@ public class VirtualMachine
         }
 
         var entryFunction = _bytecodeFile.Functions[_bytecodeFile.EntryPointIndex];
-        CallFunction(entryFunction, new object?[0]);
+        CallFunction(entryFunction, []);
     }
 
     /// <summary>
@@ -47,8 +48,10 @@ public class VirtualMachine
     private void CallFunction(FunctionMetadata function, object?[] arguments)
     {
         // 创建调用帧
-        var frame = new CallFrame(function, function.LocalCount);
-        frame.Arguments = arguments;
+        var frame = new CallFrame(function, function.LocalCount)
+        {
+            Arguments = arguments
+        };
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < arguments.Length && i < function.LocalCount; i++)
@@ -88,43 +91,44 @@ public class VirtualMachine
                 break;
 
             case OpCode.LoadConst:
-                {
-                    int constIndex = (int)instruction.Operand!;
-                    var constant = _bytecodeFile.ConstantPool.GetConstant(constIndex);
-                    _stack.Push(constant);
-                }
+            {
+                int constIndex = (int)instruction.Operand!;
+                var constant = _bytecodeFile.ConstantPool.GetConstant(constIndex);
+                _stack.Push(constant);
+            }
                 break;
 
             case OpCode.LoadLocal:
-                {
-                    int localIndex = (int)instruction.Operand!;
-                    _stack.Push(frame.Locals[localIndex]);
-                }
+            {
+                int localIndex = (int)instruction.Operand!;
+                _stack.Push(frame.Locals[localIndex]);
+            }
                 break;
 
             case OpCode.StoreLocal:
-                {
-                    int localIndex = (int)instruction.Operand!;
-                    frame.Locals[localIndex] = _stack.Pop();
-                }
+            {
+                int localIndex = (int)instruction.Operand!;
+                frame.Locals[localIndex] = _stack.Pop();
+            }
                 break;
 
             case OpCode.LoadGlobal:
+            {
+                string varName = (string)instruction.Operand!;
+                if (!_globals.TryGetValue(varName, out var value))
                 {
-                    string varName = (string)instruction.Operand!;
-                    if (!_globals.TryGetValue(varName, out var value))
-                    {
-                        throw new Exception($"未定义的全局变量: {varName}");
-                    }
-                    _stack.Push(value);
+                    throw new Exception($"未定义的全局变量: {varName}");
                 }
+
+                _stack.Push(value);
+            }
                 break;
 
             case OpCode.StoreGlobal:
-                {
-                    string varName = (string)instruction.Operand!;
-                    _globals[varName] = _stack.Pop();
-                }
+            {
+                string varName = (string)instruction.Operand!;
+                _globals[varName] = _stack.Pop();
+            }
                 break;
 
             case OpCode.Pop:
@@ -149,779 +153,867 @@ public class VirtualMachine
 
             // === 算术运算 ===
             case OpCode.Add:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Add(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Add(a, b));
+            }
                 break;
 
             case OpCode.Sub:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Sub(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Sub(a, b));
+            }
                 break;
 
             case OpCode.Mul:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Mul(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Mul(a, b));
+            }
                 break;
 
             case OpCode.Div:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Div(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Div(a, b));
+            }
                 break;
 
             case OpCode.Mod:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Mod(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Mod(a, b));
+            }
                 break;
 
             case OpCode.Pow:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Pow(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Pow(a, b));
+            }
                 break;
 
             case OpCode.Neg:
-                {
-                    var a = _stack.Pop();
-                    _stack.Push(Neg(a));
-                }
+            {
+                var a = _stack.Pop();
+                _stack.Push(Neg(a));
+            }
                 break;
 
             // === 比较运算 ===
             case OpCode.Equal:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Equals(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Equals(a, b));
+            }
                 break;
 
             case OpCode.NotEqual:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(!Equals(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(!Equals(a, b));
+            }
                 break;
 
             case OpCode.Greater:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Greater(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Greater(a, b));
+            }
                 break;
 
             case OpCode.Less:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(Less(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(Less(a, b));
+            }
                 break;
 
             case OpCode.GreaterEqual:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(GreaterEqual(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(GreaterEqual(a, b));
+            }
                 break;
 
             case OpCode.LessEqual:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(LessEqual(a, b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(LessEqual(a, b));
+            }
                 break;
 
             // === 逻辑运算 ===
             case OpCode.And:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(ToBool(a) && ToBool(b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(ToBool(a) && ToBool(b));
+            }
                 break;
 
             case OpCode.Or:
-                {
-                    var b = _stack.Pop();
-                    var a = _stack.Pop();
-                    _stack.Push(ToBool(a) || ToBool(b));
-                }
+            {
+                var b = _stack.Pop();
+                var a = _stack.Pop();
+                _stack.Push(ToBool(a) || ToBool(b));
+            }
                 break;
 
             case OpCode.Not:
-                {
-                    var a = _stack.Pop();
-                    _stack.Push(!ToBool(a));
-                }
+            {
+                var a = _stack.Pop();
+                _stack.Push(!ToBool(a));
+            }
                 break;
 
             // === 控制流 ===
             case OpCode.Jump:
-                {
-                    int targetIP = (int)instruction.Operand!;
-                    frame.IP = targetIP;
-                }
+            {
+                int targetIP = (int)instruction.Operand!;
+                frame.IP = targetIP;
+            }
                 break;
 
             case OpCode.JumpIfFalse:
+            {
+                int targetIP = (int)instruction.Operand!;
+                var condition = _stack.Pop();
+                if (!ToBool(condition))
                 {
-                    int targetIP = (int)instruction.Operand!;
-                    var condition = _stack.Pop();
-                    if (!ToBool(condition))
-                    {
-                        frame.IP = targetIP;
-                    }
+                    frame.IP = targetIP;
                 }
+            }
                 break;
 
             case OpCode.JumpIfTrue:
+            {
+                int targetIP = (int)instruction.Operand!;
+                var condition = _stack.Pop();
+                if (ToBool(condition))
                 {
-                    int targetIP = (int)instruction.Operand!;
-                    var condition = _stack.Pop();
-                    if (ToBool(condition))
-                    {
-                        frame.IP = targetIP;
-                    }
+                    frame.IP = targetIP;
                 }
+            }
                 break;
 
             case OpCode.Call:
+            {
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)operands[1];
+
+                // 从栈中弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
                 {
-                    var operands = (object[])instruction.Operand!;
-                    int argCount = (int)operands[0];
-                    string funcName = (string)operands[1];
-
-                    // 从栈中弹出参数
-                    var args = new object?[argCount];
-                    for (int i = argCount - 1; i >= 0; i--)
-                    {
-                        args[i] = _stack.Pop();
-                    }
-
-                    // 查找函数
-                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                    if (function == null)
-                    {
-                        throw new Exception($"未定义的函数: {funcName}");
-                    }
-
-                    // 调用函数
-                    CallFunction(function, args);
-
-                    // 如果有返回值,它应该在栈上
+                    args[i] = _stack.Pop();
                 }
+
+                // 查找函数
+                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                if (function == null)
+                {
+                    throw new Exception($"未定义的函数: {funcName}");
+                }
+
+                // 调用函数
+                CallFunction(function, args);
+
+                // 如果有返回值,它应该在栈上
+            }
                 break;
 
             case OpCode.CallNative:
+            {
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)operands[1];
+
+                // 从栈中弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
                 {
-                    var operands = (object[])instruction.Operand!;
-                    int argCount = (int)operands[0];
-                    string funcName = (string)operands[1];
-
-                    // 从栈中弹出参数
-                    var args = new object?[argCount];
-                    for (int i = argCount - 1; i >= 0; i--)
-                    {
-                        args[i] = _stack.Pop();
-                    }
-
-                    // 调用原生函数
-                    var result = CallNativeFunction(funcName, args);
-                    if (result != null)
-                    {
-                        _stack.Push(result);
-                    }
+                    args[i] = _stack.Pop();
                 }
+
+                // 调用原生函数
+                var result = CallNativeFunction(funcName, args);
+                if (result != null)
+                {
+                    _stack.Push(result);
+                }
+            }
                 break;
 
             case OpCode.Return:
-                {
-                    // 返回值应该已经在栈上
-                    // 调用者会从栈中获取返回值
-                    return; // 退出当前函数
-                }
+            {
+                // 返回值应该已经在栈上
+                // 调用者会从栈中获取返回值
+                return; // 退出当前函数
+            }
 
             case OpCode.ReturnVoid:
                 return; // 退出当前函数
 
             // === 容器操作 ===
             case OpCode.NewArray:
+            {
+                int count = (int)instruction.Operand!;
+                var elements = new object?[count];
+                for (int i = count - 1; i >= 0; i--)
                 {
-                    int count = (int)instruction.Operand!;
-                    var elements = new object?[count];
-                    for (int i = count - 1; i >= 0; i--)
-                    {
-                        elements[i] = _stack.Pop();
-                    }
-                    _stack.Push(elements);
+                    elements[i] = _stack.Pop();
                 }
+
+                _stack.Push(elements);
+            }
                 break;
 
             case OpCode.NewList:
+            {
+                int count = (int)instruction.Operand!;
+                var list = new List<object?>();
+                var elements = new object?[count];
+                for (int i = count - 1; i >= 0; i--)
                 {
-                    int count = (int)instruction.Operand!;
-                    var list = new List<object?>();
-                    var elements = new object?[count];
-                    for (int i = count - 1; i >= 0; i--)
-                    {
-                        elements[i] = _stack.Pop();
-                    }
-                    list.AddRange(elements);
-                    _stack.Push(list);
+                    elements[i] = _stack.Pop();
                 }
+
+                list.AddRange(elements);
+                _stack.Push(list);
+            }
                 break;
 
             case OpCode.NewTuple:
+            {
+                int count = (int)instruction.Operand!;
+                var elements = new object?[count];
+                for (int i = count - 1; i >= 0; i--)
                 {
-                    int count = (int)instruction.Operand!;
-                    var elements = new object?[count];
-                    for (int i = count - 1; i >= 0; i--)
-                    {
-                        elements[i] = _stack.Pop();
-                    }
-                    _stack.Push(new Tuple<object?, object?>(elements[0], elements[1]));
+                    elements[i] = _stack.Pop();
                 }
+
+                _stack.Push(new Tuple<object?, object?>(elements[0], elements[1]));
+            }
                 break;
 
             case OpCode.NewDict:
+            {
+                int pairCount = (int)instruction.Operand!;
+                var dict = new Dictionary<object, object?>();
+                // 每个键值对作为一个元组在栈上
+                for (int i = 0; i < pairCount; i++)
                 {
-                    int pairCount = (int)instruction.Operand!;
-                    var dict = new Dictionary<object, object?>();
-                    // 每个键值对作为一个元组在栈上
-                    for (int i = 0; i < pairCount; i++)
+                    if (_stack.Pop() is Tuple<object?, object?> { Item1: not null } tuple)
                     {
-                        var tuple = _stack.Pop() as Tuple<object?, object?>;
-                        if (tuple != null && tuple.Item1 != null)
-                        {
-                            dict[tuple.Item1] = tuple.Item2;
-                        }
+                        dict[tuple.Item1] = tuple.Item2;
                     }
-                    _stack.Push(dict);
                 }
+
+                _stack.Push(dict);
+            }
                 break;
 
             case OpCode.ArrayLength:
+            {
+                var collection = _stack.Pop();
+                int length = 0;
+
+                if (collection is Array array)
                 {
-                    var collection = _stack.Pop();
-                    int length = 0;
-
-                    if (collection is Array array)
-                    {
-                        length = array.Length;
-                    }
-                    else if (collection is ICollection<object?> list)
-                    {
-                        length = list.Count;
-                    }
-                    else if (collection is System.Collections.ICollection col)
-                    {
-                        length = col.Count;
-                    }
-                    else if (collection is string str)
-                    {
-                        length = str.Length;
-                    }
-                    else
-                    {
-                        throw new Exception($"无法获取类型 {collection?.GetType().Name} 的长度");
-                    }
-
-                    _stack.Push(length);
+                    length = array.Length;
                 }
+                else if (collection is ICollection<object?> list)
+                {
+                    length = list.Count;
+                }
+                else if (collection is System.Collections.ICollection col)
+                {
+                    length = col.Count;
+                }
+                else if (collection is string str)
+                {
+                    length = str.Length;
+                }
+                else
+                {
+                    throw new Exception($"无法获取类型 {collection?.GetType().Name} 的长度");
+                }
+
+                _stack.Push(length);
+            }
+                break;
+
+            case OpCode.GetIndex:
+            {
+                // 栈顶: index, collection
+                var index = _stack.Pop();
+                var collection = _stack.Pop();
+
+                if (collection is Array array)
+                {
+                    int idx = Convert.ToInt32(index);
+                    _stack.Push(array.GetValue(idx));
+                }
+                else if (collection is IList list)
+                {
+                    int idx = Convert.ToInt32(index);
+                    _stack.Push(list[idx]);
+                }
+                else if (collection is System.Collections.IDictionary dict)
+                {
+                    _stack.Push(dict[index]);
+                }
+                else if (collection is string str)
+                {
+                    int idx = Convert.ToInt32(index);
+                    _stack.Push(str[idx]);
+                }
+                else
+                {
+                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行索引访问");
+                }
+            }
+                break;
+
+            case OpCode.SetIndex:
+            {
+                // 栈顶: value, index, collection
+                var value = _stack.Pop();
+                var index = _stack.Pop();
+                var collection = _stack.Pop();
+
+                if (collection is Array array)
+                {
+                    int idx = Convert.ToInt32(index);
+                    array.SetValue(value, idx);
+                }
+                else if (collection is IList list)
+                {
+                    int idx = Convert.ToInt32(index);
+                    list[idx] = value;
+                }
+                else if (collection is System.Collections.IDictionary dict)
+                {
+                    dict[index] = value;
+                }
+                else
+                {
+                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行索引赋值");
+                }
+            }
                 break;
 
             case OpCode.NewRange:
+            {
+                // 栈顶: step, end, start
+                var step = _stack.Pop();
+                var end = _stack.Pop();
+                var start = _stack.Pop();
+
+                // 转换为整数
+                int startInt = Convert.ToInt32(start);
+                int endInt = Convert.ToInt32(end);
+                int stepInt = step != null ? Convert.ToInt32(step) : 1;
+
+                // 创建范围对象 (使用List<int>表示范围)
+                var range = new List<int>();
+                if (stepInt > 0)
                 {
-                    // 栈顶: step, end, start
-                    var step = _stack.Pop();
-                    var end = _stack.Pop();
-                    var start = _stack.Pop();
-
-                    // 转换为整数
-                    int startInt = Convert.ToInt32(start);
-                    int endInt = Convert.ToInt32(end);
-                    int stepInt = step != null ? Convert.ToInt32(step) : 1;
-
-                    // 创建范围对象 (使用List<int>表示范围)
-                    var range = new List<int>();
-                    if (stepInt > 0)
+                    for (int i = startInt; i < endInt; i += stepInt)
                     {
-                        for (int i = startInt; i < endInt; i += stepInt)
-                        {
-                            range.Add(i);
-                        }
+                        range.Add(i);
                     }
-                    else if (stepInt < 0)
-                    {
-                        for (int i = startInt; i > endInt; i += stepInt)
-                        {
-                            range.Add(i);
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("范围的步长不能为0");
-                    }
-
-                    _stack.Push(range);
                 }
+                else if (stepInt < 0)
+                {
+                    for (int i = startInt; i > endInt; i += stepInt)
+                    {
+                        range.Add(i);
+                    }
+                }
+                else
+                {
+                    throw new Exception("范围的步长不能为0");
+                }
+
+                _stack.Push(range);
+            }
                 break;
 
             // === 迭代器操作 ===
             case OpCode.GetIterator:
+            {
+                var collection = _stack.Pop();
+                if (collection is IEnumerable enumerable)
                 {
-                    var collection = _stack.Pop();
-                    if (collection is System.Collections.IEnumerable enumerable)
-                    {
-                        var enumerator = enumerable.GetEnumerator();
-                        _stack.Push(enumerator);
-                    }
-                    else
-                    {
-                        throw new Exception($"对象类型 {collection?.GetType().Name} 不可迭代");
-                    }
+                    var enumerator = enumerable.GetEnumerator();
+                    _stack.Push(enumerator);
                 }
+                else
+                {
+                    throw new Exception($"对象类型 {collection?.GetType().Name} 不可迭代");
+                }
+            }
                 break;
 
             case OpCode.IteratorMoveNext:
+            {
+                if (_stack.Peek() is IEnumerator enumerator)
                 {
-                    var enumerator = _stack.Peek() as System.Collections.IEnumerator;
-                    if (enumerator != null)
-                    {
-                        bool hasNext = enumerator.MoveNext();
-                        _stack.Push(hasNext);
-                    }
-                    else
-                    {
-                        var top = _stack.Count > 0 ? _stack.Peek() : null;
-                        var topType = top?.GetType().FullName ?? "null";
-                        throw new Exception($"栈顶不是迭代器对象，而是: {topType}");
-                    }
+                    bool hasNext = enumerator.MoveNext();
+                    _stack.Push(hasNext);
                 }
+                else
+                {
+                    var top = _stack.Count > 0 ? _stack.Peek() : null;
+                    var topType = top?.GetType().FullName ?? "null";
+                    throw new Exception($"栈顶不是迭代器对象，而是: {topType}");
+                }
+            }
                 break;
 
             case OpCode.IteratorCurrent:
+            {
+                // 栈顶应该是迭代器
+                if (_stack.Count == 0)
                 {
-                    // 栈顶应该是迭代器
-                    if (_stack.Count == 0)
-                    {
-                        throw new Exception("IteratorCurrent: 栈为空");
-                    }
-
-                    var top = _stack.Peek();
-                    var enumerator = top as System.Collections.IEnumerator;
-                    if (enumerator != null)
-                    {
-                        _stack.Push(enumerator.Current);
-                    }
-                    else
-                    {
-                        // 调试：输出栈的详细信息
-                        var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
-                        var topType = top?.GetType().FullName ?? "null";
-                        throw new Exception($"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
-                    }
+                    throw new Exception("IteratorCurrent: 栈为空");
                 }
+
+                var top = _stack.Peek();
+                if (top is IEnumerator enumerator)
+                {
+                    _stack.Push(enumerator.Current);
+                }
+                else
+                {
+                    // 调试：输出栈的详细信息
+                    var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                    var topType = top?.GetType().FullName ?? "null";
+                    throw new Exception($"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
+                }
+            }
+                break;
+
+            case OpCode.Slice:
+            {
+                // 栈顶: step, end, start, collection
+                var step = _stack.Pop();
+                var end = _stack.Pop();
+                var start = _stack.Pop();
+                var collection = _stack.Pop();
+
+                int startIdx = Convert.ToInt32(start);
+                int endIdx = end != null ? Convert.ToInt32(end) : int.MaxValue;
+                int stepVal = step != null ? Convert.ToInt32(step) : 1;
+
+                if (collection is Array array)
+                {
+                    var result = SliceArray(array, startIdx, endIdx, stepVal);
+                    _stack.Push(result);
+                }
+                else if (collection is IList list)
+                {
+                    var result = SliceList(list, startIdx, endIdx, stepVal);
+                    _stack.Push(result);
+                }
+                else if (collection is string str)
+                {
+                    var result = SliceString(str, startIdx, endIdx, stepVal);
+                    _stack.Push(result);
+                }
+                else
+                {
+                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行切片操作");
+                }
+            }
                 break;
 
             // === 类型操作 ===
             case OpCode.Cast:
+            {
+                var targetTypeName = (string)instruction.Operand!;
+                var value = _stack.Pop();
+
+                // 执行类型转换
+                object? convertedValue = targetTypeName.ToLower() switch
                 {
-                    var targetTypeName = (string)instruction.Operand!;
-                    var value = _stack.Pop();
+                    "int" => Convert.ToInt32(value),
+                    "double" => Convert.ToDouble(value),
+                    "string" => value?.ToString() ?? "",
+                    "bool" => Convert.ToBoolean(value),
+                    "char" => Convert.ToChar(value),
+                    _ => value // 其他类型直接返回原值
+                };
 
-                    // 执行类型转换
-                    object? convertedValue = targetTypeName.ToLower() switch
-                    {
-                        "int" => Convert.ToInt32(value),
-                        "double" => Convert.ToDouble(value),
-                        "string" => value?.ToString() ?? "",
-                        "bool" => Convert.ToBoolean(value),
-                        "char" => Convert.ToChar(value),
-                        _ => value // 其他类型直接返回原值
-                    };
-
-                    _stack.Push(convertedValue);
-                }
+                _stack.Push(convertedValue);
+            }
                 break;
 
             case OpCode.IsType:
+            {
+                var targetTypeName = (string)instruction.Operand!;
+                var value = _stack.Pop();
+
+                // 检查类型
+                bool isType = targetTypeName.ToLower() switch
                 {
-                    var targetTypeName = (string)instruction.Operand!;
-                    var value = _stack.Pop();
+                    "int" => value is int,
+                    "double" => value is double,
+                    "string" => value is string,
+                    "bool" => value is bool,
+                    "char" => value is char,
+                    "array" => value is Array,
+                    "list" => value is System.Collections.IList,
+                    "dict" => value is System.Collections.IDictionary,
+                    "null" => value == null,
+                    _ => false
+                };
 
-                    // 检查类型
-                    bool isType = targetTypeName.ToLower() switch
-                    {
-                        "int" => value is int,
-                        "double" => value is double,
-                        "string" => value is string,
-                        "bool" => value is bool,
-                        "char" => value is char,
-                        "array" => value is Array,
-                        "list" => value is System.Collections.IList,
-                        "dict" => value is System.Collections.IDictionary,
-                        "null" => value == null,
-                        _ => false
-                    };
-
-                    _stack.Push(isType);
-                }
+                _stack.Push(isType);
+            }
                 break;
 
             case OpCode.TypeOf:
+            {
+                var value = _stack.Pop();
+                string typeName;
+
+                if (value == null)
                 {
-                    var value = _stack.Pop();
-                    string typeName;
-
-                    if (value == null)
-                    {
-                        typeName = "null";
-                    }
-                    else if (value is int)
-                    {
-                        typeName = "int";
-                    }
-                    else if (value is double)
-                    {
-                        typeName = "double";
-                    }
-                    else if (value is string)
-                    {
-                        typeName = "string";
-                    }
-                    else if (value is bool)
-                    {
-                        typeName = "bool";
-                    }
-                    else if (value is char)
-                    {
-                        typeName = "char";
-                    }
-                    else if (value is Array)
-                    {
-                        typeName = "array";
-                    }
-                    else if (value is System.Collections.IList)
-                    {
-                        typeName = "list";
-                    }
-                    else if (value is System.Collections.IDictionary)
-                    {
-                        typeName = "dict";
-                    }
-                    else
-                    {
-                        typeName = value.GetType().Name;
-                    }
-
-                    _stack.Push(typeName);
+                    typeName = "null";
                 }
+                else if (value is int)
+                {
+                    typeName = "int";
+                }
+                else if (value is double)
+                {
+                    typeName = "double";
+                }
+                else if (value is string)
+                {
+                    typeName = "string";
+                }
+                else if (value is bool)
+                {
+                    typeName = "bool";
+                }
+                else if (value is char)
+                {
+                    typeName = "char";
+                }
+                else if (value is Array)
+                {
+                    typeName = "array";
+                }
+                else if (value is System.Collections.IList)
+                {
+                    typeName = "list";
+                }
+                else if (value is System.Collections.IDictionary)
+                {
+                    typeName = "dict";
+                }
+                else
+                {
+                    typeName = value.GetType().Name;
+                }
+
+                _stack.Push(typeName);
+            }
                 break;
 
             // === 并发原语 ===
             case OpCode.MutexCreate:
-                {
-                    var mutexId = Concurrency.ResourceManager.CreateMutex();
-                    _stack.Push(mutexId);
-                }
+            {
+                var mutexId = Concurrency.ResourceManager.CreateMutex();
+                _stack.Push(mutexId);
+            }
                 break;
 
             case OpCode.MutexLock:
-                {
-                    var mutexId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.LockMutex(mutexId);
-                }
+            {
+                var mutexId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.LockMutex(mutexId);
+            }
                 break;
 
             case OpCode.MutexUnlock:
-                {
-                    var mutexId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.UnlockMutex(mutexId);
-                }
+            {
+                var mutexId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.UnlockMutex(mutexId);
+            }
                 break;
 
             case OpCode.MutexDispose:
-                {
-                    var mutexId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.DisposeMutex(mutexId);
-                }
+            {
+                var mutexId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.DisposeMutex(mutexId);
+            }
                 break;
 
             case OpCode.ChannelCreate:
-                {
-                    var channelId = Concurrency.ResourceManager.CreateChannel();
-                    _stack.Push(channelId);
-                }
+            {
+                var channelId = Concurrency.ResourceManager.CreateChannel();
+                _stack.Push(channelId);
+            }
                 break;
 
             case OpCode.ChannelSend:
-                {
-                    var value = _stack.Pop();
-                    var channelId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.SendChannel(channelId, value);
-                }
+            {
+                var value = _stack.Pop();
+                var channelId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.SendChannel(channelId, value);
+            }
                 break;
 
             case OpCode.ChannelReceive:
-                {
-                    var channelId = Convert.ToInt32(_stack.Pop());
-                    var value = Concurrency.ResourceManager.ReceiveChannel(channelId);
-                    _stack.Push(value);
-                }
+            {
+                var channelId = Convert.ToInt32(_stack.Pop());
+                var value = Concurrency.ResourceManager.ReceiveChannel(channelId);
+                _stack.Push(value);
+            }
                 break;
 
             case OpCode.ChannelClose:
-                {
-                    var channelId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.CloseChannel(channelId);
-                }
+            {
+                var channelId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.CloseChannel(channelId);
+            }
                 break;
 
             case OpCode.SemaphoreCreate:
-                {
-                    // 栈顶: maxCount, initialCount
-                    var maxCount = Convert.ToInt32(_stack.Pop());
-                    var initialCount = Convert.ToInt32(_stack.Pop());
-                    var semaphoreId = Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
-                    _stack.Push(semaphoreId);
-                }
+            {
+                // 栈顶: maxCount, initialCount
+                var maxCount = Convert.ToInt32(_stack.Pop());
+                var initialCount = Convert.ToInt32(_stack.Pop());
+                var semaphoreId = Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
+                _stack.Push(semaphoreId);
+            }
                 break;
 
             case OpCode.SemaphoreAcquire:
-                {
-                    var semaphoreId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
-                }
+            {
+                var semaphoreId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
+            }
                 break;
 
             case OpCode.SemaphoreRelease:
-                {
-                    var semaphoreId = Convert.ToInt32(_stack.Pop());
-                    Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
-                }
+            {
+                var semaphoreId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
+            }
                 break;
 
             // === 异步支持 ===
             case OpCode.Await:
+            {
+                var taskValue = _stack.Pop();
+
+                // 如果是TaskLangValue，等待其完成
+                if (taskValue is TaskLangValue task)
                 {
-                    var taskValue = _stack.Pop();
+                    // 同步等待Task完成
+                    task.Task.Wait();
 
-                    // 如果是TaskLangValue，等待其完成
-                    if (taskValue is TaskLangValue task)
-                    {
-                        // 同步等待Task完成
-                        task.Task.Wait();
-
-                        // 将结果压入栈
-                        if (task.Result != null)
-                        {
-                            _stack.Push(task.Result.GetValue());
-                        }
-                        else
-                        {
-                            _stack.Push(null);
-                        }
-                    }
-                    else
-                    {
-                        // 如果不是Task，直接返回原值
-                        _stack.Push(taskValue);
-                    }
+                    // 将结果压入栈
+                    _stack.Push(task.Result?.GetValue());
                 }
+                else
+                {
+                    // 如果不是Task，直接返回原值
+                    _stack.Push(taskValue);
+                }
+            }
                 break;
 
             case OpCode.Yield:
-                {
-                    // Yield操作：生成器返回一个值
-                    // 在字节码VM中，我们简化实现：
-                    // 1. 从栈中弹出要yield的值
-                    // 2. 将值存储到某个位置（例如返回值）
-                    // 3. 暂停执行（通过返回实现）
+            {
+                // Yield操作：生成器返回一个值
+                // 在字节码VM中，我们简化实现：
+                // 1. 从栈中弹出要yield的值
+                // 2. 将值存储到某个位置（例如返回值）
+                // 3. 暂停执行（通过返回实现）
 
-                    // 注意：完整的生成器支持需要状态机，这里是简化版本
-                    var yieldValue = _stack.Pop();
+                // 注意：完整的生成器支持需要状态机，这里是简化版本
+                var yieldValue = _stack.Pop();
 
-                    // 将yield的值压回栈顶作为返回值
-                    _stack.Push(yieldValue);
+                // 将yield的值压回栈顶作为返回值
+                _stack.Push(yieldValue);
 
-                    // TODO: 完整的生成器实现需要：
-                    // - 保存当前执行状态（IP、局部变量）
-                    // - 创建可恢复的迭代器对象
-                    // - 支持多次yield和恢复执行
-                }
+                // TODO: 完整的生成器实现需要：
+                // - 保存当前执行状态（IP、局部变量）
+                // - 创建可恢复的迭代器对象
+                // - 支持多次yield和恢复执行
+            }
                 break;
 
             case OpCode.NewTask:
+            {
+                // NewTask操作：创建一个新的异步任务
+                // 栈布局：[函数索引, 参数数量, arg1, arg2, ...]
+
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)operands[1];
+
+                // 从栈中弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
                 {
-                    // NewTask操作：创建一个新的异步任务
-                    // 栈布局：[函数索引, 参数数量, arg1, arg2, ...]
-
-                    var operands = (object[])instruction.Operand!;
-                    int argCount = (int)operands[0];
-                    string funcName = (string)operands[1];
-
-                    // 从栈中弹出参数
-                    var args = new object?[argCount];
-                    for (int i = argCount - 1; i >= 0; i--)
-                    {
-                        args[i] = _stack.Pop();
-                    }
-
-                    // 查找函数
-                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                    if (function == null)
-                    {
-                        throw new Exception($"未定义的函数: {funcName}");
-                    }
-
-                    // 创建异步任务
-                    var task = Task.Run(() =>
-                    {
-                        // 在新线程中执行函数
-                        CallFunction(function, args);
-
-                        // 返回栈顶的值作为结果
-                        var result = _stack.Count > 0 ? _stack.Pop() : null;
-                        return result != null ? LangValueType.ObjToValue(result) : new NullLangValue();
-                    });
-
-                    // 将Task包装为TaskLangValue并压入栈
-                    var taskValue = new TaskLangValue(task);
-                    _stack.Push(taskValue);
+                    args[i] = _stack.Pop();
                 }
+
+                // 查找函数
+                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                if (function == null)
+                {
+                    throw new Exception($"未定义的函数: {funcName}");
+                }
+
+                // 创建异步任务
+                var task = Task.Run(() =>
+                {
+                    // 在新线程中执行函数
+                    CallFunction(function, args);
+
+                    // 返回栈顶的值作为结果
+                    var result = _stack.Count > 0 ? _stack.Pop() : null;
+                    return result != null ? LangValueType.ObjToValue(result) : new NullLangValue();
+                });
+
+                // 将Task包装为TaskLangValue并压入栈
+                var taskValue = new TaskLangValue(task);
+                _stack.Push(taskValue);
+            }
                 break;
 
             // === 异常处理 ===
             case OpCode.Throw:
-                {
-                    var exceptionValue = _stack.Pop();
-                    var message = ToString(exceptionValue);
-                    throw new Exception(message);
-                }
+            {
+                var exceptionValue = _stack.Pop();
+                var message = ToString(exceptionValue);
+                throw new Exception(message);
+            }
 
             case OpCode.TryBegin:
-                {
-                    // TryBegin操作：开始try块
-                    // 操作数: [catchOffset, finallyOffset]
-                    var operands = (int[])instruction.Operand!;
-                    int catchOffset = operands[0];
-                    int finallyOffset = operands.Length > 1 ? operands[1] : -1;
+            {
+                // TryBegin操作：开始try块
+                // 操作数: [catchOffset, finallyOffset]
+                var operands = (int[])instruction.Operand!;
+                int catchOffset = operands[0];
+                int finallyOffset = operands.Length > 1 ? operands[1] : -1;
 
-                    // 创建异常处理器并压入栈
-                    var handler = new ExceptionHandler
-                    {
-                        CatchIP = catchOffset,
-                        FinallyIP = finallyOffset,
-                        EndIP = -1, // 将在TryEnd时设置
-                        InFinally = false
-                    };
-                    _exceptionHandlers.Push(handler);
-                }
+                // 创建异常处理器并压入栈
+                var handler = new ExceptionHandler
+                {
+                    CatchIP = catchOffset,
+                    FinallyIP = finallyOffset,
+                    EndIP = -1, // 将在TryEnd时设置
+                    InFinally = false
+                };
+                _exceptionHandlers.Push(handler);
+            }
                 break;
 
             case OpCode.TryEnd:
+            {
+                // TryEnd操作：结束try块
+                // 如果没有异常，跳过catch块，执行finally块（如果有）
+                if (_exceptionHandlers.Count > 0)
                 {
-                    // TryEnd操作：结束try块
-                    // 如果没有异常，跳过catch块，执行finally块（如果有）
-                    if (_exceptionHandlers.Count > 0)
-                    {
-                        var handler = _exceptionHandlers.Peek();
+                    var handler = _exceptionHandlers.Peek();
 
-                        // 如果有finally块，跳转到finally
-                        if (handler.FinallyIP >= 0)
-                        {
-                            frame.IP = handler.FinallyIP;
-                        }
-                        // 否则跳过整个try-catch块
-                        else if (handler.EndIP >= 0)
-                        {
-                            frame.IP = handler.EndIP;
-                        }
+                    // 如果有finally块，跳转到finally
+                    if (handler.FinallyIP >= 0)
+                    {
+                        frame.IP = handler.FinallyIP;
+                    }
+                    // 否则跳过整个try-catch块
+                    else if (handler.EndIP >= 0)
+                    {
+                        frame.IP = handler.EndIP;
                     }
                 }
+            }
                 break;
 
             case OpCode.CatchBegin:
-                {
-                    // CatchBegin操作：开始catch块
-                    // 异常对象应该已经在栈上
-                    // 这里不需要做特殊处理，只是标记进入catch块
-                }
+            {
+                // CatchBegin操作：开始catch块
+                // 异常对象应该已经在栈上
+                // 这里不需要做特殊处理，只是标记进入catch块
+            }
                 break;
 
             case OpCode.CatchEnd:
+            {
+                // CatchEnd操作：结束catch块
+                // 跳转到finally块（如果有）或结束
+                if (_exceptionHandlers.Count > 0)
                 {
-                    // CatchEnd操作：结束catch块
-                    // 跳转到finally块（如果有）或结束
-                    if (_exceptionHandlers.Count > 0)
-                    {
-                        var handler = _exceptionHandlers.Peek();
+                    var handler = _exceptionHandlers.Peek();
 
-                        // 如果有finally块，跳转到finally
-                        if (handler.FinallyIP >= 0)
-                        {
-                            frame.IP = handler.FinallyIP;
-                        }
-                        // 否则跳到结束
-                        else if (handler.EndIP >= 0)
-                        {
-                            frame.IP = handler.EndIP;
-                        }
+                    // 如果有finally块，跳转到finally
+                    if (handler.FinallyIP >= 0)
+                    {
+                        frame.IP = handler.FinallyIP;
+                    }
+                    // 否则跳到结束
+                    else if (handler.EndIP >= 0)
+                    {
+                        frame.IP = handler.EndIP;
                     }
                 }
+            }
                 break;
 
             case OpCode.FinallyBegin:
+            {
+                // FinallyBegin操作：开始finally块
+                if (_exceptionHandlers.Count > 0)
                 {
-                    // FinallyBegin操作：开始finally块
-                    if (_exceptionHandlers.Count > 0)
-                    {
-                        var handler = _exceptionHandlers.Peek();
-                        handler.InFinally = true;
-                    }
+                    var handler = _exceptionHandlers.Peek();
+                    handler.InFinally = true;
                 }
+            }
                 break;
 
             case OpCode.FinallyEnd:
+            {
+                // FinallyEnd操作：结束finally块
+                // 弹出异常处理器
+                if (_exceptionHandlers.Count > 0)
                 {
-                    // FinallyEnd操作：结束finally块
-                    // 弹出异常处理器
-                    if (_exceptionHandlers.Count > 0)
-                    {
-                        _exceptionHandlers.Pop();
-                    }
+                    _exceptionHandlers.Pop();
                 }
+            }
                 break;
 
             case OpCode.DebugPrint:
-                {
-                    int messageIndex = (int)instruction.Operand!;
-                    var message = _bytecodeFile.ConstantPool.GetConstant(messageIndex);
-                    var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
-                    Console.WriteLine($"{message} - 栈深度:{_stack.Count}, 内容:[{stackContents}]");
-                }
+            {
+                int messageIndex = (int)instruction.Operand!;
+                var message = _bytecodeFile.ConstantPool.GetConstant(messageIndex);
+                var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                Console.WriteLine($"{message} - 栈深度:{_stack.Count}, 内容:[{stackContents}]");
+            }
                 break;
 
             default:
@@ -1071,6 +1163,7 @@ public class VirtualMachine
                 {
                     Console.WriteLine();
                 }
+
                 return null;
 
             case "Print":
@@ -1078,6 +1171,7 @@ public class VirtualMachine
                 {
                     Console.Write(ToString(args[0]));
                 }
+
                 return null;
 
             case "ReadLine":
@@ -1091,6 +1185,7 @@ public class VirtualMachine
                 {
                     return result;
                 }
+
                 return 0;
 
             case "ToDouble":
@@ -1098,6 +1193,7 @@ public class VirtualMachine
                 {
                     return dresult;
                 }
+
                 return 0.0;
 
             // === Mutex函数 ===
@@ -1110,6 +1206,7 @@ public class VirtualMachine
                     int mutexId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.LockMutex(mutexId);
                 }
+
                 return null;
 
             case "MutexUnlock":
@@ -1118,6 +1215,7 @@ public class VirtualMachine
                     int mutexId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.UnlockMutex(mutexId);
                 }
+
                 return null;
 
             case "MutexDispose":
@@ -1126,6 +1224,7 @@ public class VirtualMachine
                     int mutexId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.DisposeMutex(mutexId);
                 }
+
                 return null;
 
             // === Channel函数 ===
@@ -1139,6 +1238,7 @@ public class VirtualMachine
                     object? value = args[1];
                     Concurrency.ResourceManager.SendChannel(channelId, value);
                 }
+
                 return null;
 
             case "ChannelReceive":
@@ -1147,6 +1247,7 @@ public class VirtualMachine
                     int channelId = Convert.ToInt32(args[0]);
                     return Concurrency.ResourceManager.ReceiveChannel(channelId);
                 }
+
                 return null;
 
             case "ChannelClose":
@@ -1155,6 +1256,7 @@ public class VirtualMachine
                     int channelId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.CloseChannel(channelId);
                 }
+
                 return null;
 
             // === Semaphore函数 ===
@@ -1165,6 +1267,7 @@ public class VirtualMachine
                     int maxCount = Convert.ToInt32(args[1]);
                     return Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
                 }
+
                 return 0;
 
             case "SemaphoreAcquire":
@@ -1173,6 +1276,7 @@ public class VirtualMachine
                     int semaphoreId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
                 }
+
                 return null;
 
             case "SemaphoreRelease":
@@ -1181,11 +1285,117 @@ public class VirtualMachine
                     int semaphoreId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
                 }
+
                 return null;
 
             default:
                 throw new Exception($"未知的原生函数: {funcName}");
         }
+    }
+
+    /// <summary>
+    /// 对数组执行切片操作
+    /// </summary>
+    private object? SliceArray(Array array, int start, int end, int step)
+    {
+        var length = array.Length;
+
+        // 处理负索引
+        if (start < 0) start = length + start;
+        if (end < 0) end = length + end;
+
+        // 边界检查
+        start = Math.Max(0, Math.Min(start, length));
+        end = Math.Min(length, end);
+
+        var result = new List<object?>();
+
+        if (step > 0)
+        {
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(array.GetValue(i));
+            }
+        }
+        else if (step < 0)
+        {
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(array.GetValue(i));
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// 对列表执行切片操作
+    /// </summary>
+    private object? SliceList(IList list, int start, int end, int step)
+    {
+        var length = list.Count;
+
+        // 处理负索引
+        if (start < 0) start = length + start;
+        if (end < 0) end = length + end;
+
+        // 边界检查
+        start = Math.Max(0, Math.Min(start, length));
+        end = Math.Min(length, end);
+
+        var result = new List<object?>();
+
+        if (step > 0)
+        {
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(list[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(list[i]);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 对字符串执行切片操作
+    /// </summary>
+    private string SliceString(string str, int start, int end, int step)
+    {
+        var length = str.Length;
+
+        // 处理负索引
+        if (start < 0) start = length + start;
+        if (end < 0) end = length + end;
+
+        // 边界检查
+        start = Math.Max(0, Math.Min(start, length));
+        end = Math.Min(length, end);
+
+        var result = new System.Text.StringBuilder();
+
+        if (step > 0)
+        {
+            for (int i = start; i < end; i += step)
+            {
+                result.Append(str[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            for (int i = start; i > end; i += step)
+            {
+                result.Append(str[i]);
+            }
+        }
+
+        return result.ToString();
     }
 }
 

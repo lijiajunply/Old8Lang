@@ -159,6 +159,9 @@ public enum OpCode : byte
     /// <summary>获取迭代器当前元素</summary>
     IteratorCurrent = 0x68,
 
+    /// <summary>切片操作 (collection[start:end:step])</summary>
+    Slice = 0x69,
+
     // ===== 类型操作 (0x70-0x7F) =====
     /// <summary>类型转换 (操作数: targetTypeIndex)</summary>
     Cast = 0x70,
