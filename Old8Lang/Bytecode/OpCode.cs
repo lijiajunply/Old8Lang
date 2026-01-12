@@ -112,6 +112,12 @@ public enum OpCode : byte
     /// <summary>返回void</summary>
     ReturnVoid = 0x46,
 
+    /// <summary>跳出循环 (break语句)</summary>
+    Break = 0x47,
+
+    /// <summary>继续下一次循环 (continue语句)</summary>
+    Continue = 0x48,
+
     // ===== 对象操作 (0x50-0x5F) =====
     /// <summary>创建新对象 (操作数: classNameIndex)</summary>
     NewObject = 0x50,

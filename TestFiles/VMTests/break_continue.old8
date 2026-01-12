@@ -1,0 +1,79 @@
+// 测试虚拟机模式的 break 和 continue 功能
+
+// 测试1: while循环中的break
+PrintLine("=== 测试1: while循环中的break ===")
+i <- 0
+while i < 10 {
+    if i == 5 {
+        break
+    }
+    PrintLine("i = " + i.ToStr())
+    i <- i + 1
+}
+PrintLine("循环结束, i = " + i.ToStr())
+
+// 测试2: while循环中的continue
+PrintLine("\n=== 测试2: while循环中的continue ===")
+j <- 0
+while j < 5 {
+    j <- j + 1
+    if j == 3 {
+        continue
+    }
+    PrintLine("j = " + j.ToStr())
+}
+
+// 测试3: for循环中的break
+PrintLine("\n=== 测试3: for循环中的break ===")
+for k <- 0, k < 10, k <- k + 1 {
+    if k == 7 {
+        break
+    }
+    PrintLine("k = " + k.ToStr())
+}
+
+// 测试4: for循环中的continue
+PrintLine("\n=== 测试4: for循环中的continue ===")
+for m <- 0, m < 5, m <- m + 1 {
+    if m == 2 {
+        continue
+    }
+    PrintLine("m = " + m.ToStr())
+}
+
+// 测试5: for-in循环中的break
+PrintLine("\n=== 测试5: for-in循环中的break ===")
+arr <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+for item in arr {
+    if item == 6 {
+        break
+    }
+    PrintLine("item = " + item.ToStr())
+}
+
+// 测试6: for-in循环中的continue
+PrintLine("\n=== 测试6: for-in循环中的continue ===")
+list <- {10, 20, 30, 40, 50}
+for val in list {
+    if val == 30 {
+        continue
+    }
+    PrintLine("val = " + val.ToStr())
+}
+
+// 测试7: 嵌套循环中的break和continue
+PrintLine("\n=== 测试7: 嵌套循环中的break和continue ===")
+for x <- 0, x < 3, x <- x + 1 {
+    PrintLine("外层循环 x = " + x.ToStr())
+    for y <- 0, y < 5, y <- y + 1 {
+        if y == 3 {
+            break
+        }
+        if y == 1 {
+            continue
+        }
+        PrintLine("  内层循环 y = " + y.ToStr())
+    }
+}
+
+PrintLine("\n所有测试完成!")

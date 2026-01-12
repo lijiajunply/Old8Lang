@@ -235,7 +235,12 @@ public partial class BytecodeVisitor
             throw new Exception("WhileStatement节点缺少必要的字段");
         }
 
+        // 创建循环标签
+        var loopLabels = new LoopLabels();
+        _loopLabels.Push(loopLabels);
+
         int loopStart = GetCurrentPosition();
+        loopLabels.ContinueTarget = loopStart;
 
         // 生成条件代码
         expression.Accept(this);
@@ -251,7 +256,22 @@ public partial class BytecodeVisitor
         Emit(OpCode.Jump, loopStart);
 
         // 修补跳出循环的跳转
-        PatchJump(jumpIfFalseIndex, GetCurrentPosition());
+        int loopEnd = GetCurrentPosition();
+        PatchJump(jumpIfFalseIndex, loopEnd);
+
+        // 修补所有break跳转
+        foreach (var breakJump in loopLabels.BreakJumps)
+        {
+            PatchJump(breakJump, loopEnd);
+        }
+
+        // 修补所有continue跳转
+        foreach (var continueJump in loopLabels.ContinueJumps)
+        {
+            PatchJump(continueJump, loopLabels.ContinueTarget);
+        }
+
+        _loopLabels.Pop();
 
         return null;
     }
@@ -263,6 +283,10 @@ public partial class BytecodeVisitor
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         var statement = GetPrimaryConstructorParameter<OldStatement>(node, "statement");
         var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "blockStatement");
+
+        // 创建循环标签
+        var loopLabels = new LoopLabels();
+        _loopLabels.Push(loopLabels);
 
         // 初始化
         if (setStatement != null)
@@ -281,6 +305,10 @@ public partial class BytecodeVisitor
             // 生成循环体代码
             blockStatement?.Accept(this);
 
+            // continue跳转到这里(增量语句之前)
+            int continueTarget = GetCurrentPosition();
+            loopLabels.ContinueTarget = continueTarget;
+
             // 增量
             if (statement != null)
                 statement.Accept(this);
@@ -289,18 +317,50 @@ public partial class BytecodeVisitor
             Emit(OpCode.Jump, loopStart);
 
             // 修补跳出循环
-            PatchJump(jumpIfFalseIndex, GetCurrentPosition());
+            int loopEnd = GetCurrentPosition();
+            PatchJump(jumpIfFalseIndex, loopEnd);
+
+            // 修补所有break跳转
+            foreach (var breakJump in loopLabels.BreakJumps)
+            {
+                PatchJump(breakJump, loopEnd);
+            }
+
+            // 修补所有continue跳转
+            foreach (var continueJump in loopLabels.ContinueJumps)
+            {
+                PatchJump(continueJump, continueTarget);
+            }
         }
         else
         {
             // 无条件循环
             blockStatement?.Accept(this);
 
+            // continue跳转到这里(增量语句之前)
+            int continueTarget = GetCurrentPosition();
+            loopLabels.ContinueTarget = continueTarget;
+
             if (statement != null)
                 statement.Accept(this);
 
             Emit(OpCode.Jump, loopStart);
+
+            // 修补所有break跳转(无条件循环的break跳到循环后)
+            int loopEnd = GetCurrentPosition();
+            foreach (var breakJump in loopLabels.BreakJumps)
+            {
+                PatchJump(breakJump, loopEnd);
+            }
+
+            // 修补所有continue跳转
+            foreach (var continueJump in loopLabels.ContinueJumps)
+            {
+                PatchJump(continueJump, continueTarget);
+            }
         }
+
+        _loopLabels.Pop();
 
         return null;
     }
@@ -325,15 +385,37 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitBreakStatement(BreakStatement node)
     {
-        // TODO: 实现break跳转
-        Emit(OpCode.Nop);
+        // 检查是否在循环内部
+        if (_loopLabels.Count == 0)
+        {
+            throw new Exception("break语句只能在循环内部使用");
+        }
+
+        // 记录需要修补的跳转位置
+        var currentLoop = _loopLabels.Peek();
+        currentLoop.BreakJumps.Add(GetCurrentPosition());
+
+        // 发出跳转指令(目标位置稍后修补)
+        Emit(OpCode.Jump, -1);
+
         return null;
     }
 
     public Instruction? VisitContinueStatement(ContinueStatement node)
     {
-        // TODO: 实现continue跳转
-        Emit(OpCode.Nop);
+        // 检查是否在循环内部
+        if (_loopLabels.Count == 0)
+        {
+            throw new Exception("continue语句只能在循环内部使用");
+        }
+
+        // 记录需要修补的跳转位置
+        var currentLoop = _loopLabels.Peek();
+        currentLoop.ContinueJumps.Add(GetCurrentPosition());
+
+        // 发出跳转指令(目标位置稍后修补)
+        Emit(OpCode.Jump, -1);
+
         return null;
     }
 
@@ -384,6 +466,10 @@ public partial class BytecodeVisitor
 
         string varName = id.IdName;
 
+        // 创建循环标签
+        var loopLabels = new LoopLabels();
+        _loopLabels.Push(loopLabels);
+
         // 生成集合表达式的代码（栈上现在有集合）
         expression.Accept(this);
 
@@ -392,6 +478,7 @@ public partial class BytecodeVisitor
 
         // 循环开始标签
         int loopStart = GetCurrentPosition();
+        loopLabels.ContinueTarget = loopStart;
 
         // 调用 MoveNext（栈：迭代器 → 迭代器, hasNext）
         Emit(OpCode.IteratorMoveNext);
@@ -423,7 +510,22 @@ public partial class BytecodeVisitor
         Emit(OpCode.Jump, loopStart);
 
         // 修补跳出循环的跳转
-        PatchJump(jumpIfFalse, GetCurrentPosition());
+        int loopEnd = GetCurrentPosition();
+        PatchJump(jumpIfFalse, loopEnd);
+
+        // 修补所有break跳转
+        foreach (var breakJump in loopLabels.BreakJumps)
+        {
+            PatchJump(breakJump, loopEnd);
+        }
+
+        // 修补所有continue跳转
+        foreach (var continueJump in loopLabels.ContinueJumps)
+        {
+            PatchJump(continueJump, loopLabels.ContinueTarget);
+        }
+
+        _loopLabels.Pop();
 
         // 弹出迭代器
         Emit(OpCode.Pop);

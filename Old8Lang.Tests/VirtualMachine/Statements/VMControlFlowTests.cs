@@ -494,4 +494,194 @@ public class VMControlFlowTests
     }
 
     #endregion
+
+    #region Break和Continue测试
+
+    [Fact]
+    public void WhileLoopWithBreak_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            i <- 0
+            sum <- 0
+            while i < 10 {
+                if i == 5 {
+                    break
+                }
+                sum <- sum + i
+                i <- i + 1
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("10", output); // 0 + 1 + 2 + 3 + 4 = 10
+    }
+
+    [Fact]
+    public void WhileLoopWithContinue_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            i <- 0
+            sum <- 0
+            while i < 5 {
+                i <- i + 1
+                if i == 3 {
+                    continue
+                }
+                sum <- sum + i
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("12", output); // 1 + 2 + 4 + 5 = 12 (跳过3)
+    }
+
+    [Fact]
+    public void ForLoopWithBreak_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            sum <- 0
+            for i <- 1, i <= 10, i++ {
+                if i == 6 {
+                    break
+                }
+                sum <- sum + i
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("15", output); // 1 + 2 + 3 + 4 + 5 = 15
+    }
+
+    [Fact]
+    public void ForLoopWithContinue_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            sum <- 0
+            for i <- 1, i <= 5, i++ {
+                if i == 3 {
+                    continue
+                }
+                sum <- sum + i
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("12", output); // 1 + 2 + 4 + 5 = 12 (跳过3)
+    }
+
+    [Fact]
+    public void ForInLoopWithBreak_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            arr <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            sum <- 0
+            for item in arr {
+                if item == 6 {
+                    break
+                }
+                sum <- sum + item
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("15", output); // 1 + 2 + 3 + 4 + 5 = 15
+    }
+
+    [Fact]
+    public void ForInLoopWithContinue_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            list <- {10, 20, 30, 40, 50}
+            sum <- 0
+            for val in list {
+                if val == 30 {
+                    continue
+                }
+                sum <- sum + val
+            }
+            PrintLine(sum.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("120", output); // 10 + 20 + 40 + 50 = 120 (跳过30)
+    }
+
+    [Fact]
+    public void NestedLoopWithBreak_OnlyBreaksInnerLoop()
+    {
+        // Arrange
+        var code = @"
+            count <- 0
+            for i <- 1, i <= 3, i++ {
+                for j <- 1, j <= 5, j++ {
+                    if j == 3 {
+                        break
+                    }
+                    count <- count + 1
+                }
+            }
+            PrintLine(count.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("6", output); // 每个外层循环执行2次内层循环: 3 * 2 = 6
+    }
+
+    [Fact]
+    public void NestedLoopWithContinue_OnlyAffectsInnerLoop()
+    {
+        // Arrange
+        var code = @"
+            count <- 0
+            for i <- 1, i <= 2, i++ {
+                for j <- 1, j <= 4, j++ {
+                    if j == 2 {
+                        continue
+                    }
+                    count <- count + 1
+                }
+            }
+            PrintLine(count.ToStr())
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("6", output); // 每个外层循环执行3次内层循环(跳过j=2): 2 * 3 = 6
+    }
+
+    #endregion
 }

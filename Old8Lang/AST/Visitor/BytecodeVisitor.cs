@@ -21,9 +21,22 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
     private int _currentStackSize = 0;
     private int _maxStackSize = 0;
 
+    // 循环标签栈 - 用于 break 和 continue
+    private readonly Stack<LoopLabels> _loopLabels = new();
+
     public BytecodeVisitor(BytecodeCompiler compiler)
     {
         _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
+    }
+
+    /// <summary>
+    /// 循环标签 - 存储 break 和 continue 的跳转位置
+    /// </summary>
+    private class LoopLabels
+    {
+        public List<int> BreakJumps { get; } = new();
+        public List<int> ContinueJumps { get; } = new();
+        public int ContinueTarget { get; set; }
     }
 
     /// <summary>

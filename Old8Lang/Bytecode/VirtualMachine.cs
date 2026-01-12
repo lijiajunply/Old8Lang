@@ -479,6 +479,16 @@ public class VirtualMachine
             case OpCode.ReturnVoid:
                 return; // 退出当前函数
 
+            case OpCode.Break:
+                // Break指令在字节码生成阶段已经被转换为Jump指令
+                // 这里不应该被执行到
+                throw new Exception("Break指令不应该在运行时被执行");
+
+            case OpCode.Continue:
+                // Continue指令在字节码生成阶段已经被转换为Jump指令
+                // 这里不应该被执行到
+                throw new Exception("Continue指令不应该在运行时被执行");
+
             // === 容器操作 ===
             case OpCode.NewArray:
             {
