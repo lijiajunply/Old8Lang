@@ -84,6 +84,7 @@ public class BytecodeCompiler
         _currentFunction = oldFunc;
 
         _bytecodeFile.Functions.Add(func);
+
         return func;
     }
 

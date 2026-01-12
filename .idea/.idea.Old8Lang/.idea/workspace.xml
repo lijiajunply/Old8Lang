@@ -23,7 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/VM_Status_Report.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests/VMTests/vm_func_only.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests/VMTests/vm_func_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -562,7 +565,7 @@
       <workItem from="1767865400494" duration="19888000" />
       <workItem from="1767985358686" duration="156000" />
       <workItem from="1767985518540" duration="4807000" />
-      <workItem from="1768162238074" duration="2034000" />
+      <workItem from="1768162238074" duration="3699000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -907,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="609" />
+    <option name="localTasksCounter" value="610" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(tests): 更新语言服务器测试目录重组总结文档&#10;&#10;- 添加了完整的测试目录重组概览和前后对比&#10;- 记录了39个文件从扁平化结构到分层结构的详细分类&#10;- 提供了各个子目录的功能说明和测试统计信息&#10;- 包含了技术实现细节和Git命令使用说明&#10;- 记录了重组效果验证和后续改进建议&#10;- 保留了完整的文件移动历史和向后兼容性说明" />
     <MESSAGE value="refactor(tests): 重构语言服务器测试目录结构&#10;&#10;- 将扁平化的测试文件重新组织到分层目录结构中&#10;- 按功能模块分类测试文件：Completion、Handlers、Services等&#10;- 更新所有测试文件的命名空间以匹配新的目录结构&#10;- 调整using语句顺序保持代码风格一致性&#10;- 删除不必要的using引用减少代码冗余&#10;- 保持所有测试功能完整性的同时改善代码可维护性" />
     <MESSAGE value="feat(interpreter): 实现defer语句的作用域捕获和恢复机制&#10;&#10;- 重构DeferStack数据结构，从OldStatement改为DeferEntry记录类型&#10;- 添加作用域快照捕获功能，在注册defer时保存当前局部变量状态&#10;- 实现混合作用域执行机制，合并捕获作用域和当前作用域&#10;- 添加作用域同步逻辑，将defer执行的变量修改回传到当前作用域&#10;- 改进异常处理确保所有defer语句都能按LIFO顺序执行&#10;- 更新作用域缓存管理机制，适应动态作用域切换需求" />
     <MESSAGE value="fix(tests): 修复通道接收语法的测试用例&#10;&#10;- 更新SelectStatementEdgeCasesTests中的通道接收语法从case val &lt;- ChannelReceive(ch)改为case val from ch&#10;- 移除workspace.xml中多余的变更记录条目&#10;- 更新本地任务计数器数值&#10;- 清理VcsManagerConfiguration中的旧提交消息记录&#10;- 更新最后提交消息为解释器defer语句功能实现内容" />
@@ -959,7 +961,8 @@
     <MESSAGE value="feat(vm): 实现字节码虚拟机核心功能&#10;&#10;- 添加三元运算符的字节码生成和执行支持&#10;- 实现字典字面量的创建和操作&#10;- 添加异常抛出指令的支持&#10;- 完善 switch 语句的字节码生成逻辑&#10;- 实现函数调用（包括原生函数）的参数处理&#10;- 添加异步表达式和类成员访问的基础框架&#10;- 增加循环和异常处理语句的编译支持&#10;- 更新测试用例验证基本功能正确性" />
     <MESSAGE value="feat(vm): 添加虚拟机核心功能实现和测试用例&#10;&#10;- 实现了从主构造函数参数字段获取值的辅助方法GetPrimaryConstructorParameter&#10;- 修改WhileStatement访问逻辑以正确获取expression和blockStatement字段&#10;- 添加了完整的虚拟机测试用例文件，包括基础功能、字符串操作、三元运算符、ToStr转换等&#10;- 实现了While语句的正确字段访问和异常处理机制&#10;- 新增多个虚拟机测试脚本覆盖不同功能场景" />
     <MESSAGE value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
+    <MESSAGE value="docs(vm): 添加虚拟机功能状态报告文档&#10;&#10;- 创建 VM_Status_Report.md 文档详细记录 Old8Lang 虚拟机模式功能状态&#10;- 列出已实现且工作正常的功能包括基础运算、变量类型、控制流、函数调用等&#10;- 标识需要修复的核心功能如函数定义调用、Switch语句、For循环等问题&#10;- 记录简化实现的功能模块包括 For-in 循环、Try-Catch-Finally 完整支持等&#10;- 提供建议的优先级顺序帮助确定功能修复的先后顺序&#10;- 明确当前 VM 的适用场景和不支持的特性&#10;- 添加立即可做的改进项和具体的实施建议" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(vm): 添加虚拟机功能状态报告文档&#10;&#10;- 创建 VM_Status_Report.md 文档详细记录 Old8Lang 虚拟机模式功能状态&#10;- 列出已实现且工作正常的功能包括基础运算、变量类型、控制流、函数调用等&#10;- 标识需要修复的核心功能如函数定义调用、Switch语句、For循环等问题&#10;- 记录简化实现的功能模块包括 For-in 循环、Try-Catch-Finally 完整支持等&#10;- 提供建议的优先级顺序帮助确定功能修复的先后顺序&#10;- 明确当前 VM 的适用场景和不支持的特性&#10;- 添加立即可做的改进项和具体的实施建议" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

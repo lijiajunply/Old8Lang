@@ -1,0 +1,18 @@
+// 测试Switch语句
+
+x <- 2
+
+switch x {
+    case 1 {
+        PrintLine("值为1")
+    }
+    case 2 {
+        PrintLine("值为2")
+    }
+    case 3 {
+        PrintLine("值为3")
+    }
+    default {
+        PrintLine("其他值")
+    }
+}

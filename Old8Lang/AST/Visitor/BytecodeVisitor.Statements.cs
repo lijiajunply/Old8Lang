@@ -11,10 +11,18 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitBlockStatement(BlockStatement node)
     {
-        // 遍历所有语句
-        for (int i = 0; i < node.Count; i++)
+        // 先处理导入语句（函数定义、类定义等）
+        foreach (var statement in node.ImportStatements)
         {
-            var statement = node[i];
+            if (statement is OldStatement oldStatement)
+            {
+                oldStatement.Accept(this);
+            }
+        }
+
+        // 再处理其他语句
+        foreach (var statement in node.OtherStatements)
+        {
             statement.Accept(this);
         }
 
@@ -320,46 +328,46 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        // 生成 switch 表达式的代码
+        // 生成 switch 表达式的代码（栈上有 switch 值）
         switchExpression.Accept(this);
 
         var caseEndLabels = new List<int>();
-        var nextCaseLabels = new List<int>();
 
         // 为每个 case 生成代码
-        foreach (var caseStmt in switchCaseList)
+        for (int i = 0; i < switchCaseList.Count; i++)
         {
-            // 复制 switch 值用于比较
+            var caseStmt = switchCaseList[i];
+
+            // 复制 switch 值用于比较（栈上现在有 2 个 switch 值）
             Emit(OpCode.Dup);
 
-            // 生成 case 表达式的代码
-            caseStmt.Accept(this);
+            // 生成 case 表达式的代码（栈上现在有 2 个 switch 值 + case 值）
+            // 直接访问 expression 属性而不是调用 Accept
+            caseStmt.expression.Accept(this);
 
-            // 比较是否相等
+            // 比较是否相等（弹出 2 个值，栈上现在有 1 个 switch 值 + 比较结果）
             Emit(OpCode.Equal);
 
-            // 如果不相等，跳转到下一个 case
-            int nextCaseLabel = GetCurrentPosition();
+            // 如果不相等，跳转到下一个 case（弹出比较结果，栈上还有 1 个 switch 值）
+            int jumpIfFalse = GetCurrentPosition();
             Emit(OpCode.JumpIfFalse, -1);
-            nextCaseLabels.Add(nextCaseLabel);
 
-            // 弹出 switch 值（已经匹配成功）
+            // 匹配成功：弹出 switch 值（栈为空）
             Emit(OpCode.Pop);
 
-            // 执行 case 块（主构造函数参数，注意大写B）
-            var blockStmt = GetPrimaryConstructorParameter<BlockStatement>(caseStmt, "BlockStatement");
-            blockStmt?.Accept(this);
+            // 执行 case 块：直接访问 BlockStatement 属性
+            caseStmt.BlockStatement.Accept(this);
 
             // 跳转到 switch 结束
-            int endLabel = GetCurrentPosition();
+            int jumpEnd = GetCurrentPosition();
             Emit(OpCode.Jump, -1);
-            caseEndLabels.Add(endLabel);
+            caseEndLabels.Add(jumpEnd);
 
-            // 修补下一个 case 的跳转标签
-            PatchJump(nextCaseLabel, GetCurrentPosition());
+            // 修补"不匹配"的跳转：跳到这里时栈上还有 switch 值
+            PatchJump(jumpIfFalse, GetCurrentPosition());
         }
 
-        // 如果有 default 块
+        // 所有 case 都不匹配，执行 default 块
         if (defaultBlockStatement != null)
         {
             // 弹出 switch 值
@@ -374,7 +382,7 @@ public partial class BytecodeVisitor
             Emit(OpCode.Pop);
         }
 
-        // 修补所有跳转到结束的标签
+        // 修补所有"匹配成功后跳转到结束"的指令
         int endPosition = GetCurrentPosition();
         foreach (var label in caseEndLabels)
         {
@@ -386,10 +394,8 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitCaseStatement(CaseStatement node)
     {
-        // CaseStatement 的表达式在 SwitchStatement 中处理
-        // 这里只需要生成 case 表达式的代码
-        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
-        expression?.Accept(this);
+        // CaseStatement 在 SwitchStatement 中已完整处理
+        // 这个方法不应该被直接调用
         return null;
     }
 
