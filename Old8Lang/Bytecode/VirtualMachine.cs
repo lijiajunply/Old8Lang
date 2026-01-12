@@ -43,6 +43,14 @@ public class VirtualMachine
     }
 
     /// <summary>
+    /// 获取全局变量的值
+    /// </summary>
+    public object? GetGlobalVariable(string name)
+    {
+        return _globals.TryGetValue(name, out var value) ? value : null;
+    }
+
+    /// <summary>
     /// 调用函数
     /// </summary>
     private void CallFunction(FunctionMetadata function, object?[] arguments)
