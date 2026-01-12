@@ -128,7 +128,8 @@ public partial class BytecodeVisitor
     {
         // Instance 是函数调用表达式 a(b, c)
         string funcName = node.Id.IdName;
-        int argCount = node.Ids.Count;
+        int positionalCount = node.Ids.Count;
+        int namedCount = node.NamedArgs?.Count ?? 0;
 
         // 检查是否是类实例化
         bool isClassName = _compiler.IsClassName(funcName);
@@ -150,17 +151,43 @@ public partial class BytecodeVisitor
                 arg.Accept(this);
             }
 
-            // TODO: 处理命名参数
-            // 命名参数暂时不支持，需要在VM中添加命名参数支持
+            // 生成命名参数的值
+            if (namedCount > 0)
+            {
+                foreach (var namedArg in node.NamedArgs)
+                {
+                    namedArg.Value.Accept(this);
+                }
+            }
 
             // 检查是否是原生函数
             if (_compiler.IsNativeFunction(funcName))
             {
-                Emit(OpCode.CallNative, new object[] { argCount, funcName });
+                if (namedCount > 0)
+                {
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    Emit(OpCode.CallNative, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                }
+                else
+                {
+                    // 无命名参数: [argCount, funcName]
+                    Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
+                }
             }
             else
             {
-                Emit(OpCode.Call, new object[] { argCount, funcName });
+                if (namedCount > 0)
+                {
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                }
+                else
+                {
+                    // 无命名参数: [argCount, funcName]
+                    Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                }
             }
         }
 

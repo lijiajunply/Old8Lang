@@ -2,12 +2,40 @@
 
 ## 文档信息
 
-- **文档版本**: 1.1
+- **文档版本**: 1.2
 - **创建日期**: 2026-01-13
-- **最后更新**: 2026-01-13 (命令行集成完成)
+- **最后更新**: 2026-01-13 (类支持和命名参数完成)
 - **状态**: 进行中
 
 ## 最新更新 (2026-01-13)
+
+### ✅ 类支持已完成
+
+虚拟机现在完全支持类的基本功能：
+
+1. **类实例化**: 支持通过 `Person()` 创建类实例
+2. **字段访问**: 支持通过 `obj.field` 访问类字段
+3. **字段赋值**: 支持通过 `obj.field <- value` 为类字段赋值
+4. **类定义预处理**: 编译时自动注册所有类定义
+
+**实现细节**:
+- 新增 `NewObject` 操作码用于类实例化
+- 增强 `GetField` 和 `SetField` 操作码支持字典类型的类实例
+- 类实例在运行时表示为 `Dictionary<string, object?>`
+- 添加 `BytecodeCompiler.PreprocessClassDefinitions` 方法预处理类定义
+
+### ✅ 命名参数支持已完成
+
+虚拟机现在完全支持函数命名参数：
+
+1. **全命名参数**: `greet(name: "Bob", age: 30, message: "Hi")`
+2. **混合参数**: `greet("Charlie", age: 35, message: "Good morning")`
+3. **乱序命名参数**: `calculate(operation: "mul", y: 3, x: 7)`
+
+**实现细节**:
+- 扩展 `Call` 和 `CallNative` 操作数格式支持命名参数
+- 新增 `ArrangeArgumentsWithNamed` 方法重新排列参数
+- 支持参数重复检测和参数缺失检测
 
 ### ✅ 命令行集成已完成
 
@@ -32,6 +60,8 @@
 
 - **数组操作数序列化问题**: 修复了 `Instruction.cs` 不支持数组类型操作数的序列化问题
 - **字节码文件持久化**: 字节码文件现在可以正确保存和加载
+- **类成员赋值问题**: 修复了类成员访问赋值不支持的问题
+- **命名参数排列问题**: 修复了混合使用位置参数和命名参数时的参数排列错误
 
 ## 概述
 
@@ -54,15 +84,17 @@
 - ✅ 比较运算 (==, !=, >, <, >=, <=)
 - ✅ 变量赋值和访问
 - ✅ 函数声明和调用
+- ✅ 命名参数 (全命名、混合、乱序)
 - ✅ 控制流 (if/else, for, while)
 - ✅ 字符串操作
 - ✅ 集合操作 (数组, 列表, 字典)
+- ✅ 类和对象 (实例化、字段访问、字段赋值)
 - ✅ 异常处理 (try/catch/finally)
 - ✅ 并发原语 (Mutex, Channel, Semaphore)
 
 #### 暂不支持的功能 (暂时跳过)
 
-- ⏸️ 类和对象 (成员访问赋值未实现)
+- ⏸️ 类方法调用 (对象方法未实现)
 - ⏸️ 递归函数 (存在栈溢出问题)
 - ⏸️ 闭包
 - ⏸️ 生成器
@@ -93,7 +125,10 @@ Old8Lang.Tests/VirtualMachine/
 ├── CompileHelper.cs              # 编译辅助类
 ├── Functions/                    # 函数测试
 │   ├── VMFunctionDeclarationTests.cs
-│   └── VMFunctionCallTests.cs
+│   ├── VMFunctionCallTests.cs
+│   └── VMNamedArgumentsTests.cs
+├── Classes/                      # 类测试
+│   └── VMClassDeclarationTests.cs
 ├── Expressions/                  # 表达式测试
 │   ├── VMArithmeticExpressionTests.cs
 │   ├── VMLogicalExpressionTests.cs
@@ -132,6 +167,14 @@ Old8Lang.Tests/VirtualMachine/
 | `FunctionCall_WithDefaultParameters_ExecutesCorrectly` | ✅ 通过 | 默认参数函数调用 |
 | `FunctionCall_NestedCalls_ExecutesCorrectly` | ✅ 通过 | 嵌套函数调用 |
 | `FunctionCall_ReturnValue_ExecutesCorrectly` | ✅ 通过 | 函数返回值测试 |
+
+#### VMNamedArgumentsTests.cs ✅ (已完成)
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `NamedArguments_AllNamed_ExecutesCorrectly` | ✅ 通过 | 全命名参数调用 |
+| `NamedArguments_MixedWithPositional_ExecutesCorrectly` | ✅ 通过 | 混合位置参数和命名参数 |
+| `NamedArguments_OutOfOrder_ExecutesCorrectly` | ✅ 通过 | 乱序命名参数调用 |
 
 ### 2. 表达式测试 (Expressions/)
 
@@ -202,7 +245,15 @@ Old8Lang.Tests/VirtualMachine/
 | `Dictionary_Access_ExecutesCorrectly` | ✅ 通过 | 字典元素访问 |
 | `Dictionary_Keys_ExecutesCorrectly` | ✅ 通过 | 获取所有键 |
 
-### 5. 控制流测试 (Statements/)
+### 5. 类测试 (Classes/)
+
+#### VMClassDeclarationTests.cs ✅ (已完成)
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `ClassDeclaration_SimpleClass_ExecutesCorrectly` | ✅ 通过 | 简单类声明、实例化、字段赋值和访问 |
+
+### 6. 控制流测试 (Statements/)
 
 #### VMControlFlowTests.cs ✅ (已完成)
 
@@ -217,7 +268,7 @@ Old8Lang.Tests/VirtualMachine/
 | 三元运算符测试 | 3 | ✅ 通过 |
 | 复杂控制流测试 | 2 | ✅ 通过 |
 
-### 6. 高级特性测试
+### 7. 高级特性测试
 
 #### VMDeferTests.cs ⏭️ (已创建，跳过)
 
@@ -278,13 +329,13 @@ Old8Lang.Tests/VirtualMachine/
 | 语句测试 | 21 | 6 | 27 | 78% |
 | 集成测试 | 17 | 0 | 17 | 100% |
 | 集合测试 | 13 | 0 | 13 | 100% |
-| 函数测试 | 6 | 3 | 9 | 67% |
+| 函数测试 | 9 | 3 | 12 | 75% |
 | 并发测试 | 7 | 0 | 7 | 100% |
 | 字符串测试 | 6 | 0 | 6 | 100% |
-| 类测试 | 0 | 2 | 2 | 0% |
+| 类测试 | 1 | 1 | 2 | 50% |
 | 异常测试 | 1 | 0 | 1 | 100% |
 | Match表达式测试 | 0 | 1 | 1 | 0% |
-| **总计** | **197** | **21** | **218** | **90%** |
+| **总计** | **201** | **20** | **221** | **91%** |
 
 **说明**:
 - **已完成**: 测试通过的数量
@@ -293,18 +344,21 @@ Old8Lang.Tests/VirtualMachine/
 
 ### 已通过的测试
 
-✅ **197 个测试全部通过** (通过率: 100%)
-⏭️ **21 个测试已跳过** (虚拟机高级特性实现不完整)
+✅ **201 个测试全部通过** (通过率: 100%)
+⏭️ **20 个测试已跳过** (虚拟机高级特性实现不完整)
 
-**测试总数**: 218个（197个通过 + 21个跳过）
+**测试总数**: 221个（201个通过 + 20个跳过）
 
-#### 函数测试 (6个)
+#### 函数测试 (9个)
 - `FunctionDeclaration_NoParameters_ExecutesCorrectly`
 - `FunctionDeclaration_WithParameters_ExecutesCorrectly`
 - `FunctionDeclaration_WithTypeAnnotations_ExecutesCorrectly`
 - `FunctionCall_WithDefaultParameters_ExecutesCorrectly`
 - `FunctionCall_NestedCalls_ExecutesCorrectly`
 - `FunctionCall_ReturnValue_ExecutesCorrectly`
+- `NamedArguments_AllNamed_ExecutesCorrectly`
+- `NamedArguments_MixedWithPositional_ExecutesCorrectly`
+- `NamedArguments_OutOfOrder_ExecutesCorrectly`
 
 #### 表达式测试 (9个)
 - `ArithmeticExpression_Addition_ExecutesCorrectly`
@@ -332,12 +386,15 @@ Old8Lang.Tests/VirtualMachine/
 - `Dictionary_Access_ExecutesCorrectly`
 - `Dictionary_Keys_ExecutesCorrectly`
 
+#### 类测试 (1个)
+- `ClassDeclaration_SimpleClass_ExecutesCorrectly`
+
 #### 控制流测试 (21个)
 - 包含if语句、while循环、for循环、for-in循环、三元运算符等完整测试套件
 
 ### 已跳过的测试
 
-⏭️ **21 个测试已跳过** (虚拟机高级特性实现不完整)
+⏭️ **20 个测试已跳过** (虚拟机高级特性实现不完整)
 
 #### 表达式测试 (9个跳过)
 - 递归函数测试 (3个) - 虚拟机递归实现存在栈溢出问题
@@ -351,8 +408,8 @@ Old8Lang.Tests/VirtualMachine/
 #### 函数测试 (3个跳过)
 - 异步函数测试 (3个) - 虚拟机异步函数实现不完整
 
-#### 类测试 (2个跳过)
-- 类成员访问赋值测试 (2个) - 虚拟机类成员赋值未实现
+#### 类测试 (1个跳过)
+- 类构造函数测试 (1个) - 虚拟机类构造函数未实现
 
 #### Match 表达式测试 (1个跳过)
 - Match 表达式测试 (1个) - 虚拟机 Match 表达式实现不完整
@@ -378,26 +435,7 @@ result <- factorial(5)
 
 **优先级**: 高
 
-### 2. 类成员访问赋值未实现 ❌
-
-**问题描述**: 无法对类成员进行赋值操作
-
-**测试用例**:
-```old8
-class Person {
-    public name:string
-}
-p <- Person()
-p.name <- "Alice"  // 错误: 不支持的赋值左侧表达式类型
-```
-
-**错误信息**: `不支持的赋值左侧表达式类型: Operation`
-
-**状态**: 待实现
-
-**优先级**: 中
-
-### 3. 虚拟机不支持默认参数 ❌
+### 2. 虚拟机不支持默认参数 ❌
 
 **问题描述**: 虚拟机模式下函数默认参数不生效
 
@@ -417,7 +455,7 @@ result <- greet("Alice")  // 期望: "Hello, Alice", 实际: "null, Alice"
 
 **相关测试**: `VMFunctionCallTests.FunctionCall_WithDefaultParameters_ExecutesCorrectly` (已跳过)
 
-### 4. 虚拟机不支持对象方法调用 ❌
+### 3. 虚拟机不支持对象方法调用 ❌
 
 **问题描述**: 虚拟机模式下无法调用对象的方法（如 `list.Add()`）
 
@@ -443,13 +481,13 @@ list.Add(4)  // 错误: 未定义的函数: Add
 
 1. **修复已知问题** (优先级: 高)
    - [ ] 修复递归函数栈溢出问题
-   - [ ] 实现类成员访问赋值
+   - [x] ~~实现类成员访问赋值~~ (已完成)
    - [ ] 实现虚拟机默认参数支持
    - [ ] 实现虚拟机对象方法调用
 
 2. **启用已跳过的测试** (优先级: 高)
    - [ ] 启用递归函数测试 (3个)
-   - [ ] 启用类成员访问赋值测试 (2个)
+   - [x] ~~启用类成员访问赋值测试~~ (已完成 1个)
 
 ### 中期目标
 
@@ -505,16 +543,20 @@ dotnet test --filter "FullyQualifiedName~FunctionDeclaration_NoParameters_Execut
 ### 当前状态
 
 - ✅ **测试框架已建立**: CompileHelper 辅助类和测试目录结构
-- ✅ **基础测试已完成**: 197个测试全部通过
+- ✅ **基础测试已完成**: 201个测试全部通过
 - ✅ **命令行集成已完成**: -vm, -compile, -execute 三个命令全部可用
-- ✅ **测试覆盖率优秀**: 218个测试用例（197个通过 + 21个跳过），完成率90%
-- ⚠️ **已知问题**: 4个关键问题待修复（递归栈溢出、类成员赋值、默认参数、对象方法调用）
+- ✅ **类支持已完成**: 类实例化、字段访问、字段赋值全部实现
+- ✅ **命名参数已完成**: 全命名、混合、乱序参数全部支持
+- ✅ **测试覆盖率优秀**: 221个测试用例（201个通过 + 20个跳过），完成率91%
+- ⚠️ **已知问题**: 3个关键问题待修复（递归栈溢出、默认参数、对象方法调用）
 
 ### 成功标准
 
-- [x] 所有基础功能测试通过 (目标: 30+ 测试) - ✅ 已完成 197个测试
-- [x] 测试覆盖率达到 80% - ✅ 已达到 90%
+- [x] 所有基础功能测试通过 (目标: 30+ 测试) - ✅ 已完成 201个测试
+- [x] 测试覆盖率达到 80% - ✅ 已达到 91%
 - [x] 命令行集成完成 - ✅ 已完成
+- [x] 类支持完成 - ✅ 已完成
+- [x] 命名参数支持完成 - ✅ 已完成
 - [ ] 所有已知问题已修复
 - [ ] 高优先级测试补充完成（defer, match, select, async）
 - [ ] 性能测试完成

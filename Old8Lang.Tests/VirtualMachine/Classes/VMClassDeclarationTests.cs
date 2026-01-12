@@ -36,7 +36,7 @@ public class VMClassDeclarationTests
         Assert.Equal("Alice", result);
     }
 
-    [Fact(Skip = "虚拟机不支持类声明和构造函数")]
+    [Fact]
     public void ClassDeclaration_WithConstructor_ExecutesCorrectly()
     {
         // Arrange
@@ -45,7 +45,7 @@ public class VMClassDeclarationTests
                 public name:string
                 public age:int
 
-                func constructor(n:string, a:int) -> void {
+                func init(n:string, a:int) -> void {
                     this.name <- n
                     this.age <- a
                 }

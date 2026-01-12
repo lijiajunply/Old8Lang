@@ -172,6 +172,8 @@ public partial class BytecodeVisitor
         }
 
         string funcName = funcId.IdName;
+        int positionalCount = node.Arguments.Count;
+        int namedCount = node.NamedArguments?.Count ?? 0;
 
         // 检查是否是类实例化
         bool isClassName = _compiler.IsClassName(funcName);
@@ -185,15 +187,37 @@ public partial class BytecodeVisitor
         else
         {
             // 普通函数调用
-            // 生成参数代码
+            // 生成位置参数代码
             foreach (var arg in node.Arguments)
             {
                 arg.Accept(this);
             }
 
+            // 生成命名参数的值
+            if (namedCount > 0)
+            {
+                foreach (var namedArg in node.NamedArguments)
+                {
+                    namedArg.Value.Accept(this);
+                }
+            }
+
             // 检查是否是原生函数
-            Emit(_compiler.IsNativeFunction(funcName) ? OpCode.CallNative : OpCode.Call,
-                new object[] { node.Arguments.Count, funcName });
+            bool isNative = _compiler.IsNativeFunction(funcName);
+
+            if (namedCount > 0)
+            {
+                // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
+                Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                    new object[] { positionalCount, namedCount, funcName, namedArgNames });
+            }
+            else
+            {
+                // 无命名参数: [argCount, funcName]
+                Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                    new object[] { positionalCount, funcName });
+            }
         }
 
         return null;

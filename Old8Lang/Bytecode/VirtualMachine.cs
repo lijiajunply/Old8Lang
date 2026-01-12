@@ -321,25 +321,66 @@ public class VirtualMachine
             case OpCode.Call:
             {
                 var operands = (object[])instruction.Operand!;
-                int argCount = (int)operands[0];
-                string funcName = (string)operands[1];
 
-                // 从栈中弹出参数
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
+                // 检查操作数格式
+                if (operands.Length == 2)
                 {
-                    args[i] = _stack.Pop();
-                }
+                    // 无命名参数: [argCount, funcName]
+                    int argCount = (int)operands[0];
+                    string funcName = (string)operands[1];
 
-                // 查找函数
-                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                if (function == null)
+                    // 从栈中弹出参数
+                    var args = new object?[argCount];
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        args[i] = _stack.Pop();
+                    }
+
+                    // 查找函数
+                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    if (function == null)
+                    {
+                        throw new Exception($"未定义的函数: {funcName}");
+                    }
+
+                    // 调用函数
+                    CallFunction(function, args);
+                }
+                else
                 {
-                    throw new Exception($"未定义的函数: {funcName}");
-                }
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    int positionalCount = (int)operands[0];
+                    int namedCount = (int)operands[1];
+                    string funcName = (string)operands[2];
+                    string[] namedArgNames = (string[])operands[3];
 
-                // 调用函数
-                CallFunction(function, args);
+                    // 从栈中弹出参数 (命名参数值在栈顶,位置参数在下面)
+                    // 注意: 栈是后进先出,所以先弹出的是最后压入的
+                    var namedArgValues = new object?[namedCount];
+                    for (int i = namedCount - 1; i >= 0; i--)
+                    {
+                        namedArgValues[i] = _stack.Pop();
+                    }
+
+                    var positionalArgs = new object?[positionalCount];
+                    for (int i = positionalCount - 1; i >= 0; i--)
+                    {
+                        positionalArgs[i] = _stack.Pop();
+                    }
+
+                    // 查找函数
+                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    if (function == null)
+                    {
+                        throw new Exception($"未定义的函数: {funcName}");
+                    }
+
+                    // 重新排列参数以匹配函数参数定义
+                    var args = ArrangeArgumentsWithNamed(function, positionalArgs, namedArgNames, namedArgValues);
+
+                    // 调用函数
+                    CallFunction(function, args);
+                }
 
                 // 如果有返回值,它应该在栈上
             }
@@ -348,21 +389,61 @@ public class VirtualMachine
             case OpCode.CallNative:
             {
                 var operands = (object[])instruction.Operand!;
-                int argCount = (int)operands[0];
-                string funcName = (string)operands[1];
 
-                // 从栈中弹出参数
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
+                // 检查操作数格式
+                if (operands.Length == 2)
                 {
-                    args[i] = _stack.Pop();
+                    // 无命名参数: [argCount, funcName]
+                    int argCount = (int)operands[0];
+                    string funcName = (string)operands[1];
+
+                    // 从栈中弹出参数
+                    var args = new object?[argCount];
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        args[i] = _stack.Pop();
+                    }
+
+                    // 调用原生函数
+                    var result = CallNativeFunction(funcName, args);
+                    if (result != null)
+                    {
+                        _stack.Push(result);
+                    }
                 }
-
-                // 调用原生函数
-                var result = CallNativeFunction(funcName, args);
-                if (result != null)
+                else
                 {
-                    _stack.Push(result);
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    int positionalCount = (int)operands[0];
+                    int namedCount = (int)operands[1];
+                    string funcName = (string)operands[2];
+                    string[] namedArgNames = (string[])operands[3];
+
+                    // 从栈中弹出参数 (位置参数 + 命名参数值)
+                    var positionalArgs = new object?[positionalCount];
+                    for (int i = positionalCount - 1; i >= 0; i--)
+                    {
+                        positionalArgs[i] = _stack.Pop();
+                    }
+
+                    var namedArgValues = new object?[namedCount];
+                    for (int i = namedCount - 1; i >= 0; i--)
+                    {
+                        namedArgValues[i] = _stack.Pop();
+                    }
+
+                    // 原生函数暂时不支持命名参数重排,直接按顺序传递
+                    // TODO: 如果需要支持原生函数的命名参数,需要获取原生函数的参数信息
+                    var args = new object?[positionalCount + namedCount];
+                    Array.Copy(positionalArgs, 0, args, 0, positionalCount);
+                    Array.Copy(namedArgValues, 0, args, positionalCount, namedCount);
+
+                    // 调用原生函数
+                    var result = CallNativeFunction(funcName, args);
+                    if (result != null)
+                    {
+                        _stack.Push(result);
+                    }
                 }
             }
                 break;
@@ -1593,6 +1674,69 @@ public class VirtualMachine
         }
 
         return result.ToString();
+    }
+
+    /// <summary>
+    /// 重新排列参数以匹配函数参数定义(支持命名参数)
+    /// </summary>
+    /// <param name="function">函数元数据</param>
+    /// <param name="positionalArgs">位置参数</param>
+    /// <param name="namedArgNames">命名参数名称数组</param>
+    /// <param name="namedArgValues">命名参数值数组</param>
+    /// <returns>按函数参数定义顺序排列的参数数组</returns>
+    private object?[] ArrangeArgumentsWithNamed(FunctionMetadata function, object?[] positionalArgs,
+        string[] namedArgNames, object?[] namedArgValues)
+    {
+        int paramCount = function.Parameters.Count;
+        var args = new object?[paramCount];
+        var filled = new bool[paramCount]; // 跟踪哪些参数位置已被填充
+
+        // 首先填充位置参数
+        for (int i = 0; i < positionalArgs.Length; i++)
+        {
+            if (i >= paramCount)
+            {
+                throw new Exception($"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
+            }
+            args[i] = positionalArgs[i];
+            filled[i] = true;
+        }
+
+        // 然后根据命名参数填充剩余位置
+        for (int i = 0; i < namedArgNames.Length; i++)
+        {
+            string paramName = namedArgNames[i];
+            object? paramValue = namedArgValues[i];
+
+            // 查找参数在函数参数列表中的位置
+            int paramIndex = function.Parameters.IndexOf(paramName);
+            if (paramIndex == -1)
+            {
+                throw new Exception($"函数 {function.Name} 没有名为 '{paramName}' 的参数");
+            }
+
+            // 检查该位置是否已被位置参数占用
+            if (filled[paramIndex])
+            {
+                throw new Exception($"参数 '{paramName}' 已通过位置参数提供");
+            }
+
+            args[paramIndex] = paramValue;
+            filled[paramIndex] = true;
+        }
+
+        // 检查是否所有参数都已提供
+        for (int i = 0; i < paramCount; i++)
+        {
+            if (!filled[i])
+            {
+                // 参数未提供，检查是否有默认值
+                // TODO: 支持默认参数值
+                throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值");
+            }
+        }
+
+        return args;
     }
 }
 

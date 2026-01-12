@@ -23,10 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMNamedArgumentsTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine-TestPlan.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/VirtualMachine-TestPlan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMClassDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMClassDeclarationTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -568,6 +570,7 @@
       <workItem from="1767985518540" duration="4807000" />
       <workItem from="1768162238074" duration="3699000" />
       <workItem from="1768245774894" duration="4766000" />
+      <workItem from="1768250624546" duration="1235000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -912,7 +915,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="630" />
+    <option name="localTasksCounter" value="631" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +942,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加虚拟机基础算术运算和字节码编译功能&#10;&#10;- 新增 basic_arithmetic.old8 测试文件，包含算术运算、变量赋值和比较运算测试&#10;- 实现 BytecodeCompiler 类，负责将 AST 编译为字节码并管理作用域&#10;- 创建 BytecodeFile 类，定义字节码文件格式 (.o8c) 并支持读写操作&#10;- 开发 BytecodeVisitor 类及其表达式、语句、值类型实现，转换 AST 节点为字节码指令&#10;- 添加 CallFrame 类，管理虚拟机调用栈帧和局部变量&#10;- 实现 CompileBytecodeCommand 命令，支持编译 .old8 文件为 .o8c 字节码文件&#10;- 创建 ConstantPool 类，管理字节码中的常量存储和索引映射&#10;- 实现基本的栈大小跟踪和字节码优化功能" />
     <MESSAGE value="feat(vm): 实现字节码虚拟机核心功能&#10;&#10;- 添加三元运算符的字节码生成和执行支持&#10;- 实现字典字面量的创建和操作&#10;- 添加异常抛出指令的支持&#10;- 完善 switch 语句的字节码生成逻辑&#10;- 实现函数调用（包括原生函数）的参数处理&#10;- 添加异步表达式和类成员访问的基础框架&#10;- 增加循环和异常处理语句的编译支持&#10;- 更新测试用例验证基本功能正确性" />
     <MESSAGE value="feat(vm): 添加虚拟机核心功能实现和测试用例&#10;&#10;- 实现了从主构造函数参数字段获取值的辅助方法GetPrimaryConstructorParameter&#10;- 修改WhileStatement访问逻辑以正确获取expression和blockStatement字段&#10;- 添加了完整的虚拟机测试用例文件，包括基础功能、字符串操作、三元运算符、ToStr转换等&#10;- 实现了While语句的正确字段访问和异常处理机制&#10;- 新增多个虚拟机测试脚本覆盖不同功能场景" />
     <MESSAGE value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
@@ -964,7 +966,8 @@
     <MESSAGE value="docs(vm): 添加虚拟机功能限制文档并更新测试状态统计&#10;&#10;- 创建 VM_LIMITATIONS.md 文档记录不支持的语言特性&#10;- 添加面向对象编程、字符串高级操作、集合操作等功能限制说明&#10;- 更新测试状态统计显示 197个通过 21个跳过 0个失败&#10;- 标记类声明、字符串方法、字典转换等测试为跳过状态&#10;- 在VMCommand.cs中简化变量声明使用var关键字&#10;- 添加字符串长度操作测试用例并标记高级字符串方法为跳过&#10;- 更新IDE工作区配置和本地任务计数器" />
     <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并调整测试统计&#10;&#10;- 更新测试进度统计表格，显示197个通过21个跳过，完成率90%&#10;- 重新分类已跳过测试，包括表达式、语句、函数、类和Match表达式测试&#10;- 更新下一步计划，调整短期、中期和长期目标优先级&#10;- 修正当前状态描述，反映实际测试覆盖情况和已知问题&#10;- 清理IDE工作区配置，移除变更历史记录并更新任务计数器" />
     <MESSAGE value="fix(compiler): 修复异常处理和递归调用问题&#10;&#10;- 修复了嵌套异常捕获的传播机制，确保异常在最内层被捕获后不再向外传播&#10;- 修复了浮点数除以零的处理，不再抛出异常而是保持初始值&#10;- 修正了逻辑运算符的计算顺序和结果，包括and/or/xor/not运算的优先级&#10;- 移除了null值的字符串转换测试，因为该功能已被移除&#10;- 修改了字符串长度获取方式，从实例方法Length()改为全局函数Len()&#10;- 实现了函数递归调用的支持，在编译函数体前先将函数注册到DelegateVar&#10;- 重构了函数注册逻辑，支持递归调用时的函数引用查找" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复异常处理和递归调用问题&#10;&#10;- 修复了嵌套异常捕获的传播机制，确保异常在最内层被捕获后不再向外传播&#10;- 修复了浮点数除以零的处理，不再抛出异常而是保持初始值&#10;- 修正了逻辑运算符的计算顺序和结果，包括and/or/xor/not运算的优先级&#10;- 移除了null值的字符串转换测试，因为该功能已被移除&#10;- 修改了字符串长度获取方式，从实例方法Length()改为全局函数Len()&#10;- 实现了函数递归调用的支持，在编译函数体前先将函数注册到DelegateVar&#10;- 重构了函数注册逻辑，支持递归调用时的函数引用查找" />
+    <MESSAGE value="feat(vm): 实现类定义和对象实例化功能&#10;&#10;- 添加预处理阶段注册所有类定义到字节码文件&#10;- 实现 NewObject 指令支持类实例化操作&#10;- 添加 GetField 和 SetField 指令支持对象字段访问&#10;- 实现字典对象作为类实例的数据结构&#10;- 支持类成员变量的初始化和赋值操作&#10;- 启用类声明相关的单元测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现类定义和对象实例化功能&#10;&#10;- 添加预处理阶段注册所有类定义到字节码文件&#10;- 实现 NewObject 指令支持类实例化操作&#10;- 添加 GetField 和 SetField 指令支持对象字段访问&#10;- 实现字典对象作为类实例的数据结构&#10;- 支持类成员变量的初始化和赋值操作&#10;- 启用类声明相关的单元测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1362,19 +1365,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="644" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs</url>
-          <line>1338</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" containingFunctionPresentation="方法 'ToString'">
-            <startOffsets>
-              <option value="41184" />
-            </startOffsets>
-            <endOffsets>
-              <option value="41316" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="645" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
