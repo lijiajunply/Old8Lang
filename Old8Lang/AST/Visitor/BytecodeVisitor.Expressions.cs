@@ -173,15 +173,28 @@ public partial class BytecodeVisitor
 
         string funcName = funcId.IdName;
 
-        // 生成参数代码
-        foreach (var arg in node.Arguments)
-        {
-            arg.Accept(this);
-        }
+        // 检查是否是类实例化
+        bool isClassName = _compiler.IsClassName(funcName);
 
-        // 检查是否是原生函数
-        Emit(_compiler.IsNativeFunction(funcName) ? OpCode.CallNative : OpCode.Call,
-            new object[] { node.Arguments.Count, funcName });
+        if (isClassName)
+        {
+            // 类实例化: Person()
+            // 生成 NewObject 指令
+            Emit(OpCode.NewObject, funcName);
+        }
+        else
+        {
+            // 普通函数调用
+            // 生成参数代码
+            foreach (var arg in node.Arguments)
+            {
+                arg.Accept(this);
+            }
+
+            // 检查是否是原生函数
+            Emit(_compiler.IsNativeFunction(funcName) ? OpCode.CallNative : OpCode.Call,
+                new object[] { node.Arguments.Count, funcName });
+        }
 
         return null;
     }

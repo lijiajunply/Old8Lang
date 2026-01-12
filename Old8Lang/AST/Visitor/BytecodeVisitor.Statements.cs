@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.Bytecode;
 
@@ -80,10 +81,35 @@ public partial class BytecodeVisitor
                 // 发出SetIndex指令
                 Emit(OpCode.SetIndex);
             }
+            else if (leftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
+            {
+                // 成员访问赋值: obj.field <- value
+                // SetField期望栈布局(从栈顶到栈底): value, object
+                // 所以我们需要按相反顺序压栈: object, value
+
+                // 加载对象
+                operation.Left?.Accept(this);
+
+                // 加载值
+                node.Value.Accept(this);
+
+                // 获取字段名
+                string fieldName;
+                if (operation.Right is LangId rightId)
+                {
+                    fieldName = rightId.IdName;
+                }
+                else
+                {
+                    throw new NotImplementedException($"不支持的成员访问右侧类型: {operation.Right?.GetType().Name}");
+                }
+
+                // 发出SetField指令
+                Emit(OpCode.SetField, fieldName);
+            }
             else if (leftExpr != null)
             {
-                // 其他类型的左侧表达式(如成员访问)
-                // TODO: 实现成员访问赋值
+                // 其他类型的左侧表达式
                 throw new NotImplementedException($"不支持的赋值左侧表达式类型: {leftExpr.GetType().Name}");
             }
         }
@@ -472,14 +498,21 @@ public partial class BytecodeVisitor
     public Instruction? VisitClassInit(ClassInit node)
     {
         // 类定义编译
-        // TODO: 完整的类定义支持需要：
-        // 1. 在字节码文件中添加类元数据
-        // 2. 编译类的构造函数和方法
-        // 3. 支持类的继承和多态
-        //
-        // 简化实现：暂时不支持类定义
-        // 类定义在字节码层面是一个复杂的特性
+        // 从 TypeTemplate 中提取类名和字段名
+        var typeTemplate = node.AnyLangValue;
+        string className = typeTemplate.ClassName;
+        var fields = new List<string>();
 
+        // 遍历类成员变量，提取字段名
+        foreach (var member in typeTemplate.Variates.Keys)
+        {
+            fields.Add(member.IdName);
+        }
+
+        // 在编译器中注册类定义
+        _compiler.DeclareClass(className, fields);
+
+        // 类定义本身不生成运行时指令
         return null;
     }
 

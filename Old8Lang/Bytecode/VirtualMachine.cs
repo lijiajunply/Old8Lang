@@ -1027,27 +1027,154 @@ public class VirtualMachine
                     throw new Exception($"无法访问 null 对象的字段 {fieldName}");
                 }
 
-                // 使用反射获取字段或属性
-                var objType = obj.GetType();
-
-                // 先尝试获取属性
-                var property = objType.GetProperty(fieldName);
-                if (property != null)
+                // 如果是字典对象（我们创建的类实例）
+                if (obj is Dictionary<string, object?> dictObj)
                 {
-                    _stack.Push(property.GetValue(obj));
-                }
-                else
-                {
-                    // 再尝试获取字段
-                    var field = objType.GetField(fieldName);
-                    if (field != null)
+                    if (dictObj.TryGetValue(fieldName, out var value))
                     {
-                        _stack.Push(field.GetValue(obj));
+                        _stack.Push(value);
                     }
                     else
                     {
-                        throw new Exception($"类型 {objType.Name} 没有字段或属性 {fieldName}");
+                        throw new Exception($"对象没有字段 {fieldName}");
                     }
+                }
+                else
+                {
+                    // 使用反射获取字段或属性（用于内置类型）
+                    var objType = obj.GetType();
+
+                    // 先尝试获取属性
+                    var property = objType.GetProperty(fieldName);
+                    if (property != null)
+                    {
+                        _stack.Push(property.GetValue(obj));
+                    }
+                    else
+                    {
+                        // 再尝试获取字段
+                        var field = objType.GetField(fieldName);
+                        if (field != null)
+                        {
+                            _stack.Push(field.GetValue(obj));
+                        }
+                        else
+                        {
+                            throw new Exception($"类型 {objType.Name} 没有字段或属性 {fieldName}");
+                        }
+                    }
+                }
+            }
+                break;
+
+            case OpCode.SetField:
+            {
+                // 栈布局(从栈顶到栈底): value, object
+                // 操作数: fieldName (string)
+                var value = _stack.Pop();
+                var obj = _stack.Pop();
+                string fieldName = (string)instruction.Operand!;
+
+                if (obj == null)
+                {
+                    throw new Exception($"无法设置 null 对象的字段 {fieldName}");
+                }
+
+                // 如果是字典对象（我们创建的类实例）
+                if (obj is Dictionary<string, object?> dictObj)
+                {
+                    dictObj[fieldName] = value;
+                }
+                else
+                {
+                    // 使用反射设置字段或属性（用于内置类型）
+                    var objType = obj.GetType();
+
+                    // 先尝试设置属性
+                    var property = objType.GetProperty(fieldName);
+                    if (property != null && property.CanWrite)
+                    {
+                        property.SetValue(obj, value);
+                    }
+                    else
+                    {
+                        // 再尝试设置字段
+                        var field = objType.GetField(fieldName);
+                        if (field != null)
+                        {
+                            field.SetValue(obj, value);
+                        }
+                        else
+                        {
+                            throw new Exception($"类型 {objType.Name} 没有可写的字段或属性 {fieldName}");
+                        }
+                    }
+                }
+            }
+                break;
+
+            case OpCode.NewObject:
+            {
+                // 操作数: className (string)
+                string className = (string)instruction.Operand!;
+
+                // 从字节码文件中查找类定义
+                var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
+                if (classMetadata == null)
+                {
+                    throw new Exception($"未找到类定义: {className}");
+                }
+
+                // 创建对象实例（使用动态类型）
+                var obj = new Dictionary<string, object?>();
+
+                // 初始化字段为默认值
+                foreach (var field in classMetadata.Fields)
+                {
+                    obj[field.Name] = null;
+                }
+
+                // 将对象压入栈
+                _stack.Push(obj);
+            }
+                break;
+
+            case OpCode.CallMethod:
+            {
+                // 操作数: argCount (int), methodName (string)
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string methodName = (string)operands[1];
+
+                // 从栈中弹出参数（逆序）
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 弹出对象
+                var obj = _stack.Pop();
+                if (obj == null)
+                {
+                    throw new Exception($"无法在 null 对象上调用方法 {methodName}");
+                }
+
+                // 使用反射调用方法
+                var objType = obj.GetType();
+                var method = objType.GetMethod(methodName);
+
+                if (method == null)
+                {
+                    throw new Exception($"类型 {objType.Name} 没有方法 {methodName}");
+                }
+
+                var result = method.Invoke(obj, args);
+
+                // 如果方法有返回值，压入栈
+                if (method.ReturnType != typeof(void))
+                {
+                    _stack.Push(result);
                 }
             }
                 break;

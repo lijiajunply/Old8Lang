@@ -127,28 +127,41 @@ public partial class BytecodeVisitor
     public Instruction? VisitInstance(Instance node)
     {
         // Instance 是函数调用表达式 a(b, c)
-        // 生成参数代码（位置参数 + 命名参数）
-
-        // 先生成位置参数
-        foreach (var arg in node.Ids)
-        {
-            arg.Accept(this);
-        }
-
-        // TODO: 处理命名参数
-        // 命名参数暂时不支持，需要在VM中添加命名参数支持
-
         string funcName = node.Id.IdName;
         int argCount = node.Ids.Count;
 
-        // 检查是否是原生函数
-        if (_compiler.IsNativeFunction(funcName))
+        // 检查是否是类实例化
+        bool isClassName = _compiler.IsClassName(funcName);
+
+        if (isClassName)
         {
-            Emit(OpCode.CallNative, new object[] { argCount, funcName });
+            // 类实例化: Person()
+            // 生成 NewObject 指令
+            Emit(OpCode.NewObject, funcName);
         }
         else
         {
-            Emit(OpCode.Call, new object[] { argCount, funcName });
+            // 普通函数调用
+            // 生成参数代码（位置参数 + 命名参数）
+
+            // 先生成位置参数
+            foreach (var arg in node.Ids)
+            {
+                arg.Accept(this);
+            }
+
+            // TODO: 处理命名参数
+            // 命名参数暂时不支持，需要在VM中添加命名参数支持
+
+            // 检查是否是原生函数
+            if (_compiler.IsNativeFunction(funcName))
+            {
+                Emit(OpCode.CallNative, new object[] { argCount, funcName });
+            }
+            else
+            {
+                Emit(OpCode.Call, new object[] { argCount, funcName });
+            }
         }
 
         return null;

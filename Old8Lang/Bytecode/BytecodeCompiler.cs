@@ -26,6 +26,9 @@ public class BytecodeCompiler
     {
         _bytecodeFile.ConstantPool = ConstantPool;
 
+        // 第一阶段：预处理，注册所有类定义
+        PreprocessClassDefinitions(ast);
+
         // 创建主函数(入口点)
         var mainFunc = new FunctionMetadata
         {
@@ -50,6 +53,32 @@ public class BytecodeCompiler
         _bytecodeFile.EntryPointIndex = _bytecodeFile.Functions.Count - 1;
 
         return _bytecodeFile;
+    }
+
+    /// <summary>
+    /// 预处理阶段：遍历AST，注册所有类定义
+    /// </summary>
+    private void PreprocessClassDefinitions(BlockStatement ast)
+    {
+        // ClassInit 存储在 ImportStatements 中
+        foreach (var statement in ast.ImportStatements)
+        {
+            if (statement is ClassInit classInit)
+            {
+                var typeTemplate = classInit.AnyLangValue;
+                string className = typeTemplate.ClassName;
+                var fields = new List<string>();
+
+                // 提取字段名
+                foreach (var member in typeTemplate.Variates.Keys)
+                {
+                    fields.Add(member.IdName);
+                }
+
+                // 注册类定义
+                DeclareClass(className, fields);
+            }
+        }
     }
 
     /// <summary>
@@ -143,6 +172,23 @@ public class BytecodeCompiler
                 "SemaphoreCreate" or "SemaphoreAcquire" or "SemaphoreRelease" => true,
             _ => false
         };
+    }
+
+    // ===== 类定义管理 =====
+
+    public void DeclareClass(string className, List<string> fields)
+    {
+        var classMetadata = new ClassMetadata
+        {
+            Name = className,
+            Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList()
+        };
+        _bytecodeFile.Classes.Add(classMetadata);
+    }
+
+    public bool IsClassName(string name)
+    {
+        return _bytecodeFile.Classes.Any(c => c.Name == name);
     }
 
     /// <summary>

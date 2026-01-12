@@ -9,7 +9,7 @@ namespace Old8Lang.Tests.VirtualMachine.Classes;
 /// </summary>
 public class VMClassDeclarationTests
 {
-    [Fact(Skip = "虚拟机不支持类声明和对象实例化")]
+    [Fact]
     public void ClassDeclaration_SimpleClass_ExecutesCorrectly()
     {
         // Arrange
