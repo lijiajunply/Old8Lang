@@ -441,7 +441,7 @@ public class VirtualMachine
                 {
                     length = list.Count;
                 }
-                else if (collection is System.Collections.ICollection col)
+                else if (collection is ICollection col)
                 {
                     length = col.Count;
                 }
@@ -474,7 +474,7 @@ public class VirtualMachine
                     int idx = Convert.ToInt32(index);
                     _stack.Push(list[idx]);
                 }
-                else if (collection is System.Collections.IDictionary dict)
+                else if (collection is IDictionary dict)
                 {
                     _stack.Push(dict[index]);
                 }
@@ -507,7 +507,7 @@ public class VirtualMachine
                     int idx = Convert.ToInt32(index);
                     list[idx] = value;
                 }
-                else if (collection is System.Collections.IDictionary dict)
+                else if (collection is IDictionary dict)
                 {
                     dict[index] = value;
                 }
@@ -679,8 +679,8 @@ public class VirtualMachine
                     "bool" => value is bool,
                     "char" => value is char,
                     "array" => value is Array,
-                    "list" => value is System.Collections.IList,
-                    "dict" => value is System.Collections.IDictionary,
+                    "list" => value is IList,
+                    "dict" => value is IDictionary,
                     "null" => value == null,
                     _ => false
                 };
@@ -722,11 +722,11 @@ public class VirtualMachine
                 {
                     typeName = "array";
                 }
-                else if (value is System.Collections.IList)
+                else if (value is IList)
                 {
                     typeName = "list";
                 }
-                else if (value is System.Collections.IDictionary)
+                else if (value is IDictionary)
                 {
                     typeName = "dict";
                 }
@@ -1190,6 +1190,7 @@ public class VirtualMachine
             {
                 items.Add(ToString(item));
             }
+
             return "[" + string.Join(", ", items) + "]";
         }
 
@@ -1201,17 +1202,15 @@ public class VirtualMachine
             {
                 items.Add(ToString(item));
             }
+
             return "{" + string.Join(", ", items) + "}";
         }
 
         // 处理字典
-        if (value is System.Collections.IDictionary dict)
+        if (value is IDictionary dict)
         {
-            var items = new List<string>();
-            foreach (System.Collections.DictionaryEntry entry in dict)
-            {
-                items.Add($"{ToString(entry.Key)}: {ToString(entry.Value)}");
-            }
+            var items = (from DictionaryEntry entry in dict select $"{ToString(entry.Key)}: {ToString(entry.Value)}")
+                .ToList();
             return "{" + string.Join(", ", items) + "}";
         }
 
@@ -1367,7 +1366,7 @@ public class VirtualMachine
     /// <summary>
     /// 对数组执行切片操作
     /// </summary>
-    private object? SliceArray(Array array, int start, int end, int step)
+    private object SliceArray(Array array, int start, int end, int step)
     {
         var length = array.Length;
 

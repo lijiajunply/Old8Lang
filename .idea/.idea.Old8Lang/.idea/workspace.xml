@@ -23,11 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/VirtualMachine.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Debugger/DebuggerTypes.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Debugger/VMDebugger.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/FunctionProfile.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/VMProfiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/VirtualMachine.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -911,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="618" />
+    <option name="localTasksCounter" value="619" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -938,7 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(compiler): 重构Operation.cs文件优化编译器架构&#10;&#10;- 提取数值运算助手类NumericBinaryOpHelper处理+、-、*、/、%、^运算符&#10;- 提取比较运算助手类ComparisonOpHelper处理&gt;、&lt;、==、!=、&lt;=、&gt;=运算符&#10;- 提取in操作符助手类InOperatorHelper支持List、Array、Dictionary、String等集合类型&#10;- Operation.cs从2335行减少到1850行，消除约500行重复代码&#10;- 统一处理类型转换包括int/double混合运算和object vs int特殊情况&#10;- 优化栈操作通过SwapStackOrder方法处理IL栈顺序&#10;- 支持编译器模式和解释器模式的所有测试通过" />
     <MESSAGE value="feat(parser): 添加一元运算符支持&#10;&#10;- 在ExpressionParser.ParsePower方法中实现一元NOT(!)和负号(-)运算符解析&#10;- 支持多重一元运算符嵌套如!!a和!!(10 &gt; 5)的语法&#10;- 修正Operation节点创建时左操作数为null表示一元运算的情况&#10;- 添加一元运算符相关的编译器和解释器测试用例&#10;- 更新Operation.cs添加NOT运算符的字符串表示&#10;- 为一元运算符表达式添加完整的单元测试覆盖" />
     <MESSAGE value="refactor(compiler): 重构逻辑运算符和空值合并运算符的IL代码生成&#10;&#10;- 提取逻辑运算符代码生成到LogicalOpILHelper类&#10;- 提取空值合并运算符代码生成到NullishCoalescingILHelper类&#10;- 移除Operation.cs中的内联IL生成代码&#10;- 统一逻辑AND、OR、XOR运算符的短路求值实现&#10;- 优化空值合并运算符对值类型和引用类型的处理逻辑&#10;- 减少Operation.cs文件大小提升代码可维护性" />
     <MESSAGE value="refactor(compiler): 重构类型检查和转换操作的IL代码生成&#10;&#10;- 将 as、is 和 is not 运算符的IL生成逻辑提取到独立的 TypeCheckILHelper 类中&#10;- 移除 Operation.cs 中的大段内联类型检查和转换实现代码&#10;- 添加统一的类型名称到 .NET 类型映射字典&#10;- 实现统一的值类型和引用类型检查逻辑&#10;- 优化 null 类型检查的特殊处理&#10;- 提供更清晰的 IL 代码生成注释和文档说明" />
@@ -963,7 +959,8 @@
     <MESSAGE value="feat(vm): 添加字段访问和索引赋值功能支持&#10;&#10;- 实现了 GetField 操作码支持对象字段访问&#10;- 添加了数组/列表索引赋值功能支持&#10;- 扩展了 SetStatement 处理逻辑支持成员访问赋值&#10;- 增强了虚拟机 ToString 方法支持数组列表字典格式化&#10;- 修正了算术运算符测试用例和集成测试断言&#10;- 更新了 IDE 工作区配置和变更列表管理" />
     <MESSAGE value="feat(bytecode): 扩展字节码文件格式支持类定义和调试信息&#10;&#10;- 在BytecodeFile中添加Classes属性存储类元数据列表&#10;- 在BytecodeFile中添加DebugInfo属性支持调试信息可选项&#10;- 实现ClassMetadata类包含字段、方法、继承关系等完整类定义信息&#10;- 实现AccessModifier枚举和FieldMetadata、MethodMetadata类&#10;- 添加DebugInfo、SourceLocation、LocalVariableInfo等调试信息相关类&#10;- 更新BytecodeFile的序列化和反序列化逻辑以支持新结构&#10;- 实现Disassembler类提供字节码反汇编功能&#10;- 添加完整的单元测试验证类定义和调试信息的保存加载功能" />
     <MESSAGE value="feat(jit): 添加JIT即时编译器实现&#10;&#10;- 实现了JIT编译器类及其核心功能&#10;- 添加了函数调用计数和编译阈值控制&#10;- 实现了已编译函数的缓存管理&#10;- 添加了IL代码生成的基础框架&#10;- 实现了动态方法创建和委托编译功能&#10;- 添加了编译状态检查和错误处理机制" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(jit): 添加JIT即时编译器实现&#10;&#10;- 实现了JIT编译器类及其核心功能&#10;- 添加了函数调用计数和编译阈值控制&#10;- 实现了已编译函数的缓存管理&#10;- 添加了IL代码生成的基础框架&#10;- 实现了动态方法创建和委托编译功能&#10;- 添加了编译状态检查和错误处理机制" />
+    <MESSAGE value="feat(vm): 添加虚拟机调试器和性能分析器功能&#10;&#10;- 实现了调试器类型定义包括断点信息和调试器状态枚举&#10;- 创建了完整的虚拟机调试器支持断点管理单步执行和变量查看&#10;- 添加了性能分析器功能统计函数调用和指令执行性能数据&#10;- 编写了详细的虚拟机实现文档涵盖架构设计和使用示例&#10;- 更新项目配置文件包含新增调试和性能分析组件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加虚拟机调试器和性能分析器功能&#10;&#10;- 实现了调试器类型定义包括断点信息和调试器状态枚举&#10;- 创建了完整的虚拟机调试器支持断点管理单步执行和变量查看&#10;- 添加了性能分析器功能统计函数调用和指令执行性能数据&#10;- 编写了详细的虚拟机实现文档涵盖架构设计和使用示例&#10;- 更新项目配置文件包含新增调试和性能分析组件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
