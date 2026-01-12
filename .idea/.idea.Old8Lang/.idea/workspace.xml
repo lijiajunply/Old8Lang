@@ -22,7 +22,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Docs/VirtualMachine.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Debugger/DebuggerTypes.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Debugger/VMDebugger.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/FunctionProfile.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/VMProfiler.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -905,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="615" />
+    <option name="localTasksCounter" value="618" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,9 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(language-server): 实现 native extern import 语句的符号表构建支持&#10;&#10;- 在 CompletionHandler 中添加取消令牌检查防止长时间运行&#10;- 扩展 SymbolTableBuilder 支持 native statement 的符号解析和存储&#10;- 添加对 extern statement 外部函数声明的符号表构建支持&#10;- 实现 import statement 模块导入的符号表处理逻辑&#10;- 更新 CompletionHandler_ExternTests 测试用例适配新的 extern 语法&#10;- 修改 LSP 协议测试中的字符串比较方法提升兼容性&#10;- 优化取消令牌处理使用 CancelAsync 替代 Cancel 方法" />
-    <MESSAGE value="fix(compiler): 修复IL代码生成中的局部变量引用问题&#10;&#10;- 修正所有OpCodes.Ldloc和OpCodes.Stloc指令使用局部变量对象而非LocalIndex属性&#10;- 添加对object类型数组索引访问的动态处理支持&#10;- 修复成员链分析器中光标位置判断逻辑，正确处理点号位置边界情况&#10;- 更新类型注解管理器支持数组类型解析和泛型参数兼容性验证&#10;- 修改测试用例适配对象创建语法从new Class()到Class()的变化&#10;- 修正match表达式和switch语句中的局部变量引用方式&#10;- 更新类型系统测试中数组类型注解语法从int[]到array&lt;int&gt;的表示方法" />
-    <MESSAGE value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
     <MESSAGE value="refactor(compiler): 重构Operation.cs文件优化编译器架构&#10;&#10;- 提取数值运算助手类NumericBinaryOpHelper处理+、-、*、/、%、^运算符&#10;- 提取比较运算助手类ComparisonOpHelper处理&gt;、&lt;、==、!=、&lt;=、&gt;=运算符&#10;- 提取in操作符助手类InOperatorHelper支持List、Array、Dictionary、String等集合类型&#10;- Operation.cs从2335行减少到1850行，消除约500行重复代码&#10;- 统一处理类型转换包括int/double混合运算和object vs int特殊情况&#10;- 优化栈操作通过SwapStackOrder方法处理IL栈顺序&#10;- 支持编译器模式和解释器模式的所有测试通过" />
     <MESSAGE value="feat(parser): 添加一元运算符支持&#10;&#10;- 在ExpressionParser.ParsePower方法中实现一元NOT(!)和负号(-)运算符解析&#10;- 支持多重一元运算符嵌套如!!a和!!(10 &gt; 5)的语法&#10;- 修正Operation节点创建时左操作数为null表示一元运算的情况&#10;- 添加一元运算符相关的编译器和解释器测试用例&#10;- 更新Operation.cs添加NOT运算符的字符串表示&#10;- 为一元运算符表达式添加完整的单元测试覆盖" />
     <MESSAGE value="refactor(compiler): 重构逻辑运算符和空值合并运算符的IL代码生成&#10;&#10;- 提取逻辑运算符代码生成到LogicalOpILHelper类&#10;- 提取空值合并运算符代码生成到NullishCoalescingILHelper类&#10;- 移除Operation.cs中的内联IL生成代码&#10;- 统一逻辑AND、OR、XOR运算符的短路求值实现&#10;- 优化空值合并运算符对值类型和引用类型的处理逻辑&#10;- 减少Operation.cs文件大小提升代码可维护性" />
@@ -957,7 +960,10 @@
     <MESSAGE value="feat(vm): 添加并发原语和异步支持功能&#10;&#10;- 实现了互斥锁相关操作(MutexCreate、MutexLock、MutexUnlock、MutexDispose)&#10;- 实现了通道通信机制(ChannelCreate、ChannelSend、ChannelReceive、ChannelClose)&#10;- 实现了信号量控制(SemaphoreCreate、SemaphoreAcquire、SemaphoreRelease)&#10;- 添加了异步任务支持(NewTask、Await、Yield操作)&#10;- 为并发原语提供了相应的原生函数接口&#10;- 添加了并发原语的单元测试覆盖&#10;- 添加了异步功能的基本测试用例" />
     <MESSAGE value="feat(vm): 添加虚拟机异常处理支持&#10;&#10;- 实现了 try-catch-finally 字节码指令处理逻辑&#10;- 添加了异常处理器栈用于跟踪异常处理块状态&#10;- 新增 ExceptionHandler 类管理异常处理流程&#10;- 添加了 TryBegin、TryEnd、CatchBegin、CatchEnd、FinallyBegin、FinallyEnd 操作码支持&#10;- 创建了虚拟机异常处理单元测试确保功能正确性" />
     <MESSAGE value="feat(lang): 添加索引访问和切片功能支持&#10;&#10;- 实现了列表项访问的VisitLangListItem方法，支持索引访问操作&#10;- 添加了嵌套索引访问VisitNestedIndexAccess的支持&#10;- 实现了嵌套切片访问VisitNestedSliceAccess的功能&#10;- 添加了切片操作的VisitSliceLangValue实现&#10;- 在虚拟机中新增Slice操作码的处理逻辑&#10;- 实现了数组、列表和字符串的切片操作支持&#10;- 优化了调用帧和指令的构造函数语法&#10;- 更新了常量池和字节码文件的初始化方式&#10;- 改进了本地变量查找的TryGetValue方法使用" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加索引访问和切片功能支持&#10;&#10;- 实现了列表项访问的VisitLangListItem方法，支持索引访问操作&#10;- 添加了嵌套索引访问VisitNestedIndexAccess的支持&#10;- 实现了嵌套切片访问VisitNestedSliceAccess的功能&#10;- 添加了切片操作的VisitSliceLangValue实现&#10;- 在虚拟机中新增Slice操作码的处理逻辑&#10;- 实现了数组、列表和字符串的切片操作支持&#10;- 优化了调用帧和指令的构造函数语法&#10;- 更新了常量池和字节码文件的初始化方式&#10;- 改进了本地变量查找的TryGetValue方法使用" />
+    <MESSAGE value="feat(vm): 添加字段访问和索引赋值功能支持&#10;&#10;- 实现了 GetField 操作码支持对象字段访问&#10;- 添加了数组/列表索引赋值功能支持&#10;- 扩展了 SetStatement 处理逻辑支持成员访问赋值&#10;- 增强了虚拟机 ToString 方法支持数组列表字典格式化&#10;- 修正了算术运算符测试用例和集成测试断言&#10;- 更新了 IDE 工作区配置和变更列表管理" />
+    <MESSAGE value="feat(bytecode): 扩展字节码文件格式支持类定义和调试信息&#10;&#10;- 在BytecodeFile中添加Classes属性存储类元数据列表&#10;- 在BytecodeFile中添加DebugInfo属性支持调试信息可选项&#10;- 实现ClassMetadata类包含字段、方法、继承关系等完整类定义信息&#10;- 实现AccessModifier枚举和FieldMetadata、MethodMetadata类&#10;- 添加DebugInfo、SourceLocation、LocalVariableInfo等调试信息相关类&#10;- 更新BytecodeFile的序列化和反序列化逻辑以支持新结构&#10;- 实现Disassembler类提供字节码反汇编功能&#10;- 添加完整的单元测试验证类定义和调试信息的保存加载功能" />
+    <MESSAGE value="feat(jit): 添加JIT即时编译器实现&#10;&#10;- 实现了JIT编译器类及其核心功能&#10;- 添加了函数调用计数和编译阈值控制&#10;- 实现了已编译函数的缓存管理&#10;- 添加了IL代码生成的基础框架&#10;- 实现了动态方法创建和委托编译功能&#10;- 添加了编译状态检查和错误处理机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(jit): 添加JIT即时编译器实现&#10;&#10;- 实现了JIT编译器类及其核心功能&#10;- 添加了函数调用计数和编译阈值控制&#10;- 实现了已编译函数的缓存管理&#10;- 添加了IL代码生成的基础框架&#10;- 实现了动态方法创建和委托编译功能&#10;- 添加了编译状态检查和错误处理机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
