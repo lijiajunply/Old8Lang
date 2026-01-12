@@ -23,27 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompileBytecodeCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ExecuteBytecodeCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VMCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/CallFrame.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ConstantPool.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Instruction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/VMTests/basic_arithmetic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/VMTests/control_flow.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/VMTests/function_calls.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/VM_Status_Report.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -582,7 +562,7 @@
       <workItem from="1767865400494" duration="19888000" />
       <workItem from="1767985358686" duration="156000" />
       <workItem from="1767985518540" duration="4807000" />
-      <workItem from="1768162238074" duration="337000" />
+      <workItem from="1768162238074" duration="2034000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +907,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="605" />
+    <option name="localTasksCounter" value="609" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,10 +934,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(guidelines): 添加 Old8Lang API 参考文档和贡献者指南&#10;&#10;- 创建完整的 API 参考文档，涵盖基础函数、数学函数、字符串处理等功能模块&#10;- 添加详细的并发原语文档，包括互斥锁、信号量、原子整数、通道等&#10;- 编写全面的贡献者指南，包含开发环境设置、代码规范、提交规范等内容&#10;- 提供测试要求和文档贡献指导，帮助开发者参与项目&#10;- 包含问题报告和功能请求的模板，规范社区交互流程" />
-    <MESSAGE value="docs(guides): 添加高级主题文档并整合开发工具指南&#10;&#10;- 新增 ADVANCED_TOPICS.md 包含 Extern 功能工厂架构详解&#10;- 新增 DEVELOPER_TOOLS.md 整合 Language Server 和 VSCode 扩展开发指南&#10;- 移除过时的 DEBUGGER_GUIDE.md 文档&#10;- 更新高级主题涵盖渐进式类型推断系统和包开发指南&#10;- 完善开发工具文档包含调试器和性能分析工具说明" />
-    <MESSAGE value="test(completion): 添加补全处理器的边界测试和并发原语测试&#10;&#10;- 在CompletionHandler中确保全局函数初始化以支持测试环境&#10;- 添加边界测试覆盖空文档、语法错误、越界位置等极端情况&#10;- 添加并发原语函数的完整补全测试包括Mutex、Semaphore、Channel等&#10;- 添加关键字补全测试覆盖控制流、函数、异步、面向对象等关键字&#10;- 实现大量符号表的性能测试确保补全响应时间在1秒内&#10;- 验证所有并发原语函数的补全完整性和详细信息" />
-    <MESSAGE value="test(language-server): 添加语言服务器补全功能测试&#10;&#10;- 添加异步函数关键字补全测试&#10;- 添加内置函数补全功能测试，覆盖打印、数学、字符串、集合等各类函数&#10;- 添加上下文感知补全测试，验证不同作用域中的补全行为&#10;- 测试全局作用域、类方法作用域、局部变量作用域的补全功能&#10;- 验证函数参数作用域、成员访问、异常处理等场景的补全&#10;- 包含循环、嵌套函数、继承等多种编程结构的补全测试&#10;- 测试导入模块、静态成员、注释和字面量等特殊情况的补全" />
     <MESSAGE value="docs(tests): 更新语言服务器测试目录重组总结文档&#10;&#10;- 添加了完整的测试目录重组概览和前后对比&#10;- 记录了39个文件从扁平化结构到分层结构的详细分类&#10;- 提供了各个子目录的功能说明和测试统计信息&#10;- 包含了技术实现细节和Git命令使用说明&#10;- 记录了重组效果验证和后续改进建议&#10;- 保留了完整的文件移动历史和向后兼容性说明" />
     <MESSAGE value="refactor(tests): 重构语言服务器测试目录结构&#10;&#10;- 将扁平化的测试文件重新组织到分层目录结构中&#10;- 按功能模块分类测试文件：Completion、Handlers、Services等&#10;- 更新所有测试文件的命名空间以匹配新的目录结构&#10;- 调整using语句顺序保持代码风格一致性&#10;- 删除不必要的using引用减少代码冗余&#10;- 保持所有测试功能完整性的同时改善代码可维护性" />
     <MESSAGE value="feat(interpreter): 实现defer语句的作用域捕获和恢复机制&#10;&#10;- 重构DeferStack数据结构，从OldStatement改为DeferEntry记录类型&#10;- 添加作用域快照捕获功能，在注册defer时保存当前局部变量状态&#10;- 实现混合作用域执行机制，合并捕获作用域和当前作用域&#10;- 添加作用域同步逻辑，将defer执行的变量修改回传到当前作用域&#10;- 改进异常处理确保所有defer语句都能按LIFO顺序执行&#10;- 更新作用域缓存管理机制，适应动态作用域切换需求" />
@@ -979,7 +955,11 @@
     <MESSAGE value="feat(compiler): 添加异常包装和范围表达式支持&#10;&#10;- 实现 ExceptionWrapper 类用于编译器模式下异常处理&#10;- 在 TryStatement 中包装异常对象以便只显示消息&#10;- 在 ThrowStatement 中处理 ExceptionWrapper 类型异常&#10;- 添加对数组和 List&lt;T&gt; 类型 Length/Count 属性的支持&#10;- 修改范围表达式测试使用数组属性和索引访问&#10;- 更新范围表达式语法和相关测试用例&#10;- 调整嵌套异常测试的输出格式处理" />
     <MESSAGE value="feat(lang): 添加字典类型支持和优化IL代码生成&#10;&#10;- 在DictionaryLangValue中实现值类型的条件装箱以避免不必要的装箱操作&#10;- 扩展NestedIndexAccess支持Dictionary&lt;TKey, TValue&gt;类型的索引访问&#10;- 在ReturnStatement中添加返回值类型转换逻辑处理值类型与引用类型间的转换&#10;- 修复object到值类型的拆箱和值类型到引用类型的装箱操作" />
     <MESSAGE value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
+    <MESSAGE value="feat(vm): 添加虚拟机基础算术运算和字节码编译功能&#10;&#10;- 新增 basic_arithmetic.old8 测试文件，包含算术运算、变量赋值和比较运算测试&#10;- 实现 BytecodeCompiler 类，负责将 AST 编译为字节码并管理作用域&#10;- 创建 BytecodeFile 类，定义字节码文件格式 (.o8c) 并支持读写操作&#10;- 开发 BytecodeVisitor 类及其表达式、语句、值类型实现，转换 AST 节点为字节码指令&#10;- 添加 CallFrame 类，管理虚拟机调用栈帧和局部变量&#10;- 实现 CompileBytecodeCommand 命令，支持编译 .old8 文件为 .o8c 字节码文件&#10;- 创建 ConstantPool 类，管理字节码中的常量存储和索引映射&#10;- 实现基本的栈大小跟踪和字节码优化功能" />
+    <MESSAGE value="feat(vm): 实现字节码虚拟机核心功能&#10;&#10;- 添加三元运算符的字节码生成和执行支持&#10;- 实现字典字面量的创建和操作&#10;- 添加异常抛出指令的支持&#10;- 完善 switch 语句的字节码生成逻辑&#10;- 实现函数调用（包括原生函数）的参数处理&#10;- 添加异步表达式和类成员访问的基础框架&#10;- 增加循环和异常处理语句的编译支持&#10;- 更新测试用例验证基本功能正确性" />
+    <MESSAGE value="feat(vm): 添加虚拟机核心功能实现和测试用例&#10;&#10;- 实现了从主构造函数参数字段获取值的辅助方法GetPrimaryConstructorParameter&#10;- 修改WhileStatement访问逻辑以正确获取expression和blockStatement字段&#10;- 添加了完整的虚拟机测试用例文件，包括基础功能、字符串操作、三元运算符、ToStr转换等&#10;- 实现了While语句的正确字段访问和异常处理机制&#10;- 新增多个虚拟机测试脚本覆盖不同功能场景" />
+    <MESSAGE value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
