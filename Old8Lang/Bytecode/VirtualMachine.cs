@@ -1,3 +1,5 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.Bytecode;
@@ -637,6 +639,179 @@ public class VirtualMachine
                 }
                 break;
 
+            // === 并发原语 ===
+            case OpCode.MutexCreate:
+                {
+                    var mutexId = Concurrency.ResourceManager.CreateMutex();
+                    _stack.Push(mutexId);
+                }
+                break;
+
+            case OpCode.MutexLock:
+                {
+                    var mutexId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.LockMutex(mutexId);
+                }
+                break;
+
+            case OpCode.MutexUnlock:
+                {
+                    var mutexId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.UnlockMutex(mutexId);
+                }
+                break;
+
+            case OpCode.MutexDispose:
+                {
+                    var mutexId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.DisposeMutex(mutexId);
+                }
+                break;
+
+            case OpCode.ChannelCreate:
+                {
+                    var channelId = Concurrency.ResourceManager.CreateChannel();
+                    _stack.Push(channelId);
+                }
+                break;
+
+            case OpCode.ChannelSend:
+                {
+                    var value = _stack.Pop();
+                    var channelId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.SendChannel(channelId, value);
+                }
+                break;
+
+            case OpCode.ChannelReceive:
+                {
+                    var channelId = Convert.ToInt32(_stack.Pop());
+                    var value = Concurrency.ResourceManager.ReceiveChannel(channelId);
+                    _stack.Push(value);
+                }
+                break;
+
+            case OpCode.ChannelClose:
+                {
+                    var channelId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.CloseChannel(channelId);
+                }
+                break;
+
+            case OpCode.SemaphoreCreate:
+                {
+                    // 栈顶: maxCount, initialCount
+                    var maxCount = Convert.ToInt32(_stack.Pop());
+                    var initialCount = Convert.ToInt32(_stack.Pop());
+                    var semaphoreId = Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
+                    _stack.Push(semaphoreId);
+                }
+                break;
+
+            case OpCode.SemaphoreAcquire:
+                {
+                    var semaphoreId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
+                }
+                break;
+
+            case OpCode.SemaphoreRelease:
+                {
+                    var semaphoreId = Convert.ToInt32(_stack.Pop());
+                    Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
+                }
+                break;
+
+            // === 异步支持 ===
+            case OpCode.Await:
+                {
+                    var taskValue = _stack.Pop();
+
+                    // 如果是TaskLangValue，等待其完成
+                    if (taskValue is TaskLangValue task)
+                    {
+                        // 同步等待Task完成
+                        task.Task.Wait();
+
+                        // 将结果压入栈
+                        if (task.Result != null)
+                        {
+                            _stack.Push(task.Result.GetValue());
+                        }
+                        else
+                        {
+                            _stack.Push(null);
+                        }
+                    }
+                    else
+                    {
+                        // 如果不是Task，直接返回原值
+                        _stack.Push(taskValue);
+                    }
+                }
+                break;
+
+            case OpCode.Yield:
+                {
+                    // Yield操作：生成器返回一个值
+                    // 在字节码VM中，我们简化实现：
+                    // 1. 从栈中弹出要yield的值
+                    // 2. 将值存储到某个位置（例如返回值）
+                    // 3. 暂停执行（通过返回实现）
+
+                    // 注意：完整的生成器支持需要状态机，这里是简化版本
+                    var yieldValue = _stack.Pop();
+
+                    // 将yield的值压回栈顶作为返回值
+                    _stack.Push(yieldValue);
+
+                    // TODO: 完整的生成器实现需要：
+                    // - 保存当前执行状态（IP、局部变量）
+                    // - 创建可恢复的迭代器对象
+                    // - 支持多次yield和恢复执行
+                }
+                break;
+
+            case OpCode.NewTask:
+                {
+                    // NewTask操作：创建一个新的异步任务
+                    // 栈布局：[函数索引, 参数数量, arg1, arg2, ...]
+
+                    var operands = (object[])instruction.Operand!;
+                    int argCount = (int)operands[0];
+                    string funcName = (string)operands[1];
+
+                    // 从栈中弹出参数
+                    var args = new object?[argCount];
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        args[i] = _stack.Pop();
+                    }
+
+                    // 查找函数
+                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    if (function == null)
+                    {
+                        throw new Exception($"未定义的函数: {funcName}");
+                    }
+
+                    // 创建异步任务
+                    var task = Task.Run(() =>
+                    {
+                        // 在新线程中执行函数
+                        CallFunction(function, args);
+
+                        // 返回栈顶的值作为结果
+                        var result = _stack.Count > 0 ? _stack.Pop() : null;
+                        return result != null ? LangValueType.ObjToValue(result) : new NullLangValue();
+                    });
+
+                    // 将Task包装为TaskLangValue并压入栈
+                    var taskValue = new TaskLangValue(task);
+                    _stack.Push(taskValue);
+                }
+                break;
+
             // === 异常处理 ===
             case OpCode.Throw:
                 {
@@ -829,6 +1004,89 @@ public class VirtualMachine
                     return dresult;
                 }
                 return 0.0;
+
+            // === Mutex函数 ===
+            case "MutexCreate":
+                return Concurrency.ResourceManager.CreateMutex();
+
+            case "MutexLock":
+                if (args.Length > 0)
+                {
+                    int mutexId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.LockMutex(mutexId);
+                }
+                return null;
+
+            case "MutexUnlock":
+                if (args.Length > 0)
+                {
+                    int mutexId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.UnlockMutex(mutexId);
+                }
+                return null;
+
+            case "MutexDispose":
+                if (args.Length > 0)
+                {
+                    int mutexId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.DisposeMutex(mutexId);
+                }
+                return null;
+
+            // === Channel函数 ===
+            case "ChannelCreate":
+                return Concurrency.ResourceManager.CreateChannel();
+
+            case "ChannelSend":
+                if (args.Length >= 2)
+                {
+                    int channelId = Convert.ToInt32(args[0]);
+                    object? value = args[1];
+                    Concurrency.ResourceManager.SendChannel(channelId, value);
+                }
+                return null;
+
+            case "ChannelReceive":
+                if (args.Length > 0)
+                {
+                    int channelId = Convert.ToInt32(args[0]);
+                    return Concurrency.ResourceManager.ReceiveChannel(channelId);
+                }
+                return null;
+
+            case "ChannelClose":
+                if (args.Length > 0)
+                {
+                    int channelId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.CloseChannel(channelId);
+                }
+                return null;
+
+            // === Semaphore函数 ===
+            case "SemaphoreCreate":
+                if (args.Length >= 2)
+                {
+                    int initialCount = Convert.ToInt32(args[0]);
+                    int maxCount = Convert.ToInt32(args[1]);
+                    return Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
+                }
+                return 0;
+
+            case "SemaphoreAcquire":
+                if (args.Length > 0)
+                {
+                    int semaphoreId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
+                }
+                return null;
+
+            case "SemaphoreRelease":
+                if (args.Length > 0)
+                {
+                    int semaphoreId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
+                }
+                return null;
 
             default:
                 throw new Exception($"未知的原生函数: {funcName}");
