@@ -77,7 +77,19 @@ public class VirtualMachine
                 var instruction = function.Instructions[frame.IP];
                 frame.IP++;
 
-                ExecuteInstruction(instruction, frame);
+                try
+                {
+                    ExecuteInstruction(instruction, frame);
+                }
+                catch (Exception ex)
+                {
+                    // 异常处理：查找异常表中匹配的处理器
+                    if (!HandleException(ex, frame, function))
+                    {
+                        // 如果没有找到匹配的处理器，重新抛出异常
+                        throw;
+                    }
+                }
             }
         }
         finally
@@ -1422,6 +1434,79 @@ public class VirtualMachine
         if (value is double d) return d;
         if (value is string s && double.TryParse(s, out double result)) return result;
         throw new Exception($"无法将 {value?.GetType().Name} 转换为 double");
+    }
+
+    /// <summary>
+    /// 处理异常 - 查找并执行匹配的异常处理器
+    /// </summary>
+    /// <returns>如果找到并处理了异常返回true，否则返回false</returns>
+    private bool HandleException(Exception exception, CallFrame frame, FunctionMetadata function)
+    {
+        // 获取异常发生时的指令位置（已经+1了，所以要-1）
+        int exceptionIP = frame.IP - 1;
+
+        // 遍历异常表，查找匹配的处理器
+        foreach (var entry in function.ExceptionTable)
+        {
+            // 检查异常是否发生在这个try块中
+            if (entry.IsInTryBlock(exceptionIP))
+            {
+                // 检查异常类型是否匹配
+                if (IsExceptionTypeMatch(exception, entry.ExceptionType))
+                {
+                    // 将异常对象压入栈
+                    _stack.Push(exception.Message);
+
+                    // 如果有catch块，跳转到catch块
+                    if (entry.CatchStart >= 0)
+                    {
+                        frame.IP = entry.CatchStart;
+                        return true;
+                    }
+                    // 如果没有catch块但有finally块，跳转到finally块
+                    else if (entry.FinallyStart >= 0)
+                    {
+                        frame.IP = entry.FinallyStart;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // 没有找到匹配的处理器
+        return false;
+    }
+
+    /// <summary>
+    /// 检查异常类型是否匹配
+    /// </summary>
+    private bool IsExceptionTypeMatch(Exception exception, string? expectedType)
+    {
+        // 如果没有指定异常类型，匹配所有异常
+        if (string.IsNullOrEmpty(expectedType))
+            return true;
+
+        // 获取异常的类型名称
+        string actualType = exception.GetType().Name;
+
+        // 精确匹配
+        if (actualType == expectedType)
+            return true;
+
+        // 匹配完整类型名称
+        if (exception.GetType().FullName == expectedType)
+            return true;
+
+        // 检查继承关系
+        Type? currentType = exception.GetType();
+        while (currentType != null)
+        {
+            if (currentType.Name == expectedType || currentType.FullName == expectedType)
+                return true;
+            currentType = currentType.BaseType;
+        }
+
+        return false;
     }
 
     private string ToString(object? value)

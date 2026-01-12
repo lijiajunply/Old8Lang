@@ -32,6 +32,9 @@ public class FunctionMetadata
     /// <summary>函数在常量池中的索引(用于闭包)</summary>
     public int FunctionIndex { get; set; } = -1;
 
+    /// <summary>异常表 - 记录try-catch-finally块的位置信息</summary>
+    public List<ExceptionTableEntry> ExceptionTable { get; set; } = [];
+
     /// <summary>
     /// 写入二进制流
     /// </summary>
@@ -71,6 +74,11 @@ public class FunctionMetadata
         writer.Write(IsAsync);
         writer.Write(IsGenerator);
         writer.Write(FunctionIndex);
+
+        // 异常表
+        writer.Write(ExceptionTable.Count);
+        foreach (var entry in ExceptionTable)
+            entry.WriteTo(writer);
     }
 
     /// <summary>
@@ -114,6 +122,11 @@ public class FunctionMetadata
         func.IsAsync = reader.ReadBoolean();
         func.IsGenerator = reader.ReadBoolean();
         func.FunctionIndex = reader.ReadInt32();
+
+        // 异常表
+        int exceptionTableCount = reader.ReadInt32();
+        for (int i = 0; i < exceptionTableCount; i++)
+            func.ExceptionTable.Add(ExceptionTableEntry.ReadFrom(reader));
 
         return func;
     }

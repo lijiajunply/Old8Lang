@@ -145,6 +145,25 @@ public class BytecodeCompiler
         return _scopes.Peek().GetLocalIndex(name);
     }
 
+    /// <summary>
+    /// 分配局部变量（用于异常变量等临时变量）
+    /// </summary>
+    public int AllocateLocal(string name)
+    {
+        return DeclareLocalVariable(name);
+    }
+
+    /// <summary>
+    /// 添加异常表条目到当前函数
+    /// </summary>
+    public void AddExceptionTableEntry(ExceptionTableEntry entry)
+    {
+        if (_currentFunction != null)
+        {
+            _currentFunction.ExceptionTable.Add(entry);
+        }
+    }
+
     public void DeclareGlobalVariable(string name)
     {
         if (!_bytecodeFile.GlobalVariables.Contains(name))
