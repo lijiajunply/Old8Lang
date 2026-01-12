@@ -344,7 +344,26 @@ public partial class BytecodeVisitor
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
-        _compiler.CompileFunction(funcName, paramNames, funcValue.BlockStatement);
+        // 提取默认参数值
+        var defaultValues = new List<object?>();
+        if (funcValue.Ids != null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                if (param.DefaultValue != null)
+                {
+                    // 尝试计算默认值（仅支持常量表达式）
+                    var defaultValue = EvaluateConstantExpression(param.DefaultValue);
+                    defaultValues.Add(defaultValue);
+                }
+                else
+                {
+                    defaultValues.Add(null);
+                }
+            }
+        }
+
+        _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
         return null;
     }
 

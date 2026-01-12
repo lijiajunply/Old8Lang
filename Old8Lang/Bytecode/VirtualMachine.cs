@@ -343,6 +343,27 @@ public class VirtualMachine
                         throw new Exception($"未定义的函数: {funcName}");
                     }
 
+                    // 检查参数数量，如果不足则使用默认值补全
+                    if (argCount < function.Parameters.Count)
+                    {
+                        var fullArgs = new object?[function.Parameters.Count];
+                        Array.Copy(args, fullArgs, argCount);
+
+                        // 使用默认值填充剩余参数
+                        for (int i = argCount; i < function.Parameters.Count; i++)
+                        {
+                            if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
+                            {
+                                fullArgs[i] = function.DefaultValues[i];
+                            }
+                            else
+                            {
+                                throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                            }
+                        }
+                        args = fullArgs;
+                    }
+
                     // 调用函数
                     CallFunction(function, args);
                 }
@@ -1725,14 +1746,23 @@ public class VirtualMachine
             filled[paramIndex] = true;
         }
 
-        // 检查是否所有参数都已提供
+        // 检查是否所有参数都已提供，如果没有则使用默认值
         for (int i = 0; i < paramCount; i++)
         {
             if (!filled[i])
             {
                 // 参数未提供，检查是否有默认值
-                // TODO: 支持默认参数值
-                throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值");
+                if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
+                {
+                    // 使用默认值
+                    args[i] = function.DefaultValues[i];
+                    filled[i] = true;
+                }
+                else
+                {
+                    // 没有默认值，抛出错误
+                    throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                }
             }
         }
 

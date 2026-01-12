@@ -84,12 +84,13 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译函数定义
     /// </summary>
-    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, BlockStatement body)
+    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
     {
         var func = new FunctionMetadata
         {
             Name = funcName,
             Parameters = parameters,
+            DefaultValues = defaultValues,
             IsAsync = false
         };
 

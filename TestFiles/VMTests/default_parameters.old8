@@ -1,0 +1,52 @@
+// 虚拟机模式 - 默认参数测试
+
+// 测试1: 基本默认参数
+func greet(name, message: "Hello") {
+    PrintLine(message + ", " + name + "!")
+}
+
+PrintLine("=== 测试1: 基本默认参数 ===")
+greet("Alice")  // 使用默认消息
+greet("Bob", "Hi")  // 覆盖默认消息
+
+// 测试2: 多个默认参数
+func createUser(name, age: 18, city: "Unknown") {
+    PrintLine("用户: " + name + ", 年龄: " + age.ToStr() + ", 城市: " + city)
+}
+
+PrintLine("")
+PrintLine("=== 测试2: 多个默认参数 ===")
+createUser("Charlie")  // 全部使用默认值
+createUser("David", 25)  // 覆盖第一个默认值
+createUser("Eve", 30, "Beijing")  // 覆盖所有默认值
+
+// 测试3: 不同类型的默认参数
+func calculate(x, y: 10, factor: 2.5, enabled: true) {
+    if enabled {
+        result <- (x + y) * factor
+        PrintLine("计算结果: " + result.ToStr())
+    } else {
+        PrintLine("计算已禁用")
+    }
+}
+
+PrintLine("")
+PrintLine("=== 测试3: 不同类型的默认参数 ===")
+calculate(5)  // 使用所有默认值
+calculate(5, 20)  // 覆盖y
+calculate(5, 20, 3.0)  // 覆盖y和factor
+calculate(5, 20, 3.0, false)  // 覆盖所有参数
+
+// 测试4: 字符串默认参数
+func formatMessage(text, prefix: "[INFO]", suffix: "") {
+    PrintLine(prefix + " " + text + suffix)
+}
+
+PrintLine("")
+PrintLine("=== 测试4: 字符串默认参数 ===")
+formatMessage("系统启动")
+formatMessage("警告信息", "[WARN]")
+formatMessage("错误信息", "[ERROR]", " !!!")
+
+PrintLine("")
+PrintLine("=== 所有测试完成 ===")

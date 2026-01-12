@@ -135,4 +135,21 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
             targetPosition
         );
     }
+
+    /// <summary>
+    /// 计算常量表达式的值（用于默认参数）
+    /// </summary>
+    private object? EvaluateConstantExpression(LangExpression expr)
+    {
+        return expr switch
+        {
+            IntLangValue intVal => intVal.Value,
+            DoubleLangValue doubleVal => doubleVal.Value,
+            StringLangValue stringVal => stringVal.Value,
+            BoolLangValue boolVal => boolVal.Value,
+            CharLangValue charVal => charVal.Value,
+            NullLangValue => null,
+            _ => throw new NotSupportedException($"虚拟机模式不支持非常量默认参数表达式: {expr.GetType().Name}")
+        };
+    }
 }

@@ -11,6 +11,9 @@ public class FunctionMetadata
     /// <summary>参数名称列表</summary>
     public List<string> Parameters { get; set; } = [];
 
+    /// <summary>参数默认值列表（索引对应Parameters，null表示无默认值）</summary>
+    public List<object?> DefaultValues { get; set; } = [];
+
     /// <summary>字节码指令列表</summary>
     public List<Instruction> Instructions { get; set; } = [];
 
@@ -41,6 +44,22 @@ public class FunctionMetadata
         foreach (var param in Parameters)
             writer.Write(param);
 
+        // 默认参数值
+        writer.Write(DefaultValues.Count);
+        foreach (var defaultValue in DefaultValues)
+        {
+            if (defaultValue == null)
+            {
+                writer.Write((byte)0); // null标记
+            }
+            else
+            {
+                writer.Write((byte)1); // 非null标记
+                // 序列化默认值（支持基本类型）
+                WriteDefaultValue(writer, defaultValue);
+            }
+        }
+
         // 指令
         writer.Write(Instructions.Count);
         foreach (var instruction in Instructions)
@@ -69,6 +88,21 @@ public class FunctionMetadata
         for (int i = 0; i < paramCount; i++)
             func.Parameters.Add(reader.ReadString());
 
+        // 默认参数值
+        int defaultValueCount = reader.ReadInt32();
+        for (int i = 0; i < defaultValueCount; i++)
+        {
+            byte nullMarker = reader.ReadByte();
+            if (nullMarker == 0)
+            {
+                func.DefaultValues.Add(null);
+            }
+            else
+            {
+                func.DefaultValues.Add(ReadDefaultValue(reader));
+            }
+        }
+
         // 指令
         int instCount = reader.ReadInt32();
         for (int i = 0; i < instCount; i++)
@@ -87,5 +121,54 @@ public class FunctionMetadata
     public override string ToString()
     {
         return $"Function {Name}({string.Join(", ", Parameters)}) [{Instructions.Count} instructions]";
+    }
+
+    /// <summary>
+    /// 序列化默认参数值
+    /// </summary>
+    private static void WriteDefaultValue(BinaryWriter writer, object value)
+    {
+        switch (value)
+        {
+            case int intValue:
+                writer.Write((byte)1); // int类型标记
+                writer.Write(intValue);
+                break;
+            case double doubleValue:
+                writer.Write((byte)2); // double类型标记
+                writer.Write(doubleValue);
+                break;
+            case string stringValue:
+                writer.Write((byte)3); // string类型标记
+                writer.Write(stringValue);
+                break;
+            case bool boolValue:
+                writer.Write((byte)4); // bool类型标记
+                writer.Write(boolValue);
+                break;
+            case char charValue:
+                writer.Write((byte)5); // char类型标记
+                writer.Write(charValue);
+                break;
+            default:
+                throw new NotSupportedException($"不支持的默认参数类型: {value.GetType().Name}");
+        }
+    }
+
+    /// <summary>
+    /// 反序列化默认参数值
+    /// </summary>
+    private static object ReadDefaultValue(BinaryReader reader)
+    {
+        byte typeMarker = reader.ReadByte();
+        return typeMarker switch
+        {
+            1 => reader.ReadInt32(),
+            2 => reader.ReadDouble(),
+            3 => reader.ReadString(),
+            4 => reader.ReadBoolean(),
+            5 => reader.ReadChar(),
+            _ => throw new NotSupportedException($"不支持的默认参数类型标记: {typeMarker}")
+        };
     }
 }

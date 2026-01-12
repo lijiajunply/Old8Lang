@@ -9,7 +9,7 @@ namespace Old8Lang.Tests.VirtualMachine.Functions;
 /// </summary>
 public class VMFunctionCallTests
 {
-    [Fact(Skip = "虚拟机暂不支持默认参数")]
+    [Fact]
     public void FunctionCall_WithDefaultParameters_ExecutesCorrectly()
     {
         // Arrange
