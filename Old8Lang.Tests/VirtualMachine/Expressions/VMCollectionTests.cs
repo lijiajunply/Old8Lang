@@ -242,7 +242,7 @@ public class VMCollectionTests
 
     #region 字典测试
 
-    [Fact(Skip = "虚拟机字典ToString方法存在类型转换问题")]
+    [Fact]
     public void DictionaryCreation_ExecutesCorrectly()
     {
         // Arrange

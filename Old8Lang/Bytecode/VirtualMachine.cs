@@ -1810,6 +1810,54 @@ public class VirtualMachine
 
                 return null;
 
+            // === Match 表达式辅助函数 ===
+            case "CheckRange":
+                // 参数: value, start, end, includeStart, includeEnd
+                if (args.Length >= 5)
+                {
+                    double value = Convert.ToDouble(args[0]);
+                    double start = Convert.ToDouble(args[1]);
+                    double end = Convert.ToDouble(args[2]);
+                    bool includeStart = Convert.ToBoolean(args[3]);
+                    bool includeEnd = Convert.ToBoolean(args[4]);
+
+                    bool inRange = true;
+                    if (includeStart)
+                        inRange &= value >= start;
+                    else
+                        inRange &= value > start;
+
+                    if (includeEnd)
+                        inRange &= value <= end;
+                    else
+                        inRange &= value < end;
+
+                    return inRange;
+                }
+                return false;
+
+            case "FlattenTuple":
+                // 展平元组为列表
+                if (args.Length > 0 && args[0] is TupleLangValue tuple)
+                {
+                    return FlattenTupleHelper(tuple);
+                }
+                return new List<object?>();
+
+            case "GetCount":
+                // 获取集合元素数量
+                if (args.Length > 0)
+                {
+                    return args[0] switch
+                    {
+                        string str => str.Length,
+                        Array array => array.Length,
+                        IList list => list.Count,
+                        _ => 0
+                    };
+                }
+                return 0;
+
             default:
                 throw new Exception($"未知的原生函数: {funcName}");
         }
@@ -2028,6 +2076,40 @@ public class VirtualMachine
         if (value is string stringValue) return new StringLangValue(stringValue);
         if (value is bool boolValue) return new BoolLangValue(boolValue);
         return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 展平元组为列表（用于 match 表达式的元组解构）
+    /// 例如：((1, 2), 3) -> [1, 2, 3]
+    /// </summary>
+    private List<object?> FlattenTupleHelper(TupleLangValue tuple)
+    {
+        var result = new List<object?>();
+
+        var first = tuple.Value.Item1;
+        var second = tuple.Value.Item2;
+
+        // 递归展平第一个元素
+        if (first is TupleLangValue firstTuple)
+        {
+            result.AddRange(FlattenTupleHelper(firstTuple));
+        }
+        else if (first is not NullLangValue) // 排除单元素元组的 null 占位符
+        {
+            result.Add(first);
+        }
+
+        // 递归展平第二个元素
+        if (second is TupleLangValue secondTuple)
+        {
+            result.AddRange(FlattenTupleHelper(secondTuple));
+        }
+        else if (second is not NullLangValue) // 排除单元素元组的 null 占位符
+        {
+            result.Add(second);
+        }
+
+        return result;
     }
 }
 

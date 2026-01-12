@@ -193,9 +193,32 @@ public class BytecodeCompiler
     /// <summary>
     /// 分配局部变量（用于异常变量等临时变量）
     /// </summary>
-    public int AllocateLocal(string name)
+    public int AllocateLocal(string name = "")
     {
+        // 如果没有提供名称，生成一个临时名称
+        if (string.IsNullOrEmpty(name))
+        {
+            name = $"<temp_{Guid.NewGuid():N}>";
+        }
         return DeclareLocalVariable(name);
+    }
+
+    /// <summary>
+    /// 释放局部变量（用于临时变量）
+    /// 注意：这是一个占位方法，实际的局部变量管理由作用域处理
+    /// </summary>
+    public void FreeLocal(int localIndex)
+    {
+        // 在当前实现中，局部变量在作用域结束时自动释放
+        // 这个方法主要用于代码可读性，表明临时变量不再使用
+    }
+
+    /// <summary>
+    /// 添加常量到常量池
+    /// </summary>
+    public int AddConstant(object? value)
+    {
+        return ConstantPool.AddConstant(value);
     }
 
     /// <summary>

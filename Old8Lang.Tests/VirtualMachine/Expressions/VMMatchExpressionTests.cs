@@ -10,17 +10,17 @@ namespace Old8Lang.Tests.VirtualMachine.Expressions;
 /// </summary>
 public class VMMatchExpressionTests
 {
-    [Fact(Skip = "虚拟机 Match 表达式实现可能不完整")]
+    [Fact]
     public void MatchExpression_SimpleValueMatch_ExecutesCorrectly()
     {
         // Arrange
         var code = @"
             x <- 2
             result <- match x {
-                1 -> ""one""
-                2 -> ""two""
-                3 -> ""three""
-                _ -> ""other""
+                case 1 -> ""one""
+                case 2 -> ""two""
+                case 3 -> ""three""
+                case _ -> ""other""
             }
         ";
 
@@ -33,17 +33,17 @@ public class VMMatchExpressionTests
         Assert.Equal("two", vm.GetGlobalVariable("result"));
     }
 
-    [Fact(Skip = "虚拟机 Match 表达式实现可能不完整")]
+    [Fact]
     public void MatchExpression_DefaultBranch_ExecutesCorrectly()
     {
         // Arrange
         var code = @"
             x <- 10
             result <- match x {
-                1 -> ""one""
-                2 -> ""two""
-                3 -> ""three""
-                _ -> ""other""
+                case 1 -> ""one""
+                case 2 -> ""two""
+                case 3 -> ""three""
+                case _ -> ""other""
             }
         ";
 
@@ -56,17 +56,17 @@ public class VMMatchExpressionTests
         Assert.Equal("other", vm.GetGlobalVariable("result"));
     }
 
-    [Fact(Skip = "虚拟机 Match 表达式实现可能不完整")]
+    [Fact]
     public void MatchExpression_WithExpressions_ExecutesCorrectly()
     {
         // Arrange
         var code = @"
             score <- 85
             grade <- match score {
-                90 -> ""A""
-                80 -> ""B""
-                70 -> ""C""
-                _ -> ""F""
+                case 90 -> ""A""
+                case 80 -> ""B""
+                case 70 -> ""C""
+                case _ -> ""F""
             }
         ";
 
