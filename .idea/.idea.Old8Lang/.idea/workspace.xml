@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine-TestPlan.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/VirtualMachine-TestPlan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +110,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="AISelfReview" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -563,7 +564,7 @@
       <workItem from="1767985358686" duration="156000" />
       <workItem from="1767985518540" duration="4807000" />
       <workItem from="1768162238074" duration="3699000" />
-      <workItem from="1768245774894" duration="2191000" />
+      <workItem from="1768245774894" duration="2885000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -908,7 +909,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="626" />
+    <option name="localTasksCounter" value="627" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +936,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 修复编译器模式下范围表达式实现&#10;&#10;- 修改 RangeLangValue 生成实际数组而不是 IEnumerable&#10;- 添加 CreateRangeArray 辅助方法处理包含/排除逻辑&#10;- 更新 ExtendedRangeTests 使用数组索引而非 Length() 方法&#10;- 调整范围测试用例适配编译器模式行为&#10;- 修复负数范围和混合排除范围的处理逻辑&#10;- 统一异常测试类构造函数注入 ITestOutputHelper" />
     <MESSAGE value="feat(compiler): 添加异常包装和范围表达式支持&#10;&#10;- 实现 ExceptionWrapper 类用于编译器模式下异常处理&#10;- 在 TryStatement 中包装异常对象以便只显示消息&#10;- 在 ThrowStatement 中处理 ExceptionWrapper 类型异常&#10;- 添加对数组和 List&lt;T&gt; 类型 Length/Count 属性的支持&#10;- 修改范围表达式测试使用数组属性和索引访问&#10;- 更新范围表达式语法和相关测试用例&#10;- 调整嵌套异常测试的输出格式处理" />
     <MESSAGE value="feat(lang): 添加字典类型支持和优化IL代码生成&#10;&#10;- 在DictionaryLangValue中实现值类型的条件装箱以避免不必要的装箱操作&#10;- 扩展NestedIndexAccess支持Dictionary&lt;TKey, TValue&gt;类型的索引访问&#10;- 在ReturnStatement中添加返回值类型转换逻辑处理值类型与引用类型间的转换&#10;- 修复object到值类型的拆箱和值类型到引用类型的装箱操作" />
     <MESSAGE value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
@@ -960,7 +960,8 @@
     <MESSAGE value="docs(test): 更新虚拟机测试计划文档添加高级特性测试章节&#10;&#10;- 添加defer语句、Match表达式、select语句和异步函数测试章节&#10;- 新增12个高级特性测试用例并标记为跳过状态&#10;- 更新测试进度统计表格增加跳过列和重新计算完成率&#10;- 添加已跳过测试详细列表和跳过原因说明&#10;- 修改字典创建测试代码使用多行字符串字面量格式" />
     <MESSAGE value="feat(vm): 添加数组操作数序列化支持和命令行集成&#10;&#10;- 实现了数组类型操作数的序列化和反序列化功能&#10;- 添加了数组元素的递归序列化处理逻辑&#10;- 更新虚拟机实现状态文档至100%完成度&#10;- 完成了命令行工具的完整集成功能&#10;- 修复了操作数类型不支持时的错误信息显示" />
     <MESSAGE value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
+    <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

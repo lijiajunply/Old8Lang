@@ -43,7 +43,7 @@ public class VMCommand : ICommand
         }
 
         // 创建预编译符号管理器
-        PreprocessorSymbols preprocessorSymbols = new PreprocessorSymbols(symbols);
+        var preprocessorSymbols = new PreprocessorSymbols(symbols);
 
         // 验证文件扩展名
         var ext = Path.GetExtension(fileName).ToLower();
