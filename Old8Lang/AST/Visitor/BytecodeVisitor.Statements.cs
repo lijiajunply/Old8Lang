@@ -783,14 +783,31 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncFuncInit(AsyncFuncInit node)
     {
-        // 异步函数定义
-        // TODO: 完整的异步函数支持需要：
-        // 1. 状态机转换
-        // 2. Task/Promise 机制
-        // 3. await 点的暂停和恢复
-        //
-        // 简化实现：暂时不支持异步函数
+        // 编译异步函数定义
+        var funcValue = node.AsyncFuncValue;
+        var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
+        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
+        // 提取默认参数值
+        var defaultValues = new List<object?>();
+        if (funcValue.Ids != null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                if (param.DefaultValue != null)
+                {
+                    var defaultValue = EvaluateConstantExpression(param.DefaultValue);
+                    defaultValues.Add(defaultValue);
+                }
+                else
+                {
+                    defaultValues.Add(null);
+                }
+            }
+        }
+
+        // 调用编译器的 CompileAsyncFunction 方法
+        _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
         return null;
     }
 

@@ -228,6 +228,9 @@ public enum OpCode : byte
     /// <summary>创建Task</summary>
     NewTask = 0xA2,
 
+    /// <summary>调用异步函数 (操作数: argCount, funcName)</summary>
+    CallAsync = 0xA3,
+
     // ===== 异常处理 (0xB0-0xBF) =====
     /// <summary>抛出异常</summary>
     Throw = 0xB0,

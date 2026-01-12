@@ -175,6 +175,21 @@ public partial class BytecodeVisitor
                     Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
                 }
             }
+            // 检查是否是异步函数
+            else if (_compiler.IsAsyncFunction(funcName))
+            {
+                if (namedCount > 0)
+                {
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    Emit(OpCode.CallAsync, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                }
+                else
+                {
+                    // 无命名参数: [argCount, funcName]
+                    Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                }
+            }
             else
             {
                 if (namedCount > 0)

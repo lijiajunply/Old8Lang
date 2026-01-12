@@ -16,6 +16,10 @@ public class VirtualMachine
     private readonly BytecodeFile _bytecodeFile;
     private readonly Stack<ExceptionHandler> _exceptionHandlers = new();
 
+    // Task 管理
+    private readonly Dictionary<int, TaskLangValue> _tasks = new();
+    private int _nextTaskId = 1;
+
     public VirtualMachine(BytecodeFile bytecodeFile)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
@@ -421,6 +425,64 @@ public class VirtualMachine
                 }
 
                 // 如果有返回值,它应该在栈上
+            }
+                break;
+
+            case OpCode.CallAsync:
+            {
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)(operands.Length == 2 ? operands[1] : operands[2]);
+
+                // 从栈中弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 查找异步函数
+                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName && f.IsAsync);
+                if (function == null)
+                {
+                    throw new Exception($"未定义的异步函数: {funcName}");
+                }
+
+                // 创建 Task 并异步执行
+                var task = Task.Run(() =>
+                {
+                    var asyncVm = new VirtualMachine(_bytecodeFile);
+                    asyncVm.CallFunction(function, args);
+                    return asyncVm._stack.Count > 0 ? asyncVm._stack.Pop() : null;
+                });
+
+                var taskLangValue = new TaskLangValue(
+                    task.ContinueWith(t => ConvertToLangValue(t.Result)),
+                    CancellationToken.None
+                );
+
+                int taskId = RegisterTask(taskLangValue);
+                _stack.Push(taskId);
+            }
+                break;
+
+            case OpCode.Await:
+            {
+                // 从栈中弹出 Task ID
+                var taskIdObj = _stack.Pop();
+                if (taskIdObj is not int taskId)
+                {
+                    throw new Exception($"Await 指令期望 Task ID (int)，但得到 {taskIdObj?.GetType().Name ?? "null"}");
+                }
+
+                // 获取 Task
+                var taskLangValue = GetTask(taskId);
+
+                // 同步等待 Task 完成
+                var result = taskLangValue.Await();
+
+                // 将结果压入栈
+                _stack.Push(result);
             }
                 break;
 
@@ -981,26 +1043,7 @@ public class VirtualMachine
                 break;
 
             // === 异步支持 ===
-            case OpCode.Await:
-            {
-                var taskValue = _stack.Pop();
-
-                // 如果是TaskLangValue，等待其完成
-                if (taskValue is TaskLangValue task)
-                {
-                    // 同步等待Task完成
-                    task.Task.Wait();
-
-                    // 将结果压入栈
-                    _stack.Push(task.Result?.GetValue());
-                }
-                else
-                {
-                    // 如果不是Task，直接返回原值
-                    _stack.Push(taskValue);
-                }
-            }
-                break;
+            
 
             case OpCode.Yield:
             {
@@ -1593,6 +1636,12 @@ public class VirtualMachine
         if (value == null) return "null";
         if (value is string s) return s;
 
+        // 处理 LangValueType（使用 ToDisplayString 而不是 ToString）
+        if (value is LangValueType langValue)
+        {
+            return langValue.ToDisplayString();
+        }
+
         // 处理数组
         if (value is Array array)
         {
@@ -1941,6 +1990,44 @@ public class VirtualMachine
         }
 
         return args;
+    }
+
+    // ===== Task 管理 =====
+
+    /// <summary>
+    /// 注册 Task 并返回 ID
+    /// </summary>
+    private int RegisterTask(TaskLangValue task)
+    {
+        int taskId = _nextTaskId++;
+        _tasks[taskId] = task;
+        return taskId;
+    }
+
+    /// <summary>
+    /// 获取 Task
+    /// </summary>
+    private TaskLangValue GetTask(int taskId)
+    {
+        if (!_tasks.TryGetValue(taskId, out var task))
+        {
+            throw new Exception($"Task ID {taskId} 不存在");
+        }
+        return task;
+    }
+
+    /// <summary>
+    /// 辅助方法：将 object? 转换为 LangValueType
+    /// </summary>
+    private LangValueType ConvertToLangValue(object? value)
+    {
+        if (value == null) return new VoidLangValue();
+        if (value is LangValueType langValue) return langValue;
+        if (value is int intValue) return new IntLangValue(intValue);
+        if (value is double doubleValue) return new DoubleLangValue(doubleValue);
+        if (value is string stringValue) return new StringLangValue(stringValue);
+        if (value is bool boolValue) return new BoolLangValue(boolValue);
+        return new VoidLangValue();
     }
 }
 

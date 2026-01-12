@@ -247,21 +247,11 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAwaitExpression(AwaitExpression node)
     {
-        // Await 表达式
-        // TODO: 完整的 await 支持需要：
-        // 1. 异步状态机
-        // 2. Task/Promise 机制
-        // 3. 暂停和恢复执行
-        //
-        // 简化实现：暂时只生成表达式的代码，不实际等待
+        // 生成被 await 的表达式代码（应该返回 Task ID）
+        node.Expression.Accept(this);
 
-        // 获取 Expression 字段（主构造函数参数）
-        // 注意：AwaitExpression的参数名是"Expression"（大写E）
-        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "Expression");
-        expression?.Accept(this);
-
-        // TODO: 添加 Await 指令支持
-        // Emit(OpCode.Await);
+        // 发出 Await 指令
+        Emit(OpCode.Await);
 
         return null;
     }
