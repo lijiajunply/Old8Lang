@@ -22,18 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMCollectionAccessTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/CallFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/CallFrame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ConstantPool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ConstantPool.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Instruction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Instruction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -916,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="614" />
+    <option name="localTasksCounter" value="615" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -943,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(language-server): 实现成员链补全和符号分析功能&#10;&#10;- 添加 MemberChainAnalyzer 服务来解析和推断成员访问链类型&#10;- 支持多层级成员访问如 obj.getMethod().getProperty().value&#10;- 重构 CompletionHandler 使用新的成员链分析器替代原有简单查找&#10;- 添加原生库函数注册表 NativeLibraryRegistry 提供完整函数列表&#10;- 扩展类型关键字支持，添加 any 类型到补全列表&#10;- 改进内置函数补全显示全局函数和原生库函数分类&#10;- 扩展符号种类枚举，添加 Field 和 Keyword 类型支持&#10;- 在 ScopeAnalyzer 中实现 this 关键字和类字段的符号补全&#10;- 添加类字段和静态字段在方法内的可见性分析&#10;- 更新测试用例适配新的成员链分析功能和类型系统&#10;- 修正对象创建语法从 new Class() 到 Class() 的变化" />
     <MESSAGE value="feat(language-server): 实现 native extern import 语句的符号表构建支持&#10;&#10;- 在 CompletionHandler 中添加取消令牌检查防止长时间运行&#10;- 扩展 SymbolTableBuilder 支持 native statement 的符号解析和存储&#10;- 添加对 extern statement 外部函数声明的符号表构建支持&#10;- 实现 import statement 模块导入的符号表处理逻辑&#10;- 更新 CompletionHandler_ExternTests 测试用例适配新的 extern 语法&#10;- 修改 LSP 协议测试中的字符串比较方法提升兼容性&#10;- 优化取消令牌处理使用 CancelAsync 替代 Cancel 方法" />
     <MESSAGE value="fix(compiler): 修复IL代码生成中的局部变量引用问题&#10;&#10;- 修正所有OpCodes.Ldloc和OpCodes.Stloc指令使用局部变量对象而非LocalIndex属性&#10;- 添加对object类型数组索引访问的动态处理支持&#10;- 修复成员链分析器中光标位置判断逻辑，正确处理点号位置边界情况&#10;- 更新类型注解管理器支持数组类型解析和泛型参数兼容性验证&#10;- 修改测试用例适配对象创建语法从new Class()到Class()的变化&#10;- 修正match表达式和switch语句中的局部变量引用方式&#10;- 更新类型系统测试中数组类型注解语法从int[]到array&lt;int&gt;的表示方法" />
     <MESSAGE value="fix(compiler): 修复浮点数边界值测试和IL生成问题&#10;&#10;- 修正浮点数边界值测试用例，移除无穷大和NaN值避免编译错误&#10;- 修复除法运算IL代码生成中加载操作数的顺序问题&#10;- 调整workspace.xml中的变更列表和任务计数器配置&#10;- 更新最后提交消息记录修复IL代码生成中的局部变量引用问题" />
@@ -968,7 +956,8 @@
     <MESSAGE value="feat(vm): 实现虚拟机一元运算符和范围表达式功能&#10;&#10;- 添加一元运算符（!和一元负号）的字节码生成和执行支持&#10;- 实现RangeLangValue访问器，支持范围表达式的字节码生成&#10;- 添加StringTemplateValue访问器，支持字符串模板的字节码生成&#10;- 实现ArrayLength操作码，支持获取数组、集合和字符串长度&#10;- 添加NewRange操作码，支持创建数值范围对象&#10;- 实现Cast、IsType和TypeOf操作码，支持类型转换和检查功能&#10;- 添加虚拟机算术运算的全面测试用例" />
     <MESSAGE value="feat(vm): 添加并发原语和异步支持功能&#10;&#10;- 实现了互斥锁相关操作(MutexCreate、MutexLock、MutexUnlock、MutexDispose)&#10;- 实现了通道通信机制(ChannelCreate、ChannelSend、ChannelReceive、ChannelClose)&#10;- 实现了信号量控制(SemaphoreCreate、SemaphoreAcquire、SemaphoreRelease)&#10;- 添加了异步任务支持(NewTask、Await、Yield操作)&#10;- 为并发原语提供了相应的原生函数接口&#10;- 添加了并发原语的单元测试覆盖&#10;- 添加了异步功能的基本测试用例" />
     <MESSAGE value="feat(vm): 添加虚拟机异常处理支持&#10;&#10;- 实现了 try-catch-finally 字节码指令处理逻辑&#10;- 添加了异常处理器栈用于跟踪异常处理块状态&#10;- 新增 ExceptionHandler 类管理异常处理流程&#10;- 添加了 TryBegin、TryEnd、CatchBegin、CatchEnd、FinallyBegin、FinallyEnd 操作码支持&#10;- 创建了虚拟机异常处理单元测试确保功能正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加虚拟机异常处理支持&#10;&#10;- 实现了 try-catch-finally 字节码指令处理逻辑&#10;- 添加了异常处理器栈用于跟踪异常处理块状态&#10;- 新增 ExceptionHandler 类管理异常处理流程&#10;- 添加了 TryBegin、TryEnd、CatchBegin、CatchEnd、FinallyBegin、FinallyEnd 操作码支持&#10;- 创建了虚拟机异常处理单元测试确保功能正确性" />
+    <MESSAGE value="feat(lang): 添加索引访问和切片功能支持&#10;&#10;- 实现了列表项访问的VisitLangListItem方法，支持索引访问操作&#10;- 添加了嵌套索引访问VisitNestedIndexAccess的支持&#10;- 实现了嵌套切片访问VisitNestedSliceAccess的功能&#10;- 添加了切片操作的VisitSliceLangValue实现&#10;- 在虚拟机中新增Slice操作码的处理逻辑&#10;- 实现了数组、列表和字符串的切片操作支持&#10;- 优化了调用帧和指令的构造函数语法&#10;- 更新了常量池和字节码文件的初始化方式&#10;- 改进了本地变量查找的TryGetValue方法使用" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加索引访问和切片功能支持&#10;&#10;- 实现了列表项访问的VisitLangListItem方法，支持索引访问操作&#10;- 添加了嵌套索引访问VisitNestedIndexAccess的支持&#10;- 实现了嵌套切片访问VisitNestedSliceAccess的功能&#10;- 添加了切片操作的VisitSliceLangValue实现&#10;- 在虚拟机中新增Slice操作码的处理逻辑&#10;- 实现了数组、列表和字符串的切片操作支持&#10;- 优化了调用帧和指令的构造函数语法&#10;- 更新了常量池和字节码文件的初始化方式&#10;- 改进了本地变量查找的TryGetValue方法使用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

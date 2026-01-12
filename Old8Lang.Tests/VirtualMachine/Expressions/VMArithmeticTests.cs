@@ -148,7 +148,7 @@ public class VMArithmeticTests
     {
         // Arrange
         var code = $@"
-            result <- {baseNum} ** {exponent}
+            result <- {baseNum} ^ {exponent}
             PrintLine(result.ToStr())
         ";
 
@@ -166,7 +166,13 @@ public class VMArithmeticTests
     public void Negation_ExecutesCorrectly(int value, int expected)
     {
         // Arrange
-        var code = $@"
+        // 注意：当 value 为负数时，需要使用括号避免 -- 被解析为自减运算符
+        var code = value < 0
+            ? $@"
+            result <- -({value})
+            PrintLine(result.ToStr())
+        "
+            : $@"
             result <- -{value}
             PrintLine(result.ToStr())
         ";

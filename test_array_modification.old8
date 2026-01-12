@@ -1,0 +1,5 @@
+arr <- [1, 2, 3]
+PrintLine("Before: " + arr.ToStr())
+arr[1] <- 99
+PrintLine("After: " + arr.ToStr())
+PrintLine("arr[1] = " + arr[1].ToStr())

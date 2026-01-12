@@ -1007,6 +1007,43 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.GetField:
+            {
+                // 栈顶: object
+                // 操作数: fieldName (string)
+                var obj = _stack.Pop();
+                string fieldName = (string)instruction.Operand!;
+
+                if (obj == null)
+                {
+                    throw new Exception($"无法访问 null 对象的字段 {fieldName}");
+                }
+
+                // 使用反射获取字段或属性
+                var objType = obj.GetType();
+
+                // 先尝试获取属性
+                var property = objType.GetProperty(fieldName);
+                if (property != null)
+                {
+                    _stack.Push(property.GetValue(obj));
+                }
+                else
+                {
+                    // 再尝试获取字段
+                    var field = objType.GetField(fieldName);
+                    if (field != null)
+                    {
+                        _stack.Push(field.GetValue(obj));
+                    }
+                    else
+                    {
+                        throw new Exception($"类型 {objType.Name} 没有字段或属性 {fieldName}");
+                    }
+                }
+            }
+                break;
+
             case OpCode.DebugPrint:
             {
                 int messageIndex = (int)instruction.Operand!;
@@ -1144,6 +1181,40 @@ public class VirtualMachine
     {
         if (value == null) return "null";
         if (value is string s) return s;
+
+        // 处理数组
+        if (value is Array array)
+        {
+            var items = new List<string>();
+            foreach (var item in array)
+            {
+                items.Add(ToString(item));
+            }
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        // 处理列表
+        if (value is IList list)
+        {
+            var items = new List<string>();
+            foreach (var item in list)
+            {
+                items.Add(ToString(item));
+            }
+            return "{" + string.Join(", ", items) + "}";
+        }
+
+        // 处理字典
+        if (value is System.Collections.IDictionary dict)
+        {
+            var items = new List<string>();
+            foreach (System.Collections.DictionaryEntry entry in dict)
+            {
+                items.Add($"{ToString(entry.Key)}: {ToString(entry.Value)}");
+            }
+            return "{" + string.Join(", ", items) + "}";
+        }
+
         return value.ToString() ?? "";
     }
 

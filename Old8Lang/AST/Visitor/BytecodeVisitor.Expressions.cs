@@ -62,9 +62,9 @@ public partial class BytecodeVisitor
             else if (node.Right is LangId memberId)
             {
                 // 这是字段访问：object.field
-                // TODO: 实现字段访问的字节码生成
-                // 目前字节码VM不支持对象字段访问
-                Emit(OpCode.Nop);
+                // 左操作数（对象）已经在栈上
+                string fieldName = memberId.IdName;
+                Emit(OpCode.GetField, fieldName);
             }
             else
             {

@@ -1,6 +1,7 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.Bytecode;
 
@@ -31,22 +32,60 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitSetStatement(SetStatement node)
     {
-        string varName = node.Id.IdName;
-
-        // 生成右侧表达式的代码
-        node.Value.Accept(this);
-
-        // 检查是否是局部变量
-        if (_compiler.IsLocalVariable(varName))
+        // 检查是普通变量赋值还是索引/成员访问赋值
+        if (node.Id != null)
         {
-            int localIndex = _compiler.GetLocalIndex(varName);
-            Emit(OpCode.StoreLocal, localIndex);
+            // 普通变量赋值: x <- value
+            string varName = node.Id.IdName;
+
+            // 生成右侧表达式的代码
+            node.Value.Accept(this);
+
+            // 检查是否是局部变量
+            if (_compiler.IsLocalVariable(varName))
+            {
+                int localIndex = _compiler.GetLocalIndex(varName);
+                Emit(OpCode.StoreLocal, localIndex);
+            }
+            else
+            {
+                // 声明为全局变量
+                _compiler.DeclareGlobalVariable(varName);
+                Emit(OpCode.StoreGlobal, varName);
+            }
         }
         else
         {
-            // 声明为全局变量
-            _compiler.DeclareGlobalVariable(varName);
-            Emit(OpCode.StoreGlobal, varName);
+            // 索引/成员访问赋值: array[i] <- value 或 obj.field <- value
+            // 使用反射直接访问 LeftExpression 字段
+            var leftExprField = node.GetType().GetField("LeftExpression",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var leftExpr = leftExprField?.GetValue(node) as LangExpression;
+
+            if (leftExpr is LangListItem listItem)
+            {
+                // 数组/列表索引赋值: array[index] <- value
+                // SetIndex期望栈布局(从栈顶到栈底): value, index, collection
+                // 所以我们需要按相反顺序压栈: collection, index, value
+
+                // 加载集合
+                listItem.ListId.Accept(this);
+
+                // 加载索引
+                listItem.Key.Accept(this);
+
+                // 加载值
+                node.Value.Accept(this);
+
+                // 发出SetIndex指令
+                Emit(OpCode.SetIndex);
+            }
+            else if (leftExpr != null)
+            {
+                // 其他类型的左侧表达式(如成员访问)
+                // TODO: 实现成员访问赋值
+                throw new NotImplementedException($"不支持的赋值左侧表达式类型: {leftExpr.GetType().Name}");
+            }
         }
 
         return null;

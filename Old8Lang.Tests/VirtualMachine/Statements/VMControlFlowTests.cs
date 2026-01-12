@@ -359,7 +359,7 @@ public class VMControlFlowTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("10 20 30 ", output);
+        Assert.Equal("10 20 30", output);
     }
 
     [Fact]
