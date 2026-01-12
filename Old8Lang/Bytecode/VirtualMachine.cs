@@ -83,6 +83,9 @@ public class VirtualMachine
                 }
                 catch (Exception ex)
                 {
+                    // 异常发生时，先执行所有 defer 块
+                    ExecuteDefers(frame);
+
                     // 异常处理：查找异常表中匹配的处理器
                     if (!HandleException(ex, frame, function))
                     {
@@ -94,6 +97,8 @@ public class VirtualMachine
         }
         finally
         {
+            // 函数正常退出时，执行所有 defer 块
+            ExecuteDefers(frame);
             _callStack.Pop();
         }
     }
@@ -1312,6 +1317,22 @@ public class VirtualMachine
             }
                 break;
 
+            // === Defer 支持 ===
+            case OpCode.Defer:
+            {
+                // Defer 指令：将 defer 块的起始位置压入 DeferStack
+                int deferStartPos = (int)instruction.Operand!;
+                frame.DeferStack.Push(deferStartPos);
+            }
+                break;
+
+            case OpCode.ExecuteDefers:
+            {
+                // ExecuteDefers 指令：执行所有 defer 块（按 LIFO 顺序）
+                ExecuteDefers(frame);
+            }
+                break;
+
             default:
                 throw new Exception($"未实现的操作码: {instruction.OpCode}");
         }
@@ -1434,6 +1455,43 @@ public class VirtualMachine
         if (value is double d) return d;
         if (value is string s && double.TryParse(s, out double result)) return result;
         throw new Exception($"无法将 {value?.GetType().Name} 转换为 double");
+    }
+
+    /// <summary>
+    /// 执行所有 defer 块（按 LIFO 顺序）
+    /// </summary>
+    private void ExecuteDefers(CallFrame frame)
+    {
+        // 按 LIFO 顺序执行所有 defer 块
+        while (frame.DeferStack.Count > 0)
+        {
+            int deferStartPos = frame.DeferStack.Pop();
+
+            // 保存当前 IP
+            int savedIP = frame.IP;
+
+            // 跳转到 defer 块的起始位置
+            frame.IP = deferStartPos;
+
+            // 执行 defer 块（直到遇到 ReturnVoid）
+            while (frame.IP < frame.Function.Instructions.Count)
+            {
+                var instruction = frame.Function.Instructions[frame.IP];
+                frame.IP++;
+
+                // 执行指令
+                ExecuteInstruction(instruction, frame);
+
+                // 如果遇到 ReturnVoid，说明 defer 块执行完毕
+                if (instruction.OpCode == OpCode.ReturnVoid)
+                {
+                    break;
+                }
+            }
+
+            // 恢复 IP（继续执行原来的代码）
+            frame.IP = savedIP;
+        }
     }
 
     /// <summary>

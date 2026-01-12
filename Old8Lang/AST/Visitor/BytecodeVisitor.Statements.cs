@@ -370,6 +370,9 @@ public partial class BytecodeVisitor
         // 获取returnExpression字段（主构造函数参数）
         var returnExpression = GetPrimaryConstructorParameter<LangExpression>(node, "returnExpression");
 
+        // 在返回前执行所有 defer 块
+        Emit(OpCode.ExecuteDefers);
+
         if (returnExpression != null)
         {
             returnExpression.Accept(this);
@@ -807,12 +810,32 @@ public partial class BytecodeVisitor
     public Instruction? VisitDeferStatement(DeferStatement node)
     {
         // Defer 语句（延迟执行）
-        // TODO: 完整的 defer 支持需要：
-        // 1. 在 CallFrame 中添加 defer 栈
-        // 2. 在函数返回时执行所有 defer（LIFO 顺序）
-        // 3. 在异常情况下也要执行 defer
-        //
-        // 简化实现：暂时不支持 defer 语句
+        // 实现策略：
+        // 1. 跳过 defer 块的代码（不立即执行）
+        // 2. 将 defer 块的起始位置记录到 CallFrame 的 DeferStack
+        // 3. 在函数返回时，虚拟机会按 LIFO 顺序执行所有 defer 块
+
+        // 跳过 defer 块（使用 Jump 指令）
+        int jumpOverDeferIndex = GetCurrentPosition();
+        Emit(OpCode.Jump, -1); // 跳转目标稍后修补
+
+        // 记录 defer 块的起始位置
+        int deferStartPos = GetCurrentPosition();
+
+        // 生成 defer 块的代码
+        node.Statement.Accept(this);
+
+        // defer 块结束后返回（不是函数返回，而是从 defer 块返回）
+        Emit(OpCode.ReturnVoid);
+
+        // 记录 defer 块的结束位置
+        int deferEndPos = GetCurrentPosition();
+
+        // 修补跳转指令，跳过 defer 块
+        PatchJump(jumpOverDeferIndex, deferEndPos);
+
+        // 发出 Defer 指令，将 defer 块的起始位置压入 DeferStack
+        Emit(OpCode.Defer, deferStartPos);
 
         return null;
     }

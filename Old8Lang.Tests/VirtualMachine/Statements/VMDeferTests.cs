@@ -42,7 +42,7 @@ public class VMDeferTests
         }
     }
 
-    [Fact(Skip = "虚拟机 defer 语句实现可能不完整")]
+    [Fact]
     public void SimpleDeferStatement_ExecutesCorrectly()
     {
         // Arrange
@@ -66,7 +66,7 @@ public class VMDeferTests
         Assert.Equal("cleanup", lines[2]); // defer 在函数退出时执行
     }
 
-    [Fact(Skip = "虚拟机 defer 语句实现可能不完整")]
+    [Fact]
     public void MultipleDeferStatements_ExecuteInReverseOrder()
     {
         // Arrange
@@ -92,7 +92,7 @@ public class VMDeferTests
         Assert.Equal("first", lines[3]);
     }
 
-    [Fact(Skip = "虚拟机 defer 语句实现可能不完整")]
+    [Fact]
     public void DeferWithException_StillExecutes()
     {
         // Arrange

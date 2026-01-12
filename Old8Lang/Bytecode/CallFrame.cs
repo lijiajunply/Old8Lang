@@ -20,6 +20,9 @@ public class CallFrame(FunctionMetadata function, int localCount)
     /// <summary>函数参数(用于调试)</summary>
     public object?[]? Arguments { get; set; }
 
+    /// <summary>Defer栈 - 存储延迟执行的指令位置(LIFO顺序)</summary>
+    public Stack<int> DeferStack { get; } = new();
+
     /// <summary>
     /// 获取当前指令
     /// </summary>

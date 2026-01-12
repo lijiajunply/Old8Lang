@@ -24,6 +24,9 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
     // 循环标签栈 - 用于 break 和 continue
     private readonly Stack<LoopLabels> _loopLabels = new();
 
+    // Defer 块列表 - 存储需要延迟执行的代码块
+    private readonly List<DeferBlock> _deferBlocks = new();
+
     public BytecodeVisitor(BytecodeCompiler compiler)
     {
         _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
@@ -37,6 +40,17 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
         public List<int> BreakJumps { get; } = new();
         public List<int> ContinueJumps { get; } = new();
         public int ContinueTarget { get; set; }
+    }
+
+    /// <summary>
+    /// Defer 块 - 存储延迟执行的代码块信息
+    /// </summary>
+    private class DeferBlock
+    {
+        /// <summary>Defer 代码块的起始指令位置</summary>
+        public int StartPosition { get; set; }
+        /// <summary>Defer 代码块的结束指令位置</summary>
+        public int EndPosition { get; set; }
     }
 
     /// <summary>
