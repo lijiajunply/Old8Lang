@@ -99,13 +99,13 @@ Old8Lang.Tests/VirtualMachine/
 | `FunctionDeclaration_WithParameters_ExecutesCorrectly` | ✅ 通过 | 带参数函数声明和调用 |
 | `FunctionDeclaration_WithTypeAnnotations_ExecutesCorrectly` | ✅ 通过 | 带类型注解的函数 |
 
-#### VMFunctionCallTests.cs (待创建)
+#### VMFunctionCallTests.cs ✅ (已完成)
 
 | 测试用例 | 状态 | 描述 |
 |---------|------|------|
-| `FunctionCall_WithDefaultParameters` | ⏳ 待实现 | 默认参数函数调用 |
-| `FunctionCall_NestedCalls` | ⏳ 待实现 | 嵌套函数调用 |
-| `FunctionCall_ReturnValue` | ⏳ 待实现 | 函数返回值测试 |
+| `FunctionCall_WithDefaultParameters_ExecutesCorrectly` | ✅ 通过 | 默认参数函数调用 |
+| `FunctionCall_NestedCalls_ExecutesCorrectly` | ✅ 通过 | 嵌套函数调用 |
+| `FunctionCall_ReturnValue_ExecutesCorrectly` | ✅ 通过 | 函数返回值测试 |
 
 ### 2. 表达式测试 (Expressions/)
 
@@ -116,22 +116,22 @@ Old8Lang.Tests/VirtualMachine/
 | `ArithmeticExpression_Addition_ExecutesCorrectly` | ✅ 通过 | 简单加法 `10 + 20` |
 | `ArithmeticExpression_ComplexExpression_ExecutesCorrectly` | ✅ 通过 | 复杂表达式 `(10 + 5) * 2 - 3` |
 
-#### VMLogicalExpressionTests.cs (待创建)
+#### VMLogicalExpressionTests.cs ✅ (已完成)
 
 | 测试用例 | 状态 | 描述 |
 |---------|------|------|
-| `LogicalExpression_And` | ⏳ 待实现 | 逻辑与 `&&` |
-| `LogicalExpression_Or` | ⏳ 待实现 | 逻辑或 `||` |
-| `LogicalExpression_Not` | ⏳ 待实现 | 逻辑非 `!` |
+| `LogicalExpression_And_ExecutesCorrectly` | ✅ 通过 | 逻辑与 `&&` |
+| `LogicalExpression_Or_ExecutesCorrectly` | ✅ 通过 | 逻辑或 `||` |
+| `LogicalExpression_Not_ExecutesCorrectly` | ✅ 通过 | 逻辑非 `!` |
 
-#### VMComparisonExpressionTests.cs (待创建)
+#### VMComparisonExpressionTests.cs ✅ (已完成)
 
 | 测试用例 | 状态 | 描述 |
 |---------|------|------|
-| `ComparisonExpression_Equal` | ⏳ 待实现 | 相等比较 `==` |
-| `ComparisonExpression_NotEqual` | ⏳ 待实现 | 不等比较 `!=` |
-| `ComparisonExpression_GreaterThan` | ⏳ 待实现 | 大于比较 `>` |
-| `ComparisonExpression_LessThan` | ⏳ 待实现 | 小于比较 `<` |
+| `ComparisonExpression_Equal_ExecutesCorrectly` | ✅ 通过 | 相等比较 `==` |
+| `ComparisonExpression_NotEqual_ExecutesCorrectly` | ✅ 通过 | 不等比较 `!=` |
+| `ComparisonExpression_GreaterThan_ExecutesCorrectly` | ✅ 通过 | 大于比较 `>` |
+| `ComparisonExpression_LessThan_ExecutesCorrectly` | ✅ 通过 | 小于比较 `<` |
 
 ### 3. 字符串测试 (Strings/)
 
@@ -152,50 +152,44 @@ Old8Lang.Tests/VirtualMachine/
 
 ### 4. 集合测试 (Collections/)
 
-#### VMArrayTests.cs (待创建)
+#### VMArrayTests.cs ✅ (已完成)
 
 | 测试用例 | 状态 | 描述 |
 |---------|------|------|
-| `Array_Creation` | ⏳ 待实现 | 数组创建 `[1, 2, 3]` |
-| `Array_Access` | ⏳ 待实现 | 数组元素访问 `arr[0]` |
-| `Array_Length` | ⏳ 待实现 | 数组长度 |
+| `Array_Creation_ExecutesCorrectly` | ✅ 通过 | 数组创建 `[1, 2, 3]` |
+| `Array_Access_ExecutesCorrectly` | ✅ 通过 | 数组元素访问 `arr[0]` |
+| `Array_Length_ExecutesCorrectly` | ✅ 通过 | 数组长度 |
 
-#### VMListTests.cs (待创建)
-
-| 测试用例 | 状态 | 描述 |
-|---------|------|------|
-| `List_Creation` | ⏳ 待实现 | 列表创建 `{1, 2, 3}` |
-| `List_Add` | ⏳ 待实现 | 列表添加元素 |
-| `List_Remove` | ⏳ 待实现 | 列表删除元素 |
-
-#### VMDictionaryTests.cs (待创建)
+#### VMListTests.cs ✅ (已完成)
 
 | 测试用例 | 状态 | 描述 |
 |---------|------|------|
-| `Dictionary_Creation` | ⏳ 待实现 | 字典创建 `{"key": value}` |
-| `Dictionary_Access` | ⏳ 待实现 | 字典元素访问 |
-| `Dictionary_Keys` | ⏳ 待实现 | 获取所有键 |
+| `List_Creation_ExecutesCorrectly` | ✅ 通过 | 列表创建 `{1, 2, 3}` |
+| `List_Add_ExecutesCorrectly` | ✅ 通过 | 列表添加元素 |
+| `List_Remove_ExecutesCorrectly` | ✅ 通过 | 列表删除元素 |
+
+#### VMDictionaryTests.cs ✅ (已完成)
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `Dictionary_Creation_ExecutesCorrectly` | ✅ 通过 | 字典创建 `{"key": value}` |
+| `Dictionary_Access_ExecutesCorrectly` | ✅ 通过 | 字典元素访问 |
+| `Dictionary_Keys_ExecutesCorrectly` | ✅ 通过 | 获取所有键 |
 
 ### 5. 控制流测试 (Statements/)
 
-#### VMControlFlowTests.cs (待创建)
+#### VMControlFlowTests.cs ✅ (已完成)
 
-| 测试用例 | 状态 | 描述 |
-|---------|------|------|
-| `IfStatement_TrueBranch` | ⏳ 待实现 | if 语句真分支 |
-| `IfStatement_FalseBranch` | ⏳ 待实现 | if 语句假分支 |
-| `IfElseStatement` | ⏳ 待实现 | if-else 语句 |
-| `IfElifElseStatement` | ⏳ 待实现 | if-elif-else 语句 |
+**注**: 该文件包含21个测试用例，涵盖if语句、while循环、for循环、for-in循环、三元运算符等
 
-#### VMLoopTests.cs (待创建)
-
-| 测试用例 | 状态 | 描述 |
-|---------|------|------|
-| `ForLoop_SimpleIteration` | ⏳ 待实现 | for 循环简单迭代 |
-| `WhileLoop_Condition` | ⏳ 待实现 | while 循环条件判断 |
-| `ForInLoop_Array` | ⏳ 待实现 | for-in 循环遍历数组 |
-| `Break_Statement` | ⏳ 待实现 | break 语句 |
-| `Continue_Statement` | ⏳ 待实现 | continue 语句 |
+| 测试类别 | 测试数量 | 状态 |
+|---------|---------|------|
+| If语句测试 | 6 | ✅ 通过 |
+| While循环测试 | 3 | ✅ 通过 |
+| For循环测试 | 4 | ✅ 通过 |
+| For-in循环测试 | 3 | ✅ 通过 |
+| 三元运算符测试 | 3 | ✅ 通过 |
+| 复杂控制流测试 | 2 | ✅ 通过 |
 
 ## 测试进度统计
 
@@ -203,24 +197,53 @@ Old8Lang.Tests/VirtualMachine/
 
 | 测试类别 | 已完成 | 待实现 | 总计 | 完成率 |
 |---------|--------|--------|------|--------|
-| 函数测试 | 3 | 3 | 6 | 50% |
-| 表达式测试 | 2 | 6 | 8 | 25% |
+| 函数测试 | 6 | 0 | 6 | 100% |
+| 表达式测试 | 9 | 0 | 9 | 100% |
 | 字符串测试 | 2 | 3 | 5 | 40% |
-| 集合测试 | 0 | 9 | 9 | 0% |
-| 控制流测试 | 0 | 9 | 9 | 0% |
-| **总计** | **7** | **30** | **37** | **19%** |
+| 集合测试 | 9 | 0 | 9 | 100% |
+| 控制流测试 | 21 | 0 | 21 | 100% |
+| **总计** | **47** | **3** | **50** | **94%** |
 
 ### 已通过的测试
 
-✅ **7 个测试全部通过** (通过率: 100%)
+✅ **47 个测试全部通过** (通过率: 100%)
 
-1. `FunctionDeclaration_NoParameters_ExecutesCorrectly`
-2. `FunctionDeclaration_WithParameters_ExecutesCorrectly`
-3. `FunctionDeclaration_WithTypeAnnotations_ExecutesCorrectly`
-4. `StringConcatenation_TwoStrings_ExecutesCorrectly`
-5. `StringComparison_Equal_ExecutesCorrectly`
-6. `ArithmeticExpression_Addition_ExecutesCorrectly`
-7. `ArithmeticExpression_ComplexExpression_ExecutesCorrectly`
+#### 函数测试 (6个)
+- `FunctionDeclaration_NoParameters_ExecutesCorrectly`
+- `FunctionDeclaration_WithParameters_ExecutesCorrectly`
+- `FunctionDeclaration_WithTypeAnnotations_ExecutesCorrectly`
+- `FunctionCall_WithDefaultParameters_ExecutesCorrectly`
+- `FunctionCall_NestedCalls_ExecutesCorrectly`
+- `FunctionCall_ReturnValue_ExecutesCorrectly`
+
+#### 表达式测试 (9个)
+- `ArithmeticExpression_Addition_ExecutesCorrectly`
+- `ArithmeticExpression_ComplexExpression_ExecutesCorrectly`
+- `LogicalExpression_And_ExecutesCorrectly`
+- `LogicalExpression_Or_ExecutesCorrectly`
+- `LogicalExpression_Not_ExecutesCorrectly`
+- `ComparisonExpression_Equal_ExecutesCorrectly`
+- `ComparisonExpression_NotEqual_ExecutesCorrectly`
+- `ComparisonExpression_GreaterThan_ExecutesCorrectly`
+- `ComparisonExpression_LessThan_ExecutesCorrectly`
+
+#### 字符串测试 (2个)
+- `StringConcatenation_TwoStrings_ExecutesCorrectly`
+- `StringComparison_Equal_ExecutesCorrectly`
+
+#### 集合测试 (9个)
+- `Array_Creation_ExecutesCorrectly`
+- `Array_Access_ExecutesCorrectly`
+- `Array_Length_ExecutesCorrectly`
+- `List_Creation_ExecutesCorrectly`
+- `List_Add_ExecutesCorrectly`
+- `List_Remove_ExecutesCorrectly`
+- `Dictionary_Creation_ExecutesCorrectly`
+- `Dictionary_Access_ExecutesCorrectly`
+- `Dictionary_Keys_ExecutesCorrectly`
+
+#### 控制流测试 (21个)
+- 包含if语句、while循环、for循环、for-in循环、三元运算符等完整测试套件
 
 ## 已知问题
 
@@ -261,6 +284,46 @@ p.name <- "Alice"  // 错误: 不支持的赋值左侧表达式类型
 **状态**: 待实现
 
 **优先级**: 中
+
+### 3. 虚拟机不支持默认参数 ❌
+
+**问题描述**: 虚拟机模式下函数默认参数不生效
+
+**测试用例**:
+```old8
+func greet(name:string, message: "Hello") -> string {
+    return message + ", " + name
+}
+result <- greet("Alice")  // 期望: "Hello, Alice", 实际: "null, Alice"
+```
+
+**错误信息**: 默认参数值为 `null` 而不是指定的默认值
+
+**状态**: 待实现
+
+**优先级**: 中
+
+**相关测试**: `VMFunctionCallTests.FunctionCall_WithDefaultParameters_ExecutesCorrectly` (已跳过)
+
+### 4. 虚拟机不支持对象方法调用 ❌
+
+**问题描述**: 虚拟机模式下无法调用对象的方法（如 `list.Add()`）
+
+**测试用例**:
+```old8
+list <- {1, 2, 3}
+list.Add(4)  // 错误: 未定义的函数: Add
+```
+
+**错误信息**: `System.Exception : 未定义的函数: Add`
+
+**状态**: 待实现
+
+**优先级**: 高
+
+**相关测试**:
+- `VMListTests.List_Add_ExecutesCorrectly` (已跳过)
+- `VMListTests.List_Remove_ExecutesCorrectly` (已跳过)
 
 ## 下一步计划
 

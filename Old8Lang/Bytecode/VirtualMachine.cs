@@ -1193,11 +1193,7 @@ public class VirtualMachine
         // 处理数组
         if (value is Array array)
         {
-            var items = new List<string>();
-            foreach (var item in array)
-            {
-                items.Add(ToString(item));
-            }
+            var items = (from object? item in array select ToString(item)).ToList();
 
             return "[" + string.Join(", ", items) + "]";
         }
