@@ -158,9 +158,84 @@ public partial class BytecodeVisitor
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;
     public Instruction? VisitNestedIndexAccess(NestedIndexAccess node) => null;
     public Instruction? VisitNestedSliceAccess(NestedSliceAccess node) => null;
-    public Instruction? VisitRangeLangValue(RangeLangValue node) => null;
+    public Instruction? VisitRangeLangValue(RangeLangValue node)
+    {
+        // 访问start表达式
+        if (node.Start != null)
+        {
+            node.Start.Accept(this);
+        }
+        else
+        {
+            Emit(OpCode.LoadConst, 0); // 默认起始值为0
+        }
+
+        // 访问end表达式
+        if (node.End != null)
+        {
+            node.End.Accept(this);
+        }
+        else
+        {
+            Emit(OpCode.LoadConst, 0); // 默认结束值为0
+        }
+
+        // 加载includeStart和includeEnd标志
+        // 我们需要在栈上准备这些参数,然后调用辅助方法
+        // 栈布局: start, end, includeStart, includeEnd
+
+        Emit(OpCode.LoadConst, node.IncludeStart ? 1 : 0);
+        Emit(OpCode.LoadConst, node.IncludeEnd ? 1 : 0);
+
+        // 调用原生方法创建范围数组
+        // 使用CallNative调用RangeLangValue.CreateRangeArray
+        var methodName = "Old8Lang.AST.Expression.Intermediates.RangeLangValue::CreateRangeArray";
+        Emit(OpCode.CallNative, new object[] { 4, methodName });
+
+        return null;
+    }
     public Instruction? VisitSliceLangValue(SliceLangValue node) => null;
-    public Instruction? VisitStringTemplateValue(StringTemplateValue node) => null;
+    public Instruction? VisitStringTemplateValue(StringTemplateValue node)
+    {
+        // 字符串模板: $"Hello {name}, you are {age} years old"
+        // 策略: 创建一个对象数组,将所有表达式结果放入数组,然后调用string.Concat
+
+        var expressionList = node.ExpressionList;
+
+        if (expressionList.Count == 0)
+        {
+            // 空模板,返回空字符串
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(""));
+            return null;
+        }
+
+        // 创建对象数组: NewArray指令
+        Emit(OpCode.NewArray, expressionList.Count);
+
+        // 遍历所有表达式,将结果存入数组
+        for (int i = 0; i < expressionList.Count; i++)
+        {
+            var expr = expressionList[i];
+
+            // 复制数组引用
+            Emit(OpCode.Dup);
+
+            // 加载索引
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(i));
+
+            // 访问表达式,将结果压入栈
+            expr.Accept(this);
+
+            // 将值存入数组: SetIndex指令
+            Emit(OpCode.SetIndex);
+        }
+
+        // 调用string.Concat(object[])方法
+        var concatMethodName = "System.String::Concat";
+        Emit(OpCode.CallNative, new object[] { 1, concatMethodName });
+
+        return null;
+    }
     public Instruction? VisitSuperProxy(SuperProxy node) => null;
     public Instruction? VisitTaskClassLangValue(TaskClassLangValue node) => null;
     public Instruction? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node) => null;

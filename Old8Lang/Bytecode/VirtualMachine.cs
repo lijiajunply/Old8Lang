@@ -418,6 +418,73 @@ public class VirtualMachine
                 }
                 break;
 
+            case OpCode.ArrayLength:
+                {
+                    var collection = _stack.Pop();
+                    int length = 0;
+
+                    if (collection is Array array)
+                    {
+                        length = array.Length;
+                    }
+                    else if (collection is ICollection<object?> list)
+                    {
+                        length = list.Count;
+                    }
+                    else if (collection is System.Collections.ICollection col)
+                    {
+                        length = col.Count;
+                    }
+                    else if (collection is string str)
+                    {
+                        length = str.Length;
+                    }
+                    else
+                    {
+                        throw new Exception($"无法获取类型 {collection?.GetType().Name} 的长度");
+                    }
+
+                    _stack.Push(length);
+                }
+                break;
+
+            case OpCode.NewRange:
+                {
+                    // 栈顶: step, end, start
+                    var step = _stack.Pop();
+                    var end = _stack.Pop();
+                    var start = _stack.Pop();
+
+                    // 转换为整数
+                    int startInt = Convert.ToInt32(start);
+                    int endInt = Convert.ToInt32(end);
+                    int stepInt = step != null ? Convert.ToInt32(step) : 1;
+
+                    // 创建范围对象 (使用List<int>表示范围)
+                    var range = new List<int>();
+                    if (stepInt > 0)
+                    {
+                        for (int i = startInt; i < endInt; i += stepInt)
+                        {
+                            range.Add(i);
+                        }
+                    }
+                    else if (stepInt < 0)
+                    {
+                        for (int i = startInt; i > endInt; i += stepInt)
+                        {
+                            range.Add(i);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("范围的步长不能为0");
+                    }
+
+                    _stack.Push(range);
+                }
+                break;
+
             // === 迭代器操作 ===
             case OpCode.GetIterator:
                 {
@@ -472,6 +539,101 @@ public class VirtualMachine
                         var topType = top?.GetType().FullName ?? "null";
                         throw new Exception($"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
                     }
+                }
+                break;
+
+            // === 类型操作 ===
+            case OpCode.Cast:
+                {
+                    var targetTypeName = (string)instruction.Operand!;
+                    var value = _stack.Pop();
+
+                    // 执行类型转换
+                    object? convertedValue = targetTypeName.ToLower() switch
+                    {
+                        "int" => Convert.ToInt32(value),
+                        "double" => Convert.ToDouble(value),
+                        "string" => value?.ToString() ?? "",
+                        "bool" => Convert.ToBoolean(value),
+                        "char" => Convert.ToChar(value),
+                        _ => value // 其他类型直接返回原值
+                    };
+
+                    _stack.Push(convertedValue);
+                }
+                break;
+
+            case OpCode.IsType:
+                {
+                    var targetTypeName = (string)instruction.Operand!;
+                    var value = _stack.Pop();
+
+                    // 检查类型
+                    bool isType = targetTypeName.ToLower() switch
+                    {
+                        "int" => value is int,
+                        "double" => value is double,
+                        "string" => value is string,
+                        "bool" => value is bool,
+                        "char" => value is char,
+                        "array" => value is Array,
+                        "list" => value is System.Collections.IList,
+                        "dict" => value is System.Collections.IDictionary,
+                        "null" => value == null,
+                        _ => false
+                    };
+
+                    _stack.Push(isType);
+                }
+                break;
+
+            case OpCode.TypeOf:
+                {
+                    var value = _stack.Pop();
+                    string typeName;
+
+                    if (value == null)
+                    {
+                        typeName = "null";
+                    }
+                    else if (value is int)
+                    {
+                        typeName = "int";
+                    }
+                    else if (value is double)
+                    {
+                        typeName = "double";
+                    }
+                    else if (value is string)
+                    {
+                        typeName = "string";
+                    }
+                    else if (value is bool)
+                    {
+                        typeName = "bool";
+                    }
+                    else if (value is char)
+                    {
+                        typeName = "char";
+                    }
+                    else if (value is Array)
+                    {
+                        typeName = "array";
+                    }
+                    else if (value is System.Collections.IList)
+                    {
+                        typeName = "list";
+                    }
+                    else if (value is System.Collections.IDictionary)
+                    {
+                        typeName = "dict";
+                    }
+                    else
+                    {
+                        typeName = value.GetType().Name;
+                    }
+
+                    _stack.Push(typeName);
                 }
                 break;
 

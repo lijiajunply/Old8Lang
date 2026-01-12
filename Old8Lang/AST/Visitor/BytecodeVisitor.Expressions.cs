@@ -79,65 +79,85 @@ public partial class BytecodeVisitor
 
         // 原有逻辑：处理其他运算符
 
-        // 生成左操作数代码
-        if (node.Left != null)
-            node.Left.Accept(this);
+        // 检查是否是一元运算符
+        bool isUnaryOperator = node.Opera == LangTokenType.Exclamation || // !
+                                (node.Opera == LangTokenType.Minus && node.Left == null); // 一元负号
 
-        // 生成右操作数代码
-        if (node.Right != null)
-            node.Right.Accept(this);
-
-        // 生成运算符指令
-        switch (node.Opera)
+        if (isUnaryOperator)
         {
-            case LangTokenType.Plus:
-                Emit(OpCode.Add);
-                break;
-            case LangTokenType.Minus:
-                Emit(OpCode.Sub);
-                break;
-            case LangTokenType.Star:
-                Emit(OpCode.Mul);
-                break;
-            case LangTokenType.Slash:
-                Emit(OpCode.Div);
-                break;
-            case LangTokenType.Percent:
-                Emit(OpCode.Mod);
-                break;
-            case LangTokenType.Caret:  // ^ 幂运算
-                Emit(OpCode.Pow);
-                break;
-            case LangTokenType.Equals:  // ==
-                Emit(OpCode.Equal);
-                break;
-            case LangTokenType.NotEquals:  // !=
-                Emit(OpCode.NotEqual);
-                break;
-            case LangTokenType.GreaterThan:  // >
-                Emit(OpCode.Greater);
-                break;
-            case LangTokenType.LessThan:  // <
-                Emit(OpCode.Less);
-                break;
-            case LangTokenType.GreaterThanEquals:  // >=
-                Emit(OpCode.GreaterEqual);
-                break;
-            case LangTokenType.LessThanEquals:  // <=
-                Emit(OpCode.LessEqual);
-                break;
-            case LangTokenType.And:  // &&
-                Emit(OpCode.And);
-                break;
-            case LangTokenType.Or:  // ||
-                Emit(OpCode.Or);
-                break;
-            case LangTokenType.Exclamation:  // !
-                Emit(OpCode.Not);
-                break;
-            default:
-                Emit(OpCode.Nop); // 未支持的运算符
-                break;
+            // 一元运算符：只生成右操作数
+            if (node.Right != null)
+                node.Right.Accept(this);
+
+            // 生成一元运算符指令
+            switch (node.Opera)
+            {
+                case LangTokenType.Exclamation:  // !
+                    Emit(OpCode.Not);
+                    break;
+                case LangTokenType.Minus:  // 一元负号
+                    Emit(OpCode.Neg);
+                    break;
+            }
+        }
+        else
+        {
+            // 二元运算符：生成左右操作数
+            if (node.Left != null)
+                node.Left.Accept(this);
+
+            if (node.Right != null)
+                node.Right.Accept(this);
+
+            // 生成二元运算符指令
+            switch (node.Opera)
+            {
+                case LangTokenType.Plus:
+                    Emit(OpCode.Add);
+                    break;
+                case LangTokenType.Minus:
+                    Emit(OpCode.Sub);
+                    break;
+                case LangTokenType.Star:
+                    Emit(OpCode.Mul);
+                    break;
+                case LangTokenType.Slash:
+                    Emit(OpCode.Div);
+                    break;
+                case LangTokenType.Percent:
+                    Emit(OpCode.Mod);
+                    break;
+                case LangTokenType.Caret:  // ^ 幂运算
+                    Emit(OpCode.Pow);
+                    break;
+                case LangTokenType.Equals:  // ==
+                    Emit(OpCode.Equal);
+                    break;
+                case LangTokenType.NotEquals:  // !=
+                    Emit(OpCode.NotEqual);
+                    break;
+                case LangTokenType.GreaterThan:  // >
+                    Emit(OpCode.Greater);
+                    break;
+                case LangTokenType.LessThan:  // <
+                    Emit(OpCode.Less);
+                    break;
+                case LangTokenType.GreaterThanEquals:  // >=
+                    Emit(OpCode.GreaterEqual);
+                    break;
+                case LangTokenType.LessThanEquals:  // <=
+                    Emit(OpCode.LessEqual);
+                    break;
+                case LangTokenType.And:  // &&
+                    Emit(OpCode.And);
+                    break;
+                case LangTokenType.Or:  // ||
+                    Emit(OpCode.Or);
+                    break;
+                default:
+                    Emit(OpCode.Nop); // 未支持的运算符
+                    break;
+            }
         }
 
         return null;
