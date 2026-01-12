@@ -1,0 +1,11 @@
+// 测试For-in循环
+list <- {1, 2, 3, 4, 5}
+PrintLine("列表: {1, 2, 3, 4, 5}")
+
+total <- 0
+for item in list {
+    PrintLine("Item: " + item.ToStr())
+    total <- total + item
+}
+PrintLine("Total: " + total.ToStr())
+PrintLine("期望: 15")

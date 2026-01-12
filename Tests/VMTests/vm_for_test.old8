@@ -1,0 +1,16 @@
+// 测试For循环
+
+// 基本for循环
+sum <- 0
+for i <- 0, i < 5, i <- i + 1 {
+    sum <- sum + i
+}
+PrintLine("Sum: " + sum.ToStr())
+
+// For-in循环
+list <- {1, 2, 3, 4, 5}
+total <- 0
+for item in list {
+    total <- total + item
+}
+PrintLine("Total: " + total.ToStr())

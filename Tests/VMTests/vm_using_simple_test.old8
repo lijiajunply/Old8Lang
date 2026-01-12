@@ -1,0 +1,9 @@
+// 简单测试Using语句
+
+PrintLine("开始测试")
+
+using mutex <- MutexCreate() {
+    PrintLine("Using块内部")
+}
+
+PrintLine("测试结束")

@@ -1,0 +1,96 @@
+// Old8Lang 虚拟机功能演示
+
+PrintLine("=== Old8Lang VM 功能演示 ===")
+PrintLine("")
+
+// 1. 变量和算术运算
+PrintLine("1. 变量和算术运算")
+a <- 10
+b <- 20
+sum <- a + b
+PrintLine("  10 + 20 = " + sum.ToStr())
+
+// 2. 函数定义和调用
+PrintLine("")
+PrintLine("2. 函数定义和调用")
+
+func multiply(x:int, y:int) -> int {
+    return x * y
+}
+
+result <- multiply(6, 7)
+PrintLine("  multiply(6, 7) = " + result.ToStr())
+
+// 3. While 循环
+PrintLine("")
+PrintLine("3. While 循环")
+i <- 0
+while_sum <- 0
+while i < 5 {
+    while_sum <- while_sum + i
+    i <- i + 1
+}
+PrintLine("  Sum(0..4) = " + while_sum.ToStr())
+
+// 4. For 循环
+PrintLine("")
+PrintLine("4. For 循环")
+for_sum <- 0
+for j <- 1, j <= 10, j <- j + 1 {
+    for_sum <- for_sum + j
+}
+PrintLine("  Sum(1..10) = " + for_sum.ToStr())
+
+// 5. Switch 语句
+PrintLine("")
+PrintLine("5. Switch 语句")
+grade <- 85
+
+switch grade {
+    case 100 {
+        PrintLine("  成绩: 完美!")
+    }
+    case 90 {
+        PrintLine("  成绩: 优秀!")
+    }
+    case 80 {
+        PrintLine("  成绩: 良好!")
+    }
+    default {
+        PrintLine("  成绩: 其他")
+    }
+}
+
+// 6. 三元运算符
+PrintLine("")
+PrintLine("6. 三元运算符")
+age <- 18
+status <- age >= 18 ? "成年" : "未成年"
+PrintLine("  年龄18: " + status)
+
+// 7. 嵌套函数调用
+PrintLine("")
+PrintLine("7. 嵌套函数调用")
+
+func add(x:int, y:int) -> int {
+    return x + y
+}
+
+func subtract(x:int, y:int) -> int {
+    return x - y
+}
+
+nested_result <- add(multiply(3, 4), subtract(20, 5))
+PrintLine("  add(multiply(3, 4), subtract(20, 5)) = " + nested_result.ToStr())
+PrintLine("  预期: (3*4) + (20-5) = 27")
+
+// 8. 逻辑运算
+PrintLine("")
+PrintLine("8. 逻辑运算")
+x <- 5
+y <- 10
+is_valid <- x > 0 and y < 20
+PrintLine("  5 > 0 and 10 < 20 = " + is_valid.ToStr())
+
+PrintLine("")
+PrintLine("=== 所有测试完成 ===")

@@ -1,0 +1,7 @@
+// 测试基本For循环
+sum <- 0
+for i <- 0, i < 5, i <- i + 1 {
+    sum <- sum + i
+}
+PrintLine("Sum: " + sum.ToStr())
+PrintLine("期望: 10")

@@ -1,0 +1,19 @@
+// 测试Using语句
+
+// 测试 using with variable declaration
+using mutex <- MutexCreate() {
+    PrintLine("Mutex创建成功")
+    MutexLock(mutex)
+    PrintLine("Mutex已锁定")
+    MutexUnlock(mutex)
+    PrintLine("Mutex已解锁")
+}
+PrintLine("Using块结束，Mutex应已自动释放")
+
+// 测试 using with existing variable
+ch <- ChannelCreate()
+using ch {
+    ChannelSend(ch, 123)
+    PrintLine("已发送数据到Channel")
+}
+PrintLine("Using块结束，Channel应已自动释放")
