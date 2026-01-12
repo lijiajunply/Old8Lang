@@ -246,10 +246,10 @@ public class VMCollectionTests
     public void DictionaryCreation_ExecutesCorrectly()
     {
         // Arrange
-        var code = @"
-            dict <- {""name"": ""张三"", ""age"": 25}
-            PrintLine(dict.ToStr())
-        ";
+        var code = """
+                   dict <- {"name": "张三", "age": 25}
+                   PrintLine(dict.ToStr())
+                   """;
 
         // Act
         var output = ExecuteVMCode(code);

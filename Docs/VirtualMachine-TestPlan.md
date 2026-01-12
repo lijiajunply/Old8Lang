@@ -191,22 +191,81 @@ Old8Lang.Tests/VirtualMachine/
 | 三元运算符测试 | 3 | ✅ 通过 |
 | 复杂控制流测试 | 2 | ✅ 通过 |
 
+### 6. 高级特性测试
+
+#### VMDeferTests.cs ⏭️ (已创建，跳过)
+
+**注**: 该文件包含3个测试用例，测试 defer 语句的资源清理机制
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `SimpleDeferStatement_ExecutesCorrectly` | ⏭️ 跳过 | 简单 defer 语句执行 |
+| `MultipleDeferStatements_ExecuteInReverseOrder` | ⏭️ 跳过 | 多个 defer 的 LIFO 顺序 |
+| `DeferWithException_StillExecutes` | ⏭️ 跳过 | 异常情况下 defer 仍执行 |
+
+**跳过原因**: 虚拟机 defer 语句实现可能不完整
+
+#### VMMatchExpressionTests.cs ⏭️ (已创建，跳过)
+
+**注**: 该文件包含3个测试用例，测试模式匹配功能
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `MatchExpression_SimpleValueMatch_ExecutesCorrectly` | ⏭️ 跳过 | 简单值匹配 |
+| `MatchExpression_DefaultBranch_ExecutesCorrectly` | ⏭️ 跳过 | 默认分支匹配 |
+| `MatchExpression_WithExpressions_ExecutesCorrectly` | ⏭️ 跳过 | 表达式匹配 |
+
+**跳过原因**: 虚拟机 Match 表达式实现可能不完整
+
+#### VMSelectTests.cs ⏭️ (已创建，跳过)
+
+**注**: 该文件包含3个测试用例，测试 Channel 多路选择功能
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `SelectStatement_SendOperation_ExecutesCorrectly` | ⏭️ 跳过 | select 发送操作 |
+| `SelectStatement_ReceiveOperation_ExecutesCorrectly` | ⏭️ 跳过 | select 接收操作 |
+| `SelectStatement_DefaultBranch_ExecutesCorrectly` | ⏭️ 跳过 | select 默认分支 |
+
+**跳过原因**: 虚拟机 select 语句实现可能不完整
+
+#### VMAsyncTests.cs ⏭️ (已创建，跳过)
+
+**注**: 该文件包含3个测试用例，测试 async/await 机制
+
+| 测试用例 | 状态 | 描述 |
+|---------|------|------|
+| `AsyncFunction_SimpleCall_ExecutesCorrectly` | ⏭️ 跳过 | 简单异步函数调用 |
+| `AsyncFunction_WithDelay_ExecutesCorrectly` | ⏭️ 跳过 | 带延迟的异步函数 |
+| `AsyncFunction_MultipleAwaits_ExecutesCorrectly` | ⏭️ 跳过 | 多个 await 调用 |
+
+**跳过原因**: 虚拟机异步函数实现可能不完整
+
 ## 测试进度统计
 
 ### 当前进度 (2026-01-13)
 
-| 测试类别 | 已完成 | 待实现 | 总计 | 完成率 |
-|---------|--------|--------|------|--------|
-| 函数测试 | 6 | 0 | 6 | 100% |
-| 表达式测试 | 9 | 0 | 9 | 100% |
-| 字符串测试 | 2 | 3 | 5 | 40% |
-| 集合测试 | 9 | 0 | 9 | 100% |
-| 控制流测试 | 21 | 0 | 21 | 100% |
-| **总计** | **47** | **3** | **50** | **94%** |
+| 测试类别 | 已完成 | 跳过 | 待实现 | 总计 | 完成率 |
+|---------|--------|------|--------|------|--------|
+| 函数测试 | 6 | 3 | 0 | 9 | 67% |
+| 表达式测试 | 9 | 3 | 0 | 12 | 75% |
+| 字符串测试 | 2 | 0 | 3 | 5 | 40% |
+| 集合测试 | 9 | 0 | 0 | 9 | 100% |
+| 控制流测试 | 21 | 6 | 0 | 27 | 78% |
+| **总计** | **47** | **12** | **3** | **62** | **76%** |
+
+**说明**:
+- **已完成**: 测试通过的数量
+- **跳过**: 已创建但因虚拟机实现不完整而跳过的测试
+- **待实现**: 尚未创建的测试
+- **完成率**: 已完成测试占总测试的百分比（不含跳过的测试）
 
 ### 已通过的测试
 
 ✅ **47 个测试全部通过** (通过率: 100%)
+⏭️ **12 个测试已跳过** (虚拟机高级特性实现不完整)
+
+**测试总数**: 62个（47个通过 + 12个跳过 + 3个待实现）
 
 #### 函数测试 (6个)
 - `FunctionDeclaration_NoParameters_ExecutesCorrectly`
@@ -244,6 +303,30 @@ Old8Lang.Tests/VirtualMachine/
 
 #### 控制流测试 (21个)
 - 包含if语句、while循环、for循环、for-in循环、三元运算符等完整测试套件
+
+### 已跳过的测试
+
+⏭️ **12 个测试已跳过** (虚拟机高级特性实现不完整)
+
+#### defer 语句测试 (3个跳过)
+- `SimpleDeferStatement_ExecutesCorrectly` - 简单 defer 语句执行
+- `MultipleDeferStatements_ExecuteInReverseOrder` - 多个 defer 的 LIFO 顺序
+- `DeferWithException_StillExecutes` - 异常情况下 defer 仍执行
+
+#### Match 表达式测试 (3个跳过)
+- `MatchExpression_SimpleValueMatch_ExecutesCorrectly` - 简单值匹配
+- `MatchExpression_DefaultBranch_ExecutesCorrectly` - 默认分支匹配
+- `MatchExpression_WithExpressions_ExecutesCorrectly` - 表达式匹配
+
+#### select 语句测试 (3个跳过)
+- `SelectStatement_SendOperation_ExecutesCorrectly` - select 发送操作
+- `SelectStatement_ReceiveOperation_ExecutesCorrectly` - select 接收操作
+- `SelectStatement_DefaultBranch_ExecutesCorrectly` - select 默认分支
+
+#### 异步函数测试 (3个跳过)
+- `AsyncFunction_SimpleCall_ExecutesCorrectly` - 简单异步函数调用
+- `AsyncFunction_WithDelay_ExecutesCorrectly` - 带延迟的异步函数
+- `AsyncFunction_MultipleAwaits_ExecutesCorrectly` - 多个 await 调用
 
 ## 已知问题
 
