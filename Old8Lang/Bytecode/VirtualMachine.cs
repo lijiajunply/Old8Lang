@@ -13,6 +13,7 @@ public class VirtualMachine
     private readonly Stack<CallFrame> _callStack = new();
     private readonly Dictionary<string, object?> _globals = new();
     private readonly BytecodeFile _bytecodeFile;
+    private readonly Stack<ExceptionHandler> _exceptionHandlers = new();
 
     public VirtualMachine(BytecodeFile bytecodeFile)
     {
@@ -820,6 +821,100 @@ public class VirtualMachine
                     throw new Exception(message);
                 }
 
+            case OpCode.TryBegin:
+                {
+                    // TryBegin操作：开始try块
+                    // 操作数: [catchOffset, finallyOffset]
+                    var operands = (int[])instruction.Operand!;
+                    int catchOffset = operands[0];
+                    int finallyOffset = operands.Length > 1 ? operands[1] : -1;
+
+                    // 创建异常处理器并压入栈
+                    var handler = new ExceptionHandler
+                    {
+                        CatchIP = catchOffset,
+                        FinallyIP = finallyOffset,
+                        EndIP = -1, // 将在TryEnd时设置
+                        InFinally = false
+                    };
+                    _exceptionHandlers.Push(handler);
+                }
+                break;
+
+            case OpCode.TryEnd:
+                {
+                    // TryEnd操作：结束try块
+                    // 如果没有异常，跳过catch块，执行finally块（如果有）
+                    if (_exceptionHandlers.Count > 0)
+                    {
+                        var handler = _exceptionHandlers.Peek();
+
+                        // 如果有finally块，跳转到finally
+                        if (handler.FinallyIP >= 0)
+                        {
+                            frame.IP = handler.FinallyIP;
+                        }
+                        // 否则跳过整个try-catch块
+                        else if (handler.EndIP >= 0)
+                        {
+                            frame.IP = handler.EndIP;
+                        }
+                    }
+                }
+                break;
+
+            case OpCode.CatchBegin:
+                {
+                    // CatchBegin操作：开始catch块
+                    // 异常对象应该已经在栈上
+                    // 这里不需要做特殊处理，只是标记进入catch块
+                }
+                break;
+
+            case OpCode.CatchEnd:
+                {
+                    // CatchEnd操作：结束catch块
+                    // 跳转到finally块（如果有）或结束
+                    if (_exceptionHandlers.Count > 0)
+                    {
+                        var handler = _exceptionHandlers.Peek();
+
+                        // 如果有finally块，跳转到finally
+                        if (handler.FinallyIP >= 0)
+                        {
+                            frame.IP = handler.FinallyIP;
+                        }
+                        // 否则跳到结束
+                        else if (handler.EndIP >= 0)
+                        {
+                            frame.IP = handler.EndIP;
+                        }
+                    }
+                }
+                break;
+
+            case OpCode.FinallyBegin:
+                {
+                    // FinallyBegin操作：开始finally块
+                    if (_exceptionHandlers.Count > 0)
+                    {
+                        var handler = _exceptionHandlers.Peek();
+                        handler.InFinally = true;
+                    }
+                }
+                break;
+
+            case OpCode.FinallyEnd:
+                {
+                    // FinallyEnd操作：结束finally块
+                    // 弹出异常处理器
+                    if (_exceptionHandlers.Count > 0)
+                    {
+                        _exceptionHandlers.Pop();
+                    }
+                }
+                break;
+
             case OpCode.DebugPrint:
                 {
                     int messageIndex = (int)instruction.Operand!;
@@ -1092,4 +1187,15 @@ public class VirtualMachine
                 throw new Exception($"未知的原生函数: {funcName}");
         }
     }
+}
+
+/// <summary>
+/// 异常处理器 - 跟踪try-catch-finally块
+/// </summary>
+internal class ExceptionHandler
+{
+    public int CatchIP { get; set; }
+    public int FinallyIP { get; set; }
+    public int EndIP { get; set; }
+    public bool InFinally { get; set; }
 }
