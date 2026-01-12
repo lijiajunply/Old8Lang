@@ -150,6 +150,15 @@ public enum OpCode : byte
     /// <summary>创建范围 (start, end, step)</summary>
     NewRange = 0x65,
 
+    /// <summary>获取迭代器 (从集合获取迭代器)</summary>
+    GetIterator = 0x66,
+
+    /// <summary>迭代器MoveNext (返回bool表示是否有下一个元素)</summary>
+    IteratorMoveNext = 0x67,
+
+    /// <summary>获取迭代器当前元素</summary>
+    IteratorCurrent = 0x68,
+
     // ===== 类型操作 (0x70-0x7F) =====
     /// <summary>类型转换 (操作数: targetTypeIndex)</summary>
     Cast = 0x70,

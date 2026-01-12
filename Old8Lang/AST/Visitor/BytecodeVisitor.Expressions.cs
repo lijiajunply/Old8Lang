@@ -1,6 +1,7 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.Bytecode;
@@ -31,6 +32,59 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitOperation(Operation node)
     {
+        // 特殊处理 Dot 运算符（成员访问和方法调用）
+        if (node.Opera == LangTokenType.Dot)
+        {
+            // 生成左操作数代码（对象）
+            if (node.Left != null)
+                node.Left.Accept(this);
+
+            // 检查右操作数是否是方法调用（Instance）
+            if (node.Right is Instance instance)
+            {
+                // 这是方法调用：object.method(args)
+                // 左操作数（对象）已经在栈上
+
+                // 生成所有参数的代码
+                foreach (var arg in instance.Ids)
+                {
+                    arg.Accept(this);
+                }
+
+                string methodName = instance.Id.IdName;
+                int argCount = instance.Ids.Count + 1; // +1 因为对象本身是第一个参数
+
+                // 检查是否是原生函数（如ToStr）
+                if (_compiler.IsNativeFunction(methodName))
+                {
+                    Emit(OpCode.CallNative, new object[] { argCount, methodName });
+                }
+                else
+                {
+                    // 用户定义的方法
+                    Emit(OpCode.Call, new object[] { argCount, methodName });
+                }
+            }
+            else if (node.Right is LangId memberId)
+            {
+                // 这是字段访问：object.field
+                // TODO: 实现字段访问的字节码生成
+                // 目前字节码VM不支持对象字段访问
+                Emit(OpCode.Nop);
+            }
+            else
+            {
+                // 其他情况：生成右操作数代码
+                if (node.Right != null)
+                    node.Right.Accept(this);
+                Emit(OpCode.Nop);
+            }
+
+            return null;
+        }
+
+        // 原有逻辑：处理其他运算符
+
         // 生成左操作数代码
         if (node.Left != null)
             node.Left.Accept(this);

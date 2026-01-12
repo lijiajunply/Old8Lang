@@ -418,6 +418,63 @@ public class VirtualMachine
                 }
                 break;
 
+            // === 迭代器操作 ===
+            case OpCode.GetIterator:
+                {
+                    var collection = _stack.Pop();
+                    if (collection is System.Collections.IEnumerable enumerable)
+                    {
+                        var enumerator = enumerable.GetEnumerator();
+                        _stack.Push(enumerator);
+                    }
+                    else
+                    {
+                        throw new Exception($"对象类型 {collection?.GetType().Name} 不可迭代");
+                    }
+                }
+                break;
+
+            case OpCode.IteratorMoveNext:
+                {
+                    var enumerator = _stack.Peek() as System.Collections.IEnumerator;
+                    if (enumerator != null)
+                    {
+                        bool hasNext = enumerator.MoveNext();
+                        _stack.Push(hasNext);
+                    }
+                    else
+                    {
+                        var top = _stack.Count > 0 ? _stack.Peek() : null;
+                        var topType = top?.GetType().FullName ?? "null";
+                        throw new Exception($"栈顶不是迭代器对象，而是: {topType}");
+                    }
+                }
+                break;
+
+            case OpCode.IteratorCurrent:
+                {
+                    // 栈顶应该是迭代器
+                    if (_stack.Count == 0)
+                    {
+                        throw new Exception("IteratorCurrent: 栈为空");
+                    }
+
+                    var top = _stack.Peek();
+                    var enumerator = top as System.Collections.IEnumerator;
+                    if (enumerator != null)
+                    {
+                        _stack.Push(enumerator.Current);
+                    }
+                    else
+                    {
+                        // 调试：输出栈的详细信息
+                        var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                        var topType = top?.GetType().FullName ?? "null";
+                        throw new Exception($"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
+                    }
+                }
+                break;
+
             // === 异常处理 ===
             case OpCode.Throw:
                 {
@@ -425,6 +482,15 @@ public class VirtualMachine
                     var message = ToString(exceptionValue);
                     throw new Exception(message);
                 }
+
+            case OpCode.DebugPrint:
+                {
+                    int messageIndex = (int)instruction.Operand!;
+                    var message = _bytecodeFile.ConstantPool.GetConstant(messageIndex);
+                    var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                    Console.WriteLine($"{message} - 栈深度:{_stack.Count}, 内容:[{stackContents}]");
+                }
+                break;
 
             default:
                 throw new Exception($"未实现的操作码: {instruction.OpCode}");

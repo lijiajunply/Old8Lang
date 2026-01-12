@@ -300,18 +300,49 @@ public partial class BytecodeVisitor
 
         string varName = id.IdName;
 
-        // 生成集合表达式的代码
+        // 生成集合表达式的代码（栈上现在有集合）
         expression.Accept(this);
 
-        // TODO: 完整实现需要：
-        // 1. 调用集合的迭代器方法
-        // 2. 在循环中调用 MoveNext 和获取 Current
-        // 3. 将当前元素存储到循环变量
-        //
-        // 简化实现：暂时不支持 for-in 循环
-        // 需要在 VM 中添加迭代器支持
+        // 获取迭代器（栈上现在有迭代器）
+        Emit(OpCode.GetIterator);
 
-        Emit(OpCode.Pop); // 弹出集合
+        // 循环开始标签
+        int loopStart = GetCurrentPosition();
+
+        // 调用 MoveNext（栈：迭代器 → 迭代器, hasNext）
+        Emit(OpCode.IteratorMoveNext);
+
+        // 如果 MoveNext 返回 false，跳出循环
+        int jumpIfFalse = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1);
+
+        // 获取当前元素（栈：迭代器 → 迭代器, current）
+        Emit(OpCode.IteratorCurrent);
+
+        // 将当前元素存储到循环变量
+        if (_compiler.IsLocalVariable(varName))
+        {
+            int localIndex = _compiler.GetLocalIndex(varName);
+            Emit(OpCode.StoreLocal, localIndex);
+        }
+        else
+        {
+            // 声明为局部变量
+            int localIndex = _compiler.DeclareLocalVariable(varName);
+            Emit(OpCode.StoreLocal, localIndex);
+        }
+
+        // 执行循环体
+        body.Accept(this);
+
+        // 跳回循环开始
+        Emit(OpCode.Jump, loopStart);
+
+        // 修补跳出循环的跳转
+        PatchJump(jumpIfFalse, GetCurrentPosition());
+
+        // 弹出迭代器
+        Emit(OpCode.Pop);
 
         return null;
     }
