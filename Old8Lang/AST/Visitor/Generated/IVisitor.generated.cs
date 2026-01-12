@@ -121,6 +121,16 @@ public interface IVisitor<out TResult>
     /// </summary>
     TResult VisitYieldStatement(YieldStatement node);
 
+    /// <summary>
+    /// 访问 DeferStatement 节点
+    /// </summary>
+    TResult VisitDeferStatement(DeferStatement node);
+
+    /// <summary>
+    /// 访问 SelectStatement 节点
+    /// </summary>
+    TResult VisitSelectStatement(SelectStatement node);
+
 
     // ===== Expression 访问方法 =====
     /// <summary>
@@ -157,6 +167,11 @@ public interface IVisitor<out TResult>
     /// 访问 TernaryExpression 节点
     /// </summary>
     TResult VisitTernaryExpression(TernaryExpression node);
+
+    /// <summary>
+    /// 访问 MatchExpression 节点
+    /// </summary>
+    TResult VisitMatchExpression(MatchExpression node);
 
 
     // ===== Value 访问方法 =====

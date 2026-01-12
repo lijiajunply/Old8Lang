@@ -585,4 +585,17 @@ public partial class BytecodeVisitor
 
         return null;
     }
+
+    public Instruction? VisitDeferStatement(DeferStatement node)
+    {
+        // Defer 语句（延迟执行）
+        // TODO: 完整的 defer 支持需要：
+        // 1. 在 CallFrame 中添加 defer 栈
+        // 2. 在函数返回时执行所有 defer（LIFO 顺序）
+        // 3. 在异常情况下也要执行 defer
+        //
+        // 简化实现：暂时不支持 defer 语句
+
+        return null;
+    }
 }

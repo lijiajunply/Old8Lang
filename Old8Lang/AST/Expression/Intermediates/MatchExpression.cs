@@ -209,6 +209,6 @@ public partial class MatchExpression(
     /// <inheritdoc />
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException("MatchExpression visitor not implemented");
+        return visitor.VisitMatchExpression(this);
     }
 }

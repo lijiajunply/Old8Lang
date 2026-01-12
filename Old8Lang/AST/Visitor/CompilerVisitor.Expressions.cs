@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -25,6 +26,17 @@ public partial class CompilerVisitor
         {
             ilGenerator.Emit(OpCodes.Ldloc, value);
         }
+        return null;
+    }
+
+    /// <summary>
+    /// 访问 MatchExpression 节点（编译器）
+    /// </summary>
+    public object? VisitMatchExpression(MatchExpression node)
+    {
+        // 迁移自 MatchExpression.LoadIlValue()
+        // MatchExpression 的逻辑已经封装在其 LoadIlValue 方法中，直接调用
+        node.LoadIlValue(ilGenerator, local);
         return null;
     }
 }

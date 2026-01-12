@@ -185,4 +185,26 @@ public partial class CompilerVisitor
         node.GenerateIl(ilGenerator, local);
         return null;
     }
+
+    /// <summary>
+    /// 访问 DeferStatement 节点（编译器）
+    /// </summary>
+    public object? VisitDeferStatement(DeferStatement node)
+    {
+        // 迁移自 DeferStatement.GenerateIl()
+        // DeferStatement 的逻辑已经封装在其 GenerateIl 方法中，直接调用
+        node.GenerateIl(ilGenerator, local);
+        return null;
+    }
+
+    /// <summary>
+    /// 访问 SelectStatement 节点（编译器）
+    /// </summary>
+    public object? VisitSelectStatement(SelectStatement node)
+    {
+        // 迁移自 SelectStatement.GenerateIl()
+        // SelectStatement 的逻辑已经封装在其 GenerateIl 方法中，直接调用
+        node.GenerateIl(ilGenerator, local);
+        return null;
+    }
 }

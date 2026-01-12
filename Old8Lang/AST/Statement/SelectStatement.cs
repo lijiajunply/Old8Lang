@@ -400,8 +400,6 @@ public partial class SelectStatement(
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        // 目前visitor pattern尚未完全实现select语句的支持
-        // 暂时返回默认值，等待visitor pattern完善后补充
-        return default!;
+        return visitor.VisitSelectStatement(this);
     }
 }

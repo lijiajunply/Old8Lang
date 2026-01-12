@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Visitor;
@@ -129,6 +130,16 @@ public partial class InterpreterVisitor
     {
         // 迁移自 SuperExpression.Run()
         // 暂时调用原方法
+        return node.Run(manager);
+    }
+
+    /// <summary>
+    /// 访问 MatchExpression 节点
+    /// </summary>
+    public LangValueType VisitMatchExpression(MatchExpression node)
+    {
+        // 迁移自 MatchExpression.Run()
+        // Match 表达式逻辑已封装在 Run 方法中，直接调用
         return node.Run(manager);
     }
 }

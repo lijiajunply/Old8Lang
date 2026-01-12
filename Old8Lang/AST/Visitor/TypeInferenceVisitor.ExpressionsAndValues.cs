@@ -261,4 +261,9 @@ public partial class TypeInferenceVisitor
     {
         return node.OutputType(local);
     }
+
+    public Type? VisitMatchExpression(MatchExpression node)
+    {
+        return node.OutputType(local);
+    }
 }

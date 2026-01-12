@@ -356,4 +356,26 @@ public partial class InterpreterVisitor
         node.Run(manager);
         return new VoidLangValue();
     }
+
+    /// <summary>
+    /// 访问 DeferStatement 节点
+    /// </summary>
+    public LangValueType VisitDeferStatement(DeferStatement node)
+    {
+        // 迁移自 DeferStatement.Run()
+        // Defer 语句逻辑已封装在 Run 方法中，直接调用
+        node.Run(manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 SelectStatement 节点
+    /// </summary>
+    public LangValueType VisitSelectStatement(SelectStatement node)
+    {
+        // 迁移自 SelectStatement.Run()
+        // Select 语句逻辑已封装在 Run 方法中，直接调用
+        node.Run(manager);
+        return new VoidLangValue();
+    }
 }

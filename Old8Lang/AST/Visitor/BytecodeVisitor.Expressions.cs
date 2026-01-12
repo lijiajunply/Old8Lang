@@ -268,4 +268,17 @@ public partial class BytecodeVisitor
 
         return null;
     }
+
+    public Instruction? VisitMatchExpression(MatchExpression node)
+    {
+        // Match 表达式（模式匹配）
+        // TODO: 完整的 match 支持需要：
+        // 1. 模式匹配机制（值匹配、类型匹配、解构匹配）
+        // 2. 变量绑定支持
+        // 3. Guard 条件支持
+        //
+        // 简化实现：暂时不支持 match 表达式
+
+        return null;
+    }
 }
