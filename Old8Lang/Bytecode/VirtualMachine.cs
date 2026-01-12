@@ -1205,11 +1205,7 @@ public class VirtualMachine
         // 处理列表
         if (value is IList list)
         {
-            var items = new List<string>();
-            foreach (var item in list)
-            {
-                items.Add(ToString(item));
-            }
+            var items = (from object? item in list select ToString(item)).ToList();
 
             return "{" + string.Join(", ", items) + "}";
         }
