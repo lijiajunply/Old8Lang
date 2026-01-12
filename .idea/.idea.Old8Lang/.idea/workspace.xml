@@ -22,10 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -564,7 +561,7 @@
       <workItem from="1767985358686" duration="156000" />
       <workItem from="1767985518540" duration="4807000" />
       <workItem from="1768162238074" duration="3699000" />
-      <workItem from="1768245774894" duration="2885000" />
+      <workItem from="1768245774894" duration="3202000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +906,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="627" />
+    <option name="localTasksCounter" value="628" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +933,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(compiler): 添加异常包装和范围表达式支持&#10;&#10;- 实现 ExceptionWrapper 类用于编译器模式下异常处理&#10;- 在 TryStatement 中包装异常对象以便只显示消息&#10;- 在 ThrowStatement 中处理 ExceptionWrapper 类型异常&#10;- 添加对数组和 List&lt;T&gt; 类型 Length/Count 属性的支持&#10;- 修改范围表达式测试使用数组属性和索引访问&#10;- 更新范围表达式语法和相关测试用例&#10;- 调整嵌套异常测试的输出格式处理" />
     <MESSAGE value="feat(lang): 添加字典类型支持和优化IL代码生成&#10;&#10;- 在DictionaryLangValue中实现值类型的条件装箱以避免不必要的装箱操作&#10;- 扩展NestedIndexAccess支持Dictionary&lt;TKey, TValue&gt;类型的索引访问&#10;- 在ReturnStatement中添加返回值类型转换逻辑处理值类型与引用类型间的转换&#10;- 修复object到值类型的拆箱和值类型到引用类型的装箱操作" />
     <MESSAGE value="feat(lang): 添加类型转换和类型检查运算符支持&#10;&#10;- 实现 as 运算符支持 int double string bool char list array dictionary 等类型转换&#10;- 添加 is 和 is not 运算符进行类型检查并返回布尔值&#10;- 处理 List&lt;T&gt; 到数组的泛型类型转换&#10;- 支持 null 值的安全类型转换&#10;- 优化字符串转换的 null 值处理逻辑&#10;- 更新字典创建语法从 {} 为 dict() 调用&#10;- 添加类型转换相关的单元测试用例" />
     <MESSAGE value="feat(vm): 添加虚拟机基础算术运算和字节码编译功能&#10;&#10;- 新增 basic_arithmetic.old8 测试文件，包含算术运算、变量赋值和比较运算测试&#10;- 实现 BytecodeCompiler 类，负责将 AST 编译为字节码并管理作用域&#10;- 创建 BytecodeFile 类，定义字节码文件格式 (.o8c) 并支持读写操作&#10;- 开发 BytecodeVisitor 类及其表达式、语句、值类型实现，转换 AST 节点为字节码指令&#10;- 添加 CallFrame 类，管理虚拟机调用栈帧和局部变量&#10;- 实现 CompileBytecodeCommand 命令，支持编译 .old8 文件为 .o8c 字节码文件&#10;- 创建 ConstantPool 类，管理字节码中的常量存储和索引映射&#10;- 实现基本的栈大小跟踪和字节码优化功能" />
@@ -961,7 +957,8 @@
     <MESSAGE value="feat(vm): 添加数组操作数序列化支持和命令行集成&#10;&#10;- 实现了数组类型操作数的序列化和反序列化功能&#10;- 添加了数组元素的递归序列化处理逻辑&#10;- 更新虚拟机实现状态文档至100%完成度&#10;- 完成了命令行工具的完整集成功能&#10;- 修复了操作数类型不支持时的错误信息显示" />
     <MESSAGE value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
     <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
+    <MESSAGE value="docs(vm): 添加虚拟机功能限制文档并更新测试状态统计&#10;&#10;- 创建 VM_LIMITATIONS.md 文档记录不支持的语言特性&#10;- 添加面向对象编程、字符串高级操作、集合操作等功能限制说明&#10;- 更新测试状态统计显示 197个通过 21个跳过 0个失败&#10;- 标记类声明、字符串方法、字典转换等测试为跳过状态&#10;- 在VMCommand.cs中简化变量声明使用var关键字&#10;- 添加字符串长度操作测试用例并标记高级字符串方法为跳过&#10;- 更新IDE工作区配置和本地任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(vm): 添加虚拟机功能限制文档并更新测试状态统计&#10;&#10;- 创建 VM_LIMITATIONS.md 文档记录不支持的语言特性&#10;- 添加面向对象编程、字符串高级操作、集合操作等功能限制说明&#10;- 更新测试状态统计显示 197个通过 21个跳过 0个失败&#10;- 标记类声明、字符串方法、字典转换等测试为跳过状态&#10;- 在VMCommand.cs中简化变量声明使用var关键字&#10;- 添加字符串长度操作测试用例并标记高级字符串方法为跳过&#10;- 更新IDE工作区配置和本地任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
