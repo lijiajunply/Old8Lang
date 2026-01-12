@@ -23,9 +23,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestFiles/VMTests/break_continue.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
@@ -568,7 +565,7 @@
       <workItem from="1767985518540" duration="4807000" />
       <workItem from="1768162238074" duration="3699000" />
       <workItem from="1768245774894" duration="4766000" />
-      <workItem from="1768250624546" duration="2049000" />
+      <workItem from="1768250624546" duration="3666000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -913,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="633" />
+    <option name="localTasksCounter" value="636" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -940,9 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(vm): 重构字节码访问器中的节点字段访问方式&#10;&#10;- 将反射获取属性的方式改为使用主构造函数参数的通用方法&#10;- 统一使用 GetPrimaryConstructorParameter 方法访问 AST 节点字段&#10;- 修复 AwaitExpression 中 Expression 字段的访问逻辑&#10;- 优化 IfStatement 中 IfChild 节点的手动处理流程&#10;- 更新 WhileStatement、ForStatement 等控制流语句的字段访问方式&#10;- 修改 SwitchStatement 和 CaseStatement 的字段提取逻辑&#10;- 添加 comprehensive_test.old8 文件用于 VM 功能完整性测试" />
-    <MESSAGE value="docs(vm): 添加虚拟机功能状态报告文档&#10;&#10;- 创建 VM_Status_Report.md 文档详细记录 Old8Lang 虚拟机模式功能状态&#10;- 列出已实现且工作正常的功能包括基础运算、变量类型、控制流、函数调用等&#10;- 标识需要修复的核心功能如函数定义调用、Switch语句、For循环等问题&#10;- 记录简化实现的功能模块包括 For-in 循环、Try-Catch-Finally 完整支持等&#10;- 提供建议的优先级顺序帮助确定功能修复的先后顺序&#10;- 明确当前 VM 的适用场景和不支持的特性&#10;- 添加立即可做的改进项和具体的实施建议" />
-    <MESSAGE value="refactor(compiler): 简化方法调用的条件判断逻辑&#10;&#10;- 使用三元运算符替代if-else语句来决定使用CallNative还是Call操作码&#10;- 统一方法调用的字节码生成逻辑&#10;- 提高代码可读性和简洁性&#10;&#10;test(vm): 添加虚拟机算术、赋值和集合操作的全面测试&#10;&#10;- 创建VMArithmeticTests类，包含加减乘除幂运算和取余等算术操作测试&#10;- 添加VMAssignmentTests类，覆盖整数、浮点数、字符串、布尔值等类型的基础赋值测试&#10;- 实现VMCollectionTests类，涵盖数组、列表、字典、元组等集合类型的创建、访问和修改操作测试&#10;- 添加VMComparisonLogicalTests类，测试比较运算符和逻辑运算符的功能&#10;- 包含运算符优先级、复杂表达式计算、嵌套集合等高级功能的测试用例&#10;- 为所有测试方法提供详细的测试数据和预期结果验证" />
     <MESSAGE value="feat(vm): 实现虚拟机一元运算符和范围表达式功能&#10;&#10;- 添加一元运算符（!和一元负号）的字节码生成和执行支持&#10;- 实现RangeLangValue访问器，支持范围表达式的字节码生成&#10;- 添加StringTemplateValue访问器，支持字符串模板的字节码生成&#10;- 实现ArrayLength操作码，支持获取数组、集合和字符串长度&#10;- 添加NewRange操作码，支持创建数值范围对象&#10;- 实现Cast、IsType和TypeOf操作码，支持类型转换和检查功能&#10;- 添加虚拟机算术运算的全面测试用例" />
     <MESSAGE value="feat(vm): 添加并发原语和异步支持功能&#10;&#10;- 实现了互斥锁相关操作(MutexCreate、MutexLock、MutexUnlock、MutexDispose)&#10;- 实现了通道通信机制(ChannelCreate、ChannelSend、ChannelReceive、ChannelClose)&#10;- 实现了信号量控制(SemaphoreCreate、SemaphoreAcquire、SemaphoreRelease)&#10;- 添加了异步任务支持(NewTask、Await、Yield操作)&#10;- 为并发原语提供了相应的原生函数接口&#10;- 添加了并发原语的单元测试覆盖&#10;- 添加了异步功能的基本测试用例" />
     <MESSAGE value="feat(vm): 添加虚拟机异常处理支持&#10;&#10;- 实现了 try-catch-finally 字节码指令处理逻辑&#10;- 添加了异常处理器栈用于跟踪异常处理块状态&#10;- 新增 ExceptionHandler 类管理异常处理流程&#10;- 添加了 TryBegin、TryEnd、CatchBegin、CatchEnd、FinallyBegin、FinallyEnd 操作码支持&#10;- 创建了虚拟机异常处理单元测试确保功能正确性" />
@@ -965,7 +959,10 @@
     <MESSAGE value="feat(vm): 实现类定义和对象实例化功能&#10;&#10;- 添加预处理阶段注册所有类定义到字节码文件&#10;- 实现 NewObject 指令支持类实例化操作&#10;- 添加 GetField 和 SetField 指令支持对象字段访问&#10;- 实现字典对象作为类实例的数据结构&#10;- 支持类成员变量的初始化和赋值操作&#10;- 启用类声明相关的单元测试用例" />
     <MESSAGE value="feat(vm): 实现函数命名参数和类字段访问功能&#10;&#10;- 扩展 Call 和 CallNative 指令支持命名参数格式&#10;- 添加 ArrangeArgumentsWithNamed 方法处理参数重排逻辑&#10;- 实现命名参数值的栈操作和参数绑定机制&#10;- 更新字节码生成器支持位置和命名参数混合调用&#10;- 添加 VMNamedArgumentsTests 测试全命名和混合参数功能&#10;- 修复类成员访问赋值的字节码生成问题&#10;- 更新虚拟机测试计划文档记录新增功能完成状态" />
     <MESSAGE value="feat(vm): 添加虚拟机模式下的默认参数支持&#10;&#10;- 在 FunctionMetadata 中添加 DefaultValues 属性存储参数默认值&#10;- 修改 CompileFunction 方法以接收并存储默认参数值&#10;- 实现常量表达式求值器用于计算默认参数值&#10;- 添加默认参数值的序列化和反序列化功能&#10;- 在虚拟机函数调用时自动填充缺失的参数使用默认值&#10;- 完成虚拟机端默认参数的完整实现并启用相关测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加虚拟机模式下的默认参数支持&#10;&#10;- 在 FunctionMetadata 中添加 DefaultValues 属性存储参数默认值&#10;- 修改 CompileFunction 方法以接收并存储默认参数值&#10;- 实现常量表达式求值器用于计算默认参数值&#10;- 添加默认参数值的序列化和反序列化功能&#10;- 在虚拟机函数调用时自动填充缺失的参数使用默认值&#10;- 完成虚拟机端默认参数的完整实现并启用相关测试" />
+    <MESSAGE value="feat(vm): 实现虚拟机模式下的break和continue语句支持&#10;&#10;- 添加循环标签栈管理break和continue跳转位置&#10;- 实现While、For和For-in循环中的break和continue逻辑&#10;- 新增LoopLabels类存储循环跳转信息和目标位置&#10;- 在字节码生成阶段将break/continue转换为Jump指令&#10;- 添加完整的break和continue单元测试用例&#10;- 创建break_continue.old8测试文件验证各种循环场景" />
+    <MESSAGE value="feat(bytecode): 实现完整的异常处理机制&#10;&#10;- 添加 ExceptionTableEntry 类用于描述异常处理区域&#10;- 扩展 BytecodeCompiler 添加分配局部变量和异常表条目功能&#10;- 在 FunctionMetadata 中添加异常表存储和序列化支持&#10;- 实现 BytecodeVisitor 中 TryStatement 的完整异常处理字节码生成&#10;- 在 VirtualMachine 中添加异常捕获和处理器查找逻辑&#10;- 添加异常类型匹配和继承关系检查功能&#10;- 实现 catch 和 finally 块的正确跳转机制&#10;- 添加相关的单元测试验证异常处理功能" />
+    <MESSAGE value="feat(vm): 实现 defer 语句支持&#10;&#10;- 在 BytecodeVisitor 中添加 defer 块列表和相关数据结构&#10;- 实现 defer 语句的字节码生成逻辑，包括跳转和位置记录&#10;- 在 CallFrame 中添加 DeferStack 用于存储延迟执行的位置&#10;- 在虚拟机中实现 Defer 和 ExecuteDefers 操作码处理&#10;- 添加 ExecuteDefers 方法按 LIFO 顺序执行 defer 块&#10;- 在函数返回和异常情况下自动执行所有 defer 块&#10;- 启用相关的单元测试验证 defer 功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现 defer 语句支持&#10;&#10;- 在 BytecodeVisitor 中添加 defer 块列表和相关数据结构&#10;- 实现 defer 语句的字节码生成逻辑，包括跳转和位置记录&#10;- 在 CallFrame 中添加 DeferStack 用于存储延迟执行的位置&#10;- 在虚拟机中实现 Defer 和 ExecuteDefers 操作码处理&#10;- 添加 ExecuteDefers 方法按 LIFO 顺序执行 defer 块&#10;- 在函数返回和异常情况下自动执行所有 defer 块&#10;- 启用相关的单元测试验证 defer 功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

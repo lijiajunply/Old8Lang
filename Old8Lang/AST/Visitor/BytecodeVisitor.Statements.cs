@@ -797,12 +797,161 @@ public partial class BytecodeVisitor
     public Instruction? VisitSelectStatement(SelectStatement node)
     {
         // Select 语句（Channel 多路选择）
-        // TODO: 完整的 select 支持需要：
-        // 1. Channel 操作的轮询机制
-        // 2. 非阻塞的发送和接收
-        // 3. 默认分支支持
-        //
-        // 简化实现：暂时不支持 select 语句
+        // 实现轮询策略：
+        // 1. 循环检查所有 case
+        // 2. 如果任意 case 就绪，执行对应块并退出
+        // 3. 如果有 default 且所有 case 未就绪，执行 default 并退出
+        // 4. 否则短暂休眠后继续循环
+
+        int loopStart = GetCurrentPosition();
+        int loopEnd = -1; // 稍后修补
+
+        // 遍历所有 case
+        foreach (var selectCase in node.Cases)
+        {
+            if (selectCase.IsReceive)
+            {
+                // 接收 case: 尝试非阻塞接收
+                // 栈布局: channelId, timeoutMs -> ChannelReceiveResult
+
+                // 加载 channelId
+                selectCase.ChannelExpression.Accept(this);
+
+                // 加载超时时间 0（非阻塞）
+                Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0));
+
+                // 调用 ChannelTryReceive
+                Emit(OpCode.ChannelTryReceive);
+
+                // 结果在栈顶，需要检查 Success 属性
+                // 由于虚拟机不支持直接访问对象属性，我们需要使用 CallNative
+                // 暂时使用简化方案：将 ChannelReceiveResult 存储到临时变量
+
+                // 分配临时局部变量存储结果
+                int resultVarIndex = _compiler.AllocateLocal("$temp_result_" + GetCurrentPosition());
+                Emit(OpCode.StoreLocal, resultVarIndex);
+
+                // 加载结果并检查 Success（通过 GetField）
+                Emit(OpCode.LoadLocal, resultVarIndex);
+                Emit(OpCode.GetField, "Success");
+
+                // 如果 Success == false，跳过此 case
+                int skipCaseIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                // Success == true: 设置变量（如果有）并执行块
+                if (selectCase.VariableName != null)
+                {
+                    // 获取 Value 字段
+                    Emit(OpCode.LoadLocal, resultVarIndex);
+                    Emit(OpCode.GetField, "Value");
+
+                    // 存储到变量
+                    if (_compiler.IsLocalVariable(selectCase.VariableName))
+                    {
+                        int varIndex = _compiler.GetLocalIndex(selectCase.VariableName);
+                        Emit(OpCode.StoreLocal, varIndex);
+                    }
+                    else
+                    {
+                        int varIndex = _compiler.DeclareLocalVariable(selectCase.VariableName);
+                        Emit(OpCode.StoreLocal, varIndex);
+                    }
+                }
+
+                // 执行 case 块
+                selectCase.BlockStatement.Accept(this);
+
+                // 跳转到循环结束
+                int jumpToEndIndex = GetCurrentPosition();
+                Emit(OpCode.Jump, -1);
+                if (loopEnd == -1)
+                {
+                    loopEnd = jumpToEndIndex;
+                }
+
+                // 修补跳过此 case 的跳转
+                PatchJump(skipCaseIndex, GetCurrentPosition());
+            }
+            else
+            {
+                // 发送 case: 尝试非阻塞发送
+                // 栈布局: channelId, value, timeoutMs -> bool
+
+                // 加载 channelId
+                selectCase.ChannelExpression.Accept(this);
+
+                // 加载要发送的值
+                selectCase.SendValueExpression!.Accept(this);
+
+                // 加载超时时间 0（非阻塞）
+                Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0));
+
+                // 调用 ChannelTrySend
+                Emit(OpCode.ChannelTrySend);
+
+                // 如果返回 false，跳过此 case
+                int skipCaseIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                // 返回 true: 执行 case 块
+                selectCase.BlockStatement.Accept(this);
+
+                // 跳转到循环结束
+                int jumpToEndIndex = GetCurrentPosition();
+                Emit(OpCode.Jump, -1);
+                if (loopEnd == -1)
+                {
+                    loopEnd = jumpToEndIndex;
+                }
+
+                // 修补跳过此 case 的跳转
+                PatchJump(skipCaseIndex, GetCurrentPosition());
+            }
+        }
+
+        // 所有 case 都未就绪
+        if (node.DefaultCase != null)
+        {
+            // 有 default 分支：执行 default 并退出
+            node.DefaultCase.Accept(this);
+
+            // 跳转到循环结束
+            int jumpToEndIndex = GetCurrentPosition();
+            Emit(OpCode.Jump, -1);
+            if (loopEnd == -1)
+            {
+                loopEnd = jumpToEndIndex;
+            }
+        }
+        else
+        {
+            // 无 default 分支：休眠 1ms 后继续轮询
+            // Thread.Sleep(1)
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(1));
+
+            // 调用原生函数 Sleep
+            int sleepFuncIndex = _compiler.ConstantPool.AddConstant("Sleep");
+            Emit(OpCode.CallNative, new object[] { 1, sleepFuncIndex });
+
+            // 继续循环
+            Emit(OpCode.Jump, loopStart);
+        }
+
+        // 修补所有跳转到循环结束的指令
+        int actualLoopEnd = GetCurrentPosition();
+        if (loopEnd != -1)
+        {
+            // 遍历所有指令，修补跳转到 loopEnd 的指令
+            for (int i = loopStart; i < actualLoopEnd; i++)
+            {
+                var instruction = _instructions[i];
+                if (instruction.OpCode == OpCode.Jump && instruction.Operand is int target && target == -1)
+                {
+                    PatchJump(i, actualLoopEnd);
+                }
+            }
+        }
 
         return null;
     }

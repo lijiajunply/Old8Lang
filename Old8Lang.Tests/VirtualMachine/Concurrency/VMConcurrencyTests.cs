@@ -185,4 +185,123 @@ public class VMConcurrencyTests
     }
 
     #endregion
+
+    #region Select Tests
+
+    [Fact]
+    public void SelectSend_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            ch <- ChannelCreate()
+
+            select {
+                case ch <- 100 -> {
+                    PrintLine(""Sent 100 to channel"")
+                }
+                default -> {
+                    PrintLine(""Send failed"")
+                }
+            }
+
+            ChannelClose(ch)
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("Sent 100 to channel", output);
+    }
+
+    [Fact]
+    public void SelectReceive_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            ch <- ChannelCreate()
+            ChannelSend(ch, 42)
+
+            select {
+                case val from ch -> {
+                    PrintLine(""Received: "" + val.ToStr())
+                }
+                default -> {
+                    PrintLine(""Receive failed"")
+                }
+            }
+
+            ChannelClose(ch)
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("Received: 42", output);
+    }
+
+    [Fact]
+    public void SelectWithDefault_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            ch <- ChannelCreate()
+
+            // 尝试从空通道接收，应该执行 default
+            select {
+                case val from ch -> {
+                    PrintLine(""Received: "" + val.ToStr())
+                }
+                default -> {
+                    PrintLine(""Channel is empty"")
+                }
+            }
+
+            ChannelClose(ch)
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("Channel is empty", output);
+    }
+
+    [Fact]
+    public void SelectMultipleCases_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            ch1 <- ChannelCreate()
+            ch2 <- ChannelCreate()
+
+            // 向 ch1 发送数据
+            ChannelSend(ch1, 111)
+
+            // select 应该从 ch1 接收
+            select {
+                case val from ch1 -> {
+                    PrintLine(""From ch1: "" + val.ToStr())
+                }
+                case val from ch2 -> {
+                    PrintLine(""From ch2: "" + val.ToStr())
+                }
+                default -> {
+                    PrintLine(""No channel ready"")
+                }
+            }
+
+            ChannelClose(ch1)
+            ChannelClose(ch2)
+        ";
+
+        // Act
+        var output = ExecuteVMCode(code);
+
+        // Assert
+        Assert.Equal("From ch1: 111", output);
+    }
+
+    #endregion
 }

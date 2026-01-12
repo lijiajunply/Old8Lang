@@ -212,6 +212,12 @@ public enum OpCode : byte
     /// <summary>释放信号量 (操作数: semaphoreId)</summary>
     SemaphoreRelease = 0x8A,
 
+    /// <summary>尝试非阻塞发送到通道 (操作数: timeoutMs, value, channelId) 返回bool</summary>
+    ChannelTrySend = 0x8B,
+
+    /// <summary>尝试非阻塞接收通道 (操作数: timeoutMs, channelId) 返回ChannelReceiveResult</summary>
+    ChannelTryReceive = 0x8C,
+
     // ===== 异步支持 (0xA0-0xAF) =====
     /// <summary>等待异步操作</summary>
     Await = 0xA0,

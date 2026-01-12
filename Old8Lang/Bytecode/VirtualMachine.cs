@@ -935,6 +935,27 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.ChannelTrySend:
+            {
+                // 栈顶: timeoutMs, value, channelId
+                var timeoutMs = Convert.ToInt32(_stack.Pop());
+                var value = _stack.Pop();
+                var channelId = Convert.ToInt32(_stack.Pop());
+                var success = Concurrency.ResourceManager.TrySendChannel(channelId, value, timeoutMs);
+                _stack.Push(success);
+            }
+                break;
+
+            case OpCode.ChannelTryReceive:
+            {
+                // 栈顶: timeoutMs, channelId
+                var timeoutMs = Convert.ToInt32(_stack.Pop());
+                var channelId = Convert.ToInt32(_stack.Pop());
+                var result = Concurrency.ResourceManager.TryReceiveChannel(channelId, timeoutMs);
+                _stack.Push(result);
+            }
+                break;
+
             case OpCode.SemaphoreCreate:
             {
                 // 栈顶: maxCount, initialCount
