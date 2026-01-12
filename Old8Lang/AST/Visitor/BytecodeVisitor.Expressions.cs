@@ -55,15 +55,9 @@ public partial class BytecodeVisitor
                 int argCount = instance.Ids.Count + 1; // +1 因为对象本身是第一个参数
 
                 // 检查是否是原生函数（如ToStr）
-                if (_compiler.IsNativeFunction(methodName))
-                {
-                    Emit(OpCode.CallNative, new object[] { argCount, methodName });
-                }
-                else
-                {
-                    // 用户定义的方法
-                    Emit(OpCode.Call, new object[] { argCount, methodName });
-                }
+                // 用户定义的方法
+                Emit(_compiler.IsNativeFunction(methodName) ? OpCode.CallNative : OpCode.Call,
+                    new object[] { argCount, methodName });
             }
             else if (node.Right is LangId memberId)
             {
@@ -166,14 +160,8 @@ public partial class BytecodeVisitor
         }
 
         // 检查是否是原生函数
-        if (_compiler.IsNativeFunction(funcName))
-        {
-            Emit(OpCode.CallNative, new object[] { node.Arguments.Count, funcName });
-        }
-        else
-        {
-            Emit(OpCode.Call, new object[] { node.Arguments.Count, funcName });
-        }
+        Emit(_compiler.IsNativeFunction(funcName) ? OpCode.CallNative : OpCode.Call,
+            new object[] { node.Arguments.Count, funcName });
 
         return null;
     }
