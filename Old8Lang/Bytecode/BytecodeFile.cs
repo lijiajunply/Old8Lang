@@ -21,6 +21,12 @@ public class BytecodeFile
     /// <summary>函数列表</summary>
     public List<FunctionMetadata> Functions { get; set; } = [];
 
+    /// <summary>类列表</summary>
+    public List<ClassMetadata> Classes { get; set; } = [];
+
+    /// <summary>调试信息（可选）</summary>
+    public DebugInfo? DebugInfo { get; set; }
+
     /// <summary>入口点函数索引</summary>
     public int EntryPointIndex { get; set; } = -1;
 
@@ -74,8 +80,19 @@ public class BytecodeFile
         foreach (var function in Functions)
             function.WriteTo(writer);
 
+        // 类列表
+        writer.Write(Classes.Count);
+        foreach (var classMetadata in Classes)
+            classMetadata.WriteTo(writer);
+
         // 入口点
         writer.Write(EntryPointIndex);
+
+        // 调试信息（可选）
+        bool hasDebugInfo = DebugInfo != null;
+        writer.Write(hasDebugInfo);
+        if (hasDebugInfo)
+            DebugInfo!.WriteTo(writer);
     }
 
     /// <summary>
@@ -112,8 +129,18 @@ public class BytecodeFile
         for (int i = 0; i < funcCount; i++)
             bytecodeFile.Functions.Add(FunctionMetadata.ReadFrom(reader));
 
+        // 类列表
+        int classCount = reader.ReadInt32();
+        for (int i = 0; i < classCount; i++)
+            bytecodeFile.Classes.Add(ClassMetadata.ReadFrom(reader));
+
         // 入口点
         bytecodeFile.EntryPointIndex = reader.ReadInt32();
+
+        // 调试信息（可选）
+        bool hasDebugInfo = reader.ReadBoolean();
+        if (hasDebugInfo)
+            bytecodeFile.DebugInfo = DebugInfo.ReadFrom(reader);
 
         return bytecodeFile;
     }
@@ -139,7 +166,17 @@ public class BytecodeFile
 
     public override string ToString()
     {
-        return
-            $"BytecodeFile[{Functions.Count} functions, {ConstantPool.Count} constants, {GlobalVariables.Count} globals]";
+        var parts = new List<string>
+        {
+            $"{Functions.Count} functions",
+            $"{Classes.Count} classes",
+            $"{ConstantPool.Count} constants",
+            $"{GlobalVariables.Count} globals"
+        };
+
+        if (DebugInfo != null)
+            parts.Add("with debug info");
+
+        return $"BytecodeFile[{string.Join(", ", parts)}]";
     }
 }
