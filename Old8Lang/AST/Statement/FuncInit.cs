@@ -157,6 +157,29 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 创建方法的 IL 发射器
         var methodIl = dynamicMethod.GetILGenerator();
 
+        // 【修复递归调用】在编译函数体之前，先将函数注册到 DelegateVar
+        // 这样递归调用时就能找到自己的方法引用
+        var delegateKey = methodName;
+        if (FuncLangValue.Ids is not null)
+        {
+            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+            delegateKey = $"{methodName}${paramTypeNames}";
+        }
+
+        // 先注册到 local.DelegateVar（外部作用域）
+        local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+
+        // 同时注册到 funcLocal.DelegateVar（函数内部作用域），支持递归调用
+        funcLocal.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+
+        // 对于泛型函数，也需要注册基础版本
+        if (FuncLangValue.IsGeneric)
+        {
+            local.DelegateVar.TryAdd(methodName, dynamicMethod);
+            funcLocal.DelegateVar.TryAdd(methodName, dynamicMethod);
+            local.GenericFunctions[methodName] = FuncLangValue;
+        }
+
         // 清空funcLocal，重新添加参数（这次使用真正的LocalBuilder）
         funcLocal.LocalVar.Clear();
 
@@ -247,30 +270,8 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
         methodIl.Emit(OpCodes.Ret);
 
-        // 将方法添加到本地变量管理器
-        // 对于用户定义的函数，我们需要保留原始方法名以便调用
-        // 对于重载函数，使用函数名+参数类型组合作为键，支持更准确的函数重载
-        var delegateKey = methodName;
-        if (FuncLangValue.Ids is not null)
-        {
-            // 使用函数名+参数类型作为键，支持更准确的函数重载
-            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
-            delegateKey = $"{methodName}${paramTypeNames}";
-        }
-        
-        // 对于泛型函数，需要额外注册基础版本（不带类型签名）
-        if (FuncLangValue.IsGeneric)
-        {
-            // 注册泛型函数的基础版本
-            local.DelegateVar.TryAdd(methodName, dynamicMethod);
-            
-            // 存储泛型函数定义，用于后续特化
-            local.GenericFunctions[methodName] = FuncLangValue;
-        }
-        
-        local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
-
-        // 同时存储函数的参数列表信息，用于支持默认参数
+        // 注意：函数已经在编译函数体之前注册到 DelegateVar（第160-181行）
+        // 这里只需要存储函数的参数列表信息，用于支持默认参数
         if (FuncLangValue.Ids is not null)
         {
             local.FuncParameters.TryAdd(delegateKey, FuncLangValue.Ids);
