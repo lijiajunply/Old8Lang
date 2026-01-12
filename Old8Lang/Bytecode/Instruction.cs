@@ -69,9 +69,37 @@ public class Instruction(OpCode opCode, object? operand = null)
             writer.Write((byte)5);
             writer.Write(boolValue);
         }
+        else if (Operand is object[] arrayValue)
+        {
+            // 支持数组类型的操作数
+            writer.Write((byte)6);
+            writer.Write(arrayValue.Length);
+            foreach (var item in arrayValue)
+            {
+                // 递归序列化数组元素
+                if (item == null)
+                {
+                    writer.Write((byte)0);
+                }
+                else if (item is int intItem)
+                {
+                    writer.Write((byte)1);
+                    writer.Write(intItem);
+                }
+                else if (item is string stringItem)
+                {
+                    writer.Write((byte)4);
+                    writer.Write(stringItem);
+                }
+                else
+                {
+                    throw new NotSupportedException($"不支持的数组元素类型: {item.GetType()}");
+                }
+            }
+        }
         else
         {
-            throw new NotSupportedException($"不支持的操作数类型: {Operand.GetType()}");
+            throw new NotSupportedException($"不支持的操作数类型: {Operand.GetType()}, OpCode: {OpCode}");
         }
     }
 
@@ -91,10 +119,34 @@ public class Instruction(OpCode opCode, object? operand = null)
             3 => reader.ReadDouble(),
             4 => reader.ReadString(),
             5 => reader.ReadBoolean(),
+            6 => ReadArray(reader),
             _ => throw new InvalidOperationException($"未知的操作数类型: {operandType}")
         };
 
         return new Instruction(opCode, operand);
+    }
+
+    /// <summary>
+    /// 读取数组操作数
+    /// </summary>
+    private static object[] ReadArray(BinaryReader reader)
+    {
+        var length = reader.ReadInt32();
+        var array = new object[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            var elementType = reader.ReadByte();
+            array[i] = elementType switch
+            {
+                0 => null!,
+                1 => reader.ReadInt32(),
+                4 => reader.ReadString(),
+                _ => throw new InvalidOperationException($"未知的数组元素类型: {elementType}")
+            };
+        }
+
+        return array;
     }
 
     public override string ToString()
