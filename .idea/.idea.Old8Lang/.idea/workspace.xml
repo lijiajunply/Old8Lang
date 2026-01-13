@@ -23,7 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestFiles/test_extern_compiler_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqAdvancedTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqBasicTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Linq.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -568,7 +575,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="1537000" />
+      <workItem from="1768331954396" duration="2233000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -913,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="648" />
+    <option name="localTasksCounter" value="649" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

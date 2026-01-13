@@ -617,8 +617,96 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitLinqExpression(LinqExpression node)
     {
-        // LINQ 表达式在字节码模式下暂不支持
-        // TODO: 实现 LINQ 的字节码生成
+        // LINQ 查询表达式的字节码生成策略:
+        // 1. 获取数据源并转换为迭代器
+        // 2. 遍历数据源,对每个元素应用查询子句
+        // 3. 收集结果到列表中
+        // 4. 返回结果列表
+
+        // 步骤1: 计算数据源表达式
+        node.FromClause.DataSource.Accept(this);
+
+        // 获取迭代器
+        Emit(OpCode.GetIterator);
+        int iteratorLocal = _compiler.AllocateLocal();
+        Emit(OpCode.StoreLocal, iteratorLocal);
+
+        // 创建结果列表
+        Emit(OpCode.NewList, 0);
+        int resultListLocal = _compiler.AllocateLocal();
+        Emit(OpCode.StoreLocal, resultListLocal);
+
+        // 为范围变量分配局部变量槽
+        int rangeVarLocal = _compiler.AllocateLocal(node.FromClause.RangeVariable);
+
+        // 为 let 变量分配局部变量槽
+        var letVariables = new Dictionary<string, int>();
+        foreach (var clause in node.BodyClauses)
+        {
+            if (clause is LetClause letClause)
+            {
+                int letVarLocal = _compiler.AllocateLocal(letClause.Variable);
+                letVariables[letClause.Variable] = letVarLocal;
+            }
+        }
+
+        // 步骤2: 遍历数据源
+        int loopStartPos = GetCurrentPosition();
+
+        // 检查迭代器是否有下一个元素
+        Emit(OpCode.LoadLocal, iteratorLocal);
+        Emit(OpCode.IteratorMoveNext);
+
+        // 如果没有下一个元素,跳出循环
+        int loopEndJump = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1); // 占位,稍后修补
+
+        // 获取当前元素
+        Emit(OpCode.LoadLocal, iteratorLocal);
+        Emit(OpCode.IteratorCurrent);
+
+        // 将当前元素存储到范围变量
+        Emit(OpCode.StoreLocal, rangeVarLocal);
+
+        // 步骤3: 处理查询体子句 (where, let)
+        var skipElementJumps = new List<int>();
+        ProcessLinqBodyClauses(node.BodyClauses, letVariables, skipElementJumps);
+
+        // 步骤4: 执行终止子句 (select)
+        ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+
+        // 跳回循环开始
+        int continueJump = GetCurrentPosition();
+        Emit(OpCode.Jump, loopStartPos);
+
+        // 修补所有跳过元素的跳转 (where 条件不满足时跳到这里)
+        foreach (var jumpIndex in skipElementJumps)
+        {
+            PatchJump(jumpIndex, continueJump);
+        }
+
+        // 修补循环结束跳转
+        PatchJump(loopEndJump, GetCurrentPosition());
+
+        // 步骤5: 处理 OrderBy (如果有)
+        var orderByClause = node.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
+        if (orderByClause != null)
+        {
+            ProcessLinqOrderBy(orderByClause, resultListLocal);
+        }
+
+        // 步骤6: 加载结果列表到栈
+        Emit(OpCode.LoadLocal, resultListLocal);
+
+        // 释放局部变量
+        _compiler.FreeLocal(iteratorLocal);
+        _compiler.FreeLocal(resultListLocal);
+        _compiler.FreeLocal(rangeVarLocal);
+        foreach (var letVar in letVariables.Values)
+        {
+            _compiler.FreeLocal(letVar);
+        }
+
         return null;
     }
 }

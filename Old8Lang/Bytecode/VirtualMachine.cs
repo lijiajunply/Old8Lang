@@ -60,7 +60,7 @@ public class VirtualMachine
     /// </summary>
     public object? GetGlobalVariable(string name)
     {
-        return _globals.TryGetValue(name, out var value) ? value : null;
+        return _globals.GetValueOrDefault(name);
     }
 
     /// <summary>
@@ -691,7 +691,8 @@ public class VirtualMachine
                     }
 
                     // 首先检查是否是 extern 函数（从全局变量中查找）
-                    if (_globals.TryGetValue(funcName, out var externFuncObj) && externFuncObj is ExternFunctionWrapper externFunc)
+                    if (_globals.TryGetValue(funcName, out var externFuncObj) &&
+                        externFuncObj is ExternFunctionWrapper externFunc)
                     {
                         // 调用 extern 函数
                         var result = externFunc.Invoke(args);

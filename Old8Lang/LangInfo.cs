@@ -14,7 +14,7 @@ public class LangInfo
     /// <summary>
     /// 获取或设置语言版本
     /// </summary>
-    public string Var { get; set; } = "";
+    public string Var { get; set; } = "1.0.0 rc6";
 }
 
 /// <summary>

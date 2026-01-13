@@ -127,20 +127,6 @@ public static class Apis
     #endregion
 
     /// <summary>
-    /// 修改语言基本信息并保存到配置文件
-    /// </summary>
-    /// <param name="import">导入路径</param>
-    /// <param name="ver">语言版本</param>
-    /// <returns>更新后的语言信息对象</returns>
-    public static LangInfo ChangeBasicInfo(string import, string ver)
-    {
-        var langInfo = new LangInfo { ImportPath = import, Var = ver };
-        var jsonString = JsonSerializer.Serialize(langInfo);
-        File.WriteAllText(JsonPath, jsonString);
-        return langInfo;
-    }
-
-    /// <summary>
     /// 读取语言配置信息
     /// </summary>
     /// <returns>语言信息对象</returns>
@@ -156,60 +142,7 @@ public static class Apis
     /// </remarks>
     public static LangInfo ReadJson()
     {
-        LangInfo langInfo;
-
-        // 直接测试Old8Lang目录下的LangInfo.json文件
-        var directJsonPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8Lang", "LangInfo.json");
-        if (File.Exists(directJsonPath))
-        {
-            var jsonString = File.ReadAllText(directJsonPath, Encoding.UTF8);
-            langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
-        }
-        else if (File.Exists(JsonPath))
-        {
-            var jsonString = File.ReadAllText(JsonPath, Encoding.UTF8);
-            langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
-        }
-        else
-        {
-            // 如果文件不存在，创建一个空的 LangInfo 对象
-            // 不再自动填充默认库，因为标准库现在由 StandardLibraryRegistry 管理
-            langInfo = new LangInfo { Var = "1.0.0" };
-        }
-
-        // 不再自动添加默认库信息，标准库由 StandardLibraryRegistry 管理
-        // 保留空的 LibInfos 用于用户自定义库（向后兼容）
-
-        if (Directory.Exists(langInfo.ImportPath)) return langInfo;
-        var s = Path.GetDirectoryName(CodePath);
-#if RELEASE
-        s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-#endif
-
-        // 尝试使用绝对路径
-        var absoluteImportPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib");
-        langInfo.ImportPath = Directory.Exists(absoluteImportPath)
-            ? absoluteImportPath
-            : Path.Combine(s ?? "", "Old8LangLib", "OldLib");
-
-        return langInfo;
-    }
-
-    /// <summary>
-    /// 安装导入的模块
-    /// </summary>
-    /// <param name="context">安装上下文信息</param>
-    /// <returns>安装是否成功，当前版本始终返回 false</returns>
-    /// <remarks>
-    /// 此方法目前未实现完整功能，仅返回 false
-    /// </remarks>
-    public static bool ImportInstall(string context)
-    {
-        if (string.IsNullOrEmpty(context)) return false;
-        // 此方法功能尚未实现
-        // var _ = new HttpClient();
-
-        return false;
+        return new LangInfo();
     }
 
     /// <summary>
@@ -230,28 +163,6 @@ public static class Apis
 #else
             // 返回程序运行时目录或其他合理默认路径
             return AppContext.BaseDirectory;
-#endif
-        }
-    }
-
-    /// <summary>
-    /// 获取语言配置文件的路径
-    /// </summary>
-    /// <returns>配置文件的完整路径</returns>
-    private static string JsonPath
-    {
-        get
-        {
-#if DEBUG
-            var filename = Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
-            if (filename.StartsWith("Users/") || filename.StartsWith("Volumes/"))
-            {
-                filename = "/" + filename;
-            }
-
-            return filename;
-#else
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
 #endif
         }
     }
