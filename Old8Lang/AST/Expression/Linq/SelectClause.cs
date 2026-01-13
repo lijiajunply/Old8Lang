@@ -16,6 +16,7 @@ public class SelectClause(LangExpression projection, SourcePosition position = d
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // SelectClause 是 LINQ 查询的内部组成部分，不应该被独立访问
+        throw new InvalidOperationException("SelectClause 不应该被独立访问，应该通过 LinqExpression 处理");
     }
 }

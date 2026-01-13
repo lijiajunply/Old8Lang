@@ -32,6 +32,7 @@ public class QueryContinuation(
 
     public TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // QueryContinuation 是 LINQ 查询的内部组成部分，不应该被独立访问
+        throw new InvalidOperationException("QueryContinuation 不应该被独立访问，应该通过 LinqExpression 处理");
     }
 }

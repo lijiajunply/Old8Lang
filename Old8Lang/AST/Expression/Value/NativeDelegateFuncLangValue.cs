@@ -95,6 +95,8 @@ public class NativeDelegateFuncLangValue(
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException("NativeDelegateFuncLangValue 不支持 Visitor 模式访问");
+        // NativeDelegateFuncLangValue 是包装原生 .NET 委托的特殊类型
+        // 它不是标准的 AST 节点，不应该通过 Visitor 模式访问
+        throw new InvalidOperationException("NativeDelegateFuncLangValue 是原生委托包装类，不支持 Visitor 模式访问");
     }
 }

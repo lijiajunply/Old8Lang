@@ -24,6 +24,7 @@ public class GroupByClause(
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // GroupByClause 是 LINQ 查询的内部组成部分，不应该被独立访问
+        throw new InvalidOperationException("GroupByClause 不应该被独立访问，应该通过 LinqExpression 处理");
     }
 }

@@ -30,6 +30,8 @@ public class FromClause(
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // FromClause 是 LINQ 查询的内部组成部分，不应该被独立访问
+        // 它应该通过 LinqExpression 来处理
+        throw new InvalidOperationException("FromClause 不应该被独立访问，应该通过 LinqExpression 处理");
     }
 }

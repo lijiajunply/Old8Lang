@@ -16,21 +16,6 @@ public partial class TypeInferenceVisitor
 {
     // ===== Expression 节点实现 =====
 
-    public Type? VisitExternStatement(ExternStatement node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Type? VisitFileHeaderDirective(FileHeaderDirective node)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Type? VisitUsingStatement(UsingStatement node)
-    {
-        throw new NotImplementedException();
-    }
-
     public Type? VisitAsyncStreamExpression(AsyncStreamExpression node)
     {
         return node.OutputType(local);

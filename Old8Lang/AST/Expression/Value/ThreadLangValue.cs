@@ -685,8 +685,8 @@ public partial class ThreadLangValue : LangValueType
                     // 注意：这里需要重新创建线程，因为原始线程只能执行一次
                     // 实际上，我们需要重新执行原始的线程逻辑
                     // 由于ThreadLangValue没有保存原始的线程逻辑，这里需要特殊处理
-                    // 我们将使用一个新的方法来实现重试
-                    throw new NotImplementedException("Retry方法需要在FuncStatic.cs中特殊处理");
+                    // Retry 功能需要在创建线程时保存原始逻辑才能实现
+                    throw new NotSupportedException("线程 Retry 方法暂不支持，因为线程只能执行一次。建议在 FuncStatic.cs 中实现重试逻辑");
                 }
                 catch (Exception ex)
                 {

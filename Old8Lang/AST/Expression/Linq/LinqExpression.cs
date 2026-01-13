@@ -44,7 +44,9 @@ public partial class LinqExpression(
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException("LINQ 查询表达式的 LoadIlValue 方法尚未实现");
+        // LINQ 查询表达式在编译器模式下暂不支持
+        // 只支持解释器模式执行
+        throw new NotSupportedException("LINQ 查询表达式在编译器模式下暂不支持，请使用解释器模式");
     }
 
     public override Type? OutputType(LocalManager local)

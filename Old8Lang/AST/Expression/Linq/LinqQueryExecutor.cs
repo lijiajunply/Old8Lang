@@ -662,7 +662,9 @@ public class LinqQueryExecutor(VariateManager manager)
     /// </summary>
     private IEnumerable ExecuteJoin(JoinClause joinClause, IEnumerable source, string rangeVariable)
     {
-        throw new NotImplementedException("join 子句暂未实现");
+        // join 子句的实现较为复杂，涉及到两个数据源的关联
+        // 暂时不支持，未来版本会添加支持
+        throw new NotSupportedException("LINQ join 子句暂未实现，将在未来版本中添加支持");
     }
 
     /// <summary>

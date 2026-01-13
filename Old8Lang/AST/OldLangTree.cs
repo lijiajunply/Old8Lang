@@ -24,6 +24,7 @@ public class MockLangTree : IOldLangTree
 
     public TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException("MockLangTree 不支持 Accept 方法");
+        // MockLangTree 是用于测试的模拟类，不应该被实际访问
+        throw new InvalidOperationException("MockLangTree 是测试用的模拟类，不支持 Visitor 模式访问");
     }
 }

@@ -16,7 +16,8 @@ public class OrderByClause(List<OrderingItem> orderings, SourcePosition position
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // OrderByClause 是 LINQ 查询的内部组成部分，不应该被独立访问
+        throw new InvalidOperationException("OrderByClause 不应该被独立访问，应该通过 LinqExpression 处理");
     }
 }
 

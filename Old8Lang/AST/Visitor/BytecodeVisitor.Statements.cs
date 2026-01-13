@@ -93,7 +93,9 @@ public partial class BytecodeVisitor
                 }
                 else
                 {
-                    throw new NotImplementedException($"不支持的成员访问右侧类型: {operation.Right?.GetType().Name}");
+                    // 字节码模式目前只支持简单的成员访问（obj.field）
+                    // 不支持复杂的成员访问表达式（如 obj.method().field）
+                    throw new NotSupportedException($"字节码模式下不支持的成员访问右侧类型: {operation.Right?.GetType().Name}，只支持简单标识符");
                 }
 
                 // 检查是否是 super.field <- value
@@ -129,8 +131,11 @@ public partial class BytecodeVisitor
             }
             else if (leftExpr != null)
             {
-                // 其他类型的左侧表达式
-                throw new NotImplementedException($"不支持的赋值左侧表达式类型: {leftExpr.GetType().Name}");
+                // 字节码模式目前只支持以下赋值类型：
+                // 1. 简单变量赋值 (x <- value)
+                // 2. 索引赋值 (arr[i] <- value)
+                // 3. 成员访问赋值 (obj.field <- value)
+                throw new NotSupportedException($"字节码模式下不支持的赋值左侧表达式类型: {leftExpr.GetType().Name}");
             }
         }
 
