@@ -64,9 +64,9 @@ public partial class BytecodeVisitor
                 }
                 else
                 {
-                    // 检查是否是原生函数（如ToStr）
-                    Emit(_compiler.IsNativeFunction(methodName) ? OpCode.CallNative : OpCode.Call,
-                        new object[] { argCount, methodName });
+                    // object.method(args) - 调用对象方法
+                    // 使用 CallMethod 指令，它会在对象的类中查找方法
+                    Emit(OpCode.CallMethod, new object[] { argCount, methodName });
                 }
             }
             else if (node.Right is LangId memberId)

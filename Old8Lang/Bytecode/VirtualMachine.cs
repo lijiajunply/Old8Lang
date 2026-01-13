@@ -1392,8 +1392,20 @@ public class VirtualMachine
                     throw new Exception($"无法访问 null 对象的字段 {fieldName}");
                 }
 
-                // 如果是字典对象（我们创建的类实例）
-                if (obj is Dictionary<string, object?> dictObj)
+                // 如果是 BytecodeObjectInstance（Old8Lang 对象）
+                if (obj is BytecodeObjectInstance bytecodeObj)
+                {
+                    if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
+                    {
+                        _stack.Push(value);
+                    }
+                    else
+                    {
+                        throw new Exception($"对象没有字段 {fieldName}");
+                    }
+                }
+                // 如果是字典对象（兼容旧代码）
+                else if (obj is Dictionary<string, object?> dictObj)
                 {
                     if (dictObj.TryGetValue(fieldName, out var value))
                     {
@@ -1445,8 +1457,13 @@ public class VirtualMachine
                     throw new Exception($"无法设置 null 对象的字段 {fieldName}");
                 }
 
-                // 如果是字典对象（我们创建的类实例）
-                if (obj is Dictionary<string, object?> dictObj)
+                // 如果是 BytecodeObjectInstance（Old8Lang 对象）
+                if (obj is BytecodeObjectInstance bytecodeObj)
+                {
+                    bytecodeObj.Fields[fieldName] = value;
+                }
+                // 如果是字典对象（兼容旧代码）
+                else if (obj is Dictionary<string, object?> dictObj)
                 {
                     dictObj[fieldName] = value;
                 }
@@ -1490,21 +1507,26 @@ public class VirtualMachine
                     throw new Exception($"无法访问 null 对象的父类字段 {fieldName}");
                 }
 
-                // 如果是字典对象（我们创建的类实例）
-                if (thisInstance is Dictionary<string, object?> dictObj)
+                // 检查是否是 BytecodeObjectInstance
+                if (thisInstance is BytecodeObjectInstance bytecodeObj)
                 {
-                    if (dictObj.TryGetValue(fieldName, out var value))
+                    // 注意: 在 Old8Lang 中,所有字段(包括父类字段)都存储在对象实例的 Fields 字典中
+                    // super.field 访问的是继承自父类的字段,但实际存储位置在对象本身
+                    // 因此我们直接从对象的 Fields 字典中获取字段值即可
+
+                    if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
                     {
                         _stack.Push(value);
                     }
                     else
                     {
-                        throw new Exception($"对象的父类没有字段 {fieldName}");
+                        // 字段不存在,返回 null
+                        _stack.Push(null);
                     }
                 }
                 else
                 {
-                    // 使用反射获取父类字段或属性
+                    // 使用反射获取父类字段或属性（用于 C# 对象）
                     var objType = thisInstance.GetType();
                     var baseType = objType.BaseType;
 
@@ -1549,14 +1571,17 @@ public class VirtualMachine
                     throw new Exception($"无法设置 null 对象的父类字段 {fieldName}");
                 }
 
-                // 如果是字典对象（我们创建的类实例）
-                if (thisInstance is Dictionary<string, object?> dictObj)
+                // 检查是否是 BytecodeObjectInstance
+                if (thisInstance is BytecodeObjectInstance bytecodeObj)
                 {
-                    dictObj[fieldName] = value;
+                    // 注意: 在 Old8Lang 中,所有字段(包括父类字段)都存储在对象实例的 Fields 字典中
+                    // super.field <- value 设置的是继承自父类的字段,但实际存储位置在对象本身
+                    // 因此我们直接设置对象的 Fields 字典中的字段值即可
+                    bytecodeObj.Fields[fieldName] = value;
                 }
                 else
                 {
-                    // 使用反射设置父类字段或属性
+                    // 使用反射设置父类字段或属性（用于 C# 对象）
                     var objType = thisInstance.GetType();
                     var baseType = objType.BaseType;
 
@@ -1600,13 +1625,13 @@ public class VirtualMachine
                     throw new Exception($"未找到类定义: {className}");
                 }
 
-                // 创建对象实例（使用动态类型）
-                var obj = new Dictionary<string, object?>();
+                // 创建对象实例
+                var obj = new BytecodeObjectInstance(className);
 
                 // 初始化字段为默认值
                 foreach (var field in classMetadata.Fields)
                 {
-                    obj[field.Name] = null;
+                    obj.Fields[field.Name] = null;
                 }
 
                 // 将对象压入栈
@@ -1622,8 +1647,8 @@ public class VirtualMachine
                 string methodName = (string)operands[1];
 
                 // 从栈中弹出参数（逆序）
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
+                var args = new object?[argCount - 1]; // -1 因为第一个参数是对象本身
+                for (int i = args.Length - 1; i >= 0; i--)
                 {
                     args[i] = _stack.Pop();
                 }
@@ -1635,21 +1660,49 @@ public class VirtualMachine
                     throw new Exception($"无法在 null 对象上调用方法 {methodName}");
                 }
 
-                // 使用反射调用方法
-                var objType = obj.GetType();
-                var method = objType.GetMethod(methodName);
-
-                if (method == null)
+                // 检查是否是 BytecodeObjectInstance
+                if (obj is BytecodeObjectInstance bytecodeObj)
                 {
-                    throw new Exception($"类型 {objType.Name} 没有方法 {methodName}");
+                    // Old8Lang 对象，查找类方法
+                    var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
+                    if (classMetadata == null)
+                    {
+                        throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
+                    }
+
+                    // 在类的方法列表中查找方法
+                    var methodMetadata = classMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
+                    if (methodMetadata == null)
+                    {
+                        throw new Exception($"类 {bytecodeObj.ClassName} 没有方法 {methodName}");
+                    }
+
+                    // 准备方法调用参数：第一个参数是 this（对象本身）
+                    var methodArgs = new object?[args.Length + 1];
+                    methodArgs[0] = bytecodeObj;
+                    Array.Copy(args, 0, methodArgs, 1, args.Length);
+
+                    // 调用方法（返回值会自动压入栈）
+                    CallFunction(methodMetadata.Function, methodArgs);
                 }
-
-                var result = method.Invoke(obj, args);
-
-                // 如果方法有返回值，压入栈
-                if (method.ReturnType != typeof(void))
+                else
                 {
-                    _stack.Push(result);
+                    // 原生 C# 对象，使用反射调用方法
+                    var objType = obj.GetType();
+                    var method = objType.GetMethod(methodName);
+
+                    if (method == null)
+                    {
+                        throw new Exception($"类型 {objType.Name} 没有方法 {methodName}");
+                    }
+
+                    var result = method.Invoke(obj, args);
+
+                    // 如果方法有返回值，压入栈
+                    if (method.ReturnType != typeof(void))
+                    {
+                        _stack.Push(result);
+                    }
                 }
             }
                 break;
@@ -1657,16 +1710,33 @@ public class VirtualMachine
             case OpCode.LoadSuper:
             {
                 // 加载当前实例（this）作为 super 上下文
-                // 在方法调用帧中查找 this 参数（通常是第一个局部变量）
+                // this 是方法的第一个参数
                 var currentFrame = _callStack.Peek();
-                var thisInstance = currentFrame.Locals[0]; // this 通常是第一个局部变量
 
-                if (thisInstance == null)
+                // 优先从 Arguments 中获取 this（第一个参数）
+                if (currentFrame.Arguments != null && currentFrame.Arguments.Length > 0)
+                {
+                    var thisInstance = currentFrame.Arguments[0];
+                    if (thisInstance == null)
+                    {
+                        throw new Exception("super 只能在实例方法中使用");
+                    }
+                    _stack.Push(thisInstance);
+                }
+                // 如果 Arguments 为空，尝试从 Locals 获取
+                else if (currentFrame.Locals.Length > 0)
+                {
+                    var thisInstance = currentFrame.Locals[0];
+                    if (thisInstance == null)
+                    {
+                        throw new Exception("super 只能在实例方法中使用");
+                    }
+                    _stack.Push(thisInstance);
+                }
+                else
                 {
                     throw new Exception("super 只能在实例方法中使用");
                 }
-
-                _stack.Push(thisInstance);
             }
                 break;
 
@@ -1691,22 +1761,61 @@ public class VirtualMachine
                     throw new Exception($"无法在 null 对象上调用父类方法 {methodName}");
                 }
 
-                // TODO: 实现父类方法查找和调用
-                // 当前简化实现：直接在对象类型上查找方法
-                var objType = thisInstance.GetType();
-                var method = objType.GetMethod(methodName);
-
-                if (method == null)
+                // 检查是否是 BytecodeObjectInstance
+                if (thisInstance is BytecodeObjectInstance bytecodeObj)
                 {
-                    throw new Exception($"类型 {objType.Name} 的父类没有方法 {methodName}");
+                    // 查找当前类的元数据
+                    var currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
+                    if (currentClass == null)
+                    {
+                        throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
+                    }
+
+                    // 查找父类
+                    if (string.IsNullOrEmpty(currentClass.BaseClassName))
+                    {
+                        throw new Exception($"类 {bytecodeObj.ClassName} 没有父类");
+                    }
+
+                    var parentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                    if (parentClass == null)
+                    {
+                        throw new Exception($"未找到父类定义: {currentClass.BaseClassName}");
+                    }
+
+                    // 在父类中查找方法
+                    var methodMetadata = parentClass.Methods.FirstOrDefault(m => m.Name == methodName);
+                    if (methodMetadata == null)
+                    {
+                        throw new Exception($"父类 {parentClass.Name} 没有方法 {methodName}");
+                    }
+
+                    // 准备方法调用参数：第一个参数是 this
+                    var methodArgs = new object?[args.Length + 1];
+                    methodArgs[0] = bytecodeObj;
+                    Array.Copy(args, 0, methodArgs, 1, args.Length);
+
+                    // 调用父类方法
+                    CallFunction(methodMetadata.Function, methodArgs);
                 }
-
-                var result = method.Invoke(thisInstance, args);
-
-                // 如果方法有返回值，压入栈
-                if (method.ReturnType != typeof(void))
+                else
                 {
-                    _stack.Push(result);
+                    // 原生 C# 对象，使用反射调用父类方法
+                    var objType = thisInstance.GetType();
+                    var method = objType.GetMethod(methodName);
+
+                    if (method == null)
+                    {
+                        throw new Exception($"类型 {objType.Name} 的父类没有方法 {methodName}");
+                    }
+
+                    var result = method.Invoke(thisInstance, args);
+
+                    // 如果方法有返回值，压入栈
+                    if (method.ReturnType != typeof(void))
+                    {
+                        _stack.Push(result);
+                    }
                 }
             }
                 break;

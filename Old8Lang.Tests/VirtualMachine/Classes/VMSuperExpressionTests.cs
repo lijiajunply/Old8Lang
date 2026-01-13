@@ -1,5 +1,6 @@
 using Old8Lang.Bytecode;
 using Xunit;
+using VM = Old8Lang.Bytecode.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Classes;
 
@@ -10,72 +11,289 @@ namespace Old8Lang.Tests.VirtualMachine.Classes;
 public class VMSuperExpressionTests
 {
     [Fact]
-    public void SuperExpression_CallParentMethod_ReturnsParentResult()
+    public void SuperExpression_BasicInheritance_ExecutesCorrectly()
     {
         // Arrange
-        var code = """
+        var code = @"
             class Animal {
+                public name:string
+
+                func init(n:string) -> void {
+                    this.name <- n
+                }
+
                 func speak() -> string {
-                    return "Some sound"
+                    return ""Animal sound""
                 }
             }
 
             class Dog extends Animal {
                 func speak() -> string {
-                    parentSound <- super.speak()
-                    return parentSound + " - Woof!"
+                    return ""Woof""
+                }
+            }
+
+            dog <- Dog(""Buddy"")
+            result <- dog.speak()
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Woof", result);
+    }
+
+    [Fact]
+    public void SuperExpression_CallParentMethod_ReturnsParentResult()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                func speak() -> string {
+                    return ""Animal sound""
+                }
+            }
+
+            class Dog extends Animal {
+                func speak() -> string {
+                    return ""Woof""
+                }
+
+                func callParentSpeak() -> string {
+                    return super.speak()
                 }
             }
 
             dog <- Dog()
-            result <- dog.speak()
-            """;
+            result <- dog.callParentSpeak()
+        ";
 
-        // Act & Assert
-        // 注意：当前虚拟机模式的类支持可能还不完整
-        // 这个测试用于验证 Super 表达式的字节码生成
-        var exception = Record.Exception(() =>
-        {
-            var bytecodeFile = CompileHelper.CompileToBytecode(code);
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
-            vm.Execute();
-        });
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
 
-        // 如果没有抛出异常，说明字节码生成和执行成功
-        Assert.Null(exception);
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Animal sound", result);
     }
 
     [Fact]
     public void SuperExpression_AccessParentField_ReturnsFieldValue()
     {
         // Arrange
-        var code = """
+        var code = @"
             class Animal {
-                public name <- "Animal"
+                public species:string
 
-                func getName() -> string {
-                    return this.name
+                func init(s:string) -> void {
+                    this.species <- s
                 }
             }
 
             class Dog extends Animal {
-                func getParentName() -> string {
-                    return super.name
+                func getSpecies() -> string {
+                    return super.species
+                }
+            }
+
+            dog <- Dog(""Canine"")
+            result <- dog.getSpecies()
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Canine", result);
+    }
+
+    [Fact]
+    public void SuperExpression_CallParentConstructor_InitializesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                public name:string
+
+                func init(n:string) -> void {
+                    this.name <- n
+                }
+            }
+
+            class Dog extends Animal {
+                public breed:string
+
+                func init(n:string, b:string) -> void {
+                    super.init(n)
+                    this.breed <- b
+                }
+            }
+
+            dog <- Dog(""Buddy"", ""Golden Retriever"")
+            result <- dog.name
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Buddy", result);
+    }
+
+    [Fact]
+    public void SuperExpression_MultiLevelInheritance_CallsGrandparentMethod()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                func makeSound() -> string {
+                    return ""Generic sound""
+                }
+            }
+
+            class Mammal extends Animal {
+                func makeSound() -> string {
+                    return ""Mammal sound""
+                }
+            }
+
+            class Dog extends Mammal {
+                func callGrandparent() -> string {
+                    return super.makeSound()
                 }
             }
 
             dog <- Dog()
-            result <- dog.getParentName()
-            """;
+            result <- dog.callGrandparent()
+        ";
 
-        // Act & Assert
-        var exception = Record.Exception(() =>
-        {
-            var bytecodeFile = CompileHelper.CompileToBytecode(code);
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
-            vm.Execute();
-        });
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
 
-        Assert.Null(exception);
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Mammal sound", result);
+    }
+
+    [Fact]
+    public void SuperExpression_CombineParentAndChildResults_ReturnsCorrectValue()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                func speak() -> string {
+                    return ""Animal""
+                }
+            }
+
+            class Dog extends Animal {
+                func speak() -> string {
+                    parentSound <- super.speak()
+                    return parentSound + "" - Woof""
+                }
+            }
+
+            dog <- Dog()
+            result <- dog.speak()
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Animal - Woof", result);
+    }
+
+    [Fact]
+    public void SuperExpression_SetParentField_ModifiesFieldCorrectly()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                public age:int
+
+                func init() -> void {
+                    this.age <- 0
+                }
+            }
+
+            class Dog extends Animal {
+                func setAge(a:int) -> void {
+                    super.age <- a
+                }
+
+                func getAge() -> int {
+                    return this.age
+                }
+            }
+
+            dog <- Dog()
+            dog.setAge(5)
+            result <- dog.getAge()
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal(5, result);
+    }
+
+    [Fact]
+    public void SuperExpression_WithParameters_PassesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            class Animal {
+                func greet(name:string) -> string {
+                    return ""Hello, "" + name
+                }
+            }
+
+            class Dog extends Animal {
+                func greetOwner(owner:string) -> string {
+                    return super.greet(owner) + "" from Dog""
+                }
+            }
+
+            dog <- Dog()
+            result <- dog.greetOwner(""Alice"")
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.Equal("Hello, Alice from Dog", result);
     }
 }

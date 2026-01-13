@@ -463,6 +463,37 @@ public class StatementParser(
             return ParseIdentifierLeftParen();
         }
 
+        // 处理 super.field <- value 赋值语句
+        if (CurrentToken.Type == LangTokenType.Super)
+        {
+            var savedIndex = CurrentIndex;
+            try
+            {
+                // 尝试解析 super.field 表达式
+                var superExpr = primaryParser.ParsePrimary(); // 解析 super
+                if (CurrentToken.Type == LangTokenType.Dot)
+                {
+                    superExpr = expressionParser.ParseDotExpr(superExpr); // 解析 .field
+
+                    // 检查是否是赋值语句
+                    if (CurrentToken.Type == LangTokenType.Assignment)
+                    {
+                        // 这是 super.field <- value 赋值语句
+                        CurrentIndex = savedIndex;
+                        return ParseSet();
+                    }
+                }
+
+                // 不是赋值语句，回退
+                CurrentIndex = savedIndex;
+            }
+            catch
+            {
+                // 解析失败，回退
+                CurrentIndex = savedIndex;
+            }
+        }
+
         // 处理表达式语句：允许将函数运行表达式作为语句执行
         // 例如：funcCall(), (lambda)(args), t.test()
         var i = CurrentIndex;

@@ -83,15 +83,7 @@ public partial class BytecodeVisitor
             }
             else if (leftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
             {
-                // 成员访问赋值: obj.field <- value
-                // SetField期望栈布局(从栈顶到栈底): value, object
-                // 所以我们需要按相反顺序压栈: object, value
-
-                // 加载对象
-                operation.Left?.Accept(this);
-
-                // 加载值
-                node.Value.Accept(this);
+                // 成员访问赋值: obj.field <- value 或 super.field <- value
 
                 // 获取字段名
                 string fieldName;
@@ -104,8 +96,36 @@ public partial class BytecodeVisitor
                     throw new NotImplementedException($"不支持的成员访问右侧类型: {operation.Right?.GetType().Name}");
                 }
 
-                // 发出SetField指令
-                Emit(OpCode.SetField, fieldName);
+                // 检查是否是 super.field <- value
+                if (operation.Left is SuperExpression)
+                {
+                    // super.field <- value
+                    // SetSuperField期望栈布局(从栈顶到栈底): value, this
+
+                    // 加载 this (通过访问 SuperExpression,它会发出 LoadSuper 指令)
+                    operation.Left.Accept(this);
+
+                    // 加载值
+                    node.Value.Accept(this);
+
+                    // 发出SetSuperField指令
+                    Emit(OpCode.SetSuperField, fieldName);
+                }
+                else
+                {
+                    // obj.field <- value
+                    // SetField期望栈布局(从栈顶到栈底): value, object
+                    // 所以我们需要按相反顺序压栈: object, value
+
+                    // 加载对象
+                    operation.Left?.Accept(this);
+
+                    // 加载值
+                    node.Value.Accept(this);
+
+                    // 发出SetField指令
+                    Emit(OpCode.SetField, fieldName);
+                }
             }
             else if (leftExpr != null)
             {
@@ -632,19 +652,39 @@ public partial class BytecodeVisitor
     public Instruction? VisitClassInit(ClassInit node)
     {
         // 类定义编译
-        // 从 TypeTemplate 中提取类名和字段名
+        // 从 TypeTemplate 中提取类名、字段和方法
         var typeTemplate = node.AnyLangValue;
         string className = typeTemplate.ClassName;
         var fields = new List<string>();
+        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic)>();
 
-        // 遍历类成员变量，提取字段名
-        foreach (var member in typeTemplate.Variates.Keys)
+        // 遍历实例成员，提取字段和方法
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
-            fields.Add(member.IdName);
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                // 这是一个实例方法
+                methods.Add((memberId.IdName, funcValue, false));
+            }
+            else
+            {
+                // 这是一个实例字段
+                fields.Add(memberId.IdName);
+            }
         }
 
-        // 在编译器中注册类定义
-        _compiler.DeclareClass(className, fields);
+        // 遍历静态成员，提取静态方法
+        foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
+        {
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                // 这是一个静态方法
+                methods.Add((memberId.IdName, funcValue, true));
+            }
+        }
+
+        // 在编译器中注册类定义（包括方法）
+        _compiler.DeclareClass(className, fields, methods, typeTemplate.ParentClassName);
 
         // 类定义本身不生成运行时指令
         return null;

@@ -1,6 +1,8 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Visitor;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.Bytecode;
 
@@ -61,25 +63,9 @@ public class BytecodeCompiler
     /// </summary>
     private void PreprocessClassDefinitions(BlockStatement ast)
     {
-        // ClassInit 存储在 ImportStatements 中
-        foreach (var statement in ast.ImportStatements)
-        {
-            if (statement is ClassInit classInit)
-            {
-                var typeTemplate = classInit.AnyLangValue;
-                string className = typeTemplate.ClassName;
-                var fields = new List<string>();
-
-                // 提取字段名
-                foreach (var member in typeTemplate.Variates.Keys)
-                {
-                    fields.Add(member.IdName);
-                }
-
-                // 注册类定义
-                DeclareClass(className, fields);
-            }
-        }
+        // 注意：类定义现在在 BytecodeVisitor.VisitClassInit 中完整处理
+        // 包括字段和方法的编译，所以这里不需要预注册
+        // 保留这个方法是为了将来可能需要的其他预处理逻辑
     }
 
     /// <summary>
@@ -271,17 +257,94 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields)
     {
+        DeclareClass(className, fields, new List<(string, FuncLangValue, bool)>(), null);
+    }
+
+    public void DeclareClass(string className, List<string> fields,
+        List<(string methodName, FuncLangValue funcValue, bool isStatic)> methods,
+        string? parentClassName)
+    {
         var classMetadata = new ClassMetadata
         {
             Name = className,
+            BaseClassName = parentClassName,
             Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList()
         };
+
+        // 编译所有方法
+        foreach (var (methodName, funcValue, isStatic) in methods)
+        {
+            // 提取方法参数
+            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+
+            // 提取默认参数值
+            var defaultValues = new List<object?>();
+            if (funcValue.Ids != null)
+            {
+                foreach (var param in funcValue.Ids)
+                {
+                    if (param.DefaultValue != null)
+                    {
+                        var defaultValue = EvaluateConstantExpression(param.DefaultValue);
+                        defaultValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        defaultValues.Add(null);
+                    }
+                }
+            }
+
+            // 编译方法体
+            var functionMetadata = CompileFunction(
+                $"{className}.{methodName}",
+                paramNames,
+                defaultValues,
+                funcValue.BlockStatement
+            );
+
+            // 创建方法元数据
+            var methodMetadata = new MethodMetadata
+            {
+                Name = methodName,
+                IsStatic = isStatic,
+                Function = functionMetadata
+            };
+
+            // 添加到类元数据
+            if (isStatic)
+            {
+                classMetadata.StaticMethods.Add(methodMetadata);
+            }
+            else
+            {
+                classMetadata.Methods.Add(methodMetadata);
+            }
+        }
+
         _bytecodeFile.Classes.Add(classMetadata);
     }
 
     public bool IsClassName(string name)
     {
         return _bytecodeFile.Classes.Any(c => c.Name == name);
+    }
+
+    /// <summary>
+    /// 计算常量表达式的值（用于默认参数）
+    /// </summary>
+    private object? EvaluateConstantExpression(LangExpression expr)
+    {
+        return expr switch
+        {
+            IntLangValue intVal => intVal.Value,
+            DoubleLangValue doubleVal => doubleVal.Value,
+            StringLangValue stringVal => stringVal.Value,
+            BoolLangValue boolVal => boolVal.Value,
+            CharLangValue charVal => charVal.Value,
+            NullLangValue => null,
+            _ => throw new NotSupportedException($"虚拟机模式不支持非常量默认参数表达式: {expr.GetType().Name}")
+        };
     }
 
     /// <summary>
