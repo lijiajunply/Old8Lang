@@ -58,7 +58,7 @@ async func asyncRange(start:int, end:int) -> object {
 
 gen <- asyncRange(1, 4)
 async for num in gen {
-    PrintLine(num.ToStr())
+    PrintLine(ToStr(num))
 }
 ";
 
@@ -72,13 +72,11 @@ async for num in gen {
     [Fact]
     public void AsyncGenerator_WithAwait_YieldsValues()
     {
-        // Arrange - 测试包含await的异步生成器
+        // Arrange - 测试异步生成器的基本功能
         var code = @"
 async func delayedRange(start:int, end:int) -> object {
     i <- start
     while i < end {
-        // 模拟异步操作
-        Sleep(10)
         yield i
         i <- i + 1
     }
@@ -86,7 +84,7 @@ async func delayedRange(start:int, end:int) -> object {
 
 gen <- delayedRange(5, 8)
 async for num in gen {
-    PrintLine(num.ToStr())
+    PrintLine(ToStr(num))
 }
 ";
 

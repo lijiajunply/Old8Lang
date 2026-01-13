@@ -175,7 +175,23 @@ public partial class BytecodeVisitor
                     Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
                 }
             }
-            // 检查是否是异步函数
+            // 检查是否是生成器函数（包括异步生成器）
+            // 注意：生成器函数调用不执行函数体，而是创建生成器对象
+            else if (_compiler.IsGeneratorFunction(funcName))
+            {
+                if (namedCount > 0)
+                {
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                }
+                else
+                {
+                    // 无命名参数: [argCount, funcName]
+                    Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                }
+            }
+            // 检查是否是异步函数（非生成器）
             else if (_compiler.IsAsyncFunction(funcName))
             {
                 if (namedCount > 0)

@@ -304,6 +304,13 @@ public class VirtualMachine
 
         try
         {
+            // 将状态重置为NotStarted,这样当生成器自然完成时可以正确识别
+            // (如果执行了yield,状态会被重新设置为Suspended)
+            if (asyncGeneratorState.Status == GeneratorStatus.Suspended)
+            {
+                asyncGeneratorState.Status = GeneratorStatus.NotStarted;
+            }
+
             // 继续执行指令直到下一个yield或函数结束
             while (frame.IP < asyncGeneratorState.Function.Instructions.Count)
             {
@@ -315,18 +322,18 @@ public class VirtualMachine
                     // 异步执行指令
                     await ExecuteInstructionAsync(instruction, frame, cancellationToken);
 
-                    // 检查是否遇到了yield
+                    // 检查是否遇到了yield（IP被设置到函数末尾）
                     if (frame.IP >= asyncGeneratorState.Function.Instructions.Count)
                     {
-                        // 生成器已暂停或完成
+                        // 检查是否是yield（状态为Suspended）还是函数结束
                         if (asyncGeneratorState.Status == GeneratorStatus.Suspended)
                         {
-                            // 返回yield的值
+                            // 刚刚执行了yield，返回值
                             return asyncGeneratorState.CurrentValue;
                         }
                         else
                         {
-                            // 生成器已完成
+                            // 函数正常结束
                             asyncGeneratorState.Complete();
                             return null;
                         }
@@ -409,7 +416,11 @@ public class VirtualMachine
 
                         // 保存状态并标记为暂停
                         asyncGeneratorState.SaveState(frame.IP, frame.Locals, stackCopy);
-                        asyncGeneratorState.CurrentValue = yieldValue as LangValueType;
+
+                        // 将 yield 的值转换为 LangValueType
+                        asyncGeneratorState.CurrentValue = yieldValue as LangValueType ??
+                            ConvertToLangValue(yieldValue);
+
                         asyncGeneratorState.Status = GeneratorStatus.Suspended;
 
                         // 设置 IP 到函数末尾，触发返回
@@ -707,14 +718,29 @@ public class VirtualMachine
                     // 检查是否是生成器函数
                     if (function.IsGenerator)
                     {
-                        // 创建生成器状态
-                        var generatorId = _nextGeneratorId++;
-                        var generatorState = new GeneratorState(function, args);
-                        _generators[generatorId] = generatorState;
+                        // 检查是否是异步生成器
+                        if (function.IsAsync)
+                        {
+                            // 创建异步生成器状态
+                            var asyncGeneratorId = _nextAsyncGeneratorId++;
+                            var asyncGeneratorState = new AsyncGeneratorState(function, args);
+                            _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
 
-                        // 创建生成器对象并压入栈
-                        var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
-                        _stack.Push(generatorValue);
+                            // 创建异步生成器对象并压入栈
+                            var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                            _stack.Push(asyncGeneratorValue);
+                        }
+                        else
+                        {
+                            // 创建普通生成器状态
+                            var generatorId = _nextGeneratorId++;
+                            var generatorState = new GeneratorState(function, args);
+                            _generators[generatorId] = generatorState;
+
+                            // 创建生成器对象并压入栈
+                            var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                            _stack.Push(generatorValue);
+                        }
                     }
                     else
                     {
@@ -757,14 +783,29 @@ public class VirtualMachine
                     // 检查是否是生成器函数
                     if (function.IsGenerator)
                     {
-                        // 创建生成器状态
-                        var generatorId = _nextGeneratorId++;
-                        var generatorState = new GeneratorState(function, args);
-                        _generators[generatorId] = generatorState;
+                        // 检查是否是异步生成器
+                        if (function.IsAsync)
+                        {
+                            // 创建异步生成器状态
+                            var asyncGeneratorId = _nextAsyncGeneratorId++;
+                            var asyncGeneratorState = new AsyncGeneratorState(function, args);
+                            _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
 
-                        // 创建生成器对象并压入栈
-                        var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
-                        _stack.Push(generatorValue);
+                            // 创建异步生成器对象并压入栈
+                            var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                            _stack.Push(asyncGeneratorValue);
+                        }
+                        else
+                        {
+                            // 创建普通生成器状态
+                            var generatorId = _nextGeneratorId++;
+                            var generatorState = new GeneratorState(function, args);
+                            _generators[generatorId] = generatorState;
+
+                            // 创建生成器对象并压入栈
+                            var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                            _stack.Push(generatorValue);
+                        }
                     }
                     else
                     {

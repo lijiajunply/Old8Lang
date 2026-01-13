@@ -16,6 +16,11 @@ public class BytecodeCompiler
     private readonly Stack<Scope> _scopes = new();
     private FunctionMetadata? _currentFunction;
 
+    /// <summary>
+    /// 获取当前正在编译的函数是否是异步函数
+    /// </summary>
+    public bool IsCurrentFunctionAsync => _currentFunction?.IsAsync ?? false;
+
     public BytecodeCompiler()
     {
         // 初始化全局作用域
@@ -193,6 +198,29 @@ public class BytecodeCompiler
     public bool IsAsyncFunction(string funcName)
     {
         return _bytecodeFile.Functions.Any(f => f.Name == funcName && f.IsAsync);
+    }
+
+    /// <summary>
+    /// 检查是否是生成器函数
+    /// </summary>
+    public bool IsGeneratorFunction(string funcName)
+    {
+        return _bytecodeFile.Functions.Any(f => f.Name == funcName && f.IsGenerator);
+    }
+
+    /// <summary>
+    /// 获取函数在字节码文件中的索引
+    /// </summary>
+    public int GetFunctionIndex(string funcName)
+    {
+        for (int i = 0; i < _bytecodeFile.Functions.Count; i++)
+        {
+            if (_bytecodeFile.Functions[i].Name == funcName)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // ===== 作用域管理 =====

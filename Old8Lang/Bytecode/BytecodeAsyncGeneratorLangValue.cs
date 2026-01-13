@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -13,7 +14,7 @@ namespace Old8Lang.Bytecode;
 /// 表示一个可以暂停和恢复执行的异步生成器函数
 /// 类似于 C# 的 IAsyncEnumerable&lt;T&gt;
 /// </summary>
-public class BytecodeAsyncGeneratorLangValue : LangValueType, IAsyncEnumerable<LangValueType>
+public class BytecodeAsyncGeneratorLangValue : LangValueType, IAsyncEnumerable<LangValueType>, IEnumerator
 {
     /// <summary>异步生成器ID</summary>
     public int AsyncGeneratorId { get; }
@@ -165,6 +166,13 @@ public class BytecodeAsyncGeneratorLangValue : LangValueType, IAsyncEnumerable<L
     {
         _cancellationTokenSource?.Dispose();
     }
+
+    // IEnumerator 接口实现（用于同步迭代）
+    object IEnumerator.Current => Current ?? new VoidLangValue();
+
+    bool IEnumerator.MoveNext() => MoveNext();
+
+    void IEnumerator.Reset() => Reset();
 
     // 不支持的操作
     public override LangValueType Plus(LangValueType otherLangValueType)

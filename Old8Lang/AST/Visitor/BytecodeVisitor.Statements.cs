@@ -811,8 +811,17 @@ public partial class BytecodeVisitor
         // 1. 生成 yield 表达式的字节码（将值压入栈）
         node.YieldExpression.Accept(this);
 
-        // 2. 生成 Yield 指令（暂停执行并返回栈顶值）
-        Emit(OpCode.Yield);
+        // 2. 根据当前函数是否是异步函数，生成不同的指令
+        if (_compiler.IsCurrentFunctionAsync)
+        {
+            // 异步生成器：生成 AwaitYield 指令
+            Emit(OpCode.AwaitYield);
+        }
+        else
+        {
+            // 普通生成器：生成 Yield 指令
+            Emit(OpCode.Yield);
+        }
 
         return null;
     }
