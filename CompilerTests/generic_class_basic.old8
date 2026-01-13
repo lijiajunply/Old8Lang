@@ -1,0 +1,34 @@
+// 编译器模式：基本泛型类测试
+
+// 定义简单的泛型Box类
+class Box<T> {
+    private value:T
+
+    func set(v:T) -> void {
+        this.value <- v
+    }
+
+    func get() -> T {
+        return this.value
+    }
+}
+
+// 测试int类型的Box
+intBox <- Box<int>()
+intBox.set(42)
+result1 <- intBox.get()
+PrintLine("Int Box: " + result1.ToStr())
+
+// 测试string类型的Box
+stringBox <- Box<string>()
+stringBox.set("Hello Generic")
+result2 <- stringBox.get()
+PrintLine("String Box: " + result2)
+
+// 测试double类型的Box
+doubleBox <- Box<double>()
+doubleBox.set(3.14)
+result3 <- doubleBox.get()
+PrintLine("Double Box: " + result3.ToStr())
+
+PrintLine("All basic generic class tests passed!")

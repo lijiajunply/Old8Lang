@@ -129,6 +129,16 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     /// <param name="local">局部变量管理器，用于管理类或接口的声明和访问</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 0. 如果是泛型类，注册到泛型类缓存中，不立即生成类型
+        if (anyLangValue.IsGeneric)
+        {
+            if (!local.GenericClasses.ContainsKey(anyLangValue.ClassName))
+            {
+                local.GenericClasses[anyLangValue.ClassName] = anyLangValue;
+            }
+            return;
+        }
+
         // 1. 检查类或接口是否已经存在
         if (local.ClassVar.ContainsKey(anyLangValue.ClassName))
         {

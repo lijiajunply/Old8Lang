@@ -180,76 +180,148 @@ public partial class GenericInstanceExpression : LangExpression
     {
         // 编译器模式下的类型推断
         // 对于泛型实例，需要根据基础表达式和类型参数推断最终类型
-        
-        // 获取基础表达式的类型
-        var baseType = BaseExpression.OutputType(local);
-        
-        // 如果是函数调用，返回函数的返回类型
-        if (IsFunctionCall)
+
+        // 获取基础表达式名称
+        if (BaseExpression is not LangId identifier)
         {
-            // 简化处理：暂时返回 object 类型
-            // 实际实现需要分析泛型函数的返回类型和类型参数
             return typeof(object);
         }
-        
-        // 否则返回实例化后的类型
-        // 简化处理：暂时返回 object 类型
-        // 实际实现需要根据类型参数确定具体类型
+
+        var name = identifier.IdName;
+
+        // 判断是泛型类还是泛型函数
+        if (local.GenericClasses.ContainsKey(name))
+        {
+            // 泛型类实例化：返回特化后的类型
+            var typeTemplate = local.GenericClasses[name];
+            var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters);
+            var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
+            return specializedType;
+        }
+
+        if (local.GenericFunctions.ContainsKey(name))
+        {
+            // 泛型函数调用：返回函数的返回类型
+            var genericFunc = local.GenericFunctions[name];
+            var typeMapping = CreateTypeMapping(genericFunc.GenericParameters);
+            var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
+            return resolver.ResolveReturnType(genericFunc.Id?.AssumptionType);
+        }
+
+        // 默认返回 object 类型
         return typeof(object);
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译器模式下的IL生成
-        // 处理泛型函数调用：func<T>(args)
-        
-        if (!IsFunctionCall)
+        // 处理泛型类实例化和泛型函数调用
+
+        // 获取基础表达式名称
+        if (BaseExpression is not LangId identifier)
         {
-            throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型类实例化，仅支持泛型函数调用");
+            throw new InvalidOperationError(this, "编译器模式下泛型表达式必须使用简单的标识符");
         }
-        
-        // 获取基础函数名称
-        if (BaseExpression is not LangId functionId)
+
+        var name = identifier.IdName;
+
+        // 尝试判断是泛型类还是泛型函数
+        bool isGenericClass = local.GenericClasses.ContainsKey(name);
+        bool isGenericFunction = local.GenericFunctions.ContainsKey(name);
+
+        if (isGenericClass)
         {
-            throw new InvalidOperationError(this, "编译器模式下泛型函数调用必须使用简单的函数标识符");
+            // 处理泛型类实例化
+            HandleGenericClassInstantiation(ilGenerator, local, name);
         }
-        
-        var funcName = functionId.IdName;
-        
-        // 首先尝试从泛型函数定义中查找
-        if (!local.GenericFunctions.TryGetValue(funcName, out var genericFunc))
+        else if (isGenericFunction)
         {
-            // 如果找不到，尝试从普通函数定义中查找（可能是基础版本）
-            if (local.DelegateVar.TryGetValue(funcName, out var baseMethod))
-            {
-                // 创建一个临时的泛型函数定义用于特化
-                // 这里需要根据实际情况来创建
-                // 暂时跳过泛型特化，使用基础方法
-                var baseMethodInfo = baseMethod;
-                
-                // 生成所有调用参数的IL代码
-                foreach (var arg in CallArguments!)
-                {
-                    arg.LoadIlValue(ilGenerator, local);
-                }
-                
-                // 调用基础方法
-                ilGenerator.Emit(OpCodes.Call, baseMethodInfo);
-                return;
-            }
-            
-            throw new InvalidOperationError(this, $"找不到泛型函数定义：{funcName}");
+            // 处理泛型函数调用
+            HandleGenericFunctionCall(ilGenerator, local, name);
         }
-        
+        else
+        {
+            throw new InvalidOperationError(this, $"找不到泛型类或泛型函数定义：{name}");
+        }
+    }
+
+    /// <summary>
+    /// 处理泛型类实例化
+    /// </summary>
+    private void HandleGenericClassInstantiation(ILGenerator ilGenerator, LocalManager local, string className)
+    {
+        // 获取泛型类模板
+        var typeTemplate = local.GenericClasses[className];
+
         // 创建类型参数映射
-        var typeMapping = new Dictionary<string, Type>();
-        
-        // 解析类型参数并映射到泛型参数名
-        if (genericFunc.GenericParameters is not null)
+        var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters);
+
+        // 创建或获取特化类型
+        var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
+
+        // 创建实例
+        var constructor = specializedType.GetConstructor(Type.EmptyTypes);
+        if (constructor is null)
         {
-            for (int i = 0; i < Math.Min(TypeArguments.Count, genericFunc.GenericParameters.Count); i++)
+            throw new InvalidOperationError(this, $"找不到类 {className} 的无参构造函数");
+        }
+
+        ilGenerator.Emit(OpCodes.Newobj, constructor);
+
+        // 如果有调用参数（调用 init 方法），暂时不支持
+        if (IsFunctionCall && CallArguments!.Count > 0)
+        {
+            throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型类的带参数构造函数");
+        }
+    }
+
+    /// <summary>
+    /// 处理泛型函数调用
+    /// </summary>
+    private void HandleGenericFunctionCall(ILGenerator ilGenerator, LocalManager local, string funcName)
+    {
+        // 获取泛型函数定义
+        var genericFunc = local.GenericFunctions[funcName];
+
+        // 创建类型参数映射
+        var typeMapping = CreateTypeMapping(genericFunc.GenericParameters);
+
+        // 构建特化键
+        var typeArgNames = TypeArguments.Select(t => ResolveSimpleType(t).Name).ToArray();
+        var specializationKey = $"{funcName}${string.Join("_", typeArgNames)}";
+
+        // 检查是否已经存在特化方法
+        if (!local.GenericSpecializations.TryGetValue(specializationKey, out var specializedMethod))
+        {
+            // 创建新的特化方法
+            specializedMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeMapping, local);
+        }
+
+        // 生成所有调用参数的IL代码
+        if (CallArguments is not null)
+        {
+            foreach (var arg in CallArguments)
             {
-                var genericParamName = genericFunc.GenericParameters[i].Name;
+                arg.LoadIlValue(ilGenerator, local);
+            }
+        }
+
+        // 调用特化方法
+        ilGenerator.Emit(OpCodes.Call, specializedMethod);
+    }
+
+    /// <summary>
+    /// 创建类型参数映射
+    /// </summary>
+    private Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters)
+    {
+        var typeMapping = new Dictionary<string, Type>();
+
+        if (genericParameters is not null)
+        {
+            for (int i = 0; i < Math.Min(TypeArguments.Count, genericParameters.Count); i++)
+            {
+                var genericParamName = genericParameters[i].Name;
                 var typeArgumentName = TypeArguments[i];
                 var type = ResolveSimpleType(typeArgumentName);
                 typeMapping[genericParamName] = type;
@@ -266,32 +338,10 @@ public partial class GenericInstanceExpression : LangExpression
                 typeMapping[genericParamName] = type;
             }
         }
-        
-        // 构建特化键
-        var typeArgNames = TypeArguments.Select(t => ResolveSimpleType(t).Name).ToArray();
-        var specializationKey = $"{funcName}${string.Join("_", typeArgNames)}";
-        
-        // 检查是否已经存在特化方法
-        if (local.GenericSpecializations.TryGetValue(specializationKey, out var specializedMethod))
-        {
-            // 使用现有的特化方法
-        }
-        else
-        {
-            // 创建新的特化方法
-            specializedMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeMapping, local);
-        }
-        
-        // 生成所有调用参数的IL代码
-        foreach (var arg in CallArguments!)
-        {
-            arg.LoadIlValue(ilGenerator, local);
-        }
-        
-        // 调用特化方法
-        ilGenerator.Emit(OpCodes.Call, specializedMethod);
+
+        return typeMapping;
     }
-    
+
     /// <summary>
     /// 解析简单类型名称为System.Type
     /// </summary>

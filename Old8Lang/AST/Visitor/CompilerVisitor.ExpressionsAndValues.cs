@@ -261,7 +261,7 @@ public partial class CompilerVisitor
     public object? VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
         // 泛型实例化在编译器模式下暂不支持
-        // TODO: 实现泛型的编译器支持
+        node.LoadIlValue(ilGenerator, local);
         return null;
     }
 

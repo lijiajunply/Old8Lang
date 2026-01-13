@@ -67,6 +67,18 @@ public class LocalManager
     public readonly Dictionary<string, FuncLangValue> GenericFunctions = [];
 
     /// <summary>
+    /// 泛型类定义缓存，键为类名，值为TypeTemplate
+    /// 用于在运行时创建特化版本
+    /// </summary>
+    public readonly Dictionary<string, AST.Expression.AnyValues.TypeTemplate> GenericClasses = [];
+
+    /// <summary>
+    /// 泛型类特化类型缓存
+    /// 键为 "类名$类型参数1_类型参数2"，值为特化后的Type
+    /// </summary>
+    public readonly Dictionary<string, Type> GenericClassSpecializations = [];
+
+    /// <summary>
     /// 当前泛型类型解析器，用于在特化方法生成时解析泛型参数
     /// </summary>
     public GenericTypeResolver? CurrentGenericTypeResolver { get; set; }

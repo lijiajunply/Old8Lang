@@ -1,0 +1,15 @@
+// 编译器模式：最简单的泛型类方法测试
+
+class Box<T> {
+    private value:T
+
+    func set(v:T) -> void {
+        this.value <- v
+    }
+}
+
+// 只测试创建和调用set方法
+intBox <- Box<int>()
+PrintLine("Box created!")
+intBox.set(42)
+PrintLine("Set called!")
