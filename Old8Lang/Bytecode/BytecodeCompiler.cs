@@ -76,7 +76,8 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译函数定义
     /// </summary>
-    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
+    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues,
+        BlockStatement body)
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -87,7 +88,7 @@ public class BytecodeCompiler
             Parameters = parameters,
             DefaultValues = defaultValues,
             IsAsync = false,
-            IsGenerator = isGenerator  // 设置生成器标记
+            IsGenerator = isGenerator // 设置生成器标记
         };
 
         var oldFunc = _currentFunction;
@@ -117,14 +118,15 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译异步函数
     /// </summary>
-    public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
+    public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<object?> defaultValues,
+        BlockStatement body)
     {
         var func = new FunctionMetadata
         {
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
-            IsAsync = true  // 标记为异步函数
+            IsAsync = true // 标记为异步函数
         };
 
         var oldFunc = _currentFunction;
@@ -154,7 +156,8 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译异步生成器函数
     /// </summary>
-    public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
+    public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters,
+        List<object?> defaultValues, BlockStatement body)
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -164,8 +167,8 @@ public class BytecodeCompiler
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
-            IsAsync = true,      // 标记为异步函数
-            IsGenerator = isGenerator  // 标记为生成器函数
+            IsAsync = true, // 标记为异步函数
+            IsGenerator = isGenerator // 标记为生成器函数
         };
 
         var oldFunc = _currentFunction;
@@ -220,6 +223,7 @@ public class BytecodeCompiler
                 return i;
             }
         }
+
         return -1;
     }
 
@@ -260,6 +264,7 @@ public class BytecodeCompiler
         {
             name = $"<temp_{Guid.NewGuid():N}>";
         }
+
         return DeclareLocalVariable(name);
     }
 
@@ -286,10 +291,7 @@ public class BytecodeCompiler
     /// </summary>
     public void AddExceptionTableEntry(ExceptionTableEntry entry)
     {
-        if (_currentFunction != null)
-        {
-            _currentFunction.ExceptionTable.Add(entry);
-        }
+        _currentFunction?.ExceptionTable.Add(entry);
     }
 
     public void DeclareGlobalVariable(string name)
@@ -419,17 +421,10 @@ public class BytecodeCompiler
     /// <summary>
     /// 局部作用域
     /// </summary>
-    private class Scope
+    private class Scope(Scope? parent)
     {
         private readonly Dictionary<string, int> _locals = new();
-        private readonly Scope? _parent;
-        private int _nextIndex;
-
-        public Scope(Scope? parent)
-        {
-            _parent = parent;
-            _nextIndex = parent?._nextIndex ?? 0;
-        }
+        private int _nextIndex = parent?._nextIndex ?? 0;
 
         public int DeclareLocal(string name)
         {
@@ -443,14 +438,14 @@ public class BytecodeCompiler
 
         public bool HasLocal(string name)
         {
-            return _locals.ContainsKey(name) || (_parent?.HasLocal(name) ?? false);
+            return _locals.ContainsKey(name) || (parent?.HasLocal(name) ?? false);
         }
 
         public int GetLocalIndex(string name)
         {
             if (_locals.TryGetValue(name, out int index))
                 return index;
-            return _parent?.GetLocalIndex(name) ?? -1;
+            return parent?.GetLocalIndex(name) ?? -1;
         }
 
         public int LocalCount => _nextIndex;
@@ -482,6 +477,7 @@ public class BytecodeCompiler
                     return true;
             }
         }
+
         return false;
     }
 

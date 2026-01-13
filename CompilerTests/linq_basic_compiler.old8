@@ -1,0 +1,26 @@
+// LINQ 编译器模式基础测试
+
+// 测试1: 基本的 from-where-select 查询
+numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+result1 <- from x in numbers
+           where x > 5
+           select x
+
+PrintLine("测试1 - where 过滤:")
+PrintLine(result1.ToStr())
+
+// 测试2: select 投影
+result2 <- from x in numbers
+           where x % 2 == 0
+           select x * 2
+
+PrintLine("测试2 - select 投影:")
+PrintLine(result2.ToStr())
+
+// 测试3: 简单的 from-select
+result3 <- from x in numbers
+           select x * x
+
+PrintLine("测试3 - 平方投影:")
+PrintLine(result3.ToStr())

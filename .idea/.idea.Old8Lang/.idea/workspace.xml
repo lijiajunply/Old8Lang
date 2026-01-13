@@ -23,14 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqAdvancedTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqBasicTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Linq.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.Compiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -575,7 +572,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="2233000" />
+      <workItem from="1768331954396" duration="2571000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -920,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="649" />
+    <option name="localTasksCounter" value="650" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -947,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(test): 更新虚拟机测试计划文档添加高级特性测试章节&#10;&#10;- 添加defer语句、Match表达式、select语句和异步函数测试章节&#10;- 新增12个高级特性测试用例并标记为跳过状态&#10;- 更新测试进度统计表格增加跳过列和重新计算完成率&#10;- 添加已跳过测试详细列表和跳过原因说明&#10;- 修改字典创建测试代码使用多行字符串字面量格式" />
     <MESSAGE value="feat(vm): 添加数组操作数序列化支持和命令行集成&#10;&#10;- 实现了数组类型操作数的序列化和反序列化功能&#10;- 添加了数组元素的递归序列化处理逻辑&#10;- 更新虚拟机实现状态文档至100%完成度&#10;- 完成了命令行工具的完整集成功能&#10;- 修复了操作数类型不支持时的错误信息显示" />
     <MESSAGE value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
     <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
@@ -972,7 +968,8 @@
     <MESSAGE value="fix(ast): 修复 AST 访问器异常处理和清理未使用代码&#10;&#10;- 为字节码访问器中的成员访问和赋值操作添加明确的不支持异常&#10;- 为 LINQ 查询子句节点添加正确的操作不可用异常提示&#10;- 移除类型推断访问器中未使用的声明语句访问方法&#10;- 修复线程值类型的重试方法不支持异常信息&#10;- 清理 IDE 工作区配置文件中的多余变更记录" />
     <MESSAGE value="feat(vm): 实现虚拟机 extern 语句支持&#10;&#10;- 在 BytecodeVisitor 中实现 ExternStatement 的字节码生成逻辑&#10;- 添加 LoadExtern 和 CallExtern 新操作码支持 extern 函数调用&#10;- 创建 ExternFunctionWrapper 类封装原生 DLL 函数调用逻辑&#10;- 实现参数类型转换和函数签名解析功能&#10;- 支持多种调用约定包括 Cdecl、StdCall 和 WinApi&#10;- 添加 extern 函数的缓存机制提升重复调用性能&#10;- 更新虚拟机文档记录 extern 支持的实现详情&#10;- 新增虚拟机 extern 功能测试用例" />
     <MESSAGE value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
+    <MESSAGE value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -267,8 +267,8 @@ public partial class CompilerVisitor
 
     public object? VisitLinqExpression(LinqExpression node)
     {
-        // LINQ 表达式在编译器模式下暂不支持
-        // TODO: 实现 LINQ 的编译器支持
+        // 调用 LinqExpression 的 LoadIlValue 方法生成 IL 代码
+        node.LoadIlValue(ilGenerator, local);
         return null;
     }
 

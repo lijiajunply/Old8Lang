@@ -14,31 +14,26 @@ namespace Old8Lang.Bytecode;
 /// <summary>
 /// 字节码访问者 - 将AST节点转换为字节码指令
 /// </summary>
-public partial class BytecodeVisitor : IVisitor<Instruction?>
+public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instruction?>
 {
-    private readonly BytecodeCompiler _compiler;
-    private readonly List<Instruction> _instructions = new();
-    private int _currentStackSize = 0;
-    private int _maxStackSize = 0;
+    private readonly BytecodeCompiler _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
+    private readonly List<Instruction> _instructions = [];
+    private int _currentStackSize;
+    private int _maxStackSize;
 
     // 循环标签栈 - 用于 break 和 continue
     private readonly Stack<LoopLabels> _loopLabels = new();
 
     // Defer 块列表 - 存储需要延迟执行的代码块
-    private readonly List<DeferBlock> _deferBlocks = new();
-
-    public BytecodeVisitor(BytecodeCompiler compiler)
-    {
-        _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
-    }
+    private readonly List<DeferBlock> _deferBlocks = [];
 
     /// <summary>
     /// 循环标签 - 存储 break 和 continue 的跳转位置
     /// </summary>
     private class LoopLabels
     {
-        public List<int> BreakJumps { get; } = new();
-        public List<int> ContinueJumps { get; } = new();
+        public List<int> BreakJumps { get; } = [];
+        public List<int> ContinueJumps { get; } = [];
         public int ContinueTarget { get; set; }
     }
 
@@ -144,7 +139,7 @@ public partial class BytecodeVisitor : IVisitor<Instruction?>
 
     /// <summary>
     /// 从主构造函数参数字段获取值的辅助方法
-    /// C#主构造函数参数被编译为<paramName>P格式的字段
+    /// C#主构造函数参数被编译为P格式的字段
     /// </summary>
     protected T? GetPrimaryConstructorParameter<T>(object node, string paramName) where T : class
     {
