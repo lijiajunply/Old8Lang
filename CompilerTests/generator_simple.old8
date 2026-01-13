@@ -1,0 +1,11 @@
+// 最简单的生成器测试
+func simpleGen() -> void {
+    yield 1
+    yield 2
+    yield 3
+}
+
+// 测试生成器
+gen <- simpleGen()
+PrintLine("Generator created")
+PrintLine(gen.ToStr())

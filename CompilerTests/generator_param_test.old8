@@ -1,0 +1,12 @@
+// 测试带参数的生成器
+func counter(max:int) -> void {
+    PrintLine("max = " + max.ToStr())
+    i <- 0
+    PrintLine("i = " + i.ToStr())
+    yield i
+}
+
+gen <- counter(3)
+for value in gen {
+    PrintLine("value = " + value.ToStr())
+}

@@ -1,0 +1,16 @@
+// 基础生成器测试
+func counter(max:int) -> void {
+    i <- 0
+    while i < max {
+        yield i
+        i <- i + 1
+    }
+}
+
+// 测试生成器
+gen <- counter(5)
+
+// 使用for-in循环遍历生成器
+for value in gen {
+    PrintLine(value.ToStr())
+}

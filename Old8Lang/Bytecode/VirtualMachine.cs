@@ -20,6 +20,10 @@ public class VirtualMachine
     private readonly Dictionary<int, TaskLangValue> _tasks = new();
     private int _nextTaskId = 1;
 
+    // Generator 管理
+    private readonly Dictionary<int, GeneratorState> _generators = new();
+    private int _nextGeneratorId = 1;
+
     public VirtualMachine(BytecodeFile bytecodeFile)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
@@ -102,6 +106,123 @@ public class VirtualMachine
         finally
         {
             // 函数正常退出时，执行所有 defer 块
+            ExecuteDefers(frame);
+            _callStack.Pop();
+        }
+    }
+
+    /// <summary>
+    /// 恢复生成器执行
+    /// </summary>
+    /// <param name="generatorId">生成器ID</param>
+    /// <returns>yield的值，如果生成器已完成则返回null</returns>
+    public LangValueType? ResumeGenerator(int generatorId)
+    {
+        if (!_generators.TryGetValue(generatorId, out var generatorState))
+        {
+            throw new Exception($"生成器 {generatorId} 不存在");
+        }
+
+        // 检查生成器状态
+        if (generatorState.Status == GeneratorStatus.Completed)
+        {
+            return null;
+        }
+
+        int ip;
+        object?[] locals;
+        Stack<LangValueType> stack;
+
+        // 首次执行：初始化参数到局部变量
+        if (generatorState.Status == GeneratorStatus.NotStarted)
+        {
+            ip = 0;
+            locals = new object?[generatorState.Function.LocalCount];
+            stack = new Stack<LangValueType>();
+
+            // 将参数复制到局部变量（参数占据前N个局部变量槽位）
+            if (generatorState.Arguments != null)
+            {
+                for (int i = 0; i < generatorState.Arguments.Length && i < locals.Length; i++)
+                {
+                    locals[i] = generatorState.Arguments[i];
+                }
+            }
+        }
+        else
+        {
+            // 恢复执行状态
+            generatorState.RestoreState(out ip, out locals, out stack);
+        }
+
+        // 创建调用帧
+        var frame = new CallFrame(generatorState.Function, generatorState.Function.LocalCount)
+        {
+            IP = ip,
+            GeneratorId = generatorId
+        };
+
+        // 设置局部变量
+        for (int i = 0; i < locals.Length && i < frame.Locals.Length; i++)
+        {
+            frame.Locals[i] = locals[i];
+        }
+
+        // 恢复栈
+        _stack.Clear();
+        foreach (var item in stack.Reverse())
+        {
+            _stack.Push(item);
+        }
+
+        _callStack.Push(frame);
+
+        try
+        {
+            // 继续执行指令直到下一个yield或函数结束
+            while (frame.IP < generatorState.Function.Instructions.Count)
+            {
+                var instruction = generatorState.Function.Instructions[frame.IP];
+                frame.IP++;
+
+                try
+                {
+                    ExecuteInstruction(instruction, frame);
+
+                    // 检查是否遇到了yield（通过检查IP是否被设置到函数末尾）
+                    if (frame.IP >= generatorState.Function.Instructions.Count)
+                    {
+                        // 生成器已暂停或完成
+                        if (generatorState.Status == GeneratorStatus.Suspended)
+                        {
+                            // 返回yield的值
+                            return generatorState.CurrentValue;
+                        }
+                        else
+                        {
+                            // 生成器已完成
+                            generatorState.Complete();
+                            return null;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 异常处理
+                    ExecuteDefers(frame);
+                    if (!HandleException(ex, frame, generatorState.Function))
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            // 函数正常结束
+            generatorState.Complete();
+            return null;
+        }
+        finally
+        {
             ExecuteDefers(frame);
             _callStack.Pop();
         }
@@ -385,8 +506,23 @@ public class VirtualMachine
                         args = fullArgs;
                     }
 
-                    // 调用函数
-                    CallFunction(function, args);
+                    // 检查是否是生成器函数
+                    if (function.IsGenerator)
+                    {
+                        // 创建生成器状态
+                        var generatorId = _nextGeneratorId++;
+                        var generatorState = new GeneratorState(function, args);
+                        _generators[generatorId] = generatorState;
+
+                        // 创建生成器对象并压入栈
+                        var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                        _stack.Push(generatorValue);
+                    }
+                    else
+                    {
+                        // 调用普通函数
+                        CallFunction(function, args);
+                    }
                 }
                 else
                 {
@@ -420,8 +556,23 @@ public class VirtualMachine
                     // 重新排列参数以匹配函数参数定义
                     var args = ArrangeArgumentsWithNamed(function, positionalArgs, namedArgNames, namedArgValues);
 
-                    // 调用函数
-                    CallFunction(function, args);
+                    // 检查是否是生成器函数
+                    if (function.IsGenerator)
+                    {
+                        // 创建生成器状态
+                        var generatorId = _nextGeneratorId++;
+                        var generatorState = new GeneratorState(function, args);
+                        _generators[generatorId] = generatorState;
+
+                        // 创建生成器对象并压入栈
+                        var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                        _stack.Push(generatorValue);
+                    }
+                    else
+                    {
+                        // 调用普通函数
+                        CallFunction(function, args);
+                    }
                 }
 
                 // 如果有返回值,它应该在栈上
@@ -772,6 +923,8 @@ public class VirtualMachine
 
             case OpCode.IteratorMoveNext:
             {
+                // 栈顶应该是迭代器，调用MoveNext后将bool结果压入栈
+                // 注意：迭代器对象保持在栈上，以便后续的IteratorCurrent使用
                 if (_stack.Peek() is IEnumerator enumerator)
                 {
                     bool hasNext = enumerator.MoveNext();
@@ -1047,22 +1200,41 @@ public class VirtualMachine
 
             case OpCode.Yield:
             {
-                // Yield操作：生成器返回一个值
-                // 在字节码VM中，我们简化实现：
+                // Yield操作：生成器返回一个值并暂停执行
                 // 1. 从栈中弹出要yield的值
-                // 2. 将值存储到某个位置（例如返回值）
-                // 3. 暂停执行（通过返回实现）
-
-                // 注意：完整的生成器支持需要状态机，这里是简化版本
                 var yieldValue = _stack.Pop();
 
-                // 将yield的值压回栈顶作为返回值
-                _stack.Push(yieldValue);
+                // 2. 获取当前生成器状态（从frame的GeneratorId）
+                if (frame.GeneratorId.HasValue)
+                {
+                    var generatorId = frame.GeneratorId.Value;
+                    if (_generators.TryGetValue(generatorId, out var generatorState))
+                    {
+                        // 3. 保存当前执行状态
+                        var stackArray = _stack.ToArray();
+                        var stackCopy = new Stack<LangValueType>();
+                        foreach (var item in stackArray.Reverse())
+                        {
+                            if (item is LangValueType langValue)
+                                stackCopy.Push(langValue);
+                        }
 
-                // TODO: 完整的生成器实现需要：
-                // - 保存当前执行状态（IP、局部变量）
-                // - 创建可恢复的迭代器对象
-                // - 支持多次yield和恢复执行
+                        generatorState.SaveState(
+                            frame.IP,  // 保存下一条指令的位置
+                            frame.Locals,
+                            stackCopy
+                        );
+
+                        // 4. 设置当前yield的值
+                        generatorState.CurrentValue = yieldValue as LangValueType ?? new VoidLangValue();
+
+                        // 5. 将yield的值压回栈顶（作为MoveNext的返回值）
+                        _stack.Push(yieldValue);
+
+                        // 6. 通过返回来暂停执行（设置IP到函数末尾）
+                        frame.IP = frame.Function.Instructions.Count;
+                    }
+                }
             }
                 break;
 

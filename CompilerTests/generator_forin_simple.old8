@@ -1,0 +1,10 @@
+// 测试for-in循环与生成器
+func simpleGen() -> void {
+    yield 1
+    yield 2
+}
+
+gen <- simpleGen()
+for value in gen {
+    PrintLine(value.ToStr())
+}

@@ -1,0 +1,32 @@
+// 测试生成器的MoveNext功能
+func counter(max:int) -> void {
+    i <- 0
+    while i < max {
+        yield i
+        i <- i + 1
+    }
+}
+
+// 创建生成器
+gen <- counter(5)
+PrintLine("Generator created: " + gen.ToStr())
+
+// 手动调用MoveNext测试
+PrintLine("\nTesting MoveNext:")
+result1 <- gen.MoveNext()
+PrintLine("MoveNext() returned: " + result1.ToStr())
+if result1 {
+    PrintLine("Current value: " + gen.Current.ToStr())
+}
+
+result2 <- gen.MoveNext()
+PrintLine("MoveNext() returned: " + result2.ToStr())
+if result2 {
+    PrintLine("Current value: " + gen.Current.ToStr())
+}
+
+result3 <- gen.MoveNext()
+PrintLine("MoveNext() returned: " + result3.ToStr())
+if result3 {
+    PrintLine("Current value: " + gen.Current.ToStr())
+}

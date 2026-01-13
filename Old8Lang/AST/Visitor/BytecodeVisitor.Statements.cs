@@ -479,9 +479,16 @@ public partial class BytecodeVisitor
         // 获取迭代器（栈上现在有迭代器）
         Emit(OpCode.GetIterator);
 
+        // 将迭代器保存到一个临时局部变量
+        int iteratorLocalIndex = _compiler.AllocateLocal("<iterator>");
+        Emit(OpCode.StoreLocal, iteratorLocalIndex);
+
         // 循环开始标签
         int loopStart = GetCurrentPosition();
         loopLabels.ContinueTarget = loopStart;
+
+        // 加载迭代器到栈
+        Emit(OpCode.LoadLocal, iteratorLocalIndex);
 
         // 调用 MoveNext（栈：迭代器 → 迭代器, hasNext）
         Emit(OpCode.IteratorMoveNext);
@@ -489,6 +496,9 @@ public partial class BytecodeVisitor
         // 如果 MoveNext 返回 false，跳出循环
         int jumpIfFalse = GetCurrentPosition();
         Emit(OpCode.JumpIfFalse, -1);
+
+        // 加载迭代器到栈
+        Emit(OpCode.LoadLocal, iteratorLocalIndex);
 
         // 获取当前元素（栈：迭代器 → 迭代器, current）
         Emit(OpCode.IteratorCurrent);
@@ -530,8 +540,8 @@ public partial class BytecodeVisitor
 
         _loopLabels.Pop();
 
-        // 弹出迭代器
-        Emit(OpCode.Pop);
+        // 释放迭代器局部变量
+        _compiler.FreeLocal(iteratorLocalIndex);
 
         return null;
     }
@@ -758,13 +768,11 @@ public partial class BytecodeVisitor
     public Instruction? VisitYieldStatement(YieldStatement node)
     {
         // Yield 语句（生成器）
-        // TODO: 完整的生成器支持需要：
-        // 1. 在字节码层面实现协程/生成器机制
-        // 2. 保存和恢复执行状态
-        // 3. 支持 yield 暂停和恢复
-        //
-        // 简化实现：暂时不支持生成器
-        // 生成器在字节码层面是一个复杂的特性
+        // 1. 生成 yield 表达式的字节码（将值压入栈）
+        node.YieldExpression.Accept(this);
+
+        // 2. 生成 Yield 指令（暂停执行并返回栈顶值）
+        Emit(OpCode.Yield);
 
         return null;
     }

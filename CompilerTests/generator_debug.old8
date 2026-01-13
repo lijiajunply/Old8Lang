@@ -1,0 +1,12 @@
+// 调试生成器 - 无参数版本
+func simpleCounter() -> void {
+    i <- 0
+    yield i
+    i <- 1
+    yield i
+}
+
+gen <- simpleCounter()
+for value in gen {
+    PrintLine(value.ToStr())
+}

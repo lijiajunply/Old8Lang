@@ -23,6 +23,9 @@ public class CallFrame(FunctionMetadata function, int localCount)
     /// <summary>Defer栈 - 存储延迟执行的指令位置(LIFO顺序)</summary>
     public Stack<int> DeferStack { get; } = new();
 
+    /// <summary>生成器ID（如果此帧是生成器函数的执行帧）</summary>
+    public int? GeneratorId { get; set; }
+
     /// <summary>
     /// 获取当前指令
     /// </summary>

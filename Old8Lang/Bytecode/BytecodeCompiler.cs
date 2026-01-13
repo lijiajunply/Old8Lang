@@ -1,3 +1,4 @@
+using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Visitor;
 
@@ -86,12 +87,16 @@ public class BytecodeCompiler
     /// </summary>
     public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
     {
+        // 检测函数是否包含yield语句
+        bool isGenerator = ContainsYieldStatement(body);
+
         var func = new FunctionMetadata
         {
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
-            IsAsync = false
+            IsAsync = false,
+            IsGenerator = isGenerator  // 设置生成器标记
         };
 
         var oldFunc = _currentFunction;
@@ -317,5 +322,56 @@ public class BytecodeCompiler
         }
 
         public int LocalCount => _nextIndex;
+    }
+
+    /// <summary>
+    /// 检测语句块中是否包含yield语句
+    /// </summary>
+    private bool ContainsYieldStatement(BlockStatement block)
+    {
+        return ContainsYieldInStatements(block.OtherStatements);
+    }
+
+    /// <summary>
+    /// 递归检测语句列表中是否包含yield语句
+    /// </summary>
+    private bool ContainsYieldInStatements(IEnumerable<OldStatement> statements)
+    {
+        foreach (var stmt in statements)
+        {
+            if (stmt is YieldStatement)
+                return true;
+
+            // 递归检查子语句（使用索引器遍历）
+            for (int i = 0; i < stmt.Count; i++)
+            {
+                var child = stmt[i];
+                if (child != null && ContainsYieldInStatement(child))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 检测单个语句中是否包含yield
+    /// </summary>
+    private bool ContainsYieldInStatement(OldStatement stmt)
+    {
+        if (stmt is YieldStatement)
+            return true;
+
+        if (stmt is BlockStatement blockStmt)
+            return ContainsYieldStatement(blockStmt);
+
+        // 递归检查子语句
+        for (int i = 0; i < stmt.Count; i++)
+        {
+            var child = stmt[i];
+            if (child != null && ContainsYieldInStatement(child))
+                return true;
+        }
+
+        return false;
     }
 }
