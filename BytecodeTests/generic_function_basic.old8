@@ -1,0 +1,20 @@
+// 字节码模式：泛型函数测试
+
+// 定义泛型identity函数
+func identity<T>(value:T) -> T {
+    return value
+}
+
+// 测试int类型
+result1 <- identity<int>(42)
+PrintLine("Identity<int>(42) = " + result1.ToStr())
+
+// 测试string类型
+result2 <- identity<string>("Hello")
+PrintLine("Identity<string>(\"Hello\") = " + result2)
+
+// 测试double类型
+result3 <- identity<double>(3.14)
+PrintLine("Identity<double>(3.14) = " + result3.ToStr())
+
+PrintLine("All generic function tests passed!")

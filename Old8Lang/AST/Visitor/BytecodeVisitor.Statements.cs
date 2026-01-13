@@ -452,6 +452,16 @@ public partial class BytecodeVisitor
         // 编译函数定义
         var funcValue = node.FuncLangValue;
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
+
+        // 检查是否是泛型函数
+        if (funcValue.GenericParameters != null && funcValue.GenericParameters.Count > 0)
+        {
+            // 泛型函数：注册到泛型函数缓存，不立即编译
+            _compiler.RegisterGenericFunction(funcName, funcValue);
+            return null;
+        }
+
+        // 非泛型函数：正常编译
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
         // 提取默认参数值
@@ -660,6 +670,16 @@ public partial class BytecodeVisitor
         // 从 TypeTemplate 中提取类名、字段和方法
         var typeTemplate = node.AnyLangValue;
         string className = typeTemplate.ClassName;
+
+        // 检查是否是泛型类
+        if (typeTemplate.GenericParameters != null && typeTemplate.GenericParameters.Count > 0)
+        {
+            // 泛型类：注册到泛型类缓存，不立即编译
+            _compiler.RegisterGenericClass(className, typeTemplate);
+            return null;
+        }
+
+        // 非泛型类：正常编译
         var fields = new List<string>();
         var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic)>();
 

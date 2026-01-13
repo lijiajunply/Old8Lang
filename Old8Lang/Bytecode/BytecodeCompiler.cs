@@ -3,6 +3,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.AST.Visitor;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.AnyValues;
 
 namespace Old8Lang.Bytecode;
 
@@ -15,6 +16,28 @@ public class BytecodeCompiler
     private readonly BytecodeFile _bytecodeFile = new();
     private readonly Stack<Scope> _scopes = new();
     private FunctionMetadata? _currentFunction;
+
+    // ===== 泛型支持 =====
+
+    /// <summary>
+    /// 泛型类定义缓存：key = 类名
+    /// </summary>
+    public readonly Dictionary<string, TypeTemplate> GenericClasses = new();
+
+    /// <summary>
+    /// 泛型函数定义缓存：key = 函数名
+    /// </summary>
+    public readonly Dictionary<string, FuncLangValue> GenericFunctions = new();
+
+    /// <summary>
+    /// 泛型类特化缓存：key = "ClassName$Type1_Type2_..."
+    /// </summary>
+    private readonly Dictionary<string, string> _genericClassSpecializations = new();
+
+    /// <summary>
+    /// 泛型函数特化缓存：key = "FuncName$Type1_Type2_..."
+    /// </summary>
+    private readonly Dictionary<string, string> _genericFunctionSpecializations = new();
 
     /// <summary>
     /// 获取当前正在编译的函数是否是异步函数
@@ -399,6 +422,40 @@ public class BytecodeCompiler
     public bool IsClassName(string name)
     {
         return _bytecodeFile.Classes.Any(c => c.Name == name);
+    }
+
+    // ===== 泛型类和函数管理 =====
+
+    /// <summary>
+    /// 注册泛型类定义
+    /// </summary>
+    public void RegisterGenericClass(string className, TypeTemplate typeTemplate)
+    {
+        GenericClasses[className] = typeTemplate;
+    }
+
+    /// <summary>
+    /// 注册泛型函数定义
+    /// </summary>
+    public void RegisterGenericFunction(string funcName, FuncLangValue funcValue)
+    {
+        GenericFunctions[funcName] = funcValue;
+    }
+
+    /// <summary>
+    /// 检查是否是泛型类
+    /// </summary>
+    public bool IsGenericClass(string name)
+    {
+        return GenericClasses.ContainsKey(name);
+    }
+
+    /// <summary>
+    /// 检查是否是泛型函数
+    /// </summary>
+    public bool IsGenericFunction(string name)
+    {
+        return GenericFunctions.ContainsKey(name);
     }
 
     /// <summary>

@@ -610,8 +610,33 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
-        // 泛型实例化在字节码模式下暂不支持
-        // TODO: 实现泛型的字节码生成
+        // 泛型实例化的字节码生成
+        // 策略：在编译时进行泛型特化，生成具体类型的类或函数
+
+        // 获取基础表达式名称
+        if (node.BaseExpression is not LangId identifier)
+        {
+            throw new InvalidOperationException("字节码模式下泛型表达式必须使用简单的标识符");
+        }
+
+        var name = identifier.IdName;
+
+        // 判断是泛型类还是泛型函数
+        if (_compiler.IsGenericClass(name))
+        {
+            // 处理泛型类实例化
+            HandleGenericClassInstantiation(node, name);
+        }
+        else if (_compiler.IsGenericFunction(name))
+        {
+            // 处理泛型函数调用
+            HandleGenericFunctionCall(node, name);
+        }
+        else
+        {
+            throw new InvalidOperationException($"找不到泛型类或泛型函数定义：{name}");
+        }
+
         return null;
     }
 
@@ -708,5 +733,63 @@ public partial class BytecodeVisitor
         }
 
         return null;
+    }
+
+    // ===== 泛型处理辅助方法 =====
+
+    /// <summary>
+    /// 处理泛型类实例化
+    /// </summary>
+    private void HandleGenericClassInstantiation(GenericInstanceExpression node, string className)
+    {
+        // 获取泛型类模板
+        var typeTemplate = _compiler.GenericClasses[className];
+
+        // 构建特化类名：ClassName$Type1_Type2_...
+        var typeArgNames = node.TypeArguments.Select(ResolveSimpleTypeName).ToArray();
+        var specializedClassName = $"{className}${string.Join("_", typeArgNames)}";
+
+        // 检查是否已经生成过特化类
+        if (!_compiler.IsClassName(specializedClassName))
+        {
+            // 生成特化类定义
+            GenerateSpecializedClass(typeTemplate, node.TypeArguments, specializedClassName);
+        }
+
+        // 生成创建对象的字节码
+        Emit(OpCode.NewObject, specializedClassName);
+    }
+
+    /// <summary>
+    /// 处理泛型函数调用
+    /// </summary>
+    private void HandleGenericFunctionCall(GenericInstanceExpression node, string funcName)
+    {
+        // 获取泛型函数定义
+        var genericFunc = _compiler.GenericFunctions[funcName];
+
+        // 构建特化函数名：FuncName$Type1_Type2_...
+        var typeArgNames = node.TypeArguments.Select(ResolveSimpleTypeName).ToArray();
+        var specializedFuncName = $"{funcName}${string.Join("_", typeArgNames)}";
+
+        // 检查是否已经生成过特化函数
+        if (_compiler.GetFunctionIndex(specializedFuncName) == -1)
+        {
+            // 生成特化函数定义
+            GenerateSpecializedFunction(genericFunc, node.TypeArguments, specializedFuncName);
+        }
+
+        // 生成调用参数的字节码
+        if (node.CallArguments != null)
+        {
+            foreach (var arg in node.CallArguments)
+            {
+                arg.Accept(this);
+            }
+        }
+
+        // 生成函数调用字节码
+        int argCount = node.CallArguments?.Count ?? 0;
+        Emit(OpCode.Call, new object[] { argCount, specializedFuncName });
     }
 }
