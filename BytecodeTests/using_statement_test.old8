@@ -1,0 +1,44 @@
+// Using 语句字节码测试
+
+// 测试1: 基本的 using 语句（带变量名）
+PrintLine("=== 测试1: 基本的 using 语句 ===")
+using mutex <- MutexCreate() {
+    PrintLine("在 using 块内")
+    MutexLock(mutex)
+    PrintLine("已锁定 mutex")
+    MutexUnlock(mutex)
+    PrintLine("已解锁 mutex")
+}
+PrintLine("using 块结束，资源应该已自动释放")
+
+// 测试2: using 语句（不带变量名）
+PrintLine("")
+PrintLine("=== 测试2: using 语句（不带变量名）===")
+ch <- ChannelCreate()
+PrintLine("创建了 channel")
+using ch {
+    ChannelSend(ch, 100)
+    PrintLine("发送了值: 100")
+    val <- ChannelReceive(ch)
+    PrintLine("接收了值")
+}
+PrintLine("using 块结束，channel 应该已自动释放")
+
+// 测试3: using 语句中的异常处理
+PrintLine("")
+PrintLine("=== 测试3: using 语句中的异常处理 ===")
+try {
+    using mutex2 <- MutexCreate() {
+        PrintLine("在 using 块内")
+        MutexLock(mutex2)
+        PrintLine("已锁定 mutex2")
+        // 抛出异常
+        throw "测试异常"
+    }
+} catch (e) {
+    PrintLine("捕获到异常")
+    PrintLine("即使发生异常，资源也应该已自动释放")
+}
+
+PrintLine("")
+PrintLine("=== 所有测试完成 ===")

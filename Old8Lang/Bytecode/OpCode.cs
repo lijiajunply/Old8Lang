@@ -71,13 +71,13 @@ public enum OpCode : byte
     /// <summary>大于: b, a → (a > b)</summary>
     Greater = 0x22,
 
-    /// <summary>小于: b, a → (a < b)</summary>
+    /// <summary>小于: b, a → (a &lt; b)</summary>
     Less = 0x23,
 
     /// <summary>大于等于: b, a → (a >= b)</summary>
     GreaterEqual = 0x24,
 
-    /// <summary>小于等于: b, a → (a <= b)</summary>
+    /// <summary>小于等于: b, a → (a &lt;= b)</summary>
     LessEqual = 0x25,
 
     // ===== 逻辑运算 (0x30-0x3F) =====
@@ -179,6 +179,15 @@ public enum OpCode : byte
 
     /// <summary>切片操作 (collection[start:end:step])</summary>
     Slice = 0x69,
+
+    /// <summary>创建分组字典 (用于 GroupBy 操作)</summary>
+    NewGroupDict = 0x6A,
+
+    /// <summary>添加元素到分组 (操作数: groupDict, key, element)</summary>
+    AddToGroup = 0x6B,
+
+    /// <summary>将分组字典转换为分组列表</summary>
+    GroupDictToList = 0x6C,
 
     // ===== 类型操作 (0x70-0x7F) =====
     /// <summary>类型转换 (操作数: targetTypeIndex)</summary>

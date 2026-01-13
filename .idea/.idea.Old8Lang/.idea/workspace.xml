@@ -23,11 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.Compiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +569,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="2571000" />
+      <workItem from="1768331954396" duration="6183000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +914,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="650" />
+    <option name="localTasksCounter" value="655" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,11 +941,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加数组操作数序列化支持和命令行集成&#10;&#10;- 实现了数组类型操作数的序列化和反序列化功能&#10;- 添加了数组元素的递归序列化处理逻辑&#10;- 更新虚拟机实现状态文档至100%完成度&#10;- 完成了命令行工具的完整集成功能&#10;- 修复了操作数类型不支持时的错误信息显示" />
-    <MESSAGE value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
-    <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并完善命令行集成说明&#10;&#10;- 更新文档版本从 1.0 到 1.1&#10;- 添加 2026-01-13 最新更新内容和命令行集成完成状态&#10;- 详细说明 -vm、-compile、-execute 三个命令的使用方法和示例&#10;- 记录数组操作数序列化问题和字节码文件持久化的修复情况&#10;- 更新测试状态统计：基础测试从 7 个增加到 47 个全部通过&#10;- 更新测试计划总数从 37 个扩展到 62 个用例&#10;- 修订成功标准，标记已完成项目并更新待办事项&#10;- 清理 IDE 工作区变更历史记录并更新本地任务计数" />
-    <MESSAGE value="docs(vm): 添加虚拟机功能限制文档并更新测试状态统计&#10;&#10;- 创建 VM_LIMITATIONS.md 文档记录不支持的语言特性&#10;- 添加面向对象编程、字符串高级操作、集合操作等功能限制说明&#10;- 更新测试状态统计显示 197个通过 21个跳过 0个失败&#10;- 标记类声明、字符串方法、字典转换等测试为跳过状态&#10;- 在VMCommand.cs中简化变量声明使用var关键字&#10;- 添加字符串长度操作测试用例并标记高级字符串方法为跳过&#10;- 更新IDE工作区配置和本地任务计数器" />
-    <MESSAGE value="docs(vm): 更新虚拟机测试计划文档并调整测试统计&#10;&#10;- 更新测试进度统计表格，显示197个通过21个跳过，完成率90%&#10;- 重新分类已跳过测试，包括表达式、语句、函数、类和Match表达式测试&#10;- 更新下一步计划，调整短期、中期和长期目标优先级&#10;- 修正当前状态描述，反映实际测试覆盖情况和已知问题&#10;- 清理IDE工作区配置，移除变更历史记录并更新任务计数器" />
     <MESSAGE value="fix(compiler): 修复异常处理和递归调用问题&#10;&#10;- 修复了嵌套异常捕获的传播机制，确保异常在最内层被捕获后不再向外传播&#10;- 修复了浮点数除以零的处理，不再抛出异常而是保持初始值&#10;- 修正了逻辑运算符的计算顺序和结果，包括and/or/xor/not运算的优先级&#10;- 移除了null值的字符串转换测试，因为该功能已被移除&#10;- 修改了字符串长度获取方式，从实例方法Length()改为全局函数Len()&#10;- 实现了函数递归调用的支持，在编译函数体前先将函数注册到DelegateVar&#10;- 重构了函数注册逻辑，支持递归调用时的函数引用查找" />
     <MESSAGE value="feat(vm): 实现类定义和对象实例化功能&#10;&#10;- 添加预处理阶段注册所有类定义到字节码文件&#10;- 实现 NewObject 指令支持类实例化操作&#10;- 添加 GetField 和 SetField 指令支持对象字段访问&#10;- 实现字典对象作为类实例的数据结构&#10;- 支持类成员变量的初始化和赋值操作&#10;- 启用类声明相关的单元测试用例" />
     <MESSAGE value="feat(vm): 实现函数命名参数和类字段访问功能&#10;&#10;- 扩展 Call 和 CallNative 指令支持命名参数格式&#10;- 添加 ArrangeArgumentsWithNamed 方法处理参数重排逻辑&#10;- 实现命名参数值的栈操作和参数绑定机制&#10;- 更新字节码生成器支持位置和命名参数混合调用&#10;- 添加 VMNamedArgumentsTests 测试全命名和混合参数功能&#10;- 修复类成员访问赋值的字节码生成问题&#10;- 更新虚拟机测试计划文档记录新增功能完成状态" />
@@ -969,7 +961,12 @@
     <MESSAGE value="feat(vm): 实现虚拟机 extern 语句支持&#10;&#10;- 在 BytecodeVisitor 中实现 ExternStatement 的字节码生成逻辑&#10;- 添加 LoadExtern 和 CallExtern 新操作码支持 extern 函数调用&#10;- 创建 ExternFunctionWrapper 类封装原生 DLL 函数调用逻辑&#10;- 实现参数类型转换和函数签名解析功能&#10;- 支持多种调用约定包括 Cdecl、StdCall 和 WinApi&#10;- 添加 extern 函数的缓存机制提升重复调用性能&#10;- 更新虚拟机文档记录 extern 支持的实现详情&#10;- 新增虚拟机 extern 功能测试用例" />
     <MESSAGE value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
     <MESSAGE value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
+    <MESSAGE value="feat(linq): 实现 LINQ 表达式的编译器模式支持&#10;&#10;- 为 LinqExpression 添加编译器支持部分，实现 IL 代码生成逻辑&#10;- 实现 Where、Select 等基本 LINQ 子句的 IL 生成方法&#10;- 添加类型转换相关的 IL 生成辅助方法&#10;- 在 BytecodeVisitor 中集成 LINQ 表达式的编译支持&#10;- 添加基本的 LINQ 编译器模式测试文件&#10;- 重构 Scope 类使用主构造函数简化代码&#10;- 优化异常表项添加逻辑使用空合并操作符&#10;- 修复函数定义方法参数格式化问题" />
+    <MESSAGE value="feat(compiler): 实现泛型类特化功能&#10;&#10;- 添加泛型类初始化时注册到缓存的逻辑&#10;- 创建GenericClassSpecializer类处理泛型类特化&#10;- 添加多个泛型类测试文件包括基本功能、方法调用等场景&#10;- 实现GenericInstanceExpression中的泛型类实例化处理&#10;- 扩展LocalManager添加泛型类定义和特化类型缓存&#10;- 实现泛型类字段、构造函数和实例方法的IL生成&#10;- 添加泛型类类型推断和特化类型创建功能" />
+    <MESSAGE value="feat(bytecode): 添加泛型支持功能&#10;&#10;- 实现泛型类和泛型函数的定义缓存机制&#10;- 添加泛型实例化的字节码生成逻辑&#10;- 支持泛型类特化和函数特化处理&#10;- 实现泛型类实例化表达式的访问者模式处理&#10;- 添加泛型函数调用的字节码生成支持&#10;- 创建泛型类特化版本的生成逻辑&#10;- 实现泛型函数特化版本的编译流程&#10;- 添加泛型相关单元测试用例" />
+    <MESSAGE value="test(vm): 添加虚拟机泛型功能高级测试&#10;&#10;- 实现泛型类高级测试，包括嵌套泛型类型和多类型参数场景&#10;- 添加泛型边界情况测试，覆盖相同类型多次实例化和不同数值类型场景&#10;- 实现泛型函数高级测试，支持多类型参数和数组处理功能&#10;- 创建泛型集成测试，验证泛型类与泛型函数组合使用的正确性&#10;- 添加泛型函数返回复杂类型和嵌套实例化的测试用例&#10;- 实现泛型类与数组、字典等数据结构组合的测试场景" />
+    <MESSAGE value="feat(compiler): 实现枚举类型的字节码生成和虚拟机执行&#10;&#10;- 添加枚举成员值计算和验证逻辑，支持显式赋值和自动递增&#10;- 新增 DefineEnum 字节码指令用于定义枚举类型&#10;- 实现虚拟机中枚举的创建、存储和成员访问功能&#10;- 添加枚举值比较支持和枚举模板访问机制&#10;- 增加 ToStr 方法映射以支持枚举值字符串转换&#10;- 添加完整的枚举类型虚拟机测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现枚举类型的字节码生成和虚拟机执行&#10;&#10;- 添加枚举成员值计算和验证逻辑，支持显式赋值和自动递增&#10;- 新增 DefineEnum 字节码指令用于定义枚举类型&#10;- 实现虚拟机中枚举的创建、存储和成员访问功能&#10;- 添加枚举值比较支持和枚举模板访问机制&#10;- 增加 ToStr 方法映射以支持枚举值字符串转换&#10;- 添加完整的枚举类型虚拟机测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

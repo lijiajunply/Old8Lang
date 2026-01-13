@@ -1301,8 +1301,67 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitUsingStatement(UsingStatement node)
     {
-        // Using 语句在字节码模式下暂不支持
-        // TODO: 实现 using 的字节码生成
+        // Using 语句：自动资源管理
+        // 实现策略：使用 try-finally 结构，在 finally 块中调用 Dispose
+
+        // 1. 执行资源表达式，获取资源ID
+        node.ResourceExpression.Accept(this);
+
+        // 2. 将资源存储到局部变量
+        int resourceLocalIndex = -1;
+        if (node.VariableName != null)
+        {
+            // 如果有变量名，使用用户指定的变量名
+            resourceLocalIndex = _compiler.AllocateLocal(node.VariableName);
+        }
+        else
+        {
+            // 如果没有变量名，使用临时变量
+            resourceLocalIndex = _compiler.AllocateLocal("<using_resource>");
+        }
+
+        // 存储资源到局部变量
+        Emit(OpCode.StoreLocal, resourceLocalIndex);
+
+        // 3. 记录 try 块的起始位置
+        int tryStart = _instructions.Count;
+
+        // 4. 执行 using 块
+        node.BlockStatement.Accept(this);
+
+        // 5. 记录 try 块的结束位置
+        int tryEnd = _instructions.Count;
+
+        // 6. 生成 finally 块
+        int finallyStart = _instructions.Count;
+
+        // 加载资源ID
+        Emit(OpCode.LoadLocal, resourceLocalIndex);
+
+        // 调用 ResourceManager.TryDispose(resourceId)
+        // CallNative 指令格式: [argCount, funcName]
+        Emit(OpCode.CallNative, new object[] { 1, "ResourceManagerTryDispose" });
+
+        // 7. 记录 finally 块的结束位置
+        int finallyEnd = _instructions.Count;
+
+        // 8. 创建异常表条目
+        var exceptionEntry = new ExceptionTableEntry
+        {
+            TryStart = tryStart,
+            TryEnd = tryEnd,
+            CatchStart = -1,  // 没有 catch 块
+            CatchEnd = -1,
+            FinallyStart = finallyStart,
+            FinallyEnd = finallyEnd,
+            ExceptionType = null,
+            ExceptionVariable = null,
+            ExceptionVariableIndex = -1
+        };
+
+        // 9. 将异常表条目添加到当前函数的异常表
+        _compiler.AddExceptionTableEntry(exceptionEntry);
+
         return null;
     }
 }

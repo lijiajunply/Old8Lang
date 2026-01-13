@@ -1249,6 +1249,68 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.NewGroupDict:
+            {
+                // 创建一个分组字典 Dictionary<object, List<object>>
+                var groupDict = new Dictionary<object, List<object?>>(new ObjectEqualityComparer());
+                _stack.Push(groupDict);
+            }
+                break;
+
+            case OpCode.AddToGroup:
+            {
+                // 栈顶: groupDict, key, element
+                var element = _stack.Pop();
+                var key = _stack.Pop();
+                var groupDict = _stack.Pop() as Dictionary<object, List<object?>>;
+
+                if (groupDict == null)
+                {
+                    throw new Exception("AddToGroup 操作需要一个分组字典");
+                }
+
+                // 如果键不存在,创建新的列表
+                if (!groupDict.ContainsKey(key!))
+                {
+                    groupDict[key!] = new List<object?>();
+                }
+
+                // 将元素添加到对应键的列表中
+                groupDict[key!].Add(element);
+
+                // 将字典重新压栈 (因为可能还需要继续使用)
+                _stack.Push(groupDict);
+            }
+                break;
+
+            case OpCode.GroupDictToList:
+            {
+                // 将分组字典转换为分组列表
+                // 每个分组是一个包含 Key 和 Values 的对象
+                var groupDict = _stack.Pop() as Dictionary<object, List<object?>>;
+
+                if (groupDict == null)
+                {
+                    throw new Exception("GroupDictToList 操作需要一个分组字典");
+                }
+
+                var resultList = new List<object?>();
+
+                foreach (var kvp in groupDict)
+                {
+                    // 创建一个分组对象,包含 Key 和 Values
+                    var group = new Dictionary<string, object?>
+                    {
+                        ["Key"] = kvp.Key,
+                        ["Values"] = kvp.Value
+                    };
+                    resultList.Add(group);
+                }
+
+                _stack.Push(resultList);
+            }
+                break;
+
             // === 类型操作 ===
             case OpCode.Cast:
             {
@@ -2658,6 +2720,16 @@ public class VirtualMachine
 
                 return 0;
 
+            // === ResourceManager 通用函数 ===
+            case "ResourceManagerTryDispose":
+                if (args.Length > 0)
+                {
+                    int resourceId = Convert.ToInt32(args[0]);
+                    Concurrency.ResourceManager.TryDispose(resourceId);
+                }
+
+                return null;
+
             default:
                 throw new Exception($"未知的原生函数: {funcName}");
         }
@@ -2912,6 +2984,26 @@ public class VirtualMachine
         }
 
         return result;
+    }
+}
+
+/// <summary>
+/// 对象相等性比较器 - 用于 GroupBy 操作的键比较
+/// </summary>
+internal class ObjectEqualityComparer : IEqualityComparer<object>
+{
+    public new bool Equals(object? x, object? y)
+    {
+        if (ReferenceEquals(x, y)) return true;
+        if (x == null || y == null) return false;
+
+        // 使用对象的 Equals 方法进行比较
+        return x.Equals(y);
+    }
+
+    public int GetHashCode(object obj)
+    {
+        return obj?.GetHashCode() ?? 0;
     }
 }
 
