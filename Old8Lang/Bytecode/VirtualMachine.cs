@@ -1259,7 +1259,7 @@ public class VirtualMachine
 
             case OpCode.AddToGroup:
             {
-                // 栈顶: groupDict, key, element
+                // 栈顶: element, key, groupDict
                 var element = _stack.Pop();
                 var key = _stack.Pop();
                 var groupDict = _stack.Pop() as Dictionary<object, List<object?>>;
@@ -1278,8 +1278,7 @@ public class VirtualMachine
                 // 将元素添加到对应键的列表中
                 groupDict[key!].Add(element);
 
-                // 将字典重新压栈 (因为可能还需要继续使用)
-                _stack.Push(groupDict);
+                // 注意: 不需要将字典重新压栈,因为字典是引用类型,修改会直接反映到原对象
             }
                 break;
 
@@ -2520,8 +2519,11 @@ public class VirtualMachine
         // 处理字典
         if (value is IDictionary dict)
         {
-            var items = (from DictionaryEntry entry in dict select $"{ToString(entry.Key)}: {ToString(entry.Value)}")
-                .ToList();
+            var items = new List<string>();
+            foreach (var key in dict.Keys)
+            {
+                items.Add($"{ToString(key)}: {ToString(dict[key])}");
+            }
             return "{" + string.Join(", ", items) + "}";
         }
 

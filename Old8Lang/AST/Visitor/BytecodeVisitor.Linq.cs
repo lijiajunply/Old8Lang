@@ -84,8 +84,31 @@ public partial class BytecodeVisitor
         }
         else if (terminationClause is GroupByClause groupByClause)
         {
-            // TODO: 实现 GroupBy 的字节码生成
-            throw new NotSupportedException("GroupBy 子句的字节码生成暂未实现");
+            // GroupBy 的实现策略:
+            // 1. 创建一个分组字典 (Dictionary<key, List<element>>)
+            // 2. 对于每个元素:
+            //    - 计算分组键 (KeyExpression)
+            //    - 计算分组元素 (ElementExpression)
+            //    - 将元素添加到对应键的分组中
+            // 3. 将分组字典转换为分组列表
+
+            // 注意: 这个方法在循环内部被调用,每次处理一个元素
+
+            // 加载分组字典
+            Emit(OpCode.LoadLocal, resultListLocal);
+            // 栈: [groupDict]
+
+            // 计算分组键表达式
+            groupByClause.KeyExpression.Accept(this);
+            // 栈: [groupDict, key]
+
+            // 计算分组元素表达式
+            groupByClause.ElementExpression.Accept(this);
+            // 栈: [groupDict, key, element]
+
+            // 添加元素到分组 (会从栈中弹出 element, key, groupDict)
+            Emit(OpCode.AddToGroup);
+            // 栈: []
         }
     }
 

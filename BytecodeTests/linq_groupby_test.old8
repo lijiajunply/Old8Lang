@@ -1,0 +1,31 @@
+// LINQ GroupBy 测试 - 虚拟机模式
+
+// 测试1: 基本的 GroupBy 操作
+PrintLine("=== 测试1: 基本 GroupBy ===")
+numbers <- {1, 2, 3, 4, 5, 6}
+result <- from n in numbers
+          group n by n % 2
+
+PrintLine("分组结果:")
+PrintLine(result)
+
+// 测试2: GroupBy 配合 where 子句
+PrintLine("\n=== 测试2: GroupBy + Where ===")
+data <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+result2 <- from x in data
+           where x > 3
+           group x by x % 3
+
+PrintLine("分组结果 (x > 3):")
+PrintLine(result2)
+
+// 测试3: 简单验证分组结构
+PrintLine("\n=== 测试3: 验证分组结构 ===")
+simple <- {1, 2, 3}
+result3 <- from n in simple
+           group n by n % 2
+
+PrintLine("简单分组结果:")
+PrintLine(result3)
+
+PrintLine("\n所有测试完成!")

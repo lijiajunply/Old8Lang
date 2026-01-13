@@ -656,8 +656,20 @@ public partial class BytecodeVisitor
         int iteratorLocal = _compiler.AllocateLocal();
         Emit(OpCode.StoreLocal, iteratorLocal);
 
-        // 创建结果列表
-        Emit(OpCode.NewList, 0);
+        // 检查终止子句类型,决定创建列表还是分组字典
+        bool isGroupBy = node.TerminationClause is GroupByClause;
+
+        if (isGroupBy)
+        {
+            // 创建分组字典 (用于 GroupBy)
+            Emit(OpCode.NewGroupDict);
+        }
+        else
+        {
+            // 创建结果列表 (用于 Select)
+            Emit(OpCode.NewList, 0);
+        }
+
         int resultListLocal = _compiler.AllocateLocal();
         Emit(OpCode.StoreLocal, resultListLocal);
 
@@ -720,7 +732,15 @@ public partial class BytecodeVisitor
             ProcessLinqOrderBy(orderByClause, resultListLocal);
         }
 
-        // 步骤6: 加载结果列表到栈
+        // 步骤6: 如果是 GroupBy,将分组字典转换为分组列表
+        if (isGroupBy)
+        {
+            Emit(OpCode.LoadLocal, resultListLocal);
+            Emit(OpCode.GroupDictToList);
+            Emit(OpCode.StoreLocal, resultListLocal);
+        }
+
+        // 步骤7: 加载结果列表到栈
         Emit(OpCode.LoadLocal, resultListLocal);
 
         // 释放局部变量
