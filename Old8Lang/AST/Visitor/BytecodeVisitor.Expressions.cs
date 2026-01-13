@@ -35,15 +35,18 @@ public partial class BytecodeVisitor
         // 特殊处理 Dot 运算符（成员访问和方法调用）
         if (node.Opera == LangTokenType.Dot)
         {
-            // 生成左操作数代码（对象）
+            // 检查是否是 super 表达式
+            bool isSuperAccess = node.Left is SuperExpression;
+
+            // 生成左操作数代码（对象或super）
             if (node.Left != null)
                 node.Left.Accept(this);
 
             // 检查右操作数是否是方法调用（Instance）
             if (node.Right is Instance instance)
             {
-                // 这是方法调用：object.method(args)
-                // 左操作数（对象）已经在栈上
+                // 这是方法调用：object.method(args) 或 super.method(args)
+                // 左操作数（对象或super）已经在栈上
 
                 // 生成所有参数的代码
                 foreach (var arg in instance.Ids)
@@ -54,17 +57,34 @@ public partial class BytecodeVisitor
                 string methodName = instance.Id.IdName;
                 int argCount = instance.Ids.Count + 1; // +1 因为对象本身是第一个参数
 
-                // 检查是否是原生函数（如ToStr）
-                // 用户定义的方法
-                Emit(_compiler.IsNativeFunction(methodName) ? OpCode.CallNative : OpCode.Call,
-                    new object[] { argCount, methodName });
+                if (isSuperAccess)
+                {
+                    // super.method(args) - 调用父类方法
+                    Emit(OpCode.CallSuperMethod, new object[] { argCount, methodName });
+                }
+                else
+                {
+                    // 检查是否是原生函数（如ToStr）
+                    Emit(_compiler.IsNativeFunction(methodName) ? OpCode.CallNative : OpCode.Call,
+                        new object[] { argCount, methodName });
+                }
             }
             else if (node.Right is LangId memberId)
             {
-                // 这是字段访问：object.field
-                // 左操作数（对象）已经在栈上
+                // 这是字段访问：object.field 或 super.field
+                // 左操作数（对象或super）已经在栈上
                 string fieldName = memberId.IdName;
-                Emit(OpCode.GetField, fieldName);
+
+                if (isSuperAccess)
+                {
+                    // super.field - 访问父类字段
+                    Emit(OpCode.GetSuperField, fieldName);
+                }
+                else
+                {
+                    // object.field - 访问普通字段
+                    Emit(OpCode.GetField, fieldName);
+                }
             }
             else
             {
@@ -264,13 +284,6 @@ public partial class BytecodeVisitor
         return null;
     }
 
-    public Instruction? VisitSuperExpression(SuperExpression node)
-    {
-        // Super 表达式（调用父类方法）
-        // TODO: 完整的继承支持需要类层次结构
-        // 简化实现：暂时不支持
-        return null;
-    }
     public Instruction? VisitTernaryExpression(TernaryExpression node)
     {
         // 三元运算符: condition ? trueExpr : falseExpr

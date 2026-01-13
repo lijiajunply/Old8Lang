@@ -1,0 +1,23 @@
+// 简单的 Super 表达式测试
+
+class Animal {
+    func speak() -> string {
+        return "Animal sound"
+    }
+}
+
+class Dog extends Animal {
+    func speak() -> string {
+        return "Woof"
+    }
+
+    func callParentSpeak() -> string {
+        return super.speak()
+    }
+}
+
+dog <- Dog()
+result <- dog.callParentSpeak()
+PrintLine("Result: " + result)
+
+// 预期输出: Result: Animal sound

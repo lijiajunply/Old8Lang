@@ -137,6 +137,18 @@ public enum OpCode : byte
     /// <summary>调用方法 (操作数: argCount, methodNameIndex)</summary>
     CallMethod = 0x55,
 
+    /// <summary>加载super引用 (将当前实例作为super上下文压栈)</summary>
+    LoadSuper = 0x56,
+
+    /// <summary>调用父类方法 (操作数: argCount, methodNameIndex)</summary>
+    CallSuperMethod = 0x57,
+
+    /// <summary>获取父类字段 (操作数: fieldNameIndex)</summary>
+    GetSuperField = 0x58,
+
+    /// <summary>设置父类字段 (操作数: fieldNameIndex)</summary>
+    SetSuperField = 0x59,
+
     // ===== 容器操作 (0x60-0x6F) =====
     /// <summary>创建数组 (操作数: elementCount)</summary>
     NewArray = 0x60,

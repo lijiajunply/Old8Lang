@@ -41,6 +41,24 @@ public partial class SuperExpression(SourcePosition position = default) : LangEx
     {
         return "super";
     }
+
+    /// <summary>
+    /// 返回 super 表达式的类型（返回 object 类型）
+    /// </summary>
+    public override Type? OutputType(Compiler.LocalManager local)
+    {
+        // super 表达式返回父类实例，类型为 object
+        return typeof(object);
+    }
+
+    /// <summary>
+    /// 生成 IL 代码加载 super 引用
+    /// </summary>
+    public override void LoadIlValue(System.Reflection.Emit.ILGenerator ilGenerator, Compiler.LocalManager local)
+    {
+        // 加载 this 指针（ldarg.0）
+        ilGenerator.Emit(System.Reflection.Emit.OpCodes.Ldarg_0);
+    }
 }
 
 /// <summary>

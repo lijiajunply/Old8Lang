@@ -396,7 +396,20 @@ public partial class BytecodeVisitor
 
         return null;
     }
-    public Instruction? VisitSuperProxy(SuperProxy node) => null;
+    public Instruction? VisitSuperExpression(SuperExpression node)
+    {
+        // 加载 super 引用（实际上是加载当前实例 this）
+        // LoadSuper 指令会将当前实例压栈，并标记为 super 上下文
+        Emit(OpCode.LoadSuper);
+        return null;
+    }
+
+    public Instruction? VisitSuperProxy(SuperProxy node)
+    {
+        // SuperProxy 在字节码模式中不应该直接访问
+        // 它应该通过 super.method() 或 super.field 的形式使用
+        throw new NotSupportedException("SuperProxy 不应该在字节码模式中直接访问");
+    }
     public Instruction? VisitTaskClassLangValue(TaskClassLangValue node) => null;
     public Instruction? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node) => null;
     public Instruction? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node) => null;

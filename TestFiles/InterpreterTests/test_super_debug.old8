@@ -1,0 +1,20 @@
+// 调试 Super 表达式
+
+class Animal {
+    func speak() -> string {
+        PrintLine("Animal.speak() called")
+        return "Animal sound"
+    }
+}
+
+class Dog extends Animal {
+    func testSuper() {
+        PrintLine("Before super.speak()")
+        result <- super.speak()
+        PrintLine("After super.speak(), result type: " + result.GetType().ToStr())
+        PrintLine("Result value: " + result.ToStr())
+    }
+}
+
+dog <- Dog()
+dog.testSuper()

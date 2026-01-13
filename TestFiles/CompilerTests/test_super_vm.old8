@@ -1,0 +1,17 @@
+// 虚拟机模式 Super 表达式测试
+
+class Animal {
+    func speak() -> string {
+        return "Animal sound"
+    }
+}
+
+class Dog extends Animal {
+    func speak() -> string {
+        return "Woof"
+    }
+}
+
+dog <- Dog()
+result <- dog.speak()
+PrintLine(result)

@@ -1306,6 +1306,116 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.GetSuperField:
+            {
+                // 栈顶: this 实例
+                // 操作数: fieldName (string)
+                var thisInstance = _stack.Pop();
+                string fieldName = (string)instruction.Operand!;
+
+                if (thisInstance == null)
+                {
+                    throw new Exception($"无法访问 null 对象的父类字段 {fieldName}");
+                }
+
+                // 如果是字典对象（我们创建的类实例）
+                if (thisInstance is Dictionary<string, object?> dictObj)
+                {
+                    if (dictObj.TryGetValue(fieldName, out var value))
+                    {
+                        _stack.Push(value);
+                    }
+                    else
+                    {
+                        throw new Exception($"对象的父类没有字段 {fieldName}");
+                    }
+                }
+                else
+                {
+                    // 使用反射获取父类字段或属性
+                    var objType = thisInstance.GetType();
+                    var baseType = objType.BaseType;
+
+                    if (baseType == null || baseType == typeof(object))
+                    {
+                        throw new Exception($"类型 {objType.Name} 没有父类");
+                    }
+
+                    // 先尝试获取属性
+                    var property = baseType.GetProperty(fieldName);
+                    if (property != null)
+                    {
+                        _stack.Push(property.GetValue(thisInstance));
+                    }
+                    else
+                    {
+                        // 再尝试获取字段
+                        var field = baseType.GetField(fieldName);
+                        if (field != null)
+                        {
+                            _stack.Push(field.GetValue(thisInstance));
+                        }
+                        else
+                        {
+                            throw new Exception($"父类 {baseType.Name} 没有字段或属性 {fieldName}");
+                        }
+                    }
+                }
+            }
+                break;
+
+            case OpCode.SetSuperField:
+            {
+                // 栈布局(从栈顶到栈底): value, this 实例
+                // 操作数: fieldName (string)
+                var value = _stack.Pop();
+                var thisInstance = _stack.Pop();
+                string fieldName = (string)instruction.Operand!;
+
+                if (thisInstance == null)
+                {
+                    throw new Exception($"无法设置 null 对象的父类字段 {fieldName}");
+                }
+
+                // 如果是字典对象（我们创建的类实例）
+                if (thisInstance is Dictionary<string, object?> dictObj)
+                {
+                    dictObj[fieldName] = value;
+                }
+                else
+                {
+                    // 使用反射设置父类字段或属性
+                    var objType = thisInstance.GetType();
+                    var baseType = objType.BaseType;
+
+                    if (baseType == null || baseType == typeof(object))
+                    {
+                        throw new Exception($"类型 {objType.Name} 没有父类");
+                    }
+
+                    // 先尝试设置属性
+                    var property = baseType.GetProperty(fieldName);
+                    if (property != null && property.CanWrite)
+                    {
+                        property.SetValue(thisInstance, value);
+                    }
+                    else
+                    {
+                        // 再尝试设置字段
+                        var field = baseType.GetField(fieldName);
+                        if (field != null)
+                        {
+                            field.SetValue(thisInstance, value);
+                        }
+                        else
+                        {
+                            throw new Exception($"父类 {baseType.Name} 没有可写的字段或属性 {fieldName}");
+                        }
+                    }
+                }
+            }
+                break;
+
             case OpCode.NewObject:
             {
                 // 操作数: className (string)
@@ -1363,6 +1473,63 @@ public class VirtualMachine
                 }
 
                 var result = method.Invoke(obj, args);
+
+                // 如果方法有返回值，压入栈
+                if (method.ReturnType != typeof(void))
+                {
+                    _stack.Push(result);
+                }
+            }
+                break;
+
+            case OpCode.LoadSuper:
+            {
+                // 加载当前实例（this）作为 super 上下文
+                // 在方法调用帧中查找 this 参数（通常是第一个局部变量）
+                var currentFrame = _callStack.Peek();
+                var thisInstance = currentFrame.Locals[0]; // this 通常是第一个局部变量
+
+                if (thisInstance == null)
+                {
+                    throw new Exception("super 只能在实例方法中使用");
+                }
+
+                _stack.Push(thisInstance);
+            }
+                break;
+
+            case OpCode.CallSuperMethod:
+            {
+                // 操作数: argCount (int), methodName (string)
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string methodName = (string)operands[1];
+
+                // 从栈中弹出参数（逆序）
+                var args = new object?[argCount - 1]; // -1 因为第一个参数是 this
+                for (int i = args.Length - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 弹出 this 实例
+                var thisInstance = _stack.Pop();
+                if (thisInstance == null)
+                {
+                    throw new Exception($"无法在 null 对象上调用父类方法 {methodName}");
+                }
+
+                // TODO: 实现父类方法查找和调用
+                // 当前简化实现：直接在对象类型上查找方法
+                var objType = thisInstance.GetType();
+                var method = objType.GetMethod(methodName);
+
+                if (method == null)
+                {
+                    throw new Exception($"类型 {objType.Name} 的父类没有方法 {methodName}");
+                }
+
+                var result = method.Invoke(thisInstance, args);
 
                 // 如果方法有返回值，压入栈
                 if (method.ReturnType != typeof(void))

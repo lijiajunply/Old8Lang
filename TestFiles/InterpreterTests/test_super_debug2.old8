@@ -1,0 +1,24 @@
+// 简单测试 Super 表达式
+
+class Animal {
+    func speak() -> string {
+        PrintLine("Animal.speak() called")
+        return "Animal sound"
+    }
+}
+
+class Dog extends Animal {
+    func testSuper() {
+        PrintLine("Before super.speak()")
+        result <- super.speak()
+        PrintLine("After super.speak()")
+        if result == null {
+            PrintLine("Result is null")
+        } else {
+            PrintLine("Result: " + result)
+        }
+    }
+}
+
+dog <- Dog()
+dog.testSuper()

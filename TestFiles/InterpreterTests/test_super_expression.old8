@@ -1,0 +1,53 @@
+// 测试 Super 表达式功能
+
+// 基础父类
+class Animal {
+    public name <- ""
+
+    func init(n:string) {
+        this.name <- n
+    }
+
+    func speak() -> string {
+        return "Some sound"
+    }
+
+    func getName() -> string {
+        return this.name
+    }
+}
+
+// 子类使用 super 调用父类方法
+class Dog extends Animal {
+    public breed <- ""
+
+    func init(n:string, b:string) {
+        // 调用父类构造函数
+        super.init(n)
+        this.breed <- b
+    }
+
+    func speak() -> string {
+        // 调用父类方法并扩展
+        parentSound <- super.speak()
+        return parentSound + " - Woof!"
+    }
+
+    func getFullInfo() -> string {
+        // 使用 super 访问父类方法
+        parentName <- super.getName()
+        return parentName + " (" + this.breed + ")"
+    }
+}
+
+// 测试实例化和方法调用
+dog <- Dog("Buddy", "Golden Retriever")
+sound <- dog.speak()
+info <- dog.getFullInfo()
+
+PrintLine("Sound: " + sound)
+PrintLine("Info: " + info)
+
+// 预期输出:
+// Sound: Some sound - Woof!
+// Info: Buddy (Golden Retriever)

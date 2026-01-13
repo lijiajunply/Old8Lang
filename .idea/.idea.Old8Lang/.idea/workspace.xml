@@ -23,11 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMSuperExpressionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/test_super_expression.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/test_super_simple.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
@@ -115,7 +116,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="AISelfReview" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -571,6 +572,7 @@
       <workItem from="1768162238074" duration="3699000" />
       <workItem from="1768245774894" duration="4766000" />
       <workItem from="1768250624546" duration="4840000" />
+      <workItem from="1768255477344" duration="1369000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -915,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="637" />
+    <option name="localTasksCounter" value="639" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,8 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加并发原语和异步支持功能&#10;&#10;- 实现了互斥锁相关操作(MutexCreate、MutexLock、MutexUnlock、MutexDispose)&#10;- 实现了通道通信机制(ChannelCreate、ChannelSend、ChannelReceive、ChannelClose)&#10;- 实现了信号量控制(SemaphoreCreate、SemaphoreAcquire、SemaphoreRelease)&#10;- 添加了异步任务支持(NewTask、Await、Yield操作)&#10;- 为并发原语提供了相应的原生函数接口&#10;- 添加了并发原语的单元测试覆盖&#10;- 添加了异步功能的基本测试用例" />
-    <MESSAGE value="feat(vm): 添加虚拟机异常处理支持&#10;&#10;- 实现了 try-catch-finally 字节码指令处理逻辑&#10;- 添加了异常处理器栈用于跟踪异常处理块状态&#10;- 新增 ExceptionHandler 类管理异常处理流程&#10;- 添加了 TryBegin、TryEnd、CatchBegin、CatchEnd、FinallyBegin、FinallyEnd 操作码支持&#10;- 创建了虚拟机异常处理单元测试确保功能正确性" />
     <MESSAGE value="feat(lang): 添加索引访问和切片功能支持&#10;&#10;- 实现了列表项访问的VisitLangListItem方法，支持索引访问操作&#10;- 添加了嵌套索引访问VisitNestedIndexAccess的支持&#10;- 实现了嵌套切片访问VisitNestedSliceAccess的功能&#10;- 添加了切片操作的VisitSliceLangValue实现&#10;- 在虚拟机中新增Slice操作码的处理逻辑&#10;- 实现了数组、列表和字符串的切片操作支持&#10;- 优化了调用帧和指令的构造函数语法&#10;- 更新了常量池和字节码文件的初始化方式&#10;- 改进了本地变量查找的TryGetValue方法使用" />
     <MESSAGE value="feat(vm): 添加字段访问和索引赋值功能支持&#10;&#10;- 实现了 GetField 操作码支持对象字段访问&#10;- 添加了数组/列表索引赋值功能支持&#10;- 扩展了 SetStatement 处理逻辑支持成员访问赋值&#10;- 增强了虚拟机 ToString 方法支持数组列表字典格式化&#10;- 修正了算术运算符测试用例和集成测试断言&#10;- 更新了 IDE 工作区配置和变更列表管理" />
     <MESSAGE value="feat(bytecode): 扩展字节码文件格式支持类定义和调试信息&#10;&#10;- 在BytecodeFile中添加Classes属性存储类元数据列表&#10;- 在BytecodeFile中添加DebugInfo属性支持调试信息可选项&#10;- 实现ClassMetadata类包含字段、方法、继承关系等完整类定义信息&#10;- 实现AccessModifier枚举和FieldMetadata、MethodMetadata类&#10;- 添加DebugInfo、SourceLocation、LocalVariableInfo等调试信息相关类&#10;- 更新BytecodeFile的序列化和反序列化逻辑以支持新结构&#10;- 实现Disassembler类提供字节码反汇编功能&#10;- 添加完整的单元测试验证类定义和调试信息的保存加载功能" />
@@ -967,7 +967,9 @@
     <MESSAGE value="feat(bytecode): 实现完整的异常处理机制&#10;&#10;- 添加 ExceptionTableEntry 类用于描述异常处理区域&#10;- 扩展 BytecodeCompiler 添加分配局部变量和异常表条目功能&#10;- 在 FunctionMetadata 中添加异常表存储和序列化支持&#10;- 实现 BytecodeVisitor 中 TryStatement 的完整异常处理字节码生成&#10;- 在 VirtualMachine 中添加异常捕获和处理器查找逻辑&#10;- 添加异常类型匹配和继承关系检查功能&#10;- 实现 catch 和 finally 块的正确跳转机制&#10;- 添加相关的单元测试验证异常处理功能" />
     <MESSAGE value="feat(vm): 实现 defer 语句支持&#10;&#10;- 在 BytecodeVisitor 中添加 defer 块列表和相关数据结构&#10;- 实现 defer 语句的字节码生成逻辑，包括跳转和位置记录&#10;- 在 CallFrame 中添加 DeferStack 用于存储延迟执行的位置&#10;- 在虚拟机中实现 Defer 和 ExecuteDefers 操作码处理&#10;- 添加 ExecuteDefers 方法按 LIFO 顺序执行 defer 块&#10;- 在函数返回和异常情况下自动执行所有 defer 块&#10;- 启用相关的单元测试验证 defer 功能正确性" />
     <MESSAGE value="feat(vm): 实现select语句的完整支持&#10;&#10;- 添加ChannelTrySend和ChannelTryReceive操作码支持非阻塞通道操作&#10;- 在虚拟机中实现通道尝试发送和接收的具体逻辑&#10;- 实现select语句的轮询机制，支持case分支的就绪检测&#10;- 添加default分支处理逻辑和循环轮询策略&#10;- 支持接收case中的变量赋值和发送case的数据传输&#10;- 添加完整的select语句单元测试覆盖各种使用场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现select语句的完整支持&#10;&#10;- 添加ChannelTrySend和ChannelTryReceive操作码支持非阻塞通道操作&#10;- 在虚拟机中实现通道尝试发送和接收的具体逻辑&#10;- 实现select语句的轮询机制，支持case分支的就绪检测&#10;- 添加default分支处理逻辑和循环轮询策略&#10;- 支持接收case中的变量赋值和发送case的数据传输&#10;- 添加完整的select语句单元测试覆盖各种使用场景" />
+    <MESSAGE value="feat(vm): 实现异步函数和await表达式支持&#10;&#10;- 添加CallAsync和Await操作码支持异步调用和等待&#10;- 实现异步函数编译和字节码生成逻辑&#10;- 在虚拟机中添加Task管理和并发执行支持&#10;- 实现await表达式的字节码指令处理&#10;- 添加异步函数参数提取和默认值处理&#10;- 增加异步功能的单元测试用例&#10;- 添加test_vm_async.old8测试文件验证异步功能" />
+    <MESSAGE value="feat(compiler): 实现完整的 match 表达式支持&#10;&#10;- 扩展 BytecodeCompiler 添加临时变量管理和常量池功能&#10;- 实现值匹配、通配符匹配、变量绑定、类型匹配和范围匹配&#10;- 添加元组解构匹配支持和守卫条件处理&#10;- 在虚拟机中添加 CheckRange、FlattenTuple 和 GetCount 辅助函数&#10;- 实现元组展平递归算法用于解构匹配&#10;- 启用并完善 match 表达式的单元测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现完整的 match 表达式支持&#10;&#10;- 扩展 BytecodeCompiler 添加临时变量管理和常量池功能&#10;- 实现值匹配、通配符匹配、变量绑定、类型匹配和范围匹配&#10;- 添加元组解构匹配支持和守卫条件处理&#10;- 在虚拟机中添加 CheckRange、FlattenTuple 和 GetCount 辅助函数&#10;- 实现元组展平递归算法用于解构匹配&#10;- 启用并完善 match 表达式的单元测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
