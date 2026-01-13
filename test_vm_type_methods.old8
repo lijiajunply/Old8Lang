@@ -1,0 +1,31 @@
+// 测试虚拟机模式下的类型方法调用
+
+// 测试列表的扩展方法
+list <- {1, 2, 3}
+PrintLine("初始列表: " + list.ToStr())
+
+// 测试 Add 方法
+list.Add(4)
+PrintLine("添加 4 后: " + list.ToStr())
+
+// 测试 Count 方法
+count <- list.Count()
+PrintLine("列表元素数量: " + count.ToStr())
+
+// 测试 Remove 方法
+list.Remove(2)
+PrintLine("移除 2 后: " + list.ToStr())
+
+// 测试字符串的扩展方法
+str <- "hello"
+PrintLine("原始字符串: " + str)
+
+// 测试字典的扩展方法
+dict <- {"name": "张三", "age": 25}
+PrintLine("初始字典: " + dict.ToStr())
+
+// 测试 ContainsKey 方法
+hasName <- dict.ContainsKey("name")
+PrintLine("包含 name 键: " + hasName.ToStr())
+
+PrintLine("所有测试完成！")

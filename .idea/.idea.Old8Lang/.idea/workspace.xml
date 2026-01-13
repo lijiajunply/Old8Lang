@@ -23,32 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_vm_global_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_vm_list_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_vm_type_methods.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/CompilerFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/CompilerFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CancellationFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CancellationFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ConcurrencyUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ConcurrencyUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CountDownLatchFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CountDownLatchFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CyclicBarrierFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/CyclicBarrierFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/DictFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/DictFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ExecFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ExecFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/JsonFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/JsonFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/LockFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/LockFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ToObjFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ToObjFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -593,7 +573,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="7869000" />
+      <workItem from="1768331954396" duration="8684000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -938,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="658" />
+    <option name="localTasksCounter" value="659" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -965,7 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加虚拟机模式下的默认参数支持&#10;&#10;- 在 FunctionMetadata 中添加 DefaultValues 属性存储参数默认值&#10;- 修改 CompileFunction 方法以接收并存储默认参数值&#10;- 实现常量表达式求值器用于计算默认参数值&#10;- 添加默认参数值的序列化和反序列化功能&#10;- 在虚拟机函数调用时自动填充缺失的参数使用默认值&#10;- 完成虚拟机端默认参数的完整实现并启用相关测试" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下的break和continue语句支持&#10;&#10;- 添加循环标签栈管理break和continue跳转位置&#10;- 实现While、For和For-in循环中的break和continue逻辑&#10;- 新增LoopLabels类存储循环跳转信息和目标位置&#10;- 在字节码生成阶段将break/continue转换为Jump指令&#10;- 添加完整的break和continue单元测试用例&#10;- 创建break_continue.old8测试文件验证各种循环场景" />
     <MESSAGE value="feat(bytecode): 实现完整的异常处理机制&#10;&#10;- 添加 ExceptionTableEntry 类用于描述异常处理区域&#10;- 扩展 BytecodeCompiler 添加分配局部变量和异常表条目功能&#10;- 在 FunctionMetadata 中添加异常表存储和序列化支持&#10;- 实现 BytecodeVisitor 中 TryStatement 的完整异常处理字节码生成&#10;- 在 VirtualMachine 中添加异常捕获和处理器查找逻辑&#10;- 添加异常类型匹配和继承关系检查功能&#10;- 实现 catch 和 finally 块的正确跳转机制&#10;- 添加相关的单元测试验证异常处理功能" />
     <MESSAGE value="feat(vm): 实现 defer 语句支持&#10;&#10;- 在 BytecodeVisitor 中添加 defer 块列表和相关数据结构&#10;- 实现 defer 语句的字节码生成逻辑，包括跳转和位置记录&#10;- 在 CallFrame 中添加 DeferStack 用于存储延迟执行的位置&#10;- 在虚拟机中实现 Defer 和 ExecuteDefers 操作码处理&#10;- 添加 ExecuteDefers 方法按 LIFO 顺序执行 defer 块&#10;- 在函数返回和异常情况下自动执行所有 defer 块&#10;- 启用相关的单元测试验证 defer 功能正确性" />
@@ -990,7 +969,8 @@
     <MESSAGE value="feat(bytecode): 实现 using 语句的字节码生成和自动资源管理&#10;&#10;- 在 BytecodeVisitor 中实现 UsingStatement 的完整字节码生成逻辑&#10;- 使用 try-finally 结构实现自动资源管理，在 finally 块中调用 Dispose&#10;- 添加 ResourceManagerTryDispose 原生函数支持资源释放操作&#10;- 生成异常表条目记录 try-finally 块的位置信息&#10;- 支持带变量名和不带变量名两种 using 语句语法&#10;- 添加 using 语句字节码测试用例验证资源自动释放功能&#10;- 修复 OpCode 注释中的 HTML 实体编码问题" />
     <MESSAGE value="feat(linq): 实现 GroupBy 子句的字节码生成和虚拟机支持&#10;&#10;- 在 BytecodeVisitor.Expressions.cs 中添加对 GroupBy 子句类型的检查逻辑&#10;- 实现分组字典的创建和管理机制 (NewGroupDict 和 GroupDictToList 操作码)&#10;- 添加 GroupBy 终止子句的具体字节码生成逻辑&#10;- 修改 AddToGroup 操作码的参数顺序以匹配正确的执行流程&#10;- 更新虚拟机中 AddToGroup 操作的栈操作顺序&#10;- 移除分组字典操作后的冗余栈推送逻辑&#10;- 优化虚拟机字典转字符串的迭代方式以正确显示分组结果&#10;- 添加完整的 GroupBy 功能测试用例文件" />
     <MESSAGE value="fix(vm): 修复方法重载查找问题&#10;&#10;- 根据参数类型查找匹配的方法重载，而不是仅通过方法名&#10;- 添加参数类型数组构建逻辑用于精确匹配方法签名&#10;- 修复了 ToStr 方法映射到 ToString 时的重载查找问题&#10;- 更新 IDEA 工作区配置文件以反映最新的代码变更&#10;- 修正工作时间统计和本地任务计数器的数值&#10;- 清理历史提交消息记录保持配置文件整洁" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复方法重载查找问题&#10;&#10;- 根据参数类型查找匹配的方法重载，而不是仅通过方法名&#10;- 添加参数类型数组构建逻辑用于精确匹配方法签名&#10;- 修复了 ToStr 方法映射到 ToString 时的重载查找问题&#10;- 更新 IDEA 工作区配置文件以反映最新的代码变更&#10;- 修正工作时间统计和本地任务计数器的数值&#10;- 清理历史提交消息记录保持配置文件整洁" />
+    <MESSAGE value="feat(vm): 实现字节码模式下的全局函数执行&#10;&#10;- 在BaseGlobalFunction中添加ExecuteInVMInternal抽象方法和ExecuteInVM公共方法&#10;- 为所有并发相关的全局函数实现ExecuteInVMInternal方法&#10;- 为IO函数、工具函数、集合函数等实现字节码模式执行逻辑&#10;- 修改VirtualMachine类使用全局函数注册表来调用字节码模式函数&#10;- 移除VirtualMachine中硬编码的原生函数调用实现&#10;- 添加字节码模式下的参数验证方法ValidateParameterCountForVM&#10;- 为不支持字节码模式的函数返回null或默认值&#10;- 添加测试文件test_vm_global_functions.old8验证功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现字节码模式下的全局函数执行&#10;&#10;- 在BaseGlobalFunction中添加ExecuteInVMInternal抽象方法和ExecuteInVM公共方法&#10;- 为所有并发相关的全局函数实现ExecuteInVMInternal方法&#10;- 为IO函数、工具函数、集合函数等实现字节码模式执行逻辑&#10;- 修改VirtualMachine类使用全局函数注册表来调用字节码模式函数&#10;- 移除VirtualMachine中硬编码的原生函数调用实现&#10;- 添加字节码模式下的参数验证方法ValidateParameterCountForVM&#10;- 为不支持字节码模式的函数返回null或默认值&#10;- 添加测试文件test_vm_global_functions.old8验证功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

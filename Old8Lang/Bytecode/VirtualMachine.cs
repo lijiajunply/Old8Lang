@@ -2,6 +2,7 @@ using System.Collections;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.AST.Statement;
 using Old8Lang.GlobalFunctions.Core;
 
@@ -2045,25 +2046,12 @@ public class VirtualMachine
                 }
                 else
                 {
-                    // 原生 C# 对象，使用反射调用方法
-                    var objType = obj.GetType();
-
-                    // 特殊处理：将 ToStr 映射到 ToString
-                    var actualMethodName = methodName == "ToStr" ? "ToString" : methodName;
-
-                    // 根据参数类型查找匹配的方法重载
-                    var paramTypes = args.Select(a => a?.GetType() ?? typeof(object)).ToArray();
-                    var method = objType.GetMethod(actualMethodName, paramTypes);
-
-                    if (method == null)
-                    {
-                        throw new Exception($"类型 {objType.Name} 没有方法 {methodName}");
-                    }
-
-                    var result = method.Invoke(obj, args);
+                    // 原生 C# 对象或 Old8Lang 类型，使用 InvokeTypeMethod 调用方法
+                    // 这个方法会优先查找扩展方法，然后查找实例方法
+                    var result = InvokeTypeMethod(obj, methodName, args);
 
                     // 如果方法有返回值，压入栈
-                    if (method.ReturnType != typeof(void))
+                    if (result != null && result is not VoidLangValue)
                     {
                         _stack.Push(result);
                     }
@@ -2885,6 +2873,171 @@ public class VirtualMachine
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 调用类型的扩展方法或实例方法（类似于解释器模式中的 FromClassToResult）
+    /// </summary>
+    /// <param name="obj">要调用方法的对象</param>
+    /// <param name="methodName">方法名</param>
+    /// <param name="args">方法参数</param>
+    /// <returns>方法返回值</returns>
+    private object? InvokeTypeMethod(object obj, string methodName, object?[] args)
+    {
+        if (obj == null)
+        {
+            throw new Exception($"无法在 null 对象上调用方法 {methodName}");
+        }
+
+        Type? extensionType = null;
+        System.Reflection.MethodInfo? method = null;
+
+        // 对于 C# 原生类型，查找对应的扩展方法类
+        if (obj is string)
+        {
+            extensionType = typeof(StringExtensions);
+        }
+        else if (obj is object[] && obj.GetType() == typeof(object[]))
+        {
+            extensionType = typeof(ArrayExtensions);
+        }
+        else if (obj is List<object?>)
+        {
+            extensionType = typeof(ListExtensions);
+        }
+        else if (obj is Dictionary<object, object?>)
+        {
+            extensionType = typeof(DictionaryExtensions);
+        }
+        // 对于 Old8Lang 类型，查找对应的扩展方法类
+        else if (obj is DictionaryLangValue)
+        {
+            extensionType = typeof(DictionaryValueFuncStatic);
+        }
+        else if (obj is ListLangValue)
+        {
+            extensionType = typeof(ListValueFuncStatic);
+        }
+        else if (obj is TaskLangValue)
+        {
+            extensionType = typeof(TaskValueFuncStatic);
+        }
+        else if (obj is ThreadLangValue)
+        {
+            extensionType = typeof(ThreadValueFuncStatic);
+        }
+        else if (obj is StringLangValue)
+        {
+            extensionType = typeof(StringValueFuncStatic);
+        }
+        else if (obj is TupleLangValue)
+        {
+            extensionType = typeof(TupleValueFuncStatic);
+        }
+        else if (obj is ArrayLangValue)
+        {
+            extensionType = typeof(ArrayValueFuncStatic);
+        }
+        else if (obj is CharLangValue)
+        {
+            extensionType = typeof(CharValueFuncStatic);
+        }
+
+        // 如果找到扩展类型，尝试查找扩展方法
+        if (extensionType != null)
+        {
+            var allMethods = extensionType.GetMethods().Where(x => x.Name == methodName).ToArray();
+            if (allMethods.Length > 0)
+            {
+                // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是对象本身)
+                var expectedParamCount = args.Length + 1;
+
+                // 首先查找精确匹配的参数数量
+                method = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount);
+
+                // 如果没找到，查找有可选参数的方法
+                if (method == null)
+                {
+                    method = allMethods.FirstOrDefault(x =>
+                    {
+                        var parameters = x.GetParameters();
+                        if (parameters.Length < expectedParamCount) return false;
+
+                        // 检查除了第一个参数（对象本身）之外，剩余的参数是否都是可选的
+                        for (int i = expectedParamCount; i < parameters.Length; i++)
+                        {
+                            if (!parameters[i].IsOptional && !parameters[i].HasDefaultValue)
+                                return false;
+                        }
+
+                        return true;
+                    });
+                }
+
+                // 如果还是没找到，使用第一个方法
+                method ??= allMethods[0];
+            }
+        }
+
+        // 如果没有找到扩展方法，尝试在类型本身上查找实例方法
+        if (method == null)
+        {
+            var objType = obj.GetType();
+
+            // 特殊处理：将 ToStr 映射到 ToString
+            var actualMethodName = methodName == "ToStr" ? "ToString" : methodName;
+
+            var allInstanceMethods = objType.GetMethods().Where(x => x.Name == actualMethodName).ToArray();
+            if (allInstanceMethods.Length > 0)
+            {
+                // 对于实例方法，预期参数数量 = 传入参数数量
+                var expectedParamCount = args.Length;
+                method = allInstanceMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount)
+                         ?? allInstanceMethods[0];
+            }
+        }
+
+        // 如果还是找不到，尝试 ValueTypeFuncStatic
+        if (method == null)
+        {
+            var valueTypeFuncStatic = typeof(ValueTypeFuncStatic);
+            method = valueTypeFuncStatic.GetMethod(methodName);
+        }
+
+        // 如果找不到方法，抛出异常
+        if (method == null)
+        {
+            throw new Exception($"类型 {obj.GetType().Name} 没有方法 {methodName}");
+        }
+
+        // 准备方法调用参数
+        var parameters = method.GetParameters();
+        var invokeArgs = new List<object?>();
+
+        // 对于静态方法（扩展方法），第一个参数是对象本身
+        if (method.IsStatic && parameters.Length > 0)
+        {
+            invokeArgs.Add(obj);
+        }
+
+        // 添加传入的参数
+        invokeArgs.AddRange(args);
+
+        // 补充缺失的可选参数
+        if (invokeArgs.Count < parameters.Length)
+        {
+            for (int i = invokeArgs.Count; i < parameters.Length; i++)
+            {
+                if (parameters[i].IsOptional || parameters[i].HasDefaultValue)
+                {
+                    invokeArgs.Add(parameters[i].DefaultValue);
+                }
+            }
+        }
+
+        // 调用方法
+        object? invokeInstance = method.IsStatic ? null : obj;
+        return method.Invoke(invokeInstance, invokeArgs.ToArray());
     }
 }
 
