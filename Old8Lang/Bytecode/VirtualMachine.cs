@@ -2046,7 +2046,10 @@ public class VirtualMachine
 
                     // 特殊处理：将 ToStr 映射到 ToString
                     var actualMethodName = methodName == "ToStr" ? "ToString" : methodName;
-                    var method = objType.GetMethod(actualMethodName);
+
+                    // 根据参数类型查找匹配的方法重载
+                    var paramTypes = args.Select(a => a?.GetType() ?? typeof(object)).ToArray();
+                    var method = objType.GetMethod(actualMethodName, paramTypes);
 
                     if (method == null)
                     {

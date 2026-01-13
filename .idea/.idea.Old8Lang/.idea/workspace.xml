@@ -23,8 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -569,7 +568,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="6183000" />
+      <workItem from="1768331954396" duration="7031000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="655" />
+    <option name="localTasksCounter" value="657" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,8 +940,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 修复异常处理和递归调用问题&#10;&#10;- 修复了嵌套异常捕获的传播机制，确保异常在最内层被捕获后不再向外传播&#10;- 修复了浮点数除以零的处理，不再抛出异常而是保持初始值&#10;- 修正了逻辑运算符的计算顺序和结果，包括and/or/xor/not运算的优先级&#10;- 移除了null值的字符串转换测试，因为该功能已被移除&#10;- 修改了字符串长度获取方式，从实例方法Length()改为全局函数Len()&#10;- 实现了函数递归调用的支持，在编译函数体前先将函数注册到DelegateVar&#10;- 重构了函数注册逻辑，支持递归调用时的函数引用查找" />
-    <MESSAGE value="feat(vm): 实现类定义和对象实例化功能&#10;&#10;- 添加预处理阶段注册所有类定义到字节码文件&#10;- 实现 NewObject 指令支持类实例化操作&#10;- 添加 GetField 和 SetField 指令支持对象字段访问&#10;- 实现字典对象作为类实例的数据结构&#10;- 支持类成员变量的初始化和赋值操作&#10;- 启用类声明相关的单元测试用例" />
     <MESSAGE value="feat(vm): 实现函数命名参数和类字段访问功能&#10;&#10;- 扩展 Call 和 CallNative 指令支持命名参数格式&#10;- 添加 ArrangeArgumentsWithNamed 方法处理参数重排逻辑&#10;- 实现命名参数值的栈操作和参数绑定机制&#10;- 更新字节码生成器支持位置和命名参数混合调用&#10;- 添加 VMNamedArgumentsTests 测试全命名和混合参数功能&#10;- 修复类成员访问赋值的字节码生成问题&#10;- 更新虚拟机测试计划文档记录新增功能完成状态" />
     <MESSAGE value="feat(vm): 添加虚拟机模式下的默认参数支持&#10;&#10;- 在 FunctionMetadata 中添加 DefaultValues 属性存储参数默认值&#10;- 修改 CompileFunction 方法以接收并存储默认参数值&#10;- 实现常量表达式求值器用于计算默认参数值&#10;- 添加默认参数值的序列化和反序列化功能&#10;- 在虚拟机函数调用时自动填充缺失的参数使用默认值&#10;- 完成虚拟机端默认参数的完整实现并启用相关测试" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下的break和continue语句支持&#10;&#10;- 添加循环标签栈管理break和continue跳转位置&#10;- 实现While、For和For-in循环中的break和continue逻辑&#10;- 新增LoopLabels类存储循环跳转信息和目标位置&#10;- 在字节码生成阶段将break/continue转换为Jump指令&#10;- 添加完整的break和continue单元测试用例&#10;- 创建break_continue.old8测试文件验证各种循环场景" />
@@ -966,7 +963,9 @@
     <MESSAGE value="feat(bytecode): 添加泛型支持功能&#10;&#10;- 实现泛型类和泛型函数的定义缓存机制&#10;- 添加泛型实例化的字节码生成逻辑&#10;- 支持泛型类特化和函数特化处理&#10;- 实现泛型类实例化表达式的访问者模式处理&#10;- 添加泛型函数调用的字节码生成支持&#10;- 创建泛型类特化版本的生成逻辑&#10;- 实现泛型函数特化版本的编译流程&#10;- 添加泛型相关单元测试用例" />
     <MESSAGE value="test(vm): 添加虚拟机泛型功能高级测试&#10;&#10;- 实现泛型类高级测试，包括嵌套泛型类型和多类型参数场景&#10;- 添加泛型边界情况测试，覆盖相同类型多次实例化和不同数值类型场景&#10;- 实现泛型函数高级测试，支持多类型参数和数组处理功能&#10;- 创建泛型集成测试，验证泛型类与泛型函数组合使用的正确性&#10;- 添加泛型函数返回复杂类型和嵌套实例化的测试用例&#10;- 实现泛型类与数组、字典等数据结构组合的测试场景" />
     <MESSAGE value="feat(compiler): 实现枚举类型的字节码生成和虚拟机执行&#10;&#10;- 添加枚举成员值计算和验证逻辑，支持显式赋值和自动递增&#10;- 新增 DefineEnum 字节码指令用于定义枚举类型&#10;- 实现虚拟机中枚举的创建、存储和成员访问功能&#10;- 添加枚举值比较支持和枚举模板访问机制&#10;- 增加 ToStr 方法映射以支持枚举值字符串转换&#10;- 添加完整的枚举类型虚拟机测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现枚举类型的字节码生成和虚拟机执行&#10;&#10;- 添加枚举成员值计算和验证逻辑，支持显式赋值和自动递增&#10;- 新增 DefineEnum 字节码指令用于定义枚举类型&#10;- 实现虚拟机中枚举的创建、存储和成员访问功能&#10;- 添加枚举值比较支持和枚举模板访问机制&#10;- 增加 ToStr 方法映射以支持枚举值字符串转换&#10;- 添加完整的枚举类型虚拟机测试用例" />
+    <MESSAGE value="feat(bytecode): 实现 using 语句的字节码生成和自动资源管理&#10;&#10;- 在 BytecodeVisitor 中实现 UsingStatement 的完整字节码生成逻辑&#10;- 使用 try-finally 结构实现自动资源管理，在 finally 块中调用 Dispose&#10;- 添加 ResourceManagerTryDispose 原生函数支持资源释放操作&#10;- 生成异常表条目记录 try-finally 块的位置信息&#10;- 支持带变量名和不带变量名两种 using 语句语法&#10;- 添加 using 语句字节码测试用例验证资源自动释放功能&#10;- 修复 OpCode 注释中的 HTML 实体编码问题" />
+    <MESSAGE value="feat(linq): 实现 GroupBy 子句的字节码生成和虚拟机支持&#10;&#10;- 在 BytecodeVisitor.Expressions.cs 中添加对 GroupBy 子句类型的检查逻辑&#10;- 实现分组字典的创建和管理机制 (NewGroupDict 和 GroupDictToList 操作码)&#10;- 添加 GroupBy 终止子句的具体字节码生成逻辑&#10;- 修改 AddToGroup 操作码的参数顺序以匹配正确的执行流程&#10;- 更新虚拟机中 AddToGroup 操作的栈操作顺序&#10;- 移除分组字典操作后的冗余栈推送逻辑&#10;- 优化虚拟机字典转字符串的迭代方式以正确显示分组结果&#10;- 添加完整的 GroupBy 功能测试用例文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(linq): 实现 GroupBy 子句的字节码生成和虚拟机支持&#10;&#10;- 在 BytecodeVisitor.Expressions.cs 中添加对 GroupBy 子句类型的检查逻辑&#10;- 实现分组字典的创建和管理机制 (NewGroupDict 和 GroupDictToList 操作码)&#10;- 添加 GroupBy 终止子句的具体字节码生成逻辑&#10;- 修改 AddToGroup 操作码的参数顺序以匹配正确的执行流程&#10;- 更新虚拟机中 AddToGroup 操作的栈操作顺序&#10;- 移除分组字典操作后的冗余栈推送逻辑&#10;- 优化虚拟机字典转字符串的迭代方式以正确显示分组结果&#10;- 添加完整的 GroupBy 功能测试用例文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
