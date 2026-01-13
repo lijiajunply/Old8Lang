@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.Bytecode;
@@ -1179,8 +1180,50 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitEnumInit(EnumInit node)
     {
-        // 枚举定义在字节码模式下暂不支持
-        // TODO: 实现枚举的字节码生成
+        // 计算枚举成员的实际值
+        var enumValues = new Dictionary<string, int>();
+        int currentValue = 0;
+
+        foreach (var (memberName, memberValueExpr) in node.Members)
+        {
+            if (memberValueExpr is not null)
+            {
+                // 有显式赋值，必须是整数常量
+                if (memberValueExpr is IntLangValue intValue)
+                {
+                    currentValue = intValue.Value;
+                }
+                else
+                {
+                    throw new SyntaxError(node.Position, $"枚举成员 '{memberName}' 的值必须是整数常量");
+                }
+            }
+
+            // 检查成员名是否重复
+            if (!enumValues.TryAdd(memberName, currentValue))
+            {
+                throw new DuplicateNameError(node, memberName, "枚举成员");
+            }
+
+            currentValue++; // 下一个未赋值的成员值自动递增
+        }
+
+        // 将枚举名称添加到常量池
+        var enumNameIndex = _compiler.ConstantPool.AddConstant(node.EnumName);
+
+        // 将成员信息添加到常量池（成员名和值的数组）
+        var memberData = new object[enumValues.Count * 2];
+        int index = 0;
+        foreach (var kvp in enumValues)
+        {
+            memberData[index++] = kvp.Key;   // 成员名
+            memberData[index++] = kvp.Value; // 成员值
+        }
+        var memberDataIndex = _compiler.ConstantPool.AddConstant(memberData);
+
+        // 发出 DefineEnum 指令
+        Emit(OpCode.DefineEnum, new object[] { enumNameIndex, enumValues.Count, memberDataIndex });
+
         return null;
     }
 

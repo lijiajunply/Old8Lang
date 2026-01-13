@@ -1344,6 +1344,40 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.DefineEnum:
+            {
+                // 操作数格式: [enumNameIndex, memberCount, memberDataIndex]
+                var operands = (object[])instruction.Operand!;
+                var enumNameIndex = Convert.ToInt32(operands[0]);
+                var memberCount = Convert.ToInt32(operands[1]);
+                var memberDataIndex = Convert.ToInt32(operands[2]);
+
+                // 从常量池获取枚举名称
+                var enumName = (string)_bytecodeFile.ConstantPool.GetConstant(enumNameIndex);
+
+                // 从常量池获取成员数据
+                var memberData = (object[])_bytecodeFile.ConstantPool.GetConstant(memberDataIndex);
+
+                // 构建成员字典
+                var members = new Dictionary<string, int>();
+                for (int i = 0; i < memberCount; i++)
+                {
+                    var memberName = (string)memberData[i * 2];
+                    var memberValue = Convert.ToInt32(memberData[i * 2 + 1]);
+                    members[memberName] = memberValue;
+                }
+
+                // 创建枚举模板
+                var enumTemplate = new Old8Lang.AST.Expression.AnyValues.EnumTemplate(
+                    enumName,
+                    members,
+                    default);
+
+                // 将枚举模板存储到全局变量
+                _globals[enumName] = enumTemplate;
+            }
+                break;
+
             // === 并发原语 ===
             case OpCode.MutexCreate:
             {
@@ -1669,6 +1703,12 @@ public class VirtualMachine
                         throw new Exception($"对象没有字段 {fieldName}");
                     }
                 }
+                // 如果是枚举模板（访问枚举成员）
+                else if (obj is Old8Lang.AST.Expression.AnyValues.EnumTemplate enumTemplate)
+                {
+                    var enumValue = enumTemplate.GetMemberValue(fieldName);
+                    _stack.Push(enumValue);
+                }
                 else
                 {
                     // 使用反射获取字段或属性（用于内置类型）
@@ -1942,7 +1982,10 @@ public class VirtualMachine
                 {
                     // 原生 C# 对象，使用反射调用方法
                     var objType = obj.GetType();
-                    var method = objType.GetMethod(methodName);
+
+                    // 特殊处理：将 ToStr 映射到 ToString
+                    var actualMethodName = methodName == "ToStr" ? "ToString" : methodName;
+                    var method = objType.GetMethod(actualMethodName);
 
                     if (method == null)
                     {
@@ -2219,6 +2262,12 @@ public class VirtualMachine
         if (a is double da && b is double db) return Math.Abs(da - db) < 1e-10;
         if (a is bool ba && b is bool bb) return ba == bb;
         if (a is string sa && b is string sb) return sa == sb;
+
+        // 处理枚举值比较
+        if (a is Old8Lang.AST.Expression.Value.EnumLangValue ea && b is Old8Lang.AST.Expression.Value.EnumLangValue eb)
+        {
+            return ea.EnumTypeName == eb.EnumTypeName && ea.Value == eb.Value;
+        }
 
         return object.Equals(a, b);
     }

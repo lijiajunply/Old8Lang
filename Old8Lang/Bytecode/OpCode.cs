@@ -190,6 +190,9 @@ public enum OpCode : byte
     /// <summary>获取类型</summary>
     TypeOf = 0x72,
 
+    /// <summary>定义枚举 (操作数: enumNameIndex, memberCount, [memberName, memberValue]...)</summary>
+    DefineEnum = 0x73,
+
     // ===== 并发原语 (0x80-0x9F) =====
     /// <summary>创建互斥锁</summary>
     MutexCreate = 0x80,
