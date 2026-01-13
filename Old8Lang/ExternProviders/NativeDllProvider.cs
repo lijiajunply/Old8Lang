@@ -82,8 +82,22 @@ public class NativeDllProvider : IExternProvider
             // 创建 P/Invoke 方法
             var pinvokeMethod = CreatePInvokeMethod(source, funcDecl, callingConv);
 
-            // 注册到局部变量管理器
-            localManager.DelegateVar.Add(targetName, pinvokeMethod);
+            // 构建参数类型签名（与 FunctionCallExpression 中的格式一致）
+            var signature = funcDecl.FunctionSignature?.FuncLangValue;
+            var paramTypes = signature?.Ids?
+                .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
+                .ToArray() ?? [];
+            var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
+            var delegateKey = $"{targetName}${paramTypeNames}";
+
+            // 注册到局部变量管理器（使用带参数类型签名的键）
+            localManager.DelegateVar.Add(delegateKey, pinvokeMethod);
+
+            // 同时注册不带签名的键（用于泛型查找）
+            if (!localManager.DelegateVar.ContainsKey(targetName))
+            {
+                localManager.DelegateVar.Add(targetName, pinvokeMethod);
+            }
         }
     }
 

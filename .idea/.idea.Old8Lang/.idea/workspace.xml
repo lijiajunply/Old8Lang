@@ -23,13 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Extern/VMExternTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ExternFunctionWrapper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/test_extern_vm.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine-ImplementationStatus.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/VirtualMachine-ImplementationStatus.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/test_extern_compiler_debug.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -574,7 +568,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="1145000" />
+      <workItem from="1768331954396" duration="1537000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -919,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="646" />
+    <option name="localTasksCounter" value="648" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,8 +940,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(vm): 优化虚拟机列表转换逻辑并完善测试文档&#10;&#10;- 使用 LINQ 查询语法简化列表项转换逻辑&#10;- 添加虚拟机测试计划文档详细描述测试范围和进度&#10;- 新增算术表达式和字符串操作的虚拟机测试用例&#10;- 清理 IDE 配置文件中的冗余变更记录&#10;- 更新本地任务计数器和提交历史记录" />
-    <MESSAGE value="feat(vm): 重构数组字符串转换并添加虚拟机实现状态文档&#10;&#10;- 使用LINQ查询语法替换foreach循环进行数组字符串转换&#10;- 新增VirtualMachine-ImplementationStatus.md文档详细记录实现状态&#10;- 更新VirtualMachine-TestPlan.md反映最新测试完成情况&#10;- 添加VMArrayTests.cs包含数组创建、访问和长度测试&#10;- 添加VMAsyncTests.cs用于异步函数测试框架&#10;- 更新测试计划文档中的完成状态和统计数据" />
     <MESSAGE value="docs(test): 更新虚拟机测试计划文档添加高级特性测试章节&#10;&#10;- 添加defer语句、Match表达式、select语句和异步函数测试章节&#10;- 新增12个高级特性测试用例并标记为跳过状态&#10;- 更新测试进度统计表格增加跳过列和重新计算完成率&#10;- 添加已跳过测试详细列表和跳过原因说明&#10;- 修改字典创建测试代码使用多行字符串字面量格式" />
     <MESSAGE value="feat(vm): 添加数组操作数序列化支持和命令行集成&#10;&#10;- 实现了数组类型操作数的序列化和反序列化功能&#10;- 添加了数组元素的递归序列化处理逻辑&#10;- 更新虚拟机实现状态文档至100%完成度&#10;- 完成了命令行工具的完整集成功能&#10;- 修复了操作数类型不支持时的错误信息显示" />
     <MESSAGE value="feat(visitor): 实现 AST 节点的 Visitor 模式支持&#10;&#10;- 为 MatchExpression、DeferStatement 和 SelectStatement 添加 Visit 方法&#10;- 更新 IVisitor 接口生成文件包含新的访问方法&#10;- 移除未实现的异常抛出并添加正确的访问方法调用&#10;- 添加必要的 using 语句和命名空间引用&#10;- 为解释器、编译器和类型推断访问者实现访问方法" />
@@ -971,7 +963,9 @@
     <MESSAGE value="feat(vm): 添加异步生成器功能支持&#10;&#10;- 新增 BytecodeAsyncStreamLangValue 类实现异步流对象&#10;- 扩展 BytecodeAsyncGeneratorLangValue 实现 IEnumerator 接口&#10;- 添加 IsCurrentFunctionAsync、IsGeneratorFunction 等编译器辅助方法&#10;- 实现异步流表达式的字节码生成逻辑&#10;- 区分异步和普通生成器的 Yield 指令处理&#10;- 完善虚拟机中异步生成器函数的调用和执行机制&#10;- 添加异步生成器调试测试用例验证功能正确性" />
     <MESSAGE value="feat(visitor): 实现AST节点的Visitor模式并添加新节点类型支持&#10;&#10;- 为AssertClassLangValue、AssertStaticMethodWrapper等类添加partial关键字以支持代码生成&#10;- 移除旧的Accept方法实现，替换为自动生成的Accept方法&#10;- 添加GenericInstanceExpression、LinqExpression等新表达式类型的访问器实现&#10;- 为BytecodeVisitor和CompilerVisitor添加对新节点类型的支持&#10;- 实现DeferStatement、EnumInit、ExternStatement等语句类型的访问器&#10;- 更新生成时间戳以反映代码生成器的重新运行&#10;- 添加对枚举值、断言类值等特殊类型值的处理逻辑" />
     <MESSAGE value="fix(ast): 修复 AST 访问器异常处理和清理未使用代码&#10;&#10;- 为字节码访问器中的成员访问和赋值操作添加明确的不支持异常&#10;- 为 LINQ 查询子句节点添加正确的操作不可用异常提示&#10;- 移除类型推断访问器中未使用的声明语句访问方法&#10;- 修复线程值类型的重试方法不支持异常信息&#10;- 清理 IDE 工作区配置文件中的多余变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修复 AST 访问器异常处理和清理未使用代码&#10;&#10;- 为字节码访问器中的成员访问和赋值操作添加明确的不支持异常&#10;- 为 LINQ 查询子句节点添加正确的操作不可用异常提示&#10;- 移除类型推断访问器中未使用的声明语句访问方法&#10;- 修复线程值类型的重试方法不支持异常信息&#10;- 清理 IDE 工作区配置文件中的多余变更记录" />
+    <MESSAGE value="feat(vm): 实现虚拟机 extern 语句支持&#10;&#10;- 在 BytecodeVisitor 中实现 ExternStatement 的字节码生成逻辑&#10;- 添加 LoadExtern 和 CallExtern 新操作码支持 extern 函数调用&#10;- 创建 ExternFunctionWrapper 类封装原生 DLL 函数调用逻辑&#10;- 实现参数类型转换和函数签名解析功能&#10;- 支持多种调用约定包括 Cdecl、StdCall 和 WinApi&#10;- 添加 extern 函数的缓存机制提升重复调用性能&#10;- 更新虚拟机文档记录 extern 支持的实现详情&#10;- 新增虚拟机 extern 功能测试用例" />
+    <MESSAGE value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

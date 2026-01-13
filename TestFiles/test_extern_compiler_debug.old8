@@ -1,0 +1,19 @@
+// 编译器模式 extern 测试 - 简化版
+PrintLine("开始测试")
+
+native extern "libc.dylib" {
+    func abs(x:int) -> int
+}
+
+PrintLine("extern 声明完成")
+
+result <- abs(-42)
+PrintLine("调用完成")
+
+if result == 42 {
+    PrintLine("成功: 结果是 42")
+} else {
+    PrintLine("失败: 结果不是 42")
+    PrintLine("实际结果:")
+    PrintLine(result)
+}
