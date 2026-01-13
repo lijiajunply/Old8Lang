@@ -243,6 +243,15 @@ public enum OpCode : byte
     /// <summary>调用异步函数 (操作数: argCount, funcName)</summary>
     CallAsync = 0xA3,
 
+    /// <summary>异步生成器yield (在异步生成器中yield值)</summary>
+    AwaitYield = 0xA4,
+
+    /// <summary>创建异步生成器 (操作数: funcIndex)</summary>
+    NewAsyncGenerator = 0xA5,
+
+    /// <summary>调用异步生成器函数 (操作数: argCount, funcName)</summary>
+    CallAsyncGenerator = 0xA6,
+
     // ===== 异常处理 (0xB0-0xBF) =====
     /// <summary>抛出异常</summary>
     Throw = 0xB0,

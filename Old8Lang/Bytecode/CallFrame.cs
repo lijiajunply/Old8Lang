@@ -26,6 +26,9 @@ public class CallFrame(FunctionMetadata function, int localCount)
     /// <summary>生成器ID（如果此帧是生成器函数的执行帧）</summary>
     public int? GeneratorId { get; set; }
 
+    /// <summary>异步生成器ID（如果此帧是异步生成器函数的执行帧）</summary>
+    public int? AsyncGeneratorId { get; set; }
+
     /// <summary>
     /// 获取当前指令
     /// </summary>

@@ -819,12 +819,88 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncForInStatement(AsyncForInStatement node)
     {
-        // 异步 for-in 循环
-        // TODO: 完整的异步支持需要：
-        // 1. 异步迭代器支持
-        // 2. await 表达式支持
-        //
-        // 简化实现：暂时不支持异步 for-in
+        // 异步 for-in 循环：async for item in asyncGenerator { ... }
+        // 获取字段（主构造函数参数）
+        var id = GetPrimaryConstructorParameter<LangId>(node, "id");
+        var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
+        var body = GetPrimaryConstructorParameter<OldStatement>(node, "body");
+
+        if (id == null || expression == null || body == null)
+        {
+            return null;
+        }
+
+        string varName = id.IdName;
+
+        // 创建循环标签
+        var loopLabels = new LoopLabels();
+        _loopLabels.Push(loopLabels);
+
+        // 生成异步生成器表达式的代码（栈上现在有异步生成器）
+        expression.Accept(this);
+
+        // 将异步生成器保存到一个临时局部变量
+        int asyncGenLocalIndex = _compiler.AllocateLocal("<async_generator>");
+        Emit(OpCode.StoreLocal, asyncGenLocalIndex);
+
+        // 循环开始标签
+        int loopStart = GetCurrentPosition();
+        loopLabels.ContinueTarget = loopStart;
+
+        // 加载异步生成器到栈
+        Emit(OpCode.LoadLocal, asyncGenLocalIndex);
+
+        // 调用异步生成器的 MoveNextAsync（这会返回一个 Task）
+        // 注意：这里需要虚拟机支持异步迭代器的 MoveNext 操作
+        // 简化实现：使用同步的 MoveNext
+        Emit(OpCode.IteratorMoveNext);
+
+        // 如果 MoveNext 返回 false，跳出循环
+        int jumpIfFalse = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1);
+
+        // 加载异步生成器到栈
+        Emit(OpCode.LoadLocal, asyncGenLocalIndex);
+
+        // 获取当前元素
+        Emit(OpCode.IteratorCurrent);
+
+        // 将当前元素存储到循环变量
+        if (_compiler.IsLocalVariable(varName))
+        {
+            int localIndex = _compiler.GetLocalIndex(varName);
+            Emit(OpCode.StoreLocal, localIndex);
+        }
+        else
+        {
+            // 声明为局部变量
+            int localIndex = _compiler.DeclareLocalVariable(varName);
+            Emit(OpCode.StoreLocal, localIndex);
+        }
+
+        // 执行循环体
+        body.Accept(this);
+
+        // 跳回循环开始
+        Emit(OpCode.Jump, loopStart);
+
+        // 修补跳出循环的跳转
+        int loopEnd = GetCurrentPosition();
+        PatchJump(jumpIfFalse, loopEnd);
+
+        // 修补所有break跳转
+        foreach (var breakJump in loopLabels.BreakJumps)
+        {
+            PatchJump(breakJump, loopEnd);
+        }
+
+        // 修补所有continue跳转
+        foreach (var continueJump in loopLabels.ContinueJumps)
+        {
+            PatchJump(continueJump, loopStart);
+        }
+
+        _loopLabels.Pop();
 
         return null;
     }
@@ -854,8 +930,21 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 调用编译器的 CompileAsyncFunction 方法
-        _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+        // 检测函数体是否包含 yield 语句
+        bool containsYield = _compiler.ContainsYieldStatement(funcValue.BlockStatement);
+
+        // 根据是否包含 yield 调用不同的编译方法
+        if (containsYield)
+        {
+            // 异步生成器函数
+            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+        }
+        else
+        {
+            // 普通异步函数
+            _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+        }
+
         return null;
     }
 

@@ -147,6 +147,47 @@ public class BytecodeCompiler
     }
 
     /// <summary>
+    /// 编译异步生成器函数
+    /// </summary>
+    public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters, List<object?> defaultValues, BlockStatement body)
+    {
+        // 检测函数是否包含yield语句
+        bool isGenerator = ContainsYieldStatement(body);
+
+        var func = new FunctionMetadata
+        {
+            Name = funcName,
+            Parameters = parameters,
+            DefaultValues = defaultValues,
+            IsAsync = true,      // 标记为异步函数
+            IsGenerator = isGenerator  // 标记为生成器函数
+        };
+
+        var oldFunc = _currentFunction;
+        _currentFunction = func;
+        EnterScope();
+
+        // 声明参数为局部变量
+        foreach (var param in parameters)
+            DeclareLocalVariable(param);
+
+        // 编译函数体
+        var visitor = new BytecodeVisitor(this);
+        body.Accept(visitor);
+
+        func.Instructions = visitor.GetInstructions();
+        func.MaxStackSize = visitor.MaxStackSize;
+        func.LocalCount = _scopes.Peek().LocalCount;
+
+        LeaveScope();
+        _currentFunction = oldFunc;
+
+        _bytecodeFile.Functions.Add(func);
+
+        return func;
+    }
+
+    /// <summary>
     /// 检查是否是异步函数
     /// </summary>
     public bool IsAsyncFunction(string funcName)
@@ -390,7 +431,7 @@ public class BytecodeCompiler
     /// <summary>
     /// 检测语句块中是否包含yield语句
     /// </summary>
-    private bool ContainsYieldStatement(BlockStatement block)
+    public bool ContainsYieldStatement(BlockStatement block)
     {
         return ContainsYieldInStatements(block.OtherStatements);
     }

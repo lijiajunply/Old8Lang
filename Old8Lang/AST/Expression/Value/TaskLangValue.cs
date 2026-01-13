@@ -296,6 +296,60 @@ public partial class TaskLangValue : LangValueType
     }
 
     /// <summary>
+    /// 异步等待 Task 完成并返回结果（支持外部取消令牌）
+    /// </summary>
+    /// <param name="externalCancellationToken">外部取消令牌</param>
+    /// <returns>任务结果</returns>
+    public async Task<LangValueType> AwaitAsync(CancellationToken externalCancellationToken)
+    {
+        // 创建组合取消令牌源
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, externalCancellationToken);
+
+        try
+        {
+            // 检查取消请求
+            linkedCts.Token.ThrowIfCancellationRequested();
+
+            // 确保任务状态更新为 Running
+            lock (Lock)
+            {
+                if (_status == TaskStatus.Pending)
+                {
+                    _status = TaskStatus.Running;
+                }
+            }
+
+            // 等待任务完成
+            var result = await Task;
+
+            lock (Lock)
+            {
+                _status = TaskStatus.Completed;
+                _result = result;
+            }
+
+            return result;
+        }
+        catch (OperationCanceledException)
+        {
+            lock (Lock)
+            {
+                _status = TaskStatus.Canceled;
+            }
+            throw;
+        }
+        catch (Exception ex)
+        {
+            lock (Lock)
+            {
+                _status = TaskStatus.Failed;
+                _exception = ex;
+            }
+            throw;
+        }
+    }
+
+    /// <summary>
     /// 非阻塞检查任务是否完成
     /// </summary>
     public bool IsCompleted
