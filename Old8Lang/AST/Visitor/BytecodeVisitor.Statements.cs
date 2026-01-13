@@ -1166,8 +1166,67 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitExternStatement(ExternStatement node)
     {
-        // Extern 语句在字节码模式下暂不支持
-        // TODO: 实现 extern 的字节码生成
+        // 使用反射获取 ExternStatement 的私有字段
+        var nodeType = node.GetType();
+        var bindingFlags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+
+        var dllNameField = nodeType.GetField("DllName", bindingFlags);
+        var dllName = dllNameField?.GetValue(node) as string
+            ?? throw new InvalidOperationException("无法获取 DLL 名称");
+
+        var functionsField = nodeType.GetField("Functions", bindingFlags);
+        var functions = functionsField?.GetValue(node) as List<ExternFunctionDeclaration>
+            ?? throw new InvalidOperationException("无法获取函数列表");
+
+        var externTypeField = nodeType.GetField("ExternType", bindingFlags);
+        var externType = externTypeField != null
+            ? (ExternType)externTypeField.GetValue(node)!
+            : ExternType.NativeDll;
+
+        var defaultCallingConventionField = nodeType.GetField("DefaultCallingConvention", bindingFlags);
+        var defaultCallingConvention = defaultCallingConventionField != null
+            ? (CallingConventionType)defaultCallingConventionField.GetValue(node)!
+            : CallingConventionType.Cdecl;
+
+        // 为每个 extern 函数生成 LoadExtern 指令
+        foreach (var funcDecl in functions)
+        {
+            var targetName = funcDecl.Alias ?? funcDecl.FunctionName;
+
+            // 将 DLL 名称、函数名称和 extern 类型添加到常量池
+            var dllNameIndex = _compiler.ConstantPool.AddConstant(dllName);
+            var funcNameIndex = _compiler.ConstantPool.AddConstant(funcDecl.FunctionName);
+            var externTypeIndex = _compiler.ConstantPool.AddConstant((int)externType);
+
+            // 获取调用约定
+            var callingConv = funcDecl.CallingConvention != CallingConventionType.Cdecl
+                ? funcDecl.CallingConvention
+                : defaultCallingConvention;
+            var callingConvIndex = _compiler.ConstantPool.AddConstant((int)callingConv);
+
+            // 将函数签名信息序列化为字符串（如果存在）
+            string? signatureStr = null;
+            if (funcDecl.FunctionSignature != null)
+            {
+                var sig = funcDecl.FunctionSignature.FuncLangValue;
+                var paramTypes = sig.Ids?.Select(p => p.AssumptionType ?? "object").ToList() ?? new List<string>();
+                var returnType = sig.Id?.AssumptionType ?? "void";
+                signatureStr = $"{string.Join(",", paramTypes)}:{returnType}";
+            }
+            var signatureIndex = signatureStr != null
+                ? _compiler.ConstantPool.AddConstant(signatureStr)
+                : _compiler.ConstantPool.AddConstant("");
+
+            // 生成 LoadExtern 指令
+            // 操作数格式: [dllNameIndex, funcNameIndex, externTypeIndex, callingConvIndex, signatureIndex]
+            var operands = new[] { dllNameIndex, funcNameIndex, externTypeIndex, callingConvIndex, signatureIndex };
+            Emit(OpCode.LoadExtern, operands);
+
+            // 将加载的 extern 函数存储到全局变量
+            // 注意: StoreGlobal 的操作数是字符串，不是索引
+            Emit(OpCode.StoreGlobal, targetName);
+        }
+
         return null;
     }
 

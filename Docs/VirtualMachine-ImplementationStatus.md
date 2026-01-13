@@ -38,28 +38,30 @@
 
 | 指标 | 数值 | 状态 |
 |------|------|------|
-| 字节码操作码数量 | ~60 | ✅ 完成 |
+| 字节码操作码数量 | ~62 | ✅ 完成 (新增 LoadExtern, CallExtern) |
 | BytecodeVisitor 方法 | 67/67 | ✅ 完成 |
 | 单元测试数量 | 174 | ✅ 全部通过 |
 | 虚拟机功能测试 | 47/62 | ✅ 76% 通过 |
 | 跳过的测试 | 12 | ⚠️ 高级特性未完整实现 |
-| 代码行数 | ~6,700 | ✅ 完成 |
+| 代码行数 | ~7,000 | ✅ 完成 |
 | 命令行集成 | 3/3 | ✅ 完成 |
 | 文档完整性 | 95% | ✅ 完成 |
 
 ### 已实现的核心组件
 
 ✅ **字节码系统**
-- OpCode 枚举定义 (60+ 操作码)
+- OpCode 枚举定义 (62 操作码)
 - Instruction 指令类
 - ConstantPool 常量池
 - BytecodeFile 文件格式 (.o8c)
+- **新增**: LoadExtern 和 CallExtern 操作码 (2026-01-14)
 
 ✅ **虚拟机引擎**
 - VirtualMachine 执行器
 - CallFrame 调用栈帧
 - 操作数栈管理
 - 全局变量管理
+- **新增**: ExternFunctionWrapper 外部函数包装器 (2026-01-14)
 
 ✅ **元数据系统**
 - FunctionMetadata 函数元数据
@@ -71,12 +73,14 @@
 - BytecodeVisitor (4个分部类)
 - 作用域管理
 - 跳转标签解析
+- **新增**: ExternStatement 字节码生成支持 (2026-01-14)
 
 ✅ **高级特性**
 - VMDebugger 调试器 (断点、单步、变量查看)
 - VMProfiler 性能分析器
 - JITCompiler 框架 (热点检测)
 - Disassembler 反汇编器
+- **新增**: Extern C/C++ DLL 调用支持 (2026-01-14)
 
 ### 待完成的功能
 
@@ -281,8 +285,9 @@
 | 命名导入 | `import { sqrt } from "math"` | ✅ | ⚠️ | 需补充测试 |
 | 别名导入 | `import { sqrt as sq } from "math"` | ✅ | ⚠️ | 需补充测试 |
 | Native 导入 | `native "Old8LangLib" MathLib *` | ✅ | ⚠️ | 需补充测试 |
-| Extern C/C++ | `native extern "msvcrt.dll" func abs(x:int) -> int` | ✅ | ⚠️ | 需补充测试 |
-| Extern Python | `native extern "script.py" { func add(a:int, b:int) -> int }` | ✅ | ⚠️ | 需补充测试 |
+| Extern C/C++ | `native extern "msvcrt.dll" func abs(x:int) -> int` | ✅ | ✅ | 完整支持 (2026-01-14) |
+| Extern Python | `native extern "script.py" { func add(a:int, b:int) -> int }` | ❌ | ❌ | 虚拟机模式暂不支持 |
+| Extern JavaScript | `native extern "script.js" { func add(a, b) }` | ❌ | ❌ | 虚拟机模式暂不支持 |
 
 ---
 
@@ -625,10 +630,95 @@ Old8Lang 字节码虚拟机已经完成了 **100%** 的核心功能实现，是�
 - **可调试**: 完整的调试支持
 - **可分析**: 性能分析工具辅助优化
 - **可扩展**: 清晰的架构便于添加新特性
+- **Extern 支持**: 支持调用原生 C/C++ DLL 函数 (2026-01-14)
+
+---
+
+## Extern 语句支持详情 (2026-01-14 新增)
+
+### 实现概述
+
+虚拟机模式现已完整支持 `extern` 语句，允许调用原生 C/C++ DLL 函数。
+
+### 支持的 Extern 类型
+
+| Extern 类型 | 支持状态 | 说明 |
+|------------|---------|------|
+| **NativeDll (C/C++)** | ✅ 完整支持 | 通过 P/Invoke 调用原生 DLL 函数 |
+| **PythonScript** | ❌ 不支持 | 需要动态运行时，虚拟机模式暂不支持 |
+| **PythonModule** | ❌ 不支持 | 需要动态运行时，虚拟机模式暂不支持 |
+| **JavaScript** | ❌ 不支持 | 需要动态运行时，虚拟机模式暂不支持 |
+
+### 新增的字节码操作码
+
+1. **LoadExtern (0xC2)**: 加载 extern 函数
+   - 操作数格式: `[dllNameIndex, funcNameIndex, externTypeIndex, callingConvIndex, signatureIndex]`
+   - 功能: 从 DLL 加载函数并创建 ExternFunctionWrapper
+
+2. **CallExtern (0xC3)**: 调用 extern 函数
+   - 操作数格式: `[argCount, funcNameIndex]`
+   - 功能: 调用已加载的 extern 函数
+
+### 新增的核心类
+
+1. **ExternFunctionWrapper** (`Old8Lang/Bytecode/ExternFunctionWrapper.cs`)
+   - 封装 extern 函数调用逻辑
+   - 支持参数类型转换
+   - 缓存 DLL 句柄和函数指针以提高性能
+   - 支持多种调用约定 (Cdecl, StdCall, WinApi)
+
+### 实现文件
+
+| 文件 | 修改内容 |
+|------|---------|
+| `Old8Lang/Bytecode/OpCode.cs` | 新增 LoadExtern 和 CallExtern 操作码 |
+| `Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs` | 实现 ExternStatement 的字节码生成 |
+| `Old8Lang/Bytecode/VirtualMachine.cs` | 添加 LoadExtern 和 CallExtern 指令执行逻辑 |
+| `Old8Lang/Bytecode/ExternFunctionWrapper.cs` | 新增外部函数包装器类 |
+| `Old8Lang.Tests/VirtualMachine/Extern/VMExternTests.cs` | 新增虚拟机 extern 测试 |
+
+### 使用示例
+
+```old8
+// 调用 C 标准库函数
+native extern "msvcrt.dll" {
+    func abs(x:int) -> int
+}
+
+result <- abs(-42)
+PrintLine(result.ToStr())  // 输出: 42
+```
+
+```old8
+// 使用别名
+native extern "msvcrt.dll" {
+    func abs(x:int) -> int as absolute
+}
+
+result <- absolute(-100)
+PrintLine(result.ToStr())  // 输出: 100
+```
+
+```old8
+// 指定调用约定
+native extern "kernel32.dll" stdcall {
+    func GetCurrentProcessId() -> uint
+}
+
+pid <- GetCurrentProcessId()
+PrintLine("Process ID: " + pid.ToStr())
+```
+
+### 限制和注意事项
+
+1. **仅支持原生 DLL**: Python 和 JavaScript extern 在虚拟机模式下不支持
+2. **参数类型要求**: 必须明确指定参数类型和返回类型
+3. **支持的参数数量**: 最多支持 4 个参数（受 Func/Action 委托限制）
+4. **类型转换**: 自动进行基本类型转换（int, double, string 等）
 
 ---
 
 **文档完成日期**: 2026-01-13
-**最后更新日期**: 2026-01-13 (测试进度更新)
+**最后更新日期**: 2026-01-14 (新增 Extern 支持)
 **下次更新**: 完成高优先级测试补充后
 

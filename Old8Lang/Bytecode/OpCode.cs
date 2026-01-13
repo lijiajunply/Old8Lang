@@ -281,6 +281,12 @@ public enum OpCode : byte
     /// <summary>执行所有defer</summary>
     ExecuteDefers = 0xC1,
 
+    /// <summary>加载 extern 函数 (操作数: dllNameIndex, funcNameIndex, externTypeIndex)</summary>
+    LoadExtern = 0xC2,
+
+    /// <summary>调用 extern 函数 (操作数: argCount, funcNameIndex)</summary>
+    CallExtern = 0xC3,
+
     /// <summary>打印调试信息 (操作数: messageIndex)</summary>
     DebugPrint = 0xF0,
 

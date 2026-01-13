@@ -2,6 +2,7 @@ using System.Collections;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Statement;
 
 namespace Old8Lang.Bytecode;
 
@@ -238,7 +239,8 @@ public class VirtualMachine
     /// <param name="asyncGeneratorId">异步生成器ID</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>yield的值，如果生成器已完成则返回null</returns>
-    public async Task<LangValueType?> ResumeAsyncGeneratorAsync(int asyncGeneratorId, CancellationToken cancellationToken = default)
+    public async Task<LangValueType?> ResumeAsyncGeneratorAsync(int asyncGeneratorId,
+        CancellationToken cancellationToken = default)
     {
         if (!_asyncGenerators.TryGetValue(asyncGeneratorId, out var asyncGeneratorState))
         {
@@ -364,7 +366,8 @@ public class VirtualMachine
     /// <summary>
     /// 异步执行单条指令（用于异步生成器）
     /// </summary>
-    private async Task ExecuteInstructionAsync(Instruction instruction, CallFrame frame, CancellationToken cancellationToken)
+    private async Task ExecuteInstructionAsync(Instruction instruction, CallFrame frame,
+        CancellationToken cancellationToken)
     {
         // 检查取消令牌
         cancellationToken.ThrowIfCancellationRequested();
@@ -419,7 +422,7 @@ public class VirtualMachine
 
                         // 将 yield 的值转换为 LangValueType
                         asyncGeneratorState.CurrentValue = yieldValue as LangValueType ??
-                            ConvertToLangValue(yieldValue);
+                                                           ConvertToLangValue(yieldValue);
 
                         asyncGeneratorState.Status = GeneratorStatus.Suspended;
 
@@ -712,6 +715,7 @@ public class VirtualMachine
                                 throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
                             }
                         }
+
                         args = fullArgs;
                     }
 
@@ -1435,7 +1439,7 @@ public class VirtualMachine
                 break;
 
             // === 异步支持 ===
-            
+
 
             case OpCode.Yield:
             {
@@ -1459,7 +1463,7 @@ public class VirtualMachine
                         }
 
                         generatorState.SaveState(
-                            frame.IP,  // 保存下一条指令的位置
+                            frame.IP, // 保存下一条指令的位置
                             frame.Locals,
                             stackCopy
                         );
@@ -1960,6 +1964,7 @@ public class VirtualMachine
                     {
                         throw new Exception("super 只能在实例方法中使用");
                     }
+
                     _stack.Push(thisInstance);
                 }
                 // 如果 Arguments 为空，尝试从 Locals 获取
@@ -1970,6 +1975,7 @@ public class VirtualMachine
                     {
                         throw new Exception("super 只能在实例方法中使用");
                     }
+
                     _stack.Push(thisInstance);
                 }
                 else
@@ -2081,6 +2087,51 @@ public class VirtualMachine
             {
                 // ExecuteDefers 指令：执行所有 defer 块（按 LIFO 顺序）
                 ExecuteDefers(frame);
+            }
+                break;
+
+            case OpCode.LoadExtern:
+            {
+                // LoadExtern 指令：加载 extern 函数
+                // 操作数格式: [dllNameIndex, funcNameIndex, externTypeIndex, callingConvIndex, signatureIndex]
+                var operands = (int[])instruction.Operand!;
+                var dllName = (string)_bytecodeFile.ConstantPool.GetConstant(operands[0]);
+                var funcName = (string)_bytecodeFile.ConstantPool.GetConstant(operands[1]);
+                var externType = (ExternType)(int)_bytecodeFile.ConstantPool.GetConstant(operands[2]);
+                var callingConv = (CallingConventionType)(int)_bytecodeFile.ConstantPool.GetConstant(operands[3]);
+                var signatureStr = (string)_bytecodeFile.ConstantPool.GetConstant(operands[4]);
+
+                // 创建 extern 函数包装器
+                var externFunc = new ExternFunctionWrapper(dllName, funcName, externType, callingConv, signatureStr);
+                _stack.Push(externFunc);
+            }
+                break;
+
+            case OpCode.CallExtern:
+            {
+                // CallExtern 指令：调用 extern 函数
+                // 操作数格式: [argCount, funcNameIndex]
+                var operands = (int[])instruction.Operand!;
+                var argCount = operands[0];
+                var funcNameIndex = operands[1];
+                var funcName = (string)_bytecodeFile.ConstantPool.GetConstant(funcNameIndex);
+
+                // 从全局变量中获取 extern 函数
+                if (!_globals.TryGetValue(funcName, out var funcObj) || funcObj is not ExternFunctionWrapper externFunc)
+                {
+                    throw new Exception($"未找到 extern 函数: {funcName}");
+                }
+
+                // 弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 调用 extern 函数
+                var result = externFunc.Invoke(args);
+                _stack.Push(result);
             }
                 break;
 
@@ -2521,6 +2572,7 @@ public class VirtualMachine
 
                     return inRange;
                 }
+
                 return false;
 
             case "FlattenTuple":
@@ -2529,6 +2581,7 @@ public class VirtualMachine
                 {
                     return FlattenTupleHelper(tuple);
                 }
+
                 return new List<object?>();
 
             case "GetCount":
@@ -2543,6 +2596,7 @@ public class VirtualMachine
                         _ => 0
                     };
                 }
+
                 return 0;
 
             default:
@@ -2677,6 +2731,7 @@ public class VirtualMachine
             {
                 throw new Exception($"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
             }
+
             args[i] = positionalArgs[i];
             filled[i] = true;
         }
@@ -2748,6 +2803,7 @@ public class VirtualMachine
         {
             throw new Exception($"Task ID {taskId} 不存在");
         }
+
         return task;
     }
 
