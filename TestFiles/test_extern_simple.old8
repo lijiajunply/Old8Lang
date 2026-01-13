@@ -1,0 +1,48 @@
+// 简化的 extern 实际调用测试
+// 避免使用 ToStr 方法
+
+PrintLine("=== Old8Lang Extern 实际调用测试 ===")
+PrintLine("")
+
+// macOS/Linux: 使用 libc
+native extern "libc.dylib" {
+    func abs(x:int) -> int
+}
+
+PrintLine("测试 1: 调用 abs(-42)")
+result1 <- abs(-42)
+// 使用字符串拼接来输出结果
+PrintLine("结果: " + result1)
+PrintLine("")
+
+PrintLine("测试 2: 调用 abs(100)")
+result2 <- abs(100)
+PrintLine("结果: " + result2)
+PrintLine("")
+
+PrintLine("测试 3: 调用 abs(-999)")
+result3 <- abs(-999)
+PrintLine("结果: " + result3)
+PrintLine("")
+
+// 测试结果验证
+if result1 == 42 {
+    PrintLine("✓ 测试 1 通过: abs(-42) = 42")
+} else {
+    PrintLine("✗ 测试 1 失败")
+}
+
+if result2 == 100 {
+    PrintLine("✓ 测试 2 通过: abs(100) = 100")
+} else {
+    PrintLine("✗ 测试 2 失败")
+}
+
+if result3 == 999 {
+    PrintLine("✓ 测试 3 通过: abs(-999) = 999")
+} else {
+    PrintLine("✗ 测试 3 失败")
+}
+
+PrintLine("")
+PrintLine("=== 所有测试完成 ===")

@@ -690,7 +690,16 @@ public class VirtualMachine
                         args[i] = _stack.Pop();
                     }
 
-                    // 查找函数
+                    // 首先检查是否是 extern 函数（从全局变量中查找）
+                    if (_globals.TryGetValue(funcName, out var externFuncObj) && externFuncObj is ExternFunctionWrapper externFunc)
+                    {
+                        // 调用 extern 函数
+                        var result = externFunc.Invoke(args);
+                        _stack.Push(result);
+                        break;
+                    }
+
+                    // 查找普通函数
                     var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
                     if (function == null)
                     {

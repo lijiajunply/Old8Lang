@@ -146,36 +146,61 @@ public class ExternFunctionWrapper
     }
 
     /// <summary>
-    /// 创建委托类型
+    /// 创建委托类型（使用动态程序集，避免泛型类型）
     /// </summary>
     private Type CreateDelegateType(Type[] paramTypes, Type returnType)
     {
-        // 使用 Func 或 Action 委托
-        if (returnType == typeof(void))
+        // 动态创建委托类型
+        var assemblyName = new System.Reflection.AssemblyName($"ExternDelegate_{Guid.NewGuid():N}");
+        var assemblyBuilder = System.Reflection.Emit.AssemblyBuilder.DefineDynamicAssembly(
+            assemblyName,
+            System.Reflection.Emit.AssemblyBuilderAccess.Run);
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule("ExternModule");
+        var typeBuilder = moduleBuilder.DefineType(
+            $"ExternDelegate_{_funcName}",
+            System.Reflection.TypeAttributes.Public | System.Reflection.TypeAttributes.Sealed,
+            typeof(MulticastDelegate));
+
+        // 添加 UnmanagedFunctionPointer 特性
+        var callingConv = _callingConvention switch
         {
-            return paramTypes.Length switch
-            {
-                0 => typeof(Action),
-                1 => typeof(Action<>).MakeGenericType(paramTypes),
-                2 => typeof(Action<,>).MakeGenericType(paramTypes),
-                3 => typeof(Action<,,>).MakeGenericType(paramTypes),
-                4 => typeof(Action<,,,>).MakeGenericType(paramTypes),
-                _ => throw new NotSupportedException($"不支持超过 4 个参数的 Action 委托")
-            };
-        }
-        else
-        {
-            var allTypes = paramTypes.Concat(new[] { returnType }).ToArray();
-            return allTypes.Length switch
-            {
-                1 => typeof(Func<>).MakeGenericType(allTypes),
-                2 => typeof(Func<,>).MakeGenericType(allTypes),
-                3 => typeof(Func<,,>).MakeGenericType(allTypes),
-                4 => typeof(Func<,,,>).MakeGenericType(allTypes),
-                5 => typeof(Func<,,,,>).MakeGenericType(allTypes),
-                _ => throw new NotSupportedException($"不支持超过 4 个参数的 Func 委托")
-            };
-        }
+            CallingConventionType.Cdecl => System.Runtime.InteropServices.CallingConvention.Cdecl,
+            CallingConventionType.StdCall => System.Runtime.InteropServices.CallingConvention.StdCall,
+            CallingConventionType.WinApi => System.Runtime.InteropServices.CallingConvention.Winapi,
+            _ => System.Runtime.InteropServices.CallingConvention.Cdecl
+        };
+
+        var unmanagedAttr = new System.Reflection.Emit.CustomAttributeBuilder(
+            typeof(System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute)
+                .GetConstructor(new[] { typeof(System.Runtime.InteropServices.CallingConvention) })!,
+            new object[] { callingConv });
+        typeBuilder.SetCustomAttribute(unmanagedAttr);
+
+        // 定义构造函数
+        var ctorBuilder = typeBuilder.DefineConstructor(
+            System.Reflection.MethodAttributes.RTSpecialName |
+            System.Reflection.MethodAttributes.HideBySig |
+            System.Reflection.MethodAttributes.Public,
+            System.Reflection.CallingConventions.Standard,
+            new[] { typeof(object), typeof(IntPtr) });
+        ctorBuilder.SetImplementationFlags(
+            System.Reflection.MethodImplAttributes.Runtime |
+            System.Reflection.MethodImplAttributes.Managed);
+
+        // 定义 Invoke 方法
+        var invokeBuilder = typeBuilder.DefineMethod(
+            "Invoke",
+            System.Reflection.MethodAttributes.Public |
+            System.Reflection.MethodAttributes.HideBySig |
+            System.Reflection.MethodAttributes.NewSlot |
+            System.Reflection.MethodAttributes.Virtual,
+            returnType,
+            paramTypes);
+        invokeBuilder.SetImplementationFlags(
+            System.Reflection.MethodImplAttributes.Runtime |
+            System.Reflection.MethodImplAttributes.Managed);
+
+        return typeBuilder.CreateType()!;
     }
 
     /// <summary>

@@ -1,0 +1,31 @@
+// 实际调用系统 DLL 函数的测试
+// 这个测试会根据操作系统调用不同的库函数
+
+PrintLine("=== Old8Lang Extern 实际调用测试 ===")
+PrintLine("")
+
+// macOS/Linux: 使用 libc
+// 测试 abs 函数（绝对值）
+native extern "libc.dylib" {
+    func abs(x:int) -> int
+}
+
+PrintLine("测试 1: 调用 abs(-42)")
+result1 <- abs(-42)
+PrintLine("结果: " + result1.ToStr())
+PrintLine("预期: 42")
+PrintLine("")
+
+PrintLine("测试 2: 调用 abs(100)")
+result2 <- abs(100)
+PrintLine("结果: " + result2.ToStr())
+PrintLine("预期: 100")
+PrintLine("")
+
+PrintLine("测试 3: 调用 abs(-999)")
+result3 <- abs(-999)
+PrintLine("结果: " + result3.ToStr())
+PrintLine("预期: 999")
+PrintLine("")
+
+PrintLine("=== 所有测试完成 ===")
