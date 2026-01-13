@@ -140,4 +140,9 @@ public sealed class SpawnFunction : BaseGlobalFunction
     {
         return typeof(ThreadLangValue);
     }
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        // VM 模式下不支持 Spawn,返回 null
+        return null;
+    }
 }

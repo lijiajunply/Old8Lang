@@ -32,4 +32,8 @@ public sealed class TupleFunction : BaseGlobalFunction
     {
         return typeof(TupleLangValue);
     }
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return new TupleLangValue(true, default);
+    }
 }

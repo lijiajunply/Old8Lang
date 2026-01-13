@@ -42,6 +42,11 @@ public sealed class CreateCancellationTokenSourceFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return ResourceManager.CreateCancellationTokenSource();
+    }
 }
 
 /// <summary>
@@ -81,6 +86,13 @@ public sealed class CancelFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int ctsId = Convert.ToInt32(arguments[0]);
+        ResourceManager.Cancel(ctsId);
+        return null;
     }
 }
 
@@ -126,6 +138,14 @@ public sealed class CancelAfterFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int ctsId = Convert.ToInt32(arguments[0]);
+        int delayMs = Convert.ToInt32(arguments[1]);
+        ResourceManager.CancelAfter(ctsId, delayMs);
+        return null;
+    }
 }
 
 /// <summary>
@@ -165,5 +185,12 @@ public sealed class DisposeCancellationTokenSourceFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int ctsId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeCancellationTokenSource(ctsId);
+        return null;
     }
 }

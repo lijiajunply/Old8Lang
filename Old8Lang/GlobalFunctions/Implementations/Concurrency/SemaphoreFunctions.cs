@@ -52,6 +52,13 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int initialCount = Convert.ToInt32(arguments[0]);
+        int maxCount = Convert.ToInt32(arguments[1]);
+        return ResourceManager.CreateSemaphore(initialCount, maxCount);
+    }
 }
 
 /// <summary>
@@ -91,6 +98,13 @@ public sealed class SemaphoreAcquireFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int semaphoreId = Convert.ToInt32(arguments[0]);
+        ResourceManager.AcquireSemaphore(semaphoreId);
+        return null;
     }
 }
 
@@ -136,6 +150,13 @@ public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int semaphoreId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.TryAcquireSemaphore(semaphoreId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -176,6 +197,13 @@ public sealed class SemaphoreReleaseFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int semaphoreId = Convert.ToInt32(arguments[0]);
+        ResourceManager.ReleaseSemaphore(semaphoreId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -215,5 +243,12 @@ public sealed class SemaphoreDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int semaphoreId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeSemaphore(semaphoreId);
+        return null;
     }
 }

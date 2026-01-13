@@ -48,6 +48,12 @@ public sealed class AtomicIntCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int initialValue = Convert.ToInt32(arguments[0]);
+        return ResourceManager.CreateAtomicInt(initialValue);
+    }
 }
 
 /// <summary>
@@ -87,6 +93,12 @@ public sealed class AtomicIntGetFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.GetAtomicInt(atomicId);
     }
 }
 
@@ -132,6 +144,14 @@ public sealed class AtomicIntSetFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        int newValue = Convert.ToInt32(arguments[1]);
+        ResourceManager.SetAtomicInt(atomicId, newValue);
+        return null;
+    }
 }
 
 /// <summary>
@@ -172,6 +192,12 @@ public sealed class AtomicIntIncrementFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.IncrementAtomicInt(atomicId);
+    }
 }
 
 /// <summary>
@@ -211,6 +237,12 @@ public sealed class AtomicIntDecrementFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.DecrementAtomicInt(atomicId);
     }
 }
 
@@ -255,6 +287,13 @@ public sealed class AtomicIntAddFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        int delta = Convert.ToInt32(arguments[1]);
+        return ResourceManager.AddAtomicInt(atomicId, delta);
     }
 }
 
@@ -304,6 +343,14 @@ public sealed class AtomicIntCompareAndSetFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        int expectedValue = Convert.ToInt32(arguments[1]);
+        int newValue = Convert.ToInt32(arguments[2]);
+        return ResourceManager.CompareAndSetAtomicInt(atomicId, expectedValue, newValue);
+    }
 }
 
 /// <summary>
@@ -343,5 +390,12 @@ public sealed class AtomicIntDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int atomicId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeAtomicInt(atomicId);
+        return null;
     }
 }

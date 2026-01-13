@@ -33,4 +33,8 @@ public sealed class DictFunction : BaseGlobalFunction
     {
         return typeof(DictionaryLangValue);
     }
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return new DictionaryLangValue();
+    }
 }

@@ -28,7 +28,8 @@ public partial class Instance : LangValueType
         NamedArgs = new List<NamedArgument>();
     }
 
-    public Instance(LangId langId, List<LangExpression> ids, List<NamedArgument> namedArgs, SourcePosition position = default)
+    public Instance(LangId langId, List<LangExpression> ids, List<NamedArgument> namedArgs,
+        SourcePosition position = default)
         : base(position)
     {
         Id = langId;
@@ -485,8 +486,8 @@ public partial class Instance : LangValueType
         // 如果还是没找到，尝试 ValueTypeFuncStatic
         if (m is null)
         {
-            type = Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ValueTypeFuncStatic");
-            m = type?.GetMethod(Id.IdName);
+            type = typeof(ValueTypeFuncStatic);
+            m = type.GetMethod(Id.IdName);
         }
 
         // 如果找不到方法，抛出异常
@@ -985,7 +986,8 @@ public partial class Instance : LangValueType
     /// <summary>
     /// 加载参数并进行必要的类型转换
     /// </summary>
-    private void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id, Type? idType, Type paramType)
+    private void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id,
+        Type? idType, Type paramType)
     {
         // 使用LocalManager的ValidateType方法验证参数类型
         if (idType is not null)

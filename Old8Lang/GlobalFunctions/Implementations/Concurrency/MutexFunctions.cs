@@ -42,6 +42,11 @@ public sealed class MutexCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return ResourceManager.CreateMutex();
+    }
 }
 
 /// <summary>
@@ -81,6 +86,13 @@ public sealed class MutexLockFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int mutexId = Convert.ToInt32(arguments[0]);
+        ResourceManager.LockMutex(mutexId);
+        return null;
     }
 }
 
@@ -126,6 +138,13 @@ public sealed class MutexTryLockFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int mutexId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.TryLockMutex(mutexId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -166,6 +185,13 @@ public sealed class MutexUnlockFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int mutexId = Convert.ToInt32(arguments[0]);
+        ResourceManager.UnlockMutex(mutexId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -205,5 +231,12 @@ public sealed class MutexDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int mutexId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeMutex(mutexId);
+        return null;
     }
 }

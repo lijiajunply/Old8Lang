@@ -81,6 +81,25 @@ public sealed class LenFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        // VM 模式下需要获取参数的长度
+        object? value = arguments[0];
+        if (value is Array array)
+        {
+            return array.Length;
+        }
+        if (value is string str)
+        {
+            return str.Length;
+        }
+        if (value is System.Collections.ICollection collection)
+        {
+            return collection.Count;
+        }
+        return 0;
+    }
 }
 
 /// <summary>
@@ -109,6 +128,12 @@ public sealed class TypeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(string);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        object? value = arguments[0];
+        return value?.GetType().Name ?? "null";
     }
 }
 
@@ -145,6 +170,12 @@ public sealed class AssertFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        // VM 模式下暂不支持断言,返回 true
+        return true;
+    }
 }
 
 /// <summary>
@@ -172,5 +203,11 @@ public sealed class ShowValuesFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        // VM 模式下不支持 ShowValues,返回 null
+        return null;
     }
 }

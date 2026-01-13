@@ -48,6 +48,12 @@ public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int count = Convert.ToInt32(arguments[0]);
+        return ResourceManager.CreateCountDownLatch(count);
+    }
 }
 
 /// <summary>
@@ -88,6 +94,13 @@ public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int latchId = Convert.ToInt32(arguments[0]);
+        ResourceManager.CountDown(latchId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -127,6 +140,13 @@ public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int latchId = Convert.ToInt32(arguments[0]);
+        ResourceManager.WaitCountDownLatch(latchId);
+        return null;
     }
 }
 
@@ -172,6 +192,13 @@ public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int latchId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.WaitCountDownLatchTimeout(latchId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -212,6 +239,12 @@ public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int latchId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.GetCountDownLatchCount(latchId);
+    }
 }
 
 /// <summary>
@@ -251,5 +284,12 @@ public sealed class CountDownLatchDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int latchId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeCountDownLatch(latchId);
+        return null;
     }
 }

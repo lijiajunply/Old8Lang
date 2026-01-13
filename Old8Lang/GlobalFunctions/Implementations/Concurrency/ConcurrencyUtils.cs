@@ -47,6 +47,13 @@ public sealed class SleepFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int milliseconds = Convert.ToInt32(arguments[0]);
+        Thread.Sleep(milliseconds);
+        return null;
+    }
 }
 
 /// <summary>
@@ -83,6 +90,11 @@ public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return Environment.CurrentManagedThreadId;
+    }
 }
 
 /// <summary>
@@ -118,5 +130,10 @@ public sealed class GetProcessorCountFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return Environment.ProcessorCount;
     }
 }

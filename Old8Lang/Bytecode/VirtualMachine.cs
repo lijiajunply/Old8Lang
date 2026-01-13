@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.Bytecode;
 
@@ -32,6 +33,9 @@ public class VirtualMachine
     public VirtualMachine(BytecodeFile bytecodeFile)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
+
+        // 初始化全局函数注册表
+        GlobalFunctionInitializer.EnsureInitialized();
 
         // 初始化全局变量
         foreach (var globalVar in _bytecodeFile.GlobalVariables)
@@ -2538,31 +2542,23 @@ public class VirtualMachine
     /// </summary>
     private object? CallNativeFunction(string funcName, object?[] args)
     {
+        // 首先尝试从全局函数注册表中查找
+        var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
+        if (globalFunction != null)
+        {
+            try
+            {
+                return globalFunction.ExecuteInVM(args);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"调用全局函数 {funcName} 时发生错误: {ex.Message}", ex);
+            }
+        }
+
+        // 处理特殊的辅助函数（不在全局函数注册表中）
         switch (funcName)
         {
-            case "PrintLine":
-                if (args.Length > 0)
-                {
-                    Console.WriteLine(ToString(args[0]));
-                }
-                else
-                {
-                    Console.WriteLine();
-                }
-
-                return null;
-
-            case "Print":
-                if (args.Length > 0)
-                {
-                    Console.Write(ToString(args[0]));
-                }
-
-                return null;
-
-            case "ReadLine":
-                return Console.ReadLine();
-
             case "ToStr":
                 return args.Length > 0 ? ToString(args[0]) : "";
 
@@ -2571,7 +2567,6 @@ public class VirtualMachine
                 {
                     return result;
                 }
-
                 return 0;
 
             case "ToDouble":
@@ -2579,102 +2574,8 @@ public class VirtualMachine
                 {
                     return dresult;
                 }
-
                 return 0.0;
 
-            // === Mutex函数 ===
-            case "MutexCreate":
-                return Concurrency.ResourceManager.CreateMutex();
-
-            case "MutexLock":
-                if (args.Length > 0)
-                {
-                    int mutexId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.LockMutex(mutexId);
-                }
-
-                return null;
-
-            case "MutexUnlock":
-                if (args.Length > 0)
-                {
-                    int mutexId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.UnlockMutex(mutexId);
-                }
-
-                return null;
-
-            case "MutexDispose":
-                if (args.Length > 0)
-                {
-                    int mutexId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.DisposeMutex(mutexId);
-                }
-
-                return null;
-
-            // === Channel函数 ===
-            case "ChannelCreate":
-                return Concurrency.ResourceManager.CreateChannel();
-
-            case "ChannelSend":
-                if (args.Length >= 2)
-                {
-                    int channelId = Convert.ToInt32(args[0]);
-                    object? value = args[1];
-                    Concurrency.ResourceManager.SendChannel(channelId, value);
-                }
-
-                return null;
-
-            case "ChannelReceive":
-                if (args.Length > 0)
-                {
-                    int channelId = Convert.ToInt32(args[0]);
-                    return Concurrency.ResourceManager.ReceiveChannel(channelId);
-                }
-
-                return null;
-
-            case "ChannelClose":
-                if (args.Length > 0)
-                {
-                    int channelId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.CloseChannel(channelId);
-                }
-
-                return null;
-
-            // === Semaphore函数 ===
-            case "SemaphoreCreate":
-                if (args.Length >= 2)
-                {
-                    int initialCount = Convert.ToInt32(args[0]);
-                    int maxCount = Convert.ToInt32(args[1]);
-                    return Concurrency.ResourceManager.CreateSemaphore(initialCount, maxCount);
-                }
-
-                return 0;
-
-            case "SemaphoreAcquire":
-                if (args.Length > 0)
-                {
-                    int semaphoreId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.AcquireSemaphore(semaphoreId);
-                }
-
-                return null;
-
-            case "SemaphoreRelease":
-                if (args.Length > 0)
-                {
-                    int semaphoreId = Convert.ToInt32(args[0]);
-                    Concurrency.ResourceManager.ReleaseSemaphore(semaphoreId);
-                }
-
-                return null;
-
-            // === Match 表达式辅助函数 ===
             case "CheckRange":
                 // 参数: value, start, end, includeStart, includeEnd
                 if (args.Length >= 5)
@@ -2698,7 +2599,6 @@ public class VirtualMachine
 
                     return inRange;
                 }
-
                 return false;
 
             case "FlattenTuple":
@@ -2707,7 +2607,6 @@ public class VirtualMachine
                 {
                     return FlattenTupleHelper(tuple);
                 }
-
                 return new List<object?>();
 
             case "GetCount":
@@ -2722,17 +2621,14 @@ public class VirtualMachine
                         _ => 0
                     };
                 }
-
                 return 0;
 
-            // === ResourceManager 通用函数 ===
             case "ResourceManagerTryDispose":
                 if (args.Length > 0)
                 {
                     int resourceId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.TryDispose(resourceId);
                 }
-
                 return null;
 
             default:

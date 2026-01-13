@@ -74,4 +74,30 @@ public sealed class PrintLineFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        if (arguments.Length == 0)
+        {
+            Console.WriteLine();
+            return null;
+        }
+
+        // 将所有参数转换为字符串并连接
+        var value = ToString(arguments[0]);
+        for (var i = 1; i < arguments.Length; i++)
+        {
+            value += ToString(arguments[i]);
+        }
+
+        Console.WriteLine(value);
+        return null;
+    }
+
+    private static string ToString(object? value)
+    {
+        if (value == null) return "null";
+        if (value is string s) return s;
+        return value.ToString() ?? "";
+    }
 }

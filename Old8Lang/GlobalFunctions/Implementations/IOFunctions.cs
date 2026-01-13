@@ -58,6 +58,27 @@ public sealed class PrintFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        if (arguments.Length == 0) return null;
+
+        var value = ToString(arguments[0]);
+        for (var i = 1; i < arguments.Length; i++)
+        {
+            value += ToString(arguments[i]);
+        }
+
+        Console.Write(value);
+        return null;
+    }
+
+    private static string ToString(object? value)
+    {
+        if (value == null) return "null";
+        if (value is string s) return s;
+        return value.ToString() ?? "";
+    }
 }
 
 /// <summary>
@@ -84,6 +105,11 @@ public sealed class ReadLineFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(string);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return Console.ReadLine() ?? "";
     }
 }
 
@@ -152,6 +178,31 @@ public sealed class ErrorFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        if (arguments.Length == 0)
+        {
+            Console.Error.WriteLine();
+            return null;
+        }
+
+        var value = ToString(arguments[0]);
+        for (var i = 1; i < arguments.Length; i++)
+        {
+            value += ToString(arguments[i]);
+        }
+
+        Console.Error.WriteLine(value);
+        return null;
+    }
+
+    private static string ToString(object? value)
+    {
+        if (value == null) return "null";
+        if (value is string s) return s;
+        return value.ToString() ?? "";
+    }
 }
 
 /// <summary>
@@ -181,5 +232,11 @@ public sealed class ClearFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        Console.Clear();
+        return null;
     }
 }

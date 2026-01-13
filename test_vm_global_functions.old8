@@ -1,0 +1,48 @@
+// 测试字节码模式的全局函数调用
+
+// 测试 IO 函数
+PrintLine("=== 测试 IO 函数 ===")
+PrintLine("Hello from VM!")
+Print("Print without newline: ")
+PrintLine(123)
+
+// 测试工具函数
+PrintLine("\n=== 测试工具函数 ===")
+list <- {1, 2, 3, 4, 5}
+PrintLine("列表长度: " + Len(list).ToStr())
+PrintLine("列表类型: " + Type(list))
+
+// 测试并发原语 - Mutex
+PrintLine("\n=== 测试 Mutex 函数 ===")
+mutex <- MutexCreate()
+PrintLine("Mutex 创建成功，ID: " + mutex.ToStr())
+MutexLock(mutex)
+PrintLine("Mutex 已锁定")
+MutexUnlock(mutex)
+PrintLine("Mutex 已解锁")
+MutexDispose(mutex)
+PrintLine("Mutex 已销毁")
+
+// 测试并发原语 - Semaphore
+PrintLine("\n=== 测试 Semaphore 函数 ===")
+sem <- SemaphoreCreate(1, 3)
+PrintLine("Semaphore 创建成功，ID: " + sem.ToStr())
+SemaphoreAcquire(sem)
+PrintLine("Semaphore 已获取")
+SemaphoreRelease(sem)
+PrintLine("Semaphore 已释放")
+SemaphoreDispose(sem)
+PrintLine("Semaphore 已销毁")
+
+// 测试并发原语 - AtomicInt
+PrintLine("\n=== 测试 AtomicInt 函数 ===")
+atomic <- AtomicIntCreate(0)
+PrintLine("AtomicInt 创建成功，初始值: " + AtomicIntGet(atomic).ToStr())
+AtomicIntIncrement(atomic)
+PrintLine("递增后的值: " + AtomicIntGet(atomic).ToStr())
+AtomicIntAdd(atomic, 5)
+PrintLine("加5后的值: " + AtomicIntGet(atomic).ToStr())
+AtomicIntDispose(atomic)
+PrintLine("AtomicInt 已销毁")
+
+PrintLine("\n=== 所有测试完成 ===")

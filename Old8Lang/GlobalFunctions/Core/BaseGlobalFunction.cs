@@ -54,6 +54,15 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     }
 
     /// <summary>
+    /// 字节码模式执行（虚拟机模式）
+    /// </summary>
+    public object? ExecuteInVM(object?[] arguments)
+    {
+        ValidateParameterCountForVM(arguments.Length);
+        return ExecuteInVMInternal(arguments);
+    }
+
+    /// <summary>
     /// 解释器模式执行的内部实现
     /// </summary>
     protected abstract LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position);
@@ -69,6 +78,11 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     protected abstract Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local);
 
     /// <summary>
+    /// 字节码模式执行的内部实现
+    /// </summary>
+    protected abstract object? ExecuteInVMInternal(object?[] arguments);
+
+    /// <summary>
     /// 验证参数数量
     /// </summary>
     protected void ValidateParameterCount(int count, SourcePosition position)
@@ -81,6 +95,22 @@ public abstract class BaseGlobalFunction : IGlobalFunction
         if (MaxParameterCount != -1 && count > MaxParameterCount)
         {
             throw new ArgumentError(position, $"{Names[0]} 函数最多接受 {MaxParameterCount} 个参数，但提供了 {count} 个");
+        }
+    }
+
+    /// <summary>
+    /// 验证参数数量（字节码模式）
+    /// </summary>
+    protected void ValidateParameterCountForVM(int count)
+    {
+        if (count < MinParameterCount)
+        {
+            throw new ArgumentException($"{Names[0]} 函数需要至少 {MinParameterCount} 个参数，但只提供了 {count} 个");
+        }
+
+        if (MaxParameterCount != -1 && count > MaxParameterCount)
+        {
+            throw new ArgumentException($"{Names[0]} 函数最多接受 {MaxParameterCount} 个参数，但提供了 {count} 个");
         }
     }
 

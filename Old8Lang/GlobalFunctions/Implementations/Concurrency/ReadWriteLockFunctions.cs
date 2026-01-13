@@ -42,6 +42,11 @@ public sealed class ReadWriteLockCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return ResourceManager.CreateReadWriteLock();
+    }
 }
 
 /// <summary>
@@ -81,6 +86,13 @@ public sealed class ReadLockAcquireFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        ResourceManager.AcquireReadLock(lockId);
+        return null;
     }
 }
 
@@ -122,6 +134,13 @@ public sealed class ReadLockReleaseFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        ResourceManager.ReleaseReadLock(lockId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -162,6 +181,13 @@ public sealed class WriteLockAcquireFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        ResourceManager.AcquireWriteLock(lockId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -201,6 +227,13 @@ public sealed class WriteLockReleaseFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        ResourceManager.ReleaseWriteLock(lockId);
+        return null;
     }
 }
 
@@ -246,6 +279,13 @@ public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.TryAcquireReadLock(lockId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -290,6 +330,13 @@ public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.TryAcquireWriteLock(lockId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -329,5 +376,12 @@ public sealed class ReadWriteLockDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int lockId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeReadWriteLock(lockId);
+        return null;
     }
 }

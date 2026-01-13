@@ -42,6 +42,11 @@ public sealed class ChannelCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return ResourceManager.CreateChannel();
+    }
 }
 
 /// <summary>
@@ -81,6 +86,12 @@ public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int capacity = Convert.ToInt32(arguments[0]);
+        return ResourceManager.CreateBoundedChannel(capacity);
     }
 }
 
@@ -129,6 +140,14 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        object value = arguments[1]!;
+        ResourceManager.SendChannel(channelId, value);
+        return null;
     }
 }
 
@@ -182,6 +201,14 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        object value = arguments[1]!;
+        int timeoutMs = Convert.ToInt32(arguments[2]);
+        return ResourceManager.TrySendChannel(channelId, value, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -221,6 +248,12 @@ public sealed class ChannelReceiveFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(object);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.ReceiveChannel(channelId);
     }
 }
 
@@ -266,6 +299,13 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
     {
         return typeof(object);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.TryReceiveChannel(channelId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -306,6 +346,13 @@ public sealed class ChannelCloseFunction : BaseGlobalFunction
     {
         return typeof(void);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        ResourceManager.CloseChannel(channelId);
+        return null;
+    }
 }
 
 /// <summary>
@@ -345,5 +392,12 @@ public sealed class ChannelDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int channelId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeChannel(channelId);
+        return null;
     }
 }

@@ -48,6 +48,12 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int participantCount = Convert.ToInt32(arguments[0]);
+        return ResourceManager.CreateCyclicBarrier(participantCount);
+    }
 }
 
 /// <summary>
@@ -87,6 +93,13 @@ public sealed class CyclicBarrierAwaitFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int barrierId = Convert.ToInt32(arguments[0]);
+        ResourceManager.AwaitCyclicBarrier(barrierId);
+        return null;
     }
 }
 
@@ -132,6 +145,13 @@ public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
     {
         return typeof(bool);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int barrierId = Convert.ToInt32(arguments[0]);
+        int timeoutMs = Convert.ToInt32(arguments[1]);
+        return ResourceManager.AwaitCyclicBarrierTimeout(barrierId, timeoutMs);
+    }
 }
 
 /// <summary>
@@ -171,6 +191,12 @@ public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunctio
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(int);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int barrierId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.GetCyclicBarrierParticipantCount(barrierId);
     }
 }
 
@@ -212,6 +238,12 @@ public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
     {
         return typeof(int);
     }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int barrierId = Convert.ToInt32(arguments[0]);
+        return ResourceManager.GetCyclicBarrierWaitingCount(barrierId);
+    }
 }
 
 /// <summary>
@@ -251,5 +283,12 @@ public sealed class CyclicBarrierDisposeFunction : BaseGlobalFunction
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        int barrierId = Convert.ToInt32(arguments[0]);
+        ResourceManager.DisposeCyclicBarrier(barrierId);
+        return null;
     }
 }

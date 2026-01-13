@@ -76,4 +76,9 @@ public sealed class JsonFunction : BaseGlobalFunction
     {
         return typeof(string);
     }
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        // VM 模式下不支持 JSON 序列化,返回空字符串
+        return "";
+    }
 }

@@ -51,4 +51,11 @@ public interface IGlobalFunction
     /// <param name="local">局部变量管理器</param>
     /// <returns>返回类型</returns>
     Type GetReturnType(List<LangExpression> parameters, LocalManager local);
+
+    /// <summary>
+    /// 字节码模式执行（虚拟机模式）
+    /// </summary>
+    /// <param name="arguments">已求值的参数数组</param>
+    /// <returns>执行结果</returns>
+    object? ExecuteInVM(object?[] arguments);
 }
