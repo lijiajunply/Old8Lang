@@ -175,11 +175,6 @@ public partial class EnumInit(
     /// <returns>返回0，因为EnumInit是单个语句</returns>
     public override int Count => 0;
 
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// 将枚举定义转换为字符串表示
     /// </summary>

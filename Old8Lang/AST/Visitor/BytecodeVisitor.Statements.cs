@@ -1151,4 +1151,31 @@ public partial class BytecodeVisitor
 
         return null;
     }
+
+    public Instruction? VisitEnumInit(EnumInit node)
+    {
+        // 枚举定义在字节码模式下暂不支持
+        // TODO: 实现枚举的字节码生成
+        return null;
+    }
+
+    public Instruction? VisitExternStatement(ExternStatement node)
+    {
+        // Extern 语句在字节码模式下暂不支持
+        // TODO: 实现 extern 的字节码生成
+        return null;
+    }
+
+    public Instruction? VisitFileHeaderDirective(FileHeaderDirective node)
+    {
+        // 文件头指令在字节码模式下不需要生成代码
+        return null;
+    }
+
+    public Instruction? VisitUsingStatement(UsingStatement node)
+    {
+        // Using 语句在字节码模式下暂不支持
+        // TODO: 实现 using 的字节码生成
+        return null;
+    }
 }

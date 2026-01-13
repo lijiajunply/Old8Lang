@@ -397,9 +397,4 @@ public partial class SelectStatement(
             return cases.Count + (defaultCase is not null ? 1 : 0);
         }
     }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        return visitor.VisitSelectStatement(this);
-    }
 }

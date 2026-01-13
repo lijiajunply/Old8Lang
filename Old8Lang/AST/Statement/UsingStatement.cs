@@ -252,11 +252,4 @@ public partial class UsingStatement(
             return 1; // 只有 using 块
         }
     }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        // 目前visitor pattern尚未完全实现using语句的支持
-        // 暂时返回默认值，等待visitor pattern完善后补充
-        return default!;
-    }
 }

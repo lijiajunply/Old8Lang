@@ -1,6 +1,7 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.LangParser;
@@ -605,5 +606,19 @@ public partial class BytecodeVisitor
 
         // 释放临时变量
         _compiler.FreeLocal(flattenedLocal);
+    }
+
+    public Instruction? VisitGenericInstanceExpression(GenericInstanceExpression node)
+    {
+        // 泛型实例化在字节码模式下暂不支持
+        // TODO: 实现泛型的字节码生成
+        return null;
+    }
+
+    public Instruction? VisitLinqExpression(LinqExpression node)
+    {
+        // LINQ 表达式在字节码模式下暂不支持
+        // TODO: 实现 LINQ 的字节码生成
+        return null;
     }
 }

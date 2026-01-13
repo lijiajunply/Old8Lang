@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Statement;
 /// #!strict true
 /// #!optimize 2
 /// </summary>
-public class FileHeaderDirective(string directiveName, string directiveValue, int line) : OldStatement
+public partial class FileHeaderDirective(string directiveName, string directiveValue, int line) : OldStatement
 {
     /// <summary>
     /// 指令名称（如 encoding, author, version, strict 等）
@@ -51,12 +51,6 @@ public class FileHeaderDirective(string directiveName, string directiveValue, in
     public override OldStatement? this[int index] => null;
 
     public override int Count => 0;
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        // 文件头指令通常不需要遍历
-        return default!;
-    }
 }
 
 /// <summary>

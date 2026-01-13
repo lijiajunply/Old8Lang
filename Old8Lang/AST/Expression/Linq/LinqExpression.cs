@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Linq;
 /// <summary>
 /// LINQ 查询表达式
 /// </summary>
-public class LinqExpression(
+public partial class LinqExpression(
     FromClause fromClause,
     List<LinqClause> bodyClauses,
     LinqClause terminationClause,
@@ -51,10 +51,5 @@ public class LinqExpression(
     {
         // LINQ 查询返回 IEnumerable<T>
         return typeof(System.Collections.IEnumerable);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 }

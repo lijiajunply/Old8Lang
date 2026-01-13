@@ -227,13 +227,4 @@ public partial class EnumLangValue(
             _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
-
-    #region Visitor 模式
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException("EnumLangValue visitor not implemented");
-    }
-
-    #endregion
 }

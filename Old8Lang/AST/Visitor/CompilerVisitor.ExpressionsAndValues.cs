@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
 
@@ -255,5 +256,73 @@ public partial class CompilerVisitor
     {
         node.LoadIlValue(ilGenerator, local);
         return null;
+    }
+
+    public object? VisitGenericInstanceExpression(GenericInstanceExpression node)
+    {
+        // 泛型实例化在编译器模式下暂不支持
+        // TODO: 实现泛型的编译器支持
+        return null;
+    }
+
+    public object? VisitLinqExpression(LinqExpression node)
+    {
+        // LINQ 表达式在编译器模式下暂不支持
+        // TODO: 实现 LINQ 的编译器支持
+        return null;
+    }
+
+    public object? VisitAssertClassLangValue(AssertClassLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitMockLibClassLangValue(MockLibClassLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitMockObjectLangValue(MockObjectLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitLockedVariableLangValue(LockedVariableLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
+    public object? VisitInterpreterVisitor(InterpreterVisitor node)
+    {
+        // InterpreterVisitor 不应该在编译器模式下访问
+        throw new NotSupportedException("InterpreterVisitor 不应该在编译器模式下访问");
     }
 }

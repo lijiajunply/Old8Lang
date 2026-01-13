@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// Assert 类的全局对象,提供静态方法访问
 /// </summary>
-public class AssertClassLangValue : LangValueType
+public partial class AssertClassLangValue : LangValueType
 {
     private static readonly AssertClassLangValue Instance = new();
 
@@ -33,11 +33,6 @@ public class AssertClassLangValue : LangValueType
         // 直接返回 Assert 类型本身
         ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertClassLangValue));
         ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 
 
@@ -978,7 +973,7 @@ public class AssertClassLangValue : LangValueType
 /// <summary>
 /// Assert 静态方法的包装器
 /// </summary>
-public class AssertStaticMethodWrapper(
+public partial class AssertStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType
@@ -1012,10 +1007,5 @@ public class AssertStaticMethodWrapper(
     public override Type OutputType(LocalManager local)
     {
         return typeof(Delegate);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 }

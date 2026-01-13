@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -520,16 +521,95 @@ public partial class InterpreterVisitor
         return node;
     }
 
+    /// <summary>
+    /// 访问 EnumLangValue 节点
+    /// </summary>
+    public LangValueType VisitEnumLangValue(EnumLangValue node)
+    {
+        // 迁移自 EnumLangValue.Run()
+        // 枚举值节点在解释器模式下直接返回自身
+        return node;
+    }
+
     // ==================== 特殊节点 ====================
 
     /// <summary>
-    /// 访问 InterpreterVisitor 节点
+    /// 访问 GenericInstanceExpression 节点
     /// </summary>
-    public LangValueType VisitInterpreterVisitor(InterpreterVisitor node)
+    public LangValueType VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
-        // 注意: InterpreterVisitor 本身作为 AST 节点比较特殊
-        // 这个方法通常不应该被调用，因为 Visitor 本身不是值类型
-        // 如果被调用，抛出异常 (使用字符串消息而非节点,因为 InterpreterVisitor 不是 IOldLangTree)
-        throw new NotImplementedException("InterpreterVisitor 不应该被作为值类型节点访问");
+        return node.Run(manager);
+    }
+
+    /// <summary>
+    /// 访问 LinqExpression 节点
+    /// </summary>
+    public LangValueType VisitLinqExpression(LinqExpression node)
+    {
+        return node.Run(manager);
+    }
+
+    /// <summary>
+    /// 访问 AssertClassLangValue 节点
+    /// </summary>
+    public LangValueType VisitAssertClassLangValue(AssertClassLangValue node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 AssertStaticMethodWrapper 节点
+    /// </summary>
+    public LangValueType VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 LockedVariableLangValue 节点
+    /// </summary>
+    public LangValueType VisitLockedVariableLangValue(LockedVariableLangValue node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 MockLibClassLangValue 节点
+    /// </summary>
+    public LangValueType VisitMockLibClassLangValue(MockLibClassLangValue node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 MockLibStaticMethodWrapper 节点
+    /// </summary>
+    public LangValueType VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 MockObjectLangValue 节点
+    /// </summary>
+    public LangValueType VisitMockObjectLangValue(MockObjectLangValue node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 TestRunnerClassLangValue 节点
+    /// </summary>
+    public LangValueType VisitTestRunnerClassLangValue(TestRunnerClassLangValue node)
+    {
+        return node;
+    }
+
+    /// <summary>
+    /// 访问 TestRunnerStaticMethodWrapper 节点
+    /// </summary>
+    public LangValueType VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
+    {
+        return node;
     }
 }

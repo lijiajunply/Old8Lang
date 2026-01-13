@@ -29,6 +29,10 @@ public partial class TypeInferenceVisitor
     public Type? VisitYieldStatement(YieldStatement node) => typeof(void);
     public Type? VisitDeferStatement(DeferStatement node) => typeof(void);
     public Type? VisitSelectStatement(SelectStatement node) => typeof(void);
+    public Type? VisitEnumInit(EnumInit node) => typeof(void);
+    public Type? VisitExternStatement(ExternStatement node) => typeof(void);
+    public Type? VisitFileHeaderDirective(FileHeaderDirective node) => typeof(void);
+    public Type? VisitUsingStatement(UsingStatement node) => typeof(void);
 
     // ReturnStatement返回其表达式的类型
     public Type? VisitReturnStatement(ReturnStatement node)

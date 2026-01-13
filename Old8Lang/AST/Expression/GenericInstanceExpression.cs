@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression;
 /// 泛型实例化表达式
 /// 例如: Box&lt;int>(), map&lt;string>(arr, func)
 /// </summary>
-public class GenericInstanceExpression : LangExpression
+public partial class GenericInstanceExpression : LangExpression
 {
     /// <summary>
     /// 基础表达式（通常是标识符）
@@ -308,12 +308,6 @@ public class GenericInstanceExpression : LangExpression
             "object" => typeof(object),
             _ => typeof(object)
         };
-    }
-
-    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
-    {
-        // TODO: Visitor 模式支持
-        throw new NotSupportedException("GenericInstanceExpression 暂不支持 Visitor 模式");
     }
 
     public override string ToString()

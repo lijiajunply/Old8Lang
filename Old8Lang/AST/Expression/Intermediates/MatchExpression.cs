@@ -205,10 +205,4 @@ public partial class MatchExpression(
 
         return typeof(object);
     }
-
-    /// <inheritdoc />
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        return visitor.VisitMatchExpression(this);
-    }
 }

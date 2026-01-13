@@ -208,11 +208,6 @@ public partial class ExternStatement : OldStatement
     /// </summary>
     public override int Count => Functions.Count;
 
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// 将 extern 语句转换为字符串表示
     /// </summary>

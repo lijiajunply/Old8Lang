@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
@@ -9,7 +10,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
 /// <summary>
 /// 类型模板类，用于存储类的定义信息
 /// </summary>
-public class TypeTemplate(
+public partial class TypeTemplate(
     string className,
     Dictionary<ClassMemberId, LangExpression> variates,
     Dictionary<ClassMemberId, LangExpression> staticVariates,
@@ -240,6 +241,15 @@ public class TypeTemplate(
     public override LangValueType Run(VariateManager manager)
     {
         return this;
+    }
+
+    /// <summary>
+    /// 接受 Visitor 访问
+    /// </summary>
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        // TypeTemplate 是类型定义的元数据，直接返回自身
+        return (TResult)(object)this;
     }
 
     /// <summary>
@@ -711,11 +721,6 @@ public class TypeTemplate(
 
         return instance;
     }
-
-    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
-    {
-        throw new NotSupportedException("TypeTemplate 暂不支持 Visitor 模式访问");
-    }
 }
 
 /// <summary>
@@ -875,10 +880,5 @@ public partial class MethodOverloadList : LangValueType
     public override string ToString()
     {
         return $"MethodOverloadList[{Overloads.Count} overloads]";
-    }
-
-    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
-    {
-        throw new NotSupportedException("TypeTemplate 暂不支持 Visitor 模式访问");
     }
 }

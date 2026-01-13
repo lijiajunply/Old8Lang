@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
 /// <summary>
 /// 枚举模板类，用于存储枚举的定义信息
 /// </summary>
-public class EnumTemplate(
+public partial class EnumTemplate(
     string enumName,
     Dictionary<string, int> members,
     SourcePosition position = default)
@@ -61,6 +61,8 @@ public class EnumTemplate(
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotImplementedException();
+        // EnumTemplate 是编译时的元数据，不需要在运行时访问
+        // 直接返回默认值
+        return default!;
     }
 }

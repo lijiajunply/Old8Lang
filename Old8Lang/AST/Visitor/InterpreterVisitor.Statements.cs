@@ -378,4 +378,44 @@ public partial class InterpreterVisitor
         node.Run(manager);
         return new VoidLangValue();
     }
+
+    /// <summary>
+    /// 访问 EnumInit 节点
+    /// </summary>
+    public LangValueType VisitEnumInit(EnumInit node)
+    {
+        // 迁移自 EnumInit.Run()
+        // 枚举定义逻辑已封装在 Run 方法中，直接调用
+        node.Run(manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ExternStatement 节点
+    /// </summary>
+    public LangValueType VisitExternStatement(ExternStatement node)
+    {
+        // 迁移自 ExternStatement.Run()
+        node.Run(manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 FileHeaderDirective 节点
+    /// </summary>
+    public LangValueType VisitFileHeaderDirective(FileHeaderDirective node)
+    {
+        // 文件头指令在解释器模式下不需要执行
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 UsingStatement 节点
+    /// </summary>
+    public LangValueType VisitUsingStatement(UsingStatement node)
+    {
+        // 迁移自 UsingStatement.Run()
+        node.Run(manager);
+        return new VoidLangValue();
+    }
 }

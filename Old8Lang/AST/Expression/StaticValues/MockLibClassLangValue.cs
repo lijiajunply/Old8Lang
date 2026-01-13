@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// MockLib 类的全局对象,提供静态方法访问
 /// </summary>
-public class MockLibClassLangValue : LangValueType
+public partial class MockLibClassLangValue : LangValueType
 {
     private static readonly MockLibClassLangValue Instance = new();
 
@@ -34,11 +34,6 @@ public class MockLibClassLangValue : LangValueType
         // 直接返回 MockLib 类型本身
         ilGenerator.Emit(OpCodes.Ldtoken, typeof(MockLibClassLangValue));
         ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -502,7 +497,7 @@ public class MockLibClassLangValue : LangValueType
 /// <summary>
 /// MockObject 的 LangValueType 包装器
 /// </summary>
-public class MockObjectLangValue(MockLib.MockObject mockObject, SourcePosition position = default)
+public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePosition position = default)
     : LangValueType(position)
 {
     public MockLib.MockObject MockObject { get; } = mockObject;
@@ -510,11 +505,6 @@ public class MockObjectLangValue(MockLib.MockObject mockObject, SourcePosition p
     public override string TypeToString() => "MockObject";
 
     public override string ToDisplayString() => $"MockObject('{MockObject.Name}')";
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
-    }
 
     public override Type OutputType(LocalManager local)
     {
@@ -714,7 +704,7 @@ public class MockObjectLangValue(MockLib.MockObject mockObject, SourcePosition p
 /// <summary>
 /// MockLib 静态方法的包装器
 /// </summary>
-public class MockLibStaticMethodWrapper(
+public partial class MockLibStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType
@@ -747,10 +737,5 @@ public class MockLibStaticMethodWrapper(
     public override Type OutputType(LocalManager local)
     {
         return typeof(Delegate);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 }

@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// TestRunner 类的全局对象,提供静态方法访问
 /// </summary>
-public class TestRunnerClassLangValue : LangValueType
+public partial class TestRunnerClassLangValue : LangValueType
 {
     private static readonly TestRunnerClassLangValue Instance = new();
 
@@ -34,11 +34,6 @@ public class TestRunnerClassLangValue : LangValueType
         // 直接返回 TestRunner 类型本身
         ilGenerator.Emit(OpCodes.Ldtoken, typeof(TestRunnerClassLangValue));
         ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -506,7 +501,7 @@ public class TestRunnerClassLangValue : LangValueType
 /// <summary>
 /// TestRunner 静态方法的包装器
 /// </summary>
-public class TestRunnerStaticMethodWrapper(
+public partial class TestRunnerStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType
@@ -539,10 +534,5 @@ public class TestRunnerStaticMethodWrapper(
     public override Type OutputType(LocalManager local)
     {
         return typeof(Delegate);
-    }
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        throw new NotImplementedException();
     }
 }

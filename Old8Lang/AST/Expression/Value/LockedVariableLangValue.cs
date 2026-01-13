@@ -24,7 +24,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// }
 /// </code>
 /// </remarks>
-public class LockedVariableLangValue : LangValueType
+public partial class LockedVariableLangValue : LangValueType
 {
     /// <summary>
     /// 用于同步访问的锁对象
@@ -204,15 +204,5 @@ public class LockedVariableLangValue : LangValueType
         }
 
         return GetLockedValue().Equal(otherValueType);
-    }
-
-    /// <summary>
-    /// 实现 Visitor 模式的 Accept 方法
-    /// </summary>
-    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
-    {
-        // 锁定变量目前不支持 Visitor 模式遍历
-        // 如果需要，可以在 visitor 中添加 VisitLockedVariable 方法
-        throw new NotSupportedException("LockedVariable 目前不支持 Visitor 模式");
     }
 }

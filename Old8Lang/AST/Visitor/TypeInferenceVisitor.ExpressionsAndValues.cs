@@ -2,8 +2,10 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Statement;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -13,6 +15,21 @@ namespace Old8Lang.AST.Visitor;
 public partial class TypeInferenceVisitor
 {
     // ===== Expression 节点实现 =====
+
+    public Type? VisitExternStatement(ExternStatement node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Type? VisitFileHeaderDirective(FileHeaderDirective node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Type? VisitUsingStatement(UsingStatement node)
+    {
+        throw new NotImplementedException();
+    }
 
     public Type? VisitAsyncStreamExpression(AsyncStreamExpression node)
     {
@@ -263,6 +280,62 @@ public partial class TypeInferenceVisitor
     }
 
     public Type? VisitMatchExpression(MatchExpression node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitEnumLangValue(EnumLangValue node)
+    {
+        // 枚举值的类型是 int（枚举的底层类型）
+        return typeof(int);
+    }
+
+    public Type? VisitGenericInstanceExpression(GenericInstanceExpression node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitLinqExpression(LinqExpression node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitAssertClassLangValue(AssertClassLangValue node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitLockedVariableLangValue(LockedVariableLangValue node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitMockLibClassLangValue(MockLibClassLangValue node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitMockObjectLangValue(MockObjectLangValue node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node)
+    {
+        return node.OutputType(local);
+    }
+
+    public Type? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
     {
         return node.OutputType(local);
     }

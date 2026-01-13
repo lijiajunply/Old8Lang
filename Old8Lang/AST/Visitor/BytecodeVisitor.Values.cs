@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Bytecode;
 
 namespace Old8Lang.Bytecode;
@@ -441,4 +442,16 @@ public partial class BytecodeVisitor
     public Instruction? VisitAssertClassLangValue(AssertClassLangValue node) => null;
     public Instruction? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node) => null;
     public Instruction? VisitMockLibClassLangValue(MockLibClassLangValue node) => null;
+    public Instruction? VisitEnumLangValue(EnumLangValue node)
+    {
+        // 枚举值在字节码模式下加载其整数值
+        Emit(OpCode.LoadConst, node.Value);
+        return null;
+    }
+    public Instruction? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node) => null;
+    public Instruction? VisitMockObjectLangValue(MockObjectLangValue node) => null;
+    public Instruction? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node) => null;
+    public Instruction? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node) => null;
+    public Instruction? VisitLockedVariableLangValue(LockedVariableLangValue node) => null;
+    public Instruction? VisitInterpreterVisitor(InterpreterVisitor node) => null;
 }

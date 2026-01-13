@@ -50,9 +50,4 @@ public partial class DeferStatement(
     }
 
     public override int Count => 1; // 只有一个子语句
-
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        return visitor.VisitDeferStatement(this);
-    }
 }

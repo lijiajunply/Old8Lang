@@ -207,4 +207,44 @@ public partial class CompilerVisitor
         node.GenerateIl(ilGenerator, local);
         return null;
     }
+
+    /// <summary>
+    /// 访问 EnumInit 节点（编译器）
+    /// </summary>
+    public object? VisitEnumInit(EnumInit node)
+    {
+        // 迁移自 EnumInit.GenerateIl()
+        // EnumInit 的逻辑已经封装在其 GenerateIl 方法中，直接调用
+        node.GenerateIl(ilGenerator, local);
+        return null;
+    }
+
+    /// <summary>
+    /// 访问 ExternStatement 节点（编译器）
+    /// </summary>
+    public object? VisitExternStatement(ExternStatement node)
+    {
+        // 迁移自 ExternStatement.GenerateIl()
+        node.GenerateIl(ilGenerator, local);
+        return null;
+    }
+
+    /// <summary>
+    /// 访问 FileHeaderDirective 节点（编译器）
+    /// </summary>
+    public object? VisitFileHeaderDirective(FileHeaderDirective node)
+    {
+        // 文件头指令在编译器模式下不需要生成代码
+        return null;
+    }
+
+    /// <summary>
+    /// 访问 UsingStatement 节点（编译器）
+    /// </summary>
+    public object? VisitUsingStatement(UsingStatement node)
+    {
+        // 迁移自 UsingStatement.GenerateIl()
+        node.GenerateIl(ilGenerator, local);
+        return null;
+    }
 }
