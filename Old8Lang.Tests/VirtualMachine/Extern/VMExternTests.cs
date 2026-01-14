@@ -41,14 +41,18 @@ public class VMExternTests
         }
     }
 
-    [Fact(Skip = "需要实际的 C 标准库测试")]
+    [Fact]
     public void ExternCFunction_CallsCorrectly()
     {
-        // Arrange
-        var code = @"
-            native extern ""msvcrt.dll"" {
+        // Arrange - 使用跨平台的 C 标准库名称
+        var libName = OperatingSystem.IsWindows() ? "msvcrt.dll" :
+                      OperatingSystem.IsMacOS() ? "libSystem.dylib" :
+                      "libc.so.6";
+
+        var code = $@"
+            native extern ""{libName}"" {{
                 func abs(x:int) -> int
-            }
+            }}
 
             result <- abs(-42)
             PrintLine(result.ToStr())
@@ -61,14 +65,18 @@ public class VMExternTests
         Assert.Equal("42", output);
     }
 
-    [Fact(Skip = "需要实际的 C 标准库测试")]
+    [Fact]
     public void ExternCFunction_WithAlias_CallsCorrectly()
     {
-        // Arrange
-        var code = @"
-            native extern ""msvcrt.dll"" {
+        // Arrange - 使用跨平台的 C 标准库名称
+        var libName = OperatingSystem.IsWindows() ? "msvcrt.dll" :
+                      OperatingSystem.IsMacOS() ? "libSystem.dylib" :
+                      "libc.so.6";
+
+        var code = $@"
+            native extern ""{libName}"" {{
                 func abs(x:int) -> int as absolute
-            }
+            }}
 
             result <- absolute(-100)
             PrintLine(result.ToStr())
@@ -81,16 +89,23 @@ public class VMExternTests
         Assert.Equal("100", output);
     }
 
-    [Fact(Skip = "需要实际的 C 标准库测试")]
-    public void ExternCFunction_MultipleParameters_CallsCorrectly()
+    [Fact]
+    public void ExternCFunction_GetPid_CallsCorrectly()
     {
-        // Arrange - 测试多参数函数
-        var code = @"
-            native extern ""kernel32.dll"" stdcall {
-                func GetCurrentProcessId() -> uint
-            }
+        // Arrange - 测试获取进程ID（跨平台）
+        var libName = OperatingSystem.IsWindows() ? "kernel32.dll" :
+                      OperatingSystem.IsMacOS() ? "libSystem.dylib" :
+                      "libc.so.6";
 
-            pid <- GetCurrentProcessId()
+        var funcName = OperatingSystem.IsWindows() ? "GetCurrentProcessId" : "getpid";
+        var convention = OperatingSystem.IsWindows() ? "stdcall" : "";
+
+        var code = $@"
+            native extern ""{libName}"" {convention} {{
+                func {funcName}() -> int
+            }}
+
+            pid <- {funcName}()
             PrintLine(""Process ID: "" + pid.ToStr())
         ";
 
@@ -99,5 +114,6 @@ public class VMExternTests
 
         // Assert
         Assert.Contains("Process ID:", output);
+        Assert.Matches(@"Process ID: \d+", output);
     }
 }
