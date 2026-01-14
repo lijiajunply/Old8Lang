@@ -77,6 +77,7 @@ public sealed class PrintFunction : BaseGlobalFunction
     {
         if (value == null) return "null";
         if (value is string s) return s;
+        if (value is LangValueType langValue) return langValue.ToDisplayString();
         return value.ToString() ?? "";
     }
 }
