@@ -1,5 +1,7 @@
 namespace Old8Lang.Bytecode;
 
+using Old8Lang.Bytecode.ModuleSystem;
+
 /// <summary>
 /// 字节码文件(.o8c)
 /// </summary>
@@ -35,6 +37,17 @@ public class BytecodeFile
 
     /// <summary>入口点函数索引</summary>
     public int EntryPointIndex { get; set; } = -1;
+
+    // ===== 模块系统字段 =====
+
+    /// <summary>模块名称（如果是模块）</summary>
+    public string? ModuleName { get; set; }
+
+    /// <summary>模块依赖列表</summary>
+    public List<ModuleDependency> Dependencies { get; set; } = [];
+
+    /// <summary>导出符号表</summary>
+    public Dictionary<string, ExportedSymbol>? Exports { get; set; }
 
     /// <summary>
     /// 保存到文件
@@ -104,6 +117,48 @@ public class BytecodeFile
         // 入口点
         writer.Write(EntryPointIndex);
 
+        // 模块名称（可选）
+        bool hasModuleName = !string.IsNullOrEmpty(ModuleName);
+        writer.Write(hasModuleName);
+        if (hasModuleName)
+            writer.Write(ModuleName!);
+
+        // 模块依赖
+        writer.Write(Dependencies.Count);
+        foreach (var dependency in Dependencies)
+        {
+            writer.Write(dependency.ModuleName);
+            writer.Write(dependency.ImportAll);
+            writer.Write(dependency.ModuleAlias ?? string.Empty);
+
+            // 导入符号列表
+            bool hasImportedSymbols = dependency.ImportedSymbols != null;
+            writer.Write(hasImportedSymbols);
+            if (hasImportedSymbols)
+            {
+                writer.Write(dependency.ImportedSymbols!.Count);
+                foreach (var symbol in dependency.ImportedSymbols)
+                {
+                    writer.Write(symbol.OriginalName);
+                    writer.Write(symbol.Alias ?? string.Empty);
+                }
+            }
+        }
+
+        // 导出符号表（可选）
+        bool hasExports = Exports != null && Exports.Count > 0;
+        writer.Write(hasExports);
+        if (hasExports)
+        {
+            writer.Write(Exports!.Count);
+            foreach (var export in Exports)
+            {
+                writer.Write(export.Key);
+                writer.Write((int)export.Value.Type);
+                writer.Write(export.Value.MetadataIndex);
+            }
+        }
+
         // 调试信息（可选）
         bool hasDebugInfo = DebugInfo != null;
         writer.Write(hasDebugInfo);
@@ -162,6 +217,59 @@ public class BytecodeFile
 
         // 入口点
         bytecodeFile.EntryPointIndex = reader.ReadInt32();
+
+        // 模块名称（可选）
+        bool hasModuleName = reader.ReadBoolean();
+        if (hasModuleName)
+            bytecodeFile.ModuleName = reader.ReadString();
+
+        // 模块依赖
+        int dependencyCount = reader.ReadInt32();
+        for (int i = 0; i < dependencyCount; i++)
+        {
+            var dependency = new ModuleDependency(reader.ReadString())
+            {
+                ImportAll = reader.ReadBoolean(),
+                ModuleAlias = reader.ReadString()
+            };
+
+            if (string.IsNullOrEmpty(dependency.ModuleAlias))
+                dependency.ModuleAlias = null;
+
+            // 导入符号列表
+            bool hasImportedSymbols = reader.ReadBoolean();
+            if (hasImportedSymbols)
+            {
+                int symbolCount = reader.ReadInt32();
+                dependency.ImportedSymbols = new List<ImportedSymbol>();
+                for (int j = 0; j < symbolCount; j++)
+                {
+                    string originalName = reader.ReadString();
+                    string alias = reader.ReadString();
+                    dependency.ImportedSymbols.Add(new ImportedSymbol(
+                        originalName,
+                        string.IsNullOrEmpty(alias) ? null : alias
+                    ));
+                }
+            }
+
+            bytecodeFile.Dependencies.Add(dependency);
+        }
+
+        // 导出符号表（可选）
+        bool hasExports = reader.ReadBoolean();
+        if (hasExports)
+        {
+            int exportCount = reader.ReadInt32();
+            bytecodeFile.Exports = new Dictionary<string, ExportedSymbol>();
+            for (int i = 0; i < exportCount; i++)
+            {
+                string name = reader.ReadString();
+                var type = (ExportedSymbolType)reader.ReadInt32();
+                int metadataIndex = reader.ReadInt32();
+                bytecodeFile.Exports[name] = new ExportedSymbol(name, type, null, metadataIndex);
+            }
+        }
 
         // 调试信息（可选）
         bool hasDebugInfo = reader.ReadBoolean();

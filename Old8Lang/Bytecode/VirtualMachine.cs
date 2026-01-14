@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.AST.Statement;
 using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.Bytecode.ModuleSystem;
 
 namespace Old8Lang.Bytecode;
 
@@ -32,9 +33,16 @@ public class VirtualMachine
     private readonly Dictionary<int, AsyncGeneratorState> _asyncGenerators = new();
     private int _nextAsyncGeneratorId = 1;
 
-    public VirtualMachine(BytecodeFile bytecodeFile)
+    // 模块系统
+    private readonly ModuleRegistry _moduleRegistry = new();
+    private readonly ModuleLoader _moduleLoader;
+    private readonly string? _baseDirectory;
+
+    public VirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
+        _baseDirectory = baseDirectory ?? Directory.GetCurrentDirectory();
+        _moduleLoader = new ModuleLoader(_baseDirectory);
 
         // 初始化全局函数注册表
         GlobalFunctionInitializer.EnsureInitialized();
@@ -2339,6 +2347,89 @@ public class VirtualMachine
             }
                 break;
 
+            // === 模块操作 ===
+            case OpCode.LoadModule:
+            {
+                // 加载模块
+                string moduleName = (string)instruction.Operand!;
+                LoadModule(moduleName);
+            }
+                break;
+
+            case OpCode.ImportSymbol:
+            {
+                // 导入符号: import { symbol } from "module"
+                var operands = (object[])instruction.Operand!;
+                string moduleName = (string)operands[0];
+                string symbolName = (string)operands[1];
+
+                var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
+                if (symbol == null)
+                {
+                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                }
+
+                // 将符号添加到当前全局变量
+                _globals[symbolName] = symbol;
+            }
+                break;
+
+            case OpCode.ImportSymbolAs:
+            {
+                // 导入符号并重命名: import { symbol as alias } from "module"
+                var operands = (object[])instruction.Operand!;
+                string moduleName = (string)operands[0];
+                string symbolName = (string)operands[1];
+                string alias = (string)operands[2];
+
+                var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
+                if (symbol == null)
+                {
+                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                }
+
+                // 使用别名添加到全局变量
+                _globals[alias] = symbol;
+            }
+                break;
+
+            case OpCode.ImportAll:
+            {
+                // 导入所有符号: import * from "module"
+                string moduleName = (string)instruction.Operand!;
+
+                var module = _moduleRegistry.GetModule(moduleName);
+                if (module == null)
+                {
+                    throw new Exception($"模块 '{moduleName}' 未加载");
+                }
+
+                // 导入所有导出的符号
+                foreach (var symbolName in module.GetExportedSymbolNames())
+                {
+                    var symbol = module.GetSymbol(symbolName);
+                    _globals[symbolName] = symbol;
+                }
+            }
+                break;
+
+            case OpCode.GetModuleSymbol:
+            {
+                // 获取模块符号: moduleName.symbolName
+                var operands = (object[])instruction.Operand!;
+                string moduleName = (string)operands[0];
+                string symbolName = (string)operands[1];
+
+                var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
+                if (symbol == null)
+                {
+                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                }
+
+                _stack.Push(symbol);
+            }
+                break;
+
             case OpCode.DebugPrint:
             {
                 int messageIndex = (int)instruction.Operand!;
@@ -3256,6 +3347,73 @@ public class VirtualMachine
         // 调用方法
         object? invokeInstance = method.IsStatic ? null : obj;
         return method.Invoke(invokeInstance, invokeArgs.ToArray());
+    }
+
+    // === 模块加载方法 ===
+
+    /// <summary>
+    /// 加载模块
+    /// </summary>
+    private void LoadModule(string moduleName)
+    {
+        // 检查模块是否已加载
+        if (_moduleRegistry.IsModuleLoaded(moduleName))
+        {
+            return; // 模块已加载，直接返回
+        }
+
+        // 检测循环依赖
+        if (!_moduleRegistry.MarkModuleLoading(moduleName))
+        {
+            throw new Exception($"检测到循环依赖：模块 '{moduleName}' 正在加载中");
+        }
+
+        try
+        {
+            // 加载并编译模块
+            var moduleBytecode = _moduleLoader.LoadModule(moduleName);
+
+            // 创建模块的全局变量空间
+            var moduleGlobals = new Dictionary<string, object?>();
+            foreach (var globalVar in moduleBytecode.GlobalVariables)
+            {
+                moduleGlobals[globalVar] = null;
+            }
+
+            // 执行模块的初始化代码（如果有入口点）
+            if (moduleBytecode.EntryPointIndex >= 0)
+            {
+                // 创建临时虚拟机执行模块初始化
+                var moduleVM = new VirtualMachine(moduleBytecode, _baseDirectory);
+
+                // 复制模块注册表（避免重复加载依赖）
+                foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                {
+                    var loadedModule = _moduleRegistry.GetModule(loadedModuleName);
+                    if (loadedModule != null)
+                    {
+                        moduleVM._moduleRegistry.RegisterModule(
+                            loadedModuleName,
+                            loadedModule.BytecodeFile,
+                            loadedModule.Globals
+                        );
+                    }
+                }
+
+                // 执行模块初始化
+                moduleVM.Execute();
+
+                // 获取模块的全局变量
+                moduleGlobals = moduleVM._globals;
+            }
+
+            // 注册模块
+            _moduleRegistry.RegisterModule(moduleName, moduleBytecode, moduleGlobals);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"加载模块 '{moduleName}' 失败: {ex.Message}", ex);
+        }
     }
 }
 

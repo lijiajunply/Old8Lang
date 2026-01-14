@@ -750,9 +750,55 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitImportStatement(ImportStatement node)
     {
-        // 导入语句
-        // 在字节码层面，导入通常在编译时处理
-        // 运行时不需要生成指令
+        // 导入语句 - 生成模块加载和符号导入指令
+
+        // 1. 生成LoadModule指令加载模块
+        string moduleName = node.GetImportString();
+        Emit(OpCode.LoadModule, moduleName);
+
+        // 2. 根据导入类型生成相应的导入指令
+        if (node.GetFromClause())
+        {
+            // import { item1, item2 } from "module"
+            var importSpecifiers = node.GetImportSpecifiers();
+            if (importSpecifiers != null && importSpecifiers.Count > 0)
+            {
+                foreach (var specifier in importSpecifiers)
+                {
+                    if (specifier.Alias != specifier.Name)
+                    {
+                        // import { item as alias } from "module"
+                        Emit(OpCode.ImportSymbolAs, new object[] { moduleName, specifier.Name, specifier.Alias });
+                    }
+                    else
+                    {
+                        // import { item } from "module"
+                        Emit(OpCode.ImportSymbol, new object[] { moduleName, specifier.Name });
+                    }
+                }
+            }
+            else if (importSpecifiers != null && importSpecifiers.Count == 0)
+            {
+                // import * from "module"
+                Emit(OpCode.ImportAll, moduleName);
+            }
+        }
+        else
+        {
+            // import "module" 或 import "module" as alias
+            if (node.GetModuleAlias() != null)
+            {
+                // 模块别名：将模块对象存储到全局变量
+                // 这里我们不生成指令，因为LoadModule已经加载了模块
+                // 模块别名的处理在虚拟机中完成
+            }
+            else
+            {
+                // 简单导入：导入所有导出符号
+                Emit(OpCode.ImportAll, moduleName);
+            }
+        }
+
         return null;
     }
 

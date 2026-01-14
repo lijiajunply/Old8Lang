@@ -99,6 +99,26 @@ public partial class ImportStatement(
     public bool IsDynamicImport => IsDynamic;
 
     /// <summary>
+    /// 公共属性：导入的模块名称或路径
+    /// </summary>
+    public string GetImportString() => ImportString;
+
+    /// <summary>
+    /// 公共属性：是否使用from子句
+    /// </summary>
+    public bool GetFromClause() => FromClause;
+
+    /// <summary>
+    /// 公共属性：导入指定符列表
+    /// </summary>
+    public List<ImportItem> GetImportSpecifiers() => ImportSpecifiers;
+
+    /// <summary>
+    /// 公共属性：模块别名
+    /// </summary>
+    public string? GetModuleAlias() => ModuleAlias;
+
+    /// <summary>
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
     private readonly LangExpression? DynamicModuleExpression = dynamicModuleExpression;

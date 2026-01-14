@@ -23,8 +23,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Examples/vm_math_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Examples/vm_module_alias_example.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Examples/vm_module_example.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Modules/VMImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ExportedSymbol.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleDependency.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleLoader.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -569,7 +580,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="16246000" />
+      <workItem from="1768331954396" duration="20681000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +925,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="664" />
+    <option name="localTasksCounter" value="665" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +952,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(compiler): 实现完整的 match 表达式支持&#10;&#10;- 扩展 BytecodeCompiler 添加临时变量管理和常量池功能&#10;- 实现值匹配、通配符匹配、变量绑定、类型匹配和范围匹配&#10;- 添加元组解构匹配支持和守卫条件处理&#10;- 在虚拟机中添加 CheckRange、FlattenTuple 和 GetCount 辅助函数&#10;- 实现元组展平递归算法用于解构匹配&#10;- 启用并完善 match 表达式的单元测试用例" />
     <MESSAGE value="feat(vm): 添加虚拟机模式Super表达式支持&#10;&#10;- 新增LoadSuper、CallSuperMethod、GetSuperField、SetSuperField四个字节码指令&#10;- 实现BytecodeVisitor中VisitSuperExpression方法生成相应字节码&#10;- 修改Dot运算符处理逻辑支持super.method()和super.field语法&#10;- 在VirtualMachine中实现所有Super相关指令的执行逻辑&#10;- 添加SuperExpression的OutputType和LoadIlValue方法修复栈溢出问题&#10;- 创建虚拟机模式Super表达式单元测试验证功能正确性&#10;- 添加多个测试文件验证解释器和虚拟机模式下的Super功能&#10;- 生成详细的Super表达式测试报告记录实现过程和问题发现" />
     <MESSAGE value="feat(vm): 为字节码虚拟机模式添加生成器支持&#10;&#10;- 实现生成器状态管理机制，支持状态保存和恢复&#10;- 添加字节码生成器类型，实现IEnumerable接口支持for-in循环&#10;- 实现Yield指令的字节码生成和虚拟机执行逻辑&#10;- 添加生成器函数自动检测机制，自动设置IsGenerator标记&#10;- 扩展虚拟机执行引擎，支持生成器暂停和恢复执行&#10;- 修改CallFrame添加生成器ID字段，支持生成器执行上下文管理&#10;- 更新BytecodeVisitor实现YieldStatement的字节码生成&#10;- 添加多个生成器测试用例验证功能正确性" />
     <MESSAGE value="feat(vm): 修复虚拟机模式类方法编译和调用支持&#10;&#10;- 创建 BytecodeObjectInstance 类来存储类名和字段信息&#10;- 修改 BytecodeVisitor.VisitClassInit 提取类方法并传递给编译器&#10;- 扩展 BytecodeCompiler.DeclareClass 支持方法列表和父类名参数&#10;- 将 object.method() 调用从 OpCode.Call 改为 OpCode.CallMethod 指令&#10;- 重写 VirtualMachine.CallMethod 指令实现对象方法查找和调用&#10;- 修改 VirtualMachine.NewObject 使用 BytecodeObjectInstance 创建对象&#10;- 更新 GetField 和 SetField 指令支持 BytecodeObjectInstance 对象实例&#10;- 修改 LoadSuper 指令从 Arguments 或 Locals 获取 this 实例&#10;- 清空 PreprocessClassDefinitions 避免与 VisitClassInit 冲突&#10;- 实现 CallSuperMethod 指令支持父类方法调用&#10;- 实现 SetSuperField 指令支持 super.field &lt;- value 语法&#10;- 修改 StatementParser 支持 super.field &lt;- value 赋值语句解析" />
@@ -966,7 +976,8 @@
     <MESSAGE value="feat(compiler): 添加接口和Mixin支持功能&#10;&#10;- 实现接口定义和继承机制，支持多接口实现&#10;- 添加Mixin混入功能，支持多Mixin组合&#10;- 实现类构造函数自动调用机制，优先init后类名方法&#10;- 扩展字节码文件结构，添加接口和Mixin元数据存储&#10;- 更新虚拟机执行逻辑，支持Mixin方法查找和调用&#10;- 新增接口和Mixin的单元测试验证功能正确性&#10;- 优化类实例化过程，确保类定义预编译完成&#10;- 添加接口继承关系和方法签名验证机制" />
     <MESSAGE value="feat(vm): 添加对params可变参数的支持&#10;&#10;- 在FunctionMetadata中添加ParamsParameterIndex属性用于标识params参数位置&#10;- 修改BytecodeCompiler中的函数编译方法以支持params参数索引传递&#10;- 在VirtualMachine中实现ProcessParamsArguments方法处理params参数打包逻辑&#10;- 更新函数调用时的参数处理流程，将多余参数打包成数组传递给params参数&#10;- 添加针对params参数功能的完整单元测试覆盖各种使用场景&#10;- 修复函数调用时参数数量不足情况下的错误处理逻辑" />
     <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并添加模式支持说明&#10;&#10;- 添加虚拟机模式 (字节码) 执行方式说明&#10;- 为所有语法特性添加模式支持标记 (解释器|编译器|虚拟机)&#10;- 新增模式支持总结文档 (Mode_Support_Summary.md)&#10;- 更新最后更新时间为 2026 年 1 月&#10;- 详细标注各特性的支持状态 (✅完全支持 ⚠️部分支持 ❌不支持 开发中)" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(language): 更新 Old8Lang 语法文档并添加模式支持说明&#10;&#10;- 添加虚拟机模式 (字节码) 执行方式说明&#10;- 为所有语法特性添加模式支持标记 (解释器|编译器|虚拟机)&#10;- 新增模式支持总结文档 (Mode_Support_Summary.md)&#10;- 更新最后更新时间为 2026 年 1 月&#10;- 详细标注各特性的支持状态 (✅完全支持 ⚠️部分支持 ❌不支持 开发中)" />
+    <MESSAGE value="feat(vm): 实现虚拟机模式下的多线程和using语句支持&#10;&#10;- 添加ThreadCreate、ThreadStart、ThreadJoin等线程操作码指令&#10;- 实现using语句的字节码生成和虚拟机执行逻辑&#10;- 添加DisposeResource指令用于资源自动释放&#10;- 创建VMThreadLangValue类型支持线程对象操作&#10;- 实现ResourceManager对线程资源的统一管理&#10;- 添加完整的多线程和using语句单元测试&#10;- 更新示例代码展示虚拟机多线程和using语句用法" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现虚拟机模式下的多线程和using语句支持&#10;&#10;- 添加ThreadCreate、ThreadStart、ThreadJoin等线程操作码指令&#10;- 实现using语句的字节码生成和虚拟机执行逻辑&#10;- 添加DisposeResource指令用于资源自动释放&#10;- 创建VMThreadLangValue类型支持线程对象操作&#10;- 实现ResourceManager对线程资源的统一管理&#10;- 添加完整的多线程和using语句单元测试&#10;- 更新示例代码展示虚拟机多线程和using语句用法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

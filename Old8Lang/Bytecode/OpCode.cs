@@ -335,6 +335,25 @@ public enum OpCode : byte
     /// <summary>释放using资源 (从栈顶弹出资源并调用Dispose)</summary>
     DisposeResource = 0xC6,
 
+    // ===== 模块操作 (0xD0-0xDF) =====
+    /// <summary>加载模块 (操作数: moduleNameIndex)</summary>
+    LoadModule = 0xD0,
+
+    /// <summary>导入符号 (操作数: moduleNameIndex, symbolNameIndex)</summary>
+    ImportSymbol = 0xD1,
+
+    /// <summary>导入符号并重命名 (操作数: moduleNameIndex, symbolNameIndex, aliasIndex)</summary>
+    ImportSymbolAs = 0xD2,
+
+    /// <summary>导入所有符号 (操作数: moduleNameIndex)</summary>
+    ImportAll = 0xD3,
+
+    /// <summary>导出符号 (操作数: symbolNameIndex)</summary>
+    ExportSymbol = 0xD4,
+
+    /// <summary>获取模块符号 (操作数: moduleNameIndex, symbolNameIndex)</summary>
+    GetModuleSymbol = 0xD5,
+
     /// <summary>打印调试信息 (操作数: messageIndex)</summary>
     DebugPrint = 0xF0,
 
