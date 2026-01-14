@@ -266,10 +266,41 @@ public partial class BytecodeVisitor
         else
         {
             // 普通函数调用
-            // 生成位置参数代码
-            foreach (var arg in node.Arguments)
+
+            // 特殊处理 Spawn 函数：第一个参数如果是函数名，需要转换为函数索引
+            if ((funcName == "Spawn" || funcName == "spawn") && positionalCount > 0)
             {
-                arg.Accept(this);
+                // 处理第一个参数（函数引用）
+                var firstArg = node.Arguments[0];
+                if (firstArg is LangId funcRefId)
+                {
+                    // 获取函数索引
+                    int funcIndex = _compiler.GetFunctionIndex(funcRefId.IdName);
+                    if (funcIndex < 0)
+                    {
+                        throw new Exception($"Spawn 函数引用的函数 '{funcRefId.IdName}' 未找到");
+                    }
+                    Emit(OpCode.LoadConst, funcIndex);
+                }
+                else
+                {
+                    // 如果不是简单的标识符，按正常方式处理
+                    firstArg.Accept(this);
+                }
+
+                // 处理剩余的参数
+                for (int i = 1; i < node.Arguments.Count; i++)
+                {
+                    node.Arguments[i].Accept(this);
+                }
+            }
+            else
+            {
+                // 生成位置参数代码
+                foreach (var arg in node.Arguments)
+                {
+                    arg.Accept(this);
+                }
             }
 
             // 生成命名参数的值

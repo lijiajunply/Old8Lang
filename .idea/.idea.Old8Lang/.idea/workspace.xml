@@ -23,11 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/DebugSuperFieldTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_super_field.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_vm_super.csx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMThreadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMThreadTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +571,7 @@
       <workItem from="1768255477344" duration="8804000" />
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
-      <workItem from="1768331954396" duration="23144000" />
+      <workItem from="1768331954396" duration="24561000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +916,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="668" />
+    <option name="localTasksCounter" value="670" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,8 +943,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加异步生成器功能支持&#10;&#10;- 新增 AsyncGeneratorState 类管理异步生成器执行状态&#10;- 实现 BytecodeAsyncGeneratorLangValue 类提供异步生成器对象&#10;- 添加异步生成器函数编译功能到 BytecodeCompiler&#10;- 扩展 VirtualMachine 支持异步生成器的执行和恢复&#10;- 新增 AwaitYield、NewAsyncGenerator、CallAsyncGenerator 指令&#10;- 实现 async for-in 循环语句的编译和执行逻辑&#10;- 添加异步生成器相关单元测试验证功能正确性" />
-    <MESSAGE value="feat(vm): 添加异步生成器功能支持&#10;&#10;- 新增 BytecodeAsyncStreamLangValue 类实现异步流对象&#10;- 扩展 BytecodeAsyncGeneratorLangValue 实现 IEnumerator 接口&#10;- 添加 IsCurrentFunctionAsync、IsGeneratorFunction 等编译器辅助方法&#10;- 实现异步流表达式的字节码生成逻辑&#10;- 区分异步和普通生成器的 Yield 指令处理&#10;- 完善虚拟机中异步生成器函数的调用和执行机制&#10;- 添加异步生成器调试测试用例验证功能正确性" />
     <MESSAGE value="feat(visitor): 实现AST节点的Visitor模式并添加新节点类型支持&#10;&#10;- 为AssertClassLangValue、AssertStaticMethodWrapper等类添加partial关键字以支持代码生成&#10;- 移除旧的Accept方法实现，替换为自动生成的Accept方法&#10;- 添加GenericInstanceExpression、LinqExpression等新表达式类型的访问器实现&#10;- 为BytecodeVisitor和CompilerVisitor添加对新节点类型的支持&#10;- 实现DeferStatement、EnumInit、ExternStatement等语句类型的访问器&#10;- 更新生成时间戳以反映代码生成器的重新运行&#10;- 添加对枚举值、断言类值等特殊类型值的处理逻辑" />
     <MESSAGE value="fix(ast): 修复 AST 访问器异常处理和清理未使用代码&#10;&#10;- 为字节码访问器中的成员访问和赋值操作添加明确的不支持异常&#10;- 为 LINQ 查询子句节点添加正确的操作不可用异常提示&#10;- 移除类型推断访问器中未使用的声明语句访问方法&#10;- 修复线程值类型的重试方法不支持异常信息&#10;- 清理 IDE 工作区配置文件中的多余变更记录" />
     <MESSAGE value="feat(vm): 实现虚拟机 extern 语句支持&#10;&#10;- 在 BytecodeVisitor 中实现 ExternStatement 的字节码生成逻辑&#10;- 添加 LoadExtern 和 CallExtern 新操作码支持 extern 函数调用&#10;- 创建 ExternFunctionWrapper 类封装原生 DLL 函数调用逻辑&#10;- 实现参数类型转换和函数签名解析功能&#10;- 支持多种调用约定包括 Cdecl、StdCall 和 WinApi&#10;- 添加 extern 函数的缓存机制提升重复调用性能&#10;- 更新虚拟机文档记录 extern 支持的实现详情&#10;- 新增虚拟机 extern 功能测试用例" />
@@ -969,7 +966,9 @@
     <MESSAGE value="feat(vm): 实现虚拟机模块系统支持&#10;&#10;- 在BytecodeFile中添加模块名称、依赖列表和导出符号表字段&#10;- 实现ModuleDependency、ExportedSymbol等模块系统核心类&#10;- 添加LoadModule、ImportSymbol、ImportSymbolAs等模块操作指令&#10;- 实现ImportStatement的字节码生成逻辑支持各种导入语法&#10;- 创建ModuleLoader和ModuleRegistry管理模块加载和注册&#10;- 在VirtualMachine中实现模块加载、符号导入和循环依赖检测&#10;- 添加模块系统相关的单元测试验证功能正确性&#10;- 提供模块导入示例代码展示新功能使用方法" />
     <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并完善模式支持说明&#10;&#10;- 更新 Mode_Support_Summary.md 文档中的最后更新日期&#10;- 修正 using 语句在虚拟机模式下的支持状态标记&#10;- 修正 import 语句、命名导入、别名导入在虚拟机模式下的支持状态标记&#10;- 更新虚拟机模式特性描述，添加模块系统和资源管理支持说明&#10;- 更新 Old8Lang_Grammar.md 中 using 语句和导入语句的模式支持标记&#10;- 更新文档中的最后更新日期为 2026年1月15日&#10;- 添加最近完成的功能列表，包括模块导入系统、using 语句和多线程支持" />
     <MESSAGE value="feat(tests): 实现虚拟机外部函数调用的跨平台测试&#10;&#10;- 移除跳过属性使外部C函数测试能够运行&#10;- 添加跨平台库名检测支持Windows、macOS和Linux&#10;- 更新测试代码使用动态库名替换硬编码值&#10;- 修改多参数函数测试为跨平台进程ID获取测试&#10;- 添加正则表达式验证输出中的数字格式&#10;- 实现条件编译适配不同操作系统的函数调用" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(tests): 实现虚拟机外部函数调用的跨平台测试&#10;&#10;- 移除跳过属性使外部C函数测试能够运行&#10;- 添加跨平台库名检测支持Windows、macOS和Linux&#10;- 更新测试代码使用动态库名替换硬编码值&#10;- 修改多参数函数测试为跨平台进程ID获取测试&#10;- 添加正则表达式验证输出中的数字格式&#10;- 实现条件编译适配不同操作系统的函数调用" />
+    <MESSAGE value="feat(io): 添加对LangValueType类型的显示支持&#10;&#10;- 在IOFunctions中添加LangValueType到显示字符串的转换逻辑&#10;- 在PrintLineFunction中添加LangValueType到显示字符串的转换逻辑&#10;- 实现了null值的安全处理&#10;- 保持了原有的字符串和其他类型值的处理逻辑" />
+    <MESSAGE value="feat(vm): 实现虚拟机继承链查找和字段初始化支持&#10;&#10;- 沿着继承链查找构造函数，优先查找init方法，其次查找与类名相同的方法&#10;- 在NewObject指令中初始化所有父类字段，避免重复初始化同名字段&#10;- 沿着继承链查找方法实现，支持父类方法调用&#10;- 添加super.field赋值语句解析支持&#10;- 更新测试文件和调试脚本以验证继承功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现虚拟机继承链查找和字段初始化支持&#10;&#10;- 沿着继承链查找构造函数，优先查找init方法，其次查找与类名相同的方法&#10;- 在NewObject指令中初始化所有父类字段，避免重复初始化同名字段&#10;- 沿着继承链查找方法实现，支持父类方法调用&#10;- 添加super.field赋值语句解析支持&#10;- 更新测试文件和调试脚本以验证继承功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

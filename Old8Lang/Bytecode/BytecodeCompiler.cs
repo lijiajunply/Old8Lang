@@ -60,6 +60,9 @@ public class BytecodeCompiler
         // 第一阶段：预处理，注册所有类定义
         PreprocessClassDefinitions(ast);
 
+        // 第二阶段：预处理，注册所有函数定义
+        PreprocessFunctionDefinitions(ast);
+
         // 创建主函数(入口点)
         var mainFunc = new FunctionMetadata
         {
@@ -112,6 +115,46 @@ public class BytecodeCompiler
             {
                 // 编译类定义
                 classInit.Accept(visitor);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 预处理阶段：遍历AST，注册所有函数定义
+    /// </summary>
+    private void PreprocessFunctionDefinitions(BlockStatement ast)
+    {
+        // 遍历所有语句，找到函数定义并编译它们
+        // 这样在编译 Spawn(funcName) 时，函数索引已经存在
+        var visitor = new BytecodeVisitor(this);
+
+        // 遍历 ImportStatements 中的函数定义
+        foreach (var statement in ast.ImportStatements)
+        {
+            if (statement is FuncInit funcInit)
+            {
+                // 编译函数定义
+                funcInit.Accept(visitor);
+            }
+            else if (statement is AsyncFuncInit asyncFuncInit)
+            {
+                // 编译异步函数定义
+                asyncFuncInit.Accept(visitor);
+            }
+        }
+
+        // 遍历 OtherStatements 中的函数定义
+        foreach (var statement in ast.OtherStatements)
+        {
+            if (statement is FuncInit funcInit)
+            {
+                // 编译函数定义
+                funcInit.Accept(visitor);
+            }
+            else if (statement is AsyncFuncInit asyncFuncInit)
+            {
+                // 编译异步函数定义
+                asyncFuncInit.Accept(visitor);
             }
         }
     }
@@ -365,7 +408,9 @@ public class BytecodeCompiler
                 "Sleep" or "GetCurrentThreadId" or
                 "MutexCreate" or "MutexLock" or "MutexUnlock" or "MutexDispose" or
                 "ChannelCreate" or "ChannelSend" or "ChannelReceive" or "ChannelClose" or
-                "SemaphoreCreate" or "SemaphoreAcquire" or "SemaphoreRelease" => true,
+                "SemaphoreCreate" or "SemaphoreAcquire" or "SemaphoreRelease" or
+                // 线程相关
+                "Spawn" or "spawn" => true,
             _ => false
         };
     }

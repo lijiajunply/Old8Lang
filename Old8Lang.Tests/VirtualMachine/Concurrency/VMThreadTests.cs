@@ -20,10 +20,9 @@ func worker() -> int {
     return 42
 }
 
-func main() -> void {
-    thread <- Spawn(worker)
-    result <- thread.Join()
-}
+thread <- Spawn(worker)
+thread.Start()
+result <- thread.Join()
 ";
 
         var interpreter = new LangInterpreter();
@@ -49,10 +48,9 @@ func add(a:int, b:int) -> int {
     return a + b
 }
 
-func main() -> void {
-    thread <- Spawn(add, 10, 20)
-    result <- thread.Join()
-}
+thread <- Spawn(add, 10, 20)
+thread.Start()
+result <- thread.Join()
 ";
 
         var interpreter = new LangInterpreter();
@@ -78,17 +76,19 @@ func worker(id:int) -> int {
     return id * 2
 }
 
-func main() -> void {
-    t1 <- Spawn(worker, 1)
-    t2 <- Spawn(worker, 2)
-    t3 <- Spawn(worker, 3)
+t1 <- Spawn(worker, 1)
+t2 <- Spawn(worker, 2)
+t3 <- Spawn(worker, 3)
 
-    r1 <- t1.Join()
-    r2 <- t2.Join()
-    r3 <- t3.Join()
+t1.Start()
+t2.Start()
+t3.Start()
 
-    result <- r1 + r2 + r3
-}
+r1 <- t1.Join()
+r2 <- t2.Join()
+r3 <- t3.Join()
+
+result <- r1 + r2 + r3
 ";
 
         var interpreter = new LangInterpreter();

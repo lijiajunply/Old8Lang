@@ -463,6 +463,13 @@ public partial class BytecodeVisitor
             return null;
         }
 
+        // 检查函数是否已经被编译过（避免重复编译）
+        if (_compiler.GetFunctionIndex(funcName) >= 0)
+        {
+            // 函数已经在预处理阶段被编译过，跳过
+            return null;
+        }
+
         // 非泛型函数：正常编译
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
@@ -1023,6 +1030,14 @@ public partial class BytecodeVisitor
         // 编译异步函数定义
         var funcValue = node.AsyncFuncValue;
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
+
+        // 检查函数是否已经被编译过（避免重复编译）
+        if (_compiler.GetFunctionIndex(funcName) >= 0)
+        {
+            // 函数已经在预处理阶段被编译过，跳过
+            return null;
+        }
+
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
         // 提取默认参数值和params参数索引
