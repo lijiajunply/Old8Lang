@@ -2118,10 +2118,33 @@ public class VirtualMachine
                 // 创建对象实例
                 var obj = new BytecodeObjectInstance(className);
 
-                // 初始化字段为默认值
-                foreach (var field in classMetadata.Fields)
+                // 初始化所有字段为默认值（包括父类字段）
+                // 收集当前类及所有父类的字段
+                var allFields = new List<FieldMetadata>();
+                var currentClass = classMetadata;
+                while (currentClass != null)
                 {
-                    obj.Fields[field.Name] = null;
+                    allFields.AddRange(currentClass.Fields);
+
+                    // 查找父类
+                    if (!string.IsNullOrEmpty(currentClass.BaseClassName))
+                    {
+                        currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                // 初始化所有字段
+                foreach (var field in allFields)
+                {
+                    // 避免重复初始化同名字段（子类覆盖父类字段的情况）
+                    if (!obj.Fields.ContainsKey(field.Name))
+                    {
+                        obj.Fields[field.Name] = null;
+                    }
                 }
 
                 // 应用 Mixin 方法到对象
@@ -2184,10 +2207,27 @@ public class VirtualMachine
                         throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
                     }
 
-                    // 在类的方法列表中查找方法
-                    var methodMetadata = classMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
+                    // 在类的方法列表中查找方法（包括父类方法）
+                    MethodMetadata? methodMetadata = null;
+                    var currentClass = classMetadata;
 
-                    // 如果在类中没找到，尝试在 Mixin 中查找
+                    // 沿着继承链查找方法
+                    while (currentClass != null && methodMetadata == null)
+                    {
+                        methodMetadata = currentClass.Methods.FirstOrDefault(m => m.Name == methodName);
+
+                        if (methodMetadata == null && !string.IsNullOrEmpty(currentClass.BaseClassName))
+                        {
+                            // 在父类中继续查找
+                            currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    // 如果在类继承链中没找到，尝试在 Mixin 中查找
                     if (methodMetadata == null && bytecodeObj.Mixins.Count > 0)
                     {
                         foreach (var mixinName in bytecodeObj.Mixins)

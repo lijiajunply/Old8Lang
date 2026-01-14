@@ -142,20 +142,34 @@ public partial class BytecodeVisitor
             Emit(OpCode.NewObject, funcName);
 
             // 2. 查找构造函数：优先 init，其次与类名相同的方法
+            // 沿着继承链查找构造函数
             var classMetadata = _compiler.GetClassMetadata(funcName);
             string? constructorName = null;
+            ClassMetadata? currentClass = classMetadata;
 
-            if (classMetadata != null)
+            while (currentClass != null && constructorName == null)
             {
                 // 优先查找 init 方法
-                if (classMetadata.Methods.Any(m => m.Name == "init"))
+                if (currentClass.Methods.Any(m => m.Name == "init"))
                 {
                     constructorName = "init";
+                    break;
                 }
-                // 其次查找与类名相同的方法
-                else if (classMetadata.Methods.Any(m => m.Name == funcName))
+                // 其次查找与类名相同的方法（只在当前类中查找，不在父类中查找）
+                else if (currentClass.Name == funcName && currentClass.Methods.Any(m => m.Name == funcName))
                 {
                     constructorName = funcName;
+                    break;
+                }
+
+                // 在父类中继续查找
+                if (!string.IsNullOrEmpty(currentClass.BaseClassName))
+                {
+                    currentClass = _compiler.GetClassMetadata(currentClass.BaseClassName);
+                }
+                else
+                {
+                    break;
                 }
             }
 
