@@ -11,6 +11,12 @@ public class BytecodeObjectInstance
     /// <summary>字段值字典</summary>
     public Dictionary<string, object?> Fields { get; set; } = new();
 
+    /// <summary>应用的Mixin列表</summary>
+    public List<string> Mixins { get; set; } = new();
+
+    /// <summary>实现的接口列表</summary>
+    public List<string> Interfaces { get; set; } = new();
+
     public BytecodeObjectInstance(string className)
     {
         ClassName = className;

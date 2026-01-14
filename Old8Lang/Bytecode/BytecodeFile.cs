@@ -24,6 +24,12 @@ public class BytecodeFile
     /// <summary>类列表</summary>
     public List<ClassMetadata> Classes { get; set; } = [];
 
+    /// <summary>接口列表</summary>
+    public List<InterfaceMetadata> Interfaces { get; set; } = [];
+
+    /// <summary>Mixin列表</summary>
+    public List<MixinMetadata> Mixins { get; set; } = [];
+
     /// <summary>调试信息（可选）</summary>
     public DebugInfo? DebugInfo { get; set; }
 
@@ -85,6 +91,16 @@ public class BytecodeFile
         foreach (var classMetadata in Classes)
             classMetadata.WriteTo(writer);
 
+        // 接口列表
+        writer.Write(Interfaces.Count);
+        foreach (var interfaceMetadata in Interfaces)
+            interfaceMetadata.WriteTo(writer);
+
+        // Mixin列表
+        writer.Write(Mixins.Count);
+        foreach (var mixinMetadata in Mixins)
+            mixinMetadata.WriteTo(writer);
+
         // 入口点
         writer.Write(EntryPointIndex);
 
@@ -134,6 +150,16 @@ public class BytecodeFile
         for (int i = 0; i < classCount; i++)
             bytecodeFile.Classes.Add(ClassMetadata.ReadFrom(reader));
 
+        // 接口列表
+        int interfaceCount = reader.ReadInt32();
+        for (int i = 0; i < interfaceCount; i++)
+            bytecodeFile.Interfaces.Add(InterfaceMetadata.ReadFrom(reader));
+
+        // Mixin列表
+        int mixinCount = reader.ReadInt32();
+        for (int i = 0; i < mixinCount; i++)
+            bytecodeFile.Mixins.Add(MixinMetadata.ReadFrom(reader));
+
         // 入口点
         bytecodeFile.EntryPointIndex = reader.ReadInt32();
 
@@ -170,6 +196,8 @@ public class BytecodeFile
         {
             $"{Functions.Count} functions",
             $"{Classes.Count} classes",
+            $"{Interfaces.Count} interfaces",
+            $"{Mixins.Count} mixins",
             $"{ConstantPool.Count} constants",
             $"{GlobalVariables.Count} globals"
         };

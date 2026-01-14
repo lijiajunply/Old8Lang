@@ -71,6 +71,22 @@ public class VMCommand : ICommand
             stopwatch.Stop();
             var compileTime = stopwatch.Elapsed.TotalMilliseconds;
 
+            // 调试输出：显示编译后的类信息
+            if (debugMode)
+            {
+                Console.WriteLine("\n=== 编译后的类信息 ===");
+                foreach (var classMetadata in bytecodeFile.Classes)
+                {
+                    Console.WriteLine($"类: {classMetadata.Name}");
+                    Console.WriteLine($"  方法数量: {classMetadata.Methods.Count}");
+                    foreach (var method in classMetadata.Methods)
+                    {
+                        Console.WriteLine($"    - {method.Name} (静态: {method.IsStatic})");
+                    }
+                }
+                Console.WriteLine("======================\n");
+            }
+
             // 执行字节码
             stopwatch.Restart();
             var vm = new VirtualMachine(bytecodeFile);

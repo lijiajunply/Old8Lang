@@ -1,6 +1,7 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
@@ -672,11 +673,32 @@ public partial class BytecodeVisitor
         var typeTemplate = node.AnyLangValue;
         string className = typeTemplate.ClassName;
 
+        // 检查类是否已经被编译过（在PreprocessClassDefinitions阶段）
+        // 如果已经编译过，直接返回，避免重复编译
+        if (_compiler.GetClassMetadata(className) != null)
+        {
+            return null;
+        }
+
         // 检查是否是泛型类
         if (typeTemplate.GenericParameters != null && typeTemplate.GenericParameters.Count > 0)
         {
             // 泛型类：注册到泛型类缓存，不立即编译
             _compiler.RegisterGenericClass(className, typeTemplate);
+            return null;
+        }
+
+        // 处理接口定义
+        if (typeTemplate.IsInterface)
+        {
+            CompileInterfaceDefinition(typeTemplate);
+            return null;
+        }
+
+        // 处理 Mixin 定义
+        if (typeTemplate.IsMixin)
+        {
+            CompileMixinDefinition(typeTemplate);
             return null;
         }
 
@@ -709,8 +731,9 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 在编译器中注册类定义（包括方法）
-        _compiler.DeclareClass(className, fields, methods, typeTemplate.ParentClassName);
+        // 在编译器中注册类定义（包括方法、接口和Mixin）
+        _compiler.DeclareClass(className, fields, methods, typeTemplate.ParentClassName,
+            typeTemplate.ImplementsNames, typeTemplate.MixinNames);
 
         // 类定义本身不生成运行时指令
         return null;
@@ -1363,5 +1386,47 @@ public partial class BytecodeVisitor
         _compiler.AddExceptionTableEntry(exceptionEntry);
 
         return null;
+    }
+
+    /// <summary>
+    /// 编译接口定义
+    /// </summary>
+    private void CompileInterfaceDefinition(TypeTemplate typeTemplate)
+    {
+        string interfaceName = typeTemplate.ClassName;
+        var methods = new List<string>();
+
+        // 提取接口方法签名
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                methods.Add(memberId.IdName);
+            }
+        }
+
+        // 在编译器中注册接口定义
+        _compiler.DeclareInterface(interfaceName, methods, typeTemplate.ImplementsNames);
+    }
+
+    /// <summary>
+    /// 编译 Mixin 定义
+    /// </summary>
+    private void CompileMixinDefinition(TypeTemplate typeTemplate)
+    {
+        string mixinName = typeTemplate.ClassName;
+        var methods = new List<(string methodName, FuncLangValue funcValue)>();
+
+        // 提取 Mixin 方法
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                methods.Add((memberId.IdName, funcValue));
+            }
+        }
+
+        // 在编译器中注册 Mixin 定义
+        _compiler.DeclareMixin(mixinName, methods);
     }
 }

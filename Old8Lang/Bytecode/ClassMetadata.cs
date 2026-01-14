@@ -165,6 +165,12 @@ public class ClassMetadata
     /// <summary>实现的接口列表</summary>
     public List<string> InterfaceNames { get; set; } = [];
 
+    /// <summary>实现的接口列表（新字段，与InterfaceNames保持一致）</summary>
+    public List<string> ImplementsInterfaces { get; set; } = [];
+
+    /// <summary>混入的Mixin列表</summary>
+    public List<string> Mixins { get; set; } = [];
+
     /// <summary>实例字段列表</summary>
     public List<FieldMetadata> Fields { get; set; } = [];
 

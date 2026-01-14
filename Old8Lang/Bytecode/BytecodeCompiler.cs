@@ -91,9 +91,29 @@ public class BytecodeCompiler
     /// </summary>
     private void PreprocessClassDefinitions(BlockStatement ast)
     {
-        // 注意：类定义现在在 BytecodeVisitor.VisitClassInit 中完整处理
-        // 包括字段和方法的编译，所以这里不需要预注册
-        // 保留这个方法是为了将来可能需要的其他预处理逻辑
+        // 第一遍：遍历所有语句，找到类定义并编译它们
+        // 这样在编译类实例化表达式时，类元数据已经存在
+        var visitor = new BytecodeVisitor(this);
+
+        // 遍历 ImportStatements 中的类定义
+        foreach (var statement in ast.ImportStatements)
+        {
+            if (statement is ClassInit classInit)
+            {
+                // 编译类定义
+                classInit.Accept(visitor);
+            }
+        }
+
+        // 遍历 OtherStatements 中的类定义
+        foreach (var statement in ast.OtherStatements)
+        {
+            if (statement is ClassInit classInit)
+            {
+                // 编译类定义
+                classInit.Accept(visitor);
+            }
+        }
     }
 
     /// <summary>
@@ -356,13 +376,17 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields,
         List<(string methodName, FuncLangValue funcValue, bool isStatic)> methods,
-        string? parentClassName)
+        string? parentClassName,
+        List<string>? implementsNames = null,
+        List<string>? mixinNames = null)
     {
         var classMetadata = new ClassMetadata
         {
             Name = className,
             BaseClassName = parentClassName,
-            Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList()
+            Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList(),
+            ImplementsInterfaces = implementsNames ?? new List<string>(),
+            Mixins = mixinNames ?? new List<string>()
         };
 
         // 编译所有方法
@@ -387,6 +411,14 @@ public class BytecodeCompiler
                         defaultValues.Add(null);
                     }
                 }
+            }
+
+            // 实例方法需要在参数列表开头添加 this 参数
+            // 因为 CallMethod 指令会将对象作为第一个参数传递
+            if (!isStatic)
+            {
+                paramNames.Insert(0, "this");
+                defaultValues.Insert(0, null);
             }
 
             // 编译方法体
@@ -422,6 +454,14 @@ public class BytecodeCompiler
     public bool IsClassName(string name)
     {
         return _bytecodeFile.Classes.Any(c => c.Name == name);
+    }
+
+    /// <summary>
+    /// 获取类元数据
+    /// </summary>
+    public ClassMetadata? GetClassMetadata(string name)
+    {
+        return _bytecodeFile.Classes.FirstOrDefault(c => c.Name == name);
     }
 
     // ===== 泛型类和函数管理 =====
@@ -558,5 +598,72 @@ public class BytecodeCompiler
         }
 
         return false;
+    }
+
+    // ===== 接口和 Mixin 支持 =====
+
+    /// <summary>
+    /// 声明接口定义
+    /// </summary>
+    public void DeclareInterface(string interfaceName, List<string> methods, List<string> parentInterfaces)
+    {
+        var interfaceMetadata = new InterfaceMetadata
+        {
+            Name = interfaceName,
+            Methods = methods,
+            ParentInterfaces = parentInterfaces
+        };
+
+        _bytecodeFile.Interfaces.Add(interfaceMetadata);
+    }
+
+    /// <summary>
+    /// 声明 Mixin 定义
+    /// </summary>
+    public void DeclareMixin(string mixinName, List<(string methodName, FuncLangValue funcValue)> methods)
+    {
+        var mixinMetadata = new MixinMetadata
+        {
+            Name = mixinName,
+            Methods = new List<MethodMetadata>()
+        };
+
+        // 编译所有 Mixin 方法
+        foreach (var (methodName, funcValue) in methods)
+        {
+            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+            var defaultValues = new List<object?>();
+
+            if (funcValue.Ids != null)
+            {
+                foreach (var param in funcValue.Ids)
+                {
+                    defaultValues.Add(param.DefaultValue != null
+                        ? EvaluateConstantExpression(param.DefaultValue)
+                        : null);
+                }
+            }
+
+            // Mixin 方法需要在参数列表开头添加 this 参数
+            // 因为 CallMethod 指令会将对象作为第一个参数传递
+            paramNames.Insert(0, "this");
+            defaultValues.Insert(0, null);
+
+            var functionMetadata = CompileFunction(
+                $"{mixinName}.{methodName}",
+                paramNames,
+                defaultValues,
+                funcValue.BlockStatement
+            );
+
+            mixinMetadata.Methods.Add(new MethodMetadata
+            {
+                Name = methodName,
+                IsStatic = false,
+                Function = functionMetadata
+            });
+        }
+
+        _bytecodeFile.Mixins.Add(mixinMetadata);
     }
 }

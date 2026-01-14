@@ -1444,6 +1444,14 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.DefineInterface:
+            case OpCode.DefineMixin:
+            case OpCode.ApplyMixin:
+            case OpCode.CheckInterface:
+                // 接口和Mixin在编译时处理，运行时不需要额外操作
+                // 这些指令主要用于元数据记录和类型检查
+                break;
+
             // === 并发原语 ===
             case OpCode.MutexCreate:
             {
@@ -1993,6 +2001,30 @@ public class VirtualMachine
                     obj.Fields[field.Name] = null;
                 }
 
+                // 应用 Mixin 方法到对象
+                if (classMetadata.Mixins != null && classMetadata.Mixins.Count > 0)
+                {
+                    foreach (var mixinName in classMetadata.Mixins)
+                    {
+                        var mixinMetadata = _bytecodeFile.Mixins.FirstOrDefault(m => m.Name == mixinName);
+                        if (mixinMetadata != null)
+                        {
+                            // Mixin 方法在运行时通过方法查找自动可用
+                            // 这里只需要记录 Mixin 关联即可
+                            obj.Mixins.Add(mixinName);
+                        }
+                    }
+                }
+
+                // 记录实现的接口
+                if (classMetadata.ImplementsInterfaces != null && classMetadata.ImplementsInterfaces.Count > 0)
+                {
+                    foreach (var interfaceName in classMetadata.ImplementsInterfaces)
+                    {
+                        obj.Interfaces.Add(interfaceName);
+                    }
+                }
+
                 // 将对象压入栈
                 _stack.Push(obj);
             }
@@ -2031,6 +2063,24 @@ public class VirtualMachine
 
                     // 在类的方法列表中查找方法
                     var methodMetadata = classMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
+
+                    // 如果在类中没找到，尝试在 Mixin 中查找
+                    if (methodMetadata == null && bytecodeObj.Mixins.Count > 0)
+                    {
+                        foreach (var mixinName in bytecodeObj.Mixins)
+                        {
+                            var mixinMetadata = _bytecodeFile.Mixins.FirstOrDefault(m => m.Name == mixinName);
+                            if (mixinMetadata != null)
+                            {
+                                methodMetadata = mixinMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
+                                if (methodMetadata != null)
+                                {
+                                    break; // 找到方法，停止搜索
+                                }
+                            }
+                        }
+                    }
+
                     if (methodMetadata == null)
                     {
                         throw new Exception($"类 {bytecodeObj.ClassName} 没有方法 {methodName}");

@@ -137,9 +137,66 @@ public partial class BytecodeVisitor
 
         if (isClassName)
         {
-            // 类实例化: Person()
-            // 生成 NewObject 指令
+            // 类实例化: Person(arg1, arg2)
+            // 1. 生成 NewObject 指令创建对象
             Emit(OpCode.NewObject, funcName);
+
+            // 2. 查找构造函数：优先 init，其次与类名相同的方法
+            var classMetadata = _compiler.GetClassMetadata(funcName);
+            string? constructorName = null;
+
+            if (classMetadata != null)
+            {
+                // 优先查找 init 方法
+                if (classMetadata.Methods.Any(m => m.Name == "init"))
+                {
+                    constructorName = "init";
+                }
+                // 其次查找与类名相同的方法
+                else if (classMetadata.Methods.Any(m => m.Name == funcName))
+                {
+                    constructorName = funcName;
+                }
+            }
+
+            // 3. 如果找到构造函数，调用它
+            if (constructorName != null)
+            {
+                // 复制对象引用，因为 CallMethod 会消耗它
+                Emit(OpCode.Dup);
+
+                // 生成位置参数代码
+                foreach (var arg in node.Ids)
+                {
+                    arg.Accept(this);
+                }
+
+                // 生成命名参数的值
+                if (namedCount > 0)
+                {
+                    foreach (var namedArg in node.NamedArgs)
+                    {
+                        namedArg.Value.Accept(this);
+                    }
+                }
+
+                // 调用构造函数
+                // CallMethod 操作数: [argCount, methodName]
+                // argCount 包括对象本身 + 实际参数
+                int totalArgCount = positionalCount + namedCount + 1; // +1 for 'this'
+
+                if (namedCount > 0)
+                {
+                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName, namedArgNames });
+                }
+                else
+                {
+                    Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName });
+                }
+
+                // 构造函数返回 void，不需要弹出返回值
+            }
         }
         else
         {

@@ -202,6 +202,18 @@ public enum OpCode : byte
     /// <summary>定义枚举 (操作数: enumNameIndex, memberCount, [memberName, memberValue]...)</summary>
     DefineEnum = 0x73,
 
+    /// <summary>定义接口 (操作数: interfaceNameIndex, methodCount)</summary>
+    DefineInterface = 0x74,
+
+    /// <summary>定义Mixin (操作数: mixinNameIndex, methodCount)</summary>
+    DefineMixin = 0x75,
+
+    /// <summary>应用Mixin到类 (操作数: mixinNameIndex)</summary>
+    ApplyMixin = 0x76,
+
+    /// <summary>检查接口实现 (操作数: interfaceNameIndex)</summary>
+    CheckInterface = 0x77,
+
     // ===== 并发原语 (0x80-0x9F) =====
     /// <summary>创建互斥锁</summary>
     MutexCreate = 0x80,
