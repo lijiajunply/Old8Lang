@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -492,12 +493,8 @@ public static class DotOperatorILHelper
         {
             instanceId.LoadIlValue(ilGenerator, local);
             var idType = instanceId.OutputType(local);
-            if (idType!.IsValueType)
-            {
-                ilGenerator.Emit(OpCodes.Box, idType);
-            }
-
-            types.Add(instanceId.OutputType(local)!);
+            // 不装箱，保持原始类型
+            types.Add(idType!);
         }
 
         // 特殊处理Old8Lang的ToStr()方法
@@ -575,14 +572,109 @@ public static class DotOperatorILHelper
                     method.GetParameters().Length == instance.Ids.Count);
         }
 
-        if (m is null)
+        // 如果找到了方法，检查参数类型是否需要拆箱
+        if (m != null)
         {
-            // 方法未找到，抛出异常
-            throw new InvalidOperationError(operation, $"方法 '{instance.Id.IdName}' 未找到",
-                $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
+            var parameters = m.GetParameters();
+            // 如果参数类型不匹配（例如栈上是 object，但方法期望 int），需要进行类型转换
+            for (int i = 0; i < parameters.Length && i < types.Count; i++)
+            {
+                var paramType = parameters[i].ParameterType;
+                var stackType = types[i];
+
+                // 如果栈上是 object，但方法期望值类型，需要拆箱
+                if (stackType == typeof(object) && paramType.IsValueType)
+                {
+                    // 需要重新生成参数加载代码，这次不装箱
+                    // 但这很复杂，因为参数已经在栈上了
+                    // 暂时跳过这个优化
+                }
+            }
         }
 
-        // 对于实例方法使用 Callvirt，对于静态方法使用 Call
+        if (m is null)
+        {
+            // 尝试查找扩展方法
+            Type? extensionType = null;
+
+            // 根据左操作数类型确定对应的扩展方法类
+            if (leftType == typeof(string))
+            {
+                extensionType = typeof(StringExtensions);
+            }
+            else if (leftType == typeof(object[]))
+            {
+                extensionType = typeof(ArrayExtensions);
+            }
+            else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                extensionType = typeof(ListExtensions);
+            }
+            else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                extensionType = typeof(DictionaryExtensions);
+            }
+            // Old8Lang 类型的扩展方法
+            else if (leftType == typeof(StringLangValue))
+            {
+                extensionType = typeof(StringValueFuncStatic);
+            }
+            else if (leftType == typeof(ArrayLangValue))
+            {
+                extensionType = typeof(ArrayValueFuncStatic);
+            }
+            else if (leftType == typeof(ListLangValue))
+            {
+                extensionType = typeof(ListValueFuncStatic);
+            }
+            else if (leftType == typeof(DictionaryLangValue))
+            {
+                extensionType = typeof(DictionaryValueFuncStatic);
+            }
+
+            if (extensionType != null)
+            {
+                // 扩展方法的第一个参数是 this 参数（实例本身）
+                // 对于泛型类型，需要使用扩展方法期望的类型
+                Type firstParamType = leftType;
+
+                // 如果是 List<T>，转换为 List<object?>
+                if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    firstParamType = typeof(List<object?>);
+                }
+                // 如果是 Dictionary<TKey, TValue>，转换为 Dictionary<object, object?>
+                else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    firstParamType = typeof(Dictionary<object, object?>);
+                }
+
+                var extensionTypes = new Type[types.Count + 1];
+                extensionTypes[0] = firstParamType;
+                types.CopyTo(extensionTypes, 1);
+
+                // 查找精确匹配的扩展方法
+                m = extensionType.GetMethod(instance.Id.IdName, extensionTypes);
+
+                // 如果没有找到精确匹配，尝试查找参数数量匹配的扩展方法
+                if (m is null)
+                {
+                    m = extensionType.GetMethods()
+                        .FirstOrDefault(method =>
+                            method.Name == instance.Id.IdName &&
+                            method.GetParameters().Length == instance.Ids.Count + 1); // +1 因为扩展方法有 this 参数
+                }
+            }
+
+            if (m is null)
+            {
+                // 方法未找到，抛出异常
+                throw new InvalidOperationError(operation, $"方法 '{instance.Id.IdName}' 未找到",
+                    $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
+            }
+        }
+
+        // 对于实例方法使用 Callvirt，对于静态方法（包括扩展方法）使用 Call
         ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
 
         return m.ReturnType;

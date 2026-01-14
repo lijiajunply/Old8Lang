@@ -1,0 +1,39 @@
+// 综合测试：三种模式下的类型方法调用
+
+PrintLine("=== 测试列表方法 ===")
+list <- {1, 2, 3}
+PrintLine("初始列表: " + list.ToStr())
+
+list.Add(4)
+PrintLine("添加 4 后: " + list.ToStr())
+
+count <- list.Count()
+PrintLine("列表元素数量: " + count.ToStr())
+
+list.Remove(2)
+PrintLine("移除 2 后: " + list.ToStr())
+
+PrintLine("")
+PrintLine("=== 测试字符串方法 ===")
+str <- "hello world"
+PrintLine("原始字符串: " + str)
+
+upper <- str.ToUpper()
+PrintLine("转大写: " + upper)
+
+lower <- upper.ToLower()
+PrintLine("转小写: " + lower)
+
+PrintLine("")
+PrintLine("=== 测试字典方法 ===")
+dict <- {"name": "张三", "age": 25, "city": "北京"}
+PrintLine("初始字典: " + dict.ToStr())
+
+hasName <- dict.ContainsKey("name")
+PrintLine("包含 'name' 键: " + hasName.ToStr())
+
+dictCount <- dict.Count()
+PrintLine("字典元素数量: " + dictCount.ToStr())
+
+PrintLine("")
+PrintLine("=== 所有测试完成 ===")
