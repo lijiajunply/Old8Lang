@@ -120,7 +120,7 @@ public class BytecodeCompiler
     /// 编译函数定义
     /// </summary>
     public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues,
-        BlockStatement body)
+        BlockStatement body, int paramsParameterIndex = -1)
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -130,6 +130,7 @@ public class BytecodeCompiler
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
+            ParamsParameterIndex = paramsParameterIndex,
             IsAsync = false,
             IsGenerator = isGenerator // 设置生成器标记
         };
@@ -162,13 +163,14 @@ public class BytecodeCompiler
     /// 编译异步函数
     /// </summary>
     public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<object?> defaultValues,
-        BlockStatement body)
+        BlockStatement body, int paramsParameterIndex = -1)
     {
         var func = new FunctionMetadata
         {
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
+            ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true // 标记为异步函数
         };
 
@@ -200,7 +202,7 @@ public class BytecodeCompiler
     /// 编译异步生成器函数
     /// </summary>
     public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters,
-        List<object?> defaultValues, BlockStatement body)
+        List<object?> defaultValues, BlockStatement body, int paramsParameterIndex = -1)
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -210,6 +212,7 @@ public class BytecodeCompiler
             Name = funcName,
             Parameters = parameters,
             DefaultValues = defaultValues,
+            ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true, // 标记为异步函数
             IsGenerator = isGenerator // 标记为生成器函数
         };

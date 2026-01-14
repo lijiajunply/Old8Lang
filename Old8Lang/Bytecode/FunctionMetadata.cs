@@ -14,6 +14,9 @@ public class FunctionMetadata
     /// <summary>参数默认值列表（索引对应Parameters，null表示无默认值）</summary>
     public List<object?> DefaultValues { get; set; } = [];
 
+    /// <summary>params参数的索引（-1表示没有params参数）</summary>
+    public int ParamsParameterIndex { get; set; } = -1;
+
     /// <summary>字节码指令列表</summary>
     public List<Instruction> Instructions { get; set; } = [];
 
@@ -74,6 +77,7 @@ public class FunctionMetadata
         writer.Write(IsAsync);
         writer.Write(IsGenerator);
         writer.Write(FunctionIndex);
+        writer.Write(ParamsParameterIndex);
 
         // 异常表
         writer.Write(ExceptionTable.Count);
@@ -122,6 +126,7 @@ public class FunctionMetadata
         func.IsAsync = reader.ReadBoolean();
         func.IsGenerator = reader.ReadBoolean();
         func.FunctionIndex = reader.ReadInt32();
+        func.ParamsParameterIndex = reader.ReadInt32();
 
         // 异常表
         int exceptionTableCount = reader.ReadInt32();

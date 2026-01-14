@@ -73,16 +73,23 @@ public class VirtualMachine
     /// </summary>
     private void CallFunction(FunctionMetadata function, object?[] arguments)
     {
+        // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
+        object?[] processedArguments = arguments;
+        if (function.ParamsParameterIndex >= 0)
+        {
+            processedArguments = ProcessParamsArguments(function, arguments);
+        }
+
         // 创建调用帧
         var frame = new CallFrame(function, function.LocalCount)
         {
-            Arguments = arguments
+            Arguments = processedArguments
         };
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
-        for (int i = 0; i < arguments.Length && i < function.LocalCount; i++)
+        for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
         {
-            frame.Locals[i] = arguments[i];
+            frame.Locals[i] = processedArguments[i];
         }
 
         _callStack.Push(frame);
@@ -119,6 +126,50 @@ public class VirtualMachine
             ExecuteDefers(frame);
             _callStack.Pop();
         }
+    }
+
+    /// <summary>
+    /// 处理params参数：将多余的参数打包成数组
+    /// </summary>
+    private object?[] ProcessParamsArguments(FunctionMetadata function, object?[] arguments)
+    {
+        int paramsIndex = function.ParamsParameterIndex;
+        int regularParamCount = paramsIndex; // params参数之前的普通参数数量
+        int totalParamCount = function.Parameters.Count;
+
+        // 如果参数数量已经等于函数参数总数,说明params参数已经被处理过了(可能在OpCode.Call中)
+        // 直接返回原参数数组
+        if (arguments.Length == totalParamCount)
+        {
+            return arguments;
+        }
+
+        // 检查是否提供了足够的普通参数
+        if (arguments.Length < regularParamCount)
+        {
+            throw new Exception($"函数 '{function.Name}' 至少需要 {regularParamCount} 个参数，但实际提供了 {arguments.Length} 个参数");
+        }
+
+        // 创建新的参数数组：普通参数 + params数组
+        var processedArgs = new object?[totalParamCount];
+
+        // 复制普通参数
+        for (int i = 0; i < regularParamCount; i++)
+        {
+            processedArgs[i] = arguments[i];
+        }
+
+        // 将剩余参数打包成数组
+        var paramsArgs = new object?[arguments.Length - regularParamCount];
+        for (int i = 0; i < paramsArgs.Length; i++)
+        {
+            paramsArgs[i] = arguments[regularParamCount + i];
+        }
+
+        // 将params数组放入对应位置
+        processedArgs[paramsIndex] = paramsArgs;
+
+        return processedArgs;
     }
 
     /// <summary>
@@ -724,6 +775,11 @@ public class VirtualMachine
                             if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
                             {
                                 fullArgs[i] = function.DefaultValues[i];
+                            }
+                            else if (function.ParamsParameterIndex == i)
+                            {
+                                // 如果是params参数，创建空数组
+                                fullArgs[i] = new object?[0];
                             }
                             else
                             {

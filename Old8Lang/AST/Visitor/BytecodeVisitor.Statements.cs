@@ -466,12 +466,21 @@ public partial class BytecodeVisitor
         // 非泛型函数：正常编译
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
-        // 提取默认参数值
+        // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
+        int paramsIndex = -1;
         if (funcValue.Ids != null)
         {
-            foreach (var param in funcValue.Ids)
+            for (int i = 0; i < funcValue.Ids.Count; i++)
             {
+                var param = funcValue.Ids[i];
+
+                // 检查是否是params参数
+                if (param.IsParams)
+                {
+                    paramsIndex = i;
+                }
+
                 if (param.DefaultValue != null)
                 {
                     // 尝试计算默认值（仅支持常量表达式）
@@ -485,7 +494,7 @@ public partial class BytecodeVisitor
             }
         }
 
-        _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+        _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
         return null;
     }
 
@@ -970,12 +979,21 @@ public partial class BytecodeVisitor
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
-        // 提取默认参数值
+        // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
+        int paramsIndex = -1;
         if (funcValue.Ids != null)
         {
-            foreach (var param in funcValue.Ids)
+            for (int i = 0; i < funcValue.Ids.Count; i++)
             {
+                var param = funcValue.Ids[i];
+
+                // 检查是否是params参数
+                if (param.IsParams)
+                {
+                    paramsIndex = i;
+                }
+
                 if (param.DefaultValue != null)
                 {
                     var defaultValue = EvaluateConstantExpression(param.DefaultValue);
@@ -995,12 +1013,12 @@ public partial class BytecodeVisitor
         if (containsYield)
         {
             // 异步生成器函数
-            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
         }
         else
         {
             // 普通异步函数
-            _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement);
+            _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
         }
 
         return null;
