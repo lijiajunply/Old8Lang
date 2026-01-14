@@ -1,0 +1,7 @@
+// 最简单的测试
+
+func main() -> void {
+    PrintLine("Starting test...")
+    result <- 42
+    PrintLine("Result: " + result.ToStr())
+}

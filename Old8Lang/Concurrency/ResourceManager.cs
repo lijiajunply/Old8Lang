@@ -47,7 +47,8 @@ public static class ResourceManager
         ReadWriteLock,
         CountDownLatch,
         CyclicBarrier,
-        CancellationTokenSource
+        CancellationTokenSource,
+        Thread
     }
 
     // 资源类型映射
@@ -62,6 +63,7 @@ public static class ResourceManager
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CountDownLatchImpl>> CountDownLatches = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CyclicBarrierImpl>> CyclicBarriers = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>> CancellationTokenSources = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<VMThreadWrapper>> Threads = new();
 
     // ID 计数器
     private static int _mutexIdCounter;
@@ -72,6 +74,7 @@ public static class ResourceManager
     private static int _countDownLatchIdCounter;
     private static int _cyclicBarrierIdCounter;
     private static int _cancellationTokenSourceIdCounter;
+    private static int _threadIdCounter;
 
     // 定时器，用于定期清理不再使用的资源
     private static Timer? _cleanupTimer;
@@ -565,6 +568,72 @@ public static class ResourceManager
 
     #endregion
 
+    #region Thread
+
+    /// <summary>
+    /// 创建线程
+    /// </summary>
+    /// <param name="action">线程执行的动作</param>
+    /// <returns>线程ID</returns>
+    public static int CreateThread(Action action)
+    {
+        var id = Interlocked.Increment(ref _threadIdCounter);
+        var threadWrapper = new VMThreadWrapper(action);
+        Threads[id] = new ResourceWrapper<VMThreadWrapper>(threadWrapper);
+        ResourceTypes[id] = ResourceType.Thread;
+        return id;
+    }
+
+    /// <summary>
+    /// 启动线程
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    public static void StartThread(int threadId)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Start();
+    }
+
+    /// <summary>
+    /// 等待线程完成并获取结果
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    /// <returns>线程执行结果</returns>
+    public static object? JoinThread(int threadId)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Join();
+    }
+
+    /// <summary>
+    /// 检查线程是否存活
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    /// <returns>线程是否存活</returns>
+    public static bool IsThreadAlive(int threadId)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.IsAlive;
+    }
+
+    /// <summary>
+    /// 释放线程资源
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    public static void DisposeThread(int threadId)
+    {
+        if (Threads.TryRemove(threadId, out var wrapper))
+        {
+            wrapper.Resource.Dispose();
+            ResourceTypes.TryRemove(threadId, out _);
+        }
+    }
+
+    #endregion
+
     #region 统一Dispose接口（用于using语句）
 
     /// <summary>
@@ -599,6 +668,9 @@ public static class ResourceManager
                     break;
                 case ResourceType.CancellationTokenSource:
                     DisposeCancellationTokenSource(id);
+                    break;
+                case ResourceType.Thread:
+                    DisposeThread(id);
                     break;
             }
         }
@@ -689,6 +761,16 @@ public static class ResourceManager
                 ResourceTypes.TryRemove(id, out _);
             }
         }
+
+        // 清理闲置的 Thread
+        foreach (var (id, wrapper) in Threads)
+        {
+            if (wrapper.IsIdle && Threads.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+                ResourceTypes.TryRemove(id, out _);
+            }
+        }
     }
 
     /// <summary>
@@ -759,6 +841,15 @@ public static class ResourceManager
         foreach (var (id, wrapper) in CyclicBarriers)
         {
             if (CyclicBarriers.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+
+        // 清理所有 Thread
+        foreach (var (id, wrapper) in Threads)
+        {
+            if (Threads.TryRemove(id, out var removedWrapper))
             {
                 removedWrapper.Resource.Dispose();
             }

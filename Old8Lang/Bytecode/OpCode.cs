@@ -254,6 +254,21 @@ public enum OpCode : byte
     /// <summary>尝试非阻塞接收通道 (操作数: timeoutMs, channelId) 返回ChannelReceiveResult</summary>
     ChannelTryReceive = 0x8C,
 
+    /// <summary>创建线程 (操作数: funcIndex, argCount) 返回threadId</summary>
+    ThreadCreate = 0x8D,
+
+    /// <summary>启动线程 (操作数: threadId)</summary>
+    ThreadStart = 0x8E,
+
+    /// <summary>等待线程完成 (操作数: threadId) 返回线程结果</summary>
+    ThreadJoin = 0x8F,
+
+    /// <summary>检查线程是否存活 (操作数: threadId) 返回bool</summary>
+    ThreadIsAlive = 0x90,
+
+    /// <summary>释放线程资源 (操作数: threadId)</summary>
+    ThreadDispose = 0x91,
+
     // ===== 异步支持 (0xA0-0xAF) =====
     /// <summary>等待异步操作</summary>
     Await = 0xA0,
@@ -310,6 +325,15 @@ public enum OpCode : byte
 
     /// <summary>调用 extern 函数 (操作数: argCount, funcNameIndex)</summary>
     CallExtern = 0xC3,
+
+    /// <summary>开始using块 (操作数: finallyOffset) - 类似TryBegin但专门用于using</summary>
+    UsingBegin = 0xC4,
+
+    /// <summary>结束using块</summary>
+    UsingEnd = 0xC5,
+
+    /// <summary>释放using资源 (从栈顶弹出资源并调用Dispose)</summary>
+    DisposeResource = 0xC6,
 
     /// <summary>打印调试信息 (操作数: messageIndex)</summary>
     DebugPrint = 0xF0,

@@ -1,5 +1,6 @@
 using System.Collections;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
@@ -1612,6 +1613,64 @@ public class VirtualMachine
             }
                 break;
 
+            // === Thread 支持 ===
+            case OpCode.ThreadCreate:
+            {
+                // 栈顶: arg1, arg2, ..., argN, argCount, funcIndex
+                var funcIndex = Convert.ToInt32(_stack.Pop());
+                var argCount = Convert.ToInt32(_stack.Pop());
+
+                // 弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 获取函数元数据
+                var function = _bytecodeFile.Functions[funcIndex];
+
+                // 创建线程
+                var threadId = Concurrency.ResourceManager.CreateThread(() =>
+                {
+                    // 在新线程中执行函数
+                    CallFunction(function, args);
+                });
+
+                _stack.Push(threadId);
+            }
+                break;
+
+            case OpCode.ThreadStart:
+            {
+                var threadId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.StartThread(threadId);
+            }
+                break;
+
+            case OpCode.ThreadJoin:
+            {
+                var threadId = Convert.ToInt32(_stack.Pop());
+                var result = Concurrency.ResourceManager.JoinThread(threadId);
+                _stack.Push(result);
+            }
+                break;
+
+            case OpCode.ThreadIsAlive:
+            {
+                var threadId = Convert.ToInt32(_stack.Pop());
+                var isAlive = Concurrency.ResourceManager.IsThreadAlive(threadId);
+                _stack.Push(isAlive);
+            }
+                break;
+
+            case OpCode.ThreadDispose:
+            {
+                var threadId = Convert.ToInt32(_stack.Pop());
+                Concurrency.ResourceManager.DisposeThread(threadId);
+            }
+                break;
+
             // === 异步支持 ===
 
 
@@ -2350,6 +2409,31 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.DisposeResource:
+            {
+                // DisposeResource 指令：释放 using 语句的资源
+                // 从栈顶弹出资源并调用相应的 Dispose 方法
+                var resource = _stack.Pop();
+
+                // 1. 如果是整数值（资源ID），尝试通过 ResourceManager 释放
+                if (resource is int resourceId)
+                {
+                    Old8Lang.Concurrency.ResourceManager.TryDispose(resourceId);
+                }
+                // 2. 如果是 AnyLangValue（用户自定义类实例），尝试调用 dispose 方法
+                else if (resource is AnyLangValue anyValue)
+                {
+                    anyValue.TryDispose();
+                }
+                // 3. 如果实现了 IDisposable 接口，直接调用 Dispose
+                else if (resource is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+                // 4. 其他类型不做处理（静默忽略）
+            }
+                break;
+
             default:
                 throw new Exception($"未实现的操作码: {instruction.OpCode}");
         }
@@ -2653,6 +2737,34 @@ public class VirtualMachine
         // 处理特殊的辅助函数（不在全局函数注册表中）
         switch (funcName)
         {
+            case "Spawn":
+            case "spawn":
+                // Spawn 函数在虚拟机模式下的特殊处理
+                // args[0] 是函数索引(int), args[1..] 是函数参数
+                if (args.Length > 0 && args[0] is int funcIndex)
+                {
+                    // 获取函数元数据
+                    var function = _bytecodeFile.Functions[funcIndex];
+
+                    // 提取函数参数
+                    var funcArgs = new object?[args.Length - 1];
+                    Array.Copy(args, 1, funcArgs, 0, args.Length - 1);
+
+                    // 创建线程
+                    var threadId = Concurrency.ResourceManager.CreateThread(() =>
+                    {
+                        // 在新线程中执行函数
+                        CallFunction(function, funcArgs);
+                    });
+
+                    // 自动启动线程
+                    Concurrency.ResourceManager.StartThread(threadId);
+
+                    // 返回 VMThreadLangValue
+                    return new VMThreadLangValue(threadId);
+                }
+                throw new Exception("Spawn 函数需要至少一个参数（函数引用）");
+
             case "ToStr":
                 return args.Length > 0 ? ToString(args[0]) : "";
 

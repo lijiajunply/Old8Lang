@@ -1343,7 +1343,7 @@ public partial class BytecodeVisitor
     public Instruction? VisitUsingStatement(UsingStatement node)
     {
         // Using 语句：自动资源管理
-        // 实现策略：使用 try-finally 结构，在 finally 块中调用 Dispose
+        // 实现策略：使用 try-finally 结构，在 finally 块中调用 DisposeResource
 
         // 1. 执行资源表达式，获取资源ID
         node.ResourceExpression.Accept(this);
@@ -1379,9 +1379,8 @@ public partial class BytecodeVisitor
         // 加载资源ID
         Emit(OpCode.LoadLocal, resourceLocalIndex);
 
-        // 调用 ResourceManager.TryDispose(resourceId)
-        // CallNative 指令格式: [argCount, funcName]
-        Emit(OpCode.CallNative, new object[] { 1, "ResourceManagerTryDispose" });
+        // 调用 DisposeResource 指令释放资源
+        Emit(OpCode.DisposeResource);
 
         // 7. 记录 finally 块的结束位置
         int finallyEnd = _instructions.Count;

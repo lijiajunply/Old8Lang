@@ -1,0 +1,106 @@
+using Old8Lang.Bytecode;
+using Old8Lang.Interpreter;
+using Xunit;
+
+namespace Old8Lang.Tests.VirtualMachine.Concurrency;
+
+/// <summary>
+/// 虚拟机模式下的多线程测试
+/// </summary>
+public class VMThreadTests
+{
+    [Fact]
+    public void TestSimpleThreadCreationAndJoin()
+    {
+        // 测试简单的线程创建和等待
+        var code = @"
+result <- 0
+
+func worker() -> int {
+    return 42
+}
+
+func main() -> void {
+    thread <- Spawn(worker)
+    result <- thread.Join()
+}
+";
+
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiler = new BytecodeCompiler();
+        var bytecodeFile = compiler.Compile(ast);
+        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+
+        vm.Execute();
+
+        var result = vm.GetGlobalVariable("result");
+        Assert.Equal(42, result);
+    }
+
+    [Fact]
+    public void TestThreadWithParameters()
+    {
+        // 测试带参数的线程
+        var code = @"
+result <- 0
+
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+func main() -> void {
+    thread <- Spawn(add, 10, 20)
+    result <- thread.Join()
+}
+";
+
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiler = new BytecodeCompiler();
+        var bytecodeFile = compiler.Compile(ast);
+        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+
+        vm.Execute();
+
+        var result = vm.GetGlobalVariable("result");
+        Assert.Equal(30, result);
+    }
+
+    [Fact]
+    public void TestMultipleThreads()
+    {
+        // 测试多个线程
+        var code = @"
+result <- 0
+
+func worker(id:int) -> int {
+    return id * 2
+}
+
+func main() -> void {
+    t1 <- Spawn(worker, 1)
+    t2 <- Spawn(worker, 2)
+    t3 <- Spawn(worker, 3)
+
+    r1 <- t1.Join()
+    r2 <- t2.Join()
+    r3 <- t3.Join()
+
+    result <- r1 + r2 + r3
+}
+";
+
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiler = new BytecodeCompiler();
+        var bytecodeFile = compiler.Compile(ast);
+        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+
+        vm.Execute();
+
+        var result = vm.GetGlobalVariable("result");
+        // 1*2 + 2*2 + 3*2 = 2 + 4 + 6 = 12
+        Assert.Equal(12, result);
+    }
+}
