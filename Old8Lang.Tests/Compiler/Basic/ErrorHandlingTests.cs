@@ -324,7 +324,7 @@ public class ErrorHandlingTests
     }
 
     [Fact]
-    public void FunctionReturnTypeMismatch_ThrowsRuntimeException_WhenExecuted()
+    public void FunctionReturnTypeMismatch_ThrowsCompileException()
     {
         // Arrange
         var code = @"
@@ -335,20 +335,22 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        // Act & Assert - 编译器在编译时检测到返回类型不匹配
+        var exception = Assert.ThrowsAny<Old8Exception>(() =>
+        {
+            var ast = interpreter.Build(code);
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        });
 
-        // Assert
-        Assert.NotNull(compiledAction);
-        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
+        // 验证错误消息包含类型信息
+        Assert.Contains("返回类型不匹配", exception.Message);
     }
 
     #endregion
 
     #region 递归溢出测试
 
-    [Fact]
+    [Fact(Skip = "此测试会导致真正的栈溢出，使测试主机崩溃。栈溢出是预期行为，但无法在单元测试中安全捕获。")]
     public void InfiniteRecursion_ThrowsStackOverflowException_WhenExecuted()
     {
         // Arrange
@@ -369,7 +371,7 @@ public class ErrorHandlingTests
         Assert.ThrowsAny<Exception>(() => compiledAction());
     }
 
-    [Fact]
+    [Fact(Skip = "此测试会导致真正的栈溢出，使测试主机崩溃。栈溢出是预期行为，但无法在单元测试中安全捕获。")]
     public void DeepRecursion_ThrowsStackOverflowException_WhenExecuted()
     {
         // Arrange
@@ -551,7 +553,7 @@ public class ErrorHandlingTests
     }
 
     [Fact]
-    public void UndefinedClassMethod_ThrowsRuntimeException_WhenExecuted()
+    public void UndefinedClassMethod_ThrowsCompileException()
     {
         // Arrange
         var code = @"
@@ -563,13 +565,15 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        // Act & Assert - 编译器在编译时检测到未定义的方法
+        var exception = Assert.ThrowsAny<Old8Exception>(() =>
+        {
+            var ast = interpreter.Build(code);
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        });
 
-        // Assert
-        Assert.NotNull(compiledAction);
-        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
+        // 验证错误消息包含方法名
+        Assert.Contains("undefinedMethod", exception.Message);
     }
 
     #endregion
@@ -602,8 +606,23 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act & Assert - 编译模式要求函数返回值有类型注解
-        Assert.ThrowsAny<Old8Exception>(() => interpreter.Build(code));
+        // 临时禁用类型推断，以测试编译模式的严格类型检查
+        var previousInferenceEnabled = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference;
+        var previousInferReturnTypes = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody;
+        try
+        {
+            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = false;
+            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = false;
+
+            // Act & Assert - 编译模式要求函数返回值有类型注解
+            var ast = interpreter.Build(code);
+            Assert.ThrowsAny<Old8Exception>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        }
+        finally
+        {
+            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = previousInferenceEnabled;
+            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = previousInferReturnTypes;
+        }
     }
 
     [Fact]

@@ -46,6 +46,33 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         // 获取返回值表达式的类型
         var returnType = returnExpression.OutputType(local);
 
+        // 验证返回类型是否与函数声明的返回类型匹配
+        if (local.ReturnValueLocal is not null)
+        {
+            var expectedReturnType = local.ReturnValueLocal.LocalType;
+
+            // 检查返回类型是否兼容
+            if (returnType is not null && expectedReturnType != typeof(object))
+            {
+                // 检查类型是否兼容：完全匹配、可赋值、或基本类型转换
+                bool isCompatible = expectedReturnType == returnType ||
+                                   expectedReturnType.IsAssignableFrom(returnType) ||
+                                   IsBasicTypeConversionAllowed(expectedReturnType, returnType);
+
+                // 如果返回类型不匹配且不能自动转换，报告错误
+                if (!isCompatible)
+                {
+                    var errorMsg = $"[编译模式错误] 返回类型不匹配\n\n" +
+                                  $"期望返回类型: {expectedReturnType.Name}\n" +
+                                  $"实际返回类型: {returnType.Name}\n\n" +
+                                  $"修复建议：\n" +
+                                  $"- 确保return语句返回的值类型与函数声明的返回类型一致\n" +
+                                  $"- 或者修改函数的返回类型注解以匹配实际返回值";
+                    local.ReportError(errorMsg, Position);
+                }
+            }
+        }
+
         // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）
         returnExpression.LoadIlValue(ilGenerator, local);
 
@@ -95,6 +122,23 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                 ilGenerator.Emit(OpCodes.Ret);
             }
         }
+    }
+
+    /// <summary>
+    /// 检查是否允许基本类型转换
+    /// </summary>
+    private static bool IsBasicTypeConversionAllowed(Type expected, Type actual)
+    {
+        // 数值类型之间的转换
+        var numericTypes = new[] { typeof(int), typeof(long), typeof(double), typeof(float), typeof(short), typeof(byte) };
+        if (numericTypes.Contains(expected) && numericTypes.Contains(actual))
+            return true;
+
+        // 字符串转换
+        if (expected == typeof(string))
+            return true;
+
+        return false;
     }
 
     public override OldStatement? this[int index] => null;
