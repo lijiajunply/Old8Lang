@@ -30,7 +30,7 @@ def subtract(a, b):
     return a - b
 ";
         var old8Content = @"
-native extern ""math_utils.py"" {
+extern ""math_utils.py"" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int,
     func subtract(a:int, b:int) -> int
@@ -72,7 +72,7 @@ def concat(a, b):
     return a + b
 ";
         var old8Content = @"
-native extern ""string_utils.py"" {
+extern ""string_utils.py"" {
     func greet(name:string) -> string,
     func to_upper(text:string) -> string,
     func concat(a:string, b:string) -> string
@@ -111,7 +111,7 @@ def power(base, exp):
     return base ** exp
 ";
         var old8Content = @"
-native extern ""math_advanced.py"" {
+extern ""math_advanced.py"" {
     func divide(a:double, b:double) -> double,
     func power(base:double, exp:double) -> double
 }
@@ -151,7 +151,7 @@ def is_odd(n):
     return n % 2 != 0
 ";
         var old8Content = @"
-native extern ""py:predicates.py"" {
+extern ""py:predicates.py"" {
     func is_even(n:int) -> bool,
     func is_odd(n:int) -> bool
 }
@@ -188,7 +188,7 @@ result4 <- is_odd(8)
     {
         // Arrange
         var old8Content = @"
-native extern ""pymodule:math"" {
+extern ""pymodule:math"" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double,
     func floor(x:double) -> int,
@@ -232,7 +232,7 @@ def factorial(n):
     return n * factorial(n - 1)
 ";
         var old8Content = @"
-native extern ""factorial.py"" func factorial(n:int) -> int
+extern ""factorial.py"" func factorial(n:int) -> int
 
 result <- factorial(5)
 ";
@@ -260,7 +260,7 @@ result <- factorial(5)
     {
         // Arrange
         var old8Content = @"
-native extern ""nonexistent.py"" func test() -> void
+extern ""nonexistent.py"" func test() -> void
 ";
 
         CreateTempModuleFile("test_py_error_notfound.old8", old8Content);
@@ -281,7 +281,7 @@ def existing_function():
     return 42
 ";
         var old8Content = @"
-native extern ""functions.py"" func non_existent_function() -> int
+extern ""functions.py"" func non_existent_function() -> int
 
 result <- non_existent_function()
 ";
@@ -301,7 +301,7 @@ result <- non_existent_function()
     {
         // Arrange
         var old8Content = @"
-native extern ""pymodule:nonexistent_module"" func test() -> int
+extern ""pymodule:nonexistent_module"" func test() -> int
 
 result <- test()
 ";
@@ -335,7 +335,7 @@ def calculate(a, b, operation):
     return 0
 ";
         var old8Content = @"
-native extern ""mixed.py"" {
+extern ""mixed.py"" {
     func format_message(name:string, age:int, is_student:bool) -> string,
     func calculate(a:int, b:int, operation:string) -> int
 }
@@ -370,8 +370,8 @@ def custom_add(a, b):
     return a + b
 ";
         var old8Content = @"
-native extern ""custom_math.py"" func custom_add(a:int, b:int) -> int
-native extern ""pymodule:math"" func sqrt(x:double) -> double
+extern ""custom_math.py"" func custom_add(a:int, b:int) -> int
+extern ""pymodule:math"" func sqrt(x:double) -> double
 
 result1 <- custom_add(10, 20)
 result2 <- sqrt(25.0)

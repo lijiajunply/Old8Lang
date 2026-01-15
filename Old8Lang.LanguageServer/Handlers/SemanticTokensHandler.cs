@@ -157,7 +157,7 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
             case LangTokenType.Finally:
             case LangTokenType.Throw:
             case LangTokenType.Import:
-            case LangTokenType.Native:
+            case LangTokenType.Extern:
             case LangTokenType.Yield:
             case LangTokenType.Using:
             case LangTokenType.Select:

@@ -1,12 +1,12 @@
 // 测试虚拟机模式的 extern 语句
 // 这个测试只验证字节码生成，不实际调用 DLL
 
-native extern "msvcrt.dll" {
+extern "msvcrt.dll" {
     func abs(x:int) -> int
     func sqrt(x:double) -> double
 }
 
-native extern "kernel32.dll" stdcall {
+extern "kernel32.dll" stdcall {
     func GetCurrentProcessId() -> uint as GetPID
 }
 

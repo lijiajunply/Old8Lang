@@ -285,11 +285,6 @@ public enum LangTokenType
     Private,
 
     /// <summary>
-    /// native
-    /// </summary>
-    Native,
-
-    /// <summary>
     /// extern
     /// </summary>
     Extern,
@@ -491,7 +486,6 @@ public enum KeywordType
     Public,
     Private,
     Throw,
-    Native,
     Extern,
     Protected,
     Async,

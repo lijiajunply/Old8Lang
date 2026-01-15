@@ -1,7 +1,7 @@
 // 测试 JavaScript extern 功能
 
 // 导入 JavaScript 函数
-native extern "TestFiles/test_js_functions.js" {
+extern "TestFiles/test_js_functions.js" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int,
     func greet(name:string) -> string,

@@ -6,7 +6,7 @@ PrintLine("")
 
 // macOS/Linux: 使用 libc
 // 测试 abs 函数（绝对值）
-native extern "libc.dylib" {
+extern "libc.dylib" {
     func abs(x:int) -> int
 }
 

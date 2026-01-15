@@ -27,7 +27,7 @@ public class ExternCompilerTests
 
         // Arrange
         var code = @"
-native extern ""msvcrt.dll"" func abs(x:int) -> int
+extern ""msvcrt.dll"" func abs(x:int) -> int
 
 func test() -> int {
     return abs(-42)
@@ -61,7 +61,7 @@ result <- test()
 
         // Arrange
         var code = @"
-native extern ""kernel32.dll"" stdcall {
+extern ""kernel32.dll"" stdcall {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int
 }
@@ -105,7 +105,7 @@ result <- getIds()
         // Arrange
         var libName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "libSystem.dylib" : "libc.so.6";
         var code = $@"
-native extern ""{libName}"" func abs(x:int) -> int
+extern ""{libName}"" func abs(x:int) -> int
 
 func test() -> int {{
     return abs(-100)
@@ -143,8 +143,8 @@ result <- test()
 
         // Arrange
         var code = @"
-native extern ""msvcrt.dll"" cdecl func abs(x:int) -> int
-native extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
+extern ""msvcrt.dll"" cdecl func abs(x:int) -> int
+extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
 
 func test() -> int {
     a <- abs(-50)
@@ -184,7 +184,7 @@ result <- test()
 
         // Arrange
         var code = @"
-native extern ""kernel32.dll"" stdcall {
+extern ""kernel32.dll"" stdcall {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int
 }
@@ -221,7 +221,7 @@ result <- test()
     {
         // Arrange
         var code = @"
-native extern ""test.py"" func test_func() -> int
+extern ""test.py"" func test_func() -> int
 
 func main() -> int {
     return test_func()
@@ -251,7 +251,7 @@ result <- main()
     {
         // Arrange
         var code = @"
-native extern ""pymodule:math"" func sqrt(x:double) -> double
+extern ""pymodule:math"" func sqrt(x:double) -> double
 
 func main() -> double {
     return sqrt(16.0)
@@ -281,7 +281,7 @@ result <- main()
     {
         // Arrange
         var code = @"
-native extern ""test.js"" func add(a:int, b:int) -> int
+extern ""test.js"" func add(a:int, b:int) -> int
 
 func main() -> int {
     return add(1, 2)
@@ -311,7 +311,7 @@ result <- main()
     {
         // Arrange
         var code = @"
-native extern ""js:test.js"" func multiply(a:int, b:int) -> int
+extern ""js:test.js"" func multiply(a:int, b:int) -> int
 
 func main() -> int {
     return multiply(3, 4)
@@ -351,8 +351,8 @@ result <- main()
 
         // Arrange
         var code = @"
-native extern ""msvcrt.dll"" func abs(x:int) -> int
-native extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
+extern ""msvcrt.dll"" func abs(x:int) -> int
+extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
 
 func calculate() -> int {
     a <- abs(-200)

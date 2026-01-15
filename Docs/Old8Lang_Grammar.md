@@ -150,7 +150,7 @@ if elif else for while switch case default
 func async class enum mixin interface extends implements with
 return break continue throw yield
 try catch finally
-import from as native extern
+import from as extern
 true false null
 and or xor not in
 public private static
@@ -2212,13 +2212,13 @@ import { MyClass as MC } from "utils"
 #### 5.13.1 单个方法导入
 
 ```old8
-native "Math.dll" MathLib Sqrt sqrt
+extern "Math.dll" MathLib Sqrt sqrt
 ```
 
 #### 5.13.2 批量导入所有方法
 
 ```old8
-native "Old8LangLib" MathLib *
+extern "Old8LangLib" MathLib *
 
 // 之后可以直接使用所有方法
 result <- Sqrt(16)
@@ -2228,14 +2228,14 @@ pi <- GetPi()
 #### 5.13.3 选择性导入
 
 ```old8
-native "Old8LangLib" Time { GetTimeNow, TimeStamp }
+extern "Old8LangLib" Time { GetTimeNow, TimeStamp }
 ```
 
 #### 5.13.4 类导入
 
 ```old8
-native "Math.dll" MathLib -> MathLib
-native "Data.dll" DataClass as DC
+extern "Math.dll" MathLib -> MathLib
+extern "Data.dll" DataClass as DC
 ```
 
 ### 5.14 Extern 原生函数导入（P/Invoke）
@@ -2248,35 +2248,35 @@ native "Data.dll" DataClass as DC
 
 ```old8
 // 默认使用 cdecl 调用约定
-native extern "msvcrt.dll" func abs(x:int) -> int
+extern "msvcrt.dll" func abs(x:int) -> int
 
 // 指定 cdecl 调用约定
-native extern "msvcrt.dll" cdecl func printf(format:string) -> int
+extern "msvcrt.dll" cdecl func printf(format:string) -> int
 
 // 指定 stdcall 调用约定（Windows API 常用）
-native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 
 // 指定 winapi 调用约定（等同于 stdcall）
-native extern "user32.dll" winapi func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int
+extern "user32.dll" winapi func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int
 ```
 
 #### 5.14.2 带别名的函数导入
 
 ```old8
-native extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
+extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
 ```
 
 #### 5.14.3 批量函数导入（块语法）
 
 ```old8
 // 多个函数共享相同的 DLL 和默认调用约定
-native extern "user32.dll" {
+extern "user32.dll" {
     func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int,
     func MessageBoxW(hWnd:int, text:string, caption:string, type:int) -> int
 }
 
 // 可以为单个函数指定不同的调用约定
-native extern "kernel32.dll" stdcall {
+extern "kernel32.dll" stdcall {
     func Sleep(milliseconds:int) -> void as SleepMs,
     cdecl func GetCurrentThreadId() -> int as GetTid
 }
@@ -2310,7 +2310,7 @@ native extern "kernel32.dll" stdcall {
 
 ```old8
 // 导入 Windows API 函数
-native extern "kernel32.dll" stdcall {
+extern "kernel32.dll" stdcall {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int,
     func Sleep(milliseconds:int) -> void
@@ -2333,7 +2333,7 @@ Old8Lang 支持使用 `extern` 语句导入 Python 函数，通过 Python.NET (p
 
 **1. Python 脚本文件（.py 扩展名）**：
 ```old8
-native extern "path/to/script.py" {
+extern "path/to/script.py" {
     func add(a:int, b:int) -> int,
     func greet(name:string) -> string
 }
@@ -2341,19 +2341,19 @@ native extern "path/to/script.py" {
 
 **2. Python 脚本文件（py: 前缀）**：
 ```old8
-native extern "py:path/to/script.py" {
+extern "py:path/to/script.py" {
     func multiply(a:int, b:int) -> int
 }
 ```
 
 **3. Python 全局模块（pymodule: 前缀）**：
 ```old8
-native extern "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
 }
 
-native extern "pymodule:numpy" {
+extern "pymodule:numpy" {
     func array(data:object) -> object
 }
 ```
@@ -2362,7 +2362,7 @@ native extern "pymodule:numpy" {
 
 **基本语法**：
 ```old8
-native extern "Python路径或模块名" {
+extern "Python路径或模块名" {
     func 函数名(参数列表) -> 返回类型,
     func 函数名(参数列表) -> 返回类型 as 别名
 }
@@ -2370,7 +2370,7 @@ native extern "Python路径或模块名" {
 
 **别名支持**：
 ```old8
-native extern "math_utils.py" {
+extern "math_utils.py" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int as mul
 }
@@ -2421,7 +2421,7 @@ def greet(name):
 Old8Lang 代码:
 ```old8
 // 导入 Python 函数
-native extern "math_utils.py" {
+extern "math_utils.py" {
     func add(a:int, b:int) -> int,
     func subtract(a:int, b:int) -> int as sub,
     func greet(name:string) -> string
@@ -2440,7 +2440,7 @@ PrintLine(greeting)              // 输出: Hello, Old8Lang!
 
 ```old8
 // 导入 Python math 模块
-native extern "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double,
     func sin(x:double) -> double,
@@ -2472,7 +2472,7 @@ def process_dict(data):
 
 Old8Lang 代码:
 ```old8
-native extern "data_utils.py" {
+extern "data_utils.py" {
     func sum_list(numbers:object) -> int,
     func create_dict() -> object,
     func process_dict(data:object) -> string
@@ -2529,12 +2529,12 @@ PrintLine("Language: " + name)
 
 ```old8
 // ❌ 错误：参数缺少类型注解
-native extern "script.py" {
+extern "script.py" {
     func calculate(x, y) -> int  // 编译错误
 }
 
 // ❌ 错误：返回类型缺失
-native extern "script.py" {
+extern "script.py" {
     func getValue(x:int)  // 编译错误
 }
 
@@ -2545,7 +2545,7 @@ native extern "script.py" {
 **正确做法**：
 ```old8
 // ✅ 正确：完整的类型注解
-native extern "script.py" {
+extern "script.py" {
     func calculate(x:int, y:int) -> int,
     func getValue(x:int) -> string
 }
@@ -2895,7 +2895,7 @@ value.ToBool()      // 转换为布尔值
 **模式支持**: `[✅ | ✅ | ❌]`
 
 ```old8
-native "Old8LangLib" MathLib *
+extern "Old8LangLib" MathLib *
 
 result <- Sqrt(16)          // 平方根
 result <- Pow(2, 3)         // 幂运算

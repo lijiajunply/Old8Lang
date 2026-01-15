@@ -1,31 +1,31 @@
 // 测试 extern 语法解析
 
 // 1. 单个函数导入（默认 cdecl 调用约定）
-native extern "msvcrt.dll" func abs(x:int) -> int
+extern "msvcrt.dll" func abs(x:int) -> int
 
 // 2. 单个函数导入（指定 cdecl 调用约定）
-native extern "msvcrt.dll" cdecl func printf(format:string) -> int
+extern "msvcrt.dll" cdecl func printf(format:string) -> int
 
 // 3. 单个函数导入（指定 stdcall 调用约定）
-native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 
 // 4. 单个函数导入（带别名）
-native extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
+extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
 
 // 5. 多个函数导入（块语法）
-native extern "user32.dll" {
+extern "user32.dll" {
     func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int,
     func MessageBoxW(hWnd:int, text:string, caption:string, type:int) -> int
 }
 
 // 6. 多个函数导入（带别名和调用约定）
-native extern "kernel32.dll" stdcall {
+extern "kernel32.dll" stdcall {
     func Sleep(milliseconds:int) -> void as SleepMs,
     cdecl func GetCurrentThreadId() -> int as GetTid
 }
 
 // 7. 无参数函数
-native extern "kernel32.dll" func GetProcessorCount() -> int
+extern "kernel32.dll" func GetProcessorCount() -> int
 
 // 8. void 返回类型
-native extern "msvcrt.dll" func exit(code:int) -> void
+extern "msvcrt.dll" func exit(code:int) -> void

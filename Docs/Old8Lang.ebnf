@@ -171,14 +171,14 @@ importSpecifier = "{" importItem ( "," importItem )* "}" ;
 
 importItem = identifier ( "as" identifier )? ;
 
-nativeStatement = "native" STRING identifier identifier identifier?
-                | "native" STRING identifier "*"
-                | "native" STRING identifier "{" identifierList "}"
-                | "native" STRING identifier "->" identifier
-                | "native" STRING identifier ( "as" identifier )? ;
+nativeStatement = "extern" STRING identifier identifier identifier?
+                | "extern" STRING identifier "*"
+                | "extern" STRING identifier "{" identifierList "}"
+                | "extern" STRING identifier "->" identifier
+                | "extern" STRING identifier ( "as" identifier )? ;
 
 (* Extern Statement - P/Invoke Native Function Import *)
-externStatement = "native" "extern" STRING callingConvention? externBody ;
+externStatement = "extern" "extern" STRING callingConvention? externBody ;
 
 callingConvention = "cdecl" | "stdcall" | "winapi" ;
 
@@ -365,7 +365,7 @@ KEYWORDS = "if" | "elif" | "else" | "for" | "while" | "switch" | "case" | "defau
          | "func" | "class" | "enum" | "mixin" | "interface" | "extends" | "implements"
          | "return" | "break" | "continue" | "throw" | "yield" | "defer"
          | "try" | "catch" | "finally"
-         | "import" | "from" | "as" | "native" | "with"
+         | "import" | "from" | "as" | "extern" | "with"
          | "true" | "false" | "null"
          | "and" | "or" | "xor" | "not" | "in"
          | "async" | "await"

@@ -1,6 +1,6 @@
 // 所有导入必须在文件开头，避免解析问题
-native "Old8LangLib" MathLib *
-native "Old8LangLib" Time { GetTimeNow, TimeStamp }
+extern "Old8LangLib" MathLib *
+extern "Old8LangLib" Time { GetTimeNow, TimeStamp }
 
 PrintLine("=== 批量导入功能测试 ===")
 PrintLine("测试1: 批量导入所有方法")

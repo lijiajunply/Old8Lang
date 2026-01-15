@@ -23,15 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/TODO_Compiler.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/TODO_VirtualMachine.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VM_Implementation_Summary.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VM_Status_Report.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine-ImplementationStatus.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine-TestPlan.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/VirtualMachine.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -577,7 +574,7 @@
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
-      <workItem from="1768485078721" duration="11917000" />
+      <workItem from="1768485078721" duration="12617000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -922,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="680" />
+    <option name="localTasksCounter" value="681" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -949,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(bytecode): 实现 using 语句的字节码生成和自动资源管理&#10;&#10;- 在 BytecodeVisitor 中实现 UsingStatement 的完整字节码生成逻辑&#10;- 使用 try-finally 结构实现自动资源管理，在 finally 块中调用 Dispose&#10;- 添加 ResourceManagerTryDispose 原生函数支持资源释放操作&#10;- 生成异常表条目记录 try-finally 块的位置信息&#10;- 支持带变量名和不带变量名两种 using 语句语法&#10;- 添加 using 语句字节码测试用例验证资源自动释放功能&#10;- 修复 OpCode 注释中的 HTML 实体编码问题" />
     <MESSAGE value="feat(linq): 实现 GroupBy 子句的字节码生成和虚拟机支持&#10;&#10;- 在 BytecodeVisitor.Expressions.cs 中添加对 GroupBy 子句类型的检查逻辑&#10;- 实现分组字典的创建和管理机制 (NewGroupDict 和 GroupDictToList 操作码)&#10;- 添加 GroupBy 终止子句的具体字节码生成逻辑&#10;- 修改 AddToGroup 操作码的参数顺序以匹配正确的执行流程&#10;- 更新虚拟机中 AddToGroup 操作的栈操作顺序&#10;- 移除分组字典操作后的冗余栈推送逻辑&#10;- 优化虚拟机字典转字符串的迭代方式以正确显示分组结果&#10;- 添加完整的 GroupBy 功能测试用例文件" />
     <MESSAGE value="fix(vm): 修复方法重载查找问题&#10;&#10;- 根据参数类型查找匹配的方法重载，而不是仅通过方法名&#10;- 添加参数类型数组构建逻辑用于精确匹配方法签名&#10;- 修复了 ToStr 方法映射到 ToString 时的重载查找问题&#10;- 更新 IDEA 工作区配置文件以反映最新的代码变更&#10;- 修正工作时间统计和本地任务计数器的数值&#10;- 清理历史提交消息记录保持配置文件整洁" />
     <MESSAGE value="feat(vm): 实现字节码模式下的全局函数执行&#10;&#10;- 在BaseGlobalFunction中添加ExecuteInVMInternal抽象方法和ExecuteInVM公共方法&#10;- 为所有并发相关的全局函数实现ExecuteInVMInternal方法&#10;- 为IO函数、工具函数、集合函数等实现字节码模式执行逻辑&#10;- 修改VirtualMachine类使用全局函数注册表来调用字节码模式函数&#10;- 移除VirtualMachine中硬编码的原生函数调用实现&#10;- 添加字节码模式下的参数验证方法ValidateParameterCountForVM&#10;- 为不支持字节码模式的函数返回null或默认值&#10;- 添加测试文件test_vm_global_functions.old8验证功能" />
@@ -974,7 +970,8 @@
     <MESSAGE value="refactor(tests): 重构表达式补全处理器测试&#10;&#10;- 移除私有字段 _output 并直接使用构造函数参数&#10;- 更新所有测试方法中的输出写入调用以使用 output 参数&#10;- 修改 MemberAccess 测试中的代码示例以匹配新的语法格式&#10;- 调整位置参数以匹配更新后的代码结构&#10;- 更新 ChainedMemberAccess 测试中的类实例化语法&#10;- 修正所有测试用例中的断言和验证逻辑" />
     <MESSAGE value="fix(completion): 修复异步函数补全项标签和测试&#10;&#10;- 将 asyncfunc 标签更正为 &quot;async func&quot; 以符合语法规范&#10;- 更新测试用例以验证正确的 async 关键字和 async func 代码片段&#10;- 移除私有字段 _output 并直接使用构造函数注入的 output 参数&#10;- 修正断言逻辑确保代码片段插入文本匹配预期值&#10;- 统一所有测试文件中的输出参数使用方式" />
     <MESSAGE value="feat(parser): 添加泛型继承语法支持并完善代码补全功能&#10;&#10;- 在 ClassParser 中实现父类泛型参数解析功能，支持 extends List&lt;T&gt; 语法&#10;- 限制类成员补全仅显示公共成员，过滤私有成员的外部访问&#10;- 更新测试用例修复输出参数引用和代码示例格式&#10;- 在 SymbolTableBuilder 中添加泛型实例化表达式类型推断支持&#10;- 将无法推断的变量类型默认设为 &quot;any&quot; 而非 &quot;var&quot;&#10;- 添加泛型继承和成员访问的测试用例验证功能正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加泛型继承语法支持并完善代码补全功能&#10;&#10;- 在 ClassParser 中实现父类泛型参数解析功能，支持 extends List&lt;T&gt; 语法&#10;- 限制类成员补全仅显示公共成员，过滤私有成员的外部访问&#10;- 更新测试用例修复输出参数引用和代码示例格式&#10;- 在 SymbolTableBuilder 中添加泛型实例化表达式类型推断支持&#10;- 将无法推断的变量类型默认设为 &quot;any&quot; 而非 &quot;var&quot;&#10;- 添加泛型继承和成员访问的测试用例验证功能正确性" />
+    <MESSAGE value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

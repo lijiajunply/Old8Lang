@@ -213,7 +213,7 @@ func main() -> void {
     [Fact]
     public async Task NativeFunctionDeclaration_Completion()
     {
-        var code = @"native extern ""MyLib.dll"" {
+        var code = @"extern ""MyLib.dll"" {
     func CPrint(msg:string) -> void
 }
 
@@ -306,7 +306,7 @@ func main() -> void {
     [Fact]
     public async Task ExternVariable_ShouldComplete()
     {
-        var code = @"native extern ""MyLib.dll"" {
+        var code = @"extern ""MyLib.dll"" {
     func getGlobalCounter() -> int
 }
 

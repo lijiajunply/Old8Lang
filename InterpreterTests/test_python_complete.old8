@@ -5,7 +5,7 @@ PrintLine("")
 
 // 测试 1: 基本数学运算
 PrintLine("测试 1: 基本数学运算")
-native extern "TestFiles/test_math.py" {
+extern "TestFiles/test_math.py" {
     func add(a:int, b:int) -> int,
     func subtract(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
@@ -25,7 +25,7 @@ PrintLine("")
 
 // 测试 2: 字符串操作
 PrintLine("测试 2: 字符串操作")
-native extern "py:TestFiles/test_math.py" {
+extern "py:TestFiles/test_math.py" {
     func greet(name:string) -> string
 }
 

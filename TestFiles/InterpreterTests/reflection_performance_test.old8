@@ -1,7 +1,7 @@
 // 反射性能优化测试
 // 测试 native 方法调用的性能
 
-native "Old8LangLib" MathLib { Sqrt, Pow, Abs, Floor }
+extern "Old8LangLib" MathLib { Sqrt, Pow, Abs, Floor }
 
 // 测试1: Math 操作（频繁的 native 方法调用）
 func testMathOperations() -> void {

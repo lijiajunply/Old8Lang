@@ -187,22 +187,28 @@ public class StatementParser(
             return ParseYieldStatement();
         }
 
-        // 处理native语句：native "dll" class method
-        if (CurrentToken.Type == LangTokenType.Native)
+        // 处理 extern 语句：extern "dll" class method 或 extern "dll" func ...
+        if (CurrentToken.Type == LangTokenType.Extern)
         {
             var peek1 = Peek();
             var peek2 = Peek(2);
             var peek3 = Peek(3);
             var peek4 = Peek(4);
 
-            // 检查是否是 extern 语句：native extern "dll" ...
-            if (peek1.Type == LangTokenType.Extern)
+            // 检查是否是 P/Invoke/Python/JS 函数导入：extern "dll" func ...
+            // 或者带调用约定的：extern "dll" cdecl/stdcall/winapi func ...
+            // 或者函数块：extern "dll" { func1, func2 }
+            if (peek1.Type == LangTokenType.String &&
+                (peek2.Type == LangTokenType.Func ||
+                 peek2.Type == LangTokenType.LeftBrace ||
+                 (peek2.Type == LangTokenType.Identifier && peek3.Type == LangTokenType.Func)))
             {
                 return ParseExternStatement();
             }
 
-            // 先处理更具体的语法模式，再处理更通用的
-            // 1. nativeStatic: native "dll" class -> "alias"
+            // 以下是 C# DLL 导入的各种模式（使用 NativeStatement）
+
+            // 1. nativeStatic: extern "dll" class -> "alias"
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier &&
                 peek3.Type == LangTokenType.Arrow)
@@ -210,7 +216,7 @@ public class StatementParser(
                 return ParseNativeStatic();
             }
 
-            // 2. 批量导入所有方法: native "dll" class *
+            // 2. 批量导入所有方法: extern "dll" class *
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier &&
                 peek3.Type == LangTokenType.Star)
@@ -218,7 +224,7 @@ public class StatementParser(
                 return ParseNativeStatement();
             }
 
-            // 3. 选择性导入: native "dll" class { method1, method2 }
+            // 3. 选择性导入: extern "dll" class { method1, method2 }
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier &&
                 peek3.Type == LangTokenType.LeftBrace)
@@ -226,7 +232,7 @@ public class StatementParser(
                 return ParseNativeStatement();
             }
 
-            // 4. nativeClass with alias: native "dll" class as alias
+            // 4. nativeClass with alias: extern "dll" class as alias
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier &&
                 peek3.Type == LangTokenType.As)
@@ -234,7 +240,7 @@ public class StatementParser(
                 return ParseNativeClass();
             }
 
-            // 5. 单个方法导入: native "dll" class method alias?
+            // 5. 单个方法导入: extern "dll" class method alias?
             // 如果第三个 token 是 identifier，说明是方法导入
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier &&
@@ -243,7 +249,7 @@ public class StatementParser(
                 return ParseNativeStatement();
             }
 
-            // 6. nativeClass: native "dll" class（最后兜底，第三个 token 不是上述任何特殊类型）
+            // 6. nativeClass: extern "dll" class（最后兜底，第三个 token 不是上述任何特殊类型）
             if (peek1.Type == LangTokenType.String &&
                 peek2.Type == LangTokenType.Identifier)
             {
@@ -1343,20 +1349,20 @@ public class StatementParser(
     /// <returns>引入原生方法</returns>
     public NativeStatement ParseNativeStatement()
     {
-        Expect(LangTokenType.Native);
+        Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
-        // 检查是否是批量导入所有方法：native "DllName" ClassName *
+        // 检查是否是批量导入所有方法：extern "DllName" ClassName *
         if (CurrentToken.Type == LangTokenType.Star)
         {
             Expect(LangTokenType.Star);
             return new NativeStatement(dllName, className, importAll: true);
         }
 
-        // 检查是否是选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
+        // 检查是否是选择性导入多个方法：extern "DllName" ClassName { Method1, Method2 }
         if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
             Expect(LangTokenType.LeftBrace);
@@ -1392,7 +1398,7 @@ public class StatementParser(
             return new NativeStatement(dllName, className, methodList);
         }
 
-        // 原有的单个方法导入：native "DllName" ClassName MethodName Alias?
+        // 原有的单个方法导入：extern "DllName" ClassName MethodName Alias?
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         var alias = "";
@@ -1406,12 +1412,12 @@ public class StatementParser(
     }
 
     /// <summary>
-    /// nativeStatic = "native" STRING identifier "->" STRING ;
+    /// nativeStatic = "extern" STRING identifier "->" STRING ;
     /// </summary>
     /// <returns>引入原生静态类</returns>
     public NativeStatement ParseNativeStatic()
     {
-        Expect(LangTokenType.Native);
+        Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
@@ -1423,18 +1429,18 @@ public class StatementParser(
     }
 
     /// <summary>
-    ///  nativeClass = "native" STRING identifier ("as" identifier)? ;
+    ///  nativeClass = "extern" STRING identifier ("as" identifier)? ;
     /// </summary>
     /// <returns>引入原生类</returns>
     public NativeStatement ParseNativeClass()
     {
-        Expect(LangTokenType.Native);
+        Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
-        // 检查是否有 as 别名：native "DllName" ClassName as Alias
+        // 检查是否有 as 别名：extern "DllName" ClassName as Alias
         if (CurrentToken.Type == LangTokenType.As)
         {
             Expect(LangTokenType.As);
@@ -2005,7 +2011,6 @@ public class StatementParser(
     /// <returns>Extern 语句</returns>
     public ExternStatement ParseExternStatement()
     {
-        Expect(LangTokenType.Native);
         Expect(LangTokenType.Extern);
 
         // 解析 DLL 名称

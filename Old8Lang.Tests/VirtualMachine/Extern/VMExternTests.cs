@@ -50,7 +50,7 @@ public class VMExternTests
                       "libc.so.6";
 
         var code = $@"
-            native extern ""{libName}"" {{
+            extern ""{libName}"" {{
                 func abs(x:int) -> int
             }}
 
@@ -74,7 +74,7 @@ public class VMExternTests
                       "libc.so.6";
 
         var code = $@"
-            native extern ""{libName}"" {{
+            extern ""{libName}"" {{
                 func abs(x:int) -> int as absolute
             }}
 
@@ -101,7 +101,7 @@ public class VMExternTests
         var convention = OperatingSystem.IsWindows() ? "stdcall" : "";
 
         var code = $@"
-            native extern ""{libName}"" {convention} {{
+            extern ""{libName}"" {convention} {{
                 func {funcName}() -> int
             }}
 

@@ -1,4 +1,4 @@
 // Old8Lang 终端库 - 使用批量导入功能
 // 导入 Terminal 和 ColorfulTerminal 的所有方法
-native "Old8LangLib" Terminal *
-native "Old8LangLib" ColorfulTerminal *
+extern "Old8LangLib" Terminal *
+extern "Old8LangLib" ColorfulTerminal *

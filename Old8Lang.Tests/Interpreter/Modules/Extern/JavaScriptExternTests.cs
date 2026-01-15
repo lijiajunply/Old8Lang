@@ -33,7 +33,7 @@ function subtract(a, b) {
 }
 ";
         var old8Content = @"
-native extern ""math.js"" {
+extern ""math.js"" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int,
     func subtract(a:int, b:int) -> int
@@ -78,7 +78,7 @@ function concatenate(a, b) {
 }
 ";
         var old8Content = @"
-native extern ""string_utils.js"" {
+extern ""string_utils.js"" {
     func greet(name:string) -> string,
     func toUpperCase(text:string) -> string,
     func concatenate(a:string, b:string) -> string
@@ -123,7 +123,7 @@ function squareRoot(x) {
 }
 ";
         var old8Content = @"
-native extern ""math_advanced.js"" {
+extern ""math_advanced.js"" {
     func divide(a:double, b:double) -> double,
     func power(base:double, exp:double) -> double,
     func squareRoot(x:double) -> double
@@ -165,7 +165,7 @@ function factorial(n) {
 }
 ";
         var old8Content = @"
-native extern ""factorial.js"" func factorial(n:int) -> int
+extern ""factorial.js"" func factorial(n:int) -> int
 
 result <- factorial(5)
 ";
@@ -202,7 +202,7 @@ function isOdd(n) {
 }
 ";
         var old8Content = @"
-native extern ""js:predicates.js"" {
+extern ""js:predicates.js"" {
     func isEven(n:int) -> bool,
     func isOdd(n:int) -> bool
 }
@@ -252,7 +252,7 @@ function parseNumber(str) {
 }
 ";
         var old8Content = @"
-native extern ""converters.js"" {
+extern ""converters.js"" {
     func doubleValue(x:int) -> int,
     func toString(x:int) -> string,
     func parseNumber(str:string) -> int
@@ -288,7 +288,7 @@ result3 <- parseNumber(""456"")
     {
         // Arrange
         var old8Content = @"
-native extern ""nonexistent.js"" func test() -> void
+extern ""nonexistent.js"" func test() -> void
 ";
 
         CreateTempModuleFile("test_js_error_notfound.old8", old8Content);
@@ -310,7 +310,7 @@ function existingFunction() {
 }
 ";
         var old8Content = @"
-native extern ""functions.js"" func nonExistentFunction() -> int
+extern ""functions.js"" func nonExistentFunction() -> int
 
 result <- nonExistentFunction()
 ";
@@ -345,7 +345,7 @@ function calculate(a, b, operation) {
 }
 ";
         var old8Content = @"
-native extern ""mixed.js"" {
+extern ""mixed.js"" {
     func formatMessage(name:string, age:int, isStudent:bool) -> string,
     func calculate(a:int, b:int, operation:string) -> int
 }
@@ -386,8 +386,8 @@ function greet(name) {
 }
 ";
         var old8Content = @"
-native extern ""math2.js"" func add(a:int, b:int) -> int
-native extern ""greet2.js"" func greet(name:string) -> string
+extern ""math2.js"" func add(a:int, b:int) -> int
+extern ""greet2.js"" func greet(name:string) -> string
 
 result1 <- add(10, 20)
 result2 <- greet(""World"")

@@ -2,6 +2,21 @@
 
 ## Old8Lang 1.0.0 rc7
 
+### 语法统一
+
+#### 统一 extern 关键字
+- **变更**: 将 `native` 和 `native extern` 关键字统一为 `extern`
+- **影响**:
+  - C# DLL 导入：`native "DllName" Class *` → `extern "DllName" Class *`
+  - C/C++ P/Invoke：`native extern "dll" func foo() -> int` → `extern "dll" func foo() -> int`
+  - Python 函数导入：`native extern "script.py" func bar() -> void` → `extern "script.py" func bar() -> void`
+  - JavaScript 函数导入：`native extern "script.js" func baz() -> void` → `extern "script.js" func baz() -> void`
+- **优点**:
+  - 语法更简洁统一
+  - 降低学习成本
+  - 所有外部导入使用同一个关键字
+- **向后兼容**: 旧代码需要将 `native` 替换为 `extern`
+
 ### 语言特性增强
 
 #### 一元 NOT 运算符完整支持

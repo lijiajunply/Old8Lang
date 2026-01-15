@@ -1,7 +1,7 @@
 // 编译器模式 extern 测试 - 简化版
 PrintLine("开始测试")
 
-native extern "libc.dylib" {
+extern "libc.dylib" {
     func abs(x:int) -> int
 }
 

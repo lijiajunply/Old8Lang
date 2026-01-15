@@ -1,1 +1,1 @@
-native "Old8LangLib" Csv *
+extern "Old8LangLib" Csv *

@@ -29,7 +29,7 @@ public class NativeDllExternTests(ITestOutputHelper output) : ModuleImportTestBa
 
         // Arrange
         var old8Content = @"
-native extern ""msvcrt.dll"" {
+extern ""msvcrt.dll"" {
     func abs(x:int) -> int
 }
 
@@ -65,7 +65,7 @@ result3 <- abs(0)
 
         // Arrange
         var old8Content = @"
-native extern ""kernel32.dll"" stdcall {
+extern ""kernel32.dll"" stdcall {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int
 }
@@ -112,7 +112,7 @@ processId <- GetCurrentProcessId()
         // Arrange
         var libName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "libSystem.dylib" : "libc.so.6";
         var old8Content = $@"
-native extern ""{libName}"" {{
+extern ""{libName}"" {{
     func abs(x:int) -> int
 }}
 
@@ -153,10 +153,10 @@ result3 <- abs(0)
         // Arrange
         var old8Content = @"
 // 使用 cdecl 调用约定
-native extern ""msvcrt.dll"" cdecl func abs(x:int) -> int
+extern ""msvcrt.dll"" cdecl func abs(x:int) -> int
 
 // 使用 stdcall 调用约定
-native extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
+extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
 
 result1 <- abs(-100)
 result2 <- GetCurrentProcessId()
@@ -195,7 +195,7 @@ result2 <- GetCurrentProcessId()
 
         // Arrange
         var old8Content = @"
-native extern ""kernel32.dll"" stdcall {
+extern ""kernel32.dll"" stdcall {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int
 }
@@ -236,7 +236,7 @@ processId <- GetCurrentProcessId()
 
         // Arrange
         var old8Content = @"
-native extern ""msvcrt.dll"" func abs(x:int) -> int
+extern ""msvcrt.dll"" func abs(x:int) -> int
 
 result <- abs(-999)
 ";
@@ -263,7 +263,7 @@ result <- abs(-999)
     {
         // Arrange
         var old8Content = @"
-native extern ""nonexistent_library.dll"" func test() -> void
+extern ""nonexistent_library.dll"" func test() -> void
 ";
 
         CreateTempModuleFile("test_native_error_dll.old8", old8Content);
@@ -287,7 +287,7 @@ native extern ""nonexistent_library.dll"" func test() -> void
 
         // Arrange
         var old8Content = @"
-native extern ""msvcrt.dll"" func nonExistentFunction() -> int
+extern ""msvcrt.dll"" func nonExistentFunction() -> int
 
 result <- nonExistentFunction()
 ";
@@ -317,11 +317,11 @@ result <- nonExistentFunction()
 
         // Arrange
         var old8Content = @"
-native extern ""msvcrt.dll"" cdecl {
+extern ""msvcrt.dll"" cdecl {
     func abs(x:int) -> int
 }
 
-native extern ""kernel32.dll"" stdcall {
+extern ""kernel32.dll"" stdcall {
     func GetCurrentThreadId() -> int
 }
 
@@ -357,8 +357,8 @@ result2 <- GetCurrentThreadId()
 
         // Arrange
         var old8Content = @"
-native extern ""msvcrt.dll"" func abs(x:int) -> int
-native extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
+extern ""msvcrt.dll"" func abs(x:int) -> int
+extern ""kernel32.dll"" stdcall func GetCurrentProcessId() -> int
 
 result1 <- abs(-200)
 result2 <- GetCurrentProcessId()

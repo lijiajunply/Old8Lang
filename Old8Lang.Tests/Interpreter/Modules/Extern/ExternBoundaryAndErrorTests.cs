@@ -21,7 +21,7 @@ public class ExternBoundaryAndErrorTests(ITestOutputHelper output) : ModuleImpor
     {
         // Arrange
         var old8Content = @"
-native extern """" func test() -> void
+extern """" func test() -> void
 ";
 
         CreateTempModuleFile("test_empty_filename.old8", old8Content);
@@ -39,7 +39,7 @@ native extern """" func test() -> void
         // Arrange
         var longFileName = new string('a', 200) + ".js";
         var old8Content = $@"
-native extern ""{longFileName}"" func test() -> void
+extern ""{longFileName}"" func test() -> void
 ";
 
         CreateTempModuleFile("test_long_path.old8", old8Content);
@@ -56,7 +56,7 @@ native extern ""{longFileName}"" func test() -> void
     {
         // Arrange
         var old8Content = @"
-native extern ""../../../etc/passwd"" func test() -> void
+extern ""../../../etc/passwd"" func test() -> void
 ";
 
         CreateTempModuleFile("test_special_chars.old8", old8Content);
@@ -82,7 +82,7 @@ function getConstant() {
 }
 ";
         var old8Content = @"
-native extern ""no_params.js"" func getConstant() -> int
+extern ""no_params.js"" func getConstant() -> int
 
 result <- getConstant()
 ";
@@ -111,7 +111,7 @@ function sumMany(a, b, c, d, e, f, g, h) {
 }
 ";
         var old8Content = @"
-native extern ""many_params.js"" func sumMany(a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int) -> int
+extern ""many_params.js"" func sumMany(a:int, b:int, c:int, d:int, e:int, f:int, g:int, h:int) -> int
 
 result <- sumMany(1, 2, 3, 4, 5, 6, 7, 8)
 ";
@@ -144,7 +144,7 @@ function returnsNothing() {
 }
 ";
         var old8Content = @"
-native extern ""returns_nothing.js"" func returnsNothing() -> object
+extern ""returns_nothing.js"" func returnsNothing() -> object
 
 result <- returnsNothing()
 ";
@@ -176,7 +176,7 @@ function getLargeNumber() {
 }
 ";
         var old8Content = @"
-native extern ""large_number.js"" func getLargeNumber() -> int
+extern ""large_number.js"" func getLargeNumber() -> int
 
 result <- getLargeNumber()
 ";
@@ -210,7 +210,7 @@ function expectsNumber(x) {
 }
 ";
         var old8Content = @"
-native extern ""type_test.js"" func expectsNumber(x:int) -> int
+extern ""type_test.js"" func expectsNumber(x:int) -> int
 
 // 传递字符串而不是数字 - JavaScript 会将其转换为 NaN
 str <- ""not a number""
@@ -250,7 +250,7 @@ def divide_by_zero():
     return 1 / 0
 ";
         var old8Content = @"
-native extern ""exception_test.py"" func divide_by_zero() -> double
+extern ""exception_test.py"" func divide_by_zero() -> double
 
 result <- divide_by_zero()
 ";
@@ -274,7 +274,7 @@ def returns_none():
     return None
 ";
         var old8Content = @"
-native extern ""returns_none.py"" func returns_none() -> object
+extern ""returns_none.py"" func returns_none() -> object
 
 result <- returns_none()
 ";
@@ -309,7 +309,7 @@ function throwError() {
 }
 ";
         var old8Content = @"
-native extern ""error_test.js"" func throwError() -> void
+extern ""error_test.js"" func throwError() -> void
 
 throwError()
 ";
@@ -334,7 +334,7 @@ function getNaN() {
 }
 ";
         var old8Content = @"
-native extern ""nan_test.js"" func getNaN() -> double
+extern ""nan_test.js"" func getNaN() -> double
 
 result <- getNaN()
 ";
@@ -366,7 +366,7 @@ function getInfinity() {
 }
 ";
         var old8Content = @"
-native extern ""infinity_test.js"" func getInfinity() -> double
+extern ""infinity_test.js"" func getInfinity() -> double
 
 result <- getInfinity()
 ";
@@ -403,7 +403,7 @@ function incrementCounter() {
 }
 ";
         var old8Content = @"
-native extern ""counter.js"" func incrementCounter() -> int
+extern ""counter.js"" func incrementCounter() -> int
 
 result1 <- incrementCounter()
 result2 <- incrementCounter()
@@ -440,7 +440,7 @@ function test() {
 }
 ";
         var old8Content = @"
-native extern ""disposal_test.js"" func test() -> int
+extern ""disposal_test.js"" func test() -> int
 
 result <- test()
 ";
@@ -477,7 +477,7 @@ function emptyFunction() {
 }
 ";
         var old8Content = @"
-native extern ""empty_func.js"" func emptyFunction() -> object
+extern ""empty_func.js"" func emptyFunction() -> object
 
 result <- emptyFunction()
 ";

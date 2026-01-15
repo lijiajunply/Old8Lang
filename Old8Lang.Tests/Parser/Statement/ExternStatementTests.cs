@@ -19,7 +19,7 @@ public class ExternStatementTests
     public void ParseExternStatement_NativeDll_SingleFunction_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"native extern ""msvcrt.dll"" func abs(x:int) -> int";
+        var code = @"extern ""msvcrt.dll"" func abs(x:int) -> int";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -43,7 +43,7 @@ public class ExternStatementTests
     {
         // Arrange
         var code = @"
-native extern ""kernel32.dll"" {
+extern ""kernel32.dll"" {
     func GetCurrentThreadId() -> int,
     func GetCurrentProcessId() -> int
 }";
@@ -66,7 +66,7 @@ native extern ""kernel32.dll"" {
     public void ParseExternStatement_WithCallingConvention_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"native extern ""user32.dll"" stdcall func MessageBoxA(hwnd:int, text:string, caption:string, type:int) -> int";
+        var code = @"extern ""user32.dll"" stdcall func MessageBoxA(hwnd:int, text:string, caption:string, type:int) -> int";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -86,7 +86,7 @@ native extern ""kernel32.dll"" {
     public void ParseExternStatement_WithAlias_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"native extern ""msvcrt.dll"" func abs(x:int) -> int as absolute";
+        var code = @"extern ""msvcrt.dll"" func abs(x:int) -> int as absolute";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -111,7 +111,7 @@ native extern ""kernel32.dll"" {
     {
         // Arrange
         var code = @"
-native extern ""math_utils.py"" {
+extern ""math_utils.py"" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
 }";
@@ -135,7 +135,7 @@ native extern ""math_utils.py"" {
     public void ParseExternStatement_PythonScript_PyPrefix_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"native extern ""py:utils.py"" func greet(name:string) -> string";
+        var code = @"extern ""py:utils.py"" func greet(name:string) -> string";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -157,7 +157,7 @@ native extern ""math_utils.py"" {
     {
         // Arrange
         var code = @"
-native extern ""pymodule:math"" {
+extern ""pymodule:math"" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
 }";
@@ -186,7 +186,7 @@ native extern ""pymodule:math"" {
     {
         // Arrange
         var code = @"
-native extern ""utils.js"" {
+extern ""utils.js"" {
     func add(a:int, b:int) -> int,
     func greet(name:string) -> string
 }";
@@ -210,7 +210,7 @@ native extern ""utils.js"" {
     public void ParseExternStatement_JavaScript_JsPrefix_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"native extern ""js:app.js"" func init() -> void";
+        var code = @"extern ""js:app.js"" func init() -> void";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -236,9 +236,9 @@ native extern ""utils.js"" {
     {
         // Arrange
         var code = @"
-native extern ""msvcrt.dll"" func abs(x:int) -> int
-native extern ""math.py"" func sqrt(x:double) -> double
-native extern ""utils.js"" func greet(name:string) -> string
+extern ""msvcrt.dll"" func abs(x:int) -> int
+extern ""math.py"" func sqrt(x:double) -> double
+extern ""utils.js"" func greet(name:string) -> string
 ";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
@@ -260,7 +260,7 @@ native extern ""utils.js"" func greet(name:string) -> string
     {
         // Arrange
         var code = @"
-native extern ""test.dll"" stdcall {
+extern ""test.dll"" stdcall {
     func func1(a:int) -> int,
     cdecl func func2(b:int) -> int,
     winapi func func3(c:int) -> int
@@ -303,7 +303,7 @@ native extern ""test.dll"" stdcall {
     public void ParseExternStatement_MissingFunctionSignature_ThrowsException()
     {
         // Arrange
-        var code = @"native extern ""test.dll"" func test";
+        var code = @"extern ""test.dll"" func test";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -318,7 +318,7 @@ native extern ""test.dll"" stdcall {
     public void ParseExternStatement_EmptyBlock_ThrowsException()
     {
         // Arrange
-        var code = @"native extern ""test.dll"" { }";
+        var code = @"extern ""test.dll"" { }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

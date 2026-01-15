@@ -1,7 +1,7 @@
 // 测试 Python 函数导入 - 基本功能测试
 
 // 测试 1: 使用 .py 文件扩展名导入 Python 脚本
-native extern "TestFiles/test_math.py" {
+extern "TestFiles/test_math.py" {
     func add(a:int, b:int) -> int,
     func greet(name:string) -> string
 }
@@ -14,7 +14,7 @@ greeting <- greet("Old8Lang")
 PrintLine(greeting)
 
 // 测试 2: 使用 py: 前缀导入
-native extern "py:TestFiles/test_math.py" {
+extern "py:TestFiles/test_math.py" {
     func subtract(a:int, b:int) -> int as sub,
     func multiply(a:int, b:int) -> int as mul
 }

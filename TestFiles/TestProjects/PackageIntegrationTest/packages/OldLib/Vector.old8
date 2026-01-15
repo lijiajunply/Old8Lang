@@ -1,1 +1,1 @@
-native "Old8LangLib" VectorLib *
+extern "Old8LangLib" VectorLib *

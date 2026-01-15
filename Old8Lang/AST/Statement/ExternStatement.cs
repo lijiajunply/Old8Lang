@@ -12,6 +12,11 @@ namespace Old8Lang.AST.Statement;
 public enum ExternType
 {
     /// <summary>
+    /// C# DLL（托管程序集）
+    /// </summary>
+    CSharpDll,
+
+    /// <summary>
     /// C/C++ 原生 DLL（P/Invoke）
     /// </summary>
     NativeDll,
@@ -88,6 +93,109 @@ public class ExternFunctionDeclaration
         FunctionSignature = functionSignature;
         Alias = alias;
         CallingConvention = callingConvention;
+    }
+}
+
+/// <summary>
+/// C# DLL 导入模式
+/// </summary>
+public enum CSharpImportMode
+{
+    /// <summary>
+    /// 单个方法导入
+    /// </summary>
+    SingleMethod,
+
+    /// <summary>
+    /// 批量导入所有方法 (*)
+    /// </summary>
+    AllMethods,
+
+    /// <summary>
+    /// 选择性导入多个方法 { Method1, Method2 }
+    /// </summary>
+    SelectiveMethods,
+
+    /// <summary>
+    /// 类导入
+    /// </summary>
+    ClassImport
+}
+
+/// <summary>
+/// C# DLL 导入声明
+/// </summary>
+public class CSharpDllImportDeclaration
+{
+    /// <summary>
+    /// 类名称
+    /// </summary>
+    public string ClassName { get; }
+
+    /// <summary>
+    /// 导入模式
+    /// </summary>
+    public CSharpImportMode ImportMode { get; }
+
+    /// <summary>
+    /// 方法名称（单个方法导入时使用）
+    /// </summary>
+    public string? MethodName { get; }
+
+    /// <summary>
+    /// 方法列表（选择性导入时使用）
+    /// </summary>
+    public List<string>? MethodList { get; }
+
+    /// <summary>
+    /// 别名（可选）
+    /// </summary>
+    public string? Alias { get; }
+
+    /// <summary>
+    /// 函数签名（单个方法导入时使用）
+    /// </summary>
+    public FuncInit? FunctionSignature { get; }
+
+    /// <summary>
+    /// 构造函数：单个方法导入
+    /// </summary>
+    public CSharpDllImportDeclaration(string className, string methodName, string? alias = null, FuncInit? functionSignature = null)
+    {
+        ClassName = className;
+        ImportMode = CSharpImportMode.SingleMethod;
+        MethodName = methodName;
+        Alias = alias;
+        FunctionSignature = functionSignature;
+    }
+
+    /// <summary>
+    /// 构造函数：批量导入所有方法
+    /// </summary>
+    public CSharpDllImportDeclaration(string className, bool importAll)
+    {
+        ClassName = className;
+        ImportMode = CSharpImportMode.AllMethods;
+    }
+
+    /// <summary>
+    /// 构造函数：选择性导入多个方法
+    /// </summary>
+    public CSharpDllImportDeclaration(string className, List<string> methodList)
+    {
+        ClassName = className;
+        ImportMode = CSharpImportMode.SelectiveMethods;
+        MethodList = methodList;
+    }
+
+    /// <summary>
+    /// 构造函数：类导入
+    /// </summary>
+    public CSharpDllImportDeclaration(string className, string? alias, bool isClassImport)
+    {
+        ClassName = className;
+        ImportMode = CSharpImportMode.ClassImport;
+        Alias = alias;
     }
 }
 
@@ -226,7 +334,7 @@ public partial class ExternStatement : OldStatement
             var aliasStr = func.Alias is not null ? $" as {func.Alias}" : "";
             var signature = FormatFunctionSignature(func);
             return
-                $"native extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
+                $"extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
         }
 
         var funcs = string.Join("\n    ", Functions.Select(f =>
@@ -239,7 +347,7 @@ public partial class ExternStatement : OldStatement
             return $"{convOverrideStr}func {f.FunctionName}{signature}{aliasStr}";
         }));
 
-        return $"native extern \"{DllName}\"{convStr} {{\n    {funcs}\n}}";
+        return $"extern \"{DllName}\"{convStr} {{\n    {funcs}\n}}";
     }
 
     /// <summary>

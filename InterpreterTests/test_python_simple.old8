@@ -1,6 +1,6 @@
 // 简单的 Python extern 测试
 
-native extern "TestFiles/test_math.py" {
+extern "TestFiles/test_math.py" {
     func add(a:int, b:int) -> int
 }
 

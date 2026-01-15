@@ -1,1 +1,1 @@
-native "Old8LangLib" RegexLib *
+extern "Old8LangLib" RegexLib *

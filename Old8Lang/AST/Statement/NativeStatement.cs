@@ -381,34 +381,34 @@ public partial class NativeStatement : OldStatement
     {
         if (!string.IsNullOrEmpty(Name))
         {
-            return $"import native {DllName}.{ClassName} as {Name}";
+            return $"import extern {DllName}.{ClassName} as {Name}";
         }
 
         if (!string.IsNullOrEmpty(MethodName))
         {
             var funcName = string.IsNullOrEmpty(NativeName) ? MethodName : NativeName;
-            return $"import native {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
+            return $"import extern {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
         }
 
         // 批量导入所有方法
         if (ImportAll)
         {
-            return $"native \"{DllName}\" {ClassName} *";
+            return $"extern \"{DllName}\" {ClassName} *";
         }
 
         // 选择性导入多个方法
         if (MethodList is { Count: > 0 })
         {
             var methods = string.Join(", ", MethodList);
-            return $"native \"{DllName}\" {ClassName} {{ {methods} }}";
+            return $"extern \"{DllName}\" {ClassName} {{ {methods} }}";
         }
 
         // 类导入（可能带别名）
         if (!string.IsNullOrEmpty(ClassAlias))
         {
-            return $"native \"{DllName}\" {ClassName} as {ClassAlias}";
+            return $"extern \"{DllName}\" {ClassName} as {ClassAlias}";
         }
 
-        return $"import native {DllName}.{ClassName}";
+        return $"import extern {DllName}.{ClassName}";
     }
 }

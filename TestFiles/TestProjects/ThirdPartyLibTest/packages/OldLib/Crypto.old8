@@ -1,1 +1,1 @@
-native "Old8LangLib" CryptoLib *
+extern "Old8LangLib" CryptoLib *

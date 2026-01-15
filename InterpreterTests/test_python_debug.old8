@@ -1,7 +1,7 @@
 // 详细调试测试
 
 PrintLine("Step 1: Import Python function")
-native extern "TestFiles/test_math.py" {
+extern "TestFiles/test_math.py" {
     func add(a:int, b:int) -> int
 }
 PrintLine("Step 2: Import successful")

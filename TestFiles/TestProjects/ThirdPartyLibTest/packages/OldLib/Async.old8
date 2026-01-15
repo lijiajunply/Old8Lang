@@ -11,5 +11,5 @@
 // - CyclicBarrier 循环栅栏：CyclicBarrierCreate, CyclicBarrierAwait, CyclicBarrierAwaitTimeout,
 //                          CyclicBarrierGetParticipantCount, CyclicBarrierGetWaitingCount, CyclicBarrierDispose
 // - 工具函数：Sleep, GetCurrentThreadId, GetProcessorCount
-native "Old8LangLib" AsyncLib *
+extern "Old8LangLib" AsyncLib *
 
