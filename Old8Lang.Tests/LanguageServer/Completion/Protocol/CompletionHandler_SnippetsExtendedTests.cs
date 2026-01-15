@@ -65,7 +65,7 @@ public class CompletionHandler_SnippetsExtendedTests(ITestOutputHelper output)
         var matchSnippet = items.FirstOrDefault(i => i.Label == "match" && i.Kind == CompletionItemKind.Snippet);
 
         Assert.NotNull(matchSnippet);
-        Assert.Contains(matchSnippet.InsertText, "match");
+        Assert.Contains("match", matchSnippet.InsertText);
 
         _output.WriteLine($"Match snippet: {matchSnippet.InsertText}");
     }
@@ -144,7 +144,7 @@ public class CompletionHandler_SnippetsExtendedTests(ITestOutputHelper output)
         var trySnippet = items.FirstOrDefault(i => i.Label == "try" && i.Kind == CompletionItemKind.Snippet);
 
         Assert.NotNull(trySnippet);
-        Assert.Contains(trySnippet.InsertText, "try");
+        Assert.Contains("try", trySnippet.InsertText);
 
         _output.WriteLine($"Try-catch snippet: {trySnippet.InsertText}");
     }
@@ -275,7 +275,7 @@ public class CompletionHandler_SnippetsExtendedTests(ITestOutputHelper output)
         var asyncSnippet = items.FirstOrDefault(i => i.Label == "asyncfunc" || i.Label == "async func");
 
         Assert.NotNull(asyncSnippet);
-        Assert.Contains(asyncSnippet.InsertText, "async");
+        Assert.Contains("async", asyncSnippet.InsertText);
 
         _output.WriteLine($"Async function snippet: {asyncSnippet.InsertText}");
     }
@@ -332,7 +332,7 @@ public class CompletionHandler_SnippetsExtendedTests(ITestOutputHelper output)
 
         foreach (var snippet in snippets)
         {
-            Assert.Contains(snippet.InsertText, "$");
+            Assert.Contains("$", snippet.InsertText);
         }
 
         _output.WriteLine($"All {snippets.Count} snippets have placeholders");

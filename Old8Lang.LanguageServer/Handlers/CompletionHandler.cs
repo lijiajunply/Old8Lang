@@ -422,6 +422,24 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             },
             new CompletionItem
             {
+                Label = "interface",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "接口定义",
+                Documentation = "创建一个新接口",
+                InsertText = "interface ${1:InterfaceName} {\n\tfunc ${2:methodName}(${3:params}) -> ${4:void}\n}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
+                Label = "enum",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "枚举定义",
+                Documentation = "创建一个新枚举",
+                InsertText = "enum ${1:EnumName} {\n\t${2:Value1},\n\t${3:Value2}\n}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
                 Label = "if",
                 Kind = CompletionItemKind.Snippet,
                 Detail = "if 语句",
@@ -481,6 +499,42 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
                 Detail = "switch 语句",
                 Documentation = "创建 switch 分支",
                 InsertText = "switch ${1:value} {\n\tcase ${2:value1}:\n\t\t$0\n\t\tbreak\n\tdefault:\n\t\tbreak\n}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
+                Label = "match",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "match 表达式",
+                Documentation = "创建 match 模式匹配表达式",
+                InsertText = "${1:result} <- match ${2:value} {\n\tcase ${3:pattern1} -> ${4:expression1}\n\tcase _ -> ${5:defaultExpression}\n}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
+                Label = "defer",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "defer 语句",
+                Documentation = "创建延迟执行语句",
+                InsertText = "defer ${1:statement}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
+                Label = "using",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "using 语句",
+                Documentation = "创建资源管理语句",
+                InsertText = "using ${1:resource} <- ${2:CreateResource()} {\n\t$0\n}",
+                InsertTextFormat = InsertTextFormat.Snippet
+            },
+            new CompletionItem
+            {
+                Label = "select",
+                Kind = CompletionItemKind.Snippet,
+                Detail = "select 语句",
+                Documentation = "创建 channel 多路选择语句",
+                InsertText = "select {\n\tcase ${1:ch1} <- ${2:value} -> {\n\t\t$0\n\t}\n\tcase ${3:val} from ${4:ch2} -> {\n\t\t\n\t}\n\tdefault -> {\n\t\t\n\t}\n}",
                 InsertTextFormat = InsertTextFormat.Snippet
             }
         };
