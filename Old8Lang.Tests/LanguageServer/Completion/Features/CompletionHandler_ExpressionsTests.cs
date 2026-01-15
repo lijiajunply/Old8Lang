@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Features;
 /// </summary>
 public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task ArithmeticOperators_CompletionAvailable()
     {
@@ -42,7 +40,7 @@ public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
         Assert.Contains(items, i => i.Label == "b");
         Assert.Contains(items, i => i.Label == "result");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -74,7 +72,7 @@ public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
         Assert.NotNull(xVar);
         Assert.Equal(CompletionItemKind.Variable, xVar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -104,22 +102,22 @@ public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
         Assert.Contains(items, i => i.Label == "flag1");
         Assert.Contains(items, i => i.Label == "flag2");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
     public async Task MemberAccess_DotOperator()
     {
         var code = @"class Person {
-    public name <- ""
+    public name:string <- """"
     func greet() -> void {
         PrintLine(""Hello, "" + name)
     }
 }
 
 func main() -> void {
-    person <- new Person()
-    person.$1greet()
+    person:Person <- Person()
+    person.greet()
 }
 ";
         var uri = "file:///test.old8";
@@ -130,7 +128,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 12)
+            Position = new Position(9, 11)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -148,10 +146,10 @@ func main() -> void {
         Assert.NotNull(greetItem);
         Assert.Equal(CompletionItemKind.Method, greetItem.Kind);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
         foreach (var item in items)
         {
-            _output.WriteLine($"  - {item.Label}: {item.Kind}");
+            output.WriteLine($"  - {item.Label}: {item.Kind}");
         }
     }
 
@@ -182,7 +180,7 @@ func main() -> void {
         Assert.NotNull(arrVar);
         Assert.Equal(CompletionItemKind.Variable, arrVar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -210,7 +208,7 @@ func main() -> void {
         var items = result.Items.ToList();
         Assert.Contains(items, i => i.Label == "dict");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -241,7 +239,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "b");
         Assert.Contains(items, i => i.Label == "c");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -270,7 +268,7 @@ func main() -> void {
         var xVar = items.FirstOrDefault(i => i.Label == "x");
         Assert.NotNull(xVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -300,7 +298,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "name");
         Assert.Contains(items, i => i.Label == "age");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -330,7 +328,7 @@ func main() -> void {
         Assert.NotNull(squareVar);
         Assert.Equal(CompletionItemKind.Variable, squareVar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -363,17 +361,17 @@ func main() -> void {
         var valueVar = items.FirstOrDefault(i => i.Label == "value");
         Assert.NotNull(valueVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
     public async Task ChainedMemberAccess_ShouldComplete()
     {
         var code = @"class Outer {
-    public inner <- null
+    public inner:Inner <- null
 
-    func init() {
-        inner <- new Inner()
+    func init() -> void {
+        inner <- Inner()
     }
 }
 
@@ -385,8 +383,8 @@ class Inner {
 }
 
 func main() -> void {
-    outer <- new Outer()
-    result <- outer.$1inner.$2getValue()
+    outer:Outer <- Outer()
+    result <- outer.inner.getValue()
 }
 ";
         var uri = "file:///test.old8";
@@ -397,7 +395,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(24, 20)
+            Position = new Position(17, 26)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -407,10 +405,10 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "value");
         Assert.Contains(items, i => i.Label == "getValue");
 
-        _output.WriteLine($"Found {items.Count} items in chained access");
+        output.WriteLine($"Found {items.Count} items in chained access");
         foreach (var item in items)
         {
-            _output.WriteLine($"  - {item.Label}: {item.Kind}");
+            output.WriteLine($"  - {item.Label}: {item.Kind}");
         }
     }
 
@@ -443,7 +441,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "b");
         Assert.Contains(items, i => i.Label == "c");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -476,7 +474,7 @@ func main() -> void {
         Assert.NotNull(calculateFunc);
         Assert.Equal(CompletionItemKind.Function, calculateFunc.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -505,6 +503,6 @@ func main() -> void {
         var arrVar = items.FirstOrDefault(i => i.Label == "arr");
         Assert.NotNull(arrVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 }
