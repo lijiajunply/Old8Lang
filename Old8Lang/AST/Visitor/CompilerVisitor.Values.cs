@@ -88,4 +88,14 @@ public partial class CompilerVisitor
         ilGenerator.Emit(OpCodes.Ldc_I4, node.Value);
         return null;
     }
+
+    /// <summary>
+    /// 访问 FuncLangValue 节点
+    /// </summary>
+    public object? VisitFuncLangValue(FuncLangValue node)
+    {
+        // 迁移自 FuncLangValue.LoadIlValue()
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
 }

@@ -1,0 +1,21 @@
+func main() {
+    PrintLine("Testing Lambda...")
+    
+    // Define a lambda
+    f <- (x:int) -> {
+        PrintLine("Inside Lambda: " + x.ToStr())
+        return x * 2
+    }
+    
+    // Call the lambda
+    result <- f(21)
+    PrintLine("Result: " + result.ToStr())
+    
+    if result == 42 {
+        PrintLine("Lambda Test Passed!")
+    } else {
+        PrintLine("Lambda Test Failed!")
+    }
+}
+
+main()

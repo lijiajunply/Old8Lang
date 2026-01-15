@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
@@ -525,4 +528,48 @@ public partial class BytecodeVisitor
     public Instruction? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node) => null;
     public Instruction? VisitLockedVariableLangValue(LockedVariableLangValue node) => null;
     public Instruction? VisitInterpreterVisitor(InterpreterVisitor node) => null;
+
+    /// <summary>
+    /// 访问 FuncLangValue 节点
+    /// </summary>
+    public Instruction? VisitFuncLangValue(FuncLangValue node)
+    {
+        // 1. 生成唯一的 Lambda 名称
+        string lambdaName = $"<lambda_{Guid.NewGuid():N}>";
+
+        // 2. 提取参数信息
+        var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+        
+        var defaultValues = new List<object?>();
+        int paramsIndex = -1;
+        
+        if (node.Ids != null)
+        {
+            for (int i = 0; i < node.Ids.Count; i++)
+            {
+                var param = node.Ids[i];
+                if (param.IsParams) paramsIndex = i;
+                
+                if (param.DefaultValue != null)
+                {
+                    defaultValues.Add(EvaluateConstantExpression(param.DefaultValue));
+                }
+                else
+                {
+                    defaultValues.Add(null);
+                }
+            }
+        }
+
+        // 3. 编译 Lambda 函数体
+        _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex);
+
+        // 4. 获取编译后的函数索引
+        int funcIndex = _compiler.GetFunctionIndex(lambdaName);
+
+        // 5. 生成 MakeFunction 指令
+        Emit(OpCode.MakeFunction, funcIndex);
+
+        return null;
+    }
 }

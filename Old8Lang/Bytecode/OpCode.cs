@@ -118,6 +118,12 @@ public enum OpCode : byte
     /// <summary>继续下一次循环 (continue语句)</summary>
     Continue = 0x48,
 
+    /// <summary>创建函数 (操作数: funcIndex)</summary>
+    MakeFunction = 0x49,
+
+    /// <summary>调用栈顶函数 (操作数: argCount)</summary>
+    CallDynamic = 0x4A,
+
     // ===== 对象操作 (0x50-0x5F) =====
     /// <summary>创建新对象 (操作数: classNameIndex)</summary>
     NewObject = 0x50,

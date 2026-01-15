@@ -1126,6 +1126,55 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.CallDynamic:
+            {
+                int argCount = (int)instruction.Operand!;
+                
+                // 从栈中弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+                
+                // 弹出函数对象
+                var funcObj = _stack.Pop();
+                
+                if (funcObj is FunctionMetadata funcMeta)
+                {
+                    // 调用函数
+                    if (funcMeta.IsGenerator)
+                    {
+                         // 复制生成器逻辑
+                        if (funcMeta.IsAsync)
+                        {
+                            var asyncGeneratorId = _nextAsyncGeneratorId++;
+                            var asyncGeneratorState = new AsyncGeneratorState(funcMeta, args);
+                            _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
+                            var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                            _stack.Push(asyncGeneratorValue);
+                        }
+                        else
+                        {
+                            var generatorId = _nextGeneratorId++;
+                            var generatorState = new GeneratorState(funcMeta, args);
+                            _generators[generatorId] = generatorState;
+                            var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                            _stack.Push(generatorValue);
+                        }
+                    }
+                    else
+                    {
+                        CallFunction(funcMeta, args);
+                    }
+                }
+                else
+                {
+                    throw new Exception($"尝试调用非函数对象: {funcObj?.GetType().Name}");
+                }
+            }
+                break;
+
             case OpCode.Return:
             {
                 // 返回值应该已经在栈上
@@ -1145,6 +1194,23 @@ public class VirtualMachine
                 // Continue指令在字节码生成阶段已经被转换为Jump指令
                 // 这里不应该被执行到
                 throw new Exception("Continue指令不应该在运行时被执行");
+
+            case OpCode.MakeFunction:
+            {
+                int funcIndex = (int)instruction.Operand!;
+                // Get function metadata from bytecode file
+                if (funcIndex >= 0 && funcIndex < _bytecodeFile.Functions.Count)
+                {
+                    var funcMeta = _bytecodeFile.Functions[funcIndex];
+                    // TODO: Wrap in Closure if needed for capturing variables
+                    _stack.Push(funcMeta);
+                }
+                else
+                {
+                    throw new Exception($"无效的函数索引: {funcIndex}");
+                }
+            }
+                break;
 
             // === 容器操作 ===
             case OpCode.NewArray:

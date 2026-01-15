@@ -294,8 +294,29 @@ public partial class BytecodeVisitor
         {
             // 普通函数调用
 
-            // 特殊处理 Spawn 函数：第一个参数如果是函数名，需要转换为函数索引
-            if ((funcName == "Spawn" || funcName == "spawn") && positionalCount > 0)
+            // 1. 检查是否是局部变量 holding a function (Lambda调用)
+            if (_compiler.IsLocalVariable(funcName))
+            {
+                // 加载函数对象到栈底
+                int localIndex = _compiler.GetLocalIndex(funcName);
+                Emit(OpCode.LoadLocal, localIndex);
+
+                // 生成参数代码
+                foreach (var arg in node.Arguments)
+                {
+                    arg.Accept(this);
+                }
+
+                if (namedCount > 0)
+                {
+                    throw new Exception("字节码模式下的动态函数调用暂不支持命名参数");
+                }
+
+                // 调用 CallDynamic
+                Emit(OpCode.CallDynamic, positionalCount);
+            }
+            // 2. 特殊处理 Spawn 函数
+            else if ((funcName == "Spawn" || funcName == "spawn") && positionalCount > 0)
             {
                 // 处理第一个参数（函数引用）
                 var firstArg = node.Arguments[0];
@@ -320,40 +341,44 @@ public partial class BytecodeVisitor
                 {
                     node.Arguments[i].Accept(this);
                 }
+                
+                // Spawn 是原生函数
+                Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
             }
             else
             {
+                // 3. 普通静态/原生函数调用
                 // 生成位置参数代码
                 foreach (var arg in node.Arguments)
                 {
                     arg.Accept(this);
                 }
-            }
 
-            // 生成命名参数的值
-            if (namedCount > 0)
-            {
-                foreach (var namedArg in node.NamedArguments)
+                // 生成命名参数的值
+                if (namedCount > 0)
                 {
-                    namedArg.Value.Accept(this);
+                    foreach (var namedArg in node.NamedArguments)
+                    {
+                        namedArg.Value.Accept(this);
+                    }
                 }
-            }
 
-            // 检查是否是原生函数
-            bool isNative = _compiler.IsNativeFunction(funcName);
+                // 检查是否是原生函数
+                bool isNative = _compiler.IsNativeFunction(funcName);
 
-            if (namedCount > 0)
-            {
-                // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
-                Emit(isNative ? OpCode.CallNative : OpCode.Call,
-                    new object[] { positionalCount, namedCount, funcName, namedArgNames });
-            }
-            else
-            {
-                // 无命名参数: [argCount, funcName]
-                Emit(isNative ? OpCode.CallNative : OpCode.Call,
-                    new object[] { positionalCount, funcName });
+                if (namedCount > 0)
+                {
+                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                    var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
+                    Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                        new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                }
+                else
+                {
+                    // 无命名参数: [argCount, funcName]
+                    Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                        new object[] { positionalCount, funcName });
+                }
             }
         }
 

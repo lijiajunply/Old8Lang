@@ -1302,6 +1302,6 @@ public class FuncLangValue : ImportInfo
 
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
     {
-        throw new NotSupportedException("FuncLangValue 暂不支持 Visitor 模式访问");
+        return visitor.VisitFuncLangValue(this);
     }
 }

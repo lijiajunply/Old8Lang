@@ -356,6 +356,15 @@ public partial class InterpreterVisitor
     // ==================== 异步和生成器相关节点 ====================
 
     /// <summary>
+    /// 访问 FuncLangValue 节点
+    /// </summary>
+    public LangValueType VisitFuncLangValue(FuncLangValue node)
+    {
+        // 迁移自 FuncLangValue.Run()
+        return node.Run(manager);
+    }
+
+    /// <summary>
     /// 访问 GeneratorLangValue 节点
     /// </summary>
     public LangValueType VisitGeneratorLangValue(GeneratorLangValue node)

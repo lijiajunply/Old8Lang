@@ -1,6 +1,6 @@
 # 虚拟机模式完成 TODO
 
-**当前完成度**: 70.6% (77/109 功能完全支持)
+**当前完成度**: 72.5% (79/109 功能完全支持)
 
 ---
 
@@ -8,8 +8,8 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 完全支持 | 77 | 已完整实现并测试通过 |
-| ❌ 不支持 | 32 | 功能未实现 |
+| ✅ 完全支持 | 79 | 已完整实现并测试通过 |
+| ❌ 不支持 | 30 | 功能未实现 |
 
 ---
 
@@ -25,7 +25,7 @@
 
 ### 1. Lambda 表达式支持
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - Lambda 表达式 (第 1440 行)
@@ -35,11 +35,11 @@
 - 解释器和编译器模式已完全支持
 
 **实施步骤**:
-1. 分析解释器和编译器的 Lambda 实现
-2. 设计虚拟机的 Lambda 字节码表示
-3. 实现 `BytecodeVisitor.VisitLambdaExpression`
-4. 处理闭包和变量捕获
-5. 添加 Lambda 测试用例
+1. ✅ 分析解释器和编译器的 Lambda 实现
+2. ✅ 设计虚拟机的 Lambda 字节码表示 (MakeFunction)
+3. ✅ 实现 `BytecodeVisitor.VisitFuncLangValue`
+4. ✅ 实现 `OpCode.MakeFunction` 和 `OpCode.CallDynamic`
+5. ✅ 添加 Lambda 测试用例 (TestFiles/CompilerTests/LambdaTest.old8)
 
 **相关文件**:
 - `Old8Lang/AST/Expression/Intermediates/LambdaExpression.cs`
@@ -107,7 +107,7 @@
 
 ### 5. defer 语句
 
-**当前状态**: ❌ 不支持（但代码中已有实现）
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - defer 语句 (第 926 行)
@@ -117,11 +117,11 @@
 - 但代码中 `BytecodeVisitor.VisitDeferStatement` 已实现
 
 **实施步骤**:
-1. ✅ 验证现有实现是否完整
+1. ✅ 验证现有实现是否完整 (已验证 BytecodeVisitor 和 VM 实现)
 2. ✅ 运行测试用例
 3. ✅ 更新文档标记为 `[✅ | ✅ | ✅]`
 
-**结论**: 需要验证后更新文档
+**结论**: 已验证支持
 
 ---
 

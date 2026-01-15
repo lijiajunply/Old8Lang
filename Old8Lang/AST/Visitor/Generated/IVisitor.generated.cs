@@ -277,6 +277,11 @@ public interface IVisitor<out TResult>
     TResult VisitErrorLangValue(ErrorLangValue node);
 
     /// <summary>
+    /// 访问 FuncLangValue 节点
+    /// </summary>
+    TResult VisitFuncLangValue(FuncLangValue node);
+
+    /// <summary>
     /// 访问 GeneratorLangValue 节点
     /// </summary>
     TResult VisitGeneratorLangValue(GeneratorLangValue node);
