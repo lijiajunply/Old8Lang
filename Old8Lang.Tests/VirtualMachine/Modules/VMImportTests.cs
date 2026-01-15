@@ -14,25 +14,47 @@ public class VMImportTests
 {
     private string ExecuteVMCode(string code, string? baseDirectory = null)
     {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-
-        var compiler = new BytecodeCompiler();
-        var bytecodeFile = compiler.Compile(ast);
-
-        var originalOut = Console.Out;
-        using var stringWriter = new StringWriter();
-        Console.SetOut(stringWriter);
-
         try
         {
-            var vm = new VM(bytecodeFile, baseDirectory);
-            vm.Execute();
-            return stringWriter.ToString().Trim();
+            var interpreter = new LangInterpreter();
+            var ast = interpreter.Build(code);
+
+            var compiler = new BytecodeCompiler();
+            var bytecodeFile = compiler.Compile(ast);
+
+            var originalOut = Console.Out;
+            var originalErr = Console.Error;
+            using var stringWriter = new StringWriter();
+            using var errorWriter = new StringWriter();
+            Console.SetOut(stringWriter);
+            Console.SetError(errorWriter);
+
+            try
+            {
+                var vm = new VM(bytecodeFile, baseDirectory);
+                vm.Execute();
+                var errorOutput = errorWriter.ToString();
+                var stdOutput = stringWriter.ToString().Trim();
+
+                // 恢复控制台输出以便调试
+                Console.SetOut(originalOut);
+                Console.SetError(originalErr);
+
+                if (!string.IsNullOrEmpty(errorOutput))
+                {
+                    throw new System.Exception($"VM执行错误: {errorOutput}");
+                }
+                return stdOutput;
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+                Console.SetError(originalErr);
+            }
         }
-        finally
+        catch (System.Exception ex)
         {
-            Console.SetOut(originalOut);
+            throw new System.Exception($"执行失败: {ex.Message}", ex);
         }
     }
 
@@ -50,10 +72,6 @@ public class VMImportTests
 func add(a:int, b:int) -> int {
     return a + b
 }
-
-func main() -> void {
-    // 模块初始化
-}
 ";
             File.WriteAllText(Path.Combine(tempDir, "test_module.old8"), moduleCode);
 
@@ -65,6 +83,8 @@ func main() -> void {
     result <- add(10, 20)
     PrintLine(result.ToStr())
 }
+
+main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);
@@ -93,10 +113,6 @@ func main() -> void {
 func multiply(a:int, b:int) -> int {
     return a * b
 }
-
-func main() -> void {
-    // 模块初始化
-}
 ";
             File.WriteAllText(Path.Combine(tempDir, "math_module.old8"), moduleCode);
 
@@ -108,6 +124,8 @@ func main() -> void {
     result <- mul(5, 6)
     PrintLine(result.ToStr())
 }
+
+main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);
@@ -139,10 +157,6 @@ func add(a:int, b:int) -> int {
 func subtract(a:int, b:int) -> int {
     return a - b
 }
-
-func main() -> void {
-    // 模块初始化
-}
 ";
             File.WriteAllText(Path.Combine(tempDir, "calc_module.old8"), moduleCode);
 
@@ -156,6 +170,8 @@ func main() -> void {
     PrintLine(result1.ToStr())
     PrintLine(result2.ToStr())
 }
+
+main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);
@@ -187,7 +203,7 @@ class Point {
     public x:int
     public y:int
 
-    func constructor(x:int, y:int) -> void {
+    func init(x:int, y:int) {
         this.x <- x
         this.y <- y
     }
@@ -195,10 +211,6 @@ class Point {
     func distance() -> int {
         return this.x * this.x + this.y * this.y
     }
-}
-
-func main() -> void {
-    // 模块初始化
 }
 ";
             File.WriteAllText(Path.Combine(tempDir, "geometry_module.old8"), moduleCode);
@@ -208,10 +220,12 @@ func main() -> void {
 import { Point } from ""geometry_module""
 
 func main() -> void {
-    p <- new Point(3, 4)
+    p <- Point(3, 4)
     dist <- p.distance()
     PrintLine(dist.ToStr())
 }
+
+main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);
@@ -239,10 +253,6 @@ func main() -> void {
 func double(x:int) -> int {
     return x * 2
 }
-
-func main() -> void {
-    // 模块初始化
-}
 ";
             File.WriteAllText(Path.Combine(tempDir, "base_module.old8"), baseModuleCode);
 
@@ -252,10 +262,6 @@ import { double } from ""base_module""
 
 func quadruple(x:int) -> int {
     return double(double(x))
-}
-
-func main() -> void {
-    // 模块初始化
 }
 ";
             File.WriteAllText(Path.Combine(tempDir, "middle_module.old8"), middleModuleCode);
@@ -268,6 +274,8 @@ func main() -> void {
     result <- quadruple(5)
     PrintLine(result.ToStr())
 }
+
+main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);

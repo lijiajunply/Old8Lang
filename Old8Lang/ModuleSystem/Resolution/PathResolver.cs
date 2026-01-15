@@ -64,7 +64,7 @@ public class PathResolver
     /// 解析相对路径
     /// </summary>
     /// <param name="relativePath">相对路径</param>
-    /// <param name="currentFilePath">当前文件路径</param>
+    /// <param name="currentFilePath">当前文件路径或基础目录路径</param>
     /// <returns>绝对路径</returns>
     private string ResolveRelativePath(string relativePath, string? currentFilePath)
     {
@@ -72,26 +72,29 @@ public class PathResolver
 
         if (!string.IsNullOrEmpty(currentFilePath))
         {
-            // 使用当前文件所在目录作为基础目录
-            var directory = Path.GetDirectoryName(currentFilePath);
-            if (!string.IsNullOrEmpty(directory))
+            if (Directory.Exists(currentFilePath))
             {
-                baseDirectory = Path.GetFullPath(directory);
+                baseDirectory = Path.GetFullPath(currentFilePath);
             }
             else
             {
-                // 如果 GetDirectoryName 返回空，可能是相对路径，需要先获取完整路径
-                var fullPath = Path.GetFullPath(currentFilePath);
-                baseDirectory = Path.GetDirectoryName(fullPath) ?? Directory.GetCurrentDirectory();
+                var directory = Path.GetDirectoryName(currentFilePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    baseDirectory = Path.GetFullPath(directory);
+                }
+                else
+                {
+                    var fullPath = Path.GetFullPath(currentFilePath);
+                    baseDirectory = Path.GetDirectoryName(fullPath) ?? Directory.GetCurrentDirectory();
+                }
             }
         }
         else
         {
-            // 使用当前工作目录
             baseDirectory = Directory.GetCurrentDirectory();
         }
 
-        // 组合路径
         var combinedPath = Path.Combine(baseDirectory, relativePath);
         return Path.GetFullPath(combinedPath);
     }

@@ -765,10 +765,80 @@ public class VirtualMachine
                         break;
                     }
 
-                    // 查找普通函数
-                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    // 首先检查全局变量中是否有该函数（可能是从模块导入的）
+                    FunctionMetadata? function = null;
+                    if (_globals.TryGetValue(funcName, out var funcObj) && funcObj is FunctionMetadata funcMeta)
+                    {
+                        function = funcMeta;
+                    }
+
+                    // 如果全局变量中没有，从当前字节码文件中查找
                     if (function == null)
                     {
+                        function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    }
+
+                    // 如果还没找到，从所有已加载模块的导出符号中查找
+                    if (function == null)
+                    {
+                        foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                        {
+                            try
+                            {
+                                var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, funcName);
+                                if (symbol is FunctionMetadata moduleFuncMeta)
+                                {
+                                    function = moduleFuncMeta;
+                                    break;
+                                }
+                            }
+                            catch
+                            {
+                                // 模块中没有该符号，继续查找
+                            }
+                        }
+                    }
+
+                    // 如果还没找到函数，检查是否是导入的类（类实例化）
+                    if (function == null)
+                    {
+                        // 检查全局变量中是否有该类
+                        ClassMetadata? classMetadata = null;
+                        if (_globals.TryGetValue(funcName, out var globalClass) && globalClass is ClassMetadata importedClass)
+                        {
+                            classMetadata = importedClass;
+                        }
+
+                        // 从已加载模块中查找类
+                        if (classMetadata == null)
+                        {
+                            foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                            {
+                                try
+                                {
+                                    var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, funcName);
+                                    if (symbol is ClassMetadata moduleClass)
+                                    {
+                                        classMetadata = moduleClass;
+                                        break;
+                                    }
+                                }
+                                catch
+                                {
+                                    // 模块中没有该符号，继续查找
+                                }
+                            }
+                        }
+
+                        // 如果找到类，执行类实例化
+                        if (classMetadata != null)
+                        {
+                            // 创建对象实例
+                            var obj = CreateObjectInstance(classMetadata, args);
+                            _stack.Push(obj);
+                            break;
+                        }
+
                         throw new Exception($"未定义的函数: {funcName}");
                     }
 
@@ -855,7 +925,41 @@ public class VirtualMachine
                     }
 
                     // 查找函数
-                    var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    FunctionMetadata? function = null;
+
+                    // 首先检查全局变量中是否有该函数（可能是从模块导入的）
+                    if (_globals.TryGetValue(funcName, out var funcObj) && funcObj is FunctionMetadata funcMeta)
+                    {
+                        function = funcMeta;
+                    }
+
+                    // 如果全局变量中没有，从当前字节码文件中查找
+                    if (function == null)
+                    {
+                        function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                    }
+
+                    // 如果还没找到，从所有已加载模块的导出符号中查找
+                    if (function == null)
+                    {
+                        foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                        {
+                            try
+                            {
+                                var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, funcName);
+                                if (symbol is FunctionMetadata moduleFuncMeta)
+                                {
+                                    function = moduleFuncMeta;
+                                    break;
+                                }
+                            }
+                            catch
+                            {
+                                // 模块中没有该符号，继续查找
+                            }
+                        }
+                    }
+
                     if (function == null)
                     {
                         throw new Exception($"未定义的函数: {funcName}");
@@ -2110,6 +2214,37 @@ public class VirtualMachine
 
                 // 从字节码文件中查找类定义
                 var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
+
+                // 如果在当前字节码文件中没找到，从全局变量中查找（可能是导入的类）
+                if (classMetadata == null)
+                {
+                    if (_globals.TryGetValue(className, out var globalClass) && globalClass is ClassMetadata importedClass)
+                    {
+                        classMetadata = importedClass;
+                    }
+                }
+
+                // 如果还没找到，从所有已加载模块的导出符号中查找
+                if (classMetadata == null)
+                {
+                    foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                    {
+                        try
+                        {
+                            var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, className);
+                            if (symbol is ClassMetadata moduleClass)
+                            {
+                                classMetadata = moduleClass;
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // 模块中没有该符号，继续查找
+                        }
+                    }
+                }
+
                 if (classMetadata == null)
                 {
                     throw new Exception($"未找到类定义: {className}");
@@ -2202,6 +2337,36 @@ public class VirtualMachine
                 {
                     // Old8Lang 对象，查找类方法
                     var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
+
+                    // 如果在当前字节码文件中没找到，从全局变量和已加载模块中查找
+                    if (classMetadata == null)
+                    {
+                        if (_globals.TryGetValue(bytecodeObj.ClassName, out var globalClass) && globalClass is ClassMetadata importedClass)
+                        {
+                            classMetadata = importedClass;
+                        }
+                    }
+
+                    if (classMetadata == null)
+                    {
+                        foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                        {
+                            try
+                            {
+                                var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, bytecodeObj.ClassName);
+                                if (symbol is ClassMetadata moduleClass)
+                                {
+                                    classMetadata = moduleClass;
+                                    break;
+                                }
+                            }
+                            catch
+                            {
+                                // 继续查找
+                            }
+                        }
+                    }
+
                     if (classMetadata == null)
                     {
                         throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
@@ -3445,6 +3610,30 @@ public class VirtualMachine
 
                 // 获取模块的全局变量
                 moduleGlobals = moduleVM._globals;
+
+                // 传递性导入：将模块VM加载的所有依赖模块也注册到当前VM的模块注册表中
+                foreach (var depModuleName in moduleVM._moduleRegistry.GetLoadedModuleNames())
+                {
+                    // 跳过当前正在加载的模块自己
+                    if (depModuleName == moduleName)
+                    {
+                        continue;
+                    }
+
+                    // 如果当前VM还没有加载这个依赖模块，则注册它
+                    if (!_moduleRegistry.IsModuleLoaded(depModuleName))
+                    {
+                        var depModule = moduleVM._moduleRegistry.GetModule(depModuleName);
+                        if (depModule != null)
+                        {
+                            _moduleRegistry.RegisterModule(
+                                depModuleName,
+                                depModule.BytecodeFile,
+                                depModule.Globals
+                            );
+                        }
+                    }
+                }
             }
 
             // 注册模块
@@ -3454,6 +3643,77 @@ public class VirtualMachine
         {
             throw new Exception($"加载模块 '{moduleName}' 失败: {ex.Message}", ex);
         }
+    }
+
+    /// <summary>
+    /// 创建对象实例（用于从模块导入的类的实例化）
+    /// </summary>
+    private BytecodeObjectInstance CreateObjectInstance(ClassMetadata classMetadata, object?[] constructorArgs)
+    {
+        // 创建对象实例
+        var obj = new BytecodeObjectInstance(classMetadata.Name);
+
+        // 初始化所有字段为默认值（包括父类字段）
+        var allFields = new List<FieldMetadata>();
+        var currentClass = classMetadata;
+        while (currentClass != null)
+        {
+            allFields.AddRange(currentClass.Fields);
+
+            // 查找父类（首先从当前字节码文件，然后从模块）
+            if (!string.IsNullOrEmpty(currentClass.BaseClassName))
+            {
+                currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                if (currentClass == null)
+                {
+                    // 从模块中查找父类
+                    foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                    {
+                        try
+                        {
+                            var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, currentClass?.BaseClassName ?? "");
+                            if (symbol is ClassMetadata baseClass)
+                            {
+                                currentClass = baseClass;
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // 继续查找
+                        }
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // 初始化所有字段
+        foreach (var field in allFields)
+        {
+            if (!obj.Fields.ContainsKey(field.Name))
+            {
+                obj.Fields[field.Name] = null;
+            }
+        }
+
+        // 查找并调用构造函数（init方法）
+        var initMethod = classMetadata.Methods.FirstOrDefault(m => m.Name == "init");
+        if (initMethod != null)
+        {
+            // 准备方法调用参数：第一个参数是 this（对象本身）
+            var methodArgs = new object?[constructorArgs.Length + 1];
+            methodArgs[0] = obj;
+            Array.Copy(constructorArgs, 0, methodArgs, 1, constructorArgs.Length);
+
+            // 调用构造函数
+            CallFunction(initMethod.Function, methodArgs);
+        }
+
+        return obj;
     }
 }
 
