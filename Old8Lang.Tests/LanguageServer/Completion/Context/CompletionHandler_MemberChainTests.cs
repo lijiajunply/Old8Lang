@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Context;
 /// </summary>
 public class CompletionHandler_MemberChainTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task ThreeLevelMemberAccess_ShouldComplete()
     {
@@ -58,10 +56,10 @@ func main() -> void {
         var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
         Assert.NotNull(getValueMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
         foreach (var item in items)
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -112,10 +110,10 @@ func main() -> void {
         var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
         Assert.NotNull(getValueMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
         foreach (var item in items)
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -163,7 +161,7 @@ func main() -> void {
         var valueField = items.FirstOrDefault(i => i.Label == "value");
         Assert.NotNull(valueField);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
     }
 
     [Fact]
@@ -205,7 +203,7 @@ func main() -> void {
         var multiplyMethod = items.FirstOrDefault(i => i.Label == "multiply");
         Assert.NotNull(multiplyMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
     }
 
     [Fact]
@@ -245,7 +243,7 @@ func main() -> void {
         var nameField = items.FirstOrDefault(i => i.Label == "name");
         Assert.NotNull(nameField);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -288,7 +286,7 @@ func main() -> void {
         var processMethod = items.FirstOrDefault(i => i.Label == "process");
         Assert.NotNull(processMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
     }
 
     [Fact]
@@ -345,7 +343,7 @@ func main() -> void {
         var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
         Assert.NotNull(getValueMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
     }
 
     [Fact]
@@ -384,7 +382,7 @@ func main() -> void {
         var multiplyMethod = items.FirstOrDefault(i => i.Label == "multiply");
         Assert.NotNull(multiplyMethod);
 
-        _output.WriteLine($"Found {items.Count} member items");
+        output.WriteLine($"Found {items.Count} member items");
     }
 
     [Fact]
@@ -428,7 +426,7 @@ func main() -> void {
         var processMethod = items.FirstOrDefault(i => i.Label == "process");
         Assert.NotNull(processMethod);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -472,6 +470,6 @@ func main() -> void {
         var getSumMethod = items.FirstOrDefault(i => i.Label == "getSum");
         Assert.NotNull(getSumMethod);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 }

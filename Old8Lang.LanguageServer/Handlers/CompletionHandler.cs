@@ -67,6 +67,9 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
         // 添加关键字补全
         completionItems.AddRange(GetKeywordCompletions());
 
+        // 添加操作符补全
+        completionItems.AddRange(GetOperatorCompletions());
+
         // 添加代码片段补全
         completionItems.AddRange(GetSnippetCompletions());
 
@@ -227,6 +230,52 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     }
 
     /// <summary>
+    /// 获取操作符补全
+    /// </summary>
+    private static IEnumerable<CompletionItem> GetOperatorCompletions()
+    {
+        return new[]
+        {
+            // 联合类型操作符
+            new CompletionItem
+            {
+                Label = "|",
+                Kind = CompletionItemKind.Operator,
+                Detail = "联合类型操作符",
+                Documentation = "用于联合类型（union types）：int | string",
+                InsertText = "|"
+            },
+            // 交叉类型操作符
+            new CompletionItem
+            {
+                Label = "&",
+                Kind = CompletionItemKind.Operator,
+                Detail = "交叉类型操作符",
+                Documentation = "用于交叉类型（intersection types）：IComparable & ICloneable",
+                InsertText = "&"
+            },
+            // 赋值操作符
+            new CompletionItem
+            {
+                Label = "<-",
+                Kind = CompletionItemKind.Operator,
+                Detail = "赋值操作符",
+                Documentation = "Old8Lang 赋值操作符：a <- 123",
+                InsertText = "<-"
+            },
+            // 箭头操作符（lambda）
+            new CompletionItem
+            {
+                Label = "->",
+                Kind = CompletionItemKind.Operator,
+                Detail = "箭头操作符",
+                Documentation = "用于函数返回类型或 lambda 表达式：func() -> int 或 (x) -> x * 2",
+                InsertText = "->"
+            }
+        };
+    }
+
+    /// <summary>
     /// 将符号列表转换为补全项（替换原来的 GetSymbolCompletions）
     /// </summary>
     private static IEnumerable<CompletionItem> ConvertSymbolsToCompletionItems(List<Models.SymbolInfo> symbols)
@@ -377,6 +426,9 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
             // 低优先级：代码片段
             CompletionItemKind.Snippet => 40,
+
+            // 较低优先级：操作符
+            CompletionItemKind.Operator => 45,
 
             // 最低优先级：关键字
             CompletionItemKind.Keyword => 50,
