@@ -97,7 +97,8 @@ public class MemberChainAnalyzer
 
             // 如果 token 在光标位置之后，跳过
             // 注意：点号占一个字符，光标可能在点号后面（column = token.Column + 1）
-            if (token.Line > line || (token.Line == line && token.Column >= column))
+            // 但是如果光标正好在点号位置，我们也应该考虑这个点号
+            if (token.Line > line || (token.Line == line && token.Column > column))
             {
                 Console.WriteLine($"[FindDotAtPosition] Skipping token at/after cursor: {token.Value} at Line={token.Line}, Column={token.Column}");
                 continue;

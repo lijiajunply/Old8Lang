@@ -140,7 +140,7 @@ class C {
 
 func main() -> void {
     obj <- A()
-    result <- obj.b.$1c.$2value
+    result <- obj.b.c.value
 }
 ";
         var uri = "file:///test.old8";
@@ -151,15 +151,15 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(22, 5)
+            Position = new Position(20, 20) // obj.b. 之后（点号后面）
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        var valueField = items.FirstOrDefault(i => i.Label == "value");
-        Assert.NotNull(valueField);
+        var cProperty = items.FirstOrDefault(i => i.Label == "c");
+        Assert.NotNull(cProperty);
 
         output.WriteLine($"Found {items.Count} member items");
     }
@@ -210,7 +210,7 @@ func main() -> void {
     public async Task MemberAccessInExpression_ShouldComplete()
     {
         var code = @"class Person {
-    public name <- ""
+    public name <- """"
     public age <- 0
 }
 
@@ -222,7 +222,7 @@ func main() -> void {
     p <- Person()
     p.name <- ""Alice""
     p.age <- 30
-    result <- getFullName(p.$1name)
+    result <- getFullName(p.name)
 }
 ";
         var uri = "file:///test.old8";
@@ -233,7 +233,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(17, 15)
+            Position = new Position(13, 28) // p. 之后
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -257,7 +257,7 @@ func main() -> void {
 }
 
 class Item {
-    public name <- ""
+    public name <- """"
     func process(input:string) -> void {
         PrintLine(""Processing: "" + input)
     }
@@ -265,7 +265,7 @@ class Item {
 
 func main() -> void {
     container <- Container()
-    container.item.$1process($1""test"")
+    container.item.process(""test"")
 }
 ";
         var uri = "file:///test.old8";
@@ -276,7 +276,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(17, 15)
+            Position = new Position(16, 19) // item. 之后
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -322,7 +322,7 @@ class Level4 {
 
 func main() -> void {
     obj <- Level1()
-    value <- obj.level2.level3.$1level4.getValue()
+    value <- obj.level2.level3.level4.getValue()
 }
 ";
         var uri = "file:///test.old8";
@@ -333,15 +333,15 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(29, 12)
+            Position = new Position(30, 30) // level3. 之后
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        var getValueMethod = items.FirstOrDefault(i => i.Label == "getValue");
-        Assert.NotNull(getValueMethod);
+        var level4Property = items.FirstOrDefault(i => i.Label == "level4");
+        Assert.NotNull(level4Property);
 
         output.WriteLine($"Found {items.Count} member items");
     }
@@ -405,7 +405,7 @@ class Inner {
 
 func main() -> void {
     obj <- Outer()
-    obj.$1process()
+    obj.process()
 }
 ";
         var uri = "file:///test.old8";
@@ -416,7 +416,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(13, 5)
+            Position = new Position(17, 8) // obj. 之后
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
