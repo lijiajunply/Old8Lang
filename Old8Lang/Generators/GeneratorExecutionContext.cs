@@ -48,7 +48,7 @@ public class GeneratorExecutionContext
     /// <summary>
     /// 是否已完成（遇到return或执行完所有语句）
     /// </summary>
-    public bool IsCompleted { get; set; } = false;
+    public bool IsCompleted { get; set; }
 
     /// <summary>
     /// 当前执行的路径栈

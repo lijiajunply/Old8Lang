@@ -27,8 +27,18 @@ public class AsyncStateMachineGenerator
     private const int StateNotStarted = -1;
     private const int StateCompleted = -2;
 
-    // await表达式位置列表，用于生成状态转换
-    private readonly List<int> AwaitPositions = [];
+    // await表达式信息列表，用于生成状态转换
+    private readonly List<AwaitInfo> AwaitInfos = [];
+
+    /// <summary>
+    /// await 表达式信息
+    /// </summary>
+    private class AwaitInfo
+    {
+        public int StateIndex { get; set; }
+        public AwaitExpression AwaitExpression { get; set; } = null!;
+        public OldStatement ContainingStatement { get; set; } = null!;
+    }
 
     /// <summary>
     /// 构造函数
@@ -47,49 +57,88 @@ public class AsyncStateMachineGenerator
     }
 
     /// <summary>
-    /// 识别异步函数体中的await表达式位置
+    /// 识别异步函数体中的await表达式位置（简化实现）
+    /// 注意：这是一个简化版本，只处理最常见的情况
+    /// 完整实现需要遍历所有语句类型和表达式类型
     /// </summary>
     /// <param name="statement">当前语句</param>
-    /// <param name="position">当前位置</param>
-    private void IdentifyAwaitExpressions(OldStatement statement, int position = 0)
+    private void IdentifyAwaitExpressions(OldStatement statement)
     {
+        // 递归处理块语句
         if (statement is BlockStatement block)
         {
             for (int i = 0; i < block.Count; i++)
             {
-                var child = block[i];
-                IdentifyAwaitExpressions(child, position + i);
+                IdentifyAwaitExpressions(block[i]);
             }
+            return;
         }
-        // 简化实现，只处理BlockStatement
+
+        // 处理赋值语句（最常见的包含 await 的情况）
+        if (statement is SetStatement setStmt && setStmt.Value is not null)
+        {
+            IdentifyAwaitInExpression(setStmt.Value, setStmt);
+            return;
+        }
+
+        // 处理返回语句
+        if (statement is ReturnStatement returnStmt)
+        {
+            // ReturnStatement 使用主构造函数参数 returnExpression
+            // 我们需要通过反射或其他方式访问它
+            // 简化处理：暂时跳过返回语句中的 await 识别
+            // TODO: 添加对返回语句中 await 的支持
+            return;
+        }
+
+        // TODO: 添加对其他语句类型的支持（if、for、while 等）
+        // 当前简化实现只处理最常见的情况
     }
 
     /// <summary>
-    /// 识别表达式中的await表达式
+    /// 识别表达式中的await表达式（简化实现）
     /// </summary>
     /// <param name="expression">当前表达式</param>
-    /// <param name="position">当前位置</param>
-    private void IdentifyAwaitInExpression(LangExpression expression, int position)
+    /// <param name="containingStatement">包含该表达式的语句</param>
+    private void IdentifyAwaitInExpression(LangExpression expression, OldStatement containingStatement)
     {
-        if (expression is AwaitExpression)
+        // 直接检查是否为 await 表达式
+        if (expression is AwaitExpression awaitExpr)
         {
-            // 发现await表达式，记录位置
-            AwaitPositions.Add(position);
-        }
-        else if (expression is Operation op)
-        {
-            // 递归检查操作符表达式的左右操作数
-            if (op.Left is not null)
+            // 发现await表达式，记录信息
+            AwaitInfos.Add(new AwaitInfo
             {
-                IdentifyAwaitInExpression(op.Left, position);
-            }
+                StateIndex = AwaitInfos.Count,
+                AwaitExpression = awaitExpr,
+                ContainingStatement = containingStatement
+            });
+            // 继续递归检查 await 的内部表达式
+            IdentifyAwaitInExpression(awaitExpr.Expression, containingStatement);
+            return;
+        }
 
+        // 递归检查操作符表达式
+        if (expression is Operation op)
+        {
+            if (op.Left is not null)
+                IdentifyAwaitInExpression(op.Left, containingStatement);
             if (op.Right is not null)
-            {
-                IdentifyAwaitInExpression(op.Right, position);
-            }
+                IdentifyAwaitInExpression(op.Right, containingStatement);
+            return;
         }
-        // 简化实现，移除对Instance类型的依赖
+
+        // 递归检查函数调用的参数
+        if (expression is FunctionCallExpression funcCall && funcCall.Arguments is not null)
+        {
+            foreach (var param in funcCall.Arguments)
+            {
+                IdentifyAwaitInExpression(param, containingStatement);
+            }
+            return;
+        }
+
+        // TODO: 添加对其他表达式类型的支持
+        // 当前简化实现只处理最常见的情况
     }
 
     /// <summary>
@@ -153,7 +202,7 @@ public class AsyncStateMachineGenerator
         // 定义状态标签
         var stateLabels = new Dictionary<int, Label>();
         // 为每个await表达式生成状态标签
-        int maxStates = Math.Max(AwaitPositions.Count + 1, 1); // +1 是因为还有初始状态
+        int maxStates = Math.Max(AwaitInfos.Count + 1, 1); // +1 是因为还有初始状态
         for (int i = 0; i < maxStates; i++)
         {
             stateLabels[i] = moveNextIl.DefineLabel();
@@ -222,7 +271,7 @@ public class AsyncStateMachineGenerator
             var statement = BlockStatement[state];
 
             // 检查当前语句是否包含await表达式
-            bool hasAwait = AwaitPositions.Contains(state);
+            bool hasAwait = AwaitInfos.Any(info => info.StateIndex == state);
 
             if (hasAwait)
             {

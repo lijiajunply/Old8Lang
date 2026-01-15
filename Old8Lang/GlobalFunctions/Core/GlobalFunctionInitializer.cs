@@ -127,21 +127,12 @@ public static class GlobalFunctionInitializer
     /// </summary>
     public static void EnsureInitialized()
     {
-        if (!_initialized)
-        {
-            Initialize();
-        }
-    }
-
-    /// <summary>
-    /// 重置初始化状态（主要用于测试）
-    /// </summary>
-    public static void Reset()
-    {
         lock (InitLock)
         {
-            GlobalFunctionRegistry.Instance.Clear();
-            _initialized = false;
+            if (!_initialized)
+            {
+                Initialize();
+            }
         }
     }
 }
