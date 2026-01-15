@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
@@ -144,6 +145,50 @@ public static class Compiler
     }
 
     /// <summary>
+    /// 检测语句块是否包含 await 表达式
+    /// </summary>
+    /// <param name="statement">要检测的语句</param>
+    /// <returns>如果包含 await 表达式则返回 true，否则返回 false</returns>
+    private static bool ContainsAwait(OldStatement statement)
+    {
+        // 使用 AsyncStateMachineGenerator 的识别逻辑
+        // 创建一个临时的生成器来识别 await
+        if (statement is not BlockStatement block)
+        {
+            // 如果不是块语句，包装成块语句
+            block = new BlockStatement([statement]);
+        }
+
+        try
+        {
+            // 创建临时的 IL 生成器和 LocalManager
+            var tempMethod = new DynamicMethod("TempAwaitCheck", null, null, true);
+            var tempIl = tempMethod.GetILGenerator();
+            var tempLocal = new LocalManager();
+
+            // 创建 AsyncStateMachineGenerator 并检查是否识别到 await
+            var generator = new Generators.AsyncStateMachineGenerator(tempIl, tempLocal, block);
+
+            // 通过反射访问 AwaitInfos 字段
+            var awaitInfosField = typeof(Generators.AsyncStateMachineGenerator)
+                .GetField("AwaitInfos", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (awaitInfosField != null)
+            {
+                var awaitInfos = awaitInfosField.GetValue(generator) as System.Collections.IList;
+                return awaitInfos != null && awaitInfos.Count > 0;
+            }
+
+            return false;
+        }
+        catch
+        {
+            // 如果检测失败，假设不包含 await
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 注册全局静态类到LocalManager中
     /// </summary>
     /// <param name="local">局部变量管理器</param>
@@ -187,6 +232,14 @@ public static class Compiler
     {
         LogFormat("开始编译: {0}", LogLevel.Debug, path);
         LogFormat("语句类型: {0}", LogLevel.Debug, statement.GetType().Name);
+
+        // 检测顶层代码是否包含 await 表达式
+        bool containsAwait = ContainsAwait(statement);
+        if (containsAwait)
+        {
+            Log("检测到顶层 await 表达式，使用异步编译模式", LogLevel.Debug);
+            return CompileWithTopLevelAwait(statement, path, i);
+        }
 
         // 创建动态方法，用于生成和执行IL代码
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
@@ -322,6 +375,91 @@ public static class Compiler
             else if (ex is CompilerException compilerEx)
             {
                 LogFormat("位置信息: {0}", LogLevel.Error, compilerEx.Position);
+            }
+
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 编译包含顶层 await 的代码
+    /// </summary>
+    /// <param name="statement">表示整个程序的块语句</param>
+    /// <param name="path">源代码文件路径</param>
+    /// <param name="i">关联的解释器实例</param>
+    /// <returns>编译后的可执行委托</returns>
+    /// <remarks>
+    /// 该方法将顶层代码包装成异步方法，然后同步等待其完成
+    /// </remarks>
+    private static Action CompileWithTopLevelAwait(BlockStatement statement, string path, LangInterpreter i)
+    {
+        Log("编译包含顶层 await 的代码", LogLevel.Debug);
+
+        // 创建一个返回 Task 的动态方法
+        var asyncMethod = new DynamicMethod("OldLangRunAsync", typeof(Task), null, true);
+        var ilGenerator = asyncMethod.GetILGenerator();
+        var local = new LocalManager() { FilePath = path, Interpreter = i };
+
+        // 注册全局静态类
+        RegisterGlobalStaticClasses(local);
+
+        try
+        {
+            Log("开始生成异步 IL 代码", LogLevel.Debug);
+
+            // 生成语句的 IL 代码
+            statement.GenerateIl(ilGenerator, local);
+
+            // 清空栈（如果有值的话）
+            // 注意：BlockStatement.GenerateIl 通常不会在栈上留下值
+            // 但为了安全起见，我们不做任何假设
+
+            // 返回一个已完成的 Task
+            // 注意：这是简化实现，实际的 await 会在语句内部处理
+            ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("get_CompletedTask")!);
+            ilGenerator.Emit(OpCodes.Ret);
+
+            Log("异步 IL 代码生成完成", LogLevel.Debug);
+
+            // 创建异步委托
+            var asyncDelegate = (Func<Task>)asyncMethod.CreateDelegate(typeof(Func<Task>));
+            Log("异步编译成功", LogLevel.Info);
+
+            // 返回一个 Action，该 Action 会同步等待异步方法完成
+            return () =>
+            {
+                try
+                {
+                    // 使用 GetAwaiter().GetResult() 同步等待
+                    // 这会保留异常堆栈信息
+                    asyncDelegate().GetAwaiter().GetResult();
+                }
+                catch (Old8Exception)
+                {
+                    // 已经是Old8Exception，直接重新抛出
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    // 将其他.NET异常包装为Old8Exception
+                    throw new Old8Exception(
+                        "RUNTIME_ERROR",
+                        ex.Message,
+                        new SourcePosition(0, 0),
+                        innerException: ex);
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            // 处理编译过程中的异常
+            LogFormat("\n{0}", LogLevel.Error, path);
+            LogFormat("错误类型: {0}", LogLevel.Error, ex.GetType().Name);
+            LogFormat("错误信息: {0}", LogLevel.Error, ex.Message);
+
+            if (CurrentLogLevel >= LogLevel.Debug && ex.StackTrace is not null)
+            {
+                LogFormat("堆栈跟踪: {0}", LogLevel.Error, ex.StackTrace);
             }
 
             throw;

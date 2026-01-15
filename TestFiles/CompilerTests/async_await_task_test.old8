@@ -1,0 +1,10 @@
+// 测试在普通函数中 await 一个 Task
+func testAwait() -> void {
+    // 创建一个已完成的 Task
+    task <- Task.FromResult("Hello")
+    // await 这个 Task
+    result <- await task
+    PrintLine(result)
+}
+
+testAwait()

@@ -1,0 +1,10 @@
+// 测试顶层 await - 启用调试
+Compiler.DebugOutputEnabled <- true
+Compiler.CurrentLogLevel <- Compiler.LogLevel.Debug
+
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+result <- await simpleAsync()
+PrintLine(result)

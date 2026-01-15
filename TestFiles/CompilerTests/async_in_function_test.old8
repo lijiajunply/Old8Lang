@@ -1,0 +1,15 @@
+// 测试在异步函数内使用 await
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+async func testAwait() -> string {
+    result <- await simpleAsync()
+    return "Result: " + result
+}
+
+func main() -> void {
+    // 调用异步函数但不 await（获取 Task）
+    task <- testAwait()
+    PrintLine("Task created")
+}

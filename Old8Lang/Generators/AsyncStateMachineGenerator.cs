@@ -302,38 +302,34 @@ public class AsyncStateMachineGenerator
 
     /// <summary>
     /// 生成包含await表达式的状态代码
+    /// 注意：这是一个简化实现，暂时生成同步等待代码
+    /// TODO: 实现真正的异步状态机切换
     /// </summary>
     private void GenerateAwaitStateCode(ILGenerator il, int state, Dictionary<int, Label> stateLabels)
     {
         // 获取当前状态对应的语句
         var statement = BlockStatement[state];
 
-        // 生成语句的IL代码，直到遇到await表达式
-        // 注意：这里简化处理，实际实现需要更复杂的逻辑来处理语句中的await表达式
+        // 简化实现：直接生成语句的IL代码
+        // 这会导致 await 表达式使用同步等待（GetResult()）
+        // 但至少可以让代码编译和运行
         statement.GenerateIl(il, LocalManager);
 
-        // 对于await表达式，生成状态保存和恢复逻辑
-        // 这里简化处理，生成基本的状态转换逻辑
-
-        // 1. 保存当前状态
+        // 设置下一个状态
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, state + 1);
         il.Emit(OpCodes.Stfld, StateField!);
 
-        // 2. 调用异步方法构建器的Start方法
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldfld, BuilderField!);
-        il.Emit(OpCodes.Ldarg_0);
-        var startMethod = typeof(AsyncTaskMethodBuilder<object>).GetMethod("Start", [typeof(object)])!;
-        il.Emit(OpCodes.Call, startMethod);
-
-        // 3. 设置下一个状态
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldc_I4, state + 1);
-        il.Emit(OpCodes.Stfld, StateField!);
-
-        // 4. 跳转到下一个状态
-        il.Emit(OpCodes.Br, stateLabels[Math.Min(state + 1, stateLabels.Count - 1)]);
+        // 跳转到下一个状态
+        if (state + 1 < stateLabels.Count)
+        {
+            il.Emit(OpCodes.Br, stateLabels[state + 1]);
+        }
+        else
+        {
+            // 所有语句处理完成，跳转到完成状态
+            il.Emit(OpCodes.Br, stateLabels[stateLabels.Count - 1]);
+        }
     }
 
     /// <summary>

@@ -1,0 +1,8 @@
+// 测试顶层 await
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+// 顶层 await（不在函数内）
+result <- await simpleAsync()
+PrintLine(result)

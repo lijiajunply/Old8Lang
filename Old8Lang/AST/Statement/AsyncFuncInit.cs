@@ -161,10 +161,16 @@ public partial class AsyncFuncInit : OldStatement
         // 1. 创建状态机实例
         ilGenerator.Emit(OpCodes.Newobj, constructor);
 
-        // 2. 调用状态机的MoveNext方法
+        // 2. 复制状态机引用（因为 MoveNext 会消耗一个）
+        ilGenerator.Emit(OpCodes.Dup);
+
+        // 3. 调用状态机的MoveNext方法
         ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
 
-        // 3. 返回一个已完成的Task<object>
+        // 4. 弹出状态机对象（MoveNext 返回 void，但栈上还有状态机对象）
+        ilGenerator.Emit(OpCodes.Pop);
+
+        // 5. 返回一个已完成的Task<object>
         // 完整实现需要获取状态机的结果，这里简化处理
         ilGenerator.Emit(OpCodes.Ldnull);
         ilGenerator.Emit(OpCodes.Call, typeof(Task)

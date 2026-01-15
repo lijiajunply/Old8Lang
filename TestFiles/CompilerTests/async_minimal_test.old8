@@ -1,0 +1,9 @@
+// 最小的异步测试 - 只测试一个简单的 await
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+func main() -> void {
+    result <- await simpleAsync()
+    PrintLine(result)
+}

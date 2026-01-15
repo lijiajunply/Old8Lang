@@ -1,0 +1,11 @@
+// 测试异步函数内部使用 await
+async func asyncWithAwait() -> string {
+    task <- Task.FromResult("Hello")
+    result <- await task
+    return result
+}
+
+func main() -> void {
+    task <- asyncWithAwait()
+    PrintLine("Task created")
+}

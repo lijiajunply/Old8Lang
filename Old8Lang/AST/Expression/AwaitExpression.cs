@@ -81,22 +81,35 @@ public partial class AwaitExpression : LangExpression
         // 确保表达式类型是 Task 或 Task<object>
         if (exprType == typeof(Task))
         {
-            // 对于 Task 类型，转换为 Task<object>，使用 Task.WhenAll(Task) 实现
-            var whenAllMethod = typeof(Task).GetMethod("WhenAll", [typeof(Task[])])!;
-            // 创建一个包含当前 Task 的数组
-            ilGenerator.Emit(OpCodes.Ldc_I4_1);
-            ilGenerator.Emit(OpCodes.Newarr, typeof(Task));
-            ilGenerator.Emit(OpCodes.Dup);
-            ilGenerator.Emit(OpCodes.Ldc_I4_0);
-            ilGenerator.Emit(OpCodes.Dup);
-            ilGenerator.Emit(OpCodes.Stelem_Ref);
-            ilGenerator.Emit(OpCodes.Call, whenAllMethod);
-            // 现在栈上是 Task，我们需要将其转换为 Task<object>
-            // 使用 Task.FromResult<object>(null) 作为模板
-            var fromResultMethod =
-                typeof(Task).GetMethod("FromResult", [typeof(object)])!.MakeGenericMethod(typeof(object));
+            // 对于 Task 类型，简化处理：直接调用 GetAwaiter() 和 GetResult()
+            // Task.GetAwaiter() 返回 TaskAwaiter（非泛型）
+            // 我们需要等待任务完成，然后返回 null
+
+            // 栈上现在是 Task 对象
+            // 保存 Task 到局部变量
+            var taskLocal = ilGenerator.DeclareLocal(typeof(Task));
+            ilGenerator.Emit(OpCodes.Stloc, taskLocal);
+
+            // 加载 Task，调用 GetAwaiter()
+            ilGenerator.Emit(OpCodes.Ldloc, taskLocal);
+            var taskGetAwaiterMethod = typeof(Task).GetMethod("GetAwaiter")!;
+            ilGenerator.Emit(OpCodes.Callvirt, taskGetAwaiterMethod);
+
+            // 获取 TaskAwaiter（非泛型）
+            var taskAwaiterType = taskGetAwaiterMethod.ReturnType;
+            var taskAwaiterLocal = ilGenerator.DeclareLocal(taskAwaiterType);
+            ilGenerator.Emit(OpCodes.Stloc, taskAwaiterLocal);
+
+            // 调用 GetResult() 等待完成（同步等待）
+            ilGenerator.Emit(OpCodes.Ldloca, taskAwaiterLocal);
+            var taskGetResultMethod = taskAwaiterType.GetMethod("GetResult")!;
+            ilGenerator.Emit(OpCodes.Call, taskGetResultMethod);
+
+            // Task.GetResult() 返回 void，我们需要返回 null（object）
             ilGenerator.Emit(OpCodes.Ldnull);
-            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+
+            // 直接返回，跳过后续的 Task<object> 处理
+            return;
         }
 
         // 现在栈上是 Task<object>，调用 GetAwaiter() 方法获取等待器
@@ -118,9 +131,10 @@ public partial class AwaitExpression : LangExpression
         var completedLabel = ilGenerator.DefineLabel();
         var endLabel = ilGenerator.DefineLabel();
 
-        // 加载等待器，调用 IsCompleted 属性
-        ilGenerator.Emit(OpCodes.Ldloc, awaiterLocal);
-        ilGenerator.Emit(OpCodes.Callvirt, isCompletedGetMethod);
+        // 加载等待器地址，调用 IsCompleted 属性
+        // TaskAwaiter<T> 是结构体，需要使用 Ldloca 和 Call
+        ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
+        ilGenerator.Emit(OpCodes.Call, isCompletedGetMethod);
 
         // 如果已完成，跳转到获取结果
         ilGenerator.Emit(OpCodes.Brtrue_S, completedLabel);
@@ -128,11 +142,11 @@ public partial class AwaitExpression : LangExpression
         // 未完成，这里需要异步状态机支持
         // 目前生成同步等待代码，后续将替换为异步状态机切换
 
-        // 加载等待器，调用 GetResult() 方法获取结果（同步等待，直到任务完成）
+        // 加载等待器地址，调用 GetResult() 方法获取结果（同步等待，直到任务完成）
         ilGenerator.MarkLabel(completedLabel);
-        ilGenerator.Emit(OpCodes.Ldloc, awaiterLocal);
+        ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
         var getResultMethod = awaiterType.GetMethod("GetResult")!;
-        ilGenerator.Emit(OpCodes.Callvirt, getResultMethod);
+        ilGenerator.Emit(OpCodes.Call, getResultMethod);
 
         // 结束
         ilGenerator.MarkLabel(endLabel);
