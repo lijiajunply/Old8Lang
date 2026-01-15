@@ -101,6 +101,33 @@ public partial class BytecodeVisitor
 
         // 原有逻辑：处理其他运算符
 
+        // 特殊处理类型转换运算符 (as)
+        if (node.Opera == LangTokenType.As)
+        {
+            // 生成左操作数（要转换的值）
+            if (node.Left != null)
+                node.Left.Accept(this);
+
+            // 获取目标类型名称
+            string typeName;
+            if (node.Right is LangId rightId)
+            {
+                typeName = rightId.IdName;
+            }
+            else if (node.Right is TypeLangValue typeValue)
+            {
+                typeName = typeValue.ToString();
+            }
+            else
+            {
+                throw new Exception($"类型转换运算符 'as' 的右操作数必须是类型名称，实际为: {node.Right?.GetType().Name}");
+            }
+
+            // 生成 Cast 指令
+            Emit(OpCode.Cast, typeName);
+            return null;
+        }
+
         // 检查是否是一元运算符
         bool isUnaryOperator = node.Opera == LangTokenType.Exclamation || // !
                                 (node.Opera == LangTokenType.Minus && node.Left == null); // 一元负号

@@ -1,0 +1,34 @@
+// 测试虚拟机模式的类型转换（as 关键字）
+
+// 测试 int 转 double
+a <- 123
+b <- a as double
+PrintLine("int 转 double: " + b.ToStr())
+
+// 测试 double 转 int
+c <- 3.14
+d <- c as int
+PrintLine("double 转 int: " + d.ToStr())
+
+// 测试 int 转 string
+e <- 456
+f <- e as string
+PrintLine("int 转 string: " + f)
+
+// 测试 string 转 int
+g <- "789"
+h <- g as int
+PrintLine("string 转 int: " + h.ToStr())
+
+// 测试 bool 转 string
+i <- true
+j <- i as string
+PrintLine("bool 转 string: " + j)
+
+// 测试链式转换
+k <- 100
+l <- k as double
+m <- l as string
+PrintLine("链式转换 (int -> double -> string): " + m)
+
+PrintLine("所有类型转换测试通过！")
