@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Features;
 /// </summary>
 public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task UnionTypeSyntax_InTypeAnnotation()
     {
@@ -34,10 +32,10 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
         foreach (var item in items.Take(10))
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -61,7 +59,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -85,7 +83,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -109,7 +107,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -136,7 +134,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -160,10 +158,10 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
         foreach (var item in items.Take(10))
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -188,7 +186,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -213,7 +211,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -237,7 +235,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -260,7 +258,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -283,7 +281,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -309,7 +307,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -336,8 +334,8 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(pipeChar);
         Assert.Equal(CompletionItemKind.Operator, pipeChar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine($"| operator found: {pipeChar?.Label}");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"| operator found: {pipeChar?.Label}");
     }
 
     [Fact]
@@ -364,7 +362,7 @@ public class CompletionHandler_UnionTypesTests(ITestOutputHelper output)
         Assert.NotNull(ampersandChar);
         Assert.Equal(CompletionItemKind.Operator, ampersandChar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine($"& operator found: {ampersandChar?.Label}");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"& operator found: {ampersandChar?.Label}");
     }
 }

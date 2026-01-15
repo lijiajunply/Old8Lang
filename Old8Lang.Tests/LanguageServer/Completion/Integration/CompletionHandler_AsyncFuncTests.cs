@@ -6,15 +6,13 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.LanguageServer.Completion.Integration;
 
 /// <summary>
-/// 异步函数关键字验证测试
-/// 验证 asyncfunc 关键字的正确存在
+/// 异步函数补全测试
+/// 验证 async 关键字和 async func 代码片段的正确存在
 /// </summary>
 public class CompletionHandler_AsyncFuncTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
-    public async Task AsyncFuncKeyword_ShouldBeAvailable()
+    public async Task AsyncKeyword_ShouldBeAvailable()
     {
         var code = @"";
         var uri = "file:///test.old8";
@@ -32,11 +30,11 @@ public class CompletionHandler_AsyncFuncTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        var asyncfuncKeyword = items.FirstOrDefault(i => i.Label == "asyncfunc");
-        Assert.NotNull(asyncfuncKeyword);
-        Assert.Equal(CompletionItemKind.Keyword, asyncfuncKeyword.Kind);
+        var asyncKeyword = items.FirstOrDefault(i => i.Label == "async");
+        Assert.NotNull(asyncKeyword);
+        Assert.Equal(CompletionItemKind.Keyword, asyncKeyword.Kind);
 
-        _output.WriteLine($"Found asyncfunc keyword: {asyncfuncKeyword.Label}");
+        output.WriteLine($"Found async keyword: {asyncKeyword.Label}");
     }
 
     [Fact]
@@ -61,8 +59,8 @@ public class CompletionHandler_AsyncFuncTests(ITestOutputHelper output)
         var asyncfuncSnippet = items.FirstOrDefault(i => i.Kind == CompletionItemKind.Snippet && i.Label == "async func");
 
         Assert.NotNull(asyncfuncSnippet);
-        Assert.Contains(asyncfuncSnippet.InsertText, "async func");
+        Assert.Contains("async func", asyncfuncSnippet.InsertText);
 
-        _output.WriteLine($"Found asyncfunc snippet");
+        output.WriteLine($"Found async func snippet");
     }
 }

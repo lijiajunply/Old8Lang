@@ -456,7 +456,7 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             },
             new CompletionItem
             {
-                Label = "asyncfunc",
+                Label = "async func",
                 Kind = CompletionItemKind.Snippet,
                 Detail = "异步函数定义",
                 Documentation = "创建一个新的异步函数",

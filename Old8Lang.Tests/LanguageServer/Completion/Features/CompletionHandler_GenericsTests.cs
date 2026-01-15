@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Features;
 /// </summary>
 public class CompletionHandler_GenericsTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task GenericFunctionDefinition_ShouldComplete()
     {
@@ -39,10 +37,10 @@ public class CompletionHandler_GenericsTests(ITestOutputHelper output)
         Assert.NotNull(valueVar);
         Assert.Equal(CompletionItemKind.Variable, valueVar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
         foreach (var item in items.Take(10))
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -76,7 +74,7 @@ func main() -> void {
         Assert.NotNull(identityFunc);
         Assert.Equal(CompletionItemKind.Function, identityFunc.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -116,7 +114,7 @@ func main() -> void {
         Assert.NotNull(thisKeyword);
         Assert.Equal(CompletionItemKind.Keyword, thisKeyword.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -152,7 +150,7 @@ func main() -> void {
         Assert.NotNull(boxClass);
         Assert.Equal(CompletionItemKind.Class, boxClass.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -191,7 +189,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "key");
         Assert.Contains(items, i => i.Label == "value");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -222,7 +220,7 @@ func sort<T: IComparable>(items: list) -> list {
         var items = result.Items.ToList();
         Assert.Contains(items, i => i.Label == "items");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -254,7 +252,7 @@ func main() -> void {
         var itemsVar = items.FirstOrDefault(i => i.Label == "items");
         Assert.NotNull(itemsVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -295,7 +293,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "box");
         Assert.Contains(items, i => i.Label == "box2");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -351,10 +349,10 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "peek");
         Assert.All(items, item => Assert.Equal(CompletionItemKind.Method, item.Kind));
 
-        _output.WriteLine($"Found {items.Count} member items:");
+        output.WriteLine($"Found {items.Count} member items:");
         foreach (var item in items)
         {
-            _output.WriteLine($"  - {item.Label}: {item.Detail}");
+            output.WriteLine($"  - {item.Label}: {item.Detail}");
         }
     }
 
@@ -393,7 +391,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "List");
         Assert.Contains(items, i => i.Label == "SortedList");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -422,13 +420,13 @@ func main() -> void {
             var typeItem = items.FirstOrDefault(i => i.Label == type);
             if (typeItem == null)
             {
-                _output.WriteLine($"Type '{type}' not found in completions");
+                output.WriteLine($"Type '{type}' not found in completions");
             }
             Assert.True(typeItem != null, $"Type '{type}' should be available");
             Assert.Equal(CompletionItemKind.Keyword, typeItem.Kind);
         }
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("All basic types verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("All basic types verified");
     }
 }
