@@ -72,6 +72,31 @@ public class ClassParser(
             {
                 parentClassName = CurrentToken.Value;
                 CurrentIndex++;
+
+                // 处理父类的泛型参数（如果有）：extends List<T>
+                if (CurrentToken.Type == LangTokenType.LessThan)
+                {
+                    // 跳过泛型参数部分，直到找到匹配的 >
+                    int genericDepth = 0;
+                    while (CurrentIndex < Tokens.Count)
+                    {
+                        if (CurrentToken.Type == LangTokenType.LessThan)
+                        {
+                            genericDepth++;
+                        }
+                        else if (CurrentToken.Type == LangTokenType.GreaterThan)
+                        {
+                            genericDepth--;
+                            CurrentIndex++;
+                            if (genericDepth == 0)
+                            {
+                                break;
+                            }
+                            continue;
+                        }
+                        CurrentIndex++;
+                    }
+                }
             }
         }
 

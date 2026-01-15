@@ -125,8 +125,16 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
         Console.WriteLine($"[GetMemberCompletions] Found class '{classSymbol.Name}' with {classSymbol.Members.Count} members");
 
-        // 返回类的所有成员
-        return classSymbol.Members.Values.Select(member =>
+        // 过滤成员：从类外部访问时，只显示公共成员
+        // TODO: 未来可以根据访问位置（类内部/外部）来决定是否显示私有成员
+        var accessibleMembers = classSymbol.Members.Values
+            .Where(member => member.AccessModifier == Models.AccessModifier.Public)
+            .ToList();
+
+        Console.WriteLine($"[GetMemberCompletions] Accessible members: {accessibleMembers.Count}");
+
+        // 返回类的可访问成员
+        return accessibleMembers.Select(member =>
         {
             // 构建访问修饰符信息
             var modifiers = new List<string>();

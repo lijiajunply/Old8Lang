@@ -23,8 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extends_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generic_inheritance.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generic_member.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_void_return.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Context/CompletionHandler_ContextAwareTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Context/CompletionHandler_ContextAwareTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Features/CompletionHandler_GenericsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Completion/Features/CompletionHandler_GenericsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -570,7 +576,7 @@
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
-      <workItem from="1768485078721" duration="5119000" />
+      <workItem from="1768485078721" duration="10812000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -915,7 +921,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="673" />
+    <option name="localTasksCounter" value="679" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,12 +948,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
-    <MESSAGE value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
-    <MESSAGE value="feat(linq): 实现 LINQ 表达式的编译器模式支持&#10;&#10;- 为 LinqExpression 添加编译器支持部分，实现 IL 代码生成逻辑&#10;- 实现 Where、Select 等基本 LINQ 子句的 IL 生成方法&#10;- 添加类型转换相关的 IL 生成辅助方法&#10;- 在 BytecodeVisitor 中集成 LINQ 表达式的编译支持&#10;- 添加基本的 LINQ 编译器模式测试文件&#10;- 重构 Scope 类使用主构造函数简化代码&#10;- 优化异常表项添加逻辑使用空合并操作符&#10;- 修复函数定义方法参数格式化问题" />
-    <MESSAGE value="feat(compiler): 实现泛型类特化功能&#10;&#10;- 添加泛型类初始化时注册到缓存的逻辑&#10;- 创建GenericClassSpecializer类处理泛型类特化&#10;- 添加多个泛型类测试文件包括基本功能、方法调用等场景&#10;- 实现GenericInstanceExpression中的泛型类实例化处理&#10;- 扩展LocalManager添加泛型类定义和特化类型缓存&#10;- 实现泛型类字段、构造函数和实例方法的IL生成&#10;- 添加泛型类类型推断和特化类型创建功能" />
-    <MESSAGE value="feat(bytecode): 添加泛型支持功能&#10;&#10;- 实现泛型类和泛型函数的定义缓存机制&#10;- 添加泛型实例化的字节码生成逻辑&#10;- 支持泛型类特化和函数特化处理&#10;- 实现泛型类实例化表达式的访问者模式处理&#10;- 添加泛型函数调用的字节码生成支持&#10;- 创建泛型类特化版本的生成逻辑&#10;- 实现泛型函数特化版本的编译流程&#10;- 添加泛型相关单元测试用例" />
-    <MESSAGE value="test(vm): 添加虚拟机泛型功能高级测试&#10;&#10;- 实现泛型类高级测试，包括嵌套泛型类型和多类型参数场景&#10;- 添加泛型边界情况测试，覆盖相同类型多次实例化和不同数值类型场景&#10;- 实现泛型函数高级测试，支持多类型参数和数组处理功能&#10;- 创建泛型集成测试，验证泛型类与泛型函数组合使用的正确性&#10;- 添加泛型函数返回复杂类型和嵌套实例化的测试用例&#10;- 实现泛型类与数组、字典等数据结构组合的测试场景" />
     <MESSAGE value="feat(compiler): 实现枚举类型的字节码生成和虚拟机执行&#10;&#10;- 添加枚举成员值计算和验证逻辑，支持显式赋值和自动递增&#10;- 新增 DefineEnum 字节码指令用于定义枚举类型&#10;- 实现虚拟机中枚举的创建、存储和成员访问功能&#10;- 添加枚举值比较支持和枚举模板访问机制&#10;- 增加 ToStr 方法映射以支持枚举值字符串转换&#10;- 添加完整的枚举类型虚拟机测试用例" />
     <MESSAGE value="feat(bytecode): 实现 using 语句的字节码生成和自动资源管理&#10;&#10;- 在 BytecodeVisitor 中实现 UsingStatement 的完整字节码生成逻辑&#10;- 使用 try-finally 结构实现自动资源管理，在 finally 块中调用 Dispose&#10;- 添加 ResourceManagerTryDispose 原生函数支持资源释放操作&#10;- 生成异常表条目记录 try-finally 块的位置信息&#10;- 支持带变量名和不带变量名两种 using 语句语法&#10;- 添加 using 语句字节码测试用例验证资源自动释放功能&#10;- 修复 OpCode 注释中的 HTML 实体编码问题" />
     <MESSAGE value="feat(linq): 实现 GroupBy 子句的字节码生成和虚拟机支持&#10;&#10;- 在 BytecodeVisitor.Expressions.cs 中添加对 GroupBy 子句类型的检查逻辑&#10;- 实现分组字典的创建和管理机制 (NewGroupDict 和 GroupDictToList 操作码)&#10;- 添加 GroupBy 终止子句的具体字节码生成逻辑&#10;- 修改 AddToGroup 操作码的参数顺序以匹配正确的执行流程&#10;- 更新虚拟机中 AddToGroup 操作的栈操作顺序&#10;- 移除分组字典操作后的冗余栈推送逻辑&#10;- 优化虚拟机字典转字符串的迭代方式以正确显示分组结果&#10;- 添加完整的 GroupBy 功能测试用例文件" />
@@ -967,7 +967,13 @@
     <MESSAGE value="feat(vm): 实现Spawn函数的预处理和编译支持&#10;&#10;- 添加预处理阶段注册所有函数定义的功能&#10;- 实现Spawn函数的第一个参数作为函数引用时转换为函数索引&#10;- 避免函数在预处理阶段已被编译过的重复编译问题&#10;- 更新测试用例移除main函数声明并添加Start方法调用&#10;- 将Spawn和spawn都识别为线程相关内置函数" />
     <MESSAGE value="feat(vm): 实现模块系统中的跨模块函数和类查找及实例化功能&#10;&#10;- 在虚拟机中扩展函数查找逻辑，支持从全局变量和已加载模块中查找导入的函数&#10;- 实现类的跨模块查找功能，支持从全局变量和已加载模块中查找导入的类&#10;- 添加模块加载时的传递性依赖注册机制，确保依赖模块正确加载&#10;- 实现CreateObjectInstance方法支持从模块导入的类进行实例化&#10;- 更新路径解析器支持传入目录路径作为基础路径&#10;- 重构测试代码添加异常处理和错误输出捕获机制&#10;- 更新构造函数命名约定从constructor改为init方法&#10;- 修复模块系统中的符号查找和实例化相关问题" />
     <MESSAGE value="test(completion): 更新上下文感知补全功能的测试用例&#10;&#10;- 为局部变量作用域测试添加代码行注释说明&#10;- 修正全局变量作用域测试中的光标位置定位&#10;- 简化Lambda捕获变量测试的代码结构&#10;- 调整循环作用域测试的代码布局和断言逻辑&#10;- 优化嵌套函数作用域测试的验证条件&#10;- 重构函数块表达式测试的内容和预期结果&#10;- 更新类方法作用域测试的代码结构和断言&#10;- 调整静态成员访问测试的验证逻辑&#10;- 修正本地变量可见性测试的断言条件&#10;- 清理IDE工作空间配置文件中的多余变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(completion): 更新上下文感知补全功能的测试用例&#10;&#10;- 为局部变量作用域测试添加代码行注释说明&#10;- 修正全局变量作用域测试中的光标位置定位&#10;- 简化Lambda捕获变量测试的代码结构&#10;- 调整循环作用域测试的代码布局和断言逻辑&#10;- 优化嵌套函数作用域测试的验证条件&#10;- 重构函数块表达式测试的内容和预期结果&#10;- 更新类方法作用域测试的代码结构和断言&#10;- 调整静态成员访问测试的验证逻辑&#10;- 修正本地变量可见性测试的断言条件&#10;- 清理IDE工作空间配置文件中的多余变更记录" />
+    <MESSAGE value="feat(compiler): 实现编译时返回类型不匹配检查&#10;&#10;- 在 ReturnStatement 中添加返回类型与函数声明类型匹配验证逻辑&#10;- 实现基本类型转换兼容性检查，支持数值类型和字符串转换&#10;- 将运行时异常改为编译时异常，提前发现类型不匹配问题&#10;- 更新测试用例验证编译时类型检查功能&#10;- 临时禁用可能导致栈溢出的递归测试用例&#10;- 修复函数返回类型不匹配时的错误消息显示" />
+    <MESSAGE value="feat(completion): 添加新的代码片段支持&#10;&#10;- 添加 interface 接口定义代码片段&#10;- 添加 enum 枚举定义代码片段&#10;- 添加 match 模式匹配表达式代码片段&#10;- 添加 defer 延迟执行语句代码片段&#10;- 添加 using 资源管理语句代码片段&#10;- 添加 select channel多路选择语句代码片段&#10;- 修复测试中字符串包含检查的断言逻辑" />
+    <MESSAGE value="feat(completion): 添加操作符补全功能&#10;&#10;- 在补全处理器中添加操作符补全支持&#10;- 实现联合类型操作符 | 的补全&#10;- 实现交叉类型操作符 &amp; 的补全&#10;- 实现赋值操作符 &lt;- 的补全&#10;- 实现箭头操作符 -&gt; 的补全&#10;- 为操作符设置较低的补全优先级&#10;- 移除测试类中多余的私有字段声明&#10;- 修复测试方法中的输出写入器引用" />
+    <MESSAGE value="test(completion): 更新成员链补全功能测试用例&#10;&#10;- 修复了成员访问位置定位的断言逻辑&#10;- 调整了测试代码中的占位符标记以匹配实际补全位置&#10;- 修正了嵌套对象属性访问的补全验证方式&#10;- 更新了字符串字面量的表示方法以保持一致性&#10;- 修改了多个测试用例的位置参数以确保正确的补全触发点" />
+    <MESSAGE value="refactor(tests): 重构表达式补全处理器测试&#10;&#10;- 移除私有字段 _output 并直接使用构造函数参数&#10;- 更新所有测试方法中的输出写入调用以使用 output 参数&#10;- 修改 MemberAccess 测试中的代码示例以匹配新的语法格式&#10;- 调整位置参数以匹配更新后的代码结构&#10;- 更新 ChainedMemberAccess 测试中的类实例化语法&#10;- 修正所有测试用例中的断言和验证逻辑" />
+    <MESSAGE value="fix(completion): 修复异步函数补全项标签和测试&#10;&#10;- 将 asyncfunc 标签更正为 &quot;async func&quot; 以符合语法规范&#10;- 更新测试用例以验证正确的 async 关键字和 async func 代码片段&#10;- 移除私有字段 _output 并直接使用构造函数注入的 output 参数&#10;- 修正断言逻辑确保代码片段插入文本匹配预期值&#10;- 统一所有测试文件中的输出参数使用方式" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(completion): 修复异步函数补全项标签和测试&#10;&#10;- 将 asyncfunc 标签更正为 &quot;async func&quot; 以符合语法规范&#10;- 更新测试用例以验证正确的 async 关键字和 async func 代码片段&#10;- 移除私有字段 _output 并直接使用构造函数注入的 output 参数&#10;- 修正断言逻辑确保代码片段插入文本匹配预期值&#10;- 统一所有测试文件中的输出参数使用方式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

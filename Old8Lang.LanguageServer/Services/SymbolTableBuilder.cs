@@ -508,8 +508,8 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             varType = InferTypeFromExpression(setStatement.Value);
         }
 
-        // 如果仍然无法推断，使用 "var"
-        varType ??= "var";
+        // 如果仍然无法推断，使用 "any"
+        varType ??= "any";
 
         _symbolTable[varName] = new SymbolInfo
         {
@@ -527,6 +527,16 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     {
         switch (expr)
         {
+            // 泛型实例化表达式 Stack<string>()
+            case GenericInstanceExpression genericInstance:
+                // 获取基础类型名称（忽略泛型参数）
+                if (genericInstance.BaseExpression is LangId baseId)
+                {
+                    var genericClassName = baseId.IdName;
+                    return genericClassName;
+                }
+                break;
+
             // 实例化表达式 User()
             case Instance instance:
                 // Instance 表达式用于类构造函数调用

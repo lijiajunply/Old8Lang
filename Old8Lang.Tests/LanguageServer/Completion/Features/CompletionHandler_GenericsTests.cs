@@ -299,36 +299,38 @@ func main() -> void {
     [Fact]
     public async Task GenericMemberAccess_ShouldComplete()
     {
-        var code = @"class Stack<T> {
-    private items:list
+        var code = """
+                   class Stack<T> {
+                       private items:list
 
-    func init() {
-        this.items <- {}
-    }
+                       func init() {
+                           this.items <- {}
+                       }
 
-    func push(item:T) -> void {
-        this.items <- this.items.Add(item)
-    }
+                       func push(item:T) -> void {
+                           this.items <- this.items.Add(item)
+                       }
 
-    func pop() -> T {
-        lastIndex <- this.items.Count() -1
-        item <- this.items[lastIndex]
-        this.items.RemoveAt(lastIndex)
-        return item
-    }
+                       func pop() -> T {
+                           lastIndex <- this.items.Count() -1
+                           item <- this.items[lastIndex]
+                           this.items.RemoveAt(lastIndex)
+                           return item
+                       }
 
-    func peek() -> T {
-        return this.items[-1]
-    }
-}
+                       func peek() -> T {
+                           return this.items[-1]
+                       }
+                   }
 
-func main() -> void {
-    stack <- new Stack<string>()
-    stack.push(""first"")
-    stack.push(""second"")
-    value <- stack.$1peek()
-}
-";
+                   func main() -> void {
+                       stack <- Stack<string>()
+                       stack.push("first")
+                       stack.push("second")
+                       value <- stack.peek()
+                   }
+
+                   """;
         var uri = "file:///test.old8";
         var documentManager = new DocumentManager();
         documentManager.UpdateDocument(uri, code);
@@ -359,19 +361,21 @@ func main() -> void {
     [Fact]
     public async Task GenericInheritance_ShouldComplete()
     {
-        var code = @"class List<T> {
-    private items: array<T>
-}
+        var code = """
+                   class List<T> {
+                       private items: array<T>
+                   }
 
-class SortedList<T> extends List<T> {
-    func sort() -> void {
-    }
-}
+                   class SortedList<T> extends List<T> {
+                       func sort() -> void {
+                       }
+                   }
 
-func main() -> void {
-    list <- new SortedList<int>()
-}
-";
+                   func main() -> void {
+                       list <- SortedList<int>()
+                   }
+
+                   """;
         var uri = "file:///test.old8";
         var documentManager = new DocumentManager();
         documentManager.UpdateDocument(uri, code);

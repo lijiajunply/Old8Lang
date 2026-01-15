@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Context;
 /// </summary>
 public class CompletionHandler_ContextAwareTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task GlobalScope_ShouldHaveAllCompletions()
     {
@@ -43,8 +41,8 @@ globalConst <- ""constant""
         Assert.Contains(items, i => i.Label == "globalConst");
         Assert.Contains(items, i => i.Label == "PrintLine");
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("Global scope completions verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("Global scope completions verified");
     }
 
     [Fact]
@@ -90,8 +88,8 @@ func test() -> void {
         Assert.NotNull(addMethod);
         Assert.NotNull(valueField);
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("Class method scope completions verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("Class method scope completions verified");
     }
 
     [Fact]
@@ -102,12 +100,13 @@ func test() -> void {
         // Line 2:     global <- "world"
         // Line 3:     PrintLine(global + " + global)
         // Line 4: }
-        var code = @"global <- ""hello""
-func test() -> void {
-    global <- ""world""
-    PrintLine(global + "" + global)
-}
-";
+        var code = """
+                   global <- "hello"
+                   func test() -> void {
+                       global1 <- "world"
+                       PrintLine(global + global1)
+                   }
+                   """;
         var uri = "file:///test.old8";
         var documentManager = new DocumentManager();
         documentManager.UpdateDocument(uri, code);
@@ -127,8 +126,8 @@ func test() -> void {
         Assert.Contains(items, i => i.Label == "PrintLine");
         var localVars = items.Where(i => i.Label == "global" || i.Label == "test").ToList();
 
-        _output.WriteLine($"Found {localVars.Count} local variables");
-        _output.WriteLine("Local variable scope verified");
+        output.WriteLine($"Found {localVars.Count} local variables");
+        output.WriteLine("Local variable scope verified");
     }
 
     [Fact]
@@ -164,7 +163,7 @@ func test() -> void {
         Assert.NotNull(value1Var);
         Assert.NotNull(value2Var);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -207,8 +206,8 @@ func main() -> void {
         Assert.DoesNotContain(items, i => i.Label == "Test");
         Assert.DoesNotContain(items, i => i.Label == "obj");
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("Method scope completions verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("Method scope completions verified");
     }
 
     [Fact]
@@ -243,7 +242,7 @@ func test() -> void {
         var items = result.Items.ToList();
         Assert.Contains(items, i => i.Label == "riskyOperation");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -281,7 +280,7 @@ func test() -> void {
         Assert.Contains(items, i => i.Label == "doubleValue");
         Assert.Contains(items, i => i.Label == "main");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -321,7 +320,7 @@ func test() -> void {
         Assert.Contains(items, i => i.Label == "n");
         Assert.Contains(items, i => i.Label == "countTo");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -362,7 +361,7 @@ func test() -> void {
         var innerField = items.FirstOrDefault(i => i.Label == "inner");
         Assert.NotNull(innerField);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -396,7 +395,7 @@ func main() -> void {
 
         var dataCount = items.Count(i => i.Label == "data");
 
-        _output.WriteLine($"Found {dataCount} 'data' symbols");
+        output.WriteLine($"Found {dataCount} 'data' symbols");
         Assert.True(dataCount > 0);
     }
 
@@ -432,8 +431,8 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "block");
         Assert.Contains(items, i => i.Label == "process");
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("Function block expression verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("Function block expression verified");
     }
 
     [Fact]
@@ -467,7 +466,7 @@ func main() -> void {
 
         Assert.Contains(items, i => i.Label == "PrintLine");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -520,7 +519,7 @@ func main() -> void {
         Assert.NotNull(classItem);
         Assert.NotNull(mainItem);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -577,7 +576,7 @@ func main() -> void {
         Assert.NotNull(classA);
         Assert.NotNull(methodB);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -628,7 +627,7 @@ func main() -> void {
         Assert.NotNull(counterVar);
         Assert.NotNull(containerClass);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -659,7 +658,7 @@ func main() -> void {
 
         Assert.NotNull(mathSqrt);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -699,7 +698,7 @@ func main() -> void {
         Assert.NotNull(blockVar);
         Assert.NotNull(innerVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -736,7 +735,7 @@ func myFunc() -> void {
         Assert.NotNull(xVar);
         Assert.NotNull(myFunc);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -767,7 +766,7 @@ func main() -> void {
         Assert.Contains(items, i => i.Label == "message");
         Assert.DoesNotContain(items, i => i.Label.StartsWith("\""));
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -800,7 +799,7 @@ func main() -> void {
         Assert.NotNull(countVar);
         Assert.DoesNotContain(items, i => i.Label.StartsWith("\""));
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -834,6 +833,6 @@ func test() -> void {
         var globalVar = items.FirstOrDefault(i => i.Label == "globalVar");
         var localVar = items.FirstOrDefault(i => i.Label == "localVar");
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 }
