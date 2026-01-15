@@ -1,0 +1,30 @@
+func main() {
+    PrintLine("Testing Type Casting...")
+
+    // 1. Basic Types
+    i <- 123
+    d <- i as double
+    PrintLine("int to double: " + d.ToStr())
+    
+    s <- "456"
+    i2 <- s as int
+    PrintLine("string to int: " + i2.ToStr())
+
+    // 2. List to Array
+    list <- {1, 2, 3}
+    arr <- list as array
+    PrintLine("list to array type: " + typeof(arr))
+    PrintLine("arr[0]: " + arr[0].ToStr())
+
+    // 3. Array to List
+    arr2 <- [4, 5, 6]
+    list2 <- arr2 as list
+    PrintLine("array to list type: " + typeof(list2))
+    PrintLine("list2[0]: " + list2[0].ToStr())
+
+    // 4. Object Type Check (Mock)
+    // Assuming simple casting for now just passes through if type matches or is compatible
+    // For now VM might not support custom class casting logic fully, but let's see basic behavior
+}
+
+main()

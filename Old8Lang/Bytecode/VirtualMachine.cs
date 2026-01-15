@@ -1556,18 +1556,27 @@ public class VirtualMachine
                 var targetTypeName = (string)instruction.Operand!;
                 var value = _stack.Pop();
 
-                // 执行类型转换
-                object? convertedValue = targetTypeName.ToLower() switch
+                try 
                 {
-                    "int" => Convert.ToInt32(value),
-                    "double" => Convert.ToDouble(value),
-                    "string" => value?.ToString() ?? "",
-                    "bool" => Convert.ToBoolean(value),
-                    "char" => Convert.ToChar(value),
-                    _ => value // 其他类型直接返回原值
-                };
-
-                _stack.Push(convertedValue);
+                    // 执行类型转换
+                    object? convertedValue = targetTypeName.ToLower() switch
+                    {
+                        "int" => Convert.ToInt32(value),
+                        "double" => Convert.ToDouble(value),
+                        "string" => value?.ToString() ?? "",
+                        "bool" => Convert.ToBoolean(value),
+                        "char" => Convert.ToChar(value),
+                        "list" => ConvertToList(value),
+                        "array" => ConvertToArray(value),
+                        "dict" => ConvertToDict(value),
+                        _ => value // 其他类型直接返回原值
+                    };
+                    _stack.Push(convertedValue);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"类型转换失败: 无法将 {value?.GetType().Name ?? "null"} 转换为 {targetTypeName}", ex);
+                }
             }
                 break;
 
@@ -2802,6 +2811,49 @@ public class VirtualMachine
     }
 
     // ===== 辅助方法 =====
+
+    private List<object?> ConvertToList(object? value)
+    {
+        if (value == null) return new List<object?>();
+        if (value is List<object?> list) return list;
+        if (value is IEnumerable enumerable && value is not string)
+        {
+             var newList = new List<object?>();
+             foreach (var item in enumerable) newList.Add(item);
+             return newList;
+        }
+        return new List<object?> { value };
+    }
+
+    private object?[] ConvertToArray(object? value)
+    {
+        if (value == null) return Array.Empty<object?>();
+        if (value is object?[] arr) return arr;
+        if (value is List<object?> listObj) return listObj.ToArray();
+        if (value is IEnumerable enumerable && value is not string)
+        {
+            var list = new List<object?>();
+            foreach (var item in enumerable) list.Add(item);
+            return list.ToArray();
+        }
+        return new object?[] { value };
+    }
+
+    private Dictionary<object, object?> ConvertToDict(object? value)
+    {
+        if (value == null) return new Dictionary<object, object?>();
+        if (value is Dictionary<object, object?> dict) return dict;
+        if (value is IDictionary d)
+        {
+            var newDict = new Dictionary<object, object?>();
+            foreach (DictionaryEntry entry in d)
+            {
+                newDict[entry.Key] = entry.Value;
+            }
+            return newDict;
+        }
+        throw new InvalidCastException($"无法将类型 {value?.GetType().Name ?? "null"} 转换为 dict");
+    }
 
     private object? Add(object? a, object? b)
     {
