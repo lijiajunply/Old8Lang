@@ -237,8 +237,20 @@ public static class Compiler
         bool containsAwait = ContainsAwait(statement);
         if (containsAwait)
         {
-            Log("检测到顶层 await 表达式，使用异步编译模式", LogLevel.Debug);
-            return CompileWithTopLevelAwait(statement, path, i);
+            // 顶层 await 暂不支持，抛出友好的错误消息
+            throw new CompilerException(
+                "编译器模式暂不支持顶层 await 表达式。\n" +
+                "请将 await 表达式放在函数内部使用。\n\n" +
+                "示例：\n" +
+                "  // 不支持（顶层 await）\n" +
+                "  result <- await asyncFunc()\n\n" +
+                "  // 支持（函数内 await）\n" +
+                "  func main() -> void {\n" +
+                "      result <- await asyncFunc()\n" +
+                "      PrintLine(result)\n" +
+                "  }\n" +
+                "  main()",
+                new SourcePosition(0, 0));
         }
 
         // 创建动态方法，用于生成和执行IL代码

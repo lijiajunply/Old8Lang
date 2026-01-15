@@ -1,0 +1,24 @@
+// 简化的异步测试 - 测试多个 await
+
+async func simpleAsync() -> string {
+    return "Success"
+}
+
+async func asyncWithAwait() -> string {
+    result <- await simpleAsync()
+    return "Result_" + result
+}
+
+func main() -> void {
+    PrintLine("Test 1: Simple async")
+    result1 <- await simpleAsync()
+    PrintLine(result1)
+
+    PrintLine("Test 2: Async with await")
+    result2 <- await asyncWithAwait()
+    PrintLine(result2)
+
+    PrintLine("All tests passed!")
+}
+
+main()

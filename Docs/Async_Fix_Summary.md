@@ -110,7 +110,7 @@ ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult")...);
 
 ### 成功的测试
 
-1. **普通函数中的 await** ✅
+1. **普通函数中 await Task** ✅
    ```old8
    func testAwait() -> void {
        task <- Task.FromResult("Hello")
@@ -120,7 +120,20 @@ ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult")...);
    ```
    **结果**: 编译成功，输出 "Hello"
 
-2. **异步函数内部的 await** ✅
+2. **异步函数定义** ✅
+   ```old8
+   async func simpleAsync() -> string {
+       return "Hello"
+   }
+
+   func main() -> void {
+       task <- simpleAsync()
+       PrintLine("Task created")
+   }
+   ```
+   **结果**: 编译成功，正常执行
+
+3. **异步函数内部 await Task** ✅
    ```old8
    async func asyncWithAwait() -> string {
        task <- Task.FromResult("Hello")
@@ -130,7 +143,20 @@ ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult")...);
    ```
    **结果**: 编译成功，正常执行
 
-3. **在函数内 await 异步函数** ✅
+### 失败的测试
+
+1. **顶层 await** ❌ (已禁止)
+   ```old8
+   async func simpleAsync() -> string {
+       return "Hello"
+   }
+
+   result <- await simpleAsync()
+   PrintLine(result)
+   ```
+   **结果**: 友好的错误消息，提示用户将 await 放在函数内
+
+2. **await 异步函数** ❌
    ```old8
    async func simpleAsync() -> string {
        return "Hello"
@@ -141,44 +167,64 @@ ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult")...);
        PrintLine(result)
    }
    ```
-   **结果**: 编译成功，输出 "Hello"
-
-### 失败的测试
-
-1. **顶层 await** ❌
-   ```old8
-   async func simpleAsync() -> string {
-       return "Hello"
-   }
-
-   result <- await simpleAsync()
-   PrintLine(result)
-   ```
    **结果**: "Common Language Runtime detected an invalid program"
 
 ---
 
 ## 当前限制
 
-### 顶层 await 不支持
+### 1. 顶层 await 不支持（已禁止）
+
+**状态**: ✅ 已添加友好的错误提示
 
 **原因**:
-顶层 await 需要将整个程序包装成异步方法，这涉及到复杂的 IL 代码生成和状态机处理。当前的 `CompileWithTopLevelAwait` 实现仍存在问题。
+顶层 await 需要将整个程序包装成异步方法，这涉及到复杂的 IL 代码生成和状态机处理。
 
-**建议**:
-1. **短期方案**: 在编译器中检测顶层 await 并报错，提示用户将 await 放在函数内
-2. **长期方案**: 重新设计顶层 await 的实现，参考 C# 9.0 的顶层语句实现
+**错误消息**:
+```
+编译器模式暂不支持顶层 await 表达式。
+请将 await 表达式放在函数内部使用。
+
+示例：
+  // 不支持（顶层 await）
+  result <- await asyncFunc()
+
+  // 支持（函数内 await）
+  func main() -> void {
+      result <- await asyncFunc()
+      PrintLine(result)
+  }
+  main()
+```
+
+### 2. await 异步函数不支持
+
+**状态**: ❌ 仍存在问题
+
+**原因**:
+`AsyncStateMachineGenerator` 生成的状态机 IL 代码存在问题，导致 "invalid program" 错误。可能的原因：
+- 状态机的 `MoveNext` 方法生成不正确
+- 状态跳转逻辑有问题
+- Builder 初始化或结果获取有问题
 
 **临时解决方法**:
-用户可以将顶层 await 代码包装在 `main()` 函数中：
+用户可以 await `Task.FromResult()` 或其他返回 Task 的 .NET 方法：
 
 ```old8
-// 不支持（顶层 await）
-result <- await asyncFunc()
-
-// 支持（函数内 await）
+// 支持
 func main() -> void {
-    result <- await asyncFunc()
+    task <- Task.FromResult("Hello")
+    result <- await task
+    PrintLine(result)
+}
+
+// 不支持
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+func main() -> void {
+    result <- await simpleAsync()  // 会失败
     PrintLine(result)
 }
 ```
@@ -246,20 +292,31 @@ func main() -> void {
 
 ## 结论
 
-本次工作成功修复了 Old8Lang 编译器异步编程支持的核心问题。**基本的 async/await 功能现已可用**，用户可以在函数内正常使用 await 表达式。
+本次工作成功修复了 Old8Lang 编译器异步编程支持的部分问题。**基本的 await Task 功能现已可用**，用户可以在函数内 await Task 对象。
 
 **关键成果**:
 - ✅ 修复了 3 个严重的 IL 代码生成错误
-- ✅ await 表达式在普通函数和异步函数中正常工作
+- ✅ await Task 表达式在普通函数和异步函数中正常工作
 - ✅ Task 和 Task<object> 类型正确处理
-- ⚠️ 顶层 await 仍需进一步工作
+- ✅ 添加了顶层 await 的友好错误提示
+- ⚠️ await 异步函数仍需进一步工作
+
+**当前可用功能**:
+- ✅ 在函数内 await `Task.FromResult()`
+- ✅ 在函数内 await 其他返回 Task 的 .NET 方法
+- ✅ 异步函数定义和调用（不 await）
+- ✅ 异步函数内部 await Task
+
+**当前限制**:
+- ❌ 顶层 await（已禁止，有友好错误提示）
+- ❌ await 异步函数（状态机生成有问题）
 
 **建议**:
-- 短期内禁止顶层 await，提供清晰的错误消息
-- 中期实现真正的异步状态机（当前是同步等待）
-- 长期支持顶层 await 和异步生成器
+- 短期内，用户可以使用 `Task.FromResult()` 等 .NET Task API
+- 中期需要修复 `AsyncStateMachineGenerator` 的状态机生成逻辑
+- 长期支持完整的 async/await 功能，包括顶层 await
 
 ---
 
-**最后更新**: 2026-01-16 05:15
+**最后更新**: 2026-01-16 05:20
 **维护者**: Claude Code

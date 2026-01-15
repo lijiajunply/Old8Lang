@@ -23,18 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/Async_Fix_Summary.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_await_task_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_func_with_await_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_in_function_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_minimal_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_toplevel_debug_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_toplevel_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_toplevel_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/FAQ.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/FAQ.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_await_func_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_multiple_await_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/async_state_machine_fixed_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Async_Fix_Summary.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Async_Fix_Summary.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/TODO_Compiler.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/TODO_Compiler.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" afterDir="false" />
     </list>
@@ -582,7 +575,7 @@
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
-      <workItem from="1768485078721" duration="15610000" />
+      <workItem from="1768485078721" duration="16098000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="683" />
+    <option name="localTasksCounter" value="684" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现字节码模式下的全局函数执行&#10;&#10;- 在BaseGlobalFunction中添加ExecuteInVMInternal抽象方法和ExecuteInVM公共方法&#10;- 为所有并发相关的全局函数实现ExecuteInVMInternal方法&#10;- 为IO函数、工具函数、集合函数等实现字节码模式执行逻辑&#10;- 修改VirtualMachine类使用全局函数注册表来调用字节码模式函数&#10;- 移除VirtualMachine中硬编码的原生函数调用实现&#10;- 添加字节码模式下的参数验证方法ValidateParameterCountForVM&#10;- 为不支持字节码模式的函数返回null或默认值&#10;- 添加测试文件test_vm_global_functions.old8验证功能" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下C#原生类型扩展方法支持&#10;&#10;- 添加 DictionaryExtensions 类为 C# 字典提供 Old8Lang 风格方法&#10;- 添加 ListExtensions 类为 C# 列表提供 Old8Lang 风格方法&#10;- 修改 VirtualMachine 实现扩展方法查找和调用机制&#10;- 替换原有的反射调用为统一的 InvokeTypeMethod 方法&#10;- 支持字符串、数组、列表、字典等类型的扩展方法调用&#10;- 添加虚拟机类型方法测试文件验证功能正确性" />
     <MESSAGE value="feat(compiler): 添加扩展方法支持和类型方法功能&#10;&#10;- 实现了字符串、数组、列表、字典类型的扩展方法功能&#10;- 在DotOperatorILHelper中添加扩展方法查找和调用机制&#10;- 移除不必要的装箱操作以保持原始类型&#10;- 添加StringExtensions类提供字符串操作方法&#10;- 添加ArrayExtensions类提供数组操作方法&#10;- 支持泛型类型的扩展方法调用&#10;- 更新测试文件验证三种模式下的类型方法调用" />
     <MESSAGE value="feat(compiler): 添加接口和Mixin支持功能&#10;&#10;- 实现接口定义和继承机制，支持多接口实现&#10;- 添加Mixin混入功能，支持多Mixin组合&#10;- 实现类构造函数自动调用机制，优先init后类名方法&#10;- 扩展字节码文件结构，添加接口和Mixin元数据存储&#10;- 更新虚拟机执行逻辑，支持Mixin方法查找和调用&#10;- 新增接口和Mixin的单元测试验证功能正确性&#10;- 优化类实例化过程，确保类定义预编译完成&#10;- 添加接口继承关系和方法签名验证机制" />
@@ -979,7 +971,8 @@
     <MESSAGE value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
     <MESSAGE value="docs(grammar): 更新语法文档以反映 extern 关键字统一变更&#10;&#10;- 将 EBNF 语法定义中的 'native' 替换为 'extern'&#10;- 更新 Old8Lang_Grammar.md 中的关键字列表&#10;- 修改语法示例以使用新的 extern 语法&#10;- 移除已废弃的 'native' 关键字相关定义" />
     <MESSAGE value="docs(async): 添加异步编程支持问题分析和修复进展报告&#10;&#10;- 新增 Async_Issues_Analysis.md 详细分析异步功能实现不完整问题&#10;- 新增 Async_Progress_Report.md 记录异步状态机生成器重构进展&#10;- 重构 AsyncStateMachineGenerator 中 await 表达式识别逻辑&#10;- 引入 AwaitInfo 类替代简单位置列表，记录更详细的 await 信息&#10;- 改进 IdentifyAwaitExpressions 方法支持更多语句类型&#10;- 修复函数调用参数属性名称错误，统一使用 Arguments 属性&#10;- 更新状态机生成逻辑使用新的 await 信息结构&#10;- 移除已废弃的编译模式测试计划文档" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(async): 添加异步编程支持问题分析和修复进展报告&#10;&#10;- 新增 Async_Issues_Analysis.md 详细分析异步功能实现不完整问题&#10;- 新增 Async_Progress_Report.md 记录异步状态机生成器重构进展&#10;- 重构 AsyncStateMachineGenerator 中 await 表达式识别逻辑&#10;- 引入 AwaitInfo 类替代简单位置列表，记录更详细的 await 信息&#10;- 改进 IdentifyAwaitExpressions 方法支持更多语句类型&#10;- 修复函数调用参数属性名称错误，统一使用 Arguments 属性&#10;- 更新状态机生成逻辑使用新的 await 信息结构&#10;- 移除已废弃的编译模式测试计划文档" />
+    <MESSAGE value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新 FAQ 文档修正语言特性和语法说明&#10;- 完善异步编程修复总结报告" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新 FAQ 文档修正语言特性和语法说明&#10;- 完善异步编程修复总结报告" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -216,16 +216,18 @@ public class AsyncStateMachineGenerator
         moveNextIl.Emit(OpCodes.Ldarg_0);
         moveNextIl.Emit(OpCodes.Ldfld, StateField!);
 
-        // 优化：使用更高效的状态跳转逻辑
+        // 状态跳转逻辑
+        // 注意：状态值从 0 开始，Switch 指令基于 0 的索引
+        // 如果状态值 < 0 或 >= stateLabels.Count，会跳转到 Switch 之后的指令
         if (stateLabels.Count > 0)
         {
-            // 优化：使用Switch指令处理多个状态
+            // 使用 Switch 指令处理多个状态
             moveNextIl.Emit(OpCodes.Switch, stateLabels.Values.ToArray());
         }
 
-        // 初始状态（StateNotStarted）
-        moveNextIl.MarkLabel(initialStateLabel);
-        GenerateInitialStateCode(moveNextIl, stateLabels);
+        // Switch 的默认分支（状态值无效时）
+        // 跳转到初始状态
+        moveNextIl.Emit(OpCodes.Br, stateLabels[0]);
 
         // 处理其他状态
         for (int i = 0; i < maxStates; i++)
@@ -264,6 +266,15 @@ public class AsyncStateMachineGenerator
     private void GenerateStateCode(ILGenerator il, int state, Dictionary<int, Label> stateLabels,
         Label stateCompletedLabel)
     {
+        // 状态 0 是初始状态，需要初始化 Builder
+        if (state == 0)
+        {
+            // 初始化异步方法构建器
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("Create")!);
+            il.Emit(OpCodes.Stfld, BuilderField!);
+        }
+
         // 检查是否有更多语句需要处理
         if (state < BlockStatement.Count)
         {

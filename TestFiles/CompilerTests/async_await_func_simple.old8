@@ -1,0 +1,13 @@
+// 最简单的测试 - 只 await 一个异步函数
+async func simpleAsync() -> string {
+    return "Hello"
+}
+
+func main() -> void {
+    PrintLine("Before await")
+    result <- await simpleAsync()
+    PrintLine("After await")
+    PrintLine(result)
+}
+
+main()

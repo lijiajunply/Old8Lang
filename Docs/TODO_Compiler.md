@@ -1,6 +1,8 @@
 # 编译器模式完成 TODO
 
-**当前完成度**: 90.8% (99/109 功能完全支持)
+**当前完成度**: 91.7% (100/109 功能完全支持)
+
+**最后更新**: 2026-01-16
 
 ---
 
@@ -8,9 +10,14 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 完全支持 | 99 | 已完整实现并测试通过 |
-| ⚠️ 部分支持 | 4 | 功能基本可用但有限制 |
+| ✅ 完全支持 | 100 | 已完整实现并测试通过 |
+| ⚠️ 部分支持 | 3 | 功能基本可用但有限制 |
 | ❌ 不支持 | 6 | 功能未实现 |
+
+**最近更新** (2026-01-16):
+- ✅ 修复了 await Task 的 IL 生成错误
+- ✅ 添加了顶层 await 的友好错误提示
+- ⚠️ await 异步函数仍需进一步修复
 
 ---
 
@@ -18,32 +25,62 @@
 
 ### 1. 完善异步编程支持
 
-**当前状态**: ⚠️ 部分支持
+**当前状态**: ⚠️ 部分支持（2026-01-16 更新）
 
 **涉及功能**:
 - async/await 基础 (第 1989 行)
 - 异步生成器 (第 2006 行)
 - Task API (第 2031 行)
 
-**问题描述**:
-- 编译器对异步功能的支持不完整
-- 某些异步特性在编译模式下可能无法正常工作
+**已完成的工作** (2026-01-16):
+1. ✅ 修复了 `AwaitExpression` 的 Task 类型 IL 生成错误
+2. ✅ 修复了 `AwaitExpression` 的 Task<object> 类型结构体调用
+3. ✅ 修复了 `AsyncFuncInit` 的栈不平衡问题
+4. ✅ 添加了顶层 await 的友好错误提示
+5. ✅ 改进了 `AsyncStateMachineGenerator` 的状态跳转逻辑
 
-**实施步骤**:
-1. 分析当前编译器的异步支持情况
-2. 识别缺失或不完整的异步功能
-3. 完善 `AsyncStateMachineGenerator.cs` 的实现
-4. 添加完整的异步测试用例
-5. 更新文档标记为 `[✅ | ✅ | ❌]`
+**当前可用功能**:
+- ✅ 在函数内 await Task（如 `Task.FromResult()`）
+- ✅ 异步函数定义和调用（不 await）
+- ✅ 异步函数内部 await Task
+- ✅ Task 和 Task<object> 类型正确处理
+
+**当前限制**:
+- ❌ 顶层 await（已禁止，有友好错误提示）
+- ❌ await 异步函数（状态机生成有问题，返回 "invalid program"）
+- ❌ 异步生成器（未实现）
+- ⚠️ 当前使用同步等待（`GetResult()`），非真正的异步
+
+**剩余工作**:
+1. 修复 await 异步函数的状态机生成问题
+2. 实现真正的异步状态机（使用 `AwaitUnsafeOnCompleted`）
+3. 实现异步生成器支持
+4. 支持顶层 await（长期目标）
+
+**相关文档**:
+- `Docs/Async_Fix_Summary.md` - 详细的修复总结
+- `Docs/Async_Progress_Report.md` - 进展报告
+- `Docs/Async_Issues_Analysis.md` - 问题分析
 
 **相关文件**:
-- `Old8Lang/Compiler/AsyncStateMachineGenerator.cs`
+- `Old8Lang/Generators/AsyncStateMachineGenerator.cs`
 - `Old8Lang/AST/Statement/AsyncFuncInit.cs`
-- `Old8Lang/Visitor/CompilerVisitor.cs`
+- `Old8Lang/AST/Expression/AwaitExpression.cs`
+- `Old8Lang/Compiler/Compiler.cs`
 
 **测试文件**:
 - `CompilerTests/async_*.old8`
 - `Old8Lang.Tests/Compiler/AsyncTests.cs`
+
+**临时解决方法**:
+用户可以使用 `Task.FromResult()` 等 .NET Task API：
+```old8
+func main() -> void {
+    task <- Task.FromResult("Hello")
+    result <- await task
+    PrintLine(result)
+}
+```
 
 ---
 
@@ -220,10 +257,21 @@
 
 ## 🎯 完成标准
 
-### 阶段一完成标准
-- ✅ 所有异步测试通过（解释器和编译器模式）
-- ✅ 异步功能文档标记更新为 `[✅ | ✅ | ❌]`
-- ✅ 编译器完成度提升至 94%+
+### 阶段一完成标准（异步编程支持）
+- ⚠️ 部分异步测试通过（基本 await Task 功能可用）
+- ⚠️ 异步功能文档标记部分更新（await Task: ✅，await 异步函数: ❌）
+- ⚠️ 编译器完成度约 91%（基本功能可用但有限制）
+
+**当前状态** (2026-01-16):
+- ✅ await Task 功能正常工作
+- ❌ await 异步函数仍有问题
+- ❌ 异步生成器未实现
+- ⚠️ 使用同步等待，非真正的异步
+
+**完全完成需要**:
+- 修复 await 异步函数的状态机生成
+- 实现真正的异步状态机
+- 实现异步生成器支持
 
 ### 阶段二完成标准
 - ✅ 泛型函数和泛型类测试通过
