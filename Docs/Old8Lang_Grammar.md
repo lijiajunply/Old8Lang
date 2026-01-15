@@ -884,7 +884,7 @@ using ch {
 
 #### 5.4.7 select 语句（Channel 多路选择）
 
-**模式支持**: `[✅ | ❌ | ❌]`
+**模式支持**: `[✅ | ✅ | ✅]`
 
 select 语句实现 Go 风格的 Channel 多路选择：
 
@@ -918,10 +918,7 @@ select {
 - 如果没有 case 可用且存在 default 分支，立即执行 default
 - 如果没有 case 可用且没有 default，阻塞直到某个 case 变为可用
 - 接收操作使用 `from` 关键字，清晰区分发送和接收，避免语法歧义
-
-**限制**：
-- 编译模式（`-c`）不支持，会抛出 NotImplementedException
-- 需使用解释模式（`-f`）运行包含 select 语句的代码
+- 所有三种模式均完全支持（解释器、编译器、虚拟机）
 
 #### 5.4.8 defer 语句（延迟执行）
 
