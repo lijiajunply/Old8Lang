@@ -22,14 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/debug_vm_test.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_module_loading.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Modules/VMImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Modules/VMImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/PathResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/PathResolver.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -574,7 +567,7 @@
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
-      <workItem from="1768485078721" duration="1880000" />
+      <workItem from="1768485078721" duration="3324000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -919,7 +912,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="671" />
+    <option name="localTasksCounter" value="672" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,7 +939,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(ast): 修复 AST 访问器异常处理和清理未使用代码&#10;&#10;- 为字节码访问器中的成员访问和赋值操作添加明确的不支持异常&#10;- 为 LINQ 查询子句节点添加正确的操作不可用异常提示&#10;- 移除类型推断访问器中未使用的声明语句访问方法&#10;- 修复线程值类型的重试方法不支持异常信息&#10;- 清理 IDE 工作区配置文件中的多余变更记录" />
     <MESSAGE value="feat(vm): 实现虚拟机 extern 语句支持&#10;&#10;- 在 BytecodeVisitor 中实现 ExternStatement 的字节码生成逻辑&#10;- 添加 LoadExtern 和 CallExtern 新操作码支持 extern 函数调用&#10;- 创建 ExternFunctionWrapper 类封装原生 DLL 函数调用逻辑&#10;- 实现参数类型转换和函数签名解析功能&#10;- 支持多种调用约定包括 Cdecl、StdCall 和 WinApi&#10;- 添加 extern 函数的缓存机制提升重复调用性能&#10;- 更新虚拟机文档记录 extern 支持的实现详情&#10;- 新增虚拟机 extern 功能测试用例" />
     <MESSAGE value="refactor(extern): 重构外部函数委托创建机制&#10;&#10;- 移除原有的泛型 Func/Action 委托创建方式&#10;- 改为使用动态程序集创建自定义委托类型&#10;- 添加 UnmanagedFunctionPointer 特性支持调用约定&#10;- 实现动态构建委托类型的构造函数和 Invoke 方法&#10;- 删除已废弃的 JITCompiler 类文件&#10;- 添加 extern 函数实际调用测试文件&#10;- 修改虚拟机在调用函数时优先检查 extern 函数&#10;- 实现 extern 函数的直接调用机制" />
     <MESSAGE value="feat(bytecode): 实现 LINQ 表达式的字节码生成和执行&#10;&#10;- 移除旧的配置文件读写相关方法，简化 Apis.cs 中的静态方法&#10;- 在 BytecodeVisitor 中添加完整的 LINQ 查询表达式处理逻辑&#10;- 创建新的 BytecodeVisitor.Linq.cs 文件实现 LINQ 相关辅助方法&#10;- 添加虚拟机中 LINQ 功能的基础测试用例&#10;- 优化虚拟机中的全局变量获取方法，提升性能&#10;- 更新语言版本号为 1.0.0 rc6&#10;- 删除废弃的配置文件 LangInfo.json" />
@@ -971,7 +963,8 @@
     <MESSAGE value="feat(io): 添加对LangValueType类型的显示支持&#10;&#10;- 在IOFunctions中添加LangValueType到显示字符串的转换逻辑&#10;- 在PrintLineFunction中添加LangValueType到显示字符串的转换逻辑&#10;- 实现了null值的安全处理&#10;- 保持了原有的字符串和其他类型值的处理逻辑" />
     <MESSAGE value="feat(vm): 实现虚拟机继承链查找和字段初始化支持&#10;&#10;- 沿着继承链查找构造函数，优先查找init方法，其次查找与类名相同的方法&#10;- 在NewObject指令中初始化所有父类字段，避免重复初始化同名字段&#10;- 沿着继承链查找方法实现，支持父类方法调用&#10;- 添加super.field赋值语句解析支持&#10;- 更新测试文件和调试脚本以验证继承功能正确性" />
     <MESSAGE value="feat(vm): 实现Spawn函数的预处理和编译支持&#10;&#10;- 添加预处理阶段注册所有函数定义的功能&#10;- 实现Spawn函数的第一个参数作为函数引用时转换为函数索引&#10;- 避免函数在预处理阶段已被编译过的重复编译问题&#10;- 更新测试用例移除main函数声明并添加Start方法调用&#10;- 将Spawn和spawn都识别为线程相关内置函数" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现Spawn函数的预处理和编译支持&#10;&#10;- 添加预处理阶段注册所有函数定义的功能&#10;- 实现Spawn函数的第一个参数作为函数引用时转换为函数索引&#10;- 避免函数在预处理阶段已被编译过的重复编译问题&#10;- 更新测试用例移除main函数声明并添加Start方法调用&#10;- 将Spawn和spawn都识别为线程相关内置函数" />
+    <MESSAGE value="feat(vm): 实现模块系统中的跨模块函数和类查找及实例化功能&#10;&#10;- 在虚拟机中扩展函数查找逻辑，支持从全局变量和已加载模块中查找导入的函数&#10;- 实现类的跨模块查找功能，支持从全局变量和已加载模块中查找导入的类&#10;- 添加模块加载时的传递性依赖注册机制，确保依赖模块正确加载&#10;- 实现CreateObjectInstance方法支持从模块导入的类进行实例化&#10;- 更新路径解析器支持传入目录路径作为基础路径&#10;- 重构测试代码添加异常处理和错误输出捕获机制&#10;- 更新构造函数命名约定从constructor改为init方法&#10;- 修复模块系统中的符号查找和实例化相关问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现模块系统中的跨模块函数和类查找及实例化功能&#10;&#10;- 在虚拟机中扩展函数查找逻辑，支持从全局变量和已加载模块中查找导入的函数&#10;- 实现类的跨模块查找功能，支持从全局变量和已加载模块中查找导入的类&#10;- 添加模块加载时的传递性依赖注册机制，确保依赖模块正确加载&#10;- 实现CreateObjectInstance方法支持从模块导入的类进行实例化&#10;- 更新路径解析器支持传入目录路径作为基础路径&#10;- 重构测试代码添加异常处理和错误输出捕获机制&#10;- 更新构造函数命名约定从constructor改为init方法&#10;- 修复模块系统中的符号查找和实例化相关问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
