@@ -444,15 +444,22 @@ public class VirtualMachine
         {
             case OpCode.Await:
             {
-                // 从栈中弹出 Task ID
-                var taskIdObj = _stack.Pop();
-                if (taskIdObj is not int taskId)
+                // 从栈中弹出 TaskLangValue (或 Task ID)
+                var value = _stack.Pop();
+                
+                TaskLangValue taskLangValue;
+                if (value is TaskLangValue t)
                 {
-                    throw new Exception($"Await 指令期望 Task ID (int)，但得到 {taskIdObj?.GetType().Name ?? "null"}");
+                    taskLangValue = t;
                 }
-
-                // 获取 Task
-                var taskLangValue = GetTask(taskId);
+                else if (value is int taskId)
+                {
+                    taskLangValue = GetTask(taskId);
+                }
+                else
+                {
+                    throw new Exception($"Await 指令期望 TaskLangValue 或 Task ID (int)，但得到 {value?.GetType().Name ?? "null"}");
+                }
 
                 // 异步等待 Task 完成
                 var result = await taskLangValue.AwaitAsync(cancellationToken);
@@ -1007,63 +1014,7 @@ public class VirtualMachine
             }
                 break;
 
-            case OpCode.CallAsync:
-            {
-                var operands = (object[])instruction.Operand!;
-                int argCount = (int)operands[0];
-                string funcName = (string)(operands.Length == 2 ? operands[1] : operands[2]);
 
-                // 从栈中弹出参数
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
-                {
-                    args[i] = _stack.Pop();
-                }
-
-                // 查找异步函数
-                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName && f.IsAsync);
-                if (function == null)
-                {
-                    throw new Exception($"未定义的异步函数: {funcName}");
-                }
-
-                // 创建 Task 并异步执行
-                var task = Task.Run(() =>
-                {
-                    var asyncVm = new VirtualMachine(_bytecodeFile);
-                    asyncVm.CallFunction(function, args);
-                    return asyncVm._stack.Count > 0 ? asyncVm._stack.Pop() : null;
-                });
-
-                var taskLangValue = new TaskLangValue(
-                    task.ContinueWith(t => ConvertToLangValue(t.Result)),
-                    CancellationToken.None
-                );
-
-                int taskId = RegisterTask(taskLangValue);
-                _stack.Push(taskId);
-            }
-                break;
-
-            case OpCode.Await:
-            {
-                // 从栈中弹出 Task ID
-                var taskIdObj = _stack.Pop();
-                if (taskIdObj is not int taskId)
-                {
-                    throw new Exception($"Await 指令期望 Task ID (int)，但得到 {taskIdObj?.GetType().Name ?? "null"}");
-                }
-
-                // 获取 Task
-                var taskLangValue = GetTask(taskId);
-
-                // 同步等待 Task 完成
-                var result = taskLangValue.Await();
-
-                // 将结果压入栈
-                _stack.Push(result);
-            }
-                break;
 
             case OpCode.CallNative:
             {
@@ -1956,8 +1907,8 @@ public class VirtualMachine
             // === Thread 支持 ===
             case OpCode.ThreadCreate:
             {
-                // 栈顶: arg1, arg2, ..., argN, argCount, funcIndex
-                var funcIndex = Convert.ToInt32(_stack.Pop());
+                // 栈顶: func (int/string/Metadata), argCount (int)
+                var funcObj = _stack.Pop();
                 var argCount = Convert.ToInt32(_stack.Pop());
 
                 // 弹出参数
@@ -1967,14 +1918,33 @@ public class VirtualMachine
                     args[i] = _stack.Pop();
                 }
 
-                // 获取函数元数据
-                var function = _bytecodeFile.Functions[funcIndex];
+                FunctionMetadata function;
+                if (funcObj is int funcIndex)
+                {
+                    function = _bytecodeFile.Functions[funcIndex];
+                }
+                else if (funcObj is string funcName)
+                {
+                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName) 
+                        ?? throw new Exception($"Function not found: {funcName}");
+                }
+                else if (funcObj is FunctionMetadata funcMeta)
+                {
+                    function = funcMeta;
+                }
+                else 
+                {
+                     throw new Exception($"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
+                }
 
                 // 创建线程
                 var threadId = Concurrency.ResourceManager.CreateThread(() =>
                 {
-                    // 在新线程中执行函数
-                    CallFunction(function, args);
+                    // Create new VM instance
+                    var threadVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
+                    foreach (var kvp in _globals) threadVm._globals[kvp.Key] = kvp.Value;
+                    
+                    threadVm.CallFunction(function, args);
                 });
 
                 _stack.Push(threadId);
@@ -2012,16 +1982,176 @@ public class VirtualMachine
                 break;
 
             // === 异步支持 ===
+            case OpCode.NewTask:
+            {
+                // 栈顶: func, argCount
+                var funcObj = _stack.Pop();
+                var argCount = Convert.ToInt32(_stack.Pop());
+
+                // 弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                FunctionMetadata function;
+                if (funcObj is int funcIndex)
+                {
+                    function = _bytecodeFile.Functions[funcIndex];
+                }
+                else if (funcObj is string funcName)
+                {
+                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName) 
+                        ?? throw new Exception($"Function not found: {funcName}");
+                }
+                else if (funcObj is FunctionMetadata funcMeta)
+                {
+                    function = funcMeta;
+                }
+                else 
+                {
+                     throw new Exception($"Invalid function for NewTask: {funcObj?.GetType().Name}");
+                }
+
+                // 创建并启动任务
+                var task = Task.Run<LangValueType>(() =>
+                {
+                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
+                    foreach (var kvp in _globals) asyncVm._globals[kvp.Key] = kvp.Value;
+                    var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
+                    return ConvertToLangValue(result);
+                });
+
+                _stack.Push(new TaskLangValue(task));
+            }
+                break;
+
+            case OpCode.CallAsync:
+            {
+                // 栈布局: [arg1, arg2, ..., argCount, funcName]
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)operands[1];
+
+                // 弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 查找函数
+                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                if (function == null)
+                {
+                    throw new Exception($"未定义的异步函数: {funcName}");
+                }
+
+                // 创建并启动任务
+                var task = Task.Run<LangValueType>(() =>
+                {
+                    // 在新线程中执行函数
+                    // 这里我们创建一个新的 VirtualMachine 实例来执行异步任务
+                    // 共享全局变量和常量池
+                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
+                    // 复制全局变量
+                    foreach (var kvp in _globals)
+                    {
+                        asyncVm._globals[kvp.Key] = kvp.Value;
+                    }
+                    
+                    // 执行函数
+                    var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
+                    return ConvertToLangValue(result);
+                });
+
+                // 将 Task 包装并压入栈
+                _stack.Push(new TaskLangValue(task));
+            }
+                break;
+
+            case OpCode.Await:
+            {
+                // 栈顶: TaskLangValue
+                var value = _stack.Pop();
+                if (value is TaskLangValue taskValue)
+                {
+                    // 阻塞等待任务完成
+                    var result = taskValue.Await();
+                    _stack.Push(result);
+                }
+                else if (value is Task task)
+                {
+                     // 直接是 Task 对象
+                     task.GetAwaiter().GetResult();
+                     // 如果是 Task<T>，获取结果
+                     var resultProperty = task.GetType().GetProperty("Result");
+                     if (resultProperty != null)
+                     {
+                         _stack.Push(resultProperty.GetValue(task));
+                     }
+                     else
+                     {
+                         _stack.Push(null);
+                     }
+                }
+                else
+                {
+                    throw new Exception($"await 只能用于 Task 类型，实际类型为 {value?.GetType().Name ?? "null"}");
+                }
+            }
+                break;
+
+            case OpCode.NewAsyncGenerator:
+                 // TODO: Implement async generator creation
+                 throw new NotImplementedException("OpCode.NewAsyncGenerator not implemented");
+
+            case OpCode.CallAsyncGenerator:
+                 // TODO: Implement async generator call
+                 throw new NotImplementedException("OpCode.CallAsyncGenerator not implemented");
 
 
+
+            case OpCode.AwaitYield:
             case OpCode.Yield:
             {
                 // Yield操作：生成器返回一个值并暂停执行
                 // 1. 从栈中弹出要yield的值
                 var yieldValue = _stack.Pop();
 
-                // 2. 获取当前生成器状态（从frame的GeneratorId）
-                if (frame.GeneratorId.HasValue)
+                // 2. 检查是否是异步生成器
+                if (frame.AsyncGeneratorId.HasValue)
+                {
+                    var generatorId = frame.AsyncGeneratorId.Value;
+                    if (_asyncGenerators.TryGetValue(generatorId, out var generatorState))
+                    {
+                        // 保存状态
+                        var stackArray = _stack.ToArray();
+                        var stackCopy = new Stack<LangValueType>();
+                        foreach (var item in stackArray.Reverse())
+                        {
+                            if (item is LangValueType langValue)
+                                stackCopy.Push(langValue);
+                        }
+
+                        generatorState.SaveState(
+                            frame.IP, 
+                            frame.Locals,
+                            stackCopy
+                        );
+
+                        generatorState.CurrentValue = yieldValue as LangValueType ?? new VoidLangValue();
+
+                        // 将值压回栈顶
+                        _stack.Push(yieldValue);
+
+                        // 暂停执行
+                        frame.IP = frame.Function.Instructions.Count;
+                    }
+                }
+                // 3. 检查是否是普通生成器
+                else if (frame.GeneratorId.HasValue)
                 {
                     var generatorId = frame.GeneratorId.Value;
                     if (_generators.TryGetValue(generatorId, out var generatorState))
@@ -2054,45 +2184,7 @@ public class VirtualMachine
             }
                 break;
 
-            case OpCode.NewTask:
-            {
-                // NewTask操作：创建一个新的异步任务
-                // 栈布局：[函数索引, 参数数量, arg1, arg2, ...]
 
-                var operands = (object[])instruction.Operand!;
-                int argCount = (int)operands[0];
-                string funcName = (string)operands[1];
-
-                // 从栈中弹出参数
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
-                {
-                    args[i] = _stack.Pop();
-                }
-
-                // 查找函数
-                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                if (function == null)
-                {
-                    throw new Exception($"未定义的函数: {funcName}");
-                }
-
-                // 创建异步任务
-                var task = Task.Run(() =>
-                {
-                    // 在新线程中执行函数
-                    CallFunction(function, args);
-
-                    // 返回栈顶的值作为结果
-                    var result = _stack.Count > 0 ? _stack.Pop() : null;
-                    return result != null ? LangValueType.ObjToValue(result) : new NullLangValue();
-                });
-
-                // 将Task包装为TaskLangValue并压入栈
-                var taskValue = new TaskLangValue(task);
-                _stack.Push(taskValue);
-            }
-                break;
 
             // === 异常处理 ===
             case OpCode.Throw:
@@ -4273,6 +4365,15 @@ public class VirtualMachine
         }
 
         return obj;
+    }
+
+    /// <summary>
+    /// 执行函数并获取结果（用于异步调用）
+    /// </summary>
+    public object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args)
+    {
+        CallFunction(function, args);
+        return _stack.Count > 0 ? _stack.Pop() : null;
     }
 }
 

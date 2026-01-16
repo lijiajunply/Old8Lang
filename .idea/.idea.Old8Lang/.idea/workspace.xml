@@ -23,32 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/重构元组为扁平化结构并适配 C# ValueTuple 设计.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/Compiler/TupleTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build_log.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build_log_2.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Integration/InterpreterIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Integration/InterpreterIntegrationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/CollectionTypeValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/CollectionTypeValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -596,7 +573,7 @@
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
       <workItem from="1768485078721" duration="21629000" />
-      <workItem from="1768543641677" duration="9453000" />
+      <workItem from="1768543641677" duration="10318000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -941,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="691" />
+    <option name="localTasksCounter" value="693" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -968,8 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并完善模式支持说明&#10;&#10;- 更新 Mode_Support_Summary.md 文档中的最后更新日期&#10;- 修正 using 语句在虚拟机模式下的支持状态标记&#10;- 修正 import 语句、命名导入、别名导入在虚拟机模式下的支持状态标记&#10;- 更新虚拟机模式特性描述，添加模块系统和资源管理支持说明&#10;- 更新 Old8Lang_Grammar.md 中 using 语句和导入语句的模式支持标记&#10;- 更新文档中的最后更新日期为 2026年1月15日&#10;- 添加最近完成的功能列表，包括模块导入系统、using 语句和多线程支持" />
-    <MESSAGE value="feat(tests): 实现虚拟机外部函数调用的跨平台测试&#10;&#10;- 移除跳过属性使外部C函数测试能够运行&#10;- 添加跨平台库名检测支持Windows、macOS和Linux&#10;- 更新测试代码使用动态库名替换硬编码值&#10;- 修改多参数函数测试为跨平台进程ID获取测试&#10;- 添加正则表达式验证输出中的数字格式&#10;- 实现条件编译适配不同操作系统的函数调用" />
     <MESSAGE value="feat(io): 添加对LangValueType类型的显示支持&#10;&#10;- 在IOFunctions中添加LangValueType到显示字符串的转换逻辑&#10;- 在PrintLineFunction中添加LangValueType到显示字符串的转换逻辑&#10;- 实现了null值的安全处理&#10;- 保持了原有的字符串和其他类型值的处理逻辑" />
     <MESSAGE value="feat(vm): 实现虚拟机继承链查找和字段初始化支持&#10;&#10;- 沿着继承链查找构造函数，优先查找init方法，其次查找与类名相同的方法&#10;- 在NewObject指令中初始化所有父类字段，避免重复初始化同名字段&#10;- 沿着继承链查找方法实现，支持父类方法调用&#10;- 添加super.field赋值语句解析支持&#10;- 更新测试文件和调试脚本以验证继承功能正确性" />
     <MESSAGE value="feat(vm): 实现Spawn函数的预处理和编译支持&#10;&#10;- 添加预处理阶段注册所有函数定义的功能&#10;- 实现Spawn函数的第一个参数作为函数引用时转换为函数索引&#10;- 避免函数在预处理阶段已被编译过的重复编译问题&#10;- 更新测试用例移除main函数声明并添加Start方法调用&#10;- 将Spawn和spawn都识别为线程相关内置函数" />
@@ -993,7 +968,9 @@
     <MESSAGE value="feat(vm): 实现异常过滤器和元组解构赋值功能&#10;&#10;- 修改 TryStatement AST 支持异常过滤器表达式&#10;- 更新 Parser 解析 catch 块中的 where 子句&#10;- 实现虚拟机中的异常过滤器检查和分发逻辑&#10;- 添加 VmException 包装类用于传递 Old8Lang 异常对象&#10;- 实现元组解构赋值的字节码生成和执行逻辑&#10;- 重构异常类型匹配逻辑以支持自定义对象实例&#10;- 更新 IsType 指令直接接收类型注解参数&#10;- 修改文档中的功能完成状态追踪" />
     <MESSAGE value="feat(vm): 实现虚拟机中的高级类型系统&#10;&#10;- 添加对泛型集合类型(list&lt;T&gt;, dict&lt;K,V&gt;)的完整支持&#10;- 实现交叉类型(T: IInterface1 &amp; IInterface2)的运行时验证&#10;- 完善联合类型(int | string)的类型匹配逻辑&#10;- 支持可空类型的字节码表示和运行时检查&#10;- 优化类型转换操作符的实现以处理复杂类型场景&#10;- 添加详细的类型系统测试用例覆盖各种边界情况" />
     <MESSAGE value="docs(cli): 更新CLI指南文档并重构语言特性文档&#10;&#10;- 将原有的CLI命令指南从 CLI_COMMANDS_GUIDE.md 移至 CLI_GUIDE.md&#10;- 在新的CLI指南中增加基础运行命令说明&#10;- 添加包管理CLI命令的完整说明和使用示例&#10;- 重构语言特性文档LANGUAGE_FEATURES.md的目录结构&#10;- 更新语言特性文档内容，新增高级控制流、并发模型等章节&#10;- 删除过时的模式匹配详细示例内容&#10;- 更新文档间的引用关系和相关文档链接" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(cli): 更新CLI指南文档并重构语言特性文档&#10;&#10;- 将原有的CLI命令指南从 CLI_COMMANDS_GUIDE.md 移至 CLI_GUIDE.md&#10;- 在新的CLI指南中增加基础运行命令说明&#10;- 添加包管理CLI命令的完整说明和使用示例&#10;- 重构语言特性文档LANGUAGE_FEATURES.md的目录结构&#10;- 更新语言特性文档内容，新增高级控制流、并发模型等章节&#10;- 删除过时的模式匹配详细示例内容&#10;- 更新文档间的引用关系和相关文档链接" />
+    <MESSAGE value="refactor(ast): 重构元组处理逻辑以支持多元素元组&#10;&#10;- 将硬编码的二元组访问改为使用 GetItems() 方法&#10;- 更新字节码生成器以处理多元素元组&#10;- 修改元组值访问方式，使用 Elements 属性替代 V1/V2&#10;- 优化字典类型验证中的元组元素访问&#10;- 更新 IL 生成逻辑以支持 ValueTuple 类型扩展&#10;- 添加 ITuple 接口扩展方法实现元组操作功能&#10;- 统一元组构造函数使用列表参数方式&#10;- 移除过时的元组转换辅助方法" />
+    <MESSAGE value="refactor(import): 移除未使用的导入语句以优化代码结构&#10;&#10;- 从 Apis.cs 中移除了未使用的 System.Text.Json 导入&#10;- 从 ArrayExtensions.cs 中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Visitor 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从 BytecodeVisitor 相关文件中移除了多个未使用的导入&#10;- 从 OperationHelpers 文件中移除了未使用的系统导入&#10;- 从 Profiler 和 Parser 文件中移除了未使用的导入&#10;- 从各种表达式和语句类中移除了未使用的导入声明" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(import): 移除未使用的导入语句以优化代码结构&#10;&#10;- 从 Apis.cs 中移除了未使用的 System.Text.Json 导入&#10;- 从 ArrayExtensions.cs 中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Visitor 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从 BytecodeVisitor 相关文件中移除了多个未使用的导入&#10;- 从 OperationHelpers 文件中移除了未使用的系统导入&#10;- 从 Profiler 和 Parser 文件中移除了未使用的导入&#10;- 从各种表达式和语句类中移除了未使用的导入声明" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

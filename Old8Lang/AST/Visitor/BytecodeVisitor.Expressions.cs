@@ -350,6 +350,97 @@ public partial class BytecodeVisitor
             }
             else
             {
+                // 特殊处理 TaskRun 函数
+                if (funcName == "TaskRun" && namedCount == 0)
+                {
+                    if (node.Arguments.Count < 1)
+                    {
+                        throw new Exception("TaskRun requires at least 1 argument");
+                    }
+
+                    var funcExpr = node.Arguments[0];
+                    var taskArgs = node.Arguments.Skip(1).ToList();
+
+                    // 1. Visit args
+                    foreach (var arg in taskArgs)
+                    {
+                        arg.Accept(this);
+                    }
+
+                    // 2. Push arg count
+                    Emit(OpCode.LoadConst, taskArgs.Count);
+
+                    // 3. Push function
+                    if (funcExpr is LangId id)
+                    {
+                        int funcIdx = _compiler.GetFunctionIndex(id.IdName);
+                        if (funcIdx != -1)
+                        {
+                            Emit(OpCode.LoadConst, funcIdx);
+                        }
+                        else
+                        {
+                            Emit(OpCode.LoadConst, id.IdName);
+                        }
+                    }
+                    else
+                    {
+                        funcExpr.Accept(this);
+                    }
+
+                    // 4. Emit NewTask
+                    Emit(OpCode.NewTask);
+                    return null;
+                }
+
+                // 特殊处理 spawn 函数 (创建线程)
+                if (funcName == "spawn" && namedCount == 0)
+                {
+                    if (node.Arguments.Count < 1)
+                    {
+                        throw new Exception("spawn requires at least 1 argument");
+                    }
+
+                    var funcExpr = node.Arguments[0];
+                    // 线程参数是 spawn 的后续参数
+                    var threadArgs = node.Arguments.Skip(1).ToList();
+
+                    // 1. 生成线程参数代码 (压入栈)
+                    foreach (var arg in threadArgs)
+                    {
+                        arg.Accept(this);
+                    }
+
+                    // 2. 压入参数数量
+                    Emit(OpCode.LoadConst, threadArgs.Count);
+
+                    // 3. 压入函数引用
+                    if (funcExpr is LangId id)
+                    {
+                        // 尝试在编译时查找函数索引
+                        int funcIdx = _compiler.GetFunctionIndex(id.IdName);
+                        if (funcIdx != -1)
+                        {
+                            Emit(OpCode.LoadConst, funcIdx);
+                        }
+                        else
+                        {
+                            // 编译时找不到，可能是变量或后定义的函数
+                            // 传递函数名字符串，运行时查找
+                            Emit(OpCode.LoadConst, id.IdName);
+                        }
+                    }
+                    else
+                    {
+                        // 表达式求值 (如 lambda)
+                        funcExpr.Accept(this);
+                    }
+
+                    // 4. 发射创建线程指令
+                    Emit(OpCode.ThreadCreate);
+                    return null;
+                }
+
                 // 3. 普通静态/原生函数调用
                 // 生成位置参数代码
                 foreach (var arg in node.Arguments)
@@ -368,9 +459,17 @@ public partial class BytecodeVisitor
 
                 // 检查是否是原生函数
                 bool isNative = _compiler.IsNativeFunction(funcName);
+                
+                // 检查是否是异步函数
+                bool isAsync = _compiler.IsAsyncFunction(funcName);
 
                 if (namedCount > 0)
                 {
+                    if (isAsync)
+                    {
+                        throw new Exception("异步函数暂不支持命名参数调用");
+                    }
+
                     // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
                     var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
                     Emit(isNative ? OpCode.CallNative : OpCode.Call,
@@ -379,8 +478,15 @@ public partial class BytecodeVisitor
                 else
                 {
                     // 无命名参数: [argCount, funcName]
-                    Emit(isNative ? OpCode.CallNative : OpCode.Call,
-                        new object[] { positionalCount, funcName });
+                    if (isAsync)
+                    {
+                        Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                    }
+                    else
+                    {
+                        Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                            new object[] { positionalCount, funcName });
+                    }
                 }
             }
         }

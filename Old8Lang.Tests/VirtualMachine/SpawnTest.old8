@@ -1,0 +1,25 @@
+// 测试多线程 spawn
+
+func thread_func(name: string) {
+    PrintLine("Hello from thread: " + name)
+}
+
+func main() {
+    PrintLine("Main start")
+    
+    // Test 1: spawn with named function
+    t1 <- spawn(thread_func, "T1")
+    PrintLine("Thread T1 spawned")
+    
+    // Test 2: spawn with lambda
+    t2 <- spawn(() -> {
+        PrintLine("Hello from lambda thread")
+    })
+    PrintLine("Thread T2 spawned")
+    
+    // Wait for threads
+    ThreadJoin(t1)
+    ThreadJoin(t2)
+    
+    PrintLine("Main done")
+}

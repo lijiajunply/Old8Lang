@@ -1,0 +1,19 @@
+// 异步函数测试
+
+async func async_add(a: int, b: int) -> int {
+    return a + b
+}
+
+func main() {
+    PrintLine("Start")
+    
+    // 调用异步函数
+    task <- async_add(10, 20)
+    
+    PrintLine("Task created")
+    
+    // 等待结果
+    result <- await task
+    
+    PrintLine("Result: " + result.ToStr())
+}
