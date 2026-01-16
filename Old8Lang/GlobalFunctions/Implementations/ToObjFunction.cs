@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using System.Text.Json;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression;
@@ -40,9 +41,59 @@ public sealed class ToObjFunction : BaseGlobalFunction
     {
         return typeof(AnyLangValue);
     }
+    
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        // VM 模式下不支持 ToObj,返回 null
-        return null;
+        if (arguments.Length < 1 || arguments[0] is not string jsonStr)
+            return null;
+
+        try
+        {
+            var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr);
+            if (jsonObject == null) return null;
+
+            var result = new Dictionary<string, object?>();
+            foreach (var kvp in jsonObject)
+            {
+                if (kvp.Value is JsonElement element)
+                {
+                    result[kvp.Key] = ConvertJsonElement(element);
+                }
+                else
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
+            return result;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private object? ConvertJsonElement(JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.TryGetInt32(out var i) ? i : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null => null,
+            JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonElement).ToList(),
+            JsonValueKind.Object => ConvertJsonObject(element),
+            _ => null
+        };
+    }
+
+    private Dictionary<string, object?> ConvertJsonObject(JsonElement element)
+    {
+        var dict = new Dictionary<string, object?>();
+        foreach (var property in element.EnumerateObject())
+        {
+            dict[property.Name] = ConvertJsonElement(property.Value);
+        }
+        return dict;
     }
 }
