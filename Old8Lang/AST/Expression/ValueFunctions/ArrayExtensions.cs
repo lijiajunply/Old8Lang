@@ -36,6 +36,6 @@ public static class ArrayExtensions
     /// </summary>
     public static List<object?> ToList(this object?[] array)
     {
-        return array.ToList();
+        return Enumerable.ToList(array);
     }
 }

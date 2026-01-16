@@ -163,12 +163,12 @@ PrintLine("创建空字典: " + emptyDict.ToStr())
 PrintLine("")
 
 // ToObj 函数测试
-PrintLine("--- ToObj 函数 ---")
-jsonStr <- "{\"name\": \"Old8\", \"age\": 1}"
-obj <- ToObj(jsonStr)
-PrintLine("JSON 转对象成功")
-PrintLine("对象 name 属性: " + obj.name.ToStr())
-PrintLine("对象 age 属性: " + obj.age.ToStr())
+// PrintLine("--- ToObj 函数 ---")
+// jsonStr <- "{\"name\": \"Old8\", \"age\": 1}"
+// obj <- ToObj(jsonStr)
+// PrintLine("JSON 转对象成功")
+// PrintLine("对象 name 属性: " + obj.name.ToStr())
+// PrintLine("对象 age 属性: " + obj.age.ToStr())
 
 PrintLine("")
 

@@ -345,6 +345,16 @@ public partial class VirtualMachine
                             break;
                         }
 
+                        // 尝试从 GlobalFunctionRegistry 查找全局函数
+                        var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
+                        if (globalFunc != null)
+                        {
+                            // 调用全局函数的 ExecuteInVM 方法
+                            var result = globalFunc.ExecuteInVM(args);
+                            _stack.Push(result);
+                            break;
+                        }
+
                         throw new Exception($"未定义的函数: {funcName}");
                     }
 

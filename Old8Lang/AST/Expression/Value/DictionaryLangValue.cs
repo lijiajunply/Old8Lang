@@ -31,6 +31,11 @@ public partial class DictionaryLangValue : LangValueType, ILangList
     /// </summary>
     public string? ValueType { get; set; }
 
+    public DictionaryLangValue() : base(default)
+    {
+        Tuples = [];
+    }
+
     public DictionaryLangValue(List<TupleLangValue> tuples, string? keyType = null, string? valueType = null, SourcePosition position = default) : base(position)
     {
         Tuples = tuples;

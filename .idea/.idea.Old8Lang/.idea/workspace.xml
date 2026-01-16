@@ -23,7 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +575,7 @@
       <workItem from="1768331954396" duration="29077000" />
       <workItem from="1768485078721" duration="21629000" />
       <workItem from="1768543641677" duration="16866000" />
-      <workItem from="1768576580719" duration="1196000" />
+      <workItem from="1768576580719" duration="2374000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
