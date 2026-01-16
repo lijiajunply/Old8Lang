@@ -1250,7 +1250,31 @@ public class VirtualMachine
                     elements[i] = _stack.Pop();
                 }
 
-                _stack.Push(new Tuple<object?, object?>(elements[0], elements[1]));
+                if (count == 0)
+                {
+                    _stack.Push(new Tuple<object?, object?>(null, null));
+                }
+                else if (count == 1)
+                {
+                    _stack.Push(new Tuple<object?, object?>(elements[0], null));
+                }
+                else if (count == 2)
+                {
+                    _stack.Push(new Tuple<object?, object?>(elements[0], elements[1]));
+                }
+                else
+                {
+                    // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
+                    // 从后往前构建
+                    object? current = new Tuple<object?, object?>(elements[count - 2], elements[count - 1]);
+                    
+                    for (int i = count - 3; i >= 0; i--)
+                    {
+                        current = new Tuple<object?, object?>(elements[i], current);
+                    }
+                    
+                    _stack.Push(current);
+                }
             }
                 break;
 
@@ -1292,6 +1316,27 @@ public class VirtualMachine
                 {
                     length = str.Length;
                 }
+                else if (collection is Tuple<object?, object?> tuple)
+                {
+                    // 递归计算嵌套元组的长度
+                    length = 0;
+                    var traverseStack = new Stack<object?>();
+                    traverseStack.Push(tuple);
+                    
+                    while (traverseStack.Count > 0)
+                    {
+                        var current = traverseStack.Pop();
+                        if (current is Tuple<object?, object?> t)
+                        {
+                            traverseStack.Push(t.Item2);
+                            traverseStack.Push(t.Item1);
+                        }
+                        else if (current != null)
+                        {
+                            length++;
+                        }
+                    }
+                }
                 else
                 {
                     throw new Exception($"无法获取类型 {collection?.GetType().Name} 的长度");
@@ -1325,6 +1370,43 @@ public class VirtualMachine
                 {
                     int idx = Convert.ToInt32(index);
                     _stack.Push(str[idx]);
+                }
+                else if (collection is Tuple<object?, object?> tuple)
+                {
+                    int idx = Convert.ToInt32(index);
+                    int currentIdx = 0;
+                    bool found = false;
+                    
+                    // 使用栈进行迭代遍历，确保能处理任意嵌套结构的元组
+                    var traverseStack = new Stack<object?>();
+                    traverseStack.Push(tuple);
+                    
+                    while (traverseStack.Count > 0)
+                    {
+                        var current = traverseStack.Pop();
+                        if (current is Tuple<object?, object?> t)
+                        {
+                            // 保持顺序：先处理 Item1，再处理 Item2
+                            // 栈是后进先出，所以先压入 Item2，再压入 Item1
+                            traverseStack.Push(t.Item2);
+                            traverseStack.Push(t.Item1);
+                        }
+                        else if (current != null) // 跳过 null (与 TupleLangValue 行为一致)
+                        {
+                            if (currentIdx == idx)
+                            {
+                                _stack.Push(current);
+                                found = true;
+                                break;
+                            }
+                            currentIdx++;
+                        }
+                    }
+                    
+                    if (!found)
+                    {
+                        throw new Exception($"元组索引越界: {idx}");
+                    }
                 }
                 else
                 {
@@ -2121,6 +2203,70 @@ public class VirtualMachine
                 {
                     var enumValue = enumTemplate.GetMemberValue(fieldName);
                     _stack.Push(enumValue);
+                }
+                else if (obj is Tuple<object?, object?> tuple)
+                {
+                    if (fieldName == "Length")
+                    {
+                        // 计算元组长度
+                        int length = 0;
+                        var traverseStack = new Stack<object?>();
+                        traverseStack.Push(tuple);
+                        
+                        while (traverseStack.Count > 0)
+                        {
+                            var current = traverseStack.Pop();
+                            if (current is Tuple<object?, object?> t)
+                            {
+                                traverseStack.Push(t.Item2);
+                                traverseStack.Push(t.Item1);
+                            }
+                            else if (current != null)
+                            {
+                                length++;
+                            }
+                        }
+                        _stack.Push(length);
+                    }
+                    else if (fieldName.StartsWith("Item") && int.TryParse(fieldName.Substring(4), out int itemNum))
+                    {
+                        // ItemN 访问 (1-based)
+                        int idx = itemNum - 1;
+                        int currentIdx = 0;
+                        bool found = false;
+                        
+                        var traverseStack = new Stack<object?>();
+                        traverseStack.Push(tuple);
+                        
+                        while (traverseStack.Count > 0)
+                        {
+                            var current = traverseStack.Pop();
+                            if (current is Tuple<object?, object?> t)
+                            {
+                                traverseStack.Push(t.Item2);
+                                traverseStack.Push(t.Item1);
+                            }
+                            else if (current != null)
+                            {
+                                if (currentIdx == idx)
+                                {
+                                    _stack.Push(current);
+                                    found = true;
+                                    break;
+                                }
+                                currentIdx++;
+                            }
+                        }
+                        
+                        if (!found)
+                        {
+                            throw new Exception($"元组没有字段 {fieldName}");
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception($"类型 Tuple 没有字段或属性 {fieldName}");
+                    }
                 }
                 else
                 {

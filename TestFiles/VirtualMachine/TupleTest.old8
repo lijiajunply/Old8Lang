@@ -1,0 +1,57 @@
+// Tuple Test for Virtual Machine
+
+// 1. Basic 2-element tuple
+t2 <- (1, 2)
+if t2.Length != 2 {
+    throw "t2 length should be 2"
+}
+if t2[0] != 1 {
+    throw "t2[0] should be 1"
+}
+if t2[1] != 2 {
+    throw "t2[1] should be 2"
+}
+PrintLine("Tuple(2) passed")
+
+// 2. Multi-element tuple (nested)
+t3 <- (1, 2, 3)
+if t3.Length != 3 {
+    throw "t3 length should be 3, got " + t3.Length.ToStr()
+}
+if t3[0] != 1 {
+    throw "t3[0] should be 1"
+}
+if t3[1] != 2 {
+    throw "t3[1] should be 2"
+}
+if t3[2] != 3 {
+    throw "t3[2] should be 3"
+}
+PrintLine("Tuple(3) passed")
+
+// 3. Large tuple
+t5 <- (10, 20, 30, 40, 50)
+if t5.Length != 5 {
+    throw "t5 length should be 5"
+}
+if t5[4] != 50 {
+    throw "t5[4] should be 50"
+}
+PrintLine("Tuple(5) passed")
+
+// 4. Mixed types
+tm <- (1, "hello", true)
+if tm[1] != "hello" {
+    throw "tm[1] should be hello"
+}
+PrintLine("Tuple(Mixed) passed")
+
+// 5. Index out of bounds
+try {
+    val <- t2[5]
+    throw "Should have thrown index out of bounds"
+} catch (e) {
+    PrintLine("Caught expected error: " + e)
+}
+
+PrintLine("All Tuple Tests Passed")
