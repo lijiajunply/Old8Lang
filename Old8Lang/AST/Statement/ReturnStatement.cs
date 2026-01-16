@@ -112,6 +112,12 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                 // 存储返回值到局部变量
                 ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);
             }
+            else if (returnType != null && returnType != typeof(void))
+            {
+                // 如果没有返回值局部变量（如顶层代码或void函数），但表达式产生了值，需要将其弹出
+                // 否则 Leave 指令会因为堆栈非空而导致无效 IL
+                ilGenerator.Emit(OpCodes.Pop);
+            }
             // 使用Leave指令退出try块，跳转到函数结束标签
             ilGenerator.Emit(OpCodes.Leave, local.ReturnLabel.Value);
         }

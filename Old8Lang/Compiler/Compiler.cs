@@ -260,6 +260,10 @@ public static class Compiler
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager() { FilePath = path, Interpreter = i };
 
+        // 创建主程序返回标签，用于处理顶层 return 语句
+        var returnLabel = ilGenerator.DefineLabel();
+        local.ReturnLabel = returnLabel;
+
         // 注册全局静态类
         RegisterGlobalStaticClasses(local);
 
@@ -269,6 +273,9 @@ public static class Compiler
             // 调用块语句的GenerateIl方法生成IL代码
             statement.GenerateIl(ilGenerator, local);
             Log("IL代码生成完成", LogLevel.Debug);
+
+            // 标记返回标签
+            ilGenerator.MarkLabel(returnLabel);
 
             // 生成返回指令
             ilGenerator.Emit(OpCodes.Ret);
