@@ -1,6 +1,6 @@
 # 虚拟机模式完成 TODO
 
-**当前完成度**: 79.8% (87/109 功能完全支持)
+**当前完成度**: 94.5% (103/109 功能完全支持)
 
 ---
 
@@ -8,8 +8,8 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 完全支持 | 87 | 已完整实现并测试通过 |
-| ❌ 不支持 | 22 | 功能未实现 |
+| ✅ 完全支持 | 103 | 已完整实现并测试通过 |
+| ❌ 不支持 | 6 | 功能未实现 |
 
 ---
 
@@ -264,7 +264,7 @@
 
 ### 14. 解构赋值 (Destructuring Assignment)
 
-**当前状态**: 🚧 部分支持 (正在调试)
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - Tuple Destructuring: `(a, b) <- (1, 2)`
@@ -273,7 +273,7 @@
 1. ✅ 修改 Parser 支持 `( ... ) <-` 语法 (StatementParser)
 2. ✅ 修改 BytecodeVisitor 支持 TupleLangValue LHS
 3. ✅ 修复 VM OpCode.GetIndex 逻辑
-4. 🚧 调试复杂 Tuple 解构 (IndexOutOfBounds 问题)
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/DestructuringVerify.old8)
 
 ---
 
@@ -283,57 +283,59 @@
 
 ### 15. 异步编程基础（async/await）
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - 异步编程 (第 1985 行)
 - async/await 基础 (第 1989 行)
 
 **实施步骤**:
-1. 设计虚拟机的异步执行模型
-2. 实现异步状态机的字节码表示
-3. 处理 await 表达式
-4. 添加测试用例
+1. ✅ 设计虚拟机的异步执行模型 (基于 Task)
+2. ✅ 实现异步状态机的字节码表示 (OpCode.NewTask, OpCode.CallAsync)
+3. ✅ 处理 await 表达式 (OpCode.Await)
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/AsyncTest.old8)
 
-**技术难点**:
-- 异步状态机的字节码生成
-- 协程调度和上下文切换
-- 异步异常处理
+**相关文件**:
+- `Old8Lang/Bytecode/VirtualMachine.cs`
+- `Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs`
 
 ---
 
 ### 16. 异步生成器
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - 异步生成器 (第 2006 行)
 
 **实施步骤**:
-1. 实现异步生成器的字节码表示
-2. 处理 yield 和 await 的组合
-3. 实现异步迭代器
-4. 添加测试用例
+1. ✅ 实现异步生成器的字节码表示 (OpCode.NewAsyncGenerator)
+2. ✅ 处理 yield 和 await 的组合 (OpCode.AwaitYield)
+3. ✅ 实现异步迭代器 (ResumeAsyncGeneratorAsync)
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/AsyncGeneratorTest.old8)
 
 ---
 
 ### 17. Task API
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - Task API (第 2031 行)
 
 **实施步骤**:
-1. 实现 Task 相关的字节码指令
-2. 处理 Task.Delay、Task.WhenAll、Task.WhenAny
-3. 添加测试用例
+1. ✅ 实现 Task 相关的字节码指令
+2. ✅ 处理 Task.Delay、Task.WhenAll、Task.WhenAny (TaskFunctions.cs)
+3. ✅ 添加测试用例 (TestFiles/VirtualMachine/FullAsyncTest.old8)
+
+**相关文件**:
+- `Old8Lang/GlobalFunctions/Implementations/Concurrency/TaskFunctions.cs`
 
 ---
 
 ### 18. 多线程编程（spawn、Thread）
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - 多线程编程 (第 2050 行)
@@ -341,15 +343,14 @@
 - 线程管理 (第 2073 行)
 
 **实施步骤**:
-1. 实现线程相关的字节码指令
-2. 处理 spawn 函数
-3. 实现线程同步和通信
-4. 添加测试用例
+1. ✅ 实现线程相关的字节码指令 (OpCode.ThreadCreate)
+2. ✅ 处理 spawn 函数 (编译器特殊处理)
+3. ✅ 实现线程同步和通信 (ThreadFunctions.cs, ResourceManager)
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/SpawnTest.old8)
 
-**技术难点**:
-- 虚拟机的线程安全
-- 线程间的数据共享
-- 线程调度和管理
+**相关文件**:
+- `Old8Lang/GlobalFunctions/Implementations/Concurrency/ThreadFunctions.cs`
+- `Old8Lang/Concurrency/ResourceManager.cs`
 
 ---
 
