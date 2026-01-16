@@ -9,6 +9,8 @@ namespace Old8Lang.AST.Statement;
 public class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
+    public LangExpression Condition => expression;
+    public BlockStatement Block => blockStatement;
 
     public void Run(VariateManager manager, ref bool r)
     {

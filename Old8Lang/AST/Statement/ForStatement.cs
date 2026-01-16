@@ -15,6 +15,10 @@ public partial class ForStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
+    public SetStatement Init => setStatement;
+    public LangExpression Condition => expression;
+    public OldStatement Operation => statement;
+    public BlockStatement Block => blockStatement;
     
     public override void Run(VariateManager manager)
     {

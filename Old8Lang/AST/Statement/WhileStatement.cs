@@ -12,6 +12,9 @@ namespace Old8Lang.AST.Statement;
 public partial class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
+    public LangExpression Condition => expression;
+    public OldStatement Block => blockStatement;
+
     public override void Run(VariateManager manager)
     {
         // 检查是否使用新的生成器架构

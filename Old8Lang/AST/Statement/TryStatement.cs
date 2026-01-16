@@ -296,7 +296,8 @@ public partial class TryStatement(
     {
         // 检查如果有finally块，那么try块和catch块中不能包含return语句
         // 这是因为在.NET IL中，try块或catch块中的return语句与finally块一起使用会导致无效的IL代码
-        if (finallyBlock is not null)
+        // 注意：在异步状态机模式下，return 语句会编译为 Leave 指令，这是合法的，所以跳过检查
+        if (finallyBlock is not null && local.AsyncStateMachineGenerator == null)
         {
             // 检查try块中是否包含return语句
             if (ContainsReturnStatement(tryBlock))

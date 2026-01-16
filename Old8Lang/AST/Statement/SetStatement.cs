@@ -459,6 +459,19 @@ public partial class SetStatement : OldStatement
                 );
             }
 
+            // 异步模式：使用变量提升
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                Value.LoadIlValue(ilGenerator, local);
+                var valueType = Value.OutputType(local);
+                // 确保 void 类型被视为 object (null)
+                if (valueType == typeof(void)) valueType = typeof(object);
+                
+                local.DefineVariable(ilGenerator, Id.IdName, valueType);
+                local.StoreVariable(ilGenerator, Id.IdName, Position);
+                return;
+            }
+
             // 普通变量赋值: name <- value
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
@@ -556,8 +569,8 @@ public partial class SetStatement : OldStatement
                         ilGenerator.Emit(OpCodes.Callvirt, getPropertyMethod);
 
                         // 将属性值赋值给对应的变量
-                        var localVar = local.GetOrCreateLocalVar(ilGenerator, aliasName, typeof(object));
-                        ilGenerator.Emit(OpCodes.Stloc, localVar);
+                        local.DefineVariable(ilGenerator, aliasName, typeof(object));
+                        local.StoreVariable(ilGenerator, aliasName, Position);
                     }
 
                     return;

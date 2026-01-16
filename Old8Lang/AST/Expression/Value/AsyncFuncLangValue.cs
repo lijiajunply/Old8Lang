@@ -266,23 +266,130 @@ public class AsyncFuncLangValue : ImportInfo
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 创建一个委托，当调用时执行异步函数逻辑
-        // 目前实现一个简化版本，返回一个包装了RunAsync方法的委托
+        // 1. 确定参数类型和返回类型
+        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
+        var returnType = typeof(Task<object>);
+        
+        // 2. 创建 DynamicMethod
+        var dynamicMethod = new DynamicMethod(
+            Id?.IdName ?? "AnonymousAsync",
+            returnType,
+            parameterTypes,
+            true
+        );
+        
+        // 3. 生成方法体
+        var methodIl = dynamicMethod.GetILGenerator();
+        
+        // 创建新的LocalManager实例，专门用于函数体的IL生成
+        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        
+        // 处理参数
+        for (var i = 0; i < Ids.Count; i++)
+        {
+            var id = Ids[i];
+            var paramType = parameterTypes[i];
+            var localVar = methodIl.DeclareLocal(paramType);
+            funcLocal.AddLocalVar(id.IdName, localVar);
+            funcLocal.LocalVarTypes[id.IdName] = paramType;
+            
+            methodIl.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Stloc, localVar);
+        }
+        
+        GenerateMethodBody(methodIl, funcLocal);
+        
+        // 4. 创建委托并加载到栈上
+        var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
+            parameterTypes.Concat(new[] { returnType }).ToArray());
+            
+        ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
+        ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
+        ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
+    }
 
-        // 加载当前实例（this）
-        ilGenerator.Emit(OpCodes.Ldarg_0);
+    /// <summary>
+    /// 生成异步方法体（状态机启动代码）
+    /// </summary>
+    public void GenerateMethodBody(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 创建动态程序集和类型来生成状态机
+        var assemblyName = new System.Reflection.AssemblyName($"Old8LangAsync_{Id?.IdName ?? "Anonymous"}");
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name!);
+        var typeBuilder = moduleBuilder.DefineType(
+            $"AsyncStateMachine_{Id?.IdName ?? "Anonymous"}",
+            System.Reflection.TypeAttributes.Public | System.Reflection.TypeAttributes.Class);
 
-        // 创建一个闭包，捕获当前异步函数实例
-        // 使用Delegate.CreateDelegate创建Func<Task<object>>委托
+        var stateMachineGenerator = new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement);
+        stateMachineGenerator.TypeBuilder = typeBuilder;
+        
+        // 提升参数到状态机字段
+        if (Ids != null)
+        {
+            foreach (var id in Ids)
+            {
+                var argName = id.IdName;
+                var argLocal = local.GetLocalVar(argName);
+                if (argLocal != null)
+                {
+                    stateMachineGenerator.DefineVariable(argName, argLocal.LocalType);
+                }
+            }
+        }
+        
+        stateMachineGenerator.GenerateStateMachine(typeBuilder);
 
-        // 对于异步函数，我们需要生成一个委托，该委托在调用时会：
-        // 1. 创建VariateManager实例
-        // 2. 调用RunAsync方法
-        // 3. 将返回的TaskLangValue转换为Task<object>
+        var stateMachineType = typeBuilder.CreateType()!;
+        var constructor = stateMachineType.GetConstructor(Type.EmptyTypes)!;
+        var stateField = stateMachineType.GetField(stateMachineGenerator.StateField!.Name)!;
+        var builderField = stateMachineType.GetField(stateMachineGenerator.BuilderField!.Name)!;
 
-        // 目前实现一个简化版本，直接返回null
-        // 完整实现需要结合AsyncStateMachineGenerator生成状态机代码
-        ilGenerator.Emit(OpCodes.Ldnull);
+        var smLocal = ilGenerator.DeclareLocal(stateMachineType);
+
+        // 1. sm = new StateMachine();
+        ilGenerator.Emit(OpCodes.Newobj, constructor);
+        ilGenerator.Emit(OpCodes.Stloc, smLocal);
+        
+        // 初始化提升的参数字段
+        if (Ids != null)
+        {
+            foreach (var id in Ids)
+            {
+                var argName = id.IdName;
+                if (stateMachineGenerator.VariableFields.TryGetValue(argName, out var fieldBuilder))
+                {
+                    var field = stateMachineType.GetField(fieldBuilder.Name)!;
+                    var argLocal = local.GetLocalVar(argName)!;
+                    ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+                    ilGenerator.Emit(OpCodes.Ldloc, argLocal);
+                    ilGenerator.Emit(OpCodes.Stfld, field);
+                }
+            }
+        }
+
+        // 2. sm.builder = AsyncTaskMethodBuilder<object>.Create();
+        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Create")!);
+        ilGenerator.Emit(OpCodes.Stfld, builderField);
+
+        // 3. sm.state = -1;
+        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Ldc_I4_M1);
+        ilGenerator.Emit(OpCodes.Stfld, stateField);
+
+        // 4. sm.builder.Start(ref sm);
+        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Ldfld, builderField);
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Start")!
+            .MakeGenericMethod(stateMachineType));
+
+        // 5. return sm.builder.Task;
+        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Ldfld, builderField);
+        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetProperty("Task")!.GetGetMethod()!);
+        ilGenerator.Emit(OpCodes.Ret);
     }
 
     /// <summary>
@@ -290,7 +397,10 @@ public class AsyncFuncLangValue : ImportInfo
     /// </summary>
     public override Type OutputType(LocalManager local)
     {
-        return typeof(Task<object>);
+        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
+        var returnType = typeof(Task<object>);
+        return System.Linq.Expressions.Expression.GetDelegateType(
+            parameterTypes.Concat(new[] { returnType }).ToArray());
     }
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)

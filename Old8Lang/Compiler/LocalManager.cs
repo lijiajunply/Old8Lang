@@ -5,6 +5,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
+using Old8Lang.Generators;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
@@ -112,6 +113,11 @@ public class LocalManager
     /// 动态模块
     /// </summary>
     public ModuleBuilder? DynamicModule { get; set; }
+
+    /// <summary>
+    /// 异步状态机生成器
+    /// </summary>
+    public AsyncStateMachineGenerator? AsyncStateMachineGenerator { get; set; }
 
     /// <summary>
     /// IL 代码生成缓存
@@ -671,6 +677,73 @@ public class LocalManager
         foreach (var (varName, type) in inferredTypes)
         {
             RecordInferredType(varName, type);
+        }
+    }
+
+    /// <summary>
+    /// 加载变量值到栈顶（抽象了局部变量和异步状态机字段的差异）
+    /// </summary>
+    public void LoadVariable(ILGenerator il, string name, SourcePosition position)
+    {
+        if (AsyncStateMachineGenerator != null)
+        {
+            AsyncStateMachineGenerator.LoadVariable(il, name);
+            return;
+        }
+
+        if (LocalVar.TryGetValue(name, out var local))
+        {
+            il.Emit(OpCodes.Ldloc, local);
+        }
+        else
+        {
+            // 如果没找到，可能是编译错误，或者逻辑错误
+            // 这里抛出异常，由调用者捕获或直接导致编译失败
+            ReportError($"变量 '{name}' 未声明", position);
+        }
+    }
+
+    /// <summary>
+    /// 将栈顶值存储到变量（抽象了局部变量和异步状态机字段的差异）
+    /// </summary>
+    public void StoreVariable(ILGenerator il, string name, SourcePosition position)
+    {
+        if (AsyncStateMachineGenerator != null)
+        {
+            AsyncStateMachineGenerator.StoreVariable(il, name);
+            return;
+        }
+
+        if (LocalVar.TryGetValue(name, out var local))
+        {
+            il.Emit(OpCodes.Stloc, local);
+        }
+        else
+        {
+            ReportError($"变量 '{name}' 未声明", position);
+        }
+    }
+
+    /// <summary>
+    /// 定义新变量（抽象了局部变量和异步状态机字段的差异）
+    /// </summary>
+    public void DefineVariable(ILGenerator il, string name, Type type)
+    {
+        if (AsyncStateMachineGenerator != null)
+        {
+            AsyncStateMachineGenerator.DefineVariable(name, type);
+            // 记录类型，以便后续推断
+            LocalVarTypes[name] = type;
+        }
+        else
+        {
+            if (!LocalVar.ContainsKey(name))
+            {
+                var local = il.DeclareLocal(type);
+                LocalVar[name] = local;
+                // 记录类型，以便后续推断
+                LocalVarTypes[name] = type;
+            }
         }
     }
 

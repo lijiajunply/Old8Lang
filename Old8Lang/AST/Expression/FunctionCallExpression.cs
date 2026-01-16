@@ -3,6 +3,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using System.Reflection.Emit;
 using Old8Lang.Interpreter;
+using System.Reflection;
+using System.Linq;
 
 namespace Old8Lang.AST.Expression;
 
@@ -114,58 +116,103 @@ public partial class FunctionCallExpression : LangExpression
 
     public override Type OutputType(LocalManager local)
     {
-        // 编译器模式下的类型推断
-        // 由于函数表达式可能很复杂，暂时返回 object 类型
-        // 实际的编译器实现会更复杂，需要分析函数表达式的返回类型
+        // 1. 尝试分析函数表达式的类型
+        var funcType = FunctionExpression.OutputType(local);
+        
+        // 2. 如果是委托类型（包括 Action/Func），获取 Invoke 方法的返回类型
+        if (typeof(Delegate).IsAssignableFrom(funcType))
+        {
+            var invokeMethod = funcType.GetMethod("Invoke");
+            if (invokeMethod != null)
+            {
+                return invokeMethod.ReturnType;
+            }
+        }
+        
+        // 3. 如果是 LangId，尝试从 DelegateVar 中查找（针对直接函数调用）
+        if (FunctionExpression is LangId funcId)
+        {
+            // 尝试构建委托键查找
+            // 这里有一个循环依赖问题：我们需要参数类型来构建键，但参数类型推断可能依赖于函数返回类型？
+            // 通常参数类型是独立的。
+            try 
+            {
+                var paramTypes = Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
+                var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
+                var delegateKey = $"{funcId.IdName}${paramTypeNames}";
+                
+                if (local.DelegateVar.TryGetValue(delegateKey, out var method))
+                {
+                    if (method is DynamicMethod dm) return dm.ReturnType;
+                    if (method is MethodInfo mi) return mi.ReturnType;
+                }
+            }
+            catch
+            {
+                // 忽略错误，回退到 object
+            }
+        }
+
+        // return typeof(object);
+        
+        // 如果无法推断，返回 object
+        // 这是一个妥协，允许编译继续，但在运行时可能会有问题（除非我们处理了 object）
+        // 如果是 Async 函数，通常返回 Task<object>
+        if (FunctionExpression is LangId id && (id.IdName.StartsWith("Async") || id.IdName.EndsWith("Async")))
+        {
+            return typeof(Task<object>);
+        }
+        
         return typeof(object);
+        
+        // Debug:
+        // throw new InvalidOperationError(this, $"无法推断函数调用返回类型。函数表达式类型: {funcType.FullName}, IsDelegate: {typeof(Delegate).IsAssignableFrom(funcType)}");
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译器模式下的IL生成
-        
-        // 处理函数调用
+        // 1. 优先尝试直接方法调用（针对 LangId 且在 DelegateVar 中存在的情况）
         if (FunctionExpression is LangId functionId)
         {
-            // 获取函数名称
             var funcName = functionId.IdName;
-            
-            // 构建委托键：函数名 + 参数类型签名
             var paramTypes = Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
             var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
             var delegateKey = $"{funcName}${paramTypeNames}";
             
-            // 检查是否有对应的编译好的方法
             if (local.DelegateVar.TryGetValue(delegateKey, out var method))
             {
-                // 加载所有参数到堆栈
                 foreach (var arg in Arguments)
                 {
                     arg.LoadIlValue(ilGenerator, local);
                 }
-                
-                // 调用方法
                 ilGenerator.Emit(OpCodes.Call, method);
-                return;
-            }
-            
-            // 尝试查找泛型函数实例
-            var genericDelegateKey = $"{funcName}";
-            if (local.DelegateVar.TryGetValue(genericDelegateKey, out var genericMethod))
-            {
-                // 对于泛型函数，需要特殊处理
-                // 这里简化处理，直接调用
-                foreach (var arg in Arguments)
-                {
-                    arg.LoadIlValue(ilGenerator, local);
-                }
-                
-                ilGenerator.Emit(OpCodes.Call, genericMethod);
                 return;
             }
         }
 
-        // 如果是复杂的表达式函数调用，抛出异常
-        throw new InvalidOperationError(this, "编译器模式下暂时不支持复杂的表达式函数调用，请使用简单的函数标识符调用");
+        // 2. 通用委托调用逻辑
+        // 加载函数表达式（期望是一个委托实例）
+        FunctionExpression.LoadIlValue(ilGenerator, local);
+        var funcType = FunctionExpression.OutputType(local);
+        
+        if (typeof(Delegate).IsAssignableFrom(funcType))
+        {
+            var invokeMethod = funcType.GetMethod("Invoke");
+            if (invokeMethod != null)
+            {
+                // 加载参数
+                foreach (var arg in Arguments)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+                
+                // 调用委托的 Invoke 方法
+                ilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
+                return;
+            }
+        }
+
+        // 如果是复杂的表达式函数调用且无法解析为委托，抛出异常
+        throw new InvalidOperationError(this, $"无法调用类型为 {funcType} 的表达式");
     }
 }

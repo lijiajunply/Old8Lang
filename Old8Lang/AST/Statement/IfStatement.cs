@@ -16,6 +16,19 @@ public partial class IfStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
+    public IEnumerable<IfChild> Children
+    {
+        get
+        {
+            yield return ifChildBlock;
+            foreach (var item in elifBlock)
+            {
+                if (item != null) yield return item;
+            }
+        }
+    }
+    
+    public BlockStatement? ElseBlock => elseBlockStatement;
     
     public override void Run(VariateManager manager)
     {

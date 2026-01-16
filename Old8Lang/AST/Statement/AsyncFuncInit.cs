@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.Generators;
 using Old8Lang.Interpreter;
+using System.Runtime.CompilerServices;
 
 namespace Old8Lang.AST.Statement;
 
@@ -131,52 +132,7 @@ public partial class AsyncFuncInit : OldStatement
     /// </summary>
     private void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
-        // 创建动态程序集和类型来生成状态机
-        var assemblyName = new AssemblyName($"Old8LangAsync_{AsyncFuncValue.Id?.IdName ?? "Anonymous"}");
-
-        // 使用.NET Core/.NET 5+的正确API创建动态程序集
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
-            assemblyName,
-            AssemblyBuilderAccess.Run);
-
-        // 创建模块
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name!);
-
-        // 创建状态机类型
-        var typeBuilder = moduleBuilder.DefineType(
-            $"AsyncStateMachine_{AsyncFuncValue.Id?.IdName ?? "Anonymous"}",
-            TypeAttributes.Public | TypeAttributes.Class);
-
-        // 使用AsyncStateMachineGenerator生成状态机代码
-        var stateMachineGenerator = new AsyncStateMachineGenerator(ilGenerator, local, AsyncFuncValue.BlockStatement);
-        stateMachineGenerator.GenerateStateMachine(typeBuilder);
-
-        // 创建状态机类型
-        var stateMachineType = typeBuilder.CreateType()!;
-
-        // 生成调用状态机的代码
-        var constructor = stateMachineType.GetConstructor(Type.EmptyTypes)!;
-        var moveNextMethod = stateMachineType.GetMethod("MoveNext")!;
-
-        // 1. 创建状态机实例
-        ilGenerator.Emit(OpCodes.Newobj, constructor);
-
-        // 2. 复制状态机引用（因为 MoveNext 会消耗一个）
-        ilGenerator.Emit(OpCodes.Dup);
-
-        // 3. 调用状态机的MoveNext方法
-        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
-
-        // 4. 弹出状态机对象（MoveNext 返回 void，但栈上还有状态机对象）
-        ilGenerator.Emit(OpCodes.Pop);
-
-        // 5. 返回一个已完成的Task<object>
-        // 完整实现需要获取状态机的结果，这里简化处理
-        ilGenerator.Emit(OpCodes.Ldnull);
-        ilGenerator.Emit(OpCodes.Call, typeof(Task)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true })
-            .MakeGenericMethod(typeof(object)));
+        AsyncFuncValue.GenerateMethodBody(ilGenerator, local);
     }
 
     /// <summary>

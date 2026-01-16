@@ -819,6 +819,15 @@ public partial class Operation(
             return typeof(bool);
         }
 
+        // 处理比较运算符和逻辑运算符
+        if (Opera == LangTokenType.GreaterThan || Opera == LangTokenType.LessThan || 
+            Opera == LangTokenType.Equals || Opera == LangTokenType.NotEquals || 
+            Opera == LangTokenType.GreaterThanEquals || Opera == LangTokenType.LessThanEquals ||
+            Opera == LangTokenType.And || Opera == LangTokenType.Or || Opera == LangTokenType.Xor)
+        {
+            return typeof(bool);
+        }
+
         // 对于加法运算，如果任一操作数是字符串，则返回字符串类型
         if (Opera == LangTokenType.Plus && (leftType == typeof(string) || rightType == typeof(string)))
         {
@@ -829,7 +838,12 @@ public partial class Operation(
         if (Opera == LangTokenType.Star || Opera == LangTokenType.Plus || Opera == LangTokenType.Minus ||
             Opera == LangTokenType.Slash || Opera == LangTokenType.Percent || Opera == LangTokenType.Caret)
         {
-            // 对于数值运算，返回int类型
+            // 如果有浮点数，返回double
+            if (leftType == typeof(double) || rightType == typeof(double))
+            {
+                return typeof(double);
+            }
+            // 否则返回int
             return typeof(int);
         }
 

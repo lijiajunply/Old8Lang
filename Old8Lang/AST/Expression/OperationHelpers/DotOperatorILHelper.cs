@@ -4,6 +4,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using System.Linq;
+using System.Collections;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
@@ -142,6 +144,18 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        // 特殊处理Assert静态方法调用
+        if (left is LangId { IdName: "Assert" })
+        {
+            return GenerateAssertMethodCall(instance, ilGenerator, local, operation);
+        }
+
+        // 特殊处理Task静态方法调用
+        if (left is LangId { IdName: "Task" })
+        {
+            return GenerateTaskStaticMethodCall(instance, ilGenerator, local, operation);
+        }
+
         // 尝试使用StaticClassCompiler处理全局静态类方法调用
         if (left is LangId leftId && StaticClassCompiler.IsSupportedStaticClass(leftId.IdName))
         {
@@ -155,18 +169,6 @@ public static class DotOperatorILHelper
             // 如果StaticClassCompiler无法处理这个方法，抛出更有用的错误
             throw new InvalidOperationError(operation, $"方法 '{methodName}' 不支持",
                 $"静态类 '{leftId.IdName}' 不支持方法 '{methodName}'。请检查方法名是否正确。");
-        }
-
-        // 特殊处理Assert静态方法调用
-        if (left is LangId { IdName: "Assert" })
-        {
-            return GenerateAssertMethodCall(instance, ilGenerator, local, operation);
-        }
-
-        // 特殊处理Task静态方法调用
-        if (left is LangId { IdName: "Task" })
-        {
-            return GenerateTaskStaticMethodCall(instance, ilGenerator, local, operation);
         }
 
         // 普通实例方法调用
@@ -230,11 +232,15 @@ public static class DotOperatorILHelper
                         continue;
 
                     // 如果类型完全匹配或者可以赋值
-                    if (expectedType.IsAssignableFrom(actualType))
-                        continue;
+                if (expectedType.IsAssignableFrom(actualType))
+                    continue;
 
-                    return false;
-                }
+                // 如果实际类型是 object，且期望是值类型，允许（我们将尝试拆箱）
+                if (actualType == typeof(object) && expectedType.IsValueType)
+                    continue;
+
+                return false;
+            }
 
                 return true;
             });
@@ -253,6 +259,12 @@ public static class DotOperatorILHelper
                 if (paramType == typeof(object) && idType is not null && idType.IsValueType)
                 {
                     ilGenerator.Emit(OpCodes.Box, idType);
+                }
+
+                // 如果参数类型是值类型,且栈上是 object,需要拆箱
+                if (paramType.IsValueType && idType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, paramType);
                 }
             }
 
@@ -382,6 +394,26 @@ public static class DotOperatorILHelper
     }
 
     /// <summary>
+    /// 运行时辅助方法：Task.WhenAll
+    /// </summary>
+    public static Task<object[]> RuntimeWhenAll(object tasks)
+    {
+        var enumerable = (IEnumerable)tasks;
+        var casted = enumerable.Cast<Task<object>>();
+        return Task.WhenAll(casted);
+    }
+
+    /// <summary>
+    /// 运行时辅助方法：Task.WhenAny
+    /// </summary>
+    public static Task<Task<object>> RuntimeWhenAny(object tasks)
+    {
+        var enumerable = (IEnumerable)tasks;
+        var casted = enumerable.Cast<Task<object>>();
+        return Task.WhenAny(casted);
+    }
+
+    /// <summary>
     /// 生成 Task.WhenAll 的IL代码
     /// </summary>
     private static Type GenerateTaskWhenAll(Instance instance, ILGenerator ilGenerator, LocalManager local)
@@ -395,32 +427,21 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.OutputType(local);
 
-            if (listType == typeof(List<object>))
+            if (listType == typeof(List<object>) || listType == typeof(object[]))
             {
-                // 对于List<object>，转换为Task<object>[]
-                var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
-                ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
-                // 调用Task.WhenAll(Task<object>[])
-                var whenAllMethod = typeof(Task).GetMethod("WhenAll",
-                    [typeof(Task<object>[])])!;
-                ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+                // 调用 RuntimeWhenAll
+                var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAll))!;
+                ilGenerator.Emit(OpCodes.Call, runtimeMethod);
                 return typeof(Task<object[]>);
             }
 
-            if (listType == typeof(object[]))
-            {
-                // 对于object[]，直接调用Task.WhenAll
-                var whenAllMethod = typeof(Task)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .First(m => m.Name == "WhenAll" &&
-                                m.GetParameters()[0].ParameterType.IsArray);
-                ilGenerator.Emit(OpCodes.Call, whenAllMethod);
-                return typeof(Task<object[]>);
-            }
-
-            // 其他类型，简化处理
-            ilGenerator.Emit(OpCodes.Newobj,
-                typeof(Task<object>).GetConstructor(Type.EmptyTypes)!);
+            // 其他类型，简化处理，返回 Task.FromResult<object>(null)
+            ilGenerator.Emit(OpCodes.Ldnull);
+            var fromResultMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
             return typeof(Task<object>);
         }
 
@@ -441,32 +462,21 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.OutputType(local);
 
-            if (listType == typeof(List<object>))
+            if (listType == typeof(List<object>) || listType == typeof(object[]))
             {
-                // 对于List<object>，转换为Task<object>[]
-                var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
-                ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
-                // 调用Task.WhenAny(Task<object>[])
-                var whenAnyMethod = typeof(Task).GetMethod("WhenAny",
-                    [typeof(Task<object>[])])!;
-                ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
-                return typeof(Task<object>);
+                // 调用 RuntimeWhenAny
+                var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAny))!;
+                ilGenerator.Emit(OpCodes.Call, runtimeMethod);
+                return typeof(Task<Task<object>>);
             }
 
-            if (listType == typeof(object[]))
-            {
-                // 对于object[]，直接调用Task.WhenAny
-                var whenAnyMethod = typeof(Task)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .First(m => m.Name == "WhenAny" &&
-                                m.GetParameters()[0].ParameterType.IsArray);
-                ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
-                return typeof(Task<object>);
-            }
-
-            // 其他类型，简化处理
-            ilGenerator.Emit(OpCodes.Newobj,
-                typeof(Task<object>).GetConstructor(Type.EmptyTypes)!);
+            // 其他类型，简化处理，返回 Task.FromResult<object>(null)
+            ilGenerator.Emit(OpCodes.Ldnull);
+            var fromResultMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
             return typeof(Task<object>);
         }
 

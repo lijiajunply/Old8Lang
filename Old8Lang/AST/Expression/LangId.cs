@@ -151,6 +151,13 @@ public partial class LangId(
             return;
         }
 
+        // 如果在异步状态机中，使用变量提升机制
+        if (local.AsyncStateMachineGenerator != null)
+        {
+            local.LoadVariable(ilGenerator, IdName, Position);
+            return;
+        }
+
         var value = local.GetLocalVar(IdName);
         if (value is null)
         {

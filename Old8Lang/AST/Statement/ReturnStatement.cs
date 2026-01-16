@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Statement;
 
 public partial class ReturnStatement(LangExpression returnExpression, SourcePosition position = default) : OldStatement(position)
 {
+    public LangExpression Expression => returnExpression;
     
     public override void Run(VariateManager manager)
     {
@@ -75,6 +76,14 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
 
         // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）
         returnExpression.LoadIlValue(ilGenerator, local);
+
+        // 检查是否在异步状态机中且没有被 finally 块捕获
+        if (local.AsyncStateMachineGenerator != null && local.ReturnLabel == null)
+        {
+            var type = returnExpression.OutputType(local) ?? typeof(void);
+            local.AsyncStateMachineGenerator.EmitReturn(ilGenerator, type);
+            return;
+        }
 
         // 如果函数使用了try-finally结构（ReturnLabel不为null），必须使用Leave指令
         if (local.ReturnLabel is not null)
