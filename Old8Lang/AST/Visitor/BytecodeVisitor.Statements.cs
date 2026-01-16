@@ -907,9 +907,43 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitNativeStatement(NativeStatement node)
     {
-        // 原生绑定语句
-        // 在字节码层面，原生函数注册在编译时处理
-        // 运行时不需要生成指令
+        // ImportNative 指令：导入原生资源
+        // 操作数格式: [dllNameIndex, classNameIndex, mode, p1, p2]
+        // mode: 0=Single, 1=All, 2=Class
+
+        int dllNameIndex = _compiler.ConstantPool.AddConstant(node.DllName);
+        int classNameIndex = _compiler.ConstantPool.AddConstant(node.ClassName);
+
+        if (node.ImportAll)
+        {
+            // Mode 1: All Methods
+            Emit(OpCode.ImportNative, new[] { dllNameIndex, classNameIndex, 1, 0, 0 });
+        }
+        else if (node.MethodList is { Count: > 0 })
+        {
+            // Method List -> Multiple Single Method Imports
+            foreach (var methodName in node.MethodList)
+            {
+                int methodNameIndex = _compiler.ConstantPool.AddConstant(methodName);
+                int aliasIndex = _compiler.ConstantPool.AddConstant(""); // No alias for list import
+                Emit(OpCode.ImportNative, new[] { dllNameIndex, classNameIndex, 0, methodNameIndex, aliasIndex });
+            }
+        }
+        else if (!string.IsNullOrEmpty(node.MethodName))
+        {
+            // Mode 0: Single Method
+            int methodNameIndex = _compiler.ConstantPool.AddConstant(node.MethodName);
+            int aliasIndex = _compiler.ConstantPool.AddConstant(node.NativeName ?? "");
+            Emit(OpCode.ImportNative, new[] { dllNameIndex, classNameIndex, 0, methodNameIndex, aliasIndex });
+        }
+        else
+        {
+            // Mode 2: Class Import
+            string alias = node.Name ?? node.ClassAlias ?? "";
+            int aliasIndex = _compiler.ConstantPool.AddConstant(alias);
+            Emit(OpCode.ImportNative, new[] { dllNameIndex, classNameIndex, 2, aliasIndex, 0 });
+        }
+
         return null;
     }
     public Instruction? VisitTryStatement(TryStatement node)

@@ -1,5 +1,8 @@
 using System.Runtime.InteropServices;
+using System.Reflection;
 using Old8Lang.AST.Statement;
+using Python.Runtime;
+using Jint;
 
 namespace Old8Lang.Bytecode;
 
@@ -18,6 +21,7 @@ public class ExternFunctionWrapper
     private Delegate? _cachedDelegate;
     private IntPtr _cachedFuncPtr;
     private IntPtr _cachedLibHandle;
+    private MethodInfo? _cachedMethodInfo;
 
     public ExternFunctionWrapper(
         string dllName,
@@ -41,11 +45,193 @@ public class ExternFunctionWrapper
         return _externType switch
         {
             ExternType.NativeDll => InvokeNativeDll(args),
-            ExternType.PythonScript => throw new NotSupportedException("虚拟机模式暂不支持 Python 脚本调用"),
-            ExternType.PythonModule => throw new NotSupportedException("虚拟机模式暂不支持 Python 模块调用"),
-            ExternType.JavaScript => throw new NotSupportedException("虚拟机模式暂不支持 JavaScript 调用"),
+            ExternType.CSharpDll => InvokeCSharpDll(args),
+            ExternType.PythonScript => InvokePythonScript(args),
+            ExternType.PythonModule => InvokePythonModule(args),
+            ExternType.JavaScript => InvokeJavaScript(args),
             _ => throw new NotSupportedException($"不支持的 extern 类型: {_externType}")
         };
+    }
+
+    /// <summary>
+    /// 调用 C# DLL 函数
+    /// </summary>
+    private object? InvokeCSharpDll(object?[] args)
+    {
+        if (_cachedMethodInfo == null)
+        {
+            // 尝试加载程序集
+            Assembly assembly;
+            try
+            {
+                // 尝试作为文件路径加载
+                if (File.Exists(_dllName))
+                {
+                    assembly = Assembly.LoadFrom(_dllName);
+                }
+                else
+                {
+                    // 尝试作为程序集名称加载
+                    assembly = Assembly.Load(_dllName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"无法加载程序集 '{_dllName}': {ex.Message}");
+            }
+
+            // 查找类型 (假设 _funcName 是 "ClassName.MethodName" 格式? 
+            // 不，ExternStatement 分离了 ClassName 和 MethodName 吗？
+            // LoadExtern 传入的 funcName 是函数名。
+            // 对于 ExternStatement (C#), 我们没有传递 ClassName 到 LoadExtern!
+            // 这就是为什么我需要 ImportNative 指令。
+            // 但是这里是处理 ExternStatement (func import)。
+            // ExternStatement 语法: extern "dll" func Name...
+            // 它没有 ClassName! 
+            // 除非 DllName 包含了 ClassName? e.g. "Assembly.Namespace.Class"
+            // 或者 funcName 是 "Class.Method"?
+            
+            // 让我们假设 funcName 可能包含类名，或者 DllName 是全限定类名？
+            // 按照 Old8Lang 习惯，C# 导入通常用 NativeStatement。
+            // 如果使用 ExternStatement 导入 C#，可能需要约定。
+            // 暂时假设 _funcName 是 MethodName，而 _dllName 是 AssemblyName。
+            // 那么 ClassName 去哪了？
+            // 如果无法确定 ClassName，这个方法可能无法工作。
+            
+            // 重新查看 ExternStatement.cs，它没有 ClassName 字段，只有 DllName。
+            // 所以使用 ExternStatement 导入 C# 必须把类名放在 DllName 或 funcName 中。
+            // 比如 DllName = "MyAssembly", funcName = "MyClass.MyMethod"
+            
+            // 尝试解析 funcName 为 "Class.Method"
+            string typeName;
+            string methodName;
+            int lastDot = _funcName.LastIndexOf('.');
+            if (lastDot > 0)
+            {
+                typeName = _funcName.Substring(0, lastDot);
+                methodName = _funcName.Substring(lastDot + 1);
+            }
+            else
+            {
+                // 无法确定类名，抛出异常或尝试在所有导出类型中查找（太慢）
+                throw new Exception($"C# Extern 函数名必须包含类名 (例如 'ClassName.MethodName')，当前为: {_funcName}");
+            }
+            
+            var type = assembly.GetType(typeName) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == typeName || t.FullName == typeName);
+            if (type == null)
+            {
+                 throw new Exception($"在程序集 '{assembly.FullName}' 中找不到类型 '{typeName}'");
+            }
+            
+            _cachedMethodInfo = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance); // 暂时只支持静态?
+             if (_cachedMethodInfo == null)
+            {
+                 throw new Exception($"在类型 '{typeName}' 中找不到方法 '{methodName}'");
+            }
+        }
+
+        // 参数转换
+        var parameters = _cachedMethodInfo.GetParameters();
+        var convertedArgs = new object?[parameters.Length];
+        
+        // 处理参数数量不匹配（可能是可选参数）
+        int argCount = Math.Min(args.Length, parameters.Length);
+        
+        for (int i = 0; i < argCount; i++)
+        {
+            convertedArgs[i] = ConvertArgument(args[i], parameters[i].ParameterType);
+        }
+        
+        // 填充可选参数
+        for (int i = argCount; i < parameters.Length; i++)
+        {
+            if (parameters[i].HasDefaultValue)
+            {
+                convertedArgs[i] = parameters[i].DefaultValue;
+            }
+            else
+            {
+                 throw new ArgumentException($"参数数量不足且无默认值: {parameters[i].Name}");
+            }
+        }
+
+        return _cachedMethodInfo.Invoke(null, convertedArgs); // 假设是静态方法
+    }
+
+    /// <summary>
+    /// 调用 Python 脚本函数
+    /// </summary>
+    private object? InvokePythonScript(object?[] args)
+    {
+        if (!PythonEngine.IsInitialized)
+        {
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
+        }
+
+        using (Py.GIL())
+        {
+            // _dllName 是脚本路径
+            // _funcName 是函数名
+            
+            // 设置 sys.path
+            dynamic sys = Py.Import("sys");
+            string scriptDir = Path.GetDirectoryName(_dllName) ?? ".";
+            sys.path.append(scriptDir);
+            
+            string scriptName = Path.GetFileNameWithoutExtension(_dllName);
+            dynamic module = Py.Import(scriptName);
+            dynamic func = module.GetAttr(_funcName);
+            
+            // 转换参数
+            var pyArgs = args.Select(a => a.ToPython()).ToArray();
+            
+            dynamic result = func.Invoke(pyArgs);
+            return result.ToString(); // 简单转换返回值为字符串? 或者需要更复杂的转换
+        }
+    }
+    
+    /// <summary>
+    /// 调用 Python 模块函数
+    /// </summary>
+    private object? InvokePythonModule(object?[] args)
+    {
+         if (!PythonEngine.IsInitialized)
+        {
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
+        }
+
+        using (Py.GIL())
+        {
+            // _dllName 格式为 "pymodule:ModuleName"
+            string moduleName = _dllName.Substring("pymodule:".Length);
+            
+            dynamic module = Py.Import(moduleName);
+            dynamic func = module.GetAttr(_funcName);
+            
+            var pyArgs = args.Select(a => a.ToPython()).ToArray();
+            
+            dynamic result = func.Invoke(pyArgs);
+            return result.ToString();
+        }
+    }
+
+    /// <summary>
+    /// 调用 JavaScript 函数
+    /// </summary>
+    private object? InvokeJavaScript(object?[] args)
+    {
+        // _dllName 是 JS 文件路径
+        string scriptContent = File.ReadAllText(_dllName);
+        
+        var engine = new Engine();
+        engine.Execute(scriptContent);
+        
+        var jsArgs = args.Select(a => Jint.Native.JsValue.FromObject(engine, a)).ToArray();
+        var result = engine.Invoke(_funcName, jsArgs);
+        
+        return result.ToObject();
     }
 
     /// <summary>

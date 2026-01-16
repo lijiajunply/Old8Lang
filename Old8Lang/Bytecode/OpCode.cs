@@ -341,6 +341,9 @@ public enum OpCode : byte
     /// <summary>释放using资源 (从栈顶弹出资源并调用Dispose)</summary>
     DisposeResource = 0xC6,
 
+    /// <summary>导入原生资源 (操作数: dllNameIndex, classNameIndex, mode, p1, p2)</summary>
+    ImportNative = 0xC7,
+
     // ===== 模块操作 (0xD0-0xDF) =====
     /// <summary>加载模块 (操作数: moduleNameIndex)</summary>
     LoadModule = 0xD0,

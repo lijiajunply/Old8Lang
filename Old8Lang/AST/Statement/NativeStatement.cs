@@ -17,47 +17,47 @@ public partial class NativeStatement : OldStatement
     /// <summary>
     /// DLL名称
     /// </summary>
-    private readonly string DllName;
+    public readonly string DllName;
 
     /// <summary>
     /// 类名称
     /// </summary>
-    private readonly string ClassName;
+    public readonly string ClassName;
 
     /// <summary>
     /// 方法名称（可选）
     /// </summary>
-    private readonly string? MethodName;
+    public readonly string? MethodName;
 
     /// <summary>
     /// 原生方法名称别名（可选）
     /// </summary>
-    private string? NativeName { get; set; }
+    public string? NativeName { get; set; }
 
     /// <summary>
     /// 导入名称（可选）
     /// </summary>
-    private readonly string? Name;
+    public readonly string? Name;
 
     /// <summary>
     /// 函数值（可选）
     /// </summary>
-    private readonly FuncLangValue? FuncValue;
+    public readonly FuncLangValue? FuncValue;
 
     /// <summary>
     /// 是否导入所有方法 (*)
     /// </summary>
-    private readonly bool ImportAll;
+    public readonly bool ImportAll;
 
     /// <summary>
     /// 选择性导入的方法列表
     /// </summary>
-    private readonly List<string>? MethodList;
+    public readonly List<string>? MethodList;
 
     /// <summary>
     /// 类导入别名
     /// </summary>
-    private readonly string? ClassAlias;
+    public readonly string? ClassAlias;
 
     /// <summary>
     /// 构造函数：导入单个方法

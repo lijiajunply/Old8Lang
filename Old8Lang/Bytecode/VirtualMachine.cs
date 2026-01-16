@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
@@ -446,7 +447,7 @@ public class VirtualMachine
             {
                 // 从栈中弹出 TaskLangValue (或 Task ID)
                 var value = _stack.Pop();
-                
+
                 TaskLangValue taskLangValue;
                 if (value is TaskLangValue t)
                 {
@@ -458,7 +459,8 @@ public class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"Await 指令期望 TaskLangValue 或 Task ID (int)，但得到 {value?.GetType().Name ?? "null"}");
+                    throw new Exception(
+                        $"Await 指令期望 TaskLangValue 或 Task ID (int)，但得到 {value?.GetType().Name ?? "null"}");
                 }
 
                 // 异步等待 Task 完成
@@ -812,7 +814,8 @@ public class VirtualMachine
                     {
                         // 检查全局变量中是否有该类
                         ClassMetadata? classMetadata = null;
-                        if (_globals.TryGetValue(funcName, out var globalClass) && globalClass is ClassMetadata importedClass)
+                        if (_globals.TryGetValue(funcName, out var globalClass) &&
+                            globalClass is ClassMetadata importedClass)
                         {
                             classMetadata = importedClass;
                         }
@@ -1015,7 +1018,6 @@ public class VirtualMachine
                 break;
 
 
-
             case OpCode.CallNative:
             {
                 var operands = (object[])instruction.Operand!;
@@ -1081,23 +1083,23 @@ public class VirtualMachine
             case OpCode.CallDynamic:
             {
                 int argCount = (int)instruction.Operand!;
-                
+
                 // 从栈中弹出参数
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
                     args[i] = _stack.Pop();
                 }
-                
+
                 // 弹出函数对象
                 var funcObj = _stack.Pop();
-                
+
                 if (funcObj is FunctionMetadata funcMeta)
                 {
                     // 调用函数
                     if (funcMeta.IsGenerator)
                     {
-                         // 复制生成器逻辑
+                        // 复制生成器逻辑
                         if (funcMeta.IsAsync)
                         {
                             var asyncGeneratorId = _nextAsyncGeneratorId++;
@@ -1219,12 +1221,12 @@ public class VirtualMachine
                     // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
                     // 从后往前构建
                     object? current = new Tuple<object?, object?>(elements[count - 2], elements[count - 1]);
-                    
+
                     for (int i = count - 3; i >= 0; i--)
                     {
                         current = new Tuple<object?, object?>(elements[i], current);
                     }
-                    
+
                     _stack.Push(current);
                 }
             }
@@ -1274,7 +1276,7 @@ public class VirtualMachine
                     length = 0;
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
-                    
+
                     while (traverseStack.Count > 0)
                     {
                         var current = traverseStack.Pop();
@@ -1328,11 +1330,11 @@ public class VirtualMachine
                     int idx = Convert.ToInt32(index);
                     int currentIdx = 0;
                     bool found = false;
-                    
+
                     // 使用栈进行迭代遍历，确保能处理任意嵌套结构的元组
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
-                    
+
                     while (traverseStack.Count > 0)
                     {
                         var current = traverseStack.Pop();
@@ -1351,10 +1353,11 @@ public class VirtualMachine
                                 found = true;
                                 break;
                             }
+
                             currentIdx++;
                         }
                     }
-                    
+
                     if (!found)
                     {
                         throw new Exception($"元组索引越界: {idx}");
@@ -1533,7 +1536,7 @@ public class VirtualMachine
                     var tupleAsList = new List<object?>();
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
-                    
+
                     while (traverseStack.Count > 0)
                     {
                         var current = traverseStack.Pop();
@@ -1547,11 +1550,11 @@ public class VirtualMachine
                             tupleAsList.Add(current);
                         }
                     }
-                    
+
                     // 2. 对 List 进行切片
                     var sliceResult = SliceList(tupleAsList, startIdx, endIdx, stepVal);
                     var slicedList = sliceResult as List<object?>;
-                    
+
                     if (slicedList == null)
                     {
                         slicedList = new List<object?>();
@@ -1563,10 +1566,10 @@ public class VirtualMachine
                             }
                         }
                     }
-                    
+
                     // 3. 将切片后的 List 重新构建为 Tuple
                     object? resultTuple;
-                    
+
                     if (slicedList.Count == 0)
                     {
                         resultTuple = new Tuple<object?, object?>(null, null);
@@ -1583,16 +1586,17 @@ public class VirtualMachine
                     {
                         // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
                         // 从后往前构建
-                        object? current = new Tuple<object?, object?>(slicedList[slicedList.Count - 2], slicedList[slicedList.Count - 1]);
-                        
+                        object? current = new Tuple<object?, object?>(slicedList[slicedList.Count - 2],
+                            slicedList[slicedList.Count - 1]);
+
                         for (int i = slicedList.Count - 3; i >= 0; i--)
                         {
                             current = new Tuple<object?, object?>(slicedList[i], current);
                         }
-                        
+
                         resultTuple = current;
                     }
-                    
+
                     _stack.Push(resultTuple);
                 }
                 else
@@ -1676,13 +1680,17 @@ public class VirtualMachine
                     break;
                 }
 
-                try 
+                try
                 {
                     // 执行类型转换
                     object? convertedValue = targetTypeName.ToLower() switch
                     {
-                        "int" => value == null ? throw new InvalidCastException("Cannot cast null to int") : Convert.ToInt32(value),
-                        "double" => value == null ? throw new InvalidCastException("Cannot cast null to double") : Convert.ToDouble(value),
+                        "int" => value == null
+                            ? throw new InvalidCastException("Cannot cast null to int")
+                            : Convert.ToInt32(value),
+                        "double" => value == null
+                            ? throw new InvalidCastException("Cannot cast null to double")
+                            : Convert.ToDouble(value),
                         "string" => value?.ToString() ?? "",
                         "bool" => Convert.ToBoolean(value),
                         "char" => Convert.ToChar(value),
@@ -1925,16 +1933,16 @@ public class VirtualMachine
                 }
                 else if (funcObj is string funcName)
                 {
-                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName) 
-                        ?? throw new Exception($"Function not found: {funcName}");
+                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName)
+                               ?? throw new Exception($"Function not found: {funcName}");
                 }
                 else if (funcObj is FunctionMetadata funcMeta)
                 {
                     function = funcMeta;
                 }
-                else 
+                else
                 {
-                     throw new Exception($"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
+                    throw new Exception($"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
                 }
 
                 // 创建线程
@@ -1943,7 +1951,7 @@ public class VirtualMachine
                     // Create new VM instance
                     var threadVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
                     foreach (var kvp in _globals) threadVm._globals[kvp.Key] = kvp.Value;
-                    
+
                     threadVm.CallFunction(function, args);
                 });
 
@@ -2002,16 +2010,16 @@ public class VirtualMachine
                 }
                 else if (funcObj is string funcName)
                 {
-                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName) 
-                        ?? throw new Exception($"Function not found: {funcName}");
+                    function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName)
+                               ?? throw new Exception($"Function not found: {funcName}");
                 }
                 else if (funcObj is FunctionMetadata funcMeta)
                 {
                     function = funcMeta;
                 }
-                else 
+                else
                 {
-                     throw new Exception($"Invalid function for NewTask: {funcObj?.GetType().Name}");
+                    throw new Exception($"Invalid function for NewTask: {funcObj?.GetType().Name}");
                 }
 
                 // 创建并启动任务
@@ -2060,7 +2068,7 @@ public class VirtualMachine
                     {
                         asyncVm._globals[kvp.Key] = kvp.Value;
                     }
-                    
+
                     // 执行函数
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
                     return ConvertToLangValue(result);
@@ -2083,18 +2091,18 @@ public class VirtualMachine
                 }
                 else if (value is Task task)
                 {
-                     // 直接是 Task 对象
-                     task.GetAwaiter().GetResult();
-                     // 如果是 Task<T>，获取结果
-                     var resultProperty = task.GetType().GetProperty("Result");
-                     if (resultProperty != null)
-                     {
-                         _stack.Push(resultProperty.GetValue(task));
-                     }
-                     else
-                     {
-                         _stack.Push(null);
-                     }
+                    // 直接是 Task 对象
+                    task.GetAwaiter().GetResult();
+                    // 如果是 Task<T>，获取结果
+                    var resultProperty = task.GetType().GetProperty("Result");
+                    if (resultProperty != null)
+                    {
+                        _stack.Push(resultProperty.GetValue(task));
+                    }
+                    else
+                    {
+                        _stack.Push(null);
+                    }
                 }
                 else
                 {
@@ -2104,13 +2112,12 @@ public class VirtualMachine
                 break;
 
             case OpCode.NewAsyncGenerator:
-                 // TODO: Implement async generator creation
-                 throw new NotImplementedException("OpCode.NewAsyncGenerator not implemented");
+                // TODO: Implement async generator creation
+                throw new NotImplementedException("OpCode.NewAsyncGenerator not implemented");
 
             case OpCode.CallAsyncGenerator:
-                 // TODO: Implement async generator call
-                 throw new NotImplementedException("OpCode.CallAsyncGenerator not implemented");
-
+                // TODO: Implement async generator call
+                throw new NotImplementedException("OpCode.CallAsyncGenerator not implemented");
 
 
             case OpCode.AwaitYield:
@@ -2136,7 +2143,7 @@ public class VirtualMachine
                         }
 
                         generatorState.SaveState(
-                            frame.IP, 
+                            frame.IP,
                             frame.Locals,
                             stackCopy
                         );
@@ -2183,7 +2190,6 @@ public class VirtualMachine
                 }
             }
                 break;
-
 
 
             // === 异常处理 ===
@@ -2337,7 +2343,7 @@ public class VirtualMachine
                         int length = 0;
                         var traverseStack = new Stack<object?>();
                         traverseStack.Push(tuple);
-                        
+
                         while (traverseStack.Count > 0)
                         {
                             var current = traverseStack.Pop();
@@ -2351,6 +2357,7 @@ public class VirtualMachine
                                 length++;
                             }
                         }
+
                         _stack.Push(length);
                     }
                     else if (fieldName.StartsWith("Item") && int.TryParse(fieldName.Substring(4), out int itemNum))
@@ -2359,10 +2366,10 @@ public class VirtualMachine
                         int idx = itemNum - 1;
                         int currentIdx = 0;
                         bool found = false;
-                        
+
                         var traverseStack = new Stack<object?>();
                         traverseStack.Push(tuple);
-                        
+
                         while (traverseStack.Count > 0)
                         {
                             var current = traverseStack.Pop();
@@ -2379,10 +2386,11 @@ public class VirtualMachine
                                     found = true;
                                     break;
                                 }
+
                                 currentIdx++;
                             }
                         }
-                        
+
                         if (!found)
                         {
                             throw new Exception($"元组没有字段 {fieldName}");
@@ -2430,7 +2438,7 @@ public class VirtualMachine
                     }
                     else
                     {
-                         // 尝试使用反射获取其他属性
+                        // 尝试使用反射获取其他属性
                         var type = obj.GetType();
                         var prop = type.GetProperty(fieldName);
                         if (prop != null)
@@ -2439,7 +2447,7 @@ public class VirtualMachine
                         }
                         else
                         {
-                             throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
+                            throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
                         }
                     }
                 }
@@ -2651,7 +2659,8 @@ public class VirtualMachine
                 // 如果在当前字节码文件中没找到，从全局变量中查找（可能是导入的类）
                 if (classMetadata == null)
                 {
-                    if (_globals.TryGetValue(className, out var globalClass) && globalClass is ClassMetadata importedClass)
+                    if (_globals.TryGetValue(className, out var globalClass) &&
+                        globalClass is ClassMetadata importedClass)
                     {
                         classMetadata = importedClass;
                     }
@@ -2774,7 +2783,8 @@ public class VirtualMachine
                     // 如果在当前字节码文件中没找到，从全局变量和已加载模块中查找
                     if (classMetadata == null)
                     {
-                        if (_globals.TryGetValue(bytecodeObj.ClassName, out var globalClass) && globalClass is ClassMetadata importedClass)
+                        if (_globals.TryGetValue(bytecodeObj.ClassName, out var globalClass) &&
+                            globalClass is ClassMetadata importedClass)
                         {
                             classMetadata = importedClass;
                         }
@@ -2817,7 +2827,8 @@ public class VirtualMachine
                         if (methodMetadata == null && !string.IsNullOrEmpty(currentClass.BaseClassName))
                         {
                             // 在父类中继续查找
-                            currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                            currentClass =
+                                _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
                         }
                         else
                         {
@@ -3163,6 +3174,95 @@ public class VirtualMachine
             }
                 break;
 
+            case OpCode.ImportNative:
+            {
+                // ImportNative 指令：导入原生资源
+                // 操作数格式: [dllNameIndex, classNameIndex, mode, p1, p2]
+                var operands = (int[])instruction.Operand!;
+                var dllName = (string)_bytecodeFile.ConstantPool.GetConstant(operands[0]);
+                var className = (string)_bytecodeFile.ConstantPool.GetConstant(operands[1]);
+                var mode = operands[2];
+                var param1Index = operands[3];
+                var param2Index = operands[4];
+
+                // 解析 DLL 路径
+                string basePath = Directory.GetCurrentDirectory();
+                string dllPath;
+                try
+                {
+                    dllPath = DllPathResolver.ResolveDllPath(dllName, null, basePath);
+                }
+                catch (FileNotFoundException)
+                {
+                    dllPath = dllName;
+                }
+
+                Assembly? assembly = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == dllName);
+                if (assembly == null)
+                {
+                    try
+                    {
+                        assembly = File.Exists(dllPath) ? Assembly.LoadFrom(dllPath) : Assembly.Load(dllPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"无法加载程序集 '{dllPath}': {ex.Message}");
+                    }
+                }
+
+                Type? type = assembly.GetType($"{dllName}.{className}") ?? assembly.GetType(className);
+
+                // 如果找不到类型，尝试在所有类型中查找
+                if (type == null)
+                {
+                    type = assembly.GetTypes().FirstOrDefault(t => t.Name == className || t.FullName == className);
+                }
+
+                if (type == null) throw new Exception($"未找到类型: {className} in {dllName}");
+
+                // Console.WriteLine($"Importing Native: {dllName}.{className}, Mode={mode}"); // Debug
+
+                if (mode == 0) // Single Method
+                {
+                    var methodName = (string)_bytecodeFile.ConstantPool.GetConstant(param1Index);
+                    var alias = (string)_bytecodeFile.ConstantPool.GetConstant(param2Index);
+                    var registerName = string.IsNullOrEmpty(alias) ? methodName : alias;
+
+                    var methodInfo = type.GetMethod(methodName,
+                        BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+                    if (methodInfo == null) throw new Exception($"未找到方法: {methodName}");
+
+                    var func = new FuncLangValue(registerName, methodInfo);
+                    _globals[registerName] = func;
+                }
+                else if (mode == 1) // All Methods
+                {
+                    var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+                    foreach (var method in methods)
+                    {
+                        if (method.DeclaringType == typeof(object)) continue;
+                        // 检查是否有重复（重载），如果有，FuncLangValue 支持重载吗？
+                        // FuncLangValue 构造函数接受 MethodInfo。
+                        // 如果全局变量中已经有该名字，可能是重载？
+                        // Old8Lang 目前对重载支持有限，但在 Native 绑定中通常支持。
+                        // 这里简单覆盖或忽略。
+                        var func = new FuncLangValue(method.Name, method);
+                        _globals[method.Name] = func;
+                    }
+                }
+                else if (mode == 2) // Class Import
+                {
+                    var alias = (string)_bytecodeFile.ConstantPool.GetConstant(param1Index);
+                    var registerName = string.IsNullOrEmpty(alias) ? className : alias;
+
+                    // 使用 NativeStaticAny 包装类型，支持静态成员访问
+                    var nativeClass = new NativeStaticAny(registerName, type);
+                    _globals[registerName] = nativeClass;
+                }
+            }
+                break;
+
             default:
                 throw new Exception($"未实现的操作码: {instruction.OpCode}");
         }
@@ -3182,6 +3282,7 @@ public class VirtualMachine
             {
                 if (!CheckTypeMatch(type, val)) return false;
             }
+
             return true;
         }
 
@@ -3193,6 +3294,7 @@ public class VirtualMachine
             {
                 if (CheckTypeMatch(type, val)) return true;
             }
+
             return false;
         }
 
@@ -3218,8 +3320,10 @@ public class VirtualMachine
             {
                 if (!CheckTypeMatch(innerType, item)) return false;
             }
+
             return true;
         }
+
         if (typeName.StartsWith("array<") && typeName.EndsWith(">"))
         {
             if (val is not Array array) return false;
@@ -3228,8 +3332,10 @@ public class VirtualMachine
             {
                 if (!CheckTypeMatch(innerType, item)) return false;
             }
+
             return true;
         }
+
         if (typeName.StartsWith("dict<") && typeName.EndsWith(">"))
         {
             if (val is not IDictionary dict) return false;
@@ -3243,6 +3349,7 @@ public class VirtualMachine
                 if (!CheckTypeMatch(keyType, entry.Key)) return false;
                 if (!CheckTypeMatch(valueType, entry.Value)) return false;
             }
+
             return true;
         }
 
@@ -3280,36 +3387,38 @@ public class VirtualMachine
                 start = i + 1;
             }
         }
+
         result.Add(args.Substring(start));
         return result.ToArray();
     }
 
     private bool CheckCustomType(string typeName, object? val)
-     {
-         if (val is BytecodeObjectInstance instance)
-         {
-             if (instance.ClassName == typeName) return true;
-             
-             // Check inheritance
-             var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName);
-             while (metadata != null)
-             {
-                 if (metadata.Name == typeName) return true;
-                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
-                 if (metadata.BaseClassName == typeName) return true;
-                 
-                 if (metadata.BaseClassName != null)
-                 {
-                     metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == metadata.BaseClassName);
-                 }
-                 else
-                 {
-                     break;
-                 }
-             }
-         }
-         return false;
-     }
+    {
+        if (val is BytecodeObjectInstance instance)
+        {
+            if (instance.ClassName == typeName) return true;
+
+            // Check inheritance
+            var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName);
+            while (metadata != null)
+            {
+                if (metadata.Name == typeName) return true;
+                if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
+                if (metadata.BaseClassName == typeName) return true;
+
+                if (metadata.BaseClassName != null)
+                {
+                    metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == metadata.BaseClassName);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
 
     private List<object?> ConvertToList(object? value)
     {
@@ -3317,10 +3426,11 @@ public class VirtualMachine
         if (value is List<object?> list) return list;
         if (value is IEnumerable enumerable && value is not string)
         {
-             var newList = new List<object?>();
-             foreach (var item in enumerable) newList.Add(item);
-             return newList;
+            var newList = new List<object?>();
+            foreach (var item in enumerable) newList.Add(item);
+            return newList;
         }
+
         return new List<object?> { value };
     }
 
@@ -3335,6 +3445,7 @@ public class VirtualMachine
             foreach (var item in enumerable) list.Add(item);
             return list.ToArray();
         }
+
         return new object?[] { value };
     }
 
@@ -3349,8 +3460,10 @@ public class VirtualMachine
             {
                 newDict[entry.Key] = entry.Value;
             }
+
             return newDict;
         }
+
         throw new InvalidCastException($"无法将类型 {value?.GetType().Name ?? "null"} 转换为 dict");
     }
 
@@ -3580,23 +3693,23 @@ public class VirtualMachine
             // 检查类名
             if (instance.ClassName == expectedType)
                 return true;
-            
+
             // 检查继承关系
             var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == instance.ClassName);
             while (classMetadata != null && !string.IsNullOrEmpty(classMetadata.BaseClassName))
             {
                 if (classMetadata.BaseClassName == expectedType)
                     return true;
-                
+
                 classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == classMetadata.BaseClassName);
             }
-            
+
             // 检查接口实现
             // TODO: 这里需要从 ClassMetadata 中获取接口信息，或者 BytecodeObjectInstance 应该存储接口信息
             // 假设 instance.Interfaces 包含所有实现的接口
             if (instance.Interfaces.Contains(expectedType))
                 return true;
-                
+
             return false;
         }
 
@@ -3622,12 +3735,12 @@ public class VirtualMachine
                     return true;
                 currentType = currentType.BaseType;
             }
-            
+
             // 特殊情况：如果是 "Exception"，匹配所有 Exception
             if (expectedType == "Exception")
                 return true;
         }
-        
+
         // 3. 字符串异常匹配 (如果 expectedType 是 "string" 或具体值?)
         // Old8Lang 中通常不建议用字符串作为异常类型，但为了兼容性
         if (exceptionValue is string str && expectedType == "string")
@@ -3671,6 +3784,7 @@ public class VirtualMachine
             {
                 items.Add($"{ToString(key)}: {ToString(dict[key])}");
             }
+
             return "{" + string.Join(", ", items) + "}";
         }
 
@@ -3706,6 +3820,7 @@ public class VirtualMachine
                 {
                     return string.Concat(array.Select(ToString));
                 }
+
                 return string.Concat(args.Select(ToString));
             }
 
@@ -3735,6 +3850,7 @@ public class VirtualMachine
                     // 返回 VMThreadLangValue
                     return new VMThreadLangValue(threadId);
                 }
+
                 throw new Exception("Spawn 函数需要至少一个参数（函数引用）");
 
             case "ToStr":
@@ -3745,6 +3861,7 @@ public class VirtualMachine
                 {
                     return result;
                 }
+
                 return 0;
 
             case "ToDouble":
@@ -3752,6 +3869,7 @@ public class VirtualMachine
                 {
                     return dresult;
                 }
+
                 return 0.0;
 
             case "CheckRange":
@@ -3777,6 +3895,7 @@ public class VirtualMachine
 
                     return inRange;
                 }
+
                 return false;
 
             case "FlattenTuple":
@@ -3785,6 +3904,7 @@ public class VirtualMachine
                 {
                     return FlattenTupleHelper(tuple);
                 }
+
                 return new List<object?>();
 
             case "GetCount":
@@ -3799,6 +3919,7 @@ public class VirtualMachine
                         _ => 0
                     };
                 }
+
                 return 0;
 
             case "ResourceManagerTryDispose":
@@ -3807,6 +3928,7 @@ public class VirtualMachine
                     int resourceId = Convert.ToInt32(args[0]);
                     Concurrency.ResourceManager.TryDispose(resourceId);
                 }
+
                 return null;
 
             default:
@@ -4322,7 +4444,8 @@ public class VirtualMachine
                     {
                         try
                         {
-                            var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, currentClass?.BaseClassName ?? "");
+                            var symbol =
+                                _moduleRegistry.GetModuleSymbol(loadedModuleName, currentClass?.BaseClassName ?? "");
                             if (symbol is ClassMetadata baseClass)
                             {
                                 currentClass = baseClass;
