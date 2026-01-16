@@ -82,6 +82,7 @@ public class VirtualMachine
     /// </summary>
     private void CallFunction(FunctionMetadata function, object?[] arguments)
     {
+        // Console.WriteLine($"[VM Debug] Calling {function.Name} with args: {string.Join(", ", arguments.Select(a => a?.ToString() ?? "null"))}");
         // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
         object?[] processedArguments = arguments;
         if (function.ParamsParameterIndex >= 0)

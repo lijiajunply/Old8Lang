@@ -180,7 +180,8 @@ public class BytecodeCompiler
 
         var oldFunc = _currentFunction;
         _currentFunction = func;
-        EnterScope();
+        // 函数有独立的作用域和局部变量索引空间，不继承父作用域
+        _scopes.Push(new Scope(null));
 
         // 声明参数为局部变量
         foreach (var param in parameters)
@@ -219,7 +220,8 @@ public class BytecodeCompiler
 
         var oldFunc = _currentFunction;
         _currentFunction = func;
-        EnterScope();
+        // 函数有独立的作用域和局部变量索引空间，不继承父作用域
+        _scopes.Push(new Scope(null));
 
         // 声明参数为局部变量
         foreach (var param in parameters)
