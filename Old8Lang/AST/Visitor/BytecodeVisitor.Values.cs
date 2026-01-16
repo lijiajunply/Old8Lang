@@ -387,16 +387,13 @@ public partial class BytecodeVisitor
         }
 
         // 加载includeStart和includeEnd标志
-        // 我们需要在栈上准备这些参数,然后调用辅助方法
-        // 栈布局: start, end, includeStart, includeEnd
-
+        // 栈布局(从下到上): start, end, includeStart, includeEnd
         Emit(OpCode.LoadConst, node.IncludeStart ? 1 : 0);
         Emit(OpCode.LoadConst, node.IncludeEnd ? 1 : 0);
 
-        // 调用原生方法创建范围数组
-        // 使用CallNative调用RangeLangValue.CreateRangeArray
-        var methodName = "Old8Lang.AST.Expression.Intermediates.RangeLangValue::CreateRangeArray";
-        Emit(OpCode.CallNative, new object[] { 4, methodName });
+        // 使用 NewRange 指令创建范围数组
+        // NewRange 将从栈中弹出4个参数
+        Emit(OpCode.NewRange);
 
         return null;
     }

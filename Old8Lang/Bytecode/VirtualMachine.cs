@@ -1445,38 +1445,49 @@ public class VirtualMachine
 
             case OpCode.NewRange:
             {
-                // 栈顶: step, end, start
-                var step = _stack.Pop();
-                var end = _stack.Pop();
-                var start = _stack.Pop();
+                // 栈顶: includeEnd, includeStart, end, start
+                var includeEndObj = _stack.Pop();
+                var includeStartObj = _stack.Pop();
+                var endObj = _stack.Pop();
+                var startObj = _stack.Pop();
 
-                // 转换为整数
-                int startInt = Convert.ToInt32(start);
-                int endInt = Convert.ToInt32(end);
-                int stepInt = step != null ? Convert.ToInt32(step) : 1;
+                int start = Convert.ToInt32(startObj);
+                int end = Convert.ToInt32(endObj);
+                bool includeStart = Convert.ToBoolean(includeStartObj);
+                bool includeEnd = Convert.ToBoolean(includeEndObj);
 
-                // 创建范围对象 (使用List<int>表示范围)
-                var range = new List<int>();
-                if (stepInt > 0)
+                var results = new List<int>();
+
+                // 根据包含规则调整起始值
+                var startNum = start;
+                var endNum = end;
+
+                if (!includeStart)
+                    startNum++;
+                if (!includeEnd)
+                    endNum--;
+
+                // 检查范围是否有效
+                // 如果start原本就大于end,说明是反向范围
+                if (start > end)
                 {
-                    for (int i = startInt; i < endInt; i += stepInt)
+                    // 反向范围:从大到小
+                    for (var i = startNum; i >= endNum; i--)
                     {
-                        range.Add(i);
+                        results.Add(i);
                     }
                 }
-                else if (stepInt < 0)
+                else if (startNum <= endNum)
                 {
-                    for (int i = startInt; i > endInt; i += stepInt)
+                    // 正向范围:从小到大
+                    for (var i = startNum; i <= endNum; i++)
                     {
-                        range.Add(i);
+                        results.Add(i);
                     }
                 }
-                else
-                {
-                    throw new Exception("范围的步长不能为0");
-                }
+                // 如果调整后startNum > endNum但原本start <= end,说明排除导致范围为空,返回空数组
 
-                _stack.Push(range);
+                _stack.Push(results.ToArray());
             }
                 break;
 
@@ -1563,6 +1574,74 @@ public class VirtualMachine
                 {
                     var result = SliceString(str, startIdx, endIdx, stepVal);
                     _stack.Push(result);
+                }
+                else if (collection is Tuple<object?, object?> tuple)
+                {
+                    // 1. 展平 Tuple 为 List
+                    var tupleAsList = new List<object?>();
+                    var traverseStack = new Stack<object?>();
+                    traverseStack.Push(tuple);
+                    
+                    while (traverseStack.Count > 0)
+                    {
+                        var current = traverseStack.Pop();
+                        if (current is Tuple<object?, object?> t)
+                        {
+                            traverseStack.Push(t.Item2);
+                            traverseStack.Push(t.Item1);
+                        }
+                        else if (current != null)
+                        {
+                            tupleAsList.Add(current);
+                        }
+                    }
+                    
+                    // 2. 对 List 进行切片
+                    var sliceResult = SliceList(tupleAsList, startIdx, endIdx, stepVal);
+                    var slicedList = sliceResult as List<object?>;
+                    
+                    if (slicedList == null)
+                    {
+                        slicedList = new List<object?>();
+                        if (sliceResult is System.Collections.IEnumerable enumerable)
+                        {
+                            foreach (var item in enumerable)
+                            {
+                                slicedList.Add(item);
+                            }
+                        }
+                    }
+                    
+                    // 3. 将切片后的 List 重新构建为 Tuple
+                    object? resultTuple;
+                    
+                    if (slicedList.Count == 0)
+                    {
+                        resultTuple = new Tuple<object?, object?>(null, null);
+                    }
+                    else if (slicedList.Count == 1)
+                    {
+                        resultTuple = new Tuple<object?, object?>(slicedList[0], null);
+                    }
+                    else if (slicedList.Count == 2)
+                    {
+                        resultTuple = new Tuple<object?, object?>(slicedList[0], slicedList[1]);
+                    }
+                    else
+                    {
+                        // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
+                        // 从后往前构建
+                        object? current = new Tuple<object?, object?>(slicedList[slicedList.Count - 2], slicedList[slicedList.Count - 1]);
+                        
+                        for (int i = slicedList.Count - 3; i >= 0; i--)
+                        {
+                            current = new Tuple<object?, object?>(slicedList[i], current);
+                        }
+                        
+                        resultTuple = current;
+                    }
+                    
+                    _stack.Push(resultTuple);
                 }
                 else
                 {
@@ -2266,6 +2345,56 @@ public class VirtualMachine
                     else
                     {
                         throw new Exception($"类型 Tuple 没有字段或属性 {fieldName}");
+                    }
+                }
+                else if (obj is System.Collections.IList list)
+                {
+                    if (fieldName == "Length")
+                    {
+                        _stack.Push(list.Count);
+                    }
+                    else
+                    {
+                        // 尝试使用反射获取其他属性
+                        var type = obj.GetType();
+                        var prop = type.GetProperty(fieldName);
+                        if (prop != null)
+                        {
+                            _stack.Push(prop.GetValue(obj));
+                        }
+                        else
+                        {
+                            var field = type.GetField(fieldName);
+                            if (field != null)
+                            {
+                                _stack.Push(field.GetValue(obj));
+                            }
+                            else
+                            {
+                                throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
+                            }
+                        }
+                    }
+                }
+                else if (obj is Array array)
+                {
+                    if (fieldName == "Length")
+                    {
+                        _stack.Push(array.Length);
+                    }
+                    else
+                    {
+                         // 尝试使用反射获取其他属性
+                        var type = obj.GetType();
+                        var prop = type.GetProperty(fieldName);
+                        if (prop != null)
+                        {
+                            _stack.Push(prop.GetValue(obj));
+                        }
+                        else
+                        {
+                             throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
+                        }
                     }
                 }
                 else

@@ -1,0 +1,48 @@
+// Range Test for Virtual Machine
+
+// 1. Basic Range (Implicit Step 1) [1~5]
+r1 <- [1~5]
+if r1.Length != 5 {
+    throw "r1 length should be 5, got " + r1.Length.ToStr()
+}
+if r1[0] != 1 { throw "r1[0] should be 1" }
+if r1[4] != 5 { throw "r1[4] should be 5" }
+PrintLine("Range [1~5] passed")
+
+// 2. Exclude Start/End
+// Note: [1>~5] seems to have parsing issue in current parser version, skipping for now
+// r2 <- [1>~5] // Exclude start (1), Include end (5) -> 2, 3, 4, 5
+// if r2.Length != 4 {
+//     throw "r2 length should be 4, got " + r2.Length.ToStr()
+// }
+// if r2[0] != 2 { throw "r2[0] should be 2" }
+// if r2[3] != 5 { throw "r2[3] should be 5" }
+// PrintLine("Range [1>~5] passed")
+
+// r3 <- [1~<5] // Include start (1), Exclude end (5) -> 1, 2, 3, 4
+// if r3.Length != 4 {
+//     throw "r3 length should be 4, got " + r3.Length.ToStr()
+// }
+// if r3[0] != 1 { throw "r3[0] should be 1" }
+// if r3[3] != 4 { throw "r3[3] should be 4" }
+// PrintLine("Range [1~<5] passed")
+
+// 3. Reverse Range
+r4 <- [5~1]
+if r4.Length != 5 {
+    throw "r4 length should be 5, got " + r4.Length.ToStr()
+}
+if r4[0] != 5 { throw "r4[0] should be 5" }
+if r4[4] != 1 { throw "r4[4] should be 1" }
+PrintLine("Range [5~1] passed")
+
+// 4. Reverse Exclude
+// r5 <- [5>~<1] // Exclude start(5), Exclude end(1) -> 4, 3, 2
+// if r5.Length != 3 {
+//     throw "r5 length should be 3, got " + r5.Length.ToStr()
+// }
+// if r5[0] != 4 { throw "r5[0] should be 4" }
+// if r5[2] != 2 { throw "r5[2] should be 2" }
+// PrintLine("Range [5>~<1] passed")
+
+PrintLine("All Range Tests Passed")

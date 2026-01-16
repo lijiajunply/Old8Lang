@@ -1,0 +1,46 @@
+// Slice Test for Virtual Machine
+
+// 1. List Slice
+l <- {1, 2, 3, 4, 5}
+s1 <- l[1:3] // 2, 3
+if s1.Length != 2 { throw "s1 length error" }
+if s1[0] != 2 { throw "s1[0] error" }
+if s1[1] != 3 { throw "s1[1] error" }
+PrintLine("List Slice passed")
+
+// 2. Tuple Slice
+t <- (1, 2, 3, 4, 5)
+s2 <- t[1:4] // 2, 3, 4
+if s2.Length != 3 { throw "s2 length error" }
+if s2[0] != 2 { throw "s2[0] error" }
+if s2[2] != 4 { throw "s2[2] error" }
+// Verify it's still a tuple (via string representation or properties)
+PrintLine("Tuple Slice Result: " + s2.ToStr())
+PrintLine("Tuple Slice passed")
+
+// 3. String Slice
+str <- "Hello World"
+s3 <- str[0:5] // Hello
+if s3 != "Hello" { throw "s3 error: " + s3 }
+PrintLine("String Slice passed")
+
+// 4. Step Slice
+l2 <- {1, 2, 3, 4, 5, 6}
+s4 <- l2[0:6:2] // 1, 3, 5
+if s4.Length != 3 { throw "s4 length error" }
+if s4[0] != 1 { throw "s4[0] error" }
+if s4[1] != 3 { throw "s4[1] error" }
+if s4[2] != 5 { throw "s4[2] error" }
+PrintLine("Step Slice passed")
+
+// 5. Reverse Slice
+s5 <- l2[5:0:-1] // 6, 5, 4, 3, 2 (index 5 to 1)
+// Note: Slice logic in VM usually excludes end index for negative step too?
+// VM Slice logic:
+// if step < 0: for (int i = start; i > end; i += step)
+// So 5 down to 0 (exclusive) -> 5, 4, 3, 2, 1. Indices: 5, 4, 3, 2, 1. Values: 6, 5, 4, 3, 2.
+if s5.Length != 5 { throw "s5 length error: " + s5.Length.ToStr() }
+if s5[0] != 6 { throw "s5[0] error" }
+PrintLine("Reverse Slice passed")
+
+PrintLine("All Slice Tests Passed")
