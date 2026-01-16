@@ -1,12 +1,76 @@
-# Old8Lang 包管理 CLI 命令指南
+# Old8Lang CLI 指南
 
-## 概述
+本文档介绍 Old8Lang 命令行工具的使用方法，包括运行代码、编译、测试以及包管理功能。
 
-Old8Lang 现在提供了完整的包管理 CLI 命令，支持包打包、签名、验证和证书管理等功能。
+## 基础运行命令
 
-## 命令列表
+Old8Lang 提供了多种运行模式，可以通过 `Old8Lang.App` 项目直接运行。
 
-### 🚀 推荐：`old8lang publish` - 一键发布命令
+### 前置条件
+确保已安装 .NET 10.0 SDK，并在项目根目录下执行：
+```bash
+dotnet build Old8Lang.sln
+```
+
+### 1. 解释器模式 (Interpreter Mode)
+逐行解释执行代码，适合开发和调试。
+
+```bash
+dotnet run --project Old8Lang.App -- -f <文件路径> [参数]
+```
+
+**示例**:
+```bash
+dotnet run --project Old8Lang.App -- -f scripts/hello.old8
+```
+
+### 2. 编译模式 (Compiler Mode)
+将代码编译为 IL 并执行，性能更高，但要求更严格的类型注解。
+
+```bash
+dotnet run --project Old8Lang.App -- -c <文件路径> [参数]
+```
+
+**示例**:
+```bash
+dotnet run --project Old8Lang.App -- -c scripts/benchmark.old8
+```
+
+### 3. 语法检查 (Syntax Check)
+仅解析代码语法，不执行。用于验证代码格式。
+
+```bash
+dotnet run --project Old8Lang.App -- -s <文件路径>
+```
+
+### 4. 虚拟机模式 (Virtual Machine Mode)
+使用 Old8Lang 虚拟机执行字节码（实验性功能）。
+
+```bash
+dotnet run --project Old8Lang.App -- -vm <文件路径>
+```
+
+### 5. 调试模式 (Debug Mode)
+启用调试输出，查看详细的执行日志。
+
+```bash
+# 配合其他模式使用，添加 -d 参数
+dotnet run --project Old8Lang.App -- -f scripts/test.old8 -d
+```
+
+---
+
+## 包管理 CLI 命令
+
+Old8Lang 提供了完整的包管理 CLI 命令，支持包打包、签名、验证和证书管理等功能。
+
+> **注意**: 以下命令假设您已将 `Old8Lang.App` 安装为全局工具 `old8lang`。
+> 如果未安装，可以使用 `dotnet run --project Old8Lang.App -- <command>` 替代 `old8lang <command>`。
+> 例如: `old8lang publish` 等同于 `dotnet run --project Old8Lang.App -- publish`。
+
+### 命令列表
+
+### 🚀 推荐：`publish` - 一键发布命令
 
 **最简单的发布方式！** 自动完成打包、签名和准备发布的全部流程。
 
@@ -57,7 +121,7 @@ old8lang publish --no-sign
 
 ---
 
-### 1. `old8lang pack` - 打包命令
+### 1. `pack` - 打包命令
 
 将包文件夹打包成 `.o8pkg` 压缩包文件。
 
@@ -96,7 +160,7 @@ old8lang pack ./my-package -v
 
 ---
 
-### 2. `old8lang unpack` - 解包命令
+### 2. `unpack` - 解包命令
 
 解包 `.o8pkg` 文件到指定目录。
 
@@ -127,7 +191,7 @@ old8lang unpack package.o8pkg -f
 
 ---
 
-### 3. `old8lang sign` - 签名命令
+### 3. `sign` - 签名命令
 
 对包文件进行数字签名。
 
@@ -167,7 +231,7 @@ old8lang sign package.o8pkg -c my-cert.pfx -o custom.sig
 
 ---
 
-### 4. `old8lang verify` - 验证签名命令
+### 4. `verify` - 验证签名命令
 
 验证包文件的数字签名。
 
@@ -202,7 +266,7 @@ old8lang verify package.o8pkg -v
 
 ---
 
-### 5. `old8lang cert` - 证书管理命令
+### 5. `cert` - 证书管理命令
 
 证书管理工具，支持生成、查看和导出证书。
 
@@ -514,4 +578,4 @@ old8lang cert generate -h
 
 ## 反馈与贡献
 
-如有问题或建议，请访问: https://github.com/your-org/Old8Lang
+如有问题或建议，请访问项目仓库。

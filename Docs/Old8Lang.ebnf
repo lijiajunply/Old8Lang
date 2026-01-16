@@ -310,7 +310,12 @@ lambdaExpression = "(" parameterList? ")" "->" ( expression | blockStatement ) ;
 
 matchExpression = "match" expression "{" matchCase+ "}" ;
 
-matchCase = "case" ( "_" | identifier | expression ) "->" expression ;
+matchCase = "case" matchPattern ( "if" expression )? "->" expression ;
+
+matchPattern = "_"                          (* Wildcard *)
+             | identifier ":" identifier    (* Type Pattern *)
+             | identifier                   (* Variable Binding *)
+             | expression ;                 (* Constant Pattern *)
 
 typeConversion = expression "as" type ;
 
