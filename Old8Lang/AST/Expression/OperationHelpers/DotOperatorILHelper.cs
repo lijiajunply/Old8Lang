@@ -330,14 +330,7 @@ public static class DotOperatorILHelper
             // 调用 Task.Delay(int)
             methodInfo = typeof(Task).GetMethod("Delay", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Call, methodInfo);
-            // 将 Task 转换为 Task<object>
-            var fromResultMethod = typeof(Task)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-            ilGenerator.Emit(OpCodes.Ldnull);
-            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-            return typeof(Task<object>);
+            return typeof(Task);
         }
         else if (paramTypes.Count == 2)
         {
@@ -345,14 +338,7 @@ public static class DotOperatorILHelper
             methodInfo = typeof(Task).GetMethod("Delay",
                 [typeof(int), typeof(System.Threading.CancellationToken)])!;
             ilGenerator.Emit(OpCodes.Call, methodInfo);
-            // 将 Task 转换为 Task<object>
-            var fromResultMethod = typeof(Task)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-            ilGenerator.Emit(OpCodes.Ldnull);
-            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-            return typeof(Task<object>);
+            return typeof(Task);
         }
 
         return typeof(Task<object>);

@@ -595,6 +595,7 @@ public partial class Instance : LangValueType
         // 查找匹配的方法
         MethodInfo? matchingMethod = null;
         List<LangId>? funcParams = null;
+        string? matchedDelegateKey = null;
 
         // 首先，尝试通过实际参数类型构建键进行精确匹配
         var actualParamTypes = Ids.Select(id => id.OutputType(local)).ToArray();
@@ -605,6 +606,7 @@ public partial class Instance : LangValueType
         {
             matchingMethod = exactResult;
             local.FuncParameters.TryGetValue(exactDelegateKey, out funcParams);
+            matchedDelegateKey = exactDelegateKey;
         }
         else
         {
@@ -637,6 +639,7 @@ public partial class Instance : LangValueType
                             if (Ids.Count >= requiredParamsCount)
                             {
                                 matchingMethod = result;
+                                matchedDelegateKey = key;
                                 break;
                             }
                         }
@@ -644,6 +647,7 @@ public partial class Instance : LangValueType
                         {
                             // 完全匹配
                             matchingMethod = result;
+                            matchedDelegateKey = key;
                             break;
                         }
                     }
@@ -892,16 +896,52 @@ public partial class Instance : LangValueType
         // 调用方法：根据方法类型采用不同的调用方式
         if (matchingMethod is DynamicMethod dynamicMethod)
         {
-            // DynamicMethod不能直接通过Call指令调用，需要通过委托调用
-            // 对于DynamicMethod，我们需要确保栈上有正确数量的参数
-            // 注意：参数已经在前面加载过了，包括补充的默认参数
+            if (local.AsyncStateMachineGenerator != null && matchedDelegateKey is not null)
+            {
+                var parameterTypes = matchingParams.Select(p => p.ParameterType).ToArray();
+                var argLocals = new LocalBuilder[parameterTypes.Length];
+                for (int i = parameterTypes.Length - 1; i >= 0; i--)
+                {
+                    argLocals[i] = ilGenerator.DeclareLocal(parameterTypes[i]);
+                    ilGenerator.Emit(OpCodes.Stloc, argLocals[i]);
+                }
 
-            // 直接调用DynamicMethod的Invoke方法会导致栈不平衡
-            // 因此，我们需要使用一种不同的方式来调用DynamicMethod
+                var argsArrayLocal = ilGenerator.DeclareLocal(typeof(object[]));
+                ilGenerator.Emit(OpCodes.Ldc_I4, parameterTypes.Length);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                ilGenerator.Emit(OpCodes.Stloc, argsArrayLocal);
 
-            // 简化实现：直接使用Call指令调用DynamicMethod
-            // 这在某些情况下可能会失败，但在大多数情况下应该可以工作
-            ilGenerator.Emit(OpCodes.Call, dynamicMethod);
+                for (int i = 0; i < parameterTypes.Length; i++)
+                {
+                    ilGenerator.Emit(OpCodes.Ldloc, argsArrayLocal);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                    ilGenerator.Emit(OpCodes.Ldloc, argLocals[i]);
+                    if (parameterTypes[i].IsValueType) ilGenerator.Emit(OpCodes.Box, parameterTypes[i]);
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Ldstr, matchedDelegateKey);
+                ilGenerator.Emit(OpCodes.Ldloc, argsArrayLocal);
+                ilGenerator.Emit(OpCodes.Call, typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Invoke))!);
+
+                var returnType = matchingMethod.ReturnType;
+                if (returnType == typeof(void))
+                {
+                    ilGenerator.Emit(OpCodes.Pop);
+                }
+                else if (returnType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, returnType);
+                }
+                else if (returnType != typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, returnType);
+                }
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Call, dynamicMethod);
+            }
         }
         else
         {

@@ -81,7 +81,7 @@ public partial class AwaitExpression : LangExpression
         var exprType = Expression.OutputType(local);
         
         // 检查是否在异步状态机中
-        if (local.AsyncStateMachineGenerator != null)
+        if (local.AsyncStateMachineGenerator != null && Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
         {
             GenerateAsyncAwait(ilGenerator, local, exprType);
             return;

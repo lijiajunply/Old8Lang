@@ -81,6 +81,12 @@ public class AsyncStateMachineGenerator
             return;
         }
 
+        if (statement is FuncRunStatement funcRunStmt && funcRunStmt.Expression is not null)
+        {
+            IdentifyAwaitInExpression(funcRunStmt.Expression);
+            return;
+        }
+
         // 处理返回语句
         if (statement is ReturnStatement returnStmt)
         {
@@ -254,7 +260,7 @@ public class AsyncStateMachineGenerator
     {
         var moveNextMethod = typeBuilder.DefineMethod(
             "MoveNext",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual,
+            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final,
             null,
             Type.EmptyTypes);
             
@@ -271,21 +277,23 @@ public class AsyncStateMachineGenerator
         il.BeginExceptionBlock();
 
         // --- 状态分发 (Switch) ---
-        int stateCount = AwaitStateMap.Count;
-        var labels = new Label[stateCount];
-        for (int i = 0; i < stateCount; i++)
+        int stateCount = Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait ? AwaitStateMap.Count : 0;
+        var labels = stateCount > 0 ? new Label[stateCount] : Array.Empty<Label>();
+        if (stateCount > 0)
         {
-            labels[i] = il.DefineLabel();
-            StateLabels[i] = labels[i];
+            for (int i = 0; i < stateCount; i++)
+            {
+                labels[i] = il.DefineLabel();
+                StateLabels[i] = labels[i];
+            }
         }
-        
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldfld, StateField!);
         
         var startLabel = il.DefineLabel();
         
         if (stateCount > 0)
         {
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, StateField!);
             il.Emit(OpCodes.Switch, labels);
         }
         
@@ -352,12 +360,26 @@ public class AsyncStateMachineGenerator
         il.Emit(OpCodes.Stfld, AwaiterField!);
         
         // 3. 调用 AwaitUnsafeOnCompleted
+        var stateMachineInterfaceLocal = il.DeclareLocal(typeof(IAsyncStateMachine));
+        if (TypeBuilder?.IsValueType == true)
+        {
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldobj, TypeBuilder);
+            il.Emit(OpCodes.Box, TypeBuilder);
+        }
+        else
+        {
+            il.Emit(OpCodes.Ldarg_0);
+        }
+        il.Emit(OpCodes.Stloc, stateMachineInterfaceLocal);
+
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldflda, BuilderField!);
         il.Emit(OpCodes.Ldloca, awaiterLocal);
-        il.Emit(OpCodes.Ldarg_0); // this (state machine)
-        il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("AwaitUnsafeOnCompleted")!
-            .MakeGenericMethod(awaiterLocal.LocalType, TypeBuilder ?? typeof(IAsyncStateMachine)));
+        il.Emit(OpCodes.Ldloca, stateMachineInterfaceLocal);
+        il.Emit(OpCodes.Call, typeof(Old8Lang.Compiler.AsyncAwaitRuntimeHelpers)
+            .GetMethod(nameof(Old8Lang.Compiler.AsyncAwaitRuntimeHelpers.AwaitUnsafeOnCompleted))!
+            .MakeGenericMethod(awaiterLocal.LocalType));
             
         // 4. 返回 (挂起)
         il.Emit(OpCodes.Leave, _retLabel!.Value);
@@ -423,7 +445,7 @@ public class AsyncStateMachineGenerator
     {
         var setStateMachineMethod = typeBuilder.DefineMethod(
             "SetStateMachine",
-            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual,
+            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final,
             null,
             new Type[] { typeof(IAsyncStateMachine) });
 

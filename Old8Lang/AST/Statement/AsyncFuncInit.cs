@@ -70,7 +70,29 @@ public partial class AsyncFuncInit : OldStatement
         var parameterTypes = AsyncFuncValue.Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
+        // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        foreach (var (key, value) in local.DelegateVar)
+        {
+            funcLocal.DelegateVar[key] = value;
+        }
+        foreach (var (key, value) in local.ClassVar)
+        {
+            funcLocal.ClassVar[key] = value;
+        }
+        foreach (var (key, value) in local.GlobalStaticClasses)
+        {
+            funcLocal.GlobalStaticClasses[key] = value;
+        }
+        foreach (var (key, value) in local.FuncParameters)
+        {
+            funcLocal.FuncParameters[key] = value;
+        }
+        foreach (var (key, value) in local.GenericFunctions)
+        {
+            funcLocal.GenericFunctions[key] = value;
+        }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
         for (var i = 0; i < AsyncFuncValue.Ids!.Count; i++)
@@ -120,10 +142,14 @@ public partial class AsyncFuncInit : OldStatement
         var delegateKey = $"{methodName}${paramTypeNames}";
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
+        funcLocal.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+        CompiledDelegateRegistry.Register(delegateKey, dynamicMethod);
+
         // 同时存储函数的参数列表信息
         if (AsyncFuncValue.Ids is not null)
         {
             local.FuncParameters.TryAdd(delegateKey, AsyncFuncValue.Ids);
+            funcLocal.FuncParameters.TryAdd(delegateKey, AsyncFuncValue.Ids);
         }
     }
 

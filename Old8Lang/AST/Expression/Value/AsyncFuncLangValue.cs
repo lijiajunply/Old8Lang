@@ -6,6 +6,7 @@ using Old8Lang.AST.Visitor;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.Interpreter;
+using System.Reflection;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -283,6 +284,27 @@ public class AsyncFuncLangValue : ImportInfo
         
         // 创建新的LocalManager实例，专门用于函数体的IL生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        foreach (var (key, value) in local.DelegateVar)
+        {
+            funcLocal.DelegateVar[key] = value;
+        }
+        foreach (var (key, value) in local.ClassVar)
+        {
+            funcLocal.ClassVar[key] = value;
+        }
+        foreach (var (key, value) in local.GlobalStaticClasses)
+        {
+            funcLocal.GlobalStaticClasses[key] = value;
+        }
+        foreach (var (key, value) in local.FuncParameters)
+        {
+            funcLocal.FuncParameters[key] = value;
+        }
+        foreach (var (key, value) in local.GenericFunctions)
+        {
+            funcLocal.GenericFunctions[key] = value;
+        }
         
         // 处理参数
         for (var i = 0; i < Ids.Count; i++)
@@ -319,7 +341,11 @@ public class AsyncFuncLangValue : ImportInfo
         var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name!);
         var typeBuilder = moduleBuilder.DefineType(
             $"AsyncStateMachine_{Id?.IdName ?? "Anonymous"}",
-            System.Reflection.TypeAttributes.Public | System.Reflection.TypeAttributes.Class);
+            System.Reflection.TypeAttributes.Public |
+            System.Reflection.TypeAttributes.Sealed |
+            System.Reflection.TypeAttributes.AnsiClass |
+            System.Reflection.TypeAttributes.BeforeFieldInit,
+            typeof(ValueType));
 
         var stateMachineGenerator = new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement);
         stateMachineGenerator.TypeBuilder = typeBuilder;
@@ -341,15 +367,20 @@ public class AsyncFuncLangValue : ImportInfo
         stateMachineGenerator.GenerateStateMachine(typeBuilder);
 
         var stateMachineType = typeBuilder.CreateType()!;
-        var constructor = stateMachineType.GetConstructor(Type.EmptyTypes)!;
         var stateField = stateMachineType.GetField(stateMachineGenerator.StateField!.Name)!;
         var builderField = stateMachineType.GetField(stateMachineGenerator.BuilderField!.Name)!;
 
+        if (Old8Lang.Compiler.Compiler.DebugOutputEnabled)
+        {
+            var moveNext = stateMachineType.GetMethod("MoveNext", BindingFlags.Public | BindingFlags.Instance);
+            if (moveNext != null) Console.WriteLine(IlDisassembler.Disassemble(moveNext));
+        }
+
         var smLocal = ilGenerator.DeclareLocal(stateMachineType);
 
-        // 1. sm = new StateMachine();
-        ilGenerator.Emit(OpCodes.Newobj, constructor);
-        ilGenerator.Emit(OpCodes.Stloc, smLocal);
+        // 1. sm = default;
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+        ilGenerator.Emit(OpCodes.Initobj, stateMachineType);
         
         // 初始化提升的参数字段
         if (Ids != null)
@@ -361,7 +392,7 @@ public class AsyncFuncLangValue : ImportInfo
                 {
                     var field = stateMachineType.GetField(fieldBuilder.Name)!;
                     var argLocal = local.GetLocalVar(argName)!;
-                    ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+                    ilGenerator.Emit(OpCodes.Ldloca, smLocal);
                     ilGenerator.Emit(OpCodes.Ldloc, argLocal);
                     ilGenerator.Emit(OpCodes.Stfld, field);
                 }
@@ -369,25 +400,25 @@ public class AsyncFuncLangValue : ImportInfo
         }
 
         // 2. sm.builder = AsyncTaskMethodBuilder<object>.Create();
-        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Create")!);
         ilGenerator.Emit(OpCodes.Stfld, builderField);
 
         // 3. sm.state = -1;
-        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Ldc_I4_M1);
         ilGenerator.Emit(OpCodes.Stfld, stateField);
 
         // 4. sm.builder.Start(ref sm);
-        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
-        ilGenerator.Emit(OpCodes.Ldfld, builderField);
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+        ilGenerator.Emit(OpCodes.Ldflda, builderField);
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Start")!
             .MakeGenericMethod(stateMachineType));
 
         // 5. return sm.builder.Task;
-        ilGenerator.Emit(OpCodes.Ldloc, smLocal);
-        ilGenerator.Emit(OpCodes.Ldfld, builderField);
+        ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+        ilGenerator.Emit(OpCodes.Ldflda, builderField);
         ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetProperty("Task")!.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Ret);
     }

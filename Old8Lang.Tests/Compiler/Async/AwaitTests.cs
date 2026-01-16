@@ -20,6 +20,7 @@ public class AwaitTests
     {
         // Arrange
         var code = @"
+            #!debug true
             async func simpleTask() -> string {
                 await Task.Delay(50)
                 return ""Task completed""

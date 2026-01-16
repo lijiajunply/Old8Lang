@@ -14,6 +14,12 @@ public class FuncRunStatement : OldStatement
     private readonly AwaitExpression? AwaitExpr;
     private readonly GenericInstanceExpression? GenericInstance;
 
+    public LangExpression? Expression =>
+        (LangExpression?)AwaitExpr ??
+        (LangExpression?)GenericInstance ??
+        (LangExpression?)Instance ??
+        (LangExpression?)Operation;
+
     public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) =>
         Instance = instance;
 
