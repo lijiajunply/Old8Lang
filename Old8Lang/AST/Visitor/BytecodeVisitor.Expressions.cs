@@ -118,6 +118,10 @@ public partial class BytecodeVisitor
             {
                 typeName = typeValue.ToString();
             }
+            else if (node.Right is StringLangValue stringValue)
+            {
+                typeName = stringValue.Value;
+            }
             else
             {
                 throw new Exception($"类型转换运算符 'as' 的右操作数必须是类型名称，实际为: {node.Right?.GetType().Name}");

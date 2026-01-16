@@ -1,0 +1,41 @@
+// Test Intersection Types
+
+interface IA {
+    func methodA()
+}
+
+interface IB {
+    func methodB()
+}
+
+class MyClass implements IA, IB {
+    func methodA() { PrintLine("A") }
+    func methodB() { PrintLine("B") }
+}
+
+class OnlyA implements IA {
+    func methodA() { PrintLine("A") }
+}
+
+// Test variable with intersection type
+obj: IA & IB <- MyClass()
+PrintLine("IA & IB passed")
+
+// Test type check failure
+try {
+    obj2: IA & IB <- OnlyA()
+} catch (e) {
+    PrintLine("Caught expected error for IA & IB: " + e)
+}
+
+// Test cast
+c <- MyClass()
+c_casted <- c as "IA & IB"
+PrintLine("Cast to IA & IB passed")
+
+try {
+    o <- OnlyA()
+    o_casted <- o as "IA & IB"
+} catch (e) {
+    PrintLine("Caught expected error for Cast to IA & IB: " + e)
+}

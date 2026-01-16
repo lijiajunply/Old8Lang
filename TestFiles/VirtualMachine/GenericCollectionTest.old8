@@ -1,0 +1,29 @@
+// Test list<T> check
+l: list<int> <- {1, 2, 3}
+PrintLine("list<int> passed")
+
+try {
+    l2: list<int> <- {1, "s"}
+} catch (e) {
+    PrintLine("Caught expected error for list<int>: " + e)
+}
+
+// Test dict<K,V> check
+d: dict<string, int> <- {"a": 1, "b": 2}
+PrintLine("dict<string, int> passed")
+
+try {
+    d2: dict<string, int> <- {"a": "s"}
+} catch (e) {
+    PrintLine("Caught expected error for dict<string, int>: " + e)
+}
+
+// Test nested generics
+l3: list<list<int>> <- {{1, 2}, {3, 4}}
+PrintLine("list<list<int>> passed")
+
+try {
+    l4: list<list<int>> <- {{1, 2}, {3, "s"}}
+} catch (e) {
+    PrintLine("Caught expected error for list<list<int>>: " + e)
+}

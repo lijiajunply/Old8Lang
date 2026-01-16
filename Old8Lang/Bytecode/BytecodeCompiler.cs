@@ -440,6 +440,7 @@ public class BytecodeCompiler
             Name = className,
             BaseClassName = parentClassName,
             Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList(),
+            InterfaceNames = implementsNames ?? new List<string>(),
             ImplementsInterfaces = implementsNames ?? new List<string>(),
             Mixins = mixinNames ?? new List<string>()
         };

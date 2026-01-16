@@ -1718,13 +1718,20 @@ public class VirtualMachine
                 var targetTypeName = (string)instruction.Operand!;
                 var value = _stack.Pop();
 
+                // 1. 如果类型完全匹配（包括泛型检查），直接返回原值
+                if (CheckTypeMatch(targetTypeName, value))
+                {
+                    _stack.Push(value);
+                    break;
+                }
+
                 try 
                 {
                     // 执行类型转换
                     object? convertedValue = targetTypeName.ToLower() switch
                     {
-                        "int" => Convert.ToInt32(value),
-                        "double" => Convert.ToDouble(value),
+                        "int" => value == null ? throw new InvalidCastException("Cannot cast null to int") : Convert.ToInt32(value),
+                        "double" => value == null ? throw new InvalidCastException("Cannot cast null to double") : Convert.ToDouble(value),
                         "string" => value?.ToString() ?? "",
                         "bool" => Convert.ToBoolean(value),
                         "char" => Convert.ToChar(value),
@@ -1746,61 +1753,7 @@ public class VirtualMachine
             {
                 var targetTypeName = (string)instruction.Operand!;
                 var value = _stack.Pop();
-
-                // 本地函数：检查单个类型
-                bool CheckType(string typeName, object? val)
-                {
-                    typeName = typeName.Trim();
-
-                    // 处理可空类型
-                    if (typeName.EndsWith("?"))
-                    {
-                        if (val == null) return true;
-                        typeName = typeName.Substring(0, typeName.Length - 1);
-                    }
-                    
-                    // 如果值是 null 但类型不是可空的，返回 false
-                    if (val == null && typeName != "null" && typeName != "any") return false;
-
-                    return typeName.ToLower() switch
-                    {
-                        "int" => val is int,
-                        "double" => val is double,
-                        "string" => val is string,
-                        "bool" => val is bool,
-                        "char" => val is char,
-                        "array" => val is Array,
-                        "list" => val is IList,
-                        "dict" => val is IDictionary,
-                        "tuple" => val is Tuple<object?, object?>,
-                        "null" => val == null,
-                        "any" => true,
-                        "object" => true,
-                        _ => (val is BytecodeObjectInstance instance && instance.ClassName == typeName)
-                    };
-                }
-
-                bool isType = false;
-
-                // 处理联合类型 (例如 "int|string")
-                if (targetTypeName.Contains('|'))
-                {
-                    var types = targetTypeName.Split('|');
-                    foreach (var type in types)
-                    {
-                        if (CheckType(type, value))
-                        {
-                            isType = true;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    isType = CheckType(targetTypeName, value);
-                }
-
-                _stack.Push(isType);
+                _stack.Push(CheckTypeMatch(targetTypeName, value));
             }
                 break;
 
@@ -3124,6 +3077,147 @@ public class VirtualMachine
     }
 
     // ===== 辅助方法 =====
+
+    private bool CheckTypeMatch(string typeName, object? val)
+    {
+        typeName = typeName.Trim();
+
+        // 1. Intersection Types (A & B)
+        if (typeName.Contains('&'))
+        {
+            var types = typeName.Split('&');
+            foreach (var type in types)
+            {
+                if (!CheckTypeMatch(type, val)) return false;
+            }
+            return true;
+        }
+
+        // 2. Union Types (A | B)
+        if (typeName.Contains('|'))
+        {
+            var types = typeName.Split('|');
+            foreach (var type in types)
+            {
+                if (CheckTypeMatch(type, val)) return true;
+            }
+            return false;
+        }
+
+        // 3. Nullable Types (T?)
+        if (typeName.EndsWith("?"))
+        {
+            if (val == null) return true;
+            return CheckTypeMatch(typeName.Substring(0, typeName.Length - 1), val);
+        }
+
+        // 4. Null Value Check
+        if (val == null)
+        {
+            return typeName == "null" || typeName == "any";
+        }
+
+        // 5. Generic Types (list<T>, array<T>, dict<K,V>)
+        if (typeName.StartsWith("list<") && typeName.EndsWith(">"))
+        {
+            if (val is not IList list) return false;
+            var innerType = typeName.Substring(5, typeName.Length - 6);
+            foreach (var item in list)
+            {
+                if (!CheckTypeMatch(innerType, item)) return false;
+            }
+            return true;
+        }
+        if (typeName.StartsWith("array<") && typeName.EndsWith(">"))
+        {
+            if (val is not Array array) return false;
+            var innerType = typeName.Substring(6, typeName.Length - 7);
+            foreach (var item in array)
+            {
+                if (!CheckTypeMatch(innerType, item)) return false;
+            }
+            return true;
+        }
+        if (typeName.StartsWith("dict<") && typeName.EndsWith(">"))
+        {
+            if (val is not IDictionary dict) return false;
+            var innerTypes = SplitGenericArgs(typeName.Substring(5, typeName.Length - 6));
+            if (innerTypes.Length != 2) return false; // Invalid syntax
+            var keyType = innerTypes[0];
+            var valueType = innerTypes[1];
+
+            foreach (DictionaryEntry entry in dict)
+            {
+                if (!CheckTypeMatch(keyType, entry.Key)) return false;
+                if (!CheckTypeMatch(valueType, entry.Value)) return false;
+            }
+            return true;
+        }
+
+        // 6. Basic Types
+        return typeName.ToLower() switch
+        {
+            "int" => val is int,
+            "double" => val is double,
+            "string" => val is string,
+            "bool" => val is bool,
+            "char" => val is char,
+            "array" => val is Array,
+            "list" => val is IList,
+            "dict" => val is IDictionary,
+            "tuple" => val is Tuple<object?, object?>,
+            "null" => val == null,
+            "any" => true,
+            "object" => true,
+            _ => CheckCustomType(typeName, val)
+        };
+    }
+
+    private string[] SplitGenericArgs(string args)
+    {
+        var result = new List<string>();
+        int depth = 0;
+        int start = 0;
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] == '<') depth++;
+            else if (args[i] == '>') depth--;
+            else if (args[i] == ',' && depth == 0)
+            {
+                result.Add(args.Substring(start, i - start));
+                start = i + 1;
+            }
+        }
+        result.Add(args.Substring(start));
+        return result.ToArray();
+    }
+
+    private bool CheckCustomType(string typeName, object? val)
+     {
+         if (val is BytecodeObjectInstance instance)
+         {
+             if (instance.ClassName == typeName) return true;
+             
+             // Check inheritance
+             var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName);
+             while (metadata != null)
+             {
+                 if (metadata.Name == typeName) return true;
+                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
+                 if (metadata.BaseClassName == typeName) return true;
+                 
+                 if (metadata.BaseClassName != null)
+                 {
+                     metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == metadata.BaseClassName);
+                 }
+                 else
+                 {
+                     break;
+                 }
+             }
+         }
+         return false;
+     }
 
     private List<object?> ConvertToList(object? value)
     {

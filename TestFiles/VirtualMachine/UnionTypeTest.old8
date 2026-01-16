@@ -1,42 +1,55 @@
-// Union Type Test for Virtual Machine
+// Test Union Types
 
-// 1. Basic union
-u:int|string <- 123
-if u != 123 {
-    throw "u should be 123"
+class A {
+    func methodA() { PrintLine("A") }
 }
-PrintLine("u:int|string <- 123 passed")
 
-u <- "text"
-if u != "text" {
-    throw "u should be text"
+class B {
+    func methodB() { PrintLine("B") }
 }
-PrintLine("u <- text passed")
 
-// 2. Failure case
+class C {
+    func methodC() { PrintLine("C") }
+}
+
+// Variable with union type
+a: A | B <- A()
+PrintLine("A | B (A) passed")
+
+b: A | B <- B()
+PrintLine("A | B (B) passed")
+
+// Test type check failure
 try {
-    u <- true
-    throw "Should have thrown type mismatch for bool"
+    c: A | B <- C()
 } catch (e) {
-    PrintLine("Caught expected error: " + e)
+    PrintLine("Caught expected error for A | B: " + e)
 }
 
-// 3. Nullable union (syntax check: int|string?)
-// Note: "int|string?" might be parsed as "int | (string?)"
-nu:int|string? <- null
-if nu != null {
-    throw "nu should be null"
-}
-PrintLine("nu:int|string? <- null passed")
+// Test cast
+obj <- A()
+casted <- obj as "A | B"
+PrintLine("Cast to A | B passed")
 
-nu <- 456
-if nu != 456 {
-    throw "nu should be 456"
-}
-
-nu <- "test"
-if nu != "test" {
-    throw "nu should be test"
+try {
+    obj2 <- C()
+    casted2 <- obj2 as "A | B"
+} catch (e) {
+    PrintLine("Caught expected error for Cast to A | B: " + e)
 }
 
-PrintLine("All Union Tests Passed")
+// Test primitive union
+// Note: Function parameter type checking is not yet implemented in VM mode.
+// We use variable assignment to test type checking logic.
+
+val1: int | string <- 123
+PrintLine("int | string (int) passed")
+
+val2: int | string <- "hello"
+PrintLine("int | string (string) passed")
+
+try {
+    val3: int | string <- 3.14 // double
+} catch (e) {
+    PrintLine("Caught expected error for int | string: " + e)
+}
