@@ -328,9 +328,9 @@ public class BytecodeCompiler
         _scopes.Pop();
     }
 
-    public int DeclareLocalVariable(string name)
+    public int DeclareLocalVariable(string name, string type = "")
     {
-        return _scopes.Peek().DeclareLocal(name);
+        return _scopes.Peek().DeclareLocal(name, type);
     }
 
     public bool IsLocalVariable(string name)
@@ -341,6 +341,11 @@ public class BytecodeCompiler
     public int GetLocalIndex(string name)
     {
         return _scopes.Peek().GetLocalIndex(name);
+    }
+
+    public string GetLocalType(string name)
+    {
+        return _scopes.Peek().GetLocalType(name);
     }
 
     /// <summary>
@@ -569,15 +574,27 @@ public class BytecodeCompiler
     private class Scope(Scope? parent)
     {
         private readonly Dictionary<string, int> _locals = new();
+        private readonly Dictionary<string, string> _localTypes = new();
         private int _nextIndex = parent?._nextIndex ?? 0;
 
-        public int DeclareLocal(string name)
+        public int DeclareLocal(string name, string type = "")
         {
             if (_locals.TryGetValue(name, out var local))
+            {
+                // 如果变量已存在，更新类型（如果有新类型）
+                if (!string.IsNullOrEmpty(type))
+                {
+                    _localTypes[name] = type;
+                }
                 return local;
+            }
 
             int index = _nextIndex++;
             _locals[name] = index;
+            if (!string.IsNullOrEmpty(type))
+            {
+                _localTypes[name] = type;
+            }
             return index;
         }
 
@@ -591,6 +608,13 @@ public class BytecodeCompiler
             if (_locals.TryGetValue(name, out int index))
                 return index;
             return parent?.GetLocalIndex(name) ?? -1;
+        }
+
+        public string GetLocalType(string name)
+        {
+            if (_localTypes.TryGetValue(name, out string? type))
+                return type;
+            return parent?.GetLocalType(name) ?? "";
         }
 
         public int LocalCount => _nextIndex;

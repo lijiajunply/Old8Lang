@@ -1585,20 +1585,57 @@ public class VirtualMachine
                 var targetTypeName = (string)instruction.Operand!;
                 var value = _stack.Pop();
 
-                // 检查类型
-                bool isType = targetTypeName.ToLower() switch
+                // 本地函数：检查单个类型
+                bool CheckType(string typeName, object? val)
                 {
-                    "int" => value is int,
-                    "double" => value is double,
-                    "string" => value is string,
-                    "bool" => value is bool,
-                    "char" => value is char,
-                    "array" => value is Array,
-                    "list" => value is IList,
-                    "dict" => value is IDictionary,
-                    "null" => value == null,
-                    _ => false
-                };
+                    typeName = typeName.Trim();
+
+                    // 处理可空类型
+                    if (typeName.EndsWith("?"))
+                    {
+                        if (val == null) return true;
+                        typeName = typeName.Substring(0, typeName.Length - 1);
+                    }
+                    
+                    // 如果值是 null 但类型不是可空的，返回 false
+                    if (val == null && typeName != "null" && typeName != "any") return false;
+
+                    return typeName.ToLower() switch
+                    {
+                        "int" => val is int,
+                        "double" => val is double,
+                        "string" => val is string,
+                        "bool" => val is bool,
+                        "char" => val is char,
+                        "array" => val is Array,
+                        "list" => val is IList,
+                        "dict" => val is IDictionary,
+                        "null" => val == null,
+                        "any" => true,
+                        "object" => true,
+                        _ => false
+                    };
+                }
+
+                bool isType = false;
+
+                // 处理联合类型 (例如 "int|string")
+                if (targetTypeName.Contains('|'))
+                {
+                    var types = targetTypeName.Split('|');
+                    foreach (var type in types)
+                    {
+                        if (CheckType(type, value))
+                        {
+                            isType = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    isType = CheckType(targetTypeName, value);
+                }
 
                 _stack.Push(isType);
             }

@@ -44,17 +44,61 @@ public partial class BytecodeVisitor
             // 生成右侧表达式的代码
             node.Value.Accept(this);
 
+            string typeToCheck = node.Id.AssumptionType;
+
+            // 如果没有显式类型注解，尝试查找变量的已知类型
+            if (string.IsNullOrEmpty(typeToCheck) && _compiler.IsLocalVariable(varName))
+            {
+                typeToCheck = _compiler.GetLocalType(varName);
+            }
+
+            // 检查是否有类型注解
+            if (!string.IsNullOrEmpty(typeToCheck))
+            {
+                // 复制栈顶值用于检查
+                Emit(OpCode.Dup);
+                
+                // 执行类型检查
+                Emit(OpCode.IsType, typeToCheck);
+                
+                // 如果检查通过，跳转到存储
+                int jumpIfTrue = GetCurrentPosition();
+                Emit(OpCode.JumpIfTrue, -1);
+                
+                // 检查失败，抛出异常
+                // 加载错误消息
+                var errorMsg = $"变量 '{varName}' 类型不匹配: 期望 {typeToCheck}";
+                var msgIndex = _compiler.ConstantPool.AddConstant(errorMsg);
+                Emit(OpCode.LoadConst, msgIndex);
+                Emit(OpCode.Throw);
+                
+                // 修补跳转
+                PatchJump(jumpIfTrue, GetCurrentPosition());
+            }
+
             // 检查是否是局部变量
             if (_compiler.IsLocalVariable(varName))
             {
                 int localIndex = _compiler.GetLocalIndex(varName);
+                
+                // 如果有显式类型注解，更新变量类型
+                if (!string.IsNullOrEmpty(node.Id.AssumptionType))
+                {
+                    _compiler.DeclareLocalVariable(varName, node.Id.AssumptionType);
+                }
+                
                 Emit(OpCode.StoreLocal, localIndex);
+            }
+            else if (_compiler.IsGlobalVariable(varName))
+            {
+                // 全局变量更新
+                Emit(OpCode.StoreGlobal, varName);
             }
             else
             {
-                // 声明为全局变量
-                _compiler.DeclareGlobalVariable(varName);
-                Emit(OpCode.StoreGlobal, varName);
+                // 新变量：声明为局部变量
+                int localIndex = _compiler.DeclareLocalVariable(varName, node.Id.AssumptionType);
+                Emit(OpCode.StoreLocal, localIndex);
             }
         }
         else

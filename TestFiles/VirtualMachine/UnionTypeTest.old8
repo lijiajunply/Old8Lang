@@ -1,0 +1,42 @@
+// Union Type Test for Virtual Machine
+
+// 1. Basic union
+u:int|string <- 123
+if u != 123 {
+    throw "u should be 123"
+}
+PrintLine("u:int|string <- 123 passed")
+
+u <- "text"
+if u != "text" {
+    throw "u should be text"
+}
+PrintLine("u <- text passed")
+
+// 2. Failure case
+try {
+    u <- true
+    throw "Should have thrown type mismatch for bool"
+} catch (e) {
+    PrintLine("Caught expected error: " + e)
+}
+
+// 3. Nullable union (syntax check: int|string?)
+// Note: "int|string?" might be parsed as "int | (string?)"
+nu:int|string? <- null
+if nu != null {
+    throw "nu should be null"
+}
+PrintLine("nu:int|string? <- null passed")
+
+nu <- 456
+if nu != 456 {
+    throw "nu should be 456"
+}
+
+nu <- "test"
+if nu != "test" {
+    throw "nu should be test"
+}
+
+PrintLine("All Union Tests Passed")

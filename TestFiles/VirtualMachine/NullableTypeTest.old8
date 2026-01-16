@@ -1,0 +1,37 @@
+// Nullable Type Test for Virtual Machine
+
+// 1. Basic nullable int
+x:int? <- null
+if x != null {
+    throw "x should be null"
+}
+PrintLine("x:int? <- null passed")
+
+x <- 123
+if x != 123 {
+    throw "x should be 123"
+}
+PrintLine("x <- 123 passed")
+
+// 2. Nullable string
+s:string? <- "hello"
+if s != "hello" {
+    throw "s should be hello"
+}
+PrintLine("s:string? <- hello passed")
+
+s <- null
+if s != null {
+    throw "s should be null"
+}
+PrintLine("s <- null passed")
+
+// 3. Failure case (catch exception)
+try {
+    y:int? <- "not an int"
+    throw "Should have thrown type mismatch"
+} catch (e) {
+    PrintLine("Caught expected error: " + e)
+}
+
+PrintLine("All Nullable Tests Passed")
