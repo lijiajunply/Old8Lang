@@ -413,7 +413,7 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.OutputType(local);
 
-            if (listType == typeof(List<object>) || listType == typeof(object[]))
+            if (listType != null && typeof(IEnumerable).IsAssignableFrom(listType))
             {
                 // 调用 RuntimeWhenAll
                 var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAll))!;
@@ -448,7 +448,7 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.OutputType(local);
 
-            if (listType == typeof(List<object>) || listType == typeof(object[]))
+            if (listType != null && typeof(IEnumerable).IsAssignableFrom(listType))
             {
                 // 调用 RuntimeWhenAny
                 var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAny))!;

@@ -143,7 +143,10 @@ public partial class AsyncFuncInit : OldStatement
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
         funcLocal.DelegateVar.TryAdd(delegateKey, dynamicMethod);
-        CompiledDelegateRegistry.Register(delegateKey, dynamicMethod);
+        if (Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
+        {
+            CompiledDelegateRegistry.Register(delegateKey, dynamicMethod);
+        }
 
         // 同时存储函数的参数列表信息
         if (AsyncFuncValue.Ids is not null)

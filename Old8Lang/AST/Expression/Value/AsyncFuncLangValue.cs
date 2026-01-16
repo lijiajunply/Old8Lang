@@ -335,6 +335,39 @@ public class AsyncFuncLangValue : ImportInfo
     /// </summary>
     public void GenerateMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
+        if (!Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
+        {
+            local.AsyncStateMachineGenerator = null;
+
+            var returnValueLocal = ilGenerator.DeclareLocal(typeof(object));
+            var returnLabel = ilGenerator.DefineLabel();
+            local.ReturnValueLocal = returnValueLocal;
+            local.ReturnLabel = returnLabel;
+
+            ilGenerator.BeginExceptionBlock();
+            BlockStatement.GenerateIl(ilGenerator, local);
+
+            if (BlockStatement.Count == 0 || BlockStatement[^1] is not ReturnStatement)
+            {
+                ilGenerator.Emit(OpCodes.Ldnull);
+                ilGenerator.Emit(OpCodes.Stloc, returnValueLocal);
+            }
+
+            ilGenerator.Emit(OpCodes.Leave, returnLabel);
+            ilGenerator.BeginFinallyBlock();
+            ilGenerator.EndExceptionBlock();
+
+            ilGenerator.MarkLabel(returnLabel);
+            ilGenerator.Emit(OpCodes.Ldloc, returnValueLocal);
+
+            var fromResultMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+            ilGenerator.Emit(OpCodes.Call, fromResultMethod.MakeGenericMethod(typeof(object)));
+            ilGenerator.Emit(OpCodes.Ret);
+            return;
+        }
+
         // 创建动态程序集和类型来生成状态机
         var assemblyName = new System.Reflection.AssemblyName($"Old8LangAsync_{Id?.IdName ?? "Anonymous"}");
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);

@@ -31,7 +31,7 @@ public static class Compiler
     /// </summary>
     public static bool IlVerificationEnabled { get; set; } = true;
 
-    public static bool EnableAsyncStateMachineAwait { get; set; } = true;
+    public static bool EnableAsyncStateMachineAwait { get; set; } = false;
 
     /// <summary>
     /// 日志级别枚举，用于控制编译过程中的日志输出
