@@ -1,0 +1,33 @@
+
+// Simple Tuple Destructuring
+PrintLine("--- Simple Tuple Destructuring ---")
+(a, b) <- (1, 2)
+PrintLine("a: " + a.ToStr())
+PrintLine("b: " + b.ToStr())
+
+// Nested Tuple Destructuring
+PrintLine("--- Nested Tuple Destructuring ---")
+(c, (d, e)) <- (3, (4, 5))
+PrintLine("c: " + c.ToStr())
+PrintLine("d: " + d.ToStr())
+PrintLine("e: " + e.ToStr())
+
+// Destructuring with List
+PrintLine("--- Destructuring with List ---")
+(f, g) <- {6, 7}
+PrintLine("f: " + f.ToStr())
+PrintLine("g: " + g.ToStr())
+
+// Destructuring with Array
+PrintLine("--- Destructuring with Array ---")
+(h, i) <- [8, 9]
+PrintLine("h: " + h.ToStr())
+PrintLine("i: " + i.ToStr())
+
+// Swapping
+PrintLine("--- Swapping ---")
+x <- 10
+y <- 20
+(x, y) <- (y, x)
+PrintLine("x: " + x.ToStr())
+PrintLine("y: " + y.ToStr())

@@ -1,0 +1,16 @@
+
+try {
+    throw "Error1"
+} catch (e) where e == "Error1" {
+    PrintLine("Caught Error1")
+} catch (e) {
+    PrintLine("Caught other: " + e)
+}
+
+try {
+    throw "Error2"
+} catch (e) where e == "Error1" {
+    PrintLine("Caught Error1")
+} catch (e) {
+    PrintLine("Caught other: " + e)
+}
