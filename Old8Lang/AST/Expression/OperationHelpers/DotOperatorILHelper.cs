@@ -611,6 +611,11 @@ public static class DotOperatorILHelper
             {
                 extensionType = typeof(DictionaryExtensions);
             }
+            else if (leftType == typeof(int) || leftType == typeof(double) || 
+                     leftType == typeof(bool) || leftType == typeof(char))
+            {
+                extensionType = typeof(PrimitiveExtensions);
+            }
             // Old8Lang 类型的扩展方法
             else if (leftType == typeof(StringLangValue))
             {

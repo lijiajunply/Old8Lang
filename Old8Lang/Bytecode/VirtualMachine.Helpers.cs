@@ -600,6 +600,11 @@ public partial class VirtualMachine
         {
             extensionType = typeof(DictionaryExtensions);
         }
+        // 对于基本类型(int, double, bool, char)，查找对应的扩展方法类
+        else if (obj is int || obj is double || obj is bool || obj is char)
+        {
+            extensionType = typeof(PrimitiveExtensions);
+        }
         // 对于 Old8Lang 类型，查找对应的扩展方法类
         else if (obj is DictionaryLangValue)
         {
@@ -643,8 +648,20 @@ public partial class VirtualMachine
                 // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是对象本身)
                 var expectedParamCount = args.Length + 1;
 
-                // 首先查找精确匹配的参数数量
-                method = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount);
+                // 查找参数数量和类型都匹配的方法
+                method = allMethods.FirstOrDefault(x => 
+                {
+                    var parameters = x.GetParameters();
+                    if (parameters.Length != expectedParamCount) return false;
+                    
+                    // 检查第一个参数（扩展方法的 'this' 参数）类型兼容性
+                    if (obj != null && !parameters[0].ParameterType.IsInstanceOfType(obj))
+                    {
+                        return false;
+                    }
+                    
+                    return true;
+                });
 
                 // 如果没找到，查找有可选参数的方法
                 if (method == null)

@@ -27,6 +27,15 @@ public static class StringValueFuncStatic
     extension(StringLangValue str)
     {
         /// <summary>
+        /// 获取字符串的长度
+        /// </summary>
+        /// <returns>字符串长度</returns>
+        public IntLangValue Length()
+        {
+            return new IntLangValue(str.Value.Length);
+        }
+
+        /// <summary>
         /// 获取字符串的子串
         /// </summary>
         /// <param name="start">子串的起始位置</param>

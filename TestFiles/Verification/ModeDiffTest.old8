@@ -1,0 +1,46 @@
+
+func main() -> void {
+    PrintLine("=== Basic Type Methods Test ===")
+    
+    // 1. Integer methods
+    i <- 123
+    PrintLine("int.ToStr: " + i.ToStr())
+
+    // 2. Double methods
+    d <- 123.456
+    PrintLine("double.ToStr: " + d.ToStr())
+    
+    val <- d.ToInt()
+    PrintLine("double.ToInt val: " + val.ToStr())
+
+    // 3. Bool methods
+    b <- true
+    PrintLine("bool.ToStr: " + b.ToStr())
+
+    // 4. String methods
+    s <- "Hello"
+    // Split to debug
+    len <- s.Length()
+    PrintLine("string.Length: " + len.ToStr())
+
+    PrintLine("string.Upper: " + s.ToUpper()) 
+    PrintLine("string.Contains: " + s.Contains("ell").ToStr())
+
+    // 5. List methods
+    l <- {1, 2, 3}
+    count <- l.Count()
+    PrintLine("list.Count: " + count.ToStr())
+    
+    l.Add(4)
+    count2 <- l.Count()
+    PrintLine("list.Add result count: " + count2.ToStr())
+    
+    // 6. Dict methods
+    dict <- {"a": 1}
+    hasKey <- dict.ContainsKey("a")
+    PrintLine("dict.ContainsKey('a'): " + hasKey.ToStr())
+    
+    PrintLine("=== Test Finished ===")
+}
+
+main()

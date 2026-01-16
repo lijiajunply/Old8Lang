@@ -9,7 +9,7 @@ public static class StringExtensions
     /// <summary>
     /// 转换为大写
     /// </summary>
-    public static string Upper(this string str)
+    public static string ToUpper(this string str)
     {
         return str.ToUpper();
     }
@@ -17,7 +17,7 @@ public static class StringExtensions
     /// <summary>
     /// 转换为小写
     /// </summary>
-    public static string Lower(this string str)
+    public static string ToLower(this string str)
     {
         return str.ToLower();
     }
