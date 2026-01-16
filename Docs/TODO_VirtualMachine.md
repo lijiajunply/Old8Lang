@@ -1,6 +1,6 @@
 # 虚拟机模式完成 TODO
 
-**当前完成度**: 72.5% (79/109 功能完全支持)
+**当前完成度**: 73.4% (80/109 功能完全支持)
 
 ---
 
@@ -8,8 +8,8 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 完全支持 | 79 | 已完整实现并测试通过 |
-| ❌ 不支持 | 30 | 功能未实现 |
+| ✅ 完全支持 | 80 | 已完整实现并测试通过 |
+| ❌ 不支持 | 29 | 功能未实现 |
 
 ---
 
@@ -50,20 +50,21 @@
 
 ### 2. 类型转换（as 关键字）
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - 类型转换 (第 452 行)
 
 **实施步骤**:
-1. 实现 `BytecodeVisitor.VisitTypeConversion`
-2. 添加类型转换字节码指令
-3. 实现运行时类型转换逻辑
-4. 添加测试用例
+1. ✅ 实现 `BytecodeVisitor.VisitTypeConversion`
+2. ✅ 添加类型转换字节码指令 (OpCode.Cast)
+3. ✅ 实现运行时类型转换逻辑 (VM.cs 中的转换处理)
+4. ✅ 添加测试用例 (test_vm_cast.old8)
 
 **相关文件**:
 - `Old8Lang/AST/Expression/TypeConversion.cs`
 - `Old8Lang/Visitor/BytecodeVisitor.cs`
+- `Old8Lang/VirtualMachine/VM.cs`
 
 ---
 
