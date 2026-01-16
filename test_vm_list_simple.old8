@@ -1,6 +1,0 @@
-// 简单测试虚拟机中的列表
-
-list <- {1, 2, 3}
-PrintLine("列表类型测试")
-list.Add(4)
-PrintLine("添加成功")

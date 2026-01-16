@@ -1,7 +1,0 @@
-async func hello() -> string {
-    return "Hello from async"
-}
-
-task <- hello()
-result <- await task
-PrintLine(result)
