@@ -913,7 +913,8 @@ public class PrimaryParser(
 
             // 单元素元组：(expr,) 或 (x: expr,)
             // 注意：单元素元组不支持命名字段，因为命名字段需要多个元素才有意义
-            return new TupleLangValue(elements[0], new NullLangValue(), position);
+            // 使用列表构造函数创建单元素元组，避免引入 NullLangValue
+            return new TupleLangValue(new List<LangExpression> { elements[0] }, position);
         }
 
         // 多元素元组：使用支持命名字段的构造函数
@@ -924,14 +925,7 @@ public class PrimaryParser(
         }
         else
         {
-            // 无命名字段，使用普通构造函数（向后兼容）
-            if (elements.Count == 2)
-            {
-                // 双元素元组：(expr1, expr2)
-                return new TupleLangValue(elements[0], elements[1], position);
-            }
-
-            // 多元素元组：(expr1, expr2, expr3, ...) - 使用列表构造函数
+            // 无命名字段，统一使用列表构造函数
             return new TupleLangValue(elements, position);
         }
     }

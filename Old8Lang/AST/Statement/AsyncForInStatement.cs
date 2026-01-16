@@ -102,8 +102,7 @@ public partial class AsyncForInStatement(
                                     tupleValue.Run(manager);
 
                                     // 字典键值对，赋值给多个标识符
-                                    var values = new List<LangValueType>
-                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = tupleValue.GetItems().ToList();
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -180,8 +179,7 @@ public partial class AsyncForInStatement(
                                     tupleValue.Run(manager);
 
                                     // 字典键值对，赋值给多个标识符
-                                    var values = new List<LangValueType>
-                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = tupleValue.GetItems().ToList();
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -237,8 +235,7 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     tupleValue.Run(manager);
-                                    var values = new List<LangValueType>
-                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = tupleValue.GetItems().ToList();
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -277,7 +274,7 @@ public partial class AsyncForInStatement(
                         if (idValue is TupleLangValue tupleValue)
                         {
                             tupleValue.Run(manager);
-                            var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                            var values = tupleValue.GetItems().ToList();
 
                             for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                             {
@@ -453,7 +450,7 @@ public partial class AsyncForInStatement(
                             if (currentValue is TupleLangValue tupleValue)
                             {
                                 tupleValue.Run(manager);
-                                var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                var values = tupleValue.GetItems().ToList();
                                 for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                 {
                                     manager.Set(AllIds[i], values[i]);
@@ -583,8 +580,7 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     tupleValue.Run(manager);
-                                    var values = new List<LangValueType>
-                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = tupleValue.GetItems().ToList();
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
                                         manager.Set(AllIds[i], values[i]);
@@ -687,7 +683,7 @@ public partial class AsyncForInStatement(
                     if (idValue is TupleLangValue tupleValue)
                     {
                         tupleValue.Run(manager);
-                        var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                        var values = tupleValue.GetItems().ToList();
                         for (var j = 0; j < AllIds.Count && j < values.Count; j++)
                         {
                             manager.Set(AllIds[j], values[j]);

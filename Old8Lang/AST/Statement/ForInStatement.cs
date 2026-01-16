@@ -227,7 +227,7 @@ public partial class ForInStatement(
                             tupleValue.Run(manager);
 
                             // 字典键值对，赋值给多个标识符
-                            var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                            var values = tupleValue.GetItems().ToList();
 
                             for (var i = 0; i < AllIds.Count && i < values.Count; i++)
                             {
@@ -372,7 +372,7 @@ public partial class ForInStatement(
                             if (idValue is TupleLangValue tupleValue)
                             {
                                 tupleValue.Run(manager);
-                                var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                var values = tupleValue.GetItems().ToList();
                                 for (var j = 0; j < AllIds.Count && j < values.Count; j++)
                                 {
                                     manager.Set(AllIds[j], values[j]);

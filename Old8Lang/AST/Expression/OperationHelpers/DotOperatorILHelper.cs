@@ -156,6 +156,7 @@ public static class DotOperatorILHelper
             {
                 return returnType!;
             }
+
             // 如果StaticClassCompiler无法处理这个方法，抛出更有用的错误
             throw new InvalidOperationError(operation, $"方法 '{methodName}' 不支持",
                 $"静态类 '{leftId.IdName}' 不支持方法 '{methodName}'。请检查方法名是否正确。");
@@ -239,6 +240,7 @@ public static class DotOperatorILHelper
 
                     return false;
                 }
+
                 return true;
             });
 
@@ -631,6 +633,14 @@ public static class DotOperatorILHelper
             {
                 extensionType = typeof(DictionaryValueFuncStatic);
             }
+            else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
+            {
+                extensionType = typeof(ValueFunctions.TupleExtensions);
+            }
+            else if (leftType == typeof(TupleLangValue))
+            {
+                extensionType = typeof(TupleValueFuncStatic);
+            }
 
             if (extensionType != null)
             {
@@ -648,6 +658,11 @@ public static class DotOperatorILHelper
                 {
                     firstParamType = typeof(Dictionary<object, object?>);
                 }
+                // 如果是 ValueTuple，使用 ITuple
+                else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
+                {
+                    firstParamType = typeof(System.Runtime.CompilerServices.ITuple);
+                }
 
                 var extensionTypes = new Type[types.Count + 1];
                 extensionTypes[0] = firstParamType;
@@ -663,6 +678,28 @@ public static class DotOperatorILHelper
                         .FirstOrDefault(method =>
                             method.Name == instance.Id.IdName &&
                             method.GetParameters().Length == instance.Ids.Count + 1); // +1 因为扩展方法有 this 参数
+                }
+
+                // 如果找到了扩展方法，且左操作数是值类型但扩展方法期望引用类型（如接口），需要装箱
+                if (m != null && leftType.IsValueType && !m.GetParameters()[0].ParameterType.IsValueType)
+                {
+                    // 我们需要装箱 'left'，它在栈的深处，参数之下。
+                    // 保存参数
+                    var argLocals = new LocalBuilder[types.Count];
+                    for (int i = types.Count - 1; i >= 0; i--)
+                    {
+                        argLocals[i] = ilGenerator.DeclareLocal(types[i]);
+                        ilGenerator.Emit(OpCodes.Stloc, argLocals[i]);
+                    }
+
+                    // 装箱 left
+                    ilGenerator.Emit(OpCodes.Box, leftType);
+
+                    // 恢复参数
+                    for (int i = 0; i < types.Count; i++)
+                    {
+                        ilGenerator.Emit(OpCodes.Ldloc, argLocals[i]);
+                    }
                 }
             }
 
@@ -718,6 +755,19 @@ public static class DotOperatorILHelper
 
         // 普通实例成员访问
         left!.LoadIlValue(ilGenerator, local);
+
+        // 特殊处理 ValueTuple 的 Length
+        if (leftType!.FullName?.StartsWith("System.ValueTuple") == true && id.IdName == "Length")
+        {
+            // 弹出栈顶的 Tuple 实例 (因为我们不需要它来获取长度，如果是常量长度)
+            ilGenerator.Emit(OpCodes.Pop);
+
+            // 计算长度
+            int length = GetValueTupleLength(leftType);
+            ilGenerator.Emit(OpCodes.Ldc_I4, length);
+            return typeof(int);
+        }
+
         var instanceField = leftType!.GetField(id.IdName);
         if (instanceField is null)
         {
@@ -784,6 +834,21 @@ public static class DotOperatorILHelper
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(char);
         }
+        else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问
+            if (right is IntLangValue intVal)
+            {
+                // 如果是常量索引，优化为字段访问
+                return GenerateValueTupleItemAccess(ilGenerator, leftType, intVal.Value);
+            }
+
+            // 变量索引，装箱为 ITuple 并使用索引器
+            ilGenerator.Emit(OpCodes.Box, leftType);
+            var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
+            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+            return typeof(object);
+        }
         else if (leftType == typeof(object))
         {
             // Object类型，可能是字典、列表或数组
@@ -807,7 +872,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成动态索引访问的IL代码（用于 object 类型）
     /// </summary>
-    private static Type GenerateDynamicIndexAccess(ILGenerator ilGenerator, Type rightType)
+    public static Type GenerateDynamicIndexAccess(ILGenerator ilGenerator, Type rightType)
     {
         // 栈上已经有: leftValue, rightValue
         // 先保存rightValue
@@ -826,6 +891,8 @@ public static class DotOperatorILHelper
         var endLabel = ilGenerator.DefineLabel();
         var notDictLabel = ilGenerator.DefineLabel();
         var notListLabel = ilGenerator.DefineLabel();
+        var notArrayLabel = ilGenerator.DefineLabel();
+        var notTupleLabel = ilGenerator.DefineLabel();
 
         // 尝试Dictionary<object, object>
         ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
@@ -859,12 +926,79 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(OpCodes.Pop);
         ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
         ilGenerator.Emit(OpCodes.Isinst, typeof(object[]));
+        ilGenerator.Emit(OpCodes.Dup);
+        ilGenerator.Emit(OpCodes.Brfalse, notArrayLabel);
+
+        // 是Array
         ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
         ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
         ilGenerator.Emit(OpCodes.Ldelem_Ref);
+        ilGenerator.Emit(OpCodes.Br, endLabel);
+
+        // 不是Array，尝试ITuple
+        ilGenerator.MarkLabel(notArrayLabel);
+        ilGenerator.Emit(OpCodes.Pop);
+        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
+        ilGenerator.Emit(OpCodes.Isinst, typeof(System.Runtime.CompilerServices.ITuple));
+        ilGenerator.Emit(OpCodes.Dup);
+        ilGenerator.Emit(OpCodes.Brfalse, notTupleLabel);
+
+        // 是Tuple
+        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
+        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+        var tupleIndexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
+        ilGenerator.Emit(OpCodes.Callvirt, tupleIndexer.GetGetMethod()!);
+        ilGenerator.Emit(OpCodes.Br, endLabel);
+
+        // 都不匹配
+        ilGenerator.MarkLabel(notTupleLabel);
+        ilGenerator.Emit(OpCodes.Pop);
+        ilGenerator.Emit(OpCodes.Ldnull); // 或者抛出异常
 
         ilGenerator.MarkLabel(endLabel);
         return typeof(object);
     }
-}
 
+    public static int GetValueTupleLength(Type type)
+    {
+        if (type.FullName?.StartsWith("System.ValueTuple") != true) return 0;
+        var fields = type.GetFields();
+        int count = fields.Length;
+        // 如果最后一个字段是 Rest (ITuple)，则递归计算
+        if (count == 8 && fields[7].Name == "Rest")
+        {
+            return 7 + GetValueTupleLength(fields[7].FieldType);
+        }
+
+        return count;
+    }
+
+    public static Type GenerateValueTupleItemAccess(ILGenerator ilGenerator, Type tupleType, int index)
+    {
+        // 索引越界检查应该在编译期还是运行期？这里假设调用者已经验证或由运行时异常处理
+        // ValueTuple 的字段是 Item1, Item2...
+        if (index < 7)
+        {
+            var field = tupleType.GetField($"Item{index + 1}");
+            if (field == null)
+            {
+                // 可能是短元组，索引越界
+                throw new InvalidOperationException($"无法访问 ValueTuple 的索引 {index}: 字段 Item{index + 1} 不存在");
+            }
+
+            ilGenerator.Emit(OpCodes.Ldfld, field);
+            return field.FieldType;
+        }
+        else
+        {
+            var restField = tupleType.GetField("Rest");
+            if (restField == null)
+            {
+                throw new InvalidOperationException($"无法访问 ValueTuple 的索引 {index}: Rest 字段不存在");
+            }
+
+            ilGenerator.Emit(OpCodes.Ldfld, restField);
+            return GenerateValueTupleItemAccess(ilGenerator, restField.FieldType, index - 7);
+        }
+    }
+}

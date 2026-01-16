@@ -15,8 +15,6 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 获取元组指定索引的元素
         /// </summary>
-        /// <param name="index">索引值</param>
-        /// <returns>指定索引的元素</returns>
         public LangValueType Get(IntLangValue index)
         {
             return tuple.Get(index.Value);
@@ -25,11 +23,9 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 将元组中的所有元素连接成字符串
         /// </summary>
-        /// <param name="separator">分隔符</param>
-        /// <returns>连接后的字符串</returns>
         public StringLangValue Join(StringLangValue separator)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var separatorValue = separator.Value;
 
             var result = string.Join(separatorValue, elements.Select(e => e.ToDisplayString()));
@@ -39,11 +35,9 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 检查元组是否包含指定元素
         /// </summary>
-        /// <param name="value">要查找的元素</param>
-        /// <returns>如果包含返回true，否则返回false</returns>
         public BoolLangValue Contains(LangValueType value)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var contains = elements.Any(item => item.Equal(value));
             return new BoolLangValue(contains);
         }
@@ -51,13 +45,9 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 查找元组中第一个满足条件的元素
         /// </summary>
-        /// <param name="predicate">条件函数</param>
-        /// <returns>第一个满足条件的元素，如果没有找到返回Null</returns>
         public LangValueType Find(FuncLangValue predicate)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
-
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var elements = tuple.GetItems();
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
@@ -82,14 +72,10 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 过滤元组中的元素
         /// </summary>
-        /// <param name="predicate">条件函数</param>
-        /// <returns>包含满足条件元素的新元组</returns>
         public TupleLangValue Filter(FuncLangValue predicate)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var filteredElements = new List<LangValueType>();
-
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
@@ -104,7 +90,6 @@ public static class TupleValueFuncStatic
                 }
                 catch
                 {
-                    // 忽略执行错误，保留该项
                     filteredElements.Add(item);
                 }
             }
@@ -115,14 +100,10 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 转换元组中的所有元素
         /// </summary>
-        /// <param name="func">转换函数</param>
-        /// <returns>包含转换后元素的新元组</returns>
         public TupleLangValue Map(FuncLangValue func)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var transformedElements = new List<LangValueType>();
-
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
@@ -134,7 +115,6 @@ public static class TupleValueFuncStatic
                 }
                 catch
                 {
-                    // 如果转换失败，保留原值
                     transformedElements.Add(item);
                 }
             }
@@ -145,15 +125,10 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 聚合元组元素
         /// </summary>
-        /// <param name="reducer">聚合函数</param>
-        /// <param name="seed">初始值</param>
-        /// <returns>聚合结果</returns>
         public LangValueType Reduce(FuncLangValue reducer, LangValueType seed)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var result = seed;
-
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
@@ -164,7 +139,7 @@ public static class TupleValueFuncStatic
                 }
                 catch
                 {
-                    // 忽略执行错误，继续聚合
+                    // 忽略执行错误，继续排序
                 }
             }
 
@@ -174,13 +149,9 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 对元组中的每个元素执行操作
         /// </summary>
-        /// <param name="action">要执行的操作函数</param>
-        /// <returns>VoidLangValue，表示操作完成</returns>
         public VoidLangValue ForEach(FuncLangValue action)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
-
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var elements = tuple.GetItems();
             var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
@@ -191,7 +162,7 @@ public static class TupleValueFuncStatic
                 }
                 catch
                 {
-                    // 忽略执行错误，继续处理下一项
+                    // 忽略执行错误，继续排序
                 }
             }
 
@@ -201,18 +172,13 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 排序元组元素
         /// </summary>
-        /// <param name="comparer">比较函数（可选）</param>
-        /// <returns>排序后的新元组</returns>
         public TupleLangValue Sort(FuncLangValue? comparer = null)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
 
             if (comparer is not null)
             {
-                // 尝试获取当前的 VariateManager，如果没有则创建新的
                 var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
-
-                // 使用自定义比较器排序
                 var sortedElements = elements.ToList();
                 for (int i = 0; i < sortedElements.Count - 1; i++)
                 {
@@ -229,7 +195,7 @@ public static class TupleValueFuncStatic
                         }
                         catch
                         {
-                            // 忽略错误，保持原顺序
+                            // 忽略执行错误，继续排序
                         }
                     }
                 }
@@ -238,7 +204,6 @@ public static class TupleValueFuncStatic
             }
             else
             {
-                // 默认排序（按字符串表示）
                 var sortedElements = elements.OrderBy(e => e.ToDisplayString()).ToList();
                 return TupleLangValue.CreateTupleFromList(sortedElements);
             }
@@ -247,24 +212,21 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 反转元组元素顺序
         /// </summary>
-        /// <returns>反转后的新元组</returns>
         public TupleLangValue Reverse()
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems();
             var reversedElements = elements.ToList();
-            reversedElements.Reverse(); // 就地反转
+            reversedElements.Reverse();
             return TupleLangValue.CreateTupleFromList(reversedElements);
         }
 
         /// <summary>
         /// 连接两个元组
         /// </summary>
-        /// <param name="other">要连接的元组</param>
-        /// <returns>连接后的新元组</returns>
         public TupleLangValue Concat(TupleLangValue other)
         {
-            var elements1 = TupleLangValue.GetAllElements(tuple);
-            var elements2 = TupleLangValue.GetAllElements(other);
+            var elements1 = tuple.GetItems();
+            var elements2 = other.GetItems();
             var allElements = elements1.Concat(elements2).ToList();
             return TupleLangValue.CreateTupleFromList(allElements);
         }
@@ -272,11 +234,9 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 获取元素在元组中的索引
         /// </summary>
-        /// <param name="value">要查找的元素</param>
-        /// <returns>元素的索引，如果未找到返回-1</returns>
         public IntLangValue IndexOf(LangValueType value)
         {
-            var elements = TupleLangValue.GetAllElements(tuple);
+            var elements = tuple.GetItems().ToList();
             for (int i = 0; i < elements.Count; i++)
             {
                 if (elements[i].Equal(value))
@@ -291,82 +251,23 @@ public static class TupleValueFuncStatic
         /// <summary>
         /// 获取元组的切片
         /// </summary>
-        /// <param name="start">起始索引</param>
-        /// <param name="end">结束索引</param>
-        /// <returns>切片后的新元组</returns>
         public TupleLangValue Slice(IntLangValue start, IntLangValue end)
         {
+            // TupleLangValue.Slice 已经返回一个新的 TupleLangValue（带有正确填充的 ItemValues）
+            // 只要我们确保 TupleLangValue.Slice 的实现是正确的
             return tuple.Slice(start.Value, end.Value) as TupleLangValue
-                   ?? new TupleLangValue(new NullLangValue(), new NullLangValue());
-        }
-
-        /// <summary>
-        /// 获取元组中的所有元素（包括嵌套元组的元素）
-        /// </summary>
-        /// <param name="sourceTuple">元组</param>
-        /// <returns>所有元素的列表</returns>
-        private static List<LangValueType> GetAllElements(TupleLangValue sourceTuple)
-        {
-            var elements = new List<LangValueType>();
-            TupleLangValue.CollectElements(sourceTuple, elements);
-            return elements;
-        }
-
-        /// <summary>
-        /// 递归收集元组中的所有元素
-        /// </summary>
-        /// <param name="current">当前元组或元素</param>
-        /// <param name="elements">元素列表</param>
-        private static void CollectElements(LangValueType current, List<LangValueType> elements)
-        {
-            while (true)
-            {
-                if (current is TupleLangValue currentTuple)
-                {
-                    // 如果是元组，递归收集其元素
-                    TupleLangValue.CollectElements(currentTuple.Value.Item1, elements);
-                    current = currentTuple.Value.Item2;
-                    continue;
-                }
-
-                // 如果是普通元素，添加到列表
-                elements.Add(current);
-
-                break;
-            }
+                   ?? new TupleLangValue(new List<LangExpression>());
         }
 
         /// <summary>
         /// 从元素列表创建元组
         /// </summary>
-        /// <param name="elements">元素列表</param>
-        /// <returns>对应的元组</returns>
         private static TupleLangValue CreateTupleFromList(List<LangValueType> elements)
         {
-            if (elements.Count == 0)
-            {
-                var emptyTuple = new TupleLangValue(new NullLangValue(), new NullLangValue());
-                emptyTuple.Run(new VariateManager());
-                return emptyTuple;
-            }
-
-            if (elements.Count == 1)
-            {
-                var singleTuple = new TupleLangValue(elements[0], new NullLangValue());
-                singleTuple.Run(new VariateManager());
-                return singleTuple;
-            }
-
-            var result = new TupleLangValue(elements[0], elements[1]);
-            result.Run(new VariateManager()); // 初始化第一个二元元组的 Value
-
-            for (int i = 2; i < elements.Count; i++)
-            {
-                result = new TupleLangValue(result, elements[i]);
-                result.Run(new VariateManager()); // 初始化每个嵌套元组的 Value
-            }
-
-            return result;
+            var exprs = elements.Cast<LangExpression>().ToList();
+            var newTuple = new TupleLangValue(exprs);
+            newTuple.ItemValues.AddRange(elements); // 预填充运行结果
+            return newTuple;
         }
     }
 }

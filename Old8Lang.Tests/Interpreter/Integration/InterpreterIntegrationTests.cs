@@ -316,11 +316,11 @@ public class InterpreterIntegrationTests
         Assert.NotNull(tuple);
 
         // 验证元组的值
-        var v1 = tuple.V1.Run(interpreter.Manager) as IntLangValue;
+        var v1 = tuple.Get(0).Run(interpreter.Manager) as IntLangValue;
         Assert.NotNull(v1);
         Assert.Equal(100, v1.Value);
 
-        var v2 = tuple.V2.Run(interpreter.Manager) as StringLangValue;
+        var v2 = tuple.Get(1).Run(interpreter.Manager) as StringLangValue;
         Assert.NotNull(v2);
         Assert.Equal("test", v2.Value);
     }

@@ -186,22 +186,9 @@ public partial class BytecodeVisitor
                 Emit(OpCode.StoreLocal, tupleLocalIndex);
                 
                 // 3. 展平并赋值
-                // 注意：TupleLangValue 结构是嵌套的 (1, (2, 3))
-                // 我们需要递归或迭代处理
+                // 注意：新版 TupleLangValue 已经是扁平存储的，直接使用 Elements
                 
-                // 为了简化，我们假设 LHS 是扁平的 TupleLangValue (编译器构建 AST 时通常如此)
-                // 但实际结构是嵌套的，所以我们需要像 NewTuple 一样处理
-                
-                var elements = new List<LangExpression>();
-                
-                // 辅助函数：收集元组元素
-                void CollectElements(TupleLangValue t)
-                {
-                    if (t.V1 != null) elements.Add(t.V1);
-                    if (t.V2 is TupleLangValue nested) CollectElements(nested);
-                    else if (t.V2 != null) elements.Add(t.V2);
-                }
-                CollectElements(tupleLHS);
+                var elements = tupleLHS.Elements;
                 
                 for (int i = 0; i < elements.Count; i++)
                 {

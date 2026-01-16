@@ -121,7 +121,7 @@ public partial class InterpreterVisitor
         foreach (var tuple in node.Tuples)
         {
             tuple.Accept(this);
-            node.Value.Add(tuple.Value);
+            node.Value.Add((tuple.Get(0), tuple.Get(1)));
         }
 
         return node;
@@ -133,25 +133,15 @@ public partial class InterpreterVisitor
     public LangValueType VisitTupleLangValue(TupleLangValue node)
     {
         // 完整迁移自 TupleLangValue.Run()
-        // 运行第一个元素
-        var item1Result = node.V1.Accept(this);
-
-        // 运行第二个元素，处理空名称的特殊情况
-        LangValueType item2Result;
-        if (node.V2 is LangId item2Id && string.IsNullOrEmpty(item2Id.IdName))
+        // 清空之前的值
+        node.ItemValues.Clear();
+        
+        // 运行所有元素
+        foreach (var element in node.Elements)
         {
-            // 如果第二个元素是空名称的LangId，直接使用NullLangValue，避免NameError
-            item2Result = NullLangValue.Instance;
+            var result = element.Accept(this);
+            node.ItemValues.Add(result);
         }
-        else
-        {
-            // 正常运行第二个元素
-            item2Result = node.V2.Accept(this);
-        }
-
-        // 使用反射设置 Value 属性（因为它是私有 setter）
-        var valueProperty = typeof(TupleLangValue).GetProperty("Value");
-        valueProperty?.SetValue(node, (item1Result, item2Result));
 
         return node;
     }

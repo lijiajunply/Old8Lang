@@ -152,6 +152,31 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
             var listItemMethod = listType.GetMethod("get_Item", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Callvirt, listItemMethod);
         }
+        else if (listType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问
+            ListId.LoadIlValue(ilGenerator, local);
+            
+            if (Key is IntLangValue intVal)
+            {
+                // 常量索引，优化为字段访问
+                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
+            }
+            else
+            {
+                // 变量索引，装箱为 ITuple 并使用索引器
+                ilGenerator.Emit(OpCodes.Box, listType);
+                Key.LoadIlValue(ilGenerator, local);
+                var keyType = Key.OutputType(local);
+                if (keyType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                }
+                
+                var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
+                ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+            }
+        }
         else if (listType == typeof(object))
         {
             // 处理object类型的索引访问（运行时动态处理）
@@ -195,6 +220,13 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         {
             // List<T>索引访问返回T类型
             return listType.GetGenericArguments()[0];
+        }
+
+        if (listType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问，暂时返回 object
+            // 如果是常量索引，理论上可以计算出具体类型
+            return typeof(object);
         }
 
         if (listType == typeof(Dictionary<object, object>))

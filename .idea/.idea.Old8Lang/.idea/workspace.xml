@@ -23,8 +23,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.trae/documents/重构元组为扁平化结构并适配 C# ValueTuple 设计.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/Compiler/TupleTest.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build_log.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build_log_2.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.trae/documents/实现虚拟机模式下的类型转换 (as 关键字).md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Integration/InterpreterIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Integration/InterpreterIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/CollectionTypeValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/CollectionTypeValidator.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +115,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/25/ea5de0f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/3c/3135aca5/ITuple.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/c3/68e5367e/String.cs" root0="FORCE_HIGHLIGHTING" />
@@ -571,6 +596,7 @@
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
       <workItem from="1768485078721" duration="21629000" />
+      <workItem from="1768543641677" duration="9453000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -915,7 +941,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="688" />
+    <option name="localTasksCounter" value="691" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,9 +968,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并添加模式支持说明&#10;&#10;- 添加虚拟机模式 (字节码) 执行方式说明&#10;- 为所有语法特性添加模式支持标记 (解释器|编译器|虚拟机)&#10;- 新增模式支持总结文档 (Mode_Support_Summary.md)&#10;- 更新最后更新时间为 2026 年 1 月&#10;- 详细标注各特性的支持状态 (✅完全支持 ⚠️部分支持 ❌不支持 开发中)" />
-    <MESSAGE value="feat(vm): 实现虚拟机模式下的多线程和using语句支持&#10;&#10;- 添加ThreadCreate、ThreadStart、ThreadJoin等线程操作码指令&#10;- 实现using语句的字节码生成和虚拟机执行逻辑&#10;- 添加DisposeResource指令用于资源自动释放&#10;- 创建VMThreadLangValue类型支持线程对象操作&#10;- 实现ResourceManager对线程资源的统一管理&#10;- 添加完整的多线程和using语句单元测试&#10;- 更新示例代码展示虚拟机多线程和using语句用法" />
-    <MESSAGE value="feat(vm): 实现虚拟机模块系统支持&#10;&#10;- 在BytecodeFile中添加模块名称、依赖列表和导出符号表字段&#10;- 实现ModuleDependency、ExportedSymbol等模块系统核心类&#10;- 添加LoadModule、ImportSymbol、ImportSymbolAs等模块操作指令&#10;- 实现ImportStatement的字节码生成逻辑支持各种导入语法&#10;- 创建ModuleLoader和ModuleRegistry管理模块加载和注册&#10;- 在VirtualMachine中实现模块加载、符号导入和循环依赖检测&#10;- 添加模块系统相关的单元测试验证功能正确性&#10;- 提供模块导入示例代码展示新功能使用方法" />
     <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并完善模式支持说明&#10;&#10;- 更新 Mode_Support_Summary.md 文档中的最后更新日期&#10;- 修正 using 语句在虚拟机模式下的支持状态标记&#10;- 修正 import 语句、命名导入、别名导入在虚拟机模式下的支持状态标记&#10;- 更新虚拟机模式特性描述，添加模块系统和资源管理支持说明&#10;- 更新 Old8Lang_Grammar.md 中 using 语句和导入语句的模式支持标记&#10;- 更新文档中的最后更新日期为 2026年1月15日&#10;- 添加最近完成的功能列表，包括模块导入系统、using 语句和多线程支持" />
     <MESSAGE value="feat(tests): 实现虚拟机外部函数调用的跨平台测试&#10;&#10;- 移除跳过属性使外部C函数测试能够运行&#10;- 添加跨平台库名检测支持Windows、macOS和Linux&#10;- 更新测试代码使用动态库名替换硬编码值&#10;- 修改多参数函数测试为跨平台进程ID获取测试&#10;- 添加正则表达式验证输出中的数字格式&#10;- 实现条件编译适配不同操作系统的函数调用" />
     <MESSAGE value="feat(io): 添加对LangValueType类型的显示支持&#10;&#10;- 在IOFunctions中添加LangValueType到显示字符串的转换逻辑&#10;- 在PrintLineFunction中添加LangValueType到显示字符串的转换逻辑&#10;- 实现了null值的安全处理&#10;- 保持了原有的字符串和其他类型值的处理逻辑" />
@@ -967,7 +990,10 @@
     <MESSAGE value="feat(vm): 实现类型转换运算符as的功能支持&#10;&#10;- 在BytecodeVisitor中添加对as运算符的特殊处理逻辑&#10;- 生成Cast指令实现运行时类型转换功能&#10;- 支持左右操作数的类型检查和目标类型名称获取&#10;- 添加类型转换异常处理机制&#10;- 创建完整的类型转换测试文件验证各项转换功能&#10;- 更新IDE工作区配置同步项目变更信息" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下Lambda表达式支持&#10;&#10;- 添加OpCode.MakeFunction和OpCode.CallDynamic字节码指令&#10;- 实现BytecodeVisitor.VisitFuncLangValue编译Lambda表达式&#10;- 在VirtualMachine中实现MakeFunction和CallDynamic执行逻辑&#10;- 更新FunctionMetadata支持函数对象创建和动态调用&#10;- 添加Lambda表达式测试用例LambdaTest.old8&#10;- 更新TODO文档标记Lambda功能为完全支持状态&#10;- 生成Lambda表达式编译和执行的测试报告" />
     <MESSAGE value="feat(vm): 添加虚拟机模式支持并实现类型转换功能&#10;&#10;- 新增虚拟机模式运行环境和字节码执行机制&#10;- 实现了完整的类型转换功能，支持int、double、string、bool、char、list、array、dict等类型的相互转换&#10;- 添加了ConvertToList、ConvertToArray、ConvertToDict等辅助转换方法&#10;- 增加了类型转换异常处理机制，提供更详细的错误信息&#10;- 更新项目规则文档，添加虚拟机模式测试目录和命令说明&#10;- 创建类型转换测试文件，验证各种类型转换场景的正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加虚拟机模式支持并实现类型转换功能&#10;&#10;- 新增虚拟机模式运行环境和字节码执行机制&#10;- 实现了完整的类型转换功能，支持int、double、string、bool、char、list、array、dict等类型的相互转换&#10;- 添加了ConvertToList、ConvertToArray、ConvertToDict等辅助转换方法&#10;- 增加了类型转换异常处理机制，提供更详细的错误信息&#10;- 更新项目规则文档，添加虚拟机模式测试目录和命令说明&#10;- 创建类型转换测试文件，验证各种类型转换场景的正确性" />
+    <MESSAGE value="feat(vm): 实现异常过滤器和元组解构赋值功能&#10;&#10;- 修改 TryStatement AST 支持异常过滤器表达式&#10;- 更新 Parser 解析 catch 块中的 where 子句&#10;- 实现虚拟机中的异常过滤器检查和分发逻辑&#10;- 添加 VmException 包装类用于传递 Old8Lang 异常对象&#10;- 实现元组解构赋值的字节码生成和执行逻辑&#10;- 重构异常类型匹配逻辑以支持自定义对象实例&#10;- 更新 IsType 指令直接接收类型注解参数&#10;- 修改文档中的功能完成状态追踪" />
+    <MESSAGE value="feat(vm): 实现虚拟机中的高级类型系统&#10;&#10;- 添加对泛型集合类型(list&lt;T&gt;, dict&lt;K,V&gt;)的完整支持&#10;- 实现交叉类型(T: IInterface1 &amp; IInterface2)的运行时验证&#10;- 完善联合类型(int | string)的类型匹配逻辑&#10;- 支持可空类型的字节码表示和运行时检查&#10;- 优化类型转换操作符的实现以处理复杂类型场景&#10;- 添加详细的类型系统测试用例覆盖各种边界情况" />
+    <MESSAGE value="docs(cli): 更新CLI指南文档并重构语言特性文档&#10;&#10;- 将原有的CLI命令指南从 CLI_COMMANDS_GUIDE.md 移至 CLI_GUIDE.md&#10;- 在新的CLI指南中增加基础运行命令说明&#10;- 添加包管理CLI命令的完整说明和使用示例&#10;- 重构语言特性文档LANGUAGE_FEATURES.md的目录结构&#10;- 更新语言特性文档内容，新增高级控制流、并发模型等章节&#10;- 删除过时的模式匹配详细示例内容&#10;- 更新文档间的引用关系和相关文档链接" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(cli): 更新CLI指南文档并重构语言特性文档&#10;&#10;- 将原有的CLI命令指南从 CLI_COMMANDS_GUIDE.md 移至 CLI_GUIDE.md&#10;- 在新的CLI指南中增加基础运行命令说明&#10;- 添加包管理CLI命令的完整说明和使用示例&#10;- 重构语言特性文档LANGUAGE_FEATURES.md的目录结构&#10;- 更新语言特性文档内容，新增高级控制流、并发模型等章节&#10;- 删除过时的模式匹配详细示例内容&#10;- 更新文档间的引用关系和相关文档链接" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

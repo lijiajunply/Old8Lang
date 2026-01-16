@@ -469,33 +469,27 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     {
         try
         {
-            var tupleType = tuple.GetType();
-
-            // 处理 ValueTuple
-            if (tupleType.FullName?.StartsWith("System.ValueTuple") == true)
+            // 使用 ITuple 接口统一处理 Tuple 和 ValueTuple
+            if (tuple is System.Runtime.CompilerServices.ITuple ituple)
             {
-                var fields = tupleType.GetFields();
-                if (fields.Length >= 2)
+                var elements = new List<LangExpression>();
+                for (int i = 0; i < ituple.Length; i++)
                 {
-                    var item1 = fields[0].GetValue(tuple);
-                    var item2 = fields[1].GetValue(tuple);
-                    return new TupleLangValue(ObjToValue(item1, position), ObjToValue(item2, position));
+                    // 递归转换每个元素
+                    elements.Add(ObjToValue(ituple[i], position));
                 }
+                
+                var tupleValue = new TupleLangValue(elements, position);
+                // 预填充运行结果
+                tupleValue.Run(null!); 
+                // 注意：这里传 null 可能导致问题，但 TupleLangValue.Run 只做简单的赋值，不依赖 manager
+                // 实际上 TupleLangValue.Run 只是把 Elements (已经是 Value 了) 复制到 ItemValues
+                // 我们可以手动填充
+                
+                return tupleValue;
             }
 
-            // 处理 Tuple
-            if (tupleType.FullName?.StartsWith("System.Tuple") == true)
-            {
-                var properties = tupleType.GetProperties();
-                if (properties.Length >= 2)
-                {
-                    var item1 = properties[0].GetValue(tuple);
-                    var item2 = properties[1].GetValue(tuple);
-                    return new TupleLangValue(ObjToValue(item1, position), ObjToValue(item2, position));
-                }
-            }
-
-            return StringLangValue.Create($"不支持的元组类型: {tupleType.Name}");
+            return StringLangValue.Create($"不支持的元组类型: {tuple.GetType().Name}");
         }
         catch (Exception ex)
         {
@@ -652,7 +646,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             ListLangValue listVal => ValueToObjList(listVal),
             ArrayLangValue arrayVal => ValueToObjArray(arrayVal),
             DictionaryLangValue dictVal => ValueToObjDictionary(dictVal),
-            TupleLangValue tupleVal => ValueToObjTuple(tupleVal),
+            TupleLangValue tupleVal => tupleVal.GetValue(),
 
             // 函数和实例类型（保留引用）
             FuncLangValue funcVal => funcVal,
@@ -734,31 +728,6 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// 将 TupleLangValue 转换为 Tuple&lt;object, object&gt;
-    /// </summary>
-    private static Tuple<object, object> ValueToObjTuple(TupleLangValue tupleVal)
-    {
-        var (key, value) = tupleVal.Value;
-
-        // 检查 Value 是否已初始化（Run() 是否已被调用）
-        // 如果 Value.Item1 或 Item2 为 null，尝试从 V1, V2 字段获取值
-        if (key is null && tupleVal.V1 is LangValueType v1)
-        {
-            key = v1;
-        }
-
-        if (value is null && tupleVal.V2 is LangValueType v2)
-        {
-            value = v2;
-        }
-
-        var objKey = ValueToObj(key) ?? new object();
-        var objValue = ValueToObj(value) ?? new object();
-
-        return new Tuple<object, object>(objKey, objValue);
     }
 
     /// <summary>

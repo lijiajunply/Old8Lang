@@ -210,7 +210,7 @@ public static class CollectionTypeValidator
             var tuple = dictValue.Tuples[i];
 
             // 验证键类型
-            var actualKeyTypeName = GetExpressionTypeName(tuple.V1);
+            var actualKeyTypeName = GetExpressionTypeName(tuple.Elements[0]);
             var actualKeyType = typeAnnotationManager.ParseTypeAnnotation(actualKeyTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
@@ -224,7 +224,7 @@ public static class CollectionTypeValidator
             }
 
             // 验证值类型
-            var actualValueTypeName = GetExpressionTypeName(tuple.V2);
+            var actualValueTypeName = GetExpressionTypeName(tuple.Elements[1]);
             var actualValueType = typeAnnotationManager.ParseTypeAnnotation(actualValueTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(

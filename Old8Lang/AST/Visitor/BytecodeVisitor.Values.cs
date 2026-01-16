@@ -110,12 +110,14 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitTupleLangValue(TupleLangValue node)
     {
-        // 生成两个元素的代码
-        node.V1.Accept(this);
-        node.V2.Accept(this);
+        // 生成所有元素的代码
+        foreach (var element in node.Elements)
+        {
+            element.Accept(this);
+        }
 
-        // 创建元组(作为2元素数组)
-        Emit(OpCode.NewTuple, 2);
+        // 创建元组，参数是元素数量
+        Emit(OpCode.NewTuple, node.Elements.Count);
         return null;
     }
 

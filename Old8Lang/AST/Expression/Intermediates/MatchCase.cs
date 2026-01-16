@@ -377,36 +377,10 @@ public class MatchCase
     }
 
     /// <summary>
-    /// 将嵌套的元组展平为列表
-    /// 例如：((1, 2), 3) -> [1, 2, 3]
+    /// 获取元组的元素列表
     /// </summary>
     private static List<LangValueType> FlattenTuple(TupleLangValue tuple)
     {
-        var result = new List<LangValueType>();
-
-        var first = tuple.Value.Item1;
-        var second = tuple.Value.Item2;
-
-        // 递归展平第一个元素
-        if (first is TupleLangValue firstTuple)
-        {
-            result.AddRange(FlattenTuple(firstTuple));
-        }
-        else if (first is not NullLangValue) // 排除单元素元组的 null 占位符
-        {
-            result.Add(first);
-        }
-
-        // 递归展平第二个元素
-        if (second is TupleLangValue secondTuple)
-        {
-            result.AddRange(FlattenTuple(secondTuple));
-        }
-        else if (second is not NullLangValue) // 排除单元素元组的 null 占位符
-        {
-            result.Add(second);
-        }
-
-        return result;
+        return tuple.GetItems().ToList();
     }
 }

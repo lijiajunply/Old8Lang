@@ -64,7 +64,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         foreach (var tuple in Tuples)
         {
             tuple.Run(manager);
-            Value.Add(tuple.Value);
+            Value.Add((tuple.Get(0), tuple.Get(1)));
         }
 
         return this;
@@ -360,15 +360,15 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         foreach (var expr in Tuples)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l);
-            expr.V1.LoadIlValue(ilGenerator, local);
-            var keyType = expr.V1.OutputType(local);
+            expr.Elements[0].LoadIlValue(ilGenerator, local);
+            var keyType = expr.Elements[0].OutputType(local);
             // 只有值类型才需要装箱
             if (keyType!.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, keyType);
             }
-            expr.V2.LoadIlValue(ilGenerator, local);
-            var valueType = expr.V2.OutputType(local);
+            expr.Elements[1].LoadIlValue(ilGenerator, local);
+            var valueType = expr.Elements[1].OutputType(local);
             // 只有值类型才需要装箱
             if (valueType!.IsValueType)
             {

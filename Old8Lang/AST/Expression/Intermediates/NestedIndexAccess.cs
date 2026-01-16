@@ -107,6 +107,57 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             var getItemMethod = baseType.GetMethod("get_Item", [keyType])!;
             ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
         }
+        else if (baseType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问
+            // 注意：NestedIndexAccess 这里栈上已经有 BaseIndex 和 NestedIndex 的值
+            
+            // 如果 NestedIndex 是常量 IntLangValue，我们可以优化吗？
+            // NestedIndex.LoadIlValue 已经执行了，所以 NestedIndex 的值在栈上。
+            // 除非我们在 LoadIlValue 之前检查 NestedIndex。
+            // 但是 NestedIndex.LoadIlValue 可能会有副作用，虽然对于 IntLangValue 来说没有。
+            
+            // 为了简单，统一使用 ITuple 索引器（虽然慢一点，但兼容性好）
+            // 如果要优化，需要回退栈（Pop），或者不调用 NestedIndex.LoadIlValue
+            
+            // 由于已经 LoadIlValue 了，我们只能装箱 Tuple 并调用索引器
+            // 栈: [Tuple] [Index]
+            
+            // Box Tuple: 需要先保存 Index，Box Tuple，再加载 Index
+            var indexLocal = ilGenerator.DeclareLocal(typeof(int)); // 假设 Index 是 int
+            // 如果 Index 不是 int (e.g. object)，需要 Unbox
+            
+            // 我们需要知道 NestedIndex 的 OutputType
+            var indexType = NestedIndex.OutputType(local);
+            if (indexType == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            }
+            ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
+            
+            // Box Tuple
+            ilGenerator.Emit(OpCodes.Box, baseType);
+            
+            // Load Index
+            ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
+            
+            var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
+            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+        }
+        else if (baseType == typeof(object))
+        {
+            // 动态索引访问
+            // 调用 DotOperatorILHelper.GenerateDynamicIndexAccess
+            // 该方法假设栈上有 [Left] [Right]，并生成动态分发代码
+            // 我们的栈上正好有 BaseIndex 和 NestedIndex 的值
+            
+            var indexType = NestedIndex.OutputType(local);
+            
+            Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
+                ilGenerator,
+                indexType
+            );
+        }
         else
         {
             throw new InvalidOperationError(this, "不支持的嵌套索引访问类型: " + baseType.Name);

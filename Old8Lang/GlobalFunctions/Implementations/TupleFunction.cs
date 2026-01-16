@@ -19,7 +19,7 @@ public sealed class TupleFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        return new TupleLangValue(true, position);
+        return new TupleLangValue(new List<LangExpression>(), position);
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
@@ -34,6 +34,6 @@ public sealed class TupleFunction : BaseGlobalFunction
     }
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return new TupleLangValue(true, default);
+        return new TupleLangValue(new List<LangExpression>(), default);
     }
 }

@@ -3945,32 +3945,7 @@ public class VirtualMachine
     /// </summary>
     private List<object?> FlattenTupleHelper(TupleLangValue tuple)
     {
-        var result = new List<object?>();
-
-        var first = tuple.Value.Item1;
-        var second = tuple.Value.Item2;
-
-        // 递归展平第一个元素
-        if (first is TupleLangValue firstTuple)
-        {
-            result.AddRange(FlattenTupleHelper(firstTuple));
-        }
-        else if (first is not NullLangValue) // 排除单元素元组的 null 占位符
-        {
-            result.Add(first);
-        }
-
-        // 递归展平第二个元素
-        if (second is TupleLangValue secondTuple)
-        {
-            result.AddRange(FlattenTupleHelper(secondTuple));
-        }
-        else if (second is not NullLangValue) // 排除单元素元组的 null 占位符
-        {
-            result.Add(second);
-        }
-
-        return result;
+        return tuple.GetItems().Cast<object?>().ToList();
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
@@ -8,119 +9,63 @@ namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
 /// 元组 - 支持命名和未命名元组
+/// 重构后支持扁平化存储，并在编译模式下生成标准的 C# ValueTuple
 /// </summary>
-/// <param name="v1"></param>
-/// <param name="v2"></param>
-/// <param name="position"></param>
-public partial class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default)
-    : LangValueType(position), ILangList
+public partial class TupleLangValue : LangValueType, ILangList
 {
-    public readonly LangExpression V1 = v1;
-    public readonly LangExpression V2 = v2;
+    /// <summary>
+    /// 元组的所有元素表达式
+    /// </summary>
+    public readonly List<LangExpression> Elements;
 
-    public ValueTuple<LangValueType, LangValueType> Value { get; private set; }
+    /// <summary>
+    /// 解释模式下的运行时值
+    /// </summary>
+    public List<LangValueType> ItemValues { get; private set; } = new();
 
     // 命名字段支持 - 存储字段名称
-    // 对于嵌套元组，只有最外层存储所有字段名
     private readonly Dictionary<string, int>? _fieldNames = null;
 
     // 标记是否有命名字段
     public bool HasNamedFields => _fieldNames is not null && _fieldNames.Count > 0;
 
-    public override LangValueType Run(VariateManager manager)
+    // 标记是否为空元组
+    private readonly bool IsEmpty;
+
+    /// <summary>
+    /// 构造函数：双元素元组（向后兼容）
+    /// </summary>
+    public TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default)
+        : base(position)
     {
-        // 运行第一个元素
-        var item1Result = V1.Run(manager);
-
-        // 运行第二个元素，处理空名称的特殊情况
-        LangValueType item2Result;
-        if (V2 is LangId item2Id && string.IsNullOrEmpty(item2Id.IdName))
-        {
-            // 如果第二个元素是空名称的LangId，直接使用NullLangValue，避免NameError
-            item2Result = NullLangValue.Instance;
-        }
-        else
-        {
-            // 正常运行第二个元素
-            item2Result = V2.Run(manager);
-        }
-
-        Value = (item1Result, item2Result);
-        return this;
-    }
-
-    public override string ToString()
-    {
-        // 如果有命名字段，显示命名格式
-        if (HasNamedFields)
-        {
-            var allElements = new List<LangValueType>();
-            CollectElements(this, allElements);
-
-            var parts = new List<string>();
-            for (int i = 0; i < allElements.Count; i++)
-            {
-                // 查找该索引对应的字段名
-                string? fieldName = _fieldNames?.FirstOrDefault(kvp => kvp.Value == i).Key;
-                if (!string.IsNullOrEmpty(fieldName))
-                {
-                    parts.Add($"{fieldName}: {allElements[i]}");
-                }
-                else
-                {
-                    parts.Add(allElements[i].ToString() ?? "null");
-                }
-            }
-            return $"({string.Join(", ", parts)})";
-        }
-
-        // 未命名元组，使用原有格式
-        return $"({V1},{V2})";
+        Elements = new List<LangExpression> { v1, v2 };
+        IsEmpty = false;
     }
 
     /// <summary>
-    /// 明确标识元组类型，防止与列表混淆
+    /// 构造函数：多元元组
     /// </summary>
-    /// <returns>返回 "Tuple" 作为类型标识</returns>
-    public override string TypeToString() => "Tuple";
-
-    /// <summary>
-    /// 获取值的实际.NET对象
-    /// </summary>
-    /// <returns>Tuple&lt;object, object&gt; 对象</returns>
-    public override object GetValue()
+    public TupleLangValue(List<LangExpression> elements, SourcePosition position = default)
+        : base(position)
     {
-        var item1 = LangValueType.ValueToObj(Value.Item1);
-        var item2 = LangValueType.ValueToObj(Value.Item2);
-        return new Tuple<object, object>(item1 ?? new object(), item2 ?? new object());
-    }
-
-    // 支持多元元组的构造函数
-    public TupleLangValue(List<LangExpression> elements, SourcePosition position = default) : this(elements[0],
-        elements[1], position)
-    {
-        // 如果是多元元组，递归构建嵌套结构
-        for (int i = 2; i < elements.Count; i++)
+        Elements = elements ?? new List<LangExpression>();
+        IsEmpty = Elements.Count == 0;
+        
+        // 如果是空列表，为了安全起见，添加两个NullLangValue? 
+        // 不，空元组应该是允许的，但在 Old8Lang 旧逻辑中似乎用 (Null, Null) 表示空。
+        // 我们这里支持真正的空元组。
+        if (IsEmpty)
         {
-            V2 = new TupleLangValue(V2, elements[i], position);
+            // 旧逻辑兼容：如果是显式空元组，可能需要特殊处理，但新逻辑允许 Count=0
         }
     }
 
     /// <summary>
     /// 支持命名字段的多元元组构造函数
     /// </summary>
-    /// <param name="elements">元组元素表达式列表</param>
-    /// <param name="fieldNames">字段名称列表（null或空字符串表示未命名）</param>
-    /// <param name="position">源代码位置</param>
     public TupleLangValue(List<LangExpression> elements, List<string?>? fieldNames, SourcePosition position = default)
-        : this(elements[0], elements[1], position)
+        : this(elements, position)
     {
-        // 如果是多元元组，递归构建嵌套结构
-        for (int i = 2; i < elements.Count; i++)
-        {
-            V2 = new TupleLangValue(V2, elements[i], position);
-        }
-
         // 设置字段名称映射
         if (fieldNames is not null && fieldNames.Count > 0)
         {
@@ -135,43 +80,150 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
         }
     }
 
-    /// <summary>
-    /// 创建空元组的专用构造函数
-    /// </summary>
-    /// <param name="isEmpty"></param>
-    /// <param name="position">源代码位置</param>
-    public TupleLangValue(bool isEmpty, SourcePosition position = default) : this(new NullLangValue(),
-        new NullLangValue(), position)
+    public override LangValueType Run(VariateManager manager)
     {
-        if (isEmpty)
+        ItemValues.Clear();
+        foreach (var expr in Elements)
         {
-            // 标记为空元组
-            IsEmpty = true;
+            var result = expr.Run(manager);
+            ItemValues.Add(result);
+        }
+        return this;
+    }
+
+    public override string ToString()
+    {
+        // 如果有命名字段，显示命名格式
+        if (HasNamedFields)
+        {
+            var parts = new List<string>();
+            for (int i = 0; i < ItemValues.Count; i++)
+            {
+                // 查找该索引对应的字段名
+                string? fieldName = _fieldNames?.FirstOrDefault(kvp => kvp.Value == i).Key;
+                if (!string.IsNullOrEmpty(fieldName))
+                {
+                    parts.Add($"{fieldName}: {ItemValues[i]}");
+                }
+                else
+                {
+                    parts.Add(ItemValues[i].ToString() ?? "null");
+                }
+            }
+            return $"({string.Join(", ", parts)})";
+        }
+
+        // 未命名元组
+        return $"({string.Join(", ", ItemValues)})";
+    }
+
+    /// <summary>
+    /// 明确标识元组类型，防止与列表混淆
+    /// </summary>
+    public override string TypeToString() => "Tuple";
+
+    /// <summary>
+    /// 获取值的实际.NET对象
+    /// 尝试动态构建 ValueTuple，如果元素过多或复杂，返回 ITuple 或 object[] 可能更合适
+    /// 但为了完全模拟 C# 互操作，我们尝试构建 ValueTuple
+    /// </summary>
+    public override object GetValue()
+    {
+        var values = ItemValues.Select(v => LangValueType.ValueToObj(v) ?? new object()).ToArray();
+        return CreateValueTuple(values);
+    }
+
+    /// <summary>
+    /// 静态辅助方法：动态创建 ValueTuple 实例
+    /// </summary>
+    public static object CreateValueTupleStatic(object[] values)
+    {
+        if (values.Length == 0) return new ValueTuple();
+        return CreateValueTupleRecursiveStatic(values);
+    }
+
+    private static object CreateValueTupleRecursiveStatic(object[] values)
+    {
+        var count = values.Length;
+        if (count > 7)
+        {
+            // 前7个元素
+            var args = new object[8];
+            Array.Copy(values, 0, args, 0, 7);
+            
+            // 第8个元素是剩余部分的元组
+            var restValues = new object[count - 7];
+            Array.Copy(values, 7, restValues, 0, count - 7);
+            args[7] = CreateValueTupleRecursiveStatic(restValues);
+            
+            // 获取对应的泛型类型
+            var types = args.Select(v => v.GetType()).ToArray();
+            var tupleType = GetValueTupleTypeStatic(types);
+            
+            return Activator.CreateInstance(tupleType, args)!;
         }
         else
         {
-            throw new ArgumentException("使用此构造函数时必须指定 isEmpty=true");
+            var types = values.Select(v => v.GetType()).ToArray();
+            var tupleType = GetValueTupleTypeStatic(types);
+            return Activator.CreateInstance(tupleType, values)!;
         }
     }
 
-    // 标记是否为空元组
-    private readonly bool IsEmpty;
+    private static Type GetValueTupleTypeStatic(Type[] types)
+    {
+        if (types.Length > 7)
+        {
+            var first7Types = types.Take(7).ToArray();
+            var restTypes = types.Skip(7).ToArray();
+            var restTupleType = GetValueTupleTypeStatic(restTypes);
+            
+            var allTypes = new Type[8];
+            Array.Copy(first7Types, allTypes, 7);
+            allTypes[7] = restTupleType;
+            
+            return typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
+        }
+        
+        return types.Length switch
+        {
+            1 => typeof(ValueTuple<>).MakeGenericType(types),
+            2 => typeof(ValueTuple<,>).MakeGenericType(types),
+            3 => typeof(ValueTuple<,,>).MakeGenericType(types),
+            4 => typeof(ValueTuple<,,,>).MakeGenericType(types),
+            5 => typeof(ValueTuple<,,,,>).MakeGenericType(types),
+            6 => typeof(ValueTuple<,,,,,>).MakeGenericType(types),
+            7 => typeof(ValueTuple<,,,,,,>).MakeGenericType(types),
+            _ => throw new InvalidOperationException("不支持 0 元素或异常长度的元组类型生成")
+        };
+    }
+
+    /// <summary>
+    /// 动态创建 ValueTuple 实例
+    /// </summary>
+    private object CreateValueTuple(object[] values)
+    {
+        return CreateValueTupleStatic(values);
+    }
+
+    private object CreateValueTupleRecursive(object[] values)
+    {
+        return CreateValueTupleRecursiveStatic(values);
+    }
+
+    private Type GetValueTupleType(Type[] types)
+    {
+        return GetValueTupleTypeStatic(types);
+    }
 
     /// <summary>
     /// 获取元组指定索引的元素
     /// </summary>
-    /// <param name="index">索引值</param>
-    /// <returns>指定索引的元素</returns>
     public LangValueType Get(IntLangValue index)
     {
         return Get(index.Value);
     }
 
-    /// <summary>
-    /// 获取元组指定索引的元素（支持嵌套多元元组）
-    /// </summary>
-    /// <param name="index">索引值</param>
-    /// <returns>指定索引的元素</returns>
     public LangValueType Get(int index)
     {
         if (IsEmpty)
@@ -179,297 +231,260 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
             throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
         }
 
-        // 收集所有元素用于扁平化访问
-        var allElements = new List<LangValueType>();
-        CollectElements(this, allElements);
-
-        if (index < 0 || index >= allElements.Count)
+        if (index < 0 || index >= ItemValues.Count)
         {
-            throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {allElements.Count - 1}");
+            throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {ItemValues.Count - 1}");
         }
 
-        // 返回扁平化访问的结果
-        return allElements[index];
+        return ItemValues[index];
     }
 
     /// <summary>
-    /// 获取元组的直接子元素（不支持扁平化）
-    /// 用于嵌套访问：tuple[index1][index2]
+    /// 支持元组的点操作访问
     /// </summary>
-    /// <param name="index">索引值（只能是0或1）</param>
-    /// <returns>直接子元素</returns>
-    public LangValueType GetDirectChild(int index)
-    {
-        if (IsEmpty)
-        {
-            throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
-        }
-
-        if (index == 0)
-        {
-            return Value.Item1;
-        }
-
-        return index switch
-        {
-            1 => Value.Item2,
-            _ => throw new InvalidOperationError(this, $"元组直接子元素访问索引越界: {index}，只支持索引 0 和 1")
-        };
-    }
-
-    /// <summary>
-    /// 支持元组的点操作访问，包括索引访问、ItemN访问、命名字段访问
-    /// </summary>
-    /// <param name="dotExpression">点操作表达式</param>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>访问结果</returns>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
-        // 支持数字索引访问、ItemN访问、命名字段访问
         if (dotExpression is LangId id)
         {
-            // 1. 支持 ItemN 访问：tuple.Item1, tuple.Item2 等 (C# 风格)
+            // 1. 支持 ItemN 访问：tuple.Item1, tuple.Item2
             if (id.IdName.StartsWith("Item") && id.IdName.Length > 4)
             {
                 var itemNumStr = id.IdName.Substring(4);
                 if (int.TryParse(itemNumStr, out int itemNum) && itemNum >= 1)
                 {
-                    // Item1 对应索引0，Item2对应索引1，以此类推
                     return Get(itemNum - 1);
                 }
             }
 
-            // 2. 支持命名字段访问：tuple.x, tuple.name 等
+            // 2. 支持命名字段访问
             if (_fieldNames is not null && _fieldNames.ContainsKey(id.IdName))
             {
                 int fieldIndex = _fieldNames[id.IdName];
                 return Get(fieldIndex);
             }
 
-            // 3. 支持数字索引访问：tuple.0, tuple.1, tuple.2 等 (向后兼容)
+            // 3. 支持数字索引访问：tuple.0
             if (int.TryParse(id.IdName, out int index))
             {
                 return Get(index);
             }
 
-            // 4. 支持 ToStr() 方法
+            // 4. ToStr
             if (id.IdName == "ToStr")
             {
                 return new StringLangValue(ToString());
             }
 
-            // 5. 支持 Length 属性
+            // 5. Length
             if (id.IdName == "Length")
             {
-                // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
-                int length = GetLength();
-                return new IntLangValue(length);
+                return new IntLangValue(GetLength());
             }
         }
 
-        // 如果是Instance，检查是否是方法调用
         if (dotExpression is Instance instance)
         {
-            // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+             // 设置执行上下文
             Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
 
-            // 处理无参数的方法调用
             if (instance.Ids.Count == 0)
             {
-                if (instance.Id.IdName == "ToStr")
-                {
-                    return new StringLangValue(ToString());
-                }
-
-                if (instance.Id.IdName == "Length")
-                {
-                    // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
-                    int length = GetLength();
-                    return new IntLangValue(length);
-                }
+                if (instance.Id.IdName == "ToStr") return new StringLangValue(ToString());
+                if (instance.Id.IdName == "Length") return new IntLangValue(GetLength());
             }
-
-            // 对于其他方法调用，使用扩展方法机制
+            
             return instance.FromClassToResult(this, manager);
         }
 
         throw new InvalidOperationError(this, $"不支持元组的点操作: {dotExpression}");
     }
 
-    /// <summary>
-    /// 计算元组的长度（支持嵌套多元元组）
-    /// </summary>
-    /// <param name="tuple">要计算长度的元组</param>
-    /// <returns>元组中元素的总数</returns>
-    private static int GetTupleLength(TupleLangValue tuple)
-    {
-        // 如果第二个元素是嵌套元组，则递归计算长度
-        if (tuple.Value.Item2 is TupleLangValue lengthTuple)
-        {
-            return 1 + GetTupleLength(lengthTuple);
-        }
-
-        return 2; // 二元元组固定为2个元素
-    }
-
-    /// <summary>
-    /// 覆盖 Equal 方法以支持元组深度比较
-    /// 确保元组只与元组比较，不会被误认为列表
-    /// </summary>
-    /// <param name="otherValueType">要比较的值类型</param>
-    /// <returns>只有同为元组且元素相等时才返回true</returns>
     public override bool Equal(LangValueType? otherValueType)
     {
-        // 严格的类型检查：只有同为元组才能比较
         if (otherValueType is not TupleLangValue otherTuple)
             return false;
 
-        // 比较两个元素是否都相等
-        return Value.Item1.Equal(otherTuple.Value.Item1) &&
-               Value.Item2.Equal(otherTuple.Value.Item2);
+        if (ItemValues.Count != otherTuple.ItemValues.Count)
+            return false;
+
+        for (int i = 0; i < ItemValues.Count; i++)
+        {
+            if (!ItemValues[i].Equal(otherTuple.ItemValues[i]))
+                return false;
+        }
+
+        return true;
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 获取两个元素的类型
-        var type1 = V1.OutputType(local) ?? typeof(object);
-        var type2 = V2.OutputType(local) ?? typeof(object);
-
-        // 获取元组类型
-        var tupleType = typeof(ValueTuple<,>).MakeGenericType(type1, type2);
-
-        // 获取元组构造函数
-        var constructor = tupleType.GetConstructor([type1, type2])!;
-
-        // 加载第一个元素的值
-        V1.LoadIlValue(ilGenerator, local);
-
-        // 加载第二个元素的值
-        V2.LoadIlValue(ilGenerator, local);
-
-        // 调用元组构造函数创建元组实例
-        ilGenerator.Emit(OpCodes.Newobj, constructor);
+        // 获取所有元素的类型
+        var types = Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
+        
+        // 递归生成创建代码
+        EmitValueTupleCreation(ilGenerator, local, Elements, types);
+    }
+    
+    private void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements, Type[] types)
+    {
+        var count = elements.Count;
+        if (count > 7)
+        {
+            // 构造 ValueTuple<T1..T7, TRest>
+            var first7Types = types.Take(7).ToArray();
+            var restTypes = types.Skip(7).ToArray();
+            var restElements = elements.Skip(7).ToList();
+            
+            // 计算 Rest 的类型
+            var restTupleType = GetValueTupleTypeForCompiler(restTypes);
+            
+            var allTypes = new Type[8];
+            Array.Copy(first7Types, allTypes, 7);
+            allTypes[7] = restTupleType;
+            
+            var tupleType = typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
+            var constructor = tupleType.GetConstructor(allTypes)!;
+            
+            // 加载前7个元素
+            for (int i = 0; i < 7; i++)
+            {
+                elements[i].LoadIlValue(ilGenerator, local);
+            }
+            
+            // 递归加载剩余元素作为第8个参数
+            EmitValueTupleCreation(ilGenerator, local, restElements, restTypes);
+            
+            ilGenerator.Emit(OpCodes.Newobj, constructor);
+        }
+        else if (count == 0)
+        {
+             // 空元组
+             // 正确的 IL 序列生成 default(ValueTuple)
+             var tempLocal = ilGenerator.DeclareLocal(typeof(ValueTuple));
+             ilGenerator.Emit(OpCodes.Ldloca, tempLocal);
+             ilGenerator.Emit(OpCodes.Initobj, typeof(ValueTuple));
+             ilGenerator.Emit(OpCodes.Ldloc, tempLocal);
+        }
+        else
+        {
+            var tupleType = GetValueTupleTypeForCompiler(types);
+            var constructor = tupleType.GetConstructor(types)!;
+            
+            foreach (var element in elements)
+            {
+                element.LoadIlValue(ilGenerator, local);
+            }
+            
+            ilGenerator.Emit(OpCodes.Newobj, constructor);
+        }
+    }
+    
+    private Type GetValueTupleTypeForCompiler(Type[] types)
+    {
+         if (types.Length > 7)
+        {
+            var first7Types = types.Take(7).ToArray();
+            var restTypes = types.Skip(7).ToArray();
+            var restTupleType = GetValueTupleTypeForCompiler(restTypes);
+            
+            var allTypes = new Type[8];
+            Array.Copy(first7Types, allTypes, 7);
+            allTypes[7] = restTupleType;
+            
+            return typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
+        }
+        
+        return types.Length switch
+        {
+            0 => typeof(ValueTuple),
+            1 => typeof(ValueTuple<>).MakeGenericType(types),
+            2 => typeof(ValueTuple<,>).MakeGenericType(types),
+            3 => typeof(ValueTuple<,,>).MakeGenericType(types),
+            4 => typeof(ValueTuple<,,,>).MakeGenericType(types),
+            5 => typeof(ValueTuple<,,,,>).MakeGenericType(types),
+            6 => typeof(ValueTuple<,,,,,>).MakeGenericType(types),
+            7 => typeof(ValueTuple<,,,,,,>).MakeGenericType(types),
+            _ => throw new InvalidOperationException("不支持异常长度的元组类型生成")
+        };
     }
 
     public override Type OutputType(LocalManager local)
     {
-        // 获取两个元素的的类型
-        var type1 = V1.OutputType(local);
-        var type2 = V2.OutputType(local);
-
-        // 确保类型不为空
-        if (type1 is null || type2 is null)
-        {
-            return typeof(ValueTuple<object, object>);
-        }
-
-        // 返回对应的元组类型
-        return typeof(ValueTuple<,>).MakeGenericType(type1, type2);
+        var types = Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
+        return GetValueTupleTypeForCompiler(types);
     }
 
     // 实现ILangList接口
     public IEnumerable<LangValueType> GetItems()
     {
-        if (IsEmpty)
-        {
-            return new List<LangValueType>();
-        }
-
-        var items = new List<LangValueType>();
-        CollectElements(this, items);
-        return items;
+        return ItemValues;
     }
 
     public int GetLength()
     {
-        if (IsEmpty)
-        {
-            return 0;
-        }
-
-        var items = new List<LangValueType>();
-        CollectElements(this, items);
-        return items.Count;
+        return ItemValues.Count;
     }
 
     public LangValueType Slice(int start, int end)
     {
-        var items = new List<LangValueType>();
-        CollectElements(this, items);
-
-        // 处理负数索引：-1 表示最后一个元素
+        var items = ItemValues;
+        
         if (start < 0) start += items.Count;
         if (end < 0) end += items.Count;
-
-        // 确保索引在有效范围内
+        
         start = Math.Max(0, Math.Min(start, items.Count));
         end = Math.Max(0, Math.Min(end, items.Count));
-
-        // 如果 start >= end，返回空元组
+        
         if (start >= end)
         {
-            return new TupleLangValue(new NullLangValue(), new NullLangValue());
+             return new TupleLangValue(new List<LangExpression>());
         }
-
-        // 创建子元组
+        
         var sliceItems = items.Skip(start).Take(end - start).ToList();
-        if (sliceItems.Count == 0)
-        {
-            return new TupleLangValue(new NullLangValue(), new NullLangValue());
-        }
-
-        return CreateTupleFromList(sliceItems);
+        
+        // 注意：这里我们返回的是一个新的 TupleLangValue，但我们需要用 LangExpression 来构造它
+        // 实际上在解释器中，我们可以直接构造一个已经包含值的 TupleLangValue
+        // 为了方便，我们需要一个支持直接传入值的构造函数或者方法
+        
+        // 既然我们不能直接传值（因为 AST 存的是 Expression），我们需要把 Value 包装成 Expression
+        // 或者我们直接 new 一个 TupleLangValue，然后设置它的 ItemValues
+        
+        var newTuple = new TupleLangValue(sliceItems.Cast<LangExpression>().ToList());
+        newTuple.ItemValues.AddRange(sliceItems); // 预填充值
+        return newTuple;
     }
 
     public LangValueType Slice(int start, int end, int step)
     {
-        var items = new List<LangValueType>();
-        CollectElements(this, items);
+        var items = ItemValues;
         var length = items.Count;
         var result = new List<LangValueType>();
 
         if (step > 0)
         {
-            // 正向切片
             if (start < 0) start += length;
             if (end < 0) end += length;
-
             start = Math.Max(0, Math.Min(start, length));
             end = Math.Max(0, Math.Min(end, length));
-
-            for (int i = start; i < end; i += step)
-            {
-                result.Add(items[i]);
-            }
+            for (int i = start; i < end; i += step) result.Add(items[i]);
         }
         else if (step < 0)
         {
-            // 反向切片
-            // 处理负数索引，但保留 -1 作为特殊值（表示"到开头之前"）
             if (start < -1) start += length;
             if (end < -1) end += length;
-
-            // 设置边界
             if (start >= length) start = length - 1;
             if (start < -1) start = -1;
             if (end >= length) end = length - 1;
-
-            for (int i = start; i > end; i += step)
-            {
-                result.Add(items[i]);
-            }
+            for (int i = start; i > end; i += step) result.Add(items[i]);
         }
         else
         {
             throw new InvalidOperationError(this, "切片步长不能为0");
         }
 
-        if (result.Count == 0)
-        {
-            return new TupleLangValue(new NullLangValue(), new NullLangValue());
-        }
-
-        return CreateTupleFromList(result);
+        var newTuple = new TupleLangValue(result.Cast<LangExpression>().ToList());
+        newTuple.ItemValues.AddRange(result);
+        return newTuple;
     }
 
     public void Set(LangValueType index, LangValueType value)
@@ -486,149 +501,26 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
 
     public void Set(int index, LangValueType value)
     {
-        var allElements = new List<LangValueType>();
-        CollectElements(this, allElements);
-
-        if (index < 0 || index >= allElements.Count)
+        if (index < 0 || index >= ItemValues.Count)
         {
-            throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {allElements.Count - 1}");
+            throw new InvalidOperationError(this, $"元组索引越界: {index}");
         }
-
-        allElements[index] = value;
-
-        // 重建元组结构
-        RebuildFromElements(allElements);
+        
+        // 元组在 C# 中通常是不可变的（ValueTuple 的字段是可变的，但作为整体值类型...）
+        // Old8Lang 的元组设计是否允许修改？
+        // 原来的 Set 方法允许修改，并重建结构。
+        // 现在扁平化了，直接修改即可。
+        ItemValues[index] = value;
     }
 
     public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
     {
-        throw new InvalidOperationError(this, "元组是不可变类型，不支持切片赋值操作");
-    }
-
-    /// <summary>
-    /// 从元素列表重建元组结构
-    /// </summary>
-    /// <param name="elements">元素列表</param>
-    private void RebuildFromElements(List<LangValueType> elements)
-    {
-        if (elements.Count == 0)
-        {
-            Value = (NullLangValue.Instance, NullLangValue.Instance);
-            return;
-        }
-
-        if (elements.Count == 1)
-        {
-            Value = (elements[0], NullLangValue.Instance);
-            return;
-        }
-
-        if (elements.Count == 2)
-        {
-            Value = (elements[0], elements[1]);
-            return;
-        }
-
-        // 对于多元元组（>2个元素），创建嵌套结构
-        var nested = BuildNestedTupleWithValues(elements, 1);
-        Value = (elements[0], nested);
+        throw new InvalidOperationError(this, "元组不支持切片赋值操作");
     }
 
     public bool In(LangValueType value)
     {
-        var items = new List<LangValueType>();
-        CollectElements(this, items);
-        return items.Any(item => item.Equal(value));
-    }
-
-    /// <summary>
-    /// 递归收集元组中的所有元素
-    /// </summary>
-    /// <param name="tuple">当前元组</param>
-    /// <param name="items">元素列表</param>
-    private static void CollectElements(TupleLangValue tuple, List<LangValueType> items)
-    {
-        // 收集第一个元素
-        if (tuple.Value.Item1 is TupleLangValue nested1)
-        {
-            CollectElements(nested1, items);
-        }
-        else if (tuple.Value.Item1 is not NullLangValue)
-        {
-            // 跳过 NullLangValue（用于单元素元组的占位符）
-            items.Add(tuple.Value.Item1);
-        }
-
-        // 收集第二个元素
-        if (tuple.Value.Item2 is TupleLangValue nested2)
-        {
-            CollectElements(nested2, items);
-        }
-        else if (tuple.Value.Item2 is not NullLangValue)
-        {
-            // 跳过 NullLangValue（用于单元素元组的占位符）
-            items.Add(tuple.Value.Item2);
-        }
-    }
-
-    /// <summary>
-    /// 从元素列表创建元组
-    /// </summary>
-    /// <param name="elements">元素列表</param>
-    /// <returns>对应的元组</returns>
-    private static TupleLangValue CreateTupleFromList(List<LangValueType> elements)
-    {
-        if (elements.Count == 0)
-        {
-            var emptyTuple = new TupleLangValue(NullLangValue.Instance, NullLangValue.Instance);
-            emptyTuple.Value = (NullLangValue.Instance, NullLangValue.Instance);
-            return emptyTuple;
-        }
-
-        if (elements.Count == 1)
-        {
-            var singleTuple = new TupleLangValue(elements[0], NullLangValue.Instance);
-            singleTuple.Value = (elements[0], NullLangValue.Instance);
-            return singleTuple;
-        }
-
-        if (elements.Count == 2)
-        {
-            var twoTuple = new TupleLangValue(elements[0], elements[1]);
-            twoTuple.Value = (elements[0], elements[1]);
-            return twoTuple;
-        }
-
-        // 对于多元元组（>2个元素），创建嵌套结构并设置Value
-        var result = BuildNestedTupleWithValues(elements, 0);
-        return result;
-    }
-
-    /// <summary>
-    /// 从元素列表递归构建嵌套元组，并直接设置Value
-    /// </summary>
-    private static TupleLangValue BuildNestedTupleWithValues(List<LangValueType> elements, int index)
-    {
-        if (index >= elements.Count - 1)
-        {
-            // 最后一个元素
-            var lastTuple = new TupleLangValue(elements[index], NullLangValue.Instance);
-            lastTuple.Value = (elements[index], NullLangValue.Instance);
-            return lastTuple;
-        }
-
-        if (index == elements.Count - 2)
-        {
-            // 最后两个元素
-            var tuple = new TupleLangValue(elements[index], elements[index + 1]);
-            tuple.Value = (elements[index], elements[index + 1]);
-            return tuple;
-        }
-
-        // 递归构建
-        var nested = BuildNestedTupleWithValues(elements, index + 1);
-        var currentTuple = new TupleLangValue(elements[index], nested);
-        currentTuple.Value = (elements[index], nested);
-        return currentTuple;
+        return ItemValues.Any(item => item.Equal(value));
     }
 }
+
