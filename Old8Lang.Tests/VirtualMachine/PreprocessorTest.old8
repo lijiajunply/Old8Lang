@@ -1,0 +1,26 @@
+#define VM_TEST
+#define FEATURE_A
+
+result <- ""
+
+#if VM_TEST
+    result <- result + "VM_TEST "
+#else
+    result <- result + "NO_VM "
+#endif
+
+#if FEATURE_B
+    result <- result + "FEATURE_B"
+#elif FEATURE_A
+    result <- result + "FEATURE_A"
+#else
+    result <- result + "NONE"
+#endif
+
+#undef VM_TEST
+
+#if VM_TEST
+    result <- result + " SHOULD_NOT_BE_HERE"
+#endif
+
+PrintLine(result) // Expected: "VM_TEST FEATURE_A"
