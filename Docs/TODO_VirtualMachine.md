@@ -1,6 +1,6 @@
 # 虚拟机模式完成 TODO
 
-**当前完成度**: 73.4% (80/109 功能完全支持)
+**当前完成度**: 75.2% (82/109 功能完全支持)
 
 ---
 
@@ -8,20 +8,20 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 完全支持 | 80 | 已完整实现并测试通过 |
-| ❌ 不支持 | 29 | 功能未实现 |
+| ✅ 完全支持 | 82 | 已完整实现并测试通过 |
+| ❌ 不支持 | 27 | 功能未实现 |
 
 ---
 
 ## 🎯 实施策略
 
-虚拟机模式是最新的执行模式，需要逐步实现缺失的 32 个功能。按照功能重要性和实现难度，分为六个阶段。
+虚拟机模式是最新的执行模式，需要逐步实现缺失的 27 个功能。按照功能重要性和实现难度，分为六个阶段。
 
 ---
 
 ## 第一阶段：核心功能 (5 个功能)
 
-**目标完成度**: 75.2% → 79.8%
+**目标完成度**: 79.8%
 
 ### 1. Lambda 表达式支持
 
@@ -70,39 +70,41 @@
 
 ### 3. 字符串模板（$"..."）
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - String Templates (第 476 行)
 
 **实施步骤**:
-1. 实现 `BytecodeVisitor.VisitStringTemplate`
-2. 处理嵌入表达式的字节码生成
-3. 实现字符串拼接优化
-4. 添加测试用例
+1. ✅ 实现 `BytecodeVisitor.VisitStringTemplate`
+2. ✅ 处理嵌入表达式的字节码生成
+3. ✅ 实现字符串拼接优化 (System.String::Concat)
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/StringTemplateTest.old8)
 
 **相关文件**:
-- `Old8Lang/AST/Expression/Intermediates/StringTemplate.cs`
-- `Old8Lang/Visitor/BytecodeVisitor.cs`
+- `Old8Lang/AST/Expression/Intermediates/StringTemplateValue.cs`
+- `Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs`
+- `Old8Lang/Bytecode/VirtualMachine.cs`
 
 ---
 
 ### 4. Match 表达式
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
 - Match 表达式 (第 492 行)
 
 **实施步骤**:
-1. 实现 `BytecodeVisitor.VisitMatchExpression`
-2. 处理模式匹配的字节码生成
-3. 实现变量绑定和通配符
-4. 添加测试用例
+1. ✅ 实现 `BytecodeVisitor.VisitMatchExpression`
+2. ✅ 处理模式匹配的字节码生成
+3. ✅ 实现变量绑定和通配符
+4. ✅ 添加测试用例 (TestFiles/VirtualMachine/MatchExpressionTest.old8)
 
 **相关文件**:
 - `Old8Lang/AST/Expression/MatchExpression.cs`
-- `Old8Lang/Visitor/BytecodeVisitor.cs`
+- `Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs`
+- `Old8Lang/Bytecode/VirtualMachine.cs`
 
 ---
 

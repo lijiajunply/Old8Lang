@@ -3151,6 +3151,16 @@ public class VirtualMachine
         // 处理特殊的辅助函数（不在全局函数注册表中）
         switch (funcName)
         {
+            case "System.String::Concat":
+            {
+                // 字符串拼接
+                if (args.Length > 0 && args[0] is object[] array)
+                {
+                    return string.Concat(array.Select(ToString));
+                }
+                return string.Concat(args.Select(ToString));
+            }
+
             case "Spawn":
             case "spawn":
                 // Spawn 函数在虚拟机模式下的特殊处理

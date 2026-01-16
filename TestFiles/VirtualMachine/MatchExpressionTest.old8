@@ -1,0 +1,7 @@
+x <- 2
+result <- match x {
+    case 1 -> "One"
+    case 2 -> "Two"
+    case _ -> "Other"
+}
+PrintLine(result)

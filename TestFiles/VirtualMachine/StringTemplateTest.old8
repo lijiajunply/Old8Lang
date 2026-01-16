@@ -1,0 +1,4 @@
+name <- "Old8"
+age <- 1
+result <- $"Name: {name}, Age: {age}"
+PrintLine(result)

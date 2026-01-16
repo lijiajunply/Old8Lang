@@ -23,17 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/2026-01-16-12-00-CompilerTest.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/LambdaTest.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/TODO_VirtualMachine.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/TODO_VirtualMachine.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IVisitor.generated.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IVisitor.generated.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/documents/实现虚拟机模式下的类型转换 (as 关键字).md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -579,7 +570,7 @@
       <workItem from="1768329939001" duration="1896000" />
       <workItem from="1768331842186" duration="108000" />
       <workItem from="1768331954396" duration="29077000" />
-      <workItem from="1768485078721" duration="18159000" />
+      <workItem from="1768485078721" duration="21629000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -924,7 +915,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="686" />
+    <option name="localTasksCounter" value="688" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -951,8 +942,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(compiler): 添加接口和Mixin支持功能&#10;&#10;- 实现接口定义和继承机制，支持多接口实现&#10;- 添加Mixin混入功能，支持多Mixin组合&#10;- 实现类构造函数自动调用机制，优先init后类名方法&#10;- 扩展字节码文件结构，添加接口和Mixin元数据存储&#10;- 更新虚拟机执行逻辑，支持Mixin方法查找和调用&#10;- 新增接口和Mixin的单元测试验证功能正确性&#10;- 优化类实例化过程，确保类定义预编译完成&#10;- 添加接口继承关系和方法签名验证机制" />
-    <MESSAGE value="feat(vm): 添加对params可变参数的支持&#10;&#10;- 在FunctionMetadata中添加ParamsParameterIndex属性用于标识params参数位置&#10;- 修改BytecodeCompiler中的函数编译方法以支持params参数索引传递&#10;- 在VirtualMachine中实现ProcessParamsArguments方法处理params参数打包逻辑&#10;- 更新函数调用时的参数处理流程，将多余参数打包成数组传递给params参数&#10;- 添加针对params参数功能的完整单元测试覆盖各种使用场景&#10;- 修复函数调用时参数数量不足情况下的错误处理逻辑" />
     <MESSAGE value="docs(language): 更新 Old8Lang 语法文档并添加模式支持说明&#10;&#10;- 添加虚拟机模式 (字节码) 执行方式说明&#10;- 为所有语法特性添加模式支持标记 (解释器|编译器|虚拟机)&#10;- 新增模式支持总结文档 (Mode_Support_Summary.md)&#10;- 更新最后更新时间为 2026 年 1 月&#10;- 详细标注各特性的支持状态 (✅完全支持 ⚠️部分支持 ❌不支持 开发中)" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下的多线程和using语句支持&#10;&#10;- 添加ThreadCreate、ThreadStart、ThreadJoin等线程操作码指令&#10;- 实现using语句的字节码生成和虚拟机执行逻辑&#10;- 添加DisposeResource指令用于资源自动释放&#10;- 创建VMThreadLangValue类型支持线程对象操作&#10;- 实现ResourceManager对线程资源的统一管理&#10;- 添加完整的多线程和using语句单元测试&#10;- 更新示例代码展示虚拟机多线程和using语句用法" />
     <MESSAGE value="feat(vm): 实现虚拟机模块系统支持&#10;&#10;- 在BytecodeFile中添加模块名称、依赖列表和导出符号表字段&#10;- 实现ModuleDependency、ExportedSymbol等模块系统核心类&#10;- 添加LoadModule、ImportSymbol、ImportSymbolAs等模块操作指令&#10;- 实现ImportStatement的字节码生成逻辑支持各种导入语法&#10;- 创建ModuleLoader和ModuleRegistry管理模块加载和注册&#10;- 在VirtualMachine中实现模块加载、符号导入和循环依赖检测&#10;- 添加模块系统相关的单元测试验证功能正确性&#10;- 提供模块导入示例代码展示新功能使用方法" />
@@ -976,7 +965,9 @@
     <MESSAGE value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新 FAQ 文档修正语言特性和语法说明&#10;- 完善异步编程修复总结报告" />
     <MESSAGE value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制，提供友好错误提示&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新异步编程修复总结报告，完善当前限制说明&#10;- 修复 AsyncStateMachineGenerator 中状态跳转逻辑问题&#10;- 添加异步函数定义和调用的基本支持功能" />
     <MESSAGE value="feat(vm): 实现类型转换运算符as的功能支持&#10;&#10;- 在BytecodeVisitor中添加对as运算符的特殊处理逻辑&#10;- 生成Cast指令实现运行时类型转换功能&#10;- 支持左右操作数的类型检查和目标类型名称获取&#10;- 添加类型转换异常处理机制&#10;- 创建完整的类型转换测试文件验证各项转换功能&#10;- 更新IDE工作区配置同步项目变更信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现类型转换运算符as的功能支持&#10;&#10;- 在BytecodeVisitor中添加对as运算符的特殊处理逻辑&#10;- 生成Cast指令实现运行时类型转换功能&#10;- 支持左右操作数的类型检查和目标类型名称获取&#10;- 添加类型转换异常处理机制&#10;- 创建完整的类型转换测试文件验证各项转换功能&#10;- 更新IDE工作区配置同步项目变更信息" />
+    <MESSAGE value="feat(vm): 实现虚拟机模式下Lambda表达式支持&#10;&#10;- 添加OpCode.MakeFunction和OpCode.CallDynamic字节码指令&#10;- 实现BytecodeVisitor.VisitFuncLangValue编译Lambda表达式&#10;- 在VirtualMachine中实现MakeFunction和CallDynamic执行逻辑&#10;- 更新FunctionMetadata支持函数对象创建和动态调用&#10;- 添加Lambda表达式测试用例LambdaTest.old8&#10;- 更新TODO文档标记Lambda功能为完全支持状态&#10;- 生成Lambda表达式编译和执行的测试报告" />
+    <MESSAGE value="feat(vm): 添加虚拟机模式支持并实现类型转换功能&#10;&#10;- 新增虚拟机模式运行环境和字节码执行机制&#10;- 实现了完整的类型转换功能，支持int、double、string、bool、char、list、array、dict等类型的相互转换&#10;- 添加了ConvertToList、ConvertToArray、ConvertToDict等辅助转换方法&#10;- 增加了类型转换异常处理机制，提供更详细的错误信息&#10;- 更新项目规则文档，添加虚拟机模式测试目录和命令说明&#10;- 创建类型转换测试文件，验证各种类型转换场景的正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加虚拟机模式支持并实现类型转换功能&#10;&#10;- 新增虚拟机模式运行环境和字节码执行机制&#10;- 实现了完整的类型转换功能，支持int、double、string、bool、char、list、array、dict等类型的相互转换&#10;- 添加了ConvertToList、ConvertToArray、ConvertToDict等辅助转换方法&#10;- 增加了类型转换异常处理机制，提供更详细的错误信息&#10;- 更新项目规则文档，添加虚拟机模式测试目录和命令说明&#10;- 创建类型转换测试文件，验证各种类型转换场景的正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -449,7 +449,7 @@ public partial class BytecodeVisitor
     public Instruction? VisitStringTemplateValue(StringTemplateValue node)
     {
         // 字符串模板: $"Hello {name}, you are {age} years old"
-        // 策略: 创建一个对象数组,将所有表达式结果放入数组,然后调用string.Concat
+        // 策略: 将所有表达式结果压入栈，创建数组，然后调用string.Concat
 
         var expressionList = node.ExpressionList;
 
@@ -460,28 +460,16 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        // 创建对象数组: NewArray指令
-        Emit(OpCode.NewArray, expressionList.Count);
-
-        // 遍历所有表达式,将结果存入数组
-        for (int i = 0; i < expressionList.Count; i++)
+        // 1. 遍历所有表达式,将结果压入栈
+        foreach (var expr in expressionList)
         {
-            var expr = expressionList[i];
-
-            // 复制数组引用
-            Emit(OpCode.Dup);
-
-            // 加载索引
-            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(i));
-
-            // 访问表达式,将结果压入栈
             expr.Accept(this);
-
-            // 将值存入数组: SetIndex指令
-            Emit(OpCode.SetIndex);
         }
 
-        // 调用string.Concat(object[])方法
+        // 2. 创建对象数组: NewArray指令 (会从栈中弹出 expressionList.Count 个元素)
+        Emit(OpCode.NewArray, expressionList.Count);
+
+        // 3. 调用string.Concat(object[])方法
         var concatMethodName = "System.String::Concat";
         Emit(OpCode.CallNative, new object[] { 1, concatMethodName });
 
