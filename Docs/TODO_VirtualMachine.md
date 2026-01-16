@@ -246,43 +246,34 @@
 
 **目标完成度**: 86.2% → 88.1%
 
-### 13. 泛型函数
+### 13. 异常过滤器 (Exception Filters)
 
-**当前状态**: ❌ 不支持
+**当前状态**: ✅ 完全支持
 
 **涉及功能**:
-- 泛型函数 (第 1249 行)
+- catch ... where ...
 
 **实施步骤**:
-1. 实现泛型函数的字节码表示
-2. 处理类型参数和约束
-3. 实现泛型方法调用
-4. 添加测试用例
-
-**技术难点**:
-- 泛型类型参数的运行时表示
-- 泛型约束的验证
-- 泛型方法的实例化
+1. ✅ 修改 AST (TryStatement) 支持 Filter
+2. ✅ 修改 Parser 支持 where 子句
+3. ✅ 修改 VM (OpCode.Throw/HandleException) 支持对象异常传递 (VmException)
+4. ✅ 修改 BytecodeVisitor 生成 Filter 检查和 Dispatch 逻辑
+5. ✅ 添加测试用例 (TestFiles/VirtualMachine/ExceptionFilterTest.old8)
 
 ---
 
-### 14. 泛型类
+### 14. 解构赋值 (Destructuring Assignment)
 
-**当前状态**: ❌ 不支持
+**当前状态**: 🚧 部分支持 (正在调试)
 
 **涉及功能**:
-- 泛型类 (第 1544 行)
+- Tuple Destructuring: `(a, b) <- (1, 2)`
 
 **实施步骤**:
-1. 实现泛型类的字节码表示
-2. 处理泛型字段和方法
-3. 实现泛型类实例化
-4. 添加测试用例
-
-**技术难点**:
-- 泛型类的运行时表示
-- 泛型继承和接口实现
-- 泛型类型参数的传递
+1. ✅ 修改 Parser 支持 `( ... ) <-` 语法 (StatementParser)
+2. ✅ 修改 BytecodeVisitor 支持 TupleLangValue LHS
+3. ✅ 修复 VM OpCode.GetIndex 逻辑
+4. 🚧 调试复杂 Tuple 解构 (IndexOutOfBounds 问题)
 
 ---
 

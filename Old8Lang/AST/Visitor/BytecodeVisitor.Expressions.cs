@@ -603,11 +603,8 @@ public partial class BytecodeVisitor
         // 加载 match 值
         Emit(OpCode.LoadLocal, matchValueLocal);
 
-        // 加载类型名称
-        Emit(OpCode.LoadConst, _compiler.AddConstant(matchCase.TypeAnnotation!));
-
         // 调用类型检查指令
-        Emit(OpCode.IsType);
+        Emit(OpCode.IsType, matchCase.TypeAnnotation!);
 
         // 如果有守卫条件，需要额外检查
         if (matchCase.GuardCondition != null)
@@ -668,8 +665,7 @@ public partial class BytecodeVisitor
         Emit(OpCode.LoadLocal, matchValueLocal);
 
         // 检查是否是元组类型
-        Emit(OpCode.LoadConst, _compiler.AddConstant("tuple"));
-        Emit(OpCode.IsType);
+        Emit(OpCode.IsType, "tuple");
 
         // 如果不是元组，返回 false
         int notTupleJump = GetCurrentPosition();

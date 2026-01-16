@@ -106,7 +106,7 @@ public class FuncLangValue : ImportInfo
                 return true;
 
             // 检查 catch 块
-            foreach (var (_, _, catchBlock) in tryStmt.CatchBlocks)
+            foreach (var (_, _, _, catchBlock) in tryStmt.CatchBlocks)
             {
                 if (ContainsYieldStatement(catchBlock))
                     return true;

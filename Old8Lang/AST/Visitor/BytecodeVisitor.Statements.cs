@@ -175,12 +175,77 @@ public partial class BytecodeVisitor
                     Emit(OpCode.SetField, fieldName);
                 }
             }
+            else if (leftExpr is TupleLangValue tupleLHS)
+            {
+                // 元组解构赋值: (a, b) <- (1, 2)
+                // 1. 生成 RHS 代码 (栈顶: Tuple)
+                node.Value.Accept(this);
+                
+                // 2. 将 RHS 存储到临时变量，避免重复计算
+                int tupleLocalIndex = _compiler.AllocateLocal("<temp_tuple_destruct>");
+                Emit(OpCode.StoreLocal, tupleLocalIndex);
+                
+                // 3. 展平并赋值
+                // 注意：TupleLangValue 结构是嵌套的 (1, (2, 3))
+                // 我们需要递归或迭代处理
+                
+                // 为了简化，我们假设 LHS 是扁平的 TupleLangValue (编译器构建 AST 时通常如此)
+                // 但实际结构是嵌套的，所以我们需要像 NewTuple 一样处理
+                
+                var elements = new List<LangExpression>();
+                
+                // 辅助函数：收集元组元素
+                void CollectElements(TupleLangValue t)
+                {
+                    if (t.V1 != null) elements.Add(t.V1);
+                    if (t.V2 is TupleLangValue nested) CollectElements(nested);
+                    else if (t.V2 != null) elements.Add(t.V2);
+                }
+                CollectElements(tupleLHS);
+                
+                for (int i = 0; i < elements.Count; i++)
+                {
+                    var element = elements[i];
+                    if (element is LangId id)
+                    {
+                        // 提取第 i 个元素
+                        Emit(OpCode.LoadLocal, tupleLocalIndex);
+                        Emit(OpCode.LoadConst, i);
+                        Emit(OpCode.GetIndex);
+                        
+                        // 赋值给变量
+                        string elementName = id.IdName;
+                        if (_compiler.IsLocalVariable(elementName))
+                        {
+                            Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(elementName));
+                        }
+                        else if (_compiler.IsGlobalVariable(elementName))
+                        {
+                            Emit(OpCode.StoreGlobal, elementName);
+                        }
+                        else
+                        {
+                            int newLocal = _compiler.DeclareLocalVariable(elementName);
+                            Emit(OpCode.StoreLocal, newLocal);
+                        }
+                    }
+                    else
+                    {
+                        // 不支持嵌套解构赋值 (a, (b, c)) <- ... 目前仅支持单层
+                         throw new NotSupportedException($"字节码模式下元组解构仅支持变量名，不支持: {element.GetType().Name}");
+                    }
+                }
+                
+                // 清理临时变量
+                _compiler.FreeLocal(tupleLocalIndex);
+            }
             else if (leftExpr != null)
             {
                 // 字节码模式目前只支持以下赋值类型：
                 // 1. 简单变量赋值 (x <- value)
                 // 2. 索引赋值 (arr[i] <- value)
                 // 3. 成员访问赋值 (obj.field <- value)
+                // 4. 元组解构赋值 ((a, b) <- value)
                 throw new NotSupportedException($"字节码模式下不支持的赋值左侧表达式类型: {leftExpr.GetType().Name}");
             }
         }
@@ -874,72 +939,190 @@ public partial class BytecodeVisitor
         // 记录 try 块的结束位置
         int tryEnd = _instructions.Count;
 
-        // 处理 catch 块
+        // 生成跳转到 finally 或结束的指令 (跳过 catch 块)
+        int jumpToFinallyIndex = GetCurrentPosition();
+        Emit(OpCode.Jump, -1);
+
+        // 处理 catch 块 (实现手动分发逻辑)
         int catchStart = -1;
         int catchEnd = -1;
-        string? exceptionType = null;
-        string? exceptionVariable = null;
-        int exceptionVariableIndex = -1;
+        string? exceptionVariable = "<exception_dispatch>";
+        int exceptionVariableIndex = _compiler.AllocateLocal(exceptionVariable);
 
         if (node.CatchBlocks.Count > 0)
         {
-            // 目前只支持第一个 catch 块（简化实现）
-            var (catchExceptionType, catchExceptionVar, catchBlock) = node.CatchBlocks[0];
-
             catchStart = _instructions.Count;
-            exceptionType = catchExceptionType;
 
-            // 如果有异常变量，分配局部变量
-            if (catchExceptionVar != null && !string.IsNullOrEmpty(catchExceptionVar.IdName))
+            // 1. 保存异常对象到临时变量
+            Emit(OpCode.StoreLocal, exceptionVariableIndex);
+
+            // 2. 遍历所有 catch 块，生成检查链
+            List<int> jumpsToNextBlock = new List<int>();
+            List<int> jumpsToFinally = new List<int>();
+
+            for (int i = 0; i < node.CatchBlocks.Count; i++)
             {
-                exceptionVariable = catchExceptionVar.IdName;
-                exceptionVariableIndex = _compiler.AllocateLocal(exceptionVariable);
+                var (catchExceptionType, catchExceptionVar, filter, catchBlock) = node.CatchBlocks[i];
+                
+                // 修补上一个块失败后的跳转（跳到当前块的开始）
+                foreach (var jump in jumpsToNextBlock)
+                {
+                    PatchJump(jump, GetCurrentPosition());
+                }
+                jumpsToNextBlock.Clear();
 
-                // 将栈顶的异常对象存储到局部变量
-                Emit(OpCode.StoreLocal, exceptionVariableIndex);
+                // --- 类型检查 ---
+                if (!string.IsNullOrEmpty(catchExceptionType) && catchExceptionType != "Exception")
+                {
+                    // 检查类型
+                    Emit(OpCode.LoadLocal, exceptionVariableIndex);
+                    Emit(OpCode.IsType, catchExceptionType);
+                    
+                    // 如果类型不匹配，跳到下一个 catch 块
+                    jumpsToNextBlock.Add(GetCurrentPosition());
+                    Emit(OpCode.JumpIfFalse, -1);
+                }
+                
+                // --- 过滤器检查 ---
+                if (filter != null)
+                {
+                    // 绑定变量 (供过滤器使用)
+                    if (catchExceptionVar != null && !string.IsNullOrEmpty(catchExceptionVar.IdName))
+                    {
+                        int varIndex = _compiler.AllocateLocal(catchExceptionVar.IdName);
+                        Emit(OpCode.LoadLocal, exceptionVariableIndex);
+                        Emit(OpCode.StoreLocal, varIndex);
+                    }
+                    
+                    // 执行过滤器
+                    filter.Accept(this);
+                    
+                    // 如果过滤器为 false，跳到下一个 catch 块
+                    jumpsToNextBlock.Add(GetCurrentPosition());
+                    Emit(OpCode.JumpIfFalse, -1);
+                }
+
+                // --- 执行 Catch 块 ---
+                // 绑定变量 (供 catch 块使用)
+                // 简单起见，重新绑定 (覆盖)。
+                
+                if (catchExceptionVar != null && !string.IsNullOrEmpty(catchExceptionVar.IdName))
+                {
+                    // 实际上，我们应该在 catch 块开始时声明变量
+                    int varIndex = _compiler.DeclareLocalVariable(catchExceptionVar.IdName);
+                    Emit(OpCode.LoadLocal, exceptionVariableIndex);
+                    Emit(OpCode.StoreLocal, varIndex);
+                }
+
+                catchBlock.Accept(this);
+
+                // 执行完 catch 块后，跳到 finally
+                jumpsToFinally.Add(GetCurrentPosition());
+                Emit(OpCode.Jump, -1);
             }
-            else
+
+            // --- 所有 Catch 块都不匹配 ---
+            // 重新抛出异常
+            // 如果最后一个 catch 是 catch-all，则不会到达这里
+            foreach (var jump in jumpsToNextBlock)
             {
-                // 如果没有异常变量，弹出栈顶的异常对象
-                Emit(OpCode.Pop);
+                PatchJump(jump, GetCurrentPosition());
             }
-
-            // 生成 catch 块的字节码
-            catchBlock.Accept(this);
+            
+            Emit(OpCode.LoadLocal, exceptionVariableIndex);
+            Emit(OpCode.Throw);
 
             catchEnd = _instructions.Count;
+            
+            // 修补所有跳到 finally 的指令
+            // 我们将在 finally 块生成后修补
+            
+            // 为了让 jumpToFinallyList 在 finally 块后可用，我们需要存储它？
+            // 不，我们在 finally 块生成后可以手动添加它们到 elseLabel (如果 finallyBlock 为空)
+            // 或者我们可以立即修补到 finallyStart (如果 finallyBlock 存在)
+            
+            // 但是 finallyStart 还不知道。
+            // 我们可以将 jumpToFinallyIndex 也加入到 jumpsToFinally 中
+            jumpsToFinally.Add(jumpToFinallyIndex);
+            
+            // 稍后修补 jumpsToFinally
+            
+            // 处理 finally 块
+            int finallyStart = -1;
+            int finallyEnd = -1;
+
+            if (node.FinallyBlock != null)
+            {
+                finallyStart = _instructions.Count;
+
+                // 生成 finally 块的字节码
+                node.FinallyBlock.Accept(this);
+
+                finallyEnd = _instructions.Count;
+            }
+            
+            int endPos = GetCurrentPosition();
+            int target = finallyStart != -1 ? finallyStart : endPos;
+            
+            foreach (var jump in jumpsToFinally)
+            {
+                PatchJump(jump, target);
+            }
+
+            // 创建异常表条目 (单个入口，匹配所有异常)
+            var exceptionEntry = new ExceptionTableEntry
+            {
+                TryStart = tryStart,
+                TryEnd = tryEnd,
+                CatchStart = catchStart,
+                CatchEnd = catchEnd,
+                FinallyStart = finallyStart,
+                FinallyEnd = finallyEnd,
+                ExceptionType = null, // 匹配所有异常
+                ExceptionVariable = null, // 手动处理变量
+                ExceptionVariableIndex = -1
+            };
+
+            // 将异常表条目添加到当前函数的异常表
+            _compiler.AddExceptionTableEntry(exceptionEntry);
         }
-
-        // 处理 finally 块
-        int finallyStart = -1;
-        int finallyEnd = -1;
-
-        if (node.FinallyBlock != null)
+        else
         {
-            finallyStart = _instructions.Count;
+            // 没有 catch 块，只有 finally 块
+            // 修补跳过 catch 的指令 (直接跳到 finally)
+            // 此时 catchStart = -1
+            
+            int finallyStart = -1;
+            int finallyEnd = -1;
 
-            // 生成 finally 块的字节码
-            node.FinallyBlock.Accept(this);
-
-            finallyEnd = _instructions.Count;
+            if (node.FinallyBlock != null)
+            {
+                finallyStart = _instructions.Count;
+                node.FinallyBlock.Accept(this);
+                finallyEnd = _instructions.Count;
+            }
+            
+            int endPos = GetCurrentPosition();
+            int target = finallyStart != -1 ? finallyStart : endPos;
+            PatchJump(jumpToFinallyIndex, target);
+            
+            if (node.FinallyBlock != null)
+            {
+                var exceptionEntry = new ExceptionTableEntry
+                {
+                    TryStart = tryStart,
+                    TryEnd = tryEnd,
+                    CatchStart = -1,
+                    CatchEnd = -1,
+                    FinallyStart = finallyStart,
+                    FinallyEnd = finallyEnd,
+                    ExceptionType = null,
+                    ExceptionVariable = null,
+                    ExceptionVariableIndex = -1
+                };
+                _compiler.AddExceptionTableEntry(exceptionEntry);
+            }
         }
-
-        // 创建异常表条目
-        var exceptionEntry = new ExceptionTableEntry
-        {
-            TryStart = tryStart,
-            TryEnd = tryEnd,
-            CatchStart = catchStart,
-            CatchEnd = catchEnd,
-            FinallyStart = finallyStart,
-            FinallyEnd = finallyEnd,
-            ExceptionType = exceptionType,
-            ExceptionVariable = exceptionVariable,
-            ExceptionVariableIndex = exceptionVariableIndex
-        };
-
-        // 将异常表条目添加到当前函数的异常表
-        _compiler.AddExceptionTableEntry(exceptionEntry);
 
         return null;
     }

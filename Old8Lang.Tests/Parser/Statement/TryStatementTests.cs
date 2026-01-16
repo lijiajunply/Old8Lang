@@ -38,17 +38,19 @@ try {
     }
 
     /// <summary>
-    /// 测试带有异常类型的 catch 块
+    /// 测试带有异常过滤器 (where 子句) 的 catch 块
     /// </summary>
     [Fact]
-    public void ParseTryStatement_CatchWithExceptionType_ParsesSuccessfully()
+    public void ParseTryStatement_CatchWithFilter_ParsesSuccessfully()
     {
         // Arrange
         var code = @"
 try {
     a <- 10 / 0
-} catch (SyntaxError e) {
-    PrintLine(e)
+} catch (e) where e.Code == 404 {
+    PrintLine(""Not Found"")
+} catch (e) {
+    PrintLine(""Other Error"")
 }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
@@ -60,6 +62,16 @@ try {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         Assert.IsType<TryStatement>(result[0]);
+        var tryStmt = (TryStatement)result[0];
+        Assert.Equal(2, tryStmt.CatchBlocks.Count);
+        
+        // 检查第一个 catch 块的过滤器
+        var (type1, var1, filter1, block1) = tryStmt.CatchBlocks[0];
+        Assert.NotNull(filter1);
+        
+        // 检查第二个 catch 块的过滤器（应该为 null）
+        var (type2, var2, filter2, block2) = tryStmt.CatchBlocks[1];
+        Assert.Null(filter2);
     }
 
     /// <summary>

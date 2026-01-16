@@ -65,9 +65,31 @@ public class StatementParser(
         }
 
 
-        // 处理括号块：(statement)
+        // 处理括号块：(statement) 或 元组解构赋值 (a, b) <- ...
         if (CurrentToken.Type == LangTokenType.LeftParen)
         {
+            // 尝试解析为解构赋值
+            var savedIndex = CurrentIndex;
+            try
+            {
+                // 解析左侧表达式
+                var expr = expressionParser.ParseExpression();
+                
+                // 检查是否是赋值符号
+                if (CurrentToken.Type == LangTokenType.Assignment)
+                {
+                    // 是元组解构赋值，回退并调用 ParseSet
+                    CurrentIndex = savedIndex;
+                    return ParseSet();
+                }
+            }
+            catch
+            {
+                // 忽略错误
+            }
+            
+            // 回退并按原逻辑处理
+            CurrentIndex = savedIndex;
             return ParseLrBlock();
         }
 
@@ -1564,7 +1586,7 @@ public class StatementParser(
         var tryBlock = ParseBlock();
 
         // 解析catch块列表
-        var catchBlocks = new List<(string? exceptionType, LangId? exceptionVar, BlockStatement catchBlock)>();
+        var catchBlocks = new List<(string? exceptionType, LangId? exceptionVar, LangExpression? filter, BlockStatement catchBlock)>();
 
         // 循环解析catch块
         while (CurrentToken.Type == LangTokenType.Catch)
@@ -1593,7 +1615,8 @@ public class StatementParser(
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(exceptionType) && !exceptionType.Contains("Exception"))
+                        if (!string.IsNullOrEmpty(exceptionType) && !exceptionType.Contains("Exception") && 
+                            !(exceptionType.Length > 0 && char.IsUpper(exceptionType[0])))
                         {
                             exceptionVar = new LangId(exceptionType, position: CreateSourcePosition(CurrentToken));
                             exceptionType = null;
@@ -1604,9 +1627,17 @@ public class StatementParser(
                 Expect(LangTokenType.RightParen);
             }
 
+            // 解析可选的 where 子句 (Exception Filter)
+            LangExpression? filter = null;
+            if (CurrentToken.Type == LangTokenType.Where)
+            {
+                Expect(LangTokenType.Where);
+                filter = expressionParser.ParseExpression();
+            }
+
             // 解析catch块
             var catchBlock = ParseBlock();
-            catchBlocks.Add((exceptionType, exceptionVar, catchBlock));
+            catchBlocks.Add((exceptionType, exceptionVar, filter, catchBlock));
         }
 
         // 解析finally块（可选）

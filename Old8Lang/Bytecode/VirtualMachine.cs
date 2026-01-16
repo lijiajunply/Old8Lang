@@ -1771,10 +1771,11 @@ public class VirtualMachine
                         "array" => val is Array,
                         "list" => val is IList,
                         "dict" => val is IDictionary,
+                        "tuple" => val is Tuple<object?, object?>,
                         "null" => val == null,
                         "any" => true,
                         "object" => true,
-                        _ => false
+                        _ => (val is BytecodeObjectInstance instance && instance.ClassName == typeName)
                     };
                 }
 
@@ -2143,8 +2144,7 @@ public class VirtualMachine
             case OpCode.Throw:
             {
                 var exceptionValue = _stack.Pop();
-                var message = ToString(exceptionValue);
-                throw new Exception(message);
+                throw new VmException(exceptionValue);
             }
 
             case OpCode.TryBegin:
@@ -3333,6 +3333,13 @@ public class VirtualMachine
     /// <returns>如果找到并处理了异常返回true，否则返回false</returns>
     private bool HandleException(Exception exception, CallFrame frame, FunctionMetadata function)
     {
+        // 提取真实的异常对象
+        object? exceptionValue = exception;
+        if (exception is VmException vmException)
+        {
+            exceptionValue = vmException.Value;
+        }
+
         // 获取异常发生时的指令位置（已经+1了，所以要-1）
         int exceptionIP = frame.IP - 1;
 
@@ -3343,10 +3350,10 @@ public class VirtualMachine
             if (entry.IsInTryBlock(exceptionIP))
             {
                 // 检查异常类型是否匹配
-                if (IsExceptionTypeMatch(exception, entry.ExceptionType))
+                if (IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
                 {
                     // 将异常对象压入栈
-                    _stack.Push(exception.Message);
+                    _stack.Push(exceptionValue);
 
                     // 如果有catch块，跳转到catch块
                     if (entry.CatchStart >= 0)
@@ -3371,31 +3378,73 @@ public class VirtualMachine
     /// <summary>
     /// 检查异常类型是否匹配
     /// </summary>
-    private bool IsExceptionTypeMatch(Exception exception, string? expectedType)
+    private bool IsExceptionTypeMatch(object? exceptionValue, string? expectedType)
     {
         // 如果没有指定异常类型，匹配所有异常
         if (string.IsNullOrEmpty(expectedType))
             return true;
 
-        // 获取异常的类型名称
-        string actualType = exception.GetType().Name;
+        if (exceptionValue == null)
+            return false;
 
-        // 精确匹配
-        if (actualType == expectedType)
-            return true;
-
-        // 匹配完整类型名称
-        if (exception.GetType().FullName == expectedType)
-            return true;
-
-        // 检查继承关系
-        Type? currentType = exception.GetType();
-        while (currentType != null)
+        // 1. 检查 BytecodeObjectInstance
+        if (exceptionValue is BytecodeObjectInstance instance)
         {
-            if (currentType.Name == expectedType || currentType.FullName == expectedType)
+            // 检查类名
+            if (instance.ClassName == expectedType)
                 return true;
-            currentType = currentType.BaseType;
+            
+            // 检查继承关系
+            var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == instance.ClassName);
+            while (classMetadata != null && !string.IsNullOrEmpty(classMetadata.BaseClassName))
+            {
+                if (classMetadata.BaseClassName == expectedType)
+                    return true;
+                
+                classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == classMetadata.BaseClassName);
+            }
+            
+            // 检查接口实现
+            // TODO: 这里需要从 ClassMetadata 中获取接口信息，或者 BytecodeObjectInstance 应该存储接口信息
+            // 假设 instance.Interfaces 包含所有实现的接口
+            if (instance.Interfaces.Contains(expectedType))
+                return true;
+                
+            return false;
         }
+
+        // 2. 检查 .NET 异常类型
+        if (exceptionValue is Exception ex)
+        {
+            // 获取异常的类型名称
+            string actualType = ex.GetType().Name;
+
+            // 精确匹配
+            if (actualType == expectedType)
+                return true;
+
+            // 匹配完整类型名称
+            if (ex.GetType().FullName == expectedType)
+                return true;
+
+            // 检查继承关系
+            Type? currentType = ex.GetType();
+            while (currentType != null)
+            {
+                if (currentType.Name == expectedType || currentType.FullName == expectedType)
+                    return true;
+                currentType = currentType.BaseType;
+            }
+            
+            // 特殊情况：如果是 "Exception"，匹配所有 Exception
+            if (expectedType == "Exception")
+                return true;
+        }
+        
+        // 3. 字符串异常匹配 (如果 expectedType 是 "string" 或具体值?)
+        // Old8Lang 中通常不建议用字符串作为异常类型，但为了兼容性
+        if (exceptionValue is string str && expectedType == "string")
+            return true;
 
         return false;
     }
@@ -4154,6 +4203,27 @@ public class VirtualMachine
         }
 
         return obj;
+    }
+}
+
+/// <summary>
+/// 虚拟机异常包装类
+/// 用于在C#异常机制中传递Old8Lang的异常对象
+/// </summary>
+public class VmException : Exception
+{
+    public object? Value { get; }
+
+    public VmException(object? value) : base(GetMessage(value))
+    {
+        Value = value;
+    }
+
+    private static string GetMessage(object? value)
+    {
+        if (value == null) return "null";
+        if (value is LangValueType langValue) return langValue.ToDisplayString();
+        return value.ToString() ?? "";
     }
 }
 
