@@ -1,4 +1,3 @@
-using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using System.Reflection.Emit;

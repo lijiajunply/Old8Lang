@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Old8Lang.Bytecode.Profiler;
 
 /// <summary>
