@@ -22,6 +22,32 @@ namespace Old8Lang.Compiler;
 public static class TypeConversion
 {
     /// <summary>
+    /// 将对象转换为布尔值
+    /// </summary>
+    /// <param name="value">要转换的对象</param>
+    /// <returns>转换后的布尔值</returns>
+    public static bool ToBool(object? value)
+    {
+        if (value is null) return false;
+        if (value is bool b) return b;
+        if (value is int i) return i != 0;
+        if (value is double d) return d != 0;
+        if (value is string s) return !string.IsNullOrEmpty(s);
+        if (value is Old8Lang.AST.Expression.Value.BoolLangValue blv) return blv.Value;
+        
+        // 尝试调用 ToBool 方法 (如果存在)
+        // 或者是 Value 类型
+        var type = value.GetType();
+        var toBoolMethod = type.GetMethod("ToBool");
+        if (toBoolMethod != null && toBoolMethod.ReturnType == typeof(bool) && toBoolMethod.GetParameters().Length == 0)
+        {
+            return (bool)toBoolMethod.Invoke(value, null)!;
+        }
+
+        return true; // 默认非空对象为真? 或者抛出异常? 解释器通常宽容。
+    }
+
+    /// <summary>
     /// 生成类型转换的IL指令
     /// </summary>
     /// <param name="ilGenerator">IL生成器</param>

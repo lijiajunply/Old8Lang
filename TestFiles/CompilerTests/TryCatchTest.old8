@@ -1,0 +1,28 @@
+
+func main() -> void {
+    PrintLine("Start")
+    
+    // Test 1: Basic catch
+    try {
+        PrintLine("In Try 1")
+        throw "error1"
+    } catch (e) {
+        PrintLine("Caught 1: " + e.ToStr())
+    }
+
+    // Test 2: Finally
+    try {
+        PrintLine("In Try 2")
+    } finally {
+        PrintLine("In Finally 2")
+    }
+
+    // Test 3: Multiple catch blocks (this is where it might fail or behave wrongly)
+    // In current implementation, both are compiled to catch(Exception), so first one wins.
+    // But logically, if we throw "error3", it is an Exception.
+    // If we supported types, we would test that.
+    
+    PrintLine("End")
+}
+
+main()

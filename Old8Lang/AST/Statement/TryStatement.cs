@@ -294,88 +294,9 @@ public partial class TryStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 检查如果有finally块，那么try块和catch块中不能包含return语句
-        // 这是因为在.NET IL中，try块或catch块中的return语句与finally块一起使用会导致无效的IL代码
-        // 注意：在异步状态机模式下，return 语句会编译为 Leave 指令，这是合法的，所以跳过检查
-        if (finallyBlock is not null && local.AsyncStateMachineGenerator == null && local.ReturnLabel == null)
-        {
-            // 检查try块中是否包含return语句
-            if (ContainsReturnStatement(tryBlock))
-            {
-                throw new CompilerException("当有finally块时，try块中不能包含return语句", Position);
-            }
-
-            // 检查所有catch块中是否包含return语句
-            foreach (var (_, _, _, catchBlock) in catchBlocks)
-            {
-                if (ContainsReturnStatement(catchBlock))
-                {
-                    throw new CompilerException("当有finally块时，catch块中不能包含return语句", Position);
-                }
-            }
-        }
-
-        // 开始异常处理块
-        ilGenerator.BeginExceptionBlock();
-
-        // 生成try块的IL代码
-        tryBlock.GenerateIl(ilGenerator, local);
-
-        // 生成catch块的IL代码
-        foreach (var (exceptionType, exceptionVar, filter, catchBlock) in catchBlocks)
-        {
-            // 开始catch块，捕获所有类型的异常
-            // TODO: 支持过滤器 (System.Reflection.Emit 对于过滤器支持有限，这里暂时忽略过滤器)
-            ilGenerator.BeginCatchBlock(typeof(Exception));
-
-            // 如果有异常变量，将其添加到局部变量管理器
-            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
-            {
-                // 将异常对象包装为ExceptionWrapper,以便ToString()只返回消息
-                // 栈顶是捕获到的Exception对象
-                // 调用 new ExceptionWrapper(exception)
-                ilGenerator.Emit(OpCodes.Newobj, typeof(Old8Lang.Compiler.ExceptionWrapper).GetConstructor([typeof(Exception)])!);
-
-                var exceptionLocal = ilGenerator.DeclareLocal(typeof(Old8Lang.Compiler.ExceptionWrapper));
-                ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
-
-                // 将异常变量添加到局部变量管理器
-                local.AddLocalVar(exceptionVar.IdName, exceptionLocal);
-            }
-            else
-            {
-                // 如果没有异常变量，清空堆栈
-                ilGenerator.Emit(OpCodes.Pop);
-            }
-
-            // 生成catch块的IL代码
-            catchBlock.GenerateIl(ilGenerator, local);
-
-            // 如果添加了异常变量，移除它
-            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
-            {
-                local.RemoveLocalVar(exceptionVar.IdName);
-            }
-        }
-
-        // 如果有finally块，生成finally块的IL代码
-        if (finallyBlock is not null)
-        {
-            // 开始finally块
-            ilGenerator.BeginFinallyBlock();
-
-            // 设置在finally块中的标志
-            local.IsInFinallyBlock = true;
-
-            // 生成finally块的IL代码
-            finallyBlock.GenerateIl(ilGenerator, local);
-
-            // 恢复标志
-            local.IsInFinallyBlock = false;
-        }
-
-        // 结束异常处理块
-        ilGenerator.EndExceptionBlock();
+        // 委托给 CompilerVisitor 处理，以支持更复杂的逻辑（如多重 catch 块分发）
+        var visitor = new Old8Lang.AST.Visitor.CompilerVisitor(ilGenerator, local);
+        this.Accept(visitor);
     }
 
     /// <summary>

@@ -9,8 +9,14 @@
     - 修复了 `ReturnStatement.cs`，确保在 `try-catch-finally` 块（以及顶层代码）中使用 `Leave` 指令代替 `Ret` 指令。
     - 修复了当返回值局部变量为空但表达式产生值时的堆栈平衡问题（通过 `Pop` 指令）。
 
-- [ ] **实现 `try-catch-finally`**
-  - **状态**：部分实现（AST 节点已存在），但 `CompilerVisitor` 需要全面支持。
+- [x] **实现 `try-catch-finally`**
+  - **状态**：✅ 已完成。
+  - **详情**：
+    - 在 `CompilerVisitor` 中完整实现了 `TryStatement` 和 `ThrowStatement` 的 IL 生成。
+    - 支持多个 `catch` 块和类型匹配。
+    - 支持异常过滤器 (`where` 子句)，通过在 catch 块内部进行条件检查和跳转实现。
+    - 修复了 `ExceptionHelper` 以正确处理异常类型匹配。
+    - 支持 `finally` 块的正确执行。
   - **参考**：`TryStatement.cs`, `ThrowStatement.cs`。
 
 ## 中优先级

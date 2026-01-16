@@ -1,0 +1,31 @@
+
+func main() -> void {
+    PrintLine("Start Filter Test")
+    
+    // Test 1: Exception Filter
+    try {
+        PrintLine("Throwing error 404")
+        // We simulate throwing an object that has a Code property?
+        // Old8Lang exceptions are usually strings or wrappers.
+        // If we throw "error", e.ToStr() is "error".
+        throw "error404"
+    } catch (e) where e.ToStr().Contains("404") {
+        PrintLine("Caught 404 error: " + e.ToStr())
+    } catch (e) {
+        PrintLine("Caught generic error: " + e.ToStr())
+    }
+
+    // Test 2: Filter not matching
+    try {
+        PrintLine("Throwing error 500")
+        throw "error500"
+    } catch (e) where e.ToStr().Contains("404") {
+        PrintLine("Should not catch 500 as 404")
+    } catch (e) {
+        PrintLine("Caught other error: " + e.ToStr())
+    }
+
+    PrintLine("End Filter Test")
+}
+
+main()
