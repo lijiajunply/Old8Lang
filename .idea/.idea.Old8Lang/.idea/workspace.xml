@@ -23,16 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/创建 API 模式对比文档.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/PrimitiveExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2026-01-16-10-50-ModeVerification.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/Verification/ModeDiffTest.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/API_Mode_Comparison.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/API_Mode_Comparison.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringExtensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -581,7 +572,7 @@
       <workItem from="1768331954396" duration="29077000" />
       <workItem from="1768485078721" duration="21629000" />
       <workItem from="1768543641677" duration="16866000" />
-      <workItem from="1768576580719" duration="510000" />
+      <workItem from="1768576580719" duration="1196000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

@@ -1,0 +1,319 @@
+// ============================================
+// 全局函数、静态类型和基本类型内部函数测试
+// ============================================
+
+PrintLine("========== 基本类型扩展方法测试 ==========")
+
+// ========== 字符串扩展方法测试 ==========
+PrintLine("--- 字符串扩展方法 ---")
+str <- "Hello World"
+PrintLine("原始字符串: " + str)
+PrintLine("转大写: " + str.ToUpper())
+PrintLine("转小写: " + str.ToLower())
+PrintLine("长度: " + str.Length().ToStr())
+PrintLine("包含 'World': " + str.Contains("World").ToStr())
+PrintLine("替换 'World' 为 'Old8': " + str.Replace("World", "Old8"))
+PrintLine("去除空白: " + "  trim test  ".Trim())
+PrintLine("子串(0, 5): " + str.Substring(0, 5))
+
+// 字符串分割测试
+splitResult <- "a,b,c,d".Split(",")
+PrintLine("分割 'a,b,c,d': " + splitResult.ToStr())
+
+PrintLine("")
+
+// ========== 列表扩展方法测试 ==========
+PrintLine("--- 列表扩展方法 ---")
+list <- {1, 2, 3}
+PrintLine("初始列表: " + list.ToStr())
+
+list.Add(4)
+PrintLine("添加 4 后: " + list.ToStr())
+
+PrintLine("列表长度: " + list.Count().ToStr())
+PrintLine("包含 2: " + list.Contains(2).ToStr())
+PrintLine("包含 10: " + list.Contains(10).ToStr())
+
+list.Remove(2)
+PrintLine("移除 2 后: " + list.ToStr())
+
+list.RemoveAt(0)
+PrintLine("移除索引 0 后: " + list.ToStr())
+
+list.Clear()
+PrintLine("清空后: " + list.ToStr())
+PrintLine("清空后长度: " + list.Count().ToStr())
+
+PrintLine("")
+
+// ========== 数组扩展方法测试 ==========
+PrintLine("--- 数组扩展方法 ---")
+arr <- [10, 20, 30, 40]
+PrintLine("数组长度: " + arr.Length().ToStr())
+
+// 数组转列表
+arrList <- arr.ToList()
+PrintLine("转换为列表: " + arrList.ToStr())
+arrList.Add(50)
+PrintLine("列表添加 50 后: " + arrList.ToStr())
+PrintLine("列表包含 20: " + arrList.Contains(20).ToStr())
+PrintLine("列表包含 100: " + arrList.Contains(100).ToStr())
+
+PrintLine("")
+
+// ========== 字典扩展方法测试 ==========
+PrintLine("--- 字典扩展方法 ---")
+dict <- {"name": "Old8Lang", "version": 1, "active": true}
+PrintLine("字典: " + dict.ToStr())
+PrintLine("字典大小: " + dict.Count().ToStr())
+
+PrintLine("包含键 'name': " + dict.ContainsKey("name").ToStr())
+PrintLine("包含键 'author': " + dict.ContainsKey("author").ToStr())
+
+// 使用索引访问代替 Get 方法
+PrintLine("获取 'name': " + dict["name"].ToStr())
+
+dict["author"] <- "Lucky"
+PrintLine("设置 'author' 后: " + dict.ToStr())
+
+dict.Remove("version")
+PrintLine("移除 'version' 后: " + dict.ToStr())
+
+dict.Clear()
+PrintLine("清空后: " + dict.ToStr())
+
+PrintLine("")
+
+// ========== 基本类型转换测试 ==========
+PrintLine("--- 基本类型转换 ---")
+
+// Int 转换
+intVal <- 42
+PrintLine("Int 42 转 Int: " + intVal.ToInt().ToStr())
+PrintLine("Int 42 转 Double: " + intVal.ToDouble().ToStr())
+PrintLine("Int 42 转 Bool: " + intVal.ToBool().ToStr())
+zeroVal <- 0
+PrintLine("Int 0 转 Bool: " + zeroVal.ToBool().ToStr())
+charCodeVal <- 65
+PrintLine("Int 65 转 Char: " + charCodeVal.ToChar().ToStr())
+PrintLine("Int 42 转 Str: " + intVal.ToStr())
+
+PrintLine("")
+
+// Double 转换
+doubleVal <- 3.14
+PrintLine("Double 3.14 转 Int: " + doubleVal.ToInt().ToStr())
+PrintLine("Double 3.14 转 Double: " + doubleVal.ToDouble().ToStr())
+PrintLine("Double 3.14 转 Bool: " + doubleVal.ToBool().ToStr())
+zeroDouble <- 0.0
+PrintLine("Double 0.0 转 Bool: " + zeroDouble.ToBool().ToStr())
+PrintLine("Double 3.14 转 Str: " + doubleVal.ToStr())
+
+PrintLine("")
+
+// Bool 转换
+boolVal <- true
+PrintLine("Bool true 转 Int: " + boolVal.ToInt().ToStr())
+falseVal <- false
+PrintLine("Bool false 转 Int: " + falseVal.ToInt().ToStr())
+PrintLine("Bool true 转 Double: " + boolVal.ToDouble().ToStr())
+PrintLine("Bool false 转 Double: " + falseVal.ToDouble().ToStr())
+PrintLine("Bool true 转 Bool: " + boolVal.ToBool().ToStr())
+PrintLine("Bool true 转 Str: " + boolVal.ToStr())
+PrintLine("Bool false 转 Str: " + falseVal.ToStr())
+
+PrintLine("")
+
+// Char 转换
+charVal <- 'A'
+PrintLine("Char 'A' 转 Int: " + charVal.ToInt().ToStr())
+PrintLine("Char 'A' 转 Char: " + charVal.ToChar().ToStr())
+PrintLine("Char 'A' 转 Str: " + charVal.ToStr())
+
+PrintLine("")
+
+// ========== 全局函数测试 ==========
+PrintLine("========== 全局函数测试 ==========")
+
+// PrintLine 已经在使用中
+PrintLine("--- PrintLine 函数 ---")
+PrintLine("这是一个测试消息")
+
+PrintLine("")
+
+// Tuple 函数测试
+PrintLine("--- Tuple 测试 ---")
+emptyTuple <- Tuple()
+PrintLine("创建空元组: " + emptyTuple.ToStr())
+
+// 使用语法糖创建元组
+tuple2 <- (1, "hello")
+PrintLine("创建二元组: " + tuple2.ToStr())
+
+tuple3 <- (1, 2, 3)
+PrintLine("创建三元组: " + tuple3.ToStr())
+
+PrintLine("")
+
+// Dict 函数测试
+PrintLine("--- Dict 函数 ---")
+emptyDict <- Dict()
+PrintLine("创建空字典: " + emptyDict.ToStr())
+
+PrintLine("")
+
+// ToObj 函数测试
+PrintLine("--- ToObj 函数 ---")
+jsonStr <- "{\"name\": \"Old8\", \"age\": 1}"
+obj <- ToObj(jsonStr)
+PrintLine("JSON 转对象成功")
+PrintLine("对象 name 属性: " + obj.name.ToStr())
+PrintLine("对象 age 属性: " + obj.age.ToStr())
+
+PrintLine("")
+
+// ========== 并发原语测试 ==========
+PrintLine("========== 并发原语测试 ==========")
+
+// Mutex 测试
+PrintLine("--- Mutex 测试 ---")
+mutex <- MutexCreate()
+PrintLine("创建 Mutex: " + mutex.ToStr())
+MutexLock(mutex)
+PrintLine("Mutex 已锁定")
+MutexUnlock(mutex)
+PrintLine("Mutex 已解锁")
+MutexDispose(mutex)
+PrintLine("Mutex 已释放")
+
+PrintLine("")
+
+// Semaphore 测试
+PrintLine("--- Semaphore 测试 ---")
+sem <- SemaphoreCreate(1, 3)
+PrintLine("创建 Semaphore(1, 3): " + sem.ToStr())
+SemaphoreAcquire(sem)
+PrintLine("Semaphore 已获取")
+SemaphoreRelease(sem)
+PrintLine("Semaphore 已释放")
+SemaphoreDispose(sem)
+PrintLine("Semaphore 已释放")
+
+PrintLine("")
+
+// AtomicInt 测试
+PrintLine("--- AtomicInt 测试 ---")
+atomic <- AtomicIntCreate(0)
+PrintLine("创建 AtomicInt(0): " + atomic.ToStr())
+PrintLine("初始值: " + AtomicIntGet(atomic).ToStr())
+
+AtomicIntSet(atomic, 10)
+PrintLine("设置为 10: " + AtomicIntGet(atomic).ToStr())
+
+result <- AtomicIntIncrement(atomic)
+PrintLine("递增后: " + result.ToStr())
+
+result <- AtomicIntDecrement(atomic)
+PrintLine("递减后: " + result.ToStr())
+
+result <- AtomicIntAdd(atomic, 5)
+PrintLine("加 5 后: " + result.ToStr())
+
+casResult <- AtomicIntCompareAndSet(atomic, 15, 20)
+PrintLine("CAS(15, 20): " + casResult.ToStr() + ", 当前值: " + AtomicIntGet(atomic).ToStr())
+
+AtomicIntDispose(atomic)
+PrintLine("AtomicInt 已释放")
+
+PrintLine("")
+
+// Channel 测试
+PrintLine("--- Channel 测试 ---")
+ch <- ChannelCreate()
+PrintLine("创建无界 Channel: " + ch.ToStr())
+
+ChannelSend(ch, 100)
+PrintLine("发送 100 到 Channel")
+
+val <- ChannelReceive(ch)
+PrintLine("从 Channel 接收: " + val.ToStr())
+
+ChannelClose(ch)
+PrintLine("Channel 已关闭")
+ChannelDispose(ch)
+PrintLine("Channel 已释放")
+
+PrintLine("")
+
+// ReadWriteLock 测试
+PrintLine("--- ReadWriteLock 测试 ---")
+rwLock <- ReadWriteLockCreate()
+PrintLine("创建 ReadWriteLock: " + rwLock.ToStr())
+
+ReadLockAcquire(rwLock)
+PrintLine("读锁已获取")
+ReadLockRelease(rwLock)
+PrintLine("读锁已释放")
+
+WriteLockAcquire(rwLock)
+PrintLine("写锁已获取")
+WriteLockRelease(rwLock)
+PrintLine("写锁已释放")
+
+ReadWriteLockDispose(rwLock)
+PrintLine("ReadWriteLock 已释放")
+
+PrintLine("")
+
+// CountDownLatch 测试
+PrintLine("--- CountDownLatch 测试 ---")
+latch <- CountDownLatchCreate(3)
+PrintLine("创建 CountDownLatch(3): " + latch.ToStr())
+PrintLine("初始计数: " + CountDownLatchGetCount(latch).ToStr())
+
+CountDownLatchCountDown(latch)
+PrintLine("倒计时一次，剩余: " + CountDownLatchGetCount(latch).ToStr())
+
+CountDownLatchCountDown(latch)
+PrintLine("倒计时一次，剩余: " + CountDownLatchGetCount(latch).ToStr())
+
+CountDownLatchCountDown(latch)
+PrintLine("倒计时一次，剩余: " + CountDownLatchGetCount(latch).ToStr())
+
+CountDownLatchDispose(latch)
+PrintLine("CountDownLatch 已释放")
+
+PrintLine("")
+
+// CyclicBarrier 测试
+PrintLine("--- CyclicBarrier 测试 ---")
+barrier <- CyclicBarrierCreate(2)
+PrintLine("创建 CyclicBarrier(2): " + barrier.ToStr())
+PrintLine("参与者数量: " + CyclicBarrierGetParticipantCount(barrier).ToStr())
+PrintLine("等待者数量: " + CyclicBarrierGetWaitingCount(barrier).ToStr())
+
+CyclicBarrierDispose(barrier)
+PrintLine("CyclicBarrier 已释放")
+
+PrintLine("")
+
+// CancellationTokenSource 测试
+PrintLine("--- CancellationTokenSource 测试 ---")
+cts <- CreateCancellationTokenSource()
+PrintLine("创建 CancellationTokenSource: " + cts.ToStr())
+
+Cancel(cts)
+PrintLine("已取消")
+
+DisposeCancellationTokenSource(cts)
+PrintLine("CancellationTokenSource 已释放")
+
+PrintLine("")
+
+// 工具函数测试
+PrintLine("--- 工具函数测试 ---")
+PrintLine("当前线程 ID: " + GetCurrentThreadId().ToStr())
+PrintLine("处理器数量: " + GetProcessorCount().ToStr())
+
+PrintLine("")
+PrintLine("========== 所有测试完成 ==========")
