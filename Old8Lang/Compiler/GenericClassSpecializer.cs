@@ -215,6 +215,10 @@ public static class GenericClassSpecializer
             methodLocal.ClassVar[key] = value;
         foreach (var (key, value) in local.GlobalStaticClasses)
             methodLocal.GlobalStaticClasses[key] = value;
+        foreach (var (key, value) in local.GenericFunctions)
+            methodLocal.GenericFunctions[key] = value;
+        foreach (var (key, value) in local.GenericClasses)
+            methodLocal.GenericClasses[key] = value;
 
         // 添加字段信息
         foreach (var (fieldName, fieldBuilder) in fieldMap)

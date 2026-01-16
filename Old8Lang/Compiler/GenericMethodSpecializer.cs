@@ -85,6 +85,14 @@ public static class GenericMethodSpecializer
         {
             funcLocal.FuncParameters[key] = value;
         }
+        foreach (var (key, value) in local.GenericFunctions)
+        {
+            funcLocal.GenericFunctions[key] = value;
+        }
+        foreach (var (key, value) in local.GenericClasses)
+        {
+            funcLocal.GenericClasses[key] = value;
+        }
 
         // 处理参数：为特化版本创建具体的参数局部变量
         for (var i = 0; i < funcValue.Ids!.Count; i++)
@@ -104,6 +112,12 @@ public static class GenericMethodSpecializer
         var endLabel = methodIl.DefineLabel();
         funcLocal.ReturnLabel = endLabel;
 
+        // 声明返回值局部变量（如果需要）
+        if (returnType != typeof(void))
+        {
+            funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
+        }
+
         // 生成方法体的IL代码，使用特化的类型信息
         GenerateSpecializedMethodBody(funcValue, methodIl, funcLocal, resolver);
 
@@ -112,10 +126,23 @@ public static class GenericMethodSpecializer
             ? funcValue.BlockStatement[^1]
             : null;
 
-        if (lastStatement is not AST.Statement.ReturnStatement && returnType != typeof(void))
+        if (lastStatement is not AST.Statement.ReturnStatement)
         {
-            // 提供默认返回值
-            GenerateDefaultValue(methodIl, returnType);
+            if (returnType != typeof(void))
+            {
+                // 提供默认返回值
+                GenerateDefaultValue(methodIl, returnType);
+                methodIl.Emit(OpCodes.Stloc, funcLocal.ReturnValueLocal!);
+            }
+        }
+
+        // 标记函数结束位置
+        methodIl.MarkLabel(endLabel);
+
+        // 加载返回值并返回
+        if (returnType != typeof(void))
+        {
+            methodIl.Emit(OpCodes.Ldloc, funcLocal.ReturnValueLocal!);
         }
 
         methodIl.Emit(OpCodes.Ret);

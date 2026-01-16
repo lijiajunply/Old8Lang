@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Visitor;
@@ -52,6 +53,39 @@ public abstract class LangExpression : IOldLangTree
 
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
+        // 1. 检查是否为字段赋值 (在类的方法中)
+        if (local.FieldVar.TryGetValue(idName, out var fieldInfo))
+        {
+            // 确保我们在实例方法中（有 this 指针）
+            // 在编译器模式下，实例方法的参数0是this
+            
+            // 加载 this
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            
+            // 加载值
+            LoadIlValue(ilGenerator, local);
+            
+            // 检查类型兼容性
+            var fieldValueType = OutputType(local) ?? typeof(object);
+            if (fieldInfo.FieldType != fieldValueType)
+            {
+                // 如果需要，进行类型转换
+                if (fieldInfo.FieldType == typeof(object) && fieldValueType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, fieldValueType);
+                }
+                else if (fieldInfo.FieldType.IsValueType && fieldValueType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
+                }
+            }
+            
+            // 设置字段
+            ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
+            return;
+        }
+
+        // 2. 局部变量赋值处理
         // 先获取值的类型
         var valueType = OutputType(local) ?? typeof(int); // 默认类型为int
 

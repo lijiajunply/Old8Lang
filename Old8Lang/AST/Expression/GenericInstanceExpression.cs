@@ -268,10 +268,41 @@ public partial class GenericInstanceExpression : LangExpression
 
         ilGenerator.Emit(OpCodes.Newobj, constructor);
 
-        // 如果有调用参数（调用 init 方法），暂时不支持
+        // 如果有调用参数，调用 init 方法
         if (IsFunctionCall && CallArguments!.Count > 0)
         {
-            throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型类的带参数构造函数");
+            // 复制实例引用，用于调用 init 方法
+            ilGenerator.Emit(OpCodes.Dup);
+
+            // 加载参数
+            var argTypes = new Type[CallArguments.Count];
+            for (int i = 0; i < CallArguments.Count; i++)
+            {
+                CallArguments[i].LoadIlValue(ilGenerator, local);
+                argTypes[i] = CallArguments[i].OutputType(local) ?? typeof(object);
+            }
+
+            // 查找 init 方法
+            var initMethod = specializedType.GetMethod("init", argTypes);
+            if (initMethod is null)
+            {
+                // 尝试查找任何名为 init 的方法（忽略参数类型精确匹配，依赖运行时/CLR检查或后续改进）
+                // 这是一个简单的回退策略，更严谨的做法是实现完整的重载解析
+                initMethod = specializedType.GetMethod("init");
+            }
+
+            if (initMethod is null)
+            {
+                 throw new InvalidOperationError(this, $"找不到类 {className} 的匹配 init 方法");
+            }
+
+            ilGenerator.Emit(OpCodes.Callvirt, initMethod);
+            
+            // 如果 init 方法有返回值（虽然通常是 void），需要弹出
+            if (initMethod.ReturnType != typeof(void))
+            {
+                ilGenerator.Emit(OpCodes.Pop);
+            }
         }
     }
 

@@ -158,6 +158,17 @@ public partial class LangId(
             return;
         }
 
+        // 检查是否为字段 (在类的方法中)
+        if (local.FieldVar.TryGetValue(IdName, out var field))
+        {
+            // 确保我们在实例方法中（有 this 指针）
+            // 加载 this
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            // 加载字段
+            ilGenerator.Emit(OpCodes.Ldfld, field);
+            return;
+        }
+
         var value = local.GetLocalVar(IdName);
         if (value is null)
         {
@@ -259,6 +270,55 @@ public partial class LangId(
                 };
             }
 
+            // 检查是否为自定义泛型类
+            if (typeName.Contains('<') && typeName.EndsWith('>'))
+            {
+                var genericIndex = typeName.IndexOf('<');
+                var baseTypeName = typeName[..genericIndex].Trim();
+                var genericArg = typeName[(genericIndex + 1)..^1].Trim();
+
+                if (local.GenericClasses.TryGetValue(baseTypeName, out var typeTemplate))
+                {
+                    var typeMapping = new Dictionary<string, Type>();
+                    // 简单处理泛型参数（不支持嵌套泛型参数的逗号分割，如 Map<string, List<int>>）
+                    // 如果需要支持复杂嵌套，需要完整的类型解析器
+                    var args = genericArg.Split(',').Select(s => s.Trim()).ToArray();
+                    
+                    if (typeTemplate.GenericParameters != null)
+                    {
+                        for (int i = 0; i < typeTemplate.GenericParameters.Count && i < args.Length; i++)
+                        {
+                            var paramName = typeTemplate.GenericParameters[i].Name;
+                            var argTypeName = args[i];
+                            
+                            // 解析参数类型
+                            Type t = typeof(object);
+                            if (local.CurrentGenericTypeResolver is not null)
+                            {
+                                t = local.CurrentGenericTypeResolver.ResolveType(argTypeName) ?? typeof(object);
+                            }
+                            
+                            if (t == typeof(object))
+                            {
+                                t = argTypeName switch
+                                {
+                                    "int" => typeof(int),
+                                    "double" => typeof(double),
+                                    "string" => typeof(string),
+                                    "bool" => typeof(bool),
+                                    "char" => typeof(char),
+                                    "object" => typeof(object),
+                                    _ => typeof(object)
+                                };
+                            }
+                            
+                            typeMapping[paramName] = t;
+                        }
+                    }
+                    return GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
+                }
+            }
+
             // 首先尝试使用泛型类型解析器
             if (local.CurrentGenericTypeResolver is not null)
             {
@@ -294,8 +354,8 @@ public partial class LangId(
 
         if (local.InClassEnv is not null && IdName == "this")
         {
-            // 如果InClassEnv是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
-            return local.InClassEnv is TypeBuilder ? typeof(object) : local.InClassEnv;
+            // 返回当前类的类型（可能是 TypeBuilder 或 Type）
+            return local.InClassEnv;
         }
 
         var value = local.GetLocalVar(IdName);

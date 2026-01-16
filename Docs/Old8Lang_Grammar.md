@@ -1383,8 +1383,8 @@ class Container<T, U?> {
     }
 }
 
-container <- new Container(100, "text")
-container2 <- new Container(200, null)  // U? 可以是 null
+container <- Container(100, "text")
+container2 <- Container(200, null)  // U? 可以是 null
 
 // 可空类型参数也可以带约束
 class OptionalValue<T?: IComparable> {

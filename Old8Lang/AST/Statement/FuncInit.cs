@@ -89,6 +89,18 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 获取方法的名称
         var methodName = FuncLangValue.Id!.IdName;
+
+        // 对于泛型函数，只注册定义，不生成IL
+        // 泛型函数的代码生成会在实例化时由 GenericMethodSpecializer 处理
+        if (FuncLangValue.IsGeneric)
+        {
+            local.GenericFunctions[methodName] = FuncLangValue;
+            // 同时也需要注册到 DelegateVar，以便能够被识别为函数（虽然不能直接调用）
+            // 但为了避免被当作普通函数调用（没有泛型参数），我们只在 GenericFunctions 中注册
+            // FunctionCallExpression 会检查 GenericFunctions
+            return;
+        }
+
         if (FuncLangValue.Method is not null)
         {
             local.DelegateVar.Add(methodName, FuncLangValue.Method);
@@ -124,6 +136,10 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         foreach (var (key, value) in local.GenericFunctions)
         {
             funcLocal.GenericFunctions[key] = value;
+        }
+        foreach (var (key, value) in local.GenericClasses)
+        {
+            funcLocal.GenericClasses[key] = value;
         }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型

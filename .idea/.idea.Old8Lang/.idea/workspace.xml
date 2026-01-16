@@ -23,10 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/GlobalFunctionsTest.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/泛型支持完善与验证计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/generic_class.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/generic_function.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/TODO_Compiler.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/TODO_Compiler.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/GenericClassSpecializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/GenericClassSpecializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/GenericMethodSpecializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/GenericMethodSpecializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -575,7 +581,7 @@
       <workItem from="1768331954396" duration="29077000" />
       <workItem from="1768485078721" duration="21629000" />
       <workItem from="1768543641677" duration="16866000" />
-      <workItem from="1768576580719" duration="2374000" />
+      <workItem from="1768576580719" duration="7043000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -920,7 +926,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="696" />
+    <option name="localTasksCounter" value="699" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -947,9 +953,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现模块系统中的跨模块函数和类查找及实例化功能&#10;&#10;- 在虚拟机中扩展函数查找逻辑，支持从全局变量和已加载模块中查找导入的函数&#10;- 实现类的跨模块查找功能，支持从全局变量和已加载模块中查找导入的类&#10;- 添加模块加载时的传递性依赖注册机制，确保依赖模块正确加载&#10;- 实现CreateObjectInstance方法支持从模块导入的类进行实例化&#10;- 更新路径解析器支持传入目录路径作为基础路径&#10;- 重构测试代码添加异常处理和错误输出捕获机制&#10;- 更新构造函数命名约定从constructor改为init方法&#10;- 修复模块系统中的符号查找和实例化相关问题" />
-    <MESSAGE value="test(completion): 更新上下文感知补全功能的测试用例&#10;&#10;- 为局部变量作用域测试添加代码行注释说明&#10;- 修正全局变量作用域测试中的光标位置定位&#10;- 简化Lambda捕获变量测试的代码结构&#10;- 调整循环作用域测试的代码布局和断言逻辑&#10;- 优化嵌套函数作用域测试的验证条件&#10;- 重构函数块表达式测试的内容和预期结果&#10;- 更新类方法作用域测试的代码结构和断言&#10;- 调整静态成员访问测试的验证逻辑&#10;- 修正本地变量可见性测试的断言条件&#10;- 清理IDE工作空间配置文件中的多余变更记录" />
-    <MESSAGE value="feat(compiler): 实现编译时返回类型不匹配检查&#10;&#10;- 在 ReturnStatement 中添加返回类型与函数声明类型匹配验证逻辑&#10;- 实现基本类型转换兼容性检查，支持数值类型和字符串转换&#10;- 将运行时异常改为编译时异常，提前发现类型不匹配问题&#10;- 更新测试用例验证编译时类型检查功能&#10;- 临时禁用可能导致栈溢出的递归测试用例&#10;- 修复函数返回类型不匹配时的错误消息显示" />
     <MESSAGE value="feat(completion): 添加新的代码片段支持&#10;&#10;- 添加 interface 接口定义代码片段&#10;- 添加 enum 枚举定义代码片段&#10;- 添加 match 模式匹配表达式代码片段&#10;- 添加 defer 延迟执行语句代码片段&#10;- 添加 using 资源管理语句代码片段&#10;- 添加 select channel多路选择语句代码片段&#10;- 修复测试中字符串包含检查的断言逻辑" />
     <MESSAGE value="feat(completion): 添加操作符补全功能&#10;&#10;- 在补全处理器中添加操作符补全支持&#10;- 实现联合类型操作符 | 的补全&#10;- 实现交叉类型操作符 &amp; 的补全&#10;- 实现赋值操作符 &lt;- 的补全&#10;- 实现箭头操作符 -&gt; 的补全&#10;- 为操作符设置较低的补全优先级&#10;- 移除测试类中多余的私有字段声明&#10;- 修复测试方法中的输出写入器引用" />
     <MESSAGE value="test(completion): 更新成员链补全功能测试用例&#10;&#10;- 修复了成员访问位置定位的断言逻辑&#10;- 调整了测试代码中的占位符标记以匹配实际补全位置&#10;- 修正了嵌套对象属性访问的补全验证方式&#10;- 更新了字符串字面量的表示方法以保持一致性&#10;- 修改了多个测试用例的位置参数以确保正确的补全触发点" />
@@ -972,7 +975,10 @@
     <MESSAGE value="test(lang): 添加多种语言特性测试用例&#10;&#10;- 添加 defer 语句的解释器、编译器和语法测试&#10;- 添加枚举功能的基础和语法测试&#10;- 添加文档注释的参数说明测试&#10;- 添加文件头指令的编译器和语法测试&#10;- 添加生成器功能的基础测试用例&#10;- 添加泛型类、函数及约束的多模式测试&#10;- 添加可空类型与泛型结合的测试用例" />
     <MESSAGE value="feat(tests): 添加虚拟机功能测试文件&#10;&#10;- 创建基础算术运算和变量赋值测试文件 basic_arithmetic.old8&#10;- 创建控制流测试文件 control_flow.old8 包含 if/while/for 循环测试&#10;- 创建函数调用测试文件 function_calls.old8 包含递归函数测试&#10;- 创建类型转换测试文件 type_conversion_test.old8 包含各种类型转换测试" />
     <MESSAGE value="docs(virtual-machine): 添加虚拟机API模式对比文档和异步执行核心功能实现&#10;&#10;- 新增 Old8Lang 内部 API 模式对比文档，详细说明解释器、编译器、虚拟机三种模式的功能支持情况&#10;- 实现虚拟机异步生成器核心功能，支持 async/await 和 yield 异步操作&#10;- 添加虚拟机执行核心组件，包括栈管理、调用帧、任务管理和模块加载功能&#10;- 实现虚拟机异常处理机制，支持 defer 块执行和异常捕获&#10;- 添加生成器恢复执行功能，支持同步和异步两种生成器模式" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(virtual-machine): 添加虚拟机API模式对比文档和异步执行核心功能实现&#10;&#10;- 新增 Old8Lang 内部 API 模式对比文档，详细说明解释器、编译器、虚拟机三种模式的功能支持情况&#10;- 实现虚拟机异步生成器核心功能，支持 async/await 和 yield 异步操作&#10;- 添加虚拟机执行核心组件，包括栈管理、调用帧、任务管理和模块加载功能&#10;- 实现虚拟机异常处理机制，支持 defer 块执行和异常捕获&#10;- 添加生成器恢复执行功能，支持同步和异步两种生成器模式" />
+    <MESSAGE value="feat(vm): 添加虚拟机对全局函数的支持&#10;&#10;- 在 VirtualMachine.Instructions.cs 中添加全局函数查找和执行逻辑&#10;- 实现通过 GlobalFunctionRegistry 调用全局函数的功能&#10;- 修改 DictionaryLangValue 初始化逻辑&#10;- 优化 ArrayExtensions 中的 ToList 方法实现&#10;- 注释掉测试文件中的 ToObj 函数测试代码" />
+    <MESSAGE value="feat(async): 实现异步编程支持和状态机生成&#10;&#10;- 添加AsyncStateMachineGenerator用于编译async函数为状态机结构&#10;- 实现AwaitExpression.GenerateAsyncAwait方法生成await表达式的IL代码&#10;- 在DotOperatorILHelper中实现Task.WhenAll/WhenAny/FromResult等API的IL生成&#10;- 修复Operation.OutputType方法确保比较和算术运算符正确推断bool/double类型&#10;- 更新AsyncFuncInit和AsyncFuncLangValue使用动态方法和状态机启动代码&#10;- 添加变量提升机制将局部变量作为状态机字段进行生命周期管理&#10;- 实现完整的IAsyncStateMachine接口集成和状态转换逻辑&#10;- 改进AST节点识别await表达式位置支持if/while/for等复杂语句结构" />
+    <MESSAGE value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
