@@ -2920,7 +2920,7 @@ mapping:dict<int, string> <- {1: "one", 2: "two"}
 
 ```old8
 // 嵌套列表：list<list<T>>
-matrix:list<list<int>> <- {{1, 2}, {3, 4}, {5, 6}}
+matrix:list<list<int>> <- { {1, 2}, {3, 4}, {5, 6} }
 
 // 字典的值为列表：dict<K, list<T>>
 groups:dict<string, list<int>> <- {
