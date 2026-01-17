@@ -1,5 +1,8 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using LangObject = Old8Lang.Runtime.LangObject;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
@@ -101,6 +104,45 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
+        {
+            // 生成调用 _add 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (rightType != null && rightType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, rightType);
+            }
+
+            // 调用 _add 方法: LangObject._add(object)
+            var addMethod = typeof(LangObject).GetMethod("_add")!;
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod);
+            return typeof(object);
+        }
+
+        // 检查是否是 AnyLangValue（解释器模式）运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Plus 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Plus 方法: AnyLangValue.Plus(LangValueType)
+            var plusMethod = typeof(LangValueType).GetMethod("Plus", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, plusMethod);
+            return typeof(LangValueType);
+        }
+
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
         if (ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType))
@@ -125,6 +167,26 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Minus 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Minus 方法: AnyLangValue.Minus(LangValueType)
+            var minusMethod = typeof(LangValueType).GetMethod("Minus", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, minusMethod);
+            return typeof(LangValueType);
+        }
+
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
         if (ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType))
@@ -150,6 +212,26 @@ internal static class NumericBinaryOpHelper
         Type? rightType,
         Operation operation)
     {
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Times 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Times 方法: AnyLangValue.Times(LangValueType)
+            var timesMethod = typeof(LangValueType).GetMethod("Times", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, timesMethod);
+            return typeof(LangValueType);
+        }
+
         // 先加载操作数但不自动拆箱
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
@@ -214,6 +296,26 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Divide 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Divide 方法: AnyLangValue.Divide(LangValueType)
+            var divideMethod = typeof(LangValueType).GetMethod("Divide", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, divideMethod);
+            return typeof(LangValueType);
+        }
+
         if (leftType == typeof(double) || rightType == typeof(double))
         {
             // 确保两个操作数都是double类型
@@ -250,6 +352,26 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Mod 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Mod 方法: AnyLangValue.Mod(LangValueType)
+            var modMethod = typeof(LangValueType).GetMethod("Mod", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, modMethod);
+            return typeof(LangValueType);
+        }
+
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
 
@@ -310,6 +432,26 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Power 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 Power 方法: AnyLangValue.Power(LangValueType)
+            var powerMethod = typeof(LangValueType).GetMethod("Power", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, powerMethod);
+            return typeof(LangValueType);
+        }
+
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
 
@@ -356,5 +498,43 @@ internal static class NumericBinaryOpHelper
 
         // 暂时保持原有逻辑，因为这部分比较复杂
         // 实际上原代码中这部分逻辑不会执行到（已经在前面处理了object类型）
+    }
+
+    /// <summary>
+    /// 将基本类型转换为 LangValueType
+    /// </summary>
+    private static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
+    {
+        if (type == typeof(int))
+        {
+            // new IntLangValue(value)
+            var ctor = typeof(IntLangValue).GetConstructor([typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(double))
+        {
+            // new DoubleLangValue(value)
+            var ctor = typeof(DoubleLangValue).GetConstructor([typeof(double)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(string))
+        {
+            // new StringLangValue(value)
+            var ctor = typeof(StringLangValue).GetConstructor([typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(bool))
+        {
+            // new BoolLangValue(value)
+            var ctor = typeof(BoolLangValue).GetConstructor([typeof(bool)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(char))
+        {
+            // new CharLangValue(value)
+            var ctor = typeof(CharLangValue).GetConstructor([typeof(char)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        // 如果已经是 LangValueType，不需要转换
     }
 }

@@ -1,0 +1,110 @@
+// 编译器模式运算符重载测试
+
+class Number {
+    public value
+
+    func init(v) {
+        this.value <- v
+    }
+
+    func _add(other:Number) -> int {
+        return this.value + other.value
+    }
+
+    func _sub(other:Number) -> int {
+        return this.value - other.value
+    }
+
+    func _mul(other:int) -> int {
+        return this.value * other
+    }
+
+    func _div(other:Number) -> int {
+        return this.value / other.value
+    }
+
+    func _mod(other:Number) -> int {
+        return this.value % other.value
+    }
+
+    func _pow(other:int) -> int {
+        return this.value ^ other
+    }
+
+    func _eq(other:Number) -> bool {
+        return this.value == other.value
+    }
+
+    func _lt(other:Number) -> bool {
+        return this.value < other.value
+    }
+
+    func _gt(other:Number) -> bool {
+        return this.value > other.value
+    }
+
+    func _le(other:Number) -> bool {
+        return this.value <= other.value
+    }
+
+    func _ge(other:Number) -> bool {
+        return this.value >= other.value
+    }
+}
+
+// 测试加法
+n1 <- Number(10)
+n2 <- Number(20)
+result <- n1 + n2
+PrintLine("10 + 20 = " + result.ToStr())  // 应输出 30
+
+// 测试减法
+result2 <- n2 - n1
+PrintLine("20 - 10 = " + result2.ToStr())  // 应输出 10
+
+// 测试乘法
+result3 <- n1 * 3
+PrintLine("10 * 3 = " + result3.ToStr())  // 应输出 30
+
+// 测试除法
+result4 <- n2 / n1
+PrintLine("20 / 10 = " + result4.ToStr())  // 应输出 2
+
+// 测试取模
+n3 <- Number(23)
+n4 <- Number(5)
+result5 <- n3 % n4
+PrintLine("23 % 5 = " + result5.ToStr())  // 应输出 3
+
+// 测试幂运算
+n5 <- Number(2)
+result6 <- n5 ^ 3
+PrintLine("2 ^ 3 = " + result6.ToStr())  // 应输出 8
+
+// 测试相等比较
+n6 <- Number(10)
+if n1 == n6 {
+    PrintLine("相等测试通过")
+}
+
+// 测试小于比较
+if n1 < n2 {
+    PrintLine("小于测试通过")
+}
+
+// 测试大于比较
+if n2 > n1 {
+    PrintLine("大于测试通过")
+}
+
+// 测试小于等于比较
+if n1 <= n6 {
+    PrintLine("小于等于测试通过")
+}
+
+// 测试大于等于比较
+if n2 >= n1 {
+    PrintLine("大于等于测试通过")
+}
+
+PrintLine("所有运算符重载测试完成!")

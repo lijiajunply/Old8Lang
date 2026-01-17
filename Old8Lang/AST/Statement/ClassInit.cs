@@ -8,6 +8,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
+using LangObject = Old8Lang.Runtime.LangObject;
 
 namespace Old8Lang.AST.Statement;
 
@@ -181,7 +182,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         {
             // 类的处理
             typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
-            
+
             // 定义基类
             if (anyLangValue.ParentClassName is not null &&
                 local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
@@ -190,8 +191,9 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             }
             else
             {
-                // 如果没有指定父类或父类不存在，使用Object作为基类
-                baseType = typeof(object);
+                // 如果没有指定父类，使用 LangObject 作为基类
+                // 这样所有 Old8Lang 自定义类都有统一的基类，方便运算符重载
+                baseType = typeof(LangObject);
             }
         }
 

@@ -1,4 +1,6 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
@@ -39,6 +41,44 @@ internal static class ComparisonOpHelper
     }
 
     /// <summary>
+    /// 将基本类型转换为 LangValueType
+    /// </summary>
+    private static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
+    {
+        if (type == typeof(int))
+        {
+            // new IntLangValue(value)
+            var ctor = typeof(IntLangValue).GetConstructor([typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(double))
+        {
+            // new DoubleLangValue(value)
+            var ctor = typeof(DoubleLangValue).GetConstructor([typeof(double)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(string))
+        {
+            // new StringLangValue(value)
+            var ctor = typeof(StringLangValue).GetConstructor([typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(bool))
+        {
+            // new BoolLangValue(value)
+            var ctor = typeof(BoolLangValue).GetConstructor([typeof(bool)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        else if (type == typeof(char))
+        {
+            // new CharLangValue(value)
+            var ctor = typeof(CharLangValue).GetConstructor([typeof(char)])!;
+            ilGenerator.Emit(OpCodes.Newobj, ctor);
+        }
+        // 如果已经是 LangValueType，不需要转换
+    }
+
+    /// <summary>
     /// 生成大于比较 IL 代码
     /// </summary>
     public static Type GenerateGreaterThan(
@@ -47,12 +87,32 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
-
-        // 获取操作数类型以进行特殊处理
+        // 获取操作数类型
         var gtLeftType = left?.OutputType(local);
         var gtRightType = right?.OutputType(local);
+
+        // 检查是否是 AnyLangValue 运算符重载
+        if (gtLeftType == typeof(AnyLangValue) || gtLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Greater 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (gtRightType != null && !typeof(LangValueType).IsAssignableFrom(gtRightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, gtRightType);
+            }
+
+            // 调用 Greater 方法: AnyLangValue.Greater(LangValueType)
+            var greaterMethod = typeof(LangValueType).GetMethod("Greater", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, greaterMethod);
+            return typeof(bool);
+        }
+
+        left?.LoadIlValue(ilGenerator, local);
+        right?.LoadIlValue(ilGenerator, local);
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsIntComparison(gtLeftType, gtRightType))
@@ -83,12 +143,32 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
-
-        // 获取操作数类型以进行特殊处理
+        // 获取操作数类型
         var ltLeftType = left?.OutputType(local);
         var ltRightType = right?.OutputType(local);
+
+        // 检查是否是 AnyLangValue 运算符重载
+        if (ltLeftType == typeof(AnyLangValue) || ltLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Less 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (ltRightType != null && !typeof(LangValueType).IsAssignableFrom(ltRightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, ltRightType);
+            }
+
+            // 调用 Less 方法: AnyLangValue.Less(LangValueType)
+            var lessMethod = typeof(LangValueType).GetMethod("Less", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, lessMethod);
+            return typeof(bool);
+        }
+
+        left?.LoadIlValue(ilGenerator, local);
+        right?.LoadIlValue(ilGenerator, local);
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsIntComparison(ltLeftType, ltRightType))
@@ -119,12 +199,32 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
-
-        // 获取操作数类型以进行特殊处理
+        // 获取操作数类型
         var leftOpType = left?.OutputType(local);
         var rightOpType = right?.OutputType(local);
+
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftOpType == typeof(AnyLangValue) || leftOpType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 Equals 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightOpType != null && !typeof(LangValueType).IsAssignableFrom(rightOpType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightOpType);
+            }
+
+            // 调用 Equals 方法: AnyLangValue.Equals(LangValueType)
+            var equalsMethod = typeof(LangValueType).GetMethod("Equals", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, equalsMethod);
+            return typeof(bool);
+        }
+
+        left?.LoadIlValue(ilGenerator, local);
+        right?.LoadIlValue(ilGenerator, local);
 
         // 如果都是字符串，使用字符串比较
         if (leftOpType == typeof(string) && rightOpType == typeof(string))
@@ -178,6 +278,30 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
+        // 获取操作数类型
+        var leftType = left?.OutputType(local);
+        var rightType = right?.OutputType(local);
+
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 LessEqual 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 LessEqual 方法: AnyLangValue.LessEqual(LangValueType)
+            var lessEqualMethod = typeof(LangValueType).GetMethod("LessEqual", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, lessEqualMethod);
+            return typeof(bool);
+        }
+
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Cgt);
@@ -196,6 +320,30 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
+        // 获取操作数类型
+        var leftType = left?.OutputType(local);
+        var rightType = right?.OutputType(local);
+
+        // 检查是否是 AnyLangValue 运算符重载
+        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        {
+            // 生成调用 GreaterEqual 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数不是 LangValueType，需要装箱
+            if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
+            {
+                // 将基本类型转换为 LangValueType
+                ConvertToLangValueType(ilGenerator, rightType);
+            }
+
+            // 调用 GreaterEqual 方法: AnyLangValue.GreaterEqual(LangValueType)
+            var greaterEqualMethod = typeof(LangValueType).GetMethod("GreaterEqual", [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, greaterEqualMethod);
+            return typeof(bool);
+        }
+
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Clt);

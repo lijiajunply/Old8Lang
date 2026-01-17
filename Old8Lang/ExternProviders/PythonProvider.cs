@@ -52,7 +52,7 @@ public class PythonProvider : IExternProvider
             var pythonDll = DetectPythonDll();
             if (!string.IsNullOrEmpty(pythonDll))
             {
-                Runtime.PythonDLL = pythonDll;
+                Python.Runtime.Runtime.PythonDLL = pythonDll;
             }
             else
             {
@@ -69,7 +69,7 @@ public class PythonProvider : IExternProvider
             {
                 throw new ImportError(default(SourcePosition), "Python",
                     $"Python 运行时初始化失败：{ex.Message}\n" +
-                    $"Python DLL 路径：{Runtime.PythonDLL}");
+                    $"Python DLL 路径：{Python.Runtime.Runtime.PythonDLL}");
             }
         }
 
@@ -194,9 +194,9 @@ public class PythonProvider : IExternProvider
     private string? DetectPythonDll()
     {
         // 如果已经设置,直接返回
-        if (!string.IsNullOrEmpty(Runtime.PythonDLL))
+        if (!string.IsNullOrEmpty(Python.Runtime.Runtime.PythonDLL))
         {
-            return Runtime.PythonDLL;
+            return Python.Runtime.Runtime.PythonDLL;
         }
 
         // 根据操作系统选择不同的检测策略
