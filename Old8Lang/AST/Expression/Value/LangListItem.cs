@@ -224,8 +224,19 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
 
         if (listType.FullName?.StartsWith("System.ValueTuple") == true)
         {
-            // ValueTuple 索引访问，暂时返回 object
-            // 如果是常量索引，理论上可以计算出具体类型
+            // ValueTuple 索引访问
+            // 如果索引是常量，可以推断出具体的元素类型
+            if (Key is IntLangValue intValue)
+            {
+                var index = intValue.Value;
+                var elementType = GetValueTupleElementType(listType, index);
+                if (elementType != null)
+                {
+                    return elementType;
+                }
+            }
+
+            // 如果索引不是常量，返回 object（因为 ITuple 索引器返回 object）
             return typeof(object);
         }
 
@@ -235,5 +246,33 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         }
 
         return typeof(object);
+    }
+
+    /// <summary>
+    /// 获取 ValueTuple 指定索引位置的元素类型
+    /// </summary>
+    private Type? GetValueTupleElementType(Type tupleType, int index)
+    {
+        if (index < 0) return null;
+
+        var genericArgs = tupleType.GetGenericArguments();
+
+        // 如果索引在前 7 个元素范围内
+        if (index < 7 && index < genericArgs.Length)
+        {
+            return genericArgs[index];
+        }
+
+        // 如果索引超过 7，需要递归查找 Rest 元素
+        if (genericArgs.Length == 8)
+        {
+            var restType = genericArgs[7];
+            if (restType.FullName?.StartsWith("System.ValueTuple") == true)
+            {
+                return GetValueTupleElementType(restType, index - 7);
+            }
+        }
+
+        return null;
     }
 }

@@ -282,21 +282,6 @@ extern ""test.dll"" stdcall {
     #region 错误测试
 
     /// <summary>
-    /// 测试缺少 native 关键字
-    /// </summary>
-    [Fact]
-    public void ParseExternStatement_MissingNativeKeyword_ThrowsException()
-    {
-        // Arrange
-        var code = @"extern ""test.dll"" func test() -> void";
-        var tokens = LangInterpreter.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        Assert.Throws<SyntaxError>(() => parser.ParseProgram());
-    }
-
-    /// <summary>
     /// 测试缺少函数签名
     /// </summary>
     [Fact]

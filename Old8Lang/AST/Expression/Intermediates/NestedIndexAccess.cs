@@ -66,14 +66,25 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 首先加载基础索引访问的结果
-        BaseIndex.LoadIlValue(ilGenerator, local);
-
-        // 然后加载嵌套索引
-        NestedIndex.LoadIlValue(ilGenerator, local);
-
         // 根据基础索引访问的输出类型选择适当的索引访问方法
         var baseType = BaseIndex.OutputType(local);
+
+        // 特殊处理 ValueTuple 的常量索引访问
+        if (baseType.FullName?.StartsWith("System.ValueTuple") == true && NestedIndex is IntLangValue intValue)
+        {
+            var index = intValue.Value;
+
+            // 只加载基础索引访问的结果，不加载索引值
+            BaseIndex.LoadIlValue(ilGenerator, local);
+
+            // 使用递归方法加载字段（支持超过 7 个元素）
+            LoadValueTupleField(ilGenerator, baseType, index);
+            return;
+        }
+
+        // 对于其他情况，先加载基础索引访问的结果和索引值
+        BaseIndex.LoadIlValue(ilGenerator, local);
+        NestedIndex.LoadIlValue(ilGenerator, local);
 
         if (baseType == typeof(string))
         {
@@ -109,38 +120,22 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
         }
         else if (baseType.FullName?.StartsWith("System.ValueTuple") == true)
         {
-            // ValueTuple 索引访问
-            // 注意：NestedIndexAccess 这里栈上已经有 BaseIndex 和 NestedIndex 的值
-            
-            // 如果 NestedIndex 是常量 IntLangValue，我们可以优化吗？
-            // NestedIndex.LoadIlValue 已经执行了，所以 NestedIndex 的值在栈上。
-            // 除非我们在 LoadIlValue 之前检查 NestedIndex。
-            // 但是 NestedIndex.LoadIlValue 可能会有副作用，虽然对于 IntLangValue 来说没有。
-            
-            // 为了简单，统一使用 ITuple 索引器（虽然慢一点，但兼容性好）
-            // 如果要优化，需要回退栈（Pop），或者不调用 NestedIndex.LoadIlValue
-            
-            // 由于已经 LoadIlValue 了，我们只能装箱 Tuple 并调用索引器
-            // 栈: [Tuple] [Index]
-            
-            // Box Tuple: 需要先保存 Index，Box Tuple，再加载 Index
-            var indexLocal = ilGenerator.DeclareLocal(typeof(int)); // 假设 Index 是 int
-            // 如果 Index 不是 int (e.g. object)，需要 Unbox
-            
-            // 我们需要知道 NestedIndex 的 OutputType
+            // ValueTuple 索引访问（非常量索引）
+            // 使用 ITuple 索引器
             var indexType = NestedIndex.OutputType(local);
             if (indexType == typeof(object))
             {
                 ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
             }
+            var indexLocal = ilGenerator.DeclareLocal(typeof(int));
             ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
-            
+
             // Box Tuple
             ilGenerator.Emit(OpCodes.Box, baseType);
-            
+
             // Load Index
             ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
-            
+
             var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
         }
@@ -150,9 +145,9 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             // 调用 DotOperatorILHelper.GenerateDynamicIndexAccess
             // 该方法假设栈上有 [Left] [Right]，并生成动态分发代码
             // 我们的栈上正好有 BaseIndex 和 NestedIndex 的值
-            
+
             var indexType = NestedIndex.OutputType(local);
-            
+
             Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
                 ilGenerator,
                 indexType
@@ -188,6 +183,124 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             return baseType.GetGenericArguments()[1];
         }
 
+        // 处理 ValueTuple 类型
+        if (baseType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // 如果索引是常量，我们可以推断出具体的元素类型
+            if (NestedIndex is IntLangValue intValue)
+            {
+                var index = intValue.Value;
+                var elementType = GetValueTupleElementType(baseType, index);
+                if (elementType != null)
+                {
+                    return elementType;
+                }
+            }
+
+            // 如果索引不是常量，返回 object（因为 ITuple 索引器返回 object）
+            return typeof(object);
+        }
+
         return typeof(object);
+    }
+
+    /// <summary>
+    /// 获取 ValueTuple 指定索引位置的元素类型
+    /// </summary>
+    private Type? GetValueTupleElementType(Type tupleType, int index)
+    {
+        if (index < 0) return null;
+
+        var genericArgs = tupleType.GetGenericArguments();
+
+        // 如果索引在前 7 个元素范围内
+        if (index < 7 && index < genericArgs.Length)
+        {
+            return genericArgs[index];
+        }
+
+        // 如果索引超过 7，需要递归查找 Rest 元素
+        if (genericArgs.Length == 8)
+        {
+            var restType = genericArgs[7];
+            if (restType.FullName?.StartsWith("System.ValueTuple") == true)
+            {
+                return GetValueTupleElementType(restType, index - 7);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 获取 ValueTuple 字段名称
+    /// </summary>
+    private string GetValueTupleFieldName(int index)
+    {
+        return $"Item{index + 1}";
+    }
+
+    /// <summary>
+    /// 在 IL 中加载 ValueTuple 指定索引位置的字段
+    /// 处理超过 7 个元素的情况（递归访问 Rest 字段）
+    /// </summary>
+    private void LoadValueTupleField(ILGenerator ilGenerator, Type tupleType, int index)
+    {
+        if (index < 0)
+        {
+            throw new InvalidOperationError(this, $"元组索引不能为负数: {index}");
+        }
+
+        // 如果索引在前 7 个元素范围内
+        if (index < 7)
+        {
+            var fieldName = GetValueTupleFieldName(index);
+            var fieldInfo = tupleType.GetField(fieldName);
+            if (fieldInfo != null)
+            {
+                ilGenerator.Emit(OpCodes.Ldfld, fieldInfo);
+                return;
+            }
+            throw new InvalidOperationError(this, $"找不到元组字段: {fieldName}");
+        }
+
+        // 如果索引超过 7，需要递归访问 Rest 字段
+        var restField = tupleType.GetField("Rest");
+        if (restField == null)
+        {
+            throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组类型: {tupleType.Name}");
+        }
+
+        // 加载 Rest 字段
+        ilGenerator.Emit(OpCodes.Ldfld, restField);
+
+        // 递归加载 Rest 中的字段
+        var restType = restField.FieldType;
+        if (restType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            LoadValueTupleField(ilGenerator, restType, index - 7);
+        }
+        else
+        {
+            throw new InvalidOperationError(this, $"Rest 字段类型不是 ValueTuple: {restType.Name}");
+        }
+    }
+
+    /// <summary>
+    /// 获取 ValueTuple 指定索引位置的字段信息（仅用于前 7 个元素）
+    /// </summary>
+    private System.Reflection.FieldInfo? GetValueTupleField(Type tupleType, int index)
+    {
+        if (index < 0) return null;
+
+        // 如果索引在前 7 个元素范围内
+        if (index < 7)
+        {
+            var fieldName = GetValueTupleFieldName(index);
+            return tupleType.GetField(fieldName);
+        }
+
+        // 对于超过 7 个元素的情况，返回 null（需要使用 LoadValueTupleField 递归处理）
+        return null;
     }
 }

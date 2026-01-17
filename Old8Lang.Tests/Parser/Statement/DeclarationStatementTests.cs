@@ -184,11 +184,14 @@ public class DeclarationStatementTests
     {
         // Arrange
         var code = "invalid_template <- $\"Hello {name";
-        var tokens = LangInterpreter.Tokenize(code);
-        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+        Assert.ThrowsAny<SyntaxError>(() =>
+        {
+            var tokens = LangInterpreter.Tokenize(code);
+            var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+            return parser.ParseProgram();
+        });
     }
 
     /// <summary>
@@ -424,11 +427,12 @@ public class DeclarationStatementTests
     {
         // Arrange
         var code = "$\"Hello {name";
-        var tokens = LangInterpreter.Tokenize(code);
-        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+        Assert.ThrowsAny<SyntaxError>(() =>
+        {
+            var tokens = LangInterpreter.Tokenize(code);
+            var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+            return parser.ParseProgram();
+        });
     }
 
     /// <summary>

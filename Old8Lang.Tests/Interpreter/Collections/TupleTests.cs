@@ -690,11 +690,17 @@ public class TupleTests
         var code = @"
             point3d <- ((1, 2), 3)
             nested <- ((1, 2, 3), (4, 5, 6), (7, 8, 9))
-            result1 <- point3d[0]  // 扁平化访问：1
-            result2 <- point3d[1]  // 扁平化访问：2
-            result3 <- point3d[2]  // 扁平化访问：3
-            result4 <- nested[4]   // 扁平化访问：5
-            result5 <- nested[8]   // 扁平化访问：9
+            // 不再扁平化，需要通过嵌套索引访问
+            innerTuple <- point3d[0]
+            result1 <- innerTuple[0]  // 访问第一个元素的第一个值：1
+            result2 <- innerTuple[1]  // 访问第一个元素的第二个值：2
+            result3 <- point3d[1]     // 访问第二个元素：3
+
+            secondTuple <- nested[1]
+            result4 <- secondTuple[1] // 访问第二个元组的第二个值：5
+
+            thirdTuple <- nested[2]
+            result5 <- thirdTuple[2]  // 访问第三个元组的第三个值：9
         ";
         var interpreter = new LangInterpreter();
 
@@ -739,10 +745,13 @@ public class TupleTests
             name <- person[0]
             age <- person[1]
             profession <- person[2]
+
+            // 嵌套元组不再扁平化
             coordinates <- ((10, 20), 30)
-            x <- coordinates[0]
-            y <- coordinates[1]
-            z <- coordinates[2]
+            innerCoord <- coordinates[0]
+            x <- innerCoord[0]
+            y <- innerCoord[1]
+            z <- coordinates[1]
         ";
         var interpreter = new LangInterpreter();
 
@@ -891,5 +900,53 @@ public class TupleTests
         Assert.NotNull(remainder);
         Assert.IsType<IntLangValue>(remainder);
         Assert.Equal(2, ((IntLangValue)remainder).Value);
+    }
+
+    [Fact]
+    public void TupleLargeElements_SupportsMoreThanSevenElements()
+    {
+        // Arrange - 测试超过 7 个元素的元组（使用 ValueTuple 的嵌套结构）
+        var code = @"
+            // 创建一个包含 10 个元素的元组
+            largeTuple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+            result1 <- largeTuple[0]
+            result2 <- largeTuple[6]
+            result3 <- largeTuple[7]
+            result4 <- largeTuple[9]
+            result5 <- len(largeTuple)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+        var result4 = interpreter.Manager.GetValue(new LangId("result4"));
+        var result5 = interpreter.Manager.GetValue(new LangId("result5"));
+
+        Assert.NotNull(result1);
+        Assert.IsType<IntLangValue>(result1);
+        Assert.Equal(1, ((IntLangValue)result1).Value);
+
+        Assert.NotNull(result2);
+        Assert.IsType<IntLangValue>(result2);
+        Assert.Equal(7, ((IntLangValue)result2).Value);
+
+        Assert.NotNull(result3);
+        Assert.IsType<IntLangValue>(result3);
+        Assert.Equal(8, ((IntLangValue)result3).Value);
+
+        Assert.NotNull(result4);
+        Assert.IsType<IntLangValue>(result4);
+        Assert.Equal(10, ((IntLangValue)result4).Value);
+
+        Assert.NotNull(result5);
+        Assert.IsType<IntLangValue>(result5);
+        Assert.Equal(10, ((IntLangValue)result5).Value);
     }
 }
