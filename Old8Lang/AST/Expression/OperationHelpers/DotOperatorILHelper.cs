@@ -304,8 +304,12 @@ public static class DotOperatorILHelper
                 return GenerateTaskDelay(paramTypes, ilGenerator);
             case "FromResult":
                 return GenerateTaskFromResult(paramTypes, ilGenerator);
+            case "FromException":
+                return GenerateTaskFromException(paramTypes, ilGenerator);
             case "Run":
                 return GenerateTaskRun(ilGenerator);
+            case "StartNew":
+                return GenerateTaskStartNew(instance, ilGenerator, local);
             case "WhenAll":
                 return GenerateTaskWhenAll(instance, ilGenerator, local);
             case "WhenAny":
@@ -361,10 +365,45 @@ public static class DotOperatorILHelper
     }
 
     /// <summary>
+    /// 生成 Task.FromException 的IL代码
+    /// </summary>
+    private static Type GenerateTaskFromException(List<Type> paramTypes, ILGenerator ilGenerator)
+    {
+        if (paramTypes.Count == 1)
+        {
+            // 对于异常参数，返回一个包含异常的 Task<object>
+            var fromExceptionMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m is { Name: "FromException", IsGenericMethodDefinition: true });
+            fromExceptionMethod = fromExceptionMethod.MakeGenericMethod(typeof(object));
+            // 参数已经在栈上，直接调用
+            ilGenerator.Emit(OpCodes.Call, fromExceptionMethod);
+        }
+
+        return typeof(Task<object>);
+    }
+
+    /// <summary>
     /// 生成 Task.Run 的IL代码
     /// </summary>
     private static Type GenerateTaskRun(ILGenerator ilGenerator)
     {
+        // 这里简化处理，直接返回一个已完成的 Task<object>
+        var fromResultMethod = typeof(Task)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+        fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+        ilGenerator.Emit(OpCodes.Ldnull);
+        ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+        return typeof(Task<object>);
+    }
+
+    /// <summary>
+    /// 生成 Task.StartNew 的IL代码
+    /// </summary>
+    private static Type GenerateTaskStartNew(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        // Task.StartNew 实际上是 Task.Factory.StartNew 的简写
         // 这里简化处理，直接返回一个已完成的 Task<object>
         var fromResultMethod = typeof(Task)
             .GetMethods(BindingFlags.Public | BindingFlags.Static)

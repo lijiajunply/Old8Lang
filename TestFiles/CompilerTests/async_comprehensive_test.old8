@@ -1,0 +1,83 @@
+// 异步功能综合测试 - 验证编译器模式异步支持
+
+// 测试1：基本异步函数
+async func basicAsync() -> string {
+    PrintLine("basicAsync: 开始执行");
+    return "Hello from async";
+}
+
+// 测试2：带await的异步函数
+async func asyncWithAwait() -> string {
+    PrintLine("asyncWithAwait: 开始执行");
+    result <- await basicAsync();
+    PrintLine("asyncWithAwait: 收到结果: " + result);
+    return "Processed: " + result;
+}
+
+// 测试3：使用Task.Delay的异步函数
+async func asyncWithDelay() -> string {
+    PrintLine("asyncWithDelay: 开始执行，等待100ms");
+    await Task.Delay(100);
+    PrintLine("asyncWithDelay: 延迟完成");
+    return "Delayed result";
+}
+
+// 测试4：嵌套异步调用
+async func nestedAsync() -> string {
+    PrintLine("nestedAsync: 开始执行");
+    result1 <- await basicAsync();
+    result2 <- await asyncWithAwait();
+    return result1 + " | " + result2;
+}
+
+// 测试5：异步函数异常处理
+async func asyncWithException() -> string {
+    PrintLine("asyncWithException: 开始执行");
+    try {
+        throw "测试异常";
+    } catch (e) {
+        PrintLine("asyncWithException: 捕获到异常: " + e);
+        return "Exception handled";
+    }
+}
+
+// 主函数
+func main() -> void {
+    PrintLine("=== 异步功能综合测试开始 ===");
+    
+    // 测试1：基本异步函数
+    PrintLine("\n测试1：基本异步函数");
+    task1 <- basicAsync();
+    PrintLine("Task1 已创建");
+    
+    // 测试2：带await的异步函数
+    PrintLine("\n测试2：带await的异步函数");
+    task2 <- asyncWithAwait();
+    PrintLine("Task2 已创建");
+    
+    // 测试3：带延迟的异步函数
+    PrintLine("\n测试3：带延迟的异步函数");
+    task3 <- asyncWithDelay();
+    PrintLine("Task3 已创建");
+    
+    // 测试4：嵌套异步调用
+    PrintLine("\n测试4：嵌套异步调用");
+    task4 <- nestedAsync();
+    PrintLine("Task4 已创建");
+    
+    // 测试5：异步异常处理
+    PrintLine("\n测试5：异步异常处理");
+    task5 <- asyncWithException();
+    PrintLine("Task5 已创建");
+    
+    PrintLine("\n=== 所有异步任务已创建，等待执行完成 ===");
+    
+    // 等待所有任务完成
+    PrintLine("等待任务完成...");
+    Sleep(500); // 给异步任务足够的时间完成
+    
+    PrintLine("=== 异步功能综合测试完成 ===");
+}
+
+// 运行主函数
+main();

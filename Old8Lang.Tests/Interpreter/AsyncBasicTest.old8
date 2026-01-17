@@ -1,0 +1,31 @@
+// 异步基础测试 - 解释器模式
+
+// 测试1: 基本异步函数
+async func basic_async() -> int {
+    return 42
+}
+
+// 测试2: 带参数的异步函数
+async func async_add(a: int, b: int) -> int {
+    return a + b
+}
+
+// 主函数
+func main() {
+    PrintLine("=== 开始异步基础测试 ===")
+    
+    // 测试1
+    PrintLine("\n1. 测试基本异步函数:")
+    result <- await basic_async()
+    PrintLine("   结果: " + result.ToStr())
+    
+    // 测试2
+    PrintLine("\n2. 测试带参数的异步函数:")
+    result <- await async_add(5, 7)
+    PrintLine("   5 + 7 = " + result.ToStr())
+    
+    PrintLine("\n=== 异步基础测试完成 ===")
+}
+
+// 运行主函数
+main()

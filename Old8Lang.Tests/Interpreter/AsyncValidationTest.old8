@@ -1,0 +1,177 @@
+// 异步功能验证测试 - 解释器模式
+// 验证异步功能完善后的效果
+
+// 测试1: Task.Delay 验证
+func test_task_delay() {
+    PrintLine("开始Task.Delay验证...")
+    start_time <- DateTime.Now
+    
+    task <- Task.Delay(100)  // 100毫秒延迟
+    await task
+    
+    end_time <- DateTime.Now
+    elapsed <- (end_time - start_time).TotalMilliseconds
+    
+    PrintLine("Task.Delay完成，耗时: " + elapsed.ToStr() + "ms")
+    if elapsed >= 90 {
+        PrintLine("✓ Task.Delay验证通过")
+    } else {
+        PrintLine("✗ Task.Delay验证失败")
+    }
+}
+
+// 测试2: Task.FromResult 验证
+func test_task_from_result() {
+    PrintLine("\n开始Task.FromResult验证...")
+    
+    task <- Task.FromResult("测试结果")
+    result <- await task
+    
+    if result == "测试结果" {
+        PrintLine("✓ Task.FromResult验证通过")
+    } else {
+        PrintLine("✗ Task.FromResult验证失败，结果: " + result)
+    }
+}
+
+// 测试3: Task.WhenAll 验证
+func test_task_when_all() {
+    PrintLine("\n开始Task.WhenAll验证...")
+    
+    async func task1() -> string {
+        task <- Task.Delay(50)
+        await task
+        return "任务1"
+    }
+    
+    async func task2() -> string {
+        task <- Task.Delay(30)
+        await task
+        return "任务2"
+    }
+    
+    async func task3() -> string {
+        task <- Task.Delay(10)
+        await task
+        return "任务3"
+    }
+    
+    tasks <- [task1(), task2(), task3()]
+    all_task <- Task.WhenAll(tasks)
+    results <- await all_task
+    
+    if results.Length == 3 and results[0] == "任务1" and results[1] == "任务2" and results[2] == "任务3" {
+        PrintLine("✓ Task.WhenAll验证通过")
+    } else {
+        PrintLine("✗ Task.WhenAll验证失败")
+    }
+}
+
+// 测试4: 异步生成器验证
+func test_async_generator() {
+    PrintLine("\n开始异步生成器验证...")
+    
+    async func number_generator(count: int) {
+        for i in 0..count {
+            task <- Task.Delay(10)
+            await task
+            yield i
+        }
+    }
+    
+    expected_sum <- 0
+    actual_sum <- 0
+    count <- 0
+    
+    for i in 0..5 {
+        expected_sum <- expected_sum + i
+    }
+    
+    async for num in number_generator(5) {
+        actual_sum <- actual_sum + num
+        count <- count + 1
+        PrintLine("  生成值: " + num.ToStr())
+    }
+    
+    if actual_sum == expected_sum and count == 5 {
+        PrintLine("✓ 异步生成器验证通过")
+        PrintLine("  期望总和: " + expected_sum.ToStr() + ", 实际总和: " + actual_sum.ToStr())
+        PrintLine("  生成数量: " + count.ToStr())
+    } else {
+        PrintLine("✗ 异步生成器验证失败")
+    }
+}
+
+// 测试5: 异步异常处理验证
+func test_async_exception() {
+    PrintLine("\n开始异步异常处理验证...")
+    
+    async func throwing_task() -> string {
+        throw "测试异常"
+    }
+    
+    exception_caught <- false
+    exception_message <- ""
+    
+    try {
+        task <- throwing_task()
+        result <- await task
+    } catch e {
+        exception_caught <- true
+        exception_message <- e
+    }
+    
+    if exception_caught and exception_message == "测试异常" {
+        PrintLine("✓ 异步异常处理验证通过")
+    } else {
+        PrintLine("✗ 异步异常处理验证失败")
+    }
+}
+
+// 测试6: 取消令牌验证
+func test_cancellation_token() {
+    PrintLine("\n开始取消令牌验证...")
+    
+    cts <- CancellationTokenSource()
+    
+    async func cancellable_task(token: CancellationToken) -> string {
+        for i in 0..5 {
+            if token.IsCancellationRequested {
+                return "任务被取消"
+            }
+            task <- Task.Delay(20)
+            await task
+        }
+        return "任务完成"
+    }
+    
+    task <- cancellable_task(cts.Token)
+    
+    // 立即取消
+    cts.Cancel()
+    
+    result <- await task
+    
+    if result == "任务被取消" {
+        PrintLine("✓ 取消令牌验证通过")
+    } else {
+        PrintLine("✗ 取消令牌验证失败，结果: " + result)
+    }
+}
+
+// 主函数
+func main() {
+    PrintLine("=== 异步功能验证测试开始 ===")
+    
+    test_task_delay()
+    test_task_from_result()
+    test_task_when_all()
+    test_async_generator()
+    test_async_exception()
+    test_cancellation_token()
+    
+    PrintLine("\n=== 异步功能验证测试完成 ===")
+}
+
+// 运行主函数
+main()

@@ -7,6 +7,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Old8Lang.AST.Statement;
 
@@ -743,6 +745,13 @@ public partial class AsyncForInStatement(
             return;
         }
 
+        // 检查是否是异步枚举类型
+        if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+        {
+            GenerateAsyncEnumerableIl(ilGenerator, local, ty);
+            return;
+        }
+
         // 非字典类型，使用普通的IEnumerator处理
         var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
         var current = ilGenerator.DeclareLocal(typeof(object));
@@ -909,4 +918,87 @@ public partial class AsyncForInStatement(
     public override OldStatement this[int index] => body[index]!;
 
     public override int Count => body.Count;
+
+    /// <summary>
+    /// 生成异步枚举类型的IL代码
+    /// </summary>
+    private void GenerateAsyncEnumerableIl(ILGenerator ilGenerator, LocalManager local, Type asyncEnumerableType)
+    {
+        // 获取元素类型（IAsyncEnumerable<T>中的T）
+        var elementType = asyncEnumerableType.GetGenericArguments()[0];
+        
+        // 声明局部变量
+        var asyncEnumerator = ilGenerator.DeclareLocal(typeof(IAsyncEnumerator<>).MakeGenericType(elementType));
+        var current = ilGenerator.DeclareLocal(elementType);
+        
+        // 获取异步枚举器
+        var getAsyncEnumeratorMethod = asyncEnumerableType.GetMethod("GetAsyncEnumerator", [typeof(CancellationToken)])!;
+        expression.LoadIlValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Ldc_I4_0); // 默认的CancellationToken
+        ilGenerator.Emit(OpCodes.Newobj, typeof(CancellationToken).GetConstructor(Type.EmptyTypes)!);
+        ilGenerator.Emit(OpCodes.Callvirt, getAsyncEnumeratorMethod);
+        ilGenerator.Emit(OpCodes.Stloc, asyncEnumerator);
+        
+        // 定义循环标签
+        var loopStart = ilGenerator.DefineLabel();
+        var loopEnd = ilGenerator.DefineLabel();
+        var continueLabel = ilGenerator.DefineLabel();
+        
+        // 保存当前的break和continue标签
+        var oldBreakLabel = local.BreakLabel;
+        var oldContinueLabel = local.ContinueLabel;
+        
+        // 设置当前循环的break和continue标签
+        local.BreakLabel = loopEnd;
+        local.ContinueLabel = continueLabel;
+        
+        // 循环开始
+        ilGenerator.MarkLabel(loopStart);
+        
+        // 调用MoveNextAsync并等待结果
+        var moveNextAsyncMethod = typeof(IAsyncEnumerator<>).MakeGenericType(elementType).GetMethod("MoveNextAsync")!;
+        ilGenerator.Emit(OpCodes.Ldloc, asyncEnumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, moveNextAsyncMethod);
+        
+        // 获取ValueTask<bool>的Result属性
+        var resultProperty = typeof(ValueTask<bool>).GetProperty("Result")!;
+        var getResultMethod = resultProperty.GetGetMethod()!;
+        ilGenerator.Emit(OpCodes.Callvirt, getResultMethod);
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+        
+        // 获取当前元素
+        var currentProperty = typeof(IAsyncEnumerator<>).MakeGenericType(elementType).GetProperty("Current")!;
+        var getCurrentMethod = currentProperty.GetGetMethod()!;
+        ilGenerator.Emit(OpCodes.Ldloc, asyncEnumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
+        ilGenerator.Emit(OpCodes.Stloc, current);
+        
+        // 处理标识符赋值
+        if (AllIds.Count == 1)
+        {
+            // 单个标识符，直接赋值
+            local.AddLocalVar(AllIds[0].IdName, current);
+        }
+        else
+        {
+            // 多个标识符，只赋值给第一个
+            local.AddLocalVar(AllIds[0].IdName, current);
+        }
+        
+        // 生成循环体
+        body.GenerateIl(ilGenerator, local);
+        
+        // 继续标签
+        ilGenerator.MarkLabel(continueLabel);
+        
+        // 跳回循环开始
+        ilGenerator.Emit(OpCodes.Br, loopStart);
+        
+        // 循环结束
+        ilGenerator.MarkLabel(loopEnd);
+        
+        // 恢复之前的break和continue标签
+        local.BreakLabel = oldBreakLabel;
+        local.ContinueLabel = oldContinueLabel;
+    }
 }

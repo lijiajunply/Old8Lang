@@ -347,6 +347,28 @@ public partial class TaskStaticMethodWrapper(
                 var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
                 ilGenerator.Emit(OpCodes.Ldnull);
                 break;
+            case "FromResult":
+                // 获取Task.FromResult方法
+                var fromResultMethod = typeof(Task).GetMethods()
+                    .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            case "FromException":
+                // 获取Task.FromException方法
+                var fromExceptionMethod = typeof(Task).GetMethods()
+                    .First(m => m is { Name: "FromException", IsGenericMethodDefinition: true });
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            case "Run":
+                // 获取Task.Run方法
+                var runMethod = typeof(Task).GetMethod("Run", [typeof(Func<object>)])!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            case "StartNew":
+                // 获取Task.Factory.StartNew方法
+                var startNewMethod = typeof(TaskFactory).GetMethod("StartNew", [typeof(Func<object>)])!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
             default:
                 throw new InvalidOperationError(Position, $"不支持的Task静态方法: {methodName}");
         }
