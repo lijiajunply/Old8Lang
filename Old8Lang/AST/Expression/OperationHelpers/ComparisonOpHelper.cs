@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using LangObject = Old8Lang.Runtime.LangObject;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
@@ -91,7 +92,26 @@ internal static class ComparisonOpHelper
         var gtLeftType = left?.OutputType(local);
         var gtRightType = right?.OutputType(local);
 
-        // 检查是否是 AnyLangValue 运算符重载
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (gtLeftType != null && typeof(LangObject).IsAssignableFrom(gtLeftType))
+        {
+            // 生成调用 _gt 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (gtRightType != null && gtRightType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, gtRightType);
+            }
+
+            // 调用 _gt 方法: LangObject._gt(object)
+            var gtMethod = typeof(LangObject).GetMethod("_gt")!;
+            ilGenerator.Emit(OpCodes.Callvirt, gtMethod);
+            return typeof(bool);
+        }
+
+        // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (gtLeftType == typeof(AnyLangValue) || gtLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Greater 方法的 IL 代码
@@ -146,6 +166,25 @@ internal static class ComparisonOpHelper
         // 获取操作数类型
         var ltLeftType = left?.OutputType(local);
         var ltRightType = right?.OutputType(local);
+
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (ltLeftType != null && typeof(LangObject).IsAssignableFrom(ltLeftType))
+        {
+            // 生成调用 _lt 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (ltRightType != null && ltRightType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, ltRightType);
+            }
+
+            // 调用 _lt 方法: LangObject._lt(object)
+            var ltMethod = typeof(LangObject).GetMethod("_lt")!;
+            ilGenerator.Emit(OpCodes.Callvirt, ltMethod);
+            return typeof(bool);
+        }
 
         // 检查是否是 AnyLangValue 运算符重载
         if (ltLeftType == typeof(AnyLangValue) || ltLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
@@ -202,6 +241,25 @@ internal static class ComparisonOpHelper
         // 获取操作数类型
         var leftOpType = left?.OutputType(local);
         var rightOpType = right?.OutputType(local);
+
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (leftOpType != null && typeof(LangObject).IsAssignableFrom(leftOpType))
+        {
+            // 生成调用 _eq 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (rightOpType != null && rightOpType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, rightOpType);
+            }
+
+            // 调用 _eq 方法: LangObject._eq(object)
+            var eqMethod = typeof(LangObject).GetMethod("_eq")!;
+            ilGenerator.Emit(OpCodes.Callvirt, eqMethod);
+            return typeof(bool);
+        }
 
         // 检查是否是 AnyLangValue 运算符重载
         if (leftOpType == typeof(AnyLangValue) || leftOpType?.IsSubclassOf(typeof(AnyLangValue)) == true)
@@ -282,6 +340,25 @@ internal static class ComparisonOpHelper
         var leftType = left?.OutputType(local);
         var rightType = right?.OutputType(local);
 
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
+        {
+            // 生成调用 _le 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (rightType != null && rightType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, rightType);
+            }
+
+            // 调用 _le 方法: LangObject._le(object)
+            var leMethod = typeof(LangObject).GetMethod("_le")!;
+            ilGenerator.Emit(OpCodes.Callvirt, leMethod);
+            return typeof(bool);
+        }
+
         // 检查是否是 AnyLangValue 运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
@@ -323,6 +400,25 @@ internal static class ComparisonOpHelper
         // 获取操作数类型
         var leftType = left?.OutputType(local);
         var rightType = right?.OutputType(local);
+
+        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
+        {
+            // 生成调用 _ge 方法的 IL 代码
+            left?.LoadIlValue(ilGenerator, local);
+            right?.LoadIlValue(ilGenerator, local);
+
+            // 如果右操作数是值类型，需要装箱
+            if (rightType != null && rightType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, rightType);
+            }
+
+            // 调用 _ge 方法: LangObject._ge(object)
+            var geMethod = typeof(LangObject).GetMethod("_ge")!;
+            ilGenerator.Emit(OpCodes.Callvirt, geMethod);
+            return typeof(bool);
+        }
 
         // 检查是否是 AnyLangValue 运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
