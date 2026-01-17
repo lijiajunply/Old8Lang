@@ -27,7 +27,12 @@ public class FuncLangValue : ImportInfo
     private readonly FuncLangValue? Func;
 
     // 闭包环境：捕获的作用域，用于支持闭包变量访问
-    private VariateManager? CapturedScope { get; init; }
+    internal VariateManager? CapturedScope { get; init; }
+
+    /// <summary>
+    /// 获取捕获的作用域（用于装饰器等场景）
+    /// </summary>
+    internal VariateManager? GetCapturedScope() => CapturedScope;
 
     // 函数类型：区分普通方法和Lambda表达式
     private bool IsLambda { get; init; }

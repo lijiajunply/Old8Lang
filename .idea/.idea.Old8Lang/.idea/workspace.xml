@@ -23,8 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -575,7 +575,7 @@
       <workItem from="1768543641677" duration="16866000" />
       <workItem from="1768576580719" duration="7043000" />
       <workItem from="1768599044369" duration="7403000" />
-      <workItem from="1768650127141" duration="678000" />
+      <workItem from="1768650127141" duration="3260000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -920,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="704" />
+    <option name="localTasksCounter" value="707" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -947,9 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 添加泛型继承语法支持并完善代码补全功能&#10;&#10;- 在 ClassParser 中实现父类泛型参数解析功能，支持 extends List&lt;T&gt; 语法&#10;- 限制类成员补全仅显示公共成员，过滤私有成员的外部访问&#10;- 更新测试用例修复输出参数引用和代码示例格式&#10;- 在 SymbolTableBuilder 中添加泛型实例化表达式类型推断支持&#10;- 将无法推断的变量类型默认设为 &quot;any&quot; 而非 &quot;var&quot;&#10;- 添加泛型继承和成员访问的测试用例验证功能正确性" />
-    <MESSAGE value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
-    <MESSAGE value="docs(grammar): 更新语法文档以反映 extern 关键字统一变更&#10;&#10;- 将 EBNF 语法定义中的 'native' 替换为 'extern'&#10;- 更新 Old8Lang_Grammar.md 中的关键字列表&#10;- 修改语法示例以使用新的 extern 语法&#10;- 移除已废弃的 'native' 关键字相关定义" />
     <MESSAGE value="docs(async): 添加异步编程支持问题分析和修复进展报告&#10;&#10;- 新增 Async_Issues_Analysis.md 详细分析异步功能实现不完整问题&#10;- 新增 Async_Progress_Report.md 记录异步状态机生成器重构进展&#10;- 重构 AsyncStateMachineGenerator 中 await 表达式识别逻辑&#10;- 引入 AwaitInfo 类替代简单位置列表，记录更详细的 await 信息&#10;- 改进 IdentifyAwaitExpressions 方法支持更多语句类型&#10;- 修复函数调用参数属性名称错误，统一使用 Arguments 属性&#10;- 更新状态机生成逻辑使用新的 await 信息结构&#10;- 移除已废弃的编译模式测试计划文档" />
     <MESSAGE value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新 FAQ 文档修正语言特性和语法说明&#10;- 完善异步编程修复总结报告" />
     <MESSAGE value="fix(async): 修复异步编程支持中的关键问题&#10;&#10;- 修复 AwaitExpression 中 Task 类型转换的 IL 代码生成错误&#10;- 修正 TaskAwaiter 结构体方法调用使用 Ldloca 和 Call 指令&#10;- 解决 AsyncFuncInit 中状态机调用导致的栈不平衡问题&#10;- 添加顶层 await 检测和处理机制，提供友好错误提示&#10;- 创建多个异步功能测试文件验证修复效果&#10;- 更新异步编程修复总结报告，完善当前限制说明&#10;- 修复 AsyncStateMachineGenerator 中状态跳转逻辑问题&#10;- 添加异步函数定义和调用的基本支持功能" />
@@ -972,7 +969,10 @@
     <MESSAGE value="feat(parser): 添加函数装饰器支持&#10;&#10;- 实现 Python 风格的 @decorator 语法，支持无参数和带参数装饰器&#10;- 在词法分析器中添加 At 符号 token 类型识别&#10;- 扩展 AST 结构，为函数添加 Decorators 属性存储装饰器列表&#10;- 实现装饰器解析逻辑，支持命名参数和多装饰器堆叠应用&#10;- 在函数初始化时自动应用装饰器，支持异步函数装饰器&#10;- 添加完整的装饰器测试用例和语法文档说明" />
     <MESSAGE value="feat(parser): 添加装饰器语法解析和执行支持&#10;&#10;- 实现装饰器基础语法解析功能&#10;- 支持带参数和不带参数的装饰器&#10;- 支持多个装饰器堆叠应用&#10;- 实现装饰器在解释器模式下的执行逻辑&#10;- 实现装饰器在编译器模式下的编译逻辑&#10;- 添加装饰器语法边界情况测试用例&#10;- 支持装饰器参数为表达式、列表和字典类型&#10;- 实现装饰器错误处理和异常情况测试" />
     <MESSAGE value="refactor(ast): 重命名FuncInit中的FuncLangValue属性为FuncValue&#10;&#10;- 将FuncInit类中的FuncLangValue属性重命名为FuncValue&#10;- 更新所有引用FuncLangValue的地方为FuncValue&#10;- 修改相关的getter和检查逻辑以使用新属性名&#10;- 更新测试代码中对FuncLangValue的引用&#10;- 调整装饰器应用逻辑中的临时函数命名&#10;- 优化装饰器调用过程中的参数传递方式&#10;- 修正类型推断和验证逻辑中的属性引用&#10;- 更新外部提供程序和语言服务器中的相关引用" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重命名FuncInit中的FuncLangValue属性为FuncValue&#10;&#10;- 将FuncInit类中的FuncLangValue属性重命名为FuncValue&#10;- 更新所有引用FuncLangValue的地方为FuncValue&#10;- 修改相关的getter和检查逻辑以使用新属性名&#10;- 更新测试代码中对FuncLangValue的引用&#10;- 调整装饰器应用逻辑中的临时函数命名&#10;- 优化装饰器调用过程中的参数传递方式&#10;- 修正类型推断和验证逻辑中的属性引用&#10;- 更新外部提供程序和语言服务器中的相关引用" />
+    <MESSAGE value="refactor(ast): 优化数组值构造函数实现&#10;&#10;- 添加新的ArrayLangValue构造函数接受LangValueType数组参数&#10;- 修改ArrayValueFuncStatic中排序和转换方法使用新构造函数&#10;- 保持元素类型和位置信息在数组操作后正确传递&#10;- 简化数组转换过程减少不必要的ToList()调用&#10;- 更新工作区配置文件以反映最新代码变更" />
+    <MESSAGE value="feat(parser): 优化 ValueTuple 索引访问实现&#10;&#10;- 实现了对常量索引的 ValueTuple 类型推断&#10;- 添加了对超过 7 个元素的 ValueTuple 的递归访问支持&#10;- 重构了嵌套索引访问的 IL 生成逻辑&#10;- 移除了元组扁平化访问的旧实现&#10;- 更新了相关单元测试以匹配新的元组访问方式&#10;- 添加了大元组和嵌套元组的测试用例" />
+    <MESSAGE value="feat(parser): 添加对外部函数声明中调用约定的支持&#10;&#10;- 支持 extern &quot;dll&quot; cdecl/stdcall/winapi { func1, func2 } 语法&#10;- 实现调用约定关键字的识别逻辑&#10;- 添加 cdecl、stdcall、winapi 调用约定的解析支持&#10;- 扩展外部函数声明的语法匹配规则&#10;- 为调用约定检查功能添加文档注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加对外部函数声明中调用约定的支持&#10;&#10;- 支持 extern &quot;dll&quot; cdecl/stdcall/winapi { func1, func2 } 语法&#10;- 实现调用约定关键字的识别逻辑&#10;- 添加 cdecl、stdcall、winapi 调用约定的解析支持&#10;- 扩展外部函数声明的语法匹配规则&#10;- 为调用约定检查功能添加文档注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

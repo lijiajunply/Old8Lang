@@ -99,7 +99,11 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             targetFunc.GenericParameters,
             targetFunc.Position,
             isLambda: false
-        );
+        )
+        {
+            // 保留 targetFunc 的 CapturedScope，确保闭包变量可以正确访问
+            CapturedScope = targetFunc.CapturedScope
+        };
         manager.AddClassAndFunc(tempFunc);
 
         LangValueType result;
@@ -124,12 +128,9 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             }
 
             // 第二步：调用包装器，传入目标函数
-            var wrapperCallExpr = new FunctionCallExpression(
-                wrapper,
-                [new LangId(tempFuncName, position: decorator.Position)],
-                decorator.Position
-            );
-            result = wrapperCallExpr.Run(manager);
+            // 直接调用 wrapper，而不是通过 FunctionCallExpression
+            // 这样可以保留 wrapper 的 CapturedScope
+            result = wrapper.Run(manager, [new LangId(tempFuncName, position: decorator.Position)], null);
         }
         else
         {
@@ -165,6 +166,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 保留原函数的名称
         if (targetFunc.Id is not null)
         {
+            // 创建新的 FuncLangValue，保留 wrappedFunc 的所有属性，包括 CapturedScope
             return new FuncLangValue(
                 targetFunc.Id,
                 wrappedFunc.Ids ?? [],
@@ -172,7 +174,10 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 wrappedFunc.GenericParameters,
                 wrappedFunc.Position,
                 isLambda: false
-            );
+            )
+            {
+                CapturedScope = wrappedFunc.CapturedScope
+            };
         }
 
         return wrappedFunc;

@@ -486,7 +486,7 @@ public class DecoratorInterpreterTests
         var ast = interpreter.Build(code);
 
         // Assert
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<InvalidOperationError>(() => ast.Run(interpreter.Manager));
     }
 
     [Fact]
@@ -559,7 +559,7 @@ public class DecoratorInterpreterTests
         var ast = interpreter.Build(code);
 
         // Assert
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<InvalidOperationError>(() => ast.Run(interpreter.Manager));
     }
 
     #endregion
