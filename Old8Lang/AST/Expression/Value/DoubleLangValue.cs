@@ -191,9 +191,9 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
     public override bool Equal(LangValueType? otherValueType)
     {
         if (otherValueType is DoubleLangValue b)
-            return Math.Abs(Value - b.Value) < 0.001;
+            return Math.Abs(Value - b.Value) < 1e-10;
         if (otherValueType is IntLangValue i)
-            return Math.Abs(Value - i.Value) < 0.001;
+            return Math.Abs(Value - i.Value) < 1e-10;
         return false;
     }
 

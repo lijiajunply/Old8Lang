@@ -160,7 +160,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
                 }
 
                 // 如果结果是整数，返回 IntLangValue，否则返回 DoubleLangValue
-                if (Math.Abs(result - Math.Floor(result)) < 0.01)
+                if (Math.Abs(result - Math.Floor(result)) < 1e-15)
                 {
                     return Create((int)result);
                 }
@@ -225,7 +225,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
         if (otherValueType is IntLangValue b)
             return Value == b.Value;
         if (otherValueType is DoubleLangValue d)
-            return Math.Abs(Value - d.Value) < 0.001;
+            return Math.Abs(Value - d.Value) < 1e-10;
         return false;
     }
 
