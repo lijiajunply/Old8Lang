@@ -198,6 +198,30 @@ public static class GenericMethodSpecializer
         // 创建类型解析器
         var resolver = new GenericTypeResolver(typeArguments, local, local.Interpreter);
 
+        // 验证泛型约束
+        if (funcValue.GenericParameters != null)
+        {
+            foreach (var param in funcValue.GenericParameters)
+            {
+                if (param.HasConstraints && typeArguments.TryGetValue(param.Name, out var actualType))
+                {
+                    foreach (var constraintName in param.Constraints!)
+                    {
+                        var constraintType = resolver.ResolveType(constraintName);
+                        if (constraintType is not null)
+                        {
+                            // 检查约束兼容性
+                            if (!constraintType.IsAssignableFrom(actualType))
+                            {
+                                throw new ArgumentException(
+                                    $"类型 {actualType.Name} 不满足约束 {constraintName}: {actualType.Name} 没有继承或实现 {constraintType.Name}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // 解析参数类型
         var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
 

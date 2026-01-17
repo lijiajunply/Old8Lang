@@ -1,0 +1,22 @@
+func add<T>(a: T, b: T) -> T {
+    return a + b
+}
+
+class Box<T> {
+    public value: T
+
+    public func set(v: T) {
+        value <- v
+    }
+
+    public func get() -> T {
+        return value
+    }
+}
+
+res:int <- add<int>(1, 2)
+PrintLine(res)
+
+box:Box<string> <- Box<string>()
+box.set("hello")
+PrintLine(box.get())

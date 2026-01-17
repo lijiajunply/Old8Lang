@@ -1,0 +1,17 @@
+class BaseBox<T> {
+    public baseVal: T
+}
+
+class Box<T> extends BaseBox<T> {
+    public func setBase(v: T) {
+        baseVal <- v
+    }
+
+    public func getBase() -> T {
+        return baseVal
+    }
+}
+
+b:Box<int> <- Box<int>()
+b.setBase(123)
+PrintLine(b.getBase())

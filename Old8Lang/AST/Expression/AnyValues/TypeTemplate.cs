@@ -7,28 +7,30 @@ using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Expression.AnyValues;
 
-/// <summary>
-/// 类型模板类，用于存储类的定义信息
-/// </summary>
-public partial class TypeTemplate(
-    string className,
-    Dictionary<ClassMemberId, LangExpression> variates,
-    Dictionary<ClassMemberId, LangExpression> staticVariates,
-    string? parentClassName = null,
-    bool isMixin = false,
-    List<string>? mixinNames = null,
-    List<string>? implementsNames = null,
-    bool isInterface = false,
-    bool isAbstract = false,
-    List<GenericParameter>? genericParameters = null,
-    SourcePosition position = default)
-    : ImportInfo(position)
-{
-    public readonly string ClassName = className;
-    public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
-    public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
-    public readonly string? ParentClassName = parentClassName;
-    public readonly bool IsMixin = isMixin;
+    /// <summary>
+    /// 类型模板类，用于存储类的定义信息
+    /// </summary>
+    public partial class TypeTemplate(
+        string className,
+        Dictionary<ClassMemberId, LangExpression> variates,
+        Dictionary<ClassMemberId, LangExpression> staticVariates,
+        string? parentClassName = null,
+        bool isMixin = false,
+        List<string>? mixinNames = null,
+        List<string>? implementsNames = null,
+        bool isInterface = false,
+        bool isAbstract = false,
+        List<GenericParameter>? genericParameters = null,
+        List<string>? parentGenericTypeParameters = null,
+        SourcePosition position = default)
+        : ImportInfo(position)
+    {
+        public readonly string ClassName = className;
+        public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
+        public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
+        public readonly string? ParentClassName = parentClassName;
+        public readonly List<string>? ParentGenericTypeParameters = parentGenericTypeParameters;
+        public readonly bool IsMixin = isMixin;
     public readonly List<string> MixinNames = mixinNames ?? [];
     public readonly List<string> ImplementsNames = implementsNames ?? [];
     public readonly bool IsInterface = isInterface;
@@ -685,6 +687,7 @@ public partial class TypeTemplate(
             isInterface: IsInterface,
             isAbstract: IsAbstract,
             genericParameters: GenericParameters,
+            parentGenericTypeParameters: ParentGenericTypeParameters,
             position: Position
         )
         {

@@ -41,7 +41,7 @@ public class GenericTypeResolver
             {
                 // 这里需要将ITypeInfo转换为System.Type
                 // 暂时使用基本的类型映射
-                return typeName.ToLower() switch
+                var resolved = typeName.ToLower() switch
                 {
                     "int" => typeof(int),
                     "string" => typeof(string),
@@ -49,10 +49,29 @@ public class GenericTypeResolver
                     "bool" => typeof(bool),
                     "char" => typeof(char),
                     "void" => typeof(void),
-                    _ => typeof(object)
+                    "object" => typeof(object),
+                    _ => null
                 };
+                if (resolved != null) return resolved;
+                
+                // 尝试解析常用系统接口
+                if (typeName == "IComparable") return typeof(IComparable);
+                if (typeName == "IDisposable") return typeof(IDisposable);
+                if (typeName == "IEnumerable") return typeof(System.Collections.IEnumerable);
             }
         }
+
+        // 尝试从 LocalManager 获取已编译的类
+        if (_local.ClassVar.TryGetValue(typeName, out var classType))
+        {
+            return classType;
+        }
+        
+        // 尝试从 LocalManager 获取泛型类模板（递归特化）
+        // 注意：这里我们可能无法直接返回一个特化的Type，因为缺少泛型参数
+        // 但如果只是类名引用（如 MyClass），它应该在 ClassVar 中
+        // 如果 MyClass 还没有被编译（顺序问题），这可能是一个问题
+        // 但编译器通常会预先扫描所有类定义
 
         // 基本类型映射
         return typeName.ToLower() switch

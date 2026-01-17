@@ -52,10 +52,95 @@ public static class GenericClassSpecializer
         // 创建类型解析器
         var resolver = new GenericTypeResolver(typeArguments, local, local.Interpreter);
 
+        // 验证泛型约束
+        if (typeTemplate.GenericParameters != null)
+        {
+            foreach (var param in typeTemplate.GenericParameters)
+            {
+                if (param.HasConstraints && typeArguments.TryGetValue(param.Name, out var actualType))
+                {
+                    foreach (var constraintName in param.Constraints!)
+                    {
+                        var constraintType = resolver.ResolveType(constraintName);
+                        if (constraintType is not null)
+                        {
+                            // 检查约束兼容性
+                            // 注意：IsAssignableFrom 检查的是 constraintType 是否可以从 actualType 赋值
+                            if (!constraintType.IsAssignableFrom(actualType))
+                            {
+                                throw new ArgumentException(
+                                    $"类型 {actualType.Name} 不满足约束 {constraintName}: {actualType.Name} 没有继承或实现 {constraintType.Name}");
+                            }");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 解析父类
+        Type parentType = typeof(object);
+        if (!string.IsNullOrEmpty(typeTemplate.ParentClassName))
+        {
+            var parentName = typeTemplate.ParentClassName;
+
+            // 1. 查找父类 TypeTemplate
+            TypeTemplate? parentTemplate = null;
+            if (local.GenericClasses.TryGetValue(parentName, out var pTemp))
+            {
+                parentTemplate = pTemp;
+            }
+            // 2. 如果是泛型类模板，需要特化
+            if (parentTemplate != null && parentTemplate.IsGeneric)
+            {
+                // 构建父类的类型参数映射
+                var parentTypeArgs = new Dictionary<string, Type>();
+
+                if (typeTemplate.ParentGenericTypeParameters != null &&
+                    typeTemplate.ParentGenericTypeParameters.Count == parentTemplate.GenericParameters!.Count)
+                {
+                    for (int i = 0; i < typeTemplate.ParentGenericTypeParameters.Count; i++)
+                    {
+                        var argName = typeTemplate.ParentGenericTypeParameters[i];
+                        var paramName = parentTemplate.GenericParameters[i].Name;
+
+                        // 解析 argName
+                        // 优先从当前类的 typeArguments 查找（T -> int）
+                        Type resolvedType;
+                        if (typeArguments.TryGetValue(argName, out var t))
+                        {
+                            resolvedType = t;
+                        }
+                        else
+                        {
+                            // 尝试作为具体类型解析
+                            resolvedType = resolver.ResolveType(argName) ?? typeof(object);
+                        }
+
+                        parentTypeArgs[paramName] = resolvedType;
+                    }
+
+                    // 递归特化父类
+                    parentType = CreateSpecialization(parentTemplate, parentTypeArgs, local);
+                }
+                else
+                {
+                    // 泛型参数不匹配，回退到 object (或者应该报错)
+                    parentType = typeof(object);
+                }
+            }
+            // 3. 检查是否是已编译的类
+            else if (local.ClassVar.TryGetValue(parentName, out var pType))
+            {
+                parentType = pType;
+            }
+        }
+
         // 创建特化的类类型
         var typeBuilder = local.DynamicModule.DefineType(
             $"{typeTemplate.ClassName}_{string.Join("_", typeArgNames)}",
-            TypeAttributes.Public | TypeAttributes.Class);
+            TypeAttributes.Public | TypeAttributes.Class,
+            parentType);
 
         // 缓存特化类型（提前缓存以支持递归引用）
         local.GenericClassSpecializations[specializationKey] = typeBuilder;
@@ -138,7 +223,10 @@ public static class GenericClassSpecializer
 
         // 调用基类构造函数
         ctorIL.Emit(OpCodes.Ldarg_0);
-        ctorIL.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes)!);
+        
+        var parentCtor = typeBuilder.BaseType?.GetConstructor(Type.EmptyTypes) 
+                         ?? typeof(object).GetConstructor(Type.EmptyTypes)!;
+        ctorIL.Emit(OpCodes.Call, parentCtor);
 
         // 初始化所有字段为默认值
         foreach (var (fieldName, fieldBuilder) in fieldMap)
@@ -223,6 +311,20 @@ public static class GenericClassSpecializer
         // 添加字段信息
         foreach (var (fieldName, fieldBuilder) in fieldMap)
             methodLocal.FieldVar[fieldName] = fieldBuilder;
+
+        // 获取父类字段
+        if (typeBuilder.BaseType != null && typeBuilder.BaseType != typeof(object))
+        {
+            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            var parentFields = typeBuilder.BaseType.GetFields(flags);
+            foreach (var field in parentFields)
+            {
+                 if (!methodLocal.FieldVar.ContainsKey(field.Name))
+                 {
+                     methodLocal.FieldVar[field.Name] = field;
+                 }
+            }
+        }
 
         return methodLocal;
     }

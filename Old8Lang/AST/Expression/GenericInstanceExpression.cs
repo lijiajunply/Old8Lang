@@ -105,6 +105,21 @@ public partial class GenericInstanceExpression : LangExpression
                 var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
                 if (typeInfo is null)
                 {
+                    // 尝试从 manager 中获取用户定义的类
+                    var value = manager.GetAny(new LangId(typeArgName));
+                    if (value is TypeTemplate tt)
+                    {
+                        // 创建 ClassTypeInfo 代理
+                        typeInfo = new ClassTypeInfo(
+                            tt.ClassName,
+                            baseType: null, // 暂时为 null，因为需要递归解析父类
+                            interfaceNames: tt.ImplementsNames
+                        );
+                    }
+                }
+
+                if (typeInfo is null)
+                {
                     throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
                 }
 
@@ -194,7 +209,7 @@ public partial class GenericInstanceExpression : LangExpression
         {
             // 泛型类实例化：返回特化后的类型
             var typeTemplate = local.GenericClasses[name];
-            var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters);
+            var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters, local);
             var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
             return specializedType;
         }
@@ -203,7 +218,7 @@ public partial class GenericInstanceExpression : LangExpression
         {
             // 泛型函数调用：返回函数的返回类型
             var genericFunc = local.GenericFunctions[name];
-            var typeMapping = CreateTypeMapping(genericFunc.GenericParameters);
+            var typeMapping = CreateTypeMapping(genericFunc.GenericParameters, local);
             var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
             return resolver.ResolveReturnType(genericFunc.Id?.AssumptionType);
         }
@@ -254,7 +269,7 @@ public partial class GenericInstanceExpression : LangExpression
         var typeTemplate = local.GenericClasses[className];
 
         // 创建类型参数映射
-        var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters);
+        var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters, local);
 
         // 创建或获取特化类型
         var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
@@ -315,10 +330,12 @@ public partial class GenericInstanceExpression : LangExpression
         var genericFunc = local.GenericFunctions[funcName];
 
         // 创建类型参数映射
-        var typeMapping = CreateTypeMapping(genericFunc.GenericParameters);
+        var typeMapping = CreateTypeMapping(genericFunc.GenericParameters, local);
 
         // 构建特化键
-        var typeArgNames = TypeArguments.Select(t => ResolveSimpleType(t).Name).ToArray();
+        // 使用 GenericTypeResolver 来解析类型名称，获取正确的 Type.Name
+        var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
+        var typeArgNames = TypeArguments.Select(t => resolver.ResolveType(t)?.Name ?? "Object").ToArray();
         var specializationKey = $"{funcName}${string.Join("_", typeArgNames)}";
 
         // 检查是否已经存在特化方法
@@ -344,9 +361,10 @@ public partial class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 创建类型参数映射
     /// </summary>
-    private Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters)
+    private Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters, LocalManager local)
     {
         var typeMapping = new Dictionary<string, Type>();
+        var resolver = new GenericTypeResolver(new Dictionary<string, Type>(), local, local.Interpreter);
 
         if (genericParameters is not null)
         {
@@ -354,7 +372,7 @@ public partial class GenericInstanceExpression : LangExpression
             {
                 var genericParamName = genericParameters[i].Name;
                 var typeArgumentName = TypeArguments[i];
-                var type = ResolveSimpleType(typeArgumentName);
+                var type = resolver.ResolveType(typeArgumentName) ?? typeof(object);
                 typeMapping[genericParamName] = type;
             }
         }
@@ -364,7 +382,7 @@ public partial class GenericInstanceExpression : LangExpression
             for (int i = 0; i < TypeArguments.Count; i++)
             {
                 var typeArgumentName = TypeArguments[i];
-                var type = ResolveSimpleType(typeArgumentName);
+                var type = resolver.ResolveType(typeArgumentName) ?? typeof(object);
                 var genericParamName = $"T{i + 1}";
                 typeMapping[genericParamName] = type;
             }
@@ -373,23 +391,6 @@ public partial class GenericInstanceExpression : LangExpression
         return typeMapping;
     }
 
-    /// <summary>
-    /// 解析简单类型名称为System.Type
-    /// </summary>
-    private static Type ResolveSimpleType(string typeName)
-    {
-        return typeName.ToLower() switch
-        {
-            "int" => typeof(int),
-            "string" => typeof(string),
-            "double" => typeof(double),
-            "bool" => typeof(bool),
-            "char" => typeof(char),
-            "void" => typeof(void),
-            "object" => typeof(object),
-            _ => typeof(object)
-        };
-    }
 
     public override string ToString()
     {

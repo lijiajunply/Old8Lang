@@ -58,6 +58,7 @@ public class ClassParser(
         }
 
         string? parentClassName = null;
+        List<string>? parentGenericTypeParameters = null;
         List<string> mixinNames = new List<string>();
         List<string> implementsNames = new List<string>();
 
@@ -76,26 +77,30 @@ public class ClassParser(
                 // 处理父类的泛型参数（如果有）：extends List<T>
                 if (CurrentToken.Type == LangTokenType.LessThan)
                 {
-                    // 跳过泛型参数部分，直到找到匹配的 >
-                    int genericDepth = 0;
-                    while (CurrentIndex < Tokens.Count)
+                    parentGenericTypeParameters = new List<string>();
+                    Expect(LangTokenType.LessThan);
+
+                    while (CurrentToken.Type != LangTokenType.GreaterThan)
                     {
-                        if (CurrentToken.Type == LangTokenType.LessThan)
+                        var funcParser = functionParserFactory();
+                        // ParseComplexTypeAnnotation 会解析 T, List<T>, int 等
+                        // 并且它会在逗号或 > 处停止
+                        var typeArg = funcParser.ParseComplexTypeAnnotation();
+                        if (string.IsNullOrEmpty(typeArg))
                         {
-                            genericDepth++;
+                            throw CreateSyntaxError("泛型参数不能为空");
                         }
-                        else if (CurrentToken.Type == LangTokenType.GreaterThan)
+                        parentGenericTypeParameters.Add(typeArg);
+
+                        if (CurrentToken.Type == LangTokenType.Comma)
                         {
-                            genericDepth--;
-                            CurrentIndex++;
-                            if (genericDepth == 0)
-                            {
-                                break;
-                            }
+                            Expect(LangTokenType.Comma);
                             continue;
                         }
-                        CurrentIndex++;
+
+                        break;
                     }
+                    Expect(LangTokenType.GreaterThan);
                 }
             }
         }
@@ -155,7 +160,7 @@ public class ClassParser(
         var classBlock = ParseClassBlock();
         var typeTemplate = new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
             parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract,
-            genericParameters: genericParameters);
+            genericParameters: genericParameters, parentGenericTypeParameters: parentGenericTypeParameters);
 
         // 设置文档注释
         if (docComment is not null)
