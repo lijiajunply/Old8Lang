@@ -1,6 +1,3 @@
-using Old8Lang.Bytecode;
-using Old8Lang.AST.Expression.Value;
-using Xunit;
 using VM = Old8Lang.Bytecode.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Linq;

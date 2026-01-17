@@ -1,5 +1,3 @@
-using Old8Lang.Bytecode;
-using Xunit;
 using VM = Old8Lang.Bytecode.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Strings;

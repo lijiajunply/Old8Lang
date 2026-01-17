@@ -2,7 +2,6 @@
 
 using Old8Lang.FirstUI;
 using Old8Lang.FirstUI.Basic;
-using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Layout;
 
 var app = FirstUIBinding.CreateApp();

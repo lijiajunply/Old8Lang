@@ -1,5 +1,4 @@
 using Old8Lang.LangParser;
-using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Basic;
 

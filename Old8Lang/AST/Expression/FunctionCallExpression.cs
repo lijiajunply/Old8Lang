@@ -4,7 +4,6 @@ using Old8Lang.Compiler;
 using System.Reflection.Emit;
 using Old8Lang.Interpreter;
 using System.Reflection;
-using System.Linq;
 
 namespace Old8Lang.AST.Expression;
 

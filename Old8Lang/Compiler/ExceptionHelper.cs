@@ -1,5 +1,3 @@
-using Old8Lang.Error;
-
 namespace Old8Lang.Compiler;
 
 public static class ExceptionHelper

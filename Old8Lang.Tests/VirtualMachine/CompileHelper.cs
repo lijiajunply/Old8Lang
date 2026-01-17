@@ -1,4 +1,3 @@
-using Old8Lang.AST.Visitor;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 

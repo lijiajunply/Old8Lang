@@ -2,7 +2,6 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Old8Lang.LanguageServer.Services;
-using Old8Lang.LangParser;
 using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.LanguageServer.Handlers;

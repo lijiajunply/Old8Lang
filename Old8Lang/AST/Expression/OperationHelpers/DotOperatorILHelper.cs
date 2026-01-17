@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using System.Linq;
 using System.Collections;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;

@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
-using Xunit;
 
 namespace Old8Lang.Tests.Unit;
 

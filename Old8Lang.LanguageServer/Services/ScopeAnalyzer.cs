@@ -1,8 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.Intermediates;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SymbolInfo = Old8Lang.LanguageServer.Models.SymbolInfo;
 using SymbolKind = Old8Lang.LanguageServer.Models.SymbolKind;

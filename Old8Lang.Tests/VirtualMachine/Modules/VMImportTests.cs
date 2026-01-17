@@ -1,8 +1,5 @@
 using Old8Lang.Bytecode;
-using Old8Lang.Compiler;
-using Old8Lang.LangParser;
 using Old8Lang.Interpreter;
-using Xunit;
 using VM = Old8Lang.Bytecode.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Modules;
