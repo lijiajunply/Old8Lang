@@ -39,7 +39,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             QuickSort(itemsArray, 0, itemsArray.Length - 1);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             QuickSort(itemsArray, 0, itemsArray.Length - 1);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             MergeSortImpl(itemsArray, 0, itemsArray.Length - 1);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             BubbleSortImpl(itemsArray);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             SelectionSortImpl(itemsArray);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             InsertionSortImpl(itemsArray);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ public static class ArrayValueFuncStatic
             var items = arrayValue.GetItems().ToList();
             var itemsArray = items.ToArray();
             HeapSortImpl(itemsArray);
-            return new ArrayLangValue(itemsArray.ToList());
+            return new ArrayLangValue(itemsArray, arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ public static class ArrayValueFuncStatic
                 }
             }
 
-            return new ArrayLangValue(distinct);
+            return new ArrayLangValue(distinct.ToArray(), arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ public static class ArrayValueFuncStatic
                 mapped.Add(result);
             }
 
-            return new ArrayLangValue(mapped);
+            return new ArrayLangValue(mapped.ToArray(), arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ public static class ArrayValueFuncStatic
                 }
             }
 
-            return new ArrayLangValue(filtered);
+            return new ArrayLangValue(filtered.ToArray(), arrayValue.ElementType, arrayValue.Position);
         }
 
         /// <summary>

@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -574,6 +575,7 @@
       <workItem from="1768543641677" duration="16866000" />
       <workItem from="1768576580719" duration="7043000" />
       <workItem from="1768599044369" duration="7403000" />
+      <workItem from="1768650127141" duration="678000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -918,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="703" />
+    <option name="localTasksCounter" value="704" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -945,7 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(completion): 修复异步函数补全项标签和测试&#10;&#10;- 将 asyncfunc 标签更正为 &quot;async func&quot; 以符合语法规范&#10;- 更新测试用例以验证正确的 async 关键字和 async func 代码片段&#10;- 移除私有字段 _output 并直接使用构造函数注入的 output 参数&#10;- 修正断言逻辑确保代码片段插入文本匹配预期值&#10;- 统一所有测试文件中的输出参数使用方式" />
     <MESSAGE value="feat(parser): 添加泛型继承语法支持并完善代码补全功能&#10;&#10;- 在 ClassParser 中实现父类泛型参数解析功能，支持 extends List&lt;T&gt; 语法&#10;- 限制类成员补全仅显示公共成员，过滤私有成员的外部访问&#10;- 更新测试用例修复输出参数引用和代码示例格式&#10;- 在 SymbolTableBuilder 中添加泛型实例化表达式类型推断支持&#10;- 将无法推断的变量类型默认设为 &quot;any&quot; 而非 &quot;var&quot;&#10;- 添加泛型继承和成员访问的测试用例验证功能正确性" />
     <MESSAGE value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
     <MESSAGE value="docs(grammar): 更新语法文档以反映 extern 关键字统一变更&#10;&#10;- 将 EBNF 语法定义中的 'native' 替换为 'extern'&#10;- 更新 Old8Lang_Grammar.md 中的关键字列表&#10;- 修改语法示例以使用新的 extern 语法&#10;- 移除已废弃的 'native' 关键字相关定义" />
@@ -970,7 +971,8 @@
     <MESSAGE value="feat(parser): 添加函数装饰器支持功能&#10;&#10;- 在 AST 中添加 FunctionDecorator 类用于表示函数装饰器&#10;- 修改 FuncInit 和 AsyncFuncInit 类以支持装饰器的应用逻辑&#10;- 在 FuncLangValue 和 AsyncFuncLangValue 中添加装饰器列表属性&#10;- 更新函数解析器以支持装饰器语法解析 (@decorator)&#10;- 在词法分析器中添加 @ 符号的识别和 At token 类型&#10;- 实现装饰器应用逻辑，支持带参数和无参数的装饰器&#10;- 添加多个测试文件验证装饰器的基本功能、编译器模式和语法解析" />
     <MESSAGE value="feat(parser): 添加函数装饰器支持&#10;&#10;- 实现 Python 风格的 @decorator 语法，支持无参数和带参数装饰器&#10;- 在词法分析器中添加 At 符号 token 类型识别&#10;- 扩展 AST 结构，为函数添加 Decorators 属性存储装饰器列表&#10;- 实现装饰器解析逻辑，支持命名参数和多装饰器堆叠应用&#10;- 在函数初始化时自动应用装饰器，支持异步函数装饰器&#10;- 添加完整的装饰器测试用例和语法文档说明" />
     <MESSAGE value="feat(parser): 添加装饰器语法解析和执行支持&#10;&#10;- 实现装饰器基础语法解析功能&#10;- 支持带参数和不带参数的装饰器&#10;- 支持多个装饰器堆叠应用&#10;- 实现装饰器在解释器模式下的执行逻辑&#10;- 实现装饰器在编译器模式下的编译逻辑&#10;- 添加装饰器语法边界情况测试用例&#10;- 支持装饰器参数为表达式、列表和字典类型&#10;- 实现装饰器错误处理和异常情况测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加装饰器语法解析和执行支持&#10;&#10;- 实现装饰器基础语法解析功能&#10;- 支持带参数和不带参数的装饰器&#10;- 支持多个装饰器堆叠应用&#10;- 实现装饰器在解释器模式下的执行逻辑&#10;- 实现装饰器在编译器模式下的编译逻辑&#10;- 添加装饰器语法边界情况测试用例&#10;- 支持装饰器参数为表达式、列表和字典类型&#10;- 实现装饰器错误处理和异常情况测试" />
+    <MESSAGE value="refactor(ast): 重命名FuncInit中的FuncLangValue属性为FuncValue&#10;&#10;- 将FuncInit类中的FuncLangValue属性重命名为FuncValue&#10;- 更新所有引用FuncLangValue的地方为FuncValue&#10;- 修改相关的getter和检查逻辑以使用新属性名&#10;- 更新测试代码中对FuncLangValue的引用&#10;- 调整装饰器应用逻辑中的临时函数命名&#10;- 优化装饰器调用过程中的参数传递方式&#10;- 修正类型推断和验证逻辑中的属性引用&#10;- 更新外部提供程序和语言服务器中的相关引用" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重命名FuncInit中的FuncLangValue属性为FuncValue&#10;&#10;- 将FuncInit类中的FuncLangValue属性重命名为FuncValue&#10;- 更新所有引用FuncLangValue的地方为FuncValue&#10;- 修改相关的getter和检查逻辑以使用新属性名&#10;- 更新测试代码中对FuncLangValue的引用&#10;- 调整装饰器应用逻辑中的临时函数命名&#10;- 优化装饰器调用过程中的参数传递方式&#10;- 修正类型推断和验证逻辑中的属性引用&#10;- 更新外部提供程序和语言服务器中的相关引用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1296,10 +1298,10 @@
           <line>221</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" containingFunctionPresentation="方法 'TestAsyncFunctionDocComment'">
             <startOffsets>
-              <option value="6742" />
+              <option value="6710" />
             </startOffsets>
             <endOffsets>
-              <option value="6769" />
+              <option value="6737" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="638" />

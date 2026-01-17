@@ -34,6 +34,13 @@ public partial class ArrayLangValue : LangValueType, ILangList
         ElementType = elementType;
     }
 
+    public ArrayLangValue(LangValueType[] re, string? elementType = null, SourcePosition position = default) : base(position)
+    {
+        RunResult = [.. re];
+        Values = []; // 初始化空列表，因为我们已经有了RunResult
+        ElementType = elementType;
+    }
+
     public ArrayLangValue(List<LangValueType> re, string? elementType = null, SourcePosition position = default) : base(position)
     {
         RunResult = [.. re];
