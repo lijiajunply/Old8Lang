@@ -8,6 +8,7 @@ using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -655,6 +656,21 @@ public partial class Instance : LangValueType
             }
         }
 
+        if (matchingMethod is null && local.GenericFunctions.TryGetValue(Id.IdName, out var genericFunc))
+        {
+            var argTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
+            var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
+            
+            if (typeArgs != null)
+            {
+                // 创建特化版本
+                matchingMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeArgs, local);
+                // 使用函数定义的 Ids 作为参数信息
+                funcParams = genericFunc.Ids;
+                matchedDelegateKey = $"{Id.IdName}${string.Join("_", typeArgs.Values.Select(t => t.Name))}";
+            }
+        }
+
         if (matchingMethod is null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
@@ -957,6 +973,22 @@ public partial class Instance : LangValueType
         if (globalFuncReturnType is not null)
         {
             return globalFuncReturnType;
+        }
+
+        // 尝试泛型类型推断
+        if (local.GenericFunctions.TryGetValue(Id.IdName, out var genericFunc))
+        {
+            // 注意：OutputType 不应该有副作用，也不应该修改 AST
+            // 我们只需要推断返回类型
+            var argTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
+            var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
+            
+            if (typeArgs != null)
+            {
+                // 使用 GenericTypeResolver 解析返回类型
+                var resolver = new GenericTypeResolver(typeArgs, local, local.Interpreter);
+                return resolver.ResolveReturnType(genericFunc.Id?.AssumptionType);
+            }
         }
 
         // 尝试使用函数名+参数类型查找（支持重载）

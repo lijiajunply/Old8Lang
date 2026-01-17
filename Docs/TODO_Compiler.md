@@ -63,4 +63,9 @@
     - 更新了 `CompilerVisitor` 以保持逻辑一致。
 
 ## 已知问题
-- 泛型函数调用的隐式类型推断（例如 `identity(1)`）在编译模式下会抛出错误。
+- [x] 泛型函数调用的隐式类型推断（例如 `identity(1)`）在编译模式下会抛出错误。
+  - **状态**：✅ 已修复。
+  - **详情**：
+    - 在 `GenericMethodSpecializer` 中实现了 `InferTypeArguments` 方法，支持从参数类型推断泛型参数。
+    - 更新了 `Instance.LoadIlValue` 以在找不到普通方法时尝试泛型推断和特化。
+    - 更新了 `Instance.OutputType` 以正确报告特化后的返回类型，解决了 IL 堆栈不平衡和类型不匹配的问题。

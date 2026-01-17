@@ -11,6 +11,161 @@ namespace Old8Lang.Compiler;
 public static class GenericMethodSpecializer
 {
     /// <summary>
+    /// 从调用参数类型推断泛型类型参数
+    /// </summary>
+    public static Dictionary<string, Type>? InferTypeArguments(
+        FuncLangValue funcValue,
+        List<Type> argTypes,
+        LocalManager local)
+    {
+        if (!funcValue.IsGeneric || funcValue.GenericParameters is null)
+        {
+            return null;
+        }
+
+        var typeArgMapping = new Dictionary<string, Type>();
+        var funcIds = funcValue.Ids ?? [];
+
+        // 检查参数数量（暂时只处理位置参数，忽略默认参数的复杂情况）
+        // 如果实际参数少于函数参数，可能是用了默认参数，这会增加推断难度
+        // 简单起见，我们只使用提供的参数进行推断
+        
+        for (int i = 0; i < argTypes.Count && i < funcIds.Count; i++)
+        {
+            var paramId = funcIds[i];
+            var paramTypeAnnotation = paramId.AssumptionType;
+            if (string.IsNullOrEmpty(paramTypeAnnotation)) continue;
+
+            var argType = argTypes[i];
+            MatchTypePattern(paramTypeAnnotation, argType, typeArgMapping);
+        }
+
+        // 检查是否所有泛型参数都已推断
+        foreach (var genericParam in funcValue.GenericParameters)
+        {
+            if (!typeArgMapping.ContainsKey(genericParam.Name))
+            {
+                // 无法推断所有类型参数
+                return null;
+            }
+        }
+
+        return typeArgMapping;
+    }
+
+    private static bool MatchTypePattern(string pattern, Type actualType, Dictionary<string, Type> mapping)
+    {
+        pattern = pattern.Trim();
+        
+        // 1. 单个泛型参数 "T"
+        if (IsGenericParamName(pattern))
+        {
+            if (mapping.TryGetValue(pattern, out var existingType))
+            {
+                return existingType == actualType;
+            }
+            mapping[pattern] = actualType;
+            return true;
+        }
+
+        // 2. 泛型类型 "List<T>"
+        var patternGenericStart = pattern.IndexOf('<');
+        if (patternGenericStart != -1 && actualType.IsGenericType)
+        {
+            var patternBaseName = pattern.Substring(0, patternGenericStart).Trim();
+            
+            // 检查基础类型名称是否匹配 (例如 "List" 匹配 "List`1")
+            // System.Type 的 Name 通常是 "List`1"
+            var actualTypeName = actualType.Name;
+            var backtickIndex = actualTypeName.IndexOf('`');
+            var actualBaseName = backtickIndex != -1 ? actualTypeName.Substring(0, backtickIndex) : actualTypeName;
+
+            if (patternBaseName != actualBaseName)
+            {
+                return false;
+            }
+
+            // 提取泛型参数
+            var patternGenericEnd = pattern.LastIndexOf('>');
+            if (patternGenericEnd == -1) return false;
+            
+            var patternGenericArgsStr = pattern.Substring(patternGenericStart + 1, patternGenericEnd - patternGenericStart - 1);
+            var patternArgs = SplitGenericArguments(patternGenericArgsStr);
+            
+            var actualArgs = actualType.GetGenericArguments();
+
+            if (patternArgs.Count != actualArgs.Length) return false;
+
+            for (int i = 0; i < patternArgs.Count; i++)
+            {
+                if (!MatchTypePattern(patternArgs[i], actualArgs[i], mapping))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // 3. 数组 "T[]" 或 "int[]"
+        if (pattern.EndsWith("[]") && actualType.IsArray)
+        {
+            var elementPattern = pattern.Substring(0, pattern.Length - 2);
+            var actualElementType = actualType.GetElementType();
+            return actualElementType != null && MatchTypePattern(elementPattern, actualElementType, mapping);
+        }
+
+        return false;
+    }
+
+    private static bool IsGenericParamName(string name)
+    {
+        // 简单判断：大写字母开头，不包含特殊字符
+        return !string.IsNullOrEmpty(name) && 
+               char.IsUpper(name[0]) && 
+               !name.Contains('<') && 
+               !name.Contains('[') &&
+               name != "List" && name != "Dictionary"; // 排除常见类型名
+    }
+
+    private static List<string> SplitGenericArguments(string args)
+    {
+        var result = new List<string>();
+        var current = "";
+        var depth = 0;
+
+        foreach (var ch in args)
+        {
+            if (ch == '<')
+            {
+                depth++;
+                current += ch;
+            }
+            else if (ch == '>')
+            {
+                depth--;
+                current += ch;
+            }
+            else if (ch == ',' && depth == 0)
+            {
+                result.Add(current.Trim());
+                current = "";
+            }
+            else
+            {
+                current += ch;
+            }
+        }
+
+        if (current.Length > 0)
+        {
+            result.Add(current.Trim());
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// 为泛型函数创建特化版本
     /// </summary>
     /// <param name="funcValue">泛型函数值</param>

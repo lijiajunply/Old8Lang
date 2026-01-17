@@ -445,6 +445,8 @@ public partial class SetStatement : OldStatement
     /// <exception cref="InvalidOperationError">当尝试对字符串进行索引赋值时抛出</exception>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 1. 处理元组解构赋值 (a, b) <- (1, 2)
+
         if (Id is not null && !string.IsNullOrEmpty(Id.IdName))
         {
             // 如果有类型注解,进行编译时类型检查
