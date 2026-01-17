@@ -244,10 +244,12 @@ public class StatementParser(
             // 检查是否是 P/Invoke/Python/JS 函数导入：extern "dll" func ...
             // 或者带调用约定的：extern "dll" cdecl/stdcall/winapi func ...
             // 或者函数块：extern "dll" { func1, func2 }
+            // 或者带调用约定的函数块：extern "dll" cdecl/stdcall/winapi { func1, func2 }
             if (peek1.Type == LangTokenType.String &&
                 (peek2.Type == LangTokenType.Func ||
                  peek2.Type == LangTokenType.LeftBrace ||
-                 (peek2.Type == LangTokenType.Identifier && peek3.Type == LangTokenType.Func)))
+                 (peek2.Type == LangTokenType.Identifier && peek3.Type == LangTokenType.Func) ||
+                 (peek2.Type == LangTokenType.Identifier && peek3.Type == LangTokenType.LeftBrace && IsCallingConvention(peek2.Value))))
             {
                 return ParseExternStatement();
             }
@@ -2187,6 +2189,15 @@ public class StatementParser(
         }
 
         return new ExternFunctionDeclaration(functionName, funcSignature, alias, callingConvention);
+    }
+
+    /// <summary>
+    /// 检查字符串是否是调用约定关键字
+    /// </summary>
+    private static bool IsCallingConvention(string value)
+    {
+        var lower = value.ToLower();
+        return lower is "cdecl" or "stdcall" or "winapi";
     }
 
     #endregion
