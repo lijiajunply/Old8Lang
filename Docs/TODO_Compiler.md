@@ -51,9 +51,16 @@
     - 修复了 `BlockStatement` 以使用 `CompilerVisitor`，确保泛型函数调用（`FuncRunStatement`）被正确处理。
   - **参考**：`GenericMethodSpecializer.cs`
 
-- [ ] **优化变量访问**
-  - **当前**：字典查找。
+- [x] **优化变量访问**
+  - **当前**：直接 IL 参数访问 (`Ldarg`/`Starg`)。
   - **目标**：数组索引或直接 IL 局部变量映射。
+  - **状态**：✅ 已完成。
+  - **详情**：
+    - 在 `LocalManager` 中添加了 `ArgumentIndices` 映射。
+    - 修改 `FuncInit` 不再将参数复制到局部变量，而是注册到 `ArgumentIndices`。
+    - 修改 `LangId` 和 `LangExpression` (`SetValueToIl`) 以优先检查 `ArgumentIndices` 并使用 `Ldarg`/`Starg` 指令。
+    - 修复了 `LangId` 中对 `this` 的处理。
+    - 更新了 `CompilerVisitor` 以保持逻辑一致。
 
 ## 已知问题
 - 泛型函数调用的隐式类型推断（例如 `identity(1)`）在编译模式下会抛出错误。

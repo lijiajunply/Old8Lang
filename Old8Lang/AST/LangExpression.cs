@@ -85,7 +85,30 @@ public abstract class LangExpression : IOldLangTree
             return;
         }
 
-        // 2. 局部变量赋值处理
+        // 2. 检查是否为函数参数赋值 (优化访问)
+        if (local.ArgumentIndices.TryGetValue(idName, out var argIndex))
+        {
+            // 验证类型兼容性 (参数类型通常是固定的)
+            var targetType = local.LocalVarTypes.TryGetValue(idName, out var type) ? type : typeof(object);
+            var argValueType = OutputType(local) ?? typeof(int);
+            
+            // 如果需要更新类型信息 (非严格模式下参数类型可能被视为动态?)
+            // 通常参数类型是固定的，所以这里主要是验证
+            if (!local.ValidateType(targetType, argValueType, Position))
+            {
+                 // ValidateType 会报告错误
+            }
+
+            // 加载值
+            LoadIlValue(ilGenerator, local);
+            
+            // 存储到参数
+            if (argIndex <= 255) ilGenerator.Emit(OpCodes.Starg_S, (byte)argIndex);
+            else ilGenerator.Emit(OpCodes.Starg, argIndex);
+            return;
+        }
+
+        // 3. 局部变量赋值处理
         // 先获取值的类型
         var valueType = OutputType(local) ?? typeof(int); // 默认类型为int
 

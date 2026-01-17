@@ -14,18 +14,8 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitLangId(LangId node)
     {
-        // 迁移自 LangId.LoadIlValue()
-        var value = local.GetLocalVar(node.IdName);
-        if (value is null)
-        {
-            // 检查是否是函数参数
-            // 函数参数是通过Ldarg指令访问的，而不是Ldloc指令
-            ilGenerator.Emit(OpCodes.Ldarg_0); // 假设只有一个参数，索引为0
-        }
-        else
-        {
-            ilGenerator.Emit(OpCodes.Ldloc, value);
-        }
+        // 委托给 LangId.LoadIlValue，确保逻辑一致
+        node.LoadIlValue(ilGenerator, local);
         return null;
     }
 

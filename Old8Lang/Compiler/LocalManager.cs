@@ -56,6 +56,12 @@ public class LocalManager
     public readonly Dictionary<string, List<LangId>> FuncParameters = [];
 
     /// <summary>
+    /// 当前函数参数索引映射（用于直接参数访问优化）
+    /// 键为参数名，值为参数索引
+    /// </summary>
+    public readonly Dictionary<string, int> ArgumentIndices = [];
+
+    /// <summary>
     /// 泛型函数特化方法缓存
     /// 键为 "函数名$类型参数1_类型参数2"，值为特化后的MethodInfo
     /// </summary>
@@ -470,6 +476,12 @@ public class LocalManager
         foreach (var (name, @params) in FuncParameters)
         {
             cloned.FuncParameters[name] = @params;
+        }
+
+        // 克隆参数索引映射
+        foreach (var (name, index) in ArgumentIndices)
+        {
+            cloned.ArgumentIndices[name] = index;
         }
 
         // 克隆全局静态类

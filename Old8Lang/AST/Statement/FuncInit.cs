@@ -196,20 +196,15 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             local.GenericFunctions[methodName] = FuncLangValue;
         }
 
-        // 清空funcLocal，重新添加参数（这次使用真正的LocalBuilder）
+        // 清空funcLocal
         funcLocal.LocalVar.Clear();
 
-        // 处理参数
+        // 处理参数：注册到 ArgumentIndices，不生成 IL 副本
         for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
         {
             var id = FuncLangValue.Ids[i];
-            // 使用实际的参数类型声明局部变量
-            var paramType = parameterTypes[i];
-            var localVar = methodIl.DeclareLocal(paramType);
-            funcLocal.AddLocalVar(id.IdName, localVar);
-            // 加载参数并存储到局部变量
-            methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar);
+            // 记录参数索引
+            funcLocal.ArgumentIndices[id.IdName] = i;
         }
 
         // 为支持defer，使用try-finally包装函数体

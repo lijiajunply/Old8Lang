@@ -1,0 +1,10 @@
+func test(a:int, b:int) -> int {
+    PrintLine("a: " + a.ToStr())
+    PrintLine("b: " + b.ToStr())
+    a <- a + 1
+    b <- b * 2
+    return a + b
+}
+
+result <- test(10, 20)
+PrintLine("Result: " + result.ToStr())

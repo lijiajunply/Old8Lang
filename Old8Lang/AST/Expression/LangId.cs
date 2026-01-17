@@ -170,20 +170,34 @@ public partial class LangId(
         }
 
         var value = local.GetLocalVar(IdName);
-        if (value is null)
-        {
-            // 检查是否是函数参数
-            // 函数参数是通过Ldarg指令访问的，而不是Ldloc指令
-            // 我们需要查找当前函数的参数列表，找到匹配的参数索引
-            // 注意：这是一个简化的实现，假设参数名称与函数定义中的名称完全匹配
-            // 在实际实现中，应该使用更可靠的方式来映射参数名称到索引
-            // 对于当前简单的测试用例，这种方式应该足够了
-            ilGenerator.Emit(OpCodes.Ldarg_0); // 假设只有一个参数，索引为0
-        }
-        else
+        if (value is not null)
         {
             ilGenerator.Emit(OpCodes.Ldloc, value);
+            return;
         }
+
+        // 检查是否是 this
+        if (IdName == "this")
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            return;
+        }
+
+        // 检查是否是函数参数 (优化访问)
+        if (local.ArgumentIndices.TryGetValue(IdName, out var argIndex))
+        {
+            if (argIndex == 0) ilGenerator.Emit(OpCodes.Ldarg_0);
+            else if (argIndex == 1) ilGenerator.Emit(OpCodes.Ldarg_1);
+            else if (argIndex == 2) ilGenerator.Emit(OpCodes.Ldarg_2);
+            else if (argIndex == 3) ilGenerator.Emit(OpCodes.Ldarg_3);
+            else if (argIndex <= 255) ilGenerator.Emit(OpCodes.Ldarg_S, (byte)argIndex);
+            else ilGenerator.Emit(OpCodes.Ldarg, argIndex);
+            return;
+        }
+
+        // 如果找不到，且没有其他匹配，抛出错误
+        // 之前的实现盲目使用 Ldarg_0，这可能掩盖了错误
+        local.ReportError($"变量 '{IdName}' 未声明", Position);
     }
 
     /// <summary>
