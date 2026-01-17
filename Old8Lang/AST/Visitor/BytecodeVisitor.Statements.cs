@@ -548,7 +548,7 @@ public partial class BytecodeVisitor
     public Instruction? VisitFuncInit(FuncInit node)
     {
         // 编译函数定义
-        var funcValue = node.FuncLangValue;
+        var funcValue = node.FuncValue;
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
 
         // 检查是否是泛型函数
@@ -1621,7 +1621,7 @@ public partial class BytecodeVisitor
             string? signatureStr = null;
             if (funcDecl.FunctionSignature != null)
             {
-                var sig = funcDecl.FunctionSignature.FuncLangValue;
+                var sig = funcDecl.FunctionSignature.FuncValue;
                 var paramTypes = sig.Ids?.Select(p => p.AssumptionType ?? "object").ToList() ?? new List<string>();
                 var returnType = sig.Id?.AssumptionType ?? "void";
                 signatureStr = $"{string.Join(",", paramTypes)}:{returnType}";

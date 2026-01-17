@@ -47,7 +47,7 @@ public class NativeDllProvider : IExternProvider
 
                 // 将委托包装为 Old8Lang 函数
                 // 注意: 需要使用 NativeDelegateFuncLangValue 来保存委托实例
-                var funcValue = new NativeDelegateFuncLangValue(targetName, del, funcDecl.FunctionSignature?.FuncLangValue);
+                var funcValue = new NativeDelegateFuncLangValue(targetName, del, funcDecl.FunctionSignature?.FuncValue);
                 manager.AddClassAndFunc(funcValue);
             }
             catch (DllNotFoundException ex)
@@ -83,7 +83,7 @@ public class NativeDllProvider : IExternProvider
             var pinvokeMethod = CreatePInvokeMethod(source, funcDecl, callingConv);
 
             // 构建参数类型签名（与 FunctionCallExpression 中的格式一致）
-            var signature = funcDecl.FunctionSignature?.FuncLangValue;
+            var signature = funcDecl.FunctionSignature?.FuncValue;
             var paramTypes = signature?.Ids?
                 .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
                 .ToArray() ?? [];
@@ -111,7 +111,7 @@ public class NativeDllProvider : IExternProvider
             throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
-        var signature = funcDecl.FunctionSignature.FuncLangValue;
+        var signature = funcDecl.FunctionSignature.FuncValue;
         var paramTypes = signature.Ids?
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray() ?? [];
@@ -163,7 +163,7 @@ public class NativeDllProvider : IExternProvider
             throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
-        var signature = funcDecl.FunctionSignature.FuncLangValue;
+        var signature = funcDecl.FunctionSignature.FuncValue;
         var paramTypes = signature.Ids?
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray() ?? [];

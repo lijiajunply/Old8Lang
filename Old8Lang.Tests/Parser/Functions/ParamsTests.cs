@@ -26,10 +26,10 @@ func sum(params args:array<int>) -> int {
         Assert.Equal(1, ast.Total);
 
         var funcInit = Assert.IsType<FuncInit>(ast.GetImportStatement(0));
-        Assert.NotNull(funcInit.FuncLangValue.Ids);
-        Assert.Single(funcInit.FuncLangValue.Ids);
+        Assert.NotNull(funcInit.FuncValue.Ids);
+        Assert.Single(funcInit.FuncValue.Ids);
 
-        var paramsParam = funcInit.FuncLangValue.Ids[0];
+        var paramsParam = funcInit.FuncValue.Ids[0];
         Assert.Equal("args", paramsParam.IdName);
         Assert.True(paramsParam.IsParams);
         Assert.Equal("array<int>", paramsParam.AssumptionType);
@@ -53,17 +53,17 @@ func format(fmt:string, params args:array<object>) -> string {
         Assert.Equal(1, ast.Total);
 
         var funcInit = Assert.IsType<FuncInit>(ast.GetImportStatement(0));
-        Assert.NotNull(funcInit.FuncLangValue.Ids);
-        Assert.Equal(2, funcInit.FuncLangValue.Ids.Count);
+        Assert.NotNull(funcInit.FuncValue.Ids);
+        Assert.Equal(2, funcInit.FuncValue.Ids.Count);
 
         // 第一个参数是普通参数
-        var fmtParam = funcInit.FuncLangValue.Ids[0];
+        var fmtParam = funcInit.FuncValue.Ids[0];
         Assert.Equal("fmt", fmtParam.IdName);
         Assert.False(fmtParam.IsParams);
         Assert.Equal("string", fmtParam.AssumptionType);
 
         // 第二个参数是 params 参数
-        var argsParam = funcInit.FuncLangValue.Ids[1];
+        var argsParam = funcInit.FuncValue.Ids[1];
         Assert.Equal("args", argsParam.IdName);
         Assert.True(argsParam.IsParams);
         Assert.Equal("array<object>", argsParam.AssumptionType);
@@ -91,12 +91,12 @@ func printDoubles(params values:array<double>) -> void {
         Assert.Equal(2, ast.Total);
 
         var funcInit1 = Assert.IsType<FuncInit>(ast.GetImportStatement(0));
-        var paramsParam1 = funcInit1.FuncLangValue.Ids![0];
+        var paramsParam1 = funcInit1.FuncValue.Ids![0];
         Assert.True(paramsParam1.IsParams);
         Assert.Equal("array<string>", paramsParam1.AssumptionType);
 
         var funcInit2 = Assert.IsType<FuncInit>(ast.GetImportStatement(1));
-        var paramsParam2 = funcInit2.FuncLangValue.Ids![0];
+        var paramsParam2 = funcInit2.FuncValue.Ids![0];
         Assert.True(paramsParam2.IsParams);
         Assert.Equal("array<double>", paramsParam2.AssumptionType);
     }

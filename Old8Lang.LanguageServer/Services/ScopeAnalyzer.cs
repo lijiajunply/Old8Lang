@@ -134,7 +134,7 @@ public class ScopeAnalyzer
     /// </summary>
     private void FindLocalSymbolsInFunction(FuncInit funcInit)
     {
-        var funcValue = funcInit.FuncLangValue;
+        var funcValue = funcInit.FuncValue;
 
         // 粗略检查：如果光标行号大于函数开始行号，可能在函数内
         var cursorLine = _position.Line + 1;

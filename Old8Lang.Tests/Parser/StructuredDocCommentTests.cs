@@ -36,10 +36,10 @@ func add(a:int, b:int) -> int {
         // 获取函数定义
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
         // 验证文档注释
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.NotNull(docComment);
         Assert.Equal("Calculate the sum of two numbers", docComment.Summary);
 
@@ -85,9 +85,9 @@ func divide(numerator:double, denominator:double) -> double {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.NotNull(docComment);
         Assert.Equal("Divide two numbers", docComment.Summary);
 
@@ -130,9 +130,9 @@ func concat(str1:string, str2:string) -> string {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.NotNull(docComment);
         Assert.Equal("Concatenate two strings", docComment.Summary);
 
@@ -174,9 +174,9 @@ func calculateCircleArea(radius:double) -> double {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.NotNull(docComment);
         Assert.Equal("计算圆的面积", docComment.Summary);
 
@@ -287,10 +287,10 @@ func add(a:int, b:int) -> int {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
         // 验证没有文档注释时返回 null
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.Null(docComment);
     }
 
@@ -315,9 +315,9 @@ func add(a:int, b:int) -> int {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit.FuncLangValue);
+        Assert.NotNull(funcInit.FuncValue);
 
-        var docComment = funcInit.FuncLangValue.DocComment;
+        var docComment = funcInit.FuncValue.DocComment;
         Assert.NotNull(docComment);
 
         // 默认风格应该将所有内容作为摘要

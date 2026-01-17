@@ -23,62 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/ScopeAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/ScopeAnalyzer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/BytecodeFileTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/BytecodeFileTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Basic/PreprocessorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Basic/PreprocessorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ErrorCases/PreprocessorErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ErrorCases/PreprocessorErrorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/EscapeSequenceHelperTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/EscapeSequenceHelperTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/StringValueFuncStaticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/StringValueFuncStaticTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMClassDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMClassDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMInterfaceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMInterfaceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMMixinTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMMixinTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMSuperExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/VMSuperExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMArrayTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMArrayTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMDictionaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMDictionaryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMListTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Collections/VMListTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/CompileHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/CompileHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMThreadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMThreadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMArithmeticExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMArithmeticExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMLogicalExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMLogicalExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMMatchExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMMatchExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMAsyncTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMAsyncTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMNamedArgumentsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMNamedArgumentsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMParamsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMParamsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericClassAdvancedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericClassAdvancedTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericClassTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericClassTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericEdgeCaseTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericEdgeCaseTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericFunctionAdvancedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericFunctionAdvancedTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericFunctionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericFunctionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericIntegrationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqAdvancedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqAdvancedTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqBasicTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Linq/VMLinqBasicTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Modules/VMImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Modules/VMImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMDeferTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMDeferTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMSelectTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMSelectTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Strings/VMStringOperationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Async.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Exceptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Exceptions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Generators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Generators.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/ExceptionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/ExceptionHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/TaskFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/TaskFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ThreadFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ThreadFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -628,7 +573,7 @@
       <workItem from="1768485078721" duration="21629000" />
       <workItem from="1768543641677" duration="16866000" />
       <workItem from="1768576580719" duration="7043000" />
-      <workItem from="1768599044369" duration="3149000" />
+      <workItem from="1768599044369" duration="7403000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -973,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="699" />
+    <option name="localTasksCounter" value="703" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1000,10 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(completion): 添加新的代码片段支持&#10;&#10;- 添加 interface 接口定义代码片段&#10;- 添加 enum 枚举定义代码片段&#10;- 添加 match 模式匹配表达式代码片段&#10;- 添加 defer 延迟执行语句代码片段&#10;- 添加 using 资源管理语句代码片段&#10;- 添加 select channel多路选择语句代码片段&#10;- 修复测试中字符串包含检查的断言逻辑" />
-    <MESSAGE value="feat(completion): 添加操作符补全功能&#10;&#10;- 在补全处理器中添加操作符补全支持&#10;- 实现联合类型操作符 | 的补全&#10;- 实现交叉类型操作符 &amp; 的补全&#10;- 实现赋值操作符 &lt;- 的补全&#10;- 实现箭头操作符 -&gt; 的补全&#10;- 为操作符设置较低的补全优先级&#10;- 移除测试类中多余的私有字段声明&#10;- 修复测试方法中的输出写入器引用" />
-    <MESSAGE value="test(completion): 更新成员链补全功能测试用例&#10;&#10;- 修复了成员访问位置定位的断言逻辑&#10;- 调整了测试代码中的占位符标记以匹配实际补全位置&#10;- 修正了嵌套对象属性访问的补全验证方式&#10;- 更新了字符串字面量的表示方法以保持一致性&#10;- 修改了多个测试用例的位置参数以确保正确的补全触发点" />
-    <MESSAGE value="refactor(tests): 重构表达式补全处理器测试&#10;&#10;- 移除私有字段 _output 并直接使用构造函数参数&#10;- 更新所有测试方法中的输出写入调用以使用 output 参数&#10;- 修改 MemberAccess 测试中的代码示例以匹配新的语法格式&#10;- 调整位置参数以匹配更新后的代码结构&#10;- 更新 ChainedMemberAccess 测试中的类实例化语法&#10;- 修正所有测试用例中的断言和验证逻辑" />
     <MESSAGE value="fix(completion): 修复异步函数补全项标签和测试&#10;&#10;- 将 asyncfunc 标签更正为 &quot;async func&quot; 以符合语法规范&#10;- 更新测试用例以验证正确的 async 关键字和 async func 代码片段&#10;- 移除私有字段 _output 并直接使用构造函数注入的 output 参数&#10;- 修正断言逻辑确保代码片段插入文本匹配预期值&#10;- 统一所有测试文件中的输出参数使用方式" />
     <MESSAGE value="feat(parser): 添加泛型继承语法支持并完善代码补全功能&#10;&#10;- 在 ClassParser 中实现父类泛型参数解析功能，支持 extends List&lt;T&gt; 语法&#10;- 限制类成员补全仅显示公共成员，过滤私有成员的外部访问&#10;- 更新测试用例修复输出参数引用和代码示例格式&#10;- 在 SymbolTableBuilder 中添加泛型实例化表达式类型推断支持&#10;- 将无法推断的变量类型默认设为 &quot;any&quot; 而非 &quot;var&quot;&#10;- 添加泛型继承和成员访问的测试用例验证功能正确性" />
     <MESSAGE value="docs(grammar): 更新 select 语句文档并添加编译器和虚拟机待办清单&#10;&#10;- 修正 select 语句模式支持标记为 [✅ | ✅ | ✅]&#10;- 删除 select 语句编译模式限制说明，所有模式均完全支持&#10;- 新增编译器模式完成 TODO 清单文件，包含当前完成度和任务规划&#10;- 新增虚拟机模式完成 TODO 清单文件，包含实施策略和阶段计划&#10;- 清理 IDE 配置文件中的变更列表记录和历史提交消息" />
@@ -1025,7 +966,11 @@
     <MESSAGE value="feat(vm): 添加虚拟机对全局函数的支持&#10;&#10;- 在 VirtualMachine.Instructions.cs 中添加全局函数查找和执行逻辑&#10;- 实现通过 GlobalFunctionRegistry 调用全局函数的功能&#10;- 修改 DictionaryLangValue 初始化逻辑&#10;- 优化 ArrayExtensions 中的 ToList 方法实现&#10;- 注释掉测试文件中的 ToObj 函数测试代码" />
     <MESSAGE value="feat(async): 实现异步编程支持和状态机生成&#10;&#10;- 添加AsyncStateMachineGenerator用于编译async函数为状态机结构&#10;- 实现AwaitExpression.GenerateAsyncAwait方法生成await表达式的IL代码&#10;- 在DotOperatorILHelper中实现Task.WhenAll/WhenAny/FromResult等API的IL生成&#10;- 修复Operation.OutputType方法确保比较和算术运算符正确推断bool/double类型&#10;- 更新AsyncFuncInit和AsyncFuncLangValue使用动态方法和状态机启动代码&#10;- 添加变量提升机制将局部变量作为状态机字段进行生命周期管理&#10;- 实现完整的IAsyncStateMachine接口集成和状态转换逻辑&#10;- 改进AST节点识别await表达式位置支持if/while/for等复杂语句结构" />
     <MESSAGE value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
+    <MESSAGE value="chore(cleanup): 移除未使用的命名空间导入&#10;&#10;- 从多个文件中移除了未使用的 using 语句&#10;- 清理了测试文件中的冗余引用&#10;- 优化了代码的依赖关系管理" />
+    <MESSAGE value="feat(parser): 添加函数装饰器支持功能&#10;&#10;- 在 AST 中添加 FunctionDecorator 类用于表示函数装饰器&#10;- 修改 FuncInit 和 AsyncFuncInit 类以支持装饰器的应用逻辑&#10;- 在 FuncLangValue 和 AsyncFuncLangValue 中添加装饰器列表属性&#10;- 更新函数解析器以支持装饰器语法解析 (@decorator)&#10;- 在词法分析器中添加 @ 符号的识别和 At token 类型&#10;- 实现装饰器应用逻辑，支持带参数和无参数的装饰器&#10;- 添加多个测试文件验证装饰器的基本功能、编译器模式和语法解析" />
+    <MESSAGE value="feat(parser): 添加函数装饰器支持&#10;&#10;- 实现 Python 风格的 @decorator 语法，支持无参数和带参数装饰器&#10;- 在词法分析器中添加 At 符号 token 类型识别&#10;- 扩展 AST 结构，为函数添加 Decorators 属性存储装饰器列表&#10;- 实现装饰器解析逻辑，支持命名参数和多装饰器堆叠应用&#10;- 在函数初始化时自动应用装饰器，支持异步函数装饰器&#10;- 添加完整的装饰器测试用例和语法文档说明" />
+    <MESSAGE value="feat(parser): 添加装饰器语法解析和执行支持&#10;&#10;- 实现装饰器基础语法解析功能&#10;- 支持带参数和不带参数的装饰器&#10;- 支持多个装饰器堆叠应用&#10;- 实现装饰器在解释器模式下的执行逻辑&#10;- 实现装饰器在编译器模式下的编译逻辑&#10;- 添加装饰器语法边界情况测试用例&#10;- 支持装饰器参数为表达式、列表和字典类型&#10;- 实现装饰器错误处理和异常情况测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加装饰器语法解析和执行支持&#10;&#10;- 实现装饰器基础语法解析功能&#10;- 支持带参数和不带参数的装饰器&#10;- 支持多个装饰器堆叠应用&#10;- 实现装饰器在解释器模式下的执行逻辑&#10;- 实现装饰器在编译器模式下的编译逻辑&#10;- 添加装饰器语法边界情况测试用例&#10;- 支持装饰器参数为表达式、列表和字典类型&#10;- 实现装饰器错误处理和异常情况测试" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

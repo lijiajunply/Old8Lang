@@ -90,7 +90,7 @@ public partial class NativeStatement : OldStatement
         ClassName = className;
         MethodName = methodName;
         NativeName = nativeName;
-        FuncValue = a.FuncLangValue;
+        FuncValue = a.FuncValue;
         ImportAll = false;
         MethodList = null;
     }

@@ -357,7 +357,7 @@ public partial class ExternStatement : OldStatement
         if (func.FunctionSignature is null)
             return "()";
 
-        var funcValue = func.FunctionSignature.FuncLangValue;
+        var funcValue = func.FunctionSignature.FuncValue;
         var parameters = funcValue.Ids is not null
             ? string.Join(", ", funcValue.Ids.Select(p =>
             {

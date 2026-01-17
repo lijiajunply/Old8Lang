@@ -81,7 +81,7 @@ public class TypeInferenceEngine
     {
         if (tree is FuncInit funcInit)
         {
-            var funcName = funcInit.FuncLangValue.Id?.IdName ?? "anonymous";
+            var funcName = funcInit.FuncValue.Id?.IdName ?? "anonymous";
             FunctionRegistry[funcName] = funcInit;
 
             if (Config.DebugOutput)
@@ -132,7 +132,7 @@ public class TypeInferenceEngine
 
             case FuncInit funcInit:
                 // 在函数体内递归分析
-                AnalyzeNode(funcInit.FuncLangValue);
+                AnalyzeNode(funcInit.FuncValue);
 
                 break;
         }
@@ -224,10 +224,10 @@ public class TypeInferenceEngine
         // 查找函数并更新参数类型
         if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (funcInit.FuncLangValue.Ids is not null &&
-                paramIndex < funcInit.FuncLangValue.Ids.Count)
+            if (funcInit.FuncValue.Ids is not null &&
+                paramIndex < funcInit.FuncValue.Ids.Count)
             {
-                var param = funcInit.FuncLangValue.Ids[paramIndex];
+                var param = funcInit.FuncValue.Ids[paramIndex];
 
                 // 如果参数没有显式类型注解，应用推断类型
                 if (string.IsNullOrEmpty(param.AssumptionType))
@@ -255,7 +255,7 @@ public class TypeInferenceEngine
 
         if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (string.IsNullOrEmpty(funcInit.FuncLangValue.Id?.AssumptionType))
+            if (string.IsNullOrEmpty(funcInit.FuncValue.Id?.AssumptionType))
             {
                 // 存储推断的返回类型
                 var returnTypeKey = $"{funcName}_return_type";
@@ -286,7 +286,7 @@ public class TypeInferenceEngine
             Collector.CollectFromFunction(funcInit);
 
             // 分析函数体
-            AnalyzeNode(funcInit.FuncLangValue);
+            AnalyzeNode(funcInit.FuncValue);
 
             // 求解约束
             bool success = Solver.Solve();
@@ -302,7 +302,7 @@ public class TypeInferenceEngine
         {
             if (Config.DebugOutput)
             {
-                Console.WriteLine($"函数 {funcInit.FuncLangValue.Id?.IdName} 类型推断失败: {ex.Message}");
+                Console.WriteLine($"函数 {funcInit.FuncValue.Id?.IdName} 类型推断失败: {ex.Message}");
             }
 
             return Config.FallbackToDynamic;
@@ -327,9 +327,9 @@ public class TypeInferenceEngine
             return false;
 
         // 检查是否有参数缺少类型注解
-        if (funcInit.FuncLangValue.Ids is not null)
+        if (funcInit.FuncValue.Ids is not null)
         {
-            foreach (var param in funcInit.FuncLangValue.Ids)
+            foreach (var param in funcInit.FuncValue.Ids)
             {
                 if (string.IsNullOrEmpty(param.AssumptionType) && param.DefaultValue is null)
                 {
@@ -339,7 +339,7 @@ public class TypeInferenceEngine
         }
 
         // 检查是否缺少返回类型
-        if (string.IsNullOrEmpty(funcInit.FuncLangValue.Id?.AssumptionType))
+        if (string.IsNullOrEmpty(funcInit.FuncValue.Id?.AssumptionType))
         {
             return true;
         }

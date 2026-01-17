@@ -34,7 +34,7 @@ func test() {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(1, blockStatement.Total);
         Assert.IsType<DeferStatement>(blockStatement[0]);
     }
@@ -64,7 +64,7 @@ func test() {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(1, blockStatement.Count);
         var deferStmt = blockStatement[0] as DeferStatement;
         Assert.NotNull(deferStmt);
@@ -95,7 +95,7 @@ func test() {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(3, blockStatement.Count);
         Assert.All(blockStatement.OtherStatements, stmt => Assert.IsType<DeferStatement>(stmt));
     }
@@ -128,7 +128,7 @@ func test() {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(3, blockStatement.Count);
         Assert.IsType<DeferStatement>(blockStatement[1]);
     }
@@ -157,7 +157,7 @@ func test() {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(3, blockStatement.Count);
         Assert.IsType<DeferStatement>(blockStatement[2]);
     }
@@ -189,7 +189,7 @@ func test() -> int {
         Assert.True(result.Total > 0);
         var funcInit = result.ImportStatements[0] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(2, blockStatement.Count);
         Assert.IsType<DeferStatement>(blockStatement[0]);
         Assert.IsType<ReturnStatement>(blockStatement[1]);
@@ -273,7 +273,7 @@ func test() {
         Assert.Equal(2, result.Total);
         var funcInit = result.ImportStatements[1] as FuncInit;
         Assert.NotNull(funcInit);
-        var blockStatement = funcInit.FuncLangValue.BlockStatement;
+        var blockStatement = funcInit.FuncValue.BlockStatement;
         Assert.Equal(1, blockStatement.Count);
         Assert.IsType<DeferStatement>(blockStatement[0]);
     }

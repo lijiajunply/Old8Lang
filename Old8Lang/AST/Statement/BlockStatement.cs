@@ -396,10 +396,10 @@ public partial class BlockStatement : OldStatement
                 // 直接使用 ClassFieldSetStatement 中的 ClassMemberId
                 return (id: classFieldSet.Id, Expr: classFieldSet.Value);
             case FuncInit init:
-                if (init.FuncLangValue.Id is null) return (null, null);
+                if (init.FuncValue.Id is null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
-                var memberId2 = init.FuncLangValue.Id as ClassMemberId ?? new ClassMemberId(init.FuncLangValue.Id);
-                return (memberId2, Expr: init.FuncLangValue);
+                var memberId2 = init.FuncValue.Id as ClassMemberId ?? new ClassMemberId(init.FuncValue.Id);
+                return (memberId2, Expr: init.FuncValue);
             case ClassFuncInitStatement classFuncInit:
                 // 直接使用 ClassFuncInitStatement 中的 ClassMemberId
                 return (id: classFuncInit.Id, Expr: classFuncInit.FuncValue);
