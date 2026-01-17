@@ -151,12 +151,12 @@ public class PerformanceDataTests
         Assert.Equal(0, stats.Gen1Collections);
         Assert.Equal(0, stats.Gen2Collections);
         Assert.Equal(0, stats.TotalGcCollections);
-        Assert.Equal(0.0, stats.ManagedMemoryMB);
-        Assert.Equal(0.0, stats.UnmanagedMemoryMB);
+        Assert.Equal(0.0, stats.ManagedMemoryMb);
+        Assert.Equal(0.0, stats.UnmanagedMemoryMb);
         Assert.Equal(0, stats.WorkingSetBytes);
         Assert.Equal(0, stats.PrivateMemoryBytes);
-        Assert.Equal(0.0, stats.WorkingSetMB);
-        Assert.Equal(0.0, stats.PrivateMemoryMB);
+        Assert.Equal(0.0, stats.WorkingSetMb);
+        Assert.Equal(0.0, stats.PrivateMemoryMb);
     }
 
     [Fact]

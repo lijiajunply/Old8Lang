@@ -85,12 +85,12 @@ public class PerformanceAnalyzer
     /// <summary>
     /// 高内存使用阈值（MB）
     /// </summary>
-    public double HighMemoryUsageThresholdMB { get; set; } = 100.0;
+    public double HighMemoryUsageThresholdMb { get; set; } = 100.0;
 
     /// <summary>
     /// 频繁GC阈值（每分钟次数）
     /// </summary>
-    public int FrequentGCThresholdPerMinute { get; set; } = 10;
+    public int FrequentGcThresholdPerMinute { get; set; } = 10;
 
     /// <summary>
     /// 过多函数调用阈值
@@ -137,19 +137,15 @@ public class PerformanceAnalyzer
     /// </summary>
     private List<PerformanceBottleneck> AnalyzeExecutionTimeBottlenecks(ProfilingSession session)
     {
-        var bottlenecks = new List<PerformanceBottleneck>();
-
         // 找出执行时间最长的函数
         var slowFunctions = session.FunctionStats.Values
             .Where(f => f.AverageExecutionTimeMs > HighExecutionTimeThresholdMs)
             .OrderByDescending(f => f.AverageExecutionTimeMs)
             .ToList();
 
-        foreach (var func in slowFunctions)
-        {
-            var severity = CalculateSeverity(func.AverageExecutionTimeMs, HighExecutionTimeThresholdMs);
-
-            bottlenecks.Add(new PerformanceBottleneck
+        return (from func in slowFunctions
+            let severity = CalculateSeverity(func.AverageExecutionTimeMs, HighExecutionTimeThresholdMs)
+            select new PerformanceBottleneck
             {
                 Type = BottleneckType.HighExecutionTime,
                 Description = $"函数 '{func.FunctionName}' 平均执行时间过长: {func.AverageExecutionTimeMs:F2}ms",
@@ -164,10 +160,7 @@ public class PerformanceAnalyzer
                     ["max_time_ms"] = func.MaxExecutionTimeMs,
                     ["min_time_ms"] = func.MinExecutionTimeMs
                 }
-            });
-        }
-
-        return bottlenecks;
+            }).ToList();
     }
 
     /// <summary>
@@ -181,27 +174,25 @@ public class PerformanceAnalyzer
             return bottlenecks;
 
         // 找出内存使用峰值
-        var maxMemoryUsage = session.MemoryHistory.Max(m => m.ManagedMemoryMB);
-        var avgMemoryUsage = session.MemoryHistory.Average(m => m.ManagedMemoryMB);
+        var maxMemoryUsage = session.MemoryHistory.Max(m => m.ManagedMemoryMb);
+        var avgMemoryUsage = session.MemoryHistory.Average(m => m.ManagedMemoryMb);
 
-        if (maxMemoryUsage > HighMemoryUsageThresholdMB)
+        if (!(maxMemoryUsage > HighMemoryUsageThresholdMb)) return bottlenecks;
+        var severity = CalculateSeverity(maxMemoryUsage, HighMemoryUsageThresholdMb);
+
+        bottlenecks.Add(new PerformanceBottleneck
         {
-            var severity = CalculateSeverity(maxMemoryUsage, HighMemoryUsageThresholdMB);
-
-            bottlenecks.Add(new PerformanceBottleneck
+            Type = BottleneckType.HighMemoryUsage,
+            Description = $"内存使用过高: 峰值 {maxMemoryUsage:F2}MB，平均 {avgMemoryUsage:F2}MB",
+            Severity = severity,
+            Suggestion = "考虑优化内存分配模式，使用对象池，减少大对象分配，或及时释放不再使用的对象",
+            Metrics = new Dictionary<string, double>
             {
-                Type = BottleneckType.HighMemoryUsage,
-                Description = $"内存使用过高: 峰值 {maxMemoryUsage:F2}MB，平均 {avgMemoryUsage:F2}MB",
-                Severity = severity,
-                Suggestion = "考虑优化内存分配模式，使用对象池，减少大对象分配，或及时释放不再使用的对象",
-                Metrics = new Dictionary<string, double>
-                {
-                    ["peak_memory_mb"] = maxMemoryUsage,
-                    ["avg_memory_mb"] = avgMemoryUsage,
-                    ["memory_growth_rate"] = CalculateMemoryGrowthRate(session)
-                }
-            });
-        }
+                ["peak_memory_mb"] = maxMemoryUsage,
+                ["avg_memory_mb"] = avgMemoryUsage,
+                ["memory_growth_rate"] = CalculateMemoryGrowthRate(session)
+            }
+        });
 
         return bottlenecks;
     }
@@ -217,39 +208,37 @@ public class PerformanceAnalyzer
             return bottlenecks;
 
         // 计算GC频率
-        var firstGC = session.MemoryHistory.First();
-        var lastGC = session.MemoryHistory.Last();
-        var durationMinutes = (lastGC.Timestamp - firstGC.Timestamp).TotalMinutes;
+        var firstGc = session.MemoryHistory.First();
+        var lastGc = session.MemoryHistory.Last();
+        var durationMinutes = (lastGc.Timestamp - firstGc.Timestamp).TotalMinutes;
 
         if (durationMinutes <= 0)
             return bottlenecks;
 
-        var gen0GCPerMinute = (lastGC.Gen0Collections - firstGC.Gen0Collections) / durationMinutes;
-        var gen1GCPerMinute = (lastGC.Gen1Collections - firstGC.Gen1Collections) / durationMinutes;
-        var gen2GCPerMinute = (lastGC.Gen2Collections - firstGC.Gen2Collections) / durationMinutes;
+        var gen0GcPerMinute = (lastGc.Gen0Collections - firstGc.Gen0Collections) / durationMinutes;
+        var gen1GcPerMinute = (lastGc.Gen1Collections - firstGc.Gen1Collections) / durationMinutes;
+        var gen2GcPerMinute = (lastGc.Gen2Collections - firstGc.Gen2Collections) / durationMinutes;
 
-        if (gen0GCPerMinute > FrequentGCThresholdPerMinute)
+        if (!(gen0GcPerMinute > FrequentGcThresholdPerMinute)) return bottlenecks;
+        var severity = CalculateSeverity(gen0GcPerMinute, FrequentGcThresholdPerMinute);
+
+        bottlenecks.Add(new PerformanceBottleneck
         {
-            var severity = CalculateSeverity(gen0GCPerMinute, FrequentGCThresholdPerMinute);
-
-            bottlenecks.Add(new PerformanceBottleneck
+            Type = BottleneckType.FrequentGarbageCollection,
+            Description =
+                $"垃圾回收过于频繁: Gen0 {gen0GcPerMinute:F1}次/分钟, Gen1 {gen1GcPerMinute:F1}次/分钟, Gen2 {gen2GcPerMinute:F1}次/分钟",
+            Severity = severity,
+            Suggestion = "减少临时对象分配，使用对象池，预分配内存，或考虑使用结构体替代类",
+            Metrics = new Dictionary<string, double>
             {
-                Type = BottleneckType.FrequentGarbageCollection,
-                Description =
-                    $"垃圾回收过于频繁: Gen0 {gen0GCPerMinute:F1}次/分钟, Gen1 {gen1GCPerMinute:F1}次/分钟, Gen2 {gen2GCPerMinute:F1}次/分钟",
-                Severity = severity,
-                Suggestion = "减少临时对象分配，使用对象池，预分配内存，或考虑使用结构体替代类",
-                Metrics = new Dictionary<string, double>
-                {
-                    ["gen0_gc_per_minute"] = gen0GCPerMinute,
-                    ["gen1_gc_per_minute"] = gen1GCPerMinute,
-                    ["gen2_gc_per_minute"] = gen2GCPerMinute,
-                    ["total_gen0_gc"] = lastGC.Gen0Collections,
-                    ["total_gen1_gc"] = lastGC.Gen1Collections,
-                    ["total_gen2_gc"] = lastGC.Gen2Collections
-                }
-            });
-        }
+                ["gen0_gc_per_minute"] = gen0GcPerMinute,
+                ["gen1_gc_per_minute"] = gen1GcPerMinute,
+                ["gen2_gc_per_minute"] = gen2GcPerMinute,
+                ["total_gen0_gc"] = lastGc.Gen0Collections,
+                ["total_gen1_gc"] = lastGc.Gen1Collections,
+                ["total_gen2_gc"] = lastGc.Gen2Collections
+            }
+        });
 
         return bottlenecks;
     }
@@ -259,36 +248,23 @@ public class PerformanceAnalyzer
     /// </summary>
     private List<PerformanceBottleneck> AnalyzeFunctionCallBottlenecks(ProfilingSession session)
     {
-        var bottlenecks = new List<PerformanceBottleneck>();
-
         // 找出调用次数过多的函数
         var frequentFunctions = session.FunctionStats.Values
             .Where(f => f.CallCount > ExcessiveFunctionCallThreshold)
             .OrderByDescending(f => f.CallCount)
             .ToList();
 
-        foreach (var func in frequentFunctions)
-        {
-            var severity = CalculateSeverity(func.CallCount, ExcessiveFunctionCallThreshold);
-
-            bottlenecks.Add(new PerformanceBottleneck
+        return (from func in frequentFunctions
+            let severity = CalculateSeverity(func.CallCount, ExcessiveFunctionCallThreshold)
+            select new PerformanceBottleneck
             {
                 Type = BottleneckType.ExcessiveFunctionCalls,
                 Description = $"函数 '{func.FunctionName}' 调用次数过多: {func.CallCount:N0} 次",
                 FunctionName = func.FunctionName,
                 Severity = severity,
                 Suggestion = "考虑使用缓存、循环优化、减少递归调用，或将频繁调用的代码内联",
-                Metrics = new Dictionary<string, double>
-                {
-                    ["call_count"] = func.CallCount,
-                    ["total_time_ms"] = func.TotalExecutionTimeMs,
-                    ["avg_time_ms"] = func.AverageExecutionTimeMs,
-                    ["calls_per_second"] = func.CallCount / (session.DurationMs / 1000.0)
-                }
-            });
-        }
-
-        return bottlenecks;
+                Metrics = new Dictionary<string, double> { ["call_count"] = func.CallCount, ["total_time_ms"] = func.TotalExecutionTimeMs, ["avg_time_ms"] = func.AverageExecutionTimeMs, ["calls_per_second"] = func.CallCount / (session.DurationMs / 1000.0) }
+            }).ToList();
     }
 
     /// <summary>
@@ -296,8 +272,6 @@ public class PerformanceAnalyzer
     /// </summary>
     private List<PerformanceBottleneck> AnalyzeExecutionTimeStability(ProfilingSession session)
     {
-        var bottlenecks = new List<PerformanceBottleneck>();
-
         // 找出执行时间不稳定的函数
         var unstableFunctions = session.FunctionStats.Values
             .Where(f => f.ExecutionTimes.Count > 5 &&
@@ -305,12 +279,10 @@ public class PerformanceAnalyzer
             .OrderByDescending(CalculateCoefficicientOfVariation)
             .ToList();
 
-        foreach (var func in unstableFunctions)
-        {
-            var cv = CalculateCoefficicientOfVariation(func);
-            var severity = CalculateSeverity(cv, UnstableExecutionTimeThreshold);
-
-            bottlenecks.Add(new PerformanceBottleneck
+        return (from func in unstableFunctions
+            let cv = CalculateCoefficicientOfVariation(func)
+            let severity = CalculateSeverity(cv, UnstableExecutionTimeThreshold)
+            select new PerformanceBottleneck
             {
                 Type = BottleneckType.UnstableExecutionTime,
                 Description = $"函数 '{func.FunctionName}' 执行时间不稳定: 变异系数 {cv:F3}",
@@ -325,10 +297,7 @@ public class PerformanceAnalyzer
                     ["median_time_ms"] = func.GetMedian(),
                     ["execution_count"] = func.ExecutionTimes.Count
                 }
-            });
-        }
-
-        return bottlenecks;
+            }).ToList();
     }
 
     /// <summary>
@@ -375,7 +344,7 @@ public class PerformanceAnalyzer
         if (durationMinutes <= 0)
             return 0;
 
-        var memoryGrowth = last.ManagedMemoryMB - first.ManagedMemoryMB;
+        var memoryGrowth = last.ManagedMemoryMb - first.ManagedMemoryMb;
         return memoryGrowth / durationMinutes; // MB per minute
     }
 

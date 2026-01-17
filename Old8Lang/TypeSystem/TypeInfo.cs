@@ -123,7 +123,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
     public ITypeInfo? BaseType { get; } = baseType;
     public List<string> InterfaceNames { get; } = interfaceNames ?? [];
 
-    private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
+    private readonly ConcurrentDictionary<string, LangValueType> _cachedMembers = [];
 
     public bool IsCompatibleWith(ITypeInfo other)
     {
@@ -150,7 +150,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
     public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager)
     {
         // 如果有缓存，直接返回
-        if (CachedMembers.Count > 0) return CachedMembers;
+        if (_cachedMembers.Count > 0) return _cachedMembers;
 
         var members = new ConcurrentDictionary<string, LangValueType>();
 
@@ -178,10 +178,10 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
         // 缓存结果
         foreach (var member in members)
         {
-            CachedMembers.TryAdd(member.Key, member.Value);
+            _cachedMembers.TryAdd(member.Key, member.Value);
         }
 
-        return CachedMembers;
+        return _cachedMembers;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
     /// </summary>
     public void ClearCache()
     {
-        CachedMembers.Clear();
+        _cachedMembers.Clear();
     }
 }
 
@@ -215,7 +215,7 @@ public class GenericTypeInfo : ITypeInfo
     /// </summary>
     public bool IsGenericInstance => TypeArguments is not null;
 
-    private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
+    private readonly ConcurrentDictionary<string, LangValueType> _cachedMembers = [];
 
     /// <summary>
     /// 构造泛型定义
@@ -369,11 +369,11 @@ public class GenericTypeInfo : ITypeInfo
 
     public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager)
     {
-        if (CachedMembers.Count > 0) return CachedMembers;
+        if (_cachedMembers.Count > 0) return _cachedMembers;
 
         // 泛型类型的成员获取需要考虑类型参数替换
         // 这部分将在后续集成 TypeTemplate 时实现
-        return CachedMembers;
+        return _cachedMembers;
     }
 
     /// <summary>
@@ -401,20 +401,20 @@ public class GenericTypeInfo : ITypeInfo
 /// </summary>
 public class TypeFamily
 {
-    private readonly ConcurrentDictionary<string, ITypeInfo> Types = [];
-    private readonly ConcurrentDictionary<string, List<ITypeInfo>> InheritanceRelations = [];
+    private readonly ConcurrentDictionary<string, ITypeInfo> _types = [];
+    private readonly ConcurrentDictionary<string, List<ITypeInfo>> _inheritanceRelations = [];
 
     /// <summary>
     /// 注册类型
     /// </summary>
     public void RegisterType(ITypeInfo typeInfo)
     {
-        Types.TryAdd(typeInfo.Name, typeInfo);
+        _types.TryAdd(typeInfo.Name, typeInfo);
 
         // 记录继承关系
         if (typeInfo is ClassTypeInfo { BaseType: not null } classType)
         {
-            InheritanceRelations.AddOrUpdate(
+            _inheritanceRelations.AddOrUpdate(
                 classType.BaseType.Name,
                 [classType],
                 (_, existing) =>
@@ -430,7 +430,7 @@ public class TypeFamily
     /// </summary>
     public ITypeInfo? GetType(string typeName)
     {
-        return Types.GetValueOrDefault(typeName);
+        return _types.GetValueOrDefault(typeName);
     }
 
     /// <summary>
@@ -451,7 +451,7 @@ public class TypeFamily
     /// </summary>
     public List<ITypeInfo> GetSubTypes(string typeName)
     {
-        return InheritanceRelations.TryGetValue(typeName, out var subTypes) ? subTypes : [];
+        return _inheritanceRelations.TryGetValue(typeName, out var subTypes) ? subTypes : [];
     }
 
     /// <summary>

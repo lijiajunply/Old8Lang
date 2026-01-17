@@ -8,7 +8,6 @@ using AST.Statement;
 public class ParserContext
 {
     private readonly List<LangToken> _tokens;
-    private string[]? _cachedSourceLines; // 缓存分割后的源代码行
     private TokenIndexCache? _tokenIndexCache; // Token 索引缓存
 
     /// <summary>
@@ -44,13 +43,14 @@ public class ParserContext
     {
         get
         {
-            if (_cachedSourceLines is null && !string.IsNullOrEmpty(SourceCode))
+            if (field is null && !string.IsNullOrEmpty(SourceCode))
             {
                 // 使用 '\n' 分割并保留空行，确保行号正确对应
                 // 注意：Split by '\n' 会保留 '\r'，所以需要在使用时 Trim
-                _cachedSourceLines = SourceCode.Split('\n');
+                field = SourceCode.Split('\n');
             }
-            return _cachedSourceLines ?? [];
+
+            return field ?? [];
         }
     }
 
@@ -111,31 +111,5 @@ public class ParserContext
         }
 
         return _tokenIndexCache;
-    }
-
-    /// <summary>
-    /// 在指定范围内查找下一个指定类型的 Token（使用缓存优化）
-    /// </summary>
-    /// <param name="type">Token 类型</param>
-    /// <param name="startIndex">开始索引（默认从当前位置）</param>
-    /// <param name="endIndex">结束索引（-1 表示到结尾）</param>
-    /// <returns>Token 索引，未找到返回 -1</returns>
-    public int FindNextToken(LangTokenType type, int? startIndex = null, int endIndex = -1)
-    {
-        int actualStartIndex = startIndex ?? CurrentIndex;
-        return GetTokenIndexCache().FindNextToken(type, actualStartIndex, endIndex);
-    }
-
-    /// <summary>
-    /// 统计指定范围内指定类型的 Token 数量（使用缓存优化）
-    /// </summary>
-    /// <param name="type">Token 类型</param>
-    /// <param name="startIndex">开始索引（默认从当前位置）</param>
-    /// <param name="endIndex">结束索引（-1 表示到结尾）</param>
-    /// <returns>Token 数量</returns>
-    public int CountTokens(LangTokenType type, int? startIndex = null, int endIndex = -1)
-    {
-        int actualStartIndex = startIndex ?? CurrentIndex;
-        return GetTokenIndexCache().CountTokens(type, actualStartIndex, endIndex);
     }
 }

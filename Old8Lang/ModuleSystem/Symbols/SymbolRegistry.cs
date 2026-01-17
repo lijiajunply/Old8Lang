@@ -119,16 +119,9 @@ public class SymbolRegistry
     /// <returns>是否存在</returns>
     public bool SymbolExists(VariateManager manager, string symbolName, bool searchGlobal = false)
     {
-        if (searchGlobal)
-        {
-            // 搜索所有作用域
-            return manager.Scopes.Any(scope => scope.ContainsKey(symbolName));
-        }
-        else
-        {
-            // 只搜索当前作用域
-            return manager.Scopes[^1].ContainsKey(symbolName);
-        }
+        return searchGlobal
+            ? manager.Scopes.Any(scope => scope.ContainsKey(symbolName)) // 搜索所有作用域
+            : manager.Scopes[^1].ContainsKey(symbolName); // 只搜索当前作用域
     }
 
     /// <summary>

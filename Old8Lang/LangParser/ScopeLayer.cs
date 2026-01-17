@@ -35,20 +35,20 @@ public class ScopeLayer
     /// <summary>
     /// 基础作用域（只读共享）
     /// </summary>
-    private readonly Dictionary<string, LangValueType>? BaseScope;
+    private readonly Dictionary<string, LangValueType>? _baseScope;
 
     /// <summary>
     /// 差异层（写入变量）
     /// </summary>
-    private Dictionary<string, LangValueType>? DeltaScope;
+    private Dictionary<string, LangValueType>? _deltaScope;
 
     /// <summary>
     /// 创建一个独立的作用域层（无基础作用域）
     /// </summary>
     public ScopeLayer()
     {
-        BaseScope = null;
-        DeltaScope = new Dictionary<string, LangValueType>();
+        _baseScope = null;
+        _deltaScope = new Dictionary<string, LangValueType>();
     }
 
     /// <summary>
@@ -57,8 +57,8 @@ public class ScopeLayer
     /// <param name="baseScope">基础作用域（只读共享）</param>
     public ScopeLayer(Dictionary<string, LangValueType> baseScope)
     {
-        BaseScope = baseScope;
-        DeltaScope = null; // 延迟创建，只在首次写入时创建
+        _baseScope = baseScope;
+        _deltaScope = null; // 延迟创建，只在首次写入时创建
     }
 
     /// <summary>
@@ -70,13 +70,13 @@ public class ScopeLayer
     public bool TryGetValue(string name, out LangValueType? value)
     {
         // 优先从差异层查找
-        if (DeltaScope?.TryGetValue(name, out value) == true)
+        if (_deltaScope?.TryGetValue(name, out value) == true)
         {
             return true;
         }
 
         // 再从基础作用域查找
-        if (BaseScope?.TryGetValue(name, out value) == true)
+        if (_baseScope?.TryGetValue(name, out value) == true)
         {
             return true;
         }
@@ -93,10 +93,10 @@ public class ScopeLayer
     public void SetValue(string name, LangValueType value)
     {
         // 延迟创建差异层
-        DeltaScope ??= new Dictionary<string, LangValueType>();
+        _deltaScope ??= new Dictionary<string, LangValueType>();
 
         // 写入差异层（不影响基础作用域）
-        DeltaScope[name] = value;
+        _deltaScope[name] = value;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class ScopeLayer
     /// <returns>是否存在</returns>
     public bool ContainsKey(string name)
     {
-        return DeltaScope?.ContainsKey(name) == true || BaseScope?.ContainsKey(name) == true;
+        return _deltaScope?.ContainsKey(name) == true || _baseScope?.ContainsKey(name) == true;
     }
 
     /// <summary>
@@ -118,18 +118,18 @@ public class ScopeLayer
         var result = new Dictionary<string, LangValueType>();
 
         // 先复制基础作用域
-        if (BaseScope is not null)
+        if (_baseScope is not null)
         {
-            foreach (var (key, value) in BaseScope)
+            foreach (var (key, value) in _baseScope)
             {
                 result[key] = value;
             }
         }
 
         // 再应用差异层（覆盖同名变量）
-        if (DeltaScope is not null)
+        if (_deltaScope is not null)
         {
-            foreach (var (key, value) in DeltaScope)
+            foreach (var (key, value) in _deltaScope)
             {
                 result[key] = value;
             }
@@ -143,18 +143,18 @@ public class ScopeLayer
     /// </summary>
     public void ClearDelta()
     {
-        DeltaScope?.Clear();
+        _deltaScope?.Clear();
     }
 
     /// <summary>
     /// 获取差异层的大小（用于性能监控）
     /// </summary>
-    public int DeltaSize => DeltaScope?.Count ?? 0;
+    public int DeltaSize => _deltaScope?.Count ?? 0;
 
     /// <summary>
     /// 是否有写入操作（差异层是否非空）
     /// </summary>
-    public bool HasWrites => DeltaScope is not null && DeltaScope.Count > 0;
+    public bool HasWrites => _deltaScope is not null && _deltaScope.Count > 0;
 
     /// <summary>
     /// 扁平化：将差异层合并到基础作用域，返回新的独立字典

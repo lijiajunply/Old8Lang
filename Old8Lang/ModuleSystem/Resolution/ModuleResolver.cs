@@ -233,8 +233,8 @@ public class PackageInfo
 /// </summary>
 public class ModuleResolver
 {
-    private readonly PathResolver PathResolver = new();
-    private readonly VersionResolver VersionResolver = new();
+    private readonly PathResolver _pathResolver = new();
+    private readonly VersionResolver _versionResolver = new();
 
     /// <summary>
     /// 解析模块
@@ -256,11 +256,11 @@ public class ModuleResolver
             StepNumber = stepNumber,
             Description = "检查是否为网络路径 (http:// 或 https://)",
             SearchPath = moduleName,
-            Result = PathResolver.IsUrl(moduleName) ? "是网络路径" : "不是网络路径",
-            Success = PathResolver.IsUrl(moduleName)
+            Result = _pathResolver.IsUrl(moduleName) ? "是网络路径" : "不是网络路径",
+            Success = _pathResolver.IsUrl(moduleName)
         });
 
-        if (PathResolver.IsUrl(moduleName))
+        if (_pathResolver.IsUrl(moduleName))
         {
             result.ModuleType = ModuleType.NetworkModule;
             result.ResolvedPath = moduleName;
@@ -324,7 +324,7 @@ public class ModuleResolver
         {
             stepNumber++;
             // 解析版本
-            VersionResolver.ParsePackageSpec(moduleName, out var packageName, out var versionSpec);
+            _versionResolver.ParsePackageSpec(moduleName, out var packageName, out var versionSpec);
 
             var packageSearchPaths = GetPackageSearchPaths(currentFilePath);
             result.ResolutionAttempts.Add(new ResolutionAttempt
@@ -498,7 +498,7 @@ public class ModuleResolver
                 if (versionedDirs.Length > 0)
                 {
                     // 选择最佳匹配版本
-                    var bestMatch = VersionResolver.SelectBestVersion(
+                    var bestMatch = _versionResolver.SelectBestVersion(
                         versionedDirs.Select(Path.GetFileName).Where(x => x is not null).Cast<string>(),
                         versionSpec
                     );
@@ -586,10 +586,10 @@ public class ModuleResolver
     private string? ResolveLocalFile(string moduleName, string? currentFilePath, List<string> attemptedPaths)
     {
         // 添加扩展名（如果需要）
-        var fileName = PathResolver.EnsureExtension(moduleName);
+        var fileName = _pathResolver.EnsureExtension(moduleName);
 
         // 解析路径
-        var filePath = PathResolver.ResolvePath(fileName, currentFilePath);
+        var filePath = _pathResolver.ResolvePath(fileName, currentFilePath);
 
         attemptedPaths.Add(filePath);
 

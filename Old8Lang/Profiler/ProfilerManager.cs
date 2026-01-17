@@ -6,9 +6,9 @@ namespace Old8Lang.Profiler;
 public class ProfilerManager
 {
     private ProfilingSession? _currentSession;
-    private PerformanceCollector? Collector;
-    private PerformanceAnalyzer Analyzer = new();
-    private ReportGenerator ReportGenerator = new();
+    private PerformanceCollector? _collector;
+    private readonly PerformanceAnalyzer _analyzer = new();
+    private readonly ReportGenerator _reportGenerator = new();
     private readonly Lock _lockObject = new();
 
     /// <summary>
@@ -46,8 +46,8 @@ public class ProfilerManager
                 ExecutionMode = executionMode
             };
 
-            Collector = new PerformanceCollector(_currentSession);
-            Collector.StartProfiling();
+            _collector = new PerformanceCollector(_currentSession);
+            _collector.StartProfiling();
 
             return _currentSession.SessionId;
         }
@@ -57,20 +57,20 @@ public class ProfilerManager
     /// 停止性能分析
     /// </summary>
     /// <returns>性能摘要</returns>
-    public PerformanceSummary? StopProfiling()
+    public PerformanceSummary StopProfiling()
     {
         lock (_lockObject)
         {
-            if (!IsProfiling || Collector is null || _currentSession is null)
+            if (!IsProfiling || _collector is null || _currentSession is null)
             {
                 throw new InvalidOperationException("当前没有正在进行的性能分析会话");
             }
 
-            Collector.StopProfiling();
-            var summary = Analyzer.GenerateSummary(_currentSession);
+            _collector.StopProfiling();
+            var summary = _analyzer.GenerateSummary(_currentSession);
 
             _currentSession = null;
-            Collector = null;
+            _collector = null;
 
             return summary;
         }
@@ -84,9 +84,9 @@ public class ProfilerManager
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionStart(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordFunctionStart(functionName, sourceFile, lineNumber);
+            _collector.RecordFunctionStart(functionName, sourceFile, lineNumber);
         }
     }
 
@@ -98,9 +98,9 @@ public class ProfilerManager
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionEnd(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordFunctionEnd(functionName, sourceFile, lineNumber);
+            _collector.RecordFunctionEnd(functionName, sourceFile, lineNumber);
         }
     }
 
@@ -114,9 +114,9 @@ public class ProfilerManager
     public void RecordStatementExecution(string statementType, double executionTimeMs, string? sourceFile = null,
         int? lineNumber = null)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordStatementExecution(statementType, executionTimeMs, sourceFile, lineNumber);
+            _collector.RecordStatementExecution(statementType, executionTimeMs, sourceFile, lineNumber);
         }
     }
 
@@ -126,9 +126,9 @@ public class ProfilerManager
     /// <param name="parseTimeMs">解析时间（毫秒）</param>
     public void RecordParsingTime(double parseTimeMs)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordParsingTime(parseTimeMs);
+            _collector.RecordParsingTime(parseTimeMs);
         }
     }
 
@@ -138,9 +138,9 @@ public class ProfilerManager
     /// <param name="compilationTimeMs">编译时间（毫秒）</param>
     public void RecordCompilationTime(double compilationTimeMs)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordCompilationTime(compilationTimeMs);
+            _collector.RecordCompilationTime(compilationTimeMs);
         }
     }
 
@@ -153,9 +153,9 @@ public class ProfilerManager
     /// <param name="tags">标签</param>
     public void RecordCustomData(string name, double value, string unit = "", Dictionary<string, string>? tags = null)
     {
-        if (Collector is not null)
+        if (_collector is not null)
         {
-            Collector.RecordCustomData(name, value, unit, tags);
+            _collector.RecordCustomData(name, value, unit, tags);
         }
     }
 
@@ -171,8 +171,8 @@ public class ProfilerManager
             throw new InvalidOperationException("当前没有性能分析会话");
         }
 
-        var summary = Analyzer.GenerateSummary(_currentSession);
-        return ReportGenerator.GenerateReport(summary, format);
+        var summary = _analyzer.GenerateSummary(_currentSession);
+        return _reportGenerator.GenerateReport(summary, format);
     }
 
     /// <summary>
@@ -187,8 +187,8 @@ public class ProfilerManager
             throw new InvalidOperationException("当前没有性能分析会话");
         }
 
-        var summary = Analyzer.GenerateSummary(_currentSession);
-        await ReportGenerator.SaveReportAsync(summary, filePath, format);
+        var summary = _analyzer.GenerateSummary(_currentSession);
+        await _reportGenerator.SaveReportAsync(summary, filePath, format);
     }
 
     /// <summary>
@@ -215,9 +215,9 @@ public class ProfilerManager
                 status["memorySnapshotCount"] = _currentSession.MemoryHistory.Count;
             }
 
-            if (Collector is not null)
+            if (_collector is not null)
             {
-                var collectorStats = Collector.GetCollectorStats();
+                var collectorStats = _collector.GetCollectorStats();
                 foreach (var kvp in collectorStats)
                 {
                     status[$"collector_{kvp.Key}"] = kvp.Value;
@@ -235,11 +235,11 @@ public class ProfilerManager
     {
         lock (_lockObject)
         {
-            if (Collector is not null)
+            if (_collector is not null)
             {
                 try
                 {
-                    Collector.StopProfiling();
+                    _collector.StopProfiling();
                 }
                 catch
                 {
@@ -248,7 +248,7 @@ public class ProfilerManager
             }
 
             _currentSession = null;
-            Collector = null;
+            _collector = null;
         }
     }
 }

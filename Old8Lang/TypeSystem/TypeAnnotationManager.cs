@@ -13,19 +13,19 @@ namespace Old8Lang.TypeSystem;
 /// </summary>
 public class TypeAnnotationManager
 {
-    private readonly TypeFamily TypeFamily = new();
-    private readonly VariateManager GlobalManager;
+    private readonly TypeFamily _typeFamily = new();
+    private readonly VariateManager _globalManager;
 
     public TypeAnnotationManager(VariateManager globalManager)
     {
-        GlobalManager = globalManager;
+        _globalManager = globalManager;
         InitializeBasicTypes();
     }
 
     /// <summary>
     /// 获取全局变量管理器
     /// </summary>
-    public VariateManager GetGlobalManager() => GlobalManager;
+    public VariateManager GetGlobalManager() => _globalManager;
 
     /// <summary>
     /// 初始化基本类型
@@ -33,22 +33,22 @@ public class TypeAnnotationManager
     private void InitializeBasicTypes()
     {
         // 注册基本类型
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("int"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("double"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("string"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("bool"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("char"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("void"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("any"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("null"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("function"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("int"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("double"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("string"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("bool"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("char"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("void"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("any"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("null"));
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("function"));
 
         // 注册泛型集合类型
         RegisterGenericCollectionTypes();
     }
 
     /// <summary>
-    /// 注册泛型集合类型（list<T>, array<T>, dict<K,V>）
+    /// 注册泛型集合类型（list&lt;T>, array&lt;T>, dict&lt;K,V>）
     /// </summary>
     private void RegisterGenericCollectionTypes()
     {
@@ -57,21 +57,21 @@ public class TypeAnnotationManager
             name: "list",
             typeParameters: ["T"]
         );
-        TypeFamily.RegisterType(listType);
+        _typeFamily.RegisterType(listType);
 
         // array<T>: 单类型参数
         var arrayType = new GenericTypeInfo(
             name: "array",
             typeParameters: ["T"]
         );
-        TypeFamily.RegisterType(arrayType);
+        _typeFamily.RegisterType(arrayType);
 
         // dict<K, V>: 两个类型参数（键和值）
         var dictType = new GenericTypeInfo(
             name: "dict",
             typeParameters: ["K", "V"]
         );
-        TypeFamily.RegisterType(dictType);
+        _typeFamily.RegisterType(dictType);
     }
 
     /// <summary>
@@ -82,17 +82,17 @@ public class TypeAnnotationManager
         ITypeInfo? baseType = null;
         if (!string.IsNullOrEmpty(baseClassName))
         {
-            baseType = TypeFamily.GetType(baseClassName);
+            baseType = _typeFamily.GetType(baseClassName);
             if (baseType is null)
             {
                 // 如果父类还没有注册，先创建一个占位符
                 baseType = new ClassTypeInfo(baseClassName);
-                TypeFamily.RegisterType(baseType);
+                _typeFamily.RegisterType(baseType);
             }
         }
 
         var classType = new ClassTypeInfo(className, baseType, interfaceNames);
-        TypeFamily.RegisterType(classType);
+        _typeFamily.RegisterType(classType);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public class TypeAnnotationManager
     public void RegisterInterfaceType(string interfaceName, List<string>? parentInterfaceNames = null)
     {
         var interfaceType = new InterfaceTypeInfo(interfaceName, parentInterfaceNames);
-        TypeFamily.RegisterType(interfaceType);
+        _typeFamily.RegisterType(interfaceType);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public class TypeAnnotationManager
     public void RegisterEnumType(string enumName, List<string> members)
     {
         var enumType = new EnumTypeInfo(enumName, members);
-        TypeFamily.RegisterType(enumType);
+        _typeFamily.RegisterType(enumType);
     }
 
     /// <summary>
@@ -233,6 +233,7 @@ public class TypeAnnotationManager
             else if (text[i] == separator && depth == 0)
                 return i;
         }
+
         return -1;
     }
 
@@ -283,6 +284,7 @@ public class TypeAnnotationManager
             if (depth == 0)
                 return i;
         }
+
         return -1;
     }
 
@@ -305,9 +307,9 @@ public class TypeAnnotationManager
     /// - A 兼容于 A|B（任一成员类型可以赋值给联合类型）
     ///
     /// 交叉类型兼容性规则：
-    /// - A&B 兼容于 A（交叉类型满足所有成员，可以赋值给任一成员）
-    /// - A&B 兼容于 B
-    /// - A 不兼容于 A&B（单个类型不满足所有约束）
+    /// - A & B 兼容于 A（交叉类型满足所有成员，可以赋值给任一成员）
+    /// - A & B 兼容于 B
+    /// - A 不兼容于 A & B（单个类型不满足所有约束）
     /// </summary>
     private bool ValidateParsedTypeCompatibility(ParsedTypeAnnotation expected, ParsedTypeAnnotation actual)
     {
@@ -351,13 +353,13 @@ public class TypeAnnotationManager
 
         // 处理普通类型：先尝试使用 TypeFamily 进行兼容性检查
         // 如果类型未注册（GetType 返回 null），则使用名称匹配作为后备方案
-        var expectedTypeInfo = TypeFamily.GetType(expected.BaseType);
-        var actualTypeInfo = TypeFamily.GetType(actual.BaseType);
+        var expectedTypeInfo = _typeFamily.GetType(expected.BaseType);
+        var actualTypeInfo = _typeFamily.GetType(actual.BaseType);
 
         if (expectedTypeInfo is not null && actualTypeInfo is not null)
         {
             // 两个类型都已注册，使用 TypeFamily 的兼容性检查
-            return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
+            return _typeFamily.IsCompatible(actual.BaseType, expected.BaseType);
         }
 
         // 如果有类型未注册,使用名称匹配作为后备方案
@@ -447,7 +449,7 @@ public class TypeAnnotationManager
     /// </summary>
     public bool IsPolymorphicType(string typeName)
     {
-        return TypeFamily.IsPolymorphicType(typeName);
+        return _typeFamily.IsPolymorphicType(typeName);
     }
 
     /// <summary>
@@ -455,7 +457,7 @@ public class TypeAnnotationManager
     /// </summary>
     public List<string> GetSubTypes(string typeName)
     {
-        return TypeFamily.GetSubTypes(typeName)
+        return _typeFamily.GetSubTypes(typeName)
             .Select(t => t.Name)
             .ToList();
     }
@@ -463,7 +465,7 @@ public class TypeAnnotationManager
     /// <summary>
     /// 获取类型族信息
     /// </summary>
-    public TypeFamily GetTypeFamily() => TypeFamily;
+    public TypeFamily GetTypeFamily() => _typeFamily;
 
     /// <summary>
     /// 检查类型是否兼容（支持多态）
@@ -479,12 +481,12 @@ public class TypeAnnotationManager
 
         // 尝试使用 TypeFamily 的基本兼容性检查
         // 如果 TypeFamily 中未注册某个类型（如 tuple），则回退到基本类型兼容性检查
-        var sourceType = TypeFamily.GetType(sourceTypeName);
-        var targetType = TypeFamily.GetType(targetTypeName);
+        var sourceType = _typeFamily.GetType(sourceTypeName);
+        var targetType = _typeFamily.GetType(targetTypeName);
 
         if (sourceType is not null && targetType is not null)
         {
-            return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
+            return _typeFamily.IsCompatible(sourceTypeName, targetTypeName);
         }
 
         // 回退到基本类型兼容性检查（用于处理内置类型如 tuple、array 等）
@@ -496,99 +498,11 @@ public class TypeAnnotationManager
     /// </summary>
     public ConcurrentDictionary<string, LangValueType> GetTypeMembers(string typeName, VariateManager manager)
     {
-        var typeInfo = TypeFamily.GetType(typeName);
+        var typeInfo = _typeFamily.GetType(typeName);
         if (typeInfo is null)
             return new ConcurrentDictionary<string, LangValueType>();
 
         return typeInfo.GetMembers(manager);
-    }
-
-    /// <summary>
-    /// 注册泛型类型定义
-    /// </summary>
-    public void RegisterGenericType(
-        string name,
-        List<string> typeParameters,
-        Dictionary<string, List<ITypeInfo>>? constraints = null,
-        string? baseClassName = null)
-    {
-        ITypeInfo? baseType = null;
-        if (!string.IsNullOrEmpty(baseClassName))
-        {
-            baseType = TypeFamily.GetType(baseClassName);
-        }
-
-        var genericType = new GenericTypeInfo(name, typeParameters, constraints, baseType);
-        TypeFamily.RegisterType(genericType);
-    }
-
-    /// <summary>
-    /// 实例化泛型类型
-    /// </summary>
-    public GenericTypeInfo? InstantiateGenericType(string name, Dictionary<string, ITypeInfo> typeArguments)
-    {
-        var genericDefinition = TypeFamily.GetType(name);
-        if (genericDefinition is not GenericTypeInfo genericType)
-        {
-            return null;
-        }
-
-        return genericType.Instantiate(typeArguments);
-    }
-
-    /// <summary>
-    /// 将 ParsedTypeAnnotation 转换为 ITypeInfo
-    /// </summary>
-    public ITypeInfo? ResolveTypeAnnotation(ParsedTypeAnnotation annotation)
-    {
-        // 处理泛型类型
-        if (annotation.IsGeneric && annotation.GenericArguments is not null)
-        {
-            var baseTypeInfo = TypeFamily.GetType(annotation.BaseType);
-            if (baseTypeInfo is GenericTypeInfo genericType)
-            {
-                // 解析泛型参数
-                var typeArgs = new Dictionary<string, ITypeInfo>();
-                for (int i = 0; i < annotation.GenericArguments.Count && i < genericType.TypeParameters.Count; i++)
-                {
-                    var argAnnotation = annotation.GenericArguments[i];
-                    var argType = ResolveTypeAnnotation(argAnnotation);
-                    if (argType is not null)
-                    {
-                        typeArgs[genericType.TypeParameters[i]] = argType;
-                    }
-                }
-
-                return genericType.Instantiate(typeArgs);
-            }
-        }
-
-        // 处理简单类型
-        return TypeFamily.GetType(annotation.BaseType);
-    }
-
-    /// <summary>
-    /// 验证泛型约束
-    /// </summary>
-    public bool ValidateGenericConstraints(GenericTypeInfo genericType, Dictionary<string, ITypeInfo> typeArguments)
-    {
-        if (genericType.Constraints is null) return true;
-
-        foreach (var (paramName, constraintTypes) in genericType.Constraints)
-        {
-            if (typeArguments.TryGetValue(paramName, out var actualType))
-            {
-                foreach (var constraintType in constraintTypes)
-                {
-                    if (!actualType.IsCompatibleWith(constraintType))
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 }
 
@@ -606,24 +520,12 @@ public class ParsedTypeAnnotation
     /// </summary>
     public List<ParsedTypeAnnotation>? GenericArguments { get; set; }
 
-    /// <summary>
-    /// 旧的类型参数（为保持兼容性保留，但推荐使用 GenericArguments）
-    /// </summary>
-    [Obsolete("请使用 GenericArguments 代替")]
-    public List<string>? TypeParameters { get; set; }
-
-    /// <summary>
-    /// 类型约束（用于泛型定义时的约束）
-    /// 例如: T: IComparable → Constraints = [ParsedTypeAnnotation{BaseType="IComparable"}]
-    /// </summary>
-    public List<ParsedTypeAnnotation>? Constraints { get; set; }
-
-    public bool IsNullable { get; set; } = false;
+    public bool IsNullable { get; set; }
 
     /// <summary>
     /// 是否为泛型类型
     /// </summary>
-    public bool IsGeneric => GenericArguments is { Count: > 0 } || TypeParameters is { Count: > 0 };
+    public bool IsGeneric => GenericArguments is { Count: > 0 };
 
     /// <summary>
     /// 是否为联合类型
@@ -655,19 +557,10 @@ public class ParsedTypeAnnotation
             return BaseType + (IsNullable ? "?" : "");
         }
 
-        if (GenericArguments is not null)
+        if (GenericArguments is null) return BaseType + (IsNullable ? "?" : "");
         {
             var args = string.Join(", ", GenericArguments.Select(arg => arg.GetFullName()));
             return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");
         }
-
-        // 兼容旧格式
-        if (TypeParameters is not null)
-        {
-            var args = string.Join(", ", TypeParameters);
-            return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");
-        }
-
-        return BaseType + (IsNullable ? "?" : "");
     }
 }

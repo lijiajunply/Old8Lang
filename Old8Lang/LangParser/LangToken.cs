@@ -7,36 +7,16 @@ namespace Old8Lang.LangParser;
 /// <summary>
 /// 表示Old8Lang语言的词法标记
 /// </summary>
-/// <param name="value">标记的字符串值</param>
-/// <param name="type">标记的类型</param>
-/// <param name="line">标记在源代码中的行号</param>
-/// <param name="column">标记在源代码中的列号</param>
+/// <param name="Value">标记的字符串值</param>
+/// <param name="Type">标记的类型</param>
+/// <param name="Line">标记在源代码中的行号</param>
+/// <param name="Column">标记在源代码中的列号</param>
 /// <remarks>
 /// 该结构体用于存储词法分析过程中生成的标记信息，包括标记的值、类型、行号和列号。
 /// 这些信息对于后续的语法分析和错误报告非常重要。
 /// </remarks>
-public readonly struct LangToken(string value, LangTokenType type, int line = 0, int column = 0)
+public readonly record struct LangToken(string Value, LangTokenType Type, int Line = 0, int Column = 0)
 {
-    /// <summary>
-    /// 标记的字符串值
-    /// </summary>
-    public readonly string Value = value;
-
-    /// <summary>
-    /// 标记的类型
-    /// </summary>
-    public readonly LangTokenType Type = type;
-
-    /// <summary>
-    /// 标记在源代码中的行号（从1开始）
-    /// </summary>
-    public readonly int Line = line;
-
-    /// <summary>
-    /// 标记在源代码中的列号（从1开始）
-    /// </summary>
-    public readonly int Column = column + 1;
-
     /// <summary>
     /// 将标记转换为字符串表示
     /// </summary>
@@ -86,26 +66,6 @@ public static class LangTokenizer
             .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Length).ToList());
 
     /// <summary>
-    /// 将Old8Lang源代码转换为标记流
-    /// </summary>
-    /// <param name="code">要分析的Old8Lang源代码</param>
-    /// <returns>包含所有标记的列表、文件头指令和文档注释的元组</returns>
-    /// <exception cref="Error.SyntaxError">当遇到无法识别的字符时抛出</exception>
-    /// <remarks>
-    /// 该方法执行以下步骤：
-    /// 1. 过滤掉源代码中的注释，同时提取文件头指令和文档注释
-    /// 2. 逐字符扫描源代码
-    /// 3. 识别并生成各种类型的标记
-    /// 4. 将文档注释 Token 插入到标记流的合适位置
-    /// 5. 返回完整的标记列表、文件头指令和文档注释
-    /// </remarks>
-    public static (List<LangToken> tokens, List<LangToken> headerDirectives, List<LangToken> docComments)
-        TokenizeWithDirectivesAndDocs(string code)
-    {
-        return TokenizeWithDirectivesAndDocs(code, null);
-    }
-
-    /// <summary>
     /// 将Old8Lang源代码转换为标记流（支持预编译符号）
     /// </summary>
     /// <param name="code">要分析的Old8Lang源代码</param>
@@ -122,7 +82,7 @@ public static class LangTokenizer
     /// 5. 返回完整的标记列表、文件头指令和文档注释
     /// </remarks>
     public static (List<LangToken> tokens, List<LangToken> headerDirectives, List<LangToken> docComments)
-        TokenizeWithDirectivesAndDocs(string code, PreprocessorSymbols? preprocessorSymbols)
+        TokenizeWithDirectivesAndDocs(string code, PreprocessorSymbols? preprocessorSymbols = null)
     {
         // 0. 如果提供了预编译符号管理器，先处理预编译指令
         if (preprocessorSymbols is not null)
@@ -158,7 +118,7 @@ public static class LangTokenizer
             if (code[i] == '\n')
             {
                 line++;
-                column = i + 1;  // 下一行从换行符之后的下一个字符开始
+                column = i + 1; // 下一行从换行符之后的下一个字符开始
                 continue;
             }
 
@@ -324,7 +284,8 @@ public static class LangTokenizer
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
-                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i - 1, out var unicodeChar, out var unicodeAdvance))
+                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i - 1, out var unicodeChar,
+                                            out var unicodeAdvance))
                                     {
                                         sb.Append(unicodeChar);
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字
@@ -334,10 +295,12 @@ public static class LangTokenizer
                                         // Unicode序列不完整或解析失败，追加原始字符
                                         sb.Append("\\u");
                                     }
+
                                     break;
                                 case 'x':
                                     // 处理十六进制转义序列 \xXX
-                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i - 1, out var hexChar, out var hexAdvance))
+                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i - 1, out var hexChar,
+                                            out var hexAdvance))
                                     {
                                         sb.Append(hexChar);
                                         i += hexAdvance; // 跳过已解析的十六进制数字
@@ -347,6 +310,7 @@ public static class LangTokenizer
                                         // 十六进制序列不完整或解析失败，追加原始字符
                                         sb.Append("\\x");
                                     }
+
                                     break;
                                 default:
                                     sb.Append(code[i]);
@@ -424,7 +388,8 @@ public static class LangTokenizer
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
-                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i, out var unicodeChar, out var unicodeAdvance))
+                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i, out var unicodeChar,
+                                            out var unicodeAdvance))
                                     {
                                         sb.Append(unicodeChar);
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字（不包括 \u，因为外层已经在 \ 的位置）
@@ -438,7 +403,8 @@ public static class LangTokenizer
                                     break;
                                 case 'x':
                                     // 处理十六进制转义序列 \xXX
-                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i, out var hexChar, out var hexAdvance))
+                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i, out var hexChar,
+                                            out var hexAdvance))
                                     {
                                         sb.Append(hexChar);
                                         i += hexAdvance; // 跳过已解析的十六进制数字（不包括 \x，因为外层已经在 \ 的位置）
@@ -886,7 +852,7 @@ public static class LangTokenizer
     /// <returns>包含所有标记的列表和文件头指令的元组</returns>
     public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code)
     {
-        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code, null);
+        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code);
         return (tokens, headerDirectives);
     }
 
@@ -896,7 +862,8 @@ public static class LangTokenizer
     /// <param name="code">要分析的Old8Lang源代码</param>
     /// <param name="preprocessorSymbols">预编译符号管理器</param>
     /// <returns>包含所有标记的列表和文件头指令的元组</returns>
-    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code, PreprocessorSymbols? preprocessorSymbols)
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code,
+        PreprocessorSymbols? preprocessorSymbols)
     {
         var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code, preprocessorSymbols);
         return (tokens, headerDirectives);
@@ -941,17 +908,17 @@ public struct FilteringCommentsTokenizer(string input)
     /// <summary>
     /// 当前扫描索引
     /// </summary>
-    private int CurrentIndex = 0;
+    private int _currentIndex = 0;
 
     /// <summary>
     /// 文件头指令列表
     /// </summary>
-    public List<LangToken> HeaderDirectives = [];
+    public readonly List<LangToken> HeaderDirectives = [];
 
     /// <summary>
     /// 文档注释列表（按行号索引，用于后续解析时关联）
     /// </summary>
-    public List<LangToken> DocComments = [];
+    public readonly List<LangToken> DocComments = [];
 
     /// <summary>
     /// 过滤源代码中的注释
@@ -968,37 +935,37 @@ public struct FilteringCommentsTokenizer(string input)
         bool isFileHeader = true; // 是否还在文件头部分
 
         // 扫描整个输入字符串
-        while (CurrentIndex < input.Length)
+        while (_currentIndex < input.Length)
         {
-            var currentChar = input[CurrentIndex];
+            var currentChar = input[_currentIndex];
 
             // 处理换行符 - 更新行号
             if (currentChar == '\n')
             {
                 line++;
-                lineStartIndex = CurrentIndex + 1;
+                lineStartIndex = _currentIndex + 1;
             }
 
             // 在文件头部分且不在字符串中，检查文件头指令
             if (isFileHeader && !inDoubleQuoteString && !inSingleQuoteString)
             {
                 // 检查是否是文件头指令 (#!)
-                if (currentChar == '#' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '!')
+                if (currentChar == '#' && _currentIndex + 1 < input.Length && input[_currentIndex + 1] == '!')
                 {
                     Advance(); // 跳过 '#'
                     Advance(); // 跳过 '!'
 
                     // 读取指令名和值
-                    var directiveStart = CurrentIndex;
+                    var directiveStart = _currentIndex;
                     var directiveLineStart = lineStartIndex;
 
                     // 读取整行
-                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    while (_currentIndex < input.Length && input[_currentIndex] != '\n')
                     {
                         Advance();
                     }
 
-                    var directiveContent = input.Substring(directiveStart, CurrentIndex - directiveStart).Trim();
+                    var directiveContent = input.Substring(directiveStart, _currentIndex - directiveStart).Trim();
 
                     // 解析指令名和值
                     var spaceIndex = directiveContent.IndexOf(' ');
@@ -1017,7 +984,7 @@ public struct FilteringCommentsTokenizer(string input)
                     }
 
                     // 保留换行符
-                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    if (_currentIndex < input.Length && input[_currentIndex] == '\n')
                     {
                         result.Append('\n');
                         Advance();
@@ -1028,8 +995,8 @@ public struct FilteringCommentsTokenizer(string input)
 
                 // 如果遇到非空白、非注释、非文件头指令的内容，则标记文件头结束
                 if (currentChar != ' ' && currentChar != '\t' && currentChar != '\n' && currentChar != '\r' &&
-                    !(currentChar == '/' && CurrentIndex + 1 < input.Length &&
-                      (input[CurrentIndex + 1] == '/' || input[CurrentIndex + 1] == '*')))
+                    !(currentChar == '/' && _currentIndex + 1 < input.Length &&
+                      (input[_currentIndex + 1] == '/' || input[_currentIndex + 1] == '*')))
                 {
                     isFileHeader = false;
                 }
@@ -1074,22 +1041,22 @@ public struct FilteringCommentsTokenizer(string input)
             if (!inDoubleQuoteString && !inSingleQuoteString)
             {
                 // 处理文档注释（优先级最高，必须在单行注释之前检查）
-                if (currentChar == '/' && CurrentIndex + 2 < input.Length &&
-                    input[CurrentIndex + 1] == '/' && input[CurrentIndex + 2] == '/')
+                if (currentChar == '/' && _currentIndex + 2 < input.Length &&
+                    input[_currentIndex + 1] == '/' && input[_currentIndex + 2] == '/')
                 {
                     // 文档注释：///
                     Advance(); // 跳过第一个 '/'
                     Advance(); // 跳过第二个 '/'
                     Advance(); // 跳过第三个 '/'
 
-                    var docCommentStart = CurrentIndex;
+                    var docCommentStart = _currentIndex;
                     var docCommentLineStart = lineStartIndex;
                     var sb = new StringBuilder();
 
                     // 读取文档注释内容直到换行符
-                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    while (_currentIndex < input.Length && input[_currentIndex] != '\n')
                     {
-                        sb.Append(input[CurrentIndex]);
+                        sb.Append(input[_currentIndex]);
                         Advance();
                     }
 
@@ -1104,31 +1071,31 @@ public struct FilteringCommentsTokenizer(string input)
                     ));
 
                     // 保留换行符并更新行号
-                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    if (_currentIndex < input.Length && input[_currentIndex] == '\n')
                     {
                         result.Append('\n');
                         line++; // 更新行号
-                        lineStartIndex = CurrentIndex + 1; // 更新行起始索引
+                        lineStartIndex = _currentIndex + 1; // 更新行起始索引
                         Advance();
                     }
 
                     continue;
                 }
                 // 处理单行注释
-                else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                else if (currentChar == '/' && _currentIndex + 1 < input.Length && input[_currentIndex + 1] == '/')
                 {
                     // 跳过单行注释，但保留换行符
                     Advance(); // 跳过 '/'
                     Advance(); // 跳过 '/'
 
                     // 跳过注释内容直到换行符
-                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    while (_currentIndex < input.Length && input[_currentIndex] != '\n')
                     {
                         Advance();
                     }
 
                     // 保留换行符
-                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    if (_currentIndex < input.Length && input[_currentIndex] == '\n')
                     {
                         result.Append('\n');
                         Advance();
@@ -1137,18 +1104,18 @@ public struct FilteringCommentsTokenizer(string input)
                     continue;
                 }
                 // 处理多行注释
-                else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
+                else if (currentChar == '/' && _currentIndex + 1 < input.Length && input[_currentIndex + 1] == '*')
                 {
                     // 跳过多行注释，但保留其中的换行符
                     Advance(); // 跳过 '/'
                     Advance(); // 跳过 '*'
 
                     // 跳过注释内容直到结束标记
-                    while (CurrentIndex < input.Length)
+                    while (_currentIndex < input.Length)
                     {
                         // 检查是否到达注释结束标记 */
-                        if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length &&
-                            input[CurrentIndex + 1] == '/')
+                        if (input[_currentIndex] == '*' && _currentIndex + 1 < input.Length &&
+                            input[_currentIndex + 1] == '/')
                         {
                             Advance(); // 跳过 '*'
                             Advance(); // 跳过 '/'
@@ -1156,7 +1123,7 @@ public struct FilteringCommentsTokenizer(string input)
                         }
 
                         // 保留多行注释中的换行符
-                        if (input[CurrentIndex] == '\n')
+                        if (input[_currentIndex] == '\n')
                         {
                             result.Append('\n');
                         }
@@ -1181,7 +1148,7 @@ public struct FilteringCommentsTokenizer(string input)
     /// </summary>
     private void Advance()
     {
-        CurrentIndex++;
+        _currentIndex++;
     }
 
     // 以下方法暂时注释掉，如需使用可取消注释

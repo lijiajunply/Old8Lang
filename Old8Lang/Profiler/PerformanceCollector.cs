@@ -7,16 +7,16 @@ namespace Old8Lang.Profiler;
 /// </summary>
 public class PerformanceCollector
 {
-    private readonly ProfilingSession Session;
-    private readonly Stopwatch Stopwatch = new();
-    private readonly Timer MemoryMonitorTimer;
-    private readonly Lock LockObject = new();
+    private readonly ProfilingSession _session;
+    private readonly Stopwatch _stopwatch = new();
+    private readonly Timer _memoryMonitorTimer;
+    private readonly Lock _lockObject = new();
 
     // 当前执行的函数栈
-    private readonly Stack<string> FunctionCallStack = new();
+    private readonly Stack<string> _functionCallStack = new();
 
     // 函数执行开始时间
-    private readonly Dictionary<string, DateTime> FunctionStartTimes = new();
+    private readonly Dictionary<string, DateTime> _functionStartTimes = new();
 
     /// <summary>
     /// 是否启用内存监控
@@ -34,10 +34,10 @@ public class PerformanceCollector
     /// <param name="session">性能分析会话</param>
     public PerformanceCollector(ProfilingSession session)
     {
-        Session = session ?? throw new ArgumentNullException(nameof(session));
+        _session = session ?? throw new ArgumentNullException(nameof(session));
 
         // 初始化内存监控定时器
-        MemoryMonitorTimer = new Timer(RecordMemoryUsage, null, Timeout.Infinite, Timeout.Infinite);
+        _memoryMonitorTimer = new Timer(RecordMemoryUsage, null, Timeout.Infinite, Timeout.Infinite);
     }
 
     /// <summary>
@@ -45,19 +45,19 @@ public class PerformanceCollector
     /// </summary>
     public void StartProfiling()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Stopwatch.Restart();
+            _stopwatch.Restart();
 
             if (MemoryMonitoringEnabled)
             {
-                MemoryMonitorTimer.Change(TimeSpan.Zero, TimeSpan.FromMilliseconds(MemoryMonitoringIntervalMs));
+                _memoryMonitorTimer.Change(TimeSpan.Zero, TimeSpan.FromMilliseconds(MemoryMonitoringIntervalMs));
             }
 
             // 记录初始内存状态
             RecordMemoryUsage(null);
 
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "ProfilingStarted",
                 Type = PerformanceCounterType.ExecutionTime,
@@ -72,25 +72,25 @@ public class PerformanceCollector
     /// </summary>
     public void StopProfiling()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Stopwatch.Stop();
+            _stopwatch.Stop();
 
             // 停止内存监控
-            MemoryMonitorTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            _memoryMonitorTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
             // 记录最终内存状态
             RecordMemoryUsage(null);
 
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "ProfilingStopped",
                 Type = PerformanceCounterType.ExecutionTime,
-                Value = Stopwatch.Elapsed.TotalMilliseconds,
+                Value = _stopwatch.Elapsed.TotalMilliseconds,
                 Unit = "ms"
             });
 
-            Session.EndSession();
+            _session.EndSession();
         }
     }
 
@@ -102,17 +102,17 @@ public class PerformanceCollector
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionStart(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            FunctionCallStack.Push(functionName);
-            FunctionStartTimes[functionName] = DateTime.Now;
+            _functionCallStack.Push(functionName);
+            _functionStartTimes[functionName] = DateTime.Now;
 
             // 记录函数调用次数
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = functionName + "_CallCount",
                 Type = PerformanceCounterType.FunctionCallCount,
-                Value = Session.FunctionStats.TryGetValue(functionName, out var stat)
+                Value = _session.FunctionStats.TryGetValue(functionName, out var stat)
                     ? stat.CallCount + 1
                     : 1,
                 Unit = "count",
@@ -129,18 +129,18 @@ public class PerformanceCollector
     /// <param name="lineNumber">行号</param>
     public void RecordFunctionEnd(string functionName, string? sourceFile = null, int? lineNumber = null)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
             // 检查函数是否在调用栈中
-            if (FunctionCallStack.Count == 0 || FunctionCallStack.Peek() != functionName)
+            if (_functionCallStack.Count == 0 || _functionCallStack.Peek() != functionName)
             {
                 // 可能是异步函数或异常退出，尝试移除
-                if (FunctionCallStack.Contains(functionName))
+                if (_functionCallStack.Contains(functionName))
                 {
                     var tempStack = new Stack<string>();
-                    while (FunctionCallStack.Count > 0)
+                    while (_functionCallStack.Count > 0)
                     {
-                        var currentFunction = FunctionCallStack.Pop();
+                        var currentFunction = _functionCallStack.Pop();
                         if (currentFunction == functionName)
                         {
                             break;
@@ -152,21 +152,21 @@ public class PerformanceCollector
                     // 恢复栈状态
                     while (tempStack.Count > 0)
                     {
-                        FunctionCallStack.Push(tempStack.Pop());
+                        _functionCallStack.Push(tempStack.Pop());
                     }
                 }
             }
             else
             {
-                FunctionCallStack.Pop();
+                _functionCallStack.Pop();
             }
 
-            if (FunctionStartTimes.TryGetValue(functionName, out var startTime))
+            if (_functionStartTimes.TryGetValue(functionName, out var startTime))
             {
                 var executionTime = DateTime.Now.Subtract(startTime).TotalMilliseconds;
-                Session.RecordFunctionExecution(functionName, executionTime, sourceFile, lineNumber);
+                _session.RecordFunctionExecution(functionName, executionTime, sourceFile, lineNumber);
 
-                FunctionStartTimes.Remove(functionName);
+                _functionStartTimes.Remove(functionName);
             }
         }
     }
@@ -181,9 +181,9 @@ public class PerformanceCollector
     public void RecordStatementExecution(string statementType, double executionTimeMs, string? sourceFile = null,
         int? lineNumber = null)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = statementType + "_ExecutionTime",
                 Type = PerformanceCounterType.ExecutionTime,
@@ -205,9 +205,9 @@ public class PerformanceCollector
     /// <param name="parseTimeMs">解析时间（毫秒）</param>
     public void RecordParsingTime(double parseTimeMs)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "ParsingTime",
                 Type = PerformanceCounterType.ParsingTime,
@@ -223,9 +223,9 @@ public class PerformanceCollector
     /// <param name="compilationTimeMs">编译时间（毫秒）</param>
     public void RecordCompilationTime(double compilationTimeMs)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "CompilationTime",
                 Type = PerformanceCounterType.CompilationTime,
@@ -240,9 +240,9 @@ public class PerformanceCollector
     /// </summary>
     public void RecordGarbageCollection()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "Gen0Collections",
                 Type = PerformanceCounterType.GarbageCollectionCount,
@@ -250,7 +250,7 @@ public class PerformanceCollector
                 Unit = "count"
             });
 
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "Gen1Collections",
                 Type = PerformanceCounterType.GarbageCollectionCount,
@@ -258,7 +258,7 @@ public class PerformanceCollector
                 Unit = "count"
             });
 
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = "Gen2Collections",
                 Type = PerformanceCounterType.GarbageCollectionCount,
@@ -277,9 +277,9 @@ public class PerformanceCollector
     /// <param name="tags">标签</param>
     public void RecordCustomData(string name, double value, string unit = "", Dictionary<string, string>? tags = null)
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            Session.AddDataPoint(new PerformanceDataPoint
+            _session.AddDataPoint(new PerformanceDataPoint
             {
                 Name = name,
                 Type = PerformanceCounterType.ExecutionTime, // 默认类型，可以扩展
@@ -296,9 +296,9 @@ public class PerformanceCollector
     /// <returns>调用栈深度</returns>
     public int GetCallStackDepth()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            return FunctionCallStack.Count;
+            return _functionCallStack.Count;
         }
     }
 
@@ -308,9 +308,9 @@ public class PerformanceCollector
     /// <returns>当前函数名，如果没有则返回null</returns>
     public string? GetCurrentFunction()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
-            return FunctionCallStack.Count > 0 ? FunctionCallStack.Peek() : null;
+            return _functionCallStack.Count > 0 ? _functionCallStack.Peek() : null;
         }
     }
 
@@ -322,7 +322,7 @@ public class PerformanceCollector
     {
         try
         {
-            Session.RecordMemoryUsage();
+            _session.RecordMemoryUsage();
         }
         catch (Exception)
         {
@@ -336,17 +336,17 @@ public class PerformanceCollector
     /// <returns>统计信息</returns>
     public Dictionary<string, object> GetCollectorStats()
     {
-        lock (LockObject)
+        lock (_lockObject)
         {
             return new Dictionary<string, object>
             {
-                ["SessionDurationMs"] = Stopwatch.Elapsed.TotalMilliseconds,
-                ["CallStackDepth"] = FunctionCallStack.Count,
+                ["SessionDurationMs"] = _stopwatch.Elapsed.TotalMilliseconds,
+                ["CallStackDepth"] = _functionCallStack.Count,
                 ["MemoryMonitoringEnabled"] = MemoryMonitoringEnabled,
                 ["MemoryMonitoringIntervalMs"] = MemoryMonitoringIntervalMs,
-                ["DataPointsCollected"] = Session.DataPoints.Count,
-                ["FunctionStatsCollected"] = Session.FunctionStats.Count,
-                ["MemorySnapshotsCollected"] = Session.MemoryHistory.Count
+                ["DataPointsCollected"] = _session.DataPoints.Count,
+                ["FunctionStatsCollected"] = _session.FunctionStats.Count,
+                ["MemorySnapshotsCollected"] = _session.MemoryHistory.Count
             };
         }
     }

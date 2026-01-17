@@ -380,7 +380,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         // 如果是 GenericTypeInfo 实例，直接从 TypeArguments 中提取
         if (typeInfo is GenericTypeInfo genericTypeInfo)
         {
-            if (genericTypeInfo.IsGenericInstance && genericTypeInfo.TypeArguments is not null)
+            if (genericTypeInfo is { IsGenericInstance: true, TypeArguments: not null })
             {
                 // 返回泛型参数列表（按照 TypeParameters 的顺序）
                 var result = new List<ITypeInfo>();
@@ -417,15 +417,9 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                     var trimmedName = argName.Trim();
                     // 尝试从 TypeFamily 获取类型
                     var argType = typeAnnotationManager.GetTypeFamily().GetType(trimmedName);
-                    if (argType is not null)
-                    {
-                        result.Add(argType);
-                    }
-                    else
-                    {
-                        // 如果找不到类型，创建一个基本类型
-                        result.Add(new PrimitiveTypeInfo(trimmedName));
-                    }
+                    result.Add(argType ??
+                               // 如果找不到类型，创建一个基本类型
+                               new PrimitiveTypeInfo(trimmedName));
                 }
 
                 if (result.Count > 0)

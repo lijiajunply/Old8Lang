@@ -59,8 +59,8 @@ public class ReportGenerator
 
         if (session.MemoryHistory.Count > 0)
         {
-            var maxMemory = session.MemoryHistory.Max(m => m.ManagedMemoryMB);
-            var avgMemory = session.MemoryHistory.Average(m => m.ManagedMemoryMB);
+            var maxMemory = session.MemoryHistory.Max(m => m.ManagedMemoryMb);
+            var avgMemory = session.MemoryHistory.Average(m => m.ManagedMemoryMb);
             var totalGc = session.MemoryHistory.Last().TotalGcCollections;
             sb.AppendLine($"  峰值内存使用: {maxMemory:F2}MB");
             sb.AppendLine($"  平均内存使用: {avgMemory:F2}MB");

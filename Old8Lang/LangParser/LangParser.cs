@@ -23,37 +23,17 @@ public class LangParser
     /// <summary>
     /// 解析器共享上下文，包含标记列表、源代码和文件名等信息
     /// </summary>
-    private readonly ParserContext Context;
+    private readonly ParserContext _context;
     
     /// <summary>
     /// 语句解析器，负责解析各种语句结构
     /// </summary>
-    private readonly StatementParser StatementParser;
+    private readonly StatementParser _statementParser;
     
     /// <summary>
     /// 表达式解析器，负责解析各种表达式
     /// </summary>
-    private readonly ExpressionParser ExpressionParser;
-    
-    /// <summary>
-    /// 主表达式解析器，负责解析基本表达式单元
-    /// </summary>
-    private readonly PrimaryParser PrimaryParser;
-    
-    /// <summary>
-    /// 函数解析器，负责解析函数定义和调用
-    /// </summary>
-    private readonly FunctionParser FunctionParser;
-    
-    /// <summary>
-    /// 类解析器，负责解析类定义和成员
-    /// </summary>
-    private readonly ClassParser ClassParser;
-
-    /// <summary>
-    /// LINQ 解析器，负责解析 LINQ 查询表达式
-    /// </summary>
-    private readonly LinqParser LinqParser;
+    private readonly ExpressionParser _expressionParser;
 
     /// <summary>
     /// 构造函数，初始化所有解析器并解决它们之间的循环依赖
@@ -76,7 +56,7 @@ public class LangParser
     public LangParser(List<LangToken> tokens, List<LangToken> headerDirectiveTokens, string? sourceCode = null, string? fileName = null)
     {
         // 1. 创建共享上下文，供所有解析器使用
-        Context = new ParserContext(tokens, sourceCode, fileName);
+        _context = new ParserContext(tokens, sourceCode, fileName);
 
         // 解析文件头指令
         foreach (var directiveToken in headerDirectiveTokens)
@@ -88,7 +68,7 @@ public class LangParser
                 if (parts.Length == 2)
                 {
                     var directive = new FileHeaderDirective(parts[0], parts[1], directiveToken.Line);
-                    Context.HeaderDirectives.AddDirective(directive);
+                    _context.HeaderDirectives.AddDirective(directive);
                 }
             }
         }
@@ -100,45 +80,43 @@ public class LangParser
         // - FunctionParser 依赖 StatementParser, ExpressionParser
         // - ClassParser 依赖 StatementParser
         // - PrimaryParser 依赖 StatementParser, ExpressionParser, FunctionParser
-        
         // 使用延迟加载（Lambda表达式）解决循环依赖问题
-
         // 首先创建FunctionParser（需要延迟加载StatementParser和ExpressionParser）
-        FunctionParser = new FunctionParser(
-            Context,
-            () => StatementParser!,
-            () => ExpressionParser!);
+        var functionParser = new FunctionParser(
+            _context,
+            () => _statementParser!,
+            () => _expressionParser!);
 
         // 创建LinqParser（需要延迟加载ExpressionParser）
-        LinqParser = new LinqParser(
-            Context,
-            () => ExpressionParser!);
+        var linqParser = new LinqParser(
+            _context,
+            () => _expressionParser!);
 
         // 创建PrimaryParser（需要延迟加载StatementParser和ExpressionParser）
-        PrimaryParser = new PrimaryParser(
-            Context,
-            () => StatementParser!,
-            () => ExpressionParser!,
-            FunctionParser,
-            LinqParser);
+        var primaryParser = new PrimaryParser(
+            _context,
+            () => _statementParser!,
+            () => _expressionParser!,
+            functionParser,
+            linqParser);
 
         // 创建ExpressionParser（仅依赖PrimaryParser）
-        ExpressionParser = new ExpressionParser(Context, PrimaryParser, FunctionParser);
+        _expressionParser = new ExpressionParser(_context, primaryParser, functionParser);
 
         // 创建ClassParser（需要延迟加载StatementParser、ExpressionParser和FunctionParser）
-        ClassParser = new ClassParser(
-            Context,
-            () => StatementParser!,
-            () => ExpressionParser!,
-            () => FunctionParser!);
+        var classParser = new ClassParser(
+            _context,
+            () => _statementParser!,
+            () => _expressionParser!,
+            () => functionParser!);
 
         // 最后创建StatementParser（依赖所有其他解析器）
-        StatementParser = new StatementParser(
-            Context,
-            ExpressionParser,
-            FunctionParser,
-            ClassParser,
-            PrimaryParser);
+        _statementParser = new StatementParser(
+            _context,
+            _expressionParser,
+            functionParser,
+            classParser,
+            primaryParser);
     }
 
     /// <summary>
@@ -158,34 +136,34 @@ public class LangParser
         try
         {
             // 循环解析所有语句，直到到达标记流末尾
-            while (Context.CurrentIndex < Context.Tokens.Count)
+            while (_context.CurrentIndex < _context.Tokens.Count)
             {
                 // 跳过开头的分号（空语句）
-                while (Context.CurrentToken.Type == LangTokenType.Semicolon)
+                while (_context.CurrentToken.Type == LangTokenType.Semicolon)
                 {
-                    Context.CurrentIndex++;
+                    _context.CurrentIndex++;
                 }
 
                 // 跳过文档注释 tokens（它们会在 CollectPrecedingDocComments 中被处理）
-                while (Context.CurrentIndex < Context.Tokens.Count &&
-                       Context.CurrentToken.Type == LangTokenType.DocComment)
+                while (_context.CurrentIndex < _context.Tokens.Count &&
+                       _context.CurrentToken.Type == LangTokenType.DocComment)
                 {
-                    Context.CurrentIndex++;
+                    _context.CurrentIndex++;
                 }
 
                 // 如果跳过分号和文档注释后到达文件末尾，退出循环
-                if (Context.CurrentIndex >= Context.Tokens.Count)
+                if (_context.CurrentIndex >= _context.Tokens.Count)
                 {
                     break;
                 }
 
                 // 解析一条语句并添加到语句列表中
-                statements.Add(StatementParser.ParseStatement());
+                statements.Add(_statementParser.ParseStatement());
 
                 // 跳过语句后的可选分号分隔符
-                while (Context.CurrentToken.Type == LangTokenType.Semicolon)
+                while (_context.CurrentToken.Type == LangTokenType.Semicolon)
                 {
-                    Context.CurrentIndex++;
+                    _context.CurrentIndex++;
                 }
             }
 
@@ -200,7 +178,7 @@ public class LangParser
         catch (Exception ex)
         {
             // 处理其他类型的异常，转换为SyntaxError并添加上下文信息
-            var currentToken = Context.CurrentToken;
+            var currentToken = _context.CurrentToken;
 
             // 检查当前标记是否有效
             var tokenValue = currentToken.Type == LangTokenType.EndOfFile ? "<unknown>" : currentToken.Value;
@@ -226,7 +204,7 @@ public class LangParser
                     tokenValue,
                     line,
                     column,
-                    Context.FileName,
+                    _context.FileName,
                     $"解析错误：{old8Ex.Message}",
                     context);
             }
@@ -236,7 +214,7 @@ public class LangParser
                 tokenValue,
                 line,
                 column,
-                Context.FileName,
+                _context.FileName,
                 $"解析时出现代码错误：{ex.Message}",
                 context);
         }
@@ -250,7 +228,7 @@ public class LangParser
     private string[] GetSourceContext(int line)
     {
         // 使用上下文对象中缓存的分割结果，提高性能
-        var lines = Context.SourceLines;
+        var lines = _context.SourceLines;
 
         if (lines.Length == 0)
         {
@@ -282,6 +260,6 @@ public class LangParser
     /// <returns>文件头指令集合</returns>
     public FileHeaderDirectives GetHeaderDirectives()
     {
-        return Context.HeaderDirectives;
+        return _context.HeaderDirectives;
     }
 }

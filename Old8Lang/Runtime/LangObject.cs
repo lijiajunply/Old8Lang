@@ -11,7 +11,7 @@ public abstract class LangObject
     /// <summary>
     /// 加法运算符重载 (_add)
     /// </summary>
-    public virtual object? _add(object? other)
+    public virtual object _add(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持加法操作（未定义 _add 方法）");
     }
@@ -19,7 +19,7 @@ public abstract class LangObject
     /// <summary>
     /// 减法运算符重载 (_sub)
     /// </summary>
-    public virtual object? _sub(object? other)
+    public virtual object _sub(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持减法操作（未定义 _sub 方法）");
     }
@@ -27,7 +27,7 @@ public abstract class LangObject
     /// <summary>
     /// 乘法运算符重载 (_mul)
     /// </summary>
-    public virtual object? _mul(object? other)
+    public virtual object _mul(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持乘法操作（未定义 _mul 方法）");
     }
@@ -35,7 +35,7 @@ public abstract class LangObject
     /// <summary>
     /// 除法运算符重载 (_div)
     /// </summary>
-    public virtual object? _div(object? other)
+    public virtual object _div(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持除法操作（未定义 _div 方法）");
     }
@@ -43,7 +43,7 @@ public abstract class LangObject
     /// <summary>
     /// 取模运算符重载 (_mod)
     /// </summary>
-    public virtual object? _mod(object? other)
+    public virtual object _mod(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持取模操作（未定义 _mod 方法）");
     }
@@ -51,7 +51,7 @@ public abstract class LangObject
     /// <summary>
     /// 幂运算符重载 (_pow)
     /// </summary>
-    public virtual object? _pow(object? other)
+    public virtual object _pow(object? other)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持幂运算（未定义 _pow 方法）");
     }
@@ -107,7 +107,7 @@ public abstract class LangObject
     /// <summary>
     /// 获取索引运算符重载 (_getitem)
     /// </summary>
-    public virtual object? _getitem(object? index)
+    public virtual object _getitem(object? index)
     {
         throw new InvalidOperationException($"类型 '{GetType().Name}' 不支持索引访问（未定义 _getitem 方法）");
     }

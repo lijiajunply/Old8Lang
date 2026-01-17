@@ -45,7 +45,7 @@ public static class CollectionTypeValidator
         }
 
         // 验证集合元素
-        ValidateCollectionElements(parsedAnnotation, value, local, variableName, position, typeAnnotationManager);
+        ValidateCollectionElements(parsedAnnotation, value, variableName, position, typeAnnotationManager);
     }
 
     /// <summary>
@@ -54,7 +54,6 @@ public static class CollectionTypeValidator
     private static void ValidateCollectionElements(
         ParsedTypeAnnotation parsedAnnotation,
         LangExpression value,
-        LocalManager local,
         string variableName,
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
@@ -63,15 +62,15 @@ public static class CollectionTypeValidator
 
         if (baseType == "list")
         {
-            ValidateListElements(parsedAnnotation, value, local, variableName, position, typeAnnotationManager);
+            ValidateListElements(parsedAnnotation, value, variableName, position, typeAnnotationManager);
         }
         else if (baseType == "array")
         {
-            ValidateArrayElements(parsedAnnotation, value, local, variableName, position, typeAnnotationManager);
+            ValidateArrayElements(parsedAnnotation, value, variableName, position, typeAnnotationManager);
         }
         else if (baseType == "dict")
         {
-            ValidateDictElements(parsedAnnotation, value, local, variableName, position, typeAnnotationManager);
+            ValidateDictElements(parsedAnnotation, value, variableName, position, typeAnnotationManager);
         }
     }
 
@@ -81,7 +80,6 @@ public static class CollectionTypeValidator
     private static void ValidateListElements(
         ParsedTypeAnnotation parsedAnnotation,
         LangExpression value,
-        LocalManager local,
         string variableName,
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
@@ -131,7 +129,6 @@ public static class CollectionTypeValidator
     private static void ValidateArrayElements(
         ParsedTypeAnnotation parsedAnnotation,
         LangExpression value,
-        LocalManager local,
         string variableName,
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
@@ -181,7 +178,6 @@ public static class CollectionTypeValidator
     private static void ValidateDictElements(
         ParsedTypeAnnotation parsedAnnotation,
         LangExpression value,
-        LocalManager local,
         string variableName,
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)

@@ -77,7 +77,7 @@ public class StopProfilingHandler(DebugProfilerService service, ILogger<StopProf
             var hottestFunctions = session.GetHotspotFunctions(5);
             var totalCalls = session.FunctionStats.Values.Sum(f => f.CallCount);
             var peakMemory = session.MemoryHistory.Count > 0
-                ? session.MemoryHistory.Max(m => m.ManagedMemoryMB)
+                ? session.MemoryHistory.Max(m => m.ManagedMemoryMb)
                 : 0;
 
             // 获取解析和编译时间
@@ -121,7 +121,7 @@ public class StopProfilingHandler(DebugProfilerService service, ILogger<StopProf
         var hottestFunctions = session.GetHotspotFunctions(5);
         var totalCalls = session.FunctionStats.Values.Sum(f => f.CallCount);
         var peakMemory = session.MemoryHistory.Count > 0
-            ? session.MemoryHistory.Max(m => m.ManagedMemoryMB)
+            ? session.MemoryHistory.Max(m => m.ManagedMemoryMb)
             : 0;
 
         var parsingTime = session.DataPoints

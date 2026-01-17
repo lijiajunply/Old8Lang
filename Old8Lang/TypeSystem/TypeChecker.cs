@@ -526,7 +526,8 @@ public static class TypeChecker
     /// <param name="className">类名称</param>
     /// <param name="baseClassName">基类名称（可选）</param>
     /// <param name="interfaceNames">实现的接口列表（可选）</param>
-    public static void RegisterClassType(string className, string? baseClassName = null, List<string>? interfaceNames = null)
+    public static void RegisterClassType(string className, string? baseClassName = null,
+        List<string>? interfaceNames = null)
     {
         if (_annotationManager is null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
@@ -575,10 +576,8 @@ public static class TypeChecker
             return IsTypeCompatible(sourceTypeName, targetTypeName);
         }
 
-        if (_annotationManager is null)
-            return IsTypeCompatible(sourceTypeName, targetTypeName); // 回退到基本兼容性检查
-
-        return _annotationManager.IsTypeCompatible(sourceTypeName, targetTypeName);
+        return _annotationManager?.IsTypeCompatible(sourceTypeName, targetTypeName) ??
+               IsTypeCompatible(sourceTypeName, targetTypeName);
     }
 
     /// <summary>

@@ -17,17 +17,17 @@ public class PackageManager
     /// <summary>
     /// 包缓存（已加载的包）
     /// </summary>
-    private readonly Dictionary<string, LangValueType> PackageCache = new();
+    private readonly Dictionary<string, LangValueType> _packageCache = new();
 
     /// <summary>
     /// 包查找路径列表
     /// </summary>
-    private readonly List<string> PackageSearchPaths = [];
+    private readonly List<string> _packageSearchPaths = [];
 
     /// <summary>
     /// 包加载锁
     /// </summary>
-    private readonly Lock LoadLock = new();
+    private readonly Lock _loadLock = new();
 
     /// <summary>
     /// 是否启用调试日志
@@ -38,15 +38,14 @@ public class PackageManager
     /// 构造函数
     /// </summary>
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
-    /// <param name="projectRoot">项目根目录（保留参数以兼容现有调用，但不再使用）</param>
-    public PackageManager(string? packagesDir = null, string? projectRoot = null)
+    public PackageManager(string? packagesDir = null)
     {
         // 添加全局包目录
         var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
         AddSearchPath(packagesDirectory);
 
-        LogDebug($"PackageManager initialized with {PackageSearchPaths.Count} search paths:");
-        foreach (var path in PackageSearchPaths)
+        LogDebug($"PackageManager initialized with {_packageSearchPaths.Count} search paths:");
+        foreach (var path in _packageSearchPaths)
         {
             LogDebug($"  - {path} (exists: {Directory.Exists(path)})");
         }
@@ -66,8 +65,8 @@ public class PackageManager
     /// </summary>
     public void AddSearchPath(string path)
     {
-        if (PackageSearchPaths.Contains(path)) return;
-        PackageSearchPaths.Add(path);
+        if (_packageSearchPaths.Contains(path)) return;
+        _packageSearchPaths.Add(path);
         LogDebug($"Added search path: {path}");
     }
 
@@ -111,21 +110,21 @@ public class PackageManager
         VariateManager manager,
         out LangValueType? module)
     {
-        lock (LoadLock)
+        lock (_loadLock)
         {
             LogDebug($"Attempting to load package: {packageName}");
 
             // 检查缓存
-            if (PackageCache.TryGetValue(packageName, out module))
+            if (_packageCache.TryGetValue(packageName, out module))
             {
                 LogDebug($"Package '{packageName}' found in cache");
                 return true;
             }
 
-            LogDebug($"Package '{packageName}' not in cache, searching in {PackageSearchPaths.Count} paths:");
+            LogDebug($"Package '{packageName}' not in cache, searching in {_packageSearchPaths.Count} paths:");
 
             // 在所有查找路径中搜索包
-            foreach (var searchPath in PackageSearchPaths)
+            foreach (var searchPath in _packageSearchPaths)
             {
                 // 策略 1: 尝试精确目录名
                 var packagePath = Path.Combine(searchPath, packageName);
@@ -134,7 +133,7 @@ public class PackageManager
                 if (TryLoadPackageFromPath(packagePath, packageName, manager, out module) && module is not null)
                 {
                     LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {packagePath}");
-                    PackageCache[packageName] = module;
+                    _packageCache[packageName] = module;
                     return true;
                 }
 
@@ -149,7 +148,7 @@ public class PackageManager
                 if (!TryLoadPackageFromPath(versionedPath, packageName, manager, out module) ||
                     module is null) continue;
                 LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {versionedPath}");
-                PackageCache[packageName] = module;
+                _packageCache[packageName] = module;
                 return true;
             }
 
@@ -273,7 +272,7 @@ public class PackageManager
     /// </summary>
     public bool IsPackageInstalled(string packageName)
     {
-        return PackageSearchPaths.Any(searchPath =>
+        return _packageSearchPaths.Any(searchPath =>
         {
             var packagePath = Path.Combine(searchPath, packageName);
             return Directory.Exists(packagePath);
@@ -285,9 +284,9 @@ public class PackageManager
     /// </summary>
     public void ClearCache()
     {
-        lock (LoadLock)
+        lock (_loadLock)
         {
-            PackageCache.Clear();
+            _packageCache.Clear();
         }
     }
 

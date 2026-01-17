@@ -11,24 +11,24 @@ namespace Old8Lang.TypeSystem;
 /// </summary>
 public class TypeInferenceEngine
 {
-    private readonly LocalManager LocalManager;
-    private readonly TypeInferenceContext Context;
-    private readonly TypeConstraintCollector Collector;
-    private readonly TypeConstraintSolver Solver;
-    private readonly TypeInferenceConfig Config;
+    private readonly LocalManager _localManager;
+    private readonly TypeInferenceContext _context;
+    private readonly TypeConstraintCollector _collector;
+    private readonly TypeConstraintSolver _solver;
+    private readonly TypeInferenceConfig _config;
 
     /// <summary>
     /// 函数信息缓存：函数名 -> (参数列表, 返回类型, 函数体)
     /// </summary>
-    private readonly Dictionary<string, FuncInit> FunctionRegistry = [];
+    private readonly Dictionary<string, FuncInit> _functionRegistry = [];
 
     public TypeInferenceEngine(LocalManager localManager)
     {
-        LocalManager = localManager;
-        Config = TypeInferenceConfig.Instance;
-        Context = new TypeInferenceContext();
-        Collector = new TypeConstraintCollector(Context, localManager);
-        Solver = new TypeConstraintSolver(Context, Config);
+        _localManager = localManager;
+        _config = TypeInferenceConfig.Instance;
+        _context = new TypeInferenceContext();
+        _collector = new TypeConstraintCollector(_context, localManager);
+        _solver = new TypeConstraintSolver(_context, _config);
     }
 
     /// <summary>
@@ -36,10 +36,10 @@ public class TypeInferenceEngine
     /// </summary>
     public bool InferTypes(IOldLangTree program)
     {
-        if (!Config.EnableTypeInference)
+        if (!_config.EnableTypeInference)
             return true;
 
-        if (Config.DebugOutput)
+        if (_config.DebugOutput)
         {
             Console.WriteLine("=== 开始渐进式类型推断 ===\n");
         }
@@ -53,7 +53,7 @@ public class TypeInferenceEngine
             AnalyzeProgram(program);
 
             // 第三阶段：求解约束
-            bool success = Solver.Solve();
+            bool success = _solver.Solve();
 
             if (success)
             {
@@ -65,7 +65,7 @@ public class TypeInferenceEngine
         }
         catch (Exception ex)
         {
-            if (Config.DebugOutput)
+            if (_config.DebugOutput)
             {
                 Console.WriteLine($"类型推断失败: {ex.Message}");
             }
@@ -82,9 +82,9 @@ public class TypeInferenceEngine
         if (tree is FuncInit funcInit)
         {
             var funcName = funcInit.FuncValue.Id?.IdName ?? "anonymous";
-            FunctionRegistry[funcName] = funcInit;
+            _functionRegistry[funcName] = funcInit;
 
-            if (Config.DebugOutput)
+            if (_config.DebugOutput)
             {
                 Console.WriteLine($"注册函数: {funcName}");
             }
@@ -109,9 +109,9 @@ public class TypeInferenceEngine
         AnalyzeNode(tree);
 
         // 分析函数声明
-        foreach (var funcInit in FunctionRegistry.Values)
+        foreach (var funcInit in _functionRegistry.Values)
         {
-            Collector.CollectFromFunction(funcInit);
+            _collector.CollectFromFunction(funcInit);
         }
     }
 
@@ -127,7 +127,7 @@ public class TypeInferenceEngine
                 break;
 
             case SetStatement setStmt:
-                Collector.CollectFromAssignment(setStmt);
+                _collector.CollectFromAssignment(setStmt);
                 break;
 
             case FuncInit funcInit:
@@ -160,12 +160,12 @@ public class TypeInferenceEngine
             funcName = langId.IdName;
         }
 
-        if (funcName is not null && FunctionRegistry.ContainsKey(funcName))
+        if (funcName is not null && _functionRegistry.ContainsKey(funcName))
         {
             // 从调用处收集参数类型约束
-            Collector.CollectFromFunctionCall(callExpr, funcName);
+            _collector.CollectFromFunctionCall(callExpr, funcName);
 
-            if (Config.DebugOutput)
+            if (_config.DebugOutput)
             {
                 Console.WriteLine($"分析函数调用: {funcName}");
             }
@@ -177,12 +177,12 @@ public class TypeInferenceEngine
     /// </summary>
     private void ApplyInferredTypes()
     {
-        if (Config.DebugOutput)
+        if (_config.DebugOutput)
         {
             Console.WriteLine("\n=== 应用推断结果 ===");
         }
 
-        foreach (var (typeVar, inferredType) in Context.TypeVariableBindings)
+        foreach (var (typeVar, inferredType) in _context.TypeVariableBindings)
         {
             // 解析类型变量名：{funcName}$param${index}${paramName}
             if (typeVar.Contains("$param$"))
@@ -196,7 +196,7 @@ public class TypeInferenceEngine
             else
             {
                 // 普通变量
-                LocalManager.LocalVarTypes.TryAdd(typeVar, inferredType);
+                _localManager.LocalVarTypes.TryAdd(typeVar, inferredType);
             }
         }
     }
@@ -222,7 +222,7 @@ public class TypeInferenceEngine
         var paramName = paramParts[1];
 
         // 查找函数并更新参数类型
-        if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
+        if (_functionRegistry.TryGetValue(funcName, out var funcInit))
         {
             if (funcInit.FuncValue.Ids is not null &&
                 paramIndex < funcInit.FuncValue.Ids.Count)
@@ -234,9 +234,9 @@ public class TypeInferenceEngine
                 {
                     // 将推断类型存储到LocalManager
                     var fullParamName = $"{funcName}_{paramName}";
-                    LocalManager.LocalVarTypes[fullParamName] = inferredType;
+                    _localManager.LocalVarTypes[fullParamName] = inferredType;
 
-                    if (Config.DebugOutput)
+                    if (_config.DebugOutput)
                     {
                         Console.WriteLine($"  ✓ 推断参数类型: {funcName}.{paramName} = {inferredType.Name}");
                     }
@@ -253,15 +253,15 @@ public class TypeInferenceEngine
         // 解析：{funcName}$return
         var funcName = typeVar.Replace("$return", "");
 
-        if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
+        if (_functionRegistry.TryGetValue(funcName, out var funcInit))
         {
             if (string.IsNullOrEmpty(funcInit.FuncValue.Id?.AssumptionType))
             {
                 // 存储推断的返回类型
                 var returnTypeKey = $"{funcName}_return_type";
-                LocalManager.LocalVarTypes[returnTypeKey] = inferredType;
+                _localManager.LocalVarTypes[returnTypeKey] = inferredType;
 
-                if (Config.DebugOutput)
+                if (_config.DebugOutput)
                 {
                     Console.WriteLine($"  ✓ 推断返回类型: {funcName} -> {inferredType.Name}");
                 }
@@ -274,22 +274,22 @@ public class TypeInferenceEngine
     /// </summary>
     public bool InferFunctionTypes(FuncInit funcInit)
     {
-        if (!Config.EnableTypeInference)
+        if (!_config.EnableTypeInference)
             return true;
 
         try
         {
             // 清空上下文
-            Context.Clear();
+            _context.Clear();
 
             // 收集函数约束
-            Collector.CollectFromFunction(funcInit);
+            _collector.CollectFromFunction(funcInit);
 
             // 分析函数体
             AnalyzeNode(funcInit.FuncValue);
 
             // 求解约束
-            bool success = Solver.Solve();
+            bool success = _solver.Solve();
 
             if (success)
             {
@@ -300,12 +300,12 @@ public class TypeInferenceEngine
         }
         catch (Exception ex)
         {
-            if (Config.DebugOutput)
+            if (_config.DebugOutput)
             {
                 Console.WriteLine($"函数 {funcInit.FuncValue.Id?.IdName} 类型推断失败: {ex.Message}");
             }
 
-            return Config.FallbackToDynamic;
+            return _config.FallbackToDynamic;
         }
     }
 
@@ -314,8 +314,8 @@ public class TypeInferenceEngine
     /// </summary>
     public Type? GetInferredType(string variableName)
     {
-        return Context.GetTypeBinding(variableName) ??
-               LocalManager.LocalVarTypes.GetValueOrDefault(variableName);
+        return _context.GetTypeBinding(variableName) ??
+               _localManager.LocalVarTypes.GetValueOrDefault(variableName);
     }
 
     /// <summary>
@@ -323,7 +323,7 @@ public class TypeInferenceEngine
     /// </summary>
     public bool NeedsTypeInference(FuncInit funcInit)
     {
-        if (!Config.EnableTypeInference)
+        if (!_config.EnableTypeInference)
             return false;
 
         // 检查是否有参数缺少类型注解
@@ -352,10 +352,10 @@ public class TypeInferenceEngine
     /// </summary>
     public (int totalConstraints, int resolvedTypes, int unresolvedTypes) GetStatistics()
     {
-        var totalConstraints = Context.Constraints.Count;
-        var resolvedTypes = Context.TypeVariableBindings.Count;
-        var unresolvedTypes = Context.Constraints
-            .Where(c => Context.GetTypeBinding(c.TypeVariable) is null)
+        var totalConstraints = _context.Constraints.Count;
+        var resolvedTypes = _context.TypeVariableBindings.Count;
+        var unresolvedTypes = _context.Constraints
+            .Where(c => _context.GetTypeBinding(c.TypeVariable) is null)
             .Select(c => c.TypeVariable)
             .Distinct()
             .Count();

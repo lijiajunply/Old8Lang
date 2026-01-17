@@ -155,7 +155,7 @@ public class SymbolExtractor
         var notFoundSymbols = new List<string>();
 
         // 使用限定范围的 ImportInfos（如果提供），否则使用全局的
-        var importInfosToSearch = scopedImportInfos ?? manager.ImportInfos;
+        var importInfosToSearch = (scopedImportInfos ?? manager.ImportInfos).ToArray();
 
         foreach (var symbolName in symbolNames)
         {

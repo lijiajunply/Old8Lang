@@ -50,7 +50,7 @@ public static class StandardLibraryLoader
             var symbols = libInfo.ImportMode switch
             {
                 StandardLibraryImportMode.Assembly => LoadFromAssembly(assembly, libInfo, manager),
-                StandardLibraryImportMode.Types => LoadFromTypes(assembly, libInfo, manager),
+                StandardLibraryImportMode.Types => LoadFromTypes(libInfo, manager),
                 _ => throw new InvalidOperationException($"未知的导入模式: {libInfo.ImportMode}")
             };
 
@@ -88,19 +88,15 @@ public static class StandardLibraryLoader
             var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
 
             // 尝试加载程序集（不抛出异常，只验证）
-            var assembly = libInfo.GetAssembly();
+            libInfo.GetAssembly();
 
             // 验证类型是否存在
-            if (libInfo.ImportMode == StandardLibraryImportMode.Types && libInfo.TypeConfigs is not null)
+            if (libInfo is { ImportMode: StandardLibraryImportMode.Types, TypeConfigs: not null })
             {
-                foreach (var typeConfig in libInfo.TypeConfigs)
+                if (libInfo.TypeConfigs.Select(typeConfig => typeConfig.Type).Any(type => type is null))
                 {
-                    var type = typeConfig.Type;
-                    if (type is null)
-                    {
-                        errorMessage = $"标准库 '{libraryName}' 中找不到指定的类型";
-                        return false;
-                    }
+                    errorMessage = $"标准库 '{libraryName}' 中找不到指定的类型";
+                    return false;
                 }
             }
 
@@ -250,9 +246,7 @@ public static class StandardLibraryLoader
     /// <summary>
     /// 从类型列表导入
     /// </summary>
-    private static Dictionary<string, LangValueType> LoadFromTypes(
-        Assembly assembly,
-        StandardLibraryInfo libInfo,
+    private static Dictionary<string, LangValueType> LoadFromTypes(StandardLibraryInfo libInfo,
         VariateManager manager)
     {
         var symbols = new Dictionary<string, LangValueType>();
@@ -307,7 +301,7 @@ public static class StandardLibraryLoader
     private static void AddTypeToSymbols(Type type, Dictionary<string, LangValueType> symbols, VariateManager manager)
     {
         // 判断是否为静态类
-        if (type.IsAbstract && type.IsSealed)
+        if (type is { IsAbstract: true, IsSealed: true })
         {
             // 静态类：导入静态成员
             LoadStaticMembers(type, symbols, manager);
@@ -357,7 +351,7 @@ public static class StandardLibraryLoader
             if (property.CanRead)
             {
                 var value = property.GetValue(null);
-                symbols[property.Name] = ImportInfo.ObjToValue(value);
+                symbols[property.Name] = LangValueType.ObjToValue(value);
             }
         }
 
@@ -366,7 +360,7 @@ public static class StandardLibraryLoader
         foreach (var field in fields)
         {
             var value = field.GetValue(null);
-            symbols[field.Name] = ImportInfo.ObjToValue(value);
+            symbols[field.Name] = LangValueType.ObjToValue(value);
         }
     }
 

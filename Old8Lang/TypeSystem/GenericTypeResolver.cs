@@ -7,66 +7,55 @@ namespace Old8Lang.TypeSystem;
 /// <summary>
 /// 泛型类型解析器，用于将泛型参数解析为具体类型
 /// </summary>
-public class GenericTypeResolver
+public class GenericTypeResolver(
+    Dictionary<string, Type> typeMapping,
+    LocalManager local,
+    LangInterpreter? interpreter = null)
 {
-    private readonly Dictionary<string, Type> _typeMapping;
-    private readonly LocalManager _local;
-    private readonly LangInterpreter? _interpreter;
-
-    public GenericTypeResolver(Dictionary<string, Type> typeMapping, LocalManager local, LangInterpreter? interpreter = null)
-    {
-        _typeMapping = typeMapping;
-        _local = local;
-        _interpreter = interpreter;
-    }
-
     /// <summary>
     /// 解析类型，如果是泛型参数则替换为具体类型
     /// </summary>
     /// <param name="typeName">类型名称</param>
     /// <returns>解析后的Type</returns>
-    public Type? ResolveType(string typeName)
+    public Type ResolveType(string typeName)
     {
         // 如果是泛型参数，从映射中获取
-        if (_typeMapping.TryGetValue(typeName, out var mappedType))
+        if (typeMapping.TryGetValue(typeName, out var mappedType))
         {
             return mappedType;
         }
 
         // 否则尝试从类型注解管理器获取
-        if (_interpreter?.TypeAnnotationManager is not null)
+        var typeInfo = interpreter?.TypeAnnotationManager.GetTypeFamily().GetType(typeName);
+        if (typeInfo != null)
         {
-            var typeInfo = _interpreter.TypeAnnotationManager.GetTypeFamily().GetType(typeName);
-            if (typeInfo is not null)
+            // 这里需要将ITypeInfo转换为System.Type
+            // 暂时使用基本的类型映射
+            var resolved = typeName.ToLower() switch
             {
-                // 这里需要将ITypeInfo转换为System.Type
-                // 暂时使用基本的类型映射
-                var resolved = typeName.ToLower() switch
-                {
-                    "int" => typeof(int),
-                    "string" => typeof(string),
-                    "double" => typeof(double),
-                    "bool" => typeof(bool),
-                    "char" => typeof(char),
-                    "void" => typeof(void),
-                    "object" => typeof(object),
-                    _ => null
-                };
-                if (resolved != null) return resolved;
-                
-                // 尝试解析常用系统接口
-                if (typeName == "IComparable") return typeof(IComparable);
-                if (typeName == "IDisposable") return typeof(IDisposable);
-                if (typeName == "IEnumerable") return typeof(System.Collections.IEnumerable);
-            }
+                "int" => typeof(int),
+                "string" => typeof(string),
+                "double" => typeof(double),
+                "bool" => typeof(bool),
+                "char" => typeof(char),
+                "void" => typeof(void),
+                "object" => typeof(object),
+                _ => null
+            };
+            if (resolved != null) return resolved;
+
+            // 尝试解析常用系统接口
+            if (typeName == "IComparable") return typeof(IComparable);
+            if (typeName == "IDisposable") return typeof(IDisposable);
+            if (typeName == "IEnumerable") return typeof(System.Collections.IEnumerable);
         }
 
         // 尝试从 LocalManager 获取已编译的类
-        if (_local.ClassVar.TryGetValue(typeName, out var classType))
+        if (local.ClassVar.TryGetValue(typeName, out var classType))
         {
             return classType;
         }
-        
+
         // 尝试从 LocalManager 获取泛型类模板（递归特化）
         // 注意：这里我们可能无法直接返回一个特化的Type，因为缺少泛型参数
         // 但如果只是类名引用（如 MyClass），它应该在 ClassVar 中
@@ -99,13 +88,14 @@ public class GenericTypeResolver
             var param = parameters[i];
             if (!string.IsNullOrEmpty(param.AssumptionType))
             {
-                types[i] = ResolveType(param.AssumptionType) ?? typeof(object);
+                types[i] = ResolveType(param.AssumptionType);
             }
             else
             {
                 types[i] = typeof(object);
             }
         }
+
         return types;
     }
 
@@ -120,6 +110,7 @@ public class GenericTypeResolver
         {
             return typeof(void);
         }
-        return ResolveType(returnTypeAnnotation) ?? typeof(void);
+
+        return ResolveType(returnTypeAnnotation);
     }
 }

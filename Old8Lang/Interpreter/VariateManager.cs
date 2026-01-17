@@ -71,7 +71,7 @@ public class VariateManager
                 ? System.IO.Path.GetDirectoryName(Path)
                 : Directory.GetCurrentDirectory();
 
-            PackageManager = new ProjectManagement.PackageManager(projectRoot: projectRoot);
+            PackageManager = new ProjectManagement.PackageManager();
         }
 
         return PackageManager;

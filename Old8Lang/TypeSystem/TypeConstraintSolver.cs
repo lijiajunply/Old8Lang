@@ -14,7 +14,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
             return true;
 
         // 多轮求解，直到收敛
-        int maxIterations = 10;
+        const int maxIterations = 10;
         int iteration = 0;
         bool changed;
 
