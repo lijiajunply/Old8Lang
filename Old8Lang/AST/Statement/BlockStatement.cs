@@ -3,6 +3,7 @@ using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
@@ -46,6 +47,7 @@ public partial class BlockStatement : OldStatement
                     return;
                 default:
                     // 所有成员都添加到其他语句列表中，通过修饰符区分静态和实例成员
+                    Console.WriteLine($"DEBUG: Adding statement of type {statement.GetType().Name} to OtherStatements");
                     OtherStatements.Add(statement);
                     break;
             }
@@ -198,15 +200,8 @@ public partial class BlockStatement : OldStatement
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        foreach (var statement in ImportStatements)
-        {
-            statement.GenerateIl(ilGenerator, local);
-        }
-
-        foreach (var statement in OtherStatements)
-        {
-            statement.GenerateIl(ilGenerator, local);
-        }
+        var visitor = new CompilerVisitor(ilGenerator, local);
+        Accept(visitor);
     }
 
     public void GenerateImportIl(ILGenerator ilGenerator, LocalManager local)

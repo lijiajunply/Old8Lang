@@ -44,9 +44,12 @@
     - 字符串优化暂时保留为未来工作（目前使用 `string.Equals`）。
 
 ## 低优先级
-- [ ] **支持泛型方法中的 `defer`**
-  - **问题**：`GenericMethodSpecializer` 目前没有为 `defer` 将主体包装在 `try-finally` 中。
-  - **影响**：`defer` 语句将被忽略或在泛型函数中导致错误。
+- [x] **支持泛型方法中的 `defer`**
+  - **状态**：✅ 已完成。
+  - **详情**：
+    - 在 `GenericMethodSpecializer` 中添加了 `try-finally` 块生成逻辑。
+    - 修复了 `BlockStatement` 以使用 `CompilerVisitor`，确保泛型函数调用（`FuncRunStatement`）被正确处理。
+  - **参考**：`GenericMethodSpecializer.cs`
 
 - [ ] **优化变量访问**
   - **当前**：字典查找。

@@ -1,0 +1,9 @@
+func test_defer<T>(val:T) -> void {
+    PrintLine("Start")
+    defer {
+        PrintLine("Defer executed")
+    }
+    PrintLine("End")
+}
+
+test_defer<int>(123)

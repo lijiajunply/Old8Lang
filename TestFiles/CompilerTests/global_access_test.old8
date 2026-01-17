@@ -1,0 +1,5 @@
+global_var <- 123
+func test() {
+    PrintLine(global_var)
+}
+test()

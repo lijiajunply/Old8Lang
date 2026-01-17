@@ -118,6 +118,9 @@ public static class GenericMethodSpecializer
             funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
         }
 
+        // 开始 try-finally 块以支持 defer
+        methodIl.BeginExceptionBlock();
+
         // 生成方法体的IL代码，使用特化的类型信息
         GenerateSpecializedMethodBody(funcValue, methodIl, funcLocal, resolver);
 
@@ -134,7 +137,17 @@ public static class GenericMethodSpecializer
                 GenerateDefaultValue(methodIl, returnType);
                 methodIl.Emit(OpCodes.Stloc, funcLocal.ReturnValueLocal!);
             }
+            
+            // 显式离开 try 块，触发 finally 块执行
+            methodIl.Emit(OpCodes.Leave, endLabel);
         }
+
+        // Finally 块：执行 defer 语句
+        methodIl.BeginFinallyBlock();
+        funcLocal.IsInFinallyBlock = true;
+        funcLocal.GenerateDeferIL(methodIl);
+        funcLocal.IsInFinallyBlock = false;
+        methodIl.EndExceptionBlock();
 
         // 标记函数结束位置
         methodIl.MarkLabel(endLabel);

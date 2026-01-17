@@ -1,0 +1,21 @@
+func test_defer(val:int, log:list<string>) -> void {
+    log.Add("start " + val.ToStr())
+    
+    defer {
+        log.Add("defer 1 " + val.ToStr())
+    }
+    
+    defer {
+        log.Add("defer 2 " + val.ToStr())
+    }
+    
+    log.Add("end " + val.ToStr())
+}
+
+log:list<string> <- {}
+test_defer(123, log)
+
+PrintLine("Log count: " + log.Count.ToStr())
+for item in log {
+    PrintLine(item)
+}
