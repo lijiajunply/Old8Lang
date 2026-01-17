@@ -1,0 +1,102 @@
+// 装饰器语法边界测试
+
+// 测试1: 装饰器名称包含数字和下划线
+@log_v2
+func test1(x:int) -> int {
+    return x
+}
+
+@cache_123
+func test2(x:int) -> int {
+    return x
+}
+
+// 测试2: 装饰器参数为各种类型
+@config(timeout: 60, enabled: true, name: "test", factor: 1.5)
+func test3(x:int) -> int {
+    return x
+}
+
+// 测试3: 装饰器参数为表达式
+@config(timeout: 30 + 30, factor: 2.0 * 1.5)
+func test4(x:int) -> int {
+    return x
+}
+
+// 测试4: 装饰器参数为列表和字典
+@config(items: {1, 2, 3}, options: {"key": "value"})
+func test5(x:int) -> int {
+    return x
+}
+
+// 测试5: 大量装饰器堆叠（5个）
+@decorator1
+@decorator2
+@decorator3
+@decorator4
+@decorator5
+func test6(x:int) -> int {
+    return x
+}
+
+// 测试6: 装饰器应用于无参数函数
+@simple
+func test7() -> int {
+    return 42
+}
+
+// 测试7: 装饰器应用于多参数函数
+@log
+func test8(a:int, b:int, c:int, d:int, e:int) -> int {
+    return a + b + c + d + e
+}
+
+// 测试8: 装饰器应用于返回void的函数
+@timing
+func test9(x:int) -> void {
+    PrintLine(x.ToStr())
+}
+
+// 测试9: 装饰器应用于异步函数
+@async_log
+async func test10(x:int) -> int {
+    return x * 2
+}
+
+// 测试10: 装饰器参数使用变量（虽然在语法层面可以解析）
+@config(timeout: someVar)
+func test11(x:int) -> int {
+    return x
+}
+
+// 测试11: 装饰器名称很长
+@very_long_decorator_name_with_many_words_and_underscores
+func test12(x:int) -> int {
+    return x
+}
+
+// 测试12: 装饰器参数名称很长
+@config(very_long_parameter_name_with_many_words: 100)
+func test13(x:int) -> int {
+    return x
+}
+
+// 测试13: 装饰器参数为负数
+@config(offset: -10, scale: -1.5)
+func test14(x:int) -> int {
+    return x
+}
+
+// 测试14: 装饰器参数为字符
+@config(separator: 'x')
+func test15(x:int) -> int {
+    return x
+}
+
+// 测试15: 装饰器参数为空字符串
+@config(prefix: "")
+func test16(x:int) -> int {
+    return x
+}
+
+PrintLine("装饰器语法边界测试通过")
