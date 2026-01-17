@@ -1,0 +1,112 @@
+// 测试链式运算和复杂表达式
+// 验证运算符重载在复杂表达式中的正确性
+
+class Complex {
+    public real
+    public imag
+
+    init(real, imag) {
+        this.real <- real
+        this.imag <- imag
+    }
+
+    // 复数加法：(a + bi) + (c + di) = (a+c) + (b+d)i
+    _add(other) {
+        return Complex(this.real + other.real, this.imag + other.imag)
+    }
+
+    // 复数减法：(a + bi) - (c + di) = (a-c) + (b-d)i
+    _sub(other) {
+        return Complex(this.real - other.real, this.imag - other.imag)
+    }
+
+    // 复数乘法：(a + bi) * (c + di) = (ac-bd) + (ad+bc)i
+    _mul(other) {
+        newReal <- this.real * other.real - this.imag * other.imag
+        newImag <- this.real * other.imag + this.imag * other.real
+        return Complex(newReal, newImag)
+    }
+
+    // 复数相等比较
+    _eq(other) {
+        return this.real == other.real && this.imag == other.imag
+    }
+
+    // 辅助方法：打印复数
+    print() {
+        if this.imag >= 0 {
+            PrintLine(this.real.ToStr() + " + " + this.imag.ToStr() + "i")
+        } else {
+            PrintLine(this.real.ToStr() + " - " + (0 - this.imag).ToStr() + "i")
+        }
+    }
+}
+
+// 测试简单链式加法
+PrintLine("=== 测试链式加法 ===")
+c1 <- Complex(1, 2)
+c2 <- Complex(3, 4)
+c3 <- Complex(5, 6)
+result1 <- c1 + c2 + c3
+Print("(1+2i) + (3+4i) + (5+6i) = ")
+result1.print()
+
+// 测试混合运算
+PrintLine("=== 测试混合运算 ===")
+c4 <- Complex(2, 1)
+c5 <- Complex(1, 1)
+c6 <- Complex(3, 2)
+result2 <- c4 + c5 - c6
+Print("(2+1i) + (1+1i) - (3+2i) = ")
+result2.print()
+
+// 测试复杂表达式
+PrintLine("=== 测试复杂表达式 ===")
+c7 <- Complex(1, 0)
+c8 <- Complex(0, 1)
+c9 <- Complex(1, 1)
+result3 <- (c7 + c8) * c9
+Print("((1+0i) + (0+1i)) * (1+1i) = ")
+result3.print()
+
+// 测试链式乘法
+PrintLine("=== 测试链式乘法 ===")
+c10 <- Complex(2, 0)
+c11 <- Complex(1, 1)
+c12 <- Complex(1, -1)
+result4 <- c10 * c11 * c12
+Print("(2+0i) * (1+1i) * (1-1i) = ")
+result4.print()
+
+// 测试比较运算在链式表达式中的使用
+PrintLine("=== 测试比较运算 ===")
+c13 <- Complex(5, 5)
+c14 <- Complex(2, 2)
+c15 <- Complex(3, 3)
+sum <- c14 + c15
+if sum == c13 {
+    PrintLine("(2+2i) + (3+3i) == (5+5i): true (正确)")
+} else {
+    PrintLine("(2+2i) + (3+3i) == (5+5i): false (错误)")
+}
+
+// 测试更复杂的表达式
+PrintLine("=== 测试更复杂的表达式 ===")
+c16 <- Complex(1, 2)
+c17 <- Complex(3, 4)
+c18 <- Complex(5, 6)
+c19 <- Complex(7, 8)
+result5 <- c16 + c17 - c18 + c19
+Print("(1+2i) + (3+4i) - (5+6i) + (7+8i) = ")
+result5.print()
+
+// 测试括号优先级
+PrintLine("=== 测试括号优先级 ===")
+c20 <- Complex(1, 1)
+c21 <- Complex(2, 2)
+c22 <- Complex(3, 3)
+result6 <- c20 + (c21 * c22)
+Print("(1+1i) + ((2+2i) * (3+3i)) = ")
+result6.print()
+
+PrintLine("=== 所有测试通过 ===")

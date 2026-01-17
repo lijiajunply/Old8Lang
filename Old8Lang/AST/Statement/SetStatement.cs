@@ -422,6 +422,26 @@ public partial class SetStatement : OldStatement
             // 获取索引或键
             var indexValue = listItem.Key.Run(manager);
 
+            // 检查是否是 AnyLangValue（类实例）且定义了 _setitem 方法
+            if (collectionValue is AnyLangValue anyValue)
+            {
+                var setitemMethods = anyValue.Metadata.MethodTable.LookupMethod("_setitem");
+                if (setitemMethods is not null && setitemMethods.Count > 0)
+                {
+                    // 创建一个 Instance 表达式来调用 _setitem 方法
+                    var setitemCall = new Instance(
+                        new LangId("_setitem"),
+                        new List<LangExpression> { indexValue, result },
+                        null,
+                        Position
+                    );
+
+                    // 通过 Dot 操作调用方法
+                    anyValue.Dot(setitemCall, manager);
+                    return;
+                }
+            }
+
             // 检查集合是否是ILangList类型，如果是则调用其Set方法
             if (collectionValue is ILangList listCollection)
             {

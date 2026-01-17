@@ -1,0 +1,28 @@
+// 测试字典修改
+
+class DataHolder {
+    public data
+
+    init() {
+        this.data <- {"initial": 1}
+    }
+
+    addItem(key, value) {
+        this.data[key] <- value
+    }
+
+    getItem(key) {
+        return this.data[key]
+    }
+}
+
+holder <- DataHolder()
+PrintLine("初始值: " + holder.getItem("initial").ToStr())
+
+holder.addItem("key1", 10)
+PrintLine("添加 key1 后: " + holder.getItem("key1").ToStr())
+
+holder.addItem("key2", 20)
+PrintLine("添加 key2 后: " + holder.getItem("key2").ToStr())
+
+PrintLine("=== 测试通过 ===")

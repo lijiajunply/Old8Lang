@@ -1,4 +1,6 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -23,6 +25,26 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
     {
         var a = manager.GetValue(ListId);
         LangExpression result = Key.Run(manager);
+
+        // 检查是否是 AnyLangValue（类实例）且定义了 _getitem 方法
+        if (a is AnyLangValue anyValue)
+        {
+            var getitemMethods = anyValue.Metadata.MethodTable.LookupMethod("_getitem");
+            if (getitemMethods is not null && getitemMethods.Count > 0)
+            {
+                // 创建一个 Instance 表达式来调用 _getitem 方法
+                var getitemCall = new Instance(
+                    new LangId("_getitem"),
+                    new List<LangExpression> { result },
+                    null,
+                    Position
+                );
+
+                // 通过 Dot 操作调用方法
+                return anyValue.Dot(getitemCall, manager);
+            }
+        }
+
         if (a is ListLangValue list)
         {
             if (result is not IntLangValue intResult) throw new TypeError(this, "IntValue", result.GetType().Name);

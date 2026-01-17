@@ -4,6 +4,93 @@
 
 ### 语言特性增强
 
+#### 运算符重载支持
+- **功能**: 新增 Python 风格的运算符重载功能，允许用户自定义类的运算符行为
+- **支持的运算符**:
+  - 算术运算符：`+` (`_add`)、`-` (`_sub`)、`*` (`_mul`)、`/` (`_div`)、`%` (`_mod`)、`^` (`_pow`)
+  - 比较运算符：`==` (`_eq`)、`<` (`_lt`)、`>` (`_gt`)、`<=` (`_le`)、`>=` (`_ge`)
+  - 索引运算符：`obj[key]` (`_getitem`)、`obj[key] <- value` (`_setitem`)
+  - 自动实现：`!=` 运算符自动通过 `_eq` 方法的取反实现
+- **使用示例**:
+  ```old8
+  class Vector {
+      public x
+      public y
+
+      init(x, y) {
+          this.x <- x
+          this.y <- y
+      }
+
+      // 向量加法
+      _add(other) {
+          return Vector(this.x + other.x, this.y + other.y)
+      }
+
+      // 向量数乘
+      _mul(scalar) {
+          return Vector(this.x * scalar, this.y * scalar)
+      }
+
+      // 相等比较
+      _eq(other) {
+          return this.x == other.x && this.y == other.y
+      }
+  }
+
+  // 索引运算符重载示例
+  class SparseArray {
+      private data
+
+      init() {
+          this.data <- {"dummy": 0}
+      }
+
+      // 索引获取
+      _getitem(index) {
+          return this.data[index.ToStr()]
+      }
+
+      // 索引设置
+      _setitem(index, value) {
+          this.data[index.ToStr()] <- value
+      }
+  }
+
+  v1 <- Vector(1, 2)
+  v2 <- Vector(3, 4)
+  v3 <- v1 + v2        // 调用 v1._add(v2)
+  v4 <- v1 * 2         // 调用 v1._mul(2)
+  if v1 == v2 { ... }  // 调用 v1._eq(v2)
+  if v1 != v2 { ... }  // 自动实现为 !v1._eq(v2)
+
+  arr <- SparseArray()
+  arr[0] <- 10         // 调用 arr._setitem(0, 10)
+  val <- arr[0]        // 调用 arr._getitem(0)
+  ```
+- **实现细节**:
+  - 在 `AnyLangValue` 类中重写了所有运算符虚方法（`Plus`、`Minus`、`Times` 等）
+  - 在 `LangListItem.Run` 中添加了对 `_getitem` 方法的支持
+  - 在 `SetStatement` 中添加了对 `_setitem` 方法的支持
+  - 运算符方法查找通过 `MethodTable.LookupMethod()` 实现
+  - 如果类未定义对应的运算符方法，会抛出清晰的错误提示
+  - 比较运算符方法必须返回 `bool` 类型，否则抛出 `TypeError`
+- **特性**:
+  - 支持链式运算：`a + b + c` 会依次调用 `a._add(b)` 和 `result._add(c)`
+  - 支持复杂表达式：`(a + b) * c` 会正确处理运算优先级
+  - 支持索引语法：`obj[key]` 和 `obj[key] <- value`
+  - 错误处理：未定义运算符时提供清晰的错误信息
+- **测试覆盖**:
+  - 基本算术运算符重载（Vector 类）
+  - 比较运算符重载（Point 类）
+  - 链式运算和复杂表达式（Complex 类）
+  - 索引运算符重载（SparseArray 类）
+  - 错误处理（未定义运算符）
+- **当前限制**:
+  - 仅支持解释器模式（`-f`），编译器模式（`-c`）将在后续版本中支持
+  - 暂不支持一元运算符重载（如 `-x`、`!x`）
+  - 索引运算符的 `_setitem` 方法中修改引用类型字段的内部状态可能需要特殊处理
+
 #### 函数装饰器支持
 - **功能**: 新增 Python 风格的函数装饰器语法，支持在运行时动态包装和增强函数行为
 - **语法**:

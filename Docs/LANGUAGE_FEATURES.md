@@ -13,6 +13,7 @@
   - [Async/Await](#asyncawait)
   - [生成器 (Generators)](#生成器-generators)
   - [多线程 (Spawn)](#多线程-spawn)
+- [运算符重载](#运算符重载)
 - [高级类型系统](#高级类型系统)
   - [联合类型 (Union Types)](#联合类型-union-types)
   - [交叉类型 (Intersection Types)](#交叉类型-intersection-types)
@@ -169,6 +170,232 @@ func worker(id:int) -> void {
 // 启动并发任务
 spawn worker(1)
 spawn worker(2)
+```
+
+---
+
+## 运算符重载
+
+Old8Lang 支持 Python 风格的运算符重载，允许用户为自定义类定义运算符行为。
+
+### 支持的运算符
+
+通过在类中定义特殊方法（以 `_` 开头），可以重载以下运算符：
+
+| 运算符 | 特殊方法 | 说明 |
+|--------|---------|------|
+| `+` | `_add(other)` | 加法运算 |
+| `-` | `_sub(other)` | 减法运算 |
+| `*` | `_mul(other)` | 乘法运算 |
+| `/` | `_div(other)` | 除法运算 |
+| `%` | `_mod(other)` | 取模运算 |
+| `^` | `_pow(other)` | 幂运算 |
+| `==` | `_eq(other)` | 相等比较 |
+| `!=` | 自动实现 | 自动通过 `!_eq(other)` 实现 |
+| `<` | `_lt(other)` | 小于比较 |
+| `>` | `_gt(other)` | 大于比较 |
+| `<=` | `_le(other)` | 小于等于比较 |
+| `>=` | `_ge(other)` | 大于等于比较 |
+| `obj[key]` | `_getitem(key)` | 索引获取 |
+| `obj[key] <- value` | `_setitem(key, value)` | 索引设置 |
+
+### 基本示例
+
+```old8
+class Vector {
+    public x
+    public y
+
+    init(x, y) {
+        this.x <- x
+        this.y <- y
+    }
+
+    // 向量加法
+    _add(other) {
+        return Vector(this.x + other.x, this.y + other.y)
+    }
+
+    // 向量数乘
+    _mul(scalar) {
+        return Vector(this.x * scalar, this.y * scalar)
+    }
+
+    // 相等比较
+    _eq(other) {
+        return this.x == other.x && this.y == other.y
+    }
+}
+
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+
+// 使用重载的运算符
+v3 <- v1 + v2        // 调用 v1._add(v2)，结果: Vector(4, 6)
+v4 <- v1 * 2         // 调用 v1._mul(2)，结果: Vector(2, 4)
+
+if v1 == v2 {        // 调用 v1._eq(v2)
+    PrintLine("相等")
+}
+
+if v1 != v2 {        // 自动实现为 !v1._eq(v2)
+    PrintLine("不相等")
+}
+```
+
+### 复数运算示例
+
+```old8
+class Complex {
+    public real
+    public imag
+
+    init(real, imag) {
+        this.real <- real
+        this.imag <- imag
+    }
+
+    // 复数加法：(a + bi) + (c + di) = (a+c) + (b+d)i
+    _add(other) {
+        return Complex(this.real + other.real, this.imag + other.imag)
+    }
+
+    // 复数乘法：(a + bi) * (c + di) = (ac-bd) + (ad+bc)i
+    _mul(other) {
+        newReal <- this.real * other.real - this.imag * other.imag
+        newImag <- this.real * other.imag + this.imag * other.real
+        return Complex(newReal, newImag)
+    }
+
+    // 相等比较
+    _eq(other) {
+        return this.real == other.real && this.imag == other.imag
+    }
+}
+
+c1 <- Complex(1, 2)
+c2 <- Complex(3, 4)
+c3 <- c1 + c2        // Complex(4, 6)
+c4 <- c1 * c2        // Complex(-5, 10)
+```
+
+### 链式运算
+
+运算符重载支持链式运算和复杂表达式：
+
+```old8
+v1 <- Vector(1, 1)
+v2 <- Vector(2, 2)
+v3 <- Vector(3, 3)
+
+// 链式加法
+result <- v1 + v2 + v3  // 依次调用 v1._add(v2) 和 result._add(v3)
+
+// 复杂表达式
+result <- (v1 + v2) * 2  // 先加法，再乘法
+```
+
+### 比较运算符
+
+比较运算符的特殊方法必须返回 `bool` 类型：
+
+```old8
+class Point {
+    public x
+    public y
+
+    init(x, y) {
+        this.x <- x
+        this.y <- y
+    }
+
+    // 按距离原点的距离比较
+    _lt(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance < otherDistance
+    }
+
+    _gt(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance > otherDistance
+    }
+}
+
+p1 <- Point(1, 1)
+p2 <- Point(2, 2)
+
+if p1 < p2 {  // 调用 p1._lt(p2)
+    PrintLine("p1 距离原点更近")
+}
+```
+
+### 错误处理
+
+如果类未定义对应的运算符方法，会抛出清晰的错误信息：
+
+```old8
+class SimpleClass {
+    public value
+    init(value) { this.value <- value }
+}
+
+obj1 <- SimpleClass(10)
+obj2 <- SimpleClass(5)
+
+try {
+    result <- obj1 + obj2  // 错误：未定义 _add 方法
+} catch (e) {
+    // 错误信息：类型 'SimpleClass' 不支持加法操作（未定义 _add 方法）
+    PrintLine(e.ToStr())
+}
+```
+
+### 注意事项
+
+1. **返回类型**：比较运算符（`_eq`、`_lt`、`_gt` 等）必须返回 `bool` 类型
+2. **参数数量**：
+   - 算术和比较运算符方法必须接受恰好 1 个参数
+   - `_setitem` 方法必须接受恰好 2 个参数（key 和 value）
+3. **自动实现**：`!=` 运算符会自动通过 `_eq` 方法的取反实现，无需单独定义
+4. **当前限制**:
+   - 仅支持解释器模式（`-f`），编译器模式（`-c`）将在后续版本中支持
+   - 暂不支持一元运算符重载（如 `-x`、`!x`）
+   - 索引运算符的 `_setitem` 方法中修改引用类型字段的内部状态可能需要特殊处理
+
+### 索引运算符示例
+
+```old8
+class SparseArray {
+    private data
+
+    init() {
+        this.data <- {"dummy": 0}
+    }
+
+    // 索引获取：arr[index]
+    _getitem(index) {
+        key <- index.ToStr()
+        return this.data[key]
+    }
+
+    // 索引设置：arr[index] <- value
+    _setitem(index, value) {
+        key <- index.ToStr()
+        this.data[key] <- value
+    }
+}
+
+arr <- SparseArray()
+arr[0] <- 10         // 调用 arr._setitem(0, 10)
+arr[5] <- 50         // 调用 arr._setitem(5, 50)
+
+val1 <- arr[0]       // 调用 arr._getitem(0)
+val2 <- arr[5]       // 调用 arr._getitem(5)
+
+PrintLine("arr[0] = " + val1.ToStr())
+PrintLine("arr[5] = " + val2.ToStr())
 ```
 
 ---

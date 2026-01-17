@@ -1,0 +1,28 @@
+// 简单测试：验证字段修改同步
+
+class Counter {
+    public count
+
+    init() {
+        this.count <- 0
+    }
+
+    increment() {
+        this.count <- this.count + 1
+    }
+
+    getCount() {
+        return this.count
+    }
+}
+
+c <- Counter()
+PrintLine("初始值: " + c.getCount().ToStr())
+
+c.increment()
+PrintLine("调用 increment() 后: " + c.getCount().ToStr())
+
+c.increment()
+PrintLine("再次调用 increment() 后: " + c.getCount().ToStr())
+
+PrintLine("=== 测试通过 ===")

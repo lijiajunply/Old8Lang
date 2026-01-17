@@ -1,0 +1,146 @@
+// 测试比较运算符重载功能
+// 实现一个 Point 类，支持相等、小于、大于等比较运算
+
+class Point {
+    public x
+    public y
+
+    init(x, y) {
+        this.x <- x
+        this.y <- y
+    }
+
+    // 相等比较：两个点的坐标都相等
+    _eq(other) {
+        return this.x == other.x && this.y == other.y
+    }
+
+    // 小于比较：按距离原点的距离比较
+    _lt(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance < otherDistance
+    }
+
+    // 大于比较：按距离原点的距离比较
+    _gt(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance > otherDistance
+    }
+
+    // 小于等于比较
+    _le(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance <= otherDistance
+    }
+
+    // 大于等于比较
+    _ge(other) {
+        thisDistance <- this.x * this.x + this.y * this.y
+        otherDistance <- other.x * other.x + other.y * other.y
+        return thisDistance >= otherDistance
+    }
+
+    // 辅助方法：打印点
+    print() {
+        PrintLine("(" + this.x.ToStr() + ", " + this.y.ToStr() + ")")
+    }
+}
+
+// 测试相等比较
+PrintLine("=== 测试相等比较 (==) ===")
+p1 <- Point(3, 4)
+p2 <- Point(3, 4)
+p3 <- Point(5, 6)
+
+if p1 == p2 {
+    PrintLine("p1 == p2: true (正确)")
+} else {
+    PrintLine("p1 == p2: false (错误)")
+}
+
+if p1 == p3 {
+    PrintLine("p1 == p3: true (错误)")
+} else {
+    PrintLine("p1 == p3: false (正确)")
+}
+
+// 测试不等比较（自动实现）
+PrintLine("=== 测试不等比较 (!=) ===")
+if p1 != p3 {
+    PrintLine("p1 != p3: true (正确)")
+} else {
+    PrintLine("p1 != p3: false (错误)")
+}
+
+if p1 != p2 {
+    PrintLine("p1 != p2: true (错误)")
+} else {
+    PrintLine("p1 != p2: false (正确)")
+}
+
+// 测试小于比较
+PrintLine("=== 测试小于比较 (<) ===")
+p4 <- Point(1, 1)  // 距离原点: sqrt(2) ≈ 1.41
+p5 <- Point(2, 2)  // 距离原点: sqrt(8) ≈ 2.83
+
+if p4 < p5 {
+    PrintLine("p4 < p5: true (正确)")
+} else {
+    PrintLine("p4 < p5: false (错误)")
+}
+
+if p5 < p4 {
+    PrintLine("p5 < p4: true (错误)")
+} else {
+    PrintLine("p5 < p4: false (正确)")
+}
+
+// 测试大于比较
+PrintLine("=== 测试大于比较 (>) ===")
+if p5 > p4 {
+    PrintLine("p5 > p4: true (正确)")
+} else {
+    PrintLine("p5 > p4: false (错误)")
+}
+
+if p4 > p5 {
+    PrintLine("p4 > p5: true (错误)")
+} else {
+    PrintLine("p4 > p5: false (正确)")
+}
+
+// 测试小于等于比较
+PrintLine("=== 测试小于等于比较 (<=) ===")
+p6 <- Point(1, 1)
+p7 <- Point(1, 1)
+
+if p4 <= p5 {
+    PrintLine("p4 <= p5: true (正确)")
+} else {
+    PrintLine("p4 <= p5: false (错误)")
+}
+
+if p6 <= p7 {
+    PrintLine("p6 <= p7: true (正确)")
+} else {
+    PrintLine("p6 <= p7: false (错误)")
+}
+
+// 测试大于等于比较
+PrintLine("=== 测试大于等于比较 (>=) ===")
+if p5 >= p4 {
+    PrintLine("p5 >= p4: true (正确)")
+} else {
+    PrintLine("p5 >= p4: false (错误)")
+}
+
+if p6 >= p7 {
+    PrintLine("p6 >= p7: true (正确)")
+} else {
+    PrintLine("p6 >= p7: false (错误)")
+}
+
+PrintLine("=== 所有测试通过 ===")

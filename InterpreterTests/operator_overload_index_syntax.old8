@@ -1,0 +1,40 @@
+// 测试索引运算符重载功能 - 使用真正的索引语法
+// 实现一个自定义的 SparseArray 类，支持索引访问和赋值
+
+class SparseArray {
+    private data
+
+    init() {
+        this.data <- {"dummy": 0}  // 创建字典
+    }
+
+    // 索引获取：arr[index]
+    _getitem(index) {
+        key <- index.ToStr()
+        return this.data[key]
+    }
+
+    // 索引设置：arr[index] <- value
+    _setitem(index, value) {
+        key <- index.ToStr()
+        this.data[key] <- value
+    }
+}
+
+// 测试索引获取
+PrintLine("=== 测试索引获取 ===")
+arr <- SparseArray()
+arr._setitem(0, 10)
+arr._setitem(5, 50)
+arr._setitem(10, 100)
+
+val1 <- arr[0]
+PrintLine("arr[0] = " + val1.ToStr())
+
+val2 <- arr[5]
+PrintLine("arr[5] = " + val2.ToStr())
+
+val3 <- arr[10]
+PrintLine("arr[10] = " + val3.ToStr())
+
+PrintLine("=== 所有测试通过 ===")

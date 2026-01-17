@@ -343,6 +343,19 @@ public partial class AnyLangValue : LangValueType
         // 查找集合字段
         if (!InstanceData.TryGetValue(collectionName, out var collectionValue))
         {
+            // 如果字段不存在，检查是否定义了 _getitem 方法（索引重载）
+            var getitemMethod = Metadata.MethodTable.LookupMethod("_getitem");
+            if (getitemMethod is not null && getitemMethod.Count > 0)
+            {
+                // 计算索引值
+                var indexValue = listItem.Key.Run(manager);
+
+                // 调用 _getitem 方法
+                var result = CallOperatorOverloadMethod("_getitem", indexValue);
+                if (result is not null)
+                    return result;
+            }
+
             throw new AttributeError(this, collectionName, ClassId.IdName);
         }
 
@@ -354,15 +367,15 @@ public partial class AnyLangValue : LangValueType
         }
 
         // 计算索引值
-        var indexValue = listItem.Key.Run(manager);
+        var keyValue = listItem.Key.Run(manager);
 
         // 根据集合类型进行索引访问
         return collectionValue switch
         {
-            ListLangValue list when indexValue is IntLangValue intIndex => list.Get(intIndex),
-            ArrayLangValue array when indexValue is IntLangValue intIndex => array.Get(intIndex),
-            DictionaryLangValue dict => dict.Get(indexValue),
-            StringLangValue str when indexValue is IntLangValue intIndex => str.Get(intIndex),
+            ListLangValue list when keyValue is IntLangValue intIndex => list.Get(intIndex),
+            ArrayLangValue array when keyValue is IntLangValue intIndex => array.Get(intIndex),
+            DictionaryLangValue dict => dict.Get(keyValue),
+            StringLangValue str when keyValue is IntLangValue intIndex => str.Get(intIndex),
             _ => throw new InvalidOperationError(listItem, $"不支持的集合类型: {collectionValue.GetType().Name}")
         };
     }
@@ -923,4 +936,269 @@ public partial class AnyLangValue : LangValueType
                 $"执行 {ClassId.IdName}.dispose() 时发生错误: {ex.Message}");
         }
     }
+
+    // ===== 运算符重载支持 =====
+
+    /// <summary>
+    /// 调用运算符重载方法的辅助函数
+    /// </summary>
+    /// <param name="methodName">特殊方法名（如 _add, _sub 等）</param>
+    /// <param name="operand">右操作数</param>
+    /// <returns>运算结果，如果方法不存在则返回 null</returns>
+    private LangValueType? CallOperatorOverloadMethod(string methodName, LangValueType operand)
+    {
+        // 1. 查找方法
+        var methods = Metadata.MethodTable.LookupMethod(methodName);
+        if (methods is null || methods.Count == 0)
+            return null;
+
+        // 2. 选择合适的重载（参数数量为 1）
+        var method = methods.FirstOrDefault(m => m.ParameterCount == 1);
+        if (method is null)
+            throw new ArgumentError(Position, $"运算符重载方法 '{methodName}' 必须接受 1 个参数");
+
+        // 3. 创建执行作用域（与 ExecuteMethod 保持一致）
+        var executionManager = InstanceScope.Interpreter.Manager.NewManger();
+
+        // 4. 设置 this 指针
+        executionManager.Set(new LangId("this"), this);
+
+        // 5. 将所有实例字段添加到执行作用域
+        foreach (var (fieldName, fieldValue) in InstanceData)
+        {
+            executionManager.Set(new LangId(fieldName), fieldValue);
+        }
+
+        // 6. 将类的所有方法添加到执行作用域
+        foreach (var m in Metadata.MethodTable.GetAllMethods())
+        {
+            if (!m.IsStatic)
+            {
+                executionManager.Set(new LangId(m.MethodName), m.Implementation);
+            }
+        }
+
+        // 7. 将类型信息添加到作用域
+        executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+        // 8. 设置函数上下文标志
+        executionManager.IsFunc = true;
+
+        // 9. 如果这是泛型类的方法，设置类型参数映射
+        if (TypeArgumentMapping is not null)
+        {
+            executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+        }
+
+        // 10. 执行方法（将操作数作为参数传递）
+        var parameterExpressions = new List<LangExpression> { operand };
+        var result = method.Implementation.Run(executionManager, parameterExpressions, new List<NamedArgument>(), Position);
+
+        // 11. 恢复函数上下文标志
+        executionManager.IsFunc = false;
+
+        // 12. 同步字段修改
+        SyncFieldsFromExecutionScope(executionManager);
+
+        return result;
+    }
+
+    #region 算术运算符重载
+
+    /// <summary>
+    /// 加法运算符重载
+    /// 查找 _add 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Plus(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_add", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        // 如果没有重载方法，抛出错误（AnyLangValue 默认不支持算术运算）
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持加法操作（未定义 _add 方法）");
+    }
+
+    /// <summary>
+    /// 减法运算符重载
+    /// 查找 _sub 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Minus(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_sub", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持减法操作（未定义 _sub 方法）");
+    }
+
+    /// <summary>
+    /// 乘法运算符重载
+    /// 查找 _mul 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Times(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_mul", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持乘法操作（未定义 _mul 方法）");
+    }
+
+    /// <summary>
+    /// 除法运算符重载
+    /// 查找 _div 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Divide(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_div", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持除法操作（未定义 _div 方法）");
+    }
+
+    /// <summary>
+    /// 取模运算符重载
+    /// 查找 _mod 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Mod(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_mod", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持取模操作（未定义 _mod 方法）");
+    }
+
+    /// <summary>
+    /// 幂运算符重载
+    /// 查找 _pow 方法，如果不存在则回退到基类实现
+    /// </summary>
+    public override LangValueType Power(LangValueType otherLangValueType)
+    {
+        var result = CallOperatorOverloadMethod("_pow", otherLangValueType);
+        if (result is not null)
+            return result;
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持幂运算操作（未定义 _pow 方法）");
+    }
+
+    #endregion
+
+    #region 比较运算符重载
+
+    /// <summary>
+    /// 相等比较运算符重载
+    /// 查找 _eq 方法，如果不存在则使用引用相等比较
+    /// </summary>
+    public override bool Equal(LangValueType? otherValueType)
+    {
+        if (otherValueType is null)
+            return false;
+
+        var result = CallOperatorOverloadMethod("_eq", otherValueType);
+        if (result is not null)
+        {
+            // 将结果转换为布尔值
+            if (result is BoolLangValue boolValue)
+                return boolValue.Value;
+
+            throw new TypeError(this, "Bool", result.GetType().Name,
+                $"运算符重载方法 '_eq' 必须返回 bool 类型，但实际返回了 '{result.GetType().Name}'");
+        }
+
+        // 如果没有重载方法，使用引用相等比较
+        return ReferenceEquals(this, otherValueType);
+    }
+
+    /// <summary>
+    /// 小于比较运算符重载
+    /// 查找 _lt 方法，如果不存在则抛出错误
+    /// </summary>
+    public override bool Less(LangValueType? otherValue)
+    {
+        if (otherValue is null)
+            throw new InvalidOperationError(this, "无法与 null 进行小于比较");
+
+        var result = CallOperatorOverloadMethod("_lt", otherValue);
+        if (result is not null)
+        {
+            if (result is BoolLangValue boolValue)
+                return boolValue.Value;
+
+            throw new TypeError(this, "Bool", result.GetType().Name,
+                $"运算符重载方法 '_lt' 必须返回 bool 类型，但实际返回了 '{result.GetType().Name}'");
+        }
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持小于比较操作（未定义 _lt 方法）");
+    }
+
+    /// <summary>
+    /// 大于比较运算符重载
+    /// 查找 _gt 方法，如果不存在则抛出错误
+    /// </summary>
+    public override bool Greater(LangValueType? otherValue)
+    {
+        if (otherValue is null)
+            throw new InvalidOperationError(this, "无法与 null 进行大于比较");
+
+        var result = CallOperatorOverloadMethod("_gt", otherValue);
+        if (result is not null)
+        {
+            if (result is BoolLangValue boolValue)
+                return boolValue.Value;
+
+            throw new TypeError(this, "Bool", result.GetType().Name,
+                $"运算符重载方法 '_gt' 必须返回 bool 类型，但实际返回了 '{result.GetType().Name}'");
+        }
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持大于比较操作（未定义 _gt 方法）");
+    }
+
+    /// <summary>
+    /// 小于等于比较运算符重载
+    /// 查找 _le 方法，如果不存在则抛出错误
+    /// </summary>
+    public override bool LessEqual(LangValueType? otherValue)
+    {
+        if (otherValue is null)
+            throw new InvalidOperationError(this, "无法与 null 进行小于等于比较");
+
+        var result = CallOperatorOverloadMethod("_le", otherValue);
+        if (result is not null)
+        {
+            if (result is BoolLangValue boolValue)
+                return boolValue.Value;
+
+            throw new TypeError(this, "Bool", result.GetType().Name,
+                $"运算符重载方法 '_le' 必须返回 bool 类型，但实际返回了 '{result.GetType().Name}'");
+        }
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持小于等于比较操作（未定义 _le 方法）");
+    }
+
+    /// <summary>
+    /// 大于等于比较运算符重载
+    /// 查找 _ge 方法，如果不存在则抛出错误
+    /// </summary>
+    public override bool GreaterEqual(LangValueType? otherValue)
+    {
+        if (otherValue is null)
+            throw new InvalidOperationError(this, "无法与 null 进行大于等于比较");
+
+        var result = CallOperatorOverloadMethod("_ge", otherValue);
+        if (result is not null)
+        {
+            if (result is BoolLangValue boolValue)
+                return boolValue.Value;
+
+            throw new TypeError(this, "Bool", result.GetType().Name,
+                $"运算符重载方法 '_ge' 必须返回 bool 类型，但实际返回了 '{result.GetType().Name}'");
+        }
+
+        throw new InvalidOperationError(this, $"类型 '{ClassId.IdName}' 不支持大于等于比较操作（未定义 _ge 方法）");
+    }
+
+    #endregion
 }

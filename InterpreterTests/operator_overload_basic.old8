@@ -1,0 +1,99 @@
+// 测试基本运算符重载功能
+// 实现一个简单的 Vector 类，支持加法、减法、乘法运算
+
+class Vector {
+    public x
+    public y
+
+    init(x, y) {
+        this.x <- x
+        this.y <- y
+    }
+
+    // 加法运算符重载：向量加法
+    _add(other) {
+        return Vector(this.x + other.x, this.y + other.y)
+    }
+
+    // 减法运算符重载：向量减法
+    _sub(other) {
+        return Vector(this.x - other.x, this.y - other.y)
+    }
+
+    // 乘法运算符重载：向量数乘
+    _mul(scalar) {
+        return Vector(this.x * scalar, this.y * scalar)
+    }
+
+    // 除法运算符重载：向量数除
+    _div(scalar) {
+        return Vector(this.x / scalar, this.y / scalar)
+    }
+
+    // 取模运算符重载：向量模长
+    _mod(other) {
+        return (this.x % other.x + this.y % other.y)
+    }
+
+    // 幂运算符重载：向量各分量求幂
+    _pow(exponent) {
+        return Vector(this.x ^ exponent, this.y ^ exponent)
+    }
+
+    // 辅助方法：打印向量
+    print() {
+        PrintLine("(" + this.x.ToStr() + ", " + this.y.ToStr() + ")")
+    }
+}
+
+// 测试加法
+PrintLine("=== 测试加法 ===")
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+v3 <- v1 + v2
+Print("v1 + v2 = ")
+v3.print()
+
+// 测试减法
+PrintLine("=== 测试减法 ===")
+v4 <- v2 - v1
+Print("v2 - v1 = ")
+v4.print()
+
+// 测试乘法（数乘）
+PrintLine("=== 测试乘法 ===")
+v5 <- v1 * 3
+Print("v1 * 3 = ")
+v5.print()
+
+// 测试除法
+PrintLine("=== 测试除法 ===")
+v6 <- Vector(10, 20)
+v7 <- v6 / 2
+Print("v6 / 2 = ")
+v7.print()
+
+// 测试取模
+PrintLine("=== 测试取模 ===")
+v8 <- Vector(10, 15)
+v9 <- Vector(3, 4)
+result <- v8 % v9
+PrintLine("v8 % v9 = " + result.ToStr())
+
+// 测试幂运算
+PrintLine("=== 测试幂运算 ===")
+v10 <- Vector(2, 3)
+v11 <- v10 ^ 2
+Print("v10 ^ 2 = ")
+v11.print()
+
+// 测试链式运算
+PrintLine("=== 测试链式运算 ===")
+v12 <- Vector(1, 1)
+v13 <- Vector(2, 2)
+v14 <- Vector(3, 3)
+v15 <- v12 + v13 + v14
+Print("v12 + v13 + v14 = ")
+v15.print()
+
+PrintLine("=== 所有测试通过 ===")

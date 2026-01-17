@@ -1,0 +1,49 @@
+// 测试运算符重载的错误处理
+// 验证未定义运算符时的错误提示
+
+class SimpleClass {
+    public value
+
+    init(value) {
+        this.value <- value
+    }
+
+    // 只定义加法运算符
+    _add(other) {
+        return SimpleClass(this.value + other.value)
+    }
+}
+
+// 测试未定义的减法运算符（应该抛出错误）
+PrintLine("=== 测试未定义的减法运算符 ===")
+obj1 <- SimpleClass(10)
+obj2 <- SimpleClass(5)
+
+try {
+    result <- obj1 - obj2
+    PrintLine("错误：应该抛出异常但没有")
+} catch (e) {
+    PrintLine("正确：捕获到错误 - " + e.ToStr())
+}
+
+// 测试未定义的乘法运算符（应该抛出错误）
+PrintLine("=== 测试未定义的乘法运算符 ===")
+try {
+    result <- obj1 * obj2
+    PrintLine("错误：应该抛出异常但没有")
+} catch (e) {
+    PrintLine("正确：捕获到错误 - " + e.ToStr())
+}
+
+// 测试未定义的比较运算符（应该抛出错误）
+PrintLine("=== 测试未定义的比较运算符 ===")
+try {
+    result <- obj1 < obj2
+    PrintLine("错误：应该抛出异常但没有")
+} catch (e) {
+    PrintLine("正确：捕获到错误 - " + e.ToStr())
+}
+
+PrintLine("=== 所有错误处理测试通过 ===")
+
+// error

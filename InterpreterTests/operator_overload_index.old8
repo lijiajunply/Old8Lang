@@ -1,0 +1,65 @@
+// 测试索引运算符重载功能
+// 实现一个自定义的 Matrix 类，支持索引访问和赋值
+
+class Matrix {
+    private data
+
+    init(rows, cols) {
+        this.data <- {"dummy": 0}  // 创建字典
+        i <- 0
+        while i < rows {
+            j <- 0
+            while j < cols {
+                key <- i.ToStr() + "," + j.ToStr()
+                this.data[key] <- 0
+                j <- j + 1
+            }
+            i <- i + 1
+        }
+    }
+
+    // 索引获取：matrix[i, j] 或 matrix[key]
+    _getitem(key) {
+        return this.data[key]
+    }
+
+    // 索引设置：matrix[i, j] <- value 或 matrix[key] <- value
+    _setitem(key, value) {
+        this.data[key] <- value
+    }
+
+    // 辅助方法：打印矩阵
+    print() {
+        PrintLine("Matrix data:")
+        for key in this.data {
+            PrintLine("  " + key + " = " + this.data[key].ToStr())
+        }
+    }
+}
+
+// 测试索引获取
+PrintLine("=== 测试索引获取 ===")
+m <- Matrix(2, 2)
+m._setitem("0,0", 1)
+m._setitem("0,1", 2)
+m._setitem("1,0", 3)
+m._setitem("1,1", 4)
+
+val1 <- m._getitem("0,0")
+PrintLine("m[0,0] = " + val1.ToStr())
+
+val2 <- m._getitem("1,1")
+PrintLine("m[1,1] = " + val2.ToStr())
+
+// 测试索引设置
+PrintLine("=== 测试索引设置 ===")
+m._setitem("0,0", 10)
+m._setitem("1,1", 40)
+
+val3 <- m._getitem("0,0")
+PrintLine("修改后 m[0,0] = " + val3.ToStr())
+
+val4 <- m._getitem("1,1")
+PrintLine("修改后 m[1,1] = " + val4.ToStr())
+
+PrintLine("=== 所有测试通过 ===")
