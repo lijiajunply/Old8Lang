@@ -1,0 +1,13 @@
+async func precisionTask() -> double {
+    await Task.Delay(25)
+    return 3.14159
+}
+
+async func main() {
+    result <- await precisionTask()
+    PrintLine(result)
+    // Assert.True(result > 3.14 && result < 3.15)
+}
+
+main()
+

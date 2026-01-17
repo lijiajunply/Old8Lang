@@ -1,0 +1,40 @@
+async func task1() -> string {
+    await Task.Delay(50)
+    return "Task 1"
+}
+
+async func task2() -> string {
+    await Task.Delay(100)
+    return "Task 2"
+}
+
+async func main() {
+    // Test WhenAll
+    t1 <- task1()
+    t2 <- task2()
+    
+    // Note: Task.WhenAll expects a list of Task objects. 
+    // In Old8Lang, async functions return Task objects (or wrapped TaskLangValue).
+    // We might need to verify how WhenAll is exposed.
+    // Based on TaskLangValue.cs, WhenAll takes IEnumerable<TaskLangValue>.
+    
+    PrintLine("Testing WhenAll...")
+    tasks <- {t1, t2}
+    results <- await Task.WhenAll(tasks)
+    PrintLine("WhenAll results count: " + results.Count())
+    PrintLine("Result 1: " + results[0])
+    PrintLine("Result 2: " + results[1])
+    
+    // Test WhenAny
+    PrintLine("Testing WhenAny...")
+    t3 <- task1()
+    t4 <- task2()
+    // first <- await Task.WhenAny({t3, t4})
+    // PrintLine("First finished: " + first)
+    
+    // Test FromResult
+    // r <- await Task.FromResult(42)
+    // PrintLine("FromResult: " + r)
+}
+
+main()
