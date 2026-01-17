@@ -50,11 +50,11 @@ public class Row : WidgetBase
         // 设置主轴对齐
         panel.HorizontalAlignment = MainAxisAlignment switch
         {
-            MainAxisAlignment.Start => Avalonia.Layout.HorizontalAlignment.Left,
-            MainAxisAlignment.Center => Avalonia.Layout.HorizontalAlignment.Center,
-            MainAxisAlignment.End => Avalonia.Layout.HorizontalAlignment.Right,
-            MainAxisAlignment.SpaceBetween => Avalonia.Layout.HorizontalAlignment.Stretch,
-            _ => Avalonia.Layout.HorizontalAlignment.Left
+            MainAxisAlignment.Start => HorizontalAlignment.Left,
+            MainAxisAlignment.Center => HorizontalAlignment.Center,
+            MainAxisAlignment.End => HorizontalAlignment.Right,
+            MainAxisAlignment.SpaceBetween => HorizontalAlignment.Stretch,
+            _ => HorizontalAlignment.Left
         };
 
         // 构建子组件
@@ -66,11 +66,11 @@ public class Row : WidgetBase
                 // 设置交叉轴对齐
                 control.VerticalAlignment = CrossAxisAlignment switch
                 {
-                    CrossAxisAlignment.Start => Avalonia.Layout.VerticalAlignment.Top,
-                    CrossAxisAlignment.Center => Avalonia.Layout.VerticalAlignment.Center,
-                    CrossAxisAlignment.End => Avalonia.Layout.VerticalAlignment.Bottom,
-                    CrossAxisAlignment.Stretch => Avalonia.Layout.VerticalAlignment.Stretch,
-                    _ => Avalonia.Layout.VerticalAlignment.Top
+                    CrossAxisAlignment.Start => VerticalAlignment.Top,
+                    CrossAxisAlignment.Center => VerticalAlignment.Center,
+                    CrossAxisAlignment.End => VerticalAlignment.Bottom,
+                    CrossAxisAlignment.Stretch => VerticalAlignment.Stretch,
+                    _ => VerticalAlignment.Top
                 };
 
                 panel.Children.Add(control);
@@ -163,11 +163,11 @@ public class Column : WidgetBase
         // 设置主轴对齐
         panel.VerticalAlignment = MainAxisAlignment switch
         {
-            MainAxisAlignment.Start => Avalonia.Layout.VerticalAlignment.Top,
-            MainAxisAlignment.Center => Avalonia.Layout.VerticalAlignment.Center,
-            MainAxisAlignment.End => Avalonia.Layout.VerticalAlignment.Bottom,
-            MainAxisAlignment.SpaceBetween => Avalonia.Layout.VerticalAlignment.Stretch,
-            _ => Avalonia.Layout.VerticalAlignment.Top
+            MainAxisAlignment.Start => VerticalAlignment.Top,
+            MainAxisAlignment.Center => VerticalAlignment.Center,
+            MainAxisAlignment.End => VerticalAlignment.Bottom,
+            MainAxisAlignment.SpaceBetween => VerticalAlignment.Stretch,
+            _ => VerticalAlignment.Top
         };
 
         // 构建子组件
@@ -179,11 +179,11 @@ public class Column : WidgetBase
                 // 设置交叉轴对齐
                 control.HorizontalAlignment = CrossAxisAlignment switch
                 {
-                    CrossAxisAlignment.Start => Avalonia.Layout.HorizontalAlignment.Left,
-                    CrossAxisAlignment.Center => Avalonia.Layout.HorizontalAlignment.Center,
-                    CrossAxisAlignment.End => Avalonia.Layout.HorizontalAlignment.Right,
-                    CrossAxisAlignment.Stretch => Avalonia.Layout.HorizontalAlignment.Stretch,
-                    _ => Avalonia.Layout.HorizontalAlignment.Left
+                    CrossAxisAlignment.Start => HorizontalAlignment.Left,
+                    CrossAxisAlignment.Center => HorizontalAlignment.Center,
+                    CrossAxisAlignment.End => HorizontalAlignment.Right,
+                    CrossAxisAlignment.Stretch => HorizontalAlignment.Stretch,
+                    _ => HorizontalAlignment.Left
                 };
 
                 panel.Children.Add(control);

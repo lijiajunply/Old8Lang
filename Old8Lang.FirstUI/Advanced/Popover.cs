@@ -173,7 +173,7 @@ public class Popover : WidgetBase
             {
                 Text = Title,
                 FontSize = 14,
-                FontWeight = Avalonia.Media.FontWeight.SemiBold,
+                FontWeight = FontWeight.SemiBold,
                 Foreground = LayoutHelper.ParseColorBrush("#333333")
             };
 

@@ -218,7 +218,7 @@ public class StartDebuggingHandler(
             }
 
             // 创建解释器(无参数构造函数)
-            var interpreter = new Old8Lang.Interpreter.LangInterpreter();
+            var interpreter = new Interpreter.LangInterpreter();
             var session = service.StartDebugSession(request.Uri, interpreter, document.Ast);
 
             logger.LogInformation("Started debug session for {Uri}", request.Uri);

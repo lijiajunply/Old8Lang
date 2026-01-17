@@ -643,7 +643,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
     /// 实例化泛型类
     /// </summary>
     public TypeTemplate InstantiateGeneric(
-        Dictionary<string, TypeSystem.ITypeInfo> typeArguments,
+        Dictionary<string, ITypeInfo> typeArguments,
         TypeAnnotationManager typeAnnotationManager)
     {
         if (!IsGeneric)

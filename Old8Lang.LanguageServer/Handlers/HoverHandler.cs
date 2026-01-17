@@ -33,7 +33,7 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
         // 查找光标位置的符号
         var line = request.Position.Line;
         var column = request.Position.Character;
-        var symbol = Services.SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
         
         // Debug: 调试悬停查找
         System.Diagnostics.Debug.WriteLine($"Hover请求: Line={line}, Column={column}");

@@ -32,7 +32,7 @@ public partial class TaskSchedulerClassLangValue : LangValueType
             
             return propertyName switch
             {
-                "Default" => new TaskSchedulerLangValue(System.Threading.Tasks.TaskScheduler.Default, id.Position),
+                "Default" => new TaskSchedulerLangValue(TaskScheduler.Default, id.Position),
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "TaskScheduler")
             };
         }
@@ -47,9 +47,9 @@ public partial class TaskSchedulerClassLangValue : LangValueType
 /// </summary>
 public partial class TaskSchedulerLangValue : LangValueType
 {
-    private readonly System.Threading.Tasks.TaskScheduler _scheduler;
+    private readonly TaskScheduler _scheduler;
 
-    public TaskSchedulerLangValue(System.Threading.Tasks.TaskScheduler scheduler, SourcePosition position = default)
+    public TaskSchedulerLangValue(TaskScheduler scheduler, SourcePosition position = default)
         : base(position)
     {
         _scheduler = scheduler;

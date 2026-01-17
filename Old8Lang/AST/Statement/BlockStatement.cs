@@ -46,8 +46,6 @@ public partial class BlockStatement : OldStatement
                     OtherStatements.Add(statement);
                     return;
                 default:
-                    // 所有成员都添加到其他语句列表中，通过修饰符区分静态和实例成员
-                    Console.WriteLine($"DEBUG: Adding statement of type {statement.GetType().Name} to OtherStatements");
                     OtherStatements.Add(statement);
                     break;
             }
@@ -405,9 +403,9 @@ public partial class BlockStatement : OldStatement
                 return (id: classFuncInit.Id, Expr: classFuncInit.FuncValue);
             case ClassInit classInit:
                 // 对于嵌套类，创建一个特殊的ClassMemberId来标识它
-                var nestedClassId = new ClassMemberId(classInit.AnyLangValue.ClassName, "", [], classInit.Position);
+                var nestedClassId = new ClassMemberId(classInit.AnyValue.ClassName, "", [], classInit.Position);
                 // 将嵌套类作为TypeTemplate存储
-                return (id: nestedClassId, Expr: classInit.AnyLangValue);
+                return (id: nestedClassId, Expr: classInit.AnyValue);
             default:
                 return (null, null);
         }

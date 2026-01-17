@@ -71,7 +71,7 @@ public class NativeDelegateFuncLangValue(
         if (result is null)
             return new VoidLangValue();
 
-        return FuncLangValue.ObjToValue(result);
+        return ObjToValue(result);
     }
 
     public override string ToString()

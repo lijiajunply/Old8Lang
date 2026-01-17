@@ -92,7 +92,7 @@ public class LangInterpreter
     /// <param name="preprocessorSymbols">预编译符号管理器（可选）</param>
     /// <returns>表示整个程序的块语句</returns>
     /// <exception cref="SyntaxError">当代码语法错误时抛出</exception>
-    public BlockStatement Build(string code, string? fileName, LangParser.PreprocessorSymbols? preprocessorSymbols)
+    public BlockStatement Build(string code, string? fileName, PreprocessorSymbols? preprocessorSymbols)
     {
         SourceCode = code;
         Manager.Path = fileName ?? "";
@@ -164,7 +164,7 @@ public class LangInterpreter
     private void ApplyHeaderDirectives(FileHeaderDirectives directives)
     {
         // 应用到编译器配置
-        Old8Lang.Compiler.Compiler.ApplyHeaderDirectives(directives);
+        Compiler.Compiler.ApplyHeaderDirectives(directives);
 
         // 注意：编码指令（encoding）在词法分析阶段已经处理
         // 这里主要处理影响解释器行为的指令

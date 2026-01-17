@@ -105,7 +105,7 @@ class Box<T> {
         var ast = interpreter.Build(SimpleCode);
 
         // 创建 LocalManager 用于类型推断
-        var localManager = new Old8Lang.Compiler.LocalManager
+        var localManager = new Compiler.LocalManager
         {
             Interpreter = interpreter
         };
@@ -120,7 +120,7 @@ class Box<T> {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(MediumCode);
 
-        var localManager = new Old8Lang.Compiler.LocalManager
+        var localManager = new Compiler.LocalManager
         {
             Interpreter = interpreter
         };
@@ -135,7 +135,7 @@ class Box<T> {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(ComplexCode);
 
-        var localManager = new Old8Lang.Compiler.LocalManager
+        var localManager = new Compiler.LocalManager
         {
             Interpreter = interpreter
         };
@@ -150,7 +150,7 @@ class Box<T> {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(GenericCode);
 
-        var localManager = new Old8Lang.Compiler.LocalManager
+        var localManager = new Compiler.LocalManager
         {
             Interpreter = interpreter
         };
@@ -167,7 +167,7 @@ class Box<T> {
             var interpreter = new LangInterpreter();
             var ast = interpreter.Build(SimpleCode);
 
-            var localManager = new Old8Lang.Compiler.LocalManager
+            var localManager = new Compiler.LocalManager
             {
                 Interpreter = interpreter
             };

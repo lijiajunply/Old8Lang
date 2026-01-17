@@ -205,7 +205,7 @@ public partial class Instance : LangValueType
                         }
 
                         var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
-                        var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                        var inference = new GenericTypeInference(typeAnnotationManager);
                         var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
                         if (inferredTypes is not null)
@@ -265,7 +265,7 @@ public partial class Instance : LangValueType
                         }
 
                         var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
-                        var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                        var inference = new GenericTypeInference(typeAnnotationManager);
                         var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
                         if (inferredTypes is not null)
@@ -342,7 +342,7 @@ public partial class Instance : LangValueType
                     }
 
                     var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
-                    var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                    var inference = new GenericTypeInference(typeAnnotationManager);
                     var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
 
                     if (inferredTypes is not null)

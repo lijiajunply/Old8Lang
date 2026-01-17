@@ -92,7 +92,7 @@ public class Select : WidgetBase
         };
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(comboBox, this);
+        LayoutHelper.ApplyBaseStyles(comboBox, this);
 
         // 填充选项
         FillComboBoxItems(comboBox);

@@ -193,7 +193,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert - 应该成功执行
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(42, result.Value);
     }
@@ -219,7 +219,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(6, result.Value); // 1 + 2 + 3 = 6
     }
@@ -241,7 +241,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(35, result.Value); // 5 + 10 + 20 = 35
     }
@@ -263,7 +263,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(64, result.Value); // 1 + 20 + 3 + 40 = 64
     }
@@ -290,7 +290,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(10, result.Value); // test(5) = 5 * 2 = 10
     }
@@ -314,7 +314,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.IntLangValue;
         Assert.NotNull(result);
         Assert.Equal(30, result.Value); // 10 + 20 = 30
     }
@@ -340,7 +340,7 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result")) as Old8Lang.AST.Expression.Value.StringLangValue;
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result")) as AST.Expression.Value.StringLangValue;
         Assert.NotNull(result);
         Assert.Equal("null", result.Value);
     }
@@ -370,8 +370,8 @@ public class NamedArgumentsErrorTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result1 = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result1")) as Old8Lang.AST.Expression.Value.IntLangValue;
-        var result2 = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result2")) as Old8Lang.AST.Expression.Value.IntLangValue;
+        var result1 = interpreter.Manager.GetValue(new AST.Expression.LangId("result1")) as AST.Expression.Value.IntLangValue;
+        var result2 = interpreter.Manager.GetValue(new AST.Expression.LangId("result2")) as AST.Expression.Value.IntLangValue;
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);

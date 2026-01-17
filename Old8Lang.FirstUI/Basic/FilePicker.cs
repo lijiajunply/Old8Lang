@@ -146,7 +146,7 @@ public class FilePicker : WidgetBase
     /// <summary>
     /// 显示文件选择对话框
     /// </summary>
-    private async System.Threading.Tasks.Task ShowOpenFileDialog()
+    private async Task ShowOpenFileDialog()
     {
         try
         {
@@ -279,7 +279,7 @@ public class FilePicker : WidgetBase
     /// </summary>
     public bool FileExists()
     {
-        return !string.IsNullOrEmpty(Value) && System.IO.File.Exists(Value);
+        return !string.IsNullOrEmpty(Value) && File.Exists(Value);
     }
 
     /// <summary>
@@ -290,7 +290,7 @@ public class FilePicker : WidgetBase
         if (string.IsNullOrEmpty(Value))
             return string.Empty;
 
-        return System.IO.Path.GetExtension(Value);
+        return Path.GetExtension(Value);
     }
 
     /// <summary>
@@ -301,7 +301,7 @@ public class FilePicker : WidgetBase
         if (string.IsNullOrEmpty(Value))
             return string.Empty;
 
-        return System.IO.Path.GetFileName(Value);
+        return Path.GetFileName(Value);
     }
 
     /// <summary>
@@ -312,6 +312,6 @@ public class FilePicker : WidgetBase
         if (string.IsNullOrEmpty(Value))
             return string.Empty;
 
-        return System.IO.Path.GetDirectoryName(Value) ?? string.Empty;
+        return Path.GetDirectoryName(Value) ?? string.Empty;
     }
 }

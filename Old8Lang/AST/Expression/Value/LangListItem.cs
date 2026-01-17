@@ -1,6 +1,5 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -182,7 +181,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
             if (Key is IntLangValue intVal)
             {
                 // 常量索引，优化为字段访问
-                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
+                OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
             }
             else
             {

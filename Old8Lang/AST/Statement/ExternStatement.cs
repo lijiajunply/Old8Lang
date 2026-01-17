@@ -60,39 +60,31 @@ public enum CallingConventionType
 /// <summary>
 /// 外部函数声明
 /// </summary>
-public class ExternFunctionDeclaration
+public class ExternFunctionDeclaration(
+    string functionName,
+    FuncInit? functionSignature = null,
+    string? alias = null,
+    CallingConventionType callingConvention = CallingConventionType.Cdecl)
 {
     /// <summary>
     /// 函数名称
     /// </summary>
-    public string FunctionName { get; }
+    public string FunctionName { get; } = functionName;
 
     /// <summary>
     /// 参数列表（FuncInit 包含参数类型信息）
     /// </summary>
-    public FuncInit? FunctionSignature { get; }
+    public FuncInit? FunctionSignature { get; } = functionSignature;
 
     /// <summary>
     /// 别名（可选）
     /// </summary>
-    public string? Alias { get; }
+    public string? Alias { get; } = alias;
 
     /// <summary>
     /// 调用约定
     /// </summary>
-    public CallingConventionType CallingConvention { get; }
-
-    public ExternFunctionDeclaration(
-        string functionName,
-        FuncInit? functionSignature = null,
-        string? alias = null,
-        CallingConventionType callingConvention = CallingConventionType.Cdecl)
-    {
-        FunctionName = functionName;
-        FunctionSignature = functionSignature;
-        Alias = alias;
-        CallingConvention = callingConvention;
-    }
+    public CallingConventionType CallingConvention { get; } = callingConvention;
 }
 
 /// <summary>
@@ -207,22 +199,22 @@ public partial class ExternStatement : OldStatement
     /// <summary>
     /// DLL/模块名称（对于 C/C++ 是 DLL 名，对于 Python 是脚本路径或模块名）
     /// </summary>
-    private readonly string DllName;
+    private readonly string _dllName;
 
     /// <summary>
     /// 外部函数声明列表
     /// </summary>
-    private readonly List<ExternFunctionDeclaration> Functions;
+    private readonly List<ExternFunctionDeclaration> _functions;
 
     /// <summary>
     /// 默认调用约定（仅用于 C/C++ P/Invoke）
     /// </summary>
-    private readonly CallingConventionType DefaultCallingConvention;
+    private readonly CallingConventionType _defaultCallingConvention;
 
     /// <summary>
     /// Extern 类型（C/C++ DLL、Python 脚本或 Python 模块）
     /// </summary>
-    private readonly ExternType ExternType;
+    private readonly ExternType _externType;
 
     /// <summary>
     /// 构造函数：创建 extern 语句
@@ -237,10 +229,10 @@ public partial class ExternStatement : OldStatement
         CallingConventionType defaultCallingConvention = CallingConventionType.Cdecl,
         ExternType externType = ExternType.NativeDll)
     {
-        DllName = dllName;
-        Functions = functions;
-        DefaultCallingConvention = defaultCallingConvention;
-        ExternType = externType;
+        _dllName = dllName;
+        _functions = functions;
+        _defaultCallingConvention = defaultCallingConvention;
+        _externType = externType;
     }
 
     /// <summary>
@@ -279,10 +271,10 @@ public partial class ExternStatement : OldStatement
     public override void Run(VariateManager manager)
     {
         // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(ExternType);
+        var provider = ExternProviderFactory.CreateProvider(_externType);
 
         // 委托给提供者执行
-        provider.LoadFunctions(DllName, Functions, DefaultCallingConvention, manager);
+        provider.LoadFunctions(_dllName, _functions, _defaultCallingConvention, manager);
     }
 
     /// <summary>
@@ -293,16 +285,16 @@ public partial class ExternStatement : OldStatement
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(ExternType);
+        var provider = ExternProviderFactory.CreateProvider(_externType);
 
         // 检查是否支持编译模式
         if (!provider.SupportsCompilation)
         {
-            throw new NotSupportedException($"{ExternType} 类型的 extern 函数不支持编译模式，仅支持解释模式执行。");
+            throw new NotSupportedException($"{_externType} 类型的 extern 函数不支持编译模式，仅支持解释模式执行。");
         }
 
         // 委托给提供者生成 IL 代码
-        provider.GenerateIL(DllName, Functions, DefaultCallingConvention, ilGenerator, local);
+        provider.GenerateIL(_dllName, _functions, _defaultCallingConvention, ilGenerator, local);
     }
 
     /// <summary>
@@ -313,32 +305,32 @@ public partial class ExternStatement : OldStatement
     /// <summary>
     /// 获取语句数量
     /// </summary>
-    public override int Count => Functions.Count;
+    public override int Count => _functions.Count;
 
     /// <summary>
     /// 将 extern 语句转换为字符串表示
     /// </summary>
     public override string ToString()
     {
-        var convStr = DefaultCallingConvention != CallingConventionType.Cdecl
-            ? $" {DefaultCallingConvention.ToString().ToLower()}"
+        var convStr = _defaultCallingConvention != CallingConventionType.Cdecl
+            ? $" {_defaultCallingConvention.ToString().ToLower()}"
             : "";
 
-        if (Functions.Count == 1)
+        if (_functions.Count == 1)
         {
-            var func = Functions[0];
-            var convOverrideStr = func.CallingConvention != DefaultCallingConvention
+            var func = _functions[0];
+            var convOverrideStr = func.CallingConvention != _defaultCallingConvention
                 ? $"{func.CallingConvention.ToString().ToLower()} "
                 : "";
             var aliasStr = func.Alias is not null ? $" as {func.Alias}" : "";
             var signature = FormatFunctionSignature(func);
             return
-                $"extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
+                $"extern \"{_dllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
         }
 
-        var funcs = string.Join("\n    ", Functions.Select(f =>
+        var funcs = string.Join("\n    ", _functions.Select(f =>
         {
-            var convOverrideStr = f.CallingConvention != DefaultCallingConvention
+            var convOverrideStr = f.CallingConvention != _defaultCallingConvention
                 ? $"{f.CallingConvention.ToString().ToLower()} "
                 : "";
             var aliasStr = f.Alias is not null ? $" as {f.Alias}" : "";
@@ -346,7 +338,7 @@ public partial class ExternStatement : OldStatement
             return $"{convOverrideStr}func {f.FunctionName}{signature}{aliasStr}";
         }));
 
-        return $"extern \"{DllName}\"{convStr} {{\n    {funcs}\n}}";
+        return $"extern \"{_dllName}\"{convStr} {{\n    {funcs}\n}}";
     }
 
     /// <summary>

@@ -335,7 +335,7 @@ public static class DotOperatorILHelper
         {
             // 调用 Task.Delay(int, CancellationToken)
             methodInfo = typeof(Task).GetMethod("Delay",
-                [typeof(int), typeof(System.Threading.CancellationToken)])!;
+                [typeof(int), typeof(CancellationToken)])!;
             ilGenerator.Emit(OpCodes.Call, methodInfo);
             return typeof(Task);
         }

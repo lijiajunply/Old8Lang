@@ -24,22 +24,22 @@ public partial class EnumInit(
     /// <summary>
     /// 枚举名称
     /// </summary>
-    private readonly string enumName = enumName;
+    private readonly string _enumName = enumName;
 
     /// <summary>
     /// 枚举成员列表（成员名和可选的显式值）
     /// </summary>
-    private readonly List<(string name, LangExpression? value)> members = members;
+    private readonly List<(string name, LangExpression? value)> _members = members;
 
     /// <summary>
     /// 公共属性，用于访问枚举名称
     /// </summary>
-    public string EnumName => enumName;
+    public string EnumName => _enumName;
 
     /// <summary>
     /// 公共属性，用于访问枚举成员
     /// </summary>
-    public List<(string name, LangExpression? value)> Members => members;
+    public List<(string name, LangExpression? value)> Members => _members;
 
     /// <summary>
     /// 在解释模式下执行枚举定义
@@ -49,17 +49,17 @@ public partial class EnumInit(
     public override void Run(VariateManager manager)
     {
         // 检查枚举是否已存在
-        var existingEnum = manager.GetAny(new LangId(enumName));
+        var existingEnum = manager.GetAny(new LangId(_enumName));
         if (existingEnum is not null)
         {
-            throw new DuplicateNameError(this, enumName, "枚举");
+            throw new DuplicateNameError(this, _enumName, "枚举");
         }
 
         // 计算枚举成员的实际值
         var enumValues = new Dictionary<string, int>();
         int currentValue = 0;
 
-        foreach (var (memberName, memberValueExpr) in members)
+        foreach (var (memberName, memberValueExpr) in _members)
         {
             if (memberValueExpr is not null)
             {
@@ -85,13 +85,13 @@ public partial class EnumInit(
         }
 
         // 创建枚举模板并注册
-        var enumTemplate = new EnumTemplate(enumName, enumValues, Position);
+        var enumTemplate = new EnumTemplate(_enumName, enumValues, Position);
         manager.AddClassAndFunc(enumTemplate);
 
         // 注册枚举类型到类型系统
         try
         {
-            TypeChecker.RegisterEnumType(enumName, enumValues.Keys.ToList());
+            TypeChecker.RegisterEnumType(_enumName, enumValues.Keys.ToList());
         }
         catch
         {
@@ -107,7 +107,7 @@ public partial class EnumInit(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 检查枚举是否已经存在
-        if (local.ClassVar.ContainsKey(enumName))
+        if (local.ClassVar.ContainsKey(_enumName))
         {
             return;
         }
@@ -124,7 +124,7 @@ public partial class EnumInit(
 
         // 定义枚举类型
         var enumBuilder = moduleBuilder.DefineEnum(
-            enumName,
+            _enumName,
             TypeAttributes.Public,
             typeof(int)); // 枚举基础类型为 int
 
@@ -132,7 +132,7 @@ public partial class EnumInit(
         int currentValue = 0;
         var enumValues = new Dictionary<string, int>();
 
-        foreach (var (memberName, memberValueExpr) in members)
+        foreach (var (memberName, memberValueExpr) in _members)
         {
             if (memberValueExpr is not null)
             {
@@ -158,7 +158,7 @@ public partial class EnumInit(
         var createdEnumType = enumBuilder.CreateType();
 
         // 将枚举类型添加到 LocalManager
-        local.ClassVar[enumName] = createdEnumType;
+        local.ClassVar[_enumName] = createdEnumType;
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public partial class EnumInit(
     /// <returns>枚举定义的字符串表示</returns>
     public override string ToString()
     {
-        var memberStrings = members.Select(m =>
+        var memberStrings = _members.Select(m =>
         {
             if (m.value is not null)
             {
@@ -189,6 +189,6 @@ public partial class EnumInit(
 
             return m.name;
         });
-        return $"enum {enumName} {{ {string.Join(", ", memberStrings)} }}";
+        return $"enum {_enumName} {{ {string.Join(", ", memberStrings)} }}";
     }
 }

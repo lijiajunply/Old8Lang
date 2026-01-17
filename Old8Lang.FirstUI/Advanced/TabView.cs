@@ -136,7 +136,7 @@ public class TabView : WidgetBase
                     : Utils.LayoutHelper.ParseColorBrush(InactiveTabColor),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                FontWeight = isSelected ? Avalonia.Media.FontWeight.SemiBold : Avalonia.Media.FontWeight.Normal
+                FontWeight = isSelected ? FontWeight.SemiBold : FontWeight.Normal
             };
             tabContent.Children.Add(tabText);
 

@@ -86,7 +86,7 @@ public class ProgressBar(double value = 0) : WidgetBase
         };
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(progressBar, this);
+        LayoutHelper.ApplyBaseStyles(progressBar, this);
 
         // 应用进度条样式
         ApplyProgressBarStyles(progressBar);

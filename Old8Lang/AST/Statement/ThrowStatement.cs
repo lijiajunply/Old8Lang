@@ -34,10 +34,10 @@ public partial class ThrowStatement(LangExpression expression, SourcePosition po
         var exprType = expression.OutputType(local);
 
         // 如果表达式是ExceptionWrapper类型,提取内部的Exception并重新抛出
-        if (exprType == typeof(Old8Lang.Compiler.ExceptionWrapper))
+        if (exprType == typeof(ExceptionWrapper))
         {
             // 调用ExceptionWrapper.Exception属性获取内部异常
-            var exceptionProperty = typeof(Old8Lang.Compiler.ExceptionWrapper).GetProperty("Exception")!;
+            var exceptionProperty = typeof(ExceptionWrapper).GetProperty("Exception")!;
             var getMethod = exceptionProperty.GetGetMethod()!;
             ilGenerator.Emit(OpCodes.Callvirt, getMethod);
             ilGenerator.Emit(OpCodes.Throw);

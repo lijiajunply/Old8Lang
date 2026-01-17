@@ -80,7 +80,7 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
             var startType = Start.OutputType(local);
             if (startType is not null && startType != typeof(int))
             {
-                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), Start);
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), Start);
             }
         }
         else
@@ -96,7 +96,7 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
             var endType = End.OutputType(local);
             if (endType is not null && endType != typeof(int))
             {
-                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), End);
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), End);
             }
         }
         else
@@ -112,7 +112,7 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
             var stepType = Step.OutputType(local);
             if (stepType is not null && stepType != typeof(int))
             {
-                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), Step);
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), Step);
             }
         }
         else
@@ -122,8 +122,8 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         }
 
         // 调用 CollectionHelper.Slice 方法
-        var sliceMethod = typeof(Old8Lang.Compiler.CollectionHelper).GetMethod(
-            nameof(Old8Lang.Compiler.CollectionHelper.Slice),
+        var sliceMethod = typeof(CollectionHelper).GetMethod(
+            nameof(CollectionHelper.Slice),
             [typeof(object), typeof(int), typeof(int), typeof(int)]);
 
         if (sliceMethod is null)

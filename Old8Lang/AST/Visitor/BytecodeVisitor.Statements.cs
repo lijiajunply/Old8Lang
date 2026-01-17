@@ -738,7 +738,7 @@ public partial class BytecodeVisitor
 
             // 生成 case 表达式的代码（栈上现在有 2 个 switch 值 + case 值）
             // 直接访问 expression 属性而不是调用 Accept
-            caseStmt.expression.Accept(this);
+            caseStmt.Expression.Accept(this);
 
             // 比较是否相等（弹出 2 个值，栈上现在有 1 个 switch 值 + 比较结果）
             Emit(OpCode.Equal);
@@ -798,7 +798,7 @@ public partial class BytecodeVisitor
     {
         // 类定义编译
         // 从 TypeTemplate 中提取类名、字段和方法
-        var typeTemplate = node.AnyLangValue;
+        var typeTemplate = node.AnyValue;
         string className = typeTemplate.ClassName;
 
         // 检查类是否已经被编译过（在PreprocessClassDefinitions阶段）

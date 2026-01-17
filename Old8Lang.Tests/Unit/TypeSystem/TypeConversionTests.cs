@@ -642,9 +642,9 @@ public class TypeConversionTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(result);
+        Assert.IsType<AST.Expression.Intermediates.NativeAnyLangValue>(result);
 
-        var nativeValue = (Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue)result;
+        var nativeValue = (AST.Expression.Intermediates.NativeAnyLangValue)result;
         Assert.Same(customObj, nativeValue.GetNativeObject());
         Assert.Equal(typeof(TestCustomClass), nativeValue.GetNativeType());
     }
@@ -688,7 +688,7 @@ public class TypeConversionTests
             Name = "PropertyTest",
             Value = 1.23
         };
-        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue;
+        var langValue = LangValueType.ObjToValue(customObj) as AST.Expression.Intermediates.NativeAnyLangValue;
 
         Assert.NotNull(langValue);
 
@@ -713,7 +713,7 @@ public class TypeConversionTests
     {
         // Arrange
         var customObj = new TestCustomClass { Id = 1, Name = "Test", Value = 1.0 };
-        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue;
+        var langValue = LangValueType.ObjToValue(customObj) as AST.Expression.Intermediates.NativeAnyLangValue;
 
         Assert.NotNull(langValue);
 
@@ -762,8 +762,8 @@ public class TypeConversionTests
         var listVal = (ListLangValue)langValue;
         Assert.Equal(2, listVal.Values.Count);
 
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[0]);
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[1]);
+        Assert.IsType<AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[0]);
+        Assert.IsType<AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[1]);
     }
 
     #endregion

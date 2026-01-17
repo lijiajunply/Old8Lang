@@ -78,7 +78,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         returnExpression.LoadIlValue(ilGenerator, local);
 
         // 检查是否在异步状态机中且没有被 finally 块捕获
-        if (local.AsyncStateMachineGenerator != null && local.ReturnLabel == null)
+        if (local is { AsyncStateMachineGenerator: not null, ReturnLabel: null })
         {
             var type = returnExpression.OutputType(local) ?? typeof(void);
             local.AsyncStateMachineGenerator.EmitReturn(ilGenerator, type);

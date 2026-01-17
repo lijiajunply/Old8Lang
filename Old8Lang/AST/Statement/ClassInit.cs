@@ -15,19 +15,19 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// 类定义语句，用于处理Old8Lang中的类声明
 /// </summary>
-/// <param name="anyLangValue">类模板信息，包含类名、父类、成员变量和方法等</param>
+/// <param name="anyValue">类模板信息，包含类名、父类、成员变量和方法等</param>
 /// <param name="position">源代码位置信息，用于错误报告</param>
-public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition position = default) : OldStatement(position)
+public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = default) : OldStatement(position)
 {
     /// <summary>
     /// 类模板信息，包含类的完整定义
     /// </summary>
-    private readonly TypeTemplate anyLangValue = anyLangValue;
+    private readonly TypeTemplate _anyValue = anyValue;
 
     /// <summary>
     /// 公共属性，用于访问类模板信息
     /// </summary>
-    public TypeTemplate AnyLangValue => anyLangValue;
+    public TypeTemplate AnyValue => _anyValue;
     
     /// <summary>
     /// 在解释模式下执行类定义
@@ -43,15 +43,15 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         RegisterNestedClasses(manager);
 
         // 检查类是否已存在
-        var existingClass = manager.GetAny(new LangId(anyLangValue.ClassName));
+        var existingClass = manager.GetAny(new LangId(_anyValue.ClassName));
 
         if (existingClass is not null)
         {
-            throw new DuplicateNameError(this, anyLangValue.ClassName, "类");
+            throw new DuplicateNameError(this, _anyValue.ClassName, "类");
         }
 
         // 立即将类添加到ImportInfos中，以便在类定义内部访问
-        manager.AddClassAndFunc(anyLangValue);
+        manager.AddClassAndFunc(_anyValue);
     }
 
     /// <summary>
@@ -61,24 +61,24 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     {
         try
         {
-            if (anyLangValue.IsInterface)
+            if (_anyValue.IsInterface)
             {
                 // 注册接口类型
                 // 接口的父接口存储在 ImplementsNames 中（见 ClassParser.ParseInterfaceDeclaration）
-                List<string> parentInterfaceNames = anyLangValue.ImplementsNames;
-                TypeChecker.RegisterInterfaceType(anyLangValue.ClassName, parentInterfaceNames);
+                List<string> parentInterfaceNames = _anyValue.ImplementsNames;
+                TypeChecker.RegisterInterfaceType(_anyValue.ClassName, parentInterfaceNames);
             }
             else
             {
                 // 注册类类型
                 // 获取父类名称
-                string? baseClassName = anyLangValue.ParentClassName;
+                string? baseClassName = _anyValue.ParentClassName;
 
                 // 获取实现的接口列表
-                List<string> implementsNames = anyLangValue.ImplementsNames;
+                List<string> implementsNames = _anyValue.ImplementsNames;
 
                 // 注册类类型到类型假注系统
-                TypeChecker.RegisterClassType(anyLangValue.ClassName, baseClassName, implementsNames);
+                TypeChecker.RegisterClassType(_anyValue.ClassName, baseClassName, implementsNames);
             }
         }
         catch
@@ -95,7 +95,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     private void RegisterNestedClasses(VariateManager manager)
     {
         // 查找Variates中的嵌套类
-        foreach (var (memberId, memberExpr) in anyLangValue.Variates)
+        foreach (var (_, memberExpr) in _anyValue.Variates)
         {
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
@@ -109,7 +109,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         }
 
         // 查找StaticVariates中的嵌套类
-        foreach (var (memberId, memberExpr) in anyLangValue.StaticVariates)
+        foreach (var (_, memberExpr) in _anyValue.StaticVariates)
         {
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
@@ -138,17 +138,14 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 0. 如果是泛型类，注册到泛型类缓存中，不立即生成类型
-        if (anyLangValue.IsGeneric)
+        if (_anyValue.IsGeneric)
         {
-            if (!local.GenericClasses.ContainsKey(anyLangValue.ClassName))
-            {
-                local.GenericClasses[anyLangValue.ClassName] = anyLangValue;
-            }
+            local.GenericClasses.TryAdd(_anyValue.ClassName, _anyValue);
             return;
         }
 
         // 1. 检查类或接口是否已经存在
-        if (local.ClassVar.ContainsKey(anyLangValue.ClassName))
+        if (local.ClassVar.ContainsKey(_anyValue.ClassName))
         {
             // 类或接口已经存在，跳过生成
             return;
@@ -156,13 +153,12 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
 
         // 2. 检查是否已经有动态程序集和模块
         // 如果没有，创建一个全局的动态程序集和模块
-        AssemblyBuilder assemblyBuilder;
         ModuleBuilder moduleBuilder;
         
         if (local.DynamicAssembly is null || local.DynamicModule is null)
         {
             var assemblyName = new AssemblyName("Old8LangDynamicAssembly");
-            assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             moduleBuilder = assemblyBuilder.DefineDynamicModule("Old8LangDynamicModule");
             
             // 保存到local中，以便其他类和接口使用
@@ -172,7 +168,6 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         else
         {
             // 使用现有的动态程序集和模块
-            assemblyBuilder = local.DynamicAssembly;
             moduleBuilder = local.DynamicModule;
         }
 
@@ -180,7 +175,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         Type? baseType = null;
         TypeAttributes typeAttributes;
         
-        if (anyLangValue.IsInterface)
+        if (_anyValue.IsInterface)
         {
             // 接口的处理
             typeAttributes = TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract;
@@ -191,8 +186,8 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
 
             // 定义基类
-            if (anyLangValue.ParentClassName is not null &&
-                local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
+            if (_anyValue.ParentClassName is not null &&
+                local.ClassVar.TryGetValue(_anyValue.ParentClassName, out var parentType))
             {
                 baseType = parentType;
             }
@@ -206,7 +201,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
 
         // 4. 定义类型（类或接口）
         var typeBuilder = moduleBuilder.DefineType(
-            anyLangValue.ClassName,
+            _anyValue.ClassName,
             typeAttributes,
             baseType);
 
@@ -220,7 +215,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         };
 
         // 6. 定义类或接口的成员
-        if (anyLangValue.IsInterface)
+        if (_anyValue.IsInterface)
         {
             // 接口只能有方法，不能有字段
             DefineInterfaceMembers(typeBuilder, classLocal);
@@ -242,7 +237,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var createdType = typeBuilder.CreateType();
 
         // 9. 将类型添加到原始LocalManager中，以便其他类可以访问
-        local.ClassVar[anyLangValue.ClassName] = createdType;
+        local.ClassVar[_anyValue.ClassName] = createdType;
     }
 
     /// <summary>
@@ -254,8 +249,8 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
-        if (anyLangValue.ParentClassName is not null &&
-            local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
+        if (_anyValue.ParentClassName is not null &&
+            local.ClassVar.TryGetValue(_anyValue.ParentClassName, out var parentType))
         {
             // 获取父类的所有公共字段
             var parentFields = parentType.GetFields(BindingFlags.Public | BindingFlags.Instance);
@@ -266,7 +261,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             }
         }
 
-        foreach (var variate in anyLangValue.Variates)
+        foreach (var variate in _anyValue.Variates)
         {
             if (variate.Value is not FuncLangValue)
             {
@@ -338,7 +333,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     {
         var methods = new List<(ClassMemberId, FuncLangValue)>();
 
-        foreach (var variate in anyLangValue.Variates)
+        foreach (var variate in _anyValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
@@ -361,7 +356,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     private void DefineInterfaceMembers(TypeBuilder typeBuilder, LocalManager local)
     {
         // 接口只能有方法，不能有字段
-        foreach (var variate in anyLangValue.Variates)
+        foreach (var variate in _anyValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
@@ -450,41 +445,6 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     }
 
     /// <summary>
-    /// 定义类的静态成员（静态字段和静态方法）
-    /// </summary>
-    /// <param name="typeBuilder">类型构建器</param>
-    /// <param name="local">局部变量管理器</param>
-    private void DefineStaticMembers(TypeBuilder typeBuilder, LocalManager local)
-    {
-        foreach (var staticVariate in anyLangValue.StaticVariates)
-        {
-            if (staticVariate.Value is FuncLangValue funcValue)
-            {
-                // 直接定义静态方法，不调用DefineMethod
-                DefineStaticMethod(typeBuilder, staticVariate.Key, funcValue, local);
-            }
-            else
-            {
-                // 定义静态字段
-                Type fieldType;
-                try
-                {
-                    fieldType = staticVariate.Value.OutputType(local) ?? typeof(object);
-                }
-                catch
-                {
-                    fieldType = typeof(object);
-                }
-
-                typeBuilder.DefineField(
-                    staticVariate.Key.IdName,
-                    fieldType,
-                    FieldAttributes.Public | FieldAttributes.Static);
-            }
-        }
-    }
-
-    /// <summary>
     /// 定义类的方法
     /// </summary>
     /// <param name="typeBuilder">类型构建器</param>
@@ -497,20 +457,6 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     {
         return DefineMethodInternal(typeBuilder, memberId, funcValue, local, 
             MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig);
-    }
-
-    /// <summary>
-    /// 定义静态方法
-    /// </summary>
-    /// <param name="typeBuilder">类型构建器</param>
-    /// <param name="memberId">成员ID</param>
-    /// <param name="funcValue">函数值</param>
-    /// <param name="local">局部变量管理器</param>
-    private void DefineStaticMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
-        LocalManager local)
-    {
-        DefineMethodInternal(typeBuilder, memberId, funcValue, local,
-            MethodAttributes.Public | MethodAttributes.Static);
     }
 
     /// <summary>
@@ -708,16 +654,9 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             if (i < paramTypes.Length) 
             {
                 var targetType = paramTypes[i];
-                if (targetType != typeof(object)) 
+                if (targetType != typeof(object))
                 {
-                    if (targetType.IsValueType) 
-                    {
-                        il.Emit(OpCodes.Unbox_Any, targetType);
-                    } 
-                    else 
-                    {
-                        il.Emit(OpCodes.Castclass, targetType);
-                    }
+                    il.Emit(targetType.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, targetType);
                 }
             }
         }
@@ -755,8 +694,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
 
         // 保存到LocalManager，以便在方法中创建实例
         local.CurrentConstructorBuilder = constructorBuilder;
-        Console.WriteLine($"DEBUG: DefineConstructor set builder: {constructorBuilder != null} on local {local.GetHashCode()}");
-
+        
         var ctorIl = constructorBuilder.GetILGenerator();
 
         // 1. 调用基类的无参数构造函数
@@ -816,12 +754,12 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         var sb = new StringBuilder();
 
         // 根据类型确定前缀
-        var typePrefix = anyLangValue.IsInterface ? "interface" :
-                        anyLangValue.IsMixin ? "mixin" :
-                        anyLangValue.IsAbstract ? "abstract class" : "class";
+        var typePrefix = _anyValue.IsInterface ? "interface" :
+                        _anyValue.IsMixin ? "mixin" :
+                        _anyValue.IsAbstract ? "abstract class" : "class";
 
-        sb.AppendLine($"{typePrefix} {anyLangValue.ClassName} {{");
-        foreach (var variate in anyLangValue.Variates)
+        sb.AppendLine($"{typePrefix} {_anyValue.ClassName} {{");
+        foreach (var variate in _anyValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {

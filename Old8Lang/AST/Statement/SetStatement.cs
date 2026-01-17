@@ -26,7 +26,7 @@ public partial class SetStatement : OldStatement
     /// <summary>
     /// 左侧表达式（用于成员访问或索引访问赋值）
     /// </summary>
-    private readonly LangExpression? LeftExpression;
+    private readonly LangExpression? _leftExpression;
 
     /// <summary>
     /// 赋值表达式
@@ -42,7 +42,7 @@ public partial class SetStatement : OldStatement
     public SetStatement(LangId id, LangExpression value, SourcePosition position = default) : base(position)
     {
         Id = id;
-        LeftExpression = null;
+        _leftExpression = null;
         Value = value;
     }
 
@@ -56,7 +56,7 @@ public partial class SetStatement : OldStatement
         base(position)
     {
         Id = null;
-        LeftExpression = leftExpression;
+        _leftExpression = leftExpression;
         Value = value;
     }
 
@@ -86,13 +86,14 @@ public partial class SetStatement : OldStatement
                 // 没有类型注解但是修改已存在的变量，检查是否为 const 变量
                 if (TypeChecker.IsConstVariable(Id.IdName))
                 {
-                    throw new Error.TypeError(this, "any", TypeChecker.GetLangValueType(result), $"不能修改 const 变量 '{Id.IdName}'");
+                    throw new TypeError(this, "any", TypeChecker.GetLangValueType(result),
+                        $"不能修改 const 变量 '{Id.IdName}'");
                 }
             }
         }
 
         // 处理嵌套索引访问赋值：array[0][0] <- value
-        if (LeftExpression is NestedIndexAccess nestedIndexAccess)
+        if (_leftExpression is NestedIndexAccess nestedIndexAccess)
         {
             // 运行基础索引访问，获取容器对象
             var baseResult = nestedIndexAccess.BaseIndex.Run(manager);
@@ -107,11 +108,11 @@ public partial class SetStatement : OldStatement
                 return;
             }
 
-            throw new InvalidOperationError(this, $"不支持的嵌套索引赋值类型: {baseResult?.GetType().Name ?? "null"}");
+            throw new InvalidOperationError(this, $"不支持的嵌套索引赋值类型: {baseResult.GetType().Name}");
         }
 
         // 处理成员访问赋值：this.name <- value, person.name <- value
-        if (LeftExpression is Operation operation)
+        if (_leftExpression is Operation operation)
         {
             // 处理数组解构赋值：[a, b] <- [1, 2]
             if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
@@ -231,7 +232,7 @@ public partial class SetStatement : OldStatement
             {
                 // 首先检查是否是嵌套索引赋值：matrix[0][1] <- value
                 // 左侧应该是LangListItem（第一层索引），右侧应该是索引表达式
-                if (operation is { Left: LangListItem outerListItem, Right: LangExpression finalIndex })
+                if (operation is { Left: LangListItem outerListItem, Right: { } finalIndex })
                 {
                     // 获取外层索引的值：matrix[0] 返回内层数组
                     var outerCollectionValue = manager.GetValue(outerListItem.ListId);
@@ -241,7 +242,8 @@ public partial class SetStatement : OldStatement
                     {
                         // 获取内层数组
                         var innerArray = outerArray.Get(outerIndexValue as IntLangValue ??
-                                                     throw new TypeError(this, "IntLangValue", outerIndexValue.GetType().Name));
+                                                        throw new TypeError(this, "IntLangValue",
+                                                            outerIndexValue.GetType().Name));
 
                         // 检查内层数组是否是ILangList类型
                         if (innerArray is ILangList innerListCollection)
@@ -258,7 +260,8 @@ public partial class SetStatement : OldStatement
                     {
                         // 获取内层数组
                         var innerArray = outerList.Get(outerIndexValue as IntLangValue ??
-                                                    throw new TypeError(this, "IntLangValue", outerIndexValue.GetType().Name));
+                                                       throw new TypeError(this, "IntLangValue",
+                                                           outerIndexValue.GetType().Name));
 
                         // 检查内层数组是否是ILangList类型
                         if (innerArray is ILangList innerListCollection)
@@ -272,7 +275,7 @@ public partial class SetStatement : OldStatement
                         }
                     }
                 }
- 
+
                 // 处理 ClassName.staticField <- value 形式的静态字段赋值
                 if (operation is { Left: LangId className, Right: LangId staticMemberName })
                 {
@@ -333,21 +336,24 @@ public partial class SetStatement : OldStatement
                                     threadValue.IsBackground = boolValue.Value;
                                     return;
                                 }
-                                throw new Error.TypeError(this, "bool", result.TypeToString());
+
+                                throw new TypeError(this, "bool", result.TypeToString());
                             case "Name":
                                 if (result is StringLangValue stringValue)
                                 {
                                     threadValue.Name = stringValue.Value;
                                     return;
                                 }
-                                throw new Error.TypeError(this, "string", result.TypeToString());
+
+                                throw new TypeError(this, "string", result.TypeToString());
                             case "Priority":
                                 if (result is IntLangValue intValue)
                                 {
                                     threadValue.Priority = intValue.Value;
                                     return;
                                 }
-                                throw new Error.TypeError(this, "int", result.TypeToString());
+
+                                throw new TypeError(this, "int", result.TypeToString());
                             default:
                                 throw new AttributeError(leftValue, memberNameObj.IdName, "Thread");
                         }
@@ -356,7 +362,7 @@ public partial class SetStatement : OldStatement
             }
         }
         // 处理切片赋值：array[start:end] <- values
-        else if (LeftExpression is SliceLangValue sliceValue)
+        else if (_leftExpression is SliceLangValue sliceValue)
         {
             // 获取集合对象
             var collectionValue = sliceValue.Id.Run(manager);
@@ -386,17 +392,8 @@ public partial class SetStatement : OldStatement
             }
 
             // 计算起始和结束索引
-            int startValue, endValue;
-            if (stepValue > 0)
-            {
-                startValue = start1?.GetValue<int>() ?? 0;
-                endValue = end1?.GetValue<int>() ?? length;
-            }
-            else
-            {
-                startValue = start1?.GetValue<int>() ?? length - 1;
-                endValue = end1?.GetValue<int>() ?? -1;
-            }
+            var startValue = start1?.GetValue<int>() ?? 0;
+            var endValue = end1?.GetValue<int>() ?? length;
 
             // 获取要赋值的值列表
             IEnumerable<LangValueType> valuesList;
@@ -415,7 +412,7 @@ public partial class SetStatement : OldStatement
             return;
         }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
-        else if (LeftExpression is LangListItem listItem)
+        else if (_leftExpression is LangListItem listItem)
         {
             // 获取集合对象
             var collectionValue = manager.GetValue(listItem.ListId);
@@ -431,8 +428,8 @@ public partial class SetStatement : OldStatement
                     // 创建一个 Instance 表达式来调用 _setitem 方法
                     var setitemCall = new Instance(
                         new LangId("_setitem"),
-                        new List<LangExpression> { indexValue, result },
-                        null,
+                        [indexValue, result],
+                        [],
                         Position
                     );
 
@@ -488,8 +485,8 @@ public partial class SetStatement : OldStatement
                 var valueType = Value.OutputType(local);
                 // 确保 void 类型被视为 object (null)
                 if (valueType == typeof(void)) valueType = typeof(object);
-                
-                local.DefineVariable(ilGenerator, Id.IdName, valueType);
+
+                if (valueType != null) local.DefineVariable(ilGenerator, Id.IdName, valueType);
                 local.StoreVariable(ilGenerator, Id.IdName, Position);
                 return;
             }
@@ -497,9 +494,9 @@ public partial class SetStatement : OldStatement
             // 普通变量赋值: name <- value
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
-        else if (LeftExpression is not null)
+        else if (_leftExpression is not null)
         {
-            if (LeftExpression is Operation operation)
+            if (_leftExpression is Operation operation)
             {
                 // 处理数组解构赋值: [a, b, c] <- array
                 if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
@@ -769,7 +766,7 @@ public partial class SetStatement : OldStatement
                     }
                 }
             }
-            else if (LeftExpression is LangListItem listItem)
+            else if (_leftExpression is LangListItem listItem)
             {
                 // 处理LangListItem索引赋值: listId[key] <- value
                 // 获取集合类型
@@ -895,19 +892,6 @@ public partial class SetStatement : OldStatement
     }
 
     /// <summary>
-    /// 检查当前是否在构造函数（init方法）中
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>如果在构造函数中返回true</returns>
-    private static bool IsInInitMethod(VariateManager manager)
-    {
-        // 检查调用栈，看是否有名为 "init" 的函数
-        var callStack = Old8Exception.CurrentCallStack;
-        var initCount = callStack.Count(frame => frame.FunctionName == "init");
-        return initCount > 0; // 只要调用栈中有 init 就返回 true
-    }
-
-    /// <summary>
     /// 获取指定索引处的语句（实现OldStatement接口）
     /// </summary>
     /// <param name="index">语句索引</param>
@@ -926,9 +910,9 @@ public partial class SetStatement : OldStatement
     /// <returns>赋值语句的字符串表示</returns>
     public override string ToString()
     {
-        if (LeftExpression is not null)
+        if (_leftExpression is not null)
         {
-            return $"{LeftExpression} <- {Value}";
+            return $"{_leftExpression} <- {Value}";
         }
 
         // 如果 Id 为空或 IdName 为空，只显示右值（用于块表达式的返回值）

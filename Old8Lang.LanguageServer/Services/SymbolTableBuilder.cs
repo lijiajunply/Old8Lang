@@ -249,7 +249,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// </summary>
     private void VisitClass(ClassInit classInit)
     {
-        var typeTemplate = classInit.AnyLangValue;
+        var typeTemplate = classInit.AnyValue;
         var className = typeTemplate.ClassName;
 
         // 尝试从 token 列表中查找位置和类的 token 范围

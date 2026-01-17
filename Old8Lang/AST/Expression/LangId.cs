@@ -105,20 +105,17 @@ public partial class LangId(
         }
 
         // 先尝试获取普通变量
-        if (manager is not null)
+        var value = manager.GetValue(this);
+        if (value is not null)
         {
-            var value = manager.GetValue(this);
-            if (value is not null)
-            {
-                return value;
-            }
+            return value;
+        }
 
-            // 如果不是普通变量，尝试获取类或函数
-            var anyValue = manager.GetAny(this);
-            if (anyValue is not null)
-            {
-                return anyValue as LangValueType ?? throw new NameError(this, IdName);
-            }
+        // 如果不是普通变量，尝试获取类或函数
+        var anyValue = manager.GetAny(this);
+        if (anyValue is not null)
+        {
+            return anyValue as LangValueType ?? throw new NameError(this, IdName);
         }
 
         // 如果都没有找到，检查是否是类型关键字
@@ -224,7 +221,7 @@ public partial class LangId(
             // 在编译器中，可空类型被视为其基础类型（因为.NET的可空类型会自动处理null）
             if (typeName.EndsWith('?'))
             {
-                typeName = typeName.Substring(0, typeName.Length - 1).Trim();
+                typeName = typeName[..^1].Trim();
             }
 
             // 检查是否为泛型类型
@@ -321,7 +318,6 @@ public partial class LangId(
                                     "string" => typeof(string),
                                     "bool" => typeof(bool),
                                     "char" => typeof(char),
-                                    "object" => typeof(object),
                                     _ => typeof(object)
                                 };
                             }

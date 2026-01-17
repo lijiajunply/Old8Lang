@@ -112,8 +112,8 @@ public partial class CompilerVisitor
                     if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
                          ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
-                         ilGenerator.Emit(OpCodes.Newobj, typeof(Old8Lang.Compiler.ExceptionWrapper).GetConstructor([typeof(Exception)])!);
-                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(Old8Lang.Compiler.ExceptionWrapper));
+                         ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
+                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
                          ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
                          local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
                     }
@@ -164,8 +164,8 @@ public partial class CompilerVisitor
                 {
                      ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
                      // 包装异常
-                     ilGenerator.Emit(OpCodes.Newobj, typeof(Old8Lang.Compiler.ExceptionWrapper).GetConstructor([typeof(Exception)])!);
-                     var wrapperLocal = ilGenerator.DeclareLocal(typeof(Old8Lang.Compiler.ExceptionWrapper));
+                     ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
+                     var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
                      ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
                      local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
                 }

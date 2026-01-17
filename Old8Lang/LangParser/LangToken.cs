@@ -794,7 +794,7 @@ public static class LangTokenizer
             }
 
             // 处理无法识别的字符
-            throw new Error.SyntaxError(
+            throw new SyntaxError(
                 code[i].ToString(),
                 line,
                 i - column,

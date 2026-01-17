@@ -240,7 +240,7 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
         // 如果没找到，可能是成员访问，查找所有类的成员
         foreach (var kvp in document.SymbolTable)
         {
-            if (kvp.Value.Kind == Old8Lang.LanguageServer.Models.SymbolKind.Class)
+            if (kvp.Value.Kind == Models.SymbolKind.Class)
             {
                 if (kvp.Value.Members.TryGetValue(symbolName, out var memberSymbol))
                 {
@@ -268,28 +268,28 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
         // 根据符号类型分类
         switch (symbol.Kind)
         {
-            case Old8Lang.LanguageServer.Models.SymbolKind.Class:
+            case Models.SymbolKind.Class:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Class), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Function:
+            case Models.SymbolKind.Function:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Function), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Method:
+            case Models.SymbolKind.Method:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Method), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Property:
+            case Models.SymbolKind.Property:
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Property), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Parameter:
+            case Models.SymbolKind.Parameter:
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Parameter), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Variable:
+            case Models.SymbolKind.Variable:
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Variable), modifiers.ToArray());
 
-            case Old8Lang.LanguageServer.Models.SymbolKind.Constant:
+            case Models.SymbolKind.Constant:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Readonly));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Variable), modifiers.ToArray());
 

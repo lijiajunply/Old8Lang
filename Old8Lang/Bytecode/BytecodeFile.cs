@@ -1,6 +1,6 @@
 namespace Old8Lang.Bytecode;
 
-using Old8Lang.Bytecode.ModuleSystem;
+using ModuleSystem;
 
 /// <summary>
 /// 字节码文件(.o8c)

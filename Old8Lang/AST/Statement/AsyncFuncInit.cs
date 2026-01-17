@@ -2,7 +2,6 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.Interpreter;
 
@@ -95,7 +94,7 @@ public partial class AsyncFuncInit : OldStatement
     /// <summary>
     /// 应用单个装饰器
     /// </summary>
-    private Old8Lang.AST.Expression.LangValueType ApplySingleDecorator(FunctionDecorator decorator, Old8Lang.AST.Expression.LangValueType targetFunc, VariateManager manager)
+    private LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)
     {
         // 将目标函数临时注册
         var tempVarName = $"__decorator_target_{Guid.NewGuid():N}";
@@ -123,7 +122,7 @@ public partial class AsyncFuncInit : OldStatement
             manager.AddClassAndFunc(tempFunc);
         }
 
-        Old8Lang.AST.Expression.LangValueType result;
+        LangValueType result;
 
         // 检查装饰器是否有参数
         if (decorator.Arguments is not null && decorator.Arguments.Count > 0)
@@ -279,22 +278,6 @@ public partial class AsyncFuncInit : OldStatement
     private void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
         AsyncFuncValue.GenerateMethodBody(ilGenerator, local);
-    }
-
-    /// <summary>
-    /// 实现MoveNext方法
-    /// </summary>
-    private void ImplementMoveNext(
-        ILGenerator ilGenerator,
-        Type stateMachineType,
-        FieldInfo stateField,
-        FieldInfo builderField,
-        FieldInfo awaiterField,
-        LocalManager local
-    )
-    {
-        // 简化实现：这个方法暂时不会被调用
-        ilGenerator.Emit(OpCodes.Ret);
     }
 
     /// <summary>

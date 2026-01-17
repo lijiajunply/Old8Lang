@@ -607,12 +607,12 @@ public class ErrorHandlingTests
         var interpreter = new LangInterpreter();
 
         // 临时禁用类型推断，以测试编译模式的严格类型检查
-        var previousInferenceEnabled = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference;
-        var previousInferReturnTypes = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody;
+        var previousInferenceEnabled = TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference;
+        var previousInferReturnTypes = TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody;
         try
         {
-            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = false;
-            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = false;
+            TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = false;
+            TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = false;
 
             // Act & Assert - 编译模式要求函数返回值有类型注解
             var ast = interpreter.Build(code);
@@ -620,8 +620,8 @@ public class ErrorHandlingTests
         }
         finally
         {
-            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = previousInferenceEnabled;
-            Old8Lang.TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = previousInferReturnTypes;
+            TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = previousInferenceEnabled;
+            TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = previousInferReturnTypes;
         }
     }
 

@@ -125,7 +125,7 @@ public class Card(WidgetBase? child = null) : WidgetBase
             {
                 Text = Title,
                 FontSize = TitleFontSize,
-                FontWeight = Avalonia.Media.FontWeight.SemiBold
+                FontWeight = FontWeight.SemiBold
             };
             contentPanel.Children.Add(titleBlock);
         }

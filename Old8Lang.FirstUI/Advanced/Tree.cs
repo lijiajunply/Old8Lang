@@ -241,7 +241,7 @@ public class Tree : WidgetBase
     {
         if (SelectedNode == node)
         {
-            return new SolidColorBrush(Avalonia.Media.Color.FromRgb(0, 122, 255)); // 选中蓝色
+            return new SolidColorBrush(Color.FromRgb(0, 122, 255)); // 选中蓝色
         }
 
         return Brushes.Transparent;

@@ -86,7 +86,7 @@ public partial class TaskFactoryClassLangValue : LangValueType
             // 如果需要真正支持 TaskScheduler，需要使用 Task.Factory.StartNew
         }
 
-        return TaskLangValue.Run(funcValue, System.Threading.CancellationToken.None, position);
+        return TaskLangValue.Run(funcValue, CancellationToken.None, position);
     }
 }
 

@@ -1,7 +1,4 @@
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler;
@@ -61,67 +58,67 @@ public partial class ImportStatement(
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>
-    private readonly string ImportString = importString;
+    private readonly string _importString = importString;
 
     /// <summary>
     /// 是否使用from子句
     /// </summary>
-    private readonly bool FromClause = fromClause;
+    private readonly bool _fromClause = fromClause;
 
     /// <summary>
     /// 导入指定符列表，用于命名导入
     /// </summary>
-    private readonly List<ImportItem> ImportSpecifiers = importSpecifiers ?? [];
+    private readonly List<ImportItem> _importSpecifiers = importSpecifiers ?? [];
 
     /// <summary>
     /// 模块别名，如import "module" as alias
     /// </summary>
-    private readonly string? ModuleAlias = moduleAlias;
+    private readonly string? _moduleAlias = moduleAlias;
 
     /// <summary>
     /// 是否为懒导入，只在首次使用时加载模块
     /// </summary>
-    private readonly bool IsLazy = isLazy;
+    private readonly bool _isLazy = isLazy;
 
     /// <summary>
     /// 是否为选择导入，如 from module import a, b, c
     /// </summary>
-    private readonly bool IsSelective = isSelective;
+    private readonly bool _isSelective = isSelective;
 
     /// <summary>
     /// 是否为动态导入，模块名在运行时计算
     /// </summary>
-    private readonly bool IsDynamic = isDynamic;
+    private readonly bool _isDynamic = isDynamic;
 
     /// <summary>
     /// 公共属性：是否为动态导入
     /// </summary>
-    public bool IsDynamicImport => IsDynamic;
+    public bool IsDynamicImport => _isDynamic;
 
     /// <summary>
     /// 公共属性：导入的模块名称或路径
     /// </summary>
-    public string GetImportString() => ImportString;
+    public string GetImportString() => _importString;
 
     /// <summary>
     /// 公共属性：是否使用from子句
     /// </summary>
-    public bool GetFromClause() => FromClause;
+    public bool GetFromClause() => _fromClause;
 
     /// <summary>
     /// 公共属性：导入指定符列表
     /// </summary>
-    public List<ImportItem> GetImportSpecifiers() => ImportSpecifiers;
+    public List<ImportItem> GetImportSpecifiers() => _importSpecifiers;
 
     /// <summary>
     /// 公共属性：模块别名
     /// </summary>
-    public string? GetModuleAlias() => ModuleAlias;
+    public string? GetModuleAlias() => _moduleAlias;
 
     /// <summary>
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
-    private readonly LangExpression? DynamicModuleExpression = dynamicModuleExpression;
+    private readonly LangExpression? _dynamicModuleExpression = dynamicModuleExpression;
 
     /// <summary>
     /// 在解释模式下执行导入语句
@@ -130,34 +127,34 @@ public partial class ImportStatement(
     /// <exception cref="ImportError">当导入失败时抛出</exception>
     public override void Run(VariateManager manager)
     {
-        var moduleName = ImportString;
+        var moduleName = _importString;
 
         // 动态导入处理
-        if (IsDynamic)
+        if (_isDynamic)
         {
             HandleDynamicImport(manager);
             return;
         }
 
         // 懒导入处理
-        if (IsLazy)
+        if (_isLazy)
         {
             HandleLazyImport(manager);
             return;
         }
 
-        var symbolAliases = ImportSpecifiers
+        var symbolAliases = _importSpecifiers
             .Where(item => item.Name != item.Alias)
             .ToDictionary(item => item.Name, item => item.Alias);
 
         var options = new ImportOptions
         {
-            IsFromClause = FromClause,
-            ModuleAlias = ModuleAlias,
-            ImportSpecifiers = ImportSpecifiers.Select(item => item.Name).ToList(),
+            IsFromClause = _fromClause,
+            ModuleAlias = _moduleAlias,
+            ImportSpecifiers = _importSpecifiers.Select(item => item.Name).ToList(),
             SymbolAliases = symbolAliases.Count > 0 ? symbolAliases : null,
-            IsLazy = IsLazy,
-            IsSelective = IsSelective
+            IsLazy = _isLazy,
+            IsSelective = _isSelective
         };
 
         var result = ModuleService.ImportModule(moduleName, manager, options);
@@ -179,138 +176,6 @@ public partial class ImportStatement(
         }
     }
 
-
-    /// <summary>
-    /// 只导入指定的成员到当前作用域
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <param name="moduleImportInfos">当前模块新增的导入信息列表（可选）</param>
-    private void ImportSpecifiedMembers(VariateManager manager, List<ImportInfo>? moduleImportInfos = null)
-    {
-        // 获取当前作用域的所有变量（模块导出的成员）
-        var currentScope = manager.Scopes[^1];
-        var parentScope = manager.Scopes[^2];
-
-        // 如果没有指定导入成员，则导入所有成员
-        if (ImportSpecifiers.Count == 0)
-        {
-            // 直接将所有成员添加到父作用域
-            foreach (var (name, value) in currentScope)
-            {
-                parentScope[name] = value;
-            }
-
-            return;
-        }
-
-        // 只导入指定的成员
-        foreach (var specifier in ImportSpecifiers)
-        {
-            // 首先尝试从当前作用域中查找（变量和常量）
-            if (currentScope.TryGetValue(specifier.Name, out var value))
-            {
-                // 将指定成员添加到父作用域，支持重命名
-                parentScope[specifier.Alias] = value;
-            }
-            // 然后尝试从父作用域中查找（可能是之前导入的变量）
-            else if (parentScope.TryGetValue(specifier.Name, out value))
-            {
-                // 将指定成员添加到父作用域，支持重命名
-                parentScope[specifier.Alias] = value;
-            }
-            // 尝试从模块的导入信息中查找函数和类（优先使用）
-            else if (moduleImportInfos is not null && TryFindInImportInfos(moduleImportInfos, specifier.Name, out value))
-            {
-                // 将指定成员添加到父作用域，支持重命名
-                parentScope[specifier.Alias] = value!;
-            }
-            // 最后从全局导入信息中查找
-            else if ((value = manager.GetValue(new LangId(specifier.Name))) is not null)
-            {
-                // 将指定成员添加到父作用域，支持重命名
-                parentScope[specifier.Alias] = value;
-            }
-            // 如果仍然找不到，抛出错误
-            else
-            {
-                // 成员不存在，抛出错误
-                throw new ImportError(Position, ImportString, [ImportString]);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 在导入信息列表中查找指定名称的成员
-    /// </summary>
-    /// <param name="importInfos">导入信息列表</param>
-    /// <param name="name">要查找的成员名称</param>
-    /// <param name="value">找到的成员值</param>
-    /// <returns>如果找到返回true,否则返回false</returns>
-    private static bool TryFindInImportInfos(List<ImportInfo> importInfos, string name, out LangValueType? value)
-    {
-        value = importInfos.FirstOrDefault(x =>
-        {
-            return x switch
-            {
-                FuncLangValue func => func.Id!.IdName == name,
-                AsyncFuncLangValue asyncFunc => asyncFunc.Id!.IdName == name,
-                TypeTemplate template => template.ClassName == name,
-                NativeAnyLangValue na => na.RegisterName == name,
-                NativeStaticAny staticAny => staticAny.ClassName == name,
-                ConstantLangValue constant => constant.Name == name,
-                UnifiedModule module => module.ModuleName == name,
-                _ => false
-            };
-        });
-        return value is not null;
-    }
-
-    /// <summary>
-    /// 注册模块到当前作用域
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <param name="moduleName">模块名称</param>
-    /// <param name="module">模块对象</param>
-    private void RegisterModule(VariateManager manager, string moduleName, LangValueType? module)
-    {
-        if (module is null)
-            return;
-
-        if (FromClause)
-        {
-            // 命名导入：导入模块中的指定成员
-            if (module is IModuleValueType moduleValue)
-            {
-                manager.AddChildren();
-                var symbolNames = moduleValue.GetExportedSymbols();
-
-                // 将符号添加到当前作用域
-                foreach (var symbolName in symbolNames)
-                {
-                    var symbolValue = moduleValue.GetSymbol(symbolName);
-                    if (symbolValue is not null)
-                    {
-                        manager.Scopes[^1][symbolName] = symbolValue;
-                    }
-                }
-
-                // 导入指定的成员到父作用域
-                ImportSpecifiedMembers(manager);
-                manager.RemoveChildren();
-            }
-        }
-        else if (ModuleAlias is not null)
-        {
-            // 带别名的导入：import Module as Alias
-            manager.Scopes[^1][ModuleAlias] = module;
-        }
-        else
-        {
-            // 默认导入：import Module
-            manager.Scopes[^1][moduleName] = module;
-        }
-    }
-
     /// <summary>
     /// 在编译模式下生成导入语句的IL代码
     /// </summary>
@@ -318,7 +183,7 @@ public partial class ImportStatement(
     /// <param name="local">局部变量管理器，用于管理导入的模块和变量</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        string moduleName = ImportString;
+        string moduleName = _importString;
         bool isDirectory = false;
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
@@ -418,16 +283,16 @@ public partial class ImportStatement(
         // 使用新的统一模块工厂创建模块对象
         UnifiedModule moduleValue;
 
-        if (IsSelective && ImportSpecifiers.Count > 0)
+        if (_isSelective && _importSpecifiers.Count > 0)
         {
             // 选择性导入
-            var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
-            moduleValue = ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
+            var selectedSymbols = _importSpecifiers.Select(item => item.Alias).ToList();
+            moduleValue = ModuleFactory.CreateSelectiveModule(_importString, selectedSymbols, manager, Position);
         }
         else
         {
             // 懒加载模块
-            moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
+            moduleValue = ModuleFactory.CreateLazyModule(_importString, manager, Position);
         }
 
         // 注册模块对象到变量管理器
@@ -442,17 +307,17 @@ public partial class ImportStatement(
     private void RegisterModuleValue(UnifiedModule moduleValue, VariateManager manager)
     {
         ArgumentNullException.ThrowIfNull(moduleValue);
-        if (ModuleAlias is not null)
+        if (_moduleAlias is not null)
         {
-            manager.Scopes[^1][ModuleAlias] = moduleValue; // 带别名的导入：使用别名注册
+            manager.Scopes[^1][_moduleAlias] = moduleValue; // 带别名的导入：使用别名注册
         }
-        else if (IsSelective && ImportSpecifiers.Count > 0)
+        else if (_isSelective && _importSpecifiers.Count > 0)
         {
             // 选择性懒导入：创建符号代理，延迟加载到实际访问时
-            if (IsLazy)
+            if (_isLazy)
             {
                 // 懒加载选择性导入：创建代理符号
-                foreach (var specifier in ImportSpecifiers)
+                foreach (var specifier in _importSpecifiers)
                 {
                     var symbolName = specifier.Alias;
                     var originalName = specifier.Name;
@@ -465,7 +330,7 @@ public partial class ImportStatement(
             else
             {
                 // 即时加载选择性导入：直接获取符号
-                foreach (var specifier in ImportSpecifiers)
+                foreach (var specifier in _importSpecifiers)
                 {
                     var symbolName = specifier.Alias;
                     var symbol = moduleValue.GetSymbol(specifier.Name);
@@ -481,7 +346,7 @@ public partial class ImportStatement(
                 }
             }
         }
-        else if (!FromClause && ModuleAlias is null && IsLazy)
+        else if (!_fromClause && _moduleAlias is null && _isLazy)
         {
             // 通配符懒导入：lazy import "module" (无别名、无 from 子句)
             // 将所有符号以代理形式注册到当前作用域
@@ -492,183 +357,8 @@ public partial class ImportStatement(
         else
         {
             // 普通导入：使用模块名注册
-            var moduleName = Path.GetFileNameWithoutExtension(ImportString.Trim('"'));
+            var moduleName = Path.GetFileNameWithoutExtension(_importString.Trim('"'));
             manager.Scopes[^1][moduleName] = moduleValue;
-        }
-    }
-
-    /// <summary>
-    /// 处理子模块导入 module.submodule
-    /// </summary>
-    /// <param name="moduleName">模块名称，如 "package.submodule"</param>
-    /// <param name="manager">变量管理器</param>
-    private void HandleSubmoduleImport(string moduleName, VariateManager manager)
-    {
-        var parts = moduleName.Split('.');
-
-        // 确定基础路径：对于相对路径导入，使用当前文件所在目录
-        string basePath;
-        if (moduleName.StartsWith("./") || moduleName.StartsWith("../"))
-        {
-            // 相对路径：使用当前文件所在目录
-            var currentFileDir = Path.GetDirectoryName(manager.Path);
-            basePath = string.IsNullOrEmpty(currentFileDir)
-                ? Directory.GetCurrentDirectory()
-                : currentFileDir;
-        }
-        else
-        {
-            // 绝对路径或包名：使用 ImportPath
-            basePath = manager.LangInfo?.ImportPath ?? Directory.GetCurrentDirectory();
-        }
-
-        var currentPath = basePath;
-
-        // 逐级查找子模块
-        for (int i = 0; i < parts.Length; i++)
-        {
-            var part = parts[i];
-            var testPath = Path.Combine(currentPath, part);
-
-            if (i == parts.Length - 1)
-            {
-                // 最后一个部分，查找 .old8 文件或目录
-                var filePath = testPath + ".old8";
-                var dirPath = testPath;
-
-                if (File.Exists(filePath))
-                {
-                    // 找到文件，执行导入
-                    ImportModuleFile(filePath, manager, parts[i], ModuleAlias);
-                    return;
-                }
-
-                if (Directory.Exists(dirPath))
-                {
-                    // 找到目录，查找 __init__.old8 或 index.old8
-                    var initFile = Path.Combine(dirPath, "__init__.old8");
-                    var indexFile = Path.Combine(dirPath, "index.old8");
-
-                    if (File.Exists(initFile))
-                    {
-                        ImportModuleFile(initFile, manager, parts[i], ModuleAlias);
-                        return;
-                    }
-
-                    if (File.Exists(indexFile))
-                    {
-                        ImportModuleFile(indexFile, manager, parts[i], ModuleAlias);
-                        return;
-                    }
-                }
-            }
-            else if (Directory.Exists(testPath))
-            {
-                // 中间路径，继续深入
-                currentPath = testPath;
-            }
-            else
-            {
-                throw new ImportError(Position, moduleName, [testPath]);
-            }
-        }
-
-        // 如果所有路径都没找到，抛出错误
-        throw new ImportError(Position, moduleName, [currentPath]);
-    }
-
-    /// <summary>
-    /// 导入模块文件
-    /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="manager">变量管理器</param>
-    /// <param name="moduleName">模块名</param>
-    /// <param name="alias">别名</param>
-    private void ImportModuleFile(string filePath, VariateManager manager, string moduleName, string? alias)
-    {
-        var moduleAbsolutePath = Path.GetFullPath(filePath);
-
-        // 检查循环依赖
-        if (manager.ImportStack.Contains(moduleAbsolutePath))
-        {
-            throw new ImportError(Position, moduleName, manager.ImportStack);
-        }
-
-        // 检查缓存
-        if (manager.Interpreter.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
-        {
-            // 使用缓存的模块
-            if (FromClause)
-            {
-                manager.AddChildren();
-
-                // 记录执行前的 ImportInfos
-                var importInfosBefore = manager.ImportInfos.ToList();
-
-                cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
-
-                // 找出新增的 ImportInfos
-                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
-
-                ImportSpecifiedMembers(manager, newImportInfos);
-                manager.RemoveChildren();
-            }
-            else
-            {
-                if (alias is not null)
-                {
-                    var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
-                    manager.Scopes[^1][alias] = moduleObj;
-                }
-            }
-
-            return;
-        }
-
-        // 执行导入
-        manager.ImportStack.Push(moduleAbsolutePath);
-        try
-        {
-            var previousPath = manager.Path;
-            manager.Path = moduleAbsolutePath;
-
-            var code = Apis.FromFile(moduleAbsolutePath);
-            var block = manager.Interpreter.Build(code: code);
-
-            // 缓存模块
-            manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
-
-            if (FromClause)
-            {
-                manager.AddChildren();
-
-                // 记录执行前的 ImportInfos
-                var importInfosBefore = manager.ImportInfos.ToList();
-
-                block.ExecuteModule(manager);
-
-                // 找出新增的 ImportInfos
-                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
-
-                ImportSpecifiedMembers(manager, newImportInfos);
-                manager.RemoveChildren();
-            }
-            else
-            {
-                block.Run(manager);
-
-                if (alias is not null)
-                {
-                    var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
-                    manager.Scopes[^1][alias] = moduleObj;
-                }
-            }
-
-            manager.Path = previousPath;
-        }
-        finally
-        {
-            manager.ImportStack.Pop();
         }
     }
 
@@ -678,36 +368,36 @@ public partial class ImportStatement(
     /// <returns>导入语句的字符串表示</returns>
     public override string ToString()
     {
-        var lazyStr = IsLazy ? "lazy " : "";
-        var dynamicStr = IsDynamic ? "dynamic " : "";
+        var lazyStr = _isLazy ? "lazy " : "";
+        var dynamicStr = _isDynamic ? "dynamic " : "";
 
-        if (IsSelective)
+        if (_isSelective)
         {
             var specifiers = string.Join(", ",
-                ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            var prefix = IsDynamic ? $"{dynamicStr}import {specifiers} from " : $"{lazyStr}import {specifiers} from ";
-            return $"{prefix}{(IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString)}";
+                _importSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
+            var prefix = _isDynamic ? $"{dynamicStr}import {specifiers} from " : $"{lazyStr}import {specifiers} from ";
+            return $"{prefix}{(_isDynamic ? _dynamicModuleExpression?.ToString() ?? _importString : _importString)}";
         }
 
-        if (ImportSpecifiers.Count > 0)
+        if (_importSpecifiers.Count > 0)
         {
             var specifiers = string.Join(", ",
-                ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            var prefix = IsDynamic
+                _importSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
+            var prefix = _isDynamic
                 ? $"{dynamicStr}import {{ {specifiers} }} from "
                 : $"{lazyStr}import {{ {specifiers} }} from ";
-            return $"{prefix}{(IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString)}";
+            return $"{prefix}{(_isDynamic ? _dynamicModuleExpression?.ToString() ?? _importString : _importString)}";
         }
 
-        if (ModuleAlias is not null)
+        if (_moduleAlias is not null)
         {
-            var prefix = IsDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
-            var modulePart = IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString;
-            return $"{prefix}{modulePart} as {ModuleAlias}";
+            var prefix = _isDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
+            var modulePart = _isDynamic ? _dynamicModuleExpression?.ToString() ?? _importString : _importString;
+            return $"{prefix}{modulePart} as {_moduleAlias}";
         }
 
-        var basePrefix = IsDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
-        var baseModule = IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString;
+        var basePrefix = _isDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
+        var baseModule = _isDynamic ? _dynamicModuleExpression?.ToString() ?? _importString : _importString;
         return $"{basePrefix}{baseModule}";
     }
 
@@ -718,15 +408,15 @@ public partial class ImportStatement(
     /// <exception cref="ImportError">当动态导入失败时抛出</exception>
     private void HandleDynamicImport(VariateManager manager)
     {
-        if (DynamicModuleExpression is null)
+        if (_dynamicModuleExpression is null)
         {
-            throw new ImportError(this, ImportString, "Dynamic import expression is null");
+            throw new ImportError(this, _importString, "Dynamic import expression is null");
         }
 
         try
         {
             // 运行动态模块表达式来获取模块名
-            var dynamicResult = DynamicModuleExpression.Run(manager);
+            var dynamicResult = _dynamicModuleExpression.Run(manager);
 
             if (dynamicResult is StringLangValue stringModuleValue)
             {
@@ -735,10 +425,10 @@ public partial class ImportStatement(
                 // 使用新的统一模块工厂创建模块对象
                 UnifiedModule unifiedModule;
 
-                if (IsSelective && ImportSpecifiers.Count > 0)
+                if (_isSelective && _importSpecifiers.Count > 0)
                 {
                     // 选择性导入
-                    var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+                    var selectedSymbols = _importSpecifiers.Select(item => item.Alias).ToList();
                     unifiedModule =
                         ModuleFactory.CreateSelectiveModule(actualModuleName, selectedSymbols, manager, Position);
                 }
@@ -753,7 +443,7 @@ public partial class ImportStatement(
             }
             else
             {
-                throw new ImportError(this, ImportString,
+                throw new ImportError(this, _importString,
                     $"Dynamic import expression must evaluate to a string, got {dynamicResult.GetType().Name}");
             }
         }
@@ -765,7 +455,7 @@ public partial class ImportStatement(
         catch (Exception ex)
         {
             // 包装其他异常为导入错误
-            throw new ImportError(this, ImportString, $"Dynamic import failed: {ex.Message}");
+            throw new ImportError(this, _importString, $"Dynamic import failed: {ex.Message}");
         }
     }
 }

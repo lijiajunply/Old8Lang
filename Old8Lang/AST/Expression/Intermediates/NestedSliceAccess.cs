@@ -75,7 +75,7 @@ public partial class NestedSliceAccess(
         // 转换为int
         if (startType is not null && startType != typeof(int))
         {
-            Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), SliceStart);
+            TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), SliceStart);
         }
 
         // 处理结束索引（可能为null）
@@ -86,7 +86,7 @@ public partial class NestedSliceAccess(
             // 转换为int
             if (endType is not null && endType != typeof(int))
             {
-                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), SliceEnd);
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), SliceEnd);
             }
         }
         else
@@ -103,7 +103,7 @@ public partial class NestedSliceAccess(
             // 转换为int
             if (stepType is not null && stepType != typeof(int))
             {
-                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), SliceStep);
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), SliceStep);
             }
         }
         else
@@ -113,8 +113,8 @@ public partial class NestedSliceAccess(
         }
 
         // 调用CollectionHelper.Slice方法
-        var sliceMethod = typeof(Old8Lang.Compiler.CollectionHelper).GetMethod(
-            nameof(Old8Lang.Compiler.CollectionHelper.Slice),
+        var sliceMethod = typeof(CollectionHelper).GetMethod(
+            nameof(CollectionHelper.Slice),
             [typeof(object), typeof(int), typeof(int), typeof(int)]);
 
         if (sliceMethod is null)

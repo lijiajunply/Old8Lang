@@ -29,7 +29,7 @@ public sealed class TaskDelayFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         // 加载 delayMs 参数
@@ -51,7 +51,7 @@ public sealed class TaskDelayFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(TaskLangValue);
     }
@@ -88,7 +88,7 @@ public sealed class TaskWaitFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         parameters[0].LoadIlValue(ilGenerator, local);
@@ -96,7 +96,7 @@ public sealed class TaskWaitFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Callvirt, method!);
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(object); // Result type is dynamic
     }
@@ -137,7 +137,7 @@ public sealed class TaskWhenAllFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         parameters[0].LoadIlValue(ilGenerator, local);
@@ -147,7 +147,7 @@ public sealed class TaskWhenAllFunction : BaseGlobalFunction
         throw new NotImplementedException("TaskWhenAll IL generation not implemented");
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(TaskLangValue);
     }
@@ -189,13 +189,13 @@ public sealed class TaskWhenAnyFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         throw new NotImplementedException("TaskWhenAny IL generation not implemented");
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(TaskLangValue);
     }

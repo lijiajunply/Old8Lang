@@ -174,7 +174,7 @@ public class WebApiClient : IDisposable
     /// <summary>
     /// 获取底层HttpClient实例，用于高级操作
     /// </summary>
-    public System.Net.Http.HttpClient GetUnderlyingClient()
+    public HttpClient GetUnderlyingClient()
     {
         // 这里需要修改HttpClient类，添加一个方法来获取底层的System.Net.Http.HttpClient实例
         return HttpWebClient.GetUnderlyingClient();

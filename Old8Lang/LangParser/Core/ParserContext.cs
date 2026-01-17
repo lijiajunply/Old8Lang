@@ -1,6 +1,6 @@
 namespace Old8Lang.LangParser.Core;
 
-using Old8Lang.AST.Statement;
+using AST.Statement;
 
 /// <summary>
 /// 解析器共享上下文，管理 tokens、索引、源代码等状态

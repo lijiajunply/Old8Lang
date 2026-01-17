@@ -60,7 +60,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步生成器，获取下一个值（同步等待）
-                    var nextValue = asyncGenerator.Run(manager);
+                    asyncGenerator.Run(manager);
 
                     // 检查异步生成器是否已完成
                     if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -93,7 +93,6 @@ public partial class ForInStatement(
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
-                                continue;
                             }
                         }
                     }
@@ -109,7 +108,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    var nextValue = asyncStream.Run(manager);
+                    asyncStream.Run(manager);
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -142,7 +141,6 @@ public partial class ForInStatement(
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
-                                continue;
                             }
                         }
                     }
@@ -158,7 +156,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行生成器，获取下一个值
-                    var nextValue = generator.Run(manager);
+                    generator.Run(manager);
 
                     // 检查生成器是否已完成
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
@@ -192,7 +190,6 @@ public partial class ForInStatement(
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
-                                continue;
                             }
                         }
                         else
@@ -255,7 +252,6 @@ public partial class ForInStatement(
                     if (manager.ControlFlowManager.ContinueFlag)
                     {
                         manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
                     }
                 }
             }
@@ -422,7 +418,6 @@ public partial class ForInStatement(
                         if (manager.ControlFlowManager.ContinueFlag)
                         {
                             manager.ControlFlowManager.ContinueFlag = false;
-                            continue;
                         }
                     }
 
@@ -461,7 +456,7 @@ public partial class ForInStatement(
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            var nextValue = asyncGenerator.Run(manager);
+            asyncGenerator.Run(manager);
 
             if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -486,7 +481,6 @@ public partial class ForInStatement(
                     if (manager.ControlFlowManager.ContinueFlag)
                     {
                         manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
                     }
                 }
             }
@@ -501,7 +495,7 @@ public partial class ForInStatement(
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            var nextValue = asyncStream.Run(manager);
+            asyncStream.Run(manager);
 
             if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -526,7 +520,6 @@ public partial class ForInStatement(
                     if (manager.ControlFlowManager.ContinueFlag)
                     {
                         manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
                     }
                 }
             }
@@ -573,7 +566,7 @@ public partial class ForInStatement(
                 }
 
                 // 调用生成器的 Run 方法获取下一个值
-                var nextValue = generator.Run(manager);
+                generator.Run(manager);
 
                 if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                 {
@@ -610,7 +603,6 @@ public partial class ForInStatement(
                         if (manager.ControlFlowManager.ContinueFlag)
                         {
                             manager.ControlFlowManager.ContinueFlag = false;
-                            continue;
                         }
                     }
                     else

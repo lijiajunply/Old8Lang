@@ -100,7 +100,7 @@ public class Panel(WidgetBase? content = null) : WidgetBase
         };
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(mainBorder, this);
+        LayoutHelper.ApplyBaseStyles(mainBorder, this);
 
         // 设置边框颜色
         if (!string.IsNullOrEmpty(BorderColor))
@@ -239,7 +239,7 @@ public class Panel(WidgetBase? content = null) : WidgetBase
 
         foreach (var action in Actions)
         {
-            var button = new Avalonia.Controls.Button
+            var button = new Button
             {
                 Content = action.Label,
                 IsEnabled = !action.IsDisabled
@@ -283,7 +283,7 @@ public class Panel(WidgetBase? content = null) : WidgetBase
     /// </summary>
     private Control CreateCollapseButton()
     {
-        var button = new Avalonia.Controls.Button
+        var button = new Button
         {
             Content = IsExpanded ? "▼" : "▶",
             Width = 32,

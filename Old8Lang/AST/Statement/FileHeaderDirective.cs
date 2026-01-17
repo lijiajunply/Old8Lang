@@ -58,7 +58,7 @@ public partial class FileHeaderDirective(string directiveName, string directiveV
 /// </summary>
 public class FileHeaderDirectives
 {
-    private readonly Dictionary<string, string> DirectivesDict = new();
+    private readonly Dictionary<string, string> _directivesDict = new();
 
     /// <summary>
     /// 所有指令的列表（保持顺序）
@@ -72,7 +72,7 @@ public class FileHeaderDirectives
     {
         DirectiveList.Add(directive);
         // 如果有重复的指令名，后面的会覆盖前面的
-        DirectivesDict[directive.DirectiveName.ToLower()] = directive.DirectiveValue;
+        _directivesDict[directive.DirectiveName.ToLower()] = directive.DirectiveValue;
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class FileHeaderDirectives
     /// </summary>
     public string? GetDirective(string name)
     {
-        return DirectivesDict.GetValueOrDefault(name.ToLower());
+        return _directivesDict.GetValueOrDefault(name.ToLower());
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public class FileHeaderDirectives
     /// </summary>
     public bool HasDirective(string name)
     {
-        return DirectivesDict.ContainsKey(name.ToLower());
+        return _directivesDict.ContainsKey(name.ToLower());
     }
 
     /// <summary>

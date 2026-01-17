@@ -166,13 +166,13 @@ public class AsyncStateMachineGenerator
         }
         
         // 检查 List/Array 字面量
-        if (expression is Old8Lang.AST.Expression.Value.ListLangValue listVal && listVal.Values != null)
+        if (expression is AST.Expression.Value.ListLangValue listVal && listVal.Values != null)
         {
              foreach (var val in listVal.Values) IdentifyAwaitInExpression(val);
              return;
         }
         
-        if (expression is Old8Lang.AST.Expression.Value.ArrayLangValue arrayVal && arrayVal.Values != null)
+        if (expression is AST.Expression.Value.ArrayLangValue arrayVal && arrayVal.Values != null)
         {
              foreach (var val in arrayVal.Values) IdentifyAwaitInExpression(val);
              return;
@@ -377,8 +377,8 @@ public class AsyncStateMachineGenerator
         il.Emit(OpCodes.Ldflda, BuilderField!);
         il.Emit(OpCodes.Ldloca, awaiterLocal);
         il.Emit(OpCodes.Ldloca, stateMachineInterfaceLocal);
-        il.Emit(OpCodes.Call, typeof(Old8Lang.Compiler.AsyncAwaitRuntimeHelpers)
-            .GetMethod(nameof(Old8Lang.Compiler.AsyncAwaitRuntimeHelpers.AwaitUnsafeOnCompleted))!
+        il.Emit(OpCodes.Call, typeof(AsyncAwaitRuntimeHelpers)
+            .GetMethod(nameof(AsyncAwaitRuntimeHelpers.AwaitUnsafeOnCompleted))!
             .MakeGenericMethod(awaiterLocal.LocalType));
             
         // 4. 返回 (挂起)

@@ -308,12 +308,12 @@ public static class ResourceManager
             var task = wrapper.Resource.Writer.WriteAsync(value).AsTask();
             return task.Wait(timeoutMs);
         }
-        catch (AggregateException ex) when (ex.InnerException is System.Threading.Channels.ChannelClosedException)
+        catch (AggregateException ex) when (ex.InnerException is ChannelClosedException)
         {
             // Channel 已关闭，返回 false 表示发送失败
             return false;
         }
-        catch (System.Threading.Channels.ChannelClosedException)
+        catch (ChannelClosedException)
         {
             // Channel 已关闭，返回 false 表示发送失败
             return false;

@@ -33,7 +33,7 @@ public static class TypeConversion
         if (value is int i) return i != 0;
         if (value is double d) return d != 0;
         if (value is string s) return !string.IsNullOrEmpty(s);
-        if (value is Old8Lang.AST.Expression.Value.BoolLangValue blv) return blv.Value;
+        if (value is AST.Expression.Value.BoolLangValue blv) return blv.Value;
         
         // 尝试调用 ToBool 方法 (如果存在)
         // 或者是 Value 类型

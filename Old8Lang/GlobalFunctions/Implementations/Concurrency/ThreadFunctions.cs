@@ -25,13 +25,13 @@ public sealed class ThreadJoinFunction : BaseGlobalFunction
         var results = EvaluateParameters(parameters, manager);
         int threadId = ((IntLangValue)results[0]).Value;
         var result = ResourceManager.JoinThread(threadId);
-        return result != null ? LangValueType.ObjToValue(result) : new Old8Lang.AST.Expression.Intermediates.VoidLangValue();
+        return result != null ? LangValueType.ObjToValue(result) : new AST.Expression.Intermediates.VoidLangValue();
     }
 
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         parameters[0].LoadIlValue(ilGenerator, local);
@@ -40,7 +40,7 @@ public sealed class ThreadJoinFunction : BaseGlobalFunction
         // Result conversion handled by caller or generic Object wrapping
     }
     
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(object);
     }
@@ -75,7 +75,7 @@ public sealed class ThreadIsAliveFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         parameters[0].LoadIlValue(ilGenerator, local);
@@ -83,7 +83,7 @@ public sealed class ThreadIsAliveFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(bool);
     }
@@ -112,13 +112,13 @@ public sealed class ThreadDisposeFunction : BaseGlobalFunction
         var results = EvaluateParameters(parameters, manager);
         int threadId = ((IntLangValue)results[0]).Value;
         ResourceManager.DisposeThread(threadId);
-        return new Old8Lang.AST.Expression.Intermediates.VoidLangValue();
+        return new AST.Expression.Intermediates.VoidLangValue();
     }
 
     protected override void GenerateIlInternal(
         List<LangExpression> parameters,
         ILGenerator ilGenerator,
-        Old8Lang.Compiler.LocalManager local,
+        Compiler.LocalManager local,
         SourcePosition position)
     {
         parameters[0].LoadIlValue(ilGenerator, local);
@@ -126,7 +126,7 @@ public sealed class ThreadDisposeFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
-    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Old8Lang.Compiler.LocalManager local)
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, Compiler.LocalManager local)
     {
         return typeof(void);
     }

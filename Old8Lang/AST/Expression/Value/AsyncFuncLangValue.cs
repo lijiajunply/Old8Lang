@@ -375,15 +375,15 @@ public class AsyncFuncLangValue : ImportInfo
         }
 
         // 创建动态程序集和类型来生成状态机
-        var assemblyName = new System.Reflection.AssemblyName($"Old8LangAsync_{Id?.IdName ?? "Anonymous"}");
+        var assemblyName = new AssemblyName($"Old8LangAsync_{Id?.IdName ?? "Anonymous"}");
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
         var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name!);
         var typeBuilder = moduleBuilder.DefineType(
             $"AsyncStateMachine_{Id?.IdName ?? "Anonymous"}",
-            System.Reflection.TypeAttributes.Public |
-            System.Reflection.TypeAttributes.Sealed |
-            System.Reflection.TypeAttributes.AnsiClass |
-            System.Reflection.TypeAttributes.BeforeFieldInit,
+            TypeAttributes.Public |
+            TypeAttributes.Sealed |
+            TypeAttributes.AnsiClass |
+            TypeAttributes.BeforeFieldInit,
             typeof(ValueType));
 
         var stateMachineGenerator = new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement);

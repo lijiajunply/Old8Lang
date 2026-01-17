@@ -158,9 +158,9 @@ result <- returnsNothing()
         // Assert
         Assert.Null(exception);
         // JavaScript undefined 应该转换为 null
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.NullLangValue>(result);
+        Assert.IsType<AST.Expression.Value.NullLangValue>(result);
     }
 
     /// <summary>
@@ -226,11 +226,11 @@ result <- expectsNumber(str)
         // Assert
         // JavaScript 不会为类型不匹配抛出错误,而是返回 NaN
         Assert.Null(exception);
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
         // JavaScript NaN 会被转换为 Old8Lang 的 double NaN
-        Assert.IsType<Old8Lang.AST.Expression.Value.DoubleLangValue>(result);
-        var doubleResult = (Old8Lang.AST.Expression.Value.DoubleLangValue)result;
+        Assert.IsType<AST.Expression.Value.DoubleLangValue>(result);
+        var doubleResult = (AST.Expression.Value.DoubleLangValue)result;
         Assert.True(double.IsNaN(doubleResult.Value), "Expected JavaScript to return NaN for string * 2");
     }
 
@@ -287,9 +287,9 @@ result <- returns_none()
 
         // Assert
         Assert.Null(exception);
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.NullLangValue>(result);
+        Assert.IsType<AST.Expression.Value.NullLangValue>(result);
     }
 
     #endregion
@@ -347,10 +347,10 @@ result <- getNaN()
 
         // Assert
         Assert.Null(exception);
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.DoubleLangValue>(result);
-        Assert.True(double.IsNaN(((Old8Lang.AST.Expression.Value.DoubleLangValue)result).Value));
+        Assert.IsType<AST.Expression.Value.DoubleLangValue>(result);
+        Assert.True(double.IsNaN(((AST.Expression.Value.DoubleLangValue)result).Value));
     }
 
     /// <summary>
@@ -379,10 +379,10 @@ result <- getInfinity()
 
         // Assert
         Assert.Null(exception);
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.DoubleLangValue>(result);
-        Assert.True(double.IsPositiveInfinity(((Old8Lang.AST.Expression.Value.DoubleLangValue)result).Value));
+        Assert.IsType<AST.Expression.Value.DoubleLangValue>(result);
+        Assert.True(double.IsPositiveInfinity(((AST.Expression.Value.DoubleLangValue)result).Value));
     }
 
     #endregion
@@ -490,7 +490,7 @@ result <- emptyFunction()
 
         // Assert
         Assert.Null(exception);
-        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        var result = interpreter.Manager.GetValue(new AST.Expression.LangId("result"));
         Assert.NotNull(result);
     }
 

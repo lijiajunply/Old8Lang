@@ -348,7 +348,7 @@ public partial class TaskStaticMethodWrapper(
                 ilGenerator.Emit(OpCodes.Ldnull);
                 break;
             default:
-                throw new InvalidOperationError(this.Position, $"不支持的Task静态方法: {methodName}");
+                throw new InvalidOperationError(Position, $"不支持的Task静态方法: {methodName}");
         }
     }
 

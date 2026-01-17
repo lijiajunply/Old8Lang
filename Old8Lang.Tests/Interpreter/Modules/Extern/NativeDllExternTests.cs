@@ -82,14 +82,14 @@ processId <- GetCurrentProcessId()
         // Assert
         Assert.Null(exception);
         // 验证返回的是有效的 ID（大于 0）
-        var threadId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("threadId"));
-        var processId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("processId"));
+        var threadId = interpreter.Manager.GetValue(new AST.Expression.LangId("threadId"));
+        var processId = interpreter.Manager.GetValue(new AST.Expression.LangId("processId"));
         Assert.NotNull(threadId);
         Assert.NotNull(processId);
-        Assert.IsType<Old8Lang.AST.Expression.Value.IntLangValue>(threadId);
-        Assert.IsType<Old8Lang.AST.Expression.Value.IntLangValue>(processId);
-        Assert.True(((Old8Lang.AST.Expression.Value.IntLangValue)threadId).Value > 0);
-        Assert.True(((Old8Lang.AST.Expression.Value.IntLangValue)processId).Value > 0);
+        Assert.IsType<AST.Expression.Value.IntLangValue>(threadId);
+        Assert.IsType<AST.Expression.Value.IntLangValue>(processId);
+        Assert.True(((AST.Expression.Value.IntLangValue)threadId).Value > 0);
+        Assert.True(((AST.Expression.Value.IntLangValue)processId).Value > 0);
     }
 
     #endregion
@@ -170,10 +170,10 @@ result2 <- GetCurrentProcessId()
         // Assert
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result1", 100);
-        var processId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result2"));
+        var processId = interpreter.Manager.GetValue(new AST.Expression.LangId("result2"));
         Assert.NotNull(processId);
-        Assert.IsType<Old8Lang.AST.Expression.Value.IntLangValue>(processId);
-        Assert.True(((Old8Lang.AST.Expression.Value.IntLangValue)processId).Value > 0);
+        Assert.IsType<AST.Expression.Value.IntLangValue>(processId);
+        Assert.True(((AST.Expression.Value.IntLangValue)processId).Value > 0);
     }
 
     #endregion
@@ -211,8 +211,8 @@ processId <- GetCurrentProcessId()
 
         // Assert
         Assert.Null(exception);
-        var threadId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("threadId"));
-        var processId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("processId"));
+        var threadId = interpreter.Manager.GetValue(new AST.Expression.LangId("threadId"));
+        var processId = interpreter.Manager.GetValue(new AST.Expression.LangId("processId"));
         Assert.NotNull(threadId);
         Assert.NotNull(processId);
     }
@@ -337,9 +337,9 @@ result2 <- GetCurrentThreadId()
         // Assert
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result1", 50);
-        var threadId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result2"));
+        var threadId = interpreter.Manager.GetValue(new AST.Expression.LangId("result2"));
         Assert.NotNull(threadId);
-        Assert.IsType<Old8Lang.AST.Expression.Value.IntLangValue>(threadId);
+        Assert.IsType<AST.Expression.Value.IntLangValue>(threadId);
     }
 
     /// <summary>
@@ -372,10 +372,10 @@ result2 <- GetCurrentProcessId()
         // Assert
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result1", 200);
-        var processId = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result2"));
+        var processId = interpreter.Manager.GetValue(new AST.Expression.LangId("result2"));
         Assert.NotNull(processId);
-        Assert.IsType<Old8Lang.AST.Expression.Value.IntLangValue>(processId);
-        Assert.True(((Old8Lang.AST.Expression.Value.IntLangValue)processId).Value > 0);
+        Assert.IsType<AST.Expression.Value.IntLangValue>(processId);
+        Assert.True(((AST.Expression.Value.IntLangValue)processId).Value > 0);
     }
 
     #endregion

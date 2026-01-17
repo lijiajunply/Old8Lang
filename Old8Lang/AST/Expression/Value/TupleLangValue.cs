@@ -128,7 +128,7 @@ public partial class TupleLangValue : LangValueType, ILangList
     /// </summary>
     public override object GetValue()
     {
-        var values = ItemValues.Select(v => LangValueType.ValueToObj(v) ?? new object()).ToArray();
+        var values = ItemValues.Select(v => ValueToObj(v) ?? new object()).ToArray();
         return CreateValueTuple(values);
     }
 
@@ -284,7 +284,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         if (dotExpression is Instance instance)
         {
              // 设置执行上下文
-            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+            ValueFunctions.ExecutionContext.SetCurrentManager(manager);
 
             if (instance.Ids.Count == 0)
             {

@@ -88,7 +88,7 @@ public class Slider(double value = 0) : WidgetBase
         };
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(slider, this);
+        LayoutHelper.ApplyBaseStyles(slider, this);
 
         // 设置滑块尺寸（如果未设置默认尺寸）
         if (Height == 0)

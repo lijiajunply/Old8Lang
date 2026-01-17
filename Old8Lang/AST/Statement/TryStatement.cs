@@ -295,8 +295,8 @@ public partial class TryStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 委托给 CompilerVisitor 处理，以支持更复杂的逻辑（如多重 catch 块分发）
-        var visitor = new Old8Lang.AST.Visitor.CompilerVisitor(ilGenerator, local);
-        this.Accept(visitor);
+        var visitor = new Visitor.CompilerVisitor(ilGenerator, local);
+        Accept(visitor);
     }
 
     /// <summary>

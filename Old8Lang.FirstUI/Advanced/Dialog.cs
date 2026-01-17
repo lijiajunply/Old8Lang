@@ -123,7 +123,7 @@ public class Dialog : WidgetBase
             {
                 Text = Title,
                 FontSize = 16,
-                FontWeight = Avalonia.Media.FontWeight.SemiBold,
+                FontWeight = FontWeight.SemiBold,
                 Foreground = Utils.LayoutHelper.ParseColorBrush("#FFFFFF"),
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Avalonia.Thickness(16, 0)
@@ -133,7 +133,7 @@ public class Dialog : WidgetBase
             // 关闭按钮
             if (ShowCloseButton)
             {
-                var closeButton = new Avalonia.Controls.Button
+                var closeButton = new Button
                 {
                     Content = "✕",
                     FontSize = 18,
@@ -173,7 +173,7 @@ public class Dialog : WidgetBase
             contentArea.Child = new TextBlock
             {
                 Text = Content,
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                TextWrapping = TextWrapping.Wrap,
                 FontSize = 14
             };
         }
@@ -191,7 +191,7 @@ public class Dialog : WidgetBase
 
         if (ShowCancelButton)
         {
-            var cancelButton = new Avalonia.Controls.Button
+            var cancelButton = new Button
             {
                 Content = CancelText,
                 Padding = new Avalonia.Thickness(20, 8),
@@ -205,7 +205,7 @@ public class Dialog : WidgetBase
             buttonPanel.Children.Add(cancelButton);
         }
 
-        var confirmButton = new Avalonia.Controls.Button
+        var confirmButton = new Button
         {
             Content = ConfirmText,
             Padding = new Avalonia.Thickness(20, 8),

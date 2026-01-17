@@ -148,7 +148,7 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
 
             var indexType = NestedIndex.OutputType(local);
 
-            Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
+            OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
                 ilGenerator,
                 indexType
             );

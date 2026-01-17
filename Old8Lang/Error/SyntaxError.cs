@@ -45,7 +45,7 @@ public class SyntaxError : Old8Exception
     /// <param name="message">错误信息</param>
     /// <param name="suggestion">建议</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
-    public SyntaxError(SourcePosition position, string message, string suggestion, System.Guid requestId)
+    public SyntaxError(SourcePosition position, string message, string suggestion, Guid requestId)
         : base(
             ErrorCode,
             message,
@@ -64,7 +64,7 @@ public class SyntaxError : Old8Exception
     /// <param name="message">错误信息</param>
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
-    public SyntaxError(SourcePosition position, string message, string[] sourceContext, System.Guid requestId)
+    public SyntaxError(SourcePosition position, string message, string[] sourceContext, Guid requestId)
         : base(
             ErrorCode,
             message,

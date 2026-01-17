@@ -559,7 +559,7 @@ public static class StaticClassCompiler
         instance.Ids[0].LoadIlValue(ilGenerator, local);
 
         // 调用 System.Threading.Thread.Sleep(int)
-        var sleepMethod = typeof(System.Threading.Thread).GetMethod("Sleep", [typeof(int)])!;
+        var sleepMethod = typeof(Thread).GetMethod("Sleep", [typeof(int)])!;
         ilGenerator.Emit(OpCodes.Call, sleepMethod);
 
         return true;

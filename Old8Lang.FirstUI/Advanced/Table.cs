@@ -160,7 +160,7 @@ public class Table : WidgetBase
         }
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(mainGrid, this);
+        LayoutHelper.ApplyBaseStyles(mainGrid, this);
 
         return mainGrid;
     }
@@ -338,7 +338,7 @@ public class Table : WidgetBase
             // 行号表头
             return new Border
             {
-                Child = new TextBlock { Text = "#", FontWeight = Avalonia.Media.FontWeight.Bold },
+                Child = new TextBlock { Text = "#", FontWeight = FontWeight.Bold },
                 Background = GetHeaderBrush(),
                 Padding = new Avalonia.Thickness(8, 8, 8, 8)
             };
@@ -360,7 +360,7 @@ public class Table : WidgetBase
         var titleText = new TextBlock
         {
             Text = column.Title,
-            FontWeight = Avalonia.Media.FontWeight.Bold,
+            FontWeight = FontWeight.Bold,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
         };
 
@@ -650,7 +650,7 @@ public class Table : WidgetBase
             return LayoutHelper.ParseColorBrush(HeaderBackgroundColor);
         }
 
-        return new SolidColorBrush(Avalonia.Media.Color.FromRgb(240, 240, 240)); // 默认浅灰色
+        return new SolidColorBrush(Color.FromRgb(240, 240, 240)); // 默认浅灰色
     }
 
     /// <summary>

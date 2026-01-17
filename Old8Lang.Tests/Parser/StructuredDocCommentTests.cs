@@ -254,9 +254,9 @@ class Calculator {
 
         var classInit = program.GetImportStatement(0) as ClassInit;
         Assert.NotNull(classInit);
-        Assert.NotNull(classInit.AnyLangValue);
+        Assert.NotNull(classInit.AnyValue);
 
-        var typeTemplate = classInit.AnyLangValue;
+        var typeTemplate = classInit.AnyValue;
         Assert.NotNull(typeTemplate);
 
         var docComment = typeTemplate.DocComment;

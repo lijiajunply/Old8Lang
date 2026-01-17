@@ -21,15 +21,15 @@ public partial class IfStatement(
         get
         {
             yield return ifChildBlock;
-            foreach (var item in elifBlock)
+            foreach (var item in elifBlock.OfType<IfChild>())
             {
-                if (item != null) yield return item;
+                yield return item;
             }
         }
     }
-    
+
     public BlockStatement? ElseBlock => elseBlockStatement;
-    
+
     public override void Run(VariateManager manager)
     {
         var r = true;

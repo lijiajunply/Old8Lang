@@ -257,7 +257,7 @@ public partial class VirtualMachine
         if (a is string sa && b is string sb) return sa == sb;
 
         // 处理枚举值比较
-        if (a is Old8Lang.AST.Expression.Value.EnumLangValue ea && b is Old8Lang.AST.Expression.Value.EnumLangValue eb)
+        if (a is EnumLangValue ea && b is EnumLangValue eb)
         {
             return ea.EnumTypeName == eb.EnumTypeName && ea.Value == eb.Value;
         }

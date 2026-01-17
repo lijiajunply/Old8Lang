@@ -141,7 +141,7 @@ public class Pagination : WidgetBase
 
     private Control CreatePageButton(string text, int targetPage, bool disabled, bool isActive = false)
     {
-        var button = new Avalonia.Controls.Button
+        var button = new Button
         {
             Content = text,
             MinWidth = 32,

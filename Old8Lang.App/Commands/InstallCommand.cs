@@ -257,7 +257,7 @@ public class InstallCommand : ICommand
     /// <summary>
     /// 安装包（异步）- 被 PackageService 调用
     /// </summary>
-    private async Task<Old8Lang.App.Services.InstallPackageResult> InstallPackageAsync(
+    private async Task<InstallPackageResult> InstallPackageAsync(
         string packageName,
         string version,
         ProjectConfig config,

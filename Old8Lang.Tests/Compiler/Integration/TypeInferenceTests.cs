@@ -192,7 +192,7 @@ public class TypeInferenceTests
             TypeInferenceConfig.Instance.DebugOutput = true;
 
             // 捕获控制台输出
-            using var consoleOutput = new System.IO.StringWriter();
+            using var consoleOutput = new StringWriter();
             var originalConsole = Console.Out;
             Console.SetOut(consoleOutput);
 

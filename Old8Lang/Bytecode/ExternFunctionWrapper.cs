@@ -337,54 +337,54 @@ public class ExternFunctionWrapper
     private Type CreateDelegateType(Type[] paramTypes, Type returnType)
     {
         // 动态创建委托类型
-        var assemblyName = new System.Reflection.AssemblyName($"ExternDelegate_{Guid.NewGuid():N}");
+        var assemblyName = new AssemblyName($"ExternDelegate_{Guid.NewGuid():N}");
         var assemblyBuilder = System.Reflection.Emit.AssemblyBuilder.DefineDynamicAssembly(
             assemblyName,
             System.Reflection.Emit.AssemblyBuilderAccess.Run);
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("ExternModule");
         var typeBuilder = moduleBuilder.DefineType(
             $"ExternDelegate_{_funcName}",
-            System.Reflection.TypeAttributes.Public | System.Reflection.TypeAttributes.Sealed,
+            TypeAttributes.Public | TypeAttributes.Sealed,
             typeof(MulticastDelegate));
 
         // 添加 UnmanagedFunctionPointer 特性
         var callingConv = _callingConvention switch
         {
-            CallingConventionType.Cdecl => System.Runtime.InteropServices.CallingConvention.Cdecl,
-            CallingConventionType.StdCall => System.Runtime.InteropServices.CallingConvention.StdCall,
-            CallingConventionType.WinApi => System.Runtime.InteropServices.CallingConvention.Winapi,
-            _ => System.Runtime.InteropServices.CallingConvention.Cdecl
+            CallingConventionType.Cdecl => CallingConvention.Cdecl,
+            CallingConventionType.StdCall => CallingConvention.StdCall,
+            CallingConventionType.WinApi => CallingConvention.Winapi,
+            _ => CallingConvention.Cdecl
         };
 
         var unmanagedAttr = new System.Reflection.Emit.CustomAttributeBuilder(
-            typeof(System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute)
-                .GetConstructor(new[] { typeof(System.Runtime.InteropServices.CallingConvention) })!,
+            typeof(UnmanagedFunctionPointerAttribute)
+                .GetConstructor(new[] { typeof(CallingConvention) })!,
             new object[] { callingConv });
         typeBuilder.SetCustomAttribute(unmanagedAttr);
 
         // 定义构造函数
         var ctorBuilder = typeBuilder.DefineConstructor(
-            System.Reflection.MethodAttributes.RTSpecialName |
-            System.Reflection.MethodAttributes.HideBySig |
-            System.Reflection.MethodAttributes.Public,
-            System.Reflection.CallingConventions.Standard,
+            MethodAttributes.RTSpecialName |
+            MethodAttributes.HideBySig |
+            MethodAttributes.Public,
+            CallingConventions.Standard,
             new[] { typeof(object), typeof(IntPtr) });
         ctorBuilder.SetImplementationFlags(
-            System.Reflection.MethodImplAttributes.Runtime |
-            System.Reflection.MethodImplAttributes.Managed);
+            MethodImplAttributes.Runtime |
+            MethodImplAttributes.Managed);
 
         // 定义 Invoke 方法
         var invokeBuilder = typeBuilder.DefineMethod(
             "Invoke",
-            System.Reflection.MethodAttributes.Public |
-            System.Reflection.MethodAttributes.HideBySig |
-            System.Reflection.MethodAttributes.NewSlot |
-            System.Reflection.MethodAttributes.Virtual,
+            MethodAttributes.Public |
+            MethodAttributes.HideBySig |
+            MethodAttributes.NewSlot |
+            MethodAttributes.Virtual,
             returnType,
             paramTypes);
         invokeBuilder.SetImplementationFlags(
-            System.Reflection.MethodImplAttributes.Runtime |
-            System.Reflection.MethodImplAttributes.Managed);
+            MethodImplAttributes.Runtime |
+            MethodImplAttributes.Managed);
 
         return typeBuilder.CreateType()!;
     }

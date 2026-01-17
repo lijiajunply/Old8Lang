@@ -189,7 +189,7 @@ public partial class ThreadClassLangValue : LangValueType
         }
 
         // 直接调用 .NET Thread.Sleep
-        System.Threading.Thread.Sleep(delayMs.Value);
+        Thread.Sleep(delayMs.Value);
 
         return new VoidLangValue(position);
     }
@@ -206,7 +206,7 @@ public partial class ThreadClassLangValue : LangValueType
         }
 
         // 获取当前 .NET 线程
-        var currentThread = System.Threading.Thread.CurrentThread;
+        var currentThread = Thread.CurrentThread;
 
         // 创建一个特殊的 ThreadLangValue，包装当前线程
         // 注意：由于 ThreadLangValue 构造函数需要 ThreadStart，我们需要提供一个空操作

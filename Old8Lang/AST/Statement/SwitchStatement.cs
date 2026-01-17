@@ -19,7 +19,7 @@ public partial class SwitchStatement(
 
         foreach (var oldCase in switchCaseList)
         {
-            var caseValue = oldCase.expression.Run(manager);
+            var caseValue = oldCase.Expression.Run(manager);
             bool isMatch;
 
             // 处理范围匹配：如果 caseValue 是数组，检查 switchValue 是否在数组中
@@ -52,7 +52,6 @@ public partial class SwitchStatement(
                 // 如果case块中执行了continue，保留continue标志（让外层循环处理）
                 if (manager.ControlFlowManager.ContinueFlag)
                 {
-                    return;
                 }
 
                 return;
@@ -95,11 +94,11 @@ public partial class SwitchStatement(
                 var caseLabel = caseLabels[i];
 
                 // 检查是否是范围匹配
-                if (oldCase.expression is RangeLangValue)
+                if (oldCase.Expression is RangeLangValue)
                 {
                     // 范围匹配：检查 switchValue 是否在范围数组中
                     // 加载case值（数组）
-                    oldCase.expression.LoadIlValue(ilGenerator, local);
+                    oldCase.Expression.LoadIlValue(ilGenerator, local);
 
                     // 加载switch值
                     ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
@@ -128,10 +127,11 @@ public partial class SwitchStatement(
                     ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
 
                     // 加载case值并比较
-                    oldCase.expression.LoadIlValue(ilGenerator, local);
+                    oldCase.Expression.LoadIlValue(ilGenerator, local);
 
                     // 比较操作
-                    if (switchValueType == typeof(int) || switchValueType == typeof(bool) || switchValueType == typeof(char))
+                    if (switchValueType == typeof(int) || switchValueType == typeof(bool) ||
+                        switchValueType == typeof(char))
                     {
                         // 整数、布尔值和字符使用Ceq指令比较
                         ilGenerator.Emit(OpCodes.Ceq);
@@ -151,13 +151,9 @@ public partial class SwitchStatement(
                     {
                         // 其他类型比较，调用Equals方法
                         // 尝试获取精确匹配的Equals方法
-                        var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]);
-
                         // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
-                        if (equalsMethod is null)
-                        {
-                            equalsMethod = switchValueType.GetMethod("Equals", [typeof(object)]);
-                        }
+                        var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]) ??
+                                           switchValueType.GetMethod("Equals", [typeof(object)]);
 
                         if (equalsMethod is not null)
                         {
@@ -215,14 +211,15 @@ public partial class SwitchStatement(
         ilGenerator.MarkLabel(labelEnd);
     }
 
-    private bool TryGenerateIntSwitch(ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel, List<Label> caseLabels)
+    private bool TryGenerateIntSwitch(ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel,
+        List<Label> caseLabels)
     {
         // 1. 检查是否所有 case 都是整数常量
         var caseValues = new List<(int Value, int Index)>();
         for (int i = 0; i < switchCaseList.Count; i++)
         {
             var oldCase = switchCaseList[i];
-            if (oldCase.expression is IntLangValue intVal)
+            if (oldCase.Expression is IntLangValue intVal)
             {
                 caseValues.Add((intVal.Value, i));
             }
@@ -287,10 +284,13 @@ public partial class SwitchStatement(
     public override int Count => switchCaseList.Count;
 }
 
-public partial class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
+public partial class CaseStatement(
+    LangExpression expression,
+    BlockStatement blockStatement,
+    SourcePosition position = default)
     : OldStatement(position)
 {
-    public LangExpression expression { get; } = expression;
+    public LangExpression Expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;
 
     public override void Run(VariateManager manager)
@@ -301,7 +301,7 @@ public partial class CaseStatement(LangExpression expression, BlockStatement blo
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var labelCase = ilGenerator.DefineLabel();
-        expression.LoadIlValue(ilGenerator, local);
+        Expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Br, labelCase);
 
         ilGenerator.MarkLabel(labelCase);

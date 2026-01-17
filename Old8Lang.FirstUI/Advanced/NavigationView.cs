@@ -117,7 +117,7 @@ public class NavigationView : WidgetBase
         mainGrid.Children.Add(contentControl);
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(mainGrid, this);
+        LayoutHelper.ApplyBaseStyles(mainGrid, this);
 
         return mainGrid;
     }

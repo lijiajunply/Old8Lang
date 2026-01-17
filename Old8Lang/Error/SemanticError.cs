@@ -50,7 +50,7 @@ public class SemanticError : Old8Exception
     /// <param name="message">错误信息</param>
     /// <param name="suggestion">建议</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
-    public SemanticError(SourcePosition position, string errorCode, string message, string? suggestion, System.Guid requestId)
+    public SemanticError(SourcePosition position, string errorCode, string message, string? suggestion, Guid requestId)
         : base(
             errorCode, 
             message,
@@ -69,7 +69,7 @@ public class SemanticError : Old8Exception
     /// <param name="message">错误信息</param>
     /// <param name="suggestion">建议</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
-    public SemanticError(IOldLangTree node, string errorCode, string message, string? suggestion, System.Guid requestId)
+    public SemanticError(IOldLangTree node, string errorCode, string message, string? suggestion, Guid requestId)
         : base(
             errorCode, 
             message,

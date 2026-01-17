@@ -94,7 +94,7 @@ public class Toast : WidgetBase
             Text = Message,
             FontSize = 14,
             Foreground = Utils.LayoutHelper.ParseColorBrush("#FFFFFF"),
-            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            TextWrapping = TextWrapping.Wrap,
             VerticalAlignment = VerticalAlignment.Center
         };
         contentPanel.Children.Add(messageText);

@@ -1070,7 +1070,7 @@ public partial class VirtualMachine
                     if (slicedList == null)
                     {
                         slicedList = new List<object?>();
-                        if (sliceResult is System.Collections.IEnumerable enumerable)
+                        if (sliceResult is IEnumerable enumerable)
                         {
                             foreach (var item in enumerable)
                             {
@@ -1302,7 +1302,7 @@ public partial class VirtualMachine
                 }
 
                 // 创建枚举模板
-                var enumTemplate = new Old8Lang.AST.Expression.AnyValues.EnumTemplate(
+                var enumTemplate = new EnumTemplate(
                     enumName,
                     members,
                     default);
@@ -1842,7 +1842,7 @@ public partial class VirtualMachine
                     }
                 }
                 // 如果是枚举模板（访问枚举成员）
-                else if (obj is Old8Lang.AST.Expression.AnyValues.EnumTemplate enumTemplate)
+                else if (obj is EnumTemplate enumTemplate)
                 {
                     var enumValue = enumTemplate.GetMemberValue(fieldName);
                     _stack.Push(enumValue);
@@ -1913,7 +1913,7 @@ public partial class VirtualMachine
                         throw new Exception($"类型 Tuple 没有字段或属性 {fieldName}");
                     }
                 }
-                else if (obj is System.Collections.IList list)
+                else if (obj is IList list)
                 {
                     if (fieldName == "Length")
                     {
@@ -2670,7 +2670,7 @@ public partial class VirtualMachine
                 // 1. 如果是整数值（资源ID），尝试通过 ResourceManager 释放
                 if (resource is int resourceId)
                 {
-                    Old8Lang.Concurrency.ResourceManager.TryDispose(resourceId);
+                    Concurrency.ResourceManager.TryDispose(resourceId);
                 }
                 // 2. 如果是 AnyLangValue（用户自定义类实例），尝试调用 dispose 方法
                 else if (resource is AnyLangValue anyValue)

@@ -1304,7 +1304,7 @@ public class FuncLangValue : ImportInfo
         if (CapturedScope is not null)
         {
             typeof(FuncLangValue)
-                .GetProperty("CapturedScope", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
+                .GetProperty("CapturedScope", BindingFlags.NonPublic | BindingFlags.Instance)?
                 .SetValue(instantiated, CapturedScope);
         }
 

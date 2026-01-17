@@ -396,8 +396,8 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         // 使用 Value 字段（已运行的键值对）
         foreach (var (key, value) in Value)
         {
-            var objKey = LangValueType.ValueToObj(key) ?? new object();
-            var objValue = LangValueType.ValueToObj(value) ?? new object();
+            var objKey = ValueToObj(key) ?? new object();
+            var objValue = ValueToObj(value) ?? new object();
             result[objKey] = objValue;
         }
 

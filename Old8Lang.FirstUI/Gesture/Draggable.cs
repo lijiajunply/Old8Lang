@@ -76,7 +76,7 @@ public class Draggable : WidgetBase
             {
                 Width = 100,
                 Height = 100,
-                Background = Avalonia.Media.Brushes.LightGray
+                Background = Brushes.LightGray
             };
         }
 

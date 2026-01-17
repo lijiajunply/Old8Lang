@@ -48,20 +48,20 @@ public class Stack : WidgetBase
                 // 设置对齐方式
                 control.HorizontalAlignment = HorizontalAlignment switch
                 {
-                    HorizontalAlignment.Left => Avalonia.Layout.HorizontalAlignment.Left,
-                    HorizontalAlignment.Center => Avalonia.Layout.HorizontalAlignment.Center,
-                    HorizontalAlignment.Right => Avalonia.Layout.HorizontalAlignment.Right,
-                    HorizontalAlignment.Stretch => Avalonia.Layout.HorizontalAlignment.Stretch,
-                    _ => Avalonia.Layout.HorizontalAlignment.Center
+                    HorizontalAlignment.Left => HorizontalAlignment.Left,
+                    HorizontalAlignment.Center => HorizontalAlignment.Center,
+                    HorizontalAlignment.Right => HorizontalAlignment.Right,
+                    HorizontalAlignment.Stretch => HorizontalAlignment.Stretch,
+                    _ => HorizontalAlignment.Center
                 };
 
                 control.VerticalAlignment = VerticalAlignment switch
                 {
-                    VerticalAlignment.Top => Avalonia.Layout.VerticalAlignment.Top,
-                    VerticalAlignment.Center => Avalonia.Layout.VerticalAlignment.Center,
-                    VerticalAlignment.Bottom => Avalonia.Layout.VerticalAlignment.Bottom,
-                    VerticalAlignment.Stretch => Avalonia.Layout.VerticalAlignment.Stretch,
-                    _ => Avalonia.Layout.VerticalAlignment.Center
+                    VerticalAlignment.Top => VerticalAlignment.Top,
+                    VerticalAlignment.Center => VerticalAlignment.Center,
+                    VerticalAlignment.Bottom => VerticalAlignment.Bottom,
+                    VerticalAlignment.Stretch => VerticalAlignment.Stretch,
+                    _ => VerticalAlignment.Center
                 };
 
                 panel.Children.Add(control);

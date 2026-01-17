@@ -43,7 +43,7 @@ public class SelectCase
     public SourcePosition Position { get; }
 
     /// <summary>
-    /// 构造接收case：value <- channel
+    /// 构造接收case：value &lt;- channel
     /// </summary>
     public SelectCase(
         LangExpression channelExpression,
@@ -60,7 +60,7 @@ public class SelectCase
     }
 
     /// <summary>
-    /// 构造发送case：channel <- value
+    /// 构造发送case：channel &lt;- value
     /// </summary>
     public SelectCase(
         LangExpression channelExpression,
@@ -125,9 +125,10 @@ public partial class SelectStatement(
                     int channelId;
 
                     // 检查 ChannelExpression 是否为 ChannelReceive 函数调用
-                    if (selectCase.ChannelExpression is Instance funcCall &&
-                        funcCall.Id.IdName == "ChannelReceive" &&
-                        funcCall.Ids.Count > 0)
+                    if (selectCase.ChannelExpression is Instance
+                        {
+                            Id.IdName: "ChannelReceive", Ids.Count: > 0
+                        } funcCall)
                     {
                         // 提取实际的 channel ID 参数
                         var channelIdValue = funcCall.Ids[0].Run(manager);
@@ -135,6 +136,7 @@ public partial class SelectStatement(
                         {
                             continue;
                         }
+
                         channelId = intVal.Value;
                     }
                     else
@@ -145,6 +147,7 @@ public partial class SelectStatement(
                         {
                             continue;
                         }
+
                         channelId = intVal.Value;
                     }
 
@@ -154,7 +157,8 @@ public partial class SelectStatement(
                         // 接收成功
                         if (selectCase.VariableName is not null)
                         {
-                            manager.Set(new LangId(selectCase.VariableName), LangValueType.ObjToValue(receiveResult.Value));
+                            manager.Set(new LangId(selectCase.VariableName),
+                                LangValueType.ObjToValue(receiveResult.Value));
                         }
 
                         selectCase.BlockStatement.Run(manager);
@@ -200,7 +204,7 @@ public partial class SelectStatement(
 
         // 检查是否从select块内恢复
         bool isResumingFromSelectBlock = !string.IsNullOrEmpty(context.ExecutionPath) &&
-                                          context.ExecutionPath.Contains("/select_block");
+                                         context.ExecutionPath.Contains("/select_block");
 
         if (isResumingFromSelectBlock)
         {
@@ -233,10 +237,10 @@ public partial class SelectStatement(
         // 3. 如果有 default 且所有 case 未就绪，执行 default 并退出
         // 4. 否则短暂休眠后继续循环
 
-        var loopStart = ilGenerator.DefineLabel();      // 轮询循环开始
-        var loopEnd = ilGenerator.DefineLabel();        // 轮询循环结束
-        var defaultLabel = ilGenerator.DefineLabel();   // default 分支
-        var sleepLabel = ilGenerator.DefineLabel();     // 休眠逻辑
+        var loopStart = ilGenerator.DefineLabel(); // 轮询循环开始
+        var loopEnd = ilGenerator.DefineLabel(); // 轮询循环结束
+        var defaultLabel = ilGenerator.DefineLabel(); // default 分支
+        var sleepLabel = ilGenerator.DefineLabel(); // 休眠逻辑
 
         // 循环开始
         ilGenerator.MarkLabel(loopStart);
@@ -261,8 +265,8 @@ public partial class SelectStatement(
                 // 调用 ResourceManager.TryReceiveChannel(int, int)
                 var tryReceiveMethod = typeof(ResourceManager).GetMethod(
                     nameof(ResourceManager.TryReceiveChannel),
-                    new[] { typeof(int), typeof(int) });
-                ilGenerator.Emit(OpCodes.Call, tryReceiveMethod);
+                    [typeof(int), typeof(int)]);
+                if (tryReceiveMethod != null) ilGenerator.Emit(OpCodes.Call, tryReceiveMethod);
 
                 // 结果存储到临时局部变量
                 var receiveResultLocal = ilGenerator.DeclareLocal(typeof(ChannelReceiveResult));
@@ -271,28 +275,34 @@ public partial class SelectStatement(
                 // 检查 receiveResult.Success
                 ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
                 var successProperty = typeof(ChannelReceiveResult).GetProperty(nameof(ChannelReceiveResult.Success));
-                ilGenerator.Emit(OpCodes.Callvirt, successProperty.GetMethod);
-
-                // 如果 Success == false，跳过此 case
-                ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
-
-                // Success == true: 设置变量（如果有）并执行块
-                if (selectCase.VariableName is not null)
+                if (successProperty?.GetMethod != null)
                 {
-                    // 获取 receiveResult.Value
-                    ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
-                    var valueProperty = typeof(ChannelReceiveResult).GetProperty(nameof(ChannelReceiveResult.Value));
-                    ilGenerator.Emit(OpCodes.Callvirt, valueProperty.GetMethod);
+                    ilGenerator.Emit(OpCodes.Callvirt, successProperty.GetMethod);
 
-                    // 将值转换为 LangValueType
-                    var objToValueMethod = typeof(LangValueType).GetMethod(
-                        nameof(LangValueType.ObjToValue),
-                        new[] { typeof(object) });
-                    ilGenerator.Emit(OpCodes.Call, objToValueMethod);
+                    // 如果 Success == false，跳过此 case
+                    ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
 
-                    // 存储到变量（获取或创建局部变量）
-                    var varLocal = local.GetOrCreateLocalVar(ilGenerator, selectCase.VariableName, typeof(LangValueType));
-                    ilGenerator.Emit(OpCodes.Stloc, varLocal);
+                    // Success == true: 设置变量（如果有）并执行块
+                    if (selectCase.VariableName is not null)
+                    {
+                        // 获取 receiveResult.Value
+                        ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
+                        var valueProperty =
+                            typeof(ChannelReceiveResult).GetProperty(nameof(ChannelReceiveResult.Value));
+                        if (valueProperty?.GetMethod != null)
+                            ilGenerator.Emit(OpCodes.Callvirt, valueProperty.GetMethod);
+
+                        // 将值转换为 LangValueType
+                        var objToValueMethod = typeof(LangValueType).GetMethod(
+                            nameof(LangValueType.ObjToValue),
+                            [typeof(object)]);
+                        if (objToValueMethod != null) ilGenerator.Emit(OpCodes.Call, objToValueMethod);
+
+                        // 存储到变量（获取或创建局部变量）
+                        var varLocal = local.GetOrCreateLocalVar(ilGenerator, selectCase.VariableName,
+                            typeof(LangValueType));
+                        ilGenerator.Emit(OpCodes.Stloc, varLocal);
+                    }
                 }
 
                 // 执行 case 块
@@ -312,7 +322,7 @@ public partial class SelectStatement(
                 // 加载要发送的值
                 selectCase.SendValueExpression!.LoadIlValue(ilGenerator, local);
                 var sendValueType = selectCase.SendValueExpression.OutputType(local);
-                if (sendValueType.IsValueType)
+                if (sendValueType is { IsValueType: true })
                 {
                     ilGenerator.Emit(OpCodes.Box, sendValueType);
                 }
@@ -323,8 +333,8 @@ public partial class SelectStatement(
                 // 调用 ResourceManager.TrySendChannel(int, object, int)
                 var trySendMethod = typeof(ResourceManager).GetMethod(
                     nameof(ResourceManager.TrySendChannel),
-                    new[] { typeof(int), typeof(object), typeof(int) });
-                ilGenerator.Emit(OpCodes.Call, trySendMethod);
+                    [typeof(int), typeof(object), typeof(int)]);
+                if (trySendMethod != null) ilGenerator.Emit(OpCodes.Call, trySendMethod);
 
                 // 如果返回 false，跳过此 case
                 ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
@@ -357,8 +367,8 @@ public partial class SelectStatement(
             ilGenerator.Emit(OpCodes.Ldc_I4_1);
             var sleepMethod = typeof(Thread).GetMethod(
                 nameof(Thread.Sleep),
-                new[] { typeof(int) });
-            ilGenerator.Emit(OpCodes.Call, sleepMethod);
+                [typeof(int)]);
+            if (sleepMethod != null) ilGenerator.Emit(OpCodes.Call, sleepMethod);
 
             // 继续循环
             ilGenerator.Emit(OpCodes.Br, loopStart);
@@ -388,12 +398,5 @@ public partial class SelectStatement(
         }
     }
 
-    public override int Count
-    {
-        get
-        {
-            // case数量 + default块（如果有）
-            return cases.Count + (defaultCase is not null ? 1 : 0);
-        }
-    }
+    public override int Count => cases.Count + (defaultCase is not null ? 1 : 0); // case数量 + default块（如果有）
 }

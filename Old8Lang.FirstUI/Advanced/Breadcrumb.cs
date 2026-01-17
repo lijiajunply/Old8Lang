@@ -50,7 +50,7 @@ public class Breadcrumb : WidgetBase
     {
         var container = new StackPanel
         {
-            Orientation = Avalonia.Layout.Orientation.Horizontal,
+            Orientation = Orientation.Horizontal,
             Spacing = 8
         };
 
@@ -66,7 +66,7 @@ public class Breadcrumb : WidgetBase
             // 创建项目容器
             var itemPanel = new StackPanel
             {
-                Orientation = Avalonia.Layout.Orientation.Horizontal,
+                Orientation = Orientation.Horizontal,
                 Spacing = 8
             };
 
@@ -84,7 +84,7 @@ public class Breadcrumb : WidgetBase
             // 如果不是最后一项且可点击，添加点击效果
             if (!isLast || item.IsClickable)
             {
-                var button = new Avalonia.Controls.Button
+                var button = new Button
                 {
                     Content = textBlock,
                     Background = Brushes.Transparent,
@@ -97,7 +97,7 @@ public class Breadcrumb : WidgetBase
                 button.PointerEntered += (s, e) =>
                 {
                     textBlock.Foreground = LayoutHelper.ParseColorBrush(HoverColor);
-                    textBlock.TextDecorations = Avalonia.Media.TextDecorations.Underline;
+                    textBlock.TextDecorations = TextDecorations.Underline;
                 };
 
                 button.PointerExited += (s, e) =>

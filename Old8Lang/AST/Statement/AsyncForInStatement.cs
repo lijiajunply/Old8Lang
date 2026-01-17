@@ -72,7 +72,7 @@ public partial class AsyncForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    var nextValue = asyncStream.Run(manager);
+                    asyncStream.Run(manager);
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -86,7 +86,7 @@ public partial class AsyncForInStatement(
                         // 使用asyncStream.NextValue作为当前值
                         var currentValue = asyncStream.NextValue;
 
-                        if (currentValue is not null && !(currentValue is VoidLangValue))
+                        if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
                             if (AllIds.Count == 1)
@@ -130,7 +130,6 @@ public partial class AsyncForInStatement(
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
-                                continue;
                             }
                         }
                     }
@@ -149,7 +148,7 @@ public partial class AsyncForInStatement(
                     var nextValueTask = asyncGenerator.RunAsync(manager);
 
                     // 等待 Task 完成并获取值
-                    var nextValue = nextValueTask.Await();
+                    nextValueTask.Await();
 
                     // 检查生成器是否已完成
                     if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -213,7 +212,7 @@ public partial class AsyncForInStatement(
                 {
                     manager.ControlFlowManager.ResetCurrentState();
 
-                    var nextValue = generator.Run(manager);
+                    generator.Run(manager);
 
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
@@ -391,7 +390,7 @@ public partial class AsyncForInStatement(
     /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
     private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
-        Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
+        Generators.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -424,7 +423,7 @@ public partial class AsyncForInStatement(
             {
                 manager.ControlFlowManager.ResetCurrentState();
 
-                var nextValue = asyncStream.Run(manager);
+                asyncStream.Run(manager);
 
                 if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
@@ -490,7 +489,6 @@ public partial class AsyncForInStatement(
                         if (manager.ControlFlowManager.ContinueFlag)
                         {
                             manager.ControlFlowManager.ContinueFlag = false;
-                            continue;
                         }
                     }
                 }
@@ -511,7 +509,7 @@ public partial class AsyncForInStatement(
     /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
     private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
-        Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
+        Generators.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -549,7 +547,7 @@ public partial class AsyncForInStatement(
                 manager.ControlFlowManager.ResetCurrentState();
 
                 var nextValueTask = asyncGenerator.RunAsync(manager);
-                var nextValue = nextValueTask.Await();
+                nextValueTask.Await();
 
                 if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
@@ -620,7 +618,6 @@ public partial class AsyncForInStatement(
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
-                                continue;
                             }
                         }
                         finally
@@ -648,7 +645,7 @@ public partial class AsyncForInStatement(
     /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
     private void RunGeneratorContextList(VariateManager manager, ILangList oldList,
-        Old8Lang.Generators.GeneratorExecutionContext context)
+        Generators.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
 
@@ -717,7 +714,6 @@ public partial class AsyncForInStatement(
                 if (manager.ControlFlowManager.ContinueFlag)
                 {
                     manager.ControlFlowManager.ContinueFlag = false;
-                    continue;
                 }
             }
 

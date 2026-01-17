@@ -68,7 +68,7 @@ public class Icon : WidgetBase
         }
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(iconControl, this);
+        LayoutHelper.ApplyBaseStyles(iconControl, this);
 
         // 设置大小
         iconControl.Width = Size;
