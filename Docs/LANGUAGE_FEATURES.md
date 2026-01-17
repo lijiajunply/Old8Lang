@@ -168,8 +168,8 @@ func worker(id:int) -> void {
 }
 
 // 启动并发任务
-spawn worker(1)
-spawn worker(2)
+spawn(worker,1)
+spawn(worker,2)
 ```
 
 ---

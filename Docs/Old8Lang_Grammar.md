@@ -1896,6 +1896,112 @@ class Rectangle implements Drawable, Resizable {
         PrintLine("Resizing to " + width.ToStr() + "x" + height.ToStr())
     }
 }
+
+#### 5.6.7 运算符重载
+
+**模式支持**: `[✅ | ❌ | ❌]`
+
+Old8Lang 支持 Python 风格的运算符重载，允许用户为自定义类定义运算符行为。
+
+**支持的运算符**
+
+通过在类中定义特殊方法（以 `_` 开头），可以重载以下运算符：
+
+| 运算符 | 特殊方法 | 说明 |
+|--------|---------|------|
+| `+` | `_add(other)` | 加法运算 |
+| `-` | `_sub(other)` | 减法运算 |
+| `*` | `_mul(other)` | 乘法运算 |
+| `/` | `_div(other)` | 除法运算 |
+| `%` | `_mod(other)` | 取模运算 |
+| `^` | `_pow(other)` | 幂运算 |
+| `==` | `_eq(other)` | 相等比较 |
+| `!=` | 自动实现 | 自动通过 `!_eq(other)` 实现 |
+| `<` | `_lt(other)` | 小于比较 |
+| `>` | `_gt(other)` | 大于比较 |
+| `<=` | `_le(other)` | 小于等于比较 |
+| `>=` | `_ge(other)` | 大于等于比较 |
+| `obj[key]` | `_getitem(key)` | 索引获取 |
+| `obj[key] <- value` | `_setitem(key, value)` | 索引设置 |
+
+**基本示例**
+
+```old8
+class Vector {
+    public x
+    public y
+
+    init(x, y) {
+        this.x <- x
+        this.y <- y
+    }
+
+    // 向量加法
+    _add(other) {
+        return Vector(this.x + other.x, this.y + other.y)
+    }
+
+    // 向量数乘
+    _mul(scalar) {
+        return Vector(this.x * scalar, this.y * scalar)
+    }
+
+    // 相等比较
+    _eq(other) {
+        return this.x == other.x && this.y == other.y
+    }
+}
+
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+
+// 使用重载的运算符
+v3 <- v1 + v2        // 调用 v1._add(v2)，结果: Vector(4, 6)
+v4 <- v1 * 2         // 调用 v1._mul(2)，结果: Vector(2, 4)
+
+if v1 == v2 {        // 调用 v1._eq(v2)
+    PrintLine("相等")
+}
+```
+
+**索引运算符示例**
+
+```old8
+class SparseArray {
+    private data
+
+    init() {
+        this.data <- {"dummy": 0}
+    }
+
+    // 索引获取：arr[index]
+    _getitem(index) {
+        key <- index.ToStr()
+        return this.data[key]
+    }
+
+    // 索引设置：arr[index] <- value
+    _setitem(index, value) {
+        key <- index.ToStr()
+        this.data[key] <- value
+    }
+}
+
+arr <- SparseArray()
+arr[0] <- 10         // 调用 arr._setitem(0, 10)
+val1 <- arr[0]       // 调用 arr._getitem(0)
+```
+
+**注意事项**
+
+1. **返回类型**：比较运算符（`_eq`、`_lt`、`_gt` 等）必须返回 `bool` 类型
+2. **参数数量**：
+   - 算术和比较运算符方法必须接受恰好 1 个参数
+   - `_setitem` 方法必须接受恰好 2 个参数（key 和 value）
+3. **自动实现**：`!=` 运算符会自动通过 `_eq` 方法的取反实现，无需单独定义
+4. **当前限制**:
+   - 仅支持解释器模式（`-f`）
+   - 暂不支持一元运算符重载（如 `-x`、`!x`）
 ```
 
 ### 5.7 枚举声明
@@ -3377,7 +3483,6 @@ try {
 - 带默认参数的函数在编译模式下可能有运行时问题
 - 某些异步特性在编译模式下支持不完整
 - 泛型支持（仅解释器模式支持，编译模式暂不支持）
-- 不支持操作符重载
 
 ### 11.2 平台支持
 
