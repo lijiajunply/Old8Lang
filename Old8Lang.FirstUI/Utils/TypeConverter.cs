@@ -64,7 +64,7 @@ public static class TypeConverter
     public static List<T> ToList<T>(object? old8List)
     {
         if (old8List == null)
-            return new List<T>();
+            return [];
 
         if (old8List is List<T> typedList)
             return typedList;
@@ -80,7 +80,7 @@ public static class TypeConverter
             return result;
         }
 
-        return new List<T>();
+        return [];
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ public static class TypeConverter
                 var invokeMethod = old8Func.GetType().GetMethod("Invoke");
                 if (invokeMethod != null)
                 {
-                    invokeMethod.Invoke(old8Func, new object[] { arg! });
+                    invokeMethod.Invoke(old8Func, [arg!]);
                 }
             }
             catch (Exception ex)

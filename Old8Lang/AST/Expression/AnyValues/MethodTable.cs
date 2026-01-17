@@ -13,12 +13,12 @@ public class MethodTable
     /// key: 方法名
     /// value: 方法信息列表（支持重载）
     /// </summary>
-    private readonly Dictionary<string, List<LangMethodInfo>> MethodMap = new();
+    private readonly Dictionary<string, List<LangMethodInfo>> _methodMap = new();
 
     /// <summary>
     /// 所有方法的列表（用于遍历）
     /// </summary>
-    private readonly List<LangMethodInfo> AllMethods = [];
+    private readonly List<LangMethodInfo> _allMethods = [];
 
     /// <summary>
     /// 添加方法到查找表
@@ -27,10 +27,10 @@ public class MethodTable
     /// <param name="allowOverride">是否允许覆盖父类方法（默认为true）</param>
     public void AddMethod(LangMethodInfo methodInfo, bool allowOverride = true)
     {
-        if (!MethodMap.TryGetValue(methodInfo.MethodName, out var value))
+        if (!_methodMap.TryGetValue(methodInfo.MethodName, out var value))
         {
             value = [];
-            MethodMap[methodInfo.MethodName] = value;
+            _methodMap[methodInfo.MethodName] = value;
         }
 
         // 如果允许覆盖，先移除所有同名方法
@@ -39,14 +39,14 @@ public class MethodTable
             // 从 AllMethods 中移除旧方法
             foreach (var oldMethod in value.ToList())
             {
-                AllMethods.Remove(oldMethod);
+                _allMethods.Remove(oldMethod);
             }
             // 清空当前方法列表
             value.Clear();
         }
 
         value.Add(methodInfo);
-        AllMethods.Add(methodInfo);
+        _allMethods.Add(methodInfo);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class MethodTable
     /// </summary>
     public List<LangMethodInfo>? LookupMethod(string methodName)
     {
-        return MethodMap.GetValueOrDefault(methodName);
+        return _methodMap.GetValueOrDefault(methodName);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class MethodTable
     /// </summary>
     public LangMethodInfo? LookupSingleMethod(string methodName)
     {
-        if (MethodMap.TryGetValue(methodName, out var methods) && methods.Count > 0)
+        if (_methodMap.TryGetValue(methodName, out var methods) && methods.Count > 0)
         {
             return methods[0];
         }
@@ -76,7 +76,7 @@ public class MethodTable
     /// </summary>
     public bool ContainsMethod(string methodName)
     {
-        return MethodMap.ContainsKey(methodName);
+        return _methodMap.ContainsKey(methodName);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class MethodTable
     /// </summary>
     public IReadOnlyList<LangMethodInfo> GetAllMethods()
     {
-        return AllMethods.AsReadOnly();
+        return _allMethods.AsReadOnly();
     }
 
     /// <summary>
@@ -94,16 +94,16 @@ public class MethodTable
     /// <param name="allowOverride">是否允许子类方法覆盖父类方法</param>
     public void MergeFrom(MethodTable parentTable, bool allowOverride = true)
     {
-        foreach (var method in parentTable.AllMethods)
+        foreach (var method in parentTable._allMethods)
         {
             // 如果当前表中已经有同名方法，根据 allowOverride 决定是否覆盖
-            if (MethodMap.ContainsKey(method.MethodName) && !allowOverride)
+            if (_methodMap.ContainsKey(method.MethodName) && !allowOverride)
             {
                 continue; // 子类方法优先，不添加父类的同名方法
             }
 
             // 如果允许覆盖或当前没有同名方法，添加父类方法
-            if (!MethodMap.ContainsKey(method.MethodName))
+            if (!_methodMap.ContainsKey(method.MethodName))
             {
                 AddMethod(method);
             }
@@ -113,7 +113,7 @@ public class MethodTable
     /// <summary>
     /// 获取方法数量
     /// </summary>
-    public int Count => AllMethods.Count;
+    public int Count => _allMethods.Count;
 }
 
 /// <summary>

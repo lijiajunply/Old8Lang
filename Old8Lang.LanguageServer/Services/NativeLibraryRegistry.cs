@@ -11,8 +11,8 @@ public static class NativeLibraryRegistry
     /// </summary>
     public static IEnumerable<string> GetAllFunctionNames()
     {
-        return new[]
-        {
+        return
+        [
             // Math functions (MathLib)
             "Sqrt", "Abs", "Max", "Min", "Pow", "Log", "Log10", "LogBase",
             "Sin", "Cos", "Tan", "Asin", "Acos", "Atan", "Atan2",
@@ -120,7 +120,7 @@ public static class NativeLibraryRegistry
 
             // Image functions (ImageLib)
             "LoadImage", "SaveImage", "ResizeImage", "CropImage",
-            "RotateImage", "FlipImage",
-        };
+            "RotateImage", "FlipImage"
+        ];
     }
 }

@@ -73,7 +73,7 @@ public class OrmWrapper : IDisposable
             .First(m => m.Name == nameof(Insert) && m.IsGenericMethod)
             .MakeGenericMethod(entityType);
 
-        return (int)method.Invoke(this, new[] { entity })!;
+        return (int)method.Invoke(this, [entity])!;
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class OrmWrapper : IDisposable
             .First(m => m.Name == nameof(Update) && m.IsGenericMethod)
             .MakeGenericMethod(entityType);
 
-        return (int)method.Invoke(this, new[] { entity })!;
+        return (int)method.Invoke(this, [entity])!;
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public class OrmWrapper : IDisposable
             .First(m => m.Name == nameof(Delete) && m.IsGenericMethod)
             .MakeGenericMethod(entityType);
 
-        return (int)method.Invoke(this, new[] { entity })!;
+        return (int)method.Invoke(this, [entity])!;
     }
 
     /// <summary>

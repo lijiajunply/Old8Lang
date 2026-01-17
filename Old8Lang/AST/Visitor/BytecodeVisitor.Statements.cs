@@ -275,7 +275,7 @@ public partial class BytecodeVisitor
         }
 
         // 处理elif分支（主构造函数参数）
-        var elifBlocks = GetPrimaryConstructorParameter<List<IfChild?>>(node, "elifBlock") ?? new List<IfChild?>();
+        var elifBlocks = GetPrimaryConstructorParameter<List<IfChild?>>(node, "elifBlock") ?? [];
         foreach (var elif in elifBlocks.OfType<IfChild>())
         {
             // 手动处理IfChild
@@ -567,7 +567,7 @@ public partial class BytecodeVisitor
         }
 
         // 非泛型函数：正常编译
-        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
 
         // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
@@ -994,8 +994,8 @@ public partial class BytecodeVisitor
             Emit(OpCode.StoreLocal, exceptionVariableIndex);
 
             // 2. 遍历所有 catch 块，生成检查链
-            List<int> jumpsToNextBlock = new List<int>();
-            List<int> jumpsToFinally = new List<int>();
+            List<int> jumpsToNextBlock = [];
+            List<int> jumpsToFinally = [];
 
             for (int i = 0; i < node.CatchBlocks.Count; i++)
             {
@@ -1302,7 +1302,7 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
 
         // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
@@ -1638,7 +1638,7 @@ public partial class BytecodeVisitor
             if (funcDecl.FunctionSignature != null)
             {
                 var sig = funcDecl.FunctionSignature.FuncValue;
-                var paramTypes = sig.Ids?.Select(p => p.AssumptionType ?? "object").ToList() ?? new List<string>();
+                var paramTypes = sig.Ids?.Select(p => p.AssumptionType ?? "object").ToList() ?? [];
                 var returnType = sig.Id?.AssumptionType ?? "void";
                 signatureStr = $"{string.Join(",", paramTypes)}:{returnType}";
             }

@@ -143,7 +143,7 @@ class Program
             Console.WriteLine("[STEP 1/2] 扫描 AST 节点...");
             var scanner = new AstNodeScanner(
                 config.ScanDirectory,
-                new HashSet<string>(config.ExcludeClasses),
+                [..config.ExcludeClasses],
                 config.ExcludePatterns
             );
             var nodes = scanner.ScanNodes();
@@ -193,7 +193,7 @@ class Program
         Console.WriteLine("[STEP 1/4] 扫描 AST 节点...");
         var scanner = new AstNodeScanner(
             config.ScanDirectory,
-            new HashSet<string>(config.ExcludeClasses),
+            [..config.ExcludeClasses],
             config.ExcludePatterns
         );
         var nodes = scanner.ScanNodes();
@@ -321,7 +321,7 @@ class Program
             Console.WriteLine("[STEP 1/4] 扫描 AST 节点...");
             var scanner = new AstNodeScanner(
                 config.ScanDirectory,
-                new HashSet<string>(config.ExcludeClasses),
+                [..config.ExcludeClasses],
                 config.ExcludePatterns
             );
             var nodes = scanner.ScanNodes();

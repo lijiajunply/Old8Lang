@@ -177,7 +177,7 @@ public static class ListValueFuncStatic
             {
                 if (langValue.Values[i].Less(langValue.Values[i - 1]))
                 {
-                    return new BoolLangValue(false);
+                    return new BoolLangValue();
                 }
             }
 
@@ -397,7 +397,7 @@ public static class ListValueFuncStatic
                 }
             }
 
-            return new BoolLangValue(false);
+            return new BoolLangValue();
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ public static class ListValueFuncStatic
 
             if (startIndex > endIndex)
             {
-                return new ListLangValue(new List<LangValueType>());
+                return new ListLangValue(new List<LangExpression>());
             }
 
             var result = langValue.Values.Skip(startIndex).Take(endIndex - startIndex).ToList();
@@ -644,6 +644,7 @@ public static class ListValueFuncStatic
                 {
                     comparison = a.index.CompareTo(b.index);
                 }
+
                 return isAscending ? comparison : -comparison;
             });
 
@@ -968,7 +969,7 @@ public static class ListValueFuncStatic
     /// </summary>
     /// <param name="a">第一个键</param>
     /// <param name="b">第二个键</param>
-    /// <returns>比较结果：负数表示a<b，0表示a==b，正数表示a>b</returns>
+    /// <returns>比较结果：负数表示a&lt;b，0表示a==b，正数表示a>b</returns>
     private static int CompareKeys(LangValueType a, LangValueType b)
     {
         return (a, b) switch

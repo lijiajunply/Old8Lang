@@ -45,16 +45,9 @@ public partial class TaskSchedulerClassLangValue : LangValueType
 /// <summary>
 /// TaskScheduler 实例值类型
 /// </summary>
-public partial class TaskSchedulerLangValue : LangValueType
+public partial class TaskSchedulerLangValue(TaskScheduler scheduler, SourcePosition position = default)
+    : LangValueType(position)
 {
-    private readonly TaskScheduler _scheduler;
-
-    public TaskSchedulerLangValue(TaskScheduler scheduler, SourcePosition position = default)
-        : base(position)
-    {
-        _scheduler = scheduler;
-    }
-
     public override string TypeToString() => "TaskScheduler";
 
     public override string ToDisplayString() => "TaskScheduler";
@@ -62,7 +55,7 @@ public partial class TaskSchedulerLangValue : LangValueType
     /// <summary>
     /// 获取底层的 TaskScheduler 对象
     /// </summary>
-    public override object GetValue() => _scheduler;
+    public override object GetValue() => scheduler;
 
     /// <summary>
     /// 外部管理器，用于访问外部变量

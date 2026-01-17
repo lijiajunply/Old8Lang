@@ -55,21 +55,21 @@ public class TypeAnnotationManager
         // list<T>: 单类型参数
         var listType = new GenericTypeInfo(
             name: "list",
-            typeParameters: new List<string> { "T" }
+            typeParameters: ["T"]
         );
         TypeFamily.RegisterType(listType);
 
         // array<T>: 单类型参数
         var arrayType = new GenericTypeInfo(
             name: "array",
-            typeParameters: new List<string> { "T" }
+            typeParameters: ["T"]
         );
         TypeFamily.RegisterType(arrayType);
 
         // dict<K, V>: 两个类型参数（键和值）
         var dictType = new GenericTypeInfo(
             name: "dict",
-            typeParameters: new List<string> { "K", "V" }
+            typeParameters: ["K", "V"]
         );
         TypeFamily.RegisterType(dictType);
     }

@@ -169,7 +169,7 @@ public class SemanticAnalyzer(DocumentParseResult document)
         {
             if (!symbolLocations.ContainsKey(name))
             {
-                symbolLocations[name] = new List<SourceLocation>();
+                symbolLocations[name] = [];
             }
 
             symbolLocations[name].Add(symbol.Location);

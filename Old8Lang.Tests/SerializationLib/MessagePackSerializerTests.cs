@@ -33,7 +33,7 @@ public class MessagePackSerializerTests
             Id = 1,
             Name = "Test",
             Value = 3.14,
-            Tags = new List<string> { "tag1", "tag2" }
+            Tags = ["tag1", "tag2"]
         };
 
         var data = _serializer.Serialize(obj);
@@ -84,5 +84,5 @@ public class TestObject
     public int Id { get; set; }
     public string Name { get; set; } = "";
     public double Value { get; set; }
-    public List<string> Tags { get; set; } = new();
+    public List<string> Tags { get; set; } = [];
 }

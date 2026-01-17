@@ -23,97 +23,168 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InstallCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InstallCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Services/PackageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Services/PackageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ReflectionPerformanceBenchmark.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ReflectionPerformanceBenchmark.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.CodeGen/Configuration/CodeGenConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Configuration/CodeGenConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.CodeGen/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/InMemoryConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/InMemoryConnectionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Breadcrumb.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Breadcrumb.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Card.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Card.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Dialog.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Dialog.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/NavigationView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/NavigationView.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Pagination.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Pagination.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Panel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Panel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Popover.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Popover.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Menu.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/TabView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/TabView.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Table.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Table.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Toast.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Toast.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Tree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Tree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/FilePicker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/FilePicker.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Icon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Icon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/ProgressBar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/ProgressBar.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Select.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Select.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Slider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Slider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Gesture/Draggable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Gesture/Draggable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/RadioButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/RadioButton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/GlobalState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/GlobalState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/StateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/StateManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/RowColumn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/RowColumn.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Stack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Stack.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Computed.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Computed.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Theme/Theme.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Theme/Theme.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Theme/ThemeManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Theme/ThemeManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/TypeConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/TypeConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DebugProfilerHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DebugProfilerHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/NativeLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/NativeLibraryRegistry.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/ScopeAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/ScopeAnalyzer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/TypeInferenceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/TypeInferenceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/NamedArgumentsErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/NamedArgumentsErrorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/NativeDllExternTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/NativeDllExternTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/HttpWebClientTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/HttpWebClientTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SemanticAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SemanticAnalyzer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ClassificationTrainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ClassificationTrainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ClusteringTrainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ClusteringTrainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/MachineLearningLibBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/MachineLearningLibBinding.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ModelPredictor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/ModelPredictor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/RegressionTrainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/RegressionTrainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.SerializationLib/Examples.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.SerializationLib/Examples.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PreprocessorCompilerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PreprocessorCompilerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/PreprocessorInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/PreprocessorInterpreterTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/DocumentParseResultTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/DocumentParseResultTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SemanticAnalyzerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SemanticAnalyzerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SymbolFinderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SymbolFinderTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SymbolInfoTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/Services/SymbolInfoTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/FileLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/FileLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Basic/PreprocessorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Basic/PreprocessorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/SerializationLib/MessagePackSerializerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/SerializationLib/MessagePackSerializerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/SerializationLib/SerializerFactoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/SerializationLib/SerializerFactoryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMUsingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMUsingTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/DocCommentInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/DocCommentInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/ClassMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/ClassMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AsyncStreamExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AsyncStreamExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedIndexAccess.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTemplateValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTemplateValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/TuplePattern.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/TuplePattern.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LetClause.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LetClause.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqQueryExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqQueryExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/ComparisonOpHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/ComparisonOpHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/NumericBinaryOpHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/TypeCheckILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/TypeCheckILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/CancellationTokenSourceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/CancellationTokenSourceLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/MockLibClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/MockLibClassLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskCompletionSourceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskCompletionSourceLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskFactoryClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskFactoryClassLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskSchedulerClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskSchedulerClassLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TestRunnerClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TestRunnerClassLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/SuperExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/SuperExpression.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CancellationTokenLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CancellationTokenLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LockedVariableLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LockedVariableLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeDelegateFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeDelegateFuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/VMThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/VMThreadLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/AnyValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/AnyValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/PrimitiveExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/PrimitiveExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/FunctionDecorator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/FunctionDecorator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/EnumInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/EnumInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FileHeaderDirective.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FileHeaderDirective.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SelectStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SelectStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/UsingStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/UsingStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Statements2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Statements2.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeObjectInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeObjectInstance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ExternFunctionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ExternFunctionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleRegistry.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/ILVerifier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/ILVerifier.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/TaskFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/TaskFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ThreadFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ThreadFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ConcurrencyUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ConcurrencyUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/TokenIndexCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/TokenIndexCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/LangObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/LangObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorSymbols.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorSymbols.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceSummary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceSummary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Csv.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Csv.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/MockLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/MockLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/TestRunner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/TestRunner.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -666,7 +737,7 @@
       <workItem from="1768599044369" duration="7403000" />
       <workItem from="1768650127141" duration="5328000" />
       <workItem from="1768659548640" duration="240000" />
-      <workItem from="1768674022160" duration="788000" />
+      <workItem from="1768674022160" duration="2396000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -1011,7 +1082,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="710" />
+    <option name="localTasksCounter" value="711" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1038,7 +1109,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现类型转换运算符as的功能支持&#10;&#10;- 在BytecodeVisitor中添加对as运算符的特殊处理逻辑&#10;- 生成Cast指令实现运行时类型转换功能&#10;- 支持左右操作数的类型检查和目标类型名称获取&#10;- 添加类型转换异常处理机制&#10;- 创建完整的类型转换测试文件验证各项转换功能&#10;- 更新IDE工作区配置同步项目变更信息" />
     <MESSAGE value="feat(vm): 实现虚拟机模式下Lambda表达式支持&#10;&#10;- 添加OpCode.MakeFunction和OpCode.CallDynamic字节码指令&#10;- 实现BytecodeVisitor.VisitFuncLangValue编译Lambda表达式&#10;- 在VirtualMachine中实现MakeFunction和CallDynamic执行逻辑&#10;- 更新FunctionMetadata支持函数对象创建和动态调用&#10;- 添加Lambda表达式测试用例LambdaTest.old8&#10;- 更新TODO文档标记Lambda功能为完全支持状态&#10;- 生成Lambda表达式编译和执行的测试报告" />
     <MESSAGE value="feat(vm): 添加虚拟机模式支持并实现类型转换功能&#10;&#10;- 新增虚拟机模式运行环境和字节码执行机制&#10;- 实现了完整的类型转换功能，支持int、double、string、bool、char、list、array、dict等类型的相互转换&#10;- 添加了ConvertToList、ConvertToArray、ConvertToDict等辅助转换方法&#10;- 增加了类型转换异常处理机制，提供更详细的错误信息&#10;- 更新项目规则文档，添加虚拟机模式测试目录和命令说明&#10;- 创建类型转换测试文件，验证各种类型转换场景的正确性" />
     <MESSAGE value="feat(vm): 实现异常过滤器和元组解构赋值功能&#10;&#10;- 修改 TryStatement AST 支持异常过滤器表达式&#10;- 更新 Parser 解析 catch 块中的 where 子句&#10;- 实现虚拟机中的异常过滤器检查和分发逻辑&#10;- 添加 VmException 包装类用于传递 Old8Lang 异常对象&#10;- 实现元组解构赋值的字节码生成和执行逻辑&#10;- 重构异常类型匹配逻辑以支持自定义对象实例&#10;- 更新 IsType 指令直接接收类型注解参数&#10;- 修改文档中的功能完成状态追踪" />
@@ -1063,7 +1133,8 @@
     <MESSAGE value="fix(interpreter): 修复装饰器中闭包变量访问问题&#10;&#10;- 将测试中的 RuntimeError 替换为 InvalidOperationError&#10;- 在 FuncInit 中保留 targetFunc 的 CapturedScope 确保闭包变量正确访问&#10;- 直接调用 wrapper 而不是通过 FunctionCallExpression 保留 CapturedScope&#10;- 创建新 FuncLangValue 时保留 wrappedFunc 的所有属性包括 CapturedScope&#10;- 将 FuncLangValue 的 CapturedScope 访问权限从 private 改为 internal&#10;- 添加 GetCapturedScope 方法用于装饰器等场景获取捕获作用域" />
     <MESSAGE value="fix(interpreter): 修复装饰器解释器中的缓存字典初始化问题&#10;&#10;- 将空对象字面量 {} 替换为 dict() 函数调用&#10;- 确保缓存字典正确初始化为字典类型&#10;- 修复了可能导致类型错误的初始化方式" />
     <MESSAGE value="feat(lang): 添加运算符重载支持&#10;&#10;- 实现 Python 风格的运算符重载功能，支持自定义类的运算符行为&#10;- 支持算术运算符：+ (_add)、- (_sub)、* (_mul)、/ (_div)、% (_mod)、^ (_pow)&#10;- 支持比较运算符：== (_eq)、&lt; (_lt)、&gt; (_gt)、&lt;= (_le)、&gt;= (_ge)&#10;- 支持索引运算符：obj[key] (_getitem)、obj[key] &lt;- value (_setitem)&#10;- 在 AnyLangValue 类中重写所有运算符虚方法并实现 CallOperatorOverloadMethod 辅助函数&#10;- 在 LangListItem.Run 中添加对 _getitem 方法的支持&#10;- 在 SetStatement 中添加对 _setitem 方法的支持&#10;- 提供完整的文档说明和多个测试用例验证功能正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加运算符重载支持&#10;&#10;- 实现 Python 风格的运算符重载功能，支持自定义类的运算符行为&#10;- 支持算术运算符：+ (_add)、- (_sub)、* (_mul)、/ (_div)、% (_mod)、^ (_pow)&#10;- 支持比较运算符：== (_eq)、&lt; (_lt)、&gt; (_gt)、&lt;= (_le)、&gt;= (_ge)&#10;- 支持索引运算符：obj[key] (_getitem)、obj[key] &lt;- value (_setitem)&#10;- 在 AnyLangValue 类中重写所有运算符虚方法并实现 CallOperatorOverloadMethod 辅助函数&#10;- 在 LangListItem.Run 中添加对 _getitem 方法的支持&#10;- 在 SetStatement 中添加对 _setitem 方法的支持&#10;- 提供完整的文档说明和多个测试用例验证功能正确性" />
+    <MESSAGE value="refactor(core): 重构代码库移除冗余命名空间前缀和优化控制流&#10;&#10;- 移除所有 Old8Lang 命名空间的冗余前缀引用&#10;- 优化 AsyncForInStatement 中的控制流逻辑，移除不必要的 continue 语句&#10;- 简化条件表达式中的空值检查语法&#10;- 清理未使用的 using 语句和调试输出代码&#10;- 重构 ClassInit 类使用一致的字段命名约定&#10;- 移除未使用的 MoveNext 方法实现和静态成员定义方法&#10;- 优化 IL 生成中的条件分支和类型转换操作&#10;- 简化 UI 组件中的布局和样式属性设置&#10;- 优化泛型类缓存的并发安全操作&#10;- 重构字典值转换为对象的重复方法调用" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 重构代码库移除冗余命名空间前缀和优化控制流&#10;&#10;- 移除所有 Old8Lang 命名空间的冗余前缀引用&#10;- 优化 AsyncForInStatement 中的控制流逻辑，移除不必要的 continue 语句&#10;- 简化条件表达式中的空值检查语法&#10;- 清理未使用的 using 语句和调试输出代码&#10;- 重构 ClassInit 类使用一致的字段命名约定&#10;- 移除未使用的 MoveNext 方法实现和静态成员定义方法&#10;- 优化 IL 生成中的条件分支和类型转换操作&#10;- 简化 UI 组件中的布局和样式属性设置&#10;- 优化泛型类缓存的并发安全操作&#10;- 重构字典值转换为对象的重复方法调用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1337,10 +1408,10 @@
           <line>81</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="2448" />
+              <option value="2447" />
             </startOffsets>
             <endOffsets>
-              <option value="2485" />
+              <option value="2484" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="634" />
@@ -1350,10 +1421,10 @@
           <line>52</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="1435" />
+              <option value="1434" />
             </startOffsets>
             <endOffsets>
-              <option value="1474" />
+              <option value="1473" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="635" />
@@ -1402,10 +1473,10 @@
           <line>298</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" containingFunctionPresentation="方法 'Preprocessor_ComplexNestedConditions_WorkCorrectly'">
             <startOffsets>
-              <option value="7055" />
+              <option value="7047" />
             </startOffsets>
             <endOffsets>
-              <option value="7104" />
+              <option value="7096" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="643" />
@@ -1415,10 +1486,10 @@
           <line>301</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" containingFunctionPresentation="方法 'Preprocessor_ComplexNestedConditions_WorkCorrectly'">
             <startOffsets>
-              <option value="7132" />
+              <option value="7124" />
             </startOffsets>
             <endOffsets>
-              <option value="7201" />
+              <option value="7193" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="644" />

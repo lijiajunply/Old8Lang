@@ -38,7 +38,7 @@ public partial class TaskLangValue : LangValueType
     private TaskStatus _status = TaskStatus.Pending;
     private LangValueType? _result;
     private Exception? _exception;
-    private readonly Lock Lock = new();
+    private readonly Lock _lock = new();
 
     /// <summary>
     /// 外部变量管理器，用于访问外部作用域和Interpreter
@@ -77,7 +77,7 @@ public partial class TaskLangValue : LangValueType
         // 注册任务状态变化的回调
         Task.ContinueWith(t =>
         {
-            lock (Lock)
+            lock (_lock)
             {
                 if (t.IsCanceled)
                 {
@@ -100,7 +100,7 @@ public partial class TaskLangValue : LangValueType
         // 如果任务已经开始执行，更新状态为Running
         if (Task.Status == System.Threading.Tasks.TaskStatus.Running)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Running;
             }
@@ -111,7 +111,7 @@ public partial class TaskLangValue : LangValueType
         {
             _cancellationToken.Register(() =>
             {
-                lock (Lock)
+                lock (_lock)
                 {
                     if (_status == TaskStatus.Pending || _status == TaskStatus.Running)
                     {
@@ -136,7 +136,7 @@ public partial class TaskLangValue : LangValueType
             var result = Task.Result;
 
             // 更新缓存状态
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Completed;
                 _result = result;
@@ -149,7 +149,7 @@ public partial class TaskLangValue : LangValueType
         {
             // 展开 AggregateException，抛出内部异常
             var innerException = aggEx.InnerException ?? aggEx;
-            lock (Lock)
+            lock (_lock)
             {
                 _status = innerException is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
                 _exception = innerException;
@@ -166,7 +166,7 @@ public partial class TaskLangValue : LangValueType
         }
         catch (Exception ex)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 _status = ex is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
                 _exception = ex;
@@ -208,7 +208,7 @@ public partial class TaskLangValue : LangValueType
             _cancellationToken.ThrowIfCancellationRequested();
 
             // 确保任务状态更新为 Running
-            lock (Lock)
+            lock (_lock)
             {
                 if (_status == TaskStatus.Pending)
                 {
@@ -242,7 +242,7 @@ public partial class TaskLangValue : LangValueType
             }
 
             // 线程安全地更新完成状态
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Completed;
                 _result = result;
@@ -254,7 +254,7 @@ public partial class TaskLangValue : LangValueType
         catch (OperationCanceledException ex)
         {
             // 任务被取消
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Canceled;
                 _exception = ex;
@@ -266,7 +266,7 @@ public partial class TaskLangValue : LangValueType
         catch (Exception ex)
         {
             // 其他异常
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Failed;
                 _exception = ex;
@@ -303,7 +303,8 @@ public partial class TaskLangValue : LangValueType
     public async Task<LangValueType> AwaitAsync(CancellationToken externalCancellationToken)
     {
         // 创建组合取消令牌源
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, externalCancellationToken);
+        using var linkedCts =
+            CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, externalCancellationToken);
 
         try
         {
@@ -311,7 +312,7 @@ public partial class TaskLangValue : LangValueType
             linkedCts.Token.ThrowIfCancellationRequested();
 
             // 确保任务状态更新为 Running
-            lock (Lock)
+            lock (_lock)
             {
                 if (_status == TaskStatus.Pending)
                 {
@@ -322,7 +323,7 @@ public partial class TaskLangValue : LangValueType
             // 等待任务完成
             var result = await Task;
 
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Completed;
                 _result = result;
@@ -332,19 +333,21 @@ public partial class TaskLangValue : LangValueType
         }
         catch (OperationCanceledException)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Canceled;
             }
+
             throw;
         }
         catch (Exception ex)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 _status = TaskStatus.Failed;
                 _exception = ex;
             }
+
             throw;
         }
     }
@@ -356,7 +359,7 @@ public partial class TaskLangValue : LangValueType
     {
         get
         {
-            lock (Lock)
+            lock (_lock)
             {
                 return _status == TaskStatus.Completed || _status == TaskStatus.Failed ||
                        _status == TaskStatus.Canceled;
@@ -371,7 +374,7 @@ public partial class TaskLangValue : LangValueType
     {
         get
         {
-            lock (Lock)
+            lock (_lock)
             {
                 return _status;
             }
@@ -393,7 +396,7 @@ public partial class TaskLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        lock (Lock)
+        lock (_lock)
         {
             return _status switch
             {
@@ -518,7 +521,7 @@ public partial class TaskLangValue : LangValueType
             .ContinueWith(LangValueType (_) => new VoidLangValue(position), cancellationToken);
         return new TaskLangValue(delayTask, cancellationToken, position);
     }
-    
+
     /// <summary>
     /// 创建一个包含指定结果的已完成 Task
     /// </summary>
@@ -527,7 +530,7 @@ public partial class TaskLangValue : LangValueType
         var fromResultTask = System.Threading.Tasks.Task.FromResult(result);
         return new TaskLangValue(fromResultTask, CancellationToken.None, position);
     }
-    
+
     /// <summary>
     /// 在线程池上运行一个函数，并返回一个表示该操作的 Task
     /// </summary>
@@ -562,7 +565,7 @@ public partial class TaskLangValue : LangValueType
             }
 
             var result = continuation(t.Result);
-            return await result.AwaitAsync();
+            return await result.AwaitAsync(_cancellationToken);
         }, _cancellationToken).Unwrap();
         return new TaskLangValue(thenTask, _cancellationToken, position);
     }

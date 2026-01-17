@@ -150,7 +150,7 @@ public class RegressionTrainer
         if (featureColumns == null || featureColumns.Length == 0)
         {
             // 默认特征列
-            featureColumns = new[] { "Feature1", "Feature2", "Feature3", "Feature4" };
+            featureColumns = ["Feature1", "Feature2", "Feature3", "Feature4"];
         }
 
         return _mlContext.Transforms.Concatenate("Features", featureColumns)

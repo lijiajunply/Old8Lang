@@ -267,8 +267,8 @@ public class FunctionParser(
     /// <param name="namedArgs">输出的命名参数列表</param>
     public void ParseArgList(out List<LangExpression> positionalArgs, out List<NamedArgument> namedArgs)
     {
-        positionalArgs = new List<LangExpression>();
-        namedArgs = new List<NamedArgument>();
+        positionalArgs = [];
+        namedArgs = [];
 
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
@@ -750,7 +750,7 @@ public class FunctionParser(
 
             // 更新泛型参数的约束
             // 如果已有约束，则合并
-            var existingConstraints = genericParam.Constraints ?? new List<string>();
+            var existingConstraints = genericParam.Constraints ?? [];
             existingConstraints.AddRange(constraints);
 
             // 创建新的 GenericParameter 对象替换旧的，保留原有的 IsNullable 属性
@@ -800,7 +800,7 @@ public class FunctionParser(
                 ParseArgList(out var positionalArgs, out var namedArgs);
 
                 // 合并位置参数和命名参数
-                arguments = new List<LangExpression>();
+                arguments = [];
                 arguments.AddRange(positionalArgs);
 
                 // 将命名参数的值添加到参数列表
@@ -827,7 +827,7 @@ public class FunctionParser(
 
         while (CurrentToken.Type == LangTokenType.At)
         {
-            decorators ??= new List<FunctionDecorator>();
+            decorators ??= [];
             decorators.Add(ParseDecorator());
         }
 

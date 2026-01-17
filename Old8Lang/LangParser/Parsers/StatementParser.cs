@@ -1229,13 +1229,13 @@ public class StatementParser(
             }
 
             // 通配符导入：importSpecifiers 为空列表表示导入所有
-            importSpecifiers = new List<ImportItem>();
+            importSpecifiers = [];
         }
         // 检查是否有导入指定项
         else if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
             // 解析命名导入：{ item1, item2 as alias2, ... }
-            importSpecifiers = new List<ImportItem>();
+            importSpecifiers = [];
             Expect(LangTokenType.LeftBrace);
 
             do

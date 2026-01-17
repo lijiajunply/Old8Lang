@@ -20,13 +20,11 @@ public class NativeAnyLangValue : ImportInfo
     // 注册名称（用于别名功能，如果为null则使用ClassName）
     public readonly string RegisterName;
 
-    private readonly string? DllName;
-    private readonly string? Path;
+    private readonly string? _dllName;
+    private readonly string? _path;
 
     private ConstructorInfo? Constructor { get; set; }
     private object? InstanceObj { get; set; }
-
-    private VariateManager Manager = new();
 
     // 成员信息缓存 - 按类型缓存，所有同类型实例共享
     private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
@@ -61,9 +59,9 @@ public class NativeAnyLangValue : ImportInfo
     /// </summary>
     public NativeAnyLangValue(string dllName, string className, string path, string? registerName = null)
     {
-        DllName = dllName;
+        _dllName = dllName;
         ClassName = className;
-        Path = path;
+        _path = path;
         RegisterName = registerName ?? className;
     }
 
@@ -76,8 +74,8 @@ public class NativeAnyLangValue : ImportInfo
         ClassType = nativeObject.GetType();
         ClassName = ClassType.Name;
         RegisterName = ClassName;
-        DllName = null;
-        Path = null;
+        _dllName = null;
+        _path = null;
     }
 
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
@@ -159,37 +157,37 @@ public class NativeAnyLangValue : ImportInfo
         // 如果已经有实例对象（通过第二个构造函数创建），则直接返回
         if (InstanceObj is not null && ClassType is not null)
         {
-            Manager = manager.Clone();
+            manager.Clone();
             return this;
         }
 
         // 否则从 DLL 加载类型
-        if (Path is null || DllName is null)
+        if (_path is null || _dllName is null)
         {
             throw new InvalidOperationError(this, "无法加载类型：缺少 DLL 路径或名称");
         }
 
-        var assembly = Assembly.LoadFile(Path);
+        var assembly = Assembly.LoadFile(_path);
 
         // ClassName 可能是简单类名（如 "Container"）或完整类型名（如 "Old8Lang.FirstUI.Layout.Container"）
         // 先尝试使用 ClassName 直接获取类型
         ClassType = assembly.GetType(ClassName);
 
         // 如果失败，尝试拼接 DllName 和 ClassName
-        if (ClassType is null && DllName is not null)
+        if (ClassType is null && _dllName is not null)
         {
-            ClassType = assembly.GetType($"{DllName}.{ClassName}");
+            ClassType = assembly.GetType($"{_dllName}.{ClassName}");
         }
 
         if (ClassType is null)
         {
-            throw new InvalidOperationError(this, $"无法加载类型：在程序集中找不到类型 '{ClassName}' 或 '{DllName}.{ClassName}'");
+            throw new InvalidOperationError(this, $"无法加载类型：在程序集中找不到类型 '{ClassName}' 或 '{_dllName}.{ClassName}'");
         }
 
         var constructors = ClassType.GetConstructors();
         if (constructors is { Length: > 0 })
             Constructor = constructors[0];
-        Manager = manager.Clone();
+        manager.Clone();
         return this;
     }
 

@@ -10,23 +10,16 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 虚拟机模式下的线程值类型
 /// </summary>
-public class VMThreadLangValue : LangValueType
+public class VMThreadLangValue(int threadId, SourcePosition position = default) : LangValueType(position)
 {
-    private readonly int _threadId;
-
-    public VMThreadLangValue(int threadId, SourcePosition position = default) : base(position)
-    {
-        _threadId = threadId;
-    }
-
-    public int ThreadId => _threadId;
+    public int ThreadId => threadId;
 
     /// <summary>
     /// 启动线程
     /// </summary>
     public void Start()
     {
-        ResourceManager.StartThread(_threadId);
+        ResourceManager.StartThread(threadId);
     }
 
     /// <summary>
@@ -34,7 +27,7 @@ public class VMThreadLangValue : LangValueType
     /// </summary>
     public LangValueType Join()
     {
-        var result = ResourceManager.JoinThread(_threadId);
+        var result = ResourceManager.JoinThread(threadId);
         return ConvertToLangValue(result);
     }
 
@@ -43,7 +36,7 @@ public class VMThreadLangValue : LangValueType
     /// </summary>
     public bool IsAlive()
     {
-        return ResourceManager.IsThreadAlive(_threadId);
+        return ResourceManager.IsThreadAlive(threadId);
     }
 
     /// <summary>
@@ -51,7 +44,7 @@ public class VMThreadLangValue : LangValueType
     /// </summary>
     public void Dispose()
     {
-        ResourceManager.DisposeThread(_threadId);
+        ResourceManager.DisposeThread(threadId);
     }
 
     /// <summary>
@@ -89,7 +82,7 @@ public class VMThreadLangValue : LangValueType
                 case "IsAlive":
                     return new BoolLangValue(IsAlive());
                 case "ThreadId":
-                    return new IntLangValue(_threadId);
+                    return new IntLangValue(threadId);
             }
         }
 

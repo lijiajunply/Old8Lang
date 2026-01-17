@@ -16,7 +16,6 @@ internal static class ComparisonOpHelper
     /// 处理 object vs int 的特殊比较情况
     /// 将 int 装箱后使用 IComparable.CompareTo 或 object.Equals
     /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
     /// <param name="leftType">左操作数类型</param>
     /// <param name="rightType">右操作数类型</param>
     /// <returns>如果是 object vs int 特殊情况返回 true</returns>
@@ -100,7 +99,7 @@ internal static class ComparisonOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (gtRightType != null && gtRightType.IsValueType)
+            if (gtRightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, gtRightType);
             }
@@ -175,7 +174,7 @@ internal static class ComparisonOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (ltRightType != null && ltRightType.IsValueType)
+            if (ltRightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, ltRightType);
             }
@@ -250,7 +249,7 @@ internal static class ComparisonOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightOpType != null && rightOpType.IsValueType)
+            if (rightOpType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightOpType);
             }
@@ -348,7 +347,7 @@ internal static class ComparisonOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -389,7 +388,7 @@ internal static class ComparisonOpHelper
 
     /// <summary>
     /// 生成大于等于比较 IL 代码
-    /// 实现方式：!(left < right)
+    /// 实现方式：!(left &lt; right)
     /// </summary>
     public static Type GenerateGreaterThanEquals(
         LangExpression? left,
@@ -409,7 +408,7 @@ internal static class ComparisonOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }

@@ -283,102 +283,6 @@ public class LinqQueryExecutor(VariateManager manager)
     }
 
     /// <summary>
-    /// 在结果集上执行 OrderBy（已废弃，保留用于兼容）
-    /// </summary>
-    private List<object?> ExecuteOrderByOnResult(OrderByClause orderByClause, List<object?> result, string rangeVariable)
-    {
-        var rangeLangId = new LangId(rangeVariable);
-
-        if (orderByClause.Orderings.Count == 0)
-            return result;
-
-        // 第一个排序键
-        var firstOrdering = orderByClause.Orderings[0];
-        IOrderedEnumerable<object?> orderedList;
-
-        if (firstOrdering.IsAscending)
-        {
-            orderedList = result.OrderBy(item =>
-            {
-                var oldValue = manager.GetValue(rangeLangId);
-                manager.Set(rangeLangId, ConvertToLangValue(item));
-                try
-                {
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
-                    return ConvertFromLangValue(keyValue);
-                }
-                finally
-                {
-                    if (oldValue is not null)
-                        manager.Set(rangeLangId, oldValue);
-                }
-            });
-        }
-        else
-        {
-            orderedList = result.OrderByDescending(item =>
-            {
-                var oldValue = manager.GetValue(rangeLangId);
-                manager.Set(rangeLangId, ConvertToLangValue(item));
-                try
-                {
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
-                    return ConvertFromLangValue(keyValue);
-                }
-                finally
-                {
-                    if (oldValue is not null)
-                        manager.Set(rangeLangId, oldValue);
-                }
-            });
-        }
-
-        // 后续排序键
-        for (int i = 1; i < orderByClause.Orderings.Count; i++)
-        {
-            var ordering = orderByClause.Orderings[i];
-            if (ordering.IsAscending)
-            {
-                orderedList = orderedList.ThenBy(item =>
-                {
-                    var oldValue = manager.GetValue(rangeLangId);
-                    manager.Set(rangeLangId, ConvertToLangValue(item));
-                    try
-                    {
-                        var keyValue = ordering.KeyExpression.Run(manager);
-                        return ConvertFromLangValue(keyValue);
-                    }
-                    finally
-                    {
-                        if (oldValue is not null)
-                            manager.Set(rangeLangId, oldValue);
-                    }
-                });
-            }
-            else
-            {
-                orderedList = orderedList.ThenByDescending(item =>
-                {
-                    var oldValue = manager.GetValue(rangeLangId);
-                    manager.Set(rangeLangId, ConvertToLangValue(item));
-                    try
-                    {
-                        var keyValue = ordering.KeyExpression.Run(manager);
-                        return ConvertFromLangValue(keyValue);
-                    }
-                    finally
-                    {
-                        if (oldValue is not null)
-                            manager.Set(rangeLangId, oldValue);
-                    }
-                });
-            }
-        }
-
-        return orderedList.ToList();
-    }
-
-    /// <summary>
     /// 执行 from 子句
     /// </summary>
     private IEnumerable ExecuteFromClause(FromClause fromClause)
@@ -604,10 +508,10 @@ public class LinqQueryExecutor(VariateManager manager)
                 var element = ConvertFromLangValue(elementValue);
 
                 // 添加到分组
-                if (!groups.ContainsKey(key))
-                    groups[key] = new List<object?>();
+                if (key != null && !groups.ContainsKey(key))
+                    groups[key] = [];
 
-                groups[key].Add(element);
+                if (key != null) groups[key].Add(element);
             }
             finally
             {

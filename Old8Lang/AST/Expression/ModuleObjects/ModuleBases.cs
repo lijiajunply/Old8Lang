@@ -8,8 +8,8 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// </summary>
 public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTree
 {
-    private readonly Dictionary<string, LangValueType> Symbols = new();
-    private readonly Lock LoadLock = new();
+    private readonly Dictionary<string, LangValueType> _symbols = new();
+    private readonly Lock _loadLock = new();
 
     /// <summary>
     /// 源码位置
@@ -25,27 +25,27 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
     public virtual LangValueType? GetSymbol(string symbolName)
     {
         EnsureLoadedInternal();
-        Symbols.TryGetValue(symbolName, out var symbol);
+        _symbols.TryGetValue(symbolName, out var symbol);
         return symbol;
     }
 
     public virtual bool HasSymbol(string symbolName)
     {
         EnsureLoadedInternal();
-        return Symbols.ContainsKey(symbolName);
+        return _symbols.ContainsKey(symbolName);
     }
 
     public virtual IEnumerable<string> GetExportedSymbols()
     {
         EnsureLoadedInternal();
-        return Symbols.Keys;
+        return _symbols.Keys;
     }
 
     public virtual void EnsureLoaded(VariateManager variateManager)
     {
         if (!IsLoaded)
         {
-            lock (LoadLock)
+            lock (_loadLock)
             {
                 if (!IsLoaded && LoadingState != ModuleLoadingState.Loading)
                 {
@@ -61,7 +61,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
 
     protected void AddSymbol(string name, LangValueType value)
     {
-        Symbols[name] = value;
+        _symbols[name] = value;
     }
 
     protected abstract void LoadModule(VariateManager manager);
@@ -78,7 +78,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
 
     protected virtual LangValueType? GetSymbolIgnoreCase(string symbolName)
     {
-        return Symbols.FirstOrDefault(kvp =>
+        return _symbols.FirstOrDefault(kvp =>
             string.Equals(kvp.Key, symbolName, StringComparison.OrdinalIgnoreCase)).Value;
     }
 
@@ -133,7 +133,7 @@ public abstract class ModuleValueBase(IModuleObject moduleObject, SourcePosition
 
     public virtual void EnsureLoaded(VariateManager variateManager) => moduleObject.EnsureLoaded(variateManager);
 
-    public override abstract LangValueType Dot(LangExpression dotExpression, VariateManager currentManager);
+    public abstract override LangValueType Dot(LangExpression dotExpression, VariateManager currentManager);
 
     #endregion
 

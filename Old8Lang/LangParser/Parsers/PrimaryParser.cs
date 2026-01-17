@@ -914,7 +914,7 @@ public class PrimaryParser(
             // 单元素元组：(expr,) 或 (x: expr,)
             // 注意：单元素元组不支持命名字段，因为命名字段需要多个元素才有意义
             // 使用列表构造函数创建单元素元组，避免引入 NullLangValue
-            return new TupleLangValue(new List<LangExpression> { elements[0] }, position);
+            return new TupleLangValue([elements[0]], position);
         }
 
         // 多元素元组：使用支持命名字段的构造函数

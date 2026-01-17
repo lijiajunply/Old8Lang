@@ -454,11 +454,6 @@ public partial class MockLibClassLangValue : LangValueType
     /// </summary>
     private static LangValueType ConvertMockObject(MockLib.MockObject mock)
     {
-        var tuples = new List<TupleLangValue>
-        {
-            new(new StringLangValue("name"), new StringLangValue(mock.Name))
-        };
-
         // 创建一个包装对象来存储 MockObject 实例
         return new MockObjectLangValue(mock);
     }
@@ -532,7 +527,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
                 "GetCallCount" => GetCallCount(args),
                 "GetCalls" => GetCalls(args),
                 "GetLastCall" => GetLastCall(args),
-                "Reset" => Reset(args),
+                "Reset" => Reset(),
                 "ResetMethod" => ResetMethod(args),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "MockObject")
             };
@@ -651,11 +646,8 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new ListLangValue(lastCall.Select(ConvertFromNative).ToList());
     }
 
-    private LangValueType Reset(List<LangValueType> args)
+    private LangValueType Reset()
     {
-        if (args.Count != 0)
-            throw new ArgumentError(Position, "Reset 期望 0 个参数");
-
         MockObject.Reset();
         return new VoidLangValue();
     }

@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression;
 /// </summary>
 public partial class AsyncStreamExpression : LangExpression
 {
-    private readonly BlockStatement Block;
+    private readonly BlockStatement _block;
 
     /// <summary>
     /// 构造函数
@@ -23,7 +23,7 @@ public partial class AsyncStreamExpression : LangExpression
     public AsyncStreamExpression(BlockStatement block, SourcePosition position = default)
         : base(position)
     {
-        Block = block;
+        _block = block;
     }
 
     /// <summary>
@@ -35,8 +35,8 @@ public partial class AsyncStreamExpression : LangExpression
         // 将块语句包装为异步函数：async () -> { block }
         var asyncFunc = new AsyncFuncLangValue(
             id: null,
-            ids: new List<LangId>(), // 无参数
-            blockStatement: Block,
+            ids: [], // 无参数
+            blockStatement: _block,
             position: Position
         );
 
@@ -82,6 +82,6 @@ public partial class AsyncStreamExpression : LangExpression
 
     public override string ToString()
     {
-        return $"async {{ {Block} }}";
+        return $"async {{ {_block} }}";
     }
 }

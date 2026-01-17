@@ -2,8 +2,8 @@ namespace Old8Lang.AST.Expression;
 
 /// <summary>
 /// 泛型参数定义
-/// 例如: <T: IComparable> 中的 T
-/// 或: <T?: IComparable> 中的可空类型参数 T?
+/// 例如: &lt;T: IComparable> 中的 T
+/// 或: &lt;T?: IComparable> 中的可空类型参数 T?
 /// </summary>
 public class GenericParameter
 {

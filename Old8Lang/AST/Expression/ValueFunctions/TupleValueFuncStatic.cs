@@ -256,7 +256,7 @@ public static class TupleValueFuncStatic
             // TupleLangValue.Slice 已经返回一个新的 TupleLangValue（带有正确填充的 ItemValues）
             // 只要我们确保 TupleLangValue.Slice 的实现是正确的
             return tuple.Slice(start.Value, end.Value) as TupleLangValue
-                   ?? new TupleLangValue(new List<LangExpression>());
+                   ?? new TupleLangValue([]);
         }
 
         /// <summary>

@@ -146,7 +146,7 @@ public class RadioGroup : WidgetBase
     /// <summary>
     /// 单选按钮列表
     /// </summary>
-    public List<RadioButtonOption> Options { get; set; } = new();
+    public List<RadioButtonOption> Options { get; set; } = [];
 
     /// <summary>
     /// 组名

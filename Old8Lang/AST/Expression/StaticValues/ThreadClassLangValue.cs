@@ -47,17 +47,13 @@ public partial class ThreadClassLangValue : LangValueType
             }
 
             // 执行参数
-            List<LangValueType> args;
-            if (ExternalManager is not null)
-            {
+            var args =
                 // 使用 ExternalManager 执行参数
-                args = instance.Ids.Select(id => id.Run(ExternalManager)).ToList();
-            }
-            else
-            {
-                // 对于简单的静态方法（如 Sleep），直接执行参数
-                args = instance.Ids.Select(id => id.Run(manager)).ToList();
-            }
+                ExternalManager is not null
+                    ? instance.Ids.Select(id => id.Run(ExternalManager)).ToList()
+                    :
+                    // 对于简单的静态方法（如 Sleep），直接执行参数
+                    instance.Ids.Select(id => id.Run(manager)).ToList();
 
             return method(args, instance.Position);
         }

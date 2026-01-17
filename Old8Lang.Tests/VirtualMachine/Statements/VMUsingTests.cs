@@ -59,7 +59,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.StartsWith("Using mutex:", lines[0]);
         Assert.Equal("Lock acquired", lines[1]);
@@ -84,7 +84,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.StartsWith("Using channel:", lines[0]);
         Assert.Equal("Received: 100", lines[1]);
@@ -109,7 +109,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.StartsWith("Using semaphore:", lines[0]);
         Assert.Equal("Semaphore acquired", lines[1]);
@@ -135,7 +135,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.StartsWith("Channel created:", lines[0]);
         Assert.Equal("Received: 200", lines[1]);
@@ -164,7 +164,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.StartsWith("Using mutex:", lines[0]);
         Assert.Equal("Lock acquired", lines[1]);
@@ -197,7 +197,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(5, lines.Length);
         Assert.StartsWith("Using mutex1:", lines[0]);
         Assert.StartsWith("Using mutex2:", lines[1]);
@@ -229,7 +229,7 @@ public class VMUsingTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.StartsWith("Using channel1:", lines[0]);
         Assert.StartsWith("Using channel2:", lines[1]);

@@ -194,7 +194,7 @@ result:int <- 0
 #endif
 Assert.Equal(10, result)
 ";
-        var symbols = new PreprocessorSymbols(new[] { "PRODUCTION" });
+        var symbols = new PreprocessorSymbols(["PRODUCTION"]);
         var interpreter = new LangInterpreter();
 
         // Act

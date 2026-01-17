@@ -29,7 +29,7 @@ public class ThemeManager
 
     private ThemeData _currentTheme;
     private StyleSheet _styleSheet;
-    private readonly List<Action<ThemeData>> _themeChangeListeners = new();
+    private readonly List<Action<ThemeData>> _themeChangeListeners = [];
 
     private ThemeManager()
     {

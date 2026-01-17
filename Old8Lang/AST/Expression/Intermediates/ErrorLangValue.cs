@@ -29,12 +29,12 @@ public partial class ErrorLangValue(Old8Exception value) : LangValueType
 
     public override string ToString()
     {
-        const string reset = "\u001b[0m";
-        const string red = "\u001b[31m";
-        const string yellow = "\u001b[33m";
-        const string blue = "\u001b[34m";
-        const string green = "\u001b[32m";
-        const string cyan = "\u001b[36m";
+        const string reset = "\e[0m";
+        const string red = "\e[31m";
+        const string yellow = "\e[33m";
+        const string blue = "\e[34m";
+        const string green = "\e[32m";
+        const string cyan = "\e[36m";
         StringBuilder sb = new();
 
         // 错误标题和消息

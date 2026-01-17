@@ -32,7 +32,7 @@ result <- testFunction(1, 2)
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Find symbol at function definition
@@ -69,7 +69,7 @@ result <- testFunction(1, 2)
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Find symbol at function call
@@ -103,7 +103,7 @@ result <- myVariable + 10
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Find symbol at variable definition
@@ -137,7 +137,7 @@ result <- myVariable + 10
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Find symbol at variable usage
@@ -174,7 +174,7 @@ instance <- TestClass()
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Debug: Print tokens on line 2
@@ -223,7 +223,7 @@ result <- user.getName()
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Debug info
@@ -302,7 +302,7 @@ result <- user.name
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Find symbol at property access
@@ -339,7 +339,7 @@ result <- undefinedVar + 10
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Try to find undefined symbol
@@ -360,7 +360,7 @@ result <- undefinedVar + 10
             Tokens = null,
             Ast = null,
             SymbolTable = null,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act
@@ -393,7 +393,7 @@ func test() -> int {
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act - Try to find symbol at whitespace position
@@ -430,7 +430,7 @@ result3 <- testFunction()
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act
@@ -470,7 +470,7 @@ result2 <- myVar * 2
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act
@@ -507,7 +507,7 @@ result <- 42
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act
@@ -555,7 +555,7 @@ result <- testFunction(1, 2)
             Tokens = null,
             Ast = null,
             SymbolTable = null,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act

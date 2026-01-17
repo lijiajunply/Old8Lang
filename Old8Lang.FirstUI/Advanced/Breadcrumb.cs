@@ -14,7 +14,7 @@ public class Breadcrumb : WidgetBase
     /// <summary>
     /// 面包屑项列表
     /// </summary>
-    public List<BreadcrumbItem> Items { get; set; } = new();
+    public List<BreadcrumbItem> Items { get; set; } = [];
 
     /// <summary>
     /// 分隔符

@@ -34,8 +34,8 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
                 // 创建一个 Instance 表达式来调用 _getitem 方法
                 var getitemCall = new Instance(
                     new LangId("_getitem"),
-                    new List<LangExpression> { result },
-                    null,
+                    [result],
+                    [],
                     Position
                 );
 
@@ -177,7 +177,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         {
             // ValueTuple 索引访问
             ListId.LoadIlValue(ilGenerator, local);
-            
+
             if (Key is IntLangValue intVal)
             {
                 // 常量索引，优化为字段访问
@@ -193,7 +193,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
                 {
                     ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                 }
-                
+
                 var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
                 ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             }

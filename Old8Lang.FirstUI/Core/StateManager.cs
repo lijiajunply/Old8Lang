@@ -43,7 +43,7 @@ public class StateManager
     {
         if (!_listeners.ContainsKey(key))
         {
-            _listeners[key] = new List<Action>();
+            _listeners[key] = [];
         }
         _listeners[key].Add(callback);
     }
@@ -98,7 +98,7 @@ public class StateManager
 public class ObservableState<T>
 {
     private T _value;
-    private readonly List<Action<T>> _listeners = new();
+    private readonly List<Action<T>> _listeners = [];
 
     public T Value
     {

@@ -77,7 +77,7 @@ public class VMConcurrencyTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("Lock acquired", lines[0]);
         Assert.Equal("Lock released", lines[1]);
@@ -178,7 +178,7 @@ public class VMConcurrencyTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("Semaphore acquired", lines[0]);
         Assert.Equal("Semaphore released", lines[1]);

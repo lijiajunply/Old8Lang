@@ -79,8 +79,8 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
                     {
                         Changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>
                         {
-                            [DocumentUri.From(document.Uri)] = new[]
-                            {
+                            [DocumentUri.From(document.Uri)] =
+                            [
                                 new TextEdit
                                 {
                                     Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
@@ -89,7 +89,7 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
                                     ),
                                     NewText = $"{symbolName} <- null\n"
                                 }
-                            }
+                            ]
                         }
                     }
                 }));
@@ -104,8 +104,8 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
                     {
                         Changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>
                         {
-                            [DocumentUri.From(document.Uri)] = new[]
-                            {
+                            [DocumentUri.From(document.Uri)] =
+                            [
                                 new TextEdit
                                 {
                                     Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
@@ -114,7 +114,7 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
                                     ),
                                     NewText = $"func {symbolName}() -> void {{\n\t// TODO: 实现\n}}\n\n"
                                 }
-                            }
+                            ]
                         }
                     }
                 }));
@@ -189,8 +189,8 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
         {
             Changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>
             {
-                [DocumentUri.From(document.Uri)] = new[]
-                {
+                [DocumentUri.From(document.Uri)] =
+                [
                     // 插入新函数
                     new TextEdit
                     {
@@ -206,7 +206,7 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
                         Range = range,
                         NewText = "extractedFunction()"
                     }
-                }
+                ]
             }
         };
     }

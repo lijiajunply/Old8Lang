@@ -6,7 +6,7 @@ namespace Old8Lang.Bytecode.ModuleSystem;
 public class ModuleRegistry
 {
     private readonly Dictionary<string, LoadedModule> _modules = new();
-    private readonly HashSet<string> _loadingModules = new();
+    private readonly HashSet<string> _loadingModules = [];
 
     /// <summary>
     /// 注册模块

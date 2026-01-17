@@ -68,7 +68,7 @@ public partial class LinqExpression(
         FromClause.DataSource.LoadIlValue(ilGenerator, local);
 
         // 2. 转换为 IEnumerable
-        ConvertToEnumerable(ilGenerator, local);
+        ConvertToEnumerable(ilGenerator);
 
         // 3. 处理查询体子句（where, orderby, let 等）
         foreach (var clause in BodyClauses)
@@ -86,7 +86,7 @@ public partial class LinqExpression(
     /// <summary>
     /// 将值转换为 IEnumerable
     /// </summary>
-    private void ConvertToEnumerable(ILGenerator ilGenerator, LocalManager local)
+    private void ConvertToEnumerable(ILGenerator ilGenerator)
     {
         // 调用 LinqQueryExecutor.ConvertToEnumerable 的等价逻辑
         // 简化实现：假设数据源已经是 ILangList 或 ArrayLangValue
@@ -126,7 +126,7 @@ public partial class LinqExpression(
         ilGenerator.MarkLabel(endLabel);
     }
 
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // LINQ 查询返回 IEnumerable<T>
         return typeof(System.Collections.IEnumerable);

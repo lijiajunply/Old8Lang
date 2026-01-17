@@ -84,7 +84,7 @@ public partial class UsingStatement(
 
         // 检查是否从using块内恢复
         bool isResumingFromUsingBlock = !string.IsNullOrEmpty(context.ExecutionPath) &&
-                                         context.ExecutionPath.Contains("/using_block");
+                                        context.ExecutionPath.Contains("/using_block");
 
         if (isResumingFromUsingBlock)
         {
@@ -99,7 +99,7 @@ public partial class UsingStatement(
                 if (variableName is not null)
                 {
                     var resource = manager.GetValue(new LangId(variableName));
-                    DisposeResource(resource);
+                    if (resource != null) DisposeResource(resource);
                 }
             }
         }
@@ -159,34 +159,37 @@ public partial class UsingStatement(
         // 1. 创建局部变量存储资源
         resourceExpression.LoadIlValue(ilGenerator, local);
         var resourceType = resourceExpression.OutputType(local);
-        var resourceLocal = ilGenerator.DeclareLocal(resourceType);
-        ilGenerator.Emit(OpCodes.Stloc, resourceLocal);
-
-        // 2. 如果有变量名，添加到局部变量
-        if (variableName is not null)
+        if (resourceType != null)
         {
-            local.AddLocalVar(variableName, resourceLocal);
-            local.LocalVarTypes[variableName] = resourceType;
+            var resourceLocal = ilGenerator.DeclareLocal(resourceType);
+            ilGenerator.Emit(OpCodes.Stloc, resourceLocal);
+
+            // 2. 如果有变量名，添加到局部变量
+            if (variableName is not null)
+            {
+                local.AddLocalVar(variableName, resourceLocal);
+                local.LocalVarTypes[variableName] = resourceType;
+            }
+
+            // 3. 生成try-finally
+            ilGenerator.BeginExceptionBlock();
+
+            // try块：执行BlockStatement
+            blockStatement.GenerateIl(ilGenerator, local);
+
+            // finally块
+            ilGenerator.BeginFinallyBlock();
+
+            // 加载资源
+            ilGenerator.Emit(OpCodes.Ldloc, resourceLocal);
         }
-
-        // 3. 生成try-finally
-        ilGenerator.BeginExceptionBlock();
-
-        // try块：执行BlockStatement
-        blockStatement.GenerateIl(ilGenerator, local);
-
-        // finally块
-        ilGenerator.BeginFinallyBlock();
-
-        // 加载资源
-        ilGenerator.Emit(OpCodes.Ldloc, resourceLocal);
 
         // 根据资源类型调用不同的 Dispose 方法
         if (resourceType == typeof(int))
         {
             // 1. 整数资源：调用 ResourceManager.TryDispose(id)
             var disposeMethod = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryDispose));
-            ilGenerator.Emit(OpCodes.Call, disposeMethod);
+            if (disposeMethod != null) ilGenerator.Emit(OpCodes.Call, disposeMethod);
         }
         else if (typeof(AnyLangValue).IsAssignableFrom(resourceType))
         {
@@ -216,6 +219,7 @@ public partial class UsingStatement(
                     {
                         ilGenerator.Emit(OpCodes.Box, resourceType);
                     }
+
                     ilGenerator.Emit(OpCodes.Callvirt, disposeMethod);
                 }
             }
@@ -244,11 +248,5 @@ public partial class UsingStatement(
         }
     }
 
-    public override int Count
-    {
-        get
-        {
-            return 1; // 只有 using 块
-        }
-    }
+    public override int Count => 1; // 只有 using 块
 }

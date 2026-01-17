@@ -1069,7 +1069,7 @@ public partial class VirtualMachine
 
                     if (slicedList == null)
                     {
-                        slicedList = new List<object?>();
+                        slicedList = [];
                         if (sliceResult is IEnumerable enumerable)
                         {
                             foreach (var item in enumerable)
@@ -1141,7 +1141,7 @@ public partial class VirtualMachine
                 // 如果键不存在,创建新的列表
                 if (!groupDict.ContainsKey(key!))
                 {
-                    groupDict[key!] = new List<object?>();
+                    groupDict[key!] = [];
                 }
 
                 // 将元素添加到对应键的列表中
@@ -2934,7 +2934,7 @@ public partial class VirtualMachine
 
     private List<object?> ConvertToList(object? value)
     {
-        if (value == null) return new List<object?>();
+        if (value == null) return [];
         if (value is List<object?> list) return list;
         if (value is IEnumerable enumerable && value is not string)
         {
@@ -2943,12 +2943,12 @@ public partial class VirtualMachine
             return newList;
         }
 
-        return new List<object?> { value };
+        return [value];
     }
 
     private object?[] ConvertToArray(object? value)
     {
-        if (value == null) return Array.Empty<object?>();
+        if (value == null) return [];
         if (value is object?[] arr) return arr;
         if (value is List<object?> listObj) return listObj.ToArray();
         if (value is IEnumerable enumerable && value is not string)
@@ -2958,6 +2958,6 @@ public partial class VirtualMachine
             return list.ToArray();
         }
 
-        return new object?[] { value };
+        return [value];
     }
 }

@@ -241,8 +241,8 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     /// </summary>
     private static IEnumerable<CompletionItem> GetOperatorCompletions()
     {
-        return new[]
-        {
+        return
+        [
             // 联合类型操作符
             new CompletionItem
             {
@@ -279,7 +279,7 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
                 Documentation = "用于函数返回类型或 lambda 表达式：func() -> int 或 (x) -> x * 2",
                 InsertText = "->"
             }
-        };
+        ];
     }
 
     /// <summary>
@@ -450,8 +450,8 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     /// </summary>
     private static IEnumerable<CompletionItem> GetSnippetCompletions()
     {
-        return new[]
-        {
+        return
+        [
             new CompletionItem
             {
                 Label = "func",
@@ -596,7 +596,7 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
                 InsertText = "select {\n\tcase ${1:ch1} <- ${2:value} -> {\n\t\t$0\n\t}\n\tcase ${3:val} from ${4:ch2} -> {\n\t\t\n\t}\n\tdefault -> {\n\t\t\n\t}\n}",
                 InsertTextFormat = InsertTextFormat.Snippet
             }
-        };
+        ];
     }
 
     private static CompletionItemKind ConvertSymbolKind(Models.SymbolKind kind)

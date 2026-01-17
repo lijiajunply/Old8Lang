@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-
 using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.AST.Statement;
@@ -30,7 +29,8 @@ public partial class TryStatement(
     /// <summary>
     /// 获取 catch 块列表
     /// </summary>
-    public List<(string? exceptionType, LangId? exceptionVar, LangExpression? filter, BlockStatement catchBlock)> CatchBlocks => catchBlocks;
+    public List<(string? exceptionType, LangId? exceptionVar, LangExpression? filter, BlockStatement catchBlock)>
+        CatchBlocks => catchBlocks;
 
     /// <summary>
     /// 获取 finally 块
@@ -61,7 +61,6 @@ public partial class TryStatement(
             // 检查try块是否执行了return语句
             if (manager.IsReturn)
             {
-                return;
             }
         }
         catch (Old8Exception ex)
@@ -70,56 +69,54 @@ public partial class TryStatement(
             foreach (var (exceptionType, exceptionVar, filter, catchBlock) in catchBlocks)
             {
                 // 如果异常类型为null，则匹配所有异常
-                if (exceptionType is null ||
-                    IsMatch(ex, exceptionType))
+                if (exceptionType is not null &&
+                    !IsMatch(ex, exceptionType)) continue;
+                // 检查过滤器
+                if (filter != null)
                 {
-                    // 检查过滤器
-                    if (filter != null)
+                    // 需要先将异常赋值给变量，以便过滤器可以使用它
+                    // 注意：这里需要保存之前的变量状态，以便在过滤器不匹配时恢复
+                    // 但为了简单起见，我们假设变量名不会冲突，或者接受副作用
+
+                    if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
-                        // 需要先将异常赋值给变量，以便过滤器可以使用它
-                        // 注意：这里需要保存之前的变量状态，以便在过滤器不匹配时恢复
-                        // 但为了简单起见，我们假设变量名不会冲突，或者接受副作用
-                        
-                        if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
-                        {
-                            manager.Set(exceptionVar, new ErrorLangValue(ex));
-                        }
-                        else
-                        {
-                            var defaultExceptionVar = new LangId("exception");
-                            manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
-                        }
-                        
-                        var filterResult = filter.Run(manager);
-                        if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
-                        {
-                            // 过滤器不匹配，继续下一个catch块
-                            continue;
-                        }
+                        manager.Set(exceptionVar, new ErrorLangValue(ex));
                     }
                     else
                     {
-                        // 没有过滤器，直接赋值变量
-                        if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
-                        {
-                            manager.Set(exceptionVar, new ErrorLangValue(ex));
-                        }
-                        else
-                        {
-                            var defaultExceptionVar = new LangId("exception");
-                            manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
-                        }
+                        var defaultExceptionVar = new LangId("exception");
+                        manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                     }
 
-                    // 执行catch块
-                    catchBlock.Run(manager);
-                    // 检查catch块是否执行了return语句
-                    if (manager.IsReturn)
+                    var filterResult = filter.Run(manager);
+                    if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                     {
-                        return;
+                        // 过滤器不匹配，继续下一个catch块
+                        continue;
                     }
-                    return; // 只执行第一个匹配的catch块
                 }
+                else
+                {
+                    // 没有过滤器，直接赋值变量
+                    if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+                    {
+                        manager.Set(exceptionVar, new ErrorLangValue(ex));
+                    }
+                    else
+                    {
+                        var defaultExceptionVar = new LangId("exception");
+                        manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
+                    }
+                }
+
+                // 执行catch块
+                catchBlock.Run(manager);
+                // 检查catch块是否执行了return语句
+                if (manager.IsReturn)
+                {
+                }
+
+                return; // 只执行第一个匹配的catch块
             }
 
             // 如果没有匹配的catch块，则重新抛出异常
@@ -141,7 +138,7 @@ public partial class TryStatement(
 
         // 检查是否从 catch 块恢复
         bool isResumingFromCatch = !string.IsNullOrEmpty(context.ExecutionPath) &&
-                                    context.ExecutionPath.Contains("/catch");
+                                   context.ExecutionPath.Contains("/catch");
 
         // 如果从 catch 块恢复，直接执行 catch 块，跳过 try 块
         if (isResumingFromCatch)
@@ -149,7 +146,7 @@ public partial class TryStatement(
             // 执行第一个 catch 块（简化处理，假设只有一个 catch）
             if (catchBlocks.Count > 0)
             {
-                var (_, exceptionVar, _, catchBlock) = catchBlocks[0];
+                var (_, _, _, catchBlock) = catchBlocks[0];
 
                 // 压入 catch 路径
                 context.PathStack.Push("/catch");
@@ -166,7 +163,6 @@ public partial class TryStatement(
                     // 检查是否 return
                     if (manager.IsReturn)
                     {
-                        return;
                     }
                 }
                 finally
@@ -192,7 +188,6 @@ public partial class TryStatement(
                 // 检查try块是否执行了return语句
                 if (manager.IsReturn)
                 {
-                    return;
                 }
             }
             catch (Old8Exception ex)
@@ -221,7 +216,7 @@ public partial class TryStatement(
                                     var defaultExceptionVar = new LangId("exception");
                                     manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                                 }
-                                
+
                                 var filterResult = filter.Run(manager);
                                 if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                                 {
@@ -299,31 +294,6 @@ public partial class TryStatement(
         Accept(visitor);
     }
 
-    /// <summary>
-    /// 检查try块、catch块和finally块中是否包含return语句
-    /// </summary>
-    /// <param name="statement">要检查的语句</param>
-    /// <returns>如果包含return语句，返回true；否则返回false</returns>
-    private bool ContainsReturnStatement(OldStatement statement)
-    {
-        if (statement is ReturnStatement)
-        {
-            return true;
-        }
-
-        for (int i = 0; i < statement.Count; i++)
-        {
-            var child = statement[i];
-            if (child is null) continue;
-            if (ContainsReturnStatement(child))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private static bool IsMatch(Old8Exception exception, string exceptionType)
     {
         if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception" || exceptionType == "Old8Exception")
@@ -347,7 +317,7 @@ public partial class TryStatement(
             }
 
             // 检查完整命名空间路径中的类型（支持"Error.RuntimeError"格式）
-            if (currentType.FullName?.EndsWith($".{exceptionType}") == true || 
+            if (currentType.FullName?.EndsWith($".{exceptionType}") == true ||
                 currentType.FullName?.Contains($".{exceptionType}.") == true)
             {
                 return true;

@@ -15,7 +15,7 @@ public class PreprocessorSymbols
     /// </summary>
     public PreprocessorSymbols()
     {
-        _symbols = new HashSet<string>();
+        _symbols = [];
     }
 
     /// <summary>

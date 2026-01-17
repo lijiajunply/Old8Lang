@@ -71,8 +71,8 @@ public static class AnyValueFuncStatic
         var metadata = new ClassMetadata(
             className: "__JsonObject__",
             parentClassName: null,
-            interfaceNames: new List<string>(),
-            mixinNames: new List<string>(),
+            interfaceNames: [],
+            mixinNames: [],
             isInterface: false,
             isAbstract: false,
             isMixin: false

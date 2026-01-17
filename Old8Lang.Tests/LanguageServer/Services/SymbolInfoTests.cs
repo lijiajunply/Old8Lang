@@ -26,7 +26,7 @@ public partial class SymbolInfoTests(ITestOutputHelper testOutputHelper)
             Location = location,
             AccessModifier = AccessModifier.Public,
             IsStatic = false,
-            References = new List<SourceLocation>(),
+            References = [],
             Members = new Dictionary<string, SymbolInfo>()
         };
 

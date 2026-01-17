@@ -97,7 +97,7 @@ public class InitCommand : ICommand
                 Runtime = "interpreter"
             },
             Framework = "interpreter",
-            References = new List<PackageReference>(),
+            References = [],
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = "old8lang run src/main.old8",
@@ -140,7 +140,7 @@ public class InitCommand : ICommand
                 Version = old8LangVersion,
                 Runtime = "interpreter"
             },
-            References = new List<PackageReference>(),
+            References = [],
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = $"old8lang run {main}",

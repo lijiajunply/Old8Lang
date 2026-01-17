@@ -14,7 +14,7 @@ public class Stack : WidgetBase
     /// <summary>
     /// 子组件列表
     /// </summary>
-    public List<WidgetBase> Children { get; set; } = new();
+    public List<WidgetBase> Children { get; set; } = [];
 
     /// <summary>
     /// 水平对齐方式

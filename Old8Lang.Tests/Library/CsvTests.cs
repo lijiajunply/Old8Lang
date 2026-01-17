@@ -45,7 +45,7 @@ public class CsvTests
     public void FormatCsvLine_Array_ReturnsCsvLine()
     {
         // Arrange
-        string[] values = { "Name", "Age", "City" };
+        string[] values = ["Name", "Age", "City"];
         
         // Act
         var result = Csv.FormatCsvLine(values);
@@ -59,7 +59,7 @@ public class CsvTests
     public void FormatCsvLine_ArrayWithSpecialChars_ReturnsQuotedLine()
     {
         // Arrange
-        string[] values = { "John", "Doe, Jr.", "New York" };
+        string[] values = ["John", "Doe, Jr.", "New York"];
         
         // Act
         var result = Csv.FormatCsvLine(values);

@@ -17,8 +17,8 @@ public class SimpleReflectionBenchmark
         Console.WriteLine("【测试1】方法调用性能对比");
         Console.WriteLine("测试场景: 调用 Math.Sqrt 和 Math.Pow 各 500,000 次\n");
 
-        var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) })!;
-        var powMethod = typeof(Math).GetMethod("Pow", new[] { typeof(double), typeof(double) })!;
+        var sqrtMethod = typeof(Math).GetMethod("Sqrt", [typeof(double)])!;
+        var powMethod = typeof(Math).GetMethod("Pow", [typeof(double), typeof(double)])!;
         var sqrtArgs = new object?[] { 16.0 };
         var powArgs = new object?[] { 2.0, 3.0 };
 

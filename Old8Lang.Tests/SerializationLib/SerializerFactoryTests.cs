@@ -66,7 +66,7 @@ public class SerializerFactoryTests
         {
             Value = 789,
             Text = "Original",
-            Items = new List<int> { 1, 2, 3 }
+            Items = [1, 2, 3]
         };
 
         var clone = obj.DeepClone();
@@ -84,7 +84,7 @@ public class SerializerFactoryTests
         var obj = new TestData
         {
             Value = 100,
-            Items = new List<int> { 1, 2, 3 }
+            Items = [1, 2, 3]
         };
 
         var clone = obj.DeepClone();
@@ -102,5 +102,5 @@ public class TestData
 {
     public int Value { get; set; }
     public string Text { get; set; } = "";
-    public List<int> Items { get; set; } = new();
+    public List<int> Items { get; set; } = [];
 }

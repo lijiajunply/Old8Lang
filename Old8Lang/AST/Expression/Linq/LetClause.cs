@@ -4,25 +4,20 @@ namespace Old8Lang.AST.Expression.Linq;
 
 /// <summary>
 /// LINQ Let 子句
-/// 例如: let squared <- x * x
+/// 例如: let squared &lt;- x * x
 /// </summary>
-public class LetClause : LinqClause
+public class LetClause(string variable, LangExpression expression, SourcePosition position = default)
+    : LinqClause(position)
 {
     /// <summary>
     /// 变量名
     /// </summary>
-    public string Variable { get; set; }
+    public string Variable { get; set; } = variable;
 
     /// <summary>
     /// 赋值表达式
     /// </summary>
-    public LangExpression Expression { get; set; }
-
-    public LetClause(string variable, LangExpression expression, SourcePosition position = default) : base(position)
-    {
-        Variable = variable;
-        Expression = expression;
-    }
+    public LangExpression Expression { get; set; } = expression;
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {

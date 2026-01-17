@@ -20,7 +20,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 将值转换为字符串表示
     /// </summary>
     /// <returns>值的字符串表示</returns>
-    public override string ToString() => GetValue().ToString()!;
+    public override string ToString() => GetValue()?.ToString()!;
 
     #region 算术运算
 
@@ -197,7 +197,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 获取值的实际.NET对象
     /// </summary>
     /// <returns>值对应的.NET对象</returns>
-    public virtual object GetValue() => new();
+    public virtual object? GetValue() => new();
 
     /// <summary>
     /// 获取值的实际.NET对象，并转换为指定类型
@@ -205,9 +205,9 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <typeparam name="T">目标类型</typeparam>
     /// <returns>转换后的.NET对象</returns>
     /// <exception cref="InvalidCastException">当无法转换为指定类型时抛出</exception>
-    public T GetValue<T>()
+    public T? GetValue<T>()
     {
-        return (T)GetValue();
+        return (T?)GetValue();
     }
 
     /// <summary>
@@ -281,13 +281,13 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         }
 
         // 处理字典类型（必须在集合类型之前检查，因为字典也实现了 IEnumerable）
-        if (IsDictionaryType(valueType, out _, out _))
+        if (IsDictionaryType(valueType))
         {
             return HandleDictionaryConversionGeneric(value, position);
         }
 
         // 处理集合类型
-        if (IsGenericCollectionType(valueType, out _))
+        if (IsGenericCollectionType(valueType))
         {
             return HandleCollectionConversion(value);
         }
@@ -478,14 +478,14 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
                     // 递归转换每个元素
                     elements.Add(ObjToValue(ituple[i], position));
                 }
-                
+
                 var tupleValue = new TupleLangValue(elements, position);
                 // 预填充运行结果
-                tupleValue.Run(null!); 
+                tupleValue.Run(null!);
                 // 注意：这里传 null 可能导致问题，但 TupleLangValue.Run 只做简单的赋值，不依赖 manager
                 // 实际上 TupleLangValue.Run 只是把 Elements (已经是 Value 了) 复制到 ItemValues
                 // 我们可以手动填充
-                
+
                 return tupleValue;
             }
 
@@ -529,10 +529,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为泛型集合类型（排除 string）
     /// </summary>
-    private static bool IsGenericCollectionType(Type type, out Type elementType)
+    private static bool IsGenericCollectionType(Type type)
     {
-        elementType = null!;
-
         // 排除 string 类型，虽然它实现了 IEnumerable<char>
         if (type == typeof(string))
         {
@@ -541,7 +539,6 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
         {
-            elementType = type.GetGenericArguments()[0];
             return true;
         }
 
@@ -551,7 +548,6 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             var args = enumerableInterface.GetGenericArguments();
             if (args.Length > 0)
             {
-                elementType = args[0];
                 return true;
             }
         }
@@ -562,16 +558,10 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为字典类型
     /// </summary>
-    private static bool IsDictionaryType(Type type, out Type keyType, out Type valueType)
+    private static bool IsDictionaryType(Type type)
     {
-        keyType = null!;
-        valueType = null!;
-
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
-            var args = type.GetGenericArguments();
-            keyType = args[0];
-            valueType = args[1];
             return true;
         }
 
@@ -581,8 +571,6 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             var args = dictionaryInterface.GetGenericArguments();
             if (args.Length >= 2)
             {
-                keyType = args[0];
-                valueType = args[1];
                 return true;
             }
         }
@@ -733,7 +721,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 回退转换方法，用于处理无法直接转换的类型
     /// </summary>
-    private static object ValueToObjFallback(LangValueType value)
+    private static object? ValueToObjFallback(LangValueType value)
     {
         try
         {
@@ -741,7 +729,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             var result = value.GetValue();
 
             // 如果返回的是默认的空 object，尝试返回字符串表示
-            if (result.GetType() == typeof(object) && result.Equals(new object()))
+            if (result?.GetType() == typeof(object) && result.Equals(new object()))
             {
                 return value.ToDisplayString();
             }

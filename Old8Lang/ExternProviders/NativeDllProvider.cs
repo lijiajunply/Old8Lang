@@ -47,7 +47,7 @@ public class NativeDllProvider : IExternProvider
 
                 // 将委托包装为 Old8Lang 函数
                 // 注意: 需要使用 NativeDelegateFuncLangValue 来保存委托实例
-                var funcValue = new NativeDelegateFuncLangValue(targetName, del, funcDecl.FunctionSignature?.FuncValue);
+                var funcValue = new NativeDelegateFuncLangValue(targetName, del);
                 manager.AddClassAndFunc(funcValue);
             }
             catch (DllNotFoundException ex)

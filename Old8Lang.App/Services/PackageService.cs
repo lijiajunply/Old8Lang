@@ -225,7 +225,7 @@ public class PackageService
         }
         catch
         {
-            return Array.Empty<Package>();
+            return [];
         }
     }
 

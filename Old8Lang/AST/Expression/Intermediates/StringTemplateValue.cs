@@ -19,7 +19,7 @@ public partial class StringTemplateValue(List<LangExpression> list, SourcePositi
 
     public override LangValueType Run(VariateManager manager)
     {
-        var result = list.Select(item => item.Run(manager)).Aggregate(string.Empty,
+        var result = ExpressionList.Select(item => item.Run(manager)).Aggregate(string.Empty,
             (current, exprResult) => current + exprResult.ToDisplayString());
 
         return new StringLangValue(result);
@@ -31,13 +31,13 @@ public partial class StringTemplateValue(List<LangExpression> list, SourcePositi
         // 我们将使用string.Concat(object[])方法，这样可以处理不同类型的参数
 
         // 首先创建一个数组，大小为List的长度
-        ilGenerator.Emit(OpCodes.Ldc_I4, list.Count);
+        ilGenerator.Emit(OpCodes.Ldc_I4, ExpressionList.Count);
         ilGenerator.Emit(OpCodes.Newarr, typeof(object));
 
         // 遍历所有字符串片段和表达式，将它们添加到数组中
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < ExpressionList.Count; i++)
         {
-            var item = list[i];
+            var item = ExpressionList[i];
 
             // 复制数组引用到栈顶
             ilGenerator.Emit(OpCodes.Dup);

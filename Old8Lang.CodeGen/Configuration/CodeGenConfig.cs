@@ -21,24 +21,24 @@ public class CodeGenConfig
     /// <summary>
     /// 排除的文件模式
     /// </summary>
-    public List<string> ExcludePatterns { get; set; } = new()
-    {
+    public List<string> ExcludePatterns { get; set; } =
+    [
         "**/ValueFunctions/**",
         "**/ModuleObjects/**"
-    };
+    ];
 
     /// <summary>
     /// 排除的类名
     /// </summary>
-    public List<string> ExcludeClasses { get; set; } = new()
-    {
+    public List<string> ExcludeClasses { get; set; } =
+    [
         "IOldLangTree",
         "OldStatement",
         "LangExpression",
         "LangValueType",
         "IfChild",
         "DllPathResolver"
-    };
+    ];
 
     /// <summary>
     /// 生成 partial 类

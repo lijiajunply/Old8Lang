@@ -10,7 +10,7 @@ namespace Old8Lang.FirstUI.State;
 /// <typeparam name="T">状态值类型</typeparam>
 public class ObservableState<T> : State<T>
 {
-    private readonly List<WeakReference<WidgetBase>> _subscribers = new();
+    private readonly List<WeakReference<WidgetBase>> _subscribers = [];
     private readonly object _lock = new();
     private bool _batchUpdateInProgress = false;
 

@@ -37,7 +37,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// 获取输出类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(Type);
     }
@@ -334,17 +334,17 @@ public partial class TaskStaticMethodWrapper(
         {
             case "WhenAll":
                 // 获取Task.WhenAll方法
-                var whenAllMethod = typeof(Task).GetMethod("WhenAll", new[] { typeof(IEnumerable<Task<object>>) })!;
+                var whenAllMethod = typeof(Task).GetMethod("WhenAll", [typeof(IEnumerable<Task<object>>)])!;
                 ilGenerator.Emit(OpCodes.Ldnull);
                 break;
             case "WhenAny":
                 // 获取Task.WhenAny方法
-                var whenAnyMethod = typeof(Task).GetMethod("WhenAny", new[] { typeof(IEnumerable<Task<object>>) })!;
+                var whenAnyMethod = typeof(Task).GetMethod("WhenAny", [typeof(IEnumerable<Task<object>>)])!;
                 ilGenerator.Emit(OpCodes.Ldnull);
                 break;
             case "Delay":
                 // 获取Task.Delay方法
-                var delayMethod = typeof(Task).GetMethod("Delay", new[] { typeof(int) })!;
+                var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
                 ilGenerator.Emit(OpCodes.Ldnull);
                 break;
             default:
@@ -355,7 +355,7 @@ public partial class TaskStaticMethodWrapper(
     /// <summary>
     /// 获取输出类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(Delegate);
     }

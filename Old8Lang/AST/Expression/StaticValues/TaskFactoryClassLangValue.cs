@@ -75,17 +75,14 @@ public partial class TaskFactoryClassLangValue : LangValueType
         }
 
         // 第二个参数是可选的 TaskScheduler (当前实现忽略，因为 TaskLangValue.Run 不支持)
-        if (args.Count == 2)
+        if (args is [_, not TaskSchedulerLangValue])
         {
-            if (args[1] is not TaskSchedulerLangValue)
-            {
-                var tempNode = new NullLangValue(position);
-                throw new TypeError(tempNode, "TaskScheduler", args[1].TypeToString());
-            }
-            // 注意：当前实现忽略 TaskScheduler 参数，因为 TaskLangValue.Run 使用 Task.Run
-            // 如果需要真正支持 TaskScheduler，需要使用 Task.Factory.StartNew
+            var tempNode = new NullLangValue(position);
+            throw new TypeError(tempNode, "TaskScheduler", args[1].TypeToString());
         }
 
+        // 注意：当前实现忽略 TaskScheduler 参数，因为 TaskLangValue.Run 使用 Task.Run
+        // 如果需要真正支持 TaskScheduler，需要使用 Task.Factory.StartNew
         return TaskLangValue.Run(funcValue, CancellationToken.None, position);
     }
 }

@@ -326,13 +326,13 @@ public static class Theme
     /// <summary>
     /// 获取所有可用的主题名称
     /// </summary>
-    public static string[] GetAvailableThemes() => new[]
-    {
+    public static string[] GetAvailableThemes() =>
+    [
         "light",
         "dark",
         "material",
         "material-dark",
         "fluent",
         "fluent-dark"
-    };
+    ];
 }

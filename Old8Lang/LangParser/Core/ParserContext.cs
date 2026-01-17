@@ -50,7 +50,7 @@ public class ParserContext
                 // 注意：Split by '\n' 会保留 '\r'，所以需要在使用时 Trim
                 _cachedSourceLines = SourceCode.Split('\n');
             }
-            return _cachedSourceLines ?? Array.Empty<string>();
+            return _cachedSourceLines ?? [];
         }
     }
 

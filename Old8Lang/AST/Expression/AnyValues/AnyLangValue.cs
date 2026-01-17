@@ -42,7 +42,7 @@ public partial class AnyLangValue : LangValueType
     /// 记录在当前方法执行期间通过SetField修改过的字段
     /// 用于避免SyncFieldsFromExecutionScope覆盖这些字段
     /// </summary>
-    public readonly HashSet<string> FieldsModifiedBySetField = new();
+    public readonly HashSet<string> FieldsModifiedBySetField = [];
 
     /// <summary>
     /// 泛型类型参数映射（用于泛型类实例）
@@ -54,7 +54,7 @@ public partial class AnyLangValue : LangValueType
     /// 标记对象是否已被 dispose
     /// 用于防止重复调用 dispose 方法
     /// </summary>
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// 构造函数
@@ -208,7 +208,7 @@ public partial class AnyLangValue : LangValueType
         }
 
         // 执行方法，传递命名参数（确保不传递 null）
-        return ExecuteMethod(selectedMethod, instance.Ids, instance.NamedArgs ?? new List<NamedArgument>(), manager);
+        return ExecuteMethod(selectedMethod, instance.Ids, instance.NamedArgs, manager);
     }
 
     /// <summary>
@@ -234,7 +234,7 @@ public partial class AnyLangValue : LangValueType
         if (nestedClassTemplate is TypeTemplate typeTemplate)
         {
             // 创建嵌套类实例
-            var nestedInstance = typeTemplate.CreateInstanceV2(manager);
+            var nestedInstance = typeTemplate.CreateInstance(manager);
             nestedInstance.Init(manager.Interpreter);
             return nestedInstance;
         }
@@ -246,7 +246,7 @@ public partial class AnyLangValue : LangValueType
     /// 执行方法
     /// </summary>
     private LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
-        List<NamedArgument> namedArgs, VariateManager manager)
+        List<NamedArgument>? namedArgs, VariateManager manager)
     {
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
@@ -289,7 +289,7 @@ public partial class AnyLangValue : LangValueType
 
         // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
         var funcValue = methodInfo.Implementation;
-        var result = funcValue.Run(executionManager, arguments, namedArgs ?? new List<NamedArgument>(), Position);
+        var result = funcValue.Run(executionManager, arguments, namedArgs ?? [], Position);
 
         // 7. 恢复函数上下文标志
         executionManager.IsFunc = false;
@@ -385,7 +385,7 @@ public partial class AnyLangValue : LangValueType
     /// 根据参数数量和类型选择最匹配的方法
     /// </summary>
     private LangMethodInfo ResolveMethodOverload(List<LangMethodInfo> overloads, List<LangExpression> positionalArgs,
-        List<NamedArgument> namedArgs, VariateManager manager)
+        List<NamedArgument>? namedArgs, VariateManager manager)
     {
         // 计算总参数数量（位置参数 + 命名参数）
         var totalArgCount = positionalArgs.Count + (namedArgs?.Count ?? 0);
@@ -400,7 +400,7 @@ public partial class AnyLangValue : LangValueType
         // 2. 类型匹配（如果有类型注解）
         if (exactMatches.Count > 1)
         {
-            return ResolveByTypeMatching(exactMatches, positionalArgs, namedArgs, manager);
+            return ResolveByTypeMatching(exactMatches, positionalArgs, manager);
         }
 
         // 3. 兼容性匹配（允许参数数量不完全匹配，如默认参数）
@@ -422,7 +422,7 @@ public partial class AnyLangValue : LangValueType
     /// 通过类型匹配选择最佳重载
     /// </summary>
     private LangMethodInfo ResolveByTypeMatching(List<LangMethodInfo> candidates, List<LangExpression> positionalArgs,
-        List<NamedArgument> namedArgs, VariateManager manager)
+        VariateManager manager)
     {
         // 计算每个候选的匹配得分
         var scoredCandidates = new List<(LangMethodInfo method, int score)>();
@@ -474,7 +474,8 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 检查方法是否能处理给定的参数
     /// </summary>
-    private bool CanHandleArguments(LangMethodInfo method, List<LangExpression> positionalArgs, List<NamedArgument> namedArgs)
+    private bool CanHandleArguments(LangMethodInfo method, List<LangExpression> positionalArgs,
+        List<NamedArgument>? namedArgs)
     {
         var expectedParams = method.ParameterCount;
         var actualParams = positionalArgs.Count + (namedArgs?.Count ?? 0);
@@ -509,13 +510,7 @@ public partial class AnyLangValue : LangValueType
             }
 
             // 检查未提供的参数是否都有默认值
-            for (int i = 0; i < func.Ids.Count; i++)
-            {
-                if (!providedParams.Contains(func.Ids[i].IdName) && func.Ids[i].DefaultValue is null)
-                {
-                    return false; // 缺失的参数没有默认值
-                }
-            }
+            return func.Ids.All(t => providedParams.Contains(t.IdName) || t.DefaultValue is not null);
         }
 
         return true;
@@ -596,7 +591,7 @@ public partial class AnyLangValue : LangValueType
 
         // 如果有多个 init 方法，进行重载解析
         // init 方法目前不支持命名参数，所以传递空列表
-        var selectedMethod = ResolveMethodOverload(methods, arguments, new List<NamedArgument>(), manager);
+        var selectedMethod = ResolveMethodOverload(methods, arguments, [], manager);
         return selectedMethod.Implementation;
     }
 
@@ -802,7 +797,7 @@ public partial class AnyLangValue : LangValueType
         else
         {
             // 普通类类型转换，创建目标类型的实例并复制字段
-            var targetInstance = targetTypeTemplate.CreateInstanceV2(manager);
+            var targetInstance = targetTypeTemplate.CreateInstance(manager);
             foreach (var (fieldName, fieldValue) in InstanceData)
             {
                 try
@@ -992,7 +987,8 @@ public partial class AnyLangValue : LangValueType
 
         // 10. 执行方法（将操作数作为参数传递）
         var parameterExpressions = new List<LangExpression> { operand };
-        var result = method.Implementation.Run(executionManager, parameterExpressions, new List<NamedArgument>(), Position);
+        var result =
+            method.Implementation.Run(executionManager, parameterExpressions, [], Position);
 
         // 11. 恢复函数上下文标志
         executionManager.IsFunc = false;

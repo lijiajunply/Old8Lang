@@ -172,7 +172,7 @@ public static class DictionaryValueFuncStatic
                 var keyFound = false;
                 for (int i = 0; i < langValue.Value.Count; i++)
                 {
-                    var (existingKey, existingValue) = langValue.Value[i];
+                    var (existingKey, _) = langValue.Value[i];
                     if (existingKey.Equal(key))
                     {
                         // 更新现有键的值
@@ -204,7 +204,7 @@ public static class DictionaryValueFuncStatic
             var keyFound = false;
             for (int i = 0; i < langValue.Value.Count; i++)
             {
-                var (existingKey, existingValue) = langValue.Value[i];
+                var (existingKey, _) = langValue.Value[i];
                 if (existingKey.Equal(key))
                 {
                     // 更新现有键的值
@@ -433,6 +433,7 @@ public static class DictionaryValueFuncStatic
             {
                 list.Add(new TupleLangValue(key, value));
             }
+
             return new ListLangValue(list);
         }
 

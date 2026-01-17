@@ -24,7 +24,7 @@ public class DocCommentInfo
     /// <summary>
     /// 参数列表
     /// </summary>
-    public List<ParameterDoc> Parameters { get; set; } = new();
+    public List<ParameterDoc> Parameters { get; set; } = [];
 
     /// <summary>
     /// 返回值描述
@@ -34,17 +34,17 @@ public class DocCommentInfo
     /// <summary>
     /// 异常/错误描述列表
     /// </summary>
-    public List<ThrowsDoc> Throws { get; set; } = new();
+    public List<ThrowsDoc> Throws { get; set; } = [];
 
     /// <summary>
     /// 示例代码
     /// </summary>
-    public List<string> Examples { get; set; } = new();
+    public List<string> Examples { get; set; } = [];
 
     /// <summary>
     /// 备注
     /// </summary>
-    public List<string> Remarks { get; set; } = new();
+    public List<string> Remarks { get; set; } = [];
 
     /// <summary>
     /// 作者
@@ -78,31 +78,22 @@ public class DocCommentInfo
 /// <summary>
 /// 参数文档
 /// </summary>
-public class ParameterDoc
+public class ParameterDoc(string name, string? type, string description)
 {
     /// <summary>
     /// 参数名称
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = name;
 
     /// <summary>
     /// 参数类型（可选，从注释中提取）
     /// </summary>
-    public string? Type { get; set; }
+    public string? Type { get; set; } = type;
 
     /// <summary>
     /// 参数描述
     /// </summary>
-    public string Description { get; set; } = string.Empty;
-
-    public ParameterDoc() { }
-
-    public ParameterDoc(string name, string? type, string description)
-    {
-        Name = name;
-        Type = type;
-        Description = description;
-    }
+    public string Description { get; set; } = description;
 }
 
 /// <summary>
@@ -120,7 +111,9 @@ public class ReturnDoc
     /// </summary>
     public string Description { get; set; } = string.Empty;
 
-    public ReturnDoc() { }
+    public ReturnDoc()
+    {
+    }
 
     public ReturnDoc(string? type, string description)
     {
@@ -144,7 +137,9 @@ public class ThrowsDoc
     /// </summary>
     public string Description { get; set; } = string.Empty;
 
-    public ThrowsDoc() { }
+    public ThrowsDoc()
+    {
+    }
 
     public ThrowsDoc(string type, string description)
     {

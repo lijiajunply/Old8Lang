@@ -6,76 +6,31 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 /// </summary>
 public static class StringExtensions
 {
-    /// <summary>
-    /// 转换为大写
-    /// </summary>
-    public static string ToUpper(this string str)
+    extension(string str)
     {
-        return str.ToUpper();
-    }
+        /// <summary>
+        /// 获取字符串长度
+        /// </summary>
+        public int Length()
+        {
+            return str.Length;
+        }
 
-    /// <summary>
-    /// 转换为小写
-    /// </summary>
-    public static string ToLower(this string str)
-    {
-        return str.ToLower();
-    }
+        /// <summary>
+        /// 分割字符串
+        /// </summary>
+        public List<object?> Split(string separator)
+        {
+            var parts = str.Split(separator);
+            return parts.Cast<object?>().ToList();
+        }
 
-    /// <summary>
-    /// 获取字符串长度
-    /// </summary>
-    public static int Length(this string str)
-    {
-        return str.Length;
-    }
-
-    /// <summary>
-    /// 检查字符串是否包含子串
-    /// </summary>
-    public static bool Contains(this string str, string substring)
-    {
-        return str.Contains(substring);
-    }
-
-    /// <summary>
-    /// 替换字符串
-    /// </summary>
-    public static string Replace(this string str, string oldValue, string newValue)
-    {
-        return str.Replace(oldValue, newValue);
-    }
-
-    /// <summary>
-    /// 分割字符串
-    /// </summary>
-    public static List<object?> Split(this string str, string separator)
-    {
-        var parts = str.Split(separator);
-        return parts.Cast<object?>().ToList();
-    }
-
-    /// <summary>
-    /// 去除首尾空白
-    /// </summary>
-    public static string Trim(this string str)
-    {
-        return str.Trim();
-    }
-
-    /// <summary>
-    /// 获取子串
-    /// </summary>
-    public static string Substring(this string str, int startIndex, int length)
-    {
-        return str.Substring(startIndex, length);
-    }
-
-    /// <summary>
-    /// 转换为字符串表示（返回自身）
-    /// </summary>
-    public static string ToStr(this string str)
-    {
-        return str;
+        /// <summary>
+        /// 转换为字符串表示（返回自身）
+        /// </summary>
+        public string ToStr()
+        {
+            return str;
+        }
     }
 }

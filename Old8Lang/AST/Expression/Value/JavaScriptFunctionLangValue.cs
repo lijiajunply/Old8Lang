@@ -31,7 +31,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
         string functionName,
         List<LangId> parameters,
         string? returnType = null)
-        : base(new LangId(name), parameters, new BlockStatement(new List<IOldLangTree>()), null, default, false)
+        : base(new LangId(name), parameters, new BlockStatement(new List<IOldLangTree>()))
     {
         _engine = engine;
         _functionName = functionName;

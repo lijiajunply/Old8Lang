@@ -241,7 +241,7 @@ public class BytecodeFile
             if (hasImportedSymbols)
             {
                 int symbolCount = reader.ReadInt32();
-                dependency.ImportedSymbols = new List<ImportedSymbol>();
+                dependency.ImportedSymbols = [];
                 for (int j = 0; j < symbolCount; j++)
                 {
                     string originalName = reader.ReadString();

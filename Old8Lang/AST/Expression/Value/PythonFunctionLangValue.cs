@@ -1,3 +1,4 @@
+using System.Globalization;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
@@ -23,7 +24,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <param name="pythonFunction">Python 函数对象</param>
     /// <param name="parameters">参数列表</param>
     public PythonFunctionLangValue(string functionName, dynamic pythonFunction, List<LangId> parameters)
-        : base(new LangId(functionName), parameters, new BlockStatement(new List<IOldLangTree>()), null, default, false)
+        : base(new LangId(functionName), parameters, new BlockStatement(new List<IOldLangTree>()))
     {
         _pythonFunction = pythonFunction;
         _functionName = functionName;
@@ -33,7 +34,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// 重写基类的Run方法 - 处理位置参数和命名参数
     /// </summary>
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
-        List<NamedArgument> namedArgs, SourcePosition callPosition, object? obj = null)
+        List<NamedArgument>? namedArgs, SourcePosition callPosition, object? obj = null)
     {
         return ExecutePythonFunction(variateManagerFunc, positionalArgs);
     }
@@ -41,7 +42,8 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 重写基类的Run方法 - 处理位置参数
     /// </summary>
-    public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs, object? obj = null)
+    public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
+        object? obj = null)
     {
         return ExecutePythonFunction(variateManagerFunc, positionalArgs);
     }
@@ -75,7 +77,8 @@ public class PythonFunctionLangValue : FuncLangValue
             }
             catch (PythonException ex)
             {
-                throw new InvalidOperationError(default(SourcePosition), $"Python 函数 {_functionName} 调用失败：\n{ex.Message}");
+                throw new InvalidOperationError(default(SourcePosition),
+                    $"Python 函数 {_functionName} 调用失败：\n{ex.Message}");
             }
         }
     }
@@ -85,7 +88,6 @@ public class PythonFunctionLangValue : FuncLangValue
     /// </summary>
     private PyObject ConvertToPython(LangValueType value)
     {
-
         return value switch
         {
             IntLangValue intVal => new PyInt(intVal.Value).ToPython(),
@@ -95,7 +97,7 @@ public class PythonFunctionLangValue : FuncLangValue
             NullLangValue => PyObject.None,
             DictionaryLangValue dictVal => ConvertDictToPython(dictVal),
             ILangList listVal => ConvertListToPython(listVal),
-            _ => throw new TypeError(default, $"不支持将类型 {value.GetType().Name} 转换为 Python 对象")
+            _ => throw new TypeError(this, $"不支持将类型 {value.GetType().Name} 转换为 Python 对象")
         };
     }
 
@@ -218,13 +220,13 @@ public class PythonFunctionLangValue : FuncLangValue
                     }
 
                     // 默认转换为字符串
-                    return new StringLangValue(pyObject.ToString() ?? "");
+                    return new StringLangValue(pyObject.ToString(CultureInfo.InvariantCulture));
             }
         }
         catch
         {
             // 转换失败，返回字符串表示
-            return new StringLangValue(pyObject.ToString() ?? "");
+            return new StringLangValue(pyObject.ToString(CultureInfo.InvariantCulture));
         }
     }
 

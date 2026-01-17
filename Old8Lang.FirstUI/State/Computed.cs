@@ -8,8 +8,8 @@ namespace Old8Lang.FirstUI.State;
 public class Computed<T> : ObservableState<T>
 {
     private readonly Func<T?> _computeFunction;
-    private readonly List<IState> _dependencies = new();
-    private readonly List<Action> _unsubscribers = new();
+    private readonly List<IState> _dependencies = [];
+    private readonly List<Action> _unsubscribers = [];
     private bool _isComputing = false;
 
     /// <summary>

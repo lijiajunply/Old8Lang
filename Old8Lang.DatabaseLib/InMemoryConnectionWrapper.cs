@@ -23,7 +23,7 @@ public class InMemoryConnectionWrapper : IDisposable
     {
         ConnectionString = $"Data Source=file:{databaseName}?mode=memory&cache=shared";
         Connection = new SqliteConnection(ConnectionString);
-        CreatedTables = new HashSet<string>();
+        CreatedTables = [];
     }
 
     /// <summary>

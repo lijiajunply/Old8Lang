@@ -10,15 +10,15 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class TypeLangValue : LangValueType
 {
-    private readonly LangExpression? Expression;
+    private readonly LangExpression? _expression;
     public string? Value { get; private set; }
 
-    public TypeLangValue(LangExpression expression) => Expression = expression;
+    public TypeLangValue(LangExpression expression) => _expression = expression;
     public TypeLangValue(string value) => Value = value;
 
     public override LangValueType Run(VariateManager manager)
     {
-        var result = Expression?.Run(manager);
+        var result = _expression?.Run(manager);
         if (result is null) throw new InvalidOperationError(this, "类型表达式求值失败");
         Value = result.TypeToString();
         return this;

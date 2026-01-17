@@ -65,7 +65,7 @@ public class BytecodeCompiler
         var mainFunc = new FunctionMetadata
         {
             Name = "<main>",
-            Parameters = new List<string>()
+            Parameters = []
         };
 
         _currentFunction = mainFunc;
@@ -424,7 +424,7 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields)
     {
-        DeclareClass(className, fields, new List<(string, FuncLangValue, bool)>(), null);
+        DeclareClass(className, fields, [], null);
     }
 
     public void DeclareClass(string className, List<string> fields,
@@ -438,16 +438,16 @@ public class BytecodeCompiler
             Name = className,
             BaseClassName = parentClassName,
             Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList(),
-            InterfaceNames = implementsNames ?? new List<string>(),
-            ImplementsInterfaces = implementsNames ?? new List<string>(),
-            Mixins = mixinNames ?? new List<string>()
+            InterfaceNames = implementsNames ?? [],
+            ImplementsInterfaces = implementsNames ?? [],
+            Mixins = mixinNames ?? []
         };
 
         // 编译所有方法
         foreach (var (methodName, funcValue, isStatic) in methods)
         {
             // 提取方法参数
-            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
 
             // 提取默认参数值
             var defaultValues = new List<object?>();
@@ -698,13 +698,13 @@ public class BytecodeCompiler
         var mixinMetadata = new MixinMetadata
         {
             Name = mixinName,
-            Methods = new List<MethodMetadata>()
+            Methods = []
         };
 
         // 编译所有 Mixin 方法
         foreach (var (methodName, funcValue) in methods)
         {
-            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
             var defaultValues = new List<object?>();
 
             if (funcValue.Ids != null)

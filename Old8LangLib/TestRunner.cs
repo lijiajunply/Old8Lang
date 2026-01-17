@@ -24,7 +24,7 @@ public static class TestRunner
     public class TestSuite
     {
         public string Name { get; set; } = "";
-        public List<TestCase> Tests { get; set; } = new();
+        public List<TestCase> Tests { get; set; } = [];
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public static class TestRunner
         public Action TestAction { get; set; } = () => { };
     }
 
-    private static readonly List<TestSuite> _testSuites = new();
+    private static readonly List<TestSuite> _testSuites = [];
     private static TestSuite? _currentSuite;
 
     // ===== 测试套件管理 =====

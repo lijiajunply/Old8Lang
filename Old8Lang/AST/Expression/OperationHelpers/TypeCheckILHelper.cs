@@ -39,7 +39,7 @@ public static class TypeCheckILHelper
     /// <returns>.NET 类型，如果是 null 或未识别的自定义类型则返回 null</returns>
     private static Type? GetTargetType(string typeName)
     {
-        return TypeNameMap.TryGetValue(typeName, out var type) ? type : null;
+        return TypeNameMap.GetValueOrDefault(typeName);
     }
 
     /// <summary>
@@ -328,6 +328,7 @@ public static class TypeCheckILHelper
         {
             ilGenerator.Emit(OpCodes.Box, leftType);
         }
+
         ilGenerator.Emit(OpCodes.Isinst, targetType);
         ilGenerator.Emit(OpCodes.Ldnull);
         ilGenerator.Emit(OpCodes.Cgt_Un); // 不等于 null 则为 true

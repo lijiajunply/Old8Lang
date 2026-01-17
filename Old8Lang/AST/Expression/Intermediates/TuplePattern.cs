@@ -7,17 +7,12 @@ namespace Old8Lang.AST.Expression.Intermediates;
 ///      case (x, 0) -> "on X-axis"
 ///      case (x, y) -> "point"
 /// </summary>
-public class TuplePattern
+public class TuplePattern(List<TuplePatternElement> elements)
 {
     /// <summary>
     /// 元组模式的元素列表
     /// </summary>
-    public List<TuplePatternElement> Elements { get; }
-
-    public TuplePattern(List<TuplePatternElement> elements)
-    {
-        Elements = elements;
-    }
+    public List<TuplePatternElement> Elements { get; } = elements;
 }
 
 /// <summary>

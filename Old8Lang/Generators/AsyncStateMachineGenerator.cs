@@ -447,7 +447,7 @@ public class AsyncStateMachineGenerator
             "SetStateMachine",
             MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final,
             null,
-            new Type[] { typeof(IAsyncStateMachine) });
+            [typeof(IAsyncStateMachine)]);
 
         typeBuilder.DefineMethodOverride(setStateMachineMethod, typeof(IAsyncStateMachine).GetMethod("SetStateMachine")!);
 

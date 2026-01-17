@@ -209,7 +209,7 @@ PrintLine(""End"")
     PrintLine(""Production"")
 #endif
 ";
-        var symbols = new PreprocessorSymbols(new[] { "PRODUCTION" });
+        var symbols = new PreprocessorSymbols(["PRODUCTION"]);
         var preprocessor = new PreprocessorTokenizer(code, symbols);
 
         // Act

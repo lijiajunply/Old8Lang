@@ -22,11 +22,11 @@ public class ReflectionPerformanceBenchmark
     public void Setup()
     {
         // 获取 Math.Sqrt 和 Math.Pow 方法
-        _sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) })!;
-        _powMethod = typeof(Math).GetMethod("Pow", new[] { typeof(double), typeof(double) })!;
+        _sqrtMethod = typeof(Math).GetMethod("Sqrt", [typeof(double)])!;
+        _powMethod = typeof(Math).GetMethod("Pow", [typeof(double), typeof(double)])!;
 
-        _sqrtArgs = new object?[] { 16.0 };
-        _powArgs = new object?[] { 2.0, 3.0 };
+        _sqrtArgs = [16.0];
+        _powArgs = [2.0, 3.0];
     }
 
     /// <summary>

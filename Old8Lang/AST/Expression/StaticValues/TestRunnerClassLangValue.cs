@@ -219,14 +219,14 @@ public partial class TestRunnerClassLangValue : LangValueType
         }
 
         // 这里简化处理，假设传入的是一个测试套件名称字符串
-        if (args[0] is not StringLangValue suiteName)
+        if (args[0] is not StringLangValue)
         {
             var tempNode = new NullLangValue(position);
             throw new TypeError(tempNode, "string", args[0].TypeToString());
         }
 
         // 由于无法直接从字符串获取 TestSuite 对象，这里返回空列表
-        return new ListLangValue(new List<LangValueType>());
+        return new ListLangValue(new List<LangExpression>());
     }
 
     /// <summary>
@@ -410,7 +410,7 @@ public partial class TestRunnerClassLangValue : LangValueType
         {
             var results = ConvertToTestResults(resultList);
             var statistics = TestRunner.GetStatistics(results);
-            
+
             var tupleList = new List<TupleLangValue>();
             foreach (var kvp in statistics)
             {
@@ -422,10 +422,10 @@ public partial class TestRunnerClassLangValue : LangValueType
                     value = new DoubleLangValue(longValue);
                 else
                     value = new StringLangValue(kvp.Value.ToString() ?? "");
-                
+
                 tupleList.Add(new TupleLangValue(key, value));
             }
-            
+
             return new DictionaryLangValue(tupleList);
         }
         catch (Exception ex)

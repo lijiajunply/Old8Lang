@@ -13,9 +13,9 @@ public class LazySymbolProxy(
     SourcePosition position = default
 ) : LangValueType(position)
 {
-    private LangValueType? CachedSymbol;
-    private bool IsResolved;
-    private readonly Lock ResolveLock = new();
+    private LangValueType? _cachedSymbol;
+    private bool _isResolved;
+    private readonly Lock _resolveLock = new();
 
     /// <summary>
     /// 解析并获取真实符号
@@ -23,20 +23,20 @@ public class LazySymbolProxy(
     /// <returns>真实符号值</returns>
     private LangValueType ResolveSymbol()
     {
-        if (IsResolved) return CachedSymbol!;
-        lock (ResolveLock)
+        if (_isResolved) return _cachedSymbol!;
+        lock (_resolveLock)
         {
-            if (IsResolved) return CachedSymbol!;
-            CachedSymbol = module.GetSymbol(symbolName);
-            if (CachedSymbol is null)
+            if (_isResolved) return _cachedSymbol!;
+            _cachedSymbol = module.GetSymbol(symbolName);
+            if (_cachedSymbol is null)
             {
                 throw new AttributeError(this, symbolName, module.ModuleName);
             }
 
-            IsResolved = true;
+            _isResolved = true;
         }
 
-        return CachedSymbol!;
+        return _cachedSymbol!;
     }
 
     /// <summary>
@@ -61,9 +61,9 @@ public class LazySymbolProxy(
     /// </summary>
     public override string ToString()
     {
-        if (IsResolved && CachedSymbol is not null)
+        if (_isResolved && _cachedSymbol is not null)
         {
-            return CachedSymbol.ToString();
+            return _cachedSymbol.ToString();
         }
 
         return $"<lazy symbol proxy: {symbolName} from {module.ModuleName}>";

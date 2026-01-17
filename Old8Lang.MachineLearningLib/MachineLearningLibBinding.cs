@@ -34,7 +34,7 @@ public static class MachineLearningLibBinding
         EnsureMlContextInitialized();
         var (trainSet, testSet) = _mlContext!.DataLoader.SplitData(data, testFraction);
 
-        return new List<object?> { trainSet, testSet };
+        return [trainSet, testSet];
     }
 
     /// <summary>

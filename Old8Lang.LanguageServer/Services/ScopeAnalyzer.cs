@@ -16,7 +16,7 @@ public class ScopeAnalyzer
     private readonly BlockStatement _ast;
     private readonly Position _position;
     private readonly Dictionary<string, SymbolInfo> _globalSymbolTable;
-    private readonly List<SymbolInfo> _visibleSymbols = new();
+    private readonly List<SymbolInfo> _visibleSymbols = [];
     private readonly string _uri;
 
     public ScopeAnalyzer(BlockStatement ast, Position position, Dictionary<string, SymbolInfo> globalSymbolTable, string uri = "")

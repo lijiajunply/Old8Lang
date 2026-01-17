@@ -78,7 +78,7 @@ public static class MockLib
         /// <returns>调用记录列表</returns>
         public List<object?[]> GetCalls(string methodName)
         {
-            return CallHistory.GetValueOrDefault(methodName) ?? new List<object?[]>();
+            return CallHistory.GetValueOrDefault(methodName) ?? [];
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ public static class MockLib
         public object?[] GetLastCall(string methodName)
         {
             var calls = GetCalls(methodName);
-            return calls.Count > 0 ? calls[^1] : Array.Empty<object?>();
+            return calls.Count > 0 ? calls[^1] : [];
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ public static class MockLib
     public class MethodCall
     {
         public string MethodName { get; set; } = "";
-        public object?[] Arguments { get; set; } = Array.Empty<object?>();
+        public object?[] Arguments { get; set; } = [];
         public DateTime Timestamp { get; set; }
     }
 

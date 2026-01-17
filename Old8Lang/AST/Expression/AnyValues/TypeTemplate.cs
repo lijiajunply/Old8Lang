@@ -7,30 +7,30 @@ using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Expression.AnyValues;
 
-    /// <summary>
-    /// 类型模板类，用于存储类的定义信息
-    /// </summary>
-    public partial class TypeTemplate(
-        string className,
-        Dictionary<ClassMemberId, LangExpression> variates,
-        Dictionary<ClassMemberId, LangExpression> staticVariates,
-        string? parentClassName = null,
-        bool isMixin = false,
-        List<string>? mixinNames = null,
-        List<string>? implementsNames = null,
-        bool isInterface = false,
-        bool isAbstract = false,
-        List<GenericParameter>? genericParameters = null,
-        List<string>? parentGenericTypeParameters = null,
-        SourcePosition position = default)
-        : ImportInfo(position)
-    {
-        public readonly string ClassName = className;
-        public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
-        public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
-        public readonly string? ParentClassName = parentClassName;
-        public readonly List<string>? ParentGenericTypeParameters = parentGenericTypeParameters;
-        public readonly bool IsMixin = isMixin;
+/// <summary>
+/// 类型模板类，用于存储类的定义信息
+/// </summary>
+public partial class TypeTemplate(
+    string className,
+    Dictionary<ClassMemberId, LangExpression> variates,
+    Dictionary<ClassMemberId, LangExpression> staticVariates,
+    string? parentClassName = null,
+    bool isMixin = false,
+    List<string>? mixinNames = null,
+    List<string>? implementsNames = null,
+    bool isInterface = false,
+    bool isAbstract = false,
+    List<GenericParameter>? genericParameters = null,
+    List<string>? parentGenericTypeParameters = null,
+    SourcePosition position = default)
+    : ImportInfo(position)
+{
+    public readonly string ClassName = className;
+    public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
+    public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
+    public readonly string? ParentClassName = parentClassName;
+    public readonly List<string>? ParentGenericTypeParameters = parentGenericTypeParameters;
+    public readonly bool IsMixin = isMixin;
     public readonly List<string> MixinNames = mixinNames ?? [];
     public readonly List<string> ImplementsNames = implementsNames ?? [];
     public readonly bool IsInterface = isInterface;
@@ -62,7 +62,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
     /// <summary>
     /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
     /// </summary>
-    private readonly Dictionary<string, LangValueType> StaticVariableValues = [];
+    private readonly Dictionary<string, LangValueType> _staticVariableValues = [];
 
     /// <summary>
     /// 获取静态变量的当前值，如果已修改则返回存储的值，否则返回初始值
@@ -72,7 +72,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
     /// <returns>静态变量的值</returns>
     private LangValueType GetStaticVariableValue(string variableName, VariateManager manager)
     {
-        if (StaticVariableValues.TryGetValue(variableName, out var storedValue))
+        if (_staticVariableValues.TryGetValue(variableName, out var storedValue))
         {
             return storedValue;
         }
@@ -85,7 +85,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
                 // 创建一个临时管理器来初始化静态变量
                 var tempManager = manager.NewManger();
                 var initialValue = value.Run(tempManager);
-                StaticVariableValues[variableName] = initialValue;
+                _staticVariableValues[variableName] = initialValue;
                 return initialValue;
             }
         }
@@ -128,7 +128,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
         }
 
         // 设置静态字段值到运行时缓存
-        StaticVariableValues[memberName] = value;
+        _staticVariableValues[memberName] = value;
 
         // 同时更新到元数据缓存中，确保其他访问能获取到最新值（如果元数据已构建）
         if (MetadataCache is not null)
@@ -167,77 +167,6 @@ namespace Old8Lang.AST.Expression.AnyValues;
         }
 
         return baseStr;
-    }
-
-    /// <summary>
-    /// 递归获取所有父类、mixin和接口的成员变量和方法
-    /// </summary>
-    /// <param name="manager">变量管理器，用于获取父类、mixin和接口信息</param>
-    /// <param name="type">当前类型模板</param>
-    /// <param name="allVariates">用于存储所有成员的字典</param>
-    private void GetAllParentMembers(VariateManager manager, TypeTemplate type,
-        Dictionary<ClassMemberId, LangExpression> allVariates)
-    {
-        // 如果有父类，递归获取父类的所有成员
-        if (type.ParentClassName is not null)
-        {
-            if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
-            {
-                // 先递归获取祖父类的成员
-                GetAllParentMembers(manager, parentType, allVariates);
-
-                // 然后添加直接父类的成员，允许子类方法覆盖父类方法
-                foreach (var parentMember in parentType.Variates)
-                {
-                    allVariates[parentMember.Key] = parentMember.Value;
-                }
-            }
-        }
-
-        // 处理所有实现的接口
-        foreach (var interfaceName in type.ImplementsNames)
-        {
-            if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceType)
-            {
-                // 递归获取接口的成员（接口可以继承其他接口）
-                GetAllParentMembers(manager, interfaceType, allVariates);
-
-                // 添加当前接口的成员
-                foreach (var interfaceMember in interfaceType.Variates.Where(interfaceMember =>
-                             !allVariates.ContainsKey(interfaceMember.Key)))
-                {
-                    allVariates[interfaceMember.Key] = interfaceMember.Value;
-                }
-            }
-        }
-
-        // 处理所有mixin类
-        foreach (var mixinName in type.MixinNames)
-        {
-            if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixinType)
-            {
-                // 递归获取mixin的父类和mixin成员
-                GetAllParentMembers(manager, mixinType, allVariates);
-
-                // 添加当前mixin的成员
-                foreach (var mixinMember in mixinType.Variates.Where(mixinMember =>
-                             !allVariates.ContainsKey(mixinMember.Key)))
-                {
-                    allVariates[mixinMember.Key] = mixinMember.Value;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 创建类的实例（V1 兼容接口，内部使用 V2）
-    /// </summary>
-    /// <param name="manager">变量管理器，用于获取父类信息</param>
-    /// <returns>类的实例（V2 版本）</returns>
-    public AnyLangValue CreateInstance(VariateManager manager)
-    {
-        // 直接使用 V2 实现
-        return CreateInstanceV2(manager);
     }
 
     public override LangValueType Run(VariateManager manager)
@@ -404,11 +333,11 @@ namespace Old8Lang.AST.Expression.AnyValues;
                         {
                             // 只有当tempManager中的值与StaticVariableValues中的值不同时才更新
                             // 这样可以避免覆盖通过 SetStaticMember 已经更新的值
-                            var currentStoredValue = StaticVariableValues.GetValueOrDefault(variableName);
+                            var currentStoredValue = _staticVariableValues.GetValueOrDefault(variableName);
                             if (currentStoredValue is null || !ReferenceEquals(tempValue, currentStoredValue))
                             {
                                 // 保存到 StaticVariableValues（TypeTemplate 的实例字段）
-                                StaticVariableValues[variableName] = tempValue;
+                                _staticVariableValues[variableName] = tempValue;
                                 // 同时保存到元数据缓存（如果存在）
                                 if (MetadataCache is not null && MetadataCache.StaticMembers.ContainsKey(variableName))
                                 {
@@ -463,7 +392,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
                 {
                     // 找到嵌套类，创建实例（使用 V2）
                     var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
-                    var nestedInstance = nestedTypeTemplate.CreateInstanceV2(manager);
+                    var nestedInstance = nestedTypeTemplate.CreateInstance(manager);
                     nestedInstance.Init(manager.Interpreter);
                     return nestedInstance;
                 }
@@ -476,7 +405,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
                 {
                     // 找到嵌套类，创建实例（使用 V2）
                     var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
-                    var nestedInstance = nestedTypeTemplate.CreateInstanceV2(manager);
+                    var nestedInstance = nestedTypeTemplate.CreateInstance(manager);
                     nestedInstance.Init(manager.Interpreter);
                     return nestedInstance;
                 }
@@ -701,7 +630,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
     /// <summary>
     /// 创建类的实例（V2 架构）
     /// </summary>
-    public AnyLangValue CreateInstanceV2(VariateManager manager)
+    public AnyLangValue CreateInstance(VariateManager manager)
     {
         // 构建或获取缓存的元数据
         var metadata = BuildMetadata(manager);
@@ -742,7 +671,7 @@ public partial class MethodOverloadList : LangValueType
     /// <param name="overloads">重载方法列表</param>
     public MethodOverloadList(List<FuncLangValue>? overloads)
     {
-        Overloads = overloads ?? new List<FuncLangValue>();
+        Overloads = overloads ?? [];
     }
 
     /// <summary>

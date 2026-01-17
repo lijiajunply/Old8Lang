@@ -20,10 +20,10 @@ public partial class TupleLangValue : LangValueType, ILangList
     /// <summary>
     /// 解释模式下的运行时值
     /// </summary>
-    public List<LangValueType> ItemValues { get; private set; } = new();
+    public List<LangValueType> ItemValues { get; private set; } = [];
 
     // 命名字段支持 - 存储字段名称
-    private readonly Dictionary<string, int>? _fieldNames = null;
+    private readonly Dictionary<string, int>? _fieldNames;
 
     // 标记是否有命名字段
     public bool HasNamedFields => _fieldNames is not null && _fieldNames.Count > 0;
@@ -37,7 +37,7 @@ public partial class TupleLangValue : LangValueType, ILangList
     public TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default)
         : base(position)
     {
-        Elements = new List<LangExpression> { v1, v2 };
+        Elements = [v1, v2];
         IsEmpty = false;
     }
 
@@ -47,9 +47,9 @@ public partial class TupleLangValue : LangValueType, ILangList
     public TupleLangValue(List<LangExpression> elements, SourcePosition position = default)
         : base(position)
     {
-        Elements = elements ?? new List<LangExpression>();
+        Elements = elements ?? [];
         IsEmpty = Elements.Count == 0;
-        
+
         // 如果是空列表，为了安全起见，添加两个NullLangValue? 
         // 不，空元组应该是允许的，但在 Old8Lang 旧逻辑中似乎用 (Null, Null) 表示空。
         // 我们这里支持真正的空元组。
@@ -87,6 +87,7 @@ public partial class TupleLangValue : LangValueType, ILangList
             var result = expr.Run(manager);
             ItemValues.Add(result);
         }
+
         return this;
     }
 
@@ -109,6 +110,7 @@ public partial class TupleLangValue : LangValueType, ILangList
                     parts.Add(ItemValues[i].ToString() ?? "null");
                 }
             }
+
             return $"({string.Join(", ", parts)})";
         }
 
@@ -149,16 +151,16 @@ public partial class TupleLangValue : LangValueType, ILangList
             // 前7个元素
             var args = new object[8];
             Array.Copy(values, 0, args, 0, 7);
-            
+
             // 第8个元素是剩余部分的元组
             var restValues = new object[count - 7];
             Array.Copy(values, 7, restValues, 0, count - 7);
             args[7] = CreateValueTupleRecursiveStatic(restValues);
-            
+
             // 获取对应的泛型类型
             var types = args.Select(v => v.GetType()).ToArray();
             var tupleType = GetValueTupleTypeStatic(types);
-            
+
             return Activator.CreateInstance(tupleType, args)!;
         }
         else
@@ -176,14 +178,14 @@ public partial class TupleLangValue : LangValueType, ILangList
             var first7Types = types.Take(7).ToArray();
             var restTypes = types.Skip(7).ToArray();
             var restTupleType = GetValueTupleTypeStatic(restTypes);
-            
+
             var allTypes = new Type[8];
             Array.Copy(first7Types, allTypes, 7);
             allTypes[7] = restTupleType;
-            
+
             return typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
         }
-        
+
         return types.Length switch
         {
             1 => typeof(ValueTuple<>).MakeGenericType(types),
@@ -256,14 +258,13 @@ public partial class TupleLangValue : LangValueType, ILangList
             }
 
             // 2. 支持命名字段访问
-            if (_fieldNames is not null && _fieldNames.ContainsKey(id.IdName))
+            if (_fieldNames is not null && _fieldNames.TryGetValue(id.IdName, out var fieldIndex))
             {
-                int fieldIndex = _fieldNames[id.IdName];
                 return Get(fieldIndex);
             }
 
             // 3. 支持数字索引访问：tuple.0
-            if (int.TryParse(id.IdName, out int index))
+            if (int.TryParse(id.IdName, out var index))
             {
                 return Get(index);
             }
@@ -283,7 +284,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
         if (dotExpression is Instance instance)
         {
-             // 设置执行上下文
+            // 设置执行上下文
             ValueFunctions.ExecutionContext.SetCurrentManager(manager);
 
             if (instance.Ids.Count == 0)
@@ -291,7 +292,7 @@ public partial class TupleLangValue : LangValueType, ILangList
                 if (instance.Id.IdName == "ToStr") return new StringLangValue(ToString());
                 if (instance.Id.IdName == "Length") return new IntLangValue(GetLength());
             }
-            
+
             return instance.FromClassToResult(this, manager);
         }
 
@@ -319,12 +320,13 @@ public partial class TupleLangValue : LangValueType, ILangList
     {
         // 获取所有元素的类型
         var types = Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
-        
+
         // 递归生成创建代码
         EmitValueTupleCreation(ilGenerator, local, Elements, types);
     }
-    
-    private void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements, Type[] types)
+
+    private void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements,
+        Type[] types)
     {
         var count = elements.Count;
         if (count > 7)
@@ -333,66 +335,66 @@ public partial class TupleLangValue : LangValueType, ILangList
             var first7Types = types.Take(7).ToArray();
             var restTypes = types.Skip(7).ToArray();
             var restElements = elements.Skip(7).ToList();
-            
+
             // 计算 Rest 的类型
             var restTupleType = GetValueTupleTypeForCompiler(restTypes);
-            
+
             var allTypes = new Type[8];
             Array.Copy(first7Types, allTypes, 7);
             allTypes[7] = restTupleType;
-            
+
             var tupleType = typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
             var constructor = tupleType.GetConstructor(allTypes)!;
-            
+
             // 加载前7个元素
             for (int i = 0; i < 7; i++)
             {
                 elements[i].LoadIlValue(ilGenerator, local);
             }
-            
+
             // 递归加载剩余元素作为第8个参数
             EmitValueTupleCreation(ilGenerator, local, restElements, restTypes);
-            
+
             ilGenerator.Emit(OpCodes.Newobj, constructor);
         }
         else if (count == 0)
         {
-             // 空元组
-             // 正确的 IL 序列生成 default(ValueTuple)
-             var tempLocal = ilGenerator.DeclareLocal(typeof(ValueTuple));
-             ilGenerator.Emit(OpCodes.Ldloca, tempLocal);
-             ilGenerator.Emit(OpCodes.Initobj, typeof(ValueTuple));
-             ilGenerator.Emit(OpCodes.Ldloc, tempLocal);
+            // 空元组
+            // 正确的 IL 序列生成 default(ValueTuple)
+            var tempLocal = ilGenerator.DeclareLocal(typeof(ValueTuple));
+            ilGenerator.Emit(OpCodes.Ldloca, tempLocal);
+            ilGenerator.Emit(OpCodes.Initobj, typeof(ValueTuple));
+            ilGenerator.Emit(OpCodes.Ldloc, tempLocal);
         }
         else
         {
             var tupleType = GetValueTupleTypeForCompiler(types);
             var constructor = tupleType.GetConstructor(types)!;
-            
+
             foreach (var element in elements)
             {
                 element.LoadIlValue(ilGenerator, local);
             }
-            
+
             ilGenerator.Emit(OpCodes.Newobj, constructor);
         }
     }
-    
+
     private Type GetValueTupleTypeForCompiler(Type[] types)
     {
-         if (types.Length > 7)
+        if (types.Length > 7)
         {
             var first7Types = types.Take(7).ToArray();
             var restTypes = types.Skip(7).ToArray();
             var restTupleType = GetValueTupleTypeForCompiler(restTypes);
-            
+
             var allTypes = new Type[8];
             Array.Copy(first7Types, allTypes, 7);
             allTypes[7] = restTupleType;
-            
+
             return typeof(ValueTuple<,,,,,,,>).MakeGenericType(allTypes);
         }
-        
+
         return types.Length switch
         {
             0 => typeof(ValueTuple),
@@ -427,27 +429,27 @@ public partial class TupleLangValue : LangValueType, ILangList
     public LangValueType Slice(int start, int end)
     {
         var items = ItemValues;
-        
+
         if (start < 0) start += items.Count;
         if (end < 0) end += items.Count;
-        
+
         start = Math.Max(0, Math.Min(start, items.Count));
         end = Math.Max(0, Math.Min(end, items.Count));
-        
+
         if (start >= end)
         {
-             return new TupleLangValue(new List<LangExpression>());
+            return new TupleLangValue([]);
         }
-        
+
         var sliceItems = items.Skip(start).Take(end - start).ToList();
-        
+
         // 注意：这里我们返回的是一个新的 TupleLangValue，但我们需要用 LangExpression 来构造它
         // 实际上在解释器中，我们可以直接构造一个已经包含值的 TupleLangValue
         // 为了方便，我们需要一个支持直接传入值的构造函数或者方法
-        
+
         // 既然我们不能直接传值（因为 AST 存的是 Expression），我们需要把 Value 包装成 Expression
         // 或者我们直接 new 一个 TupleLangValue，然后设置它的 ItemValues
-        
+
         var newTuple = new TupleLangValue(sliceItems.Cast<LangExpression>().ToList());
         newTuple.ItemValues.AddRange(sliceItems); // 预填充值
         return newTuple;
@@ -504,7 +506,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         {
             throw new InvalidOperationError(this, $"元组索引越界: {index}");
         }
-        
+
         // 元组在 C# 中通常是不可变的（ValueTuple 的字段是可变的，但作为整体值类型...）
         // Old8Lang 的元组设计是否允许修改？
         // 原来的 Set 方法允许修改，并重建结构。
@@ -522,4 +524,3 @@ public partial class TupleLangValue : LangValueType, ILangList
         return ItemValues.Any(item => item.Equal(value));
     }
 }
-

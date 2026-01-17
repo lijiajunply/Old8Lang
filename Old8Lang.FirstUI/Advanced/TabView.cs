@@ -13,7 +13,7 @@ public class TabView : WidgetBase
     /// <summary>
     /// 选项卡列表
     /// </summary>
-    public List<TabItem> Tabs { get; set; } = new();
+    public List<TabItem> Tabs { get; set; } = [];
 
     /// <summary>
     /// 当前选中的选项卡索引

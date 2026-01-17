@@ -54,7 +54,7 @@ public class TokenIndexCache
             // 按类型索引
             if (!_typeIndex.TryGetValue(token.Type, out var typeList))
             {
-                typeList = new List<int>();
+                typeList = [];
                 _typeIndex[token.Type] = typeList;
             }
             typeList.Add(i);
@@ -64,7 +64,7 @@ public class TokenIndexCache
             {
                 if (!_valueIndex.TryGetValue(token.Value, out var valueList))
                 {
-                    valueList = new List<int>();
+                    valueList = [];
                     _valueIndex[token.Value] = valueList;
                 }
                 valueList.Add(i);

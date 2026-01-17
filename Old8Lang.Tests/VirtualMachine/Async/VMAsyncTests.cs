@@ -156,7 +156,7 @@ public class VMAsyncTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("Data-1", lines[0]);
         Assert.Equal("Data-2", lines[1]);

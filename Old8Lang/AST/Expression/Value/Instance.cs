@@ -26,7 +26,7 @@ public partial class Instance : LangValueType
     {
         Id = langId;
         Ids = ids;
-        NamedArgs = new List<NamedArgument>();
+        NamedArgs = [];
     }
 
     public Instance(LangId langId, List<LangExpression> ids, List<NamedArgument> namedArgs,
@@ -197,7 +197,7 @@ public partial class Instance : LangValueType
                 else if (bestMatch is FuncLangValue funcValue)
                 {
                     // 如果是泛型函数且未实例化，尝试自动推断类型参数
-                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
+                    if (funcValue is { IsGeneric: true, TypeArgumentMapping: null })
                     {
                         if (manager.Interpreter is null)
                         {
@@ -243,7 +243,7 @@ public partial class Instance : LangValueType
                 if (idResult is TypeTemplate typeTemplate)
                 {
                     // 创建类的实例（使用 V2 架构）
-                    var instance = typeTemplate.CreateInstanceV2(manager);
+                    var instance = typeTemplate.CreateInstance(manager);
 
                     // 初始化实例，设置Interpreter
                     instance.Init(manager.Interpreter);
@@ -257,7 +257,7 @@ public partial class Instance : LangValueType
                 else if (idResult is FuncLangValue funcValue)
                 {
                     // 如果是泛型函数且未实例化，尝试自动推断类型参数
-                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
+                    if (funcValue is { IsGeneric: true, TypeArgumentMapping: null })
                     {
                         if (manager.Interpreter is null)
                         {
@@ -320,7 +320,7 @@ public partial class Instance : LangValueType
             if (idResult is TypeTemplate typeTemplate)
             {
                 // 创建类的实例（使用 V2 架构）
-                var instance = typeTemplate.CreateInstanceV2(manager);
+                var instance = typeTemplate.CreateInstance(manager);
 
                 // 初始化实例，设置Interpreter
                 instance.Init(manager.Interpreter);
@@ -334,7 +334,7 @@ public partial class Instance : LangValueType
             else if (idResult is FuncLangValue funcValue)
             {
                 // 如果是泛型函数且未实例化,尝试自动推断类型参数
-                if (funcValue.IsGeneric && funcValue.TypeArgumentMapping is null)
+                if (funcValue is { IsGeneric: true, TypeArgumentMapping: null })
                 {
                     if (manager.Interpreter is null)
                     {
@@ -443,12 +443,9 @@ public partial class Instance : LangValueType
                 var expectedParamCount = Ids.Count + 1;
 
                 // 首先查找精确匹配的参数数量
-                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount);
-
                 // 如果没找到，查找有可选参数的方法
-                if (m is null)
-                {
-                    m = allMethods.FirstOrDefault(x =>
+                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount) ??
+                    allMethods.FirstOrDefault(x =>
                     {
                         var parameters = x.GetParameters();
                         if (parameters.Length < expectedParamCount) return false;
@@ -462,7 +459,6 @@ public partial class Instance : LangValueType
 
                         return true;
                     });
-                }
 
                 // 如果还是没找到，使用第一个方法
                 m ??= allMethods[0];
@@ -500,7 +496,7 @@ public partial class Instance : LangValueType
         var os = new List<object>();
 
         // 检查方法是否需要参数
-        var parameters = m?.GetParameters() ?? Array.Empty<ParameterInfo>();
+        var parameters = m?.GetParameters() ?? [];
 
         // 对于静态方法（扩展方法），第一个参数是 baseLangValue
         if (m?.IsStatic == true && parameters.Length > 0)
@@ -660,7 +656,7 @@ public partial class Instance : LangValueType
         {
             var argTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
             var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
-            
+
             if (typeArgs != null)
             {
                 // 创建特化版本
@@ -973,7 +969,8 @@ public partial class Instance : LangValueType
 
                 ilGenerator.Emit(OpCodes.Ldstr, matchedDelegateKey);
                 ilGenerator.Emit(OpCodes.Ldloc, argsArrayLocal);
-                ilGenerator.Emit(OpCodes.Call, typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Invoke))!);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Invoke))!);
 
                 var returnType = matchingMethod.ReturnType;
                 if (returnType == typeof(void))
@@ -1017,7 +1014,7 @@ public partial class Instance : LangValueType
             // 我们只需要推断返回类型
             var argTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
             var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
-            
+
             if (typeArgs != null)
             {
                 // 使用 GenericTypeResolver 解析返回类型

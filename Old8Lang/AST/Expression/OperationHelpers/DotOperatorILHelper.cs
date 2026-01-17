@@ -50,7 +50,7 @@ public static class DotOperatorILHelper
         // 1. 处理 this.member 访问（类环境内）
         if (local.InClassEnv is not null && left is LangId { IdName: "this" })
         {
-            return GenerateThisMemberAccess(right, ilGenerator, local, operation);
+            return GenerateThisMemberAccess(right, ilGenerator, local);
         }
 
         // 2. 处理实例方法调用
@@ -80,15 +80,13 @@ public static class DotOperatorILHelper
     private static Type GenerateThisMemberAccess(
         LangExpression? right,
         ILGenerator ilGenerator,
-        LocalManager local,
-        Operation operation)
+        LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldarg_0);
         if (right is not LangId rightId) return local.InClassEnv!;
 
         // 优先从 FieldVar 中查找字段（支持 TypeBuilder）
-        FieldInfo? fieldInfo = null;
-        if (local.FieldVar.TryGetValue(rightId.IdName, out fieldInfo))
+        if (local.FieldVar.TryGetValue(rightId.IdName, out var fieldInfo))
         {
             // 找到了字段
         }
@@ -152,7 +150,7 @@ public static class DotOperatorILHelper
         // 特殊处理Task静态方法调用
         if (left is LangId { IdName: "Task" })
         {
-            return GenerateTaskStaticMethodCall(instance, ilGenerator, local, operation);
+            return GenerateTaskStaticMethodCall(instance, ilGenerator, local);
         }
 
         // 尝试使用StaticClassCompiler处理全局静态类方法调用
@@ -231,15 +229,15 @@ public static class DotOperatorILHelper
                         continue;
 
                     // 如果类型完全匹配或者可以赋值
-                if (expectedType.IsAssignableFrom(actualType))
-                    continue;
+                    if (expectedType.IsAssignableFrom(actualType))
+                        continue;
 
-                // 如果实际类型是 object，且期望是值类型，允许（我们将尝试拆箱）
-                if (actualType == typeof(object) && expectedType.IsValueType)
-                    continue;
+                    // 如果实际类型是 object，且期望是值类型，允许（我们将尝试拆箱）
+                    if (actualType == typeof(object) && expectedType.IsValueType)
+                        continue;
 
-                return false;
-            }
+                    return false;
+                }
 
                 return true;
             });
@@ -285,8 +283,7 @@ public static class DotOperatorILHelper
     private static Type GenerateTaskStaticMethodCall(
         Instance instance,
         ILGenerator ilGenerator,
-        LocalManager local,
-        Operation operation)
+        LocalManager local)
     {
         // Task静态方法调用，如Task.Delay(100)
         var methodName = instance.Id.IdName;
@@ -331,7 +328,8 @@ public static class DotOperatorILHelper
             ilGenerator.Emit(OpCodes.Call, methodInfo);
             return typeof(Task);
         }
-        else if (paramTypes.Count == 2)
+
+        if (paramTypes.Count == 2)
         {
             // 调用 Task.Delay(int, CancellationToken)
             methodInfo = typeof(Task).GetMethod("Delay",
@@ -357,7 +355,6 @@ public static class DotOperatorILHelper
             fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
             // 参数已经在栈上，直接调用
             ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-            return typeof(Task<object>);
         }
 
         return typeof(Task<object>);
@@ -427,7 +424,6 @@ public static class DotOperatorILHelper
                 .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
             fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
             ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-            return typeof(Task<object>);
         }
 
         return typeof(Task<object>);
@@ -462,7 +458,6 @@ public static class DotOperatorILHelper
                 .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
             fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
             ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-            return typeof(Task<object>);
         }
 
         return typeof(Task<object>);
@@ -553,16 +548,11 @@ public static class DotOperatorILHelper
         }
 
         // 尝试查找精确匹配的方法
-        var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
-
         // 如果没有找到精确匹配，尝试查找参数数量匹配的方法
-        if (m is null)
-        {
-            m = leftType.GetMethods()
-                .FirstOrDefault(method =>
-                    method.Name == instance.Id.IdName &&
-                    method.GetParameters().Length == instance.Ids.Count);
-        }
+        var m = leftType!.GetMethod(instance.Id.IdName, [.. types]) ?? leftType.GetMethods()
+            .FirstOrDefault(method =>
+                method.Name == instance.Id.IdName &&
+                method.GetParameters().Length == instance.Ids.Count);
 
         // 如果找到了方法，检查参数类型是否需要拆箱
         if (m != null)
@@ -606,7 +596,7 @@ public static class DotOperatorILHelper
             {
                 extensionType = typeof(DictionaryExtensions);
             }
-            else if (leftType == typeof(int) || leftType == typeof(double) || 
+            else if (leftType == typeof(int) || leftType == typeof(double) ||
                      leftType == typeof(bool) || leftType == typeof(char))
             {
                 extensionType = typeof(PrimitiveExtensions);
@@ -664,16 +654,11 @@ public static class DotOperatorILHelper
                 types.CopyTo(extensionTypes, 1);
 
                 // 查找精确匹配的扩展方法
-                m = extensionType.GetMethod(instance.Id.IdName, extensionTypes);
-
                 // 如果没有找到精确匹配，尝试查找参数数量匹配的扩展方法
-                if (m is null)
-                {
-                    m = extensionType.GetMethods()
-                        .FirstOrDefault(method =>
-                            method.Name == instance.Id.IdName &&
-                            method.GetParameters().Length == instance.Ids.Count + 1); // +1 因为扩展方法有 this 参数
-                }
+                m = extensionType.GetMethod(instance.Id.IdName, extensionTypes) ?? extensionType.GetMethods()
+                    .FirstOrDefault(method =>
+                        method.Name == instance.Id.IdName &&
+                        method.GetParameters().Length == instance.Ids.Count + 1); // +1 因为扩展方法有 this 参数
 
                 // 如果找到了扩展方法，且左操作数是值类型但扩展方法期望引用类型（如接口），需要装箱
                 if (m != null && leftType.IsValueType && !m.GetParameters()[0].ParameterType.IsValueType)
@@ -763,7 +748,7 @@ public static class DotOperatorILHelper
             return typeof(int);
         }
 
-        var instanceField = leftType!.GetField(id.IdName);
+        var instanceField = leftType.GetField(id.IdName);
         if (instanceField is null)
         {
             var p = leftType.GetProperty(id.IdName);
@@ -808,28 +793,32 @@ public static class DotOperatorILHelper
             ilGenerator.Emit(OpCodes.Ldelem_Ref);
             return typeof(object);
         }
-        else if (leftType == typeof(List<object>))
+
+        if (leftType == typeof(List<object>))
         {
             // List<T>索引访问，调用索引器的getter方法
             var indexer = typeof(List<object>).GetProperty("Item")!;
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(object);
         }
-        else if (leftType == typeof(Dictionary<object, object>))
+
+        if (leftType == typeof(Dictionary<object, object>))
         {
             // Dictionary<TKey, TValue>索引访问，调用索引器的getter方法
             var indexer = typeof(Dictionary<object, object>).GetProperty("Item")!;
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(object);
         }
-        else if (leftType == typeof(string))
+
+        if (leftType == typeof(string))
         {
             // 字符串索引访问
             var indexer = typeof(string).GetProperty("Chars")!;
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(char);
         }
-        else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
+
+        if (leftType?.FullName?.StartsWith("System.ValueTuple") == true)
         {
             // ValueTuple 索引访问
             if (right is IntLangValue intVal)
@@ -844,7 +833,8 @@ public static class DotOperatorILHelper
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(object);
         }
-        else if (leftType == typeof(object))
+
+        if (leftType == typeof(object))
         {
             // Object类型，可能是字典、列表或数组
             // 策略：先存储到局部变量，然后依次尝试类型转换
@@ -984,16 +974,14 @@ public static class DotOperatorILHelper
             ilGenerator.Emit(OpCodes.Ldfld, field);
             return field.FieldType;
         }
-        else
-        {
-            var restField = tupleType.GetField("Rest");
-            if (restField == null)
-            {
-                throw new InvalidOperationException($"无法访问 ValueTuple 的索引 {index}: Rest 字段不存在");
-            }
 
-            ilGenerator.Emit(OpCodes.Ldfld, restField);
-            return GenerateValueTupleItemAccess(ilGenerator, restField.FieldType, index - 7);
+        var restField = tupleType.GetField("Rest");
+        if (restField == null)
+        {
+            throw new InvalidOperationException($"无法访问 ValueTuple 的索引 {index}: Rest 字段不存在");
         }
+
+        ilGenerator.Emit(OpCodes.Ldfld, restField);
+        return GenerateValueTupleItemAccess(ilGenerator, restField.FieldType, index - 7);
     }
 }

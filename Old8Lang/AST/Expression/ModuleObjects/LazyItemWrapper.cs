@@ -10,8 +10,8 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class LazyItemWrapper(string moduleNameItem, string itemName, VariateManager manager, SourcePosition position)
     : LangValueType(position), IModuleWrapper
 {
-    private bool Loaded;
-    private LangValueType? LoadedItem;
+    private bool _loaded;
+    private LangValueType? _loadedItem;
 
     /// <summary>
     /// 模块名称
@@ -21,17 +21,17 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <summary>
     /// 模块是否已加载
     /// </summary>
-    public bool IsLoaded => Loaded;
+    public bool IsLoaded => _loaded;
 
     /// <summary>
     /// 模块加载状态
     /// </summary>
-    public ModuleLoadingState LoadingState => Loaded ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
+    public ModuleLoadingState LoadingState => _loaded ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
 
     /// <summary>
     /// 是否已加载（包装器特定）
     /// </summary>
-    public bool IsWrapperLoaded => Loaded;
+    public bool IsWrapperLoaded => _loaded;
 
     /// <summary>
     /// 获取被包装的模块对象
@@ -50,7 +50,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <returns>符号值</returns>
     public LangValueType? GetSymbol(string symbolName)
     {
-        if (!Loaded)
+        if (!_loaded)
         {
             LoadItem();
         }
@@ -58,7 +58,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
         // 如果请求的符号名称与项目名称匹配，返回加载的项目
         if (string.Equals(symbolName, itemName, StringComparison.OrdinalIgnoreCase))
         {
-            return LoadedItem;
+            return _loadedItem;
         }
 
         return null;
@@ -80,12 +80,12 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <returns>符号名称列表</returns>
     public IEnumerable<string> GetExportedSymbols()
     {
-        if (!Loaded)
+        if (!_loaded)
         {
             LoadItem();
         }
 
-        return LoadedItem is not null ? [itemName] : [];
+        return _loadedItem is not null ? [itemName] : [];
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <param name="variateManager">变量管理器</param>
     public void EnsureLoaded(VariateManager variateManager)
     {
-        if (!Loaded)
+        if (!_loaded)
         {
             LoadItem();
         }
@@ -105,14 +105,14 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager currentManager)
     {
-        if (!Loaded)
+        if (!_loaded)
         {
             LoadItem();
         }
 
-        if (LoadedItem is not null)
+        if (_loadedItem is not null)
         {
-            return LoadedItem.Dot(dotExpression, currentManager);
+            return _loadedItem.Dot(dotExpression, currentManager);
         }
 
         throw new AttributeError(this, dotExpression + " is not callable", "LazyItem");
@@ -123,12 +123,12 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// </summary>
     public override bool Equal(LangValueType? otherValueType)
     {
-        if (!Loaded)
+        if (!_loaded)
         {
             LoadItem();
         }
 
-        return LoadedItem?.Equal(otherValueType) ?? false;
+        return _loadedItem?.Equal(otherValueType) ?? false;
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// </summary>
     private void LoadItem()
     {
-        if (Loaded) return;
+        if (_loaded) return;
 
         try
         {
@@ -148,14 +148,14 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
             // 查找导入的项目
             if (manager.Scopes.Count > 0 && manager.Scopes[^1].TryGetValue(itemName, out var item))
             {
-                LoadedItem = item;
+                _loadedItem = item;
             }
             else
             {
                 throw new ImportError(this, $"{moduleNameItem}.{itemName}", $"Item {itemName} not found");
             }
 
-            Loaded = true;
+            _loaded = true;
         }
         catch (Exception ex)
         {
@@ -164,7 +164,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     }
 
     public override string ToString() =>
-        Loaded ? LoadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleNameItem})";
+        _loaded ? _loadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleNameItem})";
 
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
     {

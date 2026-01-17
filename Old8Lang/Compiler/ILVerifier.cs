@@ -113,7 +113,7 @@ public class VerificationResult
     /// </summary>
     public VerificationResult()
     {
-        Errors = new List<VerificationError>();
+        Errors = [];
     }
 }
 

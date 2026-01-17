@@ -3,7 +3,6 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using System.Reflection.Emit;
 using Old8Lang.Interpreter;
-using System.Reflection;
 
 namespace Old8Lang.AST.Expression;
 
@@ -41,7 +40,7 @@ public partial class FunctionCallExpression : LangExpression
     {
         FunctionExpression = functionExpression;
         Arguments = arguments;
-        NamedArguments = new List<NamedArgument>();
+        NamedArguments = [];
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ public partial class FunctionCallExpression : LangExpression
         }
 
         // 3. 如果是泛型函数且未实例化，尝试自动推断类型参数
-        if (func.IsGeneric && func.TypeArgumentMapping is null)
+        if (func is { IsGeneric: true, TypeArgumentMapping: null })
         {
             // 尝试从参数推断类型
             if (manager.Interpreter is null)
@@ -107,7 +106,7 @@ public partial class FunctionCallExpression : LangExpression
     public override string ToString()
     {
         var args = new List<string>();
-        args.AddRange(Arguments.Select(arg => arg.ToString()));
+        args.AddRange(Arguments.Select(arg => arg.ToString())!);
         args.AddRange(NamedArguments.Select(na => na.ToString()));
         var argsStr = string.Join(", ", args);
         return $"{FunctionExpression}({argsStr})";
@@ -117,7 +116,7 @@ public partial class FunctionCallExpression : LangExpression
     {
         // 1. 尝试分析函数表达式的类型
         var funcType = FunctionExpression.OutputType(local);
-        
+
         // 2. 如果是委托类型（包括 Action/Func），获取 Invoke 方法的返回类型
         if (typeof(Delegate).IsAssignableFrom(funcType))
         {
@@ -127,23 +126,23 @@ public partial class FunctionCallExpression : LangExpression
                 return invokeMethod.ReturnType;
             }
         }
-        
+
         // 3. 如果是 LangId，尝试从 DelegateVar 中查找（针对直接函数调用）
         if (FunctionExpression is LangId funcId)
         {
             // 尝试构建委托键查找
             // 这里有一个循环依赖问题：我们需要参数类型来构建键，但参数类型推断可能依赖于函数返回类型？
             // 通常参数类型是独立的。
-            try 
+            try
             {
                 var paramTypes = Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
                 var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
                 var delegateKey = $"{funcId.IdName}${paramTypeNames}";
-                
+
                 if (local.DelegateVar.TryGetValue(delegateKey, out var method))
                 {
                     if (method is DynamicMethod dm) return dm.ReturnType;
-                    if (method is MethodInfo mi) return mi.ReturnType;
+                    return method.ReturnType;
                 }
             }
             catch
@@ -153,7 +152,7 @@ public partial class FunctionCallExpression : LangExpression
         }
 
         // return typeof(object);
-        
+
         // 如果无法推断，返回 object
         // 这是一个妥协，允许编译继续，但在运行时可能会有问题（除非我们处理了 object）
         // 如果是 Async 函数，通常返回 Task<object>
@@ -161,9 +160,9 @@ public partial class FunctionCallExpression : LangExpression
         {
             return typeof(Task<object>);
         }
-        
+
         return typeof(object);
-        
+
         // Debug:
         // throw new InvalidOperationError(this, $"无法推断函数调用返回类型。函数表达式类型: {funcType.FullName}, IsDelegate: {typeof(Delegate).IsAssignableFrom(funcType)}");
     }
@@ -177,13 +176,14 @@ public partial class FunctionCallExpression : LangExpression
             var paramTypes = Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
             var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
             var delegateKey = $"{funcName}${paramTypeNames}";
-            
+
             if (local.DelegateVar.TryGetValue(delegateKey, out var method))
             {
                 foreach (var arg in Arguments)
                 {
                     arg.LoadIlValue(ilGenerator, local);
                 }
+
                 ilGenerator.Emit(OpCodes.Call, method);
                 return;
             }
@@ -193,7 +193,7 @@ public partial class FunctionCallExpression : LangExpression
         // 加载函数表达式（期望是一个委托实例）
         FunctionExpression.LoadIlValue(ilGenerator, local);
         var funcType = FunctionExpression.OutputType(local);
-        
+
         if (typeof(Delegate).IsAssignableFrom(funcType))
         {
             var invokeMethod = funcType.GetMethod("Invoke");
@@ -204,7 +204,7 @@ public partial class FunctionCallExpression : LangExpression
                 {
                     arg.LoadIlValue(ilGenerator, local);
                 }
-                
+
                 // 调用委托的 Invoke 方法
                 ilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
                 return;

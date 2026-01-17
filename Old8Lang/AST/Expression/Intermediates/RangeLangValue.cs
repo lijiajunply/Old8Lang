@@ -38,8 +38,8 @@ public partial class RangeLangValue(
     {
         var results = new List<LangValueType>();
 
-        var startValue = start?.Run(manager);
-        var endValue = end?.Run(manager);
+        var startValue = Start?.Run(manager);
+        var endValue = End?.Run(manager);
 
         if (startValue is not IntLangValue startIntValue || endValue is not IntLangValue endIntValue)
             throw new TypeError(this, "IntValue",
@@ -82,10 +82,10 @@ public partial class RangeLangValue(
 
         // 为了简化，我们直接调用一个辅助方法来生成范围数组
         // 加载起始值
-        start?.LoadIlValue(ilGenerator, local);
+        Start?.LoadIlValue(ilGenerator, local);
 
         // 加载结束值
-        end?.LoadIlValue(ilGenerator, local);
+        End?.LoadIlValue(ilGenerator, local);
 
         // 加载 includeStart
         ilGenerator.Emit(IncludeStart ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
@@ -145,6 +145,6 @@ public partial class RangeLangValue(
     {
         var startSymbol = IncludeStart ? "[" : "(";
         var endSymbol = IncludeEnd ? "]" : ")";
-        return $"{startSymbol}{start}~{end}{endSymbol}";
+        return $"{startSymbol}{Start}~{End}{endSymbol}";
     }
 }

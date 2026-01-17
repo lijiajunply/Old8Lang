@@ -77,11 +77,11 @@ public partial class AwaitExpression : LangExpression
 
         // 获取表达式的输出类型
         var exprType = Expression.OutputType(local);
-        
+
         // 检查是否在异步状态机中
         if (local.AsyncStateMachineGenerator != null && Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
         {
-            GenerateAsyncAwait(ilGenerator, local, exprType);
+            if (exprType != null) GenerateAsyncAwait(ilGenerator, local, exprType);
             return;
         }
 
@@ -124,7 +124,7 @@ public partial class AwaitExpression : LangExpression
         // 现在栈上是 Task<object>，调用 GetAwaiter() 方法获取等待器
         // 注意：这里假设如果是泛型 Task，一定是 Task<object>，或者至少有 GetAwaiter
         // 如果是 Task<T>，GetAwaiter 返回 TaskAwaiter<T>
-        var getAwaiterMethod = exprType.GetMethod("GetAwaiter")!;
+        var getAwaiterMethod = exprType?.GetMethod("GetAwaiter")!;
         ilGenerator.Emit(OpCodes.Callvirt, getAwaiterMethod);
 
         // 获取等待器类型
@@ -170,10 +170,10 @@ public partial class AwaitExpression : LangExpression
     {
         var generator = local.AsyncStateMachineGenerator!;
         var stateIndex = generator.GetStateIndex(this);
-        
+
         // 1. 获取 Awaiter
         // 栈上已有 Task 对象
-        
+
         // 如果类型是 object，尝试转换为 Task<object>
         if (exprType == typeof(object))
         {
@@ -182,49 +182,52 @@ public partial class AwaitExpression : LangExpression
         }
 
         var getAwaiterMethod = exprType.GetMethod("GetAwaiter")!;
-        if (getAwaiterMethod == null) throw new InvalidOperationException($"Cannot find GetAwaiter on {exprType.FullName}");
-        
+        if (getAwaiterMethod == null)
+            throw new InvalidOperationException($"Cannot find GetAwaiter on {exprType.FullName}");
+
         il.Emit(OpCodes.Callvirt, getAwaiterMethod);
-        
+
         var awaiterType = getAwaiterMethod.ReturnType;
         var awaiterLocal = il.DeclareLocal(awaiterType);
         il.Emit(OpCodes.Stloc, awaiterLocal);
-        
+
         // 2. 检查 IsCompleted
         var isCompletedProperty = awaiterType.GetProperty("IsCompleted")!;
-        if (isCompletedProperty == null) throw new InvalidOperationException($"Cannot find IsCompleted property on {awaiterType.FullName}");
-        
+        if (isCompletedProperty == null)
+            throw new InvalidOperationException($"Cannot find IsCompleted property on {awaiterType.FullName}");
+
         var isCompletedGetMethod = isCompletedProperty.GetGetMethod() ?? awaiterType.GetMethod("get_IsCompleted");
-        
+
         if (isCompletedGetMethod == null)
         {
-             // Fallback: try to find on interface or explicit impl?
-             // TaskAwaiter struct has public IsCompleted.
-             throw new InvalidOperationException($"Cannot find IsCompleted getter on {awaiterType.FullName}");
+            // Fallback: try to find on interface or explicit impl?
+            // TaskAwaiter struct has public IsCompleted.
+            throw new InvalidOperationException($"Cannot find IsCompleted getter on {awaiterType.FullName}");
         }
-        
+
         il.Emit(OpCodes.Ldloca, awaiterLocal);
         il.Emit(OpCodes.Call, isCompletedGetMethod);
-        
+
         var fastPathLabel = il.DefineLabel();
         il.Emit(OpCodes.Brtrue, fastPathLabel);
-        
+
         // 3. 挂起 (Yield)
         generator.EmitAwaitYield(il, stateIndex, awaiterLocal);
-        
+
         // 4. 恢复 (Resume) - 也是 Switch 的跳转目标
         generator.EmitAwaitResume(il, stateIndex, awaiterLocal);
-        
+
         // 5. 快速路径 / 恢复后执行
         il.MarkLabel(fastPathLabel);
-        
+
         // 6. 获取结果
         il.Emit(OpCodes.Ldloca, awaiterLocal);
         var getResultMethod = awaiterType.GetMethod("GetResult")!;
-        if (getResultMethod == null) throw new InvalidOperationException($"Cannot find GetResult on {awaiterType.FullName}");
-        
+        if (getResultMethod == null)
+            throw new InvalidOperationException($"Cannot find GetResult on {awaiterType.FullName}");
+
         il.Emit(OpCodes.Call, getResultMethod);
-        
+
         // 如果 GetResult 返回 void (例如 Task)，我们需要压入 null 以保持表达式值的一致性
         if (getResultMethod.ReturnType == typeof(void))
         {
@@ -240,15 +243,15 @@ public partial class AwaitExpression : LangExpression
         // await Task<T> 返回 T
         var exprType = Expression.OutputType(local);
         if (exprType == typeof(Task)) return typeof(object); // Task 返回 void -> null
-        
+
         // 检查是否是泛型 Task<T>
-        if (exprType.IsGenericType && exprType.GetGenericTypeDefinition() == typeof(Task<>))
+        if (exprType is { IsGenericType: true } && exprType.GetGenericTypeDefinition() == typeof(Task<>))
         {
             return exprType.GetGenericArguments()[0];
         }
-        
+
         // 鸭子类型：查找 GetAwaiter().GetResult() 返回类型
-        var getAwaiter = exprType.GetMethod("GetAwaiter");
+        var getAwaiter = exprType?.GetMethod("GetAwaiter");
         if (getAwaiter != null)
         {
             var awaiterType = getAwaiter.ReturnType;
@@ -260,7 +263,7 @@ public partial class AwaitExpression : LangExpression
                 return resultType;
             }
         }
-        
+
         return typeof(object);
     }
 }

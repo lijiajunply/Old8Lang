@@ -76,7 +76,6 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                 if (manager.ControlFlowManager.ContinueFlag)
                 {
                     manager.ControlFlowManager.ContinueFlag = false;
-                    continue;
                 }
             }
         }

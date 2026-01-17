@@ -26,12 +26,12 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 生成器当前状态
     /// </summary>
-    public GeneratorState State { get; set; } = GeneratorState.Suspended;
+    public GeneratorState State { get; private set; } = GeneratorState.Suspended;
 
     /// <summary>
     /// 生成器迭代器的下一个值
     /// </summary>
-    public LangValueType? NextValue { get; set; }
+    public LangValueType? NextValue { get; private set; }
 
     /// <summary>
     /// 生成器函数的参数值
@@ -208,8 +208,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
             [],
             new BlockStatement(new List<OldStatement>()),
             null,
-            Position,
-            false
+            Position
         );
 
         return new GeneratorLangValue(slicedFunc, Position);
@@ -244,14 +243,6 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     public bool In(LangValueType value)
     {
         // 迭代生成器，检查是否包含指定值
-        foreach (var item in GetItems())
-        {
-            if (item.ToString() == value.ToString())
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return GetItems().Any(item => item.ToString() == value.ToString());
     }
 }

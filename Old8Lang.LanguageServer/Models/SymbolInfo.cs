@@ -33,7 +33,7 @@ public class SymbolInfo
     /// <summary>
     /// 符号的引用位置列表
     /// </summary>
-    public List<SourceLocation> References { get; set; } = new();
+    public List<SourceLocation> References { get; set; } = [];
 
     /// <summary>
     /// 成员列表（仅对类有效）
@@ -60,19 +60,19 @@ public class SymbolInfo
     /// 函数/方法的参数列表（仅对函数和方法有效）
     /// 存储参数符号信息，包括参数名称、类型和位置
     /// </summary>
-    public List<SymbolInfo> Parameters { get; set; } = new();
+    public List<SymbolInfo> Parameters { get; set; } = [];
 
     /// <summary>
     /// 调用的其他函数列表 (用于调用层次)
     /// 存储此函数/方法调用的其他函数的名称和位置
     /// </summary>
-    public List<CallSite> Calls { get; set; } = new();
+    public List<CallSite> Calls { get; set; } = [];
 
     /// <summary>
     /// 被哪些函数调用 (用于调用层次)
     /// 存储调用此函数/方法的其他函数的名称和位置
     /// </summary>
-    public List<CallSite> CalledBy { get; set; } = new();
+    public List<CallSite> CalledBy { get; set; } = [];
 }
 
 /// <summary>

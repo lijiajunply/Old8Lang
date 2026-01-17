@@ -36,7 +36,7 @@ public class FileLibTests
     {
         // Arrange
         string testFile = Path.GetTempFileName();
-        string[] testLines = { "Line 1", "Line 2", "Line 3" };
+        string[] testLines = ["Line 1", "Line 2", "Line 3"];
         
         try
         {
@@ -226,12 +226,13 @@ public class FileLibTests
     {
         // Arrange
         string testFile = Path.GetTempFileName();
-        string[][] testData = {
-            new[] { "Name", "Age", "City" },
-            new[] { "Alice", "25", "New York" },
-            new[] { "Bob", "30", "London" },
-            new[] { "Charlie", "35", "Paris" }
-        };
+        string[][] testData =
+        [
+            ["Name", "Age", "City"],
+            ["Alice", "25", "New York"],
+            ["Bob", "30", "London"],
+            ["Charlie", "35", "Paris"]
+        ];
         
         try
         {

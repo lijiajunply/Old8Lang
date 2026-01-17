@@ -14,13 +14,11 @@ namespace Old8Lang.AST.Expression.Value;
 public class NativeDelegateFuncLangValue(
     string idName,
     Delegate delegateInstance,
-    FuncLangValue? funcSignature = null,
     SourcePosition position = default)
     : ImportInfo(position)
 {
     public readonly LangId Id = new(idName);
-    private readonly Delegate DelegateInstance = delegateInstance;
-    private readonly FuncLangValue? FuncSignature = funcSignature;
+    private readonly Delegate _delegateInstance = delegateInstance;
 
     /// <summary>
     /// 执行原生委托函数
@@ -35,11 +33,11 @@ public class NativeDelegateFuncLangValue(
         try
         {
             // 入栈：记录函数调用
-            Old8Exception.PushCallStack(DelegateInstance.Method.Name, Position);
+            Old8Exception.PushCallStack(_delegateInstance.Method.Name, Position);
 
             // 使用委托缓存优化反射调用性能
             // 重要: 传递委托实例作为 instance 参数
-            result = MethodInvokerCache.Invoke(DelegateInstance.Method, DelegateInstance, convertedValues);
+            result = MethodInvokerCache.Invoke(_delegateInstance.Method, _delegateInstance, convertedValues);
         }
         catch (TargetInvocationException ex) when (ex.InnerException is not null)
         {
@@ -83,14 +81,14 @@ public class NativeDelegateFuncLangValue(
     {
         if (obj is NativeDelegateFuncLangValue other)
         {
-            return Id.IdName == other.Id.IdName && DelegateInstance == other.DelegateInstance;
+            return Id.IdName == other.Id.IdName && _delegateInstance == other._delegateInstance;
         }
         return false;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id.IdName, DelegateInstance);
+        return HashCode.Combine(Id.IdName, _delegateInstance);
     }
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)

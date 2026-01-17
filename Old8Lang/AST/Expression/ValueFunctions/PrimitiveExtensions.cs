@@ -10,41 +10,55 @@ public static class PrimitiveExtensions
 {
     #region Int Extensions
 
-    public static int ToInt(this int val) => val;
-    public static double ToDouble(this int val) => Convert.ToDouble(val);
-    public static bool ToBool(this int val) => val != 0;
-    public static char ToChar(this int val)
+    extension(int val)
     {
-        if (val >= 0 && val <= 65535) return (char)val;
-        throw new FormatException($"Integer value {val} is out of valid character range");
+        public int ToInt() => val;
+        public double ToDouble() => Convert.ToDouble(val);
+        public bool ToBool() => val != 0;
+
+        public char ToChar()
+        {
+            if (val is >= 0 and <= 65535) return (char)val;
+            throw new FormatException($"Integer value {val} is out of valid character range");
+        }
+
+        public string ToStr() => val.ToString();
     }
-    public static string ToStr(this int val) => val.ToString();
 
     #endregion
 
     #region Double Extensions
 
-    public static int ToInt(this double val) => Convert.ToInt32(val);
-    public static double ToDouble(this double val) => val;
-    public static bool ToBool(this double val) => val != 0.0;
-    public static string ToStr(this double val) => val.ToString(CultureInfo.InvariantCulture);
+    extension(double val)
+    {
+        public int ToInt() => Convert.ToInt32(val);
+        public double ToDouble() => val;
+        public bool ToBool() => val != 0.0;
+        public string ToStr() => val.ToString(CultureInfo.InvariantCulture);
+    }
 
     #endregion
 
     #region Bool Extensions
 
-    public static int ToInt(this bool val) => val ? 1 : 0;
-    public static double ToDouble(this bool val) => val ? 1.0 : 0.0;
-    public static bool ToBool(this bool val) => val;
-    public static string ToStr(this bool val) => val ? "true" : "false";
+    extension(bool val)
+    {
+        public int ToInt() => val ? 1 : 0;
+        public double ToDouble() => val ? 1.0 : 0.0;
+        public bool ToBool() => val;
+        public string ToStr() => val ? "true" : "false";
+    }
 
     #endregion
 
     #region Char Extensions
 
-    public static int ToInt(this char val) => Convert.ToInt32(val);
-    public static char ToChar(this char val) => val;
-    public static string ToStr(this char val) => val.ToString();
+    extension(char val)
+    {
+        public int ToInt() => Convert.ToInt32(val);
+        public char ToChar() => val;
+        public string ToStr() => val.ToString();
+    }
 
     #endregion
 }

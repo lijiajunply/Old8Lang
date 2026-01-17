@@ -720,7 +720,7 @@ public class TypeConversionTests
         var manager = new Old8Lang.Interpreter.VariateManager();
 
         // Act - 调用无参数方法
-        var descInstance = new Instance(new LangId("GetDescription"), new List<LangExpression>());
+        var descInstance = new Instance(new LangId("GetDescription"), []);
         var descResult = langValue.Dot(descInstance, manager);
 
         // Assert
@@ -733,7 +733,7 @@ public class TypeConversionTests
         // Act - 调用带参数方法
         var addInstance = new Instance(
             new LangId("Add"),
-            new List<LangExpression> { new IntLangValue(10), new IntLangValue(20) }
+            [new IntLangValue(10), new IntLangValue(20)]
         );
         var addResult = langValue.Dot(addInstance, manager);
 

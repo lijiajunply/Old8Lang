@@ -13,7 +13,7 @@ public class PerformanceSummary
     /// <summary>
     /// 性能瓶颈列表
     /// </summary>
-    public List<PerformanceBottleneck> Bottlenecks { get; set; } = new();
+    public List<PerformanceBottleneck> Bottlenecks { get; set; } = [];
     
     /// <summary>
     /// 总体性能分数（0-100，100最优）

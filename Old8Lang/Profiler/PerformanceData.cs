@@ -130,7 +130,7 @@ public class FunctionPerformanceStats
     /// <summary>
     /// 执行时间历史记录
     /// </summary>
-    public List<double> ExecutionTimes { get; set; } = new();
+    public List<double> ExecutionTimes { get; set; } = [];
     
     /// <summary>
     /// 添加执行时间记录
@@ -304,12 +304,12 @@ public class ProfilingSession
     /// <summary>
     /// 内存使用历史
     /// </summary>
-    public List<MemoryUsageStats> MemoryHistory { get; set; } = new();
+    public List<MemoryUsageStats> MemoryHistory { get; set; } = [];
     
     /// <summary>
     /// 通用性能数据点
     /// </summary>
-    public List<PerformanceDataPoint> DataPoints { get; set; } = new();
+    public List<PerformanceDataPoint> DataPoints { get; set; } = [];
     
     /// <summary>
     /// 源文件路径

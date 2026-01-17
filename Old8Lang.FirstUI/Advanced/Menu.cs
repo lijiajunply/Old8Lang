@@ -14,7 +14,7 @@ public class Menu : WidgetBase
     /// <summary>
     /// 菜单项列表
     /// </summary>
-    public List<MenuItem> Items { get; set; } = new();
+    public List<MenuItem> Items { get; set; } = [];
 
     /// <summary>
     /// 菜单方向

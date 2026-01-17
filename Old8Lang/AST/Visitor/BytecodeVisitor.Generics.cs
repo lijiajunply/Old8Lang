@@ -85,7 +85,7 @@ public partial class BytecodeVisitor
         var specializedFunc = CreateSpecializedMethod(genericFunc, typeMapping);
 
         // 提取参数名称
-        var paramNames = specializedFunc.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+        var paramNames = specializedFunc.Ids?.Select(id => id.IdName).ToList() ?? [];
 
         // 提取默认参数值
         var defaultValues = new List<object?>();

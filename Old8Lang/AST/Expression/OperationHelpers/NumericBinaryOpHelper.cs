@@ -112,7 +112,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -175,7 +175,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -239,7 +239,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -297,7 +297,7 @@ internal static class NumericBinaryOpHelper
         }
 
         // 确保操作数是int类型
-        EnsureIntType(ilGenerator, leftType, rightType);
+        // EnsureIntType(ilGenerator, leftType, rightType);
 
         ilGenerator.Emit(OpCodes.Mul);
         return typeof(int);
@@ -322,7 +322,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -397,7 +397,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -496,7 +496,7 @@ internal static class NumericBinaryOpHelper
             right?.LoadIlValue(ilGenerator, local);
 
             // 如果右操作数是值类型，需要装箱
-            if (rightType != null && rightType.IsValueType)
+            if (rightType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, rightType);
             }
@@ -558,21 +558,6 @@ internal static class NumericBinaryOpHelper
 
         // 否则返回double类型
         return typeof(double);
-    }
-
-    /// <summary>
-    /// 确保操作数是int类型（用于乘法运算）
-    /// </summary>
-    private static void EnsureIntType(ILGenerator ilGenerator, Type? leftType, Type? rightType)
-    {
-        // 注意：此时栈上已有 [left_value, right_value]
-        // 不需要再次加载，只需要类型转换
-
-        // 由于栈是后进先出，需要先处理right，再处理left
-        // 但这里的逻辑假设已经在正确位置了
-
-        // 暂时保持原有逻辑，因为这部分比较复杂
-        // 实际上原代码中这部分逻辑不会执行到（已经在前面处理了object类型）
     }
 
     /// <summary>

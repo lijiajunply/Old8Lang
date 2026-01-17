@@ -6,36 +6,39 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 /// </summary>
 public static class ArrayExtensions
 {
-    /// <summary>
-    /// 获取数组长度
-    /// </summary>
-    public static int Length(this object?[] array)
+    extension(object?[] array)
     {
-        return array.Length;
-    }
+        /// <summary>
+        /// 获取数组长度
+        /// </summary>
+        public int Length()
+        {
+            return array.Length;
+        }
 
-    /// <summary>
-    /// 检查数组是否包含指定元素
-    /// </summary>
-    public static bool Contains(this object?[] array, object? item)
-    {
-        return array.Contains(item);
-    }
+        /// <summary>
+        /// 检查数组是否包含指定元素
+        /// </summary>
+        public bool Contains(object? item)
+        {
+            return array.Contains(item);
+        }
 
-    /// <summary>
-    /// 转换为字符串表示
-    /// </summary>
-    public static string ToStr(this object?[] array)
-    {
-        var items = array.Select(item => item?.ToString() ?? "null");
-        return "[" + string.Join(", ", items) + "]";
-    }
+        /// <summary>
+        /// 转换为字符串表示
+        /// </summary>
+        public string ToStr()
+        {
+            var items = array.Select(item => item?.ToString() ?? "null");
+            return "[" + string.Join(", ", items) + "]";
+        }
 
-    /// <summary>
-    /// 转换为列表
-    /// </summary>
-    public static List<object?> ToList(this object?[] array)
-    {
-        return Enumerable.ToList(array);
+        /// <summary>
+        /// 转换为列表
+        /// </summary>
+        public List<object?> ToList()
+        {
+            return Enumerable.ToList(array);
+        }
     }
 }

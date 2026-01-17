@@ -97,7 +97,7 @@ public partial class CancellationTokenLangValue : LangValueType
 
             return methodName switch
             {
-                "ThrowIfCancellationRequested" => CallThrowIfCancellationRequested(instance.Ids, manager),
+                "ThrowIfCancellationRequested" => CallThrowIfCancellationRequested(instance.Ids),
                 _ => throw new AttributeError(instance.Position, methodName, "CancellationToken")
             };
         }
@@ -105,7 +105,7 @@ public partial class CancellationTokenLangValue : LangValueType
         return base.Dot(dotExpression, manager);
     }
 
-    private LangValueType CallThrowIfCancellationRequested(List<LangExpression> args, VariateManager manager)
+    private LangValueType CallThrowIfCancellationRequested(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -130,7 +130,7 @@ public partial class CancellationTokenLangValue : LangValueType
     /// <summary>
     /// 获取 .NET 类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(CancellationToken);
     }

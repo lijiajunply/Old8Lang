@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class TaskCompletionSourceLangValue : LangValueType
 {
-    private readonly TaskCompletionSource<LangValueType> Tcs;
+    private readonly TaskCompletionSource<LangValueType> _tcs;
 
     /// <summary>
     /// 获取关联的 Task
@@ -22,7 +22,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     {
         get
         {
-            field ??= new TaskLangValue(Tcs.Task, CancellationToken.None, Position);
+            field ??= new TaskLangValue(_tcs.Task, CancellationToken.None, Position);
 
             return field;
         }
@@ -34,7 +34,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     public TaskCompletionSourceLangValue(SourcePosition position = default)
         : base(position)
     {
-        Tcs = new TaskCompletionSource<LangValueType>();
+        _tcs = new TaskCompletionSource<LangValueType>();
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetResult(LangValueType result)
     {
-        return Tcs.TrySetResult(result);
+        return _tcs.TrySetResult(result);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetException(Exception exception)
     {
-        return Tcs.TrySetException(exception);
+        return _tcs.TrySetException(exception);
     }
 
     /// <summary>
@@ -58,13 +58,13 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetCanceled()
     {
-        return Tcs.TrySetCanceled();
+        return _tcs.TrySetCanceled();
     }
 
     /// <summary>
     /// 获取底层 TaskCompletionSource 对象
     /// </summary>
-    public override object GetValue() => Tcs;
+    public override object GetValue() => _tcs;
 
     /// <summary>
     /// 类型字符串表示
@@ -76,7 +76,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        var taskStatus = Tcs.Task.Status;
+        var taskStatus = _tcs.Task.Status;
         return $"TaskCompletionSource(Task Status: {taskStatus})";
     }
 
@@ -111,10 +111,10 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             {
                 "SetResult" => CallSetResult(instance.Ids, manager),
                 "SetException" => CallSetException(instance.Ids, manager),
-                "SetCanceled" => CallSetCanceled(instance.Ids, manager),
+                "SetCanceled" => CallSetCanceled(instance.Ids),
                 "TrySetResult" => CallTrySetResult(instance.Ids, manager),
                 "TrySetException" => CallTrySetException(instance.Ids, manager),
-                "TrySetCanceled" => CallTrySetCanceled(instance.Ids, manager),
+                "TrySetCanceled" => CallTrySetCanceled(instance.Ids),
                 _ => throw new AttributeError(instance.Position, methodName, "TaskCompletionSource")
             };
         }
@@ -157,7 +157,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallSetCanceled(List<LangExpression> args, VariateManager manager)
+    private LangValueType CallSetCanceled(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -203,7 +203,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new BoolLangValue(success, Position);
     }
 
-    private LangValueType CallTrySetCanceled(List<LangExpression> args, VariateManager manager)
+    private LangValueType CallTrySetCanceled(List<LangExpression> args)
     {
         if (args.Count != 0)
         {

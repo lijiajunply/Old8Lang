@@ -12,7 +12,10 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="baseIndex">基础索引访问，如 array[index1]</param>
 /// <param name="nestedIndex">嵌套索引，如 [index2]</param>
 /// <param name="position">源代码位置</param>
-public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression nestedIndex, SourcePosition position = default)
+public partial class NestedIndexAccess(
+    LangListItem baseIndex,
+    LangExpression nestedIndex,
+    SourcePosition position = default)
     : LangValueType(position)
 {
     public readonly LangListItem BaseIndex = baseIndex;
@@ -40,7 +43,7 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
 
         if (baseResult is DictionaryLangValue dict)
         {
-            if (NestedIndex.Run(manager) is not LangValueType keyResult)
+            if (NestedIndex.Run(manager) is not { } keyResult)
                 throw new TypeError(this, "ValueType", NestedIndex.Run(manager).GetType().Name);
             return dict.Get(keyResult);
         }
@@ -54,12 +57,12 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
 
         if (baseResult is TupleLangValue tuple)
         {
-            if (NestedIndex.Run(manager) is not IntLangValue intResult)
-                throw new TypeError(this, "IntValue", NestedIndex.Run(manager).GetType().Name);
-            return tuple.Get(intResult);
+            return NestedIndex.Run(manager) is not IntLangValue intResult
+                ? throw new TypeError(this, "IntValue", NestedIndex.Run(manager).GetType().Name)
+                : tuple.Get(intResult);
         }
 
-        throw new InvalidOperationError(this, $"不支持的嵌套索引访问类型: {baseResult?.GetType().Name ?? "null"}");
+        throw new InvalidOperationError(this, $"不支持的嵌套索引访问类型: {baseResult.GetType().Name}");
     }
 
     public override string ToString() => $"{BaseIndex}[{NestedIndex}]";
@@ -127,6 +130,7 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             {
                 ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
             }
+
             var indexLocal = ilGenerator.DeclareLocal(typeof(int));
             ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
 
@@ -148,10 +152,13 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
 
             var indexType = NestedIndex.OutputType(local);
 
-            OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
-                ilGenerator,
-                indexType
-            );
+            if (indexType != null)
+            {
+                OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
+                    ilGenerator,
+                    indexType
+                );
+            }
         }
         else
         {
@@ -198,7 +205,6 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
             }
 
             // 如果索引不是常量，返回 object（因为 ITuple 索引器返回 object）
-            return typeof(object);
         }
 
         return typeof(object);
@@ -261,6 +267,7 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
                 ilGenerator.Emit(OpCodes.Ldfld, fieldInfo);
                 return;
             }
+
             throw new InvalidOperationError(this, $"找不到元组字段: {fieldName}");
         }
 
@@ -284,23 +291,5 @@ public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression ne
         {
             throw new InvalidOperationError(this, $"Rest 字段类型不是 ValueTuple: {restType.Name}");
         }
-    }
-
-    /// <summary>
-    /// 获取 ValueTuple 指定索引位置的字段信息（仅用于前 7 个元素）
-    /// </summary>
-    private System.Reflection.FieldInfo? GetValueTupleField(Type tupleType, int index)
-    {
-        if (index < 0) return null;
-
-        // 如果索引在前 7 个元素范围内
-        if (index < 7)
-        {
-            var fieldName = GetValueTupleFieldName(index);
-            return tupleType.GetField(fieldName);
-        }
-
-        // 对于超过 7 个元素的情况，返回 null（需要使用 LoadValueTupleField 递归处理）
-        return null;
     }
 }

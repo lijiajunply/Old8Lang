@@ -140,7 +140,7 @@ public class ImportError : RuntimeError
             "请检查模块导入关系，避免循环依赖")
     {
         ModuleName = moduleName;
-        AttemptedPaths = new List<string>();
+        AttemptedPaths = [];
     }
 
     /// <summary>

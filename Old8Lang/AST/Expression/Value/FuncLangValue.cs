@@ -24,7 +24,7 @@ public class FuncLangValue : ImportInfo
 
     public readonly MethodInfo? Method;
 
-    private readonly FuncLangValue? Func;
+    private readonly FuncLangValue? _func;
 
     // 闭包环境：捕获的作用域，用于支持闭包变量访问
     internal VariateManager? CapturedScope { get; init; }
@@ -42,7 +42,7 @@ public class FuncLangValue : ImportInfo
 
     /// <summary>
     /// 泛型参数列表
-    /// 例如: func map<T, U>(...) 中的 [T, U]
+    /// 例如: func map&lt;T, U>(...) 中的 [T, U]
     /// </summary>
     public readonly List<GenericParameter>? GenericParameters;
 
@@ -53,7 +53,7 @@ public class FuncLangValue : ImportInfo
 
     /// <summary>
     /// 当前实例的类型参数映射（用于泛型实例化）
-    /// 例如: map<int, string> 时为 {"T": int, "U": string}
+    /// 例如: map&lt;int, string> 时为 {"T": int, "U": string}
     /// </summary>
     public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; set; }
 
@@ -90,7 +90,7 @@ public class FuncLangValue : ImportInfo
     {
         Id = new LangId(idName);
         Method = methodInfo;
-        Func = func;
+        _func = func;
         IsLambda = false; // 原生方法不是Lambda表达式
         GenericParameters = null; // 原生方法暂不支持泛型
     }
@@ -153,11 +153,12 @@ public class FuncLangValue : ImportInfo
                 if (Ids.Count > 0)
                 {
                     // 对于生成器函数，我们需要创建一个闭包，捕获当前作用域
-                    var generatorClosure = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
-                    {
-                        // 生成器需要独立的作用域副本，使用深拷贝
-                        CapturedScope = manager.Clone()
-                    };
+                    var generatorClosure =
+                        new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
+                        {
+                            // 生成器需要独立的作用域副本，使用深拷贝
+                            CapturedScope = manager.Clone()
+                        };
 
                     return new GeneratorLangValue(generatorClosure, Position);
                 }
@@ -201,7 +202,7 @@ public class FuncLangValue : ImportInfo
         }
 
         // 创建带有捕获作用域的函数副本
-        return new FuncLangValue(Id, Ids ?? new List<LangId>(), BlockStatement, GenericParameters, Position, IsLambda)
+        return new FuncLangValue(Id, Ids ?? [], BlockStatement, GenericParameters, Position, IsLambda)
         {
             CapturedScope = manager.Clone()
         };
@@ -263,7 +264,7 @@ public class FuncLangValue : ImportInfo
         }
 
         // 将命名参数转换为位置参数
-        var reorderedArgs = ReorderArgumentsWithNamedParameters(positionalArgs, namedArgs, callPosition, variateManagerFunc);
+        var reorderedArgs = ReorderArgumentsWithNamedParameters(positionalArgs, namedArgs, callPosition);
 
         // 使用重新排序后的参数调用原有方法
         return Run(variateManagerFunc, reorderedArgs, obj);
@@ -275,13 +276,11 @@ public class FuncLangValue : ImportInfo
     /// <param name="positionalArgs">位置参数列表</param>
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
-    /// <param name="manager">变量管理器</param>
     /// <returns>重新排序后的参数列表</returns>
     private List<LangExpression> ReorderArgumentsWithNamedParameters(
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
-        SourcePosition callPosition,
-        VariateManager manager)
+        SourcePosition callPosition)
     {
         if (Ids is null || Ids.Count == 0)
         {
@@ -290,6 +289,7 @@ public class FuncLangValue : ImportInfo
                 throw new ArgumentError(callPosition,
                     $"函数 '{Id?.IdName ?? "匿名函数"}' 不接受任何参数，但提供了命名参数");
             }
+
             return positionalArgs;
         }
 
@@ -308,6 +308,7 @@ public class FuncLangValue : ImportInfo
                 throw new ArgumentError(callPosition,
                     $"函数 '{Id?.IdName}' 期望最多 {Ids.Count} 个参数，但位置参数提供了 {positionalArgs.Count} 个");
             }
+
             paramSlots[i] = positionalArgs[i];
             parameterFilled[i] = true;
         }
@@ -377,8 +378,10 @@ public class FuncLangValue : ImportInfo
                 throw new ArgumentError(callPosition,
                     $"内部错误：函数 '{Id?.IdName}' 的参数槽位 {i} 未被填充");
             }
+
             result.Add(paramSlots[i]!);
         }
+
         return result;
     }
 
@@ -391,30 +394,24 @@ public class FuncLangValue : ImportInfo
     {
         // 检查命名参数是否重复
         var seenNames = new HashSet<string>();
-        foreach (var namedArg in namedArgs)
+        foreach (var namedArg in namedArgs.Where(namedArg => !seenNames.Add(namedArg.Name)))
         {
-            if (seenNames.Contains(namedArg.Name))
-            {
-                throw new ArgumentError(namedArg.Position,
-                    $"命名参数 '{namedArg.Name}' 重复指定");
-            }
-            seenNames.Add(namedArg.Name);
+            throw new ArgumentError(namedArg.Position,
+                $"命名参数 '{namedArg.Name}' 重复指定");
         }
 
         // 检查是否尝试对 params 参数使用命名参数
         if (Ids is not null)
         {
-            for (int i = 0; i < Ids.Count; i++)
+            foreach (var paramsName in from t in Ids
+                     where t.IsParams
+                     select t.IdName
+                     into paramsName
+                     where namedArgs.Any(na => na.Name == paramsName)
+                     select paramsName)
             {
-                if (Ids[i].IsParams)
-                {
-                    var paramsName = Ids[i].IdName;
-                    if (namedArgs.Any(na => na.Name == paramsName))
-                    {
-                        throw new ArgumentError(callPosition,
-                            $"不支持对 params 参数 '{paramsName}' 使用命名参数");
-                    }
-                }
+                throw new ArgumentError(callPosition,
+                    $"不支持对 params 参数 '{paramsName}' 使用命名参数");
             }
         }
     }
@@ -479,12 +476,13 @@ public class FuncLangValue : ImportInfo
                     adjustedParams[i] = array;
                 }
                 // 如果值为 null 且目标是可空类型，直接赋 null
-                else if (value is null && targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                else if (value is null && targetType.IsGenericType &&
+                         targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     adjustedParams[i] = null;
                 }
                 // 如果值不为 null 且类型不匹配，尝试类型转换
-                else if (value is not null && !targetType.IsAssignableFrom(value.GetType()))
+                else if (value is not null && !targetType.IsInstanceOfType(value))
                 {
                     try
                     {
@@ -531,14 +529,7 @@ public class FuncLangValue : ImportInfo
                 Old8Exception.PushCallStack(Method?.Name ?? "Unknown", Position);
 
                 // 使用委托缓存优化反射调用性能
-                if (Method is not null)
-                {
-                    invoke = MethodInvokerCache.Invoke(Method, obj, finalParams);
-                }
-                else
-                {
-                    invoke = null;
-                }
+                invoke = Method is not null ? MethodInvokerCache.Invoke(Method, obj, finalParams) : null;
             }
             catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
@@ -577,7 +568,7 @@ public class FuncLangValue : ImportInfo
             manager.Init(new Dictionary<string, LangValueType> { { "base", convertedValue } });
             manager.IsClass = false;
             manager.Result = convertedValue;
-            Func?.Run(manager, ids);
+            _func?.Run(manager, ids);
             return manager.Result;
         }
 
@@ -1029,12 +1020,12 @@ public class FuncLangValue : ImportInfo
             // 将方法注册到本地变量管理器的DelegateVar中
             // 对于泛型函数，需要同时注册泛型版本和特化版本
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
-            
+
             if (IsGeneric)
             {
                 // 注册泛型函数的基础版本（不带类型签名）
                 local.DelegateVar.TryAdd(methodName, dynamicMethod);
-                
+
                 // 也注册带类型签名的版本，确保兼容性
                 var delegateKey = $"{methodName}${paramTypeNames}";
                 local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
@@ -1167,7 +1158,7 @@ public class FuncLangValue : ImportInfo
         VariateManager variManager,
         VariateManager? executionManager = null)
     {
-        if (Ids is null) return new List<LangValueType>();
+        if (Ids is null) return [];
 
         // 1. 计算所有传入参数的值
         var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
@@ -1295,10 +1286,11 @@ public class FuncLangValue : ImportInfo
             genericParameters: GenericParameters,
             position: Position,
             isLambda: IsLambda
-        );
-
-        // 设置类型参数映射
-        instantiated.TypeArgumentMapping = typeArguments;
+        )
+        {
+            // 设置类型参数映射
+            TypeArgumentMapping = typeArguments
+        };
 
         // 复制闭包环境（如果有）
         if (CapturedScope is not null)

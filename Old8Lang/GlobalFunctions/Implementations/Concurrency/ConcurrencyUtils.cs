@@ -39,7 +39,7 @@ public sealed class SleepFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 Thread.Sleep(int)
-        var method = typeof(Thread).GetMethod(nameof(Thread.Sleep), new[] { typeof(int) });
+        var method = typeof(Thread).GetMethod(nameof(Thread.Sleep), [typeof(int)]);
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

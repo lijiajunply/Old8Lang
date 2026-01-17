@@ -276,7 +276,7 @@ public class AsyncFuncLangValue : ImportInfo
         // 1. 确定参数类型和返回类型
         var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
         var returnType = typeof(Task<object>);
-        
+
         // 2. 创建 DynamicMethod
         var dynamicMethod = new DynamicMethod(
             Id?.IdName ?? "AnonymousAsync",
@@ -284,10 +284,10 @@ public class AsyncFuncLangValue : ImportInfo
             parameterTypes,
             true
         );
-        
+
         // 3. 生成方法体
         var methodIl = dynamicMethod.GetILGenerator();
-        
+
         // 创建新的LocalManager实例，专门用于函数体的IL生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
 
@@ -295,23 +295,27 @@ public class AsyncFuncLangValue : ImportInfo
         {
             funcLocal.DelegateVar[key] = value;
         }
+
         foreach (var (key, value) in local.ClassVar)
         {
             funcLocal.ClassVar[key] = value;
         }
+
         foreach (var (key, value) in local.GlobalStaticClasses)
         {
             funcLocal.GlobalStaticClasses[key] = value;
         }
+
         foreach (var (key, value) in local.FuncParameters)
         {
             funcLocal.FuncParameters[key] = value;
         }
+
         foreach (var (key, value) in local.GenericFunctions)
         {
             funcLocal.GenericFunctions[key] = value;
         }
-        
+
         // 处理参数
         for (var i = 0; i < Ids.Count; i++)
         {
@@ -320,17 +324,17 @@ public class AsyncFuncLangValue : ImportInfo
             var localVar = methodIl.DeclareLocal(paramType);
             funcLocal.AddLocalVar(id.IdName, localVar);
             funcLocal.LocalVarTypes[id.IdName] = paramType;
-            
+
             methodIl.Emit(OpCodes.Ldarg, i);
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
-        
+
         GenerateMethodBody(methodIl, funcLocal);
-        
+
         // 4. 创建委托并加载到栈上
         var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat(new[] { returnType }).ToArray());
-            
+            parameterTypes.Concat([returnType]).ToArray());
+
         ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
         ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
         ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
@@ -386,9 +390,12 @@ public class AsyncFuncLangValue : ImportInfo
             TypeAttributes.BeforeFieldInit,
             typeof(ValueType));
 
-        var stateMachineGenerator = new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement);
-        stateMachineGenerator.TypeBuilder = typeBuilder;
-        
+        var stateMachineGenerator =
+            new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement)
+            {
+                TypeBuilder = typeBuilder
+            };
+
         // 提升参数到状态机字段
         if (Ids != null)
         {
@@ -402,7 +409,7 @@ public class AsyncFuncLangValue : ImportInfo
                 }
             }
         }
-        
+
         stateMachineGenerator.GenerateStateMachine(typeBuilder);
 
         var stateMachineType = typeBuilder.CreateType()!;
@@ -420,27 +427,25 @@ public class AsyncFuncLangValue : ImportInfo
         // 1. sm = default;
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Initobj, stateMachineType);
-        
+
         // 初始化提升的参数字段
         if (Ids != null)
         {
-            foreach (var id in Ids)
+            foreach (var argName in Ids.Select(id => id.IdName))
             {
-                var argName = id.IdName;
-                if (stateMachineGenerator.VariableFields.TryGetValue(argName, out var fieldBuilder))
-                {
-                    var field = stateMachineType.GetField(fieldBuilder.Name)!;
-                    var argLocal = local.GetLocalVar(argName)!;
-                    ilGenerator.Emit(OpCodes.Ldloca, smLocal);
-                    ilGenerator.Emit(OpCodes.Ldloc, argLocal);
-                    ilGenerator.Emit(OpCodes.Stfld, field);
-                }
+                if (!stateMachineGenerator.VariableFields.TryGetValue(argName, out var fieldBuilder)) continue;
+                var field = stateMachineType.GetField(fieldBuilder.Name)!;
+                var argLocal = local.GetLocalVar(argName)!;
+                ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+                ilGenerator.Emit(OpCodes.Ldloc, argLocal);
+                ilGenerator.Emit(OpCodes.Stfld, field);
             }
         }
 
         // 2. sm.builder = AsyncTaskMethodBuilder<object>.Create();
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
-        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Create")!);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Create")!);
         ilGenerator.Emit(OpCodes.Stfld, builderField);
 
         // 3. sm.state = -1;
@@ -452,13 +457,16 @@ public class AsyncFuncLangValue : ImportInfo
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Ldflda, builderField);
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
-        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Start")!
-            .MakeGenericMethod(stateMachineType));
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetMethod("Start")!
+                .MakeGenericMethod(stateMachineType));
 
         // 5. return sm.builder.Task;
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Ldflda, builderField);
-        ilGenerator.Emit(OpCodes.Call, typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetProperty("Task")!.GetGetMethod()!);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetProperty("Task")!
+                .GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Ret);
     }
 
@@ -470,7 +478,7 @@ public class AsyncFuncLangValue : ImportInfo
         var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
         var returnType = typeof(Task<object>);
         return System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat(new[] { returnType }).ToArray());
+            parameterTypes.Concat([returnType]).ToArray());
     }
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)

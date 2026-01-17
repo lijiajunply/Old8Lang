@@ -114,7 +114,7 @@ public class ModelPredictor(MLContext mlContext)
     {
         [ColumnName("PredictedLabel")] public string PredictedLabel { get; set; } = string.Empty;
 
-        public float[] Score { get; set; } = Array.Empty<float>();
+        public float[] Score { get; set; } = [];
     }
 
     /// <summary>
@@ -132,6 +132,6 @@ public class ModelPredictor(MLContext mlContext)
     {
         [ColumnName("PredictedLabel")] public uint PredictedClusterId { get; set; }
 
-        public float[] Distances { get; set; } = Array.Empty<float>();
+        public float[] Distances { get; set; } = [];
     }
 }

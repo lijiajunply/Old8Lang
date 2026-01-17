@@ -67,7 +67,7 @@ public class DocumentManager
         {
             Uri = uri,
             Text = text,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         try

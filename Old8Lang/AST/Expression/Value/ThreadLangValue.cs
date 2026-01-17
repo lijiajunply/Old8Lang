@@ -14,12 +14,12 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程对象
     /// </summary>
-    private readonly Thread Thread;
+    private readonly Thread _thread;
 
     /// <summary>
     /// 线程安全锁
     /// </summary>
-    private readonly Lock Lock = new();
+    private readonly Lock _lock = new();
 
     /// <summary>
     /// 线程入口点委托（ThreadStart）
@@ -46,11 +46,11 @@ public partial class ThreadLangValue : LangValueType
             // 等待线程完成
             Join();
 
-            lock (Lock)
+            lock (_lock)
             {
-                if (Exception is not null)
+                if (_exception is not null)
                 {
-                    throw new InvalidOperationError(this, "线程执行异常: " + Exception);
+                    throw new InvalidOperationError(this, "线程执行异常: " + _exception);
                 }
 
                 // 如果 _result 为 null，返回 VoidLangValue
@@ -72,7 +72,7 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程执行过程中发生的异常
     /// </summary>
-    private Exception? Exception;
+    private Exception? _exception;
 
     /// <summary>
     /// 取消令牌
@@ -114,7 +114,7 @@ public partial class ThreadLangValue : LangValueType
     {
         _cancellationToken = cancellationToken;
         _threadStart = threadStart;
-        Thread = new Thread(() =>
+        _thread = new Thread(() =>
         {
             try
             {
@@ -144,7 +144,7 @@ public partial class ThreadLangValue : LangValueType
     {
         _cancellationToken = cancellationToken;
         _parameterizedThreadStart = parameterizedThreadStart;
-        Thread = new Thread((param) =>
+        _thread = new Thread((param) =>
         {
             try
             {
@@ -174,7 +174,7 @@ public partial class ThreadLangValue : LangValueType
         _cancellationTokenSource = cancellationTokenSource;
         _cancellationToken = cancellationTokenSource.Token;
         _threadStart = threadStart;
-        Thread = new Thread(() =>
+        _thread = new Thread(() =>
         {
             try
             {
@@ -198,22 +198,19 @@ public partial class ThreadLangValue : LangValueType
     /// <returns>线程执行结果</returns>
     public LangValueType Join(IntLangValue? timeout = null)
     {
-        bool joined;
         if (timeout is not null)
         {
-            joined = Thread.Join(timeout.GetValue<int>());
+            var joined = _thread.Join(timeout.GetValue<int>());
             return new BoolLangValue(joined);
         }
-        else
-        {
-            Thread.Join();
-        }
 
-        lock (Lock)
+        _thread.Join();
+
+        lock (_lock)
         {
-            if (Exception is not null)
+            if (_exception is not null)
             {
-                throw new InvalidOperationError(this, "线程执行异常: " + Exception);
+                throw new InvalidOperationError(this, "线程执行异常: " + _exception);
             }
 
             // 如果 _result 为 null，返回 VoidLangValue
@@ -234,11 +231,11 @@ public partial class ThreadLangValue : LangValueType
     {
         if (_parameterizedThreadStart is not null && parameter is not null)
         {
-            Thread.Start(parameter);
+            _thread.Start(parameter);
         }
         else
         {
-            Thread.Start();
+            _thread.Start();
         }
     }
 
@@ -247,7 +244,7 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     public bool IsAlive()
     {
-        return Thread.IsAlive;
+        return _thread.IsAlive;
     }
 
     /// <summary>
@@ -255,8 +252,8 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     public bool IsBackground
     {
-        get => Thread.IsBackground;
-        set => Thread.IsBackground = value;
+        get => _thread.IsBackground;
+        set => _thread.IsBackground = value;
     }
 
     /// <summary>
@@ -264,8 +261,8 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     public string? Name
     {
-        get => Thread.Name;
-        set => Thread.Name = value;
+        get => _thread.Name;
+        set => _thread.Name = value;
     }
 
     /// <summary>
@@ -273,14 +270,14 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     public int Priority
     {
-        get => (int)Thread.Priority;
-        set => Thread.Priority = (ThreadPriority)value;
+        get => (int)_thread.Priority;
+        set => _thread.Priority = (ThreadPriority)value;
     }
 
     /// <summary>
     /// 获取线程的托管线程ID
     /// </summary>
-    public int ManagedThreadId => Thread.ManagedThreadId;
+    public int ManagedThreadId => _thread.ManagedThreadId;
 
     /// <summary>
     /// 设置线程执行结果
@@ -288,7 +285,7 @@ public partial class ThreadLangValue : LangValueType
     /// <param name="result">执行结果</param>
     public void SetResult(object result)
     {
-        lock (Lock)
+        lock (_lock)
         {
             _result = result;
             _isCompleted = true;
@@ -301,9 +298,9 @@ public partial class ThreadLangValue : LangValueType
     /// <param name="exception">异常对象</param>
     public void SetException(Exception exception)
     {
-        lock (Lock)
+        lock (_lock)
         {
-            Exception = exception;
+            _exception = exception;
             _isCompleted = true;
         }
     }
@@ -311,7 +308,7 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 获取线程状态
     /// </summary>
-    public ThreadState State => Thread.ThreadState;
+    public ThreadState State => _thread.ThreadState;
 
     /// <summary>
     /// 检查线程是否已完成
@@ -320,7 +317,7 @@ public partial class ThreadLangValue : LangValueType
     {
         get
         {
-            lock (Lock)
+            lock (_lock)
             {
                 return _isCompleted;
             }
@@ -399,6 +396,7 @@ public partial class ThreadLangValue : LangValueType
                         var timeoutValue = instance.Ids[0].Run(manager);
                         return Join(timeoutValue as IntLangValue);
                     }
+
                     return Join();
 
                 case "Wait":
@@ -408,6 +406,7 @@ public partial class ThreadLangValue : LangValueType
                         var timeoutValue = instance.Ids[0].Run(manager);
                         return Join(timeoutValue as IntLangValue);
                     }
+
                     return Join();
 
                 case "Start":
@@ -421,6 +420,7 @@ public partial class ThreadLangValue : LangValueType
                     {
                         Start();
                     }
+
                     return new VoidLangValue(Position);
 
                 case "IsAlive":
@@ -635,7 +635,7 @@ public partial class ThreadLangValue : LangValueType
             {
                 // 创建一个超时线程
                 var timer = new System.Timers.Timer(timeoutMs);
-                timer.Elapsed += (_, __) => tcs.Cancel();
+                timer.Elapsed += (_, _) => tcs.Cancel();
                 timer.AutoReset = false;
                 timer.Start();
 

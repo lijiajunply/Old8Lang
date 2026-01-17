@@ -31,19 +31,21 @@ public partial class DictionaryLangValue : LangValueType, ILangList
     /// </summary>
     public string? ValueType { get; set; }
 
-    public DictionaryLangValue() : base(default)
+    public DictionaryLangValue()
     {
         Tuples = [];
     }
 
-    public DictionaryLangValue(List<TupleLangValue> tuples, string? keyType = null, string? valueType = null, SourcePosition position = default) : base(position)
+    public DictionaryLangValue(List<TupleLangValue> tuples, string? keyType = null, string? valueType = null,
+        SourcePosition position = default) : base(position)
     {
         Tuples = tuples;
         KeyType = keyType;
         ValueType = valueType;
     }
 
-    public DictionaryLangValue(string? keyType = null, string? valueType = null, SourcePosition position = default) : base(position)
+    public DictionaryLangValue(string? keyType = null, string? valueType = null, SourcePosition position = default) :
+        base(position)
     {
         Tuples = [];
         KeyType = keyType;
@@ -159,7 +161,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
                 {
                     // Update(key, value) - 两个参数
                     method = extensionType.GetMethod(methodName,
-                        new[] { typeof(StringLangValue), typeof(LangValueType) });
+                        [typeof(StringLangValue), typeof(LangValueType)]);
                 }
                 else
                 {
@@ -325,7 +327,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
         }
 
-        var typeAny = typeTemplate.CreateInstanceV2(manager);
+        var typeAny = typeTemplate.CreateInstance(manager);
         typeAny.Init(manager.Interpreter);
 
         foreach (var a in Value)
@@ -372,6 +374,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             {
                 ilGenerator.Emit(OpCodes.Box, keyType);
             }
+
             expr.Elements[1].LoadIlValue(ilGenerator, local);
             var valueType = expr.Elements[1].OutputType(local);
             // 只有值类型才需要装箱
@@ -379,6 +382,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             {
                 ilGenerator.Emit(OpCodes.Box, valueType);
             }
+
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
         }
 

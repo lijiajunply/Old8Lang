@@ -34,7 +34,7 @@ public class SerializationExamples
             Name = "张三",
             Age = 25,
             Email = "zhangsan@example.com",
-            Tags = new List<string> { "开发者", "架构师" }
+            Tags = ["开发者", "架构师"]
         };
 
         // 使用 MessagePack
@@ -106,7 +106,7 @@ public class SerializationExamples
         {
             Name = "李四",
             Age = 30,
-            Tags = new List<string> { "产品经理" }
+            Tags = ["产品经理"]
         };
 
         var clone = original.DeepClone();
@@ -128,7 +128,7 @@ public class SerializationExamples
             Name = $"Person{i}",
             Age = i % 100,
             Email = $"person{i}@example.com",
-            Tags = new List<string> { "Tag1", "Tag2", "Tag3" }
+            Tags = ["Tag1", "Tag2", "Tag3"]
         }).ToList();
 
         var serializer = new MessagePackSerializer();
@@ -154,7 +154,7 @@ public class Person
     public string Name { get; set; } = "";
     public int Age { get; set; }
     public string Email { get; set; } = "";
-    public List<string> Tags { get; set; } = new();
+    public List<string> Tags { get; set; } = [];
 
     public override string ToString()
     {

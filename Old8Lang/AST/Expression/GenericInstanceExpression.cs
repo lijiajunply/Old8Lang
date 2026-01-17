@@ -118,12 +118,8 @@ public partial class GenericInstanceExpression : LangExpression
                     }
                 }
 
-                if (typeInfo is null)
-                {
-                    throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
-                }
-
-                resolvedTypeArgs[paramName] = typeInfo;
+                resolvedTypeArgs[paramName] =
+                    typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
             }
 
             // 实例化泛型类
@@ -132,7 +128,7 @@ public partial class GenericInstanceExpression : LangExpression
             // 如果后面跟着调用参数，创建实例
             if (IsFunctionCall)
             {
-                var instance = instantiatedTemplate.CreateInstanceV2(manager);
+                var instance = instantiatedTemplate.CreateInstance(manager);
                 instance.Init(manager.Interpreter);
 
                 // 调用用户定义的 init 构造函数
@@ -167,12 +163,9 @@ public partial class GenericInstanceExpression : LangExpression
                 var typeArgName = TypeArguments[i];
 
                 var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
-                if (typeInfo is null)
-                {
-                    throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
-                }
 
-                resolvedTypeArgs[paramName] = typeInfo;
+                resolvedTypeArgs[paramName] =
+                    typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
             }
 
             // 实例化泛型函数
@@ -191,7 +184,7 @@ public partial class GenericInstanceExpression : LangExpression
         throw new InvalidOperationError(this, $"表达式 {BaseExpression} 不是泛型类型或泛型函数");
     }
 
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // 编译器模式下的类型推断
         // 对于泛型实例，需要根据基础表达式和类型参数推断最终类型
@@ -205,19 +198,17 @@ public partial class GenericInstanceExpression : LangExpression
         var name = identifier.IdName;
 
         // 判断是泛型类还是泛型函数
-        if (local.GenericClasses.ContainsKey(name))
+        if (local.GenericClasses.TryGetValue(name, out var typeTemplate))
         {
             // 泛型类实例化：返回特化后的类型
-            var typeTemplate = local.GenericClasses[name];
             var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters, local);
             var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
             return specializedType;
         }
 
-        if (local.GenericFunctions.ContainsKey(name))
+        if (local.GenericFunctions.TryGetValue(name, out var genericFunc))
         {
             // 泛型函数调用：返回函数的返回类型
-            var genericFunc = local.GenericFunctions[name];
             var typeMapping = CreateTypeMapping(genericFunc.GenericParameters, local);
             var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
             return resolver.ResolveReturnType(genericFunc.Id?.AssumptionType);
@@ -298,21 +289,17 @@ public partial class GenericInstanceExpression : LangExpression
             }
 
             // 查找 init 方法
-            var initMethod = specializedType.GetMethod("init", argTypes);
-            if (initMethod is null)
-            {
-                // 尝试查找任何名为 init 的方法（忽略参数类型精确匹配，依赖运行时/CLR检查或后续改进）
-                // 这是一个简单的回退策略，更严谨的做法是实现完整的重载解析
-                initMethod = specializedType.GetMethod("init");
-            }
+            // 尝试查找任何名为 init 的方法（忽略参数类型精确匹配，依赖运行时/CLR检查或后续改进）
+            // 这是一个简单的回退策略，更严谨的做法是实现完整的重载解析
+            var initMethod = specializedType.GetMethod("init", argTypes) ?? specializedType.GetMethod("init");
 
             if (initMethod is null)
             {
-                 throw new InvalidOperationError(this, $"找不到类 {className} 的匹配 init 方法");
+                throw new InvalidOperationError(this, $"找不到类 {className} 的匹配 init 方法");
             }
 
             ilGenerator.Emit(OpCodes.Callvirt, initMethod);
-            
+
             // 如果 init 方法有返回值（虽然通常是 void），需要弹出
             if (initMethod.ReturnType != typeof(void))
             {

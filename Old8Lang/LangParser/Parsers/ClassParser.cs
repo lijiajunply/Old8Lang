@@ -59,8 +59,8 @@ public class ClassParser(
 
         string? parentClassName = null;
         List<string>? parentGenericTypeParameters = null;
-        List<string> mixinNames = new List<string>();
-        List<string> implementsNames = new List<string>();
+        List<string> mixinNames = [];
+        List<string> implementsNames = [];
 
         // 处理继承语法：class Name extends ParentClass {
         if (CurrentToken is { Type: LangTokenType.Extends })
@@ -77,7 +77,7 @@ public class ClassParser(
                 // 处理父类的泛型参数（如果有）：extends List<T>
                 if (CurrentToken.Type == LangTokenType.LessThan)
                 {
-                    parentGenericTypeParameters = new List<string>();
+                    parentGenericTypeParameters = [];
                     Expect(LangTokenType.LessThan);
 
                     while (CurrentToken.Type != LangTokenType.GreaterThan)
@@ -196,7 +196,7 @@ public class ClassParser(
             genericParameters = ParseGenericParameters();
         }
 
-        List<string> extendsNames = new List<string>();
+        List<string> extendsNames = [];
 
         // 处理 extends 子句：interface Name extends Interface1, Interface2 {
         // 接口可以继承多个父接口
@@ -231,7 +231,7 @@ public class ClassParser(
         // 接口作为特殊的类处理，isInterface 标志为 true
         // 接口的父接口通过 implementsNames 参数传递（复用implements机制）
         var typeTemplate = new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
-            null, false, new List<string>(), extendsNames, true, genericParameters: genericParameters);
+            null, false, [], extendsNames, true, genericParameters: genericParameters);
 
         // 设置文档注释
         if (docComment is not null)

@@ -26,7 +26,7 @@ public class ModuleResolutionResult
     /// <summary>
     /// 尝试过的路径列表（用于错误报告）
     /// </summary>
-    public List<string> AttemptedPaths { get; set; } = new();
+    public List<string> AttemptedPaths { get; set; } = [];
 
     /// <summary>
     /// 包信息（如果是第三方包）
@@ -41,7 +41,7 @@ public class ModuleResolutionResult
     /// <summary>
     /// 失败详情列表（记录每个尝试步骤的详细信息）
     /// </summary>
-    public List<ResolutionAttempt> ResolutionAttempts { get; set; } = new();
+    public List<ResolutionAttempt> ResolutionAttempts { get; set; } = [];
 
     /// <summary>
     /// 获取友好的错误信息

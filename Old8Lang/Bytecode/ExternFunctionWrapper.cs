@@ -290,7 +290,7 @@ public class ExternFunctionWrapper
     {
         if (string.IsNullOrEmpty(signatureStr))
         {
-            return (Array.Empty<Type>(), typeof(void));
+            return ([], typeof(void));
         }
 
         var parts = signatureStr.Split(':');
@@ -298,7 +298,7 @@ public class ExternFunctionWrapper
         var returnTypeStr = parts.Length > 1 ? parts[1] : "void";
 
         var paramTypes = string.IsNullOrEmpty(paramTypesStr)
-            ? Array.Empty<Type>()
+            ? []
             : paramTypesStr.Split(',').Select(ConvertOld8TypeToCSharpType).ToArray();
 
         var returnType = ConvertOld8TypeToCSharpType(returnTypeStr);
@@ -358,8 +358,8 @@ public class ExternFunctionWrapper
 
         var unmanagedAttr = new System.Reflection.Emit.CustomAttributeBuilder(
             typeof(UnmanagedFunctionPointerAttribute)
-                .GetConstructor(new[] { typeof(CallingConvention) })!,
-            new object[] { callingConv });
+                .GetConstructor([typeof(CallingConvention)])!,
+            [callingConv]);
         typeBuilder.SetCustomAttribute(unmanagedAttr);
 
         // 定义构造函数
@@ -368,7 +368,7 @@ public class ExternFunctionWrapper
             MethodAttributes.HideBySig |
             MethodAttributes.Public,
             CallingConventions.Standard,
-            new[] { typeof(object), typeof(IntPtr) });
+            [typeof(object), typeof(IntPtr)]);
         ctorBuilder.SetImplementationFlags(
             MethodImplAttributes.Runtime |
             MethodImplAttributes.Managed);

@@ -14,7 +14,7 @@ public class FieldDefinitionTable
     /// <summary>
     /// 所有字段的列表（用于遍历）
     /// </summary>
-    private readonly List<FieldDefinition> _allFields = new();
+    private readonly List<FieldDefinition> _allFields = [];
 
     /// <summary>
     /// 添加字段定义
@@ -98,7 +98,7 @@ public class FieldDefinition(
     /// <summary>
     /// 访问修饰符
     /// </summary>
-    public HashSet<AccessModifierType> Modifiers { get; } = modifiers ?? new HashSet<AccessModifierType>();
+    public HashSet<AccessModifierType> Modifiers { get; } = modifiers ?? [];
 
     /// <summary>
     /// 是否为静态字段

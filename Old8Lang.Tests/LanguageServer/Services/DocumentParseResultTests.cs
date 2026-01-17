@@ -14,7 +14,7 @@ public class DocumentParseResultTests(ITestOutputHelper testOutputHelper)
         {
             Uri = "file:///test.old8",
             Text = "func test() -> int { return 42 }",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Assert
@@ -82,7 +82,7 @@ variable <- ""test""
             Tokens = tokens,
             Ast = ast,
             SymbolTable = new Dictionary<string, SymbolInfo>(),
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Assert
@@ -176,7 +176,7 @@ func testFunction() -> int {
         {
             Uri = "test://empty.old8",
             Text = "",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
             // Tokens, Ast, SymbolTable can be null
         };
 
@@ -232,21 +232,21 @@ func testFunction() -> int {
         {
             Uri = "test://test1.old8",
             Text = "same content",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         var result2 = new DocumentParseResult
         {
             Uri = "test://test2.old8",
             Text = "same content",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         var result3 = new DocumentParseResult
         {
             Uri = "test://test3.old8",
             Text = "different content",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         // Act & Assert - Since DocumentParseResult doesn't override Equals

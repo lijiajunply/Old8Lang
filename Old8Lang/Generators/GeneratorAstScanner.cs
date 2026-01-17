@@ -39,12 +39,12 @@ public class GeneratorAstScanner
         /// <summary>
         /// 所有 yield 点
         /// </summary>
-        public List<YieldPoint> YieldPoints { get; set; } = new();
+        public List<YieldPoint> YieldPoints { get; set; } = [];
 
         /// <summary>
         /// 所有局部变量名
         /// </summary>
-        public HashSet<string> LocalVariables { get; set; } = new();
+        public HashSet<string> LocalVariables { get; set; } = [];
 
         /// <summary>
         /// 是否包含 yield 语句

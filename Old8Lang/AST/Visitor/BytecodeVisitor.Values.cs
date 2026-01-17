@@ -520,7 +520,7 @@ public partial class BytecodeVisitor
         string lambdaName = $"<lambda_{Guid.NewGuid():N}>";
 
         // 2. 提取参数信息
-        var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+        var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? [];
         
         var defaultValues = new List<object?>();
         int paramsIndex = -1;

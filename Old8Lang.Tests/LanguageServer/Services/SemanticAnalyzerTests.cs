@@ -30,7 +30,7 @@ PrintLine(a)
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         var analyzer = new SemanticAnalyzer(document);
@@ -78,7 +78,7 @@ func foo() -> int {
             Tokens = tokens,
             Ast = ast,
             SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics = []
         };
 
         var analyzer = new SemanticAnalyzer(document);

@@ -235,7 +235,7 @@ result:int <- 0
 #endif
 Assert.Equal(123, result)
 ";
-        var symbols = new PreprocessorSymbols(new[] { "SYMBOL1", "SYMBOL2", "SYMBOL3" });
+        var symbols = new PreprocessorSymbols(["SYMBOL1", "SYMBOL2", "SYMBOL3"]);
         var interpreter = new LangInterpreter();
 
         // Act

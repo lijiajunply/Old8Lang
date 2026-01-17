@@ -62,7 +62,7 @@ public class LangParser
     /// <param name="sourceCode">原始源代码（用于错误信息生成）</param>
     /// <param name="fileName">源代码文件名（用于错误信息生成）</param>
     public LangParser(List<LangToken> tokens, string? sourceCode = null, string? fileName = null)
-        : this(tokens, new List<LangToken>(), sourceCode, fileName)
+        : this(tokens, [], sourceCode, fileName)
     {
     }
 
@@ -254,7 +254,7 @@ public class LangParser
 
         if (lines.Length == 0)
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         // 预分配容量，提高性能

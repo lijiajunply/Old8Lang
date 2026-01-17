@@ -13,7 +13,7 @@ public class Row : WidgetBase
     /// <summary>
     /// 子组件列表
     /// </summary>
-    public List<WidgetBase> Children { get; set; } = new();
+    public List<WidgetBase> Children { get; set; } = [];
 
     /// <summary>
     /// 主轴对齐方式（水平方向）
@@ -126,7 +126,7 @@ public class Column : WidgetBase
     /// <summary>
     /// 子组件列表
     /// </summary>
-    public List<WidgetBase> Children { get; set; } = new();
+    public List<WidgetBase> Children { get; set; } = [];
 
     /// <summary>
     /// 主轴对齐方式（垂直方向）

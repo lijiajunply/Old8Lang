@@ -19,7 +19,7 @@ public partial class ListLangValue : LangValueType, ILangList
 
     public readonly List<LangValueType> Values = [];
 
-    private bool HasBeenCleared;
+    private bool _hasBeenCleared;
 
     /// <summary>
     /// 元素类型（泛型参数），null 表示非泛型或未推断
@@ -27,20 +27,23 @@ public partial class ListLangValue : LangValueType, ILangList
     public string? ElementType { get; set; }
 
 
-    public ListLangValue(List<LangExpression> value, string? elementType = null, SourcePosition position = default) : base(position)
+    public ListLangValue(List<LangExpression> value, string? elementType = null, SourcePosition position = default) :
+        base(position)
     {
         Value = value;
         ElementType = elementType;
     }
 
-    public ListLangValue(List<object> value, string? elementType = null, SourcePosition position = default) : base(position)
+    public ListLangValue(List<object> value, string? elementType = null, SourcePosition position = default) :
+        base(position)
     {
         Values.AddRange(value.Select(ObjToValue));
         Value = [];
         ElementType = elementType;
     }
 
-    public ListLangValue(List<LangValueType> value, string? elementType = null, SourcePosition position = default) : base(position)
+    public ListLangValue(List<LangValueType> value, string? elementType = null, SourcePosition position = default) :
+        base(position)
     {
         Values.AddRange(value);
         Value = [];
@@ -50,7 +53,7 @@ public partial class ListLangValue : LangValueType, ILangList
     public override LangValueType Run(VariateManager manager)
     {
         // 只有当Values为空且Value中有表达式时才需要执行，且没有被手动清空过
-        if (Values.Count == 0 && Value.Count > 0 && !HasBeenCleared)
+        if (Values.Count == 0 && Value.Count > 0 && !_hasBeenCleared)
         {
             foreach (var expr in Value)
                 Values.Add(expr.Run(manager));
@@ -131,14 +134,11 @@ public partial class ListLangValue : LangValueType, ILangList
         }
 
         // 处理属性访问：obj.property
-        if (dotExpression is LangId langId)
-        {
+        if (dotExpression is LangId { IdName: "Count" })
             // 特殊处理 Count 属性
-            if (langId.IdName == "Count")
-            {
-                // 返回列表的元素数量
-                return new IntLangValue(Values.Count);
-            }
+        {
+            // 返回列表的元素数量
+            return new IntLangValue(Values.Count);
         }
 
         // 如果是其他类型的表达式，尝试将其作为索引
@@ -198,7 +198,7 @@ public partial class ListLangValue : LangValueType, ILangList
     public void ClearInternal()
     {
         Values.Clear();
-        HasBeenCleared = true;
+        _hasBeenCleared = true;
     }
 
     public LangValueType Slice(int start, int end, int step)

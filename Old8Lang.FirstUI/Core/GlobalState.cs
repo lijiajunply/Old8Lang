@@ -51,7 +51,7 @@ public class GlobalState
     {
         if (!_listeners.ContainsKey(key))
         {
-            _listeners[key] = new List<Action<object>>();
+            _listeners[key] = [];
         }
         _listeners[key].Add(obj => listener((T)obj));
     }
@@ -106,7 +106,7 @@ public class GlobalState
 public class Computed<T>
 {
     private readonly Func<T> _compute;
-    private readonly List<WeakReference<Action<T>>> _listeners = new();
+    private readonly List<WeakReference<Action<T>>> _listeners = [];
     private T? _cachedValue;
     private bool _isDirty = true;
 

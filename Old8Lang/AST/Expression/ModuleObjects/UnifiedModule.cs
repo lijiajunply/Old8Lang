@@ -16,23 +16,21 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// </summary>
 public class UnifiedModule(
     string moduleName,
-    VariateManager manager,
+    VariateManager initialManager,
     ModuleLoadMode loadMode = ModuleLoadMode.Lazy,
     SourcePosition position = default
 ) : ImportInfo(position), IModuleValueType
 {
     // 符号存储 - 使用双字典优化查找性能
-    private readonly Dictionary<string, LangValueType> Symbols = new();
-    private readonly Dictionary<string, LangValueType> CaseInsensitiveSymbols =
+    private readonly Dictionary<string, LangValueType> _symbols = new();
+
+    private readonly Dictionary<string, LangValueType> _caseInsensitiveSymbols =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private readonly Lock LoadLock = new();
-    private readonly List<string> SelectedSymbols = [];
+    private readonly Lock _loadLock = new();
+    private readonly List<string> _selectedSymbols = [];
     private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
     private Exception? _loadException;
-
-    // 保存初始的 VariateManager，用于懒加载时的上下文
-    private readonly VariateManager InitialManager = manager;
 
     // 服务依赖
     private static readonly ModuleLoader ModuleLoaderInstance = new();
@@ -59,17 +57,12 @@ public class UnifiedModule(
     public ModuleLoadingState LoadingState => _loadingState;
 
     /// <summary>
-    /// 加载异常（如果有）
-    /// </summary>
-    public Exception? LoadException => _loadException;
-
-    /// <summary>
     /// 设置选择性导入的符号列表
     /// </summary>
     /// <param name="symbolNames">要导入的符号名称列表</param>
     public void SetSelectedSymbols(IEnumerable<string> symbolNames)
     {
-        SelectedSymbols.AddRange(symbolNames);
+        _selectedSymbols.AddRange(symbolNames);
     }
 
     /// <summary>
@@ -82,13 +75,13 @@ public class UnifiedModule(
         EnsureLoaded();
 
         // O(1) 精确查找
-        if (Symbols.TryGetValue(symbolName, out var symbol))
+        if (_symbols.TryGetValue(symbolName, out var symbol))
         {
             return symbol;
         }
 
         // O(1) 大小写不敏感查找
-        if (CaseInsensitiveSymbols.TryGetValue(symbolName, out symbol))
+        if (_caseInsensitiveSymbols.TryGetValue(symbolName, out symbol))
         {
             return symbol;
         }
@@ -113,7 +106,7 @@ public class UnifiedModule(
     public IEnumerable<string> GetExportedSymbols()
     {
         EnsureLoaded();
-        return Symbols.Keys;
+        return _symbols.Keys;
     }
 
     /// <summary>
@@ -133,7 +126,7 @@ public class UnifiedModule(
             throw new ImportError(this, ModuleName, $"模块之前加载失败: {_loadException.Message}");
         }
 
-        lock (LoadLock)
+        lock (_loadLock)
         {
             // 双重检查锁定
             if (_loadingState == ModuleLoadingState.Loaded)
@@ -192,15 +185,15 @@ public class UnifiedModule(
         {
             ModuleLoadMode.Eager => "eager",
             ModuleLoadMode.Lazy => "lazy",
-            ModuleLoadMode.Selective => SelectedSymbols.Count > 0
-                ? $"selective({SelectedSymbols.Count})"
+            ModuleLoadMode.Selective => _selectedSymbols.Count > 0
+                ? $"selective({_selectedSymbols.Count})"
                 : "selective",
             _ => "unknown"
         };
 
         var status = _loadingState switch
         {
-            ModuleLoadingState.Loaded => $"{Symbols.Count} symbols",
+            ModuleLoadingState.Loaded => $"{_symbols.Count} symbols",
             ModuleLoadingState.Loading => "loading...",
             ModuleLoadingState.LoadFailed => "load failed",
             _ => "unloaded"
@@ -256,8 +249,8 @@ public class UnifiedModule(
         // 填充符号字典
         foreach (var (name, value) in symbols)
         {
-            module.Symbols[name] = value;
-            module.CaseInsensitiveSymbols[name] = value;
+            module._symbols[name] = value;
+            module._caseInsensitiveSymbols[name] = value;
         }
 
         module._loadingState = ModuleLoadingState.Loaded;
@@ -272,7 +265,7 @@ public class UnifiedModule(
     private void LoadModuleInternal(VariateManager? manager)
     {
         // 使用初始的 manager 或传入的 manager
-        manager = manager ?? InitialManager;
+        manager = manager ?? initialManager;
 
         // 1. 解析模块路径
         var resolver = new ModuleResolver();
@@ -306,8 +299,8 @@ public class UnifiedModule(
 
         // 5. 提取符号
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
-        var selectedSymbolList = LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0
-            ? SelectedSymbols
+        var selectedSymbolList = LoadMode == ModuleLoadMode.Selective && _selectedSymbols.Count > 0
+            ? _selectedSymbols
             : null;
 
         var extractedSymbols = SymbolExtractorInstance.ExtractSymbols(
@@ -325,13 +318,13 @@ public class UnifiedModule(
             {
                 // 创建带有捕获作用域的函数副本
                 var funcWithClosure = funcValue.CreateWithCapturedScope(moduleManager);
-                Symbols[name] = funcWithClosure;
-                CaseInsensitiveSymbols[name] = funcWithClosure;
+                _symbols[name] = funcWithClosure;
+                _caseInsensitiveSymbols[name] = funcWithClosure;
             }
             else
             {
-                Symbols[name] = value;
-                CaseInsensitiveSymbols[name] = value;
+                _symbols[name] = value;
+                _caseInsensitiveSymbols[name] = value;
             }
         }
     }

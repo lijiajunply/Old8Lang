@@ -127,7 +127,7 @@ public class JavaScriptProvider : IExternProvider
         string targetName)
     {
         var signature = funcDecl.FunctionSignature?.FuncValue;
-        var parameters = signature?.Ids ?? new List<LangId>();
+        var parameters = signature?.Ids ?? [];
         var returnType = signature?.Id?.AssumptionType;
 
         // 创建包装函数

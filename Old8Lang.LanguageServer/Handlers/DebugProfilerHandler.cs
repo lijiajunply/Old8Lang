@@ -230,7 +230,7 @@ public class StartDebuggingHandler(
                 BreakpointCount = session.Debugger.BreakpointManager.GetAllBreakpoints().Count,
                 CallStackDepth = session.Debugger.CallStack.Depth,
                 StartTime = session.StartTime,
-                RecentEvents = new List<DebugEventInfo>()
+                RecentEvents = []
             });
         }
         catch (Exception ex)

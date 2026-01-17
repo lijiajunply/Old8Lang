@@ -194,7 +194,7 @@ public partial class MatchExpression(
     /// <summary>
     /// 获取输出类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // 返回第一个 case 的结果类型（假设所有 case 返回相同类型）
         if (Cases.Count > 0)

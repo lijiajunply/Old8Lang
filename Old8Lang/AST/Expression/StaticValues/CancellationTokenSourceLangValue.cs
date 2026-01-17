@@ -13,12 +13,12 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class CancellationTokenSourceLangValue : LangValueType
 {
-    private readonly CancellationTokenSource Cts;
+    private readonly CancellationTokenSource _cts;
 
     /// <summary>
     /// 获取取消令牌
     /// </summary>
-    public CancellationTokenLangValue Token => new(Cts.Token, Position);
+    public CancellationTokenLangValue Token => new(_cts.Token, Position);
 
     /// <summary>
     /// 构造函数（无参）
@@ -26,7 +26,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     public CancellationTokenSourceLangValue(SourcePosition position = default)
         : base(position)
     {
-        Cts = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     public CancellationTokenSourceLangValue(SourcePosition position, int millisecondsDelay)
         : base(position)
     {
-        Cts = new CancellationTokenSource(millisecondsDelay);
+        _cts = new CancellationTokenSource(millisecondsDelay);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void Cancel()
     {
-        Cts.Cancel();
+        _cts.Cancel();
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void CancelAfter(int delayMs)
     {
-        Cts.CancelAfter(delayMs);
+        _cts.CancelAfter(delayMs);
     }
 
     /// <summary>
@@ -61,13 +61,13 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void Dispose()
     {
-        Cts.Dispose();
+        _cts.Dispose();
     }
 
     /// <summary>
     /// 获取底层 CancellationTokenSource 对象
     /// </summary>
-    public override object GetValue() => Cts;
+    public override object GetValue() => _cts;
 
     /// <summary>
     /// 类型字符串表示
@@ -100,7 +100,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
             return propertyName switch
             {
                 "Token" => Token,
-                "IsCancellationRequested" => new BoolLangValue(Cts.IsCancellationRequested, Position),
+                "IsCancellationRequested" => new BoolLangValue(_cts.IsCancellationRequested, Position),
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "CancellationTokenSource")
             };
         }
@@ -112,9 +112,9 @@ public partial class CancellationTokenSourceLangValue : LangValueType
 
             return methodName switch
             {
-                "Cancel" => CallCancel(instance.Ids, manager),
+                "Cancel" => CallCancel(instance.Ids),
                 "CancelAfter" => CallCancelAfter(instance.Ids, manager),
-                "Dispose" => CallDispose(instance.Ids, manager),
+                "Dispose" => CallDispose(instance.Ids),
                 _ => throw new AttributeError(instance.Position, methodName, "CancellationTokenSource")
             };
         }
@@ -122,7 +122,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return base.Dot(dotExpression, manager);
     }
 
-    private LangValueType CallCancel(List<LangExpression> args, VariateManager manager)
+    private LangValueType CallCancel(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -150,7 +150,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallDispose(List<LangExpression> args, VariateManager manager)
+    private LangValueType CallDispose(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -175,7 +175,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     /// <summary>
     /// 获取 .NET 类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(CancellationTokenSource);
     }

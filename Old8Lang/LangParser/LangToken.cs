@@ -833,7 +833,7 @@ public static class LangTokenizer
         {
             if (!docCommentGroups.ContainsKey(doc.Line))
             {
-                docCommentGroups[doc.Line] = new List<LangToken>();
+                docCommentGroups[doc.Line] = [];
             }
 
             docCommentGroups[doc.Line].Add(doc);
@@ -946,12 +946,12 @@ public struct FilteringCommentsTokenizer(string input)
     /// <summary>
     /// 文件头指令列表
     /// </summary>
-    public List<LangToken> HeaderDirectives = new();
+    public List<LangToken> HeaderDirectives = [];
 
     /// <summary>
     /// 文档注释列表（按行号索引，用于后续解析时关联）
     /// </summary>
-    public List<LangToken> DocComments = new();
+    public List<LangToken> DocComments = [];
 
     /// <summary>
     /// 过滤源代码中的注释

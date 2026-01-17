@@ -30,7 +30,7 @@ public static class Csv
             var lines = File.ReadAllLines(filePath, encoding ?? Encoding.UTF8);
             if (lines.Length == 0)
             {
-                return Array.Empty<string[]>();
+                return [];
             }
 
             int startIndex = hasHeader ? 1 : 0;
@@ -77,7 +77,7 @@ public static class Csv
             var lines = File.ReadAllLines(filePath, encoding ?? Encoding.UTF8);
             if (lines.Length < 2)
             {
-                return new List<Dictionary<string, string>>();
+                return [];
             }
 
             var headers = ParseCsvLine(lines[0], delimiter, quoteChar);
@@ -217,7 +217,7 @@ public static class Csv
     {
         if (string.IsNullOrEmpty(line))
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var result = new List<string>();
@@ -310,13 +310,13 @@ public static class Csv
     {
         if (string.IsNullOrEmpty(csvContent))
         {
-            return Array.Empty<string[]>();
+            return [];
         }
 
         var lines = csvContent.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         if (lines.Length == 0)
         {
-            return Array.Empty<string[]>();
+            return [];
         }
 
         int startIndex = hasHeader ? 1 : 0;

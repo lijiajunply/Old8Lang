@@ -219,7 +219,7 @@ public class LocalManagerTests
     {
         // Arrange
         var localManager = new LocalManager();
-        var methodInfo = typeof(Console).GetMethod("WriteLine", new[] { typeof(string) })!;
+        var methodInfo = typeof(Console).GetMethod("WriteLine", [typeof(string)])!;
         
         // Act
         localManager.DelegateVar["testDelegate"] = methodInfo;

@@ -11,7 +11,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="intValue">int数据</param>
 /// <param name="position">位置</param>
-public partial class IntLangValue(int intValue = 0, SourcePosition position = default) : LangValueType(position), IPoolable
+public partial class IntLangValue(int intValue = 0, SourcePosition position = default)
+    : LangValueType(position), IPoolable
 {
     public int Value = intValue;
 
@@ -37,7 +38,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             catch (OverflowException)
             {
                 // 在整数溢出时自动转换为双精度浮点数
-                return DoubleLangValue.Create((double)Value + (double)otherInt.Value);
+                return DoubleLangValue.Create(Value + (double)otherInt.Value);
             }
         }
 
@@ -63,7 +64,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             catch (OverflowException)
             {
                 // 在整数溢出时自动转换为双精度浮点数
-                return DoubleLangValue.Create((double)Value - (double)otherInt.Value);
+                return DoubleLangValue.Create(Value - (double)otherInt.Value);
             }
         }
 
@@ -90,7 +91,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             catch (OverflowException)
             {
                 // 在整数溢出时自动转换为双精度浮点数
-                return DoubleLangValue.Create((double)Value * (double)otherInt.Value);
+                return DoubleLangValue.Create((double)Value * otherInt.Value);
             }
         }
 
@@ -224,7 +225,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
         if (otherValueType is IntLangValue b)
             return Value == b.Value;
         if (otherValueType is DoubleLangValue d)
-            return Value == d.Value;
+            return Math.Abs(Value - d.Value) < 0.001;
         return false;
     }
 

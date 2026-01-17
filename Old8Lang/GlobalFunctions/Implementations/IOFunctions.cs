@@ -51,7 +51,7 @@ public sealed class PrintFunction : BaseGlobalFunction
             ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
         }
 
-        ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", new[] { typeof(string) })!);
+        ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

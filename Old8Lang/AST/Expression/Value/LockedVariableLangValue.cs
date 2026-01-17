@@ -29,12 +29,12 @@ public partial class LockedVariableLangValue : LangValueType
     /// <summary>
     /// 用于同步访问的锁对象
     /// </summary>
-    private readonly Lock Lock = new();
+    private readonly Lock _lock = new();
 
     /// <summary>
     /// 内部存储的值
     /// </summary>
-    private LangValueType Value;
+    private LangValueType _value;
 
     /// <summary>
     /// 变量名（用于错误报告和调试）
@@ -50,7 +50,7 @@ public partial class LockedVariableLangValue : LangValueType
     public LockedVariableLangValue(LangValueType value, string variableName, SourcePosition position = default)
         : base(position)
     {
-        Value = value;
+        _value = value;
         VariableName = variableName;
     }
 
@@ -59,9 +59,9 @@ public partial class LockedVariableLangValue : LangValueType
     /// </summary>
     public LangValueType GetLockedValue()
     {
-        lock (Lock)
+        lock (_lock)
         {
-            return Value;
+            return _value;
         }
     }
 
@@ -70,9 +70,9 @@ public partial class LockedVariableLangValue : LangValueType
     /// </summary>
     public void SetValue(LangValueType value)
     {
-        lock (Lock)
+        lock (_lock)
         {
-            Value = value;
+            _value = value;
         }
     }
 
@@ -119,12 +119,12 @@ public partial class LockedVariableLangValue : LangValueType
                     throw new TypeError(this, "Function", funcExpr.GetType().Name);
                 }
 
-                lock (Lock)
+                lock (_lock)
                 {
                     // 在锁内调用函数，传入当前值
-                    var currentValue = Value;
-                    var newValue = func.Run(manager, [currentValue], null);
-                    Value = newValue;
+                    var currentValue = _value;
+                    var newValue = func.Run(manager, [currentValue]);
+                    _value = newValue;
                     return newValue;
                 }
             }
@@ -132,15 +132,15 @@ public partial class LockedVariableLangValue : LangValueType
             // 处理 .Increment() 方法 - 原子递增
             if (instance.Id.IdName == "Increment" && instance.Ids.Count == 0)
             {
-                lock (Lock)
+                lock (_lock)
                 {
-                    if (Value is not IntLangValue intValue)
+                    if (_value is not IntLangValue intValue)
                     {
-                        throw new TypeError(this, "Int", Value.GetType().Name);
+                        throw new TypeError(this, "Int", _value.GetType().Name);
                     }
 
                     var newValue = IntLangValue.Create(intValue.Value + 1);
-                    Value = newValue;
+                    _value = newValue;
                     return newValue;
                 }
             }
@@ -148,15 +148,15 @@ public partial class LockedVariableLangValue : LangValueType
             // 处理 .Decrement() 方法 - 原子递减
             if (instance.Id.IdName == "Decrement" && instance.Ids.Count == 0)
             {
-                lock (Lock)
+                lock (_lock)
                 {
-                    if (Value is not IntLangValue intValue)
+                    if (_value is not IntLangValue intValue)
                     {
-                        throw new TypeError(this, "Int", Value.GetType().Name);
+                        throw new TypeError(this, "Int", _value.GetType().Name);
                     }
 
                     var newValue = IntLangValue.Create(intValue.Value - 1);
-                    Value = newValue;
+                    _value = newValue;
                     return newValue;
                 }
             }
@@ -165,10 +165,10 @@ public partial class LockedVariableLangValue : LangValueType
             if (instance.Id.IdName == "Add" && instance.Ids.Count == 1)
             {
                 var deltaExpr = instance.Ids[0].Run(manager);
-                lock (Lock)
+                lock (_lock)
                 {
-                    var newValue = Value.Plus(deltaExpr);
-                    Value = newValue;
+                    var newValue = _value.Plus(deltaExpr);
+                    _value = newValue;
                     return newValue;
                 }
             }
@@ -183,15 +183,21 @@ public partial class LockedVariableLangValue : LangValueType
 
     public override string ToString()
     {
-        lock (Lock)
+        lock (_lock)
         {
-            return $"LockedVariable({VariableName}: {Value})";
+            return $"LockedVariable({VariableName}: {_value})";
         }
     }
 
     public override string TypeToString() => "LockedVariable";
 
-    public override object GetValue() => Value;
+    public override object GetValue()
+    {
+        lock (_lock)
+        {
+            return _value;
+        }
+    }
 
     /// <summary>
     /// 相等比较（线程安全）

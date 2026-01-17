@@ -45,7 +45,7 @@ public partial class SuperExpression(SourcePosition position = default) : LangEx
     /// <summary>
     /// 返回 super 表达式的类型（返回 object 类型）
     /// </summary>
-    public override Type? OutputType(Compiler.LocalManager local)
+    public override Type OutputType(Compiler.LocalManager local)
     {
         // super 表达式返回父类实例，类型为 object
         return typeof(object);
@@ -79,7 +79,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
             Instance instance => CallParentConstructor(instance, manager),
 
             // super.methodName - 父类方法访问
-            LangId id => AccessParentMember(id, manager),
+            LangId id => AccessParentMember(id),
 
             _ => throw new InvalidOperationError(this, $"不支持的super表达式: {dotExpression.GetType().Name}")
         };
@@ -111,7 +111,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
         }
 
         // 选择匹配的构造函数
-        var initMethod = SelectMethod(initMethods, instance.Ids, manager);
+        var initMethod = SelectMethod(initMethods, instance.Ids);
 
         // 在当前实例的上下文中执行父类构造函数
         return ExecuteParentMethod(initMethod, instance.Ids, manager);
@@ -120,7 +120,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 访问父类成员
     /// </summary>
-    private LangValueType AccessParentMember(LangId id, VariateManager manager)
+    private LangValueType AccessParentMember(LangId id)
     {
         var memberName = id.IdName;
         var parentMetadata = GetDirectParentMetadata();
@@ -182,7 +182,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 选择匹配的方法（处理重载）
     /// </summary>
-    private LangMethodInfo SelectMethod(List<LangMethodInfo> methods, List<LangExpression> arguments, VariateManager manager)
+    private LangMethodInfo SelectMethod(List<LangMethodInfo> methods, List<LangExpression> arguments)
     {
         if (methods.Count == 1)
         {
