@@ -39,6 +39,9 @@ public enum OpCode : byte
     /// <summary>加载false值</summary>
     LoadFalse = 0x0A,
 
+    /// <summary>交换栈顶两个元素</summary>
+    Swap = 0x0B,
+
     // ===== 算术运算 (0x10-0x1F) =====
     /// <summary>加法: b, a → (a + b)</summary>
     Add = 0x10,

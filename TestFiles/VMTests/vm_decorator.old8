@@ -1,0 +1,17 @@
+// 虚拟机模式装饰器测试 - 验证基本功能
+
+// 测试函数作为参数和返回值
+func getFunction() -> func {
+    func inner(x:int) -> int {
+        return x * 2
+    }
+    return inner
+}
+
+PrintLine("=== 测试函数作为返回值 ===")
+f <- getFunction()
+result <- f(5)
+PrintLine("结果: " + result.ToStr())
+
+PrintLine("")
+PrintLine("测试完成!")

@@ -597,7 +597,23 @@ public partial class BytecodeVisitor
             }
         }
 
-        _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
+        // 编译函数
+        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
+
+        // 检查是否有装饰器
+        if (funcValue.Decorators != null && funcValue.Decorators.Count > 0)
+        {
+            // 应用装饰器
+            ApplyDecorators(funcName, funcValue.Decorators);
+        }
+        else
+        {
+            // 无装饰器：直接将函数加载到栈并存储
+            int funcIndex = _compiler.GetFunctionIndex(funcName);
+            Emit(OpCode.MakeFunction, funcIndex);
+            Emit(OpCode.StoreGlobal, funcName);
+        }
+
         return null;
     }
 
@@ -1754,5 +1770,73 @@ public partial class BytecodeVisitor
 
         // 在编译器中注册 Mixin 定义
         _compiler.DeclareMixin(mixinName, methods);
+    }
+
+    /// <summary>
+    /// 应用装饰器到函数
+    /// </summary>
+    private void ApplyDecorators(string funcName, List<FunctionDecorator> decorators)
+    {
+        // 1. 加载原始函数
+        int funcIndex = _compiler.GetFunctionIndex(funcName);
+        Emit(OpCode.MakeFunction, funcIndex);
+
+        // 2. 从下到上应用装饰器
+        for (int i = decorators.Count - 1; i >= 0; i--)
+        {
+            var decorator = decorators[i];
+            ApplySingleDecorator(decorator);
+        }
+
+        // 3. 存储最终函数
+        Emit(OpCode.StoreGlobal, funcName);
+    }
+
+    /// <summary>
+    /// 应用单个装饰器
+    /// </summary>
+    private void ApplySingleDecorator(FunctionDecorator decorator)
+    {
+        // 栈顶是目标函数
+
+        if (decorator.Arguments != null && decorator.Arguments.Count > 0)
+        {
+            // 带参数的装饰器：decorator(args...)(targetFunc)
+
+            // 1. 加载装饰器函数
+            Emit(OpCode.LoadGlobal, decorator.Name);
+
+            // 2. 计算装饰器参数
+            foreach (var arg in decorator.Arguments)
+            {
+                arg.Accept(this);
+            }
+
+            // 3. 调用装饰器函数获取包装器
+            Emit(OpCode.CallDynamic, decorator.Arguments.Count);
+
+            // 4. 交换栈顶两个元素（包装器和目标函数）
+            // 栈：[targetFunc, wrapper] -> [wrapper, targetFunc]
+            Emit(OpCode.Swap);
+
+            // 5. 调用包装器
+            Emit(OpCode.CallDynamic, 1);
+        }
+        else
+        {
+            // 无参数的装饰器：decorator(targetFunc)
+
+            // 1. 加载装饰器函数
+            Emit(OpCode.LoadGlobal, decorator.Name);
+
+            // 2. 交换栈顶两个元素
+            // 栈：[targetFunc, decorator] -> [decorator, targetFunc]
+            Emit(OpCode.Swap);
+
+            // 3. 调用装饰器
+            Emit(OpCode.CallDynamic, 1);
+        }
+
+        // 栈顶现在是装饰后的函数
     }
 }

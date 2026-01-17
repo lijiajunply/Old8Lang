@@ -81,6 +81,15 @@ public partial class VirtualMachine
                 _stack.Push(false);
                 break;
 
+            case OpCode.Swap:
+            {
+                var a = _stack.Pop();
+                var b = _stack.Pop();
+                _stack.Push(a);
+                _stack.Push(b);
+            }
+                break;
+
             // === 算术运算 ===
             case OpCode.Add:
             {

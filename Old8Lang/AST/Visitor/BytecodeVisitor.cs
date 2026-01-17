@@ -95,6 +95,10 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
                 _currentStackSize--;
                 break;
 
+            case OpCode.Swap:
+                // 交换栈顶两个元素，栈大小不变
+                break;
+
             case OpCode.Add:
             case OpCode.Sub:
             case OpCode.Mul:

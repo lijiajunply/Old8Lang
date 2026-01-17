@@ -1,8 +1,10 @@
 using System.Collections;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
+using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.Bytecode;
@@ -29,6 +31,33 @@ public partial class VirtualMachine
 
     private object? Add(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            // 尝试调用 _add 方法
+            var result = TryCallOperatorMethod(objA, "_add", b);
+            if (result != null)
+                return result;
+
+            throw new Exception($"类型 '{objA.ClassName}' 不支持加法操作（未定义 _add 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Plus(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                // 如果没有定义 _add 方法，抛出错误
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持加法操作（未定义 _add 方法）");
+            }
+        }
+
+        // 原有的基本类型处理逻辑
         if (a is int ia && b is int ib) return ia + ib;
         if (a is double da && b is double db) return da + db;
         if (a is int ia2 && b is double db2) return ia2 + db2;
@@ -39,6 +68,29 @@ public partial class VirtualMachine
 
     private object? Sub(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_sub", b);
+            if (result != null)
+                return result;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持减法操作（未定义 _sub 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Minus(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持减法操作（未定义 _sub 方法）");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia - ib;
         if (a is double da && b is double db) return da - db;
         if (a is int ia2 && b is double db2) return ia2 - db2;
@@ -48,6 +100,29 @@ public partial class VirtualMachine
 
     private object? Mul(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_mul", b);
+            if (result != null)
+                return result;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持乘法操作（未定义 _mul 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Times(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持乘法操作（未定义 _mul 方法）");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia * ib;
         if (a is double da && b is double db) return da * db;
         if (a is int ia2 && b is double db2) return ia2 * db2;
@@ -57,6 +132,29 @@ public partial class VirtualMachine
 
     private object? Div(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_div", b);
+            if (result != null)
+                return result;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持除法操作（未定义 _div 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Divide(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持除法操作（未定义 _div 方法）");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia / ib;
         if (a is double da && b is double db) return da / db;
         if (a is int ia2 && b is double db2) return ia2 / db2;
@@ -66,6 +164,29 @@ public partial class VirtualMachine
 
     private object? Mod(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_mod", b);
+            if (result != null)
+                return result;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持取模操作（未定义 _mod 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Mod(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持取模操作（未定义 _mod 方法）");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia % ib;
         if (a is double da && b is double db) return da % db;
         throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模");
@@ -73,6 +194,29 @@ public partial class VirtualMachine
 
     private object? Pow(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_pow", b);
+            if (result != null)
+                return result;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持幂运算操作（未定义 _pow 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return anyA.Power(bValue);
+            }
+            catch (InvalidOperationError)
+            {
+                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持幂运算操作（未定义 _pow 方法）");
+            }
+        }
+
         double da = ToDouble(a);
         double db = ToDouble(b);
         return Math.Pow(da, db);
@@ -90,6 +234,23 @@ public partial class VirtualMachine
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
 
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_eq", b);
+            if (result != null && result is bool boolResult)
+                return boolResult;
+            // 如果没有定义 _eq 方法，使用引用相等
+            return ReferenceEquals(a, b);
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return anyA.Equal(bValue);
+        }
+
         if (a is int ia && b is int ib) return ia == ib;
         if (a is double da && b is double db) return Math.Abs(da - db) < 1e-10;
         if (a is bool ba && b is bool bb) return ba == bb;
@@ -106,6 +267,22 @@ public partial class VirtualMachine
 
     private bool Greater(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_gt", b);
+            if (result != null && result is bool boolResult)
+                return boolResult;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持大于比较操作（未定义 _gt 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return anyA.Greater(bValue);
+        }
+
         if (a is int ia && b is int ib) return ia > ib;
         if (a is double da && b is double db) return da > db;
         if (a is int ia2 && b is double db2) return ia2 > db2;
@@ -115,6 +292,22 @@ public partial class VirtualMachine
 
     private bool Less(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_lt", b);
+            if (result != null && result is bool boolResult)
+                return boolResult;
+            throw new Exception($"类型 '{objA.ClassName}' 不支持小于比较操作（未定义 _lt 方法）");
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return anyA.Less(bValue);
+        }
+
         if (a is int ia && b is int ib) return ia < ib;
         if (a is double da && b is double db) return da < db;
         if (a is int ia2 && b is double db2) return ia2 < db2;
@@ -124,11 +317,45 @@ public partial class VirtualMachine
 
     private bool GreaterEqual(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_ge", b);
+            if (result != null && result is bool boolResult)
+                return boolResult;
+            // 如果没有 _ge 方法，尝试使用 _gt 和 _eq
+            return Greater(a, b) || Equals(a, b);
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return anyA.GreaterEqual(bValue);
+        }
+
         return Greater(a, b) || Equals(a, b);
     }
 
     private bool LessEqual(object? a, object? b)
     {
+        // 检查是否是 BytecodeObjectInstance（运算符重载）
+        if (a is BytecodeObjectInstance objA)
+        {
+            var result = TryCallOperatorMethod(objA, "_le", b);
+            if (result != null && result is bool boolResult)
+                return boolResult;
+            // 如果没有 _le 方法，尝试使用 _lt 和 _eq
+            return Less(a, b) || Equals(a, b);
+        }
+
+        // 检查是否是 AnyLangValue（运算符重载）
+        if (a is AnyLangValue anyA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return anyA.LessEqual(bValue);
+        }
+
         return Less(a, b) || Equals(a, b);
     }
 
@@ -560,6 +787,44 @@ public partial class VirtualMachine
     private List<object?> FlattenTupleHelper(TupleLangValue tuple)
     {
         return tuple.GetItems().Cast<object?>().ToList();
+    }
+
+    /// <summary>
+    /// 尝试调用 BytecodeObjectInstance 的运算符重载方法
+    /// </summary>
+    private object? TryCallOperatorMethod(BytecodeObjectInstance obj, string methodName, object? operand)
+    {
+        // 查找类的元数据
+        var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == obj.ClassName);
+        if (classMetadata == null)
+            return null;
+
+        // 查找方法
+        var method = classMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
+        if (method == null)
+            return null;
+
+        // 调用方法（第一个参数是 this，第二个参数是操作数）
+        var args = new object?[] { obj, operand };
+        return ExecuteFunctionAndGetResult(method.Function, args);
+    }
+
+    /// <summary>
+    /// 将虚拟机栈上的值转换为 LangValueType
+    /// </summary>
+    private LangValueType ConvertToLangValueType(object? value)
+    {
+        return value switch
+        {
+            null => new NullLangValue(),
+            int i => new IntLangValue(i),
+            double d => new DoubleLangValue(d),
+            string s => new StringLangValue(s),
+            bool b => new BoolLangValue(b),
+            char c => new CharLangValue(c),
+            LangValueType lvt => lvt,
+            _ => throw new Exception($"无法将类型 {value.GetType().Name} 转换为 LangValueType")
+        };
     }
 
     /// <summary>

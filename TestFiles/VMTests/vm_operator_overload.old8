@@ -1,0 +1,69 @@
+// 虚拟机模式运算符重载测试 - 最简化版
+
+class Number {
+    public value
+
+    init(v) {
+        this.value <- v
+    }
+
+    _add(other) {
+        // 直接返回数值,不创建新对象
+        return this.value + other.value
+    }
+
+    _sub(other) {
+        return this.value - other.value
+    }
+
+    _mul(other) {
+        return this.value * other
+    }
+
+    _eq(other) {
+        return this.value == other.value
+    }
+
+    _lt(other) {
+        return this.value < other.value
+    }
+
+    _gt(other) {
+        return this.value > other.value
+    }
+}
+
+// 测试加法
+n1 <- Number()
+n1.value <- 10
+n2 <- Number()
+n2.value <- 20
+result <- n1 + n2
+PrintLine("10 + 20 = " + result.ToStr())  // 应输出 30
+
+// 测试减法
+result2 <- n2 - n1
+PrintLine("20 - 10 = " + result2.ToStr())  // 应输出 10
+
+// 测试乘法
+result3 <- n1 * 3
+PrintLine("10 * 3 = " + result3.ToStr())  // 应输出 30
+
+// 测试相等比较
+n3 <- Number()
+n3.value <- 10
+if n1 == n3 {
+    PrintLine("相等测试通过")
+}
+
+// 测试小于比较
+if n1 < n2 {
+    PrintLine("小于测试通过")
+}
+
+// 测试大于比较
+if n2 > n1 {
+    PrintLine("大于测试通过")
+}
+
+PrintLine("所有运算符重载测试完成!")
