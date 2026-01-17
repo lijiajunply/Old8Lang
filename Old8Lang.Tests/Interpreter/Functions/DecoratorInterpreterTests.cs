@@ -165,7 +165,7 @@ public class DecoratorInterpreterTests
             callCount <- 0
 
             func cache(f) {
-                cacheDict <- {}
+                cacheDict <- dict()
                 wrapper <- (n) -> {
                     key <- n.ToStr()
                     if cacheDict.ContainsKey(key) {
