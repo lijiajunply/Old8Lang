@@ -667,6 +667,12 @@ public static class LangTokenizer
                 continue;
             }
 
+            if (code[i] == '@')
+            {
+                tokens.Add(new LangToken("@", LangTokenType.At, line, i - column));
+                continue;
+            }
+
             #endregion
 
             #region 关键词

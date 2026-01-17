@@ -58,6 +58,12 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     public DocCommentInfo? DocComment { get; set; }
 
+    /// <summary>
+    /// 装饰器列表
+    /// 存储应用于此函数的装饰器（从上到下的顺序）
+    /// </summary>
+    public List<FunctionDecorator>? Decorators { get; set; }
+
     public FuncLangValue(
         LangId? id,
         List<LangId> ids,

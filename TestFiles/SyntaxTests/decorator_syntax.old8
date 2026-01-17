@@ -1,0 +1,28 @@
+// 测试装饰器语法解析
+
+// 无参数装饰器
+@log
+func simpleFunc(x:int) -> int {
+    return x * 2
+}
+
+// 带参数装饰器
+@cache(timeout: 60)
+func cachedFunc(n:int) -> int {
+    return n * n
+}
+
+// 多个装饰器
+@log
+@cache(timeout: 30)
+func multiDecorator(a:int, b:int) -> int {
+    return a + b
+}
+
+// 异步函数装饰器
+@async_log
+async func asyncFunc(x:int) -> int {
+    return x + 1
+}
+
+PrintLine("装饰器语法测试通过")

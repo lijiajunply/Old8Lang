@@ -18,10 +18,13 @@ public class FunctionParser(
 {
     /// <summary>
     /// 解析函数声明
-    /// funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block
+    /// funcDeclaration = decorators? ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block
     /// </summary>
-    public FuncInit ParseFuncDeclaration()
+    public FuncInit ParseFuncDeclaration(List<FunctionDecorator>? decorators = null)
     {
+        // 如果没有提供装饰器，则解析装饰器
+        decorators ??= ParseDecorators();
+
         // 收集前置的文档注释
         var docComment = CollectPrecedingDocComments();
 
@@ -107,6 +110,12 @@ public class FunctionParser(
         // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
         var funcLangValue = new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false);
 
+        // 设置装饰器
+        if (decorators is not null)
+        {
+            funcLangValue.Decorators = decorators;
+        }
+
         // 设置文档注释
         if (docComment is not null)
         {
@@ -118,9 +127,9 @@ public class FunctionParser(
 
     /// <summary>
     /// 解析异步函数声明
-    /// asyncFuncDeclaration = "async" "func" identifier "(" idList? ")" ( "->" returnType )? block
+    /// asyncFuncDeclaration = decorators? "async" "func" identifier "(" idList? ")" ( "->" returnType )? block
     /// </summary>
-    public AsyncFuncInit ParseAsyncFuncDeclaration(DocCommentInfo? providedDocComment = null)
+    public AsyncFuncInit ParseAsyncFuncDeclaration(DocCommentInfo? providedDocComment = null, List<FunctionDecorator>? decorators = null)
     {
         // 如果提供了文档注释则使用提供的，否则收集前置的文档注释
         var docComment = providedDocComment ?? CollectPrecedingDocComments();
@@ -188,6 +197,12 @@ public class FunctionParser(
 
         // 异步函数声明，生成 AsyncFuncInit
         var asyncFuncLangValue = new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position);
+
+        // 设置装饰器
+        if (decorators is not null)
+        {
+            asyncFuncLangValue.Decorators = decorators;
+        }
 
         // 设置文档注释
         if (docComment is not null)
@@ -757,5 +772,65 @@ public class FunctionParser(
             // 没有更多约束，退出循环
             break;
         }
+    }
+
+    /// <summary>
+    /// 解析单个装饰器
+    /// decorator = "@" identifier ( "(" argList? ")" )?
+    /// </summary>
+    public FunctionDecorator ParseDecorator()
+    {
+        var position = new SourcePosition(CurrentToken.Line, CurrentToken.Column);
+
+        // 消费 @ 符号
+        Expect(LangTokenType.At);
+
+        // 解析装饰器名称
+        var decoratorName = ParseIdentifier().IdName;
+
+        // 检查是否有参数
+        List<LangExpression>? arguments = null;
+        if (CurrentToken.Type == LangTokenType.LeftParen)
+        {
+            Expect(LangTokenType.LeftParen);
+
+            // 使用 ParseArgList 解析参数列表（支持命名参数）
+            if (CurrentToken.Type != LangTokenType.RightParen)
+            {
+                ParseArgList(out var positionalArgs, out var namedArgs);
+
+                // 合并位置参数和命名参数
+                arguments = new List<LangExpression>();
+                arguments.AddRange(positionalArgs);
+
+                // 将命名参数的值添加到参数列表
+                // 注意：装饰器调用时，命名参数会被转换为位置参数
+                foreach (var namedArg in namedArgs)
+                {
+                    arguments.Add(namedArg.Value);
+                }
+            }
+
+            Expect(LangTokenType.RightParen);
+        }
+
+        return new FunctionDecorator(decoratorName, arguments, position);
+    }
+
+    /// <summary>
+    /// 解析装饰器列表
+    /// decorators = decorator*
+    /// </summary>
+    public List<FunctionDecorator>? ParseDecorators()
+    {
+        List<FunctionDecorator>? decorators = null;
+
+        while (CurrentToken.Type == LangTokenType.At)
+        {
+            decorators ??= new List<FunctionDecorator>();
+            decorators.Add(ParseDecorator());
+        }
+
+        return decorators;
     }
 }

@@ -49,6 +49,30 @@ public class StatementParser(
             throw CreateSyntaxError("语法错误：意外的文件结束符。建议检查是否缺少结束符号或语句。");
         }
 
+        // 处理装饰器：@ 符号开头
+        if (CurrentToken.Type == LangTokenType.At)
+        {
+            var decorators = functionParser.ParseDecorators();
+
+            // 装饰器后面必须跟函数声明（func 或 async func）
+            if (CurrentToken.Type == LangTokenType.Func)
+            {
+                return functionParser.ParseFuncDeclaration(decorators);
+            }
+            else if (CurrentToken.Type == LangTokenType.Async)
+            {
+                // 收集文档注释
+                var docComment = CollectPrecedingDocComments();
+                Expect(LangTokenType.Async);
+                Expect(LangTokenType.Func);
+                return functionParser.ParseAsyncFuncDeclaration(docComment, decorators);
+            }
+            else
+            {
+                throw CreateSyntaxError("装饰器后面必须跟函数声明（func 或 async func）");
+            }
+        }
+
         // 处理访问修饰符：public、private、static 或它们的组合
         if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
         {
@@ -188,7 +212,7 @@ public class StatementParser(
 
             // 否则是 async func
             Expect(LangTokenType.Func);
-            return functionParser.ParseAsyncFuncDeclaration(docComment);
+            return functionParser.ParseAsyncFuncDeclaration(docComment, null);
         }
 
         // 处理函数定义（包括带有修饰符的函数定义）

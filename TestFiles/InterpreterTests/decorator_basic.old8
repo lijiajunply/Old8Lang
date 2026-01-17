@@ -1,0 +1,89 @@
+// 测试基本装饰器功能
+
+PrintLine("=== 装饰器基本测试 ===")
+
+// 定义一个简单的日志装饰器
+func log(targetFunc) {
+    // 返回一个包装函数
+    wrapper <- (a, b) -> {
+        PrintLine("调用函数，参数: " + a.ToStr() + ", " + b.ToStr())
+        result <- targetFunc(a, b)
+        PrintLine("函数返回: " + result.ToStr())
+        return result
+    }
+    return wrapper
+}
+
+// 使用装饰器
+@log
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+result <- add(3, 5)
+PrintLine("结果: " + result.ToStr())
+
+PrintLine("")
+PrintLine("=== 带参数的装饰器测试 ===")
+
+// 定义一个带参数的缓存装饰器
+func cache(timeout) {
+    return (targetFunc) -> {
+        cacheDict <- {}
+        wrapper <- (n) -> {
+            key <- n.ToStr()
+            if cacheDict.ContainsKey(key) {
+                PrintLine("从缓存返回 (timeout: " + timeout.ToStr() + ")")
+                return cacheDict[key]
+            }
+            PrintLine("执行函数计算...")
+            result <- targetFunc(n)
+            cacheDict[key] <- result
+            return result
+        }
+        return wrapper
+    }
+}
+
+@cache(timeout: 60)
+func expensiveOp(n:int) -> int {
+    return n * n
+}
+
+r1 <- expensiveOp(5)
+PrintLine("第一次调用: " + r1.ToStr())
+
+r2 <- expensiveOp(5)
+PrintLine("第二次调用: " + r2.ToStr())
+
+PrintLine("")
+PrintLine("=== 多个装饰器测试 ===")
+
+func double(targetFunc) {
+    wrapper <- (x) -> {
+        result <- targetFunc(x)
+        return result * 2
+    }
+    return wrapper
+}
+
+func addOne(targetFunc) {
+    wrapper <- (x) -> {
+        result <- targetFunc(x)
+        return result + 1
+    }
+    return wrapper
+}
+
+@double
+@addOne
+func getValue(x:int) -> int {
+    return x
+}
+
+// 应该先 addOne (5 + 1 = 6)，然后 double (6 * 2 = 12)
+r3 <- getValue(5)
+PrintLine("多装饰器结果: " + r3.ToStr())
+
+PrintLine("")
+PrintLine("✅ 装饰器测试完成")

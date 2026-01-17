@@ -1,0 +1,23 @@
+// 测试编译器模式下的装饰器
+
+PrintLine("=== 编译器模式装饰器测试 ===")
+
+// 定义装饰器（简化版本）
+func timing(targetFunc:object) -> object {
+    // 编译器模式下简化处理：直接返回原函数
+    // 完整实现需要包装函数并计时
+    PrintLine("应用 timing 装饰器")
+    return targetFunc
+}
+
+// 使用装饰器
+@timing
+func calculate(x:int, y:int) -> int {
+    return x * y
+}
+
+result:int <- calculate(4, 5)
+PrintLine("计算结果: " + result.ToStr())
+
+PrintLine("")
+PrintLine("✅ 编译器模式装饰器测试完成")

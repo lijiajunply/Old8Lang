@@ -403,6 +403,11 @@ public enum LangTokenType
     Params,
 
     /// <summary>
+    /// @ (装饰器符号)
+    /// </summary>
+    At,
+
+    /// <summary>
     /// 文件头指令 (#!...)
     /// </summary>
     FileHeaderDirective,

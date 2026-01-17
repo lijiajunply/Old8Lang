@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using System.Reflection;
@@ -52,8 +53,98 @@ public partial class AsyncFuncInit : OldStatement
             }
         }
 
+        // 应用装饰器（如果有）
+        var finalFunc = ApplyDecorators(AsyncFuncValue, manager);
+
         // 添加到导入信息列表
-        manager.AddClassAndFunc(AsyncFuncValue);
+        manager.AddClassAndFunc(finalFunc);
+    }
+
+    /// <summary>
+    /// 应用装饰器到异步函数
+    /// </summary>
+    private AsyncFuncLangValue ApplyDecorators(AsyncFuncLangValue originalFunc, VariateManager manager)
+    {
+        if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
+        {
+            return originalFunc;
+        }
+
+        // 对于异步函数，装饰器的处理稍微复杂一些
+        // 因为装饰器可能返回普通函数或异步函数
+        // 这里我们简化处理：装饰器必须返回异步函数
+
+        LangValueType currentFunc = originalFunc;
+
+        // 从下到上应用装饰器（最接近函数的装饰器最先应用）
+        for (int i = originalFunc.Decorators.Count - 1; i >= 0; i--)
+        {
+            var decorator = originalFunc.Decorators[i];
+            currentFunc = ApplySingleDecorator(decorator, currentFunc, manager);
+        }
+
+        // 确保最终结果是异步函数
+        if (currentFunc is not AsyncFuncLangValue asyncFunc)
+        {
+            throw new InvalidOperationError(originalFunc.Position, "异步函数的装饰器必须返回异步函数");
+        }
+
+        return asyncFunc;
+    }
+
+    /// <summary>
+    /// 应用单个装饰器
+    /// </summary>
+    private Old8Lang.AST.Expression.LangValueType ApplySingleDecorator(FunctionDecorator decorator, Old8Lang.AST.Expression.LangValueType targetFunc, VariateManager manager)
+    {
+        // 准备装饰器调用参数
+        var args = new List<LangExpression>();
+
+        // 将目标函数临时注册
+        var tempVarName = $"__decorator_target_{Guid.NewGuid():N}";
+        if (targetFunc is AsyncFuncLangValue asyncTarget)
+        {
+            var tempAsyncFunc = new AsyncFuncLangValue(
+                new LangId(tempVarName, position: decorator.Position),
+                asyncTarget.Ids,
+                asyncTarget.BlockStatement,
+                asyncTarget.Position
+            );
+            manager.AddClassAndFunc(tempAsyncFunc);
+        }
+        else if (targetFunc is FuncLangValue funcTarget)
+        {
+            var tempFunc = new FuncLangValue(
+                new LangId(tempVarName, position: decorator.Position),
+                funcTarget.Ids ?? [],
+                funcTarget.BlockStatement,
+                funcTarget.GenericParameters,
+                funcTarget.Position,
+                isLambda: false
+            );
+            manager.AddClassAndFunc(tempFunc);
+        }
+        args.Add(new LangId(tempVarName, position: decorator.Position));
+
+        // 添加装饰器参数（如果有）
+        if (decorator.Arguments is not null)
+        {
+            args.AddRange(decorator.Arguments);
+        }
+
+        // 创建函数调用表达式来调用装饰器
+        var callExpr = new FunctionCallExpression(
+            new LangId(decorator.Name, position: decorator.Position),
+            args,
+            decorator.Position
+        );
+
+        // 执行装饰器调用
+        var result = callExpr.Run(manager);
+
+        // 注意：我们不清理临时变量，因为它的名称是唯一的，不会冲突
+
+        return result;
     }
 
     /// <summary>

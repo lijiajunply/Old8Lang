@@ -33,6 +33,12 @@ public class AsyncFuncLangValue : ImportInfo
     public DocCommentInfo? DocComment { get; set; }
 
     /// <summary>
+    /// 装饰器列表
+    /// 存储应用于此异步函数的装饰器（从上到下的顺序）
+    /// </summary>
+    public List<FunctionDecorator>? Decorators { get; set; }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     public AsyncFuncLangValue(
