@@ -94,14 +94,20 @@ selectDefault = "default" "->" blockStatement ;
 
 (* Function Declarations *)
 
-functionDeclaration = accessModifier*
+decorator = "@" identifier ( "(" argumentList? ")" )? ;
+
+decorators = decorator* ;
+
+functionDeclaration = decorators
+                     accessModifier*
                      ( "func" identifier | identifier )
                      genericTypeParameters?
                      "(" parameterList? ")"
                      ( "->" type )?
                      blockStatement ;
 
-asyncFunctionDeclaration = accessModifier*
+asyncFunctionDeclaration = decorators
+                          accessModifier*
                           "async" "func" identifier
                           genericTypeParameters?
                           "(" parameterList? ")"

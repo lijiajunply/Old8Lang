@@ -1,0 +1,32 @@
+// 测试装饰器 - 不使用 Lambda 闭包
+
+PrintLine("=== 装饰器测试（无闭包版本）===")
+
+// 定义一个全局变量来存储目标函数
+targetFuncGlobal <- null
+
+// 定义装饰器
+func double(f) {
+    // 将函数存储到全局变量
+    targetFuncGlobal <- f
+
+    // 返回包装函数
+    func wrapper(x:int) -> int {
+        temp <- targetFuncGlobal(x)
+        return temp * 2
+    }
+
+    return wrapper
+}
+
+// 使用装饰器
+@double
+func getValue(x:int) -> int {
+    return x
+}
+
+// 测试
+r <- getValue(5)
+PrintLine("结果: " + r.ToStr())  // 应该输出 10
+
+PrintLine("✅ 装饰器测试完成")

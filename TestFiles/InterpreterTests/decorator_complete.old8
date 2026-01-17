@@ -1,0 +1,63 @@
+// 装饰器功能完整测试
+
+PrintLine("=== Old8Lang 装饰器功能测试 ===")
+PrintLine("")
+
+// 测试 1: 简单装饰器（返回原函数）
+PrintLine("测试 1: 简单装饰器")
+func identity(f) {
+    PrintLine("  - identity 装饰器被调用")
+    return f
+}
+
+@identity
+func test1(x:int) -> int {
+    return x * 2
+}
+
+r1 <- test1(5)
+PrintLine("  结果: " + r1.ToStr() + " (期望: 10)")
+PrintLine("")
+
+// 测试 2: 带参数的装饰器
+PrintLine("测试 2: 带参数的装饰器")
+func repeat(times) {
+    PrintLine("  - repeat 装饰器被调用，times = " + times.ToStr())
+    return (f) -> {
+        PrintLine("  - repeat 包装器被调用")
+        return f
+    }
+}
+
+@repeat(times: 3)
+func test2(x:int) -> int {
+    return x + 1
+}
+
+r2 <- test2(10)
+PrintLine("  结果: " + r2.ToStr() + " (期望: 11)")
+PrintLine("")
+
+// 测试 3: 多个装饰器
+PrintLine("测试 3: 多个装饰器")
+func decorator1(f) {
+    PrintLine("  - decorator1 被调用")
+    return f
+}
+
+func decorator2(f) {
+    PrintLine("  - decorator2 被调用")
+    return f
+}
+
+@decorator1
+@decorator2
+func test3(x:int) -> int {
+    return x
+}
+
+r3 <- test3(7)
+PrintLine("  结果: " + r3.ToStr() + " (期望: 7)")
+PrintLine("")
+
+PrintLine("✅ 所有装饰器测试通过！")

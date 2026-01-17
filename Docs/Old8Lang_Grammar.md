@@ -1,6 +1,6 @@
 # Old8Lang 语法文档
 
-**最后更新**: 2026年1月15日
+**最后更新**: 2026年1月17日
 
 ## 1. 简介
 
@@ -1003,11 +1003,152 @@ func withReturn() -> int {
 - `using`：专门用于自动资源管理（Dispose），作用域为代码块
 - `defer`：通用的延迟执行机制，作用域为函数，支持任意语句
 
-### 5.5 函数声明
+### 5.5 函数装饰器
+
+**模式支持**: `[✅ | ⚠️ | ❌]`
+
+函数装饰器是一种语法糖，允许在函数定义时使用 `@decorator` 语法来包装和增强函数行为。装饰器在运行时自动应用，可以用于日志记录、缓存、权限检查等场景。
+
+#### 5.5.1 基本装饰器语法
+
+**无参数装饰器**：
+
+```old8
+// 定义装饰器函数
+func log(targetFunc) {
+    PrintLine("装饰器被调用")
+    return targetFunc
+}
+
+// 使用装饰器
+@log
+func myFunc(x:int) -> int {
+    return x * 2
+}
+```
+
+**带参数的装饰器**：
+
+```old8
+// 定义带参数的装饰器
+func cache(timeout) {
+    PrintLine("缓存超时: " + timeout.ToStr())
+    return (targetFunc) -> {
+        // 返回包装函数
+        return targetFunc
+    }
+}
+
+// 使用带参数的装饰器（支持命名参数）
+@cache(timeout: 60)
+func expensiveOp(n:int) -> int {
+    return n * n
+}
+```
+
+**多个装饰器**：
+
+```old8
+// 多个装饰器从下到上依次应用
+@decorator1
+@decorator2
+@decorator3
+func myFunc(x:int) -> int {
+    return x
+}
+
+// 等价于：myFunc = decorator1(decorator2(decorator3(myFunc)))
+```
+
+#### 5.5.2 装饰器工作原理
+
+装饰器本质上是一个高阶函数，它接收一个函数作为参数，返回一个新的函数：
+
+```old8
+// 无参数装饰器：直接接收目标函数
+func decorator(targetFunc) {
+    // 返回包装后的函数
+    return targetFunc
+}
+
+// 带参数的装饰器：返回一个接收目标函数的函数（柯里化）
+func decorator(arg1, arg2) {
+    return (targetFunc) -> {
+        // 使用 arg1, arg2 和 targetFunc
+        return targetFunc
+    }
+}
+```
+
+#### 5.5.3 装饰器应用顺序
+
+多个装饰器按照**从下到上**的顺序应用（最接近函数的装饰器最先应用）：
+
+```old8
+@outer
+@middle
+@inner
+func myFunc() { }
+
+// 应用顺序：
+// 1. inner(myFunc) -> result1
+// 2. middle(result1) -> result2
+// 3. outer(result2) -> finalFunc
+```
+
+#### 5.5.4 装饰器使用场景
+
+**日志记录**：
+
+```old8
+func logCalls(f) {
+    wrapper <- (args) -> {
+        PrintLine("调用函数: " + f.Id.IdName)
+        result <- f(args)
+        PrintLine("返回: " + result.ToStr())
+        return result
+    }
+    return wrapper
+}
+
+@logCalls
+func add(a:int, b:int) -> int {
+    return a + b
+}
+```
+
+**性能计时**：
+
+```old8
+func timing(f) {
+    wrapper <- (args) -> {
+        start <- GetTime()
+        result <- f(args)
+        elapsed <- GetTime() - start
+        PrintLine("耗时: " + elapsed.ToStr() + "ms")
+        return result
+    }
+    return wrapper
+}
+
+@timing
+func slowOperation(n:int) -> int {
+    // 耗时操作
+    return n
+}
+```
+
+#### 5.5.5 已知限制
+
+- **编译器模式**: 装饰器在编译器模式下的支持需要进一步完善
+- **闭包捕获**: Lambda 闭包捕获装饰器参数的场景需要特殊处理
+- **类型推断**: 装饰器可能改变函数签名，类型推断需要额外处理
+
+### 5.6 函数声明
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
-#### 5.5.1 基本函数声明
+#### 5.6.1 基本函数声明
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -1033,7 +1174,7 @@ func add(a:int, b:int) -> int {
 }
 ```
 
-#### 5.5.2 参数和默认值
+#### 5.6.2 参数和默认值
 
 **模式支持**: `[✅ | ✅ | ✅]`
 

@@ -97,11 +97,9 @@ public partial class AsyncFuncInit : OldStatement
     /// </summary>
     private Old8Lang.AST.Expression.LangValueType ApplySingleDecorator(FunctionDecorator decorator, Old8Lang.AST.Expression.LangValueType targetFunc, VariateManager manager)
     {
-        // 准备装饰器调用参数
-        var args = new List<LangExpression>();
-
         // 将目标函数临时注册
         var tempVarName = $"__decorator_target_{Guid.NewGuid():N}";
+
         if (targetFunc is AsyncFuncLangValue asyncTarget)
         {
             var tempAsyncFunc = new AsyncFuncLangValue(
@@ -124,25 +122,55 @@ public partial class AsyncFuncInit : OldStatement
             );
             manager.AddClassAndFunc(tempFunc);
         }
-        args.Add(new LangId(tempVarName, position: decorator.Position));
 
-        // 添加装饰器参数（如果有）
-        if (decorator.Arguments is not null)
+        Old8Lang.AST.Expression.LangValueType result;
+
+        // 检查装饰器是否有参数
+        if (decorator.Arguments is not null && decorator.Arguments.Count > 0)
         {
-            args.AddRange(decorator.Arguments);
+            // 带参数的装饰器：先调用装饰器函数获取包装器，然后用包装器包装目标函数
+            var decoratorCallExpr = new FunctionCallExpression(
+                new LangId(decorator.Name, position: decorator.Position),
+                decorator.Arguments,
+                decorator.Position
+            );
+            var wrapperFunc = decoratorCallExpr.Run(manager);
+
+            if (wrapperFunc is not FuncLangValue wrapper)
+            {
+                throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
+            }
+
+            // 将包装器临时注册
+            var wrapperVarName = $"__decorator_wrapper_{Guid.NewGuid():N}";
+            var wrapperWithId = new FuncLangValue(
+                new LangId(wrapperVarName, position: decorator.Position),
+                wrapper.Ids ?? [],
+                wrapper.BlockStatement,
+                wrapper.GenericParameters,
+                wrapper.Position,
+                isLambda: false
+            );
+            manager.AddClassAndFunc(wrapperWithId);
+
+            // 调用包装器，传入目标函数
+            var wrapperCallExpr = new FunctionCallExpression(
+                new LangId(wrapperVarName, position: decorator.Position),
+                [new LangId(tempVarName, position: decorator.Position)],
+                decorator.Position
+            );
+            result = wrapperCallExpr.Run(manager);
         }
-
-        // 创建函数调用表达式来调用装饰器
-        var callExpr = new FunctionCallExpression(
-            new LangId(decorator.Name, position: decorator.Position),
-            args,
-            decorator.Position
-        );
-
-        // 执行装饰器调用
-        var result = callExpr.Run(manager);
-
-        // 注意：我们不清理临时变量，因为它的名称是唯一的，不会冲突
+        else
+        {
+            // 无参数的装饰器：直接调用装饰器函数，传入目标函数
+            var callExpr = new FunctionCallExpression(
+                new LangId(decorator.Name, position: decorator.Position),
+                [new LangId(tempVarName, position: decorator.Position)],
+                decorator.Position
+            );
+            result = callExpr.Run(manager);
+        }
 
         return result;
     }

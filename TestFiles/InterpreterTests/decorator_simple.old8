@@ -1,0 +1,25 @@
+// 简单的装饰器测试
+
+PrintLine("=== 简单装饰器测试 ===")
+
+// 定义一个简单的装饰器（不使用闭包）
+func double(f) {
+    // 返回一个新函数，这个函数会将结果翻倍
+    result <- (x) -> {
+        temp <- f(x)
+        return temp * 2
+    }
+    return result
+}
+
+// 使用装饰器
+@double
+func getValue(x:int) -> int {
+    return x
+}
+
+// 测试
+r <- getValue(5)
+PrintLine("结果: " + r.ToStr())  // 应该输出 10
+
+PrintLine("✅ 简单装饰器测试完成")

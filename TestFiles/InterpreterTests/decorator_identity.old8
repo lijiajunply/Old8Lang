@@ -1,0 +1,21 @@
+// 最简单的装饰器测试
+
+PrintLine("=== 最简单装饰器测试 ===")
+
+// 定义一个装饰器，直接返回原函数
+func identity(f) {
+    PrintLine("装饰器被调用了！")
+    return f
+}
+
+// 使用装饰器
+@identity
+func myFunc(x:int) -> int {
+    return x * 2
+}
+
+// 测试
+r <- myFunc(5)
+PrintLine("结果: " + r.ToStr())  // 应该输出 10
+
+PrintLine("✅ 测试完成")

@@ -1,5 +1,54 @@
 # 更新记录
 
+## Old8Lang 1.0.0 rc8 (未发布)
+
+### 语言特性增强
+
+#### 函数装饰器支持
+- **功能**: 新增 Python 风格的函数装饰器语法，支持在运行时动态包装和增强函数行为
+- **语法**:
+  - 无参数装饰器：`@decorator`
+  - 带参数装饰器：`@decorator(arg1, arg2)` 或 `@decorator(name: value)`
+  - 多个装饰器：可以堆叠多个装饰器，从下到上依次应用
+- **支持的功能**:
+  - 装饰普通函数和异步函数
+  - 支持命名参数语法（如 `@cache(timeout: 60)`）
+  - 装饰器可以接收目标函数作为参数并返回包装后的函数
+  - 多个装饰器按从下到上的顺序应用（最接近函数的装饰器最先应用）
+- **使用示例**:
+  ```old8
+  // 无参数装饰器
+  @log
+  func myFunc(x:int) -> int {
+      return x * 2
+  }
+
+  // 带参数的装饰器
+  @cache(timeout: 60)
+  func expensiveOp(n:int) -> int {
+      return n * n
+  }
+
+  // 多个装饰器
+  @log
+  @cache(timeout: 30)
+  func complexFunc(a:int, b:int) -> int {
+      return a + b
+  }
+  ```
+- **实现细节**:
+  - 词法分析器：添加 `@` 符号的 token 类型（`At`）
+  - 解析器：新增 `ParseDecorator` 和 `ParseDecorators` 方法，支持命名参数解析
+  - AST：为 `FuncLangValue` 和 `AsyncFuncLangValue` 添加 `Decorators` 属性
+  - 运行时：在函数初始化时自动应用装饰器，支持无参数和带参数两种模式
+- **测试覆盖**:
+  - 语法解析测试：验证装饰器语法正确解析
+  - 解释器测试：验证装饰器在运行时正确应用
+  - 支持简单装饰器、带参数装饰器和多个装饰器的组合
+- **已知限制**:
+  - 编译器模式下的装饰器支持需要进一步完善
+  - Lambda 闭包捕获装饰器参数的场景需要特殊处理
+
 ## Old8Lang 1.0.0 rc7
 
 ### 语法统一
