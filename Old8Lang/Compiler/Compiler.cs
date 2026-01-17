@@ -267,6 +267,11 @@ public static class Compiler
         // 注册全局静态类
         RegisterGlobalStaticClasses(local);
 
+        // 【装饰器支持】在编译之前，先使用解释器执行所有函数声明
+        // 这样装饰器函数就可以在应用装饰器时被找到
+        Log("预执行函数声明以支持装饰器", LogLevel.Debug);
+        statement.ExecuteModule(i.Manager, skipFunctionClassInit: false);
+
         try
         {
             Log("开始生成IL代码", LogLevel.Debug);

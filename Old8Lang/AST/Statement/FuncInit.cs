@@ -184,6 +184,120 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     }
 
     /// <summary>
+    /// 在编译器模式下应用装饰器到函数
+    /// 策略：使用解释器执行装饰器函数，获取包装后的函数
+    /// </summary>
+    private FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
+    {
+        if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
+        {
+            return originalFunc;
+        }
+
+        var manager = local.Interpreter!.Manager!;
+        var currentFunc = originalFunc;
+
+        // 从下到上应用装饰器（最接近函数的装饰器最先应用）
+        for (int i = originalFunc.Decorators.Count - 1; i >= 0; i--)
+        {
+            var decorator = originalFunc.Decorators[i];
+            currentFunc = ApplySingleDecoratorForCompiler(decorator, currentFunc, manager);
+        }
+
+        return currentFunc;
+    }
+
+    /// <summary>
+    /// 在编译器模式下应用单个装饰器
+    /// </summary>
+    private FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc, VariateManager manager)
+    {
+        // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
+        var tempFuncName = $"__temp_func_{Guid.NewGuid():N}";
+        var tempFunc = new FuncLangValue(
+            new LangId(tempFuncName, position: decorator.Position),
+            targetFunc.Ids ?? [],
+            targetFunc.BlockStatement,
+            targetFunc.GenericParameters,
+            targetFunc.Position,
+            isLambda: false
+        )
+        {
+            CapturedScope = targetFunc.CapturedScope
+        };
+        manager.AddClassAndFunc(tempFunc);
+
+        LangValueType result;
+
+        // 检查装饰器是否有参数
+        if (decorator.Arguments is not null && decorator.Arguments.Count > 0)
+        {
+            // 带参数的装饰器：先调用装饰器函数获取包装器，然后用包装器包装目标函数
+            var decoratorCallExpr = new FunctionCallExpression(
+                new LangId(decorator.Name, position: decorator.Position),
+                decorator.Arguments,
+                decorator.Position
+            );
+            var wrapperFunc = decoratorCallExpr.Run(manager);
+
+            if (wrapperFunc is not FuncLangValue wrapper)
+            {
+                throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
+            }
+
+            // 第二步：调用包装器，传入目标函数
+            result = wrapper.Run(manager, [new LangId(tempFuncName, position: decorator.Position)], null);
+        }
+        else
+        {
+            // 无参数的装饰器：直接调用装饰器函数，传入目标函数
+            var decoratorId = new LangId(decorator.Name, position: decorator.Position);
+            var decoratorFunc = manager.GetValue(decoratorId);
+
+            if (decoratorFunc is null)
+            {
+                throw new NameError(decorator.Position, decorator.Name);
+            }
+
+            if (decoratorFunc is not FuncLangValue func)
+            {
+                throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须是一个函数");
+            }
+
+            var callExpr = new FunctionCallExpression(
+                decoratorId,
+                [new LangId(tempFuncName, position: decorator.Position)],
+                decorator.Position
+            );
+            result = callExpr.Run(manager);
+        }
+
+        // 装饰器应该返回一个新的函数
+        if (result is not FuncLangValue wrappedFunc)
+        {
+            throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
+        }
+
+        // 保留原函数的名称
+        if (targetFunc.Id is not null)
+        {
+            return new FuncLangValue(
+                targetFunc.Id,
+                wrappedFunc.Ids ?? [],
+                wrappedFunc.BlockStatement,
+                wrappedFunc.GenericParameters,
+                wrappedFunc.Position,
+                isLambda: false
+            )
+            {
+                CapturedScope = wrappedFunc.CapturedScope
+            };
+        }
+
+        return wrappedFunc;
+    }
+
+    /// <summary>
     /// 在编译模式下生成函数的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
@@ -192,6 +306,24 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     {
         // 验证 params 参数的合法性
         ValidateParamsParameter();
+
+        // 应用装饰器（如果有）
+        // 在编译模式下，我们需要在编译时应用装饰器
+        // 策略：使用解释器执行装饰器函数，获取包装后的函数，然后编译包装后的函数
+        var funcToCompile = FuncValue;
+        if (FuncValue.Decorators is not null && FuncValue.Decorators.Count > 0)
+        {
+            // 需要一个 VariateManager 来执行装饰器
+            // 从 LocalManager 的 Interpreter 获取 VariateManager
+            if (local.Interpreter?.Manager is not null)
+            {
+                funcToCompile = ApplyDecoratorsForCompiler(FuncValue, local);
+            }
+            else
+            {
+                throw new CompilerException("编译器模式下应用装饰器需要解释器上下文", Position);
+            }
+        }
 
         // 尝试使用类型推断（如果启用）
         if (TypeInferenceConfig.Instance.EnableTypeInference)
@@ -204,7 +336,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 {
                     if (TypeInferenceConfig.Instance.DebugOutput)
                     {
-                        Console.WriteLine($"✓ 函数 {FuncValue.Id?.IdName} 类型推断成功");
+                        Console.WriteLine($"✓ 函数 {funcToCompile.Id?.IdName} 类型推断成功");
                     }
                 }
             }
@@ -214,28 +346,28 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         ValidateTypeAnnotations(local);
 
         // 获取方法的名称
-        var methodName = FuncValue.Id!.IdName;
+        var methodName = funcToCompile.Id!.IdName;
 
         // 对于泛型函数，只注册定义，不生成IL
         // 泛型函数的代码生成会在实例化时由 GenericMethodSpecializer 处理
-        if (FuncValue.IsGeneric)
+        if (funcToCompile.IsGeneric)
         {
-            local.GenericFunctions[methodName] = FuncValue;
+            local.GenericFunctions[methodName] = funcToCompile;
             // 同时也需要注册到 DelegateVar，以便能够被识别为函数（虽然不能直接调用）
             // 但为了避免被当作普通函数调用（没有泛型参数），我们只在 GenericFunctions 中注册
             // FunctionCallExpression 会检查 GenericFunctions
             return;
         }
 
-        if (FuncValue.Method is not null)
+        if (funcToCompile.Method is not null)
         {
-            local.DelegateVar.Add(methodName, FuncValue.Method);
+            local.DelegateVar.Add(methodName, funcToCompile.Method);
             return;
         }
 
         // 使用参数的类型注解来确定参数类型
         // 对于 params 参数，类型应该是数组类型（已经是 array<T>）
-        var parameterTypes = FuncValue.Ids!.Select(item => item.OutputType(local)).ToArray();
+        var parameterTypes = funcToCompile.Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         // 这样可以避免函数内部的局部变量与外部的局部变量冲突
@@ -269,9 +401,9 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
-        for (var i = 0; i < FuncValue.Ids!.Count; i++)
+        for (var i = 0; i < funcToCompile.Ids!.Count; i++)
         {
-            var id = FuncValue.Ids[i];
+            var id = funcToCompile.Ids[i];
             var paramType = parameterTypes[i];
             // 创建一个临时的LocalBuilder来表示参数
             // 注意：这里我们不能使用真正的LocalBuilder，因为还没有创建ILGenerator
@@ -281,11 +413,11 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 优先使用显式声明的返回类型
         // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
-        var returnType = FuncValue.Id?.OutputType(local);
+        var returnType = funcToCompile.Id?.OutputType(local);
         if (returnType is null || returnType == typeof(object))
         {
             // 如果OutputType无法解析，尝试从函数体推断
-            returnType = GetItemType(FuncValue.BlockStatement, funcLocal);
+            returnType = GetItemType(funcToCompile.BlockStatement, funcLocal);
         }
 
         // 定义新的方法
@@ -302,7 +434,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 【修复递归调用】在编译函数体之前，先将函数注册到 DelegateVar
         // 这样递归调用时就能找到自己的方法引用
         var delegateKey = methodName;
-        if (FuncValue.Ids is not null)
+        if (funcToCompile.Ids is not null)
         {
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
             delegateKey = $"{methodName}${paramTypeNames}";
@@ -315,20 +447,20 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         funcLocal.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
         // 对于泛型函数，也需要注册基础版本
-        if (FuncValue.IsGeneric)
+        if (funcToCompile.IsGeneric)
         {
             local.DelegateVar.TryAdd(methodName, dynamicMethod);
             funcLocal.DelegateVar.TryAdd(methodName, dynamicMethod);
-            local.GenericFunctions[methodName] = FuncValue;
+            local.GenericFunctions[methodName] = funcToCompile;
         }
 
         // 清空funcLocal
         funcLocal.LocalVar.Clear();
 
         // 处理参数：注册到 ArgumentIndices，不生成 IL 副本
-        for (var i = 0; i < FuncValue.Ids!.Count; i++)
+        for (var i = 0; i < funcToCompile.Ids!.Count; i++)
         {
-            var id = FuncValue.Ids[i];
+            var id = funcToCompile.Ids[i];
             // 记录参数索引
             funcLocal.ArgumentIndices[id.IdName] = i;
         }
@@ -348,11 +480,11 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         methodIl.BeginExceptionBlock();
 
         // 生成方法体的 IL 代码
-        FuncValue.BlockStatement.GenerateIl(methodIl, funcLocal);
+        funcToCompile.BlockStatement.GenerateIl(methodIl, funcLocal);
 
         // 检查函数体的最后一个语句是否是 ReturnStatement
-        var lastStatement = FuncValue.BlockStatement.Count > 0
-            ? FuncValue.BlockStatement[^1]
+        var lastStatement = funcToCompile.BlockStatement.Count > 0
+            ? funcToCompile.BlockStatement[^1]
             : null;
 
         // 如果最后一个语句不是 ReturnStatement，提供默认返回值
@@ -409,14 +541,14 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 注意：函数已经在编译函数体之前注册到 DelegateVar（第160-181行）
         // 这里只需要存储函数的参数列表信息，用于支持默认参数
-        if (FuncValue.Ids is not null)
+        if (funcToCompile.Ids is not null)
         {
-            local.FuncParameters.TryAdd(delegateKey, FuncValue.Ids);
-            
+            local.FuncParameters.TryAdd(delegateKey, funcToCompile.Ids);
+
             // 对于泛型函数，也存储基础版本的参数信息
-            if (FuncValue.IsGeneric)
+            if (funcToCompile.IsGeneric)
             {
-                local.FuncParameters.TryAdd(methodName, FuncValue.Ids);
+                local.FuncParameters.TryAdd(methodName, funcToCompile.Ids);
             }
         }
     }

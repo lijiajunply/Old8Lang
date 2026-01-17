@@ -162,6 +162,9 @@ public static class TypeChecker
         // any 类型可以匹配任何类型
         if (expectedType == "any") return true;
 
+        // object 类型可以匹配任何类型（类似于 any）
+        if (expectedType == "object") return true;
+
         // null 可以赋值给任何引用类型
         if (actualType == "null" && expectedType != "int" && expectedType != "double" && expectedType != "bool" &&
             expectedType != "char") return true;
