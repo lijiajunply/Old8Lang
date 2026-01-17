@@ -70,7 +70,6 @@ public static class GenericClassSpecializer
                             {
                                 throw new ArgumentException(
                                     $"类型 {actualType.Name} 不满足约束 {constraintName}: {actualType.Name} 没有继承或实现 {constraintType.Name}");
-                            }");
                             }
                         }
                     }

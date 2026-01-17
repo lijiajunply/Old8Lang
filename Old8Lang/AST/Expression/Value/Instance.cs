@@ -708,7 +708,24 @@ public partial class Instance : LangValueType
             }
 
             // 获取默认构造函数
-            var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+            ConstructorInfo? constructorInfo = null;
+            if (classType is TypeBuilder)
+            {
+                if (local.CurrentConstructorBuilder != null && local.InClassEnv == classType)
+                {
+                    // 如果是在当前正在编译的类中，使用ConstructorBuilder
+                    constructorInfo = local.CurrentConstructorBuilder;
+                }
+                else
+                {
+                    constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+                }
+            }
+            else
+            {
+                constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+            }
+
             if (constructorInfo is not null)
             {
                 ilGenerator.Emit(OpCodes.Newobj, constructorInfo);
@@ -718,10 +735,28 @@ public partial class Instance : LangValueType
             ilGenerator.Emit(OpCodes.Stloc, localA);
 
             // 使用BindingFlags.DeclaredOnly来只查找当前类声明的方法，避免与继承的方法冲突
-            var initFunc = classType.GetMethod("init",
-                BindingFlags.Public |
-                BindingFlags.Instance |
-                BindingFlags.DeclaredOnly);
+            MethodInfo? initFunc = null;
+
+            if (classType is TypeBuilder && local.CurrentInitMethodBuilder != null && local.InClassEnv == classType)
+            {
+                // 如果是在当前正在编译的类中，使用CurrentInitMethodBuilder
+                initFunc = local.CurrentInitMethodBuilder;
+            }
+            else
+            {
+                try
+                {
+                    initFunc = classType.GetMethod("init",
+                        BindingFlags.Public |
+                        BindingFlags.Instance |
+                        BindingFlags.DeclaredOnly);
+                }
+                catch
+                {
+                    // 忽略错误，可能是类型尚未创建
+                }
+            }
+
             if (initFunc is not null)
             {
                 // 加载 this 指针

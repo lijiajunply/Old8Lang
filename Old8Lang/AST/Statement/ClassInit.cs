@@ -123,6 +123,13 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         }
     }
 
+    private static readonly HashSet<string> OperatorNames =
+    [
+        "_add", "_sub", "_mul", "_div", "_mod", "_pow",
+        "_eq", "_lt", "_gt", "_le", "_ge",
+        "_getitem", "_setitem"
+    ];
+
     /// <summary>
     /// 在编译模式下生成类或接口的IL代码
     /// </summary>
@@ -221,10 +228,14 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         else
         {
             // 类可以有字段和方法
-            var fieldBuilders = DefineClassMembers(typeBuilder, classLocal);
+            // 6.1 定义字段
+            var fieldBuilders = DefineFields(typeBuilder, classLocal);
 
-            // 7. 定义类的构造函数
-            DefineConstructor(typeBuilder, baseType!, fieldBuilders);
+            // 6.2 定义类的构造函数 (先于方法定义，以便方法中可以创建类的实例)
+            DefineConstructor(typeBuilder, baseType!, fieldBuilders, classLocal);
+
+            // 6.3 定义方法
+            DefineMethods(typeBuilder, classLocal);
         }
 
         // 8. 创建类型
@@ -235,16 +246,11 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     }
 
     /// <summary>
-    /// 定义类的成员（字段和方法）
+    /// 定义类的字段
     /// </summary>
-    /// <param name="typeBuilder">类型构建器</param>
-    /// <param name="local">局部变量管理器</param>
-    /// <returns>字段列表，用于构造函数初始化</returns>
-    private List<(FieldBuilder, LangExpression)> DefineClassMembers(TypeBuilder typeBuilder, LocalManager local)
+    private List<(FieldBuilder, LangExpression)> DefineFields(TypeBuilder typeBuilder, LocalManager local)
     {
-        // 分离字段和方法
         var fields = new List<(ClassMemberId, LangExpression)>();
-        var methods = new List<(ClassMemberId, FuncLangValue)>();
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
@@ -262,11 +268,7 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
 
         foreach (var variate in anyLangValue.Variates)
         {
-            if (variate.Value is FuncLangValue funcValue)
-            {
-                methods.Add((variate.Key, funcValue));
-            }
-            else
+            if (variate.Value is not FuncLangValue)
             {
                 fields.Add((variate.Key, variate.Value));
             }
@@ -326,13 +328,29 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             }
         }
 
+        return fieldBuilders;
+    }
+
+    /// <summary>
+    /// 定义类的方法
+    /// </summary>
+    private void DefineMethods(TypeBuilder typeBuilder, LocalManager local)
+    {
+        var methods = new List<(ClassMemberId, FuncLangValue)>();
+
+        foreach (var variate in anyLangValue.Variates)
+        {
+            if (variate.Value is FuncLangValue funcValue)
+            {
+                methods.Add((variate.Key, funcValue));
+            }
+        }
+
         // 定义实例方法
         foreach (var (memberId, funcValue) in methods)
         {
             DefineMethod(typeBuilder, memberId, funcValue, local);
         }
-
-        return fieldBuilders;
     }
     
     /// <summary>
@@ -371,7 +389,9 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
-            InClassEnv = typeBuilder
+            InClassEnv = typeBuilder,
+            CurrentConstructorBuilder = local.CurrentConstructorBuilder,
+            CurrentInitMethodBuilder = local.CurrentInitMethodBuilder
         };
 
         // 继承外部的函数定义（包括内置函数如 PrintLine）
@@ -475,7 +495,8 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     private MethodBuilder DefineMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local)
     {
-        return DefineMethodInternal(typeBuilder, memberId, funcValue, local, MethodAttributes.Public);
+        return DefineMethodInternal(typeBuilder, memberId, funcValue, local, 
+            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig);
     }
 
     /// <summary>
@@ -512,7 +533,8 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
-            InClassEnv = typeBuilder
+            InClassEnv = typeBuilder,
+            CurrentConstructorBuilder = local.CurrentConstructorBuilder
         };
 
         // 继承外部的函数定义（包括内置函数如 PrintLine）
@@ -619,7 +641,101 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
             methodIl.Emit(OpCodes.Ret);
         }
 
+        // 检查是否是运算符重载方法，如果是，生成桥接方法
+        if (OperatorNames.Contains(methodName))
+        {
+            GenerateOperatorBridge(typeBuilder, methodName, methodBuilder, parameterTypes.ToArray(), returnType);
+        }
+
+        // 如果是 init 方法，保存到 LocalManager
+        if (methodName == "init")
+        {
+            local.CurrentInitMethodBuilder = methodBuilder;
+        }
+
         return methodBuilder;
+    }
+
+    /// <summary>
+    /// 生成运算符重载的桥接方法
+    /// </summary>
+    private void GenerateOperatorBridge(TypeBuilder typeBuilder, string methodName, MethodBuilder userMethod, Type[] paramTypes, Type returnType)
+    {
+        // 1. 确定期望的方法签名
+        Type expectedReturnType = typeof(object);
+        Type[] expectedParamTypes = [typeof(object)];
+        
+        if (methodName == "_setitem") 
+        {
+            expectedReturnType = typeof(void);
+            expectedParamTypes = [typeof(object), typeof(object)];
+        } 
+        else if (methodName == "_eq" || methodName == "_lt" || methodName == "_gt" || methodName == "_le" || methodName == "_ge") 
+        {
+            expectedReturnType = typeof(bool);
+            expectedParamTypes = [typeof(object)];
+        }
+
+        // 2. 检查用户方法是否已经匹配签名
+        bool signatureMatches = returnType == expectedReturnType && 
+                                paramTypes.Length == expectedParamTypes.Length &&
+                                paramTypes.SequenceEqual(expectedParamTypes);
+
+        if (signatureMatches) 
+        {
+            // 如果签名已经匹配，不需要生成桥接方法
+            // 运行时会自动将其作为虚方法重写
+            return; 
+        }
+
+        // 3. 定义桥接方法
+        // 注意：这里显式定义为重写基类方法
+        var bridgeMethod = typeBuilder.DefineMethod(
+            methodName,
+            MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig,
+            expectedReturnType,
+            expectedParamTypes);
+
+        var il = bridgeMethod.GetILGenerator();
+
+        // 4. 加载 this
+        il.Emit(OpCodes.Ldarg_0);
+
+        // 5. 加载参数并进行转换
+        for (int i = 0; i < expectedParamTypes.Length; i++) 
+        {
+            il.Emit(OpCodes.Ldarg, i + 1);
+            if (i < paramTypes.Length) 
+            {
+                var targetType = paramTypes[i];
+                if (targetType != typeof(object)) 
+                {
+                    if (targetType.IsValueType) 
+                    {
+                        il.Emit(OpCodes.Unbox_Any, targetType);
+                    } 
+                    else 
+                    {
+                        il.Emit(OpCodes.Castclass, targetType);
+                    }
+                }
+            }
+        }
+
+        // 6. 调用用户方法
+        il.Emit(OpCodes.Call, userMethod);
+
+        // 7. 处理返回值
+        if (returnType != expectedReturnType) 
+        {
+             if (expectedReturnType == typeof(object) && returnType.IsValueType) 
+             {
+                 il.Emit(OpCodes.Box, returnType);
+             }
+             // 其他类型的转换暂时不处理，假定用户返回类型兼容
+        }
+
+        il.Emit(OpCodes.Ret);
     }
 
     /// <summary>
@@ -628,13 +744,18 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     /// <param name="typeBuilder">类型构建器</param>
     /// <param name="baseType">基类类型</param>
     /// <param name="fieldBuilders">字段列表</param>
-    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders)
+    /// <param name="local">局部变量管理器</param>
+    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders, LocalManager local)
     {
         // 定义无参数构造函数
         var constructorBuilder = typeBuilder.DefineConstructor(
             MethodAttributes.Public,
             CallingConventions.Standard,
             Type.EmptyTypes);
+
+        // 保存到LocalManager，以便在方法中创建实例
+        local.CurrentConstructorBuilder = constructorBuilder;
+        Console.WriteLine($"DEBUG: DefineConstructor set builder: {constructorBuilder != null} on local {local.GetHashCode()}");
 
         var ctorIl = constructorBuilder.GetILGenerator();
 

@@ -96,6 +96,16 @@ public class LocalManager
     public readonly Dictionary<string, LangValueType> GlobalStaticClasses = [];
 
     /// <summary>
+    /// 当前正在构建的类的构造函数（如果存在）
+    /// </summary>
+    public ConstructorBuilder? CurrentConstructorBuilder { get; set; }
+
+    /// <summary>
+    /// 当前正在构建的类的init方法（如果存在）
+    /// </summary>
+    public MethodBuilder? CurrentInitMethodBuilder { get; set; }
+
+    /// <summary>
     /// 当前所在的类环境类型
     /// </summary>
     public Type? InClassEnv { get; init; }

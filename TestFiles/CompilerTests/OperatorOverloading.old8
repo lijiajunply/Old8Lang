@@ -1,0 +1,23 @@
+class Vector {
+    public x:int
+    public y:int
+
+    func init(x:int, y:int) {
+        this.x <- x
+        this.y <- y
+    }
+
+    func _add(other:object) -> object {
+        o:Vector <- other as Vector
+        return Vector(this.x + o.x, this.y + o.y)
+    }
+
+    func ToStr() -> string {
+        return $"Vector({x}, {y})"
+    }
+}
+
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+v3:Vector <- (v1 + v2) as Vector
+PrintLine(v3.ToStr())
