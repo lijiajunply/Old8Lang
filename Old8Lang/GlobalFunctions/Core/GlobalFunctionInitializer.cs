@@ -118,17 +118,6 @@ public static class GlobalFunctionInitializer
             registry.Register(new GetCurrentThreadIdFunction());
             registry.Register(new GetProcessorCountFunction());
 
-            // 注册 Task 函数
-            registry.Register(new TaskDelayFunction());
-            registry.Register(new TaskWaitFunction());
-            registry.Register(new TaskWhenAllFunction());
-            registry.Register(new TaskWhenAnyFunction());
-
-            // 注册 Thread 函数
-            registry.Register(new ThreadJoinFunction());
-            registry.Register(new ThreadIsAliveFunction());
-            registry.Register(new ThreadDisposeFunction());
-
             _initialized = true;
         }
     }
