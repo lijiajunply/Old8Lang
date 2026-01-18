@@ -20,7 +20,8 @@ public sealed class SpawnFunction : BaseGlobalFunction
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => -1;
 
-    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
+        SourcePosition position)
     {
         // 确保参数数量至少为1
         if (parameters.Count == 0)
@@ -130,7 +131,8 @@ public sealed class SpawnFunction : BaseGlobalFunction
         }
     }
 
-    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
+        LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持线程创建
         ilGenerator.Emit(OpCodes.Ldnull);
@@ -140,10 +142,38 @@ public sealed class SpawnFunction : BaseGlobalFunction
     {
         return typeof(ThreadLangValue);
     }
+
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        // VM 模式下暂不支持 Spawn
-        // 需要通过字节码指令来实现线程创建
-        throw new NotSupportedException("Spawn 函数在虚拟机模式下暂不支持。请使用 ThreadCreate, ThreadStart, ThreadJoin 等全局函数。");
+        // VM 模式下支持 Spawn
+        // args[0] 是函数对象（ClosureValue 或 FunctionMetadata），args[1..] 是函数参数
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("spawn 函数需要至少一个参数（函数引用）");
+        }
+
+        var funcObj = arguments[0];
+        var funcArgs = arguments.Skip(1).ToArray();
+
+        // 获取虚拟机实例（通过 VMContext）
+        var vm = Bytecode.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("无法获取当前虚拟机实例");
+        }
+
+        // 创建线程
+        var threadId = Old8Lang.Concurrency.ResourceManager.CreateThread(() =>
+        {
+            // 在新线程中执行函数
+            vm.CallFunctionObject(funcObj, funcArgs);
+        });
+
+        // 自动启动线程
+        Old8Lang.Concurrency.ResourceManager.StartThread(threadId);
+
+        // 返回 VMThreadLangValue
+        return new VMThreadLangValue(threadId);
     }
 }

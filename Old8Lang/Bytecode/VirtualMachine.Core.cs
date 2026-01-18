@@ -53,14 +53,25 @@ public partial class VirtualMachine
     /// </summary>
     public void Execute()
     {
-        // 从入口点开始执行
-        if (_bytecodeFile.EntryPointIndex < 0 || _bytecodeFile.EntryPointIndex >= _bytecodeFile.Functions.Count)
-        {
-            throw new Exception("无效的入口点索引");
-        }
+        // 设置当前虚拟机上下文
+        VMContext.CurrentVM = this;
 
-        var entryFunction = _bytecodeFile.Functions[_bytecodeFile.EntryPointIndex];
-        CallFunction(entryFunction, []);
+        try
+        {
+            // 从入口点开始执行
+            if (_bytecodeFile.EntryPointIndex < 0 || _bytecodeFile.EntryPointIndex >= _bytecodeFile.Functions.Count)
+            {
+                throw new Exception("无效的入口点索引");
+            }
+
+            var entryFunction = _bytecodeFile.Functions[_bytecodeFile.EntryPointIndex];
+            CallFunction(entryFunction, []);
+        }
+        finally
+        {
+            // 清理虚拟机上下文
+            VMContext.CurrentVM = null;
+        }
     }
 
     /// <summary>
@@ -174,5 +185,52 @@ public partial class VirtualMachine
         processedArgs[paramsIndex] = paramsArgs;
 
         return processedArgs;
+    }
+
+    /// <summary>
+    /// 调用函数对象（用于 spawn 等场景）
+    /// </summary>
+    /// <param name="funcObj">函数对象（ClosureValue 或 FunctionMetadata 或函数索引）</param>
+    /// <param name="arguments">函数参数</param>
+    public void CallFunctionObject(object? funcObj, object?[] arguments)
+    {
+        // 设置当前虚拟机上下文（对于新线程）
+        VMContext.CurrentVM = this;
+
+        try
+        {
+            if (funcObj is ClosureValue closure)
+            {
+                // 闭包：调用闭包的函数
+                CallFunction(closure.Function, arguments);
+            }
+            else if (funcObj is FunctionMetadata function)
+            {
+                // 函数元数据：直接调用
+                CallFunction(function, arguments);
+            }
+            else if (funcObj is int funcIndex)
+            {
+                // 函数索引：从字节码文件中获取函数
+                if (funcIndex >= 0 && funcIndex < _bytecodeFile.Functions.Count)
+                {
+                    var func = _bytecodeFile.Functions[funcIndex];
+                    CallFunction(func, arguments);
+                }
+                else
+                {
+                    throw new Exception($"无效的函数索引: {funcIndex}");
+                }
+            }
+            else
+            {
+                throw new Exception($"无效的函数对象类型: {funcObj?.GetType().Name ?? "null"}");
+            }
+        }
+        finally
+        {
+            // 清理虚拟机上下文
+            VMContext.CurrentVM = null;
+        }
     }
 }

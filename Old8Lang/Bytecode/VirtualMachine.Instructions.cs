@@ -1679,12 +1679,18 @@ public partial class VirtualMachine
 
             case OpCode.Await:
             {
-                // 栈顶: TaskLangValue
+                // 栈顶: TaskLangValue 或 VMThreadLangValue
                 var value = _stack.Pop();
                 if (value is TaskLangValue taskValue)
                 {
                     // 阻塞等待任务完成
                     var result = taskValue.Await();
+                    _stack.Push(result);
+                }
+                else if (value is VMThreadLangValue vmThreadValue)
+                {
+                    // 等待虚拟机线程完成
+                    var result = vmThreadValue.Join();
                     _stack.Push(result);
                 }
                 else if (value is Task task)
@@ -1704,7 +1710,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"await 只能用于 Task 类型，实际类型为 {value?.GetType().Name ?? "null"}");
+                    throw new Exception($"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
                 }
             }
                 break;

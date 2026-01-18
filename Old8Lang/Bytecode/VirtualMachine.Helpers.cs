@@ -376,6 +376,7 @@ public partial class VirtualMachine
         if (value is string s && double.TryParse(s, out double result)) return result;
         throw new Exception($"无法将 {value?.GetType().Name} 转换为 double");
     }
+
     private string ToString(object? value)
     {
         if (value == null) return "null";
@@ -406,11 +407,7 @@ public partial class VirtualMachine
         // 处理字典
         if (value is IDictionary dict)
         {
-            var items = new List<string>();
-            foreach (var key in dict.Keys)
-            {
-                items.Add($"{ToString(key)}: {ToString(dict[key])}");
-            }
+            var items = (from object? key in dict.Keys select $"{ToString(key)}: {ToString(dict[key])}").ToList();
 
             return "{" + string.Join(", ", items) + "}";
         }
@@ -450,54 +447,6 @@ public partial class VirtualMachine
 
                 return string.Concat(args.Select(ToString));
             }
-
-            case "Spawn":
-            case "spawn":
-                // Spawn 函数在虚拟机模式下的特殊处理
-                // args[0] 是函数索引(int), args[1..] 是函数参数
-                if (args.Length > 0 && args[0] is int funcIndex)
-                {
-                    // 获取函数元数据
-                    var function = _bytecodeFile.Functions[funcIndex];
-
-                    // 提取函数参数
-                    var funcArgs = new object?[args.Length - 1];
-                    Array.Copy(args, 1, funcArgs, 0, args.Length - 1);
-
-                    // 创建线程
-                    var threadId = Concurrency.ResourceManager.CreateThread(() =>
-                    {
-                        // 在新线程中执行函数
-                        CallFunction(function, funcArgs);
-                    });
-
-                    // 自动启动线程
-                    Concurrency.ResourceManager.StartThread(threadId);
-
-                    // 返回 VMThreadLangValue
-                    return new VMThreadLangValue(threadId);
-                }
-
-                throw new Exception("Spawn 函数需要至少一个参数（函数引用）");
-
-            case "ToStr":
-                return args.Length > 0 ? ToString(args[0]) : "";
-
-            case "ToInt":
-                if (args.Length > 0 && int.TryParse(ToString(args[0]), out int result))
-                {
-                    return result;
-                }
-
-                return 0;
-
-            case "ToDouble":
-                if (args.Length > 0 && double.TryParse(ToString(args[0]), out double dresult))
-                {
-                    return dresult;
-                }
-
-                return 0.0;
 
             case "CheckRange":
                 // 参数: value, start, end, includeStart, includeEnd
@@ -910,17 +859,17 @@ public partial class VirtualMachine
                 var expectedParamCount = args.Length + 1;
 
                 // 查找参数数量和类型都匹配的方法
-                method = allMethods.FirstOrDefault(x => 
+                method = allMethods.FirstOrDefault(x =>
                 {
                     var parameters = x.GetParameters();
                     if (parameters.Length != expectedParamCount) return false;
-                    
+
                     // 检查第一个参数（扩展方法的 'this' 参数）类型兼容性
                     if (obj != null && !parameters[0].ParameterType.IsInstanceOfType(obj))
                     {
                         return false;
                     }
-                    
+
                     return true;
                 });
 
