@@ -23,22 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/Old8Lang 虚拟机模式测试扩展计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCancellationTokenTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyChannelTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCountDownLatchTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCyclicBarrierTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VMContext.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2026-01-19-00-19-虚拟机并发原语测试扩展报告.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lambda_range.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_range_for_in.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_spawn_correct.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMSwitchStatementTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMDeferTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMDeferTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMSelectTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMSelectTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMUsingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Statements/VMUsingTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -595,7 +585,7 @@
       <workItem from="1768684155332" duration="309000" />
       <workItem from="1768730838950" duration="2656000" />
       <workItem from="1768741716470" duration="700000" />
-      <workItem from="1768749421043" duration="5449000" />
+      <workItem from="1768749421043" duration="6178000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -940,7 +930,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="719" />
+    <option name="localTasksCounter" value="721" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -967,8 +957,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(tests): 添加虚拟机功能测试文件&#10;&#10;- 创建基础算术运算和变量赋值测试文件 basic_arithmetic.old8&#10;- 创建控制流测试文件 control_flow.old8 包含 if/while/for 循环测试&#10;- 创建函数调用测试文件 function_calls.old8 包含递归函数测试&#10;- 创建类型转换测试文件 type_conversion_test.old8 包含各种类型转换测试" />
-    <MESSAGE value="docs(virtual-machine): 添加虚拟机API模式对比文档和异步执行核心功能实现&#10;&#10;- 新增 Old8Lang 内部 API 模式对比文档，详细说明解释器、编译器、虚拟机三种模式的功能支持情况&#10;- 实现虚拟机异步生成器核心功能，支持 async/await 和 yield 异步操作&#10;- 添加虚拟机执行核心组件，包括栈管理、调用帧、任务管理和模块加载功能&#10;- 实现虚拟机异常处理机制，支持 defer 块执行和异常捕获&#10;- 添加生成器恢复执行功能，支持同步和异步两种生成器模式" />
     <MESSAGE value="feat(vm): 添加虚拟机对全局函数的支持&#10;&#10;- 在 VirtualMachine.Instructions.cs 中添加全局函数查找和执行逻辑&#10;- 实现通过 GlobalFunctionRegistry 调用全局函数的功能&#10;- 修改 DictionaryLangValue 初始化逻辑&#10;- 优化 ArrayExtensions 中的 ToList 方法实现&#10;- 注释掉测试文件中的 ToObj 函数测试代码" />
     <MESSAGE value="feat(async): 实现异步编程支持和状态机生成&#10;&#10;- 添加AsyncStateMachineGenerator用于编译async函数为状态机结构&#10;- 实现AwaitExpression.GenerateAsyncAwait方法生成await表达式的IL代码&#10;- 在DotOperatorILHelper中实现Task.WhenAll/WhenAny/FromResult等API的IL生成&#10;- 修复Operation.OutputType方法确保比较和算术运算符正确推断bool/double类型&#10;- 更新AsyncFuncInit和AsyncFuncLangValue使用动态方法和状态机启动代码&#10;- 添加变量提升机制将局部变量作为状态机字段进行生命周期管理&#10;- 实现完整的IAsyncStateMachine接口集成和状态转换逻辑&#10;- 改进AST节点识别await表达式位置支持if/while/for等复杂语句结构" />
     <MESSAGE value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
@@ -992,7 +980,9 @@
     <MESSAGE value="docs(roadmap): 更新ROADMAP文档并生成相关报告&#10;&#10;- 新增编译器IL代码生成问题修复任务(P0关键任务)&#10;- 标记编译器模式测试补充为已完成，新增288个测试用例&#10;- 新增编译器模式测试质量提升任务(P1高优先级)&#10;- 更新异步功能完善部分的下一步行动指向新任务&#10;- 添加2026-01-18更新日志记录相关变更&#10;- 生成ROADMAP更新摘要和编译器模式测试补充报告" />
     <MESSAGE value="feat(tests): 添加虚拟机并发原语测试套件&#10;&#10;- 创建 VMConcurrencyMutexTests.cs 包含 14 个测试方法覆盖互斥锁功能&#10;- 创建 VMConcurrencySemaphoreTests.cs 包含 19 个测试方法覆盖信号量功能  &#10;- 创建 VMConcurrencyAtomicIntTests.cs 包含 22 个测试方法覆盖原子整数功能&#10;- 实现基本功能、超时场景、异常安全、多线程并发和边界条件测试&#10;- 修复虚拟机模式下布尔值字符串表示和 catch 语句语法差异&#10;- 记录多线程语法差异问题(spawn 语法需改为 Spawn() 函数调用)" />
     <MESSAGE value="feat(compiler): 实现Lambda表达式闭包支持和动态调用功能&#10;&#10;- 添加闭包变量捕获分析器，识别Lambda函数引用的外部变量&#10;- 实现MakeClosure指令用于创建带捕获变量的闭包对象&#10;- 支持Lambda变量的动态调用，使用CallDynamic指令&#10;- 添加ClosureValue类封装函数元数据和捕获的变量&#10;- 在虚拟机中实现闭包调用时的变量作用域管理&#10;- 创建闭包测试文件验证全局变量和局部变量捕获功能&#10;- 更新Lambda虚拟机测试覆盖多种Lambda表达式场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现Lambda表达式闭包支持和动态调用功能&#10;&#10;- 添加闭包变量捕获分析器，识别Lambda函数引用的外部变量&#10;- 实现MakeClosure指令用于创建带捕获变量的闭包对象&#10;- 支持Lambda变量的动态调用，使用CallDynamic指令&#10;- 添加ClosureValue类封装函数元数据和捕获的变量&#10;- 在虚拟机中实现闭包调用时的变量作用域管理&#10;- 创建闭包测试文件验证全局变量和局部变量捕获功能&#10;- 更新Lambda虚拟机测试覆盖多种Lambda表达式场景" />
+    <MESSAGE value="feat(test): 添加虚拟机并发原语测试扩展和修复spawn函数实现&#10;&#10;- 创建5个新的并发原语测试文件，包含106个测试方法&#10;- 实现虚拟机模式下的spawn函数支持线程创建和执行&#10;- 添加Range语法测试文件验证for-in循环中的Range使用&#10;- 修复SpawnFunction中ExecuteInVMInternal方法的线程创建逻辑&#10;- 更新测试计划文档包含完整的虚拟机测试扩展方案&#10;- 修复并发原语测试中的Range语法兼容性问题&#10;- 优化虚拟机线程管理和资源分配机制" />
+    <MESSAGE value="removal(global-functions): 移除并发相关全局函数&#10;&#10;- 从 GlobalFunctionInitializer 中移除 Task 和 Thread 相关函数注册&#10;- 删除 TaskFunctions.cs 文件中的 TaskDelay、TaskWait、TaskWhenAll、TaskWhenAny 函数实现&#10;- 删除 ThreadFunctions.cs 文件中的 ThreadJoin、ThreadIsAlive、ThreadDispose 函数实现&#10;- 移除相关的并发功能支持代码" />
+    <option name="LAST_COMMIT_MESSAGE" value="removal(global-functions): 移除并发相关全局函数&#10;&#10;- 从 GlobalFunctionInitializer 中移除 Task 和 Thread 相关函数注册&#10;- 删除 TaskFunctions.cs 文件中的 TaskDelay、TaskWait、TaskWhenAll、TaskWhenAny 函数实现&#10;- 删除 ThreadFunctions.cs 文件中的 ThreadJoin、ThreadIsAlive、ThreadDispose 函数实现&#10;- 移除相关的并发功能支持代码" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

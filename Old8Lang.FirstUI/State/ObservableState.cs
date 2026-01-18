@@ -11,8 +11,8 @@ namespace Old8Lang.FirstUI.State;
 public class ObservableState<T> : State<T>
 {
     private readonly List<WeakReference<WidgetBase>> _subscribers = [];
-    private readonly object _lock = new();
-    private bool _batchUpdateInProgress = false;
+    private readonly Lock _lock = new();
+    private bool _batchUpdateInProgress;
 
     /// <summary>
     /// 构造函数
@@ -52,6 +52,7 @@ public class ObservableState<T> : State<T>
                 {
                     return target == widget;
                 }
+
                 return true; // 移除已回收的弱引用
             });
         }
