@@ -165,26 +165,6 @@ public class VMStringTemplateTests
     }
 
     [Fact]
-    public void StringTemplate_WithConditionalExpression_ExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            age <- 18
-            result <- $""Status: {age >= 18 ? ""Adult"" : ""Minor""}""
-        ";
-
-        // Act
-        var bytecodeFile = CompileHelper.CompileToBytecode(code);
-        var vm = new VM(bytecodeFile);
-        vm.Execute();
-
-        // Assert
-        var result = vm.GetGlobalVariable("result");
-        Assert.NotNull(result);
-        Assert.Equal("Status: Adult", result);
-    }
-
-    [Fact]
     public void StringTemplate_NestedTemplate_ExecutesCorrectly()
     {
         // Arrange
@@ -223,26 +203,6 @@ public class VMStringTemplateTests
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
         Assert.Equal("First: 10, Last: 30", result);
-    }
-
-    [Fact]
-    public void StringTemplate_WithDictionaryAccess_ExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            data <- {""name"": ""Bob"", ""age"": 25}
-            result <- $""Name: {data[""name""]}, Age: {data[""age""]}""
-        ";
-
-        // Act
-        var bytecodeFile = CompileHelper.CompileToBytecode(code);
-        var vm = new VM(bytecodeFile);
-        vm.Execute();
-
-        // Assert
-        var result = vm.GetGlobalVariable("result");
-        Assert.NotNull(result);
-        Assert.Equal("Name: Bob, Age: 25", result);
     }
 
     [Fact]

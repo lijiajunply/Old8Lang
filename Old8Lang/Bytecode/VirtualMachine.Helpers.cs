@@ -57,6 +57,20 @@ public partial class VirtualMachine
             }
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Plus(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
+            }
+        }
+
         // 原有的基本类型处理逻辑
         if (a is int ia && b is int ib) return ia + ib;
         if (a is double da && b is double db) return da + db;
@@ -88,6 +102,20 @@ public partial class VirtualMachine
             catch (InvalidOperationError)
             {
                 throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持减法操作（未定义 _sub 方法）");
+            }
+        }
+
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Minus(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法: {ex.Message}");
             }
         }
 
@@ -123,6 +151,20 @@ public partial class VirtualMachine
             }
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Times(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法: {ex.Message}");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia * ib;
         if (a is double da && b is double db) return da * db;
         if (a is int ia2 && b is double db2) return ia2 * db2;
@@ -152,6 +194,20 @@ public partial class VirtualMachine
             catch (InvalidOperationError)
             {
                 throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持除法操作（未定义 _div 方法）");
+            }
+        }
+
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Divide(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法: {ex.Message}");
             }
         }
 
@@ -187,6 +243,20 @@ public partial class VirtualMachine
             }
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Mod(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模: {ex.Message}");
+            }
+        }
+
         if (a is int ia && b is int ib) return ia % ib;
         if (a is double da && b is double db) return da % db;
         throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模");
@@ -214,6 +284,20 @@ public partial class VirtualMachine
             catch (InvalidOperationError)
             {
                 throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持幂运算操作（未定义 _pow 方法）");
+            }
+        }
+
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            try
+            {
+                return langValueA.Power(bValue);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行幂运算: {ex.Message}");
             }
         }
 
@@ -251,6 +335,13 @@ public partial class VirtualMachine
             return anyA.Equal(bValue);
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return langValueA.Equal(bValue);
+        }
+
         if (a is int ia && b is int ib) return ia == ib;
         if (a is double da && b is double db) return Math.Abs(da - db) < 1e-10;
         if (a is bool ba && b is bool bb) return ba == bb;
@@ -283,6 +374,13 @@ public partial class VirtualMachine
             return anyA.Greater(bValue);
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return langValueA.Greater(bValue);
+        }
+
         if (a is int ia && b is int ib) return ia > ib;
         if (a is double da && b is double db) return da > db;
         if (a is int ia2 && b is double db2) return ia2 > db2;
@@ -306,6 +404,13 @@ public partial class VirtualMachine
         {
             var bValue = ConvertToLangValueType(b);
             return anyA.Less(bValue);
+        }
+
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return langValueA.Less(bValue);
         }
 
         if (a is int ia && b is int ib) return ia < ib;
@@ -334,6 +439,13 @@ public partial class VirtualMachine
             return anyA.GreaterEqual(bValue);
         }
 
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return langValueA.GreaterEqual(bValue);
+        }
+
         return Greater(a, b) || Equals(a, b);
     }
 
@@ -354,6 +466,13 @@ public partial class VirtualMachine
         {
             var bValue = ConvertToLangValueType(b);
             return anyA.LessEqual(bValue);
+        }
+
+        // 检查是否是 LangValueType（IntLangValue, DoubleLangValue 等）
+        if (a is LangValueType langValueA)
+        {
+            var bValue = ConvertToLangValueType(b);
+            return langValueA.LessEqual(bValue);
         }
 
         return Less(a, b) || Equals(a, b);

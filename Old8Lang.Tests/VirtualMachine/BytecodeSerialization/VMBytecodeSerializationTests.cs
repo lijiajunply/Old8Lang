@@ -89,12 +89,14 @@ public class VMBytecodeSerializationTests
     [Fact]
     public void BytecodeSerialization_StringOperations_CompilesAndExecutes()
     {
-        var code = @"
-            str1 <- ""Hello""
-            str2 <- ""World""
-            result <- str1 + "", "" + str2 + ""!""
-            PrintLine(result)
-        ";
+        var code = """
+
+                               str1 <- "Hello"
+                               str2 <- "World"
+                               result <- str1 + ", " + str2 + "!"
+                               PrintLine(result)
+                           
+                   """;
 
         var (bytecode, output) = CompileAndExecuteVMCode(code);
         Assert.NotNull(bytecode);

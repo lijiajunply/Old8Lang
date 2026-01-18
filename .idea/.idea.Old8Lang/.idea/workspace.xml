@@ -24,9 +24,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMStringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMStringTemplateTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -585,7 +585,7 @@
       <workItem from="1768730838950" duration="2656000" />
       <workItem from="1768741716470" duration="700000" />
       <workItem from="1768749421043" duration="8816000" />
-      <workItem from="1768767111847" duration="1052000" />
+      <workItem from="1768767111847" duration="1710000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +930,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="728" />
+    <option name="localTasksCounter" value="730" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,8 +957,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重命名FuncInit中的FuncLangValue属性为FuncValue&#10;&#10;- 将FuncInit类中的FuncLangValue属性重命名为FuncValue&#10;- 更新所有引用FuncLangValue的地方为FuncValue&#10;- 修改相关的getter和检查逻辑以使用新属性名&#10;- 更新测试代码中对FuncLangValue的引用&#10;- 调整装饰器应用逻辑中的临时函数命名&#10;- 优化装饰器调用过程中的参数传递方式&#10;- 修正类型推断和验证逻辑中的属性引用&#10;- 更新外部提供程序和语言服务器中的相关引用" />
-    <MESSAGE value="refactor(ast): 优化数组值构造函数实现&#10;&#10;- 添加新的ArrayLangValue构造函数接受LangValueType数组参数&#10;- 修改ArrayValueFuncStatic中排序和转换方法使用新构造函数&#10;- 保持元素类型和位置信息在数组操作后正确传递&#10;- 简化数组转换过程减少不必要的ToList()调用&#10;- 更新工作区配置文件以反映最新代码变更" />
     <MESSAGE value="feat(parser): 优化 ValueTuple 索引访问实现&#10;&#10;- 实现了对常量索引的 ValueTuple 类型推断&#10;- 添加了对超过 7 个元素的 ValueTuple 的递归访问支持&#10;- 重构了嵌套索引访问的 IL 生成逻辑&#10;- 移除了元组扁平化访问的旧实现&#10;- 更新了相关单元测试以匹配新的元组访问方式&#10;- 添加了大元组和嵌套元组的测试用例" />
     <MESSAGE value="feat(parser): 添加对外部函数声明中调用约定的支持&#10;&#10;- 支持 extern &quot;dll&quot; cdecl/stdcall/winapi { func1, func2 } 语法&#10;- 实现调用约定关键字的识别逻辑&#10;- 添加 cdecl、stdcall、winapi 调用约定的解析支持&#10;- 扩展外部函数声明的语法匹配规则&#10;- 为调用约定检查功能添加文档注释" />
     <MESSAGE value="fix(interpreter): 修复装饰器中闭包变量访问问题&#10;&#10;- 将测试中的 RuntimeError 替换为 InvalidOperationError&#10;- 在 FuncInit 中保留 targetFunc 的 CapturedScope 确保闭包变量正确访问&#10;- 直接调用 wrapper 而不是通过 FunctionCallExpression 保留 CapturedScope&#10;- 创建新 FuncLangValue 时保留 wrappedFunc 的所有属性包括 CapturedScope&#10;- 将 FuncLangValue 的 CapturedScope 访问权限从 private 改为 internal&#10;- 添加 GetCapturedScope 方法用于装饰器等场景获取捕获作用域" />
@@ -982,7 +980,9 @@
     <MESSAGE value="refactor(tests): 将虚拟机语句测试重构为类型系统测试&#10;&#10;- 移除 VMDeferTests 和 VMSelectTests 测试文件&#10;- 新增 VMIntersectionTypeTests 用于测试交叉类型功能&#10;- 新增 VMTypeConversionTests 用于测试类型转换场景&#10;- 新增 VMUnionTypeTests 用于测试联合类型功能&#10;- 统一测试基类 ExecuteVMCode 方法到新的类型测试中&#10;- 更新所有测试用例以使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
     <MESSAGE value="test(vm): 启用虚拟机异步函数和泛型功能测试&#10;&#10;- 移除异步函数测试的跳过标记，启用所有异步函数相关测试&#10;- 移除泛型约束测试的跳过标记，启用所有泛型约束相关测试&#10;- 移除嵌套泛型测试的跳过标记，启用所有嵌套泛型相关测试&#10;- 移除可空泛型测试的跳过标记，启用所有可空泛型相关测试&#10;- 移除switch语句中break功能的跳过标记，启用相关测试&#10;- 移除using语句异常处理的跳过标记，启用所有using语句相关测试&#10;- 移除switch和defer交互功能的跳过标记，启用相关测试&#10;- 移除using和defer交互功能的跳过标记，启用所有交互测试" />
     <MESSAGE value="refactor(tests): 重构虚拟机测试结构并更新项目路线图&#10;&#10;- 移除 Old8Lang 虚拟机模式测试扩展计划文档&#10;- 在路线图中将测试用例增加和覆盖率报告生成标记为已完成&#10;- 在路线图中将虚拟机测试补充的缺失类别、集成测试和字节码序列化标记为已完成&#10;- 更新 IDEA 工作空间配置文件中的任务计数器和工作时间统计&#10;- 移除虚拟机语句测试文件（VMDeferTests.cs 和 VMSelectTests.cs）&#10;- 新增虚拟机类型系统测试文件（VMIntersectionTypeTests.cs、VMTypeConversionTests.cs、VMUnionTypeTests.cs）&#10;- 重构测试基类 ExecuteVMCode 方法并统一使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 重构虚拟机测试结构并更新项目路线图&#10;&#10;- 移除 Old8Lang 虚拟机模式测试扩展计划文档&#10;- 在路线图中将测试用例增加和覆盖率报告生成标记为已完成&#10;- 在路线图中将虚拟机测试补充的缺失类别、集成测试和字节码序列化标记为已完成&#10;- 更新 IDEA 工作空间配置文件中的任务计数器和工作时间统计&#10;- 移除虚拟机语句测试文件（VMDeferTests.cs 和 VMSelectTests.cs）&#10;- 新增虚拟机类型系统测试文件（VMIntersectionTypeTests.cs、VMTypeConversionTests.cs、VMUnionTypeTests.cs）&#10;- 重构测试基类 ExecuteVMCode 方法并统一使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
+    <MESSAGE value="fix(tests): 修复虚拟机逻辑比较测试中的大小写断言问题&#10;&#10;- 将 VMComparisonLogicalTests 中的所有 &quot;True&quot;/&quot;False&quot; 断言改为小写 &quot;true&quot;/&quot;false&quot;&#10;- 修复了布尔值输出的大小写匹配问题&#10;- 更新了相关的注释说明&#10;- 在 VMGenericNestedTests 中修复了字典初始化语法&#10;- 添加了 CLAUDE.md 中关于IL生成问题修复的文档说明" />
+    <MESSAGE value="feat(compiler): 实现主函数顶层变量的全局声明逻辑&#10;&#10;- 添加 IsInMainFunctionTopLevel 方法检测主函数顶层作用域&#10;- 修改变量声明逻辑使主函数顶层新变量作为全局变量处理&#10;- 非主函数顶层的新变量仍按局部变量处理&#10;- 保持现有局部和全局变量的识别与存储逻辑不变" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现主函数顶层变量的全局声明逻辑&#10;&#10;- 添加 IsInMainFunctionTopLevel 方法检测主函数顶层作用域&#10;- 修改变量声明逻辑使主函数顶层新变量作为全局变量处理&#10;- 非主函数顶层的新变量仍按局部变量处理&#10;- 保持现有局部和全局变量的识别与存储逻辑不变" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
