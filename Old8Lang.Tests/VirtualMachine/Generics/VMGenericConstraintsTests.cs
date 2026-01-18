@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.VirtualMachine.Generics;
 /// </summary>
 public class VMGenericConstraintsTests
 {
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_SingleConstraint_ExecutesCorrectly()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class VMGenericConstraintsTests
         Assert.Equal(-1, result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_MultipleConstraintsWithAnd_ExecutesCorrectly()
     {
         // Arrange
@@ -105,7 +105,7 @@ public class VMGenericConstraintsTests
         Assert.Equal("test", result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_WhereClause_ExecutesCorrectly()
     {
         // Arrange
@@ -158,7 +158,7 @@ public class VMGenericConstraintsTests
         Assert.Equal(10, result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_SingleConstraint_ExecutesCorrectly()
     {
         // Arrange
@@ -215,7 +215,7 @@ public class VMGenericConstraintsTests
         Assert.Equal(1, result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_MultipleConstraints_ExecutesCorrectly()
     {
         // Arrange
@@ -276,7 +276,7 @@ public class VMGenericConstraintsTests
         Assert.Equal("Entity:User", result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_MultipleTypeParametersWithConstraints_ExecutesCorrectly()
     {
         // Arrange
@@ -340,7 +340,7 @@ public class VMGenericConstraintsTests
         Assert.Equal("1:test", result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_ConstraintWithInheritance_ExecutesCorrectly()
     {
         // Arrange
@@ -388,7 +388,7 @@ public class VMGenericConstraintsTests
         Assert.Equal(10, result);
     }
 
-    [Fact(Skip = "虚拟机泛型约束功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NestedConstraints_ExecutesCorrectly()
     {
         // Arrange

@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.VirtualMachine.Generics;
 /// </summary>
 public class VMGenericNestedTests
 {
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NestedList_ExecutesCorrectly()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class VMGenericNestedTests
         Assert.Equal(2, count);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_ListOfLists_ExecutesCorrectly()
     {
         // Arrange
@@ -95,7 +95,7 @@ public class VMGenericNestedTests
         Assert.Equal(2, result4);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_DictionaryOfLists_ExecutesCorrectly()
     {
         // Arrange
@@ -157,7 +157,7 @@ public class VMGenericNestedTests
         Assert.Equal(2, result3);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NestedGenericClass_ExecutesCorrectly()
     {
         // Arrange
@@ -201,7 +201,7 @@ public class VMGenericNestedTests
         Assert.Equal(42, result);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NestedGenericParameters_ExecutesCorrectly()
     {
         // Arrange
@@ -240,7 +240,7 @@ public class VMGenericNestedTests
         Assert.Equal(100, result);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_ListOfDictionaries_ExecutesCorrectly()
     {
         // Arrange
@@ -295,7 +295,7 @@ public class VMGenericNestedTests
         Assert.Equal(2, result3);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_ThreeLevelNesting_ExecutesCorrectly()
     {
         // Arrange
@@ -343,7 +343,7 @@ public class VMGenericNestedTests
         Assert.Equal("nested", result);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_ComplexNestedStructure_ExecutesCorrectly()
     {
         // Arrange
@@ -387,7 +387,7 @@ public class VMGenericNestedTests
         Assert.Equal(2, result3);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NestedWithDifferentTypes_ExecutesCorrectly()
     {
         // Arrange
@@ -426,7 +426,7 @@ public class VMGenericNestedTests
         Assert.Equal(42, result2);
     }
 
-    [Fact(Skip = "虚拟机嵌套泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NestedListTransformation_ExecutesCorrectly()
     {
         // Arrange

@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.VirtualMachine.Generics;
 /// </summary>
 public class VMGenericNullableTests
 {
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NullableTypeParameter_AcceptsNull()
     {
         // Arrange
@@ -39,7 +39,7 @@ public class VMGenericNullableTests
         Assert.Equal("42", result2);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NullableTypeParameter_WithStringType()
     {
         // Arrange
@@ -70,7 +70,7 @@ public class VMGenericNullableTests
         Assert.Equal("hello", result2);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NullableTypeParameter_ExecutesCorrectly()
     {
         // Arrange
@@ -123,7 +123,7 @@ public class VMGenericNullableTests
         Assert.Equal("100", result4);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NullableWithDefaultValue_ExecutesCorrectly()
     {
         // Arrange
@@ -162,7 +162,7 @@ public class VMGenericNullableTests
         Assert.Equal("test", result4);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NullableWithMultipleTypeParameters_ExecutesCorrectly()
     {
         // Arrange
@@ -228,7 +228,7 @@ public class VMGenericNullableTests
         Assert.Equal("null:null", result4);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NullableWithComplexType_ExecutesCorrectly()
     {
         // Arrange
@@ -274,7 +274,7 @@ public class VMGenericNullableTests
         Assert.Equal("No person", result2);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericClass_NullableWithList_ExecutesCorrectly()
     {
         // Arrange
@@ -341,7 +341,7 @@ public class VMGenericNullableTests
         Assert.Null(result4);
     }
 
-    [Fact(Skip = "虚拟机可空泛型功能可能需要进一步实现")]
+    [Fact]
     public void GenericFunction_NullableWithConditionalReturn_ExecutesCorrectly()
     {
         // Arrange

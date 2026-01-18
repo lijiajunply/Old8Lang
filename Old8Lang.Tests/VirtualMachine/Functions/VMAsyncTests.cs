@@ -41,7 +41,7 @@ public class VMAsyncTests
         }
     }
 
-    [Fact(Skip = "虚拟机异步函数实现可能不完整")]
+    [Fact]
     public void AsyncFunction_SimpleCall_ExecutesCorrectly()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class VMAsyncTests
         Assert.Equal("data", output);
     }
 
-    [Fact(Skip = "虚拟机异步函数实现可能不完整")]
+    [Fact]
     public void AsyncFunction_WithDelay_ExecutesCorrectly()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class VMAsyncTests
         Assert.Equal("42", output);
     }
 
-    [Fact(Skip = "虚拟机异步函数实现可能不完整")]
+    [Fact]
     public void AsyncFunction_MultipleAwaits_ExecutesCorrectly()
     {
         // Arrange

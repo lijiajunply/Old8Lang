@@ -183,39 +183,6 @@ public class VMSwitchStatementTests
         Assert.Equal("inner: 2", lines[1]);
     }
 
-    [Fact(Skip = "虚拟机中 switch 语句不支持 break")]
-    public void SwitchStatement_WithBreak_ExitsSwitch()
-    {
-        // Arrange
-        var code = @"
-            x <- 2
-            switch x {
-                case 1 {
-                    PrintLine(""case 1"")
-                }
-                case 2 {
-                    PrintLine(""case 2"")
-                    break
-                    PrintLine(""after break"")
-                }
-                case 3 {
-                    PrintLine(""case 3"")
-                }
-            }
-            PrintLine(""after switch"")
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-        Assert.Equal(2, lines.Length);
-        Assert.Equal("case 2", lines[0]);
-        Assert.Equal("after switch", lines[1]);
-        Assert.DoesNotContain("after break", lines);
-    }
-
     [Fact]
     public void SwitchStatement_InLoop_ExecutesMultipleTimes()
     {
@@ -430,7 +397,7 @@ public class VMSwitchStatementTests
         Assert.Equal("pi", output);
     }
 
-    [Fact(Skip = "虚拟机中 switch 和 defer 的交互可能需要进一步实现")]
+    [Fact]
     public void SwitchStatement_WithDefer_ExecutesInCorrectOrder()
     {
         // Arrange

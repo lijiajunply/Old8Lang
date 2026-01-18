@@ -142,7 +142,7 @@ public class VMUsingTests
         Assert.Equal("After using block", lines[2]);
     }
 
-    [Fact(Skip = "虚拟机中 using 语句的异常处理可能需要进一步实现")]
+    [Fact]
     public void UsingStatement_WithException_StillDisposesResource()
     {
         // Arrange
@@ -237,7 +237,7 @@ public class VMUsingTests
         Assert.Equal("All resources disposed", lines[3]);
     }
 
-    [Fact(Skip = "虚拟机中 using 和 defer 的交互可能需要进一步实现")]
+    [Fact]
     public void UsingWithDefer_ExecutesInCorrectOrder()
     {
         // Arrange
@@ -267,7 +267,7 @@ public class VMUsingTests
         Assert.Equal("After using", lines[3]); // using 资源释放在 defer 之后
     }
 
-    [Fact(Skip = "虚拟机中 using 和 defer 的交互可能需要进一步实现")]
+    [Fact]
     public void UsingWithDeferAndException_BothExecute()
     {
         // Arrange
@@ -298,7 +298,7 @@ public class VMUsingTests
         Assert.Equal("Caught: Test exception", lines[2]); // using 资源释放后才捕获异常
     }
 
-    [Fact(Skip = "虚拟机中 using 和 defer 的交互可能需要进一步实现")]
+    [Fact]
     public void UsingWithMultipleDefers_ExecutesInCorrectOrder()
     {
         // Arrange
