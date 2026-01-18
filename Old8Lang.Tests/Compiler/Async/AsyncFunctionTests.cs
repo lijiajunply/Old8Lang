@@ -32,7 +32,14 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        
+        // Enable debug output to see generated IL code
+        Old8Lang.Compiler.Compiler.DebugOutputEnabled = true;
+        // Disable IL verification to get more detailed error information
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
+        Old8Lang.Compiler.Compiler.DebugOutputEnabled = false;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -43,6 +50,7 @@ public class AsyncFunctionTests(ITestOutputHelper output)
     public void AsyncFunctionWithParameters_CompilesAndExecutesCorrectly()
     {
         // Arrange
+        Old8Lang.Compiler.Compiler.DebugOutputEnabled = true;
         var code = @"
             async func calculateSum(a:int, b:int) -> int {
                 await Task.Delay(50)

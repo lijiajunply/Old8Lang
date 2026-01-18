@@ -1,0 +1,7 @@
+async func testAsync() -> int {
+    await Task.Delay(10)
+    return 42
+}
+
+result <- await testAsync()
+PrintLine(result)

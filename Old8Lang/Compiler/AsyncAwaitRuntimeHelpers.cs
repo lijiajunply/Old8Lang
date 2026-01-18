@@ -4,11 +4,12 @@ namespace Old8Lang.Compiler;
 
 public static class AsyncAwaitRuntimeHelpers
 {
-    public static void AwaitUnsafeOnCompleted<TAwaiter>(
+    public static void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(
         ref AsyncTaskMethodBuilder<object> builder,
         ref TAwaiter awaiter,
-        ref IAsyncStateMachine stateMachine)
+        ref TStateMachine stateMachine)
         where TAwaiter : ICriticalNotifyCompletion
+        where TStateMachine : struct, IAsyncStateMachine
     {
         builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
     }

@@ -61,7 +61,10 @@ public static class StandardLibraryRegistry
 
         ["Vector"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(VectorLib))
+            TypeImportConfig.NormalClass(typeof(Vector2)), 
+            TypeImportConfig.NormalClass(typeof(Vector3)),
+            TypeImportConfig.NormalClass(typeof(Vector4)),
+            TypeImportConfig.NormalClass(typeof(VectorN))
         ),
 
         ["Regex"] = StandardLibraryInfo.FromTypes(

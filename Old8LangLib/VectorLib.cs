@@ -1,14 +1,6 @@
 namespace Old8LangLib;
 
 /// <summary>
-/// 向量库，提供各种维度的向量类和丰富的向量操作
-/// </summary>
-public static class VectorLib
-{
-    // 向量库的公共方法和常量可以在这里定义
-}
-
-/// <summary>
 /// 2D 向量类，提供丰富的二维向量操作
 /// </summary>
 public class Vector2

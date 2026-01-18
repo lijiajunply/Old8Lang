@@ -1,6 +1,6 @@
 ## 解释模式和编译模式
 
-Old8Lang 有两种运行模式：解释模式和编译模式。
+Old8Lang 有三种运行模式：解释模式、编译模式和虚拟机模式。
 
 ### 解释模式
 
@@ -19,10 +19,10 @@ Old8Lang 有两种运行模式：解释模式和编译模式。
 生成的 测试用代码文件 必须要符合 Old8Lang 语法规范。详情请看 /Old8Lang/Old8Lang.ebnf
 测试时可使用 PrintLine 函数打印结果，方便查看。 注释为 // 而非 #
 
-编译模式测试时，请写到 Old8Lang.Tests/Compiler 目录下。
-解释模式测试时，请写到 Old8Lang.Tests/Interpreter 目录下。
-语法测试时，请放在 Old8Lang.Tests/Parser 目录下。
-虚拟机模式测试时，请写到 Old8Lang.Tests/VirtualMachine 目录下。
+编译模式测试时，请写到 TestFiles/CompilerTests 目录下。
+解释模式测试时，请写到 TestFiles/InterpreterTests 目录下。
+语法测试时，请放在 TestFiles/SyntaxTests 目录下。
+虚拟机模式测试时，请写到 TestFiles/VirtualMachine 目录下。
 
 在测试时，也可以使用 Old8Lang.App 来编译测试用代码文件：
 
@@ -49,8 +49,9 @@ dotnet run --project Old8Lang.App -- -vm <path-to-test-file.old8>
 1. 完成语法规则的添加和解析之后，必须先进行语法测试，确保新语法可以被正确解析。
 2. 完成语法测试之后，进行解释模式测试，确保新语法在解释模式下可以正常运行。
 3. 完成解释模式测试之后，进行编译模式测试，确保新语法在编译模式下可以正常运行。
-4. 完成编译模式测试之后，更新 Old8Lang.ebnf 和 Old8Lang_Grammar.md 中的语法规则。
-
+4. 完成编译模式测试之后，进行虚拟机模式测试，确保新语法在虚拟机模式下可以正常运行。
+5. 完成虚拟机模式测试之后，更新 Old8Lang.ebnf 和 Old8Lang_Grammar.md 中的语法规则。
+6. 完成所有测试之后，在 Old8Lang.Tests 项目中添加新语法的单元测试，包括语法测试、解释模式测试、编译模式测试、虚拟机模式测试、边界测试、异常测试等。
 
 ## 任何测试结束之后
 

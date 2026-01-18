@@ -386,6 +386,7 @@ public class AsyncFuncLangValue : ImportInfo
             $"AsyncStateMachine_{Id?.IdName ?? "Anonymous"}",
             TypeAttributes.Public |
             TypeAttributes.Sealed |
+            TypeAttributes.SequentialLayout |
             TypeAttributes.AnsiClass |
             TypeAttributes.BeforeFieldInit,
             typeof(ValueType));
@@ -395,6 +396,8 @@ public class AsyncFuncLangValue : ImportInfo
             {
                 TypeBuilder = typeBuilder
             };
+
+        local.AsyncStateMachineGenerator = stateMachineGenerator;
 
         // 提升参数到状态机字段
         if (Ids != null)

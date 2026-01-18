@@ -21,7 +21,9 @@ public class AsyncStateMachineGenerator
     // 状态机字段
     public FieldBuilder? StateField { get; private set; }
     public FieldBuilder? BuilderField { get; private set; }
-    public FieldBuilder? AwaiterField { get; private set; }
+    
+    // 每个 await 表达式对应一个专用的 awaiter 字段
+    private readonly Dictionary<int, FieldBuilder> AwaiterFields = [];
 
     // 状态常量
     private const int StateNotStarted = -1;
@@ -42,6 +44,9 @@ public class AsyncStateMachineGenerator
     
     // 返回标签（用于退出 try 块）
     private Label? _retLabel;
+
+    // 是否已经执行了 return 语句（避免重复的 leave 指令）
+    private bool HasReturned { get; set; }
 
     /// <summary>
     /// 构造函数
@@ -244,13 +249,24 @@ public class AsyncStateMachineGenerator
     {
         StateField = typeBuilder.DefineField("<>1__state", typeof(int), FieldAttributes.Public);
         BuilderField = typeBuilder.DefineField("<>t__builder", typeof(AsyncTaskMethodBuilder<object>), FieldAttributes.Public);
+    }
+    
+    /// <summary>
+    /// 获取或创建 awaiter 字段
+    /// </summary>
+    private FieldBuilder GetOrCreateAwaiterField(int stateIndex, Type awaiterType)
+    {
+        if (TypeBuilder == null) throw new InvalidOperationException("TypeBuilder not initialized");
         
-        // 等待器字段：用于存储当前等待的任务等待器
-        // 使用 object 类型以支持多种类型的等待器（需要装箱/拆箱）
-        AwaiterField = typeBuilder.DefineField(
-            "<>u__1",
-            typeof(object),
-            FieldAttributes.Private);
+        if (AwaiterFields.TryGetValue(stateIndex, out var field))
+        {
+            return field;
+        }
+        
+        // 创建新的 awaiter 字段
+        field = TypeBuilder.DefineField($"<>u__{stateIndex}", awaiterType, FieldAttributes.Public);
+        AwaiterFields[stateIndex] = field;
+        return field;
     }
 
     /// <summary>
@@ -306,7 +322,11 @@ public class AsyncStateMachineGenerator
         BlockStatement.GenerateIl(il, LocalManager);
         
         // --- 完成处理 ---
-        EmitReturnInternal(il, typeof(object));
+        // 只有当函数体中没有执行 return 语句时，才调用 EmitReturnInternal
+        if (!HasReturned)
+        {
+            EmitReturnInternal(il, typeof(object));
+        }
         
         // --- 异常处理 ---
         il.BeginCatchBlock(typeof(Exception));
@@ -353,33 +373,29 @@ public class AsyncStateMachineGenerator
         il.Emit(OpCodes.Ldc_I4, stateIndex);
         il.Emit(OpCodes.Stfld, StateField!);
         
-        // 2. 保存 awaiter 到字段 (装箱)
+        // 2. 保存 awaiter 到专用字段
+        var awaiterField = GetOrCreateAwaiterField(stateIndex, awaiterLocal.LocalType);
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldloc, awaiterLocal);
-        il.Emit(OpCodes.Box, awaiterLocal.LocalType);
-        il.Emit(OpCodes.Stfld, AwaiterField!);
+        il.Emit(OpCodes.Stfld, awaiterField);
         
         // 3. 调用 AwaitUnsafeOnCompleted
-        var stateMachineInterfaceLocal = il.DeclareLocal(typeof(IAsyncStateMachine));
-        if (TypeBuilder?.IsValueType == true)
-        {
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldobj, TypeBuilder);
-            il.Emit(OpCodes.Box, TypeBuilder);
-        }
-        else
-        {
-            il.Emit(OpCodes.Ldarg_0);
-        }
-        il.Emit(OpCodes.Stloc, stateMachineInterfaceLocal);
-
+        // 签名: void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldflda, BuilderField!);
-        il.Emit(OpCodes.Ldloca, awaiterLocal);
-        il.Emit(OpCodes.Ldloca, stateMachineInterfaceLocal);
-        il.Emit(OpCodes.Call, typeof(AsyncAwaitRuntimeHelpers)
-            .GetMethod(nameof(AsyncAwaitRuntimeHelpers.AwaitUnsafeOnCompleted))!
-            .MakeGenericMethod(awaiterLocal.LocalType));
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldflda, awaiterField);
+        il.Emit(OpCodes.Ldarg_0);
+        
+        var awaitUnsafeOnCompletedMethod = typeof(AsyncTaskMethodBuilder<object>)
+            .GetMethod("AwaitUnsafeOnCompleted", BindingFlags.Public | BindingFlags.Instance);
+        
+        if (awaitUnsafeOnCompletedMethod == null)
+            throw new InvalidOperationException("Cannot find AwaitUnsafeOnCompleted method on AsyncTaskMethodBuilder<object>");
+        
+        // 创建泛型方法：AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>
+        var genericMethod = awaitUnsafeOnCompletedMethod.MakeGenericMethod(awaiterLocal.LocalType, TypeBuilder!);
+        il.Emit(OpCodes.Call, genericMethod);
             
         // 4. 返回 (挂起)
         il.Emit(OpCodes.Leave, _retLabel!.Value);
@@ -390,18 +406,13 @@ public class AsyncStateMachineGenerator
         // 1. 标记恢复标签
         il.MarkLabel(GetStateLabel(stateIndex));
         
-        // 2. 恢复 awaiter (拆箱)
+        // 2. 从专用字段恢复 awaiter
+        var awaiterField = GetOrCreateAwaiterField(stateIndex, awaiterLocal.LocalType);
         il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldfld, AwaiterField!);
-        il.Emit(OpCodes.Unbox_Any, awaiterLocal.LocalType);
+        il.Emit(OpCodes.Ldfld, awaiterField);
         il.Emit(OpCodes.Stloc, awaiterLocal);
         
-        // 3. 清除 awaiter 字段
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldnull);
-        il.Emit(OpCodes.Stfld, AwaiterField!);
-        
-        // 4. 重置状态为 -1 (Running)
+        // 3. 重置状态为 -1 (Running)
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, StateNotStarted);
         il.Emit(OpCodes.Stfld, StateField!);
@@ -439,6 +450,8 @@ public class AsyncStateMachineGenerator
         il.Emit(OpCodes.Stfld, StateField!);
         
         il.Emit(OpCodes.Leave, _retLabel!.Value);
+
+        HasReturned = true;
     }
 
     private void GenerateSetStateMachineMethod(TypeBuilder typeBuilder)

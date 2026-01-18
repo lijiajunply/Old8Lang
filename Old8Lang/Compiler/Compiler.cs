@@ -31,7 +31,7 @@ public static class Compiler
     /// </summary>
     public static bool IlVerificationEnabled { get; set; } = true;
 
-    public static bool EnableAsyncStateMachineAwait { get; set; } = false;
+    public static bool EnableAsyncStateMachineAwait { get; set; } = true;
 
     /// <summary>
     /// 日志级别枚举，用于控制编译过程中的日志输出
@@ -309,8 +309,9 @@ public static class Compiler
                         }
                     }
 
-                    throw new CompilerException($"IL代码验证失败，共发现 {verificationResult.Errors.Count} 个错误",
-                        new SourcePosition(0, 0));
+                    var errorMsg = $"IL代码验证失败，共发现 {verificationResult.Errors.Count} 个错误:\n" +
+                                   string.Join("\n", verificationResult.Errors.Select(e => $"[{e.Code}] {e.Message} (Context: {e.Context})"));
+                    throw new CompilerException(errorMsg, new SourcePosition(0, 0));
                 }
 
                 Log("IL代码验证通过", LogLevel.Debug);

@@ -1,0 +1,7 @@
+async func testAsyncWithParams(a:int, b:int) -> int {
+    await Task.Delay(10)
+    return a + b
+}
+
+result <- await testAsyncWithParams(5, 10)
+PrintLine(result)

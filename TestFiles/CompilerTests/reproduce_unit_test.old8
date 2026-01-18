@@ -1,0 +1,24 @@
+async func calculateSum(a:int, b:int) -> int {
+    await Task.Delay(50)
+    return a + b
+}
+
+async func testCalculation() {
+    result1 <- await calculateSum(10, 20)
+    result2 <- await calculateSum(5, 15)
+    
+    // 模拟 Assert
+    if result1 == 30 {
+        PrintLine("result1 OK")
+    } else {
+        PrintLine("result1 FAIL")
+    }
+    
+    if result2 == 20 {
+        PrintLine("result2 OK")
+    } else {
+        PrintLine("result2 FAIL")
+    }
+}
+
+testCalculation()
