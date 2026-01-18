@@ -496,6 +496,10 @@ When working with AST nodes:
 - **Preferred approach**: Use `Accept(visitor)` with appropriate Visitor implementation
 - **Legacy approach**: Call `Run()`, `GenerateIl()`, or `OutputType()` (automatically delegates to Visitor)
 
+## 如何修复编译器模式的 IL 生成问题
+
+可以使用 ILSpy 等工具来查看编译后的 IL 代码，定位问题所在。
+
 ### Recent Refactoring
 
 Recent changes include:

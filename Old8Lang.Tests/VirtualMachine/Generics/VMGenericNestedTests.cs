@@ -103,8 +103,8 @@ public class VMGenericNestedTests
             class GroupedData<K, V> {
                 public groups:dict
 
-                func init() -> void {
-                    this.groups <- {}
+                func init() {
+                    this.groups <- dict()
                 }
 
                 func addToGroup(key:K, value:V) -> void {

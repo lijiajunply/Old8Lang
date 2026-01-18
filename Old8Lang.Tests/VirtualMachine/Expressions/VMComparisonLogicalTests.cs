@@ -59,7 +59,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -78,7 +78,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -97,7 +97,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -135,7 +135,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -154,7 +154,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Fact]
@@ -177,8 +177,8 @@ public class VMComparisonLogicalTests
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
-        Assert.Equal("True", lines[0]);
-        Assert.Equal("True", lines[1]);
+        Assert.Equal("true", lines[0]);
+        Assert.Equal("true", lines[1]);
     }
 
     [Fact]
@@ -201,8 +201,8 @@ public class VMComparisonLogicalTests
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
-        Assert.Equal("True", lines[0]);
-        Assert.Equal("True", lines[1]);
+        Assert.Equal("true", lines[0]);
+        Assert.Equal("true", lines[1]);
     }
 
     #endregion
@@ -226,7 +226,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -246,7 +246,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Theory]
@@ -264,7 +264,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(expected.ToString(), output);
+        Assert.Equal(expected.ToString().ToLower(), output);
     }
 
     [Fact]
@@ -280,7 +280,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -299,7 +299,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output); // (10 > 5) && (15 > 10) = true && true = true
+        Assert.Equal("true", output); // (10 > 5) && (15 > 10) = true && true = true
     }
 
     [Fact]
@@ -317,7 +317,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("False", output); // (5 > 10) && (10 > 0) = false && true = false
+        Assert.Equal("false", output); // (5 > 10) && (10 > 0) = false && true = false
     }
 
     [Fact]
@@ -335,7 +335,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output); // (10 > 5) || (5 > 10) = true || false = true
+        Assert.Equal("true", output); // (10 > 5) || (5 > 10) = true || false = true
     }
 
     #endregion
@@ -364,9 +364,9 @@ public class VMComparisonLogicalTests
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
-        Assert.Equal("True", lines[0]);  // (10 > 5) && (15 > 10) = true && true = true
-        Assert.Equal("True", lines[1]);  // (10 < 5) || (15 > 5) = false || true = true
-        Assert.Equal("True", lines[2]);  // !(10 == 5) = !false = true
+        Assert.Equal("true", lines[0]);  // (10 > 5) && (15 > 10) = true && true = true
+        Assert.Equal("true", lines[1]);  // (10 < 5) || (15 > 5) = false || true = true
+        Assert.Equal("true", lines[2]);  // !(10 == 5) = !false = true
     }
 
     [Fact]
@@ -389,7 +389,7 @@ public class VMComparisonLogicalTests
         // ((1 < 2) && (3 < 4)) || ((1 > 2) && (3 > 4))
         // = (true && true) || (false && false)
         // = true || false = true
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -411,8 +411,8 @@ public class VMComparisonLogicalTests
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
-        Assert.Equal("True", lines[0]);  // (10 + 5) > (10 - 5) = 15 > 5 = true
-        Assert.Equal("True", lines[1]);  // (10 * 5) == (5 * 10) = 50 == 50 = true
+        Assert.Equal("true", lines[0]);  // (10 + 5) > (10 - 5) = 15 > 5 = true
+        Assert.Equal("true", lines[1]);  // (10 * 5) == (5 * 10) = 50 == 50 = true
     }
 
     #endregion
