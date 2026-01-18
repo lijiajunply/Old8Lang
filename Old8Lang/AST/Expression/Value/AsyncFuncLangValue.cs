@@ -386,7 +386,7 @@ public class AsyncFuncLangValue : ImportInfo
             $"AsyncStateMachine_{Id?.IdName ?? "Anonymous"}",
             TypeAttributes.Public |
             TypeAttributes.Sealed |
-            TypeAttributes.SequentialLayout |
+            TypeAttributes.AutoLayout |  // 使用 AutoLayout 而不是 SequentialLayout
             TypeAttributes.AnsiClass |
             TypeAttributes.BeforeFieldInit,
             typeof(ValueType));

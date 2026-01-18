@@ -795,12 +795,31 @@ public partial class AsyncForInStatement(
         if (AllIds.Count == 1)
         {
             // 单个标识符，直接赋值
-            local.AddLocalVar(AllIds[0].IdName, current);
+            // 在异步状态机中，需要定义变量并存储
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
         else
         {
             // 多个标识符，只赋值给第一个
-            local.AddLocalVar(AllIds[0].IdName, current);
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
 
         // 生成循环体
@@ -977,12 +996,31 @@ public partial class AsyncForInStatement(
         if (AllIds.Count == 1)
         {
             // 单个标识符，直接赋值
-            local.AddLocalVar(AllIds[0].IdName, current);
+            // 在异步状态机中，需要定义变量并存储
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
         else
         {
             // 多个标识符，只赋值给第一个
-            local.AddLocalVar(AllIds[0].IdName, current);
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
         
         // 生成循环体

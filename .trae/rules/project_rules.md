@@ -53,6 +53,10 @@ dotnet run --project Old8Lang.App -- -vm <path-to-test-file.old8>
 5. 完成虚拟机模式测试之后，更新 Old8Lang.ebnf 和 Old8Lang_Grammar.md 中的语法规则。
 6. 完成所有测试之后，在 Old8Lang.Tests 项目中添加新语法的单元测试，包括语法测试、解释模式测试、编译模式测试、虚拟机模式测试、边界测试、异常测试等。
 
+## 如何修复编译器模式的 IL 生成问题
+
+可以使用 ILSpy 等工具来查看编译后的 IL 代码，定位问题所在。
+
 ## 任何测试结束之后
 
 请生成测试报告，包含测试用代码文件的运行结果。

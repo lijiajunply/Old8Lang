@@ -1,6 +1,0 @@
-// 测试 Range 在 for-in 中的使用
-sum <- 0
-for i in [0~<5] {
-    sum <- sum + i
-}
-PrintLine("Sum: " + sum.ToStr())

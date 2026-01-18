@@ -113,9 +113,19 @@ public partial class CompilerVisitor
                     {
                          ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
                          ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
-                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
-                         ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
-                         local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
+
+                         // 在异步状态机中，需要定义变量并存储
+                         if (local.AsyncStateMachineGenerator != null)
+                         {
+                             local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(ExceptionWrapper));
+                             local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
+                         }
+                         else
+                         {
+                             var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
+                             ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
+                             local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
+                         }
                     }
                     else
                     {
@@ -165,9 +175,19 @@ public partial class CompilerVisitor
                      ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
                      // 包装异常
                      ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
-                     var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
-                     ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
-                     local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
+
+                     // 在异步状态机中，需要定义变量并存储
+                     if (local.AsyncStateMachineGenerator != null)
+                     {
+                         local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(ExceptionWrapper));
+                         local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
+                     }
+                     else
+                     {
+                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
+                         ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
+                         local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
+                     }
                 }
                 
                 // 执行块

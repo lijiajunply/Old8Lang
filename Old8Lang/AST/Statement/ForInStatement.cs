@@ -18,6 +18,11 @@ public partial class ForInStatement(
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
+    // 公共属性，用于外部访问
+    public LangId Id => id;
+    public LangExpression Expression => expression;
+    public OldStatement Body => body;
+
     // 获取所有标识符，包括主标识符和附加标识符
     private List<LangId> AllIds
     {
@@ -701,12 +706,31 @@ public partial class ForInStatement(
         if (AllIds.Count == 1)
         {
             // 单个标识符，直接赋值
-            local.AddLocalVar(AllIds[0].IdName, current);
+            // 在异步状态机中，需要定义变量并存储
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
         else
         {
             // 多个标识符，只赋值给第一个
-            local.AddLocalVar(AllIds[0].IdName, current);
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, current);
+                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[0].IdName, current);
+            }
         }
 
         // 生成循环体
@@ -789,7 +813,16 @@ public partial class ForInStatement(
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 将键添加到局部变量管理器
-        local.AddLocalVar(AllIds[0].IdName, keyLocal);
+        if (local.AsyncStateMachineGenerator != null)
+        {
+            local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+            ilGenerator.Emit(OpCodes.Ldloc, keyLocal);
+            local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+        }
+        else
+        {
+            local.AddLocalVar(AllIds[0].IdName, keyLocal);
+        }
 
         // 如果有多个标识符（键值对遍历），获取值
         if (AllIds.Count > 1)
@@ -807,7 +840,16 @@ public partial class ForInStatement(
             ilGenerator.Emit(OpCodes.Stloc, valueLocal!);
 
             // 将值添加到局部变量管理器
-            local.AddLocalVar(AllIds[1].IdName, valueLocal!);
+            if (local.AsyncStateMachineGenerator != null)
+            {
+                local.DefineVariable(ilGenerator, AllIds[1].IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, valueLocal!);
+                local.StoreVariable(ilGenerator, AllIds[1].IdName, Position);
+            }
+            else
+            {
+                local.AddLocalVar(AllIds[1].IdName, valueLocal!);
+            }
         }
 
         // 生成循环体

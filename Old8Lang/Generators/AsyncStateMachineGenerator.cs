@@ -134,6 +134,29 @@ public class AsyncStateMachineGenerator
             IdentifyAwaitExpressions(forStmt.Block);
             return;
         }
+
+        // 处理 ForIn 语句 (async for)
+        if (statement is ForInStatement forInStmt)
+        {
+            IdentifyAwaitInExpression(forInStmt.Expression);
+            IdentifyAwaitExpressions(forInStmt.Body);
+            return;
+        }
+
+        // 处理 Try 语句
+        if (statement is TryStatement tryStmt)
+        {
+            IdentifyAwaitExpressions(tryStmt.TryBlock);
+            foreach (var catchClause in tryStmt.CatchBlocks)
+            {
+                IdentifyAwaitExpressions(catchClause.catchBlock);
+            }
+            if (tryStmt.FinallyBlock != null)
+            {
+                IdentifyAwaitExpressions(tryStmt.FinallyBlock);
+            }
+            return;
+        }
     }
 
     /// <summary>
@@ -190,6 +213,10 @@ public class AsyncStateMachineGenerator
     public void GenerateStateMachine(TypeBuilder typeBuilder)
     {
         TypeBuilder = typeBuilder;
+
+        // 首先添加接口实现
+        typeBuilder.AddInterfaceImplementation(typeof(IAsyncStateMachine));
+
         GenerateStateMachineFields(typeBuilder);
         GenerateMoveNextMethod(typeBuilder);
         GenerateSetStateMachineMethod(typeBuilder);
