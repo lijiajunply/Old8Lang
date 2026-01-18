@@ -80,13 +80,13 @@ public partial class BytecodeVisitor
             if (_compiler.IsLocalVariable(varName))
             {
                 int localIndex = _compiler.GetLocalIndex(varName);
-                
+
                 // 如果有显式类型注解，更新变量类型
                 if (!string.IsNullOrEmpty(node.Id.AssumptionType))
                 {
                     _compiler.DeclareLocalVariable(varName, node.Id.AssumptionType);
                 }
-                
+
                 Emit(OpCode.StoreLocal, localIndex);
             }
             else if (_compiler.IsGlobalVariable(varName))
@@ -96,9 +96,20 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 新变量：声明为局部变量
-                int localIndex = _compiler.DeclareLocalVariable(varName, node.Id.AssumptionType);
-                Emit(OpCode.StoreLocal, localIndex);
+                // 新变量：根据作用域决定是全局变量还是局部变量
+                // 参考解释器模式：主函数顶层的变量应该是全局变量
+                if (_compiler.IsInMainFunctionTopLevel())
+                {
+                    // 在主函数顶层：声明为全局变量
+                    _compiler.DeclareGlobalVariable(varName);
+                    Emit(OpCode.StoreGlobal, varName);
+                }
+                else
+                {
+                    // 在其他作用域：声明为局部变量
+                    int localIndex = _compiler.DeclareLocalVariable(varName, node.Id.AssumptionType);
+                    Emit(OpCode.StoreLocal, localIndex);
+                }
             }
         }
         else

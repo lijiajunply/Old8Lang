@@ -399,6 +399,16 @@ public class BytecodeCompiler
         return _bytecodeFile.GlobalVariables.Contains(name);
     }
 
+    /// <summary>
+    /// 检查当前是否在主函数的顶层作用域中
+    /// </summary>
+    /// <returns>如果在主函数的顶层作用域中返回true</returns>
+    public bool IsInMainFunctionTopLevel()
+    {
+        // 主函数名为 "<main>"，且作用域深度为 2（全局作用域 + 主函数作用域）
+        return _currentFunction?.Name == "<main>" && _scopes.Count == 2;
+    }
+
     // ===== 原生函数检查 =====
 
     public bool IsNativeFunction(string name)
