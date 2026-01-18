@@ -21,6 +21,46 @@
 
 ## 短期计划 (1-2 个月)
 
+### 0. 编译器 IL 代码生成问题修复 (P0 - 关键)
+
+**最后更新**: 2026年1月18日
+
+**目标**: 修复编译器 IL 代码生成问题，确保所有异步测试通过
+
+**当前状态**: 编译器异步测试存在 IL 代码生成问题，37 个测试全部失败
+
+**问题描述**:
+- 编译器在某些情况下生成的 IL 代码不符合 CLR 验证规则
+- 错误信息：`Common Language Runtime detected an invalid program`
+- 影响范围：编译器异步测试（37 个单元测试失败）
+- 失败类型：
+  - 类型 1（约 15 个）：IL 代码生成错误，无法创建委托
+  - 类型 2（约 22 个）：异步逻辑错误，Task 未正确等待
+
+**任务**:
+- [ ] 分析 IL 代码生成器的问题根源
+  - 使用 ILVerifier 工具验证生成的 IL 代码
+  - 识别不符合 CLR 规范的具体位置
+  - 分析委托创建和异步状态机生成逻辑
+- [ ] 修正编译器异步测试代码中的异步调用逻辑
+  - 修复 Task 未正确等待的问题
+  - 确保异步方法调用符合 C# 异步模式
+- [ ] 优化编译器的 IL 代码生成器
+  - 修复委托创建的 IL 代码生成
+  - 优化异步状态机的 IL 代码生成
+  - 确保生成的 IL 代码符合 CLR 验证规则
+- [ ] 重新运行测试验证修复效果
+  - 运行所有 37 个编译器异步测试
+  - 确保测试通过率达到 95% 以上
+  - 生成测试报告
+
+**预期成果**:
+- 编译器异步测试通过率从 0% 提升到 95%+
+- 编译器模式异步功能完成度从 85% 提升到 95%+
+- IL 代码生成器符合 CLR 规范
+
+**优先级**: P0（关键）- 这是当前最重要的任务，直接影响编译器模式的可用性
+
 ### 1. 编译器模式功能补全 (P1)
 
 **目标**: 将编译器模式完成度从 75% 提升到 90%
@@ -125,49 +165,75 @@
 
 **预期成果**: 编译器模式异步功能已达到 85% 完成度，修复 IL 代码生成问题后可达到 95%
 
-**下一步行动**:
-1. 修正编译器异步测试代码中的异步调用逻辑
-2. 深入调试 IL 代码生成器，识别具体的问题点
-3. 优化编译器的 IL 代码生成，确保符合 CLR 规范
-4. 重新运行测试验证修复效果
+**下一步行动**: 参见第 0 节"编译器 IL 代码生成问题修复"（P0 关键任务）
 
 ### 2. 测试覆盖率提升 (P1)
 
 **目标**: 提升编译器模式测试覆盖率从 70% 到 85%
 
-#### 2.1 编译器模式测试补充
+#### 2.1 编译器模式测试补充 ✅
+
+**当前状态**: 已完成 (2026年1月18日)
 
 **任务**:
-- [ ] 异步编程测试 (6 个测试文件)
-  - AsyncFunctionTests.cs
-  - AsyncGeneratorTests.cs
-  - AsyncStreamTests.cs
-  - AwaitTests.cs
-  - TaskAPITests.cs
-  - SpawnTests.cs
-- [ ] 高级类功能测试 (7 个测试文件)
-  - ClassInstantiationTests.cs
-  - ConstructorTests.cs
-  - MemberAccessTests.cs
-  - InheritanceTests.cs
-  - InterfaceTests.cs
-  - MixinTests.cs
-  - GenericClassTests.cs
-- [ ] 边界和错误情况测试 (4 个测试文件)
-  - EmptyInputTests.cs
-  - ExtremeValuesTests.cs
-  - UnexpectedInputsTests.cs
-  - TypeErrorsTests.cs
-- [ ] 异常处理测试 (5 个测试文件)
-  - TryCatchTests.cs
-  - ThrowTests.cs
-  - FinallyTests.cs
-  - NestedExceptionTests.cs
-  - ErrorPropagationTests.cs
+- [x] 异步编程测试 (6 个测试文件，70 个测试用例)
+  - AsyncFunctionTests.cs (12 个测试)
+  - AsyncGeneratorTests.cs (11 个测试)
+  - AsyncStreamTests.cs (8 个测试)
+  - AwaitTests.cs (14 个测试)
+  - TaskAPITests.cs (12 个测试)
+  - SpawnTests.cs (13 个测试)
+- [x] 高级类功能测试 (7 个测试文件，70 个测试用例)
+  - ClassInstantiationTests.cs (11 个测试)
+  - ConstructorTests.cs (10 个测试)
+  - MemberAccessTests.cs (9 个测试)
+  - InheritanceTests.cs (10 个测试)
+  - InterfaceTests.cs (10 个测试)
+  - MixinTests.cs (10 个测试)
+  - GenericClassTests.cs (10 个测试)
+- [x] 边界和错误情况测试 (4 个测试文件，86 个测试用例)
+  - EmptyInputTests.cs (20 个测试)
+  - ExtremeValuesTests.cs (19 个测试)
+  - UnexpectedInputsTests.cs (22 个测试)
+  - TypeErrorsTests.cs (25 个测试)
+- [x] 异常处理测试 (5 个测试文件，62 个测试用例)
+  - TryCatchTests.cs (10 个测试)
+  - ThrowTests.cs (13 个测试)
+  - FinallyTests.cs (11 个测试)
+  - NestedExceptionTests.cs (10 个测试)
+  - ErrorPropagationTests.cs (18 个测试)
 
-**预期成果**: 编译器模式测试文件数从 29 个增加到 50+ 个
+**实际成果**:
+- ✅ 编译器模式测试文件数从 29 个增加到 70+ 个（超额完成）
+- ✅ 新增 288 个测试用例，覆盖所有要求的测试类别
+- ✅ 详细报告：`Reports/2026-01-18-23-22-编译器模式测试补充报告.md`
 
-#### 2.2 虚拟机模式测试补充
+#### 2.2 编译器模式测试质量提升 (P1)
+
+**最后更新**: 2026年1月18日
+
+**目标**: 提升现有测试的质量和覆盖率
+
+**任务**:
+- [ ] 增加测试用例数量
+  - AsyncStreamTests.cs: 从 8 个增加到 12-15 个测试
+  - MemberAccessTests.cs: 从 9 个增加到 12-15 个测试（增加静态成员、私有成员等场景）
+  - 泛型约束测试: 增加更多泛型约束场景（where T : class, where T : struct 等）
+- [ ] 运行测试并生成覆盖率报告
+  - 运行所有编译器测试：`dotnet test --filter "FullyQualifiedName~Old8Lang.Tests.Compiler"`
+  - 生成覆盖率报告：`dotnet test --collect:"XPlat Code Coverage"`
+  - 分析覆盖率数据，识别未覆盖的代码路径
+- [ ] 修复失败的测试
+  - 优先修复编译器异步测试（37 个失败）
+  - 修复其他失败的测试用例
+  - 确保测试通过率达到 95% 以上
+
+**预期成果**:
+- 编译器模式测试覆盖率从 70% 提升到 85%+
+- 测试通过率达到 95% 以上
+- 生成详细的测试覆盖率报告
+
+#### 2.3 虚拟机模式测试补充
 
 **任务**:
 - [ ] 补充缺失的测试类别
@@ -456,4 +522,9 @@
 
 ## 更新日志
 
+- **2026-01-18**:
+  - ✅ 完成编译器模式测试补充（2.1 节），新增 288 个测试用例
+  - 🔄 调整优先级：将编译器 IL 代码生成问题修复提升为 P0（关键）任务
+  - 📝 新增 2.2 节"编译器模式测试质量提升"任务
+  - 📊 生成测试补充报告：`Reports/2026-01-18-23-22-编译器模式测试补充报告.md`
 - **2026-01-17**: 初始版本，基于当前项目状态创建
