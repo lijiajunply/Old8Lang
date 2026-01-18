@@ -23,9 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/2026-01-18-23-22-ROADMAP更新摘要.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2026-01-18-23-22-编译器模式测试补充报告.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ROADMAP.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ROADMAP.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyAtomicIntTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencySemaphoreTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2026-01-18-23-43-虚拟机测试扩展报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -582,7 +584,7 @@
       <workItem from="1768684155332" duration="309000" />
       <workItem from="1768730838950" duration="2656000" />
       <workItem from="1768741716470" duration="700000" />
-      <workItem from="1768749421043" duration="634000" />
+      <workItem from="1768749421043" duration="1595000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="716" />
+    <option name="localTasksCounter" value="717" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重构元组处理逻辑以支持多元素元组&#10;&#10;- 将硬编码的二元组访问改为使用 GetItems() 方法&#10;- 更新字节码生成器以处理多元素元组&#10;- 修改元组值访问方式，使用 Elements 属性替代 V1/V2&#10;- 优化字典类型验证中的元组元素访问&#10;- 更新 IL 生成逻辑以支持 ValueTuple 类型扩展&#10;- 添加 ITuple 接口扩展方法实现元组操作功能&#10;- 统一元组构造函数使用列表参数方式&#10;- 移除过时的元组转换辅助方法" />
     <MESSAGE value="refactor(import): 移除未使用的导入语句以优化代码结构&#10;&#10;- 从 Apis.cs 中移除了未使用的 System.Text.Json 导入&#10;- 从 ArrayExtensions.cs 中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Visitor 导入&#10;- 从多个文件中移除了未使用的 Old8Lang.AST.Expression.Value 导入&#10;- 从 BytecodeVisitor 相关文件中移除了多个未使用的导入&#10;- 从 OperationHelpers 文件中移除了未使用的系统导入&#10;- 从 Profiler 和 Parser 文件中移除了未使用的导入&#10;- 从各种表达式和语句类中移除了未使用的导入声明" />
     <MESSAGE value="test(lang): 添加多种语言特性测试用例&#10;&#10;- 添加 defer 语句的解释器、编译器和语法测试&#10;- 添加枚举功能的基础和语法测试&#10;- 添加文档注释的参数说明测试&#10;- 添加文件头指令的编译器和语法测试&#10;- 添加生成器功能的基础测试用例&#10;- 添加泛型类、函数及约束的多模式测试&#10;- 添加可空类型与泛型结合的测试用例" />
     <MESSAGE value="feat(tests): 添加虚拟机功能测试文件&#10;&#10;- 创建基础算术运算和变量赋值测试文件 basic_arithmetic.old8&#10;- 创建控制流测试文件 control_flow.old8 包含 if/while/for 循环测试&#10;- 创建函数调用测试文件 function_calls.old8 包含递归函数测试&#10;- 创建类型转换测试文件 type_conversion_test.old8 包含各种类型转换测试" />
@@ -979,7 +980,8 @@
     <MESSAGE value="test(compiler): 为异步功能测试启用IL验证开关&#10;&#10;- 在AsyncFunctionTests中添加IL验证启用/禁用控制&#10;- 在AsyncGeneratorTests中添加IL验证启用/禁用控制&#10;- 在AwaitTests中添加IL验证启用/禁用控制&#10;- 更新ROADMAP文档记录异步功能完成状态和问题分析&#10;- 移除调试相关的变更文件记录&#10;- 更新工作时间统计信息" />
     <MESSAGE value="style(tests): 规范化异常类型引用和移除冗余断言&#10;&#10;- 将所有 Exception 替换为 System.Exception 以提高类型明确性&#10;- 移除 VMBytecodeSerializationTests 中多余的字节码属性验证断言&#10;- 简化多个测试方法中的断言逻辑，只保留核心的非空检查&#10;- 统一异常捕获的类型引用格式，提高代码一致性" />
     <MESSAGE value="chore(ide): 更新IDE配置和任务计数器&#10;&#10;- 移动BytecodeFileTests到VirtualMachine/BytecodeSerialization目录下&#10;- 添加新的工作项目记录，持续时间307秒&#10;- 更新本地任务计数器从714递增到715&#10;- 移除过时的高级类型系统特性提交消息记录&#10;- 更新最后提交消息为测试样式规范化相关内容" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 更新IDE配置和任务计数器&#10;&#10;- 移动BytecodeFileTests到VirtualMachine/BytecodeSerialization目录下&#10;- 添加新的工作项目记录，持续时间307秒&#10;- 更新本地任务计数器从714递增到715&#10;- 移除过时的高级类型系统特性提交消息记录&#10;- 更新最后提交消息为测试样式规范化相关内容" />
+    <MESSAGE value="docs(roadmap): 更新ROADMAP文档并生成相关报告&#10;&#10;- 新增编译器IL代码生成问题修复任务(P0关键任务)&#10;- 标记编译器模式测试补充为已完成，新增288个测试用例&#10;- 新增编译器模式测试质量提升任务(P1高优先级)&#10;- 更新异步功能完善部分的下一步行动指向新任务&#10;- 添加2026-01-18更新日志记录相关变更&#10;- 生成ROADMAP更新摘要和编译器模式测试补充报告" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(roadmap): 更新ROADMAP文档并生成相关报告&#10;&#10;- 新增编译器IL代码生成问题修复任务(P0关键任务)&#10;- 标记编译器模式测试补充为已完成，新增288个测试用例&#10;- 新增编译器模式测试质量提升任务(P1高优先级)&#10;- 更新异步功能完善部分的下一步行动指向新任务&#10;- 添加2026-01-18更新日志记录相关变更&#10;- 生成ROADMAP更新摘要和编译器模式测试补充报告" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
