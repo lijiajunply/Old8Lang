@@ -147,7 +147,7 @@ public class VMCollectionTests
         Assert.Equal(4, lines.Length);
         Assert.Equal("1", lines[0]);
         Assert.Equal("hello", lines[1]);
-        Assert.Equal("True", lines[2]);
+        Assert.Equal("true", lines[2]);
         Assert.Equal("3.14", lines[3]);
     }
 
@@ -343,7 +343,7 @@ public class VMCollectionTests
         Assert.Equal(3, lines.Length);
         Assert.Equal("42", lines[0]);
         Assert.Equal("hello", lines[1]);
-        Assert.Equal("True", lines[2]);
+        Assert.Equal("true", lines[2]);
     }
 
     #endregion

@@ -23,10 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DebugBytecode/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_bytecode.csx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_array_modification.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_array_modification_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_array_ref.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_dict_modification.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_exact_array.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMStringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMStringTemplateTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMCollectionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMCollectionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -585,7 +591,7 @@
       <workItem from="1768730838950" duration="2656000" />
       <workItem from="1768741716470" duration="700000" />
       <workItem from="1768749421043" duration="8816000" />
-      <workItem from="1768767111847" duration="1710000" />
+      <workItem from="1768767111847" duration="2366000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="730" />
+    <option name="localTasksCounter" value="731" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,7 +963,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 优化 ValueTuple 索引访问实现&#10;&#10;- 实现了对常量索引的 ValueTuple 类型推断&#10;- 添加了对超过 7 个元素的 ValueTuple 的递归访问支持&#10;- 重构了嵌套索引访问的 IL 生成逻辑&#10;- 移除了元组扁平化访问的旧实现&#10;- 更新了相关单元测试以匹配新的元组访问方式&#10;- 添加了大元组和嵌套元组的测试用例" />
     <MESSAGE value="feat(parser): 添加对外部函数声明中调用约定的支持&#10;&#10;- 支持 extern &quot;dll&quot; cdecl/stdcall/winapi { func1, func2 } 语法&#10;- 实现调用约定关键字的识别逻辑&#10;- 添加 cdecl、stdcall、winapi 调用约定的解析支持&#10;- 扩展外部函数声明的语法匹配规则&#10;- 为调用约定检查功能添加文档注释" />
     <MESSAGE value="fix(interpreter): 修复装饰器中闭包变量访问问题&#10;&#10;- 将测试中的 RuntimeError 替换为 InvalidOperationError&#10;- 在 FuncInit 中保留 targetFunc 的 CapturedScope 确保闭包变量正确访问&#10;- 直接调用 wrapper 而不是通过 FunctionCallExpression 保留 CapturedScope&#10;- 创建新 FuncLangValue 时保留 wrappedFunc 的所有属性包括 CapturedScope&#10;- 将 FuncLangValue 的 CapturedScope 访问权限从 private 改为 internal&#10;- 添加 GetCapturedScope 方法用于装饰器等场景获取捕获作用域" />
     <MESSAGE value="fix(interpreter): 修复装饰器解释器中的缓存字典初始化问题&#10;&#10;- 将空对象字面量 {} 替换为 dict() 函数调用&#10;- 确保缓存字典正确初始化为字典类型&#10;- 修复了可能导致类型错误的初始化方式" />
@@ -982,7 +987,8 @@
     <MESSAGE value="refactor(tests): 重构虚拟机测试结构并更新项目路线图&#10;&#10;- 移除 Old8Lang 虚拟机模式测试扩展计划文档&#10;- 在路线图中将测试用例增加和覆盖率报告生成标记为已完成&#10;- 在路线图中将虚拟机测试补充的缺失类别、集成测试和字节码序列化标记为已完成&#10;- 更新 IDEA 工作空间配置文件中的任务计数器和工作时间统计&#10;- 移除虚拟机语句测试文件（VMDeferTests.cs 和 VMSelectTests.cs）&#10;- 新增虚拟机类型系统测试文件（VMIntersectionTypeTests.cs、VMTypeConversionTests.cs、VMUnionTypeTests.cs）&#10;- 重构测试基类 ExecuteVMCode 方法并统一使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
     <MESSAGE value="fix(tests): 修复虚拟机逻辑比较测试中的大小写断言问题&#10;&#10;- 将 VMComparisonLogicalTests 中的所有 &quot;True&quot;/&quot;False&quot; 断言改为小写 &quot;true&quot;/&quot;false&quot;&#10;- 修复了布尔值输出的大小写匹配问题&#10;- 更新了相关的注释说明&#10;- 在 VMGenericNestedTests 中修复了字典初始化语法&#10;- 添加了 CLAUDE.md 中关于IL生成问题修复的文档说明" />
     <MESSAGE value="feat(compiler): 实现主函数顶层变量的全局声明逻辑&#10;&#10;- 添加 IsInMainFunctionTopLevel 方法检测主函数顶层作用域&#10;- 修改变量声明逻辑使主函数顶层新变量作为全局变量处理&#10;- 非主函数顶层的新变量仍按局部变量处理&#10;- 保持现有局部和全局变量的识别与存储逻辑不变" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现主函数顶层变量的全局声明逻辑&#10;&#10;- 添加 IsInMainFunctionTopLevel 方法检测主函数顶层作用域&#10;- 修改变量声明逻辑使主函数顶层新变量作为全局变量处理&#10;- 非主函数顶层的新变量仍按局部变量处理&#10;- 保持现有局部和全局变量的识别与存储逻辑不变" />
+    <MESSAGE value="feat(vm): 实现LangValueType算术和比较运算支持&#10;&#10;- 添加对LangValueType（IntLangValue, DoubleLangValue等）的加法运算支持&#10;- 添加对LangValueType的减法、乘法、除法和取模运算支持&#10;- 添加对LangValueType的幂运算和比较运算（等于、大于、小于等）支持&#10;- 实现ConvertToLangValueType转换方法支持LangValueType运算&#10;- 添加InvalidOperationError异常处理和类型错误消息提示&#10;- 更新字节码序列化测试中的字符串操作代码格式&#10;- 移除字符串模板测试中的条件表达式和字典访问测试用例&#10;- 更新IDEA工作空间配置文件中的变更列表和任务统计信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现LangValueType算术和比较运算支持&#10;&#10;- 添加对LangValueType（IntLangValue, DoubleLangValue等）的加法运算支持&#10;- 添加对LangValueType的减法、乘法、除法和取模运算支持&#10;- 添加对LangValueType的幂运算和比较运算（等于、大于、小于等）支持&#10;- 实现ConvertToLangValueType转换方法支持LangValueType运算&#10;- 添加InvalidOperationError异常处理和类型错误消息提示&#10;- 更新字节码序列化测试中的字符串操作代码格式&#10;- 移除字符串模板测试中的条件表达式和字典访问测试用例&#10;- 更新IDEA工作空间配置文件中的变更列表和任务统计信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
