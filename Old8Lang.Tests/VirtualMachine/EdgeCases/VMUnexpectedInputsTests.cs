@@ -48,7 +48,7 @@ public class VMUnexpectedInputsTests
         var bytecodeFile = compiler.Compile(ast);
 
         var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
-        Assert.ThrowsAny<Exception>(() => vm.Execute());
+        Assert.ThrowsAny<System.Exception>(() => vm.Execute());
     }
 
     #region 未定义变量访问测试
@@ -60,7 +60,7 @@ public class VMUnexpectedInputsTests
             PrintLine(undefinedVar.ToStr())
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -71,7 +71,7 @@ public class VMUnexpectedInputsTests
             result <- x + 10
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -88,7 +88,7 @@ public class VMUnexpectedInputsTests
             result <- x + y
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -101,7 +101,7 @@ public class VMUnexpectedInputsTests
             result <- x + y
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -114,7 +114,7 @@ public class VMUnexpectedInputsTests
             result <- x > y
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -130,7 +130,7 @@ public class VMUnexpectedInputsTests
             result <- arr[10]
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -142,7 +142,7 @@ public class VMUnexpectedInputsTests
             result <- arr[-1]
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -154,7 +154,7 @@ public class VMUnexpectedInputsTests
             result <- list[10]
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -166,7 +166,7 @@ public class VMUnexpectedInputsTests
             result <- dict[""c""]
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -181,7 +181,7 @@ public class VMUnexpectedInputsTests
             result <- 10 / 0
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -192,7 +192,7 @@ public class VMUnexpectedInputsTests
             result <- 10 % 0
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -207,7 +207,7 @@ public class VMUnexpectedInputsTests
             result <- undefinedFunc()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -221,7 +221,7 @@ public class VMUnexpectedInputsTests
             result <- add(1)
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -237,7 +237,7 @@ public class VMUnexpectedInputsTests
             result <- int(str)
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -249,7 +249,7 @@ public class VMUnexpectedInputsTests
             result <- double(str)
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -265,7 +265,7 @@ public class VMUnexpectedInputsTests
             result <- x.ToStr()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -279,7 +279,7 @@ public class VMUnexpectedInputsTests
             }
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -294,7 +294,7 @@ public class VMUnexpectedInputsTests
             obj <- UndefinedClass()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -311,7 +311,7 @@ public class VMUnexpectedInputsTests
             obj.undefinedMethod()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -328,7 +328,7 @@ public class VMUnexpectedInputsTests
             obj.privateMethod()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -344,7 +344,7 @@ public class VMUnexpectedInputsTests
             x <- 20
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -359,7 +359,7 @@ public class VMUnexpectedInputsTests
             break
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -370,7 +370,7 @@ public class VMUnexpectedInputsTests
             continue
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -385,7 +385,7 @@ public class VMUnexpectedInputsTests
             import ""nonexistent_module""
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -401,7 +401,7 @@ public class VMUnexpectedInputsTests
             result <- await x
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -434,7 +434,7 @@ public class VMUnexpectedInputsTests
             result <- dict[""nonexistent""]
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -450,7 +450,7 @@ public class VMUnexpectedInputsTests
             list.Remove(1)
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -466,7 +466,7 @@ public class VMUnexpectedInputsTests
             y <- x as int
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -485,7 +485,7 @@ public class VMUnexpectedInputsTests
             }
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -505,7 +505,7 @@ public class VMUnexpectedInputsTests
             }
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -527,7 +527,7 @@ public class VMUnexpectedInputsTests
             gen.MoveNext()
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 
@@ -543,7 +543,7 @@ public class VMUnexpectedInputsTests
             result <- str.Substring(10)
         ";
 
-        var exception = Assert.ThrowsAny<Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
         _output.WriteLine($"Expected exception: {exception.Message}");
     }
 

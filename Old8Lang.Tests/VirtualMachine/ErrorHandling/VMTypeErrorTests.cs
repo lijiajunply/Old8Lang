@@ -23,7 +23,7 @@ public class VMTypeErrorTests
         var bytecodeFile = compiler.Compile(ast);
 
         var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
-        var exception = Assert.ThrowsAny<Exception>(() => vm.Execute());
+        var exception = Assert.ThrowsAny<System.Exception>(() => vm.Execute());
         _output.WriteLine($"Exception type: {exception.GetType().Name}");
         _output.WriteLine($"Exception message: {exception.Message}");
     }
