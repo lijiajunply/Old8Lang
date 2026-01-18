@@ -353,7 +353,7 @@ public class VMBoundaryTests
         var code = @"
             emptyRange <- [5~5]
             count <- 0
-            for x <- emptyRange {
+            for x in emptyRange {
                 count <- count + 1
             }
             PrintLine(count.ToStr())
@@ -369,7 +369,7 @@ public class VMBoundaryTests
         var code = @"
             singleRange <- [5~6]
             count <- 0
-            for x <- singleRange {
+            for x in singleRange {
                 count <- count + 1
             }
             PrintLine(count.ToStr())
@@ -385,7 +385,7 @@ public class VMBoundaryTests
         var code = @"
             reverseRange <- [10~5]
             count <- 0
-            for x <- reverseRange {
+            for x in reverseRange {
                 count <- count + 1
             }
             PrintLine(count.ToStr())

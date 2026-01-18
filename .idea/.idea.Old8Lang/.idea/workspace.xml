@@ -23,12 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericConstraintsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNullableTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/BytecodeFileTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/BytecodeFileTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMBoundaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMBoundaryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMEmptyInputTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMEmptyInputTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMExtremeValuesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMExtremeValuesTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -585,7 +580,7 @@
       <workItem from="1768684155332" duration="309000" />
       <workItem from="1768730838950" duration="2656000" />
       <workItem from="1768741716470" duration="700000" />
-      <workItem from="1768749421043" duration="6546000" />
+      <workItem from="1768749421043" duration="6869000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +925,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="722" />
+    <option name="localTasksCounter" value="723" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,7 +952,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 实现异步编程支持和状态机生成&#10;&#10;- 添加AsyncStateMachineGenerator用于编译async函数为状态机结构&#10;- 实现AwaitExpression.GenerateAsyncAwait方法生成await表达式的IL代码&#10;- 在DotOperatorILHelper中实现Task.WhenAll/WhenAny/FromResult等API的IL生成&#10;- 修复Operation.OutputType方法确保比较和算术运算符正确推断bool/double类型&#10;- 更新AsyncFuncInit和AsyncFuncLangValue使用动态方法和状态机启动代码&#10;- 添加变量提升机制将局部变量作为状态机字段进行生命周期管理&#10;- 实现完整的IAsyncStateMachine接口集成和状态转换逻辑&#10;- 改进AST节点识别await表达式位置支持if/while/for等复杂语句结构" />
     <MESSAGE value="feat(compiler): 实现异步状态机的完整功能&#10;&#10;- 新增 AsyncAwaitRuntimeHelpers 类处理异步操作的底层支持&#10;- 在异步函数初始化过程中复制全局变量信息到函数本地管理器&#10;- 添加 CompiledDelegateRegistry 用于动态方法的注册和调用&#10;- 实现 IL 反汇编器用于调试异步状态机代码&#10;- 优化异步状态机类型定义继承自 ValueType 并设置密封属性&#10;- 修复异步函数参数传递时使用正确的 IL 指令加载地址&#10;- 添加对异步状态机中 await 表达式的深度识别和处理&#10;- 支持动态方法在异步状态机中的正确调用机制&#10;- 增加异步状态机相关的编译开关和调试选项&#10;- 优化 Task 类型转换避免不必要的 FromResult 调用&#10;- 修复异步函数中的函数调用表达式解析问题" />
     <MESSAGE value="chore(cleanup): 移除未使用的命名空间导入&#10;&#10;- 从多个文件中移除了未使用的 using 语句&#10;- 清理了测试文件中的冗余引用&#10;- 优化了代码的依赖关系管理" />
     <MESSAGE value="feat(parser): 添加函数装饰器支持功能&#10;&#10;- 在 AST 中添加 FunctionDecorator 类用于表示函数装饰器&#10;- 修改 FuncInit 和 AsyncFuncInit 类以支持装饰器的应用逻辑&#10;- 在 FuncLangValue 和 AsyncFuncLangValue 中添加装饰器列表属性&#10;- 更新函数解析器以支持装饰器语法解析 (@decorator)&#10;- 在词法分析器中添加 @ 符号的识别和 At token 类型&#10;- 实现装饰器应用逻辑，支持带参数和无参数的装饰器&#10;- 添加多个测试文件验证装饰器的基本功能、编译器模式和语法解析" />
@@ -982,7 +976,8 @@
     <MESSAGE value="feat(test): 添加虚拟机并发原语测试扩展和修复spawn函数实现&#10;&#10;- 创建5个新的并发原语测试文件，包含106个测试方法&#10;- 实现虚拟机模式下的spawn函数支持线程创建和执行&#10;- 添加Range语法测试文件验证for-in循环中的Range使用&#10;- 修复SpawnFunction中ExecuteInVMInternal方法的线程创建逻辑&#10;- 更新测试计划文档包含完整的虚拟机测试扩展方案&#10;- 修复并发原语测试中的Range语法兼容性问题&#10;- 优化虚拟机线程管理和资源分配机制" />
     <MESSAGE value="removal(global-functions): 移除并发相关全局函数&#10;&#10;- 从 GlobalFunctionInitializer 中移除 Task 和 Thread 相关函数注册&#10;- 删除 TaskFunctions.cs 文件中的 TaskDelay、TaskWait、TaskWhenAll、TaskWhenAny 函数实现&#10;- 删除 ThreadFunctions.cs 文件中的 ThreadJoin、ThreadIsAlive、ThreadDispose 函数实现&#10;- 移除相关的并发功能支持代码" />
     <MESSAGE value="test(vm): 添加虚拟机语句功能测试并优化状态管理&#10;&#10;- 为 defer 语句添加 9 个测试用例验证变量捕获、返回处理、块执行等功能&#10;- 为 select 语句添加 8 个测试用例验证通道选择、发送接收、嵌套等场景&#10;- 为 switch 语句添加 22 个测试用例覆盖基本匹配、默认分支、嵌套等场景&#10;- 为 using 语句添加多个测试验证异常处理、defer交互、资源释放等行为&#10;- 优化 ObservableState 的锁对象实现，替换为标准 Lock 对象&#10;- 修复 ObservableState 中清理已回收弱引用的逻辑&#10;- 更新项目工作区配置以反映新的测试文件结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 添加虚拟机语句功能测试并优化状态管理&#10;&#10;- 为 defer 语句添加 9 个测试用例验证变量捕获、返回处理、块执行等功能&#10;- 为 select 语句添加 8 个测试用例验证通道选择、发送接收、嵌套等场景&#10;- 为 switch 语句添加 22 个测试用例覆盖基本匹配、默认分支、嵌套等场景&#10;- 为 using 语句添加多个测试验证异常处理、defer交互、资源释放等行为&#10;- 优化 ObservableState 的锁对象实现，替换为标准 Lock 对象&#10;- 修复 ObservableState 中清理已回收弱引用的逻辑&#10;- 更新项目工作区配置以反映新的测试文件结构" />
+    <MESSAGE value="test(vm): 添加泛型约束和嵌套泛型测试&#10;&#10;- 添加 VMGenericConstraintsTests 类用于测试泛型约束功能&#10;- 添加 VMGenericNestedTests 类用于测试嵌套泛型功能  &#10;- 添加 VMGenericNullableTests 类用于测试可空泛型类型参数&#10;- 更新边界测试中的布尔值断言从 &quot;True&quot; 到 &quot;true&quot;&#10;- 修改范围语法从 .. 改为 [~] 格式&#10;- 更新空元组语法从 () 改为 tuple()&#10;- 修改循环语法从 &lt;- 改为 in&#10;- 删除嵌套空括号测试方法&#10;- 重构字节码文件测试的命名空间结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 添加泛型约束和嵌套泛型测试&#10;&#10;- 添加 VMGenericConstraintsTests 类用于测试泛型约束功能&#10;- 添加 VMGenericNestedTests 类用于测试嵌套泛型功能  &#10;- 添加 VMGenericNullableTests 类用于测试可空泛型类型参数&#10;- 更新边界测试中的布尔值断言从 &quot;True&quot; 到 &quot;true&quot;&#10;- 修改范围语法从 .. 改为 [~] 格式&#10;- 更新空元组语法从 () 改为 tuple()&#10;- 修改循环语法从 &lt;- 改为 in&#10;- 删除嵌套空括号测试方法&#10;- 重构字节码文件测试的命名空间结构" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
