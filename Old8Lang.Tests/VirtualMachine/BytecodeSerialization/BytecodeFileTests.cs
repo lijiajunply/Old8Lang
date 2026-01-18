@@ -1,6 +1,6 @@
 using Old8Lang.Bytecode;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.VirtualMachine.BytecodeSerialization;
 
 /// <summary>
 /// 字节码文件持久化测试

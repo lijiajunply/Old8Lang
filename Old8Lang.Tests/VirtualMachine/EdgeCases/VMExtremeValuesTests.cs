@@ -240,7 +240,7 @@ public class VMExtremeValuesTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]

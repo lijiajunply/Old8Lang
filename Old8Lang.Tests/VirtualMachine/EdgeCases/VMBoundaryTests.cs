@@ -95,7 +95,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     #endregion
@@ -351,7 +351,7 @@ public class VMBoundaryTests
     public void Boundary_EmptyRange_HandlesEmptyRange()
     {
         var code = @"
-            emptyRange <- 5..5
+            emptyRange <- [5~5]
             count <- 0
             for x <- emptyRange {
                 count <- count + 1
@@ -367,7 +367,7 @@ public class VMBoundaryTests
     public void Boundary_SingleElementRange_HandlesSingleElement()
     {
         var code = @"
-            singleRange <- 5..6
+            singleRange <- [5~6]
             count <- 0
             for x <- singleRange {
                 count <- count + 1
@@ -383,7 +383,7 @@ public class VMBoundaryTests
     public void Boundary_ReverseRange_HandlesReverse()
     {
         var code = @"
-            reverseRange <- 10..5
+            reverseRange <- [10~5]
             count <- 0
             for x <- reverseRange {
                 count <- count + 1

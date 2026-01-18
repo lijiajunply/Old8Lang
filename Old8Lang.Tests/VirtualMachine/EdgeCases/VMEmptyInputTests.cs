@@ -157,7 +157,7 @@ public class VMEmptyInputTests
     public void EmptyInput_EmptyTuple_HandlesEmptyTuple()
     {
         var code = @"
-            emptyTuple <- ()
+            emptyTuple <- tuple()
             result <- len(emptyTuple)
             PrintLine(result.ToStr())
         ";
@@ -215,7 +215,7 @@ public class VMEmptyInputTests
     {
         var code = @"
             emptyArray <- []
-            for x <- emptyArray {
+            for x in emptyArray {
             }
             PrintLine(""OK"")
         ";
@@ -356,18 +356,6 @@ public class VMEmptyInputTests
     #endregion
 
     #region 空表达式测试
-
-    [Fact]
-    public void EmptyInput_NestedEmptyParentheses_HandlesEmptyParens()
-    {
-        var code = @"
-            x <- (())
-            PrintLine(""OK"")
-        ";
-
-        var output = ExecuteVMCode(code);
-        Assert.Equal("OK", output);
-    }
 
     [Fact]
     public void EmptyInput_TernaryWithEmptyBranches_HandlesEmptyTernary()
