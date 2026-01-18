@@ -215,81 +215,126 @@ public partial class BytecodeVisitor
         else
         {
             // 普通函数调用
-            // 生成参数代码（位置参数 + 命名参数）
 
-            // 先生成位置参数
-            foreach (var arg in node.Ids)
-            {
-                arg.Accept(this);
-            }
+            // 检查函数名是否是局部变量或全局变量（Lambda 函数）
+            bool isLocalVariable = _compiler.IsLocalVariable(funcName);
+            bool isGlobalVariable = _compiler.IsGlobalVariable(funcName);
+            bool isLambdaVariable = isLocalVariable || isGlobalVariable;
+            bool isFunctionDefined = _compiler.GetFunctionIndex(funcName) >= 0;
 
-            // 生成命名参数的值
-            if (namedCount > 0)
+            // 如果是 Lambda 变量，使用 CallDynamic 指令
+            if (isLambdaVariable && !isFunctionDefined)
             {
-                foreach (var namedArg in node.NamedArgs)
+                // Lambda 变量调用: f(arg1, arg2)
+                // 1. 加载函数对象到栈
+                if (isLocalVariable)
                 {
-                    namedArg.Value.Accept(this);
-                }
-            }
-
-            // 检查是否是原生函数
-            if (_compiler.IsNativeFunction(funcName))
-            {
-                if (namedCount > 0)
-                {
-                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                    Emit(OpCode.CallNative, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    int localIndex = _compiler.GetLocalIndex(funcName);
+                    Emit(OpCode.LoadLocal, localIndex);
                 }
                 else
                 {
-                    // 无命名参数: [argCount, funcName]
-                    Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
+                    Emit(OpCode.LoadGlobal, funcName);
                 }
-            }
-            // 检查是否是生成器函数（包括异步生成器）
-            // 注意：生成器函数调用不执行函数体，而是创建生成器对象
-            else if (_compiler.IsGeneratorFunction(funcName))
-            {
+
+                // 2. 生成参数代码（位置参数 + 命名参数）
+                foreach (var arg in node.Ids)
+                {
+                    arg.Accept(this);
+                }
+
+                // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                    Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    foreach (var namedArg in node.NamedArgs)
+                    {
+                        namedArg.Value.Accept(this);
+                    }
                 }
-                else
-                {
-                    // 无命名参数: [argCount, funcName]
-                    Emit(OpCode.Call, new object[] { positionalCount, funcName });
-                }
-            }
-            // 检查是否是异步函数（非生成器）
-            else if (_compiler.IsAsyncFunction(funcName))
-            {
-                if (namedCount > 0)
-                {
-                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                    Emit(OpCode.CallAsync, new object[] { positionalCount, namedCount, funcName, namedArgNames });
-                }
-                else
-                {
-                    // 无命名参数: [argCount, funcName]
-                    Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
-                }
+
+                // 3. 使用 CallDynamic 指令调用
+                int totalArgCount = positionalCount + namedCount;
+                Emit(OpCode.CallDynamic, totalArgCount);
             }
             else
             {
+                // 普通函数调用
+                // 生成参数代码（位置参数 + 命名参数）
+
+                // 先生成位置参数
+                foreach (var arg in node.Ids)
+                {
+                    arg.Accept(this);
+                }
+
+                // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                    Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    foreach (var namedArg in node.NamedArgs)
+                    {
+                        namedArg.Value.Accept(this);
+                    }
+                }
+
+                // 检查是否是原生函数
+                if (_compiler.IsNativeFunction(funcName))
+                {
+                    if (namedCount > 0)
+                    {
+                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        Emit(OpCode.CallNative, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    }
+                    else
+                    {
+                        // 无命名参数: [argCount, funcName]
+                        Emit(OpCode.CallNative, new object[] { positionalCount, funcName });
+                    }
+                }
+                // 检查是否是生成器函数（包括异步生成器）
+                // 注意：生成器函数调用不执行函数体，而是创建生成器对象
+                else if (_compiler.IsGeneratorFunction(funcName))
+                {
+                    if (namedCount > 0)
+                    {
+                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    }
+                    else
+                    {
+                        // 无命名参数: [argCount, funcName]
+                        Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                    }
+                }
+                // 检查是否是异步函数（非生成器）
+                else if (_compiler.IsAsyncFunction(funcName))
+                {
+                    if (namedCount > 0)
+                    {
+                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        Emit(OpCode.CallAsync, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    }
+                    else
+                    {
+                        // 无命名参数: [argCount, funcName]
+                        Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                    }
                 }
                 else
                 {
-                    // 无命名参数: [argCount, funcName]
-                    Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                    if (namedCount > 0)
+                    {
+                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
+                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    }
+                    else
+                    {
+                        // 无命名参数: [argCount, funcName]
+                        Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                    }
                 }
             }
         }
@@ -521,17 +566,17 @@ public partial class BytecodeVisitor
 
         // 2. 提取参数信息
         var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? [];
-        
+
         var defaultValues = new List<object?>();
         int paramsIndex = -1;
-        
+
         if (node.Ids != null)
         {
             for (int i = 0; i < node.Ids.Count; i++)
             {
                 var param = node.Ids[i];
                 if (param.IsParams) paramsIndex = i;
-                
+
                 if (param.DefaultValue != null)
                 {
                     defaultValues.Add(EvaluateConstantExpression(param.DefaultValue));
@@ -543,14 +588,58 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 3. 编译 Lambda 函数体
+        // 3. 分析捕获的变量
+        var analyzer = new ClosureCaptureAnalyzer();
+        var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
+
+        // 4. 编译 Lambda 函数体
         _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex);
 
-        // 4. 获取编译后的函数索引
+        // 5. 获取编译后的函数索引
         int funcIndex = _compiler.GetFunctionIndex(lambdaName);
 
-        // 5. 生成 MakeFunction 指令
-        Emit(OpCode.MakeFunction, funcIndex);
+        // 6. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令
+        if (capturedVars.Count > 0)
+        {
+            // 过滤出实际存在的变量
+            var actualCapturedVars = new List<string>();
+
+            // 为每个捕获的变量加载其值到栈
+            foreach (var varName in capturedVars)
+            {
+                if (_compiler.IsLocalVariable(varName))
+                {
+                    int localIndex = _compiler.GetLocalIndex(varName);
+                    Emit(OpCode.LoadLocal, localIndex);
+                    actualCapturedVars.Add(varName);
+                }
+                else if (_compiler.IsGlobalVariable(varName))
+                {
+                    Emit(OpCode.LoadGlobal, varName);
+                    actualCapturedVars.Add(varName);
+                }
+                // 如果变量不存在，跳过它（可能是全局函数名等）
+            }
+
+            // 只有在有实际捕获的变量时才生成闭包
+            if (actualCapturedVars.Count > 0)
+            {
+                // 生成 MakeClosure 指令
+                // 操作数: [funcIndex, capturedVarCount, varNames...]
+                var operand = new object[] { funcIndex, actualCapturedVars.Count, actualCapturedVars.ToArray() };
+                Emit(OpCode.MakeClosure, operand);
+            }
+            else
+            {
+                // 没有实际捕获的变量，生成普通的 MakeFunction 指令
+                Emit(OpCode.MakeFunction, funcIndex);
+            }
+        }
+        else
+        {
+            // 没有捕获变量，生成普通的 MakeFunction 指令
+            Emit(OpCode.MakeFunction, funcIndex);
+        }
 
         return null;
     }

@@ -1,0 +1,11 @@
+// 使用全局变量的闭包测试
+
+x <- 10
+
+func test() -> void {
+    f <- (y:int) -> x + y
+    result <- f(5)
+    PrintLine("x=10, f(5) = " + result.ToStr())
+}
+
+test()

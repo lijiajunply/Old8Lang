@@ -606,9 +606,67 @@ public partial class VirtualMachine
                 // 弹出函数对象
                 var funcObj = _stack.Pop();
 
-                if (funcObj is FunctionMetadata funcMeta)
+                if (funcObj is ClosureValue closure)
                 {
-                    // 调用函数
+                    // 调用闭包：需要将捕获的变量添加到全局变量中
+                    // 保存原有的全局变量值
+                    var savedGlobals = new Dictionary<string, object?>();
+                    foreach (var (varName, value) in closure.CapturedVariables)
+                    {
+                        if (_globals.ContainsKey(varName))
+                        {
+                            savedGlobals[varName] = _globals[varName];
+                        }
+                        _globals[varName] = value;
+                    }
+
+                    try
+                    {
+                        // 调用函数
+                        var funcMeta = closure.Function;
+                        if (funcMeta.IsGenerator)
+                        {
+                            if (funcMeta.IsAsync)
+                            {
+                                var asyncGeneratorId = _nextAsyncGeneratorId++;
+                                var asyncGeneratorState = new AsyncGeneratorState(funcMeta, args);
+                                _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
+                                var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                                _stack.Push(asyncGeneratorValue);
+                            }
+                            else
+                            {
+                                var generatorId = _nextGeneratorId++;
+                                var generatorState = new GeneratorState(funcMeta, args);
+                                _generators[generatorId] = generatorState;
+                                var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                                _stack.Push(generatorValue);
+                            }
+                        }
+                        else
+                        {
+                            CallFunction(funcMeta, args);
+                        }
+                    }
+                    finally
+                    {
+                        // 恢复原有的全局变量值
+                        foreach (var (varName, _) in closure.CapturedVariables)
+                        {
+                            if (savedGlobals.ContainsKey(varName))
+                            {
+                                _globals[varName] = savedGlobals[varName];
+                            }
+                            else
+                            {
+                                _globals.Remove(varName);
+                            }
+                        }
+                    }
+                }
+                else if (funcObj is FunctionMetadata funcMeta)
+                {
+                    // 调用普通函数
                     if (funcMeta.IsGenerator)
                     {
                         // 复制生成器逻辑
@@ -668,13 +726,41 @@ public partial class VirtualMachine
                 if (funcIndex >= 0 && funcIndex < _bytecodeFile.Functions.Count)
                 {
                     var funcMeta = _bytecodeFile.Functions[funcIndex];
-                    // TODO: Wrap in Closure if needed for capturing variables
                     _stack.Push(funcMeta);
                 }
                 else
                 {
                     throw new Exception($"无效的函数索引: {funcIndex}");
                 }
+            }
+                break;
+
+            case OpCode.MakeClosure:
+            {
+                // 操作数: [funcIndex, capturedVarCount, varNames...]
+                var operands = (object[])instruction.Operand!;
+                int funcIndex = (int)operands[0];
+                int capturedVarCount = (int)operands[1];
+                string[] varNames = (string[])operands[2];
+
+                // 获取函数元数据
+                if (funcIndex < 0 || funcIndex >= _bytecodeFile.Functions.Count)
+                {
+                    throw new Exception($"无效的函数索引: {funcIndex}");
+                }
+                var funcMeta = _bytecodeFile.Functions[funcIndex];
+
+                // 从栈中弹出捕获的变量值（按相反顺序）
+                var capturedVariables = new Dictionary<string, object?>();
+                for (int i = capturedVarCount - 1; i >= 0; i--)
+                {
+                    var value = _stack.Pop();
+                    capturedVariables[varNames[i]] = value;
+                }
+
+                // 创建闭包对象
+                var closure = new ClosureValue(funcMeta, capturedVariables);
+                _stack.Push(closure);
             }
                 break;
 

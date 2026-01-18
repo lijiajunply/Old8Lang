@@ -1,0 +1,12 @@
+// 简单的闭包测试
+
+PrintLine("=== 闭包测试 ===")
+
+// 测试 1: 基本闭包
+PrintLine("\n1. 基本闭包:")
+x <- 10
+f <- (y:int) -> x + y
+result <- f(5)
+PrintLine("x=10, f(5) = " + result.ToStr())
+
+PrintLine("\n✅ 测试完成")

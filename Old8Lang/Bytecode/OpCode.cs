@@ -127,6 +127,9 @@ public enum OpCode : byte
     /// <summary>调用栈顶函数 (操作数: argCount)</summary>
     CallDynamic = 0x4A,
 
+    /// <summary>创建闭包 (操作数: funcIndex, capturedVarCount, [varNames...])</summary>
+    MakeClosure = 0x4B,
+
     // ===== 对象操作 (0x50-0x5F) =====
     /// <summary>创建新对象 (操作数: classNameIndex)</summary>
     NewObject = 0x50,

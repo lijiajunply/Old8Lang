@@ -1,0 +1,64 @@
+// 虚拟机模式 Lambda 测试
+
+PrintLine("=== 虚拟机模式 Lambda 测试 ===")
+
+// 1. 基本 Lambda
+PrintLine("\n1. 基本 Lambda:")
+add <- (a:int, b:int) -> a + b
+result1 <- add(10, 20)
+PrintLine("10 + 20 = " + result1.ToStr())
+
+// 2. 单参数 Lambda
+PrintLine("\n2. 单参数 Lambda:")
+square <- (x:int) -> x * x
+result2 <- square(7)
+PrintLine("7 * 7 = " + result2.ToStr())
+
+// 3. 无参数 Lambda
+PrintLine("\n3. 无参数 Lambda:")
+getMessage <- () -> "Hello from Lambda!"
+result3 <- getMessage()
+PrintLine(result3)
+
+// 4. 多语句 Lambda
+PrintLine("\n4. 多语句 Lambda:")
+calculate <- (a:int, b:int) -> {
+    sum <- a + b
+    product <- a * b
+    return sum * product
+}
+result4 <- calculate(3, 4)
+PrintLine("(3 + 4) * (3 * 4) = " + result4.ToStr())
+
+// 5. Lambda 作为变量传递
+PrintLine("\n5. Lambda 作为变量传递:")
+multiply <- (x:int, y:int) -> x * y
+operation <- multiply
+result5 <- operation(6, 7)
+PrintLine("6 * 7 = " + result5.ToStr())
+
+// 6. 条件判断 Lambda
+PrintLine("\n6. 条件判断 Lambda:")
+max <- (a:int, b:int) -> {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+result6 <- max(15, 10)
+PrintLine("max(15, 10) = " + result6.ToStr())
+
+// 7. 字符串操作 Lambda
+PrintLine("\n7. 字符串操作 Lambda:")
+concat <- (s1:string, s2:string) -> s1 + " " + s2
+result7 <- concat("Hello", "World")
+PrintLine(result7)
+
+// 8. 数学运算 Lambda
+PrintLine("\n8. 数学运算 Lambda:")
+circleArea <- (radius:double) -> 3.14159 * radius * radius
+result8 <- circleArea(5.0)
+PrintLine("圆面积(r=5) = " + result8.ToStr())
+
+PrintLine("\n✅ 所有测试通过！")
