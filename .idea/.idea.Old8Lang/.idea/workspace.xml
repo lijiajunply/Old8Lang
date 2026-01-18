@@ -22,13 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ROADMAP.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ROADMAP.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AsyncFunctionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AsyncFunctionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AsyncGeneratorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AwaitTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AwaitTests.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -583,7 +577,7 @@
       <workItem from="1768674022160" duration="3356000" />
       <workItem from="1768684155332" duration="309000" />
       <workItem from="1768730838950" duration="2656000" />
-      <workItem from="1768741716470" duration="393000" />
+      <workItem from="1768741716470" duration="700000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -928,7 +922,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="713" />
+    <option name="localTasksCounter" value="714" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +949,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现异常过滤器和元组解构赋值功能&#10;&#10;- 修改 TryStatement AST 支持异常过滤器表达式&#10;- 更新 Parser 解析 catch 块中的 where 子句&#10;- 实现虚拟机中的异常过滤器检查和分发逻辑&#10;- 添加 VmException 包装类用于传递 Old8Lang 异常对象&#10;- 实现元组解构赋值的字节码生成和执行逻辑&#10;- 重构异常类型匹配逻辑以支持自定义对象实例&#10;- 更新 IsType 指令直接接收类型注解参数&#10;- 修改文档中的功能完成状态追踪" />
     <MESSAGE value="feat(vm): 实现虚拟机中的高级类型系统&#10;&#10;- 添加对泛型集合类型(list&lt;T&gt;, dict&lt;K,V&gt;)的完整支持&#10;- 实现交叉类型(T: IInterface1 &amp; IInterface2)的运行时验证&#10;- 完善联合类型(int | string)的类型匹配逻辑&#10;- 支持可空类型的字节码表示和运行时检查&#10;- 优化类型转换操作符的实现以处理复杂类型场景&#10;- 添加详细的类型系统测试用例覆盖各种边界情况" />
     <MESSAGE value="docs(cli): 更新CLI指南文档并重构语言特性文档&#10;&#10;- 将原有的CLI命令指南从 CLI_COMMANDS_GUIDE.md 移至 CLI_GUIDE.md&#10;- 在新的CLI指南中增加基础运行命令说明&#10;- 添加包管理CLI命令的完整说明和使用示例&#10;- 重构语言特性文档LANGUAGE_FEATURES.md的目录结构&#10;- 更新语言特性文档内容，新增高级控制流、并发模型等章节&#10;- 删除过时的模式匹配详细示例内容&#10;- 更新文档间的引用关系和相关文档链接" />
     <MESSAGE value="refactor(ast): 重构元组处理逻辑以支持多元素元组&#10;&#10;- 将硬编码的二元组访问改为使用 GetItems() 方法&#10;- 更新字节码生成器以处理多元素元组&#10;- 修改元组值访问方式，使用 Elements 属性替代 V1/V2&#10;- 优化字典类型验证中的元组元素访问&#10;- 更新 IL 生成逻辑以支持 ValueTuple 类型扩展&#10;- 添加 ITuple 接口扩展方法实现元组操作功能&#10;- 统一元组构造函数使用列表参数方式&#10;- 移除过时的元组转换辅助方法" />
@@ -980,7 +973,8 @@
     <MESSAGE value="refactor(core): 重构代码库移除冗余命名空间前缀和优化控制流&#10;&#10;- 移除所有 Old8Lang 命名空间的冗余前缀引用&#10;- 优化 AsyncForInStatement 中的控制流逻辑，移除不必要的 continue 语句&#10;- 简化条件表达式中的空值检查语法&#10;- 清理未使用的 using 语句和调试输出代码&#10;- 重构 ClassInit 类使用一致的字段命名约定&#10;- 移除未使用的 MoveNext 方法实现和静态成员定义方法&#10;- 优化 IL 生成中的条件分支和类型转换操作&#10;- 简化 UI 组件中的布局和样式属性设置&#10;- 优化泛型类缓存的并发安全操作&#10;- 重构字典值转换为对象的重复方法调用" />
     <MESSAGE value="refactor(lang): 优化代码结构和性能&#10;&#10;- 将 HashSet 和 List 的初始化从 new() 改为 [] 语法&#10;- 移除不必要的 null 检查和默认值创建&#10;- 简化 LINQ 查询和条件判断逻辑&#10;- 修复命名参数传递和方法重载解析问题&#10;- 优化异步状态机生成器的字段初始化&#10;- 更新 await 表达式的类型检查逻辑&#10;- 改进字典和集合的初始化方式&#10;- 简化对象初始化器的使用&#10;- 优化空合并运算符的使用&#10;- 修复类型匹配和参数验证逻辑&#10;- 改进异常处理中的集合初始化&#10;- 简化 ML 库中的数组初始化&#10;- 优化解析器中的列表初始化&#10;- 修复 CodeGen 配置中的列表初始化&#10;- 移除多余的 XML 注释参数标记&#10;- 改进类型检查的可读性&#10;- 修复比较操作符的帮助类逻辑" />
     <MESSAGE value="refactor(core): 重构代码以改进命名约定和简化实现&#10;&#10;- 将 CacheManager 中的字段从 PascalCase 改为 _camelCase&#10;- 从 CollectionTypeValidator 中移除不必要的 LocalManager 参数&#10;- 修复 DebugProfilerHandler 中的属性名 ManagedMemoryMB 到 ManagedMemoryMb&#10;- 简化 GenericTypeInference 中的条件表达式和空值检查&#10;- 将 GenericTypeResolver 重构为构造函数注入依赖项&#10;- 更新 LangObject 中运算符重载方法的返回类型为非空对象&#10;- 将 LangParser 中的私有字段改为 _camelCase 并简化初始化逻辑&#10;- 将 LangToken 结构体改为 record struct 并优化参数命名&#10;- 从 ModuleResolver 中移除硬编码实例并使用私有字段&#10;- 将 NetworkModuleLoader 中的缓存目录字段改为 _camelCase&#10;- 移除 PackageManager 中未使用的构造函数参数并更新字段命名" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 重构代码以改进命名约定和简化实现&#10;&#10;- 将 CacheManager 中的字段从 PascalCase 改为 _camelCase&#10;- 从 CollectionTypeValidator 中移除不必要的 LocalManager 参数&#10;- 修复 DebugProfilerHandler 中的属性名 ManagedMemoryMB 到 ManagedMemoryMb&#10;- 简化 GenericTypeInference 中的条件表达式和空值检查&#10;- 将 GenericTypeResolver 重构为构造函数注入依赖项&#10;- 更新 LangObject 中运算符重载方法的返回类型为非空对象&#10;- 将 LangParser 中的私有字段改为 _camelCase 并简化初始化逻辑&#10;- 将 LangToken 结构体改为 record struct 并优化参数命名&#10;- 从 ModuleResolver 中移除硬编码实例并使用私有字段&#10;- 将 NetworkModuleLoader 中的缓存目录字段改为 _camelCase&#10;- 移除 PackageManager 中未使用的构造函数参数并更新字段命名" />
+    <MESSAGE value="test(compiler): 为异步功能测试启用IL验证开关&#10;&#10;- 在AsyncFunctionTests中添加IL验证启用/禁用控制&#10;- 在AsyncGeneratorTests中添加IL验证启用/禁用控制&#10;- 在AwaitTests中添加IL验证启用/禁用控制&#10;- 更新ROADMAP文档记录异步功能完成状态和问题分析&#10;- 移除调试相关的变更文件记录&#10;- 更新工作时间统计信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 为异步功能测试启用IL验证开关&#10;&#10;- 在AsyncFunctionTests中添加IL验证启用/禁用控制&#10;- 在AsyncGeneratorTests中添加IL验证启用/禁用控制&#10;- 在AwaitTests中添加IL验证启用/禁用控制&#10;- 更新ROADMAP文档记录异步功能完成状态和问题分析&#10;- 移除调试相关的变更文件记录&#10;- 更新工作时间统计信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
