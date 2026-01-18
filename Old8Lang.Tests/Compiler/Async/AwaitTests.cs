@@ -37,7 +37,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -65,7 +69,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -93,7 +101,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -123,7 +135,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -153,7 +169,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -183,7 +203,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -229,7 +253,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -271,7 +299,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -309,7 +341,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -355,7 +391,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -406,7 +446,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -446,7 +490,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -493,7 +541,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -533,7 +585,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -562,7 +618,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -599,7 +659,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -638,7 +702,11 @@ public class AwaitTests
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());

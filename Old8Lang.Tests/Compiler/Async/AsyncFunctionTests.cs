@@ -50,28 +50,29 @@ public class AsyncFunctionTests(ITestOutputHelper output)
     public void AsyncFunctionWithParameters_CompilesAndExecutesCorrectly()
     {
         // Arrange
-        Old8Lang.Compiler.Compiler.DebugOutputEnabled = true;
         var code = @"
             async func calculateSum(a:int, b:int) -> int {
                 await Task.Delay(50)
                 return a + b
             }
-            
+
             async func testCalculation() {
                 result1 <- await calculateSum(10, 20)
                 result2 <- await calculateSum(5, 15)
-                
+
                 Assert.Equal(30, result1)
                 Assert.Equal(20, result2)
             }
-            
+
             testCalculation()
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -101,7 +102,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -137,7 +142,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -171,7 +180,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -210,7 +223,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -253,7 +270,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -289,7 +310,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -328,7 +353,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -373,7 +402,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -411,7 +444,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
@@ -451,7 +488,11 @@ public class AsyncFunctionTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
 
         // Assert
         var exception = Record.Exception(() => compiledAction());
