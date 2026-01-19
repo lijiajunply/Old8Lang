@@ -362,8 +362,67 @@ public class StatementParser(
         }
         else if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
+            // 需要区分对象解构赋值和块语句
             // 对象解构赋值：{name, age} <- person
-            return ParseObjectDestructuring();
+            // 块语句：{ statements }
+
+            // 前瞻检查：查找是否有赋值符号 '<-'
+            var tempIndex = CurrentIndex + 1;
+            var foundAssignment = false;
+            var scanLimit = Math.Min(tempIndex + 50, Tokens.Count); // 限制前瞻深度
+            var braceDepth = 1; // 跟踪大括号嵌套深度
+
+            while (tempIndex < scanLimit && braceDepth > 0)
+            {
+                var token = Tokens[tempIndex];
+
+                if (token.Type == LangTokenType.LeftBrace)
+                {
+                    braceDepth++;
+                }
+                else if (token.Type == LangTokenType.RightBrace)
+                {
+                    braceDepth--;
+                    if (braceDepth == 0)
+                    {
+                        // 找到匹配的右大括号，检查下一个 token
+                        if (tempIndex + 1 < Tokens.Count)
+                        {
+                            var nextToken = Tokens[tempIndex + 1];
+                            // 检查是否是赋值符号或类型注解后的赋值符号
+                            if (nextToken.Type == LangTokenType.Assignment)
+                            {
+                                foundAssignment = true;
+                                break;
+                            }
+                            else if (nextToken.Type == LangTokenType.Colon)
+                            {
+                                // 可能是类型注解：{name, age}:Person <- person
+                                if (tempIndex + 3 < Tokens.Count &&
+                                    Tokens[tempIndex + 3].Type == LangTokenType.Assignment)
+                                {
+                                    foundAssignment = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                tempIndex++;
+            }
+
+            if (foundAssignment)
+            {
+                // 这是对象解构赋值
+                return ParseObjectDestructuring();
+            }
+            else
+            {
+                // 这是块语句
+                return ParseBlock();
+            }
         }
 
         // 处理赋值语句：identifier｜this <- expression 或 a.name <- value 或 this.name <- value 或 a[b] <- value

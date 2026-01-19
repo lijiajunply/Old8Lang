@@ -22,9 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -583,6 +581,7 @@
       <workItem from="1768741716470" duration="700000" />
       <workItem from="1768749421043" duration="8816000" />
       <workItem from="1768767111847" duration="12379000" />
+      <workItem from="1768841952068" duration="521000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +926,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="735" />
+    <option name="localTasksCounter" value="736" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +953,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 重构代码库移除冗余命名空间前缀和优化控制流&#10;&#10;- 移除所有 Old8Lang 命名空间的冗余前缀引用&#10;- 优化 AsyncForInStatement 中的控制流逻辑，移除不必要的 continue 语句&#10;- 简化条件表达式中的空值检查语法&#10;- 清理未使用的 using 语句和调试输出代码&#10;- 重构 ClassInit 类使用一致的字段命名约定&#10;- 移除未使用的 MoveNext 方法实现和静态成员定义方法&#10;- 优化 IL 生成中的条件分支和类型转换操作&#10;- 简化 UI 组件中的布局和样式属性设置&#10;- 优化泛型类缓存的并发安全操作&#10;- 重构字典值转换为对象的重复方法调用" />
     <MESSAGE value="refactor(lang): 优化代码结构和性能&#10;&#10;- 将 HashSet 和 List 的初始化从 new() 改为 [] 语法&#10;- 移除不必要的 null 检查和默认值创建&#10;- 简化 LINQ 查询和条件判断逻辑&#10;- 修复命名参数传递和方法重载解析问题&#10;- 优化异步状态机生成器的字段初始化&#10;- 更新 await 表达式的类型检查逻辑&#10;- 改进字典和集合的初始化方式&#10;- 简化对象初始化器的使用&#10;- 优化空合并运算符的使用&#10;- 修复类型匹配和参数验证逻辑&#10;- 改进异常处理中的集合初始化&#10;- 简化 ML 库中的数组初始化&#10;- 优化解析器中的列表初始化&#10;- 修复 CodeGen 配置中的列表初始化&#10;- 移除多余的 XML 注释参数标记&#10;- 改进类型检查的可读性&#10;- 修复比较操作符的帮助类逻辑" />
     <MESSAGE value="refactor(core): 重构代码以改进命名约定和简化实现&#10;&#10;- 将 CacheManager 中的字段从 PascalCase 改为 _camelCase&#10;- 从 CollectionTypeValidator 中移除不必要的 LocalManager 参数&#10;- 修复 DebugProfilerHandler 中的属性名 ManagedMemoryMB 到 ManagedMemoryMb&#10;- 简化 GenericTypeInference 中的条件表达式和空值检查&#10;- 将 GenericTypeResolver 重构为构造函数注入依赖项&#10;- 更新 LangObject 中运算符重载方法的返回类型为非空对象&#10;- 将 LangParser 中的私有字段改为 _camelCase 并简化初始化逻辑&#10;- 将 LangToken 结构体改为 record struct 并优化参数命名&#10;- 从 ModuleResolver 中移除硬编码实例并使用私有字段&#10;- 将 NetworkModuleLoader 中的缓存目录字段改为 _camelCase&#10;- 移除 PackageManager 中未使用的构造函数参数并更新字段命名" />
     <MESSAGE value="test(compiler): 为异步功能测试启用IL验证开关&#10;&#10;- 在AsyncFunctionTests中添加IL验证启用/禁用控制&#10;- 在AsyncGeneratorTests中添加IL验证启用/禁用控制&#10;- 在AwaitTests中添加IL验证启用/禁用控制&#10;- 更新ROADMAP文档记录异步功能完成状态和问题分析&#10;- 移除调试相关的变更文件记录&#10;- 更新工作时间统计信息" />
@@ -979,7 +977,8 @@
     <MESSAGE value="feat(vm): 实现字节码虚拟机闭包和Lambda表达式支持&#10;&#10;- 添加闭包捕获变量分析器和捕获变量环境管理&#10;- 实现Lambda表达式编译和闭包函数调用机制&#10;- 支持复杂函数调用表达式和动态函数调用&#10;- 添加闭包变量访问优先级处理（先检查闭包环境再检查全局变量）&#10;- 实现嵌套闭包变量继承机制&#10;- 优化SetStatement中的左侧表达式访问逻辑&#10;- 添加多种闭包和Lambda测试用例验证功能正确性" />
     <MESSAGE value="fix(vm): 修复字节码虚拟机循环迭代器和闭包分析问题&#10;&#10;- 修复嵌套循环中迭代器局部变量名称冲突问题，使用唯一名称避免冲突&#10;- 修复循环字节码指令中迭代器对象的栈管理，确保正确弹出迭代器对象&#10;- 添加对IfStatement和IfChild节点的闭包变量分析支持&#10;- 移除虚拟机指令中的调试输出代码&#10;- 修复测试代码中的语法错误，将for循环语法从&lt;-改为in&#10;- 修复异常捕获语法，统一使用括号包装异常变量&#10;- 修复对象创建语法，移除new关键字的使用&#10;- 更新泛型约束语法和数组类型表示方式" />
     <MESSAGE value="fix(vm): 修复字节码虚拟机异常处理和finally块执行逻辑&#10;&#10;- 实现finally块的正确执行逻辑，确保异常处理后能继续向外传播&#10;- 修复异常表遍历逻辑，从内到外查找匹配的异常处理器&#10;- 添加ExecuteFinallyBlock方法来专门处理finally块的执行&#10;- 更新using语句和defer语句的执行顺序测试，确保正确的执行时机&#10;- 修正defer语句在函数级作用域中的执行时机，应在函数返回前执行&#10;- 调整workspace.xml中的变更列表和时间统计信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复字节码虚拟机异常处理和finally块执行逻辑&#10;&#10;- 实现finally块的正确执行逻辑，确保异常处理后能继续向外传播&#10;- 修复异常表遍历逻辑，从内到外查找匹配的异常处理器&#10;- 添加ExecuteFinallyBlock方法来专门处理finally块的执行&#10;- 更新using语句和defer语句的执行顺序测试，确保正确的执行时机&#10;- 修正defer语句在函数级作用域中的执行时机，应在函数返回前执行&#10;- 调整workspace.xml中的变更列表和时间统计信息" />
+    <MESSAGE value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
