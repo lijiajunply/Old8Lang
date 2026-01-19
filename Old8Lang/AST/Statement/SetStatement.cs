@@ -100,8 +100,8 @@ public partial class SetStatement : OldStatement
         // 处理嵌套索引访问赋值：array[0][0] <- value
         if (_leftExpression is NestedIndexAccess nestedIndexAccess)
         {
-            // 运行基础索引访问，获取容器对象
-            var baseResult = nestedIndexAccess.BaseIndex.Run(manager);
+            // 运行基础表达式，获取容器对象
+            var baseResult = nestedIndexAccess.BaseExpression.Run(manager);
 
             // 获取嵌套索引值
             var nestedIndexValue = nestedIndexAccess.NestedIndex.Run(manager);

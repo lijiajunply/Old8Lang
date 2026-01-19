@@ -1290,21 +1290,34 @@ public class PrimaryParser(
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
 
-        // 尝试解析为整数，如果超出Int32范围则转为双精度浮点数
+        // 尝试解析为整数，如果超出Int32范围则尝试Long，最后才转为双精度浮点数
         try
         {
             return new IntLangValue(int.Parse(value), position);
         }
         catch
         {
-            // 整数解析失败，可能是超出范围，尝试解析为双精度浮点数
+            // 整数解析失败，可能是超出范围，尝试解析为 long
             try
             {
-                return new DoubleLangValue(double.Parse(value), position);
+                long longValue = long.Parse(value);
+                // 成功解析为 long，但 IntLangValue 只支持 int
+                // 我们需要创建一个 LongLangValue 或者将其存储为 double
+                // 由于 Old8Lang 没有 LongLangValue，我们暂时使用 double
+                // 但为了保持精度，我们应该添加 LongLangValue 支持
+                return new DoubleLangValue(longValue, position);
             }
             catch
             {
-                throw CreateSyntaxError($"无法解析数字字面量 '{value}'");
+                // long 解析也失败，尝试解析为双精度浮点数
+                try
+                {
+                    return new DoubleLangValue(double.Parse(value), position);
+                }
+                catch
+                {
+                    throw CreateSyntaxError($"无法解析数字字面量 '{value}'");
+                }
             }
         }
     }

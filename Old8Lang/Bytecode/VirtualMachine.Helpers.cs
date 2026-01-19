@@ -553,10 +553,11 @@ public partial class VirtualMachine
 
         if (value is double d)
         {
-            // 对于 double，如果是整数值，显示为整数
+            // 对于 double，如果是整数值，显示为整数（不使用科学计数法）
             if (Math.Abs(d - Math.Round(d)) < 0.0000001)
             {
-                return ((long)d).ToString();
+                // 使用 "F0" 格式强制显示为固定格式（无小数点）
+                return d.ToString("F0");
             }
             return d.ToString();
         }
@@ -937,6 +938,25 @@ public partial class VirtualMachine
         if (obj == null)
         {
             throw new Exception($"无法在 null 对象上调用方法 {methodName}");
+        }
+
+        // 特殊处理 ToStr：对于数字类型，使用自定义格式化
+        if (methodName == "ToStr")
+        {
+            // 对于 double，如果是整数值，使用固定格式（不使用科学计数法）
+            if (obj is double d)
+            {
+                if (Math.Abs(d - Math.Round(d)) < 0.0000001)
+                {
+                    return d.ToString("F0");
+                }
+                return d.ToString();
+            }
+            // 对于 long，直接转换为字符串
+            if (obj is long l)
+            {
+                return l.ToString();
+            }
         }
 
         Type? extensionType = null;

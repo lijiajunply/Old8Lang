@@ -335,6 +335,12 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                         // 创建一个特殊的嵌套索引访问表达式
                         left = new NestedIndexAccess(nestedItem, right, position);
                     }
+                    // 如果left是NestedIndexAccess，继续嵌套
+                    else if (left is NestedIndexAccess)
+                    {
+                        // 创建更深层的嵌套索引访问
+                        left = new NestedIndexAccess(left, right, position);
+                    }
                     // 如果left是Operation，这也是嵌套访问
                     else
                     {

@@ -9,22 +9,22 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 嵌套索引访问表达式，用于处理 array[index1][index2] 的情况
 /// </summary>
-/// <param name="baseIndex">基础索引访问，如 array[index1]</param>
+/// <param name="baseExpression">基础表达式，可以是 LangListItem 或 NestedIndexAccess</param>
 /// <param name="nestedIndex">嵌套索引，如 [index2]</param>
 /// <param name="position">源代码位置</param>
 public partial class NestedIndexAccess(
-    LangListItem baseIndex,
+    LangExpression baseExpression,
     LangExpression nestedIndex,
     SourcePosition position = default)
     : LangValueType(position)
 {
-    public readonly LangListItem BaseIndex = baseIndex;
+    public readonly LangExpression BaseExpression = baseExpression;
     public readonly LangExpression NestedIndex = nestedIndex;
 
     public override LangValueType Run(VariateManager manager)
     {
-        // 首先运行基础索引访问，获取结果
-        var baseResult = BaseIndex.Run(manager);
+        // 首先运行基础表达式，获取结果
+        var baseResult = BaseExpression.Run(manager);
 
         // 检查基础结果是否支持索引访问
         if (baseResult is ListLangValue list)
@@ -65,28 +65,28 @@ public partial class NestedIndexAccess(
         throw new InvalidOperationError(this, $"不支持的嵌套索引访问类型: {baseResult.GetType().Name}");
     }
 
-    public override string ToString() => $"{BaseIndex}[{NestedIndex}]";
+    public override string ToString() => $"{BaseExpression}[{NestedIndex}]";
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 根据基础索引访问的输出类型选择适当的索引访问方法
-        var baseType = BaseIndex.OutputType(local);
+        // 根据基础表达式的输出类型选择适当的索引访问方法
+        var baseType = BaseExpression.OutputType(local);
 
         // 特殊处理 ValueTuple 的常量索引访问
         if (baseType.FullName?.StartsWith("System.ValueTuple") == true && NestedIndex is IntLangValue intValue)
         {
             var index = intValue.Value;
 
-            // 只加载基础索引访问的结果，不加载索引值
-            BaseIndex.LoadIlValue(ilGenerator, local);
+            // 只加载基础表达式的结果，不加载索引值
+            BaseExpression.LoadIlValue(ilGenerator, local);
 
             // 使用递归方法加载字段（支持超过 7 个元素）
             LoadValueTupleField(ilGenerator, baseType, index);
             return;
         }
 
-        // 对于其他情况，先加载基础索引访问的结果和索引值
-        BaseIndex.LoadIlValue(ilGenerator, local);
+        // 对于其他情况，先加载基础表达式的结果和索引值
+        BaseExpression.LoadIlValue(ilGenerator, local);
         NestedIndex.LoadIlValue(ilGenerator, local);
 
         if (baseType == typeof(string))
@@ -168,7 +168,7 @@ public partial class NestedIndexAccess(
 
     public override Type OutputType(LocalManager local)
     {
-        var baseType = BaseIndex.OutputType(local);
+        var baseType = BaseExpression.OutputType(local);
 
         if (baseType == typeof(string))
         {

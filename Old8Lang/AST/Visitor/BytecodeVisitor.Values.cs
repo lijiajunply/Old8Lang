@@ -358,8 +358,8 @@ public partial class BytecodeVisitor
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;
     public Instruction? VisitNestedIndexAccess(NestedIndexAccess node)
     {
-        // 访问基础索引访问 (例如 array[index1])
-        node.BaseIndex.Accept(this);
+        // 访问基础表达式 (例如 array[index1] 或更深的嵌套)
+        node.BaseExpression.Accept(this);
 
         // 访问嵌套索引 (例如 index2)
         node.NestedIndex.Accept(this);
