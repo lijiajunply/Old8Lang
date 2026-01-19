@@ -24,8 +24,25 @@ public partial class BytecodeVisitor
         }
         else
         {
-            // 全局变量
-            Emit(OpCode.LoadGlobal, varName);
+            // 检查是否在类方法中，且 this 是局部变量（实例方法）
+            // 如果是，则应该通过 this.field 访问字段
+            if (_compiler.IsLocalVariable("this"))
+            {
+                // 这可能是一个实例方法中的字段访问
+                // 加载 this
+                int thisIndex = _compiler.GetLocalIndex("this");
+                Emit(OpCode.LoadLocal, thisIndex);
+
+                // 尝试加载字段
+                // 注意：这里我们假设如果不是局部变量且在实例方法中，那么它可能是字段
+                // 如果不是字段，GetField 指令会在运行时失败
+                Emit(OpCode.GetField, varName);
+            }
+            else
+            {
+                // 全局变量
+                Emit(OpCode.LoadGlobal, varName);
+            }
         }
 
         return null;
@@ -75,6 +92,23 @@ public partial class BytecodeVisitor
                 // 这是字段访问：object.field 或 super.field
                 // 左操作数（对象或super）已经在栈上
                 string fieldName = memberId.IdName;
+
+                if (isSuperAccess)
+                {
+                    // super.field - 访问父类字段
+                    Emit(OpCode.GetSuperField, fieldName);
+                }
+                else
+                {
+                    // object.field - 访问普通字段
+                    Emit(OpCode.GetField, fieldName);
+                }
+            }
+            else if (node.Right is ClassMemberId classMemberId)
+            {
+                // 这是字段访问：object.field 或 super.field（字段带访问修饰符）
+                // 左操作数（对象或super）已经在栈上
+                string fieldName = classMemberId.IdName;
 
                 if (isSuperAccess)
                 {
@@ -532,8 +566,23 @@ public partial class BytecodeVisitor
         }
         else
         {
-            // 全局变量或类成员
-            Emit(OpCode.LoadGlobal, varName);
+            // 检查是否在类方法中，且 this 是局部变量（实例方法）
+            // 如果是，则应该通过 this.field 访问字段
+            if (_compiler.IsLocalVariable("this"))
+            {
+                // 这是一个实例方法中的字段访问
+                // 加载 this
+                int thisIndex = _compiler.GetLocalIndex("this");
+                Emit(OpCode.LoadLocal, thisIndex);
+
+                // 加载字段
+                Emit(OpCode.GetField, varName);
+            }
+            else
+            {
+                // 全局变量或静态成员
+                Emit(OpCode.LoadGlobal, varName);
+            }
         }
 
         return null;

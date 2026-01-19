@@ -145,6 +145,36 @@ public partial class BytecodeVisitor
                 {
                     fieldName = rightId.IdName;
                 }
+                else if (operation.Right is ClassMemberId rightClassMemberId)
+                {
+                    fieldName = rightClassMemberId.IdName;
+                }
+                else if (operation.Right is LangListItem nestedListItem)
+                {
+                    // 这是索引赋值：obj.field[index] <- value
+                    // 例如：this.groups[key] <- newGroup
+                    // 这应该被处理为索引赋值，而不是成员访问赋值
+
+                    // 实际上，this.groups[key] 应该被解析为 LangListItem(Operation(this, Dot, groups), key)
+                    // 但是解析器将其解析为 Operation(this, Dot, LangListItem(groups, key))
+
+                    // 我们需要重新构造正确的表达式：
+                    // 1. 加载 this.groups
+                    operation.Left?.Accept(this);  // 加载 this
+                    Emit(OpCode.GetField, nestedListItem.ListId.IdName);  // 加载 groups 字段
+
+                    // 2. 加载索引
+                    nestedListItem.Key.Accept(this);
+
+                    // 3. 加载值
+                    node.Value.Accept(this);
+
+                    // 4. 执行 SetIndex 指令
+                    Emit(OpCode.SetIndex);
+
+                    // 直接返回，不执行后面的 SetField 逻辑
+                    return null;
+                }
                 else
                 {
                     // 字节码模式目前只支持简单的成员访问（obj.field）
