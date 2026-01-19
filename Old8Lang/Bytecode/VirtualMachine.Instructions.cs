@@ -921,6 +921,29 @@ public partial class VirtualMachine
                     }
                     _stack.Push(dict[index]);
                 }
+                else if (collection is DictionaryLangValue dictLangValue)
+                {
+                    // 处理 DictionaryLangValue 类型
+                    // 将索引转换为 LangValueType
+                    var keyToFind = ConvertToLangValueType(index);
+
+                    // 在字典中查找键
+                    bool found = false;
+                    foreach (var (key, value) in dictLangValue.Value)
+                    {
+                        if (key.Equal(keyToFind))
+                        {
+                            _stack.Push(value);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        throw new Exception($"字典中不存在键: {index}");
+                    }
+                }
                 else if (collection is string str)
                 {
                     int idx = Convert.ToInt32(index);
@@ -991,6 +1014,32 @@ public partial class VirtualMachine
                 else if (collection is IDictionary dict)
                 {
                     dict[index] = value;
+                }
+                else if (collection is DictionaryLangValue dictLangValue)
+                {
+                    // 处理 DictionaryLangValue 类型
+                    // 将索引和值转换为 LangValueType
+                    var keyToSet = ConvertToLangValueType(index);
+                    var valueToSet = ConvertToLangValueType(value);
+
+                    // 在字典中查找键并更新，如果不存在则添加
+                    bool found = false;
+                    for (int i = 0; i < dictLangValue.Value.Count; i++)
+                    {
+                        var (key, _) = dictLangValue.Value[i];
+                        if (key.Equal(keyToSet))
+                        {
+                            dictLangValue.Value[i] = (key, valueToSet);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        // 键不存在，添加新的键值对
+                        dictLangValue.Value.Add((keyToSet, valueToSet));
+                    }
                 }
                 else
                 {

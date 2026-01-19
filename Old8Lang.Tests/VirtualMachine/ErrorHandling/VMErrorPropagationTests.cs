@@ -137,7 +137,7 @@ public class VMErrorPropagationTests
                 task <- asyncWork()
                 await task
             } catch (e) {
-                PrintLine(""Caught: "" + e.ToStr())
+                PrintLine(""Caught: "" + e.Message)
             }
         ";
 
@@ -408,7 +408,7 @@ public class VMErrorPropagationTests
             class ValidatedBox {
                 public value:int
 
-                public func new(value:int) -> void {
+                public func init(value:int) -> void {
                     if value < 0 {
                         throw ""Value must be non-negative""
                     }
@@ -750,7 +750,7 @@ public class VMErrorPropagationTests
             func level1() -> void {
                 try {
                     level2()
-                } catch e {
+                } catch (e) {
                     throw ""Level 1: "" + e.ToStr()
                 }
             }

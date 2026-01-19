@@ -42,7 +42,7 @@ public class VMStaticMemberTests
             class Counter {
                 public static count:int <- 0
 
-                public func constructor() -> void {
+                public func init() -> void {
                     Counter.count <- Counter.count + 1
                 }
             }
@@ -176,7 +176,7 @@ public class VMStaticMemberTests
                 private name:string
                 private age:int
 
-                private func constructor(n:string, a:int) -> void {
+                private func init(n:string, a:int) -> void {
                     this.name <- n
                     this.age <- a
                 }
@@ -292,7 +292,7 @@ public class VMStaticMemberTests
                 private static instance:Singleton? <- null
                 private value:int
 
-                private func constructor() -> void {
+                private func init() -> void {
                     this.value <- 42
                 }
 

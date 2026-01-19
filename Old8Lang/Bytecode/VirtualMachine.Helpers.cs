@@ -1107,8 +1107,25 @@ public partial class VirtualMachine
             invokeArgs.Add(obj);
         }
 
-        // 添加传入的参数
+        // 添加传入的参数，并进行类型转换
+        int startIndex = invokeArgs.Count; // 记录参数起始位置
         invokeArgs.AddRange(args);
+
+        // 类型转换：将 C# 原始类型转换为 Old8Lang 类型（如果需要）
+        for (int i = startIndex; i < invokeArgs.Count && i < parameters.Length; i++)
+        {
+            var arg = invokeArgs[i];
+            var paramType = parameters[i].ParameterType;
+
+            // 如果参数期望 LangValueType，但传入的是 C# 原始类型，则进行转换
+            if (paramType == typeof(LangValueType) || paramType.IsSubclassOf(typeof(LangValueType)))
+            {
+                if (arg is not LangValueType)
+                {
+                    invokeArgs[i] = ConvertToLangValueType(arg);
+                }
+            }
+        }
 
         // 补充缺失的可选参数
         if (invokeArgs.Count < parameters.Length)

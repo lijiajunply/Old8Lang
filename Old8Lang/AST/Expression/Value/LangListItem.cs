@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -215,6 +216,28 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
 
             // 从数组中获取元素
             ilGenerator.Emit(OpCodes.Ldelem_Ref);
+        }
+        else if (listType == typeof(DictionaryLangValue))
+        {
+            // 处理 DictionaryLangValue 类型的索引访问
+            ListId.LoadIlValue(ilGenerator, local); // 加载字典
+
+            // 加载键
+            Key.LoadIlValue(ilGenerator, local);
+
+            // 调用 DictionaryValueFuncStatic.GetValue 方法
+            // 这是一个扩展方法，第一个参数是 DictionaryLangValue，第二个参数是 LangValueType
+            var getValueMethod = typeof(DictionaryValueFuncStatic).GetMethod("GetValue",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+
+            if (getValueMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, getValueMethod);
+            }
+            else
+            {
+                throw new InvalidOperationError(this, "无法找到 DictionaryValueFuncStatic.GetValue 方法");
+            }
         }
         else
         {
