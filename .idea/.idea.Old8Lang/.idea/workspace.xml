@@ -22,7 +22,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -582,6 +584,7 @@
       <workItem from="1768749421043" duration="8816000" />
       <workItem from="1768767111847" duration="12379000" />
       <workItem from="1768841952068" duration="521000" />
+      <workItem from="1768843331971" duration="4887000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -926,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="736" />
+    <option name="localTasksCounter" value="741" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -953,11 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(lang): 优化代码结构和性能&#10;&#10;- 将 HashSet 和 List 的初始化从 new() 改为 [] 语法&#10;- 移除不必要的 null 检查和默认值创建&#10;- 简化 LINQ 查询和条件判断逻辑&#10;- 修复命名参数传递和方法重载解析问题&#10;- 优化异步状态机生成器的字段初始化&#10;- 更新 await 表达式的类型检查逻辑&#10;- 改进字典和集合的初始化方式&#10;- 简化对象初始化器的使用&#10;- 优化空合并运算符的使用&#10;- 修复类型匹配和参数验证逻辑&#10;- 改进异常处理中的集合初始化&#10;- 简化 ML 库中的数组初始化&#10;- 优化解析器中的列表初始化&#10;- 修复 CodeGen 配置中的列表初始化&#10;- 移除多余的 XML 注释参数标记&#10;- 改进类型检查的可读性&#10;- 修复比较操作符的帮助类逻辑" />
-    <MESSAGE value="refactor(core): 重构代码以改进命名约定和简化实现&#10;&#10;- 将 CacheManager 中的字段从 PascalCase 改为 _camelCase&#10;- 从 CollectionTypeValidator 中移除不必要的 LocalManager 参数&#10;- 修复 DebugProfilerHandler 中的属性名 ManagedMemoryMB 到 ManagedMemoryMb&#10;- 简化 GenericTypeInference 中的条件表达式和空值检查&#10;- 将 GenericTypeResolver 重构为构造函数注入依赖项&#10;- 更新 LangObject 中运算符重载方法的返回类型为非空对象&#10;- 将 LangParser 中的私有字段改为 _camelCase 并简化初始化逻辑&#10;- 将 LangToken 结构体改为 record struct 并优化参数命名&#10;- 从 ModuleResolver 中移除硬编码实例并使用私有字段&#10;- 将 NetworkModuleLoader 中的缓存目录字段改为 _camelCase&#10;- 移除 PackageManager 中未使用的构造函数参数并更新字段命名" />
-    <MESSAGE value="test(compiler): 为异步功能测试启用IL验证开关&#10;&#10;- 在AsyncFunctionTests中添加IL验证启用/禁用控制&#10;- 在AsyncGeneratorTests中添加IL验证启用/禁用控制&#10;- 在AwaitTests中添加IL验证启用/禁用控制&#10;- 更新ROADMAP文档记录异步功能完成状态和问题分析&#10;- 移除调试相关的变更文件记录&#10;- 更新工作时间统计信息" />
-    <MESSAGE value="style(tests): 规范化异常类型引用和移除冗余断言&#10;&#10;- 将所有 Exception 替换为 System.Exception 以提高类型明确性&#10;- 移除 VMBytecodeSerializationTests 中多余的字节码属性验证断言&#10;- 简化多个测试方法中的断言逻辑，只保留核心的非空检查&#10;- 统一异常捕获的类型引用格式，提高代码一致性" />
-    <MESSAGE value="chore(ide): 更新IDE配置和任务计数器&#10;&#10;- 移动BytecodeFileTests到VirtualMachine/BytecodeSerialization目录下&#10;- 添加新的工作项目记录，持续时间307秒&#10;- 更新本地任务计数器从714递增到715&#10;- 移除过时的高级类型系统特性提交消息记录&#10;- 更新最后提交消息为测试样式规范化相关内容" />
     <MESSAGE value="docs(roadmap): 更新ROADMAP文档并生成相关报告&#10;&#10;- 新增编译器IL代码生成问题修复任务(P0关键任务)&#10;- 标记编译器模式测试补充为已完成，新增288个测试用例&#10;- 新增编译器模式测试质量提升任务(P1高优先级)&#10;- 更新异步功能完善部分的下一步行动指向新任务&#10;- 添加2026-01-18更新日志记录相关变更&#10;- 生成ROADMAP更新摘要和编译器模式测试补充报告" />
     <MESSAGE value="feat(tests): 添加虚拟机并发原语测试套件&#10;&#10;- 创建 VMConcurrencyMutexTests.cs 包含 14 个测试方法覆盖互斥锁功能&#10;- 创建 VMConcurrencySemaphoreTests.cs 包含 19 个测试方法覆盖信号量功能  &#10;- 创建 VMConcurrencyAtomicIntTests.cs 包含 22 个测试方法覆盖原子整数功能&#10;- 实现基本功能、超时场景、异常安全、多线程并发和边界条件测试&#10;- 修复虚拟机模式下布尔值字符串表示和 catch 语句语法差异&#10;- 记录多线程语法差异问题(spawn 语法需改为 Spawn() 函数调用)" />
     <MESSAGE value="feat(compiler): 实现Lambda表达式闭包支持和动态调用功能&#10;&#10;- 添加闭包变量捕获分析器，识别Lambda函数引用的外部变量&#10;- 实现MakeClosure指令用于创建带捕获变量的闭包对象&#10;- 支持Lambda变量的动态调用，使用CallDynamic指令&#10;- 添加ClosureValue类封装函数元数据和捕获的变量&#10;- 在虚拟机中实现闭包调用时的变量作用域管理&#10;- 创建闭包测试文件验证全局变量和局部变量捕获功能&#10;- 更新Lambda虚拟机测试覆盖多种Lambda表达式场景" />
@@ -978,7 +976,12 @@
     <MESSAGE value="fix(vm): 修复字节码虚拟机循环迭代器和闭包分析问题&#10;&#10;- 修复嵌套循环中迭代器局部变量名称冲突问题，使用唯一名称避免冲突&#10;- 修复循环字节码指令中迭代器对象的栈管理，确保正确弹出迭代器对象&#10;- 添加对IfStatement和IfChild节点的闭包变量分析支持&#10;- 移除虚拟机指令中的调试输出代码&#10;- 修复测试代码中的语法错误，将for循环语法从&lt;-改为in&#10;- 修复异常捕获语法，统一使用括号包装异常变量&#10;- 修复对象创建语法，移除new关键字的使用&#10;- 更新泛型约束语法和数组类型表示方式" />
     <MESSAGE value="fix(vm): 修复字节码虚拟机异常处理和finally块执行逻辑&#10;&#10;- 实现finally块的正确执行逻辑，确保异常处理后能继续向外传播&#10;- 修复异常表遍历逻辑，从内到外查找匹配的异常处理器&#10;- 添加ExecuteFinallyBlock方法来专门处理finally块的执行&#10;- 更新using语句和defer语句的执行顺序测试，确保正确的执行时机&#10;- 修正defer语句在函数级作用域中的执行时机，应在函数返回前执行&#10;- 调整workspace.xml中的变更列表和时间统计信息" />
     <MESSAGE value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
+    <MESSAGE value="fix(parser): 解决对象解构赋值与块语句的解析歧义&#10;&#10;- 添加前瞻检查逻辑区分对象解构赋值和块语句&#10;- 实现大括号嵌套深度跟踪机制&#10;- 检查赋值符号'&lt;-'来确定语句类型&#10;- 支持类型注解后的赋值符号识别&#10;- 限制前瞻扫描深度避免性能问题&#10;- 修复IDE工作区配置文件的时间统计信息" />
+    <MESSAGE value="feat(lang): 添加类型转换函数并优化虚拟机数值处理&#10;&#10;- 注册IntFunction和DoubleFunction类型转换函数&#10;- 实现嵌套数组访问调试测试用例&#10;- 添加完整的类型转换函数实现支持int/double转换&#10;- 优化虚拟机加法和乘法运算防止整数溢出&#10;- 改进数值转字符串显示避免科学计数法&#10;- 修复边界测试用例中的断言值差异&#10;- 更新极值测试用例的预期输出结果" />
+    <MESSAGE value="feat(parser): 支持深层嵌套索引访问和改进数字字面量解析&#10;&#10;- 修改 NestedIndexAccess 类，将 BaseIndex 字段重命名为 BaseExpression，&#10;  支持更深层的嵌套索引访问语法&#10;- 更新 BytecodeVisitor 中的访问逻辑，适配新的 BaseExpression 字段&#10;- 在 ExpressionParser 中添加对现有 NestedIndexAccess 的连续嵌套支持&#10;- 改进 PrimaryParser 中的数字字面量解析，按 int -&gt; long -&gt; double 顺序尝试解析&#10;- 更新 SetStatement 中的嵌套索引访问赋值逻辑，使用新的 BaseExpression 字段&#10;- 优化虚拟机中的数字显示格式，在 ToStr 方法中使用固定格式避免科学计数法" />
+    <MESSAGE value="feat(vm): 添加类元数据注册和字典迭代器特殊处理&#10;&#10;- 在虚拟机初始化时将所有类元数据注册到全局变量表中&#10;- 实现通过类名访问类元数据的功能以支持嵌套类访问&#10;- 为字典类型添加特殊迭代器处理逻辑&#10;- 字典迭代时返回键集合而非键值对以改善遍历行为" />
+    <MESSAGE value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

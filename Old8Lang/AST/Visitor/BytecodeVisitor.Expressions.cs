@@ -1046,6 +1046,45 @@ public partial class BytecodeVisitor
 
         // 生成创建对象的字节码
         Emit(OpCode.NewObject, specializedClassName);
+
+        // 查找并调用构造函数
+        var classMetadata = _compiler.GetClassMetadata(specializedClassName);
+        string? constructorName = null;
+
+        if (classMetadata != null)
+        {
+            // 优先查找 init 方法
+            if (classMetadata.Methods.Any(m => m.Name == "init"))
+            {
+                constructorName = "init";
+            }
+            // 其次查找与原始类名相同的方法
+            else if (classMetadata.Methods.Any(m => m.Name == className))
+            {
+                constructorName = className;
+            }
+        }
+
+        // 如果找到构造函数，调用它
+        if (constructorName != null && node.CallArguments != null)
+        {
+            // 复制对象引用，因为 CallMethod 会消耗它
+            Emit(OpCode.Dup);
+
+            // 生成参数代码
+            foreach (var arg in node.CallArguments)
+            {
+                arg.Accept(this);
+            }
+
+            // 调用构造函数
+            // CallMethod 操作数: [argCount, methodName]
+            // argCount 包括对象本身 + 实际参数
+            int totalArgCount = node.CallArguments.Count + 1; // +1 for 'this'
+            Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName });
+
+            // 构造函数返回 void，不需要弹出返回值
+        }
     }
 
     /// <summary>

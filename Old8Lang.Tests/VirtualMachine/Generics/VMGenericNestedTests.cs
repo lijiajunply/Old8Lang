@@ -109,8 +109,8 @@ public class VMGenericNestedTests
 
                 func addToGroup(key:K, value:V) -> void {
                     if this.groups.ContainsKey(key) {
-                        group <- this.groups[key]
-                        group.Add(value)
+                        group1 <- this.groups[key]
+                        group1.Add(value)
                     } else {
                         newGroup <- {}
                         newGroup.Add(value)
