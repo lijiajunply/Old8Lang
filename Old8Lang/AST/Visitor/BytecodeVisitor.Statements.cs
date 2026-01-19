@@ -852,7 +852,7 @@ public partial class BytecodeVisitor
 
         // 非泛型类：正常编译
         var fields = new List<string>();
-        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic)>();
+        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
         // 遍历实例成员，提取字段和方法
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
@@ -860,7 +860,8 @@ public partial class BytecodeVisitor
             if (memberExpr is FuncLangValue funcValue)
             {
                 // 这是一个实例方法
-                methods.Add((memberId.IdName, funcValue, false));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                methods.Add((memberId.IdName, funcValue, false, accessModifier));
             }
             else
             {
@@ -875,7 +876,8 @@ public partial class BytecodeVisitor
             if (memberExpr is FuncLangValue funcValue)
             {
                 // 这是一个静态方法
-                methods.Add((memberId.IdName, funcValue, true));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                methods.Add((memberId.IdName, funcValue, true, accessModifier));
             }
         }
 
@@ -1858,5 +1860,21 @@ public partial class BytecodeVisitor
         }
 
         // 栈顶现在是装饰后的函数
+    }
+
+    /// <summary>
+    /// 将 AccessModifierType 转换为 AccessModifier
+    /// </summary>
+    private AccessModifier GetAccessModifier(HashSet<AccessModifierType> modifiers)
+    {
+        if (modifiers.Contains(AccessModifierType.Private))
+        {
+            return AccessModifier.Private;
+        }
+        if (modifiers.Contains(AccessModifierType.Protected))
+        {
+            return AccessModifier.Protected;
+        }
+        return AccessModifier.Public;
     }
 }

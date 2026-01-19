@@ -915,6 +915,10 @@ public partial class VirtualMachine
                 }
                 else if (collection is IDictionary dict)
                 {
+                    if (!dict.Contains(index))
+                    {
+                        throw new Exception($"字典中不存在键: {index}");
+                    }
                     _stack.Push(dict[index]);
                 }
                 else if (collection is string str)
@@ -2466,6 +2470,29 @@ public partial class VirtualMachine
                     if (methodMetadata == null)
                     {
                         throw new Exception($"类 {bytecodeObj.ClassName} 没有方法 {methodName}");
+                    }
+
+                    // 检查方法访问修饰符
+                    if (methodMetadata.AccessModifier == AccessModifier.Private)
+                    {
+                        // 检查是否在类内部调用（通过检查当前调用栈中是否有该类的方法）
+                        bool isInternalCall = false;
+                        foreach (var callFrame in _callStack)
+                        {
+                            // 检查当前帧的第一个参数（this）是否是同一个类的实例
+                            if (callFrame.Arguments != null && callFrame.Arguments.Length > 0 &&
+                                callFrame.Arguments[0] is BytecodeObjectInstance frameObj &&
+                                frameObj.ClassName == bytecodeObj.ClassName)
+                            {
+                                isInternalCall = true;
+                                break;
+                            }
+                        }
+
+                        if (!isInternalCall)
+                        {
+                            throw new Exception($"无法访问类 {bytecodeObj.ClassName} 的私有方法 {methodName}");
+                        }
                     }
 
                     // 准备方法调用参数：第一个参数是 this（对象本身）

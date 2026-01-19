@@ -511,7 +511,7 @@ public class BytecodeCompiler
     }
 
     public void DeclareClass(string className, List<string> fields,
-        List<(string methodName, FuncLangValue funcValue, bool isStatic)> methods,
+        List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
         string? parentClassName,
         List<string>? implementsNames = null,
         List<string>? mixinNames = null)
@@ -527,7 +527,7 @@ public class BytecodeCompiler
         };
 
         // 编译所有方法
-        foreach (var (methodName, funcValue, isStatic) in methods)
+        foreach (var (methodName, funcValue, isStatic, accessModifier) in methods)
         {
             // 提取方法参数
             var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
@@ -571,6 +571,7 @@ public class BytecodeCompiler
             {
                 Name = methodName,
                 IsStatic = isStatic,
+                AccessModifier = accessModifier,
                 Function = functionMetadata
             };
 

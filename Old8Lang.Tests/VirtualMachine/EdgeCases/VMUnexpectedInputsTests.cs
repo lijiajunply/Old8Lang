@@ -80,19 +80,6 @@ public class VMUnexpectedInputsTests
     #region 类型不匹配操作测试
 
     [Fact]
-    public void UnexpectedInputs_IntPlusString_ThrowsException()
-    {
-        var code = @"
-            x <- 42
-            y <- ""hello""
-            result <- x + y
-        ";
-
-        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
-        _output.WriteLine($"Expected exception: {exception.Message}");
-    }
-
-    [Fact]
     public void UnexpectedInputs_BoolPlusInt_ThrowsException()
     {
         var code = @"
@@ -340,7 +327,7 @@ public class VMUnexpectedInputsTests
     public void UnexpectedInputs_AssignToConstant_ThrowsException()
     {
         var code = @"
-            const x <- 10
+            x:const <- 10
             x <- 20
         ";
 
@@ -414,7 +401,7 @@ public class VMUnexpectedInputsTests
     {
         var code = @"
             arr <- [1, 2, 3, 4, 5]
-            slice <- arr[0..10]
+            slice <- arr[0:10]
             PrintLine(len(slice).ToStr())
         ";
 

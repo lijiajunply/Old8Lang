@@ -40,7 +40,7 @@ public class BytecodeGeneratorLangValue : LangValueType, IEnumerable<LangValueTy
     public bool MoveNext()
     {
         if (IsCompleted)
-            return false;
+            throw new Exception("生成器已完成，无法继续调用 MoveNext");
 
         // 调用虚拟机的ResumeGenerator方法来恢复生成器执行
         var result = _vm.ResumeGenerator(GeneratorId);
@@ -54,7 +54,8 @@ public class BytecodeGeneratorLangValue : LangValueType, IEnumerable<LangValueTy
         {
             IsCompleted = true;
             Current = null;
-            return false;
+            // 生成器已完成，抛出异常
+            throw new Exception("生成器已完成，无法继续调用 MoveNext");
         }
     }
 

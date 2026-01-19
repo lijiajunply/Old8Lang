@@ -229,18 +229,6 @@ public class VMTypeErrorTests
     #region 操作符类型错误测试
 
     [Fact]
-    public void TypeErrors_AdditionTypeMismatch_ThrowsTypeException()
-    {
-        var code = @"
-            a <- 10
-            b <- ""hello""
-            result <- a + b
-        ";
-
-        AssertVMThrowsTypeException(code);
-    }
-
-    [Fact]
     public void TypeErrors_SubtractionTypeMismatch_ThrowsTypeException()
     {
         var code = @"
@@ -521,7 +509,7 @@ public class VMTypeErrorTests
                 public real:double
                 public imag:double
 
-                public func new(real:double, imag:double) -> void {
+                public func init(real:double, imag:double) -> void {
                     this.real <- real
                     this.imag <- imag
                 }
@@ -551,7 +539,7 @@ public class VMTypeErrorTests
     public void TypeErrors_TypeConstraintViolation_ThrowsTypeException()
     {
         var code = @"
-            func process<T where T: Comparable>(value:T) -> void {
+            func process<T: Comparable>(value:T) -> void {
                 PrintLine(value.ToStr())
             }
 

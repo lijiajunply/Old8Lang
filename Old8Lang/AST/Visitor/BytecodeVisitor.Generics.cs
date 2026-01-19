@@ -37,7 +37,7 @@ public partial class BytecodeVisitor
         }
 
         // 收集方法（从实例成员和静态成员中提取）
-        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic)>();
+        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
         // 实例方法
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
@@ -46,7 +46,8 @@ public partial class BytecodeVisitor
             {
                 // 创建方法的特化版本（替换类型参数）
                 var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
-                methods.Add((memberId.IdName, specializedMethod, false));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                methods.Add((memberId.IdName, specializedMethod, false, accessModifier));
             }
         }
 
@@ -56,7 +57,8 @@ public partial class BytecodeVisitor
             if (memberExpr is FuncLangValue funcValue)
             {
                 var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
-                methods.Add((memberId.IdName, specializedMethod, true));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                methods.Add((memberId.IdName, specializedMethod, true, accessModifier));
             }
         }
 
