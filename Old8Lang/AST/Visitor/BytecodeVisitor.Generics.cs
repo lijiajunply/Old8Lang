@@ -63,7 +63,7 @@ public partial class BytecodeVisitor
         }
 
         // 注册特化类
-        _compiler.DeclareClass(specializedClassName, fields, methods, null);
+        _compiler.DeclareClass(specializedClassName, fields, [], methods, null);
     }
 
     /// <summary>

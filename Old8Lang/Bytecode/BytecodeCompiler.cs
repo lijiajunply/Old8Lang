@@ -507,10 +507,11 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields)
     {
-        DeclareClass(className, fields, [], null);
+        DeclareClass(className, fields, [], [], null);
     }
 
     public void DeclareClass(string className, List<string> fields,
+        List<(string fieldName, LangExpression initialValue)> staticFields,
         List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
         string? parentClassName,
         List<string>? implementsNames = null,
@@ -525,6 +526,28 @@ public class BytecodeCompiler
             ImplementsInterfaces = implementsNames ?? [],
             Mixins = mixinNames ?? []
         };
+
+        // 处理静态字段
+        foreach (var (fieldName, initialValue) in staticFields)
+        {
+            // 计算静态字段的初始值并添加到常量池
+            var constantValue = EvaluateConstantExpression(initialValue);
+            int constantIndex = ConstantPool.AddConstant(constantValue ?? 0);
+
+            // 创建静态字段元数据
+            var staticFieldMetadata = new FieldMetadata
+            {
+                Name = fieldName,
+                IsStatic = true,
+                DefaultValueIndex = constantIndex
+            };
+
+            classMetadata.StaticFields.Add(staticFieldMetadata);
+        }
+
+        // 先将类元数据添加到字节码文件中
+        // 这样在编译方法体时，IsClassName 可以正确识别类名
+        _bytecodeFile.Classes.Add(classMetadata);
 
         // 编译所有方法
         foreach (var (methodName, funcValue, isStatic, accessModifier) in methods)
@@ -585,8 +608,6 @@ public class BytecodeCompiler
                 classMetadata.Methods.Add(methodMetadata);
             }
         }
-
-        _bytecodeFile.Classes.Add(classMetadata);
     }
 
     public bool IsClassName(string name)

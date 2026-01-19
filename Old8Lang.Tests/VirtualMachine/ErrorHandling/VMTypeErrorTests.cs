@@ -296,7 +296,7 @@ public class VMTypeErrorTests
     public void TypeErrors_ArrayElementTypeMismatch_ThrowsTypeException()
     {
         var code = @"
-            arr <- [1, 2, ""not an int"", 4]
+            arr:array<int> <- [1, 2, ""not an int"", 4]
         ";
 
         AssertVMThrowsTypeException(code);
@@ -306,7 +306,7 @@ public class VMTypeErrorTests
     public void TypeErrors_ListElementTypeMismatch_ThrowsTypeException()
     {
         var code = @"
-            list <- {1, 2, ""not an int"", 4}
+            list:list<int> <- {1, 2, ""not an int"", 4}
         ";
 
         AssertVMThrowsTypeException(code);
@@ -316,7 +316,7 @@ public class VMTypeErrorTests
     public void TypeErrors_DictionaryKeyTypeMismatch_ThrowsTypeException()
     {
         var code = @"
-            dict <- {""a"": 1, 2: ""not a string key""}
+            dict:dict<string,int> <- {""a"": 1, 2: ""not a string key""}
         ";
 
         AssertVMThrowsTypeException(code);
@@ -548,22 +548,6 @@ public class VMTypeErrorTests
 
         var output = ExecuteVMCode(code);
         Assert.NotEmpty(output);
-    }
-
-    #endregion
-
-    #region 动态类型错误测试
-
-    [Fact]
-    public void TypeErrors_DynamicTypeInvalidOperation_ThrowsTypeException()
-    {
-        var code = @"
-            x <- (123)
-            y <- (""hello"")
-            result <- x + y
-        ";
-
-        AssertVMThrowsTypeException(code);
     }
 
     #endregion

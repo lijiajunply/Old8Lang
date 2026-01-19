@@ -196,6 +196,13 @@ public class ClassMetadata
     public int ClassIndex { get; set; } = -1;
 
     /// <summary>
+    /// 静态字段的运行时值存储
+    /// key: 字段名
+    /// value: 字段值
+    /// </summary>
+    public Dictionary<string, object?> StaticFieldValues { get; set; } = new();
+
+    /// <summary>
     /// 写入二进制流
     /// </summary>
     public void WriteTo(BinaryWriter writer)

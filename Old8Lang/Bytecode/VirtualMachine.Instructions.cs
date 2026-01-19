@@ -1968,8 +1968,20 @@ public partial class VirtualMachine
                     throw new Exception($"无法访问 null 对象的字段 {fieldName}");
                 }
 
+                // 如果是 ClassMetadata（访问静态字段）
+                if (obj is ClassMetadata classMetadata)
+                {
+                    if (classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
+                    {
+                        _stack.Push(staticValue);
+                    }
+                    else
+                    {
+                        throw new Exception($"类 {classMetadata.Name} 没有静态字段 {fieldName}");
+                    }
+                }
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
-                if (obj is BytecodeObjectInstance bytecodeObj)
+                else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
                     if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
                     {
@@ -2155,8 +2167,20 @@ public partial class VirtualMachine
                     throw new Exception($"无法设置 null 对象的字段 {fieldName}");
                 }
 
+                // 如果是 ClassMetadata（设置静态字段）
+                if (obj is ClassMetadata classMetadata)
+                {
+                    if (classMetadata.StaticFieldValues.ContainsKey(fieldName))
+                    {
+                        classMetadata.StaticFieldValues[fieldName] = value;
+                    }
+                    else
+                    {
+                        throw new Exception($"类 {classMetadata.Name} 没有静态字段 {fieldName}");
+                    }
+                }
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
-                if (obj is BytecodeObjectInstance bytecodeObj)
+                else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
                     bytecodeObj.Fields[fieldName] = value;
                 }

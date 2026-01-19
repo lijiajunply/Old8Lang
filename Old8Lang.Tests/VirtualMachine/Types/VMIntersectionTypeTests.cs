@@ -50,7 +50,7 @@ public class VMIntersectionTypeTests
             class Document implements IReadable, IWritable {
                 private content:string
 
-                public func constructor() -> void {
+                public func init() -> void {
                     this.content <- """"
                 }
 
@@ -63,7 +63,7 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            doc <- new Document()
+            doc <- Document()
             doc.write(""Hello"")
             result <- doc.read()
         ";
@@ -100,7 +100,7 @@ public class VMIntersectionTypeTests
                 private name:string
                 private count:int
 
-                public func constructor(n:string, c:int) -> void {
+                public func init(n:string, c:int) -> void {
                     this.name <- n
                     this.count <- c
                 }
@@ -118,7 +118,7 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            item <- new Item(""Apple"", 5)
+            item <- Item(""Apple"", 5)
             result1 <- item.getName()
             result2 <- item.getCount()
             result3 <- item.getDescription()
@@ -150,7 +150,7 @@ public class VMIntersectionTypeTests
             class Number implements IComparable {
                 private value:int
 
-                public func constructor(v:int) -> void {
+                public func init(v:int) -> void {
                     this.value <- v
                 }
 
@@ -170,8 +170,8 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            num1 <- new Number(10)
-            num2 <- new Number(20)
+            num1 <- Number(10)
+            num2 <- Number(20)
             result <- num1.compareTo(num2)
         ";
 
@@ -202,7 +202,7 @@ public class VMIntersectionTypeTests
             class DataHandler implements IProcessor, IValidator {
                 private data:string
 
-                public func constructor(d:string) -> void {
+                public func init(d:string) -> void {
                     this.data <- d
                 }
 
@@ -215,7 +215,7 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            handler <- new DataHandler(""test"")
+            handler <- DataHandler(""test"")
             result1 <- handler.validate()
             result2 <- handler.process()
         ";
@@ -244,7 +244,7 @@ public class VMIntersectionTypeTests
             class Base {
                 protected value:int
 
-                public func constructor(v:int) -> void {
+                public func init(v:int) -> void {
                     this.value <- v
                 }
 
@@ -254,8 +254,8 @@ public class VMIntersectionTypeTests
             }
 
             class Derived extends Base implements ISerializable {
-                public func constructor(v:int) -> void {
-                    super(v)
+                public func init(v:int) -> void {
+                    super.init(v)
                 }
 
                 public func serialize() -> string {
@@ -263,7 +263,7 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            obj <- new Derived(42)
+            obj <- Derived(42)
             result1 <- obj.getValue()
             result2 <- obj.serialize()
         ";
@@ -346,7 +346,7 @@ public class VMIntersectionTypeTests
             class Item implements IPrintable {
                 private name:string
 
-                public func constructor(n:string) -> void {
+                public func init(n:string) -> void {
                     this.name <- n
                 }
 
@@ -356,9 +356,9 @@ public class VMIntersectionTypeTests
             }
 
             items <- {}
-            items.Add(new Item(""A""))
-            items.Add(new Item(""B""))
-            items.Add(new Item(""C""))
+            items.Add(Item(""A""))
+            items.Add(Item(""B""))
+            items.Add(Item(""C""))
 
             results <- {}
             for item in items {
@@ -395,7 +395,7 @@ public class VMIntersectionTypeTests
             class Circle implements IShape, IDrawable {
                 private radius:double
 
-                public func constructor(r:double) -> void {
+                public func init(r:double) -> void {
                     this.radius <- r
                 }
 
@@ -408,7 +408,7 @@ public class VMIntersectionTypeTests
                 }
             }
 
-            circle <- new Circle(5.0)
+            circle <- Circle(5.0)
             result1 <- circle.getArea()
             result2 <- circle.draw()
         ";

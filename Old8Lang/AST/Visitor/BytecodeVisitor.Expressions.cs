@@ -22,6 +22,12 @@ public partial class BytecodeVisitor
             int localIndex = _compiler.GetLocalIndex(varName);
             Emit(OpCode.LoadLocal, localIndex);
         }
+        // 检查是否是类名（优先于实例字段检查）
+        else if (_compiler.IsClassName(varName))
+        {
+            // 这是一个类名，应该作为全局变量加载（类元数据）
+            Emit(OpCode.LoadGlobal, varName);
+        }
         else
         {
             // 检查是否在类方法中，且 this 是局部变量（实例方法）

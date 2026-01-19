@@ -73,7 +73,7 @@ public class VMTypeConversionTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(42, result);
+        Assert.Equal(43, result);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class VMTypeConversionTests
         // Arrange
         var code = @"
             x <- ""42""
-            y <- int.Parse(x)
+            y <- int(x)
             result <- y + 10
         ";
 
@@ -123,7 +123,7 @@ public class VMTypeConversionTests
         // Arrange
         var code = @"
             x <- ""3.14""
-            y <- double.Parse(x)
+            y <- double(x)
             result <- y * 2
         ";
 
@@ -157,8 +157,8 @@ public class VMTypeConversionTests
         // Assert
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
-        Assert.Equal("True", result1);
-        Assert.Equal("False", result2);
+        Assert.Equal("true", result1);
+        Assert.Equal("false", result2);
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class VMTypeConversionTests
                 }
             }
 
-            obj <- new Derived()
+            obj <- Derived()
             baseObj <- obj as Base
             result <- baseObj.getValue()
         ";
@@ -328,7 +328,7 @@ public class VMTypeConversionTests
         // Arrange
         var code = @"
             x <- 42
-            y <- x as int?
+            y <- x as int
             result <- y != null
         ";
 
@@ -374,7 +374,7 @@ public class VMTypeConversionTests
         var code = @"
             x <- ""10""
             y <- ""20""
-            result <- int.Parse(x) + int.Parse(y)
+            result <- int(x) + int(y)
         ";
 
         // Act

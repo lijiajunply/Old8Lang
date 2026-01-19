@@ -52,6 +52,18 @@ public partial class VirtualMachine
         foreach (var classMetadata in _bytecodeFile.Classes)
         {
             _globals[classMetadata.Name] = classMetadata;
+
+            // 初始化静态字段的默认值
+            foreach (var staticField in classMetadata.StaticFields)
+            {
+                // 从常量池获取默认值
+                object? defaultValue = null;
+                if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                {
+                    defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
+                }
+                classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
+            }
         }
     }
 

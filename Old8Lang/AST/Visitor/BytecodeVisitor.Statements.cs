@@ -882,6 +882,7 @@ public partial class BytecodeVisitor
 
         // 非泛型类：正常编译
         var fields = new List<string>();
+        var staticFields = new List<(string fieldName, LangExpression initialValue)>();
         var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
         // 遍历实例成员，提取字段和方法
@@ -900,7 +901,7 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 遍历静态成员，提取静态方法
+        // 遍历静态成员，提取静态字段和静态方法
         foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
         {
             if (memberExpr is FuncLangValue funcValue)
@@ -909,10 +910,15 @@ public partial class BytecodeVisitor
                 var accessModifier = GetAccessModifier(memberId.Modifiers);
                 methods.Add((memberId.IdName, funcValue, true, accessModifier));
             }
+            else
+            {
+                // 这是一个静态字段
+                staticFields.Add((memberId.IdName, memberExpr));
+            }
         }
 
         // 在编译器中注册类定义（包括方法、接口和Mixin）
-        _compiler.DeclareClass(className, fields, methods, typeTemplate.ParentClassName,
+        _compiler.DeclareClass(className, fields, staticFields, methods, typeTemplate.ParentClassName,
             typeTemplate.ImplementsNames, typeTemplate.MixinNames);
 
         // 类定义本身不生成运行时指令
