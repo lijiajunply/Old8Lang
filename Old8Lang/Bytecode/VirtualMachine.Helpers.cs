@@ -72,7 +72,14 @@ public partial class VirtualMachine
         }
 
         // 原有的基本类型处理逻辑
-        if (a is int ia && b is int ib) return ia + ib;
+        if (a is int ia && b is int ib)
+        {
+            // 检查是否会溢出，如果会则使用 long
+            long result = (long)ia + (long)ib;
+            if (result > int.MaxValue || result < int.MinValue)
+                return result;
+            return (int)result;
+        }
         if (a is double da && b is double db) return da + db;
         if (a is int ia2 && b is double db2) return ia2 + db2;
         if (a is double da2 && b is int ib2) return da2 + ib2;
@@ -165,7 +172,14 @@ public partial class VirtualMachine
             }
         }
 
-        if (a is int ia && b is int ib) return ia * ib;
+        if (a is int ia && b is int ib)
+        {
+            // 检查是否会溢出，如果会则使用 long
+            long result = (long)ia * (long)ib;
+            if (result > int.MaxValue || result < int.MinValue)
+                return result;
+            return (int)result;
+        }
         if (a is double da && b is double db) return da * db;
         if (a is int ia2 && b is double db2) return ia2 * db2;
         if (a is double da2 && b is int ib2) return da2 * ib2;
@@ -529,6 +543,22 @@ public partial class VirtualMachine
             var items = (from object? key in dict.Keys select $"{ToString(key)}: {ToString(dict[key])}").ToList();
 
             return "{" + string.Join(", ", items) + "}";
+        }
+
+        // 处理数字类型，确保不使用科学计数法
+        if (value is int || value is long || value is short || value is byte)
+        {
+            return value.ToString() ?? "";
+        }
+
+        if (value is double d)
+        {
+            // 对于 double，如果是整数值，显示为整数
+            if (Math.Abs(d - Math.Round(d)) < 0.0000001)
+            {
+                return ((long)d).ToString();
+            }
+            return d.ToString();
         }
 
         return value.ToString() ?? "";

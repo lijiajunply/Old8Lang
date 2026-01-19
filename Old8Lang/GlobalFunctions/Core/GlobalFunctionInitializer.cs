@@ -37,6 +37,10 @@ public static class GlobalFunctionInitializer
             registry.Register(new AssertFunction());
             registry.Register(new ShowValuesFunction());
 
+            // 注册类型转换函数
+            registry.Register(new IntFunction());
+            registry.Register(new DoubleFunction());
+
             // 注册系统函数（从 Instance.cs 迁移）
             registry.Register(new LockFunction());
             registry.Register(new ExecFunction());

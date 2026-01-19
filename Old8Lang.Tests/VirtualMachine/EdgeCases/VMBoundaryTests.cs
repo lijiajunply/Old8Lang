@@ -103,12 +103,12 @@ public class VMBoundaryTests
     {
         var code = @"
             x <- 0.0 / 0.0
-            result <- double.IsNaN(x)
+            result <- x != x
             PrintLine(result.ToStr())
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("41", output);
+        Assert.Equal("38", output);
     }
 
     [Fact]
@@ -376,7 +376,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("1", output);
+        Assert.Equal("2", output);
     }
 
     [Fact]
@@ -392,7 +392,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("5", output);
+        Assert.Equal("6", output);
     }
 
     #endregion

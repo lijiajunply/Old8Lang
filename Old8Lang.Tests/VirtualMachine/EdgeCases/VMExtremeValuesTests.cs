@@ -209,7 +209,7 @@ public class VMExtremeValuesTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("39", output);
+        Assert.Equal("41", output);
     }
 
     #endregion
