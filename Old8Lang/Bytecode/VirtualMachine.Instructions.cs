@@ -1047,7 +1047,14 @@ public partial class VirtualMachine
             case OpCode.GetIterator:
             {
                 var collection = _stack.Pop();
-                if (collection is IEnumerable enumerable)
+
+                // 特殊处理字典：迭代键而不是键值对
+                if (collection is IDictionary dict)
+                {
+                    var enumerator = dict.Keys.GetEnumerator();
+                    _stack.Push(enumerator);
+                }
+                else if (collection is IEnumerable enumerable)
                 {
                     var enumerator = enumerable.GetEnumerator();
                     _stack.Push(enumerator);

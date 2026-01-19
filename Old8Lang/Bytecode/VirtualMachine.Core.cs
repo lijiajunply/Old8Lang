@@ -46,6 +46,13 @@ public partial class VirtualMachine
         {
             _globals[globalVar] = null;
         }
+
+        // 将所有类元数据注册到全局变量表中
+        // 这样在运行时可以通过类名访问类元数据（用于嵌套类访问等）
+        foreach (var classMetadata in _bytecodeFile.Classes)
+        {
+            _globals[classMetadata.Name] = classMetadata;
+        }
     }
 
     /// <summary>
