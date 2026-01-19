@@ -241,6 +241,7 @@ public class VMUsingTests
     public void UsingWithDefer_ExecutesInCorrectOrder()
     {
         // Arrange
+        // 注意：defer 是函数级作用域，在函数返回前执行，而非代码块结束时
         var code = @"
             func test() -> void {
                 using mutex <- MutexCreate() {
@@ -263,14 +264,15 @@ public class VMUsingTests
         Assert.Equal(4, lines.Length);
         Assert.Equal("Using mutex", lines[0]);
         Assert.Equal("Lock acquired", lines[1]);
-        Assert.Equal("Defer cleanup", lines[2]); // defer 在 using 块结束前执行
-        Assert.Equal("After using", lines[3]); // using 资源释放在 defer 之后
+        Assert.Equal("After using", lines[2]); // using 块结束后继续执行
+        Assert.Equal("Defer cleanup", lines[3]); // defer 在函数返回前执行
     }
 
     [Fact]
     public void UsingWithDeferAndException_BothExecute()
     {
         // Arrange
+        // 注意：在虚拟机模式下，defer 在异常处理前执行（因为异常触发了函数的退出流程）
         var code = @"
             func test() -> void {
                 try {
@@ -294,14 +296,16 @@ public class VMUsingTests
         var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("Using channel", lines[0]);
-        Assert.Equal("Defer cleanup", lines[1]); // defer 先执行
-        Assert.Equal("Caught: Test exception", lines[2]); // using 资源释放后才捕获异常
+        // 虚拟机模式下，defer 在异常处理前执行
+        Assert.Equal("Defer cleanup", lines[1]);
+        Assert.Equal("Caught: Test exception", lines[2]);
     }
 
     [Fact]
     public void UsingWithMultipleDefers_ExecutesInCorrectOrder()
     {
         // Arrange
+        // 注意：defer 是函数级作用域，在函数返回前执行（LIFO 顺序）
         var code = @"
             func test() -> void {
                 using mutex <- MutexCreate() {
@@ -322,10 +326,10 @@ public class VMUsingTests
         var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(5, lines.Length);
         Assert.Equal("Main code", lines[0]);
-        Assert.Equal("Defer 3", lines[1]); // LIFO 顺序
-        Assert.Equal("Defer 2", lines[2]);
-        Assert.Equal("Defer 1", lines[3]);
-        Assert.Equal("After using", lines[4]); // using 资源释放在所有 defer 之后
+        Assert.Equal("After using", lines[1]); // using 块结束后继续执行
+        Assert.Equal("Defer 3", lines[2]); // LIFO 顺序，defer 在函数返回前执行
+        Assert.Equal("Defer 2", lines[3]);
+        Assert.Equal("Defer 1", lines[4]);
     }
 
     [Fact]

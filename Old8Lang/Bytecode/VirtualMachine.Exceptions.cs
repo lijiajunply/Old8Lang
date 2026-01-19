@@ -54,7 +54,7 @@ public partial class VirtualMachine
         // 获取异常发生时的指令位置（已经+1了，所以要-1）
         int exceptionIP = frame.IP - 1;
 
-        // 遍历异常表，查找匹配的处理器
+        // 遍历异常表，查找匹配的处理器（从内到外）
         foreach (var entry in function.ExceptionTable)
         {
             // 检查异常是否发生在这个try块中
@@ -63,20 +63,23 @@ public partial class VirtualMachine
                 // 检查异常类型是否匹配
                 if (IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
                 {
-                    // 将异常对象压入栈
-                    _stack.Push(exceptionValue);
-
                     // 如果有catch块，跳转到catch块
                     if (entry.CatchStart >= 0)
                     {
+                        // 将异常对象压入栈
+                        _stack.Push(exceptionValue);
                         frame.IP = entry.CatchStart;
                         return true;
                     }
-                    // 如果没有catch块但有finally块，跳转到finally块
+                    // 如果没有catch块但有finally块（如using语句），执行finally块后重新抛出异常
                     else if (entry.FinallyStart >= 0)
                     {
-                        frame.IP = entry.FinallyStart;
-                        return true;
+                        // 执行finally块
+                        ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
+
+                        // finally块执行完后，继续查找外层的异常处理器
+                        // 不返回true，让异常继续向外传播
+                        continue;
                     }
                 }
             }
@@ -84,6 +87,31 @@ public partial class VirtualMachine
 
         // 没有找到匹配的处理器
         return false;
+    }
+
+    /// <summary>
+    /// 执行finally块
+    /// </summary>
+    private void ExecuteFinallyBlock(CallFrame frame, FunctionMetadata function, int finallyStart, int finallyEnd)
+    {
+        // 保存当前IP
+        int savedIP = frame.IP;
+
+        // 跳转到finally块
+        frame.IP = finallyStart;
+
+        // 执行finally块中的指令
+        while (frame.IP < finallyEnd && frame.IP < function.Instructions.Count)
+        {
+            var instruction = function.Instructions[frame.IP];
+            frame.IP++;
+
+            // 执行指令（不捕获异常，让finally块中的异常直接抛出）
+            ExecuteInstruction(instruction, frame);
+        }
+
+        // 恢复IP（虽然可能不需要，因为异常会继续传播）
+        frame.IP = savedIP;
     }
 
     /// <summary>

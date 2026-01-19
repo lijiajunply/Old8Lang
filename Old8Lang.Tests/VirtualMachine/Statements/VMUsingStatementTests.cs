@@ -361,6 +361,8 @@ public class VMUsingStatementTests
     public void UsingStatement_WithDefer_ExecutesInCorrectOrder()
     {
         // Arrange
+        // 注意：defer 是函数级作用域，在函数返回前执行，而非代码块结束时
+        // 所以 defer 会在 "After using" 之后执行
         var code = @"
             func test() -> void {
                 using mutex <- MutexCreate() {
@@ -380,7 +382,7 @@ public class VMUsingStatementTests
         var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("Body", lines[0]);
-        Assert.Equal("Defer executed", lines[1]);
-        Assert.Equal("After using", lines[2]);
+        Assert.Equal("After using", lines[1]);
+        Assert.Equal("Defer executed", lines[2]); // defer 在函数返回前执行
     }
 }
