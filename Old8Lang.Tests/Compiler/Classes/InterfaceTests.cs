@@ -23,7 +23,7 @@ public class InterfaceTests
                 func draw() -> string
             }
             
-            class Circle : IDrawable {
+            class Circle implements IDrawable {
                 public radius <- 0.0
                 
                 func init(radius:double) {
@@ -35,7 +35,7 @@ public class InterfaceTests
                 }
             }
             
-            class Square : IDrawable {
+            class Square implements IDrawable {
                 public side <- 0.0
                 
                 func init(side:double) {
@@ -73,7 +73,7 @@ public class InterfaceTests
                 func divide(a:int, b:int) -> double
             }
             
-            class BasicCalculator : ICalculator {
+            class BasicCalculator implements ICalculator {
                 func add(a:int, b:int) -> int {
                     return a + b
                 }
@@ -115,11 +115,11 @@ public class InterfaceTests
                 func speak() -> string
             }
             
-            interface IPet : IAnimal {
+            interface IPet extends IAnimal {
                 func play() -> string
             }
             
-            class Dog : IPet {
+            class Dog implements IPet {
                 public name <- """"
                 
                 func init(name:string) {
@@ -161,11 +161,11 @@ public class InterfaceTests
                 func write(content:string) -> void
             }
             
-            interface IFile : IReadable, IWritable {
+            interface IFile extends IReadable, IWritable {
                 func getName() -> string
             }
             
-            class TextFile : IFile {
+            class TextFile implements IFile {
                 public name <- """"
                 public content <- """"
                 
@@ -214,7 +214,7 @@ public class InterfaceTests
                 func isFull() -> bool
             }
             
-            class Box : IContainer {
+            class Box implements IContainer {
                 public capacity <- 10
                 public items <- {}
                 
@@ -280,13 +280,13 @@ public class InterfaceTests
                 }
             }
             
-            class ConsoleLogger : ILogger {
+            class ConsoleLogger implements ILogger {
                 public func log(message:string) -> void {
                     PrintLine(""[CONSOLE] "" + message)
                 }
             }
             
-            class FileLogger : ILogger {
+            class FileLogger implements ILogger {
             }
             
             consoleLogger <- ConsoleLogger()
@@ -313,7 +313,7 @@ public class InterfaceTests
                 func perimeter() -> double
             }
             
-            class Rectangle : IShape {
+            class Rectangle implements IShape {
                 public width <- 0.0
                 public height <- 0.0
                 
@@ -331,7 +331,7 @@ public class InterfaceTests
                 }
             }
             
-            class Triangle : IShape {
+            class Triangle implements IShape {
                 public base_len <- 0.0
                 public height <- 0.0
                 
@@ -390,7 +390,7 @@ public class InterfaceTests
                 func swim() -> string
             }
             
-            class Fish : Animal, ISwimmable {
+            class Fish extends Animal implements ISwimmable {
                 public func swim() -> string {
                     return ""Swimming in water""
                 }
@@ -417,7 +417,7 @@ public class InterfaceTests
                 public static func create(type:string) -> object
             }
             
-            class WidgetFactory : IFactory {
+            class WidgetFactory implements IFactory {
                 public static func create(type:string) -> object {
                     return ""Created: "" + type
                 }
@@ -448,7 +448,7 @@ public class InterfaceTests
                 func getAll() -> list
             }
             
-            class InMemoryRepository : IRepository {
+            class InMemoryRepository implements IRepository {
                 private items <- {}
                 private nextId <- 1
                 

@@ -37,7 +37,7 @@ public class MixinTests
                 }
             }
             
-            class Article : Timestampable {
+            class Article with Timestampable {
                 public title <- """"
                 public content <- """"
                 
@@ -97,7 +97,7 @@ public class MixinTests
                 }
             }
             
-            class User : Identifiable, Nameable {
+            class User with Identifiable, Nameable {
                 public email <- """"
                 
                 func init(id:int, name:string, email:string) {
@@ -154,7 +154,7 @@ public class MixinTests
                 }
             }
             
-            class Dog : Animal, Loggable {
+            class Dog extends Animal with Loggable {
                 public func speak() -> string {
                     this.log(""Dog barked"")
                     return ""Woof""
@@ -194,7 +194,7 @@ public class MixinTests
                 }
             }
             
-            class Point : Comparable {
+            class Point with Comparable {
                 public x <- 0
                 public y <- 0
                 
@@ -253,7 +253,7 @@ public class MixinTests
                 }
             }
             
-            class Counter : Countable {
+            class Counter with Countable {
                 public name <- """"
                 
                 func init(name:string) {
@@ -309,7 +309,7 @@ public class MixinTests
                 }
             }
             
-            class ListProcessor : CollectionHelper {
+            class ListProcessor with CollectionHelper {
                 public items <- {}
                 
                 func init() {
@@ -369,7 +369,7 @@ public class MixinTests
                 }
             }
             
-            class User : Validatable {
+            class User with Validatable {
                 public name <- """"
                 public email <- """"
                 
@@ -419,7 +419,7 @@ public class MixinTests
                 }
             }
             
-            class Rectangle : AreaCalculator {
+            class Rectangle with AreaCalculator {
                 public width <- 0.0
                 public height <- 0.0
                 
@@ -433,7 +433,7 @@ public class MixinTests
                 }
             }
             
-            class Circle : AreaCalculator {
+            class Circle with AreaCalculator {
                 public radius <- 0.0
                 
                 func init(radius:double) {
@@ -492,7 +492,7 @@ public class MixinTests
                 }
             }
             
-            class Calculator : ExtendedMixin {
+            class Calculator with ExtendedMixin {
                 public func init(base:int, extended:int) {
                     this.setBaseValue(base)
                     this.setExtendedValue(extended)
@@ -530,7 +530,7 @@ public class MixinTests
                 }
             }
             
-            class Task : IProcessable, TimestampMixin {
+            class Task implements IProcessable with TimestampMixin {
                 public name <- """"
                 
                 func init(name:string) {
