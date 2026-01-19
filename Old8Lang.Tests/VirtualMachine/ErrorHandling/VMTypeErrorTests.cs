@@ -125,7 +125,7 @@ public class VMTypeErrorTests
     public void TypeErrors_GenericConstraintViolation_ThrowsTypeException()
     {
         var code = @"
-            func process<T where T: int>(value:T) -> T {
+            func process<T: int>(value:T) -> T {
                 return value
             }
 

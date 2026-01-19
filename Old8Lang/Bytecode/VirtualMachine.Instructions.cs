@@ -615,8 +615,6 @@ public partial class VirtualMachine
                 // 弹出函数对象
                 var funcObj = _stack.Pop();
 
-                Console.WriteLine($"[CallDynamic] funcObj type: {funcObj?.GetType().Name ?? "null"}");
-
                 if (funcObj is ClosureValue closure)
                 {
                     // 调用闭包：将捕获的变量作为局部变量传递
@@ -741,32 +739,18 @@ public partial class VirtualMachine
                     capturedVariables[varNames[i]] = value;
                 }
 
-                Console.WriteLine($"[MakeClosure] Frame has closure environment: {frame.ClosureEnvironment != null}");
-                if (frame.ClosureEnvironment != null)
-                {
-                    Console.WriteLine($"[MakeClosure] Frame closure environment has {frame.ClosureEnvironment.Count} vars");
-                }
-
                 // 如果当前帧有闭包环境，需要合并到新闭包中
                 // 这样嵌套闭包就能访问外层闭包的变量
                 if (frame.ClosureEnvironment != null)
                 {
                     foreach (var (varName, value) in frame.ClosureEnvironment)
                     {
-                        Console.WriteLine($"[MakeClosure] Inheriting from parent closure: {varName} = {value}");
                         // 只添加新闭包中没有的变量（避免覆盖）
                         if (!capturedVariables.ContainsKey(varName))
                         {
                             capturedVariables[varName] = value;
                         }
                     }
-                }
-
-                // 调试输出
-                Console.WriteLine($"[MakeClosure] Created closure for {funcMeta.Name} with {capturedVariables.Count} captured vars:");
-                foreach (var kvp in capturedVariables)
-                {
-                    Console.WriteLine($"  {kvp.Key} = {kvp.Value}");
                 }
 
                 // 创建闭包对象

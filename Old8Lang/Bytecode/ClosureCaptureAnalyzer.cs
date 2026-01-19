@@ -62,6 +62,32 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
+        // 处理 IfStatement（条件语句）
+        if (node is IfStatement ifStmt)
+        {
+            // 分析所有 if/elif 块
+            foreach (var child in ifStmt.Children)
+            {
+                AnalyzeNode(child);
+            }
+            // 分析 else 块
+            if (ifStmt.ElseBlock != null)
+            {
+                AnalyzeNode(ifStmt.ElseBlock);
+            }
+            return;
+        }
+
+        // 处理 IfChild（if/elif 块）
+        if (node is IfChild ifChild)
+        {
+            // 分析条件表达式
+            AnalyzeNode(ifChild.Condition);
+            // 分析块语句
+            AnalyzeNode(ifChild.Block);
+            return;
+        }
+
         // 处理 LangId（变量引用）
         if (node is LangId id)
         {

@@ -653,7 +653,8 @@ public partial class BytecodeVisitor
         Emit(OpCode.GetIterator);
 
         // 将迭代器保存到一个临时局部变量
-        int iteratorLocalIndex = _compiler.AllocateLocal("<iterator>");
+        // 使用唯一的名称避免嵌套循环中的冲突
+        int iteratorLocalIndex = _compiler.AllocateLocal($"<iterator_{GetCurrentPosition()}>");
         Emit(OpCode.StoreLocal, iteratorLocalIndex);
 
         // 循环开始标签
@@ -664,19 +665,22 @@ public partial class BytecodeVisitor
         Emit(OpCode.LoadLocal, iteratorLocalIndex);
 
         // 调用 MoveNext（栈：迭代器 → 迭代器, hasNext）
+        // 注意：IteratorMoveNext 使用 Peek，所以迭代器仍在栈上
         Emit(OpCode.IteratorMoveNext);
 
         // 如果 MoveNext 返回 false，跳出循环
+        // JumpIfFalse 会弹出 hasNext，栈上还剩迭代器
         int jumpIfFalse = GetCurrentPosition();
         Emit(OpCode.JumpIfFalse, -1);
 
-        // 加载迭代器到栈
-        Emit(OpCode.LoadLocal, iteratorLocalIndex);
+        // 此时栈上还有迭代器对象（因为 IteratorMoveNext 使用 Peek）
+        // 不需要再次加载迭代器
 
         // 获取当前元素（栈：迭代器 → 迭代器, current）
+        // 注意：IteratorCurrent 也使用 Peek，所以迭代器仍在栈上
         Emit(OpCode.IteratorCurrent);
 
-        // 将当前元素存储到循环变量
+        // 将当前元素存储到循环变量（弹出 current）
         if (_compiler.IsLocalVariable(varName))
         {
             int localIndex = _compiler.GetLocalIndex(varName);
@@ -689,6 +693,9 @@ public partial class BytecodeVisitor
             Emit(OpCode.StoreLocal, localIndex);
         }
 
+        // 此时栈上还有迭代器对象，需要弹出
+        Emit(OpCode.Pop);
+
         // 执行循环体
         body.Accept(this);
 
@@ -699,10 +706,15 @@ public partial class BytecodeVisitor
         int loopEnd = GetCurrentPosition();
         PatchJump(jumpIfFalse, loopEnd);
 
+        // 跳出循环时（通过 JumpIfFalse），栈上还有迭代器对象，需要弹出
+        Emit(OpCode.Pop);
+
         // 修补所有break跳转
+        // break 跳转到这里时，栈上没有迭代器对象（已经在循环体中被弹出了）
+        int breakTarget = GetCurrentPosition();
         foreach (var breakJump in loopLabels.BreakJumps)
         {
-            PatchJump(breakJump, loopEnd);
+            PatchJump(breakJump, breakTarget);
         }
 
         // 修补所有continue跳转

@@ -47,9 +47,9 @@ public class VMStaticMemberTests
                 }
             }
 
-            obj1 <- new Counter()
-            obj2 <- new Counter()
-            obj3 <- new Counter()
+            obj1 <- Counter()
+            obj2 <- Counter()
+            obj3 <- Counter()
 
             result <- Counter.count
         ";
@@ -110,12 +110,12 @@ public class VMStaticMemberTests
                 }
             }
 
-            obj1 <- new Config()
+            obj1 <- Config()
             result1 <- obj1.getInfo()
 
             Config.version <- ""2.0""
 
-            obj2 <- new Config()
+            obj2 <- Config()
             result2 <- obj2.getInfo()
         ";
 

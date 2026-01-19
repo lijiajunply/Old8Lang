@@ -332,7 +332,7 @@ public class VMBytecodeSerializationTests
         var code = @"
             list <- {1, 2, 3, 4, 5}
             sum <- 0
-            for x <- list {
+            for x in list {
                 sum <- sum + x
             }
             PrintLine(sum.ToStr())
@@ -405,7 +405,7 @@ public class VMBytecodeSerializationTests
         var code = @"
             arr <- [1, 2, 3, 4, 5]
             sum <- 0
-            for x <- arr {
+            for x in arr {
                 sum <- sum + x
             }
             PrintLine(sum.ToStr())

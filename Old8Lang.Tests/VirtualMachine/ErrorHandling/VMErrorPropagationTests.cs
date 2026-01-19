@@ -136,7 +136,7 @@ public class VMErrorPropagationTests
             try {
                 task <- asyncWork()
                 await task
-            } catch e {
+            } catch (e) {
                 PrintLine(""Caught: "" + e.ToStr())
             }
         ";
@@ -354,7 +354,7 @@ public class VMErrorPropagationTests
     {
         var code = @"
             try {
-                for x <- [1, 2, 3, 4, 5] {
+                for x in [1, 2, 3, 4, 5] {
                     if x == 3 {
                         throw ""For-in loop error""
                     }
@@ -742,7 +742,7 @@ public class VMErrorPropagationTests
             func level2() -> void {
                 try {
                     level3()
-                } catch e {
+                } catch (e) {
                     throw ""Level 2: "" + e.ToStr()
                 }
             }
@@ -757,7 +757,7 @@ public class VMErrorPropagationTests
 
             try {
                 level1()
-            } catch e {
+            } catch (e) {
                 PrintLine(e.ToStr())
             }
         ";

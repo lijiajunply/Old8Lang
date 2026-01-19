@@ -188,7 +188,7 @@ public class VMUnionTypeTests
     {
         // Arrange
         var code = @"
-            func processArray(arr:(int | string)[]) -> int {
+            func processArray(arr:array<int | string>) -> int {
                 count <- 0
                 for item in arr {
                     count <- count + 1
