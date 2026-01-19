@@ -1,0 +1,7 @@
+func makeAdder(x:int) -> any {
+    return (y:int) -> x + y
+}
+
+add5 <- makeAdder(5)
+result <- add5(3)
+PrintLine(result.ToStr())

@@ -35,6 +35,9 @@ public class FunctionMetadata
     /// <summary>函数在常量池中的索引(用于闭包)</summary>
     public int FunctionIndex { get; set; } = -1;
 
+    /// <summary>捕获的变量列表(用于闭包)</summary>
+    public List<string> CapturedVariables { get; set; } = [];
+
     /// <summary>异常表 - 记录try-catch-finally块的位置信息</summary>
     public List<ExceptionTableEntry> ExceptionTable { get; set; } = [];
 

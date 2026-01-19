@@ -1,0 +1,6 @@
+func testClosure(x:int) -> int {
+    return ((y:int) -> x + y)(3)
+}
+
+result <- testClosure(5)
+PrintLine(result.ToStr())

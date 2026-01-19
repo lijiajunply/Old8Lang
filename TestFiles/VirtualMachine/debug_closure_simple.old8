@@ -1,0 +1,7 @@
+x <- 10
+func testClosure() -> int {
+    return x
+}
+
+result <- testClosure()
+PrintLine(result.ToStr())

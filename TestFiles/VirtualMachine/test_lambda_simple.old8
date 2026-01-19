@@ -1,0 +1,4 @@
+// 简单的 Lambda 测试
+square <- (x:int) -> x * x
+result <- square(7)
+PrintLine("Result: " + result.ToStr())

@@ -29,6 +29,11 @@ public partial class SetStatement : OldStatement
     private readonly LangExpression? _leftExpression;
 
     /// <summary>
+    /// 获取左侧表达式（用于成员访问或索引访问赋值）
+    /// </summary>
+    public LangExpression? LeftExpression => _leftExpression;
+
+    /// <summary>
     /// 赋值表达式
     /// </summary>
     public readonly LangExpression Value;

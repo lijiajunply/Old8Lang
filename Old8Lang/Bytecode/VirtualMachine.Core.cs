@@ -144,6 +144,67 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 调用闭包函数（带捕获变量）
+    /// </summary>
+    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, Dictionary<string, object?> capturedVariables)
+    {
+        // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
+        object?[] processedArguments = arguments;
+        if (function.ParamsParameterIndex >= 0)
+        {
+            processedArguments = ProcessParamsArguments(function, arguments);
+        }
+
+        // 创建调用帧，并设置闭包环境
+        var frame = new CallFrame(function, function.LocalCount)
+        {
+            Arguments = processedArguments,
+            ClosureEnvironment = capturedVariables  // 将捕获的变量设置为闭包环境
+        };
+
+        // 将参数复制到局部变量槽(前N个局部变量是参数)
+        for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
+        {
+            frame.Locals[i] = processedArguments[i];
+        }
+
+        _callStack.Push(frame);
+
+        try
+        {
+            // 执行指令
+            while (frame.IP < function.Instructions.Count)
+            {
+                var instruction = function.Instructions[frame.IP];
+                frame.IP++;
+
+                try
+                {
+                    ExecuteInstruction(instruction, frame);
+                }
+                catch (Exception ex)
+                {
+                    // 异常发生时，先执行所有 defer 块
+                    ExecuteDefers(frame);
+
+                    // 异常处理：查找异常表中匹配的处理器
+                    if (!HandleException(ex, frame, function))
+                    {
+                        // 如果没有找到匹配的处理器，重新抛出异常
+                        throw;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            // 函数正常退出时，执行所有 defer 块
+            ExecuteDefers(frame);
+            _callStack.Pop();
+        }
+    }
+
+    /// <summary>
     /// 处理params参数：将多余的参数打包成数组
     /// </summary>
     private object?[] ProcessParamsArguments(FunctionMetadata function, object?[] arguments)
@@ -201,8 +262,8 @@ public partial class VirtualMachine
         {
             if (funcObj is ClosureValue closure)
             {
-                // 闭包：调用闭包的函数
-                CallFunction(closure.Function, arguments);
+                // 闭包：调用闭包的函数，传递捕获的变量
+                CallClosureFunction(closure.Function, arguments, closure.CapturedVariables);
             }
             else if (funcObj is FunctionMetadata function)
             {

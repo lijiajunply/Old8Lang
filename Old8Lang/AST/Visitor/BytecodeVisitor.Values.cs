@@ -592,48 +592,44 @@ public partial class BytecodeVisitor
         var analyzer = new ClosureCaptureAnalyzer();
         var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
 
-        // 4. 编译 Lambda 函数体
-        _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex);
+        // 4. 过滤出实际存在的变量
+        var actualCapturedVars = new List<string>();
+        foreach (var varName in capturedVars)
+        {
+            if (_compiler.IsLocalVariable(varName) || _compiler.IsGlobalVariable(varName))
+            {
+                actualCapturedVars.Add(varName);
+            }
+            // 如果变量不存在，跳过它（可能是全局函数名等）
+        }
 
-        // 5. 获取编译后的函数索引
+        // 5. 编译 Lambda 函数体，传递捕获的变量列表
+        _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars);
+
+        // 6. 获取编译后的函数索引
         int funcIndex = _compiler.GetFunctionIndex(lambdaName);
 
-        // 6. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令
-        if (capturedVars.Count > 0)
+        // 7. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令
+        if (actualCapturedVars.Count > 0)
         {
-            // 过滤出实际存在的变量
-            var actualCapturedVars = new List<string>();
-
             // 为每个捕获的变量加载其值到栈
-            foreach (var varName in capturedVars)
+            foreach (var varName in actualCapturedVars)
             {
                 if (_compiler.IsLocalVariable(varName))
                 {
                     int localIndex = _compiler.GetLocalIndex(varName);
                     Emit(OpCode.LoadLocal, localIndex);
-                    actualCapturedVars.Add(varName);
                 }
                 else if (_compiler.IsGlobalVariable(varName))
                 {
                     Emit(OpCode.LoadGlobal, varName);
-                    actualCapturedVars.Add(varName);
                 }
-                // 如果变量不存在，跳过它（可能是全局函数名等）
             }
 
-            // 只有在有实际捕获的变量时才生成闭包
-            if (actualCapturedVars.Count > 0)
-            {
-                // 生成 MakeClosure 指令
-                // 操作数: [funcIndex, capturedVarCount, varNames...]
-                var operand = new object[] { funcIndex, actualCapturedVars.Count, actualCapturedVars.ToArray() };
-                Emit(OpCode.MakeClosure, operand);
-            }
-            else
-            {
-                // 没有实际捕获的变量，生成普通的 MakeFunction 指令
-                Emit(OpCode.MakeFunction, funcIndex);
-            }
+            // 生成 MakeClosure 指令
+            // 操作数: [funcIndex, capturedVarCount, varNames...]
+            var operand = new object[] { funcIndex, actualCapturedVars.Count, actualCapturedVars.ToArray() };
+            Emit(OpCode.MakeClosure, operand);
         }
         else
         {

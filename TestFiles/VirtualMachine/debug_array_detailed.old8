@@ -1,0 +1,8 @@
+arr <- [1, 2, 3]
+PrintLine("Initial array: " + arr[0].ToStr() + ", " + arr[1].ToStr() + ", " + arr[2].ToStr())
+
+arr[1] <- 99
+PrintLine("After arr[1] <- 99: " + arr[0].ToStr() + ", " + arr[1].ToStr() + ", " + arr[2].ToStr())
+
+arr[0] <- 88
+PrintLine("After arr[0] <- 88: " + arr[0].ToStr() + ", " + arr[1].ToStr() + ", " + arr[2].ToStr())

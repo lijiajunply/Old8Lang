@@ -54,6 +54,14 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
+        // 处理 ReturnStatement（返回语句）
+        if (node is ReturnStatement returnStmt)
+        {
+            // 分析返回值表达式
+            AnalyzeNode(returnStmt.Expression);
+            return;
+        }
+
         // 处理 LangId（变量引用）
         if (node is LangId id)
         {

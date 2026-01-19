@@ -45,12 +45,21 @@ public partial class VirtualMachine
             case OpCode.LoadGlobal:
             {
                 string varName = (string)instruction.Operand!;
-                if (!_globals.TryGetValue(varName, out var value))
+
+                // 先检查闭包环境
+                if (frame.ClosureEnvironment != null && frame.ClosureEnvironment.TryGetValue(varName, out var closureValue))
+                {
+                    _stack.Push(closureValue);
+                }
+                // 再检查全局变量
+                else if (_globals.TryGetValue(varName, out var globalValue))
+                {
+                    _stack.Push(globalValue);
+                }
+                else
                 {
                     throw new Exception($"未定义的全局变量: {varName}");
                 }
-
-                _stack.Push(value);
             }
                 break;
 
@@ -606,62 +615,36 @@ public partial class VirtualMachine
                 // 弹出函数对象
                 var funcObj = _stack.Pop();
 
+                Console.WriteLine($"[CallDynamic] funcObj type: {funcObj?.GetType().Name ?? "null"}");
+
                 if (funcObj is ClosureValue closure)
                 {
-                    // 调用闭包：需要将捕获的变量添加到全局变量中
-                    // 保存原有的全局变量值
-                    var savedGlobals = new Dictionary<string, object?>();
-                    foreach (var (varName, value) in closure.CapturedVariables)
-                    {
-                        if (_globals.ContainsKey(varName))
-                        {
-                            savedGlobals[varName] = _globals[varName];
-                        }
-                        _globals[varName] = value;
-                    }
+                    // 调用闭包：将捕获的变量作为局部变量传递
+                    var funcMeta = closure.Function;
 
-                    try
+                    if (funcMeta.IsGenerator)
                     {
-                        // 调用函数
-                        var funcMeta = closure.Function;
-                        if (funcMeta.IsGenerator)
+                        if (funcMeta.IsAsync)
                         {
-                            if (funcMeta.IsAsync)
-                            {
-                                var asyncGeneratorId = _nextAsyncGeneratorId++;
-                                var asyncGeneratorState = new AsyncGeneratorState(funcMeta, args);
-                                _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
-                                var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
-                                _stack.Push(asyncGeneratorValue);
-                            }
-                            else
-                            {
-                                var generatorId = _nextGeneratorId++;
-                                var generatorState = new GeneratorState(funcMeta, args);
-                                _generators[generatorId] = generatorState;
-                                var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
-                                _stack.Push(generatorValue);
-                            }
+                            var asyncGeneratorId = _nextAsyncGeneratorId++;
+                            var asyncGeneratorState = new AsyncGeneratorState(funcMeta, args);
+                            _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
+                            var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                            _stack.Push(asyncGeneratorValue);
                         }
                         else
                         {
-                            CallFunction(funcMeta, args);
+                            var generatorId = _nextGeneratorId++;
+                            var generatorState = new GeneratorState(funcMeta, args);
+                            _generators[generatorId] = generatorState;
+                            var generatorValue = new BytecodeGeneratorLangValue(generatorId, this);
+                            _stack.Push(generatorValue);
                         }
                     }
-                    finally
+                    else
                     {
-                        // 恢复原有的全局变量值
-                        foreach (var (varName, _) in closure.CapturedVariables)
-                        {
-                            if (savedGlobals.ContainsKey(varName))
-                            {
-                                _globals[varName] = savedGlobals[varName];
-                            }
-                            else
-                            {
-                                _globals.Remove(varName);
-                            }
-                        }
+                        // 调用闭包函数，传递捕获的变量
+                        CallClosureFunction(funcMeta, args, closure.CapturedVariables);
                     }
                 }
                 else if (funcObj is FunctionMetadata funcMeta)
@@ -756,6 +739,34 @@ public partial class VirtualMachine
                 {
                     var value = _stack.Pop();
                     capturedVariables[varNames[i]] = value;
+                }
+
+                Console.WriteLine($"[MakeClosure] Frame has closure environment: {frame.ClosureEnvironment != null}");
+                if (frame.ClosureEnvironment != null)
+                {
+                    Console.WriteLine($"[MakeClosure] Frame closure environment has {frame.ClosureEnvironment.Count} vars");
+                }
+
+                // 如果当前帧有闭包环境，需要合并到新闭包中
+                // 这样嵌套闭包就能访问外层闭包的变量
+                if (frame.ClosureEnvironment != null)
+                {
+                    foreach (var (varName, value) in frame.ClosureEnvironment)
+                    {
+                        Console.WriteLine($"[MakeClosure] Inheriting from parent closure: {varName} = {value}");
+                        // 只添加新闭包中没有的变量（避免覆盖）
+                        if (!capturedVariables.ContainsKey(varName))
+                        {
+                            capturedVariables[varName] = value;
+                        }
+                    }
+                }
+
+                // 调试输出
+                Console.WriteLine($"[MakeClosure] Created closure for {funcMeta.Name} with {capturedVariables.Count} captured vars:");
+                foreach (var kvp in capturedVariables)
+                {
+                    Console.WriteLine($"  {kvp.Key} = {kvp.Value}");
                 }
 
                 // 创建闭包对象

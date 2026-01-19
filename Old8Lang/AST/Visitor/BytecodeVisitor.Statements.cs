@@ -115,10 +115,7 @@ public partial class BytecodeVisitor
         else
         {
             // 索引/成员访问赋值: array[i] <- value 或 obj.field <- value
-            // 使用反射直接访问 LeftExpression 字段
-            var leftExprField = node.GetType().GetField("LeftExpression",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var leftExpr = leftExprField?.GetValue(node) as LangExpression;
+            var leftExpr = node.LeftExpression;
 
             if (leftExpr is LangListItem listItem)
             {

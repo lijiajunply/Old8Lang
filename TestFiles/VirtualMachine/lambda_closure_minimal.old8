@@ -1,0 +1,7 @@
+func test() -> int {
+    x <- 5
+    return ((y:int) -> x + y)(3)
+}
+
+result <- test()
+PrintLine(result.ToStr())

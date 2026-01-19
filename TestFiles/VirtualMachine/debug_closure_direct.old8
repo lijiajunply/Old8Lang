@@ -1,0 +1,3 @@
+add5 <- (x:int, y:int) -> x + y
+result <- add5(5, 3)
+PrintLine(result.ToStr())

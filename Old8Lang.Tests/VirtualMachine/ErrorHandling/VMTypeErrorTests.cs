@@ -570,8 +570,8 @@ public class VMTypeErrorTests
     public void TypeErrors_DynamicTypeInvalidOperation_ThrowsTypeException()
     {
         var code = @"
-            x <- dynamic(123)
-            y <- dynamic(""hello"")
+            x <- (123)
+            y <- (""hello"")
             result <- x + y
         ";
 

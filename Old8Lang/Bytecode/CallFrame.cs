@@ -29,6 +29,9 @@ public class CallFrame(FunctionMetadata function, int localCount)
     /// <summary>异步生成器ID（如果此帧是异步生成器函数的执行帧）</summary>
     public int? AsyncGeneratorId { get; set; }
 
+    /// <summary>闭包捕获的变量环境（用于闭包函数）</summary>
+    public Dictionary<string, object?>? ClosureEnvironment { get; set; }
+
     /// <summary>
     /// 获取当前指令
     /// </summary>

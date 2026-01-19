@@ -217,20 +217,22 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitFunctionCallExpression(FunctionCallExpression node)
     {
-        // 函数表达式必须是简单的标识符
-        if (node.FunctionExpression is not LangId funcId)
-        {
-            throw new Exception("字节码模式暂不支持复杂的函数调用表达式");
-        }
-
-        string funcName = funcId.IdName;
         int positionalCount = node.Arguments.Count;
         int namedCount = node.NamedArguments?.Count ?? 0;
 
-        // 检查是否是类实例化
-        bool isClassName = _compiler.IsClassName(funcName);
+        // 检查函数表达式的类型
+        bool isComplexExpression = node.FunctionExpression is not LangId;
+        bool isClassName = false;
+        string funcName = "";
 
-        if (isClassName)
+        if (!isComplexExpression)
+        {
+            funcName = ((LangId)node.FunctionExpression).IdName;
+            isClassName = _compiler.IsClassName(funcName);
+        }
+
+        // 如果是类实例化
+        if (!isComplexExpression && isClassName)
         {
             // 类实例化: Person(arg1, arg2)
             // 1. 生成 NewObject 指令创建对象
@@ -295,10 +297,31 @@ public partial class BytecodeVisitor
         }
         else
         {
-            // 普通函数调用
+            // 普通函数调用或复杂表达式调用
 
+            // 如果是复杂表达式，使用 CallIndirect
+            if (isComplexExpression)
+            {
+                // 复杂表达式调用: lambda(arg1, arg2) 或 map(lambda, array)
+                // 1. 编译函数表达式
+                node.FunctionExpression.Accept(this);
+
+                // 2. 生成参数代码
+                foreach (var arg in node.Arguments)
+                {
+                    arg.Accept(this);
+                }
+
+                if (namedCount > 0)
+                {
+                    throw new Exception("字节码模式下的动态函数调用暂不支持命名参数");
+                }
+
+                // 3. 生成 CallDynamic 指令
+                Emit(OpCode.CallDynamic, positionalCount);
+            }
             // 1. 检查是否是局部变量 holding a function (Lambda调用)
-            if (_compiler.IsLocalVariable(funcName))
+            else if (_compiler.IsLocalVariable(funcName))
             {
                 // 加载函数对象到栈底
                 int localIndex = _compiler.GetLocalIndex(funcName);

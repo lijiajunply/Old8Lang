@@ -161,7 +161,7 @@ public class BytecodeCompiler
     /// 编译函数定义
     /// </summary>
     public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues,
-        BlockStatement body, int paramsParameterIndex = -1)
+        BlockStatement body, int paramsParameterIndex = -1, List<string>? capturedVars = null)
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -185,12 +185,57 @@ public class BytecodeCompiler
         foreach (var param in parameters)
             DeclareLocalVariable(param);
 
+        // 如果有捕获的变量，声明它们为局部变量
+        var capturedVarIndices = new Dictionary<string, int>();
+        if (capturedVars != null && capturedVars.Count > 0)
+        {
+            foreach (var varName in capturedVars)
+            {
+                int index = DeclareLocalVariable(varName);
+                capturedVarIndices[varName] = index;
+            }
+        }
+
+        // 保存捕获的变量列表到函数元数据
+        if (capturedVars != null && capturedVars.Count > 0)
+        {
+            func.CapturedVariables = new List<string>(capturedVars);
+        }
+
         // 编译函数体
         var visitor = new BytecodeVisitor(this);
-        body.Accept(visitor);
+        
+        // 如果有捕获的变量，在函数体开始时加载它们的值
+        if (capturedVars != null && capturedVars.Count > 0)
+        {
+            // 需要在函数体之前插入加载指令
+            var tempInstructions = new List<Instruction>();
 
-        func.Instructions = visitor.GetInstructions();
-        func.MaxStackSize = visitor.MaxStackSize;
+            // 加载并立即存储每个捕获的变量（避免栈顺序错乱）
+            foreach (var varName in capturedVars)
+            {
+                tempInstructions.Add(new Instruction(OpCode.LoadGlobal, varName));
+                int localIndex = capturedVarIndices[varName];
+                tempInstructions.Add(new Instruction(OpCode.StoreLocal, localIndex));
+            }
+
+            // 编译函数体
+            body.Accept(visitor);
+
+            // 将加载指令插入到函数体指令之前
+            var bodyInstructions = visitor.GetInstructions();
+            var allInstructions = tempInstructions.Concat(bodyInstructions).ToList();
+
+            func.Instructions = allInstructions;
+            func.MaxStackSize = visitor.MaxStackSize;
+        }
+        else
+        {
+            body.Accept(visitor);
+            func.Instructions = visitor.GetInstructions();
+            func.MaxStackSize = visitor.MaxStackSize;
+        }
+        
         func.LocalCount = _scopes.Peek().LocalCount;
 
         LeaveScope();

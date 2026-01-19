@@ -1,0 +1,4 @@
+arr <- [1, 2, 3]
+PrintLine("Before: " + arr[1].ToStr())
+arr[1] <- 99
+PrintLine("After: " + arr[1].ToStr())
