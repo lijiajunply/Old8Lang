@@ -41,7 +41,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -70,7 +70,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -111,7 +111,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -161,7 +161,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -209,7 +209,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -335,7 +335,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -368,7 +368,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -411,7 +411,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -443,7 +443,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -480,7 +480,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -538,7 +538,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -603,7 +603,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -643,7 +643,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
@@ -720,7 +720,7 @@ public class VMResourceCleanupTests
                 public id:int
                 public disposeCount:int
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposeCount <- 0
                 }

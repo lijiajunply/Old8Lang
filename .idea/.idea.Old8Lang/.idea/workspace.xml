@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericNestedTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -584,7 +585,7 @@
       <workItem from="1768749421043" duration="8816000" />
       <workItem from="1768767111847" duration="12379000" />
       <workItem from="1768841952068" duration="521000" />
-      <workItem from="1768843331971" duration="4887000" />
+      <workItem from="1768843331971" duration="7505000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -929,7 +930,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="741" />
+    <option name="localTasksCounter" value="743" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,8 +957,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(roadmap): 更新ROADMAP文档并生成相关报告&#10;&#10;- 新增编译器IL代码生成问题修复任务(P0关键任务)&#10;- 标记编译器模式测试补充为已完成，新增288个测试用例&#10;- 新增编译器模式测试质量提升任务(P1高优先级)&#10;- 更新异步功能完善部分的下一步行动指向新任务&#10;- 添加2026-01-18更新日志记录相关变更&#10;- 生成ROADMAP更新摘要和编译器模式测试补充报告" />
-    <MESSAGE value="feat(tests): 添加虚拟机并发原语测试套件&#10;&#10;- 创建 VMConcurrencyMutexTests.cs 包含 14 个测试方法覆盖互斥锁功能&#10;- 创建 VMConcurrencySemaphoreTests.cs 包含 19 个测试方法覆盖信号量功能  &#10;- 创建 VMConcurrencyAtomicIntTests.cs 包含 22 个测试方法覆盖原子整数功能&#10;- 实现基本功能、超时场景、异常安全、多线程并发和边界条件测试&#10;- 修复虚拟机模式下布尔值字符串表示和 catch 语句语法差异&#10;- 记录多线程语法差异问题(spawn 语法需改为 Spawn() 函数调用)" />
     <MESSAGE value="feat(compiler): 实现Lambda表达式闭包支持和动态调用功能&#10;&#10;- 添加闭包变量捕获分析器，识别Lambda函数引用的外部变量&#10;- 实现MakeClosure指令用于创建带捕获变量的闭包对象&#10;- 支持Lambda变量的动态调用，使用CallDynamic指令&#10;- 添加ClosureValue类封装函数元数据和捕获的变量&#10;- 在虚拟机中实现闭包调用时的变量作用域管理&#10;- 创建闭包测试文件验证全局变量和局部变量捕获功能&#10;- 更新Lambda虚拟机测试覆盖多种Lambda表达式场景" />
     <MESSAGE value="feat(test): 添加虚拟机并发原语测试扩展和修复spawn函数实现&#10;&#10;- 创建5个新的并发原语测试文件，包含106个测试方法&#10;- 实现虚拟机模式下的spawn函数支持线程创建和执行&#10;- 添加Range语法测试文件验证for-in循环中的Range使用&#10;- 修复SpawnFunction中ExecuteInVMInternal方法的线程创建逻辑&#10;- 更新测试计划文档包含完整的虚拟机测试扩展方案&#10;- 修复并发原语测试中的Range语法兼容性问题&#10;- 优化虚拟机线程管理和资源分配机制" />
     <MESSAGE value="removal(global-functions): 移除并发相关全局函数&#10;&#10;- 从 GlobalFunctionInitializer 中移除 Task 和 Thread 相关函数注册&#10;- 删除 TaskFunctions.cs 文件中的 TaskDelay、TaskWait、TaskWhenAll、TaskWhenAny 函数实现&#10;- 删除 ThreadFunctions.cs 文件中的 ThreadJoin、ThreadIsAlive、ThreadDispose 函数实现&#10;- 移除相关的并发功能支持代码" />
@@ -981,7 +980,9 @@
     <MESSAGE value="feat(parser): 支持深层嵌套索引访问和改进数字字面量解析&#10;&#10;- 修改 NestedIndexAccess 类，将 BaseIndex 字段重命名为 BaseExpression，&#10;  支持更深层的嵌套索引访问语法&#10;- 更新 BytecodeVisitor 中的访问逻辑，适配新的 BaseExpression 字段&#10;- 在 ExpressionParser 中添加对现有 NestedIndexAccess 的连续嵌套支持&#10;- 改进 PrimaryParser 中的数字字面量解析，按 int -&gt; long -&gt; double 顺序尝试解析&#10;- 更新 SetStatement 中的嵌套索引访问赋值逻辑，使用新的 BaseExpression 字段&#10;- 优化虚拟机中的数字显示格式，在 ToStr 方法中使用固定格式避免科学计数法" />
     <MESSAGE value="feat(vm): 添加类元数据注册和字典迭代器特殊处理&#10;&#10;- 在虚拟机初始化时将所有类元数据注册到全局变量表中&#10;- 实现通过类名访问类元数据的功能以支持嵌套类访问&#10;- 为字典类型添加特殊迭代器处理逻辑&#10;- 字典迭代时返回键集合而非键值对以改善遍历行为" />
     <MESSAGE value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
+    <MESSAGE value="feat(bytecode): 添加对象构造函数调用支持&#10;&#10;- 实现构造函数查找逻辑，优先查找init方法其次查找同名方法&#10;- 添加构造函数参数生成和调用机制&#10;- 使用Dup指令复制对象引用以支持方法调用&#10;- 更新CallMethod指令参数格式支持构造函数调用&#10;- 修复VMGenericNestedTests中的变量命名冲突&#10;- 更新IDE配置文件的变更列表和任务计数器&#10;- 优化数字字面量解析顺序支持int-long-double类型推断&#10;- 添加类元数据注册机制支持嵌套类访问&#10;- 实现字典类型特殊迭代器处理逻辑" />
+    <MESSAGE value="feat(lang): 实现字段访问和索引赋值功能&#10;&#10;- 添加实例方法中字段访问的支持，通过 this.field 形式访问实例字段&#10;- 实现 super.field 父类字段访问功能&#10;- 添加对 ClassMemberId 类型成员访问标识符的支持&#10;- 实现嵌套列表项索引赋值功能，支持 obj.field[index] &lt;- value 语法&#10;- 添加 SetIndex 指令处理索引赋值操作&#10;- 重构字段访问逻辑以区分局部变量、实例字段和全局变量的访问方式" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现字段访问和索引赋值功能&#10;&#10;- 添加实例方法中字段访问的支持，通过 this.field 形式访问实例字段&#10;- 实现 super.field 父类字段访问功能&#10;- 添加对 ClassMemberId 类型成员访问标识符的支持&#10;- 实现嵌套列表项索引赋值功能，支持 obj.field[index] &lt;- value 语法&#10;- 添加 SetIndex 指令处理索引赋值操作&#10;- 重构字段访问逻辑以区分局部变量、实例字段和全局变量的访问方式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -2797,17 +2797,34 @@ public partial class VirtualMachine
                 {
                     Concurrency.ResourceManager.TryDispose(resourceId);
                 }
-                // 2. 如果是 AnyLangValue（用户自定义类实例），尝试调用 dispose 方法
+                // 2. 如果是 BytecodeObjectInstance（字节码模式的用户自定义类实例），尝试调用 Dispose 方法
+                else if (resource is BytecodeObjectInstance bytecodeObj)
+                {
+                    // 查找类的 Dispose 方法
+                    var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
+                    if (classMetadata != null)
+                    {
+                        var disposeMethod = classMetadata.Methods.FirstOrDefault(m =>
+                            m.Name.Equals("Dispose", StringComparison.OrdinalIgnoreCase));
+
+                        if (disposeMethod != null)
+                        {
+                            // 调用 Dispose 方法，传入对象本身作为 this 参数
+                            CallFunction(disposeMethod.Function, new object[] { bytecodeObj });
+                        }
+                    }
+                }
+                // 3. 如果是 AnyLangValue（解释器模式的用户自定义类实例），尝试调用 dispose 方法
                 else if (resource is AnyLangValue anyValue)
                 {
                     anyValue.TryDispose();
                 }
-                // 3. 如果实现了 IDisposable 接口，直接调用 Dispose
+                // 4. 如果实现了 IDisposable 接口，直接调用 Dispose
                 else if (resource is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }
-                // 4. 其他类型不做处理（静默忽略）
+                // 5. 其他类型不做处理（静默忽略）
             }
                 break;
 
