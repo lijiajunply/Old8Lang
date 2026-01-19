@@ -684,10 +684,14 @@ public partial class VirtualMachine
             {
                 // 返回值应该已经在栈上
                 // 调用者会从栈中获取返回值
+                // 设置 IP 超出指令范围，终止 CallFunction 中的 while 循环
+                frame.IP = frame.Function.Instructions.Count;
                 return; // 退出当前函数
             }
 
             case OpCode.ReturnVoid:
+                // 设置 IP 超出指令范围，终止 CallFunction 中的 while 循环
+                frame.IP = frame.Function.Instructions.Count;
                 return; // 退出当前函数
 
             case OpCode.Break:
