@@ -55,6 +55,9 @@ public class BytecodeCompiler
     {
         _bytecodeFile.ConstantPool = ConstantPool;
 
+        // 第零阶段：预处理，扫描所有顶层变量声明（全局变量）
+        PreprocessGlobalVariables(ast);
+
         // 第一阶段：预处理，注册所有类定义
         PreprocessClassDefinitions(ast);
 
@@ -85,6 +88,23 @@ public class BytecodeCompiler
         _bytecodeFile.EntryPointIndex = _bytecodeFile.Functions.Count - 1;
 
         return _bytecodeFile;
+    }
+
+    /// <summary>
+    /// 预处理阶段：扫描所有顶层变量声明（全局变量）
+    /// 这样在编译方法体时，可以正确识别全局变量
+    /// </summary>
+    private void PreprocessGlobalVariables(BlockStatement ast)
+    {
+        // 遍历 OtherStatements 中的变量声明
+        foreach (var statement in ast.OtherStatements)
+        {
+            if (statement is SetStatement setStatement && setStatement.Id != null)
+            {
+                // 顶层的变量声明是全局变量
+                DeclareGlobalVariable(setStatement.Id.IdName);
+            }
+        }
     }
 
     /// <summary>

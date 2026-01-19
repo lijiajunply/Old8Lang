@@ -12,6 +12,8 @@ public class VMInterfaceTests
     {
         // Arrange
         var code = @"
+            result <- """"
+
             interface IDrawable {
                 func draw() -> void
             }
@@ -48,6 +50,9 @@ public class VMInterfaceTests
     {
         // Arrange
         var code = @"
+            result1 <- """"
+            result2 <- 0
+
             interface IDrawable {
                 func draw() -> void
             }

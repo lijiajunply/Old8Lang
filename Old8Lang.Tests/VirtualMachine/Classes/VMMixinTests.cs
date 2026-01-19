@@ -12,6 +12,8 @@ public class VMMixinTests
     {
         // Arrange
         var code = @"
+            result <- """"
+
             mixin Loggable {
                 func log(message:string) -> void {
                     result <- ""[LOG] "" + message
@@ -46,6 +48,9 @@ public class VMMixinTests
     {
         // Arrange
         var code = @"
+            result1 <- """"
+            result2 <- """"
+
             mixin Loggable {
                 func log(message:string) -> void {
                     result1 <- ""[LOG] "" + message
@@ -95,6 +100,9 @@ public class VMMixinTests
     {
         // Arrange
         var code = @"
+            result1 <- """"
+            result2 <- """"
+
             interface IPrintable {
                 func print() -> void
             }
