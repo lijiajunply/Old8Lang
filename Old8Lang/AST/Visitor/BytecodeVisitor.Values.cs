@@ -592,16 +592,44 @@ public partial class BytecodeVisitor
         var analyzer = new ClosureCaptureAnalyzer();
         var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
 
+        // DEBUG: 打印分析结果
+        var debugOutput = new System.Text.StringBuilder();
+        debugOutput.AppendLine($"[DEBUG] Lambda {lambdaName}:");
+        debugOutput.AppendLine($"[DEBUG]   分析到的捕获变量: {string.Join(", ", capturedVars)}");
+        debugOutput.AppendLine($"[DEBUG]   IsLocalVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsLocalVariable(v)))}");
+        debugOutput.AppendLine($"[DEBUG]   IsGlobalVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsGlobalVariable(v)))}");
+        debugOutput.AppendLine($"[DEBUG]   IsCapturedVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsCapturedVariable(v)))}");
+
         // 4. 过滤出实际存在的变量
+        // 注意：对于嵌套 Lambda，内层 Lambda 可能需要捕获外层 Lambda 的捕获变量
+        // 这些变量在编译时既不是局部变量也不是全局变量，但仍然需要捕获
         var actualCapturedVars = new List<string>();
         foreach (var varName in capturedVars)
         {
-            if (_compiler.IsLocalVariable(varName) || _compiler.IsGlobalVariable(varName))
+            // 检查变量是否存在：局部变量、全局变量、或当前函数的捕获变量
+            // 如果都不是，也保留它（可能是外层函数的捕获变量，用于嵌套闭包）
+            if (_compiler.IsLocalVariable(varName))
             {
                 actualCapturedVars.Add(varName);
             }
-            // 如果变量不存在，跳过它（可能是全局函数名等）
+            else if (_compiler.IsGlobalVariable(varName))
+            {
+                actualCapturedVars.Add(varName);
+            }
+            else if (_compiler.IsCapturedVariable(varName))
+            {
+                actualCapturedVars.Add(varName);
+            }
+            else
+            {
+                // 对于嵌套闭包，变量可能来自外层函数但还未被标记为捕获变量
+                // 保留这些变量，让运行时从闭包环境中查找
+                actualCapturedVars.Add(varName);
+            }
         }
+
+        debugOutput.AppendLine($"[DEBUG]   实际捕获的变量: {string.Join(", ", actualCapturedVars)}");
+        System.IO.File.AppendAllText("/tmp/lambda_debug.txt", debugOutput.ToString());
 
         // 5. 编译 Lambda 函数体，传递捕获的变量列表
         _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars);
@@ -620,8 +648,20 @@ public partial class BytecodeVisitor
                     int localIndex = _compiler.GetLocalIndex(varName);
                     Emit(OpCode.LoadLocal, localIndex);
                 }
+                else if (_compiler.IsCapturedVariable(varName))
+                {
+                    // 如果变量是当前函数的捕获变量，使用 LoadGlobal 从闭包环境加载
+                    // （虚拟机会自动从闭包环境中查找）
+                    Emit(OpCode.LoadGlobal, varName);
+                }
                 else if (_compiler.IsGlobalVariable(varName))
                 {
+                    Emit(OpCode.LoadGlobal, varName);
+                }
+                else
+                {
+                    // 对于嵌套闭包，变量可能来自外层函数的参数或外层闭包的捕获变量
+                    // 使用 LoadGlobal 从闭包环境中加载（虚拟机会自动查找）
                     Emit(OpCode.LoadGlobal, varName);
                 }
             }

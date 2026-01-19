@@ -103,6 +103,33 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
+        // 处理 FuncLangValue（Lambda 表达式）
+        if (node is AST.Expression.Value.FuncLangValue funcValue)
+        {
+            // 对于嵌套 Lambda，需要分析其函数体中引用的变量
+            // 但要排除 Lambda 自己的参数
+            var nestedParameters = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
+
+            // 将嵌套 Lambda 的参数临时添加到局部变量集合（避免被捕获）
+            foreach (var param in nestedParameters)
+            {
+                _localVariables.Add(param);
+            }
+
+            // 分析嵌套 Lambda 的函数体
+            AnalyzeNode(funcValue.BlockStatement);
+
+            // 移除嵌套 Lambda 的参数
+            foreach (var param in nestedParameters)
+            {
+                _localVariables.Remove(param);
+                // 同时从捕获变量中移除（因为这些参数不应该被外层 Lambda 捕获）
+                _capturedVariables.Remove(param);
+            }
+
+            return;
+        }
+
         // 对于其他节点类型，遍历子节点
         if (node is OldStatement statement)
         {

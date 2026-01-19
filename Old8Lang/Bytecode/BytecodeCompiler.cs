@@ -204,7 +204,7 @@ public class BytecodeCompiler
 
         // 编译函数体
         var visitor = new BytecodeVisitor(this);
-        
+
         // 如果有捕获的变量，在函数体开始时加载它们的值
         if (capturedVars != null && capturedVars.Count > 0)
         {
@@ -224,6 +224,26 @@ public class BytecodeCompiler
 
             // 将加载指令插入到函数体指令之前
             var bodyInstructions = visitor.GetInstructions();
+
+            // 重要：调整函数体中所有跳转指令的目标地址
+            // 因为插入了额外的指令，所有跳转目标都需要偏移
+            int offset = tempInstructions.Count;
+            for (int i = 0; i < bodyInstructions.Count; i++)
+            {
+                var instr = bodyInstructions[i];
+                // 检查是否是跳转指令
+                if (instr.OpCode == OpCode.Jump ||
+                    instr.OpCode == OpCode.JumpIfFalse ||
+                    instr.OpCode == OpCode.JumpIfTrue)
+                {
+                    if (instr.Operand is int target)
+                    {
+                        // 调整跳转目标，加上偏移量
+                        bodyInstructions[i] = new Instruction(instr.OpCode, target + offset);
+                    }
+                }
+            }
+
             var allInstructions = tempInstructions.Concat(bodyInstructions).ToList();
 
             func.Instructions = allInstructions;
@@ -235,7 +255,7 @@ public class BytecodeCompiler
             func.Instructions = visitor.GetInstructions();
             func.MaxStackSize = visitor.MaxStackSize;
         }
-        
+
         func.LocalCount = _scopes.Peek().LocalCount;
 
         LeaveScope();
@@ -442,6 +462,14 @@ public class BytecodeCompiler
     public bool IsGlobalVariable(string name)
     {
         return _bytecodeFile.GlobalVariables.Contains(name);
+    }
+
+    /// <summary>
+    /// 检查变量是否在当前函数的捕获变量列表中
+    /// </summary>
+    public bool IsCapturedVariable(string name)
+    {
+        return _currentFunction?.CapturedVariables.Contains(name) ?? false;
     }
 
     /// <summary>

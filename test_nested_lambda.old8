@@ -1,0 +1,10 @@
+func makeMultiplier(x:int) -> any {
+    return (y:int) -> {
+        return (z:int) -> x * y * z
+    }
+}
+
+mult2 <- makeMultiplier(2)
+mult2_3 <- mult2(3)
+result <- mult2_3(4)
+PrintLine(result.ToStr())
