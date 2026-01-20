@@ -61,7 +61,8 @@ public partial class VirtualMachine
                 string varName = (string)instruction.Operand!;
 
                 // 先检查闭包环境
-                if (frame.ClosureEnvironment != null && frame.ClosureEnvironment.TryGetValue(varName, out var closureValue))
+                if (frame.ClosureEnvironment != null &&
+                    frame.ClosureEnvironment.TryGetValue(varName, out var closureValue))
                 {
                     _stack.Push(closureValue);
                 }
@@ -308,10 +309,7 @@ public partial class VirtualMachine
                     }
 
                     // 如果全局变量中没有，从当前字节码文件中查找
-                    if (function == null)
-                    {
-                        function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                    }
+                    function ??= _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
 
                     // 如果还没找到，从所有已加载模块的导出符号中查找
                     if (function == null)
@@ -408,7 +406,8 @@ public partial class VirtualMachine
                             }
                             else
                             {
-                                throw new ArgumentError(GetPosition(instruction), $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                                throw new ArgumentError(GetPosition(instruction),
+                                    $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
                             }
                         }
 
@@ -480,10 +479,7 @@ public partial class VirtualMachine
                     }
 
                     // 如果全局变量中没有，从当前字节码文件中查找
-                    if (function == null)
-                    {
-                        function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
-                    }
+                    function ??= _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
 
                     // 如果还没找到，从所有已加载模块的导出符号中查找
                     if (function == null)
@@ -747,6 +743,7 @@ public partial class VirtualMachine
                 {
                     throw new IndexError(GetPosition(instruction), $"无效的函数索引: {funcIndex}");
                 }
+
                 var funcMeta = _bytecodeFile.Functions[funcIndex];
 
                 // 从栈中弹出捕获的变量值（按相反顺序）
@@ -764,10 +761,7 @@ public partial class VirtualMachine
                     foreach (var (varName, value) in frame.ClosureEnvironment)
                     {
                         // 只添加新闭包中没有的变量（避免覆盖）
-                        if (!capturedVariables.ContainsKey(varName))
-                        {
-                            capturedVariables[varName] = value;
-                        }
+                        capturedVariables.TryAdd(varName, value);
                     }
                 }
 
@@ -933,6 +927,7 @@ public partial class VirtualMachine
                     {
                         throw new KeyError(GetPosition(instruction), index);
                     }
+
                     _stack.Push(dict[index]);
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
@@ -1119,11 +1114,13 @@ public partial class VirtualMachine
                 if (collection is IDictionary dict)
                 {
                     var enumerator = dict.Keys.GetEnumerator();
+                    using var enumerator1 = enumerator as IDisposable;
                     _stack.Push(enumerator);
                 }
                 else if (collection is IEnumerable enumerable)
                 {
                     var enumerator = enumerable.GetEnumerator();
+                    using var enumerator1 = enumerator as IDisposable;
                     _stack.Push(enumerator);
                 }
                 else
@@ -1169,7 +1166,8 @@ public partial class VirtualMachine
                     // 调试：输出栈的详细信息
                     var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
                     var topType = top?.GetType().FullName ?? "null";
-                    throw new StateError(GetPosition(instruction), $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
+                    throw new StateError(GetPosition(instruction),
+                        $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
                 }
             }
                 break;
@@ -1257,8 +1255,8 @@ public partial class VirtualMachine
                     {
                         // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
                         // 从后往前构建
-                        object? current = new Tuple<object?, object?>(slicedList[slicedList.Count - 2],
-                            slicedList[slicedList.Count - 1]);
+                        object current = new Tuple<object?, object?>(slicedList[^2],
+                            slicedList[^1]);
 
                         for (int i = slicedList.Count - 3; i >= 0; i--)
                         {
@@ -1374,7 +1372,8 @@ public partial class VirtualMachine
                 }
                 catch (Exception ex)
                 {
-                    throw new CastError(GetPosition(instruction), value?.GetType().Name ?? "null", targetTypeName, ex.Message);
+                    throw new CastError(GetPosition(instruction), value?.GetType().Name ?? "null", targetTypeName,
+                        ex.Message);
                 }
             }
                 break;
@@ -1463,8 +1462,7 @@ public partial class VirtualMachine
                 // 创建枚举模板
                 var enumTemplate = new EnumTemplate(
                     enumName,
-                    members,
-                    default);
+                    members);
 
                 // 将枚举模板存储到全局变量
                 _globals[enumName] = enumTemplate;
@@ -1613,7 +1611,8 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
+                    throw new TypeError(GetPosition(instruction),
+                        $"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
                 }
 
                 // 创建线程
@@ -1690,11 +1689,12 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"Invalid function for NewTask: {funcObj?.GetType().Name}");
+                    throw new TypeError(GetPosition(instruction),
+                        $"Invalid function for NewTask: {funcObj?.GetType().Name}");
                 }
 
                 // 创建并启动任务
-                var task = Task.Run<LangValueType>(() =>
+                var task = Task.Run(() =>
                 {
                     var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
                     foreach (var kvp in _globals) asyncVm._globals[kvp.Key] = kvp.Value;
@@ -1728,7 +1728,7 @@ public partial class VirtualMachine
                 }
 
                 // 创建并启动任务
-                var task = Task.Run<LangValueType>(() =>
+                var task = Task.Run(() =>
                 {
                     // 在新线程中执行函数
                     // 这里我们创建一个新的 VirtualMachine 实例来执行异步任务
@@ -1772,18 +1772,12 @@ public partial class VirtualMachine
                     task.GetAwaiter().GetResult();
                     // 如果是 Task<T>，获取结果
                     var resultProperty = task.GetType().GetProperty("Result");
-                    if (resultProperty != null)
-                    {
-                        _stack.Push(resultProperty.GetValue(task));
-                    }
-                    else
-                    {
-                        _stack.Push(null);
-                    }
+                    _stack.Push(resultProperty != null ? resultProperty.GetValue(task) : null);
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
+                    throw new TypeError(GetPosition(instruction),
+                        $"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
                 }
             }
                 break;
@@ -2250,15 +2244,8 @@ public partial class VirtualMachine
                     // super.field 访问的是继承自父类的字段,但实际存储位置在对象本身
                     // 因此我们直接从对象的 Fields 字典中获取字段值即可
 
-                    if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
-                    {
-                        _stack.Push(value);
-                    }
-                    else
-                    {
-                        // 字段不存在,返回 null
-                        _stack.Push(null);
-                    }
+                    // 字段不存在,返回 null
+                    _stack.Push(bytecodeObj.Fields.GetValueOrDefault(fieldName));
                 }
                 else
                 {
@@ -2419,14 +2406,11 @@ public partial class VirtualMachine
                 foreach (var field in allFields)
                 {
                     // 避免重复初始化同名字段（子类覆盖父类字段的情况）
-                    if (!obj.Fields.ContainsKey(field.Name))
-                    {
-                        obj.Fields[field.Name] = null;
-                    }
+                    obj.Fields.TryAdd(field.Name, null);
                 }
 
                 // 应用 Mixin 方法到对象
-                if (classMetadata.Mixins != null && classMetadata.Mixins.Count > 0)
+                if (classMetadata.Mixins is { Count: > 0 })
                 {
                     foreach (var mixinName in classMetadata.Mixins)
                     {
@@ -2441,7 +2425,7 @@ public partial class VirtualMachine
                 }
 
                 // 记录实现的接口
-                if (classMetadata.ImplementsInterfaces != null && classMetadata.ImplementsInterfaces.Count > 0)
+                if (classMetadata.ImplementsInterfaces is { Count: > 0 })
                 {
                     foreach (var interfaceName in classMetadata.ImplementsInterfaces)
                     {
@@ -2494,7 +2478,7 @@ public partial class VirtualMachine
                         foreach (var callFrame in _callStack)
                         {
                             // 检查当前帧的第一个参数（this）是否是同一个类的实例
-                            if (callFrame.Arguments != null && callFrame.Arguments.Length > 0 &&
+                            if (callFrame.Arguments is { Length: > 0 } &&
                                 callFrame.Arguments[0] is BytecodeObjectInstance frameObj &&
                                 frameObj.ClassName == staticClassMetadata.Name)
                             {
@@ -2514,7 +2498,8 @@ public partial class VirtualMachine
 
                         if (!isInternalCall)
                         {
-                            throw new AccessViolationError(GetPosition(instruction), methodName, staticClassMetadata.Name, "private");
+                            throw new AccessViolationError(GetPosition(instruction), methodName,
+                                staticClassMetadata.Name, "private");
                         }
                     }
 
@@ -2613,7 +2598,7 @@ public partial class VirtualMachine
                         foreach (var callFrame in _callStack)
                         {
                             // 检查当前帧的第一个参数（this）是否是同一个类的实例
-                            if (callFrame.Arguments != null && callFrame.Arguments.Length > 0 &&
+                            if (callFrame.Arguments is { Length: > 0 } &&
                                 callFrame.Arguments[0] is BytecodeObjectInstance frameObj &&
                                 frameObj.ClassName == bytecodeObj.ClassName)
                             {
@@ -2633,7 +2618,8 @@ public partial class VirtualMachine
 
                         if (!isInternalCall)
                         {
-                            throw new AccessViolationError(GetPosition(instruction), methodName, bytecodeObj.ClassName, "private");
+                            throw new AccessViolationError(GetPosition(instruction), methodName, bytecodeObj.ClassName,
+                                "private");
                         }
                     }
 
@@ -2667,7 +2653,7 @@ public partial class VirtualMachine
                 var currentFrame = _callStack.Peek();
 
                 // 优先从 Arguments 中获取 this（第一个参数）
-                if (currentFrame.Arguments != null && currentFrame.Arguments.Length > 0)
+                if (currentFrame.Arguments is { Length: > 0 })
                 {
                     var thisInstance = currentFrame.Arguments[0];
                     if (thisInstance == null)
@@ -2761,7 +2747,8 @@ public partial class VirtualMachine
 
                     if (method == null)
                     {
-                        throw new MethodNotFoundError(GetPosition(instruction), methodName, objType.BaseType?.Name ?? "unknown");
+                        throw new MethodNotFoundError(GetPosition(instruction), methodName,
+                            objType.BaseType?.Name ?? "unknown");
                     }
 
                     var result = method.Invoke(thisInstance, args);
@@ -2792,13 +2779,10 @@ public partial class VirtualMachine
                 string symbolName = (string)operands[1];
 
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
-                if (symbol == null)
-                {
-                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
-                }
 
                 // 将符号添加到当前全局变量
-                _globals[symbolName] = symbol;
+                _globals[symbolName] = symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
+                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
             }
                 break;
 
@@ -2811,13 +2795,10 @@ public partial class VirtualMachine
                 string alias = (string)operands[2];
 
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
-                if (symbol == null)
-                {
-                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
-                }
 
                 // 使用别名添加到全局变量
-                _globals[alias] = symbol;
+                _globals[alias] = symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
+                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
             }
                 break;
 
@@ -2851,7 +2832,8 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
                 if (symbol == null)
                 {
-                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                    throw new ImportError(GetPosition(instruction), moduleName,
+                        $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
                 }
 
                 _stack.Push(symbol);
@@ -2952,7 +2934,7 @@ public partial class VirtualMachine
                         if (disposeMethod != null)
                         {
                             // 调用 Dispose 方法，传入对象本身作为 this 参数
-                            CallFunction(disposeMethod.Function, new object[] { bytecodeObj });
+                            CallFunction(disposeMethod.Function, [bytecodeObj]);
                         }
                     }
                 }
@@ -3007,13 +2989,9 @@ public partial class VirtualMachine
                     }
                 }
 
-                Type? type = assembly.GetType($"{dllName}.{className}") ?? assembly.GetType(className);
-
                 // 如果找不到类型，尝试在所有类型中查找
-                if (type == null)
-                {
-                    type = assembly.GetTypes().FirstOrDefault(t => t.Name == className || t.FullName == className);
-                }
+                var type = (assembly.GetType($"{dllName}.{className}") ?? assembly.GetType(className)) ??
+                           assembly.GetTypes().FirstOrDefault(t => t.Name == className || t.FullName == className);
 
                 if (type == null) throw new ClassNotFoundError(GetPosition(instruction), $"{className} in {dllName}");
 
@@ -3161,7 +3139,7 @@ public partial class VirtualMachine
             "list" => val is IList,
             "dict" => val is IDictionary,
             "tuple" => val is Tuple<object?, object?>,
-            "null" => val == null,
+            "null" => val == null!,
             "any" => true,
             "object" => true,
             _ => CheckCustomType(typeName, val)
@@ -3220,11 +3198,9 @@ public partial class VirtualMachine
     {
         if (value == null) return [];
         if (value is List<object?> list) return list;
-        if (value is IEnumerable enumerable && value is not string)
+        if (value is IEnumerable enumerable and not string)
         {
-            var newList = new List<object?>();
-            foreach (var item in enumerable) newList.Add(item);
-            return newList;
+            return enumerable.Cast<object?>().ToList();
         }
 
         return [value];
@@ -3235,13 +3211,6 @@ public partial class VirtualMachine
         if (value == null) return [];
         if (value is object?[] arr) return arr;
         if (value is List<object?> listObj) return listObj.ToArray();
-        if (value is IEnumerable enumerable && value is not string)
-        {
-            var list = new List<object?>();
-            foreach (var item in enumerable) list.Add(item);
-            return list.ToArray();
-        }
-
-        return [value];
+        return value is IEnumerable enumerable and not string ? enumerable.Cast<object?>().ToArray() : ([value]);
     }
 }

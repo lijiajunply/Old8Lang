@@ -635,7 +635,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
             }
