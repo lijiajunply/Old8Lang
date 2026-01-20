@@ -52,6 +52,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
 
         // 立即将类添加到ImportInfos中，以便在类定义内部访问
         manager.AddClassAndFunc(_anyValue);
+
+        // 注册类型到全局反射注册表（用于反射功能）
+        TypeTemplate.RegisterType(_anyValue.ClassName, _anyValue);
     }
 
     /// <summary>

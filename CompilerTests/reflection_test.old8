@@ -1,0 +1,80 @@
+// 反射系统测试 - 编译器模式
+
+// 定义一个测试类
+class Person {
+    private name:string <- "Unknown"
+    private age:int <- 0
+
+    public init(n:string, a:int) -> void {
+        name <- n
+        age <- a
+    }
+
+    public greet() -> string {
+        return "Hello, I'm " + name
+    }
+
+    private getAge() -> int {
+        return age
+    }
+
+    public setAge(newAge:int) -> void {
+        age <- newAge
+    }
+}
+
+// 创建实例
+person <- Person("Alice", 25)
+
+// 1. 测试 GetClassName
+PrintLine("=== 测试 GetClassName ===")
+className <- GetClassName(person)
+PrintLine("Class name: " + className)
+
+// 2. 测试 GetClassMethods
+PrintLine("\n=== 测试 GetClassMethods ===")
+methods <- GetClassMethods(person)
+PrintLine("Methods count: " + Len(methods).ToStr())
+
+// 3. 测试 GetClassFields
+PrintLine("\n=== 测试 GetClassFields ===")
+fields <- GetClassFields(person)
+PrintLine("Fields count: " + Len(fields).ToStr())
+
+// 4. 测试 GetMethodInfo
+PrintLine("\n=== 测试 GetMethodInfo ===")
+methodInfo <- GetMethodInfo(person, "greet")
+PrintLine("Method name: " + methodInfo["name"])
+
+// 5. 测试 GetFieldInfo
+PrintLine("\n=== 测试 GetFieldInfo ===")
+fieldInfo <- GetFieldInfo(person, "name")
+PrintLine("Field name: " + fieldInfo["name"])
+
+// 6. 测试 GetField
+PrintLine("\n=== 测试 GetField ===")
+name <- GetField(person, "name")
+PrintLine("Name: " + name)
+
+// 7. 测试 SetField
+PrintLine("\n=== 测试 SetField ===")
+SetField(person, "name", "Bob")
+newName <- GetField(person, "name")
+PrintLine("New name: " + newName)
+
+// 8. 测试 IsInstanceOf
+PrintLine("\n=== 测试 IsInstanceOf ===")
+isPerson <- IsInstanceOf(person, "Person")
+PrintLine("Is Person: " + isPerson.ToStr())
+
+// 9. 测试 HasMethod
+PrintLine("\n=== 测试 HasMethod ===")
+hasGreet <- HasMethod(person, "greet")
+PrintLine("Has greet: " + hasGreet.ToStr())
+
+// 10. 测试 HasField
+PrintLine("\n=== 测试 HasField ===")
+hasName <- HasField(person, "name")
+PrintLine("Has name: " + hasName.ToStr())
+
+PrintLine("\n=== 编译器模式反射测试完成 ===")

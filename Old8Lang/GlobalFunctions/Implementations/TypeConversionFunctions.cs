@@ -14,11 +14,12 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 /// </summary>
 public sealed class IntFunction : BaseGlobalFunction
 {
-    public override string[] Names => ["int"];
+    public override string[] Names => ["int", "Int"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
-    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
+        SourcePosition position)
     {
         var value = parameters[0].Run(manager);
 
@@ -38,6 +39,7 @@ public sealed class IntFunction : BaseGlobalFunction
             {
                 return new IntLangValue(result);
             }
+
             throw new InvalidOperationError(position, $"无法将字符串 '{stringValue.Value}' 转换为整数");
         }
 
@@ -49,7 +51,8 @@ public sealed class IntFunction : BaseGlobalFunction
         throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为整数");
     }
 
-    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
+        LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
         param.LoadIlValue(ilGenerator, local);
@@ -118,6 +121,7 @@ public sealed class IntFunction : BaseGlobalFunction
             {
                 return result;
             }
+
             throw new Exception($"无法将字符串 '{stringValue}' 转换为整数");
         }
 
@@ -143,11 +147,12 @@ public sealed class IntFunction : BaseGlobalFunction
 /// </summary>
 public sealed class DoubleFunction : BaseGlobalFunction
 {
-    public override string[] Names => ["double"];
+    public override string[] Names => ["double", "Double"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
-    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
+        SourcePosition position)
     {
         var value = parameters[0].Run(manager);
 
@@ -167,6 +172,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
             {
                 return new DoubleLangValue(result);
             }
+
             throw new InvalidOperationError(position, $"无法将字符串 '{stringValue.Value}' 转换为浮点数");
         }
 
@@ -178,7 +184,8 @@ public sealed class DoubleFunction : BaseGlobalFunction
         throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为浮点数");
     }
 
-    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
+        LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
         param.LoadIlValue(ilGenerator, local);
@@ -248,6 +255,118 @@ public sealed class DoubleFunction : BaseGlobalFunction
             {
                 return result;
             }
+
+            throw new Exception($"无法将字符串 '{stringValue}' 转换为浮点数");
+        }
+
+        if (value is bool boolValue)
+        {
+            return boolValue ? 1.0 : 0.0;
+        }
+
+        // 尝试使用 Convert.ToDouble
+        try
+        {
+            return Convert.ToDouble(value);
+        }
+        catch
+        {
+            throw new Exception($"无法将类型 {value?.GetType().Name ?? "null"} 转换为浮点数");
+        }
+    }
+}
+
+/// <summary>
+/// Double 函数 - 将值转换为浮点数
+/// </summary>
+public sealed class CharFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["char", "Char"];
+    public override int MinParameterCount => 1;
+    public override int MaxParameterCount => 1;
+
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
+        SourcePosition position)
+    {
+        var value = parameters[0].Run(manager);
+
+        if (value is CharLangValue charValue)
+        {
+            return charValue;
+        }
+
+        if (value is IntLangValue intValue)
+        {
+            return new CharLangValue(Convert.ToChar(intValue.Value));
+        }
+
+        if (value is StringLangValue stringValue)
+        {
+            return stringValue.Value.Length == 1
+                ? new CharLangValue(stringValue.Value[0])
+                : new CharLangValue(char.Parse(stringValue.Value));
+        }
+
+        throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为浮点数");
+    }
+
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
+        LocalManager local, SourcePosition position)
+    {
+        var param = parameters[0];
+        param.LoadIlValue(ilGenerator, local);
+        var paramType = param.OutputType(local)!;
+
+        // 如果已经是 char 类型，直接返回
+        if (paramType == typeof(char))
+        {
+            return;
+        }
+
+        // string -> char
+        if (paramType == typeof(string))
+        {
+            var parseMethod = typeof(char).GetMethod("Parse", [typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Call, parseMethod);
+            return;
+        }
+
+        // object -> char 或者 int -> char
+        if (paramType == typeof(object) || paramType == typeof(int))
+        {
+            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToChar", [typeof(object)])!);
+            return;
+        }
+
+        throw new InvalidOperationError(position, $"无法将类型 {paramType.Name} 转换为浮点数");
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(double);
+    }
+
+    protected override object ExecuteInVMInternal(object?[] arguments)
+    {
+        object? value = arguments[0];
+
+        if (value is char charValue)
+        {
+            return charValue;
+        }
+
+        if (value is int intValue)
+        {
+            return (double)intValue;
+        }
+
+        if (value is string stringValue)
+        {
+            if (double.TryParse(stringValue, out double result))
+            {
+                return result;
+            }
+
             throw new Exception($"无法将字符串 '{stringValue}' 转换为浮点数");
         }
 

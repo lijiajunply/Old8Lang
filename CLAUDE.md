@@ -425,6 +425,108 @@ Old8Lang provides built-in global functions for concurrency primitives. These ar
 - `GetCurrentThreadId()` → int
 - `GetProcessorCount()` → int
 
+### Reflection System
+
+Old8Lang provides built-in reflection capabilities through global functions. These functions allow runtime inspection and manipulation of class instances, including access to private members.
+
+**Type Information Query (5 functions)**:
+- `GetClassName(obj:object)` → string - 获取对象的类名
+- `GetClassMethods(obj:object)` → list - 获取类的所有方法名列表
+- `GetClassFields(obj:object)` → list - 获取类的所有字段名列表
+- `GetMethodInfo(obj:object, methodName:string)` → dict - 获取方法详细信息
+- `GetFieldInfo(obj:object, fieldName:string)` → dict - 获取字段详细信息
+
+**Dynamic Method Invocation (1 function)**:
+- `InvokeMethod(obj:object, methodName:string, args:list)` → object - 动态调用方法（包括 private 方法）
+
+**Dynamic Field Access (2 functions)**:
+- `GetField(obj:object, fieldName:string)` → object - 动态获取字段值（包括 private 字段）
+- `SetField(obj:object, fieldName:string, value:object)` → void - 动态设置字段值（包括 private 字段）
+
+**Dynamic Instance Creation (1 function)**:
+- `CreateInstance(className:string, args:list)` → object - 通过类名创建实例
+
+**Type Checking (3 functions)**:
+- `IsInstanceOf(obj:object, className:string)` → bool - 检查对象是否是指定类的实例
+- `HasMethod(obj:object, methodName:string)` → bool - 检查对象是否有指定方法
+- `HasField(obj:object, fieldName:string)` → bool - 检查对象是否有指定字段
+
+**Example Usage**:
+
+```old8
+class Person {
+    private name:string <- "Unknown"
+    private age:int <- 0
+
+    public init(n:string, a:int) -> void {
+        name <- n
+        age <- a
+    }
+
+    public greet() -> string {
+        return "Hello, I'm " + name
+    }
+
+    private getAge() -> int {
+        return age
+    }
+}
+
+person <- Person("Alice", 25)
+
+// 1. Get class name
+className <- GetClassName(person)
+PrintLine("Class: " + className)  // Output: Class: Person
+
+// 2. Get methods and fields
+methods <- GetClassMethods(person)
+fields <- GetClassFields(person)
+PrintLine("Methods: " + methods.ToStr())  // Output: Methods: {init, greet, getAge}
+PrintLine("Fields: " + fields.ToStr())    // Output: Fields: {name, age}
+
+// 3. Get method/field info
+methodInfo <- GetMethodInfo(person, "greet")
+PrintLine(methodInfo.ToStr())  // Output: {"name": "greet", "isStatic": false, "isPublic": true, ...}
+
+fieldInfo <- GetFieldInfo(person, "name")
+PrintLine(fieldInfo.ToStr())   // Output: {"name": "name", "isStatic": false, "isPrivate": true}
+
+// 4. Invoke methods (including private)
+result <- InvokeMethod(person, "greet", {})
+PrintLine(result)  // Output: Hello, I'm Alice
+
+age <- InvokeMethod(person, "getAge", {})  // Can call private method
+PrintLine("Age: " + age.ToStr())  // Output: Age: 25
+
+// 5. Access fields (including private)
+name <- GetField(person, "name")  // Can access private field
+PrintLine("Name: " + name)  // Output: Name: Alice
+
+SetField(person, "name", "Bob")  // Can modify private field
+PrintLine(person.greet())  // Output: Hello, I'm Bob
+
+// 6. Create instance dynamically
+person2 <- CreateInstance("Person", {"Charlie", 30})
+PrintLine(person2.greet())  // Output: Hello, I'm Charlie
+
+// 7. Type checking
+isPerson <- IsInstanceOf(person, "Person")
+PrintLine("Is Person: " + isPerson.ToStr())  // Output: Is Person: true
+
+hasGreet <- HasMethod(person, "greet")
+PrintLine("Has greet: " + hasGreet.ToStr())  // Output: Has greet: true
+
+hasName <- HasField(person, "name")
+PrintLine("Has name: " + hasName.ToStr())  // Output: Has name: true
+```
+
+**Important Notes**:
+- Reflection can access **all members** including private fields and methods
+- Reflection bypasses normal access control checks
+- Both interpreter mode (`-f`) and compiler mode (`-c`) support reflection
+- Classes are automatically registered to the global type registry when defined
+- Use reflection carefully as it breaks encapsulation
+
 ### Using Statement
 
 The `using` statement provides automatic resource management with disposal:

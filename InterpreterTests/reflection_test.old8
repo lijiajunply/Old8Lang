@@ -1,0 +1,70 @@
+// 反射系统测试 - 解释器模式
+
+// 定义一个测试类
+class Person {
+    private name:string <- "Unknown"
+    private age:int <- 0
+
+    public func init(n:string, a:int) {
+        name <- n
+        age <- a
+    }
+
+    public func greet() -> string {
+        return "Hello, I am " + name
+    }
+
+    private func getAge() -> int {
+        return age
+    }
+
+    public func setAge(newAge:int) {
+        age <- newAge
+    }
+}
+
+// 创建实例
+person <- Person("Alice", 25)
+
+// 1. 测试 GetClassName
+PrintLine("=== 测试 GetClassName ===")
+className <- GetClassName(person)
+PrintLine("Class name: " + className)
+
+// 2. 测试 GetClassMethods
+PrintLine("=== 测试 GetClassMethods ===")
+methods <- GetClassMethods(person)
+PrintLine("Methods: " + methods.ToStr())
+
+// 3. 测试 GetClassFields
+PrintLine("=== 测试 GetClassFields ===")
+fields <- GetClassFields(person)
+PrintLine("Fields: " + fields.ToStr())
+
+// 4. 测试 GetField
+PrintLine("=== 测试 GetField ===")
+name <- GetField(person, "name")
+PrintLine("Name: " + name)
+
+// 5. 测试 SetField
+PrintLine("=== 测试 SetField ===")
+SetField(person, "name", "Bob")
+newName <- GetField(person, "name")
+PrintLine("New name: " + newName)
+
+// 6. 测试 IsInstanceOf
+PrintLine("=== 测试 IsInstanceOf ===")
+isPerson <- IsInstanceOf(person, "Person")
+PrintLine("Is Person: " + isPerson.ToStr())
+
+// 7. 测试 HasMethod
+PrintLine("=== 测试 HasMethod ===")
+hasGreet <- HasMethod(person, "greet")
+PrintLine("Has greet: " + hasGreet.ToStr())
+
+// 8. 测试 HasField
+PrintLine("=== 测试 HasField ===")
+hasName <- HasField(person, "name")
+PrintLine("Has name: " + hasName.ToStr())
+
+PrintLine("=== 所有反射测试完成！ ===")

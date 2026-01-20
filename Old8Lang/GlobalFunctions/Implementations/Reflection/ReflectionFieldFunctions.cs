@@ -1,0 +1,127 @@
+using System.Reflection.Emit;
+using Old8Lang.AST;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
+using Old8Lang.Error;
+using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.Interpreter;
+using Old8Lang.Runtime;
+
+namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
+
+/// <summary>
+/// GetField 函数 - 动态获取字段值
+/// </summary>
+public sealed class GetFieldFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["GetField"];
+    public override int MinParameterCount => 2;
+    public override int MaxParameterCount => 2;
+
+    protected override LangValueType ExecuteInternal(
+        List<LangExpression> parameters,
+        VariateManager manager,
+        SourcePosition position)
+    {
+        var results = EvaluateParameters(parameters, manager);
+        var obj = results[0];
+        var fieldName = ((StringLangValue)results[1]).Value;
+
+        if (obj is not AnyLangValue anyValue)
+        {
+            throw new InvalidOperationError(position, "对象不是类实例");
+        }
+
+        return anyValue.ReflectionGetField(fieldName);
+    }
+
+    protected override void GenerateIlInternal(
+        List<LangExpression> parameters,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        SourcePosition position)
+    {
+        // 加载对象参数
+        parameters[0].LoadIlValue(ilGenerator, local);
+
+        // 加载字段名参数
+        parameters[1].LoadIlValue(ilGenerator, local);
+
+        // 调用 ReflectionHelper.GetField(object, string)
+        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetField));
+        ilGenerator.Emit(OpCodes.Call, method!);
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(object);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        return ReflectionHelper.GetField(arguments[0]!, (string)arguments[1]!);
+    }
+}
+
+/// <summary>
+/// SetField 函数 - 动态设置字段值
+/// </summary>
+public sealed class SetFieldFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["SetField"];
+    public override int MinParameterCount => 3;
+    public override int MaxParameterCount => 3;
+
+    protected override LangValueType ExecuteInternal(
+        List<LangExpression> parameters,
+        VariateManager manager,
+        SourcePosition position)
+    {
+        var results = EvaluateParameters(parameters, manager);
+        var obj = results[0];
+        var fieldName = ((StringLangValue)results[1]).Value;
+        var value = results[2];
+
+        if (obj is not AnyLangValue anyValue)
+        {
+            throw new InvalidOperationError(position, "对象不是类实例");
+        }
+
+        anyValue.ReflectionSetField(fieldName, value);
+        return new VoidLangValue();
+    }
+
+    protected override void GenerateIlInternal(
+        List<LangExpression> parameters,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        SourcePosition position)
+    {
+        // 加载对象参数
+        parameters[0].LoadIlValue(ilGenerator, local);
+
+        // 加载字段名参数
+        parameters[1].LoadIlValue(ilGenerator, local);
+
+        // 加载值参数
+        parameters[2].LoadIlValue(ilGenerator, local);
+
+        // 调用 ReflectionHelper.SetField(object, string, object)
+        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.SetField));
+        ilGenerator.Emit(OpCodes.Call, method!);
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(void);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        ReflectionHelper.SetField(arguments[0]!, (string)arguments[1]!, arguments[2]!);
+        return null;
+    }
+}

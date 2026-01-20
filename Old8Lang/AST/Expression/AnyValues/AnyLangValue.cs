@@ -245,7 +245,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 执行方法
     /// </summary>
-    private LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
+    protected LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         List<NamedArgument>? namedArgs, VariateManager manager)
     {
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：

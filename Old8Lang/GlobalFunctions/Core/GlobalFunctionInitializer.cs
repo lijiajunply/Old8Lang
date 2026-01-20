@@ -1,5 +1,6 @@
 using Old8Lang.GlobalFunctions.Implementations;
 using Old8Lang.GlobalFunctions.Implementations.Concurrency;
+using Old8Lang.GlobalFunctions.Implementations.Reflection;
 
 namespace Old8Lang.GlobalFunctions.Core;
 
@@ -121,6 +122,26 @@ public static class GlobalFunctionInitializer
             registry.Register(new SleepFunction());
             registry.Register(new GetCurrentThreadIdFunction());
             registry.Register(new GetProcessorCountFunction());
+
+            // 注册反射函数 - 类型信息查询
+            registry.Register(new GetClassNameFunction());
+            registry.Register(new GetClassMethodsFunction());
+            registry.Register(new GetClassFieldsFunction());
+            registry.Register(new GetMethodInfoFunction());
+            registry.Register(new GetFieldInfoFunction());
+
+            // 注册反射函数 - 动态调用
+            registry.Register(new InvokeMethodFunction());
+
+            // 注册反射函数 - 字段访问
+            registry.Register(new GetFieldFunction());
+            registry.Register(new SetFieldFunction());
+
+            // 注册反射函数 - 实例创建和类型检查
+            registry.Register(new CreateInstanceFunction());
+            registry.Register(new IsInstanceOfFunction());
+            registry.Register(new HasMethodFunction());
+            registry.Register(new HasFieldFunction());
 
             _initialized = true;
         }

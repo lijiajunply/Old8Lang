@@ -1,0 +1,43 @@
+// 反射系统语法测试
+
+class TestClass {
+    private field1:int <- 0
+    public field2:string <- "test"
+
+    public init() -> void {
+        field1 <- 42
+    }
+
+    public method1() -> void {
+        PrintLine("method1")
+    }
+
+    private method2(x:int) -> int {
+        return x * 2
+    }
+}
+
+// 测试所有反射函数的语法
+obj <- TestClass()
+
+// 类型信息查询
+className <- GetClassName(obj)
+methods <- GetClassMethods(obj)
+fields <- GetClassFields(obj)
+methodInfo <- GetMethodInfo(obj, "method1")
+fieldInfo <- GetFieldInfo(obj, "field1")
+
+// 动态调用
+result <- InvokeMethod(obj, "method1", {})
+
+// 字段访问
+value <- GetField(obj, "field1")
+SetField(obj, "field1", 100)
+
+// 实例创建和类型检查
+obj2 <- CreateInstance("TestClass", {})
+isInstance <- IsInstanceOf(obj, "TestClass")
+hasMethod <- HasMethod(obj, "method1")
+hasField <- HasField(obj, "field1")
+
+PrintLine("语法测试通过")

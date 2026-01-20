@@ -136,6 +136,26 @@
   - 编译器模式下的装饰器支持需要进一步完善
   - Lambda 闭包捕获装饰器参数的场景需要特殊处理
 
+#### 反射系统支持
+  添加完整的反射功能，支持运行时类型检查和动态操作
+  - 添加 12 个反射全局函数：
+    - 类型信息查询：`GetClassName`, `GetClassMethods`, `GetClassFields`, `GetMethodInfo`, `GetFieldInfo`
+    - 动态方法调用：`InvokeMethod`
+    - 动态字段访问：`GetField`, `SetField`
+    - 动态实例创建：`CreateInstance`
+    - 类型检查：`IsInstanceOf`, `HasMethod`, `HasField`
+  - 反射可以访问所有成员（包括 private）
+  - 支持解释器模式和编译器模式
+  - 类定义时自动注册到全局类型注册表
+
+#### 内部改进
+
+- 在 `AnyLangValue` 中添加反射专用方法（`ReflectionGetField`, `ReflectionSetField`, `ReflectionInvokeMethod`）
+- 在 `TypeTemplate` 中添加全局类型注册表
+- 创建 `ReflectionHelper` 运行时辅助类用于编译器模式支持
+- 将 `AnyLangValue.ExecuteMethod` 访问级别从 `private` 改为 `protected`
+
+
 ## Old8Lang 1.0.0 rc7
 
 ### 语法统一

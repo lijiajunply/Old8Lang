@@ -653,6 +653,58 @@ public partial class TypeTemplate(
 
         return instance;
     }
+
+    // ==================== 反射支持：类型注册表 ====================
+
+    /// <summary>
+    /// 全局类型注册表
+    /// 用于反射功能中通过类名查找类型
+    /// </summary>
+    private static readonly Dictionary<string, TypeTemplate> TypeRegistry = new();
+
+    /// <summary>
+    /// 类型注册表锁
+    /// </summary>
+    private static readonly Lock RegistryLock = new();
+
+    /// <summary>
+    /// 注册类型到全局注册表
+    /// </summary>
+    /// <param name="className">类名</param>
+    /// <param name="template">类型模板</param>
+    public static void RegisterType(string className, TypeTemplate template)
+    {
+        lock (RegistryLock)
+        {
+            TypeRegistry[className] = template;
+        }
+    }
+
+    /// <summary>
+    /// 从全局注册表查找类型
+    /// </summary>
+    /// <param name="className">类名</param>
+    /// <returns>类型模板，如果不存在则返回 null</returns>
+    public static TypeTemplate? FindType(string className)
+    {
+        lock (RegistryLock)
+        {
+            return TypeRegistry.TryGetValue(className, out var template) ? template : null;
+        }
+    }
+
+    /// <summary>
+    /// 检查类型是否已注册
+    /// </summary>
+    /// <param name="className">类名</param>
+    /// <returns>如果类型已注册则返回 true，否则返回 false</returns>
+    public static bool IsTypeRegistered(string className)
+    {
+        lock (RegistryLock)
+        {
+            return TypeRegistry.ContainsKey(className);
+        }
+    }
 }
 
 /// <summary>
