@@ -56,13 +56,21 @@ public partial class VirtualMachine
             // 初始化静态字段的默认值
             foreach (var staticField in classMetadata.StaticFields)
             {
-                // 从常量池获取默认值
-                object? defaultValue = null;
-                if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                // 处理 null 默认值
+                if (staticField.IsDefaultNull)
                 {
-                    defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
+                    classMetadata.StaticFieldValues[staticField.Name] = null;
                 }
-                classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
+                // 从常量池获取默认值
+                else if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                {
+                    var defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
+                    classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
+                }
+                else
+                {
+                    classMetadata.StaticFieldValues[staticField.Name] = null;
+                }
             }
         }
     }

@@ -99,7 +99,7 @@ public class BytecodeCompiler
         // 遍历 OtherStatements 中的变量声明
         foreach (var statement in ast.OtherStatements)
         {
-            if (statement is SetStatement setStatement && setStatement.Id != null)
+            if (statement is SetStatement { Id: not null } setStatement)
             {
                 // 顶层的变量声明是全局变量
                 DeclareGlobalVariable(setStatement.Id.IdName);
@@ -552,15 +552,25 @@ public class BytecodeCompiler
         {
             // 计算静态字段的初始值并添加到常量池
             var constantValue = EvaluateConstantExpression(initialValue);
-            int constantIndex = ConstantPool.AddConstant(constantValue ?? 0);
 
             // 创建静态字段元数据
             var staticFieldMetadata = new FieldMetadata
             {
                 Name = fieldName,
-                IsStatic = true,
-                DefaultValueIndex = constantIndex
+                IsStatic = true
             };
+
+            // 处理 null 默认值
+            if (constantValue == null)
+            {
+                staticFieldMetadata.IsDefaultNull = true;
+                staticFieldMetadata.DefaultValueIndex = -1;
+            }
+            else
+            {
+                int constantIndex = ConstantPool.AddConstant(constantValue);
+                staticFieldMetadata.DefaultValueIndex = constantIndex;
+            }
 
             classMetadata.StaticFields.Add(staticFieldMetadata);
         }
@@ -712,6 +722,7 @@ public class BytecodeCompiler
                 {
                     _localTypes[name] = type;
                 }
+
                 return local;
             }
 
@@ -721,6 +732,7 @@ public class BytecodeCompiler
             {
                 _localTypes[name] = type;
             }
+
             return index;
         }
 

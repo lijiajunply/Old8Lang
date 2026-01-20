@@ -35,6 +35,9 @@ public class FieldMetadata
     /// <summary>默认值在常量池中的索引（-1表示无默认值）</summary>
     public int DefaultValueIndex { get; set; } = -1;
 
+    /// <summary>默认值是否为 null</summary>
+    public bool IsDefaultNull { get; set; }
+
     /// <summary>
     /// 写入二进制流
     /// </summary>
@@ -45,6 +48,7 @@ public class FieldMetadata
         writer.Write(IsStatic);
         writer.Write(TypeName ?? "");
         writer.Write(DefaultValueIndex);
+        writer.Write(IsDefaultNull);
     }
 
     /// <summary>
@@ -62,6 +66,7 @@ public class FieldMetadata
         var typeName = reader.ReadString();
         field.TypeName = string.IsNullOrEmpty(typeName) ? null : typeName;
         field.DefaultValueIndex = reader.ReadInt32();
+        field.IsDefaultNull = reader.ReadBoolean();
 
         return field;
     }

@@ -2461,8 +2461,54 @@ public partial class VirtualMachine
                     throw new Exception($"无法在 null 对象上调用方法 {methodName}");
                 }
 
+                // 检查是否是 ClassMetadata（静态方法调用）
+                if (obj is ClassMetadata staticClassMetadata)
+                {
+                    // 在静态方法列表中查找方法
+                    var staticMethod = staticClassMetadata.StaticMethods.FirstOrDefault(m => m.Name == methodName);
+
+                    if (staticMethod == null)
+                    {
+                        throw new Exception($"类 {staticClassMetadata.Name} 没有静态方法 {methodName}");
+                    }
+
+                    // 检查方法访问修饰符
+                    if (staticMethod.AccessModifier == AccessModifier.Private)
+                    {
+                        // 检查是否在类内部调用
+                        bool isInternalCall = false;
+                        foreach (var callFrame in _callStack)
+                        {
+                            // 检查当前帧的第一个参数（this）是否是同一个类的实例
+                            if (callFrame.Arguments != null && callFrame.Arguments.Length > 0 &&
+                                callFrame.Arguments[0] is BytecodeObjectInstance frameObj &&
+                                frameObj.ClassName == staticClassMetadata.Name)
+                            {
+                                isInternalCall = true;
+                                break;
+                            }
+
+                            // 检查当前帧是否是同一个类的静态方法
+                            // 函数名格式为 "ClassName.MethodName"
+                            var funcName = callFrame.Function.Name;
+                            if (funcName.StartsWith(staticClassMetadata.Name + "."))
+                            {
+                                isInternalCall = true;
+                                break;
+                            }
+                        }
+
+                        if (!isInternalCall)
+                        {
+                            throw new Exception($"无法访问类 {staticClassMetadata.Name} 的私有静态方法 {methodName}");
+                        }
+                    }
+
+                    // 静态方法不需要 this 参数，直接传递参数
+                    CallFunction(staticMethod.Function, args);
+                }
                 // 检查是否是 BytecodeObjectInstance
-                if (obj is BytecodeObjectInstance bytecodeObj)
+                else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
                     // Old8Lang 对象，查找类方法
                     var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
@@ -2556,6 +2602,15 @@ public partial class VirtualMachine
                             if (callFrame.Arguments != null && callFrame.Arguments.Length > 0 &&
                                 callFrame.Arguments[0] is BytecodeObjectInstance frameObj &&
                                 frameObj.ClassName == bytecodeObj.ClassName)
+                            {
+                                isInternalCall = true;
+                                break;
+                            }
+
+                            // 检查当前帧是否是同一个类的静态方法
+                            // 函数名格式为 "ClassName.MethodName"
+                            var funcName = callFrame.Function.Name;
+                            if (funcName.StartsWith(bytecodeObj.ClassName + "."))
                             {
                                 isInternalCall = true;
                                 break;

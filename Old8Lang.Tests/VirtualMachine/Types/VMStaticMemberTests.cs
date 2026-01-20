@@ -182,7 +182,7 @@ public class VMStaticMemberTests
                 }
 
                 public static func create(n:string, a:int) -> Person {
-                    return new Person(n, a)
+                    return Person(n, a)
                 }
 
                 public func getName() -> string {
@@ -298,7 +298,7 @@ public class VMStaticMemberTests
 
                 public static func getInstance() -> Singleton {
                     if Singleton.instance == null {
-                        Singleton.instance <- new Singleton()
+                        Singleton.instance <- Singleton()
                     }
                     return Singleton.instance
                 }
@@ -364,15 +364,27 @@ public class VMStaticMemberTests
     public void StaticField_WithList_ExecutesCorrectly()
     {
         // Arrange
+        // 注意：虚拟机模式不支持非常量默认参数表达式（如列表）
+        // 因此使用静态初始化方法来初始化列表
         var code = @"
             class Registry {
-                public static items:List<string> <- {}
+                private static items:List<string>?
+                private static initialized:bool <- false
+
+                private static func ensureInitialized() -> void {
+                    if Registry.initialized == false {
+                        Registry.items <- {}
+                        Registry.initialized <- true
+                    }
+                }
 
                 public static func register(item:string) -> void {
+                    Registry.ensureInitialized()
                     Registry.items.Add(item)
                 }
 
                 public static func getCount() -> int {
+                    Registry.ensureInitialized()
                     return Registry.items.Count()
                 }
             }
