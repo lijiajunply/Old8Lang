@@ -1,16 +1,30 @@
 using System.Collections;
 using System.Reflection;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.Bytecode;
 
 public partial class VirtualMachine
 {
+    /// <summary>
+    /// 从指令获取源代码位置信息
+    /// </summary>
+    private static SourcePosition GetPosition(Instruction instruction)
+    {
+        return new SourcePosition(
+            instruction.LineNumber ?? 0,
+            instruction.ColumnNumber ?? 0,
+            fileName: instruction.SourceFile
+        );
+    }
+
     private void ExecuteInstruction(Instruction instruction, CallFrame frame)
     {
         switch (instruction.OpCode)
@@ -58,7 +72,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"未定义的全局变量: {varName}");
+                    throw new NameError(GetPosition(instruction), varName);
                 }
             }
                 break;
@@ -371,7 +385,7 @@ public partial class VirtualMachine
                             break;
                         }
 
-                        throw new Exception($"未定义的函数: {funcName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), funcName);
                     }
 
                     // 检查参数数量，如果不足则使用默认值补全
@@ -394,7 +408,7 @@ public partial class VirtualMachine
                             }
                             else
                             {
-                                throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                                throw new ArgumentError(GetPosition(instruction), $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
                             }
                         }
 
@@ -494,7 +508,7 @@ public partial class VirtualMachine
 
                     if (function == null)
                     {
-                        throw new Exception($"未定义的函数: {funcName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), funcName);
                     }
 
                     // 重新排列参数以匹配函数参数定义
@@ -675,7 +689,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"尝试调用非函数对象: {funcObj?.GetType().Name}");
+                    throw new TypeError(GetPosition(instruction), $"尝试调用非函数对象: {funcObj?.GetType().Name}");
                 }
             }
                 break;
@@ -697,12 +711,12 @@ public partial class VirtualMachine
             case OpCode.Break:
                 // Break指令在字节码生成阶段已经被转换为Jump指令
                 // 这里不应该被执行到
-                throw new Exception("Break指令不应该在运行时被执行");
+                throw new InvalidOperationError(GetPosition(instruction), "Break指令不应该在运行时被执行");
 
             case OpCode.Continue:
                 // Continue指令在字节码生成阶段已经被转换为Jump指令
                 // 这里不应该被执行到
-                throw new Exception("Continue指令不应该在运行时被执行");
+                throw new InvalidOperationError(GetPosition(instruction), "Continue指令不应该在运行时被执行");
 
             case OpCode.MakeFunction:
             {
@@ -715,7 +729,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"无效的函数索引: {funcIndex}");
+                    throw new IndexError(GetPosition(instruction), $"无效的函数索引: {funcIndex}");
                 }
             }
                 break;
@@ -731,7 +745,7 @@ public partial class VirtualMachine
                 // 获取函数元数据
                 if (funcIndex < 0 || funcIndex >= _bytecodeFile.Functions.Count)
                 {
-                    throw new Exception($"无效的函数索引: {funcIndex}");
+                    throw new IndexError(GetPosition(instruction), $"无效的函数索引: {funcIndex}");
                 }
                 var funcMeta = _bytecodeFile.Functions[funcIndex];
 
@@ -890,7 +904,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"无法获取类型 {collection?.GetType().Name} 的长度");
+                    throw new TypeError(GetPosition(instruction), $"无法获取类型 {collection?.GetType().Name} 的长度");
                 }
 
                 _stack.Push(length);
@@ -917,7 +931,7 @@ public partial class VirtualMachine
                 {
                     if (!dict.Contains(index))
                     {
-                        throw new Exception($"字典中不存在键: {index}");
+                        throw new KeyError(GetPosition(instruction), index);
                     }
                     _stack.Push(dict[index]);
                 }
@@ -941,7 +955,7 @@ public partial class VirtualMachine
 
                     if (!found)
                     {
-                        throw new Exception($"字典中不存在键: {index}");
+                        throw new KeyError(GetPosition(instruction), index);
                     }
                 }
                 else if (collection is string str)
@@ -984,12 +998,12 @@ public partial class VirtualMachine
 
                     if (!found)
                     {
-                        throw new Exception($"元组索引越界: {idx}");
+                        throw new IndexError(GetPosition(instruction), idx, currentIdx);
                     }
                 }
                 else
                 {
-                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行索引访问");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行索引访问");
                 }
             }
                 break;
@@ -1043,7 +1057,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行索引赋值");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行索引赋值");
                 }
             }
                 break;
@@ -1114,7 +1128,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"对象类型 {collection?.GetType().Name} 不可迭代");
+                    throw new TypeError(GetPosition(instruction), $"对象类型 {collection?.GetType().Name} 不可迭代");
                 }
             }
                 break;
@@ -1132,7 +1146,7 @@ public partial class VirtualMachine
                 {
                     var top = _stack.Count > 0 ? _stack.Peek() : null;
                     var topType = top?.GetType().FullName ?? "null";
-                    throw new Exception($"栈顶不是迭代器对象，而是: {topType}");
+                    throw new StateError(GetPosition(instruction), $"栈顶不是迭代器对象，而是: {topType}");
                 }
             }
                 break;
@@ -1142,7 +1156,7 @@ public partial class VirtualMachine
                 // 栈顶应该是迭代器
                 if (_stack.Count == 0)
                 {
-                    throw new Exception("IteratorCurrent: 栈为空");
+                    throw new StateError(GetPosition(instruction), "IteratorCurrent: 栈为空");
                 }
 
                 var top = _stack.Peek();
@@ -1155,7 +1169,7 @@ public partial class VirtualMachine
                     // 调试：输出栈的详细信息
                     var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
                     var topType = top?.GetType().FullName ?? "null";
-                    throw new Exception($"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
+                    throw new StateError(GetPosition(instruction), $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
                 }
             }
                 break;
@@ -1258,7 +1272,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"无法对类型 {collection?.GetType().Name} 执行切片操作");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行切片操作");
                 }
             }
                 break;
@@ -1280,7 +1294,7 @@ public partial class VirtualMachine
 
                 if (groupDict == null)
                 {
-                    throw new Exception("AddToGroup 操作需要一个分组字典");
+                    throw new TypeError(GetPosition(instruction), "AddToGroup 操作需要一个分组字典");
                 }
 
                 // 如果键不存在,创建新的列表
@@ -1304,7 +1318,7 @@ public partial class VirtualMachine
 
                 if (groupDict == null)
                 {
-                    throw new Exception("GroupDictToList 操作需要一个分组字典");
+                    throw new TypeError(GetPosition(instruction), "GroupDictToList 操作需要一个分组字典");
                 }
 
                 var resultList = new List<object?>();
@@ -1360,7 +1374,7 @@ public partial class VirtualMachine
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"类型转换失败: 无法将 {value?.GetType().Name ?? "null"} 转换为 {targetTypeName}", ex);
+                    throw new CastError(GetPosition(instruction), value?.GetType().Name ?? "null", targetTypeName, ex.Message);
                 }
             }
                 break;
@@ -1591,7 +1605,7 @@ public partial class VirtualMachine
                 else if (funcObj is string funcName)
                 {
                     function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName)
-                               ?? throw new Exception($"Function not found: {funcName}");
+                               ?? throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
                 else if (funcObj is FunctionMetadata funcMeta)
                 {
@@ -1599,7 +1613,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
+                    throw new TypeError(GetPosition(instruction), $"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
                 }
 
                 // 创建线程
@@ -1668,7 +1682,7 @@ public partial class VirtualMachine
                 else if (funcObj is string funcName)
                 {
                     function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName)
-                               ?? throw new Exception($"Function not found: {funcName}");
+                               ?? throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
                 else if (funcObj is FunctionMetadata funcMeta)
                 {
@@ -1676,7 +1690,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"Invalid function for NewTask: {funcObj?.GetType().Name}");
+                    throw new TypeError(GetPosition(instruction), $"Invalid function for NewTask: {funcObj?.GetType().Name}");
                 }
 
                 // 创建并启动任务
@@ -1710,7 +1724,7 @@ public partial class VirtualMachine
                 var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
                 if (function == null)
                 {
-                    throw new Exception($"未定义的异步函数: {funcName}");
+                    throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
 
                 // 创建并启动任务
@@ -1769,7 +1783,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new Exception($"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
+                    throw new TypeError(GetPosition(instruction), $"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
                 }
             }
                 break;
@@ -1965,7 +1979,7 @@ public partial class VirtualMachine
 
                 if (obj == null)
                 {
-                    throw new Exception($"无法访问 null 对象的字段 {fieldName}");
+                    throw new NullReferenceError(GetPosition(instruction), fieldName);
                 }
 
                 // 如果是 ClassMetadata（访问静态字段）
@@ -1977,7 +1991,7 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        throw new Exception($"类 {classMetadata.Name} 没有静态字段 {fieldName}");
+                        throw new AttributeError(GetPosition(instruction), fieldName, classMetadata.Name);
                     }
                 }
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
@@ -1989,7 +2003,7 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        throw new Exception($"对象没有字段 {fieldName}");
+                        throw new AttributeError(GetPosition(instruction), fieldName, "BytecodeObject");
                     }
                 }
                 // 如果是字典对象（兼容旧代码）
@@ -2001,7 +2015,7 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        throw new Exception($"对象没有字段 {fieldName}");
+                        throw new AttributeError(GetPosition(instruction), fieldName, "BytecodeObject");
                     }
                 }
                 // 如果是枚举模板（访问枚举成员）
@@ -2068,12 +2082,12 @@ public partial class VirtualMachine
 
                         if (!found)
                         {
-                            throw new Exception($"元组没有字段 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, "Tuple");
                         }
                     }
                     else
                     {
-                        throw new Exception($"类型 Tuple 没有字段或属性 {fieldName}");
+                        throw new AttributeError(GetPosition(instruction), fieldName, "Tuple");
                     }
                 }
                 else if (obj is IList list)
@@ -2100,7 +2114,7 @@ public partial class VirtualMachine
                             }
                             else
                             {
-                                throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
+                                throw new AttributeError(GetPosition(instruction), fieldName, type.Name);
                             }
                         }
                     }
@@ -2147,7 +2161,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new Exception($"类型 {objType.Name} 没有字段或属性 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
                         }
                     }
                 }
@@ -2164,7 +2178,7 @@ public partial class VirtualMachine
 
                 if (obj == null)
                 {
-                    throw new Exception($"无法设置 null 对象的字段 {fieldName}");
+                    throw new NullReferenceError(GetPosition(instruction), fieldName);
                 }
 
                 // 如果是 ClassMetadata（设置静态字段）
@@ -2176,7 +2190,7 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        throw new Exception($"类 {classMetadata.Name} 没有静态字段 {fieldName}");
+                        throw new AttributeError(GetPosition(instruction), fieldName, classMetadata.Name);
                     }
                 }
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
@@ -2210,7 +2224,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new Exception($"类型 {objType.Name} 没有可写的字段或属性 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
                         }
                     }
                 }
@@ -2226,7 +2240,7 @@ public partial class VirtualMachine
 
                 if (thisInstance == null)
                 {
-                    throw new Exception($"无法访问 null 对象的父类字段 {fieldName}");
+                    throw new NullReferenceError(GetPosition(instruction), fieldName);
                 }
 
                 // 检查是否是 BytecodeObjectInstance
@@ -2254,7 +2268,7 @@ public partial class VirtualMachine
 
                     if (baseType == null || baseType == typeof(object))
                     {
-                        throw new Exception($"类型 {objType.Name} 没有父类");
+                        throw new TypeError(GetPosition(instruction), $"类型 {objType.Name} 没有父类");
                     }
 
                     // 先尝试获取属性
@@ -2273,7 +2287,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new Exception($"父类 {baseType.Name} 没有字段或属性 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, baseType.Name);
                         }
                     }
                 }
@@ -2290,7 +2304,7 @@ public partial class VirtualMachine
 
                 if (thisInstance == null)
                 {
-                    throw new Exception($"无法设置 null 对象的父类字段 {fieldName}");
+                    throw new NullReferenceError(GetPosition(instruction), fieldName);
                 }
 
                 // 检查是否是 BytecodeObjectInstance
@@ -2309,7 +2323,7 @@ public partial class VirtualMachine
 
                     if (baseType == null || baseType == typeof(object))
                     {
-                        throw new Exception($"类型 {objType.Name} 没有父类");
+                        throw new TypeError(GetPosition(instruction), $"类型 {objType.Name} 没有父类");
                     }
 
                     // 先尝试设置属性
@@ -2328,7 +2342,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new Exception($"父类 {baseType.Name} 没有可写的字段或属性 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, baseType.Name);
                         }
                     }
                 }
@@ -2376,7 +2390,7 @@ public partial class VirtualMachine
 
                 if (classMetadata == null)
                 {
-                    throw new Exception($"未找到类定义: {className}");
+                    throw new ClassNotFoundError(GetPosition(instruction), className);
                 }
 
                 // 创建对象实例
@@ -2458,7 +2472,7 @@ public partial class VirtualMachine
                 var obj = _stack.Pop();
                 if (obj == null)
                 {
-                    throw new Exception($"无法在 null 对象上调用方法 {methodName}");
+                    throw new NullReferenceError(GetPosition(instruction), methodName);
                 }
 
                 // 检查是否是 ClassMetadata（静态方法调用）
@@ -2469,7 +2483,7 @@ public partial class VirtualMachine
 
                     if (staticMethod == null)
                     {
-                        throw new Exception($"类 {staticClassMetadata.Name} 没有静态方法 {methodName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), methodName, staticClassMetadata.Name);
                     }
 
                     // 检查方法访问修饰符
@@ -2500,7 +2514,7 @@ public partial class VirtualMachine
 
                         if (!isInternalCall)
                         {
-                            throw new Exception($"无法访问类 {staticClassMetadata.Name} 的私有静态方法 {methodName}");
+                            throw new AccessViolationError(GetPosition(instruction), methodName, staticClassMetadata.Name, "private");
                         }
                     }
 
@@ -2545,7 +2559,7 @@ public partial class VirtualMachine
 
                     if (classMetadata == null)
                     {
-                        throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
+                        throw new ClassNotFoundError(GetPosition(instruction), bytecodeObj.ClassName);
                     }
 
                     // 在类的方法列表中查找方法（包括父类方法）
@@ -2588,7 +2602,7 @@ public partial class VirtualMachine
 
                     if (methodMetadata == null)
                     {
-                        throw new Exception($"类 {bytecodeObj.ClassName} 没有方法 {methodName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), methodName, bytecodeObj.ClassName);
                     }
 
                     // 检查方法访问修饰符
@@ -2619,7 +2633,7 @@ public partial class VirtualMachine
 
                         if (!isInternalCall)
                         {
-                            throw new Exception($"无法访问类 {bytecodeObj.ClassName} 的私有方法 {methodName}");
+                            throw new AccessViolationError(GetPosition(instruction), methodName, bytecodeObj.ClassName, "private");
                         }
                     }
 
@@ -2658,7 +2672,7 @@ public partial class VirtualMachine
                     var thisInstance = currentFrame.Arguments[0];
                     if (thisInstance == null)
                     {
-                        throw new Exception("super 只能在实例方法中使用");
+                        throw new StateError(GetPosition(instruction), "super 只能在实例方法中使用");
                     }
 
                     _stack.Push(thisInstance);
@@ -2669,14 +2683,14 @@ public partial class VirtualMachine
                     var thisInstance = currentFrame.Locals[0];
                     if (thisInstance == null)
                     {
-                        throw new Exception("super 只能在实例方法中使用");
+                        throw new StateError(GetPosition(instruction), "super 只能在实例方法中使用");
                     }
 
                     _stack.Push(thisInstance);
                 }
                 else
                 {
-                    throw new Exception("super 只能在实例方法中使用");
+                    throw new StateError(GetPosition(instruction), "super 只能在实例方法中使用");
                 }
             }
                 break;
@@ -2699,7 +2713,7 @@ public partial class VirtualMachine
                 var thisInstance = _stack.Pop();
                 if (thisInstance == null)
                 {
-                    throw new Exception($"无法在 null 对象上调用父类方法 {methodName}");
+                    throw new NullReferenceError(GetPosition(instruction), methodName);
                 }
 
                 // 检查是否是 BytecodeObjectInstance
@@ -2709,26 +2723,26 @@ public partial class VirtualMachine
                     var currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
                     if (currentClass == null)
                     {
-                        throw new Exception($"未找到类定义: {bytecodeObj.ClassName}");
+                        throw new ClassNotFoundError(GetPosition(instruction), bytecodeObj.ClassName);
                     }
 
                     // 查找父类
                     if (string.IsNullOrEmpty(currentClass.BaseClassName))
                     {
-                        throw new Exception($"类 {bytecodeObj.ClassName} 没有父类");
+                        throw new TypeError(GetPosition(instruction), $"类 {bytecodeObj.ClassName} 没有父类");
                     }
 
                     var parentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
                     if (parentClass == null)
                     {
-                        throw new Exception($"未找到父类定义: {currentClass.BaseClassName}");
+                        throw new ClassNotFoundError(GetPosition(instruction), currentClass.BaseClassName);
                     }
 
                     // 在父类中查找方法
                     var methodMetadata = parentClass.Methods.FirstOrDefault(m => m.Name == methodName);
                     if (methodMetadata == null)
                     {
-                        throw new Exception($"父类 {parentClass.Name} 没有方法 {methodName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), methodName, parentClass.Name);
                     }
 
                     // 准备方法调用参数：第一个参数是 this
@@ -2747,7 +2761,7 @@ public partial class VirtualMachine
 
                     if (method == null)
                     {
-                        throw new Exception($"类型 {objType.Name} 的父类没有方法 {methodName}");
+                        throw new MethodNotFoundError(GetPosition(instruction), methodName, objType.BaseType?.Name ?? "unknown");
                     }
 
                     var result = method.Invoke(thisInstance, args);
@@ -2780,7 +2794,7 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
                 if (symbol == null)
                 {
-                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
                 }
 
                 // 将符号添加到当前全局变量
@@ -2799,7 +2813,7 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
                 if (symbol == null)
                 {
-                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
                 }
 
                 // 使用别名添加到全局变量
@@ -2815,7 +2829,7 @@ public partial class VirtualMachine
                 var module = _moduleRegistry.GetModule(moduleName);
                 if (module == null)
                 {
-                    throw new Exception($"模块 '{moduleName}' 未加载");
+                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 未加载");
                 }
 
                 // 导入所有导出的符号
@@ -2837,7 +2851,7 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
                 if (symbol == null)
                 {
-                    throw new Exception($"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                    throw new ImportError(GetPosition(instruction), moduleName, $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
                 }
 
                 _stack.Push(symbol);
@@ -2898,7 +2912,7 @@ public partial class VirtualMachine
                 // 从全局变量中获取 extern 函数
                 if (!_globals.TryGetValue(funcName, out var funcObj) || funcObj is not ExternFunctionWrapper externFunc)
                 {
-                    throw new Exception($"未找到 extern 函数: {funcName}");
+                    throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
 
                 // 弹出参数
@@ -2989,7 +3003,7 @@ public partial class VirtualMachine
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"无法加载程序集 '{dllPath}': {ex.Message}");
+                        throw new IOError(GetPosition(instruction), $"无法加载程序集 '{dllPath}': {ex.Message}");
                     }
                 }
 
@@ -3001,7 +3015,7 @@ public partial class VirtualMachine
                     type = assembly.GetTypes().FirstOrDefault(t => t.Name == className || t.FullName == className);
                 }
 
-                if (type == null) throw new Exception($"未找到类型: {className} in {dllName}");
+                if (type == null) throw new ClassNotFoundError(GetPosition(instruction), $"{className} in {dllName}");
 
                 // Console.WriteLine($"Importing Native: {dllName}.{className}, Mode={mode}"); // Debug
 
@@ -3013,7 +3027,7 @@ public partial class VirtualMachine
 
                     var methodInfo = type.GetMethod(methodName,
                         BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-                    if (methodInfo == null) throw new Exception($"未找到方法: {methodName}");
+                    if (methodInfo == null) throw new MethodNotFoundError(GetPosition(instruction), methodName);
 
                     var func = new FuncLangValue(registerName, methodInfo);
                     _globals[registerName] = func;
@@ -3046,7 +3060,7 @@ public partial class VirtualMachine
                 break;
 
             default:
-                throw new Exception($"未实现的操作码: {instruction.OpCode}");
+                throw new NotImplementedError(GetPosition(instruction), $"操作码: {instruction.OpCode}");
         }
     }
 

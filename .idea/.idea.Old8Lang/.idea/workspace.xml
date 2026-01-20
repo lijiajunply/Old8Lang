@@ -23,12 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/ClassError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/ConcurrencyError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/IONetworkError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/MiscError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystemError.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ClassError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ClassError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeSystemError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystemError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -935,7 +936,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="753" />
+    <option name="localTasksCounter" value="754" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +963,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(tests): 修复虚拟机逻辑比较测试中的大小写断言问题&#10;&#10;- 将 VMComparisonLogicalTests 中的所有 &quot;True&quot;/&quot;False&quot; 断言改为小写 &quot;true&quot;/&quot;false&quot;&#10;- 修复了布尔值输出的大小写匹配问题&#10;- 更新了相关的注释说明&#10;- 在 VMGenericNestedTests 中修复了字典初始化语法&#10;- 添加了 CLAUDE.md 中关于IL生成问题修复的文档说明" />
     <MESSAGE value="feat(compiler): 实现主函数顶层变量的全局声明逻辑&#10;&#10;- 添加 IsInMainFunctionTopLevel 方法检测主函数顶层作用域&#10;- 修改变量声明逻辑使主函数顶层新变量作为全局变量处理&#10;- 非主函数顶层的新变量仍按局部变量处理&#10;- 保持现有局部和全局变量的识别与存储逻辑不变" />
     <MESSAGE value="feat(vm): 实现LangValueType算术和比较运算支持&#10;&#10;- 添加对LangValueType（IntLangValue, DoubleLangValue等）的加法运算支持&#10;- 添加对LangValueType的减法、乘法、除法和取模运算支持&#10;- 添加对LangValueType的幂运算和比较运算（等于、大于、小于等）支持&#10;- 实现ConvertToLangValueType转换方法支持LangValueType运算&#10;- 添加InvalidOperationError异常处理和类型错误消息提示&#10;- 更新字节码序列化测试中的字符串操作代码格式&#10;- 移除字符串模板测试中的条件表达式和字典访问测试用例&#10;- 更新IDEA工作空间配置文件中的变更列表和任务统计信息" />
     <MESSAGE value="fix(tests): 修复虚拟机集合测试中的布尔值大小写断言问题&#10;&#10;- 将 VMCollectionTests 中的 &quot;True&quot; 断言改为小写 &quot;true&quot;&#10;- 更新了相关的测试用例以匹配正确的布尔值输出格式" />
@@ -987,7 +987,8 @@
     <MESSAGE value="feat(reflection): 添加完整的虚拟机模式反射功能支持&#10;&#10;- 实现 BytecodeObjectInstance 对象实例的字段访问功能&#10;- 添加虚拟机模式下的类名、方法、字段信息查询功能&#10;- 实现 CreateInstance 函数创建类实例的功能&#10;- 添加 HasMethod 和 HasField 检查方法和字段存在的功能&#10;- 实现 InvokeMethod 动态调用方法的功能&#10;- 创建 VMReflectionHelper 辅助类处理虚拟机反射操作&#10;- 添加字节码对象实例的字段和静态字段访问支持&#10;- 实现反射函数对虚拟机上下文的正确依赖注入" />
     <MESSAGE value="docs(grammar): 添加完整的反射系统函数文档&#10;&#10;- 新增 8.5 章节详细介绍反射系统函数&#10;- 添加类型信息查询函数文档，包括 GetClassName、GetClassMethods 等&#10;- 添加动态方法调用和字段访问函数文档&#10;- 添加动态实例创建和类型检查函数文档&#10;- 提供完整的反射函数使用示例代码&#10;- 列出所有反射函数及其参数返回值说明&#10;- 添加反射系统的模式支持和重要说明" />
     <MESSAGE value="test(reflection): 添加编译器和解释器模式反射功能测试&#10;&#10;- 实现 GetClassName 功能测试，验证类名获取的正确性&#10;- 实现 GetClassMethods 功能测试，验证类方法列表获取&#10;- 实现 GetClassFields 功能测试，验证类字段列表获取&#10;- 实现 GetMethodInfo 功能测试，验证方法详情获取&#10;- 实现 GetFieldInfo 功能测试，验证字段详情获取&#10;- 实现 InvokeMethod 功能测试，验证动态方法调用&#10;- 实现 GetField 功能测试，验证字段值获取&#10;- 实现 SetField 功能测试，验证字段值设置&#10;- 实现 CreateInstance 功能测试，验证动态对象创建&#10;- 实现 IsInstanceOf 功能测试，验证类型检查&#10;- 实现 HasMethod 和 HasField 功能测试，验证成员存在性检查&#10;- 添加综合工作流测试，验证完整反射操作流程&#10;- 覆盖公共和私有成员的访问测试场景&#10;- 包含编译器模式和解释器模式的双重测试验证" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(reflection): 添加编译器和解释器模式反射功能测试&#10;&#10;- 实现 GetClassName 功能测试，验证类名获取的正确性&#10;- 实现 GetClassMethods 功能测试，验证类方法列表获取&#10;- 实现 GetClassFields 功能测试，验证类字段列表获取&#10;- 实现 GetMethodInfo 功能测试，验证方法详情获取&#10;- 实现 GetFieldInfo 功能测试，验证字段详情获取&#10;- 实现 InvokeMethod 功能测试，验证动态方法调用&#10;- 实现 GetField 功能测试，验证字段值获取&#10;- 实现 SetField 功能测试，验证字段值设置&#10;- 实现 CreateInstance 功能测试，验证动态对象创建&#10;- 实现 IsInstanceOf 功能测试，验证类型检查&#10;- 实现 HasMethod 和 HasField 功能测试，验证成员存在性检查&#10;- 添加综合工作流测试，验证完整反射操作流程&#10;- 覆盖公共和私有成员的访问测试场景&#10;- 包含编译器模式和解释器模式的双重测试验证" />
+    <MESSAGE value="feat(error): 添加多种错误类型定义&#10;&#10;- 添加类错误定义，包括类未找到、方法未找到、访问权限违规等错误类型&#10;- 添加并发错误定义，包括死锁、Channel操作相关错误、锁获取失败等错误类型&#10;- 添加IO和网络错误定义，涵盖文件读写、网络连接、HTTP请求等多种场景&#10;- 添加其他杂项错误定义，包括迭代器停止、编码解码、配置错误等类型&#10;- 所有错误类型都继承自RuntimeError基类并提供统一的错误处理接口" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(error): 添加多种错误类型定义&#10;&#10;- 添加类错误定义，包括类未找到、方法未找到、访问权限违规等错误类型&#10;- 添加并发错误定义，包括死锁、Channel操作相关错误、锁获取失败等错误类型&#10;- 添加IO和网络错误定义，涵盖文件读写、网络连接、HTTP请求等多种场景&#10;- 添加其他杂项错误定义，包括迭代器停止、编码解码、配置错误等类型&#10;- 所有错误类型都继承自RuntimeError基类并提供统一的错误处理接口" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

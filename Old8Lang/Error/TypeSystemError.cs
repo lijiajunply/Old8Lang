@@ -71,6 +71,22 @@ public class CastError : RuntimeError
             "请检查类型转换是否合法，或使用显式转换方法")
     {
     }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <param name="sourceType">源类型</param>
+    /// <param name="targetType">目标类型</param>
+    /// <param name="reason">失败原因</param>
+    public CastError(SourcePosition position, string sourceType, string targetType, string reason)
+        : base(
+            position,
+            ErrorCode,
+            $"无法将类型 '{sourceType}' 转换为 '{targetType}': {reason}",
+            "请检查类型转换是否合法，或使用显式转换方法")
+    {
+    }
 }
 
 /// <summary>

@@ -109,6 +109,20 @@ public class MethodNotFoundError : RuntimeError
             "请检查方法名是否正确，或者方法是否已定义")
     {
     }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <param name="methodName">方法名</param>
+    public MethodNotFoundError(SourcePosition position, string methodName)
+        : base(
+            position,
+            ErrorCode,
+            $"方法 '{methodName}' 未找到",
+            "请检查方法名是否正确，或者方法是否已定义")
+    {
+    }
 }
 
 /// <summary>

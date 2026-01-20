@@ -40,7 +40,7 @@ public sealed class IntFunction : BaseGlobalFunction
                 return new IntLangValue(result);
             }
 
-            throw new InvalidOperationError(position, $"无法将字符串 '{stringValue.Value}' 转换为整数");
+            throw new CastError(value, "string", "int", $"字符串 '{stringValue.Value}' 不是有效的整数格式");
         }
 
         if (value is BoolLangValue boolValue)
@@ -48,7 +48,7 @@ public sealed class IntFunction : BaseGlobalFunction
             return new IntLangValue(boolValue.Value ? 1 : 0);
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为整数");
+        throw new CastError(position, value.GetType().Name, "int");
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
@@ -93,7 +93,7 @@ public sealed class IntFunction : BaseGlobalFunction
             return;
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {paramType.Name} 转换为整数");
+        throw new CastError(position, paramType.Name, "int");
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -122,7 +122,7 @@ public sealed class IntFunction : BaseGlobalFunction
                 return result;
             }
 
-            throw new Exception($"无法将字符串 '{stringValue}' 转换为整数");
+            throw new CastError(new SourcePosition(), "string", "int", $"字符串 '{stringValue}' 不是有效的整数格式");
         }
 
         if (value is bool boolValue)
@@ -137,7 +137,7 @@ public sealed class IntFunction : BaseGlobalFunction
         }
         catch
         {
-            throw new Exception($"无法将类型 {value?.GetType().Name ?? "null"} 转换为整数");
+            throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "int");
         }
     }
 }
@@ -173,7 +173,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
                 return new DoubleLangValue(result);
             }
 
-            throw new InvalidOperationError(position, $"无法将字符串 '{stringValue.Value}' 转换为浮点数");
+            throw new CastError(position, "string", "double", $"字符串 '{stringValue.Value}' 不是有效的浮点数格式");
         }
 
         if (value is BoolLangValue boolValue)
@@ -181,7 +181,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
             return new DoubleLangValue(boolValue.Value ? 1.0 : 0.0);
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为浮点数");
+        throw new CastError(position, value.GetType().Name, "double");
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
@@ -227,7 +227,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
             return;
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {paramType.Name} 转换为浮点数");
+        throw new CastError(position, paramType.Name, "double");
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -256,7 +256,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
                 return result;
             }
 
-            throw new Exception($"无法将字符串 '{stringValue}' 转换为浮点数");
+            throw new CastError(new SourcePosition(), "string", "double", $"字符串 '{stringValue}' 不是有效的浮点数格式");
         }
 
         if (value is bool boolValue)
@@ -271,7 +271,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
         }
         catch
         {
-            throw new Exception($"无法将类型 {value?.GetType().Name ?? "null"} 转换为浮点数");
+            throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "double");
         }
     }
 }
@@ -307,7 +307,7 @@ public sealed class CharFunction : BaseGlobalFunction
                 : new CharLangValue(char.Parse(stringValue.Value));
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {value.GetType().Name} 转换为浮点数");
+        throw new CastError(position, value.GetType().Name, "char");
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
@@ -338,7 +338,7 @@ public sealed class CharFunction : BaseGlobalFunction
             return;
         }
 
-        throw new InvalidOperationError(position, $"无法将类型 {paramType.Name} 转换为浮点数");
+        throw new CastError(position, paramType.Name, "char");
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -367,7 +367,7 @@ public sealed class CharFunction : BaseGlobalFunction
                 return result;
             }
 
-            throw new Exception($"无法将字符串 '{stringValue}' 转换为浮点数");
+            throw new CastError(new SourcePosition(), "string", "char", $"字符串 '{stringValue}' 不是有效的字符格式");
         }
 
         if (value is bool boolValue)
@@ -382,7 +382,7 @@ public sealed class CharFunction : BaseGlobalFunction
         }
         catch
         {
-            throw new Exception($"无法将类型 {value?.GetType().Name ?? "null"} 转换为浮点数");
+            throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "char");
         }
     }
 }
