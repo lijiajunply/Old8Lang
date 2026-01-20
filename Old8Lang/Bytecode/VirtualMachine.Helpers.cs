@@ -1,4 +1,5 @@
 using System.Collections;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
@@ -39,7 +40,7 @@ public partial class VirtualMachine
             if (result != null)
                 return result;
 
-            throw new Exception($"类型 '{objA.ClassName}' 不支持加法操作（未定义 _add 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_add", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -53,7 +54,7 @@ public partial class VirtualMachine
             catch (InvalidOperationError)
             {
                 // 如果没有定义 _add 方法，抛出错误
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持加法操作（未定义 _add 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_add", anyA.ClassId.IdName);
             }
         }
 
@@ -67,7 +68,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
             }
         }
 
@@ -84,7 +85,7 @@ public partial class VirtualMachine
         if (a is int ia2 && b is double db2) return ia2 + db2;
         if (a is double da2 && b is int ib2) return da2 + ib2;
         if (a is string sa || b is string sb) return ToString(a) + ToString(b);
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法");
     }
 
     private object? Sub(object? a, object? b)
@@ -95,7 +96,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_sub", b);
             if (result != null)
                 return result;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持减法操作（未定义 _sub 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_sub", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -108,7 +109,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError)
             {
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持减法操作（未定义 _sub 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_sub", anyA.ClassId.IdName);
             }
         }
 
@@ -122,7 +123,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法: {ex.Message}");
             }
         }
 
@@ -130,7 +131,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da - db;
         if (a is int ia2 && b is double db2) return ia2 - db2;
         if (a is double da2 && b is int ib2) return da2 - ib2;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法");
     }
 
     private object? Mul(object? a, object? b)
@@ -141,7 +142,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_mul", b);
             if (result != null)
                 return result;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持乘法操作（未定义 _mul 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_mul", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -154,7 +155,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError)
             {
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持乘法操作（未定义 _mul 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_mul", anyA.ClassId.IdName);
             }
         }
 
@@ -168,7 +169,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法: {ex.Message}");
             }
         }
 
@@ -183,7 +184,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da * db;
         if (a is int ia2 && b is double db2) return ia2 * db2;
         if (a is double da2 && b is int ib2) return da2 * ib2;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法");
     }
 
     private object? Div(object? a, object? b)
@@ -194,7 +195,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_div", b);
             if (result != null)
                 return result;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持除法操作（未定义 _div 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_div", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -207,7 +208,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError)
             {
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持除法操作（未定义 _div 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_div", anyA.ClassId.IdName);
             }
         }
 
@@ -221,7 +222,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法: {ex.Message}");
             }
         }
 
@@ -229,7 +230,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da / db;
         if (a is int ia2 && b is double db2) return ia2 / db2;
         if (a is double da2 && b is int ib2) return da2 / ib2;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法");
     }
 
     private object? Mod(object? a, object? b)
@@ -240,7 +241,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_mod", b);
             if (result != null)
                 return result;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持取模操作（未定义 _mod 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_mod", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -253,7 +254,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError)
             {
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持取模操作（未定义 _mod 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_mod", anyA.ClassId.IdName);
             }
         }
 
@@ -267,13 +268,13 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模: {ex.Message}");
             }
         }
 
         if (a is int ia && b is int ib) return ia % ib;
         if (a is double da && b is double db) return da % db;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模");
     }
 
     private object? Pow(object? a, object? b)
@@ -284,7 +285,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_pow", b);
             if (result != null)
                 return result;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持幂运算操作（未定义 _pow 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_pow", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -297,7 +298,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError)
             {
-                throw new Exception($"类型 '{anyA.ClassId.IdName}' 不支持幂运算操作（未定义 _pow 方法）");
+                throw new UnsupportedOperationError(new SourcePosition(), "_pow", anyA.ClassId.IdName);
             }
         }
 
@@ -311,7 +312,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行幂运算: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行幂运算: {ex.Message}");
             }
         }
 
@@ -324,7 +325,7 @@ public partial class VirtualMachine
     {
         if (a is int ia) return -ia;
         if (a is double da) return -da;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 执行取反");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 执行取反");
     }
 
     private new bool Equals(object? a, object? b)
@@ -378,7 +379,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_gt", b);
             if (result != null && result is bool boolResult)
                 return boolResult;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持大于比较操作（未定义 _gt 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_gt", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -399,7 +400,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da > db;
         if (a is int ia2 && b is double db2) return ia2 > db2;
         if (a is double da2 && b is int ib2) return da2 > ib2;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行大于比较");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行大于比较");
     }
 
     private bool Less(object? a, object? b)
@@ -410,7 +411,7 @@ public partial class VirtualMachine
             var result = TryCallOperatorMethod(objA, "_lt", b);
             if (result != null && result is bool boolResult)
                 return boolResult;
-            throw new Exception($"类型 '{objA.ClassName}' 不支持小于比较操作（未定义 _lt 方法）");
+            throw new UnsupportedOperationError(new SourcePosition(), "_lt", objA.ClassName);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -431,7 +432,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da < db;
         if (a is int ia2 && b is double db2) return ia2 < db2;
         if (a is double da2 && b is int ib2) return da2 < ib2;
-        throw new Exception($"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行小于比较");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行小于比较");
     }
 
     private bool GreaterEqual(object? a, object? b)
@@ -507,7 +508,7 @@ public partial class VirtualMachine
         if (value is int i) return i;
         if (value is double d) return d;
         if (value is string s && double.TryParse(s, out double result)) return result;
-        throw new Exception($"无法将 {value?.GetType().Name} 转换为 double");
+        throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "double");
     }
 
     private string ToString(object? value)
@@ -580,7 +581,7 @@ public partial class VirtualMachine
             }
             catch (Exception ex)
             {
-                throw new Exception($"调用全局函数 {funcName} 时发生错误: {ex.Message}", ex);
+                throw new InvalidOperationError(new SourcePosition(), $"调用全局函数 {funcName} 时发生错误: {ex.Message}");
             }
         }
 
@@ -658,7 +659,7 @@ public partial class VirtualMachine
                 return null;
 
             default:
-                throw new Exception($"未知的原生函数: {funcName}");
+                throw new MethodNotFoundError(new SourcePosition(), funcName);
         }
     }
 
@@ -787,7 +788,7 @@ public partial class VirtualMachine
         {
             if (i >= paramCount)
             {
-                throw new Exception($"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
+                throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
             }
 
             args[i] = positionalArgs[i];
@@ -804,13 +805,13 @@ public partial class VirtualMachine
             int paramIndex = function.Parameters.IndexOf(paramName);
             if (paramIndex == -1)
             {
-                throw new Exception($"函数 {function.Name} 没有名为 '{paramName}' 的参数");
+                throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 没有名为 '{paramName}' 的参数");
             }
 
             // 检查该位置是否已被位置参数占用
             if (filled[paramIndex])
             {
-                throw new Exception($"参数 '{paramName}' 已通过位置参数提供");
+                throw new ArgumentError(new SourcePosition(), $"参数 '{paramName}' 已通过位置参数提供");
             }
 
             args[paramIndex] = paramValue;
@@ -832,7 +833,7 @@ public partial class VirtualMachine
                 else
                 {
                     // 没有默认值，抛出错误
-                    throw new Exception($"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                    throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
                 }
             }
         }
@@ -859,7 +860,7 @@ public partial class VirtualMachine
     {
         if (!_tasks.TryGetValue(taskId, out var task))
         {
-            throw new Exception($"Task ID {taskId} 不存在");
+            throw new StateError(new SourcePosition(), $"Task ID {taskId} 不存在");
         }
 
         return task;
@@ -922,7 +923,7 @@ public partial class VirtualMachine
             bool b => new BoolLangValue(b),
             char c => new CharLangValue(c),
             LangValueType lvt => lvt,
-            _ => throw new Exception($"无法将类型 {value.GetType().Name} 转换为 LangValueType")
+            _ => throw new CastError(new SourcePosition(), value.GetType().Name, "LangValueType")
         };
     }
 
@@ -937,7 +938,7 @@ public partial class VirtualMachine
     {
         if (obj == null)
         {
-            throw new Exception($"无法在 null 对象上调用方法 {methodName}");
+            throw new NullReferenceError(new SourcePosition(), methodName);
         }
 
         // 特殊处理 ToStr：对于数字类型，使用自定义格式化
@@ -1094,7 +1095,7 @@ public partial class VirtualMachine
         // 如果找不到方法，抛出异常
         if (method == null)
         {
-            throw new Exception($"类型 {obj.GetType().Name} 没有方法 {methodName}");
+            throw new MethodNotFoundError(new SourcePosition(), methodName, obj.GetType().Name);
         }
 
         // 准备方法调用参数
@@ -1160,7 +1161,7 @@ public partial class VirtualMachine
         // 检测循环依赖
         if (!_moduleRegistry.MarkModuleLoading(moduleName))
         {
-            throw new Exception($"检测到循环依赖：模块 '{moduleName}' 正在加载中");
+            throw new ImportError(new SourcePosition(), moduleName, $"检测到循环依赖：模块 '{moduleName}' 正在加载中");
         }
 
         try
@@ -1231,7 +1232,7 @@ public partial class VirtualMachine
         }
         catch (Exception ex)
         {
-            throw new Exception($"加载模块 '{moduleName}' 失败: {ex.Message}", ex);
+            throw new ImportError(new SourcePosition(), moduleName, $"加载模块 '{moduleName}' 失败: {ex.Message}");
         }
     }
 

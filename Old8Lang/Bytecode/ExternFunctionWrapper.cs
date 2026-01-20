@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Reflection;
+using Old8Lang.AST;
 using Old8Lang.AST.Statement;
+using Old8Lang.Error;
 using Python.Runtime;
 using Jint;
 
@@ -77,7 +79,7 @@ public class ExternFunctionWrapper
             }
             catch (Exception ex)
             {
-                throw new Exception($"无法加载程序集 '{_dllName}': {ex.Message}");
+                throw new IOError(new SourcePosition(), $"无法加载程序集 '{_dllName}': {ex.Message}");
             }
 
             // 查找类型 (假设 _funcName 是 "ClassName.MethodName" 格式? 
@@ -114,19 +116,19 @@ public class ExternFunctionWrapper
             else
             {
                 // 无法确定类名，抛出异常或尝试在所有导出类型中查找（太慢）
-                throw new Exception($"C# Extern 函数名必须包含类名 (例如 'ClassName.MethodName')，当前为: {_funcName}");
+                throw new FormatError(new SourcePosition(), $"C# Extern 函数名必须包含类名 (例如 'ClassName.MethodName')，当前为: {_funcName}");
             }
             
             var type = assembly.GetType(typeName) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == typeName || t.FullName == typeName);
             if (type == null)
             {
-                 throw new Exception($"在程序集 '{assembly.FullName}' 中找不到类型 '{typeName}'");
+                 throw new ClassNotFoundError(new SourcePosition(), typeName);
             }
             
             _cachedMethodInfo = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance); // 暂时只支持静态?
              if (_cachedMethodInfo == null)
             {
-                 throw new Exception($"在类型 '{typeName}' 中找不到方法 '{methodName}'");
+                 throw new MethodNotFoundError(new SourcePosition(), methodName, typeName);
             }
         }
 
@@ -251,7 +253,7 @@ public class ExternFunctionWrapper
             }
             catch (DllNotFoundException ex)
             {
-                throw new Exception($"无法加载 DLL '{_dllName}': {ex.Message}");
+                throw new IOError(new SourcePosition(), $"无法加载 DLL '{_dllName}': {ex.Message}");
             }
         }
 
@@ -264,7 +266,7 @@ public class ExternFunctionWrapper
             }
             catch (EntryPointNotFoundException ex)
             {
-                throw new Exception($"在 DLL '{_dllName}' 中找不到函数 '{_funcName}': {ex.Message}");
+                throw new MethodNotFoundError(new SourcePosition(), _funcName);
             }
         }
 
