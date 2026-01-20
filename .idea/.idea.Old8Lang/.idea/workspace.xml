@@ -23,25 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CHANGELOG.en-US.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CHANGELOG.zh-CN.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/reflection_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/reflection_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.Reflection.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/reflection_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Runtime/VMReflectionHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -948,7 +935,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="748" />
+    <option name="localTasksCounter" value="750" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -975,8 +962,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 移除并发原语测试并更新循环语法&#10;&#10;- 删除了 VMConcurrencyAtomicIntTests.cs 文件中的所有原子整数并发测试&#10;- 删除了 VMConcurrencyCancellationTokenTests.cs 文件中的所有取消令牌测试&#10;- 删除了 VMConcurrencyChannelTests.cs 文件中的所有通道测试&#10;- 删除了 VMConcurrencyCountDownLatchTests.cs 文件中的所有倒计时门测试&#10;- 将 VMBoundaryTests.cs 中的循环语法从 &quot;for x &lt;- range&quot; 更新为 &quot;for x in range&quot;&#10;- 统一了循环语法以符合最新语言规范" />
-    <MESSAGE value="test(vm): 添加虚拟机并发原语功能测试&#10;&#10;- 实现 AtomicInt 并发原子整数操作的完整测试套件&#10;- 添加 CancellationTokenSource 并发取消令牌源的功能测试&#10;- 实现 Channel 并发通道的发送接收与管道测试&#10;- 添加 CountDownLatch 并发计数器门闩的同步测试&#10;- 实现 CyclicBarrier 并发循环屏障的等待测试&#10;- 验证并发原语在多线程环境下的正确性与安全性" />
     <MESSAGE value="refactor(tests): 将虚拟机语句测试重构为类型系统测试&#10;&#10;- 移除 VMDeferTests 和 VMSelectTests 测试文件&#10;- 新增 VMIntersectionTypeTests 用于测试交叉类型功能&#10;- 新增 VMTypeConversionTests 用于测试类型转换场景&#10;- 新增 VMUnionTypeTests 用于测试联合类型功能&#10;- 统一测试基类 ExecuteVMCode 方法到新的类型测试中&#10;- 更新所有测试用例以使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
     <MESSAGE value="test(vm): 启用虚拟机异步函数和泛型功能测试&#10;&#10;- 移除异步函数测试的跳过标记，启用所有异步函数相关测试&#10;- 移除泛型约束测试的跳过标记，启用所有泛型约束相关测试&#10;- 移除嵌套泛型测试的跳过标记，启用所有嵌套泛型相关测试&#10;- 移除可空泛型测试的跳过标记，启用所有可空泛型相关测试&#10;- 移除switch语句中break功能的跳过标记，启用相关测试&#10;- 移除using语句异常处理的跳过标记，启用所有using语句相关测试&#10;- 移除switch和defer交互功能的跳过标记，启用相关测试&#10;- 移除using和defer交互功能的跳过标记，启用所有交互测试" />
     <MESSAGE value="refactor(tests): 重构虚拟机测试结构并更新项目路线图&#10;&#10;- 移除 Old8Lang 虚拟机模式测试扩展计划文档&#10;- 在路线图中将测试用例增加和覆盖率报告生成标记为已完成&#10;- 在路线图中将虚拟机测试补充的缺失类别、集成测试和字节码序列化标记为已完成&#10;- 更新 IDEA 工作空间配置文件中的任务计数器和工作时间统计&#10;- 移除虚拟机语句测试文件（VMDeferTests.cs 和 VMSelectTests.cs）&#10;- 新增虚拟机类型系统测试文件（VMIntersectionTypeTests.cs、VMTypeConversionTests.cs、VMUnionTypeTests.cs）&#10;- 重构测试基类 ExecuteVMCode 方法并统一使用 CompileHelper.CompileToBytecode 方法&#10;- 重命名测试方法以匹配新的类型系统测试范围" />
@@ -1000,7 +985,9 @@
     <MESSAGE value="feat(lang): 实现类的静态字段功能&#10;&#10;- 在BytecodeCompiler中添加静态字段参数和处理逻辑&#10;- 实现静态字段的常量池存储和元数据管理&#10;- 在VirtualMachine中添加静态字段的读取和写入支持&#10;- 修改表达式访问逻辑以支持类名作为全局变量加载&#10;- 更新泛型特化类声明以包含静态字段参数&#10;- 在类声明语句中提取和处理静态字段定义&#10;- 添加ClassMetadata中的静态字段值存储字典&#10;- 初始化虚拟机时设置静态字段的默认值&#10;- 更新测试用例中的构造函数语法为init方法&#10;- 移除废弃的嵌套数组调试测试文件" />
     <MESSAGE value="refactor(tests): 更新类继承和接口实现的语法表示&#10;&#10;- 将类实现接口的语法从冒号(:)改为implements关键字&#10;- 将接口继承的语法从冒号(:)改为extends关键字&#10;- 将类继承父类的语法从冒号(:)改为extends关键字&#10;- 将混入(Mixin)的语法从冒号(:)改为with关键字&#10;- 清理IDEA工作区配置中的无用变更追踪信息&#10;- 更新工作项计数器和最后提交消息记录" />
     <MESSAGE value="feat(compiler): 添加全局变量预处理阶段&#10;&#10;- 在字节码编译器中增加 PreprocessGlobalVariables 方法&#10;- 扫描 AST 中的顶层变量声明并注册为全局变量&#10;- 确保方法体编译时能正确识别全局变量&#10;- 为接口测试添加结果变量初始化&#10;- 为混入测试添加多个结果变量支持" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 添加全局变量预处理阶段&#10;&#10;- 在字节码编译器中增加 PreprocessGlobalVariables 方法&#10;- 扫描 AST 中的顶层变量声明并注册为全局变量&#10;- 确保方法体编译时能正确识别全局变量&#10;- 为接口测试添加结果变量初始化&#10;- 为混入测试添加多个结果变量支持" />
+    <MESSAGE value="feat(reflection): 添加完整的反射系统支持&#10;&#10;- 添加 12 个反射全局函数，包括类型信息查询、动态调用、字段访问等功能&#10;- 在 AnyLangValue 中添加反射专用方法并修改 ExecuteMethod 访问级别为 protected&#10;- 创建 ReflectionHelper 运行时辅助类以支持编译器模式下的反射功能&#10;- 实现类定义时自动注册到全局类型注册表的功能&#10;- 添加对私有成员的访问支持，绕过正常访问权限检查&#10;- 支持解释器模式和编译器模式两种运行方式&#10;- 添加完整的单元测试覆盖反射功能的各种使用场景" />
+    <MESSAGE value="chore(benchmark): 移除解析器性能测试报告文件&#10;&#10;- 删除了旧的基准测试日志文件&#10;- 清理了CSV格式的测试结果报告&#10;- 移除了HTML格式的测试结果报告&#10;- 删除了GitHub Markdown格式的测试结果报告" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(benchmark): 移除解析器性能测试报告文件&#10;&#10;- 删除了旧的基准测试日志文件&#10;- 清理了CSV格式的测试结果报告&#10;- 移除了HTML格式的测试结果报告&#10;- 删除了GitHub Markdown格式的测试结果报告" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

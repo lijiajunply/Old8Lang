@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -81,8 +82,43 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        // VM 模式下需要传递 manager，这里暂时返回 null
-        // 实际使用时需要从上下文中获取 manager
-        throw new NotImplementedException("InvokeMethod 在 VM 模式下暂不支持");
+        var obj = arguments[0];
+        var methodName = (string)arguments[1]!;
+        var args = arguments[2];
+
+        if (obj is not BytecodeObjectInstance instance)
+        {
+            throw new InvalidOperationException("对象不是类实例");
+        }
+
+        var vm = VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("无法获取当前虚拟机实例");
+        }
+
+        // 查找类元数据
+        var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+        if (classMetadata == null)
+        {
+            throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
+        }
+
+        // 查找方法
+        var method = VMReflectionHelper.FindMethod(classMetadata, methodName);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"找不到方法 {methodName}");
+        }
+
+        // 准备参数
+        List<object?> methodArgs = [instance]; // 第一个参数是 this
+        if (args is List<object?> argsList)
+        {
+            methodArgs.AddRange(argsList);
+        }
+
+        // 调用方法
+        return vm.ExecuteFunctionAndGetResult(method.Function, methodArgs.ToArray());
     }
 }

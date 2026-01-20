@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -62,7 +63,31 @@ public sealed class GetFieldFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetField(arguments[0]!, (string)arguments[1]!);
+        var obj = arguments[0];
+        var fieldName = (string)arguments[1]!;
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            if (instance.Fields.TryGetValue(fieldName, out var value))
+            {
+                return value;
+            }
+
+            // 如果实例字段中没有，检查静态字段
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null && classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
+                {
+                    return staticValue;
+                }
+            }
+
+            throw new InvalidOperationException($"找不到字段 {fieldName}");
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
 

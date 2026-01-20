@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -82,7 +83,42 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        throw new NotImplementedException("CreateInstance 在 VM 模式下暂不支持");
+        var className = (string)arguments[0]!;
+        var args = arguments[1];
+
+        var vm = VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("无法获取当前虚拟机实例");
+        }
+
+        // 查找类元数据
+        var classMetadata = VMReflectionHelper.GetClassMetadata(vm, className);
+        if (classMetadata == null)
+        {
+            throw new InvalidOperationException($"找不到类 {className}");
+        }
+
+        // 创建实例
+        var instance = new BytecodeObjectInstance(className);
+
+        // 初始化字段（使用 null 作为默认值）
+        foreach (var field in classMetadata.Fields)
+        {
+            if (!field.IsStatic)
+            {
+                instance.Fields[field.Name] = null;
+            }
+        }
+
+        // 调用 init 构造函数（如果存在）
+        var initMethod = classMetadata.Methods.FirstOrDefault(m => m.Name == "init");
+        if (initMethod != null && args is List<object?> argsList)
+        {
+            vm.CallFunctionObject(initMethod.Function, [instance, .. argsList]);
+        }
+
+        return instance;
     }
 }
 
@@ -188,7 +224,22 @@ public sealed class HasMethodFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.HasMethod(arguments[0]!, (string)arguments[1]!);
+        var obj = arguments[0];
+        var methodName = (string)arguments[1]!;
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null)
+                {
+                    return VMReflectionHelper.HasMethod(classMetadata, methodName);
+                }
+            }
+        }
+        return false;
     }
 }
 
@@ -241,6 +292,21 @@ public sealed class HasFieldFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.HasField(arguments[0]!, (string)arguments[1]!);
+        var obj = arguments[0];
+        var fieldName = (string)arguments[1]!;
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null)
+                {
+                    return VMReflectionHelper.HasField(classMetadata, fieldName);
+                }
+            }
+        }
+        return false;
     }
 }

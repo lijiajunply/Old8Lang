@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -57,7 +58,14 @@ public sealed class GetClassNameFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetClassName(arguments[0]!);
+        var obj = arguments[0];
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            return instance.ClassName;
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
 
@@ -111,7 +119,27 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetClassMethods(arguments[0]!);
+        var obj = arguments[0];
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm == null)
+            {
+                throw new InvalidOperationException("无法获取当前虚拟机实例");
+            }
+
+            var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+            if (classMetadata == null)
+            {
+                throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
+            }
+
+            var methodNames = VMReflectionHelper.GetAllMethodNames(classMetadata);
+            return methodNames;
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
 
@@ -165,7 +193,27 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetClassFields(arguments[0]!);
+        var obj = arguments[0];
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm == null)
+            {
+                throw new InvalidOperationException("无法获取当前虚拟机实例");
+            }
+
+            var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+            if (classMetadata == null)
+            {
+                throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
+            }
+
+            var fieldNames = VMReflectionHelper.GetAllFieldNames(classMetadata);
+            return fieldNames;
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
 
@@ -236,7 +284,34 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetMethodInfo(arguments[0]!, (string)arguments[1]!);
+        var obj = arguments[0];
+        var methodName = (string)arguments[1]!;
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm == null)
+            {
+                throw new InvalidOperationException("无法获取当前虚拟机实例");
+            }
+
+            var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+            if (classMetadata == null)
+            {
+                throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
+            }
+
+            var method = VMReflectionHelper.FindMethod(classMetadata, methodName);
+            if (method == null)
+            {
+                throw new InvalidOperationException($"找不到方法 {methodName}");
+            }
+
+            var tuples = VMReflectionHelper.CreateMethodInfoTuples(method);
+            return tuples;
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
 
@@ -303,6 +378,33 @@ public sealed class GetFieldInfoFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        return ReflectionHelper.GetFieldInfo(arguments[0]!, (string)arguments[1]!);
+        var obj = arguments[0];
+        var fieldName = (string)arguments[1]!;
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm == null)
+            {
+                throw new InvalidOperationException("无法获取当前虚拟机实例");
+            }
+
+            var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+            if (classMetadata == null)
+            {
+                throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
+            }
+
+            var field = VMReflectionHelper.FindField(classMetadata, fieldName);
+            if (field == null)
+            {
+                throw new InvalidOperationException($"找不到字段 {fieldName}");
+            }
+
+            var tuples = VMReflectionHelper.CreateFieldInfoTuples(field);
+            return tuples;
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }
