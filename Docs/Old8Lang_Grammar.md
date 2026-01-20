@@ -3349,6 +3349,202 @@ threadId <- GetCurrentThreadId()
 processors <- GetProcessorCount()
 ```
 
+### 8.5 反射系统函数（内置全局函数）
+
+**模式支持**: `[✅ | ✅ | ✅]`
+
+Old8Lang 提供了完整的反射系统，允许在运行时检查和操作类实例，包括访问私有成员。所有反射函数都是内置全局函数，无需导入即可使用。
+
+#### 8.5.1 类型信息查询
+
+```old8
+// 获取对象的类名
+className <- GetClassName(obj)
+
+// 获取类的所有方法名列表
+methods <- GetClassMethods(obj)
+
+// 获取类的所有字段名列表
+fields <- GetClassFields(obj)
+
+// 获取方法详细信息（返回字典）
+methodInfo <- GetMethodInfo(obj, "methodName")
+// 返回: {"name": "methodName", "isStatic": false, "isPublic": true, ...}
+
+// 获取字段详细信息（返回字典）
+fieldInfo <- GetFieldInfo(obj, "fieldName")
+// 返回: {"name": "fieldName", "isStatic": false, "isPrivate": true, ...}
+```
+
+#### 8.5.2 动态方法调用
+
+```old8
+// 动态调用方法（包括 private 方法）
+result <- InvokeMethod(obj, "methodName", {arg1, arg2, arg3})
+
+// 示例：调用公开方法
+person <- Person("Alice", 25)
+greeting <- InvokeMethod(person, "greet", {})
+
+// 示例：调用私有方法
+age <- InvokeMethod(person, "getAge", {})  // 可以调用 private 方法
+```
+
+#### 8.5.3 动态字段访问
+
+```old8
+// 动态获取字段值（包括 private 字段）
+value <- GetField(obj, "fieldName")
+
+// 动态设置字段值（包括 private 字段）
+SetField(obj, "fieldName", newValue)
+
+// 示例：访问私有字段
+name <- GetField(person, "name")  // 可以访问 private 字段
+SetField(person, "name", "Bob")   // 可以修改 private 字段
+```
+
+#### 8.5.4 动态实例创建
+
+```old8
+// 通过类名创建实例
+instance <- CreateInstance("ClassName", {arg1, arg2})
+
+// 示例：动态创建 Person 实例
+person <- CreateInstance("Person", {"Charlie", 30})
+```
+
+#### 8.5.5 类型检查
+
+```old8
+// 检查对象是否是指定类的实例
+isPerson <- IsInstanceOf(obj, "Person")
+
+// 检查对象是否有指定方法
+hasMethod <- HasMethod(obj, "methodName")
+
+// 检查对象是否有指定字段
+hasField <- HasField(obj, "fieldName")
+```
+
+#### 8.5.6 完整示例
+
+```old8
+class Person {
+    private name:string <- "Unknown"
+    private age:int <- 0
+
+    public init(n:string, a:int) -> void {
+        name <- n
+        age <- a
+    }
+
+    public greet() -> string {
+        return "Hello, I'm " + name
+    }
+
+    private getAge() -> int {
+        return age
+    }
+}
+
+person <- Person("Alice", 25)
+
+// 1. 获取类名
+className <- GetClassName(person)
+PrintLine("Class: " + className)  // 输出: Class: Person
+
+// 2. 获取方法和字段列表
+methods <- GetClassMethods(person)
+fields <- GetClassFields(person)
+PrintLine("Methods: " + methods.ToStr())  // 输出: Methods: {init, greet, getAge}
+PrintLine("Fields: " + fields.ToStr())    // 输出: Fields: {name, age}
+
+// 3. 获取方法/字段详细信息
+methodInfo <- GetMethodInfo(person, "greet")
+PrintLine(methodInfo.ToStr())  // 输出: {"name": "greet", "isStatic": false, "isPublic": true, ...}
+
+fieldInfo <- GetFieldInfo(person, "name")
+PrintLine(fieldInfo.ToStr())   // 输出: {"name": "name", "isStatic": false, "isPrivate": true}
+
+// 4. 动态调用方法（包括私有方法）
+result <- InvokeMethod(person, "greet", {})
+PrintLine(result)  // 输出: Hello, I'm Alice
+
+age <- InvokeMethod(person, "getAge", {})  // 可以调用私有方法
+PrintLine("Age: " + age.ToStr())  // 输出: Age: 25
+
+// 5. 动态访问字段（包括私有字段）
+name <- GetField(person, "name")  // 可以访问私有字段
+PrintLine("Name: " + name)  // 输出: Name: Alice
+
+SetField(person, "name", "Bob")  // 可以修改私有字段
+PrintLine(person.greet())  // 输出: Hello, I'm Bob
+
+// 6. 动态创建实例
+person2 <- CreateInstance("Person", {"Charlie", 30})
+PrintLine(person2.greet())  // 输出: Hello, I'm Charlie
+
+// 7. 类型检查
+isPerson <- IsInstanceOf(person, "Person")
+PrintLine("Is Person: " + isPerson.ToStr())  // 输出: Is Person: true
+
+hasGreet <- HasMethod(person, "greet")
+PrintLine("Has greet: " + hasGreet.ToStr())  // 输出: Has greet: true
+
+hasName <- HasField(person, "name")
+PrintLine("Has name: " + hasName.ToStr())  // 输出: Has name: true
+```
+
+#### 8.5.7 反射函数列表
+
+**类型信息查询（5 个函数）**：
+- `GetClassName(obj:object) -> string` - 获取对象的类名
+- `GetClassMethods(obj:object) -> list` - 获取类的所有方法名列表
+- `GetClassFields(obj:object) -> list` - 获取类的所有字段名列表
+- `GetMethodInfo(obj:object, methodName:string) -> dict` - 获取方法详细信息
+- `GetFieldInfo(obj:object, fieldName:string) -> dict` - 获取字段详细信息
+
+**动态方法调用（1 个函数）**：
+- `InvokeMethod(obj:object, methodName:string, args:list) -> object` - 动态调用方法（包括 private 方法）
+
+**动态字段访问（2 个函数）**：
+- `GetField(obj:object, fieldName:string) -> object` - 动态获取字段值（包括 private 字段）
+- `SetField(obj:object, fieldName:string, value:object) -> void` - 动态设置字段值（包括 private 字段）
+
+**动态实例创建（1 个函数）**：
+- `CreateInstance(className:string, args:list) -> object` - 通过类名创建实例
+
+**类型检查（3 个函数）**：
+- `IsInstanceOf(obj:object, className:string) -> bool` - 检查对象是否是指定类的实例
+- `HasMethod(obj:object, methodName:string) -> bool` - 检查对象是否有指定方法
+- `HasField(obj:object, fieldName:string) -> bool` - 检查对象是否有指定字段
+
+#### 8.5.8 重要说明
+
+**访问控制**：
+- 反射可以访问**所有成员**，包括 private 字段和方法
+- 反射绕过了正常的访问控制检查
+- 使用反射时需要谨慎，因为它破坏了封装性
+
+**模式支持**：
+- ✅ 解释器模式 (`-f`)：完全支持
+- ✅ 编译器模式 (`-c`)：完全支持
+- ✅ 虚拟机模式 (`-vm`)：完全支持
+
+**类型注册**：
+- 类在定义时会自动注册到全局类型注册表
+- `CreateInstance` 通过类名查找已注册的类型
+- 只能创建已定义类的实例
+
+**使用场景**：
+- 动态插件系统
+- 序列化/反序列化
+- 依赖注入框架
+- 单元测试框架
+- 调试工具
+- ORM 框架
+
 ## 9. 执行模式对比
 
 ### 9.1 解释模式 (`-f`)
