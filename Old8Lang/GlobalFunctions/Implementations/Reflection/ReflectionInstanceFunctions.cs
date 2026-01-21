@@ -102,12 +102,22 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         // 创建实例
         var instance = new BytecodeObjectInstance(className);
 
-        // 初始化字段（使用 null 作为默认值）
+        // 初始化字段（使用默认值）
         foreach (var field in classMetadata.Fields)
         {
             if (!field.IsStatic)
             {
-                instance.Fields[field.Name] = null;
+                // 获取字段的默认值
+                object? defaultValue = null;
+                if (field.DefaultValueIndex >= 0)
+                {
+                    defaultValue = vm.GetConstant(field.DefaultValueIndex);
+                }
+                else if (field.IsDefaultNull)
+                {
+                    defaultValue = null;
+                }
+                instance.Fields[field.Name] = defaultValue;
             }
         }
 

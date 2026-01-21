@@ -146,7 +146,34 @@ public sealed class SetFieldFunction : BaseGlobalFunction
 
     protected override object? ExecuteInVMInternal(object?[] arguments)
     {
-        ReflectionHelper.SetField(arguments[0]!, (string)arguments[1]!, arguments[2]!);
-        return null;
+        var obj = arguments[0];
+        var fieldName = (string)arguments[1]!;
+        var value = arguments[2];
+
+        if (obj is BytecodeObjectInstance instance)
+        {
+            // 先尝试设置实例字段
+            if (instance.Fields.ContainsKey(fieldName))
+            {
+                instance.Fields[fieldName] = value;
+                return null;
+            }
+
+            // 如果实例字段中没有，尝试设置静态字段
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null && classMetadata.StaticFieldValues.ContainsKey(fieldName))
+                {
+                    classMetadata.StaticFieldValues[fieldName] = value;
+                    return null;
+                }
+            }
+
+            throw new InvalidOperationException($"找不到字段 {fieldName}");
+        }
+
+        throw new InvalidOperationException("对象不是类实例");
     }
 }

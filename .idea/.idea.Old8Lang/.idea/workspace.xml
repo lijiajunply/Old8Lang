@@ -24,8 +24,12 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -588,6 +592,7 @@
       <workItem from="1768841952068" duration="521000" />
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
+      <workItem from="1768981355686" duration="1064000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

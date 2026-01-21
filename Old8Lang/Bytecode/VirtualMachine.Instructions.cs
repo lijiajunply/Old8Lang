@@ -2406,7 +2406,20 @@ public partial class VirtualMachine
                 foreach (var field in allFields)
                 {
                     // 避免重复初始化同名字段（子类覆盖父类字段的情况）
-                    obj.Fields.TryAdd(field.Name, null);
+                    if (!obj.Fields.ContainsKey(field.Name))
+                    {
+                        // 获取字段的默认值
+                        object? defaultValue = null;
+                        if (field.DefaultValueIndex >= 0 && field.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                        {
+                            defaultValue = _bytecodeFile.ConstantPool.GetConstant(field.DefaultValueIndex);
+                        }
+                        else if (field.IsDefaultNull)
+                        {
+                            defaultValue = null;
+                        }
+                        obj.Fields[field.Name] = defaultValue;
+                    }
                 }
 
                 // 应用 Mixin 方法到对象

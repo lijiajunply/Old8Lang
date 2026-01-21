@@ -110,6 +110,18 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 从常量池获取常量
+    /// </summary>
+    public object? GetConstant(int index)
+    {
+        if (index < 0 || index >= _bytecodeFile.ConstantPool.Count)
+        {
+            return null;
+        }
+        return _bytecodeFile.ConstantPool.GetConstant(index);
+    }
+
+    /// <summary>
     /// 调用函数
     /// </summary>
     private void CallFunction(FunctionMetadata function, object?[] arguments)

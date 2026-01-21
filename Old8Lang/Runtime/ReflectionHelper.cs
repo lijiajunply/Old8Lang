@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using System.Reflection.Emit;
@@ -200,6 +201,10 @@ public static class ReflectionHelper
         {
             return anyValue.ClassId.IdName == className;
         }
+        if (obj is BytecodeObjectInstance instance)
+        {
+            return instance.ClassName == className;
+        }
         return false;
     }
 
@@ -212,6 +217,18 @@ public static class ReflectionHelper
         {
             return anyValue.Metadata.MethodTable.ContainsMethod(methodName);
         }
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null)
+                {
+                    return VMReflectionHelper.HasMethod(classMetadata, methodName);
+                }
+            }
+        }
         return false;
     }
 
@@ -223,6 +240,18 @@ public static class ReflectionHelper
         if (obj is AnyLangValue anyValue)
         {
             return anyValue.Metadata.FieldTable.ContainsField(fieldName);
+        }
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null)
+                {
+                    return VMReflectionHelper.HasField(classMetadata, fieldName);
+                }
+            }
         }
         return false;
     }
