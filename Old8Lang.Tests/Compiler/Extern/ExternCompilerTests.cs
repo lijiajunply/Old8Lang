@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Compiler.Extern;
@@ -235,7 +236,7 @@ result <- main()
         var ast = interpreter.Build(code);
 
         // Assert
-        var exception = Assert.Throws<NotSupportedException>(() =>
+        var exception = Assert.Throws<ImportError>(() =>
         {
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
@@ -295,7 +296,7 @@ result <- main()
         var ast = interpreter.Build(code);
 
         // Assert
-        var exception = Assert.Throws<NotSupportedException>(() =>
+        var exception = Assert.Throws<InvalidOperationError>(() =>
         {
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
@@ -325,7 +326,7 @@ result <- main()
         var ast = interpreter.Build(code);
 
         // Assert
-        var exception = Assert.Throws<NotSupportedException>(() =>
+        var exception = Assert.Throws<InvalidOperationError>(() =>
         {
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
