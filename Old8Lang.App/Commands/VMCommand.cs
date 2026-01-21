@@ -12,7 +12,7 @@ public class VMCommand : ICommand
 {
     public string Name => "-vm";
     public string Description => "使用虚拟机模式编译并执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug]";
+    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug] [--no-type-check]";
 
     public int Execute(string[] args)
     {
@@ -27,6 +27,7 @@ public class VMCommand : ICommand
         var fileName = args[0];
         var symbols = new List<string>();
         var debugMode = false;
+        var enableTypeChecking = true; // 默认启用类型检查
 
         // 解析参数
         for (int i = 1; i < args.Length; i++)
@@ -39,6 +40,10 @@ public class VMCommand : ICommand
             else if (args[i] == "--debug")
             {
                 debugMode = true;
+            }
+            else if (args[i] == "--no-type-check")
+            {
+                enableTypeChecking = false;
             }
         }
 
@@ -66,7 +71,11 @@ public class VMCommand : ICommand
 
             // 编译为字节码
             stopwatch.Restart();
-            var compiler = new BytecodeCompiler();
+            var compiler = new BytecodeCompiler
+            {
+                Interpreter = interpreter,
+                EnableTypeChecking = enableTypeChecking
+            };
             var bytecodeFile = compiler.Compile(ast);
             stopwatch.Stop();
             var compileTime = stopwatch.Elapsed.TotalMilliseconds;

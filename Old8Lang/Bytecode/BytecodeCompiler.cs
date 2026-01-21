@@ -2,6 +2,8 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Bytecode;
 
@@ -14,6 +16,16 @@ public class BytecodeCompiler
     private readonly BytecodeFile _bytecodeFile = new();
     private readonly Stack<Scope> _scopes = new();
     private FunctionMetadata? _currentFunction;
+
+    /// <summary>
+    /// 解释器实例，用于类型检查
+    /// </summary>
+    public LangInterpreter? Interpreter { get; set; }
+
+    /// <summary>
+    /// 是否启用类型检查（默认：true）
+    /// </summary>
+    public bool EnableTypeChecking { get; set; } = true;
 
     // ===== 泛型支持 =====
 
@@ -55,13 +67,19 @@ public class BytecodeCompiler
     {
         _bytecodeFile.ConstantPool = ConstantPool;
 
-        // 第零阶段：预处理，扫描所有顶层变量声明（全局变量）
+        // 第零阶段：类型检查（如果启用）
+        if (EnableTypeChecking && Interpreter != null)
+        {
+            PerformTypeChecking(ast);
+        }
+
+        // 第一阶段：预处理，扫描所有顶层变量声明（全局变量）
         PreprocessGlobalVariables(ast);
 
-        // 第一阶段：预处理，注册所有类定义
+        // 第二阶段：预处理，注册所有类定义
         PreprocessClassDefinitions(ast);
 
-        // 第二阶段：预处理，注册所有函数定义
+        // 第三阶段：预处理，注册所有函数定义
         PreprocessFunctionDefinitions(ast);
 
         // 创建主函数(入口点)
@@ -88,6 +106,36 @@ public class BytecodeCompiler
         _bytecodeFile.EntryPointIndex = _bytecodeFile.Functions.Count - 1;
 
         return _bytecodeFile;
+    }
+
+    /// <summary>
+    /// 执行类型检查
+    /// </summary>
+    private void PerformTypeChecking(BlockStatement ast)
+    {
+        if (Interpreter == null)
+        {
+            return;
+        }
+
+        try
+        {
+            // 初始化类型检查器
+            TypeChecker.Initialize(Interpreter.Manager);
+
+            // 执行模块以注册所有类型定义
+            // 这样类型检查器可以识别所有类、接口和枚举
+            ast.ExecuteModule(Interpreter.Manager, skipFunctionClassInit: false);
+
+            // 注意：虚拟机模式目前不使用 TypeInferenceEngine
+            // 因为字节码编译器已经有自己的类型系统
+            // 如果将来需要更高级的类型推断，可以在这里添加
+        }
+        catch (Exception ex)
+        {
+            // 类型检查失败时，输出警告但不中断编译
+            Console.WriteLine($"[虚拟机类型检查警告] {ex.Message}");
+        }
     }
 
     /// <summary>

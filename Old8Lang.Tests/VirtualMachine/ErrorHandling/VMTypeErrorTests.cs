@@ -19,7 +19,11 @@ public class VMTypeErrorTests
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
 
-        var compiler = new BytecodeCompiler();
+        var compiler = new BytecodeCompiler
+        {
+            Interpreter = interpreter,
+            EnableTypeChecking = true
+        };
         var bytecodeFile = compiler.Compile(ast);
 
         var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
@@ -33,7 +37,11 @@ public class VMTypeErrorTests
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
 
-        var compiler = new BytecodeCompiler();
+        var compiler = new BytecodeCompiler
+        {
+            Interpreter = interpreter,
+            EnableTypeChecking = true
+        };
         var bytecodeFile = compiler.Compile(ast);
 
         var originalOut = Console.Out;
