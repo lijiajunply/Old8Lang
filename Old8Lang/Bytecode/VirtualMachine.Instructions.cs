@@ -3137,8 +3137,9 @@ public partial class VirtualMachine
             return typeName == "null" || typeName == "any";
         }
 
-        // 5. Generic Types (list<T>, array<T>, dict<K,V>)
-        if (typeName.StartsWith("list<") && typeName.EndsWith(">"))
+        // 5. Generic Types (list<T>/List<T>, array<T>/Array<T>, dict<K,V>/Dict<K,V>)
+        var typeNameLower = typeName.ToLower();
+        if (typeNameLower.StartsWith("list<") && typeNameLower.EndsWith(">"))
         {
             if (val is not IList list) return false;
             var innerType = typeName.Substring(5, typeName.Length - 6);
@@ -3150,7 +3151,7 @@ public partial class VirtualMachine
             return true;
         }
 
-        if (typeName.StartsWith("array<") && typeName.EndsWith(">"))
+        if (typeNameLower.StartsWith("array<") && typeNameLower.EndsWith(">"))
         {
             if (val is not Array array) return false;
             var innerType = typeName.Substring(6, typeName.Length - 7);
@@ -3162,7 +3163,7 @@ public partial class VirtualMachine
             return true;
         }
 
-        if (typeName.StartsWith("dict<") && typeName.EndsWith(">"))
+        if (typeNameLower.StartsWith("dict<") && typeNameLower.EndsWith(">"))
         {
             if (val is not IDictionary dict) return false;
             var innerTypes = SplitGenericArgs(typeName.Substring(5, typeName.Length - 6));

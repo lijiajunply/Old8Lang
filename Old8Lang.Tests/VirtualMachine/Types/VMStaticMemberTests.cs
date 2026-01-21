@@ -368,7 +368,7 @@ public class VMStaticMemberTests
         // 因此使用静态初始化方法来初始化列表
         var code = @"
             class Registry {
-                private static items:List<string>?
+                private static items:list<string>?
                 private static initialized:bool <- false
 
                 private static func ensureInitialized() -> void {
