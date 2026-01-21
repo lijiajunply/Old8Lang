@@ -177,7 +177,7 @@ public class VMEnumTests
                 Completed
             }
 
-            func printStatus(s:int) -> void {
+            func printStatus(s:Status) -> void {
                 if s == Status.Pending {
                     PrintLine(""Pending"")
                 } elif s == Status.Active {

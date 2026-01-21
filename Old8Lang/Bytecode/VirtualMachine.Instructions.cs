@@ -3299,6 +3299,12 @@ public partial class VirtualMachine
             }
         }
 
+        // 检查枚举类型
+        if (val is AST.Expression.Value.EnumLangValue enumValue)
+        {
+            return enumValue.EnumTypeName == typeName;
+        }
+
         return false;
     }
 
