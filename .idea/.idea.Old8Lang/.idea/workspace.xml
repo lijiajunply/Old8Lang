@@ -23,18 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericConstraint.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/GenericConstraintValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/GenericConstraintExtensionCompilerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/GenericConstraintExtensionInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericConstraintExtensionTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/GenericClassSpecializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/GenericClassSpecializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/GenericMethodSpecializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/GenericMethodSpecializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/TypeInferenceVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/TypeInferenceVisitor.ExpressionsAndValues.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -942,7 +937,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="772" />
+    <option name="localTasksCounter" value="773" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -969,7 +964,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 更新类继承和接口实现的语法表示&#10;&#10;- 将类实现接口的语法从冒号(:)改为implements关键字&#10;- 将接口继承的语法从冒号(:)改为extends关键字&#10;- 将类继承父类的语法从冒号(:)改为extends关键字&#10;- 将混入(Mixin)的语法从冒号(:)改为with关键字&#10;- 清理IDEA工作区配置中的无用变更追踪信息&#10;- 更新工作项计数器和最后提交消息记录" />
     <MESSAGE value="feat(compiler): 添加全局变量预处理阶段&#10;&#10;- 在字节码编译器中增加 PreprocessGlobalVariables 方法&#10;- 扫描 AST 中的顶层变量声明并注册为全局变量&#10;- 确保方法体编译时能正确识别全局变量&#10;- 为接口测试添加结果变量初始化&#10;- 为混入测试添加多个结果变量支持" />
     <MESSAGE value="feat(reflection): 添加完整的反射系统支持&#10;&#10;- 添加 12 个反射全局函数，包括类型信息查询、动态调用、字段访问等功能&#10;- 在 AnyLangValue 中添加反射专用方法并修改 ExecuteMethod 访问级别为 protected&#10;- 创建 ReflectionHelper 运行时辅助类以支持编译器模式下的反射功能&#10;- 实现类定义时自动注册到全局类型注册表的功能&#10;- 添加对私有成员的访问支持，绕过正常访问权限检查&#10;- 支持解释器模式和编译器模式两种运行方式&#10;- 添加完整的单元测试覆盖反射功能的各种使用场景" />
     <MESSAGE value="chore(benchmark): 移除解析器性能测试报告文件&#10;&#10;- 删除了旧的基准测试日志文件&#10;- 清理了CSV格式的测试结果报告&#10;- 移除了HTML格式的测试结果报告&#10;- 删除了GitHub Markdown格式的测试结果报告" />
@@ -994,7 +988,8 @@
     <MESSAGE value="feat(vm): 添加对泛型类型名称的大小写不敏感支持&#10;&#10;- 实现了 list&lt;T&gt;/List&lt;T&gt;、array&lt;T&gt;/Array&lt;T&gt;、dict&lt;K,V&gt;/Dict&lt;K,V&gt; 的大小写不敏感匹配&#10;- 在类型检查前将类型名称转换为小写进行比较&#10;- 更新测试代码中的类型声明从 List&lt;string&gt; 到 list&lt;string&gt;" />
     <MESSAGE value="test(vm): 启用泛型约束和交集类型错误处理测试&#10;&#10;- 移除泛型约束检查测试的跳过标记，启用 TypeErrors_GenericConstraintViolation_ThrowsTypeException 测试&#10;- 移除交集类型错误测试的跳过标记，启用 TypeErrors_IntersectionTypeInvalidMember_ThrowsTypeException 测试&#10;- 为交集类型测试添加完整的测试用例代码，包括类型定义和实例调用逻辑&#10;- 更新IDE配置文件中的变更追踪和任务计数器信息" />
     <MESSAGE value="test(extern): 更新外部函数编译测试中的异常类型断言&#10;&#10;- 添加 Old8Lang.Error 命名空间引用&#10;- 将 NotSupportedException 断言替换为 ImportError 和 InvalidOperationError&#10;- 更新三个测试用例中的异常类型验证逻辑&#10;- 清理 IDE 配置文件中的变更追踪信息&#10;- 更新本地任务计数器和提交消息记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(extern): 更新外部函数编译测试中的异常类型断言&#10;&#10;- 添加 Old8Lang.Error 命名空间引用&#10;- 将 NotSupportedException 断言替换为 ImportError 和 InvalidOperationError&#10;- 更新三个测试用例中的异常类型验证逻辑&#10;- 清理 IDE 配置文件中的变更追踪信息&#10;- 更新本地任务计数器和提交消息记录" />
+    <MESSAGE value="feat(lang): 添加完整的泛型约束验证功能&#10;&#10;- 在 BytecodeVisitor 中添加泛型约束验证逻辑&#10;- 实现 class、struct、new() 等特殊约束的验证&#10;- 添加类型名称约束和类型参数约束的验证机制&#10;- 创建 GenericConstraint 类统一管理约束定义&#10;- 实现 GenericConstraintValidator 进行约束验证&#10;- 扩展解析器支持多种约束语法格式&#10;- 更新泛型函数和类实例化时的约束检查&#10;- 添加值类型判断辅助方法&#10;- 实现约束冲突检测机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加完整的泛型约束验证功能&#10;&#10;- 在 BytecodeVisitor 中添加泛型约束验证逻辑&#10;- 实现 class、struct、new() 等特殊约束的验证&#10;- 添加类型名称约束和类型参数约束的验证机制&#10;- 创建 GenericConstraint 类统一管理约束定义&#10;- 实现 GenericConstraintValidator 进行约束验证&#10;- 扩展解析器支持多种约束语法格式&#10;- 更新泛型函数和类实例化时的约束检查&#10;- 添加值类型判断辅助方法&#10;- 实现约束冲突检测机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

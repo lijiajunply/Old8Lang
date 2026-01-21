@@ -150,7 +150,9 @@ public partial class TypeInferenceVisitor
 
     public Type? VisitMethodOverloadList(MethodOverloadList node)
     {
-        return node.OutputType(local);
+        // MethodOverloadList 是方法重载列表，返回 Delegate 类型
+        // 避免循环调用 OutputType -> Accept -> VisitMethodOverloadList -> OutputType
+        return typeof(Delegate);
     }
 
     public Type? VisitNestedIndexAccess(NestedIndexAccess node)

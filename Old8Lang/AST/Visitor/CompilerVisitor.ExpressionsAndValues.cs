@@ -140,7 +140,9 @@ public partial class CompilerVisitor
 
     public object? VisitMethodOverloadList(MethodOverloadList node)
     {
-        node.LoadIlValue(ilGenerator, local);
+        // MethodOverloadList 是方法重载列表，不需要生成 IL 代码
+        // 避免循环调用 LoadIlValue -> Accept -> VisitMethodOverloadList -> LoadIlValue
+        // 方法重载列表通常在函数调用时解析，而不是直接加载
         return null;
     }
 

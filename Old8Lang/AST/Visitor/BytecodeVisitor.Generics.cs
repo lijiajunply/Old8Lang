@@ -164,12 +164,27 @@ public partial class BytecodeVisitor
         string genericParamName,
         Dictionary<string, string> typeMapping)
     {
+        // 如果 actualTypeName 是另一个类型参数，尝试解析它
+        var resolvedTypeName = actualTypeName;
+        while (typeMapping.TryGetValue(resolvedTypeName, out var mappedType) && mappedType != resolvedTypeName)
+        {
+            resolvedTypeName = mappedType;
+        }
+
+        // 如果解析后仍然是类型参数（未映射），跳过验证
+        // 这种情况发生在嵌套泛型中，内部类使用外部类的类型参数
+        if (typeMapping.ContainsKey(resolvedTypeName) && typeMapping[resolvedTypeName] == resolvedTypeName)
+        {
+            // 类型参数未被映射到具体类型，跳过验证
+            return;
+        }
+
         switch (constraint.Kind)
         {
             case GenericConstraintKind.New:
                 // new() 约束：检查类型是否有无参构造函数
                 // 在虚拟机模式下，值类型总是满足 new() 约束
-                if (!IsValueType(actualTypeName))
+                if (!IsValueType(resolvedTypeName))
                 {
                     // 对于引用类型，需要在运行时检查
                     // 这里只做基本检查，实际验证在实例化时进行
@@ -178,19 +193,19 @@ public partial class BytecodeVisitor
 
             case GenericConstraintKind.Class:
                 // class 约束：检查类型是否是引用类型
-                if (IsValueType(actualTypeName))
+                if (IsValueType(resolvedTypeName))
                 {
                     throw new ArgumentException(
-                        $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的 class 约束：'{actualTypeName}' 是值类型，不是引用类型");
+                        $"类型 '{resolvedTypeName}' 不满足泛型参数 '{genericParamName}' 的 class 约束：'{resolvedTypeName}' 是值类型，不是引用类型");
                 }
                 break;
 
             case GenericConstraintKind.Struct:
                 // struct 约束：检查类型是否是值类型
-                if (!IsValueType(actualTypeName))
+                if (!IsValueType(resolvedTypeName))
                 {
                     throw new ArgumentException(
-                        $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的 struct 约束：'{actualTypeName}' 不是值类型");
+                        $"类型 '{resolvedTypeName}' 不满足泛型参数 '{genericParamName}' 的 struct 约束：'{resolvedTypeName}' 不是值类型");
                 }
                 break;
 
@@ -206,7 +221,7 @@ public partial class BytecodeVisitor
                 {
                     // 简单检查：类型名称是否相同
                     // 更复杂的兼容性检查需要在运行时进行
-                    if (!string.Equals(actualTypeName, constraintActualTypeName, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(resolvedTypeName, constraintActualTypeName, StringComparison.OrdinalIgnoreCase))
                     {
                         // 这里只是警告，实际兼容性检查在运行时进行
                     }
