@@ -1247,7 +1247,8 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     public FuncLangValue InstantiateGeneric(
         Dictionary<string, ITypeInfo> typeArguments,
-        TypeAnnotationManager typeAnnotationManager)
+        TypeAnnotationManager typeAnnotationManager,
+        VariateManager? manager = null)
     {
         if (!IsGeneric)
         {
@@ -1261,19 +1262,20 @@ public class FuncLangValue : ImportInfo
                 $"类型参数数量不匹配：期望 {GenericParameters.Count} 个，实际 {typeArguments.Count} 个");
         }
 
-        // 验证约束（如果有）
+        // 使用新的约束验证器验证约束
         foreach (var genericParam in GenericParameters)
         {
-            if (genericParam.HasConstraints && typeArguments.TryGetValue(genericParam.Name, out var actualType))
+            if (typeArguments.TryGetValue(genericParam.Name, out var actualType))
             {
-                foreach (var constraintName in genericParam.Constraints!)
+                var validationResult = GenericConstraintValidator.Validate(
+                    genericParam,
+                    actualType,
+                    typeArguments,
+                    manager);
+
+                if (!validationResult.IsValid)
                 {
-                    var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
-                    if (constraintType is not null && !actualType.IsCompatibleWith(constraintType))
-                    {
-                        throw new ArgumentException(
-                            $"类型 {actualType.Name} 不满足约束 {constraintName}");
-                    }
+                    throw new ArgumentException(validationResult.ErrorMessage);
                 }
             }
         }

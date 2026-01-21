@@ -403,6 +403,16 @@ public enum LangTokenType
     Params,
 
     /// <summary>
+    /// new (泛型约束关键字 - 要求无参构造函数)
+    /// </summary>
+    New,
+
+    /// <summary>
+    /// struct (泛型约束关键字 - 要求值类型)
+    /// </summary>
+    Struct,
+
+    /// <summary>
     /// @ (装饰器符号)
     /// </summary>
     At,
@@ -514,5 +524,7 @@ public enum KeywordType
     On,
     Into,
     Let,
-    Params
+    Params,
+    New,
+    Struct
 }

@@ -444,13 +444,28 @@ public class FunctionParser(
 
     /// <summary>
     /// 解析泛型参数列表
-    /// 语法：<T, U, V> 或 <T: IComparable, U> 或 <T?, U?>
+    /// 语法：<T, U, V> 或 <T: IComparable, U> 或 <T?, U?> 或 <T: new() & class, U>
     /// </summary>
     /// <returns>泛型参数列表</returns>
     private List<GenericParameter> ParseGenericParameters()
     {
         Expect(LangTokenType.LessThan);
         var parameters = new List<GenericParameter>();
+
+        // 收集所有泛型参数名称（用于判断类型参数约束）
+        var genericParamNames = new HashSet<string>();
+
+        // 第一遍：收集所有参数名称
+        var savedIndex = CurrentIndex;
+        while (CurrentToken.Type != LangTokenType.GreaterThan && CurrentToken.Type != LangTokenType.EndOfFile)
+        {
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                genericParamNames.Add(CurrentToken.Value);
+            }
+            CurrentIndex++;
+        }
+        CurrentIndex = savedIndex;
 
         while (CurrentToken.Type != LangTokenType.GreaterThan)
         {
@@ -471,14 +486,14 @@ public class FunctionParser(
                 Expect(LangTokenType.Question);
             }
 
-            List<string>? constraints = null;
+            List<GenericConstraint>? structuredConstraints = null;
             if (CurrentToken.Type == LangTokenType.Colon)
             {
                 Expect(LangTokenType.Colon);
-                constraints = ParseGenericConstraints();
+                structuredConstraints = ParseGenericConstraintsStructured(genericParamNames);
             }
 
-            parameters.Add(new GenericParameter(paramName, constraints, position, isNullable));
+            parameters.Add(new GenericParameter(paramName, structuredConstraints, position, isNullable));
 
             if (CurrentToken.Type == LangTokenType.Comma)
             {
@@ -494,22 +509,20 @@ public class FunctionParser(
     }
 
     /// <summary>
-    /// 解析泛型约束列表
-    /// 语法：IComparable | ICloneable 或 IComparable & ICloneable
+    /// 解析泛型约束列表（结构化版本）
+    /// 语法：new() | class | struct | IComparable | T
     /// 支持使用 | 或 & 作为分隔符
     /// </summary>
-    /// <returns>约束名称列表</returns>
-    private List<string> ParseGenericConstraints()
+    /// <param name="genericParamNames">当前泛型参数名称集合（用于判断类型参数约束）</param>
+    /// <returns>结构化约束列表</returns>
+    private List<GenericConstraint> ParseGenericConstraintsStructured(HashSet<string>? genericParamNames)
     {
-        var constraints = new List<string>();
+        var constraints = new List<GenericConstraint>();
+        var position = CreateSourcePosition(CurrentToken);
 
-        if (CurrentToken.Type != LangTokenType.Identifier)
-        {
-            throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
-        }
-
-        constraints.Add(CurrentToken.Value);
-        Expect(LangTokenType.Identifier);
+        // 解析第一个约束
+        var firstConstraint = ParseSingleConstraint(genericParamNames, position);
+        constraints.Add(firstConstraint);
 
         // 支持 | 或 & 作为分隔符
         while (CurrentToken.Type == LangTokenType.Pipe || CurrentToken.Type == LangTokenType.Ampersand)
@@ -523,13 +536,155 @@ public class FunctionParser(
                 Expect(LangTokenType.Ampersand);
             }
 
-            if (CurrentToken.Type != LangTokenType.Identifier)
+            position = CreateSourcePosition(CurrentToken);
+            var constraint = ParseSingleConstraint(genericParamNames, position);
+            constraints.Add(constraint);
+        }
+
+        return constraints;
+    }
+
+    /// <summary>
+    /// 解析单个泛型约束
+    /// </summary>
+    /// <param name="genericParamNames">当前泛型参数名称集合</param>
+    /// <param name="position">源代码位置</param>
+    /// <returns>单个约束</returns>
+    private GenericConstraint ParseSingleConstraint(HashSet<string>? genericParamNames, SourcePosition position)
+    {
+        // 检查 new() 约束
+        if (CurrentToken.Type == LangTokenType.New)
+        {
+            Expect(LangTokenType.New);
+            // 检查是否有括号 new()
+            if (CurrentToken.Type == LangTokenType.LeftParen)
+            {
+                Expect(LangTokenType.LeftParen);
+                Expect(LangTokenType.RightParen);
+            }
+            return GenericConstraint.CreateNew(position);
+        }
+
+        // 检查 class 约束
+        if (CurrentToken.Type == LangTokenType.Class)
+        {
+            Expect(LangTokenType.Class);
+            return GenericConstraint.CreateClass(position);
+        }
+
+        // 检查 struct 约束
+        if (CurrentToken.Type == LangTokenType.Struct)
+        {
+            Expect(LangTokenType.Struct);
+            return GenericConstraint.CreateStruct(position);
+        }
+
+        // 检查标识符（类型名称或类型参数约束）
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            var typeName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            // 检查是否为类型参数约束（T: U）
+            if (genericParamNames != null && genericParamNames.Contains(typeName))
+            {
+                return GenericConstraint.CreateTypeParameter(typeName, position);
+            }
+
+            // 否则为类型名称约束（接口或基类）
+            return GenericConstraint.CreateTypeName(typeName, position);
+        }
+
+        throw CreateSyntaxError($"期望约束类型（new()、class、struct 或类型名称），但得到 {CurrentToken.Type}");
+    }
+
+    /// <summary>
+    /// 解析泛型约束列表（向后兼容版本）
+    /// 语法：IComparable | ICloneable 或 IComparable & ICloneable
+    /// 支持使用 | 或 & 作为分隔符
+    /// </summary>
+    /// <returns>约束名称列表</returns>
+    private List<string> ParseGenericConstraints()
+    {
+        var constraints = new List<string>();
+
+        // 检查 new() 约束
+        if (CurrentToken.Type == LangTokenType.New)
+        {
+            Expect(LangTokenType.New);
+            if (CurrentToken.Type == LangTokenType.LeftParen)
+            {
+                Expect(LangTokenType.LeftParen);
+                Expect(LangTokenType.RightParen);
+            }
+            constraints.Add("new()");
+        }
+        // 检查 class 约束
+        else if (CurrentToken.Type == LangTokenType.Class)
+        {
+            Expect(LangTokenType.Class);
+            constraints.Add("class");
+        }
+        // 检查 struct 约束
+        else if (CurrentToken.Type == LangTokenType.Struct)
+        {
+            Expect(LangTokenType.Struct);
+            constraints.Add("struct");
+        }
+        else if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            constraints.Add(CurrentToken.Value);
+            Expect(LangTokenType.Identifier);
+        }
+        else
+        {
+            throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
+        }
+
+        // 支持 | 或 & 作为分隔符
+        while (CurrentToken.Type == LangTokenType.Pipe || CurrentToken.Type == LangTokenType.Ampersand)
+        {
+            if (CurrentToken.Type == LangTokenType.Pipe)
+            {
+                Expect(LangTokenType.Pipe);
+            }
+            else
+            {
+                Expect(LangTokenType.Ampersand);
+            }
+
+            // 检查 new() 约束
+            if (CurrentToken.Type == LangTokenType.New)
+            {
+                Expect(LangTokenType.New);
+                if (CurrentToken.Type == LangTokenType.LeftParen)
+                {
+                    Expect(LangTokenType.LeftParen);
+                    Expect(LangTokenType.RightParen);
+                }
+                constraints.Add("new()");
+            }
+            // 检查 class 约束
+            else if (CurrentToken.Type == LangTokenType.Class)
+            {
+                Expect(LangTokenType.Class);
+                constraints.Add("class");
+            }
+            // 检查 struct 约束
+            else if (CurrentToken.Type == LangTokenType.Struct)
+            {
+                Expect(LangTokenType.Struct);
+                constraints.Add("struct");
+            }
+            else if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                constraints.Add(CurrentToken.Value);
+                Expect(LangTokenType.Identifier);
+            }
+            else
             {
                 throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
             }
-
-            constraints.Add(CurrentToken.Value);
-            Expect(LangTokenType.Identifier);
         }
 
         return constraints;
@@ -707,6 +862,7 @@ public class FunctionParser(
     /// <summary>
     /// 解析 where 子句
     /// 语法：where T: IComparable | where T: IComparable & ICloneable | where T: IComparable, U: ICloneable
+    /// 支持：where T: new() & class & IComparable
     /// </summary>
     /// <param name="genericParameters">泛型参数列表的引用，将在其中更新约束</param>
     private void ParseWhereClause(ref List<GenericParameter>? genericParameters)
@@ -717,6 +873,9 @@ public class FunctionParser(
         }
 
         Expect(LangTokenType.Where);
+
+        // 收集所有泛型参数名称（用于判断类型参数约束）
+        var genericParamNames = new HashSet<string>(genericParameters.Select(p => p.Name));
 
         // 解析一个或多个约束，用逗号分隔
         // 例如: where T: IComparable, U: ICloneable
@@ -745,12 +904,12 @@ public class FunctionParser(
             }
             Expect(LangTokenType.Colon);
 
-            // 解析约束列表
-            var constraints = ParseGenericConstraints();
+            // 解析结构化约束列表
+            var constraints = ParseGenericConstraintsStructured(genericParamNames);
 
             // 更新泛型参数的约束
             // 如果已有约束，则合并
-            var existingConstraints = genericParam.Constraints ?? [];
+            var existingConstraints = genericParam.StructuredConstraints ?? [];
             existingConstraints.AddRange(constraints);
 
             // 创建新的 GenericParameter 对象替换旧的，保留原有的 IsNullable 属性
@@ -759,7 +918,7 @@ public class FunctionParser(
                 genericParam.Name,
                 existingConstraints,
                 genericParam.Position,
-                genericParam.IsNullable  // 保留可空标记
+                genericParam.IsNullable
             );
 
             // 检查是否有更多约束（逗号分隔）

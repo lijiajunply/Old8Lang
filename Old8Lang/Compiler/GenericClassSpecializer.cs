@@ -52,26 +52,21 @@ public static class GenericClassSpecializer
         // 创建类型解析器
         var resolver = new GenericTypeResolver(typeArguments, local, local.Interpreter);
 
-        // 验证泛型约束
+        // 验证泛型约束（使用新的约束验证器）
         if (typeTemplate.GenericParameters != null)
         {
             foreach (var param in typeTemplate.GenericParameters)
             {
-                if (param.HasConstraints && typeArguments.TryGetValue(param.Name, out var actualType))
+                if (typeArguments.TryGetValue(param.Name, out var actualType))
                 {
-                    foreach (var constraintName in param.Constraints!)
+                    var validationResult = GenericConstraintValidator.ValidateWithDotNetType(
+                        param,
+                        actualType,
+                        typeArguments);
+
+                    if (!validationResult.IsValid)
                     {
-                        var constraintType = resolver.ResolveType(constraintName);
-                        if (constraintType is not null)
-                        {
-                            // 检查约束兼容性
-                            // 注意：IsAssignableFrom 检查的是 constraintType 是否可以从 actualType 赋值
-                            if (!constraintType.IsAssignableFrom(actualType))
-                            {
-                                throw new ArgumentException(
-                                    $"类型 {actualType.Name} 不满足约束 {constraintName}: {actualType.Name} 没有继承或实现 {constraintType.Name}");
-                            }
-                        }
+                        throw new ArgumentException(validationResult.ErrorMessage);
                     }
                 }
             }

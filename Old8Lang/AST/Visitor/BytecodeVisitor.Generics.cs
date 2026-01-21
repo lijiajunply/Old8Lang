@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Bytecode;
 
@@ -25,6 +26,9 @@ public partial class BytecodeVisitor
                 var typeArgName = typeArguments[i];
                 typeMapping[genericParamName] = typeArgName;
             }
+
+            // 验证泛型约束
+            ValidateGenericConstraints(typeTemplate.GenericParameters, typeMapping);
         }
 
         // 收集字段名称、类型和初始值（从实例成员中提取）
@@ -89,6 +93,9 @@ public partial class BytecodeVisitor
                 var typeArgName = typeArguments[i];
                 typeMapping[genericParamName] = typeArgName;
             }
+
+            // 验证泛型约束
+            ValidateGenericConstraints(genericFunc.GenericParameters, typeMapping);
         }
 
         // 创建特化函数
@@ -124,6 +131,100 @@ public partial class BytecodeVisitor
             defaultValues,
             specializedFunc.BlockStatement
         );
+    }
+
+    /// <summary>
+    /// 验证泛型约束
+    /// </summary>
+    /// <param name="genericParameters">泛型参数列表</param>
+    /// <param name="typeMapping">类型参数映射</param>
+    private void ValidateGenericConstraints(List<GenericParameter> genericParameters, Dictionary<string, string> typeMapping)
+    {
+        foreach (var param in genericParameters)
+        {
+            if (!param.HasConstraints || param.StructuredConstraints == null)
+                continue;
+
+            if (!typeMapping.TryGetValue(param.Name, out var actualTypeName))
+                continue;
+
+            foreach (var constraint in param.StructuredConstraints)
+            {
+                ValidateSingleConstraint(constraint, actualTypeName, param.Name, typeMapping);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 验证单个约束
+    /// </summary>
+    private void ValidateSingleConstraint(
+        GenericConstraint constraint,
+        string actualTypeName,
+        string genericParamName,
+        Dictionary<string, string> typeMapping)
+    {
+        switch (constraint.Kind)
+        {
+            case GenericConstraintKind.New:
+                // new() 约束：检查类型是否有无参构造函数
+                // 在虚拟机模式下，值类型总是满足 new() 约束
+                if (!IsValueType(actualTypeName))
+                {
+                    // 对于引用类型，需要在运行时检查
+                    // 这里只做基本检查，实际验证在实例化时进行
+                }
+                break;
+
+            case GenericConstraintKind.Class:
+                // class 约束：检查类型是否是引用类型
+                if (IsValueType(actualTypeName))
+                {
+                    throw new ArgumentException(
+                        $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的 class 约束：'{actualTypeName}' 是值类型，不是引用类型");
+                }
+                break;
+
+            case GenericConstraintKind.Struct:
+                // struct 约束：检查类型是否是值类型
+                if (!IsValueType(actualTypeName))
+                {
+                    throw new ArgumentException(
+                        $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的 struct 约束：'{actualTypeName}' 不是值类型");
+                }
+                break;
+
+            case GenericConstraintKind.TypeName:
+                // 类型名称约束：检查是否实现接口或继承基类
+                // 在虚拟机模式下，这需要在运行时检查
+                break;
+
+            case GenericConstraintKind.TypeParameter:
+                // 类型参数约束：检查 T 是否兼容 U
+                var constraintTypeParamName = constraint.TypeName!;
+                if (typeMapping.TryGetValue(constraintTypeParamName, out var constraintActualTypeName))
+                {
+                    // 简单检查：类型名称是否相同
+                    // 更复杂的兼容性检查需要在运行时进行
+                    if (!string.Equals(actualTypeName, constraintActualTypeName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 这里只是警告，实际兼容性检查在运行时进行
+                    }
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 检查类型是否是值类型
+    /// </summary>
+    private bool IsValueType(string typeName)
+    {
+        var lowerTypeName = typeName.ToLowerInvariant();
+        return lowerTypeName is "int" or "double" or "bool" or "char" or
+            "int32" or "boolean" or "single" or "float" or "long" or "int64" or
+            "short" or "int16" or "byte" or "sbyte" or "uint" or "uint32" or
+            "ulong" or "uint64" or "ushort" or "uint16" or "decimal";
     }
 
     /// <summary>
