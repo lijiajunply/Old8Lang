@@ -527,10 +527,10 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields)
     {
-        DeclareClass(className, fields, [], [], null);
+        DeclareClass(className, fields.Select(f => (f, (LangExpression?)null)).ToList(), [], [], null);
     }
 
-    public void DeclareClass(string className, List<string> fields,
+    public void DeclareClass(string className, List<(string fieldName, LangExpression? initialValue)> fields,
         List<(string fieldName, LangExpression initialValue)> staticFields,
         List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
         string? parentClassName,
@@ -541,11 +541,46 @@ public class BytecodeCompiler
         {
             Name = className,
             BaseClassName = parentClassName,
-            Fields = fields.Select(f => new FieldMetadata { Name = f }).ToList(),
             InterfaceNames = implementsNames ?? [],
             ImplementsInterfaces = implementsNames ?? [],
             Mixins = mixinNames ?? []
         };
+
+        // 处理实例字段
+        foreach (var (fieldName, initialValue) in fields)
+        {
+            var fieldMetadata = new FieldMetadata
+            {
+                Name = fieldName,
+                IsStatic = false
+            };
+
+            // 如果有初始值，计算并添加到常量池
+            if (initialValue != null)
+            {
+                var constantValue = EvaluateConstantExpression(initialValue);
+
+                // 处理 null 默认值
+                if (constantValue == null)
+                {
+                    fieldMetadata.IsDefaultNull = true;
+                    fieldMetadata.DefaultValueIndex = -1;
+                }
+                else
+                {
+                    int constantIndex = ConstantPool.AddConstant(constantValue);
+                    fieldMetadata.DefaultValueIndex = constantIndex;
+                }
+            }
+            else
+            {
+                // 没有初始值，默认为 null
+                fieldMetadata.IsDefaultNull = true;
+                fieldMetadata.DefaultValueIndex = -1;
+            }
+
+            classMetadata.Fields.Add(fieldMetadata);
+        }
 
         // 处理静态字段
         foreach (var (fieldName, initialValue) in staticFields)

@@ -1,3 +1,4 @@
+using Old8Lang.AST;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 
@@ -25,14 +26,14 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 收集字段名称（从实例成员中提取）
-        var fields = new List<string>();
+        // 收集字段名称和初始值（从实例成员中提取）
+        var fields = new List<(string fieldName, LangExpression? initialValue)>();
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
             if (memberExpr is not FuncLangValue)
             {
-                // 这是一个字段
-                fields.Add(memberId.IdName);
+                // 这是一个字段，保存字段名和初始值
+                fields.Add((memberId.IdName, memberExpr));
             }
         }
 

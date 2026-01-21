@@ -22,7 +22,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -584,7 +590,7 @@
       <workItem from="1768841952068" duration="521000" />
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
-      <workItem from="1768981355686" duration="3332000" />
+      <workItem from="1768981355686" duration="4292000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -929,7 +935,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="761" />
+    <option name="localTasksCounter" value="762" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,7 +962,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
     <MESSAGE value="fix(parser): 解决对象解构赋值与块语句的解析歧义&#10;&#10;- 添加前瞻检查逻辑区分对象解构赋值和块语句&#10;- 实现大括号嵌套深度跟踪机制&#10;- 检查赋值符号'&lt;-'来确定语句类型&#10;- 支持类型注解后的赋值符号识别&#10;- 限制前瞻扫描深度避免性能问题&#10;- 修复IDE工作区配置文件的时间统计信息" />
     <MESSAGE value="feat(lang): 添加类型转换函数并优化虚拟机数值处理&#10;&#10;- 注册IntFunction和DoubleFunction类型转换函数&#10;- 实现嵌套数组访问调试测试用例&#10;- 添加完整的类型转换函数实现支持int/double转换&#10;- 优化虚拟机加法和乘法运算防止整数溢出&#10;- 改进数值转字符串显示避免科学计数法&#10;- 修复边界测试用例中的断言值差异&#10;- 更新极值测试用例的预期输出结果" />
     <MESSAGE value="feat(parser): 支持深层嵌套索引访问和改进数字字面量解析&#10;&#10;- 修改 NestedIndexAccess 类，将 BaseIndex 字段重命名为 BaseExpression，&#10;  支持更深层的嵌套索引访问语法&#10;- 更新 BytecodeVisitor 中的访问逻辑，适配新的 BaseExpression 字段&#10;- 在 ExpressionParser 中添加对现有 NestedIndexAccess 的连续嵌套支持&#10;- 改进 PrimaryParser 中的数字字面量解析，按 int -&gt; long -&gt; double 顺序尝试解析&#10;- 更新 SetStatement 中的嵌套索引访问赋值逻辑，使用新的 BaseExpression 字段&#10;- 优化虚拟机中的数字显示格式，在 ToStr 方法中使用固定格式避免科学计数法" />
@@ -981,7 +986,8 @@
     <MESSAGE value="feat(vm): 扩展虚拟机数值运算和数组操作支持&#10;&#10;- 添加 long 类型数值的加减乘除运算支持&#10;- 实现 int 与 long 混合类型的数值运算转换&#10;- 添加 long 与 double 混合类型的数值运算转换&#10;- 实现数组拼接功能，支持 object[] + object[] 操作&#10;- 添加 long 类型到 LangValue 的转换映射&#10;- 更新性能测试中的列表操作语法从 {} 改为 []&#10;- 简化 lambda 表达式的返回类型声明语法" />
     <MESSAGE value="test(performance): 更新虚拟机执行性能测试中的循环语法&#10;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- arr&quot; 改为 &quot;for x in arr&quot;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- list&quot; 改为 &quot;for x in list&quot;&#10;- 将测试代码中的范围表示法从 &quot;0..1000&quot; 改为 &quot;[0~1000]&quot;&#10;- 更新了相关的测试用例以匹配新的循环语法格式" />
     <MESSAGE value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
+    <MESSAGE value="test(reflection): 更新虚拟机反射测试中的方法声明语法&#10;&#10;- 将测试代码中的方法声明从 &quot;public add(a:int, b:int) -&gt; int&quot; 改为 &quot;public func add(a:int, b:int) -&gt; int&quot;&#10;- 将测试代码中的方法声明从 &quot;private privateMethod() -&gt; void&quot; 改为 &quot;private func privateMethod() -&gt; void&quot;&#10;- 将测试代码中的属性声明从 &quot;private secretValue:int &lt;- 0&quot; 改为 &quot;private func secretValue:int &lt;- 0&quot;&#10;- 将测试代码中的构造函数声明从 &quot;public init(n:string, a:int) -&gt; void&quot; 改为 &quot;public func init(n:string, a:int) -&gt; void&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;True&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;true&quot;, output)&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;False&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;false&quot;, output)&quot;&#10;- 清理 workspace.xml 中的变更列表记录和时间统计信息&#10;- 更新最后提交消息历史记录以反映最新的修复内容" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(reflection): 更新虚拟机反射测试中的方法声明语法&#10;&#10;- 将测试代码中的方法声明从 &quot;public add(a:int, b:int) -&gt; int&quot; 改为 &quot;public func add(a:int, b:int) -&gt; int&quot;&#10;- 将测试代码中的方法声明从 &quot;private privateMethod() -&gt; void&quot; 改为 &quot;private func privateMethod() -&gt; void&quot;&#10;- 将测试代码中的属性声明从 &quot;private secretValue:int &lt;- 0&quot; 改为 &quot;private func secretValue:int &lt;- 0&quot;&#10;- 将测试代码中的构造函数声明从 &quot;public init(n:string, a:int) -&gt; void&quot; 改为 &quot;public func init(n:string, a:int) -&gt; void&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;True&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;true&quot;, output)&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;False&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;false&quot;, output)&quot;&#10;- 清理 workspace.xml 中的变更列表记录和时间统计信息&#10;- 更新最后提交消息历史记录以反映最新的修复内容" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

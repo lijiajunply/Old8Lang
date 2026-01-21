@@ -518,7 +518,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                private func secretValue:int <- 0
+                private secretValue:int <- 0
                 public func getSecret() -> int {
                     return secretValue
                 }

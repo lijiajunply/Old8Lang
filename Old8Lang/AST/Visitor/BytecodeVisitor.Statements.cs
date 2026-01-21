@@ -881,7 +881,7 @@ public partial class BytecodeVisitor
         }
 
         // 非泛型类：正常编译
-        var fields = new List<string>();
+        var fields = new List<(string fieldName, LangExpression? initialValue)>();
         var staticFields = new List<(string fieldName, LangExpression initialValue)>();
         var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
@@ -896,8 +896,8 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 这是一个实例字段
-                fields.Add(memberId.IdName);
+                // 这是一个实例字段，保存字段名和初始值
+                fields.Add((memberId.IdName, memberExpr));
             }
         }
 
