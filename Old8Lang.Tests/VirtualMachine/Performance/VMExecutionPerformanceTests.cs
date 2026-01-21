@@ -93,7 +93,7 @@ public class VMExecutionPerformanceTests
             for i <- 0, i < 100, i++ {
                 arr <- arr + [i]
             }
-            for x <- arr {
+            for x in arr {
                 sum <- sum + x
             }
         ";
@@ -197,7 +197,7 @@ public class VMExecutionPerformanceTests
             }
 
             sum <- 0
-            for x <- list {
+            for x in list {
                 sum <- sum + x
             }
         ";
@@ -778,7 +778,7 @@ public class VMExecutionPerformanceTests
     {
         var code = @"
             sum <- 0
-            for i <- 0..1000 {
+            for i in [0~1000] {
                 sum <- sum + i
             }
         ";
