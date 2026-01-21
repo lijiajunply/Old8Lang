@@ -89,6 +89,7 @@ public partial class BytecodeVisitor
 
         // 提取参数名称
         var paramNames = specializedFunc.Ids?.Select(id => id.IdName).ToList() ?? [];
+        var paramTypes = specializedFunc.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
         // 提取默认参数值
         var defaultValues = new List<object?>();
@@ -112,6 +113,7 @@ public partial class BytecodeVisitor
         _compiler.CompileFunction(
             specializedFuncName,
             paramNames,
+            paramTypes,
             defaultValues,
             specializedFunc.BlockStatement
         );

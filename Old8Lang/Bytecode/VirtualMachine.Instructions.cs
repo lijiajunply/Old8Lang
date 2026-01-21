@@ -414,6 +414,9 @@ public partial class VirtualMachine
                         args = fullArgs;
                     }
 
+                    // 检查参数类型
+                    ValidateParameterTypes(function, args, instruction);
+
                     // 检查是否是生成器函数
                     if (function.IsGenerator)
                     {
@@ -509,6 +512,9 @@ public partial class VirtualMachine
 
                     // 重新排列参数以匹配函数参数定义
                     var args = ArrangeArgumentsWithNamed(function, positionalArgs, namedArgNames, namedArgValues);
+
+                    // 检查参数类型
+                    ValidateParameterTypes(function, args, instruction);
 
                     // 检查是否是生成器函数
                     if (function.IsGenerator)
@@ -2516,6 +2522,9 @@ public partial class VirtualMachine
                         }
                     }
 
+                    // 检查参数类型
+                    ValidateParameterTypes(staticMethod.Function, args, instruction);
+
                     // 静态方法不需要 this 参数，直接传递参数
                     CallFunction(staticMethod.Function, args);
                 }
@@ -2640,6 +2649,9 @@ public partial class VirtualMachine
                     var methodArgs = new object?[args.Length + 1];
                     methodArgs[0] = bytecodeObj;
                     Array.Copy(args, 0, methodArgs, 1, args.Length);
+
+                    // 检查参数类型
+                    ValidateParameterTypes(methodMetadata.Function, methodArgs, instruction);
 
                     // 调用方法（返回值会自动压入栈）
                     CallFunction(methodMetadata.Function, methodArgs);
@@ -3156,6 +3168,62 @@ public partial class VirtualMachine
             "any" => true,
             "object" => true,
             _ => CheckCustomType(typeName, val)
+        };
+    }
+
+    /// <summary>
+    /// 验证函数参数类型
+    /// </summary>
+    private void ValidateParameterTypes(FunctionMetadata function, object?[] args, Instruction instruction)
+    {
+        // 如果没有参数类型信息，跳过检查
+        if (function.ParameterTypes == null || function.ParameterTypes.Count == 0)
+            return;
+
+        for (int i = 0; i < Math.Min(args.Length, function.ParameterTypes.Count); i++)
+        {
+            var expectedType = function.ParameterTypes[i];
+
+            // 如果没有类型注解（空字符串），跳过检查
+            if (string.IsNullOrEmpty(expectedType))
+                continue;
+
+            var actualValue = args[i];
+
+            // 使用 CheckTypeMatch 进行类型检查
+            if (!CheckTypeMatch(expectedType, actualValue))
+            {
+                var actualType = GetValueTypeName(actualValue);
+                var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
+                throw new TypeError(
+                    GetPosition(instruction),
+                    expectedType,
+                    actualType,
+                    $"参数 '{paramName}' 类型不匹配"
+                );
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取值的类型名称
+    /// </summary>
+    private string GetValueTypeName(object? value)
+    {
+        if (value == null) return "null";
+
+        return value switch
+        {
+            int => "int",
+            double => "double",
+            string => "string",
+            bool => "bool",
+            char => "char",
+            Array => "array",
+            IList => "list",
+            IDictionary => "dict",
+            BytecodeObjectInstance instance => instance.ClassName,
+            _ => value.GetType().Name
         };
     }
 

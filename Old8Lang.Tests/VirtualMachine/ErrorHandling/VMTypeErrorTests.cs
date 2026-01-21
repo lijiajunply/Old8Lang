@@ -167,7 +167,7 @@ public class VMTypeErrorTests
                 public x:int
                 public y:int
 
-                public func new(x:int, y:int) -> void {
+                public func init(x:int, y:int) -> void {
                     this.x <- x
                     this.y <- y
                 }

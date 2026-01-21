@@ -301,7 +301,7 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译函数定义
     /// </summary>
-    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<object?> defaultValues,
+    public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
         BlockStatement body, int paramsParameterIndex = -1, List<string>? capturedVars = null)
     {
         // 检测函数是否包含yield语句
@@ -311,6 +311,7 @@ public class BytecodeCompiler
         {
             Name = funcName,
             Parameters = parameters,
+            ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = false,
@@ -410,13 +411,14 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译异步函数
     /// </summary>
-    public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<object?> defaultValues,
+    public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
         BlockStatement body, int paramsParameterIndex = -1)
     {
         var func = new FunctionMetadata
         {
             Name = funcName,
             Parameters = parameters,
+            ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true // 标记为异步函数
@@ -450,7 +452,7 @@ public class BytecodeCompiler
     /// <summary>
     /// 编译异步生成器函数
     /// </summary>
-    public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters,
+    public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters, List<string> parameterTypes,
         List<object?> defaultValues, BlockStatement body, int paramsParameterIndex = -1)
     {
         // 检测函数是否包含yield语句
@@ -460,6 +462,7 @@ public class BytecodeCompiler
         {
             Name = funcName,
             Parameters = parameters,
+            ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true, // 标记为异步函数
@@ -740,6 +743,7 @@ public class BytecodeCompiler
         {
             // 提取方法参数
             var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
             // 提取默认参数值
             var defaultValues = new List<object?>();
@@ -764,6 +768,7 @@ public class BytecodeCompiler
             if (!isStatic)
             {
                 paramNames.Insert(0, "this");
+                paramTypes.Insert(0, className); // this 的类型是类名
                 defaultValues.Insert(0, null);
             }
 
@@ -771,6 +776,7 @@ public class BytecodeCompiler
             var functionMetadata = CompileFunction(
                 $"{className}.{methodName}",
                 paramNames,
+                paramTypes,
                 defaultValues,
                 funcValue.BlockStatement
             );
@@ -998,6 +1004,7 @@ public class BytecodeCompiler
         foreach (var (methodName, funcValue) in methods)
         {
             var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
             var defaultValues = new List<object?>();
 
             if (funcValue.Ids != null)
@@ -1013,11 +1020,13 @@ public class BytecodeCompiler
             // Mixin 方法需要在参数列表开头添加 this 参数
             // 因为 CallMethod 指令会将对象作为第一个参数传递
             paramNames.Insert(0, "this");
+            paramTypes.Insert(0, mixinName); // this 的类型是 mixin 名
             defaultValues.Insert(0, null);
 
             var functionMetadata = CompileFunction(
                 $"{mixinName}.{methodName}",
                 paramNames,
+                paramTypes,
                 defaultValues,
                 funcValue.BlockStatement
             );

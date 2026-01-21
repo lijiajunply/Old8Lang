@@ -566,6 +566,7 @@ public partial class BytecodeVisitor
 
         // 2. 提取参数信息
         var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? [];
+        var paramTypes = node.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
         var defaultValues = new List<object?>();
         int paramsIndex = -1;
@@ -632,7 +633,7 @@ public partial class BytecodeVisitor
         System.IO.File.AppendAllText("/tmp/lambda_debug.txt", debugOutput.ToString());
 
         // 5. 编译 Lambda 函数体，传递捕获的变量列表
-        _compiler.CompileFunction(lambdaName, paramNames, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars);
+        _compiler.CompileFunction(lambdaName, paramNames, paramTypes, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars);
 
         // 6. 获取编译后的函数索引
         int funcIndex = _compiler.GetFunctionIndex(lambdaName);

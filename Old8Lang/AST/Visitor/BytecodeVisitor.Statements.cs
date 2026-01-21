@@ -606,6 +606,7 @@ public partial class BytecodeVisitor
 
         // 非泛型函数：正常编译
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+        var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
         // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
@@ -636,7 +637,7 @@ public partial class BytecodeVisitor
         }
 
         // 编译函数
-        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
+        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
 
         // 检查是否有装饰器
         if (funcValue.Decorators != null && funcValue.Decorators.Count > 0)
@@ -1361,6 +1362,7 @@ public partial class BytecodeVisitor
         }
 
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+        var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
         // 提取默认参数值和params参数索引
         var defaultValues = new List<object?>();
@@ -1396,12 +1398,12 @@ public partial class BytecodeVisitor
         if (containsYield)
         {
             // 异步生成器函数
-            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
+            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
         }
         else
         {
             // 普通异步函数
-            _compiler.CompileAsyncFunction(funcName, paramNames, defaultValues, funcValue.BlockStatement, paramsIndex);
+            _compiler.CompileAsyncFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
         }
 
         return null;

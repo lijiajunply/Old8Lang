@@ -11,6 +11,9 @@ public class FunctionMetadata
     /// <summary>参数名称列表</summary>
     public List<string> Parameters { get; set; } = [];
 
+    /// <summary>参数类型列表（索引对应Parameters，空字符串表示无类型注解）</summary>
+    public List<string> ParameterTypes { get; set; } = [];
+
     /// <summary>参数默认值列表（索引对应Parameters，null表示无默认值）</summary>
     public List<object?> DefaultValues { get; set; } = [];
 
@@ -52,6 +55,11 @@ public class FunctionMetadata
         writer.Write(Parameters.Count);
         foreach (var param in Parameters)
             writer.Write(param);
+
+        // 参数类型
+        writer.Write(ParameterTypes.Count);
+        foreach (var paramType in ParameterTypes)
+            writer.Write(paramType ?? "");
 
         // 默认参数值
         writer.Write(DefaultValues.Count);
@@ -102,6 +110,11 @@ public class FunctionMetadata
         int paramCount = reader.ReadInt32();
         for (int i = 0; i < paramCount; i++)
             func.Parameters.Add(reader.ReadString());
+
+        // 参数类型
+        int paramTypeCount = reader.ReadInt32();
+        for (int i = 0; i < paramTypeCount; i++)
+            func.ParameterTypes.Add(reader.ReadString());
 
         // 默认参数值
         int defaultValueCount = reader.ReadInt32();

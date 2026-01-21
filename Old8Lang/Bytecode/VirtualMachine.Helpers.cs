@@ -1332,11 +1332,48 @@ public partial class VirtualMachine
             methodArgs[0] = obj;
             Array.Copy(constructorArgs, 0, methodArgs, 1, constructorArgs.Length);
 
+            // 检查参数类型
+            ValidateConstructorParameterTypes(initMethod.Function, methodArgs, classMetadata.Name);
+
             // 调用构造函数
             CallFunction(initMethod.Function, methodArgs);
         }
 
         return obj;
+    }
+
+    /// <summary>
+    /// 验证构造函数参数类型
+    /// </summary>
+    private void ValidateConstructorParameterTypes(FunctionMetadata function, object?[] args, string className)
+    {
+        // 如果没有参数类型信息，跳过检查
+        if (function.ParameterTypes == null || function.ParameterTypes.Count == 0)
+            return;
+
+        for (int i = 0; i < Math.Min(args.Length, function.ParameterTypes.Count); i++)
+        {
+            var expectedType = function.ParameterTypes[i];
+
+            // 如果没有类型注解（空字符串），跳过检查
+            if (string.IsNullOrEmpty(expectedType))
+                continue;
+
+            var actualValue = args[i];
+
+            // 使用 CheckTypeMatch 进行类型检查
+            if (!CheckTypeMatch(expectedType, actualValue))
+            {
+                var actualType = GetValueTypeName(actualValue);
+                var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
+                throw new TypeError(
+                    new SourcePosition(0, 0),
+                    expectedType,
+                    actualType,
+                    $"构造函数 '{className}' 的参数 '{paramName}' 类型不匹配"
+                );
+            }
+        }
     }
 
     /// <summary>

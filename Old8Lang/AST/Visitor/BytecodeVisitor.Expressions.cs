@@ -651,10 +651,11 @@ public partial class BytecodeVisitor
         // 编译为异步生成器函数
         var funcName = $"<async_stream_{GetCurrentPosition()}>";
         var parameters = new List<string>();
+        var parameterTypes = new List<string>();
         var defaultValues = new List<object?>();
 
         // 编译异步生成器函数
-        var function = _compiler.CompileAsyncGeneratorFunction(funcName, parameters, defaultValues, block);
+        var function = _compiler.CompileAsyncGeneratorFunction(funcName, parameters, parameterTypes, defaultValues, block);
 
         // 查找函数在字节码文件中的索引
         var funcIndex = _compiler.GetFunctionIndex(funcName);

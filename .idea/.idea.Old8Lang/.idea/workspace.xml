@@ -23,7 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -931,7 +940,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="763" />
+    <option name="localTasksCounter" value="764" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,7 +967,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加类型转换函数并优化虚拟机数值处理&#10;&#10;- 注册IntFunction和DoubleFunction类型转换函数&#10;- 实现嵌套数组访问调试测试用例&#10;- 添加完整的类型转换函数实现支持int/double转换&#10;- 优化虚拟机加法和乘法运算防止整数溢出&#10;- 改进数值转字符串显示避免科学计数法&#10;- 修复边界测试用例中的断言值差异&#10;- 更新极值测试用例的预期输出结果" />
     <MESSAGE value="feat(parser): 支持深层嵌套索引访问和改进数字字面量解析&#10;&#10;- 修改 NestedIndexAccess 类，将 BaseIndex 字段重命名为 BaseExpression，&#10;  支持更深层的嵌套索引访问语法&#10;- 更新 BytecodeVisitor 中的访问逻辑，适配新的 BaseExpression 字段&#10;- 在 ExpressionParser 中添加对现有 NestedIndexAccess 的连续嵌套支持&#10;- 改进 PrimaryParser 中的数字字面量解析，按 int -&gt; long -&gt; double 顺序尝试解析&#10;- 更新 SetStatement 中的嵌套索引访问赋值逻辑，使用新的 BaseExpression 字段&#10;- 优化虚拟机中的数字显示格式，在 ToStr 方法中使用固定格式避免科学计数法" />
     <MESSAGE value="feat(vm): 添加类元数据注册和字典迭代器特殊处理&#10;&#10;- 在虚拟机初始化时将所有类元数据注册到全局变量表中&#10;- 实现通过类名访问类元数据的功能以支持嵌套类访问&#10;- 为字典类型添加特殊迭代器处理逻辑&#10;- 字典迭代时返回键集合而非键值对以改善遍历行为" />
     <MESSAGE value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
@@ -983,7 +991,8 @@
     <MESSAGE value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
     <MESSAGE value="test(reflection): 更新虚拟机反射测试中的方法声明语法&#10;&#10;- 将测试代码中的方法声明从 &quot;public add(a:int, b:int) -&gt; int&quot; 改为 &quot;public func add(a:int, b:int) -&gt; int&quot;&#10;- 将测试代码中的方法声明从 &quot;private privateMethod() -&gt; void&quot; 改为 &quot;private func privateMethod() -&gt; void&quot;&#10;- 将测试代码中的属性声明从 &quot;private secretValue:int &lt;- 0&quot; 改为 &quot;private func secretValue:int &lt;- 0&quot;&#10;- 将测试代码中的构造函数声明从 &quot;public init(n:string, a:int) -&gt; void&quot; 改为 &quot;public func init(n:string, a:int) -&gt; void&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;True&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;true&quot;, output)&quot;&#10;- 将布尔值断言从 &quot;Assert.Equal(&quot;False&quot;, output)&quot; 改为 &quot;Assert.Equal(&quot;false&quot;, output)&quot;&#10;- 清理 workspace.xml 中的变更列表记录和时间统计信息&#10;- 更新最后提交消息历史记录以反映最新的修复内容" />
     <MESSAGE value="feat(bytecode): 添加类型推断功能并优化字节码编译流程&#10;&#10;- 在 BytecodeCompiler 中添加 EnableTypeInference 属性控制类型推断&#10;- 实现 RegisterTypeDefinitions 方法只注册函数和类定义，避免执行其他语句&#10;- 添加 PerformTypeInference 方法执行类型推断逻辑&#10;- 在 CompileBytecodeCommand 和 VMCommand 中添加 --no-type-inference 和 --type-inference-debug 参数&#10;- 将类型推断配置统一到 TypeInferenceConfig.Instance 管理&#10;- 修复测试中 BytecodeCompiler 的初始化配置" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加类型推断功能并优化字节码编译流程&#10;&#10;- 在 BytecodeCompiler 中添加 EnableTypeInference 属性控制类型推断&#10;- 实现 RegisterTypeDefinitions 方法只注册函数和类定义，避免执行其他语句&#10;- 添加 PerformTypeInference 方法执行类型推断逻辑&#10;- 在 CompileBytecodeCommand 和 VMCommand 中添加 --no-type-inference 和 --type-inference-debug 参数&#10;- 将类型推断配置统一到 TypeInferenceConfig.Instance 管理&#10;- 修复测试中 BytecodeCompiler 的初始化配置" />
+    <MESSAGE value="feat(bytecode): 添加类型检查运算符支持并优化联合类型测试&#10;&#10;- 实现 IsType 指令支持类型检查运算符 (is) 的字节码生成&#10;- 添加对 LangId、TypeLangValue 和 StringLangValue 类型的目标类型解析&#10;- 修复联合类型测试中的布尔值大小写断言问题&#10;- 简化联合类型语法测试用例，移除不必要的嵌套括号&#10;- 优化测试代码中的空值安全调用处理&#10;- 更新 IDE 配置文件的变更列表和任务计数统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加类型检查运算符支持并优化联合类型测试&#10;&#10;- 实现 IsType 指令支持类型检查运算符 (is) 的字节码生成&#10;- 添加对 LangId、TypeLangValue 和 StringLangValue 类型的目标类型解析&#10;- 修复联合类型测试中的布尔值大小写断言问题&#10;- 简化联合类型语法测试用例，移除不必要的嵌套括号&#10;- 优化测试代码中的空值安全调用处理&#10;- 更新 IDE 配置文件的变更列表和任务计数统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
