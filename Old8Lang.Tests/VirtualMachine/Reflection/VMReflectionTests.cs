@@ -100,10 +100,10 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
-                public subtract(a:int, b:int) -> int {
+                public func subtract(a:int, b:int) -> int {
                     return a - b
                 }
             }
@@ -127,8 +127,8 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                public publicMethod() -> void { }
-                private privateMethod() -> void { }
+                public func publicMethod() -> void { }
+                private func privateMethod() -> void { }
             }
             s <- Secret()
             methods <- GetClassMethods(s)
@@ -204,7 +204,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
             }
@@ -227,7 +227,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                private getSecret() -> int {
+                private func getSecret() -> int {
                     return 42
                 }
             }
@@ -300,7 +300,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
             }
@@ -322,7 +322,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                private getSecret() -> int {
+                private func getSecret() -> int {
                     return 42
                 }
             }
@@ -344,7 +344,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Greeter {
-                public greet() -> string {
+                public func greet() -> string {
                     return ""Hello, World!""
                 }
             }
@@ -366,7 +366,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Math {
-                public calculate(a:int, b:int, c:int) -> int {
+                public func calculate(a:int, b:int, c:int) -> int {
                     return a + b * c
                 }
             }
@@ -388,7 +388,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Formatter {
-                public format(prefix:string, value:int) -> string {
+                public func format(prefix:string, value:int) -> string {
                     return prefix + value.ToStr()
                 }
             }
@@ -518,8 +518,8 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                private secretValue:int <- 0
-                public getSecret() -> int {
+                private func secretValue:int <- 0
+                public func getSecret() -> int {
                     return secretValue
                 }
             }
@@ -609,7 +609,7 @@ public class VMReflectionTests
             class Person {
                 public name:string <- """"
                 public age:int <- 0
-                public init(n:string, a:int) -> void {
+                public func init(n:string, a:int) -> void {
                     name <- n
                     age <- a
                 }
@@ -747,7 +747,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
             }
@@ -760,7 +760,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -769,7 +769,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
             }
@@ -782,7 +782,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("False", output);
+        Assert.Equal("false", output);
     }
 
     [Fact]
@@ -791,7 +791,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Secret {
-                private getSecret() -> int {
+                private func getSecret() -> int {
                     return 42
                 }
             }
@@ -804,7 +804,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -813,7 +813,7 @@ public class VMReflectionTests
         // Arrange
         var code = @"
             class Person {
-                public init(name:string) -> void { }
+                public func init(name:string) -> void { }
             }
             p <- Person(""Test"")
             result <- HasMethod(p, ""init"")
@@ -824,7 +824,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     #endregion
@@ -848,7 +848,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -868,7 +868,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("False", output);
+        Assert.Equal("false", output);
     }
 
     [Fact]
@@ -888,7 +888,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     #endregion
@@ -904,16 +904,16 @@ public class VMReflectionTests
                 private name:string <- ""Unknown""
                 private age:int <- 0
 
-                public init(n:string, a:int) -> void {
+                public func init(n:string, a:int) -> void {
                     name <- n
                     age <- a
                 }
 
-                public greet() -> string {
+                public func greet() -> string {
                     return ""Hello, I am "" + name
                 }
 
-                private getAge() -> int {
+                private func getAge() -> int {
                     return age
                 }
             }
@@ -976,12 +976,12 @@ public class VMReflectionTests
                 private width:int <- 0
                 private height:int <- 0
 
-                public init(w:int, h:int) -> void {
+                public func init(w:int, h:int) -> void {
                     width <- w
                     height <- h
                 }
 
-                public getArea() -> int {
+                public func getArea() -> int {
                     return width * height
                 }
             }
@@ -989,11 +989,11 @@ public class VMReflectionTests
             class Circle {
                 private radius:int <- 0
 
-                public init(r:int) -> void {
+                public func init(r:int) -> void {
                     radius <- r
                 }
 
-                public getArea() -> int {
+                public func getArea() -> int {
                     return radius * radius * 3
                 }
             }
@@ -1026,12 +1026,12 @@ public class VMReflectionTests
             class Counter {
                 private count:int <- 0
 
-                public increment() -> int {
+                public func increment() -> int {
                     count <- count + 1
                     return count
                 }
 
-                public getCount() -> int {
+                public func getCount() -> int {
                     return count
                 }
             }
@@ -1098,12 +1098,12 @@ public class VMReflectionTests
                 public name:string <- """"
                 public price:int <- 0
 
-                public init(n:string, p:int) -> void {
+                public func init(n:string, p:int) -> void {
                     name <- n
                     price <- p
                 }
 
-                public getInfo() -> string {
+                public func getInfo() -> string {
                     return name + "": "" + price.ToStr()
                 }
             }

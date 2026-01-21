@@ -22,9 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMExecutionPerformanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMExecutionPerformanceTests.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -586,7 +584,7 @@
       <workItem from="1768841952068" duration="521000" />
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
-      <workItem from="1768981355686" duration="2443000" />
+      <workItem from="1768981355686" duration="3332000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -931,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="759" />
+    <option name="localTasksCounter" value="761" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,8 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 修复字节码虚拟机循环迭代器和闭包分析问题&#10;&#10;- 修复嵌套循环中迭代器局部变量名称冲突问题，使用唯一名称避免冲突&#10;- 修复循环字节码指令中迭代器对象的栈管理，确保正确弹出迭代器对象&#10;- 添加对IfStatement和IfChild节点的闭包变量分析支持&#10;- 移除虚拟机指令中的调试输出代码&#10;- 修复测试代码中的语法错误，将for循环语法从&lt;-改为in&#10;- 修复异常捕获语法，统一使用括号包装异常变量&#10;- 修复对象创建语法，移除new关键字的使用&#10;- 更新泛型约束语法和数组类型表示方式" />
-    <MESSAGE value="fix(vm): 修复字节码虚拟机异常处理和finally块执行逻辑&#10;&#10;- 实现finally块的正确执行逻辑，确保异常处理后能继续向外传播&#10;- 修复异常表遍历逻辑，从内到外查找匹配的异常处理器&#10;- 添加ExecuteFinallyBlock方法来专门处理finally块的执行&#10;- 更新using语句和defer语句的执行顺序测试，确保正确的执行时机&#10;- 修正defer语句在函数级作用域中的执行时机，应在函数返回前执行&#10;- 调整workspace.xml中的变更列表和时间统计信息" />
     <MESSAGE value="fix(compiler): 解决嵌套Lambda表达式的闭包捕获问题&#10;&#10;- 修复了函数体中跳转指令目标地址的偏移计算问题&#10;- 添加了对当前函数捕获变量的检查方法IsCapturedVariable&#10;- 完善了Lambda表达式中变量捕获的分析逻辑&#10;- 支持嵌套Lambda中对外层捕获变量的正确访问&#10;- 实现了多层闭包环境中变量的正确定位和加载&#10;- 添加了详细的调试输出来跟踪捕获变量的分析过程&#10;- 创建了嵌套Lambda功能测试文件以验证修复效果" />
     <MESSAGE value="fix(parser): 解决对象解构赋值与块语句的解析歧义&#10;&#10;- 添加前瞻检查逻辑区分对象解构赋值和块语句&#10;- 实现大括号嵌套深度跟踪机制&#10;- 检查赋值符号'&lt;-'来确定语句类型&#10;- 支持类型注解后的赋值符号识别&#10;- 限制前瞻扫描深度避免性能问题&#10;- 修复IDE工作区配置文件的时间统计信息" />
     <MESSAGE value="feat(lang): 添加类型转换函数并优化虚拟机数值处理&#10;&#10;- 注册IntFunction和DoubleFunction类型转换函数&#10;- 实现嵌套数组访问调试测试用例&#10;- 添加完整的类型转换函数实现支持int/double转换&#10;- 优化虚拟机加法和乘法运算防止整数溢出&#10;- 改进数值转字符串显示避免科学计数法&#10;- 修复边界测试用例中的断言值差异&#10;- 更新极值测试用例的预期输出结果" />
@@ -983,7 +979,9 @@
     <MESSAGE value="refactor(runtime): 重构闭包和反射功能实现&#10;&#10;- 将 ClosureValue 类改为记录结构并优化构造函数&#10;- 实现对字节码对象实例的字段设置支持&#10;- 扩展反射辅助类以支持字节码对象实例的类型检查&#10;- 添加对实例方法和字段的反射查询功能&#10;- 实现字段默认值的正确初始化逻辑&#10;- 在虚拟机中添加常量池访问接口" />
     <MESSAGE value="test(performance): 更新虚拟机内存使用测试&#10;&#10;- 修改数组分配测试中的语法从 arr + [i] 到 arr.Add(i)&#10;- 调整字典分配测试中变量名从 dict 到 list 并更新语法&#10;- 更新类实例化测试中的构造函数语法从 new 到 init&#10;- 修改闭包测试中的函数返回类型和实现逻辑&#10;- 跳过生成器内存测试用例等待后续修复&#10;- 更新异步任务测试中的计数逻辑&#10;- 调整泛型类测试中的语法和类型声明&#10;- 修改循环语法从 range 表示法到传统 for 循环&#10;- 更新继承测试中的类声明语法从冒号到 extends&#10;- 替换模块导入测试为辅助函数调用测试&#10;- 优化空集合测试中的断言阈值设置" />
     <MESSAGE value="feat(vm): 扩展虚拟机数值运算和数组操作支持&#10;&#10;- 添加 long 类型数值的加减乘除运算支持&#10;- 实现 int 与 long 混合类型的数值运算转换&#10;- 添加 long 与 double 混合类型的数值运算转换&#10;- 实现数组拼接功能，支持 object[] + object[] 操作&#10;- 添加 long 类型到 LangValue 的转换映射&#10;- 更新性能测试中的列表操作语法从 {} 改为 []&#10;- 简化 lambda 表达式的返回类型声明语法" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 扩展虚拟机数值运算和数组操作支持&#10;&#10;- 添加 long 类型数值的加减乘除运算支持&#10;- 实现 int 与 long 混合类型的数值运算转换&#10;- 添加 long 与 double 混合类型的数值运算转换&#10;- 实现数组拼接功能，支持 object[] + object[] 操作&#10;- 添加 long 类型到 LangValue 的转换映射&#10;- 更新性能测试中的列表操作语法从 {} 改为 []&#10;- 简化 lambda 表达式的返回类型声明语法" />
+    <MESSAGE value="test(performance): 更新虚拟机执行性能测试中的循环语法&#10;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- arr&quot; 改为 &quot;for x in arr&quot;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- list&quot; 改为 &quot;for x in list&quot;&#10;- 将测试代码中的范围表示法从 &quot;0..1000&quot; 改为 &quot;[0~1000]&quot;&#10;- 更新了相关的测试用例以匹配新的循环语法格式" />
+    <MESSAGE value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
