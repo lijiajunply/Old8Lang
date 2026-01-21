@@ -98,7 +98,7 @@ public partial class Operation(
     /// <summary>
     /// 操作的输出类型缓存
     /// </summary>
-    private Type? Type { get; set; }
+    public Type? Type { get; private set; }
 
     /// <summary>
     /// 左操作数

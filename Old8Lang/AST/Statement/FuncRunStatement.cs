@@ -79,7 +79,8 @@ public class FuncRunStatement : OldStatement
 
         _operation.LoadIlValue(ilGenerator, local);
         // 销毁栈上的值
-        var opOutputType = _operation.OutputType(local);
+        // 使用 _operation.Type 而不是 OutputType(local)，因为 LoadIlValue 已经设置了正确的类型
+        var opOutputType = _operation.Type ?? _operation.OutputType(local);
         if (opOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
     }
 

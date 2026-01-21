@@ -56,7 +56,7 @@ public class VMExceptionTests
         ";
 
         // Act & Assert
-        var exception = Assert.Throws<System.Exception>(() => ExecuteVMCode(code));
+        var exception = Assert.Throws<VmException>(() => ExecuteVMCode(code));
         Assert.Equal("Test error", exception.Message);
     }
 

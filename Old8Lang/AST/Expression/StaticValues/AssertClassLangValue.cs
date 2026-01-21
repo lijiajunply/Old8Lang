@@ -30,7 +30,7 @@ public partial class AssertClassLangValue : LangValueType
     {
         // 对于 Assert 类静态方法，我们不需要加载实例
         // 直接返回 Assert 类型本身
-        ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertClassLangValue));
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertHelper));
         ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
     }
 
