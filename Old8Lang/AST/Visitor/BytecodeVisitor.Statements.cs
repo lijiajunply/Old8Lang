@@ -636,8 +636,11 @@ public partial class BytecodeVisitor
             }
         }
 
+        // 获取返回类型
+        var returnType = funcValue.Id?.AssumptionType ?? "";
+
         // 编译函数
-        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
+        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, null, returnType);
 
         // 检查是否有装饰器
         if (funcValue.Decorators != null && funcValue.Decorators.Count > 0)
@@ -882,8 +885,8 @@ public partial class BytecodeVisitor
         }
 
         // 非泛型类：正常编译
-        var fields = new List<(string fieldName, LangExpression? initialValue)>();
-        var staticFields = new List<(string fieldName, LangExpression initialValue)>();
+        var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
+        var staticFields = new List<(string fieldName, string fieldType, LangExpression initialValue)>();
         var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
         // 遍历实例成员，提取字段和方法
@@ -897,8 +900,9 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 这是一个实例字段，保存字段名和初始值
-                fields.Add((memberId.IdName, memberExpr));
+                // 这是一个实例字段，保存字段名、类型和初始值
+                var fieldType = memberId.AssumptionType ?? "";
+                fields.Add((memberId.IdName, fieldType, memberExpr));
             }
         }
 
@@ -913,8 +917,9 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 这是一个静态字段
-                staticFields.Add((memberId.IdName, memberExpr));
+                // 这是一个静态字段，保存字段名、类型和初始值
+                var fieldType = memberId.AssumptionType ?? "";
+                staticFields.Add((memberId.IdName, fieldType, memberExpr));
             }
         }
 
@@ -1394,16 +1399,19 @@ public partial class BytecodeVisitor
         // 检测函数体是否包含 yield 语句
         bool containsYield = _compiler.ContainsYieldStatement(funcValue.BlockStatement);
 
+        // 获取返回类型
+        var returnType = funcValue.Id?.AssumptionType ?? "";
+
         // 根据是否包含 yield 调用不同的编译方法
         if (containsYield)
         {
             // 异步生成器函数
-            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
+            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
         }
         else
         {
             // 普通异步函数
-            _compiler.CompileAsyncFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex);
+            _compiler.CompileAsyncFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
         }
 
         return null;

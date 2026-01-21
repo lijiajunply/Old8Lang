@@ -168,8 +168,8 @@ public class VMTypeConversionTests
         var code = @"
             x <- ""true""
             y <- ""false""
-            result1 <- bool.Parse(x)
-            result2 <- bool.Parse(y)
+            result1 <- bool(x)
+            result2 <- bool(y)
         ";
 
         // Act

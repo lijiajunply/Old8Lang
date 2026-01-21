@@ -224,6 +224,9 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
+                // 检查操作数是否为布尔类型
+                ValidateLogicalOperand(a, "&&", instruction);
+                ValidateLogicalOperand(b, "&&", instruction);
                 _stack.Push(ToBool(a) && ToBool(b));
             }
                 break;
@@ -232,6 +235,9 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
+                // 检查操作数是否为布尔类型
+                ValidateLogicalOperand(a, "||", instruction);
+                ValidateLogicalOperand(b, "||", instruction);
                 _stack.Push(ToBool(a) || ToBool(b));
             }
                 break;
@@ -239,6 +245,8 @@ public partial class VirtualMachine
             case OpCode.Not:
             {
                 var a = _stack.Pop();
+                // 检查操作数是否为布尔类型
+                ValidateLogicalOperand(a, "!", instruction);
                 _stack.Push(!ToBool(a));
             }
                 break;
@@ -699,6 +707,21 @@ public partial class VirtualMachine
             case OpCode.Return:
             {
                 // 返回值应该已经在栈上
+                // 检查返回值类型
+                if (!string.IsNullOrEmpty(frame.Function.ReturnType) && frame.Function.ReturnType != "void")
+                {
+                    var returnValue = _stack.Count > 0 ? _stack.Peek() : null;
+                    if (!CheckTypeMatch(frame.Function.ReturnType, returnValue))
+                    {
+                        var actualType = GetValueTypeName(returnValue);
+                        throw new TypeError(
+                            GetPosition(instruction),
+                            frame.Function.ReturnType,
+                            actualType,
+                            $"函数 '{frame.Function.Name}' 返回值类型不匹配"
+                        );
+                    }
+                }
                 // 调用者会从栈中获取返回值
                 // 设置 IP 超出指令范围，终止 CallFunction 中的 while 循环
                 frame.IP = frame.Function.Instructions.Count;
@@ -2186,6 +2209,8 @@ public partial class VirtualMachine
                 {
                     if (classMetadata.StaticFieldValues.ContainsKey(fieldName))
                     {
+                        // 检查静态字段类型
+                        ValidateStaticFieldType(classMetadata, fieldName, value, instruction);
                         classMetadata.StaticFieldValues[fieldName] = value;
                     }
                     else
@@ -2196,6 +2221,8 @@ public partial class VirtualMachine
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
                 else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
+                    // 检查字段类型
+                    ValidateFieldType(bytecodeObj.ClassName, fieldName, value, instruction);
                     bytecodeObj.Fields[fieldName] = value;
                 }
                 // 如果是字典对象（兼容旧代码）

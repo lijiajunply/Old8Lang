@@ -17,6 +17,9 @@ public class FunctionMetadata
     /// <summary>参数默认值列表（索引对应Parameters，null表示无默认值）</summary>
     public List<object?> DefaultValues { get; set; } = [];
 
+    /// <summary>返回类型（空字符串表示无类型注解）</summary>
+    public string ReturnType { get; set; } = "";
+
     /// <summary>params参数的索引（-1表示没有params参数）</summary>
     public int ParamsParameterIndex { get; set; } = -1;
 
@@ -77,6 +80,9 @@ public class FunctionMetadata
             }
         }
 
+        // 返回类型
+        writer.Write(ReturnType ?? "");
+
         // 指令
         writer.Write(Instructions.Count);
         foreach (var instruction in Instructions)
@@ -130,6 +136,9 @@ public class FunctionMetadata
                 func.DefaultValues.Add(ReadDefaultValue(reader));
             }
         }
+
+        // 返回类型
+        func.ReturnType = reader.ReadString();
 
         // 指令
         int instCount = reader.ReadInt32();

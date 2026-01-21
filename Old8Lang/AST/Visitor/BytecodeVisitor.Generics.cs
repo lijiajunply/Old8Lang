@@ -1,4 +1,5 @@
 using Old8Lang.AST;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 
@@ -26,14 +27,20 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 收集字段名称和初始值（从实例成员中提取）
-        var fields = new List<(string fieldName, LangExpression? initialValue)>();
+        // 收集字段名称、类型和初始值（从实例成员中提取）
+        var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
             if (memberExpr is not FuncLangValue)
             {
-                // 这是一个字段，保存字段名和初始值
-                fields.Add((memberId.IdName, memberExpr));
+                // 这是一个字段，保存字段名、类型和初始值
+                // 替换泛型类型参数
+                var fieldType = memberId.AssumptionType ?? "";
+                if (!string.IsNullOrEmpty(fieldType) && typeMapping.TryGetValue(fieldType, out var mappedType))
+                {
+                    fieldType = mappedType;
+                }
+                fields.Add((memberId.IdName, fieldType, memberExpr));
             }
         }
 
@@ -124,9 +131,42 @@ public partial class BytecodeVisitor
     /// </summary>
     private FuncLangValue CreateSpecializedMethod(FuncLangValue originalMethod, Dictionary<string, string> typeMapping)
     {
-        // 注意：这里我们创建一个浅拷贝，因为字节码模式不需要深度替换类型参数
-        // 类型参数的替换主要在运行时通过动态类型处理
-        return originalMethod;
+        // 如果没有类型映射，直接返回原始方法
+        if (typeMapping.Count == 0)
+            return originalMethod;
+
+        // 创建新的参数列表，替换类型参数
+        List<LangId>? newIds = null;
+        if (originalMethod.Ids != null)
+        {
+            newIds = new List<LangId>();
+            foreach (var param in originalMethod.Ids)
+            {
+                var paramType = param.AssumptionType ?? "";
+                // 替换泛型类型参数
+                if (!string.IsNullOrEmpty(paramType) && typeMapping.TryGetValue(paramType, out var mappedType))
+                {
+                    paramType = mappedType;
+                }
+                // 创建新的参数，使用替换后的类型
+                var newParam = new LangId(param.IdName, paramType, param.DefaultValue, param.IsParams, param.Position);
+                newIds.Add(newParam);
+            }
+        }
+
+        // 替换返回类型
+        var returnType = originalMethod.Id?.AssumptionType ?? "";
+        if (!string.IsNullOrEmpty(returnType) && typeMapping.TryGetValue(returnType, out var mappedReturnType))
+        {
+            returnType = mappedReturnType;
+        }
+
+        // 创建新的函数值，使用替换后的参数和返回类型
+        var newId = originalMethod.Id != null
+            ? new LangId(originalMethod.Id.IdName, returnType, originalMethod.Id.DefaultValue, originalMethod.Id.IsParams, originalMethod.Id.Position)
+            : null;
+
+        return new FuncLangValue(newId, newIds, originalMethod.BlockStatement);
     }
 
     /// <summary>

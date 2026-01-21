@@ -1377,6 +1377,94 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 验证字段赋值类型
+    /// </summary>
+    private void ValidateFieldType(string className, string fieldName, object? value, Instruction instruction)
+    {
+        // 查找类元数据
+        var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
+        if (classMetadata == null)
+            return;
+
+        // 查找字段元数据（包括父类字段）
+        FieldMetadata? fieldMetadata = null;
+        var currentClass = classMetadata;
+        while (currentClass != null && fieldMetadata == null)
+        {
+            fieldMetadata = currentClass.Fields.FirstOrDefault(f => f.Name == fieldName);
+            if (fieldMetadata == null && !string.IsNullOrEmpty(currentClass.BaseClassName))
+            {
+                currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (fieldMetadata == null || string.IsNullOrEmpty(fieldMetadata.TypeName))
+            return;
+
+        // 检查类型匹配
+        if (!CheckTypeMatch(fieldMetadata.TypeName, value))
+        {
+            var actualType = GetValueTypeName(value);
+            throw new TypeError(
+                GetPosition(instruction),
+                fieldMetadata.TypeName,
+                actualType,
+                $"字段 '{className}.{fieldName}' 类型不匹配"
+            );
+        }
+    }
+
+    /// <summary>
+    /// 验证静态字段赋值类型
+    /// </summary>
+    private void ValidateStaticFieldType(ClassMetadata classMetadata, string fieldName, object? value, Instruction instruction)
+    {
+        // 查找静态字段元数据
+        var fieldMetadata = classMetadata.StaticFields.FirstOrDefault(f => f.Name == fieldName);
+        if (fieldMetadata == null || string.IsNullOrEmpty(fieldMetadata.TypeName))
+            return;
+
+        // 检查类型匹配
+        if (!CheckTypeMatch(fieldMetadata.TypeName, value))
+        {
+            var actualType = GetValueTypeName(value);
+            throw new TypeError(
+                GetPosition(instruction),
+                fieldMetadata.TypeName,
+                actualType,
+                $"静态字段 '{classMetadata.Name}.{fieldName}' 类型不匹配"
+            );
+        }
+    }
+
+    /// <summary>
+    /// 验证逻辑运算符的操作数类型
+    /// </summary>
+    private void ValidateLogicalOperand(object? value, string operatorName, Instruction instruction)
+    {
+        // 如果值是布尔类型，直接返回
+        if (value is bool)
+            return;
+
+        // 如果值是 BoolLangValue，直接返回
+        if (value is BoolLangValue)
+            return;
+
+        // 其他类型不允许用于逻辑运算
+        var actualType = GetValueTypeName(value);
+        throw new TypeError(
+            GetPosition(instruction),
+            "bool",
+            actualType,
+            $"逻辑运算符 '{operatorName}' 的操作数必须是布尔类型"
+        );
+    }
+
+    /// <summary>
     /// 执行函数并获取结果（用于异步调用）
     /// </summary>
     public object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args)

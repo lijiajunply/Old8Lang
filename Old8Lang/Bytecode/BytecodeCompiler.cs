@@ -302,7 +302,7 @@ public class BytecodeCompiler
     /// 编译函数定义
     /// </summary>
     public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
-        BlockStatement body, int paramsParameterIndex = -1, List<string>? capturedVars = null)
+        BlockStatement body, int paramsParameterIndex = -1, List<string>? capturedVars = null, string returnType = "")
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -313,6 +313,7 @@ public class BytecodeCompiler
             Parameters = parameters,
             ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
+            ReturnType = returnType,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = false,
             IsGenerator = isGenerator // 设置生成器标记
@@ -412,7 +413,7 @@ public class BytecodeCompiler
     /// 编译异步函数
     /// </summary>
     public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
-        BlockStatement body, int paramsParameterIndex = -1)
+        BlockStatement body, int paramsParameterIndex = -1, string returnType = "")
     {
         var func = new FunctionMetadata
         {
@@ -420,6 +421,7 @@ public class BytecodeCompiler
             Parameters = parameters,
             ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
+            ReturnType = returnType,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true // 标记为异步函数
         };
@@ -453,7 +455,7 @@ public class BytecodeCompiler
     /// 编译异步生成器函数
     /// </summary>
     public FunctionMetadata CompileAsyncGeneratorFunction(string funcName, List<string> parameters, List<string> parameterTypes,
-        List<object?> defaultValues, BlockStatement body, int paramsParameterIndex = -1)
+        List<object?> defaultValues, BlockStatement body, int paramsParameterIndex = -1, string returnType = "")
     {
         // 检测函数是否包含yield语句
         bool isGenerator = ContainsYieldStatement(body);
@@ -464,6 +466,7 @@ public class BytecodeCompiler
             Parameters = parameters,
             ParameterTypes = parameterTypes,
             DefaultValues = defaultValues,
+            ReturnType = returnType,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = true, // 标记为异步函数
             IsGenerator = isGenerator // 标记为生成器函数
@@ -651,11 +654,24 @@ public class BytecodeCompiler
 
     public void DeclareClass(string className, List<string> fields)
     {
-        DeclareClass(className, fields.Select(f => (f, (LangExpression?)null)).ToList(), [], [], null);
+        DeclareClass(className, fields.Select(f => (f, "", (LangExpression?)null)).ToList(), [], [], null);
     }
 
     public void DeclareClass(string className, List<(string fieldName, LangExpression? initialValue)> fields,
         List<(string fieldName, LangExpression initialValue)> staticFields,
+        List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
+        string? parentClassName,
+        List<string>? implementsNames = null,
+        List<string>? mixinNames = null)
+    {
+        // 转换为带类型的字段列表（类型为空字符串）
+        var fieldsWithTypes = fields.Select(f => (f.fieldName, "", f.initialValue)).ToList();
+        var staticFieldsWithTypes = staticFields.Select(f => (f.fieldName, "", f.initialValue)).ToList();
+        DeclareClass(className, fieldsWithTypes, staticFieldsWithTypes, methods, parentClassName, implementsNames, mixinNames);
+    }
+
+    public void DeclareClass(string className, List<(string fieldName, string fieldType, LangExpression? initialValue)> fields,
+        List<(string fieldName, string fieldType, LangExpression initialValue)> staticFields,
         List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
         string? parentClassName,
         List<string>? implementsNames = null,
@@ -671,12 +687,13 @@ public class BytecodeCompiler
         };
 
         // 处理实例字段
-        foreach (var (fieldName, initialValue) in fields)
+        foreach (var (fieldName, fieldType, initialValue) in fields)
         {
             var fieldMetadata = new FieldMetadata
             {
                 Name = fieldName,
-                IsStatic = false
+                IsStatic = false,
+                TypeName = string.IsNullOrEmpty(fieldType) ? null : fieldType
             };
 
             // 如果有初始值，计算并添加到常量池
@@ -707,7 +724,7 @@ public class BytecodeCompiler
         }
 
         // 处理静态字段
-        foreach (var (fieldName, initialValue) in staticFields)
+        foreach (var (fieldName, fieldType, initialValue) in staticFields)
         {
             // 计算静态字段的初始值并添加到常量池
             var constantValue = EvaluateConstantExpression(initialValue);
@@ -716,7 +733,8 @@ public class BytecodeCompiler
             var staticFieldMetadata = new FieldMetadata
             {
                 Name = fieldName,
-                IsStatic = true
+                IsStatic = true,
+                TypeName = string.IsNullOrEmpty(fieldType) ? null : fieldType
             };
 
             // 处理 null 默认值
