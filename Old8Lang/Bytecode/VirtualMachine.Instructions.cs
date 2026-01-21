@@ -3100,10 +3100,10 @@ public partial class VirtualMachine
     {
         typeName = typeName.Trim();
 
-        // 1. Intersection Types (A & B)
-        if (typeName.Contains('&'))
+        // 1. Intersection Types (A & B) - but only at top level, not inside generics
+        if (ContainsTopLevelChar(typeName, '&'))
         {
-            var types = typeName.Split('&');
+            var types = SplitTopLevel(typeName, '&');
             foreach (var type in types)
             {
                 if (!CheckTypeMatch(type, val)) return false;
@@ -3112,10 +3112,10 @@ public partial class VirtualMachine
             return true;
         }
 
-        // 2. Union Types (A | B)
-        if (typeName.Contains('|'))
+        // 2. Union Types (A | B) - but only at top level, not inside generics
+        if (ContainsTopLevelChar(typeName, '|'))
         {
-            var types = typeName.Split('|');
+            var types = SplitTopLevel(typeName, '|');
             foreach (var type in types)
             {
                 if (CheckTypeMatch(type, val)) return true;
@@ -3179,11 +3179,11 @@ public partial class VirtualMachine
             return true;
         }
 
-        // 6. Basic Types
+        // 6. Basic Types (with implicit numeric conversion: int -> double)
         return typeName.ToLower() switch
         {
             "int" => val is int,
-            "double" => val is double,
+            "double" => val is double or int,  // int can be implicitly converted to double
             "string" => val is string,
             "bool" => val is bool,
             "char" => val is char,
@@ -3271,6 +3271,43 @@ public partial class VirtualMachine
         }
 
         result.Add(args.Substring(start));
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// 检查字符串中是否包含顶层的指定字符（不在尖括号内）
+    /// </summary>
+    private bool ContainsTopLevelChar(string str, char c)
+    {
+        int depth = 0;
+        foreach (var ch in str)
+        {
+            if (ch == '<') depth++;
+            else if (ch == '>') depth--;
+            else if (ch == c && depth == 0) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 按顶层的指定字符分割字符串（不分割尖括号内的字符）
+    /// </summary>
+    private string[] SplitTopLevel(string str, char separator)
+    {
+        var result = new List<string>();
+        int depth = 0;
+        int start = 0;
+        for (int i = 0; i < str.Length; i++)
+        {
+            if (str[i] == '<') depth++;
+            else if (str[i] == '>') depth--;
+            else if (str[i] == separator && depth == 0)
+            {
+                result.Add(str.Substring(start, i - start).Trim());
+                start = i + 1;
+            }
+        }
+        result.Add(str.Substring(start).Trim());
         return result.ToArray();
     }
 
