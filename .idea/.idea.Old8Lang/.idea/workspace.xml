@@ -23,13 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -592,7 +586,7 @@
       <workItem from="1768841952068" duration="521000" />
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
-      <workItem from="1768981355686" duration="1064000" />
+      <workItem from="1768981355686" duration="1723000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -937,7 +931,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="756" />
+    <option name="localTasksCounter" value="757" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,7 +958,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现LangValueType算术和比较运算支持&#10;&#10;- 添加对LangValueType（IntLangValue, DoubleLangValue等）的加法运算支持&#10;- 添加对LangValueType的减法、乘法、除法和取模运算支持&#10;- 添加对LangValueType的幂运算和比较运算（等于、大于、小于等）支持&#10;- 实现ConvertToLangValueType转换方法支持LangValueType运算&#10;- 添加InvalidOperationError异常处理和类型错误消息提示&#10;- 更新字节码序列化测试中的字符串操作代码格式&#10;- 移除字符串模板测试中的条件表达式和字典访问测试用例&#10;- 更新IDEA工作空间配置文件中的变更列表和任务统计信息" />
     <MESSAGE value="fix(tests): 修复虚拟机集合测试中的布尔值大小写断言问题&#10;&#10;- 将 VMCollectionTests 中的 &quot;True&quot; 断言改为小写 &quot;true&quot;&#10;- 更新了相关的测试用例以匹配正确的布尔值输出格式" />
     <MESSAGE value="feat(vm): 实现字节码虚拟机闭包和Lambda表达式支持&#10;&#10;- 添加闭包捕获变量分析器和捕获变量环境管理&#10;- 实现Lambda表达式编译和闭包函数调用机制&#10;- 支持复杂函数调用表达式和动态函数调用&#10;- 添加闭包变量访问优先级处理（先检查闭包环境再检查全局变量）&#10;- 实现嵌套闭包变量继承机制&#10;- 优化SetStatement中的左侧表达式访问逻辑&#10;- 添加多种闭包和Lambda测试用例验证功能正确性" />
     <MESSAGE value="fix(vm): 修复字节码虚拟机循环迭代器和闭包分析问题&#10;&#10;- 修复嵌套循环中迭代器局部变量名称冲突问题，使用唯一名称避免冲突&#10;- 修复循环字节码指令中迭代器对象的栈管理，确保正确弹出迭代器对象&#10;- 添加对IfStatement和IfChild节点的闭包变量分析支持&#10;- 移除虚拟机指令中的调试输出代码&#10;- 修复测试代码中的语法错误，将for循环语法从&lt;-改为in&#10;- 修复异常捕获语法，统一使用括号包装异常变量&#10;- 修复对象创建语法，移除new关键字的使用&#10;- 更新泛型约束语法和数组类型表示方式" />
@@ -989,7 +982,8 @@
     <MESSAGE value="test(reflection): 添加编译器和解释器模式反射功能测试&#10;&#10;- 实现 GetClassName 功能测试，验证类名获取的正确性&#10;- 实现 GetClassMethods 功能测试，验证类方法列表获取&#10;- 实现 GetClassFields 功能测试，验证类字段列表获取&#10;- 实现 GetMethodInfo 功能测试，验证方法详情获取&#10;- 实现 GetFieldInfo 功能测试，验证字段详情获取&#10;- 实现 InvokeMethod 功能测试，验证动态方法调用&#10;- 实现 GetField 功能测试，验证字段值获取&#10;- 实现 SetField 功能测试，验证字段值设置&#10;- 实现 CreateInstance 功能测试，验证动态对象创建&#10;- 实现 IsInstanceOf 功能测试，验证类型检查&#10;- 实现 HasMethod 和 HasField 功能测试，验证成员存在性检查&#10;- 添加综合工作流测试，验证完整反射操作流程&#10;- 覆盖公共和私有成员的访问测试场景&#10;- 包含编译器模式和解释器模式的双重测试验证" />
     <MESSAGE value="feat(error): 添加多种错误类型定义&#10;&#10;- 添加类错误定义，包括类未找到、方法未找到、访问权限违规等错误类型&#10;- 添加并发错误定义，包括死锁、Channel操作相关错误、锁获取失败等错误类型&#10;- 添加IO和网络错误定义，涵盖文件读写、网络连接、HTTP请求等多种场景&#10;- 添加其他杂项错误定义，包括迭代器停止、编码解码、配置错误等类型&#10;- 所有错误类型都继承自RuntimeError基类并提供统一的错误处理接口" />
     <MESSAGE value="fix(error): 统一虚拟机指令中的异常处理为具体错误类型&#10;&#10;- 在ClassError中添加MethodNotFoundError构造函数&#10;- 为IndexError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为TypeError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为CastError添加SourcePosition构造函数重载&#10;- 在VirtualMachine.Instructions.cs中添加GetPosition辅助方法获取源码位置&#10;- 将全局变量未定义异常替换为NameError&#10;- 将函数未定义异常替换为MethodNotFoundError&#10;- 将参数缺失异常替换为ArgumentError&#10;- 将非函数对象调用异常替换为TypeError&#10;- 将Break/Continue指令执行异常替换为InvalidOperationError&#10;- 将函数索引无效异常替换为IndexError&#10;- 将字典键不存在异常替换为KeyError&#10;- 将迭代器状态异常替换为StateError&#10;- 将类型转换失败异常替换为CastError&#10;- 将空引用访问异常替换为NullReferenceError&#10;- 将字段访问异常替换为AttributeError&#10;- 将类未找到异常替换为ClassNotFoundError&#10;- 将访问权限违规异常替换为AccessViolationError&#10;- 将模块导入异常替换为ImportError&#10;- 将未实现操作码异常替换为NotImplementedError&#10;- 在类型转换函数中统一使用CastError替代InvalidOperationError和通用Exception" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(error): 统一虚拟机指令中的异常处理为具体错误类型&#10;&#10;- 在ClassError中添加MethodNotFoundError构造函数&#10;- 为IndexError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为TypeError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为CastError添加SourcePosition构造函数重载&#10;- 在VirtualMachine.Instructions.cs中添加GetPosition辅助方法获取源码位置&#10;- 将全局变量未定义异常替换为NameError&#10;- 将函数未定义异常替换为MethodNotFoundError&#10;- 将参数缺失异常替换为ArgumentError&#10;- 将非函数对象调用异常替换为TypeError&#10;- 将Break/Continue指令执行异常替换为InvalidOperationError&#10;- 将函数索引无效异常替换为IndexError&#10;- 将字典键不存在异常替换为KeyError&#10;- 将迭代器状态异常替换为StateError&#10;- 将类型转换失败异常替换为CastError&#10;- 将空引用访问异常替换为NullReferenceError&#10;- 将字段访问异常替换为AttributeError&#10;- 将类未找到异常替换为ClassNotFoundError&#10;- 将访问权限违规异常替换为AccessViolationError&#10;- 将模块导入异常替换为ImportError&#10;- 将未实现操作码异常替换为NotImplementedError&#10;- 在类型转换函数中统一使用CastError替代InvalidOperationError和通用Exception" />
+    <MESSAGE value="refactor(runtime): 重构闭包和反射功能实现&#10;&#10;- 将 ClosureValue 类改为记录结构并优化构造函数&#10;- 实现对字节码对象实例的字段设置支持&#10;- 扩展反射辅助类以支持字节码对象实例的类型检查&#10;- 添加对实例方法和字段的反射查询功能&#10;- 实现字段默认值的正确初始化逻辑&#10;- 在虚拟机中添加常量池访问接口" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(runtime): 重构闭包和反射功能实现&#10;&#10;- 将 ClosureValue 类改为记录结构并优化构造函数&#10;- 实现对字节码对象实例的字段设置支持&#10;- 扩展反射辅助类以支持字节码对象实例的类型检查&#10;- 添加对实例方法和字段的反射查询功能&#10;- 实现字段默认值的正确初始化逻辑&#10;- 在虚拟机中添加常量池访问接口" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
