@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
@@ -26,6 +27,11 @@ public class BytecodeCompiler
     /// 是否启用类型检查（默认：true）
     /// </summary>
     public bool EnableTypeChecking { get; set; } = true;
+
+    /// <summary>
+    /// 是否启用类型推断（默认：true）
+    /// </summary>
+    public bool EnableTypeInference { get; set; } = true;
 
     // ===== 泛型支持 =====
 
@@ -123,18 +129,85 @@ public class BytecodeCompiler
             // 初始化类型检查器
             TypeChecker.Initialize(Interpreter.Manager);
 
-            // 执行模块以注册所有类型定义
-            // 这样类型检查器可以识别所有类、接口和枚举
-            ast.ExecuteModule(Interpreter.Manager, skipFunctionClassInit: false);
+            // 只注册函数和类定义，不执行其他语句
+            // 这样可以避免在类型检查阶段执行 PrintLine 等语句
+            RegisterTypeDefinitions(ast, Interpreter.Manager);
 
-            // 注意：虚拟机模式目前不使用 TypeInferenceEngine
-            // 因为字节码编译器已经有自己的类型系统
-            // 如果将来需要更高级的类型推断，可以在这里添加
+            // 如果启用类型推断，使用 TypeInferenceEngine 进行类型推断
+            if (EnableTypeInference && TypeInferenceConfig.Instance.EnableTypeInference)
+            {
+                PerformTypeInference(ast);
+            }
         }
         catch (Exception ex)
         {
             // 类型检查失败时，输出警告但不中断编译
             Console.WriteLine($"[虚拟机类型检查警告] {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 只注册函数和类定义，不执行其他语句
+    /// </summary>
+    private void RegisterTypeDefinitions(BlockStatement ast, VariateManager manager)
+    {
+        // 注册 ImportStatements 中的函数和类定义
+        foreach (var statement in ast.ImportStatements)
+        {
+            if (statement is FuncInit or ClassInit or AsyncFuncInit)
+            {
+                statement.Run(manager);
+            }
+        }
+
+        // 注册 OtherStatements 中的函数和类定义
+        foreach (var statement in ast.OtherStatements)
+        {
+            if (statement is FuncInit or ClassInit or AsyncFuncInit)
+            {
+                statement.Run(manager);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 执行类型推断
+    /// </summary>
+    private void PerformTypeInference(BlockStatement ast)
+    {
+        if (Interpreter == null)
+        {
+            return;
+        }
+
+        try
+        {
+            // 创建一个临时的 LocalManager 用于类型推断
+            var localManager = new LocalManager
+            {
+                Interpreter = Interpreter
+            };
+
+            // 创建类型推断引擎
+            var inferenceEngine = new TypeInferenceEngine(localManager);
+
+            // 执行类型推断
+            bool success = inferenceEngine.InferTypes(ast);
+
+            if (TypeInferenceConfig.Instance.DebugOutput)
+            {
+                var (totalConstraints, resolvedTypes, unresolvedTypes) = inferenceEngine.GetStatistics();
+                Console.WriteLine($"[虚拟机类型推断] 约束数: {totalConstraints}, 已解析: {resolvedTypes}, 未解析: {unresolvedTypes}");
+                Console.WriteLine($"[虚拟机类型推断] 推断{(success ? "成功" : "失败")}");
+            }
+        }
+        catch (Exception ex)
+        {
+            // 类型推断失败时，输出警告但不中断编译
+            if (TypeInferenceConfig.Instance.DebugOutput)
+            {
+                Console.WriteLine($"[虚拟机类型推断警告] {ex.Message}");
+            }
         }
     }
 

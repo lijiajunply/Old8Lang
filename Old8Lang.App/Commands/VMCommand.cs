@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.App.Commands;
 
@@ -12,7 +13,7 @@ public class VMCommand : ICommand
 {
     public string Name => "-vm";
     public string Description => "使用虚拟机模式编译并执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug] [--no-type-check]";
+    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug] [--no-type-check] [--no-type-inference] [--type-inference-debug]";
 
     public int Execute(string[] args)
     {
@@ -28,6 +29,8 @@ public class VMCommand : ICommand
         var symbols = new List<string>();
         var debugMode = false;
         var enableTypeChecking = true; // 默认启用类型检查
+        var enableTypeInference = true; // 默认启用类型推断
+        var typeInferenceDebug = false; // 默认关闭类型推断调试输出
 
         // 解析参数
         for (int i = 1; i < args.Length; i++)
@@ -45,7 +48,18 @@ public class VMCommand : ICommand
             {
                 enableTypeChecking = false;
             }
+            else if (args[i] == "--no-type-inference")
+            {
+                enableTypeInference = false;
+            }
+            else if (args[i] == "--type-inference-debug")
+            {
+                typeInferenceDebug = true;
+            }
         }
+
+        // 设置类型推断调试输出
+        TypeInferenceConfig.Instance.DebugOutput = typeInferenceDebug;
 
         // 创建预编译符号管理器
         var preprocessorSymbols = new PreprocessorSymbols(symbols);
@@ -74,7 +88,8 @@ public class VMCommand : ICommand
             var compiler = new BytecodeCompiler
             {
                 Interpreter = interpreter,
-                EnableTypeChecking = enableTypeChecking
+                EnableTypeChecking = enableTypeChecking,
+                EnableTypeInference = enableTypeInference
             };
             var bytecodeFile = compiler.Compile(ast);
             stopwatch.Stop();

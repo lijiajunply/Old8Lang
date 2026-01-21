@@ -1,6 +1,7 @@
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.App.Commands;
 
@@ -11,7 +12,7 @@ public class CompileBytecodeCommand : ICommand
 {
     public string Name => "-compile";
     public string Description => "将 .old8 文件编译为 .o8c 字节码文件";
-    public string Help => "使用: Old8Lang.App -compile <输入文件.old8> <输出文件.o8c> [-D SYMBOL1] ...";
+    public string Help => "使用: Old8Lang.App -compile <输入文件.old8> <输出文件.o8c> [-D SYMBOL1] ... [--no-type-check] [--no-type-inference] [--type-inference-debug]";
 
     public int Execute(string[] args)
     {
@@ -25,8 +26,11 @@ public class CompileBytecodeCommand : ICommand
         var inputFile = args[0];
         var outputFile = args[1];
         var symbols = new List<string>();
+        var enableTypeChecking = true;
+        var enableTypeInference = true;
+        var typeInferenceDebug = false;
 
-        // 解析 -D 参数
+        // 解析参数
         for (int i = 2; i < args.Length; i++)
         {
             if (args[i] == "-D" && i + 1 < args.Length)
@@ -34,7 +38,22 @@ public class CompileBytecodeCommand : ICommand
                 symbols.Add(args[i + 1]);
                 i++;
             }
+            else if (args[i] == "--no-type-check")
+            {
+                enableTypeChecking = false;
+            }
+            else if (args[i] == "--no-type-inference")
+            {
+                enableTypeInference = false;
+            }
+            else if (args[i] == "--type-inference-debug")
+            {
+                typeInferenceDebug = true;
+            }
         }
+
+        // 设置类型推断调试输出
+        TypeInferenceConfig.Instance.DebugOutput = typeInferenceDebug;
 
         // 验证输入文件扩展名
         var inputExt = Path.GetExtension(inputFile).ToLower();
@@ -70,7 +89,12 @@ public class CompileBytecodeCommand : ICommand
             var ast = interpreter.Build(Apis.FromFile(inputFile), inputFile, preprocessorSymbols);
 
             // 编译为字节码
-            var compiler = new BytecodeCompiler();
+            var compiler = new BytecodeCompiler
+            {
+                Interpreter = interpreter,
+                EnableTypeChecking = enableTypeChecking,
+                EnableTypeInference = enableTypeInference
+            };
             var bytecodeFile = compiler.Compile(ast);
 
             // 保存到文件

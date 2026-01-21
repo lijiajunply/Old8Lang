@@ -22,7 +22,6 @@ public class VMTypeErrorTests
         var compiler = new BytecodeCompiler
         {
             Interpreter = interpreter,
-            EnableTypeChecking = true
         };
         var bytecodeFile = compiler.Compile(ast);
 
@@ -40,7 +39,6 @@ public class VMTypeErrorTests
         var compiler = new BytecodeCompiler
         {
             Interpreter = interpreter,
-            EnableTypeChecking = true
         };
         var bytecodeFile = compiler.Compile(ast);
 
