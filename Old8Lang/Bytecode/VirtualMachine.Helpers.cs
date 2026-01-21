@@ -81,10 +81,25 @@ public partial class VirtualMachine
                 return result;
             return (int)result;
         }
+        if (a is long la && b is long lb) return la + lb;
+        if (a is int ia3 && b is long lb2) return (long)ia3 + lb2;
+        if (a is long la2 && b is int ib3) return la2 + (long)ib3;
         if (a is double da && b is double db) return da + db;
         if (a is int ia2 && b is double db2) return ia2 + db2;
         if (a is double da2 && b is int ib2) return da2 + ib2;
+        if (a is long la3 && b is double db3) return la3 + db3;
+        if (a is double da3 && b is long lb3) return da3 + lb3;
         if (a is string sa || b is string sb) return ToString(a) + ToString(b);
+
+        // 数组拼接：arr + [item] 或 [item] + arr
+        if (a is object[] arrA && b is object[] arrB)
+        {
+            var result = new object[arrA.Length + arrB.Length];
+            Array.Copy(arrA, 0, result, 0, arrA.Length);
+            Array.Copy(arrB, 0, result, arrA.Length, arrB.Length);
+            return result;
+        }
+
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法");
     }
 
@@ -128,9 +143,14 @@ public partial class VirtualMachine
         }
 
         if (a is int ia && b is int ib) return ia - ib;
+        if (a is long la && b is long lb) return la - lb;
+        if (a is int ia3 && b is long lb2) return (long)ia3 - lb2;
+        if (a is long la2 && b is int ib3) return la2 - (long)ib3;
         if (a is double da && b is double db) return da - db;
         if (a is int ia2 && b is double db2) return ia2 - db2;
         if (a is double da2 && b is int ib2) return da2 - ib2;
+        if (a is long la3 && b is double db3) return la3 - db3;
+        if (a is double da3 && b is long lb3) return da3 - lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法");
     }
 
@@ -181,9 +201,14 @@ public partial class VirtualMachine
                 return result;
             return (int)result;
         }
+        if (a is long la && b is long lb) return la * lb;
+        if (a is int ia3 && b is long lb2) return (long)ia3 * lb2;
+        if (a is long la2 && b is int ib3) return la2 * (long)ib3;
         if (a is double da && b is double db) return da * db;
         if (a is int ia2 && b is double db2) return ia2 * db2;
         if (a is double da2 && b is int ib2) return da2 * ib2;
+        if (a is long la3 && b is double db3) return la3 * db3;
+        if (a is double da3 && b is long lb3) return da3 * lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法");
     }
 
@@ -227,9 +252,14 @@ public partial class VirtualMachine
         }
 
         if (a is int ia && b is int ib) return ia / ib;
+        if (a is long la && b is long lb) return la / lb;
+        if (a is int ia3 && b is long lb2) return (long)ia3 / lb2;
+        if (a is long la2 && b is int ib3) return la2 / (long)ib3;
         if (a is double da && b is double db) return da / db;
         if (a is int ia2 && b is double db2) return ia2 / db2;
         if (a is double da2 && b is int ib2) return da2 / ib2;
+        if (a is long la3 && b is double db3) return la3 / db3;
+        if (a is double da3 && b is long lb3) return da3 / lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法");
     }
 
@@ -918,6 +948,7 @@ public partial class VirtualMachine
         {
             null => new NullLangValue(),
             int i => new IntLangValue(i),
+            long l => new IntLangValue((int)l), // 将 long 转换为 int（如果溢出会在运行时报错）
             double d => new DoubleLangValue(d),
             string s => new StringLangValue(s),
             bool b => new BoolLangValue(b),

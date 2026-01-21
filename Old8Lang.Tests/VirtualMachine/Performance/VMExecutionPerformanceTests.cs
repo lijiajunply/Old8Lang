@@ -191,9 +191,9 @@ public class VMExecutionPerformanceTests
     public void Performance_Collection_ListOperations()
     {
         var code = @"
-            list <- {}
+            list <- []
             for i <- 0, i < 1000, i++ {
-                list <- list + {i}
+                list <- list + [i]
             }
 
             sum <- 0
@@ -378,7 +378,7 @@ public class VMExecutionPerformanceTests
     public void Performance_Lambda_SimpleLambda()
     {
         var code = @"
-            add <- (a:int, b:int) -> int {
+            add <- (a:int, b:int) -> {
                 return a + b
             }
 
@@ -407,7 +407,7 @@ public class VMExecutionPerformanceTests
                 arr <- arr + [i]
             }
 
-            map(arr, (x:int) -> int {
+            map(arr, (x:int) -> {
                 return x * 2
             })
         ";
