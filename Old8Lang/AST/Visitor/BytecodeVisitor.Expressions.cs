@@ -171,6 +171,37 @@ public partial class BytecodeVisitor
             return null;
         }
 
+        // 特殊处理类型检查运算符 (is)
+        if (node.Opera == LangTokenType.Is)
+        {
+            // 生成左操作数（要检查的值）
+            if (node.Left != null)
+                node.Left.Accept(this);
+
+            // 获取目标类型名称
+            string typeName;
+            if (node.Right is LangId rightId)
+            {
+                typeName = rightId.IdName;
+            }
+            else if (node.Right is TypeLangValue typeValue)
+            {
+                typeName = typeValue.ToString();
+            }
+            else if (node.Right is StringLangValue stringValue)
+            {
+                typeName = stringValue.Value;
+            }
+            else
+            {
+                throw new Exception($"类型检查运算符 'is' 的右操作数必须是类型名称，实际为: {node.Right?.GetType().Name}");
+            }
+
+            // 生成 IsType 指令
+            Emit(OpCode.IsType, typeName);
+            return null;
+        }
+
         // 检查是否是一元运算符
         bool isUnaryOperator = node.Opera == LangTokenType.Exclamation || // !
                                 (node.Opera == LangTokenType.Minus && node.Left == null); // 一元负号
