@@ -357,32 +357,164 @@ public sealed class CharFunction : BaseGlobalFunction
 
         if (value is int intValue)
         {
-            return (double)intValue;
+            return Convert.ToChar(intValue);
         }
 
         if (value is string stringValue)
         {
-            if (double.TryParse(stringValue, out double result))
+            if (stringValue.Length == 1)
             {
-                return result;
+                return stringValue[0];
             }
-
-            throw new CastError(new SourcePosition(), "string", "char", $"字符串 '{stringValue}' 不是有效的字符格式");
+            throw new CastError(new SourcePosition(), "string", "char", $"字符串 '{stringValue}' 不是有效的字符格式（长度必须为1）");
         }
 
-        if (value is bool boolValue)
-        {
-            return boolValue ? 1.0 : 0.0;
-        }
-
-        // 尝试使用 Convert.ToDouble
+        // 尝试使用 Convert.ToChar
         try
         {
-            return Convert.ToDouble(value);
+            return Convert.ToChar(value);
         }
         catch
         {
             throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "char");
         }
+    }
+}
+
+/// <summary>
+/// Bool 函数 - 将值转换为布尔值
+/// </summary>
+public sealed class BoolFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["bool", "Bool"];
+    public override int MinParameterCount => 1;
+    public override int MaxParameterCount => 1;
+
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
+        SourcePosition position)
+    {
+        var value = parameters[0].Run(manager);
+
+        if (value is BoolLangValue boolValue)
+        {
+            return boolValue;
+        }
+
+        if (value is IntLangValue intValue)
+        {
+            return new BoolLangValue(intValue.Value != 0);
+        }
+
+        if (value is DoubleLangValue doubleValue)
+        {
+            return new BoolLangValue(doubleValue.Value != 0.0);
+        }
+
+        if (value is StringLangValue stringValue)
+        {
+            if (bool.TryParse(stringValue.Value, out bool result))
+            {
+                return new BoolLangValue(result);
+            }
+            // 非空字符串为 true，空字符串为 false
+            return new BoolLangValue(!string.IsNullOrEmpty(stringValue.Value));
+        }
+
+        // null 为 false，其他对象为 true
+        if (value is NullLangValue)
+        {
+            return new BoolLangValue(false);
+        }
+
+        return new BoolLangValue(true);
+    }
+
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
+        LocalManager local, SourcePosition position)
+    {
+        var param = parameters[0];
+        param.LoadIlValue(ilGenerator, local);
+        var paramType = param.OutputType(local)!;
+
+        // 如果已经是 bool 类型，直接返回
+        if (paramType == typeof(bool))
+        {
+            return;
+        }
+
+        // int -> bool
+        if (paramType == typeof(int))
+        {
+            // 比较是否不等于 0
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Cgt_Un);
+            return;
+        }
+
+        // double -> bool
+        if (paramType == typeof(double))
+        {
+            // 比较是否不等于 0.0
+            ilGenerator.Emit(OpCodes.Ldc_R8, 0.0);
+            ilGenerator.Emit(OpCodes.Ceq);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Ceq);
+            return;
+        }
+
+        // string -> bool
+        if (paramType == typeof(string))
+        {
+            var parseMethod = typeof(bool).GetMethod("Parse", [typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Call, parseMethod);
+            return;
+        }
+
+        // object -> bool (运行时转换)
+        if (paramType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToBoolean", [typeof(object)])!);
+            return;
+        }
+
+        throw new CastError(position, paramType.Name, "bool");
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(bool);
+    }
+
+    protected override object? ExecuteInVMInternal(object?[] arguments)
+    {
+        object? value = arguments[0];
+
+        if (value is bool boolValue)
+        {
+            return boolValue;
+        }
+
+        if (value is int intValue)
+        {
+            return intValue != 0;
+        }
+
+        if (value is double doubleValue)
+        {
+            return doubleValue != 0.0;
+        }
+
+        if (value is string stringValue)
+        {
+            if (bool.TryParse(stringValue, out bool result))
+            {
+                return result;
+            }
+            // 非空字符串为 true，空字符串为 false
+            return !string.IsNullOrEmpty(stringValue);
+        }
+
+        // null 为 false，其他对象为 true
+        return value != null;
     }
 }

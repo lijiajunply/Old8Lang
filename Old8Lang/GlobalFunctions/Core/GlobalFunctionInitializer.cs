@@ -41,6 +41,8 @@ public static class GlobalFunctionInitializer
             // 注册类型转换函数
             registry.Register(new IntFunction());
             registry.Register(new DoubleFunction());
+            registry.Register(new CharFunction());
+            registry.Register(new BoolFunction());
 
             // 注册系统函数（从 Instance.cs 迁移）
             registry.Register(new LockFunction());

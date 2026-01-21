@@ -23,11 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Types/VMTypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Types/VMTypeConversionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -935,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="765" />
+    <option name="localTasksCounter" value="766" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +960,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加类元数据注册和字典迭代器特殊处理&#10;&#10;- 在虚拟机初始化时将所有类元数据注册到全局变量表中&#10;- 实现通过类名访问类元数据的功能以支持嵌套类访问&#10;- 为字典类型添加特殊迭代器处理逻辑&#10;- 字典迭代时返回键集合而非键值对以改善遍历行为" />
     <MESSAGE value="feat(bytecode): 添加类方法访问修饰符支持和改进错误处理&#10;&#10;- 在DeclareClass方法中为类方法添加accessModifier参数&#10;- 为BytecodeObjectMethodMetadata类添加AccessModifier属性&#10;- 实现私有方法访问控制检查机制&#10;- 改进字典索引访问时的键存在性验证&#10;- 更新BytecodeVisitor中的方法收集逻辑以包含访问修饰符&#10;- 为生成器完成状态添加异常处理机制&#10;- 移除重复的类型错误测试用例&#10;- 更新语法测试用例中的构造函数命名和泛型约束语法&#10;- 修正数组切片语法测试用例" />
     <MESSAGE value="feat(bytecode): 添加对象构造函数调用支持&#10;&#10;- 实现构造函数查找逻辑，优先查找init方法其次查找同名方法&#10;- 添加构造函数参数生成和调用机制&#10;- 使用Dup指令复制对象引用以支持方法调用&#10;- 更新CallMethod指令参数格式支持构造函数调用&#10;- 修复VMGenericNestedTests中的变量命名冲突&#10;- 更新IDE配置文件的变更列表和任务计数器&#10;- 优化数字字面量解析顺序支持int-long-double类型推断&#10;- 添加类元数据注册机制支持嵌套类访问&#10;- 实现字典类型特殊迭代器处理逻辑" />
     <MESSAGE value="feat(lang): 实现字段访问和索引赋值功能&#10;&#10;- 添加实例方法中字段访问的支持，通过 this.field 形式访问实例字段&#10;- 实现 super.field 父类字段访问功能&#10;- 添加对 ClassMemberId 类型成员访问标识符的支持&#10;- 实现嵌套列表项索引赋值功能，支持 obj.field[index] &lt;- value 语法&#10;- 添加 SetIndex 指令处理索引赋值操作&#10;- 重构字段访问逻辑以区分局部变量、实例字段和全局变量的访问方式" />
@@ -987,7 +984,8 @@
     <MESSAGE value="feat(bytecode): 添加类型推断功能并优化字节码编译流程&#10;&#10;- 在 BytecodeCompiler 中添加 EnableTypeInference 属性控制类型推断&#10;- 实现 RegisterTypeDefinitions 方法只注册函数和类定义，避免执行其他语句&#10;- 添加 PerformTypeInference 方法执行类型推断逻辑&#10;- 在 CompileBytecodeCommand 和 VMCommand 中添加 --no-type-inference 和 --type-inference-debug 参数&#10;- 将类型推断配置统一到 TypeInferenceConfig.Instance 管理&#10;- 修复测试中 BytecodeCompiler 的初始化配置" />
     <MESSAGE value="feat(bytecode): 添加类型检查运算符支持并优化联合类型测试&#10;&#10;- 实现 IsType 指令支持类型检查运算符 (is) 的字节码生成&#10;- 添加对 LangId、TypeLangValue 和 StringLangValue 类型的目标类型解析&#10;- 修复联合类型测试中的布尔值大小写断言问题&#10;- 简化联合类型语法测试用例，移除不必要的嵌套括号&#10;- 优化测试代码中的空值安全调用处理&#10;- 更新 IDE 配置文件的变更列表和任务计数统计" />
     <MESSAGE value="feat(bytecode): 添加函数参数类型支持并实现运行时类型验证&#10;&#10;- 在 FunctionMetadata 中添加 ParameterTypes 属性存储参数类型信息&#10;- 修改 CompileFunction、CompileAsyncFunction 和 CompileAsyncGeneratorFunction 方法签名&#10;- 在字节码序列化和反序列化中添加参数类型的读写支持&#10;- 实现运行时参数类型验证功能，包括普通函数和构造函数&#10;- 在字节码访问器各相关文件中添加参数类型提取和传递逻辑&#10;- 更新 TypeError 类添加详细错误信息构造函数&#10;- 修复测试用例中构造函数命名从 new 到 init 的变更" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加函数参数类型支持并实现运行时类型验证&#10;&#10;- 在 FunctionMetadata 中添加 ParameterTypes 属性存储参数类型信息&#10;- 修改 CompileFunction、CompileAsyncFunction 和 CompileAsyncGeneratorFunction 方法签名&#10;- 在字节码序列化和反序列化中添加参数类型的读写支持&#10;- 实现运行时参数类型验证功能，包括普通函数和构造函数&#10;- 在字节码访问器各相关文件中添加参数类型提取和传递逻辑&#10;- 更新 TypeError 类添加详细错误信息构造函数&#10;- 修复测试用例中构造函数命名从 new 到 init 的变更" />
+    <MESSAGE value="feat(bytecode): 添加返回类型注解和运行时类型验证功能&#10;&#10;- 在 FunctionMetadata 中添加 ReturnType 属性存储函数返回类型&#10;- 修改 CompileFunction、CompileAsyncFunction、CompileAsyncGeneratorFunction 方法支持返回类型参数&#10;- 在字节码序列化和反序列化中添加返回类型的读写支持&#10;- 为类字段声明添加类型信息支持，扩展 DeclareClass 方法签名&#10;- 实现运行时类型验证功能，包括字段赋值、静态字段和返回值类型检查&#10;- 添加逻辑运算符操作数类型验证，确保布尔类型正确性&#10;- 在泛型特化过程中实现类型参数替换逻辑&#10;- 更新测试用例适配新的类型系统变化" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加返回类型注解和运行时类型验证功能&#10;&#10;- 在 FunctionMetadata 中添加 ReturnType 属性存储函数返回类型&#10;- 修改 CompileFunction、CompileAsyncFunction、CompileAsyncGeneratorFunction 方法支持返回类型参数&#10;- 在字节码序列化和反序列化中添加返回类型的读写支持&#10;- 为类字段声明添加类型信息支持，扩展 DeclareClass 方法签名&#10;- 实现运行时类型验证功能，包括字段赋值、静态字段和返回值类型检查&#10;- 添加逻辑运算符操作数类型验证，确保布尔类型正确性&#10;- 在泛型特化过程中实现类型参数替换逻辑&#10;- 更新测试用例适配新的类型系统变化" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
