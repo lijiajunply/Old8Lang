@@ -127,7 +127,7 @@ public class VMTypeErrorTests
         AssertVMThrowsTypeException(code);
     }
 
-    [Fact(Skip = "泛型约束检查在虚拟机模式下尚未完全支持")]
+    [Fact]
     public void TypeErrors_GenericConstraintViolation_ThrowsTypeException()
     {
         var code = @"
@@ -461,7 +461,7 @@ public class VMTypeErrorTests
 
     #region 交集类型错误测试
 
-    [Fact(Skip = "交集类型在虚拟机模式下尚未完全支持")]
+    [Fact]
     public void TypeErrors_IntersectionTypeInvalidMember_ThrowsTypeException()
     {
         var code = @"
@@ -481,6 +481,11 @@ public class VMTypeErrorTests
                 PrintLine(value.methodA())
                 PrintLine(value.methodB())
             }
+
+            v1 <- A()
+            process(v1)
+            v2 <- B()
+            process(v2)
         ";
 
         AssertVMThrowsTypeException(code);

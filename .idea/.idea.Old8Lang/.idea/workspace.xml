@@ -23,8 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMTypeErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMTypeErrorTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -932,7 +931,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="768" />
+    <option name="localTasksCounter" value="770" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,8 +958,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现字段访问和索引赋值功能&#10;&#10;- 添加实例方法中字段访问的支持，通过 this.field 形式访问实例字段&#10;- 实现 super.field 父类字段访问功能&#10;- 添加对 ClassMemberId 类型成员访问标识符的支持&#10;- 实现嵌套列表项索引赋值功能，支持 obj.field[index] &lt;- value 语法&#10;- 添加 SetIndex 指令处理索引赋值操作&#10;- 重构字段访问逻辑以区分局部变量、实例字段和全局变量的访问方式" />
-    <MESSAGE value="feat(vm): 实现字节码对象实例的Dispose方法调用&#10;&#10;- 添加对BytecodeObjectInstance类型的资源清理支持&#10;- 实现查找和调用字节码类的Dispose方法逻辑&#10;- 通过CallFunction调用传递对象本身作为this参数&#10;- 更新资源清理顺序：先处理并发资源，再处理字节码对象实例&#10;- 将测试文件中的构造函数名称从new统一改为init&#10;- 修正IDE工作区配置文件的变更追踪信息" />
     <MESSAGE value="feat(lang): 添加对字典类型索引访问的支持&#10;&#10;- 在 LangListItem 中实现 DictionaryLangValue 类型的索引访问逻辑&#10;- 添加 DictionaryValueFuncStatic.GetValue 方法调用支持&#10;- 在虚拟机指令中实现字典类型的取值和赋值操作&#10;- 添加 C# 原始类型到 Old8Lang 类型的自动转换功能&#10;- 更新测试用例中的构造函数语法为 init 方法&#10;- 修复异常处理中的消息显示方式" />
     <MESSAGE value="feat(lang): 实现类的静态字段功能&#10;&#10;- 在BytecodeCompiler中添加静态字段参数和处理逻辑&#10;- 实现静态字段的常量池存储和元数据管理&#10;- 在VirtualMachine中添加静态字段的读取和写入支持&#10;- 修改表达式访问逻辑以支持类名作为全局变量加载&#10;- 更新泛型特化类声明以包含静态字段参数&#10;- 在类声明语句中提取和处理静态字段定义&#10;- 添加ClassMetadata中的静态字段值存储字典&#10;- 初始化虚拟机时设置静态字段的默认值&#10;- 更新测试用例中的构造函数语法为init方法&#10;- 移除废弃的嵌套数组调试测试文件" />
     <MESSAGE value="refactor(tests): 更新类继承和接口实现的语法表示&#10;&#10;- 将类实现接口的语法从冒号(:)改为implements关键字&#10;- 将接口继承的语法从冒号(:)改为extends关键字&#10;- 将类继承父类的语法从冒号(:)改为extends关键字&#10;- 将混入(Mixin)的语法从冒号(:)改为with关键字&#10;- 清理IDEA工作区配置中的无用变更追踪信息&#10;- 更新工作项计数器和最后提交消息记录" />
@@ -984,7 +981,9 @@
     <MESSAGE value="feat(bytecode): 添加返回类型注解和运行时类型验证功能&#10;&#10;- 在 FunctionMetadata 中添加 ReturnType 属性存储函数返回类型&#10;- 修改 CompileFunction、CompileAsyncFunction、CompileAsyncGeneratorFunction 方法支持返回类型参数&#10;- 在字节码序列化和反序列化中添加返回类型的读写支持&#10;- 为类字段声明添加类型信息支持，扩展 DeclareClass 方法签名&#10;- 实现运行时类型验证功能，包括字段赋值、静态字段和返回值类型检查&#10;- 添加逻辑运算符操作数类型验证，确保布尔类型正确性&#10;- 在泛型特化过程中实现类型参数替换逻辑&#10;- 更新测试用例适配新的类型系统变化" />
     <MESSAGE value="feat(lang): 添加字符和布尔类型转换函数支持&#10;&#10;- 在 GlobalFunctionInitializer 中注册 CharFunction 和 BoolFunction&#10;- 实现 CharFunction 支持将整数和单字符字符串转换为字符类型&#10;- 实现 BoolFunction 支持将各种类型转换为布尔值的完整逻辑&#10;- 添加字符类型转换的 IL 生成支持&#10;- 添加布尔类型转换的 IL 生成和运行时执行支持&#10;- 修正字符串到字符转换的错误提示信息&#10;- 清理 IDE 配置文件中的变更列表记录" />
     <MESSAGE value="fix(vm): 修复虚拟机类型检查中的枚举类型支持问题&#10;&#10;- 在类型检查逻辑中添加了对枚举类型的检查支持&#10;- 修改测试代码中的函数参数类型以匹配正确的枚举类型定义&#10;- 确保枚举类型的类型名称比较功能正常工作" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复虚拟机类型检查中的枚举类型支持问题&#10;&#10;- 在类型检查逻辑中添加了对枚举类型的检查支持&#10;- 修改测试代码中的函数参数类型以匹配正确的枚举类型定义&#10;- 确保枚举类型的类型名称比较功能正常工作" />
+    <MESSAGE value="fix(vm): 修复虚拟机类型检查中的交集和联合类型支持问题&#10;&#10;- 修改交集类型检查逻辑，只在顶层检查&amp;符号而不包括泛型内部&#10;- 修改联合类型检查逻辑，只在顶层检查|符号而不包括泛型内部&#10;- 添加隐式数值转换支持，int可隐式转换为double类型&#10;- 实现ContainsTopLevelChar方法检查顶层指定字符&#10;- 实现SplitTopLevel方法按顶层分隔符分割字符串&#10;- 更新IDE配置文件中的变更列表和任务计数器&#10;- 修正类型检查测试用例中的相关问题" />
+    <MESSAGE value="feat(vm): 添加对泛型类型名称的大小写不敏感支持&#10;&#10;- 实现了 list&lt;T&gt;/List&lt;T&gt;、array&lt;T&gt;/Array&lt;T&gt;、dict&lt;K,V&gt;/Dict&lt;K,V&gt; 的大小写不敏感匹配&#10;- 在类型检查前将类型名称转换为小写进行比较&#10;- 更新测试代码中的类型声明从 List&lt;string&gt; 到 list&lt;string&gt;" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 添加对泛型类型名称的大小写不敏感支持&#10;&#10;- 实现了 list&lt;T&gt;/List&lt;T&gt;、array&lt;T&gt;/Array&lt;T&gt;、dict&lt;K,V&gt;/Dict&lt;K,V&gt; 的大小写不敏感匹配&#10;- 在类型检查前将类型名称转换为小写进行比较&#10;- 更新测试代码中的类型声明从 List&lt;string&gt; 到 list&lt;string&gt;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1369,19 +1368,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="646" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Types/VMUnionTypeTests.cs</url>
-          <line>323</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Types/VMUnionTypeTests.cs" containingFunctionPresentation="方法 'UnionType_InFunction_ExecutesCorrectly'">
-            <startOffsets>
-              <option value="9063" />
-            </startOffsets>
-            <endOffsets>
-              <option value="9109" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="647" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
