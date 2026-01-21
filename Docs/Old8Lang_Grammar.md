@@ -157,6 +157,7 @@ public private static
 this super
 await spawn
 match
+new struct where params
 ```
 
 ### 2.4 字面量
@@ -1436,14 +1437,47 @@ result2 <- makePair<int, string>(1, "first")     // "1:first"
 
 泛型函数和类可以使用约束来限制类型参数必须满足的条件。
 
+**约束类型**：
+
+Old8Lang 支持以下五种泛型约束类型：
+
+| 约束类型 | 语法 | 说明 |
+|---------|------|------|
+| 类型名称约束 | `T: IComparable` | 要求 T 实现指定接口或继承指定基类 |
+| `new()` 约束 | `T: new()` 或 `T: new` | 要求 T 有无参构造函数 |
+| `class` 约束 | `T: class` | 要求 T 是引用类型 |
+| `struct` 约束 | `T: struct` | 要求 T 是值类型 |
+| 类型参数约束 | `T: U` | 要求 T 派生自另一个类型参数 U |
+
+**基本约束示例**：
+
 ```old8
-// 使用冒号语法指定约束
+// 类型名称约束 - 要求实现接口
 func process<T: IComparable>(value: T) -> T {
     // T 必须实现 IComparable 接口
     return value
 }
 
-// 使用 & 符号组合多个约束
+// new() 约束 - 要求有无参构造函数
+func createInstance<T: new()>() -> T {
+    return T()
+}
+
+// class 约束 - 要求是引用类型
+func processRef<T: class>(item: T) -> T {
+    return item
+}
+
+// struct 约束 - 要求是值类型
+func processValue<T: struct>(item: T) -> T {
+    return item
+}
+```
+
+**组合约束**：
+
+```old8
+// 使用 & 符号组合多个约束（必须同时满足）
 class Container<T: ISerializable & ICloneable> {
     value: T
 
@@ -1452,10 +1486,44 @@ class Container<T: ISerializable & ICloneable> {
     }
 }
 
-// 使用 where 子句语法
+// class 和 new() 组合 - 引用类型且有无参构造函数
+func create<T: class & new()>() -> T {
+    return T()
+}
+
+// 使用 | 符号组合约束（满足任一即可）
+func create<T: class | new()>() -> T {
+    return T()
+}
+
+// 类型名称与特殊约束组合
+func process<T: class & IComparable>() -> T {
+    return T()
+}
+```
+
+**where 子句语法**：
+
+```old8
+// 使用 where 子句指定约束
 func sort<T>(items: List<T>) -> List<T> where T: IComparable {
     // T 必须实现 IComparable 接口
     return items
+}
+
+// where 子句中的 new() 约束
+func createInstance<T>() -> T where T: new() {
+    return T()
+}
+
+// where 子句中的 class 约束
+func handleRef<T>(item: T) -> T where T: class {
+    return item
+}
+
+// where 子句中的 struct 约束
+func handleValue<T>(item: T) -> T where T: struct {
+    return item
 }
 
 // 多个类型参数的 where 约束
@@ -1469,13 +1537,84 @@ func complexFunc<T: IComparable>(value: T) -> T where T: ICloneable {
     // T 必须同时实现 IComparable 和 ICloneable
     return value
 }
+
+// where 子句中的组合约束
+func create<T>() -> T where T: class & new() {
+    return T()
+}
 ```
 
-**约束语法**：
+**类中的约束**：
+
+```old8
+// 类中使用 new() 约束
+class Factory<T: new()> {
+    private defaultValue: T
+
+    func init(v: T) -> void {
+        this.defaultValue <- v
+    }
+
+    func create() -> T {
+        return this.defaultValue
+    }
+}
+
+// 类中使用 class 约束
+class RefContainer<T: class> {
+    private value: T
+
+    func init(v: T) -> void {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+
+// 类中使用 struct 约束
+class ValueHolder<T: struct> {
+    private value: T
+
+    func init(v: T) -> void {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+```
+
+**约束冲突规则**：
+
+某些约束之间存在冲突，不能同时使用：
+
+| 约束组合 | 是否冲突 | 说明 |
+|---------|---------|------|
+| `class` + `struct` | 冲突 | 类型不能同时是引用类型和值类型 |
+| `struct` + `new()` | 冲突 | `struct` 隐含 `new()`，不需要显式指定 |
+| `class` + `new()` | 不冲突 | 引用类型可以有无参构造函数 |
+
+```old8
+// 错误示例 - 约束冲突
+func invalid<T: class & struct>(item: T) -> T {  // 编译错误
+    return item
+}
+
+// 正确示例 - 无冲突
+func valid<T: class & new()>() -> T {
+    return T()
+}
+```
+
+**约束语法总结**：
 
 - **单个约束**：`<T: IInterface>` 或 `where T: IInterface`
-- **多个约束（| 分隔）**：`<T: IInterface1 | IInterface2>`（类型满足任一接口即可）
-- **多个约束（& 分隔）**：`<T: IInterface1 & IInterface2>`（类型必须同时满足所有接口）
+- **特殊约束**：`<T: new()>`、`<T: class>`、`<T: struct>`
+- **多个约束（& 分隔）**：`<T: IInterface1 & IInterface2>`（类型必须同时满足所有约束）
+- **多个约束（| 分隔）**：`<T: IInterface1 | IInterface2>`（类型满足任一约束即可）
 - **where 子句**：`where T: IInterface` 用于函数级别的约束
 - **多个类型参数约束**：`where T: IInterface1, U: IInterface2`
 
@@ -1775,12 +1914,12 @@ result <- wrapper.unwrap()  // result = 123
 - 类体内可以使用类型参数作为字段类型、参数类型或返回类型
 - 每个实例都有独立的类型参数绑定
 - 不同类型参数的实例是不同的类型
-- 支持泛型约束（使用 `:` 和 `&` 符号），约束类型参数必须满足特定接口
+- 支持泛型约束（使用 `:` 和 `&` 符号），约束类型参数必须满足特定条件
 
 **泛型类约束示例**：
 
 ```old8
-// 单个约束
+// 类型名称约束
 class SortedList<T: IComparable> {
     private items: list
 
@@ -1790,7 +1929,32 @@ class SortedList<T: IComparable> {
     }
 }
 
-// 多个约束（& 分隔）
+// new() 约束 - 要求有无参构造函数
+class Factory<T: new()> {
+    func create() -> T {
+        return T()
+    }
+}
+
+// class 约束 - 要求是引用类型
+class RefContainer<T: class> {
+    private value: T
+
+    func init(v: T) -> void {
+        this.value <- v
+    }
+}
+
+// struct 约束 - 要求是值类型
+class ValueHolder<T: struct> {
+    private value: T
+
+    func init(v: T) -> void {
+        this.value <- v
+    }
+}
+
+// 多个约束组合（& 分隔）
 class Cache<T: ISerializable & ICloneable> {
     private data: T
 
@@ -1800,6 +1964,13 @@ class Cache<T: ISerializable & ICloneable> {
 
     func serialize() -> string {
         return this.data.serialize()
+    }
+}
+
+// class 和 new() 组合约束
+class ObjectFactory<T: class & new()> {
+    func createNew() -> T {
+        return T()
     }
 }
 ```
