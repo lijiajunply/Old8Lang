@@ -1128,9 +1128,9 @@ public class VMReflectionTests
 
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        Assert.Contains("Is Product: True", lines);
-        Assert.Contains("Has name: True", lines);
-        Assert.Contains("Has getInfo: True", lines);
+        Assert.Contains("Is Product: true", lines);
+        Assert.Contains("Has name: true", lines);
+        Assert.Contains("Has getInfo: true", lines);
         Assert.Contains("Info: Widget: 99", lines);
     }
 

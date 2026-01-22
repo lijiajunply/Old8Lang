@@ -113,7 +113,13 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
 
         // 准备参数
         List<object?> methodArgs = [instance]; // 第一个参数是 this
-        if (args is List<object?> argsList)
+
+        // 将 args 转换为列表并添加到参数中
+        if (args is object?[] argsArray)
+        {
+            methodArgs.AddRange(argsArray);
+        }
+        else if (args is List<object?> argsList)
         {
             methodArgs.AddRange(argsList);
         }

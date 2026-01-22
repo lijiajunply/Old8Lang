@@ -123,9 +123,22 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
 
         // 调用 init 构造函数（如果存在）
         var initMethod = classMetadata.Methods.FirstOrDefault(m => m.Name == "init");
-        if (initMethod != null && args is List<object?> argsList)
+        if (initMethod != null)
         {
-            vm.CallFunctionObject(initMethod.Function, [instance, .. argsList]);
+            // 准备参数：第一个参数是 this（实例本身），后面是构造函数参数
+            List<object?> methodArgs = [instance];
+
+            // 将 args 转换为列表并添加到参数中
+            if (args is object?[] argsArray)
+            {
+                methodArgs.AddRange(argsArray);
+            }
+            else if (args is List<object?> argsList)
+            {
+                methodArgs.AddRange(argsList);
+            }
+
+            vm.CallFunctionObject(initMethod.Function, methodArgs.ToArray());
         }
 
         return instance;

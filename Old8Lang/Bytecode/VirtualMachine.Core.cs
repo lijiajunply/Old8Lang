@@ -294,7 +294,10 @@ public partial class VirtualMachine
     /// <param name="arguments">函数参数</param>
     public void CallFunctionObject(object? funcObj, object?[] arguments)
     {
-        // 设置当前虚拟机上下文（对于新线程）
+        // 保存当前虚拟机上下文（可能已经被设置）
+        var previousVM = VMContext.CurrentVM;
+
+        // 设置当前虚拟机上下文（对于新线程或嵌套调用）
         VMContext.CurrentVM = this;
 
         try
@@ -329,8 +332,8 @@ public partial class VirtualMachine
         }
         finally
         {
-            // 清理虚拟机上下文
-            VMContext.CurrentVM = null;
+            // 恢复之前的虚拟机上下文（而不是清理）
+            VMContext.CurrentVM = previousVM;
         }
     }
 }

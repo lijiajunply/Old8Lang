@@ -94,6 +94,22 @@ public partial class BytecodeVisitor
                 // 全局变量更新
                 Emit(OpCode.StoreGlobal, varName);
             }
+            else if (_compiler.IsClassField(varName))
+            {
+                // 字段赋值：this.field <- value
+                // SetField期望栈布局(从栈顶到栈底): value, object
+                // 当前栈布局：value（在栈顶）
+                // 我们需要：先加载 this，然后交换栈顶两个元素
+
+                // 加载 this（第一个局部变量）
+                Emit(OpCode.LoadLocal, 0);
+
+                // 交换栈顶两个元素：现在栈布局是 value, object（从栈顶到栈底）
+                Emit(OpCode.Swap);
+
+                // 发出 SetField 指令
+                Emit(OpCode.SetField, varName);
+            }
             else
             {
                 // 新变量：根据作用域决定是全局变量还是局部变量

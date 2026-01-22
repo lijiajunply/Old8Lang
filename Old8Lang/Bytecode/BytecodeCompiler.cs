@@ -17,6 +17,7 @@ public class BytecodeCompiler
     private readonly BytecodeFile _bytecodeFile = new();
     private readonly Stack<Scope> _scopes = new();
     private FunctionMetadata? _currentFunction;
+    private ClassMetadata? _currentClass;
 
     /// <summary>
     /// 解释器实例，用于类型检查
@@ -570,6 +571,25 @@ public class BytecodeCompiler
     }
 
     /// <summary>
+    /// 检查变量是否是当前类的字段
+    /// </summary>
+    public bool IsClassField(string name)
+    {
+        if (_currentClass == null)
+            return false;
+
+        // 检查实例字段
+        if (_currentClass.Fields.Any(f => f.Name == name))
+            return true;
+
+        // 检查静态字段
+        if (_currentClass.StaticFields.Any(f => f.Name == name))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
     /// 分配局部变量（用于异常变量等临时变量）
     /// </summary>
     public int AllocateLocal(string name = "")
@@ -768,6 +788,10 @@ public class BytecodeCompiler
         // 这样在编译方法体时，IsClassName 可以正确识别类名
         _bytecodeFile.Classes.Add(classMetadata);
 
+        // 保存当前类上下文
+        var oldClass = _currentClass;
+        _currentClass = classMetadata;
+
         // 编译所有方法
         foreach (var (methodName, funcValue, isStatic, accessModifier) in methods)
         {
@@ -830,6 +854,9 @@ public class BytecodeCompiler
                 classMetadata.Methods.Add(methodMetadata);
             }
         }
+
+        // 恢复之前的类上下文
+        _currentClass = oldClass;
     }
 
     public bool IsClassName(string name)

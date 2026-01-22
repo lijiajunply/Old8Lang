@@ -28,27 +28,20 @@ public partial class BytecodeVisitor
             // 这是一个类名，应该作为全局变量加载（类元数据）
             Emit(OpCode.LoadGlobal, varName);
         }
+        // 检查是否是当前类的字段
+        else if (_compiler.IsClassField(varName))
+        {
+            // 这是一个字段访问：this.field
+            // 加载 this（第一个局部变量）
+            Emit(OpCode.LoadLocal, 0);
+
+            // 加载字段
+            Emit(OpCode.GetField, varName);
+        }
         else
         {
-            // 检查是否在类方法中，且 this 是局部变量（实例方法）
-            // 如果是，则应该通过 this.field 访问字段
-            if (_compiler.IsLocalVariable("this"))
-            {
-                // 这可能是一个实例方法中的字段访问
-                // 加载 this
-                int thisIndex = _compiler.GetLocalIndex("this");
-                Emit(OpCode.LoadLocal, thisIndex);
-
-                // 尝试加载字段
-                // 注意：这里我们假设如果不是局部变量且在实例方法中，那么它可能是字段
-                // 如果不是字段，GetField 指令会在运行时失败
-                Emit(OpCode.GetField, varName);
-            }
-            else
-            {
-                // 全局变量
-                Emit(OpCode.LoadGlobal, varName);
-            }
+            // 全局变量
+            Emit(OpCode.LoadGlobal, varName);
         }
 
         return null;
