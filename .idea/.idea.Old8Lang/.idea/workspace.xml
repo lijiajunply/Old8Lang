@@ -22,12 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -934,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="775" />
+    <option name="localTasksCounter" value="776" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -961,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(benchmark): 移除解析器性能测试报告文件&#10;&#10;- 删除了旧的基准测试日志文件&#10;- 清理了CSV格式的测试结果报告&#10;- 移除了HTML格式的测试结果报告&#10;- 删除了GitHub Markdown格式的测试结果报告" />
     <MESSAGE value="feat(reflection): 添加完整的虚拟机模式反射功能支持&#10;&#10;- 实现 BytecodeObjectInstance 对象实例的字段访问功能&#10;- 添加虚拟机模式下的类名、方法、字段信息查询功能&#10;- 实现 CreateInstance 函数创建类实例的功能&#10;- 添加 HasMethod 和 HasField 检查方法和字段存在的功能&#10;- 实现 InvokeMethod 动态调用方法的功能&#10;- 创建 VMReflectionHelper 辅助类处理虚拟机反射操作&#10;- 添加字节码对象实例的字段和静态字段访问支持&#10;- 实现反射函数对虚拟机上下文的正确依赖注入" />
     <MESSAGE value="docs(grammar): 添加完整的反射系统函数文档&#10;&#10;- 新增 8.5 章节详细介绍反射系统函数&#10;- 添加类型信息查询函数文档，包括 GetClassName、GetClassMethods 等&#10;- 添加动态方法调用和字段访问函数文档&#10;- 添加动态实例创建和类型检查函数文档&#10;- 提供完整的反射函数使用示例代码&#10;- 列出所有反射函数及其参数返回值说明&#10;- 添加反射系统的模式支持和重要说明" />
     <MESSAGE value="test(reflection): 添加编译器和解释器模式反射功能测试&#10;&#10;- 实现 GetClassName 功能测试，验证类名获取的正确性&#10;- 实现 GetClassMethods 功能测试，验证类方法列表获取&#10;- 实现 GetClassFields 功能测试，验证类字段列表获取&#10;- 实现 GetMethodInfo 功能测试，验证方法详情获取&#10;- 实现 GetFieldInfo 功能测试，验证字段详情获取&#10;- 实现 InvokeMethod 功能测试，验证动态方法调用&#10;- 实现 GetField 功能测试，验证字段值获取&#10;- 实现 SetField 功能测试，验证字段值设置&#10;- 实现 CreateInstance 功能测试，验证动态对象创建&#10;- 实现 IsInstanceOf 功能测试，验证类型检查&#10;- 实现 HasMethod 和 HasField 功能测试，验证成员存在性检查&#10;- 添加综合工作流测试，验证完整反射操作流程&#10;- 覆盖公共和私有成员的访问测试场景&#10;- 包含编译器模式和解释器模式的双重测试验证" />
@@ -986,7 +980,8 @@
     <MESSAGE value="feat(lang): 添加完整的泛型约束验证功能&#10;&#10;- 在 BytecodeVisitor 中添加泛型约束验证逻辑&#10;- 实现 class、struct、new() 等特殊约束的验证&#10;- 添加类型名称约束和类型参数约束的验证机制&#10;- 创建 GenericConstraint 类统一管理约束定义&#10;- 实现 GenericConstraintValidator 进行约束验证&#10;- 扩展解析器支持多种约束语法格式&#10;- 更新泛型函数和类实例化时的约束检查&#10;- 添加值类型判断辅助方法&#10;- 实现约束冲突检测机制" />
     <MESSAGE value="feat(generics): 实现泛型类型参数替换和可空类型支持&#10;&#10;- 在 FuncLangValue 中添加泛型类型参数替换逻辑，处理函数参数和返回类型的类型替换&#10;- 实现 ReplaceGenericTypeParameters 方法，支持可空类型、泛型类型、联合类型和交叉类型的参数替换&#10;- 添加辅助方法处理泛型参数分割、括号匹配和类型转换&#10;- 修改 GenericInstanceExpression 使用 ParseTypeAnnotation 正确处理复杂类型&#10;- 添加 ConvertParsedTypeToTypeInfo 方法转换解析后的类型注解为 TypeInfo&#10;- 在 TypeChecker 中实现可空类型的类型兼容性检查&#10;- 更新泛型函数实例化逻辑，正确处理类型参数替换和泛型约束" />
     <MESSAGE value="refactor(vm): 移除虚拟机指令中的冗余using语句&#10;&#10;- 移除了IDictionary和IEnumerable分支中的重复using语句&#10;- 简化了枚举器资源管理逻辑&#10;- 提高了代码简洁性和可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(vm): 移除虚拟机指令中的冗余using语句&#10;&#10;- 移除了IDictionary和IEnumerable分支中的重复using语句&#10;- 简化了枚举器资源管理逻辑&#10;- 提高了代码简洁性和可读性" />
+    <MESSAGE value="feat(generics): 实现泛型类型参数映射和嵌套泛型支持&#10;&#10;- 添加 CurrentTypeParameterMapping 属性管理当前类型参数映射&#10;- 实现泛型特化类和函数编译时的类型参数替换逻辑&#10;- 添加 ReplaceTypeParameters 方法支持嵌套泛型类型参数替换&#10;- 实现 SplitGenericTypeArgs 方法处理复杂泛型参数分割&#10;- 添加 NormalizeGenericTypeName 方法统一泛型类型名称格式&#10;- 优化泛型实例化过程中的类型参数解析和映射机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(generics): 实现泛型类型参数映射和嵌套泛型支持&#10;&#10;- 添加 CurrentTypeParameterMapping 属性管理当前类型参数映射&#10;- 实现泛型特化类和函数编译时的类型参数替换逻辑&#10;- 添加 ReplaceTypeParameters 方法支持嵌套泛型类型参数替换&#10;- 实现 SplitGenericTypeArgs 方法处理复杂泛型参数分割&#10;- 添加 NormalizeGenericTypeName 方法统一泛型类型名称格式&#10;- 优化泛型实例化过程中的类型参数解析和映射机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

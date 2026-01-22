@@ -394,9 +394,60 @@ public partial class VirtualMachine
                         throw new MethodNotFoundError(GetPosition(instruction), funcName);
                     }
 
-                    // 检查参数数量，如果不足则使用默认值补全
-                    if (argCount < function.Parameters.Count)
+                    // 处理 params 可变参数
+                    if (function.ParamsParameterIndex >= 0)
                     {
+                        // 有 params 参数的情况
+                        int paramsIndex = function.ParamsParameterIndex;
+                        int regularParamCount = paramsIndex; // params 之前的常规参数数量
+
+                        if (argCount >= regularParamCount)
+                        {
+                            // 将 params 位置及之后的所有参数打包成数组
+                            int paramsArgCount = argCount - regularParamCount;
+                            var paramsArray = new object?[paramsArgCount];
+                            Array.Copy(args, regularParamCount, paramsArray, 0, paramsArgCount);
+
+                            // 创建新的参数数组
+                            var fullArgs = new object?[function.Parameters.Count];
+                            // 复制常规参数
+                            Array.Copy(args, fullArgs, regularParamCount);
+                            // 设置 params 数组
+                            fullArgs[paramsIndex] = paramsArray;
+
+                            args = fullArgs;
+                        }
+                        else
+                        {
+                            // 参数不足，需要补全
+                            var fullArgs = new object?[function.Parameters.Count];
+                            Array.Copy(args, fullArgs, argCount);
+
+                            // 使用默认值填充剩余参数
+                            for (int i = argCount; i < function.Parameters.Count; i++)
+                            {
+                                if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
+                                {
+                                    fullArgs[i] = function.DefaultValues[i];
+                                }
+                                else if (function.ParamsParameterIndex == i)
+                                {
+                                    // 如果是params参数，创建空数组
+                                    fullArgs[i] = Array.Empty<object?>();
+                                }
+                                else
+                                {
+                                    throw new ArgumentError(GetPosition(instruction),
+                                        $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                                }
+                            }
+
+                            args = fullArgs;
+                        }
+                    }
+                    else if (argCount < function.Parameters.Count)
+                    {
+                        // 没有 params 参数，但参数不足，使用默认值补全
                         var fullArgs = new object?[function.Parameters.Count];
                         Array.Copy(args, fullArgs, argCount);
 
@@ -406,11 +457,6 @@ public partial class VirtualMachine
                             if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
                             {
                                 fullArgs[i] = function.DefaultValues[i];
-                            }
-                            else if (function.ParamsParameterIndex == i)
-                            {
-                                // 如果是params参数，创建空数组
-                                fullArgs[i] = Array.Empty<object?>();
                             }
                             else
                             {
