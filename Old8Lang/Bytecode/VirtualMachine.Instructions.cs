@@ -1143,13 +1143,11 @@ public partial class VirtualMachine
                 if (collection is IDictionary dict)
                 {
                     var enumerator = dict.Keys.GetEnumerator();
-                    using var enumerator1 = enumerator as IDisposable;
                     _stack.Push(enumerator);
                 }
                 else if (collection is IEnumerable enumerable)
                 {
                     var enumerator = enumerable.GetEnumerator();
-                    using var enumerator1 = enumerator as IDisposable;
                     _stack.Push(enumerator);
                 }
                 else
