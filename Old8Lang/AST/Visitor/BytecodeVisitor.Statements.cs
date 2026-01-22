@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
@@ -135,7 +136,7 @@ public partial class BytecodeVisitor
 
             if (leftExpr is LangListItem listItem)
             {
-                // 数组/列表索引赋值: array[index] <- value
+                // 简单索引赋值: array[index] <- value
                 // SetIndex期望栈布局(从栈顶到栈底): value, index, collection
                 // 所以我们需要按相反顺序压栈: collection, index, value
 
@@ -149,6 +150,25 @@ public partial class BytecodeVisitor
                 node.Value.Accept(this);
 
                 // 发出SetIndex指令
+                Emit(OpCode.SetIndex);
+            }
+            else if (leftExpr is NestedIndexAccess nestedIndexAccess)
+            {
+                // 嵌套索引赋值: array[i][j] <- value
+                // 需要分解为两步：
+                // 1. temp <- array[i]  (获取内层数组)
+                // 2. temp[j] <- value  (设置内层数组的元素)
+
+                // 加载基础表达式 (可能是 LangListItem 或另一个 NestedIndexAccess)
+                nestedIndexAccess.BaseExpression.Accept(this);
+
+                // 加载嵌套索引
+                nestedIndexAccess.NestedIndex.Accept(this);
+
+                // 加载值
+                node.Value.Accept(this);
+
+                // 设置索引
                 Emit(OpCode.SetIndex);
             }
             else if (leftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
@@ -1570,8 +1590,7 @@ public partial class BytecodeVisitor
             Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(1));
 
             // 调用原生函数 Sleep
-            int sleepFuncIndex = _compiler.ConstantPool.AddConstant("Sleep");
-            Emit(OpCode.CallNative, new object[] { 1, sleepFuncIndex });
+            Emit(OpCode.CallNative, new object[] { 1, "Sleep" });
 
             // 继续循环
             Emit(OpCode.Jump, loopStart);

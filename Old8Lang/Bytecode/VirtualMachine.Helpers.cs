@@ -72,6 +72,20 @@ public partial class VirtualMachine
             }
         }
 
+        // 检查 b 是否是 LangValueType（处理基本类型 + LangValueType 的情况）
+        if (b is LangValueType langValueB)
+        {
+            var aValue = ConvertToLangValueType(a);
+            try
+            {
+                return aValue.Plus(langValueB);
+            }
+            catch (InvalidOperationError ex)
+            {
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
+            }
+        }
+
         // 原有的基本类型处理逻辑
         if (a is int ia && b is int ib)
         {
@@ -970,6 +984,17 @@ public partial class VirtualMachine
         if (obj == null)
         {
             throw new NullReferenceError(new SourcePosition(), methodName);
+        }
+
+        // 如果没有参数，先尝试作为属性访问
+        if (args.Length == 0)
+        {
+            var objType = obj.GetType();
+            var property = objType.GetProperty(methodName);
+            if (property != null && property.CanRead)
+            {
+                return property.GetValue(obj);
+            }
         }
 
         // 特殊处理 ToStr：对于数字类型，使用自定义格式化
