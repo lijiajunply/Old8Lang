@@ -485,7 +485,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     #endregion
@@ -691,7 +691,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     [Fact]
@@ -714,7 +714,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("False", output);
+        Assert.Equal("false", output);
     }
 
     [Fact]
@@ -734,7 +734,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("True", output);
+        Assert.Equal("true", output);
     }
 
     #endregion
@@ -1086,7 +1086,7 @@ public class VMReflectionTests
         Assert.Equal(3, lines.Length);
         Assert.Equal("100", lines[0]);
         Assert.Equal("enabled", lines[1]);
-        Assert.Equal("True", lines[2]);
+        Assert.Equal("true", lines[2]);
     }
 
     [Fact]

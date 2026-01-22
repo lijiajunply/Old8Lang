@@ -22,13 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TypeConversionFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -935,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="780" />
+    <option name="localTasksCounter" value="781" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -962,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(error): 统一虚拟机指令中的异常处理为具体错误类型&#10;&#10;- 在ClassError中添加MethodNotFoundError构造函数&#10;- 为IndexError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为TypeError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为CastError添加SourcePosition构造函数重载&#10;- 在VirtualMachine.Instructions.cs中添加GetPosition辅助方法获取源码位置&#10;- 将全局变量未定义异常替换为NameError&#10;- 将函数未定义异常替换为MethodNotFoundError&#10;- 将参数缺失异常替换为ArgumentError&#10;- 将非函数对象调用异常替换为TypeError&#10;- 将Break/Continue指令执行异常替换为InvalidOperationError&#10;- 将函数索引无效异常替换为IndexError&#10;- 将字典键不存在异常替换为KeyError&#10;- 将迭代器状态异常替换为StateError&#10;- 将类型转换失败异常替换为CastError&#10;- 将空引用访问异常替换为NullReferenceError&#10;- 将字段访问异常替换为AttributeError&#10;- 将类未找到异常替换为ClassNotFoundError&#10;- 将访问权限违规异常替换为AccessViolationError&#10;- 将模块导入异常替换为ImportError&#10;- 将未实现操作码异常替换为NotImplementedError&#10;- 在类型转换函数中统一使用CastError替代InvalidOperationError和通用Exception" />
     <MESSAGE value="refactor(runtime): 重构闭包和反射功能实现&#10;&#10;- 将 ClosureValue 类改为记录结构并优化构造函数&#10;- 实现对字节码对象实例的字段设置支持&#10;- 扩展反射辅助类以支持字节码对象实例的类型检查&#10;- 添加对实例方法和字段的反射查询功能&#10;- 实现字段默认值的正确初始化逻辑&#10;- 在虚拟机中添加常量池访问接口" />
     <MESSAGE value="test(performance): 更新虚拟机内存使用测试&#10;&#10;- 修改数组分配测试中的语法从 arr + [i] 到 arr.Add(i)&#10;- 调整字典分配测试中变量名从 dict 到 list 并更新语法&#10;- 更新类实例化测试中的构造函数语法从 new 到 init&#10;- 修改闭包测试中的函数返回类型和实现逻辑&#10;- 跳过生成器内存测试用例等待后续修复&#10;- 更新异步任务测试中的计数逻辑&#10;- 调整泛型类测试中的语法和类型声明&#10;- 修改循环语法从 range 表示法到传统 for 循环&#10;- 更新继承测试中的类声明语法从冒号到 extends&#10;- 替换模块导入测试为辅助函数调用测试&#10;- 优化空集合测试中的断言阈值设置" />
     <MESSAGE value="feat(vm): 扩展虚拟机数值运算和数组操作支持&#10;&#10;- 添加 long 类型数值的加减乘除运算支持&#10;- 实现 int 与 long 混合类型的数值运算转换&#10;- 添加 long 与 double 混合类型的数值运算转换&#10;- 实现数组拼接功能，支持 object[] + object[] 操作&#10;- 添加 long 类型到 LangValue 的转换映射&#10;- 更新性能测试中的列表操作语法从 {} 改为 []&#10;- 简化 lambda 表达式的返回类型声明语法" />
@@ -987,7 +980,8 @@
     <MESSAGE value="refactor(ast): 更新反射字段访问的私有字段命名约定&#10;&#10;- 将 DllName 字段引用更改为 _dllName 以符合私有字段命名规范&#10;- 将 Functions 字段引用更改为 _functions 以保持命名一致性&#10;- 将 ExternType 字段引用更改为 _externType 以遵循私有字段前缀约定&#10;- 将 DefaultCallingConvention 字段引用更改为 _defaultCallingConvention&#10;- 统一了反射访问私有字段的命名风格以提高代码可读性" />
     <MESSAGE value="feat(vm): 实现泛型类型参数映射和类型解析功能&#10;&#10;- 在 FunctionMetadata 和 ClassMetadata 中添加 GenericTypeMapping 属性&#10;- 实现泛型类型参数的序列化和反序列化功能&#10;- 添加 ResolveGenericType 方法支持泛型类型参数替换&#10;- 支持可空类型、泛型类型、联合类型和交叉类型的泛型解析&#10;- 在虚拟机指令中集成泛型类型映射和类型检查功能&#10;- 修复类型匹配比较中忽略可空标记的问题" />
     <MESSAGE value="fix(vm): 解决泛型类型映射中的嵌套泛型参数解析错误&#10;&#10;- 添加检查逻辑跳过包含嵌套泛型类型参数的GenericTypeMapping&#10;- 在类型检查中增加DictionaryLangValue作为dict类型的判断条件&#10;- 扩展ResolveGenericType方法支持特化类型格式如Wrapper$T的解析&#10;- 实现SplitSpecializedTypeArgs方法处理下划线分隔的特化类型参数&#10;- 修复编译器bug导致的泛型类型解析错误问题&#10;- 添加临时变通方案避免不正确的GenericTypeMapping影响类型检查" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 解决泛型类型映射中的嵌套泛型参数解析错误&#10;&#10;- 添加检查逻辑跳过包含嵌套泛型类型参数的GenericTypeMapping&#10;- 在类型检查中增加DictionaryLangValue作为dict类型的判断条件&#10;- 扩展ResolveGenericType方法支持特化类型格式如Wrapper$T的解析&#10;- 实现SplitSpecializedTypeArgs方法处理下划线分隔的特化类型参数&#10;- 修复编译器bug导致的泛型类型解析错误问题&#10;- 添加临时变通方案避免不正确的GenericTypeMapping影响类型检查" />
+    <MESSAGE value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
