@@ -22,15 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Reflection/VMReflectionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -937,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="782" />
+    <option name="localTasksCounter" value="783" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -964,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(performance): 更新虚拟机内存使用测试&#10;&#10;- 修改数组分配测试中的语法从 arr + [i] 到 arr.Add(i)&#10;- 调整字典分配测试中变量名从 dict 到 list 并更新语法&#10;- 更新类实例化测试中的构造函数语法从 new 到 init&#10;- 修改闭包测试中的函数返回类型和实现逻辑&#10;- 跳过生成器内存测试用例等待后续修复&#10;- 更新异步任务测试中的计数逻辑&#10;- 调整泛型类测试中的语法和类型声明&#10;- 修改循环语法从 range 表示法到传统 for 循环&#10;- 更新继承测试中的类声明语法从冒号到 extends&#10;- 替换模块导入测试为辅助函数调用测试&#10;- 优化空集合测试中的断言阈值设置" />
     <MESSAGE value="feat(vm): 扩展虚拟机数值运算和数组操作支持&#10;&#10;- 添加 long 类型数值的加减乘除运算支持&#10;- 实现 int 与 long 混合类型的数值运算转换&#10;- 添加 long 与 double 混合类型的数值运算转换&#10;- 实现数组拼接功能，支持 object[] + object[] 操作&#10;- 添加 long 类型到 LangValue 的转换映射&#10;- 更新性能测试中的列表操作语法从 {} 改为 []&#10;- 简化 lambda 表达式的返回类型声明语法" />
     <MESSAGE value="test(performance): 更新虚拟机执行性能测试中的循环语法&#10;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- arr&quot; 改为 &quot;for x in arr&quot;&#10;- 将测试代码中的 for 循环语法从 &quot;for x &lt;- list&quot; 改为 &quot;for x in list&quot;&#10;- 将测试代码中的范围表示法从 &quot;0..1000&quot; 改为 &quot;[0~1000]&quot;&#10;- 更新了相关的测试用例以匹配新的循环语法格式" />
     <MESSAGE value="fix(vm): 修复虚拟机异常处理和类型反射问题&#10;&#10;- 修正 AssertClassLangValue 中的类型反射，使用 AssertHelper 替代 AssertClassLangValue&#10;- 优化 FuncRunStatement 中的操作类型获取逻辑，优先使用 _operation.Type 属性&#10;- 将 Operation 类中的 Type 属性设为公共访问以支持外部类型查询&#10;- 更新 VM 异常测试，使用 VmException 替代 System.Exception 进行断言" />
@@ -989,7 +980,8 @@
     <MESSAGE value="fix(vm): 解决泛型类型映射中的嵌套泛型参数解析错误&#10;&#10;- 添加检查逻辑跳过包含嵌套泛型类型参数的GenericTypeMapping&#10;- 在类型检查中增加DictionaryLangValue作为dict类型的判断条件&#10;- 扩展ResolveGenericType方法支持特化类型格式如Wrapper$T的解析&#10;- 实现SplitSpecializedTypeArgs方法处理下划线分隔的特化类型参数&#10;- 修复编译器bug导致的泛型类型解析错误问题&#10;- 添加临时变通方案避免不正确的GenericTypeMapping影响类型检查" />
     <MESSAGE value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
     <MESSAGE value="fix(tests): 修复虚拟机反射测试中的布尔值断言大小写问题&#10;&#10;- 将测试断言中的 &quot;True&quot; 替换为 &quot;true&quot; 以匹配实际输出&#10;- 将测试断言中的 &quot;False&quot; 替换为 &quot;false&quot; 以保持一致性&#10;- 清理 IDEA 工作空间配置文件中的变更历史记录&#10;- 更新本地任务计数器值&#10;- 移除过时的提交消息记录&#10;- 更新最后提交消息为泛型类型约束检查修复内容" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复虚拟机反射测试中的布尔值断言大小写问题&#10;&#10;- 将测试断言中的 &quot;True&quot; 替换为 &quot;true&quot; 以匹配实际输出&#10;- 将测试断言中的 &quot;False&quot; 替换为 &quot;false&quot; 以保持一致性&#10;- 清理 IDEA 工作空间配置文件中的变更历史记录&#10;- 更新本地任务计数器值&#10;- 移除过时的提交消息记录&#10;- 更新最后提交消息为泛型类型约束检查修复内容" />
+    <MESSAGE value="feat(compiler): 实现类字段访问和方法调用功能&#10;&#10;- 添加_class字段跟踪当前类上下文&#10;- 实现IsClassField方法检查类字段是否存在&#10;- 在字节码编译期间保存和恢复类上下文&#10;- 实现类字段的get和set操作指令&#10;- 修复构造函数参数传递和方法调用参数处理&#10;- 改进虚拟机上下文管理以支持嵌套调用&#10;- 修复测试断言中的布尔值大小写问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现类字段访问和方法调用功能&#10;&#10;- 添加_class字段跟踪当前类上下文&#10;- 实现IsClassField方法检查类字段是否存在&#10;- 在字节码编译期间保存和恢复类上下文&#10;- 实现类字段的get和set操作指令&#10;- 修复构造函数参数传递和方法调用参数处理&#10;- 改进虚拟机上下文管理以支持嵌套调用&#10;- 修复测试断言中的布尔值大小写问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

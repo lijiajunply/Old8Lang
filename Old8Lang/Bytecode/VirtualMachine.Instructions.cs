@@ -3491,6 +3491,7 @@ public partial class VirtualMachine
                 if (metadataName == normalizedTypeName) return true;
                 if (metadataName == normalizedGenericTypeName) return true;
                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
+                if (metadata.Mixins.Contains(typeName)) return true; // Check mixins
                 if (metadata.BaseClassName != null && metadata.BaseClassName.TrimEnd('?') == normalizedTypeName) return true;
 
                 if (metadata.BaseClassName != null)
