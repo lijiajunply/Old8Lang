@@ -23,13 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/GenericConstraintExtensionCompilerTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/GenericConstraintExtensionInterpreterTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Generics/VMGenericConstraintExtensionTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.ExpressionsAndValues.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/TypeInferenceVisitor.ExpressionsAndValues.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/TypeInferenceVisitor.ExpressionsAndValues.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

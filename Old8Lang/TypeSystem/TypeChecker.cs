@@ -141,6 +141,33 @@ public static class TypeChecker
     /// <returns>是否兼容</returns>
     public static bool IsTypeCompatible(string expectedType, string actualType)
     {
+        // 处理可空类型
+        // 如果期望类型是可空的（如 int?），则非空类型（如 int）和 null 都可以赋值
+        if (expectedType.EndsWith("?"))
+        {
+            var baseExpectedType = expectedType.Substring(0, expectedType.Length - 1);
+            // null 可以赋值给任何可空类型
+            if (actualType == "null")
+            {
+                return true;
+            }
+            // 非空类型可以赋值给对应的可空类型（如 int 可以赋值给 int?）
+            if (actualType == baseExpectedType)
+            {
+                return true;
+            }
+            // 可空类型可以赋值给对应的可空类型（如 int? 可以赋值给 int?）
+            if (actualType == expectedType)
+            {
+                return true;
+            }
+            // 递归检查基础类型的兼容性（如 int 可以赋值给 double?）
+            if (IsTypeCompatible(baseExpectedType, actualType))
+            {
+                return true;
+            }
+        }
+
         // 处理 const 类型假注
         if (expectedType.StartsWith("const ", StringComparison.OrdinalIgnoreCase))
         {

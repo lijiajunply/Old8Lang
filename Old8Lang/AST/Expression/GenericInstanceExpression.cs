@@ -102,21 +102,9 @@ public partial class GenericInstanceExpression : LangExpression
                 var paramName = typeTemplate.GenericParameters[i].Name;
                 var typeArgName = TypeArguments[i];
 
-                var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
-                if (typeInfo is null)
-                {
-                    // 尝试从 manager 中获取用户定义的类
-                    var value = manager.GetAny(new LangId(typeArgName));
-                    if (value is TypeTemplate tt)
-                    {
-                        // 创建 ClassTypeInfo 代理
-                        typeInfo = new ClassTypeInfo(
-                            tt.ClassName,
-                            baseType: null, // 暂时为 null，因为需要递归解析父类
-                            interfaceNames: tt.ImplementsNames
-                        );
-                    }
-                }
+                // 使用 ParseTypeAnnotation 来正确处理可空类型和其他复杂类型
+                var parsedType = typeAnnotationManager.ParseTypeAnnotation(typeArgName);
+                var typeInfo = ConvertParsedTypeToTypeInfo(parsedType, typeAnnotationManager, manager);
 
                 resolvedTypeArgs[paramName] =
                     typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
@@ -162,7 +150,9 @@ public partial class GenericInstanceExpression : LangExpression
                 var paramName = funcValue.GenericParameters[i].Name;
                 var typeArgName = TypeArguments[i];
 
-                var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(typeArgName);
+                // 使用 ParseTypeAnnotation 来正确处理可空类型和其他复杂类型
+                var parsedType = typeAnnotationManager.ParseTypeAnnotation(typeArgName);
+                var typeInfo = ConvertParsedTypeToTypeInfo(parsedType, typeAnnotationManager, manager);
 
                 resolvedTypeArgs[paramName] =
                     typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
@@ -376,6 +366,70 @@ public partial class GenericInstanceExpression : LangExpression
         }
 
         return typeMapping;
+    }
+
+    /// <summary>
+    /// 将 ParsedTypeAnnotation 转换为 ITypeInfo
+    /// </summary>
+    private ITypeInfo? ConvertParsedTypeToTypeInfo(ParsedTypeAnnotation parsedType, TypeAnnotationManager typeAnnotationManager, VariateManager manager)
+    {
+        // 对于可空类型、联合类型、交叉类型，我们直接使用完整的类型名称字符串
+        // 因为 TypeSystem 目前没有专门的 NullableTypeInfo、UnionTypeInfo、IntersectionTypeInfo 类
+        if (parsedType.IsNullable || parsedType.IsUnion || parsedType.IsIntersection)
+        {
+            // 使用完整的类型名称（包括可空标记、联合、交叉等）
+            var fullTypeName = parsedType.GetFullName();
+            // 尝试从 TypeFamily 获取
+            var existingType = typeAnnotationManager.GetTypeFamily().GetType(fullTypeName);
+            if (existingType != null)
+            {
+                return existingType;
+            }
+            // 如果不存在，创建一个 PrimitiveTypeInfo 作为占位符
+            // 这样可以保留类型名称信息，供后续使用
+            return new PrimitiveTypeInfo(fullTypeName);
+        }
+
+        // 处理泛型类型
+        if (parsedType.IsGeneric && parsedType.GenericArguments != null)
+        {
+            var baseType = typeAnnotationManager.GetTypeFamily().GetType(parsedType.BaseType);
+            if (baseType is GenericTypeInfo genericType)
+            {
+                var typeArgs = new Dictionary<string, ITypeInfo>();
+                for (int i = 0; i < parsedType.GenericArguments.Count && i < genericType.TypeParameters.Count; i++)
+                {
+                    var paramName = genericType.TypeParameters[i];
+                    var argType = ConvertParsedTypeToTypeInfo(parsedType.GenericArguments[i], typeAnnotationManager, manager);
+                    if (argType != null)
+                    {
+                        typeArgs[paramName] = argType;
+                    }
+                }
+                return genericType.Instantiate(typeArgs);
+            }
+        }
+
+        // 处理基本类型
+        var typeInfo = typeAnnotationManager.GetTypeFamily().GetType(parsedType.BaseType);
+        if (typeInfo != null)
+        {
+            return typeInfo;
+        }
+
+        // 尝试从 manager 中获取用户定义的类
+        var value = manager.GetAny(new LangId(parsedType.BaseType));
+        if (value is TypeTemplate tt)
+        {
+            // 创建 ClassTypeInfo 代理
+            return new ClassTypeInfo(
+                tt.ClassName,
+                baseType: null, // 暂时为 null，因为需要递归解析父类
+                interfaceNames: tt.ImplementsNames
+            );
+        }
+
+        return null;
     }
 
 
