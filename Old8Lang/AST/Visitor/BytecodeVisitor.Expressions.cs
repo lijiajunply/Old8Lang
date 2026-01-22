@@ -1121,14 +1121,24 @@ public partial class BytecodeVisitor
         var typeTemplate = _compiler.GenericClasses[className];
 
         // 构建特化类名：ClassName$Type1_Type2_...
-        var typeArgNames = node.TypeArguments.Select(ResolveSimpleTypeName).ToArray();
+        // 解析类型参数时，需要考虑当前的类型参数映射
+        var typeArgNames = node.TypeArguments.Select(typeArg =>
+        {
+            var resolvedType = ResolveSimpleTypeName(typeArg);
+            // 如果类型参数在当前映射中，替换为实际类型
+            if (_compiler.CurrentTypeParameterMapping.TryGetValue(resolvedType, out var mappedType))
+            {
+                return mappedType;
+            }
+            return resolvedType;
+        }).ToArray();
         var specializedClassName = $"{className}${string.Join("_", typeArgNames)}";
 
         // 检查是否已经生成过特化类
         if (!_compiler.IsClassName(specializedClassName))
         {
             // 生成特化类定义
-            GenerateSpecializedClass(typeTemplate, node.TypeArguments, specializedClassName);
+            GenerateSpecializedClass(typeTemplate, typeArgNames.ToList(), specializedClassName);
         }
 
         // 生成创建对象的字节码

@@ -31,51 +31,64 @@ public partial class BytecodeVisitor
             ValidateGenericConstraints(typeTemplate.GenericParameters, typeMapping);
         }
 
-        // 收集字段名称、类型和初始值（从实例成员中提取）
-        var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
-        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        // 保存当前的类型参数映射
+        var previousTypeMapping = _compiler.CurrentTypeParameterMapping;
+        try
         {
-            if (memberExpr is not FuncLangValue)
+            // 设置新的类型参数映射
+            _compiler.CurrentTypeParameterMapping = typeMapping;
+
+            // 收集字段名称、类型和初始值（从实例成员中提取）
+            var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
+            foreach (var (memberId, memberExpr) in typeTemplate.Variates)
             {
-                // 这是一个字段，保存字段名、类型和初始值
-                // 替换泛型类型参数
-                var fieldType = memberId.AssumptionType ?? "";
-                if (!string.IsNullOrEmpty(fieldType) && typeMapping.TryGetValue(fieldType, out var mappedType))
+                if (memberExpr is not FuncLangValue)
                 {
-                    fieldType = mappedType;
+                    // 这是一个字段，保存字段名、类型和初始值
+                    // 替换泛型类型参数（包括嵌套泛型）
+                    var fieldType = memberId.AssumptionType ?? "";
+                    if (!string.IsNullOrEmpty(fieldType))
+                    {
+                        fieldType = ReplaceTypeParameters(fieldType, typeMapping);
+                    }
+                    fields.Add((memberId.IdName, fieldType, memberExpr));
                 }
-                fields.Add((memberId.IdName, fieldType, memberExpr));
             }
-        }
 
-        // 收集方法（从实例成员和静态成员中提取）
-        var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
+            // 收集方法（从实例成员和静态成员中提取）
+            var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
-        // 实例方法
-        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
-        {
-            if (memberExpr is FuncLangValue funcValue)
+            // 实例方法
+            foreach (var (memberId, memberExpr) in typeTemplate.Variates)
             {
-                // 创建方法的特化版本（替换类型参数）
-                var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
-                var accessModifier = GetAccessModifier(memberId.Modifiers);
-                methods.Add((memberId.IdName, specializedMethod, false, accessModifier));
+                if (memberExpr is FuncLangValue funcValue)
+                {
+                    // 创建方法的特化版本（替换类型参数）
+                    var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
+                    var accessModifier = GetAccessModifier(memberId.Modifiers);
+                    methods.Add((memberId.IdName, specializedMethod, false, accessModifier));
+                }
             }
-        }
 
-        // 静态方法
-        foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
-        {
-            if (memberExpr is FuncLangValue funcValue)
+            // 静态方法
+            foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
             {
-                var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
-                var accessModifier = GetAccessModifier(memberId.Modifiers);
-                methods.Add((memberId.IdName, specializedMethod, true, accessModifier));
+                if (memberExpr is FuncLangValue funcValue)
+                {
+                    var specializedMethod = CreateSpecializedMethod(funcValue, typeMapping);
+                    var accessModifier = GetAccessModifier(memberId.Modifiers);
+                    methods.Add((memberId.IdName, specializedMethod, true, accessModifier));
+                }
             }
-        }
 
-        // 注册特化类
-        _compiler.DeclareClass(specializedClassName, fields, [], methods, null);
+            // 注册特化类
+            _compiler.DeclareClass(specializedClassName, fields, [], methods, null);
+        }
+        finally
+        {
+            // 恢复之前的类型参数映射
+            _compiler.CurrentTypeParameterMapping = previousTypeMapping;
+        }
     }
 
     /// <summary>
@@ -98,39 +111,52 @@ public partial class BytecodeVisitor
             ValidateGenericConstraints(genericFunc.GenericParameters, typeMapping);
         }
 
-        // 创建特化函数
-        var specializedFunc = CreateSpecializedMethod(genericFunc, typeMapping);
-
-        // 提取参数名称
-        var paramNames = specializedFunc.Ids?.Select(id => id.IdName).ToList() ?? [];
-        var paramTypes = specializedFunc.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
-
-        // 提取默认参数值
-        var defaultValues = new List<object?>();
-        if (specializedFunc.Ids != null)
+        // 保存当前的类型参数映射
+        var previousTypeMapping = _compiler.CurrentTypeParameterMapping;
+        try
         {
-            foreach (var param in specializedFunc.Ids)
+            // 设置新的类型参数映射
+            _compiler.CurrentTypeParameterMapping = typeMapping;
+
+            // 创建特化函数
+            var specializedFunc = CreateSpecializedMethod(genericFunc, typeMapping);
+
+            // 提取参数名称
+            var paramNames = specializedFunc.Ids?.Select(id => id.IdName).ToList() ?? [];
+            var paramTypes = specializedFunc.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
+
+            // 提取默认参数值
+            var defaultValues = new List<object?>();
+            if (specializedFunc.Ids != null)
             {
-                if (param.DefaultValue != null)
+                foreach (var param in specializedFunc.Ids)
                 {
-                    var defaultValue = EvaluateConstantExpression(param.DefaultValue);
-                    defaultValues.Add(defaultValue);
-                }
-                else
-                {
-                    defaultValues.Add(null);
+                    if (param.DefaultValue != null)
+                    {
+                        var defaultValue = EvaluateConstantExpression(param.DefaultValue);
+                        defaultValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        defaultValues.Add(null);
+                    }
                 }
             }
-        }
 
-        // 编译特化函数
-        _compiler.CompileFunction(
-            specializedFuncName,
-            paramNames,
-            paramTypes,
-            defaultValues,
-            specializedFunc.BlockStatement
-        );
+            // 编译特化函数
+            _compiler.CompileFunction(
+                specializedFuncName,
+                paramNames,
+                paramTypes,
+                defaultValues,
+                specializedFunc.BlockStatement
+            );
+        }
+        finally
+        {
+            // 恢复之前的类型参数映射
+            _compiler.CurrentTypeParameterMapping = previousTypeMapping;
+        }
     }
 
     /// <summary>
@@ -302,6 +328,100 @@ public partial class BytecodeVisitor
             "object" => "object",
             _ => typeName
         };
+    }
+
+    /// <summary>
+    /// 替换类型字符串中的类型参数（支持嵌套泛型）
+    /// 例如：SortedList<T> + {T: Number} => SortedList<Number>
+    /// </summary>
+    private string ReplaceTypeParameters(string typeName, Dictionary<string, string> typeMapping)
+    {
+        if (string.IsNullOrEmpty(typeName) || typeMapping.Count == 0)
+            return typeName;
+
+        // 如果类型名称不包含泛型参数标记，直接检查是否需要替换
+        if (!typeName.Contains('<') && !typeName.Contains('$'))
+        {
+            return typeMapping.TryGetValue(typeName, out var mappedType) ? mappedType : typeName;
+        }
+
+        // 处理泛型类型：ClassName<T1, T2, ...>
+        if (typeName.Contains('<'))
+        {
+            var genericStart = typeName.IndexOf('<');
+            var genericEnd = typeName.LastIndexOf('>');
+
+            if (genericStart > 0 && genericEnd > genericStart)
+            {
+                var baseName = typeName.Substring(0, genericStart);
+                var typeArgs = typeName.Substring(genericStart + 1, genericEnd - genericStart - 1);
+
+                // 分割类型参数并递归替换
+                var typeArgList = SplitGenericTypeArgs(typeArgs);
+                var replacedTypeArgs = typeArgList.Select(arg => ReplaceTypeParameters(arg.Trim(), typeMapping)).ToArray();
+
+                return $"{baseName}<{string.Join(", ", replacedTypeArgs)}>";
+            }
+        }
+
+        // 处理特化类型：ClassName$T1_T2_...
+        if (typeName.Contains('$'))
+        {
+            var dollarIndex = typeName.IndexOf('$');
+            var baseName = typeName.Substring(0, dollarIndex);
+            var typeArgs = typeName.Substring(dollarIndex + 1);
+
+            // 分割类型参数并替换
+            var typeArgList = typeArgs.Split('_');
+            var replacedTypeArgs = typeArgList.Select(arg =>
+                typeMapping.TryGetValue(arg, out var mappedType) ? mappedType : arg
+            ).ToArray();
+
+            return $"{baseName}${string.Join("_", replacedTypeArgs)}";
+        }
+
+        return typeName;
+    }
+
+    /// <summary>
+    /// 分割泛型类型参数（考虑嵌套泛型）
+    /// 例如：T, List<U>, Dict<K, V> => ["T", "List<U>", "Dict<K, V>"]
+    /// </summary>
+    private List<string> SplitGenericTypeArgs(string typeArgs)
+    {
+        var result = new List<string>();
+        var current = new System.Text.StringBuilder();
+        int depth = 0;
+
+        foreach (var ch in typeArgs)
+        {
+            if (ch == '<')
+            {
+                depth++;
+                current.Append(ch);
+            }
+            else if (ch == '>')
+            {
+                depth--;
+                current.Append(ch);
+            }
+            else if (ch == ',' && depth == 0)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(ch);
+            }
+        }
+
+        if (current.Length > 0)
+        {
+            result.Add(current.ToString());
+        }
+
+        return result;
     }
 
 }

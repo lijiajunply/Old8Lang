@@ -56,6 +56,12 @@ public class BytecodeCompiler
     private readonly Dictionary<string, string> _genericFunctionSpecializations = new();
 
     /// <summary>
+    /// 当前类型参数映射（用于编译泛型特化类/函数）
+    /// key = 类型参数名（如 "T"），value = 实际类型名（如 "Number"）
+    /// </summary>
+    public Dictionary<string, string> CurrentTypeParameterMapping { get; set; } = new();
+
+    /// <summary>
     /// 获取当前正在编译的函数是否是异步函数
     /// </summary>
     public bool IsCurrentFunctionAsync => _currentFunction?.IsAsync ?? false;

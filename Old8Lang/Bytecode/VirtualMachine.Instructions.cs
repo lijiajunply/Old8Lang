@@ -3314,13 +3314,19 @@ public partial class VirtualMachine
     {
         if (val is BytecodeObjectInstance instance)
         {
+            // 直接比较类名
             if (instance.ClassName == typeName) return true;
+
+            // 处理泛型类型：将 ClassName<T1, T2> 格式转换为 ClassName$T1_T2 格式进行比较
+            var normalizedTypeName = NormalizeGenericTypeName(typeName);
+            if (instance.ClassName == normalizedTypeName) return true;
 
             // Check inheritance
             var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName);
             while (metadata != null)
             {
                 if (metadata.Name == typeName) return true;
+                if (metadata.Name == normalizedTypeName) return true;
                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
                 if (metadata.BaseClassName == typeName) return true;
 
@@ -3342,6 +3348,32 @@ public partial class VirtualMachine
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 将泛型类型名称从 ClassName<T1, T2> 格式转换为 ClassName$T1_T2 格式
+    /// </summary>
+    private string NormalizeGenericTypeName(string typeName)
+    {
+        if (!typeName.Contains('<'))
+            return typeName;
+
+        var genericStart = typeName.IndexOf('<');
+        var genericEnd = typeName.LastIndexOf('>');
+
+        if (genericStart > 0 && genericEnd > genericStart)
+        {
+            var baseName = typeName.Substring(0, genericStart);
+            var typeArgs = typeName.Substring(genericStart + 1, genericEnd - genericStart - 1);
+
+            // 分割类型参数（考虑嵌套泛型）
+            var typeArgList = SplitGenericArgs(typeArgs);
+            var normalizedTypeArgs = typeArgList.Select(arg => NormalizeGenericTypeName(arg.Trim())).ToArray();
+
+            return $"{baseName}${string.Join("_", normalizedTypeArgs)}";
+        }
+
+        return typeName;
     }
 
     private List<object?> ConvertToList(object? value)
