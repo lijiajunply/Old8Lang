@@ -136,7 +136,8 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
             }
 
             var methodNames = VMReflectionHelper.GetAllMethodNames(classMetadata);
-            return methodNames;
+            // 转换为 List<object?> 以便虚拟机正确处理
+            return methodNames.Cast<object?>().ToList();
         }
 
         throw new InvalidOperationException("对象不是类实例");
@@ -210,7 +211,8 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
             }
 
             var fieldNames = VMReflectionHelper.GetAllFieldNames(classMetadata);
-            return fieldNames;
+            // 转换为 List<object?> 以便虚拟机正确处理
+            return fieldNames.Cast<object?>().ToList();
         }
 
         throw new InvalidOperationException("对象不是类实例");
@@ -308,7 +310,13 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
             }
 
             var tuples = VMReflectionHelper.CreateMethodInfoTuples(method);
-            return tuples;
+            // 转换为 Dictionary<object, object?> 以便虚拟机正确处理
+            var dict = new Dictionary<object, object?>();
+            foreach (var (key, value) in tuples)
+            {
+                dict[key] = value;
+            }
+            return dict;
         }
 
         throw new InvalidOperationException("对象不是类实例");
@@ -402,7 +410,13 @@ public sealed class GetFieldInfoFunction : BaseGlobalFunction
             }
 
             var tuples = VMReflectionHelper.CreateFieldInfoTuples(field);
-            return tuples;
+            // 转换为 Dictionary<object, object?> 以便虚拟机正确处理
+            var dict = new Dictionary<object, object?>();
+            foreach (var (key, value) in tuples)
+            {
+                dict[key] = value;
+            }
+            return dict;
         }
 
         throw new InvalidOperationException("对象不是类实例");

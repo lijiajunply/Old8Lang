@@ -958,13 +958,13 @@ public class VMReflectionTests
         // Assert
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.Contains("Class: Person", lines);
-        Assert.Contains("Has greet: True", lines);
-        Assert.Contains("Has name: True", lines);
+        Assert.Contains("Has greet: true", lines);
+        Assert.Contains("Has name: true", lines);
         Assert.Contains("Greeting: Hello, I am Alice", lines);
         Assert.Contains("Age: 25", lines);
         Assert.Contains("Name: Alice", lines);
         Assert.Contains("New name: Bob", lines);
-        Assert.Contains("Is Person: True", lines);
+        Assert.Contains("Is Person: true", lines);
     }
 
     [Fact]
