@@ -207,6 +207,10 @@ public class ClassMetadata
     /// </summary>
     public Dictionary<string, object?> StaticFieldValues { get; set; } = new();
 
+    /// <summary>泛型类型参数映射（用于泛型类实例化）</summary>
+    /// <remarks>例如: Container&lt;int?> 时为 {"T": "int"}</remarks>
+    public Dictionary<string, string>? GenericTypeMapping { get; set; }
+
     /// <summary>
     /// 写入二进制流
     /// </summary>
@@ -246,6 +250,21 @@ public class ClassMetadata
         writer.Write(IsAbstract);
         writer.Write(IsMixin);
         writer.Write(ClassIndex);
+
+        // 泛型类型映射
+        if (GenericTypeMapping == null)
+        {
+            writer.Write(0);
+        }
+        else
+        {
+            writer.Write(GenericTypeMapping.Count);
+            foreach (var kvp in GenericTypeMapping)
+            {
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
+            }
+        }
     }
 
     /// <summary>
@@ -292,6 +311,19 @@ public class ClassMetadata
         classMetadata.IsAbstract = reader.ReadBoolean();
         classMetadata.IsMixin = reader.ReadBoolean();
         classMetadata.ClassIndex = reader.ReadInt32();
+
+        // 泛型类型映射
+        int genericTypeMappingCount = reader.ReadInt32();
+        if (genericTypeMappingCount > 0)
+        {
+            classMetadata.GenericTypeMapping = new Dictionary<string, string>();
+            for (int i = 0; i < genericTypeMappingCount; i++)
+            {
+                string key = reader.ReadString();
+                string value = reader.ReadString();
+                classMetadata.GenericTypeMapping[key] = value;
+            }
+        }
 
         return classMetadata;
     }

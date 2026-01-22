@@ -47,6 +47,10 @@ public class FunctionMetadata
     /// <summary>异常表 - 记录try-catch-finally块的位置信息</summary>
     public List<ExceptionTableEntry> ExceptionTable { get; set; } = [];
 
+    /// <summary>泛型类型参数映射（用于泛型函数实例化）</summary>
+    /// <remarks>例如: getValue&lt;int?> 时为 {"T": "int"}</remarks>
+    public Dictionary<string, string>? GenericTypeMapping { get; set; }
+
     /// <summary>
     /// 写入二进制流
     /// </summary>
@@ -100,6 +104,21 @@ public class FunctionMetadata
         writer.Write(ExceptionTable.Count);
         foreach (var entry in ExceptionTable)
             entry.WriteTo(writer);
+
+        // 泛型类型映射
+        if (GenericTypeMapping == null)
+        {
+            writer.Write(0);
+        }
+        else
+        {
+            writer.Write(GenericTypeMapping.Count);
+            foreach (var kvp in GenericTypeMapping)
+            {
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
+            }
+        }
     }
 
     /// <summary>
@@ -157,6 +176,19 @@ public class FunctionMetadata
         int exceptionTableCount = reader.ReadInt32();
         for (int i = 0; i < exceptionTableCount; i++)
             func.ExceptionTable.Add(ExceptionTableEntry.ReadFrom(reader));
+
+        // 泛型类型映射
+        int genericTypeMappingCount = reader.ReadInt32();
+        if (genericTypeMappingCount > 0)
+        {
+            func.GenericTypeMapping = new Dictionary<string, string>();
+            for (int i = 0; i < genericTypeMappingCount; i++)
+            {
+                string key = reader.ReadString();
+                string value = reader.ReadString();
+                func.GenericTypeMapping[key] = value;
+            }
+        }
 
         return func;
     }

@@ -322,7 +322,10 @@ public class BytecodeCompiler
             ReturnType = returnType,
             ParamsParameterIndex = paramsParameterIndex,
             IsAsync = false,
-            IsGenerator = isGenerator // 设置生成器标记
+            IsGenerator = isGenerator, // 设置生成器标记
+            GenericTypeMapping = CurrentTypeParameterMapping.Count > 0
+                ? new Dictionary<string, string>(CurrentTypeParameterMapping)
+                : null
         };
 
         var oldFunc = _currentFunction;
@@ -689,7 +692,10 @@ public class BytecodeCompiler
             BaseClassName = parentClassName,
             InterfaceNames = implementsNames ?? [],
             ImplementsInterfaces = implementsNames ?? [],
-            Mixins = mixinNames ?? []
+            Mixins = mixinNames ?? [],
+            GenericTypeMapping = CurrentTypeParameterMapping.Count > 0
+                ? new Dictionary<string, string>(CurrentTypeParameterMapping)
+                : null
         };
 
         // 处理实例字段

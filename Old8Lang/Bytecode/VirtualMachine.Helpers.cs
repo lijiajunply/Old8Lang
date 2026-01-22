@@ -1405,13 +1405,21 @@ public partial class VirtualMachine
         if (fieldMetadata == null || string.IsNullOrEmpty(fieldMetadata.TypeName))
             return;
 
+        // 如果字段类型包含泛型类型参数，尝试从类的泛型类型映射中替换
+        var fieldTypeName = fieldMetadata.TypeName;
+        if (classMetadata.GenericTypeMapping != null && classMetadata.GenericTypeMapping.Count > 0)
+        {
+            // 使用类的泛型类型映射替换字段类型中的泛型类型参数
+            fieldTypeName = ResolveGenericType(fieldMetadata.TypeName, classMetadata.GenericTypeMapping);
+        }
+
         // 检查类型匹配
-        if (!CheckTypeMatch(fieldMetadata.TypeName, value))
+        if (!CheckTypeMatch(fieldTypeName, value))
         {
             var actualType = GetValueTypeName(value);
             throw new TypeError(
                 GetPosition(instruction),
-                fieldMetadata.TypeName,
+                fieldTypeName,
                 actualType,
                 $"字段 '{className}.{fieldName}' 类型不匹配"
             );

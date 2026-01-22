@@ -3260,21 +3260,83 @@ public partial class VirtualMachine
             if (string.IsNullOrEmpty(expectedType))
                 continue;
 
+            // 如果函数有泛型类型映射，替换泛型类型参数
+            var resolvedType = expectedType;
+            if (function.GenericTypeMapping != null && function.GenericTypeMapping.Count > 0)
+            {
+                resolvedType = ResolveGenericType(expectedType, function.GenericTypeMapping);
+            }
+
             var actualValue = args[i];
 
             // 使用 CheckTypeMatch 进行类型检查
-            if (!CheckTypeMatch(expectedType, actualValue))
+            if (!CheckTypeMatch(resolvedType, actualValue))
             {
                 var actualType = GetValueTypeName(actualValue);
                 var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
                 throw new TypeError(
                     GetPosition(instruction),
-                    expectedType,
+                    resolvedType,
                     actualType,
                     $"参数 '{paramName}' 类型不匹配"
                 );
             }
         }
+    }
+
+    /// <summary>
+    /// 解析泛型类型，将类型参数替换为实际类型
+    /// 例如：T? -> int?，List<T> -> List<int>
+    /// </summary>
+    private string ResolveGenericType(string typePattern, Dictionary<string, string> typeMapping)
+    {
+        // 处理可空类型：T? -> int?
+        if (typePattern.EndsWith("?"))
+        {
+            var baseType = typePattern.Substring(0, typePattern.Length - 1);
+            var resolvedBase = ResolveGenericType(baseType, typeMapping);
+            return resolvedBase + "?";
+        }
+
+        // 处理泛型类型：List<T> -> List<int>
+        var genericStart = typePattern.IndexOf('<');
+        if (genericStart != -1)
+        {
+            var genericEnd = typePattern.LastIndexOf('>');
+            if (genericEnd != -1)
+            {
+                var baseName = typePattern.Substring(0, genericStart);
+                var genericArgs = typePattern.Substring(genericStart + 1, genericEnd - genericStart - 1);
+                var argList = SplitGenericArgs(genericArgs);
+                var resolvedArgs = argList.Select(arg => ResolveGenericType(arg, typeMapping)).ToArray();
+                return $"{baseName}<{string.Join(", ", resolvedArgs)}>";
+            }
+        }
+
+        // 处理联合类型：T | null -> int | null
+        if (ContainsTopLevelChar(typePattern, '|'))
+        {
+            var types = SplitTopLevel(typePattern, '|');
+            var resolvedTypes = types.Select(t => ResolveGenericType(t, typeMapping)).ToArray();
+            return string.Join(" | ", resolvedTypes);
+        }
+
+        // 处理交叉类型：T & U -> int & string
+        if (ContainsTopLevelChar(typePattern, '&'))
+        {
+            var types = SplitTopLevel(typePattern, '&');
+            var resolvedTypes = types.Select(t => ResolveGenericType(t, typeMapping)).ToArray();
+            return string.Join(" & ", resolvedTypes);
+        }
+
+        // 简单类型参数替换：T -> int
+        if (typeMapping.TryGetValue(typePattern.Trim(), out var mappedType))
+        {
+            return mappedType;
+        }
+
+        // 不是泛型类型参数，返回原类型
+        return typePattern;
     }
 
     /// <summary>
@@ -3360,21 +3422,28 @@ public partial class VirtualMachine
     {
         if (val is BytecodeObjectInstance instance)
         {
-            // 直接比较类名
-            if (instance.ClassName == typeName) return true;
+            // 规范化类型名称：去掉可空标记进行比较
+            // 例如：Container$int? 和 Container$int 应该匹配
+            var normalizedTypeName = typeName.TrimEnd('?');
+            var normalizedInstanceName = instance.ClassName.TrimEnd('?');
+
+            // 直接比较类名（忽略可空标记）
+            if (normalizedInstanceName == normalizedTypeName) return true;
 
             // 处理泛型类型：将 ClassName<T1, T2> 格式转换为 ClassName$T1_T2 格式进行比较
-            var normalizedTypeName = NormalizeGenericTypeName(typeName);
-            if (instance.ClassName == normalizedTypeName) return true;
+            var normalizedGenericTypeName = NormalizeGenericTypeName(typeName).TrimEnd('?');
+            var normalizedGenericInstanceName = NormalizeGenericTypeName(instance.ClassName).TrimEnd('?');
+            if (normalizedGenericInstanceName == normalizedGenericTypeName) return true;
 
             // Check inheritance
-            var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName);
+            var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName || m.Name == normalizedInstanceName);
             while (metadata != null)
             {
-                if (metadata.Name == typeName) return true;
-                if (metadata.Name == normalizedTypeName) return true;
+                var metadataName = metadata.Name.TrimEnd('?');
+                if (metadataName == normalizedTypeName) return true;
+                if (metadataName == normalizedGenericTypeName) return true;
                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
-                if (metadata.BaseClassName == typeName) return true;
+                if (metadata.BaseClassName != null && metadata.BaseClassName.TrimEnd('?') == normalizedTypeName) return true;
 
                 if (metadata.BaseClassName != null)
                 {
