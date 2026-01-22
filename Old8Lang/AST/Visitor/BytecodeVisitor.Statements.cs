@@ -1667,20 +1667,20 @@ public partial class BytecodeVisitor
         var nodeType = node.GetType();
         var bindingFlags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
 
-        var dllNameField = nodeType.GetField("DllName", bindingFlags);
+        var dllNameField = nodeType.GetField("_dllName", bindingFlags);
         var dllName = dllNameField?.GetValue(node) as string
             ?? throw new InvalidOperationException("无法获取 DLL 名称");
 
-        var functionsField = nodeType.GetField("Functions", bindingFlags);
+        var functionsField = nodeType.GetField("_functions", bindingFlags);
         var functions = functionsField?.GetValue(node) as List<ExternFunctionDeclaration>
             ?? throw new InvalidOperationException("无法获取函数列表");
 
-        var externTypeField = nodeType.GetField("ExternType", bindingFlags);
+        var externTypeField = nodeType.GetField("_externType", bindingFlags);
         var externType = externTypeField != null
             ? (ExternType)externTypeField.GetValue(node)!
             : ExternType.NativeDll;
 
-        var defaultCallingConventionField = nodeType.GetField("DefaultCallingConvention", bindingFlags);
+        var defaultCallingConventionField = nodeType.GetField("_defaultCallingConvention", bindingFlags);
         var defaultCallingConvention = defaultCallingConventionField != null
             ? (CallingConventionType)defaultCallingConventionField.GetValue(node)!
             : CallingConventionType.Cdecl;
