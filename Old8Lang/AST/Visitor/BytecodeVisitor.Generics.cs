@@ -237,7 +237,22 @@ public partial class BytecodeVisitor
 
             case GenericConstraintKind.TypeName:
                 // 类型名称约束：检查是否实现接口或继承基类
-                // 在虚拟机模式下，这需要在运行时检查
+                // 对于基本类型约束（如 T: int），检查类型是否匹配
+                var constraintTypeName = constraint.TypeName!;
+
+                // 简单的类型名称匹配检查
+                if (!string.Equals(resolvedTypeName, constraintTypeName, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 检查是否是可兼容的类型（例如 int 和 Int32）
+                    var normalizedActual = NormalizeTypeName(resolvedTypeName);
+                    var normalizedConstraint = NormalizeTypeName(constraintTypeName);
+
+                    if (!string.Equals(normalizedActual, normalizedConstraint, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new ArgumentException(
+                            $"类型 '{resolvedTypeName}' 不满足泛型参数 '{genericParamName}' 的类型约束 '{constraintTypeName}'");
+                    }
+                }
                 break;
 
             case GenericConstraintKind.TypeParameter:
@@ -266,6 +281,33 @@ public partial class BytecodeVisitor
             "int32" or "boolean" or "single" or "float" or "long" or "int64" or
             "short" or "int16" or "byte" or "sbyte" or "uint" or "uint32" or
             "ulong" or "uint64" or "ushort" or "uint16" or "decimal";
+    }
+
+    /// <summary>
+    /// 规范化类型名称（将别名转换为标准名称）
+    /// </summary>
+    private string NormalizeTypeName(string typeName)
+    {
+        var lowerTypeName = typeName.ToLowerInvariant();
+        return lowerTypeName switch
+        {
+            "int" or "int32" => "int",
+            "long" or "int64" => "long",
+            "short" or "int16" => "short",
+            "byte" => "byte",
+            "sbyte" => "sbyte",
+            "uint" or "uint32" => "uint",
+            "ulong" or "uint64" => "ulong",
+            "ushort" or "uint16" => "ushort",
+            "double" => "double",
+            "float" or "single" => "float",
+            "bool" or "boolean" => "bool",
+            "char" => "char",
+            "string" => "string",
+            "object" => "object",
+            "decimal" => "decimal",
+            _ => typeName // 保持原样
+        };
     }
 
     /// <summary>

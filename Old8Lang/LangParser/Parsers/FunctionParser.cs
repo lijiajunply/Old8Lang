@@ -455,15 +455,61 @@ public class FunctionParser(
         // 收集所有泛型参数名称（用于判断类型参数约束）
         var genericParamNames = new HashSet<string>();
 
-        // 第一遍：收集所有参数名称
+        // 第一遍：收集所有参数名称（只收集参数名，不包括约束中的类型）
         var savedIndex = CurrentIndex;
         while (CurrentToken.Type != LangTokenType.GreaterThan && CurrentToken.Type != LangTokenType.EndOfFile)
         {
             if (CurrentToken.Type == LangTokenType.Identifier)
             {
-                genericParamNames.Add(CurrentToken.Value);
+                var paramName = CurrentToken.Value;
+                genericParamNames.Add(paramName);
+
+                // 跳过参数名后面的内容（可空标记、约束等）
+                CurrentIndex++;
+
+                // 跳过可空标记 ?
+                if (CurrentToken.Type == LangTokenType.Question)
+                {
+                    CurrentIndex++;
+                }
+
+                // 跳过约束部分（: 后面的所有内容直到 , 或 >）
+                if (CurrentToken.Type == LangTokenType.Colon)
+                {
+                    CurrentIndex++; // 跳过 :
+
+                    // 跳过约束内容，直到遇到 , 或 >
+                    int depth = 0;
+                    while (CurrentToken.Type != LangTokenType.EndOfFile)
+                    {
+                        if (CurrentToken.Type == LangTokenType.LessThan)
+                        {
+                            depth++;
+                        }
+                        else if (CurrentToken.Type == LangTokenType.GreaterThan)
+                        {
+                            if (depth == 0)
+                                break;
+                            depth--;
+                        }
+                        else if (CurrentToken.Type == LangTokenType.Comma && depth == 0)
+                        {
+                            break;
+                        }
+                        CurrentIndex++;
+                    }
+                }
+
+                // 跳过逗号
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    CurrentIndex++;
+                }
             }
-            CurrentIndex++;
+            else
+            {
+                CurrentIndex++;
+            }
         }
         CurrentIndex = savedIndex;
 

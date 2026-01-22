@@ -416,8 +416,9 @@ public sealed class BoolFunction : BaseGlobalFunction
             {
                 return new BoolLangValue(result);
             }
-            // 非空字符串为 true，空字符串为 false
-            return new BoolLangValue(!string.IsNullOrEmpty(stringValue.Value));
+            // 字符串不是有效的布尔值，抛出异常
+            throw new CastError(position, "string", "bool",
+                $"字符串 '{stringValue.Value}' 不是有效的布尔值（只接受 'true' 或 'false'，不区分大小写）");
         }
 
         // null 为 false，其他对象为 true
@@ -510,8 +511,9 @@ public sealed class BoolFunction : BaseGlobalFunction
             {
                 return result;
             }
-            // 非空字符串为 true，空字符串为 false
-            return !string.IsNullOrEmpty(stringValue);
+            // 字符串不是有效的布尔值，抛出异常
+            throw new CastError(new SourcePosition(), "string", "bool",
+                $"字符串 '{stringValue}' 不是有效的布尔值（只接受 'true' 或 'false'，不区分大小写）");
         }
 
         // null 为 false，其他对象为 true
