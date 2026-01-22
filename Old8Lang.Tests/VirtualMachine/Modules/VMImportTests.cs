@@ -247,7 +247,7 @@ main()
         {
             // 创建基础模块
             var baseModuleCode = @"
-func double(x:int) -> int {
+func twice(x:int) -> int {
     return x * 2
 }
 ";
@@ -255,10 +255,10 @@ func double(x:int) -> int {
 
             // 创建依赖基础模块的模块
             var middleModuleCode = @"
-import { double } from ""base_module""
+import { twice } from ""base_module""
 
 func quadruple(x:int) -> int {
-    return double(double(x))
+    return twice(twice(x))
 }
 ";
             File.WriteAllText(Path.Combine(tempDir, "middle_module.old8"), middleModuleCode);

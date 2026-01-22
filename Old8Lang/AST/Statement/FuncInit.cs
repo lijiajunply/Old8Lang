@@ -58,6 +58,26 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 应用装饰器（如果有）
         var finalFunc = ApplyDecorators(FuncValue, manager);
 
+        // 如果函数还没有捕获作用域，并且当前在模块导入上下文中（ImportStack不为空），
+        // 则捕获当前作用域，以便函数能访问模块中导入的符号
+        if (finalFunc.GetCapturedScope() is null && manager.ImportStack.Count > 0)
+        {
+            // 创建带有捕获作用域的函数副本
+            finalFunc = new FuncLangValue(
+                finalFunc.Id,
+                finalFunc.Ids ?? [],
+                finalFunc.BlockStatement,
+                finalFunc.GenericParameters,
+                finalFunc.Position,
+                finalFunc.Id is null) // IsLambda
+            {
+                CapturedScope = manager.Clone(),
+                DocComment = finalFunc.DocComment,
+                Decorators = finalFunc.Decorators,
+                TypeArgumentMapping = finalFunc.TypeArgumentMapping
+            };
+        }
+
         // 注册函数
         manager.AddClassAndFunc(finalFunc);
     }
