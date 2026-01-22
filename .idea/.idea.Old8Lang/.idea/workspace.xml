@@ -23,7 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/FunctionMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Helpers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -931,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="778" />
+    <option name="localTasksCounter" value="779" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,7 +960,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(reflection): 添加编译器和解释器模式反射功能测试&#10;&#10;- 实现 GetClassName 功能测试，验证类名获取的正确性&#10;- 实现 GetClassMethods 功能测试，验证类方法列表获取&#10;- 实现 GetClassFields 功能测试，验证类字段列表获取&#10;- 实现 GetMethodInfo 功能测试，验证方法详情获取&#10;- 实现 GetFieldInfo 功能测试，验证字段详情获取&#10;- 实现 InvokeMethod 功能测试，验证动态方法调用&#10;- 实现 GetField 功能测试，验证字段值获取&#10;- 实现 SetField 功能测试，验证字段值设置&#10;- 实现 CreateInstance 功能测试，验证动态对象创建&#10;- 实现 IsInstanceOf 功能测试，验证类型检查&#10;- 实现 HasMethod 和 HasField 功能测试，验证成员存在性检查&#10;- 添加综合工作流测试，验证完整反射操作流程&#10;- 覆盖公共和私有成员的访问测试场景&#10;- 包含编译器模式和解释器模式的双重测试验证" />
     <MESSAGE value="feat(error): 添加多种错误类型定义&#10;&#10;- 添加类错误定义，包括类未找到、方法未找到、访问权限违规等错误类型&#10;- 添加并发错误定义，包括死锁、Channel操作相关错误、锁获取失败等错误类型&#10;- 添加IO和网络错误定义，涵盖文件读写、网络连接、HTTP请求等多种场景&#10;- 添加其他杂项错误定义，包括迭代器停止、编码解码、配置错误等类型&#10;- 所有错误类型都继承自RuntimeError基类并提供统一的错误处理接口" />
     <MESSAGE value="fix(error): 统一虚拟机指令中的异常处理为具体错误类型&#10;&#10;- 在ClassError中添加MethodNotFoundError构造函数&#10;- 为IndexError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为TypeError添加ErrorCode常量和SourcePosition构造函数重载&#10;- 为CastError添加SourcePosition构造函数重载&#10;- 在VirtualMachine.Instructions.cs中添加GetPosition辅助方法获取源码位置&#10;- 将全局变量未定义异常替换为NameError&#10;- 将函数未定义异常替换为MethodNotFoundError&#10;- 将参数缺失异常替换为ArgumentError&#10;- 将非函数对象调用异常替换为TypeError&#10;- 将Break/Continue指令执行异常替换为InvalidOperationError&#10;- 将函数索引无效异常替换为IndexError&#10;- 将字典键不存在异常替换为KeyError&#10;- 将迭代器状态异常替换为StateError&#10;- 将类型转换失败异常替换为CastError&#10;- 将空引用访问异常替换为NullReferenceError&#10;- 将字段访问异常替换为AttributeError&#10;- 将类未找到异常替换为ClassNotFoundError&#10;- 将访问权限违规异常替换为AccessViolationError&#10;- 将模块导入异常替换为ImportError&#10;- 将未实现操作码异常替换为NotImplementedError&#10;- 在类型转换函数中统一使用CastError替代InvalidOperationError和通用Exception" />
     <MESSAGE value="refactor(runtime): 重构闭包和反射功能实现&#10;&#10;- 将 ClosureValue 类改为记录结构并优化构造函数&#10;- 实现对字节码对象实例的字段设置支持&#10;- 扩展反射辅助类以支持字节码对象实例的类型检查&#10;- 添加对实例方法和字段的反射查询功能&#10;- 实现字段默认值的正确初始化逻辑&#10;- 在虚拟机中添加常量池访问接口" />
@@ -983,7 +984,8 @@
     <MESSAGE value="feat(generics): 实现泛型类型参数映射和嵌套泛型支持&#10;&#10;- 添加 CurrentTypeParameterMapping 属性管理当前类型参数映射&#10;- 实现泛型特化类和函数编译时的类型参数替换逻辑&#10;- 添加 ReplaceTypeParameters 方法支持嵌套泛型类型参数替换&#10;- 实现 SplitGenericTypeArgs 方法处理复杂泛型参数分割&#10;- 添加 NormalizeGenericTypeName 方法统一泛型类型名称格式&#10;- 优化泛型实例化过程中的类型参数解析和映射机制" />
     <MESSAGE value="feat(vm): 实现虚拟机对 params 可变参数的支持&#10;&#10;- 添加 params 参数处理逻辑，将可变参数打包成数组传递&#10;- 实现常规参数与可变参数的分离处理机制&#10;- 完善参数不足时的默认值填充策略&#10;- 修复函数调用时参数数量不匹配的错误处理&#10;- 保持与现有默认参数功能的兼容性" />
     <MESSAGE value="refactor(ast): 更新反射字段访问的私有字段命名约定&#10;&#10;- 将 DllName 字段引用更改为 _dllName 以符合私有字段命名规范&#10;- 将 Functions 字段引用更改为 _functions 以保持命名一致性&#10;- 将 ExternType 字段引用更改为 _externType 以遵循私有字段前缀约定&#10;- 将 DefaultCallingConvention 字段引用更改为 _defaultCallingConvention&#10;- 统一了反射访问私有字段的命名风格以提高代码可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 更新反射字段访问的私有字段命名约定&#10;&#10;- 将 DllName 字段引用更改为 _dllName 以符合私有字段命名规范&#10;- 将 Functions 字段引用更改为 _functions 以保持命名一致性&#10;- 将 ExternType 字段引用更改为 _externType 以遵循私有字段前缀约定&#10;- 将 DefaultCallingConvention 字段引用更改为 _defaultCallingConvention&#10;- 统一了反射访问私有字段的命名风格以提高代码可读性" />
+    <MESSAGE value="feat(vm): 实现泛型类型参数映射和类型解析功能&#10;&#10;- 在 FunctionMetadata 和 ClassMetadata 中添加 GenericTypeMapping 属性&#10;- 实现泛型类型参数的序列化和反序列化功能&#10;- 添加 ResolveGenericType 方法支持泛型类型参数替换&#10;- 支持可空类型、泛型类型、联合类型和交叉类型的泛型解析&#10;- 在虚拟机指令中集成泛型类型映射和类型检查功能&#10;- 修复类型匹配比较中忽略可空标记的问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现泛型类型参数映射和类型解析功能&#10;&#10;- 在 FunctionMetadata 和 ClassMetadata 中添加 GenericTypeMapping 属性&#10;- 实现泛型类型参数的序列化和反序列化功能&#10;- 添加 ResolveGenericType 方法支持泛型类型参数替换&#10;- 支持可空类型、泛型类型、联合类型和交叉类型的泛型解析&#10;- 在虚拟机指令中集成泛型类型映射和类型检查功能&#10;- 修复类型匹配比较中忽略可空标记的问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

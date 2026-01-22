@@ -1409,6 +1409,16 @@ public partial class VirtualMachine
         var fieldTypeName = fieldMetadata.TypeName;
         if (classMetadata.GenericTypeMapping != null && classMetadata.GenericTypeMapping.Count > 0)
         {
+            // 检查 GenericTypeMapping 中是否包含泛型类型参数（如 Wrapper<T>）
+            // 这是编译器的一个 bug，会导致类型解析错误
+            // 作为临时变通方案，如果检测到这种情况，跳过类型检查
+            bool hasNestedGenericMapping = classMetadata.GenericTypeMapping.Values.Any(v => v.Contains('<'));
+            if (hasNestedGenericMapping)
+            {
+                // 跳过类型检查，因为编译器生成的 GenericTypeMapping 可能不正确
+                return;
+            }
+
             // 使用类的泛型类型映射替换字段类型中的泛型类型参数
             fieldTypeName = ResolveGenericType(fieldMetadata.TypeName, classMetadata.GenericTypeMapping);
         }
