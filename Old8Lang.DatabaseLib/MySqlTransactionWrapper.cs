@@ -7,8 +7,8 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class MySqlTransactionWrapper : IDisposable
 {
-    private readonly MySqlTransaction Transaction;
-    private bool Disposed;
+    private readonly MySqlTransaction _transaction;
+    private bool _disposed;
 
     /// <summary>
     /// 构造函数
@@ -16,7 +16,7 @@ public class MySqlTransactionWrapper : IDisposable
     /// <param name="transaction">MySQL 事务</param>
     public MySqlTransactionWrapper(MySqlTransaction transaction)
     {
-        Transaction = transaction;
+        _transaction = transaction;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class MySqlTransactionWrapper : IDisposable
     /// </summary>
     public void Commit()
     {
-        Transaction.Commit();
+        _transaction.Commit();
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class MySqlTransactionWrapper : IDisposable
     /// </summary>
     public void Rollback()
     {
-        Transaction.Rollback();
+        _transaction.Rollback();
     }
 
     /// <summary>
@@ -40,10 +40,10 @@ public class MySqlTransactionWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!Disposed)
+        if (!_disposed)
         {
-            Transaction?.Dispose();
-            Disposed = true;
+            _transaction?.Dispose();
+            _disposed = true;
         }
     }
 }

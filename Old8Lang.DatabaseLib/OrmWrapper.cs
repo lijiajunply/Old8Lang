@@ -7,9 +7,9 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class OrmWrapper : IDisposable
 {
-    private readonly object Connection;
-    private readonly Type ConnectionType;
-    private bool Disposed;
+    private readonly object _connection;
+    private readonly Type _connectionType;
+    private bool _disposed;
 
     /// <summary>
     /// 构造函数
@@ -17,8 +17,8 @@ public class OrmWrapper : IDisposable
     /// <param name="connection">数据库连接对象</param>
     public OrmWrapper(object connection)
     {
-        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        ConnectionType = connection.GetType();
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        _connectionType = connection.GetType();
     }
 
     /// <summary>
@@ -233,7 +233,7 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private IEnumerable<dynamic> Query(string sql, object? parameters = null)
     {
-        return Connection switch
+        return _connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Query(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query(sql, parameters),
@@ -248,7 +248,7 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private IEnumerable<T> Query<T>(string sql, object? parameters = null)
     {
-        return Connection switch
+        return _connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Query<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query<T>(sql, parameters),
@@ -263,7 +263,7 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private T? QueryFirstOrDefault<T>(string sql, object? parameters = null)
     {
-        return Connection switch
+        return _connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.QueryFirstOrDefault<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.QueryFirstOrDefault<T>(sql, parameters),
@@ -278,7 +278,7 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private int Execute(string sql, object? parameters = null)
     {
-        return Connection switch
+        return _connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Execute(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Execute(sql, parameters),
@@ -293,7 +293,7 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private T ExecuteScalar<T>(string sql, object? parameters = null)
     {
-        return Connection switch
+        return _connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.ExecuteScalar<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.ExecuteScalar<T>(sql, parameters),
@@ -359,13 +359,13 @@ public class OrmWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!Disposed)
+        if (!_disposed)
         {
-            if (Connection is IDisposable disposable)
+            if (_connection is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-            Disposed = true;
+            _disposed = true;
         }
     }
 }

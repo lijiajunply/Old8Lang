@@ -10,10 +10,10 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class InMemoryConnectionWrapper : IDisposable
 {
-    private readonly SqliteConnection Connection;
-    private readonly string ConnectionString;
-    private readonly HashSet<string> CreatedTables;
-    private bool Disposed;
+    private readonly SqliteConnection _connection;
+    private readonly string _connectionString;
+    private readonly HashSet<string> _createdTables;
+    private bool _disposed;
 
     /// <summary>
     /// 构造函数
@@ -21,9 +21,9 @@ public class InMemoryConnectionWrapper : IDisposable
     /// <param name="databaseName">数据库名称，用于区分不同的内存数据库实例</param>
     public InMemoryConnectionWrapper(string databaseName = "default")
     {
-        ConnectionString = $"Data Source=file:{databaseName}?mode=memory&cache=shared";
-        Connection = new SqliteConnection(ConnectionString);
-        CreatedTables = [];
+        _connectionString = $"Data Source=file:{databaseName}?mode=memory&cache=shared";
+        _connection = new SqliteConnection(_connectionString);
+        _createdTables = [];
     }
 
     /// <summary>
@@ -31,13 +31,13 @@ public class InMemoryConnectionWrapper : IDisposable
     /// </summary>
     public void Open()
     {
-        if (Connection.State != ConnectionState.Open)
+        if (_connection.State != ConnectionState.Open)
         {
-            Connection.Open();
+            _connection.Open();
             // 启用外键约束
-            Connection.Execute("PRAGMA foreign_keys = ON");
+            _connection.Execute("PRAGMA foreign_keys = ON");
             // 设置WAL模式以提高并发性能
-            Connection.Execute("PRAGMA journal_mode = WAL");
+            _connection.Execute("PRAGMA journal_mode = WAL");
         }
     }
 
@@ -46,7 +46,7 @@ public class InMemoryConnectionWrapper : IDisposable
     /// </summary>
     public void Close()
     {
-        Connection.Close();
+        _connection.Close();
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public IEnumerable<dynamic> Query(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.Query(sql, parameters);
+        return _connection.Query(sql, parameters);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public IEnumerable<T> Query<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.Query<T>(sql, parameters);
+        return _connection.Query<T>(sql, parameters);
     }
 
     /// <summary>
@@ -90,11 +90,11 @@ public class InMemoryConnectionWrapper : IDisposable
             var tableName = ExtractTableName(sql);
             if (!string.IsNullOrEmpty(tableName))
             {
-                CreatedTables.Add(tableName);
+                _createdTables.Add(tableName);
             }
         }
         
-        return Connection.Execute(sql, parameters);
+        return _connection.Execute(sql, parameters);
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public object ExecuteScalar(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.ExecuteScalar(sql, parameters)!;
+        return _connection.ExecuteScalar(sql, parameters)!;
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public T ExecuteScalar<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.ExecuteScalar<T>(sql, parameters);
+        return _connection.ExecuteScalar<T>(sql, parameters);
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public dynamic? QueryFirst(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirst(sql, parameters);
+        return _connection.QueryFirst(sql, parameters);
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public T? QueryFirst<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirst<T>(sql, parameters);
+        return _connection.QueryFirst<T>(sql, parameters);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public dynamic? QueryFirstOrDefault(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirstOrDefault(sql, parameters);
+        return _connection.QueryFirstOrDefault(sql, parameters);
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public T? QueryFirstOrDefault<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirstOrDefault<T>(sql, parameters);
+        return _connection.QueryFirstOrDefault<T>(sql, parameters);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public InMemoryTransactionWrapper BeginTransaction()
     {
         EnsureConnectionOpen();
-        var transaction = Connection.BeginTransaction();
+        var transaction = _connection.BeginTransaction();
         return new InMemoryTransactionWrapper(transaction);
     }
 
@@ -192,7 +192,7 @@ public class InMemoryConnectionWrapper : IDisposable
     public int BulkInsert<T>(IEnumerable<T> entities, string tableName)
     {
         EnsureConnectionOpen();
-        return Connection.Execute($"INSERT INTO {tableName} VALUES (@Value)", entities);
+        return _connection.Execute($"INSERT INTO {tableName} VALUES (@Value)", entities);
     }
 
     /// <summary>
@@ -202,9 +202,9 @@ public class InMemoryConnectionWrapper : IDisposable
     {
         EnsureConnectionOpen();
         
-        foreach (var tableName in CreatedTables)
+        foreach (var tableName in _createdTables)
         {
-            Connection.Execute($"DELETE FROM {tableName}");
+            _connection.Execute($"DELETE FROM {tableName}");
         }
     }
 
@@ -214,7 +214,7 @@ public class InMemoryConnectionWrapper : IDisposable
     /// <returns>表名列表</returns>
     public IEnumerable<string> GetCreatedTables()
     {
-        return CreatedTables.ToList();
+        return _createdTables.ToList();
     }
 
     /// <summary>
@@ -224,12 +224,12 @@ public class InMemoryConnectionWrapper : IDisposable
     {
         EnsureConnectionOpen();
         
-        foreach (var tableName in CreatedTables)
+        foreach (var tableName in _createdTables)
         {
-            Connection.Execute($"DROP TABLE IF EXISTS {tableName}");
+            _connection.Execute($"DROP TABLE IF EXISTS {tableName}");
         }
         
-        CreatedTables.Clear();
+        _createdTables.Clear();
     }
 
     /// <summary>
@@ -242,17 +242,17 @@ public class InMemoryConnectionWrapper : IDisposable
         
         var stats = new DatabaseStatistics
         {
-            TotalTables = CreatedTables.Count,
-            ConnectionString = ConnectionString,
-            IsOpen = Connection.State == ConnectionState.Open
+            TotalTables = _createdTables.Count,
+            ConnectionString = _connectionString,
+            IsOpen = _connection.State == ConnectionState.Open
         };
 
         // 获取每个表的记录数
-        foreach (var tableName in CreatedTables)
+        foreach (var tableName in _createdTables)
         {
             try
             {
-                var count = Connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM {tableName}");
+                var count = _connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM {tableName}");
                 stats.TableRecords[tableName] = count;
             }
             catch
@@ -269,12 +269,12 @@ public class InMemoryConnectionWrapper : IDisposable
     /// </summary>
     private void EnsureConnectionOpen()
     {
-        if (Connection.State != ConnectionState.Open)
+        if (_connection.State != ConnectionState.Open)
         {
-            Connection.Open();
+            _connection.Open();
             // 重新设置PRAGMA设置
-            Connection.Execute("PRAGMA foreign_keys = ON");
-            Connection.Execute("PRAGMA journal_mode = WAL");
+            _connection.Execute("PRAGMA foreign_keys = ON");
+            _connection.Execute("PRAGMA journal_mode = WAL");
         }
     }
 
@@ -316,10 +316,10 @@ public class InMemoryConnectionWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!Disposed)
+        if (!_disposed)
         {
-            Connection?.Dispose();
-            Disposed = true;
+            _connection?.Dispose();
+            _disposed = true;
         }
     }
 }

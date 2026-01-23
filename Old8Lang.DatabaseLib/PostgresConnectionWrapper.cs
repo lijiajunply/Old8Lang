@@ -9,8 +9,8 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class PostgresConnectionWrapper : IDisposable
 {
-    private readonly NpgsqlConnection Connection;
-    private bool Disposed;
+    private readonly NpgsqlConnection _connection;
+    private bool _disposed;
 
     /// <summary>
     /// 构造函数
@@ -18,7 +18,7 @@ public class PostgresConnectionWrapper : IDisposable
     /// <param name="connectionString">连接字符串</param>
     public PostgresConnectionWrapper(string connectionString)
     {
-        Connection = new NpgsqlConnection(connectionString);
+        _connection = new NpgsqlConnection(connectionString);
     }
 
     /// <summary>
@@ -26,9 +26,9 @@ public class PostgresConnectionWrapper : IDisposable
     /// </summary>
     public void Open()
     {
-        if (Connection.State != ConnectionState.Open)
+        if (_connection.State != ConnectionState.Open)
         {
-            Connection.Open();
+            _connection.Open();
         }
     }
 
@@ -37,7 +37,7 @@ public class PostgresConnectionWrapper : IDisposable
     /// </summary>
     public void Close()
     {
-        Connection.Close();
+        _connection.Close();
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class PostgresConnectionWrapper : IDisposable
     public IEnumerable<dynamic> Query(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.Query(sql, parameters);
+        return _connection.Query(sql, parameters);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class PostgresConnectionWrapper : IDisposable
     public IEnumerable<T> Query<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.Query<T>(sql, parameters);
+        return _connection.Query<T>(sql, parameters);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class PostgresConnectionWrapper : IDisposable
     public int Execute(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.Execute(sql, parameters);
+        return _connection.Execute(sql, parameters);
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public class PostgresConnectionWrapper : IDisposable
     public object ExecuteScalar(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.ExecuteScalar(sql, parameters)!;
+        return _connection.ExecuteScalar(sql, parameters)!;
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class PostgresConnectionWrapper : IDisposable
     public T ExecuteScalar<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.ExecuteScalar<T>(sql, parameters);
+        return _connection.ExecuteScalar<T>(sql, parameters);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class PostgresConnectionWrapper : IDisposable
     public dynamic? QueryFirst(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirst(sql, parameters);
+        return _connection.QueryFirst(sql, parameters);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class PostgresConnectionWrapper : IDisposable
     public T? QueryFirst<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirst<T>(sql, parameters);
+        return _connection.QueryFirst<T>(sql, parameters);
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public class PostgresConnectionWrapper : IDisposable
     public dynamic? QueryFirstOrDefault(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirstOrDefault(sql, parameters);
+        return _connection.QueryFirstOrDefault(sql, parameters);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class PostgresConnectionWrapper : IDisposable
     public T? QueryFirstOrDefault<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return Connection.QueryFirstOrDefault<T>(sql, parameters);
+        return _connection.QueryFirstOrDefault<T>(sql, parameters);
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public class PostgresConnectionWrapper : IDisposable
     public PostgresTransactionWrapper BeginTransaction()
     {
         EnsureConnectionOpen();
-        var transaction = Connection.BeginTransaction();
+        var transaction = _connection.BeginTransaction();
         return new PostgresTransactionWrapper(transaction);
     }
 
@@ -172,7 +172,7 @@ public class PostgresConnectionWrapper : IDisposable
     public int BulkInsert<T>(IEnumerable<T> entities, string tableName)
     {
         EnsureConnectionOpen();
-        return Connection.Execute($"INSERT INTO {tableName} VALUES (@Value)", entities);
+        return _connection.Execute($"INSERT INTO {tableName} VALUES (@Value)", entities);
     }
 
     /// <summary>
@@ -180,9 +180,9 @@ public class PostgresConnectionWrapper : IDisposable
     /// </summary>
     private void EnsureConnectionOpen()
     {
-        if (Connection.State != ConnectionState.Open)
+        if (_connection.State != ConnectionState.Open)
         {
-            Connection.Open();
+            _connection.Open();
         }
     }
 
@@ -191,10 +191,10 @@ public class PostgresConnectionWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!Disposed)
+        if (!_disposed)
         {
-            Connection?.Dispose();
-            Disposed = true;
+            _connection?.Dispose();
+            _disposed = true;
         }
     }
 }
