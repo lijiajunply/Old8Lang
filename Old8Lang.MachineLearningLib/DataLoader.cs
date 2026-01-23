@@ -6,15 +6,8 @@ namespace Old8Lang.MachineLearningLib;
 /// <summary>
 /// 数据加载器，用于加载和准备机器学习数据
 /// </summary>
-public class DataLoader
+public class DataLoader(MLContext mlContext)
 {
-    private readonly MLContext _mlContext;
-
-    public DataLoader(MLContext mlContext)
-    {
-        _mlContext = mlContext;
-    }
-
     /// <summary>
     /// 从 CSV 文件加载数据
     /// </summary>
@@ -24,7 +17,7 @@ public class DataLoader
     /// <returns>IDataView</returns>
     public IDataView LoadFromCsv(string filePath, bool hasHeader = true, char separatorChar = ',')
     {
-        var dataView = _mlContext.Data.LoadFromTextFile<DynamicData>(
+        var dataView = mlContext.Data.LoadFromTextFile<DynamicData>(
             filePath,
             hasHeader: hasHeader,
             separatorChar: separatorChar);
@@ -39,7 +32,7 @@ public class DataLoader
     /// <returns>IDataView</returns>
     public IDataView LoadFromEnumerable<T>(IEnumerable<T> data) where T : class
     {
-        return _mlContext.Data.LoadFromEnumerable(data);
+        return mlContext.Data.LoadFromEnumerable(data);
     }
 
     /// <summary>
@@ -50,7 +43,7 @@ public class DataLoader
     /// <returns>训练集和测试集</returns>
     public (IDataView TrainSet, IDataView TestSet) SplitData(IDataView data, double testFraction = 0.2)
     {
-        var split = _mlContext.Data.TrainTestSplit(data, testFraction: testFraction);
+        var split = mlContext.Data.TrainTestSplit(data, testFraction: testFraction);
         return (split.TrainSet, split.TestSet);
     }
 
@@ -62,7 +55,7 @@ public class DataLoader
     /// <returns>打乱后的数据</returns>
     public IDataView ShuffleData(IDataView data, int? seed = null)
     {
-        return _mlContext.Data.ShuffleRows(data, seed: seed);
+        return mlContext.Data.ShuffleRows(data, seed: seed);
     }
 
     /// <summary>
@@ -75,7 +68,7 @@ public class DataLoader
     /// <returns>过滤后的数据</returns>
     public IDataView FilterData(IDataView data, string columnName, double lowerBound = double.MinValue, double upperBound = double.MaxValue)
     {
-        return _mlContext.Data.FilterRowsByColumn(data, columnName, lowerBound, upperBound);
+        return mlContext.Data.FilterRowsByColumn(data, columnName, lowerBound, upperBound);
     }
 
     /// <summary>

@@ -22,30 +22,23 @@ public enum StandardLibraryImportMode
 /// <summary>
 /// 类型导入配置
 /// </summary>
-public class TypeImportConfig
+public class TypeImportConfig(Type type, bool importStaticMembers, bool useNativeStaticAny = false)
 {
     /// <summary>
     /// 类型对象
     /// </summary>
-    public Type Type { get; }
+    public Type Type { get; } = type;
 
     /// <summary>
     /// 是否为静态类直接导入（导入其静态成员）
     /// 如果为 false，则导入为 NativeAnyLangValue
     /// </summary>
-    public bool ImportStaticMembers { get; }
+    public bool ImportStaticMembers { get; } = importStaticMembers;
 
     /// <summary>
     /// 是否使用 NativeStaticAny（仅当 ImportStaticMembers 为 true 时有效）
     /// </summary>
-    public bool UseNativeStaticAny { get; }
-
-    public TypeImportConfig(Type type, bool importStaticMembers, bool useNativeStaticAny = false)
-    {
-        Type = type;
-        ImportStaticMembers = importStaticMembers;
-        UseNativeStaticAny = useNativeStaticAny;
-    }
+    public bool UseNativeStaticAny { get; } = useNativeStaticAny;
 
     /// <summary>
     /// 创建静态类导入配置（直接导入静态成员）

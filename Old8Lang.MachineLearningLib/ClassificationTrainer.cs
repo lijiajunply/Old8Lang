@@ -6,15 +6,8 @@ namespace Old8Lang.MachineLearningLib;
 /// <summary>
 /// 分类模型训练器，支持多种分类算法
 /// </summary>
-public class ClassificationTrainer
+public class ClassificationTrainer(MLContext mlContext)
 {
-    private readonly MLContext _mlContext;
-
-    public ClassificationTrainer(MLContext mlContext)
-    {
-        _mlContext = mlContext;
-    }
-
     /// <summary>
     /// 使用逻辑回归训练二分类模型
     /// </summary>
@@ -25,7 +18,7 @@ public class ClassificationTrainer
     public ITransformer TrainLogisticRegression(IDataView trainData, string labelColumn = "Label", params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.BinaryClassification.Trainers.LbfgsLogisticRegression(
+            .Append(mlContext.BinaryClassification.Trainers.LbfgsLogisticRegression(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features"));
 
@@ -44,7 +37,7 @@ public class ClassificationTrainer
     public ITransformer TrainFastTree(IDataView trainData, string labelColumn = "Label", int numberOfTrees = 100, int numberOfLeaves = 20, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.BinaryClassification.Trainers.FastTree(
+            .Append(mlContext.BinaryClassification.Trainers.FastTree(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfTrees: numberOfTrees,
@@ -65,7 +58,7 @@ public class ClassificationTrainer
     public ITransformer TrainLightGbm(IDataView trainData, string labelColumn = "Label", int numberOfIterations = 100, double learningRate = 0.1, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.BinaryClassification.Trainers.LightGbm(
+            .Append(mlContext.BinaryClassification.Trainers.LightGbm(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfIterations: numberOfIterations,
@@ -84,7 +77,7 @@ public class ClassificationTrainer
     public ITransformer TrainMulticlassSdca(IDataView trainData, string labelColumn = "Label", params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.MulticlassClassification.Trainers.SdcaMaximumEntropy(
+            .Append(mlContext.MulticlassClassification.Trainers.SdcaMaximumEntropy(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features"));
 
@@ -102,7 +95,7 @@ public class ClassificationTrainer
     public ITransformer TrainMulticlassLightGbm(IDataView trainData, string labelColumn = "Label", int numberOfIterations = 100, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.MulticlassClassification.Trainers.LightGbm(
+            .Append(mlContext.MulticlassClassification.Trainers.LightGbm(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfIterations: numberOfIterations));
@@ -120,7 +113,7 @@ public class ClassificationTrainer
     public CalibratedBinaryClassificationMetrics EvaluateBinaryClassification(ITransformer model, IDataView testData, string labelColumn = "Label")
     {
         var predictions = model.Transform(testData);
-        return _mlContext.BinaryClassification.Evaluate(predictions, labelColumnName: labelColumn);
+        return mlContext.BinaryClassification.Evaluate(predictions, labelColumnName: labelColumn);
     }
 
     /// <summary>
@@ -133,7 +126,7 @@ public class ClassificationTrainer
     public MulticlassClassificationMetrics EvaluateMulticlassClassification(ITransformer model, IDataView testData, string labelColumn = "Label")
     {
         var predictions = model.Transform(testData);
-        return _mlContext.MulticlassClassification.Evaluate(predictions, labelColumnName: labelColumn);
+        return mlContext.MulticlassClassification.Evaluate(predictions, labelColumnName: labelColumn);
     }
 
     /// <summary>
@@ -147,7 +140,7 @@ public class ClassificationTrainer
             featureColumns = ["Feature1", "Feature2", "Feature3", "Feature4"];
         }
 
-        return _mlContext.Transforms.Concatenate("Features", featureColumns)
-            .Append(_mlContext.Transforms.NormalizeMinMax("Features"));
+        return mlContext.Transforms.Concatenate("Features", featureColumns)
+            .Append(mlContext.Transforms.NormalizeMinMax("Features"));
     }
 }

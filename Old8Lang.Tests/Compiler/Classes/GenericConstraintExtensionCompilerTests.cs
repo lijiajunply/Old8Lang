@@ -8,14 +8,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// 测试 new()、class、struct 和类型参数约束在编译器模式下的功能
 /// 注意：编译器模式下 Assert.Equal 有问题，所以只测试编译和执行
 /// </summary>
-public class GenericConstraintExtensionCompilerTests
+public class GenericConstraintExtensionCompilerTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public GenericConstraintExtensionCompilerTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     #region new() 约束测试
 

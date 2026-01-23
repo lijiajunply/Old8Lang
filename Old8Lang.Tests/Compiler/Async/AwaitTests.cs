@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// 编译器模式下的异步编程功能测试 - Await 关键字
 /// </summary>
-public class AwaitTests
+public class AwaitTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public AwaitTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void AwaitBasicTask_CompilesAndExecutesCorrectly()

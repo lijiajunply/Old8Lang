@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// 编译器模式下的异步编程功能测试 - 异步流
 /// </summary>
-public class AsyncStreamTests
+public class AsyncStreamTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public AsyncStreamTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicAsyncStream_CompilesAndExecutesCorrectly()

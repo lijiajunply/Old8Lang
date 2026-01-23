@@ -21,18 +21,12 @@ public class BuildContext
     /// <summary>
     /// 状态管理器
     /// </summary>
-    public StateManager StateManager { get; }
+    public StateManager StateManager { get; } = new();
 
     /// <summary>
     /// 全局状态存储
     /// </summary>
-    private readonly Dictionary<string, object> _globalState;
-
-    public BuildContext()
-    {
-        StateManager = new StateManager();
-        _globalState = new Dictionary<string, object>();
-    }
+    private readonly Dictionary<string, object> _globalState = new();
 
     /// <summary>
     /// 获取全局状态

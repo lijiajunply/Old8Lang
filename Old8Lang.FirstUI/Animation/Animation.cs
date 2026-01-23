@@ -331,40 +331,32 @@ public class AnimationUpdateEventArgs : EventArgs
 /// <summary>
 /// 泛型动画类（带起始值和结束值）
 /// </summary>
-public class Animation<T> : Animation
+public class Animation<T>(T from, T to, Func<T, T, double, T> interpolator) : Animation
 {
     /// <summary>
     /// 起始值
     /// </summary>
-    public T From { get; set; }
+    public T From { get; set; } = from;
 
     /// <summary>
     /// 结束值
     /// </summary>
-    public T To { get; set; }
+    public T To { get; set; } = to;
 
     /// <summary>
     /// 插值函数
     /// </summary>
-    public Func<T, T, double, T> Interpolator { get; set; }
+    public Func<T, T, double, T> Interpolator { get; set; } = interpolator;
 
     /// <summary>
     /// 当前值
     /// </summary>
-    public T CurrentValue { get; private set; }
+    public T CurrentValue { get; private set; } = from;
 
     /// <summary>
     /// 值更新事件
     /// </summary>
     public new event EventHandler<AnimationValueEventArgs<T>>? Updated;
-
-    public Animation(T from, T to, Func<T, T, double, T> interpolator)
-    {
-        From = from;
-        To = to;
-        Interpolator = interpolator;
-        CurrentValue = from;
-    }
 
     protected override void OnUpdate(double progress)
     {

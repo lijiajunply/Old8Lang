@@ -94,7 +94,4 @@ public class Stack : WidgetBase
 /// <summary>
 /// ZStack (Stack 的别名，类似 SwiftUI)
 /// </summary>
-public class ZStack : Stack
-{
-    public ZStack(List<WidgetBase>? children = null) : base(children) { }
-}
+public class ZStack(List<WidgetBase>? children = null) : Stack(children);

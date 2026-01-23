@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - 构造函数
 /// </summary>
-public class ConstructorTests
+public class ConstructorTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ConstructorTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicConstructor_CompilesAndExecutesCorrectly()

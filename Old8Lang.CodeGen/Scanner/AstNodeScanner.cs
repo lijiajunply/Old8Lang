@@ -8,22 +8,11 @@ namespace Old8Lang.CodeGen.Scanner;
 /// <summary>
 /// AST 节点扫描器 - 扫描 AST 目录并提取节点信息
 /// </summary>
-public class AstNodeScanner
+public class AstNodeScanner(
+    string scanDirectory,
+    HashSet<string> excludeClasses,
+    List<string> excludePatterns)
 {
-    private readonly string _scanDirectory;
-    private readonly HashSet<string> _excludeClasses;
-    private readonly List<string> _excludePatterns;
-
-    public AstNodeScanner(
-        string scanDirectory,
-        HashSet<string> excludeClasses,
-        List<string> excludePatterns)
-    {
-        _scanDirectory = scanDirectory;
-        _excludeClasses = excludeClasses;
-        _excludePatterns = excludePatterns;
-    }
-
     /// <summary>
     /// 扫描所有 AST 节点
     /// </summary>
@@ -31,12 +20,12 @@ public class AstNodeScanner
     {
         var nodes = new List<AstNodeInfo>();
 
-        if (!Directory.Exists(_scanDirectory))
+        if (!Directory.Exists(scanDirectory))
         {
-            throw new DirectoryNotFoundException($"扫描目录不存在: {_scanDirectory}");
+            throw new DirectoryNotFoundException($"扫描目录不存在: {scanDirectory}");
         }
 
-        var csFiles = Directory.GetFiles(_scanDirectory, "*.cs", SearchOption.AllDirectories);
+        var csFiles = Directory.GetFiles(scanDirectory, "*.cs", SearchOption.AllDirectories);
         Console.WriteLine($"[INFO] 找到 {csFiles.Length} 个 .cs 文件");
 
         foreach (var file in csFiles)
@@ -83,7 +72,7 @@ public class AstNodeScanner
     /// </summary>
     private bool IsExcluded(string filePath)
     {
-        foreach (var pattern in _excludePatterns)
+        foreach (var pattern in excludePatterns)
         {
             // 简单的通配符匹配
             var regexPattern = pattern
@@ -113,7 +102,7 @@ public class AstNodeScanner
 
         // 排除特定类
         var className = classDecl.Identifier.Text;
-        if (_excludeClasses.Contains(className))
+        if (excludeClasses.Contains(className))
         {
             return false;
         }

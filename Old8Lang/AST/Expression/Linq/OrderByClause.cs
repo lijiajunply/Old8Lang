@@ -24,21 +24,15 @@ public class OrderByClause(List<OrderingItem> orderings, SourcePosition position
 /// <summary>
 /// 排序项
 /// </summary>
-public class OrderingItem
+public class OrderingItem(LangExpression keyExpression, bool isAscending = true)
 {
     /// <summary>
     /// 排序键表达式
     /// </summary>
-    public LangExpression KeyExpression { get; set; }
+    public LangExpression KeyExpression { get; set; } = keyExpression;
 
     /// <summary>
     /// 是否升序（true: ascending, false: descending）
     /// </summary>
-    public bool IsAscending { get; set; }
-
-    public OrderingItem(LangExpression keyExpression, bool isAscending = true)
-    {
-        KeyExpression = keyExpression;
-        IsAscending = isAscending;
-    }
+    public bool IsAscending { get; set; } = isAscending;
 }

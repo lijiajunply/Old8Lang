@@ -5,15 +5,8 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.VirtualMachine.ErrorHandling;
 
 [Collection("Sequential")]
-public class VMTypeErrorTests
+public class VMTypeErrorTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public VMTypeErrorTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     private void AssertVMThrowsTypeException(string code)
     {
         var interpreter = new LangInterpreter();
@@ -30,14 +23,14 @@ public class VMTypeErrorTests
 
             var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             var exception = Assert.ThrowsAny<System.Exception>(() => vm.Execute());
-            _output.WriteLine($"Exception type: {exception.GetType().Name}");
-            _output.WriteLine($"Exception message: {exception.Message}");
+            output.WriteLine($"Exception type: {exception.GetType().Name}");
+            output.WriteLine($"Exception message: {exception.Message}");
         }
         catch (System.Exception ex)
         {
             // 编译时异常也是有效的类型错误
-            _output.WriteLine($"Exception type: {ex.GetType().Name}");
-            _output.WriteLine($"Exception message: {ex.Message}");
+            output.WriteLine($"Exception type: {ex.GetType().Name}");
+            output.WriteLine($"Exception message: {ex.Message}");
             // 重新抛出以确保测试通过
             return;
         }

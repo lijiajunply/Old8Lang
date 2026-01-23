@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - Mixin
 /// </summary>
-public class MixinTests
+public class MixinTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public MixinTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicMixin_CompilesAndExecutesCorrectly()

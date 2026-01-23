@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.EdgeCases;
 /// <summary>
 /// 编译器模式下的边界和错误情况测试
 /// </summary>
-public class BoundaryTests
+public class BoundaryTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public BoundaryTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void EmptyInput_CompilesAndExecutesCorrectly()

@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// 编译器模式下的异步编程功能测试 - Task API
 /// </summary>
-public class TaskAPITests
+public class TaskAPITests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public TaskAPITests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void TaskDelay_CompilesAndExecutesCorrectly()

@@ -8,24 +8,15 @@ namespace Old8Lang.CodeGen.Utils;
 /// <summary>
 /// Partial Class 转换器 - 自动将类标记为 partial
 /// </summary>
-public class PartialClassConverter
+public class PartialClassConverter(List<AstNodeInfo> nodes, bool dryRun = false)
 {
-    private readonly List<AstNodeInfo> _nodes;
-    private readonly bool _dryRun;
-
-    public PartialClassConverter(List<AstNodeInfo> nodes, bool dryRun = false)
-    {
-        _nodes = nodes;
-        _dryRun = dryRun;
-    }
-
     /// <summary>
     /// 转换所有节点为 partial class
     /// </summary>
     public async Task<int> ConvertAll()
     {
         int convertedCount = 0;
-        var fileGroups = _nodes.GroupBy(n => n.FilePath).ToList();
+        var fileGroups = nodes.GroupBy(n => n.FilePath).ToList();
 
         Console.WriteLine($"[INFO] 需要处理 {fileGroups.Count} 个文件");
 
@@ -85,7 +76,7 @@ public class PartialClassConverter
         // 如果有修改，写回文件
         if (modified)
         {
-            if (_dryRun)
+            if (dryRun)
             {
                 Console.WriteLine($"[DRY-RUN] 将修改文件: {filePath}");
                 Console.WriteLine($"变更预览:");

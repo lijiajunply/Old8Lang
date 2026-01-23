@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - 继承
 /// </summary>
-public class InheritanceTests
+public class InheritanceTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public InheritanceTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicInheritance_CompilesAndExecutesCorrectly()

@@ -8,14 +8,9 @@ namespace Old8Lang.Tests.Compiler.Functions;
 /// 装饰器编译器模式测试
 /// </summary>
 [Collection("Sequential")]
-public class DecoratorCompilerTests
+public class DecoratorCompilerTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public DecoratorCompilerTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     #region 基础功能测试
 

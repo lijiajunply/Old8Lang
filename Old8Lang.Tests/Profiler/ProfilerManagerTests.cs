@@ -7,12 +7,7 @@ namespace Old8Lang.Tests.Profiler;
 /// </summary>
 public class ProfilerManagerTests
 {
-    private readonly ProfilerManager _profiler;
-
-    public ProfilerManagerTests()
-    {
-        _profiler = new ProfilerManager();
-    }
+    private readonly ProfilerManager _profiler = new();
 
     [Fact]
     public void StartProfiling_ShouldCreateSession()

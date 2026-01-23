@@ -83,34 +83,27 @@ public class ModuleRegistry
 /// <summary>
 /// 已加载的模块信息
 /// </summary>
-public class LoadedModule
+public class LoadedModule(string name, BytecodeFile bytecodeFile, Dictionary<string, object?> globals)
 {
     /// <summary>
     /// 模块名称
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = name;
 
     /// <summary>
     /// 字节码文件
     /// </summary>
-    public BytecodeFile BytecodeFile { get; }
+    public BytecodeFile BytecodeFile { get; } = bytecodeFile;
 
     /// <summary>
     /// 模块的全局变量空间
     /// </summary>
-    public Dictionary<string, object?> Globals { get; }
+    public Dictionary<string, object?> Globals { get; } = globals;
 
     /// <summary>
     /// 导出符号缓存
     /// </summary>
     private Dictionary<string, object?>? _exportCache;
-
-    public LoadedModule(string name, BytecodeFile bytecodeFile, Dictionary<string, object?> globals)
-    {
-        Name = name;
-        BytecodeFile = bytecodeFile;
-        Globals = globals;
-    }
 
     /// <summary>
     /// 获取导出的符号

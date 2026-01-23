@@ -6,15 +6,8 @@ namespace Old8Lang.MachineLearningLib;
 /// <summary>
 /// 聚类模型训练器，支持多种聚类算法
 /// </summary>
-public class ClusteringTrainer
+public class ClusteringTrainer(MLContext mlContext)
 {
-    private readonly MLContext _mlContext;
-
-    public ClusteringTrainer(MLContext mlContext)
-    {
-        _mlContext = mlContext;
-    }
-
     /// <summary>
     /// 使用 K-Means 训练聚类模型
     /// </summary>
@@ -25,7 +18,7 @@ public class ClusteringTrainer
     public ITransformer TrainKMeans(IDataView trainData, int numberOfClusters = 3, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Clustering.Trainers.KMeans(
+            .Append(mlContext.Clustering.Trainers.KMeans(
                 featureColumnName: "Features",
                 numberOfClusters: numberOfClusters));
 
@@ -41,7 +34,7 @@ public class ClusteringTrainer
     public ClusteringMetrics Evaluate(ITransformer model, IDataView testData)
     {
         var predictions = model.Transform(testData);
-        return _mlContext.Clustering.Evaluate(predictions);
+        return mlContext.Clustering.Evaluate(predictions);
     }
 
     /// <summary>
@@ -55,7 +48,7 @@ public class ClusteringTrainer
             featureColumns = ["Feature1", "Feature2", "Feature3", "Feature4"];
         }
 
-        return _mlContext.Transforms.Concatenate("Features", featureColumns)
-            .Append(_mlContext.Transforms.NormalizeMinMax("Features"));
+        return mlContext.Transforms.Concatenate("Features", featureColumns)
+            .Append(mlContext.Transforms.NormalizeMinMax("Features"));
     }
 }

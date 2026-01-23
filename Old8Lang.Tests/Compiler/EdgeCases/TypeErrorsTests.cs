@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.EdgeCases;
 /// <summary>
 /// 编译器模式下的边界和错误情况测试 - 类型错误测试
 /// </summary>
-public class TypeErrorsTests
+public class TypeErrorsTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public TypeErrorsTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void StringToIntConversion_CompilesAndExecutesCorrectly()

@@ -12,27 +12,20 @@ namespace Old8Lang.Bytecode.Generators;
 /// 生成器对象（字节码虚拟机模式）
 /// 表示一个可以暂停和恢复执行的生成器函数
 /// </summary>
-public class BytecodeGeneratorLangValue : LangValueType, IEnumerable<LangValueType>
+public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, SourcePosition position = default)
+    : LangValueType(position), IEnumerable<LangValueType>
 {
     /// <summary>生成器ID</summary>
-    public int GeneratorId { get; }
+    public int GeneratorId { get; } = generatorId;
 
     /// <summary>虚拟机引用</summary>
-    private readonly VirtualMachine _vm;
+    private readonly VirtualMachine _vm = vm;
 
     /// <summary>当前值</summary>
     public LangValueType? Current { get; private set; }
 
     /// <summary>生成器是否已完成</summary>
-    public bool IsCompleted { get; private set; }
-
-    public BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, SourcePosition position = default)
-        : base(position)
-    {
-        GeneratorId = generatorId;
-        _vm = vm;
-        IsCompleted = false;
-    }
+    public bool IsCompleted { get; private set; } = false;
 
     /// <summary>
     /// 推进生成器到下一个yield点

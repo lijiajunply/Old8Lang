@@ -7,16 +7,16 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class HttpWebClient : IDisposable
 {
-    private readonly HttpClient Client;
-    private readonly Dictionary<string, string> DefaultHeaders;
+    private readonly HttpClient _client;
+    private readonly Dictionary<string, string> _defaultHeaders;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     public HttpWebClient()
     {
-        Client = new HttpClient();
-        DefaultHeaders = new Dictionary<string, string>();
+        _client = new HttpClient();
+        _defaultHeaders = new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class HttpWebClient : IDisposable
     /// </summary>
     public void AddDefaultHeader(string name, string value)
     {
-        DefaultHeaders[name] = value;
+        _defaultHeaders[name] = value;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class HttpWebClient : IDisposable
     /// </summary>
     public void RemoveDefaultHeader(string name)
     {
-        DefaultHeaders.Remove(name);
+        _defaultHeaders.Remove(name);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class HttpWebClient : IDisposable
     /// </summary>
     public void SetTimeout(int milliseconds)
     {
-        Client.Timeout = TimeSpan.FromMilliseconds(milliseconds);
+        _client.Timeout = TimeSpan.FromMilliseconds(milliseconds);
     }
 
     /// <summary>
@@ -90,13 +90,13 @@ public class HttpWebClient : IDisposable
 
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         // 添加默认请求头
-        foreach (var header in DefaultHeaders)
+        foreach (var header in _defaultHeaders)
         {
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
         // 发送请求
-        var response = await Client.SendAsync(request);
+        var response = await _client.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
         {
@@ -217,7 +217,7 @@ public class HttpWebClient : IDisposable
     {
         using var request = new HttpRequestMessage(method, url);
         // 添加默认请求头
-        foreach (var header in DefaultHeaders)
+        foreach (var header in _defaultHeaders)
         {
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
@@ -226,7 +226,7 @@ public class HttpWebClient : IDisposable
         request.Content = content;
 
         // 发送请求
-        var response = await Client.SendAsync(request);
+        var response = await _client.SendAsync(request);
 
         // 构建响应对象
         return new HttpResponse
@@ -245,7 +245,7 @@ public class HttpWebClient : IDisposable
     {
         using HttpRequestMessage request = new HttpRequestMessage(method, url);
         // 添加默认请求头
-        foreach (var header in DefaultHeaders)
+        foreach (var header in _defaultHeaders)
         {
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
@@ -257,7 +257,7 @@ public class HttpWebClient : IDisposable
         }
 
         // 发送请求
-        var response = await Client.SendAsync(request);
+        var response = await _client.SendAsync(request);
 
         // 构建响应对象
         return new HttpResponse
@@ -274,7 +274,7 @@ public class HttpWebClient : IDisposable
     /// </summary>
     public HttpClient GetUnderlyingClient()
     {
-        return Client;
+        return _client;
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ public class HttpWebClient : IDisposable
     /// </summary>
     public void Dispose()
     {
-        Client.Dispose();
+        _client.Dispose();
     }
 }
 

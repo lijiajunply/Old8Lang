@@ -7,15 +7,15 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class WebSocketClient : IAsyncDisposable
 {
-    private readonly ClientWebSocket Client;
-    private readonly string Url;
-    private Action<string>? TextMessageReceivedHandler;
-    private Action<byte[]>? BinaryMessageReceivedHandler;
-    private Action<string>? ConnectedHandler;
-    private Action<string>? DisconnectedHandler;
-    private Action<Exception>? ErrorHandler;
-    private CancellationTokenSource? Cts;
-    private Task? ReceiveTask;
+    private readonly ClientWebSocket _client;
+    private readonly string _url;
+    private Action<string>? _textMessageReceivedHandler;
+    private Action<byte[]>? _binaryMessageReceivedHandler;
+    private Action<string>? _connectedHandler;
+    private Action<string>? _disconnectedHandler;
+    private Action<Exception>? _errorHandler;
+    private CancellationTokenSource? _cts;
+    private Task? _receiveTask;
 
     /// <summary>
     /// 获取客户端连接状态
@@ -27,8 +27,8 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public WebSocketClient(string url)
     {
-        Url = url;
-        Client = new ClientWebSocket();
+        _url = url;
+        _client = new ClientWebSocket();
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public async Task ConnectAsync(Dictionary<string, string>? headers = null)
     {
-        Cts = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
 
         // 添加自定义头
         if (headers != null)
@@ -48,17 +48,17 @@ public class WebSocketClient : IAsyncDisposable
                     header.Key.StartsWith("Authorization", StringComparison.OrdinalIgnoreCase) ||
                     header.Key.Equals("Origin", StringComparison.OrdinalIgnoreCase))
                 {
-                    Client.Options.SetRequestHeader(header.Key, header.Value);
+                    _client.Options.SetRequestHeader(header.Key, header.Value);
                 }
             }
         }
 
-        await Client.ConnectAsync(new Uri(Url), Cts.Token);
+        await _client.ConnectAsync(new Uri(_url), _cts.Token);
         IsConnected = true;
-        ConnectedHandler?.Invoke("Connected to WebSocket server");
+        _connectedHandler?.Invoke("Connected to WebSocket server");
 
         // 启动接收循环
-        ReceiveTask = ReceiveLoopAsync();
+        _receiveTask = ReceiveLoopAsync();
     }
 
     /// <summary>
@@ -72,15 +72,15 @@ public class WebSocketClient : IAsyncDisposable
 
         try
         {
-            while (Client.State == WebSocketState.Open && !Cts!.IsCancellationRequested)
+            while (_client.State == WebSocketState.Open && !_cts!.IsCancellationRequested)
             {
-                var result = await Client.ReceiveAsync(segment, Cts.Token);
+                var result = await _client.ReceiveAsync(segment, _cts.Token);
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await Client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                    await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
                     IsConnected = false;
-                    DisconnectedHandler?.Invoke("WebSocket connection closed");
+                    _disconnectedHandler?.Invoke("WebSocket connection closed");
                     break;
                 }
 
@@ -96,13 +96,13 @@ public class WebSocketClient : IAsyncDisposable
                         {
                             // 处理文本消息
                             var message = System.Text.Encoding.UTF8.GetString(messageBytes.ToArray());
-                            TextMessageReceivedHandler?.Invoke(message);
+                            _textMessageReceivedHandler?.Invoke(message);
                         }
                         else if (result.MessageType == WebSocketMessageType.Binary)
                         {
                             // 处理二进制消息
                             var binaryData = messageBytes.ToArray();
-                            BinaryMessageReceivedHandler?.Invoke(binaryData);
+                            _binaryMessageReceivedHandler?.Invoke(binaryData);
                         }
 
                         // 重置消息缓冲区
@@ -117,9 +117,9 @@ public class WebSocketClient : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            ErrorHandler?.Invoke(ex);
+            _errorHandler?.Invoke(ex);
             IsConnected = false;
-            DisconnectedHandler?.Invoke($"WebSocket error: {ex.Message}");
+            _disconnectedHandler?.Invoke($"WebSocket error: {ex.Message}");
         }
     }
 
@@ -128,14 +128,14 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public async Task SendAsync(string message)
     {
-        if (!IsConnected || Client.State != WebSocketState.Open)
+        if (!IsConnected || _client.State != WebSocketState.Open)
         {
             throw new InvalidOperationException("WebSocket client is not connected");
         }
 
         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(message);
         var segment = new ArraySegment<byte>(buffer);
-        await Client.SendAsync(segment, WebSocketMessageType.Text, true, Cts!.Token);
+        await _client.SendAsync(segment, WebSocketMessageType.Text, true, _cts!.Token);
     }
 
     /// <summary>
@@ -143,7 +143,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public async Task SendBinaryAsync(byte[] data)
     {
-        if (!IsConnected || Client.State != WebSocketState.Open)
+        if (!IsConnected || _client.State != WebSocketState.Open)
         {
             throw new InvalidOperationException("WebSocket client is not connected");
         }
@@ -154,7 +154,7 @@ public class WebSocketClient : IAsyncDisposable
         }
 
         var segment = new ArraySegment<byte>(data);
-        await Client.SendAsync(segment, WebSocketMessageType.Binary, true, Cts!.Token);
+        await _client.SendAsync(segment, WebSocketMessageType.Binary, true, _cts!.Token);
     }
 
     /// <summary>
@@ -164,15 +164,15 @@ public class WebSocketClient : IAsyncDisposable
     {
         if (IsConnected)
         {
-            await Cts!.CancelAsync();
+            await _cts!.CancelAsync();
 
-            if (Client.State == WebSocketState.Open)
+            if (_client.State == WebSocketState.Open)
             {
-                await Client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
             }
 
             IsConnected = false;
-            DisconnectedHandler?.Invoke("Disconnected from WebSocket server");
+            _disconnectedHandler?.Invoke("Disconnected from WebSocket server");
         }
     }
 
@@ -181,7 +181,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetTextMessageReceivedHandler(Action<string> handler)
     {
-        TextMessageReceivedHandler = handler;
+        _textMessageReceivedHandler = handler;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetBinaryMessageReceivedHandler(Action<byte[]> handler)
     {
-        BinaryMessageReceivedHandler = handler;
+        _binaryMessageReceivedHandler = handler;
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetMessageReceivedHandler(Action<string> handler)
     {
-        TextMessageReceivedHandler = handler;
+        _textMessageReceivedHandler = handler;
     }
 
     /// <summary>
@@ -205,7 +205,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetConnectedHandler(Action<string> handler)
     {
-        ConnectedHandler = handler;
+        _connectedHandler = handler;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetDisconnectedHandler(Action<string> handler)
     {
-        DisconnectedHandler = handler;
+        _disconnectedHandler = handler;
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public void SetErrorHandler(Action<Exception> handler)
     {
-        ErrorHandler = handler;
+        _errorHandler = handler;
     }
 
     /// <summary>
@@ -229,9 +229,9 @@ public class WebSocketClient : IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        await CastAndDispose(Client);
-        if (Cts != null) await CastAndDispose(Cts);
-        if (ReceiveTask != null) await CastAndDispose(ReceiveTask);
+        await CastAndDispose(_client);
+        if (_cts != null) await CastAndDispose(_cts);
+        if (_receiveTask != null) await CastAndDispose(_receiveTask);
 
         return;
 

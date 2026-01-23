@@ -103,17 +103,11 @@ public class GlobalState
 /// 计算属性
 /// 基于其他状态派生新状态
 /// </summary>
-public class Computed<T>
+public class Computed<T>(Func<T> compute)
 {
-    private readonly Func<T> _compute;
     private readonly List<WeakReference<Action<T>>> _listeners = [];
     private T? _cachedValue;
     private bool _isDirty = true;
-
-    public Computed(Func<T> compute)
-    {
-        _compute = compute;
-    }
 
     /// <summary>
     /// 获取计算值
@@ -124,7 +118,7 @@ public class Computed<T>
         {
             if (_isDirty)
             {
-                _cachedValue = _compute();
+                _cachedValue = compute();
                 _isDirty = false;
             }
             return _cachedValue!;

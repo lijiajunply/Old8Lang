@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// 编译器模式下的异步编程功能测试 - 异步生成器
 /// </summary>
-public class AsyncGeneratorTests
+public class AsyncGeneratorTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public AsyncGeneratorTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicAsyncGenerator_CompilesAndExecutesCorrectly()

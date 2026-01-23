@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.EdgeCases;
 /// <summary>
 /// 编译器模式下的边界和错误情况测试 - 空输入测试
 /// </summary>
-public class EmptyInputTests
+public class EmptyInputTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public EmptyInputTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void EmptyString_CompilesAndExecutesCorrectly()

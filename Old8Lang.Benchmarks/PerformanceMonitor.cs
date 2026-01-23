@@ -9,16 +9,11 @@ namespace Old8Lang.Benchmarks;
 /// </summary>
 public class PerformanceMonitor
 {
-    private readonly Stopwatch _stopwatch;
+    private readonly Stopwatch _stopwatch = new();
     private long _initialMemory;
     private long _peakMemory;
     private int _gcCollectionsBefore;
     private int _gcCollectionsAfter;
-
-    public PerformanceMonitor()
-    {
-        _stopwatch = new Stopwatch();
-    }
 
     /// <summary>
     /// 开始性能监控

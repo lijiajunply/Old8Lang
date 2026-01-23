@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - 泛型类
 /// </summary>
-public class GenericClassTests
+public class GenericClassTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public GenericClassTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicGenericClass_CompilesAndExecutesCorrectly()

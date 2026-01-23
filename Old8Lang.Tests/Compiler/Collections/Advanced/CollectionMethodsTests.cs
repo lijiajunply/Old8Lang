@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Collections.Advanced;
 /// <summary>
 /// 编译器模式下的高级集合功能测试 - 集合方法
 /// </summary>
-public class CollectionMethodsTests
+public class CollectionMethodsTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public CollectionMethodsTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void ListMapMethod_CompilesAndExecutesCorrectly()

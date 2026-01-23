@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - 接口
 /// </summary>
-public class InterfaceTests
+public class InterfaceTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public InterfaceTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicInterface_CompilesAndExecutesCorrectly()

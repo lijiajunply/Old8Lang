@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.EdgeCases;
 /// <summary>
 /// 编译器模式下的边界和错误情况测试 - 极值测试
 /// </summary>
-public class ExtremeValuesTests
+public class ExtremeValuesTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ExtremeValuesTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void MaximumIntegerValue_CompilesAndExecutesCorrectly()

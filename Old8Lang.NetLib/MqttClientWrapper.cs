@@ -13,10 +13,10 @@ namespace Old8Lang.NetLib;
 /// </remarks>
 public class MqttClientWrapper : IDisposable, IAsyncDisposable
 {
-    private readonly IMqttClient Client;
-    private readonly string Server;
-    private readonly int Port;
-    private MqttClientOptions? Options;
+    private readonly IMqttClient _client;
+    private readonly string _server;
+    private readonly int _port;
+    private MqttClientOptions? _options;
 
     // ==========================================
     // 标准 C# 事件 - 允许外部使用 += 订阅
@@ -40,7 +40,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
     /// <summary>
     /// 获取当前连接状态
     /// </summary>
-    private bool IsConnected => Client.IsConnected;
+    private bool IsConnected => _client.IsConnected;
 
     /// <summary>
     /// 使用主构造函数风格初始化的构造函数
@@ -49,12 +49,12 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
     /// <param name="port">端口</param>
     public MqttClientWrapper(string server, int port)
     {
-        Server = server;
-        Port = port;
+        _server = server;
+        _port = port;
 
         // 创建客户端实例
         var factory = new MqttFactory();
-        Client = factory.CreateMqttClient();
+        _client = factory.CreateMqttClient();
 
         // 内部挂载事件处理
         ConfigureInternalHandlers();
@@ -62,7 +62,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
 
     private void ConfigureInternalHandlers()
     {
-        Client.ConnectedAsync += async _ =>
+        _client.ConnectedAsync += async _ =>
         {
             if (ConnectedAsync != null)
             {
@@ -70,7 +70,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             }
         };
 
-        Client.DisconnectedAsync += async _ =>
+        _client.DisconnectedAsync += async _ =>
         {
             if (DisconnectedAsync != null)
             {
@@ -78,7 +78,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             }
         };
 
-        Client.ApplicationMessageReceivedAsync += async e =>
+        _client.ApplicationMessageReceivedAsync += async e =>
         {
             var topic = e.ApplicationMessage.Topic;
             // 优化：使用 Span/Memory 避免不必要的分配，但在公共 API 转换回 string 以方便使用
@@ -119,7 +119,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
         var actualClientId = string.IsNullOrWhiteSpace(clientId) ? Guid.NewGuid().ToString() : clientId;
 
         var builder = new MqttClientOptionsBuilder()
-            .WithTcpServer(Server, Port)
+            .WithTcpServer(_server, _port)
             .WithClientId(actualClientId)
             .WithTimeout(TimeSpan.FromSeconds(timeoutSeconds))
             // 保持连接 (KeepAlive) 心跳设置
@@ -130,12 +130,12 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             builder.WithCredentials(username, password);
         }
 
-        Options = builder.Build();
+        _options = builder.Build();
 
         using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         timeoutCts.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
 
-        await Client.ConnectAsync(Options, timeoutCts.Token);
+        await _client.ConnectAsync(_options, timeoutCts.Token);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
 
         try
         {
-            await Client.DisconnectAsync(new MqttClientDisconnectOptionsBuilder()
+            await _client.DisconnectAsync(new MqttClientDisconnectOptionsBuilder()
                 .WithReason(MqttClientDisconnectOptionsReason.NormalDisconnection)
                 .Build(), ct);
         }
@@ -173,7 +173,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             .WithTopicFilter(topicFilter)
             .Build();
 
-        await Client.SubscribeAsync(subscribeOptions, ct);
+        await _client.SubscribeAsync(subscribeOptions, ct);
     }
 
     /// <summary>
@@ -183,7 +183,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
     {
         if (!IsConnected) throw new InvalidOperationException("MQTT client is not connected");
 
-        await Client.UnsubscribeAsync(topic, ct);
+        await _client.UnsubscribeAsync(topic, ct);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             .WithRetainFlag(retain)
             .Build();
 
-        await Client.PublishAsync(message, ct);
+        await _client.PublishAsync(message, ct);
     }
 
     // ==========================================
@@ -218,7 +218,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
     {
         if (disposing)
         {
-            Client.Dispose();
+            _client.Dispose();
         }
     }
 
@@ -231,7 +231,7 @@ public class MqttClientWrapper : IDisposable, IAsyncDisposable
             await DisconnectAsync();
         }
 
-        Client.Dispose();
+        _client.Dispose();
 
         GC.SuppressFinalize(this);
     }

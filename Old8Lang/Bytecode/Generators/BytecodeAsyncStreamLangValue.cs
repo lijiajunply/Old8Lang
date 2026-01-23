@@ -12,13 +12,14 @@ namespace Old8Lang.Bytecode.Generators;
 /// 异步流对象（字节码虚拟机模式）
 /// 表示一个异步流，是 BytecodeAsyncGeneratorLangValue 的包装类
 /// </summary>
-public class BytecodeAsyncStreamLangValue : LangValueType, IAsyncEnumerable<LangValueType>
+public class BytecodeAsyncStreamLangValue(int asyncGeneratorId, VirtualMachine vm, SourcePosition position = default)
+    : LangValueType(position), IAsyncEnumerable<LangValueType>
 {
     /// <summary>内部的异步生成器</summary>
-    private readonly BytecodeAsyncGeneratorLangValue _asyncGenerator;
+    private readonly BytecodeAsyncGeneratorLangValue _asyncGenerator = new(asyncGeneratorId, vm, position);
 
     /// <summary>虚拟机引用</summary>
-    private readonly VirtualMachine _vm;
+    private readonly VirtualMachine _vm = vm;
 
     /// <summary>当前值</summary>
     public LangValueType? Current => _asyncGenerator.Current;
@@ -28,13 +29,6 @@ public class BytecodeAsyncStreamLangValue : LangValueType, IAsyncEnumerable<Lang
 
     /// <summary>异步流状态</summary>
     public BytecodeAsyncGeneratorLangValue.AsyncGeneratorState State => _asyncGenerator.State;
-
-    public BytecodeAsyncStreamLangValue(int asyncGeneratorId, VirtualMachine vm, SourcePosition position = default)
-        : base(position)
-    {
-        _asyncGenerator = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, vm, position);
-        _vm = vm;
-    }
 
     /// <summary>
     /// 异步推进流到下一个值

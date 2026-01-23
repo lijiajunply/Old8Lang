@@ -95,17 +95,12 @@ public class GestureEventData
     /// <summary>
     /// 时间戳
     /// </summary>
-    public DateTime Timestamp { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.Now;
 
     /// <summary>
     /// 是否已处理
     /// </summary>
     public bool Handled { get; set; }
-
-    public GestureEventData()
-    {
-        Timestamp = DateTime.Now;
-    }
 }
 
 /// <summary>

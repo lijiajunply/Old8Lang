@@ -10,47 +10,32 @@ namespace Old8Lang.Bytecode.Interop;
 /// <summary>
 /// Extern 函数包装器 - 用于在虚拟机中调用外部函数
 /// </summary>
-public class ExternFunctionWrapper
+public class ExternFunctionWrapper(
+    string dllName,
+    string funcName,
+    ExternType externType,
+    CallingConventionType callingConvention,
+    string signatureStr)
 {
-    private readonly string _dllName;
-    private readonly string _funcName;
-    private readonly ExternType _externType;
-    private readonly CallingConventionType _callingConvention;
-    private readonly string _signatureStr;
-
     // 缓存的委托和函数指针
     private Delegate? _cachedDelegate;
     private IntPtr _cachedFuncPtr;
     private IntPtr _cachedLibHandle;
     private MethodInfo? _cachedMethodInfo;
 
-    public ExternFunctionWrapper(
-        string dllName,
-        string funcName,
-        ExternType externType,
-        CallingConventionType callingConvention,
-        string signatureStr)
-    {
-        _dllName = dllName;
-        _funcName = funcName;
-        _externType = externType;
-        _callingConvention = callingConvention;
-        _signatureStr = signatureStr;
-    }
-
     /// <summary>
     /// 调用 extern 函数
     /// </summary>
     public object? Invoke(object?[] args)
     {
-        return _externType switch
+        return externType switch
         {
             ExternType.NativeDll => InvokeNativeDll(args),
             ExternType.CSharpDll => InvokeCSharpDll(args),
             ExternType.PythonScript => InvokePythonScript(args),
             ExternType.PythonModule => InvokePythonModule(args),
             ExternType.JavaScript => InvokeJavaScript(args),
-            _ => throw new NotSupportedException($"不支持的 extern 类型: {_externType}")
+            _ => throw new NotSupportedException($"不支持的 extern 类型: {externType}")
         };
     }
 
@@ -66,19 +51,19 @@ public class ExternFunctionWrapper
             try
             {
                 // 尝试作为文件路径加载
-                if (File.Exists(_dllName))
+                if (File.Exists(dllName))
                 {
-                    assembly = Assembly.LoadFrom(_dllName);
+                    assembly = Assembly.LoadFrom(dllName);
                 }
                 else
                 {
                     // 尝试作为程序集名称加载
-                    assembly = Assembly.Load(_dllName);
+                    assembly = Assembly.Load(dllName);
                 }
             }
             catch (Exception ex)
             {
-                throw new IOError(new SourcePosition(), $"无法加载程序集 '{_dllName}': {ex.Message}");
+                throw new IOError(new SourcePosition(), $"无法加载程序集 '{dllName}': {ex.Message}");
             }
 
             // 查找类型 (假设 _funcName 是 "ClassName.MethodName" 格式? 
@@ -106,16 +91,16 @@ public class ExternFunctionWrapper
             // 尝试解析 funcName 为 "Class.Method"
             string typeName;
             string methodName;
-            int lastDot = _funcName.LastIndexOf('.');
+            int lastDot = funcName.LastIndexOf('.');
             if (lastDot > 0)
             {
-                typeName = _funcName.Substring(0, lastDot);
-                methodName = _funcName.Substring(lastDot + 1);
+                typeName = funcName.Substring(0, lastDot);
+                methodName = funcName.Substring(lastDot + 1);
             }
             else
             {
                 // 无法确定类名，抛出异常或尝试在所有导出类型中查找（太慢）
-                throw new FormatError(new SourcePosition(), $"C# Extern 函数名必须包含类名 (例如 'ClassName.MethodName')，当前为: {_funcName}");
+                throw new FormatError(new SourcePosition(), $"C# Extern 函数名必须包含类名 (例如 'ClassName.MethodName')，当前为: {funcName}");
             }
             
             var type = assembly.GetType(typeName) ?? assembly.GetTypes().FirstOrDefault(t => t.Name == typeName || t.FullName == typeName);
@@ -177,12 +162,12 @@ public class ExternFunctionWrapper
             
             // 设置 sys.path
             dynamic sys = Py.Import("sys");
-            string scriptDir = Path.GetDirectoryName(_dllName) ?? ".";
+            string scriptDir = Path.GetDirectoryName(dllName) ?? ".";
             sys.path.append(scriptDir);
             
-            string scriptName = Path.GetFileNameWithoutExtension(_dllName);
+            string scriptName = Path.GetFileNameWithoutExtension(dllName);
             dynamic module = Py.Import(scriptName);
-            dynamic func = module.GetAttr(_funcName);
+            dynamic func = module.GetAttr(funcName);
             
             // 转换参数
             var pyArgs = args.Select(a => a.ToPython()).ToArray();
@@ -206,10 +191,10 @@ public class ExternFunctionWrapper
         using (Py.GIL())
         {
             // _dllName 格式为 "pymodule:ModuleName"
-            string moduleName = _dllName.Substring("pymodule:".Length);
+            string moduleName = dllName.Substring("pymodule:".Length);
             
             dynamic module = Py.Import(moduleName);
-            dynamic func = module.GetAttr(_funcName);
+            dynamic func = module.GetAttr(funcName);
             
             var pyArgs = args.Select(a => a.ToPython()).ToArray();
             
@@ -224,13 +209,13 @@ public class ExternFunctionWrapper
     private object? InvokeJavaScript(object?[] args)
     {
         // _dllName 是 JS 文件路径
-        string scriptContent = File.ReadAllText(_dllName);
+        string scriptContent = File.ReadAllText(dllName);
         
         var engine = new Engine();
         engine.Execute(scriptContent);
         
         var jsArgs = args.Select(a => Jint.Native.JsValue.FromObject(engine, a)).ToArray();
-        var result = engine.Invoke(_funcName, jsArgs);
+        var result = engine.Invoke(funcName, jsArgs);
         
         return result.ToObject();
     }
@@ -241,18 +226,18 @@ public class ExternFunctionWrapper
     private object? InvokeNativeDll(object?[] args)
     {
         // 解析函数签名
-        var (paramTypes, returnType) = ParseSignature(_signatureStr);
+        var (paramTypes, returnType) = ParseSignature(signatureStr);
 
         // 加载 DLL（如果尚未加载）
         if (_cachedLibHandle == IntPtr.Zero)
         {
             try
             {
-                _cachedLibHandle = NativeLibrary.Load(_dllName);
+                _cachedLibHandle = NativeLibrary.Load(dllName);
             }
             catch (DllNotFoundException ex)
             {
-                throw new IOError(new SourcePosition(), $"无法加载 DLL '{_dllName}': {ex.Message}");
+                throw new IOError(new SourcePosition(), $"无法加载 DLL '{dllName}': {ex.Message}");
             }
         }
 
@@ -261,11 +246,11 @@ public class ExternFunctionWrapper
         {
             try
             {
-                _cachedFuncPtr = NativeLibrary.GetExport(_cachedLibHandle, _funcName);
+                _cachedFuncPtr = NativeLibrary.GetExport(_cachedLibHandle, funcName);
             }
             catch (EntryPointNotFoundException ex)
             {
-                throw new MethodNotFoundError(new SourcePosition(), _funcName);
+                throw new MethodNotFoundError(new SourcePosition(), funcName);
             }
         }
 
@@ -344,12 +329,12 @@ public class ExternFunctionWrapper
             System.Reflection.Emit.AssemblyBuilderAccess.Run);
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("ExternModule");
         var typeBuilder = moduleBuilder.DefineType(
-            $"ExternDelegate_{_funcName}",
+            $"ExternDelegate_{funcName}",
             TypeAttributes.Public | TypeAttributes.Sealed,
             typeof(MulticastDelegate));
 
         // 添加 UnmanagedFunctionPointer 特性
-        var callingConv = _callingConvention switch
+        var callingConv = callingConvention switch
         {
             CallingConventionType.Cdecl => CallingConvention.Cdecl,
             CallingConventionType.StdCall => CallingConvention.StdCall,

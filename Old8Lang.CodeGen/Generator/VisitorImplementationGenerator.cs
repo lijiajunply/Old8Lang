@@ -8,15 +8,8 @@ namespace Old8Lang.CodeGen.Generator;
 /// Visitor 实现骨架生成器
 /// 生成 InterpreterVisitor, CompilerVisitor, TypeInferenceVisitor 的方法骨架
 /// </summary>
-public class VisitorImplementationGenerator
+public class VisitorImplementationGenerator(List<AstNodeInfo> nodes)
 {
-    private readonly List<AstNodeInfo> _nodes;
-
-    public VisitorImplementationGenerator(List<AstNodeInfo> nodes)
-    {
-        _nodes = nodes;
-    }
-
     /// <summary>
     /// 生成 InterpreterVisitor 的骨架
     /// </summary>
@@ -35,7 +28,7 @@ public class VisitorImplementationGenerator
         sb.AppendLine("public partial class InterpreterVisitor");
         sb.AppendLine("{");
 
-        foreach (var node in _nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
+        foreach (var node in nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
         {
             AppendInterpreterVisitMethod(sb, node);
         }
@@ -62,7 +55,7 @@ public class VisitorImplementationGenerator
         sb.AppendLine("public partial class CompilerVisitor");
         sb.AppendLine("{");
 
-        foreach (var node in _nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
+        foreach (var node in nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
         {
             AppendCompilerVisitMethod(sb, node);
         }
@@ -89,7 +82,7 @@ public class VisitorImplementationGenerator
         sb.AppendLine("public partial class TypeInferenceVisitor");
         sb.AppendLine("{");
 
-        foreach (var node in _nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
+        foreach (var node in nodes.OrderBy(n => n.Category).ThenBy(n => n.ClassName))
         {
             AppendTypeInferenceVisitMethod(sb, node);
         }
@@ -104,7 +97,7 @@ public class VisitorImplementationGenerator
         sb.AppendLine($"// 此文件由代码生成器自动生成 - {visitorName} 方法骨架");
         sb.AppendLine("// 请在实现对应方法后删除此文件中的对应方法，或将其迁移到手动维护的 partial class 文件中");
         sb.AppendLine($"// 生成时间：{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-        sb.AppendLine($"// 节点数量：{_nodes.Count}");
+        sb.AppendLine($"// 节点数量：{nodes.Count}");
         sb.AppendLine();
     }
 

@@ -7,10 +7,10 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class SocketClient : IDisposable
 {
-    private readonly TcpClient Client;
-    private NetworkStream? Stream;
-    private readonly string Host;
-    private readonly int Port;
+    private readonly TcpClient _client;
+    private NetworkStream? _stream;
+    private readonly string _host;
+    private readonly int _port;
 
     /// <summary>
     /// 获取客户端连接状态
@@ -22,9 +22,9 @@ public class SocketClient : IDisposable
     /// </summary>
     public SocketClient(string host, int port)
     {
-        Host = host;
-        Port = port;
-        Client = new TcpClient();
+        _host = host;
+        _port = port;
+        _client = new TcpClient();
     }
 
     /// <summary>
@@ -32,8 +32,8 @@ public class SocketClient : IDisposable
     /// </summary>
     public async Task ConnectAsync()
     {
-        await Client.ConnectAsync(Host, Port);
-        Stream = Client.GetStream();
+        await _client.ConnectAsync(_host, _port);
+        _stream = _client.GetStream();
         IsConnected = true;
     }
 
@@ -48,7 +48,7 @@ public class SocketClient : IDisposable
         }
 
         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(data);
-        await Stream?.WriteAsync(buffer, 0, buffer.Length)!;
+        await _stream?.WriteAsync(buffer, 0, buffer.Length)!;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class SocketClient : IDisposable
         }
 
         byte[] buffer = new byte[bufferSize];
-        int bytesRead = await Stream?.ReadAsync(buffer, 0, buffer.Length)!;
+        int bytesRead = await _stream?.ReadAsync(buffer, 0, buffer.Length)!;
         return System.Text.Encoding.UTF8.GetString(buffer, 0, bytesRead);
     }
 
@@ -73,8 +73,8 @@ public class SocketClient : IDisposable
     {
         if (IsConnected)
         {
-            Stream?.Close();
-            Client.Close();
+            _stream?.Close();
+            _client.Close();
             IsConnected = false;
         }
     }
@@ -85,6 +85,6 @@ public class SocketClient : IDisposable
     public void Dispose()
     {
         Disconnect();
-        Client.Dispose();
+        _client.Dispose();
     }
 }

@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Exceptions;
 /// <summary>
 /// 编译器模式下的异常处理测试 - 错误传播测试
 /// </summary>
-public class ErrorPropagationTests
+public class ErrorPropagationTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ErrorPropagationTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void ErrorPropagatesThroughFunctionCalls_CompilesAndExecutesCorrectly()

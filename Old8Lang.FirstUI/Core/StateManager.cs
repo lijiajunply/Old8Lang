@@ -95,9 +95,9 @@ public class StateManager
 /// 封装状态值并提供响应式更新
 /// </summary>
 /// <typeparam name="T">状态值类型</typeparam>
-public class ObservableState<T>
+public class ObservableState<T>(T initialValue)
 {
-    private T _value;
+    private T _value = initialValue;
     private readonly List<Action<T>> _listeners = [];
 
     public T Value
@@ -111,11 +111,6 @@ public class ObservableState<T>
                 NotifyListeners();
             }
         }
-    }
-
-    public ObservableState(T initialValue)
-    {
-        _value = initialValue;
     }
 
     /// <summary>

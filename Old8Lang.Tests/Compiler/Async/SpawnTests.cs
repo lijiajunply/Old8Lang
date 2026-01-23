@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// 编译器模式下的异步编程功能测试 - spawn 关键字
 /// </summary>
-public class SpawnTests
+public class SpawnTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public SpawnTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicSpawn_CompilesAndExecutesCorrectly()

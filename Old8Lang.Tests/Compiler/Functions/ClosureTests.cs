@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Functions;
 /// <summary>
 /// 编译器模式下的高级函数功能测试 - 闭包
 /// </summary>
-public class ClosureTests
+public class ClosureTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ClosureTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicClosure_CompilesAndExecutesCorrectly()

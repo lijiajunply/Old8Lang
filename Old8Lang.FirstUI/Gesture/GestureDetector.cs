@@ -13,7 +13,7 @@ public class GestureDetector : WidgetBase
     private Point _dragStartPosition;
     private Point _lastPosition;
     private DateTime _pressStartTime;
-    private DateTime _lastTapTime;
+    private DateTime _lastTapTime = DateTime.MinValue;
     private Vector _totalDelta;
     private bool _isDragging;
     private System.Timers.Timer? _longPressTimer;
@@ -77,11 +77,6 @@ public class GestureDetector : WidgetBase
     /// 双击时间间隔阈值（毫秒，默认 300ms）
     /// </summary>
     public double DoubleTapDelay { get; set; } = 300;
-
-    public GestureDetector()
-    {
-        _lastTapTime = DateTime.MinValue;
-    }
 
     public override object Build(BuildContext context)
     {

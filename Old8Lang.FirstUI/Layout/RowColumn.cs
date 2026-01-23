@@ -233,18 +233,12 @@ public class Column : WidgetBase
 /// <summary>
 /// VStack (Column 的别名，类似 SwiftUI)
 /// </summary>
-public class VStack : Column
-{
-    public VStack(List<WidgetBase>? children = null) : base(children) { }
-}
+public class VStack(List<WidgetBase>? children = null) : Column(children);
 
 /// <summary>
 /// HStack (Row 的别名，类似 SwiftUI)
 /// </summary>
-public class HStack : Row
-{
-    public HStack(List<WidgetBase>? children = null) : base(children) { }
-}
+public class HStack(List<WidgetBase>? children = null) : Row(children);
 
 /// <summary>
 /// 主轴对齐方式

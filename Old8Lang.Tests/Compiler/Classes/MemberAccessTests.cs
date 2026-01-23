@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Classes;
 /// <summary>
 /// 编译器模式下的高级类功能测试 - 成员访问
 /// </summary>
-public class MemberAccessTests
+public class MemberAccessTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public MemberAccessTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicFieldAccess_CompilesAndExecutesCorrectly()

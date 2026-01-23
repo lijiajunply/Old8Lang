@@ -1523,14 +1523,9 @@ public partial class VirtualMachine
 /// 虚拟机异常包装类
 /// 用于在C#异常机制中传递Old8Lang的异常对象
 /// </summary>
-public class VmException : Exception
+public class VmException(object? value) : Exception(GetMessage(value))
 {
-    public object? Value { get; }
-
-    public VmException(object? value) : base(GetMessage(value))
-    {
-        Value = value;
-    }
+    public object? Value { get; } = value;
 
     private static string GetMessage(object? value)
     {

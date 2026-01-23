@@ -9,29 +9,18 @@ namespace Old8Lang.LanguageServer.Services;
 /// 成员链分析器 - 负责解析和推断成员访问链的类型
 /// 例如: obj.getB().getC().getValue()
 /// </summary>
-public class MemberChainAnalyzer
+public class MemberChainAnalyzer(
+    List<LangToken> tokens,
+    Dictionary<string, SymbolInfo> symbolTable,
+    Position position)
 {
-    private readonly List<LangToken> _tokens;
-    private readonly Dictionary<string, SymbolInfo> _symbolTable;
-    private readonly Position _position;
-
-    public MemberChainAnalyzer(
-        List<LangToken> tokens,
-        Dictionary<string, SymbolInfo> symbolTable,
-        Position position)
-    {
-        _tokens = tokens;
-        _symbolTable = symbolTable;
-        _position = position;
-    }
-
     /// <summary>
     /// 分析光标位置的成员链并返回最终类型
     /// </summary>
     public SymbolInfo? AnalyzeChain()
     {
-        var line = _position.Line + 1; // LSP 从 0 开始，token 从 1 开始
-        var column = _position.Character + 1;
+        var line = position.Line + 1; // LSP 从 0 开始，token 从 1 开始
+        var column = position.Character + 1;
 
         Console.WriteLine($"[MemberChainAnalyzer] Analyzing chain at Line={line}, Column={column}");
 
@@ -80,20 +69,20 @@ public class MemberChainAnalyzer
     private int FindDotAtPosition(int line, int column)
     {
         Console.WriteLine($"[FindDotAtPosition] Searching for dot before Line={line}, Column={column}");
-        Console.WriteLine($"[FindDotAtPosition] Total tokens: {_tokens.Count}");
+        Console.WriteLine($"[FindDotAtPosition] Total tokens: {tokens.Count}");
 
         // 打印光标附近的 tokens 以便调试
         Console.WriteLine($"[FindDotAtPosition] Tokens around cursor:");
-        for (int j = Math.Max(0, _tokens.Count - 30); j < _tokens.Count; j++)
+        for (int j = Math.Max(0, tokens.Count - 30); j < tokens.Count; j++)
         {
-            var t = _tokens[j];
+            var t = tokens[j];
             Console.WriteLine($"[FindDotAtPosition]   [{j}] '{t.Value}' Type={t.Type} Line={t.Line} Column={t.Column}");
         }
 
         // 从后向前查找，找到光标位置之前或所在位置的最近一个点号
-        for (int i = _tokens.Count - 1; i >= 0; i--)
+        for (int i = tokens.Count - 1; i >= 0; i--)
         {
-            var token = _tokens[i];
+            var token = tokens[i];
 
             // 如果 token 在光标位置之后，跳过
             // 注意：点号占一个字符，光标可能在点号后面（column = token.Column + 1）
@@ -129,12 +118,12 @@ public class MemberChainAnalyzer
         // 向前回溯找到链的起点
         while (currentIndex >= 0)
         {
-            var token = _tokens[currentIndex];
+            var token = tokens[currentIndex];
 
             // 跳过测试标记（$1, $2 等）
             if (token.Type == LangTokenType.Dollar ||
                 (token.Type == LangTokenType.Number && currentIndex > 0 &&
-                 _tokens[currentIndex - 1].Type == LangTokenType.Dollar))
+                 tokens[currentIndex - 1].Type == LangTokenType.Dollar))
             {
                 currentIndex--;
                 continue;
@@ -156,12 +145,12 @@ public class MemberChainAnalyzer
                 int prevIndex = currentIndex;
                 while (prevIndex >= 0)
                 {
-                    var prevToken = _tokens[prevIndex];
+                    var prevToken = tokens[prevIndex];
 
                     // 跳过测试标记
                     if (prevToken.Type == LangTokenType.Dollar ||
                         (prevToken.Type == LangTokenType.Number && prevIndex > 0 &&
-                         _tokens[prevIndex - 1].Type == LangTokenType.Dollar))
+                         tokens[prevIndex - 1].Type == LangTokenType.Dollar))
                     {
                         prevIndex--;
                         continue;
@@ -227,7 +216,7 @@ public class MemberChainAnalyzer
         }
 
         var objectName = firstToken.Value;
-        if (!_symbolTable.TryGetValue(objectName, out var currentSymbol))
+        if (!symbolTable.TryGetValue(objectName, out var currentSymbol))
         {
             Console.WriteLine($"[InferChainType] Symbol '{objectName}' not found in symbol table");
             return null;
@@ -291,7 +280,7 @@ public class MemberChainAnalyzer
                     }
 
                     // 查找返回类型的符号
-                    if (!_symbolTable.TryGetValue(returnType, out currentType))
+                    if (!symbolTable.TryGetValue(returnType, out currentType))
                     {
                         Console.WriteLine($"[InferChainType] Return type '{returnType}' not found in symbol table");
                         return null;
@@ -310,7 +299,7 @@ public class MemberChainAnalyzer
                     }
 
                     // 查找属性类型的符号
-                    if (!_symbolTable.TryGetValue(propertyType, out currentType))
+                    if (!symbolTable.TryGetValue(propertyType, out currentType))
                     {
                         Console.WriteLine($"[InferChainType] Property type '{propertyType}' not found in symbol table");
                         return null;
@@ -373,7 +362,7 @@ public class MemberChainAnalyzer
         else if (symbol.Kind == SymbolKind.Variable && !string.IsNullOrEmpty(symbol.Type))
         {
             // 变量：查找其类型
-            if (_symbolTable.TryGetValue(symbol.Type, out var typeSymbol) &&
+            if (symbolTable.TryGetValue(symbol.Type, out var typeSymbol) &&
                 typeSymbol.Kind == SymbolKind.Class)
             {
                 return typeSymbol;

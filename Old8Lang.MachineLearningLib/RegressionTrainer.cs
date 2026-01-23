@@ -6,15 +6,8 @@ namespace Old8Lang.MachineLearningLib;
 /// <summary>
 /// 回归模型训练器，支持多种回归算法
 /// </summary>
-public class RegressionTrainer
+public class RegressionTrainer(MLContext mlContext)
 {
-    private readonly MLContext _mlContext;
-
-    public RegressionTrainer(MLContext mlContext)
-    {
-        _mlContext = mlContext;
-    }
-
     /// <summary>
     /// 使用 SDCA 训练回归模型
     /// </summary>
@@ -25,7 +18,7 @@ public class RegressionTrainer
     public ITransformer TrainSdca(IDataView trainData, string labelColumn = "Label", params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.Sdca(
+            .Append(mlContext.Regression.Trainers.Sdca(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features"));
 
@@ -44,7 +37,7 @@ public class RegressionTrainer
     public ITransformer TrainFastTree(IDataView trainData, string labelColumn = "Label", int numberOfTrees = 100, int numberOfLeaves = 20, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.FastTree(
+            .Append(mlContext.Regression.Trainers.FastTree(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfTrees: numberOfTrees,
@@ -64,7 +57,7 @@ public class RegressionTrainer
     public ITransformer TrainFastTreeTweedie(IDataView trainData, string labelColumn = "Label", int numberOfTrees = 100, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.FastTreeTweedie(
+            .Append(mlContext.Regression.Trainers.FastTreeTweedie(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfTrees: numberOfTrees));
@@ -84,7 +77,7 @@ public class RegressionTrainer
     public ITransformer TrainLightGbm(IDataView trainData, string labelColumn = "Label", int numberOfIterations = 100, double learningRate = 0.1, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.LightGbm(
+            .Append(mlContext.Regression.Trainers.LightGbm(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 numberOfIterations: numberOfIterations,
@@ -103,7 +96,7 @@ public class RegressionTrainer
     public ITransformer TrainLbfgsPoissonRegression(IDataView trainData, string labelColumn = "Label", params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.LbfgsPoissonRegression(
+            .Append(mlContext.Regression.Trainers.LbfgsPoissonRegression(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features"));
 
@@ -121,7 +114,7 @@ public class RegressionTrainer
     public ITransformer TrainOnlineGradientDescent(IDataView trainData, string labelColumn = "Label", double learningRate = 0.1, params string[] featureColumns)
     {
         var pipeline = CreateFeaturePipeline(featureColumns)
-            .Append(_mlContext.Regression.Trainers.OnlineGradientDescent(
+            .Append(mlContext.Regression.Trainers.OnlineGradientDescent(
                 labelColumnName: labelColumn,
                 featureColumnName: "Features",
                 learningRate: (float)learningRate));
@@ -139,7 +132,7 @@ public class RegressionTrainer
     public RegressionMetrics Evaluate(ITransformer model, IDataView testData, string labelColumn = "Label")
     {
         var predictions = model.Transform(testData);
-        return _mlContext.Regression.Evaluate(predictions, labelColumnName: labelColumn);
+        return mlContext.Regression.Evaluate(predictions, labelColumnName: labelColumn);
     }
 
     /// <summary>
@@ -153,7 +146,7 @@ public class RegressionTrainer
             featureColumns = ["Feature1", "Feature2", "Feature3", "Feature4"];
         }
 
-        return _mlContext.Transforms.Concatenate("Features", featureColumns)
-            .Append(_mlContext.Transforms.NormalizeMinMax("Features"));
+        return mlContext.Transforms.Concatenate("Features", featureColumns)
+            .Append(mlContext.Transforms.NormalizeMinMax("Features"));
     }
 }

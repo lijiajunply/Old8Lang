@@ -7,14 +7,9 @@ namespace Old8Lang.Tests.Compiler.Collections.Advanced;
 /// 编译器模式下的高级集合功能测试 - 扩展范围
 /// 注意：当前 Range 实现在编译器模式下会直接转换为数组，不是专门的 Range 对象
 /// </summary>
-public class ExtendedRangeTests
+public class ExtendedRangeTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ExtendedRangeTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void InclusiveRange_CompilesAndExecutesCorrectly()

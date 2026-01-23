@@ -7,15 +7,8 @@ namespace Old8Lang.CodeGen.Generator;
 /// <summary>
 /// Accept 方法生成器
 /// </summary>
-public class AcceptMethodGenerator
+public class AcceptMethodGenerator(List<AstNodeInfo> nodes)
 {
-    private readonly List<AstNodeInfo> _nodes;
-
-    public AcceptMethodGenerator(List<AstNodeInfo> nodes)
-    {
-        _nodes = nodes;
-    }
-
     /// <summary>
     /// 为所有节点生成 Accept 方法
     /// </summary>
@@ -24,7 +17,7 @@ public class AcceptMethodGenerator
     {
         var result = new Dictionary<string, string>();
 
-        foreach (var node in _nodes)
+        foreach (var node in nodes)
         {
             var code = GenerateForNode(node);
             var fileName = $"{node.ClassName}.Accept.generated.cs";

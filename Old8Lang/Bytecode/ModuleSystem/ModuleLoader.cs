@@ -6,16 +6,9 @@ namespace Old8Lang.Bytecode.ModuleSystem;
 /// <summary>
 /// 模块加载器 - 负责加载和编译模块
 /// </summary>
-public class ModuleLoader
+public class ModuleLoader(string? baseDirectory = null)
 {
-    private readonly ModuleResolver _moduleResolver;
-    private readonly string? _baseDirectory;
-
-    public ModuleLoader(string? baseDirectory = null)
-    {
-        _baseDirectory = baseDirectory;
-        _moduleResolver = new ModuleResolver();
-    }
+    private readonly ModuleResolver _moduleResolver = new();
 
     /// <summary>
     /// 加载模块并编译为字节码
@@ -23,7 +16,7 @@ public class ModuleLoader
     public BytecodeFile LoadModule(string moduleName)
     {
         // 解析模块路径
-        var resolveResult = _moduleResolver.ResolveModule(moduleName, _baseDirectory);
+        var resolveResult = _moduleResolver.ResolveModule(moduleName, baseDirectory);
 
         if (!resolveResult.IsSuccess)
         {
@@ -115,7 +108,7 @@ public class ModuleLoader
     /// </summary>
     public string? ResolveModulePath(string moduleName)
     {
-        var result = _moduleResolver.ResolveModule(moduleName, _baseDirectory);
+        var result = _moduleResolver.ResolveModule(moduleName, baseDirectory);
         return result.IsSuccess ? result.ResolvedPath : null;
     }
 }

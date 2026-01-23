@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Types;
 /// <summary>
 /// 编译器模式下的类型系统测试 - 泛型类型推断
 /// </summary>
-public class GenericTypeInferenceTests
+public class GenericTypeInferenceTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public GenericTypeInferenceTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicGenericInference_CompilesAndExecutesCorrectly()

@@ -7,45 +7,37 @@ namespace Old8Lang.Bytecode.Generators;
 /// 异步生成器执行状态
 /// 保存异步生成器函数的执行上下文，支持暂停和恢复
 /// </summary>
-public class AsyncGeneratorState
+public class AsyncGeneratorState(
+    FunctionMetadata function,
+    object?[]? arguments = null,
+    CancellationToken cancellationToken = default)
 {
     /// <summary>函数元数据</summary>
-    public FunctionMetadata Function { get; }
+    public FunctionMetadata Function { get; } = function;
 
     /// <summary>当前指令指针</summary>
-    public int InstructionPointer { get; set; }
+    public int InstructionPointer { get; set; } = 0;
 
     /// <summary>局部变量</summary>
-    public object?[] Locals { get; set; }
+    public object?[] Locals { get; set; } = new object?[function.LocalCount];
 
     /// <summary>操作数栈</summary>
-    public Stack<LangValueType> Stack { get; set; }
+    public Stack<LangValueType> Stack { get; set; } = new();
 
     /// <summary>生成器状态</summary>
-    public GeneratorStatus Status { get; set; }
+    public GeneratorStatus Status { get; set; } = GeneratorStatus.NotStarted;
 
     /// <summary>当前yield的值</summary>
     public LangValueType? CurrentValue { get; set; }
 
     /// <summary>调用参数（用于首次执行）</summary>
-    public object?[]? Arguments { get; set; }
+    public object?[]? Arguments { get; set; } = arguments;
 
     /// <summary>取消令牌</summary>
-    public CancellationToken CancellationToken { get; set; }
+    public CancellationToken CancellationToken { get; set; } = cancellationToken;
 
     /// <summary>等待中的Task</summary>
     public Task<LangValueType>? PendingTask { get; set; }
-
-    public AsyncGeneratorState(FunctionMetadata function, object?[]? arguments = null, CancellationToken cancellationToken = default)
-    {
-        Function = function;
-        InstructionPointer = 0;
-        Locals = new object?[function.LocalCount];
-        Stack = new Stack<LangValueType>();
-        Status = GeneratorStatus.NotStarted;
-        Arguments = arguments;
-        CancellationToken = cancellationToken;
-    }
 
     /// <summary>
     /// 保存当前执行状态（在yield时调用）

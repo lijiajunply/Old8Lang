@@ -11,21 +11,13 @@ namespace Old8Lang.LanguageServer.Services;
 /// <summary>
 /// 作用域分析器 - 根据光标位置分析可见的符号
 /// </summary>
-public class ScopeAnalyzer
+public class ScopeAnalyzer(
+    BlockStatement ast,
+    Position position,
+    Dictionary<string, SymbolInfo> globalSymbolTable,
+    string uri = "")
 {
-    private readonly BlockStatement _ast;
-    private readonly Position _position;
-    private readonly Dictionary<string, SymbolInfo> _globalSymbolTable;
     private readonly List<SymbolInfo> _visibleSymbols = [];
-    private readonly string _uri;
-
-    public ScopeAnalyzer(BlockStatement ast, Position position, Dictionary<string, SymbolInfo> globalSymbolTable, string uri = "")
-    {
-        _ast = ast;
-        _position = position;
-        _globalSymbolTable = globalSymbolTable;
-        _uri = uri;
-    }
 
     /// <summary>
     /// 获取当前位置可见的所有符号
@@ -35,13 +27,13 @@ public class ScopeAnalyzer
         _visibleSymbols.Clear();
 
         // 1. 添加全局符号（函数、类、全局变量）
-        foreach (var symbol in _globalSymbolTable.Values)
+        foreach (var symbol in globalSymbolTable.Values)
         {
             _visibleSymbols.Add(symbol);
         }
 
         // 2. 查找包含当前位置的作用域并添加局部符号
-        FindLocalSymbols(_ast);
+        FindLocalSymbols(ast);
 
         return _visibleSymbols;
     }
@@ -83,7 +75,7 @@ public class ScopeAnalyzer
         {
             // 检查语句是否在光标位置之前或之上
             var statementLine = statement.Position.Line;
-            var cursorLine = _position.Line + 1; // LSP 从 0 开始，AST 从 1 开始
+            var cursorLine = position.Line + 1; // LSP 从 0 开始，AST 从 1 开始
 
             // 如果语句在光标之后，不可见
             if (statementLine > cursorLine)
@@ -104,7 +96,7 @@ public class ScopeAnalyzer
                     Type = varType,
                     Location = new SourceLocation
                     {
-                        Uri = _uri,
+                        Uri = uri,
                         Line = setStatement.Position.Line - 1,
                         Column = setStatement.Position.Column - 1,
                         EndLine = setStatement.Position.Line - 1,
@@ -137,7 +129,7 @@ public class ScopeAnalyzer
         var funcValue = funcInit.FuncValue;
 
         // 粗略检查：如果光标行号大于函数开始行号，可能在函数内
-        var cursorLine = _position.Line + 1;
+        var cursorLine = position.Line + 1;
         var funcStartLine = funcValue.Position.Line;
 
         if (cursorLine < funcStartLine)
@@ -157,7 +149,7 @@ public class ScopeAnalyzer
                     Type = param.AssumptionType ?? "var",
                     Location = new SourceLocation
                     {
-                        Uri = _uri,
+                        Uri = uri,
                         Line = param.Position.Line - 1,
                         Column = param.Position.Column - 1,
                         EndLine = param.Position.Line - 1,
@@ -183,7 +175,7 @@ public class ScopeAnalyzer
         var funcValue = asyncFuncInit.AsyncFuncValue;
 
         // 粗略检查：如果光标行号大于函数开始行号，可能在函数内
-        var cursorLine = _position.Line + 1;
+        var cursorLine = position.Line + 1;
         var funcStartLine = funcValue.Position.Line;
 
         if (cursorLine < funcStartLine)
@@ -203,7 +195,7 @@ public class ScopeAnalyzer
                     Type = param.AssumptionType ?? "var",
                     Location = new SourceLocation
                     {
-                        Uri = _uri,
+                        Uri = uri,
                         Line = param.Position.Line - 1,
                         Column = param.Position.Column - 1,
                         EndLine = param.Position.Line - 1,
@@ -224,7 +216,7 @@ public class ScopeAnalyzer
     private void FindLocalSymbolsInClass(ClassInit classInit)
     {
         var typeTemplate = classInit.AnyValue;
-        var cursorLine = _position.Line + 1;
+        var cursorLine = position.Line + 1;
 
         // 检查是否在类的某个方法内
         bool isInsideInstanceMethod = false;
@@ -254,7 +246,7 @@ public class ScopeAnalyzer
                                 Type = param.AssumptionType ?? "var",
                                 Location = new SourceLocation
                                 {
-                                    Uri = _uri,
+                                    Uri = uri,
                                     Line = param.Position.Line - 1,
                                     Column = param.Position.Column - 1,
                                     EndLine = param.Position.Line - 1,
@@ -295,7 +287,7 @@ public class ScopeAnalyzer
                                 Type = param.AssumptionType ?? "var",
                                 Location = new SourceLocation
                                 {
-                                    Uri = _uri,
+                                    Uri = uri,
                                     Line = param.Position.Line - 1,
                                     Column = param.Position.Column - 1,
                                     EndLine = param.Position.Line - 1,
@@ -322,7 +314,7 @@ public class ScopeAnalyzer
                 Type = typeTemplate.ClassName,
                 Location = new SourceLocation
                 {
-                    Uri = _uri,
+                    Uri = uri,
                     Line = classInit.Position.Line - 1,
                     Column = classInit.Position.Column - 1,
                     EndLine = classInit.Position.Line - 1,
@@ -353,7 +345,7 @@ public class ScopeAnalyzer
                         Type = "var", // 可以通过分析 fieldExpr 推断类型
                         Location = new SourceLocation
                         {
-                            Uri = _uri,
+                            Uri = uri,
                             Line = classInit.Position.Line - 1,
                             Column = classInit.Position.Column - 1,
                             EndLine = classInit.Position.Line - 1,
@@ -380,7 +372,7 @@ public class ScopeAnalyzer
                     Type = "var",
                     Location = new SourceLocation
                     {
-                        Uri = _uri,
+                        Uri = uri,
                         Line = classInit.Position.Line - 1,
                         Column = classInit.Position.Column - 1,
                         EndLine = classInit.Position.Line - 1,

@@ -14,22 +14,23 @@ namespace Old8Lang.Bytecode.Generators;
 /// 表示一个可以暂停和恢复执行的异步生成器函数
 /// 类似于 C# 的 IAsyncEnumerable&lt;T&gt;
 /// </summary>
-public class BytecodeAsyncGeneratorLangValue : LangValueType, IAsyncEnumerable<LangValueType>, IEnumerator
+public class BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachine vm, SourcePosition position = default)
+    : LangValueType(position), IAsyncEnumerable<LangValueType>, IEnumerator
 {
     /// <summary>异步生成器ID</summary>
-    public int AsyncGeneratorId { get; }
+    public int AsyncGeneratorId { get; } = asyncGeneratorId;
 
     /// <summary>虚拟机引用</summary>
-    private readonly VirtualMachine _vm;
+    private readonly VirtualMachine _vm = vm;
 
     /// <summary>当前值</summary>
     public LangValueType? Current { get; private set; }
 
     /// <summary>异步生成器是否已完成</summary>
-    public bool IsCompleted { get; private set; }
+    public bool IsCompleted { get; private set; } = false;
 
     /// <summary>取消令牌源</summary>
-    private CancellationTokenSource? _cancellationTokenSource;
+    private CancellationTokenSource? _cancellationTokenSource = new();
 
     /// <summary>异步生成器状态</summary>
     public AsyncGeneratorState State { get; private set; } = AsyncGeneratorState.Suspended;
@@ -42,15 +43,6 @@ public class BytecodeAsyncGeneratorLangValue : LangValueType, IAsyncEnumerable<L
         Suspended,  // 已暂停，等待下一个值
         Running,    // 正在执行
         Completed   // 已完成
-    }
-
-    public BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachine vm, SourcePosition position = default)
-        : base(position)
-    {
-        AsyncGeneratorId = asyncGeneratorId;
-        _vm = vm;
-        IsCompleted = false;
-        _cancellationTokenSource = new CancellationTokenSource();
     }
 
     /// <summary>
