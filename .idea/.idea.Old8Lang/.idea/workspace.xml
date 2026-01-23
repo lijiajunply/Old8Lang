@@ -23,40 +23,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Base/CompilerException.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Base/ErrorException.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Class/ClassError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Concurrency/ConcurrencyError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/IO/FileErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/IO/IONetworkError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Import/ImportError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/CommonErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/CustomError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/DataProcessingErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/SystemErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/REFACTORING_SUMMARY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/IndexError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/NameError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/RuntimeError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/ValueErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Semantic/SemanticError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Syntax/SyntaxError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystem/TypeError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystem/TypeSystemError.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Linq.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Linq.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/CallFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/CallFrame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureCaptureAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureCaptureAnalyzer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ClosureValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Disassembler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Debugger/Disassembler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ExceptionTableEntry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/ExceptionTableEntry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ExternFunctionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Interop/ExternFunctionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/GeneratorState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Generators/GeneratorState.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Instruction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/Instruction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/ModuleSystem/ModuleRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/OpCode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/OpCode.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/VMProfiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Profiler/VMProfiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Async.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Exceptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Exceptions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Generators.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Generators.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Helpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Helpers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VMContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/VMContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFieldFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInvokeFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/VMReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/VMReflectionHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/AdditionalErrors.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ClassError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CompilerException.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ConcurrencyError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IONetworkError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/MiscError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/NameError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeSystemError.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -964,7 +968,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="792" />
+    <option name="localTasksCounter" value="794" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -991,8 +995,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 修复虚拟机类型检查中的枚举类型支持问题&#10;&#10;- 在类型检查逻辑中添加了对枚举类型的检查支持&#10;- 修改测试代码中的函数参数类型以匹配正确的枚举类型定义&#10;- 确保枚举类型的类型名称比较功能正常工作" />
-    <MESSAGE value="fix(vm): 修复虚拟机类型检查中的交集和联合类型支持问题&#10;&#10;- 修改交集类型检查逻辑，只在顶层检查&amp;符号而不包括泛型内部&#10;- 修改联合类型检查逻辑，只在顶层检查|符号而不包括泛型内部&#10;- 添加隐式数值转换支持，int可隐式转换为double类型&#10;- 实现ContainsTopLevelChar方法检查顶层指定字符&#10;- 实现SplitTopLevel方法按顶层分隔符分割字符串&#10;- 更新IDE配置文件中的变更列表和任务计数器&#10;- 修正类型检查测试用例中的相关问题" />
     <MESSAGE value="feat(vm): 添加对泛型类型名称的大小写不敏感支持&#10;&#10;- 实现了 list&lt;T&gt;/List&lt;T&gt;、array&lt;T&gt;/Array&lt;T&gt;、dict&lt;K,V&gt;/Dict&lt;K,V&gt; 的大小写不敏感匹配&#10;- 在类型检查前将类型名称转换为小写进行比较&#10;- 更新测试代码中的类型声明从 List&lt;string&gt; 到 list&lt;string&gt;" />
     <MESSAGE value="test(vm): 启用泛型约束和交集类型错误处理测试&#10;&#10;- 移除泛型约束检查测试的跳过标记，启用 TypeErrors_GenericConstraintViolation_ThrowsTypeException 测试&#10;- 移除交集类型错误测试的跳过标记，启用 TypeErrors_IntersectionTypeInvalidMember_ThrowsTypeException 测试&#10;- 为交集类型测试添加完整的测试用例代码，包括类型定义和实例调用逻辑&#10;- 更新IDE配置文件中的变更追踪和任务计数器信息" />
     <MESSAGE value="test(extern): 更新外部函数编译测试中的异常类型断言&#10;&#10;- 添加 Old8Lang.Error 命名空间引用&#10;- 将 NotSupportedException 断言替换为 ImportError 和 InvalidOperationError&#10;- 更新三个测试用例中的异常类型验证逻辑&#10;- 清理 IDE 配置文件中的变更追踪信息&#10;- 更新本地任务计数器和提交消息记录" />
@@ -1016,20 +1018,22 @@
     <MESSAGE value="feat(module): 实现模块中函数的闭包作用域捕获机制&#10;&#10;- 在 UnifiedModule.FromSymbols 方法中添加 captureScope 参数支持&#10;- 为模块中的函数类型符号设置共享的捕获作用域&#10;- 修改 ModuleSystemService 中的模块加载逻辑传递 manager 作为捕获作用域&#10;- 克隆捕获作用域确保所有函数共享同一模块级变量环境&#10;- 更新函数对象创建逻辑直接设置共享作用域而非单独克隆&#10;- 修复 IDEA 工作空间配置文件中的变更列表记录" />
     <MESSAGE value="修改文件路径" />
     <MESSAGE value="refactor(bytecode): 重构字节码模块的命名空间结构&#10;&#10;- 将生成器相关类移动到 Old8Lang.Bytecode.Generators 命名空间&#10;- 将元数据相关类移动到 Old8Lang.Bytecode.Metadata 命名空间&#10;- 将虚拟机相关类移动到 Old8Lang.Bytecode.VM 命名空间&#10;- 更新所有相关的 using 语句以反映新的命名空间结构&#10;- 修改测试文件中的虚拟机引用路径&#10;- 重新组织字节码编译器中的元数据引用&#10;- 统一虚拟机组件的命名空间管理" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(bytecode): 重构字节码模块的命名空间结构&#10;&#10;- 将生成器相关类移动到 Old8Lang.Bytecode.Generators 命名空间&#10;- 将元数据相关类移动到 Old8Lang.Bytecode.Metadata 命名空间&#10;- 将虚拟机相关类移动到 Old8Lang.Bytecode.VM 命名空间&#10;- 更新所有相关的 using 语句以反映新的命名空间结构&#10;- 修改测试文件中的虚拟机引用路径&#10;- 重新组织字节码编译器中的元数据引用&#10;- 统一虚拟机组件的命名空间管理" />
+    <MESSAGE value="refactor(bytecode): 重构字节码模块结构并更新命名空间&#10;&#10;- 将 CallFrame 移至 Core 子目录并更新命名空间&#10;- 将 ClosureCaptureAnalyzer 和 ClosureValue 移至 Closures 子目录&#10;- 将 Disassembler 移至 Debugger 子目录并更新命名空间&#10;- 将 ExceptionTableEntry 移至 Core 子目录并更新命名空间&#10;- 将 ExternFunctionWrapper 移至 Interop 子目录并更新命名空间&#10;- 将 GeneratorState 移至 Generators 子目录并更新命名空间&#10;- 将 Instruction 和 OpCode 移至 Core 子目录并更新命名空间&#10;- 将 VMContext 移至 Core 子目录并更新命名空间&#10;- 在多个文件中添加新的命名空间引用&#10;- 更新 SpawnFunction 中的 VMContext 引用路径" />
+    <MESSAGE value="refactor(compiler): 重构编译器辅助类到Helpers命名空间&#10;&#10;- 将AssertHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将AsyncAwaitRuntimeHelpers类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将CollectionHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 在多个AST和编译器相关类中添加对Old8Lang.Compiler.CodeGeneration的引用&#10;- 更新AssertClassLangValue类的依赖引用以包含新的Helpers命名空间&#10;- 整理相关文件的using语句确保正确的命名空间引用" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(compiler): 重构编译器辅助类到Helpers命名空间&#10;&#10;- 将AssertHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将AsyncAwaitRuntimeHelpers类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将CollectionHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 在多个AST和编译器相关类中添加对Old8Lang.Compiler.CodeGeneration的引用&#10;- 更新AssertClassLangValue类的依赖引用以包含新的Helpers命名空间&#10;- 整理相关文件的using语句确保正确的命名空间引用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs</url>
-          <line>88</line>
+          <line>91</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1463" />
+              <option value="1576" />
             </startOffsets>
             <endOffsets>
-              <option value="1902" />
+              <option value="2015" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="517" />
@@ -1287,26 +1291,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs</url>
-          <line>81</line>
+          <line>82</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="2447" />
+              <option value="2487" />
             </startOffsets>
             <endOffsets>
-              <option value="2484" />
+              <option value="2524" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="634" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs</url>
-          <line>52</line>
+          <line>53</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="1434" />
+              <option value="1474" />
             </startOffsets>
             <endOffsets>
-              <option value="1473" />
+              <option value="1513" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="635" />
