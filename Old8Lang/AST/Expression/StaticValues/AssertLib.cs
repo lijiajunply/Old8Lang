@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Old8LangLib;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// 断言库 - 提供测试断言功能

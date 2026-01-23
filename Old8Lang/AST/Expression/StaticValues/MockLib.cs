@@ -1,4 +1,4 @@
-namespace Old8LangLib;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// Mock 工具库 - 提供测试 Mock 功能
@@ -10,9 +10,9 @@ public static class MockLib
     /// </summary>
     public class MockObject(string name)
     {
-        public string Name { get; set; } = name;
-        private readonly Dictionary<string, List<object?[]>> CallHistory = new();
-        private readonly Dictionary<string, object?> ReturnValues = new();
+        public string Name { get; } = name;
+        private readonly Dictionary<string, List<object?[]>> _callHistory = new();
+        private readonly Dictionary<string, object?> _returnValues = new();
 
         /// <summary>
         /// 记录方法调用
@@ -21,12 +21,13 @@ public static class MockLib
         /// <param name="args">方法参数</param>
         public void RecordCall(string methodName, params object?[] args)
         {
-            if (!CallHistory.ContainsKey(methodName))
+            if (!_callHistory.TryGetValue(methodName, out var value))
             {
-                CallHistory[methodName] = [];
+                value = [];
+                _callHistory[methodName] = value;
             }
 
-            CallHistory[methodName].Add(args);
+            value.Add(args);
         }
 
         /// <summary>
@@ -36,7 +37,7 @@ public static class MockLib
         /// <param name="returnValue">返回值</param>
         public void SetReturnValue(string methodName, object? returnValue)
         {
-            ReturnValues[methodName] = returnValue;
+            _returnValues[methodName] = returnValue;
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ public static class MockLib
         /// <returns>返回值</returns>
         public object? GetReturnValue(string methodName)
         {
-            return ReturnValues.GetValueOrDefault(methodName);
+            return _returnValues.GetValueOrDefault(methodName);
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ public static class MockLib
         /// <returns>调用次数</returns>
         public int GetCallCount(string methodName)
         {
-            return CallHistory.GetValueOrDefault(methodName)?.Count ?? 0;
+            return _callHistory.GetValueOrDefault(methodName)?.Count ?? 0;
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ public static class MockLib
         /// <returns>调用记录列表</returns>
         public List<object?[]> GetCalls(string methodName)
         {
-            return CallHistory.GetValueOrDefault(methodName) ?? [];
+            return _callHistory.GetValueOrDefault(methodName) ?? [];
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ public static class MockLib
         /// </summary>
         public void Reset()
         {
-            CallHistory.Clear();
+            _callHistory.Clear();
         }
 
         /// <summary>
@@ -106,7 +107,7 @@ public static class MockLib
         /// <param name="methodName">方法名称</param>
         public void ResetMethod(string methodName)
         {
-            CallHistory.Remove(methodName);
+            _callHistory.Remove(methodName);
         }
     }
 

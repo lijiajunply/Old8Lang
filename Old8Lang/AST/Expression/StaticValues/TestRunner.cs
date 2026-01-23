@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Old8LangLib;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// 测试运行器 - 提供测试管理和执行功能

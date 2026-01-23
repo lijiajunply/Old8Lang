@@ -23,16 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/AutoComputed.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/DependencyTracker.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/IEffect.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/IReactiveSource.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Ref.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Watch.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/WatchEffect.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/MockLibClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/MockLibClassLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TestRunnerClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TestRunnerClassLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/AssertLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/AssertLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/MockLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/MockLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/TestRunner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TestRunner.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -593,7 +588,7 @@
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
       <workItem from="1768981355686" duration="4292000" />
-      <workItem from="1769204572488" duration="1079000" />
+      <workItem from="1769204572488" duration="1741000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -938,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="806" />
+    <option name="localTasksCounter" value="809" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -965,9 +960,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
-    <MESSAGE value="fix(tests): 修复虚拟机反射测试中的布尔值断言大小写问题&#10;&#10;- 将测试断言中的 &quot;True&quot; 替换为 &quot;true&quot; 以匹配实际输出&#10;- 将测试断言中的 &quot;False&quot; 替换为 &quot;false&quot; 以保持一致性&#10;- 清理 IDEA 工作空间配置文件中的变更历史记录&#10;- 更新本地任务计数器值&#10;- 移除过时的提交消息记录&#10;- 更新最后提交消息为泛型类型约束检查修复内容" />
-    <MESSAGE value="feat(compiler): 实现类字段访问和方法调用功能&#10;&#10;- 添加_class字段跟踪当前类上下文&#10;- 实现IsClassField方法检查类字段是否存在&#10;- 在字节码编译期间保存和恢复类上下文&#10;- 实现类字段的get和set操作指令&#10;- 修复构造函数参数传递和方法调用参数处理&#10;- 改进虚拟机上下文管理以支持嵌套调用&#10;- 修复测试断言中的布尔值大小写问题" />
     <MESSAGE value="feat(vm): 添加混入类型检查支持并清理IDE配置&#10;&#10;- 在虚拟机指令中添加混入类型检查逻辑&#10;- 清理IDEA工作空间中的变更历史记录&#10;- 更新本地任务计数器和最后提交消息记录&#10;- 移除过时的提交消息配置项" />
     <MESSAGE value="feat(vm): 添加嵌套索引赋值和改进虚拟机操作&#10;&#10;- 实现嵌套索引赋值功能，支持 array[i][j] &lt;- value 语法&#10;- 添加 NestedIndexAccess 表达式的字节码生成支持&#10;- 优化 Sleep 函数调用的常量池使用方式&#10;- 增强加法运算对 LangValueType 类型的支持&#10;- 添加属性访问的反射支持，当无参数时优先查找属性&#10;- 更新测试代码中的构造函数命名约定，使用 init 替代 new&#10;- 修正字典创建语法从 {} 为 dict() 并调整生成器属性访问语法" />
     <MESSAGE value="fix(vm): 解决函数在模块导入上下文中的作用域捕获问题&#10;&#10;- 当函数没有捕获作用域且在模块导入上下文中时，自动捕获当前作用域&#10;- 创建带有捕获作用域的函数副本来确保访问模块中导入的符号&#10;- 更新测试代码中的函数名从double改为twice以保持一致性&#10;- 清理IDEA工作空间配置文件中的变更列表记录&#10;- 更新本地任务计数器和最后提交消息记录" />
@@ -990,7 +982,10 @@
     <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
     <MESSAGE value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
     <MESSAGE value="chore(ide): 清理 workspace.xml 中的多余配置&#10;&#10;- 移除 ChangeListManager 中的重复变更记录&#10;- 删除 LangId.cs 文件中的断点偏移量配置&#10;- 删除 VirtualMachine.Instructions.Main.cs 文件中的断点偏移量配置&#10;- 简化断点属性结构以减少文件冗余" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 清理 workspace.xml 中的多余配置&#10;&#10;- 移除 ChangeListManager 中的重复变更记录&#10;- 删除 LangId.cs 文件中的断点偏移量配置&#10;- 删除 VirtualMachine.Instructions.Main.cs 文件中的断点偏移量配置&#10;- 简化断点属性结构以减少文件冗余" />
+    <MESSAGE value="feat(state): 添加Vue风格响应式API实现&#10;&#10;- 实现AutoComputed自动计算属性，支持依赖追踪和懒计算&#10;- 创建DependencyTracker依赖追踪器，使用线程静态栈管理Effect执行上下文&#10;- 添加IEffect和IReactiveSource接口定义副作用和响应式源契约&#10;- 实现Ref响应式引用，支持自动依赖追踪和UI重建触发&#10;- 添加Watch监听器，支持监听响应式源变化并执行回调&#10;- 实现WatchEffect副作用监听器，自动追踪依赖并重新执行&#10;- 扩展FirstUIBinding添加RebuildUI方法用于响应式状态变化触发&#10;- 更新测试应用演示完整的Vue风格响应式API使用场景" />
+    <MESSAGE value="refactor(state): 优化 Ref 类型的值变更处理逻辑&#10;&#10;- 简化了值比较的条件判断逻辑&#10;- 调整了 Trigger 和 OnChanged 的调用顺序，先触发依赖更新再触发 UI 重建&#10;- 移除了冗余的花括号代码块" />
+    <MESSAGE value="feat(core): 实现响应式应用程序构建功能&#10;&#10;- 将 RunApp 方法参数从 WidgetBase 改为 Func&lt;WidgetBase&gt; 以支持动态重建&#10;- 添加旧版 API 兼容方法并标记为过时，提供平滑迁移路径&#10;- 更新 FirstUIAvaloniaApp 构造函数以接收构建函数委托&#10;- 修改 UI 构建逻辑，通过调用构建函数实现响应式更新&#10;- 在测试应用中演示使用 lambda 函数进行动态 UI 重建&#10;- 移除手动创建的响应式文本包装器，直接使用响应式值&#10;- 完善文档注释，明确区分响应式与非响应式 API 的用途" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(core): 实现响应式应用程序构建功能&#10;&#10;- 将 RunApp 方法参数从 WidgetBase 改为 Func&lt;WidgetBase&gt; 以支持动态重建&#10;- 添加旧版 API 兼容方法并标记为过时，提供平滑迁移路径&#10;- 更新 FirstUIAvaloniaApp 构造函数以接收构建函数委托&#10;- 修改 UI 构建逻辑，通过调用构建函数实现响应式更新&#10;- 在测试应用中演示使用 lambda 函数进行动态 UI 重建&#10;- 移除手动创建的响应式文本包装器，直接使用响应式值&#10;- 完善文档注释，明确区分响应式与非响应式 API 的用途" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
