@@ -103,7 +103,7 @@ public class Disassembler
             case OpCode.CallNative:
             case OpCode.CallMethod:
                 // 显示函数名称
-                if (instruction.Operand is object[] args && args.Length >= 2)
+                if (instruction.Operand is object[] { Length: >= 2 } args)
                 {
                     var argCount = args[0];
                     var funcNameIndex = args[1];

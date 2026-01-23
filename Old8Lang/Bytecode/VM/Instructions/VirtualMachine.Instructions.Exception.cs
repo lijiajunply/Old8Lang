@@ -6,6 +6,7 @@ using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
+// ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine

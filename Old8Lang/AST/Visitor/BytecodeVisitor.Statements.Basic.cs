@@ -172,7 +172,7 @@ public partial class BytecodeVisitor
                 // 设置索引
                 Emit(OpCode.SetIndex);
             }
-            else if (leftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
+            else if (leftExpr is Operation { Opera: LangTokenType.Dot } operation)
             {
                 // 成员访问赋值: obj.field <- value 或 super.field <- value
 

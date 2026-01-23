@@ -10,11 +10,11 @@ using ModuleSystem;
 public class BytecodeFile
 {
     // 魔数: "OLD8" (0x4F4C4438)
-    private const uint MAGIC_NUMBER = 0x4F4C4438;
+    private const uint MagicNumber = 0x4F4C4438;
 
     // 文件格式版本
-    private const ushort MAJOR_VERSION = 1;
-    private const ushort MINOR_VERSION = 0;
+    private const ushort MajorVersion = 1;
+    private const ushort MinorVersion = 0;
 
     /// <summary>常量池</summary>
     public ConstantPool ConstantPool { get; set; } = new();
@@ -82,11 +82,11 @@ public class BytecodeFile
     public void WriteTo(BinaryWriter writer)
     {
         // 魔数
-        writer.Write(MAGIC_NUMBER);
+        writer.Write(MagicNumber);
 
         // 版本号
-        writer.Write(MAJOR_VERSION);
-        writer.Write(MINOR_VERSION);
+        writer.Write(MajorVersion);
+        writer.Write(MinorVersion);
 
         // 常量池
         ConstantPool.WriteTo(writer);
@@ -148,7 +148,7 @@ public class BytecodeFile
         }
 
         // 导出符号表（可选）
-        bool hasExports = Exports != null && Exports.Count > 0;
+        bool hasExports = Exports is { Count: > 0 };
         writer.Write(hasExports);
         if (hasExports)
         {
@@ -175,16 +175,16 @@ public class BytecodeFile
     {
         // 验证魔数
         uint magic = reader.ReadUInt32();
-        if (magic != MAGIC_NUMBER)
-            throw new InvalidDataException($"无效的字节码文件格式: 魔数不匹配 (期望: 0x{MAGIC_NUMBER:X}, 实际: 0x{magic:X})");
+        if (magic != MagicNumber)
+            throw new InvalidDataException($"无效的字节码文件格式: 魔数不匹配 (期望: 0x{MagicNumber:X}, 实际: 0x{magic:X})");
 
         // 读取版本号
         ushort majorVersion = reader.ReadUInt16();
         ushort minorVersion = reader.ReadUInt16();
 
-        if (majorVersion != MAJOR_VERSION)
+        if (majorVersion != MajorVersion)
             throw new InvalidDataException(
-                $"不兼容的字节码版本: {majorVersion}.{minorVersion} (当前支持: {MAJOR_VERSION}.{MINOR_VERSION})");
+                $"不兼容的字节码版本: {majorVersion}.{minorVersion} (当前支持: {MajorVersion}.{MinorVersion})");
 
         var bytecodeFile = new BytecodeFile
         {

@@ -29,7 +29,7 @@ public class ModuleDependency(string moduleName)
     {
         if (ImportAll)
             return $"import * from \"{ModuleName}\"";
-        if (ImportedSymbols != null && ImportedSymbols.Count > 0)
+        if (ImportedSymbols is { Count: > 0 })
             return $"import {{ {string.Join(", ", ImportedSymbols)} }} from \"{ModuleName}\"";
         if (ModuleAlias != null)
             return $"import \"{ModuleName}\" as {ModuleAlias}";

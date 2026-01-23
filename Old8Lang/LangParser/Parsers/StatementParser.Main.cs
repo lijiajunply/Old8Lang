@@ -635,7 +635,7 @@ public partial class StatementParser(
                 }
 
                 // 如果是泛型实例化表达式（且是函数调用），允许作为独立语句
-                if (expr is GenericInstanceExpression genericExpr && genericExpr.IsFunctionCall)
+                if (expr is GenericInstanceExpression { IsFunctionCall: true } genericExpr)
                 {
                     return new FuncRunStatement(genericExpr, expr.Position);
                 }

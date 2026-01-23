@@ -344,7 +344,7 @@ public class BytecodeCompiler
 
         // 如果有捕获的变量，声明它们为局部变量
         var capturedVarIndices = new Dictionary<string, int>();
-        if (capturedVars != null && capturedVars.Count > 0)
+        if (capturedVars is { Count: > 0 })
         {
             foreach (var varName in capturedVars)
             {
@@ -354,7 +354,7 @@ public class BytecodeCompiler
         }
 
         // 保存捕获的变量列表到函数元数据
-        if (capturedVars != null && capturedVars.Count > 0)
+        if (capturedVars is { Count: > 0 })
         {
             func.CapturedVariables = new List<string>(capturedVars);
         }
@@ -363,7 +363,7 @@ public class BytecodeCompiler
         var visitor = new BytecodeVisitor(this);
 
         // 如果有捕获的变量，在函数体开始时加载它们的值
-        if (capturedVars != null && capturedVars.Count > 0)
+        if (capturedVars is { Count: > 0 })
         {
             // 需要在函数体之前插入加载指令
             var tempInstructions = new List<Instruction>();
@@ -801,7 +801,7 @@ public class BytecodeCompiler
         {
             // 提取方法参数
             var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
-            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
+            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType).ToList() ?? [];
 
             // 提取默认参数值
             var defaultValues = new List<object?>();
@@ -1065,7 +1065,7 @@ public class BytecodeCompiler
         foreach (var (methodName, funcValue) in methods)
         {
             var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
-            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
+            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType).ToList() ?? [];
             var defaultValues = new List<object?>();
 
             if (funcValue.Ids != null)

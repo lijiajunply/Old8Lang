@@ -180,7 +180,7 @@ public static class Compiler
             if (awaitInfosField != null)
             {
                 var awaitInfos = awaitInfosField.GetValue(generator) as System.Collections.IList;
-                return awaitInfos != null && awaitInfos.Count > 0;
+                return awaitInfos is { Count: > 0 };
             }
 
             return false;

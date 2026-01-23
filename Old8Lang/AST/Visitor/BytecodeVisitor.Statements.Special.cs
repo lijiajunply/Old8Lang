@@ -164,7 +164,7 @@ public partial class BytecodeVisitor
             for (int i = loopStart; i < actualLoopEnd; i++)
             {
                 var instruction = _instructions[i];
-                if (instruction.OpCode == OpCode.Jump && instruction.Operand is int target && target == -1)
+                if (instruction is { OpCode: OpCode.Jump, Operand: -1 })
                 {
                     PatchJump(i, actualLoopEnd);
                 }
@@ -247,9 +247,10 @@ public partial class BytecodeVisitor
         int index = 0;
         foreach (var kvp in enumValues)
         {
-            memberData[index++] = kvp.Key;   // 成员名
+            memberData[index++] = kvp.Key; // 成员名
             memberData[index++] = kvp.Value; // 成员值
         }
+
         var memberDataIndex = _compiler.ConstantPool.AddConstant(memberData);
 
         // 发出 DefineEnum 指令
@@ -267,11 +268,11 @@ public partial class BytecodeVisitor
 
         var dllNameField = nodeType.GetField("_dllName", bindingFlags);
         var dllName = dllNameField?.GetValue(node) as string
-            ?? throw new InvalidOperationException("无法获取 DLL 名称");
+                      ?? throw new InvalidOperationException("无法获取 DLL 名称");
 
         var functionsField = nodeType.GetField("_functions", bindingFlags);
         var functions = functionsField?.GetValue(node) as List<ExternFunctionDeclaration>
-            ?? throw new InvalidOperationException("无法获取函数列表");
+                        ?? throw new InvalidOperationException("无法获取函数列表");
 
         var externTypeField = nodeType.GetField("_externType", bindingFlags);
         var externType = externTypeField != null
@@ -304,10 +305,11 @@ public partial class BytecodeVisitor
             if (funcDecl.FunctionSignature != null)
             {
                 var sig = funcDecl.FunctionSignature.FuncValue;
-                var paramTypes = sig.Ids?.Select(p => p.AssumptionType ?? "object").ToList() ?? [];
+                var paramTypes = sig.Ids?.Select(p => p.AssumptionType).ToList() ?? [];
                 var returnType = sig.Id?.AssumptionType ?? "void";
                 signatureStr = $"{string.Join(",", paramTypes)}:{returnType}";
             }
+
             var signatureIndex = signatureStr != null
                 ? _compiler.ConstantPool.AddConstant(signatureStr)
                 : _compiler.ConstantPool.AddConstant("");
@@ -342,17 +344,8 @@ public partial class BytecodeVisitor
         node.ResourceExpression.Accept(this);
 
         // 2. 将资源存储到局部变量
-        int resourceLocalIndex = -1;
-        if (node.VariableName != null)
-        {
-            // 如果有变量名，使用用户指定的变量名
-            resourceLocalIndex = _compiler.AllocateLocal(node.VariableName);
-        }
-        else
-        {
-            // 如果没有变量名，使用临时变量
-            resourceLocalIndex = _compiler.AllocateLocal("<using_resource>");
-        }
+        var resourceLocalIndex =
+            _compiler.AllocateLocal(node.VariableName ?? "<using_resource>"); // 如果有变量名，使用用户指定的变量名；如果没有变量名，使用临时变量
 
         // 存储资源到局部变量
         Emit(OpCode.StoreLocal, resourceLocalIndex);
@@ -383,7 +376,7 @@ public partial class BytecodeVisitor
         {
             TryStart = tryStart,
             TryEnd = tryEnd,
-            CatchStart = -1,  // 没有 catch 块
+            CatchStart = -1, // 没有 catch 块
             CatchEnd = -1,
             FinallyStart = finallyStart,
             FinallyEnd = finallyEnd,
@@ -469,13 +462,13 @@ public partial class BytecodeVisitor
 
     private void CompileInterfaceDefinition(TypeTemplate typeTemplate)
     {
-        string interfaceName = typeTemplate.ClassName;
+        var interfaceName = typeTemplate.ClassName;
         var methods = new List<string>();
 
         // 提取接口方法签名
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
-            if (memberExpr is FuncLangValue funcValue)
+            if (memberExpr is FuncLangValue)
             {
                 methods.Add(memberId.IdName);
             }
@@ -533,7 +526,7 @@ public partial class BytecodeVisitor
     {
         // 栈顶是目标函数
 
-        if (decorator.Arguments != null && decorator.Arguments.Count > 0)
+        if (decorator.Arguments is { Count: > 0 })
         {
             // 带参数的装饰器：decorator(args...)(targetFunc)
 
@@ -583,11 +576,12 @@ public partial class BytecodeVisitor
         {
             return AccessModifier.Private;
         }
+
         if (modifiers.Contains(AccessModifierType.Protected))
         {
             return AccessModifier.Protected;
         }
+
         return AccessModifier.Public;
     }
-
 }

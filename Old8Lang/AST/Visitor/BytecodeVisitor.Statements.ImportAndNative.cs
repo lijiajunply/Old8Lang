@@ -21,7 +21,7 @@ public partial class BytecodeVisitor
         {
             // import { item1, item2 } from "module"
             var importSpecifiers = node.GetImportSpecifiers();
-            if (importSpecifiers != null && importSpecifiers.Count > 0)
+            if (importSpecifiers is { Count: > 0 })
             {
                 foreach (var specifier in importSpecifiers)
                 {
@@ -37,7 +37,7 @@ public partial class BytecodeVisitor
                     }
                 }
             }
-            else if (importSpecifiers != null && importSpecifiers.Count == 0)
+            else if (importSpecifiers is { Count: 0 })
             {
                 // import * from "module"
                 Emit(OpCode.ImportAll, moduleName);

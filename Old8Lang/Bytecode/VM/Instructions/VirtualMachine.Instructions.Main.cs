@@ -4,6 +4,7 @@ using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 
+// ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
@@ -337,7 +338,7 @@ public partial class VirtualMachine
 
             // 如果函数有泛型类型映射，替换泛型类型参数
             var resolvedType = expectedType;
-            if (function.GenericTypeMapping != null && function.GenericTypeMapping.Count > 0)
+            if (function.GenericTypeMapping is { Count: > 0 })
             {
                 // 检查 GenericTypeMapping 中是否包含泛型类型参数（如 Wrapper<T>）
                 // 这是编译器的一个 bug，会导致类型解析错误
@@ -478,7 +479,7 @@ public partial class VirtualMachine
         var typeParams = new List<string>();
 
         // 添加参数类型
-        if (func.ParameterTypes != null && func.ParameterTypes.Count > 0)
+        if (func.ParameterTypes is { Count: > 0 })
         {
             foreach (var paramType in func.ParameterTypes)
             {

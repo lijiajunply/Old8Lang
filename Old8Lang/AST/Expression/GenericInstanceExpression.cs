@@ -392,7 +392,7 @@ public partial class GenericInstanceExpression : LangExpression
         }
 
         // 处理泛型类型
-        if (parsedType.IsGeneric && parsedType.GenericArguments != null)
+        if (parsedType is { IsGeneric: true, GenericArguments: not null })
         {
             var baseType = typeAnnotationManager.GetTypeFamily().GetType(parsedType.BaseType);
             if (baseType is GenericTypeInfo genericType)

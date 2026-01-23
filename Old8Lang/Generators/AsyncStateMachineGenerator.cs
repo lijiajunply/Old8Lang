@@ -80,13 +80,13 @@ public class AsyncStateMachineGenerator
         }
 
         // 处理赋值语句
-        if (statement is SetStatement setStmt && setStmt.Value is not null)
+        if (statement is SetStatement { Value: not null } setStmt)
         {
             IdentifyAwaitInExpression(setStmt.Value);
             return;
         }
 
-        if (statement is FuncRunStatement funcRunStmt && funcRunStmt.Expression is not null)
+        if (statement is FuncRunStatement { Expression: not null } funcRunStmt)
         {
             IdentifyAwaitInExpression(funcRunStmt.Expression);
             return;
@@ -184,7 +184,7 @@ public class AsyncStateMachineGenerator
         }
 
         // 递归检查函数调用的参数
-        if (expression is FunctionCallExpression funcCall && funcCall.Arguments is not null)
+        if (expression is FunctionCallExpression { Arguments: not null } funcCall)
         {
             foreach (var param in funcCall.Arguments)
             {
@@ -194,13 +194,13 @@ public class AsyncStateMachineGenerator
         }
         
         // 检查 List/Array 字面量
-        if (expression is AST.Expression.Value.ListLangValue listVal && listVal.Values != null)
+        if (expression is AST.Expression.Value.ListLangValue { Values: not null } listVal)
         {
              foreach (var val in listVal.Values) IdentifyAwaitInExpression(val);
              return;
         }
         
-        if (expression is AST.Expression.Value.ArrayLangValue arrayVal && arrayVal.Values != null)
+        if (expression is AST.Expression.Value.ArrayLangValue { Values: not null } arrayVal)
         {
              foreach (var val in arrayVal.Values) IdentifyAwaitInExpression(val);
              return;

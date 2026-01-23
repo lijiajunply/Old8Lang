@@ -18,7 +18,7 @@ public partial class BytecodeVisitor
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
 
         // 检查是否是泛型函数
-        if (funcValue.GenericParameters != null && funcValue.GenericParameters.Count > 0)
+        if (funcValue.GenericParameters is { Count: > 0 })
         {
             // 泛型函数：注册到泛型函数缓存，不立即编译
             _compiler.RegisterGenericFunction(funcName, funcValue);
@@ -71,7 +71,7 @@ public partial class BytecodeVisitor
         var functionMetadata = _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, null, returnType);
 
         // 检查是否有装饰器
-        if (funcValue.Decorators != null && funcValue.Decorators.Count > 0)
+        if (funcValue.Decorators is { Count: > 0 })
         {
             // 应用装饰器
             ApplyDecorators(funcName, funcValue.Decorators);
@@ -108,7 +108,7 @@ public partial class BytecodeVisitor
         ProcessNestedClasses(typeTemplate);
 
         // 检查是否是泛型类
-        if (typeTemplate.GenericParameters != null && typeTemplate.GenericParameters.Count > 0)
+        if (typeTemplate.GenericParameters is { Count: > 0 })
         {
             // 泛型类：注册到泛型类缓存，不立即编译
             _compiler.RegisterGenericClass(className, typeTemplate);

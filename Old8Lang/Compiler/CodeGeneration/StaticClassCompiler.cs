@@ -276,8 +276,7 @@ public static class StaticClassCompiler
         var continueWithMethod = typeof(Task)
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .FirstOrDefault(m =>
-                m.Name == "ContinueWith" &&
-                m.IsGenericMethodDefinition &&
+                m is { Name: "ContinueWith", IsGenericMethodDefinition: true } &&
                 m.GetParameters().Length == 1 &&
                 m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
 
@@ -356,10 +355,9 @@ public static class StaticClassCompiler
             // 调用 Task.Run<object>(Func<object>)
             var runMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m.Name == "Run" &&
-                           m.IsGenericMethodDefinition &&
-                           m.GetParameters().Length == 1 &&
-                           m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<>));
+                .First(m => m is { Name: "Run", IsGenericMethodDefinition: true } &&
+                            m.GetParameters().Length == 1 &&
+                            m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<>));
             runMethod = runMethod.MakeGenericMethod(typeof(object));
             ilGenerator.Emit(OpCodes.Call, runMethod);
             return true;
@@ -369,18 +367,16 @@ public static class StaticClassCompiler
             // 调用 Task.Run(Action)，然后转换为 Task<object>
             var runMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m.Name == "Run" &&
-                           !m.IsGenericMethodDefinition &&
-                           m.GetParameters().Length == 1 &&
-                           m.GetParameters()[0].ParameterType == typeof(Action));
+                .First(m => m is { Name: "Run", IsGenericMethodDefinition: false } &&
+                            m.GetParameters().Length == 1 &&
+                            m.GetParameters()[0].ParameterType == typeof(Action));
             ilGenerator.Emit(OpCodes.Call, runMethod);
 
             // 将 Task 转换为 Task<object>，使用 ContinueWith
             var continueWithMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m =>
-                    m.Name == "ContinueWith" &&
-                    m.IsGenericMethodDefinition &&
+                    m is { Name: "ContinueWith", IsGenericMethodDefinition: true } &&
                     m.GetParameters().Length == 1 &&
                     m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
 

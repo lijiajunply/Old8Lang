@@ -1,5 +1,6 @@
 using Old8Lang.Bytecode.Core;
 
+// ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine

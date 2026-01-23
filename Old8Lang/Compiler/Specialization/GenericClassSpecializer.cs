@@ -86,7 +86,7 @@ public static class GenericClassSpecializer
                 parentTemplate = pTemp;
             }
             // 2. 如果是泛型类模板，需要特化
-            if (parentTemplate != null && parentTemplate.IsGeneric)
+            if (parentTemplate is { IsGeneric: true })
             {
                 // 构建父类的类型参数映射
                 var parentTypeArgs = new Dictionary<string, Type>();
@@ -101,16 +101,9 @@ public static class GenericClassSpecializer
 
                         // 解析 argName
                         // 优先从当前类的 typeArguments 查找（T -> int）
-                        Type resolvedType;
-                        if (typeArguments.TryGetValue(argName, out var t))
-                        {
-                            resolvedType = t;
-                        }
-                        else
-                        {
+                        var resolvedType = typeArguments.TryGetValue(argName, out var t) ? t :
                             // 尝试作为具体类型解析
-                            resolvedType = resolver.ResolveType(argName) ?? typeof(object);
-                        }
+                            resolver.ResolveType(argName);
 
                         parentTypeArgs[paramName] = resolvedType;
                     }
@@ -147,9 +140,9 @@ public static class GenericClassSpecializer
         var specializedType = typeBuilder.CreateType();
 
         // 更新缓存为最终类型
-        local.GenericClassSpecializations[specializationKey] = specializedType!;
+        local.GenericClassSpecializations[specializationKey] = specializedType;
 
-        return specializedType!;
+        return specializedType;
     }
 
     /// <summary>
@@ -199,7 +192,7 @@ public static class GenericClassSpecializer
     {
         if (!string.IsNullOrEmpty(memberId.AssumptionType))
         {
-            return resolver.ResolveType(memberId.AssumptionType) ?? typeof(object);
+            return resolver.ResolveType(memberId.AssumptionType);
         }
         return typeof(object);
     }
@@ -314,10 +307,7 @@ public static class GenericClassSpecializer
             var parentFields = typeBuilder.BaseType.GetFields(flags);
             foreach (var field in parentFields)
             {
-                 if (!methodLocal.FieldVar.ContainsKey(field.Name))
-                 {
-                     methodLocal.FieldVar[field.Name] = field;
-                 }
+                methodLocal.FieldVar.TryAdd(field.Name, field);
             }
         }
 

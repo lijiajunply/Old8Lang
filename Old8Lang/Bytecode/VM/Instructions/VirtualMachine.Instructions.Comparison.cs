@@ -1,68 +1,62 @@
 using Old8Lang.Bytecode.Core;
 
+// ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {
     /// <summary>
-    /// 执行算术运算指令
+    /// 执行比较运算指令
     /// </summary>
-    private void ExecuteArithmeticOperation(Instruction instruction, CallFrame frame)
+    private void ExecuteComparisonOperation(Instruction instruction, CallFrame frame)
     {
         switch (instruction.OpCode)
         {
-            case OpCode.Add:
+            case OpCode.Equal:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Add(a, b));
+                _stack.Push(Equals(a, b));
             }
                 break;
 
-            case OpCode.Sub:
+            case OpCode.NotEqual:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Sub(a, b));
+                _stack.Push(!Equals(a, b));
             }
                 break;
 
-            case OpCode.Mul:
+            case OpCode.Greater:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Mul(a, b));
+                _stack.Push(Greater(a, b));
             }
                 break;
 
-            case OpCode.Div:
+            case OpCode.Less:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Div(a, b));
+                _stack.Push(Less(a, b));
             }
                 break;
 
-            case OpCode.Mod:
+            case OpCode.GreaterEqual:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Mod(a, b));
+                _stack.Push(GreaterEqual(a, b));
             }
                 break;
 
-            case OpCode.Pow:
+            case OpCode.LessEqual:
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Pow(a, b));
-            }
-                break;
-
-            case OpCode.Neg:
-            {
-                var a = _stack.Pop();
-                _stack.Push(Neg(a));
+                _stack.Push(LessEqual(a, b));
             }
                 break;
 
