@@ -59,7 +59,7 @@ public static class Apis
             return [];
         if (a.Count == 0)
             return [];
-        return a[0] is null ? [] : [.. a.Select(x => x.GetValue())];
+        return a[0] == null! ? [] : [.. a.Select(x => x.GetValue())];
     }
 
     #endregion

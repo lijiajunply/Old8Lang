@@ -23,7 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.trae/documents/虚拟机模式测试补充计划.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -929,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="804" />
+    <option name="localTasksCounter" value="805" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 实现泛型类型参数映射和类型解析功能&#10;&#10;- 在 FunctionMetadata 和 ClassMetadata 中添加 GenericTypeMapping 属性&#10;- 实现泛型类型参数的序列化和反序列化功能&#10;- 添加 ResolveGenericType 方法支持泛型类型参数替换&#10;- 支持可空类型、泛型类型、联合类型和交叉类型的泛型解析&#10;- 在虚拟机指令中集成泛型类型映射和类型检查功能&#10;- 修复类型匹配比较中忽略可空标记的问题" />
     <MESSAGE value="fix(vm): 解决泛型类型映射中的嵌套泛型参数解析错误&#10;&#10;- 添加检查逻辑跳过包含嵌套泛型类型参数的GenericTypeMapping&#10;- 在类型检查中增加DictionaryLangValue作为dict类型的判断条件&#10;- 扩展ResolveGenericType方法支持特化类型格式如Wrapper$T的解析&#10;- 实现SplitSpecializedTypeArgs方法处理下划线分隔的特化类型参数&#10;- 修复编译器bug导致的泛型类型解析错误问题&#10;- 添加临时变通方案避免不正确的GenericTypeMapping影响类型检查" />
     <MESSAGE value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
     <MESSAGE value="fix(tests): 修复虚拟机反射测试中的布尔值断言大小写问题&#10;&#10;- 将测试断言中的 &quot;True&quot; 替换为 &quot;true&quot; 以匹配实际输出&#10;- 将测试断言中的 &quot;False&quot; 替换为 &quot;false&quot; 以保持一致性&#10;- 清理 IDEA 工作空间配置文件中的变更历史记录&#10;- 更新本地任务计数器值&#10;- 移除过时的提交消息记录&#10;- 更新最后提交消息为泛型类型约束检查修复内容" />
@@ -981,7 +980,8 @@
     <MESSAGE value="feat(bytecode): 添加字节码访问器的语句处理功能&#10;&#10;- 实现异步和生成器语句的字节码生成，包括YieldStatement和AsyncFuncInit&#10;- 添加基础语句处理，支持块语句、变量赋值、类型检查和元组解构赋值&#10;- 实现控制流语句的字节码生成，包括if、while、for循环和break/continue语句&#10;- 添加函数和类定义的字节码编译功能，支持泛型函数和类的注册&#10;- 实现异常处理语句的完整字节码生成，包括try-catch-finally和throw语句&#10;- 添加导入语句和原生绑定的字节码指令生成，支持模块加载和原生库导入" />
     <MESSAGE value="refactor(ast): 重构函数值类型实现并清理导入语句&#10;&#10;- 将FuncLangValue类拆分为多个部分文件以改善代码组织结构&#10;- 从各个Statement相关文件中移除不必要的using语句&#10;- 将函数值类型的IL编译逻辑分离到独立的Compiler部分文件中&#10;- 优化函数类型的字节码生成和类型推断机制&#10;- 改进Lambda表达式和普通函数的编译处理流程&#10;- 移除冗余的导入语句以减少命名空间依赖" />
     <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
+    <MESSAGE value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
