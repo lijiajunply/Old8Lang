@@ -8,8 +8,8 @@ namespace Old8Lang.FirstUI.State;
 /// </summary>
 public static class GlobalStateManager
 {
-    private static readonly ConcurrentDictionary<string, IState> _globalStates = new();
-    private static readonly object _lock = new();
+    private static readonly ConcurrentDictionary<string, IState> GlobalStates = new();
+    private static readonly Lock Lock = new();
 
     /// <summary>
     /// 注册全局状态
@@ -20,9 +20,9 @@ public static class GlobalStateManager
     /// <returns>全局状态实例</returns>
     public static GlobalState<T> Register<T>(string key, T? initialValue = default)
     {
-        lock (_lock)
+        lock (Lock)
         {
-            if (_globalStates.TryGetValue(key, out var existingState))
+            if (GlobalStates.TryGetValue(key, out var existingState))
             {
                 if (existingState is GlobalState<T> typedState)
                 {
@@ -32,7 +32,7 @@ public static class GlobalStateManager
             }
 
             var state = new GlobalState<T>(key, initialValue);
-            _globalStates[key] = state;
+            GlobalStates[key] = state;
             return state;
         }
     }
@@ -45,7 +45,7 @@ public static class GlobalStateManager
     /// <returns>全局状态实例，如果不存在则返回 null</returns>
     public static GlobalState<T>? Get<T>(string key)
     {
-        if (_globalStates.TryGetValue(key, out var state) && state is GlobalState<T> typedState)
+        if (GlobalStates.TryGetValue(key, out var state) && state is GlobalState<T> typedState)
         {
             return typedState;
         }
@@ -71,7 +71,7 @@ public static class GlobalStateManager
     /// <returns>是否成功移除</returns>
     public static bool Remove(string key)
     {
-        return _globalStates.TryRemove(key, out _);
+        return GlobalStates.TryRemove(key, out _);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public static class GlobalStateManager
     /// </summary>
     public static void Clear()
     {
-        _globalStates.Clear();
+        GlobalStates.Clear();
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public static class GlobalStateManager
     /// </summary>
     public static bool Contains(string key)
     {
-        return _globalStates.ContainsKey(key);
+        return GlobalStates.ContainsKey(key);
     }
 
     /// <summary>
@@ -95,13 +95,13 @@ public static class GlobalStateManager
     /// </summary>
     public static IEnumerable<string> GetAllKeys()
     {
-        return _globalStates.Keys;
+        return GlobalStates.Keys;
     }
 
     /// <summary>
     /// 获取全局状态数量
     /// </summary>
-    public static int Count => _globalStates.Count;
+    public static int Count => GlobalStates.Count;
 }
 
 /// <summary>

@@ -10,7 +10,7 @@ public class Computed<T> : ObservableState<T>
     private readonly Func<T?> _computeFunction;
     private readonly List<IState> _dependencies = [];
     private readonly List<Action> _unsubscribers = [];
-    private bool _isComputing = false;
+    private bool _isComputing;
 
     /// <summary>
     /// 构造函数

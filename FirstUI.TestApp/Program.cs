@@ -2,16 +2,18 @@
 
 using Old8Lang.FirstUI;
 using Old8Lang.FirstUI.Basic;
+using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Layout;
 
 var app = FirstUIBinding.CreateApp();
 int counter = 0;
+var c = new ObservableState<int>(counter);
 app.Run(new Column([
     new Text("计数器应用")
         .SetFontSize(28)
         .SetFontWeight("bold")
         .SetColor("#000000"),
-    new Text(content: counter.ToString())
+    new Text(content: c.Value.ToString())
         .SetFontSize(72)
         .SetFontWeight("bold")
         .SetColor("#007AFF")
@@ -22,7 +24,7 @@ app.Run(new Column([
             // 减少按钮
             new Button(
                 label: "➖ 减少",
-                onClick: () => { counter -= 1; }
+                onClick: () => { c.Value -= 1; }
             ),
 
             // 重置按钮
@@ -38,7 +40,7 @@ app.Run(new Column([
             // 增加按钮
             new Button(
                 label: "➕ 增加",
-                onClick: () => { counter += 1; }
+                onClick: () => { c.Value += 1; }
             ).SetMargin(20, 0, 0, 0)
         ]
     ).SetSpacing(20),
