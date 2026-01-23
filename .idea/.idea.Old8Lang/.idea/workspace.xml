@@ -22,7 +22,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/AutoComputed.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/DependencyTracker.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/IEffect.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Core/IReactiveSource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Ref.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/Watch.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Reactive/WatchEffect.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,7 +74,6 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -583,6 +593,7 @@
       <workItem from="1768843331971" duration="9622000" />
       <workItem from="1768855807020" duration="2444000" />
       <workItem from="1768981355686" duration="4292000" />
+      <workItem from="1769204572488" duration="1079000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +938,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="805" />
+    <option name="localTasksCounter" value="806" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +965,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 解决泛型类型映射中的嵌套泛型参数解析错误&#10;&#10;- 添加检查逻辑跳过包含嵌套泛型类型参数的GenericTypeMapping&#10;- 在类型检查中增加DictionaryLangValue作为dict类型的判断条件&#10;- 扩展ResolveGenericType方法支持特化类型格式如Wrapper$T的解析&#10;- 实现SplitSpecializedTypeArgs方法处理下划线分隔的特化类型参数&#10;- 修复编译器bug导致的泛型类型解析错误问题&#10;- 添加临时变通方案避免不正确的GenericTypeMapping影响类型检查" />
     <MESSAGE value="fix(generics): 解决泛型类型约束检查和解析错误&#10;&#10;- 在BytecodeVisitor中实现基本类型约束检查，添加类型名称规范化功能&#10;- 修复ClassParser和FunctionParser中泛型参数名称收集逻辑，正确跳过约束部分&#10;- 更新类型转换函数中布尔值转换逻辑，字符串转布尔值时抛出明确异常&#10;- 改进虚拟机错误处理测试，捕获编译时异常作为有效类型错误&#10;- 修复IDEA工作区配置文件中的变更列表和任务计数器更新" />
     <MESSAGE value="fix(tests): 修复虚拟机反射测试中的布尔值断言大小写问题&#10;&#10;- 将测试断言中的 &quot;True&quot; 替换为 &quot;true&quot; 以匹配实际输出&#10;- 将测试断言中的 &quot;False&quot; 替换为 &quot;false&quot; 以保持一致性&#10;- 清理 IDEA 工作空间配置文件中的变更历史记录&#10;- 更新本地任务计数器值&#10;- 移除过时的提交消息记录&#10;- 更新最后提交消息为泛型类型约束检查修复内容" />
     <MESSAGE value="feat(compiler): 实现类字段访问和方法调用功能&#10;&#10;- 添加_class字段跟踪当前类上下文&#10;- 实现IsClassField方法检查类字段是否存在&#10;- 在字节码编译期间保存和恢复类上下文&#10;- 实现类字段的get和set操作指令&#10;- 修复构造函数参数传递和方法调用参数处理&#10;- 改进虚拟机上下文管理以支持嵌套调用&#10;- 修复测试断言中的布尔值大小写问题" />
@@ -979,7 +989,8 @@
     <MESSAGE value="refactor(ast): 重构函数值类型实现并清理导入语句&#10;&#10;- 将FuncLangValue类拆分为多个部分文件以改善代码组织结构&#10;- 从各个Statement相关文件中移除不必要的using语句&#10;- 将函数值类型的IL编译逻辑分离到独立的Compiler部分文件中&#10;- 优化函数类型的字节码生成和类型推断机制&#10;- 改进Lambda表达式和普通函数的编译处理流程&#10;- 移除冗余的导入语句以减少命名空间依赖" />
     <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
     <MESSAGE value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
+    <MESSAGE value="chore(ide): 清理 workspace.xml 中的多余配置&#10;&#10;- 移除 ChangeListManager 中的重复变更记录&#10;- 删除 LangId.cs 文件中的断点偏移量配置&#10;- 删除 VirtualMachine.Instructions.Main.cs 文件中的断点偏移量配置&#10;- 简化断点属性结构以减少文件冗余" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(ide): 清理 workspace.xml 中的多余配置&#10;&#10;- 移除 ChangeListManager 中的重复变更记录&#10;- 删除 LangId.cs 文件中的断点偏移量配置&#10;- 删除 VirtualMachine.Instructions.Main.cs 文件中的断点偏移量配置&#10;- 简化断点属性结构以减少文件冗余" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

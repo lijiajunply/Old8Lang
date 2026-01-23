@@ -144,6 +144,14 @@ public static class FirstUIBinding
     }
 
     /// <summary>
+    /// 重建 UI（用于响应式状态变化时触发）
+    /// </summary>
+    public static void RebuildUI()
+    {
+        FirstUIAvaloniaApp.Instance?.RebuildUI();
+    }
+
+    /// <summary>
     /// 包装 Old8Lang 回调为 GestureEventData 回调
     /// </summary>
     public static Action<GestureEventData> WrapGestureCallback(object callback)
