@@ -2310,23 +2310,31 @@ public partial class VirtualMachine
                     // 使用反射获取字段或属性（用于内置类型）
                     var objType = obj.GetType();
 
-                    // 先尝试获取属性
-                    var property = objType.GetProperty(fieldName);
-                    if (property != null)
+                    // 特殊处理：Old8Exception 的 Message 属性返回 OriginalMessage
+                    if (obj is Old8Exception old8Ex && fieldName == "Message")
                     {
-                        _stack.Push(property.GetValue(obj));
+                        _stack.Push(old8Ex.OriginalMessage);
                     }
                     else
                     {
-                        // 再尝试获取字段
-                        var field = objType.GetField(fieldName);
-                        if (field != null)
+                        // 先尝试获取属性
+                        var property = objType.GetProperty(fieldName);
+                        if (property != null)
                         {
-                            _stack.Push(field.GetValue(obj));
+                            _stack.Push(property.GetValue(obj));
                         }
                         else
                         {
-                            throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
+                            // 再尝试获取字段
+                            var field = objType.GetField(fieldName);
+                            if (field != null)
+                            {
+                                _stack.Push(field.GetValue(obj));
+                            }
+                            else
+                            {
+                                throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
+                            }
                         }
                     }
                 }

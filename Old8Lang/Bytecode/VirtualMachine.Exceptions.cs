@@ -55,13 +55,27 @@ public partial class VirtualMachine
         int exceptionIP = frame.IP - 1;
 
         // 遍历异常表，查找匹配的处理器（从内到外）
+        bool finallyExecuted = false;
         foreach (var entry in function.ExceptionTable)
         {
-            // 检查异常是否发生在这个try块中
-            if (entry.IsInTryBlock(exceptionIP))
+            // 检查异常是否发生在这个try块或catch块中
+            bool inTryBlock = entry.IsInTryBlock(exceptionIP);
+            bool inCatchBlock = entry.IsInCatchBlock(exceptionIP);
+
+            if (inTryBlock || inCatchBlock)
             {
-                // 检查异常类型是否匹配
-                if (IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
+                // 如果异常发生在catch块中，且有finally块，先执行finally块
+                if (inCatchBlock && entry.FinallyStart >= 0)
+                {
+                    // 执行finally块
+                    ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
+                    finallyExecuted = true;
+                    // finally块执行完后，继续查找外层的异常处理器
+                    continue;
+                }
+
+                // 如果异常发生在try块中，检查异常类型是否匹配
+                if (inTryBlock && IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
                 {
                     // 如果有catch块，跳转到catch块
                     if (entry.CatchStart >= 0)
@@ -71,11 +85,12 @@ public partial class VirtualMachine
                         frame.IP = entry.CatchStart;
                         return true;
                     }
-                    // 如果没有catch块但有finally块（如using语句），执行finally块后重新抛出异常
+                    // 如果没有catch块但有finally块（如using语句或try-finally），执行finally块后重新抛出异常
                     else if (entry.FinallyStart >= 0)
                     {
                         // 执行finally块
                         ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
+                        finallyExecuted = true;
 
                         // finally块执行完后，继续查找外层的异常处理器
                         // 不返回true，让异常继续向外传播
@@ -85,7 +100,8 @@ public partial class VirtualMachine
             }
         }
 
-        // 没有找到匹配的处理器
+        // 如果执行了finally块但没有找到catch块，返回false让异常继续传播
+        // 如果没有找到任何匹配的处理器，也返回false
         return false;
     }
 
