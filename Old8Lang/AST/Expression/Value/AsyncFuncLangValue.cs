@@ -21,7 +21,12 @@ public class AsyncFuncLangValue : ImportInfo
     internal readonly BlockStatement BlockStatement;
 
     // 闭包环境：捕获的作用域
-    public VariateManager? CapturedScope { get; private init; }
+    public VariateManager? CapturedScope { get; internal init; }
+
+    /// <summary>
+    /// 获取捕获的作用域（用于模块导入等场景）
+    /// </summary>
+    internal VariateManager? GetCapturedScope() => CapturedScope;
 
     // 默认参数值缓存
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }

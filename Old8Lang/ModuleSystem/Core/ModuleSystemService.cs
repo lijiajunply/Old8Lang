@@ -7,6 +7,9 @@ using Old8Lang.AST.Statement;
 using Old8Lang.StandardLibrary;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.ModuleObjects;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.AnyValues;
 
 namespace Old8Lang.ModuleSystem.Core;
 
@@ -199,12 +202,25 @@ public class ModuleSystemService
                         _symbolExtractor.WrapConstantsAsImportInfo(manager, newImportInfos);
                     }
 
+                    // 更新函数的 CapturedScope，确保它们包含模块中定义的所有变量
+                    // 这是因为函数定义（FuncInit）在 BlockStatement 中被提升到 ImportStatements，
+                    // 导致函数定义时捕获的作用域不包含后来定义的变量
+                    UpdateFunctionCapturedScopes(newImportInfos, manager);
+
                     // 提取符号 - 使用限定范围的 ImportInfos
                     var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                    var symbols = options.ImportSpecifiers is not null && options.ImportSpecifiers.Count > 0
-                        ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName,
-                            newImportInfos)
-                        : _symbolExtractor.ExtractSymbols(manager);
+                    Dictionary<string, LangValueType> symbols;
+                    if (options.ImportSpecifiers is not null && options.ImportSpecifiers.Count > 0)
+                    {
+                        // 命名导入：从 newImportInfos 中提取指定的符号
+                        symbols = _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName,
+                            newImportInfos);
+                    }
+                    else
+                    {
+                        // 通配符导入：只从 newImportInfos 中提取符号
+                        symbols = ExtractSymbolsFromNewImportInfos(newImportInfos, manager);
+                    }
 
                     result.ExtractedSymbols = symbols;
 
@@ -289,6 +305,157 @@ public class ModuleSystemService
     /// 获取符号注册器
     /// </summary>
     public SymbolRegistry SymbolRegistry => _symbolRegistry;
+
+    /// <summary>
+    /// 更新函数的 CapturedScope，确保它们包含模块中定义的所有变量
+    /// </summary>
+    /// <param name="importInfos">新增的 ImportInfo 列表</param>
+    /// <param name="manager">当前的变量管理器（包含模块执行后的完整作用域）</param>
+    private static void UpdateFunctionCapturedScopes(List<ImportInfo> importInfos, VariateManager manager)
+    {
+        // 创建一个映射，用于跟踪需要更新的函数
+        var updatedFunctions = new Dictionary<string, ImportInfo>();
+
+        // 遍历所有新增的 ImportInfo
+        for (int i = 0; i < importInfos.Count; i++)
+        {
+            var importInfo = importInfos[i];
+
+            // 只处理 FuncLangValue
+            if (importInfo is FuncLangValue func && func.GetCapturedScope() is not null)
+            {
+                // 创建新的函数副本，使用当前的完整作用域
+                var updatedFunc = new FuncLangValue(
+                    func.Id,
+                    func.Ids ?? [],
+                    func.BlockStatement,
+                    func.GenericParameters,
+                    func.Position,
+                    func.Id is null) // IsLambda
+                {
+                    CapturedScope = manager.Clone(),
+                    DocComment = func.DocComment,
+                    Decorators = func.Decorators,
+                    TypeArgumentMapping = func.TypeArgumentMapping
+                };
+
+                // 替换列表中的函数
+                importInfos[i] = updatedFunc;
+
+                // 记录需要更新的函数
+                if (func.Id?.IdName is not null)
+                {
+                    updatedFunctions[func.Id.IdName] = updatedFunc;
+                }
+            }
+            // 同样处理 AsyncFuncLangValue
+            else if (importInfo is AsyncFuncLangValue asyncFunc && asyncFunc.GetCapturedScope() is not null)
+            {
+                // 创建新的异步函数副本，使用当前的完整作用域
+                var updatedAsyncFunc = new AsyncFuncLangValue(
+                    asyncFunc.Id,
+                    asyncFunc.Ids ?? [],
+                    asyncFunc.BlockStatement,
+                    asyncFunc.Position)
+                {
+                    CapturedScope = manager.Clone(),
+                    DocComment = asyncFunc.DocComment,
+                    Decorators = asyncFunc.Decorators
+                };
+
+                // 替换列表中的函数
+                importInfos[i] = updatedAsyncFunc;
+
+                // 记录需要更新的函数
+                if (asyncFunc.Id?.IdName is not null)
+                {
+                    updatedFunctions[asyncFunc.Id.IdName] = updatedAsyncFunc;
+                }
+            }
+        }
+
+        // 更新 manager.ImportInfos 中对应的函数
+        if (updatedFunctions.Count > 0)
+        {
+            var importInfosList = manager.ImportInfos.ToList();
+            bool hasChanges = false;
+
+            for (int i = 0; i < importInfosList.Count; i++)
+            {
+                var info = importInfosList[i];
+                string? funcName = info switch
+                {
+                    FuncLangValue f => f.Id?.IdName,
+                    AsyncFuncLangValue af => af.Id?.IdName,
+                    _ => null
+                };
+
+                if (funcName is not null && updatedFunctions.TryGetValue(funcName, out var updatedFunc))
+                {
+                    importInfosList[i] = updatedFunc;
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                manager.ClearImportInfos();
+                manager.AddImportInfoRange(importInfosList);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 从新增的 ImportInfo 列表中提取符号（用于通配符导入）
+    /// </summary>
+    /// <param name="newImportInfos">新增的 ImportInfo 列表</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>符号字典</returns>
+    private static Dictionary<string, LangValueType> ExtractSymbolsFromNewImportInfos(
+        List<ImportInfo> newImportInfos,
+        VariateManager manager)
+    {
+        var symbols = new Dictionary<string, LangValueType>();
+
+        // 1. 从当前作用域（模块作用域）中提取变量和常量
+        if (manager.Scopes.Count > 0)
+        {
+            var currentScope = manager.Scopes[^1];
+            foreach (var (name, value) in currentScope)
+            {
+                // 跳过模块对象
+                if (value is AST.Expression.ModuleObjects.IModuleObject)
+                {
+                    continue;
+                }
+
+                symbols[name] = value;
+            }
+        }
+
+        // 2. 从 newImportInfos 中提取函数和类
+        foreach (var importInfo in newImportInfos)
+        {
+            string? symbolName = importInfo switch
+            {
+                FuncLangValue { Id: not null } func => func.Id.IdName,
+                AsyncFuncLangValue { Id: not null } asyncFunc => asyncFunc.Id.IdName,
+                TypeTemplate template => template.ClassName,
+                NativeAnyLangValue nativeAny => nativeAny.RegisterName,
+                NativeStaticAny staticAny => staticAny.ClassName,
+                ConstantLangValue constant => constant.Name,
+                AST.Expression.ModuleObjects.UnifiedModule module => module.ModuleName,
+                _ => null
+            };
+
+            if (symbolName is not null)
+            {
+                symbols[symbolName] = importInfo;
+            }
+        }
+
+        return symbols;
+    }
 }
 
 /// <summary>

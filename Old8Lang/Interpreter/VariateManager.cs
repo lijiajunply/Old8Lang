@@ -847,6 +847,17 @@ public class VariateManager
     }
 
     /// <summary>
+    /// 清空导入信息列表（线程安全）
+    /// </summary>
+    public void ClearImportInfos()
+    {
+        lock (ImportInfosLock)
+        {
+            ImportInfosList.Clear();
+        }
+    }
+
+    /// <summary>
     /// 添加懒加载通配符模块
     /// 用于 lazy import "module" 语法
     /// </summary>
