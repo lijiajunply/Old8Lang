@@ -22,9 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -989,14 +987,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs</url>
           <line>90</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="2374" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2409" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'" />
           <option name="timeStamp" value="517" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
@@ -1370,14 +1361,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Main.cs</url>
           <line>215</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Main.cs" containingFunctionPresentation="方法 'CheckTypeMatch'">
-            <startOffsets>
-              <option value="6835" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6875" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Main.cs" containingFunctionPresentation="方法 'CheckTypeMatch'" />
           <option name="timeStamp" value="650" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
