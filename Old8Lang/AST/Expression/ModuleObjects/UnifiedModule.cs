@@ -239,18 +239,47 @@ public class UnifiedModule(
     /// <summary>
     /// 从现有符号创建模块（用于标准库等）
     /// </summary>
+    /// <param name="moduleName">模块名称</param>
+    /// <param name="symbols">符号字典</param>
+    /// <param name="position">源代码位置</param>
+    /// <param name="captureScope">可选的捕获作用域，用于为函数设置闭包环境</param>
     public static UnifiedModule FromSymbols(
         string moduleName,
         Dictionary<string, LangValueType> symbols,
-        SourcePosition position = default)
+        SourcePosition position = default,
+        VariateManager? captureScope = null)
     {
         var module = new UnifiedModule(moduleName, new VariateManager(), ModuleLoadMode.Eager, position);
+
+        // 如果提供了捕获作用域，克隆一份作为所有函数共享的作用域
+        // 这样所有函数都能访问和修改同一个模块级变量
+        VariateManager? sharedScope = captureScope?.Clone();
 
         // 填充符号字典
         foreach (var (name, value) in symbols)
         {
-            module._symbols[name] = value;
-            module._caseInsensitiveSymbols[name] = value;
+            // 如果提供了捕获作用域，并且符号是函数，为其设置共享的捕获作用域
+            if (sharedScope is not null && value is FuncLangValue funcValue)
+            {
+                // 直接设置共享的作用域，而不是为每个函数创建新的克隆
+                var funcWithClosure = new FuncLangValue(
+                    funcValue.Id,
+                    funcValue.Ids ?? [],
+                    funcValue.BlockStatement,
+                    funcValue.GenericParameters,
+                    funcValue.Position,
+                    funcValue.Id is null)
+                {
+                    CapturedScope = sharedScope
+                };
+                module._symbols[name] = funcWithClosure;
+                module._caseInsensitiveSymbols[name] = funcWithClosure;
+            }
+            else
+            {
+                module._symbols[name] = value;
+                module._caseInsensitiveSymbols[name] = value;
+            }
         }
 
         module._loadingState = ModuleLoadingState.Loaded;

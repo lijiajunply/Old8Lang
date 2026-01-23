@@ -240,7 +240,8 @@ public class ModuleSystemService
                 // 提取符号创建模块对象
                 var symbols = _symbolExtractor.ExtractSymbols(manager);
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols);
+                // 传递 manager 作为捕获作用域，确保函数可以访问模块中的变量
+                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
                 _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
@@ -254,7 +255,8 @@ public class ModuleSystemService
                 // 提取符号创建模块对象
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                 var symbols = _symbolExtractor.ExtractSymbols(manager);
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols);
+                // 传递 manager 作为捕获作用域，确保函数可以访问模块中的变量
+                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
                 _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
