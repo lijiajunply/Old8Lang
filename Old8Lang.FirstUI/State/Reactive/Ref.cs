@@ -40,13 +40,11 @@ public class Ref<T> : IReactiveSource, IState
         }
         set
         {
-            if (!EqualityComparer<T>.Default.Equals(_value, value))
-            {
-                var oldValue = _value;
-                _value = value;
-                OnChanged(oldValue, value);
-                Trigger();
-            }
+            if (EqualityComparer<T>.Default.Equals(_value, value)) return;
+            var oldValue = _value;
+            _value = value;
+            Trigger(); // 先触发依赖更新，让 AutoComputed 标记为脏
+            OnChanged(oldValue, value); // 再触发 UI 重建
         }
     }
 
