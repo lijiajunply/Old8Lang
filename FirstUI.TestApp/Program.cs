@@ -31,13 +31,8 @@ var effectStop = WatchEffectFactory.Create(() =>
     Console.WriteLine($"[WatchEffect] Current state: count={count.Value}, doubled={doubled.Value}, greeting={greeting.Value}");
 });
 
-// 用于显示的响应式文本
-var countText = AutoComputed.Create(() => count.Value.ToString());
-var doubledText = AutoComputed.Create(() => $"Doubled: {doubled.Value}");
-var greetingText = AutoComputed.Create(() => greeting.Value ?? "");
-
-// 构建 UI
-app.Run(new Column([
+// 构建 UI（使用 lambda 函数，每次重建时重新执行）
+app.Run(() => new Column([
     // 标题
     new Text("Vue 风格响应式 API 演示")
         .SetFontSize(28)
@@ -45,20 +40,20 @@ app.Run(new Column([
         .SetColor("#000000"),
 
     // 计数器显示
-    new Text(content: countText.Value ?? "0")
+    new Text(content: count.Value.ToString() ?? "0")
         .SetFontSize(72)
         .SetFontWeight("bold")
         .SetColor("#007AFF")
         .SetMargin(20, 0, 10, 0),
 
     // 计算属性显示
-    new Text(content: doubledText.Value ?? "")
+    new Text(content: $"Doubled: {doubled.Value}")
         .SetFontSize(24)
         .SetColor("#34C759")
         .SetMargin(0, 0, 10, 0),
 
     // 问候语显示
-    new Text(content: greetingText.Value ?? "")
+    new Text(content: greeting.Value ?? "")
         .SetFontSize(18)
         .SetColor("#5856D6")
         .SetMargin(0, 0, 20, 0),

@@ -209,9 +209,9 @@ public static class FirstUIBinding
     }
 
     /// <summary>
-    /// 运行应用程序
+    /// 运行应用程序（使用构建函数，支持响应式更新）
     /// </summary>
-    public static void RunApp(WidgetBase buildFunction, string? s = null)
+    public static void RunApp(Func<WidgetBase> buildFunction, string? s = null)
     {
         try
         {
@@ -252,9 +252,18 @@ public static class FirstUIBinding
     }
 
     /// <summary>
+    /// 运行应用程序（兼容旧 API，不支持响应式更新）
+    /// </summary>
+    [Obsolete("Use RunApp(Func<WidgetBase>, string?) for reactive updates")]
+    public static void RunApp(WidgetBase widget, string? s = null)
+    {
+        RunApp(() => widget, s);
+    }
+
+    /// <summary>
     /// 构建 Avalonia 应用
     /// </summary>
-    private static AppBuilder BuildAvaloniaApp(WidgetBase buildFunction, string? s = null)
+    private static AppBuilder BuildAvaloniaApp(Func<WidgetBase> buildFunction, string? s = null)
     {
         return AppBuilder.Configure(() => new FirstUIAvaloniaApp(buildFunction, s))
             .UsePlatformDetect()
@@ -266,7 +275,7 @@ public static class FirstUIBinding
 /// <summary>
 /// FirstUI Avalonia 应用类
 /// </summary>
-internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null) : Application
+internal class FirstUIAvaloniaApp(Func<WidgetBase> buildFunction, string? title = null) : Application
 {
     private Window? _mainWindow;
     private BuildContext? _context;
@@ -301,7 +310,8 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
             // 构建 UI
             try
             {
-                var control = buildFunction.Build(_context);
+                var widget = buildFunction();
+                var control = widget.Build(_context);
 
                 if (control is Control c)
                 {
@@ -402,7 +412,8 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
                 }
 
                 // 重新构建 UI
-                var control = buildFunction.Build(_context);
+                var widget = buildFunction();
+                var control = widget.Build(_context);
 
                 if (control is Control mainControl)
                 {
@@ -443,10 +454,19 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
 public class FirstUIApplication
 {
     /// <summary>
-    /// 运行应用程序
+    /// 运行应用程序（使用构建函数，支持响应式更新）
     /// </summary>
-    public void Run(WidgetBase buildFunction, string? s = null)
+    public void Run(Func<WidgetBase> buildFunction, string? s = null)
     {
         FirstUIBinding.RunApp(buildFunction, s);
+    }
+
+    /// <summary>
+    /// 运行应用程序（兼容旧 API，不支持响应式更新）
+    /// </summary>
+    [Obsolete("Use Run(Func<WidgetBase>, string?) for reactive updates")]
+    public void Run(WidgetBase widget, string? s = null)
+    {
+        FirstUIBinding.RunApp(() => widget, s);
     }
 }
