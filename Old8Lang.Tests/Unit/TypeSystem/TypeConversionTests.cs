@@ -405,11 +405,17 @@ public class TypeConversionTests
         var result = LangValueType.ValueToObj(langTuple);
 
         // Assert
+        // Old8Lang 内部使用 ValueTuple，所以返回的是 ValueTuple 而不是 Tuple
         Assert.NotNull(result);
-        Assert.IsType<Tuple<object, object>>(result);
-        var tuple = (Tuple<object, object>)result;
-        Assert.Equal(1, tuple.Item1);
-        Assert.Equal("test", tuple.Item2);
+        // ValueTuple 是值类型，需要使用动态类型检查
+        var resultType = result.GetType();
+        Assert.True(resultType.FullName?.StartsWith("System.ValueTuple") == true,
+            $"Expected ValueTuple but got {resultType.FullName}");
+
+        // 使用 ITuple 接口访问元素
+        var ituple = (System.Runtime.CompilerServices.ITuple)result;
+        Assert.Equal(1, ituple[0]);
+        Assert.Equal("test", ituple[1]);
     }
 
     [Fact]
@@ -523,19 +529,7 @@ public class TypeConversionTests
 
         // Act
         var langValue = LangValueType.ObjToValue(originalDict);
-
-        // 需要运行字典以填充 Value 字段
-        if (langValue is DictionaryLangValue dictVal)
-        {
-            foreach (var tuple in dictVal.Tuples)
-            {
-                var v0 = tuple.Get(0);
-                var v1 = tuple.Get(1);
-                var key = LangValueType.ObjToValue(v0);
-                var value = LangValueType.ObjToValue(v1);
-                dictVal.Value.Add((key, value));
-            }
-        }
+        // HandleDictionaryConversionGeneric 已经正确填充了 Value 字段，无需手动填充
 
         var roundTripValue = LangValueType.ValueToObj(langValue);
 
@@ -560,11 +554,16 @@ public class TypeConversionTests
         var roundTripValue = LangValueType.ValueToObj(langValue);
 
         // Assert
+        // Old8Lang 内部使用 ValueTuple，所以返回的是 ValueTuple 而不是 Tuple
         Assert.NotNull(roundTripValue);
-        Assert.IsType<Tuple<object, object>>(roundTripValue);
-        var resultTuple = (Tuple<object, object>)roundTripValue;
-        Assert.Equal(42, resultTuple.Item1);
-        Assert.Equal("test", resultTuple.Item2);
+        var resultType = roundTripValue.GetType();
+        Assert.True(resultType.FullName?.StartsWith("System.ValueTuple") == true,
+            $"Expected ValueTuple but got {resultType.FullName}");
+
+        // 使用 ITuple 接口访问元素
+        var ituple = (System.Runtime.CompilerServices.ITuple)roundTripValue;
+        Assert.Equal(42, ituple[0]);
+        Assert.Equal("test", ituple[1]);
     }
 
     [Fact]

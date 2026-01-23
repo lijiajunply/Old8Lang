@@ -23,16 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/FunctionTypeAnnotation.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/FunctionTypeAnnotation.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/SyntaxTests/FunctionTypeAnnotation.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/VMTests/FunctionTypeAnnotation.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VirtualMachine.Instructions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/TypeSystem/TypeConversionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -940,7 +933,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="787" />
+    <option name="localTasksCounter" value="788" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -967,7 +960,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(bytecode): 添加类型推断功能并优化字节码编译流程&#10;&#10;- 在 BytecodeCompiler 中添加 EnableTypeInference 属性控制类型推断&#10;- 实现 RegisterTypeDefinitions 方法只注册函数和类定义，避免执行其他语句&#10;- 添加 PerformTypeInference 方法执行类型推断逻辑&#10;- 在 CompileBytecodeCommand 和 VMCommand 中添加 --no-type-inference 和 --type-inference-debug 参数&#10;- 将类型推断配置统一到 TypeInferenceConfig.Instance 管理&#10;- 修复测试中 BytecodeCompiler 的初始化配置" />
     <MESSAGE value="feat(bytecode): 添加类型检查运算符支持并优化联合类型测试&#10;&#10;- 实现 IsType 指令支持类型检查运算符 (is) 的字节码生成&#10;- 添加对 LangId、TypeLangValue 和 StringLangValue 类型的目标类型解析&#10;- 修复联合类型测试中的布尔值大小写断言问题&#10;- 简化联合类型语法测试用例，移除不必要的嵌套括号&#10;- 优化测试代码中的空值安全调用处理&#10;- 更新 IDE 配置文件的变更列表和任务计数统计" />
     <MESSAGE value="feat(bytecode): 添加函数参数类型支持并实现运行时类型验证&#10;&#10;- 在 FunctionMetadata 中添加 ParameterTypes 属性存储参数类型信息&#10;- 修改 CompileFunction、CompileAsyncFunction 和 CompileAsyncGeneratorFunction 方法签名&#10;- 在字节码序列化和反序列化中添加参数类型的读写支持&#10;- 实现运行时参数类型验证功能，包括普通函数和构造函数&#10;- 在字节码访问器各相关文件中添加参数类型提取和传递逻辑&#10;- 更新 TypeError 类添加详细错误信息构造函数&#10;- 修复测试用例中构造函数命名从 new 到 init 的变更" />
     <MESSAGE value="feat(bytecode): 添加返回类型注解和运行时类型验证功能&#10;&#10;- 在 FunctionMetadata 中添加 ReturnType 属性存储函数返回类型&#10;- 修改 CompileFunction、CompileAsyncFunction、CompileAsyncGeneratorFunction 方法支持返回类型参数&#10;- 在字节码序列化和反序列化中添加返回类型的读写支持&#10;- 为类字段声明添加类型信息支持，扩展 DeclareClass 方法签名&#10;- 实现运行时类型验证功能，包括字段赋值、静态字段和返回值类型检查&#10;- 添加逻辑运算符操作数类型验证，确保布尔类型正确性&#10;- 在泛型特化过程中实现类型参数替换逻辑&#10;- 更新测试用例适配新的类型系统变化" />
@@ -992,7 +984,8 @@
     <MESSAGE value="feat(vm): 添加嵌套索引赋值和改进虚拟机操作&#10;&#10;- 实现嵌套索引赋值功能，支持 array[i][j] &lt;- value 语法&#10;- 添加 NestedIndexAccess 表达式的字节码生成支持&#10;- 优化 Sleep 函数调用的常量池使用方式&#10;- 增强加法运算对 LangValueType 类型的支持&#10;- 添加属性访问的反射支持，当无参数时优先查找属性&#10;- 更新测试代码中的构造函数命名约定，使用 init 替代 new&#10;- 修正字典创建语法从 {} 为 dict() 并调整生成器属性访问语法" />
     <MESSAGE value="fix(vm): 解决函数在模块导入上下文中的作用域捕获问题&#10;&#10;- 当函数没有捕获作用域且在模块导入上下文中时，自动捕获当前作用域&#10;- 创建带有捕获作用域的函数副本来确保访问模块中导入的符号&#10;- 更新测试代码中的函数名从double改为twice以保持一致性&#10;- 清理IDEA工作空间配置文件中的变更列表记录&#10;- 更新本地任务计数器和最后提交消息记录" />
     <MESSAGE value="fix(vm): 修复异常处理中的finally块执行逻辑&#10;&#10;- 在异常表遍历时同时检查try块和catch块中的异常位置&#10;- 当异常发生在catch块中有finally块时，先执行finally块再继续查找外层处理器&#10;- 修复了Old8Exception的Message属性访问，使其返回OriginalMessage值&#10;- 更新了嵌套异常处理的测试用例以验证正确的异常传播行为&#10;- 移除了match表达式异常传播的相关测试代码&#10;- 修复了类构造函数命名从new改为init的一致性问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复异常处理中的finally块执行逻辑&#10;&#10;- 在异常表遍历时同时检查try块和catch块中的异常位置&#10;- 当异常发生在catch块中有finally块时，先执行finally块再继续查找外层处理器&#10;- 修复了Old8Exception的Message属性访问，使其返回OriginalMessage值&#10;- 更新了嵌套异常处理的测试用例以验证正确的异常传播行为&#10;- 移除了match表达式异常传播的相关测试代码&#10;- 修复了类构造函数命名从new改为init的一致性问题" />
+    <MESSAGE value="feat(type-system): 实现函数类型注解和兼容性检查&#10;&#10;- 在 TypeAnnotationManager 中添加函数类型兼容性验证逻辑&#10;- 在 TypeChecker 中实现函数类型字符串获取和兼容性检查&#10;- 在 VirtualMachine 中添加函数类型匹配检查功能&#10;- 在 BytecodeVisitor 中修改 Lambda 函数编译逻辑以传递返回类型&#10;- 添加完整的函数类型注解测试文件包括编译器、解释器、语法和虚拟机测试&#10;- 实现泛型函数类型 function&lt;T1, T2, ...&gt; 的参数和返回值类型检查&#10;- 支持基本 function 类型兼容任何函数类型的功能&#10;- 添加调试信息输出用于类型注解处理跟踪" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(type-system): 实现函数类型注解和兼容性检查&#10;&#10;- 在 TypeAnnotationManager 中添加函数类型兼容性验证逻辑&#10;- 在 TypeChecker 中实现函数类型字符串获取和兼容性检查&#10;- 在 VirtualMachine 中添加函数类型匹配检查功能&#10;- 在 BytecodeVisitor 中修改 Lambda 函数编译逻辑以传递返回类型&#10;- 添加完整的函数类型注解测试文件包括编译器、解释器、语法和虚拟机测试&#10;- 实现泛型函数类型 function&lt;T1, T2, ...&gt; 的参数和返回值类型检查&#10;- 支持基本 function 类型兼容任何函数类型的功能&#10;- 添加调试信息输出用于类型注解处理跟踪" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1377,6 +1370,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="646" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs</url>
+          <line>582</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs" containingFunctionPresentation="方法 'ResourceCleanup_DeferInLoop_ExecutesEachDefer'">
+            <startOffsets>
+              <option value="17036" />
+            </startOffsets>
+            <endOffsets>
+              <option value="17063" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="649" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

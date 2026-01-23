@@ -473,18 +473,18 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             if (tuple is System.Runtime.CompilerServices.ITuple ituple)
             {
                 var elements = new List<LangExpression>();
+                var itemValues = new List<LangValueType>();
                 for (int i = 0; i < ituple.Length; i++)
                 {
                     // 递归转换每个元素
-                    elements.Add(ObjToValue(ituple[i], position));
+                    var langValue = ObjToValue(ituple[i], position);
+                    elements.Add(langValue);
+                    itemValues.Add(langValue);
                 }
 
                 var tupleValue = new TupleLangValue(elements, position);
-                // 预填充运行结果
-                tupleValue.Run(null!);
-                // 注意：这里传 null 可能导致问题，但 TupleLangValue.Run 只做简单的赋值，不依赖 manager
-                // 实际上 TupleLangValue.Run 只是把 Elements (已经是 Value 了) 复制到 ItemValues
-                // 我们可以手动填充
+                // 直接填充 ItemValues，避免调用 Run(null)
+                tupleValue.ItemValues.AddRange(itemValues);
 
                 return tupleValue;
             }
