@@ -1,6 +1,6 @@
 using System.Reflection.Emit;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>
 /// IL 代码生成缓存，用于优化重复 IL 代码生成

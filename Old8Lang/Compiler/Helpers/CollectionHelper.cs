@@ -1,4 +1,4 @@
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
 /// 集合操作辅助类，提供编译模式下集合操作的实际实现

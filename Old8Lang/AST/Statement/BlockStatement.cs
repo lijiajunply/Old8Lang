@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;

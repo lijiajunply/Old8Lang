@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;

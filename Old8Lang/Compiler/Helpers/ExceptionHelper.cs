@@ -1,4 +1,4 @@
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 public static class ExceptionHelper
 {

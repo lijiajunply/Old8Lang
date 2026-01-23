@@ -8,6 +8,7 @@ using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Interop;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;

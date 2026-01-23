@@ -5,6 +5,8 @@ using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using System.Collections;
+using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Compiler.Helpers;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 

@@ -1,4 +1,4 @@
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
 /// Assert辅助类，提供编译模式下断言方法的实际实现

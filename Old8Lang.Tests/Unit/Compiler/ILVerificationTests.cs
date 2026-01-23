@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Compiler.Verification;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Unit.Compiler;
@@ -107,7 +108,7 @@ public class ILVerificationTests
         ilGenerator.Emit(OpCodes.Ret);
         
         // Act
-        var result = Old8Lang.Compiler.IlVerifier.Verify(dynamicMethod, "TestMethod");
+        var result = IlVerifier.Verify(dynamicMethod, "TestMethod");
         
         // Assert
         Assert.True(result.IsValid);
@@ -128,7 +129,7 @@ public class ILVerificationTests
         // 我们声明返回类型为int，但没有返回任何值
         
         // Act
-        var result = Old8Lang.Compiler.IlVerifier.Verify(dynamicMethod, "InvalidMethod");
+        var result = IlVerifier.Verify(dynamicMethod, "InvalidMethod");
         
         // Assert
         Assert.False(result.IsValid);

@@ -3,6 +3,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using System.Collections;
 using System.Reflection.Emit;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.AST.Expression.Linq;
 

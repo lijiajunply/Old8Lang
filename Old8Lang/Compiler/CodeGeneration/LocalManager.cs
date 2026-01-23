@@ -9,7 +9,7 @@ using Old8Lang.Generators;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>
 /// 局部变量管理器，用于在编译过程中管理局部变量、委托、类和字段

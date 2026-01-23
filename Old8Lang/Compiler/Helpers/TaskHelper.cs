@@ -1,4 +1,4 @@
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
 /// Task辅助类，提供编译模式下Task操作的辅助方法

@@ -5,6 +5,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.Generators;
 

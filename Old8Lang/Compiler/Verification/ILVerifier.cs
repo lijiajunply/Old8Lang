@@ -1,6 +1,6 @@
 using System.Reflection.Emit;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Verification;
 
 /// <summary>
 /// IL代码验证器，用于验证生成的IL代码是否符合ECMA-335标准

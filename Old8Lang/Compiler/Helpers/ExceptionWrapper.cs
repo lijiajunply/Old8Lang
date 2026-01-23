@@ -1,4 +1,4 @@
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
 /// 异常包装类,用于在编译器模式下存储异常对象

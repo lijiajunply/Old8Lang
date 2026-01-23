@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.ExternProviders;
 using Old8Lang.Interpreter;
 

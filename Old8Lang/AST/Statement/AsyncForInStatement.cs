@@ -9,6 +9,7 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.AST.Statement;
 

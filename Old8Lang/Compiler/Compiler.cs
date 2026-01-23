@@ -2,6 +2,8 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
+using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Compiler.Verification;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;

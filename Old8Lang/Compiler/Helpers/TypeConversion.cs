@@ -2,7 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.Error;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
 /// 类型转换类，负责生成各种类型转换的IL指令

@@ -7,6 +7,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.Compiler.CodeGeneration;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>

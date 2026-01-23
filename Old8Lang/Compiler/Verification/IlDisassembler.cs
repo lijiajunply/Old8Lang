@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Verification;
 
 public static class IlDisassembler
 {

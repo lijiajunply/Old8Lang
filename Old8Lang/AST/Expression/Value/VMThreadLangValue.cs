@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Concurrency;
 using Old8Lang.Interpreter;
 

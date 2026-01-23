@@ -1,9 +1,10 @@
-using System.Reflection.Emit;
 using System.Reflection;
+using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler.Helpers;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>
 /// 全局静态类编译器，负责为全局静态类生成IL代码

@@ -8,6 +8,7 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using System.Reflection.Emit;
 using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.Runtime;
 
@@ -266,13 +267,13 @@ internal class ValueExpression(LangValueType value) : LangExpression
 {
     public override LangValueType Run(VariateManager manager) => value;
 
-    public override void LoadIlValue(ILGenerator ilGenerator, Compiler.LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译器模式下不应该调用这个方法
         throw new NotImplementedException();
     }
 
-    public override Type OutputType(Compiler.LocalManager local) => value.GetType();
+    public override Type OutputType(LocalManager local) => value.GetType();
 
     public override TResult Accept<TResult>(AST.Visitor.IVisitor<TResult> visitor)
     {

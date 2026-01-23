@@ -3,9 +3,10 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.TypeSystem;
 
-namespace Old8Lang.Compiler;
+namespace Old8Lang.Compiler.Specialization;
 
 /// <summary>
 /// 泛型类特化器，用于为泛型类创建具体的类型特化版本

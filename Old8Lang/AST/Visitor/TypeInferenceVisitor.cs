@@ -1,4 +1,5 @@
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.AST.Visitor;
 

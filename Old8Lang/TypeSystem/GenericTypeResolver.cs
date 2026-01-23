@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.TypeSystem;
