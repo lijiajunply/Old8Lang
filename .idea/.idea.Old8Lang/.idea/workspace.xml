@@ -23,19 +23,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Compiler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Execution.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Generator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Generics.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Main.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Parameters.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Func/FuncLangValue.Visitor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Async.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Basic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Basic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.ControlFlow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.ControlFlow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Definitions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Definitions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Exception.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Exception.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.ImportAndNative.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.ImportAndNative.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Loops.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Loops.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Special.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Special.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Collections.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Collections.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Generics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.InstantiationAndSlice.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.InstantiationAndSlice.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.LambdaAndTuple.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.LambdaAndTuple.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Literals.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Literals.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.Main.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.PatternMatching.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.PatternMatching.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.StringTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.StringTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.BlockStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.BlockStatements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.ControlFlow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.ControlFlow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.ImportAndNative.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.ImportAndNative.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SimpleStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SimpleStatements.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -941,7 +952,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="799" />
+    <option name="localTasksCounter" value="801" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -968,8 +979,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(vm): 移除虚拟机指令中的冗余using语句&#10;&#10;- 移除了IDictionary和IEnumerable分支中的重复using语句&#10;- 简化了枚举器资源管理逻辑&#10;- 提高了代码简洁性和可读性" />
-    <MESSAGE value="feat(generics): 实现泛型类型参数映射和嵌套泛型支持&#10;&#10;- 添加 CurrentTypeParameterMapping 属性管理当前类型参数映射&#10;- 实现泛型特化类和函数编译时的类型参数替换逻辑&#10;- 添加 ReplaceTypeParameters 方法支持嵌套泛型类型参数替换&#10;- 实现 SplitGenericTypeArgs 方法处理复杂泛型参数分割&#10;- 添加 NormalizeGenericTypeName 方法统一泛型类型名称格式&#10;- 优化泛型实例化过程中的类型参数解析和映射机制" />
     <MESSAGE value="feat(vm): 实现虚拟机对 params 可变参数的支持&#10;&#10;- 添加 params 参数处理逻辑，将可变参数打包成数组传递&#10;- 实现常规参数与可变参数的分离处理机制&#10;- 完善参数不足时的默认值填充策略&#10;- 修复函数调用时参数数量不匹配的错误处理&#10;- 保持与现有默认参数功能的兼容性" />
     <MESSAGE value="refactor(ast): 更新反射字段访问的私有字段命名约定&#10;&#10;- 将 DllName 字段引用更改为 _dllName 以符合私有字段命名规范&#10;- 将 Functions 字段引用更改为 _functions 以保持命名一致性&#10;- 将 ExternType 字段引用更改为 _externType 以遵循私有字段前缀约定&#10;- 将 DefaultCallingConvention 字段引用更改为 _defaultCallingConvention&#10;- 统一了反射访问私有字段的命名风格以提高代码可读性" />
     <MESSAGE value="feat(vm): 实现泛型类型参数映射和类型解析功能&#10;&#10;- 在 FunctionMetadata 和 ClassMetadata 中添加 GenericTypeMapping 属性&#10;- 实现泛型类型参数的序列化和反序列化功能&#10;- 添加 ResolveGenericType 方法支持泛型类型参数替换&#10;- 支持可空类型、泛型类型、联合类型和交叉类型的泛型解析&#10;- 在虚拟机指令中集成泛型类型映射和类型检查功能&#10;- 修复类型匹配比较中忽略可空标记的问题" />
@@ -993,7 +1002,9 @@
     <MESSAGE value="删除了 大量未使用的 using" />
     <MESSAGE value="修改一些东西" />
     <MESSAGE value="refactor(database): 统一数据库连接包装类的字段命名规范&#10;&#10;- 将所有数据库连接包装类中的公共字段重命名为私有字段并使用下划线前缀&#10;- 更新 InMemoryConnectionWrapper 中的 Connection、ConnectionString、CreatedTables 和 Disposed 字段&#10;- 更新 MySqlConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 MySqlTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 OrmWrapper 中的 Connection、ConnectionType 和 Disposed 字段&#10;- 更新 PostgresConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 PostgresTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 SqliteConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 SqliteTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 相应更新所有引用这些字段的方法实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(database): 统一数据库连接包装类的字段命名规范&#10;&#10;- 将所有数据库连接包装类中的公共字段重命名为私有字段并使用下划线前缀&#10;- 更新 InMemoryConnectionWrapper 中的 Connection、ConnectionString、CreatedTables 和 Disposed 字段&#10;- 更新 MySqlConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 MySqlTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 OrmWrapper 中的 Connection、ConnectionType 和 Disposed 字段&#10;- 更新 PostgresConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 PostgresTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 SqliteConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 SqliteTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 相应更新所有引用这些字段的方法实现" />
+    <MESSAGE value="style(parser): 移除解析器中的冗余注释&#10;&#10;- 删除 PrimaryParser.Collections.cs 中关于 lambda 和 tuple 的注释&#10;- 删除 PrimaryParser.InstantiationAndSlice.cs 中关于 Lambda 参数解析的注释&#10;- 删除 PrimaryParser.LambdaAndTuple.cs 中关于 match 表达式的注释&#10;- 删除 PrimaryParser.Literals.cs 中关于列表初始化或切片的注释&#10;- 删除 PrimaryParser.Main.cs 中关于列表或字典初始化的注释&#10;- 删除 PrimaryParser.PatternMatching.cs 中关于泛型实例化的注释&#10;- 删除 PrimaryParser.StringTemplate.cs 中关于标识符解析的注释&#10;- 删除 StatementParser.BlockStatements.cs 中关于泛型类型注解的注释&#10;- 删除 StatementParser.ControlFlow.cs 中关于函数调用的注释&#10;- 删除 StatementParser.ImportAndNative.cs 中关于自增运算的注释&#10;- 删除 StatementParser.Main.cs 中关于函数定义或调用的注释&#10;- 删除 StatementParser.SimpleStatements.cs 中关于模块导入的注释&#10;- 清理 IDE 工作空间配置文件中的变更记录" />
+    <MESSAGE value="feat(bytecode): 添加字节码访问器的语句处理功能&#10;&#10;- 实现异步和生成器语句的字节码生成，包括YieldStatement和AsyncFuncInit&#10;- 添加基础语句处理，支持块语句、变量赋值、类型检查和元组解构赋值&#10;- 实现控制流语句的字节码生成，包括if、while、for循环和break/continue语句&#10;- 添加函数和类定义的字节码编译功能，支持泛型函数和类的注册&#10;- 实现异常处理语句的完整字节码生成，包括try-catch-finally和throw语句&#10;- 添加导入语句和原生绑定的字节码指令生成，支持模块加载和原生库导入" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加字节码访问器的语句处理功能&#10;&#10;- 实现异步和生成器语句的字节码生成，包括YieldStatement和AsyncFuncInit&#10;- 添加基础语句处理，支持块语句、变量赋值、类型检查和元组解构赋值&#10;- 实现控制流语句的字节码生成，包括if、while、for循环和break/continue语句&#10;- 添加函数和类定义的字节码编译功能，支持泛型函数和类的注册&#10;- 实现异常处理语句的完整字节码生成，包括try-catch-finally和throw语句&#10;- 添加导入语句和原生绑定的字节码指令生成，支持模块加载和原生库导入" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
