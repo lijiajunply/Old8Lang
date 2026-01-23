@@ -113,7 +113,7 @@ public static class TypeChecker
             DictionaryLangValue dict => (dict.KeyType is not null && dict.ValueType is not null)
                 ? $"dict<{dict.KeyType}, {dict.ValueType}>"
                 : "dict",
-            FuncLangValue => "function",
+            FuncLangValue funcValue => GetFunctionTypeString(funcValue),
             AsyncFuncLangValue => "async_func",
             GeneratorLangValue => "generator",
             AsyncGeneratorLangValue => "async_generator",
@@ -131,6 +131,54 @@ public static class TypeChecker
             ErrorLangValue => "error",
             _ => "object"
         };
+    }
+
+    /// <summary>
+    /// 获取函数值的完整类型字符串
+    /// 格式: function<param1, param2, ..., returnType>
+    /// 规则: 最后一个泛型参数是返回值类型，前面的都是参数类型
+    /// </summary>
+    private static string GetFunctionTypeString(FuncLangValue funcValue)
+    {
+        // 如果是原生方法（Method 不为 null），返回基本 function 类型
+        if (funcValue.Method is not null)
+        {
+            return "function";
+        }
+
+        // 获取返回类型
+        var returnType = funcValue.Id?.AssumptionType;
+
+        // 如果没有返回类型注解，返回基本 function 类型
+        // 这样可以兼容没有完整类型注解的 lambda 表达式
+        if (string.IsNullOrEmpty(returnType))
+        {
+            return "function";
+        }
+
+        var typeParams = new List<string>();
+
+        // 添加参数类型
+        if (funcValue.Ids is not null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                var paramType = param.AssumptionType;
+                if (string.IsNullOrEmpty(paramType))
+                {
+                    // 如果参数没有类型注解，返回基本 function 类型
+                    return "function";
+                }
+                typeParams.Add(paramType);
+            }
+        }
+
+        // 添加返回类型
+        typeParams.Add(returnType);
+
+        // 如果只有返回类型（无参数函数），格式为 function<returnType>
+        // 如果有参数，格式为 function<param1, param2, ..., returnType>
+        return $"function<{string.Join(", ", typeParams)}>";
     }
 
     /// <summary>
@@ -206,6 +254,12 @@ public static class TypeChecker
             return true;
         }
 
+        // 处理函数类型兼容性
+        if (IsFunctionTypeCompatible(expectedType, actualType))
+        {
+            return true;
+        }
+
         // 严格类型检查：不允许字符串到数字的自动转换
         // 这是测试期望的行为
 
@@ -275,6 +329,139 @@ public static class TypeChecker
     private static bool IsGenericType(string typeName)
     {
         return typeName.Contains('<') && typeName.Contains('>');
+    }
+
+    /// <summary>
+    /// 检查函数类型兼容性
+    /// 规则：
+    /// - 基本 function 类型兼容任何函数类型
+    /// - 泛型函数类型 function<...> 需要检查参数数量和类型匹配
+    /// - 最后一个泛型参数是返回类型，前面的是参数类型
+    /// </summary>
+    /// <param name="expectedType">期望类型（如 "function<int, string, bool>"）</param>
+    /// <param name="actualType">实际类型（如 "function<int, string, bool>"）</param>
+    /// <returns>是否兼容</returns>
+    private static bool IsFunctionTypeCompatible(string expectedType, string actualType)
+    {
+        var expectedBase = GetBaseTypeName(expectedType);
+        var actualBase = GetBaseTypeName(actualType);
+
+        // 两者都必须是 function 类型
+        if (expectedBase != "function" || actualBase != "function")
+        {
+            return false;
+        }
+
+        // 如果期望类型是基本 function（无泛型参数），兼容任何函数
+        if (!IsGenericType(expectedType))
+        {
+            return true;
+        }
+
+        // 如果实际类型是基本 function（无泛型参数），但期望类型有泛型参数
+        // 在宽松模式下允许（因为实际函数可能没有完整的类型注解）
+        if (!IsGenericType(actualType))
+        {
+            return true;
+        }
+
+        // 两者都有泛型参数，需要解析并比较
+        var expectedParams = ParseFunctionTypeParams(expectedType);
+        var actualParams = ParseFunctionTypeParams(actualType);
+
+        if (expectedParams is null || actualParams is null)
+        {
+            return false;
+        }
+
+        // 检查参数数量是否匹配
+        if (expectedParams.Count != actualParams.Count)
+        {
+            return false;
+        }
+
+        // 检查每个类型参数是否兼容
+        for (int i = 0; i < expectedParams.Count; i++)
+        {
+            var expectedParam = expectedParams[i].Trim();
+            var actualParam = actualParams[i].Trim();
+
+            // 使用双向兼容性检查
+            if (!IsTypeCompatible(expectedParam, actualParam) &&
+                !IsTypeCompatible(actualParam, expectedParam))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 解析函数类型的泛型参数
+    /// 例如: "function<int, string, bool>" -> ["int", "string", "bool"]
+    /// </summary>
+    private static List<string>? ParseFunctionTypeParams(string functionType)
+    {
+        var genericStart = functionType.IndexOf('<');
+        if (genericStart < 0)
+        {
+            return null;
+        }
+
+        var genericEnd = FindMatchingBracket(functionType, genericStart);
+        if (genericEnd < 0)
+        {
+            return null;
+        }
+
+        var paramsPart = functionType.Substring(genericStart + 1, genericEnd - genericStart - 1);
+        return SplitTopLevel(paramsPart, ',');
+    }
+
+    /// <summary>
+    /// 查找匹配的右尖括号
+    /// </summary>
+    private static int FindMatchingBracket(string text, int startIndex)
+    {
+        int depth = 0;
+        for (int i = startIndex; i < text.Length; i++)
+        {
+            if (text[i] == '<') depth++;
+            else if (text[i] == '>') depth--;
+            if (depth == 0) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 按顶层分隔符分割（不分割泛型括号内的内容）
+    /// </summary>
+    private static List<string> SplitTopLevel(string text, char separator)
+    {
+        var result = new List<string>();
+        var current = new System.Text.StringBuilder();
+        int depth = 0;
+
+        foreach (var ch in text)
+        {
+            if (ch == '<') depth++;
+            else if (ch == '>') depth--;
+            else if (ch == separator && depth == 0)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+                continue;
+            }
+            current.Append(ch);
+        }
+
+        if (current.Length > 0)
+        {
+            result.Add(current.ToString());
+        }
+
+        return result;
     }
 
     /// <summary>

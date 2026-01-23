@@ -3407,7 +3407,14 @@ public partial class VirtualMachine
             return true;
         }
 
-        // 6. Basic Types (with implicit numeric conversion: int -> double)
+        // 6. Function Types (function, function<int>, function<int, string, bool>)
+        var typeNameLowerForFunc = typeName.ToLower();
+        if (typeNameLowerForFunc == "function" || typeNameLowerForFunc.StartsWith("function<"))
+        {
+            return CheckFunctionTypeMatch(typeName, val);
+        }
+
+        // 7. Basic Types (with implicit numeric conversion: int -> double)
         return typeName.ToLower() switch
         {
             "int" => val is int,
@@ -3563,9 +3570,219 @@ public partial class VirtualMachine
             Array => "array",
             IList => "list",
             IDictionary => "dict",
+            FunctionMetadata func => GetFunctionTypeString(func),
+            ClosureValue closure => GetFunctionTypeString(closure.Function),
             BytecodeObjectInstance instance => instance.ClassName,
             _ => value.GetType().Name
         };
+    }
+
+    /// <summary>
+    /// 获取函数的完整类型字符串
+    /// 格式: function<param1, param2, ..., returnType>
+    /// 规则: 最后一个泛型参数是返回值类型，前面的都是参数类型
+    /// </summary>
+    private string GetFunctionTypeString(FunctionMetadata func)
+    {
+        // 如果没有返回类型注解，返回基本 function 类型
+        if (string.IsNullOrEmpty(func.ReturnType))
+        {
+            return "function";
+        }
+
+        var typeParams = new List<string>();
+
+        // 添加参数类型
+        if (func.ParameterTypes != null && func.ParameterTypes.Count > 0)
+        {
+            foreach (var paramType in func.ParameterTypes)
+            {
+                if (string.IsNullOrEmpty(paramType))
+                {
+                    // 如果参数没有类型注解，返回基本 function 类型
+                    return "function";
+                }
+                typeParams.Add(paramType);
+            }
+        }
+
+        // 添加返回类型
+        typeParams.Add(func.ReturnType);
+
+        // 如果只有返回类型（无参数函数），格式为 function<returnType>
+        // 如果有参数，格式为 function<param1, param2, ..., returnType>
+        return $"function<{string.Join(", ", typeParams)}>";
+    }
+
+    /// <summary>
+    /// 检查函数类型匹配
+    /// 规则：
+    /// - 基本 function 类型兼容任何函数类型
+    /// - 泛型函数类型 function<...> 需要检查参数数量和类型匹配
+    /// - 最后一个泛型参数是返回类型，前面的是参数类型
+    /// </summary>
+    private bool CheckFunctionTypeMatch(string expectedType, object? val)
+    {
+        // 值必须是函数类型
+        if (val is not FunctionMetadata && val is not ClosureValue)
+        {
+            return false;
+        }
+
+        // 获取实际的函数元数据
+        var func = val is ClosureValue closure ? closure.Function : (FunctionMetadata)val;
+
+        // 如果期望类型是基本 function（无泛型参数），兼容任何函数
+        if (!expectedType.Contains('<'))
+        {
+            return true;
+        }
+
+        // 获取实际函数的类型字符串
+        var actualType = GetFunctionTypeString(func);
+
+        // 如果实际类型是基本 function（无泛型参数），在宽松模式下允许
+        // 因为实际函数可能没有完整的类型注解
+        if (!actualType.Contains('<'))
+        {
+            return true;
+        }
+
+        // 解析期望类型的泛型参数
+        var expectedParams = ParseFunctionTypeParams(expectedType);
+        var actualParams = ParseFunctionTypeParams(actualType);
+
+        if (expectedParams == null || actualParams == null)
+        {
+            return false;
+        }
+
+        // 检查参数数量是否匹配
+        if (expectedParams.Length != actualParams.Length)
+        {
+            return false;
+        }
+
+        // 检查每个类型参数是否兼容
+        for (int i = 0; i < expectedParams.Length; i++)
+        {
+            var expectedParam = expectedParams[i].Trim();
+            var actualParam = actualParams[i].Trim();
+
+            // 比较类型名称是否相同（忽略大小写）
+            if (!AreTypeNamesCompatible(expectedParam, actualParam))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 检查两个类型名称是否兼容
+    /// </summary>
+    private bool AreTypeNamesCompatible(string expectedType, string actualType)
+    {
+        // 完全匹配（忽略大小写）
+        if (expectedType.Equals(actualType, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // any 类型兼容任何类型
+        if (expectedType.Equals("any", StringComparison.OrdinalIgnoreCase) ||
+            expectedType.Equals("object", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // int 可以隐式转换为 double
+        if (expectedType.Equals("double", StringComparison.OrdinalIgnoreCase) &&
+            actualType.Equals("int", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // 处理可空类型
+        if (expectedType.EndsWith("?"))
+        {
+            var baseExpected = expectedType.Substring(0, expectedType.Length - 1);
+            if (actualType.Equals("null", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return AreTypeNamesCompatible(baseExpected, actualType);
+        }
+
+        // 处理泛型类型（递归检查）
+        if (expectedType.Contains('<') && actualType.Contains('<'))
+        {
+            var expectedBase = expectedType.Substring(0, expectedType.IndexOf('<'));
+            var actualBase = actualType.Substring(0, actualType.IndexOf('<'));
+
+            if (!expectedBase.Equals(actualBase, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var expectedArgs = ParseFunctionTypeParams(expectedType);
+            var actualArgs = ParseFunctionTypeParams(actualType);
+
+            if (expectedArgs == null || actualArgs == null || expectedArgs.Length != actualArgs.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < expectedArgs.Length; i++)
+            {
+                if (!AreTypeNamesCompatible(expectedArgs[i].Trim(), actualArgs[i].Trim()))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 解析函数类型的泛型参数
+    /// 例如: "function<int, string, bool>" -> ["int", "string", "bool"]
+    /// </summary>
+    private string[]? ParseFunctionTypeParams(string functionType)
+    {
+        var genericStart = functionType.IndexOf('<');
+        if (genericStart < 0)
+        {
+            return null;
+        }
+
+        var genericEnd = FindMatchingBracket(functionType, genericStart);
+        if (genericEnd < 0)
+        {
+            return null;
+        }
+
+        var paramsPart = functionType.Substring(genericStart + 1, genericEnd - genericStart - 1);
+        return SplitGenericArgs(paramsPart);
+    }
+
+    /// <summary>
+    /// 查找匹配的右尖括号
+    /// </summary>
+    private int FindMatchingBracket(string text, int startIndex)
+    {
+        int depth = 0;
+        for (int i = startIndex; i < text.Length; i++)
+        {
+            if (text[i] == '<') depth++;
+            else if (text[i] == '>') depth--;
+            if (depth == 0) return i;
+        }
+        return -1;
     }
 
     private string[] SplitGenericArgs(string args)

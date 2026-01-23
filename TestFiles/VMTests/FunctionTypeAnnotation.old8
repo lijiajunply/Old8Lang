@@ -1,0 +1,36 @@
+// 函数类型注解虚拟机测试
+
+// 1. 基本函数类型（任意签名）
+callback:function <- (x:int):int -> x * 2
+result1 <- callback(5)
+PrintLine("callback(5) = " + result1.ToStr())  // 应输出 10
+
+// 2. 无参数，有返回值的函数类型
+getter:function<int> <- ():int -> 42
+result2 <- getter()
+PrintLine("getter() = " + result2.ToStr())  // 应输出 42
+
+// 3. 有参数，无返回值的函数类型
+printer:function<string, void> <- (msg:string):void -> PrintLine("Message: " + msg)
+printer("Hello")  // 应输出 "Message: Hello"
+
+// 4. 多参数，有返回值的函数类型
+adder:function<int, int, int> <- (a:int, b:int):int -> a + b
+result4 <- adder(3, 7)
+PrintLine("adder(3, 7) = " + result4.ToStr())  // 应输出 10
+
+// 5. 函数类型作为变量重新赋值
+myFunc:function<int, int> <- (x:int):int -> x + 1
+result5a <- myFunc(5)
+PrintLine("myFunc(5) = " + result5a.ToStr())  // 应输出 6
+
+myFunc <- (x:int):int -> x * 3
+result5b <- myFunc(5)
+PrintLine("myFunc(5) after reassign = " + result5b.ToStr())  // 应输出 15
+
+// 6. 基本 function 类型兼容任何函数
+anyFunc:function <- (a:int, b:int, c:int):int -> a + b + c
+result6 <- anyFunc(1, 2, 3)
+PrintLine("anyFunc(1, 2, 3) = " + result6.ToStr())  // 应输出 6
+
+PrintLine("所有虚拟机测试通过!")

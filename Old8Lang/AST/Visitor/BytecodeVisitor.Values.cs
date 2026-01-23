@@ -632,10 +632,13 @@ public partial class BytecodeVisitor
         debugOutput.AppendLine($"[DEBUG]   实际捕获的变量: {string.Join(", ", actualCapturedVars)}");
         System.IO.File.AppendAllText("/tmp/lambda_debug.txt", debugOutput.ToString());
 
-        // 5. 编译 Lambda 函数体，传递捕获的变量列表
-        _compiler.CompileFunction(lambdaName, paramNames, paramTypes, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars);
+        // 5. 提取返回类型
+        string returnType = node.Id?.AssumptionType ?? "";
 
-        // 6. 获取编译后的函数索引
+        // 6. 编译 Lambda 函数体，传递捕获的变量列表和返回类型
+        _compiler.CompileFunction(lambdaName, paramNames, paramTypes, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars, returnType);
+
+        // 7. 获取编译后的函数索引
         int funcIndex = _compiler.GetFunctionIndex(lambdaName);
 
         // 7. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令

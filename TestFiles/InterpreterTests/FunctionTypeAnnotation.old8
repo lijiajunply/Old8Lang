@@ -1,0 +1,54 @@
+// 函数类型注解解释器测试
+
+// 1. 基本函数类型（任意签名）
+callback:function <- (x:int) -> x * 2
+result1 <- callback(5)
+PrintLine("callback(5) = " + result1.ToStr())  // 应输出 10
+
+// 2. 无参数，有返回值的函数类型
+getter:function<int> <- () -> 42
+result2 <- getter()
+PrintLine("getter() = " + result2.ToStr())  // 应输出 42
+
+// 3. 有参数，无返回值的函数类型
+printer:function<string, void> <- (msg:string) -> PrintLine("Message: " + msg)
+printer("Hello")  // 应输出 "Message: Hello"
+
+// 4. 多参数，有返回值的函数类型
+adder:function<int, int, int> <- (a:int, b:int) -> a + b
+result4 <- adder(3, 7)
+PrintLine("adder(3, 7) = " + result4.ToStr())  // 应输出 10
+
+// 5. 函数作为参数的高阶函数
+func applyTwice(f:function<int, int>, x:int) -> int {
+    return f(f(x))
+}
+
+double <- (n:int) -> n * 2
+result5 <- applyTwice(double, 3)
+PrintLine("applyTwice(double, 3) = " + result5.ToStr())  // 应输出 12 (3*2=6, 6*2=12)
+
+// 6. 返回函数的高阶函数
+func makeAdder(n:int) -> function<int, int> {
+    return (x:int) -> x + n
+}
+
+add5 <- makeAdder(5)
+result6 <- add5(10)
+PrintLine("makeAdder(5)(10) = " + result6.ToStr())  // 应输出 15
+
+// 7. 函数类型作为变量重新赋值
+myFunc:function<int, int> <- (x:int) -> x + 1
+result7a <- myFunc(5)
+PrintLine("myFunc(5) = " + result7a.ToStr())  // 应输出 6
+
+myFunc <- (x:int) -> x * 3
+result7b <- myFunc(5)
+PrintLine("myFunc(5) after reassign = " + result7b.ToStr())  // 应输出 15
+
+// 8. 基本 function 类型兼容任何函数
+anyFunc:function <- (a:int, b:int, c:int) -> a + b + c
+result8 <- anyFunc(1, 2, 3)
+PrintLine("anyFunc(1, 2, 3) = " + result8.ToStr())  // 应输出 6
+
+PrintLine("所有解释器测试通过!")

@@ -47,6 +47,9 @@ public partial class BytecodeVisitor
 
             string typeToCheck = node.Id.AssumptionType;
 
+            // DEBUG: 输出类型注解信息
+            // Console.WriteLine($"[DEBUG] Variable: {varName}, TypeAnnotation: '{typeToCheck}'");
+
             // 如果没有显式类型注解，尝试查找变量的已知类型
             if (string.IsNullOrEmpty(typeToCheck) && _compiler.IsLocalVariable(varName))
             {

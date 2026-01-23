@@ -345,6 +345,12 @@ public class TypeAnnotationManager
                 ValidateParsedTypeCompatibility(expected, actualMember));
         }
 
+        // 处理函数类型兼容性
+        if (expected.BaseType == "function" || actual.BaseType == "function")
+        {
+            return ValidateFunctionTypeCompatibility(expected, actual);
+        }
+
         // 特殊处理：null 可以赋值给任何可空类型
         if (actual.BaseType == "null" && expected.IsNullable)
         {
@@ -398,6 +404,59 @@ public class TypeAnnotationManager
     }
 
     /// <summary>
+    /// 验证函数类型兼容性
+    /// 规则：
+    /// - 基本 function 类型兼容任何函数类型
+    /// - 泛型函数类型 function<...> 需要检查参数数量和类型匹配
+    /// - 最后一个泛型参数是返回类型，前面的是参数类型
+    /// </summary>
+    private bool ValidateFunctionTypeCompatibility(ParsedTypeAnnotation expected, ParsedTypeAnnotation actual)
+    {
+        // 两者都必须是 function 类型
+        if (expected.BaseType != "function" || actual.BaseType != "function")
+        {
+            return false;
+        }
+
+        // 如果期望类型是基本 function（无泛型参数），兼容任何函数
+        if (expected.GenericArguments is null || expected.GenericArguments.Count == 0)
+        {
+            return true;
+        }
+
+        // 如果实际类型是基本 function（无泛型参数），但期望类型有泛型参数
+        // 在宽松模式下允许（因为实际函数可能没有完整的类型注解）
+        if (actual.GenericArguments is null || actual.GenericArguments.Count == 0)
+        {
+            return true;
+        }
+
+        // 两者都有泛型参数，需要检查参数数量和类型匹配
+        if (expected.GenericArguments.Count != actual.GenericArguments.Count)
+        {
+            return false;
+        }
+
+        // 递归检查每个类型参数
+        for (int i = 0; i < expected.GenericArguments.Count; i++)
+        {
+            var expectedParam = expected.GenericArguments[i];
+            var actualParam = actual.GenericArguments[i];
+
+            // 对于参数类型（除了最后一个返回类型），使用逆变规则
+            // 对于返回类型（最后一个），使用协变规则
+            // 简化处理：这里使用双向兼容性检查
+            if (!ValidateParsedTypeCompatibility(expectedParam, actualParam) &&
+                !ValidateParsedTypeCompatibility(actualParam, expectedParam))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// 验证变量赋值的类型兼容性
     /// </summary>
     public void ValidateVariableAssignment(
@@ -436,12 +495,60 @@ public class TypeAnnotationManager
             ArrayLangValue => "array",
             ListLangValue => "list",
             DictionaryLangValue => "dict",
-            FuncLangValue => "function",
+            FuncLangValue funcValue => GetFunctionTypeAnnotation(funcValue),
             TypeTemplate => "class",
             NullLangValue => "null",
             VoidLangValue => "void",
             _ => "any"
         };
+    }
+
+    /// <summary>
+    /// 获取函数值的完整类型注解
+    /// 格式: function<param1, param2, ..., returnType>
+    /// 规则: 最后一个泛型参数是返回值类型，前面的都是参数类型
+    /// </summary>
+    private string GetFunctionTypeAnnotation(FuncLangValue funcValue)
+    {
+        // 如果是原生方法（Method 不为 null），返回基本 function 类型
+        if (funcValue.Method is not null)
+        {
+            return "function";
+        }
+
+        // 获取返回类型
+        var returnType = funcValue.Id?.AssumptionType;
+
+        // 如果没有返回类型注解，返回基本 function 类型
+        // 这样可以兼容没有完整类型注解的 lambda 表达式
+        if (string.IsNullOrEmpty(returnType))
+        {
+            return "function";
+        }
+
+        var typeParams = new List<string>();
+
+        // 添加参数类型
+        if (funcValue.Ids is not null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                var paramType = param.AssumptionType;
+                if (string.IsNullOrEmpty(paramType))
+                {
+                    // 如果参数没有类型注解，返回基本 function 类型
+                    return "function";
+                }
+                typeParams.Add(paramType);
+            }
+        }
+
+        // 添加返回类型
+        typeParams.Add(returnType);
+
+        // 如果只有返回类型（无参数函数），格式为 function<returnType>
+        // 如果有参数，格式为 function<param1, param2, ..., returnType>
+        return $"function<{string.Join(", ", typeParams)}>";
     }
 
     /// <summary>

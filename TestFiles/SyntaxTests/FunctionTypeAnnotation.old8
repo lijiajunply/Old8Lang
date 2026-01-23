@@ -1,0 +1,31 @@
+// 函数类型注解语法测试
+
+// 1. 基本函数类型（任意签名）
+callback:function <- (x:int) -> x * 2
+
+// 2. 无参数，有返回值的函数类型
+getter:function<int> <- () -> 42
+
+// 3. 有参数，无返回值的函数类型
+printer:function<string, void> <- (msg:string) -> PrintLine(msg)
+
+// 4. 多参数，有返回值的函数类型
+adder:function<int, int, int> <- (a:int, b:int) -> a + b
+
+// 5. 复杂参数类型
+transformer:function<string, int> <- (s:string) -> s.Length()
+
+// 6. 函数作为参数的高阶函数
+func applyTwice(f:function<int, int>, x:int) -> int {
+    return f(f(x))
+}
+
+// 7. 返回函数的高阶函数
+func makeAdder(n:int) -> function<int, int> {
+    return (x:int) -> x + n
+}
+
+// 8. 测试基本函数类型兼容性
+anyFunc:function <- (a:int, b:string) -> a.ToStr() + b
+
+PrintLine("函数类型注解语法测试通过")
