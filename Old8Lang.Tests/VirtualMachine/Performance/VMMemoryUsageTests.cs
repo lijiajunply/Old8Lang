@@ -1,6 +1,5 @@
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
-using System.Diagnostics;
 
 namespace Old8Lang.Tests.VirtualMachine.Performance;
 

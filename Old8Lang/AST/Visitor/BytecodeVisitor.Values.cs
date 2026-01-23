@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Bytecode;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;

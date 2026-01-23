@@ -1,4 +1,3 @@
-using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
 
 namespace Old8Lang.Bytecode.ModuleSystem;

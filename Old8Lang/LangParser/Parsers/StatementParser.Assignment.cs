@@ -1,10 +1,6 @@
-using Old8Lang.AST;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
-using Old8Lang.LangParser.Core;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -28,12 +24,10 @@ public partial class StatementParser
                 var expr = expressionParser.ParseExpression();
                 return new SetStatement(id, expr, id.Position);
             }
-            else
-            {
-                // 只有类型注解，没有赋值，创建赋值 Null 的语句
-                var nullExpr = new NullLangValue(id.Position);
-                return new SetStatement(id, nullExpr, id.Position);
-            }
+
+            // 只有类型注解，没有赋值，创建赋值 Null 的语句
+            var nullExpr = new NullLangValue(id.Position);
+            return new SetStatement(id, nullExpr, id.Position);
         }
 
         // 解析左值表达式 - 只能是标识符、this或复杂左值（如a.b或a[b]），不能是解构模式
@@ -61,13 +55,11 @@ public partial class StatementParser
             {
                 var nullExpr = new NullLangValue(leftLangId.Position);
                 return new SetStatement(
-                    new LangId(leftLangId.IdName, assumptionType, null, position: leftLangId.Position), nullExpr,
+                    new LangId(leftLangId.IdName, assumptionType, position: leftLangId.Position), nullExpr,
                     leftLangId.Position);
             }
-            else
-            {
-                throw CreateSyntaxError("只有类型注解没有赋值时，左值必须是标识符");
-            }
+
+            throw CreateSyntaxError("只有类型注解没有赋值时，左值必须是标识符");
         }
 
         Expect(LangTokenType.Assignment);
@@ -88,7 +80,6 @@ public partial class StatementParser
     /// <summary>
     /// 解析数组解构赋值：[a, b] &lt;- [1, 2]
     /// </summary>
-
     private SetStatement ParseArrayDestructuring()
     {
         Expect(LangTokenType.LeftBracket);
@@ -157,7 +148,6 @@ public partial class StatementParser
     /// <summary>
     /// 解析对象解构赋值：{name, age} &lt;- person
     /// </summary>
-
     private SetStatement ParseObjectDestructuring()
     {
         Expect(LangTokenType.LeftBrace);
@@ -242,7 +232,6 @@ public partial class StatementParser
     /// minusMinus = identifier "--"
     /// </summary>
     /// <returns>i--运算</returns>
-
     public SetStatement ParseMinusMinus()
     {
         var identifier = CurrentToken.Value;
@@ -251,11 +240,4 @@ public partial class StatementParser
         return new SetStatement(new LangId(identifier),
             new Operation(new LangId(identifier), LangTokenType.Minus, new IntLangValue(1)));
     }
-
-    /// <summary>
-    /// block = "{" statement* "}"
-    ///        | statement
-    /// </summary>
-    /// <returns>块语句</returns>
-
 }

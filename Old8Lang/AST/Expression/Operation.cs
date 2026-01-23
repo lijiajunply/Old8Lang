@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.OperationHelpers;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Bytecode.VM;
-using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
