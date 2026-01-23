@@ -185,7 +185,7 @@ public partial class VirtualMachine
     /// <summary>
     /// 调用闭包函数（带捕获变量）
     /// </summary>
-    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, Dictionary<string, object?> capturedVariables)
+    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, Dictionary<string, object?> capturedVariables, ConstantPool? constantPool = null)
     {
         // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
         object?[] processedArguments = arguments;
@@ -194,11 +194,12 @@ public partial class VirtualMachine
             processedArguments = ProcessParamsArguments(function, arguments);
         }
 
-        // 创建调用帧，并设置闭包环境
+        // 创建调用帧，并设置闭包环境和常量池
         var frame = new CallFrame(function, function.LocalCount)
         {
             Arguments = processedArguments,
-            ClosureEnvironment = capturedVariables  // 将捕获的变量设置为闭包环境
+            ClosureEnvironment = capturedVariables,  // 将捕获的变量设置为闭包环境
+            ConstantPool = constantPool  // 设置常量池（用于模块导入的函数）
         };
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)

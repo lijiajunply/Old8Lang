@@ -37,7 +37,9 @@ public partial class VirtualMachine
             case OpCode.LoadConst:
             {
                 int constIndex = (int)instruction.Operand!;
-                var constant = _bytecodeFile.ConstantPool.GetConstant(constIndex);
+                // 优先使用调用帧的常量池（用于模块导入的函数）
+                var constantPool = frame.ConstantPool ?? _bytecodeFile.ConstantPool;
+                var constant = constantPool.GetConstant(constIndex);
                 _stack.Push(constant);
             }
                 break;
@@ -309,11 +311,38 @@ public partial class VirtualMachine
                         break;
                     }
 
-                    // 首先检查全局变量中是否有该函数（可能是从模块导入的）
+                    // 首先检查当前调用帧的闭包环境（如果有）
                     FunctionMetadata? function = null;
-                    if (_globals.TryGetValue(funcName, out var funcObj) && funcObj is FunctionMetadata funcMeta)
+                    Dictionary<string, object?>? closureEnvironment = null;
+                    ConstantPool? closureConstantPool = null;
+
+                    if (frame.ClosureEnvironment != null && frame.ClosureEnvironment.TryGetValue(funcName, out var closureFunc))
                     {
-                        function = funcMeta;
+                        if (closureFunc is FunctionMetadata closureFuncMeta)
+                        {
+                            function = closureFuncMeta;
+                        }
+                        else if (closureFunc is ClosureValue closureClosure)
+                        {
+                            function = closureClosure.Function;
+                            closureEnvironment = closureClosure.CapturedVariables;
+                            closureConstantPool = closureClosure.ConstantPool;
+                        }
+                    }
+
+                    // 然后检查全局变量中是否有该函数（可能是从模块导入的）
+                    if (function == null && _globals.TryGetValue(funcName, out var funcObj))
+                    {
+                        if (funcObj is FunctionMetadata funcMeta)
+                        {
+                            function = funcMeta;
+                        }
+                        else if (funcObj is ClosureValue closure)
+                        {
+                            function = closure.Function;
+                            closureEnvironment = closure.CapturedVariables;
+                            closureConstantPool = closure.ConstantPool;
+                        }
                     }
 
                     // 如果全局变量中没有，从当前字节码文件中查找
@@ -330,6 +359,12 @@ public partial class VirtualMachine
                                 if (symbol is FunctionMetadata moduleFuncMeta)
                                 {
                                     function = moduleFuncMeta;
+                                    break;
+                                }
+                                else if (symbol is ClosureValue moduleClosure)
+                                {
+                                    function = moduleClosure.Function;
+                                    closureEnvironment = moduleClosure.CapturedVariables;
                                     break;
                                 }
                             }
@@ -500,8 +535,15 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        // 调用普通函数
-                        CallFunction(function, args);
+                        // 调用普通函数或闭包函数
+                        if (closureEnvironment != null)
+                        {
+                            CallClosureFunction(function, args, closureEnvironment, closureConstantPool);
+                        }
+                        else
+                        {
+                            CallFunction(function, args);
+                        }
                     }
                 }
                 else
@@ -528,11 +570,37 @@ public partial class VirtualMachine
 
                     // 查找函数
                     FunctionMetadata? function = null;
+                    Dictionary<string, object?>? closureEnvironment = null;
+                    ConstantPool? closureConstantPool = null;
 
-                    // 首先检查全局变量中是否有该函数（可能是从模块导入的）
-                    if (_globals.TryGetValue(funcName, out var funcObj) && funcObj is FunctionMetadata funcMeta)
+                    // 首先检查当前调用帧的闭包环境（如果有）
+                    if (frame.ClosureEnvironment != null && frame.ClosureEnvironment.TryGetValue(funcName, out var closureFunc))
                     {
-                        function = funcMeta;
+                        if (closureFunc is FunctionMetadata closureFuncMeta)
+                        {
+                            function = closureFuncMeta;
+                        }
+                        else if (closureFunc is ClosureValue closureClosure)
+                        {
+                            function = closureClosure.Function;
+                            closureEnvironment = closureClosure.CapturedVariables;
+                            closureConstantPool = closureClosure.ConstantPool;
+                        }
+                    }
+
+                    // 然后检查全局变量中是否有该函数（可能是从模块导入的）
+                    if (function == null && _globals.TryGetValue(funcName, out var funcObj))
+                    {
+                        if (funcObj is FunctionMetadata funcMeta)
+                        {
+                            function = funcMeta;
+                        }
+                        else if (funcObj is ClosureValue closure)
+                        {
+                            function = closure.Function;
+                            closureEnvironment = closure.CapturedVariables;
+                            closureConstantPool = closure.ConstantPool;
+                        }
                     }
 
                     // 如果全局变量中没有，从当前字节码文件中查找
@@ -549,6 +617,12 @@ public partial class VirtualMachine
                                 if (symbol is FunctionMetadata moduleFuncMeta)
                                 {
                                     function = moduleFuncMeta;
+                                    break;
+                                }
+                                else if (symbol is ClosureValue moduleClosure)
+                                {
+                                    function = moduleClosure.Function;
+                                    closureEnvironment = moduleClosure.CapturedVariables;
                                     break;
                                 }
                             }
@@ -599,8 +673,15 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        // 调用普通函数
-                        CallFunction(function, args);
+                        // 调用普通函数或闭包函数
+                        if (closureEnvironment != null)
+                        {
+                            CallClosureFunction(function, args, closureEnvironment, closureConstantPool);
+                        }
+                        else
+                        {
+                            CallFunction(function, args);
+                        }
                     }
                 }
 

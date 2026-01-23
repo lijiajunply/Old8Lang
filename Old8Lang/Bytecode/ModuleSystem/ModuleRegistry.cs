@@ -131,10 +131,12 @@ public class LoadedModule
                     switch (symbol.Type)
                     {
                         case ExportedSymbolType.Function:
-                            // 查找函数
+                            // 查找函数并包装成闭包，捕获模块的全局变量空间和常量池
                             if (symbol.MetadataIndex >= 0 && symbol.MetadataIndex < BytecodeFile.Functions.Count)
                             {
-                                value = BytecodeFile.Functions[symbol.MetadataIndex];
+                                var funcMetadata = BytecodeFile.Functions[symbol.MetadataIndex];
+                                // 将函数包装成闭包，捕获模块的全局变量空间和常量池
+                                value = new ClosureValue(funcMetadata, Globals, BytecodeFile.ConstantPool);
                             }
                             break;
 
@@ -180,7 +182,8 @@ public class LoadedModule
                 for (int i = 0; i < BytecodeFile.Functions.Count; i++)
                 {
                     var func = BytecodeFile.Functions[i];
-                    _exportCache[func.Name] = func;
+                    // 将函数包装成闭包，捕获模块的全局变量空间和常量池
+                    _exportCache[func.Name] = new ClosureValue(func, Globals, BytecodeFile.ConstantPool);
                 }
 
                 for (int i = 0; i < BytecodeFile.Classes.Count; i++)

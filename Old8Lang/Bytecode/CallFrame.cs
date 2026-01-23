@@ -32,6 +32,9 @@ public class CallFrame(FunctionMetadata function, int localCount)
     /// <summary>闭包捕获的变量环境（用于闭包函数）</summary>
     public Dictionary<string, object?>? ClosureEnvironment { get; set; }
 
+    /// <summary>常量池（用于模块导入的函数）</summary>
+    public ConstantPool? ConstantPool { get; set; }
+
     /// <summary>
     /// 获取当前指令
     /// </summary>
