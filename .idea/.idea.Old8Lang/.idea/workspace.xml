@@ -23,44 +23,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Base/CompilerException.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Base/ErrorException.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Class/ClassError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Concurrency/ConcurrencyError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/IO/FileErrors.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/IO/IONetworkError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Import/ImportError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/CommonErrors.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/CustomError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/DataProcessingErrors.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Misc/SystemErrors.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/REFACTORING_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/IndexError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/NameError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/RuntimeError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Runtime/ValueErrors.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Semantic/SemanticError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/Syntax/SyntaxError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystem/TypeError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeSystem/TypeSystemError.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Arithmetic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Async.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Comparison.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Concurrency.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Container.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.ControlFlow.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Defer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Exception.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Iterator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Logical.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Main.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Module.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Stack.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Thread.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Type.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/AdditionalErrors.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ClassError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CompilerException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ConcurrencyError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IONetworkError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/MiscError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/NameError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeSystemError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1077,19 +1056,6 @@
           <option name="timeStamp" value="563" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs</url>
-          <line>262</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" containingFunctionPresentation="方法 'ErrorPosition_Accurate'">
-            <startOffsets>
-              <option value="5683" />
-            </startOffsets>
-            <endOffsets>
-              <option value="5724" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="564" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
           <line>31</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Array_ShouldReturnTrueWhenExists'" />
@@ -1418,6 +1384,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="649" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Main.cs</url>
+          <line>225</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Instructions.Main.cs" containingFunctionPresentation="方法 'CheckTypeMatch'">
+            <startOffsets>
+              <option value="7173" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7213" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="650" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
