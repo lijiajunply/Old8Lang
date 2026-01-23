@@ -352,13 +352,13 @@ public class InterpreterIntegrationTests
     {
         // 测试嵌套函数调用
         var code = @"
-            func double(x) {
+            func twice(x) {
                 return x * 2
             }
             func addTen(x) {
                 return x + 10
             }
-            result <- addTen(double(5))
+            result <- addTen(twice(5))
         ";
         var interpreter = new LangInterpreter();
 

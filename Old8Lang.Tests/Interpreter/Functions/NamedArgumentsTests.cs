@@ -160,13 +160,13 @@ public class NamedArgumentsTests
     {
         // Arrange
         var code = @"
-            func double(n:int) -> int {
+            func tw(n:int) -> int {
                 return n * 2
             }
             func add(x:int, y:int) -> int {
                 return x + y
             }
-            result <- add(x: double(5), y: double(10))
+            result <- add(x: tw(5), y: tw(10))
         ";
         var interpreter = new LangInterpreter();
 
@@ -383,10 +383,10 @@ public class NamedArgumentsTests
     {
         // Arrange
         var code = @"
-            func double(x:int) -> int {
+            func tw(x:int) -> int {
                 return x * 2
             }
-            result <- double(x: 21)
+            result <- tw(x: 21)
         ";
         var interpreter = new LangInterpreter();
 
