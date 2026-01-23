@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.Bytecode.Profiler;
 

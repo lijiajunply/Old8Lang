@@ -1,6 +1,6 @@
 using Old8Lang.Bytecode.VM;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Core;
 
 /// <summary>
 /// 虚拟机上下文 - 用于在全局函数中访问当前虚拟机实例

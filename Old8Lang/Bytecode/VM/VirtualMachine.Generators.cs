@@ -1,4 +1,6 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.Generators;
 
 namespace Old8Lang.Bytecode.VM;
 

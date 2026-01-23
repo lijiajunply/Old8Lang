@@ -1,4 +1,4 @@
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Core;
 
 /// <summary>
 /// 字节码操作码枚举

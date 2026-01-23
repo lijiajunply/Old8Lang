@@ -1,7 +1,8 @@
 using System.Text;
 using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Bytecode.Core;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Debugger;
 
 /// <summary>
 /// 字节码反汇编器，用于将字节码转换为可读的文本格式

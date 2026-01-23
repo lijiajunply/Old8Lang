@@ -1,4 +1,6 @@
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Generators;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Bytecode.ModuleSystem;

@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -157,7 +158,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         var funcArgs = arguments.Skip(1).ToArray();
 
         // 获取虚拟机实例（通过 VMContext）
-        var vm = Bytecode.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             throw new InvalidOperationException("无法获取当前虚拟机实例");

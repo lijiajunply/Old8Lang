@@ -1,6 +1,6 @@
 using Old8Lang.Bytecode.Metadata;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Core;
 
 /// <summary>
 /// 调用栈帧

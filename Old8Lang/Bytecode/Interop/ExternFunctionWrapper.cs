@@ -6,7 +6,7 @@ using Old8Lang.Error;
 using Python.Runtime;
 using Jint;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Interop;
 
 /// <summary>
 /// Extern 函数包装器 - 用于在虚拟机中调用外部函数

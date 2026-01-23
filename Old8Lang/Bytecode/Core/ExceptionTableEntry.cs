@@ -1,4 +1,4 @@
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Core;
 
 /// <summary>
 /// 异常表条目 - 描述一个异常处理区域

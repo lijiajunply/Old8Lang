@@ -2,7 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Closures;
 
 /// <summary>
 /// 闭包变量捕获分析器 - 分析 Lambda 函数中引用的外部变量

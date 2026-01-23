@@ -1,9 +1,11 @@
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 
 namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {
+    /// <summary>
     /// 执行所有 defer 块（按 LIFO 顺序）
     /// </summary>
     private void ExecuteDefers(CallFrame frame)

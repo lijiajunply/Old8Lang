@@ -1,6 +1,6 @@
 using Old8Lang.Bytecode.Metadata;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Closures;
 
 /// <summary>
 /// 闭包对象 - 包含函数元数据和捕获的变量
