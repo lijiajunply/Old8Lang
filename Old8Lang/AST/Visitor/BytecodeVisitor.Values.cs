@@ -522,6 +522,14 @@ public partial class BytecodeVisitor
         return null;
     }
 
+    public Instruction? VisitThisExpression(ThisExpression node)
+    {
+        // 加载 this 引用
+        // LoadThis 指令会将当前实例压栈
+        Emit(OpCode.LoadThis);
+        return null;
+    }
+
     public Instruction? VisitSuperProxy(SuperProxy node)
     {
         // SuperProxy 在字节码模式中不应该直接访问

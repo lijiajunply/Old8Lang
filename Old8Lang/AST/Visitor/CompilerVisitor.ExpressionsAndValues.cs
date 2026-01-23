@@ -50,6 +50,13 @@ public partial class CompilerVisitor
         return null;
     }
 
+    public object? VisitThisExpression(ThisExpression node)
+    {
+        // 加载 this 指针（ldarg.0）
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
+
     public object? VisitTernaryExpression(TernaryExpression node)
     {
         // 简化实现：委托给节点的LoadIlValue方法

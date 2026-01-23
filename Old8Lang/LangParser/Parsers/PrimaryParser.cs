@@ -295,11 +295,11 @@ public class PrimaryParser(
 
         if (CurrentToken.Type == LangTokenType.This)
         {
-            // 直接创建一个 LangId 对象来处理 this 关键字
+            // 创建一个 ThisExpression 对象来处理 this 关键字
             var thisToken = CurrentToken;
             var position = new SourcePosition(thisToken.Line, thisToken.Column, tokenValue: thisToken.Value);
             Expect(LangTokenType.This);
-            return new LangId(thisToken.Value, position: position);
+            return new ThisExpression(position);
         }
 
         if (CurrentToken.Type == LangTokenType.Super)

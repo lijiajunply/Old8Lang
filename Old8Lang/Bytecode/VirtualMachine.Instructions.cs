@@ -2960,6 +2960,41 @@ public partial class VirtualMachine
             }
                 break;
 
+            case OpCode.LoadThis:
+            {
+                // 加载当前实例（this）
+                // this 是方法的第一个参数
+                var currentFrame = _callStack.Peek();
+
+                // 优先从 Arguments 中获取 this（第一个参数）
+                if (currentFrame.Arguments is { Length: > 0 })
+                {
+                    var thisInstance = currentFrame.Arguments[0];
+                    if (thisInstance == null)
+                    {
+                        throw new StateError(GetPosition(instruction), "this 只能在实例方法中使用");
+                    }
+
+                    _stack.Push(thisInstance);
+                }
+                // 如果 Arguments 为空，尝试从 Locals 获取
+                else if (currentFrame.Locals.Length > 0)
+                {
+                    var thisInstance = currentFrame.Locals[0];
+                    if (thisInstance == null)
+                    {
+                        throw new StateError(GetPosition(instruction), "this 只能在实例方法中使用");
+                    }
+
+                    _stack.Push(thisInstance);
+                }
+                else
+                {
+                    throw new StateError(GetPosition(instruction), "this 只能在实例方法中使用");
+                }
+            }
+                break;
+
             case OpCode.CallSuperMethod:
             {
                 // 操作数: argCount (int), methodName (string)

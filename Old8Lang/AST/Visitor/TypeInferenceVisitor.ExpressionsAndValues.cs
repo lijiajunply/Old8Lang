@@ -45,6 +45,11 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
+    public Type? VisitThisExpression(ThisExpression node)
+    {
+        return node.OutputType(local);
+    }
+
     public Type? VisitTernaryExpression(TernaryExpression node)
     {
         return node.OutputType(local);

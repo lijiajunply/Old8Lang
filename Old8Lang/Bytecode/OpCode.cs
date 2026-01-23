@@ -152,6 +152,9 @@ public enum OpCode : byte
     /// <summary>加载super引用 (将当前实例作为super上下文压栈)</summary>
     LoadSuper = 0x56,
 
+    /// <summary>加载this引用 (将当前实例压栈)</summary>
+    LoadThis = 0x5A,
+
     /// <summary>调用父类方法 (操作数: argCount, methodNameIndex)</summary>
     CallSuperMethod = 0x57,
 

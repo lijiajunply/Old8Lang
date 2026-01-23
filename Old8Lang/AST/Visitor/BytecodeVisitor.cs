@@ -86,6 +86,7 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
             case OpCode.LoadFalse:
             case OpCode.Dup:
             case OpCode.LoadSuper:  // 加载 super 引用（压入 this）
+            case OpCode.LoadThis:   // 加载 this 引用
                 _currentStackSize++;
                 break;
 

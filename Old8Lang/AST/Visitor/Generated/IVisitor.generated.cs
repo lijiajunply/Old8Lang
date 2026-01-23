@@ -204,6 +204,11 @@ public interface IVisitor<out TResult>
     /// </summary>
     TResult VisitTernaryExpression(TernaryExpression node);
 
+    /// <summary>
+    /// 访问 ThisExpression 节点
+    /// </summary>
+    TResult VisitThisExpression(ThisExpression node);
+
 
     // ===== Value 访问方法 =====
     /// <summary>

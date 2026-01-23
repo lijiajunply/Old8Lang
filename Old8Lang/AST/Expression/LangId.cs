@@ -16,7 +16,8 @@ namespace Old8Lang.AST.Expression;
 /// <param name="position">源代码位置信息，用于错误报告</param>
 /// <remarks>
 /// 该类是Old8Lang表达式系统的基础组件，用于表示各种标识符。
-/// 支持类型注解、默认值、params 可变参数、"this"关键字处理等功能。
+/// 支持类型注解、默认值、params 可变参数等功能。
+/// 注意：this 关键字现在由独立的 ThisExpression 类处理。
 /// </remarks>
 public partial class LangId(
     string name,
@@ -79,31 +80,12 @@ public partial class LangId(
     /// <exception cref="NameError">当标识符未定义时抛出</exception>
     /// <remarks>
     /// 执行过程：
-    /// 1. 如果是"this"关键字，直接从变量管理器中获取
-    /// 2. 否则，尝试获取普通变量
-    /// 3. 如果不是普通变量，尝试获取类或函数
-    /// 4. 如果都没有找到，抛出NameError异常
+    /// 1. 尝试获取普通变量
+    /// 2. 如果不是普通变量，尝试获取类或函数
+    /// 3. 如果都没有找到，抛出NameError异常
     /// </remarks>
     public override LangValueType Run(VariateManager manager)
     {
-        if (IdName == "this")
-        {
-            // 直接从变量储存器中获取名为"this"的变量
-            if (manager is null)
-            {
-                throw new NameError(this, "this");
-            }
-
-            var thisValue = manager.GetValue(new LangId("this"));
-            if (thisValue is not null)
-            {
-                return thisValue;
-            }
-
-            // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
-            throw new NameError(this, "this");
-        }
-
         // 先尝试获取普通变量
         var value = manager.GetValue(this);
         if (value is not null)
@@ -170,13 +152,6 @@ public partial class LangId(
         if (value is not null)
         {
             ilGenerator.Emit(OpCodes.Ldloc, value);
-            return;
-        }
-
-        // 检查是否是 this
-        if (IdName == "this")
-        {
-            ilGenerator.Emit(OpCodes.Ldarg_0);
             return;
         }
 
@@ -360,12 +335,6 @@ public partial class LangId(
         if (DefaultValue is not null)
         {
             return DefaultValue.OutputType(local) ?? typeof(object);
-        }
-
-        if (local.InClassEnv is not null && IdName == "this")
-        {
-            // 返回当前类的类型（可能是 TypeBuilder 或 Type）
-            return local.InClassEnv;
         }
 
         var value = local.GetLocalVar(IdName);

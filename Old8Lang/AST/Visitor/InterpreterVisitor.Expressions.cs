@@ -15,25 +15,6 @@ public partial class InterpreterVisitor
     /// </summary>
     public LangValueType VisitLangId(LangId node)
     {
-        // 迁移自 LangId.Run()
-        if (node.IdName == "this")
-        {
-            // 直接从变量储存器中获取名为"this"的变量
-            if (manager is null)
-            {
-                throw new NameError(node.Position, "this");
-            }
-
-            var thisValue = manager.GetValue(new LangId("this"));
-            if (thisValue is not null)
-            {
-                return thisValue;
-            }
-
-            // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
-            throw new NameError(node.Position, "this");
-        }
-
         // 先尝试获取普通变量
         if (manager is not null)
         {
@@ -131,6 +112,27 @@ public partial class InterpreterVisitor
         // 迁移自 SuperExpression.Run()
         // 暂时调用原方法
         return node.Run(manager);
+    }
+
+    /// <summary>
+    /// 访问 ThisExpression 节点
+    /// </summary>
+    public LangValueType VisitThisExpression(ThisExpression node)
+    {
+        // 直接从变量储存器中获取名为"this"的变量
+        if (manager is null)
+        {
+            throw new NameError(node.Position, "this");
+        }
+
+        var thisValue = manager.GetValue(new LangId("this"));
+        if (thisValue is not null)
+        {
+            return thisValue;
+        }
+
+        // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
+        throw new NameError(node.Position, "this");
     }
 
     /// <summary>
