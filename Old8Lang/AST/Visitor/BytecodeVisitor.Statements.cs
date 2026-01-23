@@ -898,6 +898,9 @@ public partial class BytecodeVisitor
             return null;
         }
 
+        // 首先递归处理所有嵌套类
+        ProcessNestedClasses(typeTemplate);
+
         // 检查是否是泛型类
         if (typeTemplate.GenericParameters != null && typeTemplate.GenericParameters.Count > 0)
         {
@@ -934,6 +937,11 @@ public partial class BytecodeVisitor
                 var accessModifier = GetAccessModifier(memberId.Modifiers);
                 methods.Add((memberId.IdName, funcValue, false, accessModifier));
             }
+            else if (memberExpr is TypeTemplate)
+            {
+                // 这是一个嵌套类，已在上面的 ProcessNestedClasses 中处理，跳过
+                continue;
+            }
             else
             {
                 // 这是一个实例字段，保存字段名、类型和初始值
@@ -950,6 +958,11 @@ public partial class BytecodeVisitor
                 // 这是一个静态方法
                 var accessModifier = GetAccessModifier(memberId.Modifiers);
                 methods.Add((memberId.IdName, funcValue, true, accessModifier));
+            }
+            else if (memberExpr is TypeTemplate)
+            {
+                // 这是一个嵌套类，已在上面的 ProcessNestedClasses 中处理，跳过
+                continue;
             }
             else
             {
@@ -1836,6 +1849,72 @@ public partial class BytecodeVisitor
     /// <summary>
     /// 编译接口定义
     /// </summary>
+    /// <summary>
+    /// 递归处理嵌套类
+    /// </summary>
+    private void ProcessNestedClasses(TypeTemplate typeTemplate)
+    {
+        // 处理实例成员中的嵌套类
+        foreach (var (_, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberExpr is TypeTemplate nestedTypeTemplate)
+            {
+                // 创建带有完整路径的嵌套类名称
+                var fullNestedClassName = typeTemplate.ClassName + "." + nestedTypeTemplate.ClassName;
+
+                // 创建新的 TypeTemplate，使用完整的类名
+                var updatedNestedTemplate = new TypeTemplate(
+                    fullNestedClassName,
+                    nestedTypeTemplate.Variates,
+                    nestedTypeTemplate.StaticVariates,
+                    nestedTypeTemplate.ParentClassName,
+                    nestedTypeTemplate.IsMixin,
+                    nestedTypeTemplate.MixinNames,
+                    nestedTypeTemplate.ImplementsNames,
+                    nestedTypeTemplate.IsInterface,
+                    nestedTypeTemplate.IsAbstract,
+                    nestedTypeTemplate.GenericParameters,
+                    nestedTypeTemplate.ParentGenericTypeParameters,
+                    nestedTypeTemplate.Position
+                );
+
+                // 递归编译嵌套类
+                var nestedClassInit = new ClassInit(updatedNestedTemplate, updatedNestedTemplate.Position);
+                nestedClassInit.Accept(this);
+            }
+        }
+
+        // 处理静态成员中的嵌套类
+        foreach (var (_, memberExpr) in typeTemplate.StaticVariates)
+        {
+            if (memberExpr is TypeTemplate nestedTypeTemplate)
+            {
+                // 创建带有完整路径的嵌套类名称
+                var fullNestedClassName = typeTemplate.ClassName + "." + nestedTypeTemplate.ClassName;
+
+                // 创建新的 TypeTemplate，使用完整的类名
+                var updatedNestedTemplate = new TypeTemplate(
+                    fullNestedClassName,
+                    nestedTypeTemplate.Variates,
+                    nestedTypeTemplate.StaticVariates,
+                    nestedTypeTemplate.ParentClassName,
+                    nestedTypeTemplate.IsMixin,
+                    nestedTypeTemplate.MixinNames,
+                    nestedTypeTemplate.ImplementsNames,
+                    nestedTypeTemplate.IsInterface,
+                    nestedTypeTemplate.IsAbstract,
+                    nestedTypeTemplate.GenericParameters,
+                    nestedTypeTemplate.ParentGenericTypeParameters,
+                    nestedTypeTemplate.Position
+                );
+
+                // 递归编译嵌套类
+                var nestedClassInit = new ClassInit(updatedNestedTemplate, updatedNestedTemplate.Position);
+                nestedClassInit.Accept(this);
+            }
+        }
+    }
+
     private void CompileInterfaceDefinition(TypeTemplate typeTemplate)
     {
         string interfaceName = typeTemplate.ClassName;

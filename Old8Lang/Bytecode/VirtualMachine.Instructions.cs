@@ -2130,10 +2130,27 @@ public partial class VirtualMachine
                     throw new NullReferenceError(GetPosition(instruction), fieldName);
                 }
 
-                // 如果是 ClassMetadata（访问静态字段）
+                // 如果是 ClassMetadata（访问静态字段或嵌套类）
                 if (obj is ClassMetadata classMetadata)
                 {
-                    if (classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
+                    // 首先检查是否是嵌套类访问
+                    // 嵌套类的完整名称格式为 "OuterClass.NestedClass"
+                    string nestedClassName = classMetadata.Name + "." + fieldName;
+                    var nestedClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == nestedClassName);
+
+                    // 如果在当前字节码文件中没找到，从全局变量中查找
+                    if (nestedClass == null && _globals.TryGetValue(nestedClassName, out var globalNestedClass) &&
+                        globalNestedClass is ClassMetadata importedNestedClass)
+                    {
+                        nestedClass = importedNestedClass;
+                    }
+
+                    if (nestedClass != null)
+                    {
+                        // 这是嵌套类访问，将嵌套类的 ClassMetadata 压入栈
+                        _stack.Push(nestedClass);
+                    }
+                    else if (classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
                     {
                         _stack.Push(staticValue);
                     }
@@ -2630,10 +2647,87 @@ public partial class VirtualMachine
                     throw new NullReferenceError(GetPosition(instruction), methodName);
                 }
 
-                // 检查是否是 ClassMetadata（静态方法调用）
+                // 检查是否是 ClassMetadata（静态方法调用或嵌套类访问）
                 if (obj is ClassMetadata staticClassMetadata)
                 {
-                    // 在静态方法列表中查找方法
+                    // 首先检查是否是嵌套类访问
+                    // 嵌套类的完整名称格式为 "OuterClass.NestedClass"
+                    string nestedClassName = staticClassMetadata.Name + "." + methodName;
+                    var nestedClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == nestedClassName);
+
+                    // 如果在当前字节码文件中没找到，从全局变量中查找
+                    if (nestedClass == null && _globals.TryGetValue(nestedClassName, out var globalNestedClass) &&
+                        globalNestedClass is ClassMetadata importedNestedClass)
+                    {
+                        nestedClass = importedNestedClass;
+                    }
+
+                    if (nestedClass != null)
+                    {
+                        // 这是嵌套类访问
+                        // 如果有参数（argCount > 1，因为第一个参数是类本身），说明是调用构造函数，需要创建对象实例
+                        if (argCount > 1 || (argCount == 1 && args.Length == 0))
+                        {
+                            // 创建嵌套类的实例
+                            // 首先创建对象
+                            var nestedObj = new BytecodeObjectInstance(nestedClassName);
+
+                            // 初始化所有字段为默认值
+                            var allFields = new List<FieldMetadata>();
+                            var currentClass = nestedClass;
+                            while (currentClass != null)
+                            {
+                                allFields.AddRange(currentClass.Fields);
+                                if (!string.IsNullOrEmpty(currentClass.BaseClassName))
+                                {
+                                    currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            foreach (var field in allFields)
+                            {
+                                if (!nestedObj.Fields.ContainsKey(field.Name))
+                                {
+                                    object? defaultValue = null;
+                                    if (field.DefaultValueIndex >= 0 && field.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                                    {
+                                        defaultValue = _bytecodeFile.ConstantPool.GetConstant(field.DefaultValueIndex);
+                                    }
+                                    else if (field.IsDefaultNull)
+                                    {
+                                        defaultValue = null;
+                                    }
+                                    nestedObj.Fields[field.Name] = defaultValue;
+                                }
+                            }
+
+                            // 查找并调用构造函数（init方法）
+                            var initMethod = nestedClass.Methods.FirstOrDefault(m => m.Name == "init");
+                            if (initMethod != null)
+                            {
+                                // 调用构造函数，传入对象实例和参数
+                                var initArgs = new object?[args.Length + 1];
+                                initArgs[0] = nestedObj;
+                                Array.Copy(args, 0, initArgs, 1, args.Length);
+                                CallFunction(initMethod.Function, initArgs);
+                            }
+
+                            // 将对象实例压入栈
+                            _stack.Push(nestedObj);
+                        }
+                        else
+                        {
+                            // 没有参数，只是访问嵌套类，将嵌套类的 ClassMetadata 压入栈
+                            _stack.Push(nestedClass);
+                        }
+                        break;
+                    }
+
+                    // 不是嵌套类，尝试查找静态方法
                     var staticMethod = staticClassMetadata.StaticMethods.FirstOrDefault(m => m.Name == methodName);
 
                     if (staticMethod == null)
