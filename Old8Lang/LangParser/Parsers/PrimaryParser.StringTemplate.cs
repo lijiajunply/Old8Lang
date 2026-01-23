@@ -199,12 +199,4 @@ public partial class PrimaryParser
         // 如果不是字符串插值，返回普通表达式
         return ParsePrimary();
     }
-
-
-    /// <summary>
-    /// 解析标识符，支持带类型注解的标识符：identifier:type
-    /// 允许将关键字用作标识符
-    /// </summary>
-    /// <returns>标识符</returns>
-
 }

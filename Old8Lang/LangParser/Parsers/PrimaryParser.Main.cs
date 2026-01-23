@@ -317,17 +317,5 @@ public partial class PrimaryParser(
                 $"语法错误：无法识别的主表达式类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查表达式结构是否正确。")
         };
     }
-
-    /// <summary>
-    /// 解析列表或字典初始化
-    /// list = "{" expression ( "," expression )* "}" ;
-    /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
-    /// dicTuple = expression ":" expression ;
-    ///
-    /// 区分规则：
-    /// - 如果第一个元素后面跟着冒号，则是字典
-    /// - 否则是列表
-    /// </summary>
-    /// <returns>列表或字典初始化</returns>
     #endregion
 }

@@ -173,10 +173,4 @@ public partial class StatementParser
         var block = ParseBlock();
         return new CaseStatement(expression, block, position);
     }
-
-    /// <summary>
-    /// funcRunStatement = identifier "(" argList? ")" ;
-    /// </summary>
-    /// <returns>函数调用</returns>
-
 }

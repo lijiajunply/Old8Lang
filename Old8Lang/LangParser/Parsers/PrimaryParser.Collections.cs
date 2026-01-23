@@ -288,11 +288,4 @@ public partial class PrimaryParser
 
         return loops[0];
     }
-
-    /// <summary>
-    /// lambda = "(" idList? ")" "->" block ;
-    /// tuple = "(" expression ( "," expression )* ")" ;
-    /// </summary>
-    /// <returns>返回Lambda或元组</returns>
-
 }

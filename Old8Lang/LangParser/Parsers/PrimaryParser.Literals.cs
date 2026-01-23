@@ -210,10 +210,4 @@ public partial class PrimaryParser
         Expect(LangTokenType.Null);
         return new NullLangValue(position);
     }
-
-    /// <summary>
-    /// 解析列表初始化或切片
-    /// </summary>
-    /// <returns>列表初始化或切片</returns>
-
 }

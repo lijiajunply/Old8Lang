@@ -335,10 +335,4 @@ public partial class StatementParser
 
         return new NativeStatement(dllName, className);
     }
-
-    /// <summary>
-    /// plusPlus = identifier "++"
-    /// </summary>
-    /// <returns>i++运算</returns>
-
 }

@@ -163,23 +163,4 @@ public partial class StatementParser
         Expect(LangTokenType.RightParen);
         return new FuncRunStatement(new Instance(new LangId(funcName), positionalArgs, namedArgs));
     }
-
-    /// <summary>
-    /// importStatement = "import" ( "lazy" )? ( importSpecifier "from" )? ( identifier | STRING ) ;
-    /// importSpecifier = "{" importItem ( "," importItem )* "}" | importItem ( "," importItem )* ;
-    /// importItem = identifier ( "as" identifier )?;
-    ///
-    /// 支持的语法：
-    /// - import module
-    /// - import "module"
-    /// - import module as alias
-    /// - import { item1, item2 as alias2 } from module
-    /// - import item1, item2 from module
-    /// - lazy import module
-    /// - lazy import module as alias
-    /// - lazy import { item1, item2 } from module
-    /// - lazy import item1, item2 from module
-    /// </summary>
-    /// <returns>引入模块</returns>
-
 }

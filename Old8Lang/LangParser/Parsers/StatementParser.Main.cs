@@ -672,9 +672,5 @@ public partial class StatementParser(
         throw CreateSyntaxError(
             $"语法错误：无法识别的语句类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查语句结构是否正确。");
     }
-
-    /// <summary>
-    /// 处理标识符后面跟着左括号的情况，可能是函数定义或函数调用
-    /// </summary>
     #endregion
 }

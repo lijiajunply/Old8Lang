@@ -226,7 +226,6 @@ public partial class StatementParser
     /// 支持嵌套泛型：<List<int>> 返回 "List<int>"
     /// </summary>
     /// <returns>泛型类型字符串</returns>
-
     private string SkipAndParseGenericTypeAnnotation()
     {
         var result = "";

@@ -233,10 +233,4 @@ public partial class PrimaryParser
         return new RangePattern(startExpr, endExpr, includeStart, includeEnd);
     }
 
-    /// <summary>
-    /// 解析泛型实例化表达式
-    /// 语法：Box&lt;int>() 或 map&lt;string>(arr, func) 或 Box&lt;int> (不调用构造)
-    /// </summary>
-    /// <returns>泛型实例化表达式</returns>
-
 }

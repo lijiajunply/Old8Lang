@@ -415,19 +415,4 @@ public partial class PrimaryParser
 
         return new LangId(value, typeAnnotation, null, position: position);
     }
-
-    /// <summary>
-    /// 解析 match 表达式
-    /// 语法: match expression { case pattern -> expression ... }
-    /// 支持多种模式：
-    /// 1. 值匹配: case 0 -> "zero"
-    /// 2. 变量绑定: case x -> "value is " + x
-    /// 3. 通配符: case _ -> "default"
-    /// 4. 元组解构: case (x, 0) -> "on X-axis"
-    /// 5. 类型匹配: case x:int -> "int value"
-    /// 6. 范围匹配: case [0~12] -> "child"
-    /// 7. 守卫条件: case x:int if x > 0 -> "positive"
-    /// 8. default 分支: default -> "default value"
-    /// </summary>
-
 }

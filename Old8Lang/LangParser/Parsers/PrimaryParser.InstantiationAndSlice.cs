@@ -108,10 +108,4 @@ public partial class PrimaryParser
         Expect(LangTokenType.RightParen);
         return new Instance(identifier, positionalArgs, namedArgs);
     }
-
-    /// <summary>
-    /// 解析Lambda参数（支持简单类型注解）
-    /// </summary>
-    /// <returns>LangId标识符</returns>
-
 }

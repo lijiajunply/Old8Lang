@@ -387,6 +387,4 @@ public partial class StatementParser
         var lower = value.ToLower();
         return lower is "cdecl" or "stdcall" or "winapi";
     }
-
-
 }
