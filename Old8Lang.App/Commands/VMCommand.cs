@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Old8Lang.Bytecode;
+using Old8Lang.Bytecode.VM;
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
 using Old8Lang.TypeSystem;

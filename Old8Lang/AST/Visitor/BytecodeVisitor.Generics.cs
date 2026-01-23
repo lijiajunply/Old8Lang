@@ -1,10 +1,9 @@
-using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.TypeSystem;
+using Old8Lang.Bytecode.Metadata;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.AST.Visitor;
 
 /// <summary>
 /// BytecodeVisitor - 泛型支持

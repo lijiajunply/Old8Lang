@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression.Linq;
+using Old8Lang.Bytecode;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.AST.Visitor;
 
 /// <summary>
 /// BytecodeVisitor - LINQ 相关的辅助方法

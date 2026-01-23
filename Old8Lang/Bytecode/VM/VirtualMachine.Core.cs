@@ -1,8 +1,10 @@
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.Bytecode.Generators;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Bytecode.ModuleSystem;
+using Old8Lang.GlobalFunctions.Core;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.VM;
 
 /// <summary>
 /// 虚拟机 - 执行字节码指令

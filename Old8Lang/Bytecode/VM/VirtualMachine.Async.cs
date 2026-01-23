@@ -1,7 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {

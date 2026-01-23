@@ -30,7 +30,7 @@ public class VMIntegrationTests
         try
         {
             // 执行字节码
-            var vm = new Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();
@@ -54,7 +54,7 @@ public class VMIntegrationTests
         var bytecodeFile = compiler.Compile(ast);
 
         // 执行字节码 - 验证不抛出异常
-        var vm = new Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
         var exception = Record.Exception(() => vm.Execute());
         Assert.Null(exception);
     }

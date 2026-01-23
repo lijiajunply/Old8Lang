@@ -1,4 +1,4 @@
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Metadata;
 
 /// <summary>
 /// 字节码模式的对象实例

@@ -28,7 +28,7 @@ public class VMTypeErrorTests
         {
             var bytecodeFile = compiler.Compile(ast);
 
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             var exception = Assert.ThrowsAny<System.Exception>(() => vm.Execute());
             _output.WriteLine($"Exception type: {exception.GetType().Name}");
             _output.WriteLine($"Exception message: {exception.Message}");
@@ -60,7 +60,7 @@ public class VMTypeErrorTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();

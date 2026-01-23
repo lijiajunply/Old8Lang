@@ -1,8 +1,7 @@
-using Old8Lang.AST;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Visitor;
+using Old8Lang.Bytecode;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.AST.Visitor;
 
 /// <summary>
 /// 字节码访问者 - 将AST节点转换为字节码指令

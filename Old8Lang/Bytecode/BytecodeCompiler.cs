@@ -2,9 +2,12 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Visitor;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
+using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 namespace Old8Lang.Bytecode;
 

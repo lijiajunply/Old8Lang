@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Bytecode.Metadata;
 
 namespace Old8Lang.Bytecode;
 

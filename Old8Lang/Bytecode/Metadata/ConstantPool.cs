@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Metadata;
 
 /// <summary>
 /// 常量池 - 存储字节码中使用的常量

@@ -14,7 +14,7 @@ public class VMEmptyInputTests
         var compiler = new BytecodeCompiler();
         var bytecodeFile = compiler.Compile(ast);
 
-        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
         var exception = Record.Exception(() => vm.Execute());
         Assert.Null(exception);
     }
@@ -33,7 +33,7 @@ public class VMEmptyInputTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();

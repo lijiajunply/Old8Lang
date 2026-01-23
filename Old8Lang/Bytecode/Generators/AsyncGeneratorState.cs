@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Bytecode.Metadata;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Generators;
 
 /// <summary>
 /// 异步生成器执行状态

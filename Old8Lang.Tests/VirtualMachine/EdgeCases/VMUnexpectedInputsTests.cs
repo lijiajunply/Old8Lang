@@ -28,7 +28,7 @@ public class VMUnexpectedInputsTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();
@@ -47,7 +47,7 @@ public class VMUnexpectedInputsTests
         var compiler = new BytecodeCompiler();
         var bytecodeFile = compiler.Compile(ast);
 
-        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
         Assert.ThrowsAny<System.Exception>(() => vm.Execute());
     }
 

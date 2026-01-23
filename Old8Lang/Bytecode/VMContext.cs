@@ -1,3 +1,5 @@
+using Old8Lang.Bytecode.VM;
+
 namespace Old8Lang.Bytecode;
 
 /// <summary>

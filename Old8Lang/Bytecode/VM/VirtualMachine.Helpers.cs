@@ -1,14 +1,15 @@
 using System.Collections;
-using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
+using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {

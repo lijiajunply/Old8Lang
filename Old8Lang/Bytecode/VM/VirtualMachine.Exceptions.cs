@@ -1,4 +1,6 @@
-namespace Old8Lang.Bytecode;
+using Old8Lang.Bytecode.Metadata;
+
+namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {

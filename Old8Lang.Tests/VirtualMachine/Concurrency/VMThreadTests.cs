@@ -28,7 +28,7 @@ result <- thread.Join()
         var ast = interpreter.Build(code);
         var compiler = new BytecodeCompiler();
         var bytecodeFile = compiler.Compile(ast);
-        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
 
         vm.Execute();
 
@@ -56,7 +56,7 @@ result <- thread.Join()
         var ast = interpreter.Build(code);
         var compiler = new BytecodeCompiler();
         var bytecodeFile = compiler.Compile(ast);
-        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
 
         vm.Execute();
 
@@ -94,7 +94,7 @@ result <- r1 + r2 + r3
         var ast = interpreter.Build(code);
         var compiler = new BytecodeCompiler();
         var bytecodeFile = compiler.Compile(ast);
-        var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+        var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
 
         vm.Execute();
 

@@ -2,11 +2,12 @@ using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.Bytecode.VM;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Bytecode;
+namespace Old8Lang.Bytecode.Generators;
 
 /// <summary>
 /// 异步生成器对象（字节码虚拟机模式）

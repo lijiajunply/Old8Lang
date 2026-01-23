@@ -1,4 +1,4 @@
-using VM = Old8Lang.Bytecode.VirtualMachine;
+using VM = Old8Lang.Bytecode.VM.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Collections;
 

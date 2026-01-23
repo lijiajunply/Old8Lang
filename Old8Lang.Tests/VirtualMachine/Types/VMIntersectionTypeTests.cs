@@ -1,6 +1,6 @@
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
-using VM = Old8Lang.Bytecode.VirtualMachine;
+using VM = Old8Lang.Bytecode.VM.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Types;
 

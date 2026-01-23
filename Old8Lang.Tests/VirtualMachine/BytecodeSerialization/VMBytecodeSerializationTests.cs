@@ -20,7 +20,7 @@ public class VMBytecodeSerializationTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();
@@ -45,7 +45,7 @@ public class VMBytecodeSerializationTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return (bytecodeFile, stringWriter.ToString().Trim());

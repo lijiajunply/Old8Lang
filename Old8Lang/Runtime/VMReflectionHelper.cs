@@ -1,4 +1,6 @@
 using Old8Lang.Bytecode;
+using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Bytecode.VM;
 
 namespace Old8Lang.Runtime;
 

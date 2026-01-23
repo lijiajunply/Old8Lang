@@ -6,6 +6,7 @@ using Old8Lang.Bytecode;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using System.Reflection.Emit;
+using Old8Lang.Bytecode.Metadata;
 
 namespace Old8Lang.Runtime;
 

@@ -1,4 +1,5 @@
 using Old8Lang.Bytecode;
+using Old8Lang.Bytecode.VM;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.VirtualMachine.Exception;
@@ -30,7 +31,7 @@ public class VMExceptionTests
         try
         {
             // 执行字节码
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             return stringWriter.ToString().Trim();

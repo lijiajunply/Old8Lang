@@ -23,7 +23,7 @@ public class VMExecutionPerformanceTests
 
         try
         {
-            var vm = new Old8Lang.Bytecode.VirtualMachine(bytecodeFile);
+            var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
             stopwatch.Stop();
