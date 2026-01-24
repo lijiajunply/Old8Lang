@@ -232,10 +232,10 @@ public class SymbolFinder
                 references.Add(new SourceLocation
                 {
                     Uri = document.Uri,
-                    Line = token.Line - 1, // 转换为从0开始
-                    Column = token.Column - 1, // 转换为从0开始
+                    Line = token.Line - 1, // 转换为从0开始（行号是1-based）
+                    Column = token.Column, // 列号已经是0-based，不需要转换
                     EndLine = token.Line - 1,
-                    EndColumn = token.Column + token.Value.Length - 1 // 修正结束列计算 (token.Column是1-based,所以 -1 后变成0-based的结束位置)
+                    EndColumn = token.Column + token.Value.Length // 结束列 = 起始列 + 长度
                 });
             }
         }

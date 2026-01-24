@@ -793,9 +793,10 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
 
                     if (isDefinition)
                     {
-                        // 使用 token 的实际位置（转换为 0-based）
-                        var line = token.Line - 1; // 转换为0-based
-                        var column = token.Column - 1; // 转换为0-based
+                        // 使用 token 的实际位置
+                        // 注意：词法分析器的行号是 1-based，列号是 0-based
+                        var line = token.Line - 1; // 转换为 0-based
+                        var column = token.Column; // 列号已经是 0-based，不需要转换
 
                         return new SourceLocation
                         {
@@ -853,9 +854,10 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 token.Value == varName &&
                 nextToken.Type == LangTokenType.Assignment) // <- 运算符
             {
-                // 使用 token 的实际位置（转换为 0-based）
-                var line = token.Line - 1; // 转换为0-based
-                var column = token.Column - 1; // 转换为0-based
+                // 使用 token 的实际位置
+                // 注意：词法分析器的行号是 1-based，列号是 0-based
+                var line = token.Line - 1; // 转换为 0-based
+                var column = token.Column; // 列号已经是 0-based，不需要转换
 
                 return new SourceLocation
                 {

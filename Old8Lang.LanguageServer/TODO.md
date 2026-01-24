@@ -488,14 +488,15 @@
 
 ## 🐛 已知问题
 
-### 1. AST Position 不准确
+### ~~1. AST Position 不准确~~ ✅ 已修复
 **位置**: `Old8Lang.LangParser`
 
 **描述**: `FuncInit`, `AsyncFuncInit`, `ClassInit` 的 `Position` 默认为 (0, 0)
 
-**临时方案**: 使用 Token-based location finding
-
-**永久方案**: 修复 Parser，正确设置 Position
+**修复**:
+- 在 `FunctionParser.cs` 中，`ParseFuncDeclaration` 和 `ParseAsyncFuncDeclaration` 方法现在正确设置 Position
+- 在 `ClassParser.cs` 中，`ParseClassDeclaration` 和 `ParseInterfaceDeclaration` 方法现在正确设置 Position
+- 同时修复了 `SymbolTableBuilder.cs` 和 `SymbolFinder.cs` 中的列号计算错误（词法分析器的列号是 0-based，不需要再减 1）
 
 ---
 

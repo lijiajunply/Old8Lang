@@ -43,9 +43,11 @@ public partial class StatementParser(
             {
                 // 收集文档注释
                 var docComment = CollectPrecedingDocComments();
+                // 保存 async 关键字的位置
+                var asyncPosition = CreateSourcePosition(CurrentToken);
                 Expect(LangTokenType.Async);
                 Expect(LangTokenType.Func);
-                return functionParser.ParseAsyncFuncDeclaration(docComment, decorators);
+                return functionParser.ParseAsyncFuncDeclaration(docComment, decorators, asyncPosition);
             }
             else
             {
@@ -181,6 +183,8 @@ public partial class StatementParser(
         {
             // 在消费 async token 之前收集文档注释
             var docComment = CollectPrecedingDocComments();
+            // 保存 async 关键字的位置
+            var asyncPosition = CreateSourcePosition(CurrentToken);
 
             Expect(LangTokenType.Async);
 
@@ -192,7 +196,7 @@ public partial class StatementParser(
 
             // 否则是 async func
             Expect(LangTokenType.Func);
-            return functionParser.ParseAsyncFuncDeclaration(docComment, null);
+            return functionParser.ParseAsyncFuncDeclaration(docComment, null, asyncPosition);
         }
 
         // 处理函数定义（包括带有修饰符的函数定义）

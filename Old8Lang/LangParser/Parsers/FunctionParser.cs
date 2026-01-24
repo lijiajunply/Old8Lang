@@ -28,6 +28,11 @@ public class FunctionParser(
         // 收集前置的文档注释
         var docComment = CollectPrecedingDocComments();
 
+        // 保存起始位置（装饰器或 func 关键字）
+        var startPosition = decorators?.Count > 0
+            ? decorators[0].Position
+            : CreateSourcePosition(CurrentToken);
+
         var isUseFunc = CurrentToken.Type == LangTokenType.Func;
         if (isUseFunc)
         {
@@ -122,17 +127,28 @@ public class FunctionParser(
             funcLangValue.DocComment = docComment;
         }
 
-        return new FuncInit(funcLangValue);
+        return new FuncInit(funcLangValue, startPosition);
     }
 
     /// <summary>
     /// 解析异步函数声明
     /// asyncFuncDeclaration = decorators? "async" "func" identifier "(" idList? ")" ( "->" returnType )? block
     /// </summary>
-    public AsyncFuncInit ParseAsyncFuncDeclaration(DocCommentInfo? providedDocComment = null, List<FunctionDecorator>? decorators = null)
+    /// <param name="providedDocComment">提供的文档注释（如果有）</param>
+    /// <param name="decorators">装饰器列表（如果有）</param>
+    /// <param name="asyncKeywordPosition">async 关键字的位置（用于准确的错误报告）</param>
+    public AsyncFuncInit ParseAsyncFuncDeclaration(
+        DocCommentInfo? providedDocComment = null,
+        List<FunctionDecorator>? decorators = null,
+        SourcePosition? asyncKeywordPosition = null)
     {
         // 如果提供了文档注释则使用提供的，否则收集前置的文档注释
         var docComment = providedDocComment ?? CollectPrecedingDocComments();
+
+        // 确定起始位置：优先使用装饰器位置，其次是 async 关键字位置，最后是当前 token 位置
+        var startPosition = decorators?.Count > 0
+            ? decorators[0].Position
+            : asyncKeywordPosition ?? CreateSourcePosition(CurrentToken);
 
         // 这里假设 async 和 func 关键字已经被消费了
         var funcName = ParseIdentifier();
@@ -210,7 +226,7 @@ public class FunctionParser(
             asyncFuncLangValue.DocComment = docComment;
         }
 
-        return new AsyncFuncInit(asyncFuncLangValue, updatedFuncName.Position);
+        return new AsyncFuncInit(asyncFuncLangValue, startPosition);
     }
 
     /// <summary>

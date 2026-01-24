@@ -22,6 +22,9 @@ public class ClassParser(
         // 收集前置的文档注释
         var docComment = CollectPrecedingDocComments();
 
+        // 保存起始位置（abstract、class 或 mixin 关键字）
+        var startPosition = CreateSourcePosition(CurrentToken);
+
         bool isAbstract = false;
         bool isMixin = false;
 
@@ -168,13 +171,16 @@ public class ClassParser(
             typeTemplate.DocComment = docComment;
         }
 
-        return new ClassInit(typeTemplate);
+        return new ClassInit(typeTemplate, startPosition);
     }
 
     public ClassInit ParseInterfaceDeclaration()
     {
         // 收集前置的文档注释
         var docComment = CollectPrecedingDocComments();
+
+        // 保存起始位置（interface 关键字）
+        var startPosition = CreateSourcePosition(CurrentToken);
 
         // 检查是 interface
         if (CurrentToken.Type == LangTokenType.Interface)
@@ -239,7 +245,7 @@ public class ClassParser(
             typeTemplate.DocComment = docComment;
         }
 
-        return new ClassInit(typeTemplate);
+        return new ClassInit(typeTemplate, startPosition);
     }
 
     /// <summary>
