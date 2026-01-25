@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet run:*)",
+      "Bash(python generate_compiler_tests.py:*)",
+      "Bash(python fix_compiler_tests.py:*)",
+      "Bash(python thorough_fix_compiler_tests.py:*)",
+      "Bash(python final_fix_compiler_tests.py:*)",
+      "Bash(python:*)",
+      "Bash(dotnet build:*)",
+      "Bash(ls:*)",
+      "Bash(dotnet test:*)"
+    ]
+  }
+}

@@ -22,7 +22,84 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/AsyncConcurrencyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/CancellationTokenTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Async/TaskAdvancedTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PreprocessorInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/GenericConstraintExtensionInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ListComprehensionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/NestedAccessTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/SyncIteratorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/InExpressionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/MatchExpressionEnhancedTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/FileHeader/FileHeaderConfigTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/FileHeader/FileHeaderDirectiveTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/DecoratorInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionOverloadTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/NamedArgumentsErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/NamedArgumentsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/ParamsInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/EndToEndTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/InterpreterIntegrationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/InterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Linq/LinqBasicExecutionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Linq/LinqEdgeCasesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Linq/LinqErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Linq/LinqLetOrderByTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/AdvancedImport/LazyImportSyntaxTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/BasicImport/SelectiveImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Core/TestFileSystemHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/ErrorHandling/CircularDependencyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/ErrorHandling/ImportErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Extern/ExternBoundaryAndErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Extern/JavaScriptExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Extern/NativeDllExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Extern/PythonExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Integration/ComplexImportScenariosTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Integration/RealWorldUsageTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/CryptoLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/CsvTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/DatabaseLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/FileLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/JsonLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/MachineLearningLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/MathLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/NetLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/OSTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/RegexLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/SerializationLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/TerminalTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/StandardLibrary/TimeTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Modules/Unified/UnifiedModuleArchitectureTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/ConditionalTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/DeferStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/JumpStatementsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/LoopTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/SelectStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/UsingStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Threading/ThreadTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/GenericCollectionTypesInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/IntersectionTypesInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/UnionTypesInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/final_fix_compiler_tests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fix_compiler_tests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generate_compiler_tests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/missing_compiler_tests.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/missing_tests.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/thorough_fix_compiler_tests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/编译器测试生成报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/编译器测试运行报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
