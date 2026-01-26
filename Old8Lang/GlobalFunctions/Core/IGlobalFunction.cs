@@ -17,6 +17,12 @@ public interface IGlobalFunction
     string[] Names { get; }
 
     /// <summary>
+    /// 参数名称列表（用于支持命名参数）
+    /// 如果为 null 或空，则不支持命名参数
+    /// </summary>
+    string[]? ParameterNames { get; }
+
+    /// <summary>
     /// 最小参数数量
     /// </summary>
     int MinParameterCount { get; }

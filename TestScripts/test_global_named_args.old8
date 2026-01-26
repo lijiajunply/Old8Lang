@@ -1,0 +1,15 @@
+// 测试全局函数命名参数支持
+
+PrintLine("=== 测试全局函数命名参数 ===")
+
+// 1. 使用位置参数（应该工作）
+PrintLine("测试1: 使用位置参数调用 Sleep")
+Sleep(100)
+PrintLine("Sleep(100) 完成")
+
+// 2. 使用命名参数（修复后应该工作）
+PrintLine("\n测试2: 使用命名参数调用 Sleep")
+Sleep(milliseconds: 100)
+PrintLine("Sleep(milliseconds: 100) 完成")
+
+PrintLine("\n所有测试完成!")

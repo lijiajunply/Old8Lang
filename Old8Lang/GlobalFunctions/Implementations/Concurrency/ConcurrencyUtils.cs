@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class SleepFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Sleep"];
+    public override string[]? ParameterNames => ["milliseconds"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

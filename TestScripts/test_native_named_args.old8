@@ -1,0 +1,24 @@
+// 测试原生函数命名参数支持
+
+PrintLine("=== 测试原生静态方法命名参数 ===")
+
+// 测试 Math.Pow 方法（原生静态方法）
+native "System.Runtime" "System.Math" "Pow" as MathPow
+
+// 1. 使用位置参数（应该工作）
+result1 <- MathPow(2.0, 3.0)
+PrintLine("位置参数: 2^3 = " + result1.ToStr())
+
+// 2. 使用命名参数（修复后应该工作）
+result2 <- MathPow(x: 2.0, y: 3.0)
+PrintLine("命名参数: 2^3 = " + result2.ToStr())
+
+// 3. 混合位置参数和命名参数
+result3 <- MathPow(2.0, y: 3.0)
+PrintLine("混合参数: 2^3 = " + result3.ToStr())
+
+// 4. 乱序命名参数
+result4 <- MathPow(y: 3.0, x: 2.0)
+PrintLine("乱序命名参数: 2^3 = " + result4.ToStr())
+
+PrintLine("\n测试完成!")

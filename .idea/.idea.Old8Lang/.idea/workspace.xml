@@ -23,8 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncGeneratorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/test_native_named_args.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeAnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeStaticAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -905,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="812" />
+    <option name="localTasksCounter" value="813" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 修复异常处理中的finally块执行逻辑&#10;&#10;- 在异常表遍历时同时检查try块和catch块中的异常位置&#10;- 当异常发生在catch块中有finally块时，先执行finally块再继续查找外层处理器&#10;- 修复了Old8Exception的Message属性访问，使其返回OriginalMessage值&#10;- 更新了嵌套异常处理的测试用例以验证正确的异常传播行为&#10;- 移除了match表达式异常传播的相关测试代码&#10;- 修复了类构造函数命名从new改为init的一致性问题" />
     <MESSAGE value="feat(type-system): 实现函数类型注解和兼容性检查&#10;&#10;- 在 TypeAnnotationManager 中添加函数类型兼容性验证逻辑&#10;- 在 TypeChecker 中实现函数类型字符串获取和兼容性检查&#10;- 在 VirtualMachine 中添加函数类型匹配检查功能&#10;- 在 BytecodeVisitor 中修改 Lambda 函数编译逻辑以传递返回类型&#10;- 添加完整的函数类型注解测试文件包括编译器、解释器、语法和虚拟机测试&#10;- 实现泛型函数类型 function&lt;T1, T2, ...&gt; 的参数和返回值类型检查&#10;- 支持基本 function 类型兼容任何函数类型的功能&#10;- 添加调试信息输出用于类型注解处理跟踪" />
     <MESSAGE value="refactor(tests): 重命名测试中的函数名以提高可读性&#10;&#10;- 将 integration tests 中的 double 函数重命名为 twice&#10;- 将 named arguments tests 中的 double 函数重命名为 tw&#10;- 更新所有相关的函数调用以匹配新的函数名称&#10;- 保持测试逻辑不变，仅改进函数命名的清晰度" />
     <MESSAGE value="feat(module): 实现模块中函数的闭包作用域捕获机制&#10;&#10;- 在 UnifiedModule.FromSymbols 方法中添加 captureScope 参数支持&#10;- 为模块中的函数类型符号设置共享的捕获作用域&#10;- 修改 ModuleSystemService 中的模块加载逻辑传递 manager 作为捕获作用域&#10;- 克隆捕获作用域确保所有函数共享同一模块级变量环境&#10;- 更新函数对象创建逻辑直接设置共享作用域而非单独克隆&#10;- 修复 IDEA 工作空间配置文件中的变更列表记录" />
@@ -957,7 +961,8 @@
     <MESSAGE value="refactor(testing): 重构测试库文件结构并优化Mock对象实现&#10;&#10;- 将AssertLib.cs、MockLib.cs和TestRunner.cs从Old8LangLib移动到Old8Lang.AST.Expression.StaticValues命名空间&#10;- 优化MockObject类实现，将Name属性设为只读，使用私有字段存储_callHistory和_returnValues&#10;- 改进RecordCall方法使用TryGetValue避免重复字典访问，提升性能&#10;- 添加Runtime命名空间引用到MockLibClassLangValue和TestRunnerClassLangValue文件&#10;- 清理IDEA工作区配置文件中的变更历史记录和过时提交消息&#10;- 更新本地任务计数器并调整最后提交消息记录" />
     <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
     <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
+    <MESSAGE value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

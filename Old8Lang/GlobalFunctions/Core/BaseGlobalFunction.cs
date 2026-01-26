@@ -18,6 +18,13 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     public abstract string[] Names { get; }
 
     /// <summary>
+    /// 参数名称列表（用于支持命名参数）
+    /// 默认返回 null，表示不支持命名参数
+    /// 子类可以重写此属性以提供参数名称
+    /// </summary>
+    public virtual string[]? ParameterNames => null;
+
+    /// <summary>
     /// 最小参数数量
     /// </summary>
     public abstract int MinParameterCount { get; }
