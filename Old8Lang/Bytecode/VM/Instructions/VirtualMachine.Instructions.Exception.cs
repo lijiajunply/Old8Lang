@@ -566,6 +566,29 @@ public partial class VirtualMachine
                 // 创建对象实例
                 var obj = new BytecodeObjectInstance(className);
 
+                // 初始化接口信息（包括父类实现的接口）
+                var allInterfaces = new HashSet<string>();
+                var currentClassForInterfaces = classMetadata;
+                while (currentClassForInterfaces != null)
+                {
+                    // 添加当前类实现的接口
+                    foreach (var interfaceName in currentClassForInterfaces.InterfaceNames)
+                        allInterfaces.Add(interfaceName);
+                    foreach (var interfaceName in currentClassForInterfaces.ImplementsInterfaces)
+                        allInterfaces.Add(interfaceName);
+
+                    // 查找父类
+                    if (!string.IsNullOrEmpty(currentClassForInterfaces.BaseClassName))
+                    {
+                        currentClassForInterfaces = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClassForInterfaces.BaseClassName);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                obj.Interfaces = allInterfaces.ToList();
+
                 // 初始化所有字段为默认值（包括父类字段）
                 // 收集当前类及所有父类的字段
                 var allFields = new List<FieldMetadata>();
@@ -620,15 +643,6 @@ public partial class VirtualMachine
                     }
                 }
 
-                // 记录实现的接口
-                if (classMetadata.ImplementsInterfaces is { Count: > 0 })
-                {
-                    foreach (var interfaceName in classMetadata.ImplementsInterfaces)
-                    {
-                        obj.Interfaces.Add(interfaceName);
-                    }
-                }
-
                 // 将对象压入栈
                 _stack.Push(obj);
             }
@@ -679,6 +693,29 @@ public partial class VirtualMachine
                             // 创建嵌套类的实例
                             // 首先创建对象
                             var nestedObj = new BytecodeObjectInstance(nestedClassName);
+
+                            // 初始化接口信息（包括父类实现的接口）
+                            var allInterfaces = new HashSet<string>();
+                            var currentClassForInterfaces = nestedClass;
+                            while (currentClassForInterfaces != null)
+                            {
+                                // 添加当前类实现的接口
+                                foreach (var interfaceName in currentClassForInterfaces.InterfaceNames)
+                                    allInterfaces.Add(interfaceName);
+                                foreach (var interfaceName in currentClassForInterfaces.ImplementsInterfaces)
+                                    allInterfaces.Add(interfaceName);
+
+                                // 查找父类
+                                if (!string.IsNullOrEmpty(currentClassForInterfaces.BaseClassName))
+                                {
+                                    currentClassForInterfaces = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClassForInterfaces.BaseClassName);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            nestedObj.Interfaces = allInterfaces.ToList();
 
                             // 初始化所有字段为默认值
                             var allFields = new List<FieldMetadata>();

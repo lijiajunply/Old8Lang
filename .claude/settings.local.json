@@ -9,7 +9,8 @@
       "Bash(python:*)",
       "Bash(dotnet build:*)",
       "Bash(ls:*)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(grep:*)"
     ]
   }
 }

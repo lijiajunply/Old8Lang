@@ -105,6 +105,49 @@ public partial class VirtualMachine
         // 创建对象实例
         var obj = new BytecodeObjectInstance(classMetadata.Name);
 
+        // 初始化接口信息（包括父类实现的接口）
+        var allInterfaces = new HashSet<string>();
+        var currentClassForInterfaces = classMetadata;
+        while (currentClassForInterfaces != null)
+        {
+            // 添加当前类实现的接口
+            foreach (var interfaceName in currentClassForInterfaces.InterfaceNames)
+                allInterfaces.Add(interfaceName);
+            foreach (var interfaceName in currentClassForInterfaces.ImplementsInterfaces)
+                allInterfaces.Add(interfaceName);
+
+            // 查找父类
+            if (!string.IsNullOrEmpty(currentClassForInterfaces.BaseClassName))
+            {
+                currentClassForInterfaces = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClassForInterfaces.BaseClassName);
+                if (currentClassForInterfaces == null)
+                {
+                    // 从模块中查找父类
+                    foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())
+                    {
+                        try
+                        {
+                            var symbol = _moduleRegistry.GetModuleSymbol(loadedModuleName, currentClassForInterfaces?.BaseClassName ?? "");
+                            if (symbol is ClassMetadata baseClass)
+                            {
+                                currentClassForInterfaces = baseClass;
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // 继续查找
+                        }
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        obj.Interfaces = allInterfaces.ToList();
+
         // 初始化所有字段为默认值（包括父类字段）
         var allFields = new List<FieldMetadata>();
         var currentClass = classMetadata;

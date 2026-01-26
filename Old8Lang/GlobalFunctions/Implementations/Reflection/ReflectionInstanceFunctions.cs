@@ -103,6 +103,29 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         // 创建实例
         var instance = new BytecodeObjectInstance(className);
 
+        // 初始化接口信息（包括父类实现的接口）
+        var allInterfaces = new HashSet<string>();
+        var currentClassForInterfaces = classMetadata;
+        while (currentClassForInterfaces != null)
+        {
+            // 添加当前类实现的接口
+            foreach (var interfaceName in currentClassForInterfaces.InterfaceNames)
+                allInterfaces.Add(interfaceName);
+            foreach (var interfaceName in currentClassForInterfaces.ImplementsInterfaces)
+                allInterfaces.Add(interfaceName);
+
+            // 查找父类
+            if (!string.IsNullOrEmpty(currentClassForInterfaces.BaseClassName))
+            {
+                currentClassForInterfaces = VMReflectionHelper.GetClassMetadata(vm, currentClassForInterfaces.BaseClassName);
+            }
+            else
+            {
+                break;
+            }
+        }
+        instance.Interfaces = allInterfaces.ToList();
+
         // 初始化字段（使用默认值）
         foreach (var field in classMetadata.Fields)
         {

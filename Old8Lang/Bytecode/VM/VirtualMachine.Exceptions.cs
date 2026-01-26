@@ -59,7 +59,6 @@ public partial class VirtualMachine
         int exceptionIP = frame.IP - 1;
 
         // 遍历异常表，查找匹配的处理器（从内到外）
-        bool finallyExecuted = false;
         foreach (var entry in function.ExceptionTable)
         {
             // 检查异常是否发生在这个try块或catch块中
@@ -73,7 +72,6 @@ public partial class VirtualMachine
                 {
                     // 执行finally块
                     ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
-                    finallyExecuted = true;
                     // finally块执行完后，继续查找外层的异常处理器
                     continue;
                 }
@@ -94,7 +92,6 @@ public partial class VirtualMachine
                     {
                         // 执行finally块
                         ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
-                        finallyExecuted = true;
 
                         // finally块执行完后，继续查找外层的异常处理器
                         // 不返回true，让异常继续向外传播
@@ -104,8 +101,7 @@ public partial class VirtualMachine
             }
         }
 
-        // 如果执行了finally块但没有找到catch块，返回false让异常继续传播
-        // 如果没有找到任何匹配的处理器，也返回false
+        // 如果没有找到任何匹配的处理器，返回false
         return false;
     }
 
@@ -164,8 +160,32 @@ public partial class VirtualMachine
             }
 
             // 检查接口实现
-            // TODO: 这里需要从 ClassMetadata 中获取接口信息，或者 BytecodeObjectInstance 应该存储接口信息
-            // 假设 instance.Interfaces 包含所有实现的接口
+            // 从 ClassMetadata 中获取接口信息
+            if (classMetadata != null)
+            {
+                // 检查直接实现的接口
+                if (classMetadata.InterfaceNames.Contains(expectedType))
+                    return true;
+
+                // 检查 ImplementsInterfaces（备用字段）
+                if (classMetadata.ImplementsInterfaces.Contains(expectedType))
+                    return true;
+
+                // 检查父类实现的接口
+                var currentClass = classMetadata;
+                while (currentClass != null && !string.IsNullOrEmpty(currentClass.BaseClassName))
+                {
+                    currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                    if (currentClass != null)
+                    {
+                        if (currentClass.InterfaceNames.Contains(expectedType) ||
+                            currentClass.ImplementsInterfaces.Contains(expectedType))
+                            return true;
+                    }
+                }
+            }
+
+            // 也检查实例的 Interfaces 属性（如果已经被填充）
             if (instance.Interfaces.Contains(expectedType))
                 return true;
 
