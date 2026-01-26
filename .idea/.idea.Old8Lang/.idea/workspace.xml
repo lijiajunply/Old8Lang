@@ -23,12 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ModuleAndObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ModuleAndObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Exception.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Exception.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Exceptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Exceptions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Async/VMAsyncGeneratorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -909,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="811" />
+    <option name="localTasksCounter" value="812" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 解决函数在模块导入上下文中的作用域捕获问题&#10;&#10;- 当函数没有捕获作用域且在模块导入上下文中时，自动捕获当前作用域&#10;- 创建带有捕获作用域的函数副本来确保访问模块中导入的符号&#10;- 更新测试代码中的函数名从double改为twice以保持一致性&#10;- 清理IDEA工作空间配置文件中的变更列表记录&#10;- 更新本地任务计数器和最后提交消息记录" />
     <MESSAGE value="fix(vm): 修复异常处理中的finally块执行逻辑&#10;&#10;- 在异常表遍历时同时检查try块和catch块中的异常位置&#10;- 当异常发生在catch块中有finally块时，先执行finally块再继续查找外层处理器&#10;- 修复了Old8Exception的Message属性访问，使其返回OriginalMessage值&#10;- 更新了嵌套异常处理的测试用例以验证正确的异常传播行为&#10;- 移除了match表达式异常传播的相关测试代码&#10;- 修复了类构造函数命名从new改为init的一致性问题" />
     <MESSAGE value="feat(type-system): 实现函数类型注解和兼容性检查&#10;&#10;- 在 TypeAnnotationManager 中添加函数类型兼容性验证逻辑&#10;- 在 TypeChecker 中实现函数类型字符串获取和兼容性检查&#10;- 在 VirtualMachine 中添加函数类型匹配检查功能&#10;- 在 BytecodeVisitor 中修改 Lambda 函数编译逻辑以传递返回类型&#10;- 添加完整的函数类型注解测试文件包括编译器、解释器、语法和虚拟机测试&#10;- 实现泛型函数类型 function&lt;T1, T2, ...&gt; 的参数和返回值类型检查&#10;- 支持基本 function 类型兼容任何函数类型的功能&#10;- 添加调试信息输出用于类型注解处理跟踪" />
     <MESSAGE value="refactor(tests): 重命名测试中的函数名以提高可读性&#10;&#10;- 将 integration tests 中的 double 函数重命名为 twice&#10;- 将 named arguments tests 中的 double 函数重命名为 tw&#10;- 更新所有相关的函数调用以匹配新的函数名称&#10;- 保持测试逻辑不变，仅改进函数命名的清晰度" />
@@ -961,7 +956,8 @@
     <MESSAGE value="feat(core): 实现响应式应用程序构建功能&#10;&#10;- 将 RunApp 方法参数从 WidgetBase 改为 Func&lt;WidgetBase&gt; 以支持动态重建&#10;- 添加旧版 API 兼容方法并标记为过时，提供平滑迁移路径&#10;- 更新 FirstUIAvaloniaApp 构造函数以接收构建函数委托&#10;- 修改 UI 构建逻辑，通过调用构建函数实现响应式更新&#10;- 在测试应用中演示使用 lambda 函数进行动态 UI 重建&#10;- 移除手动创建的响应式文本包装器，直接使用响应式值&#10;- 完善文档注释，明确区分响应式与非响应式 API 的用途" />
     <MESSAGE value="refactor(testing): 重构测试库文件结构并优化Mock对象实现&#10;&#10;- 将AssertLib.cs、MockLib.cs和TestRunner.cs从Old8LangLib移动到Old8Lang.AST.Expression.StaticValues命名空间&#10;- 优化MockObject类实现，将Name属性设为只读，使用私有字段存储_callHistory和_returnValues&#10;- 改进RecordCall方法使用TryGetValue避免重复字典访问，提升性能&#10;- 添加Runtime命名空间引用到MockLibClassLangValue和TestRunnerClassLangValue文件&#10;- 清理IDEA工作区配置文件中的变更历史记录和过时提交消息&#10;- 更新本地任务计数器并调整最后提交消息记录" />
     <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
+    <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

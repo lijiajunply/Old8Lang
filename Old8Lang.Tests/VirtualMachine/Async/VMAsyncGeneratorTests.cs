@@ -33,7 +33,8 @@ public class VMAsyncGeneratorTests
             var vm = new Bytecode.VM.VirtualMachine(bytecodeFile);
             vm.Execute();
 
-            return stringWriter.ToString().Trim();
+            // 规范化换行符（Windows 使用 \r\n，Unix 使用 \n）
+            return stringWriter.ToString().Trim().Replace("\r\n", "\n");
         }
         finally
         {
@@ -58,7 +59,7 @@ async func asyncRange(start:int, end:int) -> object {
 
 gen <- asyncRange(1, 4)
 async for num in gen {
-    PrintLine(ToStr(num))
+    PrintLine(num.ToStr())
 }
 ";
 
@@ -84,7 +85,7 @@ async func delayedRange(start:int, end:int) -> object {
 
 gen <- delayedRange(5, 8)
 async for num in gen {
-    PrintLine(ToStr(num))
+    PrintLine(num.ToStr())
 }
 ";
 

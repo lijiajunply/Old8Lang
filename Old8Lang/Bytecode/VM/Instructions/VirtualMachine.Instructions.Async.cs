@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.Generators;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 
@@ -140,12 +141,76 @@ public partial class VirtualMachine
                 break;
 
             case OpCode.NewAsyncGenerator:
-                // TODO: Implement async generator creation
-                throw new NotImplementedException("OpCode.NewAsyncGenerator not implemented");
+            {
+                // 创建异步生成器
+                // 操作数: funcIndex (int)
+                var funcIndex = Convert.ToInt32(instruction.Operand);
+
+                if (funcIndex < 0 || funcIndex >= _bytecodeFile.Functions.Count)
+                {
+                    throw new MethodNotFoundError(GetPosition(instruction),
+                        $"函数索引 {funcIndex} 超出范围");
+                }
+
+                var function = _bytecodeFile.Functions[funcIndex];
+
+                // 验证是否是异步生成器函数
+                if (!function.IsAsync || !function.IsGenerator)
+                {
+                    throw new TypeError(GetPosition(instruction),
+                        $"函数 {function.Name} 不是异步生成器函数");
+                }
+
+                // 创建异步生成器状态（无参数）
+                var asyncGeneratorId = _nextAsyncGeneratorId++;
+                var asyncGeneratorState = new AsyncGeneratorState(function, null);
+                _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
+
+                // 创建异步生成器对象并压入栈
+                var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                _stack.Push(asyncGeneratorValue);
+            }
+                break;
 
             case OpCode.CallAsyncGenerator:
-                // TODO: Implement async generator call
-                throw new NotImplementedException("OpCode.CallAsyncGenerator not implemented");
+            {
+                // 调用异步生成器函数
+                // 操作数: [argCount, funcName]
+                var operands = (object[])instruction.Operand!;
+                int argCount = (int)operands[0];
+                string funcName = (string)operands[1];
+
+                // 弹出参数
+                var args = new object?[argCount];
+                for (int i = argCount - 1; i >= 0; i--)
+                {
+                    args[i] = _stack.Pop();
+                }
+
+                // 查找函数
+                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                if (function == null)
+                {
+                    throw new MethodNotFoundError(GetPosition(instruction), funcName);
+                }
+
+                // 验证是否是异步生成器函数
+                if (!function.IsAsync || !function.IsGenerator)
+                {
+                    throw new TypeError(GetPosition(instruction),
+                        $"函数 {funcName} 不是异步生成器函数");
+                }
+
+                // 创建异步生成器状态
+                var asyncGeneratorId = _nextAsyncGeneratorId++;
+                var asyncGeneratorState = new AsyncGeneratorState(function, args);
+                _asyncGenerators[asyncGeneratorId] = asyncGeneratorState;
+
+                // 创建异步生成器对象并压入栈
+                var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
+                _stack.Push(asyncGeneratorValue);
+            }
+                break;
 
 
             case OpCode.AwaitYield:
