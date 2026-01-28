@@ -23,8 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/final_fix_compiler_tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_compiler_tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generate_compiler_tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/missing_compiler_tests.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/missing_tests.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/thorough_fix_compiler_tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/编译器测试生成报告.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/编译器测试运行报告.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -563,7 +569,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="9267000" />
+      <workItem from="1769609608350" duration="11172000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -908,7 +914,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="822" />
+    <option name="localTasksCounter" value="826" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,10 +941,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="删除了 大量未使用的 using" />
-    <MESSAGE value="修改一些东西" />
-    <MESSAGE value="refactor(database): 统一数据库连接包装类的字段命名规范&#10;&#10;- 将所有数据库连接包装类中的公共字段重命名为私有字段并使用下划线前缀&#10;- 更新 InMemoryConnectionWrapper 中的 Connection、ConnectionString、CreatedTables 和 Disposed 字段&#10;- 更新 MySqlConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 MySqlTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 OrmWrapper 中的 Connection、ConnectionType 和 Disposed 字段&#10;- 更新 PostgresConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 PostgresTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 SqliteConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 SqliteTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 相应更新所有引用这些字段的方法实现" />
-    <MESSAGE value="style(parser): 移除解析器中的冗余注释&#10;&#10;- 删除 PrimaryParser.Collections.cs 中关于 lambda 和 tuple 的注释&#10;- 删除 PrimaryParser.InstantiationAndSlice.cs 中关于 Lambda 参数解析的注释&#10;- 删除 PrimaryParser.LambdaAndTuple.cs 中关于 match 表达式的注释&#10;- 删除 PrimaryParser.Literals.cs 中关于列表初始化或切片的注释&#10;- 删除 PrimaryParser.Main.cs 中关于列表或字典初始化的注释&#10;- 删除 PrimaryParser.PatternMatching.cs 中关于泛型实例化的注释&#10;- 删除 PrimaryParser.StringTemplate.cs 中关于标识符解析的注释&#10;- 删除 StatementParser.BlockStatements.cs 中关于泛型类型注解的注释&#10;- 删除 StatementParser.ControlFlow.cs 中关于函数调用的注释&#10;- 删除 StatementParser.ImportAndNative.cs 中关于自增运算的注释&#10;- 删除 StatementParser.Main.cs 中关于函数定义或调用的注释&#10;- 删除 StatementParser.SimpleStatements.cs 中关于模块导入的注释&#10;- 清理 IDE 工作空间配置文件中的变更记录" />
     <MESSAGE value="feat(bytecode): 添加字节码访问器的语句处理功能&#10;&#10;- 实现异步和生成器语句的字节码生成，包括YieldStatement和AsyncFuncInit&#10;- 添加基础语句处理，支持块语句、变量赋值、类型检查和元组解构赋值&#10;- 实现控制流语句的字节码生成，包括if、while、for循环和break/continue语句&#10;- 添加函数和类定义的字节码编译功能，支持泛型函数和类的注册&#10;- 实现异常处理语句的完整字节码生成，包括try-catch-finally和throw语句&#10;- 添加导入语句和原生绑定的字节码指令生成，支持模块加载和原生库导入" />
     <MESSAGE value="refactor(ast): 重构函数值类型实现并清理导入语句&#10;&#10;- 将FuncLangValue类拆分为多个部分文件以改善代码组织结构&#10;- 从各个Statement相关文件中移除不必要的using语句&#10;- 将函数值类型的IL编译逻辑分离到独立的Compiler部分文件中&#10;- 优化函数类型的字节码生成和类型推断机制&#10;- 改进Lambda表达式和普通函数的编译处理流程&#10;- 移除冗余的导入语句以减少命名空间依赖" />
     <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
@@ -960,7 +962,11 @@
     <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
     <MESSAGE value="feat(lang): 添加更多数值类型转换支持&#10;&#10;- 在 LangValueType.cs 中添加 sbyte、ushort、uint、ulong 类型的转换处理&#10;- 实现 HandleUIntConversion 和 HandleULongConversion 方法避免数值溢出&#10;- 在 VirtualMachine.Helpers.ValueConversion.cs 中添加 char、long、short、byte、&#10;  sbyte、ushort、uint、ulong、float 等类型的转换支持&#10;- 优化 long 类型转换逻辑，超出 int 范围时自动转为 double&#10;- 在 FromObjectToLangValueType 方法中增加多种数值类型的转换分支&#10;- 移除未使用的类型扩展方法注释代码" />
     <MESSAGE value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
+    <MESSAGE value="feat(compiler): 添加接口约束的鸭子类型检查功能&#10;&#10;- 在BytecodeCompiler中新增接口名称检查和元数据获取方法&#10;- 实现GetAllInterfaceMethods方法支持递归收集接口及其父接口的所有方法&#10;- 添加CollectInterfaceMethods私有方法处理接口继承关系的方法收集&#10;- 在BytecodeVisitor中实现ValidateInterfaceConstraint方法进行鸭子类型验证&#10;- 修改GenericConstraintValidator添加ImplementsInterfaceMethods方法支持方法级别检查&#10;- 更新泛型实例化表达式传递正确的参数以支持新的约束验证&#10;- 移除workspace.xml中的临时调试配置变更记录" />
+    <MESSAGE value="chore(compiler): 移除 Lambda 表达式闭包分析调试代码&#10;&#10;- 删除了闭包捕获变量的调试输出逻辑&#10;- 移除了写入临时调试文件的功能&#10;- 清理了相关的调试信息打印代码" />
+    <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMIntegrationTests 中统一使用 ['\r', '\n'] 进行行分割&#10;- 在 VMReflectionTests 中更新行分割逻辑以支持 Windows 和 Unix 换行符&#10;- 修改 VMResourceCleanupTests 中的行分割方法确保兼容性&#10;- 更新 VMTypeErrorTests 中的断言逻辑以正确处理不同平台的换行符" />
+    <MESSAGE value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1331,10 +1337,10 @@
           <line>582</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs" containingFunctionPresentation="方法 'ResourceCleanup_DeferInLoop_ExecutesEachDefer'">
             <startOffsets>
-              <option value="17030" />
+              <option value="17036" />
             </startOffsets>
             <endOffsets>
-              <option value="17057" />
+              <option value="17063" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="649" />
