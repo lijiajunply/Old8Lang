@@ -62,6 +62,36 @@
   - 在 `ReflectionHelper.cs` 中添加了 `GetFunctionInfo` 辅助方法
 - **兼容性**: 新增功能，不影响现有代码
 
+#### 原生函数命名参数支持
+- **功能**: 原生 .NET 方法和 P/Invoke 函数现在支持命名参数调用
+- **影响范围**:
+  - 原生 .NET 方法：通过 `extern NativeDll` 导入的 .NET 类库方法
+  - P/Invoke 函数：通过 `extern NativeDll` 导入的 C/C++ DLL 函数
+  - 原生静态方法：通过 `native` 语句导入的静态方法
+- **使用示例**:
+  ```old8
+  // 原生 .NET 方法命名参数
+  extern NativeDll "System.Math" {
+      func Pow(x:double, y:double) -> double
+  }
+
+  // 使用命名参数（乱序）
+  result <- Pow(y: 3.0, x: 2.0)  // 2^3 = 8.0
+
+  // 混合位置参数和命名参数
+  result <- Pow(2.0, y: 3.0)
+  ```
+- **技术实现**:
+  - 在 `FuncLangValue.Execution.cs` 中添加了 `ReorderNativeMethodArguments` 方法
+  - 使用 .NET 反射 API (`MethodInfo.GetParameters()`) 获取参数名称
+  - 在 `NativeDelegateFuncLangValue.cs` 中添加了命名参数重载方法
+  - 支持参数重新排序、默认值处理和错误验证
+- **优势**:
+  - 提高原生函数调用的可读性
+  - 减少参数顺序错误
+  - 与 Old8Lang 函数保持一致的调用体验
+- **兼容性**: 完全向后兼容，现有代码无需修改
+
 #### 运算符重载支持
 - **功能**: 新增 Python 风格的运算符重载功能，允许用户自定义类的运算符行为
 - **支持的运算符**:

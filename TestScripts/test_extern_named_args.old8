@@ -1,0 +1,76 @@
+// 测试原生 .NET 方法的命名参数支持
+
+PrintLine("=== 测试原生 .NET 方法的命名参数 ===")
+
+// 1. 测试 System.Math 方法
+PrintLine("\n1. 测试 System.Math.Pow 命名参数:")
+
+extern NativeDll "System.Math" {
+    func Pow(x:double, y:double) -> double
+    func Sqrt(value:double) -> double
+    func Max(val1:int, val2:int) -> int
+    func Min(val1:int, val2:int) -> int
+}
+
+// 使用位置参数
+result1 <- Pow(2.0, 3.0)
+PrintLine("  Pow(2.0, 3.0) = " + result1.ToStr())
+
+// 使用命名参数
+result2 <- Pow(x: 2.0, y: 3.0)
+PrintLine("  Pow(x: 2.0, y: 3.0) = " + result2.ToStr())
+
+// 使用命名参数（乱序）
+result3 <- Pow(y: 3.0, x: 2.0)
+PrintLine("  Pow(y: 3.0, x: 2.0) = " + result3.ToStr())
+
+// 混合使用位置参数和命名参数
+result4 <- Pow(2.0, y: 3.0)
+PrintLine("  Pow(2.0, y: 3.0) = " + result4.ToStr())
+
+// 2. 测试 Sqrt 方法
+PrintLine("\n2. 测试 System.Math.Sqrt 命名参数:")
+sqrt1 <- Sqrt(16.0)
+PrintLine("  Sqrt(16.0) = " + sqrt1.ToStr())
+
+sqrt2 <- Sqrt(value: 16.0)
+PrintLine("  Sqrt(value: 16.0) = " + sqrt2.ToStr())
+
+// 3. 测试 Max 和 Min 方法
+PrintLine("\n3. 测试 System.Math.Max/Min 命名参数:")
+max1 <- Max(10, 20)
+PrintLine("  Max(10, 20) = " + max1.ToStr())
+
+max2 <- Max(val1: 10, val2: 20)
+PrintLine("  Max(val1: 10, val2: 20) = " + max2.ToStr())
+
+max3 <- Max(val2: 20, val1: 10)
+PrintLine("  Max(val2: 20, val1: 10) = " + max3.ToStr())
+
+min1 <- Min(val1: 10, val2: 20)
+PrintLine("  Min(val1: 10, val2: 20) = " + min1.ToStr())
+
+// 4. 测试 System.String 方法
+PrintLine("\n4. 测试 System.String 方法命名参数:")
+
+extern NativeDll "System.String" {
+    func Concat(str0:string, str1:string) -> string
+    func IsNullOrEmpty(value:string) -> bool
+}
+
+concat1 <- Concat("Hello", " World")
+PrintLine("  Concat('Hello', ' World') = " + concat1)
+
+concat2 <- Concat(str0: "Hello", str1: " World")
+PrintLine("  Concat(str0: 'Hello', str1: ' World') = " + concat2)
+
+concat3 <- Concat(str1: " World", str0: "Hello")
+PrintLine("  Concat(str1: ' World', str0: 'Hello') = " + concat3)
+
+isEmpty1 <- IsNullOrEmpty("")
+PrintLine("  IsNullOrEmpty('') = " + isEmpty1.ToStr())
+
+isEmpty2 <- IsNullOrEmpty(value: "")
+PrintLine("  IsNullOrEmpty(value: '') = " + isEmpty2.ToStr())
+
+PrintLine("\n=== 所有测试完成 ===")

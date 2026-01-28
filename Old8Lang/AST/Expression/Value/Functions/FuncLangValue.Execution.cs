@@ -138,11 +138,18 @@ public partial class FuncLangValue
             return Run(variateManagerFunc, positionalArgs, obj);
         }
 
-        // 将命名参数转换为位置参数
-        var reorderedArgs = ReorderArgumentsWithNamedParameters(positionalArgs, namedArgs, callPosition);
+        // 如果是原生 .NET 方法，需要特殊处理
+        if (Method is not null)
+        {
+            var reorderedArgs = ReorderNativeMethodArguments(positionalArgs, namedArgs, callPosition, obj);
+            return Run(variateManagerFunc, reorderedArgs, obj);
+        }
+
+        // Old8Lang 函数：将命名参数转换为位置参数
+        var reorderedOld8Args = ReorderArgumentsWithNamedParameters(positionalArgs, namedArgs, callPosition);
 
         // 使用重新排序后的参数调用原有方法
-        return Run(variateManagerFunc, reorderedArgs, obj);
+        return Run(variateManagerFunc, reorderedOld8Args, obj);
     }
 
     /// <summary>
@@ -291,6 +298,123 @@ public partial class FuncLangValue
                     $"不支持对 params 参数 '{paramsName}' 使用命名参数");
             }
         }
+    }
+
+    /// <summary>
+    /// 为原生 .NET 方法重新排序参数（支持命名参数）
+    /// </summary>
+    /// <param name="positionalArgs">位置参数列表</param>
+    /// <param name="namedArgs">命名参数列表</param>
+    /// <param name="callPosition">调用位置</param>
+    /// <param name="obj">对象实例（方法调用时使用）</param>
+    /// <returns>重新排序后的参数列表</returns>
+    private List<LangExpression> ReorderNativeMethodArguments(
+        List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs,
+        SourcePosition callPosition,
+        object? obj)
+    {
+        if (Method is null)
+        {
+            throw new InvalidOperationError(callPosition, "方法引用为空");
+        }
+
+        // 获取方法的所有参数
+        var methodParams = Method.GetParameters();
+        var paramStartIndex = obj is not null ? 1 : 0; // 如果有 this 参数，跳过第一个参数
+        var effectiveParams = methodParams.Skip(paramStartIndex).ToArray();
+
+        // 1. 验证命名参数的合法性
+        var seenNames = new HashSet<string>();
+        foreach (var namedArg in namedArgs)
+        {
+            if (!seenNames.Add(namedArg.Name))
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"命名参数 '{namedArg.Name}' 重复指定");
+            }
+        }
+
+        // 2. 创建参数槽位数组
+        var paramSlots = new LangExpression?[effectiveParams.Length];
+        var parameterFilled = new bool[effectiveParams.Length];
+
+        // 3. 填充位置参数
+        for (int i = 0; i < positionalArgs.Count; i++)
+        {
+            if (i >= effectiveParams.Length)
+            {
+                throw new ArgumentError(callPosition,
+                    $"方法 '{Method.Name}' 期望最多 {effectiveParams.Length} 个参数，但位置参数提供了 {positionalArgs.Count} 个");
+            }
+
+            paramSlots[i] = positionalArgs[i];
+            parameterFilled[i] = true;
+        }
+
+        // 4. 填充命名参数
+        foreach (var namedArg in namedArgs)
+        {
+            // 查找参数索引
+            int paramIndex = -1;
+            for (int i = 0; i < effectiveParams.Length; i++)
+            {
+                if (effectiveParams[i].Name == namedArg.Name)
+                {
+                    paramIndex = i;
+                    break;
+                }
+            }
+
+            if (paramIndex == -1)
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"方法 '{Method.Name}' 没有名为 '{namedArg.Name}' 的参数");
+            }
+
+            // 检查是否已经通过位置参数提供
+            if (parameterFilled[paramIndex])
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"参数 '{namedArg.Name}' 已经通过位置参数提供，不能重复指定");
+            }
+
+            paramSlots[paramIndex] = namedArg.Value;
+            parameterFilled[paramIndex] = true;
+        }
+
+        // 5. 填充默认参数值或验证必需参数
+        for (int i = 0; i < effectiveParams.Length; i++)
+        {
+            if (!parameterFilled[i])
+            {
+                // 检查是否有默认值
+                if (effectiveParams[i].HasDefaultValue)
+                {
+                    // 对于有默认值的参数，我们不需要在这里填充
+                    // 因为 Run 方法会处理默认值
+                    // 但我们需要标记这个槽位为已填充（使用 null 占位）
+                    paramSlots[i] = null;
+                }
+                else
+                {
+                    throw new ArgumentError(callPosition,
+                        $"方法 '{Method.Name}' 的必需参数 '{effectiveParams[i].Name}' (第{i + 1}个参数) 未提供值");
+                }
+            }
+        }
+
+        // 6. 转换为列表并返回（过滤掉 null 占位符）
+        var result = new List<LangExpression>();
+        for (int i = 0; i < paramSlots.Length; i++)
+        {
+            if (paramSlots[i] is not null)
+            {
+                result.Add(paramSlots[i]!);
+            }
+        }
+
+        return result;
     }
 
 

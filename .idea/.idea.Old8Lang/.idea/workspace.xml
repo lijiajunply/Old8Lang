@@ -23,17 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/test_extern_named_args.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Execution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Execution.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/NativeDelegateFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/NativeDelegateFuncLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +565,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="1132000" />
+      <workItem from="1769609608350" duration="4382000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="814" />
+    <option name="localTasksCounter" value="815" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 重命名测试中的函数名以提高可读性&#10;&#10;- 将 integration tests 中的 double 函数重命名为 twice&#10;- 将 named arguments tests 中的 double 函数重命名为 tw&#10;- 更新所有相关的函数调用以匹配新的函数名称&#10;- 保持测试逻辑不变，仅改进函数命名的清晰度" />
     <MESSAGE value="feat(module): 实现模块中函数的闭包作用域捕获机制&#10;&#10;- 在 UnifiedModule.FromSymbols 方法中添加 captureScope 参数支持&#10;- 为模块中的函数类型符号设置共享的捕获作用域&#10;- 修改 ModuleSystemService 中的模块加载逻辑传递 manager 作为捕获作用域&#10;- 克隆捕获作用域确保所有函数共享同一模块级变量环境&#10;- 更新函数对象创建逻辑直接设置共享作用域而非单独克隆&#10;- 修复 IDEA 工作空间配置文件中的变更列表记录" />
     <MESSAGE value="修改文件路径" />
     <MESSAGE value="refactor(bytecode): 重构字节码模块的命名空间结构&#10;&#10;- 将生成器相关类移动到 Old8Lang.Bytecode.Generators 命名空间&#10;- 将元数据相关类移动到 Old8Lang.Bytecode.Metadata 命名空间&#10;- 将虚拟机相关类移动到 Old8Lang.Bytecode.VM 命名空间&#10;- 更新所有相关的 using 语句以反映新的命名空间结构&#10;- 修改测试文件中的虚拟机引用路径&#10;- 重新组织字节码编译器中的元数据引用&#10;- 统一虚拟机组件的命名空间管理" />
@@ -969,7 +961,8 @@
     <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
     <MESSAGE value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
     <MESSAGE value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
+    <MESSAGE value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
