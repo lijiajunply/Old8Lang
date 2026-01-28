@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class ChannelCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelCreate"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -55,6 +56,7 @@ public sealed class ChannelCreateFunction : BaseGlobalFunction
 public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelCreateBounded"];
+    public override string[]? ParameterNames => ["capacity"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -101,6 +103,7 @@ public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
 public sealed class ChannelSendFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelSend"];
+    public override string[]? ParameterNames => ["channelId", "value"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -157,6 +160,7 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
 public sealed class ChannelTrySendFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelTrySend"];
+    public override string[]? ParameterNames => ["channelId", "value", "timeoutMs"];
     public override int MinParameterCount => 3;
     public override int MaxParameterCount => 3;
 
@@ -217,6 +221,7 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
 public sealed class ChannelReceiveFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelReceive"];
+    public override string[]? ParameterNames => ["channelId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -263,6 +268,7 @@ public sealed class ChannelReceiveFunction : BaseGlobalFunction
 public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelTryReceive"];
+    public override string[]? ParameterNames => ["channelId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -314,6 +320,7 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
 public sealed class ChannelCloseFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelClose"];
+    public override string[]? ParameterNames => ["channelId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -361,6 +368,7 @@ public sealed class ChannelCloseFunction : BaseGlobalFunction
 public sealed class ChannelDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ChannelDispose"];
+    public override string[]? ParameterNames => ["channelId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

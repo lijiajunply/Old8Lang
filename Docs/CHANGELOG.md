@@ -4,6 +4,64 @@
 
 ### 语言特性增强
 
+#### 全局函数命名参数支持
+- **功能**: 所有全局函数现在支持命名参数调用，提升代码可读性和易用性
+- **影响范围**: 60+ 个全局函数，包括：
+  - IO 函数：`PrintLine`, `Print`, `ReadLine`, `Error`, `Clear`
+  - 并发函数：`MutexLock`, `ChannelSend`, `SemaphoreCreate`, `AtomicIntSet` 等
+  - 反射函数：`GetClassName`, `InvokeMethod`, `GetField`, `SetField` 等
+  - 工具函数：`Len`, `Type`, `Assert`, `Sleep` 等
+- **使用示例**:
+  ```old8
+  // 使用命名参数调用全局函数
+  Sleep(milliseconds: 1000)
+  MutexLock(mutexId: mutex)
+  ChannelSend(channelId: ch, value: 100)
+  InvokeMethod(obj: person, methodName: "greet", args: {})
+  SemaphoreCreate(initialCount: 1, maxCount: 3)
+  AtomicIntSet(atomicId: atomic, newValue: 20)
+  ```
+- **优势**:
+  - 提高代码可读性：参数含义一目了然
+  - 减少参数顺序错误：不需要记忆参数顺序
+  - 支持混合调用：可以混合使用位置参数和命名参数
+- **实现细节**:
+  - 为所有全局函数类添加了 `ParameterNames` 属性
+  - 参数名称遵循统一的命名规范（如 `mutexId`, `channelId`, `obj`, `methodName` 等）
+  - 命名参数重新排序逻辑已在 `Instance.cs` 中实现
+- **兼容性**: 完全向后兼容，现有代码无需修改
+
+#### 函数参数信息查询
+- **功能**: 新增 `GetFunctionInfo(functionName:string)` 全局函数，用于查询全局函数的参数信息
+- **返回信息**:
+  - `name`: 函数主名称
+  - `names`: 所有别名列表
+  - `parameters`: 参数列表（包含参数名称和类型）
+  - `minParameterCount`: 最小参数数量
+  - `maxParameterCount`: 最大参数数量（-1 表示不限制）
+  - `returnType`: 返回类型
+  - `isGlobalFunction`: 是否是全局函数
+- **使用示例**:
+  ```old8
+  info <- GetFunctionInfo("ChannelSend")
+  PrintLine(info.ToStr())
+  // 输出: {"name": "ChannelSend", "names": ["ChannelSend"],
+  //        "parameters": [{"name": "channelId", "type": "object"},
+  //                       {"name": "value", "type": "object"}],
+  //        "minParameterCount": 2, "maxParameterCount": 2,
+  //        "returnType": "object", "isGlobalFunction": true}
+  ```
+- **应用场景**:
+  - 动态函数调用：在运行时获取函数签名
+  - 代码生成：根据函数信息生成调用代码
+  - 文档生成：自动生成函数文档
+  - 调试和开发工具：提供函数信息查询功能
+- **实现细节**:
+  - 新增 `GetFunctionInfoFunction` 类实现函数信息查询
+  - 支持解释器模式、编译器模式和虚拟机模式
+  - 在 `ReflectionHelper.cs` 中添加了 `GetFunctionInfo` 辅助方法
+- **兼容性**: 新增功能，不影响现有代码
+
 #### 运算符重载支持
 - **功能**: 新增 Python 风格的运算符重载功能，允许用户自定义类的运算符行为
 - **支持的运算符**:

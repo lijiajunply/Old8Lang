@@ -14,6 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class PrintLineFunction : BaseGlobalFunction
 {
     public override string[] Names => ["PrintLine", "printLine"];
+    public override string[]? ParameterNames => ["values"];
 
     public override int MinParameterCount => 0;
 

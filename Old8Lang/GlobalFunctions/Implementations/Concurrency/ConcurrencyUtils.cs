@@ -64,6 +64,7 @@ public sealed class SleepFunction : BaseGlobalFunction
 public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetCurrentThreadId"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -105,6 +106,7 @@ public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
 public sealed class GetProcessorCountFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetProcessorCount"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 

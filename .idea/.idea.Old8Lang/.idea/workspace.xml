@@ -23,13 +23,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestScripts/test_native_named_args.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Advanced/Other/NativeStaticAny.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/AtomicIntFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/MutexFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ReadWriteLockFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/SemaphoreFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,8 +60,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/lijiajunply/Old8Lang&quot;,
-    &quot;accountId&quot;: &quot;da116cf9-9d16-491a-a1f8-9fb79401482c&quot;
+    &quot;url&quot;: &quot;https://github.com/lijiajunply/Old8Lang.git&quot;,
+    &quot;accountId&quot;: &quot;178fd1c1-455a-4fb0-879b-55b1a7a6f881&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -122,6 +126,7 @@
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
@@ -566,6 +571,8 @@
       <workItem from="1768855807020" duration="2444000" />
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
+      <workItem from="1769488764760" duration="9000" />
+      <workItem from="1769609608350" duration="1132000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -910,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="813" />
+    <option name="localTasksCounter" value="814" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -937,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(type-system): 实现函数类型注解和兼容性检查&#10;&#10;- 在 TypeAnnotationManager 中添加函数类型兼容性验证逻辑&#10;- 在 TypeChecker 中实现函数类型字符串获取和兼容性检查&#10;- 在 VirtualMachine 中添加函数类型匹配检查功能&#10;- 在 BytecodeVisitor 中修改 Lambda 函数编译逻辑以传递返回类型&#10;- 添加完整的函数类型注解测试文件包括编译器、解释器、语法和虚拟机测试&#10;- 实现泛型函数类型 function&lt;T1, T2, ...&gt; 的参数和返回值类型检查&#10;- 支持基本 function 类型兼容任何函数类型的功能&#10;- 添加调试信息输出用于类型注解处理跟踪" />
     <MESSAGE value="refactor(tests): 重命名测试中的函数名以提高可读性&#10;&#10;- 将 integration tests 中的 double 函数重命名为 twice&#10;- 将 named arguments tests 中的 double 函数重命名为 tw&#10;- 更新所有相关的函数调用以匹配新的函数名称&#10;- 保持测试逻辑不变，仅改进函数命名的清晰度" />
     <MESSAGE value="feat(module): 实现模块中函数的闭包作用域捕获机制&#10;&#10;- 在 UnifiedModule.FromSymbols 方法中添加 captureScope 参数支持&#10;- 为模块中的函数类型符号设置共享的捕获作用域&#10;- 修改 ModuleSystemService 中的模块加载逻辑传递 manager 作为捕获作用域&#10;- 克隆捕获作用域确保所有函数共享同一模块级变量环境&#10;- 更新函数对象创建逻辑直接设置共享作用域而非单独克隆&#10;- 修复 IDEA 工作空间配置文件中的变更列表记录" />
     <MESSAGE value="修改文件路径" />
@@ -962,7 +968,8 @@
     <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
     <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
     <MESSAGE value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
+    <MESSAGE value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

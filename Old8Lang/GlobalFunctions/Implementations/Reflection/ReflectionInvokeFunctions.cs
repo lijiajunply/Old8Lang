@@ -19,6 +19,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class InvokeMethodFunction : BaseGlobalFunction
 {
     public override string[] Names => ["InvokeMethod"];
+    public override string[]? ParameterNames => ["obj", "methodName", "args"];
     public override int MinParameterCount => 3;
     public override int MaxParameterCount => 3;
 

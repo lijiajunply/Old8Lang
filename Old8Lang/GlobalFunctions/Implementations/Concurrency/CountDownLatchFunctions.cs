@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchCreate"];
+    public override string[]? ParameterNames => ["count"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -62,6 +63,7 @@ public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
 public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchCountDown"];
+    public override string[]? ParameterNames => ["latchId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -109,6 +111,7 @@ public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
 public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchWait"];
+    public override string[]? ParameterNames => ["latchId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -156,6 +159,7 @@ public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
 public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchWaitTimeout"];
+    public override string[]? ParameterNames => ["latchId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -207,6 +211,7 @@ public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
 public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchGetCount"];
+    public override string[]? ParameterNames => ["latchId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -253,6 +258,7 @@ public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
 public sealed class CountDownLatchDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CountDownLatchDispose"];
+    public override string[]? ParameterNames => ["latchId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

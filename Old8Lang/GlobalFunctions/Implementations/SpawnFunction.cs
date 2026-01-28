@@ -17,6 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class SpawnFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Spawn", "spawn"];
+    public override string[]? ParameterNames => ["func"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => -1;
 

@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class LenFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Len", "len"];
+    public override string[]? ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -108,6 +109,7 @@ public sealed class LenFunction : BaseGlobalFunction
 public sealed class TypeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Type", "type"];
+    public override string[]? ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -143,6 +145,7 @@ public sealed class TypeFunction : BaseGlobalFunction
 public sealed class AssertFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Assert", "assert"];
+    public override string[]? ParameterNames => ["actual", "expected"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -184,6 +187,7 @@ public sealed class AssertFunction : BaseGlobalFunction
 public sealed class ShowValuesFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ShowValues", "showValues"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 

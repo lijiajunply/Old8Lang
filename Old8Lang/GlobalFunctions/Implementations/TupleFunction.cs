@@ -14,6 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class TupleFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Tuple", "tuple"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 

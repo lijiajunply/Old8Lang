@@ -15,6 +15,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class PrintFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Print", "print"];
+    public override string[]? ParameterNames => ["values"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => -1;
 
@@ -88,6 +89,7 @@ public sealed class PrintFunction : BaseGlobalFunction
 public sealed class ReadLineFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadLine", "readLine"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -120,6 +122,7 @@ public sealed class ReadLineFunction : BaseGlobalFunction
 public sealed class ErrorFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Error", "error"];
+    public override string[]? ParameterNames => ["values"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => -1;
 
@@ -212,6 +215,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
 public sealed class ClearFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Clear", "clear"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 

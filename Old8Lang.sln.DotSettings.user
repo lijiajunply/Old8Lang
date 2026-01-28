@@ -45,8 +45,8 @@
   &lt;Assembly Path="/Users/luckyfish/.nuget/packages/old8lang.packagemanager.core/1.0.0/lib/net10.0/Old8Lang.PackageManager.Core.dll" /&gt;
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/publish/Npgsql.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1283e73f_002Dd696_002D41fc_002D82f8_002Dbfc626de0827/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Project Location="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1283e73f_002Dd696_002D41fc_002D82f8_002Dbfc626de0827/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="\Users\luckyfish\Documents\Project\Old8LangProjects\Old8Lang\Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	

@@ -1,0 +1,17 @@
+// 调试字典访问
+
+info <- GetFunctionInfo("PrintLine")
+PrintLine("info 类型: " + Type(info))
+PrintLine("info 内容: " + info.ToStr())
+
+// 尝试不同的访问方式
+PrintLine("\n尝试访问 name 键:")
+name <- info["name"]
+PrintLine("name 类型: " + Type(name))
+PrintLine("name 值: " + name.ToStr())
+
+// 尝试赋值后再访问
+PrintLine("\n尝试赋值后再访问:")
+info2 <- GetFunctionInfo("PrintLine")
+funcName <- info2["name"]
+PrintLine("funcName: " + funcName.ToStr())

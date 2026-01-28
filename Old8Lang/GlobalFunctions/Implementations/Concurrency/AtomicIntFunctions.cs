@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class AtomicIntCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntCreate"];
+    public override string[]? ParameterNames => ["initialValue"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -62,6 +63,7 @@ public sealed class AtomicIntCreateFunction : BaseGlobalFunction
 public sealed class AtomicIntGetFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntGet"];
+    public override string[]? ParameterNames => ["atomicId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -108,6 +110,7 @@ public sealed class AtomicIntGetFunction : BaseGlobalFunction
 public sealed class AtomicIntSetFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntSet"];
+    public override string[]? ParameterNames => ["atomicId", "newValue"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -160,6 +163,7 @@ public sealed class AtomicIntSetFunction : BaseGlobalFunction
 public sealed class AtomicIntIncrementFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntIncrement"];
+    public override string[]? ParameterNames => ["atomicId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -206,6 +210,7 @@ public sealed class AtomicIntIncrementFunction : BaseGlobalFunction
 public sealed class AtomicIntDecrementFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntDecrement"];
+    public override string[]? ParameterNames => ["atomicId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -252,6 +257,7 @@ public sealed class AtomicIntDecrementFunction : BaseGlobalFunction
 public sealed class AtomicIntAddFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntAdd"];
+    public override string[]? ParameterNames => ["atomicId", "delta"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -303,6 +309,7 @@ public sealed class AtomicIntAddFunction : BaseGlobalFunction
 public sealed class AtomicIntCompareAndSetFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntCompareAndSet"];
+    public override string[]? ParameterNames => ["atomicId", "expectedValue", "newValue"];
     public override int MinParameterCount => 3;
     public override int MaxParameterCount => 3;
 
@@ -359,6 +366,7 @@ public sealed class AtomicIntCompareAndSetFunction : BaseGlobalFunction
 public sealed class AtomicIntDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["AtomicIntDispose"];
+    public override string[]? ParameterNames => ["atomicId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

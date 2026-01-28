@@ -1,0 +1,10 @@
+// 简单测试 GetFunctionInfo
+
+PrintLine("测试 GetFunctionInfo")
+
+info <- GetFunctionInfo("PrintLine")
+PrintLine("info 类型: " + Type(info))
+
+// 尝试直接打印 info
+PrintLine("info 内容:")
+PrintLine(info.ToStr())

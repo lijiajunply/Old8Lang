@@ -20,6 +20,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class GetFieldFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetField"];
+    public override string[]? ParameterNames => ["obj", "fieldName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -98,6 +99,7 @@ public sealed class GetFieldFunction : BaseGlobalFunction
 public sealed class SetFieldFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SetField"];
+    public override string[]? ParameterNames => ["obj", "fieldName", "value"];
     public override int MinParameterCount => 3;
     public override int MaxParameterCount => 3;
 

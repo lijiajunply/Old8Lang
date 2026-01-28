@@ -1,0 +1,10 @@
+// 测试字典访问
+
+info <- GetFunctionInfo("PrintLine")
+PrintLine("info 类型: " + Type(info))
+PrintLine("info 内容: " + info.ToStr())
+
+// 测试访问字典的键
+name <- info["name"]
+PrintLine("name 类型: " + Type(name))
+PrintLine("name 值: " + name.ToStr())

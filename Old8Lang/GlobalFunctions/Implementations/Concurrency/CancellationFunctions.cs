@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class CreateCancellationTokenSourceFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CreateCancellationTokenSource"];
+    public override string[]? ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -55,6 +56,7 @@ public sealed class CreateCancellationTokenSourceFunction : BaseGlobalFunction
 public sealed class CancelFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Cancel"];
+    public override string[]? ParameterNames => ["ctsId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -102,6 +104,7 @@ public sealed class CancelFunction : BaseGlobalFunction
 public sealed class CancelAfterFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CancelAfter"];
+    public override string[]? ParameterNames => ["ctsId", "delayMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -154,6 +157,7 @@ public sealed class CancelAfterFunction : BaseGlobalFunction
 public sealed class DisposeCancellationTokenSourceFunction : BaseGlobalFunction
 {
     public override string[] Names => ["DisposeCancellationTokenSource"];
+    public override string[]? ParameterNames => ["ctsId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

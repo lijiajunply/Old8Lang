@@ -19,6 +19,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class GetClassNameFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassName"];
+    public override string[]? ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -76,6 +77,7 @@ public sealed class GetClassNameFunction : BaseGlobalFunction
 public sealed class GetClassMethodsFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassMethods"];
+    public override string[]? ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -151,6 +153,7 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
 public sealed class GetClassFieldsFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassFields"];
+    public override string[]? ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -226,6 +229,7 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
 public sealed class GetMethodInfoFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetMethodInfo"];
+    public override string[]? ParameterNames => ["obj", "methodName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -330,6 +334,7 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
 public sealed class GetFieldInfoFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetFieldInfo"];
+    public override string[]? ParameterNames => ["obj", "fieldName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 

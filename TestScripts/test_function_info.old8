@@ -1,0 +1,138 @@
+// 测试 GetFunctionInfo 函数和命名参数支持
+
+PrintLine("=== 测试 GetFunctionInfo 函数 ===")
+
+// 1. 测试 IO 函数信息查询
+PrintLine("\n1. 测试 PrintLine 函数信息:")
+info <- GetFunctionInfo("PrintLine")
+PrintLine("  函数名: " + info["name"].ToStr())
+PrintLine("  别名数量: " + Len(info["names"]).ToStr())
+PrintLine("  参数数量: " + Len(info["parameters"]).ToStr())
+PrintLine("  最小参数数: " + info["minParameterCount"].ToStr())
+PrintLine("  最大参数数: " + info["maxParameterCount"].ToStr())
+PrintLine("  返回类型: " + info["returnType"].ToStr())
+PrintLine("  是全局函数: " + info["isGlobalFunction"].ToStr())
+
+// 2. 测试并发函数信息查询
+PrintLine("\n2. 测试 MutexLock 函数信息:")
+mutexInfo <- GetFunctionInfo("MutexLock")
+PrintLine("  函数名: " + mutexInfo["name"].ToStr())
+PrintLine("  参数数量: " + Len(mutexInfo["parameters"]).ToStr())
+PrintLine("  最小参数数: " + mutexInfo["minParameterCount"].ToStr())
+
+PrintLine("\n3. 测试 ChannelSend 函数信息:")
+channelInfo <- GetFunctionInfo("ChannelSend")
+PrintLine("  函数名: " + channelInfo["name"].ToStr())
+PrintLine("  参数数量: " + Len(channelInfo["parameters"]).ToStr())
+PrintLine("  最小参数数: " + channelInfo["minParameterCount"].ToStr())
+
+// 4. 测试反射函数信息查询
+PrintLine("\n4. 测试 InvokeMethod 函数信息:")
+invokeInfo <- GetFunctionInfo("InvokeMethod")
+PrintLine("  函数名: " + invokeInfo["name"].ToStr())
+PrintLine("  参数数量: " + Len(invokeInfo["parameters"]).ToStr())
+PrintLine("  最小参数数: " + invokeInfo["minParameterCount"].ToStr())
+
+PrintLine("\n=== 测试命名参数调用 ===")
+
+// 5. 测试 Sleep 函数的命名参数
+PrintLine("\n5. 测试 Sleep 命名参数:")
+PrintLine("  开始 Sleep...")
+Sleep(milliseconds: 100)
+PrintLine("  Sleep 完成")
+
+// 6. 测试 Mutex 函数的命名参数
+PrintLine("\n6. 测试 Mutex 命名参数:")
+mutex <- MutexCreate()
+PrintLine("  Mutex 创建成功: " + mutex.ToStr())
+MutexLock(mutexId: mutex)
+PrintLine("  Mutex 锁定成功")
+MutexUnlock(mutexId: mutex)
+PrintLine("  Mutex 解锁成功")
+MutexDispose(mutexId: mutex)
+PrintLine("  Mutex 销毁成功")
+
+// 7. 测试 Channel 函数的命名参数
+PrintLine("\n7. 测试 Channel 命名参数:")
+ch <- ChannelCreate()
+PrintLine("  Channel 创建成功: " + ch.ToStr())
+ChannelSend(channelId: ch, value: 100)
+PrintLine("  发送数据: 100")
+val <- ChannelReceive(channelId: ch)
+PrintLine("  接收数据: " + val.ToStr())
+ChannelDispose(channelId: ch)
+PrintLine("  Channel 销毁成功")
+
+// 8. 测试 Semaphore 函数的命名参数
+PrintLine("\n8. 测试 Semaphore 命名参数:")
+sem <- SemaphoreCreate(initialCount: 1, maxCount: 3)
+PrintLine("  Semaphore 创建成功: " + sem.ToStr())
+SemaphoreAcquire(semaphoreId: sem)
+PrintLine("  Semaphore 获取成功")
+SemaphoreRelease(semaphoreId: sem)
+PrintLine("  Semaphore 释放成功")
+SemaphoreDispose(semaphoreId: sem)
+PrintLine("  Semaphore 销毁成功")
+
+// 9. 测试 AtomicInt 函数的命名参数
+PrintLine("\n9. 测试 AtomicInt 命名参数:")
+atomic <- AtomicIntCreate(initialValue: 10)
+PrintLine("  AtomicInt 创建成功: " + atomic.ToStr())
+value <- AtomicIntGet(atomicId: atomic)
+PrintLine("  初始值: " + value.ToStr())
+newValue <- AtomicIntIncrement(atomicId: atomic)
+PrintLine("  递增后: " + newValue.ToStr())
+AtomicIntSet(atomicId: atomic, newValue: 20)
+PrintLine("  设置为 20")
+value <- AtomicIntGet(atomicId: atomic)
+PrintLine("  当前值: " + value.ToStr())
+AtomicIntDispose(atomicId: atomic)
+PrintLine("  AtomicInt 销毁成功")
+
+// 10. 测试反射函数的命名参数
+PrintLine("\n10. 测试反射函数命名参数:")
+
+class Person {
+    private name:string <- "Unknown"
+    private age:int <- 0
+
+    public func init(n:string, a:int) -> void {
+        name <- n
+        age <- a
+    }
+
+    public func greet() -> string {
+        return "Hello, I'm " + name
+    }
+
+    private func getAge() -> int {
+        return age
+    }
+}
+
+person <- Person("Alice", 25)
+
+// 使用命名参数调用反射函数
+className <- GetClassName(obj: person)
+PrintLine("  类名: " + className)
+
+methods <- GetClassMethods(obj: person)
+PrintLine("  方法列表: " + methods.ToStr())
+
+methodInfo <- GetMethodInfo(obj: person, methodName: "greet")
+PrintLine("  greet 方法信息: " + methodInfo.ToStr())
+
+result <- InvokeMethod(obj: person, methodName: "greet", args: {})
+PrintLine("  调用 greet: " + result)
+
+age <- InvokeMethod(obj: person, methodName: "getAge", args: {})
+PrintLine("  调用 getAge: " + age.ToStr())
+
+name <- GetField(obj: person, fieldName: "name")
+PrintLine("  获取 name 字段: " + name)
+
+SetField(obj: person, fieldName: "name", value: "Bob")
+PrintLine("  设置 name 为 Bob")
+PrintLine("  新的 greet: " + person.greet())
+
+PrintLine("\n=== 所有测试完成 ===")

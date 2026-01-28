@@ -14,6 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class LockFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Lock", "lock"];
+    public override string[]? ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

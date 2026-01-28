@@ -10,7 +10,8 @@
       "Bash(dotnet build:*)",
       "Bash(ls:*)",
       "Bash(dotnet test:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git show:*)"
     ]
   }
 }

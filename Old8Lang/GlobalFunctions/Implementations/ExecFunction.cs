@@ -16,6 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class ExecFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Exec", "exec"];
+    public override string[]? ParameterNames => ["code"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
