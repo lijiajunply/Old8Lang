@@ -309,7 +309,7 @@ public class VMArithmeticTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.Equal("15", lines[0]); // 10 + 5
         Assert.Equal("5", lines[1]);  // 10 - 5

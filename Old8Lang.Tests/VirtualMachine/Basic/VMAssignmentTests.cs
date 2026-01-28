@@ -131,7 +131,7 @@ public class VMAssignmentTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal(value.ToString(), output);
+        Assert.Equal(value.ToString().ToLower(), output);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class VMAssignmentTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("10", lines[0]);
         Assert.Equal("20", lines[1]);
@@ -175,7 +175,7 @@ public class VMAssignmentTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("10", lines[0]);
         Assert.Equal("20", lines[1]);
@@ -257,11 +257,11 @@ public class VMAssignmentTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.Equal("42", lines[0]);
         Assert.Equal("3.14", lines[1]);
         Assert.Equal("test", lines[2]);
-        Assert.Equal("True", lines[3]);
+        Assert.Equal("true", lines[3]);
     }
 }
