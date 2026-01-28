@@ -578,7 +578,7 @@ public class VMResourceCleanupTests
         ";
 
         var output = ExecuteVMCode(code);
-        var lines = output.Split('\n').ToList();
+        var lines = output.Split('\r', '\n').ToList();
         
         for (int i = 0; i < 3; i++)
         {

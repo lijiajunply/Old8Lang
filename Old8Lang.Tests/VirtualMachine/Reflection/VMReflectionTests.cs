@@ -84,7 +84,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("Animal", lines[0]);
         Assert.Equal("Vehicle", lines[1]);
@@ -623,7 +623,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("Alice", lines[0]);
         Assert.Equal("25", lines[1]);
@@ -956,7 +956,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Contains("Class: Person", lines);
         Assert.Contains("Has greet: true", lines);
         Assert.Contains("Has name: true", lines);
@@ -1013,7 +1013,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Contains("Rectangle area: 20", lines); // 4 * 5 = 20
         Assert.Contains("Circle area: 27", lines);    // 3 * 3 * 3 = 27
     }
@@ -1082,7 +1082,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("100", lines[0]);
         Assert.Equal("enabled", lines[1]);
@@ -1127,7 +1127,7 @@ public class VMReflectionTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Contains("Is Product: true", lines);
         Assert.Contains("Has name: true", lines);
         Assert.Contains("Has getInfo: true", lines);

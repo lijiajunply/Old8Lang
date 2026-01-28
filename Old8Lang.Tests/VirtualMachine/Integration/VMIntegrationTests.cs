@@ -91,7 +91,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(7, lines.Length);
         Assert.Equal("11", lines[0]);
         Assert.Equal("12", lines[1]);
@@ -126,7 +126,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(10, lines.Length);
         Assert.Equal("0", lines[0]);
         Assert.Equal("1", lines[1]);
@@ -168,7 +168,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         var primes = new[] { "2", "3", "5", "7", "11", "13", "17", "19" };
         Assert.Equal(primes.Length, lines.Length);
         for (int i = 0; i < primes.Length; i++)
@@ -212,7 +212,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("87", lines[0]); // (85+90+88)/3 = 87
         Assert.Equal("80", lines[1]); // (78+82+80)/3 = 80
@@ -252,7 +252,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.Equal("6", lines[0]);  // 1+5
         Assert.Equal("8", lines[1]);  // 2+6
@@ -293,7 +293,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("Hello: 1", lines[0]);
         Assert.Equal("World: 1", lines[1]);
@@ -329,7 +329,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("John Doe", lines[0]);
         Assert.Equal("Hello, John Doe! You are 30 years old.", lines[1]);
@@ -568,7 +568,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.Equal("20 + 4 = 24", lines[0]);
         Assert.Equal("20 - 4 = 16", lines[1]);
@@ -615,7 +615,7 @@ public class VMIntegrationTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(4, lines.Length);
         Assert.Equal("Sum: 873", lines[0]);
         Assert.Equal("Average: 87", lines[1]); // 873/10 = 87
