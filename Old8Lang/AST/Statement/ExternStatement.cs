@@ -240,10 +240,11 @@ public partial class ExternStatement : OldStatement
     /// </summary>
     public static ExternType DetectExternType(string dllName)
     {
-        // C# 程序集：C#: 或 cs: 或 csharp: 前缀
+        // C# 程序集：C#: 或 cs: 或 csharp: 或 dotnetdll: 前缀
         if (dllName.StartsWith("C#:", StringComparison.OrdinalIgnoreCase) ||
             dllName.StartsWith("cs:", StringComparison.OrdinalIgnoreCase) ||
-            dllName.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase))
+            dllName.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase) ||
+            dllName.StartsWith("dotnetdll:", StringComparison.OrdinalIgnoreCase))
         {
             return ExternType.CSharpDll;
         }

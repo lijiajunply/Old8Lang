@@ -1,0 +1,23 @@
+// 测试 dotnetdll: 前缀的 C# DLL 导入功能
+// 语法: extern "dotnetdll:AssemblyName" ClassName { func MethodName(params) -> returnType }
+
+// 使用 dotnetdll: 前缀导入 System.Math 类
+extern "dotnetdll:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double,
+    func Abs(value:double) -> double
+}
+
+// 测试 Math.Pow
+result <- Pow(2.0, 8.0)
+PrintLine("2^8 = " + result.ToStr())
+
+// 测试 Math.Sqrt
+sqrtResult <- Sqrt(256.0)
+PrintLine("sqrt(256) = " + sqrtResult.ToStr())
+
+// 测试 Math.Abs
+absResult <- Abs(-100.5)
+PrintLine("abs(-100.5) = " + absResult.ToStr())
+
+PrintLine("dotnetdll: 前缀测试完成!")

@@ -23,14 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/CSharpDllProvider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestScripts/test_csharp_extern.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestScripts/test_csharp_extern_basic.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/test_dotnetdll_extern.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/CSharpDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/CSharpDllProvider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" afterDir="false" />
     </list>
@@ -571,7 +567,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="6779000" />
+      <workItem from="1769609608350" duration="7226000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -916,7 +912,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="817" />
+    <option name="localTasksCounter" value="818" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -943,7 +939,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(bytecode): 重构字节码模块的命名空间结构&#10;&#10;- 将生成器相关类移动到 Old8Lang.Bytecode.Generators 命名空间&#10;- 将元数据相关类移动到 Old8Lang.Bytecode.Metadata 命名空间&#10;- 将虚拟机相关类移动到 Old8Lang.Bytecode.VM 命名空间&#10;- 更新所有相关的 using 语句以反映新的命名空间结构&#10;- 修改测试文件中的虚拟机引用路径&#10;- 重新组织字节码编译器中的元数据引用&#10;- 统一虚拟机组件的命名空间管理" />
     <MESSAGE value="refactor(bytecode): 重构字节码模块结构并更新命名空间&#10;&#10;- 将 CallFrame 移至 Core 子目录并更新命名空间&#10;- 将 ClosureCaptureAnalyzer 和 ClosureValue 移至 Closures 子目录&#10;- 将 Disassembler 移至 Debugger 子目录并更新命名空间&#10;- 将 ExceptionTableEntry 移至 Core 子目录并更新命名空间&#10;- 将 ExternFunctionWrapper 移至 Interop 子目录并更新命名空间&#10;- 将 GeneratorState 移至 Generators 子目录并更新命名空间&#10;- 将 Instruction 和 OpCode 移至 Core 子目录并更新命名空间&#10;- 将 VMContext 移至 Core 子目录并更新命名空间&#10;- 在多个文件中添加新的命名空间引用&#10;- 更新 SpawnFunction 中的 VMContext 引用路径" />
     <MESSAGE value="refactor(compiler): 重构编译器辅助类到Helpers命名空间&#10;&#10;- 将AssertHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将AsyncAwaitRuntimeHelpers类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将CollectionHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 在多个AST和编译器相关类中添加对Old8Lang.Compiler.CodeGeneration的引用&#10;- 更新AssertClassLangValue类的依赖引用以包含新的Helpers命名空间&#10;- 整理相关文件的using语句确保正确的命名空间引用" />
     <MESSAGE value="feat(vm): 添加虚拟机指令实现&#10;&#10;- 实现算术运算指令（加减乘除模幂运算和取负）&#10;- 实现异步操作指令（任务创建、异步调用和等待操作）&#10;- 实现比较运算指令（相等、不等、大小比较等）&#10;- 实现并发原语指令（互斥锁、信号量和通道操作）&#10;- 实现容器操作指令（数组、列表、字典和元组操作）&#10;- 实现控制流指令（跳转、条件判断和函数调用）" />
@@ -968,7 +963,8 @@
     <MESSAGE value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
     <MESSAGE value="feat(lang): 添加原生函数命名参数支持&#10;&#10;- 实现原生 .NET 方法和 P/Invoke 函数的命名参数调用功能&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 为 NativeDelegateFuncLangValue 添加命名参数处理逻辑&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 添加测试脚本验证命名参数功能的正确性" />
     <MESSAGE value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
+    <MESSAGE value="feat(lang): 添加C#程序集导入功能&#10;&#10;- 新增CSharpDllProvider类实现C#程序集加载和方法调用&#10;- 支持extern &quot;C#:AssemblyName&quot; ClassName语法导入静态方法&#10;- 实现解释器和编译器模式下的C#方法调用支持&#10;- 添加类型转换机制支持Old8Lang与.NET类型互转&#10;- 支持多种程序集查找方式包括GAC和文件路径加载&#10;- 新增C# extern语法解析和类型检测功能&#10;- 添加Math类静态方法导入测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加C#程序集导入功能&#10;&#10;- 新增CSharpDllProvider类实现C#程序集加载和方法调用&#10;- 支持extern &quot;C#:AssemblyName&quot; ClassName语法导入静态方法&#10;- 实现解释器和编译器模式下的C#方法调用支持&#10;- 添加类型转换机制支持Old8Lang与.NET类型互转&#10;- 支持多种程序集查找方式包括GAC和文件路径加载&#10;- 新增C# extern语法解析和类型检测功能&#10;- 添加Math类静态方法导入测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

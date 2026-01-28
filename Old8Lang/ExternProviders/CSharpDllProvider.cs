@@ -148,7 +148,7 @@ public class CSharpDllProvider : IExternProvider
 
     /// <summary>
     /// 解析源字符串，提取程序集名称和类名
-    /// 格式: "C#:AssemblyName" ClassName 或 "C#:Namespace.ClassName"
+    /// 格式: "C#:AssemblyName" ClassName 或 "C#:Namespace.ClassName" 或 "dotnetdll:path/to/file.dll" ClassName
     /// </summary>
     private (string assemblyName, string className) ParseSource(string source)
     {
@@ -160,6 +160,8 @@ public class CSharpDllProvider : IExternProvider
             content = source.Substring("cs:".Length);
         else if (source.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase))
             content = source.Substring("csharp:".Length);
+        else if (source.StartsWith("dotnetdll:", StringComparison.OrdinalIgnoreCase))
+            content = source.Substring("dotnetdll:".Length);
         else
             content = source;
 

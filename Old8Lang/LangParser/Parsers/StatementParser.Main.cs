@@ -226,11 +226,12 @@ public partial class StatementParser(
             var peek4 = Peek(4);
 
             // 检查是否是 C# 程序集导入：extern "C#:..." ClassName { func ... }
-            // C# 前缀包括：C#:, cs:, csharp:
+            // C# 前缀包括：C#:, cs:, csharp:, dotnetdll:
             if (peek1.Type == LangTokenType.String &&
                 (peek1.Value.StartsWith("C#:", StringComparison.OrdinalIgnoreCase) ||
                  peek1.Value.StartsWith("cs:", StringComparison.OrdinalIgnoreCase) ||
-                 peek1.Value.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase)))
+                 peek1.Value.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase) ||
+                 peek1.Value.StartsWith("dotnetdll:", StringComparison.OrdinalIgnoreCase)))
             {
                 return ParseExternStatement();
             }

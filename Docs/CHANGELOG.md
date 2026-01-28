@@ -4,6 +4,32 @@
 
 ### 语言特性增强
 
+#### extern 语句新增 `dotnetdll:` 前缀
+- **功能**: 新增 `dotnetdll:` 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL（P/Invoke）区分
+- **背景**: 之前使用 `.dll` 后缀时无法区分是 C# 托管 DLL 还是 C/C++ 非托管 DLL
+- **使用示例**:
+  ```old8
+  // 导入 .NET 托管 DLL（使用 dotnetdll: 前缀）
+  extern "dotnetdll:MyLibrary.dll" MyClass {
+      func MyMethod(x:int) -> int
+  }
+
+  // 导入 .NET 标准库（也可以使用原有的 C#: 前缀）
+  extern "C#:System" Math {
+      func Pow(x:double, y:double) -> double
+  }
+
+  // 导入 C/C++ 非托管 DLL（P/Invoke，无前缀）
+  extern "kernel32.dll" stdcall {
+      func GetCurrentProcessId() -> int
+  }
+  ```
+- **支持的前缀**:
+  - `dotnetdll:` - .NET 托管 DLL 文件（新增）
+  - `C#:` / `cs:` / `csharp:` - .NET 程序集（原有）
+  - 无前缀 `.dll` - C/C++ 非托管 DLL（P/Invoke）
+- **兼容性**: 完全向后兼容，原有语法不受影响
+
 #### 全局函数命名参数支持
 - **功能**: 所有全局函数现在支持命名参数调用，提升代码可读性和易用性
 - **影响范围**: 60+ 个全局函数，包括：

@@ -94,10 +94,7 @@ public class NativeDllProvider : IExternProvider
             localManager.DelegateVar.Add(delegateKey, pinvokeMethod);
 
             // 同时注册不带签名的键（用于泛型查找）
-            if (!localManager.DelegateVar.ContainsKey(targetName))
-            {
-                localManager.DelegateVar.Add(targetName, pinvokeMethod);
-            }
+            localManager.DelegateVar.TryAdd(targetName, pinvokeMethod);
         }
     }
 

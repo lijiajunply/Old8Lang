@@ -2656,13 +2656,104 @@ extern "Math.dll" MathLib -> MathLib
 extern "Data.dll" DataClass as DC
 ```
 
-### 5.14 Extern 原生函数导入（P/Invoke）
+### 5.14 Extern .NET 托管 DLL 导入
+
+**模式支持**: `[✅ | ✅ | ⚠️]`
+
+导入 .NET 托管程序集（C# DLL）中的静态方法。
+
+#### 5.14.1 支持的前缀格式
+
+| 前缀 | 说明 | 示例 |
+|------|------|------|
+| `dotnetdll:` | .NET 托管 DLL 文件路径 | `"dotnetdll:MyLibrary.dll"` |
+| `C#:` | .NET 程序集名称 | `"C#:System"` |
+| `cs:` | 同 `C#:` | `"cs:System"` |
+| `csharp:` | 同 `C#:` | `"csharp:System"` |
+
+#### 5.14.2 导入 .NET 标准库
+
+```old8
+// 导入 System.Math 类的静态方法
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double,
+    func Abs(value:double) -> double
+}
+
+// 调用导入的方法
+result <- Pow(2.0, 10.0)
+PrintLine("2^10 = " + result.ToStr())  // 输出: 2^10 = 1024
+```
+
+#### 5.14.3 导入自定义 .NET DLL
+
+```old8
+// 使用 dotnetdll: 前缀导入自定义 DLL
+extern "dotnetdll:MyLibrary.dll" MyMathClass {
+    func Add(a:int, b:int) -> int,
+    func Multiply(a:int, b:int) -> int
+}
+
+// 调用导入的方法
+sum <- Add(10, 20)
+product <- Multiply(5, 6)
+```
+
+#### 5.14.4 带别名的导入
+
+```old8
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double as Power,
+    func Sqrt(x:double) -> double as SquareRoot
+}
+
+// 使用别名调用
+result <- Power(2.0, 8.0)
+```
+
+#### 5.14.5 命名参数支持
+
+```old8
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double
+}
+
+// 使用命名参数（可以乱序）
+result <- Pow(y: 3.0, x: 2.0)  // 2^3 = 8.0
+
+// 混合位置参数和命名参数
+result <- Pow(2.0, y: 4.0)  // 2^4 = 16.0
+```
+
+#### 5.14.6 与 P/Invoke 的区别
+
+| 特性 | .NET 托管 DLL | C/C++ 非托管 DLL (P/Invoke) |
+|------|---------------|---------------------------|
+| 前缀 | `dotnetdll:` / `C#:` / `cs:` / `csharp:` | 无前缀 |
+| 调用约定 | 不需要指定 | 需要指定 (`cdecl`/`stdcall`/`winapi`) |
+| 加载方式 | 反射 (Reflection) | P/Invoke |
+| 类型安全 | 完全类型安全 | 需要手动映射类型 |
+
+```old8
+// .NET 托管 DLL（使用反射加载）
+extern "dotnetdll:MyLibrary.dll" MyClass {
+    func MyMethod(x:int) -> int
+}
+
+// C/C++ 非托管 DLL（使用 P/Invoke）
+extern "kernel32.dll" stdcall {
+    func GetCurrentProcessId() -> int
+}
+```
+
+### 5.15 Extern 原生函数导入（P/Invoke）
 
 **模式支持**: `[✅ | ❌ | ⚠️]`
 
 导入 C/C++ 原生库中的函数（使用 P/Invoke）：
 
-#### 5.14.1 单个函数导入
+#### 5.15.1 单个函数导入
 
 ```old8
 // 默认使用 cdecl 调用约定
@@ -2678,13 +2769,13 @@ extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 extern "user32.dll" winapi func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int
 ```
 
-#### 5.14.2 带别名的函数导入
+#### 5.15.2 带别名的函数导入
 
 ```old8
 extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
 ```
 
-#### 5.14.3 批量函数导入（块语法）
+#### 5.15.3 批量函数导入（块语法）
 
 ```old8
 // 多个函数共享相同的 DLL 和默认调用约定
@@ -2700,13 +2791,13 @@ extern "kernel32.dll" stdcall {
 }
 ```
 
-#### 5.14.4 支持的调用约定
+#### 5.15.4 支持的调用约定
 
 - `cdecl`：C 标准调用约定（默认）
 - `stdcall`：Windows API 标准调用约定
 - `winapi`：等同于 stdcall
 
-#### 5.14.5 支持的类型映射
+#### 5.15.5 支持的类型映射
 
 | Old8Lang 类型 | C# 类型 | C/C++ 类型 |
 |---------------|---------|-----------|
@@ -2724,7 +2815,7 @@ extern "kernel32.dll" stdcall {
 | ulong         | ulong   | unsigned long long |
 | ushort        | ushort  | unsigned short |
 
-#### 5.14.6 使用示例
+#### 5.15.6 使用示例
 
 ```old8
 // 导入 Windows API 函数
@@ -2741,13 +2832,13 @@ PrintLine("Current Thread ID: " + threadId.ToStr())
 Sleep(1000)  // 暂停 1 秒
 ```
 
-### 5.15 Extern Python 函数导入
+### 5.16 Extern Python 函数导入
 
 **模式支持**: `[✅ | ❌ | ❌]`
 
 Old8Lang 支持使用 `extern` 语句导入 Python 函数，通过 Python.NET (pythonnet) 实现与 Python 代码的无缝集成。
 
-#### 5.15.1 支持的导入格式
+#### 5.16.1 支持的导入格式
 
 **1. Python 脚本文件（.py 扩展名）**：
 ```old8
@@ -2776,7 +2867,7 @@ extern "pymodule:numpy" {
 }
 ```
 
-#### 5.15.2 语法规则
+#### 5.16.2 语法规则
 
 **基本语法**：
 ```old8
@@ -2798,7 +2889,7 @@ result1 <- add(10, 20)      // 使用原名
 result2 <- mul(5, 6)        // 使用别名
 ```
 
-#### 5.15.3 类型转换
+#### 5.16.3 类型转换
 
 Old8Lang 类型与 Python 类型自动转换：
 
@@ -2817,7 +2908,7 @@ Old8Lang 类型与 Python 类型自动转换：
 - Python 的 `tuple` 转换为 Old8Lang 的 `list`
 - 不支持直接映射的复杂 Python 对象会转换为字符串
 
-#### 5.15.4 使用示例
+#### 5.16.4 使用示例
 
 **示例 1：导入 Python 脚本**
 
@@ -2907,7 +2998,7 @@ name <- process_dict(pythonData) // 返回 "Python"
 PrintLine("Language: " + name)
 ```
 
-#### 5.15.5 限制和注意事项
+#### 5.16.5 限制和注意事项
 
 **支持的执行模式**：
 - ✅ **解释器模式** (`-f`): 完全支持
@@ -2932,7 +3023,7 @@ PrintLine("Language: " + name)
 - Old8Lang 使用 pythonnet 3.0.4 进行 Python 互操作
 - Python 版本建议 3.7 或更高
 
-#### 5.15.6 与 C/C++ Extern 的区别
+#### 5.16.6 与 C/C++ Extern 的区别
 
 | 特性 | C/C++ Extern (P/Invoke) | Python Extern |
 |------|------------------------|---------------|
@@ -2943,7 +3034,7 @@ PrintLine("Language: " + name)
 | 解释模式 | ✅ 支持 | ✅ 支持 |
 | 性能 | 高（直接调用） | 较低（需要类型转换） |
 
-#### 5.15.7 错误示例
+#### 5.16.7 错误示例
 
 ```old8
 // ❌ 错误：参数缺少类型注解
