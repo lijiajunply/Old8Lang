@@ -603,14 +603,6 @@ public partial class BytecodeVisitor
         var analyzer = new ClosureCaptureAnalyzer();
         var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
 
-        // DEBUG: 打印分析结果
-        var debugOutput = new System.Text.StringBuilder();
-        debugOutput.AppendLine($"[DEBUG] Lambda {lambdaName}:");
-        debugOutput.AppendLine($"[DEBUG]   分析到的捕获变量: {string.Join(", ", capturedVars)}");
-        debugOutput.AppendLine($"[DEBUG]   IsLocalVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsLocalVariable(v)))}");
-        debugOutput.AppendLine($"[DEBUG]   IsGlobalVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsGlobalVariable(v)))}");
-        debugOutput.AppendLine($"[DEBUG]   IsCapturedVariable: {string.Join(", ", capturedVars.Where(v => _compiler.IsCapturedVariable(v)))}");
-
         // 4. 过滤出实际存在的变量
         // 注意：对于嵌套 Lambda，内层 Lambda 可能需要捕获外层 Lambda 的捕获变量
         // 这些变量在编译时既不是局部变量也不是全局变量，但仍然需要捕获
@@ -638,9 +630,6 @@ public partial class BytecodeVisitor
                 actualCapturedVars.Add(varName);
             }
         }
-
-        debugOutput.AppendLine($"[DEBUG]   实际捕获的变量: {string.Join(", ", actualCapturedVars)}");
-        System.IO.File.AppendAllText("/tmp/lambda_debug.txt", debugOutput.ToString());
 
         // 5. 提取返回类型
         string returnType = node.Id?.AssumptionType ?? "";
