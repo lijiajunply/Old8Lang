@@ -20,6 +20,21 @@ public partial class VirtualMachine
         if (value is double doubleValue) return new DoubleLangValue(doubleValue);
         if (value is string stringValue) return new StringLangValue(stringValue);
         if (value is bool boolValue) return new BoolLangValue(boolValue);
+        if (value is char charValue) return new CharLangValue(charValue);
+        if (value is long longValue) return longValue is >= int.MinValue and <= int.MaxValue
+            ? new IntLangValue((int)longValue)
+            : new DoubleLangValue(longValue);
+        if (value is short shortValue) return new IntLangValue(shortValue);
+        if (value is byte byteValue) return new IntLangValue(byteValue);
+        if (value is sbyte sbyteValue) return new IntLangValue(sbyteValue);
+        if (value is ushort ushortValue) return new IntLangValue(ushortValue);
+        if (value is uint uintValue) return uintValue <= int.MaxValue
+            ? new IntLangValue((int)uintValue)
+            : new DoubleLangValue(uintValue);
+        if (value is ulong ulongValue) return ulongValue <= int.MaxValue
+            ? new IntLangValue((int)ulongValue)
+            : new DoubleLangValue(ulongValue);
+        if (value is float floatValue) return new DoubleLangValue(floatValue);
         return new VoidLangValue();
     }
 
@@ -64,7 +79,20 @@ public partial class VirtualMachine
         {
             null => new NullLangValue(),
             int i => new IntLangValue(i),
-            long l => new IntLangValue((int)l), // 将 long 转换为 int（如果溢出会在运行时报错）
+            long l => l is >= int.MinValue and <= int.MaxValue
+                ? new IntLangValue((int)l)
+                : new DoubleLangValue(l),
+            short s => new IntLangValue(s),
+            byte b => new IntLangValue(b),
+            sbyte sb => new IntLangValue(sb),
+            ushort us => new IntLangValue(us),
+            uint ui => ui <= int.MaxValue
+                ? new IntLangValue((int)ui)
+                : new DoubleLangValue(ui),
+            ulong ul => ul <= int.MaxValue
+                ? new IntLangValue((int)ul)
+                : new DoubleLangValue(ul),
+            float f => new DoubleLangValue(f),
             double d => new DoubleLangValue(d),
             string s => new StringLangValue(s),
             bool b => new BoolLangValue(b),
@@ -73,13 +101,4 @@ public partial class VirtualMachine
             _ => throw new CastError(new SourcePosition(), value.GetType().Name, "LangValueType")
         };
     }
-
-    /// <summary>
-    /// 调用类型的扩展方法或实例方法（类似于解释器模式中的 FromClassToResult）
-    /// </summary>
-    /// <param name="obj">要调用方法的对象</param>
-    /// <param name="methodName">方法名</param>
-    /// <param name="args">方法参数</param>
-    /// <returns>方法返回值</returns>
-
 }

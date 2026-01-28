@@ -305,6 +305,10 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             long a => HandleLongConversion(a),
             short a => IntLangValue.Create(a),
             byte a => IntLangValue.Create(a),
+            sbyte a => IntLangValue.Create(a),           // 有符号 8 位整数
+            ushort a => IntLangValue.Create(a),         // 无符号 16 位整数
+            uint a => HandleUIntConversion(a),          // 无符号 32 位整数
+            ulong a => HandleULongConversion(a),        // 无符号 64 位整数
             float a => DoubleLangValue.Create(Math.Round(a, 10)),
             double a => DoubleLangValue.Create(a),
             decimal a => DoubleLangValue.Create(Math.Round((double)a, 15)),
@@ -334,6 +338,34 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     private static LangValueType HandleLongConversion(long value)
     {
         if (value is >= int.MinValue and <= int.MaxValue)
+        {
+            return IntLangValue.Create((int)value);
+        }
+
+        // 如果超出 int 范围，转换为 double
+        return DoubleLangValue.Create(value);
+    }
+
+    /// <summary>
+    /// 处理 uint 类型转换，避免溢出
+    /// </summary>
+    private static LangValueType HandleUIntConversion(uint value)
+    {
+        if (value <= int.MaxValue)
+        {
+            return IntLangValue.Create((int)value);
+        }
+
+        // 如果超出 int 范围，转换为 double
+        return DoubleLangValue.Create(value);
+    }
+
+    /// <summary>
+    /// 处理 ulong 类型转换，避免溢出
+    /// </summary>
+    private static LangValueType HandleULongConversion(ulong value)
+    {
+        if (value <= int.MaxValue)
         {
             return IntLangValue.Create((int)value);
         }

@@ -22,7 +22,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -560,7 +564,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="7840000" />
+      <workItem from="1769609608350" duration="8295000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -905,7 +909,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="819" />
+    <option name="localTasksCounter" value="820" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,7 +936,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(compiler): 重构编译器辅助类到Helpers命名空间&#10;&#10;- 将AssertHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将AsyncAwaitRuntimeHelpers类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将CollectionHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 在多个AST和编译器相关类中添加对Old8Lang.Compiler.CodeGeneration的引用&#10;- 更新AssertClassLangValue类的依赖引用以包含新的Helpers命名空间&#10;- 整理相关文件的using语句确保正确的命名空间引用" />
     <MESSAGE value="feat(vm): 添加虚拟机指令实现&#10;&#10;- 实现算术运算指令（加减乘除模幂运算和取负）&#10;- 实现异步操作指令（任务创建、异步调用和等待操作）&#10;- 实现比较运算指令（相等、不等、大小比较等）&#10;- 实现并发原语指令（互斥锁、信号量和通道操作）&#10;- 实现容器操作指令（数组、列表、字典和元组操作）&#10;- 实现控制流指令（跳转、条件判断和函数调用）" />
     <MESSAGE value="feat(parser): 添加语句解析器实现赋值控制流和导入功能&#10;&#10;- 实现赋值语句解析支持类型注解和解构赋值&#10;- 添加块语句解析支持try-catch-finally结构&#10;- 实现控制流语句解析包括if、for、while、switch等&#10;- 添加导入语句解析支持动态和静态导入&#10;- 实现原生绑定语句解析支持DLL导入功能&#10;- 添加语句解析器主类整合各类语句解析功能&#10;- 优化全局状态管理器的字段命名规范&#10;- 修复计算状态的计算标志位初始化问题&#10;- 更新测试应用演示状态管理功能使用" />
     <MESSAGE value="删除了 大量未使用的 using" />
@@ -957,7 +960,8 @@
     <MESSAGE value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
     <MESSAGE value="feat(lang): 添加C#程序集导入功能&#10;&#10;- 新增CSharpDllProvider类实现C#程序集加载和方法调用&#10;- 支持extern &quot;C#:AssemblyName&quot; ClassName语法导入静态方法&#10;- 实现解释器和编译器模式下的C#方法调用支持&#10;- 添加类型转换机制支持Old8Lang与.NET类型互转&#10;- 支持多种程序集查找方式包括GAC和文件路径加载&#10;- 新增C# extern语法解析和类型检测功能&#10;- 添加Math类静态方法导入测试用例" />
     <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能" />
+    <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
