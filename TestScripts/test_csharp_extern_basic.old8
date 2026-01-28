@@ -1,0 +1,52 @@
+// 测试 C# DLL 导入功能（基本功能，不使用命名参数）
+// 语法: extern "C#:AssemblyName" ClassName { func MethodName(params) -> returnType }
+
+// 导入 System.Math 类的静态方法
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double,
+    func Abs(value:double) -> double,
+    func Max(val1:double, val2:double) -> double,
+    func Min(val1:double, val2:double) -> double,
+    func Round(value:double) -> double,
+    func Floor(d:double) -> double,
+    func Ceiling(a:double) -> double
+}
+
+// 测试 Math.Pow
+result <- Pow(2.0, 10.0)
+PrintLine("2^10 = " + result.ToStr())
+
+// 测试 Math.Sqrt
+sqrtResult <- Sqrt(144.0)
+PrintLine("sqrt(144) = " + sqrtResult.ToStr())
+
+// 测试 Math.Abs
+absResult <- Abs(-42.5)
+PrintLine("abs(-42.5) = " + absResult.ToStr())
+
+// 测试 Math.Max
+maxResult <- Max(10.0, 20.0)
+PrintLine("max(10, 20) = " + maxResult.ToStr())
+
+// 测试 Math.Min
+minResult <- Min(10.0, 20.0)
+PrintLine("min(10, 20) = " + minResult.ToStr())
+
+// 测试 Math.Round
+roundResult <- Round(3.7)
+PrintLine("round(3.7) = " + roundResult.ToStr())
+
+// 测试 Math.Floor
+floorResult <- Floor(3.7)
+PrintLine("floor(3.7) = " + floorResult.ToStr())
+
+// 测试 Math.Ceiling
+ceilingResult <- Ceiling(3.2)
+PrintLine("ceiling(3.2) = " + ceilingResult.ToStr())
+
+// 复合计算
+complexResult <- Sqrt(Pow(3.0, 2.0) + Pow(4.0, 2.0))
+PrintLine("sqrt(3^2 + 4^2) = " + complexResult.ToStr())
+
+PrintLine("C# extern 基本功能测试完成!")

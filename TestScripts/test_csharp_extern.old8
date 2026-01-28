@@ -1,0 +1,41 @@
+// 测试 C# DLL 导入功能
+// 语法: extern "C#:AssemblyName" ClassName { func MethodName(params) -> returnType }
+
+// 导入 System.Math 类的静态方法
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double,
+    func Abs(value:double) -> double,
+    func Max(val1:double, val2:double) -> double,
+    func Min(val1:double, val2:double) -> double
+}
+
+// 测试 Math.Pow
+result <- Pow(2.0, 10.0)
+PrintLine("2^10 = " + result.ToStr())
+
+// 测试 Math.Sqrt
+sqrtResult <- Sqrt(144.0)
+PrintLine("sqrt(144) = " + sqrtResult.ToStr())
+
+// 测试 Math.Abs
+absResult <- Abs(-42.5)
+PrintLine("abs(-42.5) = " + absResult.ToStr())
+
+// 测试 Math.Max
+maxResult <- Max(10.0, 20.0)
+PrintLine("max(10, 20) = " + maxResult.ToStr())
+
+// 测试 Math.Min
+minResult <- Min(10.0, 20.0)
+PrintLine("min(10, 20) = " + minResult.ToStr())
+
+// 测试命名参数调用
+namedResult <- Pow(x: 3.0, y: 4.0)
+PrintLine("3^4 (named args) = " + namedResult.ToStr())
+
+// 测试参数顺序交换
+swappedResult <- Pow(y: 2.0, x: 5.0)
+PrintLine("5^2 (swapped named args) = " + swappedResult.ToStr())
+
+PrintLine("C# extern 测试完成!")

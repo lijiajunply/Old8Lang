@@ -104,7 +104,49 @@
   - Python 函数完全支持 Python 的关键字参数特性
 - **兼容性**: 完全向后兼容，现有代码无需修改
 
-#### 运算符重载支持
+#### C# 程序集导入语法
+- **功能**: 新增 `extern "C#:AssemblyName" ClassName { ... }` 语法，支持从 .NET 程序集导入静态方法
+- **语法格式**:
+  ```old8
+  // 基本语法
+  extern "C#:AssemblyName" ClassName {
+      func MethodName(param1:type1, param2:type2) -> returnType
+  }
+
+  // 支持的前缀
+  extern "C#:System" Math { ... }      // C#: 前缀
+  extern "cs:System" Math { ... }      // cs: 前缀
+  extern "csharp:System" Math { ... }  // csharp: 前缀
+  ```
+- **使用示例**:
+  ```old8
+  // 导入 System.Math 类的静态方法
+  extern "C#:System" Math {
+      func Pow(x:double, y:double) -> double,
+      func Sqrt(x:double) -> double,
+      func Abs(value:double) -> double,
+      func Max(val1:double, val2:double) -> double,
+      func Min(val1:double, val2:double) -> double,
+      func Round(value:double) -> double,
+      func Floor(d:double) -> double,
+      func Ceiling(a:double) -> double
+  }
+
+  // 使用导入的方法
+  result <- Pow(2.0, 10.0)           // 1024
+  sqrtResult <- Sqrt(144.0)          // 12
+  complexResult <- Sqrt(Pow(3.0, 2.0) + Pow(4.0, 2.0))  // 5
+  ```
+- **支持的程序集查找方式**:
+  - 从已加载的程序集中查找
+  - 从 GAC（全局程序集缓存）加载
+  - 从文件路径加载
+- **技术实现**:
+  - 新增 `CSharpDllProvider` 类实现 C# 程序集加载
+  - 使用 .NET 反射 API 动态查找和调用方法
+  - 支持解释器模式和编译器模式
+  - 自动类型转换（Old8Lang 类型 ↔ .NET 类型）
+- **兼容性**: 新增功能，不影响现有代码
 - **功能**: 新增 Python 风格的运算符重载功能，允许用户自定义类的运算符行为
 - **支持的运算符**:
   - 算术运算符：`+` (`_add`)、`-` (`_sub`)、`*` (`_mul`)、`/` (`_div`)、`%` (`_mod`)、`^` (`_pow`)

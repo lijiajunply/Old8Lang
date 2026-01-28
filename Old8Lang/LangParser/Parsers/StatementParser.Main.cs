@@ -225,6 +225,16 @@ public partial class StatementParser(
             var peek3 = Peek(3);
             var peek4 = Peek(4);
 
+            // 检查是否是 C# 程序集导入：extern "C#:..." ClassName { func ... }
+            // C# 前缀包括：C#:, cs:, csharp:
+            if (peek1.Type == LangTokenType.String &&
+                (peek1.Value.StartsWith("C#:", StringComparison.OrdinalIgnoreCase) ||
+                 peek1.Value.StartsWith("cs:", StringComparison.OrdinalIgnoreCase) ||
+                 peek1.Value.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase)))
+            {
+                return ParseExternStatement();
+            }
+
             // 检查是否是 P/Invoke/Python/JS 函数导入：extern "dll" func ...
             // 或者带调用约定的：extern "dll" cdecl/stdcall/winapi func ...
             // 或者函数块：extern "dll" { func1, func2 }

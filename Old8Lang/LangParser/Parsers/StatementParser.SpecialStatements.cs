@@ -276,6 +276,16 @@ public partial class StatementParser
                 };
                 Expect(LangTokenType.Identifier);
             }
+            // 检查是否是 C# 类名（用于 extern "C#:System" Math { ... } 语法）
+            else if (dllName.StartsWith("C#:", StringComparison.OrdinalIgnoreCase) ||
+                     dllName.StartsWith("cs:", StringComparison.OrdinalIgnoreCase) ||
+                     dllName.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase))
+            {
+                // 解析类名并附加到 dllName
+                var className = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                dllName = $"{dllName} {className}";
+            }
         }
 
         var functions = new List<ExternFunctionDeclaration>();

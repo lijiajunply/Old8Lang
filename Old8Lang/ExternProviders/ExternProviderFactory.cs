@@ -14,6 +14,7 @@ public static class ExternProviderFactory
     private static readonly Dictionary<ExternType, Func<IExternProvider>> ProviderRegistry = new()
     {
         { ExternType.NativeDll, () => new NativeDllProvider() },
+        { ExternType.CSharpDll, () => new CSharpDllProvider() },
         { ExternType.PythonScript, () => new PythonProvider(ExternType.PythonScript) },
         { ExternType.PythonModule, () => new PythonProvider(ExternType.PythonModule) },
         { ExternType.JavaScript, () => new JavaScriptProvider() }

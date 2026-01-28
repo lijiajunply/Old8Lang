@@ -11,7 +11,8 @@
       "Bash(ls:*)",
       "Bash(dotnet test:*)",
       "Bash(grep:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(find:*)"
     ]
   }
 }

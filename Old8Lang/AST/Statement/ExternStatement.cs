@@ -240,6 +240,14 @@ public partial class ExternStatement : OldStatement
     /// </summary>
     public static ExternType DetectExternType(string dllName)
     {
+        // C# 程序集：C#: 或 cs: 或 csharp: 前缀
+        if (dllName.StartsWith("C#:", StringComparison.OrdinalIgnoreCase) ||
+            dllName.StartsWith("cs:", StringComparison.OrdinalIgnoreCase) ||
+            dllName.StartsWith("csharp:", StringComparison.OrdinalIgnoreCase))
+        {
+            return ExternType.CSharpDll;
+        }
+
         // JavaScript 脚本文件：以 .js 结尾或 js: 前缀
         if (dllName.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
             dllName.StartsWith("js:", StringComparison.OrdinalIgnoreCase))

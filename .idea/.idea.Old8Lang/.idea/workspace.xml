@@ -23,9 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/CSharpDllProvider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/test_csharp_extern.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/test_csharp_extern_basic.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/NativeDelegateFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/NativeDelegateFuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/PythonFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/PythonFunctionLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.Main.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SpecialStatements.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -564,7 +571,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="5351000" />
+      <workItem from="1769609608350" duration="6779000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +916,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="816" />
+    <option name="localTasksCounter" value="817" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +943,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="修改文件路径" />
     <MESSAGE value="refactor(bytecode): 重构字节码模块的命名空间结构&#10;&#10;- 将生成器相关类移动到 Old8Lang.Bytecode.Generators 命名空间&#10;- 将元数据相关类移动到 Old8Lang.Bytecode.Metadata 命名空间&#10;- 将虚拟机相关类移动到 Old8Lang.Bytecode.VM 命名空间&#10;- 更新所有相关的 using 语句以反映新的命名空间结构&#10;- 修改测试文件中的虚拟机引用路径&#10;- 重新组织字节码编译器中的元数据引用&#10;- 统一虚拟机组件的命名空间管理" />
     <MESSAGE value="refactor(bytecode): 重构字节码模块结构并更新命名空间&#10;&#10;- 将 CallFrame 移至 Core 子目录并更新命名空间&#10;- 将 ClosureCaptureAnalyzer 和 ClosureValue 移至 Closures 子目录&#10;- 将 Disassembler 移至 Debugger 子目录并更新命名空间&#10;- 将 ExceptionTableEntry 移至 Core 子目录并更新命名空间&#10;- 将 ExternFunctionWrapper 移至 Interop 子目录并更新命名空间&#10;- 将 GeneratorState 移至 Generators 子目录并更新命名空间&#10;- 将 Instruction 和 OpCode 移至 Core 子目录并更新命名空间&#10;- 将 VMContext 移至 Core 子目录并更新命名空间&#10;- 在多个文件中添加新的命名空间引用&#10;- 更新 SpawnFunction 中的 VMContext 引用路径" />
     <MESSAGE value="refactor(compiler): 重构编译器辅助类到Helpers命名空间&#10;&#10;- 将AssertHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将AsyncAwaitRuntimeHelpers类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 将CollectionHelper类从Old8Lang.Compiler移动到Old8Lang.Compiler.Helpers&#10;- 在多个AST和编译器相关类中添加对Old8Lang.Compiler.CodeGeneration的引用&#10;- 更新AssertClassLangValue类的依赖引用以包含新的Helpers命名空间&#10;- 整理相关文件的using语句确保正确的命名空间引用" />
@@ -961,7 +967,8 @@
     <MESSAGE value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
     <MESSAGE value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
     <MESSAGE value="feat(lang): 添加原生函数命名参数支持&#10;&#10;- 实现原生 .NET 方法和 P/Invoke 函数的命名参数调用功能&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 为 NativeDelegateFuncLangValue 添加命名参数处理逻辑&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 添加测试脚本验证命名参数功能的正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加原生函数命名参数支持&#10;&#10;- 实现原生 .NET 方法和 P/Invoke 函数的命名参数调用功能&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 为 NativeDelegateFuncLangValue 添加命名参数处理逻辑&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 添加测试脚本验证命名参数功能的正确性" />
+    <MESSAGE value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
