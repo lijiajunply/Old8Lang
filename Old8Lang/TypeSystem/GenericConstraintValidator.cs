@@ -238,7 +238,14 @@ public static class GenericConstraintValidator
                 // 检查是否实现了接口
                 if (constraintTypeTemplate.IsInterface)
                 {
+                    // 首先检查显式声明的接口实现
                     if (actualTypeTemplate.ImplementsNames.Contains(constraintTypeName))
+                    {
+                        return ConstraintValidationResult.Success();
+                    }
+
+                    // 鸭子类型检查：检查类是否实现了接口的所有方法
+                    if (ImplementsInterfaceMethods(actualTypeTemplate, constraintTypeTemplate))
                     {
                         return ConstraintValidationResult.Success();
                     }
@@ -274,6 +281,48 @@ public static class GenericConstraintValidator
         return ConstraintValidationResult.Failure(
             $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的约束 '{constraintTypeName}'：类型没有实现接口或继承自该基类",
             constraint);
+    }
+
+    /// <summary>
+    /// 检查类是否实现了接口的所有方法（鸭子类型检查）
+    /// </summary>
+    private static bool ImplementsInterfaceMethods(TypeTemplate classTemplate, TypeTemplate interfaceTemplate)
+    {
+        // 收集接口的所有方法名
+        var interfaceMethods = new HashSet<string>();
+        foreach (var (memberId, memberExpr) in interfaceTemplate.Variates)
+        {
+            if (memberExpr is FuncLangValue)
+            {
+                interfaceMethods.Add(memberId.IdName);
+            }
+        }
+
+        // 如果接口没有方法，任何类型都满足约束
+        if (interfaceMethods.Count == 0)
+        {
+            return true;
+        }
+
+        // 收集类的所有方法名
+        var classMethods = new HashSet<string>();
+        foreach (var (memberId, memberExpr) in classTemplate.Variates)
+        {
+            if (memberExpr is FuncLangValue)
+            {
+                classMethods.Add(memberId.IdName);
+            }
+        }
+        foreach (var (memberId, memberExpr) in classTemplate.StaticVariates)
+        {
+            if (memberExpr is FuncLangValue)
+            {
+                classMethods.Add(memberId.IdName);
+            }
+        }
+
+        // 检查类是否实现了接口的所有方法
+        return interfaceMethods.All(m => classMethods.Contains(m));
     }
 
     /// <summary>

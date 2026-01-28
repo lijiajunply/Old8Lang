@@ -236,11 +236,16 @@ public partial class BytecodeVisitor
 
             case GenericConstraintKind.TypeName:
                 // 类型名称约束：检查是否实现接口或继承基类
-                // 对于基本类型约束（如 T: int），检查类型是否匹配
                 var constraintTypeName = constraint.TypeName!;
 
+                // 首先检查约束类型是否是接口
+                if (_compiler.IsInterfaceName(constraintTypeName))
+                {
+                    // 接口约束：检查类是否实现了接口的所有方法（鸭子类型）
+                    ValidateInterfaceConstraint(constraintTypeName, resolvedTypeName, genericParamName);
+                }
                 // 简单的类型名称匹配检查
-                if (!string.Equals(resolvedTypeName, constraintTypeName, StringComparison.OrdinalIgnoreCase))
+                else if (!string.Equals(resolvedTypeName, constraintTypeName, StringComparison.OrdinalIgnoreCase))
                 {
                     // 检查是否是可兼容的类型（例如 int 和 Int32）
                     var normalizedActual = NormalizeTypeName(resolvedTypeName);
@@ -307,6 +312,50 @@ public partial class BytecodeVisitor
             "decimal" => "decimal",
             _ => typeName // 保持原样
         };
+    }
+
+    /// <summary>
+    /// 验证接口约束（鸭子类型检查）
+    /// 检查类是否实现了接口的所有方法
+    /// </summary>
+    private void ValidateInterfaceConstraint(string interfaceName, string actualTypeName, string genericParamName)
+    {
+        // 获取接口的所有方法（包括父接口的方法）
+        var requiredMethods = _compiler.GetAllInterfaceMethods(interfaceName);
+        if (requiredMethods.Count == 0)
+        {
+            // 接口没有方法，任何类型都满足约束
+            return;
+        }
+
+        // 获取类的元数据
+        var classMetadata = _compiler.GetClassMetadata(actualTypeName);
+        if (classMetadata == null)
+        {
+            // 类不存在，无法验证
+            // 可能是基本类型或尚未定义的类型，跳过验证
+            return;
+        }
+
+        // 收集类的所有方法名
+        var classMethods = new HashSet<string>();
+        foreach (var method in classMetadata.Methods)
+        {
+            classMethods.Add(method.Name);
+        }
+        foreach (var method in classMetadata.StaticMethods)
+        {
+            classMethods.Add(method.Name);
+        }
+
+        // 检查类是否实现了接口的所有方法
+        var missingMethods = requiredMethods.Where(m => !classMethods.Contains(m)).ToList();
+        if (missingMethods.Count > 0)
+        {
+            throw new ArgumentException(
+                $"类型 '{actualTypeName}' 不满足泛型参数 '{genericParamName}' 的接口约束 '{interfaceName}'：" +
+                $"缺少方法 {string.Join(", ", missingMethods)}");
+        }
     }
 
     /// <summary>

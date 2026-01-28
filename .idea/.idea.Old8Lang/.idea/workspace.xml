@@ -23,9 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Generics.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -564,7 +563,7 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="8295000" />
+      <workItem from="1769609608350" duration="9267000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="820" />
+    <option name="localTasksCounter" value="822" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,8 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加虚拟机指令实现&#10;&#10;- 实现算术运算指令（加减乘除模幂运算和取负）&#10;- 实现异步操作指令（任务创建、异步调用和等待操作）&#10;- 实现比较运算指令（相等、不等、大小比较等）&#10;- 实现并发原语指令（互斥锁、信号量和通道操作）&#10;- 实现容器操作指令（数组、列表、字典和元组操作）&#10;- 实现控制流指令（跳转、条件判断和函数调用）" />
-    <MESSAGE value="feat(parser): 添加语句解析器实现赋值控制流和导入功能&#10;&#10;- 实现赋值语句解析支持类型注解和解构赋值&#10;- 添加块语句解析支持try-catch-finally结构&#10;- 实现控制流语句解析包括if、for、while、switch等&#10;- 添加导入语句解析支持动态和静态导入&#10;- 实现原生绑定语句解析支持DLL导入功能&#10;- 添加语句解析器主类整合各类语句解析功能&#10;- 优化全局状态管理器的字段命名规范&#10;- 修复计算状态的计算标志位初始化问题&#10;- 更新测试应用演示状态管理功能使用" />
     <MESSAGE value="删除了 大量未使用的 using" />
     <MESSAGE value="修改一些东西" />
     <MESSAGE value="refactor(database): 统一数据库连接包装类的字段命名规范&#10;&#10;- 将所有数据库连接包装类中的公共字段重命名为私有字段并使用下划线前缀&#10;- 更新 InMemoryConnectionWrapper 中的 Connection、ConnectionString、CreatedTables 和 Disposed 字段&#10;- 更新 MySqlConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 MySqlTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 OrmWrapper 中的 Connection、ConnectionType 和 Disposed 字段&#10;- 更新 PostgresConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 PostgresTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 更新 SqliteConnectionWrapper 中的 Connection 和 Disposed 字段&#10;- 更新 SqliteTransactionWrapper 中的 Transaction 和 Disposed 字段&#10;- 相应更新所有引用这些字段的方法实现" />
@@ -961,7 +958,9 @@
     <MESSAGE value="feat(lang): 添加C#程序集导入功能&#10;&#10;- 新增CSharpDllProvider类实现C#程序集加载和方法调用&#10;- 支持extern &quot;C#:AssemblyName&quot; ClassName语法导入静态方法&#10;- 实现解释器和编译器模式下的C#方法调用支持&#10;- 添加类型转换机制支持Old8Lang与.NET类型互转&#10;- 支持多种程序集查找方式包括GAC和文件路径加载&#10;- 新增C# extern语法解析和类型检测功能&#10;- 添加Math类静态方法导入测试用例" />
     <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能" />
     <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
+    <MESSAGE value="feat(lang): 添加更多数值类型转换支持&#10;&#10;- 在 LangValueType.cs 中添加 sbyte、ushort、uint、ulong 类型的转换处理&#10;- 实现 HandleUIntConversion 和 HandleULongConversion 方法避免数值溢出&#10;- 在 VirtualMachine.Helpers.ValueConversion.cs 中添加 char、long、short、byte、&#10;  sbyte、ushort、uint、ulong、float 等类型的转换支持&#10;- 优化 long 类型转换逻辑，超出 int 范围时自动转为 double&#10;- 在 FromObjectToLangValueType 方法中增加多种数值类型的转换分支&#10;- 移除未使用的类型扩展方法注释代码" />
+    <MESSAGE value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

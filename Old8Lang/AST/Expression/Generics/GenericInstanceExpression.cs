@@ -160,7 +160,7 @@ public partial class GenericInstanceExpression : LangExpression
             }
 
             // 实例化泛型函数
-            var instantiatedFunc = funcValue.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager);
+            var instantiatedFunc = funcValue.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager, manager);
 
             // 调用实例化后的函数
             if (IsFunctionCall)

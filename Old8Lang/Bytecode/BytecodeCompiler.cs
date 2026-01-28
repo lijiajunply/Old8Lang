@@ -1051,6 +1051,59 @@ public class BytecodeCompiler
     }
 
     /// <summary>
+    /// 检查是否是接口名称
+    /// </summary>
+    public bool IsInterfaceName(string name)
+    {
+        return _bytecodeFile.Interfaces.Any(i => i.Name == name);
+    }
+
+    /// <summary>
+    /// 获取接口元数据
+    /// </summary>
+    public InterfaceMetadata? GetInterfaceMetadata(string name)
+    {
+        return _bytecodeFile.Interfaces.FirstOrDefault(i => i.Name == name);
+    }
+
+    /// <summary>
+    /// 获取接口的所有方法（包括父接口的方法）
+    /// </summary>
+    public List<string> GetAllInterfaceMethods(string interfaceName)
+    {
+        var result = new HashSet<string>();
+        var visited = new HashSet<string>();
+        CollectInterfaceMethods(interfaceName, result, visited);
+        return result.ToList();
+    }
+
+    /// <summary>
+    /// 递归收集接口的所有方法（包括父接口）
+    /// </summary>
+    private void CollectInterfaceMethods(string interfaceName, HashSet<string> methods, HashSet<string> visited)
+    {
+        if (visited.Contains(interfaceName))
+            return;
+        visited.Add(interfaceName);
+
+        var interfaceMetadata = GetInterfaceMetadata(interfaceName);
+        if (interfaceMetadata == null)
+            return;
+
+        // 添加当前接口的方法
+        foreach (var method in interfaceMetadata.Methods)
+        {
+            methods.Add(method);
+        }
+
+        // 递归收集父接口的方法
+        foreach (var parentInterface in interfaceMetadata.ParentInterfaces)
+        {
+            CollectInterfaceMethods(parentInterface, methods, visited);
+        }
+    }
+
+    /// <summary>
     /// 声明 Mixin 定义
     /// </summary>
     public void DeclareMixin(string mixinName, List<(string methodName, FuncLangValue funcValue)> methods)
