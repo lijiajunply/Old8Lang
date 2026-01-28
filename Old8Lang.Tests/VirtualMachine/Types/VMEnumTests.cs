@@ -82,7 +82,11 @@ public class VMEnumTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("10\n20\n30", output);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal(3, lines.Length);
+        Assert.Equal("10", lines[0]);
+        Assert.Equal("20", lines[1]);
+        Assert.Equal("30", lines[2]);
     }
 
     [Fact]
@@ -107,7 +111,12 @@ public class VMEnumTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("0\n5\n6\n10", output);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal(4, lines.Length);
+        Assert.Equal("0", lines[0]);
+        Assert.Equal("5", lines[1]);
+        Assert.Equal("6", lines[2]);
+        Assert.Equal("10", lines[3]);
     }
 
     [Fact]
@@ -217,6 +226,9 @@ public class VMEnumTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        Assert.Equal("-10\n0", output);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal(2, lines.Length);
+        Assert.Equal("-10", lines[0]);
+        Assert.Equal("0", lines[1]);
     }
 }

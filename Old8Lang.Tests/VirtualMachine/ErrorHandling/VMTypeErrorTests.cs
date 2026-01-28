@@ -394,8 +394,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             PrintLine(y.ToStr())
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Equal("10", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Equal("10", executeVMCode);
     }
 
     #endregion
@@ -418,9 +418,9 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             process(""hello"")
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Contains("int:123", output);
-        Assert.Contains("string:hello", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Contains("int:123", executeVMCode);
+        Assert.Contains("string:hello", executeVMCode);
     }
 
     #endregion
@@ -458,8 +458,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             }
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Equal("null", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Equal("null", executeVMCode);
     }
 
     #endregion
@@ -512,8 +512,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             PrintLine(x.ToStr())
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Equal("20", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Equal("20", executeVMCode);
     }
 
     #endregion
@@ -545,9 +545,9 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             PrintLine(c3.imag.ToStr())
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Equal("4", output.Split('\r', '\n')[0]);
-        Assert.Equal("6", output.Split('\r', '\n')[1]);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Equal("4", executeVMCode.Split('\r', '\n')[0]);
+        Assert.Equal("6", executeVMCode.Split('\r', '\n')[1]);
     }
 
     #endregion
@@ -566,8 +566,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             process<int>(123)
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Equal("123", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Equal("123", executeVMCode);
     }
 
     #endregion
@@ -590,8 +590,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
             PrintLine(className)
         ";
 
-        var output = ExecuteVMCode(code);
-        Assert.Contains("MyClass", output);
+        var executeVMCode = ExecuteVMCode(code);
+        Assert.Contains("MyClass", executeVMCode);
     }
 
     #endregion
