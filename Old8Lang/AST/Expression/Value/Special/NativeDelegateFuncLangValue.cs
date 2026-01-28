@@ -173,16 +173,7 @@ public class NativeDelegateFuncLangValue(
         }
 
         // 6. 转换为列表并返回（过滤掉未填充的可选参数）
-        var result = new List<LangExpression>();
-        for (int i = 0; i < paramSlots.Length; i++)
-        {
-            if (paramSlots[i] is not null)
-            {
-                result.Add(paramSlots[i]!);
-            }
-        }
-
-        return result;
+        return paramSlots.OfType<LangExpression>().ToList();
     }
 
     public override string ToString()
@@ -196,6 +187,7 @@ public class NativeDelegateFuncLangValue(
         {
             return Id.IdName == other.Id.IdName && _delegateInstance == other._delegateInstance;
         }
+
         return false;
     }
 

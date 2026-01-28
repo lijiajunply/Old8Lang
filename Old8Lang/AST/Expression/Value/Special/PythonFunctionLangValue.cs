@@ -36,6 +36,12 @@ public class PythonFunctionLangValue : FuncLangValue
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
         List<NamedArgument>? namedArgs, SourcePosition callPosition, object? obj = null)
     {
+        // 如果有命名参数，传递给 Python 函数
+        if (namedArgs is not null && namedArgs.Count > 0)
+        {
+            return ExecutePythonFunctionWithNamedArgs(variateManagerFunc, positionalArgs, namedArgs);
+        }
+
         return ExecutePythonFunction(variateManagerFunc, positionalArgs);
     }
 
@@ -71,6 +77,59 @@ public class PythonFunctionLangValue : FuncLangValue
 
                 // 调用 Python 函数
                 dynamic result = _pythonFunction.Invoke(pyArgs);
+
+                // 将 Python 返回值转换为 Old8Lang 值
+                return ConvertFromPython(result);
+            }
+            catch (PythonException ex)
+            {
+                throw new InvalidOperationError(default(SourcePosition),
+                    $"Python 函数 {_functionName} 调用失败：\n{ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 执行 Python 函数调用（支持命名参数）
+    /// </summary>
+    private LangValueType ExecutePythonFunctionWithNamedArgs(
+        VariateManager variateManagerFunc,
+        List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs)
+    {
+        using (Py.GIL())
+        {
+            try
+            {
+                // 将位置参数转换为 Python 对象
+                var pyArgs = new List<PyObject>();
+                foreach (var arg in positionalArgs)
+                {
+                    var argValue = arg.Run(variateManagerFunc);
+                    pyArgs.Add(ConvertToPython(argValue));
+                }
+
+                // 将命名参数转换为 Python kwargs 字典
+                var pyKwargs = new PyDict();
+                foreach (var namedArg in namedArgs)
+                {
+                    var argValue = namedArg.Value.Run(variateManagerFunc);
+                    var pyValue = ConvertToPython(argValue);
+                    pyKwargs.SetItem(new PyString(namedArg.Name), pyValue);
+                }
+
+                // 调用 Python 函数，传递位置参数和关键字参数
+                // 使用 Python.NET 的 InvokeMethod 来支持 kwargs
+                dynamic result;
+                if (pyArgs.Count > 0)
+                {
+                    result = _pythonFunction.Invoke(pyArgs.ToArray(), pyKwargs);
+                }
+                else
+                {
+                    // 只有命名参数，传递空的位置参数数组
+                    result = _pythonFunction.Invoke(Array.Empty<PyObject>(), pyKwargs);
+                }
 
                 // 将 Python 返回值转换为 Old8Lang 值
                 return ConvertFromPython(result);
