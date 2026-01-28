@@ -1,6 +1,6 @@
 # 更新记录
 
-## Old8Lang 1.0.0 rc8 (未发布)
+## Old8Lang 1.0.0 rc8
 
 ### 语言特性增强
 
@@ -185,23 +185,23 @@
       public x
       public y
 
-      init(x, y) {
+      init(x, y) -> {
           this.x <- x
           this.y <- y
       }
 
       // 向量加法
-      _add(other) {
+      _add(other) -> {
           return Vector(this.x + other.x, this.y + other.y)
       }
 
       // 向量数乘
-      _mul(scalar) {
+      _mul(scalar) -> {
           return Vector(this.x * scalar, this.y * scalar)
       }
 
       // 相等比较
-      _eq(other) {
+      _eq(other) -> {
           return this.x == other.x && this.y == other.y
       }
   }
@@ -210,17 +210,17 @@
   class SparseArray {
       private data
 
-      init() {
+      init() -> {
           this.data <- {"dummy": 0}
       }
 
       // 索引获取
-      _getitem(index) {
+      _getitem(index) -> {
           return this.data[index.ToStr()]
       }
 
       // 索引设置
-      _setitem(index, value) {
+      _setitem(index, value) -> {
           this.data[index.ToStr()] <- value
       }
   }
@@ -322,7 +322,6 @@
 - 在 `TypeTemplate` 中添加全局类型注册表
 - 创建 `ReflectionHelper` 运行时辅助类用于编译器模式支持
 - 将 `AnyLangValue.ExecuteMethod` 访问级别从 `private` 改为 `protected`
-
 
 ## Old8Lang 1.0.0 rc7
 

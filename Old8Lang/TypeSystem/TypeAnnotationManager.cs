@@ -43,6 +43,16 @@ public class TypeAnnotationManager
         _typeFamily.RegisterType(new PrimitiveTypeInfo("null"));
         _typeFamily.RegisterType(new PrimitiveTypeInfo("function"));
 
+        // 注册 P/Invoke 相关的数值类型
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("byte"));    // 无符号 8 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("sbyte"));   // 有符号 8 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("short"));   // 有符号 16 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("ushort"));  // 无符号 16 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("uint"));    // 无符号 32 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("long"));    // 有符号 64 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("ulong"));   // 无符号 64 位整数
+        _typeFamily.RegisterType(new PrimitiveTypeInfo("float"));   // 单精度浮点数
+
         // 注册泛型集合类型
         RegisterGenericCollectionTypes();
     }
