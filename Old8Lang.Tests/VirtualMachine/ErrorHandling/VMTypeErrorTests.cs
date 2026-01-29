@@ -546,8 +546,8 @@ public class VMTypeErrorTests(ITestOutputHelper output)
         ";
 
         var executeVMCode = ExecuteVMCode(code);
-        Assert.Equal("4", executeVMCode.Split('\r', '\n')[0]);
-        Assert.Equal("6", executeVMCode.Split('\r', '\n')[1]);
+        Assert.Equal("4", executeVMCode.Split(Environment.NewLine)[0]);
+        Assert.Equal("6", executeVMCode.Split(Environment.NewLine)[1]);
     }
 
     #endregion

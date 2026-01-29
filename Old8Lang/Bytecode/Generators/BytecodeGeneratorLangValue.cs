@@ -34,7 +34,7 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
     public bool MoveNext()
     {
         if (IsCompleted)
-            throw new Exception("生成器已完成，无法继续调用 MoveNext");
+            return false;
 
         // 调用虚拟机的ResumeGenerator方法来恢复生成器执行
         var result = _vm.ResumeGenerator(GeneratorId);
@@ -48,8 +48,7 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
         {
             IsCompleted = true;
             Current = null;
-            // 生成器已完成，抛出异常
-            throw new Exception("生成器已完成，无法继续调用 MoveNext");
+            return false;
         }
     }
 
