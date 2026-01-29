@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
@@ -11,6 +12,20 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 [Collection("Sequential")]
 public class VMConcurrencyReadWriteLockTests
 {
+    /// <summary>
+    /// 辅助方法：从全局变量中获取整数值
+    /// </summary>
+    private static int GetIntValue(object? value)
+    {
+        return value switch
+        {
+            int i => i,
+            long l => (int)l,
+            IntLangValue ilv => ilv.Value,
+            _ => Convert.ToInt32(value)
+        };
+    }
+
     private string ExecuteVMCode(string code)
     {
         var interpreter = new LangInterpreter();
@@ -146,16 +161,26 @@ public class VMConcurrencyReadWriteLockTests
     [Fact]
     public void ReadWriteLock_MultipleReaders_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 测试多个读者可以同时持有读锁
+        // 使用 AtomicInt 来确保计数操作是原子的
         var code = @"
             rwLock <- ReadWriteLockCreate()
-            counter <- 0
+            readerCount <- AtomicIntCreate(0)
+            maxCount <- AtomicIntCreate(0)
 
             func reader(id:int) -> void {
                 ReadLockAcquire(rwLock)
-                counter <- counter + 1
-                PrintLine(""Reader "" + id.ToStr() + "" reading"")
-                Sleep(100)
+                current <- AtomicIntIncrement(readerCount)
+
+                // 更新最大并发数
+                max <- AtomicIntGet(maxCount)
+                if current > max {
+                    AtomicIntCompareAndSet(maxCount, max, current)
+                }
+
+                PrintLine(""Reader "" + id.ToStr() + "" acquired lock, count: "" + current.ToStr())
+                Sleep(200)
+                AtomicIntDecrement(readerCount)
                 ReadLockRelease(rwLock)
             }
 
@@ -167,10 +192,13 @@ public class VMConcurrencyReadWriteLockTests
             b.Start()
             c.Start()
 
-            Sleep(50)
-            maxConcurrent <- counter
+            // 等待所有线程完成
+            Sleep(500)
 
-            Sleep(200)
+            result <- AtomicIntGet(maxCount)
+
+            AtomicIntDispose(readerCount)
+            AtomicIntDispose(maxCount)
             ReadWriteLockDispose(rwLock)
         ";
 
@@ -179,10 +207,10 @@ public class VMConcurrencyReadWriteLockTests
         var vm = new VM(bytecodeFile);
         vm.Execute();
 
-        // Assert
-        var maxConcurrent = vm.GetGlobalVariable("maxConcurrent");
-        Assert.NotNull(maxConcurrent);
-        Assert.True((int)maxConcurrent >= 2); // Multiple readers can acquire lock simultaneously
+        // Assert - 检查最大并发读者数是否 >= 2
+        var result = vm.GetGlobalVariable("result");
+        Assert.NotNull(result);
+        Assert.True(GetIntValue(result) >= 2, $"Expected at least 2 concurrent readers, but got {GetIntValue(result)}");
     }
 
     [Fact]
@@ -193,7 +221,7 @@ public class VMConcurrencyReadWriteLockTests
             rwLock <- ReadWriteLockCreate()
             WriteLockAcquire(rwLock)
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 result <- ReadLockTryAcquire(rwLock, 100)
                 if result {
                     PrintLine(""Reader acquired"")
@@ -202,6 +230,7 @@ public class VMConcurrencyReadWriteLockTests
                     PrintLine(""Reader blocked"")
                 }
             })
+            t.Start()
 
             Sleep(200)
             WriteLockRelease(rwLock)
@@ -224,7 +253,7 @@ public class VMConcurrencyReadWriteLockTests
             rwLock <- ReadWriteLockCreate()
             ReadLockAcquire(rwLock)
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 result <- WriteLockTryAcquire(rwLock, 100)
                 if result {
                     PrintLine(""Writer acquired"")
@@ -233,6 +262,7 @@ public class VMConcurrencyReadWriteLockTests
                     PrintLine(""Writer blocked"")
                 }
             })
+            t.Start()
 
             Sleep(200)
             ReadLockRelease(rwLock)
@@ -324,9 +354,13 @@ public class VMConcurrencyReadWriteLockTests
                 }
             }
 
-            spawn(writer)
-            spawn(reader)
-            spawn(reader)
+            t1 <- spawn(writer)
+            t2 <- spawn(reader)
+            t3 <- spawn(reader)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
 
@@ -342,7 +376,7 @@ public class VMConcurrencyReadWriteLockTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(5, result);
+        Assert.Equal(5, GetIntValue(result));
     }
 
     [Fact]

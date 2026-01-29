@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
@@ -11,6 +12,20 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 [Collection("Sequential")]
 public class VMConcurrencySemaphoreTests
 {
+    /// <summary>
+    /// 辅助方法：从全局变量中获取整数值
+    /// </summary>
+    private static int GetIntValue(object? value)
+    {
+        return value switch
+        {
+            int i => i,
+            long l => (int)l,
+            IntLangValue ilv => ilv.Value,
+            _ => Convert.ToInt32(value)
+        };
+    }
+
     private string ExecuteVMCode(string code)
     {
         var interpreter = new LangInterpreter();
@@ -115,9 +130,13 @@ public class VMConcurrencySemaphoreTests
                 SemaphoreRelease(sem)
             }
 
-            spawn(accessResource)
-            spawn(accessResource)
-            spawn(accessResource)
+            t1 <- spawn(accessResource)
+            t2 <- spawn(accessResource)
+            t3 <- spawn(accessResource)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(50)
             maxConcurrent <- counter
@@ -134,30 +153,39 @@ public class VMConcurrencySemaphoreTests
         // Assert
         var maxConcurrent = vm.GetGlobalVariable("maxConcurrent");
         Assert.NotNull(maxConcurrent);
-        Assert.True((int)maxConcurrent <= 2);
+        Assert.True(GetIntValue(maxConcurrent) <= 2);
     }
 
     [Fact]
     public void Semaphore_MultiplePermits_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来确保计数操作是原子的
         var code = @"
             sem <- SemaphoreCreate(3, 3)
-            results <- {}
+            counter <- AtomicIntCreate(0)
 
-            func worker(id:int) -> void {
+            func worker() -> void {
                 SemaphoreAcquire(sem)
-                results.Add(id)
+                AtomicIntIncrement(counter)
                 Sleep(50)
                 SemaphoreRelease(sem)
             }
 
-            for i in [1~5] {
-                spawn(() -> worker(i))
-            }
+            t1 <- spawn(worker)
+            t2 <- spawn(worker)
+            t3 <- spawn(worker)
+            t4 <- spawn(worker)
+            t5 <- spawn(worker)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
+            t4.Start()
+            t5.Start()
 
             Sleep(500)
-            result <- results.Count()
+            result <- AtomicIntGet(counter)
+            AtomicIntDispose(counter)
             SemaphoreDispose(sem)
         ";
 
@@ -169,7 +197,7 @@ public class VMConcurrencySemaphoreTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(5, result);
+        Assert.Equal(5, GetIntValue(result));
     }
 
     [Fact]
@@ -202,7 +230,7 @@ public class VMConcurrencySemaphoreTests
         var code = @"
             sem <- SemaphoreCreate(0, 1)
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 result <- SemaphoreTryAcquire(sem, 100)
                 if result {
                     PrintLine(""Acquired"")
@@ -210,6 +238,7 @@ public class VMConcurrencySemaphoreTests
                     PrintLine(""Timeout"")
                 }
             })
+            t.Start()
 
             Sleep(200)
             SemaphoreDispose(sem)
@@ -304,8 +333,11 @@ public class VMConcurrencySemaphoreTests
                 }
             }
 
-            spawn(producer)
-            spawn(consumer)
+            t1 <- spawn(producer)
+            t2 <- spawn(consumer)
+
+            t1.Start()
+            t2.Start()
 
             Sleep(500)
             result <- items.Count()
@@ -320,6 +352,6 @@ public class VMConcurrencySemaphoreTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(5, result);
+        Assert.Equal(5, GetIntValue(result));
     }
 }
