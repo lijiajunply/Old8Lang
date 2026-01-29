@@ -474,10 +474,11 @@ public class VMUnexpectedInputsTests(ITestOutputHelper output)
     #region 无效选择语句测试
 
     [Fact]
-    public void UnexpectedInputs_SelectNoReadyChannel_ThrowsException()
+    public void UnexpectedInputs_SelectClosedChannel_ThrowsException()
     {
         var code = @"
             ch <- ChannelCreate()
+            ChannelClose(ch)
             select {
                 case val from ch -> {
                     PrintLine(val.ToStr())

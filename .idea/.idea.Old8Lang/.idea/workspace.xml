@@ -23,14 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/final_fix_compiler_tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/fix_compiler_tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/generate_compiler_tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/missing_compiler_tests.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/missing_tests.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/thorough_fix_compiler_tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/编译器测试生成报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/编译器测试运行报告.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -569,7 +564,8 @@
       <workItem from="1768981355686" duration="4292000" />
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
-      <workItem from="1769609608350" duration="11172000" />
+      <workItem from="1769609608350" duration="11446000" />
+      <workItem from="1769657318193" duration="1393000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="826" />
+    <option name="localTasksCounter" value="827" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(bytecode): 添加字节码访问器的语句处理功能&#10;&#10;- 实现异步和生成器语句的字节码生成，包括YieldStatement和AsyncFuncInit&#10;- 添加基础语句处理，支持块语句、变量赋值、类型检查和元组解构赋值&#10;- 实现控制流语句的字节码生成，包括if、while、for循环和break/continue语句&#10;- 添加函数和类定义的字节码编译功能，支持泛型函数和类的注册&#10;- 实现异常处理语句的完整字节码生成，包括try-catch-finally和throw语句&#10;- 添加导入语句和原生绑定的字节码指令生成，支持模块加载和原生库导入" />
     <MESSAGE value="refactor(ast): 重构函数值类型实现并清理导入语句&#10;&#10;- 将FuncLangValue类拆分为多个部分文件以改善代码组织结构&#10;- 从各个Statement相关文件中移除不必要的using语句&#10;- 将函数值类型的IL编译逻辑分离到独立的Compiler部分文件中&#10;- 优化函数类型的字节码生成和类型推断机制&#10;- 改进Lambda表达式和普通函数的编译处理流程&#10;- 移除冗余的导入语句以减少命名空间依赖" />
     <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
     <MESSAGE value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
@@ -966,7 +961,8 @@
     <MESSAGE value="chore(compiler): 移除 Lambda 表达式闭包分析调试代码&#10;&#10;- 删除了闭包捕获变量的调试输出逻辑&#10;- 移除了写入临时调试文件的功能&#10;- 清理了相关的调试信息打印代码" />
     <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMIntegrationTests 中统一使用 ['\r', '\n'] 进行行分割&#10;- 在 VMReflectionTests 中更新行分割逻辑以支持 Windows 和 Unix 换行符&#10;- 修改 VMResourceCleanupTests 中的行分割方法确保兼容性&#10;- 更新 VMTypeErrorTests 中的断言逻辑以正确处理不同平台的换行符" />
     <MESSAGE value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
+    <MESSAGE value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

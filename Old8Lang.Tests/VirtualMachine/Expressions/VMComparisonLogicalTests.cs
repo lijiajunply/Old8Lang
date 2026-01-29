@@ -175,7 +175,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("true", lines[0]);
         Assert.Equal("true", lines[1]);
@@ -199,7 +199,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("true", lines[0]);
         Assert.Equal("true", lines[1]);
@@ -362,7 +362,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(3, lines.Length);
         Assert.Equal("true", lines[0]);  // (10 > 5) && (15 > 10) = true && true = true
         Assert.Equal("true", lines[1]);  // (10 < 5) || (15 > 5) = false || true = true
@@ -409,7 +409,7 @@ public class VMComparisonLogicalTests
         var output = ExecuteVMCode(code);
 
         // Assert
-        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         Assert.Equal(2, lines.Length);
         Assert.Equal("true", lines[0]);  // (10 + 5) > (10 - 5) = 15 > 5 = true
         Assert.Equal("true", lines[1]);  // (10 * 5) == (5 * 10) = 50 == 50 = true
