@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 
@@ -8,6 +9,20 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 /// </summary>
 public class VMThreadTests
 {
+    /// <summary>
+    /// 辅助方法：从全局变量中获取整数值
+    /// </summary>
+    private static int GetIntValue(object? value)
+    {
+        return value switch
+        {
+            int i => i,
+            long l => (int)l,
+            IntLangValue ilv => ilv.Value,
+            _ => Convert.ToInt32(value)
+        };
+    }
+
     [Fact]
     public void TestSimpleThreadCreationAndJoin()
     {
@@ -33,7 +48,7 @@ result <- thread.Join()
         vm.Execute();
 
         var result = vm.GetGlobalVariable("result");
-        Assert.Equal(42, result);
+        Assert.Equal(42, GetIntValue(result));
     }
 
     [Fact]
@@ -61,7 +76,7 @@ result <- thread.Join()
         vm.Execute();
 
         var result = vm.GetGlobalVariable("result");
-        Assert.Equal(30, result);
+        Assert.Equal(30, GetIntValue(result));
     }
 
     [Fact]
@@ -100,6 +115,6 @@ result <- r1 + r2 + r3
 
         var result = vm.GetGlobalVariable("result");
         // 1*2 + 2*2 + 3*2 = 2 + 4 + 6 = 12
-        Assert.Equal(12, result);
+        Assert.Equal(12, GetIntValue(result));
     }
 }

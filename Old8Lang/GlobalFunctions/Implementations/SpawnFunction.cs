@@ -164,15 +164,20 @@ public sealed class SpawnFunction : BaseGlobalFunction
             throw new InvalidOperationException("无法获取当前虚拟机实例");
         }
 
-        // 创建线程
+        // 使用一个包装器来存储 threadId，以便在 lambda 中使用
+        int[] threadIdHolder = new int[1];
+
+        // 创建线程（不自动启动，由用户调用 Start() 启动）
         var threadId = Old8Lang.Concurrency.ResourceManager.CreateThread(() =>
         {
-            // 在新线程中执行函数
-            vm.CallFunctionObject(funcObj, funcArgs);
+            // 在新线程中执行函数并获取返回值
+            var result = vm.CallFunctionObject(funcObj, funcArgs);
+            // 设置线程结果
+            Old8Lang.Concurrency.ResourceManager.SetThreadResult(threadIdHolder[0], result);
         });
 
-        // 自动启动线程
-        Old8Lang.Concurrency.ResourceManager.StartThread(threadId);
+        // 保存 threadId 到包装器中
+        threadIdHolder[0] = threadId;
 
         // 返回 VMThreadLangValue
         return new VMThreadLangValue(threadId);

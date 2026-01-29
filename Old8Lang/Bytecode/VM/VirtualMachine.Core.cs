@@ -305,7 +305,8 @@ public partial class VirtualMachine
     /// </summary>
     /// <param name="funcObj">函数对象（ClosureValue 或 FunctionMetadata 或函数索引）</param>
     /// <param name="arguments">函数参数</param>
-    public void CallFunctionObject(object? funcObj, object?[] arguments)
+    /// <returns>函数的返回值（如果有）</returns>
+    public object? CallFunctionObject(object? funcObj, object?[] arguments)
     {
         // 保存当前虚拟机上下文（可能已经被设置）
         var previousVM = VMContext.CurrentVM;
@@ -342,6 +343,13 @@ public partial class VirtualMachine
             {
                 throw new Exception($"无效的函数对象类型: {funcObj?.GetType().Name ?? "null"}");
             }
+
+            // 返回栈顶的值（如果有）
+            if (_stack.Count > 0)
+            {
+                return _stack.Pop();
+            }
+            return null;
         }
         finally
         {

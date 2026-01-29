@@ -11,6 +11,7 @@ public class VMThreadWrapper : IDisposable
     private Exception? _exception;
     private bool _isCompleted;
     private bool _disposed;
+    private bool _isStarted;
 
     /// <summary>
     /// 构造函数
@@ -44,6 +45,15 @@ public class VMThreadWrapper : IDisposable
     /// </summary>
     public void Start()
     {
+        lock (_lock)
+        {
+            if (_isStarted)
+            {
+                // 线程已启动，忽略重复调用
+                return;
+            }
+            _isStarted = true;
+        }
         _thread.Start();
     }
 

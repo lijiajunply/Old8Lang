@@ -621,6 +621,17 @@ public static class ResourceManager
     }
 
     /// <summary>
+    /// 设置线程执行结果
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    /// <param name="result">执行结果</param>
+    public static void SetThreadResult(int threadId, object? result)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.Resource.SetResult(result);
+    }
+
+    /// <summary>
     /// 释放线程资源
     /// </summary>
     /// <param name="threadId">线程ID</param>

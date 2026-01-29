@@ -159,9 +159,13 @@ public class VMConcurrencyReadWriteLockTests
                 ReadLockRelease(rwLock)
             }
 
-            spawn(() -> reader(1))
-            spawn(() -> reader(2))
-            spawn(() -> reader(3))
+            a <- spawn(() -> reader(1))
+            b <- spawn(() -> reader(2))
+            c <- spawn(() -> reader(3))
+
+            a.Start()
+            b.Start()
+            c.Start()
 
             Sleep(50)
             maxConcurrent <- counter
