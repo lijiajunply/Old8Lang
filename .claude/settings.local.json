@@ -12,7 +12,9 @@
       "Bash(dotnet test:*)",
       "Bash(grep:*)",
       "Bash(git show:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

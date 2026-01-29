@@ -25,12 +25,8 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        // 检查函数是否已经被编译过（避免重复编译）
-        if (_compiler.GetFunctionIndex(funcName) >= 0)
-        {
-            // 函数已经在预处理阶段被编译过，跳过
-            return null;
-        }
+        // 检查函数是否已经被编译过
+        bool alreadyCompiled = _compiler.GetFunctionIndex(funcName) >= 0;
 
         // 非泛型函数：正常编译
         var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
@@ -67,8 +63,13 @@ public partial class BytecodeVisitor
         // 获取返回类型
         var returnType = funcValue.Id?.AssumptionType ?? "";
 
-        // 编译函数
-        var functionMetadata = _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, null, returnType);
+        // 如果函数还没有被编译过，编译函数体
+        // 注意：顶层函数定义不捕获外部变量，函数内部直接访问全局变量
+        if (!alreadyCompiled)
+        {
+            // 编译函数，不传递捕获的变量列表（顶层函数不捕获变量）
+            _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, null, returnType);
+        }
 
         // 检查是否有装饰器
         if (funcValue.Decorators is { Count: > 0 })
@@ -78,8 +79,10 @@ public partial class BytecodeVisitor
         }
         else
         {
-            // 无装饰器：直接将函数加载到栈并存储
+            // 获取函数索引
             int funcIndex = _compiler.GetFunctionIndex(funcName);
+
+            // 顶层函数定义不捕获变量，生成普通的 MakeFunction 指令
             Emit(OpCode.MakeFunction, funcIndex);
             Emit(OpCode.StoreGlobal, funcName);
         }

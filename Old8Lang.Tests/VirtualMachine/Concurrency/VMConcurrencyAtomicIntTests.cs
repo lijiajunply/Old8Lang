@@ -370,10 +370,9 @@ public class VMConcurrencyAtomicIntTests
         var code = @"
             atomic <- AtomicIntCreate(0)
             threadCount <- 10
-            iterationsPerThread <- 100
 
             func worker() -> void {
-                for i in [1~iterationsPerThread] {
+                for i in [1~100] {
                     AtomicIntIncrement(atomic)
                 }
             }
@@ -382,7 +381,7 @@ public class VMConcurrencyAtomicIntTests
                 spawn(worker)
             }
 
-            Sleep(1000)
+            Sleep(2000)
 
             result <- AtomicIntGet(atomic)
             AtomicIntDispose(atomic)

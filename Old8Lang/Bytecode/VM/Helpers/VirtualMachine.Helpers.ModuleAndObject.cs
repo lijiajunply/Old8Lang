@@ -59,8 +59,8 @@ public partial class VirtualMachine
                 // 执行模块初始化
                 moduleVM.Execute();
 
-                // 获取模块的全局变量
-                moduleGlobals = moduleVM._globals;
+                // 获取模块的全局变量（从 ConcurrentDictionary 转换为 Dictionary）
+                moduleGlobals = new Dictionary<string, object?>(moduleVM._globals);
 
                 // 传递性导入：将模块VM加载的所有依赖模块也注册到当前VM的模块注册表中
                 foreach (var depModuleName in moduleVM._moduleRegistry.GetLoadedModuleNames())

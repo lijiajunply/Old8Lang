@@ -13,11 +13,19 @@ namespace Old8Lang.Bytecode.VM;
 /// </summary>
 public partial class VirtualMachine
 {
-    private readonly Stack<object?> _stack = new();
-    private readonly Stack<CallFrame> _callStack = new();
-    private readonly Dictionary<string, object?> _globals = new();
+    // 使用 ThreadLocal 为每个线程创建独立的栈和调用栈
+    private readonly ThreadLocal<Stack<object?>> _threadStack = new(() => new Stack<object?>());
+    private readonly ThreadLocal<Stack<CallFrame>> _threadCallStack = new(() => new Stack<CallFrame>());
+    private readonly ThreadLocal<Stack<ExceptionHandler>> _threadExceptionHandlers = new(() => new Stack<ExceptionHandler>());
+
+    // 线程安全的全局变量字典
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object?> _globals = new();
     private readonly BytecodeFile _bytecodeFile;
-    private readonly Stack<ExceptionHandler> _exceptionHandlers = new();
+
+    // 便捷属性，获取当前线程的栈
+    private Stack<object?> _stack => _threadStack.Value!;
+    private Stack<CallFrame> _callStack => _threadCallStack.Value!;
+    private Stack<ExceptionHandler> _exceptionHandlers => _threadExceptionHandlers.Value!;
 
     // Task 管理
     private readonly Dictionary<int, TaskLangValue> _tasks = new();

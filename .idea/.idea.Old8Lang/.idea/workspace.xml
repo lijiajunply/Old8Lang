@@ -23,9 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Expressions/VMComparisonLogicalTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Definitions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Definitions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -565,7 +563,7 @@
       <workItem from="1769204572488" duration="2365000" />
       <workItem from="1769488764760" duration="9000" />
       <workItem from="1769609608350" duration="11446000" />
-      <workItem from="1769657318193" duration="1393000" />
+      <workItem from="1769657318193" duration="3277000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -910,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="827" />
+    <option name="localTasksCounter" value="829" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -937,8 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重构函数值类型实现并清理导入语句&#10;&#10;- 将FuncLangValue类拆分为多个部分文件以改善代码组织结构&#10;- 从各个Statement相关文件中移除不必要的using语句&#10;- 将函数值类型的IL编译逻辑分离到独立的Compiler部分文件中&#10;- 优化函数类型的字节码生成和类型推断机制&#10;- 改进Lambda表达式和普通函数的编译处理流程&#10;- 移除冗余的导入语句以减少命名空间依赖" />
-    <MESSAGE value="refactor(ast): 重构AST访问器实现结构&#10;&#10;- 将BytecodeVisitor.Expressions.cs拆分为多个专用文件&#10;- 创建Async、Basic和Conditional三个独立的表达式处理器&#10;- 优化模式匹配代码结构，提升可维护性&#10;- 改进异步表达式处理逻辑，统一await和async stream实现&#10;- 重构条件表达式处理，分离三元运算符和match表达式逻辑&#10;- 优化基础表达式处理，提升变量访问性能&#10;- 调整代码组织结构，增强模块化设计" />
     <MESSAGE value="chore(ide): 清理项目变更列表并移除虚拟机测试计划文档&#10;&#10;- 移除了 .idea workspace 中的大量文件变更记录&#10;- 更新本地任务计数器从 803 到 804&#10;- 删除了虚拟机模式测试补充计划的 markdown 文档&#10;- 清理了相关的项目配置变更跟踪信息" />
     <MESSAGE value="chore(ide): 清理 workspace.xml 中的多余配置&#10;&#10;- 移除 ChangeListManager 中的重复变更记录&#10;- 删除 LangId.cs 文件中的断点偏移量配置&#10;- 删除 VirtualMachine.Instructions.Main.cs 文件中的断点偏移量配置&#10;- 简化断点属性结构以减少文件冗余" />
     <MESSAGE value="feat(state): 添加Vue风格响应式API实现&#10;&#10;- 实现AutoComputed自动计算属性，支持依赖追踪和懒计算&#10;- 创建DependencyTracker依赖追踪器，使用线程静态栈管理Effect执行上下文&#10;- 添加IEffect和IReactiveSource接口定义副作用和响应式源契约&#10;- 实现Ref响应式引用，支持自动依赖追踪和UI重建触发&#10;- 添加Watch监听器，支持监听响应式源变化并执行回调&#10;- 实现WatchEffect副作用监听器，自动追踪依赖并重新执行&#10;- 扩展FirstUIBinding添加RebuildUI方法用于响应式状态变化触发&#10;- 更新测试应用演示完整的Vue风格响应式API使用场景" />
@@ -962,7 +958,9 @@
     <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMIntegrationTests 中统一使用 ['\r', '\n'] 进行行分割&#10;- 在 VMReflectionTests 中更新行分割逻辑以支持 Windows 和 Unix 换行符&#10;- 修改 VMResourceCleanupTests 中的行分割方法确保兼容性&#10;- 更新 VMTypeErrorTests 中的断言逻辑以正确处理不同平台的换行符" />
     <MESSAGE value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
     <MESSAGE value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
+    <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMComparisonLogicalTests 中统一使用 Environment.NewLine 进行行分割&#10;- 修复了 select 语句测试中关闭通道的逻辑&#10;- 更新了多个测试方法中的行分割逻辑以确保跨平台兼容性" />
+    <MESSAGE value="fix(generator): 修复生成器完成后继续调用MoveNext的异常处理&#10;&#10;- 将生成器完成时的异常抛出改为返回false&#10;- 统一了生成器完成状态的处理逻辑&#10;&#10;test(cleanup): 完善资源清理测试并修复defer循环执行验证&#10;&#10;- 添加ExecuteVMCodeIgnoreException辅助方法用于忽略" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(generator): 修复生成器完成后继续调用MoveNext的异常处理&#10;&#10;- 将生成器完成时的异常抛出改为返回false&#10;- 统一了生成器完成状态的处理逻辑&#10;&#10;test(cleanup): 完善资源清理测试并修复defer循环执行验证&#10;&#10;- 添加ExecuteVMCodeIgnoreException辅助方法用于忽略" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1327,19 +1325,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="646" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs</url>
-          <line>582</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/ErrorHandling/VMResourceCleanupTests.cs" containingFunctionPresentation="方法 'ResourceCleanup_DeferInLoop_ExecutesEachDefer'">
-            <startOffsets>
-              <option value="17036" />
-            </startOffsets>
-            <endOffsets>
-              <option value="17063" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="649" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Main.cs</url>
