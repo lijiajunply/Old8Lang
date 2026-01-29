@@ -324,7 +324,8 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
-        return wrapper.Resource.Reader.ReadAsync().GetAwaiter().GetResult();
+        // 使用 AsTask().Result 来同步等待，避免 GetAwaiter().GetResult() 在异步操作未完成时抛出异常
+        return wrapper.Resource.Reader.ReadAsync().AsTask().Result;
     }
 
     public static ChannelReceiveResult TryReceiveChannel(int channelId, int timeoutMs)

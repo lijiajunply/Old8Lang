@@ -310,7 +310,9 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
     {
         int channelId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
-        return ResourceManager.TryReceiveChannel(channelId, timeoutMs);
+        var result = ResourceManager.TryReceiveChannel(channelId, timeoutMs);
+        // 返回实际值或 null，而不是 ChannelReceiveResult 对象
+        return result.Success ? result.Value : null;
     }
 }
 

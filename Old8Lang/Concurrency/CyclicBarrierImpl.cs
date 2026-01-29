@@ -2,90 +2,54 @@ namespace Old8Lang.Concurrency;
 
 /// <summary>
 /// 循环栅栏实现 - 线程同步点,所有参与者都到达后才能继续
+/// 使用 .NET 内置的 Barrier 类实现
 /// </summary>
 public class CyclicBarrierImpl : IDisposable
 {
-    private readonly int ParticipantCount;
-    private int WaitingCount;
-    private readonly ManualResetEventSlim Event = new(false);
-    private readonly Lock Lock = new();
+    private readonly Barrier _barrier;
+    private readonly int _participantCount;
 
     public CyclicBarrierImpl(int participantCount)
     {
         if (participantCount <= 0)
             throw new ArgumentOutOfRangeException(nameof(participantCount), "参与者数量必须大于0");
 
-        ParticipantCount = participantCount;
+        _participantCount = participantCount;
+        _barrier = new Barrier(participantCount);
     }
 
     public void Await()
     {
-        lock (Lock)
-        {
-            WaitingCount++;
-
-            // 如果所有参与者都到达了
-            if (WaitingCount >= ParticipantCount)
-            {
-                // 重置计数器并发出信号
-                WaitingCount = 0;
-                Event.Set();
-                Event.Reset();
-                return;
-            }
-        }
-
-        // 等待其他参与者
-        Event.Wait();
+        _barrier.SignalAndWait();
     }
 
     public bool Await(int timeoutMs)
     {
-        lock (Lock)
+        try
         {
-            WaitingCount++;
-
-            // 如果所有参与者都到达了
-            if (WaitingCount >= ParticipantCount)
-            {
-                // 重置计数器并发出信号
-                WaitingCount = 0;
-                Event.Set();
-                Event.Reset();
-                return true;
-            }
+            return _barrier.SignalAndWait(timeoutMs);
         }
-
-        // 等待其他参与者（带超时）
-        bool success = Event.Wait(timeoutMs);
-
-        // 如果超时，需要减少等待计数
-        if (!success)
+        catch (BarrierPostPhaseException)
         {
-            lock (Lock)
-            {
-                WaitingCount--;
-            }
+            // 如果在 post-phase 动作中发生异常，返回 false
+            return false;
         }
-
-        return success;
     }
 
     public int GetParticipantCount()
     {
-        return ParticipantCount;
+        return _participantCount;
     }
 
     public int GetWaitingCount()
     {
-        lock (Lock)
-        {
-            return WaitingCount;
-        }
+        // Barrier 的 ParticipantsRemaining 表示还未到达的参与者数量
+        // 等待中的数量 = 总参与者数 - 剩余参与者数
+        return _participantCount - _barrier.ParticipantsRemaining;
     }
 
     public void Dispose()
     {
-        Event.Dispose();
+        _barrier.Dispose();
     }
 }
