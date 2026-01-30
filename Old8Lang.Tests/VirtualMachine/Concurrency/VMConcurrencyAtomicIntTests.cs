@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
@@ -11,6 +12,20 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 [Collection("Sequential")]
 public class VMConcurrencyAtomicIntTests
 {
+    /// <summary>
+    /// 辅助方法：从全局变量中获取整数值
+    /// </summary>
+    private static int GetIntValue(object? value)
+    {
+        return value switch
+        {
+            int i => i,
+            long l => (int)l,
+            IntLangValue ilv => ilv.Value,
+            _ => Convert.ToInt32(value)
+        };
+    }
+
     private string ExecuteVMCode(string code)
     {
         var interpreter = new LangInterpreter();
@@ -73,7 +88,7 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(42, result);
+        Assert.Equal(42, GetIntValue(result));
     }
 
     [Fact]
@@ -95,7 +110,7 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(100, result);
+        Assert.Equal(100, GetIntValue(result));
     }
 
     [Fact]
@@ -117,8 +132,8 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
-        Assert.Equal(11, result1);
-        Assert.Equal(11, result2);
+        Assert.Equal(11, GetIntValue(result1));
+        Assert.Equal(11, GetIntValue(result2));
     }
 
     [Fact]
@@ -140,8 +155,8 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
-        Assert.Equal(9, result1);
-        Assert.Equal(9, result2);
+        Assert.Equal(9, GetIntValue(result1));
+        Assert.Equal(9, GetIntValue(result2));
     }
 
     [Fact]
@@ -163,8 +178,8 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
-        Assert.Equal(15, result1);
-        Assert.Equal(15, result2);
+        Assert.Equal(15, GetIntValue(result1));
+        Assert.Equal(15, GetIntValue(result2));
     }
 
     [Fact]
@@ -187,7 +202,7 @@ public class VMConcurrencyAtomicIntTests
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
         Assert.True((bool)result1);
-        Assert.Equal(20, result2);
+        Assert.Equal(20, GetIntValue(result2));
     }
 
     [Fact]
@@ -210,7 +225,7 @@ public class VMConcurrencyAtomicIntTests
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
         Assert.False((bool)result1);
-        Assert.Equal(10, result2);
+        Assert.Equal(10, GetIntValue(result2));
     }
 
     [Fact]
@@ -226,9 +241,13 @@ public class VMConcurrencyAtomicIntTests
                 }
             }
 
-            spawn(incrementMany)
-            spawn(incrementMany)
-            spawn(incrementMany)
+            t1 <- spawn(incrementMany)
+            t2 <- spawn(incrementMany)
+            t3 <- spawn(incrementMany)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
 
@@ -244,7 +263,7 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(300, result);
+        Assert.Equal(300, GetIntValue(result));
     }
 
     [Fact]
@@ -279,10 +298,15 @@ public class VMConcurrencyAtomicIntTests
                 }
             }
 
-            spawn(addValues)
-            spawn(addValues)
-            spawn(addValues)
-            spawn(addValues)
+            t1 <- spawn(addValues)
+            t2 <- spawn(addValues)
+            t3 <- spawn(addValues)
+            t4 <- spawn(addValues)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
+            t4.Start()
 
             Sleep(500)
 
@@ -298,7 +322,7 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(400, result); // 4 threads * 50 iterations * 2 = 400
+        Assert.Equal(400, GetIntValue(result)); // 4 threads * 50 iterations * 2 = 400
     }
 
     [Fact]
@@ -318,8 +342,11 @@ public class VMConcurrencyAtomicIntTests
                 }
             }
 
-            spawn(incrementWithCAS)
-            spawn(incrementWithCAS)
+            t1 <- spawn(incrementWithCAS)
+            t2 <- spawn(incrementWithCAS)
+
+            t1.Start()
+            t2.Start()
 
             Sleep(500)
 
@@ -335,7 +362,7 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(20, result);
+        Assert.Equal(20, GetIntValue(result));
     }
 
     [Fact]
@@ -359,17 +386,16 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
-        Assert.Equal(-9, result1);
-        Assert.Equal(-14, result2);
+        Assert.Equal(-9, GetIntValue(result1));
+        Assert.Equal(-14, GetIntValue(result2));
     }
 
     [Fact]
     public void AtomicInt_StressTest_HandlesHighContention()
     {
-        // Arrange
+        // Arrange - 简化测试，使用固定数量的线程
         var code = @"
             atomic <- AtomicIntCreate(0)
-            threadCount <- 10
 
             func worker() -> void {
                 for i in [1~100] {
@@ -377,9 +403,27 @@ public class VMConcurrencyAtomicIntTests
                 }
             }
 
-            for i in [1~threadCount] {
-                spawn(worker)
-            }
+            t1 <- spawn(worker)
+            t2 <- spawn(worker)
+            t3 <- spawn(worker)
+            t4 <- spawn(worker)
+            t5 <- spawn(worker)
+            t6 <- spawn(worker)
+            t7 <- spawn(worker)
+            t8 <- spawn(worker)
+            t9 <- spawn(worker)
+            t10 <- spawn(worker)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
+            t4.Start()
+            t5.Start()
+            t6.Start()
+            t7.Start()
+            t8.Start()
+            t9.Start()
+            t10.Start()
 
             Sleep(2000)
 
@@ -395,6 +439,6 @@ public class VMConcurrencyAtomicIntTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(1000, result); // 10 threads * 100 iterations = 1000
+        Assert.Equal(1000, GetIntValue(result)); // 10 threads * 100 iterations = 1000
     }
 }

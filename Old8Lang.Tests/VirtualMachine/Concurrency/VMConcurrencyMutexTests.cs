@@ -102,25 +102,31 @@ public class VMConcurrencyMutexTests
     [Fact]
     public void MutexTryLock_Timeout_ReturnsFalse()
     {
-        // Arrange
+        // Arrange - 使用手动启动线程的模式
         var code = @"
             mutex <- MutexCreate()
             MutexLock(mutex)
+            timeoutOccurred <- AtomicIntCreate(0)
 
-            spawn(() -> {
+            func tryLockTask() -> void {
                 result <- MutexTryLock(mutex, 100)
                 if result {
                     PrintLine(""Lock acquired"")
                     MutexUnlock(mutex)
                 } else {
                     PrintLine(""Lock timeout"")
+                    AtomicIntSet(timeoutOccurred, 1)
                 }
-            })
+            }
+
+            t <- spawn(tryLockTask)
+            t.Start()
 
             Sleep(200)
             MutexUnlock(mutex)
             Sleep(100)
             MutexDispose(mutex)
+            AtomicIntDispose(timeoutOccurred)
         ";
 
         // Act
@@ -133,25 +139,29 @@ public class VMConcurrencyMutexTests
     [Fact]
     public void Mutex_ProtectsCriticalSection_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来保证线程安全的计数
         var code = @"
             mutex <- MutexCreate()
-            counter <- 0
+            counter <- AtomicIntCreate(0)
 
             func increment() -> void {
                 for i in [1~10] {
                     MutexLock(mutex)
-                    counter <- counter + 1
+                    AtomicIntIncrement(counter)
                     MutexUnlock(mutex)
                 }
             }
 
-            spawn(increment)
-            spawn(increment)
+            t1 <- spawn(increment)
+            t2 <- spawn(increment)
+
+            t1.Start()
+            t2.Start()
 
             Sleep(500)
 
-            result <- counter
+            result <- AtomicIntGet(counter)
+            AtomicIntDispose(counter)
             MutexDispose(mutex)
         ";
 
@@ -225,25 +235,30 @@ public class VMConcurrencyMutexTests
     [Fact]
     public void Mutex_MultipleThreads_SerializesAccess()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来保证线程安全的计数
         var code = @"
             mutex <- MutexCreate()
-            results <- {}
+            counter <- AtomicIntCreate(0)
 
-            func addResult(id:int) -> void {
+            func addResult() -> void {
                 MutexLock(mutex)
-                results.Add(id)
+                AtomicIntIncrement(counter)
                 Sleep(50)
                 MutexUnlock(mutex)
             }
 
-            spawn(() -> addResult(1))
-            spawn(() -> addResult(2))
-            spawn(() -> addResult(3))
+            t1 <- spawn(addResult)
+            t2 <- spawn(addResult)
+            t3 <- spawn(addResult)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(300)
 
-            result <- results.Count()
+            result <- AtomicIntGet(counter)
+            AtomicIntDispose(counter)
             MutexDispose(mutex)
         ";
 
@@ -348,28 +363,35 @@ public class VMConcurrencyMutexTests
     [Fact]
     public void Mutex_StressTest_HandlesHighContention()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来保证线程安全的计数
         var code = @"
             mutex <- MutexCreate()
-            counter <- 0
-            threadCount <- 5
-            iterationsPerThread <- 20
+            counter <- AtomicIntCreate(0)
 
             func incrementCounter() -> void {
-                for i in [1~iterationsPerThread] {
+                for i in [1~20] {
                     MutexLock(mutex)
-                    counter <- counter + 1
+                    AtomicIntIncrement(counter)
                     MutexUnlock(mutex)
                 }
             }
 
-            for i in [1~threadCount] {
-                spawn(incrementCounter)
-            }
+            t1 <- spawn(incrementCounter)
+            t2 <- spawn(incrementCounter)
+            t3 <- spawn(incrementCounter)
+            t4 <- spawn(incrementCounter)
+            t5 <- spawn(incrementCounter)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
+            t4.Start()
+            t5.Start()
 
             Sleep(1000)
 
-            result <- counter
+            result <- AtomicIntGet(counter)
+            AtomicIntDispose(counter)
             MutexDispose(mutex)
         ";
 

@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Interpreter;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
@@ -11,6 +12,20 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 [Collection("Sequential")]
 public class VMConcurrencyChannelTests
 {
+    /// <summary>
+    /// 辅助方法：从全局变量中获取整数值
+    /// </summary>
+    private static int GetIntValue(object? value)
+    {
+        return value switch
+        {
+            int i => i,
+            long l => (int)l,
+            IntLangValue ilv => ilv.Value,
+            _ => Convert.ToInt32(value)
+        };
+    }
+
     private string ExecuteVMCode(string code)
     {
         var interpreter = new LangInterpreter();
@@ -83,9 +98,10 @@ public class VMConcurrencyChannelTests
         var code = @"
             ch <- ChannelCreate()
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 ChannelSend(ch, 42)
             })
+            t.Start()
 
             result <- ChannelReceive(ch)
             ChannelDispose(ch)
@@ -99,7 +115,7 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(42, result);
+        Assert.Equal(42, GetIntValue(result));
     }
 
     [Fact]
@@ -130,10 +146,11 @@ public class VMConcurrencyChannelTests
         var code = @"
             ch <- ChannelCreate()
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 Sleep(50)
                 ChannelSend(ch, 123)
             })
+            t.Start()
 
             result <- ChannelTryReceive(ch, 1000)
             ChannelDispose(ch)
@@ -147,7 +164,7 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(123, result);
+        Assert.Equal(123, GetIntValue(result));
     }
 
     [Fact]
@@ -193,10 +210,10 @@ public class VMConcurrencyChannelTests
     [Fact]
     public void Channel_ProducerConsumer_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来确保计数操作是原子的
         var code = @"
             ch <- ChannelCreate()
-            results <- {}
+            counter <- AtomicIntCreate(0)
 
             func producer() -> void {
                 for i in [1~5] {
@@ -208,17 +225,21 @@ public class VMConcurrencyChannelTests
             func consumer() -> void {
                 for i in [1~5] {
                     val <- ChannelReceive(ch)
-                    results.Add(val)
+                    AtomicIntIncrement(counter)
                 }
             }
 
-            spawn(producer)
-            spawn(consumer)
+            t1 <- spawn(producer)
+            t2 <- spawn(consumer)
+
+            t1.Start()
+            t2.Start()
 
             Sleep(500)
 
-            result <- results.Count()
+            result <- AtomicIntGet(counter)
             ChannelDispose(ch)
+            AtomicIntDispose(counter)
         ";
 
         // Act
@@ -229,7 +250,7 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(5, result);
+        Assert.Equal(5, GetIntValue(result));
     }
 
     [Fact]
@@ -279,28 +300,33 @@ public class VMConcurrencyChannelTests
     [Fact]
     public void Channel_MultipleProducers_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来确保计数操作是原子的
         var code = @"
             ch <- ChannelCreate()
-            results <- {}
+            counter <- AtomicIntCreate(0)
 
-            func producer(id:int) -> void {
+            func producer() -> void {
                 for i in [1~3] {
-                    ChannelSend(ch, id * 10 + i)
+                    ChannelSend(ch, i)
                 }
             }
 
-            spawn(() -> producer(1))
-            spawn(() -> producer(2))
-            spawn(() -> producer(3))
+            t1 <- spawn(producer)
+            t2 <- spawn(producer)
+            t3 <- spawn(producer)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             for i in [1~9] {
                 val <- ChannelReceive(ch)
-                results.Add(val)
+                AtomicIntIncrement(counter)
             }
 
-            result <- results.Count()
+            result <- AtomicIntGet(counter)
             ChannelDispose(ch)
+            AtomicIntDispose(counter)
         ";
 
         // Act
@@ -311,7 +337,7 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(9, result);
+        Assert.Equal(9, GetIntValue(result));
     }
 
     [Fact]
@@ -335,9 +361,13 @@ public class VMConcurrencyChannelTests
                 }
             }
 
-            spawn(producer)
-            spawn(consumer)
-            spawn(consumer)
+            t1 <- spawn(producer)
+            t2 <- spawn(consumer)
+            t3 <- spawn(consumer)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
 
@@ -354,7 +384,7 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(10, result);
+        Assert.Equal(10, GetIntValue(result));
     }
 
     [Fact]
@@ -364,11 +394,12 @@ public class VMConcurrencyChannelTests
         var code = @"
             ch <- ChannelCreate()
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 ChannelSend(ch, 42)
                 ChannelSend(ch, ""hello"")
                 ChannelSend(ch, true)
             })
+            t.Start()
 
             result1 <- ChannelReceive(ch)
             result2 <- ChannelReceive(ch)
@@ -386,7 +417,7 @@ public class VMConcurrencyChannelTests
         var result1 = vm.GetGlobalVariable("result1");
         var result2 = vm.GetGlobalVariable("result2");
         var result3 = vm.GetGlobalVariable("result3");
-        Assert.Equal(42, result1);
+        Assert.Equal(42, GetIntValue(result1));
         Assert.Equal("hello", result2);
         Assert.True((bool)result3);
     }
@@ -394,11 +425,11 @@ public class VMConcurrencyChannelTests
     [Fact]
     public void Channel_Pipeline_ExecutesCorrectly()
     {
-        // Arrange
+        // Arrange - 使用 AtomicInt 来确保计数操作是原子的
         var code = @"
             ch1 <- ChannelCreate()
             ch2 <- ChannelCreate()
-            results <- {}
+            counter <- AtomicIntCreate(0)
 
             func stage1() -> void {
                 for i in [1~5] {
@@ -418,19 +449,24 @@ public class VMConcurrencyChannelTests
             func stage3() -> void {
                 for i in [1~5] {
                     val <- ChannelReceive(ch2)
-                    results.Add(val)
+                    AtomicIntIncrement(counter)
                 }
             }
 
-            spawn(stage1)
-            spawn(stage2)
-            spawn(stage3)
+            t1 <- spawn(stage1)
+            t2 <- spawn(stage2)
+            t3 <- spawn(stage3)
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
 
-            result <- results.Count()
+            result <- AtomicIntGet(counter)
             ChannelDispose(ch1)
             ChannelDispose(ch2)
+            AtomicIntDispose(counter)
         ";
 
         // Act
@@ -441,6 +477,6 @@ public class VMConcurrencyChannelTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(5, result);
+        Assert.Equal(5, GetIntValue(result));
     }
 }

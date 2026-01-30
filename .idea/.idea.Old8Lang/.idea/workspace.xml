@@ -23,12 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyAtomicIntTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyAtomicIntTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyChannelTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyChannelTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -570,6 +567,7 @@
       <workItem from="1769488764760" duration="9000" />
       <workItem from="1769609608350" duration="11446000" />
       <workItem from="1769657318193" duration="3277000" />
+      <workItem from="1769673067148" duration="4480000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +912,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="831" />
+    <option name="localTasksCounter" value="833" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,8 +939,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(state): 添加Vue风格响应式API实现&#10;&#10;- 实现AutoComputed自动计算属性，支持依赖追踪和懒计算&#10;- 创建DependencyTracker依赖追踪器，使用线程静态栈管理Effect执行上下文&#10;- 添加IEffect和IReactiveSource接口定义副作用和响应式源契约&#10;- 实现Ref响应式引用，支持自动依赖追踪和UI重建触发&#10;- 添加Watch监听器，支持监听响应式源变化并执行回调&#10;- 实现WatchEffect副作用监听器，自动追踪依赖并重新执行&#10;- 扩展FirstUIBinding添加RebuildUI方法用于响应式状态变化触发&#10;- 更新测试应用演示完整的Vue风格响应式API使用场景" />
-    <MESSAGE value="refactor(state): 优化 Ref 类型的值变更处理逻辑&#10;&#10;- 简化了值比较的条件判断逻辑&#10;- 调整了 Trigger 和 OnChanged 的调用顺序，先触发依赖更新再触发 UI 重建&#10;- 移除了冗余的花括号代码块" />
     <MESSAGE value="feat(core): 实现响应式应用程序构建功能&#10;&#10;- 将 RunApp 方法参数从 WidgetBase 改为 Func&lt;WidgetBase&gt; 以支持动态重建&#10;- 添加旧版 API 兼容方法并标记为过时，提供平滑迁移路径&#10;- 更新 FirstUIAvaloniaApp 构造函数以接收构建函数委托&#10;- 修改 UI 构建逻辑，通过调用构建函数实现响应式更新&#10;- 在测试应用中演示使用 lambda 函数进行动态 UI 重建&#10;- 移除手动创建的响应式文本包装器，直接使用响应式值&#10;- 完善文档注释，明确区分响应式与非响应式 API 的用途" />
     <MESSAGE value="refactor(testing): 重构测试库文件结构并优化Mock对象实现&#10;&#10;- 将AssertLib.cs、MockLib.cs和TestRunner.cs从Old8LangLib移动到Old8Lang.AST.Expression.StaticValues命名空间&#10;- 优化MockObject类实现，将Name属性设为只读，使用私有字段存储_callHistory和_returnValues&#10;- 改进RecordCall方法使用TryGetValue避免重复字典访问，提升性能&#10;- 添加Runtime命名空间引用到MockLibClassLangValue和TestRunnerClassLangValue文件&#10;- 清理IDEA工作区配置文件中的变更历史记录和过时提交消息&#10;- 更新本地任务计数器并调整最后提交消息记录" />
     <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
@@ -966,7 +962,9 @@
     <MESSAGE value="fix(generator): 修复生成器完成后继续调用MoveNext的异常处理&#10;&#10;- 将生成器完成时的异常抛出改为返回false&#10;- 统一了生成器完成状态的处理逻辑&#10;&#10;test(cleanup): 完善资源清理测试并修复defer循环执行验证&#10;&#10;- 添加ExecuteVMCodeIgnoreException辅助方法用于忽略" />
     <MESSAGE value="refactor(vm): 重构虚拟机实现以支持线程安全的并发执行&#10;&#10;- 将栈和调用栈改为 ThreadLocal 实现线程隔离&#10;- 使用 ConcurrentDictionary 替代普通字典确保全局变量线程安全&#10;- 为顶层函数定义添加编译检查避免重复编译&#10;- 优化函数编译逻辑仅对未编译函数执行编译过程&#10;- 更新模块加载时全局变量转换逻辑&#10;- 调整测试代码中的迭代次数和睡眠时间参数&#10;- 更新 IDE 配置清理变更记录和断点信息" />
     <MESSAGE value="refactor(concurrency): 重构并发组件实现&#10;&#10;- 修改TryReceiveChannel函数返回实际值或null，而不是ChannelReceiveResult对象&#10;- 使用.NET内置Barrier类替换手动实现的CyclicBarrierImpl，简化同步逻辑&#10;- 更新ResourceManager中ReadAsync调用方式，使用AsTask().Result避免异常&#10;- 添加taskkill命令到本地设置的bash命令列表中" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(concurrency): 重构并发组件实现&#10;&#10;- 修改TryReceiveChannel函数返回实际值或null，而不是ChannelReceiveResult对象&#10;- 使用.NET内置Barrier类替换手动实现的CyclicBarrierImpl，简化同步逻辑&#10;- 更新ResourceManager中ReadAsync调用方式，使用AsTask().Result避免异常&#10;- 添加taskkill命令到本地设置的bash命令列表中" />
+    <MESSAGE value="feat(concurrency): 实现线程结果获取和手动启动功能&#10;&#10;- 添加 SetThreadResult 方法用于设置线程执行结果&#10;- 修改 SpawnFunction 实现，线程不再自动启动，需手动调用 Start()&#10;- 在线程执行完成后设置返回值结果&#10;- 更新虚拟机 CallFunctionObject 方法返回函数执行结果&#10;- 添加线程启动状态检查避免重复启动&#10;- 更新测试代码使用新的线程启动和结果获取方式&#10;- 添加辅助方法处理不同类型的整数值转换" />
+    <MESSAGE value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1331,19 +1329,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="646" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs</url>
-          <line>184</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang.Tests\VirtualMachine\Concurrency\VMConcurrencyReadWriteLockTests.cs" containingFunctionPresentation="方法 'ReadWriteLock_MultipleReaders_ExecutesCorrectly'">
-            <startOffsets>
-              <option value="4999" />
-            </startOffsets>
-            <endOffsets>
-              <option value="5036" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="651" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
