@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -366,7 +367,7 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Operation>(setStmt.Value);
+        Assert.IsType<NestedIndexAccess>(setStmt.Value);
     }
 
     /// <summary>

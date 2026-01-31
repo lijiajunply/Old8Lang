@@ -15,7 +15,8 @@
       "Bash(find:*)",
       "Bash(git stash:*)",
       "Bash(git checkout:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout:*)"
     ]
   }
 }
