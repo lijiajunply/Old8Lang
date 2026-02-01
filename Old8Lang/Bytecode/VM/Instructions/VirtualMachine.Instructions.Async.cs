@@ -241,7 +241,7 @@ public partial class VirtualMachine
                             stackCopy
                         );
 
-                        generatorState.CurrentValue = yieldValue as LangValueType ?? new VoidLangValue();
+                        generatorState.CurrentValue = ConvertToLangValue(yieldValue);
 
                         // 将值压回栈顶
                         _stack.Push(yieldValue);
@@ -272,7 +272,7 @@ public partial class VirtualMachine
                         );
 
                         // 4. 设置当前yield的值
-                        generatorState.CurrentValue = yieldValue as LangValueType ?? new VoidLangValue();
+                        generatorState.CurrentValue = ConvertToLangValue(yieldValue);
 
                         // 5. 将yield的值压回栈顶（作为MoveNext的返回值）
                         _stack.Push(yieldValue);

@@ -210,14 +210,14 @@ public class VMExecutionPerformanceTests
     public void Performance_Collection_DictionaryAccess()
     {
         var code = @"
-            dict <- dict()
+            d <- dict()
             for i <- 0, i < 100, i++ {
-                dict[""key"" + i.ToStr()] <- i
+                d[""key"" + i.ToStr()] <- i
             }
 
             sum <- 0
             for i <- 0, i < 100, i++ {
-                sum <- sum + dict[""key"" + i.ToStr()]
+                sum <- sum + d[""key"" + i.ToStr()]
             }
         ";
 
@@ -635,7 +635,7 @@ public class VMExecutionPerformanceTests
     public void Performance_Generator_YieldOperation()
     {
         var code = @"
-            func generate() -> {
+            func generate() -> void {
                 for i <- 0, i < 100, i++ {
                     yield i
                 }

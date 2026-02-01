@@ -475,7 +475,7 @@ func test() -> int {
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        var exception = Assert.Throws<InvalidOperationError>(() =>
+        var exception = Assert.Throws<CompilerException>(() =>
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)
         );
 
