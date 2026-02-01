@@ -11,6 +11,14 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitLinqExpression(LinqExpression node)
     {
+        // 检查是否有 Join 子句
+        var hasJoin = node.BodyClauses.Any(c => c is JoinClause);
+
+        if (hasJoin)
+        {
+            return VisitLinqExpressionWithJoin(node);
+        }
+
         // LINQ 查询表达式的字节码生成策略:
         // 1. 获取数据源并转换为迭代器
         // 2. 遍历数据源,对每个元素应用查询子句
@@ -124,6 +132,252 @@ public partial class BytecodeVisitor
         return null;
     }
 
+    /// <summary>
+    /// 处理包含 Join 子句的 LINQ 表达式
+    /// </summary>
+    private Instruction? VisitLinqExpressionWithJoin(LinqExpression node)
+    {
+        // 创建结果列表
+        Emit(OpCode.NewList, 0);
+        int resultListLocal = _compiler.AllocateLocal();
+        Emit(OpCode.StoreLocal, resultListLocal);
+
+        // 为外部范围变量分配局部变量槽
+        int outerRangeVarLocal = _compiler.AllocateLocal(node.FromClause.RangeVariable);
+
+        // 为 let 变量分配局部变量槽
+        var letVariables = new Dictionary<string, int>();
+        foreach (var clause in node.BodyClauses)
+        {
+            if (clause is LetClause letClause)
+            {
+                int letVarLocal = _compiler.AllocateLocal(letClause.Variable);
+                letVariables[letClause.Variable] = letVarLocal;
+            }
+        }
+
+        // 获取外部数据源的迭代器
+        node.FromClause.DataSource.Accept(this);
+        Emit(OpCode.GetIterator);
+        int outerIteratorLocal = _compiler.AllocateLocal();
+        Emit(OpCode.StoreLocal, outerIteratorLocal);
+
+        // 外部循环开始
+        int outerLoopStartPos = GetCurrentPosition();
+
+        // 检查外部迭代器是否有下一个元素
+        Emit(OpCode.LoadLocal, outerIteratorLocal);
+        Emit(OpCode.IteratorMoveNext);
+
+        // 如果没有下一个元素,跳出外部循环
+        int outerLoopEndJump = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1);
+
+        // 获取外部当前元素
+        Emit(OpCode.LoadLocal, outerIteratorLocal);
+        Emit(OpCode.IteratorCurrent);
+        Emit(OpCode.StoreLocal, outerRangeVarLocal);
+
+        // 处理 Join 子句
+        var joinClauses = node.BodyClauses.OfType<JoinClause>().ToList();
+        var innerIteratorLocals = new List<int>();
+        var innerRangeVarLocals = new Dictionary<string, int>();
+        var groupVarLocals = new Dictionary<string, int>();
+        var innerLoopEndJumps = new List<int>();
+        var innerLoopStartPositions = new List<int>();
+
+        foreach (var joinClause in joinClauses)
+        {
+            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
+            {
+                // Group Join: 创建一个列表来收集匹配的内部元素
+                Emit(OpCode.NewList, 0);
+                int groupListLocal = _compiler.AllocateLocal(joinClause.GroupVariable);
+                Emit(OpCode.StoreLocal, groupListLocal);
+                groupVarLocals[joinClause.GroupVariable] = groupListLocal;
+            }
+
+            // 为内部范围变量分配局部变量槽
+            int innerRangeVarLocal = _compiler.AllocateLocal(joinClause.RangeVariable);
+            innerRangeVarLocals[joinClause.RangeVariable] = innerRangeVarLocal;
+
+            // 获取内部数据源的迭代器
+            joinClause.InnerDataSource.Accept(this);
+            Emit(OpCode.GetIterator);
+            int innerIteratorLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, innerIteratorLocal);
+            innerIteratorLocals.Add(innerIteratorLocal);
+
+            // 内部循环开始
+            int innerLoopStartPos = GetCurrentPosition();
+            innerLoopStartPositions.Add(innerLoopStartPos);
+
+            // 检查内部迭代器是否有下一个元素
+            Emit(OpCode.LoadLocal, innerIteratorLocal);
+            Emit(OpCode.IteratorMoveNext);
+
+            // 如果没有下一个元素,跳出内部循环
+            int innerLoopEndJump = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+            innerLoopEndJumps.Add(innerLoopEndJump);
+
+            // 获取内部当前元素
+            Emit(OpCode.LoadLocal, innerIteratorLocal);
+            Emit(OpCode.IteratorCurrent);
+            Emit(OpCode.StoreLocal, innerRangeVarLocal);
+
+            // 计算外部键
+            joinClause.OuterKeyExpression.Accept(this);
+            int outerKeyLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, outerKeyLocal);
+
+            // 计算内部键
+            joinClause.InnerKeyExpression.Accept(this);
+            int innerKeyLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, innerKeyLocal);
+
+            // 比较键是否相等
+            Emit(OpCode.LoadLocal, outerKeyLocal);
+            Emit(OpCode.LoadLocal, innerKeyLocal);
+            Emit(OpCode.Equal);
+
+            // 如果键不相等,跳过当前内部元素
+            int skipInnerJump = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+
+            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
+            {
+                // Group Join: 将匹配的内部元素添加到分组列表
+                Emit(OpCode.LoadLocal, groupVarLocals[joinClause.GroupVariable]);
+                Emit(OpCode.LoadLocal, innerRangeVarLocal);
+                Emit(OpCode.CallMethod, new object[] { 2, "Add" });
+                Emit(OpCode.Pop);
+
+                // 跳转到内部循环继续
+                PatchJump(skipInnerJump, innerLoopStartPos);
+            }
+            else
+            {
+                // Inner Join: 处理 where 子句和 select
+                var skipElementJumps = new List<int>();
+
+                // 处理非 Join 的 body 子句 (where, let)
+                foreach (var clause in node.BodyClauses)
+                {
+                    if (clause is WhereClause whereClause)
+                    {
+                        whereClause.Condition.Accept(this);
+                        int skipJump = GetCurrentPosition();
+                        Emit(OpCode.JumpIfFalse, -1);
+                        skipElementJumps.Add(skipJump);
+                    }
+                    else if (clause is LetClause letClause)
+                    {
+                        letClause.Expression.Accept(this);
+                        Emit(OpCode.StoreLocal, letVariables[letClause.Variable]);
+                    }
+                }
+
+                // 执行 select
+                ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+
+                // 修补跳过元素的跳转
+                int continueInnerPos = GetCurrentPosition();
+                foreach (var skipJump in skipElementJumps)
+                {
+                    PatchJump(skipJump, continueInnerPos);
+                }
+
+                // 修补键不相等时的跳转
+                PatchJump(skipInnerJump, continueInnerPos);
+            }
+
+            // 跳回内部循环开始
+            Emit(OpCode.Jump, innerLoopStartPos);
+
+            // 修补内部循环结束跳转
+            PatchJump(innerLoopEndJump, GetCurrentPosition());
+
+            // 释放临时变量
+            _compiler.FreeLocal(outerKeyLocal);
+            _compiler.FreeLocal(innerKeyLocal);
+        }
+
+        // 对于 Group Join，在内部循环结束后执行 select
+        foreach (var joinClause in joinClauses)
+        {
+            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
+            {
+                // 处理 where 子句
+                var skipElementJumps = new List<int>();
+                foreach (var clause in node.BodyClauses)
+                {
+                    if (clause is WhereClause whereClause)
+                    {
+                        whereClause.Condition.Accept(this);
+                        int skipJump = GetCurrentPosition();
+                        Emit(OpCode.JumpIfFalse, -1);
+                        skipElementJumps.Add(skipJump);
+                    }
+                    else if (clause is LetClause letClause)
+                    {
+                        letClause.Expression.Accept(this);
+                        Emit(OpCode.StoreLocal, letVariables[letClause.Variable]);
+                    }
+                }
+
+                // 执行 select
+                ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+
+                // 修补跳过元素的跳转
+                int continuePos = GetCurrentPosition();
+                foreach (var skipJump in skipElementJumps)
+                {
+                    PatchJump(skipJump, continuePos);
+                }
+            }
+        }
+
+        // 跳回外部循环开始
+        Emit(OpCode.Jump, outerLoopStartPos);
+
+        // 修补外部循环结束跳转
+        PatchJump(outerLoopEndJump, GetCurrentPosition());
+
+        // 处理 OrderBy (如果有)
+        var orderByClause = node.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
+        if (orderByClause != null)
+        {
+            ProcessLinqOrderBy(orderByClause, resultListLocal);
+        }
+
+        // 加载结果列表到栈
+        Emit(OpCode.LoadLocal, resultListLocal);
+
+        // 释放局部变量
+        _compiler.FreeLocal(resultListLocal);
+        _compiler.FreeLocal(outerRangeVarLocal);
+        _compiler.FreeLocal(outerIteratorLocal);
+        foreach (var local in innerIteratorLocals)
+        {
+            _compiler.FreeLocal(local);
+        }
+        foreach (var local in innerRangeVarLocals.Values)
+        {
+            _compiler.FreeLocal(local);
+        }
+        foreach (var local in groupVarLocals.Values)
+        {
+            _compiler.FreeLocal(local);
+        }
+        foreach (var local in letVariables.Values)
+        {
+            _compiler.FreeLocal(local);
+        }
+
+        return null;
+    }
+
     // ===== 泛型处理辅助方法 =====
 
     /// <summary>
@@ -140,11 +394,7 @@ public partial class BytecodeVisitor
         {
             var resolvedType = ResolveSimpleTypeName(typeArg);
             // 如果类型参数在当前映射中，替换为实际类型
-            if (_compiler.CurrentTypeParameterMapping.TryGetValue(resolvedType, out var mappedType))
-            {
-                return mappedType;
-            }
-            return resolvedType;
+            return _compiler.CurrentTypeParameterMapping.GetValueOrDefault(resolvedType, resolvedType);
         }).ToArray();
         var specializedClassName = $"{className}${string.Join("_", typeArgNames)}";
 

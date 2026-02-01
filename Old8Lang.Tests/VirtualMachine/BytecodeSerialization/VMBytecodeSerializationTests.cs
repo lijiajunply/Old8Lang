@@ -268,7 +268,7 @@ public class VMBytecodeSerializationTests
                 public x:int
                 public y:int
 
-                public func new(x:int, y:int) -> void {
+                public func init(x:int, y:int) -> void {
                     this.x <- x
                     this.y <- y
                 }
@@ -514,7 +514,7 @@ public class VMBytecodeSerializationTests
             class Box<T> {
                 public value:T
 
-                public func new(value:T) -> void {
+                public func init(value:T) -> void {
                     this.value <- value
                 }
             }
@@ -553,7 +553,7 @@ public class VMBytecodeSerializationTests
     public void BytecodeSerialization_Lambda_CompilesAndExecutes()
     {
         var code = @"
-            add <- (a:int, b:int) -> int {
+            add <- (a:int, b:int):int -> {
                 return a + b
             }
 
@@ -578,12 +578,12 @@ public class VMBytecodeSerializationTests
                 public id:int
                 public disposed:bool
 
-                public func new(id:int) -> void {
+                public func init(id:int) -> void {
                     this.id <- id
                     this.disposed <- false
                 }
 
-                public func Dispose() -> void {
+                public func dispose() -> void {
                     this.disposed <- true
                     PrintLine(""Resource disposed"")
                 }

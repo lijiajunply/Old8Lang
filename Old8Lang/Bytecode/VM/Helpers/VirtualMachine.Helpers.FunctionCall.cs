@@ -101,9 +101,75 @@ public partial class VirtualMachine
 
                 return null;
 
+            case "LinqOrderBy":
+                // 对列表进行排序（升序或降序）
+                // 参数: list, isAscending
+                if (args.Length >= 2 && args[0] is IList listToSort)
+                {
+                    bool isAscending = Convert.ToBoolean(args[1]);
+                    return SortList(listToSort, isAscending);
+                }
+                return args.Length > 0 ? args[0] : new List<object?>();
+
+            case "LinqThenBy":
+                // 对已排序的列表进行二次排序（当前简化实现，与OrderBy相同）
+                // 参数: list, isAscending
+                if (args.Length >= 2 && args[0] is IList listToThenSort)
+                {
+                    bool isAscending = Convert.ToBoolean(args[1]);
+                    return SortList(listToThenSort, isAscending);
+                }
+                return args.Length > 0 ? args[0] : new List<object?>();
+
             default:
                 throw new MethodNotFoundError(new SourcePosition(), funcName);
         }
+    }
+
+    /// <summary>
+    /// 对列表进行排序
+    /// </summary>
+    private static List<object?> SortList(IList list, bool isAscending)
+    {
+        var result = new List<object?>();
+        foreach (var item in list)
+        {
+            result.Add(item);
+        }
+
+        result.Sort((a, b) =>
+        {
+            int comparison = CompareObjects(a, b);
+            return isAscending ? comparison : -comparison;
+        });
+
+        return result;
+    }
+
+    /// <summary>
+    /// 比较两个对象
+    /// </summary>
+    private static int CompareObjects(object? a, object? b)
+    {
+        if (a == null && b == null) return 0;
+        if (a == null) return -1;
+        if (b == null) return 1;
+
+        // 尝试使用 IComparable
+        if (a is IComparable comparableA)
+        {
+            try
+            {
+                return comparableA.CompareTo(b);
+            }
+            catch
+            {
+                // 如果类型不兼容，使用字符串比较
+            }
+        }
+
+        // 回退到字符串比较
+        return string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal);
     }
 
     /// <summary>
