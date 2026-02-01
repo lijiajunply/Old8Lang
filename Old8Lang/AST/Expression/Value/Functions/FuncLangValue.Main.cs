@@ -64,6 +64,17 @@ public partial class FuncLangValue : ImportInfo
     /// </summary>
     public List<FunctionDecorator>? Decorators { get; set; }
 
+    /// <summary>
+    /// 应用装饰器后的函数（延迟应用）
+    /// 在函数第一次被调用时应用装饰器，并缓存结果
+    /// </summary>
+    private FuncLangValue? _decoratedFunc;
+
+    /// <summary>
+    /// 装饰器是否已经应用
+    /// </summary>
+    private bool _decoratorsApplied;
+
     public FuncLangValue(
         LangId? id,
         List<LangId> ids,

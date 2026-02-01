@@ -960,26 +960,37 @@ public class VariateManager
             newManager.IsYield = IsYield;
         }
 
-        // 深拷贝作用域栈，但锁定变量共享引用
+        // 克隆作用域栈：全局作用域（第一个）共享引用，其他作用域深拷贝
+        // 这样闭包可以修改全局变量，但局部变量保持独立
         newManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
-        foreach (var scope in Scopes)
+        for (int i = 0; i < Scopes.Count; i++)
         {
-            var newScope = new Dictionary<string, LangValueType>();
-            foreach (var (varName, varValue) in scope)
-            {
-                // 如果是锁定变量，直接共享引用而非拷贝
-                if (varValue is LockedVariableLangValue lockedVar)
-                {
-                    newScope[varName] = lockedVar; // 共享同一个 LockedVariable 实例
-                    newManager.LockedVariables[varName] = lockedVar; // 在新管理器中也记录
-                }
-                else
-                {
-                    newScope[varName] = varValue; // 普通变量正常拷贝
-                }
-            }
+            var scope = Scopes[i];
 
-            newManager.Scopes.Add(newScope);
+            if (i == 0)
+            {
+                // 全局作用域：直接共享引用，使闭包可以修改全局变量
+                newManager.Scopes.Add(scope);
+            }
+            else
+            {
+                // 其他作用域：深拷贝，保持局部变量独立
+                var newScope = new Dictionary<string, LangValueType>();
+                foreach (var (varName, varValue) in scope)
+                {
+                    // 如果是锁定变量，直接共享引用而非拷贝
+                    if (varValue is LockedVariableLangValue lockedVar)
+                    {
+                        newScope[varName] = lockedVar; // 共享同一个 LockedVariable 实例
+                        newManager.LockedVariables[varName] = lockedVar; // 在新管理器中也记录
+                    }
+                    else
+                    {
+                        newScope[varName] = varValue; // 普通变量正常拷贝
+                    }
+                }
+                newManager.Scopes.Add(newScope);
+            }
         }
 
         // 复制导入信息（线程安全）

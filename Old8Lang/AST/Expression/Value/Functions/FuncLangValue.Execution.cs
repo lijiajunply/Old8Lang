@@ -420,6 +420,19 @@ public partial class FuncLangValue
 
     public virtual LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
+        // 延迟应用装饰器：在函数第一次被调用时应用装饰器
+        if (Decorators is { Count: > 0 } && !_decoratorsApplied)
+        {
+            _decoratorsApplied = true;
+            _decoratedFunc = ApplyDecoratorsLazy(variateManagerFunc);
+        }
+
+        // 如果有应用装饰器后的函数，使用它来执行
+        if (_decoratedFunc is not null)
+        {
+            return _decoratedFunc.Run(variateManagerFunc, ids, obj);
+        }
+
         if (Method is not null)
         {
             // 获取方法的所有参数
@@ -749,6 +762,126 @@ public partial class FuncLangValue
             // 出栈：函数调用结束
             Old8Exception.PopCallStack();
         }
+    }
+
+    /// <summary>
+    /// 延迟应用装饰器
+    /// 在函数第一次被调用时应用装饰器
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>应用装饰器后的函数</returns>
+    private FuncLangValue ApplyDecoratorsLazy(VariateManager manager)
+    {
+        if (Decorators is null || Decorators.Count == 0)
+        {
+            return this;
+        }
+
+        var currentFunc = this;
+
+        // 从下到上应用装饰器（最接近函数的装饰器最先应用）
+        for (int i = Decorators.Count - 1; i >= 0; i--)
+        {
+            var decorator = Decorators[i];
+            currentFunc = ApplySingleDecoratorLazy(decorator, currentFunc, manager);
+        }
+
+        return currentFunc;
+    }
+
+    /// <summary>
+    /// 延迟应用单个装饰器
+    /// </summary>
+    private FuncLangValue ApplySingleDecoratorLazy(FunctionDecorator decorator, FuncLangValue targetFunc,
+        VariateManager manager)
+    {
+        // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
+        var tempFuncName = $"__temp_func_{Guid.NewGuid():N}";
+        var tempFunc = new FuncLangValue(
+            new LangId(tempFuncName, position: decorator.Position),
+            targetFunc.Ids ?? [],
+            targetFunc.BlockStatement,
+            targetFunc.GenericParameters,
+            targetFunc.Position,
+            isLambda: false
+        )
+        {
+            CapturedScope = targetFunc.CapturedScope
+        };
+        manager.AddClassAndFunc(tempFunc);
+
+        LangValueType result;
+
+        // 检查装饰器是否有参数
+        if (decorator.Arguments is not null && decorator.Arguments.Count > 0)
+        {
+            // 带参数的装饰器：先调用装饰器函数获取包装器，然后用包装器包装目标函数
+            var decoratorCallExpr = new FunctionCallExpression(
+                new LangId(decorator.Name, position: decorator.Position),
+                decorator.Arguments,
+                decorator.Position
+            );
+            var wrapperFunc = decoratorCallExpr.Run(manager);
+
+            if (wrapperFunc is not FuncLangValue wrapper)
+            {
+                throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
+            }
+
+            // 第二步：调用包装器，传入目标函数
+            result = wrapper.Run(manager, [new LangId(tempFuncName, position: decorator.Position)]);
+        }
+        else
+        {
+            // 无参数的装饰器：直接调用装饰器函数，传入目标函数
+            var decoratorId = new LangId(decorator.Name, position: decorator.Position);
+            var decoratorFunc = manager.GetValue(decoratorId);
+
+            if (decoratorFunc is null)
+            {
+                throw new NameError(decorator.Position, decorator.Name);
+            }
+
+            if (decoratorFunc is not FuncLangValue)
+            {
+                throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须是一个函数");
+            }
+
+            var callExpr = new FunctionCallExpression(
+                decoratorId,
+                [new LangId(tempFuncName, position: decorator.Position)],
+                decorator.Position
+            );
+            result = callExpr.Run(manager);
+        }
+
+        // 装饰器应该返回一个新的函数
+        if (result is not FuncLangValue wrappedFunc)
+        {
+            throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
+        }
+
+        // 保留原函数的名称，但不保留返回类型注解
+        // 因为装饰器可能会改变函数的返回类型
+        if (targetFunc.Id is not null)
+        {
+            // 创建新的 LangId，只保留名称，不保留返回类型注解
+            var newId = new LangId(targetFunc.Id.IdName, position: targetFunc.Id.Position);
+
+            return new FuncLangValue(
+                newId,
+                wrappedFunc.Ids ?? [],
+                wrappedFunc.BlockStatement,
+                wrappedFunc.GenericParameters,
+                wrappedFunc.Position,
+                isLambda: false
+            )
+            {
+                CapturedScope = wrappedFunc.CapturedScope
+            };
+        }
+
+        return wrappedFunc;
     }
 
 

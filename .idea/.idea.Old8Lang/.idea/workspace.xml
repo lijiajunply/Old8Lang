@@ -23,11 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCyclicBarrierTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCyclicBarrierTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SimpleStatements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.SimpleStatements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/DecoratorInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/DecoratorInterpreterTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Execution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Execution.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Functions/FuncLangValue.Main.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +573,7 @@
       <workItem from="1769673067148" duration="4480000" />
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
-      <workItem from="1769878790800" duration="11904000" />
+      <workItem from="1769878790800" duration="15414000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="840" />
+    <option name="localTasksCounter" value="841" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
     <MESSAGE value="feat(lang): 添加原生函数命名参数支持&#10;&#10;- 实现原生 .NET 方法和 P/Invoke 函数的命名参数调用功能&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 为 NativeDelegateFuncLangValue 添加命名参数处理逻辑&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 添加测试脚本验证命名参数功能的正确性" />
     <MESSAGE value="feat(lang): 添加原生函数和Python函数命名参数支持&#10;&#10;- 实现原生 .NET 方法、P/Invoke 函数和 Python 函数的命名参数调用&#10;- 在 FuncLangValue.Execution.cs 中添加 ReorderNativeMethodArguments 方法&#10;- 在 PythonFunctionLangValue.cs 中添加 ExecutePythonFunctionWithNamedArgs 方法&#10;- 支持位置参数和命名参数混合使用以及参数重新排序&#10;- 实现参数验证、重复参数检查和必需参数确认机制&#10;- 完全向后兼容，现有代码无需修改&#10;- 更新文档说明命名参数的使用方法和优势" />
     <MESSAGE value="feat(lang): 添加C#程序集导入功能&#10;&#10;- 新增CSharpDllProvider类实现C#程序集加载和方法调用&#10;- 支持extern &quot;C#:AssemblyName&quot; ClassName语法导入静态方法&#10;- 实现解释器和编译器模式下的C#方法调用支持&#10;- 添加类型转换机制支持Old8Lang与.NET类型互转&#10;- 支持多种程序集查找方式包括GAC和文件路径加载&#10;- 新增C# extern语法解析和类型检测功能&#10;- 添加Math类静态方法导入测试用例" />
@@ -969,7 +969,8 @@
     <MESSAGE value="feat(compiler): 实现LINQ表达式的完整编译器支持&#10;&#10;- 添加了对Join、GroupBy、OrderBy、Let等复杂子句的IL代码生成&#10;- 实现了查询延续（into子句）功能的编译器支持&#10;- 新增LinqCompilerHelper辅助类处理类型转换和比较操作&#10;- 添加了两个新的测试文件验证LINQ Into和Join功能&#10;- 重构了变量管理机制，使用局部变量替代VariateManager&#10;- 优化了类型转换逻辑，提升编译性能和代码可读性" />
     <MESSAGE value="refactor(compiler): 移除特殊函数调用处理逻辑&#10;&#10;- 删除了 Spawn 函数的特殊处理代码&#10;- 移除了 TaskRun 函数的特殊处理逻辑&#10;- 清理了 spawn 函数的线程创建特殊处理&#10;- 简化了函数调用流程为统一的普通函数调用处理&#10;- 更新了 IDEA 工作空间配置文件中的变更记录&#10;- 调整了工作时间统计和本地任务计数器" />
     <MESSAGE value="refactor(tests): 更新并发测试中的线程启动方式&#10;&#10;- 将spawn调用改为先赋值给变量再调用Start方法&#10;- 统一了线程创建和启动的语法模式&#10;- 提高了测试代码的一致性和可读性&#10;- 确保所有线程在适当时候开始执行&#10;- 保持了原有测试逻辑不变&#10;- 优化了多线程同步的实现方式" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 更新并发测试中的线程启动方式&#10;&#10;- 将spawn调用改为先赋值给变量再调用Start方法&#10;- 统一了线程创建和启动的语法模式&#10;- 提高了测试代码的一致性和可读性&#10;- 确保所有线程在适当时候开始执行&#10;- 保持了原有测试逻辑不变&#10;- 优化了多线程同步的实现方式" />
+    <MESSAGE value="feat(parser): 支持链式调用表达式作为语句执行&#10;&#10;- 扩展 FuncRunStatement 支持任意表达式而不仅仅是函数调用&#10;- 添加新的构造函数和字段用于存储通用表达式&#10;- 实现表达式运行逻辑支持链式调用结果执行&#10;- 集成 IL 代码生成支持表达式值的加载和清理&#10;- 更新字符串表示和访问者模式支持新表达式类型&#10;- 修改解析器支持点号表达式链式调用语法&#10;- 简化并发测试中线程启动的链式调用写法" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持链式调用表达式作为语句执行&#10;&#10;- 扩展 FuncRunStatement 支持任意表达式而不仅仅是函数调用&#10;- 添加新的构造函数和字段用于存储通用表达式&#10;- 实现表达式运行逻辑支持链式调用结果执行&#10;- 集成 IL 代码生成支持表达式值的加载和清理&#10;- 更新字符串表示和访问者模式支持新表达式类型&#10;- 修改解析器支持点号表达式链式调用语法&#10;- 简化并发测试中线程启动的链式调用写法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

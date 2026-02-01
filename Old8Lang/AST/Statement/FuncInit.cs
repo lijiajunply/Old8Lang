@@ -55,8 +55,10 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             }
         }
 
-        // 应用装饰器（如果有）
-        var finalFunc = ApplyDecorators(FuncValue, manager);
+        // 不立即应用装饰器，而是保留装饰器信息
+        // 装饰器将在函数第一次被调用时应用（延迟应用）
+        // 这样可以确保装饰器可以访问全局变量
+        var finalFunc = FuncValue;
 
         // 如果函数还没有捕获作用域，并且当前在模块导入上下文中（ImportStack不为空），
         // 则捕获当前作用域，以便函数能访问模块中导入的符号

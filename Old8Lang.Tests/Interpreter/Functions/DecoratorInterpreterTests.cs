@@ -522,11 +522,14 @@ public class DecoratorInterpreterTests
     public void Interpreter_UndefinedDecorator_ThrowsError()
     {
         // Arrange
+        // 由于延迟装饰器应用，未定义的装饰器错误会在函数第一次被调用时抛出
         var code = @"
             @nonexistent
             func test(x:int) -> int {
                 return x
             }
+
+            result <- test(5)
         ";
         var interpreter = new LangInterpreter();
 
