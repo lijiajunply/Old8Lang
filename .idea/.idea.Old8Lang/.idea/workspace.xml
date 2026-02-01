@@ -23,10 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/BytecodeSerialization/VMBytecodeSerializationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.Linq.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.Linq.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.FunctionCall.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -571,7 +568,7 @@
       <workItem from="1769673067148" duration="4480000" />
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
-      <workItem from="1769878790800" duration="6024000" />
+      <workItem from="1769878790800" duration="10031000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -916,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="836" />
+    <option name="localTasksCounter" value="838" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -943,8 +940,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
-    <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
     <MESSAGE value="feat(vm): 实现异步生成器指令和相关测试&#10;&#10;- 实现 NewAsyncGenerator 指令，支持异步生成器函数创建和状态管理&#10;- 实现 CallAsyncGenerator 指令，支持异步生成器函数调用和参数传递&#10;- 添加异步生成器函数验证和错误处理机制&#10;- 优化 VMAsyncGeneratorTests 中的换行符规范化处理&#10;- 修复测试代码中 ToStr() 方法调用的语法错误&#10;- 更新 IDEA 工作空间配置文件中的变更列表记录" />
     <MESSAGE value="feat(lang): 添加命名参数支持功能&#10;&#10;- 在 BaseGlobalFunction 和 IGlobalFunction 中添加 ParameterNames 属性&#10;- 为 SleepFunction 实现参数名称映射&#10;- 在 Instance.GlobalFunctions 中实现命名参数到位置参数的转换逻辑&#10;- 为 NativeAnyLangValue 添加命名参数处理方法&#10;- 在 NativeStaticAny 中实现静态方法的命名参数支持&#10;- 添加参数验证和错误处理机制&#10;- 创建测试脚本验证全局函数和原生函数的命名参数功能" />
     <MESSAGE value="feat(lang): 添加全局函数命名参数支持和函数信息查询功能&#10;&#10;- 为所有全局函数添加 ParameterNames 属性支持命名参数调用&#10;- 实现 GetFunctionInfo 函数用于查询全局函数的参数信息&#10;- 支持通过命名参数方式调用全局函数，提升代码可读性&#10;- 添加函数信息查询功能，返回函数签名和参数详情&#10;- 完全向后兼容，不影响现有代码的正常使用&#10;- 更新文档说明命名参数的使用方法和优势" />
@@ -968,7 +963,9 @@
     <MESSAGE value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
     <MESSAGE value="test(parser): 更新高级操作符测试以验证嵌套索引访问&#10;&#10;- 添加 NestedIndexAccess 类型断言替代 Operation 类型&#10;- 导入 Intermediates 命名空间支持测试验证&#10;- 修正表达式解析器的索引操作符处理逻辑&#10;- 更新相关测试用例以匹配新的 AST 结构&#10;&#10;chore(devtools): 添加超时命令到 Claude 工作流配置&#10;&#10;- 在 settings.local.json 中增加 Bash(timeout:*) 指令&#10;- 更新 IDE 工作区配置以包含最新变更跟踪&#10;- 修正任务计数器同步工作项统计" />
     <MESSAGE value="feat(linq): 实现 LINQ Join 子句和高级列表方法&#10;&#10;- 添加完整的 LINQ Join 子句支持，包括 inner join 和 group join 功能&#10;- 实现 Join 子句的语法解析和执行逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(linq): 实现 LINQ Join 子句和高级列表方法&#10;&#10;- 添加完整的 LINQ Join 子句支持，包括 inner join 和 group join 功能&#10;- 实现 Join 子句的语法解析和执行逻辑" />
+    <MESSAGE value="feat(linq): 实现 LINQ Join 子句和 OrderBy 功能&#10;&#10;- 添加完整的 LINQ Join 子句支持，包括 inner join 和 group join 功能&#10;- 实现 Join 子句的字节码生成和执行逻辑&#10;- 添加 OrderBy 和 ThenBy 排序功能的虚拟机支持&#10;- 实现排序算法支持升序和降序排列&#10;- 添加 LINQ Join 和 OrderBy 相关的单元测试&#10;- 优化类型参数映射使用 GetValueOrDefault 方法&#10;- 更新测试代码中的构造函数名称为 init&#10;- 修改 Lambda 表达式语法支持返回类型声明" />
+    <MESSAGE value="feat(compiler): 实现LINQ表达式的完整编译器支持&#10;&#10;- 添加了对Join、GroupBy、OrderBy、Let等复杂子句的IL代码生成&#10;- 实现了查询延续（into子句）功能的编译器支持&#10;- 新增LinqCompilerHelper辅助类处理类型转换和比较操作&#10;- 添加了两个新的测试文件验证LINQ Into和Join功能&#10;- 重构了变量管理机制，使用局部变量替代VariateManager&#10;- 优化了类型转换逻辑，提升编译性能和代码可读性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现LINQ表达式的完整编译器支持&#10;&#10;- 添加了对Join、GroupBy、OrderBy、Let等复杂子句的IL代码生成&#10;- 实现了查询延续（into子句）功能的编译器支持&#10;- 新增LinqCompilerHelper辅助类处理类型转换和比较操作&#10;- 添加了两个新的测试文件验证LINQ Into和Join功能&#10;- 重构了变量管理机制，使用局部变量替代VariateManager&#10;- 优化了类型转换逻辑，提升编译性能和代码可读性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
