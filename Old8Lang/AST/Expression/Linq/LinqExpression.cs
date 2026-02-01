@@ -70,7 +70,7 @@ public partial class LinqExpression(
         // 2. 转换为 IEnumerable
         ConvertToEnumerable(ilGenerator);
 
-        // 3. 处理查询体子句（where, orderby, let 等）
+        // 3. 处理查询体子句（where, orderby, let, join 等）
         foreach (var clause in BodyClauses)
         {
             GenerateClauseIL(clause, ilGenerator, local);
@@ -79,7 +79,13 @@ public partial class LinqExpression(
         // 4. 处理终止子句（select 或 group）
         GenerateTerminationClauseIL(TerminationClause, ilGenerator, local);
 
-        // 5. 转换结果为 ListLangValue
+        // 5. 处理查询延续（into 子句）
+        if (Continuation != null)
+        {
+            GenerateContinuationIL(Continuation, ilGenerator, local);
+        }
+
+        // 6. 转换结果为 ListLangValue
         ConvertToListLangValue(ilGenerator, local);
     }
 
@@ -88,42 +94,8 @@ public partial class LinqExpression(
     /// </summary>
     private void ConvertToEnumerable(ILGenerator ilGenerator)
     {
-        // 调用 LinqQueryExecutor.ConvertToEnumerable 的等价逻辑
-        // 简化实现：假设数据源已经是 ILangList 或 ArrayLangValue
-
-        // 检查是否是 ILangList
-        var notListLabel = ilGenerator.DefineLabel();
-        var endLabel = ilGenerator.DefineLabel();
-
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(ILangList));
-        ilGenerator.Emit(OpCodes.Brfalse_S, notListLabel);
-
-        // 如果是 ILangList，调用 GetItems()
-        ilGenerator.Emit(OpCodes.Castclass, typeof(ILangList));
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangList).GetMethod("GetItems")!);
-        ilGenerator.Emit(OpCodes.Br_S, endLabel);
-
-        // 如果不是 ILangList，检查是否是 ArrayLangValue
-        ilGenerator.MarkLabel(notListLabel);
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(ArrayLangValue));
-        var notArrayLabel = ilGenerator.DefineLabel();
-        ilGenerator.Emit(OpCodes.Brfalse_S, notArrayLabel);
-
-        // 如果是 ArrayLangValue，获取 Values 属性
-        ilGenerator.Emit(OpCodes.Castclass, typeof(ArrayLangValue));
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ArrayLangValue).GetProperty("Values")!.GetMethod!);
-        ilGenerator.Emit(OpCodes.Br_S, endLabel);
-
-        // 如果都不是，抛出异常
-        ilGenerator.MarkLabel(notArrayLabel);
-        ilGenerator.Emit(OpCodes.Pop);
-        ilGenerator.Emit(OpCodes.Ldstr, "无法将数据源转换为 IEnumerable");
-        ilGenerator.Emit(OpCodes.Newobj, typeof(InvalidOperationException).GetConstructor([typeof(string)])!);
-        ilGenerator.Emit(OpCodes.Throw);
-
-        ilGenerator.MarkLabel(endLabel);
+        // 使用辅助方法进行转换，简化 IL 代码生成
+        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
     }
 
     public override Type OutputType(LocalManager local)
@@ -147,6 +119,9 @@ public partial class LinqExpression(
                 break;
             case LetClause letClause:
                 GenerateLetClauseIL(letClause, ilGenerator, local);
+                break;
+            case JoinClause joinClause:
+                GenerateJoinClauseIL(joinClause, ilGenerator, local);
                 break;
             default:
                 throw new NotSupportedException($"不支持的 LINQ 子句类型: {clause.GetType().Name}");

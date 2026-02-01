@@ -1,0 +1,46 @@
+// LINQ Join 编译器模式测试
+
+// 测试1: Inner Join 基础测试
+list1 <- {1, 2, 3}
+list2 <- {2, 3, 4}
+
+result1 <- from x in list1 join y in list2 on x == y select x
+
+PrintLine("测试1 - Inner Join 基础:")
+PrintLine(result1.ToStr())
+
+// 测试2: Inner Join 无匹配
+list3 <- {1, 2, 3}
+list4 <- {4, 5, 6}
+
+result2 <- from x in list3 join y in list4 on x == y select x
+
+PrintLine("测试2 - Inner Join 无匹配:")
+PrintLine(result2.ToStr())
+
+// 测试3: Group Join (简化版，不调用 Count)
+categories <- {1, 2, 3}
+items <- {1, 1, 2, 2, 2, 3}
+
+result3 <- from c in categories join i in items on c == i into g select g
+
+PrintLine("测试3 - Group Join:")
+PrintLine(result3.ToStr())
+
+// 测试4: Join + Where
+list5 <- {1, 2, 3, 4, 5}
+list6 <- {2, 3, 4}
+
+result4 <- from x in list5 join y in list6 on x == y where x > 2 select x
+
+PrintLine("测试4 - Join + Where:")
+PrintLine(result4.ToStr())
+
+// 测试5: 多重匹配
+list7 <- {1, 2, 2, 3}
+list8 <- {2, 2, 4}
+
+result5 <- from x in list7 join y in list8 on x == y select x
+
+PrintLine("测试5 - 多重匹配:")
+PrintLine(result5.ToStr())
