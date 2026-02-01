@@ -89,9 +89,13 @@ public class VMConcurrencyCyclicBarrierTests
                 PrintLine(""Worker "" + id.ToStr() + "" passed"")
             }
 
-            spawn(() -> worker(1))
-            spawn(() -> worker(2))
-            spawn(() -> worker(3))
+            t1 <- spawn(() -> worker(1))
+            t2 <- spawn(() -> worker(2))
+            t3 <- spawn(() -> worker(3))
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
             CyclicBarrierDispose(barrier)
@@ -116,10 +120,12 @@ public class VMConcurrencyCyclicBarrierTests
         var code = @"
             barrier <- CyclicBarrierCreate(2)
 
-            spawn(() -> {
+            t <- spawn(() -> {
                 Sleep(50)
                 CyclicBarrierAwait(barrier)
             })
+
+            t.Start()
 
             result <- CyclicBarrierAwaitTimeout(barrier, 1000)
             CyclicBarrierDispose(barrier)
@@ -164,19 +170,23 @@ public class VMConcurrencyCyclicBarrierTests
         var code = @"
             barrier <- CyclicBarrierCreate(3)
 
-            spawn(() -> {
+            t1 <- spawn(() -> {
                 CyclicBarrierAwait(barrier)
             })
-
+            
+            t1.Start()
             Sleep(100)
             result <- CyclicBarrierGetWaitingCount(barrier)
 
-            spawn(() -> {
+            t2 <- spawn(() -> {
                 CyclicBarrierAwait(barrier)
             })
-            spawn(() -> {
+            t3 <- spawn(() -> {
                 CyclicBarrierAwait(barrier)
             })
+
+            t2.Start()
+            t3.Start()
 
             Sleep(200)
             CyclicBarrierDispose(barrier)
@@ -208,8 +218,11 @@ public class VMConcurrencyCyclicBarrierTests
                 }
             }
 
-            spawn(worker)
-            spawn(worker)
+            t1 <- spawn(worker)
+            t2 <- spawn(worker)
+
+            t1.Start()
+            t2.Start()
 
             Sleep(500)
 
@@ -269,9 +282,13 @@ public class VMConcurrencyCyclicBarrierTests
                 results.Add(""Phase3-"" + id.ToStr())
             }
 
-            spawn(() -> worker(1))
-            spawn(() -> worker(2))
-            spawn(() -> worker(3))
+            t1 <- spawn(() -> worker(1))
+            t2 <- spawn(() -> worker(2))
+            t3 <- spawn(() -> worker(3))
+
+            t1.Start()
+            t2.Start()
+            t3.Start()
 
             Sleep(500)
 
@@ -328,7 +345,8 @@ public class VMConcurrencyCyclicBarrierTests
             }
 
             for i in [1~5] {
-                spawn(worker)
+                t <- spawn(worker)
+                t.Start()
             }
 
             Sleep(1000)
