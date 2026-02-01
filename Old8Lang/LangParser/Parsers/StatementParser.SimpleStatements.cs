@@ -157,10 +157,18 @@ public partial class StatementParser
     public FuncRunStatement ParseFuncRunStatement()
     {
         var funcName = CurrentToken.Value;
+        var position = new SourcePosition(CurrentToken.Line, CurrentToken.Column, tokenValue: CurrentToken.Value);
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.LeftParen);
         functionParser.ParseArgList(out var positionalArgs, out var namedArgs);
         Expect(LangTokenType.RightParen);
-        return new FuncRunStatement(new Instance(new LangId(funcName), positionalArgs, namedArgs));
+
+        // 创建初始的函数调用表达式
+        LangExpression expr = new Instance(new LangId(funcName), positionalArgs, namedArgs);
+
+        // 处理链式调用：spawn(worker).Start() 或 func().method().property
+        expr = expressionParser.ParseDotExpr(expr);
+
+        return new FuncRunStatement(expr, position);
     }
 }

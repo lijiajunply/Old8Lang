@@ -218,11 +218,8 @@ public class VMConcurrencyCyclicBarrierTests
                 }
             }
 
-            t1 <- spawn(worker)
-            t2 <- spawn(worker)
-
-            t1.Start()
-            t2.Start()
+            spawn(worker).Start()
+            spawn(worker).Start()
 
             Sleep(500)
 

@@ -13,8 +13,10 @@ public class FuncRunStatement : OldStatement
     private readonly Operation? _operation;
     private readonly AwaitExpression? _awaitExpr;
     private readonly GenericInstanceExpression? _genericInstance;
+    private readonly LangExpression? _expression;
 
     public LangExpression? Expression =>
+        _expression ??
         (LangExpression?)_awaitExpr ??
         (LangExpression?)_genericInstance ??
         (LangExpression?)_instance ??
@@ -33,8 +35,20 @@ public class FuncRunStatement : OldStatement
         base(position) =>
         _genericInstance = genericInstance;
 
+    /// <summary>
+    /// 通用构造函数，支持任意表达式（包括链式调用结果）
+    /// </summary>
+    public FuncRunStatement(LangExpression expression, SourcePosition position = default) : base(position) =>
+        _expression = expression;
+
     public override void Run(VariateManager manager)
     {
+        if (_expression is not null)
+        {
+            _expression.Run(manager);
+            return;
+        }
+
         if (_awaitExpr is not null)
         {
             _awaitExpr.Run(manager);
@@ -58,6 +72,15 @@ public class FuncRunStatement : OldStatement
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        if (_expression is not null)
+        {
+            _expression.LoadIlValue(ilGenerator, local);
+            // 销毁栈上的值
+            var outputType = _expression.OutputType(local);
+            if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return;
+        }
+
         if (_awaitExpr is not null)
         {
             _awaitExpr.LoadIlValue(ilGenerator, local);
@@ -89,6 +112,7 @@ public class FuncRunStatement : OldStatement
     public override int Count => 0;
 
     public override string? ToString() =>
+        _expression is not null ? _expression.ToString() :
         _awaitExpr is not null ? _awaitExpr.ToString() :
         _genericInstance is not null ? _genericInstance.ToString() :
         _instance is null ? _operation is null ? "" : _operation.ToString() : _instance.ToString();
@@ -97,6 +121,11 @@ public class FuncRunStatement : OldStatement
     {
         // FuncRunStatement 是一个包装表达式作为语句的节点
         // 它内部只包含一个表达式,我们让这个表达式接受visitor,然后丢弃结果
+        if (_expression != null)
+        {
+            return _expression.Accept(visitor);
+        }
+
         if (_instance != null)
         {
             return _instance.Accept(visitor);
