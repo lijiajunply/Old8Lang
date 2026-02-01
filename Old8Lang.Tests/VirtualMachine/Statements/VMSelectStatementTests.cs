@@ -44,7 +44,7 @@ public class VMSelectStatementTests
             spawn(() -> {
                 val <- ChannelReceive(ch)
                 PrintLine(""Received: "" + val.ToStr())
-            })
+            }).Start()
 
             Sleep(50)
 
@@ -76,7 +76,7 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(50)
                 ChannelSend(ch, 100)
-            })
+            }).Start()
 
             select {
                 case val from ch -> {
@@ -131,12 +131,12 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(50)
                 ChannelSend(ch1, 1)
-            })
+            }).Start()
 
             spawn(() -> {
                 Sleep(100)
                 ChannelSend(ch2, 2)
-            })
+            }).Start()
 
             select {
                 case val from ch1 -> {
@@ -170,12 +170,12 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(50)
                 ChannelSend(ch1, 123)
-            })
+            }).Start()
 
             spawn(() -> {
                 val <- ChannelReceive(ch2)
                 PrintLine(""ch2 received: "" + val.ToStr())
-            })
+            }).Start()
 
             select {
                 case val from ch1 -> {
@@ -213,7 +213,7 @@ public class VMSelectStatementTests
                     Sleep(20)
                 }
                 ChannelClose(ch)
-            })
+            }).Start()
 
             for i in [1~5] {
                 select {
@@ -253,7 +253,7 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(200)
                 ChannelSend(ch, 42)
-            })
+            }).Start()
 
             select {
                 case val from ch -> {
@@ -310,8 +310,8 @@ public class VMSelectStatementTests
                 }
             }
 
-            spawn(producer)
-            spawn(consumer)
+            spawn(producer).Start()
+            spawn(consumer).Start()
 
             results <- {}
             for i in [1~3] {
@@ -349,7 +349,7 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(50)
                 ChannelSend(ch1, 1)
-            })
+            }).Start()
 
             select {
                 case val from ch1 -> {
@@ -392,7 +392,7 @@ public class VMSelectStatementTests
             spawn(() -> {
                 Sleep(30)
                 ChannelSend(ch2, 2)
-            })
+            }).Start()
 
             select {
                 case val from ch1 -> {

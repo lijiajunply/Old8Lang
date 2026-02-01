@@ -110,7 +110,7 @@ public class VMConcurrencyCountDownLatchTests
                 CountDownLatchCountDown(latch)
                 Sleep(100)
                 CountDownLatchCountDown(latch)
-            })
+            }).Start()
 
             PrintLine(""Waiting..."")
             CountDownLatchWait(latch)
@@ -139,7 +139,7 @@ public class VMConcurrencyCountDownLatchTests
             spawn(() -> {
                 Sleep(50)
                 CountDownLatchCountDown(latch)
-            })
+            }).Start()
 
             result <- CountDownLatchWaitTimeout(latch, 1000)
             CountDownLatchDispose(latch)
@@ -190,9 +190,9 @@ public class VMConcurrencyCountDownLatchTests
                 CountDownLatchCountDown(latch)
             }
 
-            spawn(() -> worker(1))
-            spawn(() -> worker(2))
-            spawn(() -> worker(3))
+            spawn(() -> worker(1)).Start()
+            spawn(() -> worker(2)).Start()
+            spawn(() -> worker(3)).Start()
 
             PrintLine(""Waiting for workers..."")
             CountDownLatchWait(latch)
@@ -272,9 +272,9 @@ public class VMConcurrencyCountDownLatchTests
                 AtomicIntIncrement(counter)
             }
 
-            spawn(worker)
-            spawn(worker)
-            spawn(worker)
+            spawn(worker).Start()
+            spawn(worker).Start()
+            spawn(worker).Start()
 
             Sleep(100)
             CountDownLatchCountDown(startGate)
@@ -309,9 +309,9 @@ public class VMConcurrencyCountDownLatchTests
                 results.Add(id)
             }
 
-            spawn(() -> waiter(1))
-            spawn(() -> waiter(2))
-            spawn(() -> waiter(3))
+            spawn(() -> waiter(1)).Start()
+            spawn(() -> waiter(2)).Start()
+            spawn(() -> waiter(3)).Start()
 
             Sleep(100)
             CountDownLatchCountDown(latch)
