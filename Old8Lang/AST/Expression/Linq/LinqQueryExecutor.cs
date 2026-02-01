@@ -24,6 +24,15 @@ public class LinqQueryExecutor(VariateManager manager)
         // 检查是否有 OrderBy 子句
         var hasOrderBy = linqExpr.BodyClauses.Any(c => c is OrderByClause);
 
+        // 检查是否有 Join 子句
+        var hasJoin = linqExpr.BodyClauses.Any(c => c is JoinClause);
+
+        // 如果有 Join 子句，使用特殊的处理流程
+        if (hasJoin)
+        {
+            return ExecuteQueryWithJoin(linqExpr, dataSource);
+        }
+
         // 使用统一的迭代器处理所有子句
         var intermediateResults = new List<(object? item, Dictionary<string, LangValueType> letVariables)>();
         var result = new List<object?>();
@@ -152,6 +161,228 @@ public class LinqQueryExecutor(VariateManager manager)
         }
 
         // 将结果转换为 Old8Lang 的 List
+        return ConvertToLangList(result);
+    }
+
+    /// <summary>
+    /// 执行包含 Join 子句的 LINQ 查询
+    /// </summary>
+    private LangValueType ExecuteQueryWithJoin(LinqExpression linqExpr, IEnumerable dataSource)
+    {
+        var result = new List<object?>();
+        var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
+
+        // 将数据源转换为列表以便多次遍历
+        var sourceList = dataSource.Cast<object?>().ToList();
+
+        // 处理每个外部元素
+        foreach (var outerItem in sourceList)
+        {
+            // 设置外部范围变量
+            var oldOuterValue = manager.GetValue(rangeLangId);
+            manager.Set(rangeLangId, ConvertToLangValue(outerItem));
+
+            try
+            {
+                // 处理所有子句
+                var currentItems = new List<Dictionary<string, object?>>
+                {
+                    new() { [linqExpr.FromClause.RangeVariable] = outerItem }
+                };
+
+                var shouldInclude = true;
+                var letVariables = new Dictionary<string, LangValueType>();
+
+                foreach (var clause in linqExpr.BodyClauses)
+                {
+                    if (clause is JoinClause joinClause)
+                    {
+                        // 执行 Join
+                        var newItems = new List<Dictionary<string, object?>>();
+                        var innerRangeLangId = new LangId(joinClause.RangeVariable);
+
+                        // 获取内部数据源
+                        var innerSourceValue = joinClause.InnerDataSource.Run(manager);
+                        var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
+
+                        // 计算外部键
+                        var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                        var outerKey = ConvertFromLangValue(outerKeyValue);
+
+                        if (joinClause.IsGroupJoin && joinClause.GroupVariable is not null)
+                        {
+                            // Group Join: 收集所有匹配的内部元素
+                            var matchingInnerItems = new List<LangValueType>();
+
+                            foreach (var innerItem in innerSource)
+                            {
+                                var oldInnerValue = manager.GetValue(innerRangeLangId);
+                                manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+
+                                try
+                                {
+                                    var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                                    var innerKey = ConvertFromLangValue(innerKeyValue);
+
+                                    if (KeysEqual(outerKey, innerKey))
+                                    {
+                                        matchingInnerItems.Add(ConvertToLangValue(innerItem));
+                                    }
+                                }
+                                finally
+                                {
+                                    if (oldInnerValue is not null)
+                                        manager.Set(innerRangeLangId, oldInnerValue);
+                                }
+                            }
+
+                            // 设置分组变量
+                            var groupLangId = new LangId(joinClause.GroupVariable);
+                            manager.Set(groupLangId, new ListLangValue(matchingInnerItems));
+
+                            // 保留当前项（分组变量已设置）
+                            foreach (var currentItem in currentItems)
+                            {
+                                var newItem = new Dictionary<string, object?>(currentItem)
+                                {
+                                    [joinClause.GroupVariable] = matchingInnerItems
+                                };
+                                newItems.Add(newItem);
+                            }
+                        }
+                        else
+                        {
+                            // Inner Join: 为每个匹配创建新项
+                            foreach (var innerItem in innerSource)
+                            {
+                                var oldInnerValue = manager.GetValue(innerRangeLangId);
+                                manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+
+                                try
+                                {
+                                    var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                                    var innerKey = ConvertFromLangValue(innerKeyValue);
+
+                                    if (KeysEqual(outerKey, innerKey))
+                                    {
+                                        foreach (var currentItem in currentItems)
+                                        {
+                                            var newItem = new Dictionary<string, object?>(currentItem)
+                                            {
+                                                [joinClause.RangeVariable] = innerItem
+                                            };
+                                            newItems.Add(newItem);
+                                        }
+                                    }
+                                }
+                                finally
+                                {
+                                    if (oldInnerValue is not null)
+                                        manager.Set(innerRangeLangId, oldInnerValue);
+                                }
+                            }
+                        }
+
+                        currentItems = newItems;
+
+                        // 如果没有匹配项，跳过此外部元素
+                        if (currentItems.Count == 0)
+                        {
+                            shouldInclude = false;
+                            break;
+                        }
+                    }
+                    else if (clause is LetClause letClause)
+                    {
+                        var letValue = letClause.Expression.Run(manager);
+                        var letId = new LangId(letClause.Variable);
+                        manager.Set(letId, letValue);
+                        letVariables[letClause.Variable] = letValue;
+                    }
+                    else if (clause is WhereClause whereClause)
+                    {
+                        // 对每个当前项检查 where 条件
+                        var filteredItems = new List<Dictionary<string, object?>>();
+
+                        foreach (var currentItem in currentItems)
+                        {
+                            // 设置所有变量
+                            foreach (var (varName, varValue) in currentItem)
+                            {
+                                if (varValue is not null)
+                                    manager.Set(new LangId(varName), ConvertToLangValue(varValue));
+                            }
+
+                            var conditionResult = whereClause.Condition.Run(manager);
+                            if (IsTruthy(conditionResult))
+                            {
+                                filteredItems.Add(currentItem);
+                            }
+                        }
+
+                        currentItems = filteredItems;
+
+                        if (currentItems.Count == 0)
+                        {
+                            shouldInclude = false;
+                            break;
+                        }
+                    }
+                }
+
+                // 如果通过了所有条件，执行 select
+                if (shouldInclude && currentItems.Count > 0)
+                {
+                    foreach (var currentItem in currentItems)
+                    {
+                        // 设置所有变量
+                        foreach (var (varName, varValue) in currentItem)
+                        {
+                            if (varValue is not null)
+                            {
+                                // 特殊处理 List<LangValueType>（group join 的分组变量）
+                                if (varValue is List<LangValueType> listValue)
+                                {
+                                    manager.Set(new LangId(varName), new ListLangValue(listValue));
+                                }
+                                else
+                                {
+                                    manager.Set(new LangId(varName), ConvertToLangValue(varValue));
+                                }
+                            }
+                        }
+
+                        // 恢复 let 变量
+                        foreach (var (varName, varValue) in letVariables)
+                        {
+                            manager.Set(new LangId(varName), varValue);
+                        }
+
+                        if (linqExpr.TerminationClause is SelectClause selectClause)
+                        {
+                            var projectedValue = selectClause.Projection.Run(manager);
+                            result.Add(ConvertFromLangValue(projectedValue));
+                        }
+                        else if (linqExpr.TerminationClause is GroupByClause)
+                        {
+                            result.Add(currentItem);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (oldOuterValue is not null)
+                    manager.Set(rangeLangId, oldOuterValue);
+            }
+        }
+
+        // 处理查询延续（into）
+        if (linqExpr.Continuation is not null)
+        {
+            result = ExecuteContinuation(linqExpr.Continuation, result).Cast<object?>().ToList();
+        }
+
         return ConvertToLangList(result);
     }
 
@@ -562,13 +793,150 @@ public class LinqQueryExecutor(VariateManager manager)
     }
 
     /// <summary>
-    /// 执行 join 子句（暂不实现，较复杂）
+    /// 执行 join 子句
+    /// 支持 inner join 和 group join 两种模式
     /// </summary>
     private IEnumerable ExecuteJoin(JoinClause joinClause, IEnumerable source, string rangeVariable)
     {
-        // join 子句的实现较为复杂，涉及到两个数据源的关联
-        // 暂时不支持，未来版本会添加支持
-        throw new NotSupportedException("LINQ join 子句暂未实现，将在未来版本中添加支持");
+        var result = new List<object?>();
+        var rangeLangId = new LangId(rangeVariable);
+        var innerRangeLangId = new LangId(joinClause.RangeVariable);
+
+        // 获取内部数据源
+        var innerSourceValue = joinClause.InnerDataSource.Run(manager);
+        var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
+
+        // 如果是 group join（join ... into groupVar）
+        if (joinClause.IsGroupJoin && joinClause.GroupVariable is not null)
+        {
+            var groupLangId = new LangId(joinClause.GroupVariable);
+
+            foreach (var outerItem in source)
+            {
+                // 设置外部范围变量
+                var oldOuterValue = manager.GetValue(rangeLangId);
+                manager.Set(rangeLangId, ConvertToLangValue(outerItem));
+
+                try
+                {
+                    // 计算外部键
+                    var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                    var outerKey = ConvertFromLangValue(outerKeyValue);
+
+                    // 查找所有匹配的内部元素
+                    var matchingInnerItems = new List<LangValueType>();
+
+                    foreach (var innerItem in innerSource)
+                    {
+                        // 设置内部范围变量
+                        var oldInnerValue = manager.GetValue(innerRangeLangId);
+                        manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+
+                        try
+                        {
+                            // 计算内部键
+                            var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                            var innerKey = ConvertFromLangValue(innerKeyValue);
+
+                            // 比较键是否相等
+                            if (KeysEqual(outerKey, innerKey))
+                            {
+                                matchingInnerItems.Add(ConvertToLangValue(innerItem));
+                            }
+                        }
+                        finally
+                        {
+                            if (oldInnerValue is not null)
+                                manager.Set(innerRangeLangId, oldInnerValue);
+                        }
+                    }
+
+                    // 设置分组变量（包含所有匹配的内部元素）
+                    manager.Set(groupLangId, new ListLangValue(matchingInnerItems));
+
+                    // 将外部元素添加到结果（分组变量已设置，后续子句可以访问）
+                    result.Add(outerItem);
+                }
+                finally
+                {
+                    if (oldOuterValue is not null)
+                        manager.Set(rangeLangId, oldOuterValue);
+                }
+            }
+        }
+        else
+        {
+            // 普通 inner join
+            foreach (var outerItem in source)
+            {
+                // 设置外部范围变量
+                var oldOuterValue = manager.GetValue(rangeLangId);
+                manager.Set(rangeLangId, ConvertToLangValue(outerItem));
+
+                try
+                {
+                    // 计算外部键
+                    var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                    var outerKey = ConvertFromLangValue(outerKeyValue);
+
+                    foreach (var innerItem in innerSource)
+                    {
+                        // 设置内部范围变量
+                        var oldInnerValue = manager.GetValue(innerRangeLangId);
+                        manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+
+                        try
+                        {
+                            // 计算内部键
+                            var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                            var innerKey = ConvertFromLangValue(innerKeyValue);
+
+                            // 比较键是否相等
+                            if (KeysEqual(outerKey, innerKey))
+                            {
+                                // 创建包含两个元素的元组作为结果
+                                var joinedItem = new Dictionary<string, object?>
+                                {
+                                    [rangeVariable] = outerItem,
+                                    [joinClause.RangeVariable] = innerItem
+                                };
+                                result.Add(joinedItem);
+                            }
+                        }
+                        finally
+                        {
+                            if (oldInnerValue is not null)
+                                manager.Set(innerRangeLangId, oldInnerValue);
+                        }
+                    }
+                }
+                finally
+                {
+                    if (oldOuterValue is not null)
+                        manager.Set(rangeLangId, oldOuterValue);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 比较两个键是否相等
+    /// </summary>
+    private static bool KeysEqual(object? key1, object? key2)
+    {
+        if (key1 is null && key2 is null)
+            return true;
+        if (key1 is null || key2 is null)
+            return false;
+
+        // 处理 LangValueType 的比较
+        if (key1 is LangValueType lv1 && key2 is LangValueType lv2)
+            return lv1.Equal(lv2);
+
+        // 处理基本类型的比较
+        return key1.Equals(key2);
     }
 
     /// <summary>

@@ -22,10 +22,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/AdvancedOperatorsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/AdvancedOperatorsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqQueryExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqQueryExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/LinqParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/LinqParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -570,7 +571,7 @@
       <workItem from="1769673067148" duration="4480000" />
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
-      <workItem from="1769878790800" duration="859000" />
+      <workItem from="1769878790800" duration="4307000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -915,7 +916,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="834" />
+    <option name="localTasksCounter" value="835" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,7 +943,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(core): 实现响应式应用程序构建功能&#10;&#10;- 将 RunApp 方法参数从 WidgetBase 改为 Func&lt;WidgetBase&gt; 以支持动态重建&#10;- 添加旧版 API 兼容方法并标记为过时，提供平滑迁移路径&#10;- 更新 FirstUIAvaloniaApp 构造函数以接收构建函数委托&#10;- 修改 UI 构建逻辑，通过调用构建函数实现响应式更新&#10;- 在测试应用中演示使用 lambda 函数进行动态 UI 重建&#10;- 移除手动创建的响应式文本包装器，直接使用响应式值&#10;- 完善文档注释，明确区分响应式与非响应式 API 的用途" />
     <MESSAGE value="refactor(testing): 重构测试库文件结构并优化Mock对象实现&#10;&#10;- 将AssertLib.cs、MockLib.cs和TestRunner.cs从Old8LangLib移动到Old8Lang.AST.Expression.StaticValues命名空间&#10;- 优化MockObject类实现，将Name属性设为只读，使用私有字段存储_callHistory和_returnValues&#10;- 改进RecordCall方法使用TryGetValue避免重复字典访问，提升性能&#10;- 添加Runtime命名空间引用到MockLibClassLangValue和TestRunnerClassLangValue文件&#10;- 清理IDEA工作区配置文件中的变更历史记录和过时提交消息&#10;- 更新本地任务计数器并调整最后提交消息记录" />
     <MESSAGE value="test(module): 添加模块导入别名和循环依赖处理测试&#10;&#10;- 实现了模块导入别名功能的全面测试覆盖&#10;- 添加了异步并发任务执行的多种场景测试&#10;- 实现了CancellationToken取消令牌功能测试&#10;- 添加了循环依赖检测和处理机制的测试用例&#10;- 包含直接循环依赖、间接循环依赖和自依赖的测试&#10;- 覆盖了多任务并发执行和嵌套异步调用场景&#10;- 实现了异步任务异常处理和数据访问冲突测试&#10;- 添加了取消令牌在不同超时设置下的行为验证" />
     <MESSAGE value="feat(vm): 实现接口继承和异常处理优化&#10;&#10;- 在对象实例创建时初始化接口信息，支持父类实现的接口继承&#10;- 优化异常处理逻辑，移除未使用的finallyExecuted变量&#10;- 改进类型检查中的接口实现验证，支持从ClassMetadata获取接口信息&#10;- 添加模块加载时跨模块的父类接口查找功能&#10;- 在异常表遍历时正确处理嵌套异常和finally块执行逻辑" />
@@ -967,7 +967,8 @@
     <MESSAGE value="refactor(concurrency): 重构并发组件实现&#10;&#10;- 修改TryReceiveChannel函数返回实际值或null，而不是ChannelReceiveResult对象&#10;- 使用.NET内置Barrier类替换手动实现的CyclicBarrierImpl，简化同步逻辑&#10;- 更新ResourceManager中ReadAsync调用方式，使用AsTask().Result避免异常&#10;- 添加taskkill命令到本地设置的bash命令列表中" />
     <MESSAGE value="feat(concurrency): 实现线程结果获取和手动启动功能&#10;&#10;- 添加 SetThreadResult 方法用于设置线程执行结果&#10;- 修改 SpawnFunction 实现，线程不再自动启动，需手动调用 Start()&#10;- 在线程执行完成后设置返回值结果&#10;- 更新虚拟机 CallFunctionObject 方法返回函数执行结果&#10;- 添加线程启动状态检查避免重复启动&#10;- 更新测试代码使用新的线程启动和结果获取方式&#10;- 添加辅助方法处理不同类型的整数值转换" />
     <MESSAGE value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
+    <MESSAGE value="test(parser): 更新高级操作符测试以验证嵌套索引访问&#10;&#10;- 添加 NestedIndexAccess 类型断言替代 Operation 类型&#10;- 导入 Intermediates 命名空间支持测试验证&#10;- 修正表达式解析器的索引操作符处理逻辑&#10;- 更新相关测试用例以匹配新的 AST 结构&#10;&#10;chore(devtools): 添加超时命令到 Claude 工作流配置&#10;&#10;- 在 settings.local.json 中增加 Bash(timeout:*) 指令&#10;- 更新 IDE 工作区配置以包含最新变更跟踪&#10;- 修正任务计数器同步工作项统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 更新高级操作符测试以验证嵌套索引访问&#10;&#10;- 添加 NestedIndexAccess 类型断言替代 Operation 类型&#10;- 导入 Intermediates 命名空间支持测试验证&#10;- 修正表达式解析器的索引操作符处理逻辑&#10;- 更新相关测试用例以匹配新的 AST 结构&#10;&#10;chore(devtools): 添加超时命令到 Claude 工作流配置&#10;&#10;- 在 settings.local.json 中增加 Bash(timeout:*) 指令&#10;- 更新 IDE 工作区配置以包含最新变更跟踪&#10;- 修正任务计数器同步工作项统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

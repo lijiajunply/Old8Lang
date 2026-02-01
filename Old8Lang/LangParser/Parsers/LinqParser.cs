@@ -150,6 +150,17 @@ public class LinqParser(ParserContext context, Func<ExpressionParser> expression
     }
 
     /// <summary>
+    /// 解析 join 子句中的键表达式（不包括 == 运算符）
+    /// 只解析简单表达式，在遇到 == 时停止
+    /// </summary>
+    private LangExpression ParseJoinKeyExpression()
+    {
+        // 解析一个简单的表达式，不包括比较运算符
+        // 使用 ParseNumberOpera1 来解析算术表达式，但不解析比较运算符
+        return expressionParserFactory().ParseNumberOpera1();
+    }
+
+    /// <summary>
     /// 解析 select 子句
     /// 语法: select projection
     /// </summary>
@@ -290,18 +301,18 @@ public class LinqParser(ParserContext context, Func<ExpressionParser> expression
         // 期望 on 关键字
         Expect(LangTokenType.On);
 
-        // 解析外部键表达式
-        var outerKeyExpression = ParseLinqClauseExpression();
+        // 解析外部键表达式（不包括 == 运算符）
+        var outerKeyExpression = ParseJoinKeyExpression();
 
-        // 期望 equals 关键字（注意：equals 在 LINQ 中是上下文关键字）
+        // 期望 equals 关键字（注意：在 Old8Lang 中使用 == 作为 equals）
         if (CurrentToken.Type != LangTokenType.Equals)
         {
-            throw CreateSyntaxError("join 子句中期望 equals 关键字");
+            throw CreateSyntaxError("join 子句中期望 == 关键字");
         }
         Expect(LangTokenType.Equals);
 
         // 解析内部键表达式
-        var innerKeyExpression = ParseLinqClauseExpression();
+        var innerKeyExpression = ParseJoinKeyExpression();
 
         // 检查是否有 into 子句（group join）
         bool isGroupJoin = false;
