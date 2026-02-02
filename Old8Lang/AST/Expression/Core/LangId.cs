@@ -189,6 +189,18 @@ public partial class LangId(
     /// </remarks>
     public override Type OutputType(LocalManager local)
     {
+        // 处理 this 关键字
+        if (IdName == "this")
+        {
+            // 如果在类环境中，返回当前类类型
+            if (local.InClassEnv is not null)
+            {
+                return local.InClassEnv;
+            }
+            // 否则返回 object
+            return typeof(object);
+        }
+
         if (!string.IsNullOrEmpty(AssumptionType))
         {
             // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
@@ -317,7 +329,7 @@ public partial class LangId(
             }
 
             // 非泛型类型或解析失败时的默认映射
-            return typeName switch
+            var basicType = typeName switch
             {
                 "int" => typeof(int),
                 "double" => typeof(double),
@@ -329,8 +341,24 @@ public partial class LangId(
                 "array" => typeof(object[]),
                 "dictionary" => typeof(Dictionary<object, object>),
                 "tuple" => typeof(ValueTuple<object, object>),
-                _ => typeof(object)
+                "object" => typeof(object),
+                _ => (Type?)null
             };
+
+            if (basicType is not null)
+            {
+                return basicType;
+            }
+
+            // 检查是否是自定义类类型（使用原始的 AssumptionType，因为类名是大小写敏感的）
+            var originalTypeName = AssumptionType.Trim();
+            if (local.ClassVar.TryGetValue(originalTypeName, out var customClassType))
+            {
+                return customClassType;
+            }
+
+            // 如果找不到，返回 object
+            return typeof(object);
         }
 
         // 如果没有显式类型注解，但有默认值，从默认值推断类型

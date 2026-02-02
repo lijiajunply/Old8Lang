@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
@@ -712,6 +713,33 @@ public partial class Operation(
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
 
+        // 处理 this.member 访问（类环境内）- 需要在 TypeBuilder 转换之前处理
+        // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
+        if (Opera == LangTokenType.Dot && (Left is LangId { IdName: "this" } || Left is ThisExpression) && Right is LangId thisMemberId)
+        {
+            // 优先从 FieldVar 中查找字段类型
+            if (local.FieldVar.TryGetValue(thisMemberId.IdName, out var fieldInfo))
+            {
+                return fieldInfo.FieldType;
+            }
+            // 如果在类环境中，尝试从 TypeBuilder 的基类中查找
+            if (local.InClassEnv is TypeBuilder classTypeBuilder)
+            {
+                var baseType = classTypeBuilder.BaseType;
+                while (baseType is not null && baseType != typeof(object))
+                {
+                    var baseField = baseType.GetField(thisMemberId.IdName, BindingFlags.Public | BindingFlags.Instance);
+                    if (baseField is not null)
+                    {
+                        return baseField.FieldType;
+                    }
+                    baseType = baseType.BaseType;
+                }
+            }
+            // 如果找不到字段，返回 object
+            return typeof(object);
+        }
+
         // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
         if (leftType is TypeBuilder typeBuilder)
         {
@@ -769,6 +797,13 @@ public partial class Operation(
             if (Left is LangId { IdName: "Assert" })
             {
                 return typeof(void);
+            }
+
+            // 处理内置类型的扩展方法返回类型
+            var builtInReturnType = GetBuiltInMethodReturnType(leftType, instance.Id.IdName, instance.Ids.Count);
+            if (builtInReturnType is not null)
+            {
+                return builtInReturnType;
             }
 
             // 对于其他方法调用，尝试查找方法并返回其返回类型
@@ -1028,5 +1063,160 @@ public partial class Operation(
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 获取内置类型方法的返回类型
+    /// </summary>
+    /// <param name="leftType">左操作数类型（调用方法的对象类型）</param>
+    /// <param name="methodName">方法名</param>
+    /// <param name="paramCount">参数数量</param>
+    /// <returns>方法的返回类型，如果不是内置方法则返回null</returns>
+    private static Type? GetBuiltInMethodReturnType(Type? leftType, string methodName, int paramCount)
+    {
+        if (leftType is null) return null;
+
+        // 处理无参数的内置方法
+        if (paramCount == 0)
+        {
+            // 通用类型转换方法
+            switch (methodName)
+            {
+                case "ToInt":
+                    // int, double, bool, char 都有 ToInt() 方法
+                    if (leftType == typeof(int) || leftType == typeof(double) ||
+                        leftType == typeof(bool) || leftType == typeof(char))
+                        return typeof(int);
+                    break;
+                case "ToDouble":
+                    // int, double, bool 都有 ToDouble() 方法
+                    if (leftType == typeof(int) || leftType == typeof(double) || leftType == typeof(bool))
+                        return typeof(double);
+                    break;
+                case "ToBool":
+                    // int, double, bool 都有 ToBool() 方法
+                    if (leftType == typeof(int) || leftType == typeof(double) || leftType == typeof(bool))
+                        return typeof(bool);
+                    break;
+                case "ToChar":
+                    // int, char 都有 ToChar() 方法
+                    if (leftType == typeof(int) || leftType == typeof(char))
+                        return typeof(char);
+                    break;
+            }
+
+            // char 类型特有的方法
+            if (leftType == typeof(char))
+            {
+                switch (methodName)
+                {
+                    case "ToUpper":
+                    case "ToLower":
+                        return typeof(char);
+                    case "IsDigit":
+                    case "IsLetter":
+                    case "IsWhiteSpace":
+                    case "IsUpper":
+                    case "IsLower":
+                    case "IsLetterOrDigit":
+                    case "IsPunctuation":
+                    case "IsSymbol":
+                    case "IsControl":
+                        return typeof(bool);
+                    case "GetNumericValue":
+                        return typeof(double);
+                }
+            }
+
+            // string 类型的方法
+            if (leftType == typeof(string))
+            {
+                switch (methodName)
+                {
+                    case "ToUpper":
+                    case "ToLower":
+                    case "Trim":
+                    case "TrimStart":
+                    case "TrimEnd":
+                        return typeof(string);
+                    case "ToInt":
+                        return typeof(int);
+                    case "ToDouble":
+                        return typeof(double);
+                    case "ToBool":
+                        return typeof(bool);
+                }
+            }
+
+            // List 类型的方法
+            if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                switch (methodName)
+                {
+                    case "Count":
+                        return typeof(int);
+                    case "ToArray":
+                        return leftType.GetGenericArguments()[0].MakeArrayType();
+                }
+            }
+
+            // Array 类型的方法
+            if (leftType.IsArray)
+            {
+                switch (methodName)
+                {
+                    case "Length":
+                        return typeof(int);
+                    case "ToList":
+                        return typeof(List<>).MakeGenericType(leftType.GetElementType()!);
+                }
+            }
+        }
+
+        // 处理带参数的内置方法
+        if (paramCount == 1)
+        {
+            // char 类型的 CompareTo 方法
+            if (leftType == typeof(char) && methodName == "CompareTo")
+            {
+                return typeof(int);
+            }
+
+            // string 类型的方法
+            if (leftType == typeof(string))
+            {
+                switch (methodName)
+                {
+                    case "Contains":
+                    case "StartsWith":
+                    case "EndsWith":
+                        return typeof(bool);
+                    case "IndexOf":
+                    case "LastIndexOf":
+                        return typeof(int);
+                    case "Split":
+                        return typeof(string[]);
+                    case "Replace":
+                        return typeof(string);
+                    case "Substring":
+                        return typeof(string);
+                }
+            }
+        }
+
+        if (paramCount == 2)
+        {
+            if (leftType == typeof(string))
+            {
+                switch (methodName)
+                {
+                    case "Replace":
+                    case "Substring":
+                        return typeof(string);
+                }
+            }
+        }
+
+        return null;
     }
 }

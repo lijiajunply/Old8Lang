@@ -15,10 +15,10 @@ public class ClassDeclarationTests
         // Arrange
         var code = @"
             class Person {
-                public name
-                public age
+                public name:string <- """"
+                public age:int <- 0
 
-                func init(name:string, age:int) {
+                func init(name:string, age:int) -> void {
                     this.name <- name
                     this.age <- age
                 }
@@ -87,9 +87,9 @@ public class ClassDeclarationTests
         // Arrange
         var code = @"
             class Counter {
-                private count
+                private count:int <- 0
 
-                func init() {
+                func init() -> void {
                     this.count <- 0
                 }
 

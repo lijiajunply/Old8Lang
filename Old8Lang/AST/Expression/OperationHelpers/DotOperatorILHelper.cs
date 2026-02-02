@@ -49,7 +49,8 @@ public static class DotOperatorILHelper
         Operation operation)
     {
         // 1. 处理 this.member 访问（类环境内）
-        if (local.InClassEnv is not null && left is LangId { IdName: "this" })
+        // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
+        if (local.InClassEnv is not null && (left is LangId { IdName: "this" } || left is ThisExpression))
         {
             return GenerateThisMemberAccess(right, ilGenerator, local);
         }
