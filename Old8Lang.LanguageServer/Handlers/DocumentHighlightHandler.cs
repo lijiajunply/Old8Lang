@@ -92,8 +92,10 @@ public class DocumentHighlightHandler(DocumentManager documentManager) : Documen
         }
 
         // 查找对应位置的 token
+        // Token 的行号是 1-based，列号是 0-based
+        // SourceLocation 的行号和列号都是 0-based
         var tokenLine = location.Line + 1; // 转换为 1-based
-        var tokenColumn = location.Column + 1; // 转换为 1-based
+        var tokenColumn = location.Column; // 列号已经是 0-based，不需要转换
 
         for (int i = 0; i < document.Tokens.Count; i++)
         {

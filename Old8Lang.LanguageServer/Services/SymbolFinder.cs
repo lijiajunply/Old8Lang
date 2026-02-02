@@ -187,15 +187,15 @@ public class SymbolFinder
 
         System.Diagnostics.Debug.WriteLine($"FindTokenAtPosition: LSP({line},{column})");
 
-        // Token的行列号都是1-based，需要转换
+        // Token的行号是1-based，列号是0-based
         var targetLineToken = line + 1;
-        var targetColumnToken = column + 1;
+        var targetColumnToken = column; // 列号已经是0-based，不需要转换
 
         foreach (var token in tokens)
         {
             if (token.Line == targetLineToken)
             {
-                // token.Column 是1-based，指向token的第一个字符
+                // token.Column 是0-based，指向token的第一个字符
                 var tokenEndColumn = token.Column + token.Value.Length - 1;
 
                 System.Diagnostics.Debug.WriteLine($"  Checking token: '{token.Value}' at ({token.Line},{token.Column})-({token.Line},{tokenEndColumn})");

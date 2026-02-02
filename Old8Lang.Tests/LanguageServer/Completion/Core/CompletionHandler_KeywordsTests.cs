@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Core;
 /// </summary>
 public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     /// <summary>
     /// 测试控制流关键字补全
     /// </summary>
@@ -45,7 +43,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in controlFlowKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -81,7 +79,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in functionKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -117,7 +115,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in asyncKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -153,7 +151,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in oopKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -189,7 +187,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in exceptionKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -225,7 +223,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in importKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -261,7 +259,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in logicalKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -297,7 +295,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in accessModifierKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -333,7 +331,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         foreach (var keyword in miscKeywords)
         {
             Assert.Contains(keywords, item => item.Label == keyword);
-            _output.WriteLine($"✓ 找到关键字: {keyword}");
+            output.WriteLine($"✓ 找到关键字: {keyword}");
         }
     }
 
@@ -387,18 +385,18 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
             "this", "super", "true", "false", "null", "match", "using", "select", "defer"
         };
 
-        _output.WriteLine($"总共应有 {allKeywords.Length} 个关键字");
-        _output.WriteLine($"实际找到 {keywords.Count} 个关键字补全项");
+        output.WriteLine($"总共应有 {allKeywords.Length} 个关键字");
+        output.WriteLine($"实际找到 {keywords.Count} 个关键字补全项");
 
         var foundKeywords = keywords.Select(k => k.Label).ToHashSet();
         var missingKeywords = allKeywords.Where(k => !foundKeywords.Contains(k)).ToList();
 
         if (missingKeywords.Any())
         {
-            _output.WriteLine("\n缺少的关键字:");
+            output.WriteLine("\n缺少的关键字:");
             foreach (var missing in missingKeywords)
             {
-                _output.WriteLine($"  - {missing}");
+                output.WriteLine($"  - {missing}");
             }
         }
 
@@ -443,11 +441,11 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
             Assert.NotNull(keyword.InsertText);
             Assert.Equal(keyword.Label, keyword.InsertText); // 关键字的插入文本应该就是关键字本身
 
-            _output.WriteLine($"关键字: {keyword.Label}");
-            _output.WriteLine($"  Kind: {keyword.Kind}");
-            _output.WriteLine($"  Detail: {keyword.Detail}");
-            _output.WriteLine($"  InsertText: {keyword.InsertText}");
-            _output.WriteLine("");
+            output.WriteLine($"关键字: {keyword.Label}");
+            output.WriteLine($"  Kind: {keyword.Kind}");
+            output.WriteLine($"  Detail: {keyword.Detail}");
+            output.WriteLine($"  InsertText: {keyword.InsertText}");
+            output.WriteLine("");
         }
     }
 }
