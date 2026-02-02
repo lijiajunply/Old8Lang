@@ -1,5 +1,6 @@
 using System.Collections;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 
 // ReSharper disable once CheckNamespace
@@ -32,6 +33,7 @@ public partial class VirtualMachine
     {
         if (value == null) return false;
         if (value is bool b) return b;
+        if (value is BoolLangValue boolLangValue) return boolLangValue.Value;
         if (value is int i) return i != 0;
         if (value is double d) return Math.Abs(d) > 1e-10;
         if (value is string s) return !string.IsNullOrEmpty(s);

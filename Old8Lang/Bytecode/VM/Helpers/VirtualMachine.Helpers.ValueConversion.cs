@@ -98,7 +98,51 @@ public partial class VirtualMachine
             bool b => new BoolLangValue(b),
             char c => new CharLangValue(c),
             LangValueType lvt => lvt,
+            List<object?> list => ConvertListToLangValueType(list),
+            object[] array => ConvertArrayToLangValueType(array),
+            Dictionary<object, object?> dict => ConvertDictToLangValueType(dict),
             _ => throw new CastError(new SourcePosition(), value.GetType().Name, "LangValueType")
         };
+    }
+
+    /// <summary>
+    /// 将 List&lt;object?&gt; 转换为 ListLangValue
+    /// </summary>
+    private ListLangValue ConvertListToLangValueType(List<object?> list)
+    {
+        var items = new List<LangValueType>();
+        foreach (var item in list)
+        {
+            items.Add(ConvertToLangValueType(item));
+        }
+        return new ListLangValue(items);
+    }
+
+    /// <summary>
+    /// 将 object[] 转换为 ArrayLangValue
+    /// </summary>
+    private ArrayLangValue ConvertArrayToLangValueType(object[] array)
+    {
+        var items = new List<LangValueType>();
+        foreach (var item in array)
+        {
+            items.Add(ConvertToLangValueType(item));
+        }
+        return new ArrayLangValue(items);
+    }
+
+    /// <summary>
+    /// 将 Dictionary&lt;object, object?&gt; 转换为 DictionaryLangValue
+    /// </summary>
+    private DictionaryLangValue ConvertDictToLangValueType(Dictionary<object, object?> dict)
+    {
+        var result = new DictionaryLangValue();
+        foreach (var (key, value) in dict)
+        {
+            var keyLangValue = ConvertToLangValueType(key);
+            var valueLangValue = ConvertToLangValueType(value);
+            result.Value.Add((keyLangValue, valueLangValue));
+        }
+        return result;
     }
 }

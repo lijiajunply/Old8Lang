@@ -450,9 +450,9 @@ public static class DictionaryValueFuncStatic
         /// 获取字典中键值对的数量
         /// </summary>
         /// <returns>键值对数量</returns>
-        public IntLangValue Count()
+        public int Count()
         {
-            return new IntLangValue(langValue.Value.Count);
+            return langValue.Value.Count;
         }
     }
 }

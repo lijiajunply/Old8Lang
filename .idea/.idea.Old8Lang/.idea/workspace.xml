@@ -23,16 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_char.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_class.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_null.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_overload.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/ClassDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/ClassDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionOverloadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/LangId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.TypeConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.TypeConversion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -578,7 +572,7 @@
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
       <workItem from="1769878790800" duration="19115000" />
-      <workItem from="1770004902703" duration="694000" />
+      <workItem from="1770004902703" duration="2114000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -923,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="845" />
+    <option name="localTasksCounter" value="846" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加 dotnetdll: 前缀支持 .NET 托管 DLL 导入&#10;&#10;- 新增 dotnetdll: 前缀用于明确导入 .NET 托管 DLL，与 C/C++ 非托管 DLL 区分&#10;- 更新 CSharpDllProvider 解析逻辑支持 dotnetdll: 前缀格式&#10;- 修改 ExternStatement 检测逻辑识别 dotnetdll: 前缀&#10;- 更新语法解析器支持 dotnetdll: 前缀的 extern 语句解析&#10;- 优化 NativeDllProvider 中的委托变量注册使用 TryAdd 方法&#10;- 更新文档说明 .NET 托管 DLL 与 P/Invoke 的区别和使用方式&#10;- 添加 test_dotnetdll_extern.old8 测试脚本验证新功能&#10;- 在类型系统中注册 P/Invoke 相关的数值类型&#10;- 更新 CHANGELOG 文档中的版本发布状态" />
     <MESSAGE value="feat(lang): 添加更多数值类型转换支持&#10;&#10;- 在 LangValueType.cs 中添加 sbyte、ushort、uint、ulong 类型的转换处理&#10;- 实现 HandleUIntConversion 和 HandleULongConversion 方法避免数值溢出&#10;- 在 VirtualMachine.Helpers.ValueConversion.cs 中添加 char、long、short、byte、&#10;  sbyte、ushort、uint、ulong、float 等类型的转换支持&#10;- 优化 long 类型转换逻辑，超出 int 范围时自动转为 double&#10;- 在 FromObjectToLangValueType 方法中增加多种数值类型的转换分支&#10;- 移除未使用的类型扩展方法注释代码" />
     <MESSAGE value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
     <MESSAGE value="feat(compiler): 添加接口约束的鸭子类型检查功能&#10;&#10;- 在BytecodeCompiler中新增接口名称检查和元数据获取方法&#10;- 实现GetAllInterfaceMethods方法支持递归收集接口及其父接口的所有方法&#10;- 添加CollectInterfaceMethods私有方法处理接口继承关系的方法收集&#10;- 在BytecodeVisitor中实现ValidateInterfaceConstraint方法进行鸭子类型验证&#10;- 修改GenericConstraintValidator添加ImplementsInterfaceMethods方法支持方法级别检查&#10;- 更新泛型实例化表达式传递正确的参数以支持新的约束验证&#10;- 移除workspace.xml中的临时调试配置变更记录" />
@@ -975,7 +968,8 @@
     <MESSAGE value="chore(git): 更新 gitignore 配置&#10;&#10;- 移除了对 Old8Lang.Tests/OldLib 的忽略规则&#10;- 添加了新的忽略项 nul&#10;- 调整了 gitignore 文件结构" />
     <MESSAGE value="fix(tests): 修复虚拟机并发测试中的线程启动问题&#10;&#10;- 在 CountDownLatch 测试中为所有 spawn 调用添加 .Start() 方法&#10;- 在 Channel 选择语句测试中为所有 spawn 调用添加 .Start() 方法&#10;- 确保所有并发任务正确启动以避免测试失败&#10;- 修复了因缺少 Start() 调用导致的测试挂起问题" />
     <MESSAGE value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
+    <MESSAGE value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

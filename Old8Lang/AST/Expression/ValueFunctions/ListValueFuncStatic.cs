@@ -70,10 +70,10 @@ public static class ListValueFuncStatic
         /// <summary>
         /// 返回列表元素数量
         /// </summary>
-        /// <returns>包含元素数量的IntLangValue</returns>
-        public IntLangValue Count()
+        /// <returns>元素数量</returns>
+        public int Count()
         {
-            return new IntLangValue(langValue.Values.Count);
+            return langValue.Values.Count;
         }
 
         /// <summary>
