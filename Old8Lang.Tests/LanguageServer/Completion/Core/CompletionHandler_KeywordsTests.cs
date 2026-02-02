@@ -217,8 +217,8 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
         Assert.NotNull(result);
         var keywords = result.Items.Where(item => item.Kind == CompletionItemKind.Keyword).ToList();
 
-        // 导入关键字：import, from, as, native, extern
-        var importKeywords = new[] { "import", "from", "as", "native", "extern" };
+        // 导入关键字：import, from, as, extern (native 已删除)
+        var importKeywords = new[] { "import", "from", "as", "extern" };
 
         foreach (var keyword in importKeywords)
         {
@@ -374,7 +374,7 @@ public class CompletionHandler_KeywordsTests(ITestOutputHelper output)
             // 异常处理
             "try", "catch", "finally",
             // 导入
-            "import", "from", "as", "native", "extern",
+            "import", "from", "as", "extern",
             // 逻辑运算符
             "and", "or", "xor", "not", "in",
             // 访问修饰符

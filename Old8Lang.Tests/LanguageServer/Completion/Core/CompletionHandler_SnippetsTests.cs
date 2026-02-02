@@ -80,7 +80,7 @@ public class CompletionHandler_SnippetsTests(ITestOutputHelper output)
         Assert.NotNull(result);
         var snippets = result.Items.Where(item => item.Kind == CompletionItemKind.Snippet).ToList();
 
-        var asyncFuncSnippet = snippets.FirstOrDefault(s => s.Label == "asyncfunc");
+        var asyncFuncSnippet = snippets.FirstOrDefault(s => s.Label == "async func");
         Assert.NotNull(asyncFuncSnippet);
 
         // 验证包含 async 关键字
@@ -410,7 +410,7 @@ public class CompletionHandler_SnippetsTests(ITestOutputHelper output)
 
         // 所有预期的代码片段
         var expectedSnippets = new[] {
-            "func", "asyncfunc", "class", "if", "ifelse",
+            "func", "async func", "class", "if", "ifelse",
             "for", "forin", "while", "try", "switch"
         };
 

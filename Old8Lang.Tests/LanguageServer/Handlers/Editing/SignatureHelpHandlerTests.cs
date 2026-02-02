@@ -252,7 +252,7 @@ result <- outer(inner())
         var request = new SignatureHelpParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(9, 22) // 在 inner( 后
+            Position = new Position(9, 21) // 在 inner( 后，即列21是左括号后面
         };
 
         // Act

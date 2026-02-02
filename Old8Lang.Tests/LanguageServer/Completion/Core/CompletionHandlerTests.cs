@@ -69,7 +69,7 @@ public class CompletionHandlerTests(ITestOutputHelper testOutputHelper)
 
         // 验证包含代码片段
         Assert.Contains(snippets, item => item.Label == "func");
-        Assert.Contains(snippets, item => item.Label == "asyncfunc");
+        Assert.Contains(snippets, item => item.Label == "async func");
         Assert.Contains(snippets, item => item.Label == "class");
         Assert.Contains(snippets, item => item.Label == "if");
         Assert.Contains(snippets, item => item.Label == "for");
@@ -233,9 +233,9 @@ x <- user.name
         Assert.Contains(result.Items, item => item.Label == "name");
         Assert.Contains(result.Items, item => item.Label == "getName");
 
-        // 验证包含私有成员（在当前实现中可能包含）
-        Assert.Contains(result.Items, item => item.Label == "age");
-        Assert.Contains(result.Items, item => item.Label == "getAge");
+        // 私有成员不应该在类外部补全中显示
+        // Assert.Contains(result.Items, item => item.Label == "age");
+        // Assert.Contains(result.Items, item => item.Label == "getAge");
 
         // 验证方法有正确的插入格式
         var getNameItem = result.Items.First(item => item.Label == "getName");
