@@ -1112,7 +1112,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         // extern 语句声明外部函数或变量
         // 使用反射获取私有字段
         var type = externStatement.GetType();
-        var functionsField = type.GetField("Functions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var functionsField = type.GetField("_functions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         if (functionsField?.GetValue(externStatement) is List<ExternFunctionDeclaration> functions)
         {
@@ -1165,13 +1165,8 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     private void VisitImportStatement(ImportStatement importStatement)
     {
         // import 语句可能有别名
-        // 使用反射获取私有字段
-        var type = importStatement.GetType();
-        var moduleAliasField = type.GetField("ModuleAlias", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var importStringField = type.GetField("ImportString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        var moduleAlias = moduleAliasField?.GetValue(importStatement) as string;
-        var importString = importStringField?.GetValue(importStatement) as string;
+        var moduleAlias = importStatement.GetModuleAlias();
+        var importString = importStatement.GetImportString();
 
         // 如果有模块别名，添加到符号表
         if (!string.IsNullOrEmpty(moduleAlias))

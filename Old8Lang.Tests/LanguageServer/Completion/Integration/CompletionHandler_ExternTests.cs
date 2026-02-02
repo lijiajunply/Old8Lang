@@ -11,8 +11,6 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Integration;
 /// </summary>
 public class CompletionHandler_ExternTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public async Task ExternKeyword_ShouldComplete()
     {
@@ -36,34 +34,10 @@ public class CompletionHandler_ExternTests(ITestOutputHelper output)
         Assert.NotNull(externKeyword);
         Assert.Equal(CompletionItemKind.Keyword, externKeyword.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
-    [Fact]
-    public async Task NativeKeyword_ShouldComplete()
-    {
-        var code = @"";
-        var uri = "file:///test.old8";
-        var documentManager = new DocumentManager();
-        documentManager.UpdateDocument(uri, code);
-
-        var handler = new CompletionHandler(documentManager);
-        var request = new CompletionParams
-        {
-            TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(0, 0)
-        };
-
-        var result = await handler.Handle(request, CancellationToken.None);
-        Assert.NotNull(result);
-
-        var items = result.Items.ToList();
-        var nativeKeyword = items.FirstOrDefault(i => i.Label == "native");
-        Assert.NotNull(nativeKeyword);
-        Assert.Equal(CompletionItemKind.Keyword, nativeKeyword.Kind);
-
-        _output.WriteLine($"Found {items.Count} items");
-    }
+    // native 关键字已被删除，此测试不再需要
 
     [Fact]
     public async Task ImportKeyword_ShouldComplete()
@@ -88,7 +62,7 @@ public class CompletionHandler_ExternTests(ITestOutputHelper output)
         Assert.NotNull(importKeyword);
         Assert.Equal(CompletionItemKind.Keyword, importKeyword.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -114,7 +88,7 @@ public class CompletionHandler_ExternTests(ITestOutputHelper output)
         Assert.NotNull(fromKeyword);
         Assert.Equal(CompletionItemKind.Keyword, fromKeyword.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -140,7 +114,7 @@ public class CompletionHandler_ExternTests(ITestOutputHelper output)
         Assert.NotNull(asKeyword);
         Assert.Equal(CompletionItemKind.Keyword, asKeyword.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -162,21 +136,21 @@ public class CompletionHandler_ExternTests(ITestOutputHelper output)
         Assert.NotNull(result);
 
         var items = result.Items.ToList();
-        var importKeywords = new[] { "import", "from", "as", "extern", "native" };
+        var importKeywords = new[] { "import", "from", "as", "extern" };
 
         foreach (var keyword in importKeywords)
         {
             var keywordItem = items.FirstOrDefault(i => i.Label == keyword);
             if (keywordItem == null)
             {
-                _output.WriteLine($"Keyword '{keyword}' not found in completions");
+                output.WriteLine($"Keyword '{keyword}' not found in completions");
             }
             Assert.True(keywordItem != null, $"Keyword '{keyword}' should be available");
             Assert.Equal(CompletionItemKind.Keyword, keywordItem.Kind);
         }
 
-        _output.WriteLine($"Found {items.Count} items");
-        _output.WriteLine("All import keywords verified");
+        output.WriteLine($"Found {items.Count} items");
+        output.WriteLine("All import keywords verified");
     }
 
     [Fact]
@@ -203,10 +177,10 @@ func main() -> void {
 
         var items = result.Items.ToList();
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
         foreach (var item in items.Take(10))
         {
-            _output.WriteLine($"  - {item.Label} ({item.Kind})");
+            output.WriteLine($"  - {item.Label} ({item.Kind})");
         }
     }
 
@@ -240,13 +214,13 @@ func main() -> void {
         Assert.NotNull(cprintFunc);
         Assert.Equal(CompletionItemKind.Function, cprintFunc.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
     public async Task ImportWithAlias_SyntaxCompletion()
     {
-        var code = @"import ""MathLib"" as math
+        var code = @"import ""Math"" as math
 
 func main() -> void {
     result <- math.sqrt(16)
@@ -271,7 +245,7 @@ func main() -> void {
         Assert.NotNull(mathVar);
         Assert.Equal(CompletionItemKind.Variable, mathVar.Kind);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -300,7 +274,7 @@ func main() -> void {
 
         var items = result.Items.ToList();
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 
     [Fact]
@@ -333,6 +307,6 @@ func main() -> void {
         var globalCounterVar = items.FirstOrDefault(i => i.Label == "counter" || i.Label == "getGlobalCounter");
         Assert.NotNull(globalCounterVar);
 
-        _output.WriteLine($"Found {items.Count} items");
+        output.WriteLine($"Found {items.Count} items");
     }
 }
