@@ -23,10 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.TypeConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.TypeConversion.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ValueConversion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -572,7 +569,7 @@
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
       <workItem from="1769878790800" duration="19115000" />
-      <workItem from="1770004902703" duration="2114000" />
+      <workItem from="1770004902703" duration="7605000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +914,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="846" />
+    <option name="localTasksCounter" value="850" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,10 +941,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加更多数值类型转换支持&#10;&#10;- 在 LangValueType.cs 中添加 sbyte、ushort、uint、ulong 类型的转换处理&#10;- 实现 HandleUIntConversion 和 HandleULongConversion 方法避免数值溢出&#10;- 在 VirtualMachine.Helpers.ValueConversion.cs 中添加 char、long、short、byte、&#10;  sbyte、ushort、uint、ulong、float 等类型的转换支持&#10;- 优化 long 类型转换逻辑，超出 int 范围时自动转为 double&#10;- 在 FromObjectToLangValueType 方法中增加多种数值类型的转换分支&#10;- 移除未使用的类型扩展方法注释代码" />
-    <MESSAGE value="fix(tests): 修复虚拟机测试中的平台兼容性问题&#10;&#10;- 将硬编码的换行符 '\n' 替换为 Environment.NewLine 以支持跨平台&#10;- 修正布尔值断言的大小写敏感性问题，统一使用小写格式&#10;- 确保所有测试用例在不同操作系统环境下都能正确运行&#10;- 提高测试代码的可移植性和稳定性" />
-    <MESSAGE value="feat(compiler): 添加接口约束的鸭子类型检查功能&#10;&#10;- 在BytecodeCompiler中新增接口名称检查和元数据获取方法&#10;- 实现GetAllInterfaceMethods方法支持递归收集接口及其父接口的所有方法&#10;- 添加CollectInterfaceMethods私有方法处理接口继承关系的方法收集&#10;- 在BytecodeVisitor中实现ValidateInterfaceConstraint方法进行鸭子类型验证&#10;- 修改GenericConstraintValidator添加ImplementsInterfaceMethods方法支持方法级别检查&#10;- 更新泛型实例化表达式传递正确的参数以支持新的约束验证&#10;- 移除workspace.xml中的临时调试配置变更记录" />
-    <MESSAGE value="chore(compiler): 移除 Lambda 表达式闭包分析调试代码&#10;&#10;- 删除了闭包捕获变量的调试输出逻辑&#10;- 移除了写入临时调试文件的功能&#10;- 清理了相关的调试信息打印代码" />
     <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMIntegrationTests 中统一使用 ['\r', '\n'] 进行行分割&#10;- 在 VMReflectionTests 中更新行分割逻辑以支持 Windows 和 Unix 换行符&#10;- 修改 VMResourceCleanupTests 中的行分割方法确保兼容性&#10;- 更新 VMTypeErrorTests 中的断言逻辑以正确处理不同平台的换行符" />
     <MESSAGE value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
     <MESSAGE value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
@@ -969,7 +962,11 @@
     <MESSAGE value="fix(tests): 修复虚拟机并发测试中的线程启动问题&#10;&#10;- 在 CountDownLatch 测试中为所有 spawn 调用添加 .Start() 方法&#10;- 在 Channel 选择语句测试中为所有 spawn 调用添加 .Start() 方法&#10;- 确保所有并发任务正确启动以避免测试失败&#10;- 修复了因缺少 Start() 调用导致的测试挂起问题" />
     <MESSAGE value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
     <MESSAGE value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
+    <MESSAGE value="refactor(vm): 优化虚拟机类型转换逻辑&#10;&#10;- 修改Count方法返回类型从IntLangValue到int&#10;- 添加BoolLangValue到bool类型的转换支持&#10;- 实现List&lt;object?&gt;到ListLangValue的转换功能&#10;- 实现object[]到ArrayLangValue的转换功能&#10;- 实现Dictionary&lt;object, object?&gt;到DictionaryLangValue的转换功能&#10;- 添加必要的Value命名空间引用" />
+    <MESSAGE value="fix(vm): 修复生成器执行中的状态管理和栈恢复问题&#10;&#10;- 重置生成器状态为NotStarted以正确区分yield暂停和函数结束&#10;- 保存调用者栈状态和调用栈计数以便正确恢复&#10;- 修改yield检测逻辑从IP检查改为状态检查&#10;- 在生成器完成后正确恢复调用者的栈状态&#10;- 修复性能测试中生成器函数的返回类型声明" />
+    <MESSAGE value="```&#10;test(vm): 为 VMSelectStatementTests 添加等待时间确保测试稳定&#10;&#10;- 在 ChannelSend 操作后添加 Sleep(50) 确保数据发送完成&#10;- 为多个测试场景添加适当的延迟等待&#10;- 优化 SelectStatement_MultipleChannels_ExecutesCorrectly 测试逻辑&#10;- 添加注释说明测试目的和执行顺序&#10;- 提高并发操作测试的可靠性&#10;```" />
+    <MESSAGE value="test(vm): 更新虚拟机 select 语句测试用例&#10;&#10;- 为 select 语句测试添加默认 case 分支验证&#10;- 调整测试顺序，先发送数据再执行 select 以确保正确执行&#10;- 简化多 case 测试逻辑，移除不必要的延迟&#10;- 修改生产者消费者测试，使用更直接的数据流向验证&#10;- 优化嵌套 select 测试的数据发送时机&#10;- 更新断言条件以匹配新的测试逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 更新虚拟机 select 语句测试用例&#10;&#10;- 为 select 语句测试添加默认 case 分支验证&#10;- 调整测试顺序，先发送数据再执行 select 以确保正确执行&#10;- 简化多 case 测试逻辑，移除不必要的延迟&#10;- 修改生产者消费者测试，使用更直接的数据流向验证&#10;- 优化嵌套 select 测试的数据发送时机&#10;- 更新断言条件以匹配新的测试逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
