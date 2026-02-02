@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -35,7 +36,7 @@ public sealed class ReadWriteLockCreateFunction : BaseGlobalFunction
         LocalManager local,
         SourcePosition position)
     {
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateReadWriteLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateReadWriteLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -81,7 +82,7 @@ public sealed class ReadLockAcquireFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AcquireReadLock(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AcquireReadLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireReadLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -129,7 +130,7 @@ public sealed class ReadLockReleaseFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.ReleaseReadLock(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.ReleaseReadLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseReadLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -177,7 +178,7 @@ public sealed class WriteLockAcquireFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AcquireWriteLock(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AcquireWriteLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireWriteLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -225,7 +226,7 @@ public sealed class WriteLockReleaseFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.ReleaseWriteLock(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.ReleaseWriteLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseWriteLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -277,7 +278,7 @@ public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TryAcquireReadLock(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryAcquireReadLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireReadLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -329,7 +330,7 @@ public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TryAcquireWriteLock(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryAcquireWriteLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireWriteLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -377,7 +378,7 @@ public sealed class ReadWriteLockDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeReadWriteLock(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeReadWriteLock));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeReadWriteLock));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

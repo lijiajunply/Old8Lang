@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations;
 
@@ -44,7 +45,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
         if (parameters.Count == 0)
         {
             // 没有参数，调用 Console.WriteLine()
-            var writeLineNoArg = typeof(Console).GetMethod("WriteLine", Type.EmptyTypes);
+            var writeLineNoArg = GlobalMethodInfoCache.GetMethod(typeof(Console), "WriteLine", Type.EmptyTypes);
             if (writeLineNoArg is not null)
             {
                 ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
@@ -58,7 +59,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
         var printLineType = printLineExpr.OutputType(local);
 
         // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
-        var writeLineObject = typeof(Console).GetMethod("WriteLine", [typeof(object)]);
+        var writeLineObject = GlobalMethodInfoCache.GetMethod(typeof(Console), "WriteLine", [typeof(object)]);
         if (writeLineObject is not null)
         {
             // 如果是值类型，先装箱

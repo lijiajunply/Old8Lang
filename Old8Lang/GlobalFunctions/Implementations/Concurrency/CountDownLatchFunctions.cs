@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -41,7 +42,7 @@ public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CreateCountDownLatch(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateCountDownLatch));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCountDownLatch));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -88,7 +89,7 @@ public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CountDown(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CountDown));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CountDown));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -136,7 +137,7 @@ public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.WaitCountDownLatch(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.WaitCountDownLatch));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatch));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -188,7 +189,7 @@ public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.WaitCountDownLatchTimeout(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.WaitCountDownLatchTimeout));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatchTimeout));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -236,7 +237,7 @@ public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.GetCountDownLatchCount(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.GetCountDownLatchCount));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCountDownLatchCount));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -283,7 +284,7 @@ public sealed class CountDownLatchDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeCountDownLatch(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeCountDownLatch));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCountDownLatch));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -35,7 +36,7 @@ public sealed class MutexCreateFunction : BaseGlobalFunction
         LocalManager local,
         SourcePosition position)
     {
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateMutex));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateMutex));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -81,7 +82,7 @@ public sealed class MutexLockFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.LockMutex(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.LockMutex));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.LockMutex));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -133,7 +134,7 @@ public sealed class MutexTryLockFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TryLockMutex(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryLockMutex));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryLockMutex));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -181,7 +182,7 @@ public sealed class MutexUnlockFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.UnlockMutex(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.UnlockMutex));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.UnlockMutex));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -229,7 +230,7 @@ public sealed class MutexDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeMutex(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeMutex));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeMutex));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

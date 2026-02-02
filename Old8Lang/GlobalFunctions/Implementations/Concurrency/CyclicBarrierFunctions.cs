@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -41,7 +42,7 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CreateCyclicBarrier(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateCyclicBarrier));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCyclicBarrier));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -88,7 +89,7 @@ public sealed class CyclicBarrierAwaitFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AwaitCyclicBarrier(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AwaitCyclicBarrier));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AwaitCyclicBarrier));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -140,7 +141,7 @@ public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AwaitCyclicBarrierTimeout(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AwaitCyclicBarrierTimeout));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AwaitCyclicBarrierTimeout));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -188,7 +189,7 @@ public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunctio
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.GetCyclicBarrierParticipantCount(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.GetCyclicBarrierParticipantCount));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCyclicBarrierParticipantCount));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -235,7 +236,7 @@ public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.GetCyclicBarrierWaitingCount(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.GetCyclicBarrierWaitingCount));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCyclicBarrierWaitingCount));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -282,7 +283,7 @@ public sealed class CyclicBarrierDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeCyclicBarrier(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeCyclicBarrier));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCyclicBarrier));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

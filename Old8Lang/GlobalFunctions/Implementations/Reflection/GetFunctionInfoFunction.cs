@@ -7,6 +7,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
@@ -49,7 +50,7 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetFunctionInfo(string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetFunctionInfo));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetFunctionInfo));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 

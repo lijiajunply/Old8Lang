@@ -6,6 +6,7 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations;
 
@@ -82,7 +83,7 @@ public sealed class IntFunction : BaseGlobalFunction
         // string -> int
         if (paramType == typeof(string))
         {
-            var parseMethod = typeof(int).GetMethod("Parse", [typeof(string)])!;
+            var parseMethod = GlobalMethodInfoCache.GetMethod(typeof(int), "Parse", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, parseMethod);
             return;
         }
@@ -90,7 +91,7 @@ public sealed class IntFunction : BaseGlobalFunction
         // object -> int (运行时转换)
         if (paramType == typeof(object))
         {
-            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(object)])!);
+            ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Convert), "ToInt32", [typeof(object)])!);
             return;
         }
 
@@ -217,7 +218,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
         // string -> double
         if (paramType == typeof(string))
         {
-            var parseMethod = typeof(double).GetMethod("Parse", [typeof(string)])!;
+            var parseMethod = GlobalMethodInfoCache.GetMethod(typeof(double), "Parse", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, parseMethod);
             return;
         }
@@ -225,7 +226,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
         // object -> double (运行时转换)
         if (paramType == typeof(object))
         {
-            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDouble", [typeof(object)])!);
+            ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Convert), "ToDouble", [typeof(object)])!);
             return;
         }
 
@@ -329,7 +330,7 @@ public sealed class CharFunction : BaseGlobalFunction
         // string -> char
         if (paramType == typeof(string))
         {
-            var parseMethod = typeof(char).GetMethod("Parse", [typeof(string)])!;
+            var parseMethod = GlobalMethodInfoCache.GetMethod(typeof(char), "Parse", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, parseMethod);
             return;
         }
@@ -337,7 +338,7 @@ public sealed class CharFunction : BaseGlobalFunction
         // object -> char 或者 int -> char
         if (paramType == typeof(object) || paramType == typeof(int))
         {
-            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToChar", [typeof(object)])!);
+            ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Convert), "ToChar", [typeof(object)])!);
             return;
         }
 
@@ -470,7 +471,7 @@ public sealed class BoolFunction : BaseGlobalFunction
         // string -> bool
         if (paramType == typeof(string))
         {
-            var parseMethod = typeof(bool).GetMethod("Parse", [typeof(string)])!;
+            var parseMethod = GlobalMethodInfoCache.GetMethod(typeof(bool), "Parse", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, parseMethod);
             return;
         }
@@ -478,7 +479,7 @@ public sealed class BoolFunction : BaseGlobalFunction
         // object -> bool (运行时转换)
         if (paramType == typeof(object))
         {
-            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToBoolean", [typeof(object)])!);
+            ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Convert), "ToBoolean", [typeof(object)])!);
             return;
         }
 

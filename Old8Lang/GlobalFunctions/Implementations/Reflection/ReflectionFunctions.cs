@@ -10,6 +10,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
@@ -49,7 +50,7 @@ public sealed class GetClassNameFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetClassName(object)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetClassName));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetClassName));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -111,7 +112,7 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetClassMethods(object)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetClassMethods));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetClassMethods));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -187,7 +188,7 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetClassFields(object)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetClassFields));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetClassFields));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -280,7 +281,7 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetMethodInfo(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetMethodInfo));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetMethodInfo));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -381,7 +382,7 @@ public sealed class GetFieldInfoFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetFieldInfo(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetFieldInfo));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetFieldInfo));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 

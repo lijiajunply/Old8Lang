@@ -11,6 +11,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
@@ -54,7 +55,7 @@ public sealed class GetFieldFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.GetField(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.GetField));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetField));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -138,7 +139,7 @@ public sealed class SetFieldFunction : BaseGlobalFunction
         parameters[2].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.SetField(object, string, object)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.SetField));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.SetField));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 

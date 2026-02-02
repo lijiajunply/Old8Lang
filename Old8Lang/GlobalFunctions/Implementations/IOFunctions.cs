@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations;
 
@@ -44,7 +45,7 @@ public sealed class PrintFunction : BaseGlobalFunction
 
         if (printType != typeof(string))
         {
-            var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
+            var toStringMethod = GlobalMethodInfoCache.GetMethod(typeof(object), "ToString", Type.EmptyTypes)!;
             if (printType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, printType);
@@ -52,7 +53,7 @@ public sealed class PrintFunction : BaseGlobalFunction
             ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
         }
 
-        ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
+        ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Console), "Write", [typeof(string)])!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -150,9 +151,9 @@ public sealed class ErrorFunction : BaseGlobalFunction
         // 编译模式使用 Console.Error.WriteLine
         if (parameters.Count == 0)
         {
-            var errorProp = typeof(Console).GetProperty("Error")!;
-            ilGenerator.Emit(OpCodes.Call, errorProp.GetGetMethod()!);
-            var writeLineMethod = typeof(TextWriter).GetMethod("WriteLine", Type.EmptyTypes)!;
+            var errorProp = GlobalMethodInfoCache.GetPropertyGetter(typeof(Console), "Error")!;
+            ilGenerator.Emit(OpCodes.Call, errorProp);
+            var writeLineMethod = GlobalMethodInfoCache.GetMethod(typeof(TextWriter), "WriteLine", Type.EmptyTypes)!;
             ilGenerator.Emit(OpCodes.Callvirt, writeLineMethod);
             return;
         }
@@ -167,14 +168,14 @@ public sealed class ErrorFunction : BaseGlobalFunction
             {
                 ilGenerator.Emit(OpCodes.Box, exprType);
             }
-            var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
+            var toStringMethod = GlobalMethodInfoCache.GetMethod(typeof(object), "ToString", Type.EmptyTypes)!;
             ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
         }
 
-        var errorProperty = typeof(Console).GetProperty("Error")!;
-        ilGenerator.Emit(OpCodes.Call, errorProperty.GetGetMethod()!);
+        var errorProperty = GlobalMethodInfoCache.GetPropertyGetter(typeof(Console), "Error")!;
+        ilGenerator.Emit(OpCodes.Call, errorProperty);
         ilGenerator.Emit(OpCodes.Ldarg_0); // 交换栈顶两个元素的顺序
-        var writeLineStringMethod = typeof(TextWriter).GetMethod("WriteLine", [typeof(string)])!;
+        var writeLineStringMethod = GlobalMethodInfoCache.GetMethod(typeof(TextWriter), "WriteLine", [typeof(string)])!;
         ilGenerator.Emit(OpCodes.Callvirt, writeLineStringMethod);
     }
 
@@ -227,7 +228,7 @@ public sealed class ClearFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        var clearMethod = typeof(Console).GetMethod("Clear", Type.EmptyTypes);
+        var clearMethod = GlobalMethodInfoCache.GetMethod(typeof(Console), "Clear", Type.EmptyTypes);
         if (clearMethod is not null)
         {
             ilGenerator.Emit(OpCodes.Call, clearMethod);

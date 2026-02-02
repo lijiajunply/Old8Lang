@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -41,7 +42,7 @@ public sealed class AtomicIntCreateFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CreateAtomicInt(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -88,7 +89,7 @@ public sealed class AtomicIntGetFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.GetAtomicInt(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.GetAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -139,7 +140,7 @@ public sealed class AtomicIntSetFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.SetAtomicInt(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.SetAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.SetAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -188,7 +189,7 @@ public sealed class AtomicIntIncrementFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.IncrementAtomicInt(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.IncrementAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.IncrementAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -235,7 +236,7 @@ public sealed class AtomicIntDecrementFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DecrementAtomicInt(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DecrementAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DecrementAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -286,7 +287,7 @@ public sealed class AtomicIntAddFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AddAtomicInt(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AddAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AddAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -342,7 +343,7 @@ public sealed class AtomicIntCompareAndSetFunction : BaseGlobalFunction
         parameters[2].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CompareAndSetAtomicInt(int, int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CompareAndSetAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CompareAndSetAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -391,7 +392,7 @@ public sealed class AtomicIntDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeAtomicInt(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeAtomicInt));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeAtomicInt));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

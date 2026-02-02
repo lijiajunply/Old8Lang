@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -35,7 +36,7 @@ public sealed class CreateCancellationTokenSourceFunction : BaseGlobalFunction
         LocalManager local,
         SourcePosition position)
     {
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateCancellationTokenSource));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCancellationTokenSource));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -81,7 +82,7 @@ public sealed class CancelFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.Cancel(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.Cancel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.Cancel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -133,7 +134,7 @@ public sealed class CancelAfterFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CancelAfter(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CancelAfter));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CancelAfter));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -182,7 +183,7 @@ public sealed class DisposeCancellationTokenSourceFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeCancellationTokenSource(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeCancellationTokenSource));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCancellationTokenSource));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

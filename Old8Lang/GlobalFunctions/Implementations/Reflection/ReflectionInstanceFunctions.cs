@@ -10,6 +10,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
@@ -74,7 +75,7 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
 
         // 调用 ReflectionHelper.CreateInstance(string, object, VariateManager)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.CreateInstance));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.CreateInstance));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -209,7 +210,7 @@ public sealed class IsInstanceOfFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.IsInstanceOf(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.IsInstanceOf));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.IsInstanceOf));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -263,7 +264,7 @@ public sealed class HasMethodFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.HasMethod(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.HasMethod));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.HasMethod));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 
@@ -332,7 +333,7 @@ public sealed class HasFieldFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ReflectionHelper.HasField(object, string)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.HasField));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.HasField));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 

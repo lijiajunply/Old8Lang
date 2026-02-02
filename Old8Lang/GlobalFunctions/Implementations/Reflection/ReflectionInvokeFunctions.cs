@@ -10,6 +10,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
@@ -73,7 +74,7 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
         ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
 
         // 调用 ReflectionHelper.InvokeMethod(object, string, object, VariateManager)
-        var method = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.InvokeMethod));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.InvokeMethod));
         ilGenerator.Emit(OpCodes.Call, method!);
     }
 

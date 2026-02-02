@@ -6,6 +6,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.ExternProviders;
 
@@ -37,7 +38,7 @@ public class CSharpDllProvider : IExternProvider
         Assembly assembly;
         try
         {
-            assembly = LoadAssembly(assemblyName);
+            assembly = AssemblyTypeCache.GetOrLoadAssembly(assemblyName);
         }
         catch (Exception ex)
         {
@@ -46,7 +47,7 @@ public class CSharpDllProvider : IExternProvider
         }
 
         // 获取类型
-        var type = FindType(assembly, className);
+        var type = AssemblyTypeCache.FindType(assembly, className);
         if (type == null)
         {
             throw new InvalidOperationError(new SourcePosition(0, 0),
@@ -96,10 +97,10 @@ public class CSharpDllProvider : IExternProvider
         var (assemblyName, className) = ParseSource(source);
 
         // 加载程序集
-        var assembly = LoadAssembly(assemblyName);
+        var assembly = AssemblyTypeCache.GetOrLoadAssembly(assemblyName);
 
         // 获取类型
-        var type = FindType(assembly, className);
+        var type = AssemblyTypeCache.FindType(assembly, className);
         if (type == null)
         {
             throw new InvalidOperationError(new SourcePosition(0, 0),
@@ -219,81 +220,6 @@ public class CSharpDllProvider : IExternProvider
     }
 
     /// <summary>
-    /// 加载程序集
-    /// </summary>
-    private Assembly LoadAssembly(string assemblyName)
-    {
-        // 尝试作为文件路径加载
-        if (File.Exists(assemblyName))
-        {
-            return Assembly.LoadFrom(assemblyName);
-        }
-
-        // 尝试从已加载的程序集中查找
-        var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name?.Equals(assemblyName, StringComparison.OrdinalIgnoreCase) == true);
-
-        if (loadedAssembly != null)
-        {
-            return loadedAssembly;
-        }
-
-        // 尝试作为程序集名称加载
-        try
-        {
-            return Assembly.Load(assemblyName);
-        }
-        catch
-        {
-            // 尝试加载 System.Runtime 等标准程序集
-            try
-            {
-                return Assembly.Load($"{assemblyName}, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
-            }
-            catch
-            {
-                // 最后尝试从 GAC 加载
-                return Assembly.Load(new AssemblyName(assemblyName));
-            }
-        }
-    }
-
-    /// <summary>
-    /// 在程序集中查找类型
-    /// </summary>
-    private Type? FindType(Assembly assembly, string className)
-    {
-        // 直接查找
-        var type = assembly.GetType(className);
-        if (type != null) return type;
-
-        // 尝试在所有命名空间中查找
-        type = assembly.GetTypes()
-            .FirstOrDefault(t => t.Name == className || t.FullName == className);
-        if (type != null) return type;
-
-        // 尝试从所有已加载的程序集中查找
-        foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            try
-            {
-                type = loadedAssembly.GetType(className);
-                if (type != null) return type;
-
-                type = loadedAssembly.GetTypes()
-                    .FirstOrDefault(t => t.Name == className || t.FullName == className);
-                if (type != null) return type;
-            }
-            catch
-            {
-                // 忽略无法访问的程序集
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// 在类型中查找方法
     /// </summary>
     private MethodInfo? FindMethod(Type type, ExternFunctionDeclaration funcDecl)
@@ -306,18 +232,8 @@ public class CSharpDllProvider : IExternProvider
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray();
 
-        // 如果有参数类型，精确匹配
-        if (paramTypes != null && paramTypes.Length > 0)
-        {
-            var method = type.GetMethod(methodName,
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
-                null, paramTypes, null);
-            if (method != null) return method;
-        }
-
-        // 否则按名称查找
-        return type.GetMethod(methodName,
-            BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+        // 使用缓存查找方法
+        return AssemblyTypeCache.FindMethod(type, methodName, paramTypes);
     }
 
     /// <summary>

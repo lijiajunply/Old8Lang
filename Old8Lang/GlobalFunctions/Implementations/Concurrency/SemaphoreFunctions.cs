@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -45,7 +46,7 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CreateSemaphore(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateSemaphore));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateSemaphore));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -93,7 +94,7 @@ public sealed class SemaphoreAcquireFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.AcquireSemaphore(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.AcquireSemaphore));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireSemaphore));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -145,7 +146,7 @@ public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TryAcquireSemaphore(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryAcquireSemaphore));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireSemaphore));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -193,7 +194,7 @@ public sealed class SemaphoreReleaseFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.ReleaseSemaphore(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.ReleaseSemaphore));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseSemaphore));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -241,7 +242,7 @@ public sealed class SemaphoreDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeSemaphore(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeSemaphore));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeSemaphore));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 

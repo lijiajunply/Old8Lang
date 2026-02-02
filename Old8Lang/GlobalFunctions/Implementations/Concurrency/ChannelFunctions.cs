@@ -7,6 +7,7 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
@@ -35,7 +36,7 @@ public sealed class ChannelCreateFunction : BaseGlobalFunction
         LocalManager local,
         SourcePosition position)
     {
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -81,7 +82,7 @@ public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CreateBoundedChannel(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CreateBoundedChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateBoundedChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -136,7 +137,7 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
         }
 
         // 调用 ResourceManager.SendChannel(int, object)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.SendChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.SendChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -197,7 +198,7 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
         parameters[2].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TrySendChannel(int, object, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TrySendChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TrySendChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -246,7 +247,7 @@ public sealed class ChannelReceiveFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.ReceiveChannel(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.ReceiveChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReceiveChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -297,7 +298,7 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
         parameters[1].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.TryReceiveChannel(int, int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryReceiveChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryReceiveChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -347,7 +348,7 @@ public sealed class ChannelCloseFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.CloseChannel(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.CloseChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CloseChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -395,7 +396,7 @@ public sealed class ChannelDisposeFunction : BaseGlobalFunction
         parameters[0].LoadIlValue(ilGenerator, local);
 
         // 调用 ResourceManager.DisposeChannel(int)
-        var method = typeof(ResourceManager).GetMethod(nameof(ResourceManager.DisposeChannel));
+        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeChannel));
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
