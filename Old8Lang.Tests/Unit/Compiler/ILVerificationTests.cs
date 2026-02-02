@@ -210,6 +210,8 @@ public class ILVerificationTests
         // 测试类声明、实例化和方法调用的IL生成
         var code = @"
             class Person {
+                name:string <- """"
+                age:int <- -1
                 func init(name:string, age:int) -> void {
                     this.name <- name
                     this.age <- age

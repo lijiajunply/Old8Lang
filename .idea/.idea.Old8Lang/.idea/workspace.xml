@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyMutexTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -569,7 +570,7 @@
       <workItem from="1769740546710" duration="2149000" />
       <workItem from="1769843063742" duration="2459000" />
       <workItem from="1769878790800" duration="19115000" />
-      <workItem from="1770004902703" duration="7605000" />
+      <workItem from="1770004902703" duration="8045000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +915,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="850" />
+    <option name="localTasksCounter" value="851" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,7 +942,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMIntegrationTests 中统一使用 ['\r', '\n'] 进行行分割&#10;- 在 VMReflectionTests 中更新行分割逻辑以支持 Windows 和 Unix 换行符&#10;- 修改 VMResourceCleanupTests 中的行分割方法确保兼容性&#10;- 更新 VMTypeErrorTests 中的断言逻辑以正确处理不同平台的换行符" />
     <MESSAGE value="test(VM): 优化虚拟机测试中的输出验证逻辑&#10;&#10;- 将硬编码的字符串比较替换为更灵活的行分割验证&#10;- 使用 Split 方法处理跨平台的换行符差异（\r\n 和 \n）&#10;- 统一变量命名，将 output 重命名为 executeVMCode 提高可读性&#10;- 增强测试断言的健壮性，避免因换行符导致的测试失败&#10;- 改进复数类型测试中的多行输出验证方式" />
     <MESSAGE value="chore(compiler): 移除大量测试文件及相关工具脚本&#10;&#10;- 删除了 66 个编译器测试文件，这些文件对应解释器测试但不适用于编译器模式&#10;- 移除了 138 个旧版测试文件，包括数组操作、时间库、OS库等测试&#10;- 清理了编译器测试生成和修复的相关工具脚本&#10;- 删除了编译器测试生成报告和运行报告文档&#10;- 从 IDE 配置中移除了相关文件的变更记录&#10;- 更新了本地任务计数器和工作时间统计信息" />
     <MESSAGE value="fix(tests): 修复虚拟机测试中的行分隔符处理&#10;&#10;- 将所有测试中的行分割方式从仅使用 '\n' 改为支持跨平台的换行符处理&#10;- 在 VMComparisonLogicalTests 中统一使用 Environment.NewLine 进行行分割&#10;- 修复了 select 语句测试中关闭通道的逻辑&#10;- 更新了多个测试方法中的行分割逻辑以确保跨平台兼容性" />
@@ -966,7 +966,8 @@
     <MESSAGE value="fix(vm): 修复生成器执行中的状态管理和栈恢复问题&#10;&#10;- 重置生成器状态为NotStarted以正确区分yield暂停和函数结束&#10;- 保存调用者栈状态和调用栈计数以便正确恢复&#10;- 修改yield检测逻辑从IP检查改为状态检查&#10;- 在生成器完成后正确恢复调用者的栈状态&#10;- 修复性能测试中生成器函数的返回类型声明" />
     <MESSAGE value="```&#10;test(vm): 为 VMSelectStatementTests 添加等待时间确保测试稳定&#10;&#10;- 在 ChannelSend 操作后添加 Sleep(50) 确保数据发送完成&#10;- 为多个测试场景添加适当的延迟等待&#10;- 优化 SelectStatement_MultipleChannels_ExecutesCorrectly 测试逻辑&#10;- 添加注释说明测试目的和执行顺序&#10;- 提高并发操作测试的可靠性&#10;```" />
     <MESSAGE value="test(vm): 更新虚拟机 select 语句测试用例&#10;&#10;- 为 select 语句测试添加默认 case 分支验证&#10;- 调整测试顺序，先发送数据再执行 select 以确保正确执行&#10;- 简化多 case 测试逻辑，移除不必要的延迟&#10;- 修改生产者消费者测试，使用更直接的数据流向验证&#10;- 优化嵌套 select 测试的数据发送时机&#10;- 更新断言条件以匹配新的测试逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 更新虚拟机 select 语句测试用例&#10;&#10;- 为 select 语句测试添加默认 case 分支验证&#10;- 调整测试顺序，先发送数据再执行 select 以确保正确执行&#10;- 简化多 case 测试逻辑，移除不必要的延迟&#10;- 修改生产者消费者测试，使用更直接的数据流向验证&#10;- 优化嵌套 select 测试的数据发送时机&#10;- 更新断言条件以匹配新的测试逻辑" />
+    <MESSAGE value="test(vm): 更新虚拟机互斥锁重入锁定测试&#10;&#10;- 修改 Mutex_ReentrantLocking_ExecutesCorrectly 测试方法的实现逻辑&#10;- 将递归获取锁的方式改为使用 MutexTryLock 带超时检测重入失败&#10;- 添加标准 Mutex 不支持重入的注释说明&#10;- 调整测试断言验证第一次获取锁成功和重入尝试超时失败的预期结果&#10;- 更新 .idea/workspace.xml 中的变更记录和本地任务计数器统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 更新虚拟机互斥锁重入锁定测试&#10;&#10;- 修改 Mutex_ReentrantLocking_ExecutesCorrectly 测试方法的实现逻辑&#10;- 将递归获取锁的方式改为使用 MutexTryLock 带超时检测重入失败&#10;- 添加标准 Mutex 不支持重入的注释说明&#10;- 调整测试断言验证第一次获取锁成功和重入尝试超时失败的预期结果&#10;- 更新 .idea/workspace.xml 中的变更记录和本地任务计数器统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

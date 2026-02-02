@@ -270,6 +270,7 @@ public class IlGenerationTests
         // Arrange
         var code = @"
             class TestClass {
+                value:int <- -1
                 func init() -> void {
                     this.value <- 0
                 }
