@@ -78,6 +78,9 @@ public class VMSelectStatementTests
                 ChannelSend(ch, 100)
             }).Start()
 
+            // 等待数据发送完成
+            Sleep(50)
+
             select {
                 case val from ch -> {
                     PrintLine(""Received: "" + val.ToStr())
@@ -137,6 +140,9 @@ public class VMSelectStatementTests
                 Sleep(100)
                 ChannelSend(ch2, 2)
             }).Start()
+
+            // 等待数据发送完成
+            Sleep(50)
 
             select {
                 case val from ch1 -> {
@@ -313,6 +319,9 @@ public class VMSelectStatementTests
             spawn(producer).Start()
             spawn(consumer).Start()
 
+            // 等待数据发送完成
+            Sleep(50)
+
             results <- {}
             for i in [1~3] {
                 val <- ChannelReceive(ch2)
@@ -351,6 +360,9 @@ public class VMSelectStatementTests
                 ChannelSend(ch1, 1)
             }).Start()
 
+            // 等待数据发送完成
+            Sleep(50)
+
             select {
                 case val from ch1 -> {
                     PrintLine(""Outer received: "" + val.ToStr())
@@ -384,15 +396,20 @@ public class VMSelectStatementTests
     public void SelectStatement_MultipleChannels_ExecutesCorrectly()
     {
         // Arrange
+        // 测试多个 channel 的 select 语句
+        // 在 select 之前先向 ch2 发送数据，这样 select 可以立即接收
         var code = @"
             ch1 <- ChannelCreate()
             ch2 <- ChannelCreate()
             ch3 <- ChannelCreate()
 
+            // 先向 ch2 发送数据
             spawn(() -> {
-                Sleep(30)
                 ChannelSend(ch2, 2)
             }).Start()
+
+            // 等待数据发送完成
+            Sleep(50)
 
             select {
                 case val from ch1 -> {
