@@ -635,7 +635,7 @@ public class VMExecutionPerformanceTests
     public void Performance_Generator_YieldOperation()
     {
         var code = @"
-            func generate() -> void {
+            func generate() {
                 for i <- 0, i < 100, i++ {
                     yield i
                 }

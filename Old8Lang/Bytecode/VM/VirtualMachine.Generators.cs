@@ -50,6 +50,9 @@ public partial class VirtualMachine
             generatorState.RestoreState(out ip, out locals, out stack);
         }
 
+        // 重置状态为运行中（重要：这样可以区分 yield 暂停和函数正常结束）
+        generatorState.Status = GeneratorStatus.NotStarted; // 使用 NotStarted 作为"运行中"状态
+
         // 创建调用帧
         var frame = new CallFrame(generatorState.Function, generatorState.Function.LocalCount)
         {
@@ -63,7 +66,11 @@ public partial class VirtualMachine
             frame.Locals[i] = locals[i];
         }
 
-        // 恢复栈
+        // 保存调用者的栈状态和调用栈
+        var callerStack = new Stack<object?>(_stack.Reverse());
+        var callerCallStackCount = _callStack.Count;
+
+        // 恢复生成器的栈
         _stack.Clear();
         foreach (var item in stack.Reverse())
         {
@@ -84,21 +91,11 @@ public partial class VirtualMachine
                 {
                     ExecuteInstruction(instruction, frame);
 
-                    // 检查是否遇到了yield（通过检查IP是否被设置到函数末尾）
-                    if (frame.IP >= generatorState.Function.Instructions.Count)
+                    // 检查是否遇到了yield（通过检查状态是否变为 Suspended）
+                    if (generatorState.Status == GeneratorStatus.Suspended)
                     {
-                        // 生成器已暂停或完成
-                        if (generatorState.Status == GeneratorStatus.Suspended)
-                        {
-                            // 返回yield的值
-                            return generatorState.CurrentValue;
-                        }
-                        else
-                        {
-                            // 生成器已完成
-                            generatorState.Complete();
-                            return null;
-                        }
+                        // 返回yield的值
+                        return generatorState.CurrentValue;
                     }
                 }
                 catch (Exception ex)
@@ -120,6 +117,13 @@ public partial class VirtualMachine
         {
             ExecuteDefers(frame);
             _callStack.Pop();
+
+            // 恢复调用者的栈状态
+            _stack.Clear();
+            foreach (var item in callerStack.Reverse())
+            {
+                _stack.Push(item);
+            }
         }
     }
 }
