@@ -410,6 +410,13 @@ public partial class Instance : LangValueType
 
     public LangValueType FromClassToResult(LangValueType baseLangValue, VariateManager? manager = null)
     {
+        // 1. 首先尝试通过实例方法注册器执行（新系统）
+        if (TryExecuteInstanceMethod(baseLangValue, manager ?? new VariateManager(), out var instanceMethodResult))
+        {
+            return instanceMethodResult!;
+        }
+
+        // 2. 如果新系统没有找到方法，使用旧的反射系统（向后兼容）
         var type = baseLangValue.GetType();
         MethodInfo? m = null;
 

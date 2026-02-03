@@ -1,0 +1,26 @@
+// 测试实例方法系统
+
+// 测试 List.Add
+myList <- {}
+myList.Add(1)
+myList.Add(2)
+myList.Add(3)
+PrintLine("List after Add: " + myList.ToStr())
+
+// 测试 List.Count
+count <- myList.Count()
+PrintLine("List count: " + count.ToStr())
+
+// 测试 List.Contains
+contains <- myList.Contains(2)
+PrintLine("List contains 2: " + contains.ToStr())
+
+// 测试 List.Remove
+removed <- myList.Remove(2)
+PrintLine("Removed: " + removed.ToStr())
+PrintLine("List after Remove: " + myList.ToStr())
+
+// 测试 List.Clear
+myList.Clear()
+PrintLine("List after Clear: " + myList.ToStr())
+PrintLine("List count after Clear: " + myList.Count().ToStr())
