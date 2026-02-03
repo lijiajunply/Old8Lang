@@ -66,7 +66,24 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListForEachMethod());
             registry.Register(new Implementations.List.ListJoinMethod());
 
-            // TODO: 注册更多 List 方法（约13个）
+            // 注册 List 集合操作方法
+            registry.Register(new Implementations.List.ListUnionMethod());
+            registry.Register(new Implementations.List.ListIntersectMethod());
+            registry.Register(new Implementations.List.ListExceptMethod());
+            registry.Register(new Implementations.List.ListZipMethod());
+            registry.Register(new Implementations.List.ListGroupByMethod());
+
+            // 注册 List 排序检查方法
+            registry.Register(new Implementations.List.ListIsSortedMethod());
+
+            // TODO: 注册更多 List 排序算法方法（约7个）
+            // registry.Register(new Implementations.List.ListSortWithComparerMethod());
+            // registry.Register(new Implementations.List.ListQuickSortMethod());
+            // registry.Register(new Implementations.List.ListMergeSortMethod());
+            // registry.Register(new Implementations.List.ListBubbleSortMethod());
+            // registry.Register(new Implementations.List.ListSelectionSortMethod());
+            // registry.Register(new Implementations.List.ListInsertionSortMethod());
+            // registry.Register(new Implementations.List.ListHeapSortMethod());
             // ... 等
 
             // TODO: 注册 String 方法（约15个）

@@ -1,0 +1,41 @@
+// 测试 List 集合操作方法
+
+// 测试 Union（并集）
+list1 <- {1, 2, 3, 4}
+list2 <- {3, 4, 5, 6}
+union <- list1.Union(list2)
+PrintLine("Union: " + union.ToStr())
+
+// 测试 Intersect（交集）
+intersect <- list1.Intersect(list2)
+PrintLine("Intersect: " + intersect.ToStr())
+
+// 测试 Except（差集）
+except <- list1.Except(list2)
+PrintLine("Except: " + except.ToStr())
+
+// 测试 Zip（配对）- 默认创建元组
+names <- {"Alice", "Bob", "Charlie"}
+ages <- {25, 30, 35}
+zipped <- names.Zip(ages)
+PrintLine("Zipped (default): " + zipped.ToStr())
+
+// 测试 Zip（配对）- 带选择器
+zippedCustom <- names.Zip(ages, (name:string, age:int) -> name + " is " + age.ToStr() + " years old")
+PrintLine("Zipped (custom): " + zippedCustom.ToStr())
+
+// 测试 GroupBy（分组）
+numbers <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+grouped <- numbers.GroupBy((x:int) -> (x % 3).ToStr())
+PrintLine("GroupBy (mod 3): " + grouped.ToStr())
+
+// 测试字符串分组
+words <- {"apple", "banana", "apricot", "blueberry", "cherry", "avocado"}
+groupedByFirstChar <- words.GroupBy((w:string) -> w.Substring(0, 1))
+PrintLine("GroupBy (first char): " + groupedByFirstChar.ToStr())
+
+// 测试 IsSorted（检查是否已排序）
+sorted <- {1, 2, 3, 4, 5}
+unsorted <- {5, 2, 8, 1, 9}
+PrintLine("IsSorted (sorted): " + sorted.IsSorted().ToStr())
+PrintLine("IsSorted (unsorted): " + unsorted.IsSorted().ToStr())
