@@ -9,7 +9,6 @@ using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Specialization;
 using Old8Lang.Error;
-using Old8Lang.GlobalFunctions.BuiltinMethods.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
@@ -411,17 +410,6 @@ public partial class Instance : LangValueType
 
     public LangValueType FromClassToResult(LangValueType baseLangValue, VariateManager? manager = null)
     {
-        // 优先查找内置方法注册表
-        BuiltinMethodInitializer.EnsureInitialized();
-        var builtinMethod = BuiltinMethodRegistry.Instance.TryGetMethod(baseLangValue, Id.IdName);
-        if (builtinMethod is not null)
-        {
-            // 构造参数列表：第一个参数是 baseLangValue
-            var builtinParams = new List<LangExpression> { baseLangValue };
-            builtinParams.AddRange(Ids);
-            return builtinMethod.Execute(builtinParams, manager ?? new VariateManager(), Position);
-        }
-
         var type = baseLangValue.GetType();
         MethodInfo? m = null;
 
