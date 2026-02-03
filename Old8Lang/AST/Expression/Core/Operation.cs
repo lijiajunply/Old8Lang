@@ -799,6 +799,21 @@ public partial class Operation(
                 return typeof(void);
             }
 
+            // 优先查找内置方法注册表
+            if (leftType is not null)
+            {
+                GlobalFunctions.BuiltinMethods.Core.BuiltinMethodInitializer.EnsureInitialized();
+                var builtinMethod = GlobalFunctions.BuiltinMethods.Core.BuiltinMethodRegistry.Instance
+                    .TryGetMethodForCompiler(leftType, instance.Id.IdName);
+                if (builtinMethod is not null)
+                {
+                    // 构造参数列表用于获取返回类型
+                    var builtinParams = new List<LangExpression> { Left! };
+                    builtinParams.AddRange(instance.Ids);
+                    return builtinMethod.GetReturnType(builtinParams, local);
+                }
+            }
+
             // 处理内置类型的扩展方法返回类型
             var builtInReturnType = GetBuiltInMethodReturnType(leftType, instance.Id.IdName, instance.Ids.Count);
             if (builtInReturnType is not null)

@@ -6,6 +6,7 @@ using Old8Lang.Error;
 using System.Collections;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
+using Old8Lang.GlobalFunctions.BuiltinMethods.Core;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
@@ -515,6 +516,23 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        // 优先查找内置方法注册表
+        BuiltinMethodInitializer.EnsureInitialized();
+        var builtinMethod = BuiltinMethodRegistry.Instance.TryGetMethodForCompiler(leftType!, instance.Id.IdName);
+        if (builtinMethod is not null)
+        {
+            // 加载 left 作为第一个参数
+            left!.LoadIlValue(ilGenerator, local);
+
+            // 构造参数列表
+            var parameters = new List<LangExpression> { left! };
+            parameters.AddRange(instance.Ids);
+
+            // 调用内置方法的 IL 生成
+            builtinMethod.GenerateIl(parameters, ilGenerator, local, operation.Position);
+            return builtinMethod.GetReturnType(parameters, local);
+        }
+
         left!.LoadIlValue(ilGenerator, local);
         var types = new List<Type>();
         foreach (var instanceId in instance.Ids)
