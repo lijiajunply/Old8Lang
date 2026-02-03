@@ -23,15 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/BuiltinMethods/Core/BuiltinMethodInitializer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/BuiltinMethods/Core/BuiltinMethodRegistry.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/BuiltinMethods/List/ListAddFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/BuiltinMethods/List/ListCountFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/BuiltinMethods/String/StringLengthFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Core/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GEMINI.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -923,7 +916,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="856" />
+    <option name="localTasksCounter" value="857" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -950,7 +943,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(concurrency): 重构并发组件实现&#10;&#10;- 修改TryReceiveChannel函数返回实际值或null，而不是ChannelReceiveResult对象&#10;- 使用.NET内置Barrier类替换手动实现的CyclicBarrierImpl，简化同步逻辑&#10;- 更新ResourceManager中ReadAsync调用方式，使用AsTask().Result避免异常&#10;- 添加taskkill命令到本地设置的bash命令列表中" />
     <MESSAGE value="feat(concurrency): 实现线程结果获取和手动启动功能&#10;&#10;- 添加 SetThreadResult 方法用于设置线程执行结果&#10;- 修改 SpawnFunction 实现，线程不再自动启动，需手动调用 Start()&#10;- 在线程执行完成后设置返回值结果&#10;- 更新虚拟机 CallFunctionObject 方法返回函数执行结果&#10;- 添加线程启动状态检查避免重复启动&#10;- 更新测试代码使用新的线程启动和结果获取方式&#10;- 添加辅助方法处理不同类型的整数值转换" />
     <MESSAGE value="test(concurrency): 更新并发测试以使用AtomicInt和改进的线程管理&#10;&#10;- 添加GetIntValue辅助方法来统一处理不同类型的整数值&#10;- 在ReadWriteLock测试中使用AtomicInt替代普通计数器确保原子性&#10;- 在Semaphore测试中使用AtomicInt替代普通计数器确保原子性&#10;- 修改线程创建方式从spawn直接调用改为先创建再Start启动&#10;- 添加适当的资源清理和线程同步等待逻辑&#10;- 更新断言检查以使用统一的GetIntValue方法处理结果值" />
     <MESSAGE value="test(parser): 更新高级操作符测试以验证嵌套索引访问&#10;&#10;- 添加 NestedIndexAccess 类型断言替代 Operation 类型&#10;- 导入 Intermediates 命名空间支持测试验证&#10;- 修正表达式解析器的索引操作符处理逻辑&#10;- 更新相关测试用例以匹配新的 AST 结构&#10;&#10;chore(devtools): 添加超时命令到 Claude 工作流配置&#10;&#10;- 在 settings.local.json 中增加 Bash(timeout:*) 指令&#10;- 更新 IDE 工作区配置以包含最新变更跟踪&#10;- 修正任务计数器同步工作项统计" />
@@ -975,7 +967,8 @@
     <MESSAGE value="fix(language-server): 修复文档高亮处理器中的坐标系统转换问题&#10;&#10;- 修正了 Token 和 SourceLocation 坐标系统的差异说明&#10;- 移除了不必要的列号转换，因为列号已经是 0-based&#10;- 更新了符号查找器中的坐标转换逻辑以保持一致性&#10;- 修正了 Token 列号的注释说明，明确其为 0-based 系统" />
     <MESSAGE value="test(completion): 更新补全功能测试用例&#10;&#10;- 修复私有成员不应在类外部补全中显示的断言&#10;- 跳过尚未完全实现的局部变量补全功能测试&#10;- 修正导入关键字列表，移除已删除的 native 关键字&#10;- 跳过成员链类型推断功能相关的测试&#10;- 修复代码片段标签名称，将 asyncfunc 改为 async func&#10;- 调整测试位置坐标以匹配实际代码行数&#10;- 修正签名帮助处理器中的位置参数" />
     <MESSAGE value="feat(cache): 添加程序集类型缓存和全局方法信息缓存&#10;&#10;- 新增 AssemblyTypeCache 类用于缓存程序集、类型和方法信息&#10;- 新增 GlobalMethodInfoCache 类用于缓存 MethodInfo 和 PropertyInfo&#10;- 替换原有反射调用为缓存版本以提升性能&#10;- 在多个并发函数实现中使用缓存的方法查找&#10;- 在 CSharpDllProvider 中集成程序集类型缓存&#10;- 移除原有的 LoadAssembly 和 FindType 内部方法实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(cache): 添加程序集类型缓存和全局方法信息缓存&#10;&#10;- 新增 AssemblyTypeCache 类用于缓存程序集、类型和方法信息&#10;- 新增 GlobalMethodInfoCache 类用于缓存 MethodInfo 和 PropertyInfo&#10;- 替换原有反射调用为缓存版本以提升性能&#10;- 在多个并发函数实现中使用缓存的方法查找&#10;- 在 CSharpDllProvider 中集成程序集类型缓存&#10;- 移除原有的 LoadAssembly 和 FindType 内部方法实现" />
+    <MESSAGE value="删除不合适的架构" />
+    <option name="LAST_COMMIT_MESSAGE" value="删除不合适的架构" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
