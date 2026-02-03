@@ -87,6 +87,27 @@ public static class InstanceMethodInitializer
 
             // List 方法迁移完成！共 50 个方法
 
+            // 注册 String 基础方法
+            registry.Register(new Implementations.String.StringLengthMethod());
+            registry.Register(new Implementations.String.StringSubstringMethod());
+            registry.Register(new Implementations.String.StringReplaceMethod());
+            registry.Register(new Implementations.String.StringSplitMethod());
+            registry.Register(new Implementations.String.StringToUpperMethod());
+            registry.Register(new Implementations.String.StringToLowerMethod());
+            registry.Register(new Implementations.String.StringTrimMethod());
+            registry.Register(new Implementations.String.StringContainsMethod());
+
+            // 注册 String 高级方法
+            registry.Register(new Implementations.String.StringIndexOfMethod());
+            registry.Register(new Implementations.String.StringStartsWithMethod());
+            registry.Register(new Implementations.String.StringEndsWithMethod());
+            registry.Register(new Implementations.String.StringPadLeftMethod());
+            registry.Register(new Implementations.String.StringPadRightMethod());
+            registry.Register(new Implementations.String.StringReverseMethod());
+            registry.Register(new Implementations.String.StringToCharArrayMethod());
+
+            // String 方法迁移完成！共 15 个方法
+
             // TODO: 注册 String 方法（约15个）
             // registry.Register(new StringLengthMethod());
             // registry.Register(new StringSubstringMethod());
