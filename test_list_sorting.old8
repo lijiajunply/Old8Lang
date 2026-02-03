@@ -1,0 +1,47 @@
+// 测试 List 排序算法方法
+
+// 准备测试数据
+unsorted <- {64, 34, 25, 12, 22, 11, 90}
+PrintLine("Original: " + unsorted.ToStr())
+
+// 测试 QuickSort（快速排序）
+quickSorted <- unsorted.QuickSort()
+PrintLine("QuickSort: " + quickSorted.ToStr())
+
+// 测试 MergeSort（归并排序）
+mergeSorted <- unsorted.MergeSort()
+PrintLine("MergeSort: " + mergeSorted.ToStr())
+
+// 测试 BubbleSort（冒泡排序）
+bubbleSorted <- unsorted.BubbleSort()
+PrintLine("BubbleSort: " + bubbleSorted.ToStr())
+
+// 测试 SelectionSort（选择排序）
+selectionSorted <- unsorted.SelectionSort()
+PrintLine("SelectionSort: " + selectionSorted.ToStr())
+
+// 测试 InsertionSort（插入排序）
+insertionSorted <- unsorted.InsertionSort()
+PrintLine("InsertionSort: " + insertionSorted.ToStr())
+
+// 测试 HeapSort（堆排序）
+heapSorted <- unsorted.HeapSort()
+PrintLine("HeapSort: " + heapSorted.ToStr())
+
+// 测试 SortWith（自定义比较器）- 降序排序
+// 比较器返回：负数表示 a < b，0 表示 a == b，正数表示 a > b
+// 降序：当 a > b 时返回负数（让大的排前面）
+desc <- unsorted.SortWith((a:int, b:int) -> b - a)
+PrintLine("SortWith (descending): " + desc.ToStr())
+
+// 测试字符串排序
+words <- {"banana", "apple", "cherry", "date"}
+PrintLine("\nString sorting:")
+PrintLine("Original: " + words.ToStr())
+PrintLine("QuickSort: " + words.QuickSort().ToStr())
+PrintLine("MergeSort: " + words.MergeSort().ToStr())
+
+// 性能比较（小数据集）
+small <- {5, 2, 8, 1, 9}
+PrintLine("\nSmall dataset: " + small.ToStr())
+PrintLine("All algorithms produce: " + small.Sort().ToStr())
