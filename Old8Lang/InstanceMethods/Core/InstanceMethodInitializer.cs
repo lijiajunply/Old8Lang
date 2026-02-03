@@ -108,17 +108,17 @@ public static class InstanceMethodInitializer
 
             // String 方法迁移完成！共 15 个方法
 
-            // TODO: 注册 String 方法（约15个）
-            // registry.Register(new StringLengthMethod());
-            // registry.Register(new StringSubstringMethod());
-            // registry.Register(new StringReplaceMethod());
-            // ... 等
+            // 注册 Dictionary 方法
+            registry.Register(new Implementations.Dictionary.DictGetMethod());
+            registry.Register(new Implementations.Dictionary.DictSetMethod());
+            registry.Register(new Implementations.Dictionary.DictKeysMethod());
+            registry.Register(new Implementations.Dictionary.DictValuesMethod());
+            registry.Register(new Implementations.Dictionary.DictContainsKeyMethod());
+            registry.Register(new Implementations.Dictionary.DictRemoveMethod());
+            registry.Register(new Implementations.Dictionary.DictClearMethod());
+            registry.Register(new Implementations.Dictionary.DictCountMethod());
 
-            // TODO: 注册 Dictionary 方法（约8个）
-            // registry.Register(new DictGetMethod());
-            // registry.Register(new DictSetMethod());
-            // registry.Register(new DictKeysMethod());
-            // ... 等
+            // Dictionary 方法迁移完成！共 8 个方法
 
             // TODO: 注册 Array 方法（约5个）
             // registry.Register(new ArrayLengthMethod());

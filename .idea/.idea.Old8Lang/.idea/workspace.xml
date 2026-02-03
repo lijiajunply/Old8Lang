@@ -23,15 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListBubbleSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListHeapSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListInsertionSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMergeSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListQuickSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSelectionSortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_list_sorting.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictClearMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictContainsKeyMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictCountMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictGetMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictKeysMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictRemoveMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictSetMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictValuesMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_dictionary_methods.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" afterDir="false" />
     </list>
@@ -926,7 +926,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="863" />
+    <option name="localTasksCounter" value="865" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -953,8 +953,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(compiler): 移除特殊函数调用处理逻辑&#10;&#10;- 删除了 Spawn 函数的特殊处理代码&#10;- 移除了 TaskRun 函数的特殊处理逻辑&#10;- 清理了 spawn 函数的线程创建特殊处理&#10;- 简化了函数调用流程为统一的普通函数调用处理&#10;- 更新了 IDEA 工作空间配置文件中的变更记录&#10;- 调整了工作时间统计和本地任务计数器" />
-    <MESSAGE value="refactor(tests): 更新并发测试中的线程启动方式&#10;&#10;- 将spawn调用改为先赋值给变量再调用Start方法&#10;- 统一了线程创建和启动的语法模式&#10;- 提高了测试代码的一致性和可读性&#10;- 确保所有线程在适当时候开始执行&#10;- 保持了原有测试逻辑不变&#10;- 优化了多线程同步的实现方式" />
     <MESSAGE value="feat(parser): 支持链式调用表达式作为语句执行&#10;&#10;- 扩展 FuncRunStatement 支持任意表达式而不仅仅是函数调用&#10;- 添加新的构造函数和字段用于存储通用表达式&#10;- 实现表达式运行逻辑支持链式调用结果执行&#10;- 集成 IL 代码生成支持表达式值的加载和清理&#10;- 更新字符串表示和访问者模式支持新表达式类型&#10;- 修改解析器支持点号表达式链式调用语法&#10;- 简化并发测试中线程启动的链式调用写法" />
     <MESSAGE value="feat(interpreter): 实现装饰器延迟应用机制&#10;&#10;- 将装饰器应用从函数定义时推迟到函数首次调用时执行&#10;- 添加装饰器延迟应用的相关字段和执行逻辑&#10;- 更新变体管理器的作用域克隆机制以支持闭包修改全局变量&#10;- 修改测试用例以验证延迟装饰器应用的行为&#10;- 确保装饰器能够正确访问全局变量和函数作用域" />
     <MESSAGE value="chore(git): 更新 gitignore 配置&#10;&#10;- 移除了对 Old8Lang.Tests/OldLib 的忽略规则&#10;- 添加了新的忽略项 nul&#10;- 调整了 gitignore 文件结构" />
@@ -978,7 +976,9 @@
     <MESSAGE value="feat(instance-methods): 添加 List 排序和聚合方法&#10;&#10;- 实现 ListAverageMethod 计算列表平均值功能&#10;- 实现 ListDistinctMethod 去除列表重复元素功能&#10;- 实现 ListFirstMethod 获取列表第一个元素功能&#10;- 实现 ListInsertMethod 在指定位置插入元素功能&#10;- 实现 ListLastMethod 获取列表最后一个元素功能&#10;- 实现 ListMaxMethod 获取列表最大值功能&#10;- 实现 ListMinMethod 获取列表最小值功能&#10;- 实现 ListSortMethod 对列表进行排序功能&#10;- 实现 ListSumMethod 计算列表总和功能&#10;- 实现 ListToStrMethod 将列表转为字符串功能&#10;- 更新初始化器注册新增的10个列表方法&#10;- 修改进度文档反映31/101个方法已完成状态&#10;- 添加test_list_more.old8测试文件验证新功能" />
     <MESSAGE value="feat(instance-methods): 添加 List 查询和聚合方法&#10;&#10;- 注册并实现 9 个新的 List 方法包括 FirstWithPredicate、FirstOrDefault、LastWithPredicate、LastOrDefault&#10;- 添加 ElementAt、Aggregate、AggregateWithSeed、ForEach 和 Join 方法&#10;- 更新进度文档反映新的完成状态从 31/101 提升到 40/101&#10;- 添加测试文件 test_list_query.old8 来验证新功能&#10;- 重构 TODO 注释和进度跟踪标记" />
     <MESSAGE value="feat(instance-methods): 添加List集合操作和排序检查方法&#10;&#10;- 注册ListUnionMethod、ListIntersectMethod、ListExceptMethod、ListZipMethod、ListGroupByMethod&#10;- 注册ListIsSortedMethod用于检查列表排序状态&#10;- 更新进度文档显示List方法完成情况（43/50）&#10;- 添加test_list_collections.old8测试文件验证集合操作功能&#10;- 移除IDE工作空间中的临时变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加List集合操作和排序检查方法&#10;&#10;- 注册ListUnionMethod、ListIntersectMethod、ListExceptMethod、ListZipMethod、ListGroupByMethod&#10;- 注册ListIsSortedMethod用于检查列表排序状态&#10;- 更新进度文档显示List方法完成情况（43/50）&#10;- 添加test_list_collections.old8测试文件验证集合操作功能&#10;- 移除IDE工作空间中的临时变更记录" />
+    <MESSAGE value="feat(instance-methods): 添加 List 排序算法方法&#10;&#10;- 实现了冒泡排序、快速排序、归并排序、选择排序、插入排序和堆排序算法&#10;- 添加了 SortWithComparer 方法支持自定义比较器排序&#10;- 在初始化器中注册所有新排序算法方法&#10;- 更新进度文档标记 List 方法迁移完成&#10;- 添加排序算法测试文件验证所有排序方法功能" />
+    <MESSAGE value="feat(instance-methods): 添加String实例方法支持&#10;&#10;- 实现StringLengthMethod、StringSubstringMethod、StringReplaceMethod等15个String方法&#10;- 在InstanceMethodInitializer中注册所有String基础和高级方法&#10;- 更新PROGRESS_INSTANCE_METHODS.md文档显示String方法完成状态&#10;- 添加String方法相关的单元测试标记&#10;- 完成String方法的IL代码生成和虚拟机执行支持" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加String实例方法支持&#10;&#10;- 实现StringLengthMethod、StringSubstringMethod、StringReplaceMethod等15个String方法&#10;- 在InstanceMethodInitializer中注册所有String基础和高级方法&#10;- 更新PROGRESS_INSTANCE_METHODS.md文档显示String方法完成状态&#10;- 添加String方法相关的单元测试标记&#10;- 完成String方法的IL代码生成和虚拟机执行支持" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
