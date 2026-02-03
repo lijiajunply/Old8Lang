@@ -2,17 +2,17 @@
 
 ## 快速概览
 
-**总进度：** 31/101 (31%) ██████░░░░░░░░░░░░░░
+**总进度：** 40/101 (40%) ████████░░░░░░░░░░░░
 
 **当前阶段：** List 方法迁移
 
-**下一步：** 完成剩余 List 方法，然后迁移 String 方法
+**下一步：** 完成剩余 List 方法（集合操作和排序算法），然后迁移 String 方法
 
 ---
 
-## List 方法 (28/50 完成)
+## List 方法 (37/50 完成)
 
-### ✅ 已完成 (28)
+### ✅ 已完成 (37)
 
 #### 基础方法 (5)
 - [x] Add
@@ -48,7 +48,18 @@
 - [x] Distinct
 - [x] ToStr
 
-### 🔄 待完成 (22)
+#### 查询和聚合方法 (9)
+- [x] FirstWithPredicate (FirstWith/FirstWhere)
+- [x] FirstOrDefault
+- [x] LastWithPredicate (LastWith/LastWhere)
+- [x] LastOrDefault
+- [x] ElementAt (At)
+- [x] Aggregate (Fold)
+- [x] AggregateWithSeed (AggregateWith/FoldWith)
+- [x] ForEach (Each)
+- [x] Join
+
+### 🔄 待完成 (13)
 
 #### 排序方法 (8)
 - [ ] SortWithComparer
@@ -60,27 +71,12 @@
 - [ ] HeapSort
 - [ ] IsSorted
 
-#### 聚合方法 (2)
-- [ ] Aggregate
-- [ ] AggregateWithSeed
-
-#### 查询方法 (5)
-- [ ] FirstWithPredicate
-- [ ] FirstOrDefault
-- [ ] LastWithPredicate
-- [ ] LastOrDefault
-- [ ] ElementAt
-
 #### 集合操作 (5)
 - [ ] Union
 - [ ] Intersect
 - [ ] Except
 - [ ] Zip
 - [ ] GroupBy
-
-#### 其他方法 (2)
-- [ ] ForEach
-- [ ] Join
 
 ---
 
@@ -168,6 +164,7 @@
 - [x] 基础方法测试 (test_instance_methods.old8)
 - [x] 高级方法测试 (test_list_advanced.old8)
 - [x] 排序和聚合方法测试 (test_list_more.old8)
+- [x] 查询和聚合方法测试 (test_list_query.old8)
 - [ ] 单元测试套件
 - [ ] 集成测试
 - [ ] 性能基准测试
@@ -175,6 +172,13 @@
 ---
 
 ## 最近更新
+
+**2026-02-04 (晚上):**
+- ✅ 完成 9 个 List 查询和聚合方法
+- ✅ FirstWithPredicate, FirstOrDefault, LastWithPredicate, LastOrDefault, ElementAt
+- ✅ Aggregate, AggregateWithSeed, ForEach, Join
+- ✅ 所有测试通过
+- 📊 总进度：37/50 List 方法 (74%)
 
 **2026-02-04 (下午):**
 - ✅ 完成 10 个 List 排序和聚合方法
