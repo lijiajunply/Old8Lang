@@ -1,0 +1,44 @@
+// 测试 List 排序、聚合和查询方法
+
+// 测试 Sort
+unsorted <- {5, 2, 8, 1, 9, 3}
+sorted <- unsorted.Sort()
+PrintLine("Sorted: " + sorted.ToStr())
+
+// 测试 First 和 Last
+numbers <- {10, 20, 30, 40, 50}
+first <- numbers.First()
+last <- numbers.Last()
+PrintLine("First: " + first.ToStr())
+PrintLine("Last: " + last.ToStr())
+
+// 测试 Insert
+myList <- {1, 2, 4, 5}
+myList.Insert(2, 3)
+PrintLine("After Insert(2, 3): " + myList.ToStr())
+
+// 测试 Sum
+nums <- {1, 2, 3, 4, 5}
+sum <- nums.Sum()
+PrintLine("Sum: " + sum.ToStr())
+
+// 测试 Average
+avg <- nums.Average()
+PrintLine("Average: " + avg.ToStr())
+
+// 测试 Min 和 Max
+values <- {15, 3, 42, 8, 23}
+min <- values.Min()
+max <- values.Max()
+PrintLine("Min: " + min.ToStr())
+PrintLine("Max: " + max.ToStr())
+
+// 测试 Distinct
+duplicates <- {1, 2, 2, 3, 3, 3, 4, 5, 5}
+unique <- duplicates.Distinct()
+PrintLine("Distinct: " + unique.ToStr())
+
+// 测试 ToStr
+list <- {1, 2, 3}
+str <- list.ToStr()
+PrintLine("ToStr: " + str)

@@ -2,7 +2,7 @@
 
 ## 快速概览
 
-**总进度：** 21/101 (21%) ████░░░░░░░░░░░░░░░░
+**总进度：** 31/101 (31%) ██████░░░░░░░░░░░░░░
 
 **当前阶段：** List 方法迁移
 
@@ -10,9 +10,9 @@
 
 ---
 
-## List 方法 (18/50 完成)
+## List 方法 (28/50 完成)
 
-### ✅ 已完成 (18)
+### ✅ 已完成 (28)
 
 #### 基础方法 (5)
 - [x] Add
@@ -36,10 +36,21 @@
 - [x] Any
 - [x] All
 
-### 🔄 待完成 (32)
+#### 排序和聚合方法 (10)
+- [x] Sort
+- [x] First
+- [x] Last
+- [x] Insert
+- [x] Sum
+- [x] Average
+- [x] Min
+- [x] Max
+- [x] Distinct
+- [x] ToStr
 
-#### 排序方法 (9)
-- [ ] Sort
+### 🔄 待完成 (22)
+
+#### 排序方法 (8)
 - [ ] SortWithComparer
 - [ ] QuickSort
 - [ ] MergeSort
@@ -49,40 +60,27 @@
 - [ ] HeapSort
 - [ ] IsSorted
 
-#### 聚合方法 (6)
+#### 聚合方法 (2)
 - [ ] Aggregate
 - [ ] AggregateWithSeed
-- [ ] Sum
-- [ ] Average
-- [ ] Min
-- [ ] Max
 
-#### 查询方法 (8)
-- [ ] First
+#### 查询方法 (5)
 - [ ] FirstWithPredicate
 - [ ] FirstOrDefault
-- [ ] Last
 - [ ] LastWithPredicate
 - [ ] LastOrDefault
-- [ ] Single
 - [ ] ElementAt
 
-#### 集合操作 (6)
+#### 集合操作 (5)
 - [ ] Union
 - [ ] Intersect
 - [ ] Except
-- [ ] Distinct
 - [ ] Zip
 - [ ] GroupBy
 
-#### 其他方法 (3)
-- [ ] SelectMany / FlatMap
+#### 其他方法 (2)
 - [ ] ForEach
-- [ ] ToArray
-- [ ] ToDict
-- [ ] ToStr
 - [ ] Join
-- [ ] Slice
 
 ---
 
@@ -169,6 +167,7 @@
 
 - [x] 基础方法测试 (test_instance_methods.old8)
 - [x] 高级方法测试 (test_list_advanced.old8)
+- [x] 排序和聚合方法测试 (test_list_more.old8)
 - [ ] 单元测试套件
 - [ ] 集成测试
 - [ ] 性能基准测试
@@ -177,7 +176,13 @@
 
 ## 最近更新
 
-**2026-02-04:**
+**2026-02-04 (下午):**
+- ✅ 完成 10 个 List 排序和聚合方法
+- ✅ Sort, First, Last, Insert, Sum, Average, Min, Max, Distinct, ToStr
+- ✅ 所有测试通过
+- 📊 总进度：28/50 List 方法 (56%)
+
+**2026-02-04 (上午):**
 - ✅ 完成 13 个 List 高级方法
 - ✅ 所有测试通过
 - 📝 创建 TODO 文档
