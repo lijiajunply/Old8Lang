@@ -15,7 +15,7 @@ public class ListContainsMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Contains", "contains"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["item"];
+    public override string[] ParameterNames => ["item"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -102,7 +102,7 @@ public class ListContainsMethod : BaseInstanceMethod
         return typeof(BoolLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

@@ -16,7 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class SleepFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Sleep"];
-    public override string[]? ParameterNames => ["milliseconds"];
+    public override string[] ParameterNames => ["milliseconds"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -64,7 +64,7 @@ public sealed class SleepFunction : BaseGlobalFunction
 public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetCurrentThreadId"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -94,7 +94,7 @@ public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return Environment.CurrentManagedThreadId;
     }
@@ -106,7 +106,7 @@ public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
 public sealed class GetProcessorCountFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetProcessorCount"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -136,7 +136,7 @@ public sealed class GetProcessorCountFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return Environment.ProcessorCount;
     }

@@ -51,7 +51,7 @@ public class StringToLowerMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str)
         {

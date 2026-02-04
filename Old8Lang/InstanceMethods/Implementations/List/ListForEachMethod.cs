@@ -16,7 +16,7 @@ public class ListForEachMethod : BaseInstanceMethod
 {
     public override string[] Names => ["ForEach", "forEach", "Each", "each"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["action"];
+    public override string[] ParameterNames => ["action"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class ReadWriteLockCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadWriteLockCreate"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -45,7 +45,7 @@ public sealed class ReadWriteLockCreateFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return ResourceManager.CreateReadWriteLock();
     }
@@ -57,7 +57,7 @@ public sealed class ReadWriteLockCreateFunction : BaseGlobalFunction
 public sealed class ReadLockAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadLockAcquire"];
-    public override string[]? ParameterNames => ["lockId"];
+    public override string[] ParameterNames => ["lockId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -105,7 +105,7 @@ public sealed class ReadLockAcquireFunction : BaseGlobalFunction
 public sealed class ReadLockReleaseFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadLockRelease"];
-    public override string[]? ParameterNames => ["lockId"];
+    public override string[] ParameterNames => ["lockId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -153,7 +153,7 @@ public sealed class ReadLockReleaseFunction : BaseGlobalFunction
 public sealed class WriteLockAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["WriteLockAcquire"];
-    public override string[]? ParameterNames => ["lockId"];
+    public override string[] ParameterNames => ["lockId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -201,7 +201,7 @@ public sealed class WriteLockAcquireFunction : BaseGlobalFunction
 public sealed class WriteLockReleaseFunction : BaseGlobalFunction
 {
     public override string[] Names => ["WriteLockRelease"];
-    public override string[]? ParameterNames => ["lockId"];
+    public override string[] ParameterNames => ["lockId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -249,7 +249,7 @@ public sealed class WriteLockReleaseFunction : BaseGlobalFunction
 public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadLockTryAcquire"];
-    public override string[]? ParameterNames => ["lockId", "timeoutMs"];
+    public override string[] ParameterNames => ["lockId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -287,7 +287,7 @@ public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int lockId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
@@ -301,7 +301,7 @@ public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
 public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["WriteLockTryAcquire"];
-    public override string[]? ParameterNames => ["lockId", "timeoutMs"];
+    public override string[] ParameterNames => ["lockId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -339,7 +339,7 @@ public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int lockId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
@@ -353,7 +353,7 @@ public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
 public sealed class ReadWriteLockDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ReadWriteLockDispose"];
-    public override string[]? ParameterNames => ["lockId"];
+    public override string[] ParameterNames => ["lockId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

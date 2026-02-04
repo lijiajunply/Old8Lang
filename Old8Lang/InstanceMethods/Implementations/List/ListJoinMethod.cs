@@ -16,7 +16,7 @@ public class ListJoinMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Join", "join"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["separator"];
+    public override string[] ParameterNames => ["separator"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 1;
 
@@ -78,7 +78,7 @@ public class ListJoinMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

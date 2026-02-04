@@ -15,7 +15,7 @@ public class ListAggregateMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Aggregate", "aggregate", "Fold", "fold"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["accumulator"];
+    public override string[] ParameterNames => ["accumulator"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -20,7 +20,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class GetClassNameFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassName"];
-    public override string[]? ParameterNames => ["obj"];
+    public override string[] ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -59,7 +59,7 @@ public sealed class GetClassNameFunction : BaseGlobalFunction
         return typeof(string);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
 
@@ -78,7 +78,7 @@ public sealed class GetClassNameFunction : BaseGlobalFunction
 public sealed class GetClassMethodsFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassMethods"];
-    public override string[]? ParameterNames => ["obj"];
+    public override string[] ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -121,7 +121,7 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
 
@@ -154,7 +154,7 @@ public sealed class GetClassMethodsFunction : BaseGlobalFunction
 public sealed class GetClassFieldsFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetClassFields"];
-    public override string[]? ParameterNames => ["obj"];
+    public override string[] ParameterNames => ["obj"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -197,7 +197,7 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
 
@@ -230,7 +230,7 @@ public sealed class GetClassFieldsFunction : BaseGlobalFunction
 public sealed class GetMethodInfoFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetMethodInfo"];
-    public override string[]? ParameterNames => ["obj", "methodName"];
+    public override string[] ParameterNames => ["obj", "methodName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -290,7 +290,7 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
         var methodName = (string)arguments[1]!;
@@ -335,7 +335,7 @@ public sealed class GetMethodInfoFunction : BaseGlobalFunction
 public sealed class GetFieldInfoFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetFieldInfo"];
-    public override string[]? ParameterNames => ["obj", "fieldName"];
+    public override string[] ParameterNames => ["obj", "fieldName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -391,7 +391,7 @@ public sealed class GetFieldInfoFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
         var fieldName = (string)arguments[1]!;

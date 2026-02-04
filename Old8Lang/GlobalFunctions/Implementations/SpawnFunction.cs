@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class SpawnFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Spawn", "spawn"];
-    public override string[]? ParameterNames => ["func"];
+    public override string[] ParameterNames => ["func"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => -1;
 
@@ -144,7 +144,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         return typeof(ThreadLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         // VM 模式下支持 Spawn
         // args[0] 是函数对象（ClosureValue 或 FunctionMetadata），args[1..] 是函数参数

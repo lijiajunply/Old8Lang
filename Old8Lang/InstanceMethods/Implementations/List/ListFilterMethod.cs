@@ -15,7 +15,7 @@ public class ListFilterMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Filter", "filter"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["predicate"];
+    public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -94,7 +94,7 @@ public class ListFilterMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         // VM 模式下不支持高阶函数
         throw new NotSupportedException("Filter 方法在 VM 模式下不支持");

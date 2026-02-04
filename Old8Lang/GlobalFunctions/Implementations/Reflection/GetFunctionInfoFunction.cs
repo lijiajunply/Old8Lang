@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class GetFunctionInfoFunction : BaseGlobalFunction
 {
     public override string[] Names => ["GetFunctionInfo"];
-    public override string[]? ParameterNames => ["functionName"];
+    public override string[] ParameterNames => ["functionName"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -59,7 +59,7 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         string functionName = (string)arguments[0]!;
 

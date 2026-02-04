@@ -16,7 +16,7 @@ public class ListElementAtMethod : BaseInstanceMethod
 {
     public override string[] Names => ["ElementAt", "elementAt", "At", "at"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["index"];
+    public override string[] ParameterNames => ["index"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -15,7 +15,7 @@ public class ListReduceMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Reduce", "reduce"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["reducer", "initialValue"];
+    public override string[] ParameterNames => ["reducer", "initialValue"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -87,7 +87,7 @@ public class ListReduceMethod : BaseInstanceMethod
         return typeof(LangValueType);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         // VM 模式下不支持高阶函数
         throw new NotSupportedException("Reduce 方法在 VM 模式下不支持");

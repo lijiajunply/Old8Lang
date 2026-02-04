@@ -15,7 +15,7 @@ public class ListTakeMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Take", "take"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["count"];
+    public override string[] ParameterNames => ["count"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -70,7 +70,7 @@ public class ListTakeMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

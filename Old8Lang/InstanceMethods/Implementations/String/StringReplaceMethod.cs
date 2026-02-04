@@ -16,7 +16,7 @@ public class StringReplaceMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Replace", "replace"];
     public override Type TargetType => typeof(StringLangValue);
-    public override string[]? ParameterNames => ["oldValue", "newValue"];
+    public override string[] ParameterNames => ["oldValue", "newValue"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -71,7 +71,7 @@ public class StringReplaceMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str && arguments.Length >= 2 &&
             arguments[0] is string oldValue && arguments[1] is string newValue)

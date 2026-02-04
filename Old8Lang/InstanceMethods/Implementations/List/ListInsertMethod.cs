@@ -16,7 +16,7 @@ public class ListInsertMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Insert", "insert"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["index", "element"];
+    public override string[] ParameterNames => ["index", "element"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 

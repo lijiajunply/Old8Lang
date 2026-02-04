@@ -16,7 +16,7 @@ public class ListGroupByMethod : BaseInstanceMethod
 {
     public override string[] Names => ["GroupBy", "groupBy"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["keySelector"];
+    public override string[] ParameterNames => ["keySelector"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -125,7 +125,7 @@ public class ListGroupByMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list && arguments.Length > 0)
         {

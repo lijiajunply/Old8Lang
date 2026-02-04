@@ -15,22 +15,22 @@ public partial class TypeInferenceVisitor
 {
     // ===== Expression 节点实现 =====
 
-    public Type? VisitAsyncStreamExpression(AsyncStreamExpression node)
+    public Type VisitAsyncStreamExpression(AsyncStreamExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitAwaitExpression(AwaitExpression node)
+    public Type VisitAwaitExpression(AwaitExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitFunctionCallExpression(FunctionCallExpression node)
+    public Type VisitFunctionCallExpression(FunctionCallExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitLangId(LangId node)
+    public Type VisitLangId(LangId node)
     {
         return node.OutputType(local);
     }
@@ -40,12 +40,12 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitSuperExpression(SuperExpression node)
+    public Type VisitSuperExpression(SuperExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitThisExpression(ThisExpression node)
+    public Type VisitThisExpression(ThisExpression node)
     {
         return node.OutputType(local);
     }
@@ -63,52 +63,52 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitArrayLangValue(ArrayLangValue node)
+    public Type VisitArrayLangValue(ArrayLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node)
+    public Type VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitAsyncStreamLangValue(AsyncStreamLangValue node)
+    public Type VisitAsyncStreamLangValue(AsyncStreamLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitBoolLangValue(BoolLangValue node)
+    public Type VisitBoolLangValue(BoolLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitCancellationTokenLangValue(CancellationTokenLangValue node)
+    public Type VisitCancellationTokenLangValue(CancellationTokenLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node)
+    public Type VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitCharLangValue(CharLangValue node)
+    public Type VisitCharLangValue(CharLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitClassMemberId(ClassMemberId node)
+    public Type VisitClassMemberId(ClassMemberId node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitDictionaryLangValue(DictionaryLangValue node)
+    public Type VisitDictionaryLangValue(DictionaryLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitDoubleLangValue(DoubleLangValue node)
+    public Type VisitDoubleLangValue(DoubleLangValue node)
     {
         return node.OutputType(local);
     }
@@ -118,79 +118,79 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitFuncLangValue(FuncLangValue node)
+    public Type VisitFuncLangValue(FuncLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitGeneratorLangValue(GeneratorLangValue node)
+    public Type VisitGeneratorLangValue(GeneratorLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitInstance(Instance node)
+    public Type VisitInstance(Instance node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitIntLangValue(IntLangValue node)
+    public Type VisitIntLangValue(IntLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitLangListItem(LangListItem node)
+    public Type VisitLangListItem(LangListItem node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitListComprehension(ListComprehension node)
+    public Type VisitListComprehension(ListComprehension node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitListLangValue(ListLangValue node)
+    public Type VisitListLangValue(ListLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitMethodOverloadList(MethodOverloadList node)
+    public Type VisitMethodOverloadList(MethodOverloadList node)
     {
         // MethodOverloadList 是方法重载列表，返回 Delegate 类型
         // 避免循环调用 OutputType -> Accept -> VisitMethodOverloadList -> OutputType
         return typeof(Delegate);
     }
 
-    public Type? VisitNestedIndexAccess(NestedIndexAccess node)
+    public Type VisitNestedIndexAccess(NestedIndexAccess node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitNestedSliceAccess(NestedSliceAccess node)
+    public Type VisitNestedSliceAccess(NestedSliceAccess node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitNullLangValue(NullLangValue node)
+    public Type VisitNullLangValue(NullLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitRangeLangValue(RangeLangValue node)
+    public Type VisitRangeLangValue(RangeLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitSliceLangValue(SliceLangValue node)
+    public Type VisitSliceLangValue(SliceLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitStringLangValue(StringLangValue node)
+    public Type VisitStringLangValue(StringLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitStringTemplateValue(StringTemplateValue node)
+    public Type VisitStringTemplateValue(StringTemplateValue node)
     {
         return node.OutputType(local);
     }
@@ -200,12 +200,12 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitTaskClassLangValue(TaskClassLangValue node)
+    public Type VisitTaskClassLangValue(TaskClassLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node)
+    public Type VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node)
     {
         return node.OutputType(local);
     }
@@ -220,7 +220,7 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitTaskLangValue(TaskLangValue node)
+    public Type VisitTaskLangValue(TaskLangValue node)
     {
         return node.OutputType(local);
     }
@@ -235,7 +235,7 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node)
+    public Type VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node)
     {
         return node.OutputType(local);
     }
@@ -245,7 +245,7 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitThreadLangValue(ThreadLangValue node)
+    public Type VisitThreadLangValue(ThreadLangValue node)
     {
         return node.OutputType(local);
     }
@@ -255,38 +255,38 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitTupleLangValue(TupleLangValue node)
+    public Type VisitTupleLangValue(TupleLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitTypeLangValue(TypeLangValue node)
+    public Type VisitTypeLangValue(TypeLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitVoidLangValue(VoidLangValue node)
+    public Type VisitVoidLangValue(VoidLangValue node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitMatchExpression(MatchExpression node)
+    public Type VisitMatchExpression(MatchExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitEnumLangValue(EnumLangValue node)
+    public Type VisitEnumLangValue(EnumLangValue node)
     {
         // 枚举值的类型是 int（枚举的底层类型）
         return typeof(int);
     }
 
-    public Type? VisitGenericInstanceExpression(GenericInstanceExpression node)
+    public Type VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitLinqExpression(LinqExpression node)
+    public Type VisitLinqExpression(LinqExpression node)
     {
         return node.OutputType(local);
     }
@@ -296,7 +296,7 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
+    public Type VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
     {
         return node.OutputType(local);
     }
@@ -311,12 +311,12 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
+    public Type VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
     {
         return node.OutputType(local);
     }
 
-    public Type? VisitMockObjectLangValue(MockObjectLangValue node)
+    public Type VisitMockObjectLangValue(MockObjectLangValue node)
     {
         return node.OutputType(local);
     }
@@ -326,7 +326,7 @@ public partial class TypeInferenceVisitor
         return node.OutputType(local);
     }
 
-    public Type? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
+    public Type VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
     {
         return node.OutputType(local);
     }

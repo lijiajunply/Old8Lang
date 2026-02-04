@@ -16,7 +16,7 @@ public class ListRemoveMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Remove", "remove"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["item"];
+    public override string[] ParameterNames => ["item"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

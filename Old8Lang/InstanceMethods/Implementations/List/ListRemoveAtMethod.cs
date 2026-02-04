@@ -15,7 +15,7 @@ public class ListRemoveAtMethod : BaseInstanceMethod
 {
     public override string[] Names => ["RemoveAt", "removeAt"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["index"];
+    public override string[] ParameterNames => ["index"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

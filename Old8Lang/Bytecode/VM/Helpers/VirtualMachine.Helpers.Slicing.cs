@@ -44,7 +44,7 @@ public partial class VirtualMachine
     /// 对列表执行切片操作
     /// </summary>
 
-    private object? SliceList(IList list, int start, int end, int step)
+    private object SliceList(IList list, int start, int end, int step)
     {
         var length = list.Count;
 

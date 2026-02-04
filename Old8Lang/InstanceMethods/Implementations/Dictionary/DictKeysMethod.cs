@@ -43,7 +43,7 @@ public class DictKeysMethod : BaseInstanceMethod
         return typeof(List<object>);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is Dictionary<object, object> dict)
         {

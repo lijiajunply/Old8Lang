@@ -12,7 +12,7 @@ public class DictRemoveMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Remove", "remove", "Delete", "delete"];
     public override Type TargetType => typeof(DictionaryLangValue);
-    public override string[]? ParameterNames => ["key"];
+    public override string[] ParameterNames => ["key"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -53,7 +53,7 @@ public class DictRemoveMethod : BaseInstanceMethod
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is Dictionary<object, object> dict && arguments.Length > 0)
         {

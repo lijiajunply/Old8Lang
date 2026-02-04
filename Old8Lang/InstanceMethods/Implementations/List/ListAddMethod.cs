@@ -16,7 +16,7 @@ public class ListAddMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Add", "add"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["item"];
+    public override string[] ParameterNames => ["item"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -36,11 +36,10 @@ public class ListBubbleSortMethod : BaseInstanceMethod
     private static void BubbleSort(List<LangValueType> list)
     {
         int n = list.Count;
-        bool swapped;
 
         for (int i = 0; i < n - 1; i++)
         {
-            swapped = false;
+            var swapped = false;
 
             for (int j = 0; j < n - i - 1; j++)
             {
@@ -68,14 +67,17 @@ public class ListBubbleSortMethod : BaseInstanceMethod
         {
             return intA.Value < intB.Value;
         }
+
         if (a is DoubleLangValue doubleA && b is DoubleLangValue doubleB)
         {
             return doubleA.Value < doubleB.Value;
         }
+
         if (a is StringLangValue strA && b is StringLangValue strB)
         {
             return string.Compare(strA.Value, strB.Value, StringComparison.Ordinal) < 0;
         }
+
         if (a is CharLangValue charA && b is CharLangValue charB)
         {
             return charA.Value < charB.Value;
@@ -106,12 +108,13 @@ public class ListBubbleSortMethod : BaseInstanceMethod
         return new ListLangValue(sorted);
     }
 
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters,
+        LocalManager local)
     {
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

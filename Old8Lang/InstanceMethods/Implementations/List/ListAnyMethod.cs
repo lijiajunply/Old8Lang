@@ -15,7 +15,7 @@ public class ListAnyMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Any", "any"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["predicate"];
+    public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -88,7 +88,7 @@ public class ListAnyMethod : BaseInstanceMethod
         return typeof(BoolLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         // VM 模式下不支持高阶函数
         throw new NotSupportedException("Any 方法在 VM 模式下不支持");

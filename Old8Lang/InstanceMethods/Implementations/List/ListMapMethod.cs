@@ -15,7 +15,7 @@ public class ListMapMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Map", "map"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["transform"];
+    public override string[] ParameterNames => ["transform"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -85,7 +85,7 @@ public class ListMapMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         // VM 模式下不支持高阶函数
         throw new NotSupportedException("Map 方法在 VM 模式下不支持");

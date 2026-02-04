@@ -16,7 +16,7 @@ public class StringSplitMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Split", "split"];
     public override Type TargetType => typeof(StringLangValue);
-    public override string[]? ParameterNames => ["separator"];
+    public override string[] ParameterNames => ["separator"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -67,7 +67,7 @@ public class StringSplitMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str && arguments.Length > 0 && arguments[0] is string separator)
         {

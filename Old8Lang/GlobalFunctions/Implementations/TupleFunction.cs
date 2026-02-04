@@ -14,7 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class TupleFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Tuple", "tuple"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -33,7 +33,7 @@ public sealed class TupleFunction : BaseGlobalFunction
     {
         return typeof(TupleLangValue);
     }
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return new TupleLangValue([], default);
     }

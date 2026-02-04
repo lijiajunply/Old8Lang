@@ -14,7 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class DictFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Dict", "dict"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -34,7 +34,7 @@ public sealed class DictFunction : BaseGlobalFunction
     {
         return typeof(DictionaryLangValue);
     }
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return new DictionaryLangValue();
     }

@@ -15,7 +15,7 @@ public class ListIndexOfMethod : BaseInstanceMethod
 {
     public override string[] Names => ["IndexOf", "indexOf"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["element"];
+    public override string[] ParameterNames => ["element"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -143,7 +143,7 @@ public class ListIndexOfMethod : BaseInstanceMethod
         return typeof(IntLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

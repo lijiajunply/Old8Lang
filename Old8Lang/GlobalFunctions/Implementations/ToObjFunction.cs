@@ -18,7 +18,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class ToObjFunction : BaseGlobalFunction
 {
     public override string[] Names => ["ToObj", "toObj"];
-    public override string[]? ParameterNames => ["jsonString"];
+    public override string[] ParameterNames => ["jsonString"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

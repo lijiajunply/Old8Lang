@@ -532,7 +532,7 @@ public partial class BytecodeVisitor
         return null;
     }
 
-    public Instruction? VisitSuperProxy(SuperProxy node)
+    public Instruction VisitSuperProxy(SuperProxy node)
     {
         // SuperProxy 在字节码模式中不应该直接访问
         // 它应该通过 super.method() 或 super.field 的形式使用

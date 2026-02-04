@@ -1,0 +1,186 @@
+// Array 实例方法测试
+// 测试 Array 的 5 个实例方法：Length, Get, Set, ToList, Slice
+
+print("=== Array 实例方法测试 ===\n")
+
+// 1. 测试 Length 方法
+print("\n1. 测试 Length 方法\n")
+arr1 <- [1, 2, 3, 4, 5]
+print("arr1 = ")
+print(arr1)
+print("\n")
+print("arr1.Length() = ")
+print(arr1.Length())
+print("\n")
+print("arr1.Len() = ")
+print(arr1.Len())
+print("\n")
+
+arr2 <- ["a", "b", "c"]
+print("arr2 = ")
+print(arr2)
+print("\n")
+print("arr2.length() = ")
+print(arr2.length())
+print("\n")
+
+// 2. 测试 Get 方法
+print("\n2. 测试 Get 方法\n")
+arr3 <- [10, 20, 30, 40, 50]
+print("arr3 = ")
+print(arr3)
+print("\n")
+print("arr3.Get(0) = ")
+print(arr3.Get(0))
+print("\n")
+print("arr3.Get(2) = ")
+print(arr3.Get(2))
+print("\n")
+print("arr3.Get(4) = ")
+print(arr3.Get(4))
+print("\n")
+print("arr3.Get(-1) = ")
+print(arr3.Get(-1))
+print("\n")
+print("arr3.Get(-2) = ")
+print(arr3.Get(-2))
+print("\n")
+
+// 3. 测试 Set 方法
+print("\n3. 测试 Set 方法\n")
+arr4 <- [1, 2, 3, 4, 5]
+print("arr4 初始值 = ")
+print(arr4)
+print("\n")
+arr4.Set(0, 100)
+print("arr4.Set(0, 100) 后 = ")
+print(arr4)
+print("\n")
+arr4.Set(2, 300)
+print("arr4.Set(2, 300) 后 = ")
+print(arr4)
+print("\n")
+arr4.Set(-1, 999)
+print("arr4.Set(-1, 999) 后 = ")
+print(arr4)
+print("\n")
+
+// 4. 测试 ToList 方法
+print("\n4. 测试 ToList 方法\n")
+arr5 <- [1, 2, 3, 4, 5]
+print("arr5 = ")
+print(arr5)
+print("\n")
+list1 <- arr5.ToList()
+print("list1 = arr5.ToList() = ")
+print(list1)
+print("\n")
+print("list1 类型检查：可以使用 Add 方法\n")
+list1.Add(6)
+print("list1.Add(6) 后 = ")
+print(list1)
+print("\n")
+
+// 5. 测试 Slice 方法
+print("\n5. 测试 Slice 方法\n")
+arr6 <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+print("arr6 = ")
+print(arr6)
+print("\n")
+
+// 基本切片
+print("arr6.Slice(2, 5) = ")
+print(arr6.Slice(2, 5))
+print("\n")
+print("arr6.Slice(0, 3) = ")
+print(arr6.Slice(0, 3))
+print("\n")
+print("arr6.Slice(5, 10) = ")
+print(arr6.Slice(5, 10))
+print("\n")
+
+// 带步长的切片
+print("arr6.Slice(0, 10, 2) = ")
+print(arr6.Slice(0, 10, 2))
+print("\n")
+print("arr6.Slice(1, 10, 2) = ")
+print(arr6.Slice(1, 10, 2))
+print("\n")
+print("arr6.Slice(0, 10, 3) = ")
+print(arr6.Slice(0, 10, 3))
+print("\n")
+
+// 负数索引切片
+print("arr6.Slice(-5, -1) = ")
+print(arr6.Slice(-5, -1))
+print("\n")
+print("arr6.Slice(-3, 10) = ")
+print(arr6.Slice(-3, 10))
+print("\n")
+
+// 反向切片（负步长）
+print("arr6.Slice(9, 0, -1) = ")
+print(arr6.Slice(9, 0, -1))
+print("\n")
+print("arr6.Slice(5, 2, -1) = ")
+print(arr6.Slice(5, 2, -1))
+print("\n")
+
+// 6. 综合测试
+print("\n6. 综合测试\n")
+arr7 <- [10, 20, 30, 40, 50]
+print("arr7 = ")
+print(arr7)
+print("\n")
+print("arr7.Length() = ")
+print(arr7.Length())
+print("\n")
+
+// 修改元素
+arr7.Set(1, 200)
+arr7.Set(3, 400)
+print("修改后 arr7 = ")
+print(arr7)
+print("\n")
+
+// 获取切片
+slice1 <- arr7.Slice(1, 4)
+print("slice1 = arr7.Slice(1, 4) = ")
+print(slice1)
+print("\n")
+
+// 切片转列表
+list2 <- slice1.ToList()
+print("list2 = slice1.ToList() = ")
+print(list2)
+print("\n")
+list2.Add(500)
+print("list2.Add(500) 后 = ")
+print(list2)
+print("\n")
+
+// 7. 边界测试
+print("\n7. 边界测试\n")
+arr8 <- [1]
+print("arr8 = ")
+print(arr8)
+print("\n")
+print("arr8.Length() = ")
+print(arr8.Length())
+print("\n")
+print("arr8.Get(0) = ")
+print(arr8.Get(0))
+print("\n")
+print("arr8.Get(-1) = ")
+print(arr8.Get(-1))
+print("\n")
+
+arr9 <- []
+print("arr9 = ")
+print(arr9)
+print("\n")
+print("arr9.Length() = ")
+print(arr9.Length())
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")

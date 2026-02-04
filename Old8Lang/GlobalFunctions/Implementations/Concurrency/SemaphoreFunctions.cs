@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class SemaphoreCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SemaphoreCreate"];
-    public override string[]? ParameterNames => ["initialCount", "maxCount"];
+    public override string[] ParameterNames => ["initialCount", "maxCount"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -55,7 +55,7 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int initialCount = Convert.ToInt32(arguments[0]);
         int maxCount = Convert.ToInt32(arguments[1]);
@@ -69,7 +69,7 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
 public sealed class SemaphoreAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SemaphoreAcquire"];
-    public override string[]? ParameterNames => ["semaphoreId"];
+    public override string[] ParameterNames => ["semaphoreId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -117,7 +117,7 @@ public sealed class SemaphoreAcquireFunction : BaseGlobalFunction
 public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SemaphoreTryAcquire"];
-    public override string[]? ParameterNames => ["semaphoreId", "timeoutMs"];
+    public override string[] ParameterNames => ["semaphoreId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -155,7 +155,7 @@ public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int semaphoreId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
@@ -169,7 +169,7 @@ public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
 public sealed class SemaphoreReleaseFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SemaphoreRelease"];
-    public override string[]? ParameterNames => ["semaphoreId"];
+    public override string[] ParameterNames => ["semaphoreId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -217,7 +217,7 @@ public sealed class SemaphoreReleaseFunction : BaseGlobalFunction
 public sealed class SemaphoreDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["SemaphoreDispose"];
-    public override string[]? ParameterNames => ["semaphoreId"];
+    public override string[] ParameterNames => ["semaphoreId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

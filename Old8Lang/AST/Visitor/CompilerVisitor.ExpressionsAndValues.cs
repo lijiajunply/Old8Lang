@@ -329,7 +329,7 @@ public partial class CompilerVisitor
         return null;
     }
 
-    public object? VisitInterpreterVisitor(InterpreterVisitor node)
+    public object VisitInterpreterVisitor(InterpreterVisitor node)
     {
         // InterpreterVisitor 不应该在编译器模式下访问
         throw new NotSupportedException("InterpreterVisitor 不应该在编译器模式下访问");

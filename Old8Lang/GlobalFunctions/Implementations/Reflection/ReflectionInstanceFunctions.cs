@@ -20,7 +20,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 public sealed class CreateInstanceFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CreateInstance"];
-    public override string[]? ParameterNames => ["className", "args"];
+    public override string[] ParameterNames => ["className", "args"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -84,7 +84,7 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         return typeof(object);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var className = (string)arguments[0]!;
         var args = arguments[1];
@@ -177,7 +177,7 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
 public sealed class IsInstanceOfFunction : BaseGlobalFunction
 {
     public override string[] Names => ["IsInstanceOf"];
-    public override string[]? ParameterNames => ["obj", "className"];
+    public override string[] ParameterNames => ["obj", "className"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -219,7 +219,7 @@ public sealed class IsInstanceOfFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return ReflectionHelper.IsInstanceOf(arguments[0]!, (string)arguments[1]!);
     }
@@ -231,7 +231,7 @@ public sealed class IsInstanceOfFunction : BaseGlobalFunction
 public sealed class HasMethodFunction : BaseGlobalFunction
 {
     public override string[] Names => ["HasMethod"];
-    public override string[]? ParameterNames => ["obj", "methodName"];
+    public override string[] ParameterNames => ["obj", "methodName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -273,7 +273,7 @@ public sealed class HasMethodFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
         var methodName = (string)arguments[1]!;
@@ -300,7 +300,7 @@ public sealed class HasMethodFunction : BaseGlobalFunction
 public sealed class HasFieldFunction : BaseGlobalFunction
 {
     public override string[] Names => ["HasField"];
-    public override string[]? ParameterNames => ["obj", "fieldName"];
+    public override string[] ParameterNames => ["obj", "fieldName"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -342,7 +342,7 @@ public sealed class HasFieldFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         var obj = arguments[0];
         var fieldName = (string)arguments[1]!;

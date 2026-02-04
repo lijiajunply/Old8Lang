@@ -15,7 +15,7 @@ public class ListAggregateWithSeedMethod : BaseInstanceMethod
 {
     public override string[] Names => ["AggregateWith", "aggregateWith", "FoldWith", "foldWith"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["accumulator", "seed"];
+    public override string[] ParameterNames => ["accumulator", "seed"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 

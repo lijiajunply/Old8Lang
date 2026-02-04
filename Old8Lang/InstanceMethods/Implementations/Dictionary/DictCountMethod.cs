@@ -43,7 +43,7 @@ public class DictCountMethod : BaseInstanceMethod
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is Dictionary<object, object> dict)
         {

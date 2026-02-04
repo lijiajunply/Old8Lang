@@ -3,15 +3,19 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
+namespace Old8Lang.InstanceMethods.Implementations.Array;
 
-public class DictValuesMethod : BaseInstanceMethod
+/// <summary>
+/// Array.Length() - 获取数组长度
+/// </summary>
+public class ArrayLengthMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["Values", "values"];
-    public override Type TargetType => typeof(DictionaryLangValue);
+    public override string[] Names => ["Length", "length", "Len", "len"];
+    public override Type TargetType => typeof(ArrayLangValue);
     public override string[]? ParameterNames => null;
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
@@ -19,36 +23,35 @@ public class DictValuesMethod : BaseInstanceMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var dict = (DictionaryLangValue)instance;
-        return new ListLangValue(dict.Value.Select(x => x.Value).ToList());
+        var array = (ArrayLangValue)instance;
+        return new IntLangValue(array.RunResult.Length);
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.LoadIlValue(ilGenerator, local);
-
-        var helperMethod = typeof(DictValuesMethod).GetMethod(nameof(ValuesHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        var helperMethod = typeof(ArrayLengthMethod).GetMethod(nameof(LengthHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static List<object?> ValuesHelper(Dictionary<object, object> dict)
+    public static IntLangValue LengthHelper(object[] array)
     {
-        return dict.Values.Cast<object?>().ToList();
+        return new IntLangValue(array.Length);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(List<object>);
+        return typeof(IntLangValue);
     }
 
-    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is Dictionary<object, object> dict)
+        if (instance is object[] array)
         {
-            return dict.Values.Cast<object?>().ToList();
+            return array.Length;
         }
-        throw new ArgumentException("实例必须是 Dictionary 类型");
+        throw new ArgumentException("实例必须是 object[] 类型");
     }
 }

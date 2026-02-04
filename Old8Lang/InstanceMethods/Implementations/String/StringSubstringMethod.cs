@@ -16,7 +16,7 @@ public class StringSubstringMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Substring", "substring", "Substr", "substr"];
     public override Type TargetType => typeof(StringLangValue);
-    public override string[]? ParameterNames => ["start", "length"];
+    public override string[] ParameterNames => ["start", "length"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 2;
 
@@ -119,7 +119,7 @@ public class StringSubstringMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str && arguments.Length > 0 && arguments[0] is int start)
         {

@@ -13,7 +13,7 @@ public class DictSetMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Set", "set"];
     public override Type TargetType => typeof(DictionaryLangValue);
-    public override string[]? ParameterNames => ["key", "value"];
+    public override string[] ParameterNames => ["key", "value"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 

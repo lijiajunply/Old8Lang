@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class JsonFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Json", "json"];
-    public override string[]? ParameterNames => ["value"];
+    public override string[] ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -77,7 +77,7 @@ public sealed class JsonFunction : BaseGlobalFunction
     {
         return typeof(string);
     }
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         // VM 模式下不支持 JSON 序列化,返回空字符串
         return "";

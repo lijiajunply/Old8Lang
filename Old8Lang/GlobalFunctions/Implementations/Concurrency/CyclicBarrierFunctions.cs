@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierCreate"];
-    public override string[]? ParameterNames => ["participantCount"];
+    public override string[] ParameterNames => ["participantCount"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -51,7 +51,7 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int participantCount = Convert.ToInt32(arguments[0]);
         return ResourceManager.CreateCyclicBarrier(participantCount);
@@ -64,7 +64,7 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
 public sealed class CyclicBarrierAwaitFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierAwait"];
-    public override string[]? ParameterNames => ["barrierId"];
+    public override string[] ParameterNames => ["barrierId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -112,7 +112,7 @@ public sealed class CyclicBarrierAwaitFunction : BaseGlobalFunction
 public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierAwaitTimeout"];
-    public override string[]? ParameterNames => ["barrierId", "timeoutMs"];
+    public override string[] ParameterNames => ["barrierId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -150,7 +150,7 @@ public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int barrierId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
@@ -164,7 +164,7 @@ public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
 public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierGetParticipantCount"];
-    public override string[]? ParameterNames => ["barrierId"];
+    public override string[] ParameterNames => ["barrierId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -198,7 +198,7 @@ public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunctio
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int barrierId = Convert.ToInt32(arguments[0]);
         return ResourceManager.GetCyclicBarrierParticipantCount(barrierId);
@@ -211,7 +211,7 @@ public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunctio
 public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierGetWaitingCount"];
-    public override string[]? ParameterNames => ["barrierId"];
+    public override string[] ParameterNames => ["barrierId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -245,7 +245,7 @@ public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int barrierId = Convert.ToInt32(arguments[0]);
         return ResourceManager.GetCyclicBarrierWaitingCount(barrierId);
@@ -258,7 +258,7 @@ public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
 public sealed class CyclicBarrierDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["CyclicBarrierDispose"];
-    public override string[]? ParameterNames => ["barrierId"];
+    public override string[] ParameterNames => ["barrierId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

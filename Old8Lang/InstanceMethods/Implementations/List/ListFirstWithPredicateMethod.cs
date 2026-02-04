@@ -16,7 +16,7 @@ public class ListFirstWithPredicateMethod : BaseInstanceMethod
 {
     public override string[] Names => ["FirstWith", "firstWith", "FirstWhere", "firstWhere"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["predicate"];
+    public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -307,7 +307,7 @@ public partial class VirtualMachine
     }
 
 
-    private object? Pow(object? a, object? b)
+    private object Pow(object? a, object? b)
     {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)

@@ -12,7 +12,7 @@ public class DictGetMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Get", "get"];
     public override Type TargetType => typeof(DictionaryLangValue);
-    public override string[]? ParameterNames => ["key"];
+    public override string[] ParameterNames => ["key"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

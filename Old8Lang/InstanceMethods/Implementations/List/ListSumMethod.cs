@@ -171,7 +171,7 @@ public class ListSumMethod : BaseInstanceMethod
         return typeof(LangValueType);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list)
         {

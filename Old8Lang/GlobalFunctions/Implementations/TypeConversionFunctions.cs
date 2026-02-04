@@ -16,7 +16,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class IntFunction : BaseGlobalFunction
 {
     public override string[] Names => ["int", "Int"];
-    public override string[]? ParameterNames => ["value"];
+    public override string[] ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -103,7 +103,7 @@ public sealed class IntFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         object? value = arguments[0];
 
@@ -150,7 +150,7 @@ public sealed class IntFunction : BaseGlobalFunction
 public sealed class DoubleFunction : BaseGlobalFunction
 {
     public override string[] Names => ["double", "Double"];
-    public override string[]? ParameterNames => ["value"];
+    public override string[] ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -238,7 +238,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
         return typeof(double);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         object? value = arguments[0];
 
@@ -285,7 +285,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
 public sealed class CharFunction : BaseGlobalFunction
 {
     public override string[] Names => ["char", "Char"];
-    public override string[]? ParameterNames => ["value"];
+    public override string[] ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -391,7 +391,7 @@ public sealed class CharFunction : BaseGlobalFunction
 public sealed class BoolFunction : BaseGlobalFunction
 {
     public override string[] Names => ["bool", "Bool"];
-    public override string[]? ParameterNames => ["value"];
+    public override string[] ParameterNames => ["value"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

@@ -120,10 +120,14 @@ public static class InstanceMethodInitializer
 
             // Dictionary 方法迁移完成！共 8 个方法
 
-            // TODO: 注册 Array 方法（约5个）
-            // registry.Register(new ArrayLengthMethod());
-            // registry.Register(new ArrayGetMethod());
-            // ... 等
+            // 注册 Array 方法
+            registry.Register(new Implementations.Array.ArrayLengthMethod());
+            registry.Register(new Implementations.Array.ArrayGetMethod());
+            registry.Register(new Implementations.Array.ArraySetMethod());
+            registry.Register(new Implementations.Array.ArrayToListMethod());
+            registry.Register(new Implementations.Array.ArraySliceMethod());
+
+            // Array 方法迁移完成！共 5 个方法
 
             // TODO: 注册 Task 方法（约4个）
             // registry.Register(new TaskThenMethod());

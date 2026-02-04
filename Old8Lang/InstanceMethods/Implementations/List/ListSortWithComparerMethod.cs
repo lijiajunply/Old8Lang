@@ -16,7 +16,7 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
 {
     public override string[] Names => ["SortWith", "sortWith", "SortBy", "sortBy"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["comparer"];
+    public override string[] ParameterNames => ["comparer"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -111,7 +111,7 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list && arguments.Length > 0)
         {

@@ -15,7 +15,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 public sealed class CompilerFunction : BaseGlobalFunction
 {
     public override string[] Names => ["Compiler", "compiler"];
-    public override string[]? ParameterNames => ["code"];
+    public override string[] ParameterNames => ["code"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 1;
 

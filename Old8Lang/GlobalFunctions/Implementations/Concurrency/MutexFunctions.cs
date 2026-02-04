@@ -17,7 +17,7 @@ namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 public sealed class MutexCreateFunction : BaseGlobalFunction
 {
     public override string[] Names => ["MutexCreate"];
-    public override string[]? ParameterNames => [];
+    public override string[] ParameterNames => [];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -45,7 +45,7 @@ public sealed class MutexCreateFunction : BaseGlobalFunction
         return typeof(int);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         return ResourceManager.CreateMutex();
     }
@@ -57,7 +57,7 @@ public sealed class MutexCreateFunction : BaseGlobalFunction
 public sealed class MutexLockFunction : BaseGlobalFunction
 {
     public override string[] Names => ["MutexLock"];
-    public override string[]? ParameterNames => ["mutexId"];
+    public override string[] ParameterNames => ["mutexId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -105,7 +105,7 @@ public sealed class MutexLockFunction : BaseGlobalFunction
 public sealed class MutexTryLockFunction : BaseGlobalFunction
 {
     public override string[] Names => ["MutexTryLock"];
-    public override string[]? ParameterNames => ["mutexId", "timeoutMs"];
+    public override string[] ParameterNames => ["mutexId", "timeoutMs"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -143,7 +143,7 @@ public sealed class MutexTryLockFunction : BaseGlobalFunction
         return typeof(bool);
     }
 
-    protected override object? ExecuteInVMInternal(object?[] arguments)
+    protected override object ExecuteInVMInternal(object?[] arguments)
     {
         int mutexId = Convert.ToInt32(arguments[0]);
         int timeoutMs = Convert.ToInt32(arguments[1]);
@@ -157,7 +157,7 @@ public sealed class MutexTryLockFunction : BaseGlobalFunction
 public sealed class MutexUnlockFunction : BaseGlobalFunction
 {
     public override string[] Names => ["MutexUnlock"];
-    public override string[]? ParameterNames => ["mutexId"];
+    public override string[] ParameterNames => ["mutexId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -205,7 +205,7 @@ public sealed class MutexUnlockFunction : BaseGlobalFunction
 public sealed class MutexDisposeFunction : BaseGlobalFunction
 {
     public override string[] Names => ["MutexDispose"];
-    public override string[]? ParameterNames => ["mutexId"];
+    public override string[] ParameterNames => ["mutexId"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 

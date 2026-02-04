@@ -16,7 +16,7 @@ public class ListIntersectMethod : BaseInstanceMethod
 {
     public override string[] Names => ["Intersect", "intersect"];
     public override Type TargetType => typeof(ListLangValue);
-    public override string[]? ParameterNames => ["other"];
+    public override string[] ParameterNames => ["other"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -133,7 +133,7 @@ public class ListIntersectMethod : BaseInstanceMethod
         return typeof(ListLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is List<object?> list && arguments.Length > 0 && arguments[0] is List<object?> other)
         {

@@ -19,7 +19,8 @@
       "Bash(timeout:*)",
       "Bash(wc:*)",
       "Bash(del test_chain.old8 test_chain2.old8)",
-      "Bash(dotnet --list-sdks:*)"
+      "Bash(dotnet --list-sdks:*)",
+      "Bash(git add:*)"
     ]
   }
 }

@@ -13,7 +13,7 @@ public class StringPadRightMethod : BaseInstanceMethod
 {
     public override string[] Names => ["PadRight", "padRight"];
     public override Type TargetType => typeof(StringLangValue);
-    public override string[]? ParameterNames => ["totalWidth", "paddingChar"];
+    public override string[] ParameterNames => ["totalWidth", "paddingChar"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 2;
 
@@ -78,7 +78,7 @@ public class StringPadRightMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str && arguments.Length > 0 && arguments[0] is int width)
         {

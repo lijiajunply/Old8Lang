@@ -24,7 +24,7 @@ public static class GlobalMethodInfoCache
     /// <param name="type">包含方法的类型</param>
     /// <param name="methodName">方法名称</param>
     /// <returns>方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetMethod(Type type, string methodName)
+    public static MethodInfo GetMethod(Type type, string methodName)
     {
         var key = $"{type.FullName}.{methodName}";
         return MethodCache.GetOrAdd(key, _ => type.GetMethod(methodName)!);
@@ -37,7 +37,7 @@ public static class GlobalMethodInfoCache
     /// <param name="methodName">方法名称</param>
     /// <param name="parameterTypes">参数类型数组</param>
     /// <returns>方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetMethod(Type type, string methodName, Type[] parameterTypes)
+    public static MethodInfo GetMethod(Type type, string methodName, Type[] parameterTypes)
     {
         var paramTypesStr = string.Join(",", parameterTypes.Select(t => t.FullName ?? t.Name));
         var key = $"{type.FullName}.{methodName}({paramTypesStr})";
@@ -51,7 +51,7 @@ public static class GlobalMethodInfoCache
     /// <param name="methodName">方法名称</param>
     /// <param name="bindingFlags">绑定标志</param>
     /// <returns>方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetMethod(Type type, string methodName, BindingFlags bindingFlags)
+    public static MethodInfo GetMethod(Type type, string methodName, BindingFlags bindingFlags)
     {
         var key = $"{type.FullName}.{methodName}#{(int)bindingFlags}";
         return MethodCache.GetOrAdd(key, _ => type.GetMethod(methodName, bindingFlags)!);
@@ -65,7 +65,7 @@ public static class GlobalMethodInfoCache
     /// <param name="bindingFlags">绑定标志</param>
     /// <param name="parameterTypes">参数类型数组</param>
     /// <returns>方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetMethod(Type type, string methodName, BindingFlags bindingFlags, Type[] parameterTypes)
+    public static MethodInfo GetMethod(Type type, string methodName, BindingFlags bindingFlags, Type[] parameterTypes)
     {
         var paramTypesStr = string.Join(",", parameterTypes.Select(t => t.FullName ?? t.Name));
         var key = $"{type.FullName}.{methodName}#{(int)bindingFlags}({paramTypesStr})";
@@ -78,7 +78,7 @@ public static class GlobalMethodInfoCache
     /// <param name="type">包含属性的类型</param>
     /// <param name="propertyName">属性名称</param>
     /// <returns>Getter 方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetPropertyGetter(Type type, string propertyName)
+    public static MethodInfo GetPropertyGetter(Type type, string propertyName)
     {
         var key = $"{type.FullName}.{propertyName}";
         return PropertyGetterCache.GetOrAdd(key, _ =>
@@ -94,7 +94,7 @@ public static class GlobalMethodInfoCache
     /// <param name="type">包含属性的类型</param>
     /// <param name="propertyName">属性名称</param>
     /// <returns>Setter 方法信息，如果找不到则返回 null</returns>
-    public static MethodInfo? GetPropertySetter(Type type, string propertyName)
+    public static MethodInfo GetPropertySetter(Type type, string propertyName)
     {
         var key = $"{type.FullName}.{propertyName}";
         return PropertySetterCache.GetOrAdd(key, _ =>

@@ -21,7 +21,7 @@ public class StringReverseMethod : BaseInstanceMethod
     {
         var str = (StringLangValue)instance;
         var charArray = str.Value.ToCharArray();
-        Array.Reverse(charArray);
+        System.Array.Reverse(charArray);
         return new StringLangValue(new string(charArray));
     }
 
@@ -37,7 +37,7 @@ public class StringReverseMethod : BaseInstanceMethod
     public static StringLangValue ReverseHelper(StringLangValue str)
     {
         var charArray = str.Value.ToCharArray();
-        Array.Reverse(charArray);
+        System.Array.Reverse(charArray);
         return new StringLangValue(new string(charArray));
     }
 
@@ -46,12 +46,12 @@ public class StringReverseMethod : BaseInstanceMethod
         return typeof(StringLangValue);
     }
 
-    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is string str)
         {
             var charArray = str.ToCharArray();
-            Array.Reverse(charArray);
+            System.Array.Reverse(charArray);
             return new string(charArray);
         }
         throw new ArgumentException("实例必须是 string 类型");
