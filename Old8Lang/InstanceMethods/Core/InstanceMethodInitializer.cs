@@ -21,16 +21,15 @@ public static class InstanceMethodInitializer
 
             var registry = InstanceMethodRegistry.Instance;
 
-            // 注册 List 基础方法
+            // 注册 List 基础方法（特有方法）
             registry.Register(new Implementations.List.ListAddMethod());
             registry.Register(new Implementations.List.ListRemoveMethod());
-            registry.Register(new Implementations.List.ListCountMethod());
             registry.Register(new Implementations.List.ListClearMethod());
-            registry.Register(new Implementations.List.ListContainsMethod());
-
-            // 注册 List 高级方法
             registry.Register(new Implementations.List.ListRemoveAtMethod());
             registry.Register(new Implementations.List.ListAddListMethod());
+            registry.Register(new Implementations.List.ListInsertMethod());
+
+            // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
             registry.Register(new Implementations.List.ListMapMethod());
             registry.Register(new Implementations.List.ListReduceMethod());
@@ -42,41 +41,38 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListTakeMethod());
             registry.Register(new Implementations.List.ListAnyMethod());
             registry.Register(new Implementations.List.ListAllMethod());
-
-            // 注册 List 排序和聚合方法
             registry.Register(new Implementations.List.ListSortMethod());
             registry.Register(new Implementations.List.ListFirstMethod());
             registry.Register(new Implementations.List.ListLastMethod());
-            registry.Register(new Implementations.List.ListInsertMethod());
             registry.Register(new Implementations.List.ListSumMethod());
             registry.Register(new Implementations.List.ListAverageMethod());
             registry.Register(new Implementations.List.ListMinMethod());
             registry.Register(new Implementations.List.ListMaxMethod());
             registry.Register(new Implementations.List.ListDistinctMethod());
             registry.Register(new Implementations.List.ListToStrMethod());
-
-            // 注册 List 查询和聚合方法
-            registry.Register(new Implementations.List.ListFirstWithPredicateMethod());
             registry.Register(new Implementations.List.ListFirstOrDefaultMethod());
-            registry.Register(new Implementations.List.ListLastWithPredicateMethod());
             registry.Register(new Implementations.List.ListLastOrDefaultMethod());
             registry.Register(new Implementations.List.ListElementAtMethod());
-            registry.Register(new Implementations.List.ListAggregateMethod());
-            registry.Register(new Implementations.List.ListAggregateWithSeedMethod());
             registry.Register(new Implementations.List.ListForEachMethod());
             registry.Register(new Implementations.List.ListJoinMethod());
-
-            // 注册 List 集合操作方法
             registry.Register(new Implementations.List.ListUnionMethod());
             registry.Register(new Implementations.List.ListIntersectMethod());
             registry.Register(new Implementations.List.ListExceptMethod());
             registry.Register(new Implementations.List.ListZipMethod());
             registry.Register(new Implementations.List.ListGroupByMethod());
-
-            // 注册 List 排序检查方法
             registry.Register(new Implementations.List.ListIsSortedMethod());
+            registry.Register(new Implementations.List.ListContainsMethod());
+            registry.Register(new Implementations.List.ListCountMethod());
 
-            // 注册 List 排序算法方法
+            // 注册 List 特殊查询方法（带 predicate 的变体）
+            registry.Register(new Implementations.List.ListFirstWithPredicateMethod());
+            registry.Register(new Implementations.List.ListLastWithPredicateMethod());
+
+            // 注册 List 聚合方法（Aggregate 是 Reduce 的别名，但支持不同参数）
+            registry.Register(new Implementations.List.ListAggregateMethod());
+            registry.Register(new Implementations.List.ListAggregateWithSeedMethod());
+
+            // 注册 List 排序算法方法（特有的具体排序实现）
             registry.Register(new Implementations.List.ListSortWithComparerMethod());
             registry.Register(new Implementations.List.ListQuickSortMethod());
             registry.Register(new Implementations.List.ListMergeSortMethod());
@@ -85,7 +81,7 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListInsertionSortMethod());
             registry.Register(new Implementations.List.ListHeapSortMethod());
 
-            // List 方法迁移完成！共 50 个方法
+            // List 方法注册完成！
 
             // 注册 String 基础方法
             registry.Register(new Implementations.String.StringLengthMethod());

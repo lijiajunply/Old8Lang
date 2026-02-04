@@ -72,6 +72,55 @@ public class LangListGroupByMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("VM 模式暂不支持 GroupBy 方法");
+        // 获取集合元素
+        List<object?> items;
+        if (instance is ILangList langList)
+        {
+            items = langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is System.Collections.IList list)
+        {
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("GroupBy 方法需要一个 keySelector 参数");
+        }
+
+        var keySelector = arguments[0];
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("VM 上下文未初始化");
+        }
+
+        // 使用字典来分组
+        var groups = new Dictionary<string, List<object?>>();
+
+        foreach (var item in items)
+        {
+            var key = vm.CallFunctionObject(keySelector, [item]);
+            var keyString = key?.ToString() ?? "null";
+
+            if (!groups.ContainsKey(keyString))
+            {
+                groups[keyString] = new List<object?>();
+            }
+            groups[keyString].Add(item);
+        }
+
+        // 将分组结果转换为字典
+        var resultDict = new Dictionary<object?, object?>();
+        foreach (var kvp in groups)
+        {
+            resultDict[kvp.Key] = kvp.Value;
+        }
+
+        return resultDict;
     }
 }

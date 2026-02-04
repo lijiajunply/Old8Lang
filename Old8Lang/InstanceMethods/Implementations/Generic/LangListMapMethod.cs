@@ -55,6 +55,40 @@ public class LangListMapMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("VM 模式暂不支持 Map 方法");
+        // 获取集合元素
+        List<object?> items;
+        if (instance is ILangList langList)
+        {
+            items = langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is System.Collections.IList list)
+        {
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("Map 方法需要一个 mapper 参数");
+        }
+
+        var mapper = arguments[0];
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("VM 上下文未初始化");
+        }
+
+        var mappedItems = new List<object?>();
+        foreach (var item in items)
+        {
+            var result = vm.CallFunctionObject(mapper, [item]);
+            mappedItems.Add(result);
+        }
+
+        return mappedItems;
     }
 }

@@ -36,7 +36,7 @@ public class LangListFilterMethod : BaseLangListMethod
             var args = new List<LangExpression> { item };
             var result = predicate.Run(manager, args);
 
-            if (result is BoolLangValue boolResult && boolResult.Value)
+            if (result is BoolLangValue { Value: true })
             {
                 filteredItems.Add(item);
             }
@@ -59,6 +59,45 @@ public class LangListFilterMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("VM 模式暂不支持 Filter 方法");
+        // 获取集合元素
+        List<object?> items;
+        if (instance is ILangList langList)
+        {
+            items = langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is System.Collections.IList list)
+        {
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("Filter 方法需要一个 predicate 参数");
+        }
+
+        var predicate = arguments[0];
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("VM 上下文未初始化");
+        }
+
+        var filteredItems = new List<object?>();
+        foreach (var item in items)
+        {
+            var result = vm.CallFunctionObject(predicate, [item]);
+
+            // 检查结果是否为 true
+            if (result is bool boolResult && boolResult)
+            {
+                filteredItems.Add(item);
+            }
+        }
+
+        return filteredItems;
     }
 }

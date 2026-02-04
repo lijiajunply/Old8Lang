@@ -59,6 +59,44 @@ public class LangListReduceMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("VM 模式暂不支持 Reduce 方法");
+        // 获取集合元素
+        List<object?> items;
+        if (instance is ILangList langList)
+        {
+            items = langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is System.Collections.IList list)
+        {
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("Reduce 方法需要一个 reducer 参数");
+        }
+
+        if (items.Count == 0)
+        {
+            throw new InvalidOperationException("序列不包含任何元素");
+        }
+
+        var reducer = arguments[0];
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("VM 上下文未初始化");
+        }
+
+        var accumulator = items[0];
+        for (int i = 1; i < items.Count; i++)
+        {
+            accumulator = vm.CallFunctionObject(reducer, [accumulator, items[i]]);
+        }
+
+        return accumulator;
     }
 }

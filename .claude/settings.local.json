@@ -22,7 +22,8 @@
       "Bash(dotnet --list-sdks:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(instance-methods\\): 添加 Array 实例方法支持\n\n实现了 Array 类型的 5 个实例方法：\n- Length/Len: 获取数组长度\n- Get: 获取数组元素（支持负数索引）\n- Set: 设置数组元素（支持负数索引）\n- ToList: 将数组转换为列表\n- Slice: 数组切片（支持步长和负数索引）\n\n技术细节：\n- 所有方法支持三种执行模式（解释器、编译器、VM）\n- 修复了 StringReverseMethod 中的命名空间冲突（Array vs System.Array）\n- 更新 ArrayLangValue.cs 的 knownMethods 数组以支持新方法\n- 创建完整的测试文件 test_array_methods.old8\n\n测试结果：\n✅ 所有 5 个方法测试通过\n✅ 支持负数索引\n✅ 支持切片步长（正向和反向）\n✅ 边界情况处理正确\n\n进度更新：\n- Array 方法：5/5 \\(100%\\) ✅\n- 总进度：81/101 \\(80%\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

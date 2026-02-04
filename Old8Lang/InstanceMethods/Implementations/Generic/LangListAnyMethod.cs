@@ -74,30 +74,52 @@ public class LangListAnyMethod : BaseLangListMethod
         return langList.GetLength() > 0;
     }
 
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters,
+        LocalManager local)
     {
         return typeof(bool);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
+        // 获取集合元素
+        List<object?> items;
         if (instance is ILangList langList)
         {
-            if (arguments.Length == 0)
-            {
-                return langList.GetLength() > 0;
-            }
+            items = langList.GetItems().Cast<object?>().ToList();
         }
-
-        // 兼容 VM 模式下的 List<object?>
-        if (instance is System.Collections.ICollection collection)
+        else if (instance is System.Collections.IList list)
         {
-            if (arguments.Length == 0)
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        // 无参数：检查列表是否非空
+        if (arguments.Length == 0)
+        {
+            return items.Count > 0;
+        }
+
+        // 有参数：检查是否有元素满足条件
+        var predicate = arguments[0];
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null)
+        {
+            throw new InvalidOperationException("VM 上下文未初始化");
+        }
+
+        foreach (var result in items.Select(item => vm.CallFunctionObject(predicate, [item])))
+        {
+            // 检查结果是否为 true
+            if (result is true)
             {
-                return collection.Count > 0;
+                return true;
             }
         }
 
-        throw new ArgumentException($"实例必须实现 ILangList 接口或 ICollection 接口，当前类型：{instance?.GetType().Name}");
+        return false;
     }
 }

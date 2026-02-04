@@ -110,14 +110,69 @@ public class LangListZipMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is ILangList other)
+        // 获取第一个集合元素
+        List<object?> items;
+        if (instance is ILangList langList)
         {
-            if (arguments.Length == 1)
+            items = langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is System.Collections.IList list)
+        {
+            items = list.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口或 IList 接口，当前类型：{instance?.GetType().Name}");
+        }
+
+        if (arguments.Length == 0)
+        {
+            throw new ArgumentException("Zip 方法需要至少一个参数");
+        }
+
+        // 获取第二个集合元素
+        List<object?> otherItems;
+        if (arguments[0] is ILangList otherLangList)
+        {
+            otherItems = otherLangList.GetItems().Cast<object?>().ToList();
+        }
+        else if (arguments[0] is System.Collections.IList otherList)
+        {
+            otherItems = otherList.Cast<object?>().ToList();
+        }
+        else
+        {
+            throw new ArgumentException($"Zip 方法的第一个参数必须实现 ILangList 接口或 IList 接口");
+        }
+
+        var zippedItems = new List<object?>();
+        int minLength = Math.Min(items.Count, otherItems.Count);
+
+        // 如果提供了 zipper 函数
+        if (arguments.Length >= 2)
+        {
+            var zipper = arguments[1];
+            var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+            if (vm == null)
             {
-                return ZipHelper(langList, other);
+                throw new InvalidOperationException("VM 上下文未初始化");
+            }
+
+            for (int i = 0; i < minLength; i++)
+            {
+                var result = vm.CallFunctionObject(zipper, [items[i], otherItems[i]]);
+                zippedItems.Add(result);
+            }
+        }
+        else
+        {
+            // 默认创建元组（使用 List 表示）
+            for (int i = 0; i < minLength; i++)
+            {
+                zippedItems.Add(new List<object?> { items[i], otherItems[i] });
             }
         }
 
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口");
+        return zippedItems;
     }
 }
