@@ -29,6 +29,15 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListAddListMethod());
             registry.Register(new Implementations.List.ListInsertMethod());
 
+            // 注册 List 基础查询方法
+            registry.Register(new Implementations.List.ListPopMethod());
+            registry.Register(new Implementations.List.ListSliceMethod());
+            registry.Register(new Implementations.List.ListElementAtOrDefaultMethod());
+            registry.Register(new Implementations.List.ListSingleMethod());
+            registry.Register(new Implementations.List.ListSingleOrDefaultMethod());
+            registry.Register(new Implementations.List.ListIsEmptyMethod());
+            registry.Register(new Implementations.List.ListToArrayMethod());
+
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
             registry.Register(new Implementations.List.ListMapMethod());

@@ -23,17 +23,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharCompareToMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharGetNumericValueMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsControlMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLetterOrDigitMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLowerMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsPunctuationMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsSymbolMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsUpperMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsWhiteSpaceMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToIntMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_char_methods_new.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -583,7 +572,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="18753000" />
+      <workItem from="1770170083234" duration="19621000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -928,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="875" />
+    <option name="localTasksCounter" value="876" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -955,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(vm): 更新虚拟机互斥锁重入锁定测试&#10;&#10;- 修改 Mutex_ReentrantLocking_ExecutesCorrectly 测试方法的实现逻辑&#10;- 将递归获取锁的方式改为使用 MutexTryLock 带超时检测重入失败&#10;- 添加标准 Mutex 不支持重入的注释说明&#10;- 调整测试断言验证第一次获取锁成功和重入尝试超时失败的预期结果&#10;- 更新 .idea/workspace.xml 中的变更记录和本地任务计数器统计" />
     <MESSAGE value="test(compiler): 更新IL生成和验证测试中的类初始化逻辑&#10;&#10;- 在ILGenerationTests中为TestClass添加初始值赋值测试&#10;- 在ILVerificationTests中为Person类添加name和age字段的初始化&#10;- 更新IDE配置文件中的变更记录和工作时间统计&#10;- 修改虚拟机互斥锁重入锁定测试的实现逻辑&#10;- 将递归获取锁方式改为使用MutexTryLock带超时检测重入失败" />
     <MESSAGE value="refactor(tests): 更新外部函数和导入语句的补全测试&#10;&#10;- 移除未使用的 _output 字段，直接使用构造函数参数&#10;- 删除 native 关键字的补全测试，因为该关键字已被删除&#10;- 更新所有测试中的输出写入方式，使用 output 参数替代 _output 字段&#10;- 修正 SymbolTableBuilder 中反射访问字段的名称，从 Functions 改为 _functions&#10;- 简化 ImportStatement 的字段访问，使用公共方法替代反射&#10;- 更新项目配置文件中的变更列表和任务计数器统计" />
     <MESSAGE value="fix(language-server): 修复文档高亮处理器中的坐标系统转换问题&#10;&#10;- 修正了 Token 和 SourceLocation 坐标系统的差异说明&#10;- 移除了不必要的列号转换，因为列号已经是 0-based&#10;- 更新了符号查找器中的坐标转换逻辑以保持一致性&#10;- 修正了 Token 列号的注释说明，明确其为 0-based 系统" />
@@ -980,7 +968,8 @@
     <MESSAGE value="docs: 移除 ILangList 通用方法实现相关文档&#10;&#10;- 移除 GENERIC_LANGLIST_METHODS_SUMMARY.md 文件&#10;- 移除 GENERIC_METHODS_COMPLETE.md 文件  &#10;- 移除 GENERIC_METHODS_FINAL_REPORT.md 文件&#10;- 移除 GENERIC_METHODS_FINAL_SUMMARY.md 文件" />
     <MESSAGE value="feat(vm): 支持虚拟机模式下实例方法的类型等价匹配&#10;&#10;- 添加类型等价检查机制，支持 object[] 与 ListLangValue 等类型映射&#10;- 实现 IsEquivalentType 方法处理基本类型到 LangValue 类型的转换&#10;- 扩展 BaseLangListMethod 支持多种集合类型的 VM 模式访问&#10;- 更新虚拟机反射调用逻辑优先使用实例方法系统&#10;- 添加 GetEquivalentLangType 辅助方法进行类型转换映射&#10;- 移除废弃的通用方法实现文档文件减少项目冗余" />
     <MESSAGE value="先这样" />
-    <option name="LAST_COMMIT_MESSAGE" value="先这样" />
+    <MESSAGE value="feat(char): 添加字符实例方法实现&#10;&#10;- 实现 Char.CompareTo 方法用于比较字符大小&#10;- 实现 Char.GetNumericValue 方法获取字符数字值&#10;- 实现 Char.IsControl 方法判断控制字符&#10;- 实现 Char.IsLetterOrDigit 方法判断字母或数字&#10;- 实现 Char.IsLower 方法判断小写字母&#10;- 实现 Char.IsPunctuation 方法判断标点符号&#10;- 实现 Char.IsSymbol 方法判断符号字符&#10;- 实现 Char.IsUpper 方法判断大写字母&#10;- 实现 Char.IsWhiteSpace 方法判断空白字符&#10;- 实现 Char.ToInt 方法转换为 ASCII 整数值&#10;- 注册所有新字符方法到实例方法初始化器&#10;- 添加完整的字符方法测试用例覆盖所有功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(char): 添加字符实例方法实现&#10;&#10;- 实现 Char.CompareTo 方法用于比较字符大小&#10;- 实现 Char.GetNumericValue 方法获取字符数字值&#10;- 实现 Char.IsControl 方法判断控制字符&#10;- 实现 Char.IsLetterOrDigit 方法判断字母或数字&#10;- 实现 Char.IsLower 方法判断小写字母&#10;- 实现 Char.IsPunctuation 方法判断标点符号&#10;- 实现 Char.IsSymbol 方法判断符号字符&#10;- 实现 Char.IsUpper 方法判断大写字母&#10;- 实现 Char.IsWhiteSpace 方法判断空白字符&#10;- 实现 Char.ToInt 方法转换为 ASCII 整数值&#10;- 注册所有新字符方法到实例方法初始化器&#10;- 添加完整的字符方法测试用例覆盖所有功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
