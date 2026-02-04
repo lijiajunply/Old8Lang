@@ -23,20 +23,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictAddMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictCloneMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictFilterMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictForEachMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictGetOrElseMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictIsEmptyMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictMapMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictMergeMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictToListMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictUpdateMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_dict_methods.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharCompareToMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharGetNumericValueMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsControlMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLetterOrDigitMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLowerMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsPunctuationMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsSymbolMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsUpperMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsWhiteSpaceMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToIntMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_char_methods_new.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictGetMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictContainsValueMethod.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -585,7 +583,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="18047000" />
+      <workItem from="1770170083234" duration="18753000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +928,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="874" />
+    <option name="localTasksCounter" value="875" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,7 +955,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(vm): 更新虚拟机 select 语句测试用例&#10;&#10;- 为 select 语句测试添加默认 case 分支验证&#10;- 调整测试顺序，先发送数据再执行 select 以确保正确执行&#10;- 简化多 case 测试逻辑，移除不必要的延迟&#10;- 修改生产者消费者测试，使用更直接的数据流向验证&#10;- 优化嵌套 select 测试的数据发送时机&#10;- 更新断言条件以匹配新的测试逻辑" />
     <MESSAGE value="test(vm): 更新虚拟机互斥锁重入锁定测试&#10;&#10;- 修改 Mutex_ReentrantLocking_ExecutesCorrectly 测试方法的实现逻辑&#10;- 将递归获取锁的方式改为使用 MutexTryLock 带超时检测重入失败&#10;- 添加标准 Mutex 不支持重入的注释说明&#10;- 调整测试断言验证第一次获取锁成功和重入尝试超时失败的预期结果&#10;- 更新 .idea/workspace.xml 中的变更记录和本地任务计数器统计" />
     <MESSAGE value="test(compiler): 更新IL生成和验证测试中的类初始化逻辑&#10;&#10;- 在ILGenerationTests中为TestClass添加初始值赋值测试&#10;- 在ILVerificationTests中为Person类添加name和age字段的初始化&#10;- 更新IDE配置文件中的变更记录和工作时间统计&#10;- 修改虚拟机互斥锁重入锁定测试的实现逻辑&#10;- 将递归获取锁方式改为使用MutexTryLock带超时检测重入失败" />
     <MESSAGE value="refactor(tests): 更新外部函数和导入语句的补全测试&#10;&#10;- 移除未使用的 _output 字段，直接使用构造函数参数&#10;- 删除 native 关键字的补全测试，因为该关键字已被删除&#10;- 更新所有测试中的输出写入方式，使用 output 参数替代 _output 字段&#10;- 修正 SymbolTableBuilder 中反射访问字段的名称，从 Functions 改为 _functions&#10;- 简化 ImportStatement 的字段访问，使用公共方法替代反射&#10;- 更新项目配置文件中的变更列表和任务计数器统计" />
@@ -982,7 +979,8 @@
     <MESSAGE value="feat(lang): 添加数组和元组的通用方法实现&#10;&#10;- 实现了 LastOrDefault、ElementAt、Sort、IsSorted 和 ToStr 通用方法&#10;- 为 ArrayLangValue 和 TupleLangValue 添加新方法的包装类&#10;- 更新方法注册器以包含新的通用方法实现&#10;- 添加完整的测试覆盖率和性能优化&#10;- 生成详细的实现报告和文档" />
     <MESSAGE value="docs: 移除 ILangList 通用方法实现相关文档&#10;&#10;- 移除 GENERIC_LANGLIST_METHODS_SUMMARY.md 文件&#10;- 移除 GENERIC_METHODS_COMPLETE.md 文件  &#10;- 移除 GENERIC_METHODS_FINAL_REPORT.md 文件&#10;- 移除 GENERIC_METHODS_FINAL_SUMMARY.md 文件" />
     <MESSAGE value="feat(vm): 支持虚拟机模式下实例方法的类型等价匹配&#10;&#10;- 添加类型等价检查机制，支持 object[] 与 ListLangValue 等类型映射&#10;- 实现 IsEquivalentType 方法处理基本类型到 LangValue 类型的转换&#10;- 扩展 BaseLangListMethod 支持多种集合类型的 VM 模式访问&#10;- 更新虚拟机反射调用逻辑优先使用实例方法系统&#10;- 添加 GetEquivalentLangType 辅助方法进行类型转换映射&#10;- 移除废弃的通用方法实现文档文件减少项目冗余" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(vm): 支持虚拟机模式下实例方法的类型等价匹配&#10;&#10;- 添加类型等价检查机制，支持 object[] 与 ListLangValue 等类型映射&#10;- 实现 IsEquivalentType 方法处理基本类型到 LangValue 类型的转换&#10;- 扩展 BaseLangListMethod 支持多种集合类型的 VM 模式访问&#10;- 更新虚拟机反射调用逻辑优先使用实例方法系统&#10;- 添加 GetEquivalentLangType 辅助方法进行类型转换映射&#10;- 移除废弃的通用方法实现文档文件减少项目冗余" />
+    <MESSAGE value="先这样" />
+    <option name="LAST_COMMIT_MESSAGE" value="先这样" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

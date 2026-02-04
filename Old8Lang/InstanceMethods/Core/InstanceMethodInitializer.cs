@@ -233,7 +233,19 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Char.CharIsDigitMethod());
             registry.Register(new Implementations.Char.CharIsLetterMethod());
 
-            // Char 方法迁移完成！共 4 个方法
+            // 注册 Char 高级方法
+            registry.Register(new Implementations.Char.CharIsWhiteSpaceMethod());
+            registry.Register(new Implementations.Char.CharIsUpperMethod());
+            registry.Register(new Implementations.Char.CharIsLowerMethod());
+            registry.Register(new Implementations.Char.CharIsLetterOrDigitMethod());
+            registry.Register(new Implementations.Char.CharIsPunctuationMethod());
+            registry.Register(new Implementations.Char.CharIsSymbolMethod());
+            registry.Register(new Implementations.Char.CharIsControlMethod());
+            registry.Register(new Implementations.Char.CharToIntMethod());
+            registry.Register(new Implementations.Char.CharGetNumericValueMethod());
+            registry.Register(new Implementations.Char.CharCompareToMethod());
+
+            // Char 方法迁移完成！共 14 个方法
 
             _initialized = true;
         }
