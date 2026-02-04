@@ -1,0 +1,188 @@
+// ILangList 通用方法测试
+// 测试通用方法是否可以用于 List、Array、Tuple
+
+print("=== ILangList 通用方法测试 ===\n")
+
+// 1. 测试 List 使用通用方法
+print("\n1. 测试 List 使用通用方法\n")
+
+list1 <- [1, 2, 3, 4, 5]
+print("list1 = ")
+print(list1)
+print("\n")
+
+// Count 方法
+count1 <- list1.Count()
+print("list1.Count() = ")
+print(count1)
+print("\n")
+
+// Contains 方法
+contains1 <- list1.Contains(3)
+print("list1.Contains(3) = ")
+print(contains1)
+print("\n")
+
+contains2 <- list1.Contains(10)
+print("list1.Contains(10) = ")
+print(contains2)
+print("\n")
+
+// Reverse 方法
+reversed1 <- list1.Reverse()
+print("list1.Reverse() = ")
+print(reversed1)
+print("\n")
+
+// Any 方法
+any1 <- list1.Any()
+print("list1.Any() = ")
+print(any1)
+print("\n")
+
+// Filter 方法
+filtered1 <- list1.Filter(func(x) { return x > 3 })
+print("list1.Filter(x > 3) = ")
+print(filtered1)
+print("\n")
+
+// Map 方法
+mapped1 <- list1.Map(func(x) { return x * 2 })
+print("list1.Map(x * 2) = ")
+print(mapped1)
+print("\n")
+
+// All 方法
+all1 <- list1.All(func(x) { return x > 0 })
+print("list1.All(x > 0) = ")
+print(all1)
+print("\n")
+
+all2 <- list1.All(func(x) { return x > 3 })
+print("list1.All(x > 3) = ")
+print(all2)
+print("\n")
+
+// 2. 测试 Array 使用通用方法
+print("\n2. 测试 Array 使用通用方法\n")
+
+arr1 <- array(5)
+arr1.Set(0, 10)
+arr1.Set(1, 20)
+arr1.Set(2, 30)
+arr1.Set(3, 40)
+arr1.Set(4, 50)
+
+print("arr1 = [")
+i <- 0
+while i < 5 {
+    print(arr1.Get(i))
+    if i < 4 {
+        print(", ")
+    }
+    i <- i + 1
+}
+print("]\n")
+
+// Count 方法
+count2 <- arr1.Count()
+print("arr1.Count() = ")
+print(count2)
+print("\n")
+
+// Contains 方法
+contains3 <- arr1.Contains(30)
+print("arr1.Contains(30) = ")
+print(contains3)
+print("\n")
+
+contains4 <- arr1.Contains(100)
+print("arr1.Contains(100) = ")
+print(contains4)
+print("\n")
+
+// Reverse 方法
+reversed2 <- arr1.Reverse()
+print("arr1.Reverse() = ")
+print(reversed2)
+print("\n")
+
+// Any 方法
+any2 <- arr1.Any()
+print("arr1.Any() = ")
+print(any2)
+print("\n")
+
+// 3. 测试 Tuple 使用通用方法
+print("\n3. 测试 Tuple 使用通用方法\n")
+
+tuple1 <- (100, 200, 300, 400)
+print("tuple1 = ")
+print(tuple1)
+print("\n")
+
+// Count 方法
+count3 <- tuple1.Count()
+print("tuple1.Count() = ")
+print(count3)
+print("\n")
+
+// Contains 方法
+contains5 <- tuple1.Contains(200)
+print("tuple1.Contains(200) = ")
+print(contains5)
+print("\n")
+
+contains6 <- tuple1.Contains(999)
+print("tuple1.Contains(999) = ")
+print(contains6)
+print("\n")
+
+// Reverse 方法
+reversed3 <- tuple1.Reverse()
+print("tuple1.Reverse() = ")
+print(reversed3)
+print("\n")
+
+// Any 方法
+any3 <- tuple1.Any()
+print("tuple1.Any() = ")
+print(any3)
+print("\n")
+
+// Filter 方法
+filtered2 <- tuple1.Filter(func(x) { return x >= 300 })
+print("tuple1.Filter(x >= 300) = ")
+print(filtered2)
+print("\n")
+
+// Map 方法
+mapped2 <- tuple1.Map(func(x) { return x / 100 })
+print("tuple1.Map(x / 100) = ")
+print(mapped2)
+print("\n")
+
+// 4. 测试空列表
+print("\n4. 测试空列表\n")
+
+emptyList <- []
+print("emptyList = ")
+print(emptyList)
+print("\n")
+
+count4 <- emptyList.Count()
+print("emptyList.Count() = ")
+print(count4)
+print("\n")
+
+any4 <- emptyList.Any()
+print("emptyList.Any() = ")
+print(any4)
+print("\n")
+
+all3 <- emptyList.All(func(x) { return x > 0 })
+print("emptyList.All(x > 0) = ")
+print(all3)
+print(" (空列表的 All 返回 true)\n")
+
+print("\n=== 所有测试完成 ===\n")

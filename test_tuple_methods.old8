@@ -1,0 +1,135 @@
+// Tuple 实例方法测试
+// 测试 Tuple 的 2 个实例方法：Get, ToList
+
+print("=== Tuple 实例方法测试 ===\n")
+
+// 1. 测试 Get 方法
+print("\n1. 测试 Get 方法\n")
+
+tuple1 <- (10, 20, 30)
+print("tuple1 = ")
+print(tuple1)
+print("\n")
+
+val0 <- tuple1.Get(0)
+print("tuple1.Get(0) = ")
+print(val0)
+print("\n")
+
+val1 <- tuple1.Get(1)
+print("tuple1.Get(1) = ")
+print(val1)
+print("\n")
+
+val2 <- tuple1.Get(2)
+print("tuple1.Get(2) = ")
+print(val2)
+print("\n")
+
+// 2. 测试 Get 方法（命名元组）
+print("\n2. 测试 Get 方法（命名元组）\n")
+
+tuple2 <- (x: 100, y: 200, z: 300)
+print("tuple2 = ")
+print(tuple2)
+print("\n")
+
+x <- tuple2.Get(0)
+print("tuple2.Get(0) = ")
+print(x)
+print("\n")
+
+y <- tuple2.Get(1)
+print("tuple2.Get(1) = ")
+print(y)
+print("\n")
+
+z <- tuple2.Get(2)
+print("tuple2.Get(2) = ")
+print(z)
+print("\n")
+
+// 3. 测试 ToList 方法
+print("\n3. 测试 ToList 方法\n")
+
+tuple3 <- (1, 2, 3, 4, 5)
+print("tuple3 = ")
+print(tuple3)
+print("\n")
+
+list1 <- tuple3.ToList()
+print("tuple3.ToList() = ")
+print(list1)
+print("\n")
+
+// 验证列表操作
+list1.Add(6)
+print("list1.Add(6) 后: ")
+print(list1)
+print("\n")
+
+count <- list1.Count()
+print("list1.Count() = ")
+print(count)
+print("\n")
+
+// 4. 测试 ToList 方法（命名元组）
+print("\n4. 测试 ToList 方法（命名元组）\n")
+
+tuple4 <- (name: "Alice", age: 30, city: "Beijing")
+print("tuple4 = ")
+print(tuple4)
+print("\n")
+
+list2 <- tuple4.ToList()
+print("tuple4.ToList() = ")
+print(list2)
+print("\n")
+
+// 5. 测试单元素元组
+print("\n5. 测试单元素元组\n")
+
+tuple6 <- (42,)
+print("tuple6 = ")
+print(tuple6)
+print("\n")
+
+val <- tuple6.Get(0)
+print("tuple6.Get(0) = ")
+print(val)
+print("\n")
+
+list4 <- tuple6.ToList()
+print("tuple6.ToList() = ")
+print(list4)
+print("\n")
+
+// 6. 测试大元组
+print("\n6. 测试大元组\n")
+
+tuple7 <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+print("tuple7 = ")
+print(tuple7)
+print("\n")
+
+val5 <- tuple7.Get(5)
+print("tuple7.Get(5) = ")
+print(val5)
+print("\n")
+
+val9 <- tuple7.Get(9)
+print("tuple7.Get(9) = ")
+print(val9)
+print("\n")
+
+list5 <- tuple7.ToList()
+print("tuple7.ToList() = ")
+print(list5)
+print("\n")
+
+list5Count <- list5.Count()
+print("list5.Count() = ")
+print(list5Count)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")

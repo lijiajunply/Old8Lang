@@ -23,14 +23,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadAbortMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadIsAliveMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadJoinMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadStartMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_thread_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayContainsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayReverseMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsDigitMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLetterMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToLowerMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToUpperMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/BaseLangListMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListAllMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListAnyMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListContainsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFilterMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMapMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListReverseMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleAllMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleAnyMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleContainsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleFilterMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleGetMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleMapMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleReverseMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleToListMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_char_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generic_langlist_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_tuple_methods.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -579,7 +600,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="3775000" />
+      <workItem from="1770170083234" duration="6541000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

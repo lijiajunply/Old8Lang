@@ -1,0 +1,190 @@
+// Char 实例方法测试
+// 测试 Char 的 4 个实例方法：ToUpper, ToLower, IsDigit, IsLetter
+
+print("=== Char 实例方法测试 ===\n")
+
+// 1. 测试 ToUpper 方法
+print("\n1. 测试 ToUpper 方法\n")
+
+c1 <- 'a'
+print("c1 = ")
+print(c1)
+print("\n")
+
+upper1 <- c1.ToUpper()
+print("c1.ToUpper() = ")
+print(upper1)
+print("\n")
+
+c2 <- 'z'
+upper2 <- c2.ToUpper()
+print("'z'.ToUpper() = ")
+print(upper2)
+print("\n")
+
+c3 <- 'A'
+upper3 <- c3.ToUpper()
+print("'A'.ToUpper() = ")
+print(upper3)
+print(" (已经是大写)\n")
+
+// 2. 测试 ToLower 方法
+print("\n2. 测试 ToLower 方法\n")
+
+c4 <- 'A'
+print("c4 = ")
+print(c4)
+print("\n")
+
+lower1 <- c4.ToLower()
+print("c4.ToLower() = ")
+print(lower1)
+print("\n")
+
+c5 <- 'Z'
+lower2 <- c5.ToLower()
+print("'Z'.ToLower() = ")
+print(lower2)
+print("\n")
+
+c6 <- 'a'
+lower3 <- c6.ToLower()
+print("'a'.ToLower() = ")
+print(lower3)
+print(" (已经是小写)\n")
+
+// 3. 测试 IsDigit 方法
+print("\n3. 测试 IsDigit 方法\n")
+
+c7 <- '5'
+print("c7 = ")
+print(c7)
+print("\n")
+
+isDigit1 <- c7.IsDigit()
+print("c7.IsDigit() = ")
+print(isDigit1)
+print("\n")
+
+c8 <- 'a'
+isDigit2 <- c8.IsDigit()
+print("'a'.IsDigit() = ")
+print(isDigit2)
+print("\n")
+
+c9 <- '0'
+isDigit3 <- c9.IsDigit()
+print("'0'.IsDigit() = ")
+print(isDigit3)
+print("\n")
+
+c10 <- '9'
+isDigit4 <- c10.IsDigit()
+print("'9'.IsDigit() = ")
+print(isDigit4)
+print("\n")
+
+c11 <- ' '
+isDigit5 <- c11.IsDigit()
+print("' '.IsDigit() = ")
+print(isDigit5)
+print("\n")
+
+// 4. 测试 IsLetter 方法
+print("\n4. 测试 IsLetter 方法\n")
+
+c12 <- 'a'
+print("c12 = ")
+print(c12)
+print("\n")
+
+isLetter1 <- c12.IsLetter()
+print("c12.IsLetter() = ")
+print(isLetter1)
+print("\n")
+
+c13 <- 'Z'
+isLetter2 <- c13.IsLetter()
+print("'Z'.IsLetter() = ")
+print(isLetter2)
+print("\n")
+
+c14 <- '5'
+isLetter3 <- c14.IsLetter()
+print("'5'.IsLetter() = ")
+print(isLetter3)
+print("\n")
+
+c15 <- ' '
+isLetter4 <- c15.IsLetter()
+print("' '.IsLetter() = ")
+print(isLetter4)
+print("\n")
+
+c16 <- '!'
+isLetter5 <- c16.IsLetter()
+print("'!'.IsLetter() = ")
+print(isLetter5)
+print("\n")
+
+// 5. 测试组合使用
+print("\n5. 测试组合使用\n")
+
+c17 <- 'h'
+print("c17 = ")
+print(c17)
+print("\n")
+
+// 先转大写，再判断是否为字母
+upper4 <- c17.ToUpper()
+print("c17.ToUpper() = ")
+print(upper4)
+print("\n")
+
+isLetter6 <- upper4.IsLetter()
+print("upper4.IsLetter() = ")
+print(isLetter6)
+print("\n")
+
+// 6. 测试中文字符
+print("\n6. 测试中文字符\n")
+
+c18 <- '中'
+print("c18 = ")
+print(c18)
+print("\n")
+
+isLetter7 <- c18.IsLetter()
+print("c18.IsLetter() = ")
+print(isLetter7)
+print(" (中文字符也是字母)\n")
+
+isDigit6 <- c18.IsDigit()
+print("c18.IsDigit() = ")
+print(isDigit6)
+print("\n")
+
+// 7. 测试特殊字符
+print("\n7. 测试特殊字符\n")
+
+c19 <- '@'
+isLetter8 <- c19.IsLetter()
+isDigit7 <- c19.IsDigit()
+print("'@'.IsLetter() = ")
+print(isLetter8)
+print("\n")
+print("'@'.IsDigit() = ")
+print(isDigit7)
+print("\n")
+
+c20 <- '_'
+isLetter9 <- c20.IsLetter()
+isDigit8 <- c20.IsDigit()
+print("'_'.IsLetter() = ")
+print(isLetter9)
+print("\n")
+print("'_'.IsDigit() = ")
+print(isDigit8)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")

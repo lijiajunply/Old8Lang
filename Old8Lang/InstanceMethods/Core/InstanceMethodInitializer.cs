@@ -146,14 +146,19 @@ public static class InstanceMethodInitializer
             // Thread 方法迁移完成！共 3 个方法
             // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
-            // TODO: 注册 Tuple 方法（约2个）
-            // registry.Register(new TupleGetMethod());
-            // ... 等
+            // 注册 Tuple 方法
+            registry.Register(new Implementations.Tuple.TupleGetMethod());
+            registry.Register(new Implementations.Tuple.TupleToListMethod());
 
-            // TODO: 注册 Char 方法（约4个）
-            // registry.Register(new CharToUpperMethod());
-            // registry.Register(new CharToLowerMethod());
-            // ... 等
+            // Tuple 方法迁移完成！共 2 个方法
+
+            // 注册 Char 方法
+            registry.Register(new Implementations.Char.CharToUpperMethod());
+            registry.Register(new Implementations.Char.CharToLowerMethod());
+            registry.Register(new Implementations.Char.CharIsDigitMethod());
+            registry.Register(new Implementations.Char.CharIsLetterMethod());
+
+            // Char 方法迁移完成！共 4 个方法
 
             _initialized = true;
         }
