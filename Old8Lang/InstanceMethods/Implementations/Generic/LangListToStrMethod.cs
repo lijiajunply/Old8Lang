@@ -53,11 +53,9 @@ public class LangListToStrMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
-        {
-            return ToStrHelper(langList);
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        // 使用基类的辅助方法获取元素列表（支持 object[], List<object?>, ILangList）
+        var items = GetItemsForVM(instance);
+        var strings = items.Select(item => item?.ToString() ?? "null");
+        return "[" + string.Join(", ", strings) + "]";
     }
 }

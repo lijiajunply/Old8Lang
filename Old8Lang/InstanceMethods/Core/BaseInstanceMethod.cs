@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -129,12 +130,78 @@ public abstract class BaseInstanceMethod : IInstanceMethod
         }
 
         var instanceType = instance.GetType();
-        if (!TargetType.IsAssignableFrom(instanceType))
+
+        // 直接类型匹配
+        if (TargetType.IsAssignableFrom(instanceType))
         {
-            throw new ArgumentException(
-                $"{PrimaryName} 方法只能在 {TargetType.Name} 类型上调用，但实际类型是 {instanceType.Name}",
-                nameof(instance));
+            return;
         }
+
+        // 检查类型等价（VM 模式下的类型映射）
+        if (IsEquivalentType(instanceType, TargetType))
+        {
+            return;
+        }
+
+        throw new ArgumentException(
+            $"{PrimaryName} 方法只能在 {TargetType.Name} 类型上调用，但实际类型是 {instanceType.Name}",
+            nameof(instance));
+    }
+
+    /// <summary>
+    /// 检查两个类型是否等价（用于 VM 模式）
+    /// </summary>
+    private static bool IsEquivalentType(Type actualType, Type targetType)
+    {
+        // object[] 等价于 ListLangValue
+        if (actualType == typeof(object[]) && targetType == typeof(ListLangValue))
+        {
+            return true;
+        }
+
+        // List<object?> 等价于 ListLangValue
+        if (actualType == typeof(List<object?>) && targetType == typeof(ListLangValue))
+        {
+            return true;
+        }
+
+        // Dictionary<object, object?> 等价于 DictionaryLangValue
+        if (actualType == typeof(Dictionary<object, object?>) && targetType == typeof(DictionaryLangValue))
+        {
+            return true;
+        }
+
+        // string 等价于 StringLangValue
+        if (actualType == typeof(string) && targetType == typeof(StringLangValue))
+        {
+            return true;
+        }
+
+        // int 等价于 IntLangValue
+        if (actualType == typeof(int) && targetType == typeof(IntLangValue))
+        {
+            return true;
+        }
+
+        // double 等价于 DoubleLangValue
+        if (actualType == typeof(double) && targetType == typeof(DoubleLangValue))
+        {
+            return true;
+        }
+
+        // bool 等价于 BoolLangValue
+        if (actualType == typeof(bool) && targetType == typeof(BoolLangValue))
+        {
+            return true;
+        }
+
+        // char 等价于 CharLangValue
+        if (actualType == typeof(char) && targetType == typeof(CharLangValue))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>

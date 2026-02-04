@@ -48,4 +48,52 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
     {
         return instance is ILangList;
     }
+
+    /// <summary>
+    /// 从 VM 模式下的实例获取元素列表（支持 object[], List<object?>, ILangList）
+    /// </summary>
+    protected List<object?> GetItemsForVM(object? instance)
+    {
+        if (instance is ILangList langList)
+        {
+            return langList.GetItems().Cast<object?>().ToList();
+        }
+        else if (instance is object[] arr)
+        {
+            return arr.ToList();
+        }
+        else if (instance is List<object?> list)
+        {
+            return list;
+        }
+        else if (instance is System.Collections.IList ilist)
+        {
+            return ilist.Cast<object?>().ToList();
+        }
+        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表类型，当前类型：{instance?.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 从 VM 模式下的实例获取长度（支持 object[], List<object?>, ILangList）
+    /// </summary>
+    protected int GetLengthForVM(object? instance)
+    {
+        if (instance is ILangList langList)
+        {
+            return langList.GetLength();
+        }
+        else if (instance is object[] arr)
+        {
+            return arr.Length;
+        }
+        else if (instance is List<object?> list)
+        {
+            return list.Count;
+        }
+        else if (instance is System.Collections.ICollection collection)
+        {
+            return collection.Count;
+        }
+        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表类型，当前类型：{instance?.GetType().Name}");
+    }
 }

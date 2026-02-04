@@ -73,6 +73,36 @@ public partial class VirtualMachine
             }
         }
 
+        // 首先尝试使用实例方法系统（支持类型等价）
+        var registry = Old8Lang.InstanceMethods.Core.InstanceMethodRegistry.Instance;
+
+        // 尝试查找实例方法
+        var instanceMethod = registry.TryGetMethod(obj.GetType(), methodName);
+
+        // 如果没找到，尝试查找等价类型的方法
+        if (instanceMethod == null)
+        {
+            var equivalentType = GetEquivalentLangType(obj.GetType());
+            if (equivalentType != null)
+            {
+                instanceMethod = registry.TryGetMethod(equivalentType, methodName);
+            }
+        }
+
+        if (instanceMethod != null)
+        {
+            try
+            {
+                // 使用实例方法系统执行
+                var result = instanceMethod.ExecuteInVM(obj, args);
+                return result;
+            }
+            catch (NotSupportedException)
+            {
+                // 如果实例方法不支持 VM 模式，继续使用旧的扩展方法系统
+            }
+        }
+
         Type? extensionType = null;
         System.Reflection.MethodInfo? method = null;
 
@@ -258,10 +288,60 @@ public partial class VirtualMachine
         return method.Invoke(invokeInstance, invokeArgs.ToArray());
     }
 
-    // === 模块加载方法 ===
-
     /// <summary>
-    /// 加载模块
+    /// 获取 C# 原生类型对应的等价 Old8Lang 类型
+    /// 用于实例方法查找时的类型匹配
     /// </summary>
+    private static Type? GetEquivalentLangType(Type nativeType)
+    {
+        // object[] 等价于 ListLangValue (VM 模式下的列表表示)
+        if (nativeType == typeof(object[]))
+        {
+            return typeof(ListLangValue);
+        }
 
+        // List<object?> 等价于 ListLangValue
+        if (nativeType == typeof(List<object?>))
+        {
+            return typeof(ListLangValue);
+        }
+
+        // Dictionary<object, object?> 等价于 DictionaryLangValue
+        if (nativeType == typeof(Dictionary<object, object?>))
+        {
+            return typeof(DictionaryLangValue);
+        }
+
+        // string 等价于 StringLangValue
+        if (nativeType == typeof(string))
+        {
+            return typeof(StringLangValue);
+        }
+
+        // int 等价于 IntLangValue
+        if (nativeType == typeof(int))
+        {
+            return typeof(IntLangValue);
+        }
+
+        // double 等价于 DoubleLangValue
+        if (nativeType == typeof(double))
+        {
+            return typeof(DoubleLangValue);
+        }
+
+        // bool 等价于 BoolLangValue
+        if (nativeType == typeof(bool))
+        {
+            return typeof(BoolLangValue);
+        }
+
+        // char 等价于 CharLangValue
+        if (nativeType == typeof(char))
+        {
+            return typeof(CharLangValue);
+        }
+
+        return null;
+    }
 }

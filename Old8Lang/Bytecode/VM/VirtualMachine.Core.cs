@@ -5,6 +5,7 @@ using Old8Lang.Bytecode.Generators;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Bytecode.ModuleSystem;
 using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.InstanceMethods.Core;
 
 namespace Old8Lang.Bytecode.VM;
 
@@ -52,6 +53,9 @@ public partial class VirtualMachine
 
         // 初始化全局函数注册表
         GlobalFunctionInitializer.EnsureInitialized();
+
+        // 初始化实例方法注册表
+        InstanceMethodInitializer.EnsureInitialized();
 
         // 初始化全局变量
         foreach (var globalVar in _bytecodeFile.GlobalVariables)
