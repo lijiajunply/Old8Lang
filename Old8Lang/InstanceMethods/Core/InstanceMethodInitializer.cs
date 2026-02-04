@@ -158,7 +158,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.String.StringReverseMethod());
             registry.Register(new Implementations.String.StringToCharArrayMethod());
 
-            // String 方法迁移完成！共 15 个方法
+            // 注册 String 扩展方法（新增）
+            registry.Register(new Implementations.String.StringTrimStartMethod());
+            registry.Register(new Implementations.String.StringTrimEndMethod());
+            registry.Register(new Implementations.String.StringRepeatMethod());
+            registry.Register(new Implementations.String.StringToBase64Method());
+            registry.Register(new Implementations.String.StringFromBase64Method());
+
+            // String 方法迁移完成！共 20 个方法
 
             // 注册 Dictionary 方法
             registry.Register(new Implementations.Dictionary.DictKeysMethod());
@@ -247,16 +254,19 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Task.TaskThenMethod());
             registry.Register(new Implementations.Task.TaskCatchMethod());
             registry.Register(new Implementations.Task.TaskFinallyMethod());
+            registry.Register(new Implementations.Task.TaskContinueWithMethod());
 
-            // Task 方法迁移完成！共 4 个方法
+            // Task 方法迁移完成！共 5 个方法
             // 注意：Retry 方法在 Operation.cs 中有特殊处理，不需要注册为实例方法
 
             // 注册 Thread 方法
             registry.Register(new Implementations.Thread.ThreadJoinMethod());
             registry.Register(new Implementations.Thread.ThreadIsAliveMethod());
             registry.Register(new Implementations.Thread.ThreadStartMethod());
+            registry.Register(new Implementations.Thread.ThreadWithTimeoutMethod());
+            registry.Register(new Implementations.Thread.ThreadCancelMethod());
 
-            // Thread 方法迁移完成！共 3 个方法
+            // Thread 方法迁移完成！共 5 个方法
             // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
             // 注册 Tuple 方法
