@@ -23,14 +23,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GENERIC_LANGLIST_METHODS_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_array_generic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_generic_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_tuple_generic.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GENERIC_METHODS_MIGRATION_PLAN.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListConcatMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListDistinctMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFindMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFirstMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFirstOrDefaultMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListIndexOfMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListLastMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSkipMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListTakeMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleGenericWrappers.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_generic_langlist_methods.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_generic_langlist_methods.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -579,7 +584,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="7369000" />
+      <workItem from="1770170083234" duration="7688000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -924,7 +929,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="867" />
+    <option name="localTasksCounter" value="868" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -951,7 +956,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(git): 更新 gitignore 配置&#10;&#10;- 移除了对 Old8Lang.Tests/OldLib 的忽略规则&#10;- 添加了新的忽略项 nul&#10;- 调整了 gitignore 文件结构" />
     <MESSAGE value="fix(tests): 修复虚拟机并发测试中的线程启动问题&#10;&#10;- 在 CountDownLatch 测试中为所有 spawn 调用添加 .Start() 方法&#10;- 在 Channel 选择语句测试中为所有 spawn 调用添加 .Start() 方法&#10;- 确保所有并发任务正确启动以避免测试失败&#10;- 修复了因缺少 Start() 调用导致的测试挂起问题" />
     <MESSAGE value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
     <MESSAGE value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
@@ -976,7 +980,8 @@
     <MESSAGE value="feat(instance-methods): 添加String实例方法支持&#10;&#10;- 实现StringLengthMethod、StringSubstringMethod、StringReplaceMethod等15个String方法&#10;- 在InstanceMethodInitializer中注册所有String基础和高级方法&#10;- 更新PROGRESS_INSTANCE_METHODS.md文档显示String方法完成状态&#10;- 添加String方法相关的单元测试标记&#10;- 完成String方法的IL代码生成和虚拟机执行支持" />
     <MESSAGE value="feat(instance-methods): 添加 Dictionary 实例方法支持&#10;&#10;- 实现 DictClearMethod、DictContainsKeyMethod、DictCountMethod 等 8 个 Dictionary 方法&#10;- 在 InstanceMethodInitializer 中注册所有 Dictionary 方法&#10;- 更新 PROGRESS_INSTANCE_METHODS.md 文档显示 Dictionary 方法完成状态&#10;- 添加 test_dictionary_methods.old8 测试文件验证所有 Dictionary 方法功能&#10;- 完成 Dictionary 方法的 IL 代码生成和虚拟机执行支持&#10;- 总进度提升至 76/101 (75%)" />
     <MESSAGE value="加入新东西" />
-    <option name="LAST_COMMIT_MESSAGE" value="加入新东西" />
+    <MESSAGE value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

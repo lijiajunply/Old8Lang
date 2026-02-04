@@ -112,7 +112,10 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 "IsSorted", "Distinct", "Map", "Filter", "Reduce", "Get", "Set", "Length", "Len", "length", "len",
                 "ToList", "toList", "tolist", "Slice", "slice", "get", "set",
                 // 通用 ILangList 方法
-                "Contains", "contains", "Reverse", "reverse", "Any", "any", "All", "all", "Where", "where", "Select", "select"
+                "Contains", "contains", "Reverse", "reverse", "Any", "any", "All", "all", "Where", "where", "Select", "select",
+                "First", "first", "FirstOrDefault", "firstOrDefault", "Last", "last",
+                "Skip", "skip", "Take", "take", "Find", "find", "Concat", "concat", "IndexOf", "indexOf",
+                "distinct", "unique", "Unique"
             };
             if (knownMethods.Contains(methodName))
             {

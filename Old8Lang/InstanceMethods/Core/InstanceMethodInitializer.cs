@@ -132,6 +132,19 @@ public static class InstanceMethodInitializer
             // 注册 Array 通用方法（基于 ILangList）
             registry.Register(new Implementations.Array.ArrayContainsMethod());
             registry.Register(new Implementations.Array.ArrayReverseMethod());
+            registry.Register(new Implementations.Array.ArrayFilterMethod());
+            registry.Register(new Implementations.Array.ArrayMapMethod());
+            registry.Register(new Implementations.Array.ArrayAnyMethod());
+            registry.Register(new Implementations.Array.ArrayAllMethod());
+            registry.Register(new Implementations.Array.ArrayFirstMethod());
+            registry.Register(new Implementations.Array.ArrayFirstOrDefaultMethod());
+            registry.Register(new Implementations.Array.ArrayLastMethod());
+            registry.Register(new Implementations.Array.ArraySkipMethod());
+            registry.Register(new Implementations.Array.ArrayTakeMethod());
+            registry.Register(new Implementations.Array.ArrayDistinctMethod());
+            registry.Register(new Implementations.Array.ArrayFindMethod());
+            registry.Register(new Implementations.Array.ArrayConcatMethod());
+            registry.Register(new Implementations.Array.ArrayIndexOfMethod());
 
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
@@ -163,6 +176,15 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleMapMethod());
             registry.Register(new Implementations.Tuple.TupleAnyMethod());
             registry.Register(new Implementations.Tuple.TupleAllMethod());
+            registry.Register(new Implementations.Tuple.TupleFirstMethod());
+            registry.Register(new Implementations.Tuple.TupleFirstOrDefaultMethod());
+            registry.Register(new Implementations.Tuple.TupleLastMethod());
+            registry.Register(new Implementations.Tuple.TupleSkipMethod());
+            registry.Register(new Implementations.Tuple.TupleTakeMethod());
+            registry.Register(new Implementations.Tuple.TupleDistinctMethod());
+            registry.Register(new Implementations.Tuple.TupleFindMethod());
+            registry.Register(new Implementations.Tuple.TupleConcatMethod());
+            registry.Register(new Implementations.Tuple.TupleIndexOfMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());
