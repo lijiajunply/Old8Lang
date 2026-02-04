@@ -34,6 +34,9 @@ public class TaskFinallyMethod : BaseInstanceMethod
             throw new TypeError(position, "FuncValue", finallyHandlerParam.GetType().Name);
         }
 
+        // 保存当前的 manager 用于回调执行
+        var capturedManager = manager;
+
         // 创建一个新的任务，无论原任务成功或失败都执行 finally 处理函数
         var finallyTask = task.Task.ContinueWith(t =>
         {
@@ -59,8 +62,7 @@ public class TaskFinallyMethod : BaseInstanceMethod
             // 执行 finally 处理函数（不传递参数）
             try
             {
-                var tempManager = new VariateManager();
-                finallyHandler.Run(tempManager, []);
+                finallyHandler.Run(capturedManager, []);
             }
             catch (Exception finallyEx)
             {
@@ -78,7 +80,12 @@ public class TaskFinallyMethod : BaseInstanceMethod
             return result;
         }, task.CancellationToken);
 
-        return new TaskLangValue(finallyTask, task.CancellationToken, position);
+        var resultTask = new TaskLangValue(finallyTask, task.CancellationToken, position);
+
+        // 设置 ExternalManager 以支持链式调用
+        resultTask.ExternalManager = capturedManager;
+
+        return resultTask;
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,

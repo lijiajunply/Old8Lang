@@ -33,6 +33,9 @@ public class TaskThenMethod : BaseInstanceMethod
             throw new TypeError(position, "FuncValue", callbackParam.GetType().Name);
         }
 
+        // 保存当前的 manager 用于回调执行
+        var capturedManager = manager;
+
         // 创建一个新的任务，在原任务完成后执行回调
         var thenTask = task.Task.ContinueWith(t =>
         {
@@ -41,12 +44,18 @@ public class TaskThenMethod : BaseInstanceMethod
                 throw (t.Exception?.InnerException ?? t.Exception)!;
             }
 
-            // 执行回调函数，传入任务结果
-            var tempManager = new VariateManager();
-            return callback.Run(tempManager, [t.Result]);
+            // 使用捕获的 manager 执行回调函数，传入任务结果
+            // 注意：这里使用 Run(manager, args) 而不是 Run(tempManager, [result])
+            var args = new List<LangExpression> { t.Result };
+            return callback.Run(capturedManager, args);
         }, task.CancellationToken);
 
-        return new TaskLangValue(thenTask, task.CancellationToken, position);
+        var resultTask = new TaskLangValue(thenTask, task.CancellationToken, position);
+
+        // 设置 ExternalManager 以支持链式调用
+        resultTask.ExternalManager = capturedManager;
+
+        return resultTask;
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,

@@ -1,0 +1,68 @@
+// Task Retry 方法测试
+
+print("=== Task Retry 方法测试 ===\n")
+
+// 1. 测试成功的任务（不需要重试）
+print("\n1. 测试成功的任务（不需要重试）\n")
+
+async func successFunc() {
+    print("successFunc 执行\n")
+    return 42
+}
+
+// 直接在函数调用上使用 Retry
+task1 <- successFunc().Retry(3)
+result1 <- task1.Await()
+print("result1 = ")
+print(result1)
+print("\n")
+
+// 2. 测试失败的任务（会重试直到成功）
+print("\n2. 测试失败的任务（会重试直到成功）\n")
+
+// 使用全局变量来跟踪调用次数
+attemptCount <- 0
+
+async func failingFunc() {
+    attemptCount <- attemptCount + 1
+    print("failingFunc 尝试 #")
+    print(attemptCount)
+    print("\n")
+
+    if attemptCount < 3 {
+        throw("尝试失败")
+    }
+
+    return "第3次成功"
+}
+
+// 直接在函数调用上使用 Retry，最多重试5次，每次延迟100ms
+task2 <- failingFunc().Retry(5, 100)
+result2 <- task2.Await()
+print("result2 = ")
+print(result2)
+print("\n")
+
+// 3. 测试重试失败的情况
+print("\n3. 测试重试失败的情况\n")
+
+async func alwaysFailFunc() {
+    print("alwaysFailFunc 执行\n")
+    throw("总是失败")
+}
+
+// 使用 Catch 捕获重试失败的错误
+func catchHandler(error) {
+    print("捕获到错误: ")
+    print(error)
+    print("\n")
+    return "重试失败，已处理"
+}
+
+task3 <- alwaysFailFunc().Retry(2, 50).Catch(catchHandler)
+result3 <- task3.Await()
+print("result3 = ")
+print(result3)
+print("\n")
+
+print("\n=== 测试完成 ===\n")

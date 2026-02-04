@@ -33,6 +33,9 @@ public class TaskCatchMethod : BaseInstanceMethod
             throw new TypeError(position, "FuncValue", errorHandlerParam.GetType().Name);
         }
 
+        // 保存当前的 manager 用于回调执行
+        var capturedManager = manager;
+
         // 创建一个新的任务，在原任务失败时执行错误处理
         var catchTask = task.Task.ContinueWith(t =>
         {
@@ -42,14 +45,14 @@ public class TaskCatchMethod : BaseInstanceMethod
                 var exception = t.Exception?.InnerException ?? t.Exception;
                 var errorMessage = exception?.Message ?? "Unknown error";
 
-                var tempManager = new VariateManager();
-                return errorHandler.Run(tempManager, [new StringLangValue(errorMessage, position)]);
+                var args = new List<LangExpression> { new StringLangValue(errorMessage, position) };
+                return errorHandler.Run(capturedManager, args);
             }
             else if (t.IsCanceled)
             {
                 // 任务被取消，也视为错误
-                var tempManager = new VariateManager();
-                return errorHandler.Run(tempManager, [new StringLangValue("Task was canceled", position)]);
+                var args = new List<LangExpression> { new StringLangValue("Task was canceled", position) };
+                return errorHandler.Run(capturedManager, args);
             }
             else
             {
@@ -58,7 +61,12 @@ public class TaskCatchMethod : BaseInstanceMethod
             }
         }, task.CancellationToken);
 
-        return new TaskLangValue(catchTask, task.CancellationToken, position);
+        var resultTask = new TaskLangValue(catchTask, task.CancellationToken, position);
+
+        // 设置 ExternalManager 以支持链式调用
+        resultTask.ExternalManager = capturedManager;
+
+        return resultTask;
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,

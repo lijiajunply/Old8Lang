@@ -136,6 +136,7 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Task.TaskFinallyMethod());
 
             // Task 方法迁移完成！共 4 个方法
+            // 注意：Retry 方法在 Operation.cs 中有特殊处理，不需要注册为实例方法
 
             // TODO: 注册 Thread 方法（约3个）
             // registry.Register(new ThreadJoinMethod());
