@@ -23,16 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListGroupAdjacentByMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListGroupAdjacentMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListOverlapsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListPermutationsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSetEqualsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_new_list_methods.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListJoinMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListJoinMethod.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -581,7 +574,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="24764000" />
+      <workItem from="1770170083234" duration="25620000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -926,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="881" />
+    <option name="localTasksCounter" value="882" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -953,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="删除不合适的架构" />
     <MESSAGE value="chore(docs): 删除旧的AI助手配置文件&#10;&#10;- 移除 CLAUDE.md 文件中的详细项目指导内容&#10;- 移除 GEMINI.md 文件中的项目概述信息&#10;- 更新 .claude 设置添加 dotnet --list-sdks 命令&#10;- 修正 IDE 工作区配置中的变更列表和任务计数器&#10;- 清理最近提交消息记录中的冗余信息" />
     <MESSAGE value="docs: 添加 CLAUDE.md 文件以指导代码开发&#10;&#10;- 创建了 CLAUDE.md 文件，为 Claude Code 提供项目开发指导&#10;- 包含项目概述、构建运行命令、架构设计等完整文档信息&#10;- 详细说明了 Old8Lang 编程语言的两种执行模式：解释模式和编译模式&#10;- 提供了完整的目录结构和核心实现细节说明&#10;- 添加了开发模式、测试方法和调试指南&#10;- 文档使用中文编写，便于理解和维护" />
     <MESSAGE value="feat(instance-methods): 添加实例方法系统和List基础方法实现&#10;&#10;- 引入BaseInstanceMethod抽象基类提供通用参数验证和错误处理&#10;- 创建IInstanceMethod接口定义实例方法标准行为&#10;- 实现InstanceMethodRegistry单例管理所有实例方法注册和查找&#10;- 添加InstanceMethodInitializer负责内置实例方法初始化&#10;- 在Instance类中集成新实例方法系统，支持新旧系统切换&#10;- 实现List.Add、List.AddList、List.All、List.Any、List.Clear等基础方法&#10;- 支持命名参数处理和参数重排序功能&#10;- 提供解释器、编译器、字节码三种模式的统一执行接口" />
@@ -978,7 +970,8 @@
     <MESSAGE value="feat(list): 添加列表高级操作实例方法&#10;&#10;- 注册 ListChunkMethod、ListPartitionMethod、ListPairwiseMethod 等7个新方法&#10;- 实现 Chunk 方法支持将列表分割成指定大小的块&#10;- 实现 Partition 方法根据条件将列表分为两部分&#10;- 实现 Pairwise 方法将相邻元素配对返回元组列表&#10;- 实现 FlatMap 方法对每个元素应用转换函数并扁平化结果&#10;- 实现 Window 方法创建滑动窗口返回连续子列表&#10;- 实现 Flatten 方法扁平化嵌套列表结构&#10;- 添加完整的列表高级操作方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表集合操作方法&#10;&#10;- 注册 ListSymmetricExcept、ListIsSubsetOf、ListIsSupersetOf、ListFindAll 和 ListLastIndexOf 方法&#10;- 实现 SymmetricExcept 方法用于计算两个列表的对称差集&#10;- 实现 IsSubsetOf 方法用于检查当前列表是否为另一个列表的子集&#10;- 实现 IsSupersetOf 方法用于检查当前列表是否为另一个列表的超集&#10;- 实现 FindAll 方法用于查找所有满足条件的元素&#10;- 实现 LastIndexOf 方法用于查找元素最后一次出现的索引&#10;- 更新 SortBy 方法的虚拟机实现以支持函数对象调用&#10;- 添加测试文件验证所有新方法的功能" />
     <MESSAGE value="feat(list): 添加列表高级功能方法&#10;&#10;- 注册 ListWithIndex、ListFlattenDeep、ListCartesianProduct 等7个新方法&#10;- 实现 WithIndex 方法为每个元素添加索引返回元组列表&#10;- 实现 FlattenDeep 方法深度扁平化嵌套列表结构&#10;- 实现 CartesianProduct 方法计算两个列表的笛卡尔积&#10;- 实现 Combinations 方法生成从列表中选择 k 个元素的所有组合&#10;- 实现 TakeWhileIndexed 和 SkipWhileIndexed 方法支持带索引的条件操作&#10;- 添加完整的列表高级功能测试用例覆盖所有新方法&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表高级功能方法&#10;&#10;- 注册 ListWithIndex、ListFlattenDeep、ListCartesianProduct 等7个新方法&#10;- 实现 WithIndex 方法为每个元素添加索引返回元组列表&#10;- 实现 FlattenDeep 方法深度扁平化嵌套列表结构&#10;- 实现 CartesianProduct 方法计算两个列表的笛卡尔积&#10;- 实现 Combinations 方法生成从列表中选择 k 个元素的所有组合&#10;- 实现 TakeWhileIndexed 和 SkipWhileIndexed 方法支持带索引的条件操作&#10;- 添加完整的列表高级功能测试用例覆盖所有新方法&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
+    <MESSAGE value="feat(array): 添加数组分组和集合操作方法&#10;&#10;- 实现 Array.GroupAdjacentBy 方法用于按键选择器分组相邻元素&#10;- 实现 Array.GroupAdjacent 方法用于分组相邻相同元素&#10;- 实现 Array.SetEquals 方法检查两数组是否包含相同元素&#10;- 实现 Array.Overlaps 方法检查两数组是否有交集&#10;- 实现 Array.Permutations 方法生成数组元素全排列&#10;- 为 List 类型添加对应的集合操作方法实现&#10;- 扩展通用列表方法以支持 object[] 数组类型&#10;- 更新实例方法注册器以包含新的集合操作方法" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(array): 添加数组分组和集合操作方法&#10;&#10;- 实现 Array.GroupAdjacentBy 方法用于按键选择器分组相邻元素&#10;- 实现 Array.GroupAdjacent 方法用于分组相邻相同元素&#10;- 实现 Array.SetEquals 方法检查两数组是否包含相同元素&#10;- 实现 Array.Overlaps 方法检查两数组是否有交集&#10;- 实现 Array.Permutations 方法生成数组元素全排列&#10;- 为 List 类型添加对应的集合操作方法实现&#10;- 扩展通用列表方法以支持 object[] 数组类型&#10;- 更新实例方法注册器以包含新的集合操作方法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

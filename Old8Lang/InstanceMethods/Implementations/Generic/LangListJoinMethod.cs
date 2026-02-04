@@ -98,6 +98,12 @@ public class LangListJoinMethod : BaseLangListMethod
             return string.Join(separator, array.Select(item => item?.ToString() ?? "null"));
         }
 
-        throw new ArgumentException($"实例必须实现 ILangList 接口或为数组类型，当前类型：{instance?.GetType().Name}");
+        // 支持 List<object?> 类型
+        if (instance is List<object?> list)
+        {
+            return string.Join(separator, list.Select(item => item?.ToString() ?? "null"));
+        }
+
+        throw new ArgumentException($"实例必须实现 ILangList 接口、为数组类型或为 List<object?> 类型，当前类型：{instance?.GetType().Name}");
     }
 }

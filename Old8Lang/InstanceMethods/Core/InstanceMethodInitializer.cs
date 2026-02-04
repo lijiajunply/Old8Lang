@@ -73,6 +73,8 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListPermutationsMethod());
             registry.Register(new Implementations.List.ListGroupAdjacentMethod());
             registry.Register(new Implementations.List.ListGroupAdjacentByMethod());
+            registry.Register(new Implementations.List.ListZip3Method());
+            registry.Register(new Implementations.List.ListSelectManyMethod());
 
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
@@ -219,6 +221,8 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayPermutationsMethod());
             registry.Register(new Implementations.Array.ArrayGroupAdjacentMethod());
             registry.Register(new Implementations.Array.ArrayGroupAdjacentByMethod());
+            registry.Register(new Implementations.Array.ArrayZip3Method());
+            registry.Register(new Implementations.Array.ArraySelectManyMethod());
 
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
