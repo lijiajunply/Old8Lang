@@ -23,14 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMaxByMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMinByMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSkipLastMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSkipWhileMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListTakeLastMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListTakeWhileMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_list_advanced_query.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -580,7 +573,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="20648000" />
+      <workItem from="1770170083234" duration="21210000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -925,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="877" />
+    <option name="localTasksCounter" value="878" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -952,7 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 更新外部函数和导入语句的补全测试&#10;&#10;- 移除未使用的 _output 字段，直接使用构造函数参数&#10;- 删除 native 关键字的补全测试，因为该关键字已被删除&#10;- 更新所有测试中的输出写入方式，使用 output 参数替代 _output 字段&#10;- 修正 SymbolTableBuilder 中反射访问字段的名称，从 Functions 改为 _functions&#10;- 简化 ImportStatement 的字段访问，使用公共方法替代反射&#10;- 更新项目配置文件中的变更列表和任务计数器统计" />
     <MESSAGE value="fix(language-server): 修复文档高亮处理器中的坐标系统转换问题&#10;&#10;- 修正了 Token 和 SourceLocation 坐标系统的差异说明&#10;- 移除了不必要的列号转换，因为列号已经是 0-based&#10;- 更新了符号查找器中的坐标转换逻辑以保持一致性&#10;- 修正了 Token 列号的注释说明，明确其为 0-based 系统" />
     <MESSAGE value="test(completion): 更新补全功能测试用例&#10;&#10;- 修复私有成员不应在类外部补全中显示的断言&#10;- 跳过尚未完全实现的局部变量补全功能测试&#10;- 修正导入关键字列表，移除已删除的 native 关键字&#10;- 跳过成员链类型推断功能相关的测试&#10;- 修复代码片段标签名称，将 asyncfunc 改为 async func&#10;- 调整测试位置坐标以匹配实际代码行数&#10;- 修正签名帮助处理器中的位置参数" />
     <MESSAGE value="feat(cache): 添加程序集类型缓存和全局方法信息缓存&#10;&#10;- 新增 AssemblyTypeCache 类用于缓存程序集、类型和方法信息&#10;- 新增 GlobalMethodInfoCache 类用于缓存 MethodInfo 和 PropertyInfo&#10;- 替换原有反射调用为缓存版本以提升性能&#10;- 在多个并发函数实现中使用缓存的方法查找&#10;- 在 CSharpDllProvider 中集成程序集类型缓存&#10;- 移除原有的 LoadAssembly 和 FindType 内部方法实现" />
@@ -977,7 +969,8 @@
     <MESSAGE value="先这样" />
     <MESSAGE value="feat(char): 添加字符实例方法实现&#10;&#10;- 实现 Char.CompareTo 方法用于比较字符大小&#10;- 实现 Char.GetNumericValue 方法获取字符数字值&#10;- 实现 Char.IsControl 方法判断控制字符&#10;- 实现 Char.IsLetterOrDigit 方法判断字母或数字&#10;- 实现 Char.IsLower 方法判断小写字母&#10;- 实现 Char.IsPunctuation 方法判断标点符号&#10;- 实现 Char.IsSymbol 方法判断符号字符&#10;- 实现 Char.IsUpper 方法判断大写字母&#10;- 实现 Char.IsWhiteSpace 方法判断空白字符&#10;- 实现 Char.ToInt 方法转换为 ASCII 整数值&#10;- 注册所有新字符方法到实例方法初始化器&#10;- 添加完整的字符方法测试用例覆盖所有功能" />
     <MESSAGE value="feat(list): 添加列表基础查询实例方法&#10;&#10;- 注册 ListPopMethod、ListSliceMethod、ListElementAtOrDefaultMethod 等8个新方法&#10;- 实现 ElementAtOrDefault 方法支持安全获取指定索引元素并返回默认值&#10;- 实现 IsEmpty 方法用于检查列表是否为空&#10;- 实现 Pop 方法用于移除并返回列表的最后一个元素&#10;- 实现 Single 和 SingleOrDefault 方法用于获取满足条件的唯一元素&#10;- 实现 Slice 方法用于获取列表切片&#10;- 实现 ToArray 方法用于将列表转换为数组&#10;- 添加完整的列表基础查询方法测试用例覆盖所有功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表基础查询实例方法&#10;&#10;- 注册 ListPopMethod、ListSliceMethod、ListElementAtOrDefaultMethod 等8个新方法&#10;- 实现 ElementAtOrDefault 方法支持安全获取指定索引元素并返回默认值&#10;- 实现 IsEmpty 方法用于检查列表是否为空&#10;- 实现 Pop 方法用于移除并返回列表的最后一个元素&#10;- 实现 Single 和 SingleOrDefault 方法用于获取满足条件的唯一元素&#10;- 实现 Slice 方法用于获取列表切片&#10;- 实现 ToArray 方法用于将列表转换为数组&#10;- 添加完整的列表基础查询方法测试用例覆盖所有功能" />
+    <MESSAGE value="feat(list): 添加列表高级查询实例方法&#10;&#10;- 注册 ListMaxByMethod、ListMinByMethod、ListTakeLastMethod 等6个新方法&#10;- 实现 MaxBy 和 MinBy 方法支持按选择器获取最大值和最小值元素&#10;- 实现 TakeLast 和 SkipLast 方法支持对列表末尾元素的操作&#10;- 实现 TakeWhile 和 SkipWhile 方法支持按条件获取和跳过元素&#10;- 添加完整的列表高级查询方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表高级查询实例方法&#10;&#10;- 注册 ListMaxByMethod、ListMinByMethod、ListTakeLastMethod 等6个新方法&#10;- 实现 MaxBy 和 MinBy 方法支持按选择器获取最大值和最小值元素&#10;- 实现 TakeLast 和 SkipLast 方法支持对列表末尾元素的操作&#10;- 实现 TakeWhile 和 SkipWhile 方法支持按条件获取和跳过元素&#10;- 添加完整的列表高级查询方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

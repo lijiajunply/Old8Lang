@@ -46,6 +46,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListTakeWhileMethod());
             registry.Register(new Implementations.List.ListSkipWhileMethod());
 
+            // 注册 List 高级操作方法
+            registry.Register(new Implementations.List.ListChunkMethod());
+            registry.Register(new Implementations.List.ListPartitionMethod());
+            registry.Register(new Implementations.List.ListPairwiseMethod());
+            registry.Register(new Implementations.List.ListFlatMapMethod());
+            registry.Register(new Implementations.List.ListWindowMethod());
+            registry.Register(new Implementations.List.ListFlattenMethod());
+
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
             registry.Register(new Implementations.List.ListMapMethod());
