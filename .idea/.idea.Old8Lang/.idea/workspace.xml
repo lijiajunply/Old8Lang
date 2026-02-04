@@ -23,35 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayContainsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayReverseMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsDigitMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharIsLetterMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToLowerMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Char/CharToUpperMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/BaseLangListMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListAllMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListAnyMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListContainsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFilterMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMapMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListReverseMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleAllMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleAnyMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleContainsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleFilterMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleGetMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleMapMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleReverseMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleToListMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_char_methods.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_generic_langlist_methods.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_tuple_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GENERIC_LANGLIST_METHODS_SUMMARY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_array_generic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generic_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_tuple_generic.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_generic_langlist_methods.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_generic_langlist_methods.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -600,7 +579,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="6541000" />
+      <workItem from="1770170083234" duration="7369000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -945,7 +924,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="866" />
+    <option name="localTasksCounter" value="867" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -972,7 +951,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 实现装饰器延迟应用机制&#10;&#10;- 将装饰器应用从函数定义时推迟到函数首次调用时执行&#10;- 添加装饰器延迟应用的相关字段和执行逻辑&#10;- 更新变体管理器的作用域克隆机制以支持闭包修改全局变量&#10;- 修改测试用例以验证延迟装饰器应用的行为&#10;- 确保装饰器能够正确访问全局变量和函数作用域" />
     <MESSAGE value="chore(git): 更新 gitignore 配置&#10;&#10;- 移除了对 Old8Lang.Tests/OldLib 的忽略规则&#10;- 添加了新的忽略项 nul&#10;- 调整了 gitignore 文件结构" />
     <MESSAGE value="fix(tests): 修复虚拟机并发测试中的线程启动问题&#10;&#10;- 在 CountDownLatch 测试中为所有 spawn 调用添加 .Start() 方法&#10;- 在 Channel 选择语句测试中为所有 spawn 调用添加 .Start() 方法&#10;- 确保所有并发任务正确启动以避免测试失败&#10;- 修复了因缺少 Start() 调用导致的测试挂起问题" />
     <MESSAGE value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
@@ -997,7 +975,8 @@
     <MESSAGE value="feat(instance-methods): 添加 List 排序算法方法&#10;&#10;- 实现了冒泡排序、快速排序、归并排序、选择排序、插入排序和堆排序算法&#10;- 添加了 SortWithComparer 方法支持自定义比较器排序&#10;- 在初始化器中注册所有新排序算法方法&#10;- 更新进度文档标记 List 方法迁移完成&#10;- 添加排序算法测试文件验证所有排序方法功能" />
     <MESSAGE value="feat(instance-methods): 添加String实例方法支持&#10;&#10;- 实现StringLengthMethod、StringSubstringMethod、StringReplaceMethod等15个String方法&#10;- 在InstanceMethodInitializer中注册所有String基础和高级方法&#10;- 更新PROGRESS_INSTANCE_METHODS.md文档显示String方法完成状态&#10;- 添加String方法相关的单元测试标记&#10;- 完成String方法的IL代码生成和虚拟机执行支持" />
     <MESSAGE value="feat(instance-methods): 添加 Dictionary 实例方法支持&#10;&#10;- 实现 DictClearMethod、DictContainsKeyMethod、DictCountMethod 等 8 个 Dictionary 方法&#10;- 在 InstanceMethodInitializer 中注册所有 Dictionary 方法&#10;- 更新 PROGRESS_INSTANCE_METHODS.md 文档显示 Dictionary 方法完成状态&#10;- 添加 test_dictionary_methods.old8 测试文件验证所有 Dictionary 方法功能&#10;- 完成 Dictionary 方法的 IL 代码生成和虚拟机执行支持&#10;- 总进度提升至 76/101 (75%)" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加 Dictionary 实例方法支持&#10;&#10;- 实现 DictClearMethod、DictContainsKeyMethod、DictCountMethod 等 8 个 Dictionary 方法&#10;- 在 InstanceMethodInitializer 中注册所有 Dictionary 方法&#10;- 更新 PROGRESS_INSTANCE_METHODS.md 文档显示 Dictionary 方法完成状态&#10;- 添加 test_dictionary_methods.old8 测试文件验证所有 Dictionary 方法功能&#10;- 完成 Dictionary 方法的 IL 代码生成和虚拟机执行支持&#10;- 总进度提升至 76/101 (75%)" />
+    <MESSAGE value="加入新东西" />
+    <option name="LAST_COMMIT_MESSAGE" value="加入新东西" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

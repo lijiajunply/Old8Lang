@@ -1,0 +1,67 @@
+// ILangList 通用方法简单测试
+
+print("=== ILangList 通用方法简单测试 ===\n")
+
+// 1. 测试 Array 使用通用方法
+print("\n1. 测试 Array 使用通用方法\n")
+
+arr1 <- [10, 20, 30]
+print("arr1 = ")
+print(arr1)
+print("\n")
+
+// Contains 方法
+contains1 <- arr1.Contains(20)
+print("arr1.Contains(20) = ")
+print(contains1)
+print("\n")
+
+contains2 <- arr1.Contains(100)
+print("arr1.Contains(100) = ")
+print(contains2)
+print("\n")
+
+// Reverse 方法
+reversed1 <- arr1.Reverse()
+print("arr1.Reverse() = ")
+print(reversed1)
+print("\n")
+
+// 2. 测试 Tuple 使用通用方法
+print("\n2. 测试 Tuple 使用通用方法\n")
+
+tuple1 <- (100, 200, 300)
+print("tuple1 = ")
+print(tuple1)
+print("\n")
+
+// Contains 方法
+contains3 <- tuple1.Contains(200)
+print("tuple1.Contains(200) = ")
+print(contains3)
+print("\n")
+
+contains4 <- tuple1.Contains(999)
+print("tuple1.Contains(999) = ")
+print(contains4)
+print("\n")
+
+// Reverse 方法
+reversed2 <- tuple1.Reverse()
+print("tuple1.Reverse() = ")
+print(reversed2)
+print("\n")
+
+// Filter 方法
+filtered1 <- tuple1.Filter((x) -> x >= 200)
+print("tuple1.Filter(x >= 200) = ")
+print(filtered1)
+print("\n")
+
+// Map 方法
+mapped1 <- tuple1.Map((x) -> x / 100)
+print("tuple1.Map(x / 100) = ")
+print(mapped1)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")

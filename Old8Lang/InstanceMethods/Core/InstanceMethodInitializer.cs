@@ -129,6 +129,10 @@ public static class InstanceMethodInitializer
 
             // Array 方法迁移完成！共 5 个方法
 
+            // 注册 Array 通用方法（基于 ILangList）
+            registry.Register(new Implementations.Array.ArrayContainsMethod());
+            registry.Register(new Implementations.Array.ArrayReverseMethod());
+
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
             registry.Register(new Implementations.Task.TaskThenMethod());
@@ -151,6 +155,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleToListMethod());
 
             // Tuple 方法迁移完成！共 2 个方法
+
+            // 注册 Tuple 通用方法（基于 ILangList）
+            registry.Register(new Implementations.Tuple.TupleContainsMethod());
+            registry.Register(new Implementations.Tuple.TupleReverseMethod());
+            registry.Register(new Implementations.Tuple.TupleFilterMethod());
+            registry.Register(new Implementations.Tuple.TupleMapMethod());
+            registry.Register(new Implementations.Tuple.TupleAnyMethod());
+            registry.Register(new Implementations.Tuple.TupleAllMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

@@ -41,24 +41,24 @@ print(any1)
 print("\n")
 
 // Filter 方法
-filtered1 <- list1.Filter(func(x) { return x > 3 })
+filtered1 <- list1.Filter((x) -> x > 3)
 print("list1.Filter(x > 3) = ")
 print(filtered1)
 print("\n")
 
 // Map 方法
-mapped1 <- list1.Map(func(x) { return x * 2 })
+mapped1 <- list1.Map((x) -> x * 2)
 print("list1.Map(x * 2) = ")
 print(mapped1)
 print("\n")
 
 // All 方法
-all1 <- list1.All(func(x) { return x > 0 })
+all1 <- list1.All((x) -> x > 0)
 print("list1.All(x > 0) = ")
 print(all1)
 print("\n")
 
-all2 <- list1.All(func(x) { return x > 3 })
+all2 <- list1.All((x) -> x > 3)
 print("list1.All(x > 3) = ")
 print(all2)
 print("\n")
@@ -151,13 +151,13 @@ print(any3)
 print("\n")
 
 // Filter 方法
-filtered2 <- tuple1.Filter(func(x) { return x >= 300 })
+filtered2 <- tuple1.Filter((x) -> x >= 300)
 print("tuple1.Filter(x >= 300) = ")
 print(filtered2)
 print("\n")
 
 // Map 方法
-mapped2 <- tuple1.Map(func(x) { return x / 100 })
+mapped2 <- tuple1.Map((x) -> x / 100)
 print("tuple1.Map(x / 100) = ")
 print(mapped2)
 print("\n")
@@ -180,7 +180,7 @@ print("emptyList.Any() = ")
 print(any4)
 print("\n")
 
-all3 <- emptyList.All(func(x) { return x > 0 })
+all3 <- emptyList.All((x) -> x > 0)
 print("emptyList.All(x > 0) = ")
 print(all3)
 print(" (空列表的 All 返回 true)\n")
