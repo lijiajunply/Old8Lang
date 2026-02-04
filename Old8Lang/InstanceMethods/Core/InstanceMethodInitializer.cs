@@ -129,10 +129,13 @@ public static class InstanceMethodInitializer
 
             // Array 方法迁移完成！共 5 个方法
 
-            // TODO: 注册 Task 方法（约4个）
-            // registry.Register(new TaskThenMethod());
-            // registry.Register(new TaskCatchMethod());
-            // ... 等
+            // 注册 Task 方法
+            registry.Register(new Implementations.Task.TaskAwaitMethod());
+            registry.Register(new Implementations.Task.TaskThenMethod());
+            registry.Register(new Implementations.Task.TaskCatchMethod());
+            registry.Register(new Implementations.Task.TaskFinallyMethod());
+
+            // Task 方法迁移完成！共 4 个方法
 
             // TODO: 注册 Thread 方法（约3个）
             // registry.Register(new ThreadJoinMethod());

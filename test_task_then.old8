@@ -1,0 +1,29 @@
+// Task Then 方法测试
+
+print("=== Task Then 方法测试 ===\n")
+
+async func asyncFunc() {
+    return 10
+}
+
+task1 <- asyncFunc()
+print("task1 创建完成\n")
+
+// 定义回调函数
+func callback(result) {
+    print("回调收到结果: ")
+    print(result)
+    print("\n")
+    return result * 2
+}
+
+// 测试 Then 方法
+task2 <- task1.Then(callback)
+print("task2 创建完成\n")
+
+result <- task2.Await()
+print("最终结果 = ")
+print(result)
+print("\n")
+
+print("\n=== 测试完成 ===\n")

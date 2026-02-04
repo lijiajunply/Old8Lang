@@ -442,7 +442,7 @@ public partial class TaskLangValue : LangValueType
         if (dotExpression is Instance instance)
         {
             // 调用扩展方法（在 Instance.FromClassToResult 中处理）
-            return instance.FromClassToResult(this);
+            return instance.FromClassToResult(this, manager);
         }
 
         // 其他情况使用基类实现

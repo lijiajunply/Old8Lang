@@ -1,0 +1,170 @@
+// Task 实例方法测试
+// 测试 Task 的 4 个实例方法：Await, Then, Catch, Finally
+
+print("=== Task 实例方法测试 ===\n")
+
+// 1. 测试 Await 方法
+print("\n1. 测试 Await 方法\n")
+
+// 创建一个简单的异步任务
+async func asyncFunc1() {
+    return 42
+}
+
+task1 <- asyncFunc1()
+print("task1 创建完成\n")
+result1 <- task1.Await()
+print("task1.Await() = ")
+print(result1)
+print("\n")
+
+// 2. 测试 Then 方法
+print("\n2. 测试 Then 方法\n")
+
+async func asyncFunc2() {
+    return 10
+}
+
+task2 <- asyncFunc2()
+print("task2 创建完成\n")
+
+// Then 方法：任务完成后执行回调
+func thenCallback(result) {
+    print("Then 回调收到结果: ")
+    print(result)
+    print("\n")
+    return result * 2
+}
+
+task3 <- task2.Then(thenCallback)
+result3 <- task3.Await()
+print("task3.Await() = ")
+print(result3)
+print("\n")
+
+// 3. 测试 Catch 方法
+print("\n3. 测试 Catch 方法\n")
+
+// 创建一个会失败的任务
+async func failingFunc() {
+    throw("这是一个错误")
+}
+
+task4 <- failingFunc()
+print("task4 创建完成（会失败）\n")
+
+// Catch 方法：捕获异常
+func catchCallback(error) {
+    print("Catch 捕获到错误: ")
+    print(error)
+    print("\n")
+    return "错误已处理"
+}
+
+task5 <- task4.Catch(catchCallback)
+result5 <- task5.Await()
+print("task5.Await() = ")
+print(result5)
+print("\n")
+
+// 4. 测试 Finally 方法
+print("\n4. 测试 Finally 方法\n")
+
+async func asyncFunc4() {
+    return "任务完成"
+}
+
+task6 <- asyncFunc4()
+print("task6 创建完成\n")
+
+// Finally 方法：无论成功或失败都执行
+func finallyCallback1() {
+    print("Finally 清理函数执行\n")
+}
+
+task7 <- task6.Finally(finallyCallback1)
+result7 <- task7.Await()
+print("task7.Await() = ")
+print(result7)
+print("\n")
+
+// 5. 测试 Finally 方法（失败情况）
+print("\n5. 测试 Finally 方法（失败情况）\n")
+
+async func failingFunc2() {
+    throw("任务失败")
+}
+
+task8 <- failingFunc2()
+print("task8 创建完成（会失败）\n")
+
+// Finally 方法：即使失败也会执行
+func finallyCallback2() {
+    print("Finally 清理函数执行（即使任务失败）\n")
+}
+
+task9 <- task8.Finally(finallyCallback2)
+
+// 使用 Catch 捕获异常
+func catchCallback2(error) {
+    print("最终捕获到错误: ")
+    print(error)
+    print("\n")
+    return "已处理"
+}
+
+task10 <- task9.Catch(catchCallback2)
+result10 <- task10.Await()
+print("task10.Await() = ")
+print(result10)
+print("\n")
+
+// 6. 测试链式调用
+print("\n6. 测试链式调用\n")
+
+async func asyncFunc5() {
+    return 5
+}
+
+task11 <- asyncFunc5()
+print("task11 创建完成\n")
+
+// 链式调用：Then -> Then -> Finally
+func thenCallback1(result) {
+    print("第一个 Then: ")
+    print(result)
+    print("\n")
+    return result + 5
+}
+
+func thenCallback2(result) {
+    print("第二个 Then: ")
+    print(result)
+    print("\n")
+    return result * 2
+}
+
+func finallyCallback3() {
+    print("链式调用的 Finally\n")
+}
+
+task12 <- task11.Then(thenCallback1).Then(thenCallback2).Finally(finallyCallback3)
+result12 <- task12.Await()
+print("最终结果 = ")
+print(result12)
+print("\n")
+
+// 7. 测试 Wait 别名
+print("\n7. 测试 Wait 别名\n")
+
+async func asyncFunc6() {
+    return "使用 Wait 别名"
+}
+
+task13 <- asyncFunc6()
+result13 <- task13.Wait()
+print("task13.Wait() = ")
+print(result13)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")
