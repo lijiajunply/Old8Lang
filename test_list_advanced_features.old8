@@ -1,0 +1,71 @@
+// 测试 List 高级功能方法
+
+numbers <- [1, 2, 3, 4, 5].ToList()
+
+print("=== 测试 WithIndex 方法 ===")
+indexed <- numbers.WithIndex()
+print("WithIndex 结果:")
+indexed.ForEach((pair) -> print("  索引 " + pair[0].ToStr() + ": " + pair[1].ToStr()))
+
+print("\n=== 测试 FlattenDeep 方法 ===")
+deepNested <- [
+    [1, 2].ToList(),
+    [[3, 4].ToList(), [5, 6].ToList()].ToList(),
+    7,
+    [[[8, 9].ToList()].ToList()].ToList()
+].ToList()
+flattened <- deepNested.FlattenDeep()
+print("深度扁平化结果: " + flattened.ToStr())
+
+print("\n=== 测试 CartesianProduct 方法 ===")
+list1 <- [1, 2, 3].ToList()
+list2 <- ["a", "b"].ToList()
+product <- list1.CartesianProduct(list2)
+print("笛卡尔积 [1,2,3] × [a,b]:")
+product.ForEach((pair) -> print("  (" + pair[0].ToStr() + ", " + pair[1] + ")"))
+
+print("\n=== 测试 Combinations 方法 ===")
+items <- [1, 2, 3, 4].ToList()
+combos2 <- items.Combinations(2)
+print("从 [1,2,3,4] 中选 2 个的组合:")
+combos2.ForEach((combo) -> print("  " + combo.ToStr()))
+
+combos3 <- items.Combinations(3)
+print("从 [1,2,3,4] 中选 3 个的组合:")
+combos3.ForEach((combo) -> print("  " + combo.ToStr()))
+
+print("\n=== 测试 TakeWhileIndexed 方法 ===")
+allNumbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].ToList()
+// 取元素直到索引大于等于 5 或元素大于 6
+result1 <- allNumbers.TakeWhileIndexed((x, i) -> i < 5 && x <= 6)
+print("TakeWhileIndexed(i<5 && x<=6): " + result1.ToStr())
+
+// 取元素直到元素值大于索引的两倍
+result2 <- allNumbers.TakeWhileIndexed((x, i) -> x <= i * 2 + 1)
+print("TakeWhileIndexed(x <= i*2+1): " + result2.ToStr())
+
+print("\n=== 测试 SkipWhileIndexed 方法 ===")
+// 跳过元素直到索引大于等于 3
+result3 <- allNumbers.SkipWhileIndexed((x, i) -> i < 3)
+print("SkipWhileIndexed(i<3): " + result3.ToStr())
+
+// 跳过元素直到元素值大于索引的两倍
+result4 <- allNumbers.SkipWhileIndexed((x, i) -> x <= i * 2)
+print("SkipWhileIndexed(x <= i*2): " + result4.ToStr())
+
+print("\n=== 测试组合使用 ===")
+// WithIndex + Filter
+evenIndices <- numbers.WithIndex().Filter((pair) -> pair[0] % 2 == 0)
+print("偶数索引的元素:")
+evenIndices.ForEach((pair) -> print("  索引 " + pair[0].ToStr() + ": " + pair[1].ToStr()))
+
+// Combinations + Count
+combosCount <- [1, 2, 3, 4].ToList().Combinations(2).Count()
+print("所有 2 元素组合的数量: " + combosCount.ToStr())
+
+// CartesianProduct + Filter
+filteredProduct <- [1, 2, 3].ToList().CartesianProduct([1, 2, 3].ToList()).Filter((pair) -> pair[0] + pair[1] == 4)
+print("笛卡尔积中和为 4 的配对:")
+filteredProduct.ForEach((pair) -> print("  (" + pair[0].ToStr() + ", " + pair[1].ToStr() + ")"))
+
+print("\n=== 所有测试完成 ===")
