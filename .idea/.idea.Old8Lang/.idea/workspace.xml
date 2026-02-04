@@ -23,20 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Task/TaskAwaitMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Task/TaskCatchMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Task/TaskFinallyMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Task/TaskThenMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_methods.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_then.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_then_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_then_simple.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadAbortMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadIsAliveMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadJoinMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Thread/ThreadStartMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_thread_methods.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Async/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Async/TaskLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -585,7 +579,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="2251000" />
+      <workItem from="1770170083234" duration="3775000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

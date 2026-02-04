@@ -138,10 +138,13 @@ public static class InstanceMethodInitializer
             // Task 方法迁移完成！共 4 个方法
             // 注意：Retry 方法在 Operation.cs 中有特殊处理，不需要注册为实例方法
 
-            // TODO: 注册 Thread 方法（约3个）
-            // registry.Register(new ThreadJoinMethod());
-            // registry.Register(new ThreadIsAliveMethod());
-            // ... 等
+            // 注册 Thread 方法
+            registry.Register(new Implementations.Thread.ThreadJoinMethod());
+            registry.Register(new Implementations.Thread.ThreadIsAliveMethod());
+            registry.Register(new Implementations.Thread.ThreadStartMethod());
+
+            // Thread 方法迁移完成！共 3 个方法
+            // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
             // TODO: 注册 Tuple 方法（约2个）
             // registry.Register(new TupleGetMethod());

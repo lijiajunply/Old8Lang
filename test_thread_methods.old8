@@ -1,0 +1,109 @@
+// Thread 实例方法测试
+// 测试 Thread 的 3 个实例方法：Start, Join, IsAlive
+
+print("=== Thread 实例方法测试 ===\n")
+
+// 1. 测试 Start 和 Join 方法
+print("\n1. 测试 Start 和 Join 方法\n")
+
+func threadFunc1() {
+    print("threadFunc1 开始执行\n")
+    // 模拟一些工作
+    Sleep(100)
+    print("threadFunc1 执行完成\n")
+    return 42
+}
+
+thread1 <- spawn(threadFunc1)
+print("thread1 已创建\n")
+thread1.Start()
+print("thread1 已启动\n")
+result1 <- thread1.Join()
+print("thread1.Join() = ")
+print(result1)
+print("\n")
+
+// 2. 测试 Join 方法（带超时）
+print("\n2. 测试 Join 方法（带超时）\n")
+
+func threadFunc2() {
+    print("threadFunc2 开始执行\n")
+    Sleep(500)  // 睡眠 500ms
+    print("threadFunc2 执行完成\n")
+    return "完成"
+}
+
+thread2 <- spawn(threadFunc2)
+print("thread2 已创建\n")
+thread2.Start()
+print("thread2 已启动\n")
+
+// 尝试等待 100ms（应该超时）
+joined <- thread2.Join(100)
+print("thread2.Join(100) = ")
+print(joined)
+print(" (应该是 false，因为超时)\n")
+
+// 再等待足够的时间
+result2 <- thread2.Join(1000)
+print("thread2.Join(1000) = ")
+print(result2)
+print("\n")
+
+// 3. 测试 IsAlive 方法
+print("\n3. 测试 IsAlive 方法\n")
+
+func threadFunc3() {
+    print("threadFunc3 开始执行\n")
+    Sleep(200)
+    print("threadFunc3 执行完成\n")
+    return "done"
+}
+
+thread3 <- spawn(threadFunc3)
+print("thread3 已创建\n")
+
+// 启动前检查（应该是 false）
+alive0 <- thread3.IsAlive()
+print("thread3.IsAlive() (启动前) = ")
+print(alive0)
+print("\n")
+
+thread3.Start()
+print("thread3 已启动\n")
+
+// 立即检查（应该是 true）
+alive1 <- thread3.IsAlive()
+print("thread3.IsAlive() (刚启动) = ")
+print(alive1)
+print("\n")
+
+// 等待线程完成
+thread3.Join()
+
+// 再次检查（应该是 false）
+alive2 <- thread3.IsAlive()
+print("thread3.IsAlive() (完成后) = ")
+print(alive2)
+print("\n")
+
+// 4. 测试 Start 方法（带参数）
+print("\n4. 测试 Start 方法（带参数）\n")
+
+func threadFunc4(param) {
+    print("threadFunc4 执行，参数 = ")
+    print(param)
+    print("\n")
+    return param * 2
+}
+
+thread4 <- spawn(threadFunc4, 21)
+print("thread4 已创建\n")
+thread4.Start()
+print("thread4 已启动\n")
+result4 <- thread4.Join()
+print("result4 = ")
+print(result4)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")
