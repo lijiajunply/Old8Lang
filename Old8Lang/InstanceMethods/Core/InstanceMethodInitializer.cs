@@ -142,6 +142,7 @@ public static class InstanceMethodInitializer
             // 注册 String 基础方法
             registry.Register(new Implementations.String.StringLengthMethod());
             registry.Register(new Implementations.String.StringSubstringMethod());
+            registry.Register(new Implementations.String.StringSubstringOneParamMethod());
             registry.Register(new Implementations.String.StringReplaceMethod());
             registry.Register(new Implementations.String.StringSplitMethod());
             registry.Register(new Implementations.String.StringToUpperMethod());
@@ -165,7 +166,7 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.String.StringToBase64Method());
             registry.Register(new Implementations.String.StringFromBase64Method());
 
-            // String 方法迁移完成！共 20 个方法
+            // String 方法迁移完成！共 21 个方法
 
             // 注册 Dictionary 方法
             registry.Register(new Implementations.Dictionary.DictKeysMethod());
@@ -249,6 +250,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayMinWithSelectorMethod());
             registry.Register(new Implementations.Array.ArrayMaxWithSelectorMethod());
 
+            // 注册 Array 排序算法方法（新增）
+            registry.Register(new Implementations.Array.ArrayQuickSortMethod());
+            registry.Register(new Implementations.Array.ArrayMergeSortMethod());
+            registry.Register(new Implementations.Array.ArrayBubbleSortMethod());
+            registry.Register(new Implementations.Array.ArraySelectionSortMethod());
+            registry.Register(new Implementations.Array.ArrayInsertionSortMethod());
+            registry.Register(new Implementations.Array.ArrayHeapSortMethod());
+
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
             registry.Register(new Implementations.Task.TaskThenMethod());
@@ -265,15 +274,18 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Thread.ThreadStartMethod());
             registry.Register(new Implementations.Thread.ThreadWithTimeoutMethod());
             registry.Register(new Implementations.Thread.ThreadCancelMethod());
+            registry.Register(new Implementations.Thread.ThreadThenMethod());
+            registry.Register(new Implementations.Thread.ThreadRetryMethod());
 
-            // Thread 方法迁移完成！共 5 个方法
+            // Thread 方法迁移完成！共 7 个方法
             // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
             // 注册 Tuple 方法
             registry.Register(new Implementations.Tuple.TupleGetMethod());
             registry.Register(new Implementations.Tuple.TupleToListMethod());
+            registry.Register(new Implementations.Tuple.TupleSliceMethod());
 
-            // Tuple 方法迁移完成！共 2 个方法
+            // Tuple 方法迁移完成！共 3 个方法
 
             // 注册 Tuple 通用方法（基于 ILangList）
             registry.Register(new Implementations.Tuple.TupleContainsMethod());
