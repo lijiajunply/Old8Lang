@@ -1,0 +1,57 @@
+// 测试新迁移的 List 方法：Zip3 和 SelectMany
+
+// 1. 测试 Zip3 - 将三个列表合并为三元组
+print("=== 测试 Zip3 ===")
+list1 <- [1, 2, 3]
+list2 <- ["a", "b", "c"]
+list3 <- [true, false, true]
+zipped <- list1.Zip3(list2, list3)
+print("Zip3 结果数量: " + zipped.Count())
+print("Zip3 结果:")
+zipped.ForEach((tuple) -> {
+    print("  元组: " + tuple.ToStr())
+})
+
+// 2. 测试 SelectMany - 展平映射
+print("\n=== 测试 SelectMany (单参数) ===")
+numbers <- [1, 2, 3]
+// 每个数字映射到一个包含该数字重复n次的数组
+result1 <- numbers.SelectMany((n) -> {
+    if (n == 1) {
+        return [1]
+    }
+    if (n == 2) {
+        return [2, 2]
+    }
+    return [3, 3, 3]
+})
+print("SelectMany 结果: " + result1.Join(", "))
+
+// 3. 测试 SelectMany - 带结果选择器
+print("\n=== 测试 SelectMany (双参数) ===")
+categories <- [["fruit", "apple"], ["fruit", "banana"], ["vegetable", "carrot"]]
+// 将每个类别映射到其项目，然后组合成 (category, item) 对
+result2 <- categories.SelectMany(
+    (pair) -> [pair[1]],
+    (pair, item) -> pair[0] + ":" + item
+)
+print("SelectMany 带结果选择器:")
+result2.ForEach((pair) -> print("  " + pair))
+
+// 4. 综合测试 - 使用多个方法
+print("\n=== 综合测试 ===")
+data1 <- [1, 2]
+data2 <- [10, 20]
+data3 <- [100, 200]
+
+// 使用 Zip3 合并三个列表
+combined <- data1.Zip3(data2, data3)
+print("合并后的三元组:")
+combined.ForEach((t) -> print("  " + t.ToStr()))
+
+// 使用 SelectMany 展平嵌套结构
+nested <- [[1, 2], [3, 4], [5, 6]]
+flattened <- nested.SelectMany((x) -> x)
+print("\n展平后的列表: " + flattened.Join(", "))
+
+print("\n所有测试完成！")
