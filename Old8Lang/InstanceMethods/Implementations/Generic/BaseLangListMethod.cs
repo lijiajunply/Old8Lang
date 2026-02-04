@@ -50,7 +50,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
     }
 
     /// <summary>
-    /// 从 VM 模式下的实例获取元素列表（支持 object[], List<object?>, ILangList）
+    /// 从 VM 模式下的实例获取元素列表（支持 object[], List<object?>, ILangList, Tuple）
     /// </summary>
     protected List<object?> GetItemsForVM(object? instance)
     {
@@ -70,11 +70,17 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return ilist.Cast<object?>().ToList();
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表类型，当前类型：{instance?.GetType().Name}");
+        // 支持 Tuple<object?, object?> (VM 模式下的元组表示)
+        else if (instance?.GetType().IsGenericType == true &&
+                 instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            return FlattenTuple(instance);
+        }
+        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{instance?.GetType().Name}");
     }
 
     /// <summary>
-    /// 从 VM 模式下的实例获取长度（支持 object[], List<object?>, ILangList）
+    /// 从 VM 模式下的实例获取长度（支持 object[], List<object?>, ILangList, Tuple）
     /// </summary>
     protected int GetLengthForVM(object? instance)
     {
@@ -94,6 +100,43 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return collection.Count;
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表类型，当前类型：{instance?.GetType().Name}");
+        // 支持 Tuple<object?, object?> (VM 模式下的元组表示)
+        else if (instance?.GetType().IsGenericType == true &&
+                 instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            return FlattenTuple(instance).Count;
+        }
+        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{instance?.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 将嵌套的 Tuple<object?, object?> 展平为列表
+    /// VM 模式下，(1, 2, 3) 表示为 Tuple<object?, object?>(1, Tuple<object?, object?>(2, 3))
+    /// </summary>
+    private static List<object?> FlattenTuple(object tuple)
+    {
+        var result = new List<object?>();
+
+        if (tuple is not Tuple<object?, object?> t)
+        {
+            return result;
+        }
+
+        // 添加第一个元素
+        result.Add(t.Item1);
+
+        // 如果第二个元素也是 Tuple，递归展平
+        if (t.Item2?.GetType().IsGenericType == true &&
+            t.Item2.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            result.AddRange(FlattenTuple(t.Item2));
+        }
+        else if (t.Item2 != null)
+        {
+            // 否则直接添加第二个元素（如果不是 null）
+            result.Add(t.Item2);
+        }
+
+        return result;
     }
 }

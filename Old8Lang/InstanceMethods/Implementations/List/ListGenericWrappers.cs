@@ -52,3 +52,7 @@ public class ListGroupByMethod : LangListGroupByMethod { public override Type Ta
 public class ListSortMethod : LangListSortMethod { public override Type TargetType => typeof(ListLangValue); }
 public class ListIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(ListLangValue); }
 public class ListToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(ListLangValue); }
+
+// 高级组合方法
+public class ListZip3Method : LangListZip3Method { public override Type TargetType => typeof(ListLangValue); }
+public class ListSelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(ListLangValue); }

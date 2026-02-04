@@ -73,8 +73,6 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListPermutationsMethod());
             registry.Register(new Implementations.List.ListGroupAdjacentMethod());
             registry.Register(new Implementations.List.ListGroupAdjacentByMethod());
-            registry.Register(new Implementations.List.ListZip3Method());
-            registry.Register(new Implementations.List.ListSelectManyMethod());
 
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
@@ -127,6 +125,10 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListSelectionSortMethod());
             registry.Register(new Implementations.List.ListInsertionSortMethod());
             registry.Register(new Implementations.List.ListHeapSortMethod());
+
+            // 注册 List 高级组合方法（基于 Generic ILangList 方法的包装）
+            registry.Register(new Implementations.List.ListZip3Method());
+            registry.Register(new Implementations.List.ListSelectManyMethod());
 
             // List 方法注册完成！
 
@@ -221,6 +223,8 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayPermutationsMethod());
             registry.Register(new Implementations.Array.ArrayGroupAdjacentMethod());
             registry.Register(new Implementations.Array.ArrayGroupAdjacentByMethod());
+
+            // 注册 Array 高级组合方法（基于 Generic ILangList 方法的包装）
             registry.Register(new Implementations.Array.ArrayZip3Method());
             registry.Register(new Implementations.Array.ArraySelectManyMethod());
 
@@ -280,6 +284,10 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleToStrMethod());
             registry.Register(new Implementations.Tuple.TupleElementAtMethod());
             registry.Register(new Implementations.Tuple.TupleLastOrDefaultMethod());
+
+            // 注册 Tuple 高级组合方法（基于 Generic ILangList 方法的包装）
+            registry.Register(new Implementations.Tuple.TupleZip3Method());
+            registry.Register(new Implementations.Tuple.TupleSelectManyMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

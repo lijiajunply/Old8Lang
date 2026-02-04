@@ -9,15 +9,14 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.InstanceMethods.Implementations.List;
+namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
-/// List.SelectMany(selector) - 将每个元素映射到一个列表，然后展平结果
+/// ILangList.SelectMany(selector) - 将每个元素映射到一个列表，然后展平结果
 /// </summary>
-public class ListSelectManyMethod : BaseInstanceMethod
+public class LangListSelectManyMethod : BaseLangListMethod
 {
     public override string[] Names => ["SelectMany", "selectMany"];
-    public override Type TargetType => typeof(ListLangValue);
     public override string[] ParameterNames => ["selector", "resultSelector"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 2;
@@ -25,7 +24,7 @@ public class ListSelectManyMethod : BaseInstanceMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var list = (ListLangValue)instance;
+        var items = GetItems(instance);
         var selector = parameters[0].Run(manager) as FuncLangValue;
 
         if (selector == null)
@@ -44,18 +43,14 @@ public class ListSelectManyMethod : BaseInstanceMethod
                 throw new ArgumentError(position, "resultSelector 参数必须是函数类型");
             }
 
-            foreach (var item in list.Values)
+            foreach (var item in items)
             {
                 var collection = selector.Run(manager, [item]);
                 IEnumerable<LangValueType> innerItems;
 
-                if (collection is ListLangValue innerList)
+                if (IsLangList(collection))
                 {
-                    innerItems = innerList.Values;
-                }
-                else if (collection is ArrayLangValue innerArray)
-                {
-                    innerItems = innerArray.RunResult;
+                    innerItems = GetItems(collection);
                 }
                 else
                 {
@@ -72,16 +67,12 @@ public class ListSelectManyMethod : BaseInstanceMethod
         else
         {
             // 只有一个参数（selector）
-            foreach (var item in list.Values)
+            foreach (var item in items)
             {
                 var selected = selector.Run(manager, [item]);
-                if (selected is ListLangValue innerList)
+                if (IsLangList(selected))
                 {
-                    result.AddRange(innerList.Values);
-                }
-                else if (selected is ArrayLangValue innerArray)
-                {
-                    result.AddRange(innerArray.RunResult);
+                    result.AddRange(GetItems(selected));
                 }
                 else
                 {
@@ -96,7 +87,7 @@ public class ListSelectManyMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("List.SelectMany 方法暂不支持编译模式");
+        throw new NotSupportedException("SelectMany 方法暂不支持编译模式");
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
@@ -106,20 +97,7 @@ public class ListSelectManyMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // 支持 List<object?> 和 object?[] 两种类型
-        List<object?> list;
-        if (instance is List<object?> listInstance)
-        {
-            list = listInstance;
-        }
-        else if (instance is object?[] arrayInstance)
-        {
-            list = arrayInstance.ToList();
-        }
-        else
-        {
-            throw new ArgumentException("实例必须是 List<object?> 或 object?[] 类型");
-        }
+        var items = GetItemsForVM(instance);
 
         if (arguments.Length == 0)
         {
@@ -135,20 +113,16 @@ public class ListSelectManyMethod : BaseInstanceMethod
         {
             var resultSelector = arguments[1];
 
-            foreach (var item in list)
+            foreach (var item in items)
             {
                 var collection = vm.CallFunctionObject(selector, [item]);
                 IEnumerable<object?> innerItems;
 
-                if (collection is List<object?> innerList)
+                try
                 {
-                    innerItems = innerList;
+                    innerItems = GetItemsForVM(collection);
                 }
-                else if (collection is object?[] innerArray)
-                {
-                    innerItems = innerArray;
-                }
-                else
+                catch
                 {
                     innerItems = [collection];
                 }
@@ -163,18 +137,15 @@ public class ListSelectManyMethod : BaseInstanceMethod
         else
         {
             // 只有一个参数（selector）
-            foreach (var item in list)
+            foreach (var item in items)
             {
                 var selected = vm.CallFunctionObject(selector, [item]);
-                if (selected is List<object?> innerList)
+                try
                 {
-                    result.AddRange(innerList);
+                    var innerItems = GetItemsForVM(selected);
+                    result.AddRange(innerItems);
                 }
-                else if (selected is object?[] innerArray)
-                {
-                    result.AddRange(innerArray);
-                }
-                else
+                catch
                 {
                     result.Add(selected);
                 }

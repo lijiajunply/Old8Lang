@@ -44,3 +44,7 @@ public class ArrayGroupByMethod : LangListGroupByMethod { public override Type T
 public class ArraySortMethod : LangListSortMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 高级组合方法
+public class ArrayZip3Method : LangListZip3Method { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArraySelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(ArrayLangValue); }

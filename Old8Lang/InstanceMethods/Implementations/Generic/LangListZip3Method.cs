@@ -7,15 +7,14 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.InstanceMethods.Implementations.Array;
+namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
-/// Array.Zip3(second, third) - 将三个数组合并为三元组列表
+/// ILangList.Zip3(second, third) - 将三个列表合并为三元组列表
 /// </summary>
-public class ArrayZip3Method : BaseInstanceMethod
+public class LangListZip3Method : BaseLangListMethod
 {
     public override string[] Names => ["Zip3", "zip3"];
-    public override Type TargetType => typeof(ArrayLangValue);
     public override string[] ParameterNames => ["second", "third"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
@@ -23,26 +22,29 @@ public class ArrayZip3Method : BaseInstanceMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var array = (ArrayLangValue)instance;
+        var items = GetItems(instance);
         var secondValue = parameters[0].Run(manager);
         var thirdValue = parameters[1].Run(manager);
 
-        if (secondValue is not ArrayLangValue secondArray)
+        if (!IsLangList(secondValue))
         {
-            throw new ArgumentError(position, "second 参数必须是数组类型");
+            throw new ArgumentError(position, "second 参数必须是列表或数组类型");
         }
 
-        if (thirdValue is not ArrayLangValue thirdArray)
+        if (!IsLangList(thirdValue))
         {
-            throw new ArgumentError(position, "third 参数必须是数组类型");
+            throw new ArgumentError(position, "third 参数必须是列表或数组类型");
         }
+
+        var secondItems = GetItems(secondValue);
+        var thirdItems = GetItems(thirdValue);
 
         var result = new List<LangValueType>();
-        var minLength = Math.Min(Math.Min(array.RunResult.Length, secondArray.RunResult.Length), thirdArray.RunResult.Length);
+        var minLength = Math.Min(Math.Min(items.Count, secondItems.Count), thirdItems.Count);
 
         for (int i = 0; i < minLength; i++)
         {
-            var tuple = CreateTupleWithValues(array.RunResult[i], secondArray.RunResult[i], thirdArray.RunResult[i]);
+            var tuple = CreateTupleWithValues(items[i], secondItems[i], thirdItems[i]);
             result.Add(tuple);
         }
 
@@ -52,7 +54,7 @@ public class ArrayZip3Method : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("Array.Zip3 方法暂不支持编译模式");
+        throw new NotSupportedException("Zip3 方法暂不支持编译模式");
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
@@ -62,32 +64,22 @@ public class ArrayZip3Method : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not object?[] array)
-        {
-            throw new ArgumentException("实例必须是 object?[] 类型");
-        }
+        var items = GetItemsForVM(instance);
 
         if (arguments.Length < 2)
         {
             throw new ArgumentException("需要两个参数");
         }
 
-        if (arguments[0] is not object?[] second)
-        {
-            throw new ArgumentException("second 参数必须是数组类型");
-        }
-
-        if (arguments[1] is not object?[] third)
-        {
-            throw new ArgumentException("third 参数必须是数组类型");
-        }
+        var secondItems = GetItemsForVM(arguments[0]);
+        var thirdItems = GetItemsForVM(arguments[1]);
 
         var result = new List<object?>();
-        var minLength = Math.Min(Math.Min(array.Length, second.Length), third.Length);
+        var minLength = Math.Min(Math.Min(items.Count, secondItems.Count), thirdItems.Count);
 
         for (int i = 0; i < minLength; i++)
         {
-            result.Add(new object?[] { array[i], second[i], third[i] });
+            result.Add(new object?[] { items[i], secondItems[i], thirdItems[i] });
         }
 
         return result;

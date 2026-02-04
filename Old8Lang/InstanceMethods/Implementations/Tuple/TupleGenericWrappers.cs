@@ -38,3 +38,7 @@ public class TupleGroupByMethod : LangListGroupByMethod { public override Type T
 public class TupleSortMethod : LangListSortMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 高级组合方法
+public class TupleZip3Method : LangListZip3Method { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleSelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(TupleLangValue); }

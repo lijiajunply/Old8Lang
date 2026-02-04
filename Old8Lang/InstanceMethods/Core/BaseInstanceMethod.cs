@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
@@ -165,6 +166,15 @@ public abstract class BaseInstanceMethod : IInstanceMethod
             return true;
         }
 
+        // object[] 和 List<object?> 等价于 ILangList 接口
+        if (targetType == typeof(ILangList))
+        {
+            if (actualType == typeof(object[]) || actualType == typeof(List<object?>))
+            {
+                return true;
+            }
+        }
+
         // Dictionary<object, object?> 等价于 DictionaryLangValue
         if (actualType == typeof(Dictionary<object, object?>) && targetType == typeof(DictionaryLangValue))
         {
@@ -197,6 +207,13 @@ public abstract class BaseInstanceMethod : IInstanceMethod
 
         // char 等价于 CharLangValue
         if (actualType == typeof(char) && targetType == typeof(CharLangValue))
+        {
+            return true;
+        }
+
+        // Tuple<object?, object?> 等价于 TupleLangValue (VM 模式下的元组表示)
+        if (actualType.IsGenericType && actualType.GetGenericTypeDefinition() == typeof(Tuple<,>) &&
+            targetType == typeof(TupleLangValue))
         {
             return true;
         }

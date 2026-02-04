@@ -342,6 +342,12 @@ public partial class VirtualMachine
             return typeof(CharLangValue);
         }
 
+        // Tuple<object?, object?> 等价于 TupleLangValue (VM 模式下的元组表示)
+        if (nativeType.IsGenericType && nativeType.GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            return typeof(TupleLangValue);
+        }
+
         return null;
     }
 }

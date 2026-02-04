@@ -95,15 +95,70 @@ public class LangListJoinMethod : BaseLangListMethod
         // 支持 object[] 类型
         if (instance is object?[] array)
         {
-            return string.Join(separator, array.Select(item => item?.ToString() ?? "null"));
+            return string.Join(separator, array.Select(item => FormatItem(item)));
         }
 
         // 支持 List<object?> 类型
         if (instance is List<object?> list)
         {
-            return string.Join(separator, list.Select(item => item?.ToString() ?? "null"));
+            return string.Join(separator, list.Select(item => FormatItem(item)));
         }
 
         throw new ArgumentException($"实例必须实现 ILangList 接口、为数组类型或为 List<object?> 类型，当前类型：{instance?.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 格式化单个元素，特殊处理数组和元组
+    /// </summary>
+    private static string FormatItem(object? item)
+    {
+        if (item == null)
+        {
+            return "null";
+        }
+
+        // 如果是 object[] (VM 模式下的元组或数组)
+        if (item is object?[] arr)
+        {
+            var formatted = arr.Select(FormatItem);
+            return $"[{string.Join(", ", formatted)}]";
+        }
+
+        // 如果是 Tuple<object?, object?> (VM 模式下的元组)
+        if (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            var items = FlattenTuple(item);
+            var formatted = items.Select(FormatItem);
+            return $"[{string.Join(", ", formatted)}]";
+        }
+
+        return item.ToString() ?? "null";
+    }
+
+    /// <summary>
+    /// 将嵌套的 Tuple<object?, object?> 展平为列表
+    /// </summary>
+    private static List<object?> FlattenTuple(object tuple)
+    {
+        var result = new List<object?>();
+
+        if (tuple is not Tuple<object?, object?> t)
+        {
+            return result;
+        }
+
+        result.Add(t.Item1);
+
+        if (t.Item2?.GetType().IsGenericType == true &&
+            t.Item2.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            result.AddRange(FlattenTuple(t.Item2));
+        }
+        else if (t.Item2 != null)
+        {
+            result.Add(t.Item2);
+        }
+
+        return result;
     }
 }

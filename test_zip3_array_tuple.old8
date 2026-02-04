@@ -1,0 +1,27 @@
+// 测试 Array 和 Tuple 的 Zip3 和 SelectMany 方法
+
+print("=== 测试 Array 的 Zip3 ===\n")
+arr1 <- [1, 2, 3]
+arr2 <- ["a", "b", "c"]
+arr3 <- [true, false, true]
+result <- arr1.Zip3(arr2, arr3)
+print("Array Zip3 结果: " + result.Join(", ") + "\n")
+
+print("\n=== 测试 Array 的 SelectMany ===\n")
+arr <- [[1, 2], [3, 4], [5]]
+flattened <- arr.SelectMany((x) -> x)
+print("Array SelectMany 结果: " + flattened.Join(", ") + "\n")
+
+print("\n=== 测试 Tuple 的 Zip3 ===\n")
+tuple1 <- (1, 2, 3)
+tuple2 <- ("x", "y", "z")
+tuple3 <- (10, 20, 30)
+result2 <- tuple1.Zip3(tuple2, tuple3)
+print("Tuple Zip3 结果: " + result2.Join(", ") + "\n")
+
+print("\n=== 测试 Tuple 的 SelectMany ===\n")
+tuple <- ([1, 2], [3, 4], [5, 6])
+flattened2 <- tuple.SelectMany((x) -> x)
+print("Tuple SelectMany 结果: " + flattened2.Join(", ") + "\n")
+
+print("\n所有测试完成！\n")
