@@ -1,7 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
@@ -9,54 +8,56 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
-public class DictSetMethod : BaseInstanceMethod
+/// <summary>
+/// Dictionary.Clone() - 创建字典的独立副本
+/// </summary>
+public class DictCloneMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["Set", "set"];
+    public override string[] Names => ["Clone", "clone"];
     public override Type TargetType => typeof(DictionaryLangValue);
-    public override string[] ParameterNames => ["key", "value"];
-    public override int MinParameterCount => 2;
-    public override int MaxParameterCount => 2;
+    public override string[]? ParameterNames => null;
+    public override int MinParameterCount => 0;
+    public override int MaxParameterCount => 0;
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Run(manager);
-        var value = parameters[1].Run(manager);
-        dict.Set(key, value);
-        return new VoidLangValue();
+        var newDict = new DictionaryLangValue();
+
+        foreach (var (key, value) in dict.Value)
+        {
+            newDict.Value.Add((key, value));
+        }
+
+        return newDict;
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
-        parameters[1].LoadIlValue(ilGenerator, local);
 
-        var helperMethod = typeof(DictSetMethod).GetMethod(nameof(SetHelper),
+        var helperMethod = typeof(DictCloneMethod).GetMethod(nameof(CloneHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static void SetHelper(Dictionary<object, object> dict, object key, object value)
+    public static Dictionary<object, object> CloneHelper(Dictionary<object, object> dict)
     {
-        dict[key] = value;
+        return new Dictionary<object, object>(dict);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(void);
+        return typeof(Dictionary<object, object>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is Dictionary<object, object> dict && arguments.Length > 1)
+        if (instance is Dictionary<object, object> dict)
         {
-            var key = arguments[0];
-            var value = arguments[1];
-            dict[key!] = value!;
-            return null;
+            return new Dictionary<object, object>(dict);
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
     }

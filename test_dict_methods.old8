@@ -1,0 +1,63 @@
+// Dictionary 方法测试
+
+// 创建测试字典
+dict <- {"name": "张三", "age": 25, "city": "北京"}
+
+// 测试 Add
+dict.Add("country", "中国")
+Print("Add 测试: " + dict.ToStr())
+
+// 测试 ContainsValue
+hasValue <- dict.ContainsValue("张三")
+Print("ContainsValue 测试: " + hasValue.ToStr())
+
+// 测试 GetOrElse
+email <- dict.GetOrElse("email", "未设置")
+Print("GetOrElse 测试: " + email)
+
+// 测试 Clone
+dict2 <- dict.Clone()
+dict2.Set("name", "李四")
+Print("Clone 测试 - 原字典: " + dict.Get("name"))
+Print("Clone 测试 - 克隆字典: " + dict2.Get("name"))
+
+// 测试 Merge
+dict3 <- {"email": "test@example.com", "phone": "123456"}
+merged <- dict.Merge(dict3)
+Print("Merge 测试: " + merged.ToStr())
+
+// 测试 Update (单个键值对)
+dict.Update("age", 26)
+Print("Update 测试 (单个): " + dict.Get("age").ToStr())
+
+// 测试 Update (字典)
+updates <- {"age": 27, "city": "上海"}
+dict.Update(updates)
+Print("Update 测试 (字典): age=" + dict.Get("age").ToStr() + ", city=" + dict.Get("city"))
+
+// 测试 IsEmpty
+emptyDict <- {"temp": "temp"}
+emptyDict.Remove("temp")
+Print("IsEmpty 测试 (空字典): " + emptyDict.IsEmpty().ToStr())
+Print("IsEmpty 测试 (非空字典): " + dict.IsEmpty().ToStr())
+
+// 测试 Map
+dict4 <- {"a": 1, "b": 2, "c": 3}
+mapped <- dict4.Map((x) -> x * 2)
+Print("Map 测试: " + mapped.ToStr())
+
+// 测试 Filter
+filtered <- dict4.Filter((k, v) -> v > 1)
+Print("Filter 测试: " + filtered.ToStr())
+
+// 测试 ForEach
+Print("ForEach 测试:")
+dict4.ForEach((k, v) -> {
+    Print("  " + k + " = " + v.ToStr())
+})
+
+// 测试 ToList
+list <- dict4.ToList()
+Print("ToList 测试: " + list.ToStr())
+
+Print("所有 Dictionary 方法测试完成！")

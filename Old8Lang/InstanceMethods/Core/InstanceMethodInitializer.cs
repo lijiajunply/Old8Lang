@@ -105,8 +105,6 @@ public static class InstanceMethodInitializer
             // String 方法迁移完成！共 15 个方法
 
             // 注册 Dictionary 方法
-            registry.Register(new Implementations.Dictionary.DictGetMethod());
-            registry.Register(new Implementations.Dictionary.DictSetMethod());
             registry.Register(new Implementations.Dictionary.DictKeysMethod());
             registry.Register(new Implementations.Dictionary.DictValuesMethod());
             registry.Register(new Implementations.Dictionary.DictContainsKeyMethod());
@@ -114,7 +112,20 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Dictionary.DictClearMethod());
             registry.Register(new Implementations.Dictionary.DictCountMethod());
 
-            // Dictionary 方法迁移完成！共 8 个方法
+            // 注册 Dictionary 高级方法
+            registry.Register(new Implementations.Dictionary.DictAddMethod());
+            registry.Register(new Implementations.Dictionary.DictContainsValueMethod());
+            registry.Register(new Implementations.Dictionary.DictGetOrElseMethod());
+            registry.Register(new Implementations.Dictionary.DictMergeMethod());
+            registry.Register(new Implementations.Dictionary.DictUpdateMethod());
+            registry.Register(new Implementations.Dictionary.DictCloneMethod());
+            registry.Register(new Implementations.Dictionary.DictMapMethod());
+            registry.Register(new Implementations.Dictionary.DictFilterMethod());
+            registry.Register(new Implementations.Dictionary.DictForEachMethod());
+            registry.Register(new Implementations.Dictionary.DictToListMethod());
+            registry.Register(new Implementations.Dictionary.DictIsEmptyMethod());
+
+            // Dictionary 方法迁移完成！共 19 个方法
 
             // 注册 Array 方法
             registry.Register(new Implementations.Array.ArrayLengthMethod());
