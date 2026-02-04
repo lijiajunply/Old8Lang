@@ -26,7 +26,8 @@
       "Bash(xargs:*)",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(Select-String -Pattern \"===\")"
+      "Bash(Select-String -Pattern \"===\")",
+      "Bash(Select-Object -Last 50)"
     ]
   }
 }

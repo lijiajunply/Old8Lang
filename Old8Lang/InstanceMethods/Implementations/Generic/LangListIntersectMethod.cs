@@ -96,6 +96,12 @@ public class LangListIntersectMethod : BaseLangListMethod
             return list.Intersect(otherList).ToList();
         }
 
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口或为 List<object?> 类型");
+        // 支持 object[] 类型
+        if (instance is object?[] array && arguments[0] is object?[] otherArray)
+        {
+            return array.Intersect(otherArray).ToArray();
+        }
+
+        throw new ArgumentException($"实例和参数必须实现 ILangList 接口、为 List<object?> 类型或为数组类型");
     }
 }

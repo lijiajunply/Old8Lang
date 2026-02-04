@@ -1,0 +1,60 @@
+// 测试新迁移的 List 方法
+
+// 1. 测试 SetEquals - 检查两个列表是否包含相同元素（忽略顺序）
+print("=== 测试 SetEquals ===")
+list1 <- [1, 2, 3, 4]
+list2 <- [4, 3, 2, 1]
+list3 <- [1, 2, 3]
+print("list1.SetEquals(list2): " + list1.SetEquals(list2))  // 应该是 true
+print("list1.SetEquals(list3): " + list1.SetEquals(list3))  // 应该是 false
+
+// 2. 测试 Overlaps - 检查两个列表是否有交集
+print("\n=== 测试 Overlaps ===")
+listA <- [1, 2, 3]
+listB <- [3, 4, 5]
+listC <- [6, 7, 8]
+print("listA.Overlaps(listB): " + listA.Overlaps(listB))  // 应该是 true (有3)
+print("listA.Overlaps(listC): " + listA.Overlaps(listC))  // 应该是 false
+
+// 3. 测试 Permutations - 生成所有排列
+print("\n=== 测试 Permutations ===")
+small <- [1, 2, 3]
+perms <- small.Permutations()
+print("排列数量: " + perms.Count())
+print("所有排列:")
+perms.ForEach((p) -> print("  " + p.Join(", ")))
+
+// 4. 测试 GroupAdjacent - 将相邻的相同元素分组
+print("\n=== 测试 GroupAdjacent ===")
+numbers <- [1, 1, 2, 2, 2, 3, 1, 1]
+groups <- numbers.GroupAdjacent()
+print("分组结果:")
+groups.ForEach((g) -> print("  " + g.Join(", ")))
+
+// 5. 测试 GroupAdjacentBy - 使用键选择器将相邻元素分组
+print("\n=== 测试 GroupAdjacentBy ===")
+words <- ["apple", "ant", "banana", "berry", "cherry", "cat"]
+grouped <- words.GroupAdjacentBy((w) -> w[0])  // 按首字母分组
+print("按首字母分组:")
+grouped.ForEach((g) -> print("  " + g.Join(", ")))
+
+// 6. 综合测试 - 使用多个方法
+print("\n=== 综合测试 ===")
+data <- [1, 2, 3, 4, 5]
+data2 <- [4, 5, 6, 7]
+
+// 检查是否有交集
+if (data.Overlaps(data2)) {
+    print("data 和 data2 有交集")
+    intersection <- data.Intersect(data2)
+    print("交集: " + intersection.Join(", "))
+}
+
+// 生成小列表的排列并分组
+tiny <- [1, 1, 2]
+print("\n原始列表: " + tiny.Join(", "))
+tinyPerms <- tiny.Permutations()
+print("排列数量: " + tinyPerms.Count())
+tinyPerms.ForEach((p) -> print("  " + p.Join(", ")))
+
+print("\n所有测试完成！")

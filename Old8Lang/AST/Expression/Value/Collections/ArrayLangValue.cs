@@ -124,7 +124,10 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 "Union", "union", "Intersect", "intersect", "Except", "except", "Difference", "difference",
                 "Zip", "zip", "GroupBy", "groupBy",
                 // 排序和其他方法
-                "sort", "isSorted", "ToStr", "toStr", "ToString", "toString"
+                "sort", "isSorted", "ToStr", "toStr", "ToString", "toString",
+                // 新增的集合操作方法
+                "SetEquals", "setEquals", "Overlaps", "overlaps", "Permutations", "permutations",
+                "GroupAdjacent", "groupAdjacent", "GroupAdjacentBy", "groupAdjacentBy"
             };
             if (knownMethods.Contains(methodName))
             {

@@ -85,12 +85,19 @@ public class LangListJoinMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
+        string separator = arguments.Length > 0 ? arguments[0]?.ToString() ?? ", " : ", ";
+
         if (instance is ILangList langList)
         {
-            string separator = arguments.Length > 0 ? arguments[0]?.ToString() ?? ", " : ", ";
             return JoinWithSeparatorHelper(langList, separator);
         }
 
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        // 支持 object[] 类型
+        if (instance is object?[] array)
+        {
+            return string.Join(separator, array.Select(item => item?.ToString() ?? "null"));
+        }
+
+        throw new ArgumentException($"实例必须实现 ILangList 接口或为数组类型，当前类型：{instance?.GetType().Name}");
     }
 }

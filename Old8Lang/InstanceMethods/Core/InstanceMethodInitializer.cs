@@ -68,6 +68,11 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListCombinationsMethod());
             registry.Register(new Implementations.List.ListTakeWhileIndexedMethod());
             registry.Register(new Implementations.List.ListSkipWhileIndexedMethod());
+            registry.Register(new Implementations.List.ListSetEqualsMethod());
+            registry.Register(new Implementations.List.ListOverlapsMethod());
+            registry.Register(new Implementations.List.ListPermutationsMethod());
+            registry.Register(new Implementations.List.ListGroupAdjacentMethod());
+            registry.Register(new Implementations.List.ListGroupAdjacentByMethod());
 
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
@@ -209,6 +214,11 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayToStrMethod());
             registry.Register(new Implementations.Array.ArrayElementAtMethod());
             registry.Register(new Implementations.Array.ArrayLastOrDefaultMethod());
+            registry.Register(new Implementations.Array.ArraySetEqualsMethod());
+            registry.Register(new Implementations.Array.ArrayOverlapsMethod());
+            registry.Register(new Implementations.Array.ArrayPermutationsMethod());
+            registry.Register(new Implementations.Array.ArrayGroupAdjacentMethod());
+            registry.Register(new Implementations.Array.ArrayGroupAdjacentByMethod());
 
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());

@@ -23,14 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListCartesianProductMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListCombinationsMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListFlattenDeepMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSkipWhileIndexedMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListTakeWhileIndexedMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListWithIndexMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_list_advanced_features.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListGroupAdjacentByMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListGroupAdjacentMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListOverlapsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListPermutationsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSetEqualsMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_new_list_methods.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -580,7 +581,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="22641000" />
+      <workItem from="1770170083234" duration="24764000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -925,7 +926,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="880" />
+    <option name="localTasksCounter" value="881" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -952,7 +953,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(cache): 添加程序集类型缓存和全局方法信息缓存&#10;&#10;- 新增 AssemblyTypeCache 类用于缓存程序集、类型和方法信息&#10;- 新增 GlobalMethodInfoCache 类用于缓存 MethodInfo 和 PropertyInfo&#10;- 替换原有反射调用为缓存版本以提升性能&#10;- 在多个并发函数实现中使用缓存的方法查找&#10;- 在 CSharpDllProvider 中集成程序集类型缓存&#10;- 移除原有的 LoadAssembly 和 FindType 内部方法实现" />
     <MESSAGE value="删除不合适的架构" />
     <MESSAGE value="chore(docs): 删除旧的AI助手配置文件&#10;&#10;- 移除 CLAUDE.md 文件中的详细项目指导内容&#10;- 移除 GEMINI.md 文件中的项目概述信息&#10;- 更新 .claude 设置添加 dotnet --list-sdks 命令&#10;- 修正 IDE 工作区配置中的变更列表和任务计数器&#10;- 清理最近提交消息记录中的冗余信息" />
     <MESSAGE value="docs: 添加 CLAUDE.md 文件以指导代码开发&#10;&#10;- 创建了 CLAUDE.md 文件，为 Claude Code 提供项目开发指导&#10;- 包含项目概述、构建运行命令、架构设计等完整文档信息&#10;- 详细说明了 Old8Lang 编程语言的两种执行模式：解释模式和编译模式&#10;- 提供了完整的目录结构和核心实现细节说明&#10;- 添加了开发模式、测试方法和调试指南&#10;- 文档使用中文编写，便于理解和维护" />
@@ -977,7 +977,8 @@
     <MESSAGE value="feat(list): 添加列表高级查询实例方法&#10;&#10;- 注册 ListMaxByMethod、ListMinByMethod、ListTakeLastMethod 等6个新方法&#10;- 实现 MaxBy 和 MinBy 方法支持按选择器获取最大值和最小值元素&#10;- 实现 TakeLast 和 SkipLast 方法支持对列表末尾元素的操作&#10;- 实现 TakeWhile 和 SkipWhile 方法支持按条件获取和跳过元素&#10;- 添加完整的列表高级查询方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表高级操作实例方法&#10;&#10;- 注册 ListChunkMethod、ListPartitionMethod、ListPairwiseMethod 等7个新方法&#10;- 实现 Chunk 方法支持将列表分割成指定大小的块&#10;- 实现 Partition 方法根据条件将列表分为两部分&#10;- 实现 Pairwise 方法将相邻元素配对返回元组列表&#10;- 实现 FlatMap 方法对每个元素应用转换函数并扁平化结果&#10;- 实现 Window 方法创建滑动窗口返回连续子列表&#10;- 实现 Flatten 方法扁平化嵌套列表结构&#10;- 添加完整的列表高级操作方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表集合操作方法&#10;&#10;- 注册 ListSymmetricExcept、ListIsSubsetOf、ListIsSupersetOf、ListFindAll 和 ListLastIndexOf 方法&#10;- 实现 SymmetricExcept 方法用于计算两个列表的对称差集&#10;- 实现 IsSubsetOf 方法用于检查当前列表是否为另一个列表的子集&#10;- 实现 IsSupersetOf 方法用于检查当前列表是否为另一个列表的超集&#10;- 实现 FindAll 方法用于查找所有满足条件的元素&#10;- 实现 LastIndexOf 方法用于查找元素最后一次出现的索引&#10;- 更新 SortBy 方法的虚拟机实现以支持函数对象调用&#10;- 添加测试文件验证所有新方法的功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表集合操作方法&#10;&#10;- 注册 ListSymmetricExcept、ListIsSubsetOf、ListIsSupersetOf、ListFindAll 和 ListLastIndexOf 方法&#10;- 实现 SymmetricExcept 方法用于计算两个列表的对称差集&#10;- 实现 IsSubsetOf 方法用于检查当前列表是否为另一个列表的子集&#10;- 实现 IsSupersetOf 方法用于检查当前列表是否为另一个列表的超集&#10;- 实现 FindAll 方法用于查找所有满足条件的元素&#10;- 实现 LastIndexOf 方法用于查找元素最后一次出现的索引&#10;- 更新 SortBy 方法的虚拟机实现以支持函数对象调用&#10;- 添加测试文件验证所有新方法的功能" />
+    <MESSAGE value="feat(list): 添加列表高级功能方法&#10;&#10;- 注册 ListWithIndex、ListFlattenDeep、ListCartesianProduct 等7个新方法&#10;- 实现 WithIndex 方法为每个元素添加索引返回元组列表&#10;- 实现 FlattenDeep 方法深度扁平化嵌套列表结构&#10;- 实现 CartesianProduct 方法计算两个列表的笛卡尔积&#10;- 实现 Combinations 方法生成从列表中选择 k 个元素的所有组合&#10;- 实现 TakeWhileIndexed 和 SkipWhileIndexed 方法支持带索引的条件操作&#10;- 添加完整的列表高级功能测试用例覆盖所有新方法&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表高级功能方法&#10;&#10;- 注册 ListWithIndex、ListFlattenDeep、ListCartesianProduct 等7个新方法&#10;- 实现 WithIndex 方法为每个元素添加索引返回元组列表&#10;- 实现 FlattenDeep 方法深度扁平化嵌套列表结构&#10;- 实现 CartesianProduct 方法计算两个列表的笛卡尔积&#10;- 实现 Combinations 方法生成从列表中选择 k 个元素的所有组合&#10;- 实现 TakeWhileIndexed 和 SkipWhileIndexed 方法支持带索引的条件操作&#10;- 添加完整的列表高级功能测试用例覆盖所有新方法&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
