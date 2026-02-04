@@ -23,15 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GENERIC_METHODS_FINAL_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListAverageMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListForEachMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListJoinMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListReduceMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_aggregate_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GENERIC_METHODS_FINAL_REPORT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListElementAtMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListIsSortedMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListLastOrDefaultMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListToStrMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_sort_and_others.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
@@ -585,7 +583,7 @@
       <workItem from="1769878790800" duration="19115000" />
       <workItem from="1770004902703" duration="11499000" />
       <workItem from="1770085156303" duration="3631000" />
-      <workItem from="1770170083234" duration="8657000" />
+      <workItem from="1770170083234" duration="10609000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +928,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="869" />
+    <option name="localTasksCounter" value="871" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,8 +955,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(vm): 修复虚拟机异步指令中的值转换问题&#10;&#10;- 将异常断言从 InvalidOperationError 改为 CompilerException&#10;- 使用 ConvertToLangValue 方法替代类型转换确保正确的值转换&#10;- 修复生成器状态中 CurrentValue 的赋值逻辑&#10;- 更新性能测试中的字典变量名和函数返回类型声明" />
-    <MESSAGE value="feat(compiler): 完善类和函数重载的类型推断支持&#10;&#10;- 为类成员添加显式类型注解和默认值初始化&#10;- 支持 this 关键字和 ThisExpression 两种形式的成员访问&#10;- 实现内置类型方法的返回类型推断机制&#10;- 添加自定义类类型的类型查找功能&#10;- 简化函数重载测试避免编译器模式下的类型转换问题&#10;- 更新 IDE 工作空间配置和相关测试文件" />
     <MESSAGE value="refactor(vm): 优化虚拟机类型转换逻辑&#10;&#10;- 修改Count方法返回类型从IntLangValue到int&#10;- 添加BoolLangValue到bool类型的转换支持&#10;- 实现List&lt;object?&gt;到ListLangValue的转换功能&#10;- 实现object[]到ArrayLangValue的转换功能&#10;- 实现Dictionary&lt;object, object?&gt;到DictionaryLangValue的转换功能&#10;- 添加必要的Value命名空间引用" />
     <MESSAGE value="fix(vm): 修复生成器执行中的状态管理和栈恢复问题&#10;&#10;- 重置生成器状态为NotStarted以正确区分yield暂停和函数结束&#10;- 保存调用者栈状态和调用栈计数以便正确恢复&#10;- 修改yield检测逻辑从IP检查改为状态检查&#10;- 在生成器完成后正确恢复调用者的栈状态&#10;- 修复性能测试中生成器函数的返回类型声明" />
     <MESSAGE value="```&#10;test(vm): 为 VMSelectStatementTests 添加等待时间确保测试稳定&#10;&#10;- 在 ChannelSend 操作后添加 Sleep(50) 确保数据发送完成&#10;- 为多个测试场景添加适当的延迟等待&#10;- 优化 SelectStatement_MultipleChannels_ExecutesCorrectly 测试逻辑&#10;- 添加注释说明测试目的和执行顺序&#10;- 提高并发操作测试的可靠性&#10;```" />
@@ -982,7 +978,9 @@
     <MESSAGE value="加入新东西" />
     <MESSAGE value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
     <MESSAGE value="feat(lang): 扩展ILangList通用方法系统为Tuple和Array添加查询访问功能&#10;&#10;- 新增LangListFirstMethod、LangListFirstOrDefaultMethod、LangListLastMethod等9个通用方法实现&#10;- 为Array类型创建ArrayGenericWrappers包装类，添加13个方法支持&#10;- 为Tuple类型创建TupleGenericWrappers包装类，添加9个方法支持&#10;- 更新InstanceMethodInitializer注册所有新方法到系统中&#10;- 扩展ArrayLangValue的knownMethods数组包含新方法名&#10;- 创建GENERIC_METHODS_MIGRATION_PLAN和PROGRESS文档跟踪开发进度&#10;- 实现First、Last、Skip、Take、Find、Concat、IndexOf、Distinct等核心查询方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 扩展ILangList通用方法系统为Tuple和Array添加查询访问功能&#10;&#10;- 新增LangListFirstMethod、LangListFirstOrDefaultMethod、LangListLastMethod等9个通用方法实现&#10;- 为Array类型创建ArrayGenericWrappers包装类，添加13个方法支持&#10;- 为Tuple类型创建TupleGenericWrappers包装类，添加9个方法支持&#10;- 更新InstanceMethodInitializer注册所有新方法到系统中&#10;- 扩展ArrayLangValue的knownMethods数组包含新方法名&#10;- 创建GENERIC_METHODS_MIGRATION_PLAN和PROGRESS文档跟踪开发进度&#10;- 实现First、Last、Skip、Take、Find、Concat、IndexOf、Distinct等核心查询方法" />
+    <MESSAGE value="feat(array): 为Array和Tuple添加聚合和迭代方法&#10;&#10;- 添加Sum、Average、Min、Max、Reduce聚合方法&#10;- 添加ForEach、Join迭代方法&#10;- 在ArrayLangValue中注册新方法名&#10;- 为Array和Tuple创建对应的包装类&#10;- 更新实例方法初始化器注册新方法&#10;- 添加详细的测试文件验证所有功能&#10;- 生成完整的实现总结文档" />
+    <MESSAGE value="feat(array): 添加集合操作方法支持&#10;&#10;- 实现了并集(Union)、交集(Intersect)、差集(Except)、拉链(Zip)和分组(GroupBy)方法&#10;- 为ArrayLangValue添加了新的方法名映射&#10;- 在InstanceMethodInitializer中注册了新的数组方法&#10;- 为Tuple类型也添加了相应的集合操作方法包装类&#10;- 创建了通用的LangList集合操作方法基类实现&#10;- 添加了完整的集合操作功能测试文件&#10;- 更新了项目文档记录完整的通用方法系统实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(array): 添加集合操作方法支持&#10;&#10;- 实现了并集(Union)、交集(Intersect)、差集(Except)、拉链(Zip)和分组(GroupBy)方法&#10;- 为ArrayLangValue添加了新的方法名映射&#10;- 在InstanceMethodInitializer中注册了新的数组方法&#10;- 为Tuple类型也添加了相应的集合操作方法包装类&#10;- 创建了通用的LangList集合操作方法基类实现&#10;- 添加了完整的集合操作功能测试文件&#10;- 更新了项目文档记录完整的通用方法系统实现" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

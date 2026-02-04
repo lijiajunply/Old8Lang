@@ -7,12 +7,14 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 public class ArrayFirstMethod : LangListFirstMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayFirstOrDefaultMethod : LangListFirstOrDefaultMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayLastMethod : LangListLastMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayLastOrDefaultMethod : LangListLastOrDefaultMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArraySkipMethod : LangListSkipMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayTakeMethod : LangListTakeMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayDistinctMethod : LangListDistinctMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayFindMethod : LangListFindMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayConcatMethod : LangListConcatMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayIndexOfMethod : LangListIndexOfMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayElementAtMethod : LangListElementAtMethod { public override Type TargetType => typeof(ArrayLangValue); }
 
 // 高阶函数方法
 public class ArrayFilterMethod : LangListFilterMethod { public override Type TargetType => typeof(ArrayLangValue); }
@@ -37,3 +39,8 @@ public class ArrayIntersectMethod : LangListIntersectMethod { public override Ty
 public class ArrayExceptMethod : LangListExceptMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayZipMethod : LangListZipMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayGroupByMethod : LangListGroupByMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 排序和其他方法
+public class ArraySortMethod : LangListSortMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(ArrayLangValue); }

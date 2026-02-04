@@ -7,12 +7,14 @@ namespace Old8Lang.InstanceMethods.Implementations.Tuple;
 public class TupleFirstMethod : LangListFirstMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleFirstOrDefaultMethod : LangListFirstOrDefaultMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleLastMethod : LangListLastMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleLastOrDefaultMethod : LangListLastOrDefaultMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleSkipMethod : LangListSkipMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleTakeMethod : LangListTakeMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleDistinctMethod : LangListDistinctMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleFindMethod : LangListFindMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleConcatMethod : LangListConcatMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleIndexOfMethod : LangListIndexOfMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleElementAtMethod : LangListElementAtMethod { public override Type TargetType => typeof(TupleLangValue); }
 
 // 聚合方法
 public class TupleSumMethod : LangListSumMethod { public override Type TargetType => typeof(TupleLangValue); }
@@ -31,3 +33,8 @@ public class TupleIntersectMethod : LangListIntersectMethod { public override Ty
 public class TupleExceptMethod : LangListExceptMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleZipMethod : LangListZipMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleGroupByMethod : LangListGroupByMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 排序和其他方法
+public class TupleSortMethod : LangListSortMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(TupleLangValue); }

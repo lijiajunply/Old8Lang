@@ -157,6 +157,11 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayExceptMethod());
             registry.Register(new Implementations.Array.ArrayZipMethod());
             registry.Register(new Implementations.Array.ArrayGroupByMethod());
+            registry.Register(new Implementations.Array.ArraySortMethod());
+            registry.Register(new Implementations.Array.ArrayIsSortedMethod());
+            registry.Register(new Implementations.Array.ArrayToStrMethod());
+            registry.Register(new Implementations.Array.ArrayElementAtMethod());
+            registry.Register(new Implementations.Array.ArrayLastOrDefaultMethod());
 
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
@@ -209,6 +214,11 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleExceptMethod());
             registry.Register(new Implementations.Tuple.TupleZipMethod());
             registry.Register(new Implementations.Tuple.TupleGroupByMethod());
+            registry.Register(new Implementations.Tuple.TupleSortMethod());
+            registry.Register(new Implementations.Tuple.TupleIsSortedMethod());
+            registry.Register(new Implementations.Tuple.TupleToStrMethod());
+            registry.Register(new Implementations.Tuple.TupleElementAtMethod());
+            registry.Register(new Implementations.Tuple.TupleLastOrDefaultMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

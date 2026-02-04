@@ -113,16 +113,18 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 "ToList", "toList", "tolist", "Slice", "slice", "get", "set",
                 // 通用 ILangList 方法
                 "Contains", "contains", "Reverse", "reverse", "Any", "any", "All", "all", "Where", "where", "Select", "select",
-                "First", "first", "FirstOrDefault", "firstOrDefault", "Last", "last",
+                "First", "first", "FirstOrDefault", "firstOrDefault", "Last", "last", "LastOrDefault", "lastOrDefault",
                 "Skip", "skip", "Take", "take", "Find", "find", "Concat", "concat", "IndexOf", "indexOf",
-                "distinct", "unique", "Unique",
+                "distinct", "unique", "Unique", "ElementAt", "elementAt", "At", "at",
                 // 聚合方法
                 "Sum", "sum", "Average", "average", "Avg", "avg", "Min", "min", "Max", "max", "reduce",
                 // 迭代方法
                 "ForEach", "forEach", "Each", "each", "Join", "join",
                 // 集合操作方法
                 "Union", "union", "Intersect", "intersect", "Except", "except", "Difference", "difference",
-                "Zip", "zip", "GroupBy", "groupBy"
+                "Zip", "zip", "GroupBy", "groupBy",
+                // 排序和其他方法
+                "sort", "isSorted", "ToStr", "toStr", "ToString", "toString"
             };
             if (knownMethods.Contains(methodName))
             {
