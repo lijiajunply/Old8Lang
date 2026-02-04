@@ -38,6 +38,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListIsEmptyMethod());
             registry.Register(new Implementations.List.ListToArrayMethod());
 
+            // 注册 List 高级查询方法
+            registry.Register(new Implementations.List.ListMaxByMethod());
+            registry.Register(new Implementations.List.ListMinByMethod());
+            registry.Register(new Implementations.List.ListTakeLastMethod());
+            registry.Register(new Implementations.List.ListSkipLastMethod());
+            registry.Register(new Implementations.List.ListTakeWhileMethod());
+            registry.Register(new Implementations.List.ListSkipWhileMethod());
+
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
             registry.Register(new Implementations.List.ListMapMethod());
