@@ -1,0 +1,146 @@
+// 聚合和迭代方法测试
+
+print("=== 聚合和迭代方法测试 ===\n")
+
+// 1. 测试 Tuple 的聚合方法
+print("\n1. 测试 Tuple 的聚合方法\n")
+
+tuple1 <- (10, 20, 30, 40, 50)
+print("tuple1 = ")
+print(tuple1)
+print("\n")
+
+// Sum 方法
+sum1 <- tuple1.Sum()
+print("tuple1.Sum() = ")
+print(sum1)
+print("\n")
+
+// Average 方法
+avg1 <- tuple1.Average()
+print("tuple1.Average() = ")
+print(avg1)
+print("\n")
+
+// Min 方法
+min1 <- tuple1.Min()
+print("tuple1.Min() = ")
+print(min1)
+print("\n")
+
+// Max 方法
+max1 <- tuple1.Max()
+print("tuple1.Max() = ")
+print(max1)
+print("\n")
+
+// Reduce 方法
+reduced1 <- tuple1.Reduce((acc, x) -> acc + x)
+print("tuple1.Reduce((acc, x) -> acc + x) = ")
+print(reduced1)
+print("\n")
+
+// Join 方法
+joined1 <- tuple1.Join()
+print("tuple1.Join() = ")
+print(joined1)
+print("\n")
+
+joined2 <- tuple1.Join(" | ")
+print("tuple1.Join(\" | \") = ")
+print(joined2)
+print("\n")
+
+// 2. 测试 Array 的聚合方法
+print("\n2. 测试 Array 的聚合方法\n")
+
+arr1 <- [5, 10, 15, 20, 25]
+print("arr1 = ")
+print(arr1)
+print("\n")
+
+// Sum 方法
+sum2 <- arr1.Sum()
+print("arr1.Sum() = ")
+print(sum2)
+print("\n")
+
+// Average 方法
+avg2 <- arr1.Average()
+print("arr1.Average() = ")
+print(avg2)
+print("\n")
+
+// Min 方法
+min2 <- arr1.Min()
+print("arr1.Min() = ")
+print(min2)
+print("\n")
+
+// Max 方法
+max2 <- arr1.Max()
+print("arr1.Max() = ")
+print(max2)
+print("\n")
+
+// Reduce 方法
+reduced2 <- arr1.Reduce((acc, x) -> acc * x)
+print("arr1.Reduce((acc, x) -> acc * x) = ")
+print(reduced2)
+print("\n")
+
+// Join 方法
+joined3 <- arr1.Join()
+print("arr1.Join() = ")
+print(joined3)
+print("\n")
+
+joined4 <- arr1.Join(" - ")
+print("arr1.Join(\" - \") = ")
+print(joined4)
+print("\n")
+
+// 3. 测试 ForEach 方法
+print("\n3. 测试 ForEach 方法\n")
+
+arr2 <- [1, 2, 3]
+print("arr2 = ")
+print(arr2)
+print("\n")
+
+print("arr2.ForEach((x) -> print(x * 2)):\n")
+arr2.ForEach((x) -> print(x * 2))
+print("\n")
+
+// 4. 测试字符串数组
+print("\n4. 测试字符串数组\n")
+
+arr3 <- ["apple", "banana", "cherry"]
+print("arr3 = ")
+print(arr3)
+print("\n")
+
+joined5 <- arr3.Join(", ")
+print("arr3.Join(\", \") = ")
+print(joined5)
+print("\n")
+
+// 5. 测试混合类型（整数和浮点数）
+print("\n5. 测试混合类型\n")
+
+tuple2 <- (1, 2.5, 3, 4.5)
+print("tuple2 = ")
+print(tuple2)
+print("\n")
+
+sum3 <- tuple2.Sum()
+print("tuple2.Sum() = ")
+print(sum3)
+print("\n")
+
+avg3 <- tuple2.Average()
+print("tuple2.Average() = ")
+print(avg3)
+print("\n")
+
+print("\n=== 所有测试完成 ===\n")

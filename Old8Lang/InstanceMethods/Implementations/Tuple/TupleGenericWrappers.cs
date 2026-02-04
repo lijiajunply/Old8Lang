@@ -13,3 +13,14 @@ public class TupleDistinctMethod : LangListDistinctMethod { public override Type
 public class TupleFindMethod : LangListFindMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleConcatMethod : LangListConcatMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleIndexOfMethod : LangListIndexOfMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 聚合方法
+public class TupleSumMethod : LangListSumMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleAverageMethod : LangListAverageMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleMinMethod : LangListMinMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleMaxMethod : LangListMaxMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleReduceMethod : LangListReduceMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 迭代方法
+public class TupleForEachMethod : LangListForEachMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleJoinMethod : LangListJoinMethod { public override Type TargetType => typeof(TupleLangValue); }

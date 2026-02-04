@@ -145,6 +145,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayFindMethod());
             registry.Register(new Implementations.Array.ArrayConcatMethod());
             registry.Register(new Implementations.Array.ArrayIndexOfMethod());
+            registry.Register(new Implementations.Array.ArraySumMethod());
+            registry.Register(new Implementations.Array.ArrayAverageMethod());
+            registry.Register(new Implementations.Array.ArrayMinMethod());
+            registry.Register(new Implementations.Array.ArrayMaxMethod());
+            registry.Register(new Implementations.Array.ArrayReduceMethod());
+            registry.Register(new Implementations.Array.ArrayForEachMethod());
+            registry.Register(new Implementations.Array.ArrayJoinMethod());
 
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
@@ -185,6 +192,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleFindMethod());
             registry.Register(new Implementations.Tuple.TupleConcatMethod());
             registry.Register(new Implementations.Tuple.TupleIndexOfMethod());
+            registry.Register(new Implementations.Tuple.TupleSumMethod());
+            registry.Register(new Implementations.Tuple.TupleAverageMethod());
+            registry.Register(new Implementations.Tuple.TupleMinMethod());
+            registry.Register(new Implementations.Tuple.TupleMaxMethod());
+            registry.Register(new Implementations.Tuple.TupleReduceMethod());
+            registry.Register(new Implementations.Tuple.TupleForEachMethod());
+            registry.Register(new Implementations.Tuple.TupleJoinMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

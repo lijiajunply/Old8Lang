@@ -19,3 +19,14 @@ public class ArrayFilterMethod : LangListFilterMethod { public override Type Tar
 public class ArrayMapMethod : LangListMapMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayAnyMethod : LangListAnyMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayAllMethod : LangListAllMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 聚合方法
+public class ArraySumMethod : LangListSumMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayAverageMethod : LangListAverageMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayMinMethod : LangListMinMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayMaxMethod : LangListMaxMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayReduceMethod : LangListReduceMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 迭代方法
+public class ArrayForEachMethod : LangListForEachMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayJoinMethod : LangListJoinMethod { public override Type TargetType => typeof(ArrayLangValue); }

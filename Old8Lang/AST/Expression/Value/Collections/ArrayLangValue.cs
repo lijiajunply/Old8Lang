@@ -115,7 +115,11 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 "Contains", "contains", "Reverse", "reverse", "Any", "any", "All", "all", "Where", "where", "Select", "select",
                 "First", "first", "FirstOrDefault", "firstOrDefault", "Last", "last",
                 "Skip", "skip", "Take", "take", "Find", "find", "Concat", "concat", "IndexOf", "indexOf",
-                "distinct", "unique", "Unique"
+                "distinct", "unique", "Unique",
+                // 聚合方法
+                "Sum", "sum", "Average", "average", "Avg", "avg", "Min", "min", "Max", "max", "reduce",
+                // 迭代方法
+                "ForEach", "forEach", "Each", "each", "Join", "join"
             };
             if (knownMethods.Contains(methodName))
             {
