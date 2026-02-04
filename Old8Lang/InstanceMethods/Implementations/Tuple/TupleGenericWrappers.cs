@@ -24,3 +24,10 @@ public class TupleReduceMethod : LangListReduceMethod { public override Type Tar
 // 迭代方法
 public class TupleForEachMethod : LangListForEachMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleJoinMethod : LangListJoinMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 集合操作方法
+public class TupleUnionMethod : LangListUnionMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleIntersectMethod : LangListIntersectMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleExceptMethod : LangListExceptMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleZipMethod : LangListZipMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleGroupByMethod : LangListGroupByMethod { public override Type TargetType => typeof(TupleLangValue); }

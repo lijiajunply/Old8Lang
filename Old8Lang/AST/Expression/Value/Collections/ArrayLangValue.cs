@@ -119,7 +119,10 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 // 聚合方法
                 "Sum", "sum", "Average", "average", "Avg", "avg", "Min", "min", "Max", "max", "reduce",
                 // 迭代方法
-                "ForEach", "forEach", "Each", "each", "Join", "join"
+                "ForEach", "forEach", "Each", "each", "Join", "join",
+                // 集合操作方法
+                "Union", "union", "Intersect", "intersect", "Except", "except", "Difference", "difference",
+                "Zip", "zip", "GroupBy", "groupBy"
             };
             if (knownMethods.Contains(methodName))
             {

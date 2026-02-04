@@ -30,3 +30,10 @@ public class ArrayReduceMethod : LangListReduceMethod { public override Type Tar
 // 迭代方法
 public class ArrayForEachMethod : LangListForEachMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayJoinMethod : LangListJoinMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 集合操作方法
+public class ArrayUnionMethod : LangListUnionMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayIntersectMethod : LangListIntersectMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayExceptMethod : LangListExceptMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayZipMethod : LangListZipMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayGroupByMethod : LangListGroupByMethod { public override Type TargetType => typeof(ArrayLangValue); }
