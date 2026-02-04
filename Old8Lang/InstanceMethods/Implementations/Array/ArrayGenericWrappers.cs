@@ -48,3 +48,10 @@ public class ArrayToStrMethod : LangListToStrMethod { public override Type Targe
 // 高级组合方法
 public class ArrayZip3Method : LangListZip3Method { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArraySelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+// 带选择器的聚合方法
+public class ArraySortByMethod : LangListSortByMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArraySumWithSelectorMethod : LangListSumWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayAverageWithSelectorMethod : LangListAverageWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayMinWithSelectorMethod : LangListMinWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayMaxWithSelectorMethod : LangListMaxWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }

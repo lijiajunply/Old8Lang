@@ -130,6 +130,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListZip3Method());
             registry.Register(new Implementations.List.ListSelectManyMethod());
 
+            // 注册 List 带选择器的聚合方法（基于 Generic ILangList 方法的包装）
+            registry.Register(new Implementations.List.ListSortByMethod());
+            registry.Register(new Implementations.List.ListSumWithSelectorMethod());
+            registry.Register(new Implementations.List.ListAverageWithSelectorMethod());
+            registry.Register(new Implementations.List.ListMinWithSelectorMethod());
+            registry.Register(new Implementations.List.ListMaxWithSelectorMethod());
+
             // List 方法注册完成！
 
             // 注册 String 基础方法
@@ -228,6 +235,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayZip3Method());
             registry.Register(new Implementations.Array.ArraySelectManyMethod());
 
+            // 注册 Array 带选择器的聚合方法（基于 Generic ILangList 方法的包装）
+            registry.Register(new Implementations.Array.ArraySortByMethod());
+            registry.Register(new Implementations.Array.ArraySumWithSelectorMethod());
+            registry.Register(new Implementations.Array.ArrayAverageWithSelectorMethod());
+            registry.Register(new Implementations.Array.ArrayMinWithSelectorMethod());
+            registry.Register(new Implementations.Array.ArrayMaxWithSelectorMethod());
+
             // 注册 Task 方法
             registry.Register(new Implementations.Task.TaskAwaitMethod());
             registry.Register(new Implementations.Task.TaskThenMethod());
@@ -288,6 +302,13 @@ public static class InstanceMethodInitializer
             // 注册 Tuple 高级组合方法（基于 Generic ILangList 方法的包装）
             registry.Register(new Implementations.Tuple.TupleZip3Method());
             registry.Register(new Implementations.Tuple.TupleSelectManyMethod());
+
+            // 注册 Tuple 带选择器的聚合方法（基于 Generic ILangList 方法的包装）
+            registry.Register(new Implementations.Tuple.TupleSortByMethod());
+            registry.Register(new Implementations.Tuple.TupleSumWithSelectorMethod());
+            registry.Register(new Implementations.Tuple.TupleAverageWithSelectorMethod());
+            registry.Register(new Implementations.Tuple.TupleMinWithSelectorMethod());
+            registry.Register(new Implementations.Tuple.TupleMaxWithSelectorMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

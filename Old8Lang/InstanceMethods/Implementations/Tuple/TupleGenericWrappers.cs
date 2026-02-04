@@ -42,3 +42,10 @@ public class TupleToStrMethod : LangListToStrMethod { public override Type Targe
 // 高级组合方法
 public class TupleZip3Method : LangListZip3Method { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleSelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+// 带选择器的聚合方法
+public class TupleSortByMethod : LangListSortByMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleSumWithSelectorMethod : LangListSumWithSelectorMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleAverageWithSelectorMethod : LangListAverageWithSelectorMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleMinWithSelectorMethod : LangListMinWithSelectorMethod { public override Type TargetType => typeof(TupleLangValue); }
+public class TupleMaxWithSelectorMethod : LangListMaxWithSelectorMethod { public override Type TargetType => typeof(TupleLangValue); }

@@ -1,0 +1,48 @@
+// 测试新迁移的方法：SortBy, Sum(selector), Average(selector), Min(selector), Max(selector)
+
+print("=== 测试 SortBy ===\n")
+
+// 测试按年龄排序
+people <- [
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35}
+]
+
+sorted <- people.SortBy((p) -> p["age"])
+print("按年龄升序: ")
+sorted.ForEach((p) -> print(p["name"] + "(" + p["age"].ToStr() + ") "))
+print("\n")
+
+sortedDesc <- people.SortBy((p) -> p["age"], false)
+print("按年龄降序: ")
+sortedDesc.ForEach((p) -> print(p["name"] + "(" + p["age"].ToStr() + ") "))
+print("\n")
+
+print("\n=== 测试 Sum(selector) ===\n")
+totalAge <- people.Sum((p) -> p["age"])
+print("总年龄: " + totalAge.ToStr() + "\n")
+
+print("\n=== 测试 Average(selector) ===\n")
+avgAge <- people.Average((p) -> p["age"])
+print("平均年龄: " + avgAge.ToStr() + "\n")
+
+print("\n=== 测试 Min(selector) ===\n")
+minAge <- people.Min((p) -> p["age"])
+print("最小年龄: " + minAge.ToStr() + "\n")
+
+print("\n=== 测试 Max(selector) ===\n")
+maxAge <- people.Max((p) -> p["age"])
+print("最大年龄: " + maxAge.ToStr() + "\n")
+
+print("\n=== 测试 Array 的新方法 ===\n")
+arr <- [5, 2, 8, 1, 9]
+sortedArr <- arr.SortBy((x) -> x)
+print("排序后的数组: " + sortedArr.Join(", ") + "\n")
+
+print("\n=== 测试 Tuple 的新方法 ===\n")
+tuple <- (3, 1, 4, 1, 5)
+sortedTuple <- tuple.SortBy((x) -> x)
+print("排序后的元组: " + sortedTuple.Join(", ") + "\n")
+
+print("\n所有测试完成！\n")

@@ -128,7 +128,9 @@ public partial class ArrayLangValue : LangValueType, ILangList
                 // 新增的集合操作方法
                 "SetEquals", "setEquals", "Overlaps", "overlaps", "Permutations", "permutations",
                 "GroupAdjacent", "groupAdjacent", "GroupAdjacentBy", "groupAdjacentBy",
-                "Zip3", "zip3", "SelectMany", "selectMany"
+                "Zip3", "zip3", "SelectMany", "selectMany",
+                // 带选择器的聚合方法
+                "SortBy", "sortBy"
             };
             if (knownMethods.Contains(methodName))
             {

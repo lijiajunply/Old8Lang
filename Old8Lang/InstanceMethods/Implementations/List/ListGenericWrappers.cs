@@ -56,3 +56,10 @@ public class ListToStrMethod : LangListToStrMethod { public override Type Target
 // 高级组合方法
 public class ListZip3Method : LangListZip3Method { public override Type TargetType => typeof(ListLangValue); }
 public class ListSelectManyMethod : LangListSelectManyMethod { public override Type TargetType => typeof(ListLangValue); }
+
+// 带选择器的聚合方法
+public class ListSortByMethod : LangListSortByMethod { public override Type TargetType => typeof(ListLangValue); }
+public class ListSumWithSelectorMethod : LangListSumWithSelectorMethod { public override Type TargetType => typeof(ListLangValue); }
+public class ListAverageWithSelectorMethod : LangListAverageWithSelectorMethod { public override Type TargetType => typeof(ListLangValue); }
+public class ListMinWithSelectorMethod : LangListMinWithSelectorMethod { public override Type TargetType => typeof(ListLangValue); }
+public class ListMaxWithSelectorMethod : LangListMaxWithSelectorMethod { public override Type TargetType => typeof(ListLangValue); }
