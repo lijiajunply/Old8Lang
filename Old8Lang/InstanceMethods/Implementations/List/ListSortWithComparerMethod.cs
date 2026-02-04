@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
@@ -115,14 +116,27 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
     {
         if (instance is List<object?> list && arguments.Length > 0)
         {
-            var comparer = arguments[0] as Func<object?, object?, int>;
-            if (comparer == null)
-            {
-                throw new ArgumentException("参数必须是比较器函数");
-            }
+            var comparer = arguments[0];
+            var vm = VMContext.CurrentVM;
 
             var sorted = new List<object?>(list);
-            sorted.Sort((a, b) => comparer(a, b));
+            sorted.Sort((a, b) =>
+            {
+                try
+                {
+                    var result = vm.CallFunctionObject(comparer, [a, b]);
+                    if (result is int intResult)
+                    {
+                        return intResult;
+                    }
+                    // 尝试转换为 int
+                    return Convert.ToInt32(result);
+                }
+                catch
+                {
+                    return 0;
+                }
+            });
             return sorted;
         }
 

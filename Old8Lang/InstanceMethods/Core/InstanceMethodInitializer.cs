@@ -54,6 +54,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListWindowMethod());
             registry.Register(new Implementations.List.ListFlattenMethod());
 
+            // 注册 List 集合操作方法
+            registry.Register(new Implementations.List.ListSymmetricExceptMethod());
+            registry.Register(new Implementations.List.ListIsSubsetOfMethod());
+            registry.Register(new Implementations.List.ListIsSupersetOfMethod());
+            registry.Register(new Implementations.List.ListFindAllMethod());
+            registry.Register(new Implementations.List.ListLastIndexOfMethod());
+
             // 注册 List 通用方法（基于 ILangList，通过包装器）
             registry.Register(new Implementations.List.ListFilterMethod());
             registry.Register(new Implementations.List.ListMapMethod());

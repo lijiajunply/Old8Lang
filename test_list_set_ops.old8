@@ -1,0 +1,65 @@
+// 测试 List 集合操作方法
+
+numbers <- [1, 2, 3, 4, 5].ToList()
+moreNumbers <- [4, 5, 6, 7, 8].ToList()
+
+print("=== 测试 SymmetricExcept 方法 ===")
+symDiff <- numbers.SymmetricExcept(moreNumbers)
+print("SymmetricExcept [1,2,3,4,5] 和 [4,5,6,7,8]: " + symDiff.ToStr())
+
+print("\n=== 测试 IsSubsetOf 方法 ===")
+subset1 <- [1, 2, 3].ToList()
+subset2 <- [1, 2, 3, 4, 5].ToList()
+subset3 <- [1, 2, 6].ToList()
+
+print("[1,2,3] IsSubsetOf [1,2,3,4,5]: " + subset1.IsSubsetOf(subset2).ToStr())
+print("[1,2,3,4,5] IsSubsetOf [1,2,3]: " + subset2.IsSubsetOf(subset1).ToStr())
+print("[1,2,6] IsSubsetOf [1,2,3,4,5]: " + subset3.IsSubsetOf(subset2).ToStr())
+
+print("\n=== 测试 IsSupersetOf 方法 ===")
+print("[1,2,3,4,5] IsSupersetOf [1,2,3]: " + subset2.IsSupersetOf(subset1).ToStr())
+print("[1,2,3] IsSupersetOf [1,2,3,4,5]: " + subset1.IsSupersetOf(subset2).ToStr())
+print("[1,2,3,4,5] IsSupersetOf [1,2,6]: " + subset2.IsSupersetOf(subset3).ToStr())
+
+print("\n=== 测试 SortBy 方法 ===")
+people <- [
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35},
+    {"name": "David", "age": 28}
+].ToList()
+
+// 按年龄升序排序（使用比较器）
+sortedByAge <- people.SortBy((a, b) -> a["age"] - b["age"])
+print("按年龄升序:")
+sortedByAge.ForEach((p) -> print("  " + p["name"] + ": " + p["age"].ToStr()))
+
+print("\n=== 测试 FindAll 方法 ===")
+allNumbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].ToList()
+evens <- allNumbers.FindAll((x) -> x % 2 == 0)
+print("所有偶数: " + evens.ToStr())
+
+greaterThan5 <- allNumbers.FindAll((x) -> x > 5)
+print("大于 5 的数: " + greaterThan5.ToStr())
+
+print("\n=== 测试 LastIndexOf 方法 ===")
+repeated <- [1, 2, 3, 2, 4, 2, 5].ToList()
+lastIndex2 <- repeated.LastIndexOf(2)
+print("2 最后出现的索引: " + lastIndex2.ToStr())
+
+lastIndex5 <- repeated.LastIndexOf(5)
+print("5 最后出现的索引: " + lastIndex5.ToStr())
+
+lastIndex9 <- repeated.LastIndexOf(9)
+print("9 最后出现的索引（不存在）: " + lastIndex9.ToStr())
+
+print("\n=== 测试组合使用 ===")
+// FindAll + SortBy
+evensSorted <- allNumbers.FindAll((x) -> x % 2 == 0).SortBy((a, b) -> b - a)
+print("偶数降序: " + evensSorted.ToStr())
+
+// SymmetricExcept + IsSubsetOf
+diff <- [1, 2, 3].ToList().SymmetricExcept([2, 3, 4].ToList())
+print("SymmetricExcept [1,2,3] 和 [2,3,4]: " + diff.ToStr())
+
+print("\n=== 所有测试完成 ===")
