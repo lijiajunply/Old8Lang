@@ -175,6 +175,7 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Dictionary.DictRemoveMethod());
             registry.Register(new Implementations.Dictionary.DictClearMethod());
             registry.Register(new Implementations.Dictionary.DictCountMethod());
+            registry.Register(new Implementations.Dictionary.DictGetValueMethod());
 
             // 注册 Dictionary 高级方法
             registry.Register(new Implementations.Dictionary.DictAddMethod());
@@ -189,16 +190,17 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Dictionary.DictToListMethod());
             registry.Register(new Implementations.Dictionary.DictIsEmptyMethod());
 
-            // Dictionary 方法迁移完成！共 19 个方法
+            // Dictionary 方法迁移完成！共 20 个方法
 
             // 注册 Array 方法
             registry.Register(new Implementations.Array.ArrayLengthMethod());
+            registry.Register(new Implementations.Array.ArrayCountMethod());
             registry.Register(new Implementations.Array.ArrayGetMethod());
             registry.Register(new Implementations.Array.ArraySetMethod());
             registry.Register(new Implementations.Array.ArrayToListMethod());
             registry.Register(new Implementations.Array.ArraySliceMethod());
 
-            // Array 方法迁移完成！共 5 个方法
+            // Array 方法迁移完成！共 6 个方法
 
             // 注册 Array 通用方法（基于 ILangList）
             registry.Register(new Implementations.Array.ArrayContainsMethod());

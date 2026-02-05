@@ -351,8 +351,8 @@ public class CollectionMethodsTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var array = (ArrayLangValue)result;
+        Assert.IsType<ListLangValue>(result);
+        var array = (ListLangValue)result;
         Assert.Equal(6, array.GetItems().Count());
         Assert.Equal(1, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
         Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
@@ -380,8 +380,8 @@ public class CollectionMethodsTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var array = (ArrayLangValue)result;
+        Assert.IsType<ListLangValue>(result);
+        var array = (ListLangValue)result;
         Assert.Equal(5, array.GetItems().Count());
         Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
         Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
@@ -408,8 +408,8 @@ public class CollectionMethodsTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var array = (ArrayLangValue)result;
+        Assert.IsType<ListLangValue>(result);
+        var array = (ListLangValue)result;
         Assert.Equal(5, array.GetItems().Count());
         Assert.Equal(1, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
         Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
@@ -697,8 +697,8 @@ public class CollectionMethodsTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var array = (ArrayLangValue)result;
+        Assert.IsType<ListLangValue>(result);
+        var array = (ListLangValue)result;
         Assert.Equal(5, array.GetItems().Count());
     }
 
