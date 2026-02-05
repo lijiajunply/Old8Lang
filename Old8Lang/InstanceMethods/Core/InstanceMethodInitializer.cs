@@ -193,14 +193,13 @@ public static class InstanceMethodInitializer
             // Dictionary 方法迁移完成！共 20 个方法
 
             // 注册 Array 方法
-            registry.Register(new Implementations.Array.ArrayLengthMethod());
             registry.Register(new Implementations.Array.ArrayCountMethod());
             registry.Register(new Implementations.Array.ArrayGetMethod());
             registry.Register(new Implementations.Array.ArraySetMethod());
             registry.Register(new Implementations.Array.ArrayToListMethod());
             registry.Register(new Implementations.Array.ArraySliceMethod());
 
-            // Array 方法迁移完成！共 6 个方法
+            // Array 方法迁移完成！共 5 个方法
 
             // 注册 Array 通用方法（基于 ILangList）
             registry.Register(new Implementations.Array.ArrayContainsMethod());
@@ -283,11 +282,12 @@ public static class InstanceMethodInitializer
             // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
             // 注册 Tuple 方法
+            registry.Register(new Implementations.Tuple.TupleCountMethod());
             registry.Register(new Implementations.Tuple.TupleGetMethod());
             registry.Register(new Implementations.Tuple.TupleToListMethod());
             registry.Register(new Implementations.Tuple.TupleSliceMethod());
 
-            // Tuple 方法迁移完成！共 3 个方法
+            // Tuple 方法迁移完成！共 4 个方法
 
             // 注册 Tuple 通用方法（基于 ILangList）
             registry.Register(new Implementations.Tuple.TupleContainsMethod());

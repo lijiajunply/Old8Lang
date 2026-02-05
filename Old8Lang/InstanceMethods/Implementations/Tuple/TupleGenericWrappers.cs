@@ -3,6 +3,9 @@ using Old8Lang.InstanceMethods.Implementations.Generic;
 
 namespace Old8Lang.InstanceMethods.Implementations.Tuple;
 
+// 基础方法
+public class TupleCountMethod : LangListCountMethod { public override Type TargetType => typeof(TupleLangValue); }
+
 // 查询和访问方法
 public class TupleFirstMethod : LangListFirstMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleFirstOrDefaultMethod : LangListFirstOrDefaultMethod { public override Type TargetType => typeof(TupleLangValue); }

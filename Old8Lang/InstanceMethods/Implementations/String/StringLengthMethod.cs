@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.String;
 /// </summary>
 public class StringLengthMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["Length", "length", "Len", "len"];
+    public override string[] Names => ["Count", "count", "Length", "length"];
     public override Type TargetType => typeof(StringLangValue);
     public override string[]? ParameterNames => null;
     public override int MinParameterCount => 0;

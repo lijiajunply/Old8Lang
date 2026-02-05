@@ -14,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// </summary>
 public class LangListCountMethod : BaseLangListMethod
 {
-    public override string[] Names => ["Count", "count", "Length", "length", "Len", "len"];
+    public override string[] Names => ["Count", "count"];
     public override string[]? ParameterNames => null;
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;

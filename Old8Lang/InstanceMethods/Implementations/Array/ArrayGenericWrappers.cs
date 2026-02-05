@@ -3,6 +3,9 @@ using Old8Lang.InstanceMethods.Implementations.Generic;
 
 namespace Old8Lang.InstanceMethods.Implementations.Array;
 
+// 基础方法
+public class ArrayCountMethod : LangListCountMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
 // 查询和访问方法
 public class ArrayFirstMethod : LangListFirstMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayFirstOrDefaultMethod : LangListFirstOrDefaultMethod { public override Type TargetType => typeof(ArrayLangValue); }
