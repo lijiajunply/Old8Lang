@@ -23,13 +23,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/OverloadGroup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SignatureHelpHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SignatureHelpHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/OverloadResolver.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/OverloadExample.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_overload_typesystem.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_string_add_debug.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/BytecodeObjectInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/BytecodeObjectInstance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -581,7 +585,7 @@
       <workItem from="1770170083234" duration="29222000" />
       <workItem from="1770222792162" duration="713000" />
       <workItem from="1770286042546" duration="4023000" />
-      <workItem from="1770342249898" duration="862000" />
+      <workItem from="1770342249898" duration="2243000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -926,7 +930,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="890" />
+    <option name="localTasksCounter" value="891" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -953,7 +957,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(instance-methods): 添加 Dictionary 实例方法支持&#10;&#10;- 实现 DictClearMethod、DictContainsKeyMethod、DictCountMethod 等 8 个 Dictionary 方法&#10;- 在 InstanceMethodInitializer 中注册所有 Dictionary 方法&#10;- 更新 PROGRESS_INSTANCE_METHODS.md 文档显示 Dictionary 方法完成状态&#10;- 添加 test_dictionary_methods.old8 测试文件验证所有 Dictionary 方法功能&#10;- 完成 Dictionary 方法的 IL 代码生成和虚拟机执行支持&#10;- 总进度提升至 76/101 (75%)" />
     <MESSAGE value="加入新东西" />
     <MESSAGE value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
     <MESSAGE value="feat(lang): 扩展ILangList通用方法系统为Tuple和Array添加查询访问功能&#10;&#10;- 新增LangListFirstMethod、LangListFirstOrDefaultMethod、LangListLastMethod等9个通用方法实现&#10;- 为Array类型创建ArrayGenericWrappers包装类，添加13个方法支持&#10;- 为Tuple类型创建TupleGenericWrappers包装类，添加9个方法支持&#10;- 更新InstanceMethodInitializer注册所有新方法到系统中&#10;- 扩展ArrayLangValue的knownMethods数组包含新方法名&#10;- 创建GENERIC_METHODS_MIGRATION_PLAN和PROGRESS文档跟踪开发进度&#10;- 实现First、Last、Skip、Take、Find、Concat、IndexOf、Distinct等核心查询方法" />
@@ -978,7 +981,8 @@
     <MESSAGE value="feat(instance-methods): 添加数组排序算法和多类型实例方法&#10;&#10;- 实现冒泡排序、堆排序、插入排序、归并排序、快速排序和选择排序算法&#10;- 添加字符串子串单参数方法支持从指定位置截取到末尾&#10;- 注册线程重试和链式执行方法增强异步操作功能&#10;- 实现元组切片方法支持按范围提取元组元素&#10;- 更新实例方法初始化器注册所有新增方法并修正计数统计" />
     <MESSAGE value="feat(instance-methods): 添加数组Count方法和字典GetValue方法&#10;&#10;- 实现ArrayCountMethod提供数组长度获取功能，与Length方法等效&#10;- 添加DictGetValueMethod支持根据键获取字典中的值&#10;- 在InstanceMethodInitializer中注册新方法并更新统计计数&#10;- 修正CollectionMethodsTests中的断言类型以匹配实际返回值&#10;- 更新IDE工作空间配置和提交历史记录" />
     <MESSAGE value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
+    <MESSAGE value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

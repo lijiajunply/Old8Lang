@@ -3,10 +3,10 @@ namespace Old8Lang.Bytecode.Metadata;
 /// <summary>
 /// 字节码模式的对象实例
 /// </summary>
-public class BytecodeObjectInstance
+public class BytecodeObjectInstance(string className)
 {
     /// <summary>类名</summary>
-    public string ClassName { get; set; } = "";
+    public string ClassName { get; set; } = className;
 
     /// <summary>字段值字典</summary>
     public Dictionary<string, object?> Fields { get; set; } = new();
@@ -16,11 +16,6 @@ public class BytecodeObjectInstance
 
     /// <summary>实现的接口列表</summary>
     public List<string> Interfaces { get; set; } = [];
-
-    public BytecodeObjectInstance(string className)
-    {
-        ClassName = className;
-    }
 
     public override string ToString()
     {

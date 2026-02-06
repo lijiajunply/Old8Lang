@@ -14,13 +14,22 @@ public partial class VirtualMachine
 {
     private object? CallNativeFunction(string funcName, object?[] args)
     {
-        // 首先尝试从全局函数注册表中查找
-        var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
-        if (globalFunction != null)
+        // 首先尝试从全局函数注册表中查找（支持重载）
+        var overloadGroup = GlobalFunctionRegistry.Instance.GetOverloadGroup(funcName);
+        if (overloadGroup != null)
         {
             try
             {
-                return globalFunction.ExecuteInVM(args);
+                // 在 VM 模式下，基于运行时参数值解析重载
+                var globalFunction = ResolveOverloadForVM(overloadGroup, args);
+                if (globalFunction != null)
+                {
+                    return globalFunction.ExecuteInVM(args);
+                }
+
+                // 如果没有找到匹配的重载，抛出错误
+                throw new InvalidOperationError(new SourcePosition(),
+                    $"找不到与参数类型匹配的 {funcName} 函数重载。参数类型: {string.Join(", ", args.Select(a => a?.GetType().Name ?? "null"))}");
             }
             catch (Exception ex)
             {
@@ -241,10 +250,47 @@ public partial class VirtualMachine
         return args;
     }
 
-    // ===== Task 管理 =====
-
     /// <summary>
-    /// 注册 Task 并返回 ID
+    /// 在 VM 模式下基于运行时参数值解析重载
     /// </summary>
+    private IGlobalFunction? ResolveOverloadForVM(OverloadGroup overloadGroup, object?[] args)
+    {
+        if (overloadGroup.Overloads.Count == 0)
+            return null;
 
+        // 如果只有一个重载，直接返回
+        if (overloadGroup.Overloads.Count == 1)
+            return overloadGroup.Overloads[0];
+
+        // 获取参数的 Old8Lang 类型名称
+        var paramTypes = args.Select(arg => OverloadResolver.GetRuntimeValueType(arg)).ToList();
+
+        // 计算每个重载的匹配分数
+        var candidates = new List<(IGlobalFunction func, int score)>();
+
+        foreach (var overload in overloadGroup.Overloads)
+        {
+            var score = OverloadResolver.CalculateTotalMatchScore(overload, paramTypes);
+            if (score >= 0)
+            {
+                candidates.Add((overload, score));
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            // 没有精确匹配，尝试找一个可以接受参数数量的重载
+            foreach (var overload in overloadGroup.Overloads)
+            {
+                if (OverloadResolver.CanAcceptParameters(overload, paramTypes))
+                {
+                    return overload;
+                }
+            }
+            return null;
+        }
+
+        // 选择分数最高的重载
+        return candidates.OrderByDescending(c => c.score).First().func;
+    }
 }

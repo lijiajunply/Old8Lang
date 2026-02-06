@@ -68,7 +68,7 @@ public class FunctionMetadata
         // 参数类型
         writer.Write(ParameterTypes.Count);
         foreach (var paramType in ParameterTypes)
-            writer.Write(paramType ?? "");
+            writer.Write(paramType);
 
         // 默认参数值
         writer.Write(DefaultValues.Count);
@@ -87,7 +87,7 @@ public class FunctionMetadata
         }
 
         // 返回类型
-        writer.Write(ReturnType ?? "");
+        writer.Write(ReturnType);
 
         // 指令
         writer.Write(Instructions.Count);
@@ -148,14 +148,7 @@ public class FunctionMetadata
         for (int i = 0; i < defaultValueCount; i++)
         {
             byte nullMarker = reader.ReadByte();
-            if (nullMarker == 0)
-            {
-                func.DefaultValues.Add(null);
-            }
-            else
-            {
-                func.DefaultValues.Add(ReadDefaultValue(reader));
-            }
+            func.DefaultValues.Add(nullMarker == 0 ? null : ReadDefaultValue(reader));
         }
 
         // 返回类型

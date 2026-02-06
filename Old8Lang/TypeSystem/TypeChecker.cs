@@ -135,7 +135,7 @@ public static class TypeChecker
 
     /// <summary>
     /// 获取函数值的完整类型字符串
-    /// 格式: function<param1, param2, ..., returnType>
+    /// 格式: function&lt;param1, param2, ..., returnType>
     /// 规则: 最后一个泛型参数是返回值类型，前面的都是参数类型
     /// </summary>
     private static string GetFunctionTypeString(FuncLangValue funcValue)
@@ -335,11 +335,11 @@ public static class TypeChecker
     /// 检查函数类型兼容性
     /// 规则：
     /// - 基本 function 类型兼容任何函数类型
-    /// - 泛型函数类型 function<...> 需要检查参数数量和类型匹配
+    /// - 泛型函数类型 function&lt;...> 需要检查参数数量和类型匹配
     /// - 最后一个泛型参数是返回类型，前面的是参数类型
     /// </summary>
-    /// <param name="expectedType">期望类型（如 "function<int, string, bool>"）</param>
-    /// <param name="actualType">实际类型（如 "function<int, string, bool>"）</param>
+    /// <param name="expectedType">期望类型（如 "function&lt;int, string, bool>"）</param>
+    /// <param name="actualType">实际类型（如 "function&lt;int, string, bool>"）</param>
     /// <returns>是否兼容</returns>
     private static bool IsFunctionTypeCompatible(string expectedType, string actualType)
     {
@@ -399,7 +399,7 @@ public static class TypeChecker
 
     /// <summary>
     /// 解析函数类型的泛型参数
-    /// 例如: "function<int, string, bool>" -> ["int", "string", "bool"]
+    /// 例如: "function&lt;int, string, bool>" -> ["int", "string", "bool"]
     /// </summary>
     private static List<string>? ParseFunctionTypeParams(string functionType)
     {

@@ -148,6 +148,12 @@ public static class GlobalFunctionInitializer
             registry.Register(new HasMethodFunction());
             registry.Register(new HasFieldFunction());
 
+            // 注册重载示例函数（演示重载功能）
+            // 注意：这些是示例函数，实际使用时可能需要移除
+            // registry.Register(new AddIntFunction());
+            // registry.Register(new AddDoubleFunction());
+            // registry.Register(new AddStringFunction());
+
             _initialized = true;
         }
     }

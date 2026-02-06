@@ -20,23 +20,37 @@ public partial class Instance
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
 
-        // 使用重载解析查找最匹配的全局函数
-        var globalFunc = GlobalFunctionRegistry.Instance.ResolveFunction(Id.IdName, Ids, null);
-        if (globalFunc is not null)
+        // 获取重载组
+        var overloadGroup = GlobalFunctionRegistry.Instance.GetOverloadGroup(Id.IdName);
+        if (overloadGroup is not null)
         {
             // 处理命名参数：将命名参数重新排序为位置参数
             List<LangExpression> orderedArgs;
+
+            // 如果有命名参数，需要先解析一个重载来确定参数顺序
             if (NamedArgs is { Count: > 0 })
             {
-                orderedArgs = ReorderGlobalFunctionArguments(globalFunc, Ids, NamedArgs, Position);
+                // 使用第一个重载来处理命名参数
+                var firstOverload = overloadGroup.Overloads.FirstOrDefault();
+                if (firstOverload == null)
+                {
+                    result = null;
+                    return false;
+                }
+                orderedArgs = ReorderGlobalFunctionArguments(firstOverload, Ids, NamedArgs, Position);
             }
             else
             {
                 orderedArgs = Ids;
             }
 
-            result = globalFunc.Execute(orderedArgs, manager, Position);
-            return true;
+            // 在解释器模式下，基于运行时参数值解析重载
+            var globalFunc = ResolveOverloadForInterpreter(overloadGroup, orderedArgs, manager);
+            if (globalFunc is not null)
+            {
+                result = globalFunc.Execute(orderedArgs, manager, Position);
+                return true;
+            }
         }
 
         result = null;
@@ -226,5 +240,52 @@ public partial class Instance
             throw new ArgumentError(namedArg.Position,
                 $"命名参数 '{namedArg.Name}' 重复指定");
         }
+    }
+
+    /// <summary>
+    /// 在解释器模式下基于运行时参数值解析重载
+    /// </summary>
+    private IGlobalFunction? ResolveOverloadForInterpreter(OverloadGroup overloadGroup, List<LangExpression> parameters, VariateManager manager)
+    {
+        if (overloadGroup.Overloads.Count == 0)
+            return null;
+
+        // 如果只有一个重载，直接返回
+        if (overloadGroup.Overloads.Count == 1)
+            return overloadGroup.Overloads[0];
+
+        // 先执行参数表达式获取运行时值
+        var paramValues = parameters.Select(p => p.Run(manager)).ToList();
+
+        // 获取参数的 Old8Lang 类型名称
+        var paramTypes = paramValues.Select(v => OverloadResolver.GetRuntimeValueType(v)).ToList();
+
+        // 计算每个重载的匹配分数
+        var candidates = new List<(IGlobalFunction func, int score)>();
+
+        foreach (var overload in overloadGroup.Overloads)
+        {
+            var score = OverloadResolver.CalculateTotalMatchScore(overload, paramTypes);
+            if (score >= 0)
+            {
+                candidates.Add((overload, score));
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            // 没有精确匹配，尝试找一个可以接受参数数量的重载
+            foreach (var overload in overloadGroup.Overloads)
+            {
+                if (OverloadResolver.CanAcceptParameters(overload, paramTypes))
+                {
+                    return overload;
+                }
+            }
+            return null;
+        }
+
+        // 选择分数最高的重载
+        return candidates.OrderByDescending(c => c.score).First().func;
     }
 }
