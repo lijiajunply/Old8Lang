@@ -426,53 +426,8 @@ public partial class Instance : LangValueType
             ValueFunctions.ExecutionContext.SetCurrentManager(manager);
         }
 
-        // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
-        // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
-        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue or ThreadLangValue or StringLangValue
-            or TupleLangValue or ArrayLangValue or CharLangValue)
-        {
-            type = baseLangValue switch
-            {
-                DictionaryLangValue => typeof(DictionaryValueFuncStatic),
-                ListLangValue => typeof(ListValueFuncStatic),
-                TaskLangValue => typeof(TaskValueFuncStatic),
-                ThreadLangValue => typeof(ThreadValueFuncStatic),
-                StringLangValue => typeof(StringValueFuncStatic),
-                TupleLangValue => typeof(TupleValueFuncStatic),
-                ArrayLangValue => typeof(ArrayValueFuncStatic),
-                CharLangValue => typeof(CharValueFuncStatic),
-                _ => null
-            };
-
-            // 根据参数数量查找正确的重载
-            var allMethods = type?.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
-            if (allMethods is { Length: > 0 })
-            {
-                // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是baseLangValue)
-                var expectedParamCount = Ids.Count + 1;
-
-                // 首先查找精确匹配的参数数量
-                // 如果没找到，查找有可选参数的方法
-                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount) ??
-                    allMethods.FirstOrDefault(x =>
-                    {
-                        var parameters = x.GetParameters();
-                        if (parameters.Length < expectedParamCount) return false;
-
-                        // 检查除了第一个参数（baseLangValue）之外，剩余的参数是否都是可选的
-                        for (int i = expectedParamCount; i < parameters.Length; i++)
-                        {
-                            if (!parameters[i].IsOptional && !parameters[i].HasDefaultValue)
-                                return false;
-                        }
-
-                        return true;
-                    });
-
-                // 如果还是没找到，使用第一个方法
-                m ??= allMethods[0];
-            }
-        }
+        // Old8Lang 类型的实例方法已经通过 InstanceMethods 系统处理
+        // 这里不再需要旧的 ValueFunctions 回退逻辑
 
         // 如果没有找到扩展方法，尝试在类型本身上查找
         if (m is null)

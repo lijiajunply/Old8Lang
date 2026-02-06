@@ -27,7 +27,8 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(Select-String -Pattern \"===\")",
-      "Bash(Select-Object -Last 50)"
+      "Bash(Select-Object -Last 50)",
+      "Bash(git rm:*)"
     ]
   }
 }

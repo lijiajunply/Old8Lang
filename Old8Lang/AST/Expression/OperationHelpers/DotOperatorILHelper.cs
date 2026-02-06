@@ -642,30 +642,10 @@ public static class DotOperatorILHelper
             {
                 extensionType = typeof(PrimitiveExtensions);
             }
-            // Old8Lang 类型的扩展方法
-            else if (leftType == typeof(StringLangValue))
-            {
-                extensionType = typeof(StringValueFuncStatic);
-            }
-            else if (leftType == typeof(ArrayLangValue))
-            {
-                extensionType = typeof(ArrayValueFuncStatic);
-            }
-            else if (leftType == typeof(ListLangValue))
-            {
-                extensionType = typeof(ListValueFuncStatic);
-            }
-            else if (leftType == typeof(DictionaryLangValue))
-            {
-                extensionType = typeof(DictionaryValueFuncStatic);
-            }
+            // Old8Lang 类型已经通过 InstanceMethods 系统处理，不需要在这里处理
             else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
             {
                 extensionType = typeof(ValueFunctions.TupleExtensions);
-            }
-            else if (leftType == typeof(TupleLangValue))
-            {
-                extensionType = typeof(TupleValueFuncStatic);
             }
 
             if (extensionType != null)

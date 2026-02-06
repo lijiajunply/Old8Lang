@@ -23,17 +23,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/OverloadResolver.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/OverloadExample.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_overload_typesystem.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_string_add_debug.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/BytecodeObjectInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/BytecodeObjectInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROGRESS_INSTANCE_METHODS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/StringValueFuncStaticTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/DictionaryLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TaskValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ThreadValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TupleValueFuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +77,6 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
@@ -585,7 +587,7 @@
       <workItem from="1770170083234" duration="29222000" />
       <workItem from="1770222792162" duration="713000" />
       <workItem from="1770286042546" duration="4023000" />
-      <workItem from="1770342249898" duration="2243000" />
+      <workItem from="1770342249898" duration="3440000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -930,7 +932,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="891" />
+    <option name="localTasksCounter" value="892" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -957,7 +959,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入新东西" />
     <MESSAGE value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
     <MESSAGE value="feat(lang): 扩展ILangList通用方法系统为Tuple和Array添加查询访问功能&#10;&#10;- 新增LangListFirstMethod、LangListFirstOrDefaultMethod、LangListLastMethod等9个通用方法实现&#10;- 为Array类型创建ArrayGenericWrappers包装类，添加13个方法支持&#10;- 为Tuple类型创建TupleGenericWrappers包装类，添加9个方法支持&#10;- 更新InstanceMethodInitializer注册所有新方法到系统中&#10;- 扩展ArrayLangValue的knownMethods数组包含新方法名&#10;- 创建GENERIC_METHODS_MIGRATION_PLAN和PROGRESS文档跟踪开发进度&#10;- 实现First、Last、Skip、Take、Find、Concat、IndexOf、Distinct等核心查询方法" />
     <MESSAGE value="feat(array): 为Array和Tuple添加聚合和迭代方法&#10;&#10;- 添加Sum、Average、Min、Max、Reduce聚合方法&#10;- 添加ForEach、Join迭代方法&#10;- 在ArrayLangValue中注册新方法名&#10;- 为Array和Tuple创建对应的包装类&#10;- 更新实例方法初始化器注册新方法&#10;- 添加详细的测试文件验证所有功能&#10;- 生成完整的实现总结文档" />
@@ -982,7 +983,8 @@
     <MESSAGE value="feat(instance-methods): 添加数组Count方法和字典GetValue方法&#10;&#10;- 实现ArrayCountMethod提供数组长度获取功能，与Length方法等效&#10;- 添加DictGetValueMethod支持根据键获取字典中的值&#10;- 在InstanceMethodInitializer中注册新方法并更新统计计数&#10;- 修正CollectionMethodsTests中的断言类型以匹配实际返回值&#10;- 更新IDE工作空间配置和提交历史记录" />
     <MESSAGE value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
     <MESSAGE value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
+    <MESSAGE value="feat(functions): 实现全局函数重载系统和优化字节码序列化&#10;&#10;- 实现函数重载解析机制，支持基于运行时参数值的动态重载选择&#10;- 添加 OverloadResolver 辅助类处理 Old8Lang 类型系统的类型匹配&#10;- 重构 BytecodeObjectInstance 使用主构造函数简化对象创建&#10;- 优化 FunctionMetadata 序列化写入空值处理逻辑&#10;- 在解释器和虚拟机模式下分别实现实时重载解析功能&#10;- 添加重载函数示例实现包括 AddInt、AddDouble、AddString 等版本&#10;- 移除实例方法迁移进度跟踪文档(PROGRESS_INSTANCE_METHODS.md)&#10;- 修复 TypeChecker 中函数类型字符串格式化转义问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(functions): 实现全局函数重载系统和优化字节码序列化&#10;&#10;- 实现函数重载解析机制，支持基于运行时参数值的动态重载选择&#10;- 添加 OverloadResolver 辅助类处理 Old8Lang 类型系统的类型匹配&#10;- 重构 BytecodeObjectInstance 使用主构造函数简化对象创建&#10;- 优化 FunctionMetadata 序列化写入空值处理逻辑&#10;- 在解释器和虚拟机模式下分别实现实时重载解析功能&#10;- 添加重载函数示例实现包括 AddInt、AddDouble、AddString 等版本&#10;- 移除实例方法迁移进度跟踪文档(PROGRESS_INSTANCE_METHODS.md)&#10;- 修复 TypeChecker 中函数类型字符串格式化转义问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

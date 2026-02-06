@@ -225,18 +225,17 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
             // 加载键
             Key.LoadIlValue(ilGenerator, local);
 
-            // 调用 DictionaryValueFuncStatic.GetValue 方法
-            // 这是一个扩展方法，第一个参数是 DictionaryLangValue，第二个参数是 LangValueType
-            var getValueMethod = typeof(DictionaryValueFuncStatic).GetMethod("GetValue",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            // 调用 DictionaryLangValue.Get 方法
+            var getMethod = typeof(DictionaryLangValue).GetMethod("Get",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
-            if (getValueMethod != null)
+            if (getMethod != null)
             {
-                ilGenerator.Emit(OpCodes.Call, getValueMethod);
+                ilGenerator.Emit(OpCodes.Callvirt, getMethod);
             }
             else
             {
-                throw new InvalidOperationError(this, "无法找到 DictionaryValueFuncStatic.GetValue 方法");
+                throw new InvalidOperationError(this, "无法找到 DictionaryLangValue.Get 方法");
             }
         }
         else

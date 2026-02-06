@@ -128,39 +128,7 @@ public partial class VirtualMachine
         {
             extensionType = typeof(PrimitiveExtensions);
         }
-        // 对于 Old8Lang 类型，查找对应的扩展方法类
-        else if (obj is DictionaryLangValue)
-        {
-            extensionType = typeof(DictionaryValueFuncStatic);
-        }
-        else if (obj is ListLangValue)
-        {
-            extensionType = typeof(ListValueFuncStatic);
-        }
-        else if (obj is TaskLangValue)
-        {
-            extensionType = typeof(TaskValueFuncStatic);
-        }
-        else if (obj is ThreadLangValue)
-        {
-            extensionType = typeof(ThreadValueFuncStatic);
-        }
-        else if (obj is StringLangValue)
-        {
-            extensionType = typeof(StringValueFuncStatic);
-        }
-        else if (obj is TupleLangValue)
-        {
-            extensionType = typeof(TupleValueFuncStatic);
-        }
-        else if (obj is ArrayLangValue)
-        {
-            extensionType = typeof(ArrayValueFuncStatic);
-        }
-        else if (obj is CharLangValue)
-        {
-            extensionType = typeof(CharValueFuncStatic);
-        }
+        // Old8Lang 类型已经通过 InstanceMethods 系统处理，不需要在这里处理
 
         // 如果找到扩展类型，尝试查找扩展方法
         if (extensionType != null)
