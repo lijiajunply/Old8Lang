@@ -1,5 +1,4 @@
 using Old8Lang.DatabaseLib;
-using Old8Lang.FirstUI;
 using Old8Lang.MachineLearningLib;
 using Old8Lang.NetLib;
 using Old8Lang.SerializationLib;
@@ -119,7 +118,7 @@ public static class StandardLibraryRegistry
             )
         ),
 
-        ["FirstUI"] = StandardLibraryInfo.FromAssembly(assembly: new FirstUIApplication().GetType().Assembly)
+        // ["FirstUI"] = StandardLibraryInfo.FromAssembly(assembly: new FirstUIApplication().GetType().Assembly)
     };
 
     /// <summary>
