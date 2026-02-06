@@ -132,6 +132,12 @@ public static class GlobalFunctionInitializer
             registry.Register(new GetMethodInfoFunction());
             registry.Register(new GetFieldInfoFunction());
 
+            // 注册反射函数 - 类型反射
+            registry.Register(new GetTypeFunction());
+            registry.Register(new GetAllTypesFunction());
+            registry.Register(new TypeOfFunction());
+            registry.Register(new GetTypeInfoFunction());
+
             // 注册反射函数 - 函数信息查询
             registry.Register(new GetFunctionInfoFunction());
 

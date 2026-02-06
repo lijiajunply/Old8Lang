@@ -88,6 +88,22 @@ public class MethodTable
     }
 
     /// <summary>
+    /// 获取所有方法名列表
+    /// </summary>
+    public List<string> GetAllMethodNames()
+    {
+        return _methodMap.Keys.ToList();
+    }
+
+    /// <summary>
+    /// 查找单个方法（用于反射）
+    /// </summary>
+    public LangMethodInfo? FindMethod(string methodName)
+    {
+        return LookupSingleMethod(methodName);
+    }
+
+    /// <summary>
     /// 合并另一个方法表（用于继承）
     /// </summary>
     /// <param name="parentTable">父类的方法表</param>

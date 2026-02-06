@@ -707,6 +707,53 @@ public partial class TypeTemplate(
             return TypeRegistry.ContainsKey(className);
         }
     }
+
+    /// <summary>
+    /// 获取所有已注册类型名列表
+    /// </summary>
+    /// <returns>类型名列表</returns>
+    public static List<string> GetAllRegisteredTypes()
+    {
+        lock (RegistryLock)
+        {
+            return TypeRegistry.Keys.ToList();
+        }
+    }
+
+    /// <summary>
+    /// 获取所有 TypeTemplate 对象
+    /// </summary>
+    /// <returns>TypeTemplate 列表</returns>
+    public static List<TypeTemplate> GetAllTypeTemplates()
+    {
+        lock (RegistryLock)
+        {
+            return TypeRegistry.Values.ToList();
+        }
+    }
+
+    /// <summary>
+    /// 获取已注册类型数量
+    /// </summary>
+    /// <returns>类型数量</returns>
+    public static int GetTypeCount()
+    {
+        lock (RegistryLock)
+        {
+            return TypeRegistry.Count;
+        }
+    }
+
+    /// <summary>
+    /// 清除注册表（用于测试）
+    /// </summary>
+    public static void ClearRegistry()
+    {
+        lock (RegistryLock)
+        {
+            TypeRegistry.Clear();
+        }
+    }
 }
 
 /// <summary>

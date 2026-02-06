@@ -119,4 +119,100 @@ public static class VMReflectionHelper
             ("isPrivate", field.AccessModifier == AccessModifier.Private)
         };
     }
+
+    /// <summary>
+    /// 获取所有已注册的类名
+    /// </summary>
+    public static List<string> GetAllClassNames(VirtualMachine vm)
+    {
+        var classNames = new List<string>();
+
+        // 遍历全局变量，查找所有 ClassMetadata
+        var globals = vm.GetAllGlobalVariables();
+        foreach (var (name, value) in globals)
+        {
+            if (value is ClassMetadata)
+            {
+                classNames.Add(name);
+            }
+        }
+
+        return classNames;
+    }
+
+    /// <summary>
+    /// 获取类型的详细信息
+    /// </summary>
+    public static Dictionary<string, object?> GetTypeInfo(VirtualMachine vm, string className)
+    {
+        var classMetadata = GetClassMetadata(vm, className);
+        if (classMetadata == null)
+        {
+            throw new InvalidOperationException($"找不到类型: {className}");
+        }
+
+        var info = new Dictionary<string, object?>
+        {
+            ["name"] = classMetadata.Name,
+            ["isInterface"] = classMetadata.IsInterface,
+            ["isAbstract"] = classMetadata.IsAbstract,
+            ["isMixin"] = classMetadata.IsMixin,
+            ["baseClass"] = classMetadata.BaseClassName,
+            ["interfaces"] = classMetadata.InterfaceNames,
+            ["mixins"] = classMetadata.Mixins,
+            ["methods"] = GetAllMethodNames(classMetadata),
+            ["fields"] = GetAllFieldNames(classMetadata),
+            ["isGeneric"] = false // VM 模式下暂不支持泛型标记
+        };
+
+        return info;
+    }
+
+    /// <summary>
+    /// 检查类型兼容性（是否可以从 sourceType 赋值给 targetType）
+    /// </summary>
+    public static bool IsAssignableFrom(VirtualMachine vm, string targetTypeName, string sourceTypeName)
+    {
+        // 同一类型
+        if (targetTypeName == sourceTypeName)
+            return true;
+
+        var sourceMetadata = GetClassMetadata(vm, sourceTypeName);
+        if (sourceMetadata == null)
+            return false;
+
+        // 检查父类链
+        var currentParent = sourceMetadata.BaseClassName;
+        while (currentParent != null)
+        {
+            if (currentParent == targetTypeName)
+                return true;
+
+            var parentMetadata = GetClassMetadata(vm, currentParent);
+            if (parentMetadata == null)
+                break;
+
+            currentParent = parentMetadata.BaseClassName;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 获取父类型名
+    /// </summary>
+    public static string? GetBaseType(VirtualMachine vm, string className)
+    {
+        var classMetadata = GetClassMetadata(vm, className);
+        return classMetadata?.BaseClassName;
+    }
+
+    /// <summary>
+    /// 获取实现的接口列表（VM 模式下暂不支持）
+    /// </summary>
+    public static List<string> GetInterfaces(VirtualMachine vm, string className)
+    {
+        // VM 模式下暂不支持接口，返回空列表
+        return new List<string>();
+    }
 }

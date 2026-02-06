@@ -126,6 +126,14 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 获取所有全局变量
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, object?>> GetAllGlobalVariables()
+    {
+        return _globals;
+    }
+
+    /// <summary>
     /// 从常量池获取常量
     /// </summary>
     public object? GetConstant(int index)

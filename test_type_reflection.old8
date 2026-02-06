@@ -1,0 +1,98 @@
+// Old8Lang 反射系统与 TypeLangValue 集成测试脚本
+
+// 定义测试类
+class Animal {
+    public species <- "unknown"
+
+    public func makeSound() {
+        return "Some sound"
+    }
+}
+
+interface IDrawable {
+    public func draw()
+}
+
+class Dog extends Animal implements IDrawable {
+    public breed <- "unknown"
+
+    public func init(b) {
+        breed <- b
+    }
+
+    public func bark() {
+        return "Woof!"
+    }
+
+    public func draw() {
+        return "Drawing a dog"
+    }
+}
+
+// 测试 1: GetType 函数
+printLine("=== 测试 1: GetType 函数 ===")
+dogType <- GetType("Dog")
+printLine("Dog 类型: " + dogType.Value)
+
+// 测试 2: GetAllTypes 函数
+printLine("\n=== 测试 2: GetAllTypes 函数 ===")
+allTypes <- GetAllTypes()
+printLine("已注册类型数量: " + Len(allTypes))
+
+// 测试 3: TypeOf 函数
+printLine("\n=== 测试 3: TypeOf 函数 ===")
+myDog <- Dog("Golden Retriever")
+myDogType <- TypeOf(myDog)
+printLine("myDog 的类型: " + myDogType.Value)
+
+// 测试 4: TypeLangValue.GetMethodNames
+printLine("\n=== 测试 4: 获取类型的方法列表 ===")
+methods <- dogType.GetMethodNames()
+printLine("Dog 类的方法:")
+for method in methods {
+    printLine("  - " + method)
+}
+
+// 测试 5: TypeLangValue.GetFieldNames
+printLine("\n=== 测试 5: 获取类型的字段列表 ===")
+fields <- dogType.GetFieldNames()
+printLine("Dog 类的字段:")
+for field in fields {
+    printLine("  - " + field)
+}
+
+// 测试 6: TypeLangValue.GetBaseType
+printLine("\n=== 测试 6: 获取父类型 ===")
+baseType <- dogType.GetBaseType()
+if baseType != null {
+    printLine("Dog 的父类: " + baseType.Value)
+} else {
+    printLine("Dog 没有父类")
+}
+
+// 测试 7: TypeLangValue.GetInterfaces
+printLine("\n=== 测试 7: 获取实现的接口 ===")
+interfaces <- dogType.GetInterfaces()
+printLine("Dog 实现的接口:")
+for iface in interfaces {
+    printLine("  - " + iface.Value)
+}
+
+// 测试 8: TypeLangValue.IsAssignableFrom
+printLine("\n=== 测试 8: 类型兼容性检查 ===")
+animalType <- GetType("Animal")
+isCompatible <- animalType.IsAssignableFrom(dogType)
+printLine("Dog 可以赋值给 Animal: " + isCompatible)
+
+// 测试 9: TypeLangValue.IsClass
+printLine("\n=== 测试 9: 类型属性检查 ===")
+printLine("Dog 是类: " + dogType.IsClass())
+drawableType <- GetType("IDrawable")
+printLine("IDrawable 是接口: " + drawableType.IsInterface())
+
+// 测试 10: GetTypeInfo 函数
+printLine("\n=== 测试 10: GetTypeInfo 函数 ===")
+dogInfo <- GetTypeInfo("Dog")
+printLine("Dog 类型信息已获取（字典类型）")
+
+printLine("\n=== 所有测试完成 ===")

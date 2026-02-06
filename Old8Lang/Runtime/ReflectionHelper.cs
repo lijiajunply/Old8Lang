@@ -276,6 +276,124 @@ public static class ReflectionHelper
     }
 
     /// <summary>
+    /// 从类型名获取 TypeLangValue
+    /// </summary>
+    public static TypeLangValue GetType(string typeName)
+    {
+        var template = TypeTemplate.FindType(typeName);
+        if (template is null)
+        {
+            throw new InvalidOperationException($"找不到类型: {typeName}");
+        }
+        return new TypeLangValue(template);
+    }
+
+    /// <summary>
+    /// 获取所有已注册类型
+    /// </summary>
+    public static ListLangValue GetAllTypes()
+    {
+        var typeNames = TypeTemplate.GetAllRegisteredTypes();
+        var typeValues = typeNames
+            .Select(name => new TypeLangValue(name))
+            .Cast<LangValueType>()
+            .ToList();
+        return new ListLangValue(typeValues);
+    }
+
+    /// <summary>
+    /// 从对象获取类型
+    /// </summary>
+    public static TypeLangValue TypeOf(object obj)
+    {
+        if (obj is not AnyLangValue anyValue)
+        {
+            throw new InvalidOperationException("对象不是类实例");
+        }
+
+        var className = anyValue.ClassId.IdName;
+        var template = TypeTemplate.FindType(className);
+
+        if (template is null)
+        {
+            throw new InvalidOperationException($"找不到类型: {className}");
+        }
+
+        return new TypeLangValue(template);
+    }
+
+    /// <summary>
+    /// 获取类型的详细信息
+    /// </summary>
+    public static DictionaryLangValue GetTypeInfo(string typeName)
+    {
+        var template = TypeTemplate.FindType(typeName);
+        if (template is null)
+        {
+            throw new InvalidOperationException($"找不到类型: {typeName}");
+        }
+
+        // 需要一个 VariateManager 来构建元数据
+        // 在编译器模式下，我们需要从当前上下文获取
+        // 这里暂时创建一个临时的 manager
+        var manager = new VariateManager();
+        var metadata = template.BuildMetadata(manager);
+
+        var tuples = new List<TupleLangValue>
+        {
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(metadata.ClassName)]),
+            new TupleLangValue([new StringLangValue("isInterface"), new BoolLangValue(metadata.IsInterface)]),
+            new TupleLangValue([new StringLangValue("isAbstract"), new BoolLangValue(metadata.IsAbstract)]),
+            new TupleLangValue([new StringLangValue("isMixin"), new BoolLangValue(metadata.IsMixin)]),
+            new TupleLangValue([
+                new StringLangValue("baseClass"),
+                metadata.ParentClassName is not null
+                    ? new StringLangValue(metadata.ParentClassName)
+                    : new NullLangValue()
+            ]),
+            new TupleLangValue([
+                new StringLangValue("interfaces"),
+                new ListLangValue(
+                    metadata.InterfaceNames
+                        .Select(name => new StringLangValue(name))
+                        .Cast<LangValueType>()
+                        .ToList()
+                )
+            ]),
+            new TupleLangValue([
+                new StringLangValue("mixins"),
+                new ListLangValue(
+                    metadata.MixinNames
+                        .Select(name => new StringLangValue(name))
+                        .Cast<LangValueType>()
+                        .ToList()
+                )
+            ]),
+            new TupleLangValue([
+                new StringLangValue("methods"),
+                new ListLangValue(
+                    metadata.MethodTable.GetAllMethodNames()
+                        .Select(name => new StringLangValue(name))
+                        .Cast<LangValueType>()
+                        .ToList()
+                )
+            ]),
+            new TupleLangValue([
+                new StringLangValue("fields"),
+                new ListLangValue(
+                    metadata.FieldTable.GetAllFieldNames()
+                        .Select(name => new StringLangValue(name))
+                        .Cast<LangValueType>()
+                        .ToList()
+                )
+            ]),
+            new TupleLangValue([new StringLangValue("isGeneric"), new BoolLangValue(template.IsGeneric)])
+        };
+
+        return new DictionaryLangValue(tuples);
+    }
+
+    /// <summary>
     /// 创建全局函数信息
     /// </summary>
     private static object CreateGlobalFunctionInfo(IGlobalFunction func)

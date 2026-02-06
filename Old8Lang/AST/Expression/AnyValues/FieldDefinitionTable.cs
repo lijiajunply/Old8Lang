@@ -51,6 +51,22 @@ public class FieldDefinitionTable
     }
 
     /// <summary>
+    /// 获取所有字段名列表
+    /// </summary>
+    public List<string> GetAllFieldNames()
+    {
+        return _fieldMap.Keys.ToList();
+    }
+
+    /// <summary>
+    /// 查找字段（用于反射）
+    /// </summary>
+    public FieldDefinition? FindField(string fieldName)
+    {
+        return LookupField(fieldName);
+    }
+
+    /// <summary>
     /// 合并另一个字段定义表（用于继承）
     /// </summary>
     /// <param name="parentTable">父类的字段定义表</param>
