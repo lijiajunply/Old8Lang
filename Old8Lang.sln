@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.LanguageServer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.DatabaseLib", "Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj", "{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.FirstUI", "Old8Lang.FirstUI\Old8Lang.FirstUI.csproj", "{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirstUI", "FirstUI\FirstUI.csproj", "{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirstUI.TestApp", "FirstUI.TestApp\FirstUI.TestApp.csproj", "{BE07DC5A-5B9B-42D4-BA45-B507A58D6B15}"
 EndProject

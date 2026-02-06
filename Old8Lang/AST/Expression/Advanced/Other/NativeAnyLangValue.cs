@@ -184,7 +184,7 @@ public class NativeAnyLangValue : ImportInfo
 
         var assembly = Assembly.LoadFile(_path);
 
-        // ClassName 可能是简单类名（如 "Container"）或完整类型名（如 "Old8Lang.FirstUI.Layout.Container"）
+        // ClassName 可能是简单类名（如 "Container"）或完整类型名（如 "FirstUI.Layout.Container"）
         // 先尝试使用 ClassName 直接获取类型
         ClassType = assembly.GetType(ClassName);
 

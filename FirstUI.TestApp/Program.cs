@@ -1,8 +1,8 @@
-using Old8Lang.FirstUI;
-using Old8Lang.FirstUI.Basic;
-using Old8Lang.FirstUI.Core;
-using Old8Lang.FirstUI.Layout;
-using Old8Lang.FirstUI.State.Reactive;
+using FirstUI;
+using FirstUI.Basic;
+using FirstUI.Core;
+using FirstUI.Layout;
+using FirstUI.State.Reactive;
 
 var app = FirstUIBinding.CreateApp();
 

@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Old8Lang.FirstUI\Old8Lang.FirstUI.csproj" />
+      <ProjectReference Include="..\FirstUI\FirstUI.csproj" />
     </ItemGroup>
 
 </Project>
