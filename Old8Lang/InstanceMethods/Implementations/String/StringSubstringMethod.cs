@@ -20,6 +20,21 @@ public class StringSubstringMethod : BaseInstanceMethod
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 2;
 
+    /// <summary>
+    /// 参数类型：start 和 length 都必须是 int
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(IntLangValue), typeof(IntLangValue)];
+
+    /// <summary>
+    /// 返回类型：string
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(StringLangValue);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "获取从指定位置开始、指定长度的子字符串";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

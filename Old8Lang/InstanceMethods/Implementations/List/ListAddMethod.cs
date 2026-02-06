@@ -19,6 +19,21 @@ public class ListAddMethod : BaseInstanceMethod
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
+    /// <summary>
+    /// 参数类型：item 可以是任意类型
+    /// </summary>
+    public override Type?[]? ParameterTypes => [null]; // null 表示接受任意类型
+
+    /// <summary>
+    /// 返回类型：返回添加的元素
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "向列表中添加一个元素";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

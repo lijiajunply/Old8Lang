@@ -21,9 +21,15 @@ public partial class Instance
         // 确保实例方法系统已初始化
         InstanceMethodInitializer.EnsureInitialized();
 
-        // 查找实例方法
+        // 查找实例方法（使用重载解析）
         var instanceType = instance.GetType();
-        var method = InstanceMethodRegistry.Instance.TryGetMethod(instanceType, Id.IdName);
+
+        // 先尝试不使用重载解析（向后兼容）
+        var method = InstanceMethodRegistry.Instance.ResolveMethod(
+            instanceType,
+            Id.IdName,
+            Ids,
+            null); // 解释模式下没有 LocalManager
 
         if (method == null)
         {
@@ -81,8 +87,12 @@ public partial class Instance
             return false;
         }
 
-        // 查找实例方法
-        var method = InstanceMethodRegistry.Instance.TryGetMethod(instanceType, Id.IdName);
+        // 查找实例方法（使用重载解析）
+        var method = InstanceMethodRegistry.Instance.ResolveMethod(
+            instanceType,
+            Id.IdName,
+            Ids,
+            local); // 编译模式下使用 LocalManager 进行类型推断
 
         if (method == null)
         {

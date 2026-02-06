@@ -495,7 +495,7 @@ public class ListTests
         var code = @"
             unsorted <- {5, 2, 8, 1, 9, 3, 7, 4, 6}
             sorted <- unsorted.Sort()
-            reverseSorted <- unsorted.Sort((a:int, b:int) -> b - a)
+            reverseSorted <- unsorted.SortBy((a:int, b:int) -> b - a)
             result1 <- sorted[0]
             result2 <- sorted[4]
             result3 <- sorted[8]

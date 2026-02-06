@@ -20,6 +20,21 @@ public class StringSubstringOneParamMethod : BaseInstanceMethod
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
+    /// <summary>
+    /// 参数类型：start 必须是 int
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(IntLangValue)];
+
+    /// <summary>
+    /// 返回类型：string
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(StringLangValue);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "从指定位置开始获取子字符串到末尾";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

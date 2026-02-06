@@ -38,6 +38,38 @@ public interface IInstanceMethod
     int MaxParameterCount { get; }
 
     /// <summary>
+    /// 参数类型列表（用于重载解析）
+    /// null 表示接受任意类型（向后兼容）
+    /// </summary>
+    Type?[]? ParameterTypes { get; }
+
+    /// <summary>
+    /// 声明的返回类型（用于 IDE 显示）
+    /// </summary>
+    Type? DeclaredReturnType { get; }
+
+    /// <summary>
+    /// 方法文档说明
+    /// </summary>
+    string? Documentation { get; }
+
+    /// <summary>
+    /// 检查是否可以接受给定参数
+    /// </summary>
+    /// <param name="parameters">参数表达式列表</param>
+    /// <param name="local">局部变量管理器（可选）</param>
+    /// <returns>如果可以接受返回 true，否则返回 false</returns>
+    bool CanAccept(List<LangExpression> parameters, LocalManager? local);
+
+    /// <summary>
+    /// 计算匹配分数（-1表示不匹配）
+    /// </summary>
+    /// <param name="parameters">参数表达式列表</param>
+    /// <param name="local">局部变量管理器（可选）</param>
+    /// <returns>匹配分数，-1 表示不匹配</returns>
+    int CalculateMatchScore(List<LangExpression> parameters, LocalManager? local);
+
+    /// <summary>
     /// 解释器模式执行
     /// </summary>
     /// <param name="instance">实例对象</param>

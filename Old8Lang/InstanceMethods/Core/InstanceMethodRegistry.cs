@@ -1,3 +1,7 @@
+using Old8Lang.AST;
+using Old8Lang.AST.Expression;
+using Old8Lang.Compiler.CodeGeneration;
+
 namespace Old8Lang.InstanceMethods.Core;
 
 /// <summary>
@@ -14,10 +18,10 @@ public sealed class InstanceMethodRegistry
     public static InstanceMethodRegistry Instance => _instance.Value;
 
     /// <summary>
-    /// 按类型组织的方法映射：Type -> (MethodName -> IInstanceMethod)
+    /// 按类型组织的方法映射：Type -> (MethodName -> InstanceMethodOverloadGroup)
     /// 方法名称不区分大小写
     /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, IInstanceMethod>> _methodsByType = new();
+    private readonly Dictionary<Type, Dictionary<string, InstanceMethodOverloadGroup>> _methodsByType = new();
 
     /// <summary>
     /// 注册锁，确保线程安全
@@ -43,20 +47,22 @@ public sealed class InstanceMethodRegistry
             // 获取或创建该类型的方法字典
             if (!_methodsByType.TryGetValue(method.TargetType, out var methodDict))
             {
-                methodDict = new Dictionary<string, IInstanceMethod>(StringComparer.OrdinalIgnoreCase);
+                methodDict = new Dictionary<string, InstanceMethodOverloadGroup>(StringComparer.OrdinalIgnoreCase);
                 _methodsByType[method.TargetType] = methodDict;
             }
 
-            // 检查是否已经注册过这个方法对象
-            if (methodDict.Values.Distinct().Any(existingMethod => ReferenceEquals(existingMethod, method)))
-            {
-                return;
-            }
-
-            // 注册所有别名
+            // 为每个别名注册方法
             foreach (var name in method.Names)
             {
-                methodDict[name] = method;
+                // 获取或创建重载组
+                if (!methodDict.TryGetValue(name, out var overloadGroup))
+                {
+                    overloadGroup = new InstanceMethodOverloadGroup(name, method.TargetType);
+                    methodDict[name] = overloadGroup;
+                }
+
+                // 添加到重载组
+                overloadGroup.AddOverload(method);
             }
         }
     }
@@ -74,21 +80,33 @@ public sealed class InstanceMethodRegistry
     }
 
     /// <summary>
-    /// 查找实例方法（支持继承查找）
+    /// 查找实例方法（支持继承查找）- 向后兼容方法，返回第一个重载
     /// </summary>
     /// <param name="instanceType">实例类型</param>
     /// <param name="methodName">方法名称</param>
     /// <returns>找到的方法，如果不存在返回 null</returns>
     public IInstanceMethod? TryGetMethod(Type instanceType, string methodName)
     {
+        var overloadGroup = GetOverloadGroup(instanceType, methodName);
+        return overloadGroup?.GetAllOverloads().FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 获取重载组（支持继承查找）
+    /// </summary>
+    /// <param name="instanceType">实例类型</param>
+    /// <param name="methodName">方法名称</param>
+    /// <returns>找到的重载组，如果不存在返回 null</returns>
+    public InstanceMethodOverloadGroup? GetOverloadGroup(Type instanceType, string methodName)
+    {
         lock (_registerLock)
         {
             // 1. 首先尝试精确匹配
             if (_methodsByType.TryGetValue(instanceType, out var methodDict))
             {
-                if (methodDict.TryGetValue(methodName, out var method))
+                if (methodDict.TryGetValue(methodName, out var overloadGroup))
                 {
-                    return method;
+                    return overloadGroup;
                 }
             }
 
@@ -100,15 +118,30 @@ public sealed class InstanceMethodRegistry
                 // 检查 instanceType 是否是 registeredType 的子类或实现
                 if (registeredType.IsAssignableFrom(instanceType))
                 {
-                    if (kvp.Value.TryGetValue(methodName, out var method))
+                    if (kvp.Value.TryGetValue(methodName, out var overloadGroup))
                     {
-                        return method;
+                        return overloadGroup;
                     }
                 }
             }
 
             return null;
         }
+    }
+
+    /// <summary>
+    /// 解析最匹配的重载
+    /// </summary>
+    /// <param name="instanceType">实例类型</param>
+    /// <param name="methodName">方法名称</param>
+    /// <param name="parameters">参数表达式列表</param>
+    /// <param name="local">局部变量管理器（可选）</param>
+    /// <returns>最匹配的方法，如果没有匹配返回 null</returns>
+    public IInstanceMethod? ResolveMethod(Type instanceType, string methodName,
+        List<LangExpression> parameters, LocalManager? local)
+    {
+        var overloadGroup = GetOverloadGroup(instanceType, methodName);
+        return overloadGroup?.ResolveOverload(parameters, local);
     }
 
     /// <summary>
@@ -189,16 +222,13 @@ public sealed class InstanceMethodRegistry
                 return false;
             }
 
-            if (!methodDict.TryGetValue(methodName, out var method))
+            if (!methodDict.TryGetValue(methodName, out var overloadGroup))
             {
                 return false;
             }
 
-            // 移除该方法的所有别名
-            foreach (var alias in method.Names)
-            {
-                methodDict.Remove(alias);
-            }
+            // 移除重载组
+            methodDict.Remove(methodName);
 
             // 如果该类型没有方法了，移除类型条目
             if (methodDict.Count == 0)
@@ -221,9 +251,12 @@ public sealed class InstanceMethodRegistry
             var uniqueMethods = new HashSet<IInstanceMethod>();
             foreach (var methodDict in _methodsByType.Values)
             {
-                foreach (var method in methodDict.Values)
+                foreach (var overloadGroup in methodDict.Values)
                 {
-                    uniqueMethods.Add(method);
+                    foreach (var method in overloadGroup.GetAllOverloads())
+                    {
+                        uniqueMethods.Add(method);
+                    }
                 }
             }
             return uniqueMethods.Count;

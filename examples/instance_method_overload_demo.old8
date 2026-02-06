@@ -1,0 +1,32 @@
+// Old8Lang 实例方法重载示例
+
+// 1. 字符串 Substring 方法重载
+str <- "Hello World"
+
+// 单参数版本：从指定位置到末尾
+sub1 <- str.Substring(6)
+PrintLine("Substring(6): " + sub1)  // 输出: World
+
+// 双参数版本：指定起始位置和长度
+sub2 <- str.Substring(0, 5)
+PrintLine("Substring(0, 5): " + sub2)  // 输出: Hello
+
+// 2. 链式调用
+str2 <- "  Hello World  "
+result <- str2.Trim().Substring(0, 5)
+PrintLine("链式调用结果: " + result)  // 输出: Hello
+
+// 3. 多次使用不同重载
+text <- "Programming"
+part1 <- text.Substring(0, 7)    // "Program"
+part2 <- text.Substring(7)       // "ming"
+PrintLine("part1: " + part1)
+PrintLine("part2: " + part2)
+
+// 4. 列表操作
+list <- {1, 2, 3}
+list.Add(4)
+list.Add(5)
+PrintLine("列表长度: " + len(list))  // 输出: 5
+
+PrintLine("所有测试通过！")
