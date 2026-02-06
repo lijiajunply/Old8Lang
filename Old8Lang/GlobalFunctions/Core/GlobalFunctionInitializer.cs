@@ -47,12 +47,23 @@ public static class GlobalFunctionInitializer
             // 注册系统函数（从 Instance.cs 迁移）
             registry.Register(new LockFunction());
             registry.Register(new ExecFunction());
-            registry.Register(new JsonFunction());
             registry.Register(new ToObjFunction());
             registry.Register(new CompilerFunction());
             registry.Register(new SpawnFunction());
             registry.Register(new DictFunction());
             registry.Register(new TupleFunction());
+
+            // 注册 JSON 函数
+            registry.Register(new JsonSerializeFunction());
+            registry.Register(new JsonDeserializeFunction());
+            registry.Register(new JsonDeserializeFromFileFunction());
+            registry.Register(new JsonSerializeToFileFunction());
+            registry.Register(new JsonIsValidFunction());
+            registry.Register(new JsonMinifyFunction());
+            registry.Register(new JsonPrettifyFunction());
+            registry.Register(new JsonMergeFunction());
+            registry.Register(new JsonCompareFunction());
+            registry.Register(new JsonGetValueFunction());
 
             // 注册并发函数 - Mutex
             registry.Register(new MutexCreateFunction());
