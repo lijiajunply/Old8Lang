@@ -28,7 +28,8 @@
       "Bash(findstr:*)",
       "Bash(Select-String -Pattern \"===\")",
       "Bash(Select-Object -Last 50)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(dotnet clean:*)"
     ]
   }
 }

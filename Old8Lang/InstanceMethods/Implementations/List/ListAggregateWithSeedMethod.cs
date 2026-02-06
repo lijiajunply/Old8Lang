@@ -13,11 +13,26 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// </summary>
 public class ListAggregateWithSeedMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["AggregateWith", "aggregateWith", "FoldWith", "foldWith"];
+    public override string[] Names => ["Aggregate", "aggregate", "Fold", "fold"];  // 改为与无初始值版本相同的名称
     public override Type TargetType => typeof(ListLangValue);
     public override string[] ParameterNames => ["accumulator", "seed"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
+
+    /// <summary>
+    /// 参数类型：accumulator 必须是函数，seed 可以是任意类型
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue), null];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "对列表元素进行聚合操作（带初始值）";
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)

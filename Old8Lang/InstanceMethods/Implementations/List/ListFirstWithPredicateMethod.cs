@@ -10,15 +10,30 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
-/// List.FirstWithPredicate 方法 - 返回满足条件的第一个元素
+/// List.First(predicate) 方法 - 返回满足条件的第一个元素
 /// </summary>
 public class ListFirstWithPredicateMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["FirstWith", "firstWith", "FirstWhere", "firstWhere"];
+    public override string[] Names => ["First", "first"];  // 改为与无参数版本相同的名称
     public override Type TargetType => typeof(ListLangValue);
     public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
+
+    /// <summary>
+    /// 参数类型：predicate 必须是函数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue)];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "返回满足条件的第一个元素";
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)

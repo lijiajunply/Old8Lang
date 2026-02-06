@@ -69,6 +69,8 @@
 
 为以下方法添加了重载支持的元数据：
 
+**String 方法：**
+
 1. **StringSubstringOneParamMethod**
    - `ParameterTypes`: `[typeof(IntLangValue)]`
    - `DeclaredReturnType`: `typeof(StringLangValue)`
@@ -79,10 +81,47 @@
    - `DeclaredReturnType`: `typeof(StringLangValue)`
    - `Documentation`: "获取从指定位置开始、指定长度的子字符串"
 
+**List 方法：**
+
 3. **ListAddMethod**
    - `ParameterTypes`: `[null]` (接受任意类型)
    - `DeclaredReturnType`: `typeof(LangValueType)`
    - `Documentation`: "向列表中添加一个元素"
+
+4. **LangListFirstMethod** (无参数版本)
+   - `ParameterTypes`: `[]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "获取列表的第一个元素"
+
+5. **ListFirstWithPredicateMethod** (带谓词版本)
+   - `Names`: 改为 `["First", "first"]` (与无参数版本相同)
+   - `ParameterTypes`: `[typeof(FuncLangValue)]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "返回满足条件的第一个元素"
+
+6. **LangListLastMethod** (无参数版本)
+   - `ParameterTypes`: `[]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "获取列表的最后一个元素"
+
+7. **ListLastWithPredicateMethod** (带谓词版本)
+   - `Names`: 改为 `["Last", "last"]` (与无参数版本相同)
+   - `ParameterTypes`: `[typeof(FuncLangValue)]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "返回满足条件的最后一个元素"
+
+8. **ListAggregateMethod** (无初始值版本)
+   - `ParameterTypes`: `[typeof(FuncLangValue)]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "对列表元素进行聚合操作（无初始值）"
+
+9. **ListAggregateWithSeedMethod** (带初始值版本)
+   - `Names`: 改为 `["Aggregate", "aggregate", "Fold", "fold"]` (与无初始值版本相同)
+   - `ParameterTypes`: `[typeof(FuncLangValue), null]`
+   - `DeclaredReturnType`: `typeof(LangValueType)`
+   - `Documentation`: "对列表元素进行聚合操作（带初始值）"
+
+**注意：** SkipWhile/SkipWhileIndexed 和 TakeWhile/TakeWhileIndexed 保持不同的方法名，因为它们都接收相同数量的参数（1个谓词函数），只是谓词函数本身的签名不同（接收1个参数 vs 2个参数）。当前的重载解析系统无法区分函数参数签名的差异，因此保持不同的名称更清晰。
 
 ## 技术亮点
 
@@ -133,6 +172,8 @@ public virtual int CalculateMatchScore(List<LangExpression> parameters, LocalMan
 
 ## 使用示例
 
+### String 方法重载
+
 ```old8
 // 字符串 Substring 方法重载
 str <- "Hello World"
@@ -145,6 +186,26 @@ sub2 <- str.Substring(0, 5)     // "Hello"
 
 // 链式调用
 result <- str.Trim().Substring(0, 5)  // "Hello"
+```
+
+### List 方法重载
+
+```old8
+// First 方法重载
+list <- {1, 2, 3, 4, 5}
+first1 <- list.First()                    // 1 (无参数版本)
+first2 <- list.First((x:int) -> x > 2)    // 3 (带谓词版本)
+
+// Last 方法重载
+last1 <- list.Last()                      // 5 (无参数版本)
+last2 <- list.Last((x:int) -> x < 4)      // 3 (带谓词版本)
+
+// Aggregate 方法重载
+sum1 <- list.Aggregate((acc:int, x:int) -> acc + x)        // 15 (无初始值)
+sum2 <- list.Aggregate((acc:int, x:int) -> acc + x, 10)    // 25 (带初始值)
+
+// 链式调用
+result <- list.Filter((x:int) -> x > 2).First()  // 3
 ```
 
 ## 性能考虑
@@ -183,11 +244,50 @@ result <- str.Trim().Substring(0, 5)  // "Hello"
 
 ### 更新的实例方法
 
+**String 方法：**
 1. `Old8Lang/InstanceMethods/Implementations/String/StringSubstringOneParamMethod.cs`
 2. `Old8Lang/InstanceMethods/Implementations/String/StringSubstringMethod.cs`
+
+**List 方法：**
 3. `Old8Lang/InstanceMethods/Implementations/List/ListAddMethod.cs`
+4. `Old8Lang/InstanceMethods/Implementations/Generic/LangListFirstMethod.cs`
+5. `Old8Lang/InstanceMethods/Implementations/List/ListFirstWithPredicateMethod.cs`
+6. `Old8Lang/InstanceMethods/Implementations/Generic/LangListLastMethod.cs`
+7. `Old8Lang/InstanceMethods/Implementations/List/ListLastWithPredicateMethod.cs`
+8. `Old8Lang/InstanceMethods/Implementations/List/ListAggregateMethod.cs`
+9. `Old8Lang/InstanceMethods/Implementations/List/ListAggregateWithSeedMethod.cs`
+
+### 新增测试文件
+
+1. `Old8Lang.Tests/InstanceMethods/ListMethodOverloadTests.cs` - List 方法重载测试
 
 ## 测试结果
+
+### 单元测试
+```
+已通过! - 失败: 0，通过: 9，已跳过: 0，总计: 9
+```
+
+### 集成测试
+```
+已通过! - 失败: 0，通过: 6，已跳过: 0，总计: 6
+```
+
+### List 方法重载测试
+```
+已通过! - 失败: 0，通过: 9，已跳过: 0，总计: 9
+```
+
+测试覆盖：
+- ✅ First() 无参数版本
+- ✅ First(predicate) 带谓词版本
+- ✅ First() 重载解析
+- ✅ Last() 无参数版本
+- ✅ Last(predicate) 带谓词版本
+- ✅ Last() 重载解析
+- ✅ Aggregate(accumulator) 无初始值版本
+- ✅ Aggregate(accumulator, seed) 带初始值版本
+- ✅ Aggregate() 重载解析
 
 ### 单元测试
 ```
@@ -217,7 +317,31 @@ part2: ming
 1. ✅ 完整的方法重载支持（参数类型匹配、智能分数系统）
 2. ✅ 向后兼容性（现有代码无需修改）
 3. ✅ 双模式支持（解释模式和编译模式）
-4. ✅ 完整的测试覆盖（单元测试和集成测试）
+4. ✅ 完整的测试覆盖（单元测试、集成测试和 List 方法重载测试）
 5. ✅ 实际可用的示例代码
+
+### 已实现的重载方法
+
+**String 方法：**
+- `Substring(start)` / `Substring(start, length)` - 2个重载
+
+**List 方法：**
+- `First()` / `First(predicate)` - 2个重载
+- `Last()` / `Last(predicate)` - 2个重载
+- `Aggregate(accumulator)` / `Aggregate(accumulator, seed)` - 2个重载
+
+**总计：** 3组方法，7个重载版本
+
+### 重载解析模式
+
+成功建立了实例方法重载的标准模式：
+1. 保持两个独立的方法类
+2. 给它们相同的 `Names` 数组
+3. 添加 `ParameterTypes`、`DeclaredReturnType`、`Documentation` 元数据
+4. 让重载解析系统根据参数数量和类型自动选择正确的方法
+
+### 限制说明
+
+对于 SkipWhile/SkipWhileIndexed 和 TakeWhile/TakeWhileIndexed，由于它们都接收相同数量的参数（1个谓词函数），只是谓词函数本身的签名不同（接收1个参数 vs 2个参数），当前的重载解析系统无法区分函数参数签名的差异。因此这些方法保持不同的名称以保持清晰性。
 
 所有核心功能已实现并通过测试，可以投入使用。LSP 集成和文档注释功能可以在未来需要时再添加。

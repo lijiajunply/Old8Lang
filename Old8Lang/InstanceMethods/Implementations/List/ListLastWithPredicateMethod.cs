@@ -14,11 +14,26 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// </summary>
 public class ListLastWithPredicateMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["LastWith", "lastWith", "LastWhere", "lastWhere"];
+    public override string[] Names => ["Last", "last"];  // 改为与无参数版本相同的名称
     public override Type TargetType => typeof(ListLangValue);
     public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
+
+    /// <summary>
+    /// 参数类型：predicate 必须是函数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue)];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "返回满足条件的最后一个元素";
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
