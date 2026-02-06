@@ -23,21 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Reflection/TypeLangValueReflectionTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/GetAllTypesFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/GetTypeFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/GetTypeInfoFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/TypeOfFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_type_reflection.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/TypeLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/TypeLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/GetFunctionInfoFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/GetFunctionInfoFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionFunctions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Reflection/ReflectionInstanceFunctions.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/ReflectionHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Runtime/VMReflectionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Runtime/VMReflectionHelper.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -588,7 +579,7 @@
       <workItem from="1770170083234" duration="29222000" />
       <workItem from="1770222792162" duration="713000" />
       <workItem from="1770286042546" duration="4023000" />
-      <workItem from="1770342249898" duration="7421000" />
+      <workItem from="1770342249898" duration="9846000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -933,7 +924,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="893" />
+    <option name="localTasksCounter" value="894" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -960,7 +951,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 扩展ILangList通用方法系统为Tuple和Array添加查询访问功能&#10;&#10;- 新增LangListFirstMethod、LangListFirstOrDefaultMethod、LangListLastMethod等9个通用方法实现&#10;- 为Array类型创建ArrayGenericWrappers包装类，添加13个方法支持&#10;- 为Tuple类型创建TupleGenericWrappers包装类，添加9个方法支持&#10;- 更新InstanceMethodInitializer注册所有新方法到系统中&#10;- 扩展ArrayLangValue的knownMethods数组包含新方法名&#10;- 创建GENERIC_METHODS_MIGRATION_PLAN和PROGRESS文档跟踪开发进度&#10;- 实现First、Last、Skip、Take、Find、Concat、IndexOf、Distinct等核心查询方法" />
     <MESSAGE value="feat(array): 为Array和Tuple添加聚合和迭代方法&#10;&#10;- 添加Sum、Average、Min、Max、Reduce聚合方法&#10;- 添加ForEach、Join迭代方法&#10;- 在ArrayLangValue中注册新方法名&#10;- 为Array和Tuple创建对应的包装类&#10;- 更新实例方法初始化器注册新方法&#10;- 添加详细的测试文件验证所有功能&#10;- 生成完整的实现总结文档" />
     <MESSAGE value="feat(array): 添加集合操作方法支持&#10;&#10;- 实现了并集(Union)、交集(Intersect)、差集(Except)、拉链(Zip)和分组(GroupBy)方法&#10;- 为ArrayLangValue添加了新的方法名映射&#10;- 在InstanceMethodInitializer中注册了新的数组方法&#10;- 为Tuple类型也添加了相应的集合操作方法包装类&#10;- 创建了通用的LangList集合操作方法基类实现&#10;- 添加了完整的集合操作功能测试文件&#10;- 更新了项目文档记录完整的通用方法系统实现" />
     <MESSAGE value="feat(lang): 添加数组和元组的通用方法实现&#10;&#10;- 实现了 LastOrDefault、ElementAt、Sort、IsSorted 和 ToStr 通用方法&#10;- 为 ArrayLangValue 和 TupleLangValue 添加新方法的包装类&#10;- 更新方法注册器以包含新的通用方法实现&#10;- 添加完整的测试覆盖率和性能优化&#10;- 生成详细的实现报告和文档" />
@@ -985,7 +975,8 @@
     <MESSAGE value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
     <MESSAGE value="feat(functions): 实现全局函数重载系统和优化字节码序列化&#10;&#10;- 实现函数重载解析机制，支持基于运行时参数值的动态重载选择&#10;- 添加 OverloadResolver 辅助类处理 Old8Lang 类型系统的类型匹配&#10;- 重构 BytecodeObjectInstance 使用主构造函数简化对象创建&#10;- 优化 FunctionMetadata 序列化写入空值处理逻辑&#10;- 在解释器和虚拟机模式下分别实现实时重载解析功能&#10;- 添加重载函数示例实现包括 AddInt、AddDouble、AddString 等版本&#10;- 移除实例方法迁移进度跟踪文档(PROGRESS_INSTANCE_METHODS.md)&#10;- 修复 TypeChecker 中函数类型字符串格式化转义问题" />
     <MESSAGE value="refactor(ast): 移除旧的扩展方法实现并更新类型查找逻辑&#10;&#10;- 删除 ArrayExtensions、DictionaryExtensions、ListExtensions、PrimitiveExtensions 和&#10;  StringExtensions 类&#10;- 从 DotOperatorILHelper 中移除对已删除扩展方法类型的查找逻辑&#10;- 从 VirtualMachine.Helpers.ReflectionAndTasks 中移除对原生类型扩展方法的查找逻辑&#10;- 更新 workspace.xml 中的变更列表和工作时间记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 移除旧的扩展方法实现并更新类型查找逻辑&#10;&#10;- 删除 ArrayExtensions、DictionaryExtensions、ListExtensions、PrimitiveExtensions 和&#10;  StringExtensions 类&#10;- 从 DotOperatorILHelper 中移除对已删除扩展方法类型的查找逻辑&#10;- 从 VirtualMachine.Helpers.ReflectionAndTasks 中移除对原生类型扩展方法的查找逻辑&#10;- 更新 workspace.xml 中的变更列表和工作时间记录" />
+    <MESSAGE value="feat(reflection): 添加类型反射功能支持&#10;&#10;- 在 FieldDefinitionTable 中添加 GetAllFieldNames 和 FindField 方法&#10;- 在 MethodTable 中添加 GetAllMethodNames 和 FindMethod 方法&#10;- 实现 GetAllTypesFunction、GetTypeFunction 和 GetTypeInfoFunction 全局函数&#10;- 扩展 TypeLangValue 类支持反射 API 方法和类型属性检查&#10;- 添加 TypeOf 函数和相关反射辅助方法到 ReflectionHelper&#10;- 实现 TypeLangValue 的懒加载类型模板和元数据功能&#10;- 添加完整的类型反射测试用例和示例脚本" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(reflection): 添加类型反射功能支持&#10;&#10;- 在 FieldDefinitionTable 中添加 GetAllFieldNames 和 FindField 方法&#10;- 在 MethodTable 中添加 GetAllMethodNames 和 FindMethod 方法&#10;- 实现 GetAllTypesFunction、GetTypeFunction 和 GetTypeInfoFunction 全局函数&#10;- 扩展 TypeLangValue 类支持反射 API 方法和类型属性检查&#10;- 添加 TypeOf 函数和相关反射辅助方法到 ReflectionHelper&#10;- 实现 TypeLangValue 的懒加载类型模板和元数据功能&#10;- 添加完整的类型反射测试用例和示例脚本" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -278,7 +278,7 @@ public partial class TypeLangValue : LangValueType
                         .Cast<LangValueType>()
                         .ToList()
                 ),
-                "GetBaseType" => (LangValueType)(GetBaseType(manager) ?? (LangValueType)new NullLangValue()),
+                "GetBaseType" => GetBaseType(manager) ?? (LangValueType)new NullLangValue(),
                 "GetInterfaces" => new ListLangValue(
                     GetInterfaces(manager)
                         .Cast<LangValueType>()

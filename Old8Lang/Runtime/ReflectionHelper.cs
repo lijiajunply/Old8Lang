@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Compiler.CodeGeneration;
@@ -18,6 +19,253 @@ namespace Old8Lang.Runtime;
 /// </summary>
 public static class ReflectionHelper
 {
+    /// <summary>
+    /// 获取类的完整信息（合并了 GetClassName, GetClassMethods, GetClassFields）
+    /// </summary>
+    public static object GetClassInfo(object obj)
+    {
+        if (obj is AnyLangValue anyValue)
+        {
+            // 获取所有方法名
+            var methods = anyValue.Metadata.MethodTable.GetAllMethods()
+                .Select(m => new StringLangValue(m.MethodName))
+                .Cast<LangValueType>()
+                .ToList();
+
+            // 获取所有字段名
+            var fields = anyValue.Metadata.FieldTable.GetAllFields()
+                .Select(f => new StringLangValue(f.FieldName))
+                .Cast<LangValueType>()
+                .ToList();
+
+            // 构建完整的类信息字典
+            var tuples = new List<TupleLangValue>
+            {
+                new TupleLangValue([new StringLangValue("className"), new StringLangValue(anyValue.ClassId.IdName)]),
+                new TupleLangValue([new StringLangValue("methods"), new ListLangValue(methods)]),
+                new TupleLangValue([new StringLangValue("fields"), new ListLangValue(fields)]),
+                new TupleLangValue([new StringLangValue("isInterface"), new BoolLangValue(anyValue.Metadata.IsInterface)]),
+                new TupleLangValue([new StringLangValue("isAbstract"), new BoolLangValue(anyValue.Metadata.IsAbstract)]),
+                new TupleLangValue([new StringLangValue("isMixin"), new BoolLangValue(anyValue.Metadata.IsMixin)]),
+                new TupleLangValue([
+                    new StringLangValue("baseClass"),
+                    anyValue.Metadata.ParentClassName is not null
+                        ? new StringLangValue(anyValue.Metadata.ParentClassName)
+                        : new NullLangValue()
+                ]),
+                new TupleLangValue([
+                    new StringLangValue("interfaces"),
+                    new ListLangValue(
+                        anyValue.Metadata.InterfaceNames
+                            .Select(name => new StringLangValue(name))
+                            .Cast<LangValueType>()
+                            .ToList()
+                    )
+                ])
+            };
+
+            return new DictionaryLangValue(tuples);
+        }
+        throw new InvalidOperationException("对象不是类实例");
+    }
+
+    /// <summary>
+    /// 获取成员详细信息（合并了 GetMethodInfo 和 GetFieldInfo）
+    /// </summary>
+    public static object GetMemberInfo(object obj, string memberName)
+    {
+        if (obj is AnyLangValue anyValue)
+        {
+            // 先尝试查找方法
+            var methods = anyValue.Metadata.MethodTable.LookupMethod(memberName);
+            if (methods is not null && methods.Count > 0)
+            {
+                var method = methods[0];
+                var methodTuples = new List<TupleLangValue>
+                {
+                    new TupleLangValue([new StringLangValue("name"), new StringLangValue(method.MethodName)]),
+                    new TupleLangValue([new StringLangValue("type"), new StringLangValue("method")]),
+                    new TupleLangValue([new StringLangValue("isStatic"), new BoolLangValue(method.IsStatic)]),
+                    new TupleLangValue([new StringLangValue("isPublic"), new BoolLangValue(!method.HasModifier(AccessModifierType.Private))]),
+                    new TupleLangValue([new StringLangValue("isPrivate"), new BoolLangValue(method.HasModifier(AccessModifierType.Private))]),
+                    new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(method.ParameterCount)]),
+                    new TupleLangValue([new StringLangValue("overloadCount"), new IntLangValue(methods.Count)])
+                };
+                return new DictionaryLangValue(methodTuples);
+            }
+
+            // 再尝试查找字段
+            var field = anyValue.Metadata.FieldTable.LookupField(memberName);
+            if (field is not null)
+            {
+                var fieldTuples = new List<TupleLangValue>
+                {
+                    new TupleLangValue([new StringLangValue("name"), new StringLangValue(field.FieldName)]),
+                    new TupleLangValue([new StringLangValue("type"), new StringLangValue("field")]),
+                    new TupleLangValue([new StringLangValue("isStatic"), new BoolLangValue(field.IsStatic)]),
+                    new TupleLangValue([new StringLangValue("isPublic"), new BoolLangValue(!field.HasModifier(AccessModifierType.Private))]),
+                    new TupleLangValue([new StringLangValue("isPrivate"), new BoolLangValue(field.HasModifier(AccessModifierType.Private))])
+                };
+                return new DictionaryLangValue(fieldTuples);
+            }
+
+            throw new AttributeError(anyValue, memberName, anyValue.ClassId.IdName);
+        }
+        throw new InvalidOperationException("对象不是类实例");
+    }
+
+    /// <summary>
+    /// 检查对象是否有指定成员（合并了 HasMethod 和 HasField）
+    /// </summary>
+    public static bool HasMember(object obj, string memberName)
+    {
+        if (obj is AnyLangValue anyValue)
+        {
+            bool hasMethod = anyValue.Metadata.MethodTable.ContainsMethod(memberName);
+            bool hasField = anyValue.Metadata.FieldTable.ContainsField(memberName);
+            return hasMethod || hasField;
+        }
+        if (obj is BytecodeObjectInstance instance)
+        {
+            var vm = VMContext.CurrentVM;
+            if (vm != null)
+            {
+                var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
+                if (classMetadata != null)
+                {
+                    bool hasMethod = VMReflectionHelper.HasMethod(classMetadata, memberName);
+                    bool hasField = VMReflectionHelper.HasField(classMetadata, memberName);
+                    return hasMethod || hasField;
+                }
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 获取函数信息（支持全局函数、普通函数、原生函数）
+    /// </summary>
+    public static object GetFunctionInfo(object function)
+    {
+        // 情况 1: 字符串 - 全局函数
+        if (function is string functionName)
+        {
+            var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(functionName);
+            if (globalFunc != null)
+            {
+                return CreateGlobalFunctionInfoDict(globalFunc);
+            }
+            throw new InvalidOperationException($"全局函数 '{functionName}' 不存在");
+        }
+
+        // 情况 2: FuncLangValue - 普通函数或原生函数
+        if (function is FuncLangValue funcValue)
+        {
+            if (funcValue.Method != null)
+            {
+                return CreateNativeFunctionInfoDict(funcValue.Method, funcValue.Id.IdName);
+            }
+            return CreateUserFunctionInfoDict(funcValue);
+        }
+
+        throw new InvalidOperationException("GetFunctionInfo 需要：全局函数名（字符串）或函数对象（FuncLangValue）");
+    }
+
+    /// <summary>
+    /// 获取函数信息（支持类方法）
+    /// </summary>
+    public static object GetFunctionInfo(object obj, string methodName)
+    {
+        if (obj is AnyLangValue anyValue)
+        {
+            var methods = anyValue.Metadata.MethodTable.LookupMethod(methodName);
+            if (methods is null || methods.Count == 0)
+            {
+                throw new AttributeError(anyValue, methodName, anyValue.ClassId.IdName);
+            }
+            return CreateClassMethodInfoDict(methods[0], anyValue.ClassId.IdName);
+        }
+        throw new InvalidOperationException("对象不是类实例");
+    }
+
+    /// <summary>
+    /// 创建全局函数信息字典
+    /// </summary>
+    private static object CreateGlobalFunctionInfoDict(IGlobalFunction func)
+    {
+        var tuples = new List<TupleLangValue>
+        {
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Names[0])]),
+            new TupleLangValue([new StringLangValue("type"), new StringLangValue("global_function")]),
+            new TupleLangValue([
+                new StringLangValue("names"),
+                new ListLangValue(func.Names.Select(n => (LangValueType)new StringLangValue(n)).ToList())
+            ]),
+            new TupleLangValue([new StringLangValue("minParameterCount"), new IntLangValue(func.MinParameterCount)]),
+            new TupleLangValue([new StringLangValue("maxParameterCount"), new IntLangValue(func.MaxParameterCount)]),
+            new TupleLangValue([new StringLangValue("returnType"), new StringLangValue("object")])
+        };
+        return new DictionaryLangValue(tuples);
+    }
+
+    /// <summary>
+    /// 创建用户函数信息字典
+    /// </summary>
+    private static object CreateUserFunctionInfoDict(FuncLangValue func)
+    {
+        var tuples = new List<TupleLangValue>
+        {
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Id.IdName)]),
+            new TupleLangValue([new StringLangValue("type"), new StringLangValue("user_function")]),
+            new TupleLangValue([
+                new StringLangValue("parameters"),
+                new ListLangValue(func.Ids.Select(id => (LangValueType)new StringLangValue(id.IdName)).ToList())
+            ]),
+            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(func.Ids.Count)]),
+            new TupleLangValue([new StringLangValue("hasDefaultParams"), new BoolLangValue(func.Ids.Any(id => id.DefaultValue != null))]),
+            new TupleLangValue([new StringLangValue("isGeneric"), new BoolLangValue(func.GenericParameters?.Count > 0)])
+        };
+        return new DictionaryLangValue(tuples);
+    }
+
+    /// <summary>
+    /// 创建原生函数信息字典
+    /// </summary>
+    private static object CreateNativeFunctionInfoDict(MethodInfo method, string name)
+    {
+        var parameters = method.GetParameters();
+        var tuples = new List<TupleLangValue>
+        {
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(name)]),
+            new TupleLangValue([new StringLangValue("type"), new StringLangValue("native_function")]),
+            new TupleLangValue([
+                new StringLangValue("parameters"),
+                new ListLangValue(parameters.Select(p => (LangValueType)new StringLangValue(p.Name ?? "param")).ToList())
+            ]),
+            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(parameters.Length)]),
+            new TupleLangValue([new StringLangValue("returnType"), new StringLangValue(method.ReturnType.Name)]),
+            new TupleLangValue([new StringLangValue("isStatic"), new BoolLangValue(method.IsStatic)])
+        };
+        return new DictionaryLangValue(tuples);
+    }
+
+    /// <summary>
+    /// 创建类方法信息字典
+    /// </summary>
+    private static object CreateClassMethodInfoDict(LangMethodInfo method, string className)
+    {
+        var tuples = new List<TupleLangValue>
+        {
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(method.MethodName)]),
+            new TupleLangValue([new StringLangValue("type"), new StringLangValue("class_method")]),
+            new TupleLangValue([new StringLangValue("className"), new StringLangValue(className)]),
+            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(method.ParameterCount)]),
+            new TupleLangValue([new StringLangValue("isStatic"), new BoolLangValue(method.IsStatic)]),
+            new TupleLangValue([new StringLangValue("isPublic"), new BoolLangValue(!method.HasModifier(AccessModifierType.Private))])
+        };
+        return new DictionaryLangValue(tuples);
+    }
+
     /// <summary>
     /// 获取对象的类名
     /// </summary>
@@ -260,22 +508,6 @@ public static class ReflectionHelper
     }
 
     /// <summary>
-    /// 获取全局函数的参数信息
-    /// </summary>
-    public static object GetFunctionInfo(string functionName)
-    {
-        // 1. 尝试从全局函数注册表查找
-        var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(functionName);
-        if (globalFunc != null)
-        {
-            return CreateGlobalFunctionInfo(globalFunc);
-        }
-
-        // 2. 未找到函数
-        throw new InvalidOperationException($"函数 '{functionName}' 不存在");
-    }
-
-    /// <summary>
     /// 从类型名获取 TypeLangValue
     /// </summary>
     public static TypeLangValue GetType(string typeName)
@@ -393,62 +625,6 @@ public static class ReflectionHelper
         return new DictionaryLangValue(tuples);
     }
 
-    /// <summary>
-    /// 创建全局函数信息
-    /// </summary>
-    private static object CreateGlobalFunctionInfo(IGlobalFunction func)
-    {
-        var tuples = new List<TupleLangValue>
-        {
-            // 基本信息
-            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Names[0])]),
-            new TupleLangValue([
-                new StringLangValue("names"),
-                new ListLangValue(func.Names.Select(n => (LangValueType)new StringLangValue(n)).ToList())
-            ]),
-
-            // 参数信息
-            new TupleLangValue([
-                new StringLangValue("parameters"),
-                CreateParameterList(func)
-            ]),
-
-            // 参数数量
-            new TupleLangValue([new StringLangValue("minParameterCount"), new IntLangValue(func.MinParameterCount)]),
-            new TupleLangValue([new StringLangValue("maxParameterCount"), new IntLangValue(func.MaxParameterCount)]),
-
-            // 返回类型（全局函数通常是动态类型）
-            new TupleLangValue([new StringLangValue("returnType"), new StringLangValue("object")]),
-
-            // 标记
-            new TupleLangValue([new StringLangValue("isGlobalFunction"), new BoolLangValue(true)])
-        };
-
-        return new DictionaryLangValue(tuples);
-    }
-
-    /// <summary>
-    /// 创建参数列表
-    /// </summary>
-    private static LangValueType CreateParameterList(IGlobalFunction func)
-    {
-        var paramList = new List<LangValueType>();
-
-        if (func.ParameterNames != null && func.ParameterNames.Length > 0)
-        {
-            foreach (var paramName in func.ParameterNames)
-            {
-                var paramTuples = new List<TupleLangValue>
-                {
-                    new TupleLangValue([new StringLangValue("name"), new StringLangValue(paramName)]),
-                    new TupleLangValue([new StringLangValue("type"), new StringLangValue("object")])
-                };
-                paramList.Add(new DictionaryLangValue(paramTuples));
-            }
-        }
-
-        return new ListLangValue(paramList);
-    }
 }
 
 /// <summary>
