@@ -620,34 +620,6 @@ public static class DotOperatorILHelper
             // 尝试查找扩展方法
             Type? extensionType = null;
 
-            // 根据左操作数类型确定对应的扩展方法类
-            if (leftType == typeof(string))
-            {
-                extensionType = typeof(StringExtensions);
-            }
-            else if (leftType == typeof(object[]))
-            {
-                extensionType = typeof(ArrayExtensions);
-            }
-            else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                extensionType = typeof(ListExtensions);
-            }
-            else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                extensionType = typeof(DictionaryExtensions);
-            }
-            else if (leftType == typeof(int) || leftType == typeof(double) ||
-                     leftType == typeof(bool) || leftType == typeof(char))
-            {
-                extensionType = typeof(PrimitiveExtensions);
-            }
-            // Old8Lang 类型已经通过 InstanceMethods 系统处理，不需要在这里处理
-            else if (leftType.FullName?.StartsWith("System.ValueTuple") == true)
-            {
-                extensionType = typeof(ValueFunctions.TupleExtensions);
-            }
-
             if (extensionType != null)
             {
                 // 扩展方法的第一个参数是 this 参数（实例本身）

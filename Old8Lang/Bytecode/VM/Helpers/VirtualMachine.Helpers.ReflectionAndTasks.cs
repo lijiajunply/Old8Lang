@@ -105,29 +105,6 @@ public partial class VirtualMachine
 
         Type? extensionType = null;
         System.Reflection.MethodInfo? method = null;
-
-        // 对于 C# 原生类型，查找对应的扩展方法类
-        if (obj is string)
-        {
-            extensionType = typeof(StringExtensions);
-        }
-        else if (obj is object[] && obj.GetType() == typeof(object[]))
-        {
-            extensionType = typeof(ArrayExtensions);
-        }
-        else if (obj is List<object?>)
-        {
-            extensionType = typeof(ListExtensions);
-        }
-        else if (obj is Dictionary<object, object?>)
-        {
-            extensionType = typeof(DictionaryExtensions);
-        }
-        // 对于基本类型(int, double, bool, char)，查找对应的扩展方法类
-        else if (obj is int || obj is double || obj is bool || obj is char)
-        {
-            extensionType = typeof(PrimitiveExtensions);
-        }
         // Old8Lang 类型已经通过 InstanceMethods 系统处理，不需要在这里处理
 
         // 如果找到扩展类型，尝试查找扩展方法
