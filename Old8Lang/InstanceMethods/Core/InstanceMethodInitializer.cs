@@ -354,6 +354,20 @@ public static class InstanceMethodInitializer
 
             // Char 方法迁移完成！共 14 个方法
 
+            // 注册 TypeLangValue 方法
+            // 基础查询方法
+            registry.Register(new Implementations.TypeValue.TypeGetMethodNamesMethod());
+            registry.Register(new Implementations.TypeValue.TypeGetFieldNamesMethod());
+            registry.Register(new Implementations.TypeValue.TypeGetBaseTypeMethod());
+            registry.Register(new Implementations.TypeValue.TypeGetInterfacesMethod());
+
+            // 类型判断方法
+            registry.Register(new Implementations.TypeValue.TypeIsClassMethod());
+            registry.Register(new Implementations.TypeValue.TypeIsInterfaceMethod());
+            registry.Register(new Implementations.TypeValue.TypeIsPrimitiveMethod());
+            registry.Register(new Implementations.TypeValue.TypeIsGenericMethod());
+            registry.Register(new Implementations.TypeValue.TypeIsAssignableFromMethod());
+
             _initialized = true;
         }
     }

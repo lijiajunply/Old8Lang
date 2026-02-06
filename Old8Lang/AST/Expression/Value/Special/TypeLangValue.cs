@@ -261,58 +261,8 @@ public partial class TypeLangValue : LangValueType
             };
         }
 
-        // 支持方法调用
-        if (right is Instance instance)
-        {
-            return instance.Id.IdName switch
-            {
-                "GetMethodNames" => new ListLangValue(
-                    GetMethodNames(manager)
-                        .Select(name => new StringLangValue(name))
-                        .Cast<LangValueType>()
-                        .ToList()
-                ),
-                "GetFieldNames" => new ListLangValue(
-                    GetFieldNames(manager)
-                        .Select(name => new StringLangValue(name))
-                        .Cast<LangValueType>()
-                        .ToList()
-                ),
-                "GetBaseType" => GetBaseType(manager) ?? (LangValueType)new NullLangValue(),
-                "GetInterfaces" => new ListLangValue(
-                    GetInterfaces(manager)
-                        .Cast<LangValueType>()
-                        .ToList()
-                ),
-                "IsClass" => new BoolLangValue(IsClass(manager)),
-                "IsInterface" => new BoolLangValue(IsInterface(manager)),
-                "IsPrimitive" => new BoolLangValue(IsPrimitive()),
-                "IsGeneric" => new BoolLangValue(IsGeneric(manager)),
-                "IsAssignableFrom" => HandleIsAssignableFrom(instance, manager),
-                _ => throw new AttributeError(this, instance.Id.IdName, "TypeLangValue")
-            };
-        }
-
+        // 所有方法调用都通过 InstanceMethods 系统处理
         return base.Dot(right, manager);
-    }
-
-    /// <summary>
-    /// 处理 IsAssignableFrom 方法调用
-    /// </summary>
-    private LangValueType HandleIsAssignableFrom(Instance instance, VariateManager manager)
-    {
-        if (instance.Ids.Count != 1)
-        {
-            throw new InvalidOperationError(this, "IsAssignableFrom 需要一个参数");
-        }
-
-        var arg = instance.Ids[0].Run(manager);
-        if (arg is not TypeLangValue otherType)
-        {
-            throw new InvalidOperationError(this, "IsAssignableFrom 参数必须是 TypeLangValue");
-        }
-
-        return new BoolLangValue(IsAssignableFrom(otherType, manager));
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
