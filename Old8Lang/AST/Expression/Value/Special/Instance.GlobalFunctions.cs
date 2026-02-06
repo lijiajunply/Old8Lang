@@ -20,8 +20,8 @@ public partial class Instance
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
 
-        // 查找全局函数
-        var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
+        // 使用重载解析查找最匹配的全局函数
+        var globalFunc = GlobalFunctionRegistry.Instance.ResolveFunction(Id.IdName, Ids, null);
         if (globalFunc is not null)
         {
             // 处理命名参数：将命名参数重新排序为位置参数
@@ -52,8 +52,8 @@ public partial class Instance
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
 
-        // 查找全局函数
-        var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
+        // 使用重载解析查找最匹配的全局函数
+        var globalFunc = GlobalFunctionRegistry.Instance.ResolveFunction(Id.IdName, Ids, local);
         if (globalFunc is not null)
         {
             // 处理命名参数：将命名参数重新排序为位置参数
@@ -83,8 +83,8 @@ public partial class Instance
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
 
-        // 查找全局函数
-        var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
+        // 使用重载解析查找最匹配的全局函数
+        var globalFunc = GlobalFunctionRegistry.Instance.ResolveFunction(Id.IdName, Ids, local);
         if (globalFunc is not null)
         {
             // 处理命名参数：将命名参数重新排序为位置参数

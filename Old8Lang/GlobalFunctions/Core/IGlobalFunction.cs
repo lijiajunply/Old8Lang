@@ -33,6 +33,41 @@ public interface IGlobalFunction
     int MaxParameterCount { get; }
 
     /// <summary>
+    /// 参数类型列表（用于重载解析）
+    /// null 表示接受任意类型（向后兼容）
+    /// 数组中的 null 元素表示该位置接受任意类型
+    /// </summary>
+    Type?[]? ParameterTypes { get; }
+
+    /// <summary>
+    /// 声明的返回类型（用于 IDE 显示）
+    /// null 表示动态类型或未指定
+    /// </summary>
+    Type? DeclaredReturnType { get; }
+
+    /// <summary>
+    /// 函数文档说明
+    /// </summary>
+    string? Documentation { get; }
+
+    /// <summary>
+    /// 检查此函数是否可以接受给定的参数列表
+    /// </summary>
+    /// <param name="parameters">参数表达式列表</param>
+    /// <param name="local">局部变量管理器（用于获取参数类型，可为 null）</param>
+    /// <returns>如果可以接受返回 true，否则返回 false</returns>
+    bool CanAccept(List<LangExpression> parameters, LocalManager? local);
+
+    /// <summary>
+    /// 计算此函数与给定参数列表的匹配分数
+    /// 分数越高表示匹配越精确
+    /// </summary>
+    /// <param name="parameters">参数表达式列表</param>
+    /// <param name="local">局部变量管理器（用于获取参数类型，可为 null）</param>
+    /// <returns>匹配分数，-1 表示不匹配</returns>
+    int CalculateMatchScore(List<LangExpression> parameters, LocalManager? local);
+
+    /// <summary>
     /// 解释器模式执行
     /// </summary>
     /// <param name="parameters">参数表达式列表</param>

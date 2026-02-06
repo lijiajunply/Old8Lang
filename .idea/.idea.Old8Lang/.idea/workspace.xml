@@ -23,15 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_count_unified.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/OverloadGroup.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayCountMethod.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayLengthMethod.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/String/StringLengthMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/String/StringLengthMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleGenericWrappers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleGenericWrappers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SignatureHelpHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SignatureHelpHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.GlobalFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,51 +104,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.FirstUI.TestApp.executor": "Debug",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "1283e73f-d696-41fc-82f8-bfc626de0827.executor": "Debug",
-    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
-    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
-    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;1283e73f-d696-41fc-82f8-bfc626de0827.executor&quot;: &quot;Debug&quot;,
+    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
+    &quot;3af05a97-c6e2-49ab-b044-50109a642364.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
+    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -582,7 +580,8 @@
       <workItem from="1770085156303" duration="3631000" />
       <workItem from="1770170083234" duration="29222000" />
       <workItem from="1770222792162" duration="713000" />
-      <workItem from="1770286042546" duration="3090000" />
+      <workItem from="1770286042546" duration="4023000" />
+      <workItem from="1770342249898" duration="862000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -927,7 +926,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="889" />
+    <option name="localTasksCounter" value="890" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +953,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(instance-methods): 添加String实例方法支持&#10;&#10;- 实现StringLengthMethod、StringSubstringMethod、StringReplaceMethod等15个String方法&#10;- 在InstanceMethodInitializer中注册所有String基础和高级方法&#10;- 更新PROGRESS_INSTANCE_METHODS.md文档显示String方法完成状态&#10;- 添加String方法相关的单元测试标记&#10;- 完成String方法的IL代码生成和虚拟机执行支持" />
     <MESSAGE value="feat(instance-methods): 添加 Dictionary 实例方法支持&#10;&#10;- 实现 DictClearMethod、DictContainsKeyMethod、DictCountMethod 等 8 个 Dictionary 方法&#10;- 在 InstanceMethodInitializer 中注册所有 Dictionary 方法&#10;- 更新 PROGRESS_INSTANCE_METHODS.md 文档显示 Dictionary 方法完成状态&#10;- 添加 test_dictionary_methods.old8 测试文件验证所有 Dictionary 方法功能&#10;- 完成 Dictionary 方法的 IL 代码生成和虚拟机执行支持&#10;- 总进度提升至 76/101 (75%)" />
     <MESSAGE value="加入新东西" />
     <MESSAGE value="feat(instance-methods): 实现 ILangList 通用实例方法系统&#10;&#10;- 为 Array 和 Tuple 类型添加通用 ILangList 方法支持&#10;- 实现 Contains、Reverse、Any、All、Where、Select 等通用方法&#10;- 创建通用基类 BaseLangListMethod 和特定类型包装类&#10;- 更新 ArrayLangValue 中的 knownMethods 数组配置&#10;- 在 InstanceMethodInitializer 中注册新的通用方法&#10;- 添加 test_array_generic、test_tuple_generic 等测试文件&#10;- 生成详细的通用方法实现总结文档" />
@@ -979,7 +977,8 @@
     <MESSAGE value="feat(instance-methods): 添加字符串和任务线程相关实例方法&#10;&#10;- 注册 StringTrimStart、StringTrimEnd、StringRepeat 方法实现字符串修剪和重复功能&#10;- 添加 StringToBase64 和 StringFromBase64 方法实现 Base64 编码解码功能&#10;- 注册 TaskContinueWith 方法实现任务延续执行功能&#10;- 添加 ThreadCancel 和 ThreadWithTimeout 方法实现线程取消和超时控制&#10;- 更新初始化器统计信息从 15 个 String 方法扩展到 20 个&#10;- 更新 Task 方法计数从 4 个增加到 5 个&#10;- 更新 Thread 方法计数从 3 个增加到 5 个&#10;- 移除 IDE 工作空间中的变更记录和选择器方法提交历史" />
     <MESSAGE value="feat(instance-methods): 添加数组排序算法和多类型实例方法&#10;&#10;- 实现冒泡排序、堆排序、插入排序、归并排序、快速排序和选择排序算法&#10;- 添加字符串子串单参数方法支持从指定位置截取到末尾&#10;- 注册线程重试和链式执行方法增强异步操作功能&#10;- 实现元组切片方法支持按范围提取元组元素&#10;- 更新实例方法初始化器注册所有新增方法并修正计数统计" />
     <MESSAGE value="feat(instance-methods): 添加数组Count方法和字典GetValue方法&#10;&#10;- 实现ArrayCountMethod提供数组长度获取功能，与Length方法等效&#10;- 添加DictGetValueMethod支持根据键获取字典中的值&#10;- 在InstanceMethodInitializer中注册新方法并更新统计计数&#10;- 修正CollectionMethodsTests中的断言类型以匹配实际返回值&#10;- 更新IDE工作空间配置和提交历史记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加数组Count方法和字典GetValue方法&#10;&#10;- 实现ArrayCountMethod提供数组长度获取功能，与Length方法等效&#10;- 添加DictGetValueMethod支持根据键获取字典中的值&#10;- 在InstanceMethodInitializer中注册新方法并更新统计计数&#10;- 修正CollectionMethodsTests中的断言类型以匹配实际返回值&#10;- 更新IDE工作空间配置和提交历史记录" />
+    <MESSAGE value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

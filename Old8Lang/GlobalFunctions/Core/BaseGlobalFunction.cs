@@ -35,6 +35,166 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     public abstract int MaxParameterCount { get; }
 
     /// <summary>
+    /// 参数类型列表（用于重载解析）
+    /// 默认返回 null，表示接受任意类型（向后兼容）
+    /// </summary>
+    public virtual Type?[]? ParameterTypes => null;
+
+    /// <summary>
+    /// 声明的返回类型（用于 IDE 显示）
+    /// 默认返回 null，表示动态类型
+    /// </summary>
+    public virtual Type? DeclaredReturnType => null;
+
+    /// <summary>
+    /// 函数文档说明
+    /// 默认返回 null
+    /// </summary>
+    public virtual string? Documentation => null;
+
+    /// <summary>
+    /// 检查此函数是否可以接受给定的参数列表
+    /// 默认实现：检查参数数量是否在范围内，以及类型是否匹配
+    /// </summary>
+    public virtual bool CanAccept(List<LangExpression> parameters, LocalManager? local)
+    {
+        var count = parameters.Count;
+
+        // 检查参数数量
+        if (count < MinParameterCount)
+            return false;
+
+        if (MaxParameterCount != -1 && count > MaxParameterCount)
+            return false;
+
+        // 如果没有指定参数类型，接受任意类型（向后兼容）
+        if (ParameterTypes == null)
+            return true;
+
+        // 检查每个参数的类型
+        for (int i = 0; i < count && i < ParameterTypes.Length; i++)
+        {
+            var expectedType = ParameterTypes[i];
+            if (expectedType == null)
+                continue; // null 表示接受任意类型
+
+            // 尝试获取参数的类型
+            var paramType = TryGetParameterType(parameters[i], local);
+            if (paramType == null)
+                continue; // 无法确定类型时，假设匹配
+
+            // 检查类型是否兼容
+            if (!IsTypeCompatible(paramType, expectedType))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 计算此函数与给定参数列表的匹配分数
+    /// 分数越高表示匹配越精确
+    /// </summary>
+    public virtual int CalculateMatchScore(List<LangExpression> parameters, LocalManager? local)
+    {
+        if (!CanAccept(parameters, local))
+            return -1;
+
+        var count = parameters.Count;
+
+        // 如果没有指定参数类型，返回基础分数（向后兼容）
+        if (ParameterTypes == null)
+            return 0;
+
+        int score = 0;
+        for (int i = 0; i < count && i < ParameterTypes.Length; i++)
+        {
+            var expectedType = ParameterTypes[i];
+            if (expectedType == null)
+            {
+                // 任意类型：+0 分
+                continue;
+            }
+
+            var paramType = TryGetParameterType(parameters[i], local);
+            if (paramType == null)
+            {
+                // 无法确定类型：+10 分（中等优先级）
+                score += 10;
+                continue;
+            }
+
+            if (paramType == expectedType)
+            {
+                // 精确匹配：+100 分
+                score += 100;
+            }
+            else if (expectedType.IsAssignableFrom(paramType))
+            {
+                // 隐式转换匹配：+50 分
+                score += 50;
+            }
+            else if (IsNumericConversion(paramType, expectedType))
+            {
+                // 数值类型转换：+30 分
+                score += 30;
+            }
+        }
+
+        return score;
+    }
+
+    /// <summary>
+    /// 尝试获取表达式的类型
+    /// </summary>
+    protected virtual Type? TryGetParameterType(LangExpression expression, LocalManager? local)
+    {
+        if (local == null)
+            return null;
+
+        try
+        {
+            return expression.OutputType(local);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 检查两个类型是否兼容
+    /// </summary>
+    protected virtual bool IsTypeCompatible(Type sourceType, Type targetType)
+    {
+        if (targetType.IsAssignableFrom(sourceType))
+            return true;
+
+        // 数值类型之间的隐式转换
+        if (IsNumericConversion(sourceType, targetType))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// 检查是否是数值类型之间的转换
+    /// </summary>
+    protected virtual bool IsNumericConversion(Type sourceType, Type targetType)
+    {
+        var numericTypes = new HashSet<Type>
+        {
+            typeof(byte), typeof(sbyte),
+            typeof(short), typeof(ushort),
+            typeof(int), typeof(uint),
+            typeof(long), typeof(ulong),
+            typeof(float), typeof(double), typeof(decimal)
+        };
+
+        return numericTypes.Contains(sourceType) && numericTypes.Contains(targetType);
+    }
+
+    /// <summary>
     /// 解释器模式执行
     /// </summary>
     public LangValueType Execute(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
