@@ -3,7 +3,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using FirstUI.Core;
 using LayoutHelper = FirstUI.Utils.LayoutHelper;
-using LayoutHelper = FirstUI.Utils.LayoutHelper;
 
 namespace FirstUI.Advanced;
 
