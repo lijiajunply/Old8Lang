@@ -20,6 +20,21 @@ public class LangListSumMethod : BaseLangListMethod
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
+    /// <summary>
+    /// 参数类型：无参数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "对列表中的所有元素求和";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

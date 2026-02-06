@@ -23,15 +23,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/INSTANCE_METHOD_OVERLOAD_SUMMARY.md" beforeDir="false" afterPath="$PROJECT_DIR$/INSTANCE_METHOD_OVERLOAD_SUMMARY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFirstMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListFirstMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListLastMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListLastMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAggregateMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAggregateMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAggregateWithSeedMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAggregateWithSeedMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListFirstWithPredicateMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListFirstWithPredicateMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListLastWithPredicateMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListLastWithPredicateMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/InstanceMethods/ListMethodOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/InstanceMethods/ListMethodOverloadTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxWithSelectorMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinWithSelectorMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortByMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortByMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumWithSelectorMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMaxByMethod.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMinByMethod.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -927,7 +932,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="900" />
+    <option name="localTasksCounter" value="901" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +959,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(char): 添加字符实例方法实现&#10;&#10;- 实现 Char.CompareTo 方法用于比较字符大小&#10;- 实现 Char.GetNumericValue 方法获取字符数字值&#10;- 实现 Char.IsControl 方法判断控制字符&#10;- 实现 Char.IsLetterOrDigit 方法判断字母或数字&#10;- 实现 Char.IsLower 方法判断小写字母&#10;- 实现 Char.IsPunctuation 方法判断标点符号&#10;- 实现 Char.IsSymbol 方法判断符号字符&#10;- 实现 Char.IsUpper 方法判断大写字母&#10;- 实现 Char.IsWhiteSpace 方法判断空白字符&#10;- 实现 Char.ToInt 方法转换为 ASCII 整数值&#10;- 注册所有新字符方法到实例方法初始化器&#10;- 添加完整的字符方法测试用例覆盖所有功能" />
     <MESSAGE value="feat(list): 添加列表基础查询实例方法&#10;&#10;- 注册 ListPopMethod、ListSliceMethod、ListElementAtOrDefaultMethod 等8个新方法&#10;- 实现 ElementAtOrDefault 方法支持安全获取指定索引元素并返回默认值&#10;- 实现 IsEmpty 方法用于检查列表是否为空&#10;- 实现 Pop 方法用于移除并返回列表的最后一个元素&#10;- 实现 Single 和 SingleOrDefault 方法用于获取满足条件的唯一元素&#10;- 实现 Slice 方法用于获取列表切片&#10;- 实现 ToArray 方法用于将列表转换为数组&#10;- 添加完整的列表基础查询方法测试用例覆盖所有功能" />
     <MESSAGE value="feat(list): 添加列表高级查询实例方法&#10;&#10;- 注册 ListMaxByMethod、ListMinByMethod、ListTakeLastMethod 等6个新方法&#10;- 实现 MaxBy 和 MinBy 方法支持按选择器获取最大值和最小值元素&#10;- 实现 TakeLast 和 SkipLast 方法支持对列表末尾元素的操作&#10;- 实现 TakeWhile 和 SkipWhile 方法支持按条件获取和跳过元素&#10;- 添加完整的列表高级查询方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表高级操作实例方法&#10;&#10;- 注册 ListChunkMethod、ListPartitionMethod、ListPairwiseMethod 等7个新方法&#10;- 实现 Chunk 方法支持将列表分割成指定大小的块&#10;- 实现 Partition 方法根据条件将列表分为两部分&#10;- 实现 Pairwise 方法将相邻元素配对返回元组列表&#10;- 实现 FlatMap 方法对每个元素应用转换函数并扁平化结果&#10;- 实现 Window 方法创建滑动窗口返回连续子列表&#10;- 实现 Flatten 方法扁平化嵌套列表结构&#10;- 添加完整的列表高级操作方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
@@ -979,7 +983,8 @@
     <MESSAGE value="chore(code): 移除重复的命名空间别名引用&#10;&#10;- 移除了 Breadcrumb.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 GridView.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Menu.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Pagination.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Stack.cs 中重复的 LayoutHelper 别名引用" />
     <MESSAGE value="feat(global-functions): 添加完整的JSON处理函数功能&#10;&#10;- 移除旧的JsonFunction并替换为多个专用的JSON函数实现&#10;- 添加JsonSerializeFunction用于将值序列化为JSON字符串&#10;- 添加JsonDeserializeFunction用于将JSON字符串反序列化为动态对象&#10;- 添加JsonDeserializeFromFileFunction用于从JSON文件读取并反序列化&#10;- 添加JsonSerializeToFileFunction用于将对象序列化并写入JSON文件&#10;- 添加JsonIsValidFunction用于验证JSON字符串有效性&#10;- 添加JsonMinifyFunction用于压缩JSON字符串&#10;- 添加JsonPrettifyFunction用于美化JSON字符串&#10;- 添加JsonMergeFunction用于合并多个JSON对象&#10;- 添加JsonCompareFunction用于比较两个JSON字符串是否相等&#10;- 添加JsonGetValueFunction用于根据路径获取JSON值&#10;- 在GlobalFunctionInitializer中注册所有新的JSON函数&#10;- 更新JSON序列化选项配置和错误处理机制" />
     <MESSAGE value="refactor(core): 移除不需要的命名空间引用并更新JSON序列化方法&#10;&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Intermediates引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Value引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST引用&#10;- 从多个文件中移除了未使用的Old8Lang.Error引用&#10;- 从Csv.cs中将JsonLib.Serialize替换为JsonSerializer.Serialize&#10;- 移除了JsonLib.cs中的自定义JSON处理库实现&#10;- 移除了JsonLibTests.cs中的相关测试代码&#10;- 从多个实例方法实现中移除了未使用的命名空间引用&#10;- 从多个测试文件中移除了未使用的命名空间引用&#10;- 优化了代码结构和依赖关系管理" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 移除不需要的命名空间引用并更新JSON序列化方法&#10;&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Intermediates引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Value引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST引用&#10;- 从多个文件中移除了未使用的Old8Lang.Error引用&#10;- 从Csv.cs中将JsonLib.Serialize替换为JsonSerializer.Serialize&#10;- 移除了JsonLib.cs中的自定义JSON处理库实现&#10;- 移除了JsonLibTests.cs中的相关测试代码&#10;- 从多个实例方法实现中移除了未使用的命名空间引用&#10;- 从多个测试文件中移除了未使用的命名空间引用&#10;- 优化了代码结构和依赖关系管理" />
+    <MESSAGE value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

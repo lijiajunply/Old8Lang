@@ -19,6 +19,21 @@ public class LangListMinWithSelectorMethod : BaseLangListMethod
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
+    /// <summary>
+    /// 参数类型：selector 必须是函数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue)];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "对列表元素应用选择器后求最小值";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

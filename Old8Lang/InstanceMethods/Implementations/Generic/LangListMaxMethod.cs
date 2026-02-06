@@ -19,6 +19,21 @@ public class LangListMaxMethod : BaseLangListMethod
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
+    /// <summary>
+    /// 参数类型：无参数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(LangValueType);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "获取列表中的最大值";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {

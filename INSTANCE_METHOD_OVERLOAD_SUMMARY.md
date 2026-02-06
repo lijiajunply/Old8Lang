@@ -121,7 +121,60 @@
    - `DeclaredReturnType`: `typeof(LangValueType)`
    - `Documentation`: "对列表元素进行聚合操作（带初始值）"
 
-**注意：** SkipWhile/SkipWhileIndexed 和 TakeWhile/TakeWhileIndexed 保持不同的方法名，因为它们都接收相同数量的参数（1个谓词函数），只是谓词函数本身的签名不同（接收1个参数 vs 2个参数）。当前的重载解析系统无法区分函数参数签名的差异，因此保持不同的名称更清晰。
+10. **LangListSumMethod** (无参数版本)
+    - `ParameterTypes`: `[]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "对列表中的所有元素求和"
+
+11. **LangListSumWithSelectorMethod** (带选择器版本)
+    - `ParameterTypes`: `[typeof(FuncLangValue)]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "对列表元素应用选择器后求和"
+
+12. **LangListMinMethod** (无参数版本)
+    - `ParameterTypes`: `[]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "获取列表中的最小值"
+
+13. **LangListMinWithSelectorMethod** (带选择器版本)
+    - `ParameterTypes`: `[typeof(FuncLangValue)]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "对列表元素应用选择器后求最小值"
+
+14. **LangListMaxMethod** (无参数版本)
+    - `ParameterTypes`: `[]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "获取列表中的最大值"
+
+15. **LangListMaxWithSelectorMethod** (带选择器版本)
+    - `ParameterTypes`: `[typeof(FuncLangValue)]`
+    - `DeclaredReturnType`: `typeof(LangValueType)`
+    - `Documentation`: "对列表元素应用选择器后求最大值"
+
+16. **LangListSortMethod** (无参数版本)
+    - `ParameterTypes`: `[]`
+    - `DeclaredReturnType`: `typeof(ListLangValue)`
+    - `Documentation`: "对列表进行升序排序"
+
+17. **LangListSortByMethod** (带键选择器版本)
+    - `ParameterTypes`: `[typeof(FuncLangValue), typeof(BoolLangValue)]`
+    - `DeclaredReturnType`: `typeof(ListLangValue)`
+    - `Documentation`: "按键选择器对列表进行排序"
+    - 注意：第二个参数 `ascending` 是可选的
+
+18. **ListSortWithComparerMethod** (带比较器版本)
+    - `Names`: 改为 `["SortWith", "sortWith"]` (移除 "SortBy" 避免冲突)
+    - `ParameterTypes`: `[typeof(FuncLangValue)]`
+    - `DeclaredReturnType`: `typeof(ListLangValue)`
+    - `Documentation`: "使用自定义比较器排序列表"
+
+**注意：**
+1. SkipWhile/SkipWhileIndexed 和 TakeWhile/TakeWhileIndexed 保持不同的方法名，因为它们都接收相同数量的参数（1个谓词函数），只是谓词函数本身的签名不同（接收1个参数 vs 2个参数）。当前的重载解析系统无法区分函数参数签名的差异，因此保持不同的名称更清晰。
+
+2. Sort 和 SortBy 是两个不同的方法：
+   - `Sort()` - 无参数，对列表进行升序排序
+   - `SortBy(keySelector, ascending?)` - 按键选择器排序，支持可选的升序/降序参数
+   - `SortWith(comparer)` - 使用自定义比较器排序（之前名为 SortBy，已修复冲突）
 
 ## 技术亮点
 
@@ -204,6 +257,18 @@ last2 <- list.Last((x:int) -> x < 4)      // 3 (带谓词版本)
 sum1 <- list.Aggregate((acc:int, x:int) -> acc + x)        // 15 (无初始值)
 sum2 <- list.Aggregate((acc:int, x:int) -> acc + x, 10)    // 25 (带初始值)
 
+// Sum 方法重载
+sum3 <- list.Sum()                        // 15 (无参数版本)
+sum4 <- list.Sum((x:int) -> x * 2)        // 30 (带选择器版本)
+
+// Min 方法重载
+min1 <- list.Min()                        // 1 (无参数版本)
+min2 <- list.Min((x:int) -> -x)           // -5 (带选择器版本，取负数的最小值)
+
+// Max 方法重载
+max1 <- list.Max()                        // 5 (无参数版本)
+max2 <- list.Max((x:int) -> x * x)        // 25 (带选择器版本，取平方的最大值)
+
 // 链式调用
 result <- list.Filter((x:int) -> x > 2).First()  // 3
 ```
@@ -256,6 +321,15 @@ result <- list.Filter((x:int) -> x > 2).First()  // 3
 7. `Old8Lang/InstanceMethods/Implementations/List/ListLastWithPredicateMethod.cs`
 8. `Old8Lang/InstanceMethods/Implementations/List/ListAggregateMethod.cs`
 9. `Old8Lang/InstanceMethods/Implementations/List/ListAggregateWithSeedMethod.cs`
+10. `Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs`
+11. `Old8Lang/InstanceMethods/Implementations/Generic/LangListSumWithSelectorMethod.cs`
+12. `Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs`
+13. `Old8Lang/InstanceMethods/Implementations/Generic/LangListMinWithSelectorMethod.cs`
+14. `Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs`
+15. `Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxWithSelectorMethod.cs`
+16. `Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs`
+17. `Old8Lang/InstanceMethods/Implementations/Generic/LangListSortByMethod.cs`
+18. `Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs`
 
 ### 新增测试文件
 
@@ -275,7 +349,7 @@ result <- list.Filter((x:int) -> x > 2).First()  // 3
 
 ### List 方法重载测试
 ```
-已通过! - 失败: 0，通过: 9，已跳过: 0，总计: 9
+已通过! - 失败: 0，通过: 18，已跳过: 0，总计: 18
 ```
 
 测试覆盖：
@@ -288,6 +362,15 @@ result <- list.Filter((x:int) -> x > 2).First()  // 3
 - ✅ Aggregate(accumulator) 无初始值版本
 - ✅ Aggregate(accumulator, seed) 带初始值版本
 - ✅ Aggregate() 重载解析
+- ✅ Sum() 无参数版本
+- ✅ Sum(selector) 带选择器版本
+- ✅ Sum() 重载解析
+- ✅ Min() 无参数版本
+- ✅ Min(selector) 带选择器版本
+- ✅ Min() 重载解析
+- ✅ Max() 无参数版本
+- ✅ Max(selector) 带选择器版本
+- ✅ Max() 重载解析
 
 ### 单元测试
 ```
@@ -329,8 +412,11 @@ part2: ming
 - `First()` / `First(predicate)` - 2个重载
 - `Last()` / `Last(predicate)` - 2个重载
 - `Aggregate(accumulator)` / `Aggregate(accumulator, seed)` - 2个重载
+- `Sum()` / `Sum(selector)` - 2个重载
+- `Min()` / `Min(selector)` - 2个重载
+- `Max()` / `Max(selector)` - 2个重载
 
-**总计：** 3组方法，7个重载版本
+**总计：** 7组方法，14个重载版本
 
 ### 重载解析模式
 

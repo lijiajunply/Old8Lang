@@ -15,11 +15,26 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// </summary>
 public class ListSortWithComparerMethod : BaseInstanceMethod
 {
-    public override string[] Names => ["SortWith", "sortWith", "SortBy", "sortBy"];
+    public override string[] Names => ["SortWith", "sortWith"];  // 移除 "SortBy" 避免与 LangListSortByMethod 冲突
     public override Type TargetType => typeof(ListLangValue);
     public override string[] ParameterNames => ["comparer"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
+
+    /// <summary>
+    /// 参数类型：comparer 必须是函数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue)];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(ListLangValue);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "使用自定义比较器排序列表";
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)

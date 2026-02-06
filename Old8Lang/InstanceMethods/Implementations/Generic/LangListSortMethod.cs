@@ -19,6 +19,21 @@ public class LangListSortMethod : BaseLangListMethod
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
+    /// <summary>
+    /// 参数类型：无参数
+    /// </summary>
+    public override Type?[]? ParameterTypes => [];
+
+    /// <summary>
+    /// 返回类型
+    /// </summary>
+    public override Type? DeclaredReturnType => typeof(ListLangValue);
+
+    /// <summary>
+    /// 方法文档
+    /// </summary>
+    public override string? Documentation => "对列表进行升序排序";
+
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
