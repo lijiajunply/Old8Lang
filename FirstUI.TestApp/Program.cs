@@ -1,6 +1,5 @@
 using FirstUI;
 using FirstUI.Basic;
-using FirstUI.Core;
 using FirstUI.Layout;
 using FirstUI.State.Reactive;
 

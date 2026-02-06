@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using FirstUI.Core;
-using FirstUI.Utils;
 using LayoutHelper = FirstUI.Utils.LayoutHelper;
 
 namespace FirstUI.Advanced;

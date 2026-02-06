@@ -1,8 +1,6 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.Interpreter;
 using System.Collections;
-using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 

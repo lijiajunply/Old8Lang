@@ -48,11 +48,6 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(CryptoLib))
         ),
 
-        ["Json"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(JsonLib))
-        ),
-
         ["Csv"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
             TypeImportConfig.StaticClass(typeof(Csv))
