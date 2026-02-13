@@ -23,20 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/INSTANCE_METHOD_OVERLOAD_SUMMARY.md" beforeDir="false" afterPath="$PROJECT_DIR$/INSTANCE_METHOD_OVERLOAD_SUMMARY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/InstanceMethods/ListMethodOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/InstanceMethods/ListMethodOverloadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMaxWithSelectorMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListMinWithSelectorMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortByMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortByMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSortMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumWithSelectorMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumWithSelectorMethod.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMaxByMethod.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListMinByMethod.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListSortWithComparerMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +103,7 @@
     &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
     &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
     &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
     &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
     &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
     &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
@@ -176,27 +164,6 @@
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
       <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net10.0/LibTest" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LibTest/bin/Debug/net10.0" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/LibTest/LibTest.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="net10.0" />
       <method v="2">
         <option name="Build" />
       </method>
@@ -332,7 +299,6 @@
       <item itemvalue=".NET 项目.Old8Lang.PackageManager" />
       <item itemvalue=".NET 项目.Old8Lang.PackageManager.Tests" />
       <item itemvalue=".NET 项目.Old8Lang.Benchmarks" />
-      <item itemvalue=".NET 项目.LibTest" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
     </list>
     <recent_temporary>
@@ -588,6 +554,7 @@
       <workItem from="1770222792162" duration="713000" />
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
+      <workItem from="1770997398015" duration="545000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -932,7 +899,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="901" />
+    <option name="localTasksCounter" value="902" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -959,7 +926,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(list): 添加列表基础查询实例方法&#10;&#10;- 注册 ListPopMethod、ListSliceMethod、ListElementAtOrDefaultMethod 等8个新方法&#10;- 实现 ElementAtOrDefault 方法支持安全获取指定索引元素并返回默认值&#10;- 实现 IsEmpty 方法用于检查列表是否为空&#10;- 实现 Pop 方法用于移除并返回列表的最后一个元素&#10;- 实现 Single 和 SingleOrDefault 方法用于获取满足条件的唯一元素&#10;- 实现 Slice 方法用于获取列表切片&#10;- 实现 ToArray 方法用于将列表转换为数组&#10;- 添加完整的列表基础查询方法测试用例覆盖所有功能" />
     <MESSAGE value="feat(list): 添加列表高级查询实例方法&#10;&#10;- 注册 ListMaxByMethod、ListMinByMethod、ListTakeLastMethod 等6个新方法&#10;- 实现 MaxBy 和 MinBy 方法支持按选择器获取最大值和最小值元素&#10;- 实现 TakeLast 和 SkipLast 方法支持对列表末尾元素的操作&#10;- 实现 TakeWhile 和 SkipWhile 方法支持按条件获取和跳过元素&#10;- 添加完整的列表高级查询方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表高级操作实例方法&#10;&#10;- 注册 ListChunkMethod、ListPartitionMethod、ListPairwiseMethod 等7个新方法&#10;- 实现 Chunk 方法支持将列表分割成指定大小的块&#10;- 实现 Partition 方法根据条件将列表分为两部分&#10;- 实现 Pairwise 方法将相邻元素配对返回元组列表&#10;- 实现 FlatMap 方法对每个元素应用转换函数并扁平化结果&#10;- 实现 Window 方法创建滑动窗口返回连续子列表&#10;- 实现 Flatten 方法扁平化嵌套列表结构&#10;- 添加完整的列表高级操作方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表集合操作方法&#10;&#10;- 注册 ListSymmetricExcept、ListIsSubsetOf、ListIsSupersetOf、ListFindAll 和 ListLastIndexOf 方法&#10;- 实现 SymmetricExcept 方法用于计算两个列表的对称差集&#10;- 实现 IsSubsetOf 方法用于检查当前列表是否为另一个列表的子集&#10;- 实现 IsSupersetOf 方法用于检查当前列表是否为另一个列表的超集&#10;- 实现 FindAll 方法用于查找所有满足条件的元素&#10;- 实现 LastIndexOf 方法用于查找元素最后一次出现的索引&#10;- 更新 SortBy 方法的虚拟机实现以支持函数对象调用&#10;- 添加测试文件验证所有新方法的功能" />
@@ -984,7 +950,8 @@
     <MESSAGE value="feat(global-functions): 添加完整的JSON处理函数功能&#10;&#10;- 移除旧的JsonFunction并替换为多个专用的JSON函数实现&#10;- 添加JsonSerializeFunction用于将值序列化为JSON字符串&#10;- 添加JsonDeserializeFunction用于将JSON字符串反序列化为动态对象&#10;- 添加JsonDeserializeFromFileFunction用于从JSON文件读取并反序列化&#10;- 添加JsonSerializeToFileFunction用于将对象序列化并写入JSON文件&#10;- 添加JsonIsValidFunction用于验证JSON字符串有效性&#10;- 添加JsonMinifyFunction用于压缩JSON字符串&#10;- 添加JsonPrettifyFunction用于美化JSON字符串&#10;- 添加JsonMergeFunction用于合并多个JSON对象&#10;- 添加JsonCompareFunction用于比较两个JSON字符串是否相等&#10;- 添加JsonGetValueFunction用于根据路径获取JSON值&#10;- 在GlobalFunctionInitializer中注册所有新的JSON函数&#10;- 更新JSON序列化选项配置和错误处理机制" />
     <MESSAGE value="refactor(core): 移除不需要的命名空间引用并更新JSON序列化方法&#10;&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Intermediates引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Value引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST引用&#10;- 从多个文件中移除了未使用的Old8Lang.Error引用&#10;- 从Csv.cs中将JsonLib.Serialize替换为JsonSerializer.Serialize&#10;- 移除了JsonLib.cs中的自定义JSON处理库实现&#10;- 移除了JsonLibTests.cs中的相关测试代码&#10;- 从多个实例方法实现中移除了未使用的命名空间引用&#10;- 从多个测试文件中移除了未使用的命名空间引用&#10;- 优化了代码结构和依赖关系管理" />
     <MESSAGE value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
+    <MESSAGE value="feat(list): 添加列表聚合和排序方法重载实现&#10;&#10;- 实现 Sum() 和 Sum(selector) 方法用于列表求和操作&#10;- 实现 Min() 和 Min(selector) 方法用于获取列表最小值&#10;- 实现 Max() 和 Max(selector) 方法用于获取列表最大值&#10;- 实现 Sort()、SortBy() 和 SortWith() 方法用于列表排序&#10;- 添加带选择器参数的方法重载版本支持&#10;- 更新文档说明新增方法的功能和用法示例&#10;- 移除旧的 MaxBy 和 MinBy 方法避免命名冲突&#10;- 修复 SortBy 与 SortWith 的命名冲突问题&#10;- 增加单元测试覆盖所有新增方法和重载场景&#10;- 更新实例方法初始化器注册新的方法实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(list): 添加列表聚合和排序方法重载实现&#10;&#10;- 实现 Sum() 和 Sum(selector) 方法用于列表求和操作&#10;- 实现 Min() 和 Min(selector) 方法用于获取列表最小值&#10;- 实现 Max() 和 Max(selector) 方法用于获取列表最大值&#10;- 实现 Sort()、SortBy() 和 SortWith() 方法用于列表排序&#10;- 添加带选择器参数的方法重载版本支持&#10;- 更新文档说明新增方法的功能和用法示例&#10;- 移除旧的 MaxBy 和 MinBy 方法避免命名冲突&#10;- 修复 SortBy 与 SortWith 的命名冲突问题&#10;- 增加单元测试覆盖所有新增方法和重载场景&#10;- 更新实例方法初始化器注册新的方法实现" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

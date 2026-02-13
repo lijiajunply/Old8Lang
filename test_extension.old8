@@ -1,0 +1,52 @@
+// 测试扩展方法功能
+
+// 为 string 类型添加扩展方法
+extension string {
+    func reverse() {
+        result <- ""
+        i <- this.length() - 1
+        while i >= 0 {
+            result <- result + this[i]
+            i <- i - 1
+        }
+        return result
+    }
+
+    func repeat(times) {
+        result <- ""
+        i <- 0
+        while i < times {
+            result <- result + this
+            i <- i + 1
+        }
+        return result
+    }
+}
+
+// 测试扩展方法
+str <- "Hello"
+print("原始字符串: " + str)
+print("反转后: " + str.reverse())
+print("重复3次: " + str.repeat(3))
+
+// 为 int 类型添加扩展方法
+extension int {
+    func isEven() {
+        return this % 2 == 0
+    }
+
+    func square() {
+        return this * this
+    }
+}
+
+// 测试 int 扩展方法
+num <- 5
+print("数字: " + num)
+print("是偶数吗? " + num.isEven())
+print("平方: " + num.square())
+
+num2 <- 4
+print("数字: " + num2)
+print("是偶数吗? " + num2.isEven())
+print("平方: " + num2.square())

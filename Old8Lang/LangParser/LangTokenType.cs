@@ -413,6 +413,11 @@ public enum LangTokenType
     Struct,
 
     /// <summary>
+    /// extension (扩展方法关键字)
+    /// </summary>
+    Extension,
+
+    /// <summary>
     /// @ (装饰器符号)
     /// </summary>
     At,
@@ -526,5 +531,6 @@ public enum KeywordType
     Let,
     Params,
     New,
-    Struct
+    Struct,
+    Extension
 }

@@ -15,7 +15,8 @@ public partial class StatementParser(
     ExpressionParser expressionParser,
     FunctionParser functionParser,
     ClassParser classParser,
-    PrimaryParser primaryParser)
+    PrimaryParser primaryParser,
+    ExtensionParser extensionParser)
     : ParserBase(context)
 {
     #region Statement
@@ -339,6 +340,12 @@ public partial class StatementParser(
         if (CurrentToken.Type == LangTokenType.Enum)
         {
             return ParseEnumDeclaration();
+        }
+
+        // 处理扩展方法定义：extension TypeName { func method() {} }
+        if (CurrentToken.Type == LangTokenType.Extension)
+        {
+            return extensionParser.ParseExtensionDeclaration();
         }
 
         // 处理import语句：import module, lazy import module, 或 dynamic import module

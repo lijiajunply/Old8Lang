@@ -12,6 +12,16 @@ namespace Old8Lang.AST.Visitor;
 public partial class InterpreterVisitor
 {
     /// <summary>
+    /// 访问 ExtensionDeclaration 节点
+    /// </summary>
+    public LangValueType VisitExtensionDeclaration(ExtensionDeclaration node)
+    {
+        // 直接调用 Run 方法
+        node.Run(manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
     /// 访问 BreakStatement 节点
     /// </summary>
     public LangValueType VisitBreakStatement(BreakStatement node)

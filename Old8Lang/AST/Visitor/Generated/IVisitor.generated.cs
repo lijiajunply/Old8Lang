@@ -68,6 +68,11 @@ public interface IVisitor<out TResult>
     TResult VisitEnumInit(EnumInit node);
 
     /// <summary>
+    /// 访问 ExtensionDeclaration 节点
+    /// </summary>
+    TResult VisitExtensionDeclaration(ExtensionDeclaration node);
+
+    /// <summary>
     /// 访问 ExternStatement 节点
     /// </summary>
     TResult VisitExternStatement(ExternStatement node);

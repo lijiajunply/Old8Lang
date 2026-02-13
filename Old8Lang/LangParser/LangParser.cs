@@ -110,13 +110,20 @@ public class LangParser
             () => _expressionParser!,
             () => functionParser!);
 
+        // 创建ExtensionParser（需要延迟加载FunctionParser和StatementParser）
+        var extensionParser = new ExtensionParser(
+            _context,
+            () => functionParser!,
+            () => _statementParser!);
+
         // 最后创建StatementParser（依赖所有其他解析器）
         _statementParser = new StatementParser(
             _context,
             _expressionParser,
             functionParser,
             classParser,
-            primaryParser);
+            primaryParser,
+            extensionParser);
     }
 
     /// <summary>

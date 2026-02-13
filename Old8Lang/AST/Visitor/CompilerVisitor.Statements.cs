@@ -10,6 +10,15 @@ namespace Old8Lang.AST.Visitor;
 public partial class CompilerVisitor
 {
     /// <summary>
+    /// 访问 ExtensionDeclaration 节点
+    /// </summary>
+    public object? VisitExtensionDeclaration(ExtensionDeclaration node)
+    {
+        // 编译模式暂不支持扩展方法
+        throw new NotImplementedException("扩展方法的编译模式支持尚未实现，请使用解释模式");
+    }
+
+    /// <summary>
     /// 访问 BreakStatement 节点
     /// </summary>
     public object? VisitBreakStatement(BreakStatement node)

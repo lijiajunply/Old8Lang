@@ -15,6 +15,7 @@ public partial class TypeInferenceVisitor
     public Type VisitCaseStatement(CaseStatement node) => typeof(void);
     public Type VisitClassInit(ClassInit node) => typeof(void);
     public Type VisitContinueStatement(ContinueStatement node) => typeof(void);
+    public Type VisitExtensionDeclaration(ExtensionDeclaration node) => typeof(void);
     public Type VisitForInStatement(ForInStatement node) => typeof(void);
     public Type VisitForStatement(ForStatement node) => typeof(void);
     public Type VisitFuncInit(FuncInit node) => typeof(void);

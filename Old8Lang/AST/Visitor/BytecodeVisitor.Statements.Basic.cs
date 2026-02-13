@@ -12,6 +12,12 @@ namespace Old8Lang.AST.Visitor;
 /// </summary>
 public partial class BytecodeVisitor
 {
+    public Instruction? VisitExtensionDeclaration(ExtensionDeclaration node)
+    {
+        // Bytecode 模式暂不支持扩展方法
+        throw new NotImplementedException("扩展方法的 Bytecode 模式支持尚未实现");
+    }
+
     public Instruction? VisitBlockStatement(BlockStatement node)
     {
         // 先处理导入语句（函数定义、类定义等）
