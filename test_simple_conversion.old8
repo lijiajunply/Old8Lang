@@ -1,0 +1,16 @@
+// 简单测试 ToList 方法
+
+print("=== 测试 ToList ===")
+myList <- [1, 2, 3]
+result <- myList.ToList()
+print(result)
+
+print("=== 测试 ToArray ===")
+result2 <- myList.ToArray()
+print(result2)
+
+print("=== 测试 ToTuple ===")
+result3 <- myList.ToTuple()
+print(result3)
+
+print("完成")

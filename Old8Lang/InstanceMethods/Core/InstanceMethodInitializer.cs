@@ -135,6 +135,12 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.List.ListMinWithSelectorMethod());
             registry.Register(new Implementations.List.ListMaxWithSelectorMethod());
 
+            // 注册 List 转换方法
+            registry.Register(new Implementations.List.ListToListMethod());
+            registry.Register(new Implementations.List.ListToArrayMethod());
+            registry.Register(new Implementations.List.ListToTupleMethod());
+            registry.Register(new Implementations.List.ListToDictMethod());
+
             // List 方法注册完成！
 
             // 注册 String 基础方法
@@ -188,7 +194,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Dictionary.DictToListMethod());
             registry.Register(new Implementations.Dictionary.DictIsEmptyMethod());
 
-            // Dictionary 方法迁移完成！共 20 个方法
+            // 注册 Dictionary 转换方法
+            registry.Register(new Implementations.Dictionary.DictToListMethod());
+            registry.Register(new Implementations.Dictionary.DictToArrayMethod());
+            registry.Register(new Implementations.Dictionary.DictToTupleMethod());
+            registry.Register(new Implementations.Dictionary.DictToDictMethod());
+
+            // Dictionary 方法迁移完成！共 24 个方法
 
             // 注册 Array 方法
             registry.Register(new Implementations.Array.ArrayCountMethod());
@@ -248,6 +260,12 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayAverageWithSelectorMethod());
             registry.Register(new Implementations.Array.ArrayMinWithSelectorMethod());
             registry.Register(new Implementations.Array.ArrayMaxWithSelectorMethod());
+
+            // 注册 Array 转换方法
+            registry.Register(new Implementations.Array.ArrayToListMethod());
+            registry.Register(new Implementations.Array.ArrayToArrayMethod());
+            registry.Register(new Implementations.Array.ArrayToTupleMethod());
+            registry.Register(new Implementations.Array.ArrayToDictMethod());
 
             // 注册 Array 排序算法方法（新增）
             registry.Register(new Implementations.Array.ArrayQuickSortMethod());
@@ -331,6 +349,12 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Tuple.TupleAverageWithSelectorMethod());
             registry.Register(new Implementations.Tuple.TupleMinWithSelectorMethod());
             registry.Register(new Implementations.Tuple.TupleMaxWithSelectorMethod());
+
+            // 注册 Tuple 转换方法
+            registry.Register(new Implementations.Tuple.TupleToListMethod());
+            registry.Register(new Implementations.Tuple.TupleToArrayMethod());
+            registry.Register(new Implementations.Tuple.TupleToTupleMethod());
+            registry.Register(new Implementations.Tuple.TupleToDictMethod());
 
             // 注册 Char 方法
             registry.Register(new Implementations.Char.CharToUpperMethod());

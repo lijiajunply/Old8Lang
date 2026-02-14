@@ -1,0 +1,60 @@
+// 测试 ILangList 转换方法（ToList, ToArray, ToTuple, ToDict）
+
+print("=== List 转换测试 ===")
+myList <- [1, 2, 3, 4, 5]
+
+// List -> List (应该返回自身)
+list1 <- myList.ToList()
+print(list1)
+
+// List -> Array
+arr1 <- myList.ToArray()
+print(arr1)
+
+// List -> Tuple
+tuple1 <- myList.ToTuple()
+print(tuple1)
+
+print("\n=== Array 转换测试 ===")
+myArray <- array(10, 20, 30)
+
+// Array -> List
+list2 <- myArray.ToList()
+print(list2)
+
+// Array -> Array (应该返回自身)
+arr2 <- myArray.ToArray()
+print(arr2)
+
+// Array -> Tuple
+tuple2 <- myArray.ToTuple()
+print(tuple2)
+
+print("\n=== Tuple 转换测试 ===")
+myTuple <- (100, 200, 300)
+
+// Tuple -> List
+list3 <- myTuple.ToList()
+print(list3)
+
+// Tuple -> Array
+arr3 <- myTuple.ToArray()
+print(arr3)
+
+// Tuple -> Tuple (应该返回自身)
+tuple3 <- myTuple.ToTuple()
+print(tuple3)
+
+print("\n=== Dict 转换测试 ===")
+// 创建一个包含键值对的列表
+kvList <- [("a", 1), ("b", 2), ("c", 3)]
+
+// List -> Dict
+dict1 <- kvList.ToDict()
+print(dict1)
+
+// Dict -> List (返回键值对列表)
+list4 <- dict1.ToList()
+print(list4)
+
+print("\n所有测试完成！")
