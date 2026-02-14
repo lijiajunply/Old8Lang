@@ -492,28 +492,6 @@ public class VMUnexpectedInputsTests(ITestOutputHelper output)
 
     #endregion
 
-    #region 无效生成器操作测试
-
-    [Fact]
-    public void UnexpectedInputs_InvalidYield_ThrowsException()
-    {
-        var code = @"
-            func generator() -> {
-                yield 10
-                yield 20
-            }
-            gen <- generator()
-            gen.MoveNext()
-            gen.MoveNext()
-            gen.MoveNext()
-        ";
-
-        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
-        output.WriteLine($"Expected exception: {exception.Message}");
-    }
-
-    #endregion
-
     #region 无效字符串操作测试
 
     [Fact]

@@ -94,6 +94,19 @@ public static class VMTypeMapper
                 return true;
             }
 
+            // 集合类型可以映射到 LangValueType
+            if (actualType == typeof(object[]) || actualType == typeof(List<object?>) ||
+                actualType == typeof(Dictionary<object, object?>))
+            {
+                return true;
+            }
+
+            // 元组类型可以映射到 LangValueType
+            if (actualType.IsGenericType && actualType.GetGenericTypeDefinition() == typeof(Tuple<,>))
+            {
+                return true;
+            }
+
             // 如果实际类型已经是 LangValueType 的子类，也认为等价
             if (typeof(LangValueType).IsAssignableFrom(actualType))
             {

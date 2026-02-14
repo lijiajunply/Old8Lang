@@ -69,6 +69,58 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
             return b ? "true" : "false";
         }
 
+        // 对于字典类型，格式化为 {key1: value1, key2: value2}
+        if (instance is Dictionary<object, object?> dict)
+        {
+            if (dict.Count == 0)
+            {
+                return "{}";
+            }
+
+            var pairs = dict.Select(kvp =>
+            {
+                var keyStr = FormatValueForDisplay(kvp.Key);
+                var valueStr = FormatValueForDisplay(kvp.Value);
+                return $"{keyStr}: {valueStr}";
+            });
+            return "{" + string.Join(", ", pairs) + "}";
+        }
+
+        // 对于数组类型，格式化为 [item1, item2, item3]
+        if (instance is object?[] array)
+        {
+            if (array.Length == 0)
+            {
+                return "[]";
+            }
+
+            var items = array.Select(FormatValueForDisplay);
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        // 对于列表类型，格式化为 [item1, item2, item3]
+        if (instance is List<object?> list)
+        {
+            if (list.Count == 0)
+            {
+                return "[]";
+            }
+
+            var items = list.Select(FormatValueForDisplay);
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        // 对于元组类型，格式化为 (item1, item2)
+        if (instance?.GetType().IsGenericType == true &&
+            instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            var item1 = instance.GetType().GetProperty("Item1")?.GetValue(instance);
+            var item2 = instance.GetType().GetProperty("Item2")?.GetValue(instance);
+            var item1Str = FormatValueForDisplay(item1);
+            var item2Str = FormatValueForDisplay(item2);
+            return $"({item1Str}, {item2Str})";
+        }
+
         // 对于 LangValueType，使用 ToDisplayString
         if (instance is LangValueType langValue)
         {
@@ -76,5 +128,87 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
         }
 
         return instance?.ToString() ?? "null";
+    }
+
+    /// <summary>
+    /// 格式化值用于显示（递归处理嵌套集合）
+    /// </summary>
+    private static string FormatValueForDisplay(object? value)
+    {
+        if (value == null)
+        {
+            return "null";
+        }
+
+        // 字符串需要加引号
+        if (value is string str)
+        {
+            return $"\"{str}\"";
+        }
+
+        // bool 使用小写
+        if (value is bool b)
+        {
+            return b ? "true" : "false";
+        }
+
+        // double 格式化
+        if (value is double d)
+        {
+            if (Math.Abs(d - Math.Round(d)) < 0.0000001)
+            {
+                return d.ToString("F0");
+            }
+            return d.ToString(CultureInfo.InvariantCulture);
+        }
+
+        // 递归处理嵌套字典
+        if (value is Dictionary<object, object?> dict)
+        {
+            if (dict.Count == 0)
+            {
+                return "{}";
+            }
+
+            var pairs = dict.Select(kvp =>
+            {
+                var keyStr = FormatValueForDisplay(kvp.Key);
+                var valueStr = FormatValueForDisplay(kvp.Value);
+                return $"{keyStr}: {valueStr}";
+            });
+            return "{" + string.Join(", ", pairs) + "}";
+        }
+
+        // 递归处理嵌套数组
+        if (value is object?[] array)
+        {
+            if (array.Length == 0)
+            {
+                return "[]";
+            }
+
+            var items = array.Select(FormatValueForDisplay);
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        // 递归处理嵌套列表
+        if (value is List<object?> list)
+        {
+            if (list.Count == 0)
+            {
+                return "[]";
+            }
+
+            var items = list.Select(FormatValueForDisplay);
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        // LangValueType 使用 ToDisplayString
+        if (value is LangValueType langValue)
+        {
+            return langValue.ToDisplayString();
+        }
+
+        return value.ToString() ?? "null";
     }
 }

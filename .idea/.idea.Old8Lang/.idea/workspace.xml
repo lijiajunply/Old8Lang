@@ -23,11 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/BaseInstanceMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/BaseInstanceMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/EdgeCases/VMUnexpectedInputsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VMTypeMapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VMTypeMapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToStrMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToStrMethod.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -559,7 +558,7 @@
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
       <workItem from="1771037866145" duration="13170000" />
-      <workItem from="1771059572518" duration="2123000" />
+      <workItem from="1771059572518" duration="2585000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -904,7 +903,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="911" />
+    <option name="localTasksCounter" value="912" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -931,7 +930,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(instance-methods): 添加带选择器的聚合方法支持&#10;&#10;- 实现 SortBy 方法支持按键选择器对列表进行排序&#10;- 实现 SumWithSelector 方法支持对选择器结果进行求和&#10;- 实现 AverageWithSelector 方法支持对选择器结果计算平均值&#10;- 实现 MinWithSelector 和 MaxWithSelector 方法支持选择器比较&#10;- 为 List、Array、Tuple 类型注册带选择器的聚合方法&#10;- 扩展实例方法初始化器支持新的聚合操作方法&#10;- 添加测试文件验证各种选择器方法的功能正确性" />
     <MESSAGE value="feat(instance-methods): 添加字符串和任务线程相关实例方法&#10;&#10;- 注册 StringTrimStart、StringTrimEnd、StringRepeat 方法实现字符串修剪和重复功能&#10;- 添加 StringToBase64 和 StringFromBase64 方法实现 Base64 编码解码功能&#10;- 注册 TaskContinueWith 方法实现任务延续执行功能&#10;- 添加 ThreadCancel 和 ThreadWithTimeout 方法实现线程取消和超时控制&#10;- 更新初始化器统计信息从 15 个 String 方法扩展到 20 个&#10;- 更新 Task 方法计数从 4 个增加到 5 个&#10;- 更新 Thread 方法计数从 3 个增加到 5 个&#10;- 移除 IDE 工作空间中的变更记录和选择器方法提交历史" />
     <MESSAGE value="feat(instance-methods): 添加数组排序算法和多类型实例方法&#10;&#10;- 实现冒泡排序、堆排序、插入排序、归并排序、快速排序和选择排序算法&#10;- 添加字符串子串单参数方法支持从指定位置截取到末尾&#10;- 注册线程重试和链式执行方法增强异步操作功能&#10;- 实现元组切片方法支持按范围提取元组元素&#10;- 更新实例方法初始化器注册所有新增方法并修正计数统计" />
     <MESSAGE value="feat(instance-methods): 添加数组Count方法和字典GetValue方法&#10;&#10;- 实现ArrayCountMethod提供数组长度获取功能，与Length方法等效&#10;- 添加DictGetValueMethod支持根据键获取字典中的值&#10;- 在InstanceMethodInitializer中注册新方法并更新统计计数&#10;- 修正CollectionMethodsTests中的断言类型以匹配实际返回值&#10;- 更新IDE工作空间配置和提交历史记录" />
@@ -956,7 +954,8 @@
     <MESSAGE value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
     <MESSAGE value="feat(lang): 添加 ILangList 类型转换方法实现&#10;&#10;- 实现 ToList、ToArray、ToTuple、ToDict 通用转换方法&#10;- 为 List、Array、Tuple、Dictionary 类型添加转换方法包装器&#10;- 在实例方法初始化器中注册所有转换方法&#10;- 添加完整的转换方法测试用例文件&#10;- 重构 BaseValueTypeMethod 中的类型转换逻辑&#10;- 更新 IDE 工作区配置文件中的变更记录" />
     <MESSAGE value="refactor(lang): 简化数组实例方法调用逻辑并移除冗余转换方法&#10;&#10;- 移除 ArrayLangValue 中的方法名白名单检查，直接调用 FromClassToResult&#10;- 删除 ListToArrayMethod 和通用 LangList 转换方法注册&#10;- 将 Program.cs 中的参数从 -vm 修改为 -f&#10;- 更新 IDE 工作区配置中的执行器设置为 Debug 模式" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(lang): 简化数组实例方法调用逻辑并移除冗余转换方法&#10;&#10;- 移除 ArrayLangValue 中的方法名白名单检查，直接调用 FromClassToResult&#10;- 删除 ListToArrayMethod 和通用 LangList 转换方法注册&#10;- 将 Program.cs 中的参数从 -vm 修改为 -f&#10;- 更新 IDE 工作区配置中的执行器设置为 Debug 模式" />
+    <MESSAGE value="refactor(vm): 提取类型映射逻辑到专用VMTypeMapper类&#10;&#10;- 将BaseInstanceMethod中的IsEquivalentType方法替换为VMTypeMapper调用&#10;- 移除VirtualMachine.Helpers.ReflectionAndTasks中的GetEquivalentLangType方法&#10;- 将类型等价检查逻辑统一到新创建的VMTypeMapper类中&#10;- 添加VMTypeMapper类处理C#原生类型与Old8Lang类型间的映射关系&#10;- 更新程序启动参数从-f改为-vm&#10;- 修改IDE配置文件中的调试设置和测试路径记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(vm): 提取类型映射逻辑到专用VMTypeMapper类&#10;&#10;- 将BaseInstanceMethod中的IsEquivalentType方法替换为VMTypeMapper调用&#10;- 移除VirtualMachine.Helpers.ReflectionAndTasks中的GetEquivalentLangType方法&#10;- 将类型等价检查逻辑统一到新创建的VMTypeMapper类中&#10;- 添加VMTypeMapper类处理C#原生类型与Old8Lang类型间的映射关系&#10;- 更新程序启动参数从-f改为-vm&#10;- 修改IDE配置文件中的调试设置和测试路径记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1386,6 +1385,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="654" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictContainsKeyMethod.cs</url>
+          <line>50</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\InstanceMethods\Implementations\Dictionary\DictContainsKeyMethod.cs" containingFunctionPresentation="方法 'ExecuteInVMInternal'">
+            <startOffsets>
+              <option value="1986" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2058" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="655" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
