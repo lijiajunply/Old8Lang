@@ -79,16 +79,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] 更新 CLAUDE.md 的"Key Architectural Patterns"章节，详细说明 Visitor 模式的实现和三个主要 Visitor
-- [ ] T022 [P] [US2] 更新 CLAUDE.md 的"Directory Structure"章节，准确反映当前的项目组织方式（包括 Bytecode/ 目录）
-- [ ] T023 [US2] 在 Docs/ARCHITECTURE.md 更新"Visitor Pattern"章节，添加 IVisitor 接口定义和四个主要实现（InterpreterVisitor, CompilerVisitor, BytecodeVisitor, TypeInferenceVisitor）
-- [ ] T024 [US2] 在 Docs/ARCHITECTURE.md 更新"AST Node Organization"章节，说明 AST 节点的分类和组织结构（Expression/, Statement/）
-- [ ] T025 [US2] 在 Docs/ARCHITECTURE.md 更新"Parser Structure"章节，说明 Parser 的 Facade 模式和递归下降解析机制
-- [ ] T026 [US2] 在 Docs/ARCHITECTURE.md 更新"Type System"章节，说明 TypeChecker、TypeInferenceEngine、GenericTypeInference 的职责和使用场景
-- [ ] T027 [US2] 在 Docs/ARCHITECTURE.md 添加三种执行模式的详细实现位置（核心类、Visitor、文件路径）
-- [ ] T028 [US2] 在 Docs/ADVANCED_TOPICS.md 添加"Extending Old8Lang"章节，说明如何扩展 Visitor 模式和添加新的语言特性
-- [ ] T029 [US2] 更新所有架构文档中的代码位置引用，确保文件路径准确（格式：path/to/file.cs:line）
-- [ ] T030 [US2] 在 CLAUDE.md 的"Key Files to Understand"章节添加 Bytecode VM 相关的关键文件
+- [x] T021 [P] [US2] 更新 CLAUDE.md 的"Key Architectural Patterns"章节，详细说明 Visitor 模式的实现和三个主要 Visitor
+- [x] T022 [P] [US2] 更新 CLAUDE.md 的"Directory Structure"章节，准确反映当前的项目组织方式（包括 Bytecode/ 目录）
+- [x] T023 [US2] 在 Docs/ARCHITECTURE.md 更新"Visitor Pattern"章节，添加 IVisitor 接口定义和四个主要实现（InterpreterVisitor, CompilerVisitor, BytecodeVisitor, TypeInferenceVisitor）
+- [x] T024 [US2] 在 Docs/ARCHITECTURE.md 更新"AST Node Organization"章节，说明 AST 节点的分类和组织结构（Expression/, Statement/）
+- [x] T025 [US2] 在 Docs/ARCHITECTURE.md 更新"Parser Structure"章节，说明 Parser 的 Facade 模式和递归下降解析机制
+- [x] T026 [US2] 在 Docs/ARCHITECTURE.md 更新"Type System"章节，说明 TypeChecker、TypeInferenceEngine、GenericTypeInference 的职责和使用场景
+- [x] T027 [US2] 在 Docs/ARCHITECTURE.md 添加三种执行模式的详细实现位置（核心类、Visitor、文件路径）
+- [x] T028 [US2] 在 Docs/ADVANCED_TOPICS.md 添加"Extending Old8Lang"章节，说明如何扩展 Visitor 模式和添加新的语言特性
+- [x] T029 [US2] 更新所有架构文档中的代码位置引用，确保文件路径准确（格式：path/to/file.cs:line）
+- [x] T030 [US2] 在 CLAUDE.md 的"Key Files to Understand"章节添加 Bytecode VM 相关的关键文件
 
 **Checkpoint**: 此时，用户故事1和2都应该独立工作 - 用户可以理解执行模式并理解架构设计
 

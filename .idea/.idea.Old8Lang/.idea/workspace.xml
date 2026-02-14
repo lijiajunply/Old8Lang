@@ -23,22 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/API_REFERENCE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/ARCHITECTURE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/CLAUDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/CLI_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/LANGUAGE_FEATURES.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Docs/.backup/PERFORMANCE_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/compilation_mode_example.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/interpretation_mode_example.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/vm_mode_example.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-update-docs-modes/tasks.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/LANGUAGE_FEATURES.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/LANGUAGE_FEATURES.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/PERFORMANCE_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/PERFORMANCE_GUIDE.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -570,7 +555,7 @@
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
       <workItem from="1771037866145" duration="13170000" />
-      <workItem from="1771059572518" duration="6877000" />
+      <workItem from="1771059572518" duration="7331000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -915,7 +900,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="917" />
+    <option name="localTasksCounter" value="918" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -942,7 +927,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(functions): 实现全局函数重载系统和优化字节码序列化&#10;&#10;- 实现函数重载解析机制，支持基于运行时参数值的动态重载选择&#10;- 添加 OverloadResolver 辅助类处理 Old8Lang 类型系统的类型匹配&#10;- 重构 BytecodeObjectInstance 使用主构造函数简化对象创建&#10;- 优化 FunctionMetadata 序列化写入空值处理逻辑&#10;- 在解释器和虚拟机模式下分别实现实时重载解析功能&#10;- 添加重载函数示例实现包括 AddInt、AddDouble、AddString 等版本&#10;- 移除实例方法迁移进度跟踪文档(PROGRESS_INSTANCE_METHODS.md)&#10;- 修复 TypeChecker 中函数类型字符串格式化转义问题" />
     <MESSAGE value="refactor(ast): 移除旧的扩展方法实现并更新类型查找逻辑&#10;&#10;- 删除 ArrayExtensions、DictionaryExtensions、ListExtensions、PrimitiveExtensions 和&#10;  StringExtensions 类&#10;- 从 DotOperatorILHelper 中移除对已删除扩展方法类型的查找逻辑&#10;- 从 VirtualMachine.Helpers.ReflectionAndTasks 中移除对原生类型扩展方法的查找逻辑&#10;- 更新 workspace.xml 中的变更列表和工作时间记录" />
     <MESSAGE value="feat(reflection): 添加类型反射功能支持&#10;&#10;- 在 FieldDefinitionTable 中添加 GetAllFieldNames 和 FindField 方法&#10;- 在 MethodTable 中添加 GetAllMethodNames 和 FindMethod 方法&#10;- 实现 GetAllTypesFunction、GetTypeFunction 和 GetTypeInfoFunction 全局函数&#10;- 扩展 TypeLangValue 类支持反射 API 方法和类型属性检查&#10;- 添加 TypeOf 函数和相关反射辅助方法到 ReflectionHelper&#10;- 实现 TypeLangValue 的懒加载类型模板和元数据功能&#10;- 添加完整的类型反射测试用例和示例脚本" />
     <MESSAGE value="feat(reflection): 实现统一反射功能模块&#10;&#10;- 新增 GetClassInfo 函数，整合 GetClassName、GetClassMethods、GetClassFields 功能&#10;- 扩展 GetFunctionInfo 函数支持多种函数类型：全局函数、普通函数、原生函数、类方法&#10;- 新增 GetMemberInfo 函数，合并 GetMethodInfo 和 GetFieldInfo 功能&#10;- 新增 HasMember 函数，统一 HasMethod 和 HasField 检查功能&#10;- 重构反射函数注册逻辑，删除已合并的旧函数实现&#10;- 实现完整的类实例创建和类型检查功能&#10;- 优化反射函数的解释器和虚拟机模式执行路径&#10;- 统一反射信息返回格式，提供更详细的元数据信息" />
@@ -967,7 +951,8 @@
     <MESSAGE value="feat(specify): 添加 PowerShell 脚本和模板文件支持&#10;&#10;- 新增 PowerShell 脚本用于先决条件检查、功能创建和计划设置&#10;- 添加规范、计划和清单模板文件&#10;- 创建宪法模板和代理文件模板&#10;- 实现通用 PowerShell 函数库&#10;- 添加 Claude 命令配置文件用于分析功能" />
     <MESSAGE value="docs(constitution): 创建 Old8Lang 项目宪法文件&#10;&#10;- 定义双模式对等性原则，确保解释模式和编译模式功能完整性&#10;- 确立访问者模式一致性要求，规范 AST 节点实现标准&#10;- 建立测试优先开发强制性规则，保障语言正确性&#10;- 制定 API 稳定性政策，维护向后兼容性承诺&#10;- 设立性能意识准则，平衡优化与功能完整性&#10;- 明确文档完整性要求，提升语言可用性&#10;- 规范技术标准、开发工作流和治理流程&#10;- 更新 IDE 配置文件以反映宪法变更记录" />
     <MESSAGE value="docs(documentation): 添加三种执行模式的文档规范和数据模型&#10;&#10;- 新增 API 文档格式规范，标准化函数签名和参数表格格式&#10;- 更新宪法文件中执行模式描述，从双模式扩展为三模式&#10;- 创建文档结构数据模型，定义执行模式、架构组件、API参考等实体&#10;- 添加执行模式对比表格模板，规范三种模式特性对比格式&#10;- 生成文档更新实施计划，包含研究、设计和合同规范&#10;- 创建需求检查清单，验证文档更新规范的完整性&#10;- 添加详细技术研究文档，涵盖三种执行模式实现机制和架构组件" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(documentation): 添加三种执行模式的文档规范和数据模型&#10;&#10;- 新增 API 文档格式规范，标准化函数签名和参数表格格式&#10;- 更新宪法文件中执行模式描述，从双模式扩展为三模式&#10;- 创建文档结构数据模型，定义执行模式、架构组件、API参考等实体&#10;- 添加执行模式对比表格模板，规范三种模式特性对比格式&#10;- 生成文档更新实施计划，包含研究、设计和合同规范&#10;- 创建需求检查清单，验证文档更新规范的完整性&#10;- 添加详细技术研究文档，涵盖三种执行模式实现机制和架构组件" />
+    <MESSAGE value="docs(Docs): 添加API参考文档并更新架构文档&#10;&#10;- 新增 Docs/.backup/API_REFERENCE.md 文件，包含 Old8Lang 标准库完整 API 参考&#10;- 新增 Docs/.backup/ARCHITECTURE.md 文件，详细描述 Old8Lang 项目架构&#10;- 更新 Docs/ARCHITECTURE.md 文件，详述三种执行模式（解释、编译、VM）的实现细节&#10;- 添加并发原语、通道通信、原子操作等高级功能的文档说明&#10;- 补充资源管理和 using 语句的自动释放机制文档&#10;- 完善各模块内部结构和依赖关系的架构说明" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(Docs): 添加API参考文档并更新架构文档&#10;&#10;- 新增 Docs/.backup/API_REFERENCE.md 文件，包含 Old8Lang 标准库完整 API 参考&#10;- 新增 Docs/.backup/ARCHITECTURE.md 文件，详细描述 Old8Lang 项目架构&#10;- 更新 Docs/ARCHITECTURE.md 文件，详述三种执行模式（解释、编译、VM）的实现细节&#10;- 添加并发原语、通道通信、原子操作等高级功能的文档说明&#10;- 补充资源管理和 using 语句的自动释放机制文档&#10;- 完善各模块内部结构和依赖关系的架构说明" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
