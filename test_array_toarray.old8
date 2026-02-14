@@ -1,7 +1,0 @@
-myArray <- [1, 2, 3]
-print("Array created")
-print(type(myArray))
-
-result <- myArray.ToArray()
-print("ToArray called")
-print(result)

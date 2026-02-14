@@ -1,3 +1,0 @@
-myList <- [1, 2, 3]
-print(myList)
-print(type(myList))

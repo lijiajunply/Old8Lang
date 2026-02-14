@@ -1,9 +1,0 @@
-// 更简单的测试
-
-myList <- {1, 2, 3}
-
-print("List created")
-
-result <- myList.ToArray()
-print("ToArray called")
-print(result)

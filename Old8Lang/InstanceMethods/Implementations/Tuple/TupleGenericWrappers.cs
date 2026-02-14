@@ -40,7 +40,59 @@ public class TupleGroupByMethod : LangListGroupByMethod { public override Type T
 // 排序和其他方法
 public class TupleSortMethod : LangListSortMethod { public override Type TargetType => typeof(TupleLangValue); }
 public class TupleIsSortedMethod : LangListIsSortedMethod { public override Type TargetType => typeof(TupleLangValue); }
-public class TupleToStrMethod : LangListToStrMethod { public override Type TargetType => typeof(TupleLangValue); }
+
+/// <summary>
+/// 元组的 ToStr 方法 - 覆盖以返回元组格式 (item1, item2)
+/// </summary>
+public class TupleToStrMethod : LangListToStrMethod
+{
+    public override Type TargetType => typeof(TupleLangValue);
+
+    protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
+    {
+        // 对于 Tuple<object?, object?> 类型，格式化为 (item1, item2)
+        if (instance?.GetType().IsGenericType == true &&
+            instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            var item1 = instance.GetType().GetProperty("Item1")?.GetValue(instance);
+            var item2 = instance.GetType().GetProperty("Item2")?.GetValue(instance);
+            var item1Str = FormatValueForDisplay(item1);
+            var item2Str = FormatValueForDisplay(item2);
+            return $"({item1Str}, {item2Str})";
+        }
+
+        // 使用基类的辅助方法获取元素列表（支持 object[], List<object?>, ILangList）
+        var items = GetItemsForVM(instance);
+        var strings = items.Select(item => FormatValueForDisplay(item));
+        return "(" + string.Join(", ", strings) + ")";
+    }
+
+    /// <summary>
+    /// 格式化值用于显示
+    /// </summary>
+    private static string FormatValueForDisplay(object? value)
+    {
+        if (value == null)
+        {
+            return "null";
+        }
+
+        // 字符串需要加引号
+        if (value is string str)
+        {
+            return $"\"{str}\"";
+        }
+
+        // bool 使用小写
+        if (value is bool b)
+        {
+            return b ? "true" : "false";
+        }
+
+        // 其他类型使用 ToString
+        return value.ToString() ?? "null";
+    }
+}
 
 // 高级组合方法
 public class TupleZip3Method : LangListZip3Method { public override Type TargetType => typeof(TupleLangValue); }

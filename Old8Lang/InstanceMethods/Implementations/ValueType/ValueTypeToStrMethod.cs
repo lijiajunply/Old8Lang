@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using TaskStatus = System.Threading.Tasks.TaskStatus;
 
 namespace Old8Lang.InstanceMethods.Implementations.ValueType;
 
@@ -47,6 +48,12 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
+        // 处理 null
+        if (instance == null)
+        {
+            return "null";
+        }
+
         // 对于 double，如果是整数值，使用固定格式（不使用科学计数法）
         if (instance is double d)
         {
@@ -63,10 +70,28 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
             return l.ToString();
         }
 
+        // 对于 int，直接转换为字符串
+        if (instance is int i)
+        {
+            return i.ToString();
+        }
+
         // 对于 bool，返回小写字符串
         if (instance is bool b)
         {
             return b ? "true" : "false";
+        }
+
+        // 对于 char，直接转换为字符串
+        if (instance is char c)
+        {
+            return c.ToString();
+        }
+
+        // 对于 string，直接返回
+        if (instance is string str)
+        {
+            return str;
         }
 
         // 对于字典类型，格式化为 {key1: value1, key2: value2}
@@ -111,7 +136,7 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
         }
 
         // 对于元组类型，格式化为 (item1, item2)
-        if (instance?.GetType().IsGenericType == true &&
+        if (instance.GetType().IsGenericType &&
             instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
         {
             var item1 = instance.GetType().GetProperty("Item1")?.GetValue(instance);
@@ -121,13 +146,51 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
             return $"({item1Str}, {item2Str})";
         }
 
+        // 对于 Task 类型（System.Threading.Tasks.Task）
+        if (instance is System.Threading.Tasks.Task task)
+        {
+            return task.Status switch
+            {
+                TaskStatus.Created => "Task(Status: Created)",
+                TaskStatus.WaitingForActivation => "Task(Status: WaitingForActivation)",
+                TaskStatus.WaitingToRun => "Task(Status: WaitingToRun)",
+                TaskStatus.Running => "Task(Status: Running)",
+                TaskStatus.RanToCompletion => "Task(Status: Completed)",
+                TaskStatus.Canceled => "Task(Status: Canceled)",
+                TaskStatus.Faulted => $"Task(Status: Faulted, Exception: {task.Exception?.GetBaseException().Message ?? "Unknown"})",
+                _ => "Task(Status: Unknown)"
+            };
+        }
+
+        // 对于 Thread 类型（System.Threading.Thread）
+        if (instance is System.Threading.Thread thread)
+        {
+            var status = thread.IsAlive ? "Alive" : "Stopped";
+            return $"Thread(Id: {thread.ManagedThreadId}, Status: {status})";
+        }
+
+        // 对于 CancellationToken 类型
+        if (instance is CancellationToken token)
+        {
+            return token.IsCancellationRequested
+                ? "CancellationToken(Canceled)"
+                : "CancellationToken(Active)";
+        }
+
+        // 对于 Enum 类型
+        if (instance.GetType().IsEnum)
+        {
+            return instance.ToString() ?? "Enum";
+        }
+
         // 对于 LangValueType，使用 ToDisplayString
         if (instance is LangValueType langValue)
         {
             return langValue.ToDisplayString();
         }
 
-        return instance?.ToString() ?? "null";
+        // 对于其他类型，使用默认的 ToString
+        return instance.ToString() ?? "null";
     }
 
     /// <summary>
@@ -150,6 +213,24 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
         if (value is bool b)
         {
             return b ? "true" : "false";
+        }
+
+        // int 直接转换
+        if (value is int i)
+        {
+            return i.ToString();
+        }
+
+        // long 直接转换
+        if (value is long l)
+        {
+            return l.ToString();
+        }
+
+        // char 直接转换
+        if (value is char c)
+        {
+            return c.ToString();
         }
 
         // double 格式化
@@ -201,6 +282,17 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
 
             var items = list.Select(FormatValueForDisplay);
             return "[" + string.Join(", ", items) + "]";
+        }
+
+        // 递归处理元组
+        if (value.GetType().IsGenericType &&
+            value.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            var item1 = value.GetType().GetProperty("Item1")?.GetValue(value);
+            var item2 = value.GetType().GetProperty("Item2")?.GetValue(value);
+            var item1Str = FormatValueForDisplay(item1);
+            var item2Str = FormatValueForDisplay(item2);
+            return $"({item1Str}, {item2Str})";
         }
 
         // LangValueType 使用 ToDisplayString

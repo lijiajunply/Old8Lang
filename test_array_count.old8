@@ -1,6 +1,0 @@
-myArray <- [1, 2, 3]
-print("Array created")
-
-result <- myArray.Count()
-print("Count called")
-print(result)
