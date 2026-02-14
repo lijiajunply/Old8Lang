@@ -31,6 +31,7 @@ statement = blockStatement
           | enumDeclaration
           | mixinDeclaration
           | interfaceDeclaration
+          | extensionDeclaration
           | functionCallStatement
           | classMemberAccessStatement
           | importStatement
@@ -162,6 +163,25 @@ interfaceDeclaration = accessModifier*
 interfaceBlock = "{" interfaceMember* "}" ;
 
 interfaceMember = accessModifier* functionDeclaration ;
+
+(* Extension Declarations *)
+
+extensionDeclaration = "extension" identifier
+                      genericTypeParameters?
+                      ( ":" genericConstraints )?
+                      ( "where" whereClause )?
+                      "{" extensionMember* "}" ;
+
+extensionMember = functionDeclaration ;
+
+genericConstraints = constraint ( "&" constraint )* ;
+
+constraint = "new()"                    (* Constructor constraint *)
+           | "class"                    (* Reference type constraint *)
+           | "struct"                   (* Value type constraint *)
+           | identifier ;               (* Type constraint *)
+
+whereClause = identifier ":" genericConstraints ( "," identifier ":" genericConstraints )* ;
 
 (* Function & Class Member Access *)
 
@@ -382,7 +402,7 @@ KEYWORDS = "if" | "elif" | "else" | "for" | "while" | "switch" | "case" | "defau
          | "async" | "await"
          | "public" | "private" | "static"
          | "this" | "super"
-         | "spawn" | "match" ;
+         | "spawn" | "match" | "extension" | "where" ;
 
 (* ============== Operators ============== *)
 
@@ -422,4 +442,6 @@ OPERATORS = "<-"   (* assignment *)
  * 6. String templates use C# style with ${} replaced by {}
  * 7. Generics are supported for both functions and classes (interpreter mode only)
  * 8. Nullable types are supported with ? suffix (e.g., int?, string?)
+ * 9. Extension methods allow adding methods to existing types without modifying them
+ * 10. Generic constraints (new(), class, struct) and where clauses are supported
  *)

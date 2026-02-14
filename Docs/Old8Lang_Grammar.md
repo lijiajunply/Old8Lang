@@ -2175,6 +2175,217 @@ val1 <- arr[0]       // 调用 arr._getitem(0)
    - 暂不支持一元运算符重载（如 `-x`、`!x`）
 ```
 
+#### 5.6.8 扩展方法
+
+**模式支持**: `[✅ | ❌ | ✅]`
+
+扩展方法允许为现有类型添加新方法，而无需修改原始类型的定义。这是一种强大的功能，可以增强内置类型或第三方类型的功能。
+
+**语法格式**：
+
+```old8
+extension TargetType {
+    func methodName(params) -> ReturnType {
+        // 方法体
+        // 使用 this 关键字访问实例
+    }
+}
+```
+
+**基本示例**：
+
+```old8
+// 为 int 类型添加扩展方法
+extension int {
+    func double() -> int {
+        return this * 2
+    }
+
+    func isEven() -> bool {
+        return this % 2 == 0
+    }
+}
+
+// 使用扩展方法
+x <- 5
+doubled <- x.double()      // 10
+isEven <- x.isEven()       // false
+```
+
+**为字符串添加扩展方法**：
+
+```old8
+extension string {
+    func repeat(n:int) -> string {
+        result <- ""
+        i <- 0
+        while i < n {
+            result <- result + this
+            i <- i + 1
+        }
+        return result
+    }
+
+    func reverse() -> string {
+        chars <- this.ToCharArray()
+        reversed <- []
+        for i in [this.Length() - 1 ~ 0] {
+            reversed.Add(chars[i])
+        }
+        return reversed.Join("")
+    }
+}
+
+// 使用
+text <- "Hello"
+repeated <- text.repeat(3)    // "HelloHelloHello"
+reversed <- text.reverse()    // "olleH"
+```
+
+**为列表添加扩展方法**：
+
+```old8
+extension list {
+    func sum() -> int {
+        total <- 0
+        for item in this {
+            total <- total + item
+        }
+        return total
+    }
+
+    func average() -> double {
+        if this.Count() == 0 {
+            return 0.0
+        }
+        return this.sum() / this.Count()
+    }
+}
+
+// 使用
+numbers <- [1, 2, 3, 4, 5]
+total <- numbers.sum()        // 15
+avg <- numbers.average()      // 3.0
+```
+
+**泛型扩展方法**：
+
+```old8
+// 为泛型类型添加扩展方法
+extension list<T> {
+    func first() -> T {
+        if this.Count() > 0 {
+            return this[0]
+        }
+        return null
+    }
+
+    func last() -> T {
+        if this.Count() > 0 {
+            return this[this.Count() - 1]
+        }
+        return null
+    }
+}
+```
+
+**泛型约束**：
+
+扩展方法支持泛型约束，可以限制类型参数必须满足特定条件：
+
+```old8
+// new() 约束：类型必须有无参构造函数
+extension list<T: new()> {
+    func createDefault() -> T {
+        return T()
+    }
+}
+
+// class 约束：类型必须是引用类型
+extension list<T: class> {
+    func filterNull() -> list<T> {
+        result <- []
+        for item in this {
+            if item != null {
+                result.Add(item)
+            }
+        }
+        return result
+    }
+}
+
+// struct 约束：类型必须是值类型
+extension list<T: struct> {
+    func sumValues() -> T {
+        // 仅适用于值类型
+    }
+}
+
+// 类型约束：类型必须实现特定接口或继承特定类
+extension list<T: IComparable> {
+    func sortItems() -> list<T> {
+        // 使用 IComparable 接口排序
+    }
+}
+
+// 多重约束：使用 & 组合多个约束
+extension list<T: class & new()> {
+    func createInstances(count:int) -> list<T> {
+        result <- []
+        for i in [0 ~ count] {
+            result.Add(T())
+        }
+        return result
+    }
+}
+```
+
+**where 子句**：
+
+对于更复杂的约束，可以使用 `where` 子句：
+
+```old8
+// 使用 where 子句指定约束
+extension list<T> where T: class & new() {
+    func populate(count:int) -> void {
+        for i in [0 ~ count] {
+            this.Add(T())
+        }
+    }
+}
+
+// 多个类型参数的约束
+extension dict<K, V> where K: class, V: struct {
+    func getOrDefault(key:K, defaultValue:V) -> V {
+        if this.ContainsKey(key) {
+            return this[key]
+        }
+        return defaultValue
+    }
+}
+```
+
+**重要说明**：
+
+1. **this 关键字**：在扩展方法中，`this` 关键字引用被扩展类型的实例
+2. **支持的类型**：可以为以下类型添加扩展方法：
+   - 内置类型：`int`、`double`、`string`、`bool`、`char` 等
+   - 集合类型：`list`、`array`、`dict`
+   - 自定义类型：用户定义的类和接口
+3. **方法解析**：扩展方法的优先级低于类型本身定义的方法
+4. **作用域**：扩展方法在声明后全局可用
+5. **模式支持**：
+   - ✅ 解释器模式：完全支持
+   - ❌ 编译器模式：暂不支持
+   - ✅ 虚拟机模式：完全支持
+6. **泛型约束支持**：
+   - `new()`：要求类型有无参构造函数
+   - `class`：要求类型是引用类型
+   - `struct`：要求类型是值类型
+   - 类型名称：要求类型实现特定接口或继承特定类
+   - 多重约束：使用 `&` 组合多个约束
+   - `where` 子句：用于更复杂的约束表达
+
 ### 5.7 枚举声明
 
 **模式支持**: `[✅ | ✅ | ✅]`
