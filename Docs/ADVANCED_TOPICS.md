@@ -132,9 +132,9 @@ public interface IExternProvider
 - 高性能直接调用
 
 **示例：**
-```old8
-native extern "msvcrt.dll" func abs(x:int) -> int
-native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+```old8lang
+extern "msvcrt.dll" func abs(x:int) -> int
+extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 ```
 
 #### 2. PythonProvider
@@ -151,15 +151,15 @@ native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 - 仅支持解释模式（`SupportsCompilation = false`）
 
 **示例：**
-```old8
+```old8lang
 // Python 脚本文件
-native extern "math_utils.py" {
+extern "math_utils.py" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
 }
 
 // Python 标准库模块
-native extern "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
 }
@@ -179,15 +179,15 @@ native extern "pymodule:math" {
 - 支持 ES5.1 标准
 
 **示例：**
-```old8
+```old8lang
 // JavaScript 脚本文件
-native extern "math_utils.js" {
+extern "math_utils.js" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
 }
 
 // 使用 js: 前缀
-native extern "js:utils.js" {
+extern "js:utils.js" {
     func greet(name:string) -> string,
     func getArray() -> object
 }
@@ -370,7 +370,7 @@ dotnet run --project Old8Lang.App -- -s InterpreterTests/test_python_extern_basi
 
 #### 功能测试
 
-```old8
+```old8lang
 // test_extern_factory.old8
 native extern "pymodule:math" {
     func sqrt(x:double) -> double,
@@ -541,7 +541,7 @@ config.DebugOutput = false;
 
 ##### 无类型注解（需启用推断）
 
-```old8
+```old8lang
 // 启用类型推断后，可省略类型注解
 func add(a, b) -> int {
     return a + b
@@ -553,7 +553,7 @@ result <- add(10, 20)  // 推断 a:int, b:int
 
 ##### 部分类型注解
 
-```old8
+```old8lang
 // 混合使用：返回类型自动推断
 func multiply(x:int, y:int) {
     return x * y  // 推断返回类型为 int
@@ -562,7 +562,7 @@ func multiply(x:int, y:int) {
 
 ##### 默认值推断
 
-```old8
+```old8lang
 // 从默认值推断参数类型
 func greet(name:string, message: "Hello") -> void {
     // message 推断为 string 类型
@@ -623,7 +623,7 @@ func greet(name:string, message: "Hello") -> void {
 
 #### 示例 1：简单类型推断
 
-```old8
+```old8lang
 // 启用类型推断
 // TypeInferenceConfig.Instance.EnableTypeInference = true;
 
@@ -637,7 +637,7 @@ PrintLine("10 + 20 = " + result.ToStr())
 
 #### 示例 2：多类型推断
 
-```old8
+```old8lang
 // 从默认值推断
 func calculate(x, y:int, operation:"add") {
     if operation == "add" {
@@ -655,7 +655,7 @@ result2 <- calculate(10, 20, "multiply")
 
 #### 示例 3：混合注解
 
-```old8
+```old8lang
 // 部分显式注解 + 部分推断
 func max(a:int, b:int) {
     // 返回类型从 return 语句推断为 int
@@ -800,7 +800,7 @@ old8lang package init
 
 创建 `index.old8`：
 
-```old8
+```old8lang
 // MyPackage/index.old8
 
 // 导出函数
@@ -910,7 +910,7 @@ PrintLine("MyPackage loaded successfully") //不会显示
 
 #### 在代码中使用依赖
 
-```old8
+```old8lang
 // 导入依赖包
 import "Logger"
 
@@ -946,7 +946,7 @@ old8lang restore                 # 恢复依赖
 
 创建测试文件：
 
-```old8
+```old8lang
 // test_usage.old8
 import "MyPackage"
 
@@ -1006,7 +1006,7 @@ old8lang package publish
 
 明确标记公共 API：
 
-```old8
+```old8lang
 // ✅ 好的做法
 public func publicFunction() -> void {
     privateHelper()

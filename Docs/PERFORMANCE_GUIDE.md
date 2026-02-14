@@ -275,7 +275,7 @@ dotnet run --project Old8Lang.Benchmarks --configuration Release
 
 ### 示例性能差异
 
-```old8
+```old8lang
 // 计算斐波那契数列（递归版本）
 func fib(n:int) -> int {
     if n <= 1 {
@@ -301,14 +301,14 @@ result <- fib(35)
 虽然 Old8Lang 支持类型推断,但显式类型标注可以提升性能。
 
 **慢**（类型推断）:
-```old8
+```old8lang
 func calculate(a, b) {
     return a * b + a / b
 }
 ```
 
 **快**（显式类型）:
-```old8
+```old8lang
 func calculate(a:double, b:double) -> double {
     return a * b + a / b
 }
@@ -320,7 +320,7 @@ func calculate(a:double, b:double) -> double {
 
 编译器模式要求所有函数参数和返回值必须有类型标注:
 
-```old8
+```old8lang
 // ✅ 正确 - 完整类型标注
 func add(a:int, b:int) -> int {
     return a + b
@@ -340,7 +340,7 @@ func multiply(x, y) {
 ### 避免不必要的类型转换
 
 **慢**（频繁转换）:
-```old8
+```old8lang
 total:int <- 0
 for i in 0..1000 {
     value:double <- ToDouble(i)
@@ -349,7 +349,7 @@ for i in 0..1000 {
 ```
 
 **快**（直接使用合适类型）:
-```old8
+```old8lang
 total:double <- 0.0
 for i in 0..1000 {
     total <- total + (i * 2.5)
@@ -363,7 +363,7 @@ for i in 0..1000 {
 ### 使用局部变量而非全局变量
 
 **慢**（全局变量）:
-```old8
+```old8lang
 globalCounter <- 0
 
 func increment() -> void {
@@ -372,7 +372,7 @@ func increment() -> void {
 ```
 
 **快**（局部变量）:
-```old8
+```old8lang
 func processData() -> void {
     counter <- 0  // 局部变量访问快
     for i in 0..1000 {
@@ -384,7 +384,7 @@ func processData() -> void {
 ### 避免不必要的对象创建
 
 **慢**（频繁创建对象）:
-```old8
+```old8lang
 for i in 0..10000 {
     temp <- {i, i*2, i*3}  // 每次循环创建新列表
     process(temp)
@@ -392,7 +392,7 @@ for i in 0..10000 {
 ```
 
 **快**（复用对象）:
-```old8
+```old8lang
 temp <- {0, 0, 0}
 for i in 0..10000 {
     temp[0] <- i
@@ -405,7 +405,7 @@ for i in 0..10000 {
 ### 使用 using 语句管理资源
 
 **不推荐**（手动管理）:
-```old8
+```old8lang
 mutex <- MutexCreate()
 MutexLock(mutex)
 // ... 使用
@@ -414,7 +414,7 @@ MutexDispose(mutex)  // 容易忘记
 ```
 
 **推荐**（自动管理）:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     MutexLock(mutex)
     // ... 使用
@@ -441,7 +441,7 @@ using mutex <- MutexCreate() {
 ### AtomicInt vs Mutex
 
 **慢**（使用 Mutex）:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     counter <- 0
     for i in 0..10000 {
@@ -453,7 +453,7 @@ using mutex <- MutexCreate() {
 ```
 
 **快**（使用 AtomicInt，快 3-5 倍）:
-```old8
+```old8lang
 using counter <- AtomicIntCreate(0) {
     for i in 0..10000 {
         AtomicIntIncrement(counter)  // 无锁操作
@@ -464,7 +464,7 @@ using counter <- AtomicIntCreate(0) {
 ### 避免过度锁定
 
 **慢**（锁的粒度太大）:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     MutexLock(mutex)
     data1 <- processData1()  // 长时间计算
@@ -475,7 +475,7 @@ using mutex <- MutexCreate() {
 ```
 
 **快**（减小锁的粒度）:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     data1 <- processData1()  // 在锁外计算
     data2 <- processData2()  // 在锁外计算
@@ -489,7 +489,7 @@ using mutex <- MutexCreate() {
 ### 使用 Channel 避免锁竞争
 
 **传统方式**（共享内存 + 锁）:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     sharedQueue <- {}
 
@@ -504,7 +504,7 @@ using mutex <- MutexCreate() {
 ```
 
 **推荐方式**（通道通信）:
-```old8
+```old8lang
 using ch <- ChannelCreateBounded(10) {
     async func producer() -> void {
         for i in 0..100 {
@@ -537,7 +537,7 @@ using ch <- ChannelCreateBounded(10) {
 ### 示例优化
 
 **慢**（频繁搜索列表）:
-```old8
+```old8lang
 users <- {"Alice", "Bob", "Charlie", "Dave", "Eve"}
 
 for i in 0..1000 {
@@ -548,7 +548,7 @@ for i in 0..1000 {
 ```
 
 **快**（使用字典，快 10-100 倍）:
-```old8
+```old8lang
 users <- {"Alice": true, "Bob": true, "Charlie": true, "Dave": true, "Eve": true}
 
 for i in 0..1000 {
@@ -561,7 +561,7 @@ for i in 0..1000 {
 ### 预分配容量
 
 **慢**（动态扩容）:
-```old8
+```old8lang
 result <- {}
 for i in 0..10000 {
     Add(result, i)  // 多次内存重新分配
@@ -569,7 +569,7 @@ for i in 0..10000 {
 ```
 
 **快**（预分配）（假设有预分配函数）:
-```old8
+```old8lang
 result <- {}
 // 注：Old8Lang 当前不支持预分配,但这是一般优化原则
 for i in 0..10000 {
@@ -584,7 +584,7 @@ for i in 0..10000 {
 ### 1. 字符串拼接
 
 **慢**（循环中拼接字符串）:
-```old8
+```old8lang
 result <- ""
 for i in 0..1000 {
     result <- result + i.ToStr() + ","  // 每次创建新字符串 O(n²)
@@ -592,7 +592,7 @@ for i in 0..1000 {
 ```
 
 **快**（使用列表再合并）:
-```old8
+```old8lang
 parts <- {}
 for i in 0..1000 {
     Add(parts, i.ToStr())
@@ -604,7 +604,7 @@ result <- Join(parts, ",")
 ### 2. 嵌套循环
 
 **慢**（O(n²) 算法）:
-```old8
+```old8lang
 for i in 0..n {
     for j in 0..n {
         if data[i] == data[j] {
@@ -615,7 +615,7 @@ for i in 0..n {
 ```
 
 **快**（使用字典 O(n) 算法）:
-```old8
+```old8lang
 seen <- {}
 for i in 0..n {
     if seen[data[i]] != null {
@@ -629,7 +629,7 @@ for i in 0..n {
 ### 3. 递归调用
 
 **慢**（深度递归）:
-```old8
+```old8lang
 func factorial(n:int) -> int {
     if n <= 1 {
         return 1
@@ -639,7 +639,7 @@ func factorial(n:int) -> int {
 ```
 
 **快**（迭代版本）:
-```old8
+```old8lang
 func factorial(n:int) -> int {
     result <- 1
     for i in 1..n+1 {
@@ -652,14 +652,14 @@ func factorial(n:int) -> int {
 ### 4. 不必要的函数调用
 
 **慢**（重复计算）:
-```old8
+```old8lang
 for i in 0..Count(data) {  // 每次循环都调用 Count()
     process(data[i])
 }
 ```
 
 **快**（缓存结果）:
-```old8
+```old8lang
 len <- Count(data)
 for i in 0..len {
     process(data[i])
@@ -706,7 +706,7 @@ public class MyBenchmark
 
 ### 性能测试示例
 
-```old8
+```old8lang
 // test_performance.old8
 import "std:time"
 

@@ -1,5 +1,185 @@
 # 更新记录
 
+## Old8Lang 1.0.0 rc9 - 文档更新 (2024-02-14)
+
+### 文档系统全面更新
+
+本次更新对 Old8Lang 文档进行了全面改进，涵盖三种执行模式、最新架构和完整 API 参考。
+
+#### 三种执行模式文档化
+
+**新增内容**:
+- 详细的三种执行模式对比（解释模式、编译模式、VM 模式）
+- 每种模式的特点、性能、适用场景和命令参数
+- 模式选择指南和最佳实践
+- 可运行的代码示例（每种模式至少1个）
+
+**更新文件**:
+- `CLAUDE.md` - 添加执行模式对比表和处理流程图
+- `Docs/ARCHITECTURE.md` - 新增"执行模式"章节（1.3）
+- `Docs/CLI_GUIDE.md` - 新增"执行模式对比"章节
+- `Docs/PERFORMANCE_GUIDE.md` - 新增"执行模式性能"章节
+- `Docs/LANGUAGE_FEATURES.md` - 新增"模式特定功能"章节
+
+**模式对比表**:
+| 特性 | 解释模式 | 编译模式 | VM 模式 |
+|------|---------|---------|---------|
+| 启动速度 | 快 | 慢（需编译） | 中等 |
+| 运行性能 | 中等 | 高 | 中等偏高 |
+| 类型系统 | 动态类型 | 静态类型 | 动态类型 |
+| 泛型支持 | ✅ | ❌ | ✅ |
+| 运算符重载 | ✅ | ❌ | ✅ |
+| Python 互操作 | ✅ | ❌ | ✅ |
+| 调试支持 | 基础 | 基础 | 高级 |
+| 跨平台分发 | 需源代码 | 需源代码 | ✅ 字节码 |
+
+#### 架构文档更新
+
+**新增章节**:
+- **Visitor 模式详解**（第4章）- 详细说明 IVisitor 接口和四个主要实现
+  - InterpreterVisitor - 解释执行（返回 object）
+  - CompilerVisitor - IL 代码生成（返回 void）
+  - BytecodeVisitor - 字节码生成（返回 List<Instruction>）
+  - TypeInferenceVisitor - 类型推断（返回 TypeInfo）
+- **AST 节点组织**（第5章）- Expression 和 Statement 节点的分类和组织
+- **Parser 结构**（第6章）- Facade 模式和递归下降解析机制
+- **Type System**（第7章）- TypeChecker、TypeInferenceEngine、GenericTypeInference
+
+**更新内容**:
+- `CLAUDE.md` - 详细的 Visitor 模式说明和目录结构
+- `Docs/ARCHITECTURE.md` - 新增4个架构章节，重新编号后续章节
+- `Docs/ADVANCED_TOPICS.md` - 新增"Extending Old8Lang"章节
+
+**关键文件位置**:
+- Visitor 实现: `Old8Lang/AST/Visitor/`
+- Bytecode VM: `Old8Lang/Bytecode/VirtualMachine.Core.cs`
+- 类型系统: `Old8Lang/TypeSystem/`
+
+#### API 参考文档完善
+
+**新增标准库文档**:
+- **核心标准库 (Old8LangLib)** - 12个模块
+  - Math, File, Crypto, Image, Regex, Terminal, ColorfulTerminal, Time, OS, CSV, Template, Vector
+- **网络库 (Old8Lang.NetLib)** - 5个模块
+  - HTTP, WebSocket, MQTT, Socket, WebAPI
+- **数据库库 (Old8Lang.DatabaseLib)** - 5个模块
+  - MySQL, PostgreSQL, SQLite, InMemory, ORM
+- **序列化库 (Old8Lang.SerializationLib)** - 3个模块
+  - MessagePack, Protobuf, Factory
+- **机器学习库 (Old8Lang.MachineLearningLib)** - 5个模块
+  - Classification, Regression, Clustering, DataLoader, Predictor
+
+**文档特点**:
+- 每个模块包含完整的函数签名和描述
+- 模式支持标注（✅ 解释模式 | ✅/❌ 编译模式 | ✅ VM 模式）
+- 至少1个可运行的代码示例
+- 导入方式和使用场景说明
+
+**更新文件**:
+- `Docs/API_REFERENCE.md` - 新增30个模块的完整文档
+
+#### CLI 命令文档更新
+
+**新增章节**:
+- **调试和性能分析命令** - 完整的调试工具文档
+  - `debug-start` - 启动调试会话
+  - `debug-breakpoint` - 断点管理
+  - `debug-control` - 调试控制
+  - `profile` - 性能分析
+  - 交互式调试命令
+  - 调试工作流示例
+  - 调试最佳实践
+
+**更新内容**:
+- `Docs/CLI_GUIDE.md` - 新增调试章节
+- `CLAUDE.md` - 更新包管理命令示例
+
+**包管理命令**:
+- init, install, remove, restore, list
+- pack, unpack, sign, verify, cert
+- publish（一键发布）
+
+#### 代码示例验证
+
+**新增示例文件**:
+- `examples/interpretation_mode_example.old8` - 解释模式示例
+- `examples/compilation_mode_example.old8` - 编译模式示例
+- `examples/vm_mode_example.old8` - VM 模式示例
+
+**验证结果**:
+- ✅ 所有示例使用正确的 Old8Lang 语法
+- ✅ 赋值使用 `<-` 运算符
+- ✅ 函数声明使用 `func` 关键字
+- ✅ 类型注解使用 `int` 而非 `number`
+- ✅ 所有示例可成功运行
+
+#### 文档质量改进
+
+**统一规范**:
+- ✅ 代码块语言标注统一为 `old8lang`（原有 `old8` 已全部更新）
+- ✅ 内部链接格式统一
+- ✅ 表格格式统一（对齐方式、列宽）
+- ✅ 术语使用一致（中英文对照）
+
+**文档覆盖率**:
+- 主要文档: 7个文件全面更新
+- 新增章节: 15+
+- 代码示例: 100+
+- 函数文档: 200+
+
+#### 变更文件列表
+
+**核心文档**:
+- `CLAUDE.md` - 执行模式、Visitor 模式、目录结构、关键文件
+- `Docs/ARCHITECTURE.md` - 4个新章节（Visitor、AST、Parser、TypeSystem）
+- `Docs/CLI_GUIDE.md` - 执行模式对比、调试命令
+- `Docs/API_REFERENCE.md` - 5个标准库完整文档
+- `Docs/LANGUAGE_FEATURES.md` - 模式特定功能
+- `Docs/PERFORMANCE_GUIDE.md` - 执行模式性能
+- `Docs/ADVANCED_TOPICS.md` - 扩展 Old8Lang
+
+**示例文件**:
+- `examples/interpretation_mode_example.old8`
+- `examples/compilation_mode_example.old8`
+- `examples/vm_mode_example.old8`
+
+**备份文件**:
+- `Docs/.backup/` - 所有更新前的文档备份
+
+#### 功能需求满足情况
+
+本次更新满足以下功能需求：
+
+- ✅ **FR-001**: 三种执行模式的完整文档
+- ✅ **FR-002**: 模式对比表和选择指南
+- ✅ **FR-003**: 每种模式的可运行示例
+- ✅ **FR-004**: Visitor 模式详细说明
+- ✅ **FR-005**: AST 和 Parser 架构文档
+- ✅ **FR-006**: 类型系统文档
+- ✅ **FR-007**: 5个标准库完整 API 文档
+- ✅ **FR-008**: 模式支持标注
+- ✅ **FR-009**: 包管理命令文档
+- ✅ **FR-010**: 调试和性能分析命令文档
+
+#### 用户价值
+
+**开发者**:
+- 清楚理解三种执行模式的区别和使用场景
+- 快速查找 API 方法和标准库函数
+- 掌握调试和性能优化技巧
+
+**贡献者**:
+- 理解 Old8Lang 的架构设计
+- 了解如何扩展 Visitor 模式
+- 掌握添加新语言特性的流程
+
+**用户**:
+- 根据场景选择合适的执行模式
+- 使用完整的标准库功能
+- 高效管理和发布包
+
+---
+
 ## Old8Lang 1.0.0 rc8
 
 ### 语言特性增强

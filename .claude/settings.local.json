@@ -44,7 +44,10 @@
       "Bash(/tmp/VMTypeMapper_README.md:*)",
       "Bash(git fetch:*)",
       "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"update-docs-modes\" \"更新文档以支持三种执行模式（VM模式、解释模式、编译模式）和最新架构\")",
-      "Bash(powershell.exe -File:*)"
+      "Bash(powershell.exe -File:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's/^```old8$/```old8lang/g' \"$file\")",
+      "Bash(done)"
     ]
   }
 }

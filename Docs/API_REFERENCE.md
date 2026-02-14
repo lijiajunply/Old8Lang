@@ -36,7 +36,7 @@
 - `value`: 要输出的值，会自动调用 `.ToStr()` 方法转换为字符串
 
 **示例**:
-```old8
+```old8lang
 Print("Hello")
 Print(123)
 ```
@@ -50,7 +50,7 @@ Print(123)
 - `value`: 要输出的值
 
 **示例**:
-```old8
+```old8lang
 PrintLine("Hello World")
 PrintLine(42)
 ```
@@ -63,7 +63,7 @@ PrintLine(42)
 **返回值**: 用户输入的字符串
 
 **示例**:
-```old8
+```old8lang
 name <- ReadLine()
 PrintLine("你好, " + name)
 ```
@@ -99,7 +99,7 @@ PrintLine("你好, " + name)
 **返回值**: 绝对值
 
 **示例**:
-```old8
+```old8lang
 result <- Abs(-5.5)  // 5.5
 ```
 
@@ -114,7 +114,7 @@ result <- Abs(-5.5)  // 5.5
 **返回值**: 平方根
 
 **示例**:
-```old8
+```old8lang
 result <- Sqrt(16)  // 4.0
 ```
 
@@ -130,7 +130,7 @@ result <- Sqrt(16)  // 4.0
 **返回值**: base^exponent
 
 **示例**:
-```old8
+```old8lang
 result <- Pow(2, 3)  // 8.0
 ```
 
@@ -143,7 +143,7 @@ result <- Pow(2, 3)  // 8.0
 **描述**: 三角函数，参数为弧度。
 
 **示例**:
-```old8
+```old8lang
 result <- Sin(3.14159 / 2)  // 约等于 1.0
 ```
 
@@ -156,7 +156,7 @@ result <- Sin(3.14159 / 2)  // 约等于 1.0
 **描述**: 向下取整、向上取整、四舍五入。
 
 **示例**:
-```old8
+```old8lang
 Floor(3.7)    // 3.0
 Ceiling(3.2)  // 4.0
 Round(3.5)    // 4.0
@@ -170,7 +170,7 @@ Round(3.5)    // 4.0
 **描述**: 返回两个数中的最大值或最小值。
 
 **示例**:
-```old8
+```old8lang
 Max(5, 10)  // 10
 Min(5, 10)  // 5
 ```
@@ -185,7 +185,7 @@ Min(5, 10)  // 5
 **描述**: 返回字符串长度。
 
 **示例**:
-```old8
+```old8lang
 len <- Length("Hello")  // 5
 ```
 
@@ -200,7 +200,7 @@ len <- Length("Hello")  // 5
 - `length`: 子串长度
 
 **示例**:
-```old8
+```old8lang
 sub <- Substring("Hello World", 0, 5)  // "Hello"
 ```
 
@@ -212,7 +212,7 @@ sub <- Substring("Hello World", 0, 5)  // "Hello"
 **描述**: 转换为大写或小写。
 
 **示例**:
-```old8
+```old8lang
 ToUpper("hello")  // "HELLO"
 ToLower("WORLD")  // "world"
 ```
@@ -223,7 +223,7 @@ ToLower("WORLD")  // "world"
 **描述**: 去除字符串首尾空白字符。
 
 **示例**:
-```old8
+```old8lang
 Trim("  hello  ")  // "hello"
 ```
 
@@ -233,7 +233,7 @@ Trim("  hello  ")  // "hello"
 **描述**: 按分隔符拆分字符串为数组。
 
 **示例**:
-```old8
+```old8lang
 parts <- Split("a,b,c", ",")  // ["a", "b", "c"]
 ```
 
@@ -243,7 +243,7 @@ parts <- Split("a,b,c", ",")  // ["a", "b", "c"]
 **描述**: 替换字符串中的子串。
 
 **示例**:
-```old8
+```old8lang
 result <- Replace("Hello World", "World", "Old8")  // "Hello Old8"
 ```
 
@@ -253,7 +253,7 @@ result <- Replace("Hello World", "World", "Old8")  // "Hello Old8"
 **描述**: 检查字符串是否包含子串。
 
 **示例**:
-```old8
+```old8lang
 Contains("Hello World", "World")  // true
 ```
 
@@ -267,7 +267,7 @@ Contains("Hello World", "World")  // true
 **描述**: 返回集合（数组、列表、字典）的元素个数。
 
 **示例**:
-```old8
+```old8lang
 arr <- [1, 2, 3]
 count <- Count(arr)  // 3
 ```
@@ -278,7 +278,7 @@ count <- Count(arr)  // 3
 **描述**: 向列表添加元素。
 
 **示例**:
-```old8
+```old8lang
 lst <- {1, 2, 3}
 Add(lst, 4)  // lst 变为 {1, 2, 3, 4}
 ```
@@ -291,7 +291,7 @@ Add(lst, 4)  // lst 变为 {1, 2, 3, 4}
 **返回值**: 是否成功移除
 
 **示例**:
-```old8
+```old8lang
 lst <- {1, 2, 3}
 Remove(lst, 2)  // lst 变为 {1, 3}
 ```
@@ -302,7 +302,7 @@ Remove(lst, 2)  // lst 变为 {1, 3}
 **描述**: 检查集合是否包含指定元素。
 
 **示例**:
-```old8
+```old8lang
 lst <- {1, 2, 3}
 Contains(lst, 2)  // true
 ```
@@ -313,7 +313,7 @@ Contains(lst, 2)  // true
 **描述**: 对列表进行原地排序。
 
 **示例**:
-```old8
+```old8lang
 lst <- {3, 1, 2}
 Sort(lst)  // lst 变为 {1, 2, 3}
 ```
@@ -324,7 +324,7 @@ Sort(lst)  // lst 变为 {1, 2, 3}
 **描述**: 反转列表元素顺序。
 
 **示例**:
-```old8
+```old8lang
 lst <- {1, 2, 3}
 Reverse(lst)  // lst 变为 {3, 2, 1}
 ```
@@ -339,7 +339,7 @@ Reverse(lst)  // lst 变为 {3, 2, 1}
 **描述**: 将任意值转换为字符串表示。
 
 **示例**:
-```old8
+```old8lang
 num <- 123
 str <- num.ToStr()  // "123"
 ```
@@ -350,7 +350,7 @@ str <- num.ToStr()  // "123"
 **描述**: 转换为整数类型。
 
 **示例**:
-```old8
+```old8lang
 ToInt("123")    // 123
 ToInt(123.45)   // 123
 ```
@@ -361,7 +361,7 @@ ToInt(123.45)   // 123
 **描述**: 转换为双精度浮点数。
 
 **示例**:
-```old8
+```old8lang
 ToDouble("3.14")  // 3.14
 ToDouble(42)      // 42.0
 ```
@@ -372,7 +372,7 @@ ToDouble(42)      // 42.0
 **描述**: 转换为布尔值。
 
 **示例**:
-```old8
+```old8lang
 ToBool("true")   // true
 ToBool(1)        // true
 ToBool(0)        // false
@@ -393,7 +393,7 @@ ToBool(0)        // false
 **返回值**: 文件内容
 
 **示例**:
-```old8
+```old8lang
 content <- ReadFile("data.txt")
 ```
 
@@ -403,7 +403,7 @@ content <- ReadFile("data.txt")
 **描述**: 将字符串写入文件，覆盖原内容。
 
 **示例**:
-```old8
+```old8lang
 WriteFile("output.txt", "Hello World")
 ```
 
@@ -413,7 +413,7 @@ WriteFile("output.txt", "Hello World")
 **描述**: 追加内容到文件末尾。
 
 **示例**:
-```old8
+```old8lang
 AppendFile("log.txt", "新日志条目\n")
 ```
 
@@ -423,7 +423,7 @@ AppendFile("log.txt", "新日志条目\n")
 **描述**: 检查文件是否存在。
 
 **示例**:
-```old8
+```old8lang
 if FileExists("config.json") {
     config <- ReadFile("config.json")
 }
@@ -435,7 +435,7 @@ if FileExists("config.json") {
 **描述**: 删除文件。
 
 **示例**:
-```old8
+```old8lang
 DeleteFile("temp.txt")
 ```
 
@@ -451,7 +451,7 @@ DeleteFile("temp.txt")
 **返回值**: 字典或数组
 
 **示例**:
-```old8
+```old8lang
 json <- JsonParse("{\"name\": \"Old8\", \"version\": 1}")
 PrintLine(json["name"])  // "Old8"
 ```
@@ -462,7 +462,7 @@ PrintLine(json["name"])  // "Old8"
 **描述**: 将对象序列化为 JSON 字符串。
 
 **示例**:
-```old8
+```old8lang
 data <- {"name": "Old8", "version": 1}
 jsonStr <- JsonStringify(data)
 PrintLine(jsonStr)  // {"name":"Old8","version":1}
@@ -486,7 +486,7 @@ Old8Lang 提供内置的并发原语,支持多线程和并发编程。所有并�
 **返回值**: 互斥锁 ID
 
 **示例**:
-```old8
+```old8lang
 mutex <- MutexCreate()
 ```
 
@@ -499,7 +499,7 @@ mutex <- MutexCreate()
 - `mutexId`: 互斥锁 ID
 
 **示例**:
-```old8
+```old8lang
 MutexLock(mutex)
 // 临界区代码
 MutexUnlock(mutex)
@@ -517,7 +517,7 @@ MutexUnlock(mutex)
 **返回值**: 是否成功获取锁
 
 **示例**:
-```old8
+```old8lang
 if MutexTryLock(mutex, 1000) {
     // 成功获取锁
     MutexUnlock(mutex)
@@ -537,7 +537,7 @@ if MutexTryLock(mutex, 1000) {
 **描述**: 释放互斥锁资源。
 
 **示例（使用 using 语句自动释放）**:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     MutexLock(mutex)
     counter <- counter + 1
@@ -563,7 +563,7 @@ using mutex <- MutexCreate() {
 **返回值**: 信号量 ID
 
 **示例**:
-```old8
+```old8lang
 // 限制最多3个线程同时访问
 sem <- SemaphoreCreate(3, 3)
 ```
@@ -591,7 +591,7 @@ sem <- SemaphoreCreate(3, 3)
 **描述**: 释放信号量资源。
 
 **完整示例**:
-```old8
+```old8lang
 using sem <- SemaphoreCreate(2, 2) {
     SemaphoreAcquire(sem)
     PrintLine("执行任务...")
@@ -629,7 +629,7 @@ using sem <- SemaphoreCreate(2, 2) {
 **描述**: 原子递增,返回新值。
 
 **示例**:
-```old8
+```old8lang
 counter <- AtomicIntCreate(0)
 newValue <- AtomicIntIncrement(counter)
 PrintLine(newValue)  // 1
@@ -646,7 +646,7 @@ PrintLine(newValue)  // 1
 **描述**: 原子加法,返回新值。
 
 **示例**:
-```old8
+```old8lang
 newValue <- AtomicIntAdd(counter, 5)
 ```
 
@@ -658,7 +658,7 @@ newValue <- AtomicIntAdd(counter, 5)
 **返回值**: 是否成功设置
 
 **示例**:
-```old8
+```old8lang
 // 只有当前值为10时才设置为20
 if AtomicIntCompareAndSet(counter, 10, 20) {
     PrintLine("CAS成功")
@@ -689,7 +689,7 @@ if AtomicIntCompareAndSet(counter, 10, 20) {
 **描述**: 创建有界通道,指定容量。
 
 **示例**:
-```old8
+```old8lang
 ch <- ChannelCreateBounded(10)  // 最多缓冲10个消息
 ```
 
@@ -699,7 +699,7 @@ ch <- ChannelCreateBounded(10)  // 最多缓冲10个消息
 **描述**: 向通道发送消息,如果通道已满则阻塞等待。
 
 **示例**:
-```old8
+```old8lang
 ChannelSend(ch, "Hello")
 ChannelSend(ch, 123)
 ```
@@ -717,7 +717,7 @@ ChannelSend(ch, 123)
 **描述**: 从通道接收消息,如果通道为空则阻塞等待。
 
 **示例**:
-```old8
+```old8lang
 msg <- ChannelReceive(ch)
 PrintLine(msg)
 ```
@@ -740,7 +740,7 @@ PrintLine(msg)
 **描述**: 释放通道资源。
 
 **完整示例**:
-```old8
+```old8lang
 using ch <- ChannelCreate() {
     // 生产者
     async func producer() -> void {
@@ -767,7 +767,7 @@ using ch <- ChannelCreate() {
 ```
 
 **Select 语句（通道多路复用）**:
-```old8
+```old8lang
 ch1 <- ChannelCreate()
 ch2 <- ChannelCreate()
 
@@ -833,7 +833,7 @@ select {
 **描述**: 释放读写锁资源。
 
 **示例**:
-```old8
+```old8lang
 using rwLock <- ReadWriteLockCreate() {
     // 多个读者
     ReadLockAcquire(rwLock)
@@ -891,7 +891,7 @@ using rwLock <- ReadWriteLockCreate() {
 **描述**: 释放门闩资源。
 
 **示例**:
-```old8
+```old8lang
 using latch <- CountDownLatchCreate(3) {
     async func worker() -> void {
         PrintLine("工作完成")
@@ -951,7 +951,7 @@ using latch <- CountDownLatchCreate(3) {
 **描述**: 释放栅栏资源。
 
 **示例**:
-```old8
+```old8lang
 using barrier <- CyclicBarrierCreate(3) {
     async func worker(id: int) -> void {
         PrintLine("线程 " + id.ToStr() + " 到达栅栏")
@@ -998,7 +998,7 @@ using barrier <- CyclicBarrierCreate(3) {
 **描述**: 释放令牌源资源。
 
 **示例**:
-```old8
+```old8lang
 using cts <- CreateCancellationTokenSource() {
     CancelAfter(cts, 5000)  // 5秒后自动取消
 
@@ -1017,7 +1017,7 @@ using cts <- CreateCancellationTokenSource() {
 **描述**: 暂停当前线程指定毫秒数。
 
 **示例**:
-```old8
+```old8lang
 PrintLine("开始")
 Sleep(1000)  // 暂停1秒
 PrintLine("结束")
@@ -1031,7 +1031,7 @@ PrintLine("结束")
 **返回值**: 线程 ID
 
 **示例**:
-```old8
+```old8lang
 threadId <- GetCurrentThreadId()
 PrintLine("当前线程ID: " + threadId.ToStr())
 ```
@@ -1044,7 +1044,7 @@ PrintLine("当前线程ID: " + threadId.ToStr())
 **返回值**: CPU 核心数
 
 **示例**:
-```old8
+```old8lang
 cores <- GetProcessorCount()
 PrintLine("系统有 " + cores.ToStr() + " 个核心")
 ```
@@ -1058,7 +1058,7 @@ PrintLine("系统有 " + cores.ToStr() + " 个核心")
 `using` 语句提供自动资源管理,确保资源在使用完毕后自动释放。
 
 **语法**:
-```old8
+```old8lang
 // 形式1: 带变量声明
 using resource <- CreateResource() {
     // 使用资源
@@ -1082,7 +1082,7 @@ using res {
 - CancellationTokenSource → DisposeCancellationTokenSource
 
 **示例**:
-```old8
+```old8lang
 using mutex <- MutexCreate() {
     MutexLock(mutex)
     counter <- counter + 1
