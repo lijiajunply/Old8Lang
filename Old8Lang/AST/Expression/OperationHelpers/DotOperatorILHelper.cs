@@ -514,6 +514,21 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        // 首先尝试从实例方法注册表中查找
+        var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
+
+        // 将 C# 原生类型映射到 LangValueType 以便查找实例方法
+        var mappedType = MapToLangValueType(leftType!);
+        var instanceMethod = registry.ResolveMethod(mappedType, instance.Id.IdName, instance.Ids, local);
+
+        if (instanceMethod != null)
+        {
+            // 使用实例方法系统生成 IL
+            instanceMethod.GenerateIl(left!, instance.Ids, ilGenerator, local, operation.Position);
+            return instanceMethod.GetReturnType(mappedType, instance.Ids, local);
+        }
+
+        // 如果实例方法注册表中没有找到，继续使用原有的逻辑
         left!.LoadIlValue(ilGenerator, local);
         var types = new List<Type>();
         foreach (var instanceId in instance.Ids)
@@ -975,5 +990,51 @@ public static class DotOperatorILHelper
 
         ilGenerator.Emit(OpCodes.Ldfld, restField);
         return GenerateValueTupleItemAccess(ilGenerator, restField.FieldType, index - 7);
+    }
+
+    /// <summary>
+    /// 将 C# 原生类型映射到对应的 LangValueType
+    /// 用于在实例方法注册表中查找方法
+    /// </summary>
+    private static Type MapToLangValueType(Type nativeType)
+    {
+        // int/long 映射到 IntLangValue
+        if (nativeType == typeof(int) || nativeType == typeof(long))
+        {
+            return typeof(IntLangValue);
+        }
+
+        // double 映射到 DoubleLangValue
+        if (nativeType == typeof(double))
+        {
+            return typeof(DoubleLangValue);
+        }
+
+        // bool 映射到 BoolLangValue
+        if (nativeType == typeof(bool))
+        {
+            return typeof(BoolLangValue);
+        }
+
+        // char 映射到 CharLangValue
+        if (nativeType == typeof(char))
+        {
+            return typeof(CharLangValue);
+        }
+
+        // string 映射到 StringLangValue
+        if (nativeType == typeof(string))
+        {
+            return typeof(StringLangValue);
+        }
+
+        // 如果已经是 LangValueType，直接返回
+        if (typeof(LangValueType).IsAssignableFrom(nativeType))
+        {
+            return nativeType;
+        }
+
+        // 其他类型返回 LangValueType 基类
+        return typeof(LangValueType);
     }
 }

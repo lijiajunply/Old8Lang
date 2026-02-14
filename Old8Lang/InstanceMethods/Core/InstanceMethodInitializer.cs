@@ -366,6 +366,18 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.TypeValue.TypeIsGenericMethod());
             registry.Register(new Implementations.TypeValue.TypeIsAssignableFromMethod());
 
+            // 注册 LangValueType 通用转换方法
+            registry.Register(new Implementations.ValueType.ValueTypeToIntMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToDoubleMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToBoolMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToCharMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToStrMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToHashMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeToTypeMethod());
+            registry.Register(new Implementations.ValueType.ValueTypeEqualMethod());
+
+            // ValueType 方法迁移完成！共 8 个方法
+
             _initialized = true;
         }
     }

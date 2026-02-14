@@ -1,0 +1,63 @@
+// 测试 ValueType 转换方法在三种模式下的通用性
+
+print("=== ToInt 测试 ===")
+intVal <- 42
+print(intVal.ToInt())
+
+doubleVal <- 3.14
+print(doubleVal.ToInt())
+
+boolVal <- true
+print(boolVal.ToInt())
+
+strVal <- "123"
+print(strVal.ToInt())
+
+print("=== ToDouble 测试 ===")
+print(intVal.ToDouble())
+print(doubleVal.ToDouble())
+print(boolVal.ToDouble())
+
+print("=== ToBool 测试 ===")
+print(intVal.ToBool())
+
+zeroVal <- 0
+print(zeroVal.ToBool())
+
+print(doubleVal.ToBool())
+
+trueStr <- "true"
+print(trueStr.ToBool())
+
+falseStr <- "false"
+print(falseStr.ToBool())
+
+print("=== ToChar 测试 ===")
+charCode <- 65
+print(charCode.ToChar())
+
+charStr <- "B"
+print(charStr.ToChar())
+
+print("=== ToStr 测试 ===")
+print(intVal.ToStr())
+print(doubleVal.ToStr())
+print(boolVal.ToStr())
+
+print("=== ToHash 测试 ===")
+print(intVal.ToHash())
+print(strVal.ToHash())
+
+print("=== ToType 测试 ===")
+print(intVal.ToType())
+print(doubleVal.ToType())
+print(boolVal.ToType())
+print(strVal.ToType())
+
+print("=== Equal 测试 ===")
+print(intVal.Equal(42))
+print(intVal.Equal(43))
+print(strVal.Equal("123"))
+print(strVal.EqualsTo("456"))
+
+print("所有测试完成！")

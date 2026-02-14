@@ -314,6 +314,24 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// </summary>
     private static bool IsEquivalentType(Type actualType, Type targetType)
     {
+        // 如果目标类型是 LangValueType 基类，检查实际类型是否可以映射到 LangValueType
+        if (targetType == typeof(LangValueType))
+        {
+            // C# 原生类型可以映射到 LangValueType
+            if (actualType == typeof(int) || actualType == typeof(long) ||
+                actualType == typeof(double) || actualType == typeof(bool) ||
+                actualType == typeof(char) || actualType == typeof(string))
+            {
+                return true;
+            }
+
+            // 如果实际类型已经是 LangValueType 的子类，也认为等价
+            if (typeof(LangValueType).IsAssignableFrom(actualType))
+            {
+                return true;
+            }
+        }
+
         // object[] 等价于 ListLangValue
         if (actualType == typeof(object[]) && targetType == typeof(ListLangValue))
         {

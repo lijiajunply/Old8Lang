@@ -444,13 +444,6 @@ public partial class Instance : LangValueType
             }
         }
 
-        // 如果还是没找到，尝试 ValueTypeFuncStatic
-        if (m is null)
-        {
-            type = typeof(ValueTypeFuncStatic);
-            m = type.GetMethod(Id.IdName);
-        }
-
         // 如果找不到方法，抛出异常
         if (m is null)
         {

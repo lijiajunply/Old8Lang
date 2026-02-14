@@ -53,31 +53,31 @@ public partial class VirtualMachine
             }
         }
 
-        // 特殊处理 ToStr：对于数字类型，使用自定义格式化
-        if (methodName == "ToStr")
-        {
-            // 对于 double，如果是整数值，使用固定格式（不使用科学计数法）
-            if (obj is double d)
-            {
-                if (Math.Abs(d - Math.Round(d)) < 0.0000001)
-                {
-                    return d.ToString("F0");
-                }
-
-                return d.ToString(CultureInfo.InvariantCulture);
-            }
-
-            // 对于 long，直接转换为字符串
-            if (obj is long l)
-            {
-                return l.ToString();
-            }
-
-            if (obj is bool f)
-            {
-                return f ? "true" : "false";
-            }
-        }
+        // // 特殊处理 ToStr：对于数字类型，使用自定义格式化
+        // if (methodName == "ToStr")
+        // {
+        //     // 对于 double，如果是整数值，使用固定格式（不使用科学计数法）
+        //     if (obj is double d)
+        //     {
+        //         if (Math.Abs(d - Math.Round(d)) < 0.0000001)
+        //         {
+        //             return d.ToString("F0");
+        //         }
+        //
+        //         return d.ToString(CultureInfo.InvariantCulture);
+        //     }
+        //
+        //     // 对于 long，直接转换为字符串
+        //     if (obj is long l)
+        //     {
+        //         return l.ToString();
+        //     }
+        //
+        //     if (obj is bool f)
+        //     {
+        //         return f ? "true" : "false";
+        //     }
+        // }
 
         // 首先尝试使用实例方法系统（支持类型等价）
         var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
@@ -177,13 +177,6 @@ public partial class VirtualMachine
                 method = allInstanceMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount)
                          ?? allInstanceMethods[0];
             }
-        }
-
-        // 如果还是找不到，尝试 ValueTypeFuncStatic
-        if (method == null)
-        {
-            var valueTypeFuncStatic = typeof(ValueTypeFuncStatic);
-            method = valueTypeFuncStatic.GetMethod(methodName);
         }
 
         // 如果找不到方法，抛出异常

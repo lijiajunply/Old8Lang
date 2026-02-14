@@ -23,12 +23,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ExtensionMethodInterpreterTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExtensionMethodTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Classes/ExtensionMethodVMTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/BaseValueTypeMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeEqualMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToBoolMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToCharMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToDoubleMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToHashMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToIntMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToStrMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/ValueTypeToTypeMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_valuetype_methods.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationHelpers/DotOperatorILHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/BaseInstanceMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/BaseInstanceMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -559,7 +567,7 @@
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
-      <workItem from="1771037866145" duration="9459000" />
+      <workItem from="1771037866145" duration="10509000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -904,7 +912,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="906" />
+    <option name="localTasksCounter" value="907" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -931,7 +939,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(array): 添加数组分组和集合操作方法&#10;&#10;- 实现 Array.GroupAdjacentBy 方法用于按键选择器分组相邻元素&#10;- 实现 Array.GroupAdjacent 方法用于分组相邻相同元素&#10;- 实现 Array.SetEquals 方法检查两数组是否包含相同元素&#10;- 实现 Array.Overlaps 方法检查两数组是否有交集&#10;- 实现 Array.Permutations 方法生成数组元素全排列&#10;- 为 List 类型添加对应的集合操作方法实现&#10;- 扩展通用列表方法以支持 object[] 数组类型&#10;- 更新实例方法注册器以包含新的集合操作方法" />
     <MESSAGE value="feat(list): 添加Zip3和SelectMany实例方法&#10;&#10;- 实现 List.Zip3 方法将三个列表合并为三元组列表&#10;- 实现 List.SelectMany 方法将每个元素映射到列表后展平结果&#10;- 支持带结果选择器的 SelectMany 双参数版本&#10;- 为数组类型添加对应的 Zip3 和 SelectMany 方法实现&#10;- 扩展通用列表连接方法以支持 List&lt;object?&gt; 类型&#10;- 更新实例方法注册器包含新的列表操作方法&#10;- 添加完整测试用例验证新方法功能" />
     <MESSAGE value="feat(instance-methods): 添加数组和列表的SelectMany与Zip3方法实现&#10;&#10;- 实现Array.SelectMany方法，支持将每个元素映射到列表后展平结果&#10;- 实现List.SelectMany方法，支持单参数和双参数重载模式&#10;- 实现Array.Zip3方法，支持将三个数组合并为三元组列表&#10;- 实现List.Zip3方法，支持将三个列表合并为三元组列表&#10;- 添加完整的错误处理和参数验证机制&#10;- 提供虚拟机模式下的执行支持&#10;- 包含详细的单元测试用例验证功能正确性" />
     <MESSAGE value="feat(lang): 添加高级集合操作方法并优化元组支持&#10;&#10;- 实现了 SelectMany 和 Zip3 泛型方法，支持 List、Array 和 Tuple 类型&#10;- 添加了 Tuple&lt;object?, object?&gt; 类型与 ILangList 接口的兼容性转换&#10;- 重构了 Join 方法以支持嵌套数组和元组的格式化输出&#10;- 移除了特定类型的重复实现，统一使用泛型 ILangList 方法&#10;- 添加了对嵌套元组结构的扁平化处理功能&#10;- 更新了实例方法注册表以包含新的高级组合方法" />
@@ -956,7 +963,8 @@
     <MESSAGE value="refactor(extension): 重构扩展方法包装器实现并添加测试文件&#10;&#10;- 将 ExtensionMethodWrapper 类重构为主构造函数语法&#10;- 移除私有字段改用主构造函数参数&#10;- 更新字段和方法实现使用主构造函数参数&#10;- 添加多个扩展方法测试文件验证功能&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正工作时间统计和最后提交消息记录" />
     <MESSAGE value="feat(vm): 添加VM模式下object数组求和功能支持&#10;&#10;- 为LangListSumMethod添加object[]类型支持，实现SumHelperForArray方法&#10;- 支持VM模式下对object数组进行数值类型求和操作&#10;- 实现混合数值类型(int/double/long/float)的自动转换求和&#10;- 更新错误消息提示支持ILangList接口或object[]类型&#10;- 添加扩展方法测试文件验证VM模式功能&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
+    <MESSAGE value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1334,6 +1342,32 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="647" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs</url>
+          <line>59</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\Bytecode\VM\Helpers\VirtualMachine.Helpers.ReflectionAndTasks.cs" containingFunctionPresentation="方法 'InvokeTypeMethod'">
+            <startOffsets>
+              <option value="1518" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1538" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="648" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs</url>
+          <line>77</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\Bytecode\VM\Helpers\VirtualMachine.Helpers.ReflectionAndTasks.cs" containingFunctionPresentation="方法 'InvokeTypeMethod'">
+            <startOffsets>
+              <option value="1966" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1994" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="649" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
