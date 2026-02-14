@@ -104,38 +104,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
         // 如果是Instance，可能是方法调用
         if (dotExpression is Instance instance)
         {
-            var methodName = instance.Id.IdName;
-
-            // 检查是否是已知的 Array 方法，如果找到就调用 FromClassToResult
-            var knownMethods = new[] {
-                "Count", "Sort", "QuickSort", "MergeSort", "BubbleSort", "SelectionSort", "InsertionSort", "HeapSort",
-                "IsSorted", "Distinct", "Map", "Filter", "Reduce", "Get", "Set", "Length", "Len", "length", "len",
-                "ToList", "toList", "tolist", "Slice", "slice", "get", "set",
-                // 通用 ILangList 方法
-                "Contains", "contains", "Reverse", "reverse", "Any", "any", "All", "all", "Where", "where", "Select", "select",
-                "First", "first", "FirstOrDefault", "firstOrDefault", "Last", "last", "LastOrDefault", "lastOrDefault",
-                "Skip", "skip", "Take", "take", "Find", "find", "Concat", "concat", "IndexOf", "indexOf",
-                "distinct", "unique", "Unique", "ElementAt", "elementAt", "At", "at",
-                // 聚合方法
-                "Sum", "sum", "Average", "average", "Avg", "avg", "Min", "min", "Max", "max", "reduce",
-                // 迭代方法
-                "ForEach", "forEach", "Each", "each", "Join", "join",
-                // 集合操作方法
-                "Union", "union", "Intersect", "intersect", "Except", "except", "Difference", "difference",
-                "Zip", "zip", "GroupBy", "groupBy",
-                // 排序和其他方法
-                "sort", "isSorted", "ToStr", "toStr", "ToString", "toString",
-                // 新增的集合操作方法
-                "SetEquals", "setEquals", "Overlaps", "overlaps", "Permutations", "permutations",
-                "GroupAdjacent", "groupAdjacent", "GroupAdjacentBy", "groupAdjacentBy",
-                "Zip3", "zip3", "SelectMany", "selectMany",
-                // 带选择器的聚合方法
-                "SortBy", "sortBy"
-            };
-            if (knownMethods.Contains(methodName))
-            {
-                return instance.FromClassToResult(this, manager);
-            }
+            return instance.FromClassToResult(this, manager);
         }
 
         // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问

@@ -25,26 +25,8 @@
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayConversionWrappers.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_debug.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_index.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_index_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_local.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_reverse.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_simple_vm.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_string_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_this.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_this_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_this_type.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_extension_vm.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_langlist_conversions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_langlist_conversions.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_toarray.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_toarray.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_tolist.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_tolist.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_valuetype_methods.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_valuetype_methods.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +107,7 @@
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.FirstUI.TestApp.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Debug",
     ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
     ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
     "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
@@ -575,7 +557,7 @@
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
-      <workItem from="1771037866145" duration="12604000" />
+      <workItem from="1771037866145" duration="13020000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -920,7 +902,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="909" />
+    <option name="localTasksCounter" value="910" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

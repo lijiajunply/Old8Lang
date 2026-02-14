@@ -29,7 +29,7 @@ public abstract class Program
         {
             args =
             [
-                "-vm",
+                "-f",
                 "C:\\Projects\\RiderProjects\\Old8Lang\\test_langlist_conversions.old8"
             ];
         }
