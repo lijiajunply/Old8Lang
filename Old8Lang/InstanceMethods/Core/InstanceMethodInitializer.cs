@@ -206,7 +206,6 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Array.ArrayCountMethod());
             registry.Register(new Implementations.Array.ArrayGetMethod());
             registry.Register(new Implementations.Array.ArraySetMethod());
-            registry.Register(new Implementations.Array.ArrayToListMethod());
             registry.Register(new Implementations.Array.ArraySliceMethod());
 
             // Array 方法迁移完成！共 5 个方法
@@ -389,6 +388,14 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.TypeValue.TypeIsPrimitiveMethod());
             registry.Register(new Implementations.TypeValue.TypeIsGenericMethod());
             registry.Register(new Implementations.TypeValue.TypeIsAssignableFromMethod());
+
+            // 注册 ILangList 通用转换方法（适用于 List、Array、Tuple、Dict）
+            registry.Register(new Implementations.Generic.LangListToListMethod());
+            registry.Register(new Implementations.Generic.LangListToArrayMethod());
+            registry.Register(new Implementations.Generic.LangListToTupleMethod());
+            registry.Register(new Implementations.Generic.LangListToDictMethod());
+
+            // ILangList 转换方法注册完成！共 4 个方法
 
             // 注册 LangValueType 通用转换方法
             registry.Register(new Implementations.ValueType.ValueTypeToIntMethod());

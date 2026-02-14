@@ -30,7 +30,7 @@ public abstract class Program
             args =
             [
                 "-vm",
-                "C:\\Projects\\RiderProjects\\Old8Lang\\test_extension.old8"
+                "C:\\Projects\\RiderProjects\\Old8Lang\\test_langlist_conversions.old8"
             ];
         }
 #endif

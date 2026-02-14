@@ -1,6 +1,6 @@
 // 测试 ToList
 
-myList <- [1, 2, 3]
+myList <- {1, 2, 3}
 print("List created")
 
 result <- myList.ToList()

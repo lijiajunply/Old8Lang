@@ -23,20 +23,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayConversionWrappers.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Dictionary/DictConversionWrappers.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListToArrayMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListToDictMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListToListMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListToTupleMethod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListConversionWrappers.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Tuple/TupleConversionWrappers.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_langlist_conversions.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_simple_conversion.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_toarray.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/InstanceMethodInitializer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/BaseValueTypeMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/ValueType/BaseValueTypeMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayConversionWrappers.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Array/ArrayGenericWrappers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_debug.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_index.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_index_access.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_local.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_reverse.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_simple_vm.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_string_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_this.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_this_access.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_this_type.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension_vm.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_langlist_conversions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_langlist_conversions.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_toarray.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_toarray.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_tolist.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_tolist.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_valuetype_methods.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_valuetype_methods.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,51 +118,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;1283e73f-d696-41fc-82f8-bfc626de0827.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;3af05a97-c6e2-49ab-b044-50109a642364.executor&quot;: &quot;Debug&quot;,
-    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.FirstUI.TestApp.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "1283e73f-d696-41fc-82f8-bfc626de0827.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -567,7 +575,7 @@
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
-      <workItem from="1771037866145" duration="11565000" />
+      <workItem from="1771037866145" duration="12604000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -912,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="908" />
+    <option name="localTasksCounter" value="909" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(instance-methods): 添加数组和列表的SelectMany与Zip3方法实现&#10;&#10;- 实现Array.SelectMany方法，支持将每个元素映射到列表后展平结果&#10;- 实现List.SelectMany方法，支持单参数和双参数重载模式&#10;- 实现Array.Zip3方法，支持将三个数组合并为三元组列表&#10;- 实现List.Zip3方法，支持将三个列表合并为三元组列表&#10;- 添加完整的错误处理和参数验证机制&#10;- 提供虚拟机模式下的执行支持&#10;- 包含详细的单元测试用例验证功能正确性" />
     <MESSAGE value="feat(lang): 添加高级集合操作方法并优化元组支持&#10;&#10;- 实现了 SelectMany 和 Zip3 泛型方法，支持 List、Array 和 Tuple 类型&#10;- 添加了 Tuple&lt;object?, object?&gt; 类型与 ILangList 接口的兼容性转换&#10;- 重构了 Join 方法以支持嵌套数组和元组的格式化输出&#10;- 移除了特定类型的重复实现，统一使用泛型 ILangList 方法&#10;- 添加了对嵌套元组结构的扁平化处理功能&#10;- 更新了实例方法注册表以包含新的高级组合方法" />
     <MESSAGE value="feat(instance-methods): 添加带选择器的聚合方法支持&#10;&#10;- 实现 SortBy 方法支持按键选择器对列表进行排序&#10;- 实现 SumWithSelector 方法支持对选择器结果进行求和&#10;- 实现 AverageWithSelector 方法支持对选择器结果计算平均值&#10;- 实现 MinWithSelector 和 MaxWithSelector 方法支持选择器比较&#10;- 为 List、Array、Tuple 类型注册带选择器的聚合方法&#10;- 扩展实例方法初始化器支持新的聚合操作方法&#10;- 添加测试文件验证各种选择器方法的功能正确性" />
     <MESSAGE value="feat(instance-methods): 添加字符串和任务线程相关实例方法&#10;&#10;- 注册 StringTrimStart、StringTrimEnd、StringRepeat 方法实现字符串修剪和重复功能&#10;- 添加 StringToBase64 和 StringFromBase64 方法实现 Base64 编码解码功能&#10;- 注册 TaskContinueWith 方法实现任务延续执行功能&#10;- 添加 ThreadCancel 和 ThreadWithTimeout 方法实现线程取消和超时控制&#10;- 更新初始化器统计信息从 15 个 String 方法扩展到 20 个&#10;- 更新 Task 方法计数从 4 个增加到 5 个&#10;- 更新 Thread 方法计数从 3 个增加到 5 个&#10;- 移除 IDE 工作空间中的变更记录和选择器方法提交历史" />
@@ -964,7 +971,8 @@
     <MESSAGE value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
     <MESSAGE value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
     <MESSAGE value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
+    <MESSAGE value="feat(lang): 添加 ILangList 类型转换方法实现&#10;&#10;- 实现 ToList、ToArray、ToTuple、ToDict 通用转换方法&#10;- 为 List、Array、Tuple、Dictionary 类型添加转换方法包装器&#10;- 在实例方法初始化器中注册所有转换方法&#10;- 添加完整的转换方法测试用例文件&#10;- 重构 BaseValueTypeMethod 中的类型转换逻辑&#10;- 更新 IDE 工作区配置文件中的变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 ILangList 类型转换方法实现&#10;&#10;- 实现 ToList、ToArray、ToTuple、ToDict 通用转换方法&#10;- 为 List、Array、Tuple、Dictionary 类型添加转换方法包装器&#10;- 在实例方法初始化器中注册所有转换方法&#10;- 添加完整的转换方法测试用例文件&#10;- 重构 BaseValueTypeMethod 中的类型转换逻辑&#10;- 更新 IDE 工作区配置文件中的变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

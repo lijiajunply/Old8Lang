@@ -58,3 +58,7 @@ public class ArraySumWithSelectorMethod : LangListSumWithSelectorMethod { public
 public class ArrayAverageWithSelectorMethod : LangListAverageWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayMinWithSelectorMethod : LangListMinWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
 public class ArrayMaxWithSelectorMethod : LangListMaxWithSelectorMethod { public override Type TargetType => typeof(ArrayLangValue); }
+
+public class ArrayToArrayMethod : LangListToArrayMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayToTupleMethod : LangListToTupleMethod { public override Type TargetType => typeof(ArrayLangValue); }
+public class ArrayToDictMethod : LangListToDictMethod { public override Type TargetType => typeof(ArrayLangValue); }
