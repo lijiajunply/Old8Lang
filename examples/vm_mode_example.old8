@@ -1,0 +1,16 @@
+// 示例3: VM模式 - 跨平台分发
+
+func factorial(n: int) -> int {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+result <- factorial(5)
+print("Factorial of 5: " + result)
+
+// 循环示例
+for i <- 1, i <= 5, i <- i + 1 {
+    print("factorial(" + i + ") = " + factorial(i))
+}

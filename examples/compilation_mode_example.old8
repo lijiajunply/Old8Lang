@@ -1,0 +1,15 @@
+// 示例2: 编译模式 - 需要完整类型注解
+
+func multiply(a: int, b: int) -> int {
+    return a * b
+}
+
+result: int <- multiply(5, 6)
+print("Product: " + result)
+
+// 循环示例
+sum: int <- 0
+for i: int <- 0, i < 10, i <- i + 1 {
+    sum <- sum + i
+}
+print("Sum: " + sum)

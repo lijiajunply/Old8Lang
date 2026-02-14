@@ -6,10 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Old8Lang is a dynamically-typed programming language implemented in C# (.NET 10.0). It supports three execution modes:
+Old8Lang is a dynamically-typed programming language implemented in C# (.NET 10.0). It supports two execution modes:
 - **Interpretation Mode**: Direct AST execution for rapid development and debugging
 - **Compilation Mode**: IL (Intermediate Language) code generation for better performance
-- **Bytecode VM Mode**: Bytecode-based execution for cross-platform distribution and advanced debugging
 
 The language features functions, classes, exception handling, async/await, generics, and a comprehensive standard library.
 
@@ -31,31 +30,6 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~Te
 
 ### Run Old8Lang Code
 
-Old8Lang 支持三种执行模式，每种模式有不同的特点和适用场景：
-
-#### 三种执行模式对比
-
-| 特性 | 解释模式 | 编译模式 | VM 模式 |
-|------|---------|---------|---------|
-| **启动速度** | 快 | 慢（需编译） | 中等 |
-| **运行性能** | 中等 | 高 | 中等偏高 |
-| **类型系统** | 动态类型 | 静态类型 | 动态类型 |
-| **类型注解** | 可选 | 必需 | 可选 |
-| **泛型支持** | ✅ | ❌ | ✅ |
-| **运算符重载** | ✅ | ❌ | ✅ |
-| **Python 互操作** | ✅ | ❌ | ✅ |
-| **调试支持** | 基础 | 基础 | 高级（内置调试器） |
-| **跨平台分发** | 需源代码 | 需源代码 | ✅ 字节码 |
-| **适用场景** | 开发/脚本 | 生产/性能 | 分发/调试 |
-
-#### 模式选择指南
-
-- **解释模式** (`-f`): 用于快速开发、原型验证、脚本任务
-- **编译模式** (`-c`): 用于生产环境、性能关键应用、长时间运行的服务
-- **VM 模式** (`-vm`): 用于跨平台分发、调试分析、实验性功能测试（⚠️ 实验性）
-
-#### 命令示例
-
 **Interpretation Mode** (fast development, flexible):
 ```bash
 dotnet run --project Old8Lang.App -- -f <file.old8>
@@ -66,14 +40,14 @@ dotnet run --project Old8Lang.App -- -f <file.old8>
 dotnet run --project Old8Lang.App -- -c <file.old8>
 ```
 
-**Bytecode VM Mode** (⚠️ experimental - cross-platform, advanced debugging):
-```bash
-dotnet run --project Old8Lang.App -- -vm <file.old8>
-```
-
 **Syntax Check Only**:
 ```bash
 dotnet run --project Old8Lang.App -- -s <file.old8>
+```
+
+**Bytecode VM Mode** (experimental):
+```bash
+dotnet run --project Old8Lang.App -- -vm <file.old8>
 ```
 
 **Debug Mode** (enable verbose logging):
@@ -105,47 +79,16 @@ dotnet run --project Old8Lang.App -- publish -c cert.pfx -p password
 
 ### Core Processing Pipeline
 
-Old8Lang 支持三种执行模式，每种模式有不同的处理流程：
-
 ```
-Source Code (.old8)
+Source Code
     ↓
 LangParser (Tokenization + Parsing)
     ↓
 Abstract Syntax Tree (AST)
-    ├→ Interpretation Mode (-f)
-    │   ↓
-    │   InterpreterVisitor
-    │   ↓
-    │   Direct Execution (VariateManager)
-    │   ↓
-    │   Result
-    │
-    ├→ Compilation Mode (-c)
-    │   ↓
-    │   CompilerVisitor
-    │   ↓
-    │   IL Code Generation (ILGenerator)
-    │   ↓
-    │   .NET Runtime Execution
-    │   ↓
-    │   Result
-    │
-    └→ Bytecode VM Mode (-vm) ⚠️ Experimental
-        ↓
-        BytecodeVisitor
-        ↓
-        Bytecode Instructions
-        ↓
-        VirtualMachine Execution
-        ↓
-        Result
+    ├→ Interpretation Mode → InterpreterVisitor → Direct Execution
+    ├→ Compilation Mode → CompilerVisitor → IL Generation → Execution
+    └→ Bytecode Mode → BytecodeVisitor → Bytecode → VM Execution
 ```
-
-**模式特点**:
-- **解释模式**: 最快的启动速度，支持完整的动态特性（泛型、运算符重载、Python互操作）
-- **编译模式**: 最高的运行性能，需要完整类型注解，不支持某些动态特性
-- **VM 模式**: 平衡性能和灵活性，支持字节码序列化、跨平台分发和高级调试功能
 
 ### Key Architectural Patterns
 
