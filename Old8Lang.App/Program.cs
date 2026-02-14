@@ -138,6 +138,9 @@ public abstract class Program
         CommandRegistry.Register(new CertCommand());
         CommandRegistry.Register(new PublishCommand());
 
+        // 环境管理命令
+        CommandRegistry.Register(new EnvCommand());
+
         // 调试命令
         CommandRegistry.Register(new DebugStartCommand());
         CommandRegistry.Register(new DebugBreakpointCommand());

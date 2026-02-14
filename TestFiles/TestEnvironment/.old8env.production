@@ -1,0 +1,4 @@
+# Production Environment
+DEBUG=false
+LOG_LEVEL=error
+DB_HOST=prod-db.example.com

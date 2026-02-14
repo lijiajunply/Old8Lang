@@ -32,6 +32,9 @@ public static class GlobalFunctionInitializer
             registry.Register(new ErrorFunction());
             registry.Register(new ClearFunction());
 
+            // 注册环境函数
+            registry.Register(new GetEnvFunction());
+
             // 注册工具函数
             registry.Register(new LenFunction());
             registry.Register(new TypeFunction());

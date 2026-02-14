@@ -23,16 +23,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Docs/ENVIRONMENT_GUIDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/EnvCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/GetEnvFunction.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/EnvironmentManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/TestEnvironment/.old8env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/TestEnvironment/.old8env.development" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/TestEnvironment/.old8env.production" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/TestEnvironment/o8package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/test_environment.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ADVANCED_TOPICS.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ADVANCED_TOPICS.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/API_REFERENCE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/API_REFERENCE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/LANGUAGE_FEATURES.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/LANGUAGE_FEATURES.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/PERFORMANCE_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/PERFORMANCE_GUIDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +82,7 @@
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/TestFiles/TestEnvironment/o8package.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
@@ -134,7 +141,7 @@
     "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
     "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
     "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "001-update-docs-modes",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

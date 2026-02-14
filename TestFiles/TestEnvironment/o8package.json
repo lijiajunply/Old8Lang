@@ -1,0 +1,39 @@
+{
+  "name": "test-environment",
+  "version": "1.0.0",
+  "description": "Environment test project",
+  "author": "",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter",
+    "environments": {
+      "development": {
+        "debug": true,
+        "logLevel": "debug",
+        "runtime": "interpreter",
+        "env": {
+          "APP_MODE": "development",
+          "API_URL": "http://localhost:3000"
+        }
+      },
+      "production": {
+        "debug": false,
+        "logLevel": "error",
+        "runtime": "compiler",
+        "env": {
+          "APP_MODE": "production",
+          "API_URL": "https://api.production.com"
+        }
+      }
+    }
+  },
+  "main": "main.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "old8lang run main.old8",
+    "dev": "old8lang run main.old8 --env development",
+    "prod": "old8lang run main.old8 --env production"
+  }
+}

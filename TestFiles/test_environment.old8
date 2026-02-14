@@ -1,0 +1,29 @@
+// Old8Lang 环境测试示例
+
+// 获取环境变量
+var appName = GetEnv("APP_NAME") ?? "Unknown"
+var apiUrl = GetEnv("API_URL") ?? "http://localhost:3000"
+var debug = GetEnv("DEBUG") ?? "false"
+var logLevel = GetEnv("LOG_LEVEL") ?? "info"
+
+PrintLine("========================================")
+PrintLine("  Old8Lang 环境配置测试")
+PrintLine("========================================")
+PrintLine("")
+
+PrintLine($"应用名称: {appName}")
+PrintLine($"API URL: {apiUrl}")
+PrintLine($"调试模式: {debug}")
+PrintLine($"日志级别: {logLevel}")
+PrintLine("")
+
+// 根据环境执行不同逻辑
+if (debug == "true") {
+    PrintLine("[DEBUG] 调试模式已启用")
+    PrintLine("[DEBUG] 详细日志输出...")
+} else {
+    PrintLine("[INFO] 生产模式运行")
+}
+
+PrintLine("")
+PrintLine("环境配置加载成功！")

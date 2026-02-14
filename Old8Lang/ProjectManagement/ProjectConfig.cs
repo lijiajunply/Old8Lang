@@ -165,4 +165,53 @@ public class Old8LangConfig
     /// </summary>
     [JsonPropertyName("runtime")]
     public string Runtime { get; set; } = "interpreter";
+
+    /// <summary>
+    /// 环境配置
+    /// </summary>
+    [JsonPropertyName("environments")]
+    public Dictionary<string, EnvironmentConfig> Environments { get; set; } = new();
+}
+
+/// <summary>
+/// 环境配置
+/// </summary>
+[Serializable]
+public class EnvironmentConfig
+{
+    /// <summary>
+    /// 环境变量
+    /// </summary>
+    [JsonPropertyName("env")]
+    public Dictionary<string, string> EnvironmentVariables { get; set; } = new();
+
+    /// <summary>
+    /// 运行时模式覆盖
+    /// </summary>
+    [JsonPropertyName("runtime")]
+    public string? Runtime { get; set; }
+
+    /// <summary>
+    /// 调试模式
+    /// </summary>
+    [JsonPropertyName("debug")]
+    public bool Debug { get; set; }
+
+    /// <summary>
+    /// 日志级别
+    /// </summary>
+    [JsonPropertyName("logLevel")]
+    public string LogLevel { get; set; } = "info";
+
+    /// <summary>
+    /// 环境特定的依赖
+    /// </summary>
+    [JsonPropertyName("dependencies")]
+    public Dictionary<string, string>? Dependencies { get; set; }
+
+    /// <summary>
+    /// 环境特定的脚本
+    /// </summary>
+    [JsonPropertyName("scripts")]
+    public Dictionary<string, string>? Scripts { get; set; }
 }

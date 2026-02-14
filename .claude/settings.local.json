@@ -47,7 +47,11 @@
       "Bash(powershell.exe -File:*)",
       "Bash(for:*)",
       "Bash(do sed -i 's/^```old8$/```old8lang/g' \"$file\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(./Old8Lang.App.exe init:*)",
+      "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe -f main.old8 --env development)",
+      "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe -f main.old8 --env production)",
+      "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe:*)"
     ]
   }
 }

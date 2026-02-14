@@ -1,0 +1,37 @@
+// Old8Lang 环境测试
+
+PrintLine("========================================")
+PrintLine("  Old8Lang 环境配置测试")
+PrintLine("========================================")
+PrintLine("")
+
+// 从环境变量读取配置
+appName <- GetEnv("APP_NAME") ?? "Unknown"
+appVersion <- GetEnv("APP_VERSION") ?? "0.0.0"
+appMode <- GetEnv("APP_MODE") ?? "unknown"
+apiUrl <- GetEnv("API_URL") ?? "http://localhost:3000"
+debug <- GetEnv("DEBUG") ?? "false"
+logLevel <- GetEnv("LOG_LEVEL") ?? "info"
+dbHost <- GetEnv("DB_HOST") ?? "localhost"
+
+PrintLine($"应用名称: {appName}")
+PrintLine($"应用版本: {appVersion}")
+PrintLine($"运行模式: {appMode}")
+PrintLine($"API URL: {apiUrl}")
+PrintLine($"调试模式: {debug}")
+PrintLine($"日志级别: {logLevel}")
+PrintLine($"数据库主机: {dbHost}")
+PrintLine("")
+
+// 根据环境执行不同逻辑
+if (debug == "true") {
+    PrintLine("[DEBUG] 调试模式已启用")
+    PrintLine("[DEBUG] 详细日志输出...")
+    PrintLine("[DEBUG] 连接到开发数据库: " + dbHost)
+} else {
+    PrintLine("[INFO] 生产模式运行")
+    PrintLine("[INFO] 连接到生产数据库: " + dbHost)
+}
+
+PrintLine("")
+PrintLine("✓ 环境配置加载成功！")

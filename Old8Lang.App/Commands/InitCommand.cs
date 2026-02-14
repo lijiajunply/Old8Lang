@@ -93,14 +93,31 @@ public class InitCommand : ICommand
             Old8Lang = new Old8LangConfig
             {
                 Version = "^1.0.0",
-                Runtime = "interpreter"
+                Runtime = "interpreter",
+                Environments = new Dictionary<string, EnvironmentConfig>
+                {
+                    ["development"] = new EnvironmentConfig
+                    {
+                        Debug = true,
+                        LogLevel = "debug",
+                        Runtime = "interpreter"
+                    },
+                    ["production"] = new EnvironmentConfig
+                    {
+                        Debug = false,
+                        LogLevel = "error",
+                        Runtime = "compiler"
+                    }
+                }
             },
             Framework = "interpreter",
             References = [],
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = "old8lang run src/main.old8",
-                ["test"] = "old8lang run tests/test_main.old8"
+                ["test"] = "old8lang run tests/test_main.old8",
+                ["dev"] = "old8lang run src/main.old8 --env development",
+                ["prod"] = "old8lang run src/main.old8 --env production"
             }
         };
     }
@@ -137,13 +154,30 @@ public class InitCommand : ICommand
             Old8Lang = new Old8LangConfig
             {
                 Version = old8LangVersion,
-                Runtime = "interpreter"
+                Runtime = "interpreter",
+                Environments = new Dictionary<string, EnvironmentConfig>
+                {
+                    ["development"] = new EnvironmentConfig
+                    {
+                        Debug = true,
+                        LogLevel = "debug",
+                        Runtime = "interpreter"
+                    },
+                    ["production"] = new EnvironmentConfig
+                    {
+                        Debug = false,
+                        LogLevel = "error",
+                        Runtime = "compiler"
+                    }
+                }
             },
             References = [],
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = $"old8lang run {main}",
-                ["test"] = "old8lang run tests/test_main.old8"
+                ["test"] = "old8lang run tests/test_main.old8",
+                ["dev"] = $"old8lang run {main} --env development",
+                ["prod"] = $"old8lang run {main} --env production"
             }
         };
     }
@@ -245,9 +279,17 @@ old8lang run tests/test_main.old8
 
                                    # 忽略 dist 目录
                                    dist/
+
+                                   # 忽略环境文件
+                                   .old8env.local
+                                   .old8env.*.local
                                    """;
             File.WriteAllText(gitignorePath, gitignoreContent);
         }
+
+        // 创建环境配置文件
+        EnvironmentManager.CreateExampleEnvFiles(projectRoot);
+        CommandHelper.PrintSuccess("创建环境配置文件");
     }
 
     private string? GetTemplate(string[] args)

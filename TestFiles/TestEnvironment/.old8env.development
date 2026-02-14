@@ -1,0 +1,4 @@
+# Development Environment
+DEBUG=true
+LOG_LEVEL=debug
+DB_HOST=localhost
