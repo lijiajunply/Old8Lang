@@ -1,3 +1,4 @@
+using System.Globalization;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
@@ -21,7 +22,6 @@ public partial class VirtualMachine
     /// <summary>
     /// 获取 Task
     /// </summary>
-
     private TaskLangValue GetTask(int taskId)
     {
         if (!_tasks.TryGetValue(taskId, out var task))
@@ -35,7 +35,6 @@ public partial class VirtualMachine
     /// <summary>
     /// 辅助方法：将 object? 转换为 LangValueType
     /// </summary>
-
     private object? InvokeTypeMethod(object obj, string methodName, object?[] args)
     {
         if (obj == null)
@@ -64,17 +63,24 @@ public partial class VirtualMachine
                 {
                     return d.ToString("F0");
                 }
-                return d.ToString();
+
+                return d.ToString(CultureInfo.InvariantCulture);
             }
+
             // 对于 long，直接转换为字符串
             if (obj is long l)
             {
                 return l.ToString();
             }
+
+            if (obj is bool f)
+            {
+                return f ? "true" : "false";
+            }
         }
 
         // 首先尝试使用实例方法系统（支持类型等价）
-        var registry = Old8Lang.InstanceMethods.Core.InstanceMethodRegistry.Instance;
+        var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
 
         // 尝试查找实例方法
         var instanceMethod = registry.TryGetMethod(obj.GetType(), methodName);
