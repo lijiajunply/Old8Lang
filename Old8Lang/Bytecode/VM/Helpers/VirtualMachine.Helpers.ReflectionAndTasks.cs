@@ -33,7 +33,7 @@ public partial class VirtualMachine
     }
 
     /// <summary>
-    /// 辅助方法：将 object? 转换为 LangValueType
+    /// 辅助方法：调用实例方法
     /// </summary>
     private object? InvokeTypeMethod(object obj, string methodName, object?[] args)
     {
@@ -53,32 +53,6 @@ public partial class VirtualMachine
             }
         }
 
-        // // 特殊处理 ToStr：对于数字类型，使用自定义格式化
-        // if (methodName == "ToStr")
-        // {
-        //     // 对于 double，如果是整数值，使用固定格式（不使用科学计数法）
-        //     if (obj is double d)
-        //     {
-        //         if (Math.Abs(d - Math.Round(d)) < 0.0000001)
-        //         {
-        //             return d.ToString("F0");
-        //         }
-        //
-        //         return d.ToString(CultureInfo.InvariantCulture);
-        //     }
-        //
-        //     // 对于 long，直接转换为字符串
-        //     if (obj is long l)
-        //     {
-        //         return l.ToString();
-        //     }
-        //
-        //     if (obj is bool f)
-        //     {
-        //         return f ? "true" : "false";
-        //     }
-        // }
-
         // 首先尝试使用实例方法系统（支持类型等价）
         var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
 
@@ -88,11 +62,8 @@ public partial class VirtualMachine
         // 如果没找到，尝试查找等价类型的方法
         if (instanceMethod == null)
         {
-            var equivalentType = GetEquivalentLangType(obj.GetType());
-            if (equivalentType != null)
-            {
-                instanceMethod = registry.TryGetMethod(equivalentType, methodName);
-            }
+            var equivalentType = VMTypeMapper.GetEquivalentLangType(obj.GetType());
+            instanceMethod = registry.TryGetMethod(equivalentType, methodName);
         }
 
         if (instanceMethod != null)
@@ -230,68 +201,5 @@ public partial class VirtualMachine
         // 调用方法
         object? invokeInstance = method.IsStatic ? null : obj;
         return method.Invoke(invokeInstance, invokeArgs.ToArray());
-    }
-
-    /// <summary>
-    /// 获取 C# 原生类型对应的等价 Old8Lang 类型
-    /// 用于实例方法查找时的类型匹配
-    /// </summary>
-    private static Type? GetEquivalentLangType(Type nativeType)
-    {
-        // object[] 等价于 ListLangValue (VM 模式下的列表表示)
-        if (nativeType == typeof(object[]))
-        {
-            return typeof(ListLangValue);
-        }
-
-        // List<object?> 等价于 ListLangValue
-        if (nativeType == typeof(List<object?>))
-        {
-            return typeof(ListLangValue);
-        }
-
-        // Dictionary<object, object?> 等价于 DictionaryLangValue
-        if (nativeType == typeof(Dictionary<object, object?>))
-        {
-            return typeof(DictionaryLangValue);
-        }
-
-        // string 等价于 StringLangValue
-        if (nativeType == typeof(string))
-        {
-            return typeof(StringLangValue);
-        }
-
-        // int 等价于 IntLangValue
-        if (nativeType == typeof(int))
-        {
-            return typeof(IntLangValue);
-        }
-
-        // double 等价于 DoubleLangValue
-        if (nativeType == typeof(double))
-        {
-            return typeof(DoubleLangValue);
-        }
-
-        // bool 等价于 BoolLangValue
-        if (nativeType == typeof(bool))
-        {
-            return typeof(BoolLangValue);
-        }
-
-        // char 等价于 CharLangValue
-        if (nativeType == typeof(char))
-        {
-            return typeof(CharLangValue);
-        }
-
-        // Tuple<object?, object?> 等价于 TupleLangValue (VM 模式下的元组表示)
-        if (nativeType.IsGenericType && nativeType.GetGenericTypeDefinition() == typeof(Tuple<,>))
-        {
-            return typeof(TupleLangValue);
-        }
-
-        return null;
     }
 }

@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.VM;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -314,89 +315,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// </summary>
     private static bool IsEquivalentType(Type actualType, Type targetType)
     {
-        // 如果目标类型是 LangValueType 基类，检查实际类型是否可以映射到 LangValueType
-        if (targetType == typeof(LangValueType))
-        {
-            // C# 原生类型可以映射到 LangValueType
-            if (actualType == typeof(int) || actualType == typeof(long) ||
-                actualType == typeof(double) || actualType == typeof(bool) ||
-                actualType == typeof(char) || actualType == typeof(string))
-            {
-                return true;
-            }
-
-            // 如果实际类型已经是 LangValueType 的子类，也认为等价
-            if (typeof(LangValueType).IsAssignableFrom(actualType))
-            {
-                return true;
-            }
-        }
-
-        // object[] 等价于 ListLangValue
-        if (actualType == typeof(object[]) && targetType == typeof(ListLangValue))
-        {
-            return true;
-        }
-
-        // List<object?> 等价于 ListLangValue
-        if (actualType == typeof(List<object?>) && targetType == typeof(ListLangValue))
-        {
-            return true;
-        }
-
-        // object[] 和 List<object?> 等价于 ILangList 接口
-        if (targetType == typeof(ILangList))
-        {
-            if (actualType == typeof(object[]) || actualType == typeof(List<object?>))
-            {
-                return true;
-            }
-        }
-
-        // Dictionary<object, object?> 等价于 DictionaryLangValue
-        if (actualType == typeof(Dictionary<object, object?>) && targetType == typeof(DictionaryLangValue))
-        {
-            return true;
-        }
-
-        // string 等价于 StringLangValue
-        if (actualType == typeof(string) && targetType == typeof(StringLangValue))
-        {
-            return true;
-        }
-
-        // int 等价于 IntLangValue
-        if (actualType == typeof(int) && targetType == typeof(IntLangValue))
-        {
-            return true;
-        }
-
-        // double 等价于 DoubleLangValue
-        if (actualType == typeof(double) && targetType == typeof(DoubleLangValue))
-        {
-            return true;
-        }
-
-        // bool 等价于 BoolLangValue
-        if (actualType == typeof(bool) && targetType == typeof(BoolLangValue))
-        {
-            return true;
-        }
-
-        // char 等价于 CharLangValue
-        if (actualType == typeof(char) && targetType == typeof(CharLangValue))
-        {
-            return true;
-        }
-
-        // Tuple<object?, object?> 等价于 TupleLangValue (VM 模式下的元组表示)
-        if (actualType.IsGenericType && actualType.GetGenericTypeDefinition() == typeof(Tuple<,>) &&
-            targetType == typeof(TupleLangValue))
-        {
-            return true;
-        }
-
-        return false;
+        return VMTypeMapper.IsEquivalentType(actualType, targetType);
     }
 
     /// <summary>

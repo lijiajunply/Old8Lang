@@ -36,7 +36,12 @@
       "Bash(git reset:*)",
       "Bash(\"C:\\\\Projects\\\\RiderProjects\\\\Old8Lang\\\\test_doc_example.old8\" << 'EOF'\n// 测试文档中的扩展方法示例\n\n// 为 int 类型添加扩展方法\nextension int {\n    func double\\(\\) -> int {\n        return this * 2\n    }\n\n    func isEven\\(\\) -> bool {\n        return this % 2 == 0\n    }\n}\n\n// 使用扩展方法\nx <- 5\ndoubled <- x.double\\(\\)\nisEven <- x.isEven\\(\\)\n\nPrint\\(\"x.double\\(\\) = \" + doubled.ToStr\\(\\)\\)\nPrint\\(\"x.isEven\\(\\) = \" + isEven.ToStr\\(\\)\\)\n\n// 为列表添加扩展方法\nextension list {\n    func sum\\(\\) -> int {\n        total <- 0\n        for item in this {\n            total <- total + item\n        }\n        return total\n    }\n}\n\n// 使用\nnumbers <- [1, 2, 3, 4, 5]\ntotal <- numbers.sum\\(\\)\nPrint\\(\"numbers.sum\\(\\) = \" + total.ToStr\\(\\)\\)\nEOF)",
       "Bash(tee:*)",
-      "Bash(dotnet script eval:*)"
+      "Bash(dotnet script eval:*)",
+      "Bash(/tmp/test_array_toarray.old8:*)",
+      "Bash(/tmp/test_array_methods.old8:*)",
+      "Bash(/tmp/test_array_toarray_simple.old8:*)",
+      "Bash(/tmp/test_vm_type_mapper.old8:*)",
+      "Bash(/tmp/VMTypeMapper_README.md:*)"
     ]
   }
 }
