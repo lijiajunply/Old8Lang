@@ -1,0 +1,21 @@
+// 简化测试 - 不使用typeof
+
+str <- "Hello"
+print("字符串: " + str)
+
+// 在普通代码中测试
+char0 <- str[0]
+print("普通代码 str[0]: " + char0)
+
+// 在扩展方法中测试
+extension string {
+    func testIndex() {
+        print("扩展方法中 this: " + this)
+        c <- this[0]
+        print("扩展方法中 this[0]: " + c)
+        return c
+    }
+}
+
+result <- str.testIndex()
+print("返回值: " + result)

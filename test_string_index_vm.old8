@@ -1,0 +1,21 @@
+// 测试VM模式下的字符串索引访问（非扩展方法）
+
+str <- "Hello"
+print("字符串: " + str)
+print("长度: " + str.length().ToStr())
+
+// 测试索引访问
+char0 <- str[0]
+print("str[0] = " + char0)
+
+char1 <- str[1]
+print("str[1] = " + char1)
+
+// 测试在循环中使用索引
+result <- ""
+i <- 0
+while i < str.length() {
+    result <- result + str[i]
+    i <- i + 1
+}
+print("重建字符串: " + result)
