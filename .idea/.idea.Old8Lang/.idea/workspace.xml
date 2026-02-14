@@ -23,15 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_extension_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_extension_index_access.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_extension_this_access.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_extension_this_type.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_string_index_detailed.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_string_index_simple2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_string_index_vm.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_doc_example.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/ExtensionMethodWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/ExtensionMethodWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListSumMethod.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -562,7 +559,7 @@
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
-      <workItem from="1771037866145" duration="3108000" />
+      <workItem from="1771037866145" duration="6238000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -907,7 +904,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="903" />
+    <option name="localTasksCounter" value="904" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +931,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(list): 添加列表高级操作实例方法&#10;&#10;- 注册 ListChunkMethod、ListPartitionMethod、ListPairwiseMethod 等7个新方法&#10;- 实现 Chunk 方法支持将列表分割成指定大小的块&#10;- 实现 Partition 方法根据条件将列表分为两部分&#10;- 实现 Pairwise 方法将相邻元素配对返回元组列表&#10;- 实现 FlatMap 方法对每个元素应用转换函数并扁平化结果&#10;- 实现 Window 方法创建滑动窗口返回连续子列表&#10;- 实现 Flatten 方法扁平化嵌套列表结构&#10;- 添加完整的列表高级操作方法测试用例覆盖所有功能&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(list): 添加列表集合操作方法&#10;&#10;- 注册 ListSymmetricExcept、ListIsSubsetOf、ListIsSupersetOf、ListFindAll 和 ListLastIndexOf 方法&#10;- 实现 SymmetricExcept 方法用于计算两个列表的对称差集&#10;- 实现 IsSubsetOf 方法用于检查当前列表是否为另一个列表的子集&#10;- 实现 IsSupersetOf 方法用于检查当前列表是否为另一个列表的超集&#10;- 实现 FindAll 方法用于查找所有满足条件的元素&#10;- 实现 LastIndexOf 方法用于查找元素最后一次出现的索引&#10;- 更新 SortBy 方法的虚拟机实现以支持函数对象调用&#10;- 添加测试文件验证所有新方法的功能" />
     <MESSAGE value="feat(list): 添加列表高级功能方法&#10;&#10;- 注册 ListWithIndex、ListFlattenDeep、ListCartesianProduct 等7个新方法&#10;- 实现 WithIndex 方法为每个元素添加索引返回元组列表&#10;- 实现 FlattenDeep 方法深度扁平化嵌套列表结构&#10;- 实现 CartesianProduct 方法计算两个列表的笛卡尔积&#10;- 实现 Combinations 方法生成从列表中选择 k 个元素的所有组合&#10;- 实现 TakeWhileIndexed 和 SkipWhileIndexed 方法支持带索引的条件操作&#10;- 添加完整的列表高级功能测试用例覆盖所有新方法&#10;- 更新 IDE 配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(array): 添加数组分组和集合操作方法&#10;&#10;- 实现 Array.GroupAdjacentBy 方法用于按键选择器分组相邻元素&#10;- 实现 Array.GroupAdjacent 方法用于分组相邻相同元素&#10;- 实现 Array.SetEquals 方法检查两数组是否包含相同元素&#10;- 实现 Array.Overlaps 方法检查两数组是否有交集&#10;- 实现 Array.Permutations 方法生成数组元素全排列&#10;- 为 List 类型添加对应的集合操作方法实现&#10;- 扩展通用列表方法以支持 object[] 数组类型&#10;- 更新实例方法注册器以包含新的集合操作方法" />
@@ -959,7 +955,8 @@
     <MESSAGE value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
     <MESSAGE value="feat(list): 添加列表聚合和排序方法重载实现&#10;&#10;- 实现 Sum() 和 Sum(selector) 方法用于列表求和操作&#10;- 实现 Min() 和 Min(selector) 方法用于获取列表最小值&#10;- 实现 Max() 和 Max(selector) 方法用于获取列表最大值&#10;- 实现 Sort()、SortBy() 和 SortWith() 方法用于列表排序&#10;- 添加带选择器参数的方法重载版本支持&#10;- 更新文档说明新增方法的功能和用法示例&#10;- 移除旧的 MaxBy 和 MinBy 方法避免命名冲突&#10;- 修复 SortBy 与 SortWith 的命名冲突问题&#10;- 增加单元测试覆盖所有新增方法和重载场景&#10;- 更新实例方法初始化器注册新的方法实现" />
     <MESSAGE value="feat(bytecode): 添加对扩展方法的字节码编译支持&#10;&#10;- 在 BytecodeCompiler 中添加第四阶段预处理，注册扩展方法定义&#10;- 实现 PreprocessExtensionDefinitions 和 CompileExtensionDeclaration 方法&#10;- 创建 BytecodeExtensionMethod 类在 VM 中执行扩展方法&#10;- 扩展方法在编译时转换为普通函数并标记 IsExtensionMethod 属性&#10;- 在 BytecodeFile 中添加 Extensions 列表并实现序列化功能&#10;- 在 VirtualMachine 中注册扩展方法到实例方法注册表&#10;- 添加 ExecuteFunction 公共方法供扩展方法执行使用&#10;- 更新 ExtensionMethodWrapper 支持 VM 模式执行&#10;- 添加多个测试文件验证扩展方法功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加对扩展方法的字节码编译支持&#10;&#10;- 在 BytecodeCompiler 中添加第四阶段预处理，注册扩展方法定义&#10;- 实现 PreprocessExtensionDefinitions 和 CompileExtensionDeclaration 方法&#10;- 创建 BytecodeExtensionMethod 类在 VM 中执行扩展方法&#10;- 扩展方法在编译时转换为普通函数并标记 IsExtensionMethod 属性&#10;- 在 BytecodeFile 中添加 Extensions 列表并实现序列化功能&#10;- 在 VirtualMachine 中注册扩展方法到实例方法注册表&#10;- 添加 ExecuteFunction 公共方法供扩展方法执行使用&#10;- 更新 ExtensionMethodWrapper 支持 VM 模式执行&#10;- 添加多个测试文件验证扩展方法功能" />
+    <MESSAGE value="refactor(extension): 重构扩展方法包装器实现并添加测试文件&#10;&#10;- 将 ExtensionMethodWrapper 类重构为主构造函数语法&#10;- 移除私有字段改用主构造函数参数&#10;- 更新字段和方法实现使用主构造函数参数&#10;- 添加多个扩展方法测试文件验证功能&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正工作时间统计和最后提交消息记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(extension): 重构扩展方法包装器实现并添加测试文件&#10;&#10;- 将 ExtensionMethodWrapper 类重构为主构造函数语法&#10;- 移除私有字段改用主构造函数参数&#10;- 更新字段和方法实现使用主构造函数参数&#10;- 添加多个扩展方法测试文件验证功能&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正工作时间统计和最后提交消息记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

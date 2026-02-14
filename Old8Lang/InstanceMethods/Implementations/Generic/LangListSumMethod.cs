@@ -158,6 +158,84 @@ public class LangListSumMethod : BaseLangListMethod
             return SumHelper(langList);
         }
 
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        // VM模式下，列表可能是 object[] 类型
+        if (instance is object[] array)
+        {
+            return SumHelperForArray(array);
+        }
+
+        throw new ArgumentException($"实例必须实现 ILangList 接口或为 object[] 类型，当前类型：{instance?.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 为 object[] 类型提供求和功能（VM模式）
+    /// </summary>
+    private static object? SumHelperForArray(object?[] array)
+    {
+        if (array.Length == 0)
+        {
+            return 0;
+        }
+
+        // 检查第一个元素的类型来决定返回类型
+        var firstItem = array[0];
+        bool isDouble = firstItem is double;
+
+        if (isDouble)
+        {
+            double sum = 0;
+            foreach (var item in array)
+            {
+                if (item is double dv)
+                    sum += dv;
+                else if (item is int iv)
+                    sum += iv;
+                else if (item is long lv)
+                    sum += lv;
+                else if (item is float fv)
+                    sum += fv;
+                else
+                    throw new ArgumentException($"无法对类型 {item?.GetType().Name} 求和");
+            }
+            return sum;
+        }
+        else
+        {
+            int sum = 0;
+            foreach (var item in array)
+            {
+                if (item is int iv)
+                {
+                    sum += iv;
+                }
+                else if (item is double dv)
+                {
+                    // 如果遇到 double，转换为 double 计算
+                    double doubleSum = sum + dv;
+                    int currentIndex = System.Array.IndexOf(array, item);
+                    for (int i = currentIndex + 1; i < array.Length; i++)
+                    {
+                        if (array[i] is int intVal)
+                            doubleSum += intVal;
+                        else if (array[i] is double doubleVal)
+                            doubleSum += doubleVal;
+                        else if (array[i] is long longVal)
+                            doubleSum += longVal;
+                        else if (array[i] is float floatVal)
+                            doubleSum += floatVal;
+                    }
+                    return doubleSum;
+                }
+                else if (item is long lv)
+                {
+                    sum += (int)lv;
+                }
+                else
+                {
+                    throw new ArgumentException($"无法对类型 {item?.GetType().Name} 求和");
+                }
+            }
+            return sum;
+        }
     }
 }
