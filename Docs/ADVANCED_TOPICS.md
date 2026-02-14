@@ -132,9 +132,9 @@ public interface IExternProvider
 - 高性能直接调用
 
 **示例：**
-```old8
-native extern "msvcrt.dll" func abs(x:int) -> int
-native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+```old8lang
+extern "msvcrt.dll" func abs(x:int) -> int
+extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 ```
 
 #### 2. PythonProvider
@@ -151,15 +151,15 @@ native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
 - 仅支持解释模式（`SupportsCompilation = false`）
 
 **示例：**
-```old8
+```old8lang
 // Python 脚本文件
-native extern "math_utils.py" {
+extern "math_utils.py" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
 }
 
 // Python 标准库模块
-native extern "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
 }
@@ -179,15 +179,15 @@ native extern "pymodule:math" {
 - 支持 ES5.1 标准
 
 **示例：**
-```old8
+```old8lang
 // JavaScript 脚本文件
-native extern "math_utils.js" {
+extern "math_utils.js" {
     func add(a:int, b:int) -> int,
     func multiply(a:int, b:int) -> int
 }
 
 // 使用 js: 前缀
-native extern "js:utils.js" {
+extern "js:utils.js" {
     func greet(name:string) -> string,
     func getArray() -> object
 }
@@ -370,7 +370,7 @@ dotnet run --project Old8Lang.App -- -s InterpreterTests/test_python_extern_basi
 
 #### 功能测试
 
-```old8
+```old8lang
 // test_extern_factory.old8
 native extern "pymodule:math" {
     func sqrt(x:double) -> double,
@@ -541,7 +541,7 @@ config.DebugOutput = false;
 
 ##### 无类型注解（需启用推断）
 
-```old8
+```old8lang
 // 启用类型推断后，可省略类型注解
 func add(a, b) -> int {
     return a + b
@@ -553,7 +553,7 @@ result <- add(10, 20)  // 推断 a:int, b:int
 
 ##### 部分类型注解
 
-```old8
+```old8lang
 // 混合使用：返回类型自动推断
 func multiply(x:int, y:int) {
     return x * y  // 推断返回类型为 int
@@ -562,7 +562,7 @@ func multiply(x:int, y:int) {
 
 ##### 默认值推断
 
-```old8
+```old8lang
 // 从默认值推断参数类型
 func greet(name:string, message: "Hello") -> void {
     // message 推断为 string 类型
@@ -623,7 +623,7 @@ func greet(name:string, message: "Hello") -> void {
 
 #### 示例 1：简单类型推断
 
-```old8
+```old8lang
 // 启用类型推断
 // TypeInferenceConfig.Instance.EnableTypeInference = true;
 
@@ -637,7 +637,7 @@ PrintLine("10 + 20 = " + result.ToStr())
 
 #### 示例 2：多类型推断
 
-```old8
+```old8lang
 // 从默认值推断
 func calculate(x, y:int, operation:"add") {
     if operation == "add" {
@@ -655,7 +655,7 @@ result2 <- calculate(10, 20, "multiply")
 
 #### 示例 3：混合注解
 
-```old8
+```old8lang
 // 部分显式注解 + 部分推断
 func max(a:int, b:int) {
     // 返回类型从 return 语句推断为 int
@@ -800,7 +800,7 @@ old8lang package init
 
 创建 `index.old8`：
 
-```old8
+```old8lang
 // MyPackage/index.old8
 
 // 导出函数
@@ -910,7 +910,7 @@ PrintLine("MyPackage loaded successfully") //不会显示
 
 #### 在代码中使用依赖
 
-```old8
+```old8lang
 // 导入依赖包
 import "Logger"
 
@@ -946,7 +946,7 @@ old8lang restore                 # 恢复依赖
 
 创建测试文件：
 
-```old8
+```old8lang
 // test_usage.old8
 import "MyPackage"
 
@@ -1006,7 +1006,7 @@ old8lang package publish
 
 明确标记公共 API：
 
-```old8
+```old8lang
 // ✅ 好的做法
 public func publicFunction() -> void {
     privateHelper()
@@ -1045,6 +1045,686 @@ func shouldBePrivate() -> void {
 - **主版本号**（Major）：不兼容的 API 变更
 - **次版本号**（Minor）：向后兼容的功能添加
 - **修订号**（Patch）：向后兼容的问题修正
+
+---
+
+## 扩展 Old8Lang (Extending Old8Lang)
+
+### 概述
+
+Old8Lang 的架构设计使其易于扩展。本章节介绍如何扩展语言功能、添加新的执行模式和自定义标准库。
+
+### 目录
+
+1. [扩展 Visitor 模式](#扩展-visitor-模式)
+2. [添加新的语言特性](#添加新的语言特性)
+3. [创建自定义标准库](#创建自定义标准库)
+4. [添加新的执行模式](#添加新的执行模式)
+
+---
+
+### 扩展 Visitor 模式
+
+#### 为什么使用 Visitor 模式
+
+Old8Lang 使用 Visitor 模式作为核心设计模式，这使得添加新的 AST 处理方式变得简单，无需修改现有的 AST 节点类。
+
+#### 创建自定义 Visitor
+
+**步骤 1：实现 IVisitor 接口**
+
+```csharp
+// Old8Lang/AST/Visitor/MyCustomVisitor.cs
+using Old8Lang.AST;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Statement;
+
+namespace Old8Lang.AST.Visitor
+{
+    /// <summary>
+    /// 自定义 Visitor 示例：代码格式化器
+    /// </summary>
+    public class CodeFormatterVisitor : IVisitor<string>
+    {
+        private int _indentLevel = 0;
+        private const string IndentString = "    ";
+
+        public string VisitLiteralExpression(LiteralExpression expr)
+        {
+            return expr.Value?.ToString() ?? "null";
+        }
+
+        public string VisitBinaryExpression(BinaryExpression expr)
+        {
+            var left = expr.Left.Accept(this);
+            var right = expr.Right.Accept(this);
+            return $"({left} {expr.Operator} {right})";
+        }
+
+        public string VisitFunctionCallExpression(FunctionCallExpression expr)
+        {
+            var args = string.Join(", ", expr.Arguments.Select(a => a.Accept(this)));
+            return $"{expr.FunctionName}({args})";
+        }
+
+        public string VisitAssignmentStatement(AssignmentStatement stmt)
+        {
+            var indent = GetIndent();
+            var value = stmt.Value.Accept(this);
+            return $"{indent}{stmt.VariableName} <- {value}";
+        }
+
+        public string VisitIfStatement(IfStatement stmt)
+        {
+            var indent = GetIndent();
+            var condition = stmt.Condition.Accept(this);
+            var result = $"{indent}if {condition} {{\n";
+
+            _indentLevel++;
+            foreach (var s in stmt.ThenBranch)
+            {
+                result += s.Accept(this) + "\n";
+            }
+            _indentLevel--;
+
+            if (stmt.ElseBranch != null && stmt.ElseBranch.Count > 0)
+            {
+                result += $"{indent}}} else {{\n";
+                _indentLevel++;
+                foreach (var s in stmt.ElseBranch)
+                {
+                    result += s.Accept(this) + "\n";
+                }
+                _indentLevel--;
+            }
+
+            result += $"{indent}}}";
+            return result;
+        }
+
+        // ... 实现其他 Visit 方法
+
+        private string GetIndent()
+        {
+            return string.Concat(Enumerable.Repeat(IndentString, _indentLevel));
+        }
+    }
+}
+```
+
+**步骤 2：使用自定义 Visitor**
+
+```csharp
+// 解析代码
+var ast = LangParser.Parse(sourceCode);
+
+// 使用自定义 Visitor
+var formatter = new CodeFormatterVisitor();
+foreach (var statement in ast)
+{
+    var formatted = statement.Accept(formatter);
+    Console.WriteLine(formatted);
+}
+```
+
+#### Visitor 应用场景
+
+| Visitor 类型 | 用途 | 返回类型 |
+|-------------|------|---------|
+| InterpreterVisitor | 解释执行 | `object` |
+| CompilerVisitor | IL 代码生成 | `void` |
+| BytecodeVisitor | 字节码生成 | `List<Instruction>` |
+| TypeInferenceVisitor | 类型推断 | `TypeInfo` |
+| CodeFormatterVisitor | 代码格式化 | `string` |
+| ASTDumperVisitor | AST 可视化 | `string` |
+| OptimizationVisitor | 代码优化 | `LangExpression` |
+| SecurityAnalyzerVisitor | 安全分析 | `List<SecurityIssue>` |
+
+---
+
+### 添加新的语言特性
+
+#### 完整流程
+
+添加新的语言特性需要以下步骤：
+
+1. **定义 AST 节点**
+2. **更新 Parser**
+3. **实现解释模式执行**
+4. **实现编译模式 IL 生成**
+5. **实现 VM 模式字节码生成**
+6. **添加 Visitor 支持**
+7. **编写测试**
+
+#### 示例：添加 `switch` 语句
+
+**步骤 1：定义 AST 节点**
+
+```csharp
+// Old8Lang/AST/Statement/SwitchStatement.cs
+namespace Old8Lang.AST.Statement
+{
+    public class SwitchStatement : OldStatement
+    {
+        public LangExpression Expression { get; set; }
+        public List<SwitchCase> Cases { get; set; }
+        public List<OldStatement>? DefaultCase { get; set; }
+
+        public SwitchStatement(
+            LangExpression expression,
+            List<SwitchCase> cases,
+            List<OldStatement>? defaultCase = null)
+        {
+            Expression = expression;
+            Cases = cases;
+            DefaultCase = defaultCase;
+        }
+
+        // 解释模式执行
+        public override void Execute(VariateManager manager)
+        {
+            var value = Expression.Run(manager);
+
+            foreach (var switchCase in Cases)
+            {
+                var caseValue = switchCase.Value.Run(manager);
+                if (Equals(value, caseValue))
+                {
+                    foreach (var stmt in switchCase.Statements)
+                    {
+                        stmt.Execute(manager);
+                    }
+                    return;
+                }
+            }
+
+            // 执行 default 分支
+            if (DefaultCase != null)
+            {
+                foreach (var stmt in DefaultCase)
+                {
+                    stmt.Execute(manager);
+                }
+            }
+        }
+
+        // 编译模式 IL 生成
+        public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
+        {
+            // 生成 switch 表达式的 IL
+            Expression.GenerateIl(ilGenerator, local);
+
+            // 为每个 case 创建标签
+            var caseLabels = Cases.Select(_ => ilGenerator.DefineLabel()).ToList();
+            var defaultLabel = ilGenerator.DefineLabel();
+            var endLabel = ilGenerator.DefineLabel();
+
+            // 生成 case 比较逻辑
+            for (int i = 0; i < Cases.Count; i++)
+            {
+                ilGenerator.Emit(OpCodes.Dup); // 复制 switch 值
+                Cases[i].Value.GenerateIl(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Beq, caseLabels[i]); // 相等则跳转
+            }
+
+            // 没有匹配的 case，跳转到 default
+            ilGenerator.Emit(OpCodes.Br, defaultLabel);
+
+            // 生成每个 case 的代码
+            for (int i = 0; i < Cases.Count; i++)
+            {
+                ilGenerator.MarkLabel(caseLabels[i]);
+                foreach (var stmt in Cases[i].Statements)
+                {
+                    stmt.GenerateIl(ilGenerator, local);
+                }
+                ilGenerator.Emit(OpCodes.Br, endLabel);
+            }
+
+            // 生成 default 代码
+            ilGenerator.MarkLabel(defaultLabel);
+            if (DefaultCase != null)
+            {
+                foreach (var stmt in DefaultCase)
+                {
+                    stmt.GenerateIl(ilGenerator, local);
+                }
+            }
+
+            ilGenerator.MarkLabel(endLabel);
+            ilGenerator.Emit(OpCodes.Pop); // 清理栈上的 switch 值
+        }
+
+        // Visitor 模式支持
+        public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+        {
+            return visitor.VisitSwitchStatement(this);
+        }
+    }
+
+    public class SwitchCase
+    {
+        public LangExpression Value { get; set; }
+        public List<OldStatement> Statements { get; set; }
+
+        public SwitchCase(LangExpression value, List<OldStatement> statements)
+        {
+            Value = value;
+            Statements = statements;
+        }
+    }
+}
+```
+
+**步骤 2：更新 Parser**
+
+```csharp
+// Old8Lang/LangParser/Parsers/StatementParser.cs
+public OldStatement ParseSwitchStatement()
+{
+    Consume(TokenType.Switch, "Expected 'switch'");
+    var expression = ParseExpression();
+    Consume(TokenType.LeftBrace, "Expected '{'");
+
+    var cases = new List<SwitchCase>();
+    List<OldStatement>? defaultCase = null;
+
+    while (!Check(TokenType.RightBrace) && !IsAtEnd())
+    {
+        if (Match(TokenType.Case))
+        {
+            var caseValue = ParseExpression();
+            Consume(TokenType.Colon, "Expected ':'");
+            var statements = new List<OldStatement>();
+
+            while (!Check(TokenType.Case) && !Check(TokenType.Default) && !Check(TokenType.RightBrace))
+            {
+                statements.Add(ParseStatement());
+            }
+
+            cases.Add(new SwitchCase(caseValue, statements));
+        }
+        else if (Match(TokenType.Default))
+        {
+            Consume(TokenType.Colon, "Expected ':'");
+            defaultCase = new List<OldStatement>();
+
+            while (!Check(TokenType.RightBrace))
+            {
+                defaultCase.Add(ParseStatement());
+            }
+        }
+    }
+
+    Consume(TokenType.RightBrace, "Expected '}'");
+    return new SwitchStatement(expression, cases, defaultCase);
+}
+```
+
+**步骤 3：更新 IVisitor 接口**
+
+```csharp
+// Old8Lang/AST/Visitor/IVisitor.cs
+public interface IVisitor<out TResult>
+{
+    // ... 现有方法
+    TResult VisitSwitchStatement(SwitchStatement stmt);
+}
+```
+
+**步骤 4：实现 Visitor 方法**
+
+在所有 Visitor 实现中添加 `VisitSwitchStatement` 方法：
+
+```csharp
+// InterpreterVisitor
+public object VisitSwitchStatement(SwitchStatement stmt)
+{
+    stmt.Execute(_manager);
+    return null;
+}
+
+// CompilerVisitor
+public void VisitSwitchStatement(SwitchStatement stmt)
+{
+    stmt.GenerateIl(_ilGenerator, _localManager);
+}
+
+// BytecodeVisitor
+public List<Instruction> VisitSwitchStatement(SwitchStatement stmt)
+{
+    var instructions = new List<Instruction>();
+    // 生成字节码...
+    return instructions;
+}
+```
+
+**步骤 5：编写测试**
+
+```old8lang
+// test_switch.old8
+func getDayName(day: int) -> string {
+    switch day {
+        case 1:
+            return "Monday"
+        case 2:
+            return "Tuesday"
+        case 3:
+            return "Wednesday"
+        default:
+            return "Unknown"
+    }
+}
+
+result <- getDayName(1)
+print(result)  // 输出: Monday
+```
+
+---
+
+### 创建自定义标准库
+
+#### 标准库结构
+
+Old8Lang 的标准库位于独立的项目中，可以轻松扩展。
+
+**标准库项目**:
+- `Old8LangLib/` - 核心标准库
+- `Old8Lang.NetLib/` - 网络库
+- `Old8Lang.DatabaseLib/` - 数据库库
+- `Old8Lang.SerializationLib/` - 序列化库
+- `Old8Lang.MachineLearningLib/` - 机器学习库
+
+#### 创建新的标准库模块
+
+**步骤 1：创建模块类**
+
+```csharp
+// Old8LangLib/MyCustomLib.cs
+using Old8Lang.Interpreter;
+
+namespace Old8LangLib
+{
+    public static class MyCustomLib
+    {
+        /// <summary>
+        /// 注册模块到 Old8Lang
+        /// </summary>
+        public static void Register(VariateManager manager)
+        {
+            // 注册函数
+            manager.RegisterFunction("MyCustom.hello", Hello);
+            manager.RegisterFunction("MyCustom.calculate", Calculate);
+
+            // 注册常量
+            manager.SetVariable("MyCustom.VERSION", "1.0.0");
+        }
+
+        /// <summary>
+        /// 示例函数：打招呼
+        /// </summary>
+        private static object Hello(List<object> args)
+        {
+            if (args.Count != 1)
+                throw new ArgumentException("hello() requires 1 argument");
+
+            var name = args[0]?.ToString() ?? "World";
+            return $"Hello, {name}!";
+        }
+
+        /// <summary>
+        /// 示例函数：计算
+        /// </summary>
+        private static object Calculate(List<object> args)
+        {
+            if (args.Count != 2)
+                throw new ArgumentException("calculate() requires 2 arguments");
+
+            var a = Convert.ToDouble(args[0]);
+            var b = Convert.ToDouble(args[1]);
+            return a * b + 10;
+        }
+    }
+}
+```
+
+**步骤 2：注册模块**
+
+```csharp
+// Old8Lang/ModuleSystem/ModuleLoader.cs
+public void LoadStandardLibraries(VariateManager manager)
+{
+    // 现有标准库
+    MathLib.Register(manager);
+    FileLib.Register(manager);
+    // ...
+
+    // 注册自定义库
+    MyCustomLib.Register(manager);
+}
+```
+
+**步骤 3：在 Old8Lang 中使用**
+
+```old8lang
+// 使用自定义库
+import "MyCustom"
+
+result <- MyCustom.hello("Old8Lang")
+print(result)  // 输出: Hello, Old8Lang!
+
+value <- MyCustom.calculate(5, 3)
+print(value)  // 输出: 25
+```
+
+#### 标准库最佳实践
+
+1. **命名空间**: 使用模块名作为前缀（如 `MyCustom.function`）
+2. **参数验证**: 始终验证参数数量和类型
+3. **错误处理**: 抛出有意义的异常
+4. **文档**: 为每个函数添加 XML 文档注释
+5. **性能**: 避免不必要的类型转换和内存分配
+
+---
+
+### 添加新的执行模式
+
+#### 执行模式架构
+
+Old8Lang 目前支持三种执行模式：
+- 解释模式 (InterpreterVisitor)
+- 编译模式 (CompilerVisitor)
+- VM 模式 (BytecodeVisitor)
+
+添加新的执行模式需要创建新的 Visitor 实现。
+
+#### 示例：添加 JIT 编译模式
+
+**步骤 1：创建 JIT Visitor**
+
+```csharp
+// Old8Lang/JIT/JITVisitor.cs
+using System.Reflection.Emit;
+using Old8Lang.AST;
+using Old8Lang.AST.Visitor;
+
+namespace Old8Lang.JIT
+{
+    /// <summary>
+    /// JIT 编译 Visitor - 运行时动态生成机器码
+    /// </summary>
+    public class JITVisitor : IVisitor<DynamicMethod>
+    {
+        private readonly ILGenerator _ilGenerator;
+        private readonly DynamicMethod _method;
+
+        public JITVisitor(string methodName, Type returnType, Type[] parameterTypes)
+        {
+            _method = new DynamicMethod(
+                methodName,
+                returnType,
+                parameterTypes,
+                typeof(JITVisitor).Module);
+
+            _ilGenerator = _method.GetILGenerator();
+        }
+
+        public DynamicMethod VisitFunctionDeclarationStatement(FunctionDeclarationStatement func)
+        {
+            // 生成函数体的 IL 代码
+            foreach (var stmt in func.Body)
+            {
+                stmt.Accept(this);
+            }
+
+            // 返回编译好的动态方法
+            return _method;
+        }
+
+        public DynamicMethod VisitBinaryExpression(BinaryExpression expr)
+        {
+            // 生成左操作数
+            expr.Left.Accept(this);
+
+            // 生成右操作数
+            expr.Right.Accept(this);
+
+            // 生成运算符指令
+            switch (expr.Operator)
+            {
+                case "+":
+                    _ilGenerator.Emit(OpCodes.Add);
+                    break;
+                case "-":
+                    _ilGenerator.Emit(OpCodes.Sub);
+                    break;
+                case "*":
+                    _ilGenerator.Emit(OpCodes.Mul);
+                    break;
+                case "/":
+                    _ilGenerator.Emit(OpCodes.Div);
+                    break;
+            }
+
+            return _method;
+        }
+
+        // ... 实现其他 Visit 方法
+    }
+}
+```
+
+**步骤 2：创建 JIT 执行器**
+
+```csharp
+// Old8Lang/JIT/JITExecutor.cs
+namespace Old8Lang.JIT
+{
+    public class JITExecutor
+    {
+        public static object Execute(List<OldStatement> ast)
+        {
+            // 为每个函数生成 JIT 代码
+            var compiledFunctions = new Dictionary<string, Delegate>();
+
+            foreach (var stmt in ast)
+            {
+                if (stmt is FunctionDeclarationStatement funcDecl)
+                {
+                    var visitor = new JITVisitor(
+                        funcDecl.Name,
+                        typeof(object),
+                        funcDecl.Parameters.Select(p => typeof(object)).ToArray());
+
+                    var dynamicMethod = funcDecl.Accept(visitor);
+                    var compiledFunc = dynamicMethod.CreateDelegate(typeof(Func<object[], object>));
+                    compiledFunctions[funcDecl.Name] = compiledFunc;
+                }
+            }
+
+            // 执行主函数或入口点
+            if (compiledFunctions.TryGetValue("main", out var mainFunc))
+            {
+                return ((Func<object[], object>)mainFunc).Invoke(Array.Empty<object>());
+            }
+
+            return null;
+        }
+    }
+}
+```
+
+**步骤 3：添加命令行支持**
+
+```csharp
+// Old8Lang.App/Commands/JITCommand.cs
+public class JITCommand : ICommand
+{
+    public string Name => "jit";
+    public string Description => "JIT compile and execute Old8Lang code";
+
+    public void Execute(string[] args)
+    {
+        var filePath = args[0];
+        var code = File.ReadAllText(filePath);
+
+        // 解析代码
+        var ast = LangParser.Parse(code);
+
+        // JIT 编译并执行
+        var result = JITExecutor.Execute(ast);
+
+        Console.WriteLine($"Result: {result}");
+    }
+}
+```
+
+**步骤 4：注册命令**
+
+```csharp
+// Old8Lang.App/Program.cs
+commandRegistry.RegisterCommand(new JITCommand());
+```
+
+**步骤 5：使用 JIT 模式**
+
+```bash
+dotnet run --project Old8Lang.App -- jit test.old8
+```
+
+#### 执行模式对比
+
+| 模式 | 启动速度 | 运行性能 | 内存占用 | 适用场景 |
+|------|---------|---------|---------|---------|
+| 解释模式 | 最快 | 中等 | 低 | 开发、脚本 |
+| 编译模式 | 慢 | 最高 | 中等 | 生产、性能 |
+| VM 模式 | 中等 | 中等偏高 | 中等 | 分发、调试 |
+| JIT 模式 | 中等 | 高 | 高 | 长时间运行 |
+
+---
+
+### 扩展资源
+
+#### 相关文档
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - 详细架构文档
+- [LANGUAGE_FEATURES.md](LANGUAGE_FEATURES.md) - 语言特性文档
+- [API_REFERENCE.md](API_REFERENCE.md) - API 参考文档
+
+#### 示例代码
+
+- `Old8Lang/AST/Visitor/` - Visitor 实现示例
+- `Old8LangLib/` - 标准库实现示例
+- `Old8Lang.Tests/` - 测试用例示例
+
+#### 贡献指南
+
+欢迎为 Old8Lang 贡献代码：
+
+1. Fork 项目仓库
+2. 创建功能分支
+3. 实现新功能并添加测试
+4. 提交 Pull Request
 
 ---
 
