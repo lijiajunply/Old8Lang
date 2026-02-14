@@ -41,7 +41,10 @@
       "Bash(/tmp/test_array_methods.old8:*)",
       "Bash(/tmp/test_array_toarray_simple.old8:*)",
       "Bash(/tmp/test_vm_type_mapper.old8:*)",
-      "Bash(/tmp/VMTypeMapper_README.md:*)"
+      "Bash(/tmp/VMTypeMapper_README.md:*)",
+      "Bash(git fetch:*)",
+      "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"update-docs-modes\" \"更新文档以支持三种执行模式（VM模式、解释模式、编译模式）和最新架构\")",
+      "Bash(powershell.exe -File:*)"
     ]
   }
 }

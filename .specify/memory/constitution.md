@@ -18,7 +18,7 @@ Follow-up TODOs: None
 
 ### I. 双模式对等性 (Dual-Mode Parity)
 
-Old8Lang 支持解释模式和编译模式两种执行方式。所有语言特性必须在两种模式下都能正确工作。
+Old8Lang 支持解释模式、编译模式和VM模式三种执行方式。所有语言特性至少要在VM模式和解释模式下能正确工作。
 
 **规则**:
 - 每个 AST 节点必须同时实现 `Run(VariateManager)` 和 `GenerateIl(ILGenerator, LocalManager)` 方法
@@ -125,7 +125,7 @@ Old8Lang 使用访问者模式作为核心架构模式。所有 AST 节点必须
 3. **测试编写**: 在 `Old8Lang.Tests` 中编写失败的测试
 4. **实现功能**:
    - 定义 AST 节点（`AST/Expression/` 或 `AST/Statement/`）
-   - 实现双模式执行（`Run` 和 `GenerateIl`）
+   - 实现三模式执行（`Run`,`GenerateIl`和`VM`）
    - 添加访问者支持
    - 更新解析器（`LangParser/Parsers/`）
 5. **测试通过**: 确保所有测试通过

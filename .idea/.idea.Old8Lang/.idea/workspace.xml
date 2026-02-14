@@ -23,7 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/old8lang-feature/.specify/memory/constitution.md" beforeDir="false" afterPath="$PROJECT_DIR$/old8lang-feature/.specify/memory/constitution.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-update-docs-modes/spec.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/memory/constitution.md" beforeDir="false" afterPath="$PROJECT_DIR$/.specify/memory/constitution.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +128,7 @@
     "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
     "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
     "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "001-update-docs-modes",
     "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -555,7 +558,7 @@
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
       <workItem from="1771037866145" duration="13170000" />
-      <workItem from="1771059572518" duration="4662000" />
+      <workItem from="1771059572518" duration="5387000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -900,7 +903,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="915" />
+    <option name="localTasksCounter" value="916" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -927,7 +930,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(instance-methods): 统一集合类型长度获取方法&#10;&#10;- 删除原有的 ArrayLengthMethod 类&#10;- 修改 LangListCountMethod 的别名名称，只保留 Count 和 count&#10;- 为 ArrayCountMethod 添加 LangListCountMethod 继承实现&#10;- 在 StringLengthMethod 中添加 Count 别名支持&#10;- 为 Tuple 类型添加 TupleCountMethod 继承实现&#10;- 更新实例方法初始化器中的方法注册和统计计数&#10;- 修正 IDE 配置文件中的变更追踪信息" />
     <MESSAGE value="feat(global-functions): 实现函数重载解析和类型匹配系统&#10;&#10;- 添加 ParameterTypes、DeclaredReturnType 和 Documentation 属性到全局函数接口&#10;- 实现 CanAccept 和 CalculateMatchScore 方法进行参数类型验证和匹配评分&#10;- 创建 OverloadGroup 类管理同名函数的多个重载版本&#10;- 更新 GlobalFunctionRegistry 支持重载组注册和解析功能&#10;- 修改 AST 表达式求值器使用重载解析替代简单函数查找&#10;- 增强 Language Server 签名帮助支持显示所有函数重载变体&#10;- 添加类型兼容性检查和数值类型转换支持" />
     <MESSAGE value="feat(functions): 实现全局函数重载系统和优化字节码序列化&#10;&#10;- 实现函数重载解析机制，支持基于运行时参数值的动态重载选择&#10;- 添加 OverloadResolver 辅助类处理 Old8Lang 类型系统的类型匹配&#10;- 重构 BytecodeObjectInstance 使用主构造函数简化对象创建&#10;- 优化 FunctionMetadata 序列化写入空值处理逻辑&#10;- 在解释器和虚拟机模式下分别实现实时重载解析功能&#10;- 添加重载函数示例实现包括 AddInt、AddDouble、AddString 等版本&#10;- 移除实例方法迁移进度跟踪文档(PROGRESS_INSTANCE_METHODS.md)&#10;- 修复 TypeChecker 中函数类型字符串格式化转义问题" />
     <MESSAGE value="refactor(ast): 移除旧的扩展方法实现并更新类型查找逻辑&#10;&#10;- 删除 ArrayExtensions、DictionaryExtensions、ListExtensions、PrimitiveExtensions 和&#10;  StringExtensions 类&#10;- 从 DotOperatorILHelper 中移除对已删除扩展方法类型的查找逻辑&#10;- 从 VirtualMachine.Helpers.ReflectionAndTasks 中移除对原生类型扩展方法的查找逻辑&#10;- 更新 workspace.xml 中的变更列表和工作时间记录" />
@@ -952,7 +954,8 @@
     <MESSAGE value="feat(value-type): 添加集合类型ToStr方法支持&#10;&#10;- 实现字典类型的字符串格式化，格式为 {key1: value1, key2: value2}&#10;- 实现数组和列表类型的字符串格式化，格式为 [item1, item2, item3]&#10;- 实现元组类型的字符串格式化，格式为 (item1, item2)&#10;- 添加递归处理嵌套集合的FormatValueForDisplay辅助方法&#10;- 在VMTypeMapper中添加集合类型到LangValueType的映射支持&#10;- 移除无效的生成器操作测试用例" />
     <MESSAGE value="feat(tuple): 实现元组ToStr方法支持特定格式化&#10;&#10;- 为TupleToStrMethod添加详细注释说明元组格式化规则&#10;- 实现Tuple&lt;,&gt;类型的特殊格式化，输出格式为(item1, item2)&#10;- 添加FormatValueForDisplay辅助方法处理值的显示格式&#10;- 为字符串值添加引号包装，布尔值使用小写输出&#10;- 扩展ValueTypeToStrMethod支持更多类型格式化&#10;- 添加对Task、Thread、CancellationToken等系统类型的格式化支持&#10;- 实现枚举类型和元组类型的递归格式化处理&#10;- 更新IDE工作区配置中的变更记录和统计信息" />
     <MESSAGE value="feat(specify): 添加 PowerShell 脚本和模板文件支持&#10;&#10;- 新增 PowerShell 脚本用于先决条件检查、功能创建和计划设置&#10;- 添加规范、计划和清单模板文件&#10;- 创建宪法模板和代理文件模板&#10;- 实现通用 PowerShell 函数库&#10;- 添加 Claude 命令配置文件用于分析功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(specify): 添加 PowerShell 脚本和模板文件支持&#10;&#10;- 新增 PowerShell 脚本用于先决条件检查、功能创建和计划设置&#10;- 添加规范、计划和清单模板文件&#10;- 创建宪法模板和代理文件模板&#10;- 实现通用 PowerShell 函数库&#10;- 添加 Claude 命令配置文件用于分析功能" />
+    <MESSAGE value="docs(constitution): 创建 Old8Lang 项目宪法文件&#10;&#10;- 定义双模式对等性原则，确保解释模式和编译模式功能完整性&#10;- 确立访问者模式一致性要求，规范 AST 节点实现标准&#10;- 建立测试优先开发强制性规则，保障语言正确性&#10;- 制定 API 稳定性政策，维护向后兼容性承诺&#10;- 设立性能意识准则，平衡优化与功能完整性&#10;- 明确文档完整性要求，提升语言可用性&#10;- 规范技术标准、开发工作流和治理流程&#10;- 更新 IDE 配置文件以反映宪法变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(constitution): 创建 Old8Lang 项目宪法文件&#10;&#10;- 定义双模式对等性原则，确保解释模式和编译模式功能完整性&#10;- 确立访问者模式一致性要求，规范 AST 节点实现标准&#10;- 建立测试优先开发强制性规则，保障语言正确性&#10;- 制定 API 稳定性政策，维护向后兼容性承诺&#10;- 设立性能意识准则，平衡优化与功能完整性&#10;- 明确文档完整性要求，提升语言可用性&#10;- 规范技术标准、开发工作流和治理流程&#10;- 更新 IDE 配置文件以反映宪法变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
