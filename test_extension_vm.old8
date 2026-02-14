@@ -1,0 +1,49 @@
+// 测试扩展方法在VM模式下的支持
+
+extension int {
+    func isEven() {
+        return this % 2 == 0
+    }
+
+    func double() {
+        return this * 2
+    }
+}
+
+extension string {
+    func reverse() {
+        result <- ""
+        i <- this.length() - 1
+        while i >= 0 {
+            result <- result + this[i]
+            i <- i - 1
+        }
+        return result
+    }
+
+    func repeat(times) {
+        result <- ""
+        i <- 0
+        while i < times {
+            result <- result + this
+            i <- i + 1
+        }
+        return result
+    }
+}
+
+// 测试 int 扩展方法
+print("测试 int 扩展方法:")
+num <- 5
+print("5.isEven() = " + num.isEven().ToStr())
+print("5.double() = " + num.double().ToStr())
+
+num2 <- 4
+print("4.isEven() = " + num2.isEven().ToStr())
+print("4.double() = " + num2.double().ToStr())
+
+// 测试 string 扩展方法
+print("\n测试 string 扩展方法:")
+str <- "Hello"
+print("'Hello'.reverse() = " + str.reverse())
+print("'Hi'.repeat(3) = " + "Hi".repeat(3))

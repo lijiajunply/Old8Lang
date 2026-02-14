@@ -23,8 +23,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/ExtensionMetadata.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/BytecodeExtensionMethod.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_index.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_local.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_reverse.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_simple_vm.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_string_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_this.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_extension_vm.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Basic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Statements.Basic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeCompiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/BytecodeFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/ExtensionMethodWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Core/ExtensionMethodWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_extension.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_extension.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +162,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.FirstUI.TestApp">
+  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
     <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -555,6 +571,7 @@
       <workItem from="1770286042546" duration="4023000" />
       <workItem from="1770342249898" duration="10597000" />
       <workItem from="1770997398015" duration="545000" />
+      <workItem from="1771037866145" duration="1811000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

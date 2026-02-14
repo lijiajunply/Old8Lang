@@ -99,6 +99,9 @@ public class BytecodeCompiler
         // 第三阶段：预处理，注册所有函数定义
         PreprocessFunctionDefinitions(ast);
 
+        // 第四阶段：预处理，注册所有扩展方法定义
+        PreprocessExtensionDefinitions(ast);
+
         // 创建主函数(入口点)
         var mainFunc = new FunctionMetadata
         {
@@ -307,6 +310,86 @@ public class BytecodeCompiler
                 asyncFuncInit.Accept(visitor);
             }
         }
+    }
+
+    /// <summary>
+    /// 预处理阶段：遍历AST，注册所有扩展方法定义
+    /// </summary>
+    private void PreprocessExtensionDefinitions(BlockStatement ast)
+    {
+        // 遍历所有语句，找到扩展方法定义并编译它们
+
+        // 遍历 ImportStatements 中的扩展方法定义
+        foreach (var statement in ast.ImportStatements)
+        {
+            if (statement is ExtensionDeclaration extensionDecl)
+            {
+                // 编译扩展方法定义
+                CompileExtensionDeclaration(extensionDecl);
+            }
+        }
+
+        // 遍历 OtherStatements 中的扩展方法定义
+        foreach (var statement in ast.OtherStatements)
+        {
+            if (statement is ExtensionDeclaration extensionDecl)
+            {
+                // 编译扩展方法定义
+                CompileExtensionDeclaration(extensionDecl);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 编译扩展方法声明
+    /// </summary>
+    private void CompileExtensionDeclaration(ExtensionDeclaration extensionDecl)
+    {
+        var extensionMetadata = new ExtensionMetadata
+        {
+            TargetTypeName = extensionDecl.TargetTypeName
+        };
+
+        // 编译每个扩展方法
+        foreach (var method in extensionDecl.ExtensionMethods)
+        {
+            // 将扩展方法编译为普通函数
+            // 扩展方法的第一个隐式参数是 'this'
+            var parameters = new List<string> { "this" };
+            parameters.AddRange(method.Ids.Select(id => id.IdName));
+
+            var parameterTypes = new List<string> { extensionDecl.TargetTypeName };
+            // 扩展方法通常没有显式类型注解，使用空字符串
+            parameterTypes.AddRange(Enumerable.Repeat("", method.Ids.Count));
+
+            var defaultValues = new List<object?>();
+            // this 参数没有默认值
+            defaultValues.Add(null);
+            // 其他参数也没有默认值（扩展方法目前不支持默认参数）
+            defaultValues.AddRange(Enumerable.Repeat<object?>(null, method.Ids.Count));
+
+            // 生成唯一的函数名：TargetType$MethodName
+            var funcName = $"{extensionDecl.TargetTypeName}${method.Id.IdName}";
+
+            var funcMetadata = CompileFunction(
+                funcName,
+                parameters,
+                parameterTypes,
+                defaultValues,
+                method.BlockStatement,
+                paramsParameterIndex: -1,
+                capturedVars: null,
+                returnType: ""
+            );
+
+            // 标记为扩展方法
+            funcMetadata.IsExtensionMethod = true;
+
+            extensionMetadata.Methods.Add(funcMetadata);
+            _bytecodeFile.Functions.Add(funcMetadata);
+        }
+
+        _bytecodeFile.Extensions.Add(extensionMetadata);
     }
 
     /// <summary>

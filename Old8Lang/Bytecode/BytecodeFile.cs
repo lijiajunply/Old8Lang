@@ -34,6 +34,9 @@ public class BytecodeFile
     /// <summary>Mixin列表</summary>
     public List<MixinMetadata> Mixins { get; set; } = [];
 
+    /// <summary>扩展方法列表</summary>
+    public List<ExtensionMetadata> Extensions { get; set; } = [];
+
     /// <summary>调试信息（可选）</summary>
     public DebugInfo? DebugInfo { get; set; }
 
@@ -115,6 +118,11 @@ public class BytecodeFile
         writer.Write(Mixins.Count);
         foreach (var mixinMetadata in Mixins)
             mixinMetadata.WriteTo(writer);
+
+        // 扩展方法列表
+        writer.Write(Extensions.Count);
+        foreach (var extensionMetadata in Extensions)
+            extensionMetadata.WriteTo(writer);
 
         // 入口点
         writer.Write(EntryPointIndex);
@@ -217,6 +225,11 @@ public class BytecodeFile
         for (int i = 0; i < mixinCount; i++)
             bytecodeFile.Mixins.Add(MixinMetadata.ReadFrom(reader));
 
+        // 扩展方法列表
+        int extensionCount = reader.ReadInt32();
+        for (int i = 0; i < extensionCount; i++)
+            bytecodeFile.Extensions.Add(ExtensionMetadata.ReadFrom(reader));
+
         // 入口点
         bytecodeFile.EntryPointIndex = reader.ReadInt32();
 
@@ -308,6 +321,7 @@ public class BytecodeFile
             $"{Classes.Count} classes",
             $"{Interfaces.Count} interfaces",
             $"{Mixins.Count} mixins",
+            $"{Extensions.Count} extensions",
             $"{ConstantPool.Count} constants",
             $"{GlobalVariables.Count} globals"
         };

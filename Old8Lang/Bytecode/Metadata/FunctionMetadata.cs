@@ -40,6 +40,9 @@ public class FunctionMetadata
     /// <summary>是否是生成器函数</summary>
     public bool IsGenerator { get; set; }
 
+    /// <summary>是否是扩展方法</summary>
+    public bool IsExtensionMethod { get; set; }
+
     /// <summary>函数在常量池中的索引(用于闭包)</summary>
     public int FunctionIndex { get; set; } = -1;
 
@@ -99,6 +102,7 @@ public class FunctionMetadata
         writer.Write(MaxStackSize);
         writer.Write(IsAsync);
         writer.Write(IsGenerator);
+        writer.Write(IsExtensionMethod);
         writer.Write(FunctionIndex);
         writer.Write(ParamsParameterIndex);
 
@@ -164,6 +168,7 @@ public class FunctionMetadata
         func.MaxStackSize = reader.ReadInt32();
         func.IsAsync = reader.ReadBoolean();
         func.IsGenerator = reader.ReadBoolean();
+        func.IsExtensionMethod = reader.ReadBoolean();
         func.FunctionIndex = reader.ReadInt32();
         func.ParamsParameterIndex = reader.ReadInt32();
 

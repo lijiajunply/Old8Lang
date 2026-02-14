@@ -1,0 +1,11 @@
+// 测试访问this的方法
+
+extension string {
+    func testThis() {
+        i <- this.length()
+        return i
+    }
+}
+
+str <- "Hello"
+print(str.testThis().ToStr())

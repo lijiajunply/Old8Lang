@@ -1,0 +1,10 @@
+// 测试字符串索引访问
+
+extension string {
+    func getChar(index) {
+        return this[index]
+    }
+}
+
+str <- "Hello"
+print(str.getChar(0))

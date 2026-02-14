@@ -125,6 +125,93 @@ public class ExtensionMethodWrapper : IInstanceMethod
 
     public object? ExecuteInVM(object? instance, object?[] arguments)
     {
-        throw new NotImplementedException("扩展方法的 VM 模式支持尚未实现");
+        // 在 VM 模式下执行扩展方法
+        // 需要创建一个临时的 VariateManager 来执行函数体
+
+        // 创建新的作用域
+        var tempManager = new VariateManager();
+        tempManager.AddChildren();
+
+        try
+        {
+            // 绑定 this 关键字到实例
+            tempManager.Set(new LangId("this"), ConvertToLangValue(instance));
+
+            // 绑定用户定义的参数
+            for (int i = 0; i < arguments.Length && i < _function.Ids.Count; i++)
+            {
+                var paramName = _function.Ids[i].IdName;
+                var paramValue = ConvertToLangValue(arguments[i]);
+                tempManager.Set(new LangId(paramName), paramValue);
+            }
+
+            // 执行函数体
+            _function.BlockStatement.Run(tempManager);
+
+            // 检查是否有返回值
+            if (tempManager.IsReturn)
+            {
+                return ConvertFromLangValue(tempManager.Result);
+            }
+
+            // 如果没有显式返回，返回 null
+            return null;
+        }
+        finally
+        {
+            tempManager.RemoveChildren();
+        }
+    }
+
+    /// <summary>
+    /// 将 VM 对象转换为 LangValueType
+    /// </summary>
+    private static LangValueType ConvertToLangValue(object? value)
+    {
+        if (value == null)
+            return new NullLangValue();
+
+        if (value is LangValueType langValue)
+            return langValue;
+
+        // 基本类型转换
+        return value switch
+        {
+            int i => new IntLangValue(i),
+            long l => new IntLangValue((int)l),
+            double d => new DoubleLangValue(d),
+            bool b => new BoolLangValue(b),
+            string s => new StringLangValue(s),
+            char c => new CharLangValue(c),
+            LangValueType lv => lv,
+            _ => (LangValueType)value // 强制转换为 LangValueType
+        };
+    }
+
+    /// <summary>
+    /// 将 LangValueType 转换回 VM 对象
+    /// </summary>
+    private static object? ConvertFromLangValue(LangValueType value)
+    {
+        if (value is NullLangValue)
+            return null;
+
+        if (value is IntLangValue intVal)
+            return intVal.Value;
+
+        if (value is DoubleLangValue doubleVal)
+            return doubleVal.Value;
+
+        if (value is BoolLangValue boolVal)
+            return boolVal.Value;
+
+        if (value is CharLangValue charVal)
+            return charVal.Value;
+
+        if (value is StringLangValue str)
+            return str.Value;
+
+        // 其他类型保持原样
+        return value;
     }
 }

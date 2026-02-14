@@ -29,8 +29,8 @@ public abstract class Program
         {
             args =
             [
-                "-f",
-                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/union_type_assignment.old8"
+                "-vm",
+                "C:\\Projects\\RiderProjects\\Old8Lang\\test_extension.old8"
             ];
         }
 #endif

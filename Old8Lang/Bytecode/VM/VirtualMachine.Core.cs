@@ -89,6 +89,62 @@ public partial class VirtualMachine
                 }
             }
         }
+
+        // 注册扩展方法到实例方法注册表
+        RegisterExtensionMethods();
+    }
+
+    /// <summary>
+    /// 注册扩展方法到实例方法注册表
+    /// </summary>
+    private void RegisterExtensionMethods()
+    {
+        foreach (var extension in _bytecodeFile.Extensions)
+        {
+            // 解析目标类型
+            var targetType = ResolveTargetType(extension.TargetTypeName);
+            if (targetType == null)
+            {
+                // 如果无法解析类型，跳过此扩展方法
+                continue;
+            }
+
+            // 为每个扩展方法创建包装器并注册
+            foreach (var method in extension.Methods)
+            {
+                var extensionMethod = new BytecodeExtensionMethod(
+                    targetType,
+                    method,
+                    this
+                );
+
+                InstanceMethodRegistry.Instance.Register(extensionMethod);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 解析目标类型名称到 .NET Type
+    /// </summary>
+    private static Type? ResolveTargetType(string typeName)
+    {
+        // 内置类型映射到 Old8Lang 的包装类型
+        return typeName.ToLower() switch
+        {
+            "string" => typeof(string),
+            "int" => typeof(IntLangValue),
+            "double" => typeof(DoubleLangValue),
+            "bool" => typeof(BoolLangValue),
+            "char" => typeof(CharLangValue),
+            "byte" => typeof(byte),
+            "short" => typeof(short),
+            "decimal" => typeof(decimal),
+            "object" => typeof(object),
+            "list" => typeof(ListLangValue),
+            "array" => typeof(Array),
+            "dict" => typeof(DictionaryLangValue),
+            _ => Type.GetType(typeName) // 尝试通过完全限定名解析
+        };
     }
 
     /// <summary>
@@ -203,6 +259,38 @@ public partial class VirtualMachine
             // 函数正常退出时，执行所有 defer 块
             ExecuteDefers(frame);
             _callStack.Pop();
+        }
+    }
+
+    /// <summary>
+    /// 公共方法：执行指定的函数（用于扩展方法等场景）
+    /// </summary>
+    public object? ExecuteFunction(FunctionMetadata function, object?[] arguments)
+    {
+        // 保存当前栈状态
+        var stackSnapshot = _stack.Count;
+
+        try
+        {
+            // 调用函数
+            CallFunction(function, arguments);
+
+            // 如果栈上有返回值，弹出并返回
+            if (_stack.Count > stackSnapshot)
+            {
+                return _stack.Pop();
+            }
+
+            return null;
+        }
+        catch
+        {
+            // 恢复栈状态
+            while (_stack.Count > stackSnapshot)
+            {
+                _stack.Pop();
+            }
+            throw;
         }
     }
 

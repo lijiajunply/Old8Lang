@@ -14,8 +14,13 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitExtensionDeclaration(ExtensionDeclaration node)
     {
-        // Bytecode 模式暂不支持扩展方法
-        throw new NotImplementedException("扩展方法的 Bytecode 模式支持尚未实现");
+        // 在字节码模式下，扩展方法在编译阶段已经被处理
+        // 在 BytecodeCompiler.PreprocessExtensionDefinitions 中
+        // 扩展方法被编译为普通函数并添加到 BytecodeFile.Extensions 列表
+        // 在 VM 初始化时，这些扩展方法会被注册到 InstanceMethodRegistry
+
+        // 这里不需要生成任何字节码指令
+        return null;
     }
 
     public Instruction? VisitBlockStatement(BlockStatement node)
