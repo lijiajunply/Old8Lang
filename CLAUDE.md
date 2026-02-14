@@ -84,22 +84,67 @@ dotnet run --project Old8Lang.App -- -f <file.old8> -d
 
 ### Package Management Commands
 
+Old8Lang 提供完整的包管理系统，支持项目初始化、包安装、打包、签名和发布。
+
 ```bash
-# Initialize a new project
+# 初始化新项目
 dotnet run --project Old8Lang.App -- init <project-name>
 
-# Install a package
+# 安装包
 dotnet run --project Old8Lang.App -- install <package-name>
 
-# Remove a package
+# 移除包
 dotnet run --project Old8Lang.App -- remove <package-name>
 
-# List installed packages
+# 恢复项目依赖
+dotnet run --project Old8Lang.App -- restore
+
+# 列出已安装的包
 dotnet run --project Old8Lang.App -- list
 
-# Publish a package (one-step: pack + sign)
-dotnet run --project Old8Lang.App -- publish -c cert.pfx -p password
+# 打包项目
+dotnet run --project Old8Lang.App -- pack <directory> [-o <output>]
+
+# 解包 .o8pkg 文件
+dotnet run --project Old8Lang.App -- unpack <package> [-o <output>]
+
+# 签名包
+dotnet run --project Old8Lang.App -- sign <package> -c <cert.pfx> -p <password>
+
+# 验证包签名
+dotnet run --project Old8Lang.App -- verify <package> [-s <signature>]
+
+# 证书管理
+dotnet run --project Old8Lang.App -- cert generate -n "Name" -e "email@example.com"
+dotnet run --project Old8Lang.App -- cert info -c <cert.pfx>
+
+# 一键发布（推荐）
+dotnet run --project Old8Lang.App -- publish -c <cert.pfx> -p <password>
+dotnet run --project Old8Lang.App -- publish --auto-cert --cert-name "Publisher"
 ```
+
+**包管理模式**:
+- **项目模式**: 检测到 `o8packages.json` 时启用，包安装到项目本地
+- **全局模式**: 无项目配置时，包安装到全局位置
+
+**包结构**:
+```
+MyPackage/
+├── o8package.json         # 包元数据（必需）
+├── index.old8             # 主入口文件
+├── README.md              # 包文档
+├── LICENSE                # 许可证
+└── lib/                   # 库文件目录
+```
+
+**发布流程**:
+1. 创建 `o8package.json` 配置文件
+2. 编写包代码和文档
+3. 使用 `pack` 打包或 `publish` 一键发布
+4. 使用 `sign` 签名包（可选但推荐）
+5. 分发 `.o8pkg` 和 `.o8pkg.sig` 文件
+
+详细信息请参考 [CLI_GUIDE.md](Docs/CLI_GUIDE.md) 和 [ADVANCED_TOPICS.md](Docs/ADVANCED_TOPICS.md)。
 
 ## High-Level Architecture
 

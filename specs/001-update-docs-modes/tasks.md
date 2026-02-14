@@ -102,17 +102,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Core Standard Library (Old8LangLib)"章节，添加所有12个模块的完整说明（Math, File, Crypto, Image, Regex, Terminal, ColorfulTerminal, Time, OS, CSV, Template, Vector）
-- [ ] T032 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Network Library (Old8Lang.NetLib)"章节，添加所有5个模块的完整说明（HTTP, WebSocket, MQTT, Socket, WebAPI）
-- [ ] T033 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Database Library (Old8Lang.DatabaseLib)"章节，添加所有5个模块的完整说明（MySQL, PostgreSQL, SQLite, InMemory, ORM）
-- [ ] T034 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Serialization Library (Old8Lang.SerializationLib)"章节，添加所有3个模块的完整说明（MessagePack, Protobuf, Factory）
-- [ ] T035 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Machine Learning Library (Old8Lang.MachineLearningLib)"章节，添加所有5个模块的完整说明（Classification, Regression, Clustering, DataLoader, Predictor）
-- [ ] T036 [US3] 为每个标准库模块添加至少1个可运行的代码示例（使用 contracts/api-documentation-format.md 模板）
-- [ ] T037 [US3] 在所有 API 文档中添加模式支持标注（✅ 解释模式 | ✅/❌ 编译模式 | ✅ VM 模式）
-- [ ] T038 [US3] 在 Docs/CLI_GUIDE.md 更新"Package Management Commands"章节，添加所有11个包管理命令的详细说明（init, install, remove, restore, list, pack, unpack, sign, verify, cert, publish）
-- [ ] T039 [US3] 在 Docs/CLI_GUIDE.md 添加"Debugging and Profiling Commands"章节，说明调试和性能分析命令（debug-start, debug-breakpoint, debug-control, profile）
-- [ ] T040 [US3] 在 CLAUDE.md 的"Package Management Commands"章节更新命令示例，确保与最新实现一致
-- [ ] T041 [US3] 验证所有 API 文档中的代码示例可以成功运行
+- [x] T031 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Core Standard Library (Old8LangLib)"章节，添加所有12个模块的完整说明（Math, File, Crypto, Image, Regex, Terminal, ColorfulTerminal, Time, OS, CSV, Template, Vector）
+- [x] T032 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Network Library (Old8Lang.NetLib)"章节，添加所有5个模块的完整说明（HTTP, WebSocket, MQTT, Socket, WebAPI）
+- [x] T033 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Database Library (Old8Lang.DatabaseLib)"章节，添加所有5个模块的完整说明（MySQL, PostgreSQL, SQLite, InMemory, ORM）
+- [x] T034 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Serialization Library (Old8Lang.SerializationLib)"章节，添加所有3个模块的完整说明（MessagePack, Protobuf, Factory）
+- [x] T035 [P] [US3] 在 Docs/API_REFERENCE.md 更新"Machine Learning Library (Old8Lang.MachineLearningLib)"章节，添加所有5个模块的完整说明（Classification, Regression, Clustering, DataLoader, Predictor）
+- [x] T036 [US3] 为每个标准库模块添加至少1个可运行的代码示例（使用 contracts/api-documentation-format.md 模板）
+- [x] T037 [US3] 在所有 API 文档中添加模式支持标注（✅ 解释模式 | ✅/❌ 编译模式 | ✅ VM 模式）
+- [x] T038 [US3] 在 Docs/CLI_GUIDE.md 更新"Package Management Commands"章节，添加所有11个包管理命令的详细说明（init, install, remove, restore, list, pack, unpack, sign, verify, cert, publish）
+- [x] T039 [US3] 在 Docs/CLI_GUIDE.md 添加"Debugging and Profiling Commands"章节，说明调试和性能分析命令（debug-start, debug-breakpoint, debug-control, profile）
+- [x] T040 [US3] 在 CLAUDE.md 的"Package Management Commands"章节更新命令示例，确保与最新实现一致
+- [x] T041 [US3] 验证所有 API 文档中的代码示例可以成功运行
 
 **Checkpoint**: 所有用户故事现在都应该独立功能化 - 用户可以理解模式、架构和 API
 

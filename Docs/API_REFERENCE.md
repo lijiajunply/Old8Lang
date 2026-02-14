@@ -1092,10 +1092,1342 @@ using mutex <- MutexCreate() {
 
 ---
 
+## 标准库 (Standard Libraries)
+
+Old8Lang 提供了丰富的标准库，涵盖核心功能、网络、数据库、序列化和机器学习等领域。
+
+### 模式支持说明
+
+每个 API 都标注了支持的执行模式：
+- ✅ **解释模式** (`-f`): 完全支持
+- ✅ **编译模式** (`-c`): 完全支持
+- ✅ **VM 模式** (`-vm`): 完全支持
+- ❌ 不支持该模式
+
+---
+
+## 核心标准库 (Old8LangLib)
+
+**位置**: `Old8LangLib/`
+
+核心标准库提供基础功能，包括数学运算、文件操作、加密、图像处理等。
+
+### Math 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Math"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Math.Sin` | `(x: double) -> double` | 正弦函数 |
+| `Math.Cos` | `(x: double) -> double` | 余弦函数 |
+| `Math.Tan` | `(x: double) -> double` | 正切函数 |
+| `Math.Sqrt` | `(x: double) -> double` | 平方根 |
+| `Math.Pow` | `(base: double, exp: double) -> double` | 幂运算 |
+| `Math.Abs` | `(x: double) -> double` | 绝对值 |
+| `Math.Floor` | `(x: double) -> double` | 向下取整 |
+| `Math.Ceil` | `(x: double) -> double` | 向上取整 |
+| `Math.Round` | `(x: double) -> double` | 四舍五入 |
+| `Math.Max` | `(a: double, b: double) -> double` | 最大值 |
+| `Math.Min` | `(a: double, b: double) -> double` | 最小值 |
+| `Math.Log` | `(x: double) -> double` | 自然对数 |
+| `Math.Log10` | `(x: double) -> double` | 以10为底的对数 |
+| `Math.Exp` | `(x: double) -> double` | e的x次方 |
+
+**示例**:
+```old8lang
+import "Math"
+
+// 计算圆的面积
+radius <- 5.0
+area <- Math.PI * Math.Pow(radius, 2)
+PrintLine("Area: " + area.ToStr())
+
+// 三角函数
+angle <- Math.PI / 4  // 45度
+sin_value <- Math.Sin(angle)
+cos_value <- Math.Cos(angle)
+PrintLine("sin(45°) = " + sin_value.ToStr())
+PrintLine("cos(45°) = " + cos_value.ToStr())
+```
+
+---
+
+### File 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "File"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `File.Read` | `(path: string) -> string` | 读取文件全部内容 |
+| `File.Write` | `(path: string, content: string) -> void` | 写入文件 |
+| `File.Append` | `(path: string, content: string) -> void` | 追加内容到文件 |
+| `File.Exists` | `(path: string) -> bool` | 检查文件是否存在 |
+| `File.Delete` | `(path: string) -> void` | 删除文件 |
+| `File.Copy` | `(source: string, dest: string) -> void` | 复制文件 |
+| `File.Move` | `(source: string, dest: string) -> void` | 移动文件 |
+| `File.GetSize` | `(path: string) -> int` | 获取文件大小 |
+| `File.ReadLines` | `(path: string) -> list<string>` | 按行读取文件 |
+| `File.WriteLines` | `(path: string, lines: list<string>) -> void` | 按行写入文件 |
+
+**示例**:
+```old8lang
+import "File"
+
+// 写入文件
+File.Write("test.txt", "Hello, Old8Lang!")
+
+// 读取文件
+content <- File.Read("test.txt")
+PrintLine(content)
+
+// 检查文件是否存在
+if File.Exists("test.txt") {
+    PrintLine("File exists")
+    size <- File.GetSize("test.txt")
+    PrintLine("Size: " + size.ToStr() + " bytes")
+}
+
+// 按行读取
+lines <- File.ReadLines("test.txt")
+for line <- lines {
+    PrintLine("Line: " + line)
+}
+```
+
+---
+
+### Crypto 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Crypto"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Crypto.MD5` | `(data: string) -> string` | MD5 哈希 |
+| `Crypto.SHA1` | `(data: string) -> string` | SHA1 哈希 |
+| `Crypto.SHA256` | `(data: string) -> string` | SHA256 哈希 |
+| `Crypto.SHA512` | `(data: string) -> string` | SHA512 哈希 |
+| `Crypto.AESEncrypt` | `(data: string, key: string) -> string` | AES 加密 |
+| `Crypto.AESDecrypt` | `(encrypted: string, key: string) -> string` | AES 解密 |
+| `Crypto.Base64Encode` | `(data: string) -> string` | Base64 编码 |
+| `Crypto.Base64Decode` | `(encoded: string) -> string` | Base64 解码 |
+
+**示例**:
+```old8lang
+import "Crypto"
+
+// 哈希函数
+text <- "Hello, World!"
+md5_hash <- Crypto.MD5(text)
+sha256_hash <- Crypto.SHA256(text)
+PrintLine("MD5: " + md5_hash)
+PrintLine("SHA256: " + sha256_hash)
+
+// AES 加密/解密
+key <- "my-secret-key-32-characters-long"
+encrypted <- Crypto.AESEncrypt("Secret Message", key)
+decrypted <- Crypto.AESDecrypt(encrypted, key)
+PrintLine("Encrypted: " + encrypted)
+PrintLine("Decrypted: " + decrypted)
+
+// Base64 编码
+encoded <- Crypto.Base64Encode("Hello")
+decoded <- Crypto.Base64Decode(encoded)
+PrintLine("Encoded: " + encoded)
+PrintLine("Decoded: " + decoded)
+```
+
+---
+
+### Image 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Image"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Image.Load` | `(path: string) -> object` | 加载图像 |
+| `Image.Save` | `(image: object, path: string) -> void` | 保存图像 |
+| `Image.Resize` | `(image: object, width: int, height: int) -> object` | 调整大小 |
+| `Image.Crop` | `(image: object, x: int, y: int, w: int, h: int) -> object` | 裁剪图像 |
+| `Image.Rotate` | `(image: object, angle: double) -> object` | 旋转图像 |
+| `Image.Flip` | `(image: object, mode: string) -> object` | 翻转图像 |
+| `Image.GetWidth` | `(image: object) -> int` | 获取宽度 |
+| `Image.GetHeight` | `(image: object) -> int` | 获取高度 |
+
+**示例**:
+```old8lang
+import "Image"
+
+// 加载图像
+img <- Image.Load("photo.jpg")
+width <- Image.GetWidth(img)
+height <- Image.GetHeight(img)
+PrintLine("Size: " + width.ToStr() + "x" + height.ToStr())
+
+// 调整大小
+resized <- Image.Resize(img, 800, 600)
+Image.Save(resized, "photo_resized.jpg")
+
+// 裁剪
+cropped <- Image.Crop(img, 100, 100, 400, 300)
+Image.Save(cropped, "photo_cropped.jpg")
+
+// 旋转
+rotated <- Image.Rotate(img, 90)
+Image.Save(rotated, "photo_rotated.jpg")
+```
+
+---
+
+### Regex 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Regex"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Regex.Match` | `(pattern: string, text: string) -> bool` | 匹配模式 |
+| `Regex.Find` | `(pattern: string, text: string) -> string` | 查找第一个匹配 |
+| `Regex.FindAll` | `(pattern: string, text: string) -> list<string>` | 查找所有匹配 |
+| `Regex.Replace` | `(pattern: string, text: string, replacement: string) -> string` | 替换匹配 |
+| `Regex.Split` | `(pattern: string, text: string) -> list<string>` | 按模式分割 |
+
+**示例**:
+```old8lang
+import "Regex"
+
+// 匹配邮箱
+email <- "user@example.com"
+pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+if Regex.Match(pattern, email) {
+    PrintLine("Valid email")
+}
+
+// 查找所有数字
+text <- "Price: $123.45, Quantity: 10"
+numbers <- Regex.FindAll("\\d+", text)
+for num <- numbers {
+    PrintLine("Found: " + num)
+}
+
+// 替换
+result <- Regex.Replace("\\d+", "The year is 2024", "XXXX")
+PrintLine(result)  // "The year is XXXX"
+```
+
+---
+
+### Terminal 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Terminal"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Terminal.Clear` | `() -> void` | 清空终端 |
+| `Terminal.SetCursorPosition` | `(x: int, y: int) -> void` | 设置光标位置 |
+| `Terminal.GetCursorPosition` | `() -> object` | 获取光标位置 |
+| `Terminal.SetTitle` | `(title: string) -> void` | 设置终端标题 |
+| `Terminal.Beep` | `() -> void` | 发出蜂鸣声 |
+| `Terminal.GetWidth` | `() -> int` | 获取终端宽度 |
+| `Terminal.GetHeight` | `() -> int` | 获取终端高度 |
+
+**示例**:
+```old8lang
+import "Terminal"
+
+// 清空终端
+Terminal.Clear()
+
+// 设置标题
+Terminal.SetTitle("Old8Lang Application")
+
+// 获取终端大小
+width <- Terminal.GetWidth()
+height <- Terminal.GetHeight()
+PrintLine("Terminal size: " + width.ToStr() + "x" + height.ToStr())
+
+// 设置光标位置并输出
+Terminal.SetCursorPosition(10, 5)
+PrintLine("Hello at (10, 5)")
+```
+
+---
+
+### ColorfulTerminal 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "ColorfulTerminal"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `ColorfulTerminal.Print` | `(text: string, color: string) -> void` | 彩色输出 |
+| `ColorfulTerminal.PrintLine` | `(text: string, color: string) -> void` | 彩色输出并换行 |
+| `ColorfulTerminal.SetForeground` | `(color: string) -> void` | 设置前景色 |
+| `ColorfulTerminal.SetBackground` | `(color: string) -> void` | 设置背景色 |
+| `ColorfulTerminal.Reset` | `() -> void` | 重置颜色 |
+
+**支持的颜色**: `"Red"`, `"Green"`, `"Blue"`, `"Yellow"`, `"Cyan"`, `"Magenta"`, `"White"`, `"Black"`
+
+**示例**:
+```old8lang
+import "ColorfulTerminal"
+
+// 彩色输出
+ColorfulTerminal.PrintLine("Success!", "Green")
+ColorfulTerminal.PrintLine("Warning!", "Yellow")
+ColorfulTerminal.PrintLine("Error!", "Red")
+
+// 设置颜色
+ColorfulTerminal.SetForeground("Cyan")
+PrintLine("This is cyan text")
+ColorfulTerminal.Reset()
+```
+
+---
+
+### Time 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Time"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Time.Now` | `() -> object` | 获取当前时间 |
+| `Time.Format` | `(time: object, format: string) -> string` | 格式化时间 |
+| `Time.Parse` | `(timeStr: string, format: string) -> object` | 解析时间字符串 |
+| `Time.AddDays` | `(time: object, days: int) -> object` | 添加天数 |
+| `Time.AddHours` | `(time: object, hours: int) -> object` | 添加小时 |
+| `Time.AddMinutes` | `(time: object, minutes: int) -> object` | 添加分钟 |
+| `Time.Diff` | `(time1: object, time2: object) -> int` | 计算时间差（秒） |
+| `Time.Sleep` | `(milliseconds: int) -> void` | 休眠 |
+
+**示例**:
+```old8lang
+import "Time"
+
+// 获取当前时间
+now <- Time.Now()
+formatted <- Time.Format(now, "yyyy-MM-dd HH:mm:ss")
+PrintLine("Current time: " + formatted)
+
+// 时间运算
+tomorrow <- Time.AddDays(now, 1)
+PrintLine("Tomorrow: " + Time.Format(tomorrow, "yyyy-MM-dd"))
+
+// 解析时间
+parsed <- Time.Parse("2024-01-01 12:00:00", "yyyy-MM-dd HH:mm:ss")
+
+// 计算时间差
+diff <- Time.Diff(tomorrow, now)
+PrintLine("Difference: " + diff.ToStr() + " seconds")
+
+// 休眠
+PrintLine("Sleeping for 1 second...")
+Time.Sleep(1000)
+PrintLine("Done!")
+```
+
+---
+
+### OS 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "OS"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `OS.GetEnv` | `(name: string) -> string` | 获取环境变量 |
+| `OS.SetEnv` | `(name: string, value: string) -> void` | 设置环境变量 |
+| `OS.GetPlatform` | `() -> string` | 获取平台名称 |
+| `OS.GetArch` | `() -> string` | 获取架构 |
+| `OS.Exec` | `(command: string) -> string` | 执行系统命令 |
+| `OS.GetCurrentDir` | `() -> string` | 获取当前目录 |
+| `OS.SetCurrentDir` | `(path: string) -> void` | 设置当前目录 |
+| `OS.Exit` | `(code: int) -> void` | 退出程序 |
+
+**示例**:
+```old8lang
+import "OS"
+
+// 获取平台信息
+platform <- OS.GetPlatform()
+arch <- OS.GetArch()
+PrintLine("Platform: " + platform + " (" + arch + ")")
+
+// 环境变量
+path <- OS.GetEnv("PATH")
+PrintLine("PATH: " + path)
+
+// 执行命令
+result <- OS.Exec("echo Hello from shell")
+PrintLine(result)
+
+// 目录操作
+current <- OS.GetCurrentDir()
+PrintLine("Current directory: " + current)
+```
+
+---
+
+### CSV 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "CSV"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `CSV.Read` | `(path: string) -> list<list<string>>` | 读取 CSV 文件 |
+| `CSV.Write` | `(path: string, data: list<list<string>>) -> void` | 写入 CSV 文件 |
+| `CSV.Parse` | `(content: string) -> list<list<string>>` | 解析 CSV 字符串 |
+| `CSV.Stringify` | `(data: list<list<string>>) -> string` | 转换为 CSV 字符串 |
+
+**示例**:
+```old8lang
+import "CSV"
+
+// 写入 CSV
+data <- [
+    ["Name", "Age", "City"],
+    ["Alice", "30", "New York"],
+    ["Bob", "25", "London"]
+]
+CSV.Write("data.csv", data)
+
+// 读取 CSV
+rows <- CSV.Read("data.csv")
+for row <- rows {
+    PrintLine(row[0] + ", " + row[1] + ", " + row[2])
+}
+```
+
+---
+
+### Template 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Template"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Template.Render` | `(template: string, data: dict) -> string` | 渲染模板 |
+| `Template.RenderFile` | `(path: string, data: dict) -> string` | 渲染模板文件 |
+
+**模板语法**:
+- `{{variable}}` - 变量替换
+- `{{#if condition}}...{{/if}}` - 条件
+- `{{#each items}}...{{/each}}` - 循环
+
+**示例**:
+```old8lang
+import "Template"
+
+// 简单模板
+template <- "Hello, {{name}}! You are {{age}} years old."
+data <- {"name": "Alice", "age": 30}
+result <- Template.Render(template, data)
+PrintLine(result)  // "Hello, Alice! You are 30 years old."
+
+// 条件和循环
+template2 <- "{{#if show}}Items: {{#each items}}{{this}}, {{/each}}{{/if}}"
+data2 <- {"show": true, "items": [1, 2, 3]}
+result2 <- Template.Render(template2, data2)
+PrintLine(result2)
+```
+
+---
+
+### Vector 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Vector"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Vector.Create` | `(values: list<double>) -> object` | 创建向量 |
+| `Vector.Add` | `(v1: object, v2: object) -> object` | 向量加法 |
+| `Vector.Subtract` | `(v1: object, v2: object) -> object` | 向量减法 |
+| `Vector.Multiply` | `(v: object, scalar: double) -> object` | 标量乘法 |
+| `Vector.Dot` | `(v1: object, v2: object) -> double` | 点积 |
+| `Vector.Cross` | `(v1: object, v2: object) -> object` | 叉积（3D） |
+| `Vector.Magnitude` | `(v: object) -> double` | 向量长度 |
+| `Vector.Normalize` | `(v: object) -> object` | 归一化 |
+
+**示例**:
+```old8lang
+import "Vector"
+
+// 创建向量
+v1 <- Vector.Create([1.0, 2.0, 3.0])
+v2 <- Vector.Create([4.0, 5.0, 6.0])
+
+// 向量运算
+sum <- Vector.Add(v1, v2)
+diff <- Vector.Subtract(v1, v2)
+scaled <- Vector.Multiply(v1, 2.0)
+
+// 点积和叉积
+dot <- Vector.Dot(v1, v2)
+cross <- Vector.Cross(v1, v2)
+
+// 长度和归一化
+length <- Vector.Magnitude(v1)
+normalized <- Vector.Normalize(v1)
+
+PrintLine("Dot product: " + dot.ToStr())
+PrintLine("Length: " + length.ToStr())
+```
+
+## 网络库 (Old8Lang.NetLib)
+
+**位置**: `Old8Lang.NetLib/`
+
+网络库提供 HTTP、WebSocket、MQTT、Socket 等网络功能。
+
+### HTTP 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "HTTP"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `HTTP.Get` | `(url: string) -> string` | GET 请求 |
+| `HTTP.Post` | `(url: string, data: string) -> string` | POST 请求 |
+| `HTTP.Put` | `(url: string, data: string) -> string` | PUT 请求 |
+| `HTTP.Delete` | `(url: string) -> string` | DELETE 请求 |
+| `HTTP.SetHeader` | `(name: string, value: string) -> void` | 设置请求头 |
+| `HTTP.SetTimeout` | `(milliseconds: int) -> void` | 设置超时 |
+
+**示例**:
+```old8lang
+import "HTTP"
+
+// GET 请求
+response <- HTTP.Get("https://api.example.com/users")
+PrintLine(response)
+
+// POST 请求
+HTTP.SetHeader("Content-Type", "application/json")
+data <- "{\"name\": \"Alice\", \"age\": 30}"
+result <- HTTP.Post("https://api.example.com/users", data)
+PrintLine(result)
+
+// 设置超时
+HTTP.SetTimeout(5000)  // 5秒
+```
+
+---
+
+### WebSocket 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "WebSocket"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `WebSocket.Connect` | `(url: string) -> object` | 连接 WebSocket |
+| `WebSocket.Send` | `(ws: object, message: string) -> void` | 发送消息 |
+| `WebSocket.Receive` | `(ws: object) -> string` | 接收消息 |
+| `WebSocket.Close` | `(ws: object) -> void` | 关闭连接 |
+| `WebSocket.IsConnected` | `(ws: object) -> bool` | 检查连接状态 |
+
+**示例**:
+```old8lang
+import "WebSocket"
+
+// 连接 WebSocket
+ws <- WebSocket.Connect("wss://echo.websocket.org")
+
+// 发送消息
+WebSocket.Send(ws, "Hello, WebSocket!")
+
+// 接收消息
+message <- WebSocket.Receive(ws)
+PrintLine("Received: " + message)
+
+// 关闭连接
+WebSocket.Close(ws)
+```
+
+---
+
+### MQTT 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "MQTT"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `MQTT.Connect` | `(broker: string, port: int) -> object` | 连接 MQTT 代理 |
+| `MQTT.Publish` | `(client: object, topic: string, message: string) -> void` | 发布消息 |
+| `MQTT.Subscribe` | `(client: object, topic: string) -> void` | 订阅主题 |
+| `MQTT.Receive` | `(client: object) -> string` | 接收消息 |
+| `MQTT.Disconnect` | `(client: object) -> void` | 断开连接 |
+
+**示例**:
+```old8lang
+import "MQTT"
+
+// 连接 MQTT 代理
+client <- MQTT.Connect("broker.hivemq.com", 1883)
+
+// 订阅主题
+MQTT.Subscribe(client, "test/topic")
+
+// 发布消息
+MQTT.Publish(client, "test/topic", "Hello, MQTT!")
+
+// 接收消息
+message <- MQTT.Receive(client)
+PrintLine("Received: " + message)
+
+// 断开连接
+MQTT.Disconnect(client)
+```
+
+---
+
+### Socket 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Socket"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Socket.Create` | `(type: string) -> object` | 创建 Socket |
+| `Socket.Connect` | `(socket: object, host: string, port: int) -> void` | 连接服务器 |
+| `Socket.Send` | `(socket: object, data: string) -> void` | 发送数据 |
+| `Socket.Receive` | `(socket: object, size: int) -> string` | 接收数据 |
+| `Socket.Close` | `(socket: object) -> void` | 关闭 Socket |
+| `Socket.Bind` | `(socket: object, port: int) -> void` | 绑定端口 |
+| `Socket.Listen` | `(socket: object, backlog: int) -> void` | 监听连接 |
+| `Socket.Accept` | `(socket: object) -> object` | 接受连接 |
+
+**示例**:
+```old8lang
+import "Socket"
+
+// TCP 客户端
+socket <- Socket.Create("TCP")
+Socket.Connect(socket, "example.com", 80)
+Socket.Send(socket, "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
+response <- Socket.Receive(socket, 1024)
+PrintLine(response)
+Socket.Close(socket)
+
+// TCP 服务器
+server <- Socket.Create("TCP")
+Socket.Bind(server, 8080)
+Socket.Listen(server, 5)
+PrintLine("Server listening on port 8080")
+client <- Socket.Accept(server)
+data <- Socket.Receive(client, 1024)
+Socket.Send(client, "Hello, Client!")
+Socket.Close(client)
+Socket.Close(server)
+```
+
+---
+
+### WebAPI 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "WebAPI"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `WebAPI.Request` | `(method: string, url: string, data: string) -> string` | 通用请求 |
+| `WebAPI.SetAuth` | `(type: string, token: string) -> void` | 设置认证 |
+| `WebAPI.ParseJSON` | `(json: string) -> object` | 解析 JSON |
+| `WebAPI.ToJSON` | `(obj: object) -> string` | 转换为 JSON |
+
+**示例**:
+```old8lang
+import "WebAPI"
+
+// 设置认证
+WebAPI.SetAuth("Bearer", "your-api-token")
+
+// 发送请求
+response <- WebAPI.Request("GET", "https://api.example.com/data", "")
+data <- WebAPI.ParseJSON(response)
+
+// 处理数据
+PrintLine("Data: " + data.ToStr())
+```
+
+---
+
+## 数据库库 (Old8Lang.DatabaseLib)
+
+**位置**: `Old8Lang.DatabaseLib/`
+
+数据库库提供 MySQL、PostgreSQL、SQLite 等数据库连接和操作。
+
+### MySQL 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "MySQL"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `MySQL.Connect` | `(host: string, user: string, password: string, database: string) -> object` | 连接数据库 |
+| `MySQL.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
+| `MySQL.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
+| `MySQL.Close` | `(conn: object) -> void` | 关闭连接 |
+
+**示例**:
+```old8lang
+import "MySQL"
+
+// 连接数据库
+conn <- MySQL.Connect("localhost", "root", "password", "testdb")
+
+// 查询数据
+results <- MySQL.Query(conn, "SELECT * FROM users")
+for row <- results {
+    PrintLine("User: " + row["name"])
+}
+
+// 插入数据
+affected <- MySQL.Execute(conn, "INSERT INTO users (name, age) VALUES ('Alice', 30)")
+PrintLine("Inserted " + affected.ToStr() + " rows")
+
+// 关闭连接
+MySQL.Close(conn)
+```
+
+---
+
+### PostgreSQL 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "PostgreSQL"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `PostgreSQL.Connect` | `(connectionString: string) -> object` | 连接数据库 |
+| `PostgreSQL.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
+| `PostgreSQL.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
+| `PostgreSQL.Close` | `(conn: object) -> void` | 关闭连接 |
+
+**示例**:
+```old8lang
+import "PostgreSQL"
+
+// 连接数据库
+connStr <- "Host=localhost;Username=postgres;Password=password;Database=testdb"
+conn <- PostgreSQL.Connect(connStr)
+
+// 查询数据
+results <- PostgreSQL.Query(conn, "SELECT * FROM users")
+for row <- results {
+    PrintLine("User: " + row["name"])
+}
+
+// 关闭连接
+PostgreSQL.Close(conn)
+```
+
+---
+
+### SQLite 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "SQLite"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `SQLite.Connect` | `(path: string) -> object` | 连接数据库 |
+| `SQLite.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
+| `SQLite.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
+| `SQLite.Close` | `(conn: object) -> void` | 关闭连接 |
+
+**示例**:
+```old8lang
+import "SQLite"
+
+// 连接数据库（自动创建）
+conn <- SQLite.Connect("test.db")
+
+// 创建表
+SQLite.Execute(conn, "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
+
+// 插入数据
+SQLite.Execute(conn, "INSERT INTO users (name, age) VALUES ('Alice', 30)")
+
+// 查询数据
+results <- SQLite.Query(conn, "SELECT * FROM users")
+for row <- results {
+    PrintLine("User: " + row["name"] + ", Age: " + row["age"].ToStr())
+}
+
+// 关闭连接
+SQLite.Close(conn)
+```
+
+---
+
+### InMemory 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "InMemory"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `InMemory.Create` | `() -> object` | 创建内存数据库 |
+| `InMemory.Set` | `(db: object, key: string, value: object) -> void` | 设置值 |
+| `InMemory.Get` | `(db: object, key: string) -> object` | 获取值 |
+| `InMemory.Delete` | `(db: object, key: string) -> void` | 删除值 |
+| `InMemory.Exists` | `(db: object, key: string) -> bool` | 检查键是否存在 |
+| `InMemory.Clear` | `(db: object) -> void` | 清空数据库 |
+
+**示例**:
+```old8lang
+import "InMemory"
+
+// 创建内存数据库
+db <- InMemory.Create()
+
+// 存储数据
+InMemory.Set(db, "user:1", {"name": "Alice", "age": 30})
+InMemory.Set(db, "user:2", {"name": "Bob", "age": 25})
+
+// 读取数据
+user <- InMemory.Get(db, "user:1")
+PrintLine("User: " + user["name"])
+
+// 检查存在
+if InMemory.Exists(db, "user:1") {
+    PrintLine("User 1 exists")
+}
+
+// 删除数据
+InMemory.Delete(db, "user:2")
+```
+
+---
+
+### ORM 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "ORM"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `ORM.Define` | `(name: string, schema: dict) -> object` | 定义模型 |
+| `ORM.Create` | `(model: object, data: dict) -> object` | 创建记录 |
+| `ORM.Find` | `(model: object, id: int) -> object` | 查找记录 |
+| `ORM.FindAll` | `(model: object, filter: dict) -> list<object>` | 查找所有记录 |
+| `ORM.Update` | `(record: object, data: dict) -> void` | 更新记录 |
+| `ORM.Delete` | `(record: object) -> void` | 删除记录 |
+
+**示例**:
+```old8lang
+import "ORM"
+
+// 定义模型
+User <- ORM.Define("User", {
+    "name": "string",
+    "age": "int",
+    "email": "string"
+})
+
+// 创建记录
+user <- ORM.Create(User, {"name": "Alice", "age": 30, "email": "alice@example.com"})
+
+// 查找记录
+found <- ORM.Find(User, 1)
+PrintLine("Found: " + found["name"])
+
+// 更新记录
+ORM.Update(user, {"age": 31})
+
+// 删除记录
+ORM.Delete(user)
+```
+
+---
+
+## 序列化库 (Old8Lang.SerializationLib)
+
+**位置**: `Old8Lang.SerializationLib/`
+
+序列化库提供 MessagePack、Protobuf 等序列化格式支持。
+
+### MessagePack 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "MessagePack"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `MessagePack.Serialize` | `(obj: object) -> string` | 序列化对象 |
+| `MessagePack.Deserialize` | `(data: string) -> object` | 反序列化 |
+
+**示例**:
+```old8lang
+import "MessagePack"
+
+// 序列化
+data <- {"name": "Alice", "age": 30, "items": [1, 2, 3]}
+serialized <- MessagePack.Serialize(data)
+PrintLine("Serialized: " + serialized)
+
+// 反序列化
+deserialized <- MessagePack.Deserialize(serialized)
+PrintLine("Name: " + deserialized["name"])
+PrintLine("Age: " + deserialized["age"].ToStr())
+```
+
+---
+
+### Protobuf 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Protobuf"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Protobuf.Serialize` | `(obj: object, schema: string) -> string` | 序列化对象 |
+| `Protobuf.Deserialize` | `(data: string, schema: string) -> object` | 反序列化 |
+| `Protobuf.LoadSchema` | `(path: string) -> string` | 加载 .proto 文件 |
+
+**示例**:
+```old8lang
+import "Protobuf"
+
+// 加载 schema
+schema <- Protobuf.LoadSchema("user.proto")
+
+// 序列化
+data <- {"name": "Alice", "age": 30}
+serialized <- Protobuf.Serialize(data, schema)
+
+// 反序列化
+deserialized <- Protobuf.Deserialize(serialized, schema)
+PrintLine("Name: " + deserialized["name"])
+```
+
+---
+
+### Factory 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "SerializerFactory"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `SerializerFactory.Create` | `(type: string) -> object` | 创建序列化器 |
+| `SerializerFactory.Serialize` | `(serializer: object, obj: object) -> string` | 序列化 |
+| `SerializerFactory.Deserialize` | `(serializer: object, data: string) -> object` | 反序列化 |
+
+**支持的类型**: `"JSON"`, `"MessagePack"`, `"Protobuf"`, `"XML"`
+
+**示例**:
+```old8lang
+import "SerializerFactory"
+
+// 创建序列化器
+serializer <- SerializerFactory.Create("JSON")
+
+// 序列化
+data <- {"name": "Alice", "age": 30}
+serialized <- SerializerFactory.Serialize(serializer, data)
+PrintLine(serialized)
+
+// 反序列化
+deserialized <- SerializerFactory.Deserialize(serializer, serialized)
+PrintLine("Name: " + deserialized["name"])
+```
+
+---
+
+## 机器学习库 (Old8Lang.MachineLearningLib)
+
+**位置**: `Old8Lang.MachineLearningLib/`
+
+机器学习库提供分类、回归、聚类等机器学习功能。
+
+### Classification 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Classification"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Classification.Train` | `(data: list<list<double>>, labels: list<int>, algorithm: string) -> object` | 训练分类模型 |
+| `Classification.Predict` | `(model: object, input: list<double>) -> int` | 预测类别 |
+| `Classification.Evaluate` | `(model: object, testData: list<list<double>>, testLabels: list<int>) -> double` | 评估模型 |
+
+**支持的算法**: `"LogisticRegression"`, `"DecisionTree"`, `"RandomForest"`, `"SVM"`, `"NaiveBayes"`
+
+**示例**:
+```old8lang
+import "Classification"
+
+// 训练数据
+data <- [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 5.0]]
+labels <- [0, 0, 1, 1]
+
+// 训练模型
+model <- Classification.Train(data, labels, "LogisticRegression")
+
+// 预测
+prediction <- Classification.Predict(model, [2.5, 3.5])
+PrintLine("Prediction: " + prediction.ToStr())
+
+// 评估
+accuracy <- Classification.Evaluate(model, data, labels)
+PrintLine("Accuracy: " + accuracy.ToStr())
+```
+
+---
+
+### Regression 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Regression"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Regression.Train` | `(data: list<list<double>>, targets: list<double>, algorithm: string) -> object` | 训练回归模型 |
+| `Regression.Predict` | `(model: object, input: list<double>) -> double` | 预测值 |
+| `Regression.Evaluate` | `(model: object, testData: list<list<double>>, testTargets: list<double>) -> double` | 评估模型 |
+
+**支持的算法**: `"LinearRegression"`, `"PolynomialRegression"`, `"Ridge"`, `"Lasso"`
+
+**示例**:
+```old8lang
+import "Regression"
+
+// 训练数据
+data <- [[1.0], [2.0], [3.0], [4.0]]
+targets <- [2.0, 4.0, 6.0, 8.0]
+
+// 训练模型
+model <- Regression.Train(data, targets, "LinearRegression")
+
+// 预测
+prediction <- Regression.Predict(model, [5.0])
+PrintLine("Prediction: " + prediction.ToStr())
+
+// 评估（R² 分数）
+score <- Regression.Evaluate(model, data, targets)
+PrintLine("R² Score: " + score.ToStr())
+```
+
+---
+
+### Clustering 模块
+
+**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Clustering"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Clustering.Train` | `(data: list<list<double>>, numClusters: int, algorithm: string) -> object` | 训练聚类模型 |
+| `Clustering.Predict` | `(model: object, input: list<double>) -> int` | 预测簇 |
+| `Clustering.GetCenters` | `(model: object) -> list<list<double>>` | 获取簇中心 |
+
+**支持的算法**: `"KMeans"`, `"DBSCAN"`, `"HierarchicalClustering"`
+
+**示例**:
+```old8lang
+import "Clustering"
+
+// 训练数据
+data <- [[1.0, 2.0], [1.5, 1.8], [5.0, 8.0], [8.0, 8.0], [1.0, 0.6], [9.0, 11.0]]
+
+// 训练模型（3个簇）
+model <- Clustering.Train(data, 3, "KMeans")
+
+// 预测
+cluster <- Clustering.Predict(model, [2.0, 2.0])
+PrintLine("Cluster: " + cluster.ToStr())
+
+// 获取簇中心
+centers <- Clustering.GetCenters(model)
+for i <- 0, i < centers.Length(), i <- i + 1 {
+    PrintLine("Center " + i.ToStr() + ": " + centers[i].ToStr())
+}
+```
+
+---
+
+### DataLoader 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "DataLoader"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `DataLoader.LoadCSV` | `(path: string) -> list<list<double>>` | 加载 CSV 数据 |
+| `DataLoader.LoadJSON` | `(path: string) -> object` | 加载 JSON 数据 |
+| `DataLoader.Normalize` | `(data: list<list<double>>) -> list<list<double>>` | 归一化数据 |
+| `DataLoader.Split` | `(data: list<list<double>>, ratio: double) -> object` | 分割训练/测试集 |
+
+**示例**:
+```old8lang
+import "DataLoader"
+
+// 加载数据
+data <- DataLoader.LoadCSV("data.csv")
+
+// 归一化
+normalized <- DataLoader.Normalize(data)
+
+// 分割数据（80% 训练，20% 测试）
+split <- DataLoader.Split(normalized, 0.8)
+trainData <- split["train"]
+testData <- split["test"]
+
+PrintLine("Train size: " + trainData.Length().ToStr())
+PrintLine("Test size: " + testData.Length().ToStr())
+```
+
+---
+
+### Predictor 模块
+
+**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+
+**导入方式**:
+```old8lang
+import "Predictor"
+```
+
+**主要函数**:
+
+| 函数 | 签名 | 描述 |
+|------|------|------|
+| `Predictor.LoadModel` | `(path: string) -> object` | 加载模型 |
+| `Predictor.SaveModel` | `(model: object, path: string) -> void` | 保存模型 |
+| `Predictor.Predict` | `(model: object, input: object) -> object` | 预测 |
+| `Predictor.BatchPredict` | `(model: object, inputs: list<object>) -> list<object>` | 批量预测 |
+
+**示例**:
+```old8lang
+import "Predictor"
+import "Classification"
+
+// 训练模型
+data <- [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]]
+labels <- [0, 0, 1]
+model <- Classification.Train(data, labels, "LogisticRegression")
+
+// 保存模型
+Predictor.SaveModel(model, "model.pkl")
+
+// 加载模型
+loadedModel <- Predictor.LoadModel("model.pkl")
+
+// 预测
+prediction <- Predictor.Predict(loadedModel, [2.5, 3.5])
+PrintLine("Prediction: " + prediction.ToStr())
+
+// 批量预测
+inputs <- [[1.5, 2.5], [3.5, 4.5]]
+predictions <- Predictor.BatchPredict(loadedModel, inputs)
+for pred <- predictions {
+    PrintLine("Prediction: " + pred.ToStr())
+}
+```
+
+---
+
 ## 总结
 
-本 API 参考文档涵盖了 Old8Lang 的核心标准库函数。更多高级功能和库请参考:
-- [Old8LangLib](../Old8LangLib/README.md) - 操作系统、文件、网络功能
-- [Old8Lang.NetLib](../Old8Lang.NetLib/README.md) - MQTT 和高级网络功能
-- [语法参考](Old8Lang_Grammar.md) - 完整语法说明
+本 API 参考文档涵盖了 Old8Lang 的完整标准库，包括：
+
+- **核心标准库 (Old8LangLib)**: 12个模块 - Math, File, Crypto, Image, Regex, Terminal, ColorfulTerminal, Time, OS, CSV, Template, Vector
+- **网络库 (Old8Lang.NetLib)**: 5个模块 - HTTP, WebSocket, MQTT, Socket, WebAPI
+- **数据库库 (Old8Lang.DatabaseLib)**: 5个模块 - MySQL, PostgreSQL, SQLite, InMemory, ORM
+- **序列化库 (Old8Lang.SerializationLib)**: 3个模块 - MessagePack, Protobuf, Factory
+- **机器学习库 (Old8Lang.MachineLearningLib)**: 5个模块 - Classification, Regression, Clustering, DataLoader, Predictor
+
+每个模块都标注了支持的执行模式（解释模式、编译模式、VM 模式），并提供了完整的函数签名和可运行的代码示例。
+
+更多信息请参考:
+- [ARCHITECTURE.md](ARCHITECTURE.md) - 架构文档
+- [LANGUAGE_FEATURES.md](LANGUAGE_FEATURES.md) - 语言特性文档
+- [CLI_GUIDE.md](CLI_GUIDE.md) - CLI 命令参考
+- [Old8Lang_Grammar.md](Old8Lang_Grammar.md) - 完整语法说明
 
