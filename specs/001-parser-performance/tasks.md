@@ -30,12 +30,12 @@
 
 **Purpose**: 项目初始化和基准测试框架准备
 
-- [ ] T001 创建优化工具目录 Old8Lang/LangParser/Optimization/
-- [ ] T002 验证 BenchmarkDotNet 已添加到 Old8Lang.Benchmarks 项目
-- [ ] T003 [P] 创建测试数据生成器 Old8Lang.Benchmarks/TestDataGenerator.cs
-- [ ] T004 [P] 使用 TestDataGenerator 生成小型测试脚本（500行）Old8Lang.Benchmarks/TestData/small_script_500.old8
-- [ ] T005 [P] 使用 TestDataGenerator 生成中型测试脚本（3000行）Old8Lang.Benchmarks/TestData/medium_project_3000.old8
-- [ ] T006 [P] 使用 TestDataGenerator 生成大型测试脚本（5000行）Old8Lang.Benchmarks/TestData/large_script_5000.old8
+- [X] T001 创建优化工具目录 Old8Lang/LangParser/Optimization/
+- [X] T002 验证 BenchmarkDotNet 已添加到 Old8Lang.Benchmarks 项目
+- [X] T003 [P] 创建测试数据生成器 Old8Lang.Benchmarks/TestDataGenerator.cs
+- [X] T004 [P] 使用 TestDataGenerator 生成小型测试脚本（500行）Old8Lang.Benchmarks/TestData/small_script_500.old8
+- [X] T005 [P] 使用 TestDataGenerator 生成中型测试脚本（3000行）Old8Lang.Benchmarks/TestData/medium_project_3000.old8
+- [X] T006 [P] 使用 TestDataGenerator 生成大型测试脚本（5000行）Old8Lang.Benchmarks/TestData/large_script_5000.old8
 
 ---
 
