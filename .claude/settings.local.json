@@ -51,7 +51,11 @@
       "Bash(./Old8Lang.App.exe init:*)",
       "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe -f main.old8 --env development)",
       "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe -f main.old8 --env production)",
-      "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe:*)"
+      "Bash(/c/Projects/RiderProjects/Old8Lang/Old8Lang.App/bin/Release/net10.0/Old8Lang.App.exe:*)",
+      "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"parser-performance\" \"我想提升一下Old8Lang中对于语法解析的性能\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-plan.ps1 -Json)",
+      "WebSearch",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)"
     ]
   }
 }
