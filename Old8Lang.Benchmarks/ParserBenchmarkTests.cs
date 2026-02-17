@@ -18,6 +18,11 @@ public class ParserBenchmarkTests
     private string ClassIntensiveCode = "";
     private string LargeFileCode = "";
 
+    // 新增：使用生成的测试数据文件
+    private string SmallScript500 = "";
+    private string MediumProject3000 = "";
+    private string LargeScript5000 = "";
+
     [GlobalSetup]
     public void Setup()
     {
@@ -51,6 +56,12 @@ public class ParserBenchmarkTests
         ExpressionIntensiveCode = GenerateExpressionIntensiveCode();
         ClassIntensiveCode = GenerateClassIntensiveCode();
         LargeFileCode = GenerateLargeFileCode();
+
+        // 加载生成的测试数据文件
+        var testDataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData");
+        SmallScript500 = File.ReadAllText(Path.Combine(testDataDir, "small_script_500.old8"));
+        MediumProject3000 = File.ReadAllText(Path.Combine(testDataDir, "medium_project_3000.old8"));
+        LargeScript5000 = File.ReadAllText(Path.Combine(testDataDir, "large_script_5000.old8"));
     }
 
     private string GenerateComplexCode()
@@ -504,6 +515,54 @@ public class ParserBenchmarkTests
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParserClass(tokens, code);
         return parser.ParseProgram();
+    }
+
+    #endregion
+
+    #region Performance Optimization Tests (User Stories)
+
+    // User Story 1: 快速解析小型脚本 (500行)
+    [Benchmark(Description = "Parse Small Script (500 lines)")]
+    public BlockStatement ParseSmallScript500()
+    {
+        var tokens = LangTokenizer.Tokenize(SmallScript500);
+        var parser = new LangParserClass(tokens, SmallScript500);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Small Script (500 lines)")]
+    public List<LangToken> TokenizeSmallScript500()
+    {
+        return LangTokenizer.Tokenize(SmallScript500);
+    }
+
+    // User Story 2: 高效解析中大型项目 (3000行, 5000行)
+    [Benchmark(Description = "Parse Medium Project (3000 lines)")]
+    public BlockStatement ParseMediumProject3000()
+    {
+        var tokens = LangTokenizer.Tokenize(MediumProject3000);
+        var parser = new LangParserClass(tokens, MediumProject3000);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Medium Project (3000 lines)")]
+    public List<LangToken> TokenizeMediumProject3000()
+    {
+        return LangTokenizer.Tokenize(MediumProject3000);
+    }
+
+    [Benchmark(Description = "Parse Large Script (5000 lines)")]
+    public BlockStatement ParseLargeScript5000()
+    {
+        var tokens = LangTokenizer.Tokenize(LargeScript5000);
+        var parser = new LangParserClass(tokens, LargeScript5000);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Large Script (5000 lines)")]
+    public List<LangToken> TokenizeLargeScript5000()
+    {
+        return LangTokenizer.Tokenize(LargeScript5000);
     }
 
     #endregion
