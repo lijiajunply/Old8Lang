@@ -26,11 +26,11 @@
 
 **Purpose**: 项目初始化和基础结构搭建
 
-- [ ] T001 验证 Old8Lang.Benchmarks 项目配置，确保 BenchmarkDotNet 依赖已正确安装
-- [ ] T002 [P] 创建性能测试目录结构 Old8Lang.Tests/Interpreter/Performance/
-- [ ] T003 [P] 创建性能监控数据模型文件 Old8Lang/Interpreter/PerformanceMetrics.cs
-- [ ] T004 [P] 创建性能监控配置文件 Old8Lang/Interpreter/PerformanceMonitorConfig.cs
-- [ ] T005 创建测试脚本目录 TestScripts/Performance/ 用于存放性能测试用的 .old8 脚本
+- [X] T001 验证 Old8Lang.Benchmarks 项目配置，确保 BenchmarkDotNet 依赖已正确安装
+- [X] T002 [P] 创建性能测试目录结构 Old8Lang.Tests/Interpreter/Performance/
+- [X] T003 [P] 创建性能监控数据模型文件 Old8Lang/Interpreter/PerformanceMetrics.cs
+- [X] T004 [P] 创建性能监控配置文件 Old8Lang/Interpreter/PerformanceMonitorConfig.cs
+- [X] T005 创建测试脚本目录 TestScripts/Performance/ 用于存放性能测试用的 .old8 脚本
 
 ---
 
@@ -42,27 +42,27 @@
 
 ### 基准测试基础设施
 
-- [ ] T006 在 Old8Lang.Benchmarks/InterpreterBenchmarks.cs 中创建基准测试基类 InterpreterBenchmarkBase
-- [ ] T007 [P] 创建变量查找基准测试 Old8Lang.Benchmarks/VariableLookupBenchmark.cs
-- [ ] T008 [P] 创建循环执行基准测试 Old8Lang.Benchmarks/LoopExecutionBenchmark.cs
-- [ ] T009 [P] 创建函数调用基准测试 Old8Lang.Benchmarks/FunctionCallBenchmark.cs
-- [ ] T010 运行基准测试建立性能基线，保存结果到 specs/001-interpreter-performance/baseline-results.md
+- [X] T006 在 Old8Lang.Benchmarks/InterpreterBenchmarks.cs 中创建基准测试基类 InterpreterBenchmarkBase
+- [X] T007 [P] 创建变量查找基准测试 Old8Lang.Benchmarks/VariableLookupBenchmark.cs
+- [X] T008 [P] 创建循环执行基准测试 Old8Lang.Benchmarks/LoopExecutionBenchmark.cs
+- [X] T009 [P] 创建函数调用基准测试 Old8Lang.Benchmarks/FunctionCallBenchmark.cs
+- [⏳] T010 运行基准测试建立性能基线，保存结果到 specs/001-interpreter-performance/baseline-results.md
 
 ### 性能监控基础设施
 
-- [ ] T011 实现 PerformanceMetrics 数据模型 Old8Lang/Interpreter/PerformanceMetrics.cs（包含所有字段和验证）
-- [ ] T012 [P] 实现 FunctionMetrics 数据模型 Old8Lang/Interpreter/FunctionMetrics.cs
-- [ ] T013 [P] 实现 ScopeMetrics 数据模型 Old8Lang/Interpreter/ScopeMetrics.cs
-- [ ] T014 [P] 实现 ObjectPoolStats 数据模型 Old8Lang/Interpreter/ObjectPoolStats.cs
-- [ ] T015 实现 IPerformanceMonitor 接口 Old8Lang/Interpreter/IPerformanceMonitor.cs
-- [ ] T016 实现 PerformanceMonitor 基础类 Old8Lang/Interpreter/PerformanceMonitor.cs（启动、停止、重置功能）
-- [ ] T017 在 LangInterpreter.cs 中集成 PerformanceMonitor（添加可选的 monitor 参数）
+- [X] T011 实现 PerformanceMetrics 数据模型 Old8Lang/Interpreter/PerformanceMetrics.cs（包含所有字段和验证）
+- [X] T012 [P] 实现 FunctionMetrics 数据模型 Old8Lang/Interpreter/FunctionMetrics.cs
+- [X] T013 [P] 实现 ScopeMetrics 数据模型 Old8Lang/Interpreter/ScopeMetrics.cs
+- [X] T014 [P] 实现 ObjectPoolStats 数据模型 Old8Lang/Interpreter/ObjectPoolStats.cs
+- [X] T015 实现 IPerformanceMonitor 接口 Old8Lang/Interpreter/IPerformanceMonitor.cs
+- [X] T016 实现 PerformanceMonitor 基础类 Old8Lang/Interpreter/PerformanceMonitor.cs（启动、停止、重置功能）
+- [X] T017 在 LangInterpreter.cs 中集成 PerformanceMonitor（添加可选的 monitor 参数）
 
 ### 测试脚本准备
 
-- [ ] T018 [P] 创建小型测试脚本 TestScripts/Performance/small-script-50lines.old8（50行，包含变量、运算、函数）
-- [ ] T019 [P] 创建嵌套循环测试脚本 TestScripts/Performance/nested-loops.old8（100x100 循环）
-- [ ] T020 [P] 创建变量查找测试脚本 TestScripts/Performance/variable-lookup.old8（大量变量查找）
+- [X] T018 [P] 创建小型测试脚本 TestScripts/Performance/small-script-50lines.old8（50行，包含变量、运算、函数）
+- [X] T019 [P] 创建嵌套循环测试脚本 TestScripts/Performance/nested-loops.old8（100x100 循环）
+- [X] T020 [P] 创建变量查找测试脚本 TestScripts/Performance/variable-lookup.old8（大量变量查找）
 
 **Checkpoint**: 基础设施就绪 - 用户故事实现现在可以并行开始
 
@@ -85,19 +85,19 @@
 
 ### 变量查找优化实现
 
-- [ ] T025 [US1] 实现 VariableCache 类 Old8Lang/Interpreter/VariableCache.cs（LRU 缓存，最多1000条目）
-- [ ] T026 [US1] 在 VariateManager.cs 中集成 VariableCache（查找时先检查缓存）
-- [ ] T027 [US1] 实现作用域链扁平化优化 VariateManager.cs（缓存常用外层作用域变量）
-- [ ] T028 [US1] 添加全局变量快速查找表 VariateManager.cs（专门的全局变量字典）
-- [ ] T029 [US1] 在 PerformanceMonitor 中添加变量查找跟踪（RecordVariableLookup 方法）
+- [X] T025 [US1] 实现 VariableCache 类 Old8Lang/Interpreter/VariableCache.cs（LRU 缓存，最多1000条目）
+- [X] T026 [US1] 在 VariateManager.cs 中集成 VariableCache（查找时先检查缓存）
+- [X] T027 [US1] 实现作用域链扁平化优化 VariateManager.cs（缓存常用外层作用域变量）
+- [X] T028 [US1] 添加全局变量快速查找表 VariateManager.cs（专门的全局变量字典）
+- [X] T029 [US1] 在 PerformanceMonitor 中添加变量查找跟踪（RecordVariableLookup 方法）
 - [ ] T030 [US1] 运行变量查找基准测试验证 ≥40% 性能提升
 
 ### 循环执行优化实现
 
-- [ ] T031 [US1] 在 InterpreterVisitor.cs 中识别简单循环模式（for 循环计数器）
-- [ ] T032 [US1] 实现简单循环特殊化执行路径 InterpreterVisitor.cs（优化的循环执行）
-- [ ] T033 [US1] 实现循环不变量提升 InterpreterVisitor.cs（将不变计算移到循环外）
-- [ ] T034 [US1] 在 PerformanceMonitor 中添加循环迭代计数（LoopIterationCount 字段）
+- [X] T031 [US1] 在 InterpreterVisitor.cs 中识别简单循环模式（for 循环计数器）
+- [X] T032 [US1] 实现简单循环特殊化执行路径 InterpreterVisitor.cs（优化的循环执行）
+- [X] T033 [US1] 实现循环不变量提升 InterpreterVisitor.cs（将不变计算移到循环外）
+- [X] T034 [US1] 在 PerformanceMonitor 中添加循环迭代计数（LoopIterationCount 字段）
 - [ ] T035 [US1] 运行循环执行基准测试验证 ≥30% 性能提升
 
 ### 验证和集成

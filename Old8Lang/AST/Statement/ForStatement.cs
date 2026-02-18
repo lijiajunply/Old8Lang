@@ -29,6 +29,10 @@ public partial class ForStatement(
         try
         {
             setStatement.Run(manager);
+
+            // 性能优化：检测简单循环模式（可以优化的循环）
+            bool isSimpleLoop = IsSimpleCountingLoop();
+
             while (true)
             {
                 // 重置控制流状态，确保每次循环迭代开始时清除之前的break/continue标志
@@ -47,6 +51,9 @@ public partial class ForStatement(
 
                 if (expr1)
                 {
+                    // 记录循环迭代（性能监控）
+                    manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
+
                     blockStatement.Run(manager);
 
                     // 处理yield：如果循环体中遇到yield，返回以暂停执行
@@ -85,6 +92,16 @@ public partial class ForStatement(
             manager.ControlFlowManager.PopState();
             manager.RemoveChildren();
         }
+    }
+
+    /// <summary>
+    /// 检测是否为简单的计数循环（可以优化）
+    /// </summary>
+    private bool IsSimpleCountingLoop()
+    {
+        // 简单启发式：检查是否是二元比较表达式
+        // 这是一个简化版本，实际实现可以更复杂
+        return expression is Expression.Operation;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

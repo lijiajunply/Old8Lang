@@ -180,6 +180,16 @@ public class VariateManager
     [ThreadStatic] private static Dictionary<string, (int scopeIndex, LangValueType value)>? _lookupCache;
 
     /// <summary>
+    /// 增强的变量缓存（LRU策略），用于性能优化
+    /// </summary>
+    private VariableCache? _variableCache;
+
+    /// <summary>
+    /// 全局变量快速查找表
+    /// </summary>
+    private Dictionary<string, LangValueType>? _globalVariableCache;
+
+    /// <summary>
     /// 只读变量集合，使用ThreadStatic避免线程同步开销 (变量名 -> 作用域索引)
     /// </summary>
     private readonly Dictionary<string, int> ReadonlyVariables = new();
@@ -569,9 +579,17 @@ public class VariateManager
             EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
             Scopes[currentScopeIndex][id.IdName] = langValueType;
 
-            // 更新缓存
+            // 更新所有缓存
             _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
             _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+            _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+            // 如果是全局变量，更新全局缓存
+            if (currentScopeIndex == 0 && _globalVariableCache != null)
+            {
+                _globalVariableCache[id.IdName] = langValueType;
+            }
+
             return;
         }
 
@@ -587,9 +605,17 @@ public class VariateManager
             EnsureScopeNotShared(i); // COW: 确保作用域未共享
             Scopes[i][id.IdName] = langValueType;
 
-            // 更新缓存
+            // 更新所有缓存
             _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
             _lookupCache[id.IdName] = (i, langValueType);
+            _variableCache?.Set(id.IdName, langValueType, i);
+
+            // 如果是全局变量，更新全局缓存
+            if (i == 0 && _globalVariableCache != null)
+            {
+                _globalVariableCache[id.IdName] = langValueType;
+            }
+
             return;
         }
 
@@ -617,9 +643,16 @@ public class VariateManager
             MarkAsReadonly(id.IdName, currentScopeIndex);
         }
 
-        // 更新缓存
+        // 更新所有缓存
         _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
         _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+        _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+        // 如果是全局变量，更新全局缓存
+        if (currentScopeIndex == 0 && _globalVariableCache != null)
+        {
+            _globalVariableCache[id.IdName] = langValueType;
+        }
     }
 
     /// <summary>
@@ -700,6 +733,9 @@ public class VariateManager
             // 作用域变化，清理查找缓存
             _lookupCache?.Clear();
 
+            // 清理增强缓存中的当前作用域变量
+            _variableCache?.ClearScope(Scopes.Count);
+
             // 清理被移除的作用域中的只读变量
             // 移除的是当前最后一个作用域（索引为Scopes.Count）
             // 注意：此时作用域已经被移除，所以当前Scopes.Count已经减1
@@ -721,12 +757,35 @@ public class VariateManager
     /// </remarks>
     public LangValueType? GetValue(LangId id)
     {
-        // 快速路径：检查缓存
+        // 性能优化：如果启用了增强缓存，先尝试从增强缓存获取
+        if (_variableCache != null)
+        {
+            if (_variableCache.TryGet(id.IdName, out var cachedValue))
+            {
+                // 记录性能监控（如果启用）
+                Interpreter?.PerformanceMonitor?.RecordVariableLookup("enhanced_cache", true);
+                return cachedValue as LangValueType;
+            }
+        }
+
+        // 性能优化：全局变量快速查找
+        if (_globalVariableCache != null && _globalVariableCache.TryGetValue(id.IdName, out var globalValue))
+        {
+            // 更新增强缓存
+            _variableCache?.Set(id.IdName, globalValue, 0);
+            Interpreter?.PerformanceMonitor?.RecordVariableLookup("global_cache", true);
+            return globalValue;
+        }
+
+        // 快速路径：检查简单缓存
         if (_lookupCache?.TryGetValue(id.IdName, out var cached) == true
             && cached.scopeIndex < Scopes.Count
-            && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue))
+            && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue2))
         {
-            return cachedValue;
+            // 更新增强缓存
+            _variableCache?.Set(id.IdName, cachedValue2, cached.scopeIndex);
+            Interpreter?.PerformanceMonitor?.RecordVariableLookup("simple_cache", true);
+            return cachedValue2;
         }
 
         // 慢速路径：完整查找
@@ -734,9 +793,18 @@ public class VariateManager
         {
             if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
-                // 更新缓存
+                // 更新所有缓存
                 _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
                 _lookupCache[id.IdName] = (i, value);
+                _variableCache?.Set(id.IdName, value, i);
+
+                // 如果是全局变量，也更新全局缓存
+                if (i == 0 && _globalVariableCache != null)
+                {
+                    _globalVariableCache[id.IdName] = value;
+                }
+
+                Interpreter?.PerformanceMonitor?.RecordVariableLookup($"scope_{i}", false);
                 return value;
             }
         }
@@ -749,6 +817,7 @@ public class VariateManager
             {
                 // 将符号缓存到当前作用域，避免下次再查找
                 Scopes[^1][id.IdName] = symbol;
+                _variableCache?.Set(id.IdName, symbol, Scopes.Count - 1);
                 return symbol;
             }
         }
@@ -1225,4 +1294,49 @@ public class VariateManager
 
         return generatorManager;
     }
+
+    #region Performance Optimization
+
+    /// <summary>
+    /// 启用增强的变量缓存（用于性能优化）
+    /// </summary>
+    /// <param name="cacheSize">缓存大小，默认1000</param>
+    public void EnableEnhancedCache(int cacheSize = 1000)
+    {
+        _variableCache = new VariableCache(cacheSize);
+        _globalVariableCache = new Dictionary<string, LangValueType>();
+
+        // 预填充全局变量缓存
+        if (Scopes.Count > 0)
+        {
+            foreach (var kvp in Scopes[0])
+            {
+                _globalVariableCache[kvp.Key] = kvp.Value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 禁用增强的变量缓存
+    /// </summary>
+    public void DisableEnhancedCache()
+    {
+        _variableCache = null;
+        _globalVariableCache = null;
+    }
+
+    /// <summary>
+    /// 获取缓存统计信息
+    /// </summary>
+    public (int hitCount, int missCount, double hitRate) GetCacheStats()
+    {
+        if (_variableCache == null)
+        {
+            return (0, 0, 0);
+        }
+
+        return (_variableCache.HitCount, _variableCache.MissCount, _variableCache.HitRate);
+    }
+
+    #endregion
 }
