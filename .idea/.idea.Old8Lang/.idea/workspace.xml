@@ -23,15 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/checklists/requirements.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/contracts/performance-monitoring-api.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/data-model.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/plan.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/quickstart.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/research.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/spec.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/tasks.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -919,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="931" />
+    <option name="localTasksCounter" value="932" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,7 +940,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加VM模式下object数组求和功能支持&#10;&#10;- 为LangListSumMethod添加object[]类型支持，实现SumHelperForArray方法&#10;- 支持VM模式下对object数组进行数值类型求和操作&#10;- 实现混合数值类型(int/double/long/float)的自动转换求和&#10;- 更新错误消息提示支持ILangList接口或object[]类型&#10;- 添加扩展方法测试文件验证VM模式功能&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
     <MESSAGE value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
     <MESSAGE value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
@@ -971,7 +964,8 @@
     <MESSAGE value="perf(parser): 添加性能验证工具并验证解析器优化效果&#10;&#10;- 新增 PerformanceValidator 类用于验证解析器性能&#10;- 实现小型、中型、大型脚本的性能测试功能&#10;- 添加 StringCache 命中率验证测试&#10;- 在 Program.cs 中集成 --validate 参数支持&#10;- 更新任务列表标记已完成的验证项&#10;- 生成性能验证报告记录优化成果" />
     <MESSAGE value="perf(parser): 优化解析器性能通过对象池和递归深度控制&#10;&#10;- 添加 Microsoft.Extensions.ObjectPool 依赖包用于对象池管理&#10;- 实现 TokenListPool 类使用对象池管理 List&lt;LangToken&gt; 实例&#10;- 在 ParserContext 中添加递归深度计数器防止栈溢出&#10;- 实现 EnterRecursion 和 ExitRecursion 方法进行递归深度管理&#10;- 修改 SourceLines 属性为预先分割避免错误报告时重复分割&#10;- 任务清单中标记相关优化任务为已完成状态" />
     <MESSAGE value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
+    <MESSAGE value="docs(specs): 添加解释器性能优化相关文档&#10;&#10;- 添加数据模型文档，定义性能指标、函数指标、作用域指标等核心实体&#10;- 添加性能监控API契约文档，规范IPerformanceMonitor和IPerformanceReporter接口&#10;- 添加实现计划文档，规划性能优化的技术方案和实施步骤&#10;- 添加快速开始指南，帮助开发者使用性能监控功能&#10;- 定义变量缓存、对象池统计、性能监控配置等数据结构&#10;- 提供性能报告生成、CLI集成、基准测试等使用场景示例" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(specs): 添加解释器性能优化相关文档&#10;&#10;- 添加数据模型文档，定义性能指标、函数指标、作用域指标等核心实体&#10;- 添加性能监控API契约文档，规范IPerformanceMonitor和IPerformanceReporter接口&#10;- 添加实现计划文档，规划性能优化的技术方案和实施步骤&#10;- 添加快速开始指南，帮助开发者使用性能监控功能&#10;- 定义变量缓存、对象池统计、性能监控配置等数据结构&#10;- 提供性能报告生成、CLI集成、基准测试等使用场景示例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

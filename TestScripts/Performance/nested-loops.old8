@@ -1,0 +1,29 @@
+// 嵌套循环测试脚本
+// 测试 100x100 嵌套循环的性能
+// 目标: 性能提升 ≥30%
+
+sum <- 0
+count <- 0
+
+// 外层循环 100 次
+for i <- 0, i < 100, i <- i + 1 {
+    // 内层循环 100 次
+    for j <- 0, j < 100, j <- j + 1 {
+        // 执行简单的算术运算
+        temp <- i * j
+        sum <- sum + temp
+        count <- count + 1
+
+        // 添加一些条件判断
+        if temp > 100 {
+            sum <- sum + 1
+        }
+
+        if temp % 10 == 0 {
+            sum <- sum - 1
+        }
+    }
+}
+
+print("Total iterations: " + count)
+print("Final sum: " + sum)

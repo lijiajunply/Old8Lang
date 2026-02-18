@@ -1,0 +1,51 @@
+// 小型测试脚本 - 50行代码
+// 用于测试小型脚本的执行性能
+// 目标: <100ms 执行时间
+
+// 变量赋值和算术运算
+a <- 10
+b <- 20
+c <- a + b
+d <- c * 2
+e <- d - 5
+
+// 函数定义和调用
+func add(x, y) {
+    return x + y
+}
+
+func multiply(x, y) {
+    return x * y
+}
+
+func calculate(a, b, c) {
+    temp1 <- add(a, b)
+    temp2 <- multiply(temp1, c)
+    return temp2
+}
+
+// 循环操作
+sum <- 0
+for i <- 0, i < 100, i <- i + 1 {
+    sum <- sum + i
+}
+
+// 条件判断
+result <- 0
+if sum > 50 {
+    result <- calculate(a, b, c)
+} else {
+    result <- add(a, b)
+}
+
+// 数组操作
+arr <- [1, 2, 3, 4, 5]
+arr_sum <- 0
+for i <- 0, i < 5, i <- i + 1 {
+    arr_sum <- arr_sum + arr[i]
+}
+
+// 最终计算
+final_result <- result + arr_sum + sum
+
+print("Final result: " + final_result)

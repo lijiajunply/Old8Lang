@@ -27,6 +27,11 @@ public class LangInterpreter
     public readonly TypeAnnotationManager TypeAnnotationManager;
 
     /// <summary>
+    /// 性能监控器（可选）
+    /// </summary>
+    public IPerformanceMonitor? PerformanceMonitor { get; set; }
+
+    /// <summary>
     /// 源代码
     /// </summary>
     private string? SourceCode { get; set; }
