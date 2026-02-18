@@ -61,17 +61,26 @@ public sealed class StringCache
             return cached;
         }
 
-        // 检查缓存大小限制
-        if (Interlocked.Increment(ref _currentSize) <= _maxCacheSize)
+        // 检查缓存大小限制（在添加之前）
+        if (_currentSize >= _maxCacheSize)
         {
+            // 缓存已满，不再添加
             Interlocked.Increment(ref _cacheMisses);
-            return _cache.GetOrAdd(key, key);
+            return key;
         }
 
-        // 缓存已满，不再添加
-        Interlocked.Decrement(ref _currentSize);
-        Interlocked.Increment(ref _cacheMisses);
-        return key;
+        // 尝试添加到缓存（使用 TryAdd 避免重复添加）
+        if (_cache.TryAdd(key, key))
+        {
+            // 成功添加，增加计数
+            Interlocked.Increment(ref _currentSize);
+            Interlocked.Increment(ref _cacheMisses);
+            return key;
+        }
+
+        // 并发情况下，其他线程已经添加了相同的键
+        Interlocked.Increment(ref _cacheHits);
+        return _cache[key];
     }
 
     /// <summary>

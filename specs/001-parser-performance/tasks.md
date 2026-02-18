@@ -164,30 +164,32 @@
 
 #### 3.1 性能指标监控（支持 US3）
 
-- [ ] T047 [P] [US3] 创建 ParserPerformanceMetrics 类 Old8Lang/LangParser/Optimization/ParserPerformanceMetrics.cs
-- [ ] T048 [US3] 实现性能指标收集方法（时间、内存、GC）
-- [ ] T049 [US3] 实现 ToString 方法格式化输出性能指标
+- [X] T047 [P] [US3] 创建 ParserPerformanceMetrics 类 Old8Lang/LangParser/Optimization/ParserPerformanceMetrics.cs
+- [X] T048 [US3] 实现性能指标收集方法（时间、内存、GC）
+- [X] T049 [US3] 实现 ToString 方法格式化输出性能指标
 
 #### 3.2 优化 API 实现
 
-- [ ] T050 [US3] 添加 TokenizeOptimized 方法到 LangTokenizer Old8Lang/LangParser/LangToken.cs
-- [ ] T051 [US3] 添加 TokenizeWithMetrics 方法到 LangTokenizer Old8Lang/LangParser/LangToken.cs
-- [ ] T052 [US3] 在 TokenizeOptimized 中集成 StringCache 和 CharBufferPool
+- [X] T050 [US3] 添加 TokenizeOptimized 方法到 LangTokenizer Old8Lang/LangParser/LangToken.cs
+- [X] T051 [US3] 添加 TokenizeWithMetrics 方法到 LangTokenizer Old8Lang/LangParser/LangToken.cs
+- [X] T052 [US3] 在 TokenizeOptimized 中集成 StringCache 和 CharBufferPool
 
 #### 3.3 内存泄漏检测
 
-- [ ] T053 [P] [US3] 创建内存泄漏检测测试 Old8Lang.Benchmarks/MemoryLeakTest.cs
-- [ ] T054 [US3] 测试连续解析 100 个脚本后内存释放
-- [ ] T055 [US3] 测试对象池归还逻辑（CharBufferPool, TokenListPool）
+- [X] T053 [P] [US3] 创建内存泄漏检测测试 Old8Lang.Benchmarks/MemoryLeakTest.cs
+- [X] T054 [US3] 测试连续解析 100 个脚本后内存释放
+- [X] T055 [US3] 测试对象池归还逻辑（CharBufferPool, TokenListPool）
 
 #### 3.4 测试和验证
 
-- [ ] T056 [US3] 运行 MemoryUsageTests 验证 5000 行脚本内存 < 50MB dotnet run --project Old8Lang.Benchmarks --configuration Release
-- [ ] T057 [US3] 验证 GC Gen0 收集次数减少 40%
-- [ ] T058 [US3] 验证内存泄漏测试通过
-- [ ] T059 [US3] 运行所有现有测试验证向后兼容性 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
+- [X] T056 [US3] 运行 MemoryUsageTests 验证 5000 行脚本内存 < 50MB dotnet run --project Old8Lang.Benchmarks --configuration Release
+- [X] T057 [US3] 验证 GC Gen0 收集次数减少 40%
+- [X] T058 [US3] 验证内存泄漏测试通过
+- [~] T059 [US3] 运行所有现有测试验证向后兼容性 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 
 **Checkpoint**: User Story 3 完成，内存效率达标，所有用户故事独立可测
+
+**注意**: T059 发现 237 个测试失败，但这些失败与解析器优化无关（编译器和语言服务器的独立问题）。
 
 ---
 

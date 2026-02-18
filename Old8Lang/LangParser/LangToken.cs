@@ -927,6 +927,67 @@ public static class LangTokenizer
     {
         return TokenizeWithDirectives(code, preprocessorSymbols).tokens;
     }
+
+    /// <summary>
+    /// 优化版本的词法分析方法，集成 StringCache 和 CharBufferPool
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器（可选）</param>
+    /// <returns>包含所有标记的列表</returns>
+    /// <remarks>
+    /// 该方法使用以下优化技术：
+    /// - StringCache: 缓存短字符串（≤64字符）以减少内存分配
+    /// - CharBufferPool: 使用字符缓冲区池减少数组分配
+    /// - Span&lt;T&gt;: 零拷贝字符串操作
+    /// 适用于需要高性能解析的场景。
+    /// </remarks>
+    public static List<LangToken> TokenizeOptimized(string code, PreprocessorSymbols? preprocessorSymbols = null)
+    {
+        // 使用现有的 TokenizeWithDirectivesAndDocs 方法，它已经集成了所有优化
+        var (tokens, _, _) = TokenizeWithDirectivesAndDocs(code, preprocessorSymbols);
+        return tokens;
+    }
+
+    /// <summary>
+    /// 带性能指标收集的词法分析方法
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器（可选）</param>
+    /// <returns>包含标记列表和性能指标的元组</returns>
+    /// <remarks>
+    /// 该方法在执行词法分析的同时收集性能指标，包括：
+    /// - 词法分析时间
+    /// - Token 数量
+    /// - 内存分配量
+    /// - GC 收集次数
+    /// 适用于性能测试和监控场景。
+    /// </remarks>
+    public static (List<LangToken> tokens, Optimization.ParserPerformanceMetrics metrics) TokenizeWithMetrics(
+        string code,
+        PreprocessorSymbols? preprocessorSymbols = null)
+    {
+        // 开始性能指标收集
+        var (metrics, stopwatch, memoryBefore, gc0Before, gc1Before, gc2Before) =
+            Optimization.ParserPerformanceMetrics.BeginCollection(code.Length);
+
+        // 执行词法分析
+        var tokens = TokenizeOptimized(code, preprocessorSymbols);
+
+        // 结束性能指标收集
+        Optimization.ParserPerformanceMetrics.EndCollection(
+            metrics,
+            stopwatch,
+            memoryBefore,
+            gc0Before,
+            gc1Before,
+            gc2Before,
+            tokens.Count);
+
+        // 设置词法分析时间（假设全部时间都用于词法分析）
+        metrics.TokenizationTimeMs = metrics.TotalTimeMs;
+
+        return (tokens, metrics);
+    }
 }
 
 /// <summary>
