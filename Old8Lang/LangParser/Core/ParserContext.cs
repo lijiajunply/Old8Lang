@@ -9,6 +9,7 @@ public class ParserContext
 {
     private readonly List<LangToken> _tokens;
     private TokenIndexCache? _tokenIndexCache; // Token 索引缓存
+    private int _recursionDepth; // 递归深度计数器
 
     /// <summary>
     /// 源代码（用于错误上下文）
@@ -39,20 +40,7 @@ public class ParserContext
     /// 获取缓存的源代码行（延迟初始化，避免在无错误时分割）
     /// 注意：保留空行以确保行号正确匹配
     /// </summary>
-    public string[] SourceLines
-    {
-        get
-        {
-            if (field is null && !string.IsNullOrEmpty(SourceCode))
-            {
-                // 使用 '\n' 分割并保留空行，确保行号正确对应
-                // 注意：Split by '\n' 会保留 '\r'，所以需要在使用时 Trim
-                field = SourceCode.Split('\n');
-            }
-
-            return field ?? [];
-        }
-    }
+    public string[] SourceLines { get; private set; } = Array.Empty<string>();
 
     /// <summary>
     /// 获取令牌列表
@@ -78,6 +66,13 @@ public class ParserContext
         SourceCode = sourceCode;
         FileName = fileName;
         CurrentIndex = 0;
+        _recursionDepth = 0;
+
+        // 预先分割源代码行，避免在错误报告时重复分割
+        if (!string.IsNullOrEmpty(sourceCode))
+        {
+            SourceLines = sourceCode.Split('\n');
+        }
     }
 
     /// <summary>
@@ -111,5 +106,29 @@ public class ParserContext
         }
 
         return _tokenIndexCache;
+    }
+
+    /// <summary>
+    /// 进入递归层级（用于防止栈溢出）
+    /// </summary>
+    /// <exception cref="Error.SyntaxError">当递归深度超过限制时抛出</exception>
+    public void EnterRecursion()
+    {
+        if (++_recursionDepth > 500)
+        {
+            throw new Error.SyntaxError(
+                "表达式嵌套过深",
+                0,
+                0,
+                "表达式嵌套层数超过最大限制（500层），可能存在无限递归");
+        }
+    }
+
+    /// <summary>
+    /// 退出递归层级
+    /// </summary>
+    public void ExitRecursion()
+    {
+        _recursionDepth--;
     }
 }

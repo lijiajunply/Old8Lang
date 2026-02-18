@@ -11,6 +11,7 @@
         <PackageReference Include="Jint" Version="4.4.2" />
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="10.0.0" />
         <PackageReference Include="dnlib" Version="4.5.0" />
         <PackageReference Include="pythonnet" Version="3.0.5" />
         <!-- 使用 NuGet 包替代项目引用 -->

@@ -112,22 +112,22 @@
 
 #### 2.1 递归表达式解析优化（P1 优化）
 
-- [ ] T032 [US2] 在 ParserContext 中添加递归深度管理字段 Old8Lang/LangParser/Core/ParserContext.cs
-- [ ] T033 [US2] 实现 EnterRecursion 和 ExitRecursion 方法 Old8Lang/LangParser/Core/ParserContext.cs
+- [X] T032 [US2] 在 ParserContext 中添加递归深度管理字段 Old8Lang/LangParser/Core/ParserContext.cs
+- [X] T033 [US2] 实现 EnterRecursion 和 ExitRecursion 方法 Old8Lang/LangParser/Core/ParserContext.cs
 - [ ] T034 [US2] 优化幂运算解析：使用显式栈替代递归 Old8Lang/LangParser/Parsers/ExpressionParser.cs (行 201-230)
 - [ ] T035 [US2] 优化三元表达式解析：减少递归深度 Old8Lang/LangParser/Parsers/ExpressionParser.cs (行 82-116)
 - [ ] T036 [US2] 在所有递归解析方法中添加深度检查
 
 #### 2.2 ParserContext 优化（P2 优化）
 
-- [ ] T037 [US2] 预先分割 SourceLines 在构造函数中 Old8Lang/LangParser/Core/ParserContext.cs (行 42-55)
+- [X] T037 [US2] 预先分割 SourceLines 在构造函数中 Old8Lang/LangParser/Core/ParserContext.cs (行 42-55)
 - [ ] T038 [US2] 优化 TokenIndexCache 初始化：在构造函数中预先构建 Old8Lang/LangParser/Core/TokenIndexCache.cs
 
 #### 2.3 集合元素解析优化（P2 优化）
 
-- [ ] T039 [P] [US2] 创建 TokenListPool 类 Old8Lang/LangParser/Optimization/TokenListPool.cs
-- [ ] T040 [US2] 实现 TokenListPool.Rent 方法（使用 ObjectPool<List<LangToken>>）
-- [ ] T041 [US2] 实现 TokenListPool.Return 方法
+- [X] T039 [P] [US2] 创建 TokenListPool 类 Old8Lang/LangParser/Optimization/TokenListPool.cs
+- [X] T040 [US2] 实现 TokenListPool.Rent 方法（使用 ObjectPool<List<LangToken>>）
+- [X] T041 [US2] 实现 TokenListPool.Return 方法
 - [ ] T042 [US2] 在 Tokenizer 中使用 TokenListPool Old8Lang/LangParser/LangToken.cs (行 94)
 
 #### 2.4 测试和验证
