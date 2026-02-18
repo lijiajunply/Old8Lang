@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

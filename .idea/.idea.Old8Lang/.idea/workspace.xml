@@ -22,11 +22,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/CacheStatistics.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/CharBufferPool.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/StringCache.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/baseline-results.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/MemoryUsageTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/MemoryUsageTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/JsonLibTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -314,7 +321,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+      <changelist id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="" />
       <created>1669093959861</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -565,6 +572,7 @@
       <workItem from="1771339503161" duration="2365000" />
       <workItem from="1771341956377" duration="364000" />
       <workItem from="1771342366048" duration="1517000" />
+      <workItem from="1771394553923" duration="606000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

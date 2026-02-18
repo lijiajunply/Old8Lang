@@ -56,7 +56,10 @@
       "Bash(powershell.exe -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-plan.ps1 -Json)",
       "WebSearch",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)",
-      "Bash(dotnet:*)"
+      "Bash(dotnet:*)",
+      "Bash(pwsh -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(powershell.exe -NoProfile -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(test:*)"
     ]
   }
 }

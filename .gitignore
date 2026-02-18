@@ -11,3 +11,14 @@ riderModule.iml
 Old8Lang.Tests/OldLib
 
 nul
+
+# C#/.NET specific
+*.user
+*.suo
+.vs/
+*.log
+.env*
+TestResults/
+BenchmarkDotNet.Artifacts/
+*.swp
+*.tmp
