@@ -23,15 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/VariableCacheTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariableCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/implementation-progress.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestScripts/Performance/cache-test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-interpreter-performance/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-interpreter-performance/tasks.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,51 +108,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.FirstUI.TestApp.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "1283e73f-d696-41fc-82f8-bfc626de0827.executor": "Debug",
-    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
-    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
-    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "001-interpreter-performance",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;1283e73f-d696-41fc-82f8-bfc626de0827.executor&quot;: &quot;Debug&quot;,
+    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
+    &quot;3af05a97-c6e2-49ab-b044-50109a642364.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
+    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;001-interpreter-performance&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -577,6 +572,7 @@
       <workItem from="1771341956377" duration="364000" />
       <workItem from="1771342366048" duration="1517000" />
       <workItem from="1771394553923" duration="4238000" />
+      <workItem from="1771420401696" duration="1267000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -921,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="934" />
+    <option name="localTasksCounter" value="935" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -948,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
     <MESSAGE value="feat(lang): 添加 ILangList 类型转换方法实现&#10;&#10;- 实现 ToList、ToArray、ToTuple、ToDict 通用转换方法&#10;- 为 List、Array、Tuple、Dictionary 类型添加转换方法包装器&#10;- 在实例方法初始化器中注册所有转换方法&#10;- 添加完整的转换方法测试用例文件&#10;- 重构 BaseValueTypeMethod 中的类型转换逻辑&#10;- 更新 IDE 工作区配置文件中的变更记录" />
     <MESSAGE value="refactor(lang): 简化数组实例方法调用逻辑并移除冗余转换方法&#10;&#10;- 移除 ArrayLangValue 中的方法名白名单检查，直接调用 FromClassToResult&#10;- 删除 ListToArrayMethod 和通用 LangList 转换方法注册&#10;- 将 Program.cs 中的参数从 -vm 修改为 -f&#10;- 更新 IDE 工作区配置中的执行器设置为 Debug 模式" />
     <MESSAGE value="refactor(vm): 提取类型映射逻辑到专用VMTypeMapper类&#10;&#10;- 将BaseInstanceMethod中的IsEquivalentType方法替换为VMTypeMapper调用&#10;- 移除VirtualMachine.Helpers.ReflectionAndTasks中的GetEquivalentLangType方法&#10;- 将类型等价检查逻辑统一到新创建的VMTypeMapper类中&#10;- 添加VMTypeMapper类处理C#原生类型与Old8Lang类型间的映射关系&#10;- 更新程序启动参数从-f改为-vm&#10;- 修改IDE配置文件中的调试设置和测试路径记录" />
@@ -973,7 +968,8 @@
     <MESSAGE value="docs(specs): 添加解释器性能优化相关文档&#10;&#10;- 添加数据模型文档，定义性能指标、函数指标、作用域指标等核心实体&#10;- 添加性能监控API契约文档，规范IPerformanceMonitor和IPerformanceReporter接口&#10;- 添加实现计划文档，规划性能优化的技术方案和实施步骤&#10;- 添加快速开始指南，帮助开发者使用性能监控功能&#10;- 定义变量缓存、对象池统计、性能监控配置等数据结构&#10;- 提供性能报告生成、CLI集成、基准测试等使用场景示例" />
     <MESSAGE value="feat(interpreter): 添加性能监控功能和基准测试框架&#10;&#10;- 在LangInterpreter中集成IPerformanceMonitor接口支持性能监控&#10;- 创建PerformanceMetrics数据模型用于存储解释器执行的性能统计数据&#10;- 实现函数调用、变量查找、循环迭代等性能指标记录功能&#10;- 添加FunctionCallBenchmark和LoopExecutionBenchmark基准测试&#10;- 创建InterpreterBenchmarkBase作为解释器基准测试基类&#10;- 添加nested-loops.old8性能测试脚本用于100x100循环测试&#10;- 在workspace.xml中更新任务计数器和变更列表记录" />
     <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
+    <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
