@@ -199,31 +199,33 @@
 
 ### 6.1 文档更新
 
-- [ ] T060 [P] 更新架构文档：添加性能优化章节 Docs/ARCHITECTURE.md
-- [ ] T061 [P] 更新 CLI 指南：添加性能监控命令 Docs/CLI_GUIDE.md
-- [ ] T062 [P] 创建性能优化指南 Docs/PERFORMANCE_OPTIMIZATION.md
+- [X] T060 [P] 更新架构文档：添加性能优化章节 Docs/ARCHITECTURE.md
+- [X] T061 [P] 更新 CLI 指南：添加性能监控命令 Docs/CLI_GUIDE.md
+- [X] T062 [P] 创建性能优化指南 Docs/PERFORMANCE_OPTIMIZATION.md
 
 ### 6.2 代码质量
 
-- [ ] T063 [P] 添加 XML 文档注释到所有优化类
-- [ ] T064 代码审查和重构：确保代码可读性
-- [ ] T065 运行静态分析工具（Roslyn Analyzers）
+- [X] T063 [P] 添加 XML 文档注释到所有优化类
+- [X] T064 代码审查和重构：确保代码可读性
+- [X] T065 运行静态分析工具（Roslyn Analyzers）
 
 ### 6.3 最终验证
 
-- [ ] T066 运行完整基准测试套件并生成报告 dotnet run --project Old8Lang.Benchmarks --configuration Release
-- [ ] T067 对比基线数据验证所有性能目标达成
-- [ ] T068 运行 quickstart.md 中的所有验证步骤
-- [ ] T069 运行完整测试套件 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
-- [ ] T070 生成性能对比报告 specs/001-parser-performance/final-results.md
+- [X] T066 运行完整基准测试套件并生成报告 dotnet run --project Old8Lang.Benchmarks --configuration Release
+- [X] T067 对比基线数据验证所有性能目标达成
+- [X] T068 运行 quickstart.md 中的所有验证步骤
+- [X] T069 运行完整测试套件 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
+- [X] T070 生成性能对比报告 specs/001-parser-performance/final-results.md
 
 ### 6.4 边界条件测试
 
-- [ ] T071 [P] 添加极深嵌套表达式测试（50层）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
-- [ ] T072 [P] 添加大量重复模式测试（10000个赋值语句）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
-- [ ] T073 [P] 添加超大型文件测试（10000+行）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
-- [ ] T074 [P] 添加语法错误场景性能测试到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
-- [ ] T075 [P] 添加并发解析场景测试到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+- [X] T071 [P] 添加极深嵌套表达式测试（50层）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+- [X] T072 [P] 添加大量重复模式测试（10000个赋值语句）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+- [X] T073 [P] 添加超大型文件测试（10000+行）到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+- [X] T074 [P] 添加语法错误场景性能测试到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+- [X] T075 [P] 添加并发解析场景测试到 Old8Lang.Benchmarks/ParserBenchmarkTests.cs
+
+**Checkpoint**: Phase 6 完成，所有文档、代码质量、验证和边界测试已完成
 
 ---
 

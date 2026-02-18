@@ -566,4 +566,118 @@ public class ParserBenchmarkTests
     }
 
     #endregion
+
+    #region Boundary Condition Tests
+
+    // T071: 极深嵌套表达式测试（50层）
+    [Benchmark(Description = "Parse Deeply Nested Expression (50 layers)")]
+    public BlockStatement ParseDeeplyNestedExpression()
+    {
+        // 生成 50 层嵌套的三元表达式
+        var sb = new StringBuilder();
+        sb.Append("result <- ");
+        for (int i = 0; i < 50; i++)
+        {
+            sb.Append("(a > b ? ");
+        }
+        sb.Append("1");
+        for (int i = 0; i < 50; i++)
+        {
+            sb.Append(" : 0)");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T072: 大量重复模式测试（10000个赋值语句）
+    [Benchmark(Description = "Parse Massive Assignments (10000 statements)")]
+    public BlockStatement ParseMassiveAssignments()
+    {
+        var sb = new StringBuilder();
+        for (int i = 0; i < 10000; i++)
+        {
+            sb.AppendLine($"var{i} <- {i}");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T073: 超大型文件测试（10000+行）
+    [Benchmark(Description = "Parse Extra Large File (10000+ lines)")]
+    public BlockStatement ParseExtraLargeFile()
+    {
+        var sb = new StringBuilder();
+
+        // 生成 10000 行混合代码
+        for (int i = 0; i < 2000; i++)
+        {
+            sb.AppendLine($"// 函数 {i}");
+            sb.AppendLine($"func function{i}(x, y) {{");
+            sb.AppendLine($"    result <- x + y");
+            sb.AppendLine($"    return result");
+            sb.AppendLine($"}}");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T074: 语法错误场景性能测试
+    [Benchmark(Description = "Parse with Syntax Errors")]
+    public void ParseWithSyntaxErrors()
+    {
+        var code = """
+            func test() {
+                a <- 1
+                b <- 2
+                // 故意的语法错误
+                c <-
+                d <- 3
+            }
+            """;
+
+        try
+        {
+            var tokens = LangTokenizer.Tokenize(code);
+            var parser = new LangParserClass(tokens, code);
+            parser.ParseProgram();
+        }
+        catch
+        {
+            // 预期会抛出异常
+        }
+    }
+
+    // T075: 并发解析场景测试
+    [Benchmark(Description = "Concurrent Parsing (4 threads)")]
+    public void ConcurrentParsing()
+    {
+        var code = """
+            func calculate(x, y) {
+                result <- x + y
+                return result
+            }
+
+            a <- calculate(10, 20)
+            b <- calculate(30, 40)
+            """;
+
+        // 并发解析 4 次
+        Parallel.For(0, 4, i =>
+        {
+            var tokens = LangTokenizer.Tokenize(code);
+            var parser = new LangParserClass(tokens, code);
+            parser.ParseProgram();
+        });
+    }
+
+    #endregion
 }
