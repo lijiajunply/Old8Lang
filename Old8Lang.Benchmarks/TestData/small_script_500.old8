@@ -1,0 +1,500 @@
+// Old8Lang 性能测试脚本
+// 目标行数: 500
+// 生成时间: 2026-02-17 23:29:22
+
+variable_0 <- 0
+variable_1 <- 10
+variable_2 <- 20
+variable_3 <- 30
+variable_4 <- 40
+variable_5 <- 50
+variable_6 <- 60
+variable_7 <- 70
+variable_8 <- 80
+variable_9 <- 90
+variable_10 <- 100
+variable_11 <- 110
+variable_12 <- 120
+variable_13 <- 130
+variable_14 <- 140
+variable_15 <- 150
+variable_16 <- 160
+variable_17 <- 170
+variable_18 <- 180
+variable_19 <- 190
+variable_20 <- 200
+variable_21 <- 210
+variable_22 <- 220
+variable_23 <- 230
+variable_24 <- 240
+variable_25 <- 250
+variable_26 <- 260
+variable_27 <- 270
+variable_28 <- 280
+variable_29 <- 290
+variable_30 <- 300
+variable_31 <- 310
+variable_32 <- 320
+variable_33 <- 330
+variable_34 <- 340
+variable_35 <- 350
+variable_36 <- 360
+variable_37 <- 370
+variable_38 <- 380
+variable_39 <- 390
+variable_40 <- 400
+variable_41 <- 410
+variable_42 <- 420
+variable_43 <- 430
+variable_44 <- 440
+variable_45 <- 450
+variable_46 <- 460
+variable_47 <- 470
+variable_48 <- 480
+variable_49 <- 490
+
+/// 函数 0 的文档注释
+func testFunction_0(param1, param2) {
+    result <- param1 + param2 + 0
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 1 的文档注释
+func testFunction_1(param1, param2) {
+    result <- param1 + param2 + 1
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 2 的文档注释
+func testFunction_2(param1, param2) {
+    result <- param1 + param2 + 2
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 3 的文档注释
+func testFunction_3(param1, param2) {
+    result <- param1 + param2 + 3
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 4 的文档注释
+func testFunction_4(param1, param2) {
+    result <- param1 + param2 + 4
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 5 的文档注释
+func testFunction_5(param1, param2) {
+    result <- param1 + param2 + 5
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 6 的文档注释
+func testFunction_6(param1, param2) {
+    result <- param1 + param2 + 6
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 7 的文档注释
+func testFunction_7(param1, param2) {
+    result <- param1 + param2 + 7
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 8 的文档注释
+func testFunction_8(param1, param2) {
+    result <- param1 + param2 + 8
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 9 的文档注释
+func testFunction_9(param1, param2) {
+    result <- param1 + param2 + 9
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 10 的文档注释
+func testFunction_10(param1, param2) {
+    result <- param1 + param2 + 10
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 11 的文档注释
+func testFunction_11(param1, param2) {
+    result <- param1 + param2 + 11
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 12 的文档注释
+func testFunction_12(param1, param2) {
+    result <- param1 + param2 + 12
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 13 的文档注释
+func testFunction_13(param1, param2) {
+    result <- param1 + param2 + 13
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 14 的文档注释
+func testFunction_14(param1, param2) {
+    result <- param1 + param2 + 14
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 函数 15 的文档注释
+func testFunction_15(param1, param2) {
+    result <- param1 + param2 + 15
+    if (result > 100) {
+        return result * 2
+    } else {
+        return result
+    }
+}
+
+/// 类 0 的文档注释
+class TestClass_0 {
+    field1 <- 0
+    field2 <- "0_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_0() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 1 的文档注释
+class TestClass_1 {
+    field1 <- 1
+    field2 <- "1_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_1() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 2 的文档注释
+class TestClass_2 {
+    field1 <- 2
+    field2 <- "2_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_2() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 3 的文档注释
+class TestClass_3 {
+    field1 <- 3
+    field2 <- "3_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_3() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 4 的文档注释
+class TestClass_4 {
+    field1 <- 4
+    field2 <- "4_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_4() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 5 的文档注释
+class TestClass_5 {
+    field1 <- 5
+    field2 <- "5_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_5() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 6 的文档注释
+class TestClass_6 {
+    field1 <- 6
+    field2 <- "6_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_6() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 7 的文档注释
+class TestClass_7 {
+    field1 <- 7
+    field2 <- "7_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_7() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 8 的文档注释
+class TestClass_8 {
+    field1 <- 8
+    field2 <- "8_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_8() {
+        return this.field1 + this.field2
+    }
+}
+
+/// 类 9 的文档注释
+class TestClass_9 {
+    field1 <- 9
+    field2 <- "9_value"
+
+    func constructor(value) {
+        this.field1 <- value
+    }
+
+    func method_9() {
+        return this.field1 + this.field2
+    }
+}
+
+expr_355 <- 355 + 710 - 177
+if (356 % 2 == 0) { temp <- 356 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_358 <- [358, 359, 360]
+dict_359 <- { "key": 359, "value": "359" }
+expr_360 <- 360 + 720 - 180
+if (361 % 2 == 0) { temp <- 361 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_363 <- [363, 364, 365]
+dict_364 <- { "key": 364, "value": "364" }
+expr_365 <- 365 + 730 - 182
+if (366 % 2 == 0) { temp <- 366 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_368 <- [368, 369, 370]
+dict_369 <- { "key": 369, "value": "369" }
+expr_370 <- 370 + 740 - 185
+if (371 % 2 == 0) { temp <- 371 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_373 <- [373, 374, 375]
+dict_374 <- { "key": 374, "value": "374" }
+expr_375 <- 375 + 750 - 187
+if (376 % 2 == 0) { temp <- 376 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_378 <- [378, 379, 380]
+dict_379 <- { "key": 379, "value": "379" }
+expr_380 <- 380 + 760 - 190
+if (381 % 2 == 0) { temp <- 381 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_383 <- [383, 384, 385]
+dict_384 <- { "key": 384, "value": "384" }
+expr_385 <- 385 + 770 - 192
+if (386 % 2 == 0) { temp <- 386 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_388 <- [388, 389, 390]
+dict_389 <- { "key": 389, "value": "389" }
+expr_390 <- 390 + 780 - 195
+if (391 % 2 == 0) { temp <- 391 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_393 <- [393, 394, 395]
+dict_394 <- { "key": 394, "value": "394" }
+expr_395 <- 395 + 790 - 197
+if (396 % 2 == 0) { temp <- 396 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_398 <- [398, 399, 400]
+dict_399 <- { "key": 399, "value": "399" }
+expr_400 <- 400 + 800 - 200
+if (401 % 2 == 0) { temp <- 401 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_403 <- [403, 404, 405]
+dict_404 <- { "key": 404, "value": "404" }
+expr_405 <- 405 + 810 - 202
+if (406 % 2 == 0) { temp <- 406 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_408 <- [408, 409, 410]
+dict_409 <- { "key": 409, "value": "409" }
+expr_410 <- 410 + 820 - 205
+if (411 % 2 == 0) { temp <- 411 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_413 <- [413, 414, 415]
+dict_414 <- { "key": 414, "value": "414" }
+expr_415 <- 415 + 830 - 207
+if (416 % 2 == 0) { temp <- 416 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_418 <- [418, 419, 420]
+dict_419 <- { "key": 419, "value": "419" }
+expr_420 <- 420 + 840 - 210
+if (421 % 2 == 0) { temp <- 421 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_423 <- [423, 424, 425]
+dict_424 <- { "key": 424, "value": "424" }
+expr_425 <- 425 + 850 - 212
+if (426 % 2 == 0) { temp <- 426 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_428 <- [428, 429, 430]
+dict_429 <- { "key": 429, "value": "429" }
+expr_430 <- 430 + 860 - 215
+if (431 % 2 == 0) { temp <- 431 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_433 <- [433, 434, 435]
+dict_434 <- { "key": 434, "value": "434" }
+expr_435 <- 435 + 870 - 217
+if (436 % 2 == 0) { temp <- 436 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_438 <- [438, 439, 440]
+dict_439 <- { "key": 439, "value": "439" }
+expr_440 <- 440 + 880 - 220
+if (441 % 2 == 0) { temp <- 441 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_443 <- [443, 444, 445]
+dict_444 <- { "key": 444, "value": "444" }
+expr_445 <- 445 + 890 - 222
+if (446 % 2 == 0) { temp <- 446 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_448 <- [448, 449, 450]
+dict_449 <- { "key": 449, "value": "449" }
+expr_450 <- 450 + 900 - 225
+if (451 % 2 == 0) { temp <- 451 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_453 <- [453, 454, 455]
+dict_454 <- { "key": 454, "value": "454" }
+expr_455 <- 455 + 910 - 227
+if (456 % 2 == 0) { temp <- 456 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_458 <- [458, 459, 460]
+dict_459 <- { "key": 459, "value": "459" }
+expr_460 <- 460 + 920 - 230
+if (461 % 2 == 0) { temp <- 461 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_463 <- [463, 464, 465]
+dict_464 <- { "key": 464, "value": "464" }
+expr_465 <- 465 + 930 - 232
+if (466 % 2 == 0) { temp <- 466 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_468 <- [468, 469, 470]
+dict_469 <- { "key": 469, "value": "469" }
+expr_470 <- 470 + 940 - 235
+if (471 % 2 == 0) { temp <- 471 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_473 <- [473, 474, 475]
+dict_474 <- { "key": 474, "value": "474" }
+expr_475 <- 475 + 950 - 237
+if (476 % 2 == 0) { temp <- 476 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_478 <- [478, 479, 480]
+dict_479 <- { "key": 479, "value": "479" }
+expr_480 <- 480 + 960 - 240
+if (481 % 2 == 0) { temp <- 481 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_483 <- [483, 484, 485]
+dict_484 <- { "key": 484, "value": "484" }
+expr_485 <- 485 + 970 - 242
+if (486 % 2 == 0) { temp <- 486 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_488 <- [488, 489, 490]
+dict_489 <- { "key": 489, "value": "489" }
+expr_490 <- 490 + 980 - 245
+if (491 % 2 == 0) { temp <- 491 }
+for (i <- 0, i < 2, i <- i + 1) { loop_var <- i }
+array_493 <- [493, 494, 495]
+dict_494 <- { "key": 494, "value": "494" }
+expr_495 <- 495 + 990 - 247
+if (496 % 2 == 0) { temp <- 496 }
+for (i <- 0, i < 7, i <- i + 1) { loop_var <- i }
+array_498 <- [498, 499, 500]
+dict_499 <- { "key": 499, "value": "499" }

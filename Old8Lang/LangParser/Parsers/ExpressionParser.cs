@@ -84,31 +84,40 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
         // 检查是否有 ?，这是三元表达式的标志
         if (CurrentToken.Type == LangTokenType.Question)
         {
-            var questionToken = CurrentToken;
-            Expect(LangTokenType.Question);
-
-            // 解析问号后的表达式（true分支）
-            var trueExpr = ParseExpression();
-
-            // 检查是否有 :，这是三元表达式的分支分隔符
-            if (CurrentToken.Type == LangTokenType.Colon)
+            // 递归深度检查
+            Context.EnterRecursion();
+            try
             {
-                Expect(LangTokenType.Colon);
+                var questionToken = CurrentToken;
+                Expect(LangTokenType.Question);
 
-                // 解析冒号后的表达式（false分支）
-                var falseExpr = ParseExpression();
+                // 解析问号后的表达式（true分支）
+                var trueExpr = ParseExpression();
 
-                // 创建三元表达式节点
-                // 语法：condition ? trueExpr : falseExpr
-                return new TernaryExpression(
-                    condition,
-                    trueExpr,
-                    falseExpr,
-                    new SourcePosition(questionToken.Line, questionToken.Column));
+                // 检查是否有 :，这是三元表达式的分支分隔符
+                if (CurrentToken.Type == LangTokenType.Colon)
+                {
+                    Expect(LangTokenType.Colon);
+
+                    // 解析冒号后的表达式（false分支）
+                    var falseExpr = ParseExpression();
+
+                    // 创建三元表达式节点
+                    // 语法：condition ? trueExpr : falseExpr
+                    return new TernaryExpression(
+                        condition,
+                        trueExpr,
+                        falseExpr,
+                        new SourcePosition(questionToken.Line, questionToken.Column));
+                }
+
+                // 三元表达式缺少冒号，抛出错误
+                throw CreateSyntaxError("语法错误：三元表达式不完整，缺少 ':' 和假值分支。建议：使用完整的三元表达式格式 'condition ? trueValue : falseValue'。");
             }
-
-            // 三元表达式缺少冒号，抛出错误
-            throw CreateSyntaxError("语法错误：三元表达式不完整，缺少 ':' 和假值分支。建议：使用完整的三元表达式格式 'condition ? trueValue : falseValue'。");
+            finally
+            {
+                Context.ExitRecursion();
+            }
         }
 
         // 不是三元表达式，返回原始条件表达式
@@ -201,32 +210,41 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
     // 处理幂运算（右结合）
     public LangExpression ParsePower()
     {
-        // 处理一元运算符（! 和 -）
-        if (CurrentToken.Type == LangTokenType.Exclamation || CurrentToken.Type == LangTokenType.Minus)
+        // 递归深度检查
+        Context.EnterRecursion();
+        try
         {
-            var operatorToken = CurrentToken;
-            var position = CreateSourcePosition(operatorToken);
-            Expect(operatorToken.Type);
-            var operand = ParsePower(); // 递归调用以支持多个一元运算符，如 !!a
-            return new Operation(null, operatorToken.Type, operand, position);
+            // 处理一元运算符（! 和 -）
+            if (CurrentToken.Type == LangTokenType.Exclamation || CurrentToken.Type == LangTokenType.Minus)
+            {
+                var operatorToken = CurrentToken;
+                var position = CreateSourcePosition(operatorToken);
+                Expect(operatorToken.Type);
+                var operand = ParsePower(); // 递归调用以支持多个一元运算符，如 !!a
+                return new Operation(null, operatorToken.Type, operand, position);
+            }
+
+            var left = primaryParser.ParsePrimary();
+
+            // 处理点运算符（最高优先级）
+            left = ParseDotExpr(left);
+
+            // 处理右结合的幂运算
+            if (CurrentToken.Type == LangTokenType.Caret)
+            {
+                var operatorToken = CurrentToken;
+                var position = CreateSourcePosition(operatorToken);
+                Expect(operatorToken.Type);
+                var right = ParsePower(); // 递归调用，实现右结合
+                left = new Operation(left, operatorToken.Type, right, position);
+            }
+
+            return left;
         }
-
-        var left = primaryParser.ParsePrimary();
-
-        // 处理点运算符（最高优先级）
-        left = ParseDotExpr(left);
-
-        // 处理右结合的幂运算
-        if (CurrentToken.Type == LangTokenType.Caret)
+        finally
         {
-            var operatorToken = CurrentToken;
-            var position = CreateSourcePosition(operatorToken);
-            Expect(operatorToken.Type);
-            var right = ParsePower(); // 递归调用，实现右结合
-            left = new Operation(left, operatorToken.Type, right, position);
+            Context.ExitRecursion();
         }
-
-        return left;
     }
 
 // dotExpr = expression ( "." expression )* ;

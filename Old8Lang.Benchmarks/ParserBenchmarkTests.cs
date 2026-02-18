@@ -18,6 +18,11 @@ public class ParserBenchmarkTests
     private string ClassIntensiveCode = "";
     private string LargeFileCode = "";
 
+    // 新增：使用生成的测试数据文件
+    private string SmallScript500 = "";
+    private string MediumProject3000 = "";
+    private string LargeScript5000 = "";
+
     [GlobalSetup]
     public void Setup()
     {
@@ -51,6 +56,12 @@ public class ParserBenchmarkTests
         ExpressionIntensiveCode = GenerateExpressionIntensiveCode();
         ClassIntensiveCode = GenerateClassIntensiveCode();
         LargeFileCode = GenerateLargeFileCode();
+
+        // 加载生成的测试数据文件
+        var testDataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData");
+        SmallScript500 = File.ReadAllText(Path.Combine(testDataDir, "small_script_500.old8"));
+        MediumProject3000 = File.ReadAllText(Path.Combine(testDataDir, "medium_project_3000.old8"));
+        LargeScript5000 = File.ReadAllText(Path.Combine(testDataDir, "large_script_5000.old8"));
     }
 
     private string GenerateComplexCode()
@@ -504,6 +515,168 @@ public class ParserBenchmarkTests
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParserClass(tokens, code);
         return parser.ParseProgram();
+    }
+
+    #endregion
+
+    #region Performance Optimization Tests (User Stories)
+
+    // User Story 1: 快速解析小型脚本 (500行)
+    [Benchmark(Description = "Parse Small Script (500 lines)")]
+    public BlockStatement ParseSmallScript500()
+    {
+        var tokens = LangTokenizer.Tokenize(SmallScript500);
+        var parser = new LangParserClass(tokens, SmallScript500);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Small Script (500 lines)")]
+    public List<LangToken> TokenizeSmallScript500()
+    {
+        return LangTokenizer.Tokenize(SmallScript500);
+    }
+
+    // User Story 2: 高效解析中大型项目 (3000行, 5000行)
+    [Benchmark(Description = "Parse Medium Project (3000 lines)")]
+    public BlockStatement ParseMediumProject3000()
+    {
+        var tokens = LangTokenizer.Tokenize(MediumProject3000);
+        var parser = new LangParserClass(tokens, MediumProject3000);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Medium Project (3000 lines)")]
+    public List<LangToken> TokenizeMediumProject3000()
+    {
+        return LangTokenizer.Tokenize(MediumProject3000);
+    }
+
+    [Benchmark(Description = "Parse Large Script (5000 lines)")]
+    public BlockStatement ParseLargeScript5000()
+    {
+        var tokens = LangTokenizer.Tokenize(LargeScript5000);
+        var parser = new LangParserClass(tokens, LargeScript5000);
+        return parser.ParseProgram();
+    }
+
+    [Benchmark(Description = "Tokenize Large Script (5000 lines)")]
+    public List<LangToken> TokenizeLargeScript5000()
+    {
+        return LangTokenizer.Tokenize(LargeScript5000);
+    }
+
+    #endregion
+
+    #region Boundary Condition Tests
+
+    // T071: 极深嵌套表达式测试（50层）
+    [Benchmark(Description = "Parse Deeply Nested Expression (50 layers)")]
+    public BlockStatement ParseDeeplyNestedExpression()
+    {
+        // 生成 50 层嵌套的三元表达式
+        var sb = new StringBuilder();
+        sb.Append("result <- ");
+        for (int i = 0; i < 50; i++)
+        {
+            sb.Append("(a > b ? ");
+        }
+        sb.Append("1");
+        for (int i = 0; i < 50; i++)
+        {
+            sb.Append(" : 0)");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T072: 大量重复模式测试（10000个赋值语句）
+    [Benchmark(Description = "Parse Massive Assignments (10000 statements)")]
+    public BlockStatement ParseMassiveAssignments()
+    {
+        var sb = new StringBuilder();
+        for (int i = 0; i < 10000; i++)
+        {
+            sb.AppendLine($"var{i} <- {i}");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T073: 超大型文件测试（10000+行）
+    [Benchmark(Description = "Parse Extra Large File (10000+ lines)")]
+    public BlockStatement ParseExtraLargeFile()
+    {
+        var sb = new StringBuilder();
+
+        // 生成 10000 行混合代码
+        for (int i = 0; i < 2000; i++)
+        {
+            sb.AppendLine($"// 函数 {i}");
+            sb.AppendLine($"func function{i}(x, y) {{");
+            sb.AppendLine($"    result <- x + y");
+            sb.AppendLine($"    return result");
+            sb.AppendLine($"}}");
+        }
+
+        var code = sb.ToString();
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParserClass(tokens, code);
+        return parser.ParseProgram();
+    }
+
+    // T074: 语法错误场景性能测试
+    [Benchmark(Description = "Parse with Syntax Errors")]
+    public void ParseWithSyntaxErrors()
+    {
+        var code = """
+            func test() {
+                a <- 1
+                b <- 2
+                // 故意的语法错误
+                c <-
+                d <- 3
+            }
+            """;
+
+        try
+        {
+            var tokens = LangTokenizer.Tokenize(code);
+            var parser = new LangParserClass(tokens, code);
+            parser.ParseProgram();
+        }
+        catch
+        {
+            // 预期会抛出异常
+        }
+    }
+
+    // T075: 并发解析场景测试
+    [Benchmark(Description = "Concurrent Parsing (4 threads)")]
+    public void ConcurrentParsing()
+    {
+        var code = """
+            func calculate(x, y) {
+                result <- x + y
+                return result
+            }
+
+            a <- calculate(10, 20)
+            b <- calculate(30, 40)
+            """;
+
+        // 并发解析 4 次
+        Parallel.For(0, 4, i =>
+        {
+            var tokens = LangTokenizer.Tokenize(code);
+            var parser = new LangParserClass(tokens, code);
+            parser.ParseProgram();
+        });
     }
 
     #endregion

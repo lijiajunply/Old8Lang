@@ -22,8 +22,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
+    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Docs/PERFORMANCE_OPTIMIZATION.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/PROJECT_SUMMARY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/final-results.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/phase-6-completion-report.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +134,7 @@
     &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
     &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
     &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;001-parser-performance&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -310,7 +318,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+      <changelist id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="" />
       <created>1669093959861</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -558,6 +566,10 @@
       <workItem from="1771037866145" duration="13170000" />
       <workItem from="1771059572518" duration="9026000" />
       <workItem from="1771165264023" duration="937000" />
+      <workItem from="1771339503161" duration="2365000" />
+      <workItem from="1771341956377" duration="364000" />
+      <workItem from="1771342366048" duration="1517000" />
+      <workItem from="1771394553923" duration="4238000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -902,7 +914,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="922" />
+    <option name="localTasksCounter" value="931" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -929,14 +941,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(FirstUI): 将项目从 Old8Lang.FirstUI 重命名为 FirstUI&#10;&#10;- 重命名所有命名空间从 Old8Lang.FirstUI 到 FirstUI&#10;- 更新所有 using 语句以反映新的命名空间名称&#10;- 修改 Breadcrumb、Menu 和 Pagination 组件中的 LayoutHelper 引用路径&#10;- 为 FirstUI 项目创建新的项目文件 FirstUI.csproj&#10;- 在解决方案文件中更新项目引用名称&#10;- 移除旧的 Old8Lang.FirstUI.csproj 项目文件&#10;- 更新测试应用程序中的项目引用和 using 语句&#10;- 修正 NativeAnyLangValue 中的注释以匹配新命名空间" />
-    <MESSAGE value="chore(code): 移除重复的命名空间别名引用&#10;&#10;- 移除了 Breadcrumb.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 GridView.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Menu.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Pagination.cs 中重复的 LayoutHelper 别名引用&#10;- 移除了 Stack.cs 中重复的 LayoutHelper 别名引用" />
-    <MESSAGE value="feat(global-functions): 添加完整的JSON处理函数功能&#10;&#10;- 移除旧的JsonFunction并替换为多个专用的JSON函数实现&#10;- 添加JsonSerializeFunction用于将值序列化为JSON字符串&#10;- 添加JsonDeserializeFunction用于将JSON字符串反序列化为动态对象&#10;- 添加JsonDeserializeFromFileFunction用于从JSON文件读取并反序列化&#10;- 添加JsonSerializeToFileFunction用于将对象序列化并写入JSON文件&#10;- 添加JsonIsValidFunction用于验证JSON字符串有效性&#10;- 添加JsonMinifyFunction用于压缩JSON字符串&#10;- 添加JsonPrettifyFunction用于美化JSON字符串&#10;- 添加JsonMergeFunction用于合并多个JSON对象&#10;- 添加JsonCompareFunction用于比较两个JSON字符串是否相等&#10;- 添加JsonGetValueFunction用于根据路径获取JSON值&#10;- 在GlobalFunctionInitializer中注册所有新的JSON函数&#10;- 更新JSON序列化选项配置和错误处理机制" />
-    <MESSAGE value="refactor(core): 移除不需要的命名空间引用并更新JSON序列化方法&#10;&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Intermediates引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Value引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST引用&#10;- 从多个文件中移除了未使用的Old8Lang.Error引用&#10;- 从Csv.cs中将JsonLib.Serialize替换为JsonSerializer.Serialize&#10;- 移除了JsonLib.cs中的自定义JSON处理库实现&#10;- 移除了JsonLibTests.cs中的相关测试代码&#10;- 从多个实例方法实现中移除了未使用的命名空间引用&#10;- 从多个测试文件中移除了未使用的命名空间引用&#10;- 优化了代码结构和依赖关系管理" />
-    <MESSAGE value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
-    <MESSAGE value="feat(list): 添加列表聚合和排序方法重载实现&#10;&#10;- 实现 Sum() 和 Sum(selector) 方法用于列表求和操作&#10;- 实现 Min() 和 Min(selector) 方法用于获取列表最小值&#10;- 实现 Max() 和 Max(selector) 方法用于获取列表最大值&#10;- 实现 Sort()、SortBy() 和 SortWith() 方法用于列表排序&#10;- 添加带选择器参数的方法重载版本支持&#10;- 更新文档说明新增方法的功能和用法示例&#10;- 移除旧的 MaxBy 和 MinBy 方法避免命名冲突&#10;- 修复 SortBy 与 SortWith 的命名冲突问题&#10;- 增加单元测试覆盖所有新增方法和重载场景&#10;- 更新实例方法初始化器注册新的方法实现" />
-    <MESSAGE value="feat(bytecode): 添加对扩展方法的字节码编译支持&#10;&#10;- 在 BytecodeCompiler 中添加第四阶段预处理，注册扩展方法定义&#10;- 实现 PreprocessExtensionDefinitions 和 CompileExtensionDeclaration 方法&#10;- 创建 BytecodeExtensionMethod 类在 VM 中执行扩展方法&#10;- 扩展方法在编译时转换为普通函数并标记 IsExtensionMethod 属性&#10;- 在 BytecodeFile 中添加 Extensions 列表并实现序列化功能&#10;- 在 VirtualMachine 中注册扩展方法到实例方法注册表&#10;- 添加 ExecuteFunction 公共方法供扩展方法执行使用&#10;- 更新 ExtensionMethodWrapper 支持 VM 模式执行&#10;- 添加多个测试文件验证扩展方法功能" />
-    <MESSAGE value="refactor(extension): 重构扩展方法包装器实现并添加测试文件&#10;&#10;- 将 ExtensionMethodWrapper 类重构为主构造函数语法&#10;- 移除私有字段改用主构造函数参数&#10;- 更新字段和方法实现使用主构造函数参数&#10;- 添加多个扩展方法测试文件验证功能&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正工作时间统计和最后提交消息记录" />
     <MESSAGE value="feat(vm): 添加VM模式下object数组求和功能支持&#10;&#10;- 为LangListSumMethod添加object[]类型支持，实现SumHelperForArray方法&#10;- 支持VM模式下对object数组进行数值类型求和操作&#10;- 实现混合数值类型(int/double/long/float)的自动转换求和&#10;- 更新错误消息提示支持ILangList接口或object[]类型&#10;- 添加扩展方法测试文件验证VM模式功能&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
     <MESSAGE value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
@@ -954,7 +958,15 @@
     <MESSAGE value="docs(API): 添加完整的标准库API文档&#10;&#10;- 新增标准库概述和模式支持说明&#10;- 添加核心标准库文档，包括Math、File、Crypto、Image、Regex等模块&#10;- 添加网络库文档，涵盖HTTP、WebSocket、MQTT、Socket、WebAPI等模块&#10;- 添加数据库库文档，包含MySQL、PostgreSQL、SQLite、InMemory、ORM等模块&#10;- 添加序列化库文档，包括MessagePack、Protobuf、Factory等模块&#10;- 添加机器学习库文档，涵盖Classification、Regression、Clustering、DataLoader等模块&#10;- 为每个模块提供详细的函数签名、描述和使用示例&#10;- 标注各API在不同执行模式下的支持情况" />
     <MESSAGE value="feat(environment): 添加环境管理功能和相关命令&#10;&#10;- 新增 EnvCommand 命令类，支持 init、list、show、set、get 子命令&#10;- 实现 EnvironmentManager 类，支持多环境配置文件加载和变量管理&#10;- 添加 .old8env、.old8env.development、.old8env.production 示例配置文件&#10;- 在 FromFileCommand 中集成环境变量支持，新增 --env 参数&#10;- 添加 GetEnvFunction 全局函数，允许在 Old8 代码中获取环境变量&#10;- 更新 InitCommand，初始化项目时自动生成环境配置和示例文件&#10;- 扩展 ProjectConfig 支持 environments 配置项和 EnvironmentConfig 类&#10;- 更新项目初始化模板，添加 development 和 production 环境配置&#10;- 创建详细的环境管理指南文档 ENVIRONMENT_GUIDE.md&#10;- 添加环境相关的测试文件和配置示例" />
     <MESSAGE value="docs(rules): 更新项目规则文档添加虚拟机模式说明&#10;&#10;- 在项目规则文档中将运行模式更新为解释模式、编译模式和虚拟机模式&#10;- 修正 Old8Lang 运行模式的描述信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(rules): 更新项目规则文档添加虚拟机模式说明&#10;&#10;- 在项目规则文档中将运行模式更新为解释模式、编译模式和虚拟机模式&#10;- 修正 Old8Lang 运行模式的描述信息" />
+    <MESSAGE value="1" />
+    <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
+    <MESSAGE value="Changes" />
+    <MESSAGE value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
+    <MESSAGE value="perf(parser): 优化解析器性能通过Span和缓冲池减少内存分配&#10;&#10;- 添加LangToken.Create工厂方法使用字符串缓存优化&#10;- 使用ReadOnlySpan替代StringBuilder解析负数和数字字面量&#10;- 实现CharBufferPool租用字符缓冲区解析字符串和字符字面量&#10;- 使用Span切片替代Substring避免内存分配&#10;- 优化MergeDocCommentsWithTokens的O(n²)性能问题&#10;- 任务完成标记更新到已完成状态&#10;- 修复Unicode和十六进制转义序列解析的Span使用&#10;- 优化标识符和文件头指令解析使用Span切片" />
+    <MESSAGE value="perf(parser): 添加性能验证工具并验证解析器优化效果&#10;&#10;- 新增 PerformanceValidator 类用于验证解析器性能&#10;- 实现小型、中型、大型脚本的性能测试功能&#10;- 添加 StringCache 命中率验证测试&#10;- 在 Program.cs 中集成 --validate 参数支持&#10;- 更新任务列表标记已完成的验证项&#10;- 生成性能验证报告记录优化成果" />
+    <MESSAGE value="perf(parser): 优化解析器性能通过对象池和递归深度控制&#10;&#10;- 添加 Microsoft.Extensions.ObjectPool 依赖包用于对象池管理&#10;- 实现 TokenListPool 类使用对象池管理 List&lt;LangToken&gt; 实例&#10;- 在 ParserContext 中添加递归深度计数器防止栈溢出&#10;- 实现 EnterRecursion 和 ExitRecursion 方法进行递归深度管理&#10;- 修改 SourceLines 属性为预先分割避免错误报告时重复分割&#10;- 任务清单中标记相关优化任务为已完成状态" />
+    <MESSAGE value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

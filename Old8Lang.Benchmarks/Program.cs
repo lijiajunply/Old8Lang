@@ -1,8 +1,17 @@
 using BenchmarkDotNet.Running;
 using Old8Lang.Benchmarks;
+using Old8Lang.PerformanceValidation;
 
 // 运行性能基准测试
 Console.WriteLine("=== Old8Lang 性能基准测试 ===\n");
+
+// 如果传入 --validate 参数，运行性能验证
+if (args.Length > 0 && args[0] == "--validate")
+{
+    Console.WriteLine("运行性能验证测试...\n");
+    PerformanceValidator.Main(args);
+    return;
+}
 
 // 如果传入 --quick 参数，运行快速对比测试
 if (args.Length > 0 && args[0] == "--quick")

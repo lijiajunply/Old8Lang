@@ -1,0 +1,56 @@
+// 性能测试脚本 - 测试优化后的解析器
+
+// 测试数字解析
+num1 <- 123
+num2 <- 456.789
+num3 <- 1.23e10
+num4 <- -999
+
+// 测试字符串解析
+str1 <- "Hello, World!"
+str2 <- "包含中文的字符串"
+str3 <- "转义字符: \n\t\r"
+str4 <- "Unicode: \u4E2D\u6587"
+
+// 测试标识符
+identifier_test <- 100
+another_identifier <- 200
+_underscore_start <- 300
+
+// 测试函数定义
+func add(x, y) {
+    return x + y
+}
+
+func multiply(a, b) {
+    return a * b
+}
+
+// 测试类定义
+class Calculator {
+    result <- 0
+
+    func init() {
+        this.result <- 0
+    }
+
+    func calculate(x, y) {
+        this.result <- x + y
+        return this.result
+    }
+}
+
+// 测试循环
+for i in range(10) {
+    print(i)
+}
+
+// 测试条件语句
+if num1 > num2 {
+    print("num1 is greater")
+} else {
+    print("num2 is greater")
+}
+
+// 测试表达式
+result <- (num1 + num2) * num3 / num4

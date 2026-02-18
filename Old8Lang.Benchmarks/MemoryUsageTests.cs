@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.Benchmarks;
 
@@ -19,6 +20,11 @@ public class MemoryUsageTests
     private string FrequentAllocationCode = "";
     private string StringMemoryCode = "";
     private string CollectionMemoryCode = "";
+
+    // 新增：使用生成的测试数据文件进行内存测试
+    private string SmallScript500 = "";
+    private string MediumProject3000 = "";
+    private string LargeScript5000 = "";
 
     /// <summary>
     /// 初始化测试数据
@@ -386,6 +392,12 @@ public class MemoryUsageTests
 
             result <- collection_result
         ";
+
+        // 加载生成的测试数据文件
+        var testDataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData");
+        SmallScript500 = File.ReadAllText(Path.Combine(testDataDir, "small_script_500.old8"));
+        MediumProject3000 = File.ReadAllText(Path.Combine(testDataDir, "medium_project_3000.old8"));
+        LargeScript5000 = File.ReadAllText(Path.Combine(testDataDir, "large_script_5000.old8"));
     }
 
     /// <summary>
@@ -664,4 +676,68 @@ public class MemoryUsageTests
         BlockStatement ast = interpreter.Build(poolingCode);
         ast.Run(interpreter.Manager);
     }
+
+    #region Parser Memory Tests (User Story 3)
+
+    /// <summary>
+    /// 测试小型脚本（500行）的解析内存使用
+    /// </summary>
+    [Benchmark(Description = "Parse Memory - Small Script (500 lines)")]
+    public BlockStatement ParseMemorySmallScript()
+    {
+        var tokens = LangTokenizer.Tokenize(SmallScript500);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, SmallScript500);
+        return parser.ParseProgram();
+    }
+
+    /// <summary>
+    /// 测试中型项目（3000行）的解析内存使用
+    /// </summary>
+    [Benchmark(Description = "Parse Memory - Medium Project (3000 lines)")]
+    public BlockStatement ParseMemoryMediumProject()
+    {
+        var tokens = LangTokenizer.Tokenize(MediumProject3000);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, MediumProject3000);
+        return parser.ParseProgram();
+    }
+
+    /// <summary>
+    /// 测试大型脚本（5000行）的解析内存使用
+    /// </summary>
+    [Benchmark(Description = "Parse Memory - Large Script (5000 lines)")]
+    public BlockStatement ParseMemoryLargeScript()
+    {
+        var tokens = LangTokenizer.Tokenize(LargeScript5000);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, LargeScript5000);
+        return parser.ParseProgram();
+    }
+
+    /// <summary>
+    /// 测试词法分析的内存使用（500行）
+    /// </summary>
+    [Benchmark(Description = "Tokenize Memory - Small Script (500 lines)")]
+    public List<LangToken> TokenizeMemorySmallScript()
+    {
+        return LangTokenizer.Tokenize(SmallScript500);
+    }
+
+    /// <summary>
+    /// 测试词法分析的内存使用（3000行）
+    /// </summary>
+    [Benchmark(Description = "Tokenize Memory - Medium Project (3000 lines)")]
+    public List<LangToken> TokenizeMemoryMediumProject()
+    {
+        return LangTokenizer.Tokenize(MediumProject3000);
+    }
+
+    /// <summary>
+    /// 测试词法分析的内存使用（5000行）
+    /// </summary>
+    [Benchmark(Description = "Tokenize Memory - Large Script (5000 lines)")]
+    public List<LangToken> TokenizeMemoryLargeScript()
+    {
+        return LangTokenizer.Tokenize(LargeScript5000);
+    }
+
+    #endregion
 }
