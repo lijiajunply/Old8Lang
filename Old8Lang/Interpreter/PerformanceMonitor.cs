@@ -155,7 +155,10 @@ public class PerformanceMonitor : IPerformanceMonitor
             return;
         }
 
-        System.Threading.Interlocked.Increment(ref _metrics.FunctionCallCount);
+        lock (_lock)
+        {
+            _metrics.FunctionCallCount++;
+        }
 
         if (_config.DetailedMonitoring && _functionMetrics.Count < _config.MaxFunctionMetrics)
         {
@@ -195,7 +198,10 @@ public class PerformanceMonitor : IPerformanceMonitor
             return;
         }
 
-        System.Threading.Interlocked.Increment(ref _metrics.VariableLookupCount);
+        lock (_lock)
+        {
+            _metrics.VariableLookupCount++;
+        }
 
         if (_config.DetailedMonitoring && _scopeMetrics.Count < _config.MaxScopeMetrics)
         {
@@ -234,7 +240,10 @@ public class PerformanceMonitor : IPerformanceMonitor
             return;
         }
 
-        System.Threading.Interlocked.Increment(ref _metrics.ObjectAllocationCount);
+        lock (_lock)
+        {
+            _metrics.ObjectAllocationCount++;
+        }
     }
 
     /// <summary>
@@ -247,6 +256,9 @@ public class PerformanceMonitor : IPerformanceMonitor
             return;
         }
 
-        System.Threading.Interlocked.Increment(ref _metrics.LoopIterationCount);
+        lock (_lock)
+        {
+            _metrics.LoopIterationCount++;
+        }
     }
 }
