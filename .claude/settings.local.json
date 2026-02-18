@@ -59,7 +59,8 @@
       "Bash(dotnet:*)",
       "Bash(pwsh -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
       "Bash(powershell.exe -NoProfile -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"interpreter-performance\" \"我现在想提升解释器模式的性能\")"
     ]
   }
 }
