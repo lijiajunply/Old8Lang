@@ -66,35 +66,35 @@
 
 #### 1.1 字符串缓存实现（P0 优化）
 
-- [ ] T013 [P] [US1] 创建 StringCache 类 Old8Lang/LangParser/Optimization/StringCache.cs
-- [ ] T014 [P] [US1] 创建 CacheStatistics 结构 Old8Lang/LangParser/Optimization/CacheStatistics.cs
-- [ ] T015 [US1] 在 StringCache 中实现 GetOrAdd 方法（使用 ConcurrentDictionary）
-- [ ] T016 [US1] 在 StringCache 中实现 GetStatistics 方法
-- [ ] T017 [US1] 在 StringCache 中实现 Clear 方法
+- [X] T013 [P] [US1] 创建 StringCache 类 Old8Lang/LangParser/Optimization/StringCache.cs
+- [X] T014 [P] [US1] 创建 CacheStatistics 结构 Old8Lang/LangParser/Optimization/CacheStatistics.cs
+- [X] T015 [US1] 在 StringCache 中实现 GetOrAdd 方法（使用 ConcurrentDictionary）
+- [X] T016 [US1] 在 StringCache 中实现 GetStatistics 方法
+- [X] T017 [US1] 在 StringCache 中实现 Clear 方法
 
 #### 1.2 字符缓冲区池实现（P0 优化）
 
-- [ ] T018 [P] [US1] 创建 CharBufferPool 类 Old8Lang/LangParser/Optimization/CharBufferPool.cs
-- [ ] T019 [US1] 实现 CharBufferPool.RentedBuffer 结构（IDisposable）
-- [ ] T020 [US1] 实现 CharBufferPool.Rent 方法（使用 ArrayPool<char>）
+- [X] T018 [P] [US1] 创建 CharBufferPool 类 Old8Lang/LangParser/Optimization/CharBufferPool.cs
+- [X] T019 [US1] 实现 CharBufferPool.RentedBuffer 结构（IDisposable）
+- [X] T020 [US1] 实现 CharBufferPool.Rent 方法（使用 ArrayPool<char>）
 
 #### 1.3 Tokenizer 优化（P0 优化）
 
-- [ ] T021 [US1] 在 LangToken.cs 中添加 Create 工厂方法（使用 StringCache）Old8Lang/LangParser/LangToken.cs
-- [ ] T022 [US1] 优化数字字面量解析：使用 Span<char> 替代 StringBuilder Old8Lang/LangParser/LangToken.cs (行 180-212)
-- [ ] T023 [US1] 优化字符串字面量解析：使用 CharBufferPool Old8Lang/LangParser/LangToken.cs (行 256-350)
-- [ ] T024 [US1] 优化标识符解析：使用 StringCache Old8Lang/LangParser/LangToken.cs (行 644-706)
-- [ ] T025 [US1] 优化文件头指令解析：使用 ReadOnlySpan<char> 替代 Substring Old8Lang/LangParser/LangToken.cs (行 968-975)
-- [ ] T026 [US1] 优化 Unicode 转义序列：使用 Span<char> Old8Lang/LangParser/LangToken.cs (行 1186-1263)
+- [X] T021 [US1] 在 LangToken.cs 中添加 Create 工厂方法（使用 StringCache）Old8Lang/LangParser/LangToken.cs
+- [X] T022 [US1] 优化数字字面量解析：使用 Span<char> 替代 StringBuilder Old8Lang/LangParser/LangToken.cs (行 180-212)
+- [X] T023 [US1] 优化字符串字面量解析：使用 CharBufferPool Old8Lang/LangParser/LangToken.cs (行 256-350)
+- [X] T024 [US1] 优化标识符解析：使用 StringCache Old8Lang/LangParser/LangToken.cs (行 644-706)
+- [X] T025 [US1] 优化文件头指令解析：使用 ReadOnlySpan<char> 替代 Substring Old8Lang/LangParser/LangToken.cs (行 968-975)
+- [X] T026 [US1] 优化 Unicode 转义序列：使用 Span<char> Old8Lang/LangParser/LangToken.cs (行 1186-1263)
 
 #### 1.4 文档注释合并优化（P0 优化）
 
-- [ ] T027 [US1] 修复 MergeDocCommentsWithTokens 的 O(n²) 问题：使用反向遍历 Old8Lang/LangParser/LangToken.cs (行 785-846)
+- [X] T027 [US1] 修复 MergeDocCommentsWithTokens 的 O(n²) 问题：使用反向遍历 Old8Lang/LangParser/LangToken.cs (行 785-846)
 
 #### 1.5 测试和验证
 
 - [ ] T028 [US1] 运行 ParserBenchmarkTests（500行测试）验证性能提升 dotnet run --project Old8Lang.Benchmarks --configuration Release
-- [ ] T029 [US1] 运行所有现有测试验证向后兼容性 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
+- [X] T029 [US1] 运行所有现有测试验证向后兼容性 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 - [ ] T030 [US1] 验证 StringCache 命中率 > 50%（使用 GetStatistics）
 - [ ] T031 [US1] 验证内存分配减少 30-50%（使用 MemoryDiagnoser）
 

@@ -23,17 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/CacheStatistics.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/CharBufferPool.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Optimization/StringCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/baseline-results.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -572,7 +562,7 @@
       <workItem from="1771339503161" duration="2365000" />
       <workItem from="1771341956377" duration="364000" />
       <workItem from="1771342366048" duration="1517000" />
-      <workItem from="1771394553923" duration="606000" />
+      <workItem from="1771394553923" duration="1072000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -917,7 +907,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="925" />
+    <option name="localTasksCounter" value="926" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +934,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 移除不需要的命名空间引用并更新JSON序列化方法&#10;&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Intermediates引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST.Expression.Value引用&#10;- 从多个文件中移除了未使用的Old8Lang.AST引用&#10;- 从多个文件中移除了未使用的Old8Lang.Error引用&#10;- 从Csv.cs中将JsonLib.Serialize替换为JsonSerializer.Serialize&#10;- 移除了JsonLib.cs中的自定义JSON处理库实现&#10;- 移除了JsonLibTests.cs中的相关测试代码&#10;- 从多个实例方法实现中移除了未使用的命名空间引用&#10;- 从多个测试文件中移除了未使用的命名空间引用&#10;- 优化了代码结构和依赖关系管理" />
     <MESSAGE value="feat(instance-methods): 添加实例方法重载支持&#10;&#10;- 为 String 的 Substring 方法添加参数数量重载支持&#10;- 为 List 的 First 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Last 方法添加无参和带谓词两种重载版本&#10;- 为 List 的 Aggregate 方法添加无初始值和带初始值两种重载版本&#10;- 实现重载解析机制，根据参数数量和类型自动选择正确方法&#10;- 添加完整的单元测试和集成测试验证重载功能&#10;- 更新文档说明重载方法的使用方式和限制说明" />
     <MESSAGE value="feat(list): 添加列表聚合和排序方法重载实现&#10;&#10;- 实现 Sum() 和 Sum(selector) 方法用于列表求和操作&#10;- 实现 Min() 和 Min(selector) 方法用于获取列表最小值&#10;- 实现 Max() 和 Max(selector) 方法用于获取列表最大值&#10;- 实现 Sort()、SortBy() 和 SortWith() 方法用于列表排序&#10;- 添加带选择器参数的方法重载版本支持&#10;- 更新文档说明新增方法的功能和用法示例&#10;- 移除旧的 MaxBy 和 MinBy 方法避免命名冲突&#10;- 修复 SortBy 与 SortWith 的命名冲突问题&#10;- 增加单元测试覆盖所有新增方法和重载场景&#10;- 更新实例方法初始化器注册新的方法实现" />
     <MESSAGE value="feat(bytecode): 添加对扩展方法的字节码编译支持&#10;&#10;- 在 BytecodeCompiler 中添加第四阶段预处理，注册扩展方法定义&#10;- 实现 PreprocessExtensionDefinitions 和 CompileExtensionDeclaration 方法&#10;- 创建 BytecodeExtensionMethod 类在 VM 中执行扩展方法&#10;- 扩展方法在编译时转换为普通函数并标记 IsExtensionMethod 属性&#10;- 在 BytecodeFile 中添加 Extensions 列表并实现序列化功能&#10;- 在 VirtualMachine 中注册扩展方法到实例方法注册表&#10;- 添加 ExecuteFunction 公共方法供扩展方法执行使用&#10;- 更新 ExtensionMethodWrapper 支持 VM 模式执行&#10;- 添加多个测试文件验证扩展方法功能" />
@@ -969,7 +958,8 @@
     <MESSAGE value="1" />
     <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
     <MESSAGE value="Changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changes" />
+    <MESSAGE value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

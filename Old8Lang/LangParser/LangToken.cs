@@ -25,6 +25,26 @@ public readonly record struct LangToken(string Value, LangTokenType Type, int Li
     {
         return $"{Value} {Type} {Line} {Column}";
     }
+
+    /// <summary>
+    /// 创建 Token 的工厂方法（使用字符串缓存优化）
+    /// </summary>
+    /// <param name="value">Token 值（Span）</param>
+    /// <param name="type">Token 类型</param>
+    /// <param name="line">行号</param>
+    /// <param name="column">列号</param>
+    /// <param name="stringCache">字符串缓存（可选）</param>
+    /// <returns>新的 LangToken 实例</returns>
+    public static LangToken Create(
+        ReadOnlySpan<char> value,
+        LangTokenType type,
+        int line,
+        int column,
+        Optimization.StringCache? stringCache = null)
+    {
+        var cachedValue = stringCache?.GetOrAdd(value) ?? new string(value);
+        return new LangToken(cachedValue, type, line, column);
+    }
 }
 
 /// <summary>
@@ -177,37 +197,36 @@ public static class LangTokenizer
                          LangTokenType.Return or LangTokenType.Colon))
                 {
                     // 解析负数
-                    var sb = new StringBuilder("-");
-                    i++;
+                    var startIndex = i; // 记录起始位置（包括负号）
+                    i++; // 跳过负号
 
+                    // 扫描数字部分
                     while (i < code.Length && (char.IsDigit(code[i]) || code[i] == '.'))
                     {
-                        sb.Append(code[i]);
                         i++;
                     }
 
                     // 处理科学计数法
                     if (i < code.Length && char.ToLower(code[i]) == 'e')
                     {
-                        sb.Append(code[i]);
-                        i++;
+                        i++; // 跳过 'e' 或 'E'
 
                         // 处理指数符号 (+/-)
                         if (i < code.Length && (code[i] == '+' || code[i] == '-'))
                         {
-                            sb.Append(code[i]);
                             i++;
                         }
 
                         // 处理指数数字
                         while (i < code.Length && char.IsDigit(code[i]))
                         {
-                            sb.Append(code[i]);
                             i++;
                         }
                     }
 
-                    tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, i - 1 - column));
+                    // 使用 Span 切片，避免 StringBuilder
+                    var numberSpan = code.AsSpan(startIndex, i - startIndex);
+                    tokens.Add(new LangToken(new string(numberSpan), LangTokenType.Number, line, startIndex - column));
                     i--; // 回退一位，因为外层循环会 i++
                     continue;
                 }
@@ -255,7 +274,10 @@ public static class LangTokenizer
 
             if (code[i] == '"')
             {
-                var sb = new StringBuilder();
+                using var buffer = Optimization.CharBufferPool.Rent(256);
+                var bufferSpan = buffer.Span;
+                var length = 0;
+
                 i++;
                 while (i < code.Length)
                 {
@@ -268,32 +290,33 @@ public static class LangTokenizer
                             switch (code[i])
                             {
                                 case 'n':
-                                    sb.Append('\n');
+                                    bufferSpan[length++] = '\n';
                                     break;
                                 case 't':
-                                    sb.Append('\t');
+                                    bufferSpan[length++] = '\t';
                                     break;
                                 case 'r':
-                                    sb.Append('\r');
+                                    bufferSpan[length++] = '\r';
                                     break;
                                 case '\\':
-                                    sb.Append('\\');
+                                    bufferSpan[length++] = '\\';
                                     break;
                                 case '"':
-                                    sb.Append('"');
+                                    bufferSpan[length++] = '"';
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
                                     if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i - 1, out var unicodeChar,
                                             out var unicodeAdvance))
                                     {
-                                        sb.Append(unicodeChar);
+                                        bufferSpan[length++] = unicodeChar;
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字
                                     }
                                     else
                                     {
                                         // Unicode序列不完整或解析失败，追加原始字符
-                                        sb.Append("\\u");
+                                        bufferSpan[length++] = '\\';
+                                        bufferSpan[length++] = 'u';
                                     }
 
                                     break;
@@ -302,18 +325,19 @@ public static class LangTokenizer
                                     if (EscapeSequenceHelper.TryParseHexEscape(code, i - 1, out var hexChar,
                                             out var hexAdvance))
                                     {
-                                        sb.Append(hexChar);
+                                        bufferSpan[length++] = hexChar;
                                         i += hexAdvance; // 跳过已解析的十六进制数字
                                     }
                                     else
                                     {
                                         // 十六进制序列不完整或解析失败，追加原始字符
-                                        sb.Append("\\x");
+                                        bufferSpan[length++] = '\\';
+                                        bufferSpan[length++] = 'x';
                                     }
 
                                     break;
                                 default:
-                                    sb.Append(code[i]);
+                                    bufferSpan[length++] = code[i];
                                     break;
                             }
                         }
@@ -330,7 +354,7 @@ public static class LangTokenizer
                             column = i + 1;
                         }
 
-                        sb.Append(code[i]);
+                        bufferSpan[length++] = code[i];
                     }
 
                     i++;
@@ -339,21 +363,26 @@ public static class LangTokenizer
                 // 检查字符串是否正确闭合
                 if (i >= code.Length || code[i] != '"')
                 {
+                    var errorStr = new string(bufferSpan.Slice(0, length));
                     throw new SyntaxError(
-                        sb.ToString(),
+                        errorStr,
                         line,
                         i - column,
                         "语法错误：未闭合的字符串字面量，缺少结束引号");
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.String, line, i - column));
+                var stringValue = new string(bufferSpan.Slice(0, length));
+                tokens.Add(new LangToken(stringValue, LangTokenType.String, line, i - column));
                 continue;
             }
 
             // 处理字符字面量 'c'
             if (code[i] == '\'')
             {
-                var sb = new StringBuilder();
+                using var buffer = Optimization.CharBufferPool.Rent(64);
+                var bufferSpan = buffer.Span;
+                var length = 0;
+
                 i++;
                 while (i < code.Length)
                 {
@@ -366,38 +395,39 @@ public static class LangTokenizer
                             switch (code[i])
                             {
                                 case 'n':
-                                    sb.Append('\n');
+                                    bufferSpan[length++] = '\n';
                                     break;
                                 case 't':
-                                    sb.Append('\t');
+                                    bufferSpan[length++] = '\t';
                                     break;
                                 case 'r':
-                                    sb.Append('\r');
+                                    bufferSpan[length++] = '\r';
                                     break;
                                 case '\\':
-                                    sb.Append('\\');
+                                    bufferSpan[length++] = '\\';
                                     break;
                                 case '\'':
-                                    sb.Append('\'');
+                                    bufferSpan[length++] = '\'';
                                     break;
                                 case '"':
-                                    sb.Append('"');
+                                    bufferSpan[length++] = '"';
                                     break;
                                 case '0':
-                                    sb.Append('\0');
+                                    bufferSpan[length++] = '\0';
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
                                     if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i, out var unicodeChar,
                                             out var unicodeAdvance))
                                     {
-                                        sb.Append(unicodeChar);
+                                        bufferSpan[length++] = unicodeChar;
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字（不包括 \u，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
                                         // Unicode序列不完整或解析失败，追加原始字符
-                                        sb.Append("\\u");
+                                        bufferSpan[length++] = '\\';
+                                        bufferSpan[length++] = 'u';
                                     }
 
                                     break;
@@ -406,20 +436,21 @@ public static class LangTokenizer
                                     if (EscapeSequenceHelper.TryParseHexEscape(code, i, out var hexChar,
                                             out var hexAdvance))
                                     {
-                                        sb.Append(hexChar);
+                                        bufferSpan[length++] = hexChar;
                                         i += hexAdvance; // 跳过已解析的十六进制数字（不包括 \x，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
                                         // 十六进制序列不完整或解析失败，追加原始字符
-                                        sb.Append("\\x");
+                                        bufferSpan[length++] = '\\';
+                                        bufferSpan[length++] = 'x';
                                     }
 
                                     break;
                                 default:
                                     // 未知的转义字符，追加原始字符
-                                    sb.Append('\\');
-                                    sb.Append(code[i]);
+                                    bufferSpan[length++] = '\\';
+                                    bufferSpan[length++] = code[i];
                                     break;
                             }
                         }
@@ -436,14 +467,15 @@ public static class LangTokenizer
                             column = i + 1;
                         }
 
-                        sb.Append(code[i]);
+                        bufferSpan[length++] = code[i];
                     }
 
                     i++;
                 }
 
                 // 为字符token添加单引号以保持格式一致性
-                tokens.Add(new LangToken($"'{sb}'", LangTokenType.Char, line, i - column));
+                var charValue = new string(bufferSpan.Slice(0, length));
+                tokens.Add(new LangToken($"'{charValue}'", LangTokenType.Char, line, i - column));
                 continue;
             }
 
@@ -712,50 +744,51 @@ public static class LangTokenizer
             if (char.IsDigit(code[i]))
             {
                 var startIndex = i; // 记录数字起始位置
-                var sb = new StringBuilder(code[i].ToString());
+
+                // 扫描数字部分（整数和小数）
                 while (i + 1 < code.Length && (char.IsDigit(code[i + 1]) || code[i + 1] == '.'))
                 {
-                    sb.Append(code[i + 1]);
                     i++;
                 }
 
                 // 处理科学计数法 (e.g., 1.23e3, 1.23E-4, 1e10)
                 if (i + 1 < code.Length && char.ToLower(code[i + 1]) == 'e')
                 {
-                    sb.Append(code[i + 1]);
-                    i++;
+                    i++; // 跳过 'e' 或 'E'
 
                     // 处理指数符号 (+/-)
                     if (i + 1 < code.Length && (code[i + 1] == '+' || code[i + 1] == '-'))
                     {
-                        sb.Append(code[i + 1]);
                         i++;
                     }
 
                     // 处理指数数字
                     while (i + 1 < code.Length && char.IsDigit(code[i + 1]))
                     {
-                        sb.Append(code[i + 1]);
                         i++;
                     }
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, startIndex - column));
+                // 使用 Span 切片，避免 StringBuilder 和 Substring
+                var numberSpan = code.AsSpan(startIndex, i - startIndex + 1);
+                tokens.Add(new LangToken(new string(numberSpan), LangTokenType.Number, line, startIndex - column));
                 continue;
             }
 
             if (char.IsLetter(code[i]) || code[i] == '_')
             {
                 var startIndex = i; // 记录标识符起始位置
-                var sb = new StringBuilder(code[i].ToString());
+
+                // 扫描标识符
                 while (i + 1 < code.Length &&
                        (char.IsLetter(code[i + 1]) || char.IsDigit(code[i + 1]) || code[i + 1] == '_'))
                 {
-                    sb.Append(code[i + 1]);
                     i++;
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, startIndex - column));
+                // 使用 Span 切片，避免 StringBuilder
+                var identifierSpan = code.AsSpan(startIndex, i - startIndex + 1);
+                tokens.Add(new LangToken(new string(identifierSpan), LangTokenType.Identifier, line, startIndex - column));
                 continue;
             }
 
@@ -812,19 +845,24 @@ public static class LangTokenizer
 
             // 查找在当前 token 之前的文档注释
             // 文档注释应该出现在它所描述的声明之前
+            // 优化：使用反向遍历收集，然后反转，避免 InsertRange(0, ...) 的 O(n²) 问题
             var relevantDocs = new List<LangToken>();
             for (int line = token.Line - 1; line > 0 && docCommentGroups.ContainsKey(line); line--)
             {
                 // 只收集连续的文档注释行
                 if (docCommentGroups.TryGetValue(line, out var group))
                 {
-                    relevantDocs.InsertRange(0, group);
+                    // 反向添加（因为我们从 token.Line - 1 向下遍历）
+                    relevantDocs.AddRange(group);
                 }
                 else
                 {
                     break;
                 }
             }
+
+            // 反转列表以恢复正确的顺序（从上到下）
+            relevantDocs.Reverse();
 
             // 添加相关的文档注释
             foreach (var doc in relevantDocs)
@@ -965,14 +1003,15 @@ public struct FilteringCommentsTokenizer(string input)
                         Advance();
                     }
 
-                    var directiveContent = input.Substring(directiveStart, _currentIndex - directiveStart).Trim();
+                    // 使用 Span 替代 Substring，避免内存分配
+                    var directiveSpan = input.AsSpan(directiveStart, _currentIndex - directiveStart).Trim();
 
                     // 解析指令名和值
-                    var spaceIndex = directiveContent.IndexOf(' ');
+                    var spaceIndex = directiveSpan.IndexOf(' ');
                     if (spaceIndex > 0)
                     {
-                        var directiveName = directiveContent.Substring(0, spaceIndex).Trim();
-                        var directiveValue = directiveContent.Substring(spaceIndex + 1).Trim();
+                        var directiveName = new string(directiveSpan.Slice(0, spaceIndex).Trim());
+                        var directiveValue = new string(directiveSpan.Slice(spaceIndex + 1).Trim());
 
                         // 创建 token 并添加到列表
                         HeaderDirectives.Add(new LangToken(
@@ -1182,9 +1221,9 @@ public static class EscapeSequenceHelper
             return false;
         }
 
-        // 提取 4 位十六进制数（从 \u 后面开始）
-        var hexStr = input.Substring(startIndex + 2, 4);
-        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var unicodeCode))
+        // 使用 Span 提取 4 位十六进制数（从 \u 后面开始），避免 Substring
+        var hexSpan = input.AsSpan(startIndex + 2, 4);
+        if (int.TryParse(hexSpan, System.Globalization.NumberStyles.HexNumber, null, out var unicodeCode))
         {
             result = (char)unicodeCode;
             advanceCount = 4; // 只跳过 4 位十六进制，不包括 \u（因为外层 for 循环已经在 \ 的位置）
@@ -1213,9 +1252,9 @@ public static class EscapeSequenceHelper
             return false;
         }
 
-        // 提取 2 位十六进制数（从 \x 后面开始）
-        var hexStr = input.Substring(startIndex + 2, 2);
-        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var hexCode))
+        // 使用 Span 提取 2 位十六进制数（从 \x 后面开始），避免 Substring
+        var hexSpan = input.AsSpan(startIndex + 2, 2);
+        if (int.TryParse(hexSpan, System.Globalization.NumberStyles.HexNumber, null, out var hexCode))
         {
             result = (char)hexCode;
             advanceCount = 2; // 只跳过 2 位十六进制，不包括 \x（因为外层 for 循环已经在 \ 的位置）
@@ -1237,8 +1276,9 @@ public static class EscapeSequenceHelper
 
         if (content.StartsWith("\\u") && content.Length == 6)
         {
-            var hexCode = content.Substring(2);
-            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+            // 使用 Span 避免 Substring
+            var hexSpan = content.AsSpan(2);
+            if (int.TryParse(hexSpan, System.Globalization.NumberStyles.HexNumber, null, out var code))
             {
                 result = (char)code;
                 return true;
@@ -1260,8 +1300,9 @@ public static class EscapeSequenceHelper
 
         if (content.StartsWith("\\x") && content.Length >= 3)
         {
-            var hexCode = content.Substring(2);
-            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+            // 使用 Span 避免 Substring
+            var hexSpan = content.AsSpan(2);
+            if (int.TryParse(hexSpan, System.Globalization.NumberStyles.HexNumber, null, out var code))
             {
                 result = (char)code;
                 return true;
