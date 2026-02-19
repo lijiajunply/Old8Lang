@@ -1,0 +1,83 @@
+// 递归调用测试脚本
+// 测试递归深度和性能
+// 目标: 支持至少100层递归深度
+
+// 简单递归 - 阶乘
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+// 斐波那契数列 (递归)
+func fibonacci(n) {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// 深度递归测试 - 累加
+func deepRecursion(n, acc) {
+    if n <= 0 {
+        return acc
+    }
+    return deepRecursion(n - 1, acc + n)
+}
+
+// 相互递归测试
+func isEven(n) {
+    if n == 0 {
+        return true
+    }
+    return isOdd(n - 1)
+}
+
+func isOdd(n) {
+    if n == 0 {
+        return false
+    }
+    return isEven(n - 1)
+}
+
+// 树遍历递归
+func sumTree(node) {
+    if node == null {
+        return 0
+    }
+
+    sum <- node
+
+    // 假设 node 是一个数字，简化版本
+    if node > 0 {
+        return node + sumTree(node - 1)
+    }
+
+    return sum
+}
+
+// 执行测试
+print("测试递归调用性能...")
+
+// 测试阶乘 (深度 20)
+result1 <- factorial(20)
+print("Factorial(20) = " + result1)
+
+// 测试斐波那契 (深度 15，避免指数级增长)
+result2 <- fibonacci(15)
+print("Fibonacci(15) = " + result2)
+
+// 测试深度递归 (深度 100)
+result3 <- deepRecursion(100, 0)
+print("DeepRecursion(100) = " + result3)
+
+// 测试相互递归 (深度 50)
+result4 <- isEven(50)
+print("IsEven(50) = " + result4)
+
+// 测试树遍历 (深度 30)
+result5 <- sumTree(30)
+print("SumTree(30) = " + result5)
+
+print("递归测试完成")

@@ -1,0 +1,71 @@
+// 精简的中等规模测试程序
+// 专注于核心性能指标
+// 目标: 执行时间 <2s
+
+// 基础函数
+func add(a, b) {
+    return a + b
+}
+
+func multiply(a, b) {
+    return a * b
+}
+
+func sumArray(arr) {
+    total <- 0
+    for i <- 0, i < arr.count(), i <- i + 1 {
+        total <- total + arr[i]
+    }
+    return total
+}
+
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+// 主测试
+print("开始性能测试...")
+
+// 测试1: 函数调用 (200次)
+result1 <- 0
+for i <- 0, i < 200, i <- i + 1 {
+    result1 <- result1 + add(i, i + 1)
+}
+print("测试1完成: " + result1)
+
+// 测试2: 数组处理 (20次)
+testArray <- [10, 20, 30, 40, 50]
+result2 <- 0
+for i <- 0, i < 20, i <- i + 1 {
+    result2 <- result2 + sumArray(testArray)
+}
+print("测试2完成: " + result2)
+
+// 测试3: 嵌套循环 (20x20)
+result3 <- 0
+for i <- 0, i < 20, i <- i + 1 {
+    for j <- 0, j < 20, j <- j + 1 {
+        result3 <- result3 + i + j
+    }
+}
+print("测试3完成: " + result3)
+
+// 测试4: 递归 (factorial(10))
+result4 <- factorial(10)
+print("测试4完成: " + result4)
+
+// 测试5: 混合操作 (10次迭代)
+result5 <- 0
+for i <- 0, i < 10, i <- i + 1 {
+    arr <- [1, 2, 3, 4, 5]
+    sum <- sumArray(arr)
+    result5 <- result5 + add(sum, i)
+}
+print("测试5完成: " + result5)
+
+print("所有测试完成!")
+finalResult <- result1 + result2 + result3 + result4 + result5
+print("最终结果: " + finalResult)
