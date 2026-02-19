@@ -46,7 +46,7 @@
 - [X] T007 [P] 创建变量查找基准测试 Old8Lang.Benchmarks/VariableLookupBenchmark.cs
 - [X] T008 [P] 创建循环执行基准测试 Old8Lang.Benchmarks/LoopExecutionBenchmark.cs
 - [X] T009 [P] 创建函数调用基准测试 Old8Lang.Benchmarks/FunctionCallBenchmark.cs
-- [⏳] T010 运行基准测试建立性能基线，保存结果到 specs/001-interpreter-performance/baseline-results.md
+- [X] T010 运行基准测试建立性能基线，保存结果到 specs/001-interpreter-performance/baseline-results.md
 
 ### 性能监控基础设施
 

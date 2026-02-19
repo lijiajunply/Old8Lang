@@ -61,7 +61,15 @@
       "Bash(powershell.exe -NoProfile -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
       "Bash(test:*)",
       "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 -Json -Number 1 -ShortName \"interpreter-performance\" \"我现在想提升解释器模式的性能\")",
-      "Bash(powershell.exe -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")"
+      "Bash(powershell.exe -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(if [ -d \"C:\\\\Projects\\\\RiderProjects\\\\Old8Lang\\\\specs\\\\001-interpreter-performance\\\\checklists\" ])",
+      "Bash(then echo \"EXISTS\")",
+      "Bash(else echo \"NOT_EXISTS\")",
+      "Bash(fi)",
+      "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/small-script-50lines.old8\":*)",
+      "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/nested-loops.old8\":*)",
+      "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/variable-lookup.old8\":*)"
     ]
   }
 }
