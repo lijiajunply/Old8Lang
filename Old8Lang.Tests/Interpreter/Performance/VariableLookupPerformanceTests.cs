@@ -48,13 +48,13 @@ public class VariableLookupPerformanceTests
     {
         // Arrange
         var code = @"
-            global_var1 = 100
-            global_var2 = 200
-            global_var3 = 300
+            global_var1 <- 100
+            global_var2 <- 200
+            global_var3 <- 300
 
-            function test() {
-                for (i = 0; i < 1000; i++) {
-                    x = global_var1 + global_var2 + global_var3
+            func test() {
+                for i <- 0, i < 1000, i <- i + 1 {
+                    x <- global_var1 + global_var2 + global_var3
                 }
             }
 
@@ -93,17 +93,17 @@ public class VariableLookupPerformanceTests
     {
         // Arrange
         var code = @"
-            outer_var = 100
+            outer_var <- 100
 
-            function outer() {
-                middle_var = 200
+            func outer() {
+                middle_var <- 200
 
-                function middle() {
-                    inner_var = 300
+                func middle() {
+                    inner_var <- 300
 
-                    function inner() {
-                        for (i = 0; i < 100; i++) {
-                            sum = outer_var + middle_var + inner_var
+                    func inner() {
+                        for i <- 0, i < 100, i <- i + 1 {
+                            sum <- outer_var + middle_var + inner_var
                         }
                     }
 

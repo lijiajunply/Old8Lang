@@ -16,6 +16,10 @@ public class PerformanceMonitor : IPerformanceMonitor
     private long _initialMemory;
     private int _initialGCCount;
 
+    // 缓存统计
+    private long _cacheHits;
+    private long _cacheMisses;
+
     // 函数级别指标缓存
     private readonly ConcurrentDictionary<string, FunctionMetrics> _functionMetrics = new();
 
@@ -94,8 +98,17 @@ public class PerformanceMonitor : IPerformanceMonitor
             // 计算缓存命中率
             if (_metrics.VariableLookupCount > 0)
             {
-                var totalHits = _scopeMetrics.Values.Sum(s => s.CacheHitCount);
-                _metrics.CacheHitRate = (double)totalHits / _metrics.VariableLookupCount;
+                // 优先使用全局缓存统计
+                if (_cacheHits + _cacheMisses > 0)
+                {
+                    _metrics.CacheHitRate = (double)_cacheHits / (_cacheHits + _cacheMisses);
+                }
+                else if (_config.DetailedMonitoring)
+                {
+                    // 回退到作用域统计
+                    var totalHits = _scopeMetrics.Values.Sum(s => s.CacheHitCount);
+                    _metrics.CacheHitRate = (double)totalHits / _metrics.VariableLookupCount;
+                }
             }
 
             // 复制函数和作用域指标
@@ -135,6 +148,8 @@ public class PerformanceMonitor : IPerformanceMonitor
             _metrics = new PerformanceMetrics();
             _functionMetrics.Clear();
             _scopeMetrics.Clear();
+            _cacheHits = 0;
+            _cacheMisses = 0;
             _stopwatch.Reset();
         }
     }
@@ -201,6 +216,16 @@ public class PerformanceMonitor : IPerformanceMonitor
         lock (_lock)
         {
             _metrics.VariableLookupCount++;
+
+            // 更新全局缓存统计
+            if (cacheHit)
+            {
+                _cacheHits++;
+            }
+            else
+            {
+                _cacheMisses++;
+            }
         }
 
         if (_config.DetailedMonitoring && _scopeMetrics.Count < _config.MaxScopeMetrics)

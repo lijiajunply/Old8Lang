@@ -23,10 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/SmallScriptPerformanceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/LoopExecutionPerformanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/LoopExecutionPerformanceTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/VariableLookupPerformanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Performance/VariableLookupPerformanceTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -573,7 +572,7 @@
       <workItem from="1771342366048" duration="1517000" />
       <workItem from="1771394553923" duration="4238000" />
       <workItem from="1771420401696" duration="3110000" />
-      <workItem from="1771504104788" duration="804000" />
+      <workItem from="1771504104788" duration="1467000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -918,7 +917,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="936" />
+    <option name="localTasksCounter" value="937" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -945,7 +944,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(lang): 简化数组实例方法调用逻辑并移除冗余转换方法&#10;&#10;- 移除 ArrayLangValue 中的方法名白名单检查，直接调用 FromClassToResult&#10;- 删除 ListToArrayMethod 和通用 LangList 转换方法注册&#10;- 将 Program.cs 中的参数从 -vm 修改为 -f&#10;- 更新 IDE 工作区配置中的执行器设置为 Debug 模式" />
     <MESSAGE value="refactor(vm): 提取类型映射逻辑到专用VMTypeMapper类&#10;&#10;- 将BaseInstanceMethod中的IsEquivalentType方法替换为VMTypeMapper调用&#10;- 移除VirtualMachine.Helpers.ReflectionAndTasks中的GetEquivalentLangType方法&#10;- 将类型等价检查逻辑统一到新创建的VMTypeMapper类中&#10;- 添加VMTypeMapper类处理C#原生类型与Old8Lang类型间的映射关系&#10;- 更新程序启动参数从-f改为-vm&#10;- 修改IDE配置文件中的调试设置和测试路径记录" />
     <MESSAGE value="feat(value-type): 添加集合类型ToStr方法支持&#10;&#10;- 实现字典类型的字符串格式化，格式为 {key1: value1, key2: value2}&#10;- 实现数组和列表类型的字符串格式化，格式为 [item1, item2, item3]&#10;- 实现元组类型的字符串格式化，格式为 (item1, item2)&#10;- 添加递归处理嵌套集合的FormatValueForDisplay辅助方法&#10;- 在VMTypeMapper中添加集合类型到LangValueType的映射支持&#10;- 移除无效的生成器操作测试用例" />
     <MESSAGE value="feat(tuple): 实现元组ToStr方法支持特定格式化&#10;&#10;- 为TupleToStrMethod添加详细注释说明元组格式化规则&#10;- 实现Tuple&lt;,&gt;类型的特殊格式化，输出格式为(item1, item2)&#10;- 添加FormatValueForDisplay辅助方法处理值的显示格式&#10;- 为字符串值添加引号包装，布尔值使用小写输出&#10;- 扩展ValueTypeToStrMethod支持更多类型格式化&#10;- 添加对Task、Thread、CancellationToken等系统类型的格式化支持&#10;- 实现枚举类型和元组类型的递归格式化处理&#10;- 更新IDE工作区配置中的变更记录和统计信息" />
@@ -970,7 +968,8 @@
     <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
     <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
     <MESSAGE value="perf(interpreter): 优化变量查找和循环性能并移除废弃测试&#10;&#10;- 添加 PerformanceOptimizationTests 测试类验证性能改进效果&#10;- 移除废弃的数组 Length() 方法测试代码&#10;- 修正 NetLibTests 中的 Json 序列化函数调用方式&#10;- 更新 IDE 配置文件中的任务计数器和变更列表记录&#10;- 重构工作区配置文件的 XML 格式和实体编码&#10;- 添加 cache-test.old8 性能测试脚本验证变量查找和嵌套循环性能" />
-    <option name="LAST_COMMIT_MESSAGE" value="perf(interpreter): 优化变量查找和循环性能并移除废弃测试&#10;&#10;- 添加 PerformanceOptimizationTests 测试类验证性能改进效果&#10;- 移除废弃的数组 Length() 方法测试代码&#10;- 修正 NetLibTests 中的 Json 序列化函数调用方式&#10;- 更新 IDE 配置文件中的任务计数器和变更列表记录&#10;- 重构工作区配置文件的 XML 格式和实体编码&#10;- 添加 cache-test.old8 性能测试脚本验证变量查找和嵌套循环性能" />
+    <MESSAGE value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
+    <option name="LAST_COMMIT_MESSAGE" value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

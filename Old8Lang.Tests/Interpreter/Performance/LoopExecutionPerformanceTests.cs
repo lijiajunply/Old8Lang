@@ -21,7 +21,7 @@ public class LoopExecutionPerformanceTests
         // Arrange
         var code = @"
             sum <- 0
-            for i <- 0, i < 10000, i++ {
+            for i <- 0, i < 10000, i <- i + 1 {
                 sum <- sum + i
             }
         ";
@@ -58,10 +58,10 @@ public class LoopExecutionPerformanceTests
     {
         // Arrange
         var code = @"
-            sum = 0
-            for (i = 0; i < 100; i++) {
-                for (j = 0; j < 100; j++) {
-                    sum = sum + i * j
+            sum <- 0
+            for i <- 0, i < 100, i <- i + 1 {
+                for j <- 0, j < 100, j <- j + 1 {
+                    sum <- sum + i * j
                 }
             }
         ";
@@ -98,13 +98,13 @@ public class LoopExecutionPerformanceTests
     {
         // Arrange
         var code = @"
-            constant = 100
-            sum = 0
+            constant <- 100
+            sum <- 0
 
-            for (i = 0; i < 1000; i++) {
+            for i <- 0, i < 1000, i <- i + 1 {
                 // 这个计算是循环不变的，应该被提升
-                multiplier = constant * 2
-                sum = sum + i * multiplier
+                multiplier <- constant * 2
+                sum <- sum + i * multiplier
             }
         ";
 
@@ -133,11 +133,11 @@ public class LoopExecutionPerformanceTests
     {
         // Arrange
         var code = @"
-            global_var = 100
-            sum = 0
+            global_var <- 100
+            sum <- 0
 
-            for (i = 0; i < 1000; i++) {
-                sum = sum + global_var
+            for i <- 0, i < 1000, i <- i + 1 {
+                sum <- sum + global_var
             }
         ";
 
