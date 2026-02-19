@@ -71,15 +71,14 @@ for i <- 0, i < 100, i <- i + 1 {
 ";
 
         var monitor = new PerformanceMonitor();
-        var interpreter = new LangInterpreter();
-        interpreter.PerformanceMonitor = monitor;
+        monitor.StartMonitoring();
 
         // Act
-        monitor.StartMonitoring();
+        var interpreter = new LangInterpreter(monitor);
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        monitor.StopMonitoring();
 
+        monitor.StopMonitoring();
         var metrics = monitor.GetMetrics();
 
         // Assert
@@ -99,15 +98,18 @@ z <- x + y
 ";
 
         var monitor = new PerformanceMonitor();
-        var interpreter = new LangInterpreter();
-        interpreter.PerformanceMonitor = monitor;
+        monitor.StartMonitoring(new PerformanceMonitorConfig
+        {
+            Enabled = true,
+            EnableCacheTracking = true
+        });
 
         // Act
-        monitor.StartMonitoring();
+        var interpreter = new LangInterpreter(monitor);
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        monitor.StopMonitoring();
 
+        monitor.StopMonitoring();
         var metrics = monitor.GetMetrics();
 
         // Assert

@@ -21,7 +21,16 @@ public class SmallScriptPerformanceTests
     public void SmallScript_ExecutionTime_ShouldBeLessThan100ms()
     {
         // Arrange
-        var scriptPath = Path.Combine("TestScripts", "Performance", "small-script-50lines.old8");
+        // 从当前程序集位置向上查找项目根目录
+        var assemblyLocation = Path.GetDirectoryName(typeof(SmallScriptPerformanceTests).Assembly.Location)!;
+        var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
+        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "small-script-50lines.old8");
+
+        if (!File.Exists(scriptPath))
+        {
+            throw new FileNotFoundException($"测试脚本未找到: {scriptPath}");
+        }
+
         var code = File.ReadAllText(scriptPath);
 
         // Warmup
@@ -56,7 +65,15 @@ public class SmallScriptPerformanceTests
     public void SmallScript_WithPerformanceMonitoring_OverheadShouldBeLessThan1Percent()
     {
         // Arrange
-        var scriptPath = Path.Combine("TestScripts", "Performance", "small-script-50lines.old8");
+        var assemblyLocation = Path.GetDirectoryName(typeof(SmallScriptPerformanceTests).Assembly.Location)!;
+        var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
+        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "small-script-50lines.old8");
+
+        if (!File.Exists(scriptPath))
+        {
+            throw new FileNotFoundException($"测试脚本未找到: {scriptPath}");
+        }
+
         var code = File.ReadAllText(scriptPath);
 
         // Measure without monitoring

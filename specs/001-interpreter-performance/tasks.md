@@ -78,10 +78,10 @@
 
 > **NOTE: 先编写这些测试，确保它们失败（性能未达标），然后再实现优化**
 
-- [ ] T021 [P] [US1] 编写小型脚本性能测试 Old8Lang.Tests/Interpreter/Performance/SmallScriptPerformanceTests.cs
-- [ ] T022 [P] [US1] 编写变量查找性能测试 Old8Lang.Tests/Interpreter/Performance/VariableLookupPerformanceTests.cs
-- [ ] T023 [P] [US1] 编写循环执行性能测试 Old8Lang.Tests/Interpreter/Performance/LoopExecutionPerformanceTests.cs
-- [ ] T024 [US1] 运行测试验证当前性能未达标（测试应该失败）
+- [X] T021 [P] [US1] 编写小型脚本性能测试 Old8Lang.Tests/Interpreter/Performance/SmallScriptPerformanceTests.cs
+- [X] T022 [P] [US1] 编写变量查找性能测试 Old8Lang.Tests/Interpreter/Performance/VariableLookupPerformanceTests.cs
+- [X] T023 [P] [US1] 编写循环执行性能测试 Old8Lang.Tests/Interpreter/Performance/LoopExecutionPerformanceTests.cs
+- [X] T024 [US1] 运行测试验证当前性能未达标（测试应该失败）
 
 ### 变量查找优化实现
 
@@ -90,7 +90,7 @@
 - [X] T027 [US1] 实现作用域链扁平化优化 VariateManager.cs（缓存常用外层作用域变量）
 - [X] T028 [US1] 添加全局变量快速查找表 VariateManager.cs（专门的全局变量字典）
 - [X] T029 [US1] 在 PerformanceMonitor 中添加变量查找跟踪（RecordVariableLookup 方法）
-- [ ] T030 [US1] 运行变量查找基准测试验证 ≥40% 性能提升
+- [X] T030 [US1] 运行变量查找基准测试验证 ≥40% 性能提升
 
 ### 循环执行优化实现
 
@@ -98,14 +98,14 @@
 - [X] T032 [US1] 实现简单循环特殊化执行路径 InterpreterVisitor.cs（优化的循环执行）
 - [X] T033 [US1] 实现循环不变量提升 InterpreterVisitor.cs（将不变计算移到循环外）
 - [X] T034 [US1] 在 PerformanceMonitor 中添加循环迭代计数（LoopIterationCount 字段）
-- [ ] T035 [US1] 运行循环执行基准测试验证 ≥30% 性能提升
+- [X] T035 [US1] 运行循环执行基准测试验证 ≥30% 性能提升
 
 ### 验证和集成
 
-- [ ] T036 [US1] 运行所有 US1 性能测试验证性能目标达成
-- [ ] T037 [US1] 运行现有解释器测试确保功能正确性未被破坏
-- [ ] T038 [US1] 使用 small-script-50lines.old8 进行端到端测试，验证 <100ms 执行时间
-- [ ] T039 [US1] 更新基准测试结果文档 specs/001-interpreter-performance/us1-results.md
+- [X] T036 [US1] 运行所有 US1 性能测试验证性能目标达成
+- [X] T037 [US1] 运行现有解释器测试确保功能正确性未被破坏
+- [X] T038 [US1] 使用 small-script-50lines.old8 进行端到端测试，验证 <100ms 执行时间
+- [X] T039 [US1] 更新基准测试结果文档 specs/001-interpreter-performance/us1-results.md
 
 **Checkpoint**: 此时 User Story 1 应该完全功能正常且可独立测试，小型脚本性能达标
 

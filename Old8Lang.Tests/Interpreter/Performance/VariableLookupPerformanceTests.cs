@@ -20,7 +20,15 @@ public class VariableLookupPerformanceTests
     public void VariableLookup_CacheHitRate_ShouldBeGreaterThan80Percent()
     {
         // Arrange
-        var scriptPath = Path.Combine("TestScripts", "Performance", "variable-lookup.old8");
+        var assemblyLocation = Path.GetDirectoryName(typeof(VariableLookupPerformanceTests).Assembly.Location)!;
+        var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
+        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "variable-lookup.old8");
+
+        if (!File.Exists(scriptPath))
+        {
+            throw new FileNotFoundException($"测试脚本未找到: {scriptPath}");
+        }
+
         var code = File.ReadAllText(scriptPath);
 
         var monitor = new PerformanceMonitor();

@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>Old8Lang.Benchmarks.ParserBenchmarkTests-20260218-140127</title>
+<title>Old8Lang.Benchmarks.ParserBenchmarkTests-20260219-203413</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -22,35 +22,40 @@ AMD Ryzen 7 5800H with Radeon Graphics 3.20GHz, 1 CPU, 16 logical and 8 physical
 <pre><code></code></pre>
 
 <table>
-<thead><tr><th>Method                          </th><th>Mean</th><th>Error</th>
+<thead><tr><th>Method                                  </th><th>Mean    </th><th>Error  </th><th>StdDev </th><th>Median  </th><th>Gen0</th><th>Gen1</th><th>Gen2</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>&#39;Tokenize Simple Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Medium Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Complex Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Large File&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Simple Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Medium Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Complex Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Large File&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Full Pipeline - Simple Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Full Pipeline - Medium Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Full Pipeline - Complex Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Loop Intensive Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Function Intensive Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Expression Intensive Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Class Intensive Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Multiple Parses - Simple Code&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Multiple Parses - Different Codes&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Generic Syntax&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Lambda Expressions&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse LINQ Syntax&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Match Expressions&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Small Script (500 lines)&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Small Script (500 lines)&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Medium Project (3000 lines)&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Medium Project (3000 lines)&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Parse Large Script (5000 lines)&#39;</td><td>NA</td><td>NA</td>
-</tr><tr><td>&#39;Tokenize Large Script (5000 lines)&#39;</td><td>NA</td><td>NA</td>
+</thead><tbody><tr><td>&#39;Tokenize Simple Code&#39;</td><td>920.4 ns</td><td>18.32 ns</td><td>50.75 ns</td><td>918.5 ns</td><td>0.2899</td><td>-</td><td>-</td><td>2.38 KB</td>
+</tr><tr><td>&#39;Tokenize Medium Code&#39;</td><td>2,125.3 ns</td><td>70.17 ns</td><td>204.69 ns</td><td>2,125.6 ns</td><td>0.5951</td><td>0.0038</td><td>-</td><td>4.88 KB</td>
+</tr><tr><td>&#39;Tokenize Complex Code&#39;</td><td>4,498.2 ns</td><td>88.88 ns</td><td>95.10 ns</td><td>4,501.0 ns</td><td>1.1978</td><td>0.0229</td><td>-</td><td>9.82 KB</td>
+</tr><tr><td>&#39;Tokenize Large File&#39;</td><td>40,585.8 ns</td><td>745.91 ns</td><td>1,183.10 ns</td><td>40,458.9 ns</td><td>9.3384</td><td>1.2817</td><td>-</td><td>76.82 KB</td>
+</tr><tr><td>&#39;Parse Simple Code&#39;</td><td>2,645.5 ns</td><td>48.80 ns</td><td>47.92 ns</td><td>2,659.3 ns</td><td>0.7896</td><td>0.0038</td><td>-</td><td>6.46 KB</td>
+</tr><tr><td>&#39;Parse Medium Code&#39;</td><td>5,030.3 ns</td><td>97.61 ns</td><td>123.45 ns</td><td>5,042.0 ns</td><td>1.4572</td><td>0.0305</td><td>-</td><td>11.91 KB</td>
+</tr><tr><td>&#39;Parse Complex Code&#39;</td><td>13,015.4 ns</td><td>257.82 ns</td><td>538.16 ns</td><td>12,906.6 ns</td><td>3.6774</td><td>0.1526</td><td>-</td><td>30.05 KB</td>
+</tr><tr><td>&#39;Parse Large File&#39;</td><td>106,925.8 ns</td><td>2,117.43 ns</td><td>2,438.43 ns</td><td>107,411.5 ns</td><td>25.6348</td><td>5.2490</td><td>-</td><td>209.52 KB</td>
+</tr><tr><td>&#39;Full Pipeline - Simple Code&#39;</td><td>2,544.1 ns</td><td>51.25 ns</td><td>42.80 ns</td><td>2,557.0 ns</td><td>0.7896</td><td>0.0038</td><td>-</td><td>6.46 KB</td>
+</tr><tr><td>&#39;Full Pipeline - Medium Code&#39;</td><td>6,161.8 ns</td><td>432.81 ns</td><td>1,276.16 ns</td><td>5,705.9 ns</td><td>1.4572</td><td>0.0305</td><td>-</td><td>11.91 KB</td>
+</tr><tr><td>&#39;Full Pipeline - Complex Code&#39;</td><td>14,110.3 ns</td><td>275.58 ns</td><td>257.78 ns</td><td>14,098.3 ns</td><td>3.6774</td><td>0.1526</td><td>-</td><td>30.05 KB</td>
+</tr><tr><td>&#39;Parse Loop Intensive Code&#39;</td><td>9,420.0 ns</td><td>182.01 ns</td><td>488.97 ns</td><td>9,398.5 ns</td><td>2.4414</td><td>0.0458</td><td>-</td><td>19.99 KB</td>
+</tr><tr><td>&#39;Parse Function Intensive Code&#39;</td><td>12,930.2 ns</td><td>243.41 ns</td><td>578.49 ns</td><td>12,737.7 ns</td><td>3.9368</td><td>0.1831</td><td>-</td><td>32.23 KB</td>
+</tr><tr><td>&#39;Parse Expression Intensive Code&#39;</td><td>16,121.2 ns</td><td>317.70 ns</td><td>424.12 ns</td><td>16,251.3 ns</td><td>4.3640</td><td>0.2441</td><td>-</td><td>35.82 KB</td>
+</tr><tr><td>&#39;Parse Class Intensive Code&#39;</td><td>34,218.6 ns</td><td>765.34 ns</td><td>2,244.62 ns</td><td>33,796.9 ns</td><td>9.9487</td><td>1.0376</td><td>-</td><td>81.57 KB</td>
+</tr><tr><td>&#39;Multiple Parses - Simple Code&#39;</td><td>27,541.1 ns</td><td>545.48 ns</td><td>849.25 ns</td><td>27,855.9 ns</td><td>7.9041</td><td>0.0610</td><td>-</td><td>64.61 KB</td>
+</tr><tr><td>&#39;Multiple Parses - Different Codes&#39;</td><td>22,730.1 ns</td><td>448.21 ns</td><td>498.18 ns</td><td>22,855.0 ns</td><td>5.9204</td><td>0.1831</td><td>-</td><td>48.42 KB</td>
+</tr><tr><td>&#39;Parse Generic Syntax&#39;</td><td>8,238.2 ns</td><td>164.61 ns</td><td>364.75 ns</td><td>8,209.2 ns</td><td>2.5787</td><td>0.0763</td><td>-</td><td>21.16 KB</td>
+</tr><tr><td>&#39;Parse Lambda Expressions&#39;</td><td>10,597.6 ns</td><td>401.22 ns</td><td>1,131.65 ns</td><td>10,336.1 ns</td><td>2.7161</td><td>0.0916</td><td>-</td><td>22.27 KB</td>
+</tr><tr><td>&#39;Parse LINQ Syntax&#39;</td><td>7,900.7 ns</td><td>133.85 ns</td><td>318.11 ns</td><td>7,883.6 ns</td><td>2.0142</td><td>0.0458</td><td>-</td><td>16.54 KB</td>
+</tr><tr><td>&#39;Parse Match Expressions&#39;</td><td>8,064.9 ns</td><td>160.58 ns</td><td>309.38 ns</td><td>8,075.4 ns</td><td>2.0905</td><td>0.0534</td><td>-</td><td>17.13 KB</td>
+</tr><tr><td>&#39;Parse Small Script (500 lines)&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Tokenize Small Script (500 lines)&#39;</td><td>227,606.7 ns</td><td>4,522.35 ns</td><td>10,747.85 ns</td><td>224,918.1 ns</td><td>62.2559</td><td>62.2559</td><td>62.2559</td><td>581.36 KB</td>
+</tr><tr><td>&#39;Parse Medium Project (3000 lines)&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Tokenize Medium Project (3000 lines)&#39;</td><td>1,859,294.6 ns</td><td>36,894.34 ns</td><td>97,838.57 ns</td><td>1,854,568.4 ns</td><td>832.0313</td><td>820.3125</td><td>689.4531</td><td>4211.38 KB</td>
+</tr><tr><td>&#39;Parse Large Script (5000 lines)&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Tokenize Large Script (5000 lines)&#39;</td><td>2,326,364.2 ns</td><td>26,022.42 ns</td><td>24,341.39 ns</td><td>2,328,133.2 ns</td><td>996.0938</td><td>996.0938</td><td>996.0938</td><td>4982.22 KB</td>
+</tr><tr><td>&#39;Parse Deeply Nested Expression (50 layers)&#39;</td><td>34,966.6 ns</td><td>573.45 ns</td><td>508.35 ns</td><td>34,928.8 ns</td><td>8.5449</td><td>0.6104</td><td>-</td><td>69.88 KB</td>
+</tr><tr><td>&#39;Parse Massive Assignments (10000 statements)&#39;</td><td>9,550,957.8 ns</td><td>257,415.08 ns</td><td>734,419.77 ns</td><td>9,485,451.6 ns</td><td>1171.8750</td><td>1109.3750</td><td>531.2500</td><td>7965.47 KB</td>
+</tr><tr><td>&#39;Parse Extra Large File (10000+ lines)&#39;</td><td>7,269,869.3 ns</td><td>342,068.90 ns</td><td>942,157.17 ns</td><td>7,063,418.4 ns</td><td>1093.7500</td><td>1070.3125</td><td>500.0000</td><td>7254.45 KB</td>
+</tr><tr><td>&#39;Parse with Syntax Errors&#39;</td><td>16,023.1 ns</td><td>311.09 ns</td><td>291.00 ns</td><td>16,050.9 ns</td><td>1.1597</td><td>-</td><td>-</td><td>9.6 KB</td>
+</tr><tr><td>&#39;Concurrent Parsing (4 threads)&#39;</td><td>8,876.6 ns</td><td>176.03 ns</td><td>156.04 ns</td><td>8,871.1 ns</td><td>4.1351</td><td>0.1831</td><td>-</td><td>33.46 KB</td>
 </tr></tbody></table>
 </body>
 </html>
