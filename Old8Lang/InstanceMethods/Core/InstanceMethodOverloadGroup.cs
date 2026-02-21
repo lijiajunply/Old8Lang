@@ -75,35 +75,67 @@ public class InstanceMethodOverloadGroup
     {
         lock (_lock)
         {
-            // 如果只有一个重载，直接返回
-            if (_overloads.Count == 1)
-            {
-                var singleOverload = _overloads[0];
-                return singleOverload.CanAccept(parameters, local) ? singleOverload : null;
-            }
+            // 【修复】优先查找内置方法，然后才是扩展方法
+            // 这样可以防止扩展方法覆盖内置方法导致的栈溢出
 
-            // 计算每个重载的匹配分数
-            var candidates = new List<(IInstanceMethod Method, int Score)>();
-
-            foreach (var overload in _overloads)
+            // 1. 首先尝试匹配内置方法
+            var builtInMethods = _overloads.Where(m => !m.IsExtensionMethod).ToList();
+            if (builtInMethods.Count > 0)
             {
-                var score = overload.CalculateMatchScore(parameters, local);
-                if (score >= 0)
+                var builtInMatch = ResolveFromCandidates(builtInMethods, parameters, local);
+                if (builtInMatch != null)
                 {
-                    candidates.Add((overload, score));
+                    return builtInMatch;
                 }
             }
 
-            // 如果没有匹配的重载
-            if (candidates.Count == 0)
+            // 2. 如果没有匹配的内置方法，再尝试扩展方法
+            var extensionMethods = _overloads.Where(m => m.IsExtensionMethod).ToList();
+            if (extensionMethods.Count > 0)
             {
-                return null;
+                return ResolveFromCandidates(extensionMethods, parameters, local);
             }
 
-            // 选择分数最高的重载
-            var bestMatch = candidates.OrderByDescending(c => c.Score).First();
-            return bestMatch.Method;
+            return null;
         }
+    }
+
+    /// <summary>
+    /// 从候选方法列表中解析最匹配的方法
+    /// </summary>
+    private IInstanceMethod? ResolveFromCandidates(
+        List<IInstanceMethod> candidates,
+        List<LangExpression> parameters,
+        LocalManager? local)
+    {
+        // 如果只有一个候选，直接返回
+        if (candidates.Count == 1)
+        {
+            var singleCandidate = candidates[0];
+            return singleCandidate.CanAccept(parameters, local) ? singleCandidate : null;
+        }
+
+        // 计算每个候选的匹配分数
+        var scoredCandidates = new List<(IInstanceMethod Method, int Score)>();
+
+        foreach (var candidate in candidates)
+        {
+            var score = candidate.CalculateMatchScore(parameters, local);
+            if (score >= 0)
+            {
+                scoredCandidates.Add((candidate, score));
+            }
+        }
+
+        // 如果没有匹配的候选
+        if (scoredCandidates.Count == 0)
+        {
+            return null;
+        }
+
+        // 选择分数最高的候选
+        var bestMatch = scoredCandidates.OrderByDescending(c => c.Score).First();
+        return bestMatch.Method;
     }
 
     /// <summary>

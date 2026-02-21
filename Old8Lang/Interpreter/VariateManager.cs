@@ -1339,4 +1339,74 @@ public class VariateManager
     }
 
     #endregion
+
+    #region Extension Method Recursion Detection
+
+    /// <summary>
+    /// 扩展方法调用栈（用于检测递归调用）
+    /// </summary>
+    private readonly Stack<string> _extensionMethodCallStack = new();
+
+    /// <summary>
+    /// 最大扩展方法递归深度
+    /// </summary>
+    private const int MaxExtensionMethodDepth = 100;
+
+    /// <summary>
+    /// 进入扩展方法调用
+    /// </summary>
+    /// <param name="methodSignature">方法签名（类型名.方法名）</param>
+    public void EnterExtensionMethod(string methodSignature)
+    {
+        // 检查递归深度
+        if (_extensionMethodCallStack.Count >= MaxExtensionMethodDepth)
+        {
+            var callStack = string.Join(" -> ", _extensionMethodCallStack);
+            throw new InvalidOperationError(
+                (SourcePosition)default,
+                $"扩展方法递归深度超过限制 ({MaxExtensionMethodDepth})。\n" +
+                $"调用栈: {callStack} -> {methodSignature}");
+        }
+
+        // 检查是否已经在调用栈中（直接递归）
+        if (_extensionMethodCallStack.Contains(methodSignature))
+        {
+            var callStack = string.Join(" -> ", _extensionMethodCallStack);
+            throw new InvalidOperationError(
+                (SourcePosition)default,
+                $"检测到扩展方法递归调用: {methodSignature}\n" +
+                $"调用栈: {callStack} -> {methodSignature}\n" +
+                $"提示: 扩展方法内部不应该调用同名的扩展方法。如果需要调用内置方法，请使用不同的方法名。");
+        }
+
+        _extensionMethodCallStack.Push(methodSignature);
+    }
+
+    /// <summary>
+    /// 退出扩展方法调用
+    /// </summary>
+    public void ExitExtensionMethod()
+    {
+        if (_extensionMethodCallStack.Count > 0)
+        {
+            _extensionMethodCallStack.Pop();
+        }
+    }
+
+    /// <summary>
+    /// 检查是否在扩展方法调用中
+    /// </summary>
+    /// <param name="methodSignature">方法签名</param>
+    /// <returns>如果在调用栈中返回 true</returns>
+    public bool IsInExtensionMethod(string methodSignature)
+    {
+        return _extensionMethodCallStack.Contains(methodSignature);
+    }
+
+    /// <summary>
+    /// 获取当前扩展方法调用深度
+    /// </summary>
+    public int ExtensionMethodCallDepth => _extensionMethodCallStack.Count;
+
+    #endregion
 }

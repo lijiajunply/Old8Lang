@@ -37,6 +37,11 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
 
     public string? Documentation => function.DocComment?.Summary;
 
+    /// <summary>
+    /// 标记为扩展方法
+    /// </summary>
+    public bool IsExtensionMethod => true;
+
     public bool CanAccept(List<LangExpression> parameters, LocalManager? local)
     {
         // 检查参数数量（不包括隐式的 this 参数）
@@ -61,37 +66,59 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         VariateManager manager,
         SourcePosition position)
     {
-        // 创建新的作用域
-        manager.AddChildren();
+        // 【调试】检查 manager.Interpreter 是否为 null
+        if (manager.Interpreter == null)
+        {
+            throw new InvalidOperationError(position,
+                $"扩展方法 '{function.Id.IdName}' 执行时，VariateManager.Interpreter 为 null。" +
+                $"这可能是因为扩展方法在错误的上下文中被调用。");
+        }
+
+        // 【修复】生成方法签名用于递归检测
+        var methodSignature = $"{instance.GetType().Name}.{function.Id.IdName}";
+
+        // 【修复】进入扩展方法，启用递归检测
+        manager.EnterExtensionMethod(methodSignature);
 
         try
         {
-            // 绑定 this 关键字到实例
-            manager.Set(new LangId("this"), instance);
+            // 创建新的作用域
+            manager.AddChildren();
 
-            // 绑定用户定义的参数
-            for (int i = 0; i < parameters.Count; i++)
+            try
             {
-                var paramName = function.Ids[i].IdName;
-                var paramValue = parameters[i].Run(manager);
-                manager.Set(new LangId(paramName), paramValue);
+                // 绑定 this 关键字到实例
+                manager.Set(new LangId("this"), instance);
+
+                // 绑定用户定义的参数
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    var paramName = function.Ids[i].IdName;
+                    var paramValue = parameters[i].Run(manager);
+                    manager.Set(new LangId(paramName), paramValue);
+                }
+
+                // 执行函数体
+                function.BlockStatement.Run(manager);
+
+                // 检查是否有返回值
+                if (manager.IsReturn)
+                {
+                    return manager.Result;
+                }
+
+                // 如果没有显式返回，返回 null
+                return new NullLangValue();
             }
-
-            // 执行函数体
-            function.BlockStatement.Run(manager);
-
-            // 检查是否有返回值
-            if (manager.IsReturn)
+            finally
             {
-                return manager.Result;
+                manager.RemoveChildren();
             }
-
-            // 如果没有显式返回，返回 null
-            return new NullLangValue();
         }
         finally
         {
-            manager.RemoveChildren();
+            // 【修复】退出扩展方法，清理递归检测状态
+            manager.ExitExtensionMethod();
         }
     }
 

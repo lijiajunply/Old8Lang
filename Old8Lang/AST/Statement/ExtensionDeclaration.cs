@@ -96,7 +96,7 @@ public class ExtensionDeclaration(
         // 内置类型映射到 Old8Lang 的包装类型
         return typeName.ToLower() switch
         {
-            "string" => typeof(string),
+            "string" => typeof(StringLangValue), // 【修复】映射到 StringLangValue 而不是 string
             "int" => typeof(IntLangValue),
             "double" => typeof(DoubleLangValue),
             "bool" => typeof(BoolLangValue),

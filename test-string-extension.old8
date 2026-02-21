@@ -1,0 +1,9 @@
+extension string {
+    func getValue() -> string {
+        return this
+    }
+}
+
+s <- "hello"
+result <- s.getValue()
+print(result)

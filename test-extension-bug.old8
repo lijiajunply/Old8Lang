@@ -1,0 +1,10 @@
+// 测试扩展方法栈溢出问题
+extension int {
+    func toStr() -> string {
+        return this.ToStr()
+    }
+}
+
+x <- 42
+str <- x.toStr()
+print(str)

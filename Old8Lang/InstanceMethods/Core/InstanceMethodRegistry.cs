@@ -19,7 +19,7 @@ public sealed class InstanceMethodRegistry
 
     /// <summary>
     /// 按类型组织的方法映射：Type -> (MethodName -> InstanceMethodOverloadGroup)
-    /// 方法名称不区分大小写
+    /// 方法名称区分大小写（Ordinal）
     /// </summary>
     private readonly Dictionary<Type, Dictionary<string, InstanceMethodOverloadGroup>> _methodsByType = new();
 
@@ -47,7 +47,8 @@ public sealed class InstanceMethodRegistry
             // 获取或创建该类型的方法字典
             if (!_methodsByType.TryGetValue(method.TargetType, out var methodDict))
             {
-                methodDict = new Dictionary<string, InstanceMethodOverloadGroup>(StringComparer.OrdinalIgnoreCase);
+                // 【修复】使用大小写敏感的字符串比较器，避免 toStr 和 ToStr 冲突
+                methodDict = new Dictionary<string, InstanceMethodOverloadGroup>(StringComparer.Ordinal);
                 _methodsByType[method.TargetType] = methodDict;
             }
 
@@ -164,7 +165,8 @@ public sealed class InstanceMethodRegistry
     {
         lock (_registerLock)
         {
-            var methodNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // 【修复】使用大小写敏感的字符串比较器
+            var methodNames = new HashSet<string>(StringComparer.Ordinal);
 
             // 收集所有适用于该类型的方法名称
             foreach (var kvp in _methodsByType)

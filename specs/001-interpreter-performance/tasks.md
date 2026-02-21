@@ -22,6 +22,45 @@
 
 ---
 
+## Phase 0: CRITICAL BUG FIXES (阻塞性问题修复) 🔴
+
+**Purpose**: 修复解释器核心功能的严重 bug，这些问题会导致栈溢出和测试失败
+
+**⚠️ BLOCKING**: 必须在继续性能优化之前完成这些修复
+
+**参考文档**: `specs/001-interpreter-performance/CRITICAL_ISSUES.md`
+
+### 问题 1: 扩展方法栈溢出修复
+
+- [ ] T000 [P] [CRITICAL] 分析扩展方法查找优先级问题 - 阅读 InstanceMethodRegistry.ResolveMethod 实现
+- [ ] T001-BUG [CRITICAL] 实现内置方法优先级检查 Instance.InstanceMethods.cs（在查找扩展方法前先检查内置方法）
+- [ ] T002-BUG [CRITICAL] 确保方法名匹配大小写敏感 InstanceMethodRegistry.cs（toStr ≠ ToStr）
+- [ ] T003-BUG [CRITICAL] 添加递归调用检测机制 VariateManager.cs（跟踪正在执行的扩展方法）
+- [ ] T004-BUG [CRITICAL] 在 ExtensionMethodWrapper.Execute 中启用递归检测
+- [ ] T005-BUG [CRITICAL] 运行测试验证栈溢出已修复 ExtensionMethodInterpreterTests.Execute_ExtensionMethodReturningDifferentType_ExecutesCorrectly
+
+### 问题 2: 扩展方法类型匹配修复
+
+- [ ] T006-BUG [P] [CRITICAL] 分析扩展方法类型注册问题 - 检查 InstanceMethodRegistry 如何存储不同类型的同名方法
+- [ ] T007-BUG [CRITICAL] 修复扩展方法类型解析逻辑 InstanceMethodRegistry.ResolveMethod（确保正确匹配目标类型）
+- [ ] T008-BUG [CRITICAL] 运行测试验证类型匹配已修复 ExtensionMethodInterpreterTests.Execute_SameMethodNameForDifferentTypes_ExecutesCorrectly
+
+### 问题 3: 泛型约束验证修复
+
+- [ ] T009-BUG [P] [CRITICAL] 分析泛型约束验证失败原因 GenericConstraintExtensionInterpreterTests
+- [ ] T010-BUG [CRITICAL] 修复泛型约束类型推断 GenericTypeInference.cs
+- [ ] T011-BUG [CRITICAL] 运行测试验证泛型约束已修复 GenericConstraintExtensionInterpreterTests.ComplexScenario_GenericClassWithMultipleConstraints_WorksCorrectly
+
+### 验证和回归测试
+
+- [ ] T012-BUG [CRITICAL] 运行所有 Interpreter.Classes 测试确保无回归
+- [ ] T013-BUG [CRITICAL] 运行完整测试套件确保整体稳定性
+- [ ] T014-BUG [CRITICAL] 更新 CRITICAL_ISSUES.md 记录修复结果
+
+**Checkpoint**: 所有关键 bug 修复完成，测试通过率 100%，可以继续性能优化工作
+
+---
+
 ## Phase 1: Setup (共享基础设施)
 
 **Purpose**: 项目初始化和基础结构搭建
@@ -119,25 +158,25 @@
 
 ### 测试脚本和基准测试
 
-- [ ] T040 [P] [US2] 创建中等规模测试程序 TestScripts/Performance/medium-program-1000lines.old8（1000行，10类，50函数）
-- [ ] T041 [P] [US2] 创建递归测试脚本 TestScripts/Performance/recursive-calls.old8（递归深度100层）
-- [ ] T042 [P] [US2] 编写中等规模程序性能测试 Old8Lang.Tests/Interpreter/Performance/MediumProgramPerformanceTests.cs
-- [ ] T043 [P] [US2] 编写递归调用性能测试 Old8Lang.Tests/Interpreter/Performance/RecursiveCallPerformanceTests.cs
-- [ ] T044 [US2] 运行测试验证当前性能未达标
+- [X] T040 [P] [US2] 创建中等规模测试程序 TestScripts/Performance/medium-program-1000lines.old8（1000行，10类，50函数）
+- [X] T041 [P] [US2] 创建递归测试脚本 TestScripts/Performance/recursive-calls.old8（递归深度100层）
+- [X] T042 [P] [US2] 编写中等规模程序性能测试 Old8Lang.Tests/Interpreter/Performance/MediumProgramPerformanceTests.cs
+- [X] T043 [P] [US2] 编写递归调用性能测试 Old8Lang.Tests/Interpreter/Performance/RecursiveCallPerformanceTests.cs
+- [X] T044 [US2] 运行测试验证当前性能未达标
 
 ### 函数调用优化实现
 
 - [ ] T045 [US2] 优化函数调用栈管理 InterpreterVisitor.cs（减少栈帧创建开销）
 - [ ] T046 [US2] 实现函数调用缓存 InterpreterVisitor.cs（缓存常用函数引用）
 - [ ] T047 [US2] 优化闭包变量捕获 CapturedScope.cs（减少闭包创建开销）
-- [ ] T048 [US2] 在 PerformanceMonitor 中添加函数调用跟踪（RecordFunctionCall 方法）
+- [X] T048 [US2] 在 PerformanceMonitor 中添加函数调用跟踪（RecordFunctionCall 方法）
 - [ ] T049 [US2] 运行函数调用基准测试验证性能提升
 
 ### 递归深度优化
 
 - [ ] T050 [US2] 实现递归深度控制 InterpreterVisitor.cs（跟踪递归深度，支持至少100层）
 - [ ] T051 [US2] 优化递归调用的栈使用 InterpreterVisitor.cs（减少每层递归的内存占用）
-- [ ] T052 [US2] 添加递归深度监控 PerformanceMonitor.cs（FunctionMetrics.RecursionDepth）
+- [X] T052 [US2] 添加递归深度监控 PerformanceMonitor.cs（FunctionMetrics.RecursionDepth）
 - [ ] T053 [US2] 运行递归调用测试验证支持100层深度
 
 ### 对象创建优化

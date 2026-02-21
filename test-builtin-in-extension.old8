@@ -1,0 +1,11 @@
+extension int {
+    func doubleAndPrint() -> int {
+        result <- this * 2
+        Print(result.ToStr())
+        return result
+    }
+}
+
+x <- 5
+result <- x.doubleAndPrint()
+print(result)
