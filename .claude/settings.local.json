@@ -69,7 +69,8 @@
       "Bash(fi)",
       "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/small-script-50lines.old8\":*)",
       "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/nested-loops.old8\":*)",
-      "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/variable-lookup.old8\":*)"
+      "Bash(\"/c/Projects/RiderProjects/Old8Lang/TestScripts/Performance/variable-lookup.old8\":*)",
+      "Bash(powershell.exe:*)"
     ]
   }
 }

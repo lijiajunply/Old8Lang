@@ -66,14 +66,6 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         VariateManager manager,
         SourcePosition position)
     {
-        // 【调试】检查 manager.Interpreter 是否为 null
-        if (manager.Interpreter == null)
-        {
-            throw new InvalidOperationError(position,
-                $"扩展方法 '{function.Id.IdName}' 执行时，VariateManager.Interpreter 为 null。" +
-                $"这可能是因为扩展方法在错误的上下文中被调用。");
-        }
-
         // 【修复】生成方法签名用于递归检测
         var methodSignature = $"{instance.GetType().Name}.{function.Id.IdName}";
 
@@ -104,7 +96,9 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
                 // 检查是否有返回值
                 if (manager.IsReturn)
                 {
-                    return manager.Result;
+                    var returnValue = manager.Result;
+                    manager.ClearReturn();
+                    return returnValue;
                 }
 
                 // 如果没有显式返回，返回 null
