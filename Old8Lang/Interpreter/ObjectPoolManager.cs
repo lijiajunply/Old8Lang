@@ -55,4 +55,17 @@ public class ObjectPoolManager
     {
         // 对象池使用ConcurrentBag实现，不需要显式重置
     }
+
+    /// <summary>
+    /// 获取所有对象池的统计信息
+    /// </summary>
+    public IEnumerable<ObjectPoolStats> GetAllStats()
+    {
+        yield return BoolPool.GetStats("BoolPool", "BoolLangValue");
+        yield return IntPool.GetStats("IntPool", "IntLangValue");
+        yield return DoublePool.GetStats("DoublePool", "DoubleLangValue");
+        yield return StringPool.GetStats("StringPool", "StringLangValue");
+        yield return CharPool.GetStats("CharPool", "CharLangValue");
+        yield return ControlFlowStatePool.GetStats("ControlFlowStatePool", "ControlFlowState");
+    }
 }

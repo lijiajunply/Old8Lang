@@ -69,6 +69,11 @@ public class PerformanceMetrics
     public List<ScopeMetrics> ScopeMetrics { get; set; } = new();
 
     /// <summary>
+    /// 对象池统计信息
+    /// </summary>
+    public List<ObjectPoolStats> ObjectPoolStats { get; set; } = new();
+
+    /// <summary>
     /// 验证性能指标数据的有效性
     /// </summary>
     public bool Validate()

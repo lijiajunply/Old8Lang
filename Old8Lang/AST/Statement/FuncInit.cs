@@ -38,7 +38,8 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
         // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
         // 但对于来自不同模块的函数，允许重复（它们可能通过别名导入）
-        if (FuncValue.Id is not null)
+        // 在函数内部定义的函数（嵌套函数）不检查重复，因为每次调用外层函数都会重新定义
+        if (FuncValue.Id is not null && !manager.IsFunc)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is FuncLangValue func &&
@@ -81,7 +82,16 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
 
         // 注册函数
-        manager.AddClassAndFunc(finalFunc);
+        // 在函数内部定义的嵌套函数：添加到当前作用域（函数返回时自动清理）
+        // 在顶层定义的函数：添加到 ImportInfosList（全局可见）
+        if (manager.IsFunc && FuncValue.Id is not null)
+        {
+            manager.SetLocal(FuncValue.Id, finalFunc);
+        }
+        else
+        {
+            manager.AddClassAndFunc(finalFunc);
+        }
     }
 
     /// <summary>

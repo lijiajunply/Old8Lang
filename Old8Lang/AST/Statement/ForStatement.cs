@@ -28,7 +28,17 @@ public partial class ForStatement(
 
         try
         {
-            setStatement.Run(manager);
+            // 使用 SetLocal 确保循环变量在当前作用域中创建，防止污染外层同名变量
+            // 例如：外层 for i <- 0, i < 20 调用函数，函数内 for i <- 0, i < 5 不应修改外层 i
+            if (setStatement.Id is not null)
+            {
+                var initValue = setStatement.Value.Run(manager);
+                manager.SetLocal(setStatement.Id, initValue);
+            }
+            else
+            {
+                setStatement.Run(manager);
+            }
 
             // 性能优化：检测简单循环模式（可以优化的循环）
             bool isSimpleLoop = IsSimpleCountingLoop();

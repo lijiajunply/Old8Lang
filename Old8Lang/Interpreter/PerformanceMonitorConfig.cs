@@ -45,7 +45,7 @@ public class PerformanceMonitorConfig
     /// </summary>
     public static PerformanceMonitorConfig Default => new()
     {
-        Enabled = false,
+        Enabled = true,
         DetailedMonitoring = false,
         SampleRate = 1.0,
         MaxFunctionMetrics = 100,

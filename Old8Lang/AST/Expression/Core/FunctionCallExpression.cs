@@ -62,7 +62,25 @@ public partial class FunctionCallExpression : LangExpression
     public override LangValueType Run(VariateManager manager)
     {
         // 1. 运行函数表达式获取函数对象
-        var functionValue = FunctionExpression.Run(manager);
+        // 对于简单标识符调用，尝试使用函数引用缓存（仅缓存非闭包函数）
+        LangValueType functionValue;
+        if (FunctionExpression is LangId langId)
+        {
+            var name = langId.IdName;
+            if (!manager.TryGetCachedFunction(name, out functionValue!))
+            {
+                functionValue = FunctionExpression.Run(manager);
+                // 只缓存非闭包、非泛型的顶层函数（闭包每次调用外层函数时会重新创建）
+                if (functionValue is FuncLangValue { IsGeneric: false, CapturedScope: null } topLevelFunc)
+                {
+                    manager.CacheFunctionReference(name, topLevelFunc);
+                }
+            }
+        }
+        else
+        {
+            functionValue = FunctionExpression.Run(manager);
+        }
 
         // 2. 检查获取到的是否为函数
         if (functionValue is not FuncLangValue func)

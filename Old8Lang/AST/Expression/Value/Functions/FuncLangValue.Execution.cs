@@ -576,7 +576,7 @@ public partial class FuncLangValue
             }
 
             if (invoke is null)
-                return new VoidLangValue();
+                return VoidLangValue.Instance;
 
             var manager = new VariateManager();
             var convertedValue = ObjToValue(invoke);

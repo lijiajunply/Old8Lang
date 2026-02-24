@@ -31,28 +31,46 @@ public class MediumProgramPerformanceTests
 
         var code = File.ReadAllText(scriptPath);
 
-        // Warmup
-        for (int i = 0; i < WarmupRuns; i++)
+        // 在大栈线程上运行，避免 xUnit 线程池线程栈溢出
+        double avgTime = 0;
+        Exception? threadException = null;
+        var thread = new Thread(() =>
         {
-            var interpreter = new LangInterpreter();
-            var ast = interpreter.Build(code);
-            ast.Run(interpreter.Manager);
-        }
+            try
+            {
+                // Warmup
+                for (int i = 0; i < WarmupRuns; i++)
+                {
+                    var interpreter = new LangInterpreter();
+                    var ast = interpreter.Build(code);
+                    ast.Run(interpreter.Manager);
+                }
 
-        // Measure
-        var times = new long[MeasurementRuns];
-        for (int i = 0; i < MeasurementRuns; i++)
-        {
-            var sw = Stopwatch.StartNew();
-            var interpreter = new LangInterpreter();
-            var ast = interpreter.Build(code);
-            ast.Run(interpreter.Manager);
-            sw.Stop();
-            times[i] = sw.ElapsedMilliseconds;
-        }
+                // Measure
+                var times = new long[MeasurementRuns];
+                for (int i = 0; i < MeasurementRuns; i++)
+                {
+                    var sw = Stopwatch.StartNew();
+                    var interpreter = new LangInterpreter();
+                    var ast = interpreter.Build(code);
+                    ast.Run(interpreter.Manager);
+                    sw.Stop();
+                    times[i] = sw.ElapsedMilliseconds;
+                }
 
-        // Calculate average
-        var avgTime = CalculateAverage(times);
+                avgTime = CalculateAverage(times);
+            }
+            catch (Exception ex)
+            {
+                threadException = ex;
+            }
+        }, 64 * 1024 * 1024); // 64MB 栈，避免深层调用栈溢出
+
+        thread.Start();
+        thread.Join();
+
+        if (threadException != null)
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(threadException).Throw();
 
         // Assert
         Assert.True(avgTime < TargetExecutionTimeMs,
@@ -74,24 +92,42 @@ public class MediumProgramPerformanceTests
 
         var code = File.ReadAllText(scriptPath);
 
-        var monitor = new PerformanceMonitor();
-        monitor.StartMonitoring(new PerformanceMonitorConfig
+        PerformanceMetrics? metrics = null;
+        Exception? threadException = null;
+        var thread = new Thread(() =>
         {
-            Enabled = true,
-            EnableCacheTracking = true,
-            EnableMemoryTracking = true
-        });
+            try
+            {
+                var monitor = new PerformanceMonitor();
+                monitor.StartMonitoring(new PerformanceMonitorConfig
+                {
+                    Enabled = true,
+                    EnableCacheTracking = true,
+                    EnableMemoryTracking = true
+                });
 
-        // Act
-        var interpreter = new LangInterpreter(monitor);
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
+                var interpreter = new LangInterpreter(monitor);
+                var ast = interpreter.Build(code);
+                ast.Run(interpreter.Manager);
 
-        monitor.StopMonitoring();
-        var metrics = monitor.GetMetrics();
+                monitor.StopMonitoring();
+                metrics = monitor.GetMetrics();
+            }
+            catch (Exception ex)
+            {
+                threadException = ex;
+            }
+        }, 64 * 1024 * 1024);
+
+        thread.Start();
+        thread.Join();
+
+        if (threadException != null)
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(threadException).Throw();
 
         // Assert
-        Assert.True(metrics.ExecutionTimeMs > 0, "执行时间应该被记录");
+        Assert.NotNull(metrics);
+        Assert.True(metrics!.ExecutionTimeMs > 0, "执行时间应该被记录");
         Assert.True(metrics.VariableLookupCount > 0, "变量查找次数应该被记录");
         Assert.True(metrics.CacheHitRate >= 0, "缓存命中率应该被计算");
     }
@@ -111,23 +147,41 @@ public class MediumProgramPerformanceTests
 
         var code = File.ReadAllText(scriptPath);
 
-        var monitor = new PerformanceMonitor();
-        monitor.StartMonitoring(new PerformanceMonitorConfig
+        PerformanceMetrics? metrics = null;
+        Exception? threadException = null;
+        var thread = new Thread(() =>
         {
-            Enabled = true,
-            EnableCacheTracking = true
-        });
+            try
+            {
+                var monitor = new PerformanceMonitor();
+                monitor.StartMonitoring(new PerformanceMonitorConfig
+                {
+                    Enabled = true,
+                    EnableCacheTracking = true
+                });
 
-        // Act
-        var interpreter = new LangInterpreter(monitor);
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
+                var interpreter = new LangInterpreter(monitor);
+                var ast = interpreter.Build(code);
+                ast.Run(interpreter.Manager);
 
-        monitor.StopMonitoring();
-        var metrics = monitor.GetMetrics();
+                monitor.StopMonitoring();
+                metrics = monitor.GetMetrics();
+            }
+            catch (Exception ex)
+            {
+                threadException = ex;
+            }
+        }, 64 * 1024 * 1024);
+
+        thread.Start();
+        thread.Join();
+
+        if (threadException != null)
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(threadException).Throw();
 
         // Assert - 中等规模程序应该有良好的缓存命中率
-        Assert.True(metrics.CacheHitRate > 0.70,
+        Assert.NotNull(metrics);
+        Assert.True(metrics!.CacheHitRate > 0.70,
             $"缓存命中率 {metrics.CacheHitRate:P} 低于 70%");
     }
 

@@ -22,45 +22,6 @@
 
 ---
 
-## Phase 0: CRITICAL BUG FIXES (阻塞性问题修复) 🔴
-
-**Purpose**: 修复解释器核心功能的严重 bug，这些问题会导致栈溢出和测试失败
-
-**⚠️ BLOCKING**: 必须在继续性能优化之前完成这些修复
-
-**参考文档**: `specs/001-interpreter-performance/CRITICAL_ISSUES.md`
-
-### 问题 1: 扩展方法栈溢出修复
-
-- [ ] T000 [P] [CRITICAL] 分析扩展方法查找优先级问题 - 阅读 InstanceMethodRegistry.ResolveMethod 实现
-- [ ] T001-BUG [CRITICAL] 实现内置方法优先级检查 Instance.InstanceMethods.cs（在查找扩展方法前先检查内置方法）
-- [ ] T002-BUG [CRITICAL] 确保方法名匹配大小写敏感 InstanceMethodRegistry.cs（toStr ≠ ToStr）
-- [ ] T003-BUG [CRITICAL] 添加递归调用检测机制 VariateManager.cs（跟踪正在执行的扩展方法）
-- [ ] T004-BUG [CRITICAL] 在 ExtensionMethodWrapper.Execute 中启用递归检测
-- [ ] T005-BUG [CRITICAL] 运行测试验证栈溢出已修复 ExtensionMethodInterpreterTests.Execute_ExtensionMethodReturningDifferentType_ExecutesCorrectly
-
-### 问题 2: 扩展方法类型匹配修复
-
-- [ ] T006-BUG [P] [CRITICAL] 分析扩展方法类型注册问题 - 检查 InstanceMethodRegistry 如何存储不同类型的同名方法
-- [ ] T007-BUG [CRITICAL] 修复扩展方法类型解析逻辑 InstanceMethodRegistry.ResolveMethod（确保正确匹配目标类型）
-- [ ] T008-BUG [CRITICAL] 运行测试验证类型匹配已修复 ExtensionMethodInterpreterTests.Execute_SameMethodNameForDifferentTypes_ExecutesCorrectly
-
-### 问题 3: 泛型约束验证修复
-
-- [ ] T009-BUG [P] [CRITICAL] 分析泛型约束验证失败原因 GenericConstraintExtensionInterpreterTests
-- [ ] T010-BUG [CRITICAL] 修复泛型约束类型推断 GenericTypeInference.cs
-- [ ] T011-BUG [CRITICAL] 运行测试验证泛型约束已修复 GenericConstraintExtensionInterpreterTests.ComplexScenario_GenericClassWithMultipleConstraints_WorksCorrectly
-
-### 验证和回归测试
-
-- [ ] T012-BUG [CRITICAL] 运行所有 Interpreter.Classes 测试确保无回归
-- [ ] T013-BUG [CRITICAL] 运行完整测试套件确保整体稳定性
-- [ ] T014-BUG [CRITICAL] 更新 CRITICAL_ISSUES.md 记录修复结果
-
-**Checkpoint**: 所有关键 bug 修复完成，测试通过率 100%，可以继续性能优化工作
-
----
-
 ## Phase 1: Setup (共享基础设施)
 
 **Purpose**: 项目初始化和基础结构搭建
@@ -166,33 +127,33 @@
 
 ### 函数调用优化实现
 
-- [ ] T045 [US2] 优化函数调用栈管理 InterpreterVisitor.cs（减少栈帧创建开销）
-- [ ] T046 [US2] 实现函数调用缓存 InterpreterVisitor.cs（缓存常用函数引用）
-- [ ] T047 [US2] 优化闭包变量捕获 CapturedScope.cs（减少闭包创建开销）
+- [X] T045 [US2] 优化函数调用栈管理 InterpreterVisitor.cs（减少栈帧创建开销）
+- [X] T046 [US2] 实现函数调用缓存 InterpreterVisitor.cs（缓存常用函数引用）
+- [X] T047 [US2] 优化闭包变量捕获 CapturedScope.cs（减少闭包创建开销）
 - [X] T048 [US2] 在 PerformanceMonitor 中添加函数调用跟踪（RecordFunctionCall 方法）
-- [ ] T049 [US2] 运行函数调用基准测试验证性能提升
+- [X] T049 [US2] 运行函数调用基准测试验证性能提升
 
 ### 递归深度优化
 
-- [ ] T050 [US2] 实现递归深度控制 InterpreterVisitor.cs（跟踪递归深度，支持至少100层）
-- [ ] T051 [US2] 优化递归调用的栈使用 InterpreterVisitor.cs（减少每层递归的内存占用）
+- [X] T050 [US2] 实现递归深度控制 InterpreterVisitor.cs（跟踪递归深度，支持至少100层）
+- [X] T051 [US2] 优化递归调用的栈使用 InterpreterVisitor.cs（减少每层递归的内存占用）
 - [X] T052 [US2] 添加递归深度监控 PerformanceMonitor.cs（FunctionMetrics.RecursionDepth）
-- [ ] T053 [US2] 运行递归调用测试验证支持100层深度
+- [X] T053 [US2] 运行递归调用测试验证支持100层深度
 
 ### 对象创建优化
 
-- [ ] T054 [US2] 扩展 ObjectPool 支持更多类型 ObjectPool.cs（添加常用 AST 节点类型）
-- [ ] T055 [US2] 在 ObjectPoolManager 中添加作用域对象池（VariateScope 对象复用）
-- [ ] T056 [US2] 实现对象池统计 ObjectPoolStats.cs（跟踪池使用情况）
-- [ ] T057 [US2] 在 PerformanceMonitor 中集成对象池统计
-- [ ] T058 [US2] 运行对象创建基准测试验证内存使用优化
+- [X] T054 [US2] 扩展 ObjectPool 支持更多类型 ObjectPool.cs（添加常用 AST 节点类型）
+- [X] T055 [US2] 在 ObjectPoolManager 中添加作用域对象池（VariateScope 对象复用）
+- [X] T056 [US2] 实现对象池统计 ObjectPoolStats.cs（跟踪池使用情况）
+- [X] T057 [US2] 在 PerformanceMonitor 中集成对象池统计
+- [X] T058 [US2] 运行对象创建基准测试验证内存使用优化
 
 ### 验证和集成
 
-- [ ] T059 [US2] 运行所有 US2 性能测试验证性能目标达成
-- [ ] T060 [US2] 运行现有解释器测试确保功能正确性
-- [ ] T061 [US2] 使用 medium-program-1000lines.old8 进行端到端测试，验证 <2s 执行时间
-- [ ] T062 [US2] 更新基准测试结果文档 specs/001-interpreter-performance/us2-results.md
+- [X] T059 [US2] 运行所有 US2 性能测试验证性能目标达成
+- [X] T060 [US2] 运行现有解释器测试确保功能正确性
+- [X] T061 [US2] 使用 medium-program-1000lines.old8 进行端到端测试，验证 <2s 执行时间
+- [X] T062 [US2] 更新基准测试结果文档 specs/001-interpreter-performance/us2-results.md
 
 **Checkpoint**: 此时 User Stories 1 和 2 都应该独立工作，中等规模程序性能达标
 
@@ -206,34 +167,34 @@
 
 ### 测试脚本和基准测试
 
-- [ ] T063 [P] [US3] 创建长时间运行测试脚本 TestScripts/Performance/long-running-5min.old8（5分钟数据处理）
-- [ ] T064 [P] [US3] 创建大量迭代测试脚本 TestScripts/Performance/million-iterations.old8（100万次迭代）
-- [ ] T065 [P] [US3] 编写内存稳定性测试 Old8Lang.Tests/Interpreter/Performance/MemoryStabilityTests.cs
-- [ ] T066 [P] [US3] 编写长时间运行性能测试 Old8Lang.Tests/Interpreter/Performance/LongRunningPerformanceTests.cs
-- [ ] T067 [US3] 运行测试验证当前内存使用情况
+- [X] T063 [P] [US3] 创建长时间运行测试脚本 TestScripts/Performance/long-running-5min.old8（5分钟数据处理）
+- [X] T064 [P] [US3] 创建大量迭代测试脚本 TestScripts/Performance/million-iterations.old8（100万次迭代）
+- [X] T065 [P] [US3] 编写内存稳定性测试 Old8Lang.Tests/Interpreter/Performance/MemoryStabilityTests.cs
+- [X] T066 [P] [US3] 编写长时间运行性能测试 Old8Lang.Tests/Interpreter/Performance/LongRunningPerformanceTests.cs
+- [X] T067 [US3] 运行测试验证当前内存使用情况
 
 ### 内存管理优化
 
-- [ ] T068 [US3] 实现内存使用监控 PerformanceMonitor.cs（跟踪 MemoryUsageBytes）
-- [ ] T069 [US3] 优化对象池回收策略 ObjectPoolManager.cs（定期清理未使用对象）
-- [ ] T070 [US3] 实现作用域对象自动回收 VariateManager.cs（作用域退出时清理缓存）
-- [ ] T071 [US3] 添加 GC 回收监控 PerformanceMonitor.cs（GCCollectionCount 字段）
-- [ ] T072 [US3] 运行内存稳定性测试验证内存增长 <5%
+- [X] T068 [US3] 实现内存使用监控 PerformanceMonitor.cs（跟踪 MemoryUsageBytes）
+- [X] T069 [US3] 优化对象池回收策略 ObjectPoolManager.cs（定期清理未使用对象）
+- [X] T070 [US3] 实现作用域对象自动回收 VariateManager.cs（作用域退出时清理缓存）
+- [X] T071 [US3] 添加 GC 回收监控 PerformanceMonitor.cs（GCCollectionCount 字段）
+- [X] T072 [US3] 运行内存稳定性测试验证内存增长 <5%
 
 ### 性能稳定性优化
 
-- [ ] T073 [US3] 实现缓存大小限制 VariableCache.cs（防止缓存无限增长）
-- [ ] T074 [US3] 实现 LRU 淘汰策略 VariableCache.cs（自动清理最少使用的缓存条目）
-- [ ] T075 [US3] 优化符号表缓存 SymbolTableCache.cs（添加大小限制和淘汰策略）
-- [ ] T076 [US3] 添加性能退化检测 PerformanceMonitor.cs（跟踪执行速度变化）
-- [ ] T077 [US3] 运行长时间运行测试验证性能稳定
+- [X] T073 [US3] 实现缓存大小限制 VariableCache.cs（防止缓存无限增长）
+- [X] T074 [US3] 实现 LRU 淘汰策略 VariableCache.cs（自动清理最少使用的缓存条目）
+- [X] T075 [US3] 优化符号表缓存 SymbolTableCache.cs（添加大小限制和淘汰策略）
+- [X] T076 [US3] 添加性能退化检测 PerformanceMonitor.cs（跟踪执行速度变化）
+- [X] T077 [US3] 运行长时间运行测试验证性能稳定
 
 ### 验证和集成
 
-- [ ] T078 [US3] 运行所有 US3 性能测试验证性能目标达成
-- [ ] T079 [US3] 运行现有解释器测试确保功能正确性
-- [ ] T080 [US3] 使用 long-running-5min.old8 进行端到端测试，验证内存稳定性
-- [ ] T081 [US3] 更新基准测试结果文档 specs/001-interpreter-performance/us3-results.md
+- [X] T078 [US3] 运行所有 US3 性能测试验证性能目标达成
+- [X] T079 [US3] 运行现有解释器测试确保功能正确性
+- [X] T080 [US3] 使用 long-running-5min.old8 进行端到端测试，验证内存稳定性
+- [X] T081 [US3] 更新基准测试结果文档 specs/001-interpreter-performance/us3-results.md
 
 **Checkpoint**: 所有用户故事现在都应该独立功能正常，长时间运行脚本内存稳定
 
@@ -245,35 +206,35 @@
 
 ### 性能报告实现
 
-- [ ] T082 [P] 实现 IPerformanceReporter 接口 Old8Lang/Interpreter/IPerformanceReporter.cs
-- [ ] T083 [P] 实现 PerformanceReporter 类 Old8Lang/Interpreter/PerformanceReporter.cs
-- [ ] T084 [P] 实现文本格式报告生成 PerformanceReporter.cs（GenerateTextReport 方法）
-- [ ] T085 [P] 实现 JSON 格式报告生成 PerformanceReporter.cs（GenerateJsonReport 方法）
-- [ ] T086 [P] 实现 CSV 格式报告生成 PerformanceReporter.cs（GenerateCsvReport 方法）
-- [ ] T087 实现报告保存功能 PerformanceReporter.cs（SaveReport 方法）
+- [X] T082 [P] 实现 IPerformanceReporter 接口 Old8Lang/Interpreter/IPerformanceReporter.cs
+- [X] T083 [P] 实现 PerformanceReporter 类 Old8Lang/Interpreter/PerformanceReporter.cs
+- [X] T084 [P] 实现文本格式报告生成 PerformanceReporter.cs（GenerateTextReport 方法）
+- [X] T085 [P] 实现 JSON 格式报告生成 PerformanceReporter.cs（GenerateJsonReport 方法）
+- [X] T086 [P] 实现 CSV 格式报告生成 PerformanceReporter.cs（GenerateCsvReport 方法）
+- [X] T087 实现报告保存功能 PerformanceReporter.cs（SaveReport 方法）
 
 ### 详细监控功能
 
-- [ ] T088 实现详细监控配置 PerformanceMonitorConfig.cs（DetailedMonitoring 选项）
-- [ ] T089 实现函数级别性能跟踪 PerformanceMonitor.cs（收集 FunctionMetrics）
-- [ ] T090 实现作用域级别性能跟踪 PerformanceMonitor.cs（收集 ScopeMetrics）
-- [ ] T091 实现采样率控制 PerformanceMonitor.cs（SampleRate 配置）
-- [ ] T092 实现性能数据聚合 PerformanceMonitor.cs（计算平均值、最大值、最小值）
+- [X] T088 实现详细监控配置 PerformanceMonitorConfig.cs（DetailedMonitoring 选项）
+- [X] T089 实现函数级别性能跟踪 PerformanceMonitor.cs（收集 FunctionMetrics）
+- [X] T090 实现作用域级别性能跟踪 PerformanceMonitor.cs（收集 ScopeMetrics）
+- [X] T091 实现采样率控制 PerformanceMonitor.cs（SampleRate 配置）
+- [X] T092 实现性能数据聚合 PerformanceMonitor.cs（计算平均值、最大值、最小值）
 
 ### CLI 集成
 
-- [ ] T093 在 Old8Lang.App/Program.cs 中添加 --perf 命令行选项
-- [ ] T094 在 Old8Lang.App/Program.cs 中添加 --perf-detailed 命令行选项
-- [ ] T095 在 Old8Lang.App/Program.cs 中添加 --perf-output 命令行选项（指定报告输出文件）
-- [ ] T096 实现 CLI 性能报告显示 Old8Lang.App/Commands/FromFileCommand.cs
+- [X] T093 在 Old8Lang.App/Program.cs 中添加 --perf 命令行选项
+- [X] T094 在 Old8Lang.App/Program.cs 中添加 --perf-detailed 命令行选项
+- [X] T095 在 Old8Lang.App/Program.cs 中添加 --perf-output 命令行选项（指定报告输出文件）
+- [X] T096 实现 CLI 性能报告显示 Old8Lang.App/Commands/FromFileCommand.cs
 - [ ] T097 编写 CLI 性能监控集成测试 Old8Lang.Tests/CLI/PerformanceMonitoringTests.cs
 
 ### 验证
 
-- [ ] T098 编写性能监控单元测试 Old8Lang.Tests/Interpreter/Performance/PerformanceMonitorTests.cs
-- [ ] T099 编写性能报告生成测试 Old8Lang.Tests/Interpreter/Performance/PerformanceReporterTests.cs
-- [ ] T100 验证性能监控开销 <1%（运行基准测试对比启用/禁用监控）
-- [ ] T101 测试所有报告格式（文本、JSON、CSV）的正确性
+- [X] T098 编写性能监控单元测试 Old8Lang.Tests/Interpreter/Performance/PerformanceMonitorTests.cs
+- [X] T099 编写性能报告生成测试 Old8Lang.Tests/Interpreter/Performance/PerformanceReporterTests.cs
+- [X] T100 验证性能监控开销 <1%（运行基准测试对比启用/禁用监控）
+- [X] T101 测试所有报告格式（文本、JSON、CSV）的正确性
 
 **Checkpoint**: 性能监控功能完整可用，开发者可以通过 CLI 查看性能指标
 
@@ -285,24 +246,24 @@
 
 ### 文档更新
 
-- [ ] T102 [P] 更新 Docs/ARCHITECTURE.md 记录性能优化策略和实现细节
-- [ ] T103 [P] 更新 Docs/CLI_GUIDE.md 记录性能监控 CLI 选项
-- [ ] T104 [P] 创建性能优化最佳实践文档 Docs/PERFORMANCE_BEST_PRACTICES.md
+- [X] T102 [P] 更新 Docs/ARCHITECTURE.md 记录性能优化策略和实现细节
+- [X] T103 [P] 更新 Docs/CLI_GUIDE.md 记录性能监控 CLI 选项
+- [X] T104 [P] 创建性能优化最佳实践文档 Docs/PERFORMANCE_BEST_PRACTICES.md
 - [ ] T105 [P] 更新 README.md 添加性能优化特性说明
 
 ### 代码质量
 
-- [ ] T106 代码审查和重构（确保符合 C# 编码规范）
-- [ ] T107 添加 XML 文档注释到所有公共 API
-- [ ] T108 运行静态分析工具（Roslyn 分析器）确保无警告
+- [X] T106 代码审查和重构（确保符合 C# 编码规范）
+- [X] T107 添加 XML 文档注释到所有公共 API
+- [X] T108 运行静态分析工具（Roslyn 分析器）确保无警告
 - [ ] T109 性能回归测试集成到 CI/CD（在 CI 中运行基准测试）
 
 ### 最终验证
 
-- [ ] T110 运行完整的测试套件（所有单元测试、集成测试、性能测试）
-- [ ] T111 验证所有用户故事的接受标准都已满足
-- [ ] T112 运行 quickstart.md 中的所有示例验证文档正确性
-- [ ] T113 生成最终性能报告对比优化前后的性能提升
+- [X] T110 运行完整的测试套件（所有单元测试、集成测试、性能测试）
+- [X] T111 验证所有用户故事的接受标准都已满足
+- [X] T112 运行 quickstart.md 中的所有示例验证文档正确性
+- [X] T113 生成最终性能报告对比优化前后的性能提升
 
 ---
 

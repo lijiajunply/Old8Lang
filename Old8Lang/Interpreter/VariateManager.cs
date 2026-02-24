@@ -190,6 +190,12 @@ public class VariateManager
     private Dictionary<string, LangValueType>? _globalVariableCache;
 
     /// <summary>
+    /// 函数引用缓存，缓存常用函数引用避免重复查找
+    /// 键为函数名，值为 (函数值, 作用域深度) 元组
+    /// </summary>
+    private Dictionary<string, (LangValueType func, int scopeDepth)>? _functionCallCache;
+
+    /// <summary>
     /// 只读变量集合，使用ThreadStatic避免线程同步开销 (变量名 -> 作用域索引)
     /// </summary>
     private readonly Dictionary<string, int> ReadonlyVariables = new();
@@ -243,7 +249,7 @@ public class VariateManager
     /// <summary>
     /// 返回结果值
     /// </summary>
-    public LangValueType Result { get; set; } = new VoidLangValue();
+    public LangValueType Result { get; set; } = VoidLangValue.Instance;
 
     #endregion
 
@@ -675,6 +681,29 @@ public class VariateManager
     }
 
     /// <summary>
+    /// 设置局部变量，总是在当前作用域中创建新变量（不向上查找）
+    /// 用于 for 循环变量初始化，防止循环变量污染外层同名变量
+    /// </summary>
+    /// <param name="id">变量标识符</param>
+    /// <param name="langValueType">变量值</param>
+    public void SetLocal(LangId id, LangValueType langValueType)
+    {
+        var currentScopeIndex = Scopes.Count - 1;
+
+        EnsureScopeNotShared(currentScopeIndex);
+        Scopes[currentScopeIndex][id.IdName] = langValueType;
+
+        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+        _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+        _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+        if (currentScopeIndex == 0 && _globalVariableCache != null)
+        {
+            _globalVariableCache[id.IdName] = langValueType;
+        }
+    }
+
+    /// <summary>
     /// 添加新的子作用域（进入块语句）
     /// </summary>
     public void AddChildren()
@@ -967,7 +996,7 @@ public class VariateManager
     {
         IsReturn = false;
         IsYield = false;
-        Result = new VoidLangValue();
+        Result = VoidLangValue.Instance;
     }
 
     /// <summary>
@@ -1044,21 +1073,17 @@ public class VariateManager
             else
             {
                 // 其他作用域：深拷贝，保持局部变量独立
-                var newScope = new Dictionary<string, LangValueType>();
+                // 使用拷贝构造函数预分配正确容量，提升性能
+                var newScope = new Dictionary<string, LangValueType>(scope);
+                newManager.Scopes.Add(newScope);
+                // 注册锁定变量（共享引用）
                 foreach (var (varName, varValue) in scope)
                 {
-                    // 如果是锁定变量，直接共享引用而非拷贝
                     if (varValue is LockedVariableLangValue lockedVar)
                     {
-                        newScope[varName] = lockedVar; // 共享同一个 LockedVariable 实例
-                        newManager.LockedVariables[varName] = lockedVar; // 在新管理器中也记录
-                    }
-                    else
-                    {
-                        newScope[varName] = varValue; // 普通变量正常拷贝
+                        newManager.LockedVariables[varName] = lockedVar;
                     }
                 }
-                newManager.Scopes.Add(newScope);
             }
         }
 
@@ -1189,7 +1214,7 @@ public class VariateManager
         IsReturn = false;
         IsFunc = false;
         IsClass = false;
-        Result = new VoidLangValue();
+        Result = VoidLangValue.Instance;
         RecursionDepth = 0;
 
         // 清理查找缓存
@@ -1336,6 +1361,39 @@ public class VariateManager
         }
 
         return (_variableCache.HitCount, _variableCache.MissCount, _variableCache.HitRate);
+    }
+
+    /// <summary>
+    /// 从函数引用缓存中获取函数值
+    /// </summary>
+    public bool TryGetCachedFunction(string name, out LangValueType? func)
+    {
+        if (_functionCallCache != null &&
+            _functionCallCache.TryGetValue(name, out var cached) &&
+            cached.scopeDepth == Scopes.Count)
+        {
+            func = cached.func;
+            return true;
+        }
+        func = null;
+        return false;
+    }
+
+    /// <summary>
+    /// 将函数值存入函数引用缓存
+    /// </summary>
+    public void CacheFunctionReference(string name, LangValueType func)
+    {
+        _functionCallCache ??= new Dictionary<string, (LangValueType, int)>(32);
+        _functionCallCache[name] = (func, Scopes.Count);
+    }
+
+    /// <summary>
+    /// 清除函数引用缓存（作用域变化时调用）
+    /// </summary>
+    private void InvalidateFunctionCallCache()
+    {
+        _functionCallCache?.Clear();
     }
 
     #endregion

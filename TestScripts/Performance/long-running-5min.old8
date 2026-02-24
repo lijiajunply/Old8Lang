@@ -1,0 +1,52 @@
+// 长时间运行测试脚本
+// 模拟5分钟数据处理任务（简化版，实际运行约10-30秒）
+// 目标: 内存使用增长 <5%，无性能退化
+
+// 数据处理函数
+func processData(data, multiplier) {
+    result <- 0
+    for i <- 0, i < data, i <- i + 1 {
+        result <- result + i * multiplier
+    }
+    return result
+}
+
+// 字符串处理函数
+func buildString(n) {
+    result <- ""
+    for i <- 0, i < n, i <- i + 1 {
+        result <- result + "x"
+    }
+    return result
+}
+
+// 递归计算
+func sumRecursive(n) {
+    if n <= 0 {
+        return 0
+    }
+    return n + sumRecursive(n - 1)
+}
+
+// 主循环 - 模拟长时间运行
+totalIterations <- 1000
+batchSize <- 100
+
+for batch <- 0, batch < totalIterations, batch <- batch + 1 {
+    // 数值计算批次
+    r1 <- processData(batchSize, batch + 1)
+
+    // 递归计算
+    r2 <- sumRecursive(20)
+
+    // 简单字符串操作
+    s <- buildString(5)
+
+    // 变量查找密集操作
+    a <- batch * 2
+    b <- a + r2
+    c <- b - r1
+    d <- c + 1
+}
+
+print("长时间运行测试完成")

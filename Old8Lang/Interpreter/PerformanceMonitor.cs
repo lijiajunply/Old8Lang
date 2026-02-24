@@ -26,6 +26,9 @@ public class PerformanceMonitor : IPerformanceMonitor
     // 作用域级别指标缓存
     private readonly ConcurrentDictionary<string, ScopeMetrics> _scopeMetrics = new();
 
+    // 性能基线（用于退化检测）
+    private PerformanceMetrics? _baselineMetrics;
+
     /// <summary>
     /// 检查监控是否启用
     /// </summary>
@@ -117,6 +120,10 @@ public class PerformanceMonitor : IPerformanceMonitor
                 _metrics.FunctionMetrics.AddRange(_functionMetrics.Values.Take(_config.MaxFunctionMetrics));
                 _metrics.ScopeMetrics.AddRange(_scopeMetrics.Values.Take(_config.MaxScopeMetrics));
             }
+
+            // 收集对象池统计信息
+            _metrics.ObjectPoolStats.Clear();
+            _metrics.ObjectPoolStats.AddRange(ObjectPoolManager.Instance.GetAllStats());
 
             IsMonitoring = false;
         }
@@ -284,6 +291,39 @@ public class PerformanceMonitor : IPerformanceMonitor
         lock (_lock)
         {
             _metrics.LoopIterationCount++;
+        }
+    }
+
+    /// <summary>
+    /// 设置性能基线（用于退化检测）
+    /// </summary>
+    public void SetBaseline()
+    {
+        lock (_lock)
+        {
+            _baselineMetrics = _metrics;
+        }
+    }
+
+    /// <summary>
+    /// 检测性能退化
+    /// </summary>
+    /// <param name="degradationThreshold">退化阈值（0-1，例如 0.2 表示允许20%的退化）</param>
+    /// <returns>如果检测到退化返回 true</returns>
+    public bool DetectPerformanceDegradation(double degradationThreshold = 0.2)
+    {
+        lock (_lock)
+        {
+            if (_baselineMetrics is null || _metrics.ExecutionTimeMs == 0)
+                return false;
+
+            if (_baselineMetrics.ExecutionTimeMs == 0)
+                return false;
+
+            var degradationRatio = (double)(_metrics.ExecutionTimeMs - _baselineMetrics.ExecutionTimeMs)
+                                   / _baselineMetrics.ExecutionTimeMs;
+
+            return degradationRatio > degradationThreshold;
         }
     }
 }

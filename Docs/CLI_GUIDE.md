@@ -24,6 +24,19 @@ dotnet run --project Old8Lang.App -- -f <文件路径> [参数]
 dotnet run --project Old8Lang.App -- -f scripts/hello.old8
 ```
 
+**性能监控选项**:
+```bash
+# 启用基础性能监控（执行后显示性能报告）
+dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf
+
+# 启用详细性能监控（包含函数级别指标）
+dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf-detailed
+
+# 将性能报告保存到文件（支持 .txt、.json、.csv 格式）
+dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf --perf-output report.json
+dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf --perf-output report.csv
+```
+
 ### 2. 编译模式 (Compiler Mode)
 将代码编译为 IL 并执行，性能更高，但要求更严格的类型注解。
 
