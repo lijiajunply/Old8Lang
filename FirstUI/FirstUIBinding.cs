@@ -22,13 +22,10 @@ public static class FirstUIBinding
     /// </summary>
     private static void EnsureContextInitialized()
     {
-        if (_context == null)
+        _context ??= new BuildContext
         {
-            _context = new BuildContext
-            {
-                Theme = ThemeManager.Instance.CurrentTheme
-            };
-        }
+            Theme = ThemeManager.Instance.CurrentTheme
+        };
     }
 
     /// <summary>
@@ -376,10 +373,7 @@ internal class FirstUIAvaloniaApp(Func<WidgetBase> buildFunction, string? title 
                 // 设置关闭回调
                 toast.OnClose = () =>
                 {
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        _toastContainer.Children.Remove(toastControl);
-                    });
+                    Dispatcher.UIThread.Post(() => { _toastContainer.Children.Remove(toastControl); });
                 };
             }
             catch (Exception ex)
@@ -406,8 +400,10 @@ internal class FirstUIAvaloniaApp(Func<WidgetBase> buildFunction, string? title 
                 {
                     foreach (var child in _toastContainer.Children)
                     {
-                        if (child is Control toastControl)
-                            toastChildren.Add(toastControl);
+                        if (child != null)
+                        {
+                            toastChildren.Add(child);
+                        }
                     }
                 }
 
@@ -456,17 +452,8 @@ public class FirstUIApplication
     /// <summary>
     /// 运行应用程序（使用构建函数，支持响应式更新）
     /// </summary>
-    public void Run(Func<WidgetBase> buildFunction, string? s = null)
+    public static void Run(Func<WidgetBase> buildFunction, string? s = null)
     {
         FirstUIBinding.RunApp(buildFunction, s);
-    }
-
-    /// <summary>
-    /// 运行应用程序（兼容旧 API，不支持响应式更新）
-    /// </summary>
-    [Obsolete("Use Run(Func<WidgetBase>, string?) for reactive updates")]
-    public void Run(WidgetBase widget, string? s = null)
-    {
-        FirstUIBinding.RunApp(() => widget, s);
     }
 }

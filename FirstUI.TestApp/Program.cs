@@ -31,7 +31,7 @@ var effectStop = WatchEffectFactory.Create(() =>
 });
 
 // 构建 UI（使用 lambda 函数，每次重建时重新执行）
-app.Run(() => new Column([
+FirstUIApplication.Run(() => new Column([
     // 标题
     new Text("Vue 风格响应式 API 演示")
         .SetFontSize(28)

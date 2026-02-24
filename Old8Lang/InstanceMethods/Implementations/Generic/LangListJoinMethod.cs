@@ -38,7 +38,7 @@ public class LangListJoinMethod : BaseLangListMethod
             }
         }
 
-        var strings = items.Select(item => item.ToString() ?? "null");
+        var strings = items.Select(item => item.ToDisplayString() ?? "null");
         var result = string.Join(separator, strings);
 
         return StringLangValue.Create(result, position);

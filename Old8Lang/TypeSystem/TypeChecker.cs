@@ -20,12 +20,15 @@ public static class TypeChecker
     /// <summary>
     /// 类型假注管理器实例
     /// </summary>
+    [ThreadStatic]
     private static TypeAnnotationManager? _annotationManager;
 
     /// <summary>
-    /// 跟踪 const 变量的集合
+    /// 跟踪 const 变量的集合（线程隔离，避免并行测试互相污染）
     /// </summary>
-    private static readonly HashSet<string> ConstVariables = [];
+    [ThreadStatic]
+    private static HashSet<string>? _constVariables;
+    private static HashSet<string> ConstVariables => _constVariables ??= [];
 
     /// <summary>
     /// 初始化类型检查器
@@ -34,6 +37,7 @@ public static class TypeChecker
     public static void Initialize(VariateManager globalManager)
     {
         _annotationManager = new TypeAnnotationManager(globalManager);
+        ConstVariables.Clear();
     }
 
     /// <summary>

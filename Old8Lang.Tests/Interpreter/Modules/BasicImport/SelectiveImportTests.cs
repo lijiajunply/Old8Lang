@@ -14,6 +14,17 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
     public void Import_SelectiveFunctions_ShouldImportOnlySpecifiedFunctions()
     {
         // Arrange
+        var lazyMathContent = """
+            func CalculateLargeNumber() {
+                return 42
+            }
+            func HeavyOperation() {
+                return 100
+            }
+            PI <- 3.14
+            """;
+        CreateTempModuleFile("lazy_math.old8", lazyMathContent);
+
         var testContent = """
             // 选择导入测试 - 从模块中导入特定功能
             import { CalculateLargeNumber, PI } from "lazy_math"
@@ -51,6 +62,17 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
     public void Import_SelectiveFromModule_ShouldImportSpecificItems()
     {
         // Arrange
+        var lazyMathContent = """
+            func CalculateLargeNumber() {
+                return 42
+            }
+            func HeavyOperation() {
+                return 100
+            }
+            PI <- 3.14
+            """;
+        CreateTempModuleFile("lazy_math.old8", lazyMathContent);
+
         var testContent = """
             // 从模块选择导入测试
             import CalculateLargeNumber, HeavyOperation from "lazy_math"
