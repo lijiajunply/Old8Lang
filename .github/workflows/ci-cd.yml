@@ -39,6 +39,9 @@ jobs:
       
     - name: Run unit tests
       run: dotnet test Old8Lang.Tests --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+
+    - name: Run performance regression tests
+      run: dotnet test Old8Lang.Tests --configuration Release --no-build --filter "FullyQualifiedName~Performance" --verbosity normal --logger "trx;LogFileName=performance_test_results.trx"
       
     - name: Run syntax tests
       run: |

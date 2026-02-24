@@ -227,7 +227,7 @@
 - [X] T094 在 Old8Lang.App/Program.cs 中添加 --perf-detailed 命令行选项
 - [X] T095 在 Old8Lang.App/Program.cs 中添加 --perf-output 命令行选项（指定报告输出文件）
 - [X] T096 实现 CLI 性能报告显示 Old8Lang.App/Commands/FromFileCommand.cs
-- [ ] T097 编写 CLI 性能监控集成测试 Old8Lang.Tests/CLI/PerformanceMonitoringTests.cs
+- [X] T097 编写 CLI 性能监控集成测试 Old8Lang.Tests/CLI/PerformanceMonitoringTests.cs
 
 ### 验证
 
@@ -249,14 +249,14 @@
 - [X] T102 [P] 更新 Docs/ARCHITECTURE.md 记录性能优化策略和实现细节
 - [X] T103 [P] 更新 Docs/CLI_GUIDE.md 记录性能监控 CLI 选项
 - [X] T104 [P] 创建性能优化最佳实践文档 Docs/PERFORMANCE_BEST_PRACTICES.md
-- [ ] T105 [P] 更新 README.md 添加性能优化特性说明
+- [X] T105 [P] 更新 README.md 添加性能优化特性说明
 
 ### 代码质量
 
 - [X] T106 代码审查和重构（确保符合 C# 编码规范）
 - [X] T107 添加 XML 文档注释到所有公共 API
 - [X] T108 运行静态分析工具（Roslyn 分析器）确保无警告
-- [ ] T109 性能回归测试集成到 CI/CD（在 CI 中运行基准测试）
+- [X] T109 性能回归测试集成到 CI/CD（在 CI 中运行基准测试）
 
 ### 最终验证
 
