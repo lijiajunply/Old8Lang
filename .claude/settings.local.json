@@ -76,7 +76,8 @@
       "Bash(cat:*)",
       "Bash(cd:*)",
       "Bash(echo EXIT: $?:*)",
-      "Bash(cd /c/Projects/RiderProjects/Old8Lang && pwsh .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks 2>&1)"
+      "Bash(cd /c/Projects/RiderProjects/Old8Lang && pwsh .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks 2>&1)",
+      "Bash(awk NR>=658 && NR<=698:*)"
     ]
   }
 }

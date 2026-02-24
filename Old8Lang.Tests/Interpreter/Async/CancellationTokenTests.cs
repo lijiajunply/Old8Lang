@@ -326,7 +326,8 @@ async func countWithCancellation(token) -> int {
 
 cts <- CancellationTokenSource(50)
 token <- cts.Token
-task <- countWithCancellation(token)";
+task <- countWithCancellation(token)
+Thread.Sleep(10)";
         var interpreter = new LangInterpreter();
 
         // Act
