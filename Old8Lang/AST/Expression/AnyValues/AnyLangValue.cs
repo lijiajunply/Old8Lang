@@ -635,11 +635,11 @@ public partial class AnyLangValue : LangValueType
         // 2. 添加实例字段和 this（可以在 init 中访问实例成员）
         var initManager = manager.NewManger();
 
-        // 1. 设置 this 指针
-        initManager.Set(new LangId("this"), this);
-
-        // 2. 创建基础作用域用于字段
+        // 1. 创建基础作用域用于字段
         initManager.AddChildren();
+
+        // 2. 设置 this 指针
+        initManager.Set(new LangId("this"), this);
 
         // 3. 将所有实例字段添加到基础作用域
         //    这样参数可以在更高优先级的作用域中覆盖字段
