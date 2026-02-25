@@ -699,10 +699,63 @@ public partial class Instance : LangValueType
             {
                 try
                 {
-                    initFunc = classType.GetMethod("init",
-                        BindingFlags.Public |
-                        BindingFlags.Instance |
-                        BindingFlags.DeclaredOnly);
+                    var initMethods = classType
+                        .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                        .Where(m => m.Name == "init")
+                        .ToArray();
+
+                    if (initMethods.Length == 1)
+                    {
+                        initFunc = initMethods[0];
+                    }
+                    else if (initMethods.Length > 1)
+                    {
+                        var argTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+
+                        static int Score(ParameterInfo[] ps, Type[] args)
+                        {
+                            if (ps.Length != args.Length)
+                            {
+                                return -1;
+                            }
+
+                            var score = 0;
+                            for (var i = 0; i < ps.Length; i++)
+                            {
+                                var pt = ps[i].ParameterType;
+                                var at = args[i];
+                                if (pt == typeof(object))
+                                {
+                                    continue;
+                                }
+
+                                if (pt == at)
+                                {
+                                    score += 2;
+                                    continue;
+                                }
+
+                                if (pt.IsAssignableFrom(at))
+                                {
+                                    score += 1;
+                                    continue;
+                                }
+
+                                return -1;
+                            }
+
+                            return score;
+                        }
+
+                        initFunc = initMethods
+                            .Select(m => (method: m, ps: m.GetParameters()))
+                            .Where(x => x.ps.Length == argTypes.Length)
+                            .Select(x => (x.method, x.ps, score: Score(x.ps, argTypes)))
+                            .Where(x => x.score >= 0)
+                            .OrderByDescending(x => x.score)
+                            .Select(x => x.method)
+                            .FirstOrDefault();
+                    }
                 }
                 catch
                 {

@@ -255,56 +255,67 @@ public partial class AnyLangValue : LangValueType
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在方法中访问实例成员）
         var executionManager = manager.NewManger();
+        executionManager.AddChildren();
 
-        // 1. 设置 this 指针
-        executionManager.Set(new LangId("this"), this);
-
-        // 2. 将所有实例字段添加到执行作用域
-        //    （方法内部可以直接访问字段，不需要 this.field）
-        foreach (var (fieldName, fieldValue) in InstanceData)
+        try
         {
-            executionManager.Set(new LangId(fieldName), fieldValue);
-        }
+            // 1. 设置 this 指针（必须是局部变量，避免污染外层作用域）
+            executionManager.SetLocal(new LangId("this"), this);
 
-        // 3. 将类的所有方法添加到执行作用域
-        //    （方法内部可以直接调用其他方法，不需要 this.method()）
-        foreach (var method in Metadata.MethodTable.GetAllMethods())
-        {
-            // 只添加非静态方法到实例方法作用域
-            if (!method.IsStatic)
+            // 2. 将所有实例字段添加到执行作用域
+            //    （方法内部可以直接访问字段，不需要 this.field）
+            //    使用 SetLocal，避免覆盖外层同名变量
+            foreach (var (fieldName, fieldValue) in InstanceData)
             {
-                executionManager.Set(new LangId(method.MethodName), method.Implementation);
+                executionManager.SetLocal(new LangId(fieldName), fieldValue);
             }
+
+            // 3. 将类的所有方法添加到执行作用域
+            //    （方法内部可以直接调用其他方法，不需要 this.method()）
+            //    使用 SetLocal，避免覆盖外层同名变量（例如外部定义了 count 变量）
+            foreach (var method in Metadata.MethodTable.GetAllMethods())
+            {
+                // 只添加非静态方法到实例方法作用域
+                if (!method.IsStatic)
+                {
+                    executionManager.SetLocal(new LangId(method.MethodName), method.Implementation);
+                }
+            }
+
+            // 4. 将类型信息添加到作用域（从 InstanceScope 继承）
+            executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+            // 5. 设置函数上下文标志
+            executionManager.IsFunc = true;
+
+            // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
+            //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
+            if (TypeArgumentMapping is not null)
+            {
+                executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            }
+
+            // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
+            var funcValue = methodInfo.Implementation;
+            var result = funcValue.Run(executionManager, arguments, namedArgs ?? [], Position);
+
+            // 7. 恢复函数上下文标志
+            executionManager.IsFunc = false;
+
+            // 8. 同步字段修改
+            //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
+            SyncFieldsFromExecutionScope(executionManager);
+
+            // 9. 清空SetField修改标记（方法执行结束）
+            FieldsModifiedBySetField.Clear();
+
+            return result;
         }
-
-        // 4. 将类型信息添加到作用域（从 InstanceScope 继承）
-        executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
-
-        // 5. 设置函数上下文标志
-        executionManager.IsFunc = true;
-
-        // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
-        //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping is not null)
+        finally
         {
-            executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            // 清理注入的局部作用域，避免 this/字段/方法名污染外层作用域
+            executionManager.RemoveChildren();
         }
-
-        // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
-        var funcValue = methodInfo.Implementation;
-        var result = funcValue.Run(executionManager, arguments, namedArgs ?? [], Position);
-
-        // 7. 恢复函数上下文标志
-        executionManager.IsFunc = false;
-
-        // 8. 同步字段修改
-        //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
-        SyncFieldsFromExecutionScope(executionManager);
-
-        // 9. 清空SetField修改标记（方法执行结束）
-        FieldsModifiedBySetField.Clear();
-
-        return result;
     }
 
     /// <summary>

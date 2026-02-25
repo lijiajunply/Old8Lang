@@ -258,12 +258,22 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                 var dotToken = CurrentToken;
                 var position = new SourcePosition(dotToken.Line, dotToken.Column, tokenValue: dotToken.Value);
                 Expect(LangTokenType.Dot);
-                var right = primaryParser.ParsePrimary();
+                LangExpression right;
+                if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.LeftBracket)
+                {
+                    var idToken = CurrentToken;
+                    var idPosition = new SourcePosition(idToken.Line, idToken.Column, tokenValue: idToken.Value);
+                    Expect(LangTokenType.Identifier);
+                    right = new LangId(idToken.Value, position: idPosition);
+                }
+                else
+                {
+                    right = primaryParser.ParsePrimary();
+                }
                 left = new Operation(left, LangTokenType.Dot, right, position);
             }
             else if (CurrentToken.Type == LangTokenType.LeftBracket)
             {
-                // 处理索引访问或切片: left[right] 或 left[start:end]
                 var leftBracketToken = CurrentToken;
                 var position = new SourcePosition(leftBracketToken.Line, leftBracketToken.Column,
                     tokenValue: leftBracketToken.Value);
@@ -362,7 +372,7 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                     // 如果left是Operation，这也是嵌套访问
                     else
                     {
-                        left = new Operation(left, LangTokenType.Dot, right, position);
+                        left = new NestedIndexAccess(left, right, position);
                     }
                 }
             }

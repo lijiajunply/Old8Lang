@@ -265,17 +265,18 @@ public partial class GenericInstanceExpression : LangExpression
 
         ilGenerator.Emit(OpCodes.Newobj, constructor);
 
-        // 如果有调用参数，调用 init 方法
-        if (IsFunctionCall && CallArguments!.Count > 0)
+        // 如果使用了调用语法（带括号），调用 init 方法（包括无参 init）
+        if (IsFunctionCall)
         {
             // 复制实例引用，用于调用 init 方法
             ilGenerator.Emit(OpCodes.Dup);
 
             // 加载参数
-            var argTypes = new Type[CallArguments.Count];
-            for (int i = 0; i < CallArguments.Count; i++)
+            var argCount = CallArguments?.Count ?? 0;
+            var argTypes = new Type[argCount];
+            for (int i = 0; i < argCount; i++)
             {
-                CallArguments[i].LoadIlValue(ilGenerator, local);
+                CallArguments![i].LoadIlValue(ilGenerator, local);
                 argTypes[i] = CallArguments[i].OutputType(local) ?? typeof(object);
             }
 

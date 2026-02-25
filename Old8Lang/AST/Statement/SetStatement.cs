@@ -606,7 +606,8 @@ public partial class SetStatement : OldStatement
                     // 成员访问赋值: left.right <- value
 
                     // 检查是否是this访问（如this.name <- value）
-                    if (operation.Left is LangId { IdName: "this" } && local.InClassEnv is not null)
+                    if ((operation.Left is LangId { IdName: "this" } || operation.Left is ThisExpression) &&
+                        local.InClassEnv is not null)
                     {
                         // 加载 this（参数0）
                         ilGenerator.Emit(OpCodes.Ldarg_0);

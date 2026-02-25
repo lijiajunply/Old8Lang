@@ -266,7 +266,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
 
         foreach (var variate in _anyValue.Variates)
         {
-            if (variate.Value is not FuncLangValue)
+            if (variate.Value is not FuncLangValue && variate.Value is not MethodOverloadList)
             {
                 fields.Add((variate.Key, variate.Value));
             }
@@ -341,6 +341,13 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             if (variate.Value is FuncLangValue funcValue)
             {
                 methods.Add((variate.Key, funcValue));
+            }
+            else if (variate.Value is MethodOverloadList overloadList)
+            {
+                foreach (var overload in overloadList.Overloads)
+                {
+                    methods.Add((variate.Key, overload));
+                }
             }
         }
 
@@ -691,8 +698,8 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     {
         // 定义无参数构造函数
         var constructorBuilder = typeBuilder.DefineConstructor(
-            MethodAttributes.Public,
-            CallingConventions.Standard,
+            MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.HideBySig,
+            CallingConventions.Standard | CallingConventions.HasThis,
             Type.EmptyTypes);
 
         // 保存到LocalManager，以便在方法中创建实例

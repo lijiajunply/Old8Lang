@@ -574,6 +574,7 @@
       <workItem from="1771829113653" duration="1417000" />
       <workItem from="1771912573218" duration="2766000" />
       <workItem from="1771936929558" duration="1352000" />
+      <workItem from="1771992969295" duration="688000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -918,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="948" />
+    <option name="localTasksCounter" value="949" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -945,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="1" />
     <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
     <MESSAGE value="Changes" />
     <MESSAGE value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
@@ -970,7 +970,8 @@
     <MESSAGE value="删除FirstUI" />
     <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
     <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
+    <MESSAGE value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
