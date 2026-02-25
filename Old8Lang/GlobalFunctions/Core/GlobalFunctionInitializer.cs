@@ -143,15 +143,6 @@ public static class GlobalFunctionInitializer
             registry.Register(new GetClassInfoFunction());  // 合并了 GetClassName, GetClassMethods, GetClassFields
             registry.Register(new GetMemberInfoFunction()); // 合并了 GetMethodInfo, GetFieldInfo
 
-            // 注册反射函数 - 独立别名（向后兼容）
-            registry.Register(new GetClassNameFunction());
-            registry.Register(new GetClassMethodsFunction());
-            registry.Register(new GetClassFieldsFunction());
-            registry.Register(new GetMethodInfoFunction());
-            registry.Register(new GetFieldInfoFunction());
-            registry.Register(new HasMethodFunction());
-            registry.Register(new HasFieldFunction());
-
             // 注册反射函数 - 类型反射
             registry.Register(new GetTypeFunction());
             registry.Register(new GetAllTypesFunction());
@@ -172,12 +163,6 @@ public static class GlobalFunctionInitializer
             registry.Register(new CreateInstanceFunction());
             registry.Register(new IsInstanceOfFunction());
             registry.Register(new HasMemberFunction());  // 合并了 HasMethod, HasField
-
-            // 注册重载示例函数（演示重载功能）
-            // 注意：这些是示例函数，实际使用时可能需要移除
-            // registry.Register(new AddIntFunction());
-            // registry.Register(new AddDoubleFunction());
-            // registry.Register(new AddStringFunction());
 
             _initialized = true;
         }
