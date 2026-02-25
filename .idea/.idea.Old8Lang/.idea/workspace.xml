@@ -24,7 +24,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -919,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="946" />
+    <option name="localTasksCounter" value="948" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,8 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(environment): 添加环境管理功能和相关命令&#10;&#10;- 新增 EnvCommand 命令类，支持 init、list、show、set、get 子命令&#10;- 实现 EnvironmentManager 类，支持多环境配置文件加载和变量管理&#10;- 添加 .old8env、.old8env.development、.old8env.production 示例配置文件&#10;- 在 FromFileCommand 中集成环境变量支持，新增 --env 参数&#10;- 添加 GetEnvFunction 全局函数，允许在 Old8 代码中获取环境变量&#10;- 更新 InitCommand，初始化项目时自动生成环境配置和示例文件&#10;- 扩展 ProjectConfig 支持 environments 配置项和 EnvironmentConfig 类&#10;- 更新项目初始化模板，添加 development 和 production 环境配置&#10;- 创建详细的环境管理指南文档 ENVIRONMENT_GUIDE.md&#10;- 添加环境相关的测试文件和配置示例" />
-    <MESSAGE value="docs(rules): 更新项目规则文档添加虚拟机模式说明&#10;&#10;- 在项目规则文档中将运行模式更新为解释模式、编译模式和虚拟机模式&#10;- 修正 Old8Lang 运行模式的描述信息" />
     <MESSAGE value="1" />
     <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
     <MESSAGE value="Changes" />
@@ -971,7 +968,9 @@
     <MESSAGE value="test(cli): 添加性能监控集成测试&#10;&#10;- 创建 PerformanceMonitoringTests 类验证 --perf、--perf-detailed、--perf-output 功能&#10;- 实现执行指标收集、函数指标收集、文本格式报告生成功能测试&#10;- 添加 JSON 和 CSV 格式报告生成及文件保存功能测试&#10;- 集成内存跟踪和对象池统计功能验证&#10;- 更新 CI/CD 工作流添加性能回归测试步骤&#10;- 完成规格文档中的性能监控集成测试任务" />
     <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
     <MESSAGE value="删除FirstUI" />
-    <option name="LAST_COMMIT_MESSAGE" value="删除FirstUI" />
+    <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
+    <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
