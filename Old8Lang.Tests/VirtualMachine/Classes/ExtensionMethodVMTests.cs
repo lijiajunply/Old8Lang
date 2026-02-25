@@ -544,7 +544,7 @@ public class ExtensionMethodVMTests
     {
         // Arrange
         var code = @"
-            extension list {
+            extension array {
                 func customSum() -> int {
                     total <- 0
                     for item in this {

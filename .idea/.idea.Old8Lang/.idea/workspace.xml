@@ -23,8 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +62,6 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/FirstUI.TestApp/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
@@ -920,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="945" />
+    <option name="localTasksCounter" value="946" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -947,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(API): 添加完整的标准库API文档&#10;&#10;- 新增标准库概述和模式支持说明&#10;- 添加核心标准库文档，包括Math、File、Crypto、Image、Regex等模块&#10;- 添加网络库文档，涵盖HTTP、WebSocket、MQTT、Socket、WebAPI等模块&#10;- 添加数据库库文档，包含MySQL、PostgreSQL、SQLite、InMemory、ORM等模块&#10;- 添加序列化库文档，包括MessagePack、Protobuf、Factory等模块&#10;- 添加机器学习库文档，涵盖Classification、Regression、Clustering、DataLoader等模块&#10;- 为每个模块提供详细的函数签名、描述和使用示例&#10;- 标注各API在不同执行模式下的支持情况" />
     <MESSAGE value="feat(environment): 添加环境管理功能和相关命令&#10;&#10;- 新增 EnvCommand 命令类，支持 init、list、show、set、get 子命令&#10;- 实现 EnvironmentManager 类，支持多环境配置文件加载和变量管理&#10;- 添加 .old8env、.old8env.development、.old8env.production 示例配置文件&#10;- 在 FromFileCommand 中集成环境变量支持，新增 --env 参数&#10;- 添加 GetEnvFunction 全局函数，允许在 Old8 代码中获取环境变量&#10;- 更新 InitCommand，初始化项目时自动生成环境配置和示例文件&#10;- 扩展 ProjectConfig 支持 environments 配置项和 EnvironmentConfig 类&#10;- 更新项目初始化模板，添加 development 和 production 环境配置&#10;- 创建详细的环境管理指南文档 ENVIRONMENT_GUIDE.md&#10;- 添加环境相关的测试文件和配置示例" />
     <MESSAGE value="docs(rules): 更新项目规则文档添加虚拟机模式说明&#10;&#10;- 在项目规则文档中将运行模式更新为解释模式、编译模式和虚拟机模式&#10;- 修正 Old8Lang 运行模式的描述信息" />
     <MESSAGE value="1" />
@@ -972,7 +970,8 @@
     <MESSAGE value="feat(cli): 添加性能监控功能和CLI选项&#10;&#10;- 实现性能监控器，可追踪执行时间、内存使用、函数调用等指标&#10;- 添加 --perf、--perf-detailed、--perf-output CLI选项用于性能分析&#10;- 在文档中添加性能监控相关的使用说明和示例&#10;- 优化ForStatement循环变量作用域，防止外层变量污染&#10;- 实现函数引用缓存机制，提升函数调用性能&#10;- 支持嵌套函数定义和局部作用域管理&#10;- 添加性能报告生成器，支持文本、JSON、CSV格式输出&#10;- 实现对象池统计和内存稳定性测试&#10;- 添加长期运行性能测试和内存泄漏检测" />
     <MESSAGE value="test(cli): 添加性能监控集成测试&#10;&#10;- 创建 PerformanceMonitoringTests 类验证 --perf、--perf-detailed、--perf-output 功能&#10;- 实现执行指标收集、函数指标收集、文本格式报告生成功能测试&#10;- 添加 JSON 和 CSV 格式报告生成及文件保存功能测试&#10;- 集成内存跟踪和对象池统计功能验证&#10;- 更新 CI/CD 工作流添加性能回归测试步骤&#10;- 完成规格文档中的性能监控集成测试任务" />
     <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
+    <MESSAGE value="删除FirstUI" />
+    <option name="LAST_COMMIT_MESSAGE" value="删除FirstUI" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

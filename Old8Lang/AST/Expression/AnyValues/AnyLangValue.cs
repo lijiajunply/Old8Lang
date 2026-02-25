@@ -248,6 +248,9 @@ public partial class AnyLangValue : LangValueType
     protected LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         List<NamedArgument>? namedArgs, VariateManager manager)
     {
+        // 清空SetField修改标记（开始新的方法执行）
+        FieldsModifiedBySetField.Clear();
+
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在方法中访问实例成员）
@@ -298,8 +301,8 @@ public partial class AnyLangValue : LangValueType
         //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
         SyncFieldsFromExecutionScope(executionManager);
 
-        // 注意：不在这里清空 _fieldsModifiedBySetField
-        // 让调用者（如 CallInit）来管理
+        // 9. 清空SetField修改标记（方法执行结束）
+        FieldsModifiedBySetField.Clear();
 
         return result;
     }
@@ -814,19 +817,39 @@ public partial class AnyLangValue : LangValueType
         }
     }
 
+    /// <summary>
+    /// 用于检测 ToString 中的循环引用，防止无限递归
+    /// </summary>
+    [ThreadStatic]
+    private static HashSet<AnyLangValue>? _toStringVisited;
+
     public override string ToString()
     {
-        var builder = new StringBuilder();
-        builder.Append('{');
-        var fields = InstanceData.ToList();
-        for (var i = 0; i < fields.Count; i++)
+        _toStringVisited ??= new HashSet<AnyLangValue>(ReferenceEqualityComparer.Instance);
+
+        if (!_toStringVisited.Add(this))
         {
-            var field = fields[i];
-            builder.Append($"{(i == 0 ? "" : ",")}\"{field.Key}\":{field.Value}");
+            return $"<{ClassId.IdName} ...>";
         }
 
-        builder.Append('}');
-        return builder.ToString();
+        try
+        {
+            var builder = new StringBuilder();
+            builder.Append('{');
+            var fields = InstanceData.ToList();
+            for (var i = 0; i < fields.Count; i++)
+            {
+                var field = fields[i];
+                builder.Append($"{(i == 0 ? "" : ",")}\"{field.Key}\":{field.Value}");
+            }
+
+            builder.Append('}');
+            return builder.ToString();
+        }
+        finally
+        {
+            _toStringVisited.Remove(this);
+        }
     }
 
     public override string ToDisplayString()
@@ -1090,7 +1113,7 @@ public partial class AnyLangValue : LangValueType
     /// </summary>
     public override bool Equal(LangValueType? otherValueType)
     {
-        if (otherValueType is null)
+        if (otherValueType is null or NullLangValue)
             return false;
 
         var result = CallOperatorOverloadMethod("_eq", otherValueType);
