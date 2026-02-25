@@ -248,7 +248,7 @@ public partial class AnyLangValue : LangValueType
     protected LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         List<NamedArgument>? namedArgs, VariateManager manager)
     {
-        // 清空SetField修改标记（开始新的方法执行）
+        var outerFieldsModifiedBySetField = new HashSet<string>(FieldsModifiedBySetField);
         FieldsModifiedBySetField.Clear();
 
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
@@ -306,8 +306,10 @@ public partial class AnyLangValue : LangValueType
             //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
             SyncFieldsFromExecutionScope(executionManager);
 
-            // 9. 清空SetField修改标记（方法执行结束）
+            var currentFieldsModifiedBySetField = new HashSet<string>(FieldsModifiedBySetField);
             FieldsModifiedBySetField.Clear();
+            FieldsModifiedBySetField.UnionWith(outerFieldsModifiedBySetField);
+            FieldsModifiedBySetField.UnionWith(currentFieldsModifiedBySetField);
 
             return result;
         }
@@ -638,52 +640,59 @@ public partial class AnyLangValue : LangValueType
         // 1. 创建基础作用域用于字段
         initManager.AddChildren();
 
-        // 2. 设置 this 指针
-        initManager.Set(new LangId("this"), this);
-
-        // 3. 将所有实例字段添加到基础作用域
-        //    这样参数可以在更高优先级的作用域中覆盖字段
-        var fieldScopeIndex = initManager.Scopes.Count - 1;
-        foreach (var (fieldName, fieldValue) in InstanceData)
+        try
         {
-            // 直接在字段作用域中设置字段
-            initManager.Scopes[fieldScopeIndex][fieldName] = fieldValue;
-        }
+            // 2. 设置 this 指针（必须是局部变量，避免污染外层作用域）
+            initManager.SetLocal(new LangId("this"), this);
 
-        // 3.5 将类的所有方法添加到基础作用域
-        //     这样 init 方法内部可以直接调用其他方法，包括从 mixin 继承的方法
-        foreach (var method in Metadata.MethodTable.GetAllMethods())
-        {
-            // 只添加非静态方法到实例方法作用域
-            if (!method.IsStatic)
+            // 3. 将所有实例字段添加到基础作用域
+            //    这样参数可以在更高优先级的作用域中覆盖字段
+            var fieldScopeIndex = initManager.Scopes.Count - 1;
+            foreach (var (fieldName, fieldValue) in InstanceData)
             {
-                initManager.Scopes[fieldScopeIndex][method.MethodName] = method.Implementation;
+                // 直接在字段作用域中设置字段
+                initManager.Scopes[fieldScopeIndex][fieldName] = fieldValue;
             }
+
+            // 3.5 将类的所有方法添加到基础作用域
+            //     这样 init 方法内部可以直接调用其他方法，包括从 mixin 继承的方法
+            foreach (var method in Metadata.MethodTable.GetAllMethods())
+            {
+                // 只添加非静态方法到实例方法作用域
+                if (!method.IsStatic)
+                {
+                    initManager.Scopes[fieldScopeIndex][method.MethodName] = method.Implementation;
+                }
+            }
+
+            // 4. 将类型信息添加到字段作用域（从 InstanceScope 继承）
+            initManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+            // 5. 设置函数上下文标志
+            initManager.IsFunc = true;
+
+            // 5.5 设置泛型类型参数映射（如果是泛型类实例）
+            //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
+            if (TypeArgumentMapping is not null)
+            {
+                initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            }
+
+            // 6. 执行 init 方法，传入已经求值的参数表达式
+            //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
+            initMethod.Run(initManager, parameterValueExpressions);
+
+            // 7. 恢复函数上下文标志
+            initManager.IsFunc = false;
+
+            // 8. 同步字段修改
+            //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
+            SyncFieldsFromExecutionScope(initManager);
         }
-
-        // 4. 将类型信息添加到字段作用域（从 InstanceScope 继承）
-        initManager.AddImportInfoRange(InstanceScope.ImportInfos);
-
-        // 5. 设置函数上下文标志
-        initManager.IsFunc = true;
-
-        // 5.5 设置泛型类型参数映射（如果是泛型类实例）
-        //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping is not null)
+        finally
         {
-            initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            initManager.RemoveChildren();
         }
-
-        // 6. 执行 init 方法，传入已经求值的参数表达式
-        //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
-        initMethod.Run(initManager, parameterValueExpressions);
-
-        // 7. 恢复函数上下文标志
-        initManager.IsFunc = false;
-
-        // 8. 同步字段修改
-        //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
-        SyncFieldsFromExecutionScope(initManager);
 
         // 9. 清空SetField修改标记（方法执行结束）
         FieldsModifiedBySetField.Clear();
