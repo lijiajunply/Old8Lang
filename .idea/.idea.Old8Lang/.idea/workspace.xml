@@ -23,7 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/REFLECTION_API.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +60,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.jetbrains/acp.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
@@ -78,8 +80,29 @@
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c9edfa3590b94021aa605bb7035fdb06f48910/86/d49bd55b/ExecutionContext.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d2fc4e5236f74a0d8789f902be54d3bbf48938/bf/5269aee9/Interlocked.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04eab530f3e74fe4bf9a74715ecc3f0d17e00/6c/4b1e0e94/IPackageConfigurationManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/67/279e01f8/LocalPackageSource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/7c/6bd13adf/Package.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/be/962039df/IPackageResolver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/c6/4a506b20/DefaultPackageInstaller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/05/191a139c/IndexOutOfRangeException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/0f/47447396/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1e/2b09662c/Exception.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/25/ea5de0f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/3c/3135aca5/ITuple.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/c3/68e5367e/String.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/13/c04ed676/ClassicDesktopStyleApplicationLifetimeExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/22/ef001b1c/Grid.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3b92f859131bde25d0f7a63de08963e995d1e1426e584dfd4b8e833d2d3dba/ExecutionTimer.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -919,7 +942,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="949" />
+    <option name="localTasksCounter" value="950" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -946,7 +969,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
     <MESSAGE value="Changes" />
     <MESSAGE value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
     <MESSAGE value="perf(parser): 优化解析器性能通过Span和缓冲池减少内存分配&#10;&#10;- 添加LangToken.Create工厂方法使用字符串缓存优化&#10;- 使用ReadOnlySpan替代StringBuilder解析负数和数字字面量&#10;- 实现CharBufferPool租用字符缓冲区解析字符串和字符字面量&#10;- 使用Span切片替代Substring避免内存分配&#10;- 优化MergeDocCommentsWithTokens的O(n²)性能问题&#10;- 任务完成标记更新到已完成状态&#10;- 修复Unicode和十六进制转义序列解析的Span使用&#10;- 优化标识符和文件头指令解析使用Span切片" />
@@ -971,7 +993,8 @@
     <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
     <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
     <MESSAGE value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
+    <MESSAGE value="feat(interpreter): 添加 CancellationToken 类型支持&#10;&#10;- 在 LangId 中注册 CancellationToken 和 CancellationTokenSource 类型&#10;- 实现取消令牌类型的类型映射和解析功能&#10;- 更新测试用例以验证取消令牌的正确行为&#10;- 修复拼写错误 cancelation -&gt; cancellation&#10;- 修改异步函数返回类型为 void 并使用 break 替代 return" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加 CancellationToken 类型支持&#10;&#10;- 在 LangId 中注册 CancellationToken 和 CancellationTokenSource 类型&#10;- 实现取消令牌类型的类型映射和解析功能&#10;- 更新测试用例以验证取消令牌的正确行为&#10;- 修复拼写错误 cancelation -&gt; cancellation&#10;- 修改异步函数返回类型为 void 并使用 break 替代 return" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
