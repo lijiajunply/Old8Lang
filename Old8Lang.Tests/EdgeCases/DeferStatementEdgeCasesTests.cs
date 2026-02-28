@@ -420,8 +420,8 @@ test()
         Assert.IsType<IntLangValue>(result);
         // defer按LIFO执行：
         // defer 2: result = 0 + 30 = 30
-        // defer 1: result = 30 (x的最终值是30)
-        Assert.Equal(60, ((IntLangValue)result).Value);
+        // defer 1: result = 30 (x的最终值是30，赋值后结果仍为30)
+        Assert.Equal(30, ((IntLangValue)result).Value);
     }
 
     /// <summary>
@@ -488,8 +488,8 @@ test()
         var result = interpreter.Manager.GetValue(new LangId("order"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        // 执行顺序：U -> D2(函数内defer) -> D3 -> D1
-        Assert.Equal("UD2D3D1", ((StringLangValue)result).Value);
+        // defer 在函数返回前统一执行，按注册逆序：D3 -> D2 -> D1
+        Assert.Equal("UD3D2D1", ((StringLangValue)result).Value);
     }
 
     /// <summary>
@@ -736,8 +736,8 @@ inc()
         var resultValue = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(resultValue);
         Assert.IsType<IntLangValue>(resultValue);
-        // 第二次调用：x=10，defer看到x=10
-        Assert.Equal(10, ((IntLangValue)resultValue).Value);
+        // defer 执行时看到的是本次调用末尾的 x（第二次调用为20）
+        Assert.Equal(20, ((IntLangValue)resultValue).Value);
     }
 
     #endregion
