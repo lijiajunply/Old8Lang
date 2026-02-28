@@ -23,18 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/AdvancedOperatorsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/AdvancedOperatorsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/cache-test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/cache-test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/long-running-5min.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/long-running-5min.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/medium-program-1000lines.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/medium-program-1000lines.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/medium-program-simple.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/medium-program-simple.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/million-iterations.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/million-iterations.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/nested-loops.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/nested-loops.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/recursive-calls.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/recursive-calls.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/small-script-50lines.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/small-script-50lines.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestScripts/Performance/variable-lookup.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestScripts/Performance/variable-lookup.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -953,7 +942,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="952" />
+    <option name="localTasksCounter" value="953" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -980,7 +969,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(parser): 优化解析器性能通过Span和缓冲池减少内存分配&#10;&#10;- 添加LangToken.Create工厂方法使用字符串缓存优化&#10;- 使用ReadOnlySpan替代StringBuilder解析负数和数字字面量&#10;- 实现CharBufferPool租用字符缓冲区解析字符串和字符字面量&#10;- 使用Span切片替代Substring避免内存分配&#10;- 优化MergeDocCommentsWithTokens的O(n²)性能问题&#10;- 任务完成标记更新到已完成状态&#10;- 修复Unicode和十六进制转义序列解析的Span使用&#10;- 优化标识符和文件头指令解析使用Span切片" />
     <MESSAGE value="perf(parser): 添加性能验证工具并验证解析器优化效果&#10;&#10;- 新增 PerformanceValidator 类用于验证解析器性能&#10;- 实现小型、中型、大型脚本的性能测试功能&#10;- 添加 StringCache 命中率验证测试&#10;- 在 Program.cs 中集成 --validate 参数支持&#10;- 更新任务列表标记已完成的验证项&#10;- 生成性能验证报告记录优化成果" />
     <MESSAGE value="perf(parser): 优化解析器性能通过对象池和递归深度控制&#10;&#10;- 添加 Microsoft.Extensions.ObjectPool 依赖包用于对象池管理&#10;- 实现 TokenListPool 类使用对象池管理 List&lt;LangToken&gt; 实例&#10;- 在 ParserContext 中添加递归深度计数器防止栈溢出&#10;- 实现 EnterRecursion 和 ExitRecursion 方法进行递归深度管理&#10;- 修改 SourceLines 属性为预先分割避免错误报告时重复分割&#10;- 任务清单中标记相关优化任务为已完成状态" />
     <MESSAGE value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
@@ -1005,7 +993,8 @@
     <MESSAGE value="feat(interpreter): 添加 CancellationToken 类型支持&#10;&#10;- 在 LangId 中注册 CancellationToken 和 CancellationTokenSource 类型&#10;- 实现取消令牌类型的类型映射和解析功能&#10;- 更新测试用例以验证取消令牌的正确行为&#10;- 修复拼写错误 cancelation -&gt; cancellation&#10;- 修改异步函数返回类型为 void 并使用 break 替代 return" />
     <MESSAGE value="docs(reflection): 添加反射API文档并更新相关测试&#10;&#10;- 添加了完整的反射API文档(REFLECTION_API.md)，涵盖全局函数和TypeLangValue实例方法&#10;- 移除了旧的反射测试方法(GetClassName、GetClassMethods、GetClassFields等)&#10;- 更新测试用例以使用新的反射API(HasMember替代HasMethod/HasField)&#10;- 添加了对新反射API的验证测试，确保返回正确的数据结构&#10;- 修改综合测试以使用新的反射函数和预期行为" />
     <MESSAGE value="feat(lang): 为字典和列表添加自定义比较器支持&#10;&#10;- 在 DictionaryLangValue 中同步更新 Tuples 数组以保持数据一致性&#10;- 为 LangListSortMethod 添加可选的 comparer 参数支持&#10;- 实现 QuickSortWithComparerInternal 方法支持自定义比较逻辑&#10;- 添加 PartitionWithComparer 方法实现基于比较器的分区逻辑&#10;- 扩展列表排序功能以支持自定义比较函数" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 为字典和列表添加自定义比较器支持&#10;&#10;- 在 DictionaryLangValue 中同步更新 Tuples 数组以保持数据一致性&#10;- 为 LangListSortMethod 添加可选的 comparer 参数支持&#10;- 实现 QuickSortWithComparerInternal 方法支持自定义比较逻辑&#10;- 添加 PartitionWithComparer 方法实现基于比较器的分区逻辑&#10;- 扩展列表排序功能以支持自定义比较函数" />
+    <MESSAGE value="fix(parser): 修复嵌套索引访问的AST类型判断&#10;&#10;- 修改AdvancedOperatorsTests测试用例中的断言类型从Operation改为NestedIndexAccess&#10;- 在AnyLangValue中修复方法调用时的参数求值逻辑，确保参数在正确的作用域中求值&#10;- 将测试脚本中的print函数调用改为PrintLine函数调用&#10;- 更新IDE配置文件中的变更列表和任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复嵌套索引访问的AST类型判断&#10;&#10;- 修改AdvancedOperatorsTests测试用例中的断言类型从Operation改为NestedIndexAccess&#10;- 在AnyLangValue中修复方法调用时的参数求值逻辑，确保参数在正确的作用域中求值&#10;- 将测试脚本中的print函数调用改为PrintLine函数调用&#10;- 更新IDE配置文件中的变更列表和任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
