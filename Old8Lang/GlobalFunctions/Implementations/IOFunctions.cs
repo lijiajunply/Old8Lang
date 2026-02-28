@@ -118,6 +118,62 @@ public sealed class ReadLineFunction : BaseGlobalFunction
 }
 
 /// <summary>
+/// Input 函数 - 显示提示并读取一行输入
+/// </summary>
+public sealed class InputFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["Input", "input"];
+    public override string[] ParameterNames => ["prompt"];
+    public override Type?[] ParameterTypes => [typeof(string)];
+    public override Type? DeclaredReturnType => typeof(string);
+    public override string? Documentation => "读取用户输入并返回字符串";
+    public override int MinParameterCount => 0;
+    public override int MaxParameterCount => 1;
+
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    {
+        if (parameters.Count == 1)
+        {
+            var prompt = parameters[0].Run(manager).ToDisplayString();
+            manager.Interpreter.OutputProvider.Write(prompt);
+        }
+
+        var input = manager.Interpreter.OutputProvider.ReadLine();
+        return new StringLangValue(input);
+    }
+
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local,
+        SourcePosition position)
+    {
+        // 编译模式暂不支持控制台交互，返回空字符串
+        ilGenerator.Emit(OpCodes.Ldstr, "");
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(string);
+    }
+
+    protected override object ExecuteInVMInternal(object?[] arguments)
+    {
+        if (arguments.Length == 1)
+        {
+            Console.Write(ToString(arguments[0]));
+        }
+
+        return Console.ReadLine() ?? "";
+    }
+
+    private static string ToString(object? value)
+    {
+        if (value == null) return "null";
+        if (value is string s) return s;
+        if (value is LangValueType langValue) return langValue.ToDisplayString();
+        return value.ToString() ?? "";
+    }
+}
+
+/// <summary>
 /// Error 函数 - 打印错误信息
 /// </summary>
 public sealed class ErrorFunction : BaseGlobalFunction

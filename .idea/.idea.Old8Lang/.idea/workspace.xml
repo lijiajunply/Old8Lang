@@ -22,9 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Performance/VMMemoryUsageTests.cs" afterDir="false" />
-    </list>
+    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -942,7 +940,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="953" />
+    <option name="localTasksCounter" value="957" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -969,10 +967,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(parser): 添加性能验证工具并验证解析器优化效果&#10;&#10;- 新增 PerformanceValidator 类用于验证解析器性能&#10;- 实现小型、中型、大型脚本的性能测试功能&#10;- 添加 StringCache 命中率验证测试&#10;- 在 Program.cs 中集成 --validate 参数支持&#10;- 更新任务列表标记已完成的验证项&#10;- 生成性能验证报告记录优化成果" />
-    <MESSAGE value="perf(parser): 优化解析器性能通过对象池和递归深度控制&#10;&#10;- 添加 Microsoft.Extensions.ObjectPool 依赖包用于对象池管理&#10;- 实现 TokenListPool 类使用对象池管理 List&lt;LangToken&gt; 实例&#10;- 在 ParserContext 中添加递归深度计数器防止栈溢出&#10;- 实现 EnterRecursion 和 ExitRecursion 方法进行递归深度管理&#10;- 修改 SourceLines 属性为预先分割避免错误报告时重复分割&#10;- 任务清单中标记相关优化任务为已完成状态" />
-    <MESSAGE value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
-    <MESSAGE value="docs(specs): 添加解释器性能优化相关文档&#10;&#10;- 添加数据模型文档，定义性能指标、函数指标、作用域指标等核心实体&#10;- 添加性能监控API契约文档，规范IPerformanceMonitor和IPerformanceReporter接口&#10;- 添加实现计划文档，规划性能优化的技术方案和实施步骤&#10;- 添加快速开始指南，帮助开发者使用性能监控功能&#10;- 定义变量缓存、对象池统计、性能监控配置等数据结构&#10;- 提供性能报告生成、CLI集成、基准测试等使用场景示例" />
     <MESSAGE value="feat(interpreter): 添加性能监控功能和基准测试框架&#10;&#10;- 在LangInterpreter中集成IPerformanceMonitor接口支持性能监控&#10;- 创建PerformanceMetrics数据模型用于存储解释器执行的性能统计数据&#10;- 实现函数调用、变量查找、循环迭代等性能指标记录功能&#10;- 添加FunctionCallBenchmark和LoopExecutionBenchmark基准测试&#10;- 创建InterpreterBenchmarkBase作为解释器基准测试基类&#10;- 添加nested-loops.old8性能测试脚本用于100x100循环测试&#10;- 在workspace.xml中更新任务计数器和变更列表记录" />
     <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
     <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
@@ -994,7 +988,11 @@
     <MESSAGE value="docs(reflection): 添加反射API文档并更新相关测试&#10;&#10;- 添加了完整的反射API文档(REFLECTION_API.md)，涵盖全局函数和TypeLangValue实例方法&#10;- 移除了旧的反射测试方法(GetClassName、GetClassMethods、GetClassFields等)&#10;- 更新测试用例以使用新的反射API(HasMember替代HasMethod/HasField)&#10;- 添加了对新反射API的验证测试，确保返回正确的数据结构&#10;- 修改综合测试以使用新的反射函数和预期行为" />
     <MESSAGE value="feat(lang): 为字典和列表添加自定义比较器支持&#10;&#10;- 在 DictionaryLangValue 中同步更新 Tuples 数组以保持数据一致性&#10;- 为 LangListSortMethod 添加可选的 comparer 参数支持&#10;- 实现 QuickSortWithComparerInternal 方法支持自定义比较逻辑&#10;- 添加 PartitionWithComparer 方法实现基于比较器的分区逻辑&#10;- 扩展列表排序功能以支持自定义比较函数" />
     <MESSAGE value="fix(parser): 修复嵌套索引访问的AST类型判断&#10;&#10;- 修改AdvancedOperatorsTests测试用例中的断言类型从Operation改为NestedIndexAccess&#10;- 在AnyLangValue中修复方法调用时的参数求值逻辑，确保参数在正确的作用域中求值&#10;- 将测试脚本中的print函数调用改为PrintLine函数调用&#10;- 更新IDE配置文件中的变更列表和任务计数器" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复嵌套索引访问的AST类型判断&#10;&#10;- 修改AdvancedOperatorsTests测试用例中的断言类型从Operation改为NestedIndexAccess&#10;- 在AnyLangValue中修复方法调用时的参数求值逻辑，确保参数在正确的作用域中求值&#10;- 将测试脚本中的print函数调用改为PrintLine函数调用&#10;- 更新IDE配置文件中的变更列表和任务计数器" />
+    <MESSAGE value="fix(tests): 激活生成器内存效率测试并调整内存限制&#10;&#10;- 移除 VMMemoryUsageTests 中的 Skip 标记激活测试&#10;- 将内存增加限制从 100_000 字节调整为 1_000_000 字节&#10;- 清理 workspace.xml 中的变更列表记录&#10;- 更新本地任务计数器数值&#10;- 修正最后提交消息为修复嵌套索引访问问题" />
+    <MESSAGE value="refactor(dictionary): 重构字典和列表方法以支持语言值类型&#10;&#10;- 修改 DictContainsKeyMethod 支持 DictionaryLangValue 和系统字典接口&#10;- 添加 ConvertToLangValue 方法用于将对象转换为语言值类型&#10;- 更新 DictCountMethod 支持 DictionaryLangValue 类型&#10;- 修改 ListAddMethod 支持 ListLangValue 类型并添加值转换逻辑&#10;- 统一异常消息为更通用的类型检查提示" />
+    <MESSAGE value="test(vm): 更新虚拟机模块导入测试&#10;&#10;- 为 VMImportTests 类添加 [Collection(&quot;Sequential&quot;)] 属性以确保顺序执行&#10;- 修改字符串拆分逻辑，使用 ['\r', '\n'] 替代 Environment.NewLine 进行分行符分割&#10;- 保持测试断言逻辑不变，确保输出行数和内容验证正常工作" />
+    <MESSAGE value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1407,7 +1405,7 @@
               <option value="1986" />
             </startOffsets>
             <endOffsets>
-              <option value="2058" />
+              <option value="2060" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="655" />

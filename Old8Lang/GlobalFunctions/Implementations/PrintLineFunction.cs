@@ -16,6 +16,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
 {
     public override string[] Names => ["PrintLine", "printLine"];
     public override string[] ParameterNames => ["values"];
+    public override string? Documentation => "打印一行并换行";
 
     public override int MinParameterCount => 0;
 

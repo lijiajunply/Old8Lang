@@ -29,6 +29,7 @@ public static class GlobalFunctionInitializer
             registry.Register(new PrintLineFunction());
             registry.Register(new PrintFunction());
             registry.Register(new ReadLineFunction());
+            registry.Register(new InputFunction());
             registry.Register(new ErrorFunction());
             registry.Register(new ClearFunction());
 
@@ -37,6 +38,7 @@ public static class GlobalFunctionInitializer
 
             // 注册工具函数
             registry.Register(new LenFunction());
+            registry.Register(new RangeFunction());
             registry.Register(new TypeFunction());
             registry.Register(new AssertFunction());
             registry.Register(new ShowValuesFunction());

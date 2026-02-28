@@ -104,6 +104,97 @@ public sealed class LenFunction : BaseGlobalFunction
 }
 
 /// <summary>
+/// Range 函数 - 创建整数序列 [start, end)，步长为 step
+/// </summary>
+public sealed class RangeFunction : BaseGlobalFunction
+{
+    public override string[] Names => ["Range", "range"];
+    public override string[] ParameterNames => ["start", "end", "step"];
+    public override Type?[] ParameterTypes => [typeof(int), typeof(int), typeof(int)];
+    public override Type? DeclaredReturnType => typeof(int[]);
+    public override string? Documentation => "创建一个整数范围序列";
+    public override int MinParameterCount => 3;
+    public override int MaxParameterCount => 3;
+
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    {
+        var values = EvaluateParameters(parameters, manager);
+        var start = ToInt(values[0], position);
+        var end = ToInt(values[1], position);
+        var step = ToInt(values[2], position);
+
+        var result = BuildRangeValues(start, end, step, position);
+        return new ArrayLangValue(result, "int", position);
+    }
+
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    {
+        // 编译模式暂不支持动态构建 Range，返回空数组
+        ilGenerator.Emit(OpCodes.Ldc_I4_0);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(int));
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(int[]);
+    }
+
+    protected override object ExecuteInVMInternal(object?[] arguments)
+    {
+        var start = Convert.ToInt32(arguments[0]);
+        var end = Convert.ToInt32(arguments[1]);
+        var step = Convert.ToInt32(arguments[2]);
+
+        var values = BuildRangeIntegers(start, end, step, new SourcePosition());
+        return values.ToArray();
+    }
+
+    private static List<LangValueType> BuildRangeValues(int start, int end, int step, SourcePosition position)
+    {
+        var numbers = BuildRangeIntegers(start, end, step, position);
+        return numbers.Select(static n => (LangValueType)new IntLangValue(n)).ToList();
+    }
+
+    private static List<int> BuildRangeIntegers(int start, int end, int step, SourcePosition position)
+    {
+        if (step == 0)
+        {
+            throw new InvalidOperationError(position, "Range 的 step 不能为 0");
+        }
+
+        var result = new List<int>();
+        if (step > 0)
+        {
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(i);
+            }
+        }
+        else
+        {
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(i);
+            }
+        }
+
+        return result;
+    }
+
+    private static int ToInt(LangValueType value, SourcePosition position)
+    {
+        return value switch
+        {
+            IntLangValue intValue => intValue.Value,
+            DoubleLangValue doubleValue => (int)doubleValue.Value,
+            StringLangValue stringValue when int.TryParse(stringValue.Value, out var n) => n,
+            BoolLangValue boolValue => boolValue.Value ? 1 : 0,
+            _ => throw new InvalidOperationError(position, $"Range 参数必须是可转换为 int 的值，实际为 {value.TypeToString()}")
+        };
+    }
+}
+
+/// <summary>
 /// Type 函数 - 获取值的类型名称
 /// </summary>
 public sealed class TypeFunction : BaseGlobalFunction
