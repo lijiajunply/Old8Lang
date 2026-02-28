@@ -314,14 +314,14 @@ second <- token.IsCancellationRequested";
         var code = @"
 counter <- 0
 
-async func countWithCancellation(token) -> int {
+async func countWithCancellation(token: CancellationToken) -> void {
     for i <- 0, i < 1000, i++ {
         if token.IsCancellationRequested {
-            return counter
+            break
         }
+        Thread.Sleep(1)
         counter <- counter + 1
     }
-    return counter
 }
 
 cts <- CancellationTokenSource(50)
@@ -339,7 +339,7 @@ Thread.Sleep(10)";
         // Assert
         var counter = interpreter.Manager.GetValue(new LangId("counter"));
         Assert.IsType<IntLangValue>(counter);
-        // Counter should be less than 1000 since it was cancelled
+        // Counter should be less than 1000 since it was canceled
         Assert.True(((IntLangValue)counter).Value < 1000);
     }
 
