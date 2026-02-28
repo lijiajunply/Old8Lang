@@ -71,13 +71,31 @@ public class ListAddMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is List<object?> list)
+        if (instance is ListLangValue listLangValue)
+        {
+            var item = arguments[0] switch
+            {
+                LangValueType langValue => langValue,
+                null => NullLangValue.Instance,
+                int i => new IntLangValue(i),
+                long l => new IntLangValue((int)l),
+                double d => new DoubleLangValue(d),
+                bool b => new BoolLangValue(b),
+                string s => new StringLangValue(s),
+                char c => new CharLangValue(c),
+                _ => new StringLangValue(arguments[0]?.ToString() ?? string.Empty)
+            };
+            listLangValue.Values.Add(item);
+            return arguments[0];
+        }
+
+        if (instance is System.Collections.IList list)
         {
             var item = arguments[0];
             list.Add(item);
             return item;
         }
 
-        throw new ArgumentException("实例必须是 List<object?> 类型");
+        throw new ArgumentException("实例必须是 List 类型");
     }
 }

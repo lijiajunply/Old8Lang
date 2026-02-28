@@ -48,11 +48,33 @@ public class DictContainsKeyMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is Dictionary<object, object> dict && arguments.Length > 0)
+        if (arguments.Length > 0 && instance is DictionaryLangValue dictLangValue)
+        {
+            var key = ConvertToLangValue(arguments[0]);
+            return dictLangValue.Value.Any(x => x.Key.Equal(key));
+        }
+
+        if (instance is System.Collections.IDictionary dict && arguments.Length > 0)
         {
             var key = arguments[0];
-            return dict.ContainsKey(key!);
+            return dict.Contains(key);
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
+    }
+
+    private static LangValueType ConvertToLangValue(object? value)
+    {
+        return value switch
+        {
+            null => NullLangValue.Instance,
+            LangValueType langValue => langValue,
+            int i => new IntLangValue(i),
+            long l => new IntLangValue((int)l),
+            double d => new DoubleLangValue(d),
+            bool b => new BoolLangValue(b),
+            string s => new StringLangValue(s),
+            char c => new CharLangValue(c),
+            _ => new StringLangValue(value.ToString() ?? string.Empty)
+        };
     }
 }
