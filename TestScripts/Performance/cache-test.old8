@@ -25,11 +25,11 @@ func test_nested_loops() {
 }
 
 // 执行测试
-print("开始性能测试...")
+PrintLine("开始性能测试...")
 result1 <- test_variable_lookup()
-print("变量查找测试完成: " + result1)
+PrintLine("变量查找测试完成: " + result1)
 
 result2 <- test_nested_loops()
-print("嵌套循环测试完成: " + result2)
+PrintLine("嵌套循环测试完成: " + result2)
 
-print("所有测试完成")
+PrintLine("所有测试完成")

@@ -55,4 +55,4 @@ func outer_function() {
 }
 
 result <- outer_function()
-print("Result: " + result)
+PrintLine("Result: " + result)

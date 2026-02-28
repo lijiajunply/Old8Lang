@@ -49,4 +49,4 @@ for batch <- 0, batch < totalIterations, batch <- batch + 1 {
     d <- c + 1
 }
 
-print("长时间运行测试完成")
+PrintLine("长时间运行测试完成")

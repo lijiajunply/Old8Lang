@@ -48,4 +48,4 @@ for i <- 0, i < 5, i <- i + 1 {
 // 最终计算
 final_result <- result + arr_sum + sum
 
-print("Final result: " + final_result)
+PrintLine("Final result: " + final_result)

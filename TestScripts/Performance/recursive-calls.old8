@@ -58,26 +58,26 @@ func sumTree(node) {
 }
 
 // 执行测试
-print("测试递归调用性能...")
+PrintLine("测试递归调用性能...")
 
 // 测试阶乘 (深度 20)
 result1 <- factorial(20)
-print("Factorial(20) = " + result1)
+PrintLine("Factorial(20) = " + result1)
 
 // 测试斐波那契 (深度 15，避免指数级增长)
 result2 <- fibonacci(15)
-print("Fibonacci(15) = " + result2)
+PrintLine("Fibonacci(15) = " + result2)
 
 // 测试深度递归 (深度 100)
 result3 <- deepRecursion(100, 0)
-print("DeepRecursion(100) = " + result3)
+PrintLine("DeepRecursion(100) = " + result3)
 
 // 测试相互递归 (深度 50)
 result4 <- isEven(50)
-print("IsEven(50) = " + result4)
+PrintLine("IsEven(50) = " + result4)
 
 // 测试树遍历 (深度 30)
 result5 <- sumTree(30)
-print("SumTree(30) = " + result5)
+PrintLine("SumTree(30) = " + result5)
 
-print("递归测试完成")
+PrintLine("递归测试完成")

@@ -230,18 +230,18 @@ func complexCalculation(n) {
 
 // ==================== 主测试程序 ====================
 
-print("开始中等规模程序性能测试...")
+PrintLine("开始中等规模程序性能测试...")
 
 // 测试1: 大量函数调用
-print("测试1: 函数调用性能")
+PrintLine("测试1: 函数调用性能")
 callResult <- 0
 for i <- 0, i < 500, i <- i + 1 {
     callResult <- callResult + add(i, i + 1)
 }
-print("函数调用测试完成: " + callResult)
+PrintLine("函数调用测试完成: " + callResult)
 
 // 测试2: 数组处理
-print("测试2: 数组处理性能")
+PrintLine("测试2: 数组处理性能")
 testArray <- [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 for iteration <- 0, iteration < 50, iteration <- iteration + 1 {
     sum <- sumArray(testArray)
@@ -249,47 +249,47 @@ for iteration <- 0, iteration < 50, iteration <- iteration + 1 {
     max <- maxArray(testArray)
     min <- minArray(testArray)
 }
-print("数组处理测试完成")
+PrintLine("数组处理测试完成")
 
 // 测试3: 嵌套循环
-print("测试3: 嵌套循环性能")
+PrintLine("测试3: 嵌套循环性能")
 nestedResult <- 0
 for i <- 0, i < 30, i <- i + 1 {
     for j <- 0, j < 30, j <- j + 1 {
         nestedResult <- nestedResult + i * j
     }
 }
-print("嵌套循环测试完成: " + nestedResult)
+PrintLine("嵌套循环测试完成: " + nestedResult)
 
 // 测试4: 递归调用
-print("测试4: 递归调用性能")
+PrintLine("测试4: 递归调用性能")
 fact10 <- factorial(10)
 fib10 <- fibonacci(10)
-print("递归测试完成: factorial(10)=" + fact10 + ", fibonacci(10)=" + fib10)
+PrintLine("递归测试完成: factorial(10)=" + fact10 + ", fibonacci(10)=" + fib10)
 
 // 测试5: 字符串处理
-print("测试5: 字符串处理性能")
+PrintLine("测试5: 字符串处理性能")
 for i <- 0, i < 50, i <- i + 1 {
     str <- repeatString("test", 10)
     rev <- reverseString(str)
 }
-print("字符串处理测试完成")
+PrintLine("字符串处理测试完成")
 
 // 测试6: 计算密集型
-print("测试6: 计算密集型任务")
+PrintLine("测试6: 计算密集型任务")
 primeCount <- countPrimes(100)
-print("素数计数测试完成: " + primeCount)
+PrintLine("素数计数测试完成: " + primeCount)
 
 // 测试7: 嵌套函数
-print("测试7: 嵌套函数性能")
+PrintLine("测试7: 嵌套函数性能")
 nestedSum <- 0
 for i <- 0, i < 30, i <- i + 1 {
     nestedSum <- nestedSum + outerFunction(i)
 }
-print("嵌套函数测试完成: " + nestedSum)
+PrintLine("嵌套函数测试完成: " + nestedSum)
 
 // 测试8: 数据处理管道
-print("测试8: 数据处理管道")
+PrintLine("测试8: 数据处理管道")
 bigArray <- {}
 for i <- 0, i < 50, i <- i + 1 {
     bigArray.add(i)
@@ -299,15 +299,15 @@ pipelineResult <- 0
 for i <- 0, i < 5, i <- i + 1 {
     pipelineResult <- pipelineResult + processPipeline(bigArray)
 }
-print("数据处理管道测试完成: " + pipelineResult)
+PrintLine("数据处理管道测试完成: " + pipelineResult)
 
 // 测试9: 复杂计算
-print("测试9: 复杂计算")
+PrintLine("测试9: 复杂计算")
 complexResult <- complexCalculation(100)
-print("复杂计算测试完成: " + complexResult)
+PrintLine("复杂计算测试完成: " + complexResult)
 
 // 测试10: 综合测试
-print("测试10: 综合性能测试")
+PrintLine("测试10: 综合性能测试")
 finalResult <- 0
 for iteration <- 0, iteration < 10, iteration <- iteration + 1 {
     // 混合各种操作
@@ -323,7 +323,7 @@ for iteration <- 0, iteration < 10, iteration <- iteration + 1 {
 
     finalResult <- finalResult + factorial(8)
 }
-print("综合测试完成: " + finalResult)
+PrintLine("综合测试完成: " + finalResult)
 
-print("所有测试完成!")
-print("最终结果: " + finalResult)
+PrintLine("所有测试完成!")
+PrintLine("最终结果: " + finalResult)

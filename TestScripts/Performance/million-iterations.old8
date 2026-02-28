@@ -22,4 +22,4 @@ for batch <- 0, batch < batchCount, batch <- batch + 1 {
     total <- total + batchTotal
 }
 
-print("百万次迭代完成，总计: " + total)
+PrintLine("百万次迭代完成，总计: " + total)

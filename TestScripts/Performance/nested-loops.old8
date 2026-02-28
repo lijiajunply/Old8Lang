@@ -25,5 +25,5 @@ for i <- 0, i < 100, i <- i + 1 {
     }
 }
 
-print("Total iterations: " + count)
-print("Final sum: " + sum)
+PrintLine("Total iterations: " + count)
+PrintLine("Final sum: " + sum)

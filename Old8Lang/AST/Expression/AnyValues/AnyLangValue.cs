@@ -297,7 +297,20 @@ public partial class AnyLangValue : LangValueType
 
             // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
             var funcValue = methodInfo.Implementation;
-            var result = funcValue.Run(executionManager, arguments, namedArgs ?? [], Position);
+            // 参数表达式必须在调用方作用域中先求值，避免 this 绑定到被调对象后导致作用域错位。
+            var evaluatedArguments = arguments
+                .Select(arg => arg is LangValueType value ? value : arg.Run(manager))
+                .Cast<LangExpression>()
+                .ToList();
+            var evaluatedNamedArgs = (namedArgs ?? [])
+                .Select(arg =>
+                {
+                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Run(manager);
+                    return new NamedArgument(arg.Name, evaluated, arg.Position);
+                })
+                .ToList();
+
+            var result = funcValue.Run(executionManager, evaluatedArguments, evaluatedNamedArgs, Position);
 
             // 7. 恢复函数上下文标志
             executionManager.IsFunc = false;
