@@ -577,21 +577,13 @@ public class VMTypeErrorTests(ITestOutputHelper output)
     [Fact]
     public void TypeErrors_ReflectionInvalidType_ThrowsTypeException()
     {
-        // 虚拟机模式使用 GetClassName 函数获取类名
+        // 对非类实例使用反射函数应抛出类型相关异常
         var code = @"
-            class MyClass {
-                public value:int
-            }
-
-            obj <- MyClass()
-            obj.value <- 42
-
-            className <- GetClassName(obj)
-            PrintLine(className)
+            value <- 123
+            classInfo <- GetClassInfo(value)
         ";
 
-        var executeVMCode = ExecuteVMCode(code);
-        Assert.Contains("MyClass", executeVMCode);
+        AssertVMThrowsTypeException(code);
     }
 
     #endregion
