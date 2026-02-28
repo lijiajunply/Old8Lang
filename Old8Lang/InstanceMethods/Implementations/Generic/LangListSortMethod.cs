@@ -15,14 +15,14 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 public class LangListSortMethod : BaseLangListMethod
 {
     public override string[] Names => ["Sort", "sort"];
-    public override string[]? ParameterNames => null;
+    public override string[]? ParameterNames => ["comparer"];
     public override int MinParameterCount => 0;
-    public override int MaxParameterCount => 0;
+    public override int MaxParameterCount => 1;
 
     /// <summary>
     /// 参数类型：无参数
     /// </summary>
-    public override Type?[]? ParameterTypes => [];
+    public override Type?[]? ParameterTypes => [typeof(FuncLangValue)];
 
     /// <summary>
     /// 返回类型
@@ -40,8 +40,21 @@ public class LangListSortMethod : BaseLangListMethod
         var items = GetItems(instance);
         var sortedItems = new List<LangValueType>(items);
 
-        // 使用快速排序
-        QuickSortInternal(sortedItems, 0, sortedItems.Count - 1);
+        if (parameters.Count == 1)
+        {
+            var comparerParam = parameters[0].Run(manager);
+            if (comparerParam is not FuncLangValue comparer)
+            {
+                throw new ArgumentException("Sort 方法的 comparer 参数必须是函数");
+            }
+
+            QuickSortWithComparerInternal(sortedItems, 0, sortedItems.Count - 1, comparer, manager);
+        }
+        else
+        {
+            // 使用快速排序
+            QuickSortInternal(sortedItems, 0, sortedItems.Count - 1);
+        }
 
         return new ListLangValue(sortedItems, null, position);
     }
@@ -64,6 +77,37 @@ public class LangListSortMethod : BaseLangListMethod
         for (int j = left; j < right; j++)
         {
             if (list[j].Less(pivot) || list[j].Equal(pivot))
+            {
+                i++;
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
+
+        (list[i + 1], list[right]) = (list[right], list[i + 1]);
+        return i + 1;
+    }
+
+    private void QuickSortWithComparerInternal(List<LangValueType> list, int left, int right, FuncLangValue comparer,
+        VariateManager manager)
+    {
+        if (left < right)
+        {
+            int pivotIndex = PartitionWithComparer(list, left, right, comparer, manager);
+            QuickSortWithComparerInternal(list, left, pivotIndex - 1, comparer, manager);
+            QuickSortWithComparerInternal(list, pivotIndex + 1, right, comparer, manager);
+        }
+    }
+
+    private int PartitionWithComparer(List<LangValueType> list, int left, int right, FuncLangValue comparer,
+        VariateManager manager)
+    {
+        var pivot = list[right];
+        int i = left - 1;
+
+        for (int j = left; j < right; j++)
+        {
+            var result = comparer.Run(manager, [list[j], pivot]);
+            if (result is IntLangValue intResult && intResult.Value < 0)
             {
                 i++;
                 (list[i], list[j]) = (list[j], list[i]);

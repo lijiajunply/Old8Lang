@@ -200,11 +200,16 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         {
             // 更新现有键值对
             Value[b] = (key, value);
+            if (b < Tuples.Count)
+            {
+                Tuples[b] = new TupleLangValue(key, value, Position);
+            }
         }
         else
         {
             // 添加新键值对
             Value.Add((key, value));
+            Tuples.Add(new TupleLangValue(key, value, Position));
         }
     }
 
