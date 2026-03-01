@@ -121,6 +121,37 @@ public class VMPerformanceReportTests : IDisposable
     }
 
     [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithNaScenarioAndLog_ProducesFailAndFailureReason()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-fail-reason");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-fail-reason");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickCsvWithNaScenario());
+
+        var quickLogPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-20260302-001859.log");
+        File.WriteAllText(quickLogPath, BuildQuickFailureLog());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("VMXQ_Concurrency_Channel_MPMC_4Workers", markdown);
+        Assert.Contains("| FAIL |", markdown);
+        Assert.Contains("FailureReason", markdown);
+        Assert.Contains("Old8Lang.Error.InvalidOperationError", markdown);
+
+        Assert.Contains("\"Scenario\": \"VMXQ_Concurrency_Channel_MPMC_4Workers\"", json);
+        Assert.Contains("\"Status\": \"FAIL\"", json);
+        Assert.Contains("\"FailureReason\":", json);
+        Assert.Contains("ChannelSend", json);
+        Assert.Contains("The asynchronous operation has not completed.", json);
+        Assert.True(VMPerformanceReport.HasFailStatus(jsonPath));
+    }
+
+    [Fact]
     public void GenerateFromBenchmarkArtifacts_WhenCsvMissing_ThrowsFileNotFoundException()
     {
         var artifactsDir = Path.Combine(_tempRoot, "missing-artifacts");
@@ -178,6 +209,24 @@ public class VMPerformanceReportTests : IDisposable
             Environment.NewLine,
             "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
             "VMXN_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,3,8,110.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildQuickCsvWithNaScenario()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Concurrency_Channel_MPMC_4Workers,Job-EATLBP,.NET 10.0,1,4,NA,NA,NA");
+    }
+
+    private static string BuildQuickFailureLog()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "// Benchmark: VMQuickPerformanceBenchmarks.VMXQ_Concurrency_Channel_MPMC_4Workers: Job-EATLBP(IterationCount=4, WarmupCount=1)",
+            "System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.",
+            " ---> System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.",
+            " ---> Old8Lang.Error.InvalidOperationError: 调用全局函数 ChannelSend 时发生错误: The asynchronous operation has not completed.");
     }
 
     private static string BuildThresholdBaselineJson()

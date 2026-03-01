@@ -296,7 +296,15 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Writer.WriteAsync(value).GetAwaiter().GetResult();
+        var writer = wrapper.Resource.Writer;
+        if (writer.TryWrite(value))
+        {
+            return;
+        }
+
+        // 对于有界通道，队列已满时 WriteAsync 可能返回未完成 ValueTask。
+        // 通过 AsTask() 阻塞等待，避免直接 GetResult 导致 “The asynchronous operation has not completed”。
+        writer.WriteAsync(value).AsTask().GetAwaiter().GetResult();
     }
 
     public static bool TrySendChannel(int channelId, object value, int timeoutMs)

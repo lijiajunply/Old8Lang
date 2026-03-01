@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.VisualBasic.FileIO;
 
 namespace Old8Lang.Benchmarks.Benchmarks.VM.Reports;
@@ -11,6 +12,7 @@ public static class VMPerformanceReport
 {
     private sealed record VmScenarioResult(
         string Scenario,
+        string Job,
         double? MeanMs,
         double? StdDevMs,
         double? P95Ms,
@@ -42,6 +44,7 @@ public static class VMPerformanceReport
         double? MeanDeltaPercent,
         double? RegressionThresholdPercent,
         string Status,
+        string? FailureReason,
         string RawMean,
         string RawAllocated);
 
@@ -82,6 +85,7 @@ public static class VMPerformanceReport
             artifactsDir,
             reportsDir,
             csvPattern: "*VMExtendedPerformanceBenchmarks*-report.csv",
+            logPattern: "*VMExtendedPerformanceBenchmarks-*.log",
             notFoundMessage: "未找到扩展 VM BenchmarkDotNet 报告 CSV",
             scenarioPrefix: "VMX_",
             reportFilePrefix: "VM_Extended_Performance_Report",
@@ -97,6 +101,7 @@ public static class VMPerformanceReport
             artifactsDir,
             reportsDir,
             csvPattern: "*VMQuickPerformanceBenchmarks*-report.csv",
+            logPattern: "*VMQuickPerformanceBenchmarks-*.log",
             notFoundMessage: "未找到 VM Quick BenchmarkDotNet 报告 CSV",
             scenarioPrefix: "VMXQ_",
             reportFilePrefix: "VM_Quick_Performance_Report",
@@ -112,6 +117,7 @@ public static class VMPerformanceReport
             artifactsDir,
             reportsDir,
             csvPattern: "*VMNightlyPerformanceBenchmarks*-report.csv",
+            logPattern: "*VMNightlyPerformanceBenchmarks-*.log",
             notFoundMessage: "未找到 VM Nightly BenchmarkDotNet 报告 CSV",
             scenarioPrefix: "VMXN_",
             reportFilePrefix: "VM_Nightly_Performance_Report",
@@ -156,6 +162,7 @@ public static class VMPerformanceReport
         string artifactsDir,
         string reportsDir,
         string csvPattern,
+        string logPattern,
         string notFoundMessage,
         string scenarioPrefix,
         string reportFilePrefix,
@@ -163,6 +170,10 @@ public static class VMPerformanceReport
     {
         var csvPath = ResolveLatestCsvByPattern(artifactsDir, csvPattern, notFoundMessage);
         var parsed = ParseCsv(csvPath);
+        var failureReasonByScenarioAndJob = LoadFailureReasons(artifactsDir, logPattern, scenarioPrefix);
+        var failureReasonByScenario = failureReasonByScenarioAndJob
+            .GroupBy(pair => pair.Key.Scenario, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First().Value, StringComparer.Ordinal);
 
         Directory.CreateDirectory(reportsDir);
         var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix);
@@ -170,7 +181,20 @@ public static class VMPerformanceReport
 
         var scenarios = parsed.Scenarios
             .Where(s => s.Scenario.StartsWith(scenarioPrefix, StringComparison.Ordinal))
-            .Select(s => ConvertToTieredScenario(s, baselineMap))
+            .Select(s =>
+            {
+                string? failureReason = null;
+                if (failureReasonByScenarioAndJob.TryGetValue((s.Scenario, s.Job), out var matchedReason))
+                {
+                    failureReason = matchedReason;
+                }
+                else if (failureReasonByScenario.TryGetValue(s.Scenario, out var fallbackReason))
+                {
+                    failureReason = fallbackReason;
+                }
+
+                return ConvertToTieredScenario(s, baselineMap, failureReason);
+            })
             .ToArray();
 
         if (scenarios.Length == 0)
@@ -182,6 +206,10 @@ public static class VMPerformanceReport
         if (baselineJson is null)
         {
             warnings.Add("未找到历史基线报告，回归对比状态将显示 N/A。");
+        }
+        if (scenarios.Any(s => string.Equals(s.Status, "FAIL", StringComparison.OrdinalIgnoreCase)))
+        {
+            warnings.Add("检测到执行失败场景（FAIL），请优先查看 FailureReason 与 BenchmarkDotNet 日志。");
         }
 
         var report = new TieredReportModel(
@@ -240,6 +268,120 @@ public static class VMPerformanceReport
         }
 
         return candidates[0].FullName;
+    }
+
+    private static Dictionary<(string Scenario, string Job), string> LoadFailureReasons(
+        string artifactsDir,
+        string logPattern,
+        string scenarioPrefix)
+    {
+        var result = new Dictionary<(string Scenario, string Job), string>();
+        if (!Directory.Exists(artifactsDir))
+        {
+            return result;
+        }
+
+        var logCandidates = Directory
+            .GetFiles(artifactsDir, logPattern, System.IO.SearchOption.TopDirectoryOnly)
+            .Select(path => new FileInfo(path))
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ToArray();
+
+        if (logCandidates.Length == 0)
+        {
+            return result;
+        }
+
+        var lines = File.ReadAllLines(logCandidates[0].FullName);
+        var benchmarkPattern = new Regex(
+            "^// Benchmark:\\s+[^.]+\\.(?<scenario>[^:]+):\\s+(?<job>[^\\(]+)\\(",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var line = StripAnsi(lines[i]).Trim();
+            var match = benchmarkPattern.Match(line);
+            if (!match.Success)
+            {
+                continue;
+            }
+
+            var scenario = match.Groups["scenario"].Value.Trim();
+            if (!scenario.StartsWith(scenarioPrefix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var job = match.Groups["job"].Value.Trim();
+            var key = (scenario, job);
+            if (result.ContainsKey(key))
+            {
+                continue;
+            }
+
+            var reason = ExtractFailureReason(lines, i + 1);
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                result[key] = reason;
+            }
+        }
+
+        return result;
+    }
+
+    private static string? ExtractFailureReason(IReadOnlyList<string> lines, int startIndex)
+    {
+        var endIndex = Math.Min(lines.Count - 1, startIndex + 220);
+        for (var i = startIndex; i <= endIndex; i++)
+        {
+            var line = StripAnsi(lines[i]).Trim();
+            if (line.StartsWith("// Benchmark:", StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            if (!line.Contains("--->", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var separatorIndex = line.IndexOf("--->", StringComparison.Ordinal);
+            if (separatorIndex < 0 || separatorIndex + 3 >= line.Length)
+            {
+                continue;
+            }
+
+            var exceptionSegment = line[(separatorIndex + 3)..].Trim();
+            if (exceptionSegment.Contains("TargetInvocationException", StringComparison.Ordinal) &&
+                exceptionSegment.Contains("target of an invocation", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var colonIndex = exceptionSegment.IndexOf(':');
+            if (colonIndex <= 0 || colonIndex + 1 >= exceptionSegment.Length)
+            {
+                continue;
+            }
+
+            var exceptionType = exceptionSegment[..colonIndex].Trim();
+            var message = exceptionSegment[(colonIndex + 1)..].Trim();
+            if (string.IsNullOrWhiteSpace(exceptionType) || string.IsNullOrWhiteSpace(message))
+            {
+                continue;
+            }
+
+            return $"{exceptionType}: {message}";
+        }
+
+        return null;
+    }
+
+    private static string StripAnsi(string input)
+    {
+        return string.IsNullOrEmpty(input)
+            ? string.Empty
+            : Regex.Replace(input, "\\x1B\\[[0-9;]*m", string.Empty);
     }
 
     private static VmReportModel ParseCsv(string csvPath)
@@ -306,7 +448,8 @@ public static class VMPerformanceReport
             var rawStdDev = ReadFieldWithFallback(fields, headerIndex, "StdDev", "Error");
             var rawAllocated = ReadField(fields, headerIndex, "Allocated", "NA");
 
-            job = ReadField(fields, headerIndex, "Job", job);
+            var currentJob = ReadField(fields, headerIndex, "Job", job);
+            job = currentJob;
             runtime = ReadField(fields, headerIndex, "Runtime", runtime);
             warmupCount = ReadField(fields, headerIndex, "WarmupCount", warmupCount);
             iterationCount = ReadField(fields, headerIndex, "IterationCount", iterationCount);
@@ -331,6 +474,7 @@ public static class VMPerformanceReport
 
             scenarios.Add(new VmScenarioResult(
                 Scenario: method,
+                Job: currentJob,
                 MeanMs: meanMs,
                 StdDevMs: stdDevMs,
                 P95Ms: p95Ms,
@@ -514,13 +658,13 @@ public static class VMPerformanceReport
         {
             writer.WriteLine($"## {group.Key}");
             writer.WriteLine();
-            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status |");
-            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|");
+            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status | FailureReason |");
+            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
 
             foreach (var scenario in group)
             {
                 writer.WriteLine(
-                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} |");
+                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
             }
 
             writer.WriteLine();
@@ -615,7 +759,8 @@ public static class VMPerformanceReport
 
     private static TieredScenarioResult ConvertToTieredScenario(
         VmScenarioResult source,
-        IReadOnlyDictionary<string, double?> baselineMap)
+        IReadOnlyDictionary<string, double?> baselineMap,
+        string? failureReason)
     {
         var category = GetTieredCategory(source.Scenario);
         var operationCount = GetOperationCount(source.Scenario);
@@ -630,7 +775,7 @@ public static class VMPerformanceReport
         baselineMap.TryGetValue(source.Scenario, out var baselineMeanMs);
         var meanDeltaPercent = ComputeRegressionPercent(baselineMeanMs, source.MeanMs);
         var threshold = GetRegressionThresholdPercent(category);
-        var status = EvaluateRegressionStatus(meanDeltaPercent, threshold);
+        var status = EvaluateScenarioStatus(source, meanDeltaPercent, threshold, ref failureReason);
 
         return new TieredScenarioResult(
             Scenario: source.Scenario,
@@ -645,6 +790,7 @@ public static class VMPerformanceReport
             MeanDeltaPercent: meanDeltaPercent,
             RegressionThresholdPercent: threshold,
             Status: status,
+            FailureReason: failureReason,
             RawMean: source.RawMean,
             RawAllocated: source.RawAllocated);
     }
@@ -678,6 +824,21 @@ public static class VMPerformanceReport
             "Concurrency" => 12d,
             _ => 10d
         };
+    }
+
+    private static string EvaluateScenarioStatus(
+        VmScenarioResult source,
+        double? meanDeltaPercent,
+        double thresholdPercent,
+        ref string? failureReason)
+    {
+        if (!source.MeanMs.HasValue)
+        {
+            failureReason ??= "Benchmark result is NA (no measurable output).";
+            return "FAIL";
+        }
+
+        return EvaluateRegressionStatus(meanDeltaPercent, thresholdPercent);
     }
 
     private static string EvaluateRegressionStatus(double? meanDeltaPercent, double thresholdPercent)
