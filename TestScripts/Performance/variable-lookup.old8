@@ -1,0 +1,58 @@
+// 变量查找测试脚本
+// 测试大量变量查找操作的性能
+// 目标: 性能提升 ≥40%
+
+// 全局变量
+global_var1 <- 100
+global_var2 <- 200
+global_var3 <- 300
+global_var4 <- 400
+global_var5 <- 500
+
+// 外层函数
+func outer_function() {
+    // 外层作用域变量
+    outer_var1 <- 10
+    outer_var2 <- 20
+    outer_var3 <- 30
+
+    // 中层函数
+    func middle_function() {
+        // 中层作用域变量
+        middle_var1 <- 1
+        middle_var2 <- 2
+
+        // 内层函数
+        func inner_function() {
+            // 局部变量
+            local_var <- 0
+
+            // 大量变量查找操作
+            for i <- 0, i < 1000, i <- i + 1 {
+                // 查找局部变量
+                local_var <- local_var + 1
+
+                // 查找中层作用域变量
+                temp1 <- middle_var1 + middle_var2
+
+                // 查找外层作用域变量
+                temp2 <- outer_var1 + outer_var2 + outer_var3
+
+                // 查找全局变量
+                temp3 <- global_var1 + global_var2 + global_var3 + global_var4 + global_var5
+
+                // 组合计算
+                local_var <- local_var + temp1 + temp2 + temp3
+            }
+
+            return local_var
+        }
+
+        return inner_function()
+    }
+
+    return middle_function()
+}
+
+result <- outer_function()
+PrintLine("Result: " + result)

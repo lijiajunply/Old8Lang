@@ -41,8 +41,9 @@ public class CallStackFrame
 public class Old8Exception : Exception
 {
     /// <summary>
-    /// 当前解释器实例，用于获取源代码上下文
+    /// 当前解释器实例，用于获取源代码上下文（线程隔离，避免并行测试互相污染）
     /// </summary>
+    [field: ThreadStatic]
     public static LangInterpreter? CurrentInterpreter { get; set; }
 
     /// <summary>

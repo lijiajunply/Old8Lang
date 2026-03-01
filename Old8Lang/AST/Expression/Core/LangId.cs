@@ -104,7 +104,7 @@ public partial class LangId(
 
         // 如果都没有找到，检查是否是类型关键字
         var supportedTypes = new[]
-            { "int", "double", "string", "bool", "char", "void", "list", "dict", "array", "dictionary", "tuple" };
+            { "int", "double", "string", "bool", "char", "void", "list", "dict", "array", "dictionary", "tuple","CancellationToken", "CancellationTokenSource" };
         if (supportedTypes.Contains(IdName))
         {
             return new TypeLangValue(IdName);
@@ -240,6 +240,8 @@ public partial class LangId(
                             "string" => typeof(string),
                             "bool" => typeof(bool),
                             "char" => typeof(char),
+                            "cancellationtoken" => typeof(CancellationToken),
+                            "cancellationtokensource" => typeof(CancellationTokenSource),
                             "object" => typeof(object),
                             _ => typeof(object) // 默认为object
                         };
@@ -255,6 +257,8 @@ public partial class LangId(
                         "string" => typeof(string),
                         "bool" => typeof(bool),
                         "char" => typeof(char),
+                        "cancellationtoken" => typeof(CancellationToken),
+                        "cancellationtokensource" => typeof(CancellationTokenSource),
                         "object" => typeof(object),
                         _ => typeof(object) // 默认为object
                     };
@@ -307,6 +311,8 @@ public partial class LangId(
                                     "string" => typeof(string),
                                     "bool" => typeof(bool),
                                     "char" => typeof(char),
+                                    "cancellationtoken" => typeof(CancellationToken),
+                                    "cancellationtokensource" => typeof(CancellationTokenSource),
                                     _ => typeof(object)
                                 };
                             }
@@ -341,6 +347,8 @@ public partial class LangId(
                 "array" => typeof(object[]),
                 "dictionary" => typeof(Dictionary<object, object>),
                 "tuple" => typeof(ValueTuple<object, object>),
+                "cancellationtoken" => typeof(CancellationToken),
+                "cancellationtokensource" => typeof(CancellationTokenSource),
                 "object" => typeof(object),
                 _ => (Type?)null
             };

@@ -347,7 +347,10 @@ t3 <- Spawn(appendResult, 3)
 
 t1.Start()
 t2.Start()
-t3.Start()";
+t3.Start()
+
+Thread.Sleep(10)
+";
         var interpreter = new LangInterpreter();
 
         // Act

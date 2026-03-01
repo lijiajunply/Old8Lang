@@ -659,13 +659,15 @@ public partial class TypeTemplate(
     // ==================== 反射支持：类型注册表 ====================
 
     /// <summary>
-    /// 全局类型注册表
+    /// 全局类型注册表（线程隔离，避免并行测试互相污染）
     /// 用于反射功能中通过类名查找类型
     /// </summary>
-    private static readonly Dictionary<string, TypeTemplate> TypeRegistry = new();
+    [ThreadStatic]
+    private static Dictionary<string, TypeTemplate>? _typeRegistry;
+    private static Dictionary<string, TypeTemplate> TypeRegistry => _typeRegistry ??= new();
 
     /// <summary>
-    /// 类型注册表锁
+    /// 类型注册表锁（线程隔离后不再需要跨线程锁，保留为空操作兼容）
     /// </summary>
     private static readonly Lock RegistryLock = new();
 

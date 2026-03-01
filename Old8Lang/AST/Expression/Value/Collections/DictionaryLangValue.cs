@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -128,13 +129,18 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             }
 
             // 只有在特定情况下才当作索引访问：方法名不是已知方法且只有一个参数
-            if (a.Ids is { Count: 1 } && methodName != "Get" && methodName != "ContainsKey" &&
-                methodName != "GetOrElse" && methodName != "Merge" && methodName != "Update" &&
-                methodName != "Keys" && methodName != "Values")
+            // 先检查 InstanceMethodRegistry 中是否有这个方法，如果有就调用方法而不是索引访问
+            if (a.Ids is { Count: 1 })
             {
-                // 运行索引表达式获取键值
-                var result = a.Ids[0].Run(manager);
-                return Get(result);
+                InstanceMethodInitializer.EnsureInitialized();
+                var registeredMethod = InstanceMethodRegistry.Instance.ResolveMethod(
+                    typeof(DictionaryLangValue), methodName, a.Ids, null);
+                if (registeredMethod == null)
+                {
+                    // 没有注册的方法，当作索引访问
+                    var result = a.Ids[0].Run(manager);
+                    return Get(result);
+                }
             }
 
             // 默认情况下，调用 FromClassToResult（使用新的 InstanceMethods 系统）
@@ -194,11 +200,16 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         {
             // 更新现有键值对
             Value[b] = (key, value);
+            if (b < Tuples.Count)
+            {
+                Tuples[b] = new TupleLangValue(key, value, Position);
+            }
         }
         else
         {
             // 添加新键值对
             Value.Add((key, value));
+            Tuples.Add(new TupleLangValue(key, value, Position));
         }
     }
 

@@ -180,6 +180,22 @@ public class VariateManager
     [ThreadStatic] private static Dictionary<string, (int scopeIndex, LangValueType value)>? _lookupCache;
 
     /// <summary>
+    /// 增强的变量缓存（LRU策略），用于性能优化
+    /// </summary>
+    private VariableCache? _variableCache;
+
+    /// <summary>
+    /// 全局变量快速查找表
+    /// </summary>
+    private Dictionary<string, LangValueType>? _globalVariableCache;
+
+    /// <summary>
+    /// 函数引用缓存，缓存常用函数引用避免重复查找
+    /// 键为函数名，值为 (函数值, 作用域深度) 元组
+    /// </summary>
+    private Dictionary<string, (LangValueType func, int scopeDepth)>? _functionCallCache;
+
+    /// <summary>
     /// 只读变量集合，使用ThreadStatic避免线程同步开销 (变量名 -> 作用域索引)
     /// </summary>
     private readonly Dictionary<string, int> ReadonlyVariables = new();
@@ -233,7 +249,7 @@ public class VariateManager
     /// <summary>
     /// 返回结果值
     /// </summary>
-    public LangValueType Result { get; set; } = new VoidLangValue();
+    public LangValueType Result { get; set; } = VoidLangValue.Instance;
 
     #endregion
 
@@ -569,9 +585,17 @@ public class VariateManager
             EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
             Scopes[currentScopeIndex][id.IdName] = langValueType;
 
-            // 更新缓存
+            // 更新所有缓存
             _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
             _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+            _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+            // 如果是全局变量，更新全局缓存
+            if (currentScopeIndex == 0 && _globalVariableCache != null)
+            {
+                _globalVariableCache[id.IdName] = langValueType;
+            }
+
             return;
         }
 
@@ -587,9 +611,17 @@ public class VariateManager
             EnsureScopeNotShared(i); // COW: 确保作用域未共享
             Scopes[i][id.IdName] = langValueType;
 
-            // 更新缓存
+            // 更新所有缓存
             _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
             _lookupCache[id.IdName] = (i, langValueType);
+            _variableCache?.Set(id.IdName, langValueType, i);
+
+            // 如果是全局变量，更新全局缓存
+            if (i == 0 && _globalVariableCache != null)
+            {
+                _globalVariableCache[id.IdName] = langValueType;
+            }
+
             return;
         }
 
@@ -617,9 +649,16 @@ public class VariateManager
             MarkAsReadonly(id.IdName, currentScopeIndex);
         }
 
-        // 更新缓存
+        // 更新所有缓存
         _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
         _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+        _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+        // 如果是全局变量，更新全局缓存
+        if (currentScopeIndex == 0 && _globalVariableCache != null)
+        {
+            _globalVariableCache[id.IdName] = langValueType;
+        }
     }
 
     /// <summary>
@@ -639,6 +678,29 @@ public class VariateManager
         // 更新缓存
         _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
         _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+    }
+
+    /// <summary>
+    /// 设置局部变量，总是在当前作用域中创建新变量（不向上查找）
+    /// 用于 for 循环变量初始化，防止循环变量污染外层同名变量
+    /// </summary>
+    /// <param name="id">变量标识符</param>
+    /// <param name="langValueType">变量值</param>
+    public void SetLocal(LangId id, LangValueType langValueType)
+    {
+        var currentScopeIndex = Scopes.Count - 1;
+
+        EnsureScopeNotShared(currentScopeIndex);
+        Scopes[currentScopeIndex][id.IdName] = langValueType;
+
+        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+        _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+        _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+        if (currentScopeIndex == 0 && _globalVariableCache != null)
+        {
+            _globalVariableCache[id.IdName] = langValueType;
+        }
     }
 
     /// <summary>
@@ -700,6 +762,9 @@ public class VariateManager
             // 作用域变化，清理查找缓存
             _lookupCache?.Clear();
 
+            // 清理增强缓存中的当前作用域变量
+            _variableCache?.ClearScope(Scopes.Count);
+
             // 清理被移除的作用域中的只读变量
             // 移除的是当前最后一个作用域（索引为Scopes.Count）
             // 注意：此时作用域已经被移除，所以当前Scopes.Count已经减1
@@ -721,12 +786,35 @@ public class VariateManager
     /// </remarks>
     public LangValueType? GetValue(LangId id)
     {
-        // 快速路径：检查缓存
+        // 性能优化：如果启用了增强缓存，先尝试从增强缓存获取
+        if (_variableCache != null)
+        {
+            if (_variableCache.TryGet(id.IdName, out var cachedValue))
+            {
+                // 记录性能监控（如果启用）
+                Interpreter?.PerformanceMonitor?.RecordVariableLookup("enhanced_cache", true);
+                return cachedValue as LangValueType;
+            }
+        }
+
+        // 性能优化：全局变量快速查找
+        if (_globalVariableCache != null && _globalVariableCache.TryGetValue(id.IdName, out var globalValue))
+        {
+            // 更新增强缓存
+            _variableCache?.Set(id.IdName, globalValue, 0);
+            Interpreter?.PerformanceMonitor?.RecordVariableLookup("global_cache", true);
+            return globalValue;
+        }
+
+        // 快速路径：检查简单缓存
         if (_lookupCache?.TryGetValue(id.IdName, out var cached) == true
             && cached.scopeIndex < Scopes.Count
-            && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue))
+            && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue2))
         {
-            return cachedValue;
+            // 更新增强缓存
+            _variableCache?.Set(id.IdName, cachedValue2, cached.scopeIndex);
+            Interpreter?.PerformanceMonitor?.RecordVariableLookup("simple_cache", true);
+            return cachedValue2;
         }
 
         // 慢速路径：完整查找
@@ -734,9 +822,18 @@ public class VariateManager
         {
             if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
-                // 更新缓存
+                // 更新所有缓存
                 _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
                 _lookupCache[id.IdName] = (i, value);
+                _variableCache?.Set(id.IdName, value, i);
+
+                // 如果是全局变量，也更新全局缓存
+                if (i == 0 && _globalVariableCache != null)
+                {
+                    _globalVariableCache[id.IdName] = value;
+                }
+
+                Interpreter?.PerformanceMonitor?.RecordVariableLookup($"scope_{i}", false);
                 return value;
             }
         }
@@ -749,6 +846,7 @@ public class VariateManager
             {
                 // 将符号缓存到当前作用域，避免下次再查找
                 Scopes[^1][id.IdName] = symbol;
+                _variableCache?.Set(id.IdName, symbol, Scopes.Count - 1);
                 return symbol;
             }
         }
@@ -898,7 +996,7 @@ public class VariateManager
     {
         IsReturn = false;
         IsYield = false;
-        Result = new VoidLangValue();
+        Result = VoidLangValue.Instance;
     }
 
     /// <summary>
@@ -975,21 +1073,17 @@ public class VariateManager
             else
             {
                 // 其他作用域：深拷贝，保持局部变量独立
-                var newScope = new Dictionary<string, LangValueType>();
+                // 使用拷贝构造函数预分配正确容量，提升性能
+                var newScope = new Dictionary<string, LangValueType>(scope);
+                newManager.Scopes.Add(newScope);
+                // 注册锁定变量（共享引用）
                 foreach (var (varName, varValue) in scope)
                 {
-                    // 如果是锁定变量，直接共享引用而非拷贝
                     if (varValue is LockedVariableLangValue lockedVar)
                     {
-                        newScope[varName] = lockedVar; // 共享同一个 LockedVariable 实例
-                        newManager.LockedVariables[varName] = lockedVar; // 在新管理器中也记录
-                    }
-                    else
-                    {
-                        newScope[varName] = varValue; // 普通变量正常拷贝
+                        newManager.LockedVariables[varName] = lockedVar;
                     }
                 }
-                newManager.Scopes.Add(newScope);
             }
         }
 
@@ -1120,7 +1214,7 @@ public class VariateManager
         IsReturn = false;
         IsFunc = false;
         IsClass = false;
-        Result = new VoidLangValue();
+        Result = VoidLangValue.Instance;
         RecursionDepth = 0;
 
         // 清理查找缓存
@@ -1225,4 +1319,152 @@ public class VariateManager
 
         return generatorManager;
     }
+
+    #region Performance Optimization
+
+    /// <summary>
+    /// 启用增强的变量缓存（用于性能优化）
+    /// </summary>
+    /// <param name="cacheSize">缓存大小，默认1000</param>
+    public void EnableEnhancedCache(int cacheSize = 1000)
+    {
+        _variableCache = new VariableCache(cacheSize);
+        _globalVariableCache = new Dictionary<string, LangValueType>();
+
+        // 预填充全局变量缓存
+        if (Scopes.Count > 0)
+        {
+            foreach (var kvp in Scopes[0])
+            {
+                _globalVariableCache[kvp.Key] = kvp.Value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 禁用增强的变量缓存
+    /// </summary>
+    public void DisableEnhancedCache()
+    {
+        _variableCache = null;
+        _globalVariableCache = null;
+    }
+
+    /// <summary>
+    /// 获取缓存统计信息
+    /// </summary>
+    public (int hitCount, int missCount, double hitRate) GetCacheStats()
+    {
+        if (_variableCache == null)
+        {
+            return (0, 0, 0);
+        }
+
+        return (_variableCache.HitCount, _variableCache.MissCount, _variableCache.HitRate);
+    }
+
+    /// <summary>
+    /// 从函数引用缓存中获取函数值
+    /// </summary>
+    public bool TryGetCachedFunction(string name, out LangValueType? func)
+    {
+        if (_functionCallCache != null &&
+            _functionCallCache.TryGetValue(name, out var cached) &&
+            cached.scopeDepth == Scopes.Count)
+        {
+            func = cached.func;
+            return true;
+        }
+        func = null;
+        return false;
+    }
+
+    /// <summary>
+    /// 将函数值存入函数引用缓存
+    /// </summary>
+    public void CacheFunctionReference(string name, LangValueType func)
+    {
+        _functionCallCache ??= new Dictionary<string, (LangValueType, int)>(32);
+        _functionCallCache[name] = (func, Scopes.Count);
+    }
+
+    /// <summary>
+    /// 清除函数引用缓存（作用域变化时调用）
+    /// </summary>
+    private void InvalidateFunctionCallCache()
+    {
+        _functionCallCache?.Clear();
+    }
+
+    #endregion
+
+    #region Extension Method Recursion Detection
+
+    /// <summary>
+    /// 扩展方法调用栈（用于检测递归调用）
+    /// </summary>
+    private readonly Stack<string> _extensionMethodCallStack = new();
+
+    /// <summary>
+    /// 最大扩展方法递归深度
+    /// </summary>
+    private const int MaxExtensionMethodDepth = 100;
+
+    /// <summary>
+    /// 进入扩展方法调用
+    /// </summary>
+    /// <param name="methodSignature">方法签名（类型名.方法名）</param>
+    public void EnterExtensionMethod(string methodSignature)
+    {
+        // 检查递归深度
+        if (_extensionMethodCallStack.Count >= MaxExtensionMethodDepth)
+        {
+            var callStack = string.Join(" -> ", _extensionMethodCallStack);
+            throw new InvalidOperationError(
+                (SourcePosition)default,
+                $"扩展方法递归深度超过限制 ({MaxExtensionMethodDepth})。\n" +
+                $"调用栈: {callStack} -> {methodSignature}");
+        }
+
+        // 检查是否已经在调用栈中（直接递归）
+        if (_extensionMethodCallStack.Contains(methodSignature))
+        {
+            var callStack = string.Join(" -> ", _extensionMethodCallStack);
+            throw new InvalidOperationError(
+                (SourcePosition)default,
+                $"检测到扩展方法递归调用: {methodSignature}\n" +
+                $"调用栈: {callStack} -> {methodSignature}\n" +
+                $"提示: 扩展方法内部不应该调用同名的扩展方法。如果需要调用内置方法，请使用不同的方法名。");
+        }
+
+        _extensionMethodCallStack.Push(methodSignature);
+    }
+
+    /// <summary>
+    /// 退出扩展方法调用
+    /// </summary>
+    public void ExitExtensionMethod()
+    {
+        if (_extensionMethodCallStack.Count > 0)
+        {
+            _extensionMethodCallStack.Pop();
+        }
+    }
+
+    /// <summary>
+    /// 检查是否在扩展方法调用中
+    /// </summary>
+    /// <param name="methodSignature">方法签名</param>
+    /// <returns>如果在调用栈中返回 true</returns>
+    public bool IsInExtensionMethod(string methodSignature)
+    {
+        return _extensionMethodCallStack.Contains(methodSignature);
+    }
+
+    /// <summary>
+    /// 获取当前扩展方法调用深度
+    /// </summary>
+    public int ExtensionMethodCallDepth => _extensionMethodCallStack.Count;
+
+    #endregion
 }

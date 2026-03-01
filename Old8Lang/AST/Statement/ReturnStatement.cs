@@ -58,6 +58,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                 // 检查类型是否兼容：完全匹配、可赋值、或基本类型转换
                 bool isCompatible = expectedReturnType == returnType ||
                                    expectedReturnType.IsAssignableFrom(returnType) ||
+                                   (!expectedReturnType.IsValueType && returnType == typeof(object)) ||
                                    IsBasicTypeConversionAllowed(expectedReturnType, returnType);
 
                 // 如果返回类型不匹配且不能自动转换，报告错误
@@ -126,6 +127,26 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
             // 没有使用defer，直接返回
             // 只有当返回值类型是 Task<object> 时，才进行异步包装
             // 这表明当前函数是异步函数
+            if (local.ReturnValueLocal is not null)
+            {
+                var expectedReturnType = local.ReturnValueLocal.LocalType;
+                if (returnType != null && expectedReturnType != typeof(object) && returnType != expectedReturnType)
+                {
+                    if (expectedReturnType.IsValueType && returnType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, expectedReturnType);
+                    }
+                    else if (!expectedReturnType.IsValueType && returnType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, returnType);
+                    }
+                    else if (!expectedReturnType.IsValueType && !returnType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Castclass, expectedReturnType);
+                    }
+                }
+            }
+
             if (returnType == typeof(Task<object>))
             {
                 // 返回值已经是 Task<object>，直接返回

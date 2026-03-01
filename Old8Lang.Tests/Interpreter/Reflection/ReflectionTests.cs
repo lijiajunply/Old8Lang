@@ -10,280 +10,6 @@ namespace Old8Lang.Tests.Interpreter.Reflection;
 /// </summary>
 public class ReflectionTests
 {
-    #region GetClassName 测试
-
-    [Fact]
-    public void GetClassName_ReturnsCorrectClassName()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name <- ""test""
-            }
-            p <- Person()
-            result <- GetClassName(p)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Person", ((StringLangValue)result).Value);
-    }
-
-    [Fact]
-    public void GetClassName_WithNestedClass_ReturnsCorrectName()
-    {
-        // Arrange
-        var code = @"
-            class OuterClass {
-                public value <- 0
-            }
-            obj <- OuterClass()
-            className <- GetClassName(obj)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("className"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("OuterClass", ((StringLangValue)result).Value);
-    }
-
-    #endregion
-
-    #region GetClassMethods 测试
-
-    [Fact]
-    public void GetClassMethods_ReturnsAllMethods()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a, b) {
-                    return a + b
-                }
-                public func subtract(a, b) {
-                    return a - b
-                }
-                private func multiply(a, b) {
-                    return a * b
-                }
-            }
-            calc <- Calculator()
-            methods <- GetClassMethods(calc)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("methods"));
-        Assert.NotNull(result);
-        Assert.IsType<ListLangValue>(result);
-    }
-
-    [Fact]
-    public void GetClassMethods_IncludesInitMethod()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                private name <- """"
-                func init(n) {
-                    name <- n
-                }
-                public func greet() {
-                    return ""Hello""
-                }
-            }
-            p <- Person(""Test"")
-            methods <- GetClassMethods(p)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("methods"));
-        Assert.NotNull(result);
-        Assert.IsType<ListLangValue>(result);
-    }
-
-    #endregion
-
-    #region GetClassFields 测试
-
-    [Fact]
-    public void GetClassFields_ReturnsAllFields()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name <- ""Unknown""
-                private age <- 0
-                public email <- """"
-            }
-            p <- Person()
-            fields <- GetClassFields(p)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("fields"));
-        Assert.NotNull(result);
-        Assert.IsType<ListLangValue>(result);
-    }
-
-    [Fact]
-    public void GetClassFields_IncludesPrivateFields()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue <- 42
-                public publicValue <- 100
-            }
-            s <- Secret()
-            fields <- GetClassFields(s)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("fields"));
-        Assert.NotNull(result);
-        Assert.IsType<ListLangValue>(result);
-    }
-
-    #endregion
-
-    #region GetMethodInfo 测试
-
-    [Fact]
-    public void GetMethodInfo_ReturnsMethodDetails()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a, b) {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            info <- GetMethodInfo(calc, ""add"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("info"));
-        Assert.NotNull(result);
-        Assert.IsType<DictionaryLangValue>(result);
-    }
-
-    [Fact]
-    public void GetMethodInfo_ReturnsPublicFlag()
-    {
-        // Arrange
-        var code = @"
-            class Test {
-                public func publicMethod() { }
-                private func privateMethod() { }
-            }
-            t <- Test()
-            publicInfo <- GetMethodInfo(t, ""publicMethod"")
-            privateInfo <- GetMethodInfo(t, ""privateMethod"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var publicInfo = interpreter.Manager.GetValue(new LangId("publicInfo"));
-        var privateInfo = interpreter.Manager.GetValue(new LangId("privateInfo"));
-        Assert.NotNull(publicInfo);
-        Assert.NotNull(privateInfo);
-    }
-
-    #endregion
-
-    #region GetFieldInfo 测试
-
-    [Fact]
-    public void GetFieldInfo_ReturnsFieldDetails()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name <- ""Test""
-            }
-            p <- Person()
-            info <- GetFieldInfo(p, ""name"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("info"));
-        Assert.NotNull(result);
-        Assert.IsType<DictionaryLangValue>(result);
-    }
-
-    [Fact]
-    public void GetFieldInfo_ReturnsPrivateFlag()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue <- 42
-            }
-            s <- Secret()
-            info <- GetFieldInfo(s, ""secretValue"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("info"));
-        Assert.NotNull(result);
-        Assert.IsType<DictionaryLangValue>(result);
-    }
-
-    #endregion
-
     #region InvokeMethod 测试
 
     [Fact]
@@ -691,48 +417,15 @@ public class ReflectionTests
         Assert.False(((BoolLangValue)result).Value);
     }
 
-    #endregion
-
-    #region HasMethod 测试
-
     [Fact]
-    public void HasMethod_ReturnsTrueForExistingMethod()
+    public void IsInstanceOf_WithInheritance_UsesExactClassMatch()
     {
         // Arrange
         var code = @"
-            class Calculator {
-                public func add(a, b) {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            result <- HasMethod(calc, ""add"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
-    }
-
-    [Fact]
-    public void HasMethod_ReturnsFalseForNonExistingMethod()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a, b) {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            result <- HasMethod(calc, ""subtract"")
+            class Animal { }
+            class Dog extends Animal { }
+            d <- Dog()
+            result <- IsInstanceOf(d, ""Animal"")
         ";
         var interpreter = new LangInterpreter();
 
@@ -747,18 +440,33 @@ public class ReflectionTests
         Assert.False(((BoolLangValue)result).Value);
     }
 
+    #endregion
+
+    #region 文档对齐 API 测试
+
     [Fact]
-    public void HasMethod_ReturnsTrueForPrivateMethod()
+    public void Reflection_NewApis_ReturnExpectedShapes()
     {
         // Arrange
         var code = @"
-            class Secret {
-                private func getSecret() {
-                    return 42
+            class Person {
+                public name <- ""Alice""
+                public func greet() {
+                    return ""hi""
                 }
             }
-            s <- Secret()
-            result <- HasMethod(s, ""getSecret"")
+            p <- Person()
+            typeInfo <- GetTypeInfo(""Person"")
+            classInfo <- GetClassInfo(p)
+            memberMethod <- GetMemberInfo(p, ""greet"")
+            memberField <- GetMemberInfo(p, ""name"")
+            funcInfo <- GetFunctionInfo(""PrintLine"")
+            hasMemberMethod <- HasMember(p, ""greet"")
+            hasMemberField <- HasMember(p, ""name"")
+            hasMemberMissing <- HasMember(p, ""missing"")
+            allTypes <- GetAllTypes()
+            typeOfP <- TypeOf(p)
+            personType <- GetType(""Person"")
         ";
         var interpreter = new LangInterpreter();
 
@@ -767,90 +475,40 @@ public class ReflectionTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
+        var typeInfo = Assert.IsType<DictionaryLangValue>(interpreter.Manager.GetValue(new LangId("typeInfo")));
+        Assert.True(HasDictionaryKey(typeInfo, "name"));
+        Assert.True(HasDictionaryKey(typeInfo, "methods"));
+        Assert.True(HasDictionaryKey(typeInfo, "fields"));
+        Assert.True(HasDictionaryKey(typeInfo, "isGeneric"));
+
+        var classInfo = Assert.IsType<DictionaryLangValue>(interpreter.Manager.GetValue(new LangId("classInfo")));
+        Assert.True(HasDictionaryKey(classInfo, "className"));
+        Assert.True(HasDictionaryKey(classInfo, "methods"));
+        Assert.True(HasDictionaryKey(classInfo, "fields"));
+
+        var memberMethod = Assert.IsType<DictionaryLangValue>(interpreter.Manager.GetValue(new LangId("memberMethod")));
+        var memberMethodType = Assert.IsType<StringLangValue>(GetDictionaryValue(memberMethod, "type"));
+        Assert.Equal("method", memberMethodType.Value);
+
+        var memberField = Assert.IsType<DictionaryLangValue>(interpreter.Manager.GetValue(new LangId("memberField")));
+        var memberFieldType = Assert.IsType<StringLangValue>(GetDictionaryValue(memberField, "type"));
+        Assert.Equal("field", memberFieldType.Value);
+
+        var funcInfo = Assert.IsType<DictionaryLangValue>(interpreter.Manager.GetValue(new LangId("funcInfo")));
+        Assert.True(HasDictionaryKey(funcInfo, "name"));
+        Assert.True(HasDictionaryKey(funcInfo, "type"));
+        Assert.True(HasDictionaryKey(funcInfo, "parameters"));
+
+        Assert.True(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasMemberMethod"))).Value);
+        Assert.True(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasMemberField"))).Value);
+        Assert.False(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasMemberMissing"))).Value);
+
+        Assert.NotNull(Assert.IsType<ListLangValue>(interpreter.Manager.GetValue(new LangId("allTypes"))));
+        Assert.NotNull(Assert.IsType<TypeLangValue>(interpreter.Manager.GetValue(new LangId("typeOfP"))));
+        Assert.NotNull(Assert.IsType<TypeLangValue>(interpreter.Manager.GetValue(new LangId("personType"))));
     }
 
     #endregion
-
-    #region HasField 测试
-
-    [Fact]
-    public void HasField_ReturnsTrueForExistingField()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name <- ""Test""
-            }
-            p <- Person()
-            result <- HasField(p, ""name"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
-    }
-
-    [Fact]
-    public void HasField_ReturnsFalseForNonExistingField()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name <- ""Test""
-            }
-            p <- Person()
-            result <- HasField(p, ""age"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.False(((BoolLangValue)result).Value);
-    }
-
-    [Fact]
-    public void HasField_ReturnsTrueForPrivateField()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue <- 42
-            }
-            s <- Secret()
-            result <- HasField(s, ""secretValue"")
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
-    }
-
-    #endregion
-
     #region 综合测试
 
     [Fact]
@@ -879,12 +537,12 @@ public class ReflectionTests
             // 创建实例
             person <- Person(""Alice"", 25)
 
-            // 获取类名
-            className <- GetClassName(person)
+            // 获取类信息
+            classInfo <- GetClassInfo(person)
 
             // 检查方法和字段
-            hasGreet <- HasMethod(person, ""greet"")
-            hasName <- HasField(person, ""name"")
+            hasGreet <- HasMember(person, ""greet"")
+            hasName <- HasMember(person, ""name"")
 
             // 动态调用方法
             greeting <- InvokeMethod(person, ""greet"", {})
@@ -907,7 +565,7 @@ public class ReflectionTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var className = interpreter.Manager.GetValue(new LangId("className")) as StringLangValue;
+        var classInfo = interpreter.Manager.GetValue(new LangId("classInfo")) as DictionaryLangValue;
         var hasGreet = interpreter.Manager.GetValue(new LangId("hasGreet")) as BoolLangValue;
         var hasName = interpreter.Manager.GetValue(new LangId("hasName")) as BoolLangValue;
         var greeting = interpreter.Manager.GetValue(new LangId("greeting")) as StringLangValue;
@@ -916,7 +574,8 @@ public class ReflectionTests
         var newName = interpreter.Manager.GetValue(new LangId("newName")) as StringLangValue;
         var isPerson = interpreter.Manager.GetValue(new LangId("isPerson")) as BoolLangValue;
 
-        Assert.NotNull(className);
+        Assert.NotNull(classInfo);
+        var className = Assert.IsType<StringLangValue>(GetDictionaryValue(classInfo, "className"));
         Assert.Equal("Person", className.Value);
 
         Assert.NotNull(hasGreet);
@@ -997,4 +656,40 @@ public class ReflectionTests
     }
 
     #endregion
+
+    private static bool HasDictionaryKey(DictionaryLangValue dict, string key)
+    {
+        foreach (var tuple in dict.Tuples)
+        {
+            if (tuple.Elements.Count < 2)
+            {
+                continue;
+            }
+
+            if (tuple.Elements[0] is StringLangValue keyValue && keyValue.Value == key)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static LangValueType GetDictionaryValue(DictionaryLangValue dict, string key)
+    {
+        foreach (var tuple in dict.Tuples)
+        {
+            if (tuple.Elements.Count < 2)
+            {
+                continue;
+            }
+
+            if (tuple.Elements[0] is StringLangValue keyValue && keyValue.Value == key)
+            {
+                return (LangValueType)tuple.Elements[1];
+            }
+        }
+
+        throw new Xunit.Sdk.XunitException($"找不到字典键: {key}");
+    }
 }

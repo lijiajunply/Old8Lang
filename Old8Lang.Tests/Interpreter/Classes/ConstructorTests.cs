@@ -272,6 +272,44 @@ public class ConstructorTests
     }
 
     [Fact]
+    public void Constructor_NestedConstruction_DoesNotOverwriteThis()
+    {
+        var code = @"
+            class Address {
+                public street <- """"
+                public city <- """"
+
+                func init(street:string, city:string) {
+                    this.street <- street
+                    this.city <- city
+                }
+            }
+
+            class Person {
+                public name <- """"
+                public address <- null
+
+                func init(name:string, street:string, city:string) {
+                    this.address <- Address(street, city)
+                    this.name <- name
+                }
+            }
+
+            person <- Person(""Alice"", ""123 Main St"", ""New York"")
+            resultName <- person.name
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var resultName = interpreter.Manager.GetValue(new LangId("resultName"));
+        Assert.NotNull(resultName);
+        Assert.IsType<StringLangValue>(resultName);
+        Assert.Equal("Alice", ((StringLangValue)resultName).Value);
+    }
+
+    [Fact]
     public void Constructor_WithMethodCall_CallsMethodDuringInitialization()
     {
         // Arrange

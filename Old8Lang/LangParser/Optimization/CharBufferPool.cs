@@ -54,6 +54,6 @@ public static class CharBufferPool
     public static RentedBuffer Rent(int minimumLength)
     {
         var buffer = Pool.Rent(minimumLength);
-        return new RentedBuffer(buffer, minimumLength);
+        return new RentedBuffer(buffer, buffer.Length);
     }
 }

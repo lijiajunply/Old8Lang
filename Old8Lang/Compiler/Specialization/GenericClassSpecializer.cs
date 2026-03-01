@@ -324,6 +324,11 @@ public static class GenericClassSpecializer
         Type[] parameterTypes,
         Type returnType)
     {
+        if (returnType != typeof(void))
+        {
+            methodLocal.ReturnValueLocal = methodIL.DeclareLocal(returnType);
+        }
+
         // 处理参数：为方法创建参数局部变量
         // 对于实例方法，参数索引从 1 开始（0 是 this）
         int paramIndex = 1;

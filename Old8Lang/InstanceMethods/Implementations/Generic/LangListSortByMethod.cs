@@ -38,14 +38,29 @@ public class LangListSortByMethod : BaseLangListMethod
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var keySelector = parameters[0].Run(manager) as FuncLangValue;
+        var func = parameters[0].Run(manager) as FuncLangValue;
 
-        if (keySelector == null)
+        if (func == null)
         {
             throw new ArgumentError(position, "keySelector 参数必须是函数类型");
         }
 
-        // 获取排序方向（默认升序）
+        // 检测是否是比较器（两参数）还是 key selector（单参数）
+        bool isComparator = func.Ids?.Count >= 2;
+
+        if (isComparator)
+        {
+            // 比较器模式：(a, b) -> int，直接用作比较函数
+            var sortedItems = new List<LangValueType>(items);
+            sortedItems.Sort((a, b) =>
+            {
+                var result = func.Run(manager, [a, b]);
+                return result is IntLangValue intResult ? intResult.Value : 0;
+            });
+            return new ListLangValue(sortedItems);
+        }
+
+        // key selector 模式：(item) -> key，按键排序
         bool isAscending = true;
         if (parameters.Count > 1)
         {
@@ -61,7 +76,7 @@ public class LangListSortByMethod : BaseLangListMethod
         for (int i = 0; i < items.Count; i++)
         {
             var item = items[i];
-            var key = keySelector.Run(manager, [item]);
+            var key = func.Run(manager, [item]);
             indexedItems.Add((i, item, key));
         }
 
@@ -69,7 +84,6 @@ public class LangListSortByMethod : BaseLangListMethod
         indexedItems.Sort((a, b) =>
         {
             var comparison = CompareKeys(a.key, b.key);
-            // 如果键相同，保持原始顺序（稳定排序）
             if (comparison == 0)
             {
                 comparison = a.index.CompareTo(b.index);

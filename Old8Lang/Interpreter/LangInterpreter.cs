@@ -27,6 +27,11 @@ public class LangInterpreter
     public readonly TypeAnnotationManager TypeAnnotationManager;
 
     /// <summary>
+    /// 性能监控器（可选）
+    /// </summary>
+    public IPerformanceMonitor? PerformanceMonitor { get; set; }
+
+    /// <summary>
     /// 源代码
     /// </summary>
     private string? SourceCode { get; set; }
@@ -50,8 +55,17 @@ public class LangInterpreter
     /// <summary>
     /// 初始化LangInterpreter实例
     /// </summary>
-    public LangInterpreter()
+    public LangInterpreter() : this(null)
     {
+    }
+
+    /// <summary>
+    /// 初始化LangInterpreter实例，并指定性能监控器
+    /// </summary>
+    /// <param name="performanceMonitor">性能监控器（可选）</param>
+    public LangInterpreter(IPerformanceMonitor? performanceMonitor)
+    {
+        PerformanceMonitor = performanceMonitor;
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
 

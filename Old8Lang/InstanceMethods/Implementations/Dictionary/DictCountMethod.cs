@@ -45,7 +45,12 @@ public class DictCountMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is Dictionary<object, object> dict)
+        if (instance is DictionaryLangValue dictLangValue)
+        {
+            return dictLangValue.Value.Count;
+        }
+
+        if (instance is System.Collections.IDictionary dict)
         {
             return dict.Count;
         }

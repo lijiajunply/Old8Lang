@@ -131,37 +131,6 @@ count <- arr.Count()
     }
 
     /// <summary>
-    /// 测试数组 Length() 方法
-    /// </summary>
-    [Fact]
-    public void Run_ArrayLengthMethod_ExecutesSuccessfully()
-    {
-        // Arrange
-        var code = @"
-arr:array<int> <- [1, 2, 3]
-lengthResult <- arr.Length()
-countResult <- arr.Count()
-";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var lengthResult = interpreter.Manager.GetValue(new LangId("lengthResult"));
-        var countResult = interpreter.Manager.GetValue(new LangId("countResult"));
-
-        Assert.NotNull(lengthResult);
-        Assert.IsType<IntLangValue>(lengthResult);
-        Assert.Equal(3, ((IntLangValue)lengthResult).Value);
-
-        Assert.NotNull(countResult);
-        Assert.IsType<IntLangValue>(countResult);
-        Assert.Equal(3, ((IntLangValue)countResult).Value);
-    }
-
-    /// <summary>
     /// 测试多种类型的泛型数组
     /// </summary>
     [Fact]

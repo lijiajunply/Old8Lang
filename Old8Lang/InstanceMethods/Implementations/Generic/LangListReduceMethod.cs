@@ -15,9 +15,9 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 public class LangListReduceMethod : BaseLangListMethod
 {
     public override string[] Names => ["Reduce", "reduce"];
-    public override string[] ParameterNames => ["reducer"];
+    public override string[] ParameterNames => ["reducer", "initialValue"];
     public override int MinParameterCount => 1;
-    public override int MaxParameterCount => 1;
+    public override int MaxParameterCount => 2;
 
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
@@ -30,13 +30,24 @@ public class LangListReduceMethod : BaseLangListMethod
             throw new ArgumentException("Reduce 方法的参数必须是函数");
         }
 
-        if (items.Count == 0)
+        LangValueType accumulator;
+        int startIndex;
+
+        if (parameters.Count >= 2)
         {
-            throw new InvalidOperationException("序列不包含任何元素");
+            // 有初始值
+            accumulator = parameters[1].Run(manager);
+            startIndex = 0;
+        }
+        else
+        {
+            if (items.Count == 0)
+                throw new InvalidOperationException("序列不包含任何元素");
+            accumulator = items[0];
+            startIndex = 1;
         }
 
-        var accumulator = items[0];
-        for (int i = 1; i < items.Count; i++)
+        for (int i = startIndex; i < items.Count; i++)
         {
             var args = new List<LangExpression> { accumulator, items[i] };
             accumulator = reducer.Run(manager, args);

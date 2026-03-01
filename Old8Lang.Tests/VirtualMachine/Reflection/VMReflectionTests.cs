@@ -40,258 +40,6 @@ public class VMReflectionTests
             Console.SetOut(originalOut);
         }
     }
-
-    #region GetClassName 测试
-
-    [Fact]
-    public void GetClassName_ReturnsCorrectClassName()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name:string <- ""test""
-            }
-            p <- Person()
-            result <- GetClassName(p)
-            PrintLine(result)
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.Equal("Person", output);
-    }
-
-    [Fact]
-    public void GetClassName_WithDifferentClasses_ReturnsCorrectNames()
-    {
-        // Arrange
-        var code = @"
-            class Animal {
-                public species:string <- ""Unknown""
-            }
-            class Vehicle {
-                public brand:string <- ""Unknown""
-            }
-            a <- Animal()
-            v <- Vehicle()
-            PrintLine(GetClassName(a))
-            PrintLine(GetClassName(v))
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-        Assert.Equal(2, lines.Length);
-        Assert.Equal("Animal", lines[0]);
-        Assert.Equal("Vehicle", lines[1]);
-    }
-
-    #endregion
-
-    #region GetClassMethods 测试
-
-    [Fact]
-    public void GetClassMethods_ReturnsMethodList()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a:int, b:int) -> int {
-                    return a + b
-                }
-                public func subtract(a:int, b:int) -> int {
-                    return a - b
-                }
-            }
-            calc <- Calculator()
-            methods <- GetClassMethods(calc)
-            PrintLine(methods.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("add", output);
-        Assert.Contains("subtract", output);
-    }
-
-    [Fact]
-    public void GetClassMethods_IncludesPrivateMethods()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                public func publicMethod() -> void { }
-                private func privateMethod() -> void { }
-            }
-            s <- Secret()
-            methods <- GetClassMethods(s)
-            PrintLine(methods.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("publicMethod", output);
-        Assert.Contains("privateMethod", output);
-    }
-
-    #endregion
-
-    #region GetClassFields 测试
-
-    [Fact]
-    public void GetClassFields_ReturnsFieldList()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name:string <- ""Unknown""
-                public age:int <- 0
-            }
-            p <- Person()
-            fields <- GetClassFields(p)
-            PrintLine(fields.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("name", output);
-        Assert.Contains("age", output);
-    }
-
-    [Fact]
-    public void GetClassFields_IncludesPrivateFields()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue:int <- 42
-                public publicValue:int <- 100
-            }
-            s <- Secret()
-            fields <- GetClassFields(s)
-            PrintLine(fields.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("secretValue", output);
-        Assert.Contains("publicValue", output);
-    }
-
-    #endregion
-
-    #region GetMethodInfo 测试
-
-    [Fact]
-    public void GetMethodInfo_ReturnsMethodDetails()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a:int, b:int) -> int {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            info <- GetMethodInfo(calc, ""add"")
-            PrintLine(info.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("add", output);
-    }
-
-    [Fact]
-    public void GetMethodInfo_ForPrivateMethod_ReturnsDetails()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private func getSecret() -> int {
-                    return 42
-                }
-            }
-            s <- Secret()
-            info <- GetMethodInfo(s, ""getSecret"")
-            PrintLine(info.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("getSecret", output);
-    }
-
-    #endregion
-
-    #region GetFieldInfo 测试
-
-    [Fact]
-    public void GetFieldInfo_ReturnsFieldDetails()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name:string <- ""Test""
-            }
-            p <- Person()
-            info <- GetFieldInfo(p, ""name"")
-            PrintLine(info.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("name", output);
-    }
-
-    [Fact]
-    public void GetFieldInfo_ForPrivateField_ReturnsDetails()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue:int <- 42
-            }
-            s <- Secret()
-            info <- GetFieldInfo(s, ""secretValue"")
-            PrintLine(info.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.NotEmpty(output);
-        Assert.Contains("secretValue", output);
-    }
-
-    #endregion
-
     #region InvokeMethod 测试
 
     [Fact]
@@ -737,44 +485,15 @@ public class VMReflectionTests
         Assert.Equal("true", output);
     }
 
-    #endregion
-
-    #region HasMethod 测试
-
     [Fact]
-    public void HasMethod_ReturnsTrueForExistingMethod()
+    public void IsInstanceOf_WithInheritance_UsesExactClassMatch()
     {
         // Arrange
         var code = @"
-            class Calculator {
-                public func add(a:int, b:int) -> int {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            result <- HasMethod(calc, ""add"")
-            PrintLine(result.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.Equal("true", output);
-    }
-
-    [Fact]
-    public void HasMethod_ReturnsFalseForNonExistingMethod()
-    {
-        // Arrange
-        var code = @"
-            class Calculator {
-                public func add(a:int, b:int) -> int {
-                    return a + b
-                }
-            }
-            calc <- Calculator()
-            result <- HasMethod(calc, ""subtract"")
+            class Animal { }
+            class Dog extends Animal { }
+            d <- Dog()
+            result <- IsInstanceOf(d, ""Animal"")
             PrintLine(result.ToStr())
         ";
 
@@ -785,114 +504,90 @@ public class VMReflectionTests
         Assert.Equal("false", output);
     }
 
+    #endregion
+
+    #region 文档对齐 API 测试
+
     [Fact]
-    public void HasMethod_ReturnsTrueForPrivateMethod()
+    public void Reflection_NewApis_ReturnExpectedMarkers()
     {
         // Arrange
         var code = @"
-            class Secret {
-                private func getSecret() -> int {
-                    return 42
+            class Person {
+                public name:string <- ""Alice""
+                public func greet() -> string {
+                    return ""hi""
                 }
             }
-            s <- Secret()
-            result <- HasMethod(s, ""getSecret"")
-            PrintLine(result.ToStr())
+            p <- Person()
+
+            typeInfo <- GetTypeInfo(""Person"")
+            classInfo <- GetClassInfo(p)
+            memberMethod <- GetMemberInfo(p, ""greet"")
+            memberField <- GetMemberInfo(p, ""name"")
+            funcInfo <- GetFunctionInfo(""PrintLine"")
+            hasMethod <- HasMember(p, ""greet"")
+            hasField <- HasMember(p, ""name"")
+            hasMissing <- HasMember(p, ""missing"")
+            allTypes <- GetAllTypes()
+            typeOfP <- TypeOf(p)
+            personType <- GetType(""Person"")
+
+            // VM 模式下这些结构可能是原生对象，不直接调用 ToStr，主要验证调用不抛错
+            PrintLine(""ok_typeInfo"")
+            PrintLine(""ok_classInfo"")
+            PrintLine(""ok_memberMethod"")
+            PrintLine(""ok_memberField"")
+            PrintLine(""ok_funcInfo"")
+            PrintLine(hasMethod.ToStr())
+            PrintLine(hasField.ToStr())
+            PrintLine(hasMissing.ToStr())
+            PrintLine(""ok_allTypes"")
+            PrintLine(typeOfP.ToStr())
+            PrintLine(personType.ToStr())
         ";
 
         // Act
         var output = ExecuteVMCode(code);
+        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
         // Assert
-        Assert.Equal("true", output);
+        Assert.True(lines.Length >= 11);
+        Assert.Equal("ok_typeInfo", lines[0]);
+        Assert.Equal("ok_classInfo", lines[1]);
+        Assert.Equal("ok_memberMethod", lines[2]);
+        Assert.Equal("ok_memberField", lines[3]);
+        Assert.Equal("ok_funcInfo", lines[4]);
+        Assert.Equal("true", lines[5]); // hasMethod
+        Assert.Equal("true", lines[6]); // hasField
+        Assert.Equal("false", lines[7]); // hasMissing
+        Assert.Equal("ok_allTypes", lines[8]);
     }
 
     [Fact]
-    public void HasMethod_ReturnsTrueForInitMethod()
+    public void GetFunctionInfo_WithClassMethod_ThrowsInVmMode()
     {
         // Arrange
         var code = @"
             class Person {
-                public func init(name:string) -> void { }
+                public func greet() -> string {
+                    return ""hi""
+                }
             }
-            p <- Person(""Test"")
-            result <- HasMethod(p, ""init"")
-            PrintLine(result.ToStr())
+            p <- Person()
+            info <- GetFunctionInfo(p, ""greet"")
+            PrintLine(info.ToStr())
         ";
 
         // Act
-        var output = ExecuteVMCode(code);
+        var exception = Record.Exception(() => ExecuteVMCode(code));
 
         // Assert
-        Assert.Equal("true", output);
+        Assert.NotNull(exception);
+        Assert.Contains("VM 模式下暂不支持类方法反射", exception.ToString());
     }
 
     #endregion
-
-    #region HasField 测试
-
-    [Fact]
-    public void HasField_ReturnsTrueForExistingField()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name:string <- ""Test""
-            }
-            p <- Person()
-            result <- HasField(p, ""name"")
-            PrintLine(result.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.Equal("true", output);
-    }
-
-    [Fact]
-    public void HasField_ReturnsFalseForNonExistingField()
-    {
-        // Arrange
-        var code = @"
-            class Person {
-                public name:string <- ""Test""
-            }
-            p <- Person()
-            result <- HasField(p, ""age"")
-            PrintLine(result.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.Equal("false", output);
-    }
-
-    [Fact]
-    public void HasField_ReturnsTrueForPrivateField()
-    {
-        // Arrange
-        var code = @"
-            class Secret {
-                private secretValue:int <- 42
-            }
-            s <- Secret()
-            result <- HasField(s, ""secretValue"")
-            PrintLine(result.ToStr())
-        ";
-
-        // Act
-        var output = ExecuteVMCode(code);
-
-        // Assert
-        Assert.Equal("true", output);
-    }
-
-    #endregion
-
     #region 综合测试
 
     [Fact]
@@ -921,13 +616,9 @@ public class VMReflectionTests
             // 创建实例
             person <- Person(""Alice"", 25)
 
-            // 获取类名
-            className <- GetClassName(person)
-            PrintLine(""Class: "" + className)
-
             // 检查方法和字段
-            hasGreet <- HasMethod(person, ""greet"")
-            hasName <- HasField(person, ""name"")
+            hasGreet <- HasMember(person, ""greet"")
+            hasName <- HasMember(person, ""name"")
             PrintLine(""Has greet: "" + hasGreet.ToStr())
             PrintLine(""Has name: "" + hasName.ToStr())
 
@@ -957,7 +648,6 @@ public class VMReflectionTests
 
         // Assert
         var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-        Assert.Contains("Class: Person", lines);
         Assert.Contains("Has greet: true", lines);
         Assert.Contains("Has name: true", lines);
         Assert.Contains("Greeting: Hello, I am Alice", lines);
@@ -1115,8 +805,8 @@ public class VMReflectionTests
             PrintLine(""Is Product: "" + IsInstanceOf(product, ""Product"").ToStr())
 
             // 检查成员
-            PrintLine(""Has name: "" + HasField(product, ""name"").ToStr())
-            PrintLine(""Has getInfo: "" + HasMethod(product, ""getInfo"").ToStr())
+            PrintLine(""Has name: "" + HasMember(product, ""name"").ToStr())
+            PrintLine(""Has getInfo: "" + HasMember(product, ""getInfo"").ToStr())
 
             // 调用方法
             info <- InvokeMethod(product, ""getInfo"", {})

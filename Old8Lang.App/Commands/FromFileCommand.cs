@@ -11,7 +11,7 @@ public class FromFileCommand : ICommand
 {
     public string Name => "-f";
     public string Description => "解释执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -f <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--env <environment>]";
+    public string Help => "使用: Old8Lang.App -f <文件名> [-D SYMBOL1] ... [--env <environment>] [--perf] [--perf-detailed] [--perf-output <file>]";
 
     public int Execute(string[] args)
     {
@@ -26,19 +26,36 @@ public class FromFileCommand : ICommand
         var fileName = args[0];
         var symbols = new List<string>();
         string? environment = null;
+        bool enablePerf = false;
+        bool enablePerfDetailed = false;
+        string? perfOutputFile = null;
 
-        // 解析 -D 和 --env 参数
+        // 解析 -D、--env、--perf、--perf-detailed、--perf-output 参数
         for (int i = 1; i < args.Length; i++)
         {
             if (args[i] == "-D" && i + 1 < args.Length)
             {
                 symbols.Add(args[i + 1]);
-                i++; // 跳过符号名
+                i++;
             }
             else if (args[i] == "--env" && i + 1 < args.Length)
             {
                 environment = args[i + 1];
-                i++; // 跳过环境名
+                i++;
+            }
+            else if (args[i] == "--perf")
+            {
+                enablePerf = true;
+            }
+            else if (args[i] == "--perf-detailed")
+            {
+                enablePerf = true;
+                enablePerfDetailed = true;
+            }
+            else if (args[i] == "--perf-output" && i + 1 < args.Length)
+            {
+                perfOutputFile = args[i + 1];
+                i++;
             }
         }
 
@@ -55,7 +72,6 @@ public class FromFileCommand : ICommand
                 Console.WriteLine($"[项目模式] 环境: {envManager.CurrentEnvironment}");
                 Console.WriteLine($"[项目模式] 运行时: {envManager.GetRuntimeMode()}");
 
-                // 应用环境变量到系统环境
                 foreach (var (key, value) in envManager.GetAllVariables())
                 {
                     Environment.SetEnvironmentVariable(key, value);
@@ -63,20 +79,60 @@ public class FromFileCommand : ICommand
             }
         }
 
-        // 总是创建预编译符号管理器（即使没有符号也可以处理#define等指令）
         PreprocessorSymbols preprocessorSymbols = new PreprocessorSymbols(symbols);
 
-        var langInterpreter = new LangInterpreter();
+        // 配置性能监控
+        PerformanceMonitor? monitor = null;
+        if (enablePerf)
+        {
+            monitor = new PerformanceMonitor();
+            monitor.StartMonitoring(new PerformanceMonitorConfig
+            {
+                Enabled = true,
+                DetailedMonitoring = enablePerfDetailed,
+                EnableMemoryTracking = true,
+                EnableCacheTracking = true
+            });
+        }
+
+        var langInterpreter = new LangInterpreter(monitor);
 
         try
         {
             var code = Apis.FromFile(fileName);
             var ast = langInterpreter.Build(code, fileName, preprocessorSymbols);
             ast.Run(langInterpreter.Manager);
+
+            // 输出性能报告
+            if (enablePerf && monitor != null)
+            {
+                monitor.StopMonitoring();
+                var metrics = monitor.GetMetrics();
+                var reporter = new PerformanceReporter();
+
+                if (perfOutputFile != null)
+                {
+                    var ext = Path.GetExtension(perfOutputFile).ToLowerInvariant();
+                    string report = ext switch
+                    {
+                        ".json" => reporter.GenerateJsonReport(metrics),
+                        ".csv" => reporter.GenerateCsvReport(metrics),
+                        _ => reporter.GenerateTextReport(metrics)
+                    };
+                    reporter.SaveReport(report, perfOutputFile);
+                    Console.WriteLine($"性能报告已保存到: {perfOutputFile}");
+                }
+                else
+                {
+                    Console.WriteLine(reporter.GenerateTextReport(metrics));
+                }
+            }
+
             return 0;
         }
         catch (Exception e)
         {
+            monitor?.StopMonitoring();
 #if DEBUG
             throw;
 #endif
@@ -85,3 +141,4 @@ public class FromFileCommand : ICommand
         }
     }
 }
+

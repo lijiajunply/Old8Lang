@@ -99,7 +99,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
         if (dotExpression is Instance instance)
         {
-            return instance.FromClassToResult(this);
+            return instance.FromClassToResult(this, manager);
         }
 
         throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 的点操作");

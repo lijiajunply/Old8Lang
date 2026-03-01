@@ -1,0 +1,54 @@
+class Item {
+    public name:string
+
+    func init() -> void {
+        this.name <- ""
+    }
+
+    func init(n:string) -> void {
+        this.name <- n
+    }
+}
+
+class Repository<T: class & new()> {
+    private items:list
+
+    func init() -> void {
+        this.items <- {}
+    }
+
+    func add(item:T) -> void {
+        this.items.Add(item)
+    }
+
+    func get(index:int) -> T {
+        return this.items[index]
+    }
+
+    func count() -> int {
+        tmp <- this.items
+        PrintLine(tmp)
+        PrintLine(tmp.Count())
+        PrintLine(this.items.Count())
+        return this.items.Count()
+    }
+}
+
+repo <- Repository<Item>()
+repo.add(Item("first"))
+repo.add(Item("second"))
+repo.add(Item("third"))
+
+r1 <- repo.count()
+r2 <- repo.count()
+count <- r2
+c2 <- repo.count()
+first <- repo.get(0)
+firstName <- first.name
+
+PrintLine(repo.count())
+PrintLine(count)
+PrintLine(c2)
+PrintLine(r1)
+PrintLine(r2)
+PrintLine(firstName)

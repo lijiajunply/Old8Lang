@@ -25,6 +25,26 @@ public class GenericTypeResolver(
             return mappedType;
         }
 
+        // 常用集合类型映射（编译模式需要具体运行时类型，而不是 object）
+        // 注意：这里既支持 list，也支持 list<T> 等形式（统一映射到运行时容器类型）
+        var loweredTypeName = typeName.Trim();
+        var loweredBase = loweredTypeName;
+        var genericStart = loweredTypeName.IndexOf('<');
+        if (genericStart > 0)
+        {
+            loweredBase = loweredTypeName[..genericStart].Trim();
+        }
+
+        switch (loweredBase.ToLower())
+        {
+            case "list":
+                return typeof(List<object>);
+            case "array":
+                return typeof(object[]);
+            case "dict":
+                return typeof(Dictionary<object, object>);
+        }
+
         // 否则尝试从类型注解管理器获取
         var typeInfo = interpreter?.TypeAnnotationManager.GetTypeFamily().GetType(typeName);
         if (typeInfo != null)

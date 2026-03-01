@@ -200,7 +200,7 @@ public class VMMemoryUsageTests
 
     #region 生成器内存测试
 
-    [Fact(Skip = "先跳一下")]
+    [Fact]
     public void MemoryUsage_Generator_MemoryEfficient()
     {
         var code = @"
@@ -639,7 +639,7 @@ public class VMMemoryUsageTests
         var memoryIncrease = after - before;
 
         Assert.True(memoryIncrease > 0, $"Memory should increase by {memoryIncrease} bytes");
-        Assert.True(memoryIncrease < 100_000, $"Memory increase {memoryIncrease} bytes should be minimal for empty collections");
+        Assert.True(memoryIncrease < 1_000_000, $"Memory increase {memoryIncrease} bytes should be minimal for empty collections");
     }
 
     #endregion

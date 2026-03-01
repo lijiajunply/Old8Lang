@@ -248,60 +248,89 @@ public partial class AnyLangValue : LangValueType
     protected LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         List<NamedArgument>? namedArgs, VariateManager manager)
     {
+        var outerFieldsModifiedBySetField = new HashSet<string>(FieldsModifiedBySetField);
+        FieldsModifiedBySetField.Clear();
+
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在方法中访问实例成员）
         var executionManager = manager.NewManger();
+        executionManager.AddChildren();
 
-        // 1. 设置 this 指针
-        executionManager.Set(new LangId("this"), this);
-
-        // 2. 将所有实例字段添加到执行作用域
-        //    （方法内部可以直接访问字段，不需要 this.field）
-        foreach (var (fieldName, fieldValue) in InstanceData)
+        try
         {
-            executionManager.Set(new LangId(fieldName), fieldValue);
-        }
+            // 1. 设置 this 指针（必须是局部变量，避免污染外层作用域）
+            executionManager.SetLocal(new LangId("this"), this);
 
-        // 3. 将类的所有方法添加到执行作用域
-        //    （方法内部可以直接调用其他方法，不需要 this.method()）
-        foreach (var method in Metadata.MethodTable.GetAllMethods())
-        {
-            // 只添加非静态方法到实例方法作用域
-            if (!method.IsStatic)
+            // 2. 将所有实例字段添加到执行作用域
+            //    （方法内部可以直接访问字段，不需要 this.field）
+            //    使用 SetLocal，避免覆盖外层同名变量
+            foreach (var (fieldName, fieldValue) in InstanceData)
             {
-                executionManager.Set(new LangId(method.MethodName), method.Implementation);
+                executionManager.SetLocal(new LangId(fieldName), fieldValue);
             }
+
+            // 3. 将类的所有方法添加到执行作用域
+            //    （方法内部可以直接调用其他方法，不需要 this.method()）
+            //    使用 SetLocal，避免覆盖外层同名变量（例如外部定义了 count 变量）
+            foreach (var method in Metadata.MethodTable.GetAllMethods())
+            {
+                // 只添加非静态方法到实例方法作用域
+                if (!method.IsStatic)
+                {
+                    executionManager.SetLocal(new LangId(method.MethodName), method.Implementation);
+                }
+            }
+
+            // 4. 将类型信息添加到作用域（从 InstanceScope 继承）
+            executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+            // 5. 设置函数上下文标志
+            executionManager.IsFunc = true;
+
+            // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
+            //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
+            if (TypeArgumentMapping is not null)
+            {
+                executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            }
+
+            // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
+            var funcValue = methodInfo.Implementation;
+            // 参数表达式必须在调用方作用域中先求值，避免 this 绑定到被调对象后导致作用域错位。
+            var evaluatedArguments = arguments
+                .Select(arg => arg is LangValueType value ? value : arg.Run(manager))
+                .Cast<LangExpression>()
+                .ToList();
+            var evaluatedNamedArgs = (namedArgs ?? [])
+                .Select(arg =>
+                {
+                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Run(manager);
+                    return new NamedArgument(arg.Name, evaluated, arg.Position);
+                })
+                .ToList();
+
+            var result = funcValue.Run(executionManager, evaluatedArguments, evaluatedNamedArgs, Position);
+
+            // 7. 恢复函数上下文标志
+            executionManager.IsFunc = false;
+
+            // 8. 同步字段修改
+            //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
+            SyncFieldsFromExecutionScope(executionManager);
+
+            var currentFieldsModifiedBySetField = new HashSet<string>(FieldsModifiedBySetField);
+            FieldsModifiedBySetField.Clear();
+            FieldsModifiedBySetField.UnionWith(outerFieldsModifiedBySetField);
+            FieldsModifiedBySetField.UnionWith(currentFieldsModifiedBySetField);
+
+            return result;
         }
-
-        // 4. 将类型信息添加到作用域（从 InstanceScope 继承）
-        executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
-
-        // 5. 设置函数上下文标志
-        executionManager.IsFunc = true;
-
-        // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
-        //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping is not null)
+        finally
         {
-            executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            // 清理注入的局部作用域，避免 this/字段/方法名污染外层作用域
+            executionManager.RemoveChildren();
         }
-
-        // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
-        var funcValue = methodInfo.Implementation;
-        var result = funcValue.Run(executionManager, arguments, namedArgs ?? [], Position);
-
-        // 7. 恢复函数上下文标志
-        executionManager.IsFunc = false;
-
-        // 8. 同步字段修改
-        //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
-        SyncFieldsFromExecutionScope(executionManager);
-
-        // 注意：不在这里清空 _fieldsModifiedBySetField
-        // 让调用者（如 CallInit）来管理
-
-        return result;
     }
 
     /// <summary>
@@ -621,55 +650,62 @@ public partial class AnyLangValue : LangValueType
         // 2. 添加实例字段和 this（可以在 init 中访问实例成员）
         var initManager = manager.NewManger();
 
-        // 1. 设置 this 指针
-        initManager.Set(new LangId("this"), this);
-
-        // 2. 创建基础作用域用于字段
+        // 1. 创建基础作用域用于字段
         initManager.AddChildren();
 
-        // 3. 将所有实例字段添加到基础作用域
-        //    这样参数可以在更高优先级的作用域中覆盖字段
-        var fieldScopeIndex = initManager.Scopes.Count - 1;
-        foreach (var (fieldName, fieldValue) in InstanceData)
+        try
         {
-            // 直接在字段作用域中设置字段
-            initManager.Scopes[fieldScopeIndex][fieldName] = fieldValue;
-        }
+            // 2. 设置 this 指针（必须是局部变量，避免污染外层作用域）
+            initManager.SetLocal(new LangId("this"), this);
 
-        // 3.5 将类的所有方法添加到基础作用域
-        //     这样 init 方法内部可以直接调用其他方法，包括从 mixin 继承的方法
-        foreach (var method in Metadata.MethodTable.GetAllMethods())
-        {
-            // 只添加非静态方法到实例方法作用域
-            if (!method.IsStatic)
+            // 3. 将所有实例字段添加到基础作用域
+            //    这样参数可以在更高优先级的作用域中覆盖字段
+            var fieldScopeIndex = initManager.Scopes.Count - 1;
+            foreach (var (fieldName, fieldValue) in InstanceData)
             {
-                initManager.Scopes[fieldScopeIndex][method.MethodName] = method.Implementation;
+                // 直接在字段作用域中设置字段
+                initManager.Scopes[fieldScopeIndex][fieldName] = fieldValue;
             }
+
+            // 3.5 将类的所有方法添加到基础作用域
+            //     这样 init 方法内部可以直接调用其他方法，包括从 mixin 继承的方法
+            foreach (var method in Metadata.MethodTable.GetAllMethods())
+            {
+                // 只添加非静态方法到实例方法作用域
+                if (!method.IsStatic)
+                {
+                    initManager.Scopes[fieldScopeIndex][method.MethodName] = method.Implementation;
+                }
+            }
+
+            // 4. 将类型信息添加到字段作用域（从 InstanceScope 继承）
+            initManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+            // 5. 设置函数上下文标志
+            initManager.IsFunc = true;
+
+            // 5.5 设置泛型类型参数映射（如果是泛型类实例）
+            //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
+            if (TypeArgumentMapping is not null)
+            {
+                initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            }
+
+            // 6. 执行 init 方法，传入已经求值的参数表达式
+            //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
+            initMethod.Run(initManager, parameterValueExpressions);
+
+            // 7. 恢复函数上下文标志
+            initManager.IsFunc = false;
+
+            // 8. 同步字段修改
+            //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
+            SyncFieldsFromExecutionScope(initManager);
         }
-
-        // 4. 将类型信息添加到字段作用域（从 InstanceScope 继承）
-        initManager.AddImportInfoRange(InstanceScope.ImportInfos);
-
-        // 5. 设置函数上下文标志
-        initManager.IsFunc = true;
-
-        // 5.5 设置泛型类型参数映射（如果是泛型类实例）
-        //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
-        if (TypeArgumentMapping is not null)
+        finally
         {
-            initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            initManager.RemoveChildren();
         }
-
-        // 6. 执行 init 方法，传入已经求值的参数表达式
-        //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
-        initMethod.Run(initManager, parameterValueExpressions);
-
-        // 7. 恢复函数上下文标志
-        initManager.IsFunc = false;
-
-        // 8. 同步字段修改
-        //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
-        SyncFieldsFromExecutionScope(initManager);
 
         // 9. 清空SetField修改标记（方法执行结束）
         FieldsModifiedBySetField.Clear();
@@ -814,19 +850,39 @@ public partial class AnyLangValue : LangValueType
         }
     }
 
+    /// <summary>
+    /// 用于检测 ToString 中的循环引用，防止无限递归
+    /// </summary>
+    [ThreadStatic]
+    private static HashSet<AnyLangValue>? _toStringVisited;
+
     public override string ToString()
     {
-        var builder = new StringBuilder();
-        builder.Append('{');
-        var fields = InstanceData.ToList();
-        for (var i = 0; i < fields.Count; i++)
+        _toStringVisited ??= new HashSet<AnyLangValue>(ReferenceEqualityComparer.Instance);
+
+        if (!_toStringVisited.Add(this))
         {
-            var field = fields[i];
-            builder.Append($"{(i == 0 ? "" : ",")}\"{field.Key}\":{field.Value}");
+            return $"<{ClassId.IdName} ...>";
         }
 
-        builder.Append('}');
-        return builder.ToString();
+        try
+        {
+            var builder = new StringBuilder();
+            builder.Append('{');
+            var fields = InstanceData.ToList();
+            for (var i = 0; i < fields.Count; i++)
+            {
+                var field = fields[i];
+                builder.Append($"{(i == 0 ? "" : ",")}\"{field.Key}\":{field.Value}");
+            }
+
+            builder.Append('}');
+            return builder.ToString();
+        }
+        finally
+        {
+            _toStringVisited.Remove(this);
+        }
     }
 
     public override string ToDisplayString()
@@ -1090,7 +1146,7 @@ public partial class AnyLangValue : LangValueType
     /// </summary>
     public override bool Equal(LangValueType? otherValueType)
     {
-        if (otherValueType is null)
+        if (otherValueType is null or NullLangValue)
             return false;
 
         var result = CallOperatorOverloadMethod("_eq", otherValueType);

@@ -191,9 +191,7 @@ public partial class Operation(
             {
                 if (Right is Instance r1)
                 {
-                    var ids = r1.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(r1.Id, ids, r1.NamedArgs, r1.Position);
-                    return any.Dot(newInstance, manager);
+                    return any.Dot(r1, manager);
                 }
 
                 if (Right is not null)
@@ -205,9 +203,7 @@ public partial class Operation(
             {
                 if (Right is Instance instance)
                 {
-                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
-                    return list.Dot(newInstance, manager);
+                    return list.Dot(instance, manager);
                 }
 
                 if (Right is not null)
@@ -268,9 +264,7 @@ public partial class Operation(
                 // 处理数组方法调用
                 if (Right is Instance instance)
                 {
-                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
-                    return array.Dot(newInstance, manager);
+                    return array.Dot(instance, manager);
                 }
 
                 // 处理数组索引访问，需要先运行Right表达式
@@ -291,9 +285,7 @@ public partial class Operation(
                 // 处理字典方法调用
                 if (Right is Instance instance)
                 {
-                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
-                    return dict.Dot(newInstance, manager);
+                    return dict.Dot(instance, manager);
                 }
 
                 // 处理字典属性访问和方法调用

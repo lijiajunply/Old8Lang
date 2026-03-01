@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.VirtualMachine.Modules;
 /// <summary>
 /// 虚拟机模块导入测试
 /// </summary>
+[Collection("Sequential")]
 public class VMImportTests
 {
     private string ExecuteVMCode(string code, string? baseDirectory = null)
@@ -172,7 +173,7 @@ main()
 ";
 
             var output = ExecuteVMCode(mainCode, tempDir);
-            var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             Assert.Equal(2, lines.Length);
             Assert.Equal("150", lines[0]);
             Assert.Equal("50", lines[1]);

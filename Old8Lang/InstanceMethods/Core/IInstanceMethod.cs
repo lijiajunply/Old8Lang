@@ -54,6 +54,13 @@ public interface IInstanceMethod
     string? Documentation { get; }
 
     /// <summary>
+    /// 是否是扩展方法（用户定义的扩展方法）
+    /// 内置方法返回 false，扩展方法返回 true
+    /// 默认实现返回 false（内置方法）
+    /// </summary>
+    bool IsExtensionMethod => false;
+
+    /// <summary>
     /// 检查是否可以接受给定参数
     /// </summary>
     /// <param name="parameters">参数表达式列表</param>

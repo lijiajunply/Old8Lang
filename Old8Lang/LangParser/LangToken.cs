@@ -274,9 +274,7 @@ public static class LangTokenizer
 
             if (code[i] == '"')
             {
-                using var buffer = Optimization.CharBufferPool.Rent(256);
-                var bufferSpan = buffer.Span;
-                var length = 0;
+                var stringBuilder = new StringBuilder(256);
 
                 i++;
                 while (i < code.Length)
@@ -290,33 +288,33 @@ public static class LangTokenizer
                             switch (code[i])
                             {
                                 case 'n':
-                                    bufferSpan[length++] = '\n';
+                                    stringBuilder.Append('\n');
                                     break;
                                 case 't':
-                                    bufferSpan[length++] = '\t';
+                                    stringBuilder.Append('\t');
                                     break;
                                 case 'r':
-                                    bufferSpan[length++] = '\r';
+                                    stringBuilder.Append('\r');
                                     break;
                                 case '\\':
-                                    bufferSpan[length++] = '\\';
+                                    stringBuilder.Append('\\');
                                     break;
                                 case '"':
-                                    bufferSpan[length++] = '"';
+                                    stringBuilder.Append('"');
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
                                     if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i - 1, out var unicodeChar,
                                             out var unicodeAdvance))
                                     {
-                                        bufferSpan[length++] = unicodeChar;
+                                        stringBuilder.Append(unicodeChar);
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字
                                     }
                                     else
                                     {
                                         // Unicode序列不完整或解析失败，追加原始字符
-                                        bufferSpan[length++] = '\\';
-                                        bufferSpan[length++] = 'u';
+                                        stringBuilder.Append('\\');
+                                        stringBuilder.Append('u');
                                     }
 
                                     break;
@@ -325,19 +323,19 @@ public static class LangTokenizer
                                     if (EscapeSequenceHelper.TryParseHexEscape(code, i - 1, out var hexChar,
                                             out var hexAdvance))
                                     {
-                                        bufferSpan[length++] = hexChar;
+                                        stringBuilder.Append(hexChar);
                                         i += hexAdvance; // 跳过已解析的十六进制数字
                                     }
                                     else
                                     {
                                         // 十六进制序列不完整或解析失败，追加原始字符
-                                        bufferSpan[length++] = '\\';
-                                        bufferSpan[length++] = 'x';
+                                        stringBuilder.Append('\\');
+                                        stringBuilder.Append('x');
                                     }
 
                                     break;
                                 default:
-                                    bufferSpan[length++] = code[i];
+                                    stringBuilder.Append(code[i]);
                                     break;
                             }
                         }
@@ -354,7 +352,7 @@ public static class LangTokenizer
                             column = i + 1;
                         }
 
-                        bufferSpan[length++] = code[i];
+                        stringBuilder.Append(code[i]);
                     }
 
                     i++;
@@ -363,7 +361,7 @@ public static class LangTokenizer
                 // 检查字符串是否正确闭合
                 if (i >= code.Length || code[i] != '"')
                 {
-                    var errorStr = new string(bufferSpan.Slice(0, length));
+                    var errorStr = stringBuilder.ToString();
                     throw new SyntaxError(
                         errorStr,
                         line,
@@ -371,7 +369,7 @@ public static class LangTokenizer
                         "语法错误：未闭合的字符串字面量，缺少结束引号");
                 }
 
-                var stringValue = new string(bufferSpan.Slice(0, length));
+                var stringValue = stringBuilder.ToString();
                 tokens.Add(new LangToken(stringValue, LangTokenType.String, line, i - column));
                 continue;
             }
@@ -379,9 +377,7 @@ public static class LangTokenizer
             // 处理字符字面量 'c'
             if (code[i] == '\'')
             {
-                using var buffer = Optimization.CharBufferPool.Rent(64);
-                var bufferSpan = buffer.Span;
-                var length = 0;
+                var charBuilder = new StringBuilder(64);
 
                 i++;
                 while (i < code.Length)
@@ -395,39 +391,39 @@ public static class LangTokenizer
                             switch (code[i])
                             {
                                 case 'n':
-                                    bufferSpan[length++] = '\n';
+                                    charBuilder.Append('\n');
                                     break;
                                 case 't':
-                                    bufferSpan[length++] = '\t';
+                                    charBuilder.Append('\t');
                                     break;
                                 case 'r':
-                                    bufferSpan[length++] = '\r';
+                                    charBuilder.Append('\r');
                                     break;
                                 case '\\':
-                                    bufferSpan[length++] = '\\';
+                                    charBuilder.Append('\\');
                                     break;
                                 case '\'':
-                                    bufferSpan[length++] = '\'';
+                                    charBuilder.Append('\'');
                                     break;
                                 case '"':
-                                    bufferSpan[length++] = '"';
+                                    charBuilder.Append('"');
                                     break;
                                 case '0':
-                                    bufferSpan[length++] = '\0';
+                                    charBuilder.Append('\0');
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
                                     if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i, out var unicodeChar,
                                             out var unicodeAdvance))
                                     {
-                                        bufferSpan[length++] = unicodeChar;
+                                        charBuilder.Append(unicodeChar);
                                         i += unicodeAdvance; // 跳过已解析的十六进制数字（不包括 \u，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
                                         // Unicode序列不完整或解析失败，追加原始字符
-                                        bufferSpan[length++] = '\\';
-                                        bufferSpan[length++] = 'u';
+                                        charBuilder.Append('\\');
+                                        charBuilder.Append('u');
                                     }
 
                                     break;
@@ -436,21 +432,21 @@ public static class LangTokenizer
                                     if (EscapeSequenceHelper.TryParseHexEscape(code, i, out var hexChar,
                                             out var hexAdvance))
                                     {
-                                        bufferSpan[length++] = hexChar;
+                                        charBuilder.Append(hexChar);
                                         i += hexAdvance; // 跳过已解析的十六进制数字（不包括 \x，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
                                         // 十六进制序列不完整或解析失败，追加原始字符
-                                        bufferSpan[length++] = '\\';
-                                        bufferSpan[length++] = 'x';
+                                        charBuilder.Append('\\');
+                                        charBuilder.Append('x');
                                     }
 
                                     break;
                                 default:
                                     // 未知的转义字符，追加原始字符
-                                    bufferSpan[length++] = '\\';
-                                    bufferSpan[length++] = code[i];
+                                    charBuilder.Append('\\');
+                                    charBuilder.Append(code[i]);
                                     break;
                             }
                         }
@@ -467,14 +463,14 @@ public static class LangTokenizer
                             column = i + 1;
                         }
 
-                        bufferSpan[length++] = code[i];
+                        charBuilder.Append(code[i]);
                     }
 
                     i++;
                 }
 
                 // 为字符token添加单引号以保持格式一致性
-                var charValue = new string(bufferSpan.Slice(0, length));
+                var charValue = charBuilder.ToString();
                 tokens.Add(new LangToken($"'{charValue}'", LangTokenType.Char, line, i - column));
                 continue;
             }

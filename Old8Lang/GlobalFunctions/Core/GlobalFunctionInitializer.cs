@@ -29,6 +29,7 @@ public static class GlobalFunctionInitializer
             registry.Register(new PrintLineFunction());
             registry.Register(new PrintFunction());
             registry.Register(new ReadLineFunction());
+            registry.Register(new InputFunction());
             registry.Register(new ErrorFunction());
             registry.Register(new ClearFunction());
 
@@ -37,6 +38,7 @@ public static class GlobalFunctionInitializer
 
             // 注册工具函数
             registry.Register(new LenFunction());
+            registry.Register(new RangeFunction());
             registry.Register(new TypeFunction());
             registry.Register(new AssertFunction());
             registry.Register(new ShowValuesFunction());
@@ -163,12 +165,6 @@ public static class GlobalFunctionInitializer
             registry.Register(new CreateInstanceFunction());
             registry.Register(new IsInstanceOfFunction());
             registry.Register(new HasMemberFunction());  // 合并了 HasMethod, HasField
-
-            // 注册重载示例函数（演示重载功能）
-            // 注意：这些是示例函数，实际使用时可能需要移除
-            // registry.Register(new AddIntFunction());
-            // registry.Register(new AddDoubleFunction());
-            // registry.Register(new AddStringFunction());
 
             _initialized = true;
         }

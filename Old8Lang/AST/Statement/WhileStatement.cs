@@ -62,6 +62,9 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                     break;
                 }
 
+                // 记录循环迭代（性能监控）
+                manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
+
                 // 执行循环体
                 blockStatement.Run(manager);
 

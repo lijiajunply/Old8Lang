@@ -155,6 +155,12 @@ public partial class ListLangValue : LangValueType, ILangList
         // 如果是 Instance，则作为方法调用
         if (dotExpression is Instance a)
         {
+            // 特殊处理 Count() 方法调用（等同于 Count 属性）
+            if (a.Id.IdName == "Count" && a.Ids.Count == 0)
+            {
+                return new IntLangValue(Values.Count);
+            }
+
             return a.FromClassToResult(this, manager);
         }
 

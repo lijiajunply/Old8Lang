@@ -22,17 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/PERFORMANCE_OPTIMIZATION.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/PROJECT_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/final-results.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/specs/001-parser-performance/phase-6-completion-report.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ARCHITECTURE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CLI_GUIDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-parser-performance/tasks.md" afterDir="false" />
-    </list>
+    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,6 +39,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="6c280c92de11a8b8b046f8bc364d6010e02b27a4" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -63,8 +58,9 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.jetbrains/acp.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/FirstUI.TestApp/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
@@ -72,6 +68,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang/Interpreter/VariableCache.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
@@ -81,7 +78,29 @@
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c9edfa3590b94021aa605bb7035fdb06f48910/86/d49bd55b/ExecutionContext.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04eab530f3e74fe4bf9a74715ecc3f0d17e00/6c/4b1e0e94/IPackageConfigurationManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/67/279e01f8/LocalPackageSource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/7c/6bd13adf/Package.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/be/962039df/IPackageResolver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/c6/4a506b20/DefaultPackageInstaller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/05/191a139c/IndexOutOfRangeException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/0f/47447396/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1e/2b09662c/Exception.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/25/ea5de0f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/3c/3135aca5/ITuple.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/c3/68e5367e/String.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/13/c04ed676/ClassicDesktopStyleApplicationLifetimeExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/22/ef001b1c/Grid.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3b92f859131bde25d0f7a63de08963e995d1e1426e584dfd4b8e833d2d3dba/ExecutionTimer.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -134,7 +153,7 @@
     &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
     &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
     &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;001-parser-performance&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;001-interpreter-performance&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -570,6 +589,13 @@
       <workItem from="1771341956377" duration="364000" />
       <workItem from="1771342366048" duration="1517000" />
       <workItem from="1771394553923" duration="4238000" />
+      <workItem from="1771420401696" duration="3110000" />
+      <workItem from="1771504104788" duration="4627000" />
+      <workItem from="1771640139519" duration="7149000" />
+      <workItem from="1771829113653" duration="1417000" />
+      <workItem from="1771912573218" duration="2766000" />
+      <workItem from="1771936929558" duration="1352000" />
+      <workItem from="1771992969295" duration="688000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -914,7 +940,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="931" />
+    <option name="localTasksCounter" value="957" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -941,32 +967,32 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(vm): 添加VM模式下object数组求和功能支持&#10;&#10;- 为LangListSumMethod添加object[]类型支持，实现SumHelperForArray方法&#10;- 支持VM模式下对object数组进行数值类型求和操作&#10;- 实现混合数值类型(int/double/long/float)的自动转换求和&#10;- 更新错误消息提示支持ILangList接口或object[]类型&#10;- 添加扩展方法测试文件验证VM模式功能&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
-    <MESSAGE value="feat(grammar): 添加扩展方法和泛型约束语法支持&#10;&#10;- 在EBNF语法中添加extensionDeclaration语法定义&#10;- 添加泛型约束(genericConstraints)和where子句支持&#10;- 扩展关键字列表包含extension和where&#10;- 在文档中添加完整的扩展方法语法说明&#10;- 添加扩展方法示例包括基本用法和泛型约束&#10;- 支持new()、class、struct等多种约束类型&#10;- 实现where子句用于复杂约束表达式" />
-    <MESSAGE value="test(extension): 添加扩展方法相关测试用例&#10;&#10;- 新增解释器模式下的扩展方法执行测试&#10;- 新增语法解析器对扩展方法声明的测试&#10;- 新增虚拟机模式下的扩展方法执行测试&#10;- 验证扩展方法的基本功能、参数传递和链式调用&#10;- 测试不同数据类型的扩展方法实现&#10;- 验证扩展方法与内置方法的共存情况&#10;- 更新测试脚本以包含扩展方法功能验证" />
-    <MESSAGE value="feat(lang-value-type): 实现 LangValueType 通用实例方法系统&#10;&#10;- 添加 LangValueType 类型等价检查逻辑，支持 C# 原生类型映射&#10;- 实现 DotOperatorILHelper 中的类型映射机制，统一实例方法查找流程&#10;- 移除旧的 ValueTypeFuncStatic 机制，优化反射调用流程&#10;- 新增 BaseValueTypeMethod 基类，提供类型转换通用功能&#10;- 添加 ToInt、ToDouble、ToBool、ToChar、ToStr、ToHash、ToType、Equal 八种转换方法&#10;- 在实例方法初始化器中注册所有 LangValueType 通用转换方法&#10;- 添加完整的 ValueType 方法测试用例文件" />
-    <MESSAGE value="feat(lang): 添加 ILangList 类型转换方法实现&#10;&#10;- 实现 ToList、ToArray、ToTuple、ToDict 通用转换方法&#10;- 为 List、Array、Tuple、Dictionary 类型添加转换方法包装器&#10;- 在实例方法初始化器中注册所有转换方法&#10;- 添加完整的转换方法测试用例文件&#10;- 重构 BaseValueTypeMethod 中的类型转换逻辑&#10;- 更新 IDE 工作区配置文件中的变更记录" />
-    <MESSAGE value="refactor(lang): 简化数组实例方法调用逻辑并移除冗余转换方法&#10;&#10;- 移除 ArrayLangValue 中的方法名白名单检查，直接调用 FromClassToResult&#10;- 删除 ListToArrayMethod 和通用 LangList 转换方法注册&#10;- 将 Program.cs 中的参数从 -vm 修改为 -f&#10;- 更新 IDE 工作区配置中的执行器设置为 Debug 模式" />
-    <MESSAGE value="refactor(vm): 提取类型映射逻辑到专用VMTypeMapper类&#10;&#10;- 将BaseInstanceMethod中的IsEquivalentType方法替换为VMTypeMapper调用&#10;- 移除VirtualMachine.Helpers.ReflectionAndTasks中的GetEquivalentLangType方法&#10;- 将类型等价检查逻辑统一到新创建的VMTypeMapper类中&#10;- 添加VMTypeMapper类处理C#原生类型与Old8Lang类型间的映射关系&#10;- 更新程序启动参数从-f改为-vm&#10;- 修改IDE配置文件中的调试设置和测试路径记录" />
-    <MESSAGE value="feat(value-type): 添加集合类型ToStr方法支持&#10;&#10;- 实现字典类型的字符串格式化，格式为 {key1: value1, key2: value2}&#10;- 实现数组和列表类型的字符串格式化，格式为 [item1, item2, item3]&#10;- 实现元组类型的字符串格式化，格式为 (item1, item2)&#10;- 添加递归处理嵌套集合的FormatValueForDisplay辅助方法&#10;- 在VMTypeMapper中添加集合类型到LangValueType的映射支持&#10;- 移除无效的生成器操作测试用例" />
-    <MESSAGE value="feat(tuple): 实现元组ToStr方法支持特定格式化&#10;&#10;- 为TupleToStrMethod添加详细注释说明元组格式化规则&#10;- 实现Tuple&lt;,&gt;类型的特殊格式化，输出格式为(item1, item2)&#10;- 添加FormatValueForDisplay辅助方法处理值的显示格式&#10;- 为字符串值添加引号包装，布尔值使用小写输出&#10;- 扩展ValueTypeToStrMethod支持更多类型格式化&#10;- 添加对Task、Thread、CancellationToken等系统类型的格式化支持&#10;- 实现枚举类型和元组类型的递归格式化处理&#10;- 更新IDE工作区配置中的变更记录和统计信息" />
-    <MESSAGE value="feat(specify): 添加 PowerShell 脚本和模板文件支持&#10;&#10;- 新增 PowerShell 脚本用于先决条件检查、功能创建和计划设置&#10;- 添加规范、计划和清单模板文件&#10;- 创建宪法模板和代理文件模板&#10;- 实现通用 PowerShell 函数库&#10;- 添加 Claude 命令配置文件用于分析功能" />
-    <MESSAGE value="docs(constitution): 创建 Old8Lang 项目宪法文件&#10;&#10;- 定义双模式对等性原则，确保解释模式和编译模式功能完整性&#10;- 确立访问者模式一致性要求，规范 AST 节点实现标准&#10;- 建立测试优先开发强制性规则，保障语言正确性&#10;- 制定 API 稳定性政策，维护向后兼容性承诺&#10;- 设立性能意识准则，平衡优化与功能完整性&#10;- 明确文档完整性要求，提升语言可用性&#10;- 规范技术标准、开发工作流和治理流程&#10;- 更新 IDE 配置文件以反映宪法变更记录" />
-    <MESSAGE value="docs(documentation): 添加三种执行模式的文档规范和数据模型&#10;&#10;- 新增 API 文档格式规范，标准化函数签名和参数表格格式&#10;- 更新宪法文件中执行模式描述，从双模式扩展为三模式&#10;- 创建文档结构数据模型，定义执行模式、架构组件、API参考等实体&#10;- 添加执行模式对比表格模板，规范三种模式特性对比格式&#10;- 生成文档更新实施计划，包含研究、设计和合同规范&#10;- 创建需求检查清单，验证文档更新规范的完整性&#10;- 添加详细技术研究文档，涵盖三种执行模式实现机制和架构组件" />
-    <MESSAGE value="docs(Docs): 添加API参考文档并更新架构文档&#10;&#10;- 新增 Docs/.backup/API_REFERENCE.md 文件，包含 Old8Lang 标准库完整 API 参考&#10;- 新增 Docs/.backup/ARCHITECTURE.md 文件，详细描述 Old8Lang 项目架构&#10;- 更新 Docs/ARCHITECTURE.md 文件，详述三种执行模式（解释、编译、VM）的实现细节&#10;- 添加并发原语、通道通信、原子操作等高级功能的文档说明&#10;- 补充资源管理和 using 语句的自动释放机制文档&#10;- 完善各模块内部结构和依赖关系的架构说明" />
-    <MESSAGE value="docs(lang): 添加 Old8Lang 扩展指南和架构详解&#10;&#10;- 新增扩展 Old8Lang 章节，涵盖 Visitor 模式扩展方法&#10;- 添加自定义标准库创建指南和最佳实践&#10;- 详细介绍四种执行模式实现原理和示例代码&#10;- 扩展语言特性添加流程和测试用例编写方法&#10;- 更新架构文档，详述 AST 节点组织和解析器结构&#10;- 完善类型系统说明，包括泛型和类型推断机制&#10;- 优化项目依赖关系和开发工作流程说明" />
-    <MESSAGE value="docs(API): 添加完整的标准库API文档&#10;&#10;- 新增标准库概述和模式支持说明&#10;- 添加核心标准库文档，包括Math、File、Crypto、Image、Regex等模块&#10;- 添加网络库文档，涵盖HTTP、WebSocket、MQTT、Socket、WebAPI等模块&#10;- 添加数据库库文档，包含MySQL、PostgreSQL、SQLite、InMemory、ORM等模块&#10;- 添加序列化库文档，包括MessagePack、Protobuf、Factory等模块&#10;- 添加机器学习库文档，涵盖Classification、Regression、Clustering、DataLoader等模块&#10;- 为每个模块提供详细的函数签名、描述和使用示例&#10;- 标注各API在不同执行模式下的支持情况" />
-    <MESSAGE value="feat(environment): 添加环境管理功能和相关命令&#10;&#10;- 新增 EnvCommand 命令类，支持 init、list、show、set、get 子命令&#10;- 实现 EnvironmentManager 类，支持多环境配置文件加载和变量管理&#10;- 添加 .old8env、.old8env.development、.old8env.production 示例配置文件&#10;- 在 FromFileCommand 中集成环境变量支持，新增 --env 参数&#10;- 添加 GetEnvFunction 全局函数，允许在 Old8 代码中获取环境变量&#10;- 更新 InitCommand，初始化项目时自动生成环境配置和示例文件&#10;- 扩展 ProjectConfig 支持 environments 配置项和 EnvironmentConfig 类&#10;- 更新项目初始化模板，添加 development 和 production 环境配置&#10;- 创建详细的环境管理指南文档 ENVIRONMENT_GUIDE.md&#10;- 添加环境相关的测试文件和配置示例" />
-    <MESSAGE value="docs(rules): 更新项目规则文档添加虚拟机模式说明&#10;&#10;- 在项目规则文档中将运行模式更新为解释模式、编译模式和虚拟机模式&#10;- 修正 Old8Lang 运行模式的描述信息" />
-    <MESSAGE value="1" />
-    <MESSAGE value="docs(spec): 更新解析器性能规范文档并添加详细任务清单&#10;&#10;- 为 SC-007 和 SC-008 场景添加部署后验证说明&#10;- 创建完整的任务分解文档 tasks.md，包含 75 个具体实施任务&#10;- 按用户故事组织任务，分为三个优先级的性能优化故事&#10;- 定义性能基准测试框架和内存使用监控方案&#10;- 明确各阶段依赖关系和并行开发策略&#10;- 更新 IDE 配置文件以反映最新的文档变更" />
-    <MESSAGE value="Changes" />
-    <MESSAGE value="feat(parser): 实现解析器性能优化和基准测试框架&#10;&#10;- 添加字符缓冲区池 (CharBufferPool) 减少内存分配&#10;- 创建缓存统计结构 (CacheStatistics) 用于性能监控&#10;- 生成性能基准测试基线文档和测试数据文件&#10;- 更新项目配置支持测试数据文件复制&#10;- 添加 .NET 项目特定文件到 gitignore&#10;- 重置基准测试结果文件以适应新测试场景" />
-    <MESSAGE value="perf(parser): 优化解析器性能通过Span和缓冲池减少内存分配&#10;&#10;- 添加LangToken.Create工厂方法使用字符串缓存优化&#10;- 使用ReadOnlySpan替代StringBuilder解析负数和数字字面量&#10;- 实现CharBufferPool租用字符缓冲区解析字符串和字符字面量&#10;- 使用Span切片替代Substring避免内存分配&#10;- 优化MergeDocCommentsWithTokens的O(n²)性能问题&#10;- 任务完成标记更新到已完成状态&#10;- 修复Unicode和十六进制转义序列解析的Span使用&#10;- 优化标识符和文件头指令解析使用Span切片" />
-    <MESSAGE value="perf(parser): 添加性能验证工具并验证解析器优化效果&#10;&#10;- 新增 PerformanceValidator 类用于验证解析器性能&#10;- 实现小型、中型、大型脚本的性能测试功能&#10;- 添加 StringCache 命中率验证测试&#10;- 在 Program.cs 中集成 --validate 参数支持&#10;- 更新任务列表标记已完成的验证项&#10;- 生成性能验证报告记录优化成果" />
-    <MESSAGE value="perf(parser): 优化解析器性能通过对象池和递归深度控制&#10;&#10;- 添加 Microsoft.Extensions.ObjectPool 依赖包用于对象池管理&#10;- 实现 TokenListPool 类使用对象池管理 List&lt;LangToken&gt; 实例&#10;- 在 ParserContext 中添加递归深度计数器防止栈溢出&#10;- 实现 EnterRecursion 和 ExitRecursion 方法进行递归深度管理&#10;- 修改 SourceLines 属性为预先分割避免错误报告时重复分割&#10;- 任务清单中标记相关优化任务为已完成状态" />
-    <MESSAGE value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加性能监控API和内存泄漏检测&#10;&#10;- 添加 TokenizeOptimized 方法提供高性能词法分析&#10;- 添加 TokenizeWithMetrics 方法收集性能指标包括时间、内存、GC数据&#10;- 实现 ParserPerformanceMetrics 类格式化输出性能数据&#10;- 创建 MemoryLeakTest 类验证对象池归还和内存释放&#10;- 修复 StringCache 大小限制逻辑防止无限增长&#10;- 更新任务规格文档标记用户故事3完成&#10;- 添加单元测试依赖包支持内存泄漏检测测试" />
+    <MESSAGE value="feat(interpreter): 添加性能监控功能和基准测试框架&#10;&#10;- 在LangInterpreter中集成IPerformanceMonitor接口支持性能监控&#10;- 创建PerformanceMetrics数据模型用于存储解释器执行的性能统计数据&#10;- 实现函数调用、变量查找、循环迭代等性能指标记录功能&#10;- 添加FunctionCallBenchmark和LoopExecutionBenchmark基准测试&#10;- 创建InterpreterBenchmarkBase作为解释器基准测试基类&#10;- 添加nested-loops.old8性能测试脚本用于100x100循环测试&#10;- 在workspace.xml中更新任务计数器和变更列表记录" />
+    <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
+    <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
+    <MESSAGE value="perf(interpreter): 优化变量查找和循环性能并移除废弃测试&#10;&#10;- 添加 PerformanceOptimizationTests 测试类验证性能改进效果&#10;- 移除废弃的数组 Length() 方法测试代码&#10;- 修正 NetLibTests 中的 Json 序列化函数调用方式&#10;- 更新 IDE 配置文件中的任务计数器和变更列表记录&#10;- 重构工作区配置文件的 XML 格式和实体编码&#10;- 添加 cache-test.old8 性能测试脚本验证变量查找和嵌套循环性能" />
+    <MESSAGE value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
+    <MESSAGE value="perf(interpreter): 优化性能监控器缓存统计和更新测试用例语法&#10;&#10;- 添加全局缓存命中和未命中计数器优化统计精度&#10;- 实现条件缓存命中率计算优先使用全局统计而非作用域统计&#10;- 在变量查找时更新全局缓存统计并在重置时清零计数器&#10;- 更新性能测试用例中的赋值语法从=改为&lt;-操作符&#10;- 将for循环语法从传统括号格式改为逗号分隔格式&#10;- 重命名function关键字为func以符合语言规范&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正性能测试脚本中的循环语法和变量声明方式" />
+    <MESSAGE value="perf(benchmark): 更新解析器性能测试报告&#10;&#10;- 添加了详细的性能指标数据，包括平均值、误差、标准差、中位数等&#10;- 新增内存分配统计信息，包含Gen0、Gen1、Gen2垃圾回收统计&#10;- 更新了HTML报告标题中的时间戳&#10;- 扩展了测试用例覆盖范围，增加深度嵌套表达式解析等场景&#10;- 补充了并发解析和语法错误处理的性能数据&#10;- 完善了大文件解析的基准测试结果" />
+    <MESSAGE value="perf(interpreter): 添加中等规模程序和递归调用性能测试&#10;&#10;- 创建 medium-program-1000lines.old8 测试脚本包含数学函数、数组处理、字符串操作等&#10;- 添加 recursive-calls.old8 测试脚本验证递归深度和性能表现&#10;- 实现 MediumProgramPerformanceTests 验证千行程序执行时间小于2秒&#10;- 创建 RecursiveCallPerformanceTests 确保支持至少100层递归深度&#10;- 添加精简版 medium-program-simple.old8 用于快速性能验证&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
+    <MESSAGE value="fix(interpreter): 解决扩展方法导致的栈溢出和方法查找问题&#10;&#10;- 修改 ExtensionDeclaration 映射内置类型到正确的 LangValue 类型&#10;- 在 ExtensionMethodWrapper 中添加递归检测机制防止栈溢出&#10;- 实现内置方法优先级高于扩展方法的查找逻辑&#10;- 确保方法名匹配区分大小写避免 toStr 和 ToStr 冲突&#10;- 添加扩展方法标识属性用于方法查找优先级判断&#10;- 修复实例方法重载组中内置方法优先匹配的逻辑&#10;- 更新方法注册表使用大小写敏感的字符串比较器&#10;- 在 VariateManager 中添加扩展方法调用栈跟踪功能" />
+    <MESSAGE value="fix(interpreter): 修复扩展方法执行中的返回值处理和方法查找问题&#10;&#10;- 移除 ExtensionMethodWrapper 中的调试空检查代码&#10;- 修改返回值处理逻辑，先获取结果再清除返回状态&#10;- 将测试代码中的 Count() 方法调用改为 len() 函数调用&#10;- 修复 LangValueType 中 FromClassToResult 方法调用传递 manager 参数&#10;- 在 ListLangValue 中添加 Count() 方法的特殊处理逻辑&#10;- 更新 .claude 配置文件添加 powershell.exe 路径排除&#10;- 更新 IDE 工作区配置文件中的变更列表和任务计数器" />
+    <MESSAGE value="feat(cli): 添加性能监控功能和CLI选项&#10;&#10;- 实现性能监控器，可追踪执行时间、内存使用、函数调用等指标&#10;- 添加 --perf、--perf-detailed、--perf-output CLI选项用于性能分析&#10;- 在文档中添加性能监控相关的使用说明和示例&#10;- 优化ForStatement循环变量作用域，防止外层变量污染&#10;- 实现函数引用缓存机制，提升函数调用性能&#10;- 支持嵌套函数定义和局部作用域管理&#10;- 添加性能报告生成器，支持文本、JSON、CSV格式输出&#10;- 实现对象池统计和内存稳定性测试&#10;- 添加长期运行性能测试和内存泄漏检测" />
+    <MESSAGE value="test(cli): 添加性能监控集成测试&#10;&#10;- 创建 PerformanceMonitoringTests 类验证 --perf、--perf-detailed、--perf-output 功能&#10;- 实现执行指标收集、函数指标收集、文本格式报告生成功能测试&#10;- 添加 JSON 和 CSV 格式报告生成及文件保存功能测试&#10;- 集成内存跟踪和对象池统计功能验证&#10;- 更新 CI/CD 工作流添加性能回归测试步骤&#10;- 完成规格文档中的性能监控集成测试任务" />
+    <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
+    <MESSAGE value="删除FirstUI" />
+    <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
+    <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
+    <MESSAGE value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
+    <MESSAGE value="feat(interpreter): 添加 CancellationToken 类型支持&#10;&#10;- 在 LangId 中注册 CancellationToken 和 CancellationTokenSource 类型&#10;- 实现取消令牌类型的类型映射和解析功能&#10;- 更新测试用例以验证取消令牌的正确行为&#10;- 修复拼写错误 cancelation -&gt; cancellation&#10;- 修改异步函数返回类型为 void 并使用 break 替代 return" />
+    <MESSAGE value="docs(reflection): 添加反射API文档并更新相关测试&#10;&#10;- 添加了完整的反射API文档(REFLECTION_API.md)，涵盖全局函数和TypeLangValue实例方法&#10;- 移除了旧的反射测试方法(GetClassName、GetClassMethods、GetClassFields等)&#10;- 更新测试用例以使用新的反射API(HasMember替代HasMethod/HasField)&#10;- 添加了对新反射API的验证测试，确保返回正确的数据结构&#10;- 修改综合测试以使用新的反射函数和预期行为" />
+    <MESSAGE value="feat(lang): 为字典和列表添加自定义比较器支持&#10;&#10;- 在 DictionaryLangValue 中同步更新 Tuples 数组以保持数据一致性&#10;- 为 LangListSortMethod 添加可选的 comparer 参数支持&#10;- 实现 QuickSortWithComparerInternal 方法支持自定义比较逻辑&#10;- 添加 PartitionWithComparer 方法实现基于比较器的分区逻辑&#10;- 扩展列表排序功能以支持自定义比较函数" />
+    <MESSAGE value="fix(parser): 修复嵌套索引访问的AST类型判断&#10;&#10;- 修改AdvancedOperatorsTests测试用例中的断言类型从Operation改为NestedIndexAccess&#10;- 在AnyLangValue中修复方法调用时的参数求值逻辑，确保参数在正确的作用域中求值&#10;- 将测试脚本中的print函数调用改为PrintLine函数调用&#10;- 更新IDE配置文件中的变更列表和任务计数器" />
+    <MESSAGE value="fix(tests): 激活生成器内存效率测试并调整内存限制&#10;&#10;- 移除 VMMemoryUsageTests 中的 Skip 标记激活测试&#10;- 将内存增加限制从 100_000 字节调整为 1_000_000 字节&#10;- 清理 workspace.xml 中的变更列表记录&#10;- 更新本地任务计数器数值&#10;- 修正最后提交消息为修复嵌套索引访问问题" />
+    <MESSAGE value="refactor(dictionary): 重构字典和列表方法以支持语言值类型&#10;&#10;- 修改 DictContainsKeyMethod 支持 DictionaryLangValue 和系统字典接口&#10;- 添加 ConvertToLangValue 方法用于将对象转换为语言值类型&#10;- 更新 DictCountMethod 支持 DictionaryLangValue 类型&#10;- 修改 ListAddMethod 支持 ListLangValue 类型并添加值转换逻辑&#10;- 统一异常消息为更通用的类型检查提示" />
+    <MESSAGE value="test(vm): 更新虚拟机模块导入测试&#10;&#10;- 为 VMImportTests 类添加 [Collection(&quot;Sequential&quot;)] 属性以确保顺序执行&#10;- 修改字符串拆分逻辑，使用 ['\r', '\n'] 替代 Environment.NewLine 进行分行符分割&#10;- 保持测试断言逻辑不变，确保输出行数和内容验证正常工作" />
+    <MESSAGE value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1346,32 +1372,6 @@
           <option name="timeStamp" value="650" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs</url>
-          <line>413</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Expression\Value\Special\Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="16384" />
-            </startOffsets>
-            <endOffsets>
-              <option value="16491" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="651" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Special/Instance.cs</url>
-          <line>419</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Expression\Value\Special\Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="16604" />
-            </startOffsets>
-            <endOffsets>
-              <option value="16639" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="652" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListToArrayMethod.cs</url>
           <line>51</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\InstanceMethods\Implementations\List\ListToArrayMethod.cs" containingFunctionPresentation="方法 'ExecuteInVMInternal'">
@@ -1405,10 +1405,23 @@
               <option value="1986" />
             </startOffsets>
             <endOffsets>
-              <option value="2058" />
+              <option value="2060" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="655" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/GenericConstraintExtensionInterpreterTests.cs</url>
+          <line>420</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang.Tests\Interpreter\Classes\GenericConstraintExtensionInterpreterTests.cs" containingFunctionPresentation="方法 'ComplexScenario_GenericClassWithMultipleConstraints_WorksCorrectly'">
+            <startOffsets>
+              <option value="11748" />
+            </startOffsets>
+            <endOffsets>
+              <option value="11783" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="656" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
