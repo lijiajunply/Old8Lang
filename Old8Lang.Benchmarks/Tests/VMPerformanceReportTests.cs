@@ -152,6 +152,37 @@ public class VMPerformanceReportTests : IDisposable
     }
 
     [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithSameScenarioMultipleJobs_ProducesPerJobAndAggregateViews()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-multi-job");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-multi-job");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickMultiJobBaselineJson());
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickMultiJobCsv());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("Per-Job Details", markdown);
+        Assert.Contains("Scenario Aggregate (Median)", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | Job-A |", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | Job-B |", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | 2 |", markdown);
+
+        Assert.Contains("\"Job\": \"Job-A\"", json);
+        Assert.Contains("\"Job\": \"Job-B\"", json);
+        Assert.Contains("\"AggregatedScenarios\":", json);
+        Assert.Contains("\"JobCount\": 2", json);
+    }
+
+    [Fact]
     public void GenerateFromBenchmarkArtifacts_WhenCsvMissing_ThrowsFileNotFoundException()
     {
         var artifactsDir = Path.Combine(_tempRoot, "missing-artifacts");
@@ -201,6 +232,15 @@ public class VMPerformanceReportTests : IDisposable
             Environment.NewLine,
             "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
             "VMXQ_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,1,4,95.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildQuickMultiJobCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Edge_HighArgCount_CallHotPath,Job-A,.NET 10.0,1,4,30.000 ms,1.000 ms,2.00 MB",
+            "VMXQ_Edge_HighArgCount_CallHotPath,Job-B,.NET 10.0,1,4,34.000 ms,1.200 ms,2.20 MB");
     }
 
     private static string BuildNightlyCsvWithFail()
@@ -261,6 +301,27 @@ public class VMPerformanceReportTests : IDisposable
                    {
                      "Scenario": "VMXN_LargeFile_CompileAndExecute_10k",
                      "MeanMs": 100.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildQuickMultiJobBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "Job": "Job-A",
+                     "MeanMs": 29.0
+                   },
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "Job": "Job-B",
+                     "MeanMs": 33.0
                    }
                  ]
                }

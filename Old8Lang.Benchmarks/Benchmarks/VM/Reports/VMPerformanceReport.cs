@@ -33,6 +33,7 @@ public static class VMPerformanceReport
 
     private sealed record TieredScenarioResult(
         string Scenario,
+        string Job,
         string Category,
         double? MeanMs,
         double? StdDevMs,
@@ -48,12 +49,29 @@ public static class VMPerformanceReport
         string RawMean,
         string RawAllocated);
 
+    private sealed record TieredAggregatedScenarioResult(
+        string Scenario,
+        string Category,
+        int JobCount,
+        double? MedianMeanMs,
+        double? MedianStdDevMs,
+        double? MedianP95Ms,
+        long? MedianAllocatedBytes,
+        double? MedianThroughputOpsPerSec,
+        double? MedianAllocatedBytesPerOp,
+        double? MedianBaselineMeanMs,
+        double? MedianMeanDeltaPercent,
+        double? RegressionThresholdPercent,
+        string Status,
+        string? FailureReason);
+
     private sealed record TieredReportModel(
         DateTime GeneratedAt,
         string SourceCsv,
         string? BaselineJson,
         IReadOnlyList<string> Warnings,
-        IReadOnlyList<TieredScenarioResult> Scenarios);
+        IReadOnlyList<TieredScenarioResult> Scenarios,
+        IReadOnlyList<TieredAggregatedScenarioResult> AggregatedScenarios);
 
     /// <summary>
     /// 从 BenchmarkDotNet artifacts 解析并生成 VM 报告（md + json）
@@ -177,7 +195,7 @@ public static class VMPerformanceReport
 
         Directory.CreateDirectory(reportsDir);
         var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix);
-        var baselineMap = LoadBaselineMap(baselineJson);
+        var baselineLookup = LoadBaselineLookup(baselineJson);
 
         var scenarios = parsed.Scenarios
             .Where(s => s.Scenario.StartsWith(scenarioPrefix, StringComparison.Ordinal))
@@ -193,8 +211,15 @@ public static class VMPerformanceReport
                     failureReason = fallbackReason;
                 }
 
-                return ConvertToTieredScenario(s, baselineMap, failureReason);
+                return ConvertToTieredScenario(s, baselineLookup, failureReason);
             })
+            .ToArray();
+
+        var aggregatedScenarios = scenarios
+            .GroupBy(s => s.Scenario, StringComparer.Ordinal)
+            .Select(AggregateTieredScenario)
+            .OrderBy(s => s.Category, StringComparer.Ordinal)
+            .ThenBy(s => s.Scenario, StringComparer.Ordinal)
             .ToArray();
 
         if (scenarios.Length == 0)
@@ -217,7 +242,8 @@ public static class VMPerformanceReport
             SourceCsv: csvPath,
             BaselineJson: baselineJson,
             Warnings: warnings,
-            Scenarios: scenarios);
+            Scenarios: scenarios,
+            AggregatedScenarios: aggregatedScenarios);
 
         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
         var markdownPath = Path.Combine(reportsDir, $"{reportFilePrefix}_{timestamp}.md");
@@ -658,13 +684,30 @@ public static class VMPerformanceReport
         {
             writer.WriteLine($"## {group.Key}");
             writer.WriteLine();
-            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status | FailureReason |");
-            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
+            writer.WriteLine("### Per-Job Details");
+            writer.WriteLine();
+            writer.WriteLine("| Scenario | Job | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status | FailureReason |");
+            writer.WriteLine("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
 
             foreach (var scenario in group)
             {
                 writer.WriteLine(
-                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
+                    $"| {scenario.Scenario} | {EscapeMarkdown(scenario.Job)} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
+            }
+
+            writer.WriteLine();
+
+            writer.WriteLine("### Scenario Aggregate (Median)");
+            writer.WriteLine();
+            writer.WriteLine("| Scenario | Jobs | MedianMean(ms) | MedianStdDev(ms) | MedianP95(ms) | MedianAllocated(bytes) | MedianThroughput(ops/s) | MedianAlloc/Op(bytes) | MedianMeanΔ(%) | Threshold(%) | Status | FailureReason |");
+            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
+
+            foreach (var scenario in report.AggregatedScenarios
+                         .Where(s => string.Equals(s.Category, group.Key, StringComparison.Ordinal))
+                         .OrderBy(s => s.Scenario, StringComparer.Ordinal))
+            {
+                writer.WriteLine(
+                    $"| {scenario.Scenario} | {scenario.JobCount} | {FormatNumber(scenario.MedianMeanMs)} | {FormatNumber(scenario.MedianStdDevMs)} | {FormatNumber(scenario.MedianP95Ms)} | {FormatNumber(scenario.MedianAllocatedBytes)} | {FormatNumber(scenario.MedianThroughputOpsPerSec)} | {FormatNumber(scenario.MedianAllocatedBytesPerOp)} | {FormatPercent(scenario.MedianMeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
             }
 
             writer.WriteLine();
@@ -717,19 +760,27 @@ public static class VMPerformanceReport
         return candidates.Length == 0 ? null : candidates[0].FullName;
     }
 
-    private static Dictionary<string, double?> LoadBaselineMap(string? baselineJsonPath)
+    private sealed record BaselineLookup(
+        IReadOnlyDictionary<(string Scenario, string Job), double?> ByScenarioAndJob,
+        IReadOnlyDictionary<string, double?> ByScenario);
+
+    private static BaselineLookup LoadBaselineLookup(string? baselineJsonPath)
     {
-        var map = new Dictionary<string, double?>(StringComparer.Ordinal);
+        var entries = new List<(string Scenario, string? Job, double? MeanMs)>();
         if (string.IsNullOrWhiteSpace(baselineJsonPath) || !File.Exists(baselineJsonPath))
         {
-            return map;
+            return new BaselineLookup(
+                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), double?>(),
+                ByScenario: new Dictionary<string, double?>(StringComparer.Ordinal));
         }
 
         using var document = JsonDocument.Parse(File.ReadAllText(baselineJsonPath));
         if (!document.RootElement.TryGetProperty("Scenarios", out var scenariosElement) ||
             scenariosElement.ValueKind != JsonValueKind.Array)
         {
-            return map;
+            return new BaselineLookup(
+                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), double?>(),
+                ByScenario: new Dictionary<string, double?>(StringComparer.Ordinal));
         }
 
         foreach (var item in scenariosElement.EnumerateArray())
@@ -751,15 +802,30 @@ public static class VMPerformanceReport
                 mean = meanElement.GetDouble();
             }
 
-            map[scenario] = mean;
+            string? job = null;
+            if (item.TryGetProperty("Job", out var jobElement) && jobElement.ValueKind == JsonValueKind.String)
+            {
+                job = jobElement.GetString();
+            }
+
+            entries.Add((scenario, job, mean));
         }
 
-        return map;
+        var byScenarioAndJob = entries
+            .Where(entry => !string.IsNullOrWhiteSpace(entry.Job))
+            .GroupBy(entry => (entry.Scenario, Job: entry.Job!), tuple => tuple.MeanMs)
+            .ToDictionary(group => group.Key, group => SelectMedian(group), comparer: EqualityComparer<(string Scenario, string Job)>.Default);
+
+        var byScenario = entries
+            .GroupBy(entry => entry.Scenario, entry => entry.MeanMs, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => SelectMedian(group), StringComparer.Ordinal);
+
+        return new BaselineLookup(byScenarioAndJob, byScenario);
     }
 
     private static TieredScenarioResult ConvertToTieredScenario(
         VmScenarioResult source,
-        IReadOnlyDictionary<string, double?> baselineMap,
+        BaselineLookup baselineLookup,
         string? failureReason)
     {
         var category = GetTieredCategory(source.Scenario);
@@ -772,13 +838,18 @@ public static class VMPerformanceReport
             ? source.AllocatedBytes.Value / (double)operationCount.Value
             : null;
 
-        baselineMap.TryGetValue(source.Scenario, out var baselineMeanMs);
+        if (!baselineLookup.ByScenarioAndJob.TryGetValue((source.Scenario, source.Job), out var baselineMeanMs))
+        {
+            baselineLookup.ByScenario.TryGetValue(source.Scenario, out baselineMeanMs);
+        }
+
         var meanDeltaPercent = ComputeRegressionPercent(baselineMeanMs, source.MeanMs);
         var threshold = GetRegressionThresholdPercent(category);
         var status = EvaluateScenarioStatus(source, meanDeltaPercent, threshold, ref failureReason);
 
         return new TieredScenarioResult(
             Scenario: source.Scenario,
+            Job: source.Job,
             Category: category,
             MeanMs: source.MeanMs,
             StdDevMs: source.StdDevMs,
@@ -793,6 +864,32 @@ public static class VMPerformanceReport
             FailureReason: failureReason,
             RawMean: source.RawMean,
             RawAllocated: source.RawAllocated);
+    }
+
+    private static TieredAggregatedScenarioResult AggregateTieredScenario(IGrouping<string, TieredScenarioResult> group)
+    {
+        var list = group.OrderBy(item => item.Job, StringComparer.Ordinal).ToList();
+        var first = list[0];
+        var status = EvaluateWorstStatus(list.Select(item => item.Status));
+        var failureReason = list
+            .Select(item => item.FailureReason)
+            .FirstOrDefault(reason => !string.IsNullOrWhiteSpace(reason));
+
+        return new TieredAggregatedScenarioResult(
+            Scenario: first.Scenario,
+            Category: first.Category,
+            JobCount: list.Count,
+            MedianMeanMs: SelectMedian(list.Select(item => item.MeanMs)),
+            MedianStdDevMs: SelectMedian(list.Select(item => item.StdDevMs)),
+            MedianP95Ms: SelectMedian(list.Select(item => item.P95Ms)),
+            MedianAllocatedBytes: SelectMedianLong(list.Select(item => item.AllocatedBytes)),
+            MedianThroughputOpsPerSec: SelectMedian(list.Select(item => item.ThroughputOpsPerSec)),
+            MedianAllocatedBytesPerOp: SelectMedian(list.Select(item => item.AllocatedBytesPerOp)),
+            MedianBaselineMeanMs: SelectMedian(list.Select(item => item.BaselineMeanMs)),
+            MedianMeanDeltaPercent: SelectMedian(list.Select(item => item.MeanDeltaPercent)),
+            RegressionThresholdPercent: first.RegressionThresholdPercent,
+            Status: status,
+            FailureReason: failureReason);
     }
 
     private static string GetTieredCategory(string scenario)
@@ -923,6 +1020,79 @@ public static class VMPerformanceReport
 
         // 正值表示回归（变慢），负值表示提升。
         return (currentValue.Value - baselineValue.Value) / baselineValue.Value * 100d;
+    }
+
+    private static string EvaluateWorstStatus(IEnumerable<string> statuses)
+    {
+        var worst = "PASS";
+        var worstScore = GetStatusSeverityScore(worst);
+        foreach (var status in statuses)
+        {
+            var score = GetStatusSeverityScore(status);
+            if (score > worstScore)
+            {
+                worstScore = score;
+                worst = status;
+            }
+        }
+
+        return worst;
+    }
+
+    private static int GetStatusSeverityScore(string? status)
+    {
+        return status?.ToUpperInvariant() switch
+        {
+            "FAIL" => 3,
+            "WARN" => 2,
+            "N/A" => 1,
+            _ => 0
+        };
+    }
+
+    private static double? SelectMedian(IEnumerable<double?> values)
+    {
+        var ordered = values
+            .Where(v => v.HasValue)
+            .Select(v => v!.Value)
+            .OrderBy(v => v)
+            .ToArray();
+
+        if (ordered.Length == 0)
+        {
+            return null;
+        }
+
+        var middle = ordered.Length / 2;
+        if (ordered.Length % 2 == 1)
+        {
+            return ordered[middle];
+        }
+
+        return (ordered[middle - 1] + ordered[middle]) / 2d;
+    }
+
+    private static long? SelectMedianLong(IEnumerable<long?> values)
+    {
+        var ordered = values
+            .Where(v => v.HasValue)
+            .Select(v => v!.Value)
+            .OrderBy(v => v)
+            .ToArray();
+
+        if (ordered.Length == 0)
+        {
+            return null;
+        }
+
+        var middle = ordered.Length / 2;
+        if (ordered.Length % 2 == 1)
+        {
+            return ordered[middle];
+        }
+
+        var avg = (ordered[middle - 1] + ordered[middle]) / 2d;
+        return (long)Math.Round(avg, MidpointRounding.AwayFromZero);
     }
 
     private static string FormatNumber(double? value)

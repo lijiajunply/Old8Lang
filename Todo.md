@@ -20,6 +20,8 @@
 - [x] P1-3（部分）：`MakeClosure` 改为链式闭包环境（`ClosureEnvironment.Parent`），移除创建子闭包时对父环境的 `SnapshotToDictionary()` 全量拷贝；无捕获场景复用 `ClosureEnvironment.Empty`。
 - [x] 回归验证：`VMLambdaExpressionTests`（15/15）与 `VMMemoryUsageTests`（26/26）通过。
 - [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_021345.{md,json}`。
+- [x] P2-1：报告去重改造完成（Markdown 增加 `Per-Job Details` + `Scenario Aggregate (Median)` 双视图，Tiered JSON 保留 `Job` 维度并新增 `AggregatedScenarios`）。
+- [x] 回归验证：`dotnet test Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj --filter "FullyQualifiedName~VMPerformanceReportTests"` 通过（7/7）。
 
 ## 结论摘要
 
@@ -107,7 +109,7 @@
 
 ## P2（基准与报告质量）
 
-- [ ] 报告去重策略：按 `Scenario + Job` 保留明细，并输出聚合视图。
+- [x] 报告去重策略：按 `Scenario + Job` 保留明细，并输出聚合视图。
   - 代码点：`Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs`
   - 问题：当前同一场景在不同 Job 下重复出现，阅读和趋势判断成本高。
   - 建议：
