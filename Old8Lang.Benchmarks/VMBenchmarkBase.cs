@@ -10,6 +10,7 @@ namespace Old8Lang.Benchmarks;
 /// </summary>
 [MemoryDiagnoser]
 [SimpleJob(warmupCount: 3, iterationCount: 8)]
+[Config(typeof(VMBenchmarkConfig))]
 public abstract class VMBenchmarkBase
 {
     protected static BytecodeFile CompileToBytecode(string code)

@@ -23,22 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMModePerformanceBenchmarks.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReport.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReportTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMFunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMNamedArgumentsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Functions/VMNamedArgumentsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Expressions.FunctionCall.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Arithmetic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Arithmetic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.ControlFlow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.ControlFlow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Stack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Stack.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReport.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -616,7 +604,7 @@
       <workItem from="1771912573218" duration="2766000" />
       <workItem from="1771936929558" duration="1352000" />
       <workItem from="1771992969295" duration="688000" />
-      <workItem from="1772335461211" duration="1250000" />
+      <workItem from="1772335461211" duration="3556000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -961,7 +949,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="957" />
+    <option name="localTasksCounter" value="959" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -988,8 +976,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 添加性能监控功能和基准测试框架&#10;&#10;- 在LangInterpreter中集成IPerformanceMonitor接口支持性能监控&#10;- 创建PerformanceMetrics数据模型用于存储解释器执行的性能统计数据&#10;- 实现函数调用、变量查找、循环迭代等性能指标记录功能&#10;- 添加FunctionCallBenchmark和LoopExecutionBenchmark基准测试&#10;- 创建InterpreterBenchmarkBase作为解释器基准测试基类&#10;- 添加nested-loops.old8性能测试脚本用于100x100循环测试&#10;- 在workspace.xml中更新任务计数器和变更列表记录" />
-    <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
     <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
     <MESSAGE value="perf(interpreter): 优化变量查找和循环性能并移除废弃测试&#10;&#10;- 添加 PerformanceOptimizationTests 测试类验证性能改进效果&#10;- 移除废弃的数组 Length() 方法测试代码&#10;- 修正 NetLibTests 中的 Json 序列化函数调用方式&#10;- 更新 IDE 配置文件中的任务计数器和变更列表记录&#10;- 重构工作区配置文件的 XML 格式和实体编码&#10;- 添加 cache-test.old8 性能测试脚本验证变量查找和嵌套循环性能" />
     <MESSAGE value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
@@ -1013,7 +999,9 @@
     <MESSAGE value="refactor(dictionary): 重构字典和列表方法以支持语言值类型&#10;&#10;- 修改 DictContainsKeyMethod 支持 DictionaryLangValue 和系统字典接口&#10;- 添加 ConvertToLangValue 方法用于将对象转换为语言值类型&#10;- 更新 DictCountMethod 支持 DictionaryLangValue 类型&#10;- 修改 ListAddMethod 支持 ListLangValue 类型并添加值转换逻辑&#10;- 统一异常消息为更通用的类型检查提示" />
     <MESSAGE value="test(vm): 更新虚拟机模块导入测试&#10;&#10;- 为 VMImportTests 类添加 [Collection(&quot;Sequential&quot;)] 属性以确保顺序执行&#10;- 修改字符串拆分逻辑，使用 ['\r', '\n'] 替代 Environment.NewLine 进行分行符分割&#10;- 保持测试断言逻辑不变，确保输出行数和内容验证正常工作" />
     <MESSAGE value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
+    <MESSAGE value="perf(vm): 优化虚拟机函数调用性能&#10;&#10;- 为函数调用添加函数索引支持以提高查找速度&#10;- 重构参数归一化逻辑以提升函数调用效率&#10;- 实现函数调用分发机制分离以减少重复代码&#10;- 添加模块符号缓存机制以加速模块符号访问&#10;- 优化算术运算指令执行性能&#10;- 改进异步函数调用的参数处理流程&#10;- 移除过时的函数调用指令实现代码&#10;- 添加函数调用过程中的类型验证功能&#10;- 实现闭包和普通函数调用的统一处理机制&#10;- 优化调用帧执行循环以减少性能开销" />
+    <MESSAGE value="test(vm): 添加虚拟机指令操作数兼容性测试并生成性能对比报告&#10;&#10;- 新增 VMCallAsyncOperandCompatibilityTests 测试类验证异步调用指令兼容性&#10;- 新增 VMCallOperandCompatibilityTests 测试类验证函数调用指令兼容性&#10;- 添加辅助方法 GetIntValue 支持多种数值类型转换&#10;- 实现对新旧操作数格式的兼容性验证&#10;- 添加函数索引回退到函数名称的功能测试&#10;- 生成 VM 性能对比报告包含吞吐量和内存分配指标&#10;- 添加性能验收阈值检查功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 添加虚拟机指令操作数兼容性测试并生成性能对比报告&#10;&#10;- 新增 VMCallAsyncOperandCompatibilityTests 测试类验证异步调用指令兼容性&#10;- 新增 VMCallOperandCompatibilityTests 测试类验证函数调用指令兼容性&#10;- 添加辅助方法 GetIntValue 支持多种数值类型转换&#10;- 实现对新旧操作数格式的兼容性验证&#10;- 添加函数索引回退到函数名称的功能测试&#10;- 生成 VM 性能对比报告包含吞吐量和内存分配指标&#10;- 添加性能验收阈值检查功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

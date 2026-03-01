@@ -21,19 +21,11 @@ if (args.Length > 0 && args[0] == "--quick")
     return;
 }
 
-// 如果传入 --vm 参数，运行 VM 基准测试
-if (args.Length > 0 && args[0] == "--vm")
+// 如果传入 --vm 或 --vm-report 参数，统一走 BenchmarkDotNet 流程
+if (args.Length > 0 && (args[0] == "--vm" || args[0] == "--vm-report"))
 {
-    Console.WriteLine("运行 VM 模式基准测试...\n");
-    BenchmarkRunner.Run<VMModePerformanceBenchmarks>();
-    return;
-}
-
-// 如果传入 --vm-report 参数，输出 VM 性能报告到 Reports/
-if (args.Length > 0 && args[0] == "--vm-report")
-{
-    Console.WriteLine("生成 VM 性能报告...\n");
-    VMPerformanceReport.RunAndWriteReport();
+    var generateReport = args[0] == "--vm-report";
+    RunVmBenchmarksAndOptionalReport(generateReport);
     return;
 }
 
@@ -57,3 +49,23 @@ BenchmarkRunner.Run<ParserBenchmarkTests>();
 
 Console.WriteLine("\n✅ 所有性能测试已完成！");
 Console.WriteLine($"结果已保存到: BenchmarkDotNet.Artifacts/results/");
+return;
+
+static void RunVmBenchmarksAndOptionalReport(bool generateReport)
+{
+    Console.WriteLine("运行 VM 模式基准测试（BenchmarkDotNet）...\n");
+    BenchmarkRunner.Run<VMModePerformanceBenchmarks>();
+
+    if (!generateReport)
+    {
+        return;
+    }
+
+    Console.WriteLine("从 BenchmarkDotNet artifacts 生成 VM 性能报告...\n");
+    var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results");
+    var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+    var (markdownPath, jsonPath) = VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+    Console.WriteLine($"VM Markdown 报告: {markdownPath}");
+    Console.WriteLine($"VM JSON 报告: {jsonPath}");
+}
