@@ -1,0 +1,7 @@
+Old8Lang VM Performance Report
+GeneratedAt: 2026-03-01T11:53:22.5455100+08:00
+
+Scenario, AvgMs, P95Ms, AvgAllocatedBytes
+ArithmeticLoop, 30.508, 33.145, 3603560
+DenseFunctionCall, 115.061, 116.368, 8403608
+DefaultAndNamedArgs, 54.248, 62.429, 9834776
