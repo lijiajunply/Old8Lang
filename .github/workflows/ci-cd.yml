@@ -5,6 +5,9 @@ on:
     branches: [ main, develop, master ]
   pull_request:
     branches: [ main, develop, master ]
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
 
 env:
   DOTNET_VERSION: '10.0.100'
@@ -95,14 +98,22 @@ jobs:
     - name: Build benchmarks
       run: dotnet build Old8Lang.Benchmarks --configuration Release
       
-    - name: Run performance benchmarks
-      run: dotnet run --project Old8Lang.Benchmarks --configuration Release
+    - name: Run PR/Push quick VM benchmarks
+      if: github.event_name != 'schedule'
+      run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
+
+    - name: Run nightly full VM benchmarks
+      if: github.event_name == 'schedule'
+      run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
       
     - name: Upload benchmark results
       uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
-        path: BenchmarkDotNet.Artifacts/results/
+        path: |
+          BenchmarkDotNet.Artifacts/results/
+          Reports/**/*.md
+          Reports/**/*.json
         
   code-quality:
     runs-on: ubuntu-latest

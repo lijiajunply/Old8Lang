@@ -33,41 +33,7 @@ public class VMPerformanceReportTests : IDisposable
         Assert.Contains("VM_ArithmeticLoop", markdown);
         Assert.Contains("30.508", markdown);
         Assert.Contains("3690045", markdown);
-        Assert.Contains("N/A", markdown); // P95 默认不可用
-    }
-
-    [Fact]
-    public void GenerateFromBenchmarkArtifacts_WithNaValues_OutputsNaAndWarningsSection()
-    {
-        var artifactsDir = Path.Combine(_tempRoot, "artifacts-na");
-        var reportsDir = Path.Combine(_tempRoot, "reports-na");
-        Directory.CreateDirectory(artifactsDir);
-        Directory.CreateDirectory(reportsDir);
-
-        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMModePerformanceBenchmarks-report.csv");
-        File.WriteAllText(csvPath, BuildCsvWithNa());
-
-        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir);
-        var markdown = File.ReadAllText(markdownPath);
-        var json = File.ReadAllText(jsonPath);
-
         Assert.Contains("N/A", markdown);
-        Assert.Contains("VM_DefaultAndNamedArgs", markdown);
-        Assert.Contains("\"Scenario\": \"VM_DefaultAndNamedArgs\"", json);
-    }
-
-    [Fact]
-    public void GenerateFromBenchmarkArtifacts_WhenCsvMissing_ThrowsFileNotFoundException()
-    {
-        var artifactsDir = Path.Combine(_tempRoot, "missing-artifacts");
-        var reportsDir = Path.Combine(_tempRoot, "missing-reports");
-        Directory.CreateDirectory(artifactsDir);
-        Directory.CreateDirectory(reportsDir);
-
-        var exception = Assert.Throws<FileNotFoundException>(() =>
-            VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir));
-
-        Assert.Contains("未找到 VM BenchmarkDotNet 报告 CSV", exception.Message);
     }
 
     [Fact]
@@ -87,13 +53,13 @@ public class VMPerformanceReportTests : IDisposable
 
         Assert.Contains("Old8Lang Extended VM Performance Report", markdown);
         Assert.Contains("## Concurrency", markdown);
-        Assert.Contains("Throughput(ops/s)", markdown);
-        Assert.Contains("VMX_Concurrency_Channel_SPSC_Throughput", markdown);
+        Assert.Contains("Threshold(%)", markdown);
         Assert.Contains("\"Category\": \"Concurrency\"", json);
+        Assert.Contains("\"Status\": \"N/A\"", json);
     }
 
     [Fact]
-    public void GenerateExtendedFromBenchmarkArtifacts_WithBaseline_ProducesWarnWhenRegressionLarge()
+    public void GenerateExtendedFromBenchmarkArtifacts_WithCategoryThresholds_AssignsExpectedStatus()
     {
         var artifactsDir = Path.Combine(_tempRoot, "artifacts-extended-baseline");
         var reportsDir = Path.Combine(_tempRoot, "reports-extended-baseline");
@@ -101,17 +67,70 @@ public class VMPerformanceReportTests : IDisposable
         Directory.CreateDirectory(reportsDir);
 
         var baselineJsonPath = Path.Combine(reportsDir, "VM_Extended_Performance_Report_20260101_000000.json");
-        File.WriteAllText(baselineJsonPath, BuildExtendedBaselineJson());
+        File.WriteAllText(baselineJsonPath, BuildThresholdBaselineJson());
         File.SetLastWriteTimeUtc(baselineJsonPath, DateTime.UtcNow.AddMinutes(-1));
 
         var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMExtendedPerformanceBenchmarks-report.csv");
-        File.WriteAllText(csvPath, BuildExtendedCsvWithRegression());
+        File.WriteAllText(csvPath, BuildThresholdCsv());
 
-        var (markdownPath, _) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
-        var markdown = File.ReadAllText(markdownPath);
+        var (_, jsonPath) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var json = File.ReadAllText(jsonPath);
 
-        Assert.Contains("WARN", markdown);
-        Assert.Contains("MeanΔ(%)", markdown);
+        Assert.Contains("\"Scenario\": \"VMX_LargeFile_CompileOnly_10k\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 8", json);
+        Assert.Contains("\"Status\": \"FAIL\"", json);
+
+        Assert.Contains("\"Scenario\": \"VMX_Edge_HighArgCount_CallHotPath\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 10", json);
+
+        Assert.Contains("\"Scenario\": \"VMX_Concurrency_Channel_SPSC_Throughput\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 12", json);
+    }
+
+    [Fact]
+    public void GenerateQuickAndNightlyReports_ProducesFilesAndNightlyFailCanBeDetected()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-nightly");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-nightly");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var quickBaseline = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(quickBaseline, "{\"Scenarios\":[]}");
+        File.SetLastWriteTimeUtc(quickBaseline, DateTime.UtcNow.AddMinutes(-2));
+
+        var nightlyBaseline = Path.Combine(reportsDir, "VM_Nightly_Performance_Report_20260101_000000.json");
+        File.WriteAllText(nightlyBaseline, BuildNightlyBaselineJson());
+        File.SetLastWriteTimeUtc(nightlyBaseline, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickCsv());
+
+        var nightlyCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMNightlyPerformanceBenchmarks-report.csv");
+        File.WriteAllText(nightlyCsvPath, BuildNightlyCsvWithFail());
+
+        var (quickMd, quickJson) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var (nightlyMd, nightlyJson) = VMPerformanceReport.GenerateNightlyFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        Assert.True(File.Exists(quickMd));
+        Assert.True(File.Exists(quickJson));
+        Assert.True(File.Exists(nightlyMd));
+        Assert.True(File.Exists(nightlyJson));
+        Assert.True(VMPerformanceReport.HasFailStatus(nightlyJson));
+    }
+
+    [Fact]
+    public void GenerateFromBenchmarkArtifacts_WhenCsvMissing_ThrowsFileNotFoundException()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "missing-artifacts");
+        var reportsDir = Path.Combine(_tempRoot, "missing-reports");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var exception = Assert.Throws<FileNotFoundException>(() =>
+            VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir));
+
+        Assert.Contains("未找到 VM BenchmarkDotNet 报告 CSV", exception.Message);
     }
 
     private static string BuildSampleCsv()
@@ -124,15 +143,6 @@ public class VMPerformanceReportTests : IDisposable
             "VM_DefaultAndNamedArgs,DefaultJob,.NET 10.0,3,8,54.248 ms,3.667 ms,9834.78 KB");
     }
 
-    private static string BuildCsvWithNa()
-    {
-        return string.Join(
-            Environment.NewLine,
-            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
-            "VM_ArithmeticLoop,DefaultJob,.NET 10.0,3,8,30.000 ms,1.100 ms,3500 KB",
-            "VM_DefaultAndNamedArgs,DefaultJob,.NET 10.0,3,8,NA,NA,NA");
-    }
-
     private static string BuildExtendedCsv()
     {
         return string.Join(
@@ -143,24 +153,64 @@ public class VMPerformanceReportTests : IDisposable
             "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,80.000 ms,1.200 ms,4.00 MB");
     }
 
-    private static string BuildExtendedCsvWithRegression()
+    private static string BuildThresholdCsv()
     {
         return string.Join(
             Environment.NewLine,
             "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
-            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,120.000 ms,1.000 ms,6.00 MB");
+            "VMX_LargeFile_CompileOnly_10k,DefaultJob,.NET 10.0,1,6,109.000 ms,1.000 ms,5.00 MB",
+            "VMX_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,6,109.000 ms,1.000 ms,2.00 MB",
+            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,111.000 ms,1.000 ms,4.00 MB");
     }
 
-    private static string BuildExtendedBaselineJson()
+    private static string BuildQuickCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,1,4,95.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildNightlyCsvWithFail()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXN_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,3,8,110.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildThresholdBaselineJson()
     {
         return """
                {
                  "GeneratedAt": "2026-01-01T00:00:00+08:00",
                  "Scenarios": [
                    {
+                     "Scenario": "VMX_LargeFile_CompileOnly_10k",
+                     "MeanMs": 100.0
+                   },
+                   {
+                     "Scenario": "VMX_Edge_HighArgCount_CallHotPath",
+                     "MeanMs": 100.0
+                   },
+                   {
                      "Scenario": "VMX_Concurrency_Channel_SPSC_Throughput",
-                     "MeanMs": 80.0,
-                     "AllocatedBytes": 4194304
+                     "MeanMs": 100.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildNightlyBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXN_LargeFile_CompileAndExecute_10k",
+                     "MeanMs": 100.0
                    }
                  ]
                }

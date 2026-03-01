@@ -23,9 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_130659.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_130659.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMNightlyPerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMQuickPerformanceBenchmarks.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -606,7 +611,7 @@
       <workItem from="1771936929558" duration="1352000" />
       <workItem from="1771992969295" duration="688000" />
       <workItem from="1772335461211" duration="4496000" />
-      <workItem from="1772340986312" duration="1632000" />
+      <workItem from="1772340986312" duration="4289000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -951,7 +956,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="961" />
+    <option name="localTasksCounter" value="963" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -978,8 +983,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
-    <MESSAGE value="perf(interpreter): 优化性能监控器缓存统计和更新测试用例语法&#10;&#10;- 添加全局缓存命中和未命中计数器优化统计精度&#10;- 实现条件缓存命中率计算优先使用全局统计而非作用域统计&#10;- 在变量查找时更新全局缓存统计并在重置时清零计数器&#10;- 更新性能测试用例中的赋值语法从=改为&lt;-操作符&#10;- 将for循环语法从传统括号格式改为逗号分隔格式&#10;- 重命名function关键字为func以符合语言规范&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正性能测试脚本中的循环语法和变量声明方式" />
     <MESSAGE value="perf(benchmark): 更新解析器性能测试报告&#10;&#10;- 添加了详细的性能指标数据，包括平均值、误差、标准差、中位数等&#10;- 新增内存分配统计信息，包含Gen0、Gen1、Gen2垃圾回收统计&#10;- 更新了HTML报告标题中的时间戳&#10;- 扩展了测试用例覆盖范围，增加深度嵌套表达式解析等场景&#10;- 补充了并发解析和语法错误处理的性能数据&#10;- 完善了大文件解析的基准测试结果" />
     <MESSAGE value="perf(interpreter): 添加中等规模程序和递归调用性能测试&#10;&#10;- 创建 medium-program-1000lines.old8 测试脚本包含数学函数、数组处理、字符串操作等&#10;- 添加 recursive-calls.old8 测试脚本验证递归深度和性能表现&#10;- 实现 MediumProgramPerformanceTests 验证千行程序执行时间小于2秒&#10;- 创建 RecursiveCallPerformanceTests 确保支持至少100层递归深度&#10;- 添加精简版 medium-program-simple.old8 用于快速性能验证&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="fix(interpreter): 解决扩展方法导致的栈溢出和方法查找问题&#10;&#10;- 修改 ExtensionDeclaration 映射内置类型到正确的 LangValue 类型&#10;- 在 ExtensionMethodWrapper 中添加递归检测机制防止栈溢出&#10;- 实现内置方法优先级高于扩展方法的查找逻辑&#10;- 确保方法名匹配区分大小写避免 toStr 和 ToStr 冲突&#10;- 添加扩展方法标识属性用于方法查找优先级判断&#10;- 修复实例方法重载组中内置方法优先匹配的逻辑&#10;- 更新方法注册表使用大小写敏感的字符串比较器&#10;- 在 VariateManager 中添加扩展方法调用栈跟踪功能" />
@@ -1003,7 +1006,9 @@
     <MESSAGE value="test(vm): 添加虚拟机指令操作数兼容性测试并生成性能对比报告&#10;&#10;- 新增 VMCallAsyncOperandCompatibilityTests 测试类验证异步调用指令兼容性&#10;- 新增 VMCallOperandCompatibilityTests 测试类验证函数调用指令兼容性&#10;- 添加辅助方法 GetIntValue 支持多种数值类型转换&#10;- 实现对新旧操作数格式的兼容性验证&#10;- 添加函数索引回退到函数名称的功能测试&#10;- 生成 VM 性能对比报告包含吞吐量和内存分配指标&#10;- 添加性能验收阈值检查功能" />
     <MESSAGE value="refactor(benchmark): 重构 VM 基准测试报告生成机制&#10;&#10;- 将 VM 性能报告生成改为解析 BenchmarkDotNet 产物&#10;- 添加 --vm-report 参数支持生成 Markdown 和 JSON 格式报告&#10;- 创建 VMBenchmarkConfig 配置类禁用优化校验&#10;- 实现 CSV 解析功能从 BenchmarkDotNet 结果生成性能报告&#10;- 添加 VMPerformanceReportTests 测试类验证报告生成功能&#10;- 统一 --vm 和 --vm-report 参数处理流程&#10;- 移除旧的 VM 性能测试执行代码" />
     <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制" />
+    <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制&#10;- 生成 VM 性能报告的 JSON 和 Markdown 文件格式&#10;- 更新 IDE 配置文件中的变更列表和任务计数器设置" />
+    <MESSAGE value="test(vm): 启用虚拟机相关功能的单元测试&#10;&#10;- 移除 VMExceptionTests 中嵌套异常测试的跳过标记&#10;- 移除 VMListTests 中列表添加和删除操作测试的跳过标记&#10;- 移除 VMStringOperationTests 中字符串子串和索引查找测试的跳过标记&#10;- 更新单元测试配置以确保测试正常运行" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 启用虚拟机相关功能的单元测试&#10;&#10;- 移除 VMExceptionTests 中嵌套异常测试的跳过标记&#10;- 移除 VMListTests 中列表添加和删除操作测试的跳过标记&#10;- 移除 VMStringOperationTests 中字符串子串和索引查找测试的跳过标记&#10;- 更新单元测试配置以确保测试正常运行" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -29,7 +29,7 @@ public static class VMPerformanceReport
         IReadOnlyList<string> Warnings,
         IReadOnlyList<VmScenarioResult> Scenarios);
 
-    private sealed record ExtendedScenarioResult(
+    private sealed record TieredScenarioResult(
         string Scenario,
         string Category,
         double? MeanMs,
@@ -38,20 +38,19 @@ public static class VMPerformanceReport
         long? AllocatedBytes,
         double? ThroughputOpsPerSec,
         double? AllocatedBytesPerOp,
-        string SoftGateStatus,
         double? BaselineMeanMs,
-        double? MeanChangePct,
-        long? BaselineAllocatedBytes,
-        double? AllocatedChangePct,
+        double? MeanDeltaPercent,
+        double? RegressionThresholdPercent,
+        string Status,
         string RawMean,
         string RawAllocated);
 
-    private sealed record ExtendedReportModel(
+    private sealed record TieredReportModel(
         DateTime GeneratedAt,
         string SourceCsv,
         string? BaselineJson,
         IReadOnlyList<string> Warnings,
-        IReadOnlyList<ExtendedScenarioResult> Scenarios);
+        IReadOnlyList<TieredScenarioResult> Scenarios);
 
     /// <summary>
     /// 从 BenchmarkDotNet artifacts 解析并生成 VM 报告（md + json）
@@ -77,35 +76,115 @@ public static class VMPerformanceReport
     /// <summary>
     /// 从 BenchmarkDotNet artifacts 解析并生成扩展 VM 报告（md + json）
     /// </summary>
-    /// <param name="artifactsDir">BenchmarkDotNet.Artifacts/results 目录</param>
-    /// <param name="reportsDir">报告输出目录（通常为 Reports）</param>
-    /// <returns>Markdown 与 JSON 报告路径</returns>
     public static (string MarkdownPath, string JsonPath) GenerateExtendedFromBenchmarkArtifacts(string artifactsDir, string reportsDir)
     {
-        var csvPath = ResolveLatestCsvByPattern(artifactsDir, "*VMExtendedPerformanceBenchmarks*-report.csv",
-            "未找到扩展 VM BenchmarkDotNet 报告 CSV");
+        return GenerateTieredFromBenchmarkArtifacts(
+            artifactsDir,
+            reportsDir,
+            csvPattern: "*VMExtendedPerformanceBenchmarks*-report.csv",
+            notFoundMessage: "未找到扩展 VM BenchmarkDotNet 报告 CSV",
+            scenarioPrefix: "VMX_",
+            reportFilePrefix: "VM_Extended_Performance_Report",
+            reportTitle: "Old8Lang Extended VM Performance Report");
+    }
+
+    /// <summary>
+    /// 从 BenchmarkDotNet artifacts 解析并生成 VM Quick 报告（md + json）
+    /// </summary>
+    public static (string MarkdownPath, string JsonPath) GenerateQuickFromBenchmarkArtifacts(string artifactsDir, string reportsDir)
+    {
+        return GenerateTieredFromBenchmarkArtifacts(
+            artifactsDir,
+            reportsDir,
+            csvPattern: "*VMQuickPerformanceBenchmarks*-report.csv",
+            notFoundMessage: "未找到 VM Quick BenchmarkDotNet 报告 CSV",
+            scenarioPrefix: "VMXQ_",
+            reportFilePrefix: "VM_Quick_Performance_Report",
+            reportTitle: "Old8Lang VM Quick Performance Report");
+    }
+
+    /// <summary>
+    /// 从 BenchmarkDotNet artifacts 解析并生成 VM Nightly 报告（md + json）
+    /// </summary>
+    public static (string MarkdownPath, string JsonPath) GenerateNightlyFromBenchmarkArtifacts(string artifactsDir, string reportsDir)
+    {
+        return GenerateTieredFromBenchmarkArtifacts(
+            artifactsDir,
+            reportsDir,
+            csvPattern: "*VMNightlyPerformanceBenchmarks*-report.csv",
+            notFoundMessage: "未找到 VM Nightly BenchmarkDotNet 报告 CSV",
+            scenarioPrefix: "VMXN_",
+            reportFilePrefix: "VM_Nightly_Performance_Report",
+            reportTitle: "Old8Lang VM Nightly Performance Report");
+    }
+
+    /// <summary>
+    /// 检查报告 JSON 是否包含 FAIL 状态
+    /// </summary>
+    public static bool HasFailStatus(string reportJsonPath)
+    {
+        if (string.IsNullOrWhiteSpace(reportJsonPath) || !File.Exists(reportJsonPath))
+        {
+            return false;
+        }
+
+        using var document = JsonDocument.Parse(File.ReadAllText(reportJsonPath));
+        if (!document.RootElement.TryGetProperty("Scenarios", out var scenariosElement) ||
+            scenariosElement.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var scenario in scenariosElement.EnumerateArray())
+        {
+            if (!scenario.TryGetProperty("Status", out var statusElement) ||
+                statusElement.ValueKind != JsonValueKind.String)
+            {
+                continue;
+            }
+
+            if (string.Equals(statusElement.GetString(), "FAIL", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static (string MarkdownPath, string JsonPath) GenerateTieredFromBenchmarkArtifacts(
+        string artifactsDir,
+        string reportsDir,
+        string csvPattern,
+        string notFoundMessage,
+        string scenarioPrefix,
+        string reportFilePrefix,
+        string reportTitle)
+    {
+        var csvPath = ResolveLatestCsvByPattern(artifactsDir, csvPattern, notFoundMessage);
         var parsed = ParseCsv(csvPath);
+
         Directory.CreateDirectory(reportsDir);
-        var baselineJson = ResolveLatestExtendedBaselineJson(reportsDir);
+        var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix);
         var baselineMap = LoadBaselineMap(baselineJson);
 
         var scenarios = parsed.Scenarios
-            .Where(s => s.Scenario.StartsWith("VMX_", StringComparison.Ordinal))
-            .Select(s => ConvertToExtendedScenario(s, baselineMap))
+            .Where(s => s.Scenario.StartsWith(scenarioPrefix, StringComparison.Ordinal))
+            .Select(s => ConvertToTieredScenario(s, baselineMap))
             .ToArray();
 
         if (scenarios.Length == 0)
         {
-            throw new InvalidDataException($"扩展 CSV 中没有 VMX 场景: {csvPath}");
+            throw new InvalidDataException($"CSV 中没有 {scenarioPrefix} 场景: {csvPath}");
         }
 
         var warnings = parsed.Warnings.ToList();
         if (baselineJson is null)
         {
-            warnings.Add("未找到历史扩展基线报告，软门禁对比已跳过。");
+            warnings.Add("未找到历史基线报告，回归对比状态将显示 N/A。");
         }
 
-        var report = new ExtendedReportModel(
+        var report = new TieredReportModel(
             GeneratedAt: DateTime.Now,
             SourceCsv: csvPath,
             BaselineJson: baselineJson,
@@ -113,9 +192,10 @@ public static class VMPerformanceReport
             Scenarios: scenarios);
 
         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
-        var markdownPath = Path.Combine(reportsDir, $"VM_Extended_Performance_Report_{timestamp}.md");
-        var jsonPath = Path.Combine(reportsDir, $"VM_Extended_Performance_Report_{timestamp}.json");
-        WriteExtendedMarkdown(report, markdownPath);
+        var markdownPath = Path.Combine(reportsDir, $"{reportFilePrefix}_{timestamp}.md");
+        var jsonPath = Path.Combine(reportsDir, $"{reportFilePrefix}_{timestamp}.json");
+
+        WriteTieredMarkdown(report, markdownPath, reportTitle);
         WriteJson(report, jsonPath);
         return (markdownPath, jsonPath);
     }
@@ -166,7 +246,6 @@ public static class VMPerformanceReport
     {
         var warnings = new List<string>();
         var scenarios = new List<VmScenarioResult>();
-        Dictionary<string, int>? headerIndex = null;
         string job = "N/A";
         string runtime = "N/A";
         string warmupCount = "N/A";
@@ -190,7 +269,7 @@ public static class VMPerformanceReport
             throw new InvalidDataException($"CSV 头部为空: {csvPath}");
         }
 
-        headerIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var headerIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         for (var i = 0; i < headers.Length; i++)
         {
             var key = headers[i].Trim();
@@ -235,7 +314,7 @@ public static class VMPerformanceReport
             var meanMs = ParseDurationToMilliseconds(rawMean, out var meanWarning);
             var stdDevMs = ParseDurationToMilliseconds(rawStdDev, out var stdDevWarning);
             var allocatedBytes = ParseBytes(rawAllocated, out var allocatedWarning);
-            double? p95Ms = null; // CSV 默认不含 P95，统一标记 N/A
+            double? p95Ms = null;
 
             if (meanWarning is not null)
             {
@@ -405,6 +484,42 @@ public static class VMPerformanceReport
         }
     }
 
+    private static void WriteTieredMarkdown(TieredReportModel report, string markdownPath, string reportTitle)
+    {
+        using var writer = new StreamWriter(markdownPath);
+        writer.WriteLine($"# {reportTitle}");
+        writer.WriteLine();
+        writer.WriteLine($"- GeneratedAt: {report.GeneratedAt:O}");
+        writer.WriteLine($"- SourceCsv: `{report.SourceCsv}`");
+        writer.WriteLine($"- BaselineJson: `{report.BaselineJson ?? "N/A"}`");
+        writer.WriteLine();
+
+        foreach (var group in report.Scenarios.GroupBy(s => s.Category).OrderBy(g => g.Key))
+        {
+            writer.WriteLine($"## {group.Key}");
+            writer.WriteLine();
+            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status |");
+            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|");
+
+            foreach (var scenario in group)
+            {
+                writer.WriteLine(
+                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} |");
+            }
+
+            writer.WriteLine();
+        }
+
+        if (report.Warnings.Count > 0)
+        {
+            writer.WriteLine("## Warnings");
+            foreach (var warning in report.Warnings)
+            {
+                writer.WriteLine($"- {warning}");
+            }
+        }
+    }
+
     private static void WriteJson(VmReportModel report, string jsonPath)
     {
         var options = new JsonSerializerOptions
@@ -415,7 +530,7 @@ public static class VMPerformanceReport
         File.WriteAllText(jsonPath, json);
     }
 
-    private static void WriteJson(ExtendedReportModel report, string jsonPath)
+    private static void WriteJson(TieredReportModel report, string jsonPath)
     {
         var options = new JsonSerializerOptions
         {
@@ -425,15 +540,16 @@ public static class VMPerformanceReport
         File.WriteAllText(jsonPath, json);
     }
 
-    private static string? ResolveLatestExtendedBaselineJson(string reportsDir)
+    private static string? ResolveLatestTieredBaselineJson(string reportsDir, string reportFilePrefix)
     {
         if (!Directory.Exists(reportsDir))
         {
             return null;
         }
 
+        var pattern = $"{reportFilePrefix}_*.json";
         var candidates = Directory
-            .GetFiles(reportsDir, "VM_Extended_Performance_Report_*.json", System.IO.SearchOption.TopDirectoryOnly)
+            .GetFiles(reportsDir, pattern, System.IO.SearchOption.TopDirectoryOnly)
             .Select(path => new FileInfo(path))
             .OrderByDescending(file => file.LastWriteTimeUtc)
             .ToArray();
@@ -441,9 +557,9 @@ public static class VMPerformanceReport
         return candidates.Length == 0 ? null : candidates[0].FullName;
     }
 
-    private static Dictionary<string, (double? MeanMs, long? AllocatedBytes)> LoadBaselineMap(string? baselineJsonPath)
+    private static Dictionary<string, double?> LoadBaselineMap(string? baselineJsonPath)
     {
-        var map = new Dictionary<string, (double? MeanMs, long? AllocatedBytes)>(StringComparer.Ordinal);
+        var map = new Dictionary<string, double?>(StringComparer.Ordinal);
         if (string.IsNullOrWhiteSpace(baselineJsonPath) || !File.Exists(baselineJsonPath))
         {
             return map;
@@ -470,30 +586,24 @@ public static class VMPerformanceReport
             }
 
             double? mean = null;
-            long? allocated = null;
-
             if (item.TryGetProperty("MeanMs", out var meanElement) && meanElement.ValueKind == JsonValueKind.Number)
             {
                 mean = meanElement.GetDouble();
             }
-            if (item.TryGetProperty("AllocatedBytes", out var allocatedElement) &&
-                allocatedElement.ValueKind == JsonValueKind.Number)
-            {
-                allocated = allocatedElement.GetInt64();
-            }
 
-            map[scenario] = (mean, allocated);
+            map[scenario] = mean;
         }
 
         return map;
     }
 
-    private static ExtendedScenarioResult ConvertToExtendedScenario(
+    private static TieredScenarioResult ConvertToTieredScenario(
         VmScenarioResult source,
-        IReadOnlyDictionary<string, (double? MeanMs, long? AllocatedBytes)> baselineMap)
+        IReadOnlyDictionary<string, double?> baselineMap)
     {
-        var category = GetExtendedCategory(source.Scenario);
+        var category = GetTieredCategory(source.Scenario);
         var operationCount = GetOperationCount(source.Scenario);
+
         double? throughput = source.MeanMs.HasValue && operationCount.HasValue && source.MeanMs.Value > 0
             ? operationCount.Value * 1000d / source.MeanMs.Value
             : null;
@@ -501,12 +611,12 @@ public static class VMPerformanceReport
             ? source.AllocatedBytes.Value / (double)operationCount.Value
             : null;
 
-        baselineMap.TryGetValue(source.Scenario, out var baseline);
-        var meanChangePct = ComputeChangePct(baseline.MeanMs, source.MeanMs, decreaseIsGood: true);
-        var allocatedChangePct = ComputeChangePct(baseline.AllocatedBytes, source.AllocatedBytes, decreaseIsGood: true);
-        var gate = EvaluateSoftGate(category, meanChangePct, allocatedChangePct);
+        baselineMap.TryGetValue(source.Scenario, out var baselineMeanMs);
+        var meanDeltaPercent = ComputeRegressionPercent(baselineMeanMs, source.MeanMs);
+        var threshold = GetRegressionThresholdPercent(category);
+        var status = EvaluateRegressionStatus(meanDeltaPercent, threshold);
 
-        return new ExtendedScenarioResult(
+        return new TieredScenarioResult(
             Scenario: source.Scenario,
             Category: category,
             MeanMs: source.MeanMs,
@@ -515,36 +625,71 @@ public static class VMPerformanceReport
             AllocatedBytes: source.AllocatedBytes,
             ThroughputOpsPerSec: throughput,
             AllocatedBytesPerOp: allocatedPerOp,
-            SoftGateStatus: gate,
-            BaselineMeanMs: baseline.MeanMs,
-            MeanChangePct: meanChangePct,
-            BaselineAllocatedBytes: baseline.AllocatedBytes,
-            AllocatedChangePct: allocatedChangePct,
+            BaselineMeanMs: baselineMeanMs,
+            MeanDeltaPercent: meanDeltaPercent,
+            RegressionThresholdPercent: threshold,
+            Status: status,
             RawMean: source.RawMean,
             RawAllocated: source.RawAllocated);
     }
 
-    private static string GetExtendedCategory(string scenario)
+    private static string GetTieredCategory(string scenario)
     {
-        if (scenario.StartsWith("VMX_LargeFile_", StringComparison.Ordinal))
+        if (scenario.Contains("_LargeFile_", StringComparison.Ordinal))
         {
             return "LargeFile";
         }
-        if (scenario.StartsWith("VMX_Edge_", StringComparison.Ordinal))
+
+        if (scenario.Contains("_Edge_", StringComparison.Ordinal))
         {
             return "Edge";
         }
-        if (scenario.StartsWith("VMX_Concurrency_", StringComparison.Ordinal))
+
+        if (scenario.Contains("_Concurrency_", StringComparison.Ordinal))
         {
             return "Concurrency";
         }
+
         return "Core";
+    }
+
+    private static double GetRegressionThresholdPercent(string category)
+    {
+        return category switch
+        {
+            "LargeFile" => 8d,
+            "Edge" => 10d,
+            "Concurrency" => 12d,
+            _ => 10d
+        };
+    }
+
+    private static string EvaluateRegressionStatus(double? meanDeltaPercent, double thresholdPercent)
+    {
+        if (!meanDeltaPercent.HasValue)
+        {
+            return "N/A";
+        }
+
+        if (meanDeltaPercent.Value > thresholdPercent)
+        {
+            return "FAIL";
+        }
+
+        // 接近阈值时给出预警，便于观察趋势但不阻断。
+        if (meanDeltaPercent.Value > thresholdPercent * 0.8d)
+        {
+            return "WARN";
+        }
+
+        return "PASS";
     }
 
     private static long? GetOperationCount(string scenario)
     {
         return scenario switch
         {
+            // Extended
             "VMX_LargeFile_CompileOnly_10k" => 10_000,
             "VMX_LargeFile_CompileAndExecute_10k" => 10_000,
             "VMX_LargeFile_CompileOnly_50k_Generated" => 50_000,
@@ -560,89 +705,47 @@ public static class VMPerformanceReport
             "VMX_Concurrency_Semaphore_Contention" => 100_000,
             "VMX_Concurrency_MutexAtomicCounter" => 1_000_000,
             "VMX_Concurrency_AsyncFanOutFanIn" => 2_000,
+
+            // Quick
+            "VMXQ_LargeFile_CompileAndExecute_10k" => 10_000,
+            "VMXQ_LargeFile_CompileAndExecute_50k_Generated" => 50_000,
+            "VMXQ_Edge_DeepRecursion_NearLimit" => 1_000,
+            "VMXQ_Edge_HighArgCount_CallHotPath" => 30_000,
+            "VMXQ_Edge_HighThrowRate_TryCatch" => 40_000,
+            "VMXQ_Edge_LargeClosureCapture_HighFreq" => 50_000,
+            "VMXQ_Concurrency_Channel_MPMC_4Workers" => 100_000,
+            "VMXQ_Concurrency_MutexAtomicCounter_4Workers" => 320_000,
+
+            // Nightly
+            "VMXN_LargeFile_CompileAndExecute_10k" => 10_000,
+            "VMXN_LargeFile_CompileAndExecute_50k_Generated" => 50_000,
+            "VMXN_LargeFile_CompileAndExecute_100k_Generated" => 100_000,
+            "VMXN_LargeFile_ModuleStyle_ImportLike" => 60_000,
+            "VMXN_Edge_DeepRecursion_NearLimit" => 1_000,
+            "VMXN_Edge_HighArgCount_CallHotPath" => 70_000,
+            "VMXN_Edge_HighThrowRate_TryCatch" => 120_000,
+            "VMXN_Edge_LargeClosureCapture_HighFreq" => 150_000,
+            "VMXN_Concurrency_Channel_MPMC_2Workers" => 100_000,
+            "VMXN_Concurrency_Channel_MPMC_4Workers" => 200_000,
+            "VMXN_Concurrency_Channel_MPMC_8Workers" => 400_000,
+            "VMXN_Concurrency_MutexAtomicCounter_2Workers" => 300_000,
+            "VMXN_Concurrency_MutexAtomicCounter_4Workers" => 600_000,
+            "VMXN_Concurrency_MutexAtomicCounter_8Workers" => 1_200_000,
+            "VMXN_Concurrency_Semaphore_Contention" => 120_000,
+            "VMXN_Concurrency_SpawnJoin_Throughput" => 20_000,
             _ => null
         };
     }
 
-    private static double? ComputeChangePct(double? baselineValue, double? currentValue, bool decreaseIsGood)
+    private static double? ComputeRegressionPercent(double? baselineValue, double? currentValue)
     {
         if (!baselineValue.HasValue || !currentValue.HasValue || baselineValue.Value == 0)
         {
             return null;
         }
 
-        var raw = (currentValue.Value - baselineValue.Value) / baselineValue.Value * 100d;
-        return decreaseIsGood ? -raw : raw;
-    }
-
-    private static double? ComputeChangePct(long? baselineValue, long? currentValue, bool decreaseIsGood)
-    {
-        if (!baselineValue.HasValue || !currentValue.HasValue || baselineValue.Value == 0)
-        {
-            return null;
-        }
-
-        var raw = (currentValue.Value - baselineValue.Value) / (double)baselineValue.Value * 100d;
-        return decreaseIsGood ? -raw : raw;
-    }
-
-    private static string EvaluateSoftGate(string category, double? meanImprovePct, double? allocatedImprovePct)
-    {
-        if (!meanImprovePct.HasValue && !allocatedImprovePct.HasValue)
-        {
-            return "N/A";
-        }
-
-        var meanThreshold = category switch
-        {
-            "Core" => -15d,
-            "LargeFile" => -25d,
-            "Concurrency" => -20d,
-            "Edge" => -30d,
-            _ => -15d
-        };
-
-        var allocThreshold = -20d;
-
-        var meanWarn = meanImprovePct.HasValue && meanImprovePct.Value < meanThreshold;
-        var allocWarn = allocatedImprovePct.HasValue && allocatedImprovePct.Value < allocThreshold;
-        return meanWarn || allocWarn ? "WARN" : "PASS";
-    }
-
-    private static void WriteExtendedMarkdown(ExtendedReportModel report, string markdownPath)
-    {
-        using var writer = new StreamWriter(markdownPath);
-        writer.WriteLine("# Old8Lang Extended VM Performance Report");
-        writer.WriteLine();
-        writer.WriteLine($"- GeneratedAt: {report.GeneratedAt:O}");
-        writer.WriteLine($"- SourceCsv: `{report.SourceCsv}`");
-        writer.WriteLine($"- BaselineJson: `{report.BaselineJson ?? "N/A"}`");
-        writer.WriteLine();
-
-        foreach (var group in report.Scenarios.GroupBy(s => s.Category).OrderBy(g => g.Key))
-        {
-            writer.WriteLine($"## {group.Key}");
-            writer.WriteLine();
-            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | AllocΔ(%) | Gate |");
-            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|");
-
-            foreach (var scenario in group)
-            {
-                writer.WriteLine(
-                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanChangePct)} | {FormatPercent(scenario.AllocatedChangePct)} | {scenario.SoftGateStatus} |");
-            }
-
-            writer.WriteLine();
-        }
-
-        if (report.Warnings.Count > 0)
-        {
-            writer.WriteLine("## Warnings");
-            foreach (var warning in report.Warnings)
-            {
-                writer.WriteLine($"- {warning}");
-            }
-        }
+        // 正值表示回归（变慢），负值表示提升。
+        return (currentValue.Value - baselineValue.Value) / baselineValue.Value * 100d;
     }
 
     private static string FormatNumber(double? value)

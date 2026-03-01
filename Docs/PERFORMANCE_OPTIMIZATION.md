@@ -418,6 +418,12 @@ var x3 = ID;
 # 运行完整基准测试
 dotnet run --project Old8Lang.Benchmarks --configuration Release
 
+# 运行 VM Quick（PR 快速回归）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
+
+# 运行 VM Nightly（全量回归，FAIL 时返回非零退出码）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
+
 # 运行性能验证
 dotnet test Old8Lang.Benchmarks --filter "FullyQualifiedName~PerformanceValidator"
 ```
