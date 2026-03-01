@@ -13,6 +13,13 @@
 - [x] P1-2（部分）：`VmException` 消息延迟构建，降低高抛异常热路径的即时字符串开销。
 - [x] P1-2（部分）：按异常指令 IP 缓存候选处理器，避免高抛异常场景重复全表扫描 `ExceptionTable`。
 - [x] P1-4（完成）：并发资源热路径优化（`Mutex` 轻量实现 + 资源访问时间更新节流）。
+- [x] P1-3（补充）：`CallFrame` 的 `DeferStack` 改为惰性分配，减少无 `defer` 函数调用下的固定对象分配。
+- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_012717.{md,json}`，用于后续闭包/调用路径优化对比。
+- [x] P1-3（部分）：函数调用 `Locals` 数组改为 `ArrayPool<object?>` 复用（`CallFunction/CallClosureFunction` + `ExecuteFrame` 归还）。
+- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_013755.{md,json}`。
+- [x] P1-3（部分）：`MakeClosure` 改为链式闭包环境（`ClosureEnvironment.Parent`），移除创建子闭包时对父环境的 `SnapshotToDictionary()` 全量拷贝；无捕获场景复用 `ClosureEnvironment.Empty`。
+- [x] 回归验证：`VMLambdaExpressionTests`（15/15）与 `VMMemoryUsageTests`（26/26）通过。
+- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_021345.{md,json}`。
 
 ## 结论摘要
 
@@ -22,9 +29,9 @@
   - 50k 大文件编译执行（`VMXQ_LargeFile_CompileAndExecute_50k_Generated`: 41.976~43.733 ms）
   - 高频闭包捕获（`VMXQ_Edge_LargeClosureCapture_HighFreq`: 31.343~31.413 ms，`PASS` 但 alloc 偏高）
 - 分配量偏高场景：
-  - `LargeClosureCapture`: 25,395.8 bytes/op
-  - `Channel_MPMC`: 28,590.5~28,922.1 bytes/op
-  - `MutexAtomicCounter`: 60,722.1~60,730.4 bytes/op
+  - `LargeClosureCapture`: 19,535.9 KB/op（`20260302_013755`，较 `20260302_012717` 的 `25,395.3 KB/op` 下降约 **23.1%**）
+  - `Channel_MPMC`: 28,896.3~29,788.4 KB/op（`20260302_013755`）
+  - `MutexAtomicCounter`: 60,719.5~60,722.9 KB/op（`20260302_013755`）
 
 ## P0（必须先做）
 
@@ -80,6 +87,7 @@
   - 建议：
     - 闭包捕获变量按索引化存储（数组或紧凑结构）替代 `Dictionary<string, object?>` 热路径访问。
     - 对高频闭包函数增加“无变更捕获环境复用”策略。
+  - 当前进展（`20260302_021345`）：alloc/op 维持在 `19,535.88 KB/op`（相对 `20260302_012717` 下降约 **23.1%**，达标）；耗时为 `30.802 ms / 30.708 ms`（EATLBP/LGHQEI），较 `20260302_013755` 仅小幅改善，仍未达到下降 >=10% 的目标。
   - 验收：`VMXQ_Edge_LargeClosureCapture_HighFreq` alloc/op 下降 >= 20%，耗时下降 >= 10%。
 
 - [x] 并发互斥计数路径减少资源管理层字典查找频率（已完成）。

@@ -23,15 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/baseline.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/baseline.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/raw.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Base/VMBenchmarkBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Base/VMBenchmarkBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMExtendedPerformanceBenchmarks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMExtendedPerformanceBenchmarks.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMNightlyPerformanceBenchmarks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMNightlyPerformanceBenchmarks.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMQuickPerformanceBenchmarks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMQuickPerformanceBenchmarks.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,6 +75,7 @@
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/baseline.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_122811.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_130659.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestEnvironment/o8package.json" root0="FORCE_HIGHLIGHTING" />
@@ -521,7 +514,7 @@
       <workItem from="1772335461211" duration="4496000" />
       <workItem from="1772340986312" duration="4289000" />
       <workItem from="1772378960908" duration="240000" />
-      <workItem from="1772379564921" duration="2163000" />
+      <workItem from="1772379564921" duration="4614000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

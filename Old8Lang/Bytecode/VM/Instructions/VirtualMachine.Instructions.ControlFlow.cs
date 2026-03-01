@@ -195,26 +195,25 @@ public partial class VirtualMachine
                 var funcMeta = _bytecodeFile.Functions[funcIndex];
 
                 // 从栈中弹出捕获的变量值（按相反顺序）
-                var capturedVariables = new Dictionary<string, object?>();
+                var capturedVariables = new Dictionary<string, object?>(capturedVarCount);
                 for (int i = capturedVarCount - 1; i >= 0; i--)
                 {
                     var value = _stack.Pop();
                     capturedVariables[varNames[i]] = value;
                 }
 
-                // 如果当前帧有闭包环境，需要合并到新闭包中
-                // 这样嵌套闭包就能访问外层闭包的变量
-                if (frame.ClosureEnvironment != null)
+                ClosureEnvironment closureEnvironment;
+                if (frame.ClosureEnvironment == null)
                 {
-                    foreach (var (varName, value) in frame.ClosureEnvironment)
-                    {
-                        // 只添加新闭包中没有的变量（避免覆盖）
-                        capturedVariables.TryAdd(varName, value);
-                    }
+                    closureEnvironment = new ClosureEnvironment(capturedVariables);
+                }
+                else
+                {
+                    closureEnvironment = new ClosureEnvironment(capturedVariables, frame.ClosureEnvironment);
                 }
 
                 // 创建闭包对象
-                var closure = new ClosureValue(funcMeta, capturedVariables);
+                var closure = new ClosureValue(funcMeta, closureEnvironment);
                 _stack.Push(closure);
             }
                 break;

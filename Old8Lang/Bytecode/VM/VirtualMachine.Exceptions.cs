@@ -11,10 +11,8 @@ public partial class VirtualMachine
     private void ExecuteDefers(CallFrame frame)
     {
         // 按 LIFO 顺序执行所有 defer 块
-        while (frame.DeferStack.Count > 0)
+        while (frame.TryPopDefer(out int deferStartPos))
         {
-            int deferStartPos = frame.DeferStack.Pop();
-
             // 保存当前 IP
             int savedIP = frame.IP;
 

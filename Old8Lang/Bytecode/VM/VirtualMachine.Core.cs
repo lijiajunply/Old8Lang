@@ -7,6 +7,7 @@ using Old8Lang.Bytecode.ModuleSystem;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
+using System.Buffers;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 namespace Old8Lang.Bytecode.VM;
@@ -212,6 +213,29 @@ public partial class VirtualMachine
         return _bytecodeFile.ConstantPool.GetConstant(index);
     }
 
+    private static object?[] RentLocalsBuffer(int localCount)
+    {
+        if (localCount <= 0)
+        {
+            return Array.Empty<object?>();
+        }
+
+        var buffer = ArrayPool<object?>.Shared.Rent(localCount);
+        Array.Clear(buffer, 0, localCount);
+        return buffer;
+    }
+
+    private static void ReturnLocalsBuffer(CallFrame frame)
+    {
+        if (!frame.UsesPooledLocals || frame.LocalCount <= 0)
+        {
+            return;
+        }
+
+        Array.Clear(frame.Locals, 0, frame.LocalCount);
+        ArrayPool<object?>.Shared.Return(frame.Locals, clearArray: false);
+    }
+
     private void ExecuteFrameLoop(CallFrame frame)
     {
         var function = frame.Function;
@@ -227,7 +251,10 @@ public partial class VirtualMachine
             catch (Exception ex)
             {
                 // 异常发生时，先执行所有 defer 块
-                ExecuteDefers(frame);
+                if (frame.HasDeferredInstructions)
+                {
+                    ExecuteDefers(frame);
+                }
 
                 // 异常处理：查找异常表中匹配的处理器
                 if (!HandleException(ex, frame, function))
@@ -248,8 +275,12 @@ public partial class VirtualMachine
         }
         finally
         {
-            ExecuteDefers(frame);
+            if (frame.HasDeferredInstructions)
+            {
+                ExecuteDefers(frame);
+            }
             _callStack.Pop();
+            ReturnLocalsBuffer(frame);
         }
     }
 
@@ -259,9 +290,10 @@ public partial class VirtualMachine
     private void CallFunction(FunctionMetadata function, object?[] arguments)
     {
         var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
+        var locals = RentLocalsBuffer(function.LocalCount);
 
         // 创建调用帧
-        var frame = new CallFrame(function, function.LocalCount)
+        var frame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
         {
             Arguments = processedArguments
         };
@@ -310,12 +342,13 @@ public partial class VirtualMachine
     /// <summary>
     /// 调用闭包函数（带捕获变量）
     /// </summary>
-    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, Dictionary<string, object?> capturedVariables, ConstantPool? constantPool = null)
+    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, ClosureEnvironment capturedVariables, ConstantPool? constantPool = null)
     {
         var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
+        var locals = RentLocalsBuffer(function.LocalCount);
 
         // 创建调用帧，并设置闭包环境和常量池
-        var frame = new CallFrame(function, function.LocalCount)
+        var frame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
         {
             Arguments = processedArguments,
             ClosureEnvironment = capturedVariables,  // 将捕获的变量设置为闭包环境

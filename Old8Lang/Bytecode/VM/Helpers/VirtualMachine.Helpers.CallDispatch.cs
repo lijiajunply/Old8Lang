@@ -151,7 +151,7 @@ public partial class VirtualMachine
     }
 
     private void InvokeResolvedFunction(FunctionMetadata function, object?[] args,
-        Dictionary<string, object?>? closureEnvironment, ConstantPool? closureConstantPool)
+        ClosureEnvironment? closureEnvironment, ConstantPool? closureConstantPool)
     {
         if (function.IsGenerator)
         {
@@ -185,7 +185,7 @@ public partial class VirtualMachine
     }
 
     private bool TryResolveCallableFunction(CallFrame frame, string funcName, int functionIndexHint,
-        out FunctionMetadata function, out Dictionary<string, object?>? closureEnvironment, out ConstantPool? closureConstantPool)
+        out FunctionMetadata function, out ClosureEnvironment? closureEnvironment, out ConstantPool? closureConstantPool)
     {
         function = null!;
         closureEnvironment = null;
