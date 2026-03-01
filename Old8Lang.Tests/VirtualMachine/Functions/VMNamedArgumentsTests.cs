@@ -1,4 +1,5 @@
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
+using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.Tests.VirtualMachine.Functions;
 
@@ -7,6 +8,33 @@ namespace Old8Lang.Tests.VirtualMachine.Functions;
 /// </summary>
 public class VMNamedArgumentsTests
 {
+    [Fact]
+    public void NamedArguments_EmitsFunctionIndexOperand_AndExecutes()
+    {
+        var code = @"
+            func greet(name:string, age:int, message:string) -> string {
+                return message + "", "" + name + ""! Age: "" + age.ToStr()
+            }
+            result <- greet(name: ""Bob"", age: 30, message: ""Hi"")
+        ";
+
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var mainFunction = bytecodeFile.Functions[bytecodeFile.EntryPointIndex];
+        var callInstruction = mainFunction.Instructions.First(i => i.OpCode == OpCode.Call);
+        var operands = Assert.IsType<object[]>(callInstruction.Operand);
+
+        Assert.Equal(5, operands.Length);
+        Assert.Equal(0, Assert.IsType<int>(operands[0]));
+        Assert.Equal(3, Assert.IsType<int>(operands[1]));
+        Assert.Equal("greet", Assert.IsType<string>(operands[2]));
+        Assert.NotEmpty(Assert.IsType<string[]>(operands[3]));
+        Assert.True(Assert.IsType<int>(operands[4]) >= 0);
+
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+        Assert.Equal("Hi, Bob! Age: 30", vm.GetGlobalVariable("result"));
+    }
+
     [Fact]
     public void NamedArguments_AllNamed_ExecutesCorrectly()
     {

@@ -21,6 +21,22 @@ if (args.Length > 0 && args[0] == "--quick")
     return;
 }
 
+// 如果传入 --vm 参数，运行 VM 基准测试
+if (args.Length > 0 && args[0] == "--vm")
+{
+    Console.WriteLine("运行 VM 模式基准测试...\n");
+    BenchmarkRunner.Run<VMModePerformanceBenchmarks>();
+    return;
+}
+
+// 如果传入 --vm-report 参数，输出 VM 性能报告到 Reports/
+if (args.Length > 0 && args[0] == "--vm-report")
+{
+    Console.WriteLine("生成 VM 性能报告...\n");
+    VMPerformanceReport.RunAndWriteReport();
+    return;
+}
+
 // // 运行反射性能基准测试（新增）
 // Console.WriteLine("正在运行反射性能基准测试...");
 // Console.WriteLine("对比优化前后的性能差异\n");

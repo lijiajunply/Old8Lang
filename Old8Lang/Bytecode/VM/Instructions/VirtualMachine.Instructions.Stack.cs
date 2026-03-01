@@ -1,5 +1,6 @@
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
+using System.Runtime.CompilerServices;
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
@@ -9,6 +10,7 @@ public partial class VirtualMachine
     /// <summary>
     /// 执行栈操作指令
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ExecuteStackOperation(Instruction instruction, CallFrame frame)
     {
         switch (instruction.OpCode)

@@ -279,6 +279,8 @@ public partial class BytecodeVisitor
                 }
 
                 // 检查是否是原生函数
+                int funcIndex = _compiler.GetFunctionIndex(funcName);
+                bool hasFunctionIndex = funcIndex >= 0;
                 if (_compiler.IsNativeFunction(funcName))
                 {
                     if (namedCount > 0)
@@ -299,14 +301,26 @@ public partial class BytecodeVisitor
                 {
                     if (namedCount > 0)
                     {
-                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
                         var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                        Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                        }
                     }
                     else
                     {
-                        // 无命名参数: [argCount, funcName]
-                        Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, funcName, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                        }
                     }
                 }
                 // 检查是否是异步函数（非生成器）
@@ -320,22 +334,40 @@ public partial class BytecodeVisitor
                     }
                     else
                     {
-                        // 无命名参数: [argCount, funcName]
-                        Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.CallAsync, new object[] { positionalCount, funcName, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                        }
                     }
                 }
                 else
                 {
                     if (namedCount > 0)
                     {
-                        // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
                         var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
-                        Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                        }
                     }
                     else
                     {
-                        // 无命名参数: [argCount, funcName]
-                        Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, funcName, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, funcName });
+                        }
                     }
                 }
             }

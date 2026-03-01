@@ -1,4 +1,5 @@
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
+using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.Tests.VirtualMachine.Functions;
 
@@ -7,6 +8,55 @@ namespace Old8Lang.Tests.VirtualMachine.Functions;
 /// </summary>
 public class VMFunctionCallTests
 {
+    [Fact]
+    public void FunctionCall_EmitsFunctionIndexOperand_AndExecutes()
+    {
+        var code = @"
+            func add(a:int, b:int) -> int {
+                return a + b
+            }
+
+            result <- add(1, 2)
+        ";
+
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var mainFunction = bytecodeFile.Functions[bytecodeFile.EntryPointIndex];
+        var callInstruction = mainFunction.Instructions.First(i => i.OpCode == OpCode.Call);
+        var operands = Assert.IsType<object[]>(callInstruction.Operand);
+
+        Assert.Equal(3, operands.Length);
+        Assert.Equal(2, Assert.IsType<int>(operands[0]));
+        Assert.Equal("add", Assert.IsType<string>(operands[1]));
+        Assert.True(Assert.IsType<int>(operands[2]) >= 0);
+
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+        Assert.Equal(3, vm.GetGlobalVariable("result"));
+    }
+
+    [Fact]
+    public void FunctionCall_InvalidFunctionIndex_FallsBackToFunctionName()
+    {
+        var code = @"
+            func add(a:int, b:int) -> int {
+                return a + b
+            }
+
+            result <- add(10, 20)
+        ";
+
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var mainFunction = bytecodeFile.Functions[bytecodeFile.EntryPointIndex];
+        int callInstructionIndex = mainFunction.Instructions.FindIndex(i => i.OpCode == OpCode.Call);
+        Assert.True(callInstructionIndex >= 0);
+
+        mainFunction.Instructions[callInstructionIndex].Operand = new object[] { 2, "add", 9_999_999 };
+
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+        Assert.Equal(30, vm.GetGlobalVariable("result"));
+    }
+
     [Fact]
     public void FunctionCall_WithDefaultParameters_ExecutesCorrectly()
     {
