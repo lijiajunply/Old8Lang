@@ -31,6 +31,16 @@ public partial class VirtualMachine
                 throw new InvalidOperationError(new SourcePosition(),
                     $"找不到与参数类型匹配的 {funcName} 函数重载。参数类型: {string.Join(", ", args.Select(a => a?.GetType().Name ?? "null"))}");
             }
+            catch (Old8Exception)
+            {
+                // Old8Lang 自有异常直接透传，避免重复包装带来的额外分配与丢失语义。
+                throw;
+            }
+            catch (VmException)
+            {
+                // VM throw 语义异常也直接透传。
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new InvalidOperationError(new SourcePosition(), $"调用全局函数 {funcName} 时发生错误: {ex.Message}");

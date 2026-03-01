@@ -167,12 +167,22 @@ public partial class VirtualMachine
 /// 虚拟机异常包装类
 /// 用于在C#异常机制中传递Old8Lang的异常对象
 /// </summary>
-public class VmException(object? value) : Exception(GetMessage(value))
+public sealed class VmException : Exception
 {
-    public object? Value { get; } = value;
+    private readonly object? _value;
+    private string? _cachedMessage;
 
+    public VmException(object? value)
+        : base(string.Empty)
+    {
+        _value = value;
+    }
 
-    private static string GetMessage(object? value)
+    public object? Value => _value;
+
+    public override string Message => _cachedMessage ??= BuildMessage(_value);
+
+    private static string BuildMessage(object? value)
     {
         if (value == null) return "null";
         if (value is LangValueType langValue) return langValue.ToDisplayString();

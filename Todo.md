@@ -8,6 +8,8 @@
 - [x] P1-1（部分）：参数类型校验热路径优化（基础类型快速判定）已完成并通过回归测试。
 - [x] P1-1（剩余）：补充“仅位置参数且无需默认值补全”调度级 fast path（已完成）。
 - [x] P1-1（补充）：`CallAsync` 命名参数路径去重，避免重复 `NormalizeArguments/ValidateParameterTypes`（已完成）。
+- [x] P1-2（部分）：全局函数调用异常路径避免重复包装（`Old8Exception/VmException` 直通，未知异常再包装）。
+- [x] P1-2（部分）：`VmException` 消息延迟构建，降低高抛异常热路径的即时字符串开销。
 
 ## 结论摘要
 
