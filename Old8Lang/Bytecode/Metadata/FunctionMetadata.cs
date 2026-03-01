@@ -24,6 +24,8 @@ public class FunctionMetadata
     private int _parameterIndexMapCount = -1;
     private FastParameterTypeKind[]? _fastParameterKinds;
     private int _fastParameterKindsCount = -1;
+    private Dictionary<int, ExceptionDispatchCandidate[]>? _exceptionDispatchCandidatesByIp;
+    private int _exceptionDispatchCacheTableCount = -1;
 
     /// <summary>函数名称</summary>
     public string Name { get; set; } = "";
@@ -216,6 +218,55 @@ public class FunctionMetadata
         return $"Function {Name}({string.Join(", ", Parameters)}) [{Instructions.Count} instructions]";
     }
 
+    public readonly struct ExceptionDispatchCandidate
+    {
+        public ExceptionDispatchCandidate(ExceptionTableEntry entry, bool inTryBlock, bool inCatchBlock)
+        {
+            Entry = entry;
+            InTryBlock = inTryBlock;
+            InCatchBlock = inCatchBlock;
+        }
+
+        public ExceptionTableEntry Entry { get; }
+        public bool InTryBlock { get; }
+        public bool InCatchBlock { get; }
+    }
+
+    /// <summary>
+    /// 获取异常指令位置对应的候选处理器（热路径缓存，保持异常表原有顺序）。
+    /// </summary>
+    public ExceptionDispatchCandidate[] GetExceptionDispatchCandidates(int instructionPointer)
+    {
+        EnsureExceptionDispatchCache();
+
+        if (_exceptionDispatchCandidatesByIp!.TryGetValue(instructionPointer, out var cached))
+        {
+            return cached;
+        }
+
+        if (ExceptionTable.Count == 0)
+        {
+            cached = [];
+            _exceptionDispatchCandidatesByIp[instructionPointer] = cached;
+            return cached;
+        }
+
+        var candidates = new List<ExceptionDispatchCandidate>(ExceptionTable.Count);
+        foreach (var entry in ExceptionTable)
+        {
+            var inTry = entry.IsInTryBlock(instructionPointer);
+            var inCatch = entry.IsInCatchBlock(instructionPointer);
+            if (inTry || inCatch)
+            {
+                candidates.Add(new ExceptionDispatchCandidate(entry, inTry, inCatch));
+            }
+        }
+
+        cached = candidates.Count == 0 ? [] : candidates.ToArray();
+        _exceptionDispatchCandidatesByIp[instructionPointer] = cached;
+        return cached;
+    }
+
     /// <summary>
     /// 尝试获取参数名对应的索引（命名参数绑定热路径缓存）
     /// </summary>
@@ -292,6 +343,17 @@ public class FunctionMetadata
 
         _fastParameterKinds = kinds;
         _fastParameterKindsCount = ParameterTypes.Count;
+    }
+
+    private void EnsureExceptionDispatchCache()
+    {
+        if (_exceptionDispatchCandidatesByIp is not null && _exceptionDispatchCacheTableCount == ExceptionTable.Count)
+        {
+            return;
+        }
+
+        _exceptionDispatchCandidatesByIp = new Dictionary<int, ExceptionDispatchCandidate[]>();
+        _exceptionDispatchCacheTableCount = ExceptionTable.Count;
     }
 
     /// <summary>

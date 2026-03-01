@@ -48,6 +48,11 @@ public partial class VirtualMachine
     /// <returns>如果找到并处理了异常返回true，否则返回false</returns>
     private bool HandleException(Exception exception, CallFrame frame, FunctionMetadata function)
     {
+        if (function.ExceptionTable.Count == 0)
+        {
+            return false;
+        }
+
         // 提取真实的异常对象
         object? exceptionValue = exception;
         if (exception is VmException vmException)
@@ -58,12 +63,15 @@ public partial class VirtualMachine
         // 获取异常发生时的指令位置（已经+1了，所以要-1）
         int exceptionIP = frame.IP - 1;
 
-        // 遍历异常表，查找匹配的处理器（从内到外）
-        foreach (var entry in function.ExceptionTable)
+        // 获取候选处理器（按异常表顺序，使用 FunctionMetadata 内缓存减少热路径扫描开销）。
+        var candidates = function.GetExceptionDispatchCandidates(exceptionIP);
+
+        // 遍历候选处理器，查找匹配项（从内到外，顺序与异常表一致）
+        foreach (var candidate in candidates)
         {
-            // 检查异常是否发生在这个try块或catch块中
-            bool inTryBlock = entry.IsInTryBlock(exceptionIP);
-            bool inCatchBlock = entry.IsInCatchBlock(exceptionIP);
+            var entry = candidate.Entry;
+            bool inTryBlock = candidate.InTryBlock;
+            bool inCatchBlock = candidate.InCatchBlock;
 
             if (inTryBlock || inCatchBlock)
             {

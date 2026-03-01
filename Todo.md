@@ -10,6 +10,7 @@
 - [x] P1-1（补充）：`CallAsync` 命名参数路径去重，避免重复 `NormalizeArguments/ValidateParameterTypes`（已完成）。
 - [x] P1-2（部分）：全局函数调用异常路径避免重复包装（`Old8Exception/VmException` 直通，未知异常再包装）。
 - [x] P1-2（部分）：`VmException` 消息延迟构建，降低高抛异常热路径的即时字符串开销。
+- [x] P1-2（部分）：按异常指令 IP 缓存候选处理器，避免高抛异常场景重复全表扫描 `ExceptionTable`。
 
 ## 结论摘要
 
