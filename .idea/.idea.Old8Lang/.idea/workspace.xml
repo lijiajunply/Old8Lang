@@ -23,14 +23,74 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyBase.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyConfig.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickBase.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickConfig.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMNightlyPerformanceBenchmarks.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMQuickPerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Interpreter/InterpreterBenchmarkBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Interpreter/InterpreterExecutionBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Interpreter/InterpreterFunctionCallBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Interpreter/InterpreterLoopExecutionBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Interpreter/InterpreterVariableLookupBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Legacy/LegacyAdvancedPerformanceBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Parser/ParserCompilerBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Parser/ParserCoreBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Parser/ParserLargeDataPerformanceBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Parser/ParserMemoryUsageBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Parser/ParserTypeInferenceBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Reflection/ReflectionPerformanceBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/Reflection/SimpleReflectionBenchmark.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Base/VMBenchmarkBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Base/VMBenchmarkNightlyBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Base/VMBenchmarkQuickBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Config/VMBenchmarkConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Config/VMBenchmarkNightlyConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Config/VMBenchmarkQuickConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMExtendedPerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMModePerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMNightlyPerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMQuickPerformanceBenchmarks.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkArgumentParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkProgram.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/BenchmarkArgumentParserTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/MemoryLeakTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/VMPerformanceReportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/GenerateTestData.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/PerformanceMonitor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/PerformanceValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/TestDataGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/AdvancedPerformanceTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkArgumentParserTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/FunctionCallBenchmark.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/GenerateTestData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/LargeDataPerformanceTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/LoopExecutionBenchmark.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/MemoryLeakTest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/MemoryUsageTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/PerformanceMonitor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/PerformanceValidator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ReflectionPerformanceBenchmark.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/TestDataGenerator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkConfig.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkNightlyConfig.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMBenchmarkQuickConfig.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMExtendedPerformanceBenchmarks.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMModePerformanceBenchmarks.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMNightlyPerformanceBenchmarks.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReport.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMPerformanceReportTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VMQuickPerformanceBenchmarks.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/VariableLookupBenchmark.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +101,7 @@
     <option name="firstShow" value="false" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="751" />
+    <option name="cachedIndexableFilesCount" value="759" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -187,28 +247,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
-    <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/FirstUI.TestApp/FirstUI.TestApp.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected=".NET 项目.Old8Lang.Benchmarks">
     <configuration name="Old8Lang.App" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net10.0/Old8Lang.App" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -231,9 +270,9 @@
       </method>
     </configuration>
     <configuration name="Old8Lang.Benchmarks" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.Benchmarks/bin/Debug/net10.0/Old8Lang.Benchmarks" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.Benchmarks/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -246,15 +285,15 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
+      <option name="PROJECT_TFM" value="net10.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <configuration name="Old8Lang.LanguageServer" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.LanguageServer/bin/Debug/net10.0/Old8Lang.LanguageServer" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.LanguageServer/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -267,86 +306,16 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.PackageManager" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager/Old8Lang.PackageManager.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.PackageManager.Tests" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager.Tests/Old8Lang.PackageManager.Tests.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.FirstUI.FirstUIBinding.Initialize" type="DotNetStaticMethod" factoryName=".NET Static Method" temporary="true">
-      <option name="EXE_PATH" value="$APPLICATION_HOME_DIR$/lib/ReSharperHost/JetLauncherILc.exe" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/FirstUI/FirstUI.csproj" />
       <option name="PROJECT_TFM" value="net10.0" />
-      <option name="CLASS_NAME" value="Old8Lang.FirstUI.FirstUIBinding" />
-      <option name="METHOD_NAME" value="Initialize" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <list>
-      <item itemvalue=".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize" />
-      <item itemvalue=".NET 项目.FirstUI.TestApp" />
       <item itemvalue=".NET 项目.Old8Lang.LanguageServer" />
-      <item itemvalue=".NET 项目.Old8Lang.PackageManager" />
-      <item itemvalue=".NET 项目.Old8Lang.PackageManager.Tests" />
       <item itemvalue=".NET 项目.Old8Lang.Benchmarks" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue=".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -612,6 +581,8 @@
       <workItem from="1771992969295" duration="688000" />
       <workItem from="1772335461211" duration="4496000" />
       <workItem from="1772340986312" duration="4289000" />
+      <workItem from="1772378960908" duration="240000" />
+      <workItem from="1772379564921" duration="1058000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -956,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="963" />
+    <option name="localTasksCounter" value="964" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -983,7 +954,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(benchmark): 更新解析器性能测试报告&#10;&#10;- 添加了详细的性能指标数据，包括平均值、误差、标准差、中位数等&#10;- 新增内存分配统计信息，包含Gen0、Gen1、Gen2垃圾回收统计&#10;- 更新了HTML报告标题中的时间戳&#10;- 扩展了测试用例覆盖范围，增加深度嵌套表达式解析等场景&#10;- 补充了并发解析和语法错误处理的性能数据&#10;- 完善了大文件解析的基准测试结果" />
     <MESSAGE value="perf(interpreter): 添加中等规模程序和递归调用性能测试&#10;&#10;- 创建 medium-program-1000lines.old8 测试脚本包含数学函数、数组处理、字符串操作等&#10;- 添加 recursive-calls.old8 测试脚本验证递归深度和性能表现&#10;- 实现 MediumProgramPerformanceTests 验证千行程序执行时间小于2秒&#10;- 创建 RecursiveCallPerformanceTests 确保支持至少100层递归深度&#10;- 添加精简版 medium-program-simple.old8 用于快速性能验证&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
     <MESSAGE value="fix(interpreter): 解决扩展方法导致的栈溢出和方法查找问题&#10;&#10;- 修改 ExtensionDeclaration 映射内置类型到正确的 LangValue 类型&#10;- 在 ExtensionMethodWrapper 中添加递归检测机制防止栈溢出&#10;- 实现内置方法优先级高于扩展方法的查找逻辑&#10;- 确保方法名匹配区分大小写避免 toStr 和 ToStr 冲突&#10;- 添加扩展方法标识属性用于方法查找优先级判断&#10;- 修复实例方法重载组中内置方法优先匹配的逻辑&#10;- 更新方法注册表使用大小写敏感的字符串比较器&#10;- 在 VariateManager 中添加扩展方法调用栈跟踪功能" />
     <MESSAGE value="fix(interpreter): 修复扩展方法执行中的返回值处理和方法查找问题&#10;&#10;- 移除 ExtensionMethodWrapper 中的调试空检查代码&#10;- 修改返回值处理逻辑，先获取结果再清除返回状态&#10;- 将测试代码中的 Count() 方法调用改为 len() 函数调用&#10;- 修复 LangValueType 中 FromClassToResult 方法调用传递 manager 参数&#10;- 在 ListLangValue 中添加 Count() 方法的特殊处理逻辑&#10;- 更新 .claude 配置文件添加 powershell.exe 路径排除&#10;- 更新 IDE 工作区配置文件中的变更列表和任务计数器" />
@@ -1008,7 +978,8 @@
     <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制" />
     <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制&#10;- 生成 VM 性能报告的 JSON 和 Markdown 文件格式&#10;- 更新 IDE 配置文件中的变更列表和任务计数器设置" />
     <MESSAGE value="test(vm): 启用虚拟机相关功能的单元测试&#10;&#10;- 移除 VMExceptionTests 中嵌套异常测试的跳过标记&#10;- 移除 VMListTests 中列表添加和删除操作测试的跳过标记&#10;- 移除 VMStringOperationTests 中字符串子串和索引查找测试的跳过标记&#10;- 更新单元测试配置以确保测试正常运行" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(vm): 启用虚拟机相关功能的单元测试&#10;&#10;- 移除 VMExceptionTests 中嵌套异常测试的跳过标记&#10;- 移除 VMListTests 中列表添加和删除操作测试的跳过标记&#10;- 移除 VMStringOperationTests 中字符串子串和索引查找测试的跳过标记&#10;- 更新单元测试配置以确保测试正常运行" />
+    <MESSAGE value="feat(benchmark): 添加VM基准测试命令解析和多层级性能报告功能&#10;&#10;- 实现BenchmarkArgumentParser用于解析多种VM基准测试命令参数&#10;- 添加VMQuickPerformanceBenchmarks和VMNightlyPerformanceBenchmarks两类基准测试&#10;- 集成CI/CD工作流支持PR/Push场景的快速基准测试和夜间完整基准测试&#10;- 实现多层级VM性能报告生成功能包括Quick、Nightly等不同报告类型&#10;- 添加基准测试结果验证机制和性能回归检测功能&#10;- 更新文档说明各种VM基准测试命令的使用方法" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(benchmark): 添加VM基准测试命令解析和多层级性能报告功能&#10;&#10;- 实现BenchmarkArgumentParser用于解析多种VM基准测试命令参数&#10;- 添加VMQuickPerformanceBenchmarks和VMNightlyPerformanceBenchmarks两类基准测试&#10;- 集成CI/CD工作流支持PR/Push场景的快速基准测试和夜间完整基准测试&#10;- 实现多层级VM性能报告生成功能包括Quick、Nightly等不同报告类型&#10;- 添加基准测试结果验证机制和性能回归检测功能&#10;- 更新文档说明各种VM基准测试命令的使用方法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
