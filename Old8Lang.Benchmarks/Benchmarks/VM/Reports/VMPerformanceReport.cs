@@ -279,7 +279,7 @@ public static class VMPerformanceReport
             }
         }
 
-        var requiredColumns = new[] { "Method", "Mean", "StdDev", "Allocated" };
+        var requiredColumns = new[] { "Method", "Mean" };
         foreach (var column in requiredColumns)
         {
             if (!headerIndex.ContainsKey(column))
@@ -303,8 +303,8 @@ public static class VMPerformanceReport
             }
 
             var rawMean = ReadField(fields, headerIndex, "Mean");
-            var rawStdDev = ReadField(fields, headerIndex, "StdDev");
-            var rawAllocated = ReadField(fields, headerIndex, "Allocated");
+            var rawStdDev = ReadFieldWithFallback(fields, headerIndex, "StdDev", "Error");
+            var rawAllocated = ReadField(fields, headerIndex, "Allocated", "NA");
 
             job = ReadField(fields, headerIndex, "Job", job);
             runtime = ReadField(fields, headerIndex, "Runtime", runtime);
@@ -370,6 +370,22 @@ public static class VMPerformanceReport
 
         var value = fields[index].Trim();
         return string.IsNullOrEmpty(value) ? fallback : value;
+    }
+
+    private static string ReadFieldWithFallback(
+        string[] fields,
+        IReadOnlyDictionary<string, int> headerIndex,
+        string primaryColumn,
+        string fallbackColumn,
+        string fallback = "")
+    {
+        var value = ReadField(fields, headerIndex, primaryColumn, string.Empty);
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        return ReadField(fields, headerIndex, fallbackColumn, fallback);
     }
 
     private static double? ParseDurationToMilliseconds(string raw, out string? warning)

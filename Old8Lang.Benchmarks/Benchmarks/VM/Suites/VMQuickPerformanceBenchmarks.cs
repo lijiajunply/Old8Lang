@@ -28,7 +28,7 @@ public class VMQuickPerformanceBenchmarks : VMBenchmarkQuickBase
     [GlobalSetup]
     public void Setup()
     {
-        var fixedPath = Path.Combine(AppContext.BaseDirectory, "TestData", "vm_large_10000.old8");
+        var fixedPath = ResolveTestDataPath("vm_large_10000.old8");
         if (!File.Exists(fixedPath))
         {
             throw new FileNotFoundException($"固定大文件测试数据不存在: {fixedPath}");

@@ -15,6 +15,35 @@ namespace Old8Lang.Benchmarks.Benchmarks.VM.Base;
 [Config(typeof(VMBenchmarkConfig))]
 public abstract class VMBenchmarkBase
 {
+    protected static string ResolveTestDataPath(string fileName)
+    {
+        var directPath = Path.Combine(AppContext.BaseDirectory, "TestData", fileName);
+        if (File.Exists(directPath))
+        {
+            return directPath;
+        }
+
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current is not null)
+        {
+            var candidateInCurrent = Path.Combine(current.FullName, "TestData", fileName);
+            if (File.Exists(candidateInCurrent))
+            {
+                return candidateInCurrent;
+            }
+
+            var candidateInProject = Path.Combine(current.FullName, "Old8Lang.Benchmarks", "TestData", fileName);
+            if (File.Exists(candidateInProject))
+            {
+                return candidateInProject;
+            }
+
+            current = current.Parent;
+        }
+
+        throw new FileNotFoundException($"固定大文件测试数据不存在: {directPath}");
+    }
+
     protected static BytecodeFile CompileToBytecode(string code)
     {
         var interpreter = new LangInterpreter();
