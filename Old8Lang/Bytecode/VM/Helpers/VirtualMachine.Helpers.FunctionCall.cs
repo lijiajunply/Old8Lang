@@ -192,16 +192,16 @@ public partial class VirtualMachine
         var args = new object?[paramCount];
         var filled = new bool[paramCount]; // 跟踪哪些参数位置已被填充
 
-        // 首先填充位置参数
-        for (int i = 0; i < positionalArgs.Length; i++)
+        if (positionalArgs.Length > paramCount)
         {
-            if (i >= paramCount)
-            {
-                throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
-            }
+            throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 期望 {paramCount} 个参数，但提供了过多的参数");
+        }
 
-            args[i] = positionalArgs[i];
-            filled[i] = true;
+        // 首先填充位置参数
+        if (positionalArgs.Length > 0)
+        {
+            Array.Copy(positionalArgs, args, positionalArgs.Length);
+            Array.Fill(filled, true, 0, positionalArgs.Length);
         }
 
         // 然后根据命名参数填充剩余位置
@@ -211,8 +211,7 @@ public partial class VirtualMachine
             object? paramValue = namedArgValues[i];
 
             // 查找参数在函数参数列表中的位置
-            int paramIndex = function.Parameters.IndexOf(paramName);
-            if (paramIndex == -1)
+            if (!function.TryGetParameterIndex(paramName, out var paramIndex))
             {
                 throw new ArgumentError(new SourcePosition(), $"函数 {function.Name} 没有名为 '{paramName}' 的参数");
             }

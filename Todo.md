@@ -1,5 +1,13 @@
 # VM 模式性能优化 TODO（基于 2026-03-02 Quick 报告）
 
+## 进度更新（2026-03-02）
+
+- [x] P0-1：修复 `ChannelSend` 在 VM 线程中的异步阻塞异常（已完成，基准不再因该异常直接 NA）。
+- [x] P0-2：Quick 报告增加失败场景显式标记和 `FailureReason` 提取（已完成）。
+- [x] P1-1（部分）：命名参数绑定热路径优化（参数名索引缓存 + 参数数组填充优化）已完成并通过回归测试。
+- [x] P1-1（部分）：参数类型校验热路径优化（基础类型快速判定）已完成并通过回归测试。
+- [ ] P1-1（剩余）：补充“仅位置参数且无需默认值补全”调度级 fast path（可继续减少调用分派开销）。
+
 ## 结论摘要
 
 - 当前最紧急问题不是“慢”，而是 **`VMXQ_Concurrency_Channel_MPMC_4Workers` 基准失效（NA）**，导致并发通道路径无法评估。
@@ -15,7 +23,7 @@
 
 ## P0（必须先做）
 
-- [ ] 修复 `ChannelSend` 在 VM 线程中抛出 `The asynchronous operation has not completed` 的问题。
+- [x] 修复 `ChannelSend` 在 VM 线程中抛出 `The asynchronous operation has not completed` 的问题。
   - 证据：`BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-20260302-001859.log`
   - 当前栈：`VirtualMachine.Helpers.FunctionCall.cs:36` 触发 `ChannelSend` 全局函数异常
   - 代码点：
@@ -24,7 +32,7 @@
   - 建议修复：避免直接对未完成 `ValueTask` 调 `GetAwaiter().GetResult()`；改为同步可等待路径（例如 `AsTask().GetAwaiter().GetResult()` 或 `WaitToWriteAsync + TryWrite`）。
   - 验收：`VMXQ_Concurrency_Channel_MPMC_4Workers` 不再为 `NA`，两套 Job 都产生有效 `Mean/StdDev/Allocated`。
 
-- [ ] 给 Quick 报告增加“失败场景显式标记”与“失败原因提取”。
+- [x] 给 Quick 报告增加“失败场景显式标记”与“失败原因提取”。
   - 代码点：`Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs`
   - 问题：当前只显示 `N/A`，没有把失败原因（异常摘要）带入报告，不利于 CI 快速定位。
   - 验收：报告中对 `NA` 场景新增 `FailureReason`（至少包含异常类型+关键消息）。

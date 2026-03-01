@@ -328,7 +328,10 @@ public partial class VirtualMachine
         if (function.ParameterTypes == null || function.ParameterTypes.Count == 0)
             return;
 
-        for (int i = 0; i < Math.Min(args.Length, function.ParameterTypes.Count); i++)
+        var checkCount = Math.Min(args.Length, function.ParameterTypes.Count);
+        var hasGenericMapping = function.GenericTypeMapping is { Count: > 0 };
+
+        for (int i = 0; i < checkCount; i++)
         {
             var expectedType = function.ParameterTypes[i];
 
@@ -336,9 +339,34 @@ public partial class VirtualMachine
             if (string.IsNullOrEmpty(expectedType))
                 continue;
 
+            var actualValue = args[i];
+
+            // 热路径快速校验：无泛型映射时，常见基础类型可直接判定，避免通用类型解析分支开销。
+            if (!hasGenericMapping)
+            {
+                var fastTypeKind = function.GetFastParameterTypeKind(i);
+                if (fastTypeKind != FunctionMetadata.FastParameterTypeKind.Other &&
+                    fastTypeKind != FunctionMetadata.FastParameterTypeKind.None)
+                {
+                    if (!FastTypeMatches(fastTypeKind, actualValue))
+                    {
+                        var actualType = GetValueTypeName(actualValue);
+                        var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
+                        throw new TypeError(
+                            GetPosition(instruction),
+                            expectedType,
+                            actualType,
+                            $"参数 '{paramName}' 类型不匹配"
+                        );
+                    }
+
+                    continue;
+                }
+            }
+
             // 如果函数有泛型类型映射，替换泛型类型参数
             var resolvedType = expectedType;
-            if (function.GenericTypeMapping is { Count: > 0 })
+            if (hasGenericMapping)
             {
                 // 检查 GenericTypeMapping 中是否包含泛型类型参数（如 Wrapper<T>）
                 // 这是编译器的一个 bug，会导致类型解析错误
@@ -353,8 +381,6 @@ public partial class VirtualMachine
                 resolvedType = ResolveGenericType(expectedType, function.GenericTypeMapping);
             }
 
-            var actualValue = args[i];
-
             // 使用 CheckTypeMatch 进行类型检查
             if (!CheckTypeMatch(resolvedType, actualValue))
             {
@@ -368,6 +394,21 @@ public partial class VirtualMachine
                 );
             }
         }
+    }
+
+    private static bool FastTypeMatches(FunctionMetadata.FastParameterTypeKind kind, object? value)
+    {
+        return kind switch
+        {
+            FunctionMetadata.FastParameterTypeKind.Int => value is int,
+            FunctionMetadata.FastParameterTypeKind.Double => value is double or int,
+            FunctionMetadata.FastParameterTypeKind.String => value is string,
+            FunctionMetadata.FastParameterTypeKind.Bool => value is bool,
+            FunctionMetadata.FastParameterTypeKind.Char => value is char,
+            FunctionMetadata.FastParameterTypeKind.Any => true,
+            FunctionMetadata.FastParameterTypeKind.Object => true,
+            _ => false
+        };
     }
 
     /// <summary>

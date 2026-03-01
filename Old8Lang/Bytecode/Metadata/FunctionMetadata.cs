@@ -7,6 +7,24 @@ namespace Old8Lang.Bytecode.Metadata;
 /// </summary>
 public class FunctionMetadata
 {
+    public enum FastParameterTypeKind : byte
+    {
+        None = 0,
+        Int = 1,
+        Double = 2,
+        String = 3,
+        Bool = 4,
+        Char = 5,
+        Any = 6,
+        Object = 7,
+        Other = 255
+    }
+
+    private Dictionary<string, int>? _parameterIndexMap;
+    private int _parameterIndexMapCount = -1;
+    private FastParameterTypeKind[]? _fastParameterKinds;
+    private int _fastParameterKindsCount = -1;
+
     /// <summary>函数名称</summary>
     public string Name { get; set; } = "";
 
@@ -196,6 +214,84 @@ public class FunctionMetadata
     public override string ToString()
     {
         return $"Function {Name}({string.Join(", ", Parameters)}) [{Instructions.Count} instructions]";
+    }
+
+    /// <summary>
+    /// 尝试获取参数名对应的索引（命名参数绑定热路径缓存）
+    /// </summary>
+    public bool TryGetParameterIndex(string parameterName, out int index)
+    {
+        EnsureParameterIndexMap();
+        return _parameterIndexMap!.TryGetValue(parameterName, out index);
+    }
+
+    private void EnsureParameterIndexMap()
+    {
+        if (_parameterIndexMap is not null && _parameterIndexMapCount == Parameters.Count)
+        {
+            return;
+        }
+
+        var map = new Dictionary<string, int>(Parameters.Count, StringComparer.Ordinal);
+        for (var i = 0; i < Parameters.Count; i++)
+        {
+            var name = Parameters[i];
+            if (!map.ContainsKey(name))
+            {
+                map[name] = i;
+            }
+        }
+
+        _parameterIndexMap = map;
+        _parameterIndexMapCount = Parameters.Count;
+    }
+
+    /// <summary>
+    /// 获取参数类型的快速分类（用于 VM 热路径类型校验）
+    /// </summary>
+    public FastParameterTypeKind GetFastParameterTypeKind(int index)
+    {
+        EnsureFastParameterKinds();
+        if (_fastParameterKinds is null || index < 0 || index >= _fastParameterKinds.Length)
+        {
+            return FastParameterTypeKind.Other;
+        }
+
+        return _fastParameterKinds[index];
+    }
+
+    private void EnsureFastParameterKinds()
+    {
+        if (_fastParameterKinds is not null && _fastParameterKindsCount == ParameterTypes.Count)
+        {
+            return;
+        }
+
+        var kinds = new FastParameterTypeKind[ParameterTypes.Count];
+        for (var i = 0; i < ParameterTypes.Count; i++)
+        {
+            var typeName = ParameterTypes[i];
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                kinds[i] = FastParameterTypeKind.None;
+                continue;
+            }
+
+            kinds[i] = typeName switch
+            {
+                _ when typeName.Equals("int", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Int,
+                _ when typeName.Equals("double", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Double,
+                _ when typeName.Equals("string", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.String,
+                _ when typeName.Equals("bool", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Bool,
+                _ when typeName.Equals("char", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Char,
+                _ when typeName.Equals("any", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Any,
+                _ when typeName.Equals("object", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Object,
+                _ => FastParameterTypeKind.Other
+            };
+        }
+
+        _fastParameterKinds = kinds;
+        _fastParameterKindsCount = ParameterTypes.Count;
     }
 
     /// <summary>
