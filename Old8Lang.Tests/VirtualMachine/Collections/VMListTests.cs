@@ -27,7 +27,7 @@ public class VMListTests
         Assert.IsAssignableFrom<System.Collections.IList>(result);
     }
 
-    [Fact(Skip = "虚拟机暂不支持对象方法调用（list.Add）")]
+    [Fact]
     public void List_Add_ExecutesCorrectly()
     {
         // Arrange
@@ -47,7 +47,7 @@ public class VMListTests
         Assert.Equal(5, vm.GetGlobalVariable("result"));
     }
 
-    [Fact(Skip = "虚拟机暂不支持对象方法调用（list.Remove）")]
+    [Fact]
     public void List_Remove_ExecutesCorrectly()
     {
         // Arrange

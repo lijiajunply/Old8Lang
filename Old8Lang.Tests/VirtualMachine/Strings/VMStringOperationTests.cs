@@ -65,7 +65,7 @@ public class VMStringOperationTests
         Assert.Equal(11, result);
     }
 
-    [Fact(Skip = "虚拟机不支持对象方法调用 - Substring方法未实现")]
+    [Fact]
     public void StringSubstring_ExecutesCorrectly()
     {
         // Arrange
@@ -85,7 +85,7 @@ public class VMStringOperationTests
         Assert.Equal("World", result);
     }
 
-    [Fact(Skip = "虚拟机不支持对象方法调用 - IndexOf方法未实现")]
+    [Fact]
     public void StringIndexOf_ExecutesCorrectly()
     {
         // Arrange
@@ -105,7 +105,7 @@ public class VMStringOperationTests
         Assert.Equal(6, result);
     }
 
-    [Fact(Skip = "虚拟机不支持对象方法调用 - IndexOf方法未实现")]
+    [Fact]
     public void StringIndexOf_NotFound_ExecutesCorrectly()
     {
         // Arrange

@@ -152,7 +152,7 @@ public class VMExceptionTests
 
     #region Nested Exception Tests
 
-    [Fact(Skip = "需要进一步调试 - 命令行测试通过但单元测试失败")]
+    [Fact]
     public void NestedTryCatch_InnerExceptionCaught()
     {
         // Arrange
@@ -187,7 +187,7 @@ test()
         Assert.DoesNotContain("Outer catch", output);
     }
 
-    [Fact(Skip = "需要进一步调试 - 命令行测试通过但单元测试失败")]
+    [Fact]
     public void NestedTryCatch_OuterExceptionCaught()
     {
         // Arrange
