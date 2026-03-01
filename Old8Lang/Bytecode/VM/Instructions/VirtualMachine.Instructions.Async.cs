@@ -72,6 +72,8 @@ public partial class VirtualMachine
                 string funcName;
                 int functionIndexHint;
                 object?[] args;
+                FunctionMetadata? function = null;
+                bool argsAlreadyNormalizedAndValidated = false;
 
                 if (operands.Length >= 4)
                 {
@@ -112,7 +114,8 @@ public partial class VirtualMachine
                     args = ArrangeArgumentsWithNamed(namedFunction, positionalArgs, namedArgNames, namedArgValues);
                     args = NormalizeArguments(namedFunction, args, GetPosition(instruction));
                     ValidateParameterTypes(namedFunction, args, instruction);
-                    functionIndexHint = _bytecodeFile.Functions.IndexOf(namedFunction);
+                    function = namedFunction;
+                    argsAlreadyNormalizedAndValidated = true;
                 }
                 else
                 {
@@ -128,8 +131,7 @@ public partial class VirtualMachine
                 }
 
                 // 优先使用函数索引，失败时按名称回退
-                FunctionMetadata? function = null;
-                if (functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
+                if (function == null && functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
                 {
                     var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
                     if (indexedFunction.Name == funcName)
@@ -144,8 +146,11 @@ public partial class VirtualMachine
                     throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
 
-                args = NormalizeArguments(function, args, GetPosition(instruction));
-                ValidateParameterTypes(function, args, instruction);
+                if (!argsAlreadyNormalizedAndValidated)
+                {
+                    args = NormalizeArguments(function, args, GetPosition(instruction));
+                    ValidateParameterTypes(function, args, instruction);
+                }
 
                 // 创建并启动任务
                 var task = Task.Run(() =>

@@ -39,6 +39,11 @@ public partial class VirtualMachine
         return functionIndex;
     }
 
+    private static bool CanSkipNormalizeForPositionalCall(FunctionMetadata function, int argCount)
+    {
+        return function.ParamsParameterIndex < 0 && argCount == function.Parameters.Count;
+    }
+
     private void ExecuteCallInstruction(Instruction instruction, CallFrame frame)
     {
         var operands = (object[])instruction.Operand!;
@@ -64,7 +69,9 @@ public partial class VirtualMachine
             if (TryResolveCallableFunction(frame, funcName, functionIndexHint, out var function, out var closureEnvironment,
                     out var closureConstantPool))
             {
-                var normalizedArgs = NormalizeArguments(function, args, position);
+                var normalizedArgs = CanSkipNormalizeForPositionalCall(function, args.Length)
+                    ? args
+                    : NormalizeArguments(function, args, position);
                 ValidateParameterTypes(function, normalizedArgs, instruction);
                 InvokeResolvedFunction(function, normalizedArgs, closureEnvironment, closureConstantPool);
                 return;
