@@ -340,22 +340,34 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
-        var task = wrapper.Resource.Reader.ReadAsync().AsTask();
-        if (task.Wait(timeoutMs))
+        var reader = wrapper.Resource.Reader;
+
+        if (reader.TryRead(out var value))
         {
-            try
-            {
-                var result = task.GetAwaiter().GetResult();
-                return ChannelReceiveResult.FromValue(result);
-            }
-            catch (InvalidOperationException)
-            {
-                // 任务未完成或被取消
-                return ChannelReceiveResult.Failed;
-            }
+            return ChannelReceiveResult.FromValue(value);
         }
 
-        return ChannelReceiveResult.Failed;
+        using var cts = timeoutMs >= 0
+            ? new CancellationTokenSource(timeoutMs)
+            : new CancellationTokenSource();
+
+        try
+        {
+            // 先等待可读，再显式 TryRead，避免 ReadAsync 超时后遗留挂起读取任务导致消息被“吞掉”。
+            var canRead = reader.WaitToReadAsync(cts.Token).AsTask().GetAwaiter().GetResult();
+            if (!canRead)
+            {
+                return ChannelReceiveResult.Failed;
+            }
+
+            return reader.TryRead(out value)
+                ? ChannelReceiveResult.FromValue(value)
+                : ChannelReceiveResult.Failed;
+        }
+        catch (OperationCanceledException)
+        {
+            return ChannelReceiveResult.Failed;
+        }
     }
 
     public static void CloseChannel(int channelId)
