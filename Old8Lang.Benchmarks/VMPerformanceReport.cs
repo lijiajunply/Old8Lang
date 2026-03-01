@@ -29,6 +29,30 @@ public static class VMPerformanceReport
         IReadOnlyList<string> Warnings,
         IReadOnlyList<VmScenarioResult> Scenarios);
 
+    private sealed record ExtendedScenarioResult(
+        string Scenario,
+        string Category,
+        double? MeanMs,
+        double? StdDevMs,
+        double? P95Ms,
+        long? AllocatedBytes,
+        double? ThroughputOpsPerSec,
+        double? AllocatedBytesPerOp,
+        string SoftGateStatus,
+        double? BaselineMeanMs,
+        double? MeanChangePct,
+        long? BaselineAllocatedBytes,
+        double? AllocatedChangePct,
+        string RawMean,
+        string RawAllocated);
+
+    private sealed record ExtendedReportModel(
+        DateTime GeneratedAt,
+        string SourceCsv,
+        string? BaselineJson,
+        IReadOnlyList<string> Warnings,
+        IReadOnlyList<ExtendedScenarioResult> Scenarios);
+
     /// <summary>
     /// 从 BenchmarkDotNet artifacts 解析并生成 VM 报告（md + json）
     /// </summary>
@@ -50,6 +74,52 @@ public static class VMPerformanceReport
         return (markdownPath, jsonPath);
     }
 
+    /// <summary>
+    /// 从 BenchmarkDotNet artifacts 解析并生成扩展 VM 报告（md + json）
+    /// </summary>
+    /// <param name="artifactsDir">BenchmarkDotNet.Artifacts/results 目录</param>
+    /// <param name="reportsDir">报告输出目录（通常为 Reports）</param>
+    /// <returns>Markdown 与 JSON 报告路径</returns>
+    public static (string MarkdownPath, string JsonPath) GenerateExtendedFromBenchmarkArtifacts(string artifactsDir, string reportsDir)
+    {
+        var csvPath = ResolveLatestCsvByPattern(artifactsDir, "*VMExtendedPerformanceBenchmarks*-report.csv",
+            "未找到扩展 VM BenchmarkDotNet 报告 CSV");
+        var parsed = ParseCsv(csvPath);
+        Directory.CreateDirectory(reportsDir);
+        var baselineJson = ResolveLatestExtendedBaselineJson(reportsDir);
+        var baselineMap = LoadBaselineMap(baselineJson);
+
+        var scenarios = parsed.Scenarios
+            .Where(s => s.Scenario.StartsWith("VMX_", StringComparison.Ordinal))
+            .Select(s => ConvertToExtendedScenario(s, baselineMap))
+            .ToArray();
+
+        if (scenarios.Length == 0)
+        {
+            throw new InvalidDataException($"扩展 CSV 中没有 VMX 场景: {csvPath}");
+        }
+
+        var warnings = parsed.Warnings.ToList();
+        if (baselineJson is null)
+        {
+            warnings.Add("未找到历史扩展基线报告，软门禁对比已跳过。");
+        }
+
+        var report = new ExtendedReportModel(
+            GeneratedAt: DateTime.Now,
+            SourceCsv: csvPath,
+            BaselineJson: baselineJson,
+            Warnings: warnings,
+            Scenarios: scenarios);
+
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
+        var markdownPath = Path.Combine(reportsDir, $"VM_Extended_Performance_Report_{timestamp}.md");
+        var jsonPath = Path.Combine(reportsDir, $"VM_Extended_Performance_Report_{timestamp}.json");
+        WriteExtendedMarkdown(report, markdownPath);
+        WriteJson(report, jsonPath);
+        return (markdownPath, jsonPath);
+    }
+
     private static string ResolveLatestVmCsv(string artifactsDir)
     {
         if (!Directory.Exists(artifactsDir))
@@ -66,6 +136,27 @@ public static class VMPerformanceReport
         if (candidates.Length == 0)
         {
             throw new FileNotFoundException($"未找到 VM BenchmarkDotNet 报告 CSV，目录: {artifactsDir}");
+        }
+
+        return candidates[0].FullName;
+    }
+
+    private static string ResolveLatestCsvByPattern(string artifactsDir, string pattern, string notFoundMessage)
+    {
+        if (!Directory.Exists(artifactsDir))
+        {
+            throw new DirectoryNotFoundException($"BenchmarkDotNet artifacts 目录不存在: {artifactsDir}");
+        }
+
+        var candidates = Directory
+            .GetFiles(artifactsDir, pattern, System.IO.SearchOption.TopDirectoryOnly)
+            .Select(path => new FileInfo(path))
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ToArray();
+
+        if (candidates.Length == 0)
+        {
+            throw new FileNotFoundException($"{notFoundMessage}，目录: {artifactsDir}");
         }
 
         return candidates[0].FullName;
@@ -324,9 +415,244 @@ public static class VMPerformanceReport
         File.WriteAllText(jsonPath, json);
     }
 
+    private static void WriteJson(ExtendedReportModel report, string jsonPath)
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+        var json = JsonSerializer.Serialize(report, options);
+        File.WriteAllText(jsonPath, json);
+    }
+
+    private static string? ResolveLatestExtendedBaselineJson(string reportsDir)
+    {
+        if (!Directory.Exists(reportsDir))
+        {
+            return null;
+        }
+
+        var candidates = Directory
+            .GetFiles(reportsDir, "VM_Extended_Performance_Report_*.json", System.IO.SearchOption.TopDirectoryOnly)
+            .Select(path => new FileInfo(path))
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ToArray();
+
+        return candidates.Length == 0 ? null : candidates[0].FullName;
+    }
+
+    private static Dictionary<string, (double? MeanMs, long? AllocatedBytes)> LoadBaselineMap(string? baselineJsonPath)
+    {
+        var map = new Dictionary<string, (double? MeanMs, long? AllocatedBytes)>(StringComparer.Ordinal);
+        if (string.IsNullOrWhiteSpace(baselineJsonPath) || !File.Exists(baselineJsonPath))
+        {
+            return map;
+        }
+
+        using var document = JsonDocument.Parse(File.ReadAllText(baselineJsonPath));
+        if (!document.RootElement.TryGetProperty("Scenarios", out var scenariosElement) ||
+            scenariosElement.ValueKind != JsonValueKind.Array)
+        {
+            return map;
+        }
+
+        foreach (var item in scenariosElement.EnumerateArray())
+        {
+            if (!item.TryGetProperty("Scenario", out var scenarioElement))
+            {
+                continue;
+            }
+
+            var scenario = scenarioElement.GetString();
+            if (string.IsNullOrWhiteSpace(scenario))
+            {
+                continue;
+            }
+
+            double? mean = null;
+            long? allocated = null;
+
+            if (item.TryGetProperty("MeanMs", out var meanElement) && meanElement.ValueKind == JsonValueKind.Number)
+            {
+                mean = meanElement.GetDouble();
+            }
+            if (item.TryGetProperty("AllocatedBytes", out var allocatedElement) &&
+                allocatedElement.ValueKind == JsonValueKind.Number)
+            {
+                allocated = allocatedElement.GetInt64();
+            }
+
+            map[scenario] = (mean, allocated);
+        }
+
+        return map;
+    }
+
+    private static ExtendedScenarioResult ConvertToExtendedScenario(
+        VmScenarioResult source,
+        IReadOnlyDictionary<string, (double? MeanMs, long? AllocatedBytes)> baselineMap)
+    {
+        var category = GetExtendedCategory(source.Scenario);
+        var operationCount = GetOperationCount(source.Scenario);
+        double? throughput = source.MeanMs.HasValue && operationCount.HasValue && source.MeanMs.Value > 0
+            ? operationCount.Value * 1000d / source.MeanMs.Value
+            : null;
+        double? allocatedPerOp = source.AllocatedBytes.HasValue && operationCount.HasValue && operationCount.Value > 0
+            ? source.AllocatedBytes.Value / (double)operationCount.Value
+            : null;
+
+        baselineMap.TryGetValue(source.Scenario, out var baseline);
+        var meanChangePct = ComputeChangePct(baseline.MeanMs, source.MeanMs, decreaseIsGood: true);
+        var allocatedChangePct = ComputeChangePct(baseline.AllocatedBytes, source.AllocatedBytes, decreaseIsGood: true);
+        var gate = EvaluateSoftGate(category, meanChangePct, allocatedChangePct);
+
+        return new ExtendedScenarioResult(
+            Scenario: source.Scenario,
+            Category: category,
+            MeanMs: source.MeanMs,
+            StdDevMs: source.StdDevMs,
+            P95Ms: source.P95Ms,
+            AllocatedBytes: source.AllocatedBytes,
+            ThroughputOpsPerSec: throughput,
+            AllocatedBytesPerOp: allocatedPerOp,
+            SoftGateStatus: gate,
+            BaselineMeanMs: baseline.MeanMs,
+            MeanChangePct: meanChangePct,
+            BaselineAllocatedBytes: baseline.AllocatedBytes,
+            AllocatedChangePct: allocatedChangePct,
+            RawMean: source.RawMean,
+            RawAllocated: source.RawAllocated);
+    }
+
+    private static string GetExtendedCategory(string scenario)
+    {
+        if (scenario.StartsWith("VMX_LargeFile_", StringComparison.Ordinal))
+        {
+            return "LargeFile";
+        }
+        if (scenario.StartsWith("VMX_Edge_", StringComparison.Ordinal))
+        {
+            return "Edge";
+        }
+        if (scenario.StartsWith("VMX_Concurrency_", StringComparison.Ordinal))
+        {
+            return "Concurrency";
+        }
+        return "Core";
+    }
+
+    private static long? GetOperationCount(string scenario)
+    {
+        return scenario switch
+        {
+            "VMX_LargeFile_CompileOnly_10k" => 10_000,
+            "VMX_LargeFile_CompileAndExecute_10k" => 10_000,
+            "VMX_LargeFile_CompileOnly_50k_Generated" => 50_000,
+            "VMX_LargeFile_CompileAndExecute_50k_Generated" => 50_000,
+            "VMX_Edge_DeepRecursion_NearLimit" => 1_000,
+            "VMX_Edge_HighArgCount_CallHotPath" => 30_000,
+            "VMX_Edge_HeavyTryCatch_LowThrowRate" => 100_000,
+            "VMX_Edge_LargeClosureCapture" => 20_000,
+            "VMX_Edge_DefaultAndNamedArgs_Stress" => 25_000,
+            "VMX_Concurrency_SpawnJoin_Throughput" => 10_000,
+            "VMX_Concurrency_Channel_SPSC_Throughput" => 200_000,
+            "VMX_Concurrency_Channel_MPMC_Throughput" => 200_000,
+            "VMX_Concurrency_Semaphore_Contention" => 100_000,
+            "VMX_Concurrency_MutexAtomicCounter" => 1_000_000,
+            "VMX_Concurrency_AsyncFanOutFanIn" => 2_000,
+            _ => null
+        };
+    }
+
+    private static double? ComputeChangePct(double? baselineValue, double? currentValue, bool decreaseIsGood)
+    {
+        if (!baselineValue.HasValue || !currentValue.HasValue || baselineValue.Value == 0)
+        {
+            return null;
+        }
+
+        var raw = (currentValue.Value - baselineValue.Value) / baselineValue.Value * 100d;
+        return decreaseIsGood ? -raw : raw;
+    }
+
+    private static double? ComputeChangePct(long? baselineValue, long? currentValue, bool decreaseIsGood)
+    {
+        if (!baselineValue.HasValue || !currentValue.HasValue || baselineValue.Value == 0)
+        {
+            return null;
+        }
+
+        var raw = (currentValue.Value - baselineValue.Value) / (double)baselineValue.Value * 100d;
+        return decreaseIsGood ? -raw : raw;
+    }
+
+    private static string EvaluateSoftGate(string category, double? meanImprovePct, double? allocatedImprovePct)
+    {
+        if (!meanImprovePct.HasValue && !allocatedImprovePct.HasValue)
+        {
+            return "N/A";
+        }
+
+        var meanThreshold = category switch
+        {
+            "Core" => -15d,
+            "LargeFile" => -25d,
+            "Concurrency" => -20d,
+            "Edge" => -30d,
+            _ => -15d
+        };
+
+        var allocThreshold = -20d;
+
+        var meanWarn = meanImprovePct.HasValue && meanImprovePct.Value < meanThreshold;
+        var allocWarn = allocatedImprovePct.HasValue && allocatedImprovePct.Value < allocThreshold;
+        return meanWarn || allocWarn ? "WARN" : "PASS";
+    }
+
+    private static void WriteExtendedMarkdown(ExtendedReportModel report, string markdownPath)
+    {
+        using var writer = new StreamWriter(markdownPath);
+        writer.WriteLine("# Old8Lang Extended VM Performance Report");
+        writer.WriteLine();
+        writer.WriteLine($"- GeneratedAt: {report.GeneratedAt:O}");
+        writer.WriteLine($"- SourceCsv: `{report.SourceCsv}`");
+        writer.WriteLine($"- BaselineJson: `{report.BaselineJson ?? "N/A"}`");
+        writer.WriteLine();
+
+        foreach (var group in report.Scenarios.GroupBy(s => s.Category).OrderBy(g => g.Key))
+        {
+            writer.WriteLine($"## {group.Key}");
+            writer.WriteLine();
+            writer.WriteLine("| Scenario | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | AllocΔ(%) | Gate |");
+            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|");
+
+            foreach (var scenario in group)
+            {
+                writer.WriteLine(
+                    $"| {scenario.Scenario} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanChangePct)} | {FormatPercent(scenario.AllocatedChangePct)} | {scenario.SoftGateStatus} |");
+            }
+
+            writer.WriteLine();
+        }
+
+        if (report.Warnings.Count > 0)
+        {
+            writer.WriteLine("## Warnings");
+            foreach (var warning in report.Warnings)
+            {
+                writer.WriteLine($"- {warning}");
+            }
+        }
+    }
+
     private static string FormatNumber(double? value)
     {
         return value.HasValue ? value.Value.ToString("F3", CultureInfo.InvariantCulture) : "N/A";
+    }
+
+    private static string FormatPercent(double? value)
+    {
+        return value.HasValue ? value.Value.ToString("F2", CultureInfo.InvariantCulture) : "N/A";
     }
 
     private static string FormatNumber(long? value)

@@ -29,6 +29,14 @@ if (args.Length > 0 && (args[0] == "--vm" || args[0] == "--vm-report"))
     return;
 }
 
+// 如果传入 --vm-extended 或 --vm-report-extended 参数，运行扩展 VM 基准与报告
+if (args.Length > 0 && (args[0] == "--vm-extended" || args[0] == "--vm-report-extended"))
+{
+    var generateReport = args[0] == "--vm-report-extended";
+    RunExtendedVmBenchmarksAndOptionalReport(generateReport);
+    return;
+}
+
 // // 运行反射性能基准测试（新增）
 // Console.WriteLine("正在运行反射性能基准测试...");
 // Console.WriteLine("对比优化前后的性能差异\n");
@@ -68,4 +76,23 @@ static void RunVmBenchmarksAndOptionalReport(bool generateReport)
 
     Console.WriteLine($"VM Markdown 报告: {markdownPath}");
     Console.WriteLine($"VM JSON 报告: {jsonPath}");
+}
+
+static void RunExtendedVmBenchmarksAndOptionalReport(bool generateReport)
+{
+    Console.WriteLine("运行扩展 VM 模式基准测试（BenchmarkDotNet）...\n");
+    BenchmarkRunner.Run<VMExtendedPerformanceBenchmarks>();
+
+    if (!generateReport)
+    {
+        return;
+    }
+
+    Console.WriteLine("从 BenchmarkDotNet artifacts 生成扩展 VM 性能报告...\n");
+    var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results");
+    var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+    var (markdownPath, jsonPath) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+    Console.WriteLine($"扩展 VM Markdown 报告: {markdownPath}");
+    Console.WriteLine($"扩展 VM JSON 报告: {jsonPath}");
 }

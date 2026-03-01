@@ -242,4 +242,80 @@ public static class TestDataGenerator
         GenerateTestScript(3000, Path.Combine(testDataDir, "medium_project_3000.old8"));
         GenerateTestScript(5000, Path.Combine(testDataDir, "large_script_5000.old8"));
     }
+
+    /// <summary>
+    /// 生成 VM 大文件性能测试脚本（固定 seed 保证可复现）
+    /// </summary>
+    /// <param name="lineCount">目标行数</param>
+    /// <param name="seed">随机种子</param>
+    /// <param name="outputPath">输出路径</param>
+    public static void GenerateVmLargeScript(int lineCount, int seed, string outputPath)
+    {
+        var random = new Random(seed);
+        var sb = new StringBuilder();
+
+        sb.AppendLine("// VM large benchmark script");
+        sb.AppendLine($"// lineCount={lineCount}, seed={seed}");
+        sb.AppendLine();
+
+        sb.AppendLine("func transform(x:int, offset:int) -> int {");
+        sb.AppendLine("    return (x * 3 + offset) % 100000");
+        sb.AppendLine("}");
+        sb.AppendLine();
+        sb.AppendLine("func fold(arr) -> int {");
+        sb.AppendLine("    s <- 0");
+        sb.AppendLine("    for v in arr {");
+        sb.AppendLine("        s <- s + v");
+        sb.AppendLine("    }");
+        sb.AppendLine("    return s");
+        sb.AppendLine("}");
+        sb.AppendLine();
+        sb.AppendLine("data <- {}");
+        sb.AppendLine("result <- 0");
+        sb.AppendLine();
+
+        var currentLines = sb.ToString().Split('\n').Length;
+        var targetBodyLines = Math.Max(0, lineCount - currentLines - 20);
+
+        for (var i = 0; i < targetBodyLines; i++)
+        {
+            var value = random.Next(1, 1_000_000);
+            var op = i % 6;
+            switch (op)
+            {
+                case 0:
+                    sb.AppendLine($"data.Add(transform({value}, {i % 97}))");
+                    break;
+                case 1:
+                    sb.AppendLine($"result <- result + transform({value}, {i % 113})");
+                    break;
+                case 2:
+                    sb.AppendLine($"if {value} % 2 == 0 {{ result <- result + {i % 17} }}");
+                    break;
+                case 3:
+                    sb.AppendLine($"if len(data) > 0 {{ result <- result + data[len(data) - 1] % {(i % 23) + 2} }}");
+                    break;
+                case 4:
+                    sb.AppendLine($"tmp_{i} <- transform({value}, {i % 131})");
+                    break;
+                default:
+                    sb.AppendLine($"result <- result + ({value} % {(i % 29) + 3})");
+                    break;
+            }
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("result <- result + fold(data)");
+        sb.AppendLine("if len(data) > 1000 {");
+        sb.AppendLine("    result <- result + len(data)");
+        sb.AppendLine("}");
+
+        var directory = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllText(outputPath, sb.ToString());
+    }
 }

@@ -70,6 +70,50 @@ public class VMPerformanceReportTests : IDisposable
         Assert.Contains("未找到 VM BenchmarkDotNet 报告 CSV", exception.Message);
     }
 
+    [Fact]
+    public void GenerateExtendedFromBenchmarkArtifacts_WithValidCsv_GeneratesExtendedReports()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-extended");
+        var reportsDir = Path.Combine(_tempRoot, "reports-extended");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMExtendedPerformanceBenchmarks-report.csv");
+        File.WriteAllText(csvPath, BuildExtendedCsv());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("Old8Lang Extended VM Performance Report", markdown);
+        Assert.Contains("## Concurrency", markdown);
+        Assert.Contains("Throughput(ops/s)", markdown);
+        Assert.Contains("VMX_Concurrency_Channel_SPSC_Throughput", markdown);
+        Assert.Contains("\"Category\": \"Concurrency\"", json);
+    }
+
+    [Fact]
+    public void GenerateExtendedFromBenchmarkArtifacts_WithBaseline_ProducesWarnWhenRegressionLarge()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-extended-baseline");
+        var reportsDir = Path.Combine(_tempRoot, "reports-extended-baseline");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselineJsonPath = Path.Combine(reportsDir, "VM_Extended_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselineJsonPath, BuildExtendedBaselineJson());
+        File.SetLastWriteTimeUtc(baselineJsonPath, DateTime.UtcNow.AddMinutes(-1));
+
+        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMExtendedPerformanceBenchmarks-report.csv");
+        File.WriteAllText(csvPath, BuildExtendedCsvWithRegression());
+
+        var (markdownPath, _) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+
+        Assert.Contains("WARN", markdown);
+        Assert.Contains("MeanΔ(%)", markdown);
+    }
+
     private static string BuildSampleCsv()
     {
         return string.Join(
@@ -87,6 +131,40 @@ public class VMPerformanceReportTests : IDisposable
             "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
             "VM_ArithmeticLoop,DefaultJob,.NET 10.0,3,8,30.000 ms,1.100 ms,3500 KB",
             "VM_DefaultAndNamedArgs,DefaultJob,.NET 10.0,3,8,NA,NA,NA");
+    }
+
+    private static string BuildExtendedCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMX_LargeFile_CompileOnly_10k,DefaultJob,.NET 10.0,1,6,100.000 ms,2.000 ms,5.00 MB",
+            "VMX_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,6,40.000 ms,1.000 ms,2.00 MB",
+            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,80.000 ms,1.200 ms,4.00 MB");
+    }
+
+    private static string BuildExtendedCsvWithRegression()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,120.000 ms,1.000 ms,6.00 MB");
+    }
+
+    private static string BuildExtendedBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMX_Concurrency_Channel_SPSC_Throughput",
+                     "MeanMs": 80.0,
+                     "AllocatedBytes": 4194304
+                   }
+                 ]
+               }
+               """;
     }
 
     public void Dispose()
