@@ -4,6 +4,7 @@
 
 - [x] P0-1：修复 `ChannelSend` 在 VM 线程中的异步阻塞异常（已完成，基准不再因该异常直接 NA）。
 - [x] P0-2：Quick 报告增加失败场景显式标记和 `FailureReason` 提取（已完成）。
+- [x] P0-3：修复 `TryReceiveChannel(timeout)` 超时后遗留挂起读取任务导致的通道消息丢失（已完成）。
 - [x] P1-1（部分）：命名参数绑定热路径优化（参数名索引缓存 + 参数数组填充优化）已完成并通过回归测试。
 - [x] P1-1（部分）：参数类型校验热路径优化（基础类型快速判定）已完成并通过回归测试。
 - [x] P1-1（剩余）：补充“仅位置参数且无需默认值补全”调度级 fast path（已完成）。
@@ -11,19 +12,19 @@
 - [x] P1-2（部分）：全局函数调用异常路径避免重复包装（`Old8Exception/VmException` 直通，未知异常再包装）。
 - [x] P1-2（部分）：`VmException` 消息延迟构建，降低高抛异常热路径的即时字符串开销。
 - [x] P1-2（部分）：按异常指令 IP 缓存候选处理器，避免高抛异常场景重复全表扫描 `ExceptionTable`。
+- [x] P1-4（完成）：并发资源热路径优化（`Mutex` 轻量实现 + 资源访问时间更新节流）。
 
 ## 结论摘要
 
-- 当前最紧急问题不是“慢”，而是 **`VMXQ_Concurrency_Channel_MPMC_4Workers` 基准失效（NA）**，导致并发通道路径无法评估。
+- `VMXQ_Concurrency_Channel_MPMC_4Workers` 的 **NA/偶发错误已修复**（`99999/100000` 丢消息问题），2026-03-02 01:08 的 quick 报告两套 Job 均为有效 `PASS`。
 - 真实热点主要集中在：
-  - 高参数调用热路径（`VMXQ_Edge_HighArgCount_CallHotPath`: 286.979~368.526 ms）
-  - 高异常率路径（`VMXQ_Edge_HighThrowRate_TryCatch`: 36.792~54.469 ms）
-  - 高频闭包捕获（`VMXQ_Edge_LargeClosureCapture_HighFreq`: 34.186~39.347 ms）
-  - 互斥+原子计数并发（`VMXQ_Concurrency_MutexAtomicCounter_4Workers`: 241.784~252.553 ms）
+  - 互斥+原子计数并发（`VMXQ_Concurrency_MutexAtomicCounter_4Workers`: 128.296~146.315 ms，已从高风险区间显著下降）
+  - 50k 大文件编译执行（`VMXQ_LargeFile_CompileAndExecute_50k_Generated`: 41.976~43.733 ms）
+  - 高频闭包捕获（`VMXQ_Edge_LargeClosureCapture_HighFreq`: 31.343~31.413 ms，`PASS` 但 alloc 偏高）
 - 分配量偏高场景：
-  - `HighArgCount`: 544.133 bytes/op
-  - `LargeClosureCapture`: 520.106 bytes/op
-  - `HighThrowRate`: 250.094 bytes/op
+  - `LargeClosureCapture`: 25,395.8 bytes/op
+  - `Channel_MPMC`: 28,590.5~28,922.1 bytes/op
+  - `MutexAtomicCounter`: 60,722.1~60,730.4 bytes/op
 
 ## P0（必须先做）
 
@@ -40,6 +41,15 @@
   - 代码点：`Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs`
   - 问题：当前只显示 `N/A`，没有把失败原因（异常摘要）带入报告，不利于 CI 快速定位。
   - 验收：报告中对 `NA` 场景新增 `FailureReason`（至少包含异常类型+关键消息）。
+
+- [x] 修复 `TryReceiveChannel(timeout)` 在超时场景下可能“吞消息”的并发正确性问题。
+  - 代码点：`Old8Lang/Concurrency/ResourceManager.cs`（`TryReceiveChannel`）
+  - 根因：旧实现对 `ReadAsync().AsTask().Wait(timeout)` 超时后不取消挂起读取，后续读取可能被遗留任务抢走，导致消费方统计缺失。
+  - 修复：改为 `TryRead` fast path + `WaitToReadAsync(cts.Token)` + `TryRead`，超时通过 `OperationCanceledException` 明确返回失败。
+  - 验收：
+    - `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~VMConcurrencyChannelTests"` 通过（14/14）。
+    - `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~VMConcurrencyPerformanceTests"` 通过（3/3）。
+    - `VMXQ_Concurrency_Channel_MPMC_4Workers` 在 `20260302_010825` 报告中两套 Job 均为 `PASS`（78.191 ms / 73.765 ms）。
 
 ## P1（高收益优化）
 
@@ -72,15 +82,20 @@
     - 对高频闭包函数增加“无变更捕获环境复用”策略。
   - 验收：`VMXQ_Edge_LargeClosureCapture_HighFreq` alloc/op 下降 >= 20%，耗时下降 >= 10%。
 
-- [ ] 并发互斥计数路径减少资源管理层字典查找频率。
+- [x] 并发互斥计数路径减少资源管理层字典查找频率（已完成）。
   - 代码点：
     - `Old8Lang/Concurrency/ResourceManager.cs`
-    - `Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Concurrency.cs`
+    - `Old8Lang/Concurrency/ResourceWrapper.cs`
+    - `Old8Lang/Concurrency/MutexImpl.cs`
   - 问题：每次 `MutexLock/Unlock`、`AtomicIntIncrement` 都经过 `ConcurrentDictionary + wrapper.UpdateLastAccessTime()`，在高频循环下开销明显。
   - 建议：
-    - 在 VM 执行期缓存热点资源句柄（例如 frame 级别缓存）减少重复查表。
-    - 对高频原子操作提供轻量 fast path（保证语义一致）。
-  - 验收：`VMXQ_Concurrency_MutexAtomicCounter_4Workers` 耗时下降 >= 10%，alloc/op 下降 >= 15%。
+    - `Mutex` 资源从 `SemaphoreSlim` 替换为 `Monitor` 驱动的轻量 `MutexImpl`。
+    - `ResourceWrapper.UpdateLastAccessTime()` 改为秒级节流，减少热路径时间读取+字段写入。
+  - 验收：
+    - `VMXQ_Concurrency_MutexAtomicCounter_4Workers`（20260302_010825 -> 20260302_011433）：
+      - Job-EATLBP：`279.923 ms -> 146.315 ms`（约 **47.7%** 改善）
+      - Job-LGHQEI：`250.942 ms -> 128.296 ms`（约 **48.9%** 改善）
+    - 两套 Job 均为 `PASS`。
 
 ## P2（基准与报告质量）
 
@@ -105,13 +120,17 @@
 
 ## 建议执行顺序
 
-1. 先修 P0（让通道并发基准可测 + 报告可诊断）
-2. 再做 P1（高收益热路径优化）
-3. 最后做 P2（报告/门禁体系完善）
+1. 优先做 P1 的闭包捕获路径降分配。
+2. 接着补强函数调用/异常路径在新基线下的回归余量。
+3. 最后做 P2（报告聚合 + 基线门禁）。
 
 ## 本次分析输入
 
 - `Reports/VM_Quick_Performance_Report_20260302_002147.md`
 - `Reports/VM_Quick_Performance_Report_20260302_002147.json`
+- `Reports/VM_Quick_Performance_Report_20260302_010825.md`
+- `Reports/VM_Quick_Performance_Report_20260302_010825.json`
+- `Reports/VM_Quick_Performance_Report_20260302_011433.md`
+- `Reports/VM_Quick_Performance_Report_20260302_011433.json`
 - `BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-report.csv`
 - `BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-20260302-001859.log`

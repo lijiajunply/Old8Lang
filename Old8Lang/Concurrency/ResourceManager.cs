@@ -55,7 +55,7 @@ public static class ResourceManager
     private static readonly ConcurrentDictionary<int, ResourceType> ResourceTypes = new();
 
     // 存储各类资源
-    private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Mutexes = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<MutexImpl>> Mutexes = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Semaphores = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<AtomicIntImpl>> AtomicInts = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<Channel<object>>> Channels = new();
@@ -125,7 +125,7 @@ public static class ResourceManager
     public static int CreateMutex()
     {
         var id = Interlocked.Increment(ref _mutexIdCounter);
-        Mutexes[id] = new ResourceWrapper<SemaphoreSlim>(new SemaphoreSlim(1, 1));
+        Mutexes[id] = new ResourceWrapper<MutexImpl>(new MutexImpl());
         ResourceTypes[id] = ResourceType.Mutex;
         return id;
     }
@@ -134,21 +134,21 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Wait();
+        wrapper.Resource.Lock();
     }
 
     public static bool TryLockMutex(int mutexId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        return wrapper.Resource.Wait(timeoutMs);
+        return wrapper.Resource.TryLock(timeoutMs);
     }
 
     public static void UnlockMutex(int mutexId)
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Release();
+        wrapper.Resource.Unlock();
     }
 
     public static void DisposeMutex(int mutexId)
