@@ -22,6 +22,12 @@
 - [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_021345.{md,json}`。
 - [x] P2-1：报告去重改造完成（Markdown 增加 `Per-Job Details` + `Scenario Aggregate (Median)` 双视图，Tiered JSON 保留 `Job` 维度并新增 `AggregatedScenarios`）。
 - [x] 回归验证：`dotnet test Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj --filter "FullyQualifiedName~VMPerformanceReportTests"` 通过（7/7）。
+- [x] P1-3（部分）：闭包环境读路径优化（`ClosureEnvironment` 对较大捕获集使用 `FrozenDictionary`，并为本地查找添加内联 fast path），减少高频闭包变量读取开销。
+- [x] 回归验证：`VMLambdaExpressionTests`（15/15）与 `VMMemoryUsageTests`（26/26）通过（串行执行，避免并发构建文件锁冲突）。
+- [x] P1-1（补充）：位置参数调用 fast path 预计算缓存（`FunctionMetadata.TryGetPositionalFastCallTypeKinds`）+ 调度路径去重，移除每次调用重复的可用性判定循环。
+- [x] 回归验证：`Old8Lang.Tests.VirtualMachine.Functions.VM`（25/25）与 `VMLambdaExpressionTests`（15/15）通过。
+- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_024032.{md,json}`。
+- [ ] 基准观察：`20260302_024032` 中 `VMXQ_Edge_HighThrowRate_TryCatch` 聚合状态为 `FAIL`（中位数约 `+7.52%`），需在后续排查是否为噪声还是异常路径回归。
 
 ## 结论摘要
 
@@ -70,6 +76,10 @@
   - 建议：
     - 在 `FunctionMetadata` 预构建 `参数名 -> 索引` 映射缓存。
     - 为“仅位置参数且无默认参数补全需求”走 fast path，绕过命名参数拼装逻辑。
+  - 当前进展（`20260302_024032`，基线 `20260302_023424`）：
+    - Job-EATLBP：`40.689 -> 40.049 ms`（约 **-1.57%**，`PASS`）
+    - Job-LGHQEI：`45.983 -> 41.023 ms`（约 **-10.79%**，`PASS`）
+    - 聚合中位数：约 **-6.18%**（`PASS`，但尚未达到 TODO 目标 `>=10%`）
   - 验收：`VMXQ_Edge_HighArgCount_CallHotPath` 平均耗时下降 >= 10%，alloc/op 下降 >= 15%。
 
 - [ ] 优化高异常率 Try/Catch 路径，减少异常对象构造和包装层级。

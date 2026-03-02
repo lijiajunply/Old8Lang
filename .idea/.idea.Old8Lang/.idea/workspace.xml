@@ -23,9 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_023424.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_023424.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_024032.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_024032.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/VMPerformanceReportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/VMPerformanceReportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureEnvironment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureEnvironment.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Metadata/FunctionMetadata.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Todo.md" beforeDir="false" afterPath="$PROJECT_DIR$/Todo.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -518,7 +523,7 @@
       <workItem from="1772335461211" duration="4496000" />
       <workItem from="1772340986312" duration="4289000" />
       <workItem from="1772378960908" duration="240000" />
-      <workItem from="1772379564921" duration="5612000" />
+      <workItem from="1772379564921" duration="6770000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -863,7 +868,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="966" />
+    <option name="localTasksCounter" value="967" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -890,7 +895,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(interpreter): 修复扩展方法执行中的返回值处理和方法查找问题&#10;&#10;- 移除 ExtensionMethodWrapper 中的调试空检查代码&#10;- 修改返回值处理逻辑，先获取结果再清除返回状态&#10;- 将测试代码中的 Count() 方法调用改为 len() 函数调用&#10;- 修复 LangValueType 中 FromClassToResult 方法调用传递 manager 参数&#10;- 在 ListLangValue 中添加 Count() 方法的特殊处理逻辑&#10;- 更新 .claude 配置文件添加 powershell.exe 路径排除&#10;- 更新 IDE 工作区配置文件中的变更列表和任务计数器" />
     <MESSAGE value="feat(cli): 添加性能监控功能和CLI选项&#10;&#10;- 实现性能监控器，可追踪执行时间、内存使用、函数调用等指标&#10;- 添加 --perf、--perf-detailed、--perf-output CLI选项用于性能分析&#10;- 在文档中添加性能监控相关的使用说明和示例&#10;- 优化ForStatement循环变量作用域，防止外层变量污染&#10;- 实现函数引用缓存机制，提升函数调用性能&#10;- 支持嵌套函数定义和局部作用域管理&#10;- 添加性能报告生成器，支持文本、JSON、CSV格式输出&#10;- 实现对象池统计和内存稳定性测试&#10;- 添加长期运行性能测试和内存泄漏检测" />
     <MESSAGE value="test(cli): 添加性能监控集成测试&#10;&#10;- 创建 PerformanceMonitoringTests 类验证 --perf、--perf-detailed、--perf-output 功能&#10;- 实现执行指标收集、函数指标收集、文本格式报告生成功能测试&#10;- 添加 JSON 和 CSV 格式报告生成及文件保存功能测试&#10;- 集成内存跟踪和对象池统计功能验证&#10;- 更新 CI/CD 工作流添加性能回归测试步骤&#10;- 完成规格文档中的性能监控集成测试任务" />
     <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
@@ -915,7 +919,8 @@
     <MESSAGE value="feat(benchmark): 添加VM基准测试命令解析和多层级性能报告功能&#10;&#10;- 实现BenchmarkArgumentParser用于解析多种VM基准测试命令参数&#10;- 添加VMQuickPerformanceBenchmarks和VMNightlyPerformanceBenchmarks两类基准测试&#10;- 集成CI/CD工作流支持PR/Push场景的快速基准测试和夜间完整基准测试&#10;- 实现多层级VM性能报告生成功能包括Quick、Nightly等不同报告类型&#10;- 添加基准测试结果验证机制和性能回归检测功能&#10;- 更新文档说明各种VM基准测试命令的使用方法" />
     <MESSAGE value="refactor(benchmarks): 重构基准测试项目结构并移除废弃测试文件&#10;&#10;- 将基准测试入口逻辑分离到独立的 Entry 目录中&#10;- 创建新的命令行参数解析器和命令枚举类型&#10;- 实现新的基准测试主程序入口点和命令分发逻辑&#10;- 移除旧的高级性能测试和编译器基准测试文件&#10;- 创建新的解释器基准测试基类并调整命名空间&#10;- 更新测试数据生成工具的命名空间和路径配置&#10;- 重新组织基准测试项目的整体架构和目录结构" />
     <MESSAGE value="perf(vm): 优化虚拟机调用帧和闭包环境性能&#10;&#10;- CallFrame 改为惰性分配 DeferStack，减少无 defer 函数的固定对象分配&#10;- 实现局部变量数组池化复用，通过 ArrayPool&lt;object?&gt; 减少内存分配压力&#10;- 引入链式闭包环境 ClosureEnvironment 替代字典拷贝，支持嵌套闭包变量查找&#10;- 添加 CallFrame 构造函数重载，支持外部提供局部变量数组和池化标识&#10;- 优化 defer 指令执行逻辑，使用 TryPopDefer 方法替代直接访问栈&#10;- 在函数调用完成后归还局部变量数组到池中，实现内存复用&#10;- 更新模块系统中闭包创建逻辑，使用新的闭包环境构造方式&#10;- 性能基准测试显示大闭包捕获场景内存分配下降约 23.1%" />
-    <option name="LAST_COMMIT_MESSAGE" value="perf(vm): 优化虚拟机调用帧和闭包环境性能&#10;&#10;- CallFrame 改为惰性分配 DeferStack，减少无 defer 函数的固定对象分配&#10;- 实现局部变量数组池化复用，通过 ArrayPool&lt;object?&gt; 减少内存分配压力&#10;- 引入链式闭包环境 ClosureEnvironment 替代字典拷贝，支持嵌套闭包变量查找&#10;- 添加 CallFrame 构造函数重载，支持外部提供局部变量数组和池化标识&#10;- 优化 defer 指令执行逻辑，使用 TryPopDefer 方法替代直接访问栈&#10;- 在函数调用完成后归还局部变量数组到池中，实现内存复用&#10;- 更新模块系统中闭包创建逻辑，使用新的闭包环境构造方式&#10;- 性能基准测试显示大闭包捕获场景内存分配下降约 23.1%" />
+    <MESSAGE value="perf(benchmark): 优化基准测试报告去重和聚合视图&#10;&#10;- 添加 Job 字段到 TieredScenarioResult 记录类型&#10;- 实现 TieredAggregatedScenarioResult 记录类型用于聚合数据&#10;- 添加按 Scenario 分组的聚合功能，计算中位数值&#10;- 在 Markdown 报告中增加 Per-Job Details 和 Scenario Aggregate 视图&#10;- 更新基线查找逻辑，支持按 (Scenario, Job) 键查找&#10;- 实现多作业场景的状态评估和最差状态选择&#10;- 添加中位数计算辅助方法用于聚合统计&#10;- 更新测试用例验证多作业场景的报告生成" />
+    <option name="LAST_COMMIT_MESSAGE" value="perf(benchmark): 优化基准测试报告去重和聚合视图&#10;&#10;- 添加 Job 字段到 TieredScenarioResult 记录类型&#10;- 实现 TieredAggregatedScenarioResult 记录类型用于聚合数据&#10;- 添加按 Scenario 分组的聚合功能，计算中位数值&#10;- 在 Markdown 报告中增加 Per-Job Details 和 Scenario Aggregate 视图&#10;- 更新基线查找逻辑，支持按 (Scenario, Job) 键查找&#10;- 实现多作业场景的状态评估和最差状态选择&#10;- 添加中位数计算辅助方法用于聚合统计&#10;- 更新测试用例验证多作业场景的报告生成" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

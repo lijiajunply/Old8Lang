@@ -24,6 +24,7 @@ public class FunctionMetadata
     private int _parameterIndexMapCount = -1;
     private FastParameterTypeKind[]? _fastParameterKinds;
     private int _fastParameterKindsCount = -1;
+    private bool _fastParameterKindsContainUnsupportedType;
     private Dictionary<int, ExceptionDispatchCandidate[]>? _exceptionDispatchCandidatesByIp;
     private int _exceptionDispatchCacheTableCount = -1;
 
@@ -311,6 +312,33 @@ public class FunctionMetadata
         return _fastParameterKinds[index];
     }
 
+    /// <summary>
+    /// 尝试获取“纯位置参数调用”热路径所需的参数类型分类缓存。
+    /// </summary>
+    public bool TryGetPositionalFastCallTypeKinds(int argCount, out FastParameterTypeKind[] typeKinds)
+    {
+        typeKinds = Array.Empty<FastParameterTypeKind>();
+
+        if (argCount != Parameters.Count || ParamsParameterIndex >= 0 || IsGenerator || GenericTypeMapping is { Count: > 0 })
+        {
+            return false;
+        }
+
+        EnsureFastParameterKinds();
+        if (_fastParameterKinds is null || _fastParameterKinds.Length < argCount)
+        {
+            return false;
+        }
+
+        if (_fastParameterKindsContainUnsupportedType)
+        {
+            return false;
+        }
+
+        typeKinds = _fastParameterKinds;
+        return true;
+    }
+
     private void EnsureFastParameterKinds()
     {
         if (_fastParameterKinds is not null && _fastParameterKindsCount == ParameterTypes.Count)
@@ -319,6 +347,7 @@ public class FunctionMetadata
         }
 
         var kinds = new FastParameterTypeKind[ParameterTypes.Count];
+        var hasUnsupportedType = false;
         for (var i = 0; i < ParameterTypes.Count; i++)
         {
             var typeName = ParameterTypes[i];
@@ -339,10 +368,16 @@ public class FunctionMetadata
                 _ when typeName.Equals("object", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Object,
                 _ => FastParameterTypeKind.Other
             };
+
+            if (kinds[i] == FastParameterTypeKind.Other)
+            {
+                hasUnsupportedType = true;
+            }
         }
 
         _fastParameterKinds = kinds;
         _fastParameterKindsCount = ParameterTypes.Count;
+        _fastParameterKindsContainUnsupportedType = hasUnsupportedType;
     }
 
     private void EnsureExceptionDispatchCache()

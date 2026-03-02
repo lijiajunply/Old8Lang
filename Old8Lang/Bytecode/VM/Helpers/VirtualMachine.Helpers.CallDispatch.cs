@@ -44,6 +44,94 @@ public partial class VirtualMachine
         return function.ParamsParameterIndex < 0 && argCount == function.Parameters.Count;
     }
 
+    private bool TryInvokeResolvedFunctionPositionalFastFromStack(
+        FunctionMetadata function,
+        int argCount,
+        FunctionMetadata.FastParameterTypeKind[] fastTypeKinds,
+        ClosureEnvironment? closureEnvironment,
+        ConstantPool? closureConstantPool,
+        Instruction instruction)
+    {
+        var locals = RentLocalsBuffer(function.LocalCount);
+        var fastFrame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
+        {
+            ClosureEnvironment = closureEnvironment,
+            ConstantPool = closureConstantPool
+        };
+
+        var hasFastTypeChecks = function.ParameterTypes.Count > 0 && fastTypeKinds.Length >= argCount;
+        if (function.LocalCount >= argCount)
+        {
+            for (var i = argCount - 1; i >= 0; i--)
+            {
+                var argValue = _stack.Pop();
+                fastFrame.Locals[i] = argValue;
+
+                if (!hasFastTypeChecks)
+                {
+                    continue;
+                }
+
+                var fastTypeKind = fastTypeKinds[i];
+                if (fastTypeKind == FunctionMetadata.FastParameterTypeKind.None)
+                {
+                    continue;
+                }
+
+                if (!FastTypeMatches(fastTypeKind, argValue))
+                {
+                    var expectedType = function.ParameterTypes[i];
+                    var actualType = GetValueTypeName(argValue);
+                    var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
+                    throw new TypeError(
+                        GetPosition(instruction),
+                        expectedType,
+                        actualType,
+                        $"参数 '{paramName}' 类型不匹配"
+                    );
+                }
+            }
+        }
+        else
+        {
+            for (var i = argCount - 1; i >= 0; i--)
+            {
+                var argValue = _stack.Pop();
+                if (i < function.LocalCount)
+                {
+                    fastFrame.Locals[i] = argValue;
+                }
+
+                if (!hasFastTypeChecks)
+                {
+                    continue;
+                }
+
+                var fastTypeKind = fastTypeKinds[i];
+                if (fastTypeKind == FunctionMetadata.FastParameterTypeKind.None)
+                {
+                    continue;
+                }
+
+                if (!FastTypeMatches(fastTypeKind, argValue))
+                {
+                    var expectedType = function.ParameterTypes[i];
+                    var actualType = GetValueTypeName(argValue);
+                    var paramName = i < function.Parameters.Count ? function.Parameters[i] : $"参数{i}";
+                    throw new TypeError(
+                        GetPosition(instruction),
+                        expectedType,
+                        actualType,
+                        $"参数 '{paramName}' 类型不匹配"
+                    );
+                }
+            }
+        }
+
+        ExecuteFrame(fastFrame);
+        return true;
+    }
+
     private void ExecuteCallInstruction(Instruction instruction, CallFrame frame)
     {
         var operands = (object[])instruction.Operand!;
@@ -55,13 +143,13 @@ public partial class VirtualMachine
             int argCount = (int)operands[0];
             string funcName = (string)operands[1];
             int functionIndexHint = ParseFunctionIndex(operands, 2);
-            var args = PopArguments(argCount);
 
             // extern 函数优先保持原有行为
             if (_globals.TryGetValue(funcName, out var externFuncObj) &&
                 externFuncObj is ExternFunctionWrapper externFunc)
             {
-                var result = externFunc.Invoke(args);
+                var externArgs = PopArguments(argCount);
+                var result = externFunc.Invoke(externArgs);
                 _stack.Push(result);
                 return;
             }
@@ -69,17 +157,32 @@ public partial class VirtualMachine
             if (TryResolveCallableFunction(frame, funcName, functionIndexHint, out var function, out var closureEnvironment,
                     out var closureConstantPool))
             {
-                var normalizedArgs = CanSkipNormalizeForPositionalCall(function, args.Length)
-                    ? args
-                    : NormalizeArguments(function, args, position);
+                if (function.TryGetPositionalFastCallTypeKinds(argCount, out var fastTypeKinds) &&
+                    TryInvokeResolvedFunctionPositionalFastFromStack(
+                        function,
+                        argCount,
+                        fastTypeKinds,
+                        closureEnvironment,
+                        closureConstantPool,
+                        instruction))
+                {
+                    return;
+                }
+
+                var resolvedArgs = PopArguments(argCount);
+                var normalizedArgs = CanSkipNormalizeForPositionalCall(function, resolvedArgs.Length)
+                    ? resolvedArgs
+                    : NormalizeArguments(function, resolvedArgs, position);
                 ValidateParameterTypes(function, normalizedArgs, instruction);
                 InvokeResolvedFunction(function, normalizedArgs, closureEnvironment, closureConstantPool);
                 return;
             }
 
+            var fallbackArgs = PopArguments(argCount);
+
             if (TryResolveClassByName(funcName, out var classMetadata))
             {
-                var obj = CreateObjectInstance(classMetadata, args);
+                var obj = CreateObjectInstance(classMetadata, fallbackArgs);
                 _stack.Push(obj);
                 return;
             }
@@ -87,7 +190,7 @@ public partial class VirtualMachine
             var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
             if (globalFunction != null)
             {
-                _stack.Push(globalFunction.ExecuteInVM(args));
+                _stack.Push(globalFunction.ExecuteInVM(fallbackArgs));
                 return;
             }
 
