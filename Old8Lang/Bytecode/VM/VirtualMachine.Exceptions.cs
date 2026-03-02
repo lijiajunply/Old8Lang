@@ -41,6 +41,61 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 内联异常分发 - 当 throw 指令的异常能被当前帧捕获时，直接跳转到 catch 块，
+    /// 完全跳过 new VmException + .NET 异常机制（快速路径）。
+    /// </summary>
+    /// <returns>如果在当前帧内处理了异常返回 true，否则返回 false（需走跨帧慢路径）</returns>
+    private bool TryHandleExceptionInline(object? exceptionValue, CallFrame frame, FunctionMetadata function)
+    {
+        if (function.ExceptionTable.Count == 0)
+            return false;
+
+        // frame.IP 已经 +1（在 ExecuteFrameLoop 中 frame.IP++ 发生在 ExecuteInstruction 之前）
+        int exceptionIP = frame.IP - 1;
+
+        var candidates = function.GetExceptionDispatchCandidates(exceptionIP);
+
+        foreach (var candidate in candidates)
+        {
+            var entry = candidate.Entry;
+            bool inTryBlock = candidate.InTryBlock;
+            bool inCatchBlock = candidate.InCatchBlock;
+
+            if (inTryBlock || inCatchBlock)
+            {
+                // 异常发生在 catch 块中且有 finally：先执行 finally，继续查找外层处理器
+                if (inCatchBlock && entry.FinallyStart >= 0)
+                {
+                    ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
+                    continue;
+                }
+
+                if (inTryBlock && IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
+                {
+                    if (entry.CatchStart >= 0)
+                    {
+                        // 执行当前帧的 defers（与 ExecuteFrameLoop catch 路径保持一致）
+                        if (frame.HasDeferredInstructions)
+                            ExecuteDefers(frame);
+
+                        _stack.Push(exceptionValue);
+                        frame.IP = entry.CatchStart;
+                        return true;
+                    }
+
+                    if (entry.FinallyStart >= 0)
+                    {
+                        ExecuteFinallyBlock(frame, function, entry.FinallyStart, entry.FinallyEnd);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// 处理异常 - 查找并执行匹配的异常处理器
     /// </summary>
     /// <returns>如果找到并处理了异常返回true，否则返回false</returns>

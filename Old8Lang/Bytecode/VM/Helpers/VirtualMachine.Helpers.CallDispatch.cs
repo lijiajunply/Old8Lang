@@ -53,11 +53,9 @@ public partial class VirtualMachine
         Instruction instruction)
     {
         var locals = RentLocalsBuffer(function.LocalCount);
-        var fastFrame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
-        {
-            ClosureEnvironment = closureEnvironment,
-            ConstantPool = closureConstantPool
-        };
+        var fastFrame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
+        fastFrame.ClosureEnvironment = closureEnvironment;
+        fastFrame.ConstantPool = closureConstantPool;
 
         var hasFastTypeChecks = function.ParameterTypes.Count > 0 && fastTypeKinds.Length >= argCount;
         if (function.LocalCount >= argCount)
@@ -231,6 +229,20 @@ public partial class VirtualMachine
             if (funcMeta.IsGenerator)
             {
                 PushGeneratorForFunction(funcMeta, args);
+                return;
+            }
+
+            // 快速路径：参数数量匹配且无 params 参数时，跳过 NormalizeArguments + new SourcePosition()
+            if (CanSkipNormalizeForPositionalCall(funcMeta, args.Length))
+            {
+                var locals = RentLocalsBuffer(funcMeta.LocalCount);
+                var fastFrame = RentCallFrame(funcMeta, locals, funcMeta.LocalCount, usesPooledLocals: funcMeta.LocalCount > 0);
+                fastFrame.ClosureEnvironment = closure.CapturedVariables;
+                fastFrame.ConstantPool = closure.ConstantPool;
+                int copyLen = Math.Min(args.Length, funcMeta.LocalCount);
+                for (int i = 0; i < copyLen; i++)
+                    fastFrame.Locals[i] = args[i];
+                ExecuteFrame(fastFrame);
                 return;
             }
 

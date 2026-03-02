@@ -123,7 +123,8 @@ public static class VMPerformanceReport
             notFoundMessage: "未找到 VM Quick BenchmarkDotNet 报告 CSV",
             scenarioPrefix: "VMXQ_",
             reportFilePrefix: "VM_Quick_Performance_Report",
-            reportTitle: "Old8Lang VM Quick Performance Report");
+            reportTitle: "Old8Lang VM Quick Performance Report",
+            fallbackBaselineFileName: "vm_quick_baseline.json");
     }
 
     /// <summary>
@@ -184,7 +185,8 @@ public static class VMPerformanceReport
         string notFoundMessage,
         string scenarioPrefix,
         string reportFilePrefix,
-        string reportTitle)
+        string reportTitle,
+        string? fallbackBaselineFileName = null)
     {
         var csvPath = ResolveLatestCsvByPattern(artifactsDir, csvPattern, notFoundMessage);
         var parsed = ParseCsv(csvPath);
@@ -194,7 +196,7 @@ public static class VMPerformanceReport
             .ToDictionary(group => group.Key, group => group.First().Value, StringComparer.Ordinal);
 
         Directory.CreateDirectory(reportsDir);
-        var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix);
+        var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix, fallbackBaselineFileName);
         var baselineLookup = LoadBaselineLookup(baselineJson);
 
         var scenarios = parsed.Scenarios
@@ -743,21 +745,34 @@ public static class VMPerformanceReport
         File.WriteAllText(jsonPath, json);
     }
 
-    private static string? ResolveLatestTieredBaselineJson(string reportsDir, string reportFilePrefix)
+    private static string? ResolveLatestTieredBaselineJson(string reportsDir, string reportFilePrefix, string? fallbackBaselineFileName = null)
     {
-        if (!Directory.Exists(reportsDir))
+        if (Directory.Exists(reportsDir))
         {
-            return null;
+            var pattern = $"{reportFilePrefix}_*.json";
+            var candidates = Directory
+                .GetFiles(reportsDir, pattern, System.IO.SearchOption.TopDirectoryOnly)
+                .Select(path => new FileInfo(path))
+                .OrderByDescending(file => file.LastWriteTimeUtc)
+                .ToArray();
+
+            if (candidates.Length > 0)
+            {
+                return candidates[0].FullName;
+            }
         }
 
-        var pattern = $"{reportFilePrefix}_*.json";
-        var candidates = Directory
-            .GetFiles(reportsDir, pattern, System.IO.SearchOption.TopDirectoryOnly)
-            .Select(path => new FileInfo(path))
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ToArray();
+        // 静态回退：当 reportsDir 中无历史报告时，尝试加载预设基线文件
+        if (!string.IsNullOrWhiteSpace(fallbackBaselineFileName))
+        {
+            var fallbackPath = Path.Combine(reportsDir, "Baselines", fallbackBaselineFileName);
+            if (File.Exists(fallbackPath))
+            {
+                return fallbackPath;
+            }
+        }
 
-        return candidates.Length == 0 ? null : candidates[0].FullName;
+        return null;
     }
 
     private sealed record BaselineLookup(

@@ -1,0 +1,38 @@
+{
+  "GeneratedAt": "2026-03-02T00:00:00Z",
+  "Note": "Static baseline representing expected post-optimization performance (Sprint A/B/C). Used as fallback when no dynamic baseline exists in reportsDir.",
+  "Scenarios": [
+    {
+      "Scenario": "VMXQ_LargeFile_CompileAndExecute_10k",
+      "MeanMs": 7.2
+    },
+    {
+      "Scenario": "VMXQ_LargeFile_CompileAndExecute_50k_Generated",
+      "MeanMs": 36.8
+    },
+    {
+      "Scenario": "VMXQ_Edge_DeepRecursion_NearLimit",
+      "MeanMs": 0.155
+    },
+    {
+      "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+      "MeanMs": 36.0
+    },
+    {
+      "Scenario": "VMXQ_Edge_HighThrowRate_TryCatch",
+      "MeanMs": 27.0
+    },
+    {
+      "Scenario": "VMXQ_Edge_LargeClosureCapture_HighFreq",
+      "MeanMs": 26.5
+    },
+    {
+      "Scenario": "VMXQ_Concurrency_Channel_MPMC_4Workers",
+      "MeanMs": 70.0
+    },
+    {
+      "Scenario": "VMXQ_Concurrency_MutexAtomicCounter_4Workers",
+      "MeanMs": 115.0
+    }
+  ]
+}

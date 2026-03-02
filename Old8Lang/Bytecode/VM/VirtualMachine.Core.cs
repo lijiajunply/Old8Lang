@@ -22,6 +22,9 @@ public partial class VirtualMachine
     private readonly ThreadLocal<Stack<CallFrame>> _threadCallStack = new(() => new Stack<CallFrame>());
     private readonly ThreadLocal<Stack<ExceptionHandler>> _threadExceptionHandlers = new(() => new Stack<ExceptionHandler>());
 
+    // CallFrame 对象池：复用帧实例，减少 GC 压力（每线程独立，最多缓存 32 个）
+    private readonly ThreadLocal<Stack<CallFrame>> _threadFramePool = new(() => new Stack<CallFrame>(32));
+
     // 线程安全的全局变量字典
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object?> _globals = new();
     private readonly BytecodeFile _bytecodeFile;
@@ -213,6 +216,35 @@ public partial class VirtualMachine
         return _bytecodeFile.ConstantPool.GetConstant(index);
     }
 
+    /// <summary>
+    /// 从线程本地池租借 CallFrame（如池为空则新建），并用指定参数初始化
+    /// </summary>
+    private CallFrame RentCallFrame(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    {
+        var pool = _threadFramePool.Value!;
+        if (pool.Count > 0)
+        {
+            var frame = pool.Pop();
+            frame.ReinitializeFromPool(function, locals, localCount, usesPooledLocals);
+            return frame;
+        }
+
+        return new CallFrame(function, locals, localCount, usesPooledLocals);
+    }
+
+    /// <summary>
+    /// 将 CallFrame 归还到线程本地池（上限 32 个，超出则丢弃）
+    /// </summary>
+    private void ReturnCallFrame(CallFrame frame)
+    {
+        frame.ClearForPool();
+        var pool = _threadFramePool.Value!;
+        if (pool.Count < 32)
+        {
+            pool.Push(frame);
+        }
+    }
+
     private static object?[] RentLocalsBuffer(int localCount)
     {
         if (localCount <= 0)
@@ -281,6 +313,7 @@ public partial class VirtualMachine
             }
             _callStack.Pop();
             ReturnLocalsBuffer(frame);
+            ReturnCallFrame(frame);
         }
     }
 
@@ -292,11 +325,8 @@ public partial class VirtualMachine
         var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
         var locals = RentLocalsBuffer(function.LocalCount);
 
-        // 创建调用帧
-        var frame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
-        {
-            Arguments = processedArguments
-        };
+        var frame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
+        frame.Arguments = processedArguments;
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
@@ -347,13 +377,10 @@ public partial class VirtualMachine
         var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
         var locals = RentLocalsBuffer(function.LocalCount);
 
-        // 创建调用帧，并设置闭包环境和常量池
-        var frame = new CallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0)
-        {
-            Arguments = processedArguments,
-            ClosureEnvironment = capturedVariables,  // 将捕获的变量设置为闭包环境
-            ConstantPool = constantPool  // 设置常量池（用于模块导入的函数）
-        };
+        var frame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
+        frame.Arguments = processedArguments;
+        frame.ClosureEnvironment = capturedVariables;
+        frame.ConstantPool = constantPool;
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)

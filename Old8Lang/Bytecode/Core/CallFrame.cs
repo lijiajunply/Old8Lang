@@ -9,16 +9,16 @@ namespace Old8Lang.Bytecode.Core;
 public class CallFrame
 {
     /// <summary>当前执行的函数</summary>
-    public FunctionMetadata Function { get; }
+    public FunctionMetadata Function { get; private set; } = null!;
 
     /// <summary>局部变量数组</summary>
-    public object?[] Locals { get; }
+    public object?[] Locals { get; private set; } = [];
 
     /// <summary>局部变量有效槽位数量</summary>
-    public int LocalCount { get; }
+    public int LocalCount { get; private set; }
 
     /// <summary>局部变量数组是否来自池</summary>
-    public bool UsesPooledLocals { get; }
+    public bool UsesPooledLocals { get; private set; }
 
     /// <summary>指令指针(Instruction Pointer)</summary>
     public int IP { get; set; } = 0;
@@ -63,6 +63,37 @@ public class CallFrame
         Locals = locals;
         LocalCount = localCount;
         UsesPooledLocals = usesPooledLocals;
+    }
+
+    /// <summary>
+    /// 从对象池取出后重新初始化（复用帧实例，避免分配）
+    /// </summary>
+    internal void ReinitializeFromPool(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    {
+        Function = function;
+        Locals = locals;
+        LocalCount = localCount;
+        UsesPooledLocals = usesPooledLocals;
+        IP = 0;
+        Caller = null;
+        Arguments = null;
+        _deferStack?.Clear();   // 清空但保留 Stack 实例，下次继续复用
+        GeneratorId = null;
+        AsyncGeneratorId = null;
+        ClosureEnvironment = null;
+        ConstantPool = null;
+    }
+
+    /// <summary>
+    /// 归还对象池前清理持有的引用（防止 GC root 泄漏）
+    /// </summary>
+    internal void ClearForPool()
+    {
+        Arguments = null;
+        ClosureEnvironment = null;
+        ConstantPool = null;
+        Caller = null;
+        // Function/Locals/LocalCount/UsesPooledLocals 在 ReinitializeFromPool 时会被覆盖，无需清空
     }
 
     /// <summary>是否存在待执行的 defer 指令</summary>
