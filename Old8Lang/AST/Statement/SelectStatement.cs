@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Concurrency;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
@@ -117,6 +118,8 @@ public partial class SelectStatement(
         while (true)
         {
             // 检查每个case
+            bool allCasesClosed = true;
+
             foreach (var selectCase in cases)
             {
                 if (selectCase.IsReceive)
@@ -152,6 +155,15 @@ public partial class SelectStatement(
                     }
 
                     var receiveResult = ResourceManager.TryReceiveChannel(channelId, 0);
+
+                    // 检测 Channel 是否已关闭
+                    if (receiveResult.IsChannelClosed)
+                    {
+                        continue;
+                    }
+
+                    allCasesClosed = false;
+
                     if (receiveResult.Success)
                     {
                         // 接收成功
@@ -172,6 +184,15 @@ public partial class SelectStatement(
                     if (channelIdValue is IntLangValue intVal)
                     {
                         int channelId = intVal.Value;
+
+                        // 检测 Channel 是否已关闭
+                        if (ResourceManager.IsChannelClosed(channelId))
+                        {
+                            continue;
+                        }
+
+                        allCasesClosed = false;
+
                         var sendValue = selectCase.SendValueExpression!.Run(manager);
                         if (ResourceManager.TrySendChannel(channelId, sendValue.GetValue(), 0))
                         {
@@ -188,6 +209,12 @@ public partial class SelectStatement(
             {
                 defaultCase.Run(manager);
                 return;
+            }
+
+            // 所有 Channel 都已关闭，抛出异常
+            if (allCasesClosed && cases.Count > 0)
+            {
+                throw new ChannelClosedError(this, "select 语句中所有 Channel 已关闭，无法进行任何操作");
             }
 
             // 短暂休眠避免CPU 100%占用

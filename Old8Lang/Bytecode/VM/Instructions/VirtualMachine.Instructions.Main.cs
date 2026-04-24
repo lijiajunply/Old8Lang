@@ -135,6 +135,7 @@ public partial class VirtualMachine
             case OpCode.ChannelClose:
             case OpCode.ChannelTrySend:
             case OpCode.ChannelTryReceive:
+            case OpCode.ChannelIsClosed:
             case OpCode.SemaphoreCreate:
             case OpCode.SemaphoreAcquire:
             case OpCode.SemaphoreRelease:

@@ -19,9 +19,19 @@ public class ChannelReceiveResult
     public object? Value { get; set; }
 
     /// <summary>
+    /// Channel 是否已关闭
+    /// </summary>
+    public bool IsChannelClosed { get; set; }
+
+    /// <summary>
     /// 表示接收失败的结果
     /// </summary>
     public static ChannelReceiveResult Failed => new() { Success = false, Value = null };
+
+    /// <summary>
+    /// 表示 Channel 已关闭的结果
+    /// </summary>
+    public static ChannelReceiveResult Closed => new() { Success = false, Value = null, IsChannelClosed = true };
 
     /// <summary>
     /// 表示接收成功的结果
@@ -62,7 +72,10 @@ public static class ResourceManager
     private static readonly ConcurrentDictionary<int, ResourceWrapper<ReaderWriterLockSlim>> ReadWriteLocks = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CountDownLatchImpl>> CountDownLatches = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CyclicBarrierImpl>> CyclicBarriers = new();
-    private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>> CancellationTokenSources = new();
+
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>>
+        CancellationTokenSources = new();
+
     private static readonly ConcurrentDictionary<int, ResourceWrapper<VMThreadWrapper>> Threads = new();
 
     // ID 计数器
@@ -88,9 +101,11 @@ public static class ResourceManager
             {
                 // 使用 Interlocked 确保线程安全的单例初始化
                 Interlocked.CompareExchange(ref _cleanupTimer,
-                    new Timer(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes), TimeSpan.FromMinutes(AutoCleanupIntervalMinutes)),
+                    new Timer(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes),
+                        TimeSpan.FromMinutes(AutoCleanupIntervalMinutes)),
                     null);
             }
+
             return _cleanupTimer;
         }
     }
@@ -115,6 +130,7 @@ public static class ResourceManager
         {
             throw new ArgumentException($"{resourceTypeName} ID {resourceId} 不存在");
         }
+
         return wrapper;
     }
 
@@ -347,17 +363,28 @@ public static class ResourceManager
             return ChannelReceiveResult.FromValue(value);
         }
 
-        using var cts = timeoutMs >= 0
+        // 非阻塞模式下，先检查 Channel 是否已关闭
+        if (timeoutMs == 0)
+        {
+            if (reader.Completion.IsCompleted)
+            {
+                return ChannelReceiveResult.Closed;
+            }
+
+            return ChannelReceiveResult.Failed;
+        }
+
+        using var cts = timeoutMs > 0
             ? new CancellationTokenSource(timeoutMs)
             : new CancellationTokenSource();
 
         try
         {
-            // 先等待可读，再显式 TryRead，避免 ReadAsync 超时后遗留挂起读取任务导致消息被“吞掉”。
+            // 先等待可读，再显式 TryRead，避免 ReadAsync 超时后遗留挂起读取任务导致消息被”吞掉”。
             var canRead = reader.WaitToReadAsync(cts.Token).AsTask().GetAwaiter().GetResult();
             if (!canRead)
             {
-                return ChannelReceiveResult.Failed;
+                return ChannelReceiveResult.Closed;
             }
 
             return reader.TryRead(out value)
@@ -368,6 +395,14 @@ public static class ResourceManager
         {
             return ChannelReceiveResult.Failed;
         }
+    }
+
+    /// <summary>
+    /// 检查指定 Channel 是否已关闭
+    /// </summary>
+    public static bool IsChannelClosed(int channelId)
+    {
+        return Channels.TryGetValue(channelId, out var wrapper) && wrapper.Resource.Reader.Completion.IsCompleted;
     }
 
     public static void CloseChannel(int channelId)
@@ -390,7 +425,8 @@ public static class ResourceManager
     public static int CreateReadWriteLock()
     {
         var id = Interlocked.Increment(ref _readWriteLockIdCounter);
-        ReadWriteLocks[id] = new ResourceWrapper<ReaderWriterLockSlim>(new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
+        ReadWriteLocks[id] =
+            new ResourceWrapper<ReaderWriterLockSlim>(new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
         ResourceTypes[id] = ResourceType.ReadWriteLock;
         return id;
     }
@@ -429,6 +465,7 @@ public static class ResourceManager
         {
             wrapper.UpdateLastAccessTime();
         }
+
         return acquired;
     }
 
@@ -440,6 +477,7 @@ public static class ResourceManager
         {
             wrapper.UpdateLastAccessTime();
         }
+
         return acquired;
     }
 
