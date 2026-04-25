@@ -15,6 +15,7 @@ internal static class BenchmarkArgumentParser
         return args[0] switch
         {
             "--validate" => BenchmarkCommand.Validate,
+            "--vm-diagnose" => BenchmarkCommand.VmDiagnose,
             "--quick" => BenchmarkCommand.QuickCompare,
             "--vm" => BenchmarkCommand.Vm,
             "--vm-report" => BenchmarkCommand.VmReport,

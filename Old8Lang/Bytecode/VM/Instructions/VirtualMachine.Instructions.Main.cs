@@ -28,6 +28,26 @@ public partial class VirtualMachine
     {
         switch (instruction.OpCode)
         {
+            case OpCode.LoadConst:
+            case OpCode.LoadLocal:
+            case OpCode.StoreLocal:
+            case OpCode.LoadGlobal:
+            case OpCode.StoreGlobal:
+                ExecuteStackOperation(instruction, frame);
+                return;
+            case OpCode.Call:
+            case OpCode.Jump:
+            case OpCode.JumpIfFalse:
+                ExecuteControlFlowOperation(instruction, frame);
+                return;
+            case OpCode.Add:
+            case OpCode.Less:
+                ExecuteHotOperation(instruction, frame);
+                return;
+        }
+
+        switch (instruction.OpCode)
+        {
 
             // === 栈操作 ===
             case OpCode.Nop:
@@ -206,6 +226,41 @@ public partial class VirtualMachine
                 throw new InvalidOperationError(GetPosition(instruction), 
                     $"未知的指令: {instruction.OpCode}");
         }
+    }
+
+    private void ExecuteHotOperation(Instruction instruction, CallFrame frame)
+    {
+        switch (instruction.OpCode)
+        {
+            case OpCode.Add:
+                ExecuteArithmeticOperation(instruction, frame);
+                return;
+            case OpCode.Less:
+                ExecuteComparisonOperation(instruction, frame);
+                return;
+        }
+    }
+
+    private object? ResolveGlobalValue(CallFrame frame, string varName, Instruction instruction)
+    {
+        if (frame.ClosureEnvironment != null &&
+            frame.ClosureEnvironment.TryGetLocalIndex(varName, out var closureLocalIndex))
+        {
+            return frame.ClosureEnvironment.GetLocalValue(closureLocalIndex);
+        }
+
+        if (frame.ClosureEnvironment != null &&
+            frame.ClosureEnvironment.TryGetValue(varName, out var closureValue))
+        {
+            return closureValue;
+        }
+
+        if (_globals.TryGetValue(varName, out var globalResolvedValue))
+        {
+            return globalResolvedValue;
+        }
+
+        throw new NameError(GetPosition(instruction), varName);
     }
 
     // === 辅助方法 ===

@@ -8,14 +8,14 @@ namespace Old8Lang.Bytecode.Closures;
 /// </summary>
 public sealed class ClosureEnvironment
 {
-    private static readonly Dictionary<string, object?> EmptyCapturedVariables = new(0);
-    public static readonly ClosureEnvironment Empty = new(EmptyCapturedVariables);
+    public static readonly ClosureEnvironment Empty = new([], [], null);
+    private const int LinearScanThreshold = 4;
     private const int FrozenLookupThreshold = 6;
-    private static readonly FrozenDictionary<string, object?> EmptyFrozenCapturedVariables =
-        EmptyCapturedVariables.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private readonly Dictionary<string, object?>? _capturedVariables;
-    private readonly FrozenDictionary<string, object?>? _frozenCapturedVariables;
+    private readonly string[] _capturedNames;
+    private readonly object?[] _capturedValues;
+    private readonly FrozenDictionary<string, int>? _frozenNameToIndex;
+    private Dictionary<string, int>? _nameToIndex;
 
     /// <summary>
     /// 父级闭包环境（用于嵌套闭包按需回溯查找）
@@ -31,19 +31,49 @@ public sealed class ClosureEnvironment
 
         if (capturedVariables.Count == 0)
         {
-            _capturedVariables = null;
-            _frozenCapturedVariables = EmptyFrozenCapturedVariables;
-        }
-        else if (capturedVariables.Count >= FrozenLookupThreshold)
-        {
-            _capturedVariables = null;
-            _frozenCapturedVariables = capturedVariables.ToFrozenDictionary(StringComparer.Ordinal);
+            _capturedNames = [];
+            _capturedValues = [];
+            _frozenNameToIndex = null;
         }
         else
         {
-            _capturedVariables = capturedVariables;
-            _frozenCapturedVariables = null;
+            _capturedNames = new string[capturedVariables.Count];
+            _capturedValues = new object?[capturedVariables.Count];
+
+            var index = 0;
+            foreach (var (name, value) in capturedVariables)
+            {
+                _capturedNames[index] = name;
+                _capturedValues[index] = value;
+                index++;
+            }
+
+            _frozenNameToIndex = capturedVariables.Count >= FrozenLookupThreshold
+                ? _capturedNames
+                    .Select((name, idx) => new KeyValuePair<string, int>(name, idx))
+                    .ToFrozenDictionary(StringComparer.Ordinal)
+                : null;
         }
+
+        Parent = parent;
+    }
+
+    public ClosureEnvironment(string[] capturedNames, object?[] capturedValues, ClosureEnvironment? parent = null)
+    {
+        ArgumentNullException.ThrowIfNull(capturedNames);
+        ArgumentNullException.ThrowIfNull(capturedValues);
+        if (capturedNames.Length != capturedValues.Length)
+        {
+            throw new ArgumentException("闭包名称和值数量不匹配");
+        }
+
+        _capturedNames = capturedNames;
+        _capturedValues = capturedValues;
+        _frozenNameToIndex = capturedNames.Length >= FrozenLookupThreshold
+            ? capturedNames
+                .Select((name, idx) => new KeyValuePair<string, int>(name, idx))
+                .ToFrozenDictionary(StringComparer.Ordinal)
+            : null;
 
         Parent = parent;
     }
@@ -51,7 +81,7 @@ public sealed class ClosureEnvironment
     /// <summary>
     /// 局部捕获变量数量（不含父级）
     /// </summary>
-    public int LocalCount => _capturedVariables?.Count ?? _frozenCapturedVariables?.Count ?? 0;
+    public int LocalCount => _capturedNames.Length;
 
     /// <summary>
     /// 尝试获取变量值（先查局部，再向父级回溯）
@@ -59,18 +89,61 @@ public sealed class ClosureEnvironment
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool TryGetLocalValue(string variableName, out object? value)
     {
-        if (_capturedVariables != null)
+        if (TryGetLocalIndex(variableName, out var index))
         {
-            return _capturedVariables.TryGetValue(variableName, out value);
-        }
-
-        if (_frozenCapturedVariables != null)
-        {
-            return _frozenCapturedVariables.TryGetValue(variableName, out value);
+            value = _capturedValues[index];
+            return true;
         }
 
         value = null;
         return false;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetLocalIndex(string variableName, out int index)
+    {
+        if (_capturedNames.Length <= LinearScanThreshold)
+        {
+            for (var i = 0; i < _capturedNames.Length; i++)
+            {
+                if (string.Equals(_capturedNames[i], variableName, StringComparison.Ordinal))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            index = -1;
+            return false;
+        }
+
+        if (_frozenNameToIndex != null)
+        {
+            return _frozenNameToIndex.TryGetValue(variableName, out index);
+        }
+
+        var nameToIndex = _nameToIndex;
+        if (nameToIndex == null)
+        {
+            nameToIndex = new Dictionary<string, int>(_capturedNames.Length, StringComparer.Ordinal);
+            for (var i = 0; i < _capturedNames.Length; i++)
+            {
+                if (!nameToIndex.ContainsKey(_capturedNames[i]))
+                {
+                    nameToIndex[_capturedNames[i]] = i;
+                }
+            }
+
+            _nameToIndex = nameToIndex;
+        }
+
+        return nameToIndex.TryGetValue(variableName, out index);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public object? GetLocalValue(int index)
+    {
+        return _capturedValues[index];
     }
 
     public bool TryGetValue(string variableName, out object? value)
@@ -93,19 +166,9 @@ public sealed class ClosureEnvironment
     public Dictionary<string, object?> SnapshotToDictionary()
     {
         var merged = Parent?.SnapshotToDictionary() ?? new Dictionary<string, object?>();
-        if (_capturedVariables != null)
+        for (var i = 0; i < _capturedNames.Length; i++)
         {
-            foreach (var (name, value) in _capturedVariables)
-            {
-                merged[name] = value;
-            }
-        }
-        else if (_frozenCapturedVariables != null)
-        {
-            foreach (var (name, value) in _frozenCapturedVariables)
-            {
-                merged[name] = value;
-            }
+            merged[_capturedNames[i]] = _capturedValues[i];
         }
 
         return merged;

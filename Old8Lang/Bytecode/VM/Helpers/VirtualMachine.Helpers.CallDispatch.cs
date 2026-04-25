@@ -177,7 +177,6 @@ public partial class VirtualMachine
             }
 
             var fallbackArgs = PopArguments(argCount);
-
             if (TryResolveClassByName(funcName, out var classMetadata))
             {
                 var obj = CreateObjectInstance(classMetadata, fallbackArgs);
@@ -232,7 +231,6 @@ public partial class VirtualMachine
                 return;
             }
 
-            // 快速路径：参数数量匹配且无 params 参数时，跳过 NormalizeArguments + new SourcePosition()
             if (CanSkipNormalizeForPositionalCall(funcMeta, args.Length))
             {
                 var locals = RentLocalsBuffer(funcMeta.LocalCount);

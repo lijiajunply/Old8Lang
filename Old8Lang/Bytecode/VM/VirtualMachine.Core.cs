@@ -271,9 +271,12 @@ public partial class VirtualMachine
     private void ExecuteFrameLoop(CallFrame frame)
     {
         var function = frame.Function;
-        while (frame.IP < function.Instructions.Count)
+        var instructions = function.Instructions;
+        var instructionCount = instructions.Count;
+        while (frame.IP < instructionCount)
         {
-            var instruction = function.Instructions[frame.IP];
+            var instructionIndex = frame.IP;
+            var instruction = instructions[instructionIndex];
             frame.IP++;
 
             try

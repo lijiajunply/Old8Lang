@@ -46,22 +46,7 @@ public partial class VirtualMachine
             case OpCode.LoadGlobal:
             {
                 string varName = (string)instruction.Operand!;
-
-                // 先检查闭包环境
-                if (frame.ClosureEnvironment != null &&
-                    frame.ClosureEnvironment.TryGetValue(varName, out var closureValue))
-                {
-                    _stack.Push(closureValue);
-                }
-                // 再检查全局变量
-                else if (_globals.TryGetValue(varName, out var globalValue))
-                {
-                    _stack.Push(globalValue);
-                }
-                else
-                {
-                    throw new NameError(GetPosition(instruction), varName);
-                }
+                _stack.Push(ResolveGlobalValue(frame, varName, instruction));
             }
                 break;
 

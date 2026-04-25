@@ -20,6 +20,7 @@ internal static class BenchmarkProgram
         return command switch
         {
             BenchmarkCommand.Validate => RunValidate(args),
+            BenchmarkCommand.VmDiagnose => RunVmDiagnose(),
             BenchmarkCommand.QuickCompare => RunQuickCompare(args),
             BenchmarkCommand.Vm => RunVmBenchmarksAndOptionalReport(generateReport: false),
             BenchmarkCommand.VmReport => RunVmBenchmarksAndOptionalReport(generateReport: true),
@@ -44,6 +45,15 @@ internal static class BenchmarkProgram
     {
         Console.WriteLine("运行快速性能对比测试...\n");
         SimpleReflectionBenchmark.Main(args);
+        return 0;
+    }
+
+    private static int RunVmDiagnose()
+    {
+        Console.WriteLine("运行 VM 热点诊断...\n");
+        var reportsDir = GetReportsDir();
+        var reportPath = VmHotspotDiagnosticRunner.Run(reportsDir);
+        Console.WriteLine($"VM 热点诊断报告: {reportPath}");
         return 0;
     }
 

@@ -9,10 +9,10 @@ namespace Old8Lang.Bytecode.Core;
 public class CallFrame
 {
     /// <summary>当前执行的函数</summary>
-    public FunctionMetadata Function { get; private set; } = null!;
+    public FunctionMetadata Function { get; private set; }
 
     /// <summary>局部变量数组</summary>
-    public object?[] Locals { get; private set; } = [];
+    public object?[] Locals { get; private set; }
 
     /// <summary>局部变量有效槽位数量</summary>
     public int LocalCount { get; private set; }

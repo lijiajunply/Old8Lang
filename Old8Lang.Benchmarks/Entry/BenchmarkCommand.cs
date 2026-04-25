@@ -7,6 +7,7 @@ public enum BenchmarkCommand
 {
     DefaultParserBenchmark,
     Validate,
+    VmDiagnose,
     QuickCompare,
     Vm,
     VmReport,

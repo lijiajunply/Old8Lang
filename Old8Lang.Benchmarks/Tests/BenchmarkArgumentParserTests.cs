@@ -8,6 +8,7 @@ public class BenchmarkArgumentParserTests
     [Theory]
     [InlineData(new string[] { }, BenchmarkCommand.DefaultParserBenchmark)]
     [InlineData(new[] { "--validate" }, BenchmarkCommand.Validate)]
+    [InlineData(new[] { "--vm-diagnose" }, BenchmarkCommand.VmDiagnose)]
     [InlineData(new[] { "--quick" }, BenchmarkCommand.QuickCompare)]
     [InlineData(new[] { "--vm" }, BenchmarkCommand.Vm)]
     [InlineData(new[] { "--vm-report" }, BenchmarkCommand.VmReport)]

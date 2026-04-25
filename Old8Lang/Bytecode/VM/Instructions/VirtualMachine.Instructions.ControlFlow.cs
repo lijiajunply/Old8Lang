@@ -180,39 +180,59 @@ public partial class VirtualMachine
 
             case OpCode.MakeClosure:
             {
-                // 操作数: [funcIndex, capturedVarCount, varNames...]
                 var operands = (object[])instruction.Operand!;
                 int funcIndex = (int)operands[0];
                 int capturedVarCount = (int)operands[1];
-                string[] varNames = (string[])operands[2];
 
-                // 获取函数元数据
                 if (funcIndex < 0 || funcIndex >= _bytecodeFile.Functions.Count)
                 {
                     throw new IndexError(GetPosition(instruction), $"无效的函数索引: {funcIndex}");
                 }
 
                 var funcMeta = _bytecodeFile.Functions[funcIndex];
+                var localCaptureCount = 0;
 
-                // 从栈中弹出捕获的变量值（按相反顺序）
-                var capturedVariables = new Dictionary<string, object?>(capturedVarCount);
-                for (int i = capturedVarCount - 1; i >= 0; i--)
+                for (var i = 0; i < capturedVarCount; i++)
                 {
-                    var value = _stack.Pop();
-                    capturedVariables[varNames[i]] = value;
+                    var baseIndex = 2 + i * 3;
+                    if ((int)operands[baseIndex] == 0)
+                    {
+                        localCaptureCount++;
+                    }
                 }
 
-                ClosureEnvironment closureEnvironment;
-                if (frame.ClosureEnvironment == null)
+                var localCapturedNames = localCaptureCount == 0 ? [] : new string[localCaptureCount];
+                var localCapturedValues = localCaptureCount == 0 ? [] : new object?[localCaptureCount];
+                var localCaptureIndex = 0;
+
+                for (var i = 0; i < capturedVarCount; i++)
                 {
-                    closureEnvironment = new ClosureEnvironment(capturedVariables);
-                }
-                else
-                {
-                    closureEnvironment = new ClosureEnvironment(capturedVariables, frame.ClosureEnvironment);
+                    var baseIndex = 2 + i * 3;
+                    var captureKind = (int)operands[baseIndex];
+                    var captureOperand = (int)operands[baseIndex + 1];
+                    var captureName = (string)operands[baseIndex + 2];
+
+                    switch (captureKind)
+                    {
+                        case 0:
+                            localCapturedNames[localCaptureIndex] = captureName;
+                            localCapturedValues[localCaptureIndex] = frame.Locals[captureOperand];
+                            localCaptureIndex++;
+                            break;
+                        case 1:
+                        case 2:
+                            break;
+                        default:
+                            throw new InvalidOperationError(GetPosition(instruction), $"未知的闭包捕获类型: {captureKind}");
+                    }
                 }
 
-                // 创建闭包对象
+                ClosureEnvironment closureEnvironment = localCaptureCount == 0
+                    ? new ClosureEnvironment([], [], frame.ClosureEnvironment)
+                    : new ClosureEnvironment(
+                        localCapturedNames,
+                        localCapturedValues,
+                        frame.ClosureEnvironment);
                 var closure = new ClosureValue(funcMeta, closureEnvironment);
                 _stack.Push(closure);
             }

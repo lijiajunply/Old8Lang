@@ -675,35 +675,36 @@ public partial class BytecodeVisitor
         // 7. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令
         if (actualCapturedVars.Count > 0)
         {
-            // 为每个捕获的变量加载其值到栈
-            foreach (var varName in actualCapturedVars)
+            // 生成 MakeClosure 指令
+            // 操作数: [funcIndex, capturedVarCount, kind0, operand0, name0, kind1, operand1, name1, ...]
+            var operand = new object[2 + actualCapturedVars.Count * 3];
+            operand[0] = funcIndex;
+            operand[1] = actualCapturedVars.Count;
+
+            for (var i = 0; i < actualCapturedVars.Count; i++)
             {
+                var varName = actualCapturedVars[i];
+                var baseIndex = 2 + i * 3;
                 if (_compiler.IsLocalVariable(varName))
                 {
-                    int localIndex = _compiler.GetLocalIndex(varName);
-                    Emit(OpCode.LoadLocal, localIndex);
+                    operand[baseIndex] = 0;
+                    operand[baseIndex + 1] = _compiler.GetLocalIndex(varName);
+                    operand[baseIndex + 2] = varName;
                 }
                 else if (_compiler.IsCapturedVariable(varName))
                 {
-                    // 如果变量是当前函数的捕获变量，使用 LoadGlobal 从闭包环境加载
-                    // （虚拟机会自动从闭包环境中查找）
-                    Emit(OpCode.LoadGlobal, varName);
-                }
-                else if (_compiler.IsGlobalVariable(varName))
-                {
-                    Emit(OpCode.LoadGlobal, varName);
+                    operand[baseIndex] = 1;
+                    operand[baseIndex + 1] = -1;
+                    operand[baseIndex + 2] = varName;
                 }
                 else
                 {
-                    // 对于嵌套闭包，变量可能来自外层函数的参数或外层闭包的捕获变量
-                    // 使用 LoadGlobal 从闭包环境中加载（虚拟机会自动查找）
-                    Emit(OpCode.LoadGlobal, varName);
+                    operand[baseIndex] = 2;
+                    operand[baseIndex + 1] = -1;
+                    operand[baseIndex + 2] = varName;
                 }
             }
 
-            // 生成 MakeClosure 指令
-            // 操作数: [funcIndex, capturedVarCount, varNames...]
-            var operand = new object[] { funcIndex, actualCapturedVars.Count, actualCapturedVars.ToArray() };
             Emit(OpCode.MakeClosure, operand);
         }
         else
