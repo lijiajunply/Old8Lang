@@ -315,7 +315,7 @@ public class VMConcurrencyCountDownLatchTests
 
             Sleep(100)
             CountDownLatchCountDown(latch)
-            Sleep(100)
+            Sleep(250)
 
             result <- results.Count()
             CountDownLatchDispose(latch)

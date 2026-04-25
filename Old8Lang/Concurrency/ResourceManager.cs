@@ -494,6 +494,7 @@ public static class ResourceManager
     public static void AcquireReadLock(int lockId)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         wrapper.Resource.EnterReadLock();
         wrapper.UpdateLastAccessTime();
     }
@@ -507,6 +508,7 @@ public static class ResourceManager
     public static void AcquireWriteLock(int lockId)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         wrapper.Resource.EnterWriteLock();
         wrapper.UpdateLastAccessTime();
     }
@@ -520,6 +522,7 @@ public static class ResourceManager
     public static bool TryAcquireReadLock(int lockId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         bool acquired = wrapper.Resource.TryEnterReadLock(timeoutMs);
         if (acquired)
         {
@@ -532,6 +535,7 @@ public static class ResourceManager
     public static bool TryAcquireWriteLock(int lockId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         bool acquired = wrapper.Resource.TryEnterWriteLock(timeoutMs);
         if (acquired)
         {

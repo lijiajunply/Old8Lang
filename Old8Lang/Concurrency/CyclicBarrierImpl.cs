@@ -20,11 +20,13 @@ public class CyclicBarrierImpl : IDisposable
 
     public void Await()
     {
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         _barrier.SignalAndWait();
     }
 
     public bool Await(int timeoutMs)
     {
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         try
         {
             return _barrier.SignalAndWait(timeoutMs);

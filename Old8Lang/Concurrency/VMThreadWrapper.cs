@@ -5,32 +5,32 @@ namespace Old8Lang.Concurrency;
 /// </summary>
 public class VMThreadWrapper : IDisposable
 {
+    private const int BootstrapDedicatedThreadCount = 16;
+    private const int StartupFallbackTimeoutMs = 2;
     private readonly Action _action;
     private readonly TaskCompletionSource<object?> _completionSource =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly Thread _thread;
+    private readonly bool _preferDedicatedThread;
     private int _started;
     private int _disposed;
+    private int _status;
+    private int _dedicatedFallbackStarted;
+
+    private const int StatusCreated = 0;
+    private const int StatusQueued = 1;
+    private const int StatusRunning = 2;
+    private const int StatusCompleted = 3;
+    private static int _activeExecutionUnits;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="action">线程执行的动作</param>
-    public VMThreadWrapper(Action action)
+    /// <param name="preferDedicatedThread">是否优先使用独立线程</param>
+    public VMThreadWrapper(Action action, bool preferDedicatedThread = false)
     {
         _action = action ?? throw new ArgumentNullException(nameof(action));
-        _thread = new Thread(() =>
-        {
-            try
-            {
-                _action();
-                _completionSource.TrySetResult(null);
-            }
-            catch (Exception ex)
-            {
-                _completionSource.TrySetException(ex);
-            }
-        });
+        _preferDedicatedThread = preferDedicatedThread;
     }
 
     /// <summary>
@@ -43,7 +43,33 @@ public class VMThreadWrapper : IDisposable
             return;
         }
 
-        _thread.Start();
+        Volatile.Write(ref _status, StatusQueued);
+
+        if (_preferDedicatedThread)
+        {
+            StartDedicatedThread();
+            return;
+        }
+
+        VMThreadPoolCompatibility.PrepareForQueuedWork();
+        _ = Task.Factory.StartNew(
+            static state => ((VMThreadWrapper)state!).RunCore(),
+            this,
+            CancellationToken.None,
+            TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler,
+            TaskScheduler.Default);
+
+        if (Volatile.Read(ref _activeExecutionUnits) < BootstrapDedicatedThreadCount)
+        {
+            StartDedicatedThread();
+            return;
+        }
+
+        if (Volatile.Read(ref _status) == StatusQueued &&
+            !SpinWait.SpinUntil(() => Volatile.Read(ref _status) != StatusQueued, StartupFallbackTimeoutMs))
+        {
+            StartDedicatedThread();
+        }
     }
 
     /// <summary>
@@ -63,7 +89,7 @@ public class VMThreadWrapper : IDisposable
     /// <summary>
     /// 检查线程是否存活
     /// </summary>
-    public bool IsAlive => Volatile.Read(ref _started) != 0 && _thread.IsAlive;
+    public bool IsAlive => Volatile.Read(ref _started) != 0 && Volatile.Read(ref _status) != StatusCompleted;
 
     /// <summary>
     /// 检查线程是否已完成
@@ -94,5 +120,44 @@ public class VMThreadWrapper : IDisposable
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
         GC.SuppressFinalize(this);
+    }
+
+    private void RunCore()
+    {
+        if (Interlocked.CompareExchange(ref _status, StatusRunning, StatusQueued) != StatusQueued)
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref _activeExecutionUnits);
+        using var executionUnitScope = VMExecutionUnitContext.EnterNewScope();
+        try
+        {
+            _action();
+            _completionSource.TrySetResult(null);
+        }
+        catch (Exception ex)
+        {
+            _completionSource.TrySetException(ex);
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _activeExecutionUnits);
+            Volatile.Write(ref _status, StatusCompleted);
+        }
+    }
+
+    private void StartDedicatedThread()
+    {
+        if (Interlocked.Exchange(ref _dedicatedFallbackStarted, 1) != 0)
+        {
+            return;
+        }
+
+        var thread = new Thread(RunCore)
+        {
+            IsBackground = true
+        };
+        thread.Start();
     }
 }

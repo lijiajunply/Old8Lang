@@ -18,6 +18,7 @@ public partial class ListLangValue : LangValueType, ILangList
     public List<LangExpression> Value { get; }
 
     public readonly List<LangValueType> Values = [];
+    private readonly object _syncRoot = new();
 
     private bool _hasBeenCleared;
 
@@ -197,6 +198,8 @@ public partial class ListLangValue : LangValueType, ILangList
     public IEnumerable<LangValueType> GetItems() => Values;
 
     public int GetLength() => Values.Count;
+
+    public object GetSyncRoot() => _syncRoot;
 
     /// <summary>
     /// 内部清空方法，同时清空 Values 并设置清空标志
