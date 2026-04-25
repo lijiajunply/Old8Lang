@@ -24,7 +24,11 @@ public static class VmHotspotDiagnosticRunner
         {
             new VmDiagnosticScenario("LargeFile_10k", File.ReadAllText(ResolveTestDataPath("vm_large_10000.old8"))),
             new VmDiagnosticScenario("LargeFile_50k_Generated", GenerateLargeFile50kCode()),
-            new VmDiagnosticScenario("LargeClosureCapture_HighFreq", EdgeClosureHighFreqCode)
+            new VmDiagnosticScenario("LargeClosureCapture_HighFreq", EdgeClosureHighFreqCode),
+            new VmDiagnosticScenario("ChannelTryReceive_Timeout0", ChannelTryReceiveTimeout0Code),
+            new VmDiagnosticScenario("ChannelTryReceive_Timeout10", ChannelTryReceiveTimeout10Code),
+            new VmDiagnosticScenario("SpawnJoin_10k", SpawnJoin10kCode),
+            new VmDiagnosticScenario("Await_10k", Await10kCode)
         };
 
         var results = scenarios.Select(MeasureScenario).ToArray();
@@ -210,6 +214,92 @@ adder <- (x:int) -> {
 sum <- 0
 for i <- 0, i < 50000, i <- i + 1 {
     sum <- sum + adder(i)
+}
+result <- sum
+";
+
+    private const string ChannelTryReceiveTimeout0Code = @"
+ch <- ChannelCreateBounded(2048)
+count <- AtomicIntCreate(0)
+producerDone <- AtomicIntCreate(0)
+
+producer <- spawn(() -> {
+    for i <- 0, i < 40000, i <- i + 1 {
+        ChannelSend(ch, i)
+    }
+    AtomicIntSet(producerDone, 1)
+    ChannelClose(ch)
+})
+producer.Start()
+
+while true {
+    v <- ChannelTryReceive(ch, 0)
+    if v != null {
+        AtomicIntIncrement(count)
+    } elif AtomicIntGet(producerDone) == 1 {
+        break
+    }
+}
+
+producer.Join()
+result <- AtomicIntGet(count)
+AtomicIntDispose(count)
+AtomicIntDispose(producerDone)
+ChannelDispose(ch)
+";
+
+    private const string ChannelTryReceiveTimeout10Code = @"
+ch <- ChannelCreateBounded(2048)
+count <- AtomicIntCreate(0)
+producerDone <- AtomicIntCreate(0)
+
+producer <- spawn(() -> {
+    for i <- 0, i < 40000, i <- i + 1 {
+        ChannelSend(ch, i)
+    }
+    AtomicIntSet(producerDone, 1)
+    ChannelClose(ch)
+})
+producer.Start()
+
+while true {
+    v <- ChannelTryReceive(ch, 10)
+    if v != null {
+        AtomicIntIncrement(count)
+    } elif AtomicIntGet(producerDone) == 1 {
+        break
+    }
+}
+
+producer.Join()
+result <- AtomicIntGet(count)
+AtomicIntDispose(count)
+AtomicIntDispose(producerDone)
+ChannelDispose(ch)
+";
+
+    private const string SpawnJoin10kCode = @"
+func worker(x:int) -> int {
+    return x
+}
+
+sum <- 0
+for i <- 1, i <= 10000, i <- i + 1 {
+    t <- spawn(worker, i)
+    t.Start()
+    sum <- sum + t.Join()
+}
+result <- sum
+";
+
+    private const string Await10kCode = @"
+async func worker(x:int) -> int {
+    return x + 1
+}
+
+sum <- 0
+for i <- 0, i < 10000, i <- i + 1 {
+    sum <- sum + await worker(i)
 }
 result <- sum
 ";

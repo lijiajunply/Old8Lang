@@ -1,0 +1,140 @@
+{
+  "GeneratedAt": "2026-04-25T12:21:52.3260089+08:00",
+  "RuntimeVersion": "10.0.7",
+  "IterationsPerScenario": 6,
+  "Scenarios": [
+    {
+      "Name": "LargeFile_10k",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 403.9821,
+        "MedianAllocatedBytes": 39459856,
+        "Gen0Collections": 18,
+        "Gen1Collections": 6,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 59.8713,
+        "MedianAllocatedBytes": 1624456,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "LargeFile_50k_Generated",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 3143.1202000000003,
+        "MedianAllocatedBytes": 212825132,
+        "Gen0Collections": 115,
+        "Gen1Collections": 67,
+        "Gen2Collections": 13
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 202.94605,
+        "MedianAllocatedBytes": 8189488,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "LargeClosureCapture_HighFreq",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.3338,
+        "MedianAllocatedBytes": 62208,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 282.19795,
+        "MedianAllocatedBytes": 14805032,
+        "Gen0Collections": 6,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "ChannelTryReceive_Timeout0",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.46485,
+        "MedianAllocatedBytes": 81392,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 113.26135,
+        "MedianAllocatedBytes": 6834664,
+        "Gen0Collections": 6,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "ChannelTryReceive_Timeout10",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.54755,
+        "MedianAllocatedBytes": 81504,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 118.51705,
+        "MedianAllocatedBytes": 6833440,
+        "Gen0Collections": 6,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "SpawnJoin_10k",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.25015,
+        "MedianAllocatedBytes": 46184,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 2095.9982,
+        "MedianAllocatedBytes": 31617012,
+        "Gen0Collections": 131,
+        "Gen1Collections": 123,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "Await_10k",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.22255000000000003,
+        "MedianAllocatedBytes": 43296,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 160.98735,
+        "MedianAllocatedBytes": 4658684,
+        "Gen0Collections": 12,
+        "Gen1Collections": 6,
+        "Gen2Collections": 0
+      }
+    }
+  ]
+}

@@ -53,8 +53,7 @@ public partial class VirtualMachine
                 // 创建并启动任务
                 var task = Task.Run(() =>
                 {
-                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
-                    foreach (var kvp in _globals) asyncVm._globals[kvp.Key] = kvp.Value;
+                    var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
                     return ConvertToLangValue(result);
                 });
@@ -155,17 +154,7 @@ public partial class VirtualMachine
                 // 创建并启动任务
                 var task = Task.Run(() =>
                 {
-                    // 在新线程中执行函数
-                    // 这里我们创建一个新的 VirtualMachine 实例来执行异步任务
-                    // 共享全局变量和常量池
-                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
-                    // 复制全局变量
-                    foreach (var kvp in _globals)
-                    {
-                        asyncVm._globals[kvp.Key] = kvp.Value;
-                    }
-
-                    // 执行函数
+                    var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
                     return ConvertToLangValue(result);
                 });
@@ -193,11 +182,8 @@ public partial class VirtualMachine
                 }
                 else if (value is Task task)
                 {
-                    // 直接是 Task 对象
                     task.GetAwaiter().GetResult();
-                    // 如果是 Task<T>，获取结果
-                    var resultProperty = task.GetType().GetProperty("Result");
-                    _stack.Push(resultProperty != null ? resultProperty.GetValue(task) : null);
+                    _stack.Push(task is Task<object?> objectTask ? objectTask.Result : null);
                 }
                 else
                 {

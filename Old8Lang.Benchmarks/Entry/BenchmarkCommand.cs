@@ -16,5 +16,7 @@ public enum BenchmarkCommand
     VmQuick,
     VmReportQuick,
     VmNightly,
-    VmReportNightly
+    VmReportNightly,
+    VmConcurrency,
+    VmReportConcurrency
 }

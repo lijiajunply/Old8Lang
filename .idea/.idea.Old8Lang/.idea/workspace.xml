@@ -29,21 +29,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Suites/VMConcurrencyPerformanceBenchmarks.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.ParserBenchmarkTests-20260215-222423.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.ParserBenchmarkTests-20260215-224455.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkArgumentParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkArgumentParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkCommand.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkProgram.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Entry/BenchmarkProgram.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/BenchmarkArgumentParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tests/BenchmarkArgumentParserTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/BytecodeVisitor.Values.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureEnvironment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Closures/ClosureEnvironment.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/CallFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/Core/CallFrame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.ControlFlow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.ControlFlow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Main.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Stack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Stack.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/VmHotspotDiagnosticRunner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Tools/VmHotspotDiagnosticRunner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Async/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Async/TaskLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Async.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Thread.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Thread.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Bytecode/VM/VirtualMachine.Core.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/MutexImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/MutexImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,11 +101,13 @@
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/baseline.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Hotspot_Diagnostic_Report_20260425_112634.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_122811.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_130659.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_013755.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260424_191358.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260425_111231.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260425_113040.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestEnvironment/o8package.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
@@ -518,7 +527,7 @@
       <workItem from="1772378960908" duration="240000" />
       <workItem from="1772379564921" duration="6770000" />
       <workItem from="1772455289741" duration="912000" />
-      <workItem from="1777086360262" duration="1280000" />
+      <workItem from="1777086360262" duration="4566000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -863,7 +872,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="969" />
+    <option name="localTasksCounter" value="970" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -890,7 +899,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
     <MESSAGE value="删除FirstUI" />
     <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
     <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
@@ -915,7 +923,8 @@
     <MESSAGE value="perf(benchmark): 优化基准测试报告去重和聚合视图&#10;&#10;- 添加 Job 字段到 TieredScenarioResult 记录类型&#10;- 实现 TieredAggregatedScenarioResult 记录类型用于聚合数据&#10;- 添加按 Scenario 分组的聚合功能，计算中位数值&#10;- 在 Markdown 报告中增加 Per-Job Details 和 Scenario Aggregate 视图&#10;- 更新基线查找逻辑，支持按 (Scenario, Job) 键查找&#10;- 实现多作业场景的状态评估和最差状态选择&#10;- 添加中位数计算辅助方法用于聚合统计&#10;- 更新测试用例验证多作业场景的报告生成" />
     <MESSAGE value="perf(vm): 优化虚拟机性能提升闭包和函数调用效率&#10;&#10;- 为 ClosureEnvironment 实现 FrozenDictionary 优化，对大捕获集使用不可变字典提升查找性能&#10;- 添加内联方法 TryGetLocalValue 优化闭包变量本地查找路径&#10;- 在 FunctionMetadata 中预计算参数类型分类缓存，实现快速调用路径&#10;- 重构虚拟机调用分发逻辑，为位置参数调用实现专用快速路径&#10;- 优化参数类型验证，在 fast path 中集成类型检查逻辑&#10;- 更新性能基准报告，验证各项优化效果" />
     <MESSAGE value="feat(bytecode): 添加特殊语句的字节码生成支持&#10;&#10;- 实现 Select 语句的字节码生成，支持 Channel 多路选择功能&#10;- 实现 Defer 语句的字节码生成，支持延迟执行机制&#10;- 实现 EnumInit 的字节码生成，支持枚举定义&#10;- 实现 ExternStatement 的字节码生成，支持外部函数导入&#10;- 实现 UsingStatement 的字节码生成，支持自动资源管理&#10;- 添加完整的 OpCode 枚举定义，涵盖栈操作、算术运算、控制流等功能&#10;- 实现并发原语相关的字节码指令，包括 Channel、Mutex、Semaphore 等&#10;- 添加异常处理和特殊指令的 OpCode 定义&#10;- 实现 ResourceManager 类，统一管理并发资源" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(bytecode): 添加特殊语句的字节码生成支持&#10;&#10;- 实现 Select 语句的字节码生成，支持 Channel 多路选择功能&#10;- 实现 Defer 语句的字节码生成，支持延迟执行机制&#10;- 实现 EnumInit 的字节码生成，支持枚举定义&#10;- 实现 ExternStatement 的字节码生成，支持外部函数导入&#10;- 实现 UsingStatement 的字节码生成，支持自动资源管理&#10;- 添加完整的 OpCode 枚举定义，涵盖栈操作、算术运算、控制流等功能&#10;- 实现并发原语相关的字节码指令，包括 Channel、Mutex、Semaphore 等&#10;- 添加异常处理和特殊指令的 OpCode 定义&#10;- 实现 ResourceManager 类，统一管理并发资源" />
+    <MESSAGE value="feat(benchmark): 添加VM诊断命令和基准测试框架重构&#10;&#10;- 添加 --vm-diagnose 命令用于运行VM热点诊断&#10;- 创建BenchmarkCommand枚举统一管理所有基准测试命令类型&#10;- 添加完整的基准测试参数解析器和程序入口逻辑&#10;- 实现多种VM基准测试模式（常规、扩展、快速、夜间构建）&#10;- 集成性能报告生成功能和诊断工具&#10;- 添加字节码编译器核心功能实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(benchmark): 添加VM诊断命令和基准测试框架重构&#10;&#10;- 添加 --vm-diagnose 命令用于运行VM热点诊断&#10;- 创建BenchmarkCommand枚举统一管理所有基准测试命令类型&#10;- 添加完整的基准测试参数解析器和程序入口逻辑&#10;- 实现多种VM基准测试模式（常规、扩展、快速、夜间构建）&#10;- 集成性能报告生成功能和诊断工具&#10;- 添加字节码编译器核心功能实现" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -8,6 +8,7 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
 using System.Buffers;
+using System.Collections.Concurrent;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 namespace Old8Lang.Bytecode.VM;
@@ -26,11 +27,11 @@ public partial class VirtualMachine
     private readonly ThreadLocal<Stack<CallFrame>> _threadFramePool = new(() => new Stack<CallFrame>(32));
 
     // 线程安全的全局变量字典
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object?> _globals = new();
+    private readonly ConcurrentDictionary<string, object?> _globals;
     private readonly BytecodeFile _bytecodeFile;
-    private readonly Dictionary<string, FunctionMetadata> _functionByName = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ClassMetadata> _classByName = new(StringComparer.Ordinal);
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<(string ModuleName, string SymbolName), object> _moduleSymbolCache = new();
+    private readonly Dictionary<string, FunctionMetadata> _functionByName;
+    private readonly Dictionary<string, ClassMetadata> _classByName;
+    private readonly ConcurrentDictionary<(string ModuleName, string SymbolName), object> _moduleSymbolCache;
 
     // 便捷属性，获取当前线程的栈
     private Stack<object?> _stack => _threadStack.Value!;
@@ -55,10 +56,26 @@ public partial class VirtualMachine
     private readonly string? _baseDirectory;
 
     public VirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
+        : this(bytecodeFile, baseDirectory, null, null, null, null, initializeRuntimeMetadata: true)
+    {
+    }
+
+    private VirtualMachine(
+        BytecodeFile bytecodeFile,
+        string? baseDirectory,
+        ConcurrentDictionary<string, object?>? sharedGlobals,
+        Dictionary<string, FunctionMetadata>? sharedFunctionByName,
+        Dictionary<string, ClassMetadata>? sharedClassByName,
+        ConcurrentDictionary<(string ModuleName, string SymbolName), object>? sharedModuleSymbolCache,
+        bool initializeRuntimeMetadata)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
         _baseDirectory = baseDirectory ?? Directory.GetCurrentDirectory();
         _moduleLoader = new ModuleLoader(_baseDirectory);
+        _globals = sharedGlobals ?? new ConcurrentDictionary<string, object?>();
+        _functionByName = sharedFunctionByName ?? new Dictionary<string, FunctionMetadata>(StringComparer.Ordinal);
+        _classByName = sharedClassByName ?? new Dictionary<string, ClassMetadata>(StringComparer.Ordinal);
+        _moduleSymbolCache = sharedModuleSymbolCache ?? new ConcurrentDictionary<(string ModuleName, string SymbolName), object>();
 
         // 初始化全局函数注册表
         GlobalFunctionInitializer.EnsureInitialized();
@@ -66,47 +83,55 @@ public partial class VirtualMachine
         // 初始化实例方法注册表
         InstanceMethodInitializer.EnsureInitialized();
 
-        // 初始化全局变量
-        foreach (var globalVar in _bytecodeFile.GlobalVariables)
+        if (initializeRuntimeMetadata)
         {
-            _globals[globalVar] = null;
-        }
-
-        foreach (var function in _bytecodeFile.Functions)
-        {
-            _functionByName.TryAdd(function.Name, function);
-        }
-
-        // 将所有类元数据注册到全局变量表中
-        // 这样在运行时可以通过类名访问类元数据（用于嵌套类访问等）
-        foreach (var classMetadata in _bytecodeFile.Classes)
-        {
-            _globals[classMetadata.Name] = classMetadata;
-            _classByName.TryAdd(classMetadata.Name, classMetadata);
-
-            // 初始化静态字段的默认值
-            foreach (var staticField in classMetadata.StaticFields)
+            foreach (var globalVar in _bytecodeFile.GlobalVariables)
             {
-                // 处理 null 默认值
-                if (staticField.IsDefaultNull)
+                _globals[globalVar] = null;
+            }
+
+            foreach (var function in _bytecodeFile.Functions)
+            {
+                _functionByName.TryAdd(function.Name, function);
+            }
+
+            foreach (var classMetadata in _bytecodeFile.Classes)
+            {
+                _globals[classMetadata.Name] = classMetadata;
+                _classByName.TryAdd(classMetadata.Name, classMetadata);
+
+                foreach (var staticField in classMetadata.StaticFields)
                 {
-                    classMetadata.StaticFieldValues[staticField.Name] = null;
-                }
-                // 从常量池获取默认值
-                else if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
-                {
-                    var defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
-                    classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
-                }
-                else
-                {
-                    classMetadata.StaticFieldValues[staticField.Name] = null;
+                    if (staticField.IsDefaultNull)
+                    {
+                        classMetadata.StaticFieldValues[staticField.Name] = null;
+                    }
+                    else if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                    {
+                        var defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
+                        classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
+                    }
+                    else
+                    {
+                        classMetadata.StaticFieldValues[staticField.Name] = null;
+                    }
                 }
             }
-        }
 
-        // 注册扩展方法到实例方法注册表
-        RegisterExtensionMethods();
+            RegisterExtensionMethods();
+        }
+    }
+
+    private VirtualMachine CreateWorkerVirtualMachine()
+    {
+        return new VirtualMachine(
+            _bytecodeFile,
+            _baseDirectory,
+            _globals,
+            _functionByName,
+            _classByName,
+            _moduleSymbolCache,
+            initializeRuntimeMetadata: false);
     }
 
     /// <summary>
@@ -529,5 +554,11 @@ public partial class VirtualMachine
             // 恢复之前的虚拟机上下文（而不是清理）
             VMContext.CurrentVM = previousVM;
         }
+    }
+
+    public object? ExecuteFunctionObjectInWorker(object? funcObj, object?[] arguments)
+    {
+        var workerVm = CreateWorkerVirtualMachine();
+        return workerVm.CallFunctionObject(funcObj, arguments);
     }
 }

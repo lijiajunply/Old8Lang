@@ -144,6 +144,22 @@ public static class VMPerformanceReport
     }
 
     /// <summary>
+    /// 从 BenchmarkDotNet artifacts 解析并生成 VM 并发/异步专项报告（md + json）
+    /// </summary>
+    public static (string MarkdownPath, string JsonPath) GenerateConcurrencyFromBenchmarkArtifacts(string artifactsDir, string reportsDir)
+    {
+        return GenerateTieredFromBenchmarkArtifacts(
+            artifactsDir,
+            reportsDir,
+            csvPattern: "*VMConcurrencyPerformanceBenchmarks*-report.csv",
+            logPattern: "*VMConcurrencyPerformanceBenchmarks-*.log",
+            notFoundMessage: "未找到 VM 并发/异步专项 BenchmarkDotNet 报告 CSV",
+            scenarioPrefix: "VMXC_",
+            reportFilePrefix: "VM_Concurrency_Performance_Report",
+            reportTitle: "Old8Lang VM Concurrency Performance Report");
+    }
+
+    /// <summary>
     /// 检查报告 JSON 是否包含 FAIL 状态
     /// </summary>
     public static bool HasFailStatus(string reportJsonPath)
@@ -909,6 +925,21 @@ public static class VMPerformanceReport
 
     private static string GetTieredCategory(string scenario)
     {
+        if (scenario.Contains("_Throughput_", StringComparison.Ordinal))
+        {
+            return "Throughput";
+        }
+
+        if (scenario.Contains("_Latency_", StringComparison.Ordinal))
+        {
+            return "Latency";
+        }
+
+        if (scenario.Contains("_Allocation_", StringComparison.Ordinal))
+        {
+            return "Allocation";
+        }
+
         if (scenario.Contains("_LargeFile_", StringComparison.Ordinal))
         {
             return "LargeFile";
@@ -931,6 +962,9 @@ public static class VMPerformanceReport
     {
         return category switch
         {
+            "Throughput" => 8d,
+            "Latency" => 8d,
+            "Allocation" => 5d,
             "LargeFile" => 8d,
             "Edge" => 10d,
             "Concurrency" => 12d,
@@ -1022,6 +1056,14 @@ public static class VMPerformanceReport
             "VMXN_Concurrency_MutexAtomicCounter_8Workers" => 1_200_000,
             "VMXN_Concurrency_Semaphore_Contention" => 120_000,
             "VMXN_Concurrency_SpawnJoin_Throughput" => 20_000,
+
+            // Concurrency/Async focused
+            "VMXC_Latency_SpawnJoin_ColdStart" => 1_000,
+            "VMXC_Throughput_SpawnJoin_HotLoop" => 10_000,
+            "VMXC_Latency_Task_NewTask_Await" => 1_000,
+            "VMXC_Throughput_Async_FanOutFanIn" => 2_000,
+            "VMXC_Allocation_Channel_SPSC_NoTimeout" => 120_000,
+            "VMXC_Throughput_Channel_MPMC_WithTimeout" => 120_000,
             _ => null
         };
     }

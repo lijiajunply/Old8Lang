@@ -171,7 +171,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         var threadId = Old8Lang.Concurrency.ResourceManager.CreateThread(() =>
         {
             // 在新线程中执行函数并获取返回值
-            var result = vm.CallFunctionObject(funcObj, funcArgs);
+            var result = vm.ExecuteFunctionObjectInWorker(funcObj, funcArgs);
             // 设置线程结果
             Old8Lang.Concurrency.ResourceManager.SetThreadResult(threadIdHolder[0], result);
         });

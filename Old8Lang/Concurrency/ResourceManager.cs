@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace Old8Lang.Concurrency;
@@ -6,22 +7,22 @@ namespace Old8Lang.Concurrency;
 /// <summary>
 /// Channel 接收结果
 /// </summary>
-public class ChannelReceiveResult
+public readonly struct ChannelReceiveResult
 {
     /// <summary>
     /// 是否成功接收
     /// </summary>
-    public bool Success { get; set; }
+    public bool Success { get; init; }
 
     /// <summary>
     /// 接收到的值（可能为 null）
     /// </summary>
-    public object? Value { get; set; }
+    public object? Value { get; init; }
 
     /// <summary>
     /// Channel 是否已关闭
     /// </summary>
-    public bool IsChannelClosed { get; set; }
+    public bool IsChannelClosed { get; init; }
 
     /// <summary>
     /// 表示接收失败的结果
@@ -303,7 +304,13 @@ public static class ResourceManager
         }
 
         var id = Interlocked.Increment(ref _channelIdCounter);
-        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateBounded<object>(capacity));
+        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateBounded<object>(new BoundedChannelOptions(capacity)
+        {
+            SingleReader = false,
+            SingleWriter = false,
+            FullMode = BoundedChannelFullMode.Wait,
+            AllowSynchronousContinuations = true
+        }));
         ResourceTypes[id] = ResourceType.Channel;
         return id;
     }
@@ -327,10 +334,44 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
+        var writer = wrapper.Resource.Writer;
+
+        if (writer.TryWrite(value))
+        {
+            return true;
+        }
+
         try
         {
-            var task = wrapper.Resource.Writer.WriteAsync(value).AsTask();
-            return task.Wait(timeoutMs);
+            if (timeoutMs == 0)
+            {
+                return false;
+            }
+
+            if (timeoutMs < 0)
+            {
+                writer.WriteAsync(value).AsTask().GetAwaiter().GetResult();
+                return true;
+            }
+
+            var spinWait = new SpinWait();
+            var deadline = Stopwatch.GetTimestamp() + TimeoutToStopwatchTicks(timeoutMs);
+            while (Stopwatch.GetTimestamp() <= deadline)
+            {
+                if (writer.TryWrite(value))
+                {
+                    return true;
+                }
+
+                if (wrapper.Resource.Reader.Completion.IsCompleted)
+                {
+                    return false;
+                }
+
+                spinWait.SpinOnce();
+            }
+
+            return false;
         }
         catch (AggregateException ex) when (ex.InnerException is ChannelClosedException)
         {
@@ -374,27 +415,46 @@ public static class ResourceManager
             return ChannelReceiveResult.Failed;
         }
 
-        using var cts = timeoutMs > 0
-            ? new CancellationTokenSource(timeoutMs)
-            : new CancellationTokenSource();
-
         try
         {
-            // 先等待可读，再显式 TryRead，避免 ReadAsync 超时后遗留挂起读取任务导致消息被”吞掉”。
-            var canRead = reader.WaitToReadAsync(cts.Token).AsTask().GetAwaiter().GetResult();
-            if (!canRead)
+            if (timeoutMs < 0)
             {
-                return ChannelReceiveResult.Closed;
+                return ChannelReceiveResult.FromValue(reader.ReadAsync().AsTask().GetAwaiter().GetResult());
             }
 
-            return reader.TryRead(out value)
-                ? ChannelReceiveResult.FromValue(value)
-                : ChannelReceiveResult.Failed;
-        }
-        catch (OperationCanceledException)
-        {
+            var spinWait = new SpinWait();
+            var deadline = Stopwatch.GetTimestamp() + TimeoutToStopwatchTicks(timeoutMs);
+            while (Stopwatch.GetTimestamp() <= deadline)
+            {
+                if (reader.TryRead(out value))
+                {
+                    return ChannelReceiveResult.FromValue(value);
+                }
+
+                if (reader.Completion.IsCompleted)
+                {
+                    return ChannelReceiveResult.Closed;
+                }
+
+                spinWait.SpinOnce();
+            }
+
             return ChannelReceiveResult.Failed;
         }
+        catch (ChannelClosedException)
+        {
+            return ChannelReceiveResult.Closed;
+        }
+    }
+
+    private static long TimeoutToStopwatchTicks(int timeoutMs)
+    {
+        if (timeoutMs <= 0)
+        {
+            return 0;
+        }
+
+        return (long)(timeoutMs * (Stopwatch.Frequency / 1000d));
     }
 
     /// <summary>
@@ -687,6 +747,12 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
         wrapper.Resource.SetResult(result);
+    }
+
+    public static void SetThreadException(int threadId, Exception exception)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.Resource.SetException(exception);
     }
 
     /// <summary>

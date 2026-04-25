@@ -5,13 +5,12 @@ namespace Old8Lang.Concurrency;
 /// </summary>
 public class VMThreadWrapper : IDisposable
 {
+    private readonly Action _action;
+    private readonly TaskCompletionSource<object?> _completionSource =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly Thread _thread;
-    private readonly Lock _lock = new();
-    private object? _result;
-    private Exception? _exception;
-    private bool _isCompleted;
-    private bool _disposed;
-    private bool _isStarted;
+    private int _started;
+    private int _disposed;
 
     /// <summary>
     /// 构造函数
@@ -19,23 +18,17 @@ public class VMThreadWrapper : IDisposable
     /// <param name="action">线程执行的动作</param>
     public VMThreadWrapper(Action action)
     {
+        _action = action ?? throw new ArgumentNullException(nameof(action));
         _thread = new Thread(() =>
         {
             try
             {
-                action();
-                lock (_lock)
-                {
-                    _isCompleted = true;
-                }
+                _action();
+                _completionSource.TrySetResult(null);
             }
             catch (Exception ex)
             {
-                lock (_lock)
-                {
-                    _exception = ex;
-                    _isCompleted = true;
-                }
+                _completionSource.TrySetException(ex);
             }
         });
     }
@@ -45,15 +38,11 @@ public class VMThreadWrapper : IDisposable
     /// </summary>
     public void Start()
     {
-        lock (_lock)
+        if (Interlocked.Exchange(ref _started, 1) != 0)
         {
-            if (_isStarted)
-            {
-                // 线程已启动，忽略重复调用
-                return;
-            }
-            _isStarted = true;
+            return;
         }
+
         _thread.Start();
     }
 
@@ -63,36 +52,25 @@ public class VMThreadWrapper : IDisposable
     /// <returns>线程执行结果</returns>
     public object? Join()
     {
-        _thread.Join();
-
-        lock (_lock)
+        if (Volatile.Read(ref _started) == 0)
         {
-            if (_exception is not null)
-            {
-                throw new Exception($"线程执行异常: {_exception.Message}", _exception);
-            }
-
-            return _result;
+            throw new InvalidOperationException("线程尚未启动");
         }
+
+        return _completionSource.Task.GetAwaiter().GetResult();
     }
 
     /// <summary>
     /// 检查线程是否存活
     /// </summary>
-    public bool IsAlive => _thread.IsAlive;
+    public bool IsAlive => Volatile.Read(ref _started) != 0 && _thread.IsAlive;
 
     /// <summary>
     /// 检查线程是否已完成
     /// </summary>
     public bool IsCompleted
     {
-        get
-        {
-            lock (_lock)
-            {
-                return _isCompleted;
-            }
-        }
+        get => _completionSource.Task.IsCompleted;
     }
 
     /// <summary>
@@ -101,10 +79,12 @@ public class VMThreadWrapper : IDisposable
     /// <param name="result">执行结果</param>
     public void SetResult(object? result)
     {
-        lock (_lock)
-        {
-            _result = result;
-        }
+        _completionSource.TrySetResult(result);
+    }
+
+    public void SetException(Exception exception)
+    {
+        _completionSource.TrySetException(exception);
     }
 
     /// <summary>
@@ -112,16 +92,7 @@ public class VMThreadWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_disposed) return;
-
-        // 等待线程完成（如果还在运行）
-        if (_thread.IsAlive)
-        {
-            // 给线程一些时间完成，但不要无限等待
-            _thread.Join(TimeSpan.FromSeconds(5));
-        }
-
-        _disposed = true;
+        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
         GC.SuppressFinalize(this);
     }
 }

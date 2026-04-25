@@ -48,14 +48,14 @@ public partial class VirtualMachine
                 }
 
                 // 创建线程
+                var threadIdHolder = new int[1];
                 var threadId = Concurrency.ResourceManager.CreateThread(() =>
                 {
-                    // Create new VM instance
-                    var threadVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
-                    foreach (var kvp in _globals) threadVm._globals[kvp.Key] = kvp.Value;
-
-                    threadVm.CallFunction(function, args);
+                    var threadVm = CreateWorkerVirtualMachine();
+                    var result = threadVm.ExecuteFunctionAndGetResult(function, args);
+                    Concurrency.ResourceManager.SetThreadResult(threadIdHolder[0], result);
                 });
+                threadIdHolder[0] = threadId;
 
                 _stack.Push(threadId);
             }

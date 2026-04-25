@@ -30,6 +30,8 @@ internal static class BenchmarkProgram
             BenchmarkCommand.VmReportQuick => RunQuickVmBenchmarksAndOptionalReport(generateReport: true),
             BenchmarkCommand.VmNightly => RunNightlyVmBenchmarksAndOptionalReport(generateReport: false),
             BenchmarkCommand.VmReportNightly => RunNightlyVmBenchmarksAndOptionalReport(generateReport: true),
+            BenchmarkCommand.VmConcurrency => RunConcurrencyVmBenchmarksAndOptionalReport(generateReport: false),
+            BenchmarkCommand.VmReportConcurrency => RunConcurrencyVmBenchmarksAndOptionalReport(generateReport: true),
             _ => RunDefaultParserBenchmarks()
         };
     }
@@ -139,6 +141,23 @@ internal static class BenchmarkProgram
 
         Console.WriteLine("检测到 VM Nightly 性能回归 FAIL，返回非零退出码。");
         return 1;
+    }
+
+    private static int RunConcurrencyVmBenchmarksAndOptionalReport(bool generateReport)
+    {
+        Console.WriteLine("运行 VM 并发/异步专项基准测试（BenchmarkDotNet）...\n");
+        BenchmarkRunner.Run<VMConcurrencyPerformanceBenchmarks>();
+
+        if (!generateReport)
+        {
+            return 0;
+        }
+
+        GenerateVmReport(
+            "从 BenchmarkDotNet artifacts 生成 VM 并发/异步专项报告...\n",
+            VMPerformanceReport.GenerateConcurrencyFromBenchmarkArtifacts,
+            "VM Concurrency");
+        return 0;
     }
 
     private static (string markdownPath, string jsonPath) GenerateVmReport(

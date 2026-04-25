@@ -25,6 +25,8 @@ internal static class BenchmarkArgumentParser
             "--vm-report-quick" => BenchmarkCommand.VmReportQuick,
             "--vm-nightly" => BenchmarkCommand.VmNightly,
             "--vm-report-nightly" => BenchmarkCommand.VmReportNightly,
+            "--vm-concurrency" => BenchmarkCommand.VmConcurrency,
+            "--vm-report-concurrency" => BenchmarkCommand.VmReportConcurrency,
             _ => BenchmarkCommand.DefaultParserBenchmark
         };
     }

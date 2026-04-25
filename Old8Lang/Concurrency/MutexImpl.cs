@@ -5,25 +5,25 @@ namespace Old8Lang.Concurrency;
 /// </summary>
 public sealed class MutexImpl
 {
-    private readonly object _sync = new();
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public void Lock()
     {
-        Monitor.Enter(_sync);
+        _semaphore.Wait();
     }
 
     public bool TryLock(int timeoutMs)
     {
-        return Monitor.TryEnter(_sync, timeoutMs);
+        return _semaphore.Wait(timeoutMs);
     }
 
     public void Unlock()
     {
-        Monitor.Exit(_sync);
+        _semaphore.Release();
     }
 
     public void Dispose()
     {
-        // 无托管资源，保留接口形状以复用 ResourceManager 释放逻辑。
+        _semaphore.Dispose();
     }
 }
