@@ -4,15 +4,23 @@ namespace Old8Lang;
 /// 表示源代码中的位置信息，用于错误报告和调试
 /// </summary>
 /// <remarks>
-/// 行列基准不一致，这是历史遗留问题，使用方需注意：
+/// <para>行列基准并不一致，这是全语言统一的约定，不是历史遗留的错误，使用方需按位置分别处理：</para>
 /// <list type="bullet">
-/// <item><see cref="Line"/> 从 1 开始（与词法分析器一致）。</item>
+/// <item><see cref="Line"/> 从 1 开始（与 <c>LangToken.Line</c> 一致）。</item>
 /// <item><see cref="Column"/> 是相对于行首的 0 起始偏移量，直接来自
 /// <c>LangToken.Column</c>（词法器按 <c>索引 - 行首索引</c> 计算）。</item>
 /// </list>
-/// <see cref="ToString"/> 会在展示时把列号转成 1 起始，因此打印出来的是人读的行列。
-/// 注意 <c>Old8Lang.LanguageServer</c> 内部对列基准的假设并不统一（部分处理器按 0 起始使用，
-/// 部分又做了 <c>- 1</c> 转换），修改列基准取值时需要一并核对。
+/// <para>
+/// LSP 协议里 <c>Position.Line</c> 与 <c>Position.Character</c> 都是 0 起始，
+/// 因此从本结构体跨界到 LSP 时：<b>行号要减 1，列号原样使用</b>。
+/// 反过来，<see cref="ToString"/> 面向人展示时才把列号转成 1 起始。
+/// </para>
+/// <para>
+/// 也就是说「列号已经是从 0 开始的偏移量」是唯一正确的读法；曾经有若干处理器
+/// （折叠、语义高亮、诊断、作用域分析）误以为列号 1 起始而多做了一次 <c>- 1</c>，
+/// 造成整体左偏一列。<c>Old8Lang.Tests/LanguageServer/PositionBasisTests.cs</c>
+/// 逐条钉住了这些出口的列号，改动列基准前请先看那里的约定说明。
+/// </para>
 /// </remarks>
 /// <param name="line">行号（从1开始）</param>
 /// <param name="column">列号（相对行首的0起始偏移量）</param>

@@ -13,7 +13,11 @@ namespace Old8Lang.LanguageServer.Handlers;
 public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTokensHandlerBase
 {
     // 语义标记类型（按LSP协议标准定义）
-    private static readonly string[] TokenTypes =
+    // 注意：元素类型必须是 SemanticTokenType 而不是 string。
+    // 若声明为 string[]，下面的 Array.IndexOf(TokenTypes, SemanticTokenType.X) 会绑定到
+    // 非泛型的 Array.IndexOf(Array, object)，用 Equals 比较 string 与 SemanticTokenType，
+    // 结果恒为 -1，ClassifyToken 返回的索引全部为负，整个语义高亮将不会产生任何标记。
+    private static readonly SemanticTokenType[] TokenTypes =
     [
         SemanticTokenType.Namespace,   // 0
         SemanticTokenType.Class,       // 1
@@ -63,7 +67,7 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
             DocumentSelector = TextDocumentSelector.ForLanguage("old8lang"),
             Legend = new SemanticTokensLegend
             {
-                TokenTypes = new Container<SemanticTokenType>(TokenTypes.Select(t => new SemanticTokenType(t))),
+                TokenTypes = new Container<SemanticTokenType>(TokenTypes),
                 TokenModifiers = new Container<SemanticTokenModifier>(TokenModifiers.Select(m => new SemanticTokenModifier(m)))
             },
             Full = new SemanticTokensCapabilityRequestFull
@@ -80,7 +84,7 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
         // 如果 RegistrationOptions 未初始化（例如在测试环境中），创建默认的 Legend
         var legend = RegistrationOptions?.Legend ?? new SemanticTokensLegend
         {
-            TokenTypes = new Container<SemanticTokenType>(TokenTypes.Select(t => new SemanticTokenType(t))),
+            TokenTypes = new Container<SemanticTokenType>(TokenTypes),
             TokenModifiers = new Container<SemanticTokenModifier>(TokenModifiers.Select(m => new SemanticTokenModifier(m)))
         };
 
@@ -103,8 +107,8 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
 
             if (tokenTypeIndex.HasValue && tokenTypeIndex.Value >= 0 && tokenTypeIndex.Value < TokenTypes.Length)
             {
-                var line = token.Line - 1; // 转换为 0-based
-                var column = token.Column - 1; // 转换为 0-based
+                var line = token.Line - 1; // 行号 1-based -> 0-based
+                var column = token.Column; // 列号本就是 0-based，不能再减 1
                 var length = token.Value.Length;
 
                 // Push 方法的签名是: Push(line, column, length, tokenTypeIndex, modifiersBitfield)

@@ -19,8 +19,8 @@ public class MemberChainAnalyzer(
     /// </summary>
     public SymbolInfo? AnalyzeChain()
     {
-        var line = position.Line + 1; // LSP 从 0 开始，token 从 1 开始
-        var column = position.Character + 1;
+        var line = position.Line + 1; // LSP 行号从 0 开始，token 行号从 1 开始
+        var column = position.Character; // 两者的列号都是 0 起始，无需转换
 
         Console.WriteLine($"[MemberChainAnalyzer] Analyzing chain at Line={line}, Column={column}");
 
@@ -85,8 +85,8 @@ public class MemberChainAnalyzer(
             var token = tokens[i];
 
             // 如果 token 在光标位置之后，跳过
-            // 注意：点号占一个字符，光标可能在点号后面（column = token.Column + 1）
-            // 但是如果光标正好在点号位置，我们也应该考虑这个点号
+            // 注意：column 是 0 起始的光标列，光标停在点号右侧一格时 token.Column == column - 1，
+            // 仍然会走到下面的点号分支，因此点号和紧随其后的位置都能被识别
             if (token.Line > line || (token.Line == line && token.Column > column))
             {
                 Console.WriteLine($"[FindDotAtPosition] Skipping token at/after cursor: {token.Value} at Line={token.Line}, Column={token.Column}");

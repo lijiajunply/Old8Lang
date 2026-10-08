@@ -1,5 +1,43 @@
 # 更新记录
 
+## LSP 位置基准统一 (2026-10-08)
+
+`SourcePosition` / `LangToken` 的约定是**行号 1 起始、列号 0 起始**（列号即相对行首的偏移量），
+这与 LSP 的 `Position.Line`（0 起始）不完全相同，但与 `Position.Character`（0 起始）完全一致。
+语言服务器内部此前对列号的假设分成两派：符号表构建、定义/引用/重命名/高亮按 0 起始使用（正确），
+而折叠、语义高亮、诊断、作用域分析、签名帮助又多做了一次 `- 1`（把它当成 1 起始），
+导致这些出口整体左偏一列；另有符号表回退路径与文档链接漏掉了行号转换。
+
+本次统一为「**列号原样使用、行号减 1**」，修的是各消费端，没有改动词法器基准——
+翻转词法器会连带打断 36 个按位置匹配的既有用例（hover/定义/重命名/引用），因此不动。
+
+### 实现修复
+
+- **列号多减 1**（整体左偏一列，列号为 0 的记号会算成 -1）：
+  `FoldingRangeHandler`（折叠区起止列）、`SemanticTokensHandler`（语义标记起点）、
+  `TextDocumentSyncHandler`（诊断范围起点）、`ScopeAnalyzer`（16 处符号位置）、
+  `SignatureHelpHandler`（光标定位最后落在哪个记号）、`SemanticAnalyzer`（重复定义诊断多加的 1）。
+- **行号漏减 1**：`SymbolTableBuilder` 的 AST 回退路径（24 处，函数/异步函数/类/方法/属性/变量/
+  native/extern/import，另外函数参数因为查不到对应记号而必然走这条路径）、
+  `DocumentLinkHandler` 的 import 范围、`MemberChainAnalyzer` 里按 0 起始的光标列。
+- **语义高亮此前完全不产出标记**：`TokenTypes` 图例数组被声明成 `string[]`，
+  `Array.IndexOf(TokenTypes, SemanticTokenType.X)` 因此绑定到非泛型的 `Array.IndexOf(Array, object)`，
+  用 `Equals` 比较 `string` 与 `SemanticTokenType` 恒为 false，索引全部是 -1，所有记号都被丢弃。
+  改为 `SemanticTokenType[]` 后恢复正常（修复列号偏移后，标记覆盖的源码片段与记号逐一对应）。
+- `SourcePosition` 的文档注释改写为明确约定（原先只写了「基准不一致，使用方自行注意」）。
+
+### 测试
+
+- 新增 `Old8Lang.Tests/LanguageServer/PositionBasisTests.cs`：把词法器约定、折叠起止列、
+  语义标记覆盖的源码片段、符号表位置、作用域符号位置、实际发布的诊断范围逐条钉死。
+  其中 5 条在修复前失败、修复后通过。
+- 已有的折叠与语义高亮用例此前只断言数量（`Count >= 3`、`Assert.NotNull`），
+  这正是偏移长期没被发现的原因；新用例改为精确断言。
+- 语言服务器全量：**445 通过 / 0 失败 / 2 跳过**（此前 438，新增 7）。
+- 非编译模式全量：4637 通过 / 1 失败 / 3 跳过，失败的是既有并发用例
+  `VMConcurrencyCyclicBarrierTests.CyclicBarrier_PhaseCoordination_ExecutesCorrectly`（单独跑同样失败）。
+- 编译模式仍是既有的 IL 校验失败（`Common Language Runtime detected an invalid program`），与本次改动无关。
+
 ## 文档与实现对齐修复 (2026-10-08)
 
 本次按三种执行模式的**实际运行结果**复核并修正了文档中的支持矩阵，同时修复复核过程中

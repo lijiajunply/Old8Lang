@@ -298,7 +298,8 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
         string moduleName)
     {
         // 从 import 语句的位置开始查找
-        var line = importStatement.Position.Line;
+        // SourcePosition 的行号是 1-based、列号是 0-based，LSP Position 两者都是 0-based
+        var line = importStatement.Position.Line - 1;
         var column = importStatement.Position.Column;
 
         // import 语句的模块名通常在引号中

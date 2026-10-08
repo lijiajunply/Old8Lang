@@ -95,9 +95,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = funcInit.Position.Line,
+            Line = funcInit.Position.Line - 1,
             Column = funcInit.Position.Column,
-            EndLine = funcInit.Position.Line,
+            EndLine = funcInit.Position.Line - 1,
             EndColumn = funcInit.Position.Column + funcName.Length
         };
 
@@ -137,9 +137,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     paramLocation = new SourceLocation
                     {
                         Uri = uri,
-                        Line = param.Position.Line,
+                        Line = param.Position.Line - 1,
                         Column = param.Position.Column,
-                        EndLine = param.Position.Line,
+                        EndLine = param.Position.Line - 1,
                         EndColumn = param.Position.Column + param.IdName.Length
                     };
                 }
@@ -178,9 +178,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = asyncFuncInit.Position.Line,
+            Line = asyncFuncInit.Position.Line - 1,
             Column = asyncFuncInit.Position.Column,
-            EndLine = asyncFuncInit.Position.Line,
+            EndLine = asyncFuncInit.Position.Line - 1,
             EndColumn = asyncFuncInit.Position.Column + funcName.Length
         };
 
@@ -219,9 +219,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     paramLocation = new SourceLocation
                     {
                         Uri = uri,
-                        Line = param.Position.Line,
+                        Line = param.Position.Line - 1,
                         Column = param.Position.Column,
-                        EndLine = param.Position.Line,
+                        EndLine = param.Position.Line - 1,
                         EndColumn = param.Position.Column + param.IdName.Length
                     };
                 }
@@ -257,9 +257,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = classInit.Position.Line,
+            Line = classInit.Position.Line - 1,
             Column = classInit.Position.Column,
-            EndLine = classInit.Position.Line,
+            EndLine = classInit.Position.Line - 1,
             EndColumn = classInit.Position.Column + className.Length
         };
 
@@ -348,9 +348,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = funcValue.Position.Line,
+            Line = funcValue.Position.Line - 1,
             Column = funcValue.Position.Column,
-            EndLine = funcValue.Position.Line,
+            EndLine = funcValue.Position.Line - 1,
             EndColumn = funcValue.Position.Column + methodName.Length
         };
 
@@ -409,9 +409,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     paramLocation = new SourceLocation
                     {
                         Uri = uri,
-                        Line = param.Position.Line,
+                        Line = param.Position.Line - 1,
                         Column = param.Position.Column,
-                        EndLine = param.Position.Line,
+                        EndLine = param.Position.Line - 1,
                         EndColumn = param.Position.Column + param.IdName.Length
                     };
                 }
@@ -442,9 +442,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = new SourceLocation
         {
             Uri = uri,
-            Line = memberExpr.Position.Line,
+            Line = memberExpr.Position.Line - 1,
             Column = memberExpr.Position.Column,
-            EndLine = memberExpr.Position.Line,
+            EndLine = memberExpr.Position.Line - 1,
             EndColumn = memberExpr.Position.Column + propertyName.Length
         };
 
@@ -492,9 +492,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = setStatement.Position.Line,
+            Line = setStatement.Position.Line - 1,
             Column = setStatement.Position.Column,
-            EndLine = setStatement.Position.Line,
+            EndLine = setStatement.Position.Line - 1,
             EndColumn = setStatement.Position.Column
         };
 
@@ -1087,9 +1087,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             var location = new SourceLocation
             {
                 Uri = uri,
-                Line = nativeStatement.Position.Line,
+                Line = nativeStatement.Position.Line - 1,
                 Column = nativeStatement.Position.Column,
-                EndLine = nativeStatement.Position.Line,
+                EndLine = nativeStatement.Position.Line - 1,
                 EndColumn = nativeStatement.Position.Column + functionName.Length
             };
 
@@ -1141,9 +1141,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 var location = new SourceLocation
                 {
                     Uri = uri,
-                    Line = externStatement.Position.Line,
+                    Line = externStatement.Position.Line - 1,
                     Column = externStatement.Position.Column,
-                    EndLine = externStatement.Position.Line,
+                    EndLine = externStatement.Position.Line - 1,
                     EndColumn = externStatement.Position.Column + functionName.Length
                 };
 
@@ -1174,9 +1174,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             var location = new SourceLocation
             {
                 Uri = uri,
-                Line = importStatement.Position.Line,
+                Line = importStatement.Position.Line - 1,
                 Column = importStatement.Position.Column,
-                EndLine = importStatement.Position.Line,
+                EndLine = importStatement.Position.Line - 1,
                 EndColumn = importStatement.Position.Column + moduleAlias.Length
             };
 

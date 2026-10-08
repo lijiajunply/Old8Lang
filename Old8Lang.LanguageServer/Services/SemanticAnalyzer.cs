@@ -187,7 +187,7 @@ public class SemanticAnalyzer(DocumentParseResult document)
                         Severity = DiagnosticSeverity.Error,
                         Message = $"符号 '{name}' 重复定义",
                         Line = location.Line + 1,
-                        Column = location.Column + 1,
+                        Column = location.Column,
                         Source = "Old8Lang Semantic"
                     };
                     _diagnostics.Add(diagnostic);

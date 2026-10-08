@@ -34,8 +34,8 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
             return Task.FromResult<SignatureHelp?>(null);
         }
 
-        var line = request.Position.Line + 1; // LSP 从 0 开始
-        var column = request.Position.Character + 1;
+        var line = request.Position.Line + 1; // LSP 行号从 0 开始，token 行号从 1 开始
+        var column = request.Position.Character; // 两者的列号都是 0 起始，无需转换
 
         // 查找当前光标所在的函数调用
         var functionCall = FindFunctionCall(document, line, column);

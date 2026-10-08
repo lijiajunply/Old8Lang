@@ -107,7 +107,7 @@ public class TextDocumentSyncHandler(DocumentManager documentManager, ILanguageS
         {
             Severity = ConvertSeverity(d.Severity),
             Range = new Range(
-                new Position(Math.Max(0, d.Line - 1), Math.Max(0, d.Column - 1)),
+                new Position(Math.Max(0, d.Line - 1), Math.Max(0, d.Column)),
                 new Position(Math.Max(0, d.Line - 1), Math.Max(0, d.Column))
             ),
             Message = d.Message,

@@ -76,7 +76,7 @@ public class FoldingRangeHandler(DocumentManager documentManager) : FoldingRange
                     }
                 }
 
-                braceStack.Push((token.Line - 1, token.Column - 1, contextType));
+                braceStack.Push((token.Line - 1, token.Column, contextType));
             }
             // 匹配右花括号
             else if (token.Type == LangTokenType.RightBrace)
@@ -96,7 +96,8 @@ public class FoldingRangeHandler(DocumentManager documentManager) : FoldingRange
                             StartLine = startLine,
                             StartCharacter = startColumn,
                             EndLine = endLine,
-                            EndCharacter = token.Column - 1 + token.Value.Length, // 转换为 0-based
+                            // token.Column 已是 0-based，加上长度即为独占结束列
+                            EndCharacter = token.Column + token.Value.Length,
                             Kind = foldingKind
                         });
                     }

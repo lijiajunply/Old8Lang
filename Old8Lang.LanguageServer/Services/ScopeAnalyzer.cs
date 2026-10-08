@@ -98,9 +98,9 @@ public class ScopeAnalyzer(
                     {
                         Uri = uri,
                         Line = setStatement.Position.Line - 1,
-                        Column = setStatement.Position.Column - 1,
+                        Column = setStatement.Position.Column,
                         EndLine = setStatement.Position.Line - 1,
-                        EndColumn = setStatement.Position.Column - 1 + varName.Length
+                        EndColumn = setStatement.Position.Column + varName.Length
                     }
                 };
 
@@ -151,9 +151,9 @@ public class ScopeAnalyzer(
                     {
                         Uri = uri,
                         Line = param.Position.Line - 1,
-                        Column = param.Position.Column - 1,
+                        Column = param.Position.Column,
                         EndLine = param.Position.Line - 1,
-                        EndColumn = param.Position.Column - 1 + param.IdName.Length
+                        EndColumn = param.Position.Column + param.IdName.Length
                     }
                 };
                 _visibleSymbols.Add(paramSymbol);
@@ -197,9 +197,9 @@ public class ScopeAnalyzer(
                     {
                         Uri = uri,
                         Line = param.Position.Line - 1,
-                        Column = param.Position.Column - 1,
+                        Column = param.Position.Column,
                         EndLine = param.Position.Line - 1,
-                        EndColumn = param.Position.Column - 1 + param.IdName.Length
+                        EndColumn = param.Position.Column + param.IdName.Length
                     }
                 };
                 _visibleSymbols.Add(paramSymbol);
@@ -248,9 +248,9 @@ public class ScopeAnalyzer(
                                 {
                                     Uri = uri,
                                     Line = param.Position.Line - 1,
-                                    Column = param.Position.Column - 1,
+                                    Column = param.Position.Column,
                                     EndLine = param.Position.Line - 1,
-                                    EndColumn = param.Position.Column - 1 + param.IdName.Length
+                                    EndColumn = param.Position.Column + param.IdName.Length
                                 }
                             };
                             _visibleSymbols.Add(paramSymbol);
@@ -289,9 +289,9 @@ public class ScopeAnalyzer(
                                 {
                                     Uri = uri,
                                     Line = param.Position.Line - 1,
-                                    Column = param.Position.Column - 1,
+                                    Column = param.Position.Column,
                                     EndLine = param.Position.Line - 1,
-                                    EndColumn = param.Position.Column - 1 + param.IdName.Length
+                                    EndColumn = param.Position.Column + param.IdName.Length
                                 }
                             };
                             _visibleSymbols.Add(paramSymbol);
@@ -316,9 +316,9 @@ public class ScopeAnalyzer(
                 {
                     Uri = uri,
                     Line = classInit.Position.Line - 1,
-                    Column = classInit.Position.Column - 1,
+                    Column = classInit.Position.Column,
                     EndLine = classInit.Position.Line - 1,
-                    EndColumn = classInit.Position.Column - 1 + 4 // "this" length
+                    EndColumn = classInit.Position.Column + 4 // "this" length
                 }
             };
             _visibleSymbols.Add(thisSymbol);
@@ -347,9 +347,9 @@ public class ScopeAnalyzer(
                         {
                             Uri = uri,
                             Line = classInit.Position.Line - 1,
-                            Column = classInit.Position.Column - 1,
+                            Column = classInit.Position.Column,
                             EndLine = classInit.Position.Line - 1,
-                            EndColumn = classInit.Position.Column - 1 + memberId.IdName.Length
+                            EndColumn = classInit.Position.Column + memberId.IdName.Length
                         }
                     };
                     _visibleSymbols.Add(fieldSymbol);
@@ -374,9 +374,9 @@ public class ScopeAnalyzer(
                     {
                         Uri = uri,
                         Line = classInit.Position.Line - 1,
-                        Column = classInit.Position.Column - 1,
+                        Column = classInit.Position.Column,
                         EndLine = classInit.Position.Line - 1,
-                        EndColumn = classInit.Position.Column - 1 + memberId.IdName.Length
+                        EndColumn = classInit.Position.Column + memberId.IdName.Length
                     }
                 };
                 _visibleSymbols.Add(fieldSymbol);
