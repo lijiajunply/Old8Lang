@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 /// 测试 ReadWriteLock 的创建、读锁、写锁和释放功能
 /// </summary>
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMConcurrencyReadWriteLockTests
 {
     /// <summary>

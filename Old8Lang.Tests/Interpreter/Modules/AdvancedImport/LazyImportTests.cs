@@ -56,6 +56,9 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
             // 此时模块应该已经加载
             status2 <- "Loaded"
             """;
+        // 该用例 import 的 lazy_math 是 OldLib 下的 fixture；模块解析相对于脚本所在目录，
+        // 因此需要先把它复制到本测试类专属的临时目录，避免依赖其他测试类写下的文件
+        CopyModuleFixture("lazy_math.old8");
         CreateTempModuleFile("lazy_new_syntax_test.old8", testContent);
 
         // Act
@@ -100,6 +103,9 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
 
             status2 <- "Loaded"
             """;
+        // 该用例 import 的 lazy_math 是 OldLib 下的 fixture；模块解析相对于脚本所在目录，
+        // 因此需要先把它复制到本测试类专属的临时目录，避免依赖其他测试类写下的文件
+        CopyModuleFixture("lazy_math.old8");
         CreateTempModuleFile("lazy_selective_test.old8", testContent);
 
         // Act
@@ -141,6 +147,9 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
             // 此时模块应该已经加载
             status2 <- "Loaded"
             """;
+        // 该用例 import 的 lazy_math 是 OldLib 下的 fixture；模块解析相对于脚本所在目录，
+        // 因此需要先把它复制到本测试类专属的临时目录，避免依赖其他测试类写下的文件
+        CopyModuleFixture("lazy_math.old8");
         CreateTempModuleFile("lazy_alias_test.old8", testContent);
 
         // Act
@@ -178,6 +187,9 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
             result2 <- math.PI
             result3 <- math.HeavyOperation()
             """;
+        // 该用例 import 的 lazy_math 是 OldLib 下的 fixture；模块解析相对于脚本所在目录，
+        // 因此需要先把它复制到本测试类专属的临时目录，避免依赖其他测试类写下的文件
+        CopyModuleFixture("lazy_math.old8");
         CreateTempModuleFile("lazy_enhanced_test.old8", testContent);
 
         // Act

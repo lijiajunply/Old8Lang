@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!--
+      默认测试跑排除 Category=Performance 的用例。
+      这些用例断言的是墙钟耗时、GC/内存占用，或用 Sleep 同步线程，
+      在与其他测试并行时会因 CPU 争抢而抖动，因此改为在单独的串行任务中运行，
+      见 performance.runsettings。
+    -->
+    <TestCaseFilter>Category!=Performance</TestCaseFilter>
+  </RunConfiguration>
+</RunSettings>

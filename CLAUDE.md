@@ -22,12 +22,31 @@ dotnet build Old8Lang.sln
 
 ### Run Tests
 ```bash
-# Run all tests
+# Run all tests（默认排除性能/并发用例，见下）
 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 
 # Run specific test
 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~TestName"
 ```
+
+**性能/并发用例分档**
+
+断言墙钟耗时、GC/内存占用，或用 `Sleep` 同步线程的用例标记为 `[Trait("Category", "Performance")]`，
+它们与其他测试并行时会因资源争抢而抖动，因此：
+
+```bash
+# 默认档：Old8Lang.Tests/default.runsettings（已通过 csproj 的 RunSettingsFilePath 生效）
+# 自动排除 Category=Performance，普通 `dotnet test` / `--filter` 即为这一档
+
+# 性能档：只跑这些用例
+dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --settings Old8Lang.Tests/performance.runsettings
+
+# 性能档里跑单个用例（两档的过滤器是 AND 关系，选性能用例必须带 --settings）
+dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --settings Old8Lang.Tests/performance.runsettings --filter "FullyQualifiedName~TestName"
+```
+
+注意：`--filter` 与 runsettings 里的 `TestCaseFilter` 是 **AND** 关系，所以在默认档下
+用 `--filter` 指定性能用例会匹配不到任何测试。
 
 ### Run Old8Lang Code
 

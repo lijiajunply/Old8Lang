@@ -15,6 +15,19 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
     private readonly string TestFilesDirectory = GetTestFilesDirectory();
 
     /// <summary>
+    /// 当前测试类专属的临时目录。
+    /// </summary>
+    /// <remarks>
+    /// xUnit 会并行执行不同的测试类，而这些测试类会往临时目录写入同名的模块文件
+    /// （例如 utils.old8、constants_module.old8）。如果共用同一个目录，并行写入会互相覆盖，
+    /// 导致单跑通过、一起跑失败的偶发错误。因此每个测试类使用独立的子目录。
+    /// </remarks>
+    private string TempDirectory => Path.Combine(
+        TestFilesDirectory,
+        "temp",
+        GetType().FullName!.Replace("Old8Lang.Tests.", string.Empty).Replace('.', '_'));
+
+    /// <summary>
     /// 获取测试文件目录的绝对路径
     /// </summary>
     private static string GetTestFilesDirectory()
@@ -61,13 +74,18 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
         // 首先尝试在主目录中查找文件
         var fullPath = Path.Combine(TestFilesDirectory, relativeFilePath);
 
-        // 如果主目录中不存在，尝试在 temp 子目录中查找
+        // 如果主目录中不存在，先在本测试类专属的 temp 子目录中查找，再回退到共享的 temp 子目录
         if (!File.Exists(fullPath))
         {
-            var tempPath = Path.Combine(TestFilesDirectory, "temp", relativeFilePath);
-            if (File.Exists(tempPath))
+            foreach (var candidate in new[]
+                     {
+                         Path.Combine(TempDirectory, relativeFilePath),
+                         Path.Combine(TestFilesDirectory, "temp", relativeFilePath)
+                     })
             {
-                fullPath = tempPath;
+                if (!File.Exists(candidate)) continue;
+                fullPath = candidate;
+                break;
             }
         }
 
@@ -161,7 +179,7 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
     /// </summary>
     protected string CreateTempModuleFile(string fileName, string content)
     {
-        var tempDir = Path.Combine(TestFilesDirectory, "temp");
+        var tempDir = TempDirectory;
         Directory.CreateDirectory(tempDir);
 
         var filePath = Path.Combine(tempDir, fileName);
@@ -178,11 +196,29 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
     }
 
     /// <summary>
+    /// 将 OldLib 根目录下的模块 fixture 复制到当前测试类专属的临时目录。
+    /// </summary>
+    /// <remarks>
+    /// 模块解析是相对于导入它的脚本所在目录进行的，而脚本现在位于本测试类的专属临时目录，
+    /// 因此脚本需要 import 的 fixture 也必须位于同一目录。
+    /// </remarks>
+    protected void CopyModuleFixture(string fileName)
+    {
+        var source = Path.Combine(TestFilesDirectory, fileName);
+        if (!File.Exists(source))
+        {
+            throw new FileNotFoundException($"模块 fixture 不存在: {source}");
+        }
+
+        CreateTempModuleFile(fileName, File.ReadAllText(source));
+    }
+
+    /// <summary>
     /// 清理临时测试文件
     /// </summary>
     protected void CleanupTempFiles()
     {
-        var tempDir = Path.Combine(TestFilesDirectory, "temp");
+        var tempDir = TempDirectory;
         if (Directory.Exists(tempDir))
         {
             try

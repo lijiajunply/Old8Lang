@@ -47,12 +47,44 @@ public partial class TaskLangValue : LangValueType
     /// <summary>
     /// 获取任务结果（如果已完成）
     /// </summary>
-    public LangValueType? Result => _result;
+    /// <remarks>
+    /// 任务可能在从未被 await 的情况下于后台完成，此时缓存的 <see cref="_result"/> 仍为 null。
+    /// 因此这里在任务已成功完成时直接读取底层 Task 的结果，避免已完成的返回值被当成 null。
+    /// </remarks>
+    public LangValueType? Result
+    {
+        get
+        {
+            if (_result is not null)
+                return _result;
+
+            if (Task.IsCompletedSuccessfully)
+                _result = Task.Result;
+
+            return _result;
+        }
+    }
 
     /// <summary>
     /// 获取任务异常（如果已失败）
     /// </summary>
-    public Exception? Exception => _exception;
+    /// <remarks>
+    /// 与 <see cref="Result"/> 同理：任务可能后台失败而从未被 await，
+    /// 此时需要从底层 Task 中取出异常，否则异常会被静默吞掉。
+    /// </remarks>
+    public Exception? Exception
+    {
+        get
+        {
+            if (_exception is not null)
+                return _exception;
+
+            if (Task.IsFaulted)
+                _exception = Task.Exception?.InnerException ?? Task.Exception;
+
+            return _exception;
+        }
+    }
 
     /// <summary>
     /// 获取取消令牌
@@ -302,8 +334,8 @@ public partial class TaskLangValue : LangValueType
         {
             TaskStatus.Pending => "Task(Status: Pending)",
             TaskStatus.Running => "Task(Status: Running)",
-            TaskStatus.Completed => $"Task(Completed: {_result?.ToString() ?? "void"})",
-            TaskStatus.Failed => $"Task(Failed: {_exception?.ToString() ?? Task.Exception?.ToString() ?? "Unknown error"})",
+            TaskStatus.Completed => $"Task(Completed: {Result?.ToString() ?? "void"})",
+            TaskStatus.Failed => $"Task(Failed: {Exception?.ToString() ?? "Unknown error"})",
             TaskStatus.Canceled => "Task(Canceled)",
             _ => "Task(Status: Unknown)"
         };

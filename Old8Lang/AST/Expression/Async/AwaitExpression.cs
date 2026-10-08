@@ -39,19 +39,10 @@ public partial class AwaitExpression : LangExpression
             );
         }
 
-        // 检查任务是否已完成，如果已完成直接返回结果
-        if (taskValue.IsCompleted)
-        {
-            if (taskValue.Exception is not null)
-            {
-                throw taskValue.Exception;
-            }
-
-            return taskValue.Result!;
-        }
-
-        // 对于未完成的任务，直接异步等待并获取结果
-        // TaskLangValue.AwaitAsync() 内部已经处理了线程安全
+        // 统一走 AwaitAsync：已完成的任务会同步返回结果，未完成的任务会阻塞等待。
+        // 这样成功、异常、取消三种情况都能正确处理。
+        // 注意不要用“已完成就直接读 TaskLangValue.Result”的快速路径：
+        // 任务可能在未被 await 的情况下于后台完成，那种写法会把已完成任务的结果当成 null。
         try
         {
             var awaitTask = taskValue.AwaitAsync();

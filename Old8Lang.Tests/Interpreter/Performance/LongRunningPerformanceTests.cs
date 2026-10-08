@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 长时间运行性能测试
 /// 目标: 验证长时间运行时性能稳定，无退化
 /// </summary>
+[Trait("Category", "Performance")]
 public class LongRunningPerformanceTests
 {
     [Fact]

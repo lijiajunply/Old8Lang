@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 递归调用性能测试
 /// 目标: 支持至少100层递归深度
 /// </summary>
+[Trait("Category", "Performance")]
 public class RecursiveCallPerformanceTests
 {
     private const int WarmupRuns = 2;

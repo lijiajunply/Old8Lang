@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 中等规模程序性能测试
 /// 目标: 1000行程序执行时间 <2s，性能提升 ≥40%
 /// </summary>
+[Trait("Category", "Performance")]
 public class MediumProgramPerformanceTests
 {
     private const int WarmupRuns = 2;

@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 循环执行性能测试
 /// 目标: 嵌套循环性能提升 ≥30%
 /// </summary>
+[Trait("Category", "Performance")]
 public class LoopExecutionPerformanceTests
 {
     private const int WarmupRuns = 3;

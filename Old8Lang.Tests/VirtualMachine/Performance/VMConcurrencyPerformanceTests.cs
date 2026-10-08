@@ -5,6 +5,7 @@ using VM = Old8Lang.Bytecode.VM.VirtualMachine;
 namespace Old8Lang.Tests.VirtualMachine.Performance;
 
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMConcurrencyPerformanceTests
 {
     [Fact]

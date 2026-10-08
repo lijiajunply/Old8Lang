@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// <summary>
 /// 性能优化效果测试
 /// </summary>
+[Trait("Category", "Performance")]
 public class PerformanceOptimizationTests
 {
     [Fact]

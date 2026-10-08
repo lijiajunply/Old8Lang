@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.VirtualMachine.Performance;
 /// 对应基准场景：VMXQ_Edge_HighArgCount_CallHotPath / HighThrowRate_TryCatch / LargeClosureCapture_HighFreq
 /// </summary>
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMPerformanceSmokeTests
 {
     /// <summary>

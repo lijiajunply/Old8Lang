@@ -11,6 +11,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 小型脚本性能测试
 /// 目标: 50行脚本执行时间 <100ms，性能提升 ≥50%
 /// </summary>
+[Trait("Category", "Performance")]
 public class SmallScriptPerformanceTests
 {
     private const int WarmupRuns = 3;

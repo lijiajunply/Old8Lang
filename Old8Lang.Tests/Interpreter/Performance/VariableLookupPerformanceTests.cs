@@ -11,6 +11,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 变量查找性能测试
 /// 目标: 变量查找性能提升 ≥40%
 /// </summary>
+[Trait("Category", "Performance")]
 public class VariableLookupPerformanceTests
 {
     private const int WarmupRuns = 3;

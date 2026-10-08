@@ -5,6 +5,7 @@ using System.Diagnostics;
 namespace Old8Lang.Tests.VirtualMachine.Performance;
 
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMExecutionPerformanceTests
 {
     private (TimeSpan elapsed, string output) ExecuteVMCodeWithTiming(string code)

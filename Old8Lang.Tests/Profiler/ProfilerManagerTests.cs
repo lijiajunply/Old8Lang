@@ -5,6 +5,7 @@ namespace Old8Lang.Tests.Profiler;
 /// <summary>
 /// ProfilerManager 测试
 /// </summary>
+[Trait("Category", "Performance")]
 public class ProfilerManagerTests
 {
     private readonly ProfilerManager _profiler = new();

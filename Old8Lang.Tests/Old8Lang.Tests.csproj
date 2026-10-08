@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- 默认排除 Category=Performance 的用例；这些用例由 performance.runsettings 单独跑 -->
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)/default.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

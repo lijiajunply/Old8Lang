@@ -9,6 +9,7 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 /// 测试 CountDownLatch 的创建、倒计时、等待和释放功能
 /// </summary>
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMConcurrencyCountDownLatchTests
 {
     private string ExecuteVMCode(string code)

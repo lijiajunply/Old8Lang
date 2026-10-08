@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!--
+      性能/并发档：只跑标记为 Category=Performance 的用例。
+      用法见 CLAUDE.md 的“性能/并发用例分档”一节。
+
+      注意：这些用例断言墙钟耗时、GC 占用或用 Sleep 同步线程，在同一进程内
+      仍会互相干扰，彻底稳定需要隔离到独立进程运行。
+    -->
+    <TestCaseFilter>Category=Performance</TestCaseFilter>
+  </RunConfiguration>
+</RunSettings>

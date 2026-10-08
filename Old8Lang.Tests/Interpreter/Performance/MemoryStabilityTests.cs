@@ -10,6 +10,7 @@ namespace Old8Lang.Tests.Interpreter.Performance;
 /// 内存稳定性测试
 /// 目标: 长时间运行时内存增长 <5%
 /// </summary>
+[Trait("Category", "Performance")]
 public class MemoryStabilityTests
 {
     [Fact]

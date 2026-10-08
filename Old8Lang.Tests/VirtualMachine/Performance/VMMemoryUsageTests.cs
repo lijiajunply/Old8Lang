@@ -4,6 +4,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.VirtualMachine.Performance;
 
 [Collection("Sequential")]
+[Trait("Category", "Performance")]
 public class VMMemoryUsageTests
 {
     private (long memoryBefore, long memoryAfter, string output) ExecuteVMCodeWithMemoryTracking(string code)
