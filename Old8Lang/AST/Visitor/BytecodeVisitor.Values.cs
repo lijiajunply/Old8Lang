@@ -842,27 +842,19 @@ public partial class BytecodeVisitor
         // 4. 过滤出实际存在的变量
         // 注意：对于嵌套 Lambda，内层 Lambda 可能需要捕获外层 Lambda 的捕获变量
         // 这些变量在编译时既不是局部变量也不是全局变量，但仍然需要捕获
+        //
+        // 只有**变量**才进捕获列表。捕获项会在闭包函数开头生成一句 `LoadGlobal 名字`，
+        // 名字在运行时不存在就会直接抛“名称未定义”，所以像函数名（Print、类名、被装饰
+        // 的函数名）或成员名这类根本不是变量的名字一旦被收集进来，就会把一个本来能跑的
+        // 闭包变成运行期报错。这些名字本来也由各自的指令（Call/NewObject/CallMethod）
+        // 静态解析或按名动态解析，不需要闭包按值快照。
         var actualCapturedVars = new List<string>();
         foreach (var varName in capturedVars)
         {
-            // 检查变量是否存在：局部变量、全局变量、或当前函数的捕获变量
-            // 如果都不是，也保留它（可能是外层函数的捕获变量，用于嵌套闭包）
-            if (_compiler.IsLocalVariable(varName))
+            if (_compiler.IsLocalVariable(varName) ||
+                _compiler.IsGlobalVariable(varName) ||
+                _compiler.IsCapturedVariable(varName))
             {
-                actualCapturedVars.Add(varName);
-            }
-            else if (_compiler.IsGlobalVariable(varName))
-            {
-                actualCapturedVars.Add(varName);
-            }
-            else if (_compiler.IsCapturedVariable(varName))
-            {
-                actualCapturedVars.Add(varName);
-            }
-            else
-            {
-                // 对于嵌套闭包，变量可能来自外层函数但还未被标记为捕获变量
-                // 保留这些变量，让运行时从闭包环境中查找
                 actualCapturedVars.Add(varName);
             }
         }

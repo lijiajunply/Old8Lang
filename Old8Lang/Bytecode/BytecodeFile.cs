@@ -13,8 +13,9 @@ public class BytecodeFile
     private const uint MagicNumber = 0x4F4C4438;
 
     // 文件格式版本
+    // 1.1: FunctionMetadata 增加 IsDecorated 字段（装饰器函数的调用必须走全局绑定）
     private const ushort MajorVersion = 1;
-    private const ushort MinorVersion = 0;
+    private const ushort MinorVersion = 1;
 
     /// <summary>常量池</summary>
     public ConstantPool ConstantPool { get; set; } = new();
@@ -190,7 +191,9 @@ public class BytecodeFile
         ushort majorVersion = reader.ReadUInt16();
         ushort minorVersion = reader.ReadUInt16();
 
-        if (majorVersion != MajorVersion)
+        // 次版本号也必须不低于当前值：函数元数据是按字段顺序定长写入的，
+        // 旧文件缺少新增字段，继续按新布局解析会读出垃圾数据而不是报错。
+        if (majorVersion != MajorVersion || minorVersion < MinorVersion)
             throw new InvalidDataException(
                 $"不兼容的字节码版本: {majorVersion}.{minorVersion} (当前支持: {MajorVersion}.{MinorVersion})");
 

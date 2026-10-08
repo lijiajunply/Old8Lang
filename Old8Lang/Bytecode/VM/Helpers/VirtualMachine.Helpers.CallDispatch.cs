@@ -152,7 +152,7 @@ public partial class VirtualMachine
                 return;
             }
 
-            if (TryResolveCallableFunction(frame, funcName, functionIndexHint, out var function, out var closureEnvironment,
+            if (TryResolveCallableFunction(frame, funcName, functionIndexHint, position, out var function, out var closureEnvironment,
                     out var closureConstantPool))
             {
                 if (function.TryGetPositionalFastCallTypeKinds(argCount, out var fastTypeKinds) &&
@@ -204,7 +204,7 @@ public partial class VirtualMachine
         var namedArgValues = PopArguments(namedCount);
         var positionalArgs = PopArguments(positionalCount);
 
-        if (!TryResolveCallableFunction(frame, namedFuncName, namedFunctionIndexHint, out var namedFunction,
+        if (!TryResolveCallableFunction(frame, namedFuncName, namedFunctionIndexHint, position, out var namedFunction,
                 out var namedClosureEnvironment, out var namedClosureConstantPool))
         {
             throw new MethodNotFoundError(position, namedFuncName);
@@ -298,20 +298,31 @@ public partial class VirtualMachine
     }
 
     private bool TryResolveCallableFunction(CallFrame frame, string funcName, int functionIndexHint,
-        out FunctionMetadata function, out ClosureEnvironment? closureEnvironment, out ConstantPool? closureConstantPool)
+        SourcePosition position, out FunctionMetadata function, out ClosureEnvironment? closureEnvironment,
+        out ConstantPool? closureConstantPool)
     {
         function = null!;
         closureEnvironment = null;
         closureConstantPool = null;
 
         // 新协议优先：函数索引命中时快速直达
+        //
+        // 带装饰器的函数例外：装饰器在运行期把包装后的函数写回同名全局变量，
+        // 函数体本身已经不是调用该名字时应该执行的东西。这类调用要走下面的
+        // 全局绑定查找，否则装饰器会被静默绕过（@twice 包装的 inc(10) 得到 11）。
+        var isDecoratedFunction = false;
         if (functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
         {
             var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
             if (indexedFunction.Name == funcName)
             {
-                function = indexedFunction;
-                return true;
+                if (!indexedFunction.IsDecorated)
+                {
+                    function = indexedFunction;
+                    return true;
+                }
+
+                isDecoratedFunction = true;
             }
         }
 
@@ -346,6 +357,15 @@ public partial class VirtualMachine
                 closureEnvironment = globalClosure.CapturedVariables;
                 closureConstantPool = globalClosure.ConstantPool;
                 return true;
+            }
+
+            // 带装饰器的函数，其全局绑定就是调用该名字时该执行的东西。
+            // 绑定不是函数说明装饰器写错了（例如返回了 123），此时若继续往下退回
+            // 原函数，用户只会看到装饰器“不生效”，拿不到任何提示。
+            if (isDecoratedFunction)
+            {
+                throw new TypeError(position,
+                    $"装饰器返回值不是函数，无法调用 '{funcName}'（实际类型: {funcObj?.GetType().Name ?? "null"}）");
             }
         }
 

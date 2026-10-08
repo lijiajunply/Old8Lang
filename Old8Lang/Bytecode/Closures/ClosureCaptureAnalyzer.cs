@@ -1,6 +1,8 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.Bytecode.Closures;
 
@@ -45,6 +47,27 @@ public class ClosureCaptureAnalyzer
         return _capturedVariables
             .Where(v => !_parameters.Contains(v) && !_localVariables.Contains(v))
             .ToList();
+    }
+
+    /// <summary>
+    /// 递归分析调用的实参（位置参数与命名参数）
+    /// </summary>
+    private void AnalyzeArguments(List<LangExpression> arguments, List<NamedArgument>? namedArguments)
+    {
+        foreach (var argument in arguments)
+        {
+            AnalyzeNode(argument);
+        }
+
+        if (namedArguments is null)
+        {
+            return;
+        }
+
+        foreach (var namedArgument in namedArguments)
+        {
+            AnalyzeNode(namedArgument.Value);
+        }
     }
 
     private void AnalyzeNode(IOldLangTree? node)
@@ -105,6 +128,43 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
+        // 处理成员访问与方法调用：obj.member、obj.method(args)
+        //
+        // 点号右侧是成员名（字段名或方法名），不是变量引用。若把它当成变量收集，
+        // 闭包就会为一个并不存在的变量（例如 ToUpper）建立捕获项，闭包创建时即报
+        // “名称未定义”。因此这里只递归左操作数；右操作数是方法调用时，额外递归实参。
+        if (node is Operation { Opera: LangTokenType.Dot } dotExpression)
+        {
+            AnalyzeNode(dotExpression.Left);
+
+            if (dotExpression.Right is Instance methodCall)
+            {
+                AnalyzeArguments(methodCall.Ids, methodCall.NamedArgs);
+            }
+
+            return;
+        }
+
+        // 处理标识符调用：f(x)。
+        //
+        // 被调用名本身要作为变量引用收集：装饰器包装函数（形如
+        // func deco(f) { return (x) -> f(x) * 2 }）正是靠捕获形参 f
+        // 才拿得到被装饰的函数。名字是否真的需要捕获由调用方结合作用域判断。
+        if (node is Instance instance)
+        {
+            AnalyzeNode(instance.Id);
+            AnalyzeArguments(instance.Ids, instance.NamedArgs);
+            return;
+        }
+
+        // 处理复杂表达式调用：expressions(x, y)
+        if (node is FunctionCallExpression functionCall)
+        {
+            AnalyzeNode(functionCall.FunctionExpression);
+            AnalyzeArguments(functionCall.Arguments, functionCall.NamedArguments);
+            return;
+        }
+
         // 处理 Operation（二元操作）
         if (node is Operation operation)
         {
@@ -134,12 +194,13 @@ public class ClosureCaptureAnalyzer
             // 分析嵌套 Lambda 的函数体
             AnalyzeNode(funcValue.BlockStatement);
 
-            // 移除嵌套 Lambda 的参数
-            foreach (var param in nestedParameters)
-            {
-                // 同时从捕获变量中移除（因为这些参数不应该被外层 Lambda 捕获）
-                _capturedVariables.Remove(param);
-            }
+            // 内层闭包自己声明的名字（形参、以及它内部赋值建立的局部变量）只属于它自己。
+            // 若把它们留在当前闭包的捕获集合里，外层闭包就会凭空多出一个同名局部变量：
+            // 内层闭包随后在“闭包写外层局部变量”的检查里看到这个名字，会误判成写回外层变量
+            // 而直接报错（典型触发：内层闭包里的 result <- f(x)，外层恰有同名全局/局部）。
+            var nestedDeclared = new HashSet<string>(_localVariables, StringComparer.Ordinal);
+            nestedDeclared.ExceptWith(outerAssignedSnapshot);
+            _capturedVariables.ExceptWith(nestedDeclared);
 
             // 恢复赋值集合：嵌套闭包的赋值不回传给当前闭包
             _localVariables.Clear();

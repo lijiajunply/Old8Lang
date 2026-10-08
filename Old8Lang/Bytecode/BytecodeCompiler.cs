@@ -625,6 +625,22 @@ public class BytecodeCompiler
         return -1;
     }
 
+    /// <summary>
+    /// 把函数标记为带装饰器
+    /// </summary>
+    /// <remarks>
+    /// 装饰器在运行期会用包装后的函数覆盖同名全局绑定，所以调用这类函数时
+    /// 不能再按函数索引直达函数体（详见 <see cref="FunctionMetadata.IsDecorated"/>）。
+    /// </remarks>
+    public void MarkFunctionDecorated(string funcName)
+    {
+        int funcIndex = GetFunctionIndex(funcName);
+        if (funcIndex >= 0)
+        {
+            _bytecodeFile.Functions[funcIndex].IsDecorated = true;
+        }
+    }
+
     // ===== 作用域管理 =====
 
     public void EnterScope()

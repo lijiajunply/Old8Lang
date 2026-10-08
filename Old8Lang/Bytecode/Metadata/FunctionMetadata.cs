@@ -64,6 +64,14 @@ public class FunctionMetadata
     /// <summary>是否是扩展方法</summary>
     public bool IsExtensionMethod { get; set; }
 
+    /// <summary>是否是带装饰器的函数</summary>
+    /// <remarks>
+    /// 装饰器在运行期把包装后的函数写回同名全局变量，因此这类函数的“真身”
+    /// 是全局绑定而不是这里的函数体。调用点若按函数索引直接跳到函数体，
+    /// 就会静默绕过装饰器，所以解析调用目标时要避开索引捷径、走全局绑定。
+    /// </remarks>
+    public bool IsDecorated { get; set; }
+
     /// <summary>函数在常量池中的索引(用于闭包)</summary>
     public int FunctionIndex { get; set; } = -1;
 
@@ -124,6 +132,7 @@ public class FunctionMetadata
         writer.Write(IsAsync);
         writer.Write(IsGenerator);
         writer.Write(IsExtensionMethod);
+        writer.Write(IsDecorated);
         writer.Write(FunctionIndex);
         writer.Write(ParamsParameterIndex);
 
@@ -190,6 +199,7 @@ public class FunctionMetadata
         func.IsAsync = reader.ReadBoolean();
         func.IsGenerator = reader.ReadBoolean();
         func.IsExtensionMethod = reader.ReadBoolean();
+        func.IsDecorated = reader.ReadBoolean();
         func.FunctionIndex = reader.ReadInt32();
         func.ParamsParameterIndex = reader.ReadInt32();
 

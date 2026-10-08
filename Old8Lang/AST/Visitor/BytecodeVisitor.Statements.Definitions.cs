@@ -74,6 +74,9 @@ public partial class BytecodeVisitor
         // 检查是否有装饰器
         if (funcValue.Decorators is { Count: > 0 })
         {
+            // 标记为带装饰器：调用点必须走全局绑定，否则会绕过装饰器
+            _compiler.MarkFunctionDecorated(funcName);
+
             // 应用装饰器
             ApplyDecorators(funcName, funcValue.Decorators);
         }

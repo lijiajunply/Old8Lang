@@ -1,5 +1,6 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -35,6 +36,14 @@ public partial class BytecodeVisitor
         // 编译异步函数定义
         var funcValue = node.AsyncFuncValue;
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
+
+        // 异步函数的装饰器尚未实现。这里必须显式报错：异步函数不走
+        // MakeFunction/StoreGlobal 这条绑定路径，若放任不管，装饰器会被静默丢弃，
+        // 用户只会看到“装饰器没生效”，拿不到任何提示。
+        if (funcValue.Decorators is { Count: > 0 })
+        {
+            throw new VmUnsupportedError(node, "异步函数（async func）的装饰器");
+        }
 
         // 检查函数是否已经被编译过（避免重复编译）
         if (_compiler.GetFunctionIndex(funcName) >= 0)
