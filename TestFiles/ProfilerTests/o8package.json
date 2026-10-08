@@ -1,0 +1,20 @@
+{
+  "name": "profiler-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 性能分析器测试用例",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter"
+  },
+  "main": "simple_test.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run simple_test.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "verification-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 三模式一致性验证用例",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter"
+  },
+  "main": "ModeDiffTest.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run ModeDiffTest.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

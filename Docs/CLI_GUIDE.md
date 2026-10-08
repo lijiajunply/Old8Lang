@@ -215,7 +215,7 @@ old8lang publish [选项]
 - `-h, --help` - 显示帮助信息
 
 #### 发布流程
-1. 读取项目配置（o8packages.json）
+1. 读取项目配置（o8package.json）
 2. 验证包结构和元数据
 3. 打包为 .o8pkg 文件
 4. 签名包文件（可选）
@@ -976,7 +976,7 @@ old8lang cert generate -n "Production Certificate" -e production@company.com -o 
 |------|----------|
 | 全局包目录 | `~/.old8lang/packages/` |
 | 项目包目录 | `<项目根目录>/packages/` |
-| 包配置文件 | `o8packages.json` |
+| 包配置文件 | `o8package.json` |
 | 包元数据 | `package.json` |
 
 ### 支持的证书格式

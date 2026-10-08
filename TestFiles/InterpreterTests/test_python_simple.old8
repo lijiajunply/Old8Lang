@@ -1,6 +1,6 @@
 // 简单的 Python extern 测试
 
-extern "TestFiles/test_math.py" {
+extern "test_math.py" {
     func add(a:int, b:int) -> int
 }
 

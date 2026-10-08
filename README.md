@@ -19,7 +19,7 @@
 ## 包管理系统
 
 ### 虚拟环境（项目模式）
-当检测到 `o8packages.json` 文件时，自动启用项目级包隔离：
+当检测到 `o8package.json` 文件时，自动启用项目级包隔离：
 ```bash
 old8lang init myproject
 cd myproject

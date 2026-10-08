@@ -132,7 +132,7 @@ cd TestFiles && ./run_comprehensive_compiler_tests.sh
 ## 包管理说明
 
 ### 运行模式
-- **项目模式**: 检测到 `o8packages.json` 时自动启用虚拟环境
+- **项目模式**: 检测到 `o8package.json` 时自动启用虚拟环境
 - **非项目模式**: 没有项目配置时自动使用全局包（`~/.old8lang/packages`）
 
 ### 包加载优先级

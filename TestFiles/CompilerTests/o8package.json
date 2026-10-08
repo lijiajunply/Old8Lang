@@ -1,0 +1,20 @@
+{
+  "name": "compiler-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 编译模式（-c）测试用例集",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "compiler"
+  },
+  "main": "01_basic_literals.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run 01_basic_literals.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

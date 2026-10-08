@@ -1,0 +1,20 @@
+{
+  "name": "profiler-examples",
+  "version": "1.0.0",
+  "description": "Old8Lang 性能分析器示例脚本",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter"
+  },
+  "main": "computation_heavy.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run computation_heavy.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

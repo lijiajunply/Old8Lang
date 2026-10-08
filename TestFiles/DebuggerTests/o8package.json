@@ -1,0 +1,20 @@
+{
+  "name": "debugger-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 调试器测试用例（断点/变量/调用栈）",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter"
+  },
+  "main": "test_breakpoints.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run test_breakpoints.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

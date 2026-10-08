@@ -1,0 +1,20 @@
+{
+  "name": "extern-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang extern 外部库调用测试用例（平台相关）",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "interpreter"
+  },
+  "main": "test_extern_simple.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run test_extern_simple.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

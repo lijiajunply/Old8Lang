@@ -1,0 +1,20 @@
+{
+  "name": "vm-language-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 虚拟机语言特性测试用例（vm_* 系列）",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "vm"
+  },
+  "main": "vm_basic_test.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run vm_basic_test.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}

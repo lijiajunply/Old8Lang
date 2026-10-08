@@ -124,7 +124,7 @@ dotnet run --project Old8Lang.App -- publish --auto-cert --cert-name "Publisher"
 ```
 
 **包管理模式**:
-- **项目模式**: 检测到 `o8packages.json` 时启用，包安装到项目本地
+- **项目模式**: 检测到 `o8package.json` 时启用，包安装到项目本地
 - **全局模式**: 无项目配置时，包安装到全局位置
 
 **包结构**:
@@ -462,14 +462,14 @@ Old8Lang 的每个 AST 节点支持三种执行方式：
 
 - Modules are loaded via `import "ModuleName"` syntax
 - Module resolution checks:
-  1. Project-level packages (if `o8packages.json` exists)
+  1. Project-level packages (if `o8package.json` exists)
   2. Global packages
   3. Standard library
 - Module caching prevents duplicate loading
 
 ### Package Management
 
-- Project mode: Detected by presence of `o8packages.json`
+- Project mode: Detected by presence of `o8package.json`
 - Global mode: Used when no project configuration exists
 - Packages are stored in `.o8pkg` format (compressed archives)
 - Package signing and verification supported via certificates

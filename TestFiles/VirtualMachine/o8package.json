@@ -1,0 +1,20 @@
+{
+  "name": "vm-feature-tests",
+  "version": "1.0.0",
+  "description": "Old8Lang 虚拟机特性测试用例（解构/泛型/闭包等）",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "old8lang": {
+    "version": "^1.0.0",
+    "runtime": "vm"
+  },
+  "main": "GenericTest.old8",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "run GenericTest.old8"
+  },
+  "repositories": [
+    "https://packages.old8lang.org"
+  ]
+}
