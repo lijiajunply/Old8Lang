@@ -30,8 +30,9 @@
 | 运算符重载（虚拟机） | ❌ | ✅ | 虚拟机下 `_add`/`_mul`/`_eq` 均正确生效 |
 | 函数装饰器（编译器） | ⚠️ | ❌ | 运行期抛 `Object reference not set to an instance of an object` |
 | 函数装饰器（虚拟机） | ⚠️ | ❌ → ✅（已修） | 原为**静默绕过**（`@twice` 包装的 `inc(10)` 返回 11 而非 12）；已修复闭包捕获与调用解析两处问题 |
-| Task API（虚拟机） | ✅ | ❌ | `Task.Delay` 等报 `名称 'Task' 未定义`（现改为明确的 `VM_UNSUPPORTED_ERROR`） |
-| Thread API（虚拟机） | ✅ | ❌ | `Thread.Sleep`/`Thread.CurrentThread` 同上 |
+| Task API（虚拟机） | ✅ | ❌ → ⚠️（已修） | 复核时为 ❌（`Task.Delay` 报 `VM_UNSUPPORTED_ERROR`）；现已支持 `Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/`Run`/`StartNew`。`Task.Factory`、`Task.Delay` 的第 2 个参数（CancellationToken）仍报 `VM_UNSUPPORTED_ERROR` |
+| Thread API（虚拟机） | ✅ | ❌ → ⚠️（已修） | 复核时为 ❌；现已支持 `Thread.Sleep`，`Thread.CurrentThread`/`Delay`/`WhenAll`/`WhenAny` 仍报 `VM_UNSUPPORTED_ERROR`（虚拟机线程模型是 `VMThreadLangValue`，与解释器的 `ThreadLangValue` 不同构） |
+| Assert 断言（虚拟机） | ✅ | ❌ → ✅（已修） | 复核时为 ❌（`Assert.Equal` 报 `VM_UNSUPPORTED_ERROR`）；现 24 个断言方法在虚拟机下均可用。**行为差异**：虚拟机下断言失败抛 `AssertionError`，因此**语言层 `try/catch` 能捕获到它**；解释器抛的是普通 `Exception`，`try`/`catch` 都捕获不到（旧文档未单列此行） |
 | 原生库导入 extern（编译器/虚拟机） | ✅ | ❌ | `extern "Old8LangLib" MathLib Sqrt sqrt` 后调用报名称/方法未找到 |
 | 数组/列表/字典直接打印（虚拟机） | ✅ | ⚠️ | 直接 `print` 输出 .NET 类型名，`.ToStr()` 正常 |
 | 闭包（虚拟机） | ✅ | ⚠️ | 只读捕获正常；**写回外层局部变量不支持**（按值快照捕获） |
@@ -166,7 +167,7 @@
 |-----|-------|-------|-------|------|
 | async/await | ✅ | ⚠️ | ✅ | 异步函数 |
 | 异步生成器 | ✅ | ⚠️ | ✅ | `async func` + `yield` |
-| Task API | ✅ | ⚠️ | ❌ | Task.Delay, WhenAll, WhenAny；**虚拟机未注册 Task 静态类**，报 `VM_UNSUPPORTED_ERROR`。`async`/`await` 本身在虚拟机下可用 |
+| Task API | ✅ | ⚠️ | ⚠️ | `Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/`Run`/`StartNew` 在虚拟机下可用（编译期改写为静态类原生调用）。不支持：`Task.Factory`、`Task.Delay` 的第 2 个参数（虚拟机无法构造 `CancellationToken`）、`t.Then/Catch/Finally/ContinueWith` |
 | async for-in | ✅ | ⚠️ | ✅ | 异步迭代 |
 
 #### 8. 并发编程 (100% / 100% / 100%)
@@ -182,7 +183,7 @@
 | CyclicBarrier | ✅ | ✅ | ✅ | 循环栅栏 (6 个函数) |
 | CancellationToken | ✅ | ✅ | ✅ | 取消令牌 (4 个函数) |
 | spawn | ✅ | ✅ | ✅ | 创建线程；**只创建不启动，必须再调用 `Start()` 才会执行**，之后用 `Join()` 等待并取回返回值（2026-10-08 实测三种模式一致） |
-| Thread API | ✅ | ✅ | ❌ | 线程管理；`Thread.Sleep`/`Thread.CurrentThread` 等静态 API 在虚拟机下报 `VM_UNSUPPORTED_ERROR`，基于专用指令的线程操作不受影响 |
+| Thread API | ✅ | ✅ | ⚠️ | 线程管理；虚拟机下支持 `Thread.Sleep`，`Thread.CurrentThread`/`Delay`/`WhenAll`/`WhenAny` 报 `VM_UNSUPPORTED_ERROR`（与解释器的 `ThreadLangValue` 不同构），基于专用指令的线程操作不受影响 |
 
 #### 9. 模块系统 (100% / 100% / 95%)
 
@@ -236,6 +237,7 @@
 | LINQ 查询 | ✅ | ✅ | ✅ | 查询表达式 |
 | 列表推导式 | ✅ | ✅ | ✅ | `[x for x in list]`；虚拟机模式此前为空实现（栈失衡后报 `Stack empty`），已于 2026-10-08 实现 |
 | 生成器 | ✅ | ✅ | ✅ | `yield` 语句 |
+| 断言 API（Assert） | ✅ | ⚠️ | ✅ | 24 个方法（`Assert.Equal` 等）；编译器模式只覆盖其中一部分。虚拟机下失败抛 `AssertionError`（**可被语言层 `try/catch` 捕获**，解释器下捕获不到），相等判定用虚拟机自身的相等语义（解释器的判定会把同一类的两个不同实例误判为相等） |
 | 字节码序列化 | ❌ | ❌ | ✅ | BytecodeFile |
 | 反汇编器 | ❌ | ❌ | ✅ | Disassembler |
 | 调试器 | ❌ | ❌ | ✅ | VMDebugger |
@@ -281,25 +283,30 @@
 
 ### 虚拟机模式测试
 
-- **测试文件数**: 91 个（2026-10-08 实测）
-- **实测结果**（非编译模式全量）：**4517 通过 / 0 失败 / 3 跳过**
+- **测试文件数**: 97 个（2026-10-08 实测，按含 `[Fact]`/`[Theory]` 的 .cs 文件计）
+- **实测结果**（非编译模式全量，即排除 `~.Tests.Compiler`）：**4700 通过 / 0 失败 / 3 跳过**
 - **主要测试类别**:
-  - Async: 3 个测试文件
+  - Async: 5 个测试文件
   - Basic: 2 个测试文件
-  - Classes: 4 个测试文件
-  - Collections: 4 个测试文件
-  - Concurrency: 2 个测试文件
+  - BytecodeSerialization: 2 个测试文件
+  - Classes: 5 个测试文件
+  - Collections: 5 个测试文件
+  - Concurrency: 12 个测试文件
+  - EdgeCases: 4 个测试文件
+  - ErrorHandling: 5 个测试文件
   - Exception: 1 个测试文件
-  - Expressions: 7 个测试文件
+  - Expressions: 10 个测试文件
   - Extern: 1 个测试文件
-  - Functions: 5 个测试文件
-  - Generics: 6 个测试文件
+  - Functions: 7 个测试文件
+  - Generics: 10 个测试文件
   - Integration: 1 个测试文件
-  - Linq: 2 个测试文件
+  - Linq: 3 个测试文件
   - Modules: 1 个测试文件
-  - Statements: 4 个测试文件
+  - Performance: 7 个测试文件（带 `Category=Performance`，默认档不执行）
+  - Reflection: 2 个测试文件
+  - Statements: 7 个测试文件
   - Strings: 1 个测试文件
-  - Types: 1 个测试文件
+  - Types: 6 个测试文件
 
 ## 虚拟机模式特有功能
 
@@ -375,24 +382,32 @@
 2. **异步函数的装饰器**: 不支持。`@decorator async func` 会报 `VM_UNSUPPORTED_ERROR`
    （异步函数不走 `MakeFunction`/`StoreGlobal` 这条绑定路径，装饰器无法生效）。
    普通函数的装饰器自 2026-10-08 起完全可用。
-3. **Task / Thread / Assert / TestRunner / Mock / TaskScheduler / TaskCompletionSource /
-   CancellationTokenSource 静态类**: 未在虚拟机中注册，不可用
-   （自 2026-10-08 起报 `VM_UNSUPPORTED_ERROR` 并给出位置，此前只报 `名称 'X' 未定义`）。
-4. **集合直接打印**: 直接 `print` 数组/列表/字典会输出 .NET 类型名，需改用 `.ToStr()`。
-5. **字典遍历顺序**: 与解释器不同，依赖顺序时需显式排序。
-6. **元组**: 索引可用，`.Count()` 不可用。
-7. **Python 互操作**: 不支持。
-8. **P/Invoke**: C/C++ P/Invoke 支持不完整。
-9. **原生库导入（`extern "dll" ...`）**: 调用时报方法未找到。
-10. **一元运算符重载**: 不支持（三种模式一致）。
-11. **原生函数无法区分"无返回值"与"null"（残留差异）**: 用户函数无返回值时，虚拟机补
+3. **静态类 API（Task / Thread / Assert）**: 自 2026-10-08 起部分可用——编译期把 `类名.方法(...)`
+   改写成静态类原生调用。可用的方法见功能列表；不支持的形式（裸引用 `Task`、`Task.Factory`、
+   `Thread.CurrentThread`、命名参数、`Task.Delay` 的第二个参数）报 `VM_UNSUPPORTED_ERROR` 并给出位置。
+   仍然完全不可用的静态类：**TestRunner / Mock / TaskScheduler / TaskCompletionSource /
+   CancellationTokenSource**（自 2026-10-08 起报 `VM_UNSUPPORTED_ERROR` 并给出位置，
+   此前只报 `名称 'X' 未定义`）。
+4. **`await` 的结果 + 函数返回类型注解**: `func f() -> int { return await g() }` 会报
+   `类型不匹配: 期望 int，但得到 IntLangValue`（`g` 是普通 async 函数也一样，与静态类 API 无关）。
+   `await` 的结果是 `LangValueType`，而 `CheckTypeMatch` 只按原始 CLR 类型匹配，
+   不换算 `LangValueType`。这是 2026-10-08 支持 Task 静态 API 时发现的既有缺口，尚未修复；
+   `return await ...` 之前先把结果赋给变量再返回，或去掉返回类型注解，都能绕过。
+5. **集合直接打印**: 直接 `print` 数组/列表/字典会输出 .NET 类型名，需改用 `.ToStr()`。
+6. **字典遍历顺序**: 与解释器不同，依赖顺序时需显式排序。
+7. **元组**: 索引可用，`.Count()` 不可用。
+8. **Python 互操作**: 不支持。
+9. **P/Invoke**: C/C++ P/Invoke 支持不完整。
+10. **原生库导入（`extern "dll" ...`）**: 调用时报方法未找到。
+11. **一元运算符重载**: 不支持（三种模式一致）。
+12. **原生函数无法区分"无返回值"与"null"（残留差异）**: 用户函数无返回值时，虚拟机补
     `VoidLangValue` 占位，与解释器一致（`r == null` 为 false、`print(f())` 不输出内容）。
     但**原生/内置函数**（如 `Sleep`、`PrintLine`）的实现统一返回 C# `null`，
     虚拟机无法区分它是"无返回值"还是"null 值"，因此这类调用参与表达式时：
     `print(Sleep(1))` 会输出 `null`（解释器不输出），`r <- Sleep(1)` 后 `r == null` 为 true
     （解释器为 false）。要彻底对齐，需要让各原生函数分别返回 `VoidLangValue` / `NullLangValue`。
     （2026-10-08 之前这类写法会直接报 `Stack empty`，现已不会破坏求值栈。）
-12. **`spawn` 需要显式 `Start()`**: `spawn` 只创建线程，不启动；必须再调用 `Start()`。
+13. **`spawn` 需要显式 `Start()`**: `spawn` 只创建线程，不启动；必须再调用 `Start()`。
     只创建不启动时线程函数不会执行，未启动就 `Join()` 会报 `Thread has not been started`。
     这是三种模式一致的既定行为（不是虚拟机独有），已在语法文档 §5.9 中说明。
 
@@ -434,6 +449,19 @@
 
 ## 更新日志
 
+- **2026-10-08（再续）**: 虚拟机模式支持静态类 API（Task / Thread / Assert）。
+  编译期把 `类名.方法(...)` 改写成带限定名的静态类原生调用，运行期由 `VirtualMachine` 分发，
+  支持的方法集合集中在新增的 `VmStaticClassRegistry` 里：
+  `Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/`Run`/`StartNew`、
+  `Thread.Sleep`、`Assert` 的 24 个断言方法。不支持的形式（裸引用 `Task`、`Task.Factory`、
+  `Thread.CurrentThread`、命名参数、`Task.Delay` 的第二个参数、TestRunner/Mock/TaskScheduler 等）
+  仍报 `VM_UNSUPPORTED_ERROR` 并给出位置与支持清单。
+  同时修掉三处相关问题：虚拟机容器指令（`GetIndex`/`SetIndex`/`GetIterator`/`GetCount`）
+  补上 `ILangList` 分支（否则 `await Task.WhenAll(...)` 的列表结果无法索引与迭代）；
+  `t.Wait()`/`t.Await()` 在虚拟机下不再误报“实例必须是 Task<object> 类型”；
+  断言的相等判定改用虚拟机自身的相等语义（解释器的判定会把同一类的两个不同实例误判为相等，
+  且断言失败改为抛 `AssertionError`；`Assert.Throws` 改按异常类型识别自身失败，
+  不再让 `Assert.Throws(() -> Assert.True(false))` 假通过）。
 - **2026-10-08（续）**: 虚拟机模式支持函数装饰器。修正两处导致装饰器静默失效的问题
   （包装闭包捕获不到被装饰的函数、按函数名调用绕过被改写的全局绑定），
   并为异步函数的装饰器补上明确报错；函数装饰器（虚拟机）标记 ❌ → ✅。

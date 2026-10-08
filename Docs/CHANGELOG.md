@@ -1,5 +1,80 @@
 # 更新记录
 
+## 虚拟机模式静态类 API 支持：Task / Thread / Assert (2026-10-08)
+
+虚拟机模式下 `Task.Delay(...)`、`Assert.Equal(...)`、`Thread.Sleep(...)` 此前直接报
+`VM_UNSUPPORTED_ERROR`。原因是解释器把这三个静态类注册成运行期全局对象、由各自的
+`Dot(Instance, manager)` 分发，而虚拟机没有这套对象。本次建立了一套通用的静态类分发机制。
+
+### 实现
+
+- **编译期改写**（`BytecodeVisitor.StaticClasses.cs`）：`类名.方法(参数)` 被改写成带限定名的
+  原生调用（如 `CallNative { argCount, "Task.Delay" }`）。拦截点在 `VisitOperation` 的 Dot 分支，
+  且必须在访问左操作数之前——`Task.Delay(100)` 的语法树是
+  `Operation{ Dot, Left=LangId("Task"), Right=Instance("Delay",[100]) }`，按普通成员访问走
+  只会在 `VisitLangId` 里报“名称 'Task' 未定义”。
+- **运行期分发**（`VirtualMachine.Helpers.StaticClasses.cs`）：在 `CallNativeFunction` 查全局函数
+  注册表**之前**按限定名分发，这样 `Old8Exception` 能原样透传，不被注册表分支的兜底包装改写。
+- **唯一真源**（`Bytecode/VmStaticClassRegistry.cs`）：编译期与运行期共用同一张
+  “类 → 方法”表，编译期据此决定能否改写、不支持时如何报错，运行期据此找实现。
+- **复用解释器实现**：`TaskClassLangValue` / `ThreadClassLangValue` / `AssertClassLangValue`
+  各自新增 `internal` 的 `VmReusableMethods` 表，登记只依赖 `LangValueType` 的既有实现
+  （`Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`、`Thread.Sleep`、
+  `Assert` 的 16 个方法）。语义不同或需要访问虚拟机的由虚拟机自己实现。
+
+### 支持矩阵
+
+- **Task**：`Delay`、`WhenAll`、`WhenAny`、`FromResult`、`FromException`、`Run`、`StartNew`
+- **Thread**：`Sleep`
+- **Assert**：24 个方法（短名与 `AssertXxx` 长名都接受）
+- **不支持**（报 `VM_UNSUPPORTED_ERROR`，并列出该类支持的方法）：裸引用 `Task`、`Task.Factory`、
+  `Thread.CurrentThread` / `Delay` / `WhenAll` / `WhenAny`、静态类方法使用命名参数、
+  `Task.Delay` 的第二个参数；`TestRunner` / `Mock` / `TaskScheduler` / `TaskCompletionSource` /
+  `CancellationTokenSource` 仍然完全不可用。
+
+### 顺带修复的问题
+
+- **虚拟机容器指令补上 `ILangList` 分支**（`GetIndex`/`SetIndex`/`GetIterator`/`GetCount`）：
+  `ILangList` 既不是 `IList` 也不是 `IEnumerable`，所以 `await Task.WhenAll(...)` 返回的
+  `ListLangValue` 落到求值栈上无法索引、无法 `for-in`。此前没有任何虚拟机路径产出这类值，
+  缺口一直没被触发。
+- **`t.Wait()` / `t.Await()`**：`TaskAwaitMethod` 的虚拟机实现只认 `Task<object>`，
+  而栈上放的是 `TaskLangValue`，因此报“实例必须是 Task<object> 类型”。现在两种都支持，
+  与已可用的 `t.Result` / `t.IsCompleted` / `t.Status` 对齐。
+- **断言的相等语义**：解释器的 `AreEqual` 在遇到不认识的类型时会退回比较 `ToDisplayString()`，
+  而虚拟机类实例的 `ToString()` 只含类名，导致 `Assert.Equal` 对同一类的两个不同实例**假通过**
+  （`Assert.NotEqual` 假失败）。虚拟机改用自身语义：没有等价 `LangValueType` 表示的对象
+  （类实例、函数值）走虚拟机的 `Equals`（认 `_eq` 重载，否则引用相等），其余值换算到解释器
+  口径后沿用 `AreEqual`，从而 `Assert.Equal(42, await task)`、列表逐元素比较都能正确判等。
+- **断言失败改为抛 `AssertionError`**：解释器用普通 `Exception` 表示断言失败，语言层的
+  `try`/`catch` 都捕获不到它（这是解释器侧的既有行为）；虚拟机统一成 `AssertionError`
+  （`Old8Exception` 子类），因此**虚拟机下 `try { Assert.Equal(1, 2) } catch { ... }` 能捕获到，
+  而解释器下不能**——这是有意的跨模式差异，错误码也从通用的 `RUNTIME_ERROR` 变成 `ASSERTION_ERROR`。
+- **`Assert.Throws` 改按异常类型识别自身失败**：解释器按消息前缀 `断言失败:` 判断，
+  会让 `Assert.Throws(() -> Assert.True(false))` **假通过**。虚拟机改为 `ex is AssertionError`。
+- **`Assert.Throws` 的求值栈回滚**：被断言的调用在表达式求值中途抛异常时，
+  `ExecuteFrame` 的 finally 只归还 locals 与帧、不回滚求值栈，会把中间值留在栈上污染调用方。
+  现在按 `ExecuteFunction` 的既有范式做快照与回滚。
+- **`Assert.InstanceOf` 的类型名口径**：解释器是 `Int`/`List`/`Dictionary`，虚拟机的
+  `GetValueTypeName` 是小写 `int`/`list`/`dict`。虚拟机改用解释器口径并做大小写不敏感比较，
+  按解释器写好的断言在虚拟机下同样成立。
+
+### 测试
+
+- 新增 `VMTaskStaticApiTests`（14 条）、`VMStaticClassAssertTests`（20 条）、
+  `VMThreadStaticApiTests`（3 条）、`Performance/VMStaticClassTimingTests`（2 条，Performance 档）。
+- 改写 `ErrorHandling/VMUnsupportedFeatureTests` 中原本断言 `Task.Delay`/`Assert.Equal`/`Thread.Sleep`
+  报不支持的三条用例，改为断言不支持的形式（裸引用、`Task.Factory`、`Thread.CurrentThread`、
+  命名参数、`TaskScheduler`）。
+- 虚拟机测试 933 → 972 通过 / 0 失败；解释器 1943、Parser 881、Unit 147 均无变化。
+
+### 未修复（本次发现的既有缺口，与本改动无关）
+
+- `func f() -> int { return await g() }` 报 `类型不匹配: 期望 int，但得到 IntLangValue`
+  ——纯 `async`/`await` 加返回类型注解就会触发，`g` 是普通异步函数也一样。
+  `CheckTypeMatch` 只按原始 CLR 类型匹配，不换算 `LangValueType`。已记入
+  `MODE_COMPLETION_STATUS.md` 的虚拟机已知限制。
+
 ## 虚拟机模式函数装饰器支持 (2026-10-08)
 
 装饰器此前在虚拟机模式下**静默失效**：`@twice` 包装的 `inc(10)` 返回 `11` 而不是 `12`。

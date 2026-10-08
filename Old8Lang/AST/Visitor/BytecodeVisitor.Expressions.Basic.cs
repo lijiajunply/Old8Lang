@@ -52,20 +52,26 @@ public partial class BytecodeVisitor
     }
 
     /// <summary>
-    /// 解释器注册了而在字节码模式中未实现的静态类
+    /// 解释器注册了、而在字节码模式中不能作为值使用的静态类名
     /// </summary>
     /// <remarks>
     /// key 为解释器模式下 <c>LangInterpreter</c> 注册的全局对象名，value 为错误信息中展示的特性描述。
     /// 支持矩阵见 Docs/MODE_COMPLETION_STATUS.md。
+    ///
+    /// <c>Task</c> / <c>Thread</c> / <c>Assert</c> 三者在虚拟机下部分可用，但只能写成
+    /// <c>类名.方法(...)</c> 的调用形式（由 <c>VisitOperation</c> 的静态类分支处理），
+    /// 裸名字落在这里说明用户在当值用（例如 <c>f &lt;- Task</c>），此时要把原因讲清楚，
+    /// 而不是让它退化成运行期的「名称 'Task' 未定义」。
+    /// 支持的方法清单见 <see cref="Old8Lang.Bytecode.VmStaticClassRegistry"/>。
     /// </remarks>
     private static readonly Dictionary<string, string> StaticClassesUnsupportedInVm = new()
     {
-        ["Task"] = "Task 静态 API（Task.Delay / Task.WhenAll / Task.WhenAny）",
-        ["Thread"] = "Thread 静态 API（Thread.Sleep / Thread.CurrentThread）",
+        ["Task"] = "把 Task 当作值使用（虚拟机模式下只能写成 Task.方法(...)，如 Task.Delay / Task.WhenAll）",
+        ["Thread"] = "把 Thread 当作值使用（虚拟机模式下只支持 Thread.Sleep）",
+        ["Assert"] = "把 Assert 当作值使用（虚拟机模式下只能写成 Assert.方法(...)，如 Assert.Equal）",
         ["TaskScheduler"] = "TaskScheduler 静态 API",
         ["TaskCompletionSource"] = "TaskCompletionSource",
         ["CancellationTokenSource"] = "CancellationTokenSource",
-        ["Assert"] = "Assert 断言 API（Assert.Equal 等）",
         ["TestRunner"] = "TestRunner API",
         ["Mock"] = "Mock API"
     };

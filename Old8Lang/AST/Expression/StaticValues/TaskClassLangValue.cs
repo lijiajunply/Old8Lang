@@ -302,6 +302,25 @@ public partial class TaskClassLangValue : LangValueType
 
         return TaskLangValue.Run(funcValue, cancellationToken, position);
     }
+
+    /// <summary>
+    /// 字节码虚拟机可以直接复用的静态方法（规范名 → 实现）。
+    /// </summary>
+    /// <remarks>
+    /// 这里的方法只依赖 <see cref="LangValueType"/> 参数，不要求解释器环境，因此虚拟机把栈上的值
+    /// 转换成 <see cref="LangValueType"/> 后即可调用。
+    /// <c>Run</c> / <c>StartNew</c> 不在表内：它们要求 <see cref="FuncLangValue"/>，
+    /// 而虚拟机里的函数值是 <c>ClosureValue</c> / <c>FunctionMetadata</c>，需由虚拟机自己执行。
+    /// </remarks>
+    internal static readonly Dictionary<string, Func<List<LangValueType>, SourcePosition, LangValueType>>
+        VmReusableMethods = new(StringComparer.Ordinal)
+        {
+            ["Delay"] = Delay,
+            ["WhenAll"] = WhenAll,
+            ["WhenAny"] = WhenAny,
+            ["FromResult"] = FromResult,
+            ["FromException"] = FromException,
+        };
 }
 
 /// <summary>

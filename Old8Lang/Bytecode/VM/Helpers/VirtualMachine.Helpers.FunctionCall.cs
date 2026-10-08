@@ -1,4 +1,5 @@
 using System.Collections;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
@@ -14,6 +15,15 @@ public partial class VirtualMachine
 {
     private object? CallNativeFunction(string funcName, object?[] args)
     {
+        // 静态类 API（Task.Delay / Thread.Sleep / Assert.Equal ...）用的是带限定名的原生调用，
+        // 编译期由 BytecodeVisitor 的静态类分支改写而来。
+        // 分发放在全局函数注册表之前：注册表分支会把非 Old8Exception 的异常包成 InvalidOperationError，
+        // 那会改写断言失败这类本应原样透传的错误。
+        if (TryInvokeStaticClassMethod(funcName, args, out var staticClassResult))
+        {
+            return staticClassResult;
+        }
+
         // 首先尝试从全局函数注册表中查找（支持重载）
         var overloadGroup = GlobalFunctionRegistry.Instance.GetOverloadGroup(funcName);
         if (overloadGroup != null)
@@ -175,6 +185,8 @@ public partial class VirtualMachine
                         string str => str.Length,
                         Array array => array.Length,
                         IList list => list.Count,
+                        // Old8Lang 列表只实现 ILangList（见 GetIndex 的同类分支）
+                        ILangList langList => langList.GetLength(),
                         _ => 0
                     };
                 }

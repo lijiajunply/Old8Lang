@@ -869,7 +869,11 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// 比较两个对象是否相等
     /// </summary>
-    private static bool AreEqual(LangValueType a, LangValueType b)
+    /// <remarks>
+    /// 虚拟机模式的断言复用本方法（见 <c>VirtualMachine</c> 的静态类分发）：没有等价
+    /// <c>LangValueType</c> 表示的虚拟机自有对象会先由虚拟机自己的相等语义处理，其余值才会走到这里。
+    /// </remarks>
+    internal static bool AreEqual(LangValueType a, LangValueType b)
     {
         if (ReferenceEquals(a, b)) return true;
 
@@ -968,6 +972,43 @@ public partial class AssertClassLangValue : LangValueType
 
         return false;
     }
+
+    /// <summary>
+    /// 字节码虚拟机可以直接复用的静态方法（规范名 → 实现）。
+    /// </summary>
+    /// <remarks>
+    /// 不在表内的四类方法由虚拟机自己实现，原因是语义不同：
+    /// <list type="bullet">
+    /// <item><c>AssertEqual</c> / <c>AssertNotEqual</c> / <c>AssertContainsItem</c> /
+    /// <c>AssertNotContainsItem</c>：本类的相等判定（<see cref="AreEqual"/>）在遇到不认识的类型时
+    /// 退回比较 <c>ToDisplayString()</c>，而虚拟机自有对象（<c>BytecodeObjectInstance</c>）的
+    /// <c>ToString()</c> 只含类名，会把同一类的两个不同实例判成相等。虚拟机改用自身的相等语义。</item>
+    /// <item><c>AssertThrows</c> / <c>AssertNotThrows</c>：要求 <see cref="FuncLangValue"/> 并能执行它，
+    /// 虚拟机里的函数值是 <c>ClosureValue</c> / <c>FunctionMetadata</c>。</item>
+    /// <item><c>AssertInstanceOf</c> / <c>AssertNotInstanceOf</c>：依赖 <c>TypeToString()</c> 的类型名口径，
+    /// 与虚拟机的类型名口径不一致（见 <c>VirtualMachine</c> 的实现）。</item>
+    /// </list>
+    /// </remarks>
+    internal static readonly Dictionary<string, Func<List<LangValueType>, SourcePosition, LangValueType>>
+        VmReusableMethods = new(StringComparer.Ordinal)
+        {
+            ["AssertTrue"] = AssertTrue,
+            ["AssertFalse"] = AssertFalse,
+            ["AssertNull"] = AssertNull,
+            ["AssertNotNull"] = AssertNotNull,
+            ["AssertGreater"] = AssertGreater,
+            ["AssertGreaterOrEqual"] = AssertGreaterOrEqual,
+            ["AssertLess"] = AssertLess,
+            ["AssertLessOrEqual"] = AssertLessOrEqual,
+            ["AssertContains"] = AssertContains,
+            ["AssertNotContains"] = AssertNotContains,
+            ["AssertStartsWith"] = AssertStartsWith,
+            ["AssertEndsWith"] = AssertEndsWith,
+            ["AssertMatches"] = AssertMatches,
+            ["AssertEmpty"] = AssertEmpty,
+            ["AssertNotEmpty"] = AssertNotEmpty,
+            ["AssertLength"] = AssertLength,
+        };
 }
 
 /// <summary>

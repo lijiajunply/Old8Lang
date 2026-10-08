@@ -1,4 +1,5 @@
 using System.Collections;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
@@ -196,6 +197,26 @@ public partial class VirtualMachine
                         throw new KeyError(GetPosition(instruction), index);
                     }
                 }
+                else if (collection is ILangList langList)
+                {
+                    // ListLangValue 之类的 Old8Lang 列表：只实现 ILangList，既不是 IList 也不是
+                    // IEnumerable，必须单独处理，否则 await Task.WhenAll(...) 之类产出的列表值
+                    // 落到求值栈上就无法索引。
+                    // 本分支必须排在 DictionaryLangValue 之后：DictionaryLangValue 也实现 ILangList。
+                    var items = langList.GetItems().ToList();
+                    int idx = Convert.ToInt32(index);
+                    if (idx < 0)
+                    {
+                        idx += items.Count;
+                    }
+
+                    if (idx < 0 || idx >= items.Count)
+                    {
+                        throw new IndexError(GetPosition(instruction), idx, items.Count);
+                    }
+
+                    _stack.Push(items[idx]);
+                }
                 else if (collection is string str)
                 {
                     int idx = Convert.ToInt32(index);
@@ -292,6 +313,13 @@ public partial class VirtualMachine
                         // 键不存在，添加新的键值对
                         dictLangValue.Value.Add((keyToSet, valueToSet));
                     }
+                }
+                else if (collection is ILangList langList)
+                {
+                    // 见 GetIndex 的同类分支：Old8Lang 列表只实现 ILangList。
+                    // Set 内部自带负索引换算、越界报错与元素类型转换，与解释器一致。
+                    // 本分支必须排在 DictionaryLangValue 之后：DictionaryLangValue 也实现 ILangList。
+                    langList.Set(ConvertToLangValueType(index), ConvertToLangValueType(value));
                 }
                 else
                 {

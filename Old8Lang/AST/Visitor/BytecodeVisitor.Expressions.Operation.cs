@@ -15,6 +15,14 @@ public partial class BytecodeVisitor
         // 特殊处理 Dot 运算符（成员访问和方法调用）
         if (node.Opera == LangTokenType.Dot)
         {
+            // 静态类 API（Task.Delay / Thread.Sleep / Assert.Equal ...）必须在访问左操作数之前拦截：
+            // 解释器把这些静态类注册为全局对象，字节码模式没有对应对象，按普通成员访问走只会报
+            // “名称 'Task' 未定义”。
+            if (TryCompileStaticClassAccess(node))
+            {
+                return null;
+            }
+
             // 检查是否是 super 表达式
             bool isSuperAccess = node.Left is SuperExpression;
 

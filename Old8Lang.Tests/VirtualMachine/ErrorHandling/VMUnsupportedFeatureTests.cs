@@ -24,13 +24,13 @@ public class VMUnsupportedFeatureTests
     }
 
     [Fact]
-    public void TaskApi_ReportsVmUnsupportedInsteadOfUndefinedName()
+    public void TaskApi_BareReference_ReportsVmUnsupported()
     {
         var exception = Assert.Throws<VmUnsupportedError>(() =>
         {
             var vm = new VM(Compile("""
                 func work() {
-                    Task.Delay(100)
+                    value <- Task.Delay
                 }
                 work()
                 """));
@@ -44,27 +44,51 @@ public class VMUnsupportedFeatureTests
     }
 
     [Fact]
-    public void AssertApi_ReportsVmUnsupported()
+    public void AssertApi_UnsupportedMethod_ReportsVmUnsupported()
     {
         var exception = Assert.Throws<VmUnsupportedError>(() =>
         {
-            var vm = new VM(Compile("Assert.Equal(1, 1)"));
+            var vm = new VM(Compile("Assert.Bogus(1, 1)"));
             vm.Execute();
         });
 
-        Assert.Contains("Assert", exception.Message);
+        Assert.Contains("Assert.Bogus", exception.Message);
     }
 
     [Fact]
-    public void ThreadApi_ReportsVmUnsupported()
+    public void ThreadApi_CurrentThread_ReportsVmUnsupported()
     {
         var exception = Assert.Throws<VmUnsupportedError>(() =>
         {
-            var vm = new VM(Compile("Thread.Sleep(1)"));
+            var vm = new VM(Compile("value <- Thread.CurrentThread"));
             vm.Execute();
         });
 
         Assert.Contains("Thread", exception.Message);
+    }
+
+    [Fact]
+    public void StaticClassMethod_NamedArgument_ReportsVmUnsupported()
+    {
+        var exception = Assert.Throws<VmUnsupportedError>(() =>
+        {
+            var vm = new VM(Compile("Task.Delay(milliseconds: 1)"));
+            vm.Execute();
+        });
+
+        Assert.Contains("命名参数", exception.Message);
+    }
+
+    [Fact]
+    public void TaskSchedulerApi_ReportsVmUnsupported()
+    {
+        var exception = Assert.Throws<VmUnsupportedError>(() =>
+        {
+            var vm = new VM(Compile("value <- TaskScheduler"));
+            vm.Execute();
+        });
+
+        Assert.Contains("TaskScheduler", exception.Message);
     }
 
     [Fact]

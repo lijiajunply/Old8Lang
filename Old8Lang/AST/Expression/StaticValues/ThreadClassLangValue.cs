@@ -215,6 +215,24 @@ public partial class ThreadClassLangValue : LangValueType
 
         return threadValue;
     }
+
+    /// <summary>
+    /// 字节码虚拟机可以直接复用的静态方法（规范名 → 实现）。
+    /// </summary>
+    /// <remarks>
+    /// 只有 <c>Sleep</c>：它不依赖解释器的线程模型。
+    /// <c>CurrentThread</c> / <c>Delay</c> / <c>WhenAll</c> / <c>WhenAny</c> 都围绕解释器的
+    /// <see cref="ThreadLangValue"/> 构造，而虚拟机用的是 <c>VMThreadLangValue</c> 与
+    /// <c>Concurrency.ResourceManager</c>，两者不同构，因此不在表内。
+    ///
+    /// 这里刻意复用本类实现而不转发给同名的全局函数 <c>Sleep</c>：后者用 <c>Convert.ToInt32</c>
+    /// 转换参数，会接受 double/string，而 <c>Thread.Sleep</c> 在解释器下只接受整数。
+    /// </remarks>
+    internal static readonly Dictionary<string, Func<List<LangValueType>, SourcePosition, LangValueType>>
+        VmReusableMethods = new(StringComparer.Ordinal)
+        {
+            ["Sleep"] = Sleep,
+        };
 }
 
 /// <summary>

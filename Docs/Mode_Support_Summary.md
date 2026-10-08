@@ -150,7 +150,7 @@
 | `yield` 语句 | ✅ | ✅ | ✅ | 完全支持 |
 | 异步生成器 | ✅ | ⚠️ | ❌ | 本次未取得可判定结论，标记暂维持 |
 | `async for-in` | ✅ | ❌ | ❌ | 本次未取得可判定结论，标记暂维持 |
-| Task API | ✅ | ⚠️ | ❌ | 虚拟机未注册 Task 静态类，`Task.Delay` 等不可用（`async`/`await` 本身可用） |
+| Task API | ✅ | ⚠️ | ⚠️ | `Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/`Run`/`StartNew` 可用（编译期改写为静态类原生调用）；`Task.Factory`、`Task.Delay` 的第二个参数、`t.Then/Catch/Finally/ContinueWith` 不支持 |
 
 ## 10. 多线程和并发
 
@@ -246,7 +246,8 @@
 - **限制**（2026-10-08 实测，详见 [MODE_COMPLETION_STATUS.md](./MODE_COMPLETION_STATUS.md) 的「虚拟机模式」已知限制）:
   - ❌ 闭包写回外层**局部**变量（按值快照捕获，会报 `VM_UNSUPPORTED_ERROR`）
   - ❌ 函数装饰器（被静默绕过）
-  - ❌ Task / Thread / Assert / TestRunner / Mock 等静态类 API（报 `VM_UNSUPPORTED_ERROR`）
+  - ⚠️ 静态类 API：`Task.Delay`/`WhenAll`/`WhenAny`/`Run`/`StartNew` 等、`Thread.Sleep`、`Assert` 的断言方法可用；
+    `Task.Factory`、`Thread.CurrentThread`、TestRunner / Mock / TaskScheduler / TaskCompletionSource 仍报 `VM_UNSUPPORTED_ERROR`
   - ❌ 原生库导入 `extern "dll" ...` 后的调用
   - ❌ 泛型类（泛型函数可用，但需显式类型参数）
   - ⚠️ 直接 `print` 集合输出 .NET 类型名（`.ToStr()` 正常）
@@ -269,7 +270,8 @@ Lambda 表达式、字符串模板、可空类型、类型转换、预编译指�
 当前确定待补的虚拟机能力：
 - 🚧 闭包对外层局部变量的写回（需要按引用捕获/共享单元）
 - 🚧 函数装饰器（当前被静默绕过）
-- 🚧 Task / Thread / Assert / TestRunner / Mock 等静态类 API
+- 🚧 TestRunner / Mock / TaskScheduler / TaskCompletionSource / CancellationTokenSource 静态类；
+  🚧 `Task.Factory`、Task 实例方法 `Then/Catch/Finally/ContinueWith`（`Task`/`Thread`/`Assert` 的其余静态 API 已于 2026-10-08 支持）
 - 🚧 原生库导入后的调用
 - 🚧 泛型类
 - 🚧 集合的直接打印

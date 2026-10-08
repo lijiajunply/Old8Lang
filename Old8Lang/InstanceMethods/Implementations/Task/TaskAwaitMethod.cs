@@ -55,6 +55,13 @@ public class TaskAwaitMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
+        // 字节码模式求值栈上放的是 TaskLangValue（OpCode.CallAsync 与 Task.* 静态方法都产出它），
+        // 不是底层的 Task<object>。两者都要支持，否则 t.Wait() / t.Await() 会报“实例必须是 Task<object> 类型”。
+        if (instance is TaskLangValue taskLangValue)
+        {
+            return taskLangValue.Await();
+        }
+
         if (instance is System.Threading.Tasks.Task<object> task)
         {
             try
@@ -67,6 +74,7 @@ public class TaskAwaitMethod : BaseInstanceMethod
                 throw innerException;
             }
         }
-        throw new ArgumentException("实例必须是 Task<object> 类型");
+
+        throw new ArgumentException("实例必须是 TaskLangValue 或 Task<object> 类型");
     }
 }

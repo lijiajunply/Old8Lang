@@ -2673,9 +2673,9 @@ async func main() {
 
 **模式支持**: `[✅ | ⚠️ | ✅]`
 
-> **复核说明**（2026-10-08 实测）：本节的示例内部调用了 `Task.Delay`，
-> 而 Task 静态 API 在虚拟机模式下不可用（见 §5.8.3），因此该示例在虚拟机模式下会直接报错。
-> 异步生成器本身在虚拟机模式下不会报错，但本次复核中其输出与解释器模式一样为空，
+> **复核说明**（2026-10-08 实测，同日更新）：本节的示例内部调用了 `Task.Delay`；
+> 该 API 自 2026-10-08 起在虚拟机模式下已可用（见 §5.8.3），示例不再报错。
+> 异步生成器本身在虚拟机模式下不报错，但本次复核中其输出与解释器模式一样为空，
 > 未能取得可判定的结果，故本小节标记暂维持原状。
 
 结合 `yield` 和 `async` 创建异步流：
@@ -2701,16 +2701,22 @@ async func processStream() {
 
 #### 5.8.3 Task API
 
-**模式支持**: `[✅ | ⚠️ | ❌]`
+**模式支持**: `[✅ | ⚠️ | ⚠️]`
 
-> **复核说明**（2026-10-08 实测）：虚拟机模式**不支持** Task 静态 API。
-> 解释器模式会把 `Task`（以及 `Thread`、`TaskScheduler`、`TaskCompletionSource`、
-> `CancellationTokenSource`、`Assert`、`TestRunner`、`Mock`）注册为全局对象，
-> 虚拟机模式没有对应注册，因此 `Task.Delay(...)` 等写法在虚拟机下不可用。
-> 自 2026-10-08 起，这类写法在虚拟机模式下会报出明确错误
-> `VM_UNSUPPORTED_ERROR: 虚拟机模式暂不支持 Task 静态 API`（此前报的是
-> `名称 'Task' 未定义`，无法反映真实原因）。
-> 注意 `async`/`await` 本身在虚拟机模式下是可用的，不可用的只是 Task 这个静态类。
+> **复核说明**（2026-10-08 实测，同日更新）：解释器模式会把 `Task`（以及 `Thread`、
+> `TaskScheduler`、`TaskCompletionSource`、`CancellationTokenSource`、`Assert`、`TestRunner`、
+> `Mock`）注册为全局对象；虚拟机模式没有这套对象，改为在编译期把 `Task.方法(...)`
+> 改写成静态类原生调用。
+>
+> 虚拟机模式下**可用**：`Task.Delay`、`Task.WhenAll`、`Task.WhenAny`、`Task.FromResult`、
+> `Task.FromException`、`Task.Run`、`Task.StartNew`。
+> **不可用**（报 `VM_UNSUPPORTED_ERROR` 并给出位置与支持清单）：`Task.Factory`、
+> `Task.Delay` 的第二个参数（虚拟机无法构造 `CancellationToken`）、把 `Task` 或其方法当作值
+> 传递（如 `f <- Task.Delay`）、静态类方法使用命名参数，以及 Task 实例方法
+> `t.Then`/`t.Catch`/`t.Finally`/`t.ContinueWith`。
+> `await` 某个任务、`t.Result`、`t.IsCompleted`、`t.Status`、`t.Wait()` 在虚拟机模式下均可用。
+>
+> 注意 `async`/`await` 本身在虚拟机模式下是可用的。
 
 ```old8
 // 延迟执行
@@ -2785,12 +2791,13 @@ t.Join()
 
 #### 5.9.2 线程管理
 
-**模式支持**: `[✅ | ✅ | ❌]`
+**模式支持**: `[✅ | ✅ | ⚠️]`
 
-> **复核说明**（2026-10-08 实测）：`Thread.CurrentThread()`、`Thread.Sleep(...)` 等
-> Thread 静态 API 在虚拟机模式下不可用，会报
-> `VM_UNSUPPORTED_ERROR: 虚拟机模式暂不支持 Thread 静态 API`
-> （此前报 `名称 'Thread' 未定义`）。
+> **复核说明**（2026-10-08 实测，同日更新）：自 2026-10-08 起 `Thread.Sleep(...)` 在
+> 虚拟机模式下已可用（参数必须是整数，与解释器一致）。
+> `Thread.CurrentThread()`、`Thread.Delay`、`Thread.WhenAll`、`Thread.WhenAny` 仍不可用，
+> 会报 `VM_UNSUPPORTED_ERROR` 并给出位置与支持清单——它们都围绕解释器的 `ThreadLangValue`
+> 构造，而虚拟机用的是 `VMThreadLangValue`，两者不同构。
 > 基于 `ThreadCreate`/`ThreadStart`/`ThreadJoin` 指令的线程操作不受影响，
 > 且**全局函数** `Sleep(...)`（无需 `Thread.` 前缀）三种模式均可用。
 

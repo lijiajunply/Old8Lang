@@ -1,4 +1,5 @@
 using System.Collections;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 
@@ -28,6 +29,12 @@ public partial class VirtualMachine
                 {
                     var enumerator = enumerable.GetEnumerator();
                     _stack.Push(enumerator);
+                }
+                else if (collection is ILangList langList)
+                {
+                    // Old8Lang 列表只实现 ILangList（既不是 IList 也不是 IEnumerable），
+                    // 必须单独处理，否则 await Task.WhenAll(...) 之类产出的列表值无法 for-in。
+                    _stack.Push(langList.GetItems().GetEnumerator());
                 }
                 else
                 {
