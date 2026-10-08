@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -34,6 +35,13 @@ public partial class BytecodeVisitor
             // 加载字段
             Emit(OpCode.GetField, varName);
         }
+        // 解释器模式会把下面这些静态类注册为全局对象，字节码模式尚未提供对应实现。
+        // 若不在此拦截，最终只会在运行时报出 "名称 'X' 未定义"，无法反映真实原因。
+        // 用户自己定义的全局同名变量优先，因此放在全局变量判断之前仅作提示。
+        else if (!_compiler.IsGlobalVariable(varName) && StaticClassesUnsupportedInVm.TryGetValue(varName, out var feature))
+        {
+            throw new VmUnsupportedError(node, feature);
+        }
         else
         {
             // 全局变量
@@ -42,5 +50,24 @@ public partial class BytecodeVisitor
 
         return null;
     }
+
+    /// <summary>
+    /// 解释器注册了而在字节码模式中未实现的静态类
+    /// </summary>
+    /// <remarks>
+    /// key 为解释器模式下 <c>LangInterpreter</c> 注册的全局对象名，value 为错误信息中展示的特性描述。
+    /// 支持矩阵见 Docs/MODE_COMPLETION_STATUS.md。
+    /// </remarks>
+    private static readonly Dictionary<string, string> StaticClassesUnsupportedInVm = new()
+    {
+        ["Task"] = "Task 静态 API（Task.Delay / Task.WhenAll / Task.WhenAny）",
+        ["Thread"] = "Thread 静态 API（Thread.Sleep / Thread.CurrentThread）",
+        ["TaskScheduler"] = "TaskScheduler 静态 API",
+        ["TaskCompletionSource"] = "TaskCompletionSource",
+        ["CancellationTokenSource"] = "CancellationTokenSource",
+        ["Assert"] = "Assert 断言 API（Assert.Equal 等）",
+        ["TestRunner"] = "TestRunner API",
+        ["Mock"] = "Mock API"
+    };
 
 }

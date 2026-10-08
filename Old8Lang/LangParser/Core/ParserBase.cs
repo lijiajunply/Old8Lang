@@ -48,7 +48,7 @@ public abstract class ParserBase(ParserContext context)
                 CurrentToken.Column,
                 Context.FileName,
                 detailedMessage + " " + suggestion,
-                GetSourceContext(CurrentToken.Line));
+                GetSourceContextWindow(CurrentToken.Line));
         }
     }
 
@@ -62,32 +62,42 @@ public abstract class ParserBase(ParserContext context)
     /// <summary>
     /// 获取错误位置附近的源代码上下文
     /// </summary>
-    /// <param name="line">错误行号</param>
+    /// <param name="line">错误行号（从1开始）</param>
     /// <returns>错误位置附近的源代码上下文（最多3行）</returns>
     private string[] GetSourceContext(int line)
+    {
+        return GetSourceContextWindow(line).Lines;
+    }
+
+    /// <summary>
+    /// 获取错误位置附近的源代码上下文及其起始行号
+    /// </summary>
+    /// <param name="line">错误行号（从1开始）</param>
+    /// <returns>上下文窗口（行数组 + 首行真实行号）</returns>
+    private SourceContextWindow GetSourceContextWindow(int line)
     {
         // 使用缓存的分割结果
         var lines = Context.SourceLines;
 
         if (lines.Length == 0)
         {
-            return [];
+            return SourceContextWindow.Empty;
         }
 
         var contextLines = new List<string>(4); // 预分配容量
 
-        // 获取错误行前后的上下文，最多显示3行上下文
-        // 确保line至少为0，避免负数行号导致的问题
-        var safeLine = Math.Max(0, line);
-        var startLine = Math.Max(0, safeLine - 2);
-        var endLine = Math.Min(lines.Length - 1, safeLine + 1);
+        // 获取错误行前后的上下文，最多显示3行
+        // line 为 1 起始行号，先换算成 0 起始下标
+        var zeroBasedLine = Math.Max(0, line - 1);
+        var startLine = Math.Max(0, zeroBasedLine - 1);
+        var endLine = Math.Min(lines.Length - 1, zeroBasedLine + 1);
 
         for (var i = startLine; i <= endLine; i++)
         {
             contextLines.Add(lines[i]);
         }
 
-        return contextLines.ToArray();
+        return new SourceContextWindow(contextLines.ToArray(), startLine + 1);
     }
 
     /// <summary>
@@ -97,7 +107,7 @@ public abstract class ParserBase(ParserContext context)
     /// <returns>语法错误对象</returns>
     protected SyntaxError CreateSyntaxError(string message)
     {
-        var context = GetSourceContext(CurrentToken.Line);
+        var context = GetSourceContextWindow(CurrentToken.Line);
         return new SyntaxError(
             CurrentToken.Value,
             CurrentToken.Line,

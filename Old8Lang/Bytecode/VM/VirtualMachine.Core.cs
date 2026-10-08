@@ -316,6 +316,19 @@ public partial class VirtualMachine
                     ExecuteDefers(frame);
                 }
 
+                // 求值栈下溢：底层只会抛出 "Stack empty." 这类信息，完全不指向真实原因。
+                // 典型成因是把没有返回值的调用当作值使用（例如 "r <- f()" 而 f 无返回值），
+                // 此时调用没有向栈上压入任何值，后续消费该值的指令就会读到空栈。
+                // 这里补上失败的指令与所在函数，便于定位。
+                if (ex is InvalidOperationException { Message: "Stack empty." })
+                {
+                    throw new StateError(GetPosition(instruction),
+                        $"求值栈为空：指令 {instruction.OpCode} 需要从栈上取值，但栈是空的" +
+                        $"（所在函数 '{function.Name}'，指令位置 {instructionIndex}）。" +
+                        "常见原因是把没有返回值的调用当作值使用（例如 `r <- f()` 而 f 没有 return），" +
+                        "或某个表达式没有产出值，请检查该处调用是否有返回值。");
+                }
+
                 // 异常处理：查找异常表中匹配的处理器
                 if (!HandleException(ex, frame, function))
                 {

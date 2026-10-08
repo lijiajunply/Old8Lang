@@ -12,6 +12,7 @@ public partial class BytecodeVisitor
     public Instruction? VisitForInStatement(ForInStatement node)
     {
         // For-in 循环：for item in collection { ... }
+        // 也支持多标识符解构：for key, value in dict { ... }
         // 获取字段（主构造函数参数）
         var id = GetPrimaryConstructorParameter<LangId>(node, "id");
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
@@ -22,7 +23,8 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        string varName = id.IdName;
+        var ids = node.Ids;
+        bool isDestructuring = ids.Count > 1;
 
         // 创建循环标签
         var loopLabels = new LoopLabels();
@@ -31,6 +33,14 @@ public partial class BytecodeVisitor
         // 生成集合表达式的代码（栈上现在有集合）
         expression.Accept(this);
 
+        // 解构时需要保留被迭代表达式本身：
+        // 字典迭代产出的是键，取值还需要回查原集合
+        int collectionLocalIndex = -1;
+        if (isDestructuring)
+        {
+            Emit(OpCode.Dup);
+        }
+
         // 获取迭代器（栈上现在有迭代器）
         Emit(OpCode.GetIterator);
 
@@ -38,6 +48,12 @@ public partial class BytecodeVisitor
         // 使用唯一的名称避免嵌套循环中的冲突
         int iteratorLocalIndex = _compiler.AllocateLocal($"<iterator_{GetCurrentPosition()}>");
         Emit(OpCode.StoreLocal, iteratorLocalIndex);
+
+        if (isDestructuring)
+        {
+            collectionLocalIndex = _compiler.AllocateLocal($"<iterable_{GetCurrentPosition()}>");
+            Emit(OpCode.StoreLocal, collectionLocalIndex);
+        }
 
         // 循环开始标签
         int loopStart = GetCurrentPosition();
@@ -62,17 +78,58 @@ public partial class BytecodeVisitor
         // 注意：IteratorCurrent 也使用 Peek，所以迭代器仍在栈上
         Emit(OpCode.IteratorCurrent);
 
-        // 将当前元素存储到循环变量（弹出 current）
-        if (_compiler.IsLocalVariable(varName))
+        if (isDestructuring)
         {
-            int localIndex = _compiler.GetLocalIndex(varName);
-            Emit(OpCode.StoreLocal, localIndex);
+            // 当前元素是键/元组，交由原生函数拆成一组值再逐个绑定
+            int itemLocalIndex = _compiler.AllocateLocal($"<loop_item_{GetCurrentPosition()}>");
+            Emit(OpCode.StoreLocal, itemLocalIndex);
+
+            // 参数顺序：[collection, item, arity]
+            // 注意：LoadConst 的操作数是常量池下标，必须先入池再引用
+            Emit(OpCode.LoadLocal, collectionLocalIndex);
+            Emit(OpCode.LoadLocal, itemLocalIndex);
+            Emit(OpCode.LoadConst, _compiler.AddConstant(ids.Count));
+            Emit(OpCode.CallNative, new object[] { 3, "__for_in_unpack" });
+
+            int unpackedLocalIndex = _compiler.AllocateLocal($"<loop_unpacked_{GetCurrentPosition()}>");
+            Emit(OpCode.StoreLocal, unpackedLocalIndex);
+
+            for (var i = 0; i < ids.Count; i++)
+            {
+                var targetName = ids[i].IdName;
+
+                Emit(OpCode.LoadLocal, unpackedLocalIndex);
+                Emit(OpCode.LoadConst, _compiler.AddConstant(i));
+                Emit(OpCode.GetIndex);
+
+                if (_compiler.IsLocalVariable(targetName))
+                {
+                    Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(targetName));
+                }
+                else
+                {
+                    Emit(OpCode.StoreLocal, _compiler.DeclareLocalVariable(targetName));
+                }
+            }
+
+            _compiler.FreeLocal(itemLocalIndex);
+            _compiler.FreeLocal(unpackedLocalIndex);
         }
         else
         {
-            // 声明为局部变量
-            int localIndex = _compiler.DeclareLocalVariable(varName);
-            Emit(OpCode.StoreLocal, localIndex);
+            // 将当前元素存储到循环变量（弹出 current）
+            string varName = id.IdName;
+            if (_compiler.IsLocalVariable(varName))
+            {
+                int localIndex = _compiler.GetLocalIndex(varName);
+                Emit(OpCode.StoreLocal, localIndex);
+            }
+            else
+            {
+                // 声明为局部变量
+                int localIndex = _compiler.DeclareLocalVariable(varName);
+                Emit(OpCode.StoreLocal, localIndex);
+            }
         }
 
         // 此时栈上还有迭代器对象，需要弹出
@@ -109,6 +166,11 @@ public partial class BytecodeVisitor
 
         // 释放迭代器局部变量
         _compiler.FreeLocal(iteratorLocalIndex);
+
+        if (collectionLocalIndex >= 0)
+        {
+            _compiler.FreeLocal(collectionLocalIndex);
+        }
 
         return null;
     }

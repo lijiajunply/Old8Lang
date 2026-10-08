@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Error;
 using Old8Lang.Bytecode.Closures;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
@@ -119,14 +120,30 @@ public partial class BytecodeVisitor
     }
 
     // ===== 其他值类型 - 默认实现 =====
+    // 说明：这些节点在字节码模式下没有对应实现。此处必须显式报错而不是静默返回 null——
+    // 静默返回会让表达式不产出任何字节码，栈随之失衡，最终在无关指令处抛出
+    // "Stack empty" 之类的错误，报出的原因和位置都与真实问题无关。
 
-    public Instruction? VisitAnyLangValue(AnyLangValue node) => null;
-    public Instruction? VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node) => null;
-    public Instruction? VisitAsyncStreamLangValue(AsyncStreamLangValue node) => null;
-    public Instruction? VisitCancellationTokenLangValue(CancellationTokenLangValue node) => null;
-    public Instruction? VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node) => null;
-    public Instruction? VisitErrorLangValue(ErrorLangValue node) => null;
-    public Instruction? VisitGeneratorLangValue(GeneratorLangValue node) => null;
+    public Instruction? VisitAnyLangValue(AnyLangValue node) =>
+        throw new VmUnsupportedError(node, "类实例值参与表达式求值");
+
+    public Instruction? VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node) =>
+        throw new VmUnsupportedError(node, "异步生成器值");
+
+    public Instruction? VisitAsyncStreamLangValue(AsyncStreamLangValue node) =>
+        throw new VmUnsupportedError(node, "异步流值");
+
+    public Instruction? VisitCancellationTokenLangValue(CancellationTokenLangValue node) =>
+        throw new VmUnsupportedError(node, "CancellationToken");
+
+    public Instruction? VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node) =>
+        throw new VmUnsupportedError(node, "CancellationTokenSource");
+
+    public Instruction? VisitErrorLangValue(ErrorLangValue node) =>
+        throw new VmUnsupportedError(node, "错误值（ErrorValue）");
+
+    public Instruction? VisitGeneratorLangValue(GeneratorLangValue node) =>
+        throw new VmUnsupportedError(node, "生成器值");
     public Instruction? VisitInstance(Instance node)
     {
         // Instance 是函数调用表达式 a(b, c)
@@ -388,7 +405,127 @@ public partial class BytecodeVisitor
 
         return null;
     }
-    public Instruction? VisitListComprehension(ListComprehension node) => null;
+    /// <summary>
+    /// 生成列表推导式的字节码
+    /// </summary>
+    /// <remarks>
+    /// 节点结构：最外层节点持有元素表达式、首个 for 子句及其 if 条件，
+    /// 后续 for 子句以链式结构挂在 NestedLoops 上（每层最多一个）。
+    /// 生成的字节码等价于：
+    /// <code>
+    /// result = []
+    /// for v1 in iterable1:            # 逐层嵌套
+    ///     if cond1:
+    ///         for v2 in iterable2:
+    ///             if cond2:
+    ///                 result.Add(expr)
+    /// </code>
+    /// 解释器会在最内层重新检查外层条件，对无副作用的条件表达式而言两种做法结果一致，
+    /// 这里按层级就地检查，避免重复求值。
+    /// </remarks>
+    public Instruction? VisitListComprehension(ListComprehension node)
+    {
+        // 结果列表局部变量
+        int resultLocalIndex = _compiler.AllocateLocal($"<comprehension_result_{GetCurrentPosition()}>");
+
+        Emit(OpCode.NewList, 0);
+        Emit(OpCode.StoreLocal, resultLocalIndex);
+
+        EmitComprehensionLevel(node, resultLocalIndex, 0);
+
+        // 推导式整体的值就是收集到的列表
+        Emit(OpCode.LoadLocal, resultLocalIndex);
+
+        _compiler.FreeLocal(resultLocalIndex);
+
+        return null;
+    }
+
+    /// <summary>
+    /// 生成列表推导式中一层 for 子句的字节码
+    /// </summary>
+    /// <param name="level">当前层节点</param>
+    /// <param name="resultLocalIndex">收集结果的列表所在局部变量下标</param>
+    /// <param name="depth">嵌套深度，仅用于生成唯一的临时变量名</param>
+    private void EmitComprehensionLevel(ListComprehension level, int resultLocalIndex, int depth)
+    {
+        int iteratorLocalIndex = _compiler.AllocateLocal($"<comprehension_iterator_{GetCurrentPosition()}_{depth}>");
+
+        // 求值可迭代对象并取出迭代器
+        level.Iterable.Accept(this);
+        Emit(OpCode.GetIterator);
+        Emit(OpCode.StoreLocal, iteratorLocalIndex);
+
+        int loopStart = GetCurrentPosition();
+
+        // 迭代器在循环开始时压栈，跳出循环时弹出，与 for-in 的栈约定保持一致
+        Emit(OpCode.LoadLocal, iteratorLocalIndex);
+        Emit(OpCode.IteratorMoveNext);
+        int jumpIfNoMore = GetCurrentPosition();
+        Emit(OpCode.JumpIfFalse, -1);
+
+        // IteratorCurrent / IteratorMoveNext 都只做 Peek，取完当前元素后需要手动弹出迭代器
+        Emit(OpCode.IteratorCurrent);
+
+        var varName = level.Variable.IdName;
+        if (_compiler.IsLocalVariable(varName))
+        {
+            Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(varName));
+        }
+        else
+        {
+            Emit(OpCode.StoreLocal, _compiler.DeclareLocalVariable(varName));
+        }
+
+        Emit(OpCode.Pop);
+
+        // 条件筛选
+        int jumpIfConditionFalse = -1;
+        if (level.Condition is not null)
+        {
+            level.Condition.Accept(this);
+            jumpIfConditionFalse = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+        }
+
+        var nestedLoops = level.NestedLoops;
+        if (nestedLoops is { Count: > 0 })
+        {
+            // 还有后续 for 子句，继续向下嵌套
+            foreach (var nested in nestedLoops)
+            {
+                EmitComprehensionLevel(nested, resultLocalIndex, depth + 1);
+            }
+        }
+        else
+        {
+            // 最内层：求值元素表达式并追加到结果列表
+            Emit(OpCode.LoadLocal, resultLocalIndex);
+            level.Expression.Accept(this);
+            Emit(OpCode.CallNative, new object[] { 2, "__list_append" });
+        }
+
+        // 本轮结束：条件不满足时直接跳到循环末尾
+        int continueTarget = GetCurrentPosition();
+        if (jumpIfConditionFalse >= 0)
+        {
+            PatchJump(jumpIfConditionFalse, continueTarget);
+        }
+
+        Emit(OpCode.Jump, loopStart);
+
+        int loopEnd = GetCurrentPosition();
+        PatchJump(jumpIfNoMore, loopEnd);
+
+        // 跳出循环时栈上还留着迭代器
+        Emit(OpCode.Pop);
+
+        _compiler.FreeLocal(iteratorLocalIndex);
+    }
+    /// <summary>
+    /// 方法重载列表是编译期的元数据集合，本身不是可求值的表达式，因此不产出字节码。
+    /// 这里返回 null 是设计如此（与 CompilerVisitor 的处理一致），并非未实现的桩。
+    /// </summary>
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;
     public Instruction? VisitNestedIndexAccess(NestedIndexAccess node)
     {
@@ -570,33 +707,80 @@ public partial class BytecodeVisitor
         // 它应该通过 super.method() 或 super.field 的形式使用
         throw new NotSupportedException("SuperProxy 不应该在字节码模式中直接访问");
     }
-    public Instruction? VisitTaskClassLangValue(TaskClassLangValue node) => null;
-    public Instruction? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node) => null;
-    public Instruction? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node) => null;
-    public Instruction? VisitTaskFactoryStaticMethodWrapper(TaskFactoryStaticMethodWrapper node) => null;
-    public Instruction? VisitTaskLangValue(TaskLangValue node) => null;
-    public Instruction? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node) => null;
-    public Instruction? VisitTaskSchedulerLangValue(TaskSchedulerLangValue node) => null;
-    public Instruction? VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node) => null;
-    public Instruction? VisitThreadClassLangValue(ThreadClassLangValue node) => null;
-    public Instruction? VisitThreadLangValue(ThreadLangValue node) => null;
-    public Instruction? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node) => null;
-    public Instruction? VisitTypeLangValue(TypeLangValue node) => null;
-    public Instruction? VisitAssertClassLangValue(AssertClassLangValue node) => null;
-    public Instruction? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node) => null;
-    public Instruction? VisitMockLibClassLangValue(MockLibClassLangValue node) => null;
+    // 以下静态类在解释器模式下由 LangInterpreter 注册为全局对象，字节码模式尚未提供对应实现，
+    // 详见 Docs/MODE_COMPLETION_STATUS.md 的支持矩阵。这里显式报错以指明真实原因。
+
+    public Instruction? VisitTaskClassLangValue(TaskClassLangValue node) =>
+        throw new VmUnsupportedError(node, "Task 静态 API（Task.Delay / Task.WhenAll / Task.WhenAny）");
+
+    public Instruction? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node) =>
+        throw new VmUnsupportedError(node, "TaskCompletionSource");
+
+    public Instruction? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node) =>
+        throw new VmUnsupportedError(node, "TaskFactory");
+
+    public Instruction? VisitTaskFactoryStaticMethodWrapper(TaskFactoryStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "TaskFactory 静态方法");
+
+    public Instruction? VisitTaskLangValue(TaskLangValue node) =>
+        throw new VmUnsupportedError(node, "Task 实例");
+
+    public Instruction? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node) =>
+        throw new VmUnsupportedError(node, "TaskScheduler");
+
+    public Instruction? VisitTaskSchedulerLangValue(TaskSchedulerLangValue node) =>
+        throw new VmUnsupportedError(node, "TaskScheduler 实例");
+
+    public Instruction? VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "Task 静态方法");
+
+    public Instruction? VisitThreadClassLangValue(ThreadClassLangValue node) =>
+        throw new VmUnsupportedError(node, "Thread 静态 API（Thread.Sleep / Thread.CurrentThread）");
+
+    public Instruction? VisitThreadLangValue(ThreadLangValue node) =>
+        throw new VmUnsupportedError(node, "Thread 实例");
+
+    public Instruction? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "Thread 静态方法");
+
+    public Instruction? VisitTypeLangValue(TypeLangValue node) =>
+        throw new VmUnsupportedError(node, "Type 类型对象");
+
+    public Instruction? VisitAssertClassLangValue(AssertClassLangValue node) =>
+        throw new VmUnsupportedError(node, "Assert 断言 API（Assert.Equal 等）");
+
+    public Instruction? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node) =>
+        throw new VmUnsupportedError(node, "TestRunner API");
+
+    public Instruction? VisitMockLibClassLangValue(MockLibClassLangValue node) =>
+        throw new VmUnsupportedError(node, "Mock API");
     public Instruction? VisitEnumLangValue(EnumLangValue node)
     {
         // 枚举值在字节码模式下加载其整数值
         Emit(OpCode.LoadConst, node.Value);
         return null;
     }
-    public Instruction? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node) => null;
-    public Instruction? VisitMockObjectLangValue(MockObjectLangValue node) => null;
-    public Instruction? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node) => null;
-    public Instruction? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node) => null;
-    public Instruction? VisitLockedVariableLangValue(LockedVariableLangValue node) => null;
-    public Instruction? VisitInterpreterVisitor(InterpreterVisitor node) => null;
+    public Instruction? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "Assert 静态方法");
+
+    public Instruction? VisitMockObjectLangValue(MockObjectLangValue node) =>
+        throw new VmUnsupportedError(node, "Mock 对象");
+
+    public Instruction? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "Mock 静态方法");
+
+    public Instruction? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node) =>
+        throw new VmUnsupportedError(node, "TestRunner 静态方法");
+
+    public Instruction? VisitLockedVariableLangValue(LockedVariableLangValue node) =>
+        throw new VmUnsupportedError(node, "锁变量（lock）");
+
+    /// <summary>
+    /// InterpreterVisitor 是解释器的访问者对象，不属于可求值的 AST 节点，
+    /// 出现在表达式位置说明代码结构异常（与 CompilerVisitor 的处理保持一致）
+    /// </summary>
+    public Instruction? VisitInterpreterVisitor(InterpreterVisitor node) =>
+        throw new NotSupportedException("虚拟机模式下不应访问 InterpreterVisitor 对象");
 
     /// <summary>
     /// 访问 FuncLangValue 节点
@@ -634,6 +818,23 @@ public partial class BytecodeVisitor
         // 3. 分析捕获的变量
         var analyzer = new ClosureCaptureAnalyzer();
         var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
+
+        // 3.1 闭包写入外层 **局部** 变量无法支持：
+        // 字节码模式的闭包按值快照捕获（MakeClosure 把外层局部变量的当前值复制进闭包环境），
+        // 没有共享单元，写回不会反映到外层作用域，与解释器语义不一致。
+        // 若放任不管，闭包内会另建一个同名局部变量：自引用式写法（c <- c + 1）会因读取时
+        // 该局部变量尚未声明而报 "名称 'c' 未定义"，非自引用写法则会静默地变成遮蔽。
+        // 两种结果都远离真实原因，因此这里直接报错。
+        // 全局变量不在此列：闭包读写的是同一张全局表，写回本来就生效。
+        foreach (var assignedName in analyzer.AssignedVariables)
+        {
+            if (_compiler.IsLocalVariable(assignedName) ||
+                _compiler.IsCapturedVariable(assignedName))
+            {
+                throw new VmUnsupportedError(node,
+                    $"闭包对外层局部变量 '{assignedName}' 的赋值（按引用捕获）");
+            }
+        }
 
         // 4. 过滤出实际存在的变量
         // 注意：对于嵌套 Lambda，内层 Lambda 可能需要捕获外层 Lambda 的捕获变量

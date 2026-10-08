@@ -146,12 +146,22 @@ public class LangInterpreter
     /// <returns>错误位置前后的源代码行数组</returns>
     public string[] GetSourceContext(SourcePosition position)
     {
+        return GetSourceContextWindow(position).Lines;
+    }
+
+    /// <summary>
+    /// 获取错误位置附近的源代码上下文及其起始行号
+    /// </summary>
+    /// <param name="position">错误发生的位置信息</param>
+    /// <returns>上下文窗口（行数组 + 首行真实行号）</returns>
+    public SourceContextWindow GetSourceContextWindow(SourcePosition position)
+    {
         if (string.IsNullOrEmpty(SourceCode))
         {
-            return [];
+            return SourceContextWindow.Empty;
         }
 
-        var lines = SourceCode.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
+        var lines = SplitSourceLines(SourceCode);
         var contextLines = new List<string>();
 
         // 确保行号至少为1，然后转换为0-based索引
@@ -168,7 +178,25 @@ public class LangInterpreter
             contextLines.Add(lines[i]);
         }
 
-        return contextLines.ToArray();
+        // 起始行号按 1 起始回传，供错误渲染器标注真实行号
+        return new SourceContextWindow(contextLines.ToArray(), startLine + 1);
+    }
+
+    /// <summary>
+    /// 按行切分源代码
+    /// </summary>
+    /// <param name="sourceCode">源代码</param>
+    /// <returns>源代码行数组</returns>
+    /// <remarks>
+    /// 必须保留空行：上下文行数组的下标要与真实行号一一对应，
+    /// 一旦丢弃空行，错误位置标注就会整体前移。
+    /// </remarks>
+    internal static string[] SplitSourceLines(string sourceCode)
+    {
+        return sourceCode
+            .Replace("\r\n", "\n")
+            .Replace('\r', '\n')
+            .Split('\n');
     }
 
     /// <summary>

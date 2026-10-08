@@ -29,6 +29,15 @@ public partial class ForInStatement(
         get => [id, .. field];
     } = additionalIds ?? [];
 
+    /// <summary>
+    /// 获取循环绑定的全部标识符（首个标识符 + 附加标识符）
+    /// </summary>
+    /// <remarks>
+    /// 形如 "for key, value in dict" 的循环会绑定两个标识符，
+    /// 各执行模式需要据此决定是否对迭代元素做解构。
+    /// </remarks>
+    public IReadOnlyList<LangId> Ids => AllIds;
+
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
@@ -217,7 +226,13 @@ public partial class ForInStatement(
                 {
                     if (AllIds.Count == 1)
                     {
-                        // 单个标识符的情况，保持原有行为
+                        // 单个标识符的情况：迭代元素若是元组（例如字典迭代产出的键值对），
+                        // 必须先求值再绑定，否则绑定到的元组 ItemValues 为空，读取时会得到空元组
+                        if (idValue is TupleLangValue singleTuple)
+                        {
+                            singleTuple.Run(manager);
+                        }
+
                         manager.Set(id, idValue);
                     }
                     else

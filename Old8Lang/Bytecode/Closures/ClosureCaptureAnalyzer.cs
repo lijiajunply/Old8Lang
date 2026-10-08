@@ -14,6 +14,16 @@ public class ClosureCaptureAnalyzer
     private readonly HashSet<string> _parameters = new();
 
     /// <summary>
+    /// 闭包体内被赋值的变量名
+    /// </summary>
+    /// <remarks>
+    /// 其中若某个名字在外层作用域中已存在，说明闭包试图写回外层变量。
+    /// 字节码模式的闭包按值快照捕获，没有共享单元，无法支持这种写回，
+    /// 调用方需要据此报错而不是静默地让它在闭包内另建一个同名局部变量。
+    /// </remarks>
+    public IReadOnlyCollection<string> AssignedVariables => _localVariables;
+
+    /// <summary>
     /// 分析函数体，返回捕获的外部变量列表
     /// </summary>
     public List<string> AnalyzeCaptures(BlockStatement functionBody, List<string> parameters)
@@ -110,6 +120,11 @@ public class ClosureCaptureAnalyzer
             // 但要排除 Lambda 自己的参数
             var nestedParameters = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
+            // 嵌套闭包内部的赋值属于嵌套闭包自身，不应算作当前闭包的赋值，
+            // 否则会把 "只有内层闭包才写回外层变量" 的情况误判到当前层。
+            // 嵌套闭包在编译到它自己时会被单独分析，因此这里做快照隔离。
+            var outerAssignedSnapshot = new HashSet<string>(_localVariables, StringComparer.Ordinal);
+
             // 将嵌套 Lambda 的参数临时添加到局部变量集合（避免被捕获）
             foreach (var param in nestedParameters)
             {
@@ -122,10 +137,13 @@ public class ClosureCaptureAnalyzer
             // 移除嵌套 Lambda 的参数
             foreach (var param in nestedParameters)
             {
-                _localVariables.Remove(param);
                 // 同时从捕获变量中移除（因为这些参数不应该被外层 Lambda 捕获）
                 _capturedVariables.Remove(param);
             }
+
+            // 恢复赋值集合：嵌套闭包的赋值不回传给当前闭包
+            _localVariables.Clear();
+            _localVariables.UnionWith(outerAssignedSnapshot);
 
             return;
         }

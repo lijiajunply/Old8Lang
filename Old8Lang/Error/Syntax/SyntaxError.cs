@@ -123,4 +123,27 @@ public class SyntaxError : Old8Exception
     public SyntaxError(string? tokenValue, int line, int column, string? fileName, string message, string[] sourceContext) 
         : this(new SourcePosition(line, column, fileName: fileName, tokenValue: tokenValue), message, sourceContext)
     {}
+
+    /// <summary>
+    /// 构造函数（携带上下文窗口的起始行号，用于窗口在文件首尾被裁剪的场景）
+    /// </summary>
+    /// <param name="tokenValue">令牌值</param>
+    /// <param name="line">行号</param>
+    /// <param name="column">列号</param>
+    /// <param name="fileName">文件名</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="sourceContext">源代码上下文窗口</param>
+    public SyntaxError(string? tokenValue, int line, int column, string? fileName, string message,
+        SourceContextWindow sourceContext)
+        : base(
+            ErrorCode,
+            message,
+            new SourcePosition(line, column, fileName: fileName, tokenValue: tokenValue),
+            node: null,
+            suggestion: "请检查语法是否正确",
+            sourceContext: sourceContext,
+            requestId: null,
+            innerException: null,
+            variableStates: new Dictionary<string, string>())
+    {}
 }

@@ -96,6 +96,76 @@ public partial class VirtualMachine
 
                 return new List<object?>();
 
+            case "__list_append":
+            {
+                // 列表推导式内部收集元素。参数：[list, item]，原地追加，无返回值
+                if (args.Length >= 2 && args[0] is IList targetList)
+                {
+                    targetList.Add(args[1]);
+                }
+
+                return null;
+            }
+
+            case "__for_in_unpack":
+            {
+                // 多标识符 for-in（for k, v in ...）的绑定辅助。
+                // 参数：[collection, item, arity]
+                if (args.Length < 3)
+                {
+                    return new List<object?>();
+                }
+
+                var collection = args[0];
+                var item = args[1];
+                int arity = Convert.ToInt32(args[2]);
+
+                // 情况一：迭代元素本身是序列，直接解构。
+                // 字节码中的元组是嵌套的 Tuple<object,object>（(1,2,3) 表示为 (1,(2,3))），
+                // 因此需要按嵌套结构展开到 arity 个元素。
+                if (item is System.Runtime.CompilerServices.ITuple tupleValue)
+                {
+                    var flattened = FlattenVmTuple(tupleValue);
+                    if (flattened.Count >= arity)
+                    {
+                        return flattened.GetRange(0, arity);
+                    }
+                }
+
+                if (item is IList itemList && itemList.Count >= arity)
+                {
+                    var values = new List<object?>(arity);
+                    for (int i = 0; i < arity; i++)
+                    {
+                        values.Add(itemList[i]);
+                    }
+
+                    return values;
+                }
+
+                if (item is Array itemArray && itemArray.Length >= arity)
+                {
+                    var values = new List<object?>(arity);
+                    for (int i = 0; i < arity; i++)
+                    {
+                        values.Add(itemArray.GetValue(i));
+                    }
+
+                    return values;
+                }
+
+                // 情况二：迭代字典产出的是键，第二个变量取对应的值
+                if (arity == 2 && collection is IDictionary dictionary && item is not null &&
+                    dictionary.Contains(item))
+                {
+                    return new List<object?> { item, dictionary[item] };
+                }
+
+                throw new TypeError(new SourcePosition(),
+                    $"无法将 {item?.GetType().Name ?? "null"} 解构为 {arity} 个变量，" +
+                    "请确认迭代的是键值对集合（字典或由元组组成的列表）");
+            }
+
             case "GetCount":
                 // 获取集合元素数量
                 if (args.Length > 0)
@@ -143,6 +213,37 @@ public partial class VirtualMachine
             default:
                 throw new MethodNotFoundError(new SourcePosition(), funcName);
         }
+    }
+
+    /// <summary>
+    /// 展开字节码中的嵌套元组
+    /// </summary>
+    /// <param name="tuple">元组</param>
+    /// <returns>按顺序展开的元素列表</returns>
+    /// <remarks>
+    /// 字节码中的多元元组按右嵌套表示：(1, 2, 3) 实际是 (1, (2, 3))。
+    /// 末元素若仍是元组则继续展开，因此 (1, (2, 3)) 与 (1, 2, 3) 无法区分，
+    /// 这与 OrCode.NewTuple 的构造方式一致。
+    /// </remarks>
+    private static List<object?> FlattenVmTuple(System.Runtime.CompilerServices.ITuple tuple)
+    {
+        var result = new List<object?>();
+
+        for (var i = 0; i < tuple.Length; i++)
+        {
+            var element = tuple[i];
+
+            if (i == tuple.Length - 1 && element is System.Runtime.CompilerServices.ITuple nested)
+            {
+                result.AddRange(FlattenVmTuple(nested));
+            }
+            else
+            {
+                result.Add(element);
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

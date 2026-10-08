@@ -71,7 +71,9 @@ public class FunctionParser(
         {
             Expect(LangTokenType.Arrow);
             // 解析返回类型标识符（如果有）
-            if (isUseFunc && CurrentToken.Type == LangTokenType.Identifier)
+            // 注意：返回类型注解与 func 关键字无关，省略 func 的声明同样可以写 -> returnType
+            // （例如 "public greet() -> string { ... }"），因此这里不能以 isUseFunc 作为前提
+            if (CurrentToken.Type == LangTokenType.Identifier)
             {
                 if (!string.IsNullOrEmpty(returnType))
                 {

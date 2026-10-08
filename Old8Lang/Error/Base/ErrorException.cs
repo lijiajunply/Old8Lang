@@ -72,6 +72,11 @@ public class Old8Exception : Exception
     public string[]? SourceContext { get; }
 
     /// <summary>
+    /// 源代码上下文窗口中第一行的真实行号（从1开始），0 表示未知
+    /// </summary>
+    public int SourceContextStartLine { get; }
+
+    /// <summary>
     /// 错误发生时间戳
     /// </summary>
     public DateTime Timestamp { get; }
@@ -201,15 +206,43 @@ public class Old8Exception : Exception
         Guid? requestId,
         Exception? innerException,
         Dictionary<string, string> variableStates)
+        : this(errorCode, message, position, node, suggestion,
+            ResolveSourceContext(position, sourceContext), requestId, innerException, variableStates)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数：直接接收上下文窗口，用于调用方已知窗口首行真实行号的场景（如解析器）
+    /// </summary>
+    /// <param name="errorCode">错误代码</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="position">位置信息</param>
+    /// <param name="node">AST节点</param>
+    /// <param name="suggestion">建议</param>
+    /// <param name="sourceContext">源代码上下文窗口</param>
+    /// <param name="requestId">请求ID</param>
+    /// <param name="innerException">内部异常</param>
+    /// <param name="variableStates">变量状态信息</param>
+    public Old8Exception(
+        string errorCode,
+        string message,
+        SourcePosition position,
+        IOldLangTree? node,
+        string? suggestion,
+        SourceContextWindow sourceContext,
+        Guid? requestId,
+        Exception? innerException,
+        Dictionary<string, string> variableStates)
         : base(FormatErrorMessage(errorCode, message, position, suggestion,
-            GetSourceContextFromInterpreter(position, sourceContext), DateTime.Now, requestId ?? Guid.NewGuid(), 
+            sourceContext, DateTime.Now, requestId ?? Guid.NewGuid(),
             GetCombinedCallStack(innerException), variableStates), innerException)
     {
         ErrorCode = errorCode;
         Position = position;
         Node = node;
         Suggestion = suggestion;
-        SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
+        SourceContext = sourceContext.Lines;
+        SourceContextStartLine = sourceContext.StartLine;
         Timestamp = DateTime.Now;
         RequestId = requestId ?? Guid.NewGuid();
         // 保存原始消息
@@ -239,7 +272,7 @@ public class Old8Exception : Exception
         Guid? requestId = null,
         Exception? innerException = null)
         : this(errorCode, message, node.Position, node, suggestion,
-            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId, innerException, new Dictionary<string, string>())
+            ResolveSourceContext(node.Position, sourceContext), requestId, innerException, new Dictionary<string, string>())
     {
     }
     
@@ -264,7 +297,7 @@ public class Old8Exception : Exception
         Exception? innerException,
         Dictionary<string, string> variableStates)
         : this(errorCode, message, node.Position, node, suggestion,
-            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId, innerException, variableStates)
+            ResolveSourceContext(node.Position, sourceContext), requestId, innerException, variableStates)
     {
     }
 
@@ -295,22 +328,22 @@ public class Old8Exception : Exception
     /// <param name="position">位置信息</param>
     /// <param name="providedContext">提供的上下文信息</param>
     /// <returns>源代码上下文</returns>
-    private static string[] GetSourceContextFromInterpreter(SourcePosition position, string[]? providedContext)
+    private static SourceContextWindow ResolveSourceContext(SourcePosition position, string[]? providedContext)
     {
-        // 如果提供了上下文，直接使用
+        // 如果提供了上下文，直接使用（起始行号未知，由渲染器按旧假设估算）
         if (providedContext is not null && providedContext.Length > 0)
         {
-            return providedContext;
+            return SourceContextWindow.FromLines(providedContext);
         }
 
         // 否则从当前解释器获取
         if (CurrentInterpreter is not null)
         {
-            return CurrentInterpreter.GetSourceContext(position);
+            return CurrentInterpreter.GetSourceContextWindow(position);
         }
 
-        // 如果没有解释器，返回空数组
-        return [];
+        // 如果没有解释器，返回空窗口
+        return SourceContextWindow.Empty;
     }
 
     /// <summary>
@@ -327,7 +360,7 @@ public class Old8Exception : Exception
     /// <param name="variableStates">变量状态信息</param>
     /// <returns>格式化后的错误信息</returns>
     private static string FormatErrorMessage(string errorCode, string message, SourcePosition position,
-        string? suggestion, string[]? sourceContext, DateTime timestamp, Guid requestId, 
+        string? suggestion, SourceContextWindow sourceContext, DateTime timestamp, Guid requestId,
         List<CallStackFrame> callStack, Dictionary<string, string> variableStates)
     {
         var sb = new System.Text.StringBuilder();
@@ -349,27 +382,32 @@ public class Old8Exception : Exception
         sb.AppendLine($"{blue}位置:{reset} {position}");
 
         // 源代码上下文
-        if (sourceContext is { Length: > 0 })
+        if (!sourceContext.IsEmpty)
         {
             sb.AppendLine($"{blue}上下文:{reset}");
-            for (int i = 0; i < sourceContext.Length; i++)
+
+            // 窗口首行的真实行号：优先使用随上下文一起传递的起始行号，
+            // 未提供时才退回"窗口以错误行为中心"的估算（窗口在文件首尾被裁剪后该估算会整体错位）
+            var firstLineNumber = sourceContext.ResolveStartLine(position.Line);
+
+            for (int i = 0; i < sourceContext.Lines.Length; i++)
             {
-                var lineNumber = position.Line - sourceContext.Length / 2 + i;
+                var lineNumber = firstLineNumber + i;
                 var isErrorLine = lineNumber == position.Line;
 
                 // 显示行号
                 sb.Append($"{blue}{lineNumber,3}{reset} | ");
 
                 // 显示源代码行
-                var line = sourceContext[i];
+                var line = sourceContext.Lines[i];
                 sb.AppendLine(line);
 
                 // 如果是错误行，显示错误位置指示器
                 if (isErrorLine)
                 {
                     sb.Append($"{blue}      {reset} | ");
-                    // 确保列号大于0，避免ArgumentOutOfRangeException
-                    var spaceCount = Math.Max(0, position.Column - 1);
+                    // 标记列号是以行首为 0 的偏移量，直接作为缩进宽度即为脱字符所在列
+                    var spaceCount = Math.Max(0, position.Column);
                     sb.Append(new string(' ', spaceCount));
                     sb.AppendLine($"{red}^ 错误发生在这里{reset}");
                 }

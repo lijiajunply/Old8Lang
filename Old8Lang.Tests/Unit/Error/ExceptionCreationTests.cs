@@ -175,14 +175,25 @@ public class ExceptionCreationTests
     {
         // Arrange
         var position = new SourcePosition(10, 25, "test_file.old8");
-        
+
         // Act
         var result = position.ToString();
-        
+
         // Assert
-        Assert.Contains("test_file.old8", result);
-        Assert.Contains("10", result);
-        Assert.Contains("25", result);
+        // ToString 面向人阅读，列号统一按 1 起始展示：
+        // SourcePosition.Column 保存的是相对行首的 0 起始偏移量（直接来自词法分析器），
+        // 展示时 +1 才与错误信息中脱字符所在的实际列一致
+        Assert.Equal("test_file.old8(10:26)", result);
+    }
+
+    [Fact]
+    public void SourcePosition_ToString_UnknownPosition_IsNotShifted()
+    {
+        // Arrange：位置未知时（0,0）不应显示成 "0:1"
+        var position = new SourcePosition();
+
+        // Act & Assert
+        Assert.Equal("0:0", position.ToString());
     }
     
     [Fact]

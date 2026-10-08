@@ -51,8 +51,24 @@ public class ParserContext
     /// 获取当前令牌
     /// </summary>
     public LangToken CurrentToken => CurrentIndex >= _tokens.Count
-        ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex)
+        ? CreateEndOfFileToken()
         : _tokens[CurrentIndex];
+
+    /// <summary>
+    /// 创建文件结束标记
+    /// 注意：行号/列号必须取自最后一个真实标记，而不是标记下标，
+    /// 否则在 EOF 处报错时会显示成 "第 N 行"（N 为标记数量）这类无意义的位置
+    /// </summary>
+    private LangToken CreateEndOfFileToken()
+    {
+        if (_tokens.Count == 0)
+        {
+            return new LangToken("", LangTokenType.EndOfFile, 1, 1);
+        }
+
+        var last = _tokens[^1];
+        return new LangToken("", LangTokenType.EndOfFile, last.Line, last.Column + last.Value.Length);
+    }
 
     /// <summary>
     /// 构造函数
@@ -83,7 +99,7 @@ public class ParserContext
     public LangToken Peek(int offset = 1)
     {
         return CurrentIndex + offset >= _tokens.Count
-            ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex + offset)
+            ? CreateEndOfFileToken()
             : _tokens[CurrentIndex + offset];
     }
 

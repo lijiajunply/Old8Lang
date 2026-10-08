@@ -282,8 +282,9 @@ public partial class BytecodeVisitor
                     if (element is LangId id)
                     {
                         // 提取第 i 个元素
+                        // 注意：LoadConst 的操作数是常量池下标，必须先把下标值本身放入常量池
                         Emit(OpCode.LoadLocal, tupleLocalIndex);
-                        Emit(OpCode.LoadConst, i);
+                        Emit(OpCode.LoadConst, _compiler.AddConstant(i));
                         Emit(OpCode.GetIndex);
                         
                         // 赋值给变量

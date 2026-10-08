@@ -193,15 +193,15 @@ public class LangParser
             var column = currentToken.Column;
 
             // 获取错误位置附近的源代码上下文
-            string[] context;
+            SourceContextWindow context;
             try
             {
-                context = GetSourceContext(line);
+                context = GetSourceContextWindow(line);
             }
             catch
             {
-                // 如果获取上下文失败，使用空数组
-                context = [];
+                // 如果获取上下文失败，使用空窗口
+                context = SourceContextWindow.Empty;
             }
 
             if (ex is Old8Exception old8Ex)
@@ -230,27 +230,37 @@ public class LangParser
     /// <summary>
     /// 获取错误位置附近的源代码上下文，用于生成友好的错误信息
     /// </summary>
-    /// <param name="line">错误发生的行号</param>
+    /// <param name="line">错误发生的行号（从1开始）</param>
     /// <returns>错误位置前后的源代码行数组（最多5行）</returns>
     private string[] GetSourceContext(int line)
+    {
+        return GetSourceContextWindow(line).Lines;
+    }
+
+    /// <summary>
+    /// 获取错误位置附近的源代码上下文及其起始行号
+    /// </summary>
+    /// <param name="line">错误发生的行号（从1开始）</param>
+    /// <returns>上下文窗口（行数组 + 首行真实行号）</returns>
+    private SourceContextWindow GetSourceContextWindow(int line)
     {
         // 使用上下文对象中缓存的分割结果，提高性能
         var lines = _context.SourceLines;
 
         if (lines.Length == 0)
         {
-            return [];
+            return SourceContextWindow.Empty;
         }
 
         // 预分配容量，提高性能
-        var contextLines = new List<string>(4);
+        var contextLines = new List<string>(5);
 
-        // 确保行号有效，避免负数行号导致的问题
-        var safeLine = Math.Max(0, line);
-        
+        // line 为 1 起始行号，先换算成 0 起始下标
+        var zeroBasedLine = Math.Max(0, line - 1);
+
         // 获取错误行前后各2行，最多显示5行上下文
-        var startLine = Math.Max(0, safeLine - 2);
-        var endLine = Math.Min(lines.Length - 1, safeLine + 1);
+        var startLine = Math.Max(0, zeroBasedLine - 2);
+        var endLine = Math.Min(lines.Length - 1, zeroBasedLine + 2);
 
         // 收集上下文行
         for (var i = startLine; i <= endLine; i++)
@@ -258,7 +268,7 @@ public class LangParser
             contextLines.Add(lines[i]);
         }
 
-        return contextLines.ToArray();
+        return new SourceContextWindow(contextLines.ToArray(), startLine + 1);
     }
 
     /// <summary>
