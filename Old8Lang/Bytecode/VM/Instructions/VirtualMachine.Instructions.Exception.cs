@@ -957,11 +957,10 @@ public partial class VirtualMachine
                     // 这个方法会优先查找扩展方法，然后查找实例方法
                     var result = InvokeTypeMethod(obj, methodName, args);
 
-                    // 如果方法有返回值，压入栈
-                    if (result != null && result is not VoidLangValue)
-                    {
-                        _stack.Push(result);
-                    }
+                    // 必须无条件压入：调用方按"一次调用在栈上留下一个值"的约定消费。
+                    // 无返回值的方法本身就以 VoidLangValue 表示"没有值"，直接压它即可
+                    // （与解释器语义一致：void 不是 null）；漏压则会把无返回值的方法调用当作值使用时读到空栈。
+                    _stack.Push(result);
                 }
             }
                 break;

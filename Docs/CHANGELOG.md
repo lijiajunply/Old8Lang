@@ -52,6 +52,39 @@ Lambda/异步（虚拟机 ❌→✅）。
 - 编译模式在本机存在既有的 IL 校验失败（`Common Language Runtime detected an invalid program`），
   737 个既有失败，与本次改动无关。
 
+## 虚拟机求值栈一致性与 spawn 文档修正 (2026-10-08)
+
+### 实现修复
+
+- **虚拟机：统一"一次调用在求值栈上恰好留下一个值"的调用约定**。
+  此前无返回值的用户函数（`ReturnVoid` 或函数体执行到末尾）与原生函数都不向求值栈压入任何值，
+  而调用方按值位置消费，于是 `r <- f()`（f 无返回值）、`print(f())`、`r <- Sleep(1)` 等写法
+  会读到空栈，报出与真实原因无关的 `Stack empty`。
+  现改为：无返回值的调用补一个 `VoidLangValue` 占位（与解释器语义一致，
+  `r == null` 为 false、`print(f())` 不输出内容）；对应地，语句位置等**丢弃返回值**的调用补 `Pop`
+  （`FuncRunStatement`、类实例化的构造函数调用）。
+- **解释器：修复函数返回值的残留**。函数走末尾未执行 `return` 时，会返回上一次调用留在
+  变量管理器上的返回值（例如先 `f(true)` 得到 42，再 `f(false)` 仍得到 42）。现在返回 void。
+- 求值栈下溢的报错信息会指出失败的指令与所在函数（此前只报 `Stack empty`）。
+- 虚拟机反射调用实例方法时的 `TargetInvocationException` 不再吞掉真实原因，
+  内部异常会带着原始调用栈重新抛出（此前只显示 `Exception has been thrown by the target of an invocation.`）。
+
+### 残留差异
+
+- **原生函数无法区分"无返回值"与"null"**：用户函数无返回值时虚拟机补 `VoidLangValue` 占位，
+  与解释器一致；但原生/内置函数（`Sleep`、`PrintLine` 等）统一返回 C# `null`，
+  虚拟机无法区分二者，因此 `print(Sleep(1))` 在虚拟机输出 `null`（解释器不输出）、
+  `r <- Sleep(1)` 后 `r == null` 为 true（解释器为 false）。
+  彻底对齐需要各原生函数分别返回 `VoidLangValue` / `NullLangValue`，本次未做。
+
+### 文档修正
+
+- 语法文档 §5.9 多线程编程：明确 `spawn` **只创建线程、必须再调用 `Start()`** 才会执行，
+  之后用 `Join()` 等待并取回线程函数返回值；原示例 `t <- spawn(worker(1))` + `t.Join()`
+  在三种模式下都无法运行（参数形式错误且缺少 `Start()`）。新增返回值与闭包两种完整示例。
+- 支持矩阵中 `spawn` 一行由 ⚠️ 更正为 ✅（三种模式行为一致，实测通过）。
+- 更正"虚拟机不支持 `Thread.Sleep`"的说明：无 `Thread.` 前缀的全局函数 `Sleep(...)` 三种模式均可用。
+
 ## Old8Lang 1.0.0 rc9 - 文档更新 (2024-02-14)
 
 ### 文档系统全面更新

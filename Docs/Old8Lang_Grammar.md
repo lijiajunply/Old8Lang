@@ -2727,18 +2727,20 @@ first <- await Task.WhenAny([asyncFunc1(), asyncFunc2()])
 
 ### 5.9 多线程编程
 
-**模式支持**: `[✅ | ✅ | ⚠️]`
+**模式支持**: `[✅ | ✅ | ✅]`
 
-> **复核说明**（2026-10-08 实测）：本节的示例在三种模式下**都无法运行**，属于示例本身的问题
-> （`spawn` 需要传入函数值，而 `spawn(worker(1))` 传入的是调用结果；
-> 且对返回的线程句柄调用 `Join()` 会抛 `Thread has not been started`）。
-> 这一失败在三种模式下一致，不是模式差异，故不改动模式标记，仅在此提示。
+> **⚠️ `spawn` 只创建线程，不会自动启动**（2026-10-08 实测，三种模式行为一致）：
+> `spawn` 返回线程句柄后，必须调用 `Start()` 线程才会真正开始执行，
+> 之后用 `Join()` 等待结束并取回线程函数的返回值。
+> - 只 `spawn` 而不 `Start()`：线程函数**不会执行**，程序继续往下走。
+> - 未 `Start()` 就 `Join()`：抛 `Thread has not been started`。
+> - 线程函数的参数跟在函数后面传给 `spawn`，例如 `spawn(worker, 1)`。
 
 #### 5.9.1 创建线程
 
-**模式支持**: `[✅ | ✅ | ⚠️]`
+**模式支持**: `[✅ | ✅ | ✅]`
 
-使用 `spawn` 函数：
+使用 `spawn` 函数（创建 → `Start()` → `Join()`）：
 
 ```old8
 func worker(id:int) {
@@ -2746,10 +2748,36 @@ func worker(id:int) {
     // 执行工作
 }
 
-// 创建并启动线程
-t <- spawn(worker(1))
+// 创建线程（此时尚未运行）
+t <- spawn(worker, 1)
+
+// 启动线程
+t.Start()
 
 // 等待线程完成
+t.Join()
+```
+
+线程函数的返回值可以通过 `Join()` 取回：
+
+```old8
+func compute(x:int) -> int {
+    return x * 2
+}
+
+t <- spawn(compute, 21)
+t.Start()
+result <- t.Join()      // result 为 42
+PrintLine(result.ToStr())
+```
+
+也可以直接传入闭包：
+
+```old8
+t <- spawn(() -> {
+    PrintLine("closure ran")
+})
+t.Start()
 t.Join()
 ```
 
@@ -2761,19 +2789,18 @@ t.Join()
 > Thread 静态 API 在虚拟机模式下不可用，会报
 > `VM_UNSUPPORTED_ERROR: 虚拟机模式暂不支持 Thread 静态 API`
 > （此前报 `名称 'Thread' 未定义`）。
-> 基于 `ThreadCreate`/`ThreadStart`/`ThreadJoin` 指令的线程操作不受影响。
+> 基于 `ThreadCreate`/`ThreadStart`/`ThreadJoin` 指令的线程操作不受影响，
+> 且**全局函数** `Sleep(...)`（无需 `Thread.` 前缀）三种模式均可用。
 
 ```old8
 // 当前线程
 currentThread <- Thread.CurrentThread()
 
-// 线程休眠
-Thread.Sleep(1000)
+// 线程休眠（全局函数，无需 Thread. 前缀）
+Sleep(1000)
 
-// 检查线程状态
-if t.IsAlive() {
-    PrintLine("Thread is running")
-}
+// 检查线程状态：Start() 之前为 false，启动后为 true，结束后回到 false
+PrintLine(t.IsAlive().ToStr())
 ```
 
 ### 5.10 异常处理

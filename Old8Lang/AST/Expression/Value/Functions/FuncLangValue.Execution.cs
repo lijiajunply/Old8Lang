@@ -725,6 +725,11 @@ public partial class FuncLangValue
             // 保持函数上下文标志，确保变量遮蔽正常工作
             // executionManager.IsFunc = true; // 已经设置为true，不要重置
 
+            // 运行方法体之前清空上一次调用残留的返回值：
+            // Result 是变量管理器上的字段，若不重置，函数体未执行 return（走到末尾或条件分支跳过 return）时
+            // 会把上一次调用的返回值当成自己的返回值返回
+            executionManager.Result = VoidLangValue.Instance;
+
             // 运行方法体
             BlockStatement.Run(executionManager);
 

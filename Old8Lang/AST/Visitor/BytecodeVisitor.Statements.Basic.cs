@@ -38,9 +38,26 @@ public partial class BytecodeVisitor
         foreach (var statement in node.OtherStatements)
         {
             statement.Accept(this);
+            DiscardStatementValue(statement);
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 丢弃语句位置上被调用的函数留下的返回值
+    /// </summary>
+    /// <remarks>
+    /// 调用约定要求"一次调用在求值栈上恰好留下一个值"（无返回值的调用由 ExecuteFrame 补 VoidLangValue 占位）。
+    /// FuncRunStatement 表示"把调用当语句执行"，其返回值按语言语义应被丢弃，
+    /// 因此这里补一条 Pop，否则每次这样的调用都会在栈上多留一个值。
+    /// </remarks>
+    private void DiscardStatementValue(OldStatement statement)
+    {
+        if (statement is FuncRunStatement)
+        {
+            Emit(OpCode.Pop);
+        }
     }
 
     public Instruction? VisitSetStatement(SetStatement node)

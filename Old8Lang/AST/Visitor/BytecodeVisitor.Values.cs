@@ -228,7 +228,10 @@ public partial class BytecodeVisitor
                     Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName });
                 }
 
-                // 构造函数返回 void，不需要弹出返回值
+
+                // 实例已经留在栈上（NewObject 创建 + Dup 保留引用），
+                // 构造函数自身的返回值（无返回值时是一个 VoidLangValue 占位）必须丢弃
+                Emit(OpCode.Pop);
             }
         }
         else

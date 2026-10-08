@@ -47,6 +47,17 @@ public class CallFrame
     public ConstantPool? ConstantPool { get; set; }
 
     /// <summary>
+    /// 本次调用是否已向求值栈留下返回值
+    /// </summary>
+    /// <remarks>
+    /// 调用约定要求"一次调用在求值栈上恰好留下一个值"：有 return 的函数由 Return 指令压入返回值，
+    /// 无返回值的函数（ReturnVoid 或函数体执行到末尾）不会压入任何值。调用方据此补一个
+    /// VoidLangValue 占位，否则把无返回值的调用当作值使用时（例如 "r <- f()" 而 f 没有 return）
+    /// 会读到空栈。
+    /// </remarks>
+    public bool LeftReturnValue { get; set; }
+
+    /// <summary>
     /// 创建调用栈帧（默认分配新的局部变量数组）
     /// </summary>
     public CallFrame(FunctionMetadata function, int localCount)
@@ -82,6 +93,9 @@ public class CallFrame
         AsyncGeneratorId = null;
         ClosureEnvironment = null;
         ConstantPool = null;
+        // 帧是池化复用的，必须清掉上一次调用留下的返回值标记，
+        // 否则复用该帧的无返回值函数会被误判为"已留下返回值"，调用方拿到空栈
+        LeftReturnValue = false;
     }
 
     /// <summary>

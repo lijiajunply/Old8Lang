@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
@@ -345,6 +346,17 @@ public partial class VirtualMachine
         try
         {
             ExecuteFrameLoop(frame);
+
+            // 调用约定：一次调用在求值栈上恰好留下一个值。
+            // 无返回值的函数（ReturnVoid，或函数体执行到末尾）不会压入任何值，
+            // 这里补一个 VoidLangValue，使 "r <- f()" 这类把无返回值调用当作值使用的写法不再读到空栈。
+            // 用 VoidLangValue 而不是 null：解释器模式下无返回值的调用同样产生 VoidLangValue，
+            // 因此 "f() == null" 为 false、"print(f())" 不输出内容，两种模式行为一致。
+            // 注意必须放在 ExecuteFrameLoop 正常返回之后：若函数抛出异常则不补值。
+            if (!frame.LeftReturnValue)
+            {
+                _stack.Push(new VoidLangValue());
+            }
         }
         finally
         {

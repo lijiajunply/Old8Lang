@@ -200,6 +200,18 @@ public partial class VirtualMachine
 
         // 调用方法
         object? invokeInstance = method.IsStatic ? null : obj;
-        return method.Invoke(invokeInstance, invokeArgs.ToArray());
+        try
+        {
+            return method.Invoke(invokeInstance, invokeArgs.ToArray());
+        }
+        catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            // 反射调用会把被调用方法抛出的异常包装成 TargetInvocationException，
+            // 其 Message 只有 "Exception has been thrown by the target of an invocation."，
+            // 真实原因在 InnerException 中。直接抛出内部异常（保留原始调用栈），
+            // 否则用户看到的报错信息完全不指向真实原因。
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw;
+        }
     }
 }

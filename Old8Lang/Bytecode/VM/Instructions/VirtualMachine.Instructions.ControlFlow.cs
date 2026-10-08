@@ -74,11 +74,9 @@ public partial class VirtualMachine
                     }
 
                     // 调用原生函数
-                    var result = CallNativeFunction(funcName, args);
-                    if (result != null)
-                    {
-                        _stack.Push(result);
-                    }
+                    // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
+                    // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
+                    _stack.Push(CallNativeFunction(funcName, args));
                 }
                 else
                 {
@@ -108,11 +106,9 @@ public partial class VirtualMachine
                     Array.Copy(namedArgValues, 0, args, positionalCount, namedCount);
 
                     // 调用原生函数
-                    var result = CallNativeFunction(funcName, args);
-                    if (result != null)
-                    {
-                        _stack.Push(result);
-                    }
+                    // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
+                    // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
+                    _stack.Push(CallNativeFunction(funcName, args));
                 }
             }
                 break;
@@ -142,12 +138,15 @@ public partial class VirtualMachine
                     }
                 }
                 // 调用者会从栈中获取返回值
+                frame.LeftReturnValue = true;
                 // 设置 IP 超出指令范围，终止 CallFunction 中的 while 循环
                 frame.IP = frame.Function.Instructions.Count;
                 return; // 退出当前函数
             }
 
             case OpCode.ReturnVoid:
+                // 无返回值：调用方需要一个占位值，由 ExecuteFrame 统一补 VoidLangValue
+                frame.LeftReturnValue = false;
                 // 设置 IP 超出指令范围，终止 CallFunction 中的 while 循环
                 frame.IP = frame.Function.Instructions.Count;
                 return; // 退出当前函数
