@@ -5,7 +5,9 @@ namespace Old8Lang.Concurrency;
 /// </summary>
 public class CountDownLatchImpl : IDisposable
 {
+    private const int ReleaseDrainTimeoutMs = 20;
     private int Count;
+    private int _waitingCount;
     private readonly ManualResetEventSlim Event = new(false);
 
     public CountDownLatchImpl(int initialCount)
@@ -31,17 +33,60 @@ public class CountDownLatchImpl : IDisposable
         if (newCount == 0)
         {
             Event.Set();
+
+            if (Volatile.Read(ref _waitingCount) > 0)
+            {
+                SpinWait.SpinUntil(() => Volatile.Read(ref _waitingCount) == 0, ReleaseDrainTimeoutMs);
+            }
         }
     }
 
     public void Wait()
     {
-        Event.Wait();
+        if (Volatile.Read(ref Count) == 0)
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref _waitingCount);
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
+        try
+        {
+            if (Volatile.Read(ref Count) == 0)
+            {
+                return;
+            }
+
+            Event.Wait();
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _waitingCount);
+        }
     }
 
     public bool Wait(int timeoutMs)
     {
-        return Event.Wait(timeoutMs);
+        if (Volatile.Read(ref Count) == 0)
+        {
+            return true;
+        }
+
+        Interlocked.Increment(ref _waitingCount);
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
+        try
+        {
+            if (Volatile.Read(ref Count) == 0)
+            {
+                return true;
+            }
+
+            return Event.Wait(timeoutMs);
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _waitingCount);
+        }
     }
 
     public int GetCount()

@@ -4,8 +4,12 @@ using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Generators;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Bytecode.ModuleSystem;
+using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
+using System.Buffers;
+using System.Collections.Concurrent;
+using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 namespace Old8Lang.Bytecode.VM;
 
@@ -19,9 +23,15 @@ public partial class VirtualMachine
     private readonly ThreadLocal<Stack<CallFrame>> _threadCallStack = new(() => new Stack<CallFrame>());
     private readonly ThreadLocal<Stack<ExceptionHandler>> _threadExceptionHandlers = new(() => new Stack<ExceptionHandler>());
 
+    // CallFrame 对象池：复用帧实例，减少 GC 压力（每线程独立，最多缓存 32 个）
+    private readonly ThreadLocal<Stack<CallFrame>> _threadFramePool = new(() => new Stack<CallFrame>(32));
+
     // 线程安全的全局变量字典
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object?> _globals = new();
+    private readonly ConcurrentDictionary<string, object?> _globals;
     private readonly BytecodeFile _bytecodeFile;
+    private readonly Dictionary<string, FunctionMetadata> _functionByName;
+    private readonly Dictionary<string, ClassMetadata> _classByName;
+    private readonly ConcurrentDictionary<(string ModuleName, string SymbolName), object> _moduleSymbolCache;
 
     // 便捷属性，获取当前线程的栈
     private Stack<object?> _stack => _threadStack.Value!;
@@ -46,10 +56,26 @@ public partial class VirtualMachine
     private readonly string? _baseDirectory;
 
     public VirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
+        : this(bytecodeFile, baseDirectory, null, null, null, null, initializeRuntimeMetadata: true)
+    {
+    }
+
+    private VirtualMachine(
+        BytecodeFile bytecodeFile,
+        string? baseDirectory,
+        ConcurrentDictionary<string, object?>? sharedGlobals,
+        Dictionary<string, FunctionMetadata>? sharedFunctionByName,
+        Dictionary<string, ClassMetadata>? sharedClassByName,
+        ConcurrentDictionary<(string ModuleName, string SymbolName), object>? sharedModuleSymbolCache,
+        bool initializeRuntimeMetadata)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
         _baseDirectory = baseDirectory ?? Directory.GetCurrentDirectory();
         _moduleLoader = new ModuleLoader(_baseDirectory);
+        _globals = sharedGlobals ?? new ConcurrentDictionary<string, object?>();
+        _functionByName = sharedFunctionByName ?? new Dictionary<string, FunctionMetadata>(StringComparer.Ordinal);
+        _classByName = sharedClassByName ?? new Dictionary<string, ClassMetadata>(StringComparer.Ordinal);
+        _moduleSymbolCache = sharedModuleSymbolCache ?? new ConcurrentDictionary<(string ModuleName, string SymbolName), object>();
 
         // 初始化全局函数注册表
         GlobalFunctionInitializer.EnsureInitialized();
@@ -57,41 +83,55 @@ public partial class VirtualMachine
         // 初始化实例方法注册表
         InstanceMethodInitializer.EnsureInitialized();
 
-        // 初始化全局变量
-        foreach (var globalVar in _bytecodeFile.GlobalVariables)
+        if (initializeRuntimeMetadata)
         {
-            _globals[globalVar] = null;
-        }
-
-        // 将所有类元数据注册到全局变量表中
-        // 这样在运行时可以通过类名访问类元数据（用于嵌套类访问等）
-        foreach (var classMetadata in _bytecodeFile.Classes)
-        {
-            _globals[classMetadata.Name] = classMetadata;
-
-            // 初始化静态字段的默认值
-            foreach (var staticField in classMetadata.StaticFields)
+            foreach (var globalVar in _bytecodeFile.GlobalVariables)
             {
-                // 处理 null 默认值
-                if (staticField.IsDefaultNull)
+                _globals[globalVar] = null;
+            }
+
+            foreach (var function in _bytecodeFile.Functions)
+            {
+                _functionByName.TryAdd(function.Name, function);
+            }
+
+            foreach (var classMetadata in _bytecodeFile.Classes)
+            {
+                _globals[classMetadata.Name] = classMetadata;
+                _classByName.TryAdd(classMetadata.Name, classMetadata);
+
+                foreach (var staticField in classMetadata.StaticFields)
                 {
-                    classMetadata.StaticFieldValues[staticField.Name] = null;
-                }
-                // 从常量池获取默认值
-                else if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
-                {
-                    var defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
-                    classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
-                }
-                else
-                {
-                    classMetadata.StaticFieldValues[staticField.Name] = null;
+                    if (staticField.IsDefaultNull)
+                    {
+                        classMetadata.StaticFieldValues[staticField.Name] = null;
+                    }
+                    else if (staticField.DefaultValueIndex >= 0 && staticField.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
+                    {
+                        var defaultValue = _bytecodeFile.ConstantPool.GetConstant(staticField.DefaultValueIndex);
+                        classMetadata.StaticFieldValues[staticField.Name] = defaultValue;
+                    }
+                    else
+                    {
+                        classMetadata.StaticFieldValues[staticField.Name] = null;
+                    }
                 }
             }
-        }
 
-        // 注册扩展方法到实例方法注册表
-        RegisterExtensionMethods();
+            RegisterExtensionMethods();
+        }
+    }
+
+    private VirtualMachine CreateWorkerVirtualMachine()
+    {
+        return new VirtualMachine(
+            _bytecodeFile,
+            _baseDirectory,
+            _globals,
+            _functionByName,
+            _classByName,
+            _moduleSymbolCache,
+            initializeRuntimeMetadata: false);
     }
 
     /// <summary>
@@ -202,23 +242,119 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 从线程本地池租借 CallFrame（如池为空则新建），并用指定参数初始化
+    /// </summary>
+    private CallFrame RentCallFrame(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    {
+        var pool = _threadFramePool.Value!;
+        if (pool.Count > 0)
+        {
+            var frame = pool.Pop();
+            frame.ReinitializeFromPool(function, locals, localCount, usesPooledLocals);
+            return frame;
+        }
+
+        return new CallFrame(function, locals, localCount, usesPooledLocals);
+    }
+
+    /// <summary>
+    /// 将 CallFrame 归还到线程本地池（上限 32 个，超出则丢弃）
+    /// </summary>
+    private void ReturnCallFrame(CallFrame frame)
+    {
+        frame.ClearForPool();
+        var pool = _threadFramePool.Value!;
+        if (pool.Count < 32)
+        {
+            pool.Push(frame);
+        }
+    }
+
+    private static object?[] RentLocalsBuffer(int localCount)
+    {
+        if (localCount <= 0)
+        {
+            return Array.Empty<object?>();
+        }
+
+        var buffer = ArrayPool<object?>.Shared.Rent(localCount);
+        Array.Clear(buffer, 0, localCount);
+        return buffer;
+    }
+
+    private static void ReturnLocalsBuffer(CallFrame frame)
+    {
+        if (!frame.UsesPooledLocals || frame.LocalCount <= 0)
+        {
+            return;
+        }
+
+        Array.Clear(frame.Locals, 0, frame.LocalCount);
+        ArrayPool<object?>.Shared.Return(frame.Locals, clearArray: false);
+    }
+
+    private void ExecuteFrameLoop(CallFrame frame)
+    {
+        var function = frame.Function;
+        var instructions = function.Instructions;
+        var instructionCount = instructions.Count;
+        while (frame.IP < instructionCount)
+        {
+            var instructionIndex = frame.IP;
+            var instruction = instructions[instructionIndex];
+            frame.IP++;
+
+            try
+            {
+                ExecuteInstruction(instruction, frame);
+            }
+            catch (Exception ex)
+            {
+                // 异常发生时，先执行所有 defer 块
+                if (frame.HasDeferredInstructions)
+                {
+                    ExecuteDefers(frame);
+                }
+
+                // 异常处理：查找异常表中匹配的处理器
+                if (!HandleException(ex, frame, function))
+                {
+                    // 如果没有找到匹配的处理器，重新抛出异常
+                    throw;
+                }
+            }
+        }
+    }
+
+    private void ExecuteFrame(CallFrame frame)
+    {
+        _callStack.Push(frame);
+        try
+        {
+            ExecuteFrameLoop(frame);
+        }
+        finally
+        {
+            if (frame.HasDeferredInstructions)
+            {
+                ExecuteDefers(frame);
+            }
+            _callStack.Pop();
+            ReturnLocalsBuffer(frame);
+            ReturnCallFrame(frame);
+        }
+    }
+
+    /// <summary>
     /// 调用函数
     /// </summary>
     private void CallFunction(FunctionMetadata function, object?[] arguments)
     {
-        // Console.WriteLine($"[VM Debug] Calling {function.Name} with args: {string.Join(", ", arguments.Select(a => a?.ToString() ?? "null"))}");
-        // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
-        object?[] processedArguments = arguments;
-        if (function.ParamsParameterIndex >= 0)
-        {
-            processedArguments = ProcessParamsArguments(function, arguments);
-        }
+        var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
+        var locals = RentLocalsBuffer(function.LocalCount);
 
-        // 创建调用帧
-        var frame = new CallFrame(function, function.LocalCount)
-        {
-            Arguments = processedArguments
-        };
+        var frame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
+        frame.Arguments = processedArguments;
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
@@ -226,40 +362,7 @@ public partial class VirtualMachine
             frame.Locals[i] = processedArguments[i];
         }
 
-        _callStack.Push(frame);
-
-        try
-        {
-            // 执行指令
-            while (frame.IP < function.Instructions.Count)
-            {
-                var instruction = function.Instructions[frame.IP];
-                frame.IP++;
-
-                try
-                {
-                    ExecuteInstruction(instruction, frame);
-                }
-                catch (Exception ex)
-                {
-                    // 异常发生时，先执行所有 defer 块
-                    ExecuteDefers(frame);
-
-                    // 异常处理：查找异常表中匹配的处理器
-                    if (!HandleException(ex, frame, function))
-                    {
-                        // 如果没有找到匹配的处理器，重新抛出异常
-                        throw;
-                    }
-                }
-            }
-        }
-        finally
-        {
-            // 函数正常退出时，执行所有 defer 块
-            ExecuteDefers(frame);
-            _callStack.Pop();
-        }
+        ExecuteFrame(frame);
     }
 
     /// <summary>
@@ -297,22 +400,15 @@ public partial class VirtualMachine
     /// <summary>
     /// 调用闭包函数（带捕获变量）
     /// </summary>
-    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, Dictionary<string, object?> capturedVariables, ConstantPool? constantPool = null)
+    private void CallClosureFunction(FunctionMetadata function, object?[] arguments, ClosureEnvironment capturedVariables, ConstantPool? constantPool = null)
     {
-        // 处理params参数：如果函数有params参数,需要将多余的参数打包成数组
-        object?[] processedArguments = arguments;
-        if (function.ParamsParameterIndex >= 0)
-        {
-            processedArguments = ProcessParamsArguments(function, arguments);
-        }
+        var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
+        var locals = RentLocalsBuffer(function.LocalCount);
 
-        // 创建调用帧，并设置闭包环境和常量池
-        var frame = new CallFrame(function, function.LocalCount)
-        {
-            Arguments = processedArguments,
-            ClosureEnvironment = capturedVariables,  // 将捕获的变量设置为闭包环境
-            ConstantPool = constantPool  // 设置常量池（用于模块导入的函数）
-        };
+        var frame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
+        frame.Arguments = processedArguments;
+        frame.ClosureEnvironment = capturedVariables;
+        frame.ConstantPool = constantPool;
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
@@ -320,84 +416,86 @@ public partial class VirtualMachine
             frame.Locals[i] = processedArguments[i];
         }
 
-        _callStack.Push(frame);
-
-        try
-        {
-            // 执行指令
-            while (frame.IP < function.Instructions.Count)
-            {
-                var instruction = function.Instructions[frame.IP];
-                frame.IP++;
-
-                try
-                {
-                    ExecuteInstruction(instruction, frame);
-                }
-                catch (Exception ex)
-                {
-                    // 异常发生时，先执行所有 defer 块
-                    ExecuteDefers(frame);
-
-                    // 异常处理：查找异常表中匹配的处理器
-                    if (!HandleException(ex, frame, function))
-                    {
-                        // 如果没有找到匹配的处理器，重新抛出异常
-                        throw;
-                    }
-                }
-            }
-        }
-        finally
-        {
-            // 函数正常退出时，执行所有 defer 块
-            ExecuteDefers(frame);
-            _callStack.Pop();
-        }
+        ExecuteFrame(frame);
     }
 
-    /// <summary>
-    /// 处理params参数：将多余的参数打包成数组
-    /// </summary>
-    private object?[] ProcessParamsArguments(FunctionMetadata function, object?[] arguments)
+    private object?[] NormalizeArguments(FunctionMetadata function, object?[] arguments, SourcePosition position)
     {
         int paramsIndex = function.ParamsParameterIndex;
-        int regularParamCount = paramsIndex; // params参数之前的普通参数数量
         int totalParamCount = function.Parameters.Count;
+        if (paramsIndex >= totalParamCount)
+        {
+            return arguments;
+        }
 
-        // 如果参数数量已经等于函数参数总数,说明params参数已经被处理过了(可能在OpCode.Call中)
-        // 直接返回原参数数组
+        // 无 params 参数：仅在参数不足时补默认值，多余参数保持向后兼容
+        if (paramsIndex < 0)
+        {
+            if (arguments.Length >= totalParamCount)
+            {
+                return arguments;
+            }
+
+            var normalized = new object?[totalParamCount];
+            Array.Copy(arguments, normalized, arguments.Length);
+            for (int i = arguments.Length; i < totalParamCount; i++)
+            {
+                if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
+                {
+                    normalized[i] = function.DefaultValues[i];
+                }
+                else
+                {
+                    throw new ArgumentError(position, $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
+                }
+            }
+
+            return normalized;
+        }
+
+        int regularParamCount = paramsIndex;
+        if (arguments.Length < regularParamCount)
+        {
+            throw new ArgumentError(position, $"函数 '{function.Name}' 至少需要 {regularParamCount} 个参数，但实际提供了 {arguments.Length} 个参数");
+        }
+
+        // 参数数量与声明一致时，视为可能已归一化（兼容旧调用路径）
         if (arguments.Length == totalParamCount)
         {
             return arguments;
         }
 
-        // 检查是否提供了足够的普通参数
-        if (arguments.Length < regularParamCount)
-        {
-            throw new Exception($"函数 '{function.Name}' 至少需要 {regularParamCount} 个参数，但实际提供了 {arguments.Length} 个参数");
-        }
-
-        // 创建新的参数数组：普通参数 + params数组
-        var processedArgs = new object?[totalParamCount];
-
-        // 复制普通参数
+        var normalizedArgs = new object?[totalParamCount];
         for (int i = 0; i < regularParamCount; i++)
         {
-            processedArgs[i] = arguments[i];
+            normalizedArgs[i] = arguments[i];
         }
 
-        // 将剩余参数打包成数组
-        var paramsArgs = new object?[arguments.Length - regularParamCount];
-        for (int i = 0; i < paramsArgs.Length; i++)
+        for (int i = regularParamCount; i < totalParamCount; i++)
         {
-            paramsArgs[i] = arguments[regularParamCount + i];
+            if (i == paramsIndex)
+            {
+                int paramsArgCount = Math.Max(0, arguments.Length - regularParamCount);
+                var paramsArray = new object?[paramsArgCount];
+                if (paramsArgCount > 0)
+                {
+                    Array.Copy(arguments, regularParamCount, paramsArray, 0, paramsArgCount);
+                }
+
+                normalizedArgs[i] = paramsArray;
+                continue;
+            }
+
+            if (i < function.DefaultValues.Count && function.DefaultValues[i] != null)
+            {
+                normalizedArgs[i] = function.DefaultValues[i];
+                continue;
+            }
+
+            throw new ArgumentError(position, $"函数 {function.Name} 的参数 '{function.Parameters[i]}' 未提供值且没有默认值");
         }
 
-        // 将params数组放入对应位置
-        processedArgs[paramsIndex] = paramsArgs;
-
-        return processedArgs;
+        return normalizedArgs;
     }
 
     /// <summary>
@@ -456,5 +554,11 @@ public partial class VirtualMachine
             // 恢复之前的虚拟机上下文（而不是清理）
             VMContext.CurrentVM = previousVM;
         }
+    }
+
+    public object? ExecuteFunctionObjectInWorker(object? funcObj, object?[] arguments)
+    {
+        var workerVm = CreateWorkerVirtualMachine();
+        return workerVm.CallFunctionObject(funcObj, arguments);
     }
 }

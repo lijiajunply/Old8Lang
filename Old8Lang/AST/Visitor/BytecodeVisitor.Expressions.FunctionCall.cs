@@ -154,7 +154,9 @@ public partial class BytecodeVisitor
 
                 // 检查是否是原生函数
                 bool isNative = _compiler.IsNativeFunction(funcName);
-                
+                int funcIndex = _compiler.GetFunctionIndex(funcName);
+                bool hasFunctionIndex = funcIndex >= 0 && !isNative;
+
                 // 检查是否是异步函数
                 bool isAsync = _compiler.IsAsyncFunction(funcName);
 
@@ -167,20 +169,41 @@ public partial class BytecodeVisitor
 
                     // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
                     var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
-                    Emit(isNative ? OpCode.CallNative : OpCode.Call,
-                        new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    if (hasFunctionIndex)
+                    {
+                        Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });
+                    }
+                    else
+                    {
+                        Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                            new object[] { positionalCount, namedCount, funcName, namedArgNames });
+                    }
                 }
                 else
                 {
                     // 无命名参数: [argCount, funcName]
                     if (isAsync)
                     {
-                        Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.CallAsync, new object[] { positionalCount, funcName, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(OpCode.CallAsync, new object[] { positionalCount, funcName });
+                        }
                     }
                     else
                     {
-                        Emit(isNative ? OpCode.CallNative : OpCode.Call,
-                            new object[] { positionalCount, funcName });
+                        if (hasFunctionIndex)
+                        {
+                            Emit(OpCode.Call, new object[] { positionalCount, funcName, funcIndex });
+                        }
+                        else
+                        {
+                            Emit(isNative ? OpCode.CallNative : OpCode.Call,
+                                new object[] { positionalCount, funcName });
+                        }
                     }
                 }
             }

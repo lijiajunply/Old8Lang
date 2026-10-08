@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 namespace Old8Lang.Concurrency;
@@ -6,22 +7,32 @@ namespace Old8Lang.Concurrency;
 /// <summary>
 /// Channel 接收结果
 /// </summary>
-public class ChannelReceiveResult
+public readonly struct ChannelReceiveResult
 {
     /// <summary>
     /// 是否成功接收
     /// </summary>
-    public bool Success { get; set; }
+    public bool Success { get; init; }
 
     /// <summary>
     /// 接收到的值（可能为 null）
     /// </summary>
-    public object? Value { get; set; }
+    public object? Value { get; init; }
+
+    /// <summary>
+    /// Channel 是否已关闭
+    /// </summary>
+    public bool IsChannelClosed { get; init; }
 
     /// <summary>
     /// 表示接收失败的结果
     /// </summary>
     public static ChannelReceiveResult Failed => new() { Success = false, Value = null };
+
+    /// <summary>
+    /// 表示 Channel 已关闭的结果
+    /// </summary>
+    public static ChannelReceiveResult Closed => new() { Success = false, Value = null, IsChannelClosed = true };
 
     /// <summary>
     /// 表示接收成功的结果
@@ -55,14 +66,17 @@ public static class ResourceManager
     private static readonly ConcurrentDictionary<int, ResourceType> ResourceTypes = new();
 
     // 存储各类资源
-    private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Mutexes = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<MutexImpl>> Mutexes = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Semaphores = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<AtomicIntImpl>> AtomicInts = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<Channel<object>>> Channels = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<ReaderWriterLockSlim>> ReadWriteLocks = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CountDownLatchImpl>> CountDownLatches = new();
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CyclicBarrierImpl>> CyclicBarriers = new();
-    private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>> CancellationTokenSources = new();
+
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>>
+        CancellationTokenSources = new();
+
     private static readonly ConcurrentDictionary<int, ResourceWrapper<VMThreadWrapper>> Threads = new();
 
     // ID 计数器
@@ -88,9 +102,11 @@ public static class ResourceManager
             {
                 // 使用 Interlocked 确保线程安全的单例初始化
                 Interlocked.CompareExchange(ref _cleanupTimer,
-                    new Timer(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes), TimeSpan.FromMinutes(AutoCleanupIntervalMinutes)),
+                    new Timer(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes),
+                        TimeSpan.FromMinutes(AutoCleanupIntervalMinutes)),
                     null);
             }
+
             return _cleanupTimer;
         }
     }
@@ -115,6 +131,7 @@ public static class ResourceManager
         {
             throw new ArgumentException($"{resourceTypeName} ID {resourceId} 不存在");
         }
+
         return wrapper;
     }
 
@@ -125,7 +142,7 @@ public static class ResourceManager
     public static int CreateMutex()
     {
         var id = Interlocked.Increment(ref _mutexIdCounter);
-        Mutexes[id] = new ResourceWrapper<SemaphoreSlim>(new SemaphoreSlim(1, 1));
+        Mutexes[id] = new ResourceWrapper<MutexImpl>(new MutexImpl());
         ResourceTypes[id] = ResourceType.Mutex;
         return id;
     }
@@ -134,21 +151,21 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Wait();
+        wrapper.Resource.Lock();
     }
 
     public static bool TryLockMutex(int mutexId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        return wrapper.Resource.Wait(timeoutMs);
+        return wrapper.Resource.TryLock(timeoutMs);
     }
 
     public static void UnlockMutex(int mutexId)
     {
         var wrapper = ValidateAndGetResource(mutexId, Mutexes, "Mutex");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Release();
+        wrapper.Resource.Unlock();
     }
 
     public static void DisposeMutex(int mutexId)
@@ -287,7 +304,13 @@ public static class ResourceManager
         }
 
         var id = Interlocked.Increment(ref _channelIdCounter);
-        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateBounded<object>(capacity));
+        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateBounded<object>(new BoundedChannelOptions(capacity)
+        {
+            SingleReader = false,
+            SingleWriter = false,
+            FullMode = BoundedChannelFullMode.Wait,
+            AllowSynchronousContinuations = true
+        }));
         ResourceTypes[id] = ResourceType.Channel;
         return id;
     }
@@ -296,17 +319,59 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
-        wrapper.Resource.Writer.WriteAsync(value).GetAwaiter().GetResult();
+        var writer = wrapper.Resource.Writer;
+        if (writer.TryWrite(value))
+        {
+            return;
+        }
+
+        // 对于有界通道，队列已满时 WriteAsync 可能返回未完成 ValueTask。
+        // 通过 AsTask() 阻塞等待，避免直接 GetResult 导致 “The asynchronous operation has not completed”。
+        writer.WriteAsync(value).AsTask().GetAwaiter().GetResult();
     }
 
     public static bool TrySendChannel(int channelId, object value, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
+        var writer = wrapper.Resource.Writer;
+
+        if (writer.TryWrite(value))
+        {
+            return true;
+        }
+
         try
         {
-            var task = wrapper.Resource.Writer.WriteAsync(value).AsTask();
-            return task.Wait(timeoutMs);
+            if (timeoutMs == 0)
+            {
+                return false;
+            }
+
+            if (timeoutMs < 0)
+            {
+                writer.WriteAsync(value).AsTask().GetAwaiter().GetResult();
+                return true;
+            }
+
+            var spinWait = new SpinWait();
+            var deadline = Stopwatch.GetTimestamp() + TimeoutToStopwatchTicks(timeoutMs);
+            while (Stopwatch.GetTimestamp() <= deadline)
+            {
+                if (writer.TryWrite(value))
+                {
+                    return true;
+                }
+
+                if (wrapper.Resource.Reader.Completion.IsCompleted)
+                {
+                    return false;
+                }
+
+                spinWait.SpinOnce();
+            }
+
+            return false;
         }
         catch (AggregateException ex) when (ex.InnerException is ChannelClosedException)
         {
@@ -332,22 +397,72 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(channelId, Channels, "Channel");
         wrapper.UpdateLastAccessTime();
-        var task = wrapper.Resource.Reader.ReadAsync().AsTask();
-        if (task.Wait(timeoutMs))
+        var reader = wrapper.Resource.Reader;
+
+        if (reader.TryRead(out var value))
         {
-            try
-            {
-                var result = task.GetAwaiter().GetResult();
-                return ChannelReceiveResult.FromValue(result);
-            }
-            catch (InvalidOperationException)
-            {
-                // 任务未完成或被取消
-                return ChannelReceiveResult.Failed;
-            }
+            return ChannelReceiveResult.FromValue(value);
         }
 
-        return ChannelReceiveResult.Failed;
+        // 非阻塞模式下，先检查 Channel 是否已关闭
+        if (timeoutMs == 0)
+        {
+            if (reader.Completion.IsCompleted)
+            {
+                return ChannelReceiveResult.Closed;
+            }
+
+            return ChannelReceiveResult.Failed;
+        }
+
+        try
+        {
+            if (timeoutMs < 0)
+            {
+                return ChannelReceiveResult.FromValue(reader.ReadAsync().AsTask().GetAwaiter().GetResult());
+            }
+
+            var spinWait = new SpinWait();
+            var deadline = Stopwatch.GetTimestamp() + TimeoutToStopwatchTicks(timeoutMs);
+            while (Stopwatch.GetTimestamp() <= deadline)
+            {
+                if (reader.TryRead(out value))
+                {
+                    return ChannelReceiveResult.FromValue(value);
+                }
+
+                if (reader.Completion.IsCompleted)
+                {
+                    return ChannelReceiveResult.Closed;
+                }
+
+                spinWait.SpinOnce();
+            }
+
+            return ChannelReceiveResult.Failed;
+        }
+        catch (ChannelClosedException)
+        {
+            return ChannelReceiveResult.Closed;
+        }
+    }
+
+    private static long TimeoutToStopwatchTicks(int timeoutMs)
+    {
+        if (timeoutMs <= 0)
+        {
+            return 0;
+        }
+
+        return (long)(timeoutMs * (Stopwatch.Frequency / 1000d));
+    }
+
+    /// <summary>
+    /// 检查指定 Channel 是否已关闭
+    /// </summary>
+    public static bool IsChannelClosed(int channelId)
+    {
+        return Channels.TryGetValue(channelId, out var wrapper) && wrapper.Resource.Reader.Completion.IsCompleted;
     }
 
     public static void CloseChannel(int channelId)
@@ -370,7 +485,8 @@ public static class ResourceManager
     public static int CreateReadWriteLock()
     {
         var id = Interlocked.Increment(ref _readWriteLockIdCounter);
-        ReadWriteLocks[id] = new ResourceWrapper<ReaderWriterLockSlim>(new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
+        ReadWriteLocks[id] =
+            new ResourceWrapper<ReaderWriterLockSlim>(new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
         ResourceTypes[id] = ResourceType.ReadWriteLock;
         return id;
     }
@@ -378,6 +494,7 @@ public static class ResourceManager
     public static void AcquireReadLock(int lockId)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         wrapper.Resource.EnterReadLock();
         wrapper.UpdateLastAccessTime();
     }
@@ -391,6 +508,7 @@ public static class ResourceManager
     public static void AcquireWriteLock(int lockId)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         wrapper.Resource.EnterWriteLock();
         wrapper.UpdateLastAccessTime();
     }
@@ -404,22 +522,26 @@ public static class ResourceManager
     public static bool TryAcquireReadLock(int lockId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         bool acquired = wrapper.Resource.TryEnterReadLock(timeoutMs);
         if (acquired)
         {
             wrapper.UpdateLastAccessTime();
         }
+
         return acquired;
     }
 
     public static bool TryAcquireWriteLock(int lockId, int timeoutMs)
     {
         var wrapper = ValidateAndGetResource(lockId, ReadWriteLocks, "读写锁");
+        using var blockingScope = VMThreadPoolCompatibility.EnterBlockingRegion();
         bool acquired = wrapper.Resource.TryEnterWriteLock(timeoutMs);
         if (acquired)
         {
             wrapper.UpdateLastAccessTime();
         }
+
         return acquired;
     }
 
@@ -629,6 +751,12 @@ public static class ResourceManager
     {
         var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
         wrapper.Resource.SetResult(result);
+    }
+
+    public static void SetThreadException(int threadId, Exception exception)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.Resource.SetException(exception);
     }
 
     /// <summary>

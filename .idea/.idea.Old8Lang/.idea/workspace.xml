@@ -21,8 +21,28 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="" />
+    <list default="true" id="ada57470-3172-47cc-9338-704abfb1137a" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/VMExecutionUnitContext.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadPoolCompatibility.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCountDownLatchTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyCountDownLatchTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/VirtualMachine/Concurrency/VMConcurrencyReadWriteLockTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ListLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Collections/ListLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/CountDownLatchImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/CountDownLatchImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/CyclicBarrierImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/CyclicBarrierImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/MutexImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/MutexImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/VMThreadWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/Generic/LangListCountMethod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAddMethod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/InstanceMethods/Implementations/List/ListAddMethod.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,6 +50,9 @@
   </component>
   <component name="DpaMonitoringSettings">
     <option name="firstShow" value="false" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="760" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -41,7 +64,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="6c280c92de11a8b8b046f8bc364d6010e02b27a4" />
+        <entry key="$PROJECT_DIR$" value="001-interpreter-performance" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,18 +74,14 @@
     &quot;state&quot;: &quot;OPEN&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/lijiajunply/Old8Lang.git&quot;,
-    &quot;accountId&quot;: &quot;178fd1c1-455a-4fb0-879b-55b1a7a6f881&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/lijiajunply/Old8Lang.git",
+    "accountId": "178fd1c1-455a-4fb0-879b-55b1a7a6f881"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$USER_HOME$/.jetbrains/acp.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
@@ -72,35 +91,20 @@
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/Baselines/VMNightly/2026-03-01/baseline.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Hotspot_Diagnostic_Report_20260425_112634.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_122811.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Performance_Report_20260301_130659.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260302_013755.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260424_191358.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260425_111231.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Reports/VM_Quick_Performance_Report_20260425_113040.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestEnvironment/o8package.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04eab530f3e74fe4bf9a74715ecc3f0d17e00/6c/4b1e0e94/IPackageConfigurationManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/67/279e01f8/LocalPackageSource.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/7c/6bd13adf/Package.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/be/962039df/IPackageResolver.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0b4469f57e1045c6b0e02e2e57b8ed7511c00/c6/4a506b20/DefaultPackageInstaller.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/05/191a139c/IndexOutOfRangeException.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/0f/47447396/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1e/2b09662c/Exception.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/25/ea5de0f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/3c/3135aca5/ITuple.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/c3/68e5367e/String.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/13/c04ed676/ClassicDesktopStyleApplicationLifetimeExtensions.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/22/ef001b1c/Grid.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3b92f859131bde25d0f7a63de08963e995d1e1426e584dfd4b8e833d2d3dba/ExecutionTimer.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -125,76 +129,59 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;1283e73f-d696-41fc-82f8-bfc626de0827.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;3af05a97-c6e2-49ab-b044-50109a642364.executor&quot;: &quot;Debug&quot;,
-    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;f78aac1c-737b-4818-93b8-88cd934af35e.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;001-interpreter-performance&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.FirstUI.TestApp.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "1283e73f-d696-41fc-82f8-bfc626de0827.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "f78aac1c-737b-4818-93b8-88cd934af35e.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "codex/vm__update",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
-    <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/FirstUI.TestApp/FirstUI.TestApp.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected=".NET 项目.Old8Lang.Benchmarks">
     <configuration name="Old8Lang.App" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net10.0/Old8Lang.App" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -217,9 +204,9 @@
       </method>
     </configuration>
     <configuration name="Old8Lang.Benchmarks" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.Benchmarks/bin/Debug/net10.0/Old8Lang.Benchmarks" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.Benchmarks/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -232,15 +219,15 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
+      <option name="PROJECT_TFM" value="net10.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <configuration name="Old8Lang.LanguageServer" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.LanguageServer/bin/Debug/net10.0/Old8Lang.LanguageServer" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.LanguageServer/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -253,86 +240,16 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.PackageManager" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager/Old8Lang.PackageManager.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.PackageManager.Tests" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager.Tests/Old8Lang.PackageManager.Tests.csproj" />
-      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
-      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
-      <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Old8Lang.FirstUI.FirstUIBinding.Initialize" type="DotNetStaticMethod" factoryName=".NET Static Method" temporary="true">
-      <option name="EXE_PATH" value="$APPLICATION_HOME_DIR$/lib/ReSharperHost/JetLauncherILc.exe" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="ENV_FILE_PATHS" value="" />
-      <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="PROJECT_PATH" value="$PROJECT_DIR$/FirstUI/FirstUI.csproj" />
       <option name="PROJECT_TFM" value="net10.0" />
-      <option name="CLASS_NAME" value="Old8Lang.FirstUI.FirstUIBinding" />
-      <option name="METHOD_NAME" value="Initialize" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <list>
-      <item itemvalue=".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize" />
-      <item itemvalue=".NET 项目.FirstUI.TestApp" />
       <item itemvalue=".NET 项目.Old8Lang.LanguageServer" />
-      <item itemvalue=".NET 项目.Old8Lang.PackageManager" />
-      <item itemvalue=".NET 项目.Old8Lang.PackageManager.Tests" />
       <item itemvalue=".NET 项目.Old8Lang.Benchmarks" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue=".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -596,6 +513,12 @@
       <workItem from="1771912573218" duration="2766000" />
       <workItem from="1771936929558" duration="1352000" />
       <workItem from="1771992969295" duration="688000" />
+      <workItem from="1772335461211" duration="4496000" />
+      <workItem from="1772340986312" duration="4289000" />
+      <workItem from="1772378960908" duration="240000" />
+      <workItem from="1772379564921" duration="6770000" />
+      <workItem from="1772455289741" duration="912000" />
+      <workItem from="1777086360262" duration="6446000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -940,7 +863,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="957" />
+    <option name="localTasksCounter" value="971" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -967,20 +890,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 添加性能监控功能和基准测试框架&#10;&#10;- 在LangInterpreter中集成IPerformanceMonitor接口支持性能监控&#10;- 创建PerformanceMetrics数据模型用于存储解释器执行的性能统计数据&#10;- 实现函数调用、变量查找、循环迭代等性能指标记录功能&#10;- 添加FunctionCallBenchmark和LoopExecutionBenchmark基准测试&#10;- 创建InterpreterBenchmarkBase作为解释器基准测试基类&#10;- 添加nested-loops.old8性能测试脚本用于100x100循环测试&#10;- 在workspace.xml中更新任务计数器和变更列表记录" />
-    <MESSAGE value="docs(specs): 添加解释器性能基线测试文档&#10;&#10;- 创建 baseline-results.md 记录性能基线测试结果&#10;- 定义变量查找、循环执行、函数调用等测试项目&#10;- 设立小型脚本、中等规模程序、长时间运行性能目标&#10;- 添加测试环境配置和注意事项说明&#10;- 规划后续优化步骤包括变量查找缓存和作用域链扁平化&#10;- 更新 IDE 配置文件排除反编译缓存文件&#10;- 修复性能监控器中的并发安全问题&#10;- 重构工作区变更列表和提交历史记录" />
-    <MESSAGE value="perf(interpreter): 实现变量缓存和循环性能监控功能&#10;&#10;- 添加 VariableCache 类实现 LRU 缓存策略，最大支持 1000 条目&#10;- 在 VariateManager 中集成增强缓存，提升变量查找性能&#10;- 实现全局变量快速查找表，优化全局变量访问速度&#10;- 在 ForStatement 和 WhileStatement 中添加循环迭代监控&#10;- 添加 IsSimpleCountingLoop 方法用于简单循环模式检测&#10;- 创建 VariableCacheTests 单元测试验证缓存功能正确性&#10;- 更新任务进度文档标记已完成的功能模块&#10;- 在 LangInterpreter 中集成 PerformanceMonitor 性能监控&#10;- 实现缓存命中率统计和作用域级别清理功能" />
-    <MESSAGE value="perf(interpreter): 优化变量查找和循环性能并移除废弃测试&#10;&#10;- 添加 PerformanceOptimizationTests 测试类验证性能改进效果&#10;- 移除废弃的数组 Length() 方法测试代码&#10;- 修正 NetLibTests 中的 Json 序列化函数调用方式&#10;- 更新 IDE 配置文件中的任务计数器和变更列表记录&#10;- 重构工作区配置文件的 XML 格式和实体编码&#10;- 添加 cache-test.old8 性能测试脚本验证变量查找和嵌套循环性能" />
-    <MESSAGE value="perf(interpreter): 添加性能监控构造函数并实现性能测试框架&#10;&#10;- 在LangInterpreter中添加带IPerformanceMonitor参数的构造函数&#10;- 添加性能监控器依赖注入支持&#10;- 实现SmallScriptPerformanceTests性能测试类验证50行脚本执行时间&#10;- 创建LoopExecutionPerformanceTests测试循环执行性能和缓存命中率&#10;- 添加VariableLookupPerformanceTests测试变量查找性能和缓存效率&#10;- 更新配置文件添加性能测试脚本路径和监控命令&#10;- 标记性能基线任务为已完成状态" />
-    <MESSAGE value="perf(interpreter): 优化性能监控器缓存统计和更新测试用例语法&#10;&#10;- 添加全局缓存命中和未命中计数器优化统计精度&#10;- 实现条件缓存命中率计算优先使用全局统计而非作用域统计&#10;- 在变量查找时更新全局缓存统计并在重置时清零计数器&#10;- 更新性能测试用例中的赋值语法从=改为&lt;-操作符&#10;- 将for循环语法从传统括号格式改为逗号分隔格式&#10;- 重命名function关键字为func以符合语言规范&#10;- 更新IDE配置文件中的变更记录和任务计数器&#10;- 修正性能测试脚本中的循环语法和变量声明方式" />
-    <MESSAGE value="perf(benchmark): 更新解析器性能测试报告&#10;&#10;- 添加了详细的性能指标数据，包括平均值、误差、标准差、中位数等&#10;- 新增内存分配统计信息，包含Gen0、Gen1、Gen2垃圾回收统计&#10;- 更新了HTML报告标题中的时间戳&#10;- 扩展了测试用例覆盖范围，增加深度嵌套表达式解析等场景&#10;- 补充了并发解析和语法错误处理的性能数据&#10;- 完善了大文件解析的基准测试结果" />
-    <MESSAGE value="perf(interpreter): 添加中等规模程序和递归调用性能测试&#10;&#10;- 创建 medium-program-1000lines.old8 测试脚本包含数学函数、数组处理、字符串操作等&#10;- 添加 recursive-calls.old8 测试脚本验证递归深度和性能表现&#10;- 实现 MediumProgramPerformanceTests 验证千行程序执行时间小于2秒&#10;- 创建 RecursiveCallPerformanceTests 确保支持至少100层递归深度&#10;- 添加精简版 medium-program-simple.old8 用于快速性能验证&#10;- 更新IDE配置文件中的变更记录和任务计数器统计" />
-    <MESSAGE value="fix(interpreter): 解决扩展方法导致的栈溢出和方法查找问题&#10;&#10;- 修改 ExtensionDeclaration 映射内置类型到正确的 LangValue 类型&#10;- 在 ExtensionMethodWrapper 中添加递归检测机制防止栈溢出&#10;- 实现内置方法优先级高于扩展方法的查找逻辑&#10;- 确保方法名匹配区分大小写避免 toStr 和 ToStr 冲突&#10;- 添加扩展方法标识属性用于方法查找优先级判断&#10;- 修复实例方法重载组中内置方法优先匹配的逻辑&#10;- 更新方法注册表使用大小写敏感的字符串比较器&#10;- 在 VariateManager 中添加扩展方法调用栈跟踪功能" />
-    <MESSAGE value="fix(interpreter): 修复扩展方法执行中的返回值处理和方法查找问题&#10;&#10;- 移除 ExtensionMethodWrapper 中的调试空检查代码&#10;- 修改返回值处理逻辑，先获取结果再清除返回状态&#10;- 将测试代码中的 Count() 方法调用改为 len() 函数调用&#10;- 修复 LangValueType 中 FromClassToResult 方法调用传递 manager 参数&#10;- 在 ListLangValue 中添加 Count() 方法的特殊处理逻辑&#10;- 更新 .claude 配置文件添加 powershell.exe 路径排除&#10;- 更新 IDE 工作区配置文件中的变更列表和任务计数器" />
-    <MESSAGE value="feat(cli): 添加性能监控功能和CLI选项&#10;&#10;- 实现性能监控器，可追踪执行时间、内存使用、函数调用等指标&#10;- 添加 --perf、--perf-detailed、--perf-output CLI选项用于性能分析&#10;- 在文档中添加性能监控相关的使用说明和示例&#10;- 优化ForStatement循环变量作用域，防止外层变量污染&#10;- 实现函数引用缓存机制，提升函数调用性能&#10;- 支持嵌套函数定义和局部作用域管理&#10;- 添加性能报告生成器，支持文本、JSON、CSV格式输出&#10;- 实现对象池统计和内存稳定性测试&#10;- 添加长期运行性能测试和内存泄漏检测" />
-    <MESSAGE value="test(cli): 添加性能监控集成测试&#10;&#10;- 创建 PerformanceMonitoringTests 类验证 --perf、--perf-detailed、--perf-output 功能&#10;- 实现执行指标收集、函数指标收集、文本格式报告生成功能测试&#10;- 添加 JSON 和 CSV 格式报告生成及文件保存功能测试&#10;- 集成内存跟踪和对象池统计功能验证&#10;- 更新 CI/CD 工作流添加性能回归测试步骤&#10;- 完成规格文档中的性能监控集成测试任务" />
-    <MESSAGE value="feat(lang): 实现字典实例方法调用和改进性能监控&#10;&#10;- 在 DictionaryLangValue 中集成 InstanceMethodRegistry 支持实例方法调用&#10;- 为 Old8Exception.CurrentInterpreter 添加 ThreadStatic 特性避免并行测试污染&#10;- 重构 FirstUIBinding 确保上下文初始化和 Toast 容器清理逻辑&#10;- 在 GlobalFunctionInitializer 中注册反射函数的独立别名实现向后兼容&#10;- 修复 LangListJoinMethod 使用 ToDisplayString 替代 ToString 方法&#10;- 扩展 LangListReduceMethod 支持 initialValue 参数和累加器初始化&#10;- 增强 LangListSortByMethod 支持比较器模式和键选择器模式排序&#10;- 添加 ReflectionAliasFunctions 实现 GetClassName、GetClassMethods 等别名函数&#10;- 在 SelectiveImportTests 中添加延迟加载数学模块测试用例&#10;- 调整 SmallScriptPerformanceTests 性能监控开销阈值到 50%&#10;- 为 TypeChecker 和 TypeTemplate 添加线程静态字段避免测试污染&#10;- 在 UnexpectedInputsTests 中跳过导致 CLR 崩溃的栈溢出测试&#10;- 更新 FirstUI.TestApp 使用 FirstUIApplication.Run 方法入口点" />
-    <MESSAGE value="删除FirstUI" />
     <MESSAGE value="fix(runtime): 修复方法执行时字段修改标记管理和循环引用问题&#10;&#10;- 在方法执行开始时清空 FieldsModifiedBySetField 修改标记&#10;- 在方法执行结束时再次清空 FieldsModifiedBySetField 修改标记&#10;- 为 ToString 方法添加循环引用检测机制防止无限递归&#10;- 修改 Equals 方法实现使其正确处理 NullLangValue 比较&#10;- 更新扩展方法测试中的关键字从 list 改为 array&#10;- 清理 IDE 配置文件中的无用变更记录" />
     <MESSAGE value="refactor(reflection): 移除废弃的反射函数别名实现&#10;&#10;- 删除了 GetClassName, GetClassMethods, GetClassFields 等独立别名函数注册&#10;- 移除了 HasMethod, HasField 函数的单独注册&#10;- 清理了 ReflectionAliasFunctions.cs 文件中的所有别名函数实现&#10;- 保留了合并后的统一反射函数 GetClassInfoFunction 和 GetMemberInfoFunction&#10;- 移除了注释掉的重载示例函数代码" />
     <MESSAGE value="docs(summary): 删除实例方法重载功能实现总结文档&#10;&#10;- 移除了 INSTANCE_METHOD_OVERLOAD_SUMMARY.md 文件&#10;- 更新了 workspace.xml 中的变更列表&#10;- 调整了本地任务计数器数值&#10;- 清理了提交历史中的相关消息记录" />
@@ -992,7 +901,21 @@
     <MESSAGE value="refactor(dictionary): 重构字典和列表方法以支持语言值类型&#10;&#10;- 修改 DictContainsKeyMethod 支持 DictionaryLangValue 和系统字典接口&#10;- 添加 ConvertToLangValue 方法用于将对象转换为语言值类型&#10;- 更新 DictCountMethod 支持 DictionaryLangValue 类型&#10;- 修改 ListAddMethod 支持 ListLangValue 类型并添加值转换逻辑&#10;- 统一异常消息为更通用的类型检查提示" />
     <MESSAGE value="test(vm): 更新虚拟机模块导入测试&#10;&#10;- 为 VMImportTests 类添加 [Collection(&quot;Sequential&quot;)] 属性以确保顺序执行&#10;- 修改字符串拆分逻辑，使用 ['\r', '\n'] 替代 Environment.NewLine 进行分行符分割&#10;- 保持测试断言逻辑不变，确保输出行数和内容验证正常工作" />
     <MESSAGE value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(VM): 添加反射函数类型错误测试用例&#10;&#10;- 修改测试用例验证对非类实例使用反射函数时抛出类型异常&#10;- 移除原有的正常反射功能测试代码&#10;- 使用 AssertVMThrowsTypeException 验证类型错误处理" />
+    <MESSAGE value="perf(vm): 优化虚拟机函数调用性能&#10;&#10;- 为函数调用添加函数索引支持以提高查找速度&#10;- 重构参数归一化逻辑以提升函数调用效率&#10;- 实现函数调用分发机制分离以减少重复代码&#10;- 添加模块符号缓存机制以加速模块符号访问&#10;- 优化算术运算指令执行性能&#10;- 改进异步函数调用的参数处理流程&#10;- 移除过时的函数调用指令实现代码&#10;- 添加函数调用过程中的类型验证功能&#10;- 实现闭包和普通函数调用的统一处理机制&#10;- 优化调用帧执行循环以减少性能开销" />
+    <MESSAGE value="test(vm): 添加虚拟机指令操作数兼容性测试并生成性能对比报告&#10;&#10;- 新增 VMCallAsyncOperandCompatibilityTests 测试类验证异步调用指令兼容性&#10;- 新增 VMCallOperandCompatibilityTests 测试类验证函数调用指令兼容性&#10;- 添加辅助方法 GetIntValue 支持多种数值类型转换&#10;- 实现对新旧操作数格式的兼容性验证&#10;- 添加函数索引回退到函数名称的功能测试&#10;- 生成 VM 性能对比报告包含吞吐量和内存分配指标&#10;- 添加性能验收阈值检查功能" />
+    <MESSAGE value="refactor(benchmark): 重构 VM 基准测试报告生成机制&#10;&#10;- 将 VM 性能报告生成改为解析 BenchmarkDotNet 产物&#10;- 添加 --vm-report 参数支持生成 Markdown 和 JSON 格式报告&#10;- 创建 VMBenchmarkConfig 配置类禁用优化校验&#10;- 实现 CSV 解析功能从 BenchmarkDotNet 结果生成性能报告&#10;- 添加 VMPerformanceReportTests 测试类验证报告生成功能&#10;- 统一 --vm 和 --vm-report 参数处理流程&#10;- 移除旧的 VM 性能测试执行代码" />
+    <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制" />
+    <MESSAGE value="feat(benchmark): 添加扩展 VM 性能基准测试与报告功能&#10;&#10;- 在 Program.cs 中添加 --vm-extended 和 --vm-report-extended 参数支持&#10;- 实现 RunExtendedVmBenchmarksAndOptionalReport 方法用于运行扩展基准测试&#10;- 新增 VMExtendedPerformanceBenchmarks 类包含大文件、边缘场景和并发测试&#10;- 添加 TestDataGenerator.GenerateVmLargeScript 方法生成大文件测试脚本&#10;- 创建 VMConcurrencyPerformanceTests 和 VMEdgePerformanceTests 单元测试&#10;- 新增 VMLargeFilePerformanceTests 测试大文件编译执行性能&#10;- 扩展 VMPerformanceReport 类支持生成扩展性能报告&#10;- 实现扩展报告的 JSON 序列化和 Markdown 输出功能&#10;- 添加基准线对比和软门限检查机制&#10;- 生成 VM 性能报告的 JSON 和 Markdown 文件格式&#10;- 更新 IDE 配置文件中的变更列表和任务计数器设置" />
+    <MESSAGE value="test(vm): 启用虚拟机相关功能的单元测试&#10;&#10;- 移除 VMExceptionTests 中嵌套异常测试的跳过标记&#10;- 移除 VMListTests 中列表添加和删除操作测试的跳过标记&#10;- 移除 VMStringOperationTests 中字符串子串和索引查找测试的跳过标记&#10;- 更新单元测试配置以确保测试正常运行" />
+    <MESSAGE value="feat(benchmark): 添加VM基准测试命令解析和多层级性能报告功能&#10;&#10;- 实现BenchmarkArgumentParser用于解析多种VM基准测试命令参数&#10;- 添加VMQuickPerformanceBenchmarks和VMNightlyPerformanceBenchmarks两类基准测试&#10;- 集成CI/CD工作流支持PR/Push场景的快速基准测试和夜间完整基准测试&#10;- 实现多层级VM性能报告生成功能包括Quick、Nightly等不同报告类型&#10;- 添加基准测试结果验证机制和性能回归检测功能&#10;- 更新文档说明各种VM基准测试命令的使用方法" />
+    <MESSAGE value="refactor(benchmarks): 重构基准测试项目结构并移除废弃测试文件&#10;&#10;- 将基准测试入口逻辑分离到独立的 Entry 目录中&#10;- 创建新的命令行参数解析器和命令枚举类型&#10;- 实现新的基准测试主程序入口点和命令分发逻辑&#10;- 移除旧的高级性能测试和编译器基准测试文件&#10;- 创建新的解释器基准测试基类并调整命名空间&#10;- 更新测试数据生成工具的命名空间和路径配置&#10;- 重新组织基准测试项目的整体架构和目录结构" />
+    <MESSAGE value="perf(vm): 优化虚拟机调用帧和闭包环境性能&#10;&#10;- CallFrame 改为惰性分配 DeferStack，减少无 defer 函数的固定对象分配&#10;- 实现局部变量数组池化复用，通过 ArrayPool&lt;object?&gt; 减少内存分配压力&#10;- 引入链式闭包环境 ClosureEnvironment 替代字典拷贝，支持嵌套闭包变量查找&#10;- 添加 CallFrame 构造函数重载，支持外部提供局部变量数组和池化标识&#10;- 优化 defer 指令执行逻辑，使用 TryPopDefer 方法替代直接访问栈&#10;- 在函数调用完成后归还局部变量数组到池中，实现内存复用&#10;- 更新模块系统中闭包创建逻辑，使用新的闭包环境构造方式&#10;- 性能基准测试显示大闭包捕获场景内存分配下降约 23.1%" />
+    <MESSAGE value="perf(benchmark): 优化基准测试报告去重和聚合视图&#10;&#10;- 添加 Job 字段到 TieredScenarioResult 记录类型&#10;- 实现 TieredAggregatedScenarioResult 记录类型用于聚合数据&#10;- 添加按 Scenario 分组的聚合功能，计算中位数值&#10;- 在 Markdown 报告中增加 Per-Job Details 和 Scenario Aggregate 视图&#10;- 更新基线查找逻辑，支持按 (Scenario, Job) 键查找&#10;- 实现多作业场景的状态评估和最差状态选择&#10;- 添加中位数计算辅助方法用于聚合统计&#10;- 更新测试用例验证多作业场景的报告生成" />
+    <MESSAGE value="perf(vm): 优化虚拟机性能提升闭包和函数调用效率&#10;&#10;- 为 ClosureEnvironment 实现 FrozenDictionary 优化，对大捕获集使用不可变字典提升查找性能&#10;- 添加内联方法 TryGetLocalValue 优化闭包变量本地查找路径&#10;- 在 FunctionMetadata 中预计算参数类型分类缓存，实现快速调用路径&#10;- 重构虚拟机调用分发逻辑，为位置参数调用实现专用快速路径&#10;- 优化参数类型验证，在 fast path 中集成类型检查逻辑&#10;- 更新性能基准报告，验证各项优化效果" />
+    <MESSAGE value="feat(bytecode): 添加特殊语句的字节码生成支持&#10;&#10;- 实现 Select 语句的字节码生成，支持 Channel 多路选择功能&#10;- 实现 Defer 语句的字节码生成，支持延迟执行机制&#10;- 实现 EnumInit 的字节码生成，支持枚举定义&#10;- 实现 ExternStatement 的字节码生成，支持外部函数导入&#10;- 实现 UsingStatement 的字节码生成，支持自动资源管理&#10;- 添加完整的 OpCode 枚举定义，涵盖栈操作、算术运算、控制流等功能&#10;- 实现并发原语相关的字节码指令，包括 Channel、Mutex、Semaphore 等&#10;- 添加异常处理和特殊指令的 OpCode 定义&#10;- 实现 ResourceManager 类，统一管理并发资源" />
+    <MESSAGE value="feat(benchmark): 添加VM诊断命令和基准测试框架重构&#10;&#10;- 添加 --vm-diagnose 命令用于运行VM热点诊断&#10;- 创建BenchmarkCommand枚举统一管理所有基准测试命令类型&#10;- 添加完整的基准测试参数解析器和程序入口逻辑&#10;- 实现多种VM基准测试模式（常规、扩展、快速、夜间构建）&#10;- 集成性能报告生成功能和诊断工具&#10;- 添加字节码编译器核心功能实现" />
+    <MESSAGE value="feat(benchmark): 添加性能基准测试框架和并发功能优化&#10;&#10;- 新增 BenchmarkArgumentParser 命令行参数解析器&#10;- 添加 BenchmarkCommand 枚举定义各种基准测试命令&#10;- 实现 BenchmarkProgram 入口程序支持多种测试模式&#10;- 重构 ChannelFunctions 中的通道接收逻辑提高可靠性&#10;- 使用 SemaphoreSlim 替换 Monitor 优化 MutexImpl 并发性能&#10;- 添加 Rider 用户配置文件排除反编译缓存文件检查" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(benchmark): 添加性能基准测试框架和并发功能优化&#10;&#10;- 新增 BenchmarkArgumentParser 命令行参数解析器&#10;- 添加 BenchmarkCommand 枚举定义各种基准测试命令&#10;- 实现 BenchmarkProgram 入口程序支持多种测试模式&#10;- 重构 ChannelFunctions 中的通道接收逻辑提高可靠性&#10;- 使用 SemaphoreSlim 替换 Monitor 优化 MutexImpl 并发性能&#10;- 添加 Rider 用户配置文件排除反编译缓存文件检查" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

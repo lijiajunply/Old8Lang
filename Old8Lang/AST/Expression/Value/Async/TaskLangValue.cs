@@ -35,10 +35,8 @@ public partial class TaskLangValue : LangValueType
 {
     public readonly Task<LangValueType> Task;
     private readonly CancellationToken _cancellationToken;
-    private TaskStatus _status = TaskStatus.Pending;
     private LangValueType? _result;
     private Exception? _exception;
-    private readonly Lock _lock = new();
 
     /// <summary>
     /// 外部变量管理器，用于访问外部作用域和Interpreter
@@ -73,54 +71,6 @@ public partial class TaskLangValue : LangValueType
     {
         Task = task;
         _cancellationToken = cancellationToken;
-
-        // 注册任务状态变化的回调
-        Task.ContinueWith(t =>
-        {
-            lock (_lock)
-            {
-                if (t.IsCanceled)
-                {
-                    _status = TaskStatus.Canceled;
-                    _exception = new OperationCanceledException("任务被取消");
-                }
-                else if (t.IsFaulted)
-                {
-                    _status = TaskStatus.Failed;
-                    _exception = t.Exception?.InnerException ?? t.Exception;
-                }
-                else if (t.IsCompletedSuccessfully)
-                {
-                    _status = TaskStatus.Completed;
-                    _result = t.Result;
-                }
-            }
-        });
-
-        // 如果任务已经开始执行，更新状态为Running
-        if (Task.Status == System.Threading.Tasks.TaskStatus.Running)
-        {
-            lock (_lock)
-            {
-                _status = TaskStatus.Running;
-            }
-        }
-
-        // 注册取消回调
-        if (_cancellationToken.CanBeCanceled)
-        {
-            _cancellationToken.Register(() =>
-            {
-                lock (_lock)
-                {
-                    if (_status == TaskStatus.Pending || _status == TaskStatus.Running)
-                    {
-                        _status = TaskStatus.Canceled;
-                        _exception = new OperationCanceledException("任务被取消");
-                    }
-                }
-            });
-        }
     }
 
     /// <summary>
@@ -135,13 +85,8 @@ public partial class TaskLangValue : LangValueType
             // 同步等待任务完成并获取结果
             var result = Task.Result;
 
-            // 更新缓存状态
-            lock (_lock)
-            {
-                _status = TaskStatus.Completed;
-                _result = result;
-                _exception = null;
-            }
+            _result = result;
+            _exception = null;
 
             return result;
         }
@@ -149,12 +94,8 @@ public partial class TaskLangValue : LangValueType
         {
             // 展开 AggregateException，抛出内部异常
             var innerException = aggEx.InnerException ?? aggEx;
-            lock (_lock)
-            {
-                _status = innerException is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
-                _exception = innerException;
-                _result = null;
-            }
+            _exception = innerException;
+            _result = null;
 
             // 将标准异常包装为Old8Exception
             if (innerException is Old8Exception old8Ex)
@@ -166,12 +107,8 @@ public partial class TaskLangValue : LangValueType
         }
         catch (Exception ex)
         {
-            lock (_lock)
-            {
-                _status = ex is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
-                _exception = ex;
-                _result = null;
-            }
+            _exception = ex;
+            _result = null;
 
             // 将标准异常包装为Old8Exception
             if (ex is Old8Exception old8Ex)
@@ -207,15 +144,6 @@ public partial class TaskLangValue : LangValueType
             // 检查取消请求
             _cancellationToken.ThrowIfCancellationRequested();
 
-            // 确保任务状态更新为 Running
-            lock (_lock)
-            {
-                if (_status == TaskStatus.Pending)
-                {
-                    _status = TaskStatus.Running;
-                }
-            }
-
             LangValueType result;
             if (timeoutMs <= 0)
             {
@@ -241,37 +169,22 @@ public partial class TaskLangValue : LangValueType
                 result = await Task;
             }
 
-            // 线程安全地更新完成状态
-            lock (_lock)
-            {
-                _status = TaskStatus.Completed;
-                _result = result;
-                _exception = null;
-            }
+            _result = result;
+            _exception = null;
 
             return result;
         }
         catch (OperationCanceledException ex)
         {
-            // 任务被取消
-            lock (_lock)
-            {
-                _status = TaskStatus.Canceled;
-                _exception = ex;
-                _result = null;
-            }
+            _exception = ex;
+            _result = null;
 
             throw;
         }
         catch (Exception ex)
         {
-            // 其他异常
-            lock (_lock)
-            {
-                _status = TaskStatus.Failed;
-                _exception = ex;
-                _result = null;
-            }
+            _exception = ex;
+            _result = null;
 
             throw;
         }
@@ -302,52 +215,32 @@ public partial class TaskLangValue : LangValueType
     /// <returns>任务结果</returns>
     public async Task<LangValueType> AwaitAsync(CancellationToken externalCancellationToken)
     {
-        // 创建组合取消令牌源
-        using var linkedCts =
-            CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, externalCancellationToken);
+        if (!_cancellationToken.CanBeCanceled)
+        {
+            externalCancellationToken.ThrowIfCancellationRequested();
+            return await Task.WaitAsync(externalCancellationToken);
+        }
+
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, externalCancellationToken);
 
         try
         {
-            // 检查取消请求
             linkedCts.Token.ThrowIfCancellationRequested();
 
-            // 确保任务状态更新为 Running
-            lock (_lock)
-            {
-                if (_status == TaskStatus.Pending)
-                {
-                    _status = TaskStatus.Running;
-                }
-            }
-
-            // 等待任务完成
-            var result = await Task;
-
-            lock (_lock)
-            {
-                _status = TaskStatus.Completed;
-                _result = result;
-            }
+            var result = await Task.WaitAsync(linkedCts.Token);
+            _result = result;
+            _exception = null;
 
             return result;
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            lock (_lock)
-            {
-                _status = TaskStatus.Canceled;
-            }
-
+            _exception = ex;
             throw;
         }
         catch (Exception ex)
         {
-            lock (_lock)
-            {
-                _status = TaskStatus.Failed;
-                _exception = ex;
-            }
-
+            _exception = ex;
             throw;
         }
     }
@@ -357,14 +250,7 @@ public partial class TaskLangValue : LangValueType
     /// </summary>
     public bool IsCompleted
     {
-        get
-        {
-            lock (_lock)
-            {
-                return _status == TaskStatus.Completed || _status == TaskStatus.Failed ||
-                       _status == TaskStatus.Canceled;
-            }
-        }
+        get => Task.IsCompleted;
     }
 
     /// <summary>
@@ -374,10 +260,26 @@ public partial class TaskLangValue : LangValueType
     {
         get
         {
-            lock (_lock)
+            if (_cancellationToken.IsCancellationRequested || Task.IsCanceled)
             {
-                return _status;
+                return TaskStatus.Canceled;
             }
+
+            if (Task.IsFaulted)
+            {
+                return TaskStatus.Failed;
+            }
+
+            if (Task.IsCompletedSuccessfully)
+            {
+                return TaskStatus.Completed;
+            }
+
+            return Task.Status == System.Threading.Tasks.TaskStatus.Created ||
+                   Task.Status == System.Threading.Tasks.TaskStatus.WaitingForActivation ||
+                   Task.Status == System.Threading.Tasks.TaskStatus.WaitingToRun
+                ? TaskStatus.Pending
+                : TaskStatus.Running;
         }
     }
 
@@ -396,18 +298,15 @@ public partial class TaskLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        lock (_lock)
+        return Status switch
         {
-            return _status switch
-            {
-                TaskStatus.Pending => "Task(Status: Pending)",
-                TaskStatus.Running => "Task(Status: Running)",
-                TaskStatus.Completed => $"Task(Completed: {_result?.ToString() ?? "void"})",
-                TaskStatus.Failed => $"Task(Failed: {_exception?.ToString() ?? "Unknown error"})",
-                TaskStatus.Canceled => "Task(Canceled)",
-                _ => "Task(Status: Unknown)"
-            };
-        }
+            TaskStatus.Pending => "Task(Status: Pending)",
+            TaskStatus.Running => "Task(Status: Running)",
+            TaskStatus.Completed => $"Task(Completed: {_result?.ToString() ?? "void"})",
+            TaskStatus.Failed => $"Task(Failed: {_exception?.ToString() ?? Task.Exception?.ToString() ?? "Unknown error"})",
+            TaskStatus.Canceled => "Task(Canceled)",
+            _ => "Task(Status: Unknown)"
+        };
     }
 
     /// <summary>

@@ -1,0 +1,347 @@
+using Old8Lang.Benchmarks.Benchmarks.VM.Reports;
+using Xunit;
+
+namespace Old8Lang.Benchmarks.Tests;
+
+public class VMPerformanceReportTests : IDisposable
+{
+    private readonly string _tempRoot;
+
+    public VMPerformanceReportTests()
+    {
+        _tempRoot = Path.Combine(Path.GetTempPath(), "vm-report-tests-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(_tempRoot);
+    }
+
+    [Fact]
+    public void GenerateFromBenchmarkArtifacts_WithValidCsv_GeneratesMarkdownAndJson()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts");
+        var reportsDir = Path.Combine(_tempRoot, "reports");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMModePerformanceBenchmarks-report.csv");
+        File.WriteAllText(csvPath, BuildSampleCsv());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        Assert.True(File.Exists(markdownPath));
+        Assert.True(File.Exists(jsonPath));
+
+        var markdown = File.ReadAllText(markdownPath);
+        Assert.Contains("Old8Lang VM Performance Report", markdown);
+        Assert.Contains("VM_ArithmeticLoop", markdown);
+        Assert.Contains("30.508", markdown);
+        Assert.Contains("3690045", markdown);
+        Assert.Contains("N/A", markdown);
+    }
+
+    [Fact]
+    public void GenerateExtendedFromBenchmarkArtifacts_WithValidCsv_GeneratesExtendedReports()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-extended");
+        var reportsDir = Path.Combine(_tempRoot, "reports-extended");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMExtendedPerformanceBenchmarks-report.csv");
+        File.WriteAllText(csvPath, BuildExtendedCsv());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("Old8Lang Extended VM Performance Report", markdown);
+        Assert.Contains("## Concurrency", markdown);
+        Assert.Contains("Threshold(%)", markdown);
+        Assert.Contains("\"Category\": \"Concurrency\"", json);
+        Assert.Contains("\"Status\": \"N/A\"", json);
+    }
+
+    [Fact]
+    public void GenerateExtendedFromBenchmarkArtifacts_WithCategoryThresholds_AssignsExpectedStatus()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-extended-baseline");
+        var reportsDir = Path.Combine(_tempRoot, "reports-extended-baseline");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselineJsonPath = Path.Combine(reportsDir, "VM_Extended_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselineJsonPath, BuildThresholdBaselineJson());
+        File.SetLastWriteTimeUtc(baselineJsonPath, DateTime.UtcNow.AddMinutes(-1));
+
+        var csvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMExtendedPerformanceBenchmarks-report.csv");
+        File.WriteAllText(csvPath, BuildThresholdCsv());
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateExtendedFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("\"Scenario\": \"VMX_LargeFile_CompileOnly_10k\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 8", json);
+        Assert.Contains("\"Status\": \"FAIL\"", json);
+
+        Assert.Contains("\"Scenario\": \"VMX_Edge_HighArgCount_CallHotPath\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 10", json);
+
+        Assert.Contains("\"Scenario\": \"VMX_Concurrency_Channel_SPSC_Throughput\"", json);
+        Assert.Contains("\"RegressionThresholdPercent\": 12", json);
+    }
+
+    [Fact]
+    public void GenerateQuickAndNightlyReports_ProducesFilesAndNightlyFailCanBeDetected()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-nightly");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-nightly");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var quickBaseline = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(quickBaseline, "{\"Scenarios\":[]}");
+        File.SetLastWriteTimeUtc(quickBaseline, DateTime.UtcNow.AddMinutes(-2));
+
+        var nightlyBaseline = Path.Combine(reportsDir, "VM_Nightly_Performance_Report_20260101_000000.json");
+        File.WriteAllText(nightlyBaseline, BuildNightlyBaselineJson());
+        File.SetLastWriteTimeUtc(nightlyBaseline, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickCsv());
+
+        var nightlyCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMNightlyPerformanceBenchmarks-report.csv");
+        File.WriteAllText(nightlyCsvPath, BuildNightlyCsvWithFail());
+
+        var (quickMd, quickJson) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var (nightlyMd, nightlyJson) = VMPerformanceReport.GenerateNightlyFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        Assert.True(File.Exists(quickMd));
+        Assert.True(File.Exists(quickJson));
+        Assert.True(File.Exists(nightlyMd));
+        Assert.True(File.Exists(nightlyJson));
+        Assert.True(VMPerformanceReport.HasFailStatus(nightlyJson));
+    }
+
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithNaScenarioAndLog_ProducesFailAndFailureReason()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-fail-reason");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-fail-reason");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickCsvWithNaScenario());
+
+        var quickLogPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-20260302-001859.log");
+        File.WriteAllText(quickLogPath, BuildQuickFailureLog());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("VMXQ_Concurrency_Channel_MPMC_4Workers", markdown);
+        Assert.Contains("| FAIL |", markdown);
+        Assert.Contains("FailureReason", markdown);
+        Assert.Contains("Old8Lang.Error.InvalidOperationError", markdown);
+
+        Assert.Contains("\"Scenario\": \"VMXQ_Concurrency_Channel_MPMC_4Workers\"", json);
+        Assert.Contains("\"Status\": \"FAIL\"", json);
+        Assert.Contains("\"FailureReason\":", json);
+        Assert.Contains("ChannelSend", json);
+        Assert.Contains("The asynchronous operation has not completed.", json);
+        Assert.True(VMPerformanceReport.HasFailStatus(jsonPath));
+    }
+
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithSameScenarioMultipleJobs_ProducesPerJobAndAggregateViews()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-quick-multi-job");
+        var reportsDir = Path.Combine(_tempRoot, "reports-quick-multi-job");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickMultiJobBaselineJson());
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickMultiJobCsv());
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var markdown = File.ReadAllText(markdownPath);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("Per-Job Details", markdown);
+        Assert.Contains("Scenario Aggregate (Median)", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | Job-A |", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | Job-B |", markdown);
+        Assert.Contains("| VMXQ_Edge_HighArgCount_CallHotPath | 2 |", markdown);
+
+        Assert.Contains("\"Job\": \"Job-A\"", json);
+        Assert.Contains("\"Job\": \"Job-B\"", json);
+        Assert.Contains("\"AggregatedScenarios\":", json);
+        Assert.Contains("\"JobCount\": 2", json);
+    }
+
+    [Fact]
+    public void GenerateFromBenchmarkArtifacts_WhenCsvMissing_ThrowsFileNotFoundException()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "missing-artifacts");
+        var reportsDir = Path.Combine(_tempRoot, "missing-reports");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var exception = Assert.Throws<FileNotFoundException>(() =>
+            VMPerformanceReport.GenerateFromBenchmarkArtifacts(artifactsDir, reportsDir));
+
+        Assert.Contains("未找到 VM BenchmarkDotNet 报告 CSV", exception.Message);
+    }
+
+    private static string BuildSampleCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VM_ArithmeticLoop,DefaultJob,.NET 10.0,3,8,30.508 ms,1.337 ms,3603.56 KB",
+            "VM_DenseFunctionCall,DefaultJob,.NET 10.0,3,8,115.061 ms,2.113 ms,8403.61 KB",
+            "VM_DefaultAndNamedArgs,DefaultJob,.NET 10.0,3,8,54.248 ms,3.667 ms,9834.78 KB");
+    }
+
+    private static string BuildExtendedCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMX_LargeFile_CompileOnly_10k,DefaultJob,.NET 10.0,1,6,100.000 ms,2.000 ms,5.00 MB",
+            "VMX_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,6,40.000 ms,1.000 ms,2.00 MB",
+            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,80.000 ms,1.200 ms,4.00 MB");
+    }
+
+    private static string BuildThresholdCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMX_LargeFile_CompileOnly_10k,DefaultJob,.NET 10.0,1,6,109.000 ms,1.000 ms,5.00 MB",
+            "VMX_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,6,109.000 ms,1.000 ms,2.00 MB",
+            "VMX_Concurrency_Channel_SPSC_Throughput,DefaultJob,.NET 10.0,1,6,111.000 ms,1.000 ms,4.00 MB");
+    }
+
+    private static string BuildQuickCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,1,4,95.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildQuickMultiJobCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Edge_HighArgCount_CallHotPath,Job-A,.NET 10.0,1,4,30.000 ms,1.000 ms,2.00 MB",
+            "VMXQ_Edge_HighArgCount_CallHotPath,Job-B,.NET 10.0,1,4,34.000 ms,1.200 ms,2.20 MB");
+    }
+
+    private static string BuildNightlyCsvWithFail()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXN_LargeFile_CompileAndExecute_10k,DefaultJob,.NET 10.0,3,8,110.000 ms,1.000 ms,5.00 MB");
+    }
+
+    private static string BuildQuickCsvWithNaScenario()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Concurrency_Channel_MPMC_4Workers,Job-EATLBP,.NET 10.0,1,4,NA,NA,NA");
+    }
+
+    private static string BuildQuickFailureLog()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "// Benchmark: VMQuickPerformanceBenchmarks.VMXQ_Concurrency_Channel_MPMC_4Workers: Job-EATLBP(IterationCount=4, WarmupCount=1)",
+            "System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.",
+            " ---> System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.",
+            " ---> Old8Lang.Error.InvalidOperationError: 调用全局函数 ChannelSend 时发生错误: The asynchronous operation has not completed.");
+    }
+
+    private static string BuildThresholdBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMX_LargeFile_CompileOnly_10k",
+                     "MeanMs": 100.0
+                   },
+                   {
+                     "Scenario": "VMX_Edge_HighArgCount_CallHotPath",
+                     "MeanMs": 100.0
+                   },
+                   {
+                     "Scenario": "VMX_Concurrency_Channel_SPSC_Throughput",
+                     "MeanMs": 100.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildNightlyBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXN_LargeFile_CompileAndExecute_10k",
+                     "MeanMs": 100.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildQuickMultiJobBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "Job": "Job-A",
+                     "MeanMs": 29.0
+                   },
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "Job": "Job-B",
+                     "MeanMs": 33.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    public void Dispose()
+    {
+        if (!Directory.Exists(_tempRoot))
+        {
+            return;
+        }
+
+        try
+        {
+            Directory.Delete(_tempRoot, recursive: true);
+        }
+        catch
+        {
+            // 忽略清理失败，避免影响测试结果
+        }
+    }
+}

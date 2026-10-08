@@ -50,6 +50,14 @@ public class LangListCountMethod : BaseLangListMethod
     {
         if (instance is ILangList langList)
         {
+            if (instance is ListLangValue listLangValue)
+            {
+                lock (listLangValue.GetSyncRoot())
+                {
+                    return listLangValue.GetLength();
+                }
+            }
+
             return langList.GetLength();
         }
 

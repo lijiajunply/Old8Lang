@@ -49,7 +49,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Simple loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Simple loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -65,7 +66,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Nested loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Nested loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -81,7 +83,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"While loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"While loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -99,7 +102,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"For-in loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"For-in loop took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     #endregion
@@ -121,7 +125,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Function calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Function calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -143,7 +148,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Nested function calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Nested function calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -161,7 +167,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Recursive call took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Recursive call took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -184,7 +191,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Array access took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Array access took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -203,7 +211,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"List operations took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"List operations took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -222,7 +231,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Dictionary access took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Dictionary access took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -240,7 +250,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"String concatenation took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"String concatenation took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -256,7 +267,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"String comparison took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"String comparison took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -271,7 +283,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"String methods took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"String methods took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -303,7 +316,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Multiplication took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Multiplication took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -318,7 +332,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Complex arithmetic took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Complex arithmetic took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -346,7 +361,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Class instantiation took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Class instantiation took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -367,7 +383,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Method calls took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Method calls took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -389,7 +406,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Lambda calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Lambda calls took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -413,7 +431,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Higher-order function took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Higher-order function took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -437,7 +456,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Async await took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Async await took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -460,7 +480,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Multiple await took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Multiple await took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -480,7 +501,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"If statement took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"If statement took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -499,7 +521,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Switch statement took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Switch statement took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -513,7 +536,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Ternary operator took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Ternary operator took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -535,7 +559,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 1000, $"Generic function took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
+        Assert.True(elapsed.TotalMilliseconds < 1000,
+            $"Generic function took {elapsed.TotalMilliseconds}ms, expected < 1000ms");
     }
 
     [Fact]
@@ -557,7 +582,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Generic class took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Generic class took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -601,7 +627,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Bubble sort took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Bubble sort took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     [Fact]
@@ -624,7 +651,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Matrix multiplication took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Matrix multiplication took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -766,7 +794,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Type conversion took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Type conversion took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion
@@ -784,7 +813,8 @@ public class VMExecutionPerformanceTests
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);
-        Assert.True(elapsed.TotalMilliseconds < 500, $"Range iteration took {elapsed.TotalMilliseconds}ms, expected < 500ms");
+        Assert.True(elapsed.TotalMilliseconds < 500,
+            $"Range iteration took {elapsed.TotalMilliseconds}ms, expected < 500ms");
     }
 
     #endregion

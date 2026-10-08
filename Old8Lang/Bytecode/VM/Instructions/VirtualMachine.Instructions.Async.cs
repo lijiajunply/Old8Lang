@@ -53,8 +53,7 @@ public partial class VirtualMachine
                 // 创建并启动任务
                 var task = Task.Run(() =>
                 {
-                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
-                    foreach (var kvp in _globals) asyncVm._globals[kvp.Key] = kvp.Value;
+                    var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
                     return ConvertToLangValue(result);
                 });
@@ -65,39 +64,97 @@ public partial class VirtualMachine
 
             case OpCode.CallAsync:
             {
-                // 栈布局: [arg1, arg2, ..., argCount, funcName]
+                // 操作数:
+                // - [argCount, funcName] / [argCount, funcName, funcIndex]
+                // - [positionalCount, namedCount, funcName, namedArgNames[]] / +funcIndex
                 var operands = (object[])instruction.Operand!;
-                int argCount = (int)operands[0];
-                string funcName = (string)operands[1];
+                string funcName;
+                int functionIndexHint;
+                object?[] args;
+                FunctionMetadata? function = null;
+                bool argsAlreadyNormalizedAndValidated = false;
 
-                // 弹出参数
-                var args = new object?[argCount];
-                for (int i = argCount - 1; i >= 0; i--)
+                if (operands.Length >= 4)
                 {
-                    args[i] = _stack.Pop();
+                    int positionalCount = (int)operands[0];
+                    int namedCount = (int)operands[1];
+                    funcName = (string)operands[2];
+                    string[] namedArgNames = (string[])operands[3];
+                    functionIndexHint = operands.Length > 4 && operands[4] is int namedIdx ? namedIdx : -1;
+
+                    var namedArgValues = new object?[namedCount];
+                    for (int i = namedCount - 1; i >= 0; i--)
+                    {
+                        namedArgValues[i] = _stack.Pop();
+                    }
+
+                    var positionalArgs = new object?[positionalCount];
+                    for (int i = positionalCount - 1; i >= 0; i--)
+                    {
+                        positionalArgs[i] = _stack.Pop();
+                    }
+
+                    FunctionMetadata? namedFunction = null;
+                    if (functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
+                    {
+                        var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
+                        if (indexedFunction.Name == funcName)
+                        {
+                            namedFunction = indexedFunction;
+                        }
+                    }
+
+                    namedFunction ??= _functionByName.GetValueOrDefault(funcName);
+                    if (namedFunction == null)
+                    {
+                        throw new MethodNotFoundError(GetPosition(instruction), funcName);
+                    }
+
+                    args = ArrangeArgumentsWithNamed(namedFunction, positionalArgs, namedArgNames, namedArgValues);
+                    args = NormalizeArguments(namedFunction, args, GetPosition(instruction));
+                    ValidateParameterTypes(namedFunction, args, instruction);
+                    function = namedFunction;
+                    argsAlreadyNormalizedAndValidated = true;
+                }
+                else
+                {
+                    int argCount = (int)operands[0];
+                    funcName = (string)operands[1];
+                    functionIndexHint = operands.Length > 2 && operands[2] is int idx ? idx : -1;
+
+                    args = new object?[argCount];
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        args[i] = _stack.Pop();
+                    }
                 }
 
-                // 查找函数
-                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                // 优先使用函数索引，失败时按名称回退
+                if (function == null && functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
+                {
+                    var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
+                    if (indexedFunction.Name == funcName)
+                    {
+                        function = indexedFunction;
+                    }
+                }
+
+                function ??= _functionByName.GetValueOrDefault(funcName);
                 if (function == null)
                 {
                     throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
 
+                if (!argsAlreadyNormalizedAndValidated)
+                {
+                    args = NormalizeArguments(function, args, GetPosition(instruction));
+                    ValidateParameterTypes(function, args, instruction);
+                }
+
                 // 创建并启动任务
                 var task = Task.Run(() =>
                 {
-                    // 在新线程中执行函数
-                    // 这里我们创建一个新的 VirtualMachine 实例来执行异步任务
-                    // 共享全局变量和常量池
-                    var asyncVm = new VirtualMachine(_bytecodeFile, _baseDirectory);
-                    // 复制全局变量
-                    foreach (var kvp in _globals)
-                    {
-                        asyncVm._globals[kvp.Key] = kvp.Value;
-                    }
-
-                    // 执行函数
+                    var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
                     return ConvertToLangValue(result);
                 });
@@ -125,11 +182,8 @@ public partial class VirtualMachine
                 }
                 else if (value is Task task)
                 {
-                    // 直接是 Task 对象
                     task.GetAwaiter().GetResult();
-                    // 如果是 Task<T>，获取结果
-                    var resultProperty = task.GetType().GetProperty("Result");
-                    _stack.Push(resultProperty != null ? resultProperty.GetValue(task) : null);
+                    _stack.Push(task is Task<object?> objectTask ? objectTask.Result : null);
                 }
                 else
                 {
@@ -174,10 +228,11 @@ public partial class VirtualMachine
             case OpCode.CallAsyncGenerator:
             {
                 // 调用异步生成器函数
-                // 操作数: [argCount, funcName]
+                // 操作数: [argCount, funcName] / [argCount, funcName, funcIndex]
                 var operands = (object[])instruction.Operand!;
                 int argCount = (int)operands[0];
                 string funcName = (string)operands[1];
+                int functionIndexHint = operands.Length > 2 && operands[2] is int idx ? idx : -1;
 
                 // 弹出参数
                 var args = new object?[argCount];
@@ -186,12 +241,24 @@ public partial class VirtualMachine
                     args[i] = _stack.Pop();
                 }
 
-                // 查找函数
-                var function = _bytecodeFile.Functions.FirstOrDefault(f => f.Name == funcName);
+                FunctionMetadata? function = null;
+                if (functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
+                {
+                    var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
+                    if (indexedFunction.Name == funcName)
+                    {
+                        function = indexedFunction;
+                    }
+                }
+
+                function ??= _functionByName.GetValueOrDefault(funcName);
                 if (function == null)
                 {
                     throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
+
+                args = NormalizeArguments(function, args, GetPosition(instruction));
+                ValidateParameterTypes(function, args, instruction);
 
                 // 验证是否是异步生成器函数
                 if (!function.IsAsync || !function.IsGenerator)

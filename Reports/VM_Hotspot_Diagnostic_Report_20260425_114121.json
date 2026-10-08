@@ -1,0 +1,64 @@
+{
+  "GeneratedAt": "2026-04-25T11:41:21.4991588+08:00",
+  "RuntimeVersion": "10.0.7",
+  "IterationsPerScenario": 6,
+  "Scenarios": [
+    {
+      "Name": "LargeFile_10k",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 491.52200000000005,
+        "MedianAllocatedBytes": 38077136,
+        "Gen0Collections": 18,
+        "Gen1Collections": 6,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 170.95765,
+        "MedianAllocatedBytes": 1624456,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "LargeFile_50k_Generated",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 1949.0399499999999,
+        "MedianAllocatedBytes": 200562988,
+        "Gen0Collections": 100,
+        "Gen1Collections": 58,
+        "Gen2Collections": 10
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 109.80405,
+        "MedianAllocatedBytes": 8189488,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    },
+    {
+      "Name": "LargeClosureCapture_HighFreq",
+      "Compile": {
+        "PhaseName": "CompileToBytecode",
+        "MedianMilliseconds": 0.21725,
+        "MedianAllocatedBytes": 62360,
+        "Gen0Collections": 0,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      },
+      "Execute": {
+        "PhaseName": "VMExecute",
+        "MedianMilliseconds": 73.184,
+        "MedianAllocatedBytes": 14805184,
+        "Gen0Collections": 6,
+        "Gen1Collections": 0,
+        "Gen2Collections": 0
+      }
+    }
+  ]
+}

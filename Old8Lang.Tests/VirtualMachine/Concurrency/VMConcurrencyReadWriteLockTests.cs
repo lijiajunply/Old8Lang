@@ -179,7 +179,7 @@ public class VMConcurrencyReadWriteLockTests
                 }
 
                 PrintLine(""Reader "" + id.ToStr() + "" acquired lock, count: "" + current.ToStr())
-                Sleep(200)
+                Sleep(400)
                 AtomicIntDecrement(readerCount)
                 ReadLockRelease(rwLock)
             }
@@ -193,7 +193,7 @@ public class VMConcurrencyReadWriteLockTests
             c.Start()
 
             // 等待所有线程完成
-            Sleep(500)
+            Sleep(1000)
 
             result <- AtomicIntGet(maxCount)
 

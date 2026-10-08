@@ -131,7 +131,7 @@ public class LoadedModule(string name, BytecodeFile bytecodeFile, Dictionary<str
                             {
                                 var funcMetadata = BytecodeFile.Functions[symbol.MetadataIndex];
                                 // 将函数包装成闭包，捕获模块的全局变量空间和常量池
-                                value = new ClosureValue(funcMetadata, Globals, BytecodeFile.ConstantPool);
+                                value = new ClosureValue(funcMetadata, new ClosureEnvironment(Globals), BytecodeFile.ConstantPool);
                             }
                             break;
 
@@ -178,7 +178,7 @@ public class LoadedModule(string name, BytecodeFile bytecodeFile, Dictionary<str
                 {
                     var func = BytecodeFile.Functions[i];
                     // 将函数包装成闭包，捕获模块的全局变量空间和常量池
-                    _exportCache[func.Name] = new ClosureValue(func, Globals, BytecodeFile.ConstantPool);
+                    _exportCache[func.Name] = new ClosureValue(func, new ClosureEnvironment(Globals), BytecodeFile.ConstantPool);
                 }
 
                 for (int i = 0; i < BytecodeFile.Classes.Count; i++)

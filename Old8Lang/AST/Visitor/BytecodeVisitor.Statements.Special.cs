@@ -24,8 +24,12 @@ public partial class BytecodeVisitor
 
         int loopStart = GetCurrentPosition();
         int loopEnd = -1; // 稍后修补
+        int allCasesClosedVarIndex = _compiler.AllocateLocal("$select_all_closed_" + loopStart);
 
         // 遍历所有 case
+        Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(true));
+        Emit(OpCode.StoreLocal, allCasesClosedVarIndex);
+
         foreach (var selectCase in node.Cases)
         {
             if (selectCase.IsReceive)
@@ -49,6 +53,21 @@ public partial class BytecodeVisitor
                 // 分配临时局部变量存储结果
                 int resultVarIndex = _compiler.AllocateLocal("$temp_result_" + GetCurrentPosition());
                 Emit(OpCode.StoreLocal, resultVarIndex);
+
+                // 如果通道已关闭，跳过此 case，并保留 allCasesClosed 为 true。
+                Emit(OpCode.LoadLocal, resultVarIndex);
+                Emit(OpCode.GetField, "IsChannelClosed");
+                int checkSuccessIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                int skipClosedCaseIndex = GetCurrentPosition();
+                Emit(OpCode.Jump, -1);
+
+                PatchJump(checkSuccessIndex, GetCurrentPosition());
+
+                // 只要通道未关闭，就说明不是 “所有 case 都关闭”。
+                Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(false));
+                Emit(OpCode.StoreLocal, allCasesClosedVarIndex);
 
                 // 加载结果并检查 Success（通过 GetField）
                 Emit(OpCode.LoadLocal, resultVarIndex);
@@ -91,11 +110,26 @@ public partial class BytecodeVisitor
 
                 // 修补跳过此 case 的跳转
                 PatchJump(skipCaseIndex, GetCurrentPosition());
+                PatchJump(skipClosedCaseIndex, GetCurrentPosition());
             }
             else
             {
                 // 发送 case: 尝试非阻塞发送
                 // 栈布局: channelId, value, timeoutMs -> bool
+
+                // 已关闭的通道不参与发送，并保持 allCasesClosed 为 true。
+                selectCase.ChannelExpression.Accept(this);
+                Emit(OpCode.ChannelIsClosed);
+                int checkSendCaseOpenIndex = GetCurrentPosition();
+                Emit(OpCode.JumpIfFalse, -1);
+
+                int skipClosedSendCaseIndex = GetCurrentPosition();
+                Emit(OpCode.Jump, -1);
+
+                PatchJump(checkSendCaseOpenIndex, GetCurrentPosition());
+
+                Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(false));
+                Emit(OpCode.StoreLocal, allCasesClosedVarIndex);
 
                 // 加载 channelId
                 selectCase.ChannelExpression.Accept(this);
@@ -126,6 +160,7 @@ public partial class BytecodeVisitor
 
                 // 修补跳过此 case 的跳转
                 PatchJump(skipCaseIndex, GetCurrentPosition());
+                PatchJump(skipClosedSendCaseIndex, GetCurrentPosition());
             }
         }
 
@@ -145,6 +180,16 @@ public partial class BytecodeVisitor
         }
         else
         {
+            Emit(OpCode.LoadLocal, allCasesClosedVarIndex);
+            int continuePollingIndex = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(
+                "select 语句中所有 Channel 已关闭，无法进行任何操作"));
+            Emit(OpCode.Throw);
+
+            PatchJump(continuePollingIndex, GetCurrentPosition());
+
             // 无 default 分支：休眠 1ms 后继续轮询
             // Thread.Sleep(1)
             Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(1));

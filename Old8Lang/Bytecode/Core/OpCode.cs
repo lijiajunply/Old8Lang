@@ -284,6 +284,9 @@ public enum OpCode : byte
     /// <summary>释放线程资源 (操作数: threadId)</summary>
     ThreadDispose = 0x91,
 
+    /// <summary>检查通道是否已关闭 (操作数: channelId) 返回bool</summary>
+    ChannelIsClosed = 0x92,
+
     // ===== 异步支持 (0xA0-0xAF) =====
     /// <summary>等待异步操作</summary>
     Await = 0xA0,

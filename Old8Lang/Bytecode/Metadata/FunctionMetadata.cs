@@ -7,6 +7,27 @@ namespace Old8Lang.Bytecode.Metadata;
 /// </summary>
 public class FunctionMetadata
 {
+    public enum FastParameterTypeKind : byte
+    {
+        None = 0,
+        Int = 1,
+        Double = 2,
+        String = 3,
+        Bool = 4,
+        Char = 5,
+        Any = 6,
+        Object = 7,
+        Other = 255
+    }
+
+    private Dictionary<string, int>? _parameterIndexMap;
+    private int _parameterIndexMapCount = -1;
+    private FastParameterTypeKind[]? _fastParameterKinds;
+    private int _fastParameterKindsCount = -1;
+    private bool _fastParameterKindsContainUnsupportedType;
+    private Dictionary<int, ExceptionDispatchCandidate[]>? _exceptionDispatchCandidatesByIp;
+    private int _exceptionDispatchCacheTableCount = -1;
+
     /// <summary>函数名称</summary>
     public string Name { get; set; } = "";
 
@@ -196,6 +217,178 @@ public class FunctionMetadata
     public override string ToString()
     {
         return $"Function {Name}({string.Join(", ", Parameters)}) [{Instructions.Count} instructions]";
+    }
+
+    public readonly struct ExceptionDispatchCandidate
+    {
+        public ExceptionDispatchCandidate(ExceptionTableEntry entry, bool inTryBlock, bool inCatchBlock)
+        {
+            Entry = entry;
+            InTryBlock = inTryBlock;
+            InCatchBlock = inCatchBlock;
+        }
+
+        public ExceptionTableEntry Entry { get; }
+        public bool InTryBlock { get; }
+        public bool InCatchBlock { get; }
+    }
+
+    /// <summary>
+    /// 获取异常指令位置对应的候选处理器（热路径缓存，保持异常表原有顺序）。
+    /// </summary>
+    public ExceptionDispatchCandidate[] GetExceptionDispatchCandidates(int instructionPointer)
+    {
+        EnsureExceptionDispatchCache();
+
+        if (_exceptionDispatchCandidatesByIp!.TryGetValue(instructionPointer, out var cached))
+        {
+            return cached;
+        }
+
+        if (ExceptionTable.Count == 0)
+        {
+            cached = [];
+            _exceptionDispatchCandidatesByIp[instructionPointer] = cached;
+            return cached;
+        }
+
+        var candidates = new List<ExceptionDispatchCandidate>(ExceptionTable.Count);
+        foreach (var entry in ExceptionTable)
+        {
+            var inTry = entry.IsInTryBlock(instructionPointer);
+            var inCatch = entry.IsInCatchBlock(instructionPointer);
+            if (inTry || inCatch)
+            {
+                candidates.Add(new ExceptionDispatchCandidate(entry, inTry, inCatch));
+            }
+        }
+
+        cached = candidates.Count == 0 ? [] : candidates.ToArray();
+        _exceptionDispatchCandidatesByIp[instructionPointer] = cached;
+        return cached;
+    }
+
+    /// <summary>
+    /// 尝试获取参数名对应的索引（命名参数绑定热路径缓存）
+    /// </summary>
+    public bool TryGetParameterIndex(string parameterName, out int index)
+    {
+        EnsureParameterIndexMap();
+        return _parameterIndexMap!.TryGetValue(parameterName, out index);
+    }
+
+    private void EnsureParameterIndexMap()
+    {
+        if (_parameterIndexMap is not null && _parameterIndexMapCount == Parameters.Count)
+        {
+            return;
+        }
+
+        var map = new Dictionary<string, int>(Parameters.Count, StringComparer.Ordinal);
+        for (var i = 0; i < Parameters.Count; i++)
+        {
+            var name = Parameters[i];
+            if (!map.ContainsKey(name))
+            {
+                map[name] = i;
+            }
+        }
+
+        _parameterIndexMap = map;
+        _parameterIndexMapCount = Parameters.Count;
+    }
+
+    /// <summary>
+    /// 获取参数类型的快速分类（用于 VM 热路径类型校验）
+    /// </summary>
+    public FastParameterTypeKind GetFastParameterTypeKind(int index)
+    {
+        EnsureFastParameterKinds();
+        if (_fastParameterKinds is null || index < 0 || index >= _fastParameterKinds.Length)
+        {
+            return FastParameterTypeKind.Other;
+        }
+
+        return _fastParameterKinds[index];
+    }
+
+    /// <summary>
+    /// 尝试获取“纯位置参数调用”热路径所需的参数类型分类缓存。
+    /// </summary>
+    public bool TryGetPositionalFastCallTypeKinds(int argCount, out FastParameterTypeKind[] typeKinds)
+    {
+        typeKinds = Array.Empty<FastParameterTypeKind>();
+
+        if (argCount != Parameters.Count || ParamsParameterIndex >= 0 || IsGenerator || GenericTypeMapping is { Count: > 0 })
+        {
+            return false;
+        }
+
+        EnsureFastParameterKinds();
+        if (_fastParameterKinds is null || _fastParameterKinds.Length < argCount)
+        {
+            return false;
+        }
+
+        if (_fastParameterKindsContainUnsupportedType)
+        {
+            return false;
+        }
+
+        typeKinds = _fastParameterKinds;
+        return true;
+    }
+
+    private void EnsureFastParameterKinds()
+    {
+        if (_fastParameterKinds is not null && _fastParameterKindsCount == ParameterTypes.Count)
+        {
+            return;
+        }
+
+        var kinds = new FastParameterTypeKind[ParameterTypes.Count];
+        var hasUnsupportedType = false;
+        for (var i = 0; i < ParameterTypes.Count; i++)
+        {
+            var typeName = ParameterTypes[i];
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                kinds[i] = FastParameterTypeKind.None;
+                continue;
+            }
+
+            kinds[i] = typeName switch
+            {
+                _ when typeName.Equals("int", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Int,
+                _ when typeName.Equals("double", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Double,
+                _ when typeName.Equals("string", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.String,
+                _ when typeName.Equals("bool", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Bool,
+                _ when typeName.Equals("char", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Char,
+                _ when typeName.Equals("any", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Any,
+                _ when typeName.Equals("object", StringComparison.OrdinalIgnoreCase) => FastParameterTypeKind.Object,
+                _ => FastParameterTypeKind.Other
+            };
+
+            if (kinds[i] == FastParameterTypeKind.Other)
+            {
+                hasUnsupportedType = true;
+            }
+        }
+
+        _fastParameterKinds = kinds;
+        _fastParameterKindsCount = ParameterTypes.Count;
+        _fastParameterKindsContainUnsupportedType = hasUnsupportedType;
+    }
+
+    private void EnsureExceptionDispatchCache()
+    {
+        if (_exceptionDispatchCandidatesByIp is not null && _exceptionDispatchCacheTableCount == ExceptionTable.Count)
+        {
+            return;
+        }
+
+        _exceptionDispatchCandidatesByIp = new Dictionary<int, ExceptionDispatchCandidate[]>();
+        _exceptionDispatchCacheTableCount = ExceptionTable.Count;
     }
 
     /// <summary>

@@ -39,7 +39,11 @@ public class ListAddMethod : BaseInstanceMethod
     {
         var list = (ListLangValue)instance;
         var item = parameters[0].Run(manager);
-        list.Values.Add(item);
+        lock (list.GetSyncRoot())
+        {
+            list.Values.Add(item);
+        }
+
         return item;
     }
 
@@ -85,7 +89,11 @@ public class ListAddMethod : BaseInstanceMethod
                 char c => new CharLangValue(c),
                 _ => new StringLangValue(arguments[0]?.ToString() ?? string.Empty)
             };
-            listLangValue.Values.Add(item);
+            lock (listLangValue.GetSyncRoot())
+            {
+                listLangValue.Values.Add(item);
+            }
+
             return arguments[0];
         }
 

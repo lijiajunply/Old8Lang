@@ -91,6 +91,14 @@ public partial class VirtualMachine
             }
                 break;
 
+            case OpCode.ChannelIsClosed:
+            {
+                var channelId = Convert.ToInt32(_stack.Pop());
+                var isClosed = Concurrency.ResourceManager.IsChannelClosed(channelId);
+                _stack.Push(isClosed);
+            }
+                break;
+
             case OpCode.SemaphoreCreate:
             {
                 // 栈顶: maxCount, initialCount

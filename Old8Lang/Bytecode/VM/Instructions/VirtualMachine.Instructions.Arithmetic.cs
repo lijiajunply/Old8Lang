@@ -1,4 +1,5 @@
 using Old8Lang.Bytecode.Core;
+using System.Runtime.CompilerServices;
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
@@ -8,6 +9,7 @@ public partial class VirtualMachine
     /// <summary>
     /// 执行算术运算指令
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ExecuteArithmeticOperation(Instruction instruction, CallFrame frame)
     {
         switch (instruction.OpCode)

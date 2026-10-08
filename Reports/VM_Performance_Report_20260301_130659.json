@@ -1,0 +1,41 @@
+{
+  "GeneratedAt": "2026-03-01T13:06:59.642098+08:00",
+  "SourceCsv": "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.VMModePerformanceBenchmarks-report.csv",
+  "Job": "Job-LGHQEI",
+  "Runtime": ".NET 10.0",
+  "WarmupCount": "3",
+  "IterationCount": "8",
+  "Warnings": [],
+  "Scenarios": [
+    {
+      "Scenario": "VM_ArithmeticLoop",
+      "MeanMs": 7.711,
+      "StdDevMs": 0.0628,
+      "P95Ms": null,
+      "AllocatedBytes": 3607101,
+      "RawMean": "7.711 ms",
+      "RawStdDev": "0.0628 ms",
+      "RawAllocated": "3.44 MB"
+    },
+    {
+      "Scenario": "VM_DenseFunctionCall",
+      "MeanMs": 109.525,
+      "StdDevMs": 15.9101,
+      "P95Ms": null,
+      "AllocatedBytes": 8399094,
+      "RawMean": "109.525 ms",
+      "RawStdDev": "15.9101 ms",
+      "RawAllocated": "8.01 MB"
+    },
+    {
+      "Scenario": "VM_DefaultAndNamedArgs",
+      "MeanMs": 33.24,
+      "StdDevMs": 0.5652,
+      "P95Ms": null,
+      "AllocatedBytes": 9835643,
+      "RawMean": "33.240 ms",
+      "RawStdDev": "0.5652 ms",
+      "RawAllocated": "9.38 MB"
+    }
+  ]
+}

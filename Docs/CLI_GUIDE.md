@@ -997,6 +997,18 @@ Old8Lang 提供了内置的性能监控工具，用于分析和优化代码性�
 
 ```bash
 dotnet run --project Old8Lang.Benchmarks --configuration Release
+
+# VM Quick 基准与报告（PR 场景）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
+
+# VM Nightly 基准与报告（夜间场景；出现性能 FAIL 时退出码为 1）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
+
+# 其他 VM 命令
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-extended
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-extended
 ```
 
 **测试内容**:

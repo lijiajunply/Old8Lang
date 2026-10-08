@@ -246,6 +246,18 @@ processData          5000        1800.3       0.36
 
 ```bash
 dotnet run --project Old8Lang.Benchmarks --configuration Release
+
+# VM 基线（基础场景）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm
+
+# VM Quick（PR 快速回归）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
+
+# VM Nightly（全量回归，遇到 FAIL 返回非零退出码）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
+
+# VM 扩展（手动排障/趋势分析）
+dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-extended
 ```
 
 ---
@@ -754,4 +766,3 @@ PrintLine("耗时: " + (endTime - startTime).ToStr() + "ms")
 - [PROFILER_GUIDE.md](PROFILER_GUIDE.md) - 性能分析器详细文档
 - [DEBUGGER_GUIDE.md](DEBUGGER_GUIDE.md) - 调试工具使用
 - [API_REFERENCE.md](API_REFERENCE.md) - 标准库 API 参考
-

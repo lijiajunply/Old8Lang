@@ -21,6 +21,10 @@ public partial class VirtualMachine
             case OpCode.Throw:
             {
                 var exceptionValue = _stack.Pop();
+                // 快速路径：当前帧存在匹配的 catch 块时直接跳转，跳过 new VmException + .NET 栈回溯
+                if (TryHandleExceptionInline(exceptionValue, frame, frame.Function))
+                    return;
+                // 慢路径：当前帧无匹配处理器，通过 C# 异常机制跨帧传播
                 throw new VmException(exceptionValue);
             }
 
