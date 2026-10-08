@@ -1,4 +1,4 @@
-// 示例2: 编译模式 - 需要完整类型注解
+// 示例2: IL 模式 - 需要完整类型注解
 
 func multiply(a: int, b: int) -> int {
     return a * b

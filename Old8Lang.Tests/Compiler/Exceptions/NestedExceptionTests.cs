@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Exceptions;
 
 /// <summary>
-/// 编译器模式下的异常处理测试 - 嵌套异常处理
+/// IL 模式下的异常处理测试 - 嵌套异常处理
 /// </summary>
 public class NestedExceptionTests(ITestOutputHelper output)
 {

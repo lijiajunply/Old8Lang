@@ -15,7 +15,7 @@ namespace Old8Lang.ExternProviders;
 public class JavaScriptProvider : IExternProvider
 {
     /// <summary>
-    /// 不支持编译模式（JavaScript 需要动态运行时）
+    /// 不支持 IL 模式（JavaScript 需要动态运行时）
     /// </summary>
     public bool SupportsCompilation => false;
 
@@ -105,7 +105,7 @@ public class JavaScriptProvider : IExternProvider
     }
 
     /// <summary>
-    /// 编译模式：不支持
+    /// IL 模式：不支持
     /// </summary>
     public void GenerateIL(
         string source,
@@ -114,7 +114,7 @@ public class JavaScriptProvider : IExternProvider
         ILGenerator ilGenerator,
         LocalManager localManager)
     {
-        throw new NotSupportedException("JavaScript extern 函数不支持编译模式，仅支持解释模式执行。");
+        throw new NotSupportedException("JavaScript extern 函数不支持 IL 模式，仅支持解释模式执行。");
     }
 
     /// <summary>

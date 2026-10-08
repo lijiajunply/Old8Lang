@@ -1,7 +1,7 @@
 namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
-/// 异常包装类,用于在编译器模式下存储异常对象
+/// 异常包装类,用于在 IL 模式下存储异常对象
 /// 重写ToString()方法,只返回异常消息而不包含完整的堆栈跟踪
 /// </summary>
 public class ExceptionWrapper

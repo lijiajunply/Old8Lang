@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Collections.Range;
 
 /// <summary>
-/// 编译器模式下的范围表达式测试
+/// IL 模式下的范围表达式测试
 /// </summary>
 public class RangeTests(ITestOutputHelper output)
 {

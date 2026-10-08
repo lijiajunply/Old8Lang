@@ -337,11 +337,11 @@ public class PythonFunctionLangValue : FuncLangValue
     }
 
     /// <summary>
-    /// 在编译模式下生成 IL 代码（暂不支持）
+    /// 在 IL 模式下生成 IL 代码（暂不支持）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotSupportedException("编译模式暂不支持 Python 函数调用");
+        throw new NotSupportedException("IL 模式暂不支持 Python 函数调用");
     }
 
     /// <summary>
@@ -349,7 +349,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// </summary>
     public override Type OutputType(LocalManager local)
     {
-        throw new NotSupportedException("编译模式暂不支持 Python 函数调用");
+        throw new NotSupportedException("IL 模式暂不支持 Python 函数调用");
     }
 
     public override string ToString()

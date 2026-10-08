@@ -4,9 +4,9 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Classes;
 
 /// <summary>
-/// 编译器模式泛型约束扩展测试
-/// 测试 new()、class、struct 和类型参数约束在编译器模式下的功能
-/// 注意：编译器模式下 Assert.Equal 有问题，所以只测试编译和执行
+/// IL 模式泛型约束扩展测试
+/// 测试 new()、class、struct 和类型参数约束在 IL 模式下的功能
+/// 注意：IL 模式下 Assert.Equal 有问题，所以只测试编译和执行
 /// </summary>
 public class GenericConstraintExtensionCompilerTests(ITestOutputHelper output)
 {

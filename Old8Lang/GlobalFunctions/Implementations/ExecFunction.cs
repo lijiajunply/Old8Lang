@@ -34,7 +34,7 @@ public sealed class ExecFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持动态代码执行
+        // IL 模式暂不支持动态代码执行
         ilGenerator.Emit(OpCodes.Ldnull);
     }
 

@@ -3,9 +3,9 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// 函数声明编译模式测试
-/// 测试编译器模式下函数声明的 IL 生成和执行
-/// 注意:编译模式要求函数参数必须有类型注解或默认值,返回类型必须显式声明
+/// 函数声明 IL 模式测试
+/// 测试 IL 模式下函数声明的 IL 生成和执行
+/// 注意:IL 模式要求函数参数必须有类型注解或默认值,返回类型必须显式声明
 /// </summary>
 [Collection("Sequential")]
 public class FunctionDeclarationTests
@@ -15,7 +15,7 @@ public class FunctionDeclarationTests
     [Fact]
     public void FunctionDeclaration_NoParameters_CompilesCorrectly()
     {
-        // Arrange - 编译模式要求返回类型注解
+        // Arrange - IL 模式要求返回类型注解
         var code = @"
             func sayHello() -> string {
                 return ""Hello, World!""

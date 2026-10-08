@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Statements;
 
 /// <summary>
-/// 控制流编译模式测试
-/// 测试编译器模式下的条件语句、循环语句和复杂控制流的 IL 生成和执行
+/// 控制流 IL 模式测试
+/// 测试 IL 模式下的条件语句、循环语句和复杂控制流的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class ControlFlowTests

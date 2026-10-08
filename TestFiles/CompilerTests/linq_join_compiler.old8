@@ -1,4 +1,4 @@
-// LINQ Join 编译器模式测试
+// LINQ Join IL 模式测试
 
 // 测试1: Inner Join 基础测试
 list1 <- {1, 2, 3}

@@ -3,12 +3,12 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Error.Compilation;
 
 /// <summary>
-/// 编译器测试辅助类，用于处理编译模式下的常见问题
+/// 编译器测试辅助类，用于处理 IL 模式下的常见问题
 /// </summary>
 public static class FixCompilationIssue
 {
     /// <summary>
-    /// 验证代码是否能在编译模式下正确编译和执行
+    /// 验证代码是否能在 IL 模式下正确编译和执行
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -35,7 +35,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 测试编译器模式下的类型注解严格性
+    /// 测试 IL 模式下的类型注解严格性
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -43,7 +43,7 @@ public static class FixCompilationIssue
     {
         try
         {
-            // 在编译模式下，类型注解应该是严格的
+            // 在 IL 模式下，类型注解应该是严格的
             VerifyCompilationAndExecution(name, code);
         }
         catch (Exception ex)
@@ -53,7 +53,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证错误处理代码在编译模式下的行为
+    /// 验证错误处理代码在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -70,7 +70,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证函数在编译模式下的行为
+    /// 验证函数在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -87,7 +87,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证集合操作在编译模式下的行为
+    /// 验证集合操作在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -104,7 +104,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证异步操作在编译模式下的行为
+    /// 验证异步操作在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -121,7 +121,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证边界情况在编译模式下的行为
+    /// 验证边界情况在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>
@@ -138,7 +138,7 @@ public static class FixCompilationIssue
     }
     
     /// <summary>
-    /// 验证泛型操作在编译模式下的行为
+    /// 验证泛型操作在 IL 模式下的行为
     /// </summary>
     /// <param name="name">测试名称</param>
     /// <param name="code">要测试的代码</param>

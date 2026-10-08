@@ -104,7 +104,7 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _add 方法的 IL 代码
@@ -167,7 +167,7 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _sub 方法的 IL 代码
@@ -231,7 +231,7 @@ internal static class NumericBinaryOpHelper
         Type? rightType,
         Operation operation)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _mul 方法的 IL 代码
@@ -314,7 +314,7 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _div 方法的 IL 代码
@@ -389,7 +389,7 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _mod 方法的 IL 代码
@@ -488,7 +488,7 @@ internal static class NumericBinaryOpHelper
         Type? leftType,
         Type? rightType)
     {
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _pow 方法的 IL 代码

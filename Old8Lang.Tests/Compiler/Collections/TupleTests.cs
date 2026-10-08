@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Collections;
 
 /// <summary>
-/// 元组（Tuple）编译模式测试
-/// 测试编译器模式下的元组操作的 IL 生成和执行
+/// 元组（Tuple）IL 模式测试
+/// 测试 IL 模式下的元组操作的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class TupleTests

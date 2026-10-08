@@ -162,13 +162,13 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式暂不支持）
+    /// 生成 IL 代码（IL 模式暂不支持）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         throw new NotImplementedError(
             Position,
-            "编译模式暂不支持 CancellationTokenSource 类型"
+            "IL 模式暂不支持 CancellationTokenSource 类型"
         );
     }
 

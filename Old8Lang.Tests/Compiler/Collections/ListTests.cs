@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Collections;
 
 /// <summary>
-/// 列表（List）编译模式测试
-/// 测试编译器模式下的列表操作的 IL 生成和执行
+/// 列表（List）IL 模式测试
+/// 测试 IL 模式下的列表操作的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class ListTests

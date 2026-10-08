@@ -175,14 +175,14 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     public override Type OutputType(LocalManager local) => typeof(object);
 
     /// <summary>
-    /// 生成IL代码（编译器模式）
+    /// 生成IL代码（IL 模式）
     /// 生成异步生成器的委托，支持异步生成器的编译
     /// </summary>
     /// <param name="ilGenerator">IL生成器</param>
     /// <param name="local">局部变量管理器</param>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 异步生成器在编译器模式下返回一个可以迭代的对象
+        // 异步生成器在 IL 模式下返回一个可以迭代的对象
         // 我们创建一个委托，当调用时会返回一个IAsyncEnumerable<object>
         
         // 1. 确定参数类型和返回类型
@@ -448,7 +448,7 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
 }
 
 /// <summary>
-/// 空的异步可枚举实现，用于编译器模式下的异步生成器
+/// 空的异步可枚举实现，用于 IL 模式下的异步生成器
 /// </summary>
 public class EmptyAsyncEnumerable : IAsyncEnumerable<object>
 {

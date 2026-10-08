@@ -650,7 +650,7 @@ public partial class Instance : LangValueType
                     if (classType is null)
                     {
                         // 创建一个临时的object类型引用，允许编译继续进行
-                        // 这是一个临时解决方案，编译器模式下类前向引用的处理需要改进
+                        // 这是一个临时解决方案，IL 模式下类前向引用的处理需要改进
                         classType = typeof(object);
 
                         // 生成临时的null对象，实际运行时将通过解释器处理

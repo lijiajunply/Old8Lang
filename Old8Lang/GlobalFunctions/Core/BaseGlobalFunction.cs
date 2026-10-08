@@ -204,7 +204,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     }
 
     /// <summary>
-    /// 编译器模式生成 IL 代码
+    /// IL 模式生成 IL 代码
     /// </summary>
     public void GenerateIl(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
@@ -213,7 +213,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     }
 
     /// <summary>
-    /// 编译器模式获取返回类型
+    /// IL 模式获取返回类型
     /// </summary>
     public Type GetReturnType(List<LangExpression> parameters, LocalManager local)
     {
@@ -235,12 +235,12 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     protected abstract LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式生成 IL 代码的内部实现
+    /// IL 模式生成 IL 代码的内部实现
     /// </summary>
     protected abstract void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式获取返回类型的内部实现
+    /// IL 模式获取返回类型的内部实现
     /// </summary>
     protected abstract Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local);
 

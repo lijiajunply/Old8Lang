@@ -17,7 +17,7 @@ namespace Old8Lang.ExternProviders;
 public class CSharpDllProvider : IExternProvider
 {
     /// <summary>
-    /// 支持编译模式
+    /// 支持 IL 模式
     /// </summary>
     public bool SupportsCompilation => true;
 
@@ -83,7 +83,7 @@ public class CSharpDllProvider : IExternProvider
     }
 
     /// <summary>
-    /// 编译模式：生成 IL 代码
+    /// IL 模式：生成 IL 代码
     /// </summary>
     public void GenerateIL(
         string source,

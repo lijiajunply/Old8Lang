@@ -16,12 +16,13 @@ public static class BasicInfo
 
 运行模式：
   解释模式：直接解释执行 Old8Lang 代码
-  编译模式：将 Old8Lang 代码编译为中间代码后执行
+  IL 模式：将 Old8Lang 代码编译为 IL 中间代码后执行
 
   可用命令：
   执行命令：
     -f <文件路径>          解释执行指定的 .old8 或 .ol 文件
-    -c <文件路径>          编译并执行指定的 .old8 或 .ol 文件
+    -il <文件路径>         以 IL 模式编译并执行指定的 .old8 或 .ol 文件
+    -c <文件路径>          -il 的别名，二者等价
     -s <文件路径>          对指定的 .old8 或 .ol 文件进行语法测试
     run [脚本名]           智能运行文件或项目（自动检测模式）
 
@@ -46,7 +47,7 @@ public static class BasicInfo
  使用示例：
   执行文件：
     Old8Lang.App -f example.old8
-    Old8Lang.App -c example.old8
+    Old8Lang.App -il example.old8
     Old8Lang.App run example.old8       # 智能运行（自动选择模式）
 
   项目管理：
@@ -62,7 +63,7 @@ public static class BasicInfo
 
 注意事项：
   - 仅支持 .old8 和 .ol 扩展名的文件
-  - 编译模式会显示执行时间统计
+  - IL 模式会显示执行时间统计
   - 语法测试会显示解析时间和生成的代码结构
   - run 命令会自动检测项目配置并选择运行模式
   - 项目管理命令需要在项目目录中执行（init 除外）";

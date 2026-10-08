@@ -264,7 +264,7 @@ public partial class NativeStatement : OldStatement
     }
 
     /// <summary>
-    /// 在编译模式下生成原生导入的IL代码
+    /// 在 IL 模式下生成原生导入的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器</param>
@@ -284,7 +284,7 @@ public partial class NativeStatement : OldStatement
         }
         catch (FileNotFoundException ex)
         {
-            throw new ImportError(new SourcePosition(0, 0), $"编译模式：导入原生库失败：\n{ex.Message}");
+            throw new ImportError(new SourcePosition(0, 0), $"IL 模式：导入原生库失败：\n{ex.Message}");
         }
 
         // 加载程序集并获取类型
@@ -295,7 +295,7 @@ public partial class NativeStatement : OldStatement
         }
         catch (Exception ex)
         {
-            throw new ImportError(new SourcePosition(0, 0), $"编译模式：加载 DLL 文件失败：{path}\n错误：{ex.Message}");
+            throw new ImportError(new SourcePosition(0, 0), $"IL 模式：加载 DLL 文件失败：{path}\n错误：{ex.Message}");
         }
 
         var type = assembly.GetType($"{DllName}.{ClassName}");

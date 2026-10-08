@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// Lambda表达式编译模式测试
-/// 测试编译器模式下的Lambda表达式的 IL 生成和执行
+/// Lambda表达式 IL 模式测试
+/// 测试 IL 模式下的Lambda表达式的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class LambdaTests

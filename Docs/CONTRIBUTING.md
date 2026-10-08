@@ -454,11 +454,11 @@ func test() -> void {
 **好的例子**:
 ```markdown
 **描述**
-编译器模式下,使用默认参数的函数调用时报类型错误。
+IL 模式下,使用默认参数的函数调用时报类型错误。
 
 **重现步骤**
 1. 创建文件 `test.old8` 包含以下代码
-2. 运行 `dotnet run --project Old8Lang.App -- -c test.old8`
+2. 运行 `dotnet run --project Old8Lang.App -- -il test.old8`
 3. 观察到类型错误
 
 **代码**

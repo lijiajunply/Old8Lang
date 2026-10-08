@@ -134,7 +134,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     ];
 
     /// <summary>
-    /// 在编译模式下生成类或接口的IL代码
+    /// 在 IL 模式下生成类或接口的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器，用于管理类或接口的声明和访问</param>

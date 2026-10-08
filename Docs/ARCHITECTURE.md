@@ -3,7 +3,7 @@
 ## 1. 项目概述
 
 ### 1.1 项目简介
-Old8Lang 是一种简单的动态类型编程语言，支持解释模式和编译模式两种运行方式。它设计简洁，易于学习和使用，同时提供了完整的编程语言特性，包括函数、类、异常处理等。
+Old8Lang 是一种简单的动态类型编程语言，支持解释模式和 IL 模式两种运行方式。它设计简洁，易于学习和使用，同时提供了完整的编程语言特性，包括函数、类、异常处理等。
 
 ### 1.2 技术栈
 - **开发语言**: C#
@@ -53,7 +53,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 
 **命令行参数**: `-f <file.old8>` 或 `--file <file.old8>`
 
-#### 1.3.2 编译模式 (Compilation Mode)
+#### 1.3.2 IL 模式 (IL Mode)
 
 **实现位置**:
 - 核心类: `Old8Lang/Compiler/Compiler.cs` (静态类)
@@ -84,7 +84,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 - 需要静态类型保证的场景
 - 长时间运行的服务
 
-**命令行参数**: `-c <file.old8>` 或 `--compile <file.old8>`
+**命令行参数**: `-il <file.old8>`（别名 `-c`）
 
 #### 1.3.3 VM 模式 (Bytecode VM Mode) ⚠️ 实验性
 
@@ -109,7 +109,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 - ✅ 完整的异常处理
 - ✅ 支持异步和生成器
 - ✅ 独立的指令集架构
-- ⚠️ 性能介于解释模式和编译模式之间
+- ⚠️ 性能介于解释模式和 IL 模式之间
 
 **完成度**: 90-95% ✅ **已完整实现**
 
@@ -129,7 +129,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 
 #### 1.3.4 三种模式对比
 
-| 特性 | 解释模式 | 编译模式 | VM 模式 |
+| 特性 | 解释模式 | IL 模式 | VM 模式 |
 |------|---------|---------|---------|
 | **启动速度** | 快 | 慢（需编译） | 中等 |
 | **运行性能** | 中等 | 高 | 中等偏高 |
@@ -179,9 +179,9 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 **功能**: 提供命令行界面，用于运行和测试Old8Lang代码。
 
 **主要命令**:
-- `-f <file>`: 解释模式运行Old8Lang代码
-- `-c <file>`: 编译模式运行Old8Lang代码
-- `-s <file>`: 语法测试Old8Lang代码
+- `-f <file>`: 解释模式运行 Old8Lang 代码
+- `-il <file>`: 以 IL 模式运行 Old8Lang 代码（别名 `-c`）
+- `-s <file>`: 语法测试 Old8Lang 代码
 
 #### 2.2.3 Old8LangLib（标准库）
 **功能**: 提供Old8Lang语言的标准库，包括数学、文件操作、字符串处理等常用功能。
@@ -356,7 +356,7 @@ public void VisitBinaryExpression(BinaryExpression expr)
 }
 ```
 
-**使用场景**: 编译模式 (`-c` 参数)
+**使用场景**: IL 模式 (`-il` 参数)
 
 #### 4.3.3 BytecodeVisitor (字节码生成)
 
@@ -406,7 +406,7 @@ public List<Instruction> VisitBinaryExpression(BinaryExpression expr)
 - 分析表达式的类型
 - 推断泛型类型参数
 - 验证类型兼容性
-- 为编译模式提供类型信息
+- 为 IL 模式提供类型信息
 
 **核心实现示例**:
 ```csharp
@@ -507,7 +507,7 @@ public abstract class LangExpression
     // 解释模式执行
     public abstract object Run(VariateManager manager);
 
-    // 编译模式 IL 生成
+    // IL 模式 IL 生成
     public abstract void GenerateIl(ILGenerator ilGenerator, LocalManager local);
 
     // 位置信息（用于错误报告）
@@ -522,7 +522,7 @@ public abstract class OldStatement
     // 解释模式执行
     public abstract void Execute(VariateManager manager);
 
-    // 编译模式 IL 生成
+    // IL 模式 IL 生成
     public abstract void GenerateIl(ILGenerator ilGenerator, LocalManager local);
 
     // 位置信息（用于错误报告）
@@ -691,7 +691,7 @@ Parser 实现了错误恢复机制，在遇到语法错误时：
 
 Old8Lang 支持两种类型系统模式：
 - **解释模式**: 动态类型 + 运行时检查
-- **编译模式**: 静态类型 + 编译时检查
+- **IL 模式**: 静态类型 + 编译时检查
 
 ### 7.2 核心组件
 
@@ -702,7 +702,7 @@ Old8Lang 支持两种类型系统模式：
 **职责**:
 - 验证类型正确性
 - 检查类型兼容性
-- 强制编译模式的类型注解
+- 强制 IL 模式的类型注解
 
 **核心方法**:
 ```csharp
@@ -729,7 +729,7 @@ public class TypeChecker
 }
 ```
 
-**使用场景**: 编译模式的类型验证
+**使用场景**: IL 模式的类型验证
 
 #### 7.2.2 TypeInferenceEngine (类型推断引擎)
 
@@ -770,7 +770,7 @@ public class TypeInferenceEngine
 }
 ```
 
-**使用场景**: 解释模式的类型提示、编译模式的类型推断
+**使用场景**: 解释模式的类型提示、IL 模式的类型推断
 
 #### 7.2.3 GenericTypeInference (泛型类型推断)
 
@@ -831,7 +831,7 @@ strings <- map(numbers, (x) => "Number: " + x)
 
 ### 7.3 类型系统特点
 
-| 特性 | 解释模式 | 编译模式 |
+| 特性 | 解释模式 | IL 模式 |
 |------|---------|---------|
 | **类型检查时机** | 运行时 | 编译时 |
 | **类型注解** | 可选 | 必需 |
@@ -855,7 +855,7 @@ strings <- map(numbers, (x) => "Number: " + x)
 AST → InterpreterVisitor.Visit() → 直接执行 → 返回结果
 ```
 
-#### 7.4.2 编译模式
+#### 7.4.2 IL 模式
 
 **核心文件**:
 - `Old8Lang/Compiler/Compiler.cs` - 编译器主类
@@ -910,7 +910,7 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 5. **解释执行**: LangInterpreter逐条解释执行AST节点
 6. **输出结果**: 将执行结果输出到控制台
 
-### 9.2 编译模式工作流程
+### 9.2 IL 模式工作流程
 
 1. **命令行输入**: 用户通过Old8Lang.App输入命令，指定要编译运行的Old8Lang文件
 2. **文件读取**: 读取Old8Lang代码文件
@@ -925,7 +925,7 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 
 ### 10.1 测试目录
 
-- **CompilerTests**: 编译模式测试用例
+- **CompilerTests**: IL 模式测试用例
 - **InterpreterTests**: 解释模式测试用例
 - **SyntaxTests**: 语法测试用例
 - **Old8Lang.Tests**: 单元测试和集成测试
@@ -936,8 +936,8 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 # 解释模式测试
 dotnet run --project Old8Lang.App -- -f <path-to-test-file.old8>
 
-# 编译模式测试
-dotnet run --project Old8Lang.App -- -c <path-to-test-file.old8>
+# IL 模式测试
+dotnet run --project Old8Lang.App -- -il <path-to-test-file.old8>
 
 # 语法测试
 dotnet run --project Old8Lang.App -- -s <path-to-test-file.old8>
@@ -951,7 +951,7 @@ Old8Lang/
 ├── .idea/               # IDEA编辑器配置
 ├── .trae/               # Trae配置和文档
 ├── .vs/                 # Visual Studio配置
-├── CompilerTests/       # 编译模式测试用例
+├── CompilerTests/       # IL 模式测试用例
 ├── InterpreterTests/    # 解释模式测试用例
 ├── Old8Lang/            # 核心语言实现
 ├── Old8Lang.App/        # 命令行应用
@@ -1311,7 +1311,7 @@ if (_cache.TryAdd(key, key))
 
 1. **选择合适的执行模式**:
    - 开发/调试：解释模式（快速启动）
-   - 生产环境：编译模式（高性能）
+   - 生产环境：IL 模式（高性能）
    - 跨平台分发：VM 模式（字节码）
 
 2. **优化代码结构**:

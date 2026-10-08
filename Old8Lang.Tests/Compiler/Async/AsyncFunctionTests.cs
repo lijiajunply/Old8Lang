@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Async;
 
 /// <summary>
-/// 编译器模式下的异步编程功能测试 - 异步函数
+/// IL 模式下的异步编程功能测试 - 异步函数
 /// </summary>
 public class AsyncFunctionTests(ITestOutputHelper output)
 {

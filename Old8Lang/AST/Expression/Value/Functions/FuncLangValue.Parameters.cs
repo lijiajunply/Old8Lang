@@ -57,7 +57,7 @@ public partial class FuncLangValue
     }
 
     /// <summary>
-    /// 验证Lambda表达式的类型注解完整性（编译模式要求）
+    /// 验证Lambda表达式的类型注解完整性（IL 模式要求）
     /// </summary>
 
     private void ValidateLambdaTypeAnnotations(LocalManager local, string variableName)
@@ -71,8 +71,8 @@ public partial class FuncLangValue
                 if (string.IsNullOrEmpty(param.AssumptionType))
                 {
                     var errorMsg =
-                        $"[编译模式错误] Lambda表达式 '{variableName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
-                        $"编译模式下Lambda表达式的所有参数必须显式声明类型注解。\n\n" +
+                        $"[IL 模式错误] Lambda表达式 '{variableName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
+                        $"IL 模式下Lambda表达式的所有参数必须显式声明类型注解。\n\n" +
                         $"修复示例：\n" +
                         $"  {variableName} <- ({param.IdName}:int, ...) -> {{ ... }}\n" +
                         $"  {variableName} <- ({param.IdName}:int, ...) -> expression\n\n" +

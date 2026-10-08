@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Statements;
 
 /// <summary>
-/// Switch语句编译模式测试
-/// 测试编译器模式下的 switch-case 语句的 IL 生成和执行
+/// Switch语句 IL 模式测试
+/// 测试 IL 模式下的 switch-case 语句的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class SwitchTests

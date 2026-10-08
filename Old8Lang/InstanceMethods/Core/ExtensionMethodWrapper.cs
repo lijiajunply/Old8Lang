@@ -123,7 +123,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         LocalManager local,
         SourcePosition position)
     {
-        throw new NotImplementedException("扩展方法的编译模式支持尚未实现");
+        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现");
     }
 
     public Type GetReturnType(Type instanceType, List<LangExpression> parameters, LocalManager local)

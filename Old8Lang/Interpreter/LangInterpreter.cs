@@ -12,7 +12,7 @@ namespace Old8Lang.Interpreter;
 /// </summary>
 /// <remarks>
 /// 解释器是Old8Lang的核心组件之一，提供了代码的词法分析、语法分析和执行功能。
-/// 它支持两种运行模式：解释模式和编译模式（通过与编译器协同工作）。
+/// 它支持两种运行模式：解释模式和 IL 模式（通过与编译器协同工作）。
 /// </remarks>
 public class LangInterpreter
 {

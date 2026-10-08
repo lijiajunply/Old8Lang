@@ -25,7 +25,7 @@ public class GenericTypeResolver(
             return mappedType;
         }
 
-        // 常用集合类型映射（编译模式需要具体运行时类型，而不是 object）
+        // 常用集合类型映射（IL 模式需要具体运行时类型，而不是 object）
         // 注意：这里既支持 list，也支持 list<T> 等形式（统一映射到运行时容器类型）
         var loweredTypeName = typeName.Trim();
         var loweredBase = loweredTypeName;

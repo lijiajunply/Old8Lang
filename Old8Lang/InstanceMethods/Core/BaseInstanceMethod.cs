@@ -214,7 +214,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     }
 
     /// <summary>
-    /// 编译器模式生成 IL 代码
+    /// IL 模式生成 IL 代码
     /// </summary>
     public void GenerateIl(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
@@ -224,7 +224,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     }
 
     /// <summary>
-    /// 编译器模式获取返回类型
+    /// IL 模式获取返回类型
     /// </summary>
     public Type GetReturnType(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
@@ -248,13 +248,13 @@ public abstract class BaseInstanceMethod : IInstanceMethod
         VariateManager manager, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式生成 IL 代码的内部实现
+    /// IL 模式生成 IL 代码的内部实现
     /// </summary>
     protected abstract void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式获取返回类型的内部实现
+    /// IL 模式获取返回类型的内部实现
     /// </summary>
     protected abstract Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local);
 

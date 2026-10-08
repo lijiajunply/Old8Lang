@@ -6,7 +6,7 @@
 
 - [执行模式性能](#执行模式性能)
 - [性能分析工具](#性能分析工具)
-- [编译器模式 vs 解释器模式](#编译器模式-vs-解释器模式)
+- [IL 模式 vs 解释器模式](#IL 模式-vs-解释器模式)
 - [类型系统优化](#类型系统优化)
 - [内存管理](#内存管理)
 - [并发优化](#并发优化)
@@ -22,7 +22,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的性能特征。选�
 
 ### 三种模式性能对比
 
-| 性能指标 | 解释模式 | 编译模式 | VM 模式 |
+| 性能指标 | 解释模式 | IL 模式 | VM 模式 |
 |---------|---------|---------|---------|
 | **启动时间** | 最快 (~50ms) | 慢 (~500ms) | 中等 (~200ms) |
 | **运行时性能** | 中等 (1x) | 最快 (3-5x) | 较快 (1.5-2x) |
@@ -55,7 +55,7 @@ dotnet run --project Old8Lang.App -- -f prototypes/algorithm_test.old8
 dotnet run --project Old8Lang.App -- -f src/main.old8 -d
 ```
 
-#### 何时使用编译模式
+#### 何时使用 IL 模式
 
 **优势**:
 - 运行时性能最高（3-5倍于解释模式）
@@ -70,13 +70,13 @@ dotnet run --project Old8Lang.App -- -f src/main.old8 -d
 **推荐场景**:
 ```bash
 # 长时间运行的服务
-dotnet run --project Old8Lang.App -- -c services/api_server.old8
+dotnet run --project Old8Lang.App -- -il services/api_server.old8
 
 # 计算密集型任务
-dotnet run --project Old8Lang.App -- -c algorithms/matrix_multiply.old8
+dotnet run --project Old8Lang.App -- -il algorithms/matrix_multiply.old8
 
 # 生产环境部署
-dotnet run --project Old8Lang.App -- -c production/app.old8
+dotnet run --project Old8Lang.App -- -il production/app.old8
 ```
 
 #### 何时使用 VM 模式 ⚠️ 实验性
@@ -88,7 +88,7 @@ dotnet run --project Old8Lang.App -- -c production/app.old8
 - 支持完整的语言特性
 
 **劣势**:
-- 性能介于解释模式和编译模式之间
+- 性能介于解释模式和 IL 模式之间
 - 实验性功能，可能不稳定
 
 **推荐场景**:
@@ -120,7 +120,7 @@ function sum_interpreted() {
     return total
 }
 
-// 编译模式版本（需要类型注解）
+// IL 模式版本（需要类型注解）
 function sum_compiled() -> number {
     let total: number = 0
     for (let i: number = 0; i < 1000000; i = i + 1) {
@@ -132,7 +132,7 @@ function sum_compiled() -> number {
 
 **性能结果**:
 - 解释模式: ~2.5 秒
-- 编译模式: ~0.5 秒 (5x 更快)
+- IL 模式: ~0.5 秒 (5x 更快)
 - VM 模式: ~1.2 秒 (2x 更快)
 
 #### 测试 2: 递归计算（斐波那契数列 fib(35)）
@@ -148,7 +148,7 @@ function fibonacci(n: number) -> number {
 
 **性能结果**:
 - 解释模式: ~8.0 秒
-- 编译模式: ~1.5 秒 (5.3x 更快)
+- IL 模式: ~1.5 秒 (5.3x 更快)
 - VM 模式: ~3.5 秒 (2.3x 更快)
 
 #### 测试 3: 字符串操作（拼接 10,000 次）
@@ -165,7 +165,7 @@ function string_concat() {
 
 **性能结果**:
 - 解释模式: ~1.8 秒
-- 编译模式: ~0.4 秒 (4.5x 更快)
+- IL 模式: ~0.4 秒 (4.5x 更快)
 - VM 模式: ~0.9 秒 (2x 更快)
 
 ### 性能优化建议
@@ -176,11 +176,11 @@ function string_concat() {
 # 开发阶段：使用解释模式
 dotnet run --project Old8Lang.App -- -f src/app.old8
 
-# 性能测试：使用编译模式
-dotnet run --project Old8Lang.App -- -c src/app.old8
+# 性能测试：使用 IL 模式
+dotnet run --project Old8Lang.App -- -il src/app.old8
 
-# 生产部署：使用编译模式
-dotnet run --project Old8Lang.App -- -c production/app.old8
+# 生产部署：使用 IL 模式
+dotnet run --project Old8Lang.App -- -il production/app.old8
 
 # 跨平台分发：使用 VM 模式
 dotnet run --project Old8Lang.App -- compile-bytecode src/app.old8 -o app.o8bc
@@ -189,7 +189,7 @@ dotnet run --project Old8Lang.App -- compile-bytecode src/app.old8 -o app.o8bc
 #### 2. 混合使用模式
 
 对于复杂应用，可以混合使用不同模式：
-- 主程序使用编译模式（高性能）
+- 主程序使用 IL 模式（高性能）
 - 配置脚本使用解释模式（灵活性）
 - 插件系统使用 VM 模式（隔离和安全）
 
@@ -205,7 +205,7 @@ dotnet run --project Old8Lang.App -- -vm app.old8 --profile
 cat profiler-report-*.txt
 ```
 
-然后针对热点函数优化，并使用编译模式运行。
+然后针对热点函数优化，并使用 IL 模式运行。
 
 ---
 
@@ -262,18 +262,18 @@ dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-
 
 ---
 
-## 编译器模式 vs 解释器模式
+## IL 模式 vs 解释器模式
 
 ### 性能对比
 
 | 模式 | 执行速度 | 启动时间 | 内存使用 | 适用场景 |
 |------|---------|----------|---------|---------|
-| 编译器模式 (`-c`) | ⚡ **快** (5-10x) | 中等 | 较高 | 生产环境、长时间运行 |
+| IL 模式 (`-il`) | ⚡ **快** (5-10x) | 中等 | 较高 | 生产环境、长时间运行 |
 | 解释器模式 (`-f`) | 较慢 | **快** | 较低 | 开发调试、脚本执行 |
 
 ### 选择建议
 
-**使用编译器模式**:
+**使用 IL 模式**:
 - 生产环境部署
 - CPU 密集型计算（循环、数学运算）
 - 长时间运行的服务
@@ -300,7 +300,7 @@ result <- fib(35)
 ```
 
 **性能对比**:
-- 编译器模式: ~500ms
+- IL 模式: ~500ms
 - 解释器模式: ~3500ms
 - **编译器快 7 倍**
 
@@ -328,9 +328,9 @@ func calculate(a:double, b:double) -> double {
 
 **原因**: 显式类型避免运行时类型检查和装箱/拆箱操作。
 
-### 编译器模式的类型要求
+### IL 模式的类型要求
 
-编译器模式要求所有函数参数和返回值必须有类型标注:
+IL 模式要求所有函数参数和返回值必须有类型标注:
 
 ```old8lang
 // ✅ 正确 - 完整类型标注
@@ -343,7 +343,7 @@ func greet(name:string, prefix: "Hello") -> string {
     return prefix + ", " + name
 }
 
-// ❌ 错误 - 编译器模式缺少类型
+// ❌ 错误 - IL 模式缺少类型
 func multiply(x, y) {
     return x * y
 }
@@ -739,7 +739,7 @@ PrintLine("耗时: " + (endTime - startTime).ToStr() + "ms")
 
 在优化性能时,按照以下顺序检查:
 
-- [ ] **1. 使用编译器模式** (`-c`) 而非解释器模式
+- [ ] **1. 使用 IL 模式** (`-il`) 而非解释器模式
 - [ ] **2. 添加类型标注** 到所有函数参数和返回值
 - [ ] **3. 性能分析** 使用 `--profile` 找到热点函数
 - [ ] **4. 算法优化** 降低时间复杂度 (O(n²) → O(n))

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Types;
 
 /// <summary>
-/// 编译器模式下的类型系统测试 - 泛型类型推断
+/// IL 模式下的类型系统测试 - 泛型类型推断
 /// </summary>
 public class GenericTypeInferenceTests(ITestOutputHelper output)
 {

@@ -100,7 +100,7 @@ public partial class EnumInit(
     }
 
     /// <summary>
-    /// 在编译模式下生成枚举的IL代码
+    /// 在 IL 模式下生成枚举的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器</param>
@@ -137,7 +137,7 @@ public partial class EnumInit(
             if (memberValueExpr is not null)
             {
                 // 有显式赋值，计算表达式的值
-                // 注意：编译模式下，表达式必须是常量
+                // 注意：IL 模式下，表达式必须是常量
                 if (memberValueExpr is IntLangValue intValue)
                 {
                     currentValue = intValue.Value;

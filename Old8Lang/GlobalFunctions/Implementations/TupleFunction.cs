@@ -25,7 +25,7 @@ public sealed class TupleFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持元组创建
+        // IL 模式暂不支持元组创建
         ilGenerator.Emit(OpCodes.Ldnull);
     }
 

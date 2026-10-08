@@ -4,7 +4,7 @@ using Old8Lang.LangParser;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 编译器模式预编译指令测试
+/// IL 模式预编译指令测试
 /// </summary>
 [Collection("Sequential")]
 public class PreprocessorCompilerTests

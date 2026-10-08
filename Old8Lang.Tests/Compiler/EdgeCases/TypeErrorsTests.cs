@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.EdgeCases;
 
 /// <summary>
-/// 编译器模式下的边界和错误情况测试 - 类型错误测试
+/// IL 模式下的边界和错误情况测试 - 类型错误测试
 /// </summary>
 public class TypeErrorsTests(ITestOutputHelper output)
 {

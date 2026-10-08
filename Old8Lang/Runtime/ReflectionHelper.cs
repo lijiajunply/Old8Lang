@@ -15,7 +15,7 @@ namespace Old8Lang.Runtime;
 
 /// <summary>
 /// 反射运行时辅助类
-/// 提供编译器模式下的反射支持
+/// 提供 IL 模式下的反射支持
 /// </summary>
 public static class ReflectionHelper
 {
@@ -566,7 +566,7 @@ public static class ReflectionHelper
         }
 
         // 需要一个 VariateManager 来构建元数据
-        // 在编译器模式下，我们需要从当前上下文获取
+        // 在 IL 模式下，我们需要从当前上下文获取
         // 这里暂时创建一个临时的 manager
         var manager = new VariateManager();
         var metadata = template.BuildMetadata(manager);
@@ -636,7 +636,7 @@ internal class ValueExpression(LangValueType value) : LangExpression
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译器模式下不应该调用这个方法
+        // IL 模式下不应该调用这个方法
         throw new NotImplementedException();
     }
 

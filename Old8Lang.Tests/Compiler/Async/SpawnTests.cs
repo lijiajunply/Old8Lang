@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Async;
 
 /// <summary>
-/// 编译器模式下的异步编程功能测试 - spawn 关键字
+/// IL 模式下的异步编程功能测试 - spawn 关键字
 /// </summary>
 public class SpawnTests(ITestOutputHelper output)
 {

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Types;
 
 /// <summary>
-/// 编译器模式下的类型系统测试 - 枚举
+/// IL 模式下的类型系统测试 - 枚举
 /// </summary>
 public class EnumTests(ITestOutputHelper output)
 {

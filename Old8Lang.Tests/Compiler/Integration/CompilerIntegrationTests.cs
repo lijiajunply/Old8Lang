@@ -5,7 +5,7 @@ namespace Old8Lang.Tests.Compiler.Integration;
 /// <summary>
 /// 编译器集成测试 - 验证编译器的 IL 生成功能
 /// 测试从源代码到 IL 代码生成的完整管道
-/// 注意:编译器模式主要测试 IL 生成过程不抛出异常,而不是执行结果
+/// 注意:IL 模式主要测试 IL 生成过程不抛出异常,而不是执行结果
 /// </summary>
 [Collection("Sequential")]
 public class CompilerIntegrationTests
@@ -79,7 +79,7 @@ public class CompilerIntegrationTests
     public void CompilerPipeline_FunctionCall_GeneratesCorrectIL()
     {
         // 测试函数调用的 IL 生成 - 简化版本
-        // 注意:完整的函数调用测试在编译器模式下可能有 bug,这里仅测试编译不抛出异常
+        // 注意:完整的函数调用测试在 IL 模式下可能有 bug,这里仅测试编译不抛出异常
         var code = @"
             func multiply(x:int, y:int) -> int {
                 return x * y

@@ -1,4 +1,4 @@
-// 测试类字段类型假注 - 编译器模式测试
+// 测试类字段类型假注 - IL 模式测试
 
 class Person {
     public name:string <- "Alice"

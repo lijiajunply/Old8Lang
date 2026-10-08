@@ -3,7 +3,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// 测试默认参数在编译器模式下的行为
+/// 测试默认参数在 IL 模式下的行为
 /// </summary>
 [Collection("Sequential")]
 public class DefaultParametersCompilerTests

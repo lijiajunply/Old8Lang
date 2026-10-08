@@ -267,8 +267,8 @@ public class LocalManager
         errorBuilder.AppendLine($"错误信息: {message}");
         errorBuilder.AppendLine(new string('-', 60));
         
-        // 通用编译模式提示
-        errorBuilder.AppendLine("编译模式下的类型检查规则：");
+        // 通用 IL 模式提示
+        errorBuilder.AppendLine("IL 模式下的类型检查规则：");
         errorBuilder.AppendLine("1. 所有函数必须显式声明返回类型");
         errorBuilder.AppendLine("2. 所有函数参数必须有类型注解或默认值");
         errorBuilder.AppendLine("3. 变量赋值必须保持类型一致");
@@ -395,7 +395,7 @@ public class LocalManager
     {
         if (!LocalVarTypes.ContainsKey(varName))
         {
-            ReportError($"变量 '{varName}' 缺少类型注解（编译模式要求所有变量必须显式声明类型）", position);
+            ReportError($"变量 '{varName}' 缺少类型注解（IL 模式要求所有变量必须显式声明类型）", position);
             return false;
         }
         return true;

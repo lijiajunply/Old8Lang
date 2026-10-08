@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Integration;
 
 /// <summary>
-/// 编译模式端到端测试 - 验证从源代码到目标代码输出的全过程
-/// 测试编译模式下的完整流程：解析 -> IL生成 -> 验证 -> 执行
+/// IL 模式端到端测试 - 验证从源代码到目标代码输出的全过程
+/// 测试 IL 模式下的完整流程：解析 -> IL生成 -> 验证 -> 执行
 /// </summary>
 [Collection("Sequential")]
 public class EndToEndCompileTests
@@ -54,12 +54,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的基本语法结构
+    /// 测试 IL 模式下的基本语法结构
     /// </summary>
     [Fact(Skip = "函数调用的IL生成有已知bug - 需要编译器层面修复")]
     public void EndToEndCompile_BasicSyntaxStructures_CompilesCorrectly()
     {
-        // 测试各种基本语法结构在编译模式下的表现
+        // 测试各种基本语法结构在 IL 模式下的表现
         var code = """
                                // 变量赋值
                                a <- 123
@@ -120,12 +120,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的类和对象
+    /// 测试 IL 模式下的类和对象
     /// </summary>
     [Fact(Skip = "类方法调用的IL生成有已知bug - 需要编译器层面修复")]
     public void EndToEndCompile_ClassAndObject_CompilesCorrectly()
     {
-        // 测试类声明、实例化和方法调用在编译模式下的表现
+        // 测试类声明、实例化和方法调用在 IL 模式下的表现
         var code = """
                                class Person {
                                     name <- ""
@@ -184,12 +184,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的lambda表达式
+    /// 测试 IL 模式下的lambda表达式
     /// </summary>
     [Fact(Skip = "Lambda表达式调用的IL生成有已知bug - 需要编译器层面修复")]
     public void EndToEndCompile_LambdaExpressions_CompilesCorrectly()
     {
-        // 测试lambda表达式在编译模式下的表现
+        // 测试lambda表达式在 IL 模式下的表现
         var code = """
                                // 简单lambda
                                add <- (x:int, y:int) -> x + y
@@ -225,12 +225,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的错误处理
+    /// 测试 IL 模式下的错误处理
     /// </summary>
     [Fact]
     public void EndToEndCompile_ErrorHandling_CompilesCorrectly()
     {
-        // 测试try-catch语句在编译模式下的表现
+        // 测试try-catch语句在 IL 模式下的表现
         var code = """
 
                                // 测试try-catch
@@ -272,12 +272,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的复杂控制流
+    /// 测试 IL 模式下的复杂控制流
     /// </summary>
     [Fact]
     public void EndToEndCompile_ComplexControlFlow_CompilesCorrectly()
     {
-        // 测试复杂控制流在编译模式下的表现
+        // 测试复杂控制流在 IL 模式下的表现
         var code = """
 
                                // 测试嵌套条件和循环
@@ -343,12 +343,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的递归函数
+    /// 测试 IL 模式下的递归函数
     /// </summary>
     [Fact(Skip = "递归函数调用的IL生成有已知bug - 需要编译器层面修复")]
     public void EndToEndCompile_RecursiveFunctions_CompilesCorrectly()
     {
-        // 测试递归函数在编译模式下的表现
+        // 测试递归函数在 IL 模式下的表现
         var code = """
 
                                // 测试阶乘函数
@@ -388,12 +388,12 @@ public class EndToEndCompileTests
     }
 
     /// <summary>
-    /// 测试编译模式下的类型转换
+    /// 测试 IL 模式下的类型转换
     /// </summary>
     [Fact]
     public void EndToEndCompile_TypeConversion_CompilesCorrectly()
     {
-        // 测试类型转换在编译模式下的表现
+        // 测试类型转换在 IL 模式下的表现
         var code = """
                        // 数值类型转换
                        int_val <- 123

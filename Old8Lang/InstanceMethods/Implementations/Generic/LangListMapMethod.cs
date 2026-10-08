@@ -44,7 +44,7 @@ public class LangListMapMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持高阶函数
+        // IL 模式暂不支持高阶函数
         ilGenerator.Emit(OpCodes.Ldnull);
     }
 

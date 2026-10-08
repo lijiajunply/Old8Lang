@@ -102,7 +102,7 @@ public sealed class ReadLineFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持
+        // IL 模式暂不支持
         ilGenerator.Emit(OpCodes.Ldstr, "");
     }
 
@@ -145,7 +145,7 @@ public sealed class InputFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local,
         SourcePosition position)
     {
-        // 编译模式暂不支持控制台交互，返回空字符串
+        // IL 模式暂不支持控制台交互，返回空字符串
         ilGenerator.Emit(OpCodes.Ldstr, "");
     }
 
@@ -204,7 +204,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式使用 Console.Error.WriteLine
+        // IL 模式使用 Console.Error.WriteLine
         if (parameters.Count == 0)
         {
             var errorProp = GlobalMethodInfoCache.GetPropertyGetter(typeof(Console), "Error")!;

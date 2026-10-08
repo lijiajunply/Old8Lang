@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Classes;
 
 /// <summary>
-/// 类声明编译模式测试
-/// 测试编译器模式下的类声明、实例化和方法调用的 IL 生成和执行
+/// 类声明 IL 模式测试
+/// 测试 IL 模式下的类声明、实例化和方法调用的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class ClassDeclarationTests

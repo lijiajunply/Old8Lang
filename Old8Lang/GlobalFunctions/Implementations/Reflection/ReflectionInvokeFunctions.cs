@@ -67,7 +67,7 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
 
         // 加载 manager 参数（需要从某处获取）
         // 这里我们需要传递当前的 VariateManager
-        // 由于编译模式下没有直接的 manager，我们需要使用 Interpreter.Manager
+        // 由于 IL 模式下没有直接的 manager，我们需要使用 Interpreter.Manager
         var interpreterField = typeof(LocalManager).GetField("Interpreter");
         ilGenerator.Emit(OpCodes.Ldsfld, interpreterField!);
         var managerProperty = typeof(LangInterpreter).GetProperty("Manager");

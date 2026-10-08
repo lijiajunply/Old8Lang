@@ -80,7 +80,7 @@ public class LangListZipMethod : BaseLangListMethod
         }
         else
         {
-            // 编译模式暂不支持带 zipper 函数的版本
+            // IL 模式暂不支持带 zipper 函数的版本
             ilGenerator.Emit(OpCodes.Ldnull);
         }
     }

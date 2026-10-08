@@ -6,13 +6,13 @@
 > 各特性的实际可用性请以 [MODE_COMPLETION_STATUS.md](./MODE_COMPLETION_STATUS.md) 为准
 > （该文档已于 2026-10-08 按三种模式的实际运行结果全量复核）。
 
-本文档详细对比了 Old8Lang 在 **解释器模式**、**编译器模式** 和 **虚拟机模式** 下的内部 API（全局函数、标准库、基本类型方法）的实现机制与差异。
+本文档详细对比了 Old8Lang 在 **解释器模式**、**IL 模式** 和 **虚拟机模式** 下的内部 API（全局函数、标准库、基本类型方法）的实现机制与差异。
 
 ## 1. 核心架构概述
 
 Old8Lang 通过统一的接口设计和 Visitor 模式，实现了三种执行模式的共存与隔离。
 
-| 特性 | 解释器模式 (`-f`) | 编译器模式 (`-c`) | 虚拟机模式 (VM) |
+| 特性 | 解释器模式 (`-f`) | IL 模式 (`-il`) | 虚拟机模式 (VM) |
 | :--- | :--- | :--- | :--- |
 | **设计目标** | 开发效率、动态灵活性 | 运行性能、类型安全 | 可移植性、细粒度控制 |
 | **执行核心** | `LangInterpreter` | `Compiler` | `VirtualMachine` |
@@ -35,7 +35,7 @@ public interface IGlobalFunction
     // 解释器模式实现
     Value ExecuteInternal(Value[] args, VariateManager manager);
     
-    // 编译器模式实现
+    // IL 模式实现
     void GenerateIlInternal(ILGenerator il, Type[] paramTypes);
     
     // 虚拟机模式实现
@@ -45,7 +45,7 @@ public interface IGlobalFunction
 
 ### 2.2 实现机制对比
 
-| 机制 | 解释器模式 | 编译器模式 | 虚拟机模式 |
+| 机制 | 解释器模式 | IL 模式 | 虚拟机模式 |
 | :--- | :--- | :--- | :--- |
 | **函数查找** | 运行时通过 `GlobalFunctionRegistry` 和 `VariateManager` 动态查找。 | 编译时解析函数名，直接绑定到对应的 IL 生成逻辑。 | 运行时通过 `OpCode.Call` 或 `OpCode.CallNative` 指令，在 `_globals` 表中查找。 |
 | **参数传递** | 接收 `Value[]` 数组，运行时解析。 | 通过计算栈传递参数，编译时确定类型。 | 通过操作数栈传递参数，运行时弹出。 |
@@ -66,7 +66,7 @@ public interface IGlobalFunction
 
 ### 3.1 加载与调用
 
-| 机制 | 解释器模式 | 编译器模式 | 虚拟机模式 |
+| 机制 | 解释器模式 | IL 模式 | 虚拟机模式 |
 | :--- | :--- | :--- | :--- |
 | **库加载** | 使用 `StandardLibraryLoader` 动态加载程序集，注册到当前作用域。 | 使用 `StandardLibraryLoader` 提取类型元数据，用于编译时类型检查和方法绑定。 | 使用 `ModuleRegistry` 管理模块，通过 `OpCode.ImportNative` 指令加载。 |
 | **Import 语句** | `ImportStatement.Run()`: 立即执行加载逻辑。 | `ImportStatement.GenerateIl()`: 生成加载指令或静态链接。 | `BytecodeVisitor`: 生成 `LoadModule` 或 `ImportNative` 指令。 |
@@ -78,7 +78,7 @@ public interface IGlobalFunction
 - **编译器**: 需要库提供明确的类型签名，不支持部分动态特性。
 - **虚拟机**: 需要通过 `ExternFunctionWrapper` 进行封装，目前主要支持核心标准库。
   2026-10-08 实测：`extern "Old8LangLib" MathLib Sqrt sqrt` 这类导入在虚拟机模式下调用会报
-  `方法 'sqrt' 未找到`（编译模式报 `名称 'sqrt' 未定义`），即标准库的导入调用尚未打通。
+  `方法 'sqrt' 未找到`（IL 模式报 `名称 'sqrt' 未定义`），即标准库的导入调用尚未打通。
 
 ---
 
@@ -96,7 +96,7 @@ Old8Lang 使用 **静态扩展方法类** 来统一管理这些方法。不同�
   - `DictionaryValueFuncStatic`
   - `ValueTypeFuncStatic` (通用方法如 `.ToInt()`)
 
-- **编译器模式 (针对原生 CLR 类型)**:
+- **IL 模式 (针对原生 CLR 类型)**:
   - `StringExtensions` (针对 `string`)
   - `ListExtensions` (针对 `List<T>`)
   - `DictionaryExtensions` (针对 `Dictionary<K,V>`)
@@ -104,7 +104,7 @@ Old8Lang 使用 **静态扩展方法类** 来统一管理这些方法。不同�
 
 ### 4.2 调用机制对比
 
-| 机制 | 解释器模式 | 编译器模式 | 虚拟机模式 |
+| 机制 | 解释器模式 | IL 模式 | 虚拟机模式 |
 | :--- | :--- | :--- | :--- |
 | **解析方式** | `FunctionCallExpression`: 运行时检查对象类型，反射查找对应的 `*ValueFuncStatic` 类。 | `DotOperatorILHelper`: 编译时根据变量类型(CLR Type)，查找对应的 `*Extensions` 类。 | `OpCode.CallMethod`: 运行时指令，动态分发。 |
 | **重写逻辑** | 动态分发。例如 `str.Length()` -> `StringValueFuncStatic.Length(strVal)`。 | 静态重写。例如 `str.Length()` -> `StringExtensions.Length(str)`。基本类型如 `i.ToStr()` -> `PrimitiveExtensions.ToStr(i)`。 | 动态分发。VM 检查栈顶对象类型，查虚表或元数据调用对应方法。 |
@@ -145,7 +145,7 @@ VM 使用显式的异常表指令结构，而不是 C# 的 `try-catch` 块：
 
 ## 6. 总结
 
-| 维度 | 解释器模式 | 编译器模式 | 虚拟机模式 |
+| 维度 | 解释器模式 | IL 模式 | 虚拟机模式 |
 | :--- | :--- | :--- | :--- |
 | **API 实现** | 动态反射，灵活但慢 | 静态绑定，快速且类型安全 | 字节码指令，可移植且可控 |
 | **扩展性** | 极高，可运行时修改 | 中等，需重新编译 | 高，支持模块化加载 |

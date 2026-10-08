@@ -1,4 +1,4 @@
-// 异步Lambda表达式编译模式测试
+// 异步Lambda表达式 IL 模式测试
 
 // 测试异步无参数Lambda表达式
 async_lambda1 <- async () -> 123

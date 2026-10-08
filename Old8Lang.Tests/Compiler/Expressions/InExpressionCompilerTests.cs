@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// In表达式编译模式测试
-/// 测试in表达式和for-in循环在编译模式下的IL生成和执行
+/// In表达式 IL 模式测试
+/// 测试in表达式和for-in循环在 IL 模式下的IL生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class InExpressionCompilerTests
@@ -12,7 +12,7 @@ public class InExpressionCompilerTests
     #region in表达式编译测试
 
     /// <summary>
-    /// 测试in表达式在编译模式下的运行效果
+    /// 测试in表达式在 IL 模式下的运行效果
     /// </summary>
     [Fact]
     public void CompileMode_InExpression_CompilesCorrectly()
@@ -128,7 +128,7 @@ public class InExpressionCompilerTests
     #region for-in循环编译测试
 
     /// <summary>
-    /// 测试for-in循环在编译模式下的运行效果
+    /// 测试for-in循环在 IL 模式下的运行效果
     /// </summary>
     [Fact]
     public void CompileMode_ForInLoop_CompilesCorrectly()

@@ -106,7 +106,7 @@ public class InitCommand : ICommand
                     {
                         Debug = false,
                         LogLevel = "error",
-                        Runtime = "compiler"
+                        Runtime = "il"
                     }
                 }
             },
@@ -167,7 +167,7 @@ public class InitCommand : ICommand
                     {
                         Debug = false,
                         LogLevel = "error",
-                        Runtime = "compiler"
+                        Runtime = "il"
                     }
                 }
             },

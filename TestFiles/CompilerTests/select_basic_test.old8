@@ -1,5 +1,5 @@
-// Select 语句编译器模式基本测试
-// 测试 select 语句在编译器模式（-c）下的执行
+// Select 语句 IL 模式基本测试
+// 测试 select 语句在 IL 模式（-c）下的执行
 
 PrintLine("=== 测试 1: select 发送到有容量的channel ===")
 ch1 <- ChannelCreateBounded(1)

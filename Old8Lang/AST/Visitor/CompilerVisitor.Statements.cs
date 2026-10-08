@@ -14,8 +14,8 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitExtensionDeclaration(ExtensionDeclaration node)
     {
-        // 编译模式暂不支持扩展方法
-        throw new NotImplementedException("扩展方法的编译模式支持尚未实现，请使用解释模式");
+        // IL 模式暂不支持扩展方法
+        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现，请使用解释模式");
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitFileHeaderDirective(FileHeaderDirective node)
     {
-        // 文件头指令在编译器模式下不需要生成代码
+        // 文件头指令在 IL 模式下不需要生成代码
         return null;
     }
 

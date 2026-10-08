@@ -101,7 +101,7 @@ public partial class RangeLangValue(
     }
 
     /// <summary>
-    /// 创建范围数组的辅助方法(用于编译模式)
+    /// 创建范围数组的辅助方法(用于 IL 模式)
     /// </summary>
     public static int[] CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
     {

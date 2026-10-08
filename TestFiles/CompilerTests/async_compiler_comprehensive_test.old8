@@ -1,4 +1,4 @@
-// 异步编译模式综合测试
+// 异步 IL 模式综合测试
 // 测试async/await的IL生成、Task类型支持和AsyncStateMachine生成
 
 // 测试1：简单异步函数，不使用Task.Delay
@@ -20,7 +20,7 @@ async func asyncWithParams(x, y) -> int {
 // 注意：main函数不能使用await，因为它不是异步函数
 // 所以我们需要直接调用异步函数，不使用await
 func main() -> void {
-    PrintLine("=== 异步编译模式综合测试 ===");
+    PrintLine("=== 异步 IL 模式综合测试 ===");
     
     // 测试1：简单异步函数，直接调用（不使用await）
     PrintLine("\n1. 测试简单异步函数：");

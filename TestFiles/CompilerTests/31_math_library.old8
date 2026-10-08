@@ -1,6 +1,6 @@
-// 测试 Math 库 - 编译器模式
+// 测试 Math 库 - IL 模式
 
-PrintLine("=== Math 库测试（编译器模式）===")
+PrintLine("=== Math 库测试（IL 模式）===")
 
 // 基本算术运算
 PrintLine("\n--- 基本算术运算 ---")

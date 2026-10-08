@@ -63,7 +63,7 @@ public partial class AsyncStreamExpression : LangExpression
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式）
+    /// 生成 IL 代码（IL 模式）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

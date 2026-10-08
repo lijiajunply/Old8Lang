@@ -4,7 +4,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 编译模式类型系统测试
+/// IL 模式类型系统测试
 /// 测试编译器在处理类型注解、类型转换和类型检查时的行为
 /// </summary>
 [Collection("Sequential")]

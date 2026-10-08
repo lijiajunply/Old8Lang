@@ -88,20 +88,20 @@ dict_new <- dict()            // 新建一个空字典
 
 ## 编译器和解释器
 
-### Q: 编译器模式和解释器模式有什么区别?
+### Q: IL 模式和解释器模式有什么区别?
 
 **A**:
 
-| 特性 | 编译器模式 (`-c`) | 解释器模式 (`-f`) |
+| 特性 | IL 模式 (`-il`) | 解释器模式 (`-f`) |
 |------|------------------|------------------|
 | 执行速度 | 快 (5-10x) | 慢 |
 | 类型要求 | 严格（必须标注） | 宽松（可选） |
 | 启动时间 | 中等 | 快 |
 | 适用场景 | 生产环境 | 开发调试 |
 
-### Q: 编译器模式下为什么必须标注类型?
+### Q: IL 模式下为什么必须标注类型?
 
-**A**: 编译器模式生成优化的 CIL代码(.Net 中间代码) ,需要在编译时确定类型信息。解决方法:
+**A**: IL 模式生成优化的 CIL代码(.Net 中间代码) ,需要在编译时确定类型信息。解决方法:
 
 ```old8
 // ✅ 显式类型标注
@@ -122,8 +122,8 @@ func greet(name:string, prefix: "Hello") -> string {
 # 解释器模式
 dotnet run --project Old8Lang.App -- -f mycode.old8
 
-# 编译器模式
-dotnet run --project Old8Lang.App -- -c mycode.old8
+# IL 模式
+dotnet run --project Old8Lang.App -- -il mycode.old8
 
 # 语法测试（不执行）
 dotnet run --project Old8Lang.App -- -s mycode.old8
@@ -140,7 +140,7 @@ dotnet run --project Old8Lang.App -- -vm mycode.old8
 
 **A**: Old8Lang 是**动态类型**语言,但支持**可选类型标注**:
 - 解释器模式: 完全动态,类型标注可选
-- 编译器模式: 要求函数签名必须有类型
+- IL 模式: 要求函数签名必须有类型
 
 ### Q: 类型推断如何工作?
 
@@ -222,7 +222,7 @@ func validateAge(age:int) -> void {
    num.ToStr()     // 正确
    ```
 
-4. **编译器模式缺少类型标注**
+4. **IL 模式缺少类型标注**
    ```old8
    func add(a, b) { return a + b }  // 错误
    func add(a:int, b:int) -> int { return a + b }  // 正确
@@ -236,7 +236,7 @@ func validateAge(age:int) -> void {
 
 **A**: 按以下步骤优化:
 
-1. **使用编译器模式** (`-c`) 而非解释器模式
+1. **使用 IL 模式** (`-il`) 而非解释器模式
 2. **添加类型标注** 到所有函数
 3. **使用性能分析器** 找到热点:
    ```bash

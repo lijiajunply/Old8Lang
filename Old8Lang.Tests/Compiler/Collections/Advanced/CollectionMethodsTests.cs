@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Collections.Advanced;
 
 /// <summary>
-/// 编译器模式下的高级集合功能测试 - 集合方法
+/// IL 模式下的高级集合功能测试 - 集合方法
 /// </summary>
 public class CollectionMethodsTests(ITestOutputHelper output)
 {

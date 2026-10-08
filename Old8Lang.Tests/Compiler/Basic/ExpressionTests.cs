@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 基础表达式编译模式测试
-/// 测试编译器模式下各类表达式的 IL 生成和执行
+/// 基础表达式 IL 模式测试
+/// 测试 IL 模式下各类表达式的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class ExpressionTests

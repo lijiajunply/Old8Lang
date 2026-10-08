@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 变量相关编译模式测试
-/// 测试编译器模式下的变量声明、赋值、作用域等功能
+/// 变量相关 IL 模式测试
+/// 测试 IL 模式下的变量声明、赋值、作用域等功能
 /// </summary>
 [Collection("Sequential")]
 public class VariableTests

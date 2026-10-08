@@ -110,7 +110,11 @@ public abstract class Program
     {
         // 执行命令
         CommandRegistry.Register(new FromFileCommand());
-        CommandRegistry.Register(new CompilerCommand());
+
+        // IL 模式命令（-il），并保留 -c 作为别名以向后兼容
+        var ilCommand = new CompilerCommand();
+        CommandRegistry.Register(ilCommand);
+        CommandRegistry.Register(new CommandAlias("-c", ilCommand, "IL 模式命令的别名（等价于 -il）"));
         CommandRegistry.Register(new SyntaxTestCommand());
         CommandRegistry.Register(new RunCommand());
 

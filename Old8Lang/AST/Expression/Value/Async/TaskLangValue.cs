@@ -394,7 +394,7 @@ public partial class TaskLangValue : LangValueType
     }
 
     /// <summary>
-    /// 获取 .NET 类型（编译器模式暂不支持）
+    /// 获取 .NET 类型（IL 模式暂不支持）
     /// </summary>
     public override Type OutputType(LocalManager local)
     {

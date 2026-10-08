@@ -65,7 +65,7 @@ public partial class CompilerVisitor
     }
 
     // ===== Value 节点实现 =====
-    // Value节点在编译器模式下通常直接加载常量或调用LoadIlValue
+    // Value节点在 IL 模式下通常直接加载常量或调用LoadIlValue
 
     public object? VisitAnyLangValue(AnyLangValue node)
     {
@@ -269,7 +269,7 @@ public partial class CompilerVisitor
 
     public object? VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
-        // 泛型实例化在编译器模式下暂不支持
+        // 泛型实例化在 IL 模式下暂不支持
         node.LoadIlValue(ilGenerator, local);
         return null;
     }
@@ -331,7 +331,7 @@ public partial class CompilerVisitor
 
     public object VisitInterpreterVisitor(InterpreterVisitor node)
     {
-        // InterpreterVisitor 不应该在编译器模式下访问
-        throw new NotSupportedException("InterpreterVisitor 不应该在编译器模式下访问");
+        // InterpreterVisitor 不应该在 IL 模式下访问
+        throw new NotSupportedException("InterpreterVisitor 不应该在 IL 模式下访问");
     }
 }

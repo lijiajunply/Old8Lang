@@ -418,10 +418,10 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
    - 验证类型推断正确性
    - 确保向后兼容性
 
-3. **与编译模式对比**:
+3. **与 IL 模式对比**:
    - 解释模式测试覆盖更全面（84 vs 29 个测试文件）
    - 许多特性在解释模式下更容易测试
-   - 解释模式测试可以作为编译模式测试的参考
+   - 解释模式测试可以作为 IL 模式测试的参考
 
 4. **代码质量**:
    - 保持测试代码清晰可读
@@ -439,7 +439,7 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 ## 相关资源
 
 - 当前解释模式测试: `Old8Lang.Tests/Interpreter/`
-- 编译模式测试: `Old8Lang.Tests/Compiler/`
+- IL 模式测试: `Old8Lang.Tests/Compiler/`
 - AST 节点定义: `Old8Lang/AST/`
 - 语法规范: `Docs/Old8Lang_Grammar.md`
 - EBNF 规范: `Old8Lang/Old8Lang.ebnf`

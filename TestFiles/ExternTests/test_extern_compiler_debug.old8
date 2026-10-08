@@ -1,4 +1,4 @@
-// 编译器模式 extern 测试 - 简化版
+// IL 模式 extern 测试 - 简化版
 PrintLine("开始测试")
 
 extern "libc.dylib" {

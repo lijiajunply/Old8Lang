@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// 编译器模式下的高级函数功能测试 - 闭包
+/// IL 模式下的高级函数功能测试 - 闭包
 /// </summary>
 public class ClosureTests(ITestOutputHelper output)
 {

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Classes;
 
 /// <summary>
-/// 编译器模式下的高级类功能测试 - 类实例化
+/// IL 模式下的高级类功能测试 - 类实例化
 /// </summary>
 public class ClassInstantiationTests(ITestOutputHelper output)
 {

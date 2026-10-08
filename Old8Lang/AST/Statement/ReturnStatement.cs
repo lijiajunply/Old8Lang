@@ -64,7 +64,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                 // 如果返回类型不匹配且不能自动转换，报告错误
                 if (!isCompatible)
                 {
-                    var errorMsg = $"[编译模式错误] 返回类型不匹配\n\n" +
+                    var errorMsg = $"[IL 模式错误] 返回类型不匹配\n\n" +
                                   $"期望返回类型: {expectedReturnType.Name}\n" +
                                   $"实际返回类型: {returnType.Name}\n\n" +
                                   $"修复建议：\n" +

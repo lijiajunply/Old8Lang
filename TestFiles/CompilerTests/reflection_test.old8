@@ -1,4 +1,4 @@
-// 反射系统测试 - 编译器模式
+// 反射系统测试 - IL 模式
 
 // 定义一个测试类
 class Person {
@@ -77,4 +77,4 @@ PrintLine("\n=== 测试 HasField ===")
 hasName <- HasField(person, "name")
 PrintLine("Has name: " + hasName.ToStr())
 
-PrintLine("\n=== 编译器模式反射测试完成 ===")
+PrintLine("\n=== IL 模式反射测试完成 ===")

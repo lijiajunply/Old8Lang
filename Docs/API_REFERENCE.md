@@ -1100,7 +1100,7 @@ Old8Lang 提供了丰富的标准库，涵盖核心功能、网络、数据库�
 
 每个 API 都标注了支持的执行模式：
 - ✅ **解释模式** (`-f`): 完全支持
-- ✅ **编译模式** (`-c`): 完全支持
+- ✅ **IL 模式** (`-il`): 完全支持
 - ✅ **VM 模式** (`-vm`): 完全支持
 - ❌ 不支持该模式
 
@@ -1114,7 +1114,7 @@ Old8Lang 提供了丰富的标准库，涵盖核心功能、网络、数据库�
 
 ### Math 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1161,7 +1161,7 @@ PrintLine("cos(45°) = " + cos_value.ToStr())
 
 ### File 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1212,7 +1212,7 @@ for line <- lines {
 
 ### Crypto 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1261,7 +1261,7 @@ PrintLine("Decoded: " + decoded)
 
 ### Image 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1308,7 +1308,7 @@ Image.Save(rotated, "photo_rotated.jpg")
 
 ### Regex 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1352,7 +1352,7 @@ PrintLine(result)  // "The year is XXXX"
 
 ### Terminal 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1395,7 +1395,7 @@ PrintLine("Hello at (10, 5)")
 
 ### ColorfulTerminal 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1433,7 +1433,7 @@ ColorfulTerminal.Reset()
 
 ### Time 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1483,7 +1483,7 @@ PrintLine("Done!")
 
 ### OS 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1529,7 +1529,7 @@ PrintLine("Current directory: " + current)
 
 ### CSV 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1568,7 +1568,7 @@ for row <- rows {
 
 ### Template 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1608,7 +1608,7 @@ PrintLine(result2)
 
 ### Vector 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1661,7 +1661,7 @@ PrintLine("Length: " + length.ToStr())
 
 ### HTTP 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1701,7 +1701,7 @@ HTTP.SetTimeout(5000)  // 5秒
 
 ### WebSocket 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1740,7 +1740,7 @@ WebSocket.Close(ws)
 
 ### MQTT 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1782,7 +1782,7 @@ MQTT.Disconnect(client)
 
 ### Socket 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1830,7 +1830,7 @@ Socket.Close(server)
 
 ### WebAPI 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1871,7 +1871,7 @@ PrintLine("Data: " + data.ToStr())
 
 ### MySQL 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1912,7 +1912,7 @@ MySQL.Close(conn)
 
 ### PostgreSQL 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1950,7 +1950,7 @@ PostgreSQL.Close(conn)
 
 ### SQLite 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -1993,7 +1993,7 @@ SQLite.Close(conn)
 
 ### InMemory 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2039,7 +2039,7 @@ InMemory.Delete(db, "user:2")
 
 ### ORM 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2092,7 +2092,7 @@ ORM.Delete(user)
 
 ### MessagePack 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2125,7 +2125,7 @@ PrintLine("Age: " + deserialized["age"].ToStr())
 
 ### Protobuf 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2160,7 +2160,7 @@ PrintLine("Name: " + deserialized["name"])
 
 ### Factory 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2204,7 +2204,7 @@ PrintLine("Name: " + deserialized["name"])
 
 ### Classification 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2245,7 +2245,7 @@ PrintLine("Accuracy: " + accuracy.ToStr())
 
 ### Regression 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2286,7 +2286,7 @@ PrintLine("R² Score: " + score.ToStr())
 
 ### Clustering 模块
 
-**模式支持**: ✅ 解释模式 | ❌ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2328,7 +2328,7 @@ for i <- 0, i < centers.Length(), i <- i + 1 {
 
 ### DataLoader 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2367,7 +2367,7 @@ PrintLine("Test size: " + testData.Length().ToStr())
 
 ### Predictor 模块
 
-**模式支持**: ✅ 解释模式 | ✅ 编译模式 | ✅ VM 模式
+**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
 
 **导入方式**:
 ```old8lang
@@ -2423,7 +2423,7 @@ for pred <- predictions {
 - **序列化库 (Old8Lang.SerializationLib)**: 3个模块 - MessagePack, Protobuf, Factory
 - **机器学习库 (Old8Lang.MachineLearningLib)**: 5个模块 - Classification, Regression, Clustering, DataLoader, Predictor
 
-每个模块都标注了支持的执行模式（解释模式、编译模式、VM 模式），并提供了完整的函数签名和可运行的代码示例。
+每个模块都标注了支持的执行模式（解释模式、IL 模式、VM 模式），并提供了完整的函数签名和可运行的代码示例。
 
 更多信息请参考:
 - [ARCHITECTURE.md](ARCHITECTURE.md) - 架构文档

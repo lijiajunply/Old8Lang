@@ -217,7 +217,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     }
 
     /// <summary>
-    /// 在编译器模式下应用装饰器到函数
+    /// 在 IL 模式下应用装饰器到函数
     /// 策略：使用解释器执行装饰器函数，获取包装后的函数
     /// </summary>
     private FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
@@ -241,7 +241,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     }
 
     /// <summary>
-    /// 在编译器模式下应用单个装饰器
+    /// 在 IL 模式下应用单个装饰器
     /// </summary>
     private FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
@@ -332,7 +332,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     }
 
     /// <summary>
-    /// 在编译模式下生成函数的IL代码
+    /// 在 IL 模式下生成函数的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器，用于管理函数的声明和访问</param>
@@ -342,7 +342,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         ValidateParamsParameter();
 
         // 应用装饰器（如果有）
-        // 在编译模式下，我们需要在编译时应用装饰器
+        // 在 IL 模式下，我们需要在编译时应用装饰器
         // 策略：使用解释器执行装饰器函数，获取包装后的函数，然后编译包装后的函数
         var funcToCompile = FuncValue;
         if (FuncValue.Decorators is not null && FuncValue.Decorators.Count > 0)
@@ -355,7 +355,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             }
             else
             {
-                throw new CompilerException("编译器模式下应用装饰器需要解释器上下文", Position);
+                throw new CompilerException("IL 模式下应用装饰器需要解释器上下文", Position);
             }
         }
 
@@ -376,7 +376,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             }
         }
 
-        // 验证函数类型注解完整性（编译模式要求）
+        // 验证函数类型注解完整性（IL 模式要求）
         ValidateTypeAnnotations(local);
 
         // 获取方法的名称
@@ -595,7 +595,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     }
 
     /// <summary>
-    /// 验证函数的类型注解完整性（编译模式要求）
+    /// 验证函数的类型注解完整性（IL 模式要求）
     /// </summary>
     /// <param name="local">局部变量管理器，用于报告错误</param>
     private void ValidateTypeAnnotations(LocalManager local)
@@ -619,7 +619,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                         if (param.DefaultValue.OutputType(local) is null)
                         {
                             var defaultErrorMsg =
-                                $"[编译模式错误] 函数 '{FuncValue.Id?.IdName}' 的参数 '{param.IdName}' 的默认值类型无效\n\n" +
+                                $"[IL 模式错误] 函数 '{FuncValue.Id?.IdName}' 的参数 '{param.IdName}' 的默认值类型无效\n\n" +
                                 $"默认值必须是一个有效的表达式，可以推断出具体类型。\n\n" +
                                 $"修复示例：\n" +
                                 $"  func {FuncValue.Id?.IdName}(..., {param.IdName}: 0, ...) -> returnType {{ ... }}\n" +
@@ -643,8 +643,8 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
 
                     // 既没有类型注解也没有默认值，且未启用类型推断，报错
                     var errorMsg =
-                        $"[编译模式错误] 函数 '{FuncValue.Id?.IdName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
-                        $"编译模式下所有函数参数必须满足以下之一：\n" +
+                        $"[IL 模式错误] 函数 '{FuncValue.Id?.IdName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
+                        $"IL 模式下所有函数参数必须满足以下之一：\n" +
                         $"  1. 显式声明类型注解：{param.IdName}:int\n" +
                         $"  2. 提供默认值以推断类型：{param.IdName}: 123\n" +
                         $"  3. 启用类型推断功能（通过 TypeInferenceConfig）\n\n" +
@@ -675,8 +675,8 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 }
 
                 // 普通函数必须显式声明返回类型
-                var errorMsg = $"[编译模式错误] 函数 '{FuncValue.Id.IdName}' 缺少返回值类型注解\n\n" +
-                               $"编译模式下所有函数必须显式声明返回类型，或启用类型推断功能。\n\n" +
+                var errorMsg = $"[IL 模式错误] 函数 '{FuncValue.Id.IdName}' 缺少返回值类型注解\n\n" +
+                               $"IL 模式下所有函数必须显式声明返回类型，或启用类型推断功能。\n\n" +
                                $"修复示例：\n" +
                                $"  方式1：func {FuncValue.Id.IdName}(...) -> int {{ return ... }}\n" +
                                $"  方式2：func {FuncValue.Id.IdName}(...) -> void {{ ... }}\n" +
@@ -691,7 +691,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             var returnType = FuncValue.Id.OutputType(local);
             if (returnType is null)
             {
-                var errorMsg = $"[编译模式错误] 函数 '{FuncValue.Id.IdName}' 的返回类型注解 '{FuncValue.Id.AssumptionType}' 无效\n\n" +
+                var errorMsg = $"[IL 模式错误] 函数 '{FuncValue.Id.IdName}' 的返回类型注解 '{FuncValue.Id.AssumptionType}' 无效\n\n" +
                                $"请使用有效的类型注解，如：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>\n\n" +
                                $"修复示例：\n" +
                                $"  func {FuncValue.Id.IdName}(...) -> int {{ return ... }}\n" +

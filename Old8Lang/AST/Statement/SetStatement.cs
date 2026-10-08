@@ -460,7 +460,7 @@ public partial class SetStatement : OldStatement
     }
 
     /// <summary>
-    /// 在编译模式下生成赋值语句的IL代码
+    /// 在 IL 模式下生成赋值语句的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器，用于管理变量的赋值和访问</param>

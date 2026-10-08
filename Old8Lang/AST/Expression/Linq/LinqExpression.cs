@@ -43,14 +43,14 @@ public partial class LinqExpression(
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 在编译器模式下，LINQ 查询需要生成 IL 代码来执行查询逻辑
-        // 由于编译器模式下无法直接访问 VariateManager（生成的方法是无参数的 Action），
+        // 在 IL 模式下，LINQ 查询需要生成 IL 代码来执行查询逻辑
+        // 由于 IL 模式下无法直接访问 VariateManager（生成的方法是无参数的 Action），
         // 我们需要通过 LocalManager.Interpreter.Manager 来访问
 
         // 检查是否有 Interpreter
         if (local.Interpreter?.Manager == null)
         {
-            throw new NotSupportedException("LINQ 查询在编译器模式下需要 Interpreter 支持");
+            throw new NotSupportedException("LINQ 查询在 IL 模式下需要 Interpreter 支持");
         }
 
         // 将 LINQ 查询转换为手动的循环和过滤逻辑

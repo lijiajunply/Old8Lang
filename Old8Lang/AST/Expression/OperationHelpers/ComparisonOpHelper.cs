@@ -91,7 +91,7 @@ internal static class ComparisonOpHelper
         var gtLeftType = left?.OutputType(local);
         var gtRightType = right?.OutputType(local);
 
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (gtLeftType != null && typeof(LangObject).IsAssignableFrom(gtLeftType))
         {
             // 生成调用 _gt 方法的 IL 代码
@@ -166,7 +166,7 @@ internal static class ComparisonOpHelper
         var ltLeftType = left?.OutputType(local);
         var ltRightType = right?.OutputType(local);
 
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (ltLeftType != null && typeof(LangObject).IsAssignableFrom(ltLeftType))
         {
             // 生成调用 _lt 方法的 IL 代码
@@ -241,7 +241,7 @@ internal static class ComparisonOpHelper
         var leftOpType = left?.OutputType(local);
         var rightOpType = right?.OutputType(local);
 
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftOpType != null && typeof(LangObject).IsAssignableFrom(leftOpType))
         {
             // 生成调用 _eq 方法的 IL 代码
@@ -339,7 +339,7 @@ internal static class ComparisonOpHelper
         var leftType = left?.OutputType(local);
         var rightType = right?.OutputType(local);
 
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _le 方法的 IL 代码
@@ -400,7 +400,7 @@ internal static class ComparisonOpHelper
         var leftType = left?.OutputType(local);
         var rightType = right?.OutputType(local);
 
-        // 检查是否是 LangObject（编译器模式的自定义类）运算符重载
+        // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _ge 方法的 IL 代码

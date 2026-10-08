@@ -3,7 +3,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// 逻辑表达式编译模式测试
+/// 逻辑表达式 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class LogicalTests

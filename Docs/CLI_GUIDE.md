@@ -37,16 +37,16 @@ dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf --perf-output re
 dotnet run --project Old8Lang.App -- -f scripts/app.old8 --perf --perf-output report.csv
 ```
 
-### 2. 编译模式 (Compiler Mode)
+### 2. IL 模式 (IL Mode)
 将代码编译为 IL 并执行，性能更高，但要求更严格的类型注解。
 
 ```bash
-dotnet run --project Old8Lang.App -- -c <文件路径> [参数]
+dotnet run --project Old8Lang.App -- -il <文件路径> [参数]
 ```
 
 **示例**:
 ```bash
-dotnet run --project Old8Lang.App -- -c scripts/benchmark.old8
+dotnet run --project Old8Lang.App -- -il scripts/benchmark.old8
 ```
 
 ### 3. 语法检查 (Syntax Check)
@@ -77,7 +77,7 @@ Old8Lang 支持三种主要执行模式，每种模式有不同的特点和适�
 
 ### 模式对比表
 
-| 特性 | 解释模式 (`-f`) | 编译模式 (`-c`) | VM 模式 (`-vm`) |
+| 特性 | 解释模式 (`-f`) | IL 模式 (`-il`) | VM 模式 (`-vm`) |
 |------|----------------|----------------|----------------|
 | **启动速度** | 快 | 慢（需编译） | 中等 |
 | **运行性能** | 中等 | 高 | 中等偏高 |
@@ -113,7 +113,7 @@ dotnet run --project Old8Lang.App -- -f examples/generics_demo.old8
 dotnet run --project Old8Lang.App -- -f examples/operator_overload.old8
 ```
 
-#### 编译模式 (`-c`) - 推荐用于生产
+#### IL 模式 (`-il`) - 推荐用于生产
 
 **适用场景**:
 - 生产环境部署
@@ -129,10 +129,10 @@ dotnet run --project Old8Lang.App -- -f examples/operator_overload.old8
 **示例**:
 ```bash
 # 高性能计算
-dotnet run --project Old8Lang.App -- -c scripts/performance_critical.old8
+dotnet run --project Old8Lang.App -- -il scripts/performance_critical.old8
 
 # 生产服务
-dotnet run --project Old8Lang.App -- -c services/api_server.old8
+dotnet run --project Old8Lang.App -- -il services/api_server.old8
 ```
 
 #### VM 模式 (`-vm`) - 推荐用于分发和调试 ⚠️ 实验性
@@ -173,8 +173,8 @@ dotnet run --project Old8Lang.App -- execute-bytecode app.o8bc
 dotnet run --project Old8Lang.App -- -f benchmark/sum.old8
 # 预期时间: ~2-3 秒
 
-# 编译模式
-dotnet run --project Old8Lang.App -- -c benchmark/sum_typed.old8
+# IL 模式
+dotnet run --project Old8Lang.App -- -il benchmark/sum_typed.old8
 # 预期时间: ~0.5-1 秒
 
 # VM 模式
@@ -1096,7 +1096,7 @@ Console.WriteLine($"GC 收集: Gen0={metrics.GCGen0Collections}");
 
 **选择合适的执行模式**:
 - 开发/调试：解释模式 (`-f`) - 快速启动
-- 生产环境：编译模式 (`-c`) - 高性能
+- 生产环境：IL 模式 (`-il`) - 高性能
 - 跨平台分发：VM 模式 (`-vm`) - 字节码
 
 **优化代码结构**:

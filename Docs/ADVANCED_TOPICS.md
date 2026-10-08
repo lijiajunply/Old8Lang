@@ -101,7 +101,7 @@ public interface IExternProvider
         VariateManager manager);
 
     /// <summary>
-    /// 编译模式：生成 IL 代码
+    /// IL 模式：生成 IL 代码
     /// </summary>
     void GenerateIL(
         string source,
@@ -111,7 +111,7 @@ public interface IExternProvider
         LocalManager local);
 
     /// <summary>
-    /// 是否支持编译模式
+    /// 是否支持 IL 模式
     /// </summary>
     bool SupportsCompilation { get; }
 }
@@ -124,7 +124,7 @@ public interface IExternProvider
 **功能：**
 - 加载原生 DLL 中的函数
 - 支持三种调用约定：Cdecl、StdCall、WinApi
-- 完全支持编译模式和解释模式
+- 完全支持 IL 模式和解释模式
 
 **实现特点：**
 - 使用 `System.Runtime.InteropServices.NativeLibrary`
@@ -258,11 +258,11 @@ public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     // 使用工厂创建对应的提供者
     var provider = ExternProviderFactory.CreateProvider(ExternType);
 
-    // 检查是否支持编译模式
+    // 检查是否支持 IL 模式
     if (!provider.SupportsCompilation)
     {
         throw new NotSupportedException(
-            $"{ExternType} 类型的 extern 函数不支持编译模式，仅支持解释模式执行。");
+            $"{ExternType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
     }
 
     // 委托给提供者生成 IL 代码
@@ -285,7 +285,7 @@ public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
 
 #### 3. 统一接口
 - 所有语言提供者遵循相同的接口契约
-- 编译模式支持通过 `SupportsCompilation` 属性明确声明
+- IL 模式支持通过 `SupportsCompilation` 属性明确声明
 - 错误处理统一规范
 
 #### 4. 类型安全
@@ -322,7 +322,7 @@ public class JavaScriptProvider : IExternProvider
 
     public void GenerateIL(...)
     {
-        throw new NotSupportedException("JS 不支持编译模式");
+        throw new NotSupportedException("JS 不支持 IL 模式");
     }
 }
 
@@ -395,9 +395,9 @@ dotnet run --project Old8Lang.App -- -f test_extern_factory.old8
 - 所有现有的 extern 语句无需修改
 - 语法和行为保持不变
 
-#### 编译模式支持
+#### IL 模式支持
 
-| Provider | 解释模式 (-f) | 编译模式 (-c) |
+| Provider | 解释模式 (-f) | IL 模式 (-c) |
 |----------|--------------|--------------|
 | NativeDllProvider | ✅ 支持 | ✅ 支持 |
 | PythonProvider | ✅ 支持 | ❌ 不支持 |
@@ -412,7 +412,7 @@ dotnet run --project Old8Lang.App -- -f test_extern_factory.old8
 
 #### 错误处理
 - 不支持的 ExternType：抛出 `NotSupportedException`
-- 编译模式检查：在 `GenerateIl` 中验证 `SupportsCompilation`
+- IL 模式检查：在 `GenerateIl` 中验证 `SupportsCompilation`
 - 具体错误由各提供者内部处理
 
 #### 性能影响
@@ -435,7 +435,7 @@ dotnet run --project Old8Lang.App -- -f test_extern_factory.old8
 
 3. **测试要求**：
    - 为每个新提供者添加单元测试
-   - 测试解释模式和编译模式（如支持）
+   - 测试解释模式和 IL 模式（如支持）
    - 测试错误处理和边界条件
 
 ---
@@ -444,7 +444,7 @@ dotnet run --project Old8Lang.App -- -f test_extern_factory.old8
 
 ### 概述
 
-Old8Lang 编译器现在支持 TypeScript 风格的渐进式类型推断系统，可以智能推断函数参数和返回值类型，减少编译模式下的类型注解负担。
+Old8Lang 编译器现在支持 TypeScript 风格的渐进式类型推断系统，可以智能推断函数参数和返回值类型，减少 IL 模式下的类型注解负担。
 
 ### 功能特性
 
@@ -537,7 +537,7 @@ config.MinimumConfidence = 0.5;
 config.DebugOutput = false;
 ```
 
-#### 3. 编译器模式下使用
+#### 3. IL 模式下使用
 
 ##### 无类型注解（需启用推断）
 
@@ -1191,7 +1191,7 @@ foreach (var statement in ast)
 1. **定义 AST 节点**
 2. **更新 Parser**
 3. **实现解释模式执行**
-4. **实现编译模式 IL 生成**
+4. **实现 IL 模式 IL 生成**
 5. **实现 VM 模式字节码生成**
 6. **添加 Visitor 支持**
 7. **编写测试**
@@ -1248,7 +1248,7 @@ namespace Old8Lang.AST.Statement
             }
         }
 
-        // 编译模式 IL 生成
+        // IL 模式 IL 生成
         public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
         {
             // 生成 switch 表达式的 IL
@@ -1533,12 +1533,12 @@ print(value)  // 输出: 25
 
 Old8Lang 目前支持三种执行模式：
 - 解释模式 (InterpreterVisitor)
-- 编译模式 (CompilerVisitor)
+- IL 模式 (CompilerVisitor)
 - VM 模式 (BytecodeVisitor)
 
 添加新的执行模式需要创建新的 Visitor 实现。
 
-#### 示例：添加 JIT 编译模式
+#### 示例：添加 JIT IL 模式
 
 **步骤 1：创建 JIT Visitor**
 
@@ -1697,7 +1697,7 @@ dotnet run --project Old8Lang.App -- jit test.old8
 | 模式 | 启动速度 | 运行性能 | 内存占用 | 适用场景 |
 |------|---------|---------|---------|---------|
 | 解释模式 | 最快 | 中等 | 低 | 开发、脚本 |
-| 编译模式 | 慢 | 最高 | 中等 | 生产、性能 |
+| IL 模式 | 慢 | 最高 | 中等 | 生产、性能 |
 | VM 模式 | 中等 | 中等偏高 | 中等 | 分发、调试 |
 | JIT 模式 | 中等 | 高 | 高 | 长时间运行 |
 

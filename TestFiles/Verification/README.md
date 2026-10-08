@@ -22,7 +22,7 @@ old8lang run start          # 运行 o8package.json 中的 start 脚本
 old8lang run <file.old8>    # 单文件，模式由 old8lang.runtime 决定
 ```
 
-> 注意：`runtime` 只在 `old8lang run <file>` 时生效，且仅识别 `compiler`
+> 注意：`runtime` 只在 `old8lang run <file>` 时生效，取值为 `il`（旧值 `compiler` 仍兼容）
 > （其余值一律按解释模式执行）。需要显式指定模式时，直接调用 `old8lang -f|-c|-s <file>`。
 
 ## 备注

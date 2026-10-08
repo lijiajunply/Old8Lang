@@ -4,8 +4,8 @@ using Old8Lang.Error;
 namespace Old8Lang.Tests.Compiler.Types;
 
 /// <summary>
-/// 泛型集合类型编译模式测试
-/// 测试 list&lt;T&gt;, array&lt;T&gt;, dict&lt;K,V&gt; 在编译器模式下的类型检查和 IL 生成
+/// 泛型集合类型 IL 模式测试
+/// 测试 list&lt;T&gt;, array&lt;T&gt;, dict&lt;K,V&gt; 在 IL 模式下的类型检查和 IL 生成
 /// </summary>
 [Collection("Sequential")]
 public class GenericCollectionTypesCompilerTests
@@ -128,7 +128,7 @@ Assert.True(test() == 1)
     }
 
     /// <summary>
-    /// 测试数组 Length 属性（编译器模式）
+    /// 测试数组 Length 属性（IL 模式）
     /// </summary>
     [Fact]
     public void Compile_ArrayLengthProperty_CompilesAndExecutes()

@@ -3,7 +3,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 边界条件编译模式测试
+/// 边界条件 IL 模式测试
 /// 测试编译器在处理各种边界情况时的行为
 /// </summary>
 [Collection("Sequential")]

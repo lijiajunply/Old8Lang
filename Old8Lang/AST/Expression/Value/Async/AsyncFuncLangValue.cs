@@ -274,7 +274,7 @@ public class AsyncFuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式）
+    /// 生成 IL 代码（IL 模式）
     /// 生成异步函数的委托，支持异步函数的编译
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

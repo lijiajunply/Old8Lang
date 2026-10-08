@@ -1,7 +1,7 @@
 namespace Old8Lang.Runtime;
 
 /// <summary>
-/// Old8Lang 编译器模式下所有自定义类的基类
+/// Old8Lang IL 模式下所有自定义类的基类
 /// 提供运算符重载的基础支持
 /// </summary>
 public abstract class LangObject

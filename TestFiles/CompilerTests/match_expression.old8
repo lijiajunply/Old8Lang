@@ -1,7 +1,7 @@
-// Match 表达式测试 - 编译器模式
+// Match 表达式测试 - IL 模式
 // 简化版，移除了复杂的测试
 
-PrintLine("=== Match 表达式测试（编译器模式）===")
+PrintLine("=== Match 表达式测试（IL 模式）===")
 
 // 测试 1: 基本值匹配
 PrintLine("\n1. 基本值匹配:")

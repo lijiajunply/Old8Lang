@@ -4,7 +4,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Collections;
 
 /// <summary>
-/// 数组操作编译模式测试
+/// 数组操作 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class ArrayTests

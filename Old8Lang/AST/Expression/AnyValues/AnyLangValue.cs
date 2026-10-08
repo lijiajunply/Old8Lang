@@ -892,7 +892,7 @@ public partial class AnyLangValue : LangValueType
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // IL 代码生成（编译模式）
+        // IL 代码生成（IL 模式）
         var dictType = typeof(Dictionary<string, object>);
         var constructor = dictType.GetConstructor(Type.EmptyTypes)!;
 

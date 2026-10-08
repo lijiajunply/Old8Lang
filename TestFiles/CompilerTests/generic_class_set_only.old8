@@ -1,4 +1,4 @@
-// 编译器模式：最简单的泛型类方法测试
+// IL 模式：最简单的泛型类方法测试
 
 class Box<T> {
     private value:T

@@ -114,7 +114,7 @@ PrintLine("斐波那契数列第6项 = " + fibResult)
 
 // 函数作为参数
 // PrintLine("\n=== 函数作为参数 ===")
-// 注意：目前编译模式不支持函数类型的类型注解
+// 注意：目前 IL 模式不支持函数类型的类型注解
 // func applyOperation(a:int, b:int, operation) -> int {
 //     return operation(a, b)
 // }
@@ -138,7 +138,7 @@ testOverload(1)
 testOverload(1, 2)
 
 // 带默认参数的函数
-// 注意：编译模式下默认参数语法的限制
+// 注意：IL 模式下默认参数语法的限制
 // 当参数有类型注解时，默认参数功能受限
 PrintLine("\n=== 带默认参数的函数 ===")
 
@@ -160,7 +160,7 @@ func calculateTotal(price:int, taxRate:double) -> double {
 calculateTotal(100, 0.1)
 calculateTotal(100, 0.15)
 
-//注意：默认参数与类型注解的组合在编译模式下暂不完全支持
+//注意：默认参数与类型注解的组合在 IL 模式下暂不完全支持
 //因此删除了部分测试用例
 
 PrintLine("\n✅ 所有函数声明和调用测试完成")

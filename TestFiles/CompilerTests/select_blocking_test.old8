@@ -1,4 +1,4 @@
-// Select 语句编译器模式 - 多个 case 竞争测试
+// Select 语句 IL 模式 - 多个 case 竞争测试
 
 PrintLine("=== 测试：select 多个 case 竞争 ===")
 

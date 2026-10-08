@@ -1,4 +1,4 @@
-// 编译器模式运算符重载测试 - 简化版
+// IL 模式运算符重载测试 - 简化版
 
 class Number {
     public value

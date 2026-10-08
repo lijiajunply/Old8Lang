@@ -192,7 +192,7 @@ result3 <- formatHello(""World"") // ""Hello World""";
 
     #endregion
 
-    #region 编译器模式类型注解
+    #region IL 模式类型注解
 
     /// <summary>
     /// 测试Lambda参数类型注解
@@ -202,7 +202,7 @@ result3 <- formatHello(""World"") // ""Hello World""";
     {
         // Arrange
         var code = @"
-// 编译器模式下的Lambda，需要明确的类型注解
+// IL 模式下的Lambda，需要明确的类型注解
 lambda1 <- (x:int) -> x * 2
 lambda2 <- (a:int, b:int) -> a + b
 lambda3 <- (s:string) -> s.ToUpper()

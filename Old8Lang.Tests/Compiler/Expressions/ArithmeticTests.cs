@@ -4,7 +4,7 @@ using System.Globalization;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// 算术表达式编译模式测试
+/// 算术表达式 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class ArithmeticTests

@@ -4,8 +4,8 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Collections.Advanced;
 
 /// <summary>
-/// 编译器模式下的高级集合功能测试 - 扩展范围
-/// 注意：当前 Range 实现在编译器模式下会直接转换为数组，不是专门的 Range 对象
+/// IL 模式下的高级集合功能测试 - 扩展范围
+/// 注意：当前 Range 实现在 IL 模式下会直接转换为数组，不是专门的 Range 对象
 /// </summary>
 public class ExtendedRangeTests(ITestOutputHelper output)
 {

@@ -1,7 +1,7 @@
 namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
-/// 集合操作辅助类，提供编译模式下集合操作的实际实现
+/// 集合操作辅助类，提供 IL 模式下集合操作的实际实现
 /// </summary>
 /// <remarks>
 /// 该类将被编译后的IL代码调用，提供与解释模式相同的集合操作功能。

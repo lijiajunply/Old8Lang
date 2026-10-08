@@ -4,9 +4,9 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Statements;
 
 /// <summary>
-/// 条件语句编译模式测试
-/// 测试编译器模式下的 条件语句 的 IL 生成和执行
-/// 注意:编译模式要求函数参数和返回类型有类型注解
+/// 条件语句 IL 模式测试
+/// 测试 IL 模式下的 条件语句 的 IL 生成和执行
+/// 注意:IL 模式要求函数参数和返回类型有类型注解
 /// </summary>
 [Collection("Sequential")]
 public class ConditionalTests

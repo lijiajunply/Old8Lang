@@ -56,7 +56,7 @@ public class ListFindAllMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("List.FindAll 方法暂不支持编译模式");
+        throw new NotSupportedException("List.FindAll 方法暂不支持 IL 模式");
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

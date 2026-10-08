@@ -3,7 +3,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// 字符串模板编译模式测试
+/// 字符串模板 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class StringTemplateTests

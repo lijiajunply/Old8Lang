@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Classes;
 
 /// <summary>
-/// 编译器模式下的高级类功能测试 - Mixin
+/// IL 模式下的高级类功能测试 - Mixin
 /// </summary>
 public class MixinTests(ITestOutputHelper output)
 {

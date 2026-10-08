@@ -4,7 +4,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Basic;
 
 /// <summary>
-/// 编译模式错误处理测试
+/// IL 模式错误处理测试
 /// 测试编译器在处理错误代码时的行为和错误报告
 /// </summary>
 [Collection("Sequential")]
@@ -591,7 +591,7 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act & Assert - 编译模式要求函数参数有类型注解
+        // Act & Assert - IL 模式要求函数参数有类型注解
         Assert.ThrowsAny<Old8Exception>(() => interpreter.Build(code));
     }
 
@@ -606,7 +606,7 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // 临时禁用类型推断，以测试编译模式的严格类型检查
+        // 临时禁用类型推断，以测试 IL 模式的严格类型检查
         var previousInferenceEnabled = TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference;
         var previousInferReturnTypes = TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody;
         try
@@ -614,7 +614,7 @@ public class ErrorHandlingTests
             TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = false;
             TypeSystem.TypeInferenceConfig.Instance.InferReturnTypesFromBody = false;
 
-            // Act & Assert - 编译模式要求函数返回值有类型注解
+            // Act & Assert - IL 模式要求函数返回值有类型注解
             var ast = interpreter.Build(code);
             Assert.ThrowsAny<Old8Exception>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
         }
@@ -629,7 +629,7 @@ public class ErrorHandlingTests
     public void MissingTypeAnnotation_VariableDeclaration_HandlesGracefully()
     {
         // Arrange
-        var code = "a:int <- 42"; // 如果编译模式要求变量类型注解
+        var code = "a:int <- 42"; // 如果 IL 模式要求变量类型注解
         var interpreter = new LangInterpreter();
 
         // Act

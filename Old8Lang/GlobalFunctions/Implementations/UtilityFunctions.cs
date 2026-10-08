@@ -129,7 +129,7 @@ public sealed class RangeFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持动态构建 Range，返回空数组
+        // IL 模式暂不支持动态构建 Range，返回空数组
         ilGenerator.Emit(OpCodes.Ldc_I4_0);
         ilGenerator.Emit(OpCodes.Newarr, typeof(int));
     }
@@ -211,7 +211,7 @@ public sealed class TypeFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式下type()函数返回类型名称字符串
+        // IL 模式下type()函数返回类型名称字符串
         var typeId = parameters[0];
         var typeIdType = typeId.OutputType(local);
         // 直接返回类型名称字符串，不调用GetType()
@@ -256,7 +256,7 @@ public sealed class AssertFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持断言，返回 true
+        // IL 模式暂不支持断言，返回 true
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
     }
 
@@ -292,7 +292,7 @@ public sealed class ShowValuesFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式不做任何操作
+        // IL 模式不做任何操作
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

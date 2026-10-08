@@ -1,7 +1,7 @@
 namespace Old8Lang.Compiler.Helpers;
 
 /// <summary>
-/// Task辅助类，提供编译模式下Task操作的辅助方法
+/// Task辅助类，提供 IL 模式下Task操作的辅助方法
 /// </summary>
 public static class TaskHelper
 {

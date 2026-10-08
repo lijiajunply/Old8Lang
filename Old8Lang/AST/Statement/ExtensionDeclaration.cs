@@ -61,20 +61,20 @@ public class ExtensionDeclaration(
     }
 
     /// <summary>
-    /// 在编译模式下生成扩展方法声明的 IL 代码
+    /// 在 IL 模式下生成扩展方法声明的 IL 代码
     /// </summary>
     /// <param name="ilGenerator">IL 生成器</param>
     /// <param name="local">局部变量管理器</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译模式下，扩展方法需要在运行时注册
+        // IL 模式下，扩展方法需要在运行时注册
         // 这里生成调用 Run 方法的代码
 
         // 加载 this（ExtensionDeclaration 实例）
-        // 注意：在编译模式下，我们需要将扩展方法注册逻辑嵌入到生成的代码中
+        // 注意：在 IL 模式下，我们需要将扩展方法注册逻辑嵌入到生成的代码中
         // 暂时使用解释器模式的注册逻辑
 
-        throw new NotImplementedException("扩展方法的编译模式支持尚未实现，请使用解释模式");
+        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现，请使用解释模式");
     }
 
     public override OldStatement? this[int index] => this;

@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Collections;
 
 /// <summary>
-/// 切片（Slice）编译模式测试
-/// 测试编译器模式下的切片操作的 IL 生成和执行
+/// 切片（Slice）IL 模式测试
+/// 测试 IL 模式下的切片操作的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class SliceTests

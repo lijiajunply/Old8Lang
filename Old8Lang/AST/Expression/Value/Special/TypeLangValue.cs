@@ -265,7 +265,7 @@ public partial class TypeLangValue : LangValueType
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 在编译模式下，创建 TypeLangValue 对象
+        // 在 IL 模式下，创建 TypeLangValue 对象
         ilGenerator.Emit(OpCodes.Ldstr, Value ?? "");
         ilGenerator.Emit(OpCodes.Newobj, typeof(TypeLangValue).GetConstructor([typeof(string)])!);
     }

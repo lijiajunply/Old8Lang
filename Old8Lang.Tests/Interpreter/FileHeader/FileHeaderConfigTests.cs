@@ -66,7 +66,7 @@ result <- a * b";
     #region verify-il 指令测试
 
     /// <summary>
-    /// 测试 verify-il 指令（编译模式）
+    /// 测试 verify-il 指令（IL 模式）
     /// </summary>
     [Fact]
     public void Run_VerifyIlDirective_ExecutesSuccessfully()

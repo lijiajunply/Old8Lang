@@ -120,7 +120,7 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithArrays_OverloadsArrayParameters()
     {
         // Arrange
-        // 注意：编译器模式下，数组元素类型在 for-in 循环中被推断为 object
+        // 注意：IL 模式下，数组元素类型在 for-in 循环中被推断为 object
         // 简化测试，避免使用 as 操作符
         var code = """
                                func getArrayLength(numbers:array) -> int {
@@ -156,8 +156,8 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithLists_OverloadsListParameters()
     {
         // Arrange
-        // 注意：编译器模式下，list[0] 返回 object 类型
-        // 由于 as 操作符在编译器模式下可能有问题，我们简化测试
+        // 注意：IL 模式下，list[0] 返回 object 类型
+        // 由于 as 操作符在 IL 模式下可能有问题，我们简化测试
         var code = @"            func getFirstInt(list:list) -> object {
                 return list[0]
             }
@@ -220,7 +220,7 @@ public class FunctionOverloadTests
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "类参数类型推断在编译器模式下需要进一步修复")]
+    [Fact(Skip = "类参数类型推断在 IL 模式下需要进一步修复")]
     public void FunctionOverload_WithComplexTypes_OverloadsClassParameters()
     {
         // Arrange
@@ -448,7 +448,7 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithNullParameters_OverloadsNullHandling()
     {
         // Arrange
-        // 注意：编译器模式下，所有参数必须有类型注解
+        // 注意：IL 模式下，所有参数必须有类型注解
         // 简化测试，避免使用 as 操作符
         var code = @"
             func safeGetInt(value:object, defaultValue:int) -> object {

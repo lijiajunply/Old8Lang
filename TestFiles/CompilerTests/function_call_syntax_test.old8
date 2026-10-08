@@ -1,4 +1,4 @@
-// 编译器模式函数调用语法测试
+// IL 模式函数调用语法测试
 func greet(name:string) -> string {
     return "Hello, " + name
 }

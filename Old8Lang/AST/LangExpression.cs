@@ -36,7 +36,7 @@ public abstract class LangExpression : IOldLangTree
     }
 
     /// <summary>
-    /// 编译器模式：加载表达式的IL值
+    /// IL 模式：加载表达式的IL值
     /// </summary>
     /// <param name="ilGenerator">IL 生成器</param>
     /// <param name="local">局部变量管理器</param>
@@ -56,7 +56,7 @@ public abstract class LangExpression : IOldLangTree
         if (local.FieldVar.TryGetValue(idName, out var fieldInfo))
         {
             // 确保我们在实例方法中（有 this 指针）
-            // 在编译器模式下，实例方法的参数0是this
+            // 在 IL 模式下，实例方法的参数0是this
             
             // 加载 this
             ilGenerator.Emit(OpCodes.Ldarg_0);

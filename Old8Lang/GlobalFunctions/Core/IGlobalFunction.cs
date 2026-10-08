@@ -77,7 +77,7 @@ public interface IGlobalFunction
     LangValueType Execute(List<LangExpression> parameters, VariateManager manager, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式生成 IL 代码
+    /// IL 模式生成 IL 代码
     /// </summary>
     /// <param name="parameters">参数表达式列表</param>
     /// <param name="ilGenerator">IL 生成器</param>
@@ -86,7 +86,7 @@ public interface IGlobalFunction
     void GenerateIl(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式获取返回类型
+    /// IL 模式获取返回类型
     /// </summary>
     /// <param name="parameters">参数表达式列表</param>
     /// <param name="local">局部变量管理器</param>

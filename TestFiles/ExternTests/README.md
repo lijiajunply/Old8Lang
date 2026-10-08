@@ -10,14 +10,14 @@ Old8Lang 项目（`o8package.json`）—— 运行时模式：`interpreter`（�
 |------|---------|------------|------|
 | `test_extern_simple.old8` | `-f` | `libc.dylib` | macOS |
 | `test_extern_real_call.old8` | `-f` | `libc.dylib` | macOS |
-| `test_extern_compiler_debug.old8` | `-c` | `libc.dylib` | macOS |
+| `test_extern_compiler_debug.old8` | `-il` | `libc.dylib` | macOS |
 | `test_extern_vm.old8` | `-vm` | `msvcrt.dll` / `kernel32.dll`（仅生成字节码，不实际调用） | 任意 |
 
 ## 运行
 
 ```bash
 old8lang -f test_extern_simple.old8   # 解释模式
-old8lang -c test_extern_compiler_debug.old8
+old8lang -il test_extern_compiler_debug.old8
 old8lang -vm test_extern_vm.old8
 ```
 

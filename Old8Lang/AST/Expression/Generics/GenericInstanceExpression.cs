@@ -177,7 +177,7 @@ public partial class GenericInstanceExpression : LangExpression
 
     public override Type OutputType(LocalManager local)
     {
-        // 编译器模式下的类型推断
+        // IL 模式下的类型推断
         // 对于泛型实例，需要根据基础表达式和类型参数推断最终类型
 
         // 获取基础表达式名称
@@ -211,13 +211,13 @@ public partial class GenericInstanceExpression : LangExpression
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译器模式下的IL生成
+        // IL 模式下的IL生成
         // 处理泛型类实例化和泛型函数调用
 
         // 获取基础表达式名称
         if (BaseExpression is not LangId identifier)
         {
-            throw new InvalidOperationError(this, "编译器模式下泛型表达式必须使用简单的标识符");
+            throw new InvalidOperationError(this, "IL 模式下泛型表达式必须使用简单的标识符");
         }
 
         var name = identifier.IdName;

@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// 装饰器编译器模式测试
+/// 装饰器 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class DecoratorCompilerTests(ITestOutputHelper output)

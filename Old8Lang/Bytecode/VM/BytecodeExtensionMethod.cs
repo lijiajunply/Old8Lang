@@ -83,7 +83,7 @@ public class BytecodeExtensionMethod : IInstanceMethod
         LocalManager local,
         SourcePosition position)
     {
-        throw new NotSupportedException("BytecodeExtensionMethod 不支持编译模式");
+        throw new NotSupportedException("BytecodeExtensionMethod 不支持 IL 模式");
     }
 
     public Type GetReturnType(Type instanceType, List<LangExpression> parameters, LocalManager local)

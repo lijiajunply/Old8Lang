@@ -3,9 +3,9 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Reflection;
 
 /// <summary>
-/// 编译器模式反射系统测试
-/// 测试反射功能在编译器模式下的 IL 生成和执行
-/// 注意：编译模式要求函数参数和返回类型有类型注解
+/// IL 模式反射系统测试
+/// 测试反射功能在 IL 模式下的 IL 生成和执行
+/// 注意：IL 模式要求函数参数和返回类型有类型注解
 /// </summary>
 [Collection("Sequential")]
 public class ReflectionTests

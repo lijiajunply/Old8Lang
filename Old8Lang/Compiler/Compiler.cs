@@ -198,7 +198,7 @@ public static class Compiler
     /// <param name="local">局部变量管理器</param>
     /// <remarks>
     /// 该方法将所有全局静态类实例注册到LocalManager的GlobalStaticClasses字典中，
-    /// 使得在编译模式下可以像解释模式一样访问这些静态类
+    /// 使得在 IL 模式下可以像解释模式一样访问这些静态类
     /// </remarks>
     private static void RegisterGlobalStaticClasses(LocalManager local)
     {
@@ -243,7 +243,7 @@ public static class Compiler
         {
             // 顶层 await 暂不支持，抛出友好的错误消息
             throw new CompilerException(
-                "编译器模式暂不支持顶层 await 表达式。\n" +
+                "IL 模式暂不支持顶层 await 表达式。\n" +
                 "请将 await 表达式放在函数内部使用。\n\n" +
                 "示例：\n" +
                 "  // 不支持（顶层 await）\n" +

@@ -48,7 +48,7 @@ public class ThreadRetryMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("Thread.Retry 方法在编译器模式下暂不支持");
+        throw new NotSupportedException("Thread.Retry 方法在 IL 模式下暂不支持");
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

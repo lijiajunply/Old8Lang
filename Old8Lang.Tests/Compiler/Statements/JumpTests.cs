@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Statements;
 
 /// <summary>
-/// 跳转语句编译模式测试
-/// 测试编译器模式下的 break、continue、return 语句的 IL 生成和执行
+/// 跳转语句 IL 模式测试
+/// 测试 IL 模式下的 break、continue、return 语句的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class JumpTests

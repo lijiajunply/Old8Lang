@@ -28,7 +28,7 @@ public partial class ThrowStatement(LangExpression expression, SourcePosition po
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译模式下的实现
+        // IL 模式下的实现
         expression.LoadIlValue(ilGenerator, local);
 
         // 获取表达式的类型

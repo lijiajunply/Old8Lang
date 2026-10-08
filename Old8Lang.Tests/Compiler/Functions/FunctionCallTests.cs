@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
-/// 函数调用编译模式测试
-/// 测试编译器模式下的函数调用的 IL 生成和执行
+/// 函数调用 IL 模式测试
+/// 测试 IL 模式下的函数调用的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class FunctionCallTests

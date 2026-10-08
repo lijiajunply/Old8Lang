@@ -92,7 +92,7 @@ public partial class Instance
             instanceType,
             Id.IdName,
             Ids,
-            local); // 编译模式下使用 LocalManager 进行类型推断
+            local); // IL 模式下使用 LocalManager 进行类型推断
 
         if (method == null)
         {

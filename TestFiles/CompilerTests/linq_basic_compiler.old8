@@ -1,4 +1,4 @@
-// LINQ 编译器模式基础测试
+// LINQ IL 模式基础测试
 
 // 测试1: 基本的 from-where-select 查询
 numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

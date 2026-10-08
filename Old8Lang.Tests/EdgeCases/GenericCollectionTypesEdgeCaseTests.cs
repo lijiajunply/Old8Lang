@@ -355,10 +355,10 @@ positive <- numbers[4]
 
     #endregion
 
-    #region 编译器模式类型错误边界测试
+    #region IL 模式类型错误边界测试
 
     /// <summary>
-    /// 测试编译器模式下第一个元素类型错误
+    /// 测试 IL 模式下第一个元素类型错误
     /// </summary>
     [Fact]
     public void Compiler_FirstElementTypeMismatch_ThrowsException()
@@ -383,7 +383,7 @@ func test() -> int {
     }
 
     /// <summary>
-    /// 测试编译器模式下最后一个元素类型错误
+    /// 测试 IL 模式下最后一个元素类型错误
     /// </summary>
     [Fact]
     public void Compiler_LastElementTypeMismatch_ThrowsException()
@@ -408,7 +408,7 @@ func test() -> int {
     }
 
     /// <summary>
-    /// 测试编译器模式下中间元素类型错误
+    /// 测试 IL 模式下中间元素类型错误
     /// </summary>
     [Fact]
     public void Compiler_MiddleElementTypeMismatch_ThrowsException()
@@ -433,7 +433,7 @@ func test() -> int {
     }
 
     /// <summary>
-    /// 测试编译器模式下所有元素类型都错误
+    /// 测试 IL 模式下所有元素类型都错误
     /// </summary>
     [Fact]
     public void Compiler_AllElementsTypeMismatch_ThrowsException()
@@ -459,7 +459,7 @@ func test() -> int {
     }
 
     /// <summary>
-    /// 测试编译器模式下嵌套类型的内部元素错误
+    /// 测试 IL 模式下嵌套类型的内部元素错误
     /// </summary>
     [Fact]
     public void Compiler_NestedTypeMismatch_ThrowsException()

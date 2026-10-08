@@ -44,7 +44,7 @@ PrintLine(complexResult)
 
 // Lambda表达式作为函数参数
 // PrintLine("\n=== Lambda表达式作为函数参数 ===")
-// 注意：目前编译模式不支持函数类型的类型注解
+// 注意：目前 IL 模式不支持函数类型的类型注解
 // func applyOperation(x:int, y:int, operation) -> int {
 //     return operation(x, y)
 // }

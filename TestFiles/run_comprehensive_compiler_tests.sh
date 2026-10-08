@@ -42,7 +42,7 @@ for TEST_FILE in $TEST_FILES; do
     echo "正在测试: $TEST_FILE"
 
     # 运行测试并捕获输出
-    OUTPUT=$(dotnet run --project Old8Lang.App -- -c "$TEST_FILE" 2>&1)
+    OUTPUT=$(dotnet run --project Old8Lang.App -- -il "$TEST_FILE" 2>&1)
     EXIT_CODE=$?
 
     # 检查是否成功

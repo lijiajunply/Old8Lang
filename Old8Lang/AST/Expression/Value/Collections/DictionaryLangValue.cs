@@ -220,7 +220,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
 
     public bool In(LangValueType value)
     {
-        // 检查键是否存在（与编译模式的ContainsKey行为一致）
+        // 检查键是否存在（与 IL 模式的ContainsKey行为一致）
         return Value.Any(x => x.Key.Equal(value));
     }
 

@@ -74,7 +74,7 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitVoidLangValue(VoidLangValue node)
     {
-        // Void值在编译器模式下不需要加载任何值到栈上
+        // Void值在 IL 模式下不需要加载任何值到栈上
         return null;
     }
 
@@ -84,7 +84,7 @@ public partial class CompilerVisitor
     public object? VisitEnumLangValue(EnumLangValue node)
     {
         // 迁移自 EnumLangValue.LoadIlValue()
-        // 枚举值在编译器模式下加载其整数值
+        // 枚举值在 IL 模式下加载其整数值
         ilGenerator.Emit(OpCodes.Ldc_I4, node.Value);
         return null;
     }

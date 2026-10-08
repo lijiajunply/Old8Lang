@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Types;
 
 /// <summary>
-/// 编译器模式下的类型系统测试 - 类型转换
+/// IL 模式下的类型系统测试 - 类型转换
 /// </summary>
 public class TypeConversionTests(ITestOutputHelper output)
 {

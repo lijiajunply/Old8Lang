@@ -177,7 +177,7 @@ public partial class ImportStatement(
     }
 
     /// <summary>
-    /// 在编译模式下生成导入语句的IL代码
+    /// 在 IL 模式下生成导入语句的IL代码
     /// </summary>
     /// <param name="ilGenerator">IL指令生成器</param>
     /// <param name="local">局部变量管理器，用于管理导入的模块和变量</param>
@@ -187,7 +187,7 @@ public partial class ImportStatement(
         bool isDirectory = false;
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
-        // 在编译模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
+        // 在 IL 模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
         if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
         {
             // 验证标准库是否可用（程序集和类是否存在）
@@ -198,7 +198,7 @@ public partial class ImportStatement(
                     "请确保标准库程序集已正确部署到运行时目录。");
             }
 
-            // 标准库在编译模式下不需要生成 IL（运行时会处理）
+            // 标准库在 IL 模式下不需要生成 IL（运行时会处理）
             // 但已经过验证，确保编译后能正常运行
             return;
         }
@@ -216,11 +216,11 @@ public partial class ImportStatement(
         // 处理不同类型的模块
         string? resolvedPath = resolution.ResolvedPath;
 
-        // 如果是网络模块，编译模式暂不支持
+        // 如果是网络模块，IL 模式暂不支持
         if (resolution.ModuleType == ModuleType.NetworkModule)
         {
             throw new ImportError(Position, moduleName,
-                "编译模式暂不支持从网络URL导入模块。请使用解释模式 (-f) 或将模块下载到本地。");
+                "IL 模式暂不支持从网络URL导入模块。请使用解释模式 (-f) 或将模块下载到本地。");
         }
 
         // 对于本地文件、第三方包和子模块，继续处理

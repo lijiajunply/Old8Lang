@@ -72,8 +72,8 @@ public class TaskCatchMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译器模式下暂不支持 Catch 方法（需要闭包支持）
-        throw new NotSupportedException("Task.Catch 方法在编译器模式下暂不支持");
+        // IL 模式下暂不支持 Catch 方法（需要闭包支持）
+        throw new NotSupportedException("Task.Catch 方法在 IL 模式下暂不支持");
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

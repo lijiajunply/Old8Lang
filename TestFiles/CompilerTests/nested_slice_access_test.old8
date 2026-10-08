@@ -1,4 +1,4 @@
-// 测试嵌套切片访问在编译模式下的实现
+// 测试嵌套切片访问在 IL 模式下的实现
 
 func testArrayNestedSlice() -> void {
     // 创建二维数组

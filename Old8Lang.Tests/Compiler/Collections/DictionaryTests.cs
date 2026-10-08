@@ -3,8 +3,8 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Collections;
 
 /// <summary>
-/// 字典（Dictionary）编译模式测试
-/// 测试编译器模式下的字典操作的 IL 生成和执行
+/// 字典（Dictionary）IL 模式测试
+/// 测试 IL 模式下的字典操作的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class DictionaryTests

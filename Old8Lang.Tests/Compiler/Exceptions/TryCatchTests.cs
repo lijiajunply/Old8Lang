@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Compiler.Exceptions;
 
 /// <summary>
-/// 编译器模式下的异常处理测试 - Try-Catch 语句
+/// IL 模式下的异常处理测试 - Try-Catch 语句
 /// </summary>
 public class TryCatchTests(ITestOutputHelper output)
 {

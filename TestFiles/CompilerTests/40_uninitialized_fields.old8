@@ -1,5 +1,5 @@
-// 测试编译模式下的未初始化字段声明
-PrintLine("=== 编译模式未初始化字段测试 ===")
+// 测试 IL 模式下的未初始化字段声明
+PrintLine("=== IL 模式未初始化字段测试 ===")
 
 // 定义一个带有未初始化字段的类
 class TestClass {
@@ -17,4 +17,4 @@ PrintLine("y 的值: " + obj.y)
 obj.x <- 100
 PrintLine("赋值后 x 的值: " + obj.x)
 
-PrintLine("\n✅ 编译模式未初始化字段测试完成")
+PrintLine("\n✅ IL 模式未初始化字段测试完成")

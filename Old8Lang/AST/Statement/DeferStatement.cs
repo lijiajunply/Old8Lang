@@ -28,7 +28,7 @@ public partial class DeferStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 编译器模式下的defer实现
+        // IL 模式下的defer实现
         // 将defer语句添加到LocalManager的defer栈中
         local.RegisterDefer(statement);
     }

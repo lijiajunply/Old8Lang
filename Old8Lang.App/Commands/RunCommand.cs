@@ -11,14 +11,14 @@ public class RunCommand : ICommand
     public string Description => "智能运行文件或项目";
     public string Help => @"使用方法:
   Old8Lang.App run [script-name]              - 运行项目中的脚本
-  Old8Lang.App run [-s|-f|-c] <file>          - 使用指定模式运行文件
+  Old8Lang.App run [-s|-f|-il] <file>         - 使用指定模式运行文件
   Old8Lang.App run <file>                     - 使用解释模式运行文件
 
 参数说明:
   script-name    - 项目配置中定义的脚本名称
   -s             - 语法检查模式
   -f             - 解释执行模式（默认）
-  -c             - 编译执行模式
+  -il            - IL 模式（-c 为其等价别名）
   <file>         - 要运行的文件路径
 
 项目模式:
@@ -91,7 +91,7 @@ public class RunCommand : ICommand
         // 检查第一个参数是否为脚本名称
         var scriptName = args[0];
         
-        // 检查是否为模式参数（-s, -f, -c）
+        // 检查是否为模式参数（-s, -f, -il, -c）
         if (scriptName.StartsWith("-"))
         {
             // 这是文件模式，不是脚本名称
@@ -122,7 +122,7 @@ public class RunCommand : ICommand
         {
             "-s" => new SyntaxTestCommand(),
             "-f" => new FromFileCommand(),
-            "-c" => new CompilerCommand(),
+            "-il" or "-c" => new CompilerCommand(),
             "run" => new RunCommand(),
             _ => null
         };
@@ -156,9 +156,9 @@ public class RunCommand : ICommand
             filePath = args[0];
             
             // 如果在项目中，使用项目配置的运行时模式
-            if (projectConfig?.Old8Lang?.Runtime?.ToLower() == "compiler")
+            if (IsIlRuntime(projectConfig))
             {
-                mode = "-c";
+                mode = "-il";
             }
         }
         else if (args.Length >= 2)
@@ -168,16 +168,16 @@ public class RunCommand : ICommand
             filePath = args[1];
 
             // 验证模式参数
-            if (mode != "-s" && mode != "-f" && mode != "-c")
+            if (mode != "-s" && mode != "-f" && mode != "-il" && mode != "-c")
             {
                 // 第一个参数不是模式参数，假设是文件路径，使用项目配置或默认模式
                 mode = "-f";
                 filePath = args[0];
                 
                 // 如果在项目中，使用项目配置的运行时模式
-                if (projectConfig?.Old8Lang?.Runtime?.ToLower() == "compiler")
+                if (IsIlRuntime(projectConfig))
                 {
-                    mode = "-c";
+                    mode = "-il";
                 }
             }
         }
@@ -208,7 +208,7 @@ public class RunCommand : ICommand
         {
             "-s" => new SyntaxTestCommand(),
             "-f" => new FromFileCommand(),
-            "-c" => new CompilerCommand(),
+            "-il" or "-c" => new CompilerCommand(),
             _ => null
         };
         
@@ -220,6 +220,18 @@ public class RunCommand : ICommand
 
         var commandArgs = new[] { filePath };
         return command.Execute(commandArgs);
+    }
+
+    /// <summary>
+    /// 判断项目配置是否要求以 IL 模式运行
+    /// </summary>
+    /// <remarks>
+    /// runtime 的取值为 "il"；旧值 "compiler" 继续识别，以兼容既有项目配置。
+    /// </remarks>
+    private static bool IsIlRuntime(ProjectConfig? config)
+    {
+        var runtime = config?.Old8Lang?.Runtime?.ToLowerInvariant();
+        return runtime is "il" or "compiler";
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ public abstract class OldStatement : IOldLangTree
     public abstract void Run(VariateManager manager);
 
     /// <summary>
-    /// 编译器模式IL代码生成
+    /// IL 代码生成
     /// </summary>
     /// <param name="ilGenerator">IL 生成器</param>
     /// <param name="local">局部变量管理器</param>

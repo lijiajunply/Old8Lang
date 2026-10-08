@@ -58,7 +58,7 @@ public partial class Instance
     }
 
     /// <summary>
-    /// 尝试通过全局函数注册器生成 IL 代码（编译器模式）
+    /// 尝试通过全局函数注册器生成 IL 代码（IL 模式）
     /// </summary>
     /// <returns>如果找到并生成了 IL 代码返回 true，否则返回 false</returns>
     private bool TryGenerateGlobalFunctionIl(ILGenerator ilGenerator, LocalManager local)
@@ -89,7 +89,7 @@ public partial class Instance
     }
 
     /// <summary>
-    /// 尝试通过全局函数注册器获取返回类型（编译器模式）
+    /// 尝试通过全局函数注册器获取返回类型（IL 模式）
     /// </summary>
     /// <returns>如果找到了全局函数返回其返回类型，否则返回 null</returns>
     private Type? TryGetGlobalFunctionReturnType(LocalManager local)

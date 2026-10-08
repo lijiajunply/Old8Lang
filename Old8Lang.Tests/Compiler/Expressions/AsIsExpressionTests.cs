@@ -3,13 +3,13 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// as 和 is 表达式编译模式测试
-/// 测试编译器模式下 as 和 is 操作符的 IL 生成和执行
+/// as 和 is 表达式 IL 模式测试
+/// 测试 IL 模式下 as 和 is 操作符的 IL 生成和执行
 /// </summary>
 [Collection("Sequential")]
 public class AsIsExpressionTests
 {
-    #region as 表达式测试 - 编译模式
+    #region as 表达式测试 - IL 模式
 
     [Fact]
     public void AsExpression_ValidConversion_IntToDouble_CompilesCorrectly()
@@ -133,7 +133,7 @@ public class AsIsExpressionTests
 
     #endregion
 
-    #region is 表达式测试 - 编译模式
+    #region is 表达式测试 - IL 模式
 
     [Fact]
     public void IsExpression_IntCheck_IsInt_CompilesCorrectly()
@@ -284,7 +284,7 @@ public class AsIsExpressionTests
 
     #endregion
 
-    #region 混合表达式测试 - 编译模式
+    #region 混合表达式测试 - IL 模式
 
     [Fact]
     public void AsIsExpression_MixedUsage_CompilesCorrectly()
@@ -363,7 +363,7 @@ public class AsIsExpressionTests
 
     #endregion
 
-    #region 边界情况测试 - 编译模式
+    #region 边界情况测试 - IL 模式
 
     [Fact]
     public void AsExpression_NullValue_CompilesCorrectly()
@@ -429,7 +429,7 @@ public class AsIsExpressionTests
 
     #endregion
 
-    #region is not 表达式测试 - 编译模式
+    #region is not 表达式测试 - IL 模式
 
     [Fact]
     public void IsNotExpression_IntCheck_IsNotString_CompilesCorrectly()

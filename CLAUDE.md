@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Old8Lang is a dynamically-typed programming language implemented in C# (.NET 10.0). It supports three execution modes:
 - **Interpretation Mode**: Direct AST execution for rapid development and debugging
-- **Compilation Mode**: IL (Intermediate Language) code generation for better performance
+- **IL Mode**: IL (Intermediate Language) code generation for better performance
 - **Bytecode VM Mode**: Bytecode-based execution for cross-platform distribution and advanced debugging
 
 The language features functions, classes, exception handling, async/await, generics, and a comprehensive standard library.
@@ -54,7 +54,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的特点和适用场�
 
 #### 三种执行模式对比
 
-| 特性 | 解释模式 | 编译模式 | VM 模式 |
+| 特性 | 解释模式 | IL 模式 | VM 模式 |
 |------|---------|---------|---------|
 | **启动速度** | 快 | 慢（需编译） | 中等 |
 | **运行性能** | 中等 | 高 | 中等偏高 |
@@ -70,7 +70,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的特点和适用场�
 #### 模式选择指南
 
 - **解释模式** (`-f`): 用于快速开发、原型验证、脚本任务
-- **编译模式** (`-c`): 用于生产环境、性能关键应用、长时间运行的服务
+- **IL 模式** (`-il`): 用于生产环境、性能关键应用、长时间运行的服务
 - **VM 模式** (`-vm`): 用于跨平台分发、调试分析、实验性功能测试（⚠️ 实验性）
 
 #### 命令示例
@@ -80,9 +80,9 @@ Old8Lang 支持三种执行模式，每种模式有不同的特点和适用场�
 dotnet run --project Old8Lang.App -- -f <file.old8>
 ```
 
-**Compilation Mode** (better performance, stricter type checking):
+**IL Mode** (better performance, stricter type checking):
 ```bash
-dotnet run --project Old8Lang.App -- -c <file.old8>
+dotnet run --project Old8Lang.App -- -il <file.old8>
 ```
 
 **Bytecode VM Mode** (⚠️ experimental - cross-platform, advanced debugging):
@@ -185,7 +185,7 @@ Abstract Syntax Tree (AST)
     │   ↓
     │   Result
     │
-    ├→ Compilation Mode (-c)
+    ├→ IL Mode (-il)
     │   ↓
     │   CompilerVisitor
     │   ↓
@@ -208,7 +208,7 @@ Abstract Syntax Tree (AST)
 
 **模式特点**:
 - **解释模式**: 最快的启动速度，支持完整的动态特性（泛型、运算符重载、Python互操作）
-- **编译模式**: 最高的运行性能，需要完整类型注解，不支持某些动态特性
+- **IL 模式**: 最高的运行性能，需要完整类型注解，不支持某些动态特性
 - **VM 模式**: 平衡性能和灵活性，支持字节码序列化、跨平台分发和高级调试功能
 
 ### Key Architectural Patterns
@@ -242,7 +242,7 @@ public interface IVisitor<out TResult>
    - **核心方法**: `Visit(LangExpression expr)` → 直接返回计算结果
 
 2. **CompilerVisitor** (`Old8Lang/Compiler/CompilerVisitor.cs`)
-   - **用途**: 编译模式 IL 代码生成
+   - **用途**: IL 模式 IL 代码生成
    - **返回类型**: `void` (生成 IL 指令)
    - **特点**:
      - 将 AST 转换为 .NET IL 代码
@@ -267,7 +267,7 @@ public interface IVisitor<out TResult>
    - **特点**:
      - 在编译前进行类型分析
      - 支持泛型类型推断
-     - 为编译模式提供类型信息
+     - 为 IL 模式提供类型信息
    - **核心方法**: `Visit(LangExpression expr)` → 返回表达式的类型信息
 
 **Visitor 模式的优势**:
@@ -317,7 +317,7 @@ Old8Lang 的每个 AST 节点支持三种执行方式：
 
 - **SymbolTableCache** (`Old8Lang/TypeSystem/SymbolTableCache.cs`)
   - 缓存符号信息以提高性能
-  - 用于编译模式的符号解析
+  - 用于 IL 模式的符号解析
 
 - **TypeAnnotationManager** (`Old8Lang/TypeSystem/TypeAnnotationManager.cs`)
   - 管理类型注解信息
@@ -327,7 +327,7 @@ Old8Lang 的每个 AST 节点支持三种执行方式：
 
 - **TypeChecker** (`Old8Lang/TypeSystem/TypeChecker.cs`)
   - 验证类型正确性
-  - 编译模式下强制类型检查
+  - IL 模式下强制类型检查
 
 - **TypeInferenceEngine** (`Old8Lang/TypeSystem/TypeInferenceEngine.cs`)
   - 从上下文推断类型
@@ -339,7 +339,7 @@ Old8Lang 的每个 AST 节点支持三种执行方式：
 
 **类型系统特点**:
 - 解释模式: 动态类型 + 运行时检查
-- 编译模式: 静态类型 + 编译时检查
+- IL 模式: 静态类型 + 编译时检查
 - VM 模式: 动态类型 + 字节码验证
 
 ### Directory Structure
@@ -473,7 +473,7 @@ Old8Lang 的每个 AST 节点支持三种执行方式：
 ### Type System Considerations
 
 - Interpretation mode is dynamically typed with runtime type checking
-- Compilation mode requires type annotations and performs static type checking
+- IL mode requires type annotations and performs static type checking
 - Generic types are supported: `list<T>`, `array<T>`, `dict<K,V>`
 - Type inference engine can infer types from context in many cases
 
@@ -510,7 +510,7 @@ Test both execution modes when adding features:
 dotnet run --project Old8Lang.App -- -f path/to/test.old8
 
 # Test compilation mode
-dotnet run --project Old8Lang.App -- -c path/to/test.old8
+dotnet run --project Old8Lang.App -- -il path/to/test.old8
 
 # Run unit tests
 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
@@ -535,7 +535,7 @@ This shows:
 **核心解析和执行**:
 - `Old8Lang/LangParser/LangParser.cs` - Main parser entry point (Facade 模式)
 - `Old8Lang/Interpreter/LangInterpreter.cs` - Interpretation mode executor
-- `Old8Lang/Compiler/Compiler.cs` - Compilation mode IL generator
+- `Old8Lang/Compiler/Compiler.cs` - IL mode IL generator
 - `Old8Lang/AST/LangExpression.cs` - Base class for all expressions
 - `Old8Lang/AST/OldStatement.cs` - Base class for all statements
 - `Old8Lang/Interpreter/VariateManager.cs` - Variable/scope management
@@ -544,7 +544,7 @@ This shows:
 **Visitor 模式实现**:
 - `Old8Lang/AST/Visitor/IVisitor.cs` - Visitor 接口定义
 - `Old8Lang/Interpreter/InterpreterVisitor.cs` - 解释模式 Visitor (返回 object)
-- `Old8Lang/Compiler/CompilerVisitor.cs` - 编译模式 Visitor (生成 IL)
+- `Old8Lang/Compiler/CompilerVisitor.cs` - IL 模式 Visitor (生成 IL)
 - `Old8Lang/Bytecode/BytecodeVisitor.cs` - VM 模式 Visitor (生成字节码)
 - `Old8Lang/TypeSystem/TypeInferenceVisitor.cs` - 类型推断 Visitor (返回 TypeInfo)
 

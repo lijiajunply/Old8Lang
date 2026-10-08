@@ -3,7 +3,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Expressions;
 
 /// <summary>
-/// 三元运算符编译模式测试
+/// 三元运算符 IL 模式测试
 /// </summary>
 [Collection("Sequential")]
 public class TernaryTests

@@ -20,7 +20,7 @@
       "production": {
         "debug": false,
         "logLevel": "error",
-        "runtime": "compiler",
+        "runtime": "il",
         "env": {
           "APP_MODE": "production",
           "API_URL": "https://api.production.com"

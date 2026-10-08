@@ -92,7 +92,7 @@ public sealed class JsonSerializeFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 编译模式暂不支持 JSON 序列化
+        // IL 模式暂不支持 JSON 序列化
         ilGenerator.Emit(OpCodes.Ldstr, "");
     }
 

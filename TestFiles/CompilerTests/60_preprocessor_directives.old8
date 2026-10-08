@@ -1,10 +1,10 @@
-// 测试编译器模式下的预编译指令
+// 测试 IL 模式下的预编译指令
 
 #define DEBUG
 #define FEATURE_A
 
 func testPreprocessor() -> void {
-    PrintLine("=== 编译器模式预编译测试 ===")
+    PrintLine("=== IL 模式预编译测试 ===")
 
     #if DEBUG
         PrintLine("DEBUG 模式已启用")

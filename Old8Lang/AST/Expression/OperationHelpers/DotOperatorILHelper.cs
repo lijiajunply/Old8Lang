@@ -540,7 +540,7 @@ public static class DotOperatorILHelper
         }
 
         // 特殊处理Old8Lang的ToStr()方法
-        // ToStr()是Old8Lang的扩展方法，在编译模式下将其映射到.NET的ToString()
+        // ToStr()是Old8Lang的扩展方法，在 IL 模式下将其映射到.NET的ToString()
         if (instance.Id.IdName == "ToStr" && instance.Ids.Count == 0)
         {
             // 调用ToString()方法

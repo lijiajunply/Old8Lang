@@ -5,9 +5,9 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Extern;
 
 /// <summary>
-/// Extern 语句编译模式测试
+/// Extern 语句 IL 模式测试
 /// 测试 Native DLL extern 的 IL 生成和执行
-/// 注意：Python 和 JavaScript extern 不支持编译模式
+/// 注意：Python 和 JavaScript extern 不支持 IL 模式
 /// </summary>
 [Collection("Sequential")]
 public class ExternCompilerTests
@@ -212,10 +212,10 @@ result <- test()
 
     #endregion
 
-    #region Python/JavaScript 编译模式测试（应该抛出异常）
+    #region Python/JavaScript IL 模式测试（应该抛出异常）
 
     /// <summary>
-    /// 测试 Python extern 在编译模式下抛出 NotSupportedException
+    /// 测试 Python extern 在 IL 模式下抛出 NotSupportedException
     /// </summary>
     [Fact]
     public void CompilePython_Script_ThrowsNotSupportedException()
@@ -241,11 +241,11 @@ result <- main()
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
 
-        Assert.Contains("不支持编译模式", exception.Message);
+        Assert.Contains("不支持 IL 模式", exception.Message);
     }
 
     /// <summary>
-    /// 测试 Python module extern 在编译模式下抛出 NotSupportedException
+    /// 测试 Python module extern 在 IL 模式下抛出 NotSupportedException
     /// </summary>
     [Fact]
     public void CompilePython_Module_ThrowsNotSupportedException()
@@ -271,11 +271,11 @@ result <- main()
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
 
-        Assert.Contains("不支持编译模式", exception.Message);
+        Assert.Contains("不支持 IL 模式", exception.Message);
     }
 
     /// <summary>
-    /// 测试 JavaScript extern 在编译模式下抛出 NotSupportedException
+    /// 测试 JavaScript extern 在 IL 模式下抛出 NotSupportedException
     /// </summary>
     [Fact]
     public void CompileJavaScript_Script_ThrowsNotSupportedException()
@@ -301,11 +301,11 @@ result <- main()
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
 
-        Assert.Contains("不支持编译模式", exception.Message);
+        Assert.Contains("不支持 IL 模式", exception.Message);
     }
 
     /// <summary>
-    /// 测试 js: 前缀在编译模式下抛出 NotSupportedException
+    /// 测试 js: 前缀在 IL 模式下抛出 NotSupportedException
     /// </summary>
     [Fact]
     public void CompileJavaScript_WithJsPrefix_ThrowsNotSupportedException()
@@ -331,7 +331,7 @@ result <- main()
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         });
 
-        Assert.Contains("不支持编译模式", exception.Message);
+        Assert.Contains("不支持 IL 模式", exception.Message);
     }
 
     #endregion

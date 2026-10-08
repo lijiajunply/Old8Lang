@@ -88,7 +88,7 @@ public interface IInstanceMethod
         VariateManager manager, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式生成 IL 代码
+    /// IL 模式生成 IL 代码
     /// </summary>
     /// <param name="instance">实例表达式</param>
     /// <param name="parameters">参数表达式列表</param>
@@ -99,7 +99,7 @@ public interface IInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
-    /// 编译器模式获取返回类型
+    /// IL 模式获取返回类型
     /// </summary>
     /// <param name="instanceType">实例类型</param>
     /// <param name="parameters">参数表达式列表</param>

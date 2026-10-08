@@ -5,13 +5,14 @@ using Old8Lang.LangParser;
 namespace Old8Lang.App.Commands;
 
 /// <summary>
-/// 编译执行文件命令
+/// IL 模式执行文件命令
 /// </summary>
 public class CompilerCommand : ICommand
 {
-    public string Name => "-c";
-    public string Description => "编译并执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -c <文件名> [-D SYMBOL1] [-D SYMBOL2] ...";
+    public string Name => "-il";
+    public string Description => "以 IL 模式编译并执行指定的 .old8 或 .ol 文件";
+    public string Help => "使用: Old8Lang.App -il <文件名> [-D SYMBOL1] [-D SYMBOL2] ...\n" +
+                          "别名: -c（等价，向后兼容）";
 
     public int Execute(string[] args)
     {

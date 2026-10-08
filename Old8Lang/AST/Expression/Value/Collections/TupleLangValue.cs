@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
 /// 元组 - 支持命名和未命名元组
-/// 重构后支持扁平化存储，并在编译模式下生成标准的 C# ValueTuple
+/// 重构后支持扁平化存储，并在 IL 模式下生成标准的 C# ValueTuple
 /// </summary>
 public partial class TupleLangValue : LangValueType, ILangList
 {

@@ -81,7 +81,7 @@ public class ArrayCountMethod : LangListCountMethod
 
 2. **返回类型**：大多数通用方法返回 `ListLangValue`，而不是原始类型。例如，`tuple.Reverse()` 返回 `ListLangValue` 而不是 `TupleLangValue`。
 
-3. **编译模式支持**：高阶函数方法（Filter、Map、All、Any with predicate）在编译模式下支持有限。
+3. **IL 模式支持**：高阶函数方法（Filter、Map、All、Any with predicate）在 IL 模式下支持有限。
 
 4. **VM 模式支持**：高阶函数方法在 VM 模式下暂不支持。
 
@@ -127,6 +127,6 @@ reversed <- tuple.Reverse()     // [300, 200, 100]
 ## 未来改进
 
 1. 支持更多通用方法（如 `First`、`Last`、`Skip`、`Take` 等）
-2. 改进编译模式和 VM 模式的支持
+2. 改进 IL 模式和 VM 模式的支持
 3. 添加泛型类型推断，使返回类型更准确
 4. 优化性能，减少不必要的列表复制

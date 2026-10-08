@@ -728,7 +728,7 @@ public partial class AsyncForInStatement(
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式）
+    /// 生成 IL 代码（IL 模式）
     /// </summary>
     /// <param name="ilGenerator">IL生成器</param>
     /// <param name="local">局部变量管理器</param>

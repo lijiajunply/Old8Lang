@@ -25,7 +25,7 @@ public interface IExternProvider
         VariateManager manager);
 
     /// <summary>
-    /// 编译模式：生成 IL 代码
+    /// IL 模式：生成 IL 代码
     /// </summary>
     /// <param name="source">外部资源路径</param>
     /// <param name="functions">要导入的函数声明列表</param>
@@ -40,7 +40,7 @@ public interface IExternProvider
         LocalManager localManager);
 
     /// <summary>
-    /// 是否支持编译模式
+    /// 是否支持 IL 模式
     /// 注意：某些动态语言（如 Python）可能只支持解释模式
     /// </summary>
     bool SupportsCompilation { get; }
