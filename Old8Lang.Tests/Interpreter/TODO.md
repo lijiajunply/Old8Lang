@@ -1,156 +1,114 @@
 # 解释模式测试待办事项
 
+> 清点日期：2026-10-09。以下所有数字均由 `Old8Lang.Tests/Interpreter/` 下的实际文件清点得出，
+> 修改本文件前请先重新清点，避免出现「把已有测试列为待补」的情况。
+
 ## 当前测试覆盖情况
 
-**已有测试统计**:
-- Async: 5 个测试文件 (AsyncFunctionTests, AsyncGeneratorTests, AsyncStreamTests, AwaitTests, TaskAPITests)
-- Basic: 3 个测试文件 (AssignmentTests, ExpressionTests, VariableTests)
-- Classes: 8 个测试文件 (ClassDeclarationTests, ClassInstantiationTests, ConstructorTests, GenericClassTests, InheritanceTests, InterfaceTests, MemberAccessTests, MixinTests)
-- Collections: 7 个测试文件 (ArrayTests, CollectionMethodsTests, DictionaryTests, ListTests, SliceTests, SyncIteratorTests, TupleTests)
+**已有测试统计**（17 个子目录，共 131 个测试文件）:
+
+- Async: 8 个测试文件 (AsyncConcurrencyTests, AsyncFunctionTests, AsyncGeneratorTests, AsyncStreamTests, AwaitTests, CancellationTokenTests, TaskAPITests, TaskAdvancedTests)
+- Basic: 4 个测试文件 (AssignmentTests, ExpressionTests, PreprocessorInterpreterTests, VariableTests)
+- Classes: 10 个测试文件 (ClassDeclarationTests, ClassInstantiationTests, ConstructorTests, ExtensionMethodInterpreterTests, GenericClassTests, GenericConstraintExtensionInterpreterTests, InheritanceTests, InterfaceTests, MemberAccessTests, MixinTests)
+- Collections: 9 个测试文件 (ArrayTests, CollectionMethodsTests, DictionaryTests, ListComprehensionTests, ListTests, NestedAccessTests, SliceTests, SyncIteratorTests, TupleTests)
 - EdgeCases: 5 个测试文件 (BoundaryTests, EmptyInputTests, ExtremeValuesTests, TypeErrorsTests, UnexpectedInputsTests)
 - Exceptions: 5 个测试文件 (ErrorPropagationTests, FinallyTests, NestedExceptionTests, ThrowTests, TryCatchTests)
-- Expressions: 11 个测试文件 (ArithmeticTests, ComparisonTests, ExtendedRangeTests, InExpressionTests, LogicalTests, MatchExpressionEnhancedTests, MatchExpressionTests, RangeTests, StringTemplateTests, TernaryTests, TypeConversionTests)
-- Functions: 8 个测试文件 (ClosureTests, FunctionCallTests, FunctionDeclarationTests, FunctionOverloadTests, GenericFunctionTests, GenericTypeInferenceTests, HigherOrderTests, LambdaTests)
+- Expressions: 12 个测试文件 (ArithmeticTests, AsIsExpressionTests, ComparisonTests, ExtendedRangeTests, InExpressionTests, LogicalTests, MatchExpressionEnhancedTests, MatchExpressionTests, RangeTests, StringTemplateTests, TernaryTests, TypeConversionTests)
+- FileHeader: 2 个测试文件 (FileHeaderConfigTests, FileHeaderDirectiveTests)
+- Functions: 12 个测试文件 (ClosureTests, DecoratorInterpreterTests, FunctionCallTests, FunctionDeclarationTests, FunctionOverloadTests, GenericFunctionTests, GenericTypeInferenceTests, HigherOrderTests, LambdaTests, NamedArgumentsErrorTests, NamedArgumentsTests, ParamsInterpreterTests)
 - Integration: 3 个测试文件 (EndToEndTests, InterpreterIntegrationTests, InterpreterTests)
-- Linq: 4 个测试文件 (LinqBasicExecutionTests, LinqEdgeCasesTests, LinqErrorTests, LinqLetOrderByTests)
-- Modules: 16 个测试文件（包含基础导入、高级导入、错误处理、集成测试等）
-- Statements: 6 个测试文件 (ConditionalTests, ControlFlowTests, EnumTests, JumpStatementsTests, LoopTests, SwitchTests)
-- Threading: 1 个测试文件 (SpawnTests)
-- Types: 2 个测试文件 (GenericCollectionTypesInterpreterTests, UnionTypesInterpreterTests)
+- Linq: 6 个测试文件 (LinqBasicExecutionTests, LinqEdgeCasesTests, LinqErrorTests, LinqJoinTests, LinqLetOrderByTests, ListAdvancedMethodsTests)
+- Modules: 28 个测试文件（含基础导入、高级导入、Extern、标准库、错误处理、统一模块架构等；`Modules/Core/` 下为测试基建，未计入）
+- Performance: 11 个测试文件 (LongRunningPerformanceTests, LoopExecutionPerformanceTests, MediumProgramPerformanceTests, MemoryStabilityTests, PerformanceMonitorTests, PerformanceOptimizationTests, PerformanceReporterTests, RecursiveCallPerformanceTests, SmallScriptPerformanceTests, VariableCacheTests, VariableLookupPerformanceTests)
+- Reflection: 2 个测试文件 (ReflectionTests, TypeLangValueReflectionTests)
+- Statements: 9 个测试文件 (ConditionalTests, ControlFlowTests, DeferStatementTests, EnumTests, JumpStatementsTests, LoopTests, SelectStatementTests, SwitchTests, UsingStatementTests)
+- Threading: 2 个测试文件 (SpawnTests, ThreadTests)
+- Types: 3 个测试文件 (GenericCollectionTypesInterpreterTests, IntersectionTypesInterpreterTests, UnionTypesInterpreterTests)
 
-**总计**: 84 个测试文件
+**总计**: 131 个测试文件
+
+## 已完成的补充测试
+
+以下条目曾作为「待补测试」列在本文件中，对应测试文件现已存在，不再重复列入待办：
+
+| 原待补项 | 已落地文件 |
+|---------|-----------|
+| 文件头指令测试 | `FileHeader/FileHeaderDirectiveTests.cs`、`FileHeader/FileHeaderConfigTests.cs` |
+| 交叉类型测试 | `Types/IntersectionTypesInterpreterTests.cs` |
+| 异步并发测试 | `Async/AsyncConcurrencyTests.cs` |
+| 取消令牌测试 | `Async/CancellationTokenTests.cs` |
+| 线程基础测试 | `Threading/ThreadTests.cs`（含 Thread.Sleep、Join、Name、Priority、IsAlive 等） |
+| Task 相关测试 | `Async/TaskAPITests.cs`（已覆盖 TaskCompletionSource / TaskScheduler / TaskFactory）、`Async/TaskAdvancedTests.cs` |
+| LINQ Join 测试 | `Linq/LinqJoinTests.cs`（含 `into g` 分组联接） |
+| 列表推导式测试 | `Collections/ListComprehensionTests.cs` |
+| 集合嵌套访问测试 | `Collections/NestedAccessTests.cs` |
+| 性能测试 | `Performance/` 下 11 个文件（循环、递归、内存、变量查找等） |
+| 异步 for-in 循环测试 | `Async/AsyncStreamTests.cs`、`Async/AsyncGeneratorTests.cs` |
+| 枚举基础测试 | `Statements/EnumTests.cs`（空枚举、单成员、负值、switch 等 20 例） |
 
 ## 需要补充的测试
 
-### 1. 文件头指令测试 (FileHeader/)
-
-**优先级**: 中
-
-文件头指令是 Old8Lang 的重要特性，但目前缺少系统测试。
-
-- [ ] `FileHeaderDirectiveTests.cs` - 文件头指令基础测试
-  - 测试元数据指令：encoding, author, version, date, description
-  - 测试编译器配置指令：debug, verify-il, type-inference, optimize
-  - 测试指令解析规则（必须在文件开头、大小写不敏感等）
-  - 测试无效指令的处理
-
-**示例测试场景**:
-```old8
-#!encoding utf-8
-#!author 测试作者
-#!version 1.0.0
-#!debug true
-```
-
-### 2. 交叉类型测试 (Types/)
+### 1. 线程同步与并发原语测试 (Threading/)
 
 **优先级**: 中高
 
-语法文档中提到了交叉类型（Intersection Types），但当前没有专门测试。
-
-- [ ] `IntersectionTypesInterpreterTests.cs` - 交叉类型测试
-  - 泛型约束中的交叉类型
-  - 多接口实现的交叉类型
-  - 交叉类型的兼容性规则
-  - 交叉类型错误处理
-
-**示例测试场景**:
-```old8
-func sort<T>(items: List<T>) -> List<T> where T: IComparable & ICloneable {
-    // 测试泛型约束
-}
-```
-
-### 3. 异步并发增强测试 (Async/)
-
-**优先级**: 中
-
-当前已有基础异步测试，但可能需要更全面的测试覆盖。
-
-- [ ] `AsyncConcurrencyTests.cs` - 异步并发场景测试
-  - 多个异步任务并发执行
-  - 异步任务同步和协调
-  - 异步任务超时和取消
-  - 异步任务异常处理
-
-- [ ] `CancellationTokenTests.cs` - 取消令牌测试
-  - CancellationToken 基础用法
-  - CancellationTokenSource 创建和管理
-  - 任务取消传播
-  - 取消后的清理工作
-
-**AST 节点支持**: `CancellationTokenLangValue`, `CancellationTokenSourceLangValue`
-
-### 4. 线程相关测试增强 (Threading/)
-
-**优先级**: 中
-
-当前只有 `SpawnTests`，但语法文档和 AST 节点显示有更多线程功能。
-
-- [ ] `ThreadTests.cs` - 线程基础测试
-  - Thread 类基础用法
-  - 线程创建和启动
-  - 线程状态检查（IsAlive等）
-  - Thread.Sleep 等静态方法
-  - Thread.CurrentThread() 获取当前线程
+`ThreadTests.cs` 覆盖了线程本身，但语法文档 §8.4 列出的并发原语在解释器侧没有测试。
 
 - [ ] `ThreadSynchronizationTests.cs` - 线程同步测试
-  - 线程锁和同步机制
   - 多线程访问共享资源
-  - 死锁检测和避免
+  - 锁与临界区行为
+  - 同步顺序与竞态场景
 
-**AST 节点支持**: `ThreadClassLangValue`, `ThreadLangValue`, `ThreadStaticMethodWrapper`, `LockedVariableLangValue`
+- [ ] `ConcurrentPrimitiveTests.cs` - 并发原语测试
+  - Mutex（互斥锁）加锁/释放
+  - Semaphore（信号量）计数与等待
+  - AtomicInt（原子整数）并发自增
+  - Channel（通道）收发
+  - ReadWriteLock（读写锁）、CountDownLatch（倒计时锁）、CyclicBarrier（循环栅栏）
 
-### 5. 任务相关测试增强 (Async/)
+**AST 节点支持**: `LockedVariableLangValue`, `ThreadStaticMethodWrapper`
 
-**优先级**: 中
+### 2. .NET 托管方法绑定测试 (Integration/)
 
-AST 中有丰富的 Task 相关节点，但当前测试覆盖不够全面。
+**优先级**: 中高
 
-- [ ] `TaskCompletionSourceTests.cs` - TaskCompletionSource 测试
-  - TaskCompletionSource 创建和使用
-  - 手动完成任务
-  - 任务结果设置
-  - 任务异常设置
+绑定 C# 方法原本写作 `native func ... from ...`，解析器现已统一为 `extern`，`native` 关键字不再存在
+（见 `LangParser/Parsers/StatementParser.ImportAndNative.cs`，其中 `Expect(LangTokenType.Extern)`）。
+`Modules/Extern/` 下已覆盖 C/C++ P/Invoke（`NativeDllExternTests.cs`）、Python（`PythonExternTests.cs`）、
+JavaScript（`JavaScriptExternTests.cs`），但语法文档 §5.15 的 .NET 托管程序集形式（`"C#:"` / `"cs:"` /
+`"csharp:"` / `"dotnetdll:"` 前缀）在解释器侧仍无测试。
 
-- [ ] `TaskSchedulerTests.cs` - TaskScheduler 测试
-  - 任务调度器基础用法
-  - 自定义任务调度
-  - 任务优先级
+- [ ] `ManagedDllExternTests.cs` - .NET 托管 DLL 导入测试
+  - 方法块导入：`extern "C#:System" Math { func Pow(x:double, y:double) -> double, ... }`
+  - 单个方法导入：`extern "C#:System" Math func Pow(x:double, y:double) -> double`
+  - 带别名的导入：`func Pow(x:double, y:double) -> double as Power`
+  - 导入自定义 DLL：`extern "dotnetdll:MyLibrary.dll" MyMathClass { ... }`（需准备测试程序集）
+  - 命名参数调用：`Pow(y: 3.0, x: 2.0)`
+  - 程序集不存在时的异常处理（实测报 `IMPORT_ERROR`）
+  - `cs:` / `csharp:` 前缀与 `C#:` 的等价性
 
-- [ ] `TaskFactoryTests.cs` - TaskFactory 测试
-  - TaskFactory 创建任务
-  - 任务创建选项
-  - 任务延续
-
-**AST 节点支持**: `TaskCompletionSourceLangValue`, `TaskSchedulerClassLangValue`, `TaskFactoryClassLangValue`
-
-### 6. 本地方法绑定测试 (Integration/)
-
-**优先级**: 中
-
-语法文档提到 `native` 关键字用于绑定 C# 方法，需要测试。
-
-- [ ] `NativeMethodBindingTests.cs` - 本地方法绑定测试
-  - native 语句基础用法
-  - 绑定静态方法
-  - 绑定实例方法
-  - 参数类型映射
-  - 返回值类型映射
-  - 异常处理
+> 已实测（2026-10-09，解释模式）：上述 `{ func ... }` 块、单个 `func`、`as` 别名、命名参数四种写法均可用；
+> 而 `extern "C#:System" Math *` 和 `extern "C#:System" Math as SysMath` 会报
+> `语法错误：缺少 'func' 关键字`——这两种写法属于 `NativeStatement` 解析路径，带 `C#:` 等托管前缀时走的是
+> `ParseExternStatement`，因此写用例时不要照搬 §5.14.2/§5.14.4 的 `*`、`as` 示例（语法文档 §5.14 的复核说明
+> 也已记录同类示例问题）。
 
 **AST 节点支持**: `NativeStatement`, `NativeAnyLangValue`, `NativeStaticAny`
 
 **示例测试场景**:
 ```old8
-native func WriteLine(s:string) -> void from System.Console.WriteLine
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double
+}
+result <- Pow(2.0, 10.0)
 ```
 
-### 7. 模块高级功能测试 (Modules/)
+### 3. 模块命名空间与重载测试 (Modules/)
 
-**优先级**: 中低
+**优先级**: 中
 
-当前模块测试已较完善，但可能需要更多边界情况测试。
+`Modules/AdvancedImport/` 已覆盖条件导入、动态导入、惰性导入，但命名空间隔离与模块重载仍无测试。
 
 - [ ] `ModuleNamespaceTests.cs` - 模块命名空间测试
   - 模块命名空间隔离
@@ -164,55 +122,30 @@ native func WriteLine(s:string) -> void from System.Console.WriteLine
 
 **AST 节点支持**: `UnifiedModule`, `ImportInfo`, `LazySymbolProxy`
 
-### 8. LINQ 高级查询测试 (Linq/)
+### 4. LINQ 查询语法 group by / into 延续测试 (Linq/)
 
 **优先级**: 中低
 
-当前 LINQ 测试较完善，但可能需要更多复杂查询场景。
+`ListAdvancedMethodsTests.cs` 覆盖的是 `List.GroupBy` 方法形式，`LinqJoinTests.cs` 中带 `into g` 的用例只有一条；
+查询语法 `group x by ...` 在解释器侧尚无执行用例（解析器侧有 `Parser/Linq/LinqAdvancedParsingTests.cs`）。
 
-- [ ] `LinqJoinTests.cs` - LINQ Join 操作测试
-  - join 子句基础用法
-  - 多表关联查询
-  - 左连接、内连接
-  - join 性能测试
-
-- [ ] `LinqGroupByTests.cs` - LINQ GroupBy 操作测试
-  - group by 子句基础用法
-  - 分组聚合
+- [ ] `LinqGroupByTests.cs` - 查询语法 group by 测试
+  - `group x by <key>` 基础用法
+  - 分组后聚合（Count / Sum / Max）
   - 多键分组
   - 分组后过滤
 
-- [ ] `LinqQueryContinuationTests.cs` - LINQ 查询延续测试
-  - into 关键字用法
+- [ ] `LinqQueryContinuationTests.cs` - 查询延续测试
+  - `into` 关键字用法
   - 查询延续链式调用
 
-**AST 节点支持**: `JoinClause`, `GroupByClause`, `QueryContinuation`
+**AST 节点支持**: `GroupByClause`, `QueryContinuation`
 
-### 9. 列表推导式测试 (Collections/)
-
-**优先级**: 中
-
-AST 中有 `ListComprehension` 节点，但可能缺少专门测试。
-
-- [ ] `ListComprehensionTests.cs` - 列表推导式测试
-  - 基础列表推导式
-  - 带条件的推导式
-  - 多重循环推导式
-  - 嵌套推导式
-
-**AST 节点支持**: `ListComprehension`
-
-**示例测试场景**:
-```old8
-// [expression for item in iterable if condition]
-squares <- [x * x for x in range(10) if x % 2 == 0]
-```
-
-### 10. Super 表达式测试 (Classes/)
+### 5. Super 表达式测试 (Classes/)
 
 **优先级**: 中低
 
-AST 中有 `SuperExpression` 和 `SuperProxy` 节点，测试类继承时需要覆盖。
+`super` 目前只在 `MemberAccessTests.cs`、`MixinTests.cs` 中顺带出现，没有专门用例。
 
 - [ ] `SuperExpressionTests.cs` - super 关键字测试
   - super 调用父类方法
@@ -222,11 +155,11 @@ AST 中有 `SuperExpression` 和 `SuperProxy` 节点，测试类继承时需要�
 
 **AST 节点支持**: `SuperExpression`, `SuperProxy`
 
-### 11. 错误处理增强测试 (ErrorCases/)
+### 6. 错误处理增强测试 (EdgeCases/)
 
 **优先级**: 中
 
-可以添加更多错误场景测试，确保解释器健壮性。
+`EdgeCases/TypeErrorsTests.cs` 已覆盖常见的类型不匹配运算，以下场景仍缺测试。
 
 - [ ] `ParserErrorTests.cs` - 解析器错误测试
   - 语法错误恢复
@@ -234,7 +167,6 @@ AST 中有 `SuperExpression` 和 `SuperProxy` 节点，测试类继承时需要�
   - 错误提示信息准确性
 
 - [ ] `RuntimeTypeErrorTests.cs` - 运行时类型错误测试
-  - 类型不匹配错误
   - 空引用错误
   - 越界访问错误
 
@@ -243,57 +175,13 @@ AST 中有 `SuperExpression` 和 `SuperProxy` 节点，测试类继承时需要�
   - 函数递归深度
   - 类实例循环引用
 
-### 12. 枚举增强测试 (Statements/)
+> 注：`Modules/ErrorHandling/CircularDependencyTests.cs` 测的是模块循环依赖，与此处的数据结构循环引用不是同一类场景。
 
-**优先级**: 低
+### 7. 测试工具类测试 (Testing/)
 
-当前有 `EnumTests`，但可能需要更全面的测试。
+**优先级**: 中低
 
-- [ ] 在现有 `EnumTests.cs` 中补充：
-  - 枚举自定义值
-  - 枚举值转换
-  - 枚举标志位组合
-  - 枚举方法和属性
-
-**AST 节点支持**: `EnumInit`, `EnumTemplate`
-
-### 13. 性能和压力测试 (Performance/)
-
-**优先级**: 低
-
-添加性能基准测试，虽然有独立的 Benchmarks 项目，但解释器测试中也可以包含一些性能验证。
-
-- [ ] `InterpreterPerformanceTests.cs` - 解释器性能测试
-  - 大数据集处理
-  - 深度递归
-  - 复杂表达式计算
-  - 内存使用测试
-
-### 14. 集合嵌套访问测试 (Collections/)
-
-**优先级**: 中
-
-AST 中有 `NestedIndexAccess` 和 `NestedSliceAccess` 节点。
-
-- [ ] `NestedAccessTests.cs` - 嵌套访问测试
-  - 多维数组嵌套索引
-  - 嵌套字典访问
-  - 嵌套切片操作
-  - 混合嵌套访问
-
-**AST 节点支持**: `NestedIndexAccess`, `NestedSliceAccess`
-
-**示例测试场景**:
-```old8
-matrix <- [[1, 2], [3, 4]]
-value <- matrix[0][1]  // 嵌套索引访问
-```
-
-### 15. Mock 和测试工具类测试 (Testing/)
-
-**优先级**: 低
-
-AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLangValue` 等节点。
+AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLangValue` 等节点，解释器侧无测试。
 
 - [ ] `TestUtilitiesTests.cs` - 测试工具类测试
   - Assert 类用法
@@ -303,7 +191,7 @@ AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLang
 
 **AST 节点支持**: `AssertClassLangValue`, `TestRunnerClassLangValue`, `MockLibClassLangValue`
 
-### 16. 类型模板测试 (Types/)
+### 8. 类型模板测试 (Types/)
 
 **优先级**: 中
 
@@ -317,20 +205,7 @@ AST 中有 `TypeTemplate` 节点，用于类型参数和泛型。
 
 **AST 节点支持**: `TypeTemplate`, `GenericParameter`, `GenericInstanceExpression`
 
-### 17. 异步 for-in 循环测试 (Async/)
-
-**优先级**: 中
-
-AST 中有 `AsyncForInStatement` 节点。
-
-- [ ] 在现有异步测试中补充或创建新测试：
-  - async for-in 循环基础用法
-  - 异步迭代器
-  - 异步序列处理
-
-**AST 节点支持**: `AsyncForInStatement`
-
-### 18. 常量优化测试 (Expressions/)
+### 9. 常量优化测试 (Expressions/)
 
 **优先级**: 低
 
@@ -343,66 +218,60 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 
 **AST 节点支持**: `ConstantLangValue`
 
+### 10. 枚举增强测试 (Statements/)
+
+**优先级**: 低
+
+`EnumTests.cs` 已覆盖声明、取值、比较、switch，但以下场景仍缺：
+
+- [ ] 在现有 `EnumTests.cs` 中补充：
+  - 枚举标志位组合
+  - 枚举方法和属性
+
+**AST 节点支持**: `EnumInit`, `EnumTemplate`
+
 ## 测试优先级汇总
 
 ### 高优先级（建议立即补充）
 暂无紧急缺失
 
 ### 中高优先级（重要但不紧急）
-1. 交叉类型测试 (Types/)
-2. 文件头指令测试 (FileHeader/)
+1. 线程同步与并发原语测试 (Threading/)
+2. .NET 托管方法绑定测试 (Integration/)
 
 ### 中优先级（后续补充）
-3. 异步并发增强测试 (Async/)
-4. 线程相关测试增强 (Threading/)
-5. 任务相关测试增强 (Async/)
-6. 本地方法绑定测试 (Integration/)
-7. 列表推导式测试 (Collections/)
-8. 集合嵌套访问测试 (Collections/)
-9. 类型模板测试 (Types/)
-10. 异步 for-in 循环测试 (Async/)
-11. 错误处理增强测试 (ErrorCases/)
+3. 模块命名空间与重载测试 (Modules/)
+4. 测试工具类测试 (Testing/)
+5. 类型模板测试 (Types/)
+6. 错误处理增强测试 (EdgeCases/)
 
 ### 中低优先级（可选增强）
-12. 模块高级功能测试 (Modules/)
-13. LINQ 高级查询测试 (Linq/)
-14. Super 表达式测试 (Classes/)
-15. 枚举增强测试 (Statements/)
+7. LINQ 查询语法 group by / into 测试 (Linq/)
+8. Super 表达式测试 (Classes/)
 
 ### 低优先级（长期优化）
-16. 性能和压力测试 (Performance/)
-17. 常量优化测试 (Expressions/)
-18. Mock 和测试工具类测试 (Testing/)
+9. 常量优化测试 (Expressions/)
+10. 枚举增强测试 (Statements/)
 
 ## 实施建议
 
-### 阶段 1: 类型系统完善 (1 周)
-1. 交叉类型测试
-2. 类型模板测试
-3. 文件头指令测试
+### 阶段 1: 并发与互操作 (1 周)
+1. 线程同步与并发原语测试
+2. .NET 托管方法绑定测试
 
-### 阶段 2: 异步和并发 (2 周)
-4. 异步并发增强测试
-5. 线程相关测试增强
-6. 任务相关测试增强
-7. 异步 for-in 循环测试
+### 阶段 2: 类型系统完善 (1 周)
+3. 类型模板测试
+4. 错误处理增强测试
 
-### 阶段 3: 集合和表达式 (1 周)
-8. 列表推导式测试
-9. 集合嵌套访问测试
-10. 本地方法绑定测试
+### 阶段 3: 模块与工具 (1 周)
+5. 模块命名空间与重载测试
+6. 测试工具类测试
 
-### 阶段 4: 其他增强 (2 周)
-11. 错误处理增强测试
-12. Super 表达式测试
-13. LINQ 高级查询测试
-14. 模块高级功能测试
-
-### 阶段 5: 可选优化 (按需)
-15. 枚举增强测试
-16. 性能和压力测试
-17. 常量优化测试
-18. Mock 和测试工具类测试
+### 阶段 4: 可选优化 (按需)
+7. LINQ 查询语法 group by / into 测试
+8. Super 表达式测试
+9. 常量优化测试
+10. 枚举增强测试
 
 ## 注意事项
 
@@ -419,9 +288,9 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
    - 确保向后兼容性
 
 3. **与 IL 模式对比**:
-   - 解释模式测试覆盖更全面（84 vs 29 个测试文件）
-   - 许多特性在解释模式下更容易测试
-   - 解释模式测试可以作为 IL 模式测试的参考
+   - 两侧规模已接近：解释模式 131 个测试文件，IL 模式 134 个（均按文件名以 `Tests.cs` 结尾清点）
+   - 部分动态特性（泛型、运算符重载、Python 互操作）只在解释模式与虚拟机模式下可测
+   - 解释模式测试可以作为其他模式测试的参考
 
 4. **代码质量**:
    - 保持测试代码清晰可读
@@ -440,6 +309,7 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 
 - 当前解释模式测试: `Old8Lang.Tests/Interpreter/`
 - IL 模式测试: `Old8Lang.Tests/Compiler/`
+- 虚拟机模式测试: `Old8Lang.Tests/VirtualMachine/`
 - AST 节点定义: `Old8Lang/AST/`
 - 语法规范: `Docs/Old8Lang_Grammar.md`
-- EBNF 规范: `Old8Lang/Old8Lang.ebnf`
+- EBNF 规范: `Docs/Old8Lang.ebnf`

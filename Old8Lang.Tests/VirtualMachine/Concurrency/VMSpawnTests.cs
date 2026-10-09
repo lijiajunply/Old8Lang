@@ -9,7 +9,7 @@ namespace Old8Lang.Tests.VirtualMachine.Concurrency;
 /// </summary>
 /// <remarks>
 /// `spawn` 只创建线程，不启动；必须调用 `Start()` 线程才会执行，之后用 `Join()` 等待结束
-/// 并取回线程函数的返回值。语法文档 §5.9 已按此说明。
+/// 并取回线程函数的返回值。语法文档 §5.10 已按此说明。
 /// </remarks>
 [Collection("Sequential")]
 public class VMSpawnTests
