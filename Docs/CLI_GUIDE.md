@@ -475,307 +475,117 @@ old8lang cert export -c my-cert.pfx -p mypassword -o public-cert.cer
 
 ---
 
-## 调试和性能分析命令 (Debugging and Profiling Commands)
+## 调试和性能分析命令
 
-Old8Lang 提供了强大的调试和性能分析工具，特别是在 VM 模式下支持高级调试功能。
+> **先读这一段**（2026-10-09 逐条实测）：本节命令的名称与参数以下文为准。
+> 早期文档里出现过的 `debug-breakpoint`、`debug-control`、`(old8lang-debugger)` 提示符、
+> `profile <文件> -o report.json -f html` 等写法**都不存在**。
+> 另外，**可用的调试与性能测量能力在解释器侧**，虚拟机模式没有可用的调试器与性能分析器
+> （详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md#虚拟机模式)）。
 
 ### 1. `debug-start` - 启动调试会话
 
-启动 Old8Lang 调试器，支持断点、单步执行和变量查看。
-
-#### 用法
 ```bash
-old8lang debug-start [选项] <文件路径>
+old8lang debug-start <文件路径>
 ```
 
-#### 参数
-- `<文件路径>` - 要调试的 Old8Lang 文件（必需）
+**没有选项**：不接受 `-m` / `-p` / `--break-on-start` 之类的参数。
+语义是「挂上调试器把文件跑一遍」——程序会**同步执行到结束**，然后命令返回。
 
-#### 选项
-- `-m, --mode <模式>` - 执行模式（`vm`, `interpreter`，默认 `vm`）
-- `-p, --port <端口>` - 调试服务器端口（默认 5858）
-- `-b, --break-on-start` - 在第一行代码处暂停
-- `-h, --help` - 显示帮助信息
-
-#### 示例
 ```bash
-# 启动 VM 模式调试
-old8lang debug-start app.old8
-
-# 在第一行暂停
-old8lang debug-start app.old8 --break-on-start
-
-# 使用解释模式调试
-old8lang debug-start app.old8 -m interpreter
-
-# 指定调试端口
-old8lang debug-start app.old8 -p 9229
+dotnet run --project Old8Lang.App -- debug-start app.old8
 ```
 
-#### 调试器功能
-- ✅ **断点管理** - 设置、删除、列出断点
-- ✅ **单步执行** - step-in, step-over, step-out
-- ✅ **变量查看** - 查看局部变量、全局变量、调用栈
-- ✅ **表达式求值** - 在断点处求值表达式
-- ✅ **调用栈追踪** - 查看完整的函数调用栈
+### 2. `debug-bp` - 断点管理
 
----
-
-### 2. `debug-breakpoint` - 断点管理
-
-管理调试断点（添加、删除、列出）。
-
-#### 用法
 ```bash
-old8lang debug-breakpoint <操作> [参数]
+old8lang debug-bp <子命令> [参数]
 ```
 
-#### 操作
-- `add <文件>:<行号>` - 添加断点
-- `remove <ID>` - 删除断点
-- `list` - 列出所有断点
-- `clear` - 清除所有断点
+| 子命令 | 说明 |
+|--------|------|
+| `add <文件> <行号> [条件]` | 添加断点 |
+| `func <函数名>` | 添加函数断点 |
+| `list` | 列出所有断点 |
+| `remove <断点ID>` | 移除断点 |
+| `clear` | 清除所有断点 |
 
-#### 示例
+### 3. `debug` - 调试控制
+
 ```bash
-# 添加断点
-old8lang debug-breakpoint add app.old8:10
-old8lang debug-breakpoint add app.old8:25
-
-# 列出断点
-old8lang debug-breakpoint list
-
-# 删除断点
-old8lang debug-breakpoint remove 1
-
-# 清除所有断点
-old8lang debug-breakpoint clear
+old8lang debug <命令>
 ```
 
----
+| 命令 | 说明 |
+|------|------|
+| `continue` | 继续执行 |
+| `step` / `stepinto` | 单步进入 |
+| `stepover` | 单步跳过 |
+| `stepout` | 单步跳出 |
+| `pause` | 暂停执行 |
+| `stop` | 停止调试 |
 
-### 3. `debug-control` - 调试控制
-
-控制调试会话的执行流程。
-
-#### 用法
-```bash
-old8lang debug-control <操作>
-```
-
-#### 操作
-- `continue` - 继续执行到下一个断点
-- `step-in` - 单步进入（进入函数内部）
-- `step-over` - 单步跳过（不进入函数）
-- `step-out` - 跳出当前函数
-- `pause` - 暂停执行
-- `stop` - 停止调试会话
-
-#### 示例
-```bash
-# 继续执行
-old8lang debug-control continue
-
-# 单步进入
-old8lang debug-control step-in
-
-# 单步跳过
-old8lang debug-control step-over
-
-# 跳出函数
-old8lang debug-control step-out
-
-# 暂停执行
-old8lang debug-control pause
-
-# 停止调试
-old8lang debug-control stop
-```
-
----
+> ⚠️ **`debug-bp` 与 `debug` 目前无法从命令行实际使用。** 两者都要求「进程内已经初始化过调试器」，
+> 而唯一的初始化入口 `debug-start` 会立刻把程序跑完；独立执行时它们直接报错：
+>
+> ```
+> $ Old8Lang.App debug-bp list
+> 错误: 调试器未初始化
+> ```
+>
+> 断点与单步的**引擎能力是真实存在且有测试覆盖的**：`Old8Lang.Tests/Debugger/` 下的
+> `BreakpointManagerTests`、`CallStackTests`、`VariableWatcherTests` 等 22 个用例全部通过，
+> 执行路径会在命中断点时经 `DebuggableInterpreter` 回调。缺的是把它们串起来的 CLI 工作流。
+>
+> 目前实际可用的调试手段是 `debug-start` 配合 `PrintLine` 打印中间结果。
+> 语言里**没有 `debugger` 语句**（写 `debugger` 会报 `语法错误：表达式 'debugger' 不能作为独立语句使用`）。
 
 ### 4. `profile` - 性能分析
 
-分析代码性能，生成详细的性能报告。
-
-#### 用法
 ```bash
-old8lang profile [选项] <文件路径>
+old8lang profile <子命令> [参数]
 ```
 
-#### 参数
-- `<文件路径>` - 要分析的 Old8Lang 文件（必需）
+| 子命令 | 说明 |
+|--------|------|
+| `start <文件> [名称]` | 登记一个分析会话（**不会执行该文件**） |
+| `stop` | 结束会话并输出摘要 |
+| `status` | 查看当前会话状态 |
+| `clear` | 清除会话 |
 
-#### 选项
-- `-m, --mode <模式>` - 执行模式（`vm`, `interpreter`, `compiler`，默认 `vm`）
-- `-o, --output <路径>` - 报告输出路径（默认 `profile-report.json`）
-- `-f, --format <格式>` - 报告格式（`json`, `html`, `text`，默认 `json`）
-- `--samples <数量>` - 采样次数（默认 1000）
-- `--include-memory` - 包含内存分析
-- `--include-gc` - 包含 GC 统计
-- `-h, --help` - 显示帮助信息
+没有 `-o`、`-f`、`-m`、`--samples`、`--include-memory`、`--include-gc` 这些参数。
 
-#### 示例
-```bash
-# 基本性能分析
-old8lang profile app.old8
+> ⚠️ **`profile` 目前无法产出有效数据。** 没有任何执行路径调用
+> `ProfilerManager.RecordFunctionStart` / `RecordFunctionEnd`，因此 `profile stop` 的
+> 函数调用总数恒为 0，永远输出「性能分数 100.0/100 (A) · 未发现明显性能瓶颈」——
+> 一个恒真的空报告。此外 `ProfilerService` 是进程内静态单例，
+> 跨进程调用 `profile start` 与 `profile stop` 不会共享同一个会话。
 
-# 生成 HTML 报告
-old8lang profile app.old8 -f html -o report.html
+### 5. 性能测量：用 `--perf`
 
-# 包含内存和 GC 分析
-old8lang profile app.old8 --include-memory --include-gc
-
-# 对比不同模式的性能
-old8lang profile app.old8 -m interpreter -o interpreter-profile.json
-old8lang profile app.old8 -m compiler -o compiler-profile.json
-old8lang profile app.old8 -m vm -o vm-profile.json
-```
-
-#### 性能报告内容
-- **执行时间** - 总执行时间、函数级别时间
-- **函数调用统计** - 调用次数、平均时间、最大/最小时间
-- **热点分析** - 最耗时的函数和代码行
-- **内存使用** - 内存分配、峰值内存、GC 统计（可选）
-- **调用图** - 函数调用关系图
-
----
-
-### 5. 调试器交互式命令
-
-在调试会话中，可以使用以下交互式命令：
-
-#### 断点命令
-```
-break <文件>:<行号>    # 设置断点
-delete <ID>            # 删除断点
-list                   # 列出断点
-```
-
-#### 执行控制
-```
-continue (c)           # 继续执行
-step (s)               # 单步进入
-next (n)               # 单步跳过
-finish (f)             # 跳出函数
-```
-
-#### 变量查看
-```
-print <变量名>         # 打印变量值
-locals                 # 显示局部变量
-globals                # 显示全局变量
-watch <表达式>         # 监视表达式
-```
-
-#### 调用栈
-```
-backtrace (bt)         # 显示调用栈
-frame <编号>           # 切换栈帧
-up                     # 向上移动栈帧
-down                   # 向下移动栈帧
-```
-
-#### 其他命令
-```
-help                   # 显示帮助
-quit (q)               # 退出调试器
-```
-
----
-
-### 6. 调试示例工作流
-
-#### 场景 1: 调试程序错误
+真正可用的性能测量入口是 `-f` 的 `--perf` 系列参数（见[性能指南](./PERFORMANCE_GUIDE.md#性能分析工具)）：
 
 ```bash
-# 1. 启动调试器
-old8lang debug-start app.old8 --break-on-start
+# 基础监控：执行时间、内存、GC、变量查找次数、缓存命中率、对象池统计
+dotnet run --project Old8Lang.App -- -f app.old8 --perf
 
-# 2. 在交互式调试器中：
-(old8lang-debugger) break app.old8:15    # 设置断点
-(old8lang-debugger) continue              # 继续执行到断点
+# 详细监控（含函数级指标）
+dotnet run --project Old8Lang.App -- -f app.old8 --perf-detailed
 
-# 3. 检查变量
-(old8lang-debugger) locals                # 查看局部变量
-(old8lang-debugger) print myVariable      # 打印特定变量
-
-# 4. 单步执行
-(old8lang-debugger) step                  # 单步进入
-(old8lang-debugger) next                  # 单步跳过
-
-# 5. 查看调用栈
-(old8lang-debugger) backtrace             # 显示调用栈
-
-# 6. 退出
-(old8lang-debugger) quit
+# 报告写入文件（支持 .txt / .json / .csv）
+dotnet run --project Old8Lang.App -- -f app.old8 --perf --perf-output report.json
 ```
 
-#### 场景 2: 性能优化
+参数必须写在**文件名之后**。
 
-```bash
-# 1. 运行性能分析
-old8lang profile app.old8 -f html -o profile.html --include-memory
+### 6. 调试与性能的实操建议
 
-# 2. 打开 HTML 报告查看热点
-
-# 3. 针对热点函数进行优化
-
-# 4. 重新分析对比
-old8lang profile app.old8 -f html -o profile-optimized.html
-
-# 5. 对比两次报告，验证优化效果
-```
-
-#### 场景 3: 内存泄漏检测
-
-```bash
-# 运行带内存分析的性能分析
-old8lang profile app.old8 --include-memory --include-gc -o memory-profile.json
-
-# 查看报告中的内存增长趋势和 GC 统计
-# 识别可能的内存泄漏点
-```
-
----
-
-### 7. 调试最佳实践
-
-#### 使用 VM 模式调试
-VM 模式提供最完整的调试支持：
-```bash
-# 推荐：使用 VM 模式调试
-old8lang debug-start app.old8 -m vm
-```
-
-#### 设置条件断点
-在代码中使用 `debugger` 语句：
-```old8lang
-func processData(data) {
-    if data.Length() > 1000 {
-        debugger  // 仅在数据量大时触发断点
-    }
-    // 处理数据...
-}
-```
-
-#### 使用日志辅助调试
-结合 `PrintLine` 和调试器：
-```old8lang
-func calculate(x, y) {
-    PrintLine("Debug: x=" + x.ToStr() + ", y=" + y.ToStr())
-    result <- x * y + 10
-    PrintLine("Debug: result=" + result.ToStr())
-    return result
-}
-```
-
-#### 性能分析技巧
-1. **先整体后局部** - 先分析整体性能，再针对热点优化
-2. **对比测试** - 优化前后都运行性能分析，对比效果
-3. **多次采样** - 增加采样次数以获得更准确的结果
-4. **关注内存** - 内存问题往往比 CPU 问题更难发现
-
+- **调试**：`debug-start` 只是「带调试器跑一遍」，实际排查以 `PrintLine` 打印中间结果为主。
+- **性能**：先用 `--perf` 拿到执行时间、缓存命中率与对象池统计；确有必要再用
+  [BenchmarkDotNet 套件](./PERFORMANCE_GUIDE.md#benchmarkdotnet-基准测试)做精确测量。
+  虚拟机侧的性能评估走 `--vm-report-quick` / `--vm-report-nightly`。
+- **不要**照搬早期文档中的 `debug-breakpoint` / `debug-control` / `debug-start -m vm` /
+  `profile -f html` 等写法——这些接口不存在。
 ---
 
 ## 完整工作流示例

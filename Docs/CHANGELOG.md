@@ -1,5 +1,58 @@
 # 更新记录
 
+## 修正 CLI 帮助文本与调试/性能分析文档 (2026-10-09)
+
+延续当日的文档整理：核查 `CLI_GUIDE.md` 的 `profile` 一节时，发现整组「调试和性能分析命令」
+（第 478–779 行，301 行）描述的接口与实现**没有一处对得上**；顺带发现 `-h` 的帮助文本本身也已失真。
+
+### 1. `-h` 帮助文本（`Old8Lang.App/BasicInfo.cs`）
+
+帮助里列着四个**从未注册**的命令，实测全部报 `未知命令`：
+
+```
+$ Old8Lang.App add      → 错误: 未知命令 'add'
+$ Old8Lang.App info     → 错误: 未知命令 'info'
+$ Old8Lang.App import   → 错误: 未知命令 'import'
+$ Old8Lang.App -change  → 错误: 未知命令 '-change'
+```
+
+同时又漏掉了已注册的 `-vm`、`-compile`、`-execute`、`restore`、`pack`、`unpack`、`sign`、
+`verify`、`cert`、`publish`、`env`、`debug-start`、`debug-bp`、`debug`、`profile`，
+开头还只写了「解释模式 / IL 模式」两种模式。
+
+已按 `Program.RegisterCommands` 的实际注册表重写。**验证方式**：把新帮助里列出的 26 个命令逐个
+实际调用一遍，确认无一报 `未知命令`；四个幻影命令已不再出现。
+
+### 2. `CLI_GUIDE.md` 的调试与性能分析章节（301 行 → 111 行）
+
+| 文档原写法 | 实际 |
+|-----------|------|
+| `debug-start [选项] <文件>`，选项含 `-m` / `-p` / `-b, --break-on-start` | `debug-start <文件路径>`，**无任何选项** |
+| `debug-breakpoint add/remove/list/clear` | `debug-bp add/func/list/remove/clear` |
+| `debug-control continue/step-in/step-over/…` | `debug continue/step/stepinto/stepover/stepout/pause/stop` |
+| `(old8lang-debugger)` 交互式提示符，含 `break` / `locals` / `watch` / `backtrace` / `quit` | 不存在；调试控制是独立调用的 `debug <命令>` |
+| `profile [选项] <文件>`，选项含 `-m` / `-o` / `-f html` / `--samples` / `--include-memory` / `--include-gc` | `profile start/stop/status/clear`，**无任何选项** |
+| 「VM 模式提供最完整的调试支持」 | 调试器与性能分析器都在**解释器侧**，虚拟机侧无可用实现 |
+| 用 `debugger` 语句设置条件断点 | 语言里**没有 `debugger` 语句**，写它会报语法错误 |
+
+### 3. 核查中确认的两处「接口存在但不可用」
+
+- **`debug-bp` / `debug`**：要求进程内已初始化调试器，而唯一初始化入口 `debug-start` 会把文件
+  **同步执行到结束**才返回，因此断点与单步来不及生效；独立执行时报 `错误: 调试器未初始化`。
+  断点与单步的**引擎能力是真实且有测试覆盖的**（`Old8Lang.Tests/Debugger/` 下 22 个用例通过，
+  执行路径会经 `DebuggableInterpreter` 回调），缺的是把它们串起来的 CLI 工作流。
+- **`profile`**：没有任何执行路径调用 `ProfilerManager.RecordFunctionStart` / `RecordFunctionEnd`，
+  因此 `profile stop` 的函数调用总数恒为 0，永远输出「性能分数 100.0/100 (A) · 未发现明显性能瓶颈」；
+  且 `ProfilerService` 是进程内静态单例，跨进程的 `start` 与 `stop` 不共享会话。
+
+两处均**未修改实现**（超出文档范围），但已在 `CLI_GUIDE.md` 中以醒目提示写明，
+并指向真正可用的 `--perf` 系列参数。
+
+### 4. 顺带发现（未处理）
+
+`Program.Main` 里有一段 `#if DEBUG` 的无参启动代码，硬编码了一个 Windows 绝对路径
+（`C:\Projects\RiderProjects\Old8Lang\test_langlist_conversions.old8`）并直接以 `-vm` 执行。
+它使 **Debug 构建下无法进入交互式命令行模式**（无参启动会命中该分支）。
 ## 文档：性能文档三合一，ARCHITECTURE §14 改为指针 (2026-10-09)
 
 `PERFORMANCE_GUIDE.md`（768 行）与 `PERFORMANCE_OPTIMIZATION.md`（591 行）**标题都叫
