@@ -744,7 +744,7 @@ PrintLine(msg)
 using ch <- ChannelCreate() {
     // 生产者
     async func producer() -> void {
-        for i in 0..10 {
+        for i in [0~10] {
             ChannelSend(ch, i)
         }
         ChannelClose(ch)
@@ -1203,7 +1203,7 @@ if File.Exists("test.txt") {
 
 // 按行读取
 lines <- File.ReadLines("test.txt")
-for line <- lines {
+for line in lines {
     PrintLine("Line: " + line)
 }
 ```
@@ -1339,7 +1339,7 @@ if Regex.Match(pattern, email) {
 // 查找所有数字
 text <- "Price: $123.45, Quantity: 10"
 numbers <- Regex.FindAll("\\d+", text)
-for num <- numbers {
+for num in numbers {
     PrintLine("Found: " + num)
 }
 
@@ -1559,7 +1559,7 @@ CSV.Write("data.csv", data)
 
 // 读取 CSV
 rows <- CSV.Read("data.csv")
-for row <- rows {
+for row in rows {
     PrintLine(row[0] + ", " + row[1] + ", " + row[2])
 }
 ```
@@ -1896,7 +1896,7 @@ conn <- MySQL.Connect("localhost", "root", "password", "testdb")
 
 // 查询数据
 results <- MySQL.Query(conn, "SELECT * FROM users")
-for row <- results {
+for row in results {
     PrintLine("User: " + row["name"])
 }
 
@@ -1938,7 +1938,7 @@ conn <- PostgreSQL.Connect(connStr)
 
 // 查询数据
 results <- PostgreSQL.Query(conn, "SELECT * FROM users")
-for row <- results {
+for row in results {
     PrintLine("User: " + row["name"])
 }
 
@@ -1981,7 +1981,7 @@ SQLite.Execute(conn, "INSERT INTO users (name, age) VALUES ('Alice', 30)")
 
 // 查询数据
 results <- SQLite.Query(conn, "SELECT * FROM users")
-for row <- results {
+for row in results {
     PrintLine("User: " + row["name"] + ", Age: " + row["age"].ToStr())
 }
 
@@ -2319,7 +2319,7 @@ PrintLine("Cluster: " + cluster.ToStr())
 
 // 获取簇中心
 centers <- Clustering.GetCenters(model)
-for i <- 0, i < centers.Length(), i <- i + 1 {
+for i <- 0, i < centers.Length(), i++ {
     PrintLine("Center " + i.ToStr() + ": " + centers[i].ToStr())
 }
 ```
@@ -2406,7 +2406,7 @@ PrintLine("Prediction: " + prediction.ToStr())
 // 批量预测
 inputs <- [[1.5, 2.5], [3.5, 4.5]]
 predictions <- Predictor.BatchPredict(loadedModel, inputs)
-for pred <- predictions {
+for pred in predictions {
     PrintLine("Prediction: " + pred.ToStr())
 }
 ```

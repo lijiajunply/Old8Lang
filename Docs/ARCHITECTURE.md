@@ -816,17 +816,18 @@ public class GenericTypeInference
 **示例**:
 ```old8lang
 // 泛型函数
-func map<T, R>(list: list<T>, fn: func(T) -> R) -> list<R> {
-    result <- []
-    for item <- list {
-        result.add(fn(item))
+func map<T, R>(items: list<T>, fn) -> list<R> {
+    result <- {}
+    for item in items {
+        result.Add(fn(item))
     }
     return result
 }
 
-// 类型推断：T = int, R = string
-numbers <- [1, 2, 3]
-strings <- map(numbers, (x) => "Number: " + x)
+numbers <- {1, 2, 3}
+// 泛型实参需显式给出；lambda 的箭头是 `->`，不是 `=>`
+strings <- map<int, string>(numbers, (x) -> "Number: " + x.ToStr())
+PrintLine(strings.ToStr())
 ```
 
 ### 7.3 类型系统特点

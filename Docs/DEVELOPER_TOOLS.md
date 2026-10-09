@@ -102,15 +102,13 @@ class Person {
     }
 }
 
-// 主程序
-main() -> {
-    greet("Old8Lang")
+// 主程序：Old8Lang 的入口就是脚本顶层，没有隐式的 main 函数
+greet("Old8Lang")
 
-    person <- new Person()
-    person.name <- "张三"
-    person.age <- 25
-    person.sayHello()
-}
+person <- Person()
+person.name <- "张三"
+person.age <- 25
+person.sayHello()
 ```
 
 验证功能：

@@ -372,7 +372,7 @@ dotnet run --project Old8Lang.App -- -s InterpreterTests/test_python_extern_basi
 
 ```old8lang
 // test_extern_factory.old8
-native extern "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
 }
@@ -1405,14 +1405,18 @@ public List<Instruction> VisitSwitchStatement(SwitchStatement stmt)
 // test_switch.old8
 func getDayName(day: int) -> string {
     switch day {
-        case 1:
+        case 1 {
             return "Monday"
-        case 2:
+        }
+        case 2 {
             return "Tuesday"
-        case 3:
+        }
+        case 3 {
             return "Wednesday"
-        default:
+        }
+        default {
             return "Unknown"
+        }
     }
 }
 

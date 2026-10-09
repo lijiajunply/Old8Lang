@@ -125,19 +125,19 @@ Old8Lang 的反射能力分为两类：
 ## 简单示例
 
 ```old8
-let t = GetType("MyClass")
+t <- GetType("MyClass")
 PrintLine(t.IsClass())
 PrintLine(t.GetMethodNames())
 
-let obj = CreateInstance("MyClass", [])
+obj <- CreateInstance("MyClass", [])
 PrintLine(GetClassInfo(obj))
 
 if HasMember(obj, "count") {
-    let v = GetField(obj, "count")
+    v <- GetField(obj, "count")
     SetField(obj, "count", v + 1)
 }
 
-let result = InvokeMethod(obj, "Run", [1, 2, 3])
+result <- InvokeMethod(obj, "Run", [1, 2, 3])
 PrintLine(result)
 ```
 

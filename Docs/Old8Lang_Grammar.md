@@ -1679,9 +1679,9 @@ class Box<T?> {
     }
 }
 
-// 使用可空泛型类
-box1 <- new Box(123)      // T? 推断为 int?
-box2 <- new Box(null)     // T? 允许 null 值
+// 使用可空泛型类（实例化不写 new）
+box1 <- Box(123)      // T? 推断为 int?
+box2 <- Box(null)     // T? 允许 null 值
 
 // 定义可空类型参数的泛型函数
 func identity<T?>(value: T?) -> T? {
@@ -2310,6 +2310,16 @@ avg <- numbers.average()      // 3.0
 ```
 
 **泛型扩展方法**：
+
+> **复核说明**（2026-10-09 实测）：本节列出的**泛型扩展方法与泛型约束尚未实现**。
+> `extension list<T> { ... }` 在解析阶段即报
+> `解析时出现代码错误：Input string was not in a correct format`，错误位置指向 `<`；
+> `extension list<T: new()>`、`extension list<T: class>`、`extension list<T> where T: class & new()`、
+> `extension dict<K, V> where ...` 同样无法解析。解析器 `ExtensionParser.ParseExtensionDeclaration`
+> 只接受**非泛型**的目标类型名（`extension list`、`extension int`、`extension string` 可用），
+> 也不处理类型参数与约束。
+> **下面的示例不能直接运行**，保留在此仅作为语法草案；上文「重要说明」第 6 点的
+> 「泛型约束支持」同样尚未落地。
 
 ```old8
 // 为泛型类型添加扩展方法
@@ -2972,8 +2982,8 @@ extern "Old8LangLib" Time { GetTimeNow, TimeStamp }
 #### 5.14.4 类导入
 
 ```old8
-extern "Math.dll" MathLib -> MathLib
-extern "Data.dll" DataClass as DC
+extern "Math.dll" MathLib as ML
+extern "Data.dll" DataClass as DC    // 别名用 as，`-> 别名` 的写法不成立
 ```
 
 ### 5.15 Extern .NET 托管 DLL 导入

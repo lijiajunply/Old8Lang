@@ -56,29 +56,30 @@ Old8Lang 支持三种执行模式，不同模式下某些语言特性的支持�
 完全支持泛型函数和泛型类：
 
 ```old8lang
-// 泛型函数
-function identity<T>(value: T) -> T {
+// 泛型函数：类型参数在调用时显式给出
+func identity<T>(value: T) -> T {
     return value
 }
 
-let num = identity<number>(42)
-let str = identity<string>("hello")
+num <- identity<int>(42)
+str <- identity<string>("hello")
 
 // 泛型类
 class Box<T> {
     value: T
 
-    constructor(value: T) {
-        this.value = value
+    init(v: T) {
+        this.value <- v
     }
 
-    getValue() -> T {
+    func getValue() -> T {
         return this.value
     }
 }
 
-let intBox = new Box<number>(100)
-let strBox = new Box<string>("world")
+// 实例化不需要 new 关键字
+intBox <- Box<int>(100)
+strBox <- Box<string>("world")
 ```
 
 #### IL 模式 ❌
@@ -87,16 +88,16 @@ let strBox = new Box<string>("world")
 
 ```old8lang
 // IL 模式：需要为每种类型编写函数
-function identityNumber(value: number) -> number {
+func identityInt(value: int) -> int {
     return value
 }
 
-function identityString(value: string) -> string {
+func identityString(value: string) -> string {
     return value
 }
 
-let num: number = identityNumber(42)
-let str: string = identityString("hello")
+num: int <- identityInt(42)
+str: string <- identityString("hello")
 ```
 
 ### 运算符重载
@@ -107,29 +108,29 @@ let str: string = identityString("hello")
 
 ```old8lang
 class Vector {
-    x: number
-    y: number
+    public x
+    public y
 
-    constructor(x: number, y: number) {
-        this.x = x
-        this.y = y
+    init(x, y) {
+        this.x <- x
+        this.y <- y
     }
 
-    // 重载 + 运算符
-    operator +(other: Vector) -> Vector {
-        return new Vector(this.x + other.x, this.y + other.y)
+    // 重载 + 运算符（Python 风格：以 _ 开头的特殊方法）
+    _add(other) {
+        return Vector(this.x + other.x, this.y + other.y)
     }
 
     // 重载 * 运算符
-    operator *(scalar: number) -> Vector {
-        return new Vector(this.x * scalar, this.y * scalar)
+    _mul(scalar) {
+        return Vector(this.x * scalar, this.y * scalar)
     }
 }
 
-let v1 = new Vector(1, 2)
-let v2 = new Vector(3, 4)
-let v3 = v1 + v2  // Vector(4, 6)
-let v4 = v1 * 2   // Vector(2, 4)
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+v3 <- v1 + v2   // 调用 v1._add(v2)    → Vector(4, 6)
+v4 <- v1 * 2    // 调用 v1._mul(2)     → Vector(2, 4)
 ```
 
 #### IL 模式 ❌
@@ -138,28 +139,28 @@ let v4 = v1 * 2   // Vector(2, 4)
 
 ```old8lang
 class Vector {
-    x: number
-    y: number
+    public x
+    public y
 
-    constructor(x: number, y: number) {
-        this.x = x
-        this.y = y
+    init(x, y) {
+        this.x <- x
+        this.y <- y
     }
 
     // IL 模式：使用显式方法
-    add(other: Vector) -> Vector {
-        return new Vector(this.x + other.x, this.y + other.y)
+    func add(other: Vector) -> Vector {
+        return Vector(this.x + other.x, this.y + other.y)
     }
 
-    multiply(scalar: number) -> Vector {
-        return new Vector(this.x * scalar, this.y * scalar)
+    func multiply(scalar: int) -> Vector {
+        return Vector(this.x * scalar, this.y * scalar)
     }
 }
 
-let v1: Vector = new Vector(1, 2)
-let v2: Vector = new Vector(3, 4)
-let v3: Vector = v1.add(v2)  // 必须使用方法调用
-let v4: Vector = v1.multiply(2)
+v1 <- Vector(1, 2)
+v2 <- Vector(3, 4)
+v3 <- v1.add(v2)        // 必须使用方法调用
+v4 <- v1.multiply(2)
 ```
 
 ### Python 互操作
@@ -169,18 +170,17 @@ let v4: Vector = v1.multiply(2)
 支持与 Python 代码互操作：
 
 ```old8lang
-// 导入 Python 模块
-import python "numpy" as np
+// 导入 Python 模块（pymodule: 前缀指向 Python 标准库或已安装的包）
+extern "pymodule:math" {
+    func sqrt(x:double) -> double,
+    func pow(base:double, exp:double) -> double
+}
 
 // 调用 Python 函数
-let arr = np.array([1, 2, 3, 4, 5])
-let mean = np.mean(arr)
-print("Mean: " + mean)
-
-// 使用 Python 对象
-let matrix = np.matrix([[1, 2], [3, 4]])
-let det = np.linalg.det(matrix)
-print("Determinant: " + det)
+root <- sqrt(16.0)
+power <- pow(2.0, 3.0)
+PrintLine("sqrt(16) = " + root.ToStr())     // 4.0
+PrintLine("pow(2, 3) = " + power.ToStr())   // 8.0
 ```
 
 #### IL 模式 ❌
@@ -196,13 +196,13 @@ print("Determinant: " + det)
 - **可选类型注解**: 类型注解是可选的
 
 ```old8lang
-// 类型推断
-let x = 42  // 推断为 number
-let y = "hello"  // 推断为 string
+// 类型推断：不需要写类型注解
+x <- 42          // 推断为 Int
+y <- "hello"     // 推断为 String
 
-// 动态类型
-function process(value) {
-    if (typeof(value) == "number") {
+// 动态类型：同一个函数可以接收不同类型的实参
+func process(value) {
+    if Type(value) == "Int" {
         return value * 2
     } else {
         return value + " processed"
@@ -218,15 +218,15 @@ function process(value) {
 
 ```old8lang
 // IL 模式：必须提供类型注解
-let x: number = 42
-let y: string = "hello"
+x: int <- 42
+y: string <- "hello"
 
 // 必须明确类型
-function processNumber(value: number) -> number {
+func processInt(value: int) -> int {
     return value * 2
 }
 
-function processString(value: string) -> string {
+func processString(value: string) -> string {
     return value + " processed"
 }
 ```
@@ -259,10 +259,10 @@ Old8Lang 提供强大的模式匹配功能，支持多种模式类型。
 ### 基本语法
 
 ```old8lang
-match expression {
+result <- match value {
     case pattern1 -> result1
     case pattern2 -> result2
-    default -> defaultResult  // 可选的默认分支
+    case _ -> defaultResult   // 通配分支写作 `_`，不是 `default`
 }
 ```
 
@@ -372,14 +372,15 @@ async func main() -> void {
 使用 `yield` 关键字轻松创建迭代器。
 
 ```old8lang
-func range(start:int, end:int) -> object {
-    for i in start..end {
+// 注意：函数不要命名为 range —— 那会遮蔽内置的范围表达式语法
+func numberRange(start:int, end:int) -> object {
+    for i in [start~end] {
         yield i
     }
 }
 
-for num in range(1, 5) {
-    PrintLine(num) // 输出 1, 2, 3, 4, 5
+for num in numberRange(1, 5) {
+    PrintLine(num.ToStr())   // 输出 1, 2, 3, 4, 5
 }
 ```
 
@@ -692,7 +693,7 @@ Old8Lang 提供了强大的外部语言交互能力。
 
 ```old8lang
 // 导入 Windows Kernel32.dll
-extern "extern" "kernel32.dll" stdcall func GetTickCount() -> int
+extern "kernel32.dll" stdcall func GetTickCount() -> int
 
 start <- GetTickCount()
 ```
@@ -703,11 +704,11 @@ start <- GetTickCount()
 
 ```old8lang
 // 导入 Python 标准库 math
-extern "extern" "pymodule:math" {
+extern "pymodule:math" {
     func sqrt(x:double) -> double
 }
 
-result <- sqrt(16.0) // 4.0
+result <- sqrt(16.0)   // 4.0
 ```
 
 ---
@@ -717,8 +718,11 @@ result <- sqrt(16.0) // 4.0
 允许在函数调用时指定参数名称，提高可读性并支持跳过默认参数。
 
 ```old8lang
-func window(title:string, width:int = 800, height:int = 600) -> void { ... }
+// 默认值写作 `参数名: 默认值`（注意不是类型注解）
+func window(title:string, width: 800, height: 600) -> void {
+    PrintLine(title + " " + width.ToStr() + "x" + height.ToStr())
+}
 
-// 乱序调用，且使用默认 height
-window(width: 1024, title: "App")
+// 乱序调用，且省略 height 使用默认值
+window(width: 1024, title: "App")   // 输出: App 1024x600
 ```

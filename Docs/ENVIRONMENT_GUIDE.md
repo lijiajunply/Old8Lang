@@ -143,14 +143,14 @@ old8lang -f src/main.old8
 使用 `GetEnv()` 函数读取环境变量：
 
 ```old8
-// 获取环境变量
-var apiUrl = GetEnv("API_URL") ?? "http://localhost:3000"
-var debug = GetEnv("DEBUG") ?? "false"
+// 获取环境变量（?? 提供默认值）
+apiUrl <- GetEnv("API_URL") ?? "http://localhost:3000"
+debug <- GetEnv("DEBUG") ?? "false"
 
 PrintLine($"API URL: {apiUrl}")
 
 // 根据环境执行不同逻辑
-if (debug == "true") {
+if debug == "true" {
     PrintLine("[DEBUG] 调试模式已启用")
 } else {
     PrintLine("[INFO] 生产模式运行")
@@ -323,11 +323,14 @@ config/secrets.json
 不要在代码中硬编码敏感信息：
 
 ```old8
-// ❌ 不好的做法
-var apiKey = "sk_live_1234567890abcdef"
+// ❌ 不好的做法：把密钥硬编码进代码
+apiKey <- "sk_live_1234567890abcdef"
 
-// ✅ 好的做法
-var apiKey = GetEnv("API_KEY") ?? throw "API_KEY not set"
+// ✅ 好的做法：从环境变量读取，缺失时明确报错
+apiKey <- GetEnv("API_KEY") ?? ""
+if apiKey == "" {
+    throw "API_KEY 未设置"
+}
 ```
 
 ### 3. 为每个环境提供示例配置
@@ -349,16 +352,16 @@ API_KEY=your_api_key_here
 
 ```old8
 // 验证必需的环境变量
-var requiredVars = ["API_URL", "DB_HOST", "API_KEY"]
+requiredVars <- {"API_URL", "DB_HOST", "API_KEY"}
 
-for (var varName in requiredVars) {
-    var value = GetEnv(varName)
-    if (value == null) {
-        throw $"Required environment variable '{varName}' is not set"
+for varName in requiredVars {
+    value <- GetEnv(varName)
+    if value == null {
+        throw $"必需的环境变量 {varName} 未设置"
     }
 }
 
-PrintLine("✓ 所有必需的环境变量已设置")
+PrintLine("所有必需的环境变量已设置")
 ```
 
 ### 5. 使用不同的运行时模式

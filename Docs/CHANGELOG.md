@@ -1,5 +1,68 @@
 # 更新记录
 
+> **关于本文档中的代码片段**：CHANGELOG 是按日期记录当时改动的日志，
+> 其中较早条目（各 rc 版本）里的示例反映的是**当时**的语法，部分写法（如 `native` 语句、
+> `{ ... }` 形式的省略占位符）在后续版本中已不再适用，不能直接复制运行。
+> 当前可用的语法以 [Old8Lang_Grammar.md](./Old8Lang_Grammar.md) 与
+> [MODE_SUPPORT.md](./MODE_SUPPORT.md) 为准。
+
+## 文档示例代码全面核对与修正 (2026-10-09)
+
+延续当日的文档整理，把 `Docs/` 下全部 **430 个 `.old8` 代码块**逐个落成文件实跑，
+修掉跑不通的示例。
+
+### 度量方式的一个坑
+
+先用 `-s`（语法检查）扫，得到的失败数偏高。原因是 **`-s` 与 `-f` 对预编译指令的处理不一致**：
+
+```
+$ Old8Lang.App -s pp.old8      # 文件内容为 #define / #if
+[SYNTAX_ERROR] 语法错误：无法识别的字符 '#'。
+
+$ Old8Lang.App -f pp.old8
+OTHER on                       # 正常执行
+```
+
+因此本轮改为「`-s` 失败后用 `-f` 复核」。最终：**398 块 `-s` 通过，另有 6 块仅 `-f` 通过，
+26 块确认失败**；那 26 块经逐条核对全部是**合法项**——语法参考里的字面量/成员访问清单、
+带 `params`/`TypeParam1` 占位符的骨架、以及文档中刻意标注「❌ 错误」的反例，
+另有 3 块是下文所述的「已实现但未落地的语法草案」。**实际需要修的都修完了。**
+
+### 修正的示例
+
+| 文档 | 处数 | 主要问题 |
+|-----|------|---------|
+| `LANGUAGE_FEATURES.md` | 12 → 全部重写 | 整篇用 C#/Java 风格伪代码写成：`function` / `let` / `new` / `constructor` / `operator +` / `typeof` / `=` 赋值 / `start..end` |
+| `ENVIRONMENT_GUIDE.md` | 3 | `var x = ...` |
+| `FAQ.md` | 4 | `catch e` 缺括号、`native` 语句、`match` 缺 `case`、生成器 |
+| `API_REFERENCE.md` | 8 | `for x <- list` 与 `for i in 0, i < n, i <- i+1` |
+| `ARCHITECTURE.md` | 1 | `for item <- list`、`fn: func(T) -> R`、`(x) => ...` |
+| `ADVANCED_TOPICS.md` | 2 | `native extern`、`switch` 用冒号分支 |
+| `Old8Lang_Grammar.md` | 4 | `new Box(...)`、`extern ... -> Alias` |
+| `REFLECTION_API.md` / `DEVELOPER_TOOLS.md` | 各 1 | `let`、`main() -> {` 与 `new Person()` |
+
+期间确认并统一采用的正确写法：赋值 `<-`、函数 `func`、实例化**不用** `new`、
+lambda 箭头是 `->`（**不是 `=>`**）、默认值是 `参数名: 默认值`、
+函数参数的类型标注用 `Func`（但 lambda 实参不能标 `Func`，留空即可）、
+取类型用 `Type(x)`（**没有** `typeof`）、`switch` 用 `case N { }` 块、
+`match` 用 `case p -> e` 且通配是 `_`、范围是两端闭区间的 `[a~b]`。
+
+### 核对中发现的既有问题（均已记入对应文档，前两项另见 [ROADMAP.md](./ROADMAP.md) 当前重点第 3 节）
+
+- **泛型扩展方法与泛型约束未实现**：`extension list<T> { ... }` 在解析阶段即失败
+  （`ExtensionParser.ParseExtensionDeclaration` 只接受非泛型目标类型名）。
+  语法文档 §5.7 的整节泛型扩展示例属语法草案，已加复核说明。
+- **`match` 不支持 `case 2 | 3` 这样的联合模式**（报「缺少箭头 `->`」）。
+- **用户函数不能命名为 `range`**：`[a~b]` 会编译成对 `Range(...)` 的调用，
+  被同名用户函数遮蔽后报「Range 函数需要至少 3 个参数」。
+- **`=>` 写法的 lambda 会静默失败**：能通过解析，但参数不绑定，调用时报 `名称 'x' 未定义`。
+- **Python 互操作在本机会挂起**：`extern "pymodule:math" { ... }` 后调用，30 秒无返回。
+  环境为 pythonnet 3.0.5 + Python 3.13.9，而 pythonnet 3.0.x 官方支持到 Python 3.12。
+  `Old8Lang/ExternProviders/PythonProvider.cs` 存在且 csproj 已引用 pythonnet，属实现/环境问题，
+  **本次未修**，仅记录；相关文档示例已保证语法正确。
+- `CHANGELOG.md` 顶部补充说明：本文档较早条目（各 rc 版本）中的代码片段反映当时的语法，
+  其中 `native` 语句、`{ ... }` 省略占位符等在后续版本已不适用，不能直接复制运行。
+
 ## 修正 CLI 帮助文本与调试/性能分析文档 (2026-10-09)
 
 延续当日的文档整理：核查 `CLI_GUIDE.md` 的 `profile` 一节时，发现整组「调试和性能分析命令」

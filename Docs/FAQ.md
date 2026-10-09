@@ -183,7 +183,7 @@ TypeInferenceConfig.Instance.EnableTypeInference = false;
 ```old8
 try {
     riskyOperation()
-} catch e {
+} catch (e) {
     PrintLine("错误: " + e.ToStr())
 }
 ```
@@ -343,14 +343,28 @@ ChannelDispose(ch)  // 可能忘记调用
 
 ### Q: Old8Lang 如何调用 C# 代码?
 
-**A**: 使用 `native` 语句绑定 C# 方法:
+**A**: 使用 `extern` 语句按托管程序集导入。
+
+> `native` 关键字已不再存在——早期写法 `native X() -> Y` 现在会报
+> `语法错误：表达式 'native' 不能作为独立语句使用`。
 
 ```old8
-native DateTime.Now() -> object
-native Console.WriteLine(value:string) -> void
+// 导入 System.Math 的静态方法
+extern "C#:System" Math {
+    func Sqrt(x:double) -> double,
+    func Pow(x:double, y:double) -> double
+}
 
-now <- DateTime.Now()
-Console.WriteLine("Current time: " + now.ToStr())
+root <- Sqrt(16.0)
+PrintLine("sqrt(16) = " + root.ToStr())   // 4
+```
+
+导入自定义 .NET DLL 用 `dotnetdll:` 前缀：
+
+```old8
+extern "dotnetdll:MyLibrary.dll" MyMathClass {
+    func Add(a:int, b:int) -> int
+}
 ```
 
 ### Q: 如何导入外部库?
@@ -429,11 +443,13 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 **A**: 支持。详见 [模式匹配](LANGUAGE_FEATURES.md#模式匹配)
 
 ```old8
-match value {
-    1 -> PrintLine("One")
-    2 | 3 -> PrintLine("Two or Three")
-    _ -> PrintLine("Other")
+result <- match value {
+    case 1 -> "One"
+    case 2 -> "Two"
+    case 3 -> "Three"
+    case _ -> "Other"    // 通配分支写作 `_`
 }
+PrintLine(result)
 ```
 
 ### Q: Old8Lang 支持生成器(Generator)吗?
@@ -441,14 +457,15 @@ match value {
 **A**: 支持,使用 `yield` 语句:
 
 ```old8
-func range(start:int, end:int) -> object {
-    for i in start..end {
+// 注意：函数不要命名为 range —— 那会遮蔽内置的范围表达式语法
+func numberRange(start:int, end:int) -> object {
+    for i in [start~end] {
         yield i
     }
 }
 
-for num in range(1, 10) {
-    PrintLine(num)
+for num in numberRange(1, 5) {
+    PrintLine(num.ToStr())   // 输出 1, 2, 3, 4, 5
 }
 ```
 
