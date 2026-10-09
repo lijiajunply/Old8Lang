@@ -203,6 +203,12 @@ public partial class BytecodeVisitor
             int continueTarget = GetCurrentPosition();
             loopLabels.ContinueTarget = continueTarget;
 
+            // 增量之前为循环变量换新共享单元：循环体内新建的闭包继续持有本轮那个盒子
+            // （值停在当轮），增量写进新盒子，下一轮迭代的闭包才捕获到新值。
+            // 若在循环体之前换盒子，增量会写进闭包仍持有的盒子，结果变成 1,2,3。
+            // 循环变量是全局变量时（脚本顶层）无槽位可换，因此只在函数内生效。
+            EmitLoopVariableRebind(setStatement?.Id?.IdName);
+
             // 增量
             if (statement != null)
                 statement.Accept(this);
@@ -234,6 +240,8 @@ public partial class BytecodeVisitor
             // continue跳转到这里(增量语句之前)
             int continueTarget = GetCurrentPosition();
             loopLabels.ContinueTarget = continueTarget;
+
+            EmitLoopVariableRebind(setStatement?.Id?.IdName);
 
             if (statement != null)
                 statement.Accept(this);

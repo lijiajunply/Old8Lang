@@ -348,8 +348,11 @@ public class VMBoundaryTests
     #region 范围边界测试
 
     [Fact]
-    public void Boundary_EmptyRange_HandlesEmptyRange()
+    public void Boundary_InclusiveRange_EqualBoundsYieldsSingleElement()
     {
+        // `~` 两端都含，因此 [5~5] 是只含 5 的单元素区间（解释器与 IL 模式同为 [5]）。
+        // 此前虚拟机的 includeStart/includeEnd 标志取自常量池槽 0/1（恰好是 0 与 1），
+        // includeStart 被当成 false，于是 [5~5] 变成空区间、这里是断言 0 通过。
         var code = @"
             emptyRange <- [5~5]
             count <- 0
@@ -360,7 +363,7 @@ public class VMBoundaryTests
         ";
 
         var output = ExecuteVMCode(code);
-        Assert.Equal("0", output);
+        Assert.Equal("1", output);
     }
 
     [Fact]

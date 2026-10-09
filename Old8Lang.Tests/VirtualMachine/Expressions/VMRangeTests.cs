@@ -172,12 +172,10 @@ public class VMRangeTests
     [Fact]
     public void Range_InListComprehension_ExecutesCorrectly()
     {
-        // Arrange
+        // 用例名要求真的覆盖「range 出现在列表推导式里」。
+        // 此前函数体是普通 for 循环 + Add，推导式一行都没有，覆盖率因此失真。
         var code = @"
-            squares <- {}
-            for i in [1~5] {
-                squares.Add(i * i)
-            }
+            squares <- [i * i for i in [1~5]]
             result <- squares[3]
         ";
 
@@ -189,7 +187,27 @@ public class VMRangeTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal(16, result); // 4*4 = 16
+        Assert.Equal(16, result); // [1, 4, 9, 16, 25][3] = 16
+    }
+
+    [Fact]
+    public void Range_InListComprehensionWithCondition_FiltersElements()
+    {
+        var code = @"
+            result <- [i for i in [0~10] if i % 2 == 0]
+        ";
+
+        // Act
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        // Assert
+        var result = vm.GetGlobalVariable("result");
+        var list = Assert.IsAssignableFrom<System.Collections.IList>(result);
+        Assert.Equal(6, list.Count); // 0,2,4,6,8,10
+        Assert.Equal(0, list[0]);
+        Assert.Equal(10, list[5]);
     }
 
     [Fact]

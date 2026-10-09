@@ -9,6 +9,25 @@ namespace Old8Lang.AST.Visitor;
 /// </summary>
 public partial class BytecodeVisitor
 {
+    /// <summary>
+    /// 为循环变量发出「每轮迭代重新绑定」指令
+    /// </summary>
+    /// <remarks>
+    /// 解释器每轮迭代都为循环变量建立独立绑定，循环体内创建的闭包各自捕获当轮的值
+    /// （<c>for i in [0~2] { fs.Add(() -&gt; i) }</c> 得到 0,1,2）。虚拟机的局部变量槽位是
+    /// 复用的：一旦某个闭包把槽位装箱成共享单元，后续迭代若不换新单元，所有闭包就会
+    /// 共享同一个变量、全都读到最终值（得到 2,2,2）。槽位未装箱时该指令不做事。
+    /// </remarks>
+    private void EmitLoopVariableRebind(string? variableName)
+    {
+        if (string.IsNullOrEmpty(variableName) || !_compiler.IsLocalVariable(variableName))
+        {
+            return;
+        }
+
+        Emit(OpCode.RefreshLocalBinding, _compiler.GetLocalIndex(variableName));
+    }
+
     public Instruction? VisitForInStatement(ForInStatement node)
     {
         // For-in 循环：for item in collection { ... }
@@ -33,8 +52,10 @@ public partial class BytecodeVisitor
         // 生成集合表达式的代码（栈上现在有集合）
         expression.Accept(this);
 
-        // 解构时需要保留被迭代表达式本身：
-        // 字典迭代产出的是键，取值还需要回查原集合
+        // 解构（for k, v in ...）时把被迭代表达式留在栈上备用。
+        // 迭代元素现在统一是「值或 (键, 值) 元组」，拆包不再需要回查原集合，
+        // 但 __for_in_unpack 的调用点仍按三参数协议传它（见该原生函数的说明），
+        // 因此这里继续保留集合本身。
         int collectionLocalIndex = -1;
         if (isDestructuring)
         {
@@ -102,14 +123,14 @@ public partial class BytecodeVisitor
                 Emit(OpCode.LoadConst, _compiler.AddConstant(i));
                 Emit(OpCode.GetIndex);
 
-                if (_compiler.IsLocalVariable(targetName))
-                {
-                    Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(targetName));
-                }
-                else
-                {
-                    Emit(OpCode.StoreLocal, _compiler.DeclareLocalVariable(targetName));
-                }
+                // 先换新共享单元，再写入本轮的值：此后新建的闭包捕获的是本轮绑定。
+                // 下标要在声明之后再取，首轮此处会把变量声明成局部变量（槽位尚未装箱，
+                // 该指令此时是空操作）。
+                int targetLocalIndex = _compiler.IsLocalVariable(targetName)
+                    ? _compiler.GetLocalIndex(targetName)
+                    : _compiler.DeclareLocalVariable(targetName);
+                Emit(OpCode.RefreshLocalBinding, targetLocalIndex);
+                Emit(OpCode.StoreLocal, targetLocalIndex);
             }
 
             _compiler.FreeLocal(itemLocalIndex);
@@ -119,17 +140,14 @@ public partial class BytecodeVisitor
         {
             // 将当前元素存储到循环变量（弹出 current）
             string varName = id.IdName;
-            if (_compiler.IsLocalVariable(varName))
-            {
-                int localIndex = _compiler.GetLocalIndex(varName);
-                Emit(OpCode.StoreLocal, localIndex);
-            }
-            else
-            {
-                // 声明为局部变量
-                int localIndex = _compiler.DeclareLocalVariable(varName);
-                Emit(OpCode.StoreLocal, localIndex);
-            }
+            // 先换新共享单元，再写入本轮的元素：此后新建的闭包捕获的是本轮绑定。
+            // 下标要在声明之后再取，首轮此处会把变量声明成局部变量（槽位尚未装箱，
+            // 该指令此时是空操作）。
+            int loopVarLocalIndex = _compiler.IsLocalVariable(varName)
+                ? _compiler.GetLocalIndex(varName)
+                : _compiler.DeclareLocalVariable(varName);
+            Emit(OpCode.RefreshLocalBinding, loopVarLocalIndex);
+            Emit(OpCode.StoreLocal, loopVarLocalIndex);
         }
 
         // 此时栈上还有迭代器对象，需要弹出

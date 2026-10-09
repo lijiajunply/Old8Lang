@@ -14,16 +14,27 @@ public class ClosureCaptureAnalyzer
     private readonly HashSet<string> _capturedVariables = new();
     private readonly HashSet<string> _localVariables = new();
     private readonly HashSet<string> _parameters = new();
+    private readonly HashSet<string> _namesNeededByNestedClosures = new(StringComparer.Ordinal);
 
     /// <summary>
     /// 闭包体内被赋值的变量名
     /// </summary>
     /// <remarks>
     /// 其中若某个名字在外层作用域中已存在，说明闭包试图写回外层变量。
-    /// 字节码模式的闭包按值快照捕获，没有共享单元，无法支持这种写回，
-    /// 调用方需要据此报错而不是静默地让它在闭包内另建一个同名局部变量。
+    /// 写回由共享单元（<see cref="UpValueCell"/>）支持，调用方据此决定捕获哪些名字。
     /// </remarks>
     public IReadOnlyCollection<string> AssignedVariables => _localVariables;
+
+    /// <summary>
+    /// 本函数体内嵌套闭包（lambda 或具名函数）需要从本层取得的名字（含更深层闭包的传递需求）
+    /// </summary>
+    /// <remarks>
+    /// 字节码里嵌套闭包的声明会被提升到兄弟语句之前，因此本层必须在编译函数体之前就把
+    /// 这些名字的槽位分配好，闭包才能拿到局部变量下标并按引用捕获。调用方应把这个集合
+    /// 与 <see cref="AssignedVariables"/>（本层自己的局部名）求交集后再决定要提前分配谁，
+    /// 否则会把嵌套闭包引用的全局名误当成局部变量而遮蔽它。
+    /// </remarks>
+    public IReadOnlyCollection<string> NamesNeededByNestedClosures => _namesNeededByNestedClosures;
 
     /// <summary>
     /// 分析函数体，返回捕获的外部变量列表
@@ -33,6 +44,7 @@ public class ClosureCaptureAnalyzer
         _capturedVariables.Clear();
         _localVariables.Clear();
         _parameters.Clear();
+        _namesNeededByNestedClosures.Clear();
 
         // 记录参数
         foreach (var param in parameters)
@@ -47,6 +59,24 @@ public class ClosureCaptureAnalyzer
         return _capturedVariables
             .Where(v => !_parameters.Contains(v) && !_localVariables.Contains(v))
             .ToList();
+    }
+
+    /// <summary>
+    /// 记录一个嵌套闭包需要从当前层取得的名字
+    /// </summary>
+    /// <remarks>
+    /// 用独立的分析器实例处理嵌套闭包，避免它的局部变量与赋值污染当前层的分析结果；
+    /// 递归合并更深层闭包的需求，因为「闭包里的闭包引用了最外层的局部变量」同样要求
+    /// 最外层提前分配该变量的槽位。
+    /// </remarks>
+    private void RecordNestedClosureNeeds(BlockStatement body, List<string> parameters)
+    {
+        var nested = new ClosureCaptureAnalyzer();
+        var nestedFreeVariables = nested.AnalyzeCaptures(body, parameters);
+
+        _namesNeededByNestedClosures.UnionWith(nestedFreeVariables);
+        _namesNeededByNestedClosures.UnionWith(nested.AssignedVariables);
+        _namesNeededByNestedClosures.UnionWith(nested.NamesNeededByNestedClosures);
     }
 
     /// <summary>
@@ -180,6 +210,9 @@ public class ClosureCaptureAnalyzer
             // 但要排除 Lambda 自己的参数
             var nestedParameters = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
 
+            // 记录本层需要为它准备的名字（本层局部变量若在其中就要按引用捕获）
+            RecordNestedClosureNeeds(funcValue.BlockStatement, nestedParameters);
+
             // 嵌套闭包内部的赋值属于嵌套闭包自身，不应算作当前闭包的赋值，
             // 否则会把 "只有内层闭包才写回外层变量" 的情况误判到当前层。
             // 嵌套闭包在编译到它自己时会被单独分析，因此这里做快照隔离。
@@ -206,6 +239,52 @@ public class ClosureCaptureAnalyzer
             _localVariables.Clear();
             _localVariables.UnionWith(outerAssignedSnapshot);
 
+            return;
+        }
+
+        // 处理块语句
+        //
+        // BlockStatement 的 Count/索引器只暴露 OtherStatements（普通语句），函数定义与
+        // 类定义放在 ImportStatements 里，因此下面通用的子节点遍历看不到嵌套的 func 声明。
+        // 这里显式处理 ImportStatements：只记录嵌套函数需要的名字，不下钻（保持既有行为，
+        // 避免类定义的方法体污染本层的自由变量集合）。
+        if (node is BlockStatement block)
+        {
+            foreach (var importStatement in block.ImportStatements)
+            {
+                switch (importStatement)
+                {
+                    case FuncInit nestedInit:
+                        RecordNestedClosureNeeds(
+                            nestedInit.FuncValue.BlockStatement,
+                            nestedInit.FuncValue.Ids?.Select(id => id.IdName).ToList() ?? []);
+                        break;
+                    case AsyncFuncInit asyncInit:
+                        RecordNestedClosureNeeds(
+                            asyncInit.AsyncFuncValue.BlockStatement,
+                            asyncInit.AsyncFuncValue.Ids?.Select(id => id.IdName).ToList() ?? []);
+                        break;
+                }
+            }
+
+            foreach (var blockStatement in block.OtherStatements)
+            {
+                AnalyzeNode(blockStatement);
+            }
+
+            return;
+        }
+
+        // 处理具名嵌套函数（func 里再声明 func）
+        //
+        // 它有自己的独立作用域与闭包环境，函数体内的引用不应计入本层的自由变量，
+        // 因此不在这里下钻分析；但它需要的名字要记录下来，本层需为其中的局部变量
+        // 提前分配槽位，闭包才能按引用捕获（嵌套函数声明在字节码里被提升到兄弟语句之前）。
+        if (node is FuncInit funcInit)
+        {
+            var initValue = funcInit.FuncValue;
+            var initParameters = initValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+            RecordNestedClosureNeeds(initValue.BlockStatement, initParameters);
             return;
         }
 

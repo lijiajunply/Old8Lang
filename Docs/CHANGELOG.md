@@ -1,5 +1,68 @@
 # 更新记录
 
+## 虚拟机闭包按引用捕获、字典遍历对齐、区间常量池下标修复 (2026-10-09)
+
+起因是复核「文档标为支持、却没测过」的空白：虚拟机侧没有闭包写捕获用例、没有字典
+`for ... in` 用例、extern 只有 3 个「能调通」用例。补齐这些测试时暴露出下面几处缺陷。
+
+### 修复
+
+- **闭包改为按引用捕获（共享单元）**：`MakeClosure` 原先把外层局部变量的当前值快照进闭包
+  环境，导致外层在闭包创建之后再赋值时闭包读不到新值，闭包内的赋值也无法传回外层。
+  现在外层帧的槽位会就地装箱成 `UpValueCell`，闭包与外层共用同一个盒子，双向可见。
+  由此**闭包写回外层局部变量**（此前报 `VM_UNSUPPORTED_ERROR`）成为可用能力。
+  未涉及闭包的函数不产生盒子，`LoadLocal`/`StoreLocal` 只多一次类型判断。
+  相关：`Bytecode/Closures/UpValueCell.cs`、`ClosureEnvironment`、`MakeClosure` 处理器、
+  `BytecodeCompiler.CompileFunction`（捕获变量不再复制成函数局部变量，改由环境按名解析）。
+- **嵌套具名函数支持捕获外层变量**：`VisitFuncInit` 此前对所有具名函数一律
+  `MakeFunction` + `StoreGlobal` 且不做捕获分析，于是函数体里的外层局部变量被当作全局名查找，
+  运行时报 `名称 'x' 未定义`、位置还是无意义的 `0:0`。现在与 lambda 走同一套捕获分析与
+  `MakeClosure`，并新增 `FunctionMetadata.NeedsClosureEnvironment`（字节码格式升至 **1.2**）
+  让调用点回退到绑定查找以取到闭包环境。
+- **循环变量按迭代重新绑定**：共享单元会让同一循环里创建的闭包全都读到循环变量的最终值
+  （`for i in [0~2] { fs.Add(() -> i) }` 得到 `2,2,2`）。新增 `RefreshLocalBinding` 指令，
+  在每轮迭代写入新元素前（C 风格循环则在增量之前）换一个新盒子，使每个闭包捕获当轮的值，
+  与解释器一致（`0,1,2`）。
+- **区间表达式取错常量池槽**：`VisitRangeLangValue` 把 `LoadConst` 的操作数当字面值用
+  （`Emit(LoadConst, 0/1)`），而它其实是常量池下标 —— 等于假定槽 0 放着 `0`、槽 1 放着 `1`。
+  只要此前有别的常量占用这两个槽就会取错，典型触发是 `extern` 块先放入库名与函数名：
+  `extern "..." { func abs(...) }` 之后的 `for i in [1~3]` 会把布尔标志读成字符串 `"abs"`，
+  报 `String 'abs' was not recognized as a valid Boolean`。现改为先入池再按下标加载，
+  布尔标志改用 `LoadTrue`/`LoadFalse`。
+  连带修正：`[5~5]` 此前因 `includeStart` 被误读为 false 而变成空区间，现为 `[5]`，
+  与解释器/IL 一致。
+- **字典遍历与解释器对齐**：`NewDict` 用栈顶弹出顺序写入 `Dictionary`，使插入顺序变成逆序；
+  `GetIterator` 又把字典特判成 `dict.Keys`，单标识符只拿到键。现在 `NewDict` 保序、
+  迭代元素统一为 `(键, 值)` 元组，三种模式的单变量绑定语义与遍历顺序完全一致。
+  `__for_in_unpack` 增加「元组长度恰好等于解构元数时按位取」的判定，避免字典的值本身是
+  元组时被展平（顺带修正 `for a, b in [(1, (2, 3))]`：此前虚拟机得到 `b=2`，解释器是 `b=(2, 3)`）。
+
+### 测试
+
+- `VirtualMachine/Functions/VMClosureTests.cs`（26 例）：闭包读/写捕获、跨层捕获、闭包工厂、
+  循环捕获、嵌套具名函数捕获，以及与解释器的一致性对照。
+- `VirtualMachine/Extern/VMExternConventionTests.cs`（16 例）：三种调用约定（块级与单函数级）、
+  批量与单函数导入、别名、多块并存、int/long/double 转换、重复调用的委托缓存、
+  缺库报 `IO_ERROR`、缺符号报 `METHOD_NOT_FOUND_ERROR`。全部跨平台，不用「非 Windows 就提前
+  return」那种会让用例在 macOS/Linux 上静默通过的写法。
+- `VirtualMachine/Collections/VMDictionaryTests.cs`：补 11 例字典遍历（含两模式一致性 Theory）。
+- `VirtualMachine/Expressions/VMRangeTests.cs`：`Range_InListComprehension_ExecutesCorrectly`
+  函数体原是普通 for 循环、与用例名不符，改为真正的列表推导式。
+- `VirtualMachine/ErrorHandling/VMUnsupportedFeatureTests.cs`：把断言「闭包不能写回外层局部变量」
+  的用例改写为断言写回生效，并补嵌套具名函数的读/写捕获。
+
+### 已知限制（本次未处理）
+
+- **脚本顶层的 C 风格 for 循环变量**：`for i <- 0, i < 3, i++` 的变量在顶层被声明为全局变量，
+  循环体内创建的闭包读到的是最终值（`333`），解释器为 `012`。此分歧在本次改动之前就存在。
+  函数内的同种循环已对齐。
+- **解释器侧 lambda 写回不一致**：解释器对 lambda 的写回不传回外层
+  （`func make() { c <- 0; inc <- () -> { c <- c + 1 }; inc(); print(c) }` 输出 `0`），
+  而同等的具名嵌套函数却传回 `1`。虚拟机两种写法都传回。解释器侧待统一。
+- **虚拟机运行期错误位置恒为 0:0**：`Instruction.LineNumber/ColumnNumber` 在整个编译器里
+  从未被写入（带调试信息的 `Emit` 重载与 `Instruction.WithDebugInfo` 全仓库零调用），
+  因此运行期错误的位置信息与源代码上下文都不可用。这是牵涉面较广的独立改动，本次未实施。
+
 ## 编译模式更名为 IL 模式 (2026-10-08)
 
 「编译模式」这个名称名不副实：它做的是把 Old8Lang 编译成 IL（中间语言）再交给 .NET 运行时执行，

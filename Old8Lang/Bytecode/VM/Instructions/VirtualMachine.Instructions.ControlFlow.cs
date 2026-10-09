@@ -201,7 +201,7 @@ public partial class VirtualMachine
                 }
 
                 var localCapturedNames = localCaptureCount == 0 ? [] : new string[localCaptureCount];
-                var localCapturedValues = localCaptureCount == 0 ? [] : new object?[localCaptureCount];
+                var localCapturedCells = localCaptureCount == 0 ? [] : new UpValueCell[localCaptureCount];
                 var localCaptureIndex = 0;
 
                 for (var i = 0; i < capturedVarCount; i++)
@@ -214,11 +214,17 @@ public partial class VirtualMachine
                     switch (captureKind)
                     {
                         case 0:
+                            // 按引用捕获：把外层帧的槽位原地装箱，闭包与外层此后共用同一个共享单元，
+                            // 因此外层之后再赋值闭包也能读到，闭包内的赋值也能传回外层。
                             localCapturedNames[localCaptureIndex] = captureName;
-                            localCapturedValues[localCaptureIndex] = frame.Locals[captureOperand];
+                            localCapturedCells[localCaptureIndex] =
+                                UpValueCell.Box(ref frame.Locals[captureOperand]);
                             localCaptureIndex++;
                             break;
                         case 1:
+                            // 外层闭包已捕获的变量：新环境的父链就是外层环境，父链上持有同一个共享单元，
+                            // 无需在此复制
+                            break;
                         case 2:
                             break;
                         default:
@@ -230,7 +236,7 @@ public partial class VirtualMachine
                     ? new ClosureEnvironment([], [], frame.ClosureEnvironment)
                     : new ClosureEnvironment(
                         localCapturedNames,
-                        localCapturedValues,
+                        localCapturedCells,
                         frame.ClosureEnvironment);
                 var closure = new ClosureValue(funcMeta, closureEnvironment);
                 _stack.Push(closure);

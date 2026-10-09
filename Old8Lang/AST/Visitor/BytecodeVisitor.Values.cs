@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Statement;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 using Old8Lang.Bytecode.Closures;
@@ -582,6 +583,14 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitRangeLangValue(RangeLangValue node)
     {
+        // 注意：LoadConst 的操作数是**常量池下标**，不是字面值。
+        // 这里曾经直接写 Emit(LoadConst, 0/1)，等于假定常量池槽 0 放着 0、槽 1 放着 1。
+        // 只要此前有别的常量占用了这两个槽（典型：extern 块先放入库名与函数名，
+        // 槽 1 变成函数名字符串），区间表达式就会取到错误的操作数 ——
+        // 例如 `extern "..." { func abs(...) }` 之后的 `for i in [1~3]` 会把
+        // 布尔标志读成字符串 "abs"，报 “String 'abs' was not recognized as a valid Boolean”。
+        // 因此一律先入池再按下标加载。
+
         // 访问start表达式
         if (node.Start != null)
         {
@@ -589,7 +598,7 @@ public partial class BytecodeVisitor
         }
         else
         {
-            Emit(OpCode.LoadConst, 0); // 默认起始值为0
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0)); // 默认起始值为0
         }
 
         // 访问end表达式
@@ -599,13 +608,13 @@ public partial class BytecodeVisitor
         }
         else
         {
-            Emit(OpCode.LoadConst, 0); // 默认结束值为0
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0)); // 默认结束值为0
         }
 
         // 加载includeStart和includeEnd标志
         // 栈布局(从下到上): start, end, includeStart, includeEnd
-        Emit(OpCode.LoadConst, node.IncludeStart ? 1 : 0);
-        Emit(OpCode.LoadConst, node.IncludeEnd ? 1 : 0);
+        Emit(node.IncludeStart ? OpCode.LoadTrue : OpCode.LoadFalse);
+        Emit(node.IncludeEnd ? OpCode.LoadTrue : OpCode.LoadFalse);
 
         // 使用 NewRange 指令创建范围数组
         // NewRange 将从栈中弹出4个参数
@@ -818,97 +827,125 @@ public partial class BytecodeVisitor
             }
         }
 
-        // 3. 分析捕获的变量
-        var analyzer = new ClosureCaptureAnalyzer();
-        var capturedVars = analyzer.AnalyzeCaptures(node.BlockStatement, paramNames);
+        // 3. 分析捕获的变量，并拦截无法支持的写回（全局变量计入捕获，沿用既有行为）
+        var actualCapturedVars = AnalyzeClosureCaptures(node.BlockStatement, paramNames);
 
-        // 3.1 闭包写入外层 **局部** 变量无法支持：
-        // 字节码模式的闭包按值快照捕获（MakeClosure 把外层局部变量的当前值复制进闭包环境），
-        // 没有共享单元，写回不会反映到外层作用域，与解释器语义不一致。
-        // 若放任不管，闭包内会另建一个同名局部变量：自引用式写法（c <- c + 1）会因读取时
-        // 该局部变量尚未声明而报 "名称 'c' 未定义"，非自引用写法则会静默地变成遮蔽。
-        // 两种结果都远离真实原因，因此这里直接报错。
-        // 全局变量不在此列：闭包读写的是同一张全局表，写回本来就生效。
+        // 4. 提取返回类型
+        string returnType = node.Id?.AssumptionType ?? "";
+
+        // 5. 编译 Lambda 函数体，传递捕获的变量列表和返回类型
+        _compiler.CompileFunction(lambdaName, paramNames, paramTypes, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars, returnType);
+
+        // 6. 获取编译后的函数索引：有捕获则生成 MakeClosure，否则生成 MakeFunction
+        int funcIndex = _compiler.GetFunctionIndex(lambdaName);
+        EmitClosureOrFunction(funcIndex, actualCapturedVars);
+
+        return null;
+    }
+
+    /// <summary>
+    /// 分析函数体（lambda 或嵌套具名函数）对外层变量的捕获。
+    /// </summary>
+    /// <param name="body">函数体</param>
+    /// <param name="paramNames">形参名，形参不算捕获</param>
+    /// <remarks>
+    /// 捕获项只取「外层的局部变量或已被外层闭包捕获的变量」。全局变量不进捕获列表：
+    /// 运行期按名直接查全局表，既能读到最新值，也不会把每个引用全局的函数都变成闭包。
+    /// </remarks>
+    private List<string> AnalyzeClosureCaptures(
+        BlockStatement body, List<string> paramNames)
+    {
+        var analyzer = new ClosureCaptureAnalyzer();
+        var capturedVars = analyzer.AnalyzeCaptures(body, paramNames);
+
+        var candidates = new List<string>(capturedVars);
+
+        // 只读引用只是捕获的一部分。闭包**只写**某个外层局部变量（不读它）时，
+        // AnalyzeCaptures 不会把该名字算作自由变量；若漏掉它，闭包内会另建一个同名局部
+        // 变量，静默遮蔽外层那个，写回悄悄地不生效。因此「闭包内赋值 + 恰好是外层变量」
+        // 的名字也必须捕获。
         foreach (var assignedName in analyzer.AssignedVariables)
         {
-            if (_compiler.IsLocalVariable(assignedName) ||
-                _compiler.IsCapturedVariable(assignedName))
+            if (!candidates.Contains(assignedName))
             {
-                throw new VmUnsupportedError(node,
-                    $"闭包对外层局部变量 '{assignedName}' 的赋值（按引用捕获）");
+                candidates.Add(assignedName);
             }
         }
 
-        // 4. 过滤出实际存在的变量
-        // 注意：对于嵌套 Lambda，内层 Lambda 可能需要捕获外层 Lambda 的捕获变量
-        // 这些变量在编译时既不是局部变量也不是全局变量，但仍然需要捕获
-        //
-        // 只有**变量**才进捕获列表。捕获项会在闭包函数开头生成一句 `LoadGlobal 名字`，
-        // 名字在运行时不存在就会直接抛“名称未定义”，所以像函数名（Print、类名、被装饰
-        // 的函数名）或成员名这类根本不是变量的名字一旦被收集进来，就会把一个本来能跑的
-        // 闭包变成运行期报错。这些名字本来也由各自的指令（Call/NewObject/CallMethod）
-        // 静态解析或按名动态解析，不需要闭包按值快照。
+        // 本闭包体内的嵌套闭包（例如 lambda 里的 func）需要的名字也要算进来：
+        // 那些名字只出现在嵌套具名函数的函数体里，AnalyzeCaptures 不会把它算作本层的
+        // 自由变量，但只有本层先捕获它，嵌套闭包才能沿父环境链取到。
+        // 本层自己声明的局部变量由本层直接提供，不算捕获。
+        var ownLocals = new HashSet<string>(analyzer.AssignedVariables, StringComparer.Ordinal);
+        foreach (var neededName in analyzer.NamesNeededByNestedClosures)
+        {
+            if (!ownLocals.Contains(neededName) && !candidates.Contains(neededName))
+            {
+                candidates.Add(neededName);
+            }
+        }
+
         var actualCapturedVars = new List<string>();
-        foreach (var varName in capturedVars)
+        foreach (var varName in candidates)
         {
             if (_compiler.IsLocalVariable(varName) ||
-                _compiler.IsGlobalVariable(varName) ||
                 _compiler.IsCapturedVariable(varName))
             {
                 actualCapturedVars.Add(varName);
             }
         }
 
-        // 5. 提取返回类型
-        string returnType = node.Id?.AssumptionType ?? "";
+        return actualCapturedVars;
+    }
 
-        // 6. 编译 Lambda 函数体，传递捕获的变量列表和返回类型
-        _compiler.CompileFunction(lambdaName, paramNames, paramTypes, defaultValues, node.BlockStatement, paramsIndex, actualCapturedVars, returnType);
-
-        // 7. 获取编译后的函数索引
-        int funcIndex = _compiler.GetFunctionIndex(lambdaName);
-
-        // 7. 如果有捕获的变量，生成 MakeClosure 指令；否则生成 MakeFunction 指令
-        if (actualCapturedVars.Count > 0)
+    /// <summary>
+    /// 发出「构造函数值」的指令，lambda 与嵌套具名函数共用。
+    /// </summary>
+    /// <remarks>
+    /// 有捕获变量时发 MakeClosure：外层局部变量会就地装箱成共享单元，闭包与外层此后
+    /// 共用同一个盒子（双向可见）；否则发 MakeFunction（裸函数元数据，调用时
+    /// frame.ClosureEnvironment 为 null）。
+    /// 操作数编码: [funcIndex, capturedVarCount, kind0, operand0, name0, kind1, operand1, name1, ...]
+    ///   kind 0 = 外层局部变量（operand 是该局部变量的下标）
+    ///   kind 1 = 外层闭包已捕获的变量（运行期沿父环境链查找）
+    ///   kind 2 = 全局变量（运行期查全局表）
+    /// </remarks>
+    private void EmitClosureOrFunction(int funcIndex, List<string> capturedVars)
+    {
+        if (capturedVars.Count == 0)
         {
-            // 生成 MakeClosure 指令
-            // 操作数: [funcIndex, capturedVarCount, kind0, operand0, name0, kind1, operand1, name1, ...]
-            var operand = new object[2 + actualCapturedVars.Count * 3];
-            operand[0] = funcIndex;
-            operand[1] = actualCapturedVars.Count;
-
-            for (var i = 0; i < actualCapturedVars.Count; i++)
-            {
-                var varName = actualCapturedVars[i];
-                var baseIndex = 2 + i * 3;
-                if (_compiler.IsLocalVariable(varName))
-                {
-                    operand[baseIndex] = 0;
-                    operand[baseIndex + 1] = _compiler.GetLocalIndex(varName);
-                    operand[baseIndex + 2] = varName;
-                }
-                else if (_compiler.IsCapturedVariable(varName))
-                {
-                    operand[baseIndex] = 1;
-                    operand[baseIndex + 1] = -1;
-                    operand[baseIndex + 2] = varName;
-                }
-                else
-                {
-                    operand[baseIndex] = 2;
-                    operand[baseIndex + 1] = -1;
-                    operand[baseIndex + 2] = varName;
-                }
-            }
-
-            Emit(OpCode.MakeClosure, operand);
-        }
-        else
-        {
-            // 没有捕获变量，生成普通的 MakeFunction 指令
             Emit(OpCode.MakeFunction, funcIndex);
+            return;
         }
 
-        return null;
+        var operand = new object[2 + capturedVars.Count * 3];
+        operand[0] = funcIndex;
+        operand[1] = capturedVars.Count;
+
+        for (var i = 0; i < capturedVars.Count; i++)
+        {
+            var varName = capturedVars[i];
+            var baseIndex = 2 + i * 3;
+            if (_compiler.IsLocalVariable(varName))
+            {
+                operand[baseIndex] = 0;
+                operand[baseIndex + 1] = _compiler.GetLocalIndex(varName);
+                operand[baseIndex + 2] = varName;
+            }
+            else if (_compiler.IsCapturedVariable(varName))
+            {
+                operand[baseIndex] = 1;
+                operand[baseIndex + 1] = -1;
+                operand[baseIndex + 2] = varName;
+            }
+            else
+            {
+                operand[baseIndex] = 2;
+                operand[baseIndex + 1] = -1;
+                operand[baseIndex + 2] = varName;
+            }
+        }
+
+        Emit(OpCode.MakeClosure, operand);
     }
 }

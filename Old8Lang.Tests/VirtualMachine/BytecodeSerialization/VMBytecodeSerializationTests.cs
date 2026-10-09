@@ -349,8 +349,8 @@ public class VMBytecodeSerializationTests
         var code = @"
             dict <- {""a"": 1, ""b"": 2, ""c"": 3}
             sum <- 0
-            for key in dict {
-                sum <- sum + dict[key]
+            for key, value in dict {
+                sum <- sum + value
             }
             PrintLine(sum.ToStr())
         ";

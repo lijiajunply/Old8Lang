@@ -1,3 +1,4 @@
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 using System.Runtime.CompilerServices;
@@ -32,14 +33,38 @@ public partial class VirtualMachine
             case OpCode.LoadLocal:
             {
                 int localIndex = (int)instruction.Operand!;
-                _stack.Push(frame.Locals[localIndex]);
+                // 被闭包按引用捕获的局部变量槽位里放的是共享单元，读取时解引用
+                var localValue = frame.Locals[localIndex];
+                _stack.Push(localValue is UpValueCell cell ? cell.Value : localValue);
             }
                 break;
 
             case OpCode.StoreLocal:
             {
                 int localIndex = (int)instruction.Operand!;
-                frame.Locals[localIndex] = _stack.Pop();
+                var localValue = _stack.Pop();
+                // 已装箱的槽位要写进共享单元，而不是把盒子本身替换掉，
+                // 否则闭包持有的盒子会与外层脱离，写回失效
+                if (frame.Locals[localIndex] is UpValueCell cell)
+                {
+                    cell.Value = localValue;
+                }
+                else
+                {
+                    frame.Locals[localIndex] = localValue;
+                }
+            }
+                break;
+
+            case OpCode.RefreshLocalBinding:
+            {
+                // 循环变量每轮迭代换一个新的共享单元：已经装箱时换成新盒子，
+                // 此前创建的闭包继续持有旧盒子（各自保留当轮的值）；未装箱则无事发生。
+                int localIndex = (int)instruction.Operand!;
+                if (frame.Locals[localIndex] is UpValueCell existing)
+                {
+                    frame.Locals[localIndex] = new UpValueCell(existing.Value);
+                }
             }
                 break;
 
@@ -53,7 +78,13 @@ public partial class VirtualMachine
             case OpCode.StoreGlobal:
             {
                 string varName = (string)instruction.Operand!;
-                _globals[varName] = _stack.Pop();
+                var globalValue = _stack.Pop();
+                // 被闭包捕获的名字写进共享单元；否则写全局表
+                if (frame.ClosureEnvironment == null ||
+                    !frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                {
+                    _globals[varName] = globalValue;
+                }
             }
                 break;
 

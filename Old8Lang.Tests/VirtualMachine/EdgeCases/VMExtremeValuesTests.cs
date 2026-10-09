@@ -352,8 +352,8 @@ public class VMExtremeValuesTests
         var code = @"
             dict <- {""a"": 10, ""b"": 20, ""c"": 30}
             sum <- 0
-            for key in dict {
-                sum <- sum + dict[key]
+            for key, value in dict {
+                sum <- sum + value
             }
             PrintLine(sum.ToStr())
         ";

@@ -19,11 +19,19 @@ public partial class VirtualMachine
             {
                 var collection = _stack.Pop();
 
-                // 特殊处理字典：迭代键而不是键值对
+                // 字典要放在 IEnumerable 之前判断：Dictionary 本身也是 IEnumerable，
+                // 落到下面那支会拿到 KeyValuePair 而不是 (键, 值) 元组。
+                // 迭代元素统一为 (键, 值) 元组，与解释器一致：单标识符绑定整个元组，
+                // 多标识符由 __for_in_unpack 按下标解构。顺序为插入顺序（依赖 NewDict 保序）。
                 if (collection is IDictionary dict)
                 {
-                    var enumerator = dict.Keys.GetEnumerator();
-                    _stack.Push(enumerator);
+                    var pairs = new List<object?>(dict.Count);
+                    foreach (DictionaryEntry entry in dict)
+                    {
+                        pairs.Add(new Tuple<object?, object?>(entry.Key, entry.Value));
+                    }
+
+                    _stack.Push(pairs.GetEnumerator());
                 }
                 else if (collection is IEnumerable enumerable)
                 {

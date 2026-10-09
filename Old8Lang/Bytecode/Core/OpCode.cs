@@ -42,6 +42,17 @@ public enum OpCode : byte
     /// <summary>交换栈顶两个元素</summary>
     Swap = 0x0B,
 
+    /// <summary>
+    /// 为局部变量换一个新的共享单元 (操作数: localIndex)
+    /// </summary>
+    /// <remarks>
+    /// 槽位里存的是闭包共享单元（UpValueCell）时，换成一个新的、初值相同的单元，
+    /// 使此前创建的闭包继续持有旧单元。循环变量每轮迭代都需要这一步：解释器每轮迭代
+    /// 都建立独立绑定，循环体内创建的闭包各自捕获当轮的值。槽位不是共享单元时本指令
+    /// 不做任何事，因此未涉及闭包的循环不产生额外开销。
+    /// </remarks>
+    RefreshLocalBinding = 0x0C,
+
     // ===== 算术运算 (0x10-0x1F) =====
     /// <summary>加法: b, a → (a + b)</summary>
     Add = 0x10,

@@ -14,8 +14,10 @@ public class BytecodeFile
 
     // 文件格式版本
     // 1.1: FunctionMetadata 增加 IsDecorated 字段（装饰器函数的调用必须走全局绑定）
+    // 1.2: FunctionMetadata 增加 NeedsClosureEnvironment 字段
+    //      （嵌套具名函数捕获外层局部变量后，调用同样必须走绑定以取得闭包环境）
     private const ushort MajorVersion = 1;
-    private const ushort MinorVersion = 1;
+    private const ushort MinorVersion = 2;
 
     /// <summary>常量池</summary>
     public ConstantPool ConstantPool { get; set; } = new();

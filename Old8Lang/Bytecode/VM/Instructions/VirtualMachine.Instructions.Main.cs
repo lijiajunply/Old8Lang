@@ -33,6 +33,7 @@ public partial class VirtualMachine
             case OpCode.StoreLocal:
             case OpCode.LoadGlobal:
             case OpCode.StoreGlobal:
+            case OpCode.RefreshLocalBinding:
                 ExecuteStackOperation(instruction, frame);
                 return;
             case OpCode.Call:
@@ -62,6 +63,7 @@ public partial class VirtualMachine
             case OpCode.LoadTrue:
             case OpCode.LoadFalse:
             case OpCode.Swap:
+            case OpCode.RefreshLocalBinding:
                 ExecuteStackOperation(instruction, frame);
                 break;
 

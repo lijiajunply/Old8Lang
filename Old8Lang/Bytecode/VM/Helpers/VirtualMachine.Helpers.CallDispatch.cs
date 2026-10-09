@@ -307,22 +307,26 @@ public partial class VirtualMachine
 
         // 新协议优先：函数索引命中时快速直达
         //
-        // 带装饰器的函数例外：装饰器在运行期把包装后的函数写回同名全局变量，
-        // 函数体本身已经不是调用该名字时应该执行的东西。这类调用要走下面的
-        // 全局绑定查找，否则装饰器会被静默绕过（@twice 包装的 inc(10) 得到 11）。
+        // 两类函数例外，必须走下面的绑定查找：
+        // 1. 带装饰器的函数：装饰器在运行期把包装后的函数写回同名全局变量，
+        //    函数体本身已经不是调用该名字时应该执行的东西。若按索引直达，
+        //    装饰器会被静默绕过（@twice 包装的 inc(10) 得到 11）。
+        // 2. 捕获了外层局部变量的嵌套具名函数：捕获值按值快照存在声明的那个
+        //    ClosureValue 里，索引快捷路径给出的裸 FunctionMetadata 不带环境，
+        //    函数体里对被捕获变量的读取会退化成查全局表并报「名称未定义」。
         var isDecoratedFunction = false;
         if (functionIndexHint >= 0 && functionIndexHint < _bytecodeFile.Functions.Count)
         {
             var indexedFunction = _bytecodeFile.Functions[functionIndexHint];
             if (indexedFunction.Name == funcName)
             {
-                if (!indexedFunction.IsDecorated)
+                if (!indexedFunction.IsDecorated && !indexedFunction.NeedsClosureEnvironment)
                 {
                     function = indexedFunction;
                     return true;
                 }
 
-                isDecoratedFunction = true;
+                isDecoratedFunction = indexedFunction.IsDecorated;
             }
         }
 

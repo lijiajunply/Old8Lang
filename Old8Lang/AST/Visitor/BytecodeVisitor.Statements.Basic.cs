@@ -119,6 +119,12 @@ public partial class BytecodeVisitor
 
                 Emit(OpCode.StoreLocal, localIndex);
             }
+            else if (_compiler.IsCapturedVariable(varName))
+            {
+                // 闭包捕获来的变量：走环境按名写入，运行期会写进与外层共用的共享单元，
+                // 因此闭包内的赋值对外层可见（这是闭包写回外层局部变量的实现基础）
+                Emit(OpCode.StoreGlobal, varName);
+            }
             else if (_compiler.IsGlobalVariable(varName))
             {
                 // 全局变量更新

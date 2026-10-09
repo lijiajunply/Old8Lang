@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
@@ -393,6 +394,29 @@ public class BytecodeCompiler
     }
 
     /// <summary>
+    /// 为「将被本函数体内嵌套闭包捕获的本层局部变量」提前分配槽位
+    /// </summary>
+    /// <remarks>
+    /// 字节码里嵌套闭包（lambda 或具名函数）的声明被提升到兄弟语句之前，而它们可能按引用
+    /// 捕获本函数的局部变量。提前分配槽位才能让闭包在编译时拿到该变量的下标。
+    /// 只处理「本层自己的局部名 ∩ 嵌套闭包需要的名字」这个交集：嵌套闭包引用的全局名若
+    /// 也在此声明，会把它遮蔽成局部变量。
+    /// </remarks>
+    private void PredeclareLocalsCapturedByNestedClosures(BlockStatement body, List<string> parameters)
+    {
+        var preScan = new ClosureCaptureAnalyzer();
+        preScan.AnalyzeCaptures(body, parameters);
+
+        foreach (var neededName in preScan.NamesNeededByNestedClosures)
+        {
+            if (preScan.AssignedVariables.Contains(neededName))
+            {
+                DeclareLocalVariable(neededName);
+            }
+        }
+    }
+
+    /// <summary>
     /// 编译函数定义
     /// </summary>
     public FunctionMetadata CompileFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
@@ -425,18 +449,15 @@ public class BytecodeCompiler
         foreach (var param in parameters)
             DeclareLocalVariable(param);
 
-        // 如果有捕获的变量，声明它们为局部变量
-        var capturedVarIndices = new Dictionary<string, int>();
-        if (capturedVars is { Count: > 0 })
-        {
-            foreach (var varName in capturedVars)
-            {
-                int index = DeclareLocalVariable(varName);
-                capturedVarIndices[varName] = index;
-            }
-        }
+        // 嵌套闭包会按引用捕获本函数的局部变量，提前为这些变量分配槽位
+        PredeclareLocalsCapturedByNestedClosures(body, parameters);
 
         // 保存捕获的变量列表到函数元数据
+        //
+        // 捕获来的名字**不**声明为本函数的局部变量：它们在运行期由闭包环境按名解析，
+        // 环境里存的是与外层共用的共享单元（UpValueCell），因此读写都直接落到外层那个
+        // 变量上。此前把捕获值复制进局部变量的做法是一次性快照，外层之后再赋值闭包看不到，
+        // 闭包内的赋值也传不回去。
         if (capturedVars is { Count: > 0 })
         {
             func.CapturedVariables = new List<string>(capturedVars);
@@ -444,57 +465,9 @@ public class BytecodeCompiler
 
         // 编译函数体
         var visitor = new BytecodeVisitor(this);
-
-        // 如果有捕获的变量，在函数体开始时加载它们的值
-        if (capturedVars is { Count: > 0 })
-        {
-            // 需要在函数体之前插入加载指令
-            var tempInstructions = new List<Instruction>();
-
-            // 加载并立即存储每个捕获的变量（避免栈顺序错乱）
-            foreach (var varName in capturedVars)
-            {
-                tempInstructions.Add(new Instruction(OpCode.LoadGlobal, varName));
-                int localIndex = capturedVarIndices[varName];
-                tempInstructions.Add(new Instruction(OpCode.StoreLocal, localIndex));
-            }
-
-            // 编译函数体
-            body.Accept(visitor);
-
-            // 将加载指令插入到函数体指令之前
-            var bodyInstructions = visitor.GetInstructions();
-
-            // 重要：调整函数体中所有跳转指令的目标地址
-            // 因为插入了额外的指令，所有跳转目标都需要偏移
-            int offset = tempInstructions.Count;
-            for (int i = 0; i < bodyInstructions.Count; i++)
-            {
-                var instr = bodyInstructions[i];
-                // 检查是否是跳转指令
-                if (instr.OpCode == OpCode.Jump ||
-                    instr.OpCode == OpCode.JumpIfFalse ||
-                    instr.OpCode == OpCode.JumpIfTrue)
-                {
-                    if (instr.Operand is int target)
-                    {
-                        // 调整跳转目标，加上偏移量
-                        bodyInstructions[i] = new Instruction(instr.OpCode, target + offset);
-                    }
-                }
-            }
-
-            var allInstructions = tempInstructions.Concat(bodyInstructions).ToList();
-
-            func.Instructions = allInstructions;
-            func.MaxStackSize = visitor.MaxStackSize;
-        }
-        else
-        {
-            body.Accept(visitor);
-            func.Instructions = visitor.GetInstructions();
-            func.MaxStackSize = visitor.MaxStackSize;
-        }
+        body.Accept(visitor);
+        func.Instructions = visitor.GetInstructions();
+        func.MaxStackSize = visitor.MaxStackSize;
 
         func.LocalCount = _scopes.Peek().LocalCount;
 
@@ -531,6 +504,9 @@ public class BytecodeCompiler
         // 声明参数为局部变量
         foreach (var param in parameters)
             DeclareLocalVariable(param);
+
+        // 嵌套闭包会按引用捕获本函数的局部变量，提前为这些变量分配槽位
+        PredeclareLocalsCapturedByNestedClosures(body, parameters);
 
         // 编译函数体
         var visitor = new BytecodeVisitor(this);
@@ -576,6 +552,9 @@ public class BytecodeCompiler
         // 声明参数为局部变量
         foreach (var param in parameters)
             DeclareLocalVariable(param);
+
+        // 嵌套闭包会按引用捕获本函数的局部变量，提前为这些变量分配槽位
+        PredeclareLocalsCapturedByNestedClosures(body, parameters);
 
         // 编译函数体
         var visitor = new BytecodeVisitor(this);
@@ -639,6 +618,39 @@ public class BytecodeCompiler
         {
             _bytecodeFile.Functions[funcIndex].IsDecorated = true;
         }
+    }
+
+    /// <summary>
+    /// 把函数标记为「需要闭包环境才能调用」
+    /// </summary>
+    /// <remarks>
+    /// 嵌套具名函数捕获外层局部变量时，声明处发出 MakeClosure，捕获值存在调用点绑定的
+    /// ClosureValue 里。调用这类函数时必须走绑定查找才能取到该环境，不能按函数索引直达
+    /// 函数体（详见 <see cref="FunctionMetadata.NeedsClosureEnvironment"/>）。
+    /// </remarks>
+    public void MarkFunctionNeedsClosureEnvironment(string funcName)
+    {
+        int funcIndex = GetFunctionIndex(funcName);
+        if (funcIndex >= 0)
+        {
+            _bytecodeFile.Functions[funcIndex].NeedsClosureEnvironment = true;
+        }
+    }
+
+    /// <summary>
+    /// 取某个函数编译时记录下来的捕获变量列表
+    /// </summary>
+    /// <remarks>
+    /// 同一个函数声明可能被访问多次（预处理阶段与主流程各一次），而每次的可见作用域
+    /// 未必相同。构造 MakeClosure 的操作数必须与编译函数体时用的那份列表一致，
+    /// 否则闭包环境的槽位对不上，因此统一回读元数据里记录的那一份。
+    /// </remarks>
+    public List<string> GetFunctionCapturedVariables(string funcName)
+    {
+        int funcIndex = GetFunctionIndex(funcName);
+        return funcIndex >= 0
+            ? new List<string>(_bytecodeFile.Functions[funcIndex].CapturedVariables)
+            : [];
     }
 
     // ===== 作用域管理 =====

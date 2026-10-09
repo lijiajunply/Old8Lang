@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -64,16 +65,41 @@ public partial class BytecodeVisitor
         var returnType = funcValue.Id?.AssumptionType ?? "";
 
         // 如果函数还没有被编译过，编译函数体
-        // 注意：顶层函数定义不捕获外部变量，函数内部直接访问全局变量
+        //
+        // 嵌套具名函数可能引用外层函数的局部变量。这种名字在函数体里既不是局部变量
+        // 也不是全局变量，不加处理会被 VisitLangId 降级成 LoadGlobal，运行时查全局表
+        // 失败并报「名称 'x' 未定义」（连带 0:0 的错位位置）。因此这里与 lambda 一样
+        // 做捕获分析，把捕获值随 MakeClosure 一起绑定。
+        // 顶层函数没有外层局部变量，分析结果为空，行为与以往完全一致。
+        // 全局变量不计入捕获（includeGlobals: false）：运行时直接查全局表既能读到最新值，
+        // 也避免把每个引用了全局的函数都变成闭包。
+        var capturedVars = AnalyzeClosureCaptures(funcValue.BlockStatement, paramNames);
+
         if (!alreadyCompiled)
         {
-            // 编译函数，不传递捕获的变量列表（顶层函数不捕获变量）
-            _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, null, returnType);
+            _compiler.CompileFunction(funcName, paramNames, paramTypes, defaultValues,
+                funcValue.BlockStatement, paramsIndex, capturedVars, returnType);
+
+            if (capturedVars.Count > 0)
+            {
+                // 调用点必须走绑定查找才能取到闭包环境，不能按函数索引直达函数体
+                _compiler.MarkFunctionNeedsClosureEnvironment(funcName);
+            }
         }
 
         // 检查是否有装饰器
         if (funcValue.Decorators is { Count: > 0 })
         {
+            // 装饰器会在运行期用包装后的函数覆盖绑定，与 MakeClosure 携带的闭包环境
+            // 无法并存：包装函数拿不到捕获值，函数体开头的取捕获值序言也无从成立。
+            // 这种组合此前就会报「名称 'x' 未定义」，原因完全不指向真实问题，因此明确报错。
+            if (capturedVars.Count > 0)
+            {
+                throw new VmUnsupportedError(node,
+                    $"嵌套函数 '{funcName}' 同时使用装饰器与对外层局部变量 " +
+                    $"'{string.Join("', '", capturedVars)}' 的捕获");
+            }
+
             // 标记为带装饰器：调用点必须走全局绑定，否则会绕过装饰器
             _compiler.MarkFunctionDecorated(funcName);
 
@@ -85,8 +111,11 @@ public partial class BytecodeVisitor
             // 获取函数索引
             int funcIndex = _compiler.GetFunctionIndex(funcName);
 
-            // 顶层函数定义不捕获变量，生成普通的 MakeFunction 指令
-            Emit(OpCode.MakeFunction, funcIndex);
+            // 有捕获则构造闭包（捕获值按值快照），否则是普通的裸函数元数据。
+            // 回读元数据里记录的捕获列表而非本地变量 capturedVars：同一函数声明
+            // 可能被访问多次，两次可见的作用域未必相同，操作数必须与编译函数体时
+            // 用的那份列表一致，否则闭包环境槽位对不上。
+            EmitClosureOrFunction(funcIndex, _compiler.GetFunctionCapturedVariables(funcName));
             Emit(OpCode.StoreGlobal, funcName);
         }
 

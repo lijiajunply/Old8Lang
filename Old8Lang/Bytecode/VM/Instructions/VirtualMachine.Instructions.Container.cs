@@ -85,12 +85,23 @@ public partial class VirtualMachine
             {
                 int pairCount = (int)instruction.Operand!;
                 var dict = new Dictionary<object, object?>();
-                // 每个键值对作为一个元组在栈上
-                for (int i = 0; i < pairCount; i++)
+                // 每个键值对作为一个元组在栈上，栈顶是最后一个键值对。
+                // 先按倒序收回数组再正序写入，否则 Dictionary 的插入顺序（也就是遍历顺序）
+                // 会是源码顺序的逆序，与解释器/IL 模式不一致。
+                var pairs = new Tuple<object?, object?>[pairCount];
+                for (int i = pairCount - 1; i >= 0; i--)
                 {
                     if (_stack.Pop() is Tuple<object?, object?> { Item1: not null } tuple)
                     {
-                        dict[tuple.Item1] = tuple.Item2;
+                        pairs[i] = tuple;
+                    }
+                }
+
+                foreach (var pair in pairs)
+                {
+                    if (pair is not null)
+                    {
+                        dict[pair.Item1] = pair.Item2;
                     }
                 }
 

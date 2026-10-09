@@ -72,6 +72,16 @@ public class FunctionMetadata
     /// </remarks>
     public bool IsDecorated { get; set; }
 
+    /// <summary>是否需要在取得闭包环境后才能调用（嵌套具名函数捕获了外层局部变量）</summary>
+    /// <remarks>
+    /// 嵌套具名函数捕获外层局部变量时，声明处发出的是 MakeClosure —— 捕获值按值快照存在
+    /// 调用点绑定的那个 ClosureValue 里，函数体本身不带环境。但调用点若按函数索引直达
+    /// 函数体（索引捷径），拿到的是裸 FunctionMetadata，frame.ClosureEnvironment 为 null，
+    /// 函数体里对被捕获变量的读取就会退化成查全局表并报「名称未定义」。
+    /// 因此这类函数必须与装饰器函数一样避开索引捷径、走绑定查找。
+    /// </remarks>
+    public bool NeedsClosureEnvironment { get; set; }
+
     /// <summary>函数在常量池中的索引(用于闭包)</summary>
     public int FunctionIndex { get; set; } = -1;
 
@@ -133,6 +143,7 @@ public class FunctionMetadata
         writer.Write(IsGenerator);
         writer.Write(IsExtensionMethod);
         writer.Write(IsDecorated);
+        writer.Write(NeedsClosureEnvironment);
         writer.Write(FunctionIndex);
         writer.Write(ParamsParameterIndex);
 
@@ -200,6 +211,7 @@ public class FunctionMetadata
         func.IsGenerator = reader.ReadBoolean();
         func.IsExtensionMethod = reader.ReadBoolean();
         func.IsDecorated = reader.ReadBoolean();
+        func.NeedsClosureEnvironment = reader.ReadBoolean();
         func.FunctionIndex = reader.ReadInt32();
         func.ParamsParameterIndex = reader.ReadInt32();
 

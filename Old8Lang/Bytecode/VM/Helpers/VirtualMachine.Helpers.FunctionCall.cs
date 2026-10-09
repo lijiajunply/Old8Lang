@@ -120,13 +120,13 @@ public partial class VirtualMachine
             case "__for_in_unpack":
             {
                 // 多标识符 for-in（for k, v in ...）的绑定辅助。
-                // 参数：[collection, item, arity]
+                // 参数：[collection, item, arity] —— args[0]（原集合）已不再参与解构，
+                // 但字节码调用点仍在传递它，保留该形参位置以免改动指令编码。
                 if (args.Length < 3)
                 {
                     return new List<object?>();
                 }
 
-                var collection = args[0];
                 var item = args[1];
                 int arity = Convert.ToInt32(args[2]);
 
@@ -135,6 +135,21 @@ public partial class VirtualMachine
                 // 因此需要按嵌套结构展开到 arity 个元素。
                 if (item is System.Runtime.CompilerServices.ITuple tupleValue)
                 {
+                    // 长度恰好等于 arity 时按位取，不走嵌套展开：
+                    // FlattenVmTuple 会把「最后一个元素本身是元组」的情形递归展开，
+                    // 而 (键, 值) 这种二元组的第二个元素恰恰可能是元组（字典的值是元组，
+                    // 或 for a, b in [(1, (2, 3))] 这类写法），展开会取错元素。
+                    if (tupleValue.Length == arity)
+                    {
+                        var exact = new List<object?>(arity);
+                        for (int i = 0; i < arity; i++)
+                        {
+                            exact.Add(tupleValue[i]);
+                        }
+
+                        return exact;
+                    }
+
                     var flattened = FlattenVmTuple(tupleValue);
                     if (flattened.Count >= arity)
                     {
@@ -164,11 +179,17 @@ public partial class VirtualMachine
                     return values;
                 }
 
-                // 情况二：迭代字典产出的是键，第二个变量取对应的值
-                if (arity == 2 && collection is IDictionary dictionary && item is not null &&
-                    dictionary.Contains(item))
+                // 情况二：元素是 Old8Lang 自身的序列值（元组、列表等只实现 ILangList，
+                // 既不是 IList 也不是 ITuple）。字典字面量在虚拟机上走 NewDict 产出 .NET
+                // Dictionary，但经 ConvertDictToLangValueType 之类的路径回到栈上时会是
+                // DictionaryLangValue，其 GetItems() 产出的正是 TupleLangValue。
+                if (item is ILangList itemLangList)
                 {
-                    return new List<object?> { item, dictionary[item] };
+                    var langItems = itemLangList.GetItems().ToList();
+                    if (langItems.Count >= arity)
+                    {
+                        return langItems.GetRange(0, arity).Cast<object?>().ToList();
+                    }
                 }
 
                 throw new TypeError(new SourcePosition(),
