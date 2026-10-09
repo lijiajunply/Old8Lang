@@ -154,13 +154,13 @@ dotnet run --project Old8Lang.App -- -il services/api_server.old8
 dotnet run --project Old8Lang.App -- -vm scripts/app.old8
 
 # 编译为字节码
-dotnet run --project Old8Lang.App -- compile-bytecode scripts/app.old8 -o app.o8bc
+dotnet run --project Old8Lang.App -- -compile scripts/app.old8 app.o8c
 
 # 执行字节码
-dotnet run --project Old8Lang.App -- execute-bytecode app.o8bc
+dotnet run --project Old8Lang.App -- -execute app.o8c
 ```
 
-**⚠️ 注意**: VM 模式目前处于实验阶段，虽然功能已完整实现，但建议在生产环境中谨慎使用。
+**⚠️ 注意**: VM 模式仍有限制（异步生成器、`async for-in` 等不可用），详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md#虚拟机模式)。
 
 ### 性能对比示例
 
@@ -977,10 +977,8 @@ old8lang cert generate -n "Production Certificate" -e production@company.com -o 
 
 ## 相关文档
 
-- [PackageService API 文档](./PACKAGE_SERVICE_USAGE.md)
-- [包格式规范](./PACKAGE_FORMAT.md)
-- [证书管理最佳实践](./CERTIFICATE_BEST_PRACTICES.md)
-- [Old8Lang 项目配置](./PROJECT_CONFIG.md)
+- [包开发与发布指南](./ADVANCED_TOPICS.md#包开发和发布指南) - 包结构、`o8package.json` 配置、依赖管理与发布
+- [环境配置](./ENVIRONMENT_GUIDE.md) - `o8package.json` 环境段与 `.old8env` 变量加载
 
 ---
 

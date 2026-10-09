@@ -36,7 +36,7 @@ dotnet run --project Old8Lang.App -- --version
 
 ### Q: 如何配置 VS Code 支持 Old8Lang?
 
-**A**: 参考 [LSP_VSCode_Documentation.md](LSP_VSCode_Documentation.md) 配置 Language Server Protocol 支持,获得语法高亮、自动补全等功能。
+**A**: 参考 [开发工具 · Language Server 与 VSCode 扩展](DEVELOPER_TOOLS.md#language-server-和-vscode-扩展) 配置 Language Server Protocol 支持,获得语法高亮、自动补全等功能。
 
 ---
 
@@ -153,7 +153,7 @@ c <- "hello"     // 推断为 string
 d <- {1, 2, 3}   // 推断为 list<int>
 ```
 
-详细文档: [TypeInference.md](TypeInference.md)
+详细文档: [渐进式类型推断系统](ADVANCED_TOPICS.md#渐进式类型推断系统)
 
 ### Q: 如何禁用类型推断?
 
@@ -238,9 +238,9 @@ func validateAge(age:int) -> void {
 
 1. **使用 IL 模式** (`-il`) 而非解释器模式
 2. **添加类型标注** 到所有函数
-3. **使用性能分析器** 找到热点:
+3. **使用性能监控** 找到热点:
    ```bash
-   dotnet run --project Old8Lang.App -- -f code.old8 --profile
+   dotnet run --project Old8Lang.App -- -f code.old8 --perf
    ```
 4. **优化算法** 降低时间复杂度
 5. **选择合适的数据结构** (数组/列表/字典)
@@ -249,13 +249,18 @@ func validateAge(age:int) -> void {
 
 ### Q: 如何进行性能分析?
 
-**A**: 使用内置性能分析器:
+**A**: 两条路径：
 
 ```bash
-dotnet run --project Old8Lang.App -- -f mycode.old8 --profile
-```
+# 1. 命令行开关：输出执行时间、内存、GC、变量查找次数、缓存命中率与对象池统计
+dotnet run --project Old8Lang.App -- -f mycode.old8 --perf
 
-生成的报告位于 `profiler-report-{timestamp}.txt`
+# 2. 交互式会话里的 profile 命令：按函数聚合的诊断（热点排序）
+profile start mycode.old8    # 开始分析
+profile status               # 查看状态
+profile stop                 # 结束并输出报告
+profile clear                # 清除会话
+```
 
 ### Q: 并发编程时如何提升性能?
 
@@ -377,7 +382,7 @@ import "MyCustomLib"     // 导入自定义库
 - 错误诊断
 - 跳转定义
 
-配置方法: [LSP_VSCode_Documentation.md](LSP_VSCode_Documentation.md)
+配置方法: [开发工具 · Language Server 与 VSCode 扩展](DEVELOPER_TOOLS.md#language-server-和-vscode-扩展)
 
 ### Q: 如何调试 Old8Lang 代码?
 
@@ -387,7 +392,7 @@ import "MyCustomLib"     // 导入自定义库
 dotnet run --project Old8Lang.App -- -f mycode.old8 --debug
 ```
 
-详细文档: [DEBUGGER_GUIDE.md](DEBUGGER_GUIDE.md)
+详细文档: [开发工具 · 调试器](DEVELOPER_TOOLS.md#调试器)
 
 ### Q: 如何运行测试?
 
@@ -421,7 +426,7 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 
 ### Q: Old8Lang 支持模式匹配吗?
 
-**A**: 支持。详见 [PatternMatching.md](PatternMatching.md)
+**A**: 支持。详见 [模式匹配](LANGUAGE_FEATURES.md#模式匹配)
 
 ```old8
 match value {
@@ -459,13 +464,13 @@ func greet(name:string, age:int) -> void {
 greet(age: 25, name: "Alice")  // 命名参数,可以乱序
 ```
 
-详见: [NamedArguments.md](NamedArguments.md)
+详见: [命名参数](LANGUAGE_FEATURES.md#命名参数)
 
 ### Q: Old8Lang 支持泛型吗?
 
 **A**: 支持泛型类型推断,但不支持用户定义泛型类。详见:
-- [GenericTypeInference.md](GenericTypeInference.md)
-- [GenericCollections.md](GenericCollections.md)
+- [泛型类型推断](LANGUAGE_FEATURES.md#泛型类型推断)
+- [泛型集合](LANGUAGE_FEATURES.md#泛型集合)
 
 ### Q: 如何处理 JSON 数据?
 

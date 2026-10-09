@@ -380,7 +380,7 @@ dotnet test --collect:"XPlat Code Coverage"
 ### 文档规范
 
 **Markdown 格式**:
-```markdown
+````markdown
 # 标题
 
 ## 子标题
@@ -393,13 +393,13 @@ dotnet test --collect:"XPlat Code Coverage"
 
 `代码`
 
-​```old8
+```old8
 // 代码块
 func example() -> void {
     PrintLine("Hello")
 }
-​```
 ```
+````
 
 **更新 CHANGELOG**:
 
@@ -448,12 +448,12 @@ func example() -> void {
 实际发生了什么。
 
 **最小可重现示例**
-​```old8
+```old8
 // 最小的代码示例
 func test() -> void {
     // ...
 }
-​```
+```
 
 **环境**
 - Old8Lang 版本: [例如 v1.0.0]
@@ -478,13 +478,13 @@ IL 模式下,使用默认参数的函数调用时报类型错误。
 3. 观察到类型错误
 
 **代码**
-​```old8
+```old8
 func greet(name:string, prefix: "Hello") -> string {
     return prefix + ", " + name
 }
 
 result <- greet("World")
-​```
+```
 
 **预期行为**
 应该输出 "Hello, World"
@@ -519,12 +519,12 @@ result <- greet("World")
 您考虑过的其他解决方案或功能。
 
 **示例代码**
-​```old8
+```old8
 // 期望的语法示例
 func example() -> void {
     // ...
 }
-​```
+```
 
 **额外信息**
 其他相关信息或截图。

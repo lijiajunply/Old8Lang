@@ -56,7 +56,7 @@ public partial class BytecodeVisitor
     /// </summary>
     /// <remarks>
     /// key 为解释器模式下 <c>LangInterpreter</c> 注册的全局对象名，value 为错误信息中展示的特性描述。
-    /// 支持矩阵见 Docs/MODE_COMPLETION_STATUS.md。
+    /// 支持矩阵见 Docs/MODE_SUPPORT.md。
     ///
     /// <c>Task</c> / <c>Thread</c> / <c>Assert</c> 三者在虚拟机下部分可用，但只能写成
     /// <c>类名.方法(...)</c> 的调用形式（由 <c>VisitOperation</c> 的静态类分支处理），

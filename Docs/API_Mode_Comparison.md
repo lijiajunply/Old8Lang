@@ -3,7 +3,7 @@
 **最后更新**: 2026年10月8日
 
 > **说明**：本文档对比的是三种模式的内部实现机制，不是支持矩阵。
-> 各特性的实际可用性请以 [MODE_COMPLETION_STATUS.md](./MODE_COMPLETION_STATUS.md) 为准
+> 各特性的实际可用性请以 [MODE_SUPPORT.md](./MODE_SUPPORT.md) 为准
 > （该文档已于 2026-10-08 按三种模式的实际运行结果全量复核）。
 
 本文档详细对比了 Old8Lang 在 **解释器模式**、**IL 模式** 和 **虚拟机模式** 下的内部 API（全局函数、标准库、基本类型方法）的实现机制与差异。
@@ -155,6 +155,6 @@ VM 使用显式的异常表指令结构，而不是 C# 的 `try-catch` 块：
 
 **相关文档**:
 - [Old8Lang 语法文档](Old8Lang_Grammar.md)
-- [模式支持总结](Mode_Support_Summary.md)
-- [编译器 TODO](TODO_Compiler.md)
-- [虚拟机 TODO](TODO_VirtualMachine.md)
+- [模式支持矩阵](MODE_SUPPORT.md)
+- [IL 模式测试 TODO](../Old8Lang.Tests/Compiler/TODO.md)
+- [虚拟机模式已知限制](MODE_SUPPORT.md#虚拟机模式)

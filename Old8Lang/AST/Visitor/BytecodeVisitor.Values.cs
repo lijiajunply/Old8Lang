@@ -720,7 +720,7 @@ public partial class BytecodeVisitor
         throw new NotSupportedException("SuperProxy 不应该在字节码模式中直接访问");
     }
     // 以下静态类在解释器模式下由 LangInterpreter 注册为全局对象，字节码模式尚未提供对应实现，
-    // 详见 Docs/MODE_COMPLETION_STATUS.md 的支持矩阵。这里显式报错以指明真实原因。
+    // 详见 Docs/MODE_SUPPORT.md 的支持矩阵。这里显式报错以指明真实原因。
 
     public Instruction? VisitTaskClassLangValue(TaskClassLangValue node) =>
         throw new VmUnsupportedError(node, "Task 静态 API（Task.Delay / Task.WhenAll / Task.WhenAny）");

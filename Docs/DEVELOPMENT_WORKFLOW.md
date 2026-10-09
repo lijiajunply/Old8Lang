@@ -141,7 +141,7 @@ IL 模式的问题往往出在生成出来的 IL 上，而不是源代码逻辑�
 
 - 用 `Old8Lang.Benchmarks` 项目做基准测试：`dotnet run --project Old8Lang.Benchmarks --configuration Release`。
 - 关注内存占用与执行时间；大数据量操作尤其要留意。
-- 优化建议与既有优化技术栈见 [PERFORMANCE_GUIDE.md](./PERFORMANCE_GUIDE.md)、[PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md)。
+- 优化建议、既有优化技术栈与监控 API 见 [PERFORMANCE_GUIDE.md](./PERFORMANCE_GUIDE.md)。
 
 ---
 

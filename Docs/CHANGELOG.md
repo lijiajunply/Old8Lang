@@ -1,5 +1,105 @@
 # 更新记录
 
+## 文档：性能文档三合一，ARCHITECTURE §14 改为指针 (2026-10-09)
+
+`PERFORMANCE_GUIDE.md`（768 行）与 `PERFORMANCE_OPTIMIZATION.md`（591 行）**标题都叫
+「Old8Lang 性能优化指南」**，读者无法判断该看哪份；`PERFORMANCE_BEST_PRACTICES.md`（115 行）
+是第三份且全仓库无人引用；`ARCHITECTURE.md` 的 §14「性能优化架构」（344 行）则与
+`PERFORMANCE_OPTIMIZATION.md` 几乎逐字重复——同样的 `126ms/32ms/30ms/4.87MB` 数字、
+同样的零拷贝/内存池/字符串缓存/`ParserPerformanceMetrics` 说明。
+
+### 变更
+
+- 三份合并为 `Docs/PERFORMANCE_GUIDE.md`，分「第一部分 · 写代码」与「第二部分 · 运行时内部优化」。
+  合并后 1056 行（原三份合计 1474 行），删去的部分是重复的执行模式选择、性能监控 CLI 命令
+  与内存管理建议（三份各写了一遍）。
+- `ARCHITECTURE.md` §14 由 344 行压缩为 13 行：保留一层「解析器 / 解释器 / 监控」的技术与实现位置对照表，
+  细节指向 `PERFORMANCE_GUIDE.md`。
+- 顺带修掉合并范围内跑不通的示例（该文件代码块通过率 **10/34 → 33/33**）：
+  - `let x = 0` → `x <- 0`、`function f()` → `func f()`；
+  - `for (let i = 0; i < n; i = i + 1)` → `for i <- 0, i < n, i++`；
+  - `for i in 0..1000` → `for i in [0~1000]`（含以变量为边界的 5 处，共 21 处）；
+  - `Add(list, x)` → `list.Add(x)`、`Contains(list, x)` → `list.Contains(x)`、
+    `Join(parts, sep)` → `parts.Join(sep)`、`Count(data)` → `data.Count()`——
+    这四个都是**列表实例方法**，文档此前当成全局函数调用；
+  - `--profile` 不存在（`-f` 只认 `--perf`/`--perf-detailed`/`--perf-output`），
+    交互式会话里另有 `profile start` 命令；
+  - 删除了用 `GetCurrentTimeMs()` 计时的示例——**该函数不存在**，改为展示 `--perf` 的实测输出。
+
+### 关于「优化前后」的数字
+
+旧文档给过一组优化后快照（500/3000/5000 行 → 126/32/30 ms）。2026-10-09 用 `-s` 冷启动口径
+复测约为 **41/53/64 ms**，与那组数字差异很大，无法互相印证（测量口径、样本、是否预热均不明）。
+合并后的文档不再照抄历史快照，改为给出「以本机 `Old8Lang.Benchmarks` 现场测量为准」并说明差异。
+
+### 引用更新
+
+`DEVELOPMENT_WORKFLOW.md`、`README.md` 中的路径已指向合并后的 `PERFORMANCE_GUIDE.md`。
+## 文档：模式支持矩阵合并为一份 (2026-10-09)
+
+`MODE_COMPLETION_STATUS.md`（486 行）与 `Mode_Support_Summary.md`（295 行）写的是同一件事——
+三种执行模式的特性可用性。两份是 2026-10-08 同一次复核的产物，互相链接、共享同一批实测数据，
+但已经出现互相矛盾的单元格：`Mode_Support_Summary.md` 的虚拟机列仍把泛型类、函数装饰器标为 ❌，
+而 `MODE_COMPLETION_STATUS.md` 标 ✅。`MODE_COMPLETION_STATUS.md` 自身也不自洽——功能表把闭包写回
+标为 ⚠️「不可用」，同一份文件的已知限制却写着「自 2026-10-09 起支持」。
+
+### 变更
+
+- 合并为 `Docs/MODE_SUPPORT.md`，明确为模式可用性的唯一权威说明。
+- 合并前逐格 diff 两份表，对 7 处冲突单元格重新编写用例，在 `-f` / `-il` / `-vm` 下实测裁决：
+
+  | 功能 | 旧标记 | 实测结论 |
+  |-----|-------|---------|
+  | 泛型类（虚拟机） | 两份冲突（❌ / ✅） | ✅ `Box<int>()` + `set`/`get` 得 `42` |
+  | 函数装饰器（虚拟机） | 两份冲突（❌ / ✅） | ✅ `@twice` 包装的 `inc(10)` 得 `12` |
+  | Match 表达式（虚拟机） | ⚠️「无法判定」 | ✅ 三种模式均输出 `two`（旧文档示例漏了 `case` 关键字） |
+  | 异步生成器（虚拟机） | 两份冲突（❌ / ✅） | ❌ 报 `STATE_ERROR` 求值栈为空（`IteratorMoveNext`） |
+  | `async for-in`（虚拟机） | 两份冲突（❌ / ✅） | ❌ 与异步生成器是同一处缺陷 |
+  | 闭包写回外层局部变量（虚拟机） | 同文件自相矛盾（⚠️ / ✅） | ✅ 闭包内两次写回后外层读出 `2` |
+  | 闭包写回外层局部变量（解释器 / IL） | 两份均未列 | ❌ lambda 写回得 `0`；**具名嵌套函数**三种模式都得 `2` |
+
+- 补齐旧文档 5 处标为「本次未单独验证」的单元格：`#undef`、`#if`/`#elif`/`#else`/`#endif`、
+  条件表达式（`&&` `||` `!`）、命令行 `-D` 在虚拟机下均实测通过。
+- 顺带修正 `-D` 的用法：**必须写在文件名之后**（`-f file.old8 -D SYMBOL`），
+  `FromFileCommand` 把 `args[0]` 当文件名，`-D` 放在前面会被当成源代码。
+
+### 顺带发现的既有问题（未修，已记入 `MODE_SUPPORT.md` 的已知限制）
+
+- 虚拟机模式下异步生成器与 `async for-in` 不可用（`STATE_ERROR` 求值栈为空，指令 `IteratorMoveNext`）。
+- 解释器与 IL 模式下 **lambda** 写回外层变量不传回（虚拟机传回），而具名嵌套函数三种模式都传回。
+- `new` 关键字三种模式都不存在，但 `LANGUAGE_FEATURES.md` 与 `Old8Lang_Grammar.md` 的示例在用它
+  （解析报 `无法识别的主表达式类型 'New'`）。
+
+### 核查中发现的死代码
+
+合并时逐项验证「其他特性」表里的四项虚拟机专属能力，发现三项与文档不符：
+
+| 项 | 文档原标记 | 实况 |
+|----|-----------|------|
+| `VMDebugger`（调试器） | 虚拟机 ✅ | **全仓库无调用点**。真正的调试器是解释器侧的 `Old8Lang.Debugger.Debugger` + `DebuggableInterpreter`，入口 `debug-start` |
+| `VMProfiler`（性能分析器） | 虚拟机 ✅ | **全仓库无调用点**。真正的分析器是解释器侧的 `ProfilerManager`，入口 `profile start` |
+| `Disassembler`（字节码反汇编器） | 虚拟机 ✅ | **全仓库无调用点** |
+| `BytecodeFile`（字节码序列化） | 虚拟机 ✅ | 属实：`-compile` 产出、`-execute` 载入，有 CLI 与测试覆盖 |
+
+原表的 ✅ 是照抄类名而非验证可达性，已按实况修正。三个死代码类**未删除**（改动源码超出文档范围），
+但已在 `MODE_SUPPORT.md` 的已知限制中记录。
+
+### 顺带修正的命令名与参数
+
+- `compile-bytecode <file> -o <out>` / `execute-bytecode <out>` → 实际是
+  `-compile <输入.old8> <输出.o8c>` / `-execute <文件.o8c>`（见 `-compile -h`）。
+  出现在 `ARCHITECTURE.md`、`CLI_GUIDE.md`、`PERFORMANCE_GUIDE.md` 共 4 处。
+- `--vm <file>` 不存在，只有 `-vm`。
+- `-f ... --profile` 与 `-f ... -p` 都不存在（`-f` 只认 `--perf`/`--perf-detailed`/`--perf-output`；
+  `-p` 只在 `cert`/`publish`/`sign` 里是 `--password` 的简写）。出现在 `PERFORMANCE_GUIDE.md` 与 `FAQ.md`。
+- `ARCHITECTURE.md` 与 `CLI_GUIDE.md` 中「VM 模式功能已完整实现」的表述与实测不符，改为指向已知限制。
+
+### 引用更新
+
+`ROADMAP.md`、`README.md`、`API_Mode_Comparison.md` 以及两处源码注释
+（`BytecodeVisitor.Expressions.Basic.cs`、`BytecodeVisitor.Values.cs`）中的路径已改为 `MODE_SUPPORT.md`；
+`CHANGELOG.md` 中指向「虚拟机已知限制」的指引也已改指新文件。
+本文件 2026-10-08 的条目里叙述当时对旧文件做了什么的句子保留原样，那是当时的事实记录。
 ## 虚拟机闭包按引用捕获、字典遍历对齐、区间常量池下标修复 (2026-10-09)
 
 起因是复核「文档标为支持、却没测过」的空白：虚拟机侧没有闭包写捕获用例、没有字典
@@ -155,7 +255,7 @@
 - `func f() -> int { return await g() }` 报 `类型不匹配: 期望 int，但得到 IntLangValue`
   ——纯 `async`/`await` 加返回类型注解就会触发，`g` 是普通异步函数也一样。
   `CheckTypeMatch` 只按原始 CLR 类型匹配，不换算 `LangValueType`。已记入
-  `MODE_COMPLETION_STATUS.md` 的虚拟机已知限制。
+  `MODE_SUPPORT.md` 的虚拟机已知限制。
 
 ## 虚拟机模式函数装饰器支持 (2026-10-08)
 
