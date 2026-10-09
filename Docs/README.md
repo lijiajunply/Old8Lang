@@ -24,8 +24,6 @@
   - 形式化的语法定义，适合语言研究者和工具开发者。
 - **[标准库 API 参考 (API_REFERENCE.md)](./API_REFERENCE.md)**
   - 全局函数、数学/字符串/集合/文件/JSON 操作、并发原语。
-- **[反射 API (REFLECTION_API.md)](./REFLECTION_API.md)**
-  - 全局反射函数（`GetTypeInfo`/`InvokeMethod`/`CreateInstance` 等）与 `TypeLangValue` 实例方法。
 
 ### 🧩 执行模式
 
@@ -54,8 +52,6 @@
   - 新语法添加流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 问题排查。
 - **[测试指南 (TESTING_GUIDE.md)](./TESTING_GUIDE.md)**
   - 单元测试分档、`.old8` 测试文件规范、测试目录与测试报告要求。
-- **[贡献指南 (CONTRIBUTING.md)](./CONTRIBUTING.md)**
-  - 代码规范、提交规范、PR 流程。
 - **[开发路线图 (ROADMAP.md)](./ROADMAP.md)**
   - 方向性的当前重点与各领域待办入口。
 - **[变更日志 (CHANGELOG.md)](./CHANGELOG.md)**

@@ -233,7 +233,7 @@
 | `ToStr` / `ToInt` / `ToDouble` / `ToBool` | ✅ | ✅ | ✅ | |
 | 集合方法（`Add` `Remove` `Count` 等） | ✅ | ✅ | ✅ | |
 | 字符串方法（`Length` `ToUpper` `Split` 等） | ✅ | ✅ | ✅ | |
-| 反射函数与 `TypeLangValue` 实例方法 | ✅ | — | ⚠️ | 见 [REFLECTION_API.md](./REFLECTION_API.md) 的「模式差异和当前限制」 |
+| 反射函数与 `TypeLangValue` 实例方法 | ✅ | — | ⚠️ | 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) 的反射一节 |
 
 ### 15. 类型系统
 
@@ -340,7 +340,7 @@
 - [语法文档](./Old8Lang_Grammar.md) - 各语法的完整说明与模式标记
 - [EBNF 规范](./Old8Lang.ebnf) - 形式化语法定义
 - [API 模式实现对比](./API_Mode_Comparison.md) - 三种模式的内部实现机制差异
-- [反射 API](./REFLECTION_API.md) - 反射函数与模式差异
+- [API 参考](./API_REFERENCE.md) - 全局函数、实例方法与标准库模块
 - [开发路线图](./ROADMAP.md) - 方向性重点与各领域待办入口
 - [开发流程](./DEVELOPMENT_WORKFLOW.md) - 新语法如何依次落进三种模式
 

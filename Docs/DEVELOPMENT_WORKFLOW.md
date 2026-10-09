@@ -7,7 +7,7 @@
 
 - 测试怎么跑、测试文件怎么写：[TESTING_GUIDE.md](./TESTING_GUIDE.md)
 - 三种执行模式的对比与选择：[ARCHITECTURE.md §1.3](./ARCHITECTURE.md#13-执行模式-execution-modes)、[CLI_GUIDE.md](./CLI_GUIDE.md)
-- 代码规范与贡献流程：[CONTRIBUTING.md](./CONTRIBUTING.md)
+- 代码规范与提交规范：见本文第 9、10 节
 
 ---
 
@@ -145,12 +145,120 @@ IL 模式的问题往往出在生成出来的 IL 上，而不是源代码逻辑�
 
 ---
 
-## 9. 代码风格
+## 9. 代码规范
 
-通用的 C# 命名、代码风格与 XML 文档注释要求见 **[CONTRIBUTING.md § 代码规范](./CONTRIBUTING.md#代码规范)**，此处不重复。
+### 9.1 C# 代码规范
 
-Old8Lang 项目额外要求：
+**命名**：
 
-- 公共 API 必须有完整的 XML 文档注释，注释用中文，说明参数、返回值与可能抛出的异常。
+```csharp
+public class LangParser { }              // 类名 PascalCase
+public void ParseExpression() { }        // 方法名 PascalCase
+private int currentIndex;                // 私有字段 camelCase 或 _camelCase
+public string FileName { get; set; }     // 属性 PascalCase
+public const int MaxTokens = 1000;       // 常量 PascalCase
+```
+
+- 接口名以 `I` 开头（`IVisitor`、`ICommand`）
+- 异常类以 `Exception` 或 `Error` 结尾
+
+**风格**：即使只有一行语句也用大括号；用空行分隔逻辑块。
+
+```csharp
+if (condition)
+{
+    DoSomething();
+}
+```
+
+**导入与类型系统**：
+
+- `using` 按字母顺序排列，优先局部导入而非全局导入
+- 项目启用 `Nullable` 与 `ImplicitUsings`，目标框架 .NET 10.0
+- 命名空间结构遵循项目目录结构
+
+**XML 文档注释**：公共 API 必须写，注释用中文，说明参数、返回值与可能抛出的异常。
+
+```csharp
+/// <summary>
+/// 解析表达式并返回 AST 节点
+/// </summary>
+/// <param name="tokens">Token 列表</param>
+/// <returns>表达式 AST 节点</returns>
+/// <exception cref="SyntaxError">当语法不正确时抛出</exception>
+public Expression ParseExpression(List<LangToken> tokens)
+{
+    // ...
+}
+```
+
+### 9.2 Old8Lang 代码规范
+
+编写 `.old8` 文件时：
+
+```old8
+// 注释用 //，不是 #
+// 赋值用 <-
+value <- 10
+
+// 类型标注紧跟变量名
+name:string <- "Old8"
+
+// 函数定义保持一致的格式
+func add(a:int, b:int) -> int {
+    return a + b
+}
+```
+
+### 9.3 项目额外要求
+
+- 公共 API 必须有完整的 XML 文档注释。
 - 重要逻辑补行内注释。
 - 新增 AST 节点遵循第 2 节的规范；新增错误类型遵循第 3 节的规范。
+
+---
+
+## 10. 提交规范
+
+### Commit Message 格式
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**type 取值**：
+
+| type | 含义 |
+|------|------|
+| `feat` | 新功能 |
+| `fix` | Bug 修复 |
+| `docs` | 文档更新 |
+| `style` | 代码格式调整（不影响功能） |
+| `refactor` | 重构（既不修 Bug 也不加功能） |
+| `test` | 添加或修改测试 |
+| `chore` | 构建工具或辅助工具的变动 |
+
+**示例**：
+
+```
+feat(parser): 添加模式匹配语法支持
+
+实现了 match 表达式的解析和 AST 节点定义，支持基本模式与通配符模式。
+
+Closes #123
+```
+
+### 分支命名
+
+- `feature/feature-name` — 新功能
+- `fix/bug-description` — Bug 修复
+- `docs/documentation-update` — 文档更新
+- `refactor/component-name` — 重构
+
+### 更新 CHANGELOG
+
+CHANGELOG 的收录范围与写法见 [AGENTS.md 的 CHANGELOG 规则](../AGENTS.md#changelog-规则)，此处不重复。

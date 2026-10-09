@@ -28,6 +28,12 @@ Old8Lang（老八语言）是一种动态类型编程语言，具有类似 C#/Ja
 
 **标记格式**: `[解释器 | 编译器 | 虚拟机]`
 
+> **本文档只写语法。** 集合方法、内置函数、标准库模块的 API 清单已迁至
+> [API_REFERENCE.md](./API_REFERENCE.md)——那里是全局函数、实例方法与各模块方法的唯一出处。
+> 各特性在三种模式下的可用性见 [MODE_SUPPORT.md](./MODE_SUPPORT.md)。
+> 执行模式的命令行用法见 [CLI_GUIDE.md](./CLI_GUIDE.md)。
+
+
 ## 2. 词法规则
 
 ### 2.1 文件头指令
@@ -3393,68 +3399,9 @@ extern "script.py" {
 // dotnet run --project Old8Lang.App -- -f program.old8
 ```
 
-## 6. 集合操作
+## 6. 类型系统
 
-### 6.1 列表方法
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-list <- {1, 2, 3}
-
-list.Add(4)           // 添加元素
-list.Remove(2)        // 删除元素
-list.Clear()          // 清空列表
-list.Count()          // 获取元素数量
-list.Contains(2)      // 检查是否包含元素
-list.Join(",")        // 使用分隔符连接元素
-```
-
-### 6.2 数组方法
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-arr <- [1, 2, 3, 4, 5]
-
-arr.Length        // 获取长度
-arr.Reverse()     // 反转
-arr.Sort()        // 排序
-```
-
-### 6.3 字典方法
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-dict <- {"a": 1, "b": 2}
-
-dict.Add("c", 3)        // 添加
-dict.Remove("a")        // 删除
-dict.Clear()            // 清空
-dict.ContainsKey("a")   // 检查键
-dict.GetOrElse("x", 0)  // 获取或返回默认值
-```
-
-### 6.4 字符串方法
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-str <- "Hello, World"
-
-str.Length              // 长度
-str.ToUpper()           // 转大写
-str.ToLower()           // 转小写
-str.Substring(0, 5)     // 截取
-str.Contains("World")   // 检查包含
-str.Split(",")          // 分割
-str.Replace("World", "Old8")  // 替换
-```
-
-## 7. 类型系统
-
-### 7.1 动态类型
+### 6.1 动态类型
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3464,7 +3411,7 @@ x <- "hello" // 改变为 string，推断为 string
 x <- 3.14    // 改变为 double
 ```
 
-### 7.2 类型注解
+### 6.2 类型注解
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3481,7 +3428,7 @@ func add(a:int, b:int) -> int {
 x <- "hello"  // ❌ 类型不匹配
 ```
 
-### 7.3 泛型集合类型 (Generic Collection Types)
+### 6.3 泛型集合类型 (Generic Collection Types)
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3492,7 +3439,7 @@ Old8Lang 支持泛型集合类型注解，提供编译时类型检查。
 - `array<T>`：数组，单类型参数
 - `dict<K,V>`：字典，双类型参数（键类型和值类型）
 
-#### 7.3.1 基本用法
+#### 6.3.1 基本用法
 
 ```old8
 // 列表：list<T>
@@ -3508,7 +3455,7 @@ ages:dict<string, int> <- {"Alice": 30, "Bob": 25}
 mapping:dict<int, string> <- {1: "one", 2: "two"}
 ```
 
-#### 7.3.2 嵌套泛型类型
+#### 6.3.2 嵌套泛型类型
 
 ```old8
 // 嵌套列表：list<list<T>>
@@ -3524,7 +3471,7 @@ groups:dict<string, list<int>> <- {
 arrays:list<array<int>> <- {[1, 2], [3, 4]}
 ```
 
-#### 7.3.3 编译时类型检查
+#### 6.3.3 编译时类型检查
 
 在**IL 模式** (`-il`) 下，泛型集合类型会进行严格的类型检查：
 
@@ -3544,7 +3491,7 @@ ages:dict<string, int> <- {"Alice": 30, "Bob": "twenty-five"}
 // 编译错误：变量 'ages' 字典值类型不匹配: 第 1 个值期望类型 int,实际类型 string
 ```
 
-#### 7.3.4 向后兼容性
+#### 6.3.4 向后兼容性
 
 在**解释器模式** (`-f`) 下，泛型类型注解是可选的：
 
@@ -3562,7 +3509,7 @@ items:list<int> <- {1, 2, 3}       // ✅ 两种模式都支持
 - 泛型类型注解是可选特性，不强制使用
 - IL 模式提供更严格的类型安全，解释器模式保持灵活性
 
-### 7.4 联合类型 (Union Types)
+### 6.4 联合类型 (Union Types)
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3640,7 +3587,7 @@ map: Map<string, int | string> <- {"age": 25, "name": "Alice"}
 - `A` 兼容于 `A | B`（任一成员类型可以赋值给联合类型）
 - `null` 兼容于任何包含可空类型的联合类型（如 `int? | string?`）
 
-### 7.5 交叉类型 (Intersection Types)
+### 6.5 交叉类型 (Intersection Types)
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3691,7 +3638,7 @@ handler: ILogger & IMetrics <- MyHandler()
 - 交叉类型主要用于接口组合，不能对基础类型（如 `int & string`）使用
 - 在泛型约束中，`&` 和 `|` 都表示"且"关系（历史原因），但在类型注解中有明确区分
 
-### 7.6 类型转换
+### 6.6 类型转换
 
 **模式支持**: `[✅ | ✅ | ✅]`
 
@@ -3707,505 +3654,9 @@ d <- c as int         // string → int
 // bool ↔ string ("true"/"false")
 ```
 
-## 8. 常用内置函数
+## 7. 示例代码
 
-### 8.1 输出函数
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-Print("Hello")      // 输出文本，无换行
-PrintLine("Hello")  // 输出文本，有换行
-```
-
-### 8.2 类型转换函数
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-```old8
-value.ToStr()       // 转换为字符串
-value.ToInt()       // 转换为整数
-value.ToDouble()    // 转换为浮点数
-value.ToBool()      // 转换为布尔值
-```
-
-### 8.3 数学函数（需导入 MathLib）
-
-**模式支持**: `[✅ | ❌ | ❌]`
-
-> **复核说明**（2026-10-08 实测）：本节的 `extern "Old8LangLib" MathLib *` 写法在三种模式下
-> 结果不一致——解释器模式 `Sqrt(16)` 得 `4`；IL 模式报 `名称 'Sqrt' 未定义`；
-> 虚拟机模式报 `方法 'Sqrt' 未找到`。故标记由 `[✅ | ✅ | ✅]` 修正为 `[✅ | ❌ | ❌]`。
-> 无需导入即可使用的数学函数不受影响（如 `Math.Abs` 一类的内置全局函数）。
-
-```old8
-extern "Old8LangLib" MathLib *
-
-result <- Sqrt(16)          // 平方根
-result <- Pow(2, 3)         // 幂运算
-result <- Sin(1.57)         // 正弦
-result <- Abs(-42)          // 绝对值
-result <- Floor(3.7)        // 向下取整
-result <- Ceil(3.2)         // 向上取整
-```
-
-### 8.4 并发原语函数（内置全局函数）
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-Old8Lang 提供了一套完整的并发原语全局函数，无需导入即可使用：
-
-#### 8.4.1 Mutex（互斥锁）
-
-```old8
-// 创建互斥锁
-mutex <- MutexCreate()
-
-// 加锁
-MutexLock(mutex)
-
-// 尝试加锁（带超时）
-success <- MutexTryLock(mutex, 1000)  // 超时时间：毫秒
-
-// 解锁
-MutexUnlock(mutex)
-
-// 释放资源
-MutexDispose(mutex)
-```
-
-#### 8.4.2 Semaphore（信号量）
-
-```old8
-// 创建信号量（初始计数，最大计数）
-sem <- SemaphoreCreate(1, 3)
-
-// 获取信号
-SemaphoreAcquire(sem)
-
-// 尝试获取信号（带超时）
-success <- SemaphoreTryAcquire(sem, 1000)
-
-// 释放信号
-SemaphoreRelease(sem)
-
-// 释放资源
-SemaphoreDispose(sem)
-```
-
-#### 8.4.3 AtomicInt（原子整数）
-
-```old8
-// 创建原子整数
-atomic <- AtomicIntCreate(0)
-
-// 获取值
-value <- AtomicIntGet(atomic)
-
-// 设置值
-AtomicIntSet(atomic, 10)
-
-// 原子递增/递减
-newValue <- AtomicIntIncrement(atomic)
-newValue <- AtomicIntDecrement(atomic)
-
-// 原子加法
-newValue <- AtomicIntAdd(atomic, 5)
-
-// 比较并交换（CAS）
-success <- AtomicIntCompareAndSet(atomic, 10, 20)
-
-// 释放资源
-AtomicIntDispose(atomic)
-```
-
-#### 8.4.4 Channel（通道）
-
-```old8
-// 创建无界通道
-ch <- ChannelCreate()
-
-// 创建有界通道
-boundedCh <- ChannelCreateBounded(10)
-
-// 发送数据
-ChannelSend(ch, "Hello")
-
-// 尝试发送（带超时）
-success <- ChannelTrySend(ch, "World", 1000)
-
-// 接收数据
-data <- ChannelReceive(ch)
-
-// 尝试接收（带超时）
-data <- ChannelTryReceive(ch, 1000)  // 超时返回 null
-
-// 关闭通道
-ChannelClose(ch)
-
-// 释放资源
-ChannelDispose(ch)
-```
-
-#### 8.4.5 ReadWriteLock（读写锁）
-
-```old8
-// 创建读写锁
-rwLock <- ReadWriteLockCreate()
-
-// 读锁
-ReadLockAcquire(rwLock)
-// ... 读操作
-ReadLockRelease(rwLock)
-
-// 写锁
-WriteLockAcquire(rwLock)
-// ... 写操作
-WriteLockRelease(rwLock)
-
-// 尝试获取读锁（带超时）
-success <- ReadLockTryAcquire(rwLock, 1000)
-
-// 尝试获取写锁（带超时）
-success <- WriteLockTryAcquire(rwLock, 1000)
-
-// 释放资源
-ReadWriteLockDispose(rwLock)
-```
-
-#### 8.4.6 CountDownLatch（倒计时锁）
-
-```old8
-// 创建倒计时锁（初始计数）
-latch <- CountDownLatchCreate(3)
-
-// 减少计数
-CountDownLatchCountDown(latch)
-
-// 等待计数归零
-CountDownLatchWait(latch)
-
-// 带超时的等待
-success <- CountDownLatchWaitTimeout(latch, 5000)
-
-// 获取当前计数
-count <- CountDownLatchGetCount(latch)
-
-// 释放资源
-CountDownLatchDispose(latch)
-```
-
-#### 8.4.7 CyclicBarrier（循环栅栏）
-
-```old8
-// 创建循环栅栏（参与者数量）
-barrier <- CyclicBarrierCreate(3)
-
-// 等待所有参与者到达
-CyclicBarrierAwait(barrier)
-
-// 带超时的等待
-success <- CyclicBarrierAwaitTimeout(barrier, 5000)
-
-// 获取参与者数量
-count <- CyclicBarrierGetParticipantCount(barrier)
-
-// 获取当前等待数量
-waiting <- CyclicBarrierGetWaitingCount(barrier)
-
-// 释放资源
-CyclicBarrierDispose(barrier)
-```
-
-#### 8.4.8 CancellationTokenSource（取消令牌源）
-
-```old8
-// 创建取消令牌源
-cts <- CreateCancellationTokenSource()
-
-// 请求取消
-Cancel(cts)
-
-// 延时取消
-CancelAfter(cts, 5000)  // 5秒后取消
-
-// 释放资源
-DisposeCancellationTokenSource(cts)
-```
-
-#### 8.4.9 并发工具函数
-
-```old8
-// 休眠（毫秒）
-Sleep(1000)
-
-// 获取当前线程 ID
-threadId <- GetCurrentThreadId()
-
-// 获取处理器数量
-processors <- GetProcessorCount()
-```
-
-### 8.5 反射系统函数（内置全局函数）
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-Old8Lang 提供了完整的反射系统，允许在运行时检查和操作类实例，包括访问私有成员。所有反射函数都是内置全局函数，无需导入即可使用。
-
-#### 8.5.1 类型信息查询
-
-```old8
-// 获取对象的类名
-className <- GetClassName(obj)
-
-// 获取类的所有方法名列表
-methods <- GetClassMethods(obj)
-
-// 获取类的所有字段名列表
-fields <- GetClassFields(obj)
-
-// 获取方法详细信息（返回字典）
-methodInfo <- GetMethodInfo(obj, "methodName")
-// 返回: {"name": "methodName", "isStatic": false, "isPublic": true, ...}
-
-// 获取字段详细信息（返回字典）
-fieldInfo <- GetFieldInfo(obj, "fieldName")
-// 返回: {"name": "fieldName", "isStatic": false, "isPrivate": true, ...}
-```
-
-#### 8.5.2 动态方法调用
-
-```old8
-// 动态调用方法（包括 private 方法）
-result <- InvokeMethod(obj, "methodName", {arg1, arg2, arg3})
-
-// 示例：调用公开方法
-person <- Person("Alice", 25)
-greeting <- InvokeMethod(person, "greet", {})
-
-// 示例：调用私有方法
-age <- InvokeMethod(person, "getAge", {})  // 可以调用 private 方法
-```
-
-#### 8.5.3 动态字段访问
-
-```old8
-// 动态获取字段值（包括 private 字段）
-value <- GetField(obj, "fieldName")
-
-// 动态设置字段值（包括 private 字段）
-SetField(obj, "fieldName", newValue)
-
-// 示例：访问私有字段
-name <- GetField(person, "name")  // 可以访问 private 字段
-SetField(person, "name", "Bob")   // 可以修改 private 字段
-```
-
-#### 8.5.4 动态实例创建
-
-```old8
-// 通过类名创建实例
-instance <- CreateInstance("ClassName", {arg1, arg2})
-
-// 示例：动态创建 Person 实例
-person <- CreateInstance("Person", {"Charlie", 30})
-```
-
-#### 8.5.5 类型检查
-
-```old8
-// 检查对象是否是指定类的实例
-isPerson <- IsInstanceOf(obj, "Person")
-
-// 检查对象是否有指定方法
-hasMethod <- HasMethod(obj, "methodName")
-
-// 检查对象是否有指定字段
-hasField <- HasField(obj, "fieldName")
-```
-
-#### 8.5.6 完整示例
-
-```old8
-class Person {
-    private name:string <- "Unknown"
-    private age:int <- 0
-
-    public init(n:string, a:int) -> void {
-        name <- n
-        age <- a
-    }
-
-    public greet() -> string {
-        return "Hello, I'm " + name
-    }
-
-    private getAge() -> int {
-        return age
-    }
-}
-
-person <- Person("Alice", 25)
-
-// 1. 获取类名
-className <- GetClassName(person)
-PrintLine("Class: " + className)  // 输出: Class: Person
-
-// 2. 获取方法和字段列表
-methods <- GetClassMethods(person)
-fields <- GetClassFields(person)
-PrintLine("Methods: " + methods.ToStr())  // 输出: Methods: {init, greet, getAge}
-PrintLine("Fields: " + fields.ToStr())    // 输出: Fields: {name, age}
-
-// 3. 获取方法/字段详细信息
-methodInfo <- GetMethodInfo(person, "greet")
-PrintLine(methodInfo.ToStr())  // 输出: {"name": "greet", "isStatic": false, "isPublic": true, ...}
-
-fieldInfo <- GetFieldInfo(person, "name")
-PrintLine(fieldInfo.ToStr())   // 输出: {"name": "name", "isStatic": false, "isPrivate": true}
-
-// 4. 动态调用方法（包括私有方法）
-result <- InvokeMethod(person, "greet", {})
-PrintLine(result)  // 输出: Hello, I'm Alice
-
-age <- InvokeMethod(person, "getAge", {})  // 可以调用私有方法
-PrintLine("Age: " + age.ToStr())  // 输出: Age: 25
-
-// 5. 动态访问字段（包括私有字段）
-name <- GetField(person, "name")  // 可以访问私有字段
-PrintLine("Name: " + name)  // 输出: Name: Alice
-
-SetField(person, "name", "Bob")  // 可以修改私有字段
-PrintLine(person.greet())  // 输出: Hello, I'm Bob
-
-// 6. 动态创建实例
-person2 <- CreateInstance("Person", {"Charlie", 30})
-PrintLine(person2.greet())  // 输出: Hello, I'm Charlie
-
-// 7. 类型检查
-isPerson <- IsInstanceOf(person, "Person")
-PrintLine("Is Person: " + isPerson.ToStr())  // 输出: Is Person: true
-
-hasGreet <- HasMethod(person, "greet")
-PrintLine("Has greet: " + hasGreet.ToStr())  // 输出: Has greet: true
-
-hasName <- HasField(person, "name")
-PrintLine("Has name: " + hasName.ToStr())  // 输出: Has name: true
-```
-
-#### 8.5.7 反射函数列表
-
-**类型信息查询（5 个函数）**：
-- `GetClassName(obj:object) -> string` - 获取对象的类名
-- `GetClassMethods(obj:object) -> list` - 获取类的所有方法名列表
-- `GetClassFields(obj:object) -> list` - 获取类的所有字段名列表
-- `GetMethodInfo(obj:object, methodName:string) -> dict` - 获取方法详细信息
-- `GetFieldInfo(obj:object, fieldName:string) -> dict` - 获取字段详细信息
-
-**动态方法调用（1 个函数）**：
-- `InvokeMethod(obj:object, methodName:string, args:list) -> object` - 动态调用方法（包括 private 方法）
-
-**动态字段访问（2 个函数）**：
-- `GetField(obj:object, fieldName:string) -> object` - 动态获取字段值（包括 private 字段）
-- `SetField(obj:object, fieldName:string, value:object) -> void` - 动态设置字段值（包括 private 字段）
-
-**动态实例创建（1 个函数）**：
-- `CreateInstance(className:string, args:list) -> object` - 通过类名创建实例
-
-**类型检查（3 个函数）**：
-- `IsInstanceOf(obj:object, className:string) -> bool` - 检查对象是否是指定类的实例
-- `HasMethod(obj:object, methodName:string) -> bool` - 检查对象是否有指定方法
-- `HasField(obj:object, fieldName:string) -> bool` - 检查对象是否有指定字段
-
-#### 8.5.8 重要说明
-
-**访问控制**：
-- 反射可以访问**所有成员**，包括 private 字段和方法
-- 反射绕过了正常的访问控制检查
-- 使用反射时需要谨慎，因为它破坏了封装性
-
-**模式支持**：
-- ✅ 解释器模式 (`-f`)：完全支持
-- ✅ IL 模式 (`-il`)：完全支持
-- ✅ 虚拟机模式 (`-vm`)：完全支持
-
-**类型注册**：
-- 类在定义时会自动注册到全局类型注册表
-- `CreateInstance` 通过类名查找已注册的类型
-- 只能创建已定义类的实例
-
-**使用场景**：
-- 动态插件系统
-- 序列化/反序列化
-- 依赖注入框架
-- 单元测试框架
-- 调试工具
-- ORM 框架
-
-## 9. 执行模式对比
-
-### 9.1 解释模式 (`-f`)
-
-**模式支持**: `[✅ | ❌ | ❌]`
-
-- 无需编译，直接执行
-- 支持完整的类型推断
-- 完整支持异步/多线程
-- 性能较低，适合开发调试
-
-```bash
-dotnet run --project Old8Lang.App -- -f program.old8
-```
-
-### 9.2 IL 模式 (`-il`)
-
-**模式支持**: `[❌ | ✅ | ❌]`
-
-- 编译为中间代码再执行
-- 需要完整的类型注解
-- 多线程支持良好
-- 异步功能部分支持
-- 性能较高，适合生产环境
-
-```bash
-dotnet run --project Old8Lang.App -- -il program.old8
-```
-
-### 9.3 虚拟机模式 (`-vm`)
-
-**模式支持**: `[❌ | ❌ | ✅]`
-
-- 编译为字节码后在虚拟机中执行
-- 支持字节码序列化和跨平台
-- 支持完整的泛型功能
-- 提供调试器和性能分析器
-- 性能介于解释模式和 IL 模式之间
-- 适合字节码分发和跨平台场景
-
-```bash
-dotnet run --project Old8Lang.App -- -vm program.old8
-```
-
-**虚拟机模式特有功能**:
-- 字节码编译和执行
-- 字节码序列化 (BytecodeFile)
-- 调试器 (VMDebugger) - 支持断点、单步执行、变量查看
-- 性能分析器 (VMProfiler) - 函数调用统计、热点分析
-- 反汇编器 (Disassembler) - 字节码反汇编
-
-### 9.4 语法检查模式 (`-s`)
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-仅检查语法，不执行代码：
-
-```bash
-dotnet run --project Old8Lang.App -- -s program.old8
-```
-
-## 10. 示例代码
-
-### 10.1 斐波那契数列
+### 6.1 斐波那契数列
 
 ```old8
 func fibonacci(n:int) -> int {
@@ -4219,7 +3670,7 @@ result <- fibonacci(10)
 PrintLine("F(10) = " + result.ToStr())
 ```
 
-### 10.2 类和继承
+### 6.2 类和继承
 
 ```old8
 class Shape {
@@ -4251,7 +3702,7 @@ circle <- Circle("MyCircle", 5.0)
 PrintLine("Area: " + circle.getArea().ToStr())
 ```
 
-### 10.3 异步编程
+### 6.3 异步编程
 
 ```old8
 async func downloadData() -> string {
@@ -4269,7 +3720,7 @@ task <- main()
 await task
 ```
 
-### 10.4 异常处理
+### 6.4 异常处理
 
 ```old8
 func divide(a:int, b:int) {
@@ -4289,39 +3740,7 @@ try {
 }
 ```
 
-## 11. 兼容性和局限
-
-### 11.1 已知限制
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-- 带默认参数的函数在 IL 模式下可能有运行时问题
-- 某些异步特性在 IL 模式下支持不完整
-- 泛型支持（仅解释器模式支持，IL 模式暂不支持）
-
-### 11.2 平台支持
-
-**模式支持**: `[✅ | ✅ | ✅]`
-
-- 基于 .NET 10.0 开发
-- 跨平台支持（Windows, Linux, macOS）
-- 与 C# 代码互操作
-
-## 12. 总结
-
-Old8Lang 是一个功能完整的动态类型语言，结合了脚本语言的灵活性和系统语言的性能。通过支持解释模式（`-f`）、IL 模式（`-il`）和虚拟机模式（`-vm`）三种执行模式，它既适合快速开发也适合生产环境。
-
-关键特性总结：
-- ✅ 动态类型与可选类型注解
-- ✅ 完整的面向对象支持（类、继承、Mixin、接口）
-- ✅ 泛型支持（泛型函数、泛型类）
-- ✅ 异步/等待模式
-- ✅ 多线程支持
-- ✅ 异常处理
-- ✅ 函数式编程（Lambda、高阶函数）
-- ✅ 丰富的集合操作
-
-## 预编译指令
+## 8. 预编译指令
 
 **模式支持**: `[✅ | ✅ | ✅]`
 

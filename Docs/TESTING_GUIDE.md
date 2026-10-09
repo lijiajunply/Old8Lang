@@ -7,7 +7,7 @@
 
 - 语法本身的定义：[Old8Lang.ebnf](./Old8Lang.ebnf)、[Old8Lang_Grammar.md](./Old8Lang_Grammar.md)
 - 开发流程（含新语法测试顺序的上下文）：[DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)
-- 贡献流程与代码规范：[CONTRIBUTING.md](./CONTRIBUTING.md)
+- 代码规范与提交规范：[DEVELOPMENT_WORKFLOW.md §9-§10](./DEVELOPMENT_WORKFLOW.md#9-代码规范)
 
 ---
 

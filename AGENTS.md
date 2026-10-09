@@ -44,6 +44,20 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
 以上规则的完整说明见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md)。
 
+## CHANGELOG 规则
+
+**`Docs/CHANGELOG.md` 只记录「语法」与「API」两类变更，且只做精简介绍。**
+
+- **要写的**：语言语法的新增与改动（关键字、运算符、语句形式）、
+  API 的新增与改动（全局函数、实例方法、标准库模块方法、命令行参数、配置项格式）、
+  跨模式的行为差异。
+- **不要写的**：实现细节与重构（内部机制、生成的代码形态、数据结构）、
+  测试数量与用例清单、文档整理、性能数据、文件路径级的技术说明——这些看 git log 即可。
+- **写法**：按版本或日期分节，每节分「语法」「API」两组，用一两句话说清**使用者看到的变化**；
+  不贴大段代码、不逐个罗列函数签名、不把已经能用的能力再数一遍。
+- **反例**：写「`MakeClosure` 原先把外层局部变量的当前值快照进闭包环境……」是实现说明，
+  应写成「闭包可写回外层局部变量」。
+
 ## 架构速览
 
 `LangParser` 把源码解析成 AST；同一棵 AST 由不同 Visitor 处理成三种执行方式——`InterpreterVisitor`（解释）、`CompilerVisitor`（生成 IL）、`BytecodeVisitor`（生成字节码），另有 `TypeInferenceVisitor` 做类型推断。四个 Visitor 都在 `Old8Lang/AST/Visitor/`，`IVisitor` 接口是自动生成的，新增 AST 节点后需要重新生成。
@@ -72,12 +86,13 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 | 文档 | 内容 |
 |------|------|
 | [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md) | **测试必读**：单测分档、`.old8` 文件规范、测试目录、测试报告 |
-| [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md) | **开发必读**：新语法流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 排查 |
+| [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md) | **开发必读**：新语法流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 排查、代码规范与提交规范 |
 | [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) | 架构总览 |
 | [Docs/CLI_GUIDE.md](Docs/CLI_GUIDE.md) | CLI 全量命令、包管理 |
-| [Docs/CONTRIBUTING.md](Docs/CONTRIBUTING.md) | 代码规范、提交规范、PR 流程 |
 | [Docs/LANGUAGE_FEATURES.md](Docs/LANGUAGE_FEATURES.md) | 语言特性 |
 | [Docs/Old8Lang_Grammar.md](Docs/Old8Lang_Grammar.md)、[Docs/Old8Lang.ebnf](Docs/Old8Lang.ebnf) | 语法参考 |
-| [Docs/API_REFERENCE.md](Docs/API_REFERENCE.md) | 标准库 API |
+| [Docs/API_REFERENCE.md](Docs/API_REFERENCE.md) | **API 唯一出处**：全局函数、实例方法、标准库模块方法 |
+| [Docs/MODE_SUPPORT.md](Docs/MODE_SUPPORT.md) | **模式必读**：三种模式逐行实测的支持矩阵与已知限制 |
 | [Docs/PERFORMANCE_GUIDE.md](Docs/PERFORMANCE_GUIDE.md) | 性能优化 |
+| [Docs/CHANGELOG.md](Docs/CHANGELOG.md) | 语法与 API 变更记录（收录规则见上文） |
 | [Docs/README.md](Docs/README.md) | 文档中心（全部文档的索引） |

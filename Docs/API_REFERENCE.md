@@ -1,2433 +1,621 @@
-# Old8Lang API 参考文档
+# Old8Lang API 参考
 
-本文档提供 Old8Lang 标准库的完整 API 参考。
+**最后更新**: 2026-10-09
+
+> **本文档已按源码与实测重建。**
+> 此前版本中大量内容与实现不符，最典型的两类错误是：
+> 把**实例方法写成全局函数**（如 `Substring("Hello",0,2)`、`Add(list,x)`——这些函数不存在），
+> 以及**标准库方法名与实现对不上**（如 `File.Read` 实际叫 `File.FileRead`，
+> `Time.Now` 实际叫 `Time.GetLocalTime`）。
+>
+> 重建办法：从 `Old8LangLib/`、`Old8Lang/GlobalFunctions/`、`Old8Lang/InstanceMethods/`
+> 与 `StandardLibraryRegistry` 提取真实签名，再抽样实跑验证。本文档中的方法名均取自实现。
+>
+> **注意**：用 `-s` 做语法检查**不能**发现这类错误——动态类型语言里未定义的函数照样通过解析。
+> 验证 API 是否存在必须实际运行（`-f`）。
+
+---
 
 ## 目录
 
-- [基础函数](#基础函数)
-- [控制台输入输出](#控制台输入输出)
-- [数学函数](#数学函数)
-- [字符串处理](#字符串处理)
-- [数组和列表操作](#数组和列表操作)
-- [类型转换](#类型转换)
-- [文件操作](#文件操作)
-- [JSON 操作](#json-操作)
-- [并发原语](#并发原语)
-  - [互斥锁 (Mutex)](#互斥锁-mutex)
-  - [信号量 (Semaphore)](#信号量-semaphore)
-  - [原子整数 (AtomicInt)](#原子整数-atomicint)
-  - [通道 (Channel)](#通道-channel)
-  - [读写锁 (ReadWriteLock)](#读写锁-readwritelock)
-  - [倒计时门闩 (CountDownLatch)](#倒计时门闩-countdownlatch)
-  - [循环栅栏 (CyclicBarrier)](#循环栅栏-cyclicbarrier)
-  - [取消令牌源 (CancellationTokenSource)](#取消令牌源-cancellationtokensource)
-- [实用工具函数](#实用工具函数)
+- [1. 三种调用形式](#1-三种调用形式)
+- [2. 全局函数（99 个）](#2-全局函数99-个)
+- [3. 实例方法](#3-实例方法)
+- [4. 标准库模块](#4-标准库模块)
+- [5. 资源管理](#5-资源管理)
+- [附录：与旧版文档的主要差异](#附录与旧版文档的主要差异)
 
 ---
 
-## 基础函数
+## 1. 三种调用形式
 
-### Print
-**签名**: `Print(value: object) -> void`
+Old8Lang 的 API 分三类，**调用形式各不相同**——这是旧版文档出错最多的地方。
 
-**描述**: 输出内容到控制台，不换行。
+### 1.1 全局函数：直接调用
 
-**参数**:
-- `value`: 要输出的值，会自动调用 `.ToStr()` 方法转换为字符串
+不带任何前缀，直接写函数名：
 
-**示例**:
-```old8lang
-Print("Hello")
-Print(123)
+```old8
+PrintLine("hello")
+m <- MutexCreate()
+n <- Len({1, 2, 3})
+t <- Type(42)          // "Int"
 ```
 
-### PrintLine
-**签名**: `PrintLine(value: object) -> void`
+### 1.2 实例方法：值 `.` 方法
 
-**描述**: 输出内容到控制台并换行。
+字符串、列表、字典、数组、元组、类型值的能力都挂在**值本身**上：
 
-**参数**:
-- `value`: 要输出的值
+```old8
+s <- "hello"
+s.ToUpper()            // "HELLO"
+s.Length()             // 5
+s.Substring(0, 2)      // "he"
 
-**示例**:
-```old8lang
-PrintLine("Hello World")
-PrintLine(42)
+l <- {1, 2, 3}
+l.Add(4)
+l.Count()              // 4
+l.Join(",")            // "1,2,3,4"
+
+d <- {"a": 1}
+d.ContainsKey("a")     // true
+d.GetOrElse("z", 0)    // 0
 ```
 
-### ReadLine
-**签名**: `ReadLine() -> string`
+> **不存在** `Length(s)`、`Substring(s,0,2)`、`Add(l,x)`、`Contains(s,x)` 这类全局形式，
+> 写了会报 `[NAME_ERROR] 名称 'X' 未定义`。
 
-**描述**: 从控制台读取一行输入。
+### 1.3 标准库：`import "模块"` 后 `模块.方法(...)`
 
-**返回值**: 用户输入的字符串
+模块名取注册名，方法名**与 C# 实现里的方法名完全一致**：
 
-**示例**:
-```old8lang
-name <- ReadLine()
-PrintLine("你好, " + name)
+```old8
+import "Math"
+Math.Sqrt(16.0)        // 4
+Math.GetPi()           // 3.141592653589793
+
+import "Time"
+Time.GetLocalTime("yyyy-MM-dd")
+
+import "Regex"
+Regex.RegexIsMatch("a1", "\\d+", false)   // true
 ```
+
+> 方法名与常见直觉不同：File 模块是 `File.FileRead` / `File.FileWrite` / `File.FileExists`，
+> 不是 `File.Read` / `File.Write` / `File.Exists`。以本文档第 4 节为准。
 
 ---
 
-## 控制台输入输出
+## 2. 全局函数（99 个）
 
-### Read
-**签名**: `Read() -> string`
+### 2.1 输出与输入
 
-**描述**: 读取单个字符输入。
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `Print` / `print` | `values...` | 输出，不换行 |
+| `PrintLine` / `printLine` | `values...` | 输出并换行 |
+| `ReadLine` / `readLine` | — | 读一行，返回 `string` |
+| `Input` / `input` | `prompt?` | 带提示地读一行 |
+| `Error` / `error` | `values...` | 输出到错误流 |
+| `Clear` / `clear` | — | 清屏 |
+| `ShowValues` / `showValues` | — | 转储当前全部变量（调试用） |
 
-**返回值**: 字符串形式的字符
+### 2.2 类型与转换
 
-### Clear
-**签名**: `Clear() -> void`
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `Type` / `type` | `value` | 返回值类型名，如 `"Int"`、`"String"`、`"List"`、`"Value"` |
+| `Len` / `len` | `value` | 集合长度 / 字符串长度 |
+| `int` / `Int` | `value` | 转整数 |
+| `double` / `Double` | `value` | 转浮点 |
+| `bool` / `Bool` | `value` | 转布尔 |
+| `char` / `Char` | `value` | 转字符 |
+| `ToObj` / `toObj` | `jsonString` | JSON 字符串转对象 |
+| `Dict` / `dict` | — | 创建空字典 |
+| `Tuple` / `tuple` | — | 创建空元组 |
+| `Range` / `range` | `start, end, step` | 构造范围值 |
 
-**描述**: 清空控制台屏幕。
+> 单个值的转换还可以用**实例方法**：`"123".ToInt()`、`x.ToStr()`、`x.ToDouble()`。
+> 见 [3.7 通用实例方法](#37-通用实例方法valuetype)。
 
----
+### 2.3 JSON
 
-## 数学函数
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `JsonSerialize` / `jsonSerialize` / `json` | `value` | 对象 → JSON 字符串 |
+| `JsonDeserialize` / `jsonDeserialize` | `json` | JSON 字符串 → 对象 |
+| `JsonSerializeToFile` | `obj, filePath` | 序列化到文件 |
+| `JsonDeserializeFromFile` | `filePath` | 从文件反序列化 |
+| `JsonIsValid` | `json` | 是否为合法 JSON |
+| `JsonPrettify` | `json` | 格式化（缩进） |
+| `JsonMinify` | `json` | 压缩 |
+| `JsonCompare` | `json1, json2` | 比较两个 JSON 是否等价 |
+| `JsonMerge` | `jsonObjects...` | 合并多个 JSON |
+| `JsonGetValue` | `json, path` | 按路径取值 |
 
-### Abs
-**签名**: `Abs(value: double) -> double`
+> 旧版文档写的 `JsonParse` / `JsonStringify` **不存在**。
 
-**描述**: 返回数值的绝对值。
+### 2.4 反射
 
-**参数**:
-- `value`: 输入数值
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `GetAllTypes` | — | 所有已注册类型 |
+| `GetType` | `typeName` | 按名取类型值 |
+| `TypeOf` | `obj` | 取对象实例的类型值 |
+| `GetTypeInfo` | `typeName` | 类型的完整元信息（字典） |
+| `GetClassInfo` | `obj` | 对象所属类的信息（字典） |
+| `GetFunctionInfo` | `function, methodName?` | 全局函数 / 函数对象 / 类方法信息 |
+| `GetMemberInfo` | `obj, memberName` | 成员（字段或方法）元信息 |
+| `HasMember` | `obj, memberName` | 是否存在该成员 |
+| `GetField` | `obj, fieldName` | 读字段（含 private） |
+| `SetField` | `obj, fieldName, value` | 写字段（含 private） |
+| `InvokeMethod` | `obj, methodName, args` | 动态调用方法，`args` 为列表 |
+| `CreateInstance` | `className, args` | 按类名创建实例并调用 `init` |
+| `IsInstanceOf` | `obj, className` | 是否为指定类实例（类名精确匹配） |
 
-**返回值**: 绝对值
+**主要返回结构**
 
-**示例**:
-```old8lang
-result <- Abs(-5.5)  // 5.5
-```
+`GetTypeInfo(typeName)` 返回字典，含：
+`name`、`isInterface`、`isAbstract`、`isMixin`、`baseClass`、`interfaces`、`mixins`、
+`methods`、`fields`、`isGeneric`。
 
-### Sqrt
-**签名**: `Sqrt(value: double) -> double`
+`GetClassInfo(obj)` 返回字典，含：
+`className`、`methods`、`fields`、`isInterface`、`isAbstract`、`isMixin`、`baseClass`、`interfaces`。
 
-**描述**: 返回数值的平方根。
+`GetMemberInfo(obj, memberName)`：成员是方法时含 `name`、`type`（值为 `method`）、`isStatic`、
+`isPublic`、`isPrivate`、`parameterCount`、`overloadCount`；是字段时含 `name`、
+`type`（值为 `field`）、`isStatic`、`isPublic`、`isPrivate`。
 
-**参数**:
-- `value`: 非负数值
+`GetFunctionInfo(...)` 按输入类型返回不同结构，`type` 取值：
+`global_function`（传全局函数名）、`user_function`（传函数对象）、
+`native_function`（原生函数）、`class_method`（传对象 + 方法名）。
+常见字段：`name`、`type`、`parameters` 或 `names`、`parameterCount` / `minParameterCount` /
+`maxParameterCount`、`isStatic` / `isPublic` / `isPrivate` / `isAbstract` / `isVirtual`、`returnType`。
 
-**返回值**: 平方根
+**模式差异与当前限制**
 
-**示例**:
-```old8lang
-result <- Sqrt(16)  // 4.0
-```
+- 虚拟机下 `GetFunctionInfo(obj, methodName)`（类方法反射）暂不支持，会抛错。
+- 虚拟机下 `Type.IsGeneric()` 与 `Type.IsAssignableFrom()` 固定返回 `false`。
+- `IsInstanceOf` 是**类名精确匹配**，不沿继承链或接口实现链判断。
+- 多数 API 在解释模式返回 `LangValue`（如 `DictionaryLangValue`），
+  虚拟机模式返回原生 .NET 字典/列表；使用方需按运行模式适配。
 
-### Pow
-**签名**: `Pow(base: double, exponent: double) -> double`
+`TypeLangValue` 的实例方法见 [3.10](#310-类型值实例方法typelangvalue)。
 
-**描述**: 返回 base 的 exponent 次幂。
+> 旧版语法文档里出现的 `GetClassName` / `GetClassMethods` / `GetClassFields` / `GetMethodInfo` /
+> `GetFieldInfo` / `HasMethod` / `HasField` **均不存在**，已从语法文档移除。
 
-**参数**:
-- `base`: 底数
-- `exponent`: 指数
+### 2.5 并发原语
 
-**返回值**: base^exponent
+全部为内置全局函数，无需导入。配套的 `using` 自动释放见 [第 5 节](#5-资源管理)。
 
-**示例**:
-```old8lang
-result <- Pow(2, 3)  // 8.0
-```
+**Mutex（互斥锁）**
 
-### Sin / Cos / Tan
-**签名**:
-- `Sin(angle: double) -> double`
-- `Cos(angle: double) -> double`
-- `Tan(angle: double) -> double`
+| 函数 | 参数 |
+|------|------|
+| `MutexCreate` | — |
+| `MutexLock` | `mutexId` |
+| `MutexTryLock` | `mutexId, timeoutMs` |
+| `MutexUnlock` | `mutexId` |
+| `MutexDispose` | `mutexId` |
 
-**描述**: 三角函数，参数为弧度。
+**Semaphore（信号量）**：`SemaphoreCreate(initialCount, maxCount)` · `SemaphoreAcquire(semaphoreId)` ·
+`SemaphoreTryAcquire(semaphoreId, timeoutMs)` · `SemaphoreRelease(semaphoreId)` · `SemaphoreDispose(semaphoreId)`
 
-**示例**:
-```old8lang
-result <- Sin(3.14159 / 2)  // 约等于 1.0
-```
+**AtomicInt（原子整数）**：`AtomicIntCreate(initialValue)` · `AtomicIntGet(atomicId)` ·
+`AtomicIntSet(atomicId, newValue)` · `AtomicIntIncrement(atomicId)` · `AtomicIntDecrement(atomicId)` ·
+`AtomicIntAdd(atomicId, delta)` · `AtomicIntCompareAndSet(atomicId, expectedValue, newValue)` ·
+`AtomicIntDispose(atomicId)`
 
-### Floor / Ceiling / Round
-**签名**:
-- `Floor(value: double) -> double`
-- `Ceiling(value: double) -> double`
-- `Round(value: double) -> double`
+**Channel（通道）**：`ChannelCreate()` · `ChannelCreateBounded(capacity)` · `ChannelSend(channelId, value)` ·
+`ChannelTrySend(channelId, value, timeoutMs)` · `ChannelReceive(channelId)` ·
+`ChannelTryReceive(channelId, timeoutMs)` · `ChannelClose(channelId)` · `ChannelDispose(channelId)`
 
-**描述**: 向下取整、向上取整、四舍五入。
+**ReadWriteLock（读写锁）**：`ReadWriteLockCreate()` · `ReadLockAcquire(lockId)` · `ReadLockRelease(lockId)` ·
+`WriteLockAcquire(lockId)` · `WriteLockRelease(lockId)` · `ReadLockTryAcquire(lockId, timeoutMs)` ·
+`WriteLockTryAcquire(lockId, timeoutMs)` · `ReadWriteLockDispose(lockId)`
 
-**示例**:
-```old8lang
-Floor(3.7)    // 3.0
-Ceiling(3.2)  // 4.0
-Round(3.5)    // 4.0
-```
+**CountDownLatch（倒计时门闩）**：`CountDownLatchCreate(count)` · `CountDownLatchCountDown(latchId)` ·
+`CountDownLatchWait(latchId)` · `CountDownLatchWaitTimeout(latchId, timeoutMs)` ·
+`CountDownLatchGetCount(latchId)` · `CountDownLatchDispose(latchId)`
 
-### Max / Min
-**签名**:
-- `Max(a: double, b: double) -> double`
-- `Min(a: double, b: double) -> double`
+**CyclicBarrier（循环栅栏）**：`CyclicBarrierCreate(participantCount)` · `CyclicBarrierAwait(barrierId)` ·
+`CyclicBarrierAwaitTimeout(barrierId, timeoutMs)` · `CyclicBarrierGetParticipantCount(barrierId)` ·
+`CyclicBarrierGetWaitingCount(barrierId)` · `CyclicBarrierDispose(barrierId)`
 
-**描述**: 返回两个数中的最大值或最小值。
+**CancellationTokenSource**：`CreateCancellationTokenSource()` · `Cancel(ctsId)` · `CancelAfter(ctsId, delayMs)` ·
+`DisposeCancellationTokenSource(ctsId)`
 
-**示例**:
-```old8lang
-Max(5, 10)  // 10
-Min(5, 10)  // 5
-```
+并发相关的还有 `Lock(value)`、`Spawn(func, args...)`。
+`Spawn` **只创建线程，必须再调用 `Start()` 才会执行**，之后用 `Join()` 等待并取回返回值——
+详见语法文档的多线程一节。
 
----
+### 2.6 进程与执行
 
-## 字符串处理
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `Sleep` | `milliseconds` | 休眠 |
+| `GetCurrentThreadId` | — | 当前线程 ID |
+| `GetProcessorCount` | — | CPU 核心数 |
+| `GetEnv` / `getEnv` | `key` | 读环境变量 |
+| `Exec` / `exec` | `code` | 执行系统命令 |
+| `Compiler` / `compiler` | `code?` | 编译相关入口 |
+| `Assert` / `assert` | `actual, expected` | 断言相等 |
 
-### Length
-**签名**: `Length(str: string) -> int`
-
-**描述**: 返回字符串长度。
-
-**示例**:
-```old8lang
-len <- Length("Hello")  // 5
-```
-
-### Substring
-**签名**: `Substring(str: string, startIndex: int, length: int) -> string`
-
-**描述**: 提取子字符串。
-
-**参数**:
-- `str`: 原字符串
-- `startIndex`: 起始索引（从0开始）
-- `length`: 子串长度
-
-**示例**:
-```old8lang
-sub <- Substring("Hello World", 0, 5)  // "Hello"
-```
-
-### ToUpper / ToLower
-**签名**:
-- `ToUpper(str: string) -> string`
-- `ToLower(str: string) -> string`
-
-**描述**: 转换为大写或小写。
-
-**示例**:
-```old8lang
-ToUpper("hello")  // "HELLO"
-ToLower("WORLD")  // "world"
-```
-
-### Trim
-**签名**: `Trim(str: string) -> string`
-
-**描述**: 去除字符串首尾空白字符。
-
-**示例**:
-```old8lang
-Trim("  hello  ")  // "hello"
-```
-
-### Split
-**签名**: `Split(str: string, separator: string) -> array`
-
-**描述**: 按分隔符拆分字符串为数组。
-
-**示例**:
-```old8lang
-parts <- Split("a,b,c", ",")  // ["a", "b", "c"]
-```
-
-### Replace
-**签名**: `Replace(str: string, oldValue: string, newValue: string) -> string`
-
-**描述**: 替换字符串中的子串。
-
-**示例**:
-```old8lang
-result <- Replace("Hello World", "World", "Old8")  // "Hello Old8"
-```
-
-### Contains
-**签名**: `Contains(str: string, substring: string) -> bool`
-
-**描述**: 检查字符串是否包含子串。
-
-**示例**:
-```old8lang
-Contains("Hello World", "World")  // true
-```
+> `Assert` 的行为各模式不一致：虚拟机下失败抛 `AssertionError`（语言层 `try/catch` **能**捕获），
+> 解释器下抛普通异常（捕获不到）。详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md)。
 
 ---
 
-## 数组和列表操作
+## 3. 实例方法
 
-### Count
-**签名**: `Count(collection: object) -> int`
+### 3.1 通用（`ValueType`）
 
-**描述**: 返回集合（数组、列表、字典）的元素个数。
+所有值都可调用：
 
-**示例**:
-```old8lang
-arr <- [1, 2, 3]
-count <- Count(arr)  // 3
+| 方法 | 说明 |
+|------|------|
+| `.ToStr()` | 转字符串 |
+| `.ToInt()` / `.ToDouble()` / `.ToBool()` / `.ToChar()` | 数值与字符转换 |
+| `.ToType(type)` | 转换为指定类型 |
+| `.ToHash()` | 哈希值 |
+| `.Equal(other)` | 相等比较 |
+
+> `.ToStr()` 在几个容器类型上还有各自的重载（见下），
+> 虚拟机模式下**直接 `Print` 集合会输出 .NET 类型名，必须用 `.ToStr()`**。
+
+### 3.2 字符串（`String`）
+
+```
+Contains  Count  EndsWith  FromBase64  IndexOf  PadLeft  PadRight  Repeat
+Replace  Reverse  Split  StartsWith  Substring  ToBase64  ToCharArray
+ToLower  ToUpper  Trim  TrimEnd  TrimStart
 ```
 
-### Add
-**签名**: `Add(list: list, item: object) -> void`
-
-**描述**: 向列表添加元素。
-
-**示例**:
-```old8lang
-lst <- {1, 2, 3}
-Add(lst, 4)  // lst 变为 {1, 2, 3, 4}
+```old8
+s <- "Hello"
+s.ToUpper()              // "HELLO"
+s.Substring(0, 2)        // "He"
+s.Split(",")             // ["Hello"]
+"7".PadLeft(5, "0")      // "00007"
+"abc".Reverse()          // "cba"
 ```
 
-### Remove
-**签名**: `Remove(list: list, item: object) -> bool`
+**注意**：`.Length()` 是方法带括号；写成属性 `.Length` 会报 `[ATTRIBUTE_ERROR]`。
 
-**描述**: 从列表移除指定元素。
+### 3.3 列表（`List`）
 
-**返回值**: 是否成功移除
-
-**示例**:
-```old8lang
-lst <- {1, 2, 3}
-Remove(lst, 2)  // lst 变为 {1, 3}
+```
+Add  AddList  Aggregate  BubbleSort  CartesianProduct  Chunk  Clear  Combinations
+ElementAtOrDefault  FindAll  First  FlatMap  Flatten  FlattenDeep
+GroupAdjacent  GroupAdjacentBy  HeapSort  Insert  InsertionSort  IsEmpty
+IsSubsetOf  IsSupersetOf  Last  LastIndexOf  MergeSort  Overlaps  Pairwise
+Partition  Permutations  Pop  QuickSort  Remove  RemoveAt  SelectionSort
+SetEquals  Single  SingleOrDefault  SkipLast  SkipWhile  SkipWhileIndexed
+Slice  SortWith  SymmetricExcept  TakeLast  TakeWhile  TakeWhileIndexed
+ToArray  Window  WithIndex
 ```
 
-### Contains (集合)
-**签名**: `Contains(collection: object, item: object) -> bool`
-
-**描述**: 检查集合是否包含指定元素。
-
-**示例**:
-```old8lang
-lst <- {1, 2, 3}
-Contains(lst, 2)  // true
+```old8
+l <- {1, 2, 3, 4}
+l.Add(5)
+l.Slice(0, 2)            // [1, 2]
+l.Chunk(2)               // [[1, 2], [3, 4]]
+l.Window(2)              // [[1, 2], [2, 3]]
+l.Flatten()              // 展平一层
 ```
 
-### Sort
-**签名**: `Sort(list: list) -> void`
+`List` 同时拥有 `Generic`（见 3.5）的全部高阶方法：`Map` / `Filter` / `Reduce` / `Sum` /
+`Sort` / `Reverse` / `Join` / `Count` / `Contains` 等。
 
-**描述**: 对列表进行原地排序。
+> **容器方法返回新集合**：`l.Sort()`、`a.Reverse()` **不修改原值**，
+> 而是返回排好序 / 反转后的新集合。要就地生效需自己接回去：`l <- l.Sort()`。
 
-**示例**:
-```old8lang
-lst <- {3, 1, 2}
-Sort(lst)  // lst 变为 {1, 2, 3}
+### 3.4 字典（`Dictionary`）
+
+```
+Add  Clear  Clone  ContainsKey  ContainsValue  Count  Filter  ForEach
+GetOrElse  GetValue  IsEmpty  Keys  Map  Merge  Remove  ToList  Update  Values
 ```
 
-### Reverse
-**签名**: `Reverse(list: list) -> void`
-
-**描述**: 反转列表元素顺序。
-
-**示例**:
-```old8lang
-lst <- {1, 2, 3}
-Reverse(lst)  // lst 变为 {3, 2, 1}
+```old8
+d <- {"a": 1}
+d.Add("b", 2)
+d.ContainsKey("a")       // true
+d.GetOrElse("z", 0)      // 0
+d.Merge({"c": 3})        // {"a": 1, "b": 2, "c": 3}
+d.Keys()                 // ["a", "b", "c"]
 ```
+
+### 3.5 高阶方法（`Generic`，适用于列表等集合）
+
+```
+All  Any  Average  Concat  Contains  Count  Distinct  ElementAt  Except  Filter
+Find  First  FirstOrDefault  ForEach  GroupBy  IndexOf  Intersect  IsSorted
+Join  Last  LastOrDefault  Map  Max  Min  Reduce  Reverse  SelectMany  Skip
+Sort  SortBy  Sum  Take  ToArray  ToDict  ToList  ToStr  ToTuple  Union  Zip  Zip3
+```
+
+```old8
+l <- {1, 2, 3, 4}
+l.Map((x) -> x * 2)              // [2, 4, 6, 8]
+l.Filter((x) -> x > 2)           // [3, 4]
+l.Reduce((a, b) -> a + b, 0)     // 10
+l.Sum()                          // 10
+l.Join(",")                      // "1,2,3,4"
+```
+
+### 3.6 数组（`Array`）
+
+```
+BubbleSort  Get  GroupAdjacent  GroupAdjacentBy  HeapSort  InsertionSort
+MergeSort  Overlaps  Permutations  QuickSort  SelectionSort  Set  SetEquals
+Slice  ToList
+```
+
+数组取长度用 `len(a)` 或 `a.Count()`，**没有 `.Length` 属性**。
+
+### 3.7 元组（`Tuple`）
+
+`Get(index)` · `Slice(start)` · `ToList()`
+
+### 3.8 字符（`Char`）
+
+```
+CompareTo  GetNumericValue  IsControl  IsDigit  IsLetter  IsLetterOrDigit
+IsLower  IsPunctuation  IsSymbol  IsUpper  IsWhiteSpace  ToInt  ToLower  ToUpper
+```
+
+### 3.9 任务与线程（`Task` / `Thread`）
+
+`Task`：`Await` `Catch` `ContinueWith` `Finally` `Then`
+`Thread`：`Cancel` `IsAlive` `Join` `Retry` `Start` `Then` `WithTimeout`
+
+### 3.10 类型值实例方法（`TypeLangValue`）
+
+由 `GetType("X")` / `TypeOf(obj)` 返回的类型值：
+
+| 方法 | 说明 |
+|------|------|
+| `.IsClass()` | 是否为类（非接口、非 mixin） |
+| `.IsInterface()` | 是否为接口 |
+| `.IsPrimitive()` | 是否为基本类型 |
+| `.IsGeneric()` | 是否为泛型类型 |
+| `.IsAssignableFrom(otherType)` | 类型兼容性检查 |
+| `.GetBaseType()` | 父类型（无则 `null`） |
+| `.GetInterfaces()` | 实现的接口列表 |
+| `.GetMethodNames()` | 全部方法名 |
+| `.GetFieldNames()` | 全部字段名 |
+
+**模式差异**：虚拟机下 `.IsGeneric()` 与 `.IsAssignableFrom()` 目前**固定返回 `false`**（未实现完整检查）。
 
 ---
 
-## 类型转换
+## 4. 标准库模块
 
-### ToStr
-**签名**: `value.ToStr() -> string`
+导入语法：`import "模块名"`，之后用 `模块名.C#方法名(...)`。
+下表的方法名即实现中的方法名。
 
-**描述**: 将任意值转换为字符串表示。
+### 4.1 Math（51 个）
 
-**示例**:
-```old8lang
-num <- 123
-str <- num.ToStr()  // "123"
+**基础运算**
+
+| 方法 | 签名 |
+|------|------|
+| `Sqrt` | `(value: double) -> double` |
+| `Pow` | `(baseValue: double, exponent: double) -> double` |
+| `Abs` / `Ceil` / `Floor` / `Round` / `Trunc` | `(value: double) -> double` |
+| `Log` / `Log10` / `Exp` | `(value: double) -> double` |
+| `LogBase` | `(value: double, baseValue: double) -> double` |
+| `Sign` | `(value: double) -> int` |
+| `Factorial` | `(n: int) -> long` |
+| `Max` / `Min` | `(a: double, b: double) -> double` |
+
+**三角与双曲**：`Sin` `Cos` `Tan` `Asin` `Acos` `Atan` `Sinh` `Cosh` `Tanh`（均 `(radians: double)`）、
+`Atan2(y, x)`
+
+**常量与特殊函数**：`GetPi()` · `GetE()` · `Gamma(value)` · `Beta(x, y)`
+
+**随机**：`Random() -> double` · `RandomInt(minValue: int, maxValue: int) -> int`
+
+**单位换算**：`DegreesToRadians` `RadiansToDegrees` `CelsiusToFahrenheit` `FahrenheitToCelsius`
+`MetersToFeet` `FeetToMeters` `KilogramsToPounds` `PoundsToKilograms`
+
+**向量运算**：`VectorMagnitude(vector)` · `VectorDotProduct(v1, v2)` · `VectorAdd(vectors)` ·
+`VectorSubtract(v1, v2)` · `VectorMultiply(vector, scalar)` · `VectorNormalize(vector)` ·
+`VectorAngle(v1, v2)` · `VectorSin/Cos/Tan/Exp/Log/Abs/Sqrt(vector)`
+
+> 这些方法的 C# 形参是 `params double[]` / `params double[][]`，
+> **必须显式传数组，不能展开成变参**：
+> `Math.VectorMagnitude([3.0, 4.0])` → `5` ✅；
+> `Math.VectorMagnitude(3.0, 4.0)` → `[ARGUMENT_ERROR]` ❌。
+
+```old8
+import "Math"
+PrintLine(Math.Sqrt(16.0).ToStr())     // 4
+PrintLine(Math.GetPi().ToStr())         // 3.141592653589793
 ```
 
-### ToInt
-**签名**: `ToInt(value: object) -> int`
+### 4.2 File（31 个）
 
-**描述**: 转换为整数类型。
+> 方法名带 `File` 前缀，**不是** `Read` / `Write` / `Exists`。
 
-**示例**:
-```old8lang
-ToInt("123")    // 123
-ToInt(123.45)   // 123
+| 方法 | 签名 |
+|------|------|
+| `FileRead` | `(path: string, encoding: object? ) -> string` |
+| `FileWrite` | `(path, content: string, encoding?) -> void` |
+| `FileAppend` | `(path, content: string, encoding?) -> void` |
+| `FileReadLines` / `FileWriteLines` / `FileAppendLines` | 按行读写，元素为 `array<string>` |
+| `FileExists` | `(path) -> bool` |
+| `GetFileSize` | `(path) -> long` |
+| `CopyFile` / `DeleteFile` / `RenameFile` | 文件操作 |
+| `CreateDirectory` / `DeleteDirectory` / `DirectoryExists` / `MoveDirectory` | 目录操作 |
+| `GetDirectoryInfo` / `GetFileInfo` | 取信息（返回字符串） |
+| `GetDirectories` / `GetFiles` | 枚举 |
+| `ReadAllBytes` / `WriteAllBytes` / `AppendAllBytes` | 字节流 |
+| `UnpackZip` / `CompressZip` / `ZipReadAll` | ZIP |
+| `ReadXml` / `WriteXml` / `ReadYaml` / `WriteYaml` | XML / YAML |
+| `GetLastWriteTime` / `SetLastWriteTime` | 时间戳 |
+
+**受限**：`encoding` 参数是 .NET 的 `Encoding` 类型，Old8Lang 侧只能省略（用默认）；
+`CompressionLevel`、`SearchOption`、`DateTime` 同理——**这些方法从 Old8Lang 调用时参数类型对不上**，
+实际只能走默认值或无法调用。
+
+```old8
+import "File"
+File.FileWrite("/tmp/o8.txt", "hello")
+PrintLine(File.FileRead("/tmp/o8.txt"))
+PrintLine(File.FileExists("/tmp/o8.txt").ToStr())
 ```
 
-### ToDouble
-**签名**: `ToDouble(value: object) -> double`
+### 4.3 Time（25 个）
 
-**描述**: 转换为双精度浮点数。
+| 方法 | 签名 |
+|------|------|
+| `GetLocalTime` / `GetUtcTime` | `(format: string?) -> string` |
+| `GetTimeInTimeZone` | `(timeZoneId, format?) -> string` |
+| `GetUnixTimeSeconds` / `GetUnixTimeMilliseconds` | `() -> long` |
+| `FromUnixTimeSeconds` / `FromUnixTimeMilliseconds` | `(秒/毫秒, format?) -> string` |
+| `StartTimer` / `StopTimer` / `ResetTimer` / `GetElapsedMilliseconds` | 计时器：`StopTimer()` 与 `GetElapsedMilliseconds()` 返回 `double` |
+| `GetCommonFormats` / `TimeFormat` | `() -> array<string>` |
+| `TimeStamp` | `() -> string` |
+| `AddDays` / `AddHours` / `AddMinutes` / `AddSeconds` | `(dateTime: object, 数量: int, format?) -> string` |
+| `LocalToUtc` / `UtcToLocal` / `ConvertTimeBetweenTimeZones` / `Format` | 需要 `DateTime` 实参，**Old8Lang 侧受限** |
 
-**示例**:
-```old8lang
-ToDouble("3.14")  // 3.14
-ToDouble(42)      // 42.0
+```old8
+import "Time"
+PrintLine(Time.GetLocalTime("yyyy-MM-dd"))     // 2026-10-09
+PrintLine(Time.GetUnixTimeSeconds().ToStr())
 ```
 
-### ToBool
-**签名**: `ToBool(value: object) -> bool`
+### 4.4 Csv（10 个）
 
-**描述**: 转换为布尔值。
+| 方法 | 签名 |
+|------|------|
+| `ReadCsv` | `(filePath, hasHeader: bool, delimiter: char, quoteChar: char) -> array<array<string>>` |
+| `WriteCsv` | `(filePath, data: array<array<string>>, headers, delimiter, quoteChar)` |
+| `WriteCsvFromDictionary` | 同上，数据源为字典列表 |
+| `ParseCsvLine` | `(line: string, delimiter: char, quoteChar: char) -> array<string>` |
+| `FormatCsvLine` | `(values, delimiter, quoteChar) -> string` |
+| `ParseCsvContent` | `(csvContent, hasHeader, delimiter, quoteChar) -> array<array<string>>` |
+| `ConvertCsvToJson` / `ConvertJsonToCsv` | 内容互转 |
+| `ConvertCsvToJsonFile` / `ConvertJsonToCsvFile` | 文件互转 |
 
-**示例**:
-```old8lang
-ToBool("true")   // true
-ToBool(1)        // true
-ToBool(0)        // false
+```old8
+import "Csv"
+PrintLine(Csv.ParseCsvLine("a,b", 44, 34).ToStr())    // ["a", "b"]
 ```
+（`delimiter` / `quoteChar` 是 `char`，用 ASCII 码传入：`,`=44，`"`=34。）
+
+### 4.5 Crypto（12 个）
+
+| 方法 | 签名 |
+|------|------|
+| `AesEncrypt` / `AesDecrypt` | `(文本, key: string, iv: string) -> string` |
+| `RsaEncrypt` / `RsaDecrypt` | `(文本, 密钥: string) -> string` |
+| `Sha256Hash` / `Sha512Hash` | `(input: string) -> string` |
+| `HmacSha256Hash` / `HmacSha512Hash` | `(input, key: string) -> string` |
+| `Base64Encode` / `Base64Decode` | `(input: string) -> string` |
+| `XorEncrypt` / `XorDecrypt` | `(input, key: string) -> string` |
+
+> 旧版文档写的 `Crypto.MD5` / `Crypto.SHA1` **不存在**。
+
+### 4.6 Regex（4 个）
+
+| 方法 | 签名 |
+|------|------|
+| `RegexIsMatch` | `(input: string, pattern: string, ignoreCase: bool) -> bool` |
+| `RegexMatch` | `(input, pattern, ignoreCase) -> string?`（首个匹配） |
+| `RegexMatches` | `(input, pattern, ignoreCase) -> array<string>`（全部匹配） |
+| `RegexReplace` | `(input, pattern, replacement: string, ignoreCase) -> string` |
+
+> 注意参数顺序是 **输入在前、模式在后**，与 .NET/.NET 直觉相反；
+> 且名字带 `Regex` 前缀（`RegexIsMatch` 而非 `Match`）。
+
+### 4.7 Terminal（5 个）
+
+`Title(title)` · `ReadAscii() -> int` · `ReadKey() -> string` · `Beep()` · `BeepWindow(tone, duration)`
+
+### 4.8 ColorfulTerminal（4 个）
+
+`PrintColorful(context, color)` · `PrintLineColorful(context, color)` ·
+`PrintAscii(context)` · `PrintAsciiColorful(context, color)`
+
+### 4.9 TemplateEngine（2 个）
+
+`RenderHtml(template, variables)` · `RenderConfig(template, variables)`
+（`variables` 为 `Dictionary<string, object>`）
+
+> 模块名是 **`TemplateEngine`**，不是 `Template`。
+
+### 4.10 OS（2 个）
+
+`OsInfo() -> string` · `Process(code: string) -> string`
+
+> 旧版文档写的 `OS.GetPlatform` / `OS.GetEnv` / `OS.Exec` **不存在**；
+> 读环境变量与执行命令用**全局函数** `GetEnv(key)` 与 `Exec(code)`（见 2.6）。
+
+### 4.11 Vector / Net / Database / Serialization / MachineLearning
+
+这五个模块注册在案，但**从 Old8Lang 直接可用性受限**：
+
+| 模块 | 注册实现 | 状况 |
+|------|---------|------|
+| `Vector` | `Vector2` / `Vector3` / `Vector4` / `VectorN`（普通类，非静态类） | 需先构造实例再用其方法 |
+| `Net` | `SocketClient` / `HttpWebClient` / `MqttClientWrapper` / `WebSocketClient` / `WebApiClient` | 同上；主要能力在构造函数与属性上 |
+| `Database` | `DatabaseLibBinding` | 方法签名大量使用 .NET 的 `object` / `Type` 参数（如 `QueryById(orm, entityType: Type, id)`），**Old8Lang 侧无法构造这些实参** |
+| `Serialization` | `SerializationLibBinding` | 同上（`MsgPackDeserialize(data, targetType: Type)`） |
+| `MachineLearning` | `MachineLearningLibBinding` | 同上（`IDataView` / `ITransformer`） |
+
+`import "Database"` + `Database.CreateSqliteConnection("Data Source=:memory:")` 这类**无 .NET 类型参数**的入口
+是可以调用的，但随后的 `ExecuteQuery` 等方法需要 `object` 参数，从 Old8Lang 传值不可靠。
+**本次未逐方法实测**，使用时请自行验证。
 
 ---
 
-## 文件操作
+## 5. 资源管理
 
-### ReadFile
-**签名**: `ReadFile(path: string) -> string`
+`using` 语句在块结束时自动调用对应的 `Dispose`：
 
-**描述**: 读取文件全部内容为字符串。
-
-**参数**:
-- `path`: 文件路径
-
-**返回值**: 文件内容
-
-**示例**:
-```old8lang
-content <- ReadFile("data.txt")
-```
-
-### WriteFile
-**签名**: `WriteFile(path: string, content: string) -> void`
-
-**描述**: 将字符串写入文件，覆盖原内容。
-
-**示例**:
-```old8lang
-WriteFile("output.txt", "Hello World")
-```
-
-### AppendFile
-**签名**: `AppendFile(path: string, content: string) -> void`
-
-**描述**: 追加内容到文件末尾。
-
-**示例**:
-```old8lang
-AppendFile("log.txt", "新日志条目\n")
-```
-
-### FileExists
-**签名**: `FileExists(path: string) -> bool`
-
-**描述**: 检查文件是否存在。
-
-**示例**:
-```old8lang
-if FileExists("config.json") {
-    config <- ReadFile("config.json")
-}
-```
-
-### DeleteFile
-**签名**: `DeleteFile(path: string) -> void`
-
-**描述**: 删除文件。
-
-**示例**:
-```old8lang
-DeleteFile("temp.txt")
-```
-
----
-
-## JSON 操作
-
-### JsonParse
-**签名**: `JsonParse(jsonString: string) -> object`
-
-**描述**: 解析 JSON 字符串为 Old8Lang 对象。
-
-**返回值**: 字典或数组
-
-**示例**:
-```old8lang
-json <- JsonParse("{\"name\": \"Old8\", \"version\": 1}")
-PrintLine(json["name"])  // "Old8"
-```
-
-### JsonStringify
-**签名**: `JsonStringify(obj: object) -> string`
-
-**描述**: 将对象序列化为 JSON 字符串。
-
-**示例**:
-```old8lang
-data <- {"name": "Old8", "version": 1}
-jsonStr <- JsonStringify(data)
-PrintLine(jsonStr)  // {"name":"Old8","version":1}
-```
-
----
-
-## 并发原语
-
-Old8Lang 提供内置的并发原语,支持多线程和并发编程。所有并发原语都是全局函数,无需导入库即可使用。
-
-### 互斥锁 (Mutex)
-
-互斥锁用于保护共享资源,确保同一时刻只有一个线程可以访问。
-
-#### MutexCreate
-**签名**: `MutexCreate() -> int`
-
-**描述**: 创建一个新的互斥锁。
-
-**返回值**: 互斥锁 ID
-
-**示例**:
-```old8lang
-mutex <- MutexCreate()
-```
-
-#### MutexLock
-**签名**: `MutexLock(mutexId: int) -> void`
-
-**描述**: 获取互斥锁,如果锁已被占用则阻塞等待。
-
-**参数**:
-- `mutexId`: 互斥锁 ID
-
-**示例**:
-```old8lang
-MutexLock(mutex)
-// 临界区代码
-MutexUnlock(mutex)
-```
-
-#### MutexTryLock
-**签名**: `MutexTryLock(mutexId: int, timeoutMs: int) -> bool`
-
-**描述**: 尝试获取互斥锁,可设置超时时间。
-
-**参数**:
-- `mutexId`: 互斥锁 ID
-- `timeoutMs`: 超时时间（毫秒）
-
-**返回值**: 是否成功获取锁
-
-**示例**:
-```old8lang
-if MutexTryLock(mutex, 1000) {
-    // 成功获取锁
-    MutexUnlock(mutex)
-} else {
-    PrintLine("获取锁超时")
-}
-```
-
-#### MutexUnlock
-**签名**: `MutexUnlock(mutexId: int) -> void`
-
-**描述**: 释放互斥锁。
-
-#### MutexDispose
-**签名**: `MutexDispose(mutexId: int) -> void`
-
-**描述**: 释放互斥锁资源。
-
-**示例（使用 using 语句自动释放）**:
-```old8lang
+```old8
+// 形式 1：创建并管理
 using mutex <- MutexCreate() {
     MutexLock(mutex)
-    counter <- counter + 1
     MutexUnlock(mutex)
-}  // 自动调用 MutexDispose
+}   // 自动 MutexDispose
+
+// 形式 2：管理已有变量
+ch <- ChannelCreate()
+using ch {
+    ChannelSend(ch, 123)
+}   // 自动 ChannelDispose
 ```
+
+支持自动释放的资源：`Mutex` `Semaphore` `AtomicInt` `Channel` `ReadWriteLock`
+`CountDownLatch` `CyclicBarrier` `CancellationTokenSource` —— 即所有返回资源 ID 且配有
+`XxxDispose` 的并发原语。用 try-finally 实现，异常时同样释放。
 
 ---
 
-### 信号量 (Semaphore)
-
-信号量用于限制同时访问某资源的线程数量。
-
-#### SemaphoreCreate
-**签名**: `SemaphoreCreate(initialCount: int, maxCount: int) -> int`
-
-**描述**: 创建信号量。
-
-**参数**:
-- `initialCount`: 初始计数
-- `maxCount`: 最大计数
-
-**返回值**: 信号量 ID
-
-**示例**:
-```old8lang
-// 限制最多3个线程同时访问
-sem <- SemaphoreCreate(3, 3)
-```
-
-#### SemaphoreAcquire
-**签名**: `SemaphoreAcquire(semaphoreId: int) -> void`
-
-**描述**: 获取信号量,计数减1,如果计数为0则阻塞等待。
-
-#### SemaphoreTryAcquire
-**签名**: `SemaphoreTryAcquire(semaphoreId: int, timeoutMs: int) -> bool`
-
-**描述**: 尝试获取信号量,可设置超时。
-
-**返回值**: 是否成功获取
-
-#### SemaphoreRelease
-**签名**: `SemaphoreRelease(semaphoreId: int) -> void`
-
-**描述**: 释放信号量,计数加1。
-
-#### SemaphoreDispose
-**签名**: `SemaphoreDispose(semaphoreId: int) -> void`
-
-**描述**: 释放信号量资源。
-
-**完整示例**:
-```old8lang
-using sem <- SemaphoreCreate(2, 2) {
-    SemaphoreAcquire(sem)
-    PrintLine("执行任务...")
-    Sleep(1000)
-    SemaphoreRelease(sem)
-}
-```
-
----
-
-### 原子整数 (AtomicInt)
-
-原子整数提供线程安全的整数操作,无需加锁。
-
-#### AtomicIntCreate
-**签名**: `AtomicIntCreate(initialValue: int) -> int`
-
-**描述**: 创建原子整数。
-
-**返回值**: 原子整数 ID
-
-#### AtomicIntGet
-**签名**: `AtomicIntGet(atomicId: int) -> int`
-
-**描述**: 获取当前值。
-
-#### AtomicIntSet
-**签名**: `AtomicIntSet(atomicId: int, newValue: int) -> void`
-
-**描述**: 设置新值。
-
-#### AtomicIntIncrement
-**签名**: `AtomicIntIncrement(atomicId: int) -> int`
-
-**描述**: 原子递增,返回新值。
-
-**示例**:
-```old8lang
-counter <- AtomicIntCreate(0)
-newValue <- AtomicIntIncrement(counter)
-PrintLine(newValue)  // 1
-```
-
-#### AtomicIntDecrement
-**签名**: `AtomicIntDecrement(atomicId: int) -> int`
-
-**描述**: 原子递减,返回新值。
-
-#### AtomicIntAdd
-**签名**: `AtomicIntAdd(atomicId: int, delta: int) -> int`
-
-**描述**: 原子加法,返回新值。
-
-**示例**:
-```old8lang
-newValue <- AtomicIntAdd(counter, 5)
-```
-
-#### AtomicIntCompareAndSet
-**签名**: `AtomicIntCompareAndSet(atomicId: int, expectedValue: int, newValue: int) -> bool`
-
-**描述**: 比较并交换（CAS操作）。
-
-**返回值**: 是否成功设置
-
-**示例**:
-```old8lang
-// 只有当前值为10时才设置为20
-if AtomicIntCompareAndSet(counter, 10, 20) {
-    PrintLine("CAS成功")
-}
-```
-
-#### AtomicIntDispose
-**签名**: `AtomicIntDispose(atomicId: int) -> void`
-
-**描述**: 释放原子整数资源。
-
----
-
-### 通道 (Channel)
-
-通道用于线程间通信,支持发送和接收消息。
-
-#### ChannelCreate
-**签名**: `ChannelCreate() -> int`
-
-**描述**: 创建无界通道。
-
-**返回值**: 通道 ID
-
-#### ChannelCreateBounded
-**签名**: `ChannelCreateBounded(capacity: int) -> int`
-
-**描述**: 创建有界通道,指定容量。
-
-**示例**:
-```old8lang
-ch <- ChannelCreateBounded(10)  // 最多缓冲10个消息
-```
-
-#### ChannelSend
-**签名**: `ChannelSend(channelId: int, value: object) -> void`
-
-**描述**: 向通道发送消息,如果通道已满则阻塞等待。
-
-**示例**:
-```old8lang
-ChannelSend(ch, "Hello")
-ChannelSend(ch, 123)
-```
-
-#### ChannelTrySend
-**签名**: `ChannelTrySend(channelId: int, value: object, timeoutMs: int) -> bool`
-
-**描述**: 尝试发送消息,可设置超时。
-
-**返回值**: 是否成功发送
-
-#### ChannelReceive
-**签名**: `ChannelReceive(channelId: int) -> object`
-
-**描述**: 从通道接收消息,如果通道为空则阻塞等待。
-
-**示例**:
-```old8lang
-msg <- ChannelReceive(ch)
-PrintLine(msg)
-```
-
-#### ChannelTryReceive
-**签名**: `ChannelTryReceive(channelId: int, timeoutMs: int) -> object?`
-
-**描述**: 尝试接收消息,可设置超时。
-
-**返回值**: 接收到的消息,超时则返回 null
-
-#### ChannelClose
-**签名**: `ChannelClose(channelId: int) -> void`
-
-**描述**: 关闭通道,不再接受新消息。
-
-#### ChannelDispose
-**签名**: `ChannelDispose(channelId: int) -> void`
-
-**描述**: 释放通道资源。
-
-**完整示例**:
-```old8lang
-using ch <- ChannelCreate() {
-    // 生产者
-    async func producer() -> void {
-        for i in [0~10] {
-            ChannelSend(ch, i)
-        }
-        ChannelClose(ch)
-    }
-
-    // 消费者
-    async func consumer() -> void {
-        while true {
-            msg <- ChannelTryReceive(ch, 100)
-            if msg == null {
-                break
-            }
-            PrintLine(msg)
-        }
-    }
-
-    producer()
-    consumer()
-}
-```
-
-**Select 语句（通道多路复用）**:
-```old8lang
-ch1 <- ChannelCreate()
-ch2 <- ChannelCreate()
-
-select {
-    case ch1 <- 100 -> {
-        PrintLine("发送到 ch1")
-    }
-    case val from ch2 -> {
-        PrintLine("从 ch2 接收: " + val.ToStr())
-    }
-    default -> {
-        PrintLine("没有通道就绪")
-    }
-}
-```
-
----
-
-### 读写锁 (ReadWriteLock)
-
-读写锁允许多个读者同时访问,但写者独占访问。
-
-#### ReadWriteLockCreate
-**签名**: `ReadWriteLockCreate() -> int`
-
-**描述**: 创建读写锁。
-
-**返回值**: 读写锁 ID
-
-#### ReadLockAcquire
-**签名**: `ReadLockAcquire(lockId: int) -> void`
-
-**描述**: 获取读锁。
-
-#### ReadLockRelease
-**签名**: `ReadLockRelease(lockId: int) -> void`
-
-**描述**: 释放读锁。
-
-#### WriteLockAcquire
-**签名**: `WriteLockAcquire(lockId: int) -> void`
-
-**描述**: 获取写锁（独占）。
-
-#### WriteLockRelease
-**签名**: `WriteLockRelease(lockId: int) -> void`
-
-**描述**: 释放写锁。
-
-#### ReadLockTryAcquire
-**签名**: `ReadLockTryAcquire(lockId: int, timeoutMs: int) -> bool`
-
-**描述**: 尝试获取读锁。
-
-#### WriteLockTryAcquire
-**签名**: `WriteLockTryAcquire(lockId: int, timeoutMs: int) -> bool`
-
-**描述**: 尝试获取写锁。
-
-#### ReadWriteLockDispose
-**签名**: `ReadWriteLockDispose(lockId: int) -> void`
-
-**描述**: 释放读写锁资源。
-
-**示例**:
-```old8lang
-using rwLock <- ReadWriteLockCreate() {
-    // 多个读者
-    ReadLockAcquire(rwLock)
-    data <- ReadData()
-    ReadLockRelease(rwLock)
-
-    // 单个写者
-    WriteLockAcquire(rwLock)
-    WriteData(newData)
-    WriteLockRelease(rwLock)
-}
-```
-
----
-
-### 倒计时门闩 (CountDownLatch)
-
-倒计时门闩用于等待多个线程完成任务。
-
-#### CountDownLatchCreate
-**签名**: `CountDownLatchCreate(count: int) -> int`
-
-**描述**: 创建倒计时门闩。
-
-**参数**:
-- `count`: 初始计数
-
-**返回值**: 门闩 ID
-
-#### CountDownLatchCountDown
-**签名**: `CountDownLatchCountDown(latchId: int) -> void`
-
-**描述**: 计数减1。
-
-#### CountDownLatchWait
-**签名**: `CountDownLatchWait(latchId: int) -> void`
-
-**描述**: 等待计数归零。
-
-#### CountDownLatchWaitTimeout
-**签名**: `CountDownLatchWaitTimeout(latchId: int, timeoutMs: int) -> bool`
-
-**描述**: 等待计数归零,可设置超时。
-
-**返回值**: 是否成功等待到归零
-
-#### CountDownLatchGetCount
-**签名**: `CountDownLatchGetCount(latchId: int) -> int`
-
-**描述**: 获取当前计数。
-
-#### CountDownLatchDispose
-**签名**: `CountDownLatchDispose(latchId: int) -> void`
-
-**描述**: 释放门闩资源。
-
-**示例**:
-```old8lang
-using latch <- CountDownLatchCreate(3) {
-    async func worker() -> void {
-        PrintLine("工作完成")
-        CountDownLatchCountDown(latch)
-    }
-
-    worker()
-    worker()
-    worker()
-
-    CountDownLatchWait(latch)
-    PrintLine("所有工作完成")
-}
-```
-
----
-
-### 循环栅栏 (CyclicBarrier)
-
-循环栅栏用于让多个线程在某个点上相互等待。
-
-#### CyclicBarrierCreate
-**签名**: `CyclicBarrierCreate(participantCount: int) -> int`
-
-**描述**: 创建循环栅栏。
-
-**参数**:
-- `participantCount`: 参与者数量
-
-**返回值**: 栅栏 ID
-
-#### CyclicBarrierAwait
-**签名**: `CyclicBarrierAwait(barrierId: int) -> void`
-
-**描述**: 等待所有参与者到达栅栏。
-
-#### CyclicBarrierAwaitTimeout
-**签名**: `CyclicBarrierAwaitTimeout(barrierId: int, timeoutMs: int) -> bool`
-
-**描述**: 等待所有参与者到达,可设置超时。
-
-**返回值**: 是否成功等待
-
-#### CyclicBarrierGetParticipantCount
-**签名**: `CyclicBarrierGetParticipantCount(barrierId: int) -> int`
-
-**描述**: 获取参与者总数。
-
-#### CyclicBarrierGetWaitingCount
-**签名**: `CyclicBarrierGetWaitingCount(barrierId: int) -> int`
-
-**描述**: 获取当前等待的参与者数量。
-
-#### CyclicBarrierDispose
-**签名**: `CyclicBarrierDispose(barrierId: int) -> void`
-
-**描述**: 释放栅栏资源。
-
-**示例**:
-```old8lang
-using barrier <- CyclicBarrierCreate(3) {
-    async func worker(id: int) -> void {
-        PrintLine("线程 " + id.ToStr() + " 到达栅栏")
-        CyclicBarrierAwait(barrier)
-        PrintLine("线程 " + id.ToStr() + " 继续执行")
-    }
-
-    worker(1)
-    worker(2)
-    worker(3)
-}
-```
-
----
-
-### 取消令牌源 (CancellationTokenSource)
-
-取消令牌源用于协调取消异步操作。
-
-#### CreateCancellationTokenSource
-**签名**: `CreateCancellationTokenSource() -> int`
-
-**描述**: 创建取消令牌源。
-
-**返回值**: 令牌源 ID
-
-#### Cancel
-**签名**: `Cancel(ctsId: int) -> void`
-
-**描述**: 立即取消操作。
-
-#### CancelAfter
-**签名**: `CancelAfter(ctsId: int, delayMs: int) -> void`
-
-**描述**: 延迟指定时间后取消。
-
-**参数**:
-- `ctsId`: 令牌源 ID
-- `delayMs`: 延迟时间（毫秒）
-
-#### DisposeCancellationTokenSource
-**签名**: `DisposeCancellationTokenSource(ctsId: int) -> void`
-
-**描述**: 释放令牌源资源。
-
-**示例**:
-```old8lang
-using cts <- CreateCancellationTokenSource() {
-    CancelAfter(cts, 5000)  // 5秒后自动取消
-
-    // 执行可取消的长时间操作
-    // ...
-}
-```
-
----
-
-## 实用工具函数
-
-### Sleep
-**签名**: `Sleep(milliseconds: int) -> void`
-
-**描述**: 暂停当前线程指定毫秒数。
-
-**示例**:
-```old8lang
-PrintLine("开始")
-Sleep(1000)  // 暂停1秒
-PrintLine("结束")
-```
-
-### GetCurrentThreadId
-**签名**: `GetCurrentThreadId() -> int`
-
-**描述**: 获取当前线程的 ID。
-
-**返回值**: 线程 ID
-
-**示例**:
-```old8lang
-threadId <- GetCurrentThreadId()
-PrintLine("当前线程ID: " + threadId.ToStr())
-```
-
-### GetProcessorCount
-**签名**: `GetProcessorCount() -> int`
-
-**描述**: 获取系统处理器核心数量。
-
-**返回值**: CPU 核心数
-
-**示例**:
-```old8lang
-cores <- GetProcessorCount()
-PrintLine("系统有 " + cores.ToStr() + " 个核心")
-```
-
----
-
-## 资源管理
-
-### Using 语句
-
-`using` 语句提供自动资源管理,确保资源在使用完毕后自动释放。
-
-**语法**:
-```old8lang
-// 形式1: 带变量声明
-using resource <- CreateResource() {
-    // 使用资源
-}  // 自动调用 Dispose
-
-// 形式2: 使用已有变量
-res <- CreateResource()
-using res {
-    // 使用资源
-}  // 自动调用 Dispose
-```
-
-**适用资源**: 所有返回 ID（int）的并发原语都支持自动释放:
-- Mutex → MutexDispose
-- Semaphore → SemaphoreDispose
-- AtomicInt → AtomicIntDispose
-- Channel → ChannelDispose
-- ReadWriteLock → ReadWriteLockDispose
-- CountDownLatch → CountDownLatchDispose
-- CyclicBarrier → CyclicBarrierDispose
-- CancellationTokenSource → DisposeCancellationTokenSource
-
-**示例**:
-```old8lang
-using mutex <- MutexCreate() {
-    MutexLock(mutex)
-    counter <- counter + 1
-    MutexUnlock(mutex)
-}  // MutexDispose 自动调用
-```
-
----
-
-## 标准库 (Standard Libraries)
-
-Old8Lang 提供了丰富的标准库，涵盖核心功能、网络、数据库、序列化和机器学习等领域。
-
-### 模式支持说明
-
-每个 API 都标注了支持的执行模式：
-- ✅ **解释模式** (`-f`): 完全支持
-- ✅ **IL 模式** (`-il`): 完全支持
-- ✅ **VM 模式** (`-vm`): 完全支持
-- ❌ 不支持该模式
-
----
-
-## 核心标准库 (Old8LangLib)
-
-**位置**: `Old8LangLib/`
-
-核心标准库提供基础功能，包括数学运算、文件操作、加密、图像处理等。
-
-### Math 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Math"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Math.Sin` | `(x: double) -> double` | 正弦函数 |
-| `Math.Cos` | `(x: double) -> double` | 余弦函数 |
-| `Math.Tan` | `(x: double) -> double` | 正切函数 |
-| `Math.Sqrt` | `(x: double) -> double` | 平方根 |
-| `Math.Pow` | `(base: double, exp: double) -> double` | 幂运算 |
-| `Math.Abs` | `(x: double) -> double` | 绝对值 |
-| `Math.Floor` | `(x: double) -> double` | 向下取整 |
-| `Math.Ceil` | `(x: double) -> double` | 向上取整 |
-| `Math.Round` | `(x: double) -> double` | 四舍五入 |
-| `Math.Max` | `(a: double, b: double) -> double` | 最大值 |
-| `Math.Min` | `(a: double, b: double) -> double` | 最小值 |
-| `Math.Log` | `(x: double) -> double` | 自然对数 |
-| `Math.Log10` | `(x: double) -> double` | 以10为底的对数 |
-| `Math.Exp` | `(x: double) -> double` | e的x次方 |
-
-**示例**:
-```old8lang
-import "Math"
-
-// 计算圆的面积
-radius <- 5.0
-area <- Math.PI * Math.Pow(radius, 2)
-PrintLine("Area: " + area.ToStr())
-
-// 三角函数
-angle <- Math.PI / 4  // 45度
-sin_value <- Math.Sin(angle)
-cos_value <- Math.Cos(angle)
-PrintLine("sin(45°) = " + sin_value.ToStr())
-PrintLine("cos(45°) = " + cos_value.ToStr())
-```
-
----
-
-### File 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "File"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `File.Read` | `(path: string) -> string` | 读取文件全部内容 |
-| `File.Write` | `(path: string, content: string) -> void` | 写入文件 |
-| `File.Append` | `(path: string, content: string) -> void` | 追加内容到文件 |
-| `File.Exists` | `(path: string) -> bool` | 检查文件是否存在 |
-| `File.Delete` | `(path: string) -> void` | 删除文件 |
-| `File.Copy` | `(source: string, dest: string) -> void` | 复制文件 |
-| `File.Move` | `(source: string, dest: string) -> void` | 移动文件 |
-| `File.GetSize` | `(path: string) -> int` | 获取文件大小 |
-| `File.ReadLines` | `(path: string) -> list<string>` | 按行读取文件 |
-| `File.WriteLines` | `(path: string, lines: list<string>) -> void` | 按行写入文件 |
-
-**示例**:
-```old8lang
-import "File"
-
-// 写入文件
-File.Write("test.txt", "Hello, Old8Lang!")
-
-// 读取文件
-content <- File.Read("test.txt")
-PrintLine(content)
-
-// 检查文件是否存在
-if File.Exists("test.txt") {
-    PrintLine("File exists")
-    size <- File.GetSize("test.txt")
-    PrintLine("Size: " + size.ToStr() + " bytes")
-}
-
-// 按行读取
-lines <- File.ReadLines("test.txt")
-for line in lines {
-    PrintLine("Line: " + line)
-}
-```
-
----
-
-### Crypto 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Crypto"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Crypto.MD5` | `(data: string) -> string` | MD5 哈希 |
-| `Crypto.SHA1` | `(data: string) -> string` | SHA1 哈希 |
-| `Crypto.SHA256` | `(data: string) -> string` | SHA256 哈希 |
-| `Crypto.SHA512` | `(data: string) -> string` | SHA512 哈希 |
-| `Crypto.AESEncrypt` | `(data: string, key: string) -> string` | AES 加密 |
-| `Crypto.AESDecrypt` | `(encrypted: string, key: string) -> string` | AES 解密 |
-| `Crypto.Base64Encode` | `(data: string) -> string` | Base64 编码 |
-| `Crypto.Base64Decode` | `(encoded: string) -> string` | Base64 解码 |
-
-**示例**:
-```old8lang
-import "Crypto"
-
-// 哈希函数
-text <- "Hello, World!"
-md5_hash <- Crypto.MD5(text)
-sha256_hash <- Crypto.SHA256(text)
-PrintLine("MD5: " + md5_hash)
-PrintLine("SHA256: " + sha256_hash)
-
-// AES 加密/解密
-key <- "my-secret-key-32-characters-long"
-encrypted <- Crypto.AESEncrypt("Secret Message", key)
-decrypted <- Crypto.AESDecrypt(encrypted, key)
-PrintLine("Encrypted: " + encrypted)
-PrintLine("Decrypted: " + decrypted)
-
-// Base64 编码
-encoded <- Crypto.Base64Encode("Hello")
-decoded <- Crypto.Base64Decode(encoded)
-PrintLine("Encoded: " + encoded)
-PrintLine("Decoded: " + decoded)
-```
-
----
-
-### Image 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Image"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Image.Load` | `(path: string) -> object` | 加载图像 |
-| `Image.Save` | `(image: object, path: string) -> void` | 保存图像 |
-| `Image.Resize` | `(image: object, width: int, height: int) -> object` | 调整大小 |
-| `Image.Crop` | `(image: object, x: int, y: int, w: int, h: int) -> object` | 裁剪图像 |
-| `Image.Rotate` | `(image: object, angle: double) -> object` | 旋转图像 |
-| `Image.Flip` | `(image: object, mode: string) -> object` | 翻转图像 |
-| `Image.GetWidth` | `(image: object) -> int` | 获取宽度 |
-| `Image.GetHeight` | `(image: object) -> int` | 获取高度 |
-
-**示例**:
-```old8lang
-import "Image"
-
-// 加载图像
-img <- Image.Load("photo.jpg")
-width <- Image.GetWidth(img)
-height <- Image.GetHeight(img)
-PrintLine("Size: " + width.ToStr() + "x" + height.ToStr())
-
-// 调整大小
-resized <- Image.Resize(img, 800, 600)
-Image.Save(resized, "photo_resized.jpg")
-
-// 裁剪
-cropped <- Image.Crop(img, 100, 100, 400, 300)
-Image.Save(cropped, "photo_cropped.jpg")
-
-// 旋转
-rotated <- Image.Rotate(img, 90)
-Image.Save(rotated, "photo_rotated.jpg")
-```
-
----
-
-### Regex 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Regex"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Regex.Match` | `(pattern: string, text: string) -> bool` | 匹配模式 |
-| `Regex.Find` | `(pattern: string, text: string) -> string` | 查找第一个匹配 |
-| `Regex.FindAll` | `(pattern: string, text: string) -> list<string>` | 查找所有匹配 |
-| `Regex.Replace` | `(pattern: string, text: string, replacement: string) -> string` | 替换匹配 |
-| `Regex.Split` | `(pattern: string, text: string) -> list<string>` | 按模式分割 |
-
-**示例**:
-```old8lang
-import "Regex"
-
-// 匹配邮箱
-email <- "user@example.com"
-pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-if Regex.Match(pattern, email) {
-    PrintLine("Valid email")
-}
-
-// 查找所有数字
-text <- "Price: $123.45, Quantity: 10"
-numbers <- Regex.FindAll("\\d+", text)
-for num in numbers {
-    PrintLine("Found: " + num)
-}
-
-// 替换
-result <- Regex.Replace("\\d+", "The year is 2024", "XXXX")
-PrintLine(result)  // "The year is XXXX"
-```
-
----
-
-### Terminal 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Terminal"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Terminal.Clear` | `() -> void` | 清空终端 |
-| `Terminal.SetCursorPosition` | `(x: int, y: int) -> void` | 设置光标位置 |
-| `Terminal.GetCursorPosition` | `() -> object` | 获取光标位置 |
-| `Terminal.SetTitle` | `(title: string) -> void` | 设置终端标题 |
-| `Terminal.Beep` | `() -> void` | 发出蜂鸣声 |
-| `Terminal.GetWidth` | `() -> int` | 获取终端宽度 |
-| `Terminal.GetHeight` | `() -> int` | 获取终端高度 |
-
-**示例**:
-```old8lang
-import "Terminal"
-
-// 清空终端
-Terminal.Clear()
-
-// 设置标题
-Terminal.SetTitle("Old8Lang Application")
-
-// 获取终端大小
-width <- Terminal.GetWidth()
-height <- Terminal.GetHeight()
-PrintLine("Terminal size: " + width.ToStr() + "x" + height.ToStr())
-
-// 设置光标位置并输出
-Terminal.SetCursorPosition(10, 5)
-PrintLine("Hello at (10, 5)")
-```
-
----
-
-### ColorfulTerminal 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "ColorfulTerminal"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `ColorfulTerminal.Print` | `(text: string, color: string) -> void` | 彩色输出 |
-| `ColorfulTerminal.PrintLine` | `(text: string, color: string) -> void` | 彩色输出并换行 |
-| `ColorfulTerminal.SetForeground` | `(color: string) -> void` | 设置前景色 |
-| `ColorfulTerminal.SetBackground` | `(color: string) -> void` | 设置背景色 |
-| `ColorfulTerminal.Reset` | `() -> void` | 重置颜色 |
-
-**支持的颜色**: `"Red"`, `"Green"`, `"Blue"`, `"Yellow"`, `"Cyan"`, `"Magenta"`, `"White"`, `"Black"`
-
-**示例**:
-```old8lang
-import "ColorfulTerminal"
-
-// 彩色输出
-ColorfulTerminal.PrintLine("Success!", "Green")
-ColorfulTerminal.PrintLine("Warning!", "Yellow")
-ColorfulTerminal.PrintLine("Error!", "Red")
-
-// 设置颜色
-ColorfulTerminal.SetForeground("Cyan")
-PrintLine("This is cyan text")
-ColorfulTerminal.Reset()
-```
-
----
-
-### Time 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Time"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Time.Now` | `() -> object` | 获取当前时间 |
-| `Time.Format` | `(time: object, format: string) -> string` | 格式化时间 |
-| `Time.Parse` | `(timeStr: string, format: string) -> object` | 解析时间字符串 |
-| `Time.AddDays` | `(time: object, days: int) -> object` | 添加天数 |
-| `Time.AddHours` | `(time: object, hours: int) -> object` | 添加小时 |
-| `Time.AddMinutes` | `(time: object, minutes: int) -> object` | 添加分钟 |
-| `Time.Diff` | `(time1: object, time2: object) -> int` | 计算时间差（秒） |
-| `Time.Sleep` | `(milliseconds: int) -> void` | 休眠 |
-
-**示例**:
-```old8lang
-import "Time"
-
-// 获取当前时间
-now <- Time.Now()
-formatted <- Time.Format(now, "yyyy-MM-dd HH:mm:ss")
-PrintLine("Current time: " + formatted)
-
-// 时间运算
-tomorrow <- Time.AddDays(now, 1)
-PrintLine("Tomorrow: " + Time.Format(tomorrow, "yyyy-MM-dd"))
-
-// 解析时间
-parsed <- Time.Parse("2024-01-01 12:00:00", "yyyy-MM-dd HH:mm:ss")
-
-// 计算时间差
-diff <- Time.Diff(tomorrow, now)
-PrintLine("Difference: " + diff.ToStr() + " seconds")
-
-// 休眠
-PrintLine("Sleeping for 1 second...")
-Time.Sleep(1000)
-PrintLine("Done!")
-```
-
----
-
-### OS 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "OS"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `OS.GetEnv` | `(name: string) -> string` | 获取环境变量 |
-| `OS.SetEnv` | `(name: string, value: string) -> void` | 设置环境变量 |
-| `OS.GetPlatform` | `() -> string` | 获取平台名称 |
-| `OS.GetArch` | `() -> string` | 获取架构 |
-| `OS.Exec` | `(command: string) -> string` | 执行系统命令 |
-| `OS.GetCurrentDir` | `() -> string` | 获取当前目录 |
-| `OS.SetCurrentDir` | `(path: string) -> void` | 设置当前目录 |
-| `OS.Exit` | `(code: int) -> void` | 退出程序 |
-
-**示例**:
-```old8lang
-import "OS"
-
-// 获取平台信息
-platform <- OS.GetPlatform()
-arch <- OS.GetArch()
-PrintLine("Platform: " + platform + " (" + arch + ")")
-
-// 环境变量
-path <- OS.GetEnv("PATH")
-PrintLine("PATH: " + path)
-
-// 执行命令
-result <- OS.Exec("echo Hello from shell")
-PrintLine(result)
-
-// 目录操作
-current <- OS.GetCurrentDir()
-PrintLine("Current directory: " + current)
-```
-
----
-
-### CSV 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "CSV"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `CSV.Read` | `(path: string) -> list<list<string>>` | 读取 CSV 文件 |
-| `CSV.Write` | `(path: string, data: list<list<string>>) -> void` | 写入 CSV 文件 |
-| `CSV.Parse` | `(content: string) -> list<list<string>>` | 解析 CSV 字符串 |
-| `CSV.Stringify` | `(data: list<list<string>>) -> string` | 转换为 CSV 字符串 |
-
-**示例**:
-```old8lang
-import "CSV"
-
-// 写入 CSV
-data <- [
-    ["Name", "Age", "City"],
-    ["Alice", "30", "New York"],
-    ["Bob", "25", "London"]
-]
-CSV.Write("data.csv", data)
-
-// 读取 CSV
-rows <- CSV.Read("data.csv")
-for row in rows {
-    PrintLine(row[0] + ", " + row[1] + ", " + row[2])
-}
-```
-
----
-
-### Template 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Template"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Template.Render` | `(template: string, data: dict) -> string` | 渲染模板 |
-| `Template.RenderFile` | `(path: string, data: dict) -> string` | 渲染模板文件 |
-
-**模板语法**:
-- `{{variable}}` - 变量替换
-- `{{#if condition}}...{{/if}}` - 条件
-- `{{#each items}}...{{/each}}` - 循环
-
-**示例**:
-```old8lang
-import "Template"
-
-// 简单模板
-template <- "Hello, {{name}}! You are {{age}} years old."
-data <- {"name": "Alice", "age": 30}
-result <- Template.Render(template, data)
-PrintLine(result)  // "Hello, Alice! You are 30 years old."
-
-// 条件和循环
-template2 <- "{{#if show}}Items: {{#each items}}{{this}}, {{/each}}{{/if}}"
-data2 <- {"show": true, "items": [1, 2, 3]}
-result2 <- Template.Render(template2, data2)
-PrintLine(result2)
-```
-
----
-
-### Vector 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Vector"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Vector.Create` | `(values: list<double>) -> object` | 创建向量 |
-| `Vector.Add` | `(v1: object, v2: object) -> object` | 向量加法 |
-| `Vector.Subtract` | `(v1: object, v2: object) -> object` | 向量减法 |
-| `Vector.Multiply` | `(v: object, scalar: double) -> object` | 标量乘法 |
-| `Vector.Dot` | `(v1: object, v2: object) -> double` | 点积 |
-| `Vector.Cross` | `(v1: object, v2: object) -> object` | 叉积（3D） |
-| `Vector.Magnitude` | `(v: object) -> double` | 向量长度 |
-| `Vector.Normalize` | `(v: object) -> object` | 归一化 |
-
-**示例**:
-```old8lang
-import "Vector"
-
-// 创建向量
-v1 <- Vector.Create([1.0, 2.0, 3.0])
-v2 <- Vector.Create([4.0, 5.0, 6.0])
-
-// 向量运算
-sum <- Vector.Add(v1, v2)
-diff <- Vector.Subtract(v1, v2)
-scaled <- Vector.Multiply(v1, 2.0)
-
-// 点积和叉积
-dot <- Vector.Dot(v1, v2)
-cross <- Vector.Cross(v1, v2)
-
-// 长度和归一化
-length <- Vector.Magnitude(v1)
-normalized <- Vector.Normalize(v1)
-
-PrintLine("Dot product: " + dot.ToStr())
-PrintLine("Length: " + length.ToStr())
-```
-
-## 网络库 (Old8Lang.NetLib)
-
-**位置**: `Old8Lang.NetLib/`
-
-网络库提供 HTTP、WebSocket、MQTT、Socket 等网络功能。
-
-### HTTP 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "HTTP"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `HTTP.Get` | `(url: string) -> string` | GET 请求 |
-| `HTTP.Post` | `(url: string, data: string) -> string` | POST 请求 |
-| `HTTP.Put` | `(url: string, data: string) -> string` | PUT 请求 |
-| `HTTP.Delete` | `(url: string) -> string` | DELETE 请求 |
-| `HTTP.SetHeader` | `(name: string, value: string) -> void` | 设置请求头 |
-| `HTTP.SetTimeout` | `(milliseconds: int) -> void` | 设置超时 |
-
-**示例**:
-```old8lang
-import "HTTP"
-
-// GET 请求
-response <- HTTP.Get("https://api.example.com/users")
-PrintLine(response)
-
-// POST 请求
-HTTP.SetHeader("Content-Type", "application/json")
-data <- "{\"name\": \"Alice\", \"age\": 30}"
-result <- HTTP.Post("https://api.example.com/users", data)
-PrintLine(result)
-
-// 设置超时
-HTTP.SetTimeout(5000)  // 5秒
-```
-
----
-
-### WebSocket 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "WebSocket"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `WebSocket.Connect` | `(url: string) -> object` | 连接 WebSocket |
-| `WebSocket.Send` | `(ws: object, message: string) -> void` | 发送消息 |
-| `WebSocket.Receive` | `(ws: object) -> string` | 接收消息 |
-| `WebSocket.Close` | `(ws: object) -> void` | 关闭连接 |
-| `WebSocket.IsConnected` | `(ws: object) -> bool` | 检查连接状态 |
-
-**示例**:
-```old8lang
-import "WebSocket"
-
-// 连接 WebSocket
-ws <- WebSocket.Connect("wss://echo.websocket.org")
-
-// 发送消息
-WebSocket.Send(ws, "Hello, WebSocket!")
-
-// 接收消息
-message <- WebSocket.Receive(ws)
-PrintLine("Received: " + message)
-
-// 关闭连接
-WebSocket.Close(ws)
-```
-
----
-
-### MQTT 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "MQTT"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `MQTT.Connect` | `(broker: string, port: int) -> object` | 连接 MQTT 代理 |
-| `MQTT.Publish` | `(client: object, topic: string, message: string) -> void` | 发布消息 |
-| `MQTT.Subscribe` | `(client: object, topic: string) -> void` | 订阅主题 |
-| `MQTT.Receive` | `(client: object) -> string` | 接收消息 |
-| `MQTT.Disconnect` | `(client: object) -> void` | 断开连接 |
-
-**示例**:
-```old8lang
-import "MQTT"
-
-// 连接 MQTT 代理
-client <- MQTT.Connect("broker.hivemq.com", 1883)
-
-// 订阅主题
-MQTT.Subscribe(client, "test/topic")
-
-// 发布消息
-MQTT.Publish(client, "test/topic", "Hello, MQTT!")
-
-// 接收消息
-message <- MQTT.Receive(client)
-PrintLine("Received: " + message)
-
-// 断开连接
-MQTT.Disconnect(client)
-```
-
----
-
-### Socket 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Socket"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Socket.Create` | `(type: string) -> object` | 创建 Socket |
-| `Socket.Connect` | `(socket: object, host: string, port: int) -> void` | 连接服务器 |
-| `Socket.Send` | `(socket: object, data: string) -> void` | 发送数据 |
-| `Socket.Receive` | `(socket: object, size: int) -> string` | 接收数据 |
-| `Socket.Close` | `(socket: object) -> void` | 关闭 Socket |
-| `Socket.Bind` | `(socket: object, port: int) -> void` | 绑定端口 |
-| `Socket.Listen` | `(socket: object, backlog: int) -> void` | 监听连接 |
-| `Socket.Accept` | `(socket: object) -> object` | 接受连接 |
-
-**示例**:
-```old8lang
-import "Socket"
-
-// TCP 客户端
-socket <- Socket.Create("TCP")
-Socket.Connect(socket, "example.com", 80)
-Socket.Send(socket, "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
-response <- Socket.Receive(socket, 1024)
-PrintLine(response)
-Socket.Close(socket)
-
-// TCP 服务器
-server <- Socket.Create("TCP")
-Socket.Bind(server, 8080)
-Socket.Listen(server, 5)
-PrintLine("Server listening on port 8080")
-client <- Socket.Accept(server)
-data <- Socket.Receive(client, 1024)
-Socket.Send(client, "Hello, Client!")
-Socket.Close(client)
-Socket.Close(server)
-```
-
----
-
-### WebAPI 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "WebAPI"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `WebAPI.Request` | `(method: string, url: string, data: string) -> string` | 通用请求 |
-| `WebAPI.SetAuth` | `(type: string, token: string) -> void` | 设置认证 |
-| `WebAPI.ParseJSON` | `(json: string) -> object` | 解析 JSON |
-| `WebAPI.ToJSON` | `(obj: object) -> string` | 转换为 JSON |
-
-**示例**:
-```old8lang
-import "WebAPI"
-
-// 设置认证
-WebAPI.SetAuth("Bearer", "your-api-token")
-
-// 发送请求
-response <- WebAPI.Request("GET", "https://api.example.com/data", "")
-data <- WebAPI.ParseJSON(response)
-
-// 处理数据
-PrintLine("Data: " + data.ToStr())
-```
-
----
-
-## 数据库库 (Old8Lang.DatabaseLib)
-
-**位置**: `Old8Lang.DatabaseLib/`
-
-数据库库提供 MySQL、PostgreSQL、SQLite 等数据库连接和操作。
-
-### MySQL 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "MySQL"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `MySQL.Connect` | `(host: string, user: string, password: string, database: string) -> object` | 连接数据库 |
-| `MySQL.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
-| `MySQL.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
-| `MySQL.Close` | `(conn: object) -> void` | 关闭连接 |
-
-**示例**:
-```old8lang
-import "MySQL"
-
-// 连接数据库
-conn <- MySQL.Connect("localhost", "root", "password", "testdb")
-
-// 查询数据
-results <- MySQL.Query(conn, "SELECT * FROM users")
-for row in results {
-    PrintLine("User: " + row["name"])
-}
-
-// 插入数据
-affected <- MySQL.Execute(conn, "INSERT INTO users (name, age) VALUES ('Alice', 30)")
-PrintLine("Inserted " + affected.ToStr() + " rows")
-
-// 关闭连接
-MySQL.Close(conn)
-```
-
----
-
-### PostgreSQL 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "PostgreSQL"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `PostgreSQL.Connect` | `(connectionString: string) -> object` | 连接数据库 |
-| `PostgreSQL.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
-| `PostgreSQL.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
-| `PostgreSQL.Close` | `(conn: object) -> void` | 关闭连接 |
-
-**示例**:
-```old8lang
-import "PostgreSQL"
-
-// 连接数据库
-connStr <- "Host=localhost;Username=postgres;Password=password;Database=testdb"
-conn <- PostgreSQL.Connect(connStr)
-
-// 查询数据
-results <- PostgreSQL.Query(conn, "SELECT * FROM users")
-for row in results {
-    PrintLine("User: " + row["name"])
-}
-
-// 关闭连接
-PostgreSQL.Close(conn)
-```
-
----
-
-### SQLite 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "SQLite"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `SQLite.Connect` | `(path: string) -> object` | 连接数据库 |
-| `SQLite.Query` | `(conn: object, sql: string) -> list<dict>` | 执行查询 |
-| `SQLite.Execute` | `(conn: object, sql: string) -> int` | 执行命令 |
-| `SQLite.Close` | `(conn: object) -> void` | 关闭连接 |
-
-**示例**:
-```old8lang
-import "SQLite"
-
-// 连接数据库（自动创建）
-conn <- SQLite.Connect("test.db")
-
-// 创建表
-SQLite.Execute(conn, "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
-
-// 插入数据
-SQLite.Execute(conn, "INSERT INTO users (name, age) VALUES ('Alice', 30)")
-
-// 查询数据
-results <- SQLite.Query(conn, "SELECT * FROM users")
-for row in results {
-    PrintLine("User: " + row["name"] + ", Age: " + row["age"].ToStr())
-}
-
-// 关闭连接
-SQLite.Close(conn)
-```
-
----
-
-### InMemory 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "InMemory"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `InMemory.Create` | `() -> object` | 创建内存数据库 |
-| `InMemory.Set` | `(db: object, key: string, value: object) -> void` | 设置值 |
-| `InMemory.Get` | `(db: object, key: string) -> object` | 获取值 |
-| `InMemory.Delete` | `(db: object, key: string) -> void` | 删除值 |
-| `InMemory.Exists` | `(db: object, key: string) -> bool` | 检查键是否存在 |
-| `InMemory.Clear` | `(db: object) -> void` | 清空数据库 |
-
-**示例**:
-```old8lang
-import "InMemory"
-
-// 创建内存数据库
-db <- InMemory.Create()
-
-// 存储数据
-InMemory.Set(db, "user:1", {"name": "Alice", "age": 30})
-InMemory.Set(db, "user:2", {"name": "Bob", "age": 25})
-
-// 读取数据
-user <- InMemory.Get(db, "user:1")
-PrintLine("User: " + user["name"])
-
-// 检查存在
-if InMemory.Exists(db, "user:1") {
-    PrintLine("User 1 exists")
-}
-
-// 删除数据
-InMemory.Delete(db, "user:2")
-```
-
----
-
-### ORM 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "ORM"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `ORM.Define` | `(name: string, schema: dict) -> object` | 定义模型 |
-| `ORM.Create` | `(model: object, data: dict) -> object` | 创建记录 |
-| `ORM.Find` | `(model: object, id: int) -> object` | 查找记录 |
-| `ORM.FindAll` | `(model: object, filter: dict) -> list<object>` | 查找所有记录 |
-| `ORM.Update` | `(record: object, data: dict) -> void` | 更新记录 |
-| `ORM.Delete` | `(record: object) -> void` | 删除记录 |
-
-**示例**:
-```old8lang
-import "ORM"
-
-// 定义模型
-User <- ORM.Define("User", {
-    "name": "string",
-    "age": "int",
-    "email": "string"
-})
-
-// 创建记录
-user <- ORM.Create(User, {"name": "Alice", "age": 30, "email": "alice@example.com"})
-
-// 查找记录
-found <- ORM.Find(User, 1)
-PrintLine("Found: " + found["name"])
-
-// 更新记录
-ORM.Update(user, {"age": 31})
-
-// 删除记录
-ORM.Delete(user)
-```
-
----
-
-## 序列化库 (Old8Lang.SerializationLib)
-
-**位置**: `Old8Lang.SerializationLib/`
-
-序列化库提供 MessagePack、Protobuf 等序列化格式支持。
-
-### MessagePack 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "MessagePack"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `MessagePack.Serialize` | `(obj: object) -> string` | 序列化对象 |
-| `MessagePack.Deserialize` | `(data: string) -> object` | 反序列化 |
-
-**示例**:
-```old8lang
-import "MessagePack"
-
-// 序列化
-data <- {"name": "Alice", "age": 30, "items": [1, 2, 3]}
-serialized <- MessagePack.Serialize(data)
-PrintLine("Serialized: " + serialized)
-
-// 反序列化
-deserialized <- MessagePack.Deserialize(serialized)
-PrintLine("Name: " + deserialized["name"])
-PrintLine("Age: " + deserialized["age"].ToStr())
-```
-
----
-
-### Protobuf 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Protobuf"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Protobuf.Serialize` | `(obj: object, schema: string) -> string` | 序列化对象 |
-| `Protobuf.Deserialize` | `(data: string, schema: string) -> object` | 反序列化 |
-| `Protobuf.LoadSchema` | `(path: string) -> string` | 加载 .proto 文件 |
-
-**示例**:
-```old8lang
-import "Protobuf"
-
-// 加载 schema
-schema <- Protobuf.LoadSchema("user.proto")
-
-// 序列化
-data <- {"name": "Alice", "age": 30}
-serialized <- Protobuf.Serialize(data, schema)
-
-// 反序列化
-deserialized <- Protobuf.Deserialize(serialized, schema)
-PrintLine("Name: " + deserialized["name"])
-```
-
----
-
-### Factory 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "SerializerFactory"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `SerializerFactory.Create` | `(type: string) -> object` | 创建序列化器 |
-| `SerializerFactory.Serialize` | `(serializer: object, obj: object) -> string` | 序列化 |
-| `SerializerFactory.Deserialize` | `(serializer: object, data: string) -> object` | 反序列化 |
-
-**支持的类型**: `"JSON"`, `"MessagePack"`, `"Protobuf"`, `"XML"`
-
-**示例**:
-```old8lang
-import "SerializerFactory"
-
-// 创建序列化器
-serializer <- SerializerFactory.Create("JSON")
-
-// 序列化
-data <- {"name": "Alice", "age": 30}
-serialized <- SerializerFactory.Serialize(serializer, data)
-PrintLine(serialized)
-
-// 反序列化
-deserialized <- SerializerFactory.Deserialize(serializer, serialized)
-PrintLine("Name: " + deserialized["name"])
-```
-
----
-
-## 机器学习库 (Old8Lang.MachineLearningLib)
-
-**位置**: `Old8Lang.MachineLearningLib/`
-
-机器学习库提供分类、回归、聚类等机器学习功能。
-
-### Classification 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Classification"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Classification.Train` | `(data: list<list<double>>, labels: list<int>, algorithm: string) -> object` | 训练分类模型 |
-| `Classification.Predict` | `(model: object, input: list<double>) -> int` | 预测类别 |
-| `Classification.Evaluate` | `(model: object, testData: list<list<double>>, testLabels: list<int>) -> double` | 评估模型 |
-
-**支持的算法**: `"LogisticRegression"`, `"DecisionTree"`, `"RandomForest"`, `"SVM"`, `"NaiveBayes"`
-
-**示例**:
-```old8lang
-import "Classification"
-
-// 训练数据
-data <- [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 5.0]]
-labels <- [0, 0, 1, 1]
-
-// 训练模型
-model <- Classification.Train(data, labels, "LogisticRegression")
-
-// 预测
-prediction <- Classification.Predict(model, [2.5, 3.5])
-PrintLine("Prediction: " + prediction.ToStr())
-
-// 评估
-accuracy <- Classification.Evaluate(model, data, labels)
-PrintLine("Accuracy: " + accuracy.ToStr())
-```
-
----
-
-### Regression 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Regression"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Regression.Train` | `(data: list<list<double>>, targets: list<double>, algorithm: string) -> object` | 训练回归模型 |
-| `Regression.Predict` | `(model: object, input: list<double>) -> double` | 预测值 |
-| `Regression.Evaluate` | `(model: object, testData: list<list<double>>, testTargets: list<double>) -> double` | 评估模型 |
-
-**支持的算法**: `"LinearRegression"`, `"PolynomialRegression"`, `"Ridge"`, `"Lasso"`
-
-**示例**:
-```old8lang
-import "Regression"
-
-// 训练数据
-data <- [[1.0], [2.0], [3.0], [4.0]]
-targets <- [2.0, 4.0, 6.0, 8.0]
-
-// 训练模型
-model <- Regression.Train(data, targets, "LinearRegression")
-
-// 预测
-prediction <- Regression.Predict(model, [5.0])
-PrintLine("Prediction: " + prediction.ToStr())
-
-// 评估（R² 分数）
-score <- Regression.Evaluate(model, data, targets)
-PrintLine("R² Score: " + score.ToStr())
-```
-
----
-
-### Clustering 模块
-
-**模式支持**: ✅ 解释模式 | ❌ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Clustering"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Clustering.Train` | `(data: list<list<double>>, numClusters: int, algorithm: string) -> object` | 训练聚类模型 |
-| `Clustering.Predict` | `(model: object, input: list<double>) -> int` | 预测簇 |
-| `Clustering.GetCenters` | `(model: object) -> list<list<double>>` | 获取簇中心 |
-
-**支持的算法**: `"KMeans"`, `"DBSCAN"`, `"HierarchicalClustering"`
-
-**示例**:
-```old8lang
-import "Clustering"
-
-// 训练数据
-data <- [[1.0, 2.0], [1.5, 1.8], [5.0, 8.0], [8.0, 8.0], [1.0, 0.6], [9.0, 11.0]]
-
-// 训练模型（3个簇）
-model <- Clustering.Train(data, 3, "KMeans")
-
-// 预测
-cluster <- Clustering.Predict(model, [2.0, 2.0])
-PrintLine("Cluster: " + cluster.ToStr())
-
-// 获取簇中心
-centers <- Clustering.GetCenters(model)
-for i <- 0, i < centers.Length(), i++ {
-    PrintLine("Center " + i.ToStr() + ": " + centers[i].ToStr())
-}
-```
-
----
-
-### DataLoader 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "DataLoader"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `DataLoader.LoadCSV` | `(path: string) -> list<list<double>>` | 加载 CSV 数据 |
-| `DataLoader.LoadJSON` | `(path: string) -> object` | 加载 JSON 数据 |
-| `DataLoader.Normalize` | `(data: list<list<double>>) -> list<list<double>>` | 归一化数据 |
-| `DataLoader.Split` | `(data: list<list<double>>, ratio: double) -> object` | 分割训练/测试集 |
-
-**示例**:
-```old8lang
-import "DataLoader"
-
-// 加载数据
-data <- DataLoader.LoadCSV("data.csv")
-
-// 归一化
-normalized <- DataLoader.Normalize(data)
-
-// 分割数据（80% 训练，20% 测试）
-split <- DataLoader.Split(normalized, 0.8)
-trainData <- split["train"]
-testData <- split["test"]
-
-PrintLine("Train size: " + trainData.Length().ToStr())
-PrintLine("Test size: " + testData.Length().ToStr())
-```
-
----
-
-### Predictor 模块
-
-**模式支持**: ✅ 解释模式 | ✅ IL 模式 | ✅ VM 模式
-
-**导入方式**:
-```old8lang
-import "Predictor"
-```
-
-**主要函数**:
-
-| 函数 | 签名 | 描述 |
-|------|------|------|
-| `Predictor.LoadModel` | `(path: string) -> object` | 加载模型 |
-| `Predictor.SaveModel` | `(model: object, path: string) -> void` | 保存模型 |
-| `Predictor.Predict` | `(model: object, input: object) -> object` | 预测 |
-| `Predictor.BatchPredict` | `(model: object, inputs: list<object>) -> list<object>` | 批量预测 |
-
-**示例**:
-```old8lang
-import "Predictor"
-import "Classification"
-
-// 训练模型
-data <- [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]]
-labels <- [0, 0, 1]
-model <- Classification.Train(data, labels, "LogisticRegression")
-
-// 保存模型
-Predictor.SaveModel(model, "model.pkl")
-
-// 加载模型
-loadedModel <- Predictor.LoadModel("model.pkl")
-
-// 预测
-prediction <- Predictor.Predict(loadedModel, [2.5, 3.5])
-PrintLine("Prediction: " + prediction.ToStr())
-
-// 批量预测
-inputs <- [[1.5, 2.5], [3.5, 4.5]]
-predictions <- Predictor.BatchPredict(loadedModel, inputs)
-for pred in predictions {
-    PrintLine("Prediction: " + pred.ToStr())
-}
-```
-
----
-
-## 总结
-
-本 API 参考文档涵盖了 Old8Lang 的完整标准库，包括：
-
-- **核心标准库 (Old8LangLib)**: 12个模块 - Math, File, Crypto, Image, Regex, Terminal, ColorfulTerminal, Time, OS, CSV, Template, Vector
-- **网络库 (Old8Lang.NetLib)**: 5个模块 - HTTP, WebSocket, MQTT, Socket, WebAPI
-- **数据库库 (Old8Lang.DatabaseLib)**: 5个模块 - MySQL, PostgreSQL, SQLite, InMemory, ORM
-- **序列化库 (Old8Lang.SerializationLib)**: 3个模块 - MessagePack, Protobuf, Factory
-- **机器学习库 (Old8Lang.MachineLearningLib)**: 5个模块 - Classification, Regression, Clustering, DataLoader, Predictor
-
-每个模块都标注了支持的执行模式（解释模式、IL 模式、VM 模式），并提供了完整的函数签名和可运行的代码示例。
-
-更多信息请参考:
-- [ARCHITECTURE.md](ARCHITECTURE.md) - 架构文档
-- [LANGUAGE_FEATURES.md](LANGUAGE_FEATURES.md) - 语言特性文档
-- [CLI_GUIDE.md](CLI_GUIDE.md) - CLI 命令参考
-- [Old8Lang_Grammar.md](Old8Lang_Grammar.md) - 完整语法说明
-
+## 附录：与旧版文档的主要差异
+
+本次重建中，旧版 API_REFERENCE 被证实与实现不符的内容：
+
+| 旧版写法 | 实况 |
+|---------|------|
+| `Length("Hello")` `Substring(s,0,2)` `ToUpper("hi")` `Trim` `Split` `Replace` `Contains` | 这些**全局函数不存在**，全部是实例方法：`s.Length()`、`s.Substring(0,2)`、`s.ToUpper()`… |
+| `Abs(-5)` `Sqrt(16)` `Pow(2,3)` `Floor` `Max` | 全局形式不存在；用 `import "Math"` + `Math.Sqrt(...)` |
+| `Count(arr)` `Add(lst,x)` `Remove(lst,x)` `Sort(lst)` `Reverse(lst)` `Contains(lst,x)` | 全局形式不存在；`arr.Count()`、`lst.Add(x)`、`lst.Sort()`… |
+| `ToInt("123")` `ToDouble(...)` `ToBool(...)` | 全局形式不存在；`"123".ToInt()` 等实例方法 |
+| `JsonParse` / `JsonStringify` | 实为 `JsonDeserialize` / `JsonSerialize` |
+| `ReadFile` / `WriteFile` / `AppendFile` / `FileExists` / `DeleteFile` | 实为 `File.FileRead` / `File.FileWrite` / `File.FileAppend` / `File.FileExists` / `File.DeleteFile` |
+| `File.Read` / `File.Write` / `File.Exists` / `File.GetSize` / `File.ReadLines` | 实为 `File.FileRead` / `File.FileWrite` / `File.FileExists` / `File.GetFileSize` / `File.FileReadLines` |
+| `OS.GetPlatform` / `OS.SetEnv` / `OS.Exec` / `OS.GetCurrentDir` | 不存在；OS 只有 `OsInfo` 与 `Process`，环境变量与命令执行是全局函数 |
+| `Time.Now` / `Time.Format` / `Time.Diff` / `Time.Sleep` | 实为 `Time.GetLocalTime` / `Time.Format`（需 `DateTime`）/ 无对应项 / 用全局 `Sleep` |
+| `Regex.Match` / `Regex.FindAll` / `Regex.Replace` | 实为 `Regex.RegexIsMatch` / `Regex.RegexMatches` / `Regex.RegexReplace`，且参数顺序为「输入, 模式」 |
+| `Crypto.MD5` / `Crypto.SHA1` / `Crypto.AESEncrypt` | 实为 `Sha256Hash` / `Sha512Hash` / `AesEncrypt`（无 MD5/SHA1） |
+| `CSV.Read` / `CSV.Write` | 模块名是 `Csv`，方法是 `ReadCsv` / `WriteCsv` |
+| `Vector.Create` / `Vector.Add` / `Vector.Dot` | 模块注册的是 `Vector2/3/4/N` 类，无这些静态方法 |
+| `Template.Render` | 模块名是 `TemplateEngine` |
+| `MySQL.*` / `PostgreSQL.*` / `SQLite.*` / `ORM.*` / `Classification.*` / `Regression.*` / `Clustering.*` / `Predictor.*` / `MessagePack.*` / `Protobuf.*` / `HTTP.*` / `MQTT.*` / `Socket.*` / `WebAPI.*` | 这些**都不是模块名**；对应模块分别是 `Database`、`MachineLearning`、`Serialization`、`Net`，且这些模块的方法签名多含 .NET 类型，从 Old8Lang 直接调用受限 |
+| 全局反射函数 `GetClassName` / `GetClassMethods` / `HasMethod` / `HasField` 等 | 不存在；真实反射 API 见 [2.4](#24-反射) |

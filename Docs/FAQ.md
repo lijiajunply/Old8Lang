@@ -509,7 +509,7 @@ jsonStr <- JsonStringify(data)
 
 ### Q: Old8Lang 是开源的吗?
 
-**A**: 是的,Old8Lang 是开源项目。欢迎贡献! 参见 [CONTRIBUTING.md](CONTRIBUTING.md)
+**A**: 是的，Old8Lang 是开源项目。参见 [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md)
 
 ---
 
