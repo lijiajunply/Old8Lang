@@ -35,13 +35,19 @@
   - 项目架构概览。
 - **[贡献指南 (CONTRIBUTING.md)](./CONTRIBUTING.md)**
   - 如何参与 Old8Lang 的开发。
+- **[测试指南 (TESTING_GUIDE.md)](./TESTING_GUIDE.md)**
+  - 单元测试分档、`.old8` 测试文件规范、测试目录与测试报告要求。
+- **[开发流程 (DEVELOPMENT_WORKFLOW.md)](./DEVELOPMENT_WORKFLOW.md)**
+  - 新语法添加流程、AST 节点与错误处理规范、调试与 IL 问题排查。
 - **[变更日志 (CHANGELOG.md)](./CHANGELOG.md)**
   - 查看版本更新历史。
 
 ### 📊 开发状态 (TODO)
 
-- **[编译器 TODO (TODO_Compiler.md)](./TODO_Compiler.md)**
-- **[虚拟机 TODO (TODO_VirtualMachine.md)](./TODO_VirtualMachine.md)**
+- **[待办事项 (Todo.md)](../Todo.md)**
+  - 虚拟机模式性能优化等待办。
+- **[IL 模式测试待办 (TODO.md)](../Old8Lang.Tests/Compiler/TODO.md)**
+  - IL 模式测试覆盖缺口。
 
 ---
 

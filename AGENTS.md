@@ -1,217 +1,83 @@
 # Old8Lang 代理开发指南
 
-## 构建和测试命令
+本文件是代理（AI）的入口索引：只放「必须知道的要点」和「必须遵守的硬规则」，细节一律在 `Docs/` 下。
+**动手前请按需打开对应文档，不要凭记忆臆测**——尤其是测试与开发流程两类。
+
+## 项目概述
+
+Old8Lang 是一门用 C#（.NET 10.0）实现的**动态类型**编程语言，支持三种执行模式：
+
+- **解释模式**（`-f`）：逐条执行 AST，启动最快，支持全部动态特性（泛型、运算符重载、Python 互操作）。用于开发与脚本。
+- **IL 模式**（`-il`，`-c` 为等价别名）：编译成 .NET IL 再执行，运行性能最高，**要求完整类型注解**，不支持部分动态特性。用于生产与性能敏感场景。
+- **虚拟机模式**（`-vm`）：编译成自定义字节码由 VM 执行，支持字节码序列化、跨平台分发与高级调试（实验性）。用于分发与调试。
+
+语言特性包括函数、类、异常处理、async/await、泛型，以及一套完整的标准库。
+
+## 常用命令
 
 ```bash
-# 构建解决方案
+# 构建
 dotnet build Old8Lang.sln
 
-# 运行单元测试（使用 xUnit）
-dotnet test Old8Lang.Tests --configuration Debug
-dotnet test Old8Lang.Tests --configuration Release
+# 单元测试（默认档，自动排除性能/并发用例）
+dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 
-# 运行单个测试类
-dotnet test Old8Lang.Tests --filter "FullyQualifiedName~TestClassName"
+# 运行 Old8Lang 代码
+dotnet run --project Old8Lang.App -- -f  <file.old8>   # 解释模式
+dotnet run --project Old8Lang.App -- -il <file.old8>   # IL 模式
+dotnet run --project Old8Lang.App -- -vm <file.old8>   # 虚拟机模式
+dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
-# 运行单个测试方法
-dotnet test Old8Lang.Tests --filter "TestMethodName"
-
-# 解释模式测试
-dotnet run --project Old8Lang.App -- -f <path-to-file.old8>
-
-# IL 模式测试  
-dotnet run --project Old8Lang.App -- -il <path-to-file.old8>
-
-# 语法测试
-dotnet run --project Old8Lang.App -- -s <path-to-file.old8>
-
-# 运行性能基准测试
-dotnet run --project Old8Lang.Benchmarks --configuration Release
-
-# 运行语法测试套件
-cd TestFiles && ./run_syntax_tests.sh
-
-# 运行解释器测试套件
-cd TestFiles && ./run_interpreter_tests.sh
-
-# 运行 IL 模式测试套件
-cd TestFiles && ./run_compiler_tests.sh
-
-# 运行完整测试套件
-cd TestFiles && ./run_comprehensive_compiler_tests.sh
+# 加 -d 或 --log-level debug 打开调试输出
 ```
 
-## 项目结构
+全量 CLI 命令（性能监控参数、包管理 init/install/pack/publish/sign/cert 等）见 [Docs/CLI_GUIDE.md](Docs/CLI_GUIDE.md)。
 
-### 核心组件
-- **Old8Lang**: 核心语言实现（AST、解析器、编译器、解释器）
-- **Old8Lang.App**: 命令行应用程序
-- **Old8LangLib**: 标准库函数
-- **Old8Lang.Tests**: xUnit 测试套件
-- **Old8Lang.Benchmarks**: 性能基准测试
+## 必须遵守的硬规则
 
-### 扩展库
-- **Old8Lang.NetLib**: 网络功能库
-- **Old8Lang.SerializationLib**: 序列化库
-- **Old8Lang.MachineLearningLib**: 机器学习库
-- **Old8Lang.DatabaseLib**: 数据库库
-- **Old8Lang.CodeGen**: 代码生成器
-- **Old8Lang.LanguageServer**: LSP 服务器实现
+1. **新增语法必须按顺序测试**：语法测试 → 解释模式 → IL 模式 → 虚拟机模式，逐级推进，前一级不过不进下一级。完整流程见 [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md#1-新功能新语法添加流程)。
+2. **测试用 `.old8` 文件按模式放目录**：语法 → `TestFiles/SyntaxTests/`，解释 → `TestFiles/InterpreterTests/`，IL → `TestFiles/CompilerTests/`，VM → `TestFiles/VirtualMachine/`。
+3. **写 `.old8` 的约定**：注释用 `//` 而不是 `#`；用 `PrintLine` 打印结果；期望失败的用例在**文件最后一行**写 `error`。
+4. **每次测试结束都要生成测试报告**，放到 `Reports/`，文件名用 `日期-小时-分钟-测试类型.md`。
+5. **性能/并发用例**必须标 `[Trait("Category", "Performance")]`，它们只在 `performance.runsettings` 档下运行。
+6. **测试中发现与本任务无关的错误**，不要顺手改，记录到 `Todo.md`；不再使用的测试文件及时删除。
 
-## 代码风格规范
+以上规则的完整说明见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md)。
 
-### 导入和命名空间
-- 使用 System 命名空间别名（如 `System.Text` 而非 `System.Text.*`）
-- 按字母顺序排列 using 语句
-- 优先使用局部导入而非全局导入
-- 命名空间结构遵循项目目录结构
+## 架构速览
 
-### 类型系统
-- 启用 `Nullable` 和 `ImplicitUsings`
-- 使用 C# 10.0 语法特性
-- 目标框架：.NET 10.0
-- IL 模式要求函数参数必须有类型注解或默认值
-- 解释模式支持类型推断
+`LangParser` 把源码解析成 AST；同一棵 AST 由不同 Visitor 处理成三种执行方式——`InterpreterVisitor`（解释）、`CompilerVisitor`（生成 IL）、`BytecodeVisitor`（生成字节码），另有 `TypeInferenceVisitor` 做类型推断。四个 Visitor 都在 `Old8Lang/AST/Visitor/`，`IVisitor` 接口是自动生成的，新增 AST 节点后需要重新生成。
 
-### 命名约定
-- **类名**: PascalCase（如 `Operation`, `FunctionCallExpression`）
-- **方法名**: PascalCase（如 `OperaToString()`, `GenerateIl()`）
-- **变量名**: camelCase（如 `left`, `right`, `position`）
-- **常量**: PascalCase 或全大写下划线分隔
-- **接口名**: 以 I 开头（如 `ICommand`, `ILGenerator`）
-- **异常类**: 以 Exception 或 Error 结尾
+详细内容见 [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md)：
 
-### AST 节点规范
-- 继承自适当的基类（如 `LangExpression`, `Statement`）
-- 实现访问者模式支持
-- 包含位置信息参数（`SourcePosition`）
-- 重写 `ToString()` 方法用于调试
-- 实现 `Run()` 方法用于解释器模式
-- 实现 `LoadIlValue()` 方法用于 IL 模式
+- 三种执行模式对比与选择 → [§1.3 执行模式](Docs/ARCHITECTURE.md#13-执行模式-execution-modes)
+- Visitor 模式与四个实现 → [§4 Visitor 模式详解](Docs/ARCHITECTURE.md#4-visitor-模式详解)
+- 模块划分与目录结构 → [§2 模块架构](Docs/ARCHITECTURE.md#2-模块架构)、[§11 项目目录结构](Docs/ARCHITECTURE.md#11-项目目录结构)
+- 类型系统 → [§7 Type System](Docs/ARCHITECTURE.md#7-type-system-类型系统)
 
-### 错误处理
-- 使用自定义异常类型（位于 `Old8Lang.Error` 命名空间）
-- 包含 `SourcePosition` 用于错误定位
-- 优先使用具体的异常类型而非通用 Exception
-- 异常类必须包含位置信息的构造函数
+## 主要项目
 
-### 注释和文档
-- 使用 XML 文档注释
-- 中文注释，描述参数、返回值和异常
-- 重要逻辑添加行内注释
-- 公共 API 必须有完整的 XML 文档
+| 项目 | 说明 |
+|------|------|
+| `Old8Lang/` | 核心语言实现（AST、解析器、解释器、编译器、VM、类型系统） |
+| `Old8Lang.App/` | 命令行应用 |
+| `Old8LangLib/` | 标准库（数学、字符串、文件、集合） |
+| `Old8Lang.Tests/` | xUnit 单元测试 |
+| `Old8Lang.Benchmarks/` | 性能基准测试 |
+| `Old8Lang.NetLib/`、`Old8Lang.SerializationLib/`、`Old8Lang.DatabaseLib/`、`Old8Lang.MachineLearningLib/` | 扩展库 |
+| `Old8Lang.LanguageServer/`、`vscode-old8lang/` | LSP 服务与 VS Code 扩展 |
 
-## 测试规范
+## 文档索引
 
-### 测试文件组织
-- **语法测试**: `TestFiles/SyntaxTests/` 目录，使用 `.old8` 扩展名
-- **解释器测试**: `TestFiles/InterpreterTests/` 目录，使用 `.old8` 扩展名
-- **IL 模式测试**: `TestFiles/CompilerTests/` 目录，使用 `.old8` 扩展名
-- **单元测试**: `Old8Lang.Tests/` 项目，使用 `.cs` 文件
-
-### 测试文件规范
-- 测试文件使用 `.old8` 扩展名
-- 期望错误的文件末尾标记 "error"
-- 测试时可使用 `PrintLine()` 函数打印结果
-- 注释为 `//` 而非 `#`
-- 测试报告保存到 `Reports/` 目录
-
-### 测试流程
-1. 语法测试 → 解释模式测试 → IL 模式测试
-2. 新语法添加必须按此顺序进行测试
-3. 每个测试完成后生成测试报告
-
-## 新语法添加规范
-
-1. **语法解析**: 更新 EBNF 语法规则，实现解析器
-2. **语法测试**: 确保新语法可以被正确解析
-3. **解释器实现**: 在解释器模式下支持新语法
-4. **编译器实现**: 在 IL 模式下支持新语法
-5. **文档更新**: 更新 `Docs/Old8Lang.ebnf` 和 `Docs/Old8Lang_Grammar.md`
-
-## 包管理说明
-
-### 运行模式
-- **项目模式**: 检测到 `o8package.json` 时自动启用虚拟环境
-- **非项目模式**: 没有项目配置时自动使用全局包（`~/.old8lang/packages`）
-
-### 包加载优先级
-1. 标准库（MathLib, OS, File 等）
-2. 项目本地包（如果启用虚拟环境）
-3. 全局第三方包
-4. 相对路径文件
-
-### 全局包目录
-默认位置：`~/.old8lang/packages/`
-包结构：
-```
-~/.old8lang/packages/
-├── TestGlobalLib/
-│   └── index.old8
-└── SomeOtherLib/
-    └── main.old8
-```
-
-## 双模式架构
-
-Old8Lang 支持解释模式和 IL 模式：
-
-### 解释模式
-- 代码逐条解释执行（运行 `Run` 方法）
-- 无需编译步骤
-- 支持动态类型和类型推断
-- 适合开发和调试
-
-### IL 模式
-- 代码编译成 IL 中间代码（运行 `GenerateIl` 方法）
-- 然后执行编译后的代码
-- 要求更严格的类型注解
-- 性能更好，适合生产环境
-
-## 开发工作流
-
-### 1. 环境设置
-```bash
-# 克隆仓库
-git clone <repository-url>
-cd Old8Lang
-
-# 构建解决方案
-dotnet build Old8Lang.sln
-
-# 运行基础测试确保环境正确
-dotnet test Old8Lang.Tests --filter "FullyQualifiedName~BasicTests"
-```
-
-### 2. 开发新功能
-- 在相应的 AST 类中添加新节点
-- 更新解析器支持新语法
-- 实现解释器逻辑
-- 实现编译器逻辑
-- 添加相应的测试
-
-### 3. 测试验证
-- 运行语法测试确保解析正确
-- 运行解释器测试确保功能正确
-- 运行 IL 模式测试确保代码生成正确
-- 运行完整测试套件确保无回归
-
-### 4. 代码质量
-- 所有公共 API 必须有 XML 文档
-- 遵循命名约定和代码风格
-- 异常处理必须包含位置信息
-- 测试覆盖率应保持高水平
-
-## 性能考虑
-
-- 使用 `Old8Lang.Benchmarks` 项目进行性能测试
-- 关注内存使用和执行时间
-- IL 模式通常比解释器模式快
-- 大数据操作需要特别注意性能
-
-## 调试技巧
-
-- 使用 `PrintLine()` 函数在 Old8Lang 代码中调试
-- 使用 Visual Studio 调试器调试 C# 代码
-- 查看测试报告了解失败原因
-- 使用 `-d` 参数启用调试模式
+| 文档 | 内容 |
+|------|------|
+| [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md) | **测试必读**：单测分档、`.old8` 文件规范、测试目录、测试报告 |
+| [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md) | **开发必读**：新语法流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 排查 |
+| [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) | 架构总览 |
+| [Docs/CLI_GUIDE.md](Docs/CLI_GUIDE.md) | CLI 全量命令、包管理 |
+| [Docs/CONTRIBUTING.md](Docs/CONTRIBUTING.md) | 代码规范、提交规范、PR 流程 |
+| [Docs/LANGUAGE_FEATURES.md](Docs/LANGUAGE_FEATURES.md) | 语言特性 |
+| [Docs/Old8Lang_Grammar.md](Docs/Old8Lang_Grammar.md)、[Docs/Old8Lang.ebnf](Docs/Old8Lang.ebnf) | 语法参考 |
+| [Docs/API_REFERENCE.md](Docs/API_REFERENCE.md) | 标准库 API |
+| [Docs/PERFORMANCE_GUIDE.md](Docs/PERFORMANCE_GUIDE.md) | 性能优化 |
+| [Docs/README.md](Docs/README.md) | 文档中心（全部文档的索引） |

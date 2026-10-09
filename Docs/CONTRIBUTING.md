@@ -156,6 +156,11 @@ public string FileName { get; set; }
 public const int MaxTokens = 1000;
 ```
 
+**命名约定补充**:
+
+- 接口名以 `I` 开头（如 `IVisitor`、`ICommand`）
+- 异常类以 `Exception` 或 `Error` 结尾
+
 **代码风格**:
 ```csharp
 // 使用大括号,即使是单行语句
@@ -179,6 +184,14 @@ public void Method()
     }
 }
 ```
+
+**导入与类型系统**:
+
+- 按字母顺序排列 `using` 语句
+- 优先使用局部导入而非全局导入
+- 使用 `System` 命名空间别名（如用 `System.Text` 而非 `System.Text.*`）
+- 项目启用 `Nullable` 与 `ImplicitUsings`，目标框架为 .NET 10.0，使用 C# 10.0 语法特性
+- 命名空间结构遵循项目目录结构
 
 ### Old8Lang 代码规范
 
@@ -278,6 +291,9 @@ Fixes #456
 ---
 
 ## 测试要求
+
+> 测试的分档机制、`.old8` 测试文件规范、测试目录与测试报告要求，统一见 [TESTING_GUIDE.md](./TESTING_GUIDE.md)。
+
 
 ### 单元测试
 

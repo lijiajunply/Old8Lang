@@ -192,6 +192,32 @@ Old8Lang 提供了完整的包管理 CLI 命令，支持包打包、签名、验
 > 如果未安装，可以使用 `dotnet run --project Old8Lang.App -- <command>` 替代 `old8lang <command>`。
 > 例如: `old8lang publish` 等同于 `dotnet run --project Old8Lang.App -- publish`。
 
+### 运行模式与包加载顺序
+
+**运行模式**由是否检测到 `o8package.json` 决定：
+
+- **项目模式**：当前目录（或向上查找到）存在 `o8package.json` 时启用，包安装到项目本地。
+- **全局模式**：没有项目配置时使用，包安装到全局位置。
+
+**包加载优先级**（同名时靠前者胜出）：
+
+1. 标准库（MathLib、OS、File 等）
+2. 项目本地包（项目模式下）
+3. 全局第三方包
+4. 相对路径文件
+
+**全局包目录**默认为 `~/.old8lang/packages/`，结构如下：
+
+```
+~/.old8lang/packages/
+├── TestGlobalLib/
+│   └── index.old8
+└── SomeOtherLib/
+    └── main.old8
+```
+
+包本身的结构要求、`o8package.json` 字段说明见下文 `pack` 命令与 [ADVANCED_TOPICS.md](./ADVANCED_TOPICS.md)。
+
 ### 命令列表
 
 ### 🚀 推荐：`publish` - 一键发布命令

@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.VirtualMachine.Performance;
 /// 虚拟机静态类 API 的计时测试
 /// </summary>
 /// <remarks>
-/// 这些用例断言墙钟耗时，并行跑会因为资源争抢而抖动，因此按 CLAUDE.md 的分档约定
+/// 这些用例断言墙钟耗时，并行跑会因为资源争抢而抖动，因此按 Docs/TESTING_GUIDE.md 的分档约定
 /// 标记为 Performance：默认档（default.runsettings）不会执行它们，
 /// 需要用 performance.runsettings 单独跑。
 ///

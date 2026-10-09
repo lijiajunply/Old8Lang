@@ -925,10 +925,17 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 
 ### 10.1 测试目录
 
-- **CompilerTests**: IL 模式测试用例
-- **InterpreterTests**: 解释模式测试用例
-- **SyntaxTests**: 语法测试用例
-- **Old8Lang.Tests**: 单元测试和集成测试
+`.old8` 测试用例统一放在 `TestFiles/` 下，按模式分目录：
+
+| 目录 | 用途 | 运行模式 |
+|------|------|----------|
+| `TestFiles/SyntaxTests/` | 语法测试用例 | `-s` |
+| `TestFiles/InterpreterTests/` | 解释模式测试用例 | `-f` |
+| `TestFiles/CompilerTests/` | IL 模式测试用例 | `-il` |
+| `TestFiles/VirtualMachine/` | 虚拟机模式测试用例 | `-vm` |
+
+此外还有若干专项目录：`TestFiles/VMTests/`、`BytecodeTests/`、`DebuggerTests/`、`ExternTests/`、`ProfilerTests/`、`Verification/`。
+单元测试与集成测试在 `Old8Lang.Tests`。
 
 ### 10.2 测试运行方式
 
@@ -941,41 +948,51 @@ dotnet run --project Old8Lang.App -- -il <path-to-test-file.old8>
 
 # 语法测试
 dotnet run --project Old8Lang.App -- -s <path-to-test-file.old8>
+
+# 虚拟机模式测试
+dotnet run --project Old8Lang.App -- -vm <path-to-test-file.old8>
 ```
+
+完整的测试约定（性能用例分档、`.old8` 文件规范、测试报告要求）见 [TESTING_GUIDE.md](./TESTING_GUIDE.md)。
 
 ## 11. 项目目录结构
 
 ```
 Old8Lang/
-├── .cursor/             # Cursor编辑器配置
-├── .idea/               # IDEA编辑器配置
-├── .trae/               # Trae配置和文档
-├── .vs/                 # Visual Studio配置
-├── CompilerTests/       # IL 模式测试用例
-├── InterpreterTests/    # 解释模式测试用例
-├── Old8Lang/            # 核心语言实现
-├── Old8Lang.App/        # 命令行应用
-├── Old8Lang.NetLib/     # 网络库
-├── Old8Lang.Tests/      # 测试项目
-├── Old8LangLib/         # 标准库
-├── Reports/             # 测试报告
-├── SyntaxTests/         # 语法测试用例
-├── CHANGELOG.md         # 更新日志
-├── LICENSE              # 许可证
-├── Old8Lang.sln         # 解决方案文件
-├── Old8Lang_Grammar.md  # 语法文档
-├── README.md            # 项目说明
+├── .agent/                      # 代理（AI）规则
+├── .claude/                     # Claude Code 配置与命令
+├── .github/workflows/           # CI/CD 工作流
+├── .idea/                       # IDEA / Rider 编辑器配置
+├── Docs/                        # 项目文档（架构、CLI、语法、测试、开发流程等）
+├── Old8Lang/                    # 核心语言实现（AST、解析器、解释器、编译器、VM、类型系统）
+├── Old8Lang.App/                # 命令行应用
+├── Old8Lang.Tests/              # xUnit 单元测试项目
+├── Old8Lang.Benchmarks/         # 性能基准测试
+├── Old8LangLib/                 # 标准库
+├── Old8Lang.NetLib/             # 网络库
+├── Old8Lang.SerializationLib/   # 序列化库
+├── Old8Lang.DatabaseLib/        # 数据库库
+├── Old8Lang.MachineLearningLib/ # 机器学习库
+├── Old8Lang.LanguageServer/     # LSP 服务
+├── Old8Lang.CodeGen/            # 代码生成器
+├── TestFiles/                   # .old8 测试用例（按模式分目录，见 10.1）
+├── TestScripts/                 # 测试脚本
+├── Reports/                     # 测试报告
+├── examples/                    # 示例代码
+├── vscode-old8lang/             # VS Code 扩展
+├── AGENTS.md                    # 代理开发指南（AI 入口）
+├── CLAUDE.md                    # Claude Code 入口（导入 AGENTS.md）
+├── Old8Lang.sln                 # 解决方案文件
+├── README.md                    # 项目说明
+├── Todo.md                      # 待办事项
+└── LICENSE                      # 许可证
 ```
 
 ## 12. 开发流程
 
-1. **语法设计**: 在Old8Lang.ebnf中定义新语法
-2. **解析器实现**: 在LangParser中实现语法解析
-3. **AST节点定义**: 在AST模块中定义相应的节点类型
-4. **解释器实现**: 在LangInterpreter中实现解释执行
-5. **编译器实现**: 在Compiler中实现编译生成IL代码
-6. **测试编写**: 编写测试用例验证功能
-7. **文档更新**: 更新相关文档
+新增功能/语法需要同时落进解释、IL、虚拟机三种模式，流程为：定义 AST 节点 → 实现解析 → 依次通过语法/解释/IL/VM 测试 → 更新 `Old8Lang.ebnf` 与 `Old8Lang_Grammar.md` → 补单元测试。
+
+完整步骤、AST 节点与错误处理规范、调试与 IL 排查方法见 [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)。
 
 ## 13. 代码规范
 

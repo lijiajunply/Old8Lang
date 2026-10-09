@@ -56,7 +56,7 @@ import "Logger" as log
 
 ## 更新记录
 
-请查看 [CHANGELOG.md](./CHANGELOG.md) 文件获取详细的更新记录。
+请查看 [CHANGELOG.md](./Docs/CHANGELOG.md) 文件获取详细的更新记录。
 
 ## 开发人员
 1. LuckyFish
