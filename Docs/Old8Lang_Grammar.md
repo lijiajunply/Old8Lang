@@ -2317,15 +2317,10 @@ avg <- numbers.average()      // 3.0
 
 **泛型扩展方法**：
 
-> **复核说明**（2026-10-09 实测）：本节列出的**泛型扩展方法与泛型约束尚未实现**。
-> `extension list<T> { ... }` 在解析阶段即报
-> `解析时出现代码错误：Input string was not in a correct format`，错误位置指向 `<`；
-> `extension list<T: new()>`、`extension list<T: class>`、`extension list<T> where T: class & new()`、
-> `extension dict<K, V> where ...` 同样无法解析。解析器 `ExtensionParser.ParseExtensionDeclaration`
-> 只接受**非泛型**的目标类型名（`extension list`、`extension int`、`extension string` 可用），
-> 也不处理类型参数与约束。
-> **下面的示例不能直接运行**，保留在此仅作为语法草案；上文「重要说明」第 6 点的
-> 「泛型约束支持」同样尚未落地。
+> **复核说明**（2026-10-10）：解析器现在接受目标类型上的泛型参数、声明级约束和 `where` 子句，
+> 但 `ExtensionDeclaration` 目前只保存基础目标类型名；类型参数与约束不会参与运行时注册或校验。
+> 因此，方法体中依赖 `T`/`K`/`V` 的泛型绑定以及约束语义仍未落地，下面的示例仍不能视为完整的
+> 泛型扩展方法实现。
 
 ```old8
 // 为泛型类型添加扩展方法

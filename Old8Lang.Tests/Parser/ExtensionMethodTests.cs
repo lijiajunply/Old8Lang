@@ -118,6 +118,35 @@ public class ExtensionMethodTests
     }
 
     /// <summary>
+    /// 测试泛型目标类型及其约束只影响声明语法，不改变基础目标类型名。
+    /// </summary>
+    [Theory]
+    [InlineData("extension list<T>")]
+    [InlineData("extension list<T: new()>")]
+    [InlineData("extension list<T> where T: class & new()")]
+    [InlineData("extension dict<K, V> where K: class, V: struct")]
+    public void ParseProgram_GenericExtensionTarget_ParsesCorrectly(string declaration)
+    {
+        var code = $@"
+            {declaration} {{
+                func countItems() -> int {{
+                    return this.Count()
+                }}
+            }}
+        ";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+
+        var program = parser.ParseProgram();
+
+        Assert.Equal(1, program.Count);
+        var extension = Assert.IsType<ExtensionDeclaration>(program[0]);
+        Assert.Equal(declaration.Contains("dict<", StringComparison.Ordinal) ? "dict" : "list",
+            extension.TargetTypeName);
+        Assert.Single(extension.ExtensionMethods);
+    }
+
+    /// <summary>
     /// 测试扩展方法带参数
     /// </summary>
     [Fact]

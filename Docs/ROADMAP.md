@@ -39,23 +39,17 @@ IL 模式在一批用例上抛 `Common Language Runtime detected an invalid prog
 下面两项在语法文档里都有完整章节，实际却跑不起来。文档侧已加「复核说明」标明，
 但**功能本身仍是缺口**。
 
-#### 泛型扩展方法与泛型约束：未实现
+#### 泛型扩展方法与泛型约束：运行时语义未实现
 
-`extension list<T> { ... }` 在**解析阶段**就失败：
-
-```
-[SYNTAX_ERROR] 解析时出现代码错误：Input string was not in a correct format. Failure to parse near offset 14. Expected an ASCII digit.
-```
-
-带约束的形式同样解析不了：`extension list<T: new()>`、`extension list<T: class>`、
-`extension list<T: struct>`、`extension list<T: IComparable>`、
-`extension list<T> where T: class & new()`、`extension dict<K, V> where K: class, V: struct`。
+解析器已接受 `extension list<T> { ... }`、带 `new()`/`class`/`struct` 约束的形式，以及
+`where` 子句和多类型参数声明。当前 AST 仍只保存基础目标类型名，类型参数不会参与扩展方法
+注册，约束也不会在运行时校验；方法体中依赖 `T`/`K`/`V` 的泛型绑定仍未实现。
 
 **非泛型**扩展是正常的（`extension list` / `extension int` / `extension string` 均可用），
 `Old8Lang.Tests` 里也只有非泛型用例。
 
-- 实现位置：`Old8Lang/LangParser/Parsers/ExtensionParser.cs`——`ParseExtensionDeclaration`
-  只取一个目标类型名，不处理类型参数与约束
+- 解析实现位置：`Old8Lang/LangParser/Parsers/ExtensionParser.cs`——`ParseExtensionDeclaration`
+  消费类型参数与约束语法，但保留基础目标类型名
 - 文档：`Old8Lang_Grammar.md` 的「泛型扩展方法」一节已标为语法草案
 
 #### Python 互操作：进程无法正常退出（已修复）

@@ -1,0 +1,8 @@
+extension list<T> {
+    func marker() -> int {
+        return 7
+    }
+}
+
+items <- {1, 2, 3}
+PrintLine(items.marker().ToStr())

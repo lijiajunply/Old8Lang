@@ -1,0 +1,24 @@
+// 泛型扩展声明的语法回归用例
+extension list<T> {
+    func countItems() -> int {
+        return this.Count()
+    }
+}
+
+extension list<T: new()> {
+    func countWithNewConstraint() -> int {
+        return this.Count()
+    }
+}
+
+extension list<T> where T: class & new() {
+    func countWithWhereConstraint() -> int {
+        return this.Count()
+    }
+}
+
+extension dict<K, V> where K: class, V: struct {
+    func countEntries() -> int {
+        return this.Count()
+    }
+}

@@ -1,0 +1,7 @@
+extension list<T> {
+    func marker() -> int {
+        return 7
+    }
+}
+
+PrintLine("parsed")

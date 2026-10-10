@@ -190,6 +190,10 @@
 
 ## B. IL 模式既有缺陷（本轮踩到、但非清单项）
 
+- [ ] **泛型目标类型的扩展方法调用未接入 IL 方法解析。**
+  - 复现：`extension list<T> { func marker() -> int { return 7 } }` 后调用
+    `items.marker()`，IL 模式报无法在 `List\`1` 中找到方法 `marker`；解释器模式可正常调用。
+  - 本轮仅修复声明语法解析，未改变 IL 扩展方法注册与调用路径。
 - [ ] **方法调用结果上直接链式调用生成无效 IL。**
   - 复现：`l.Count().ToStr()`、`l.FindAll((x:int) -> x % 2 == 0).Count()` → `IL001 invalid program`
     （改动前同样失败）。
