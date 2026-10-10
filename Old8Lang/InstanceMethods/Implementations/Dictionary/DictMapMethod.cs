@@ -12,7 +12,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 /// <summary>
 /// Dictionary.Map(func) - 使用函数转换字典中的所有值
 /// </summary>
-public class DictMapMethod : BaseInstanceMethod
+public class DictMapMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Map", "map"];
     public override Type TargetType => typeof(DictionaryLangValue);
@@ -50,15 +50,65 @@ public class DictMapMethod : BaseInstanceMethod
         return newDict;
     }
 
+    /// <summary>
+    /// IL 模式：接收者是原生 <c>Dictionary&lt;K,V&gt;</c>，函数参数是编译好的 .NET 委托。
+    /// 先把两者转换成 Old8Lang 值调用 helper，再把结果按原生字典返回。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("Dictionary.Map 方法暂不支持 IL 模式");
+
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperMethod = typeof(DictMapMethod).GetMethod(nameof(MapHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：按函数转换字典中的所有值，返回原生字典。
+    /// 与 <see cref="ExecuteInternal"/> 语义一致（转换失败时保留原值）。
+    /// </summary>
+    public static Dictionary<object, object?> MapHelper(LangValueType instance, LangValueType func)
+    {
+        if (instance is not DictionaryLangValue dict)
+        {
+            throw new ArgumentException($"实例必须是字典类型，实际是 {instance.GetType().Name}");
+        }
+
+        if (func is not FuncLangValue function)
+        {
+            throw new ArgumentException("参数必须是函数类型");
+        }
+
+        var manager = new VariateManager();
+        // IL 模式下字典由 IlValueBridge.Wrap 构造，Value 列表尚未填充
+        dict.Run(manager);
+
+        var newDict = new Dictionary<object, object?>();
+
+        foreach (var (key, value) in dict.Value)
+        {
+            try
+            {
+                var result = function.Run(manager, [value]);
+                newDict[IlValueBridge.Unwrap(key)!] = IlValueBridge.Unwrap(result);
+            }
+            catch
+            {
+                // 如果转换失败，保留原值
+                newDict[IlValueBridge.Unwrap(key)!] = IlValueBridge.Unwrap(value);
+            }
+        }
+
+        return newDict;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(Dictionary<object, object>);
+        return typeof(Dictionary<object, object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

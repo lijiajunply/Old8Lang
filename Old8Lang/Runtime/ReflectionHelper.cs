@@ -634,13 +634,20 @@ internal class ValueExpression(LangValueType value) : LangExpression
 {
     public override LangValueType Run(VariateManager manager) => value;
 
+    /// <summary>
+    /// IL 模式下按被包装值自身的原生表示加载。
+    /// </summary>
+    /// <remarks>
+    /// 包装值本身就是一个 LangValueType，它在 IL 模式下有自己的加载规则
+    /// （基础类型加载原生常量，集合类型构造原生集合），这里直接委托给它，
+    /// 保证栈上的类型与 <see cref="OutputType"/> 一致。
+    /// </remarks>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // IL 模式下不应该调用这个方法
-        throw new NotImplementedException();
+        value.LoadIlValue(ilGenerator, local);
     }
 
-    public override Type OutputType(LocalManager local) => value.GetType();
+    public override Type OutputType(LocalManager local) => value.OutputType(local);
 
     public override TResult Accept<TResult>(AST.Visitor.IVisitor<TResult> visitor)
     {

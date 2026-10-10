@@ -12,7 +12,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Thread;
 /// <summary>
 /// Thread.Then(continuation) - 线程完成后执行下一个线程
 /// </summary>
-public class ThreadThenMethod : BaseInstanceMethod
+public class ThreadThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Then", "then"];
     public override Type TargetType => typeof(ThreadLangValue);
@@ -58,10 +58,47 @@ public class ThreadThenMethod : BaseInstanceMethod
         });
     }
 
+    /// <summary>
+    /// IL 模式：接收者转成 <see cref="ThreadLangValue"/>，continuation 转成函数值后调用静态 helper。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("Thread.Then 方法在 IL 模式下暂不支持");
+
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperMethod = typeof(ThreadThenMethod).GetMethod(nameof(ThenHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：线程完成后执行 continuation。
+    /// </summary>
+    public static ThreadLangValue ThenHelper(LangValueType instance, LangValueType continuation)
+    {
+        if (instance is not ThreadLangValue thread)
+        {
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
+        }
+
+        if (continuation is not FuncLangValue func)
+        {
+            throw new ArgumentException("continuation 参数必须是函数类型");
+        }
+
+        return thread.Then(result =>
+        {
+            var next = func.Run(new VariateManager(), [result]);
+            if (next is ThreadLangValue nextThread)
+            {
+                return nextThread;
+            }
+
+            throw new InvalidOperationException("Then 的 continuation 函数必须返回一个 Thread");
+        });
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
@@ -71,6 +108,8 @@ public class ThreadThenMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Thread.Then 方法在 VM 模式下暂不支持");
+        // 见 Todo.md「VM 线程模型」：VM 的线程是 VMThreadLangValue，与本方法的 TargetType 不同构。
+        throw new NotSupportedException(
+            "Thread.Then 在 VM 模式下不可用：VM 的线程是 VMThreadLangValue（线程 id + ResourceManager），与 ThreadLangValue 不同构");
     }
 }

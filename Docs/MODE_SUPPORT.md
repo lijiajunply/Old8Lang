@@ -172,7 +172,7 @@
 | `async` / `await` | ✅ | ⚠️ | ✅ | |
 | 异步生成器 | ✅ | ❌ | ❌ | 虚拟机报 `STATE_ERROR` 求值栈为空（`IteratorMoveNext`） |
 | `async for-in` | ✅ | ❌ | ❌ | 与异步生成器是同一处缺陷 |
-| Task API | ✅ | ⚠️ | ⚠️ | 见「已知限制」第 3 条 |
+| Task API | ✅ | ✅ | ✅ | 实例方法 `Then` / `Catch` / `Finally` / `ContinueWith` 自 2026-10-10 起三种模式都可用（IL 用原生 `Task` 表示，VM 用 `TaskLangValue`）；静态类仍见「已知限制」第 3 条 |
 
 ### 9. 并发编程
 
@@ -189,6 +189,7 @@
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
 | Thread API（静态类） | ✅ | ✅ | ⚠️ | 虚拟机仅 `Thread.Sleep` 可用，见「已知限制」第 3 条 |
+| Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ❌ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机线程对象是 `VMThreadLangValue`，与这 4 个方法的 `TargetType` 不同构，且 VM 线程模型没有取消/超时/重试原语，见「已知限制」第 11 条 |
 
 ### 10. 异常处理
 
@@ -274,7 +275,8 @@
 
 ### IL 模式
 
-1. **类型注解要求**：函数参数与返回值必须有类型注解或默认值。
+1. **类型注解要求**：函数参数与返回值必须有类型注解或默认值。lambda 也必须有参数类型注解，
+   否则生成的委托形参是 `object`，参与算术/比较会失败。
 2. 不支持泛型函数、泛型类、运算符重载、装饰器。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
 4. 异步功能支持不完整。
@@ -282,6 +284,21 @@
    **2026-10-09 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
    → **737 失败 / 446 通过 / 25 跳过，共 1208 例**。
    与单个特性无关，IL 模式列的 ❌/⚠️ 需在可正常验证 IL 的环境中复核。
+6. **高阶实例方法自 2026-10-10 起可用**：`List` 的 `FindAll`/`FlatMap`/`GroupAdjacentBy`/`Partition`/
+   `Single`/`SingleOrDefault`/`SkipWhile(Indexed)`/`TakeWhile(Indexed)`、`Dictionary` 的
+   `Map`/`Filter`/`ForEach`、泛型列表的 `SelectMany`/`SortBy`/`Zip3`/`Sum(selector)`/
+   `Average(selector)`/`Max(selector)`/`Min(selector)`、`Array.GroupAdjacentBy` 在 IL 下都能真正执行
+   （lambda / 具名函数会被编译成委托，运行期以「函数值」传给解释器语义的 helper）。
+   用法限制：
+   - lambda 必须有类型注解；
+   - lambda 内部**不能读写外层普通局部变量**（可以按名字调用已定义的函数）；
+   - **不能在方法调用结果上直接链式调用**（`l.FindAll(f).Count()`、`l.Count().ToStr()` 会生成无效 IL，
+     既有缺陷，见 `Todo.md`），需要先赋值给变量。
+7. **扩展方法自 2026-10-10 起可用**：`extension X { func f(...) }` 的声明在编译前的解释器预执行阶段
+   注册，调用点按普通实例方法解析，扩展方法体仍由解释器执行（因此函数体内可以使用全局函数/变量）。
+8. **线程自 2026-10-10 起可用**：`spawn(f)` 会真的创建线程对象，
+   `Thread.Start` / `Join` / `IsAlive` / `Then` / `Cancel` / `Retry` / `WithTimeout` 都可用；
+   `Retry` 必须写成 `spawn(f).Retry(n)`（解释器把 `Retry` 特判为「重新执行函数调用」）。
 
 ### 虚拟机模式
 
@@ -313,6 +330,18 @@
     均在 `Old8Lang/Bytecode/` 下各自定义，但全仓库找不到任何调用点，
     因此虚拟机模式目前**没有**可用的性能分析器、调试器与反汇编器。
     可用的调试与性能分析工具都在解释器侧（见上表）。
+11. **Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` 不可用**（2026-10-10 核查）：
+    这 4 个方法的 `TargetType` 是 `ThreadLangValue`，而 VM 的线程对象是 `VMThreadLangValue`
+    （整数线程 id + `Concurrency.ResourceManager`），分发时精确匹配与等价类型映射都命中不了，
+    报 `类 'VMThreadLangValue' 中未找到方法 'X'`；即便改 `TargetType`，VM 线程模型也没有
+    取消令牌 / 保存原始函数（Retry）/ 超时 Join 原语。需要先扩展 VM 线程模型，见 `Todo.md`。
+    附带：`PrintLine(线程)` 在 VM 下会栈溢出（`VMThreadLangValue.ToString` 自递归）。
+12. **数组排序自 2026-10-10 起可用**：`Array.QuickSort`/`HeapSort`/`SelectionSort`/`InsertionSort`/
+    `MergeSort`/`BubbleSort` 以及通用 `Sort()` / `IsSorted()` 在 `object?[]` 上已实现
+    （字符串按长度排序，与解释器 `StringLangValue.Less` 语义一致）。
+13. **Task 实例方法自 2026-10-10 起可用**：`Then` / `Catch` / `Finally` / `ContinueWith` 在
+    `TaskLangValue` 上已实现；continuation 会切到 worker 虚拟机执行（`VMContext.CurrentVM` 是
+    `[ThreadStatic]`，不能在线程池线程上复用当前 VM 的求值栈）。
 
 ---
 
@@ -346,6 +375,12 @@
 
 ## 更新日志
 
+- **2026-10-10**: 实例方法跨模式补齐。IL 模式新增「函数值」桥接（lambda / 具名函数 → 委托 → 函数值），
+  29 个此前显式抛 `NotSupportedException` 的高阶实例方法、扩展方法、`spawn` 与
+  `Thread.Start/Join/IsAlive/Then/Cancel/Retry/WithTimeout` 全部可用；虚拟机模式新增
+  数组 6 个排序（含 `Sort()` / `IsSorted()` 兜底）与 Task 的 `Then`/`Catch`/`Finally`/`ContinueWith`。
+  VM 的 Thread 4 个实例方法确认为线程模型缺口（已知限制第 11 条）。
+  实测报告：`Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md`。
 - **2026-10-09（补）**: 核查「其他特性」表里的四项虚拟机专属能力，发现 `VMProfiler`、`VMDebugger`、
   字节码 `Disassembler` 三个类均无调用点（死代码），原表的 ✅ 系照抄类名而非验证可用性；
   真正的调试器与性能分析器都在解释器侧。已按实况修正并记入已知限制第 10 条。

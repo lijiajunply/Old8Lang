@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.TakeWhileIndexed(predicate) - 从列表开头获取元素，直到不满足条件（谓词接收元素和索引）
 /// </summary>
-public class ListTakeWhileIndexedMethod : BaseInstanceMethod
+public class ListTakeWhileIndexedMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["TakeWhileIndexed", "takeWhileIndexed"];
     public override Type TargetType => typeof(ListLangValue);
@@ -57,10 +57,63 @@ public class ListTakeWhileIndexedMethod : BaseInstanceMethod
         return new ListLangValue(result);
     }
 
+    /// <summary>
+    /// IL 模式：接收者是原生 <c>List&lt;T&gt;</c>，谓词是编译好的 .NET 委托
+    /// （形如 <c>(item, index) -&gt; ...</c>，索引由 helper 作为第二个实参传入）。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("List.TakeWhileIndexed 方法暂不支持 IL 模式");
+        // 接收者：原生集合 -> Old8Lang 值
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        // 谓词：编译好的委托 -> 函数值（索引不是方法参数，由 helper 逐元素提供）
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperMethod = typeof(ListTakeWhileIndexedMethod).GetMethod(nameof(TakeWhileIndexedHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：语义与 <see cref="ExecuteInternal"/> 一致，返回原生列表。
+    /// </summary>
+    public static List<object?> TakeWhileIndexedHelper(LangValueType instance, LangValueType predicate)
+    {
+        if (instance is not ListLangValue list)
+        {
+            throw new ArgumentException($"实例必须是列表，实际是 {instance.GetType().Name}");
+        }
+
+        if (predicate is not FuncLangValue func)
+        {
+            throw new ArgumentException("predicate 参数必须是函数类型");
+        }
+
+        var manager = new VariateManager();
+        var result = new List<object?>();
+
+        for (var i = 0; i < list.Values.Count; i++)
+        {
+            try
+            {
+                var predicateResult = func.Run(manager, [list.Values[i], new IntLangValue(i)]);
+                if (predicateResult is BoolLangValue { Value: true })
+                {
+                    result.Add(IlValueBridge.Unwrap(list.Values[i]));
+                }
+                else
+                {
+                    break;
+                }
+            }
+            catch
+            {
+                break;
+            }
+        }
+
+        return result;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

@@ -67,14 +67,10 @@ public class ExtensionDeclaration(
     /// <param name="local">局部变量管理器</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // IL 模式下，扩展方法需要在运行时注册
-        // 这里生成调用 Run 方法的代码
-
-        // 加载 this（ExtensionDeclaration 实例）
-        // 注意：在 IL 模式下，我们需要将扩展方法注册逻辑嵌入到生成的代码中
-        // 暂时使用解释器模式的注册逻辑
-
-        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现，请使用解释模式");
+        // 扩展方法的注册发生在编译前的解释器预执行阶段（Compiler.Compile 里的
+        // statement.ExecuteModule 会调用 Run），调用点此时已经能在实例方法表里找到
+        // ExtensionMethodWrapper。因此这里不需要生成任何 IL：
+        // 扩展方法本身的调用由 ExtensionMethodWrapper.GenerateIl 生成。
     }
 
     public override OldStatement? this[int index] => this;

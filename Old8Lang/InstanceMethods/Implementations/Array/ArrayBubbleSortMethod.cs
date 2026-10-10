@@ -69,6 +69,24 @@ public class ArrayBubbleSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.BubbleSort 方法在 VM 模式下暂不支持");
+        return ArraySortVmSupport.SortAndReturn(instance, BubbleSort);
+    }
+
+    /// <summary>VM 冒泡排序：相邻元素比较交换，一轮无交换即提前结束。</summary>
+    private static void BubbleSort(List<object?> items)
+    {
+        var n = items.Count;
+        for (var i = 0; i < n - 1; i++)
+        {
+            var swapped = false;
+            for (var j = 0; j < n - i - 1; j++)
+            {
+                if (!ArraySortVmSupport.Less(items[j + 1], items[j])) continue;
+                ArraySortVmSupport.Swap(items, j, j + 1);
+                swapped = true;
+            }
+
+            if (!swapped) break;
+        }
     }
 }

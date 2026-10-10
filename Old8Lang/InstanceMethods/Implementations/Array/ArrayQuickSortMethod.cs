@@ -82,6 +82,55 @@ public class ArrayQuickSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.QuickSort 方法在 VM 模式下暂不支持");
+        return ArraySortVmSupport.SortAndReturn(instance, QuickSort);
+    }
+
+    /// <summary>
+    /// VM 快速排序：Lomuto 分区 + 三数取中 + 只递归较小一侧（递归深度 O(log n)）。
+    /// </summary>
+    private static void QuickSort(List<object?> items) => QuickSortRange(items, 0, items.Count - 1);
+
+    private static void QuickSortRange(List<object?> items, int left, int right)
+    {
+        while (left < right)
+        {
+            var pivotIndex = Partition(items, left, right);
+
+            if (pivotIndex - left < right - pivotIndex)
+            {
+                QuickSortRange(items, left, pivotIndex - 1);
+                left = pivotIndex + 1;
+            }
+            else
+            {
+                QuickSortRange(items, pivotIndex + 1, right);
+                right = pivotIndex - 1;
+            }
+        }
+    }
+
+    private static int Partition(List<object?> items, int left, int right)
+    {
+        // 三数取中，避免已排序 / 逆序输入退化成 O(n^2)
+        var mid = left + (right - left) / 2;
+        if (ArraySortVmSupport.Less(items[mid], items[left])) ArraySortVmSupport.Swap(items, mid, left);
+        if (ArraySortVmSupport.Less(items[right], items[left])) ArraySortVmSupport.Swap(items, right, left);
+        if (ArraySortVmSupport.Less(items[right], items[mid])) ArraySortVmSupport.Swap(items, right, mid);
+
+        // 把中位数换到 right 位置作为枢轴
+        ArraySortVmSupport.Swap(items, mid, right);
+
+        var pivot = items[right];
+        var i = left - 1;
+
+        for (var j = left; j < right; j++)
+        {
+            if (!ArraySortVmSupport.Less(items[j], pivot)) continue;
+            i++;
+            ArraySortVmSupport.Swap(items, i, j);
+        }
+
+        ArraySortVmSupport.Swap(items, i + 1, right);
+        return i + 1;
     }
 }

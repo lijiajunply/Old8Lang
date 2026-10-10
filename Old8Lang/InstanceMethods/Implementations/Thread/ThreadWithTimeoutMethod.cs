@@ -12,7 +12,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Thread;
 /// <summary>
 /// Thread.WithTimeout(timeoutMs) - 为线程添加超时限制
 /// </summary>
-public class ThreadWithTimeoutMethod : BaseInstanceMethod
+public class ThreadWithTimeoutMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["WithTimeout", "withTimeout"];
     public override Type TargetType => typeof(ThreadLangValue);
@@ -34,10 +34,33 @@ public class ThreadWithTimeoutMethod : BaseInstanceMethod
         return thread.WithTimeout(timeout.Value);
     }
 
+    /// <summary>
+    /// IL 模式：接收者与超时时间都转成 Old8Lang 值后调用静态 helper。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("Thread.WithTimeout 方法在 IL 模式下暂不支持");
+
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperMethod = typeof(ThreadWithTimeoutMethod).GetMethod(nameof(WithTimeoutHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：给线程加超时。
+    /// </summary>
+    public static ThreadLangValue WithTimeoutHelper(LangValueType instance, LangValueType timeoutMs)
+    {
+        if (instance is not ThreadLangValue thread)
+        {
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
+        }
+
+        return thread.WithTimeout((int)IlValueBridge.ToInt64(timeoutMs));
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
@@ -47,6 +70,8 @@ public class ThreadWithTimeoutMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Thread.WithTimeout 方法在 VM 模式下暂不支持");
+        // 见 Todo.md「VM 线程模型」：VM 的线程是 VMThreadLangValue，与本方法的 TargetType 不同构。
+        throw new NotSupportedException(
+            "Thread.WithTimeout 在 VM 模式下不可用：VM 的线程是 VMThreadLangValue（线程 id + ResourceManager），没有超时原语");
     }
 }

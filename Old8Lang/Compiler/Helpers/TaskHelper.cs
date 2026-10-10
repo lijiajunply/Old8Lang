@@ -12,4 +12,19 @@ public static class TaskHelper
     {
         return null;
     }
+
+    /// <summary>
+    /// 把 <c>Task.FromException</c> 的实参转换成 <see cref="Exception"/>。
+    /// </summary>
+    /// <remarks>
+    /// 解释器/虚拟机里的 <c>Task.FromException("错误")</c> 允许传字符串（或任意值），
+    /// 而 .NET 的 <c>Task.FromException&lt;T&gt;(Exception)</c> 只接受异常对象，
+    /// 这里做一次转换，让 IL 模式与其它模式语义一致。
+    /// </remarks>
+    public static Exception ToException(object? value) => value switch
+    {
+        Exception exception => exception,
+        null => new Exception("Unknown error"),
+        _ => new Exception(value.ToString())
+    };
 }

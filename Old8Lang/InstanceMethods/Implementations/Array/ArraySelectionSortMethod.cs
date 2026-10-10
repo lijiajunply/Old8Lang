@@ -71,6 +71,22 @@ public class ArraySelectionSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.SelectionSort 方法在 VM 模式下暂不支持");
+        return ArraySortVmSupport.SortAndReturn(instance, SelectionSort);
+    }
+
+    /// <summary>VM 选择排序：每轮选出未排序区间的最小值放到区间首部。</summary>
+    private static void SelectionSort(List<object?> items)
+    {
+        for (var i = 0; i < items.Count - 1; i++)
+        {
+            var minIndex = i;
+            for (var j = i + 1; j < items.Count; j++)
+            {
+                if (ArraySortVmSupport.Less(items[j], items[minIndex]))
+                    minIndex = j;
+            }
+
+            ArraySortVmSupport.Swap(items, i, minIndex);
+        }
     }
 }

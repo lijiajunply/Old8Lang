@@ -29,15 +29,24 @@ public class ThreadIsAliveMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        // IL 模式：IL 下的线程值是 ThreadLangValue，不是原生 Thread
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
         var helperMethod = typeof(ThreadIsAliveMethod).GetMethod(nameof(IsAliveHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static bool IsAliveHelper(System.Threading.Thread thread)
+    /// <summary>
+    /// IL 模式的辅助方法：线程是否仍在运行。
+    /// </summary>
+    public static bool IsAliveHelper(LangValueType instance)
     {
-        return thread.IsAlive;
+        if (instance is not ThreadLangValue thread)
+        {
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
+        }
+
+        return thread.IsAlive();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

@@ -38,39 +38,58 @@ public class ThreadStartMethod : BaseInstanceMethod
         return thread;
     }
 
+    /// <summary>
+    /// IL 模式：IL 下的线程值是 <see cref="ThreadLangValue"/>（不是原生 Thread），
+    /// 所以把接收者与参数统一转成 Old8Lang 值后交给静态 helper。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
 
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        var helperName = parameters.Count == 1 ? nameof(StartWithParameterHelper) : nameof(StartHelper);
         if (parameters.Count == 1)
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
-            var helperMethod = typeof(ThreadStartMethod).GetMethod(nameof(StartWithParameterHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
         }
-        else
+
+        var helperMethod = typeof(ThreadStartMethod).GetMethod(helperName,
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：启动线程。
+    /// </summary>
+    public static LangValueType StartHelper(LangValueType instance)
+    {
+        if (instance is not ThreadLangValue thread)
         {
-            var helperMethod = typeof(ThreadStartMethod).GetMethod(nameof(StartHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
         }
-    }
 
-    public static void StartHelper(System.Threading.Thread thread)
-    {
         thread.Start();
+        return thread;
     }
 
-    public static void StartWithParameterHelper(System.Threading.Thread thread, object? parameter)
+    /// <summary>
+    /// IL 模式的辅助方法：带参数启动线程。
+    /// </summary>
+    public static LangValueType StartWithParameterHelper(LangValueType instance, LangValueType parameter)
     {
-        thread.Start(parameter);
+        if (instance is not ThreadLangValue thread)
+        {
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
+        }
+
+        thread.Start(parameter.GetValue());
+        return thread;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ThreadLangValue);
+        return typeof(LangValueType);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

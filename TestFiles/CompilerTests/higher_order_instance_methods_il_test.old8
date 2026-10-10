@@ -1,0 +1,84 @@
+// IL 模式高阶实例方法测试
+// 覆盖 List / Dictionary / Generic / Array 共 29 个此前在 IL 模式下抛 NotSupportedException 的方法：
+//   List: FindAll FlatMap GroupAdjacentBy Partition Single SingleOrDefault
+//         SkipWhile SkipWhileIndexed TakeWhile TakeWhileIndexed
+//   Dictionary: Map Filter ForEach
+//   Generic: SelectMany SortBy Zip3 Sum Average Max Min（带 selector）
+//   Array: GroupAdjacentBy
+//
+// 运行：
+//   dotnet Old8Lang.App/bin/Debug/net10.0/Old8Lang.App.dll -il TestFiles/CompilerTests/higher_order_instance_methods_il_test.old8
+//
+// 说明：
+//   - IL 模式的 lambda 需要类型注解，例如 (x:int) -> x > 1。
+//   - 结果先赋值给变量再调用 .Count()：IL 模式下「在方法调用结果上直接链式调用」目前仍会生成无效 IL
+//     （与本次改动无关的既有缺陷，见 Todo.md）。
+//   - IL 模式会先用解释器预执行整个模块再编译执行，因此输出会出现两轮，本文件两种模式结果一致。
+
+l <- {1, 2, 3, 4, 5}
+
+// ---------- List ----------
+r1 <- l.FindAll((x:int) -> x % 2 == 0)
+PrintLine(r1.Count())                                  // 2
+
+r2 <- l.FlatMap((x:int) -> [x, x * 10])
+PrintLine(r2.Count())                                  // 5（与解释器一致：FlatMap 只扁平化列表，不扁平化数组）
+
+r3 <- l.GroupAdjacentBy((x:int) -> x % 2)
+PrintLine(r3.Count())                                  // 5
+
+r4 <- l.Partition((x:int) -> x > 2)
+PrintLine(r4.Count())                                  // 2
+
+r5 <- l.Single((x:int) -> x == 3)
+PrintLine(r5)                                          // 3
+
+r6 <- l.SingleOrDefault((x:int) -> x == 99, -1)
+PrintLine(r6)                                          // -1
+
+r7 <- l.SkipWhile((x:int) -> x < 3)
+PrintLine(r7.Count())                                  // 3
+
+r8 <- l.TakeWhile((x:int) -> x < 3)
+PrintLine(r8.Count())                                  // 2
+
+r9 <- l.SkipWhileIndexed((x:int, i:int) -> i < 2)
+PrintLine(r9.Count())                                  // 3
+
+r10 <- l.TakeWhileIndexed((x:int, i:int) -> i < 2)
+PrintLine(r10.Count())                                 // 2
+
+// ---------- Dictionary ----------
+d <- {"a": 1, "b": 2}
+r11 <- d.Map((v:int) -> v * 10)
+PrintLine(r11.Count())                                 // 2
+
+r12 <- d.Filter((k:string, v:int) -> v > 1)
+PrintLine(r12.Count())                                 // 1
+
+d.ForEach((k:string, v:int) -> PrintLine(v))           // 1 / 2
+
+// ---------- Generic（List 包装） ----------
+r13 <- l.SelectMany((x:int) -> [x, x])
+PrintLine(r13.Count())                                 // 10
+
+r14 <- l.SortBy((x:int) -> -x)
+PrintLine(r14.Count())                                 // 5
+
+r15 <- l.SortBy((a:int, b:int) -> b - a)
+PrintLine(r15.Count())                                 // 5（比较器形式）
+
+r16 <- l.Zip3([1, 2, 3], [4, 5, 6])
+PrintLine(r16.Count())                                 // 3
+
+PrintLine(l.Sum((x:int) -> x * 2))                     // 30
+PrintLine(l.Average((x:int) -> x))                     // 3
+PrintLine(l.Max((x:int) -> x * 3))                     // 15
+PrintLine(l.Min((x:int) -> x * 3))                     // 3
+
+// ---------- Array ----------
+a <- [3, 1, 2, 4]
+r17 <- a.GroupAdjacentBy((x:int) -> x % 2)
+PrintLine(r17.Count())                                 // 2
+
+PrintLine("HigherOrder IL Tests Passed")

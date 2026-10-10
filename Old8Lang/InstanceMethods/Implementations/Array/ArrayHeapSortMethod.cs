@@ -92,6 +92,44 @@ public class ArrayHeapSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.HeapSort 方法在 VM 模式下暂不支持");
+        return ArraySortVmSupport.SortAndReturn(instance, HeapSort);
+    }
+
+    /// <summary>VM 堆排序：先建最大堆，再逐个把堆顶换到末尾并下沉修复。</summary>
+    private static void HeapSort(List<object?> items)
+    {
+        var n = items.Count;
+
+        // 构建最大堆
+        for (var i = n / 2 - 1; i >= 0; i--)
+            SiftDown(items, n, i);
+
+        // 逐个提取堆顶（当前最大值）到数组末尾
+        for (var i = n - 1; i > 0; i--)
+        {
+            ArraySortVmSupport.Swap(items, 0, i);
+            SiftDown(items, i, 0);
+        }
+    }
+
+    private static void SiftDown(List<object?> items, int n, int i)
+    {
+        while (true)
+        {
+            var largest = i;
+            var left = 2 * i + 1;
+            var right = 2 * i + 2;
+
+            if (left < n && ArraySortVmSupport.Less(items[largest], items[left]))
+                largest = left;
+
+            if (right < n && ArraySortVmSupport.Less(items[largest], items[right]))
+                largest = right;
+
+            if (largest == i) return;
+
+            ArraySortVmSupport.Swap(items, i, largest);
+            i = largest;
+        }
     }
 }

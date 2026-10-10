@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -14,6 +15,15 @@ namespace Old8Lang.InstanceMethods.Core;
 public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, VariateManager manager)
     : IInstanceMethod
 {
+    /// <summary>
+    /// 声明扩展方法时的变量管理器（解释器预执行阶段）。
+    /// </summary>
+    /// <remarks>
+    /// IL 模式下扩展方法体仍然由解释器执行，需要一个能访问全局函数/全局变量的管理器；
+    /// 这里复用声明阶段的管理器（与解释器模式使用调用方 manager 的做法一致）。
+    /// </remarks>
+    private VariateManager DeclarationManager { get; } = manager;
+
     public string[] Names => [function.Id.IdName];
 
     public Type TargetType => targetType;
@@ -116,6 +126,14 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         }
     }
 
+    /// <summary>
+    /// IL 模式：把接收者与参数转成 Old8Lang 值，交给运行期 helper 用解释器执行扩展方法体。
+    /// </summary>
+    /// <remarks>
+    /// 扩展方法声明在编译前会由解释器预执行（<c>Compiler.Compile</c> 里的
+    /// <c>statement.ExecuteModule</c>）注册进实例方法表，因此这里只需要把
+    /// 「注册好的包装器」带进生成代码，再按 <see cref="Execute"/> 的语义执行函数体。
+    /// </remarks>
     public void GenerateIl(
         LangExpression instance,
         List<LangExpression> parameters,
@@ -123,12 +141,92 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         LocalManager local,
         SourcePosition position)
     {
-        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现");
+        // 包装器本身作为编译期常量传入
+        var wrapperId = RuntimeConstantRegistry.Register(this);
+        ilGenerator.Emit(OpCodes.Ldc_I4, wrapperId);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(RuntimeConstantRegistry).GetMethod(nameof(RuntimeConstantRegistry.Get))!);
+        ilGenerator.Emit(OpCodes.Castclass, typeof(ExtensionMethodWrapper));
+
+        // 接收者与参数：原生值 -> Old8Lang 值
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, parameters.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(LangValueType));
+
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            IlValueBridge.EmitLoadWrapped(parameters[i], ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        var helperMethod = typeof(ExtensionMethodWrapper).GetMethod(nameof(InvokeExtension),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+
+        // 结果转回 IL 模式的原生表示，避免后续按 LangValueType 处理导致跨模式输出差异
+        ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Unwrap))!);
+    }
+
+    /// <summary>
+    /// IL 模式的运行期 helper：按解释器语义执行扩展方法体。
+    /// </summary>
+    public static LangValueType InvokeExtension(ExtensionMethodWrapper wrapper, LangValueType instance,
+        LangValueType[] arguments)
+    {
+        return wrapper.ExecuteWithValues(instance, arguments, wrapper.DeclarationManager);
+    }
+
+    /// <summary>
+    /// 用已求值的参数执行扩展方法（供 IL 模式使用，不依赖参数表达式）。
+    /// </summary>
+    private LangValueType ExecuteWithValues(LangValueType instance, LangValueType[] arguments,
+        VariateManager manager)
+    {
+        var methodSignature = $"{instance.GetType().Name}.{function.Id.IdName}";
+
+        manager.EnterExtensionMethod(methodSignature);
+
+        try
+        {
+            manager.AddChildren();
+
+            try
+            {
+                manager.Set(new LangId("this"), instance);
+
+                for (var i = 0; i < arguments.Length && i < function.Ids.Count; i++)
+                {
+                    manager.Set(new LangId(function.Ids[i].IdName), arguments[i]);
+                }
+
+                function.BlockStatement.Run(manager);
+
+                if (manager.IsReturn)
+                {
+                    var returnValue = manager.Result;
+                    manager.ClearReturn();
+                    return returnValue;
+                }
+
+                return new NullLangValue();
+            }
+            finally
+            {
+                manager.RemoveChildren();
+            }
+        }
+        finally
+        {
+            manager.ExitExtensionMethod();
+        }
     }
 
     public Type GetReturnType(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        // 返回动态类型
+        // 返回动态类型（IL 模式下结果已转回原生表示）
         return typeof(object);
     }
 

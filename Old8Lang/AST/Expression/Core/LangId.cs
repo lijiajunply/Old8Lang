@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
 using Old8Lang.Compiler.Specialization;
@@ -169,9 +171,57 @@ public partial class LangId(
             return;
         }
 
+        // 具名函数在 IL 模式下也可以作为「函数值」传递（例如传入 List.FindAll 这类高阶方法）。
+        // 这里从已编译的委托表里取出对应的 DynamicMethod，注册成一个委托常量后加载。
+        if (TryGetFunctionMethod(IdName, local, out var functionMethod))
+        {
+            var functionValueId = CompiledDelegateRegistry.RegisterFunctionValue(functionMethod);
+            ilGenerator.Emit(OpCodes.Ldc_I4, functionValueId);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Get))!);
+            return;
+        }
+
         // 如果找不到，且没有其他匹配，抛出错误
         // 之前的实现盲目使用 Ldarg_0，这可能掩盖了错误
         local.ReportError($"变量 '{IdName}' 未声明", Position);
+    }
+
+    /// <summary>
+    /// 在已编译的委托表中查找具名函数（支持 <c>名称$参数类型</c> 形式的带签名键）。
+    /// </summary>
+    /// <remarks>
+    /// 如果同名函数存在多个重载，返回 false，避免静默选中错误的重载。
+    /// </remarks>
+    private static bool TryGetFunctionMethod(string name, LocalManager local, out MethodInfo method)
+    {
+        if (local.DelegateVar.TryGetValue(name, out var exactMatch))
+        {
+            method = exactMatch;
+            return true;
+        }
+
+        MethodInfo? found = null;
+        var prefix = $"{name}$";
+        foreach (var (key, value) in local.DelegateVar)
+        {
+            if (!key.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (found is not null)
+            {
+                // 多个重载：无法在这里确定签名
+                method = null!;
+                return false;
+            }
+
+            found = value;
+        }
+
+        method = found!;
+        return found is not null;
     }
 
     /// <summary>

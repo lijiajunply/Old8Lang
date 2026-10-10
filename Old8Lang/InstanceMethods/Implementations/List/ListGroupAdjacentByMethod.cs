@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.GroupAdjacentBy(keySelector) - 使用键选择器将相邻的相同键元素分组
 /// </summary>
-public class ListGroupAdjacentByMethod : BaseInstanceMethod
+public class ListGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["GroupAdjacentBy", "groupAdjacentBy"];
     public override Type TargetType => typeof(ListLangValue);
@@ -62,10 +62,69 @@ public class ListGroupAdjacentByMethod : BaseInstanceMethod
         return new ListLangValue(result);
     }
 
+    /// <summary>
+    /// IL 模式：接收者是原生 <c>List&lt;T&gt;</c>，键选择器是编译好的 .NET 委托。
+    /// 先把两者转换成 Old8Lang 值调用 helper，再由 helper 把结果转回原生列表。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        throw new NotSupportedException("List.GroupAdjacentBy 方法暂不支持 IL 模式");
+        // 接收者：原生集合 -> Old8Lang 值
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        // 键选择器：编译好的委托 -> 函数值
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperMethod = typeof(ListGroupAdjacentByMethod).GetMethod(nameof(GroupAdjacentByHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：语义与 <see cref="ExecuteInternal"/> 一致。
+    /// 返回原生列表，每个分组是元素类型为 <see cref="object"/> 的原生列表。
+    /// </summary>
+    public static List<object?> GroupAdjacentByHelper(LangValueType instance, LangValueType keySelector)
+    {
+        if (instance is not ListLangValue list)
+        {
+            throw new ArgumentException($"实例必须是列表，实际是 {instance.GetType().Name}");
+        }
+
+        if (keySelector is not FuncLangValue func)
+        {
+            throw new ArgumentException("keySelector 参数必须是函数类型");
+        }
+
+        var manager = new VariateManager();
+        var result = new List<object?>();
+
+        if (list.Values.Count == 0)
+        {
+            return result;
+        }
+
+        var currentGroup = new List<LangValueType> { list.Values[0] };
+        var currentKey = func.Run(manager, [list.Values[0]]);
+
+        for (int i = 1; i < list.Values.Count; i++)
+        {
+            var key = func.Run(manager, [list.Values[i]]);
+
+            if (key.Equal(currentKey))
+            {
+                currentGroup.Add(list.Values[i]);
+            }
+            else
+            {
+                result.Add(currentGroup.Select(IlValueBridge.Unwrap).ToList());
+                currentGroup = new List<LangValueType> { list.Values[i] };
+                currentKey = key;
+            }
+        }
+
+        result.Add(currentGroup.Select(IlValueBridge.Unwrap).ToList());
+        return result;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

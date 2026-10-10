@@ -72,6 +72,15 @@ public class FuncRunStatement : OldStatement
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        if (_genericInstance is not null)
+        {
+            var genericOutputType = _genericInstance.OutputType(local);
+            _genericInstance.LoadIlValue(ilGenerator, local);
+            // 销毁栈上的值
+            if (genericOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return;
+        }
+
         if (_expression is not null)
         {
             _expression.LoadIlValue(ilGenerator, local);

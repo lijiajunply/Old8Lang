@@ -135,8 +135,57 @@ public sealed class SpawnFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator,
         LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持线程创建
-        ilGenerator.Emit(OpCodes.Ldnull);
+        // spawn(f, args...)：把函数编译成委托、额外参数打包成 Old8Lang 值数组，交给运行期 helper 创建线程
+        parameters[0].LoadIlValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
+                nameof(InstanceMethods.Core.IlValueBridge.WrapFunction))!);
+
+        var extraArgumentCount = parameters.Count - 1;
+        ilGenerator.Emit(OpCodes.Ldc_I4, extraArgumentCount);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(LangValueType));
+
+        for (var i = 1; i < parameters.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i - 1);
+            parameters[i].LoadIlValue(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
+                    nameof(InstanceMethods.Core.IlValueBridge.Wrap))!);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        var helperMethod = typeof(SpawnFunction).GetMethod(nameof(SpawnHelper),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>
+    /// IL 模式下的 spawn 实现：把函数值包装成一个真实线程（与解释器一致，不自动启动）。
+    /// </summary>
+    public static ThreadLangValue SpawnHelper(LangValueType func, LangValueType[] arguments)
+    {
+        if (func is not FuncLangValue spawnFunc)
+        {
+            throw new ArgumentException("spawn 函数需要一个函数参数");
+        }
+
+        ThreadLangValue? thread = null;
+        thread = new ThreadLangValue(() =>
+        {
+            try
+            {
+                var result = spawnFunc.Run(new VariateManager(), [.. arguments]);
+                thread?.SetResult(result);
+            }
+            catch (Exception ex)
+            {
+                thread?.SetException(ex);
+            }
+        });
+
+        return thread;
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

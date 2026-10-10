@@ -68,6 +68,24 @@ public class ArrayInsertionSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.InsertionSort 方法在 VM 模式下暂不支持");
+        return ArraySortVmSupport.SortAndReturn(instance, InsertionSort);
+    }
+
+    /// <summary>VM 插入排序：把当前元素插入到前面已排序区间的正确位置。</summary>
+    private static void InsertionSort(List<object?> items)
+    {
+        for (var i = 1; i < items.Count; i++)
+        {
+            var key = items[i];
+            var j = i - 1;
+
+            while (j >= 0 && ArraySortVmSupport.Less(key, items[j]))
+            {
+                items[j + 1] = items[j];
+                j--;
+            }
+
+            items[j + 1] = key;
+        }
     }
 }

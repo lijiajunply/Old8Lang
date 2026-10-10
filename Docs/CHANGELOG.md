@@ -26,6 +26,18 @@
   `Run` / `StartNew`，`Thread.Sleep`，以及 `Assert` 的 24 个断言方法。
 - 虚拟机模式下断言失败改抛 `AssertionError`（语言层 `try/catch` **可以**捕获；
   解释器下抛普通异常，捕获不到——这是有意的跨模式差异）。
+- **IL 模式支持高阶实例方法**：列表的 `FindAll` / `FlatMap` / `GroupAdjacentBy` / `Partition` /
+  `Single` / `SingleOrDefault` / `SkipWhile(Indexed)` / `TakeWhile(Indexed)`，字典的
+  `Map` / `Filter` / `ForEach`，以及 `SelectMany` / `SortBy` / `Zip3` / `Sum(selector)` /
+  `Average(selector)` / `Max(selector)` / `Min(selector)` / `Array.GroupAdjacentBy` 不再抛
+  `NotSupportedException`（lambda 需带参数类型注解，且仍不支持读写外层局部变量）。
+- **IL 模式支持扩展方法与线程**：`extension` 声明的方法可在 IL 下调用；`spawn(f)` 会创建真实线程，
+  `Thread` 的 `Start` / `Join` / `IsAlive` / `Then` / `Cancel` / `Retry` / `WithTimeout` 可用
+  （`Retry` 写作 `spawn(f).Retry(n)`）。
+- **虚拟机模式支持数组排序与 Task 实例方法**：`Array` 的 `QuickSort` / `HeapSort` /
+  `SelectionSort` / `InsertionSort` / `MergeSort` / `BubbleSort` 及通用 `Sort()` / `IsSorted()`；
+  Task 的 `Then` / `Catch` / `Finally` / `ContinueWith`。字符串排序统一按长度（与解释器一致）。
+  虚拟机模式下 `Thread` 的 `Then` / `Cancel` / `Retry` / `WithTimeout` 仍不可用（线程模型缺口）。
 
 ---
 

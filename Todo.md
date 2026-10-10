@@ -154,3 +154,59 @@
 - `Reports/VM_Quick_Performance_Report_20260302_011433.json`
 - `BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-report.csv`
 - `BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-20260302-001859.log`
+
+---
+
+# 跨模式实例方法补齐后的遗留 TODO（2026-10-10）
+
+背景：`Reports/2026-10-09-22-56-项目缺口排查.md` 第 5 节列出的 IL 29 个方法、VM 14 个方法以及两处
+代码级缺口已处理，详见 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md`。
+以下是执行过程中发现、但**与本轮清单无关**（按 AGENTS.md 规则不顺手改）的问题。
+
+## A. 阻塞类（导致清单内方法在某个模式下不可用）
+
+- [ ] **VM 线程模型：`Thread.Then` / `Cancel` / `Retry` / `WithTimeout` 在 VM 下不可达。**
+  - 现状：这 4 个方法 `TargetType = ThreadLangValue`，而 VM 的线程对象是 `VMThreadLangValue`
+    （`Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs:183`，整数线程 id + `Concurrency.ResourceManager`）。
+    VM 分发（`Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs:38/60/65`）
+    精确匹配与 `VMTypeMapper` 等价映射都得不到 `ThreadLangValue`，方法体不会执行（实测报
+    `类 'VMThreadLangValue' 中未找到方法 'X'`）。
+  - 需要：给 `VMThreadLangValue` 新增同名实例方法（并注册），以及 `ResourceManager` 侧的
+    取消令牌 / 保存原始函数（Retry）/ 超时 Join 原语。属于改线程模型。
+  - 备注：`ThreadStartMethod` / `ThreadJoinMethod` / `ThreadIsAliveMethod` 的 VM 实现（要求原生
+    `System.Threading.Thread`）同样是死代码；VM 下 `.Start()/.Join()/.IsAlive()` 实际走反射回退。
+  - 附带缺陷：`PrintLine(VMThreadLangValue)` 会栈溢出（`VMThreadLangValue.GetValue()` 返回自身，
+    `LangValueType.ToString()` 递归）。
+
+## B. IL 模式既有缺陷（本轮踩到、但非清单项）
+
+- [ ] **方法调用结果上直接链式调用生成无效 IL。**
+  - 复现：`l.Count().ToStr()`、`l.FindAll((x:int) -> x % 2 == 0).Count()` → `IL001 invalid program`
+    （改动前同样失败）。
+  - 根因：`Old8Lang/AST/Expression/Core/Operation.cs:880` 的
+    `OutputType(ILGenerator, LocalManager)` 用 `Left.OutputType(local)`（非 IL 重载）取嵌套表达式类型，
+    对 `Operation` 恒为 `object`，于是外层按 `object` 解析实例方法/属性。
+  - 影响：所有「链式调用」写法在 IL 下不可用；测试需先赋给变量。
+- [ ] **无类型注解的递归函数在 IL 下无限递归（栈溢出，会让 `dotnet test` 直接中止）。**
+  - 复现：`func factorial(n) { if n <= 1 { return 1 } return n * factorial(n - 1) }` + `factorial(5)`
+    用 `-il` 运行 → `Stack overflow ... at DynamicClass.factorial(System.Object)`；
+    **基线（HEAD 67005c8c）同样复现**，非本轮引入。
+  - 影响用例：`Old8Lang.Tests/Compiler/Integration/EndToEndTests.EndToEnd_FactorialCalculation_WorksCorrectly`、
+    `EndToEnd_FibonacciSequence_GeneratesCorrectValues`（这两例在基线 TRX 中也没有记录，
+    因为基线整轮测试同样在这里中止）。
+  - 根因方向：参数无注解时 DynamicMethod 形参为 `object`，`n <= 1` 的比较代码在 `object` 上语义错误，
+    递归没有基线条件。建议：IL 模式对无注解参数直接报编译错误（IL 本来就要求完整类型注解）。
+- [ ] **IL 模式 lambda 不能读写外层普通局部变量。**
+  - 现状：`BuildLambdaDynamicMethod` 的 `funcLocal` 只带了外层**函数**委托表（本轮新增），
+    普通局部变量仍不可见。既有边界。
+
+## C. 其它同类实现待迁移（同一套桥接机制可复用）
+
+- [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
+  （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
+  在 `List<T>` 接收者下会「方法未找到」。
+  - 迁移方式：参照 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md` §2 的机制
+    （实现 `IIlNativeValueInstanceMethod` + `IlValueBridge.EmitLoadWrapped` + 静态 helper）。
+- [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
+  只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
+

@@ -105,6 +105,46 @@ public class ArrayMergeSortMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        throw new NotSupportedException("Array.MergeSort 方法在 VM 模式下暂不支持");
+        var items = ArraySortVmSupport.Normalize(instance);
+        if (items.Count > 1)
+        {
+            // 单一辅助缓冲区，避免每层归并都分配临时数组
+            var buffer = new object?[items.Count];
+            MergeSortRange(items, buffer, 0, items.Count - 1);
+        }
+
+        return items.ToArray();
+    }
+
+    /// <summary>VM 归并排序：自顶向下二分，合并时借助缓冲区，相等元素保持原顺序（稳定）。</summary>
+    private static void MergeSortRange(List<object?> items, object?[] buffer, int left, int right)
+    {
+        if (left >= right) return;
+
+        var mid = left + (right - left) / 2;
+        MergeSortRange(items, buffer, left, mid);
+        MergeSortRange(items, buffer, mid + 1, right);
+
+        Merge(items, buffer, left, mid, right);
+    }
+
+    private static void Merge(List<object?> items, object?[] buffer, int left, int mid, int right)
+    {
+        for (var k = left; k <= right; k++)
+            buffer[k] = items[k];
+
+        int i = left, j = mid + 1, dest = left;
+
+        while (i <= mid && j <= right)
+        {
+            // 只在右侧严格小于左侧时先取右侧，保证稳定
+            if (ArraySortVmSupport.Less(buffer[j], buffer[i]))
+                items[dest++] = buffer[j++];
+            else
+                items[dest++] = buffer[i++];
+        }
+
+        while (i <= mid) items[dest++] = buffer[i++];
+        while (j <= right) items[dest++] = buffer[j++];
     }
 }

@@ -1,0 +1,77 @@
+// IL 模式 Task / Thread 实例方法测试
+// 覆盖此前在 IL 模式下抛 NotSupportedException 的方法：
+//   Task: Then Catch Finally ContinueWith
+//   Thread: Then Cancel Retry WithTimeout（以及依赖的 spawn / Start / Join / IsAlive）
+//
+// 运行：
+//   dotnet Old8Lang.App/bin/Debug/net10.0/Old8Lang.App.dll -il TestFiles/CompilerTests/task_thread_methods_il_test.old8
+//
+// 说明：
+//   - Task 回调先写成具名函数：IL 模式下 lambda 不能直接访问外层局部变量（既有边界）。
+//   - Task.FromException 传字符串时，IL 会按解释器语义转成异常消息。
+//   - Retry 的写法必须是 `spawn(f).Retry(n)`：解释器把 Retry 特判为「重新执行函数调用」，
+//     对线程变量调用 `t.Retry(n)` 会被拒绝。
+//   - IL 模式会先用解释器预执行整个模块再编译执行，因此输出会出现两轮，本文件两种模式结果一致。
+
+func onThen(s:string) -> string {
+    return s + "!"
+}
+func onCatch(msg:string) -> string {
+    return "caught: " + msg
+}
+func onFinally() -> void {
+    PrintLine("finally-ran")
+}
+func onContinue(s:string) -> string {
+    return s + "?"
+}
+
+// ---------- Task ----------
+t1 <- Task.FromResult("hi")
+r1 <- t1.Then(onThen)
+PrintLine(r1.Result)                                   // hi!
+
+t2 <- Task.FromException("boom")
+r2 <- t2.Catch(onCatch)
+PrintLine(r2.Result)                                   // caught: boom
+
+t3 <- Task.FromResult("x")
+t3.Finally(onFinally)                                  // finally-ran
+
+t4 <- Task.FromResult("y")
+r4 <- t4.ContinueWith(onContinue)
+PrintLine(r4.Result)                                   // y?
+
+// ---------- Thread ----------
+func work() -> int {
+    return 7
+}
+func nothing() -> void {
+}
+
+t5 <- spawn(work)
+t5.Start()
+PrintLine(t5.Join())                                   // 7
+
+t6 <- spawn(nothing)
+t6.Start()
+t6.Cancel()                                            // 取消是协作式的，这里只验证调用可用
+PrintLine("cancel-ok")
+
+t7 <- spawn(work).Retry(2)
+t7.Start()
+PrintLine(t7.Join())                                   // 7
+
+t8 <- spawn(work)
+t8.Start()
+t9 <- t8.WithTimeout(1000)
+t9.Start()
+PrintLine(t9.Join())                                   // 7
+
+t10 <- spawn(nothing)
+t10.Start()
+t11 <- t10.Then((r:int) -> spawn(nothing))
+t11.Start()
+PrintLine("then-ok")
+
+PrintLine("Task/Thread IL Tests Passed")

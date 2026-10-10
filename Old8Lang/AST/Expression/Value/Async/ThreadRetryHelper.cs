@@ -42,6 +42,9 @@ public static class ThreadRetryHelper
                         throw new TypeError(funcCall, "Retry 只能用于返回 Thread 的函数");
                     }
 
+                    // 新线程需要先启动再等待（spawn 不会自动启动线程）
+                    newThread.Start();
+
                     // 等待 Thread 完成
                     var result = newThread.Join();
 

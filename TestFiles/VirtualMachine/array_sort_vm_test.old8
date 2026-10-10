@@ -1,0 +1,190 @@
+// VM 数组排序方法测试
+// 覆盖：QuickSort / HeapSort / SelectionSort / InsertionSort / MergeSort / BubbleSort
+//      以及通用 LangList 路径的 Sort() / IsSorted()
+//
+// 运行：
+//   dotnet Old8Lang.App/bin/Debug/net10.0/Old8Lang.App.dll -vm TestFiles/VirtualMachine/array_sort_vm_test.old8
+//
+// 说明：
+//   - VM 中数组字面量 [3, 1, 2] 的运行时类型是原生 object?[]，排序结果也是数组，
+//     所以用 s[i] / s.Count() / s.Join(",") 校验，而不是直接打印数组。
+//   - string 按长度排序（与解释器/IL 的 StringLangValue.Less 语义一致），
+//     长度相同时再按序号比较，保证 6 种算法结果完全一致。
+//   - 全部断言失败都会 throw，正常结束时打印 All Array Sort VM Tests Passed。
+
+// ================= 共享输入 =================
+srcInt <- [3, 1, 2]
+srcNeg <- [-1, 5, -3, 5, 0, -3]
+srcStr <- ["bb", "a", "ccc", "dd"]
+srcRev <- [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+srcOne <- [42]
+srcEmpty <- []
+srcNull <- [3, null, 1]
+
+// ================= 1. QuickSort =================
+r <- srcInt.QuickSort()
+if r.Join(",") != "1,2,3" { throw "QuickSort 基本整数失败: " + r.Join(",") }
+if r.Count() != 3 { throw "QuickSort 结果长度错误" }
+r <- srcNeg.QuickSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "QuickSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.QuickSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "QuickSort 字符串失败: " + r.Join(",") }
+r <- srcRev.QuickSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "QuickSort 逆序失败: " + r.Join(",") }
+r <- srcOne.QuickSort()
+if r.Join(",") != "42" { throw "QuickSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.QuickSort()
+if r.Count() != 0 { throw "QuickSort 空数组失败" }
+r <- srcNull.QuickSort()
+if r[0] != null { throw "QuickSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "QuickSort null 顺序失败" }
+PrintLine("QuickSort OK")
+
+// ================= 2. HeapSort =================
+r <- srcInt.HeapSort()
+if r.Join(",") != "1,2,3" { throw "HeapSort 基本整数失败: " + r.Join(",") }
+r <- srcNeg.HeapSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "HeapSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.HeapSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "HeapSort 字符串失败: " + r.Join(",") }
+r <- srcRev.HeapSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "HeapSort 逆序失败: " + r.Join(",") }
+r <- srcOne.HeapSort()
+if r.Join(",") != "42" { throw "HeapSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.HeapSort()
+if r.Count() != 0 { throw "HeapSort 空数组失败" }
+r <- srcNull.HeapSort()
+if r[0] != null { throw "HeapSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "HeapSort null 顺序失败" }
+PrintLine("HeapSort OK")
+
+// ================= 3. SelectionSort =================
+r <- srcInt.SelectionSort()
+if r.Join(",") != "1,2,3" { throw "SelectionSort 基本整数失败: " + r.Join(",") }
+r <- srcNeg.SelectionSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "SelectionSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.SelectionSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "SelectionSort 字符串失败: " + r.Join(",") }
+r <- srcRev.SelectionSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "SelectionSort 逆序失败: " + r.Join(",") }
+r <- srcOne.SelectionSort()
+if r.Join(",") != "42" { throw "SelectionSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.SelectionSort()
+if r.Count() != 0 { throw "SelectionSort 空数组失败" }
+r <- srcNull.SelectionSort()
+if r[0] != null { throw "SelectionSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "SelectionSort null 顺序失败" }
+PrintLine("SelectionSort OK")
+
+// ================= 4. InsertionSort =================
+r <- srcInt.InsertionSort()
+if r.Join(",") != "1,2,3" { throw "InsertionSort 基本整数失败: " + r.Join(",") }
+r <- srcNeg.InsertionSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "InsertionSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.InsertionSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "InsertionSort 字符串失败: " + r.Join(",") }
+r <- srcRev.InsertionSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "InsertionSort 逆序失败: " + r.Join(",") }
+r <- srcOne.InsertionSort()
+if r.Join(",") != "42" { throw "InsertionSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.InsertionSort()
+if r.Count() != 0 { throw "InsertionSort 空数组失败" }
+r <- srcNull.InsertionSort()
+if r[0] != null { throw "InsertionSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "InsertionSort null 顺序失败" }
+PrintLine("InsertionSort OK")
+
+// ================= 5. MergeSort =================
+r <- srcInt.MergeSort()
+if r.Join(",") != "1,2,3" { throw "MergeSort 基本整数失败: " + r.Join(",") }
+r <- srcNeg.MergeSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "MergeSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.MergeSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "MergeSort 字符串失败: " + r.Join(",") }
+r <- srcRev.MergeSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "MergeSort 逆序失败: " + r.Join(",") }
+r <- srcOne.MergeSort()
+if r.Join(",") != "42" { throw "MergeSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.MergeSort()
+if r.Count() != 0 { throw "MergeSort 空数组失败" }
+r <- srcNull.MergeSort()
+if r[0] != null { throw "MergeSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "MergeSort null 顺序失败" }
+PrintLine("MergeSort OK")
+
+// ================= 6. BubbleSort =================
+r <- srcInt.BubbleSort()
+if r.Join(",") != "1,2,3" { throw "BubbleSort 基本整数失败: " + r.Join(",") }
+r <- srcNeg.BubbleSort()
+if r.Join(",") != "-3,-3,-1,0,5,5" { throw "BubbleSort 负数+重复失败: " + r.Join(",") }
+r <- srcStr.BubbleSort()
+if r.Join(",") != "a,bb,dd,ccc" { throw "BubbleSort 字符串失败: " + r.Join(",") }
+r <- srcRev.BubbleSort()
+if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "BubbleSort 逆序失败: " + r.Join(",") }
+r <- srcOne.BubbleSort()
+if r.Join(",") != "42" { throw "BubbleSort 单元素失败: " + r.Join(",") }
+r <- srcEmpty.BubbleSort()
+if r.Count() != 0 { throw "BubbleSort 空数组失败" }
+r <- srcNull.BubbleSort()
+if r[0] != null { throw "BubbleSort null 未排在最前" }
+if r[1] != 1 || r[2] != 3 { throw "BubbleSort null 顺序失败" }
+PrintLine("BubbleSort OK")
+
+// ================= 7. 6 种算法结果一致 =================
+same <- [5, -1, 3, 3, 0, -7, 2]
+v1 <- same.QuickSort().Join(",")
+v2 <- same.HeapSort().Join(",")
+v3 <- same.SelectionSort().Join(",")
+v4 <- same.InsertionSort().Join(",")
+v5 <- same.MergeSort().Join(",")
+v6 <- same.BubbleSort().Join(",")
+if v1 != "-7,-1,0,2,3,3,5" { throw "排序结果错误: " + v1 }
+if v1 != v2 || v2 != v3 || v3 != v4 || v4 != v5 || v5 != v6 {
+    throw "6 种算法结果不一致: " + v1 + " / " + v2 + " / " + v3 + " / " + v4 + " / " + v5 + " / " + v6
+}
+PrintLine("6 种算法一致 OK")
+
+// ================= 8. 原数组不被修改（数组进、数组出） =================
+orig <- [3, 1, 2]
+dummy <- orig.QuickSort()
+if dummy.Join(",") != "1,2,3" { throw "QuickSort 结果错误" }
+if orig.Join(",") != "3,1,2" { throw "排序修改了原数组: " + orig.Join(",") }
+PrintLine("原数组不被修改 OK")
+
+// ================= 9. 混合 int/double =================
+mix <- [2.5, 1, 3.5, -2, 0.0]
+if mix.QuickSort().Join(",") != "-2,0,1,2.5,3.5" { throw "混合数值失败: " + mix.QuickSort().Join(",") }
+if mix.MergeSort().Join(",") != "-2,0,1,2.5,3.5" { throw "混合数值 MergeSort 失败" }
+PrintLine("混合 int/double OK")
+
+// ================= 10. 通用 Sort() / IsSorted() =================
+s1 <- [3, 1, 2]
+if s1.IsSorted() { throw "IsSorted 对未排序数组应返回 false" }
+sr <- s1.Sort()
+if sr.Join(",") != "1,2,3" { throw "Sort 失败: " + sr.Join(",") }
+if !sr.IsSorted() { throw "Sort 结果应已排序" }
+if s1.Join(",") != "3,1,2" { throw "Sort 修改了原数组: " + s1.Join(",") }
+s2 <- []
+if s2.Sort().Count() != 0 { throw "Sort 空数组失败" }
+if !s2.IsSorted() { throw "空数组应视为已排序" }
+s3 <- [42]
+if s3.Sort().Join(",") != "42" { throw "Sort 单元素失败" }
+s4 <- ["bb", "a", "ccc", "dd"]
+if s4.Sort().Join(",") != "a,bb,dd,ccc" { throw "Sort 字符串失败: " + s4.Sort().Join(",") }
+s5 <- [1, 2, 3]
+if !s5.IsSorted() { throw "已排序数组 IsSorted 应为 true" }
+s6 <- [3, null, 1]
+sn <- s6.Sort()
+if sn.Join(",") != "null,1,3" { throw "Sort null 失败: " + sn.Join(",") }
+PrintLine("Sort/IsSorted OK")
+
+// ================= 11. Sort(comparer) 自定义比较器 =================
+desc <- (a, b) -> { if a > b { return -1 } if a < b { return 1 } return 0 }
+sc <- [3, 1, 2].Sort(desc)
+if sc.Join(",") != "3,2,1" { throw "Sort(comparer) 失败: " + sc.Join(",") }
+func descFunc(a, b) { if a > b { return -1 } if a < b { return 1 } return 0 }
+sc2 <- [3, 1, 2].Sort(descFunc)
+if sc2.Join(",") != "3,2,1" { throw "Sort(func) 失败: " + sc2.Join(",") }
+PrintLine("Sort(comparer) OK")
+
+PrintLine("All Array Sort VM Tests Passed")

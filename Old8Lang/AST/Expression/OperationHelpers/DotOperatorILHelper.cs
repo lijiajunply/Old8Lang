@@ -372,12 +372,18 @@ public static class DotOperatorILHelper
     {
         if (paramTypes.Count == 1)
         {
-            // 对于异常参数，返回一个包含异常的 Task<object>
+            // 参数已经在栈上：先按解释器语义转成 Exception（允许传字符串），再调用 FromException<object>
+            if (paramTypes[0].IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, paramTypes[0]);
+            }
+
+            ilGenerator.Emit(OpCodes.Call, typeof(TaskHelper).GetMethod(nameof(TaskHelper.ToException))!);
+
             var fromExceptionMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m is { Name: "FromException", IsGenericMethodDefinition: true });
             fromExceptionMethod = fromExceptionMethod.MakeGenericMethod(typeof(object));
-            // 参数已经在栈上，直接调用
             ilGenerator.Emit(OpCodes.Call, fromExceptionMethod);
         }
 
@@ -515,11 +521,28 @@ public static class DotOperatorILHelper
         Operation operation)
     {
         // 首先尝试从实例方法注册表中查找
+        // 注意：IL 代码生成不经过解释器的实例方法分派，某些程序（例如只用到 Thread 的
+        // 原生 Dot 分派、从没触发过解释器实例方法查找的程序）不会初始化注册表，
+        // 这里必须显式确保初始化，否则会查不到任何实例方法。
+        InstanceMethods.Core.InstanceMethodInitializer.EnsureInitialized();
         var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
 
         // 将 C# 原生类型映射到 LangValueType 以便查找实例方法
         var mappedType = MapToLangValueType(leftType!);
         var instanceMethod = registry.ResolveMethod(mappedType, instance.Id.IdName, instance.Ids, local);
+
+        // 原生集合（List<T> / T[] / Dictionary<K,V>）在 IL 模式下没有对应的 LangValueType 静态类型，
+        // 这里再按「等价类型」解析一次，但只接受显式声明支持原生接收者的方法，
+        // 避免让既有实现（假定接收者已经是 LangValueType）在栈类型不匹配时生成无效 IL。
+        if (instanceMethod is null && TryGetEquivalentLangValueType(leftType!, out var equivalentType))
+        {
+            var candidate = registry.ResolveMethod(equivalentType, instance.Id.IdName, instance.Ids, local);
+            if (candidate is InstanceMethods.Core.IIlNativeValueInstanceMethod)
+            {
+                instanceMethod = candidate;
+                mappedType = equivalentType;
+            }
+        }
 
         if (instanceMethod != null)
         {
@@ -575,6 +598,14 @@ public static class DotOperatorILHelper
                 // 获取Length属性
                 var lengthProperty = leftType.GetProperty("Length")!;
                 ilGenerator.Emit(OpCodes.Callvirt, lengthProperty.GetGetMethod()!);
+                return typeof(int);
+            }
+
+            // 其它实现 ICollection 的集合（字典等）同样用 Count 属性
+            if (typeof(ICollection).IsAssignableFrom(leftType) && !leftType.IsValueType)
+            {
+                var collectionCount = typeof(ICollection).GetProperty(nameof(ICollection.Count))!.GetGetMethod()!;
+                ilGenerator.Emit(OpCodes.Callvirt, collectionCount);
                 return typeof(int);
             }
         }
@@ -1036,5 +1067,46 @@ public static class DotOperatorILHelper
 
         // 其他类型返回 LangValueType 基类
         return typeof(LangValueType);
+    }
+
+    /// <summary>
+    /// 尝试把 IL 模式下的原生集合类型映射到等价的 LangValueType。
+    /// </summary>
+    /// <remarks>
+    /// 只用于「按等价类型再解析一次实例方法」的回退路径，且调用方只会采纳
+    /// 显式实现 <see cref="InstanceMethods.Core.IIlNativeValueInstanceMethod"/> 的方法。
+    /// </remarks>
+    private static bool TryGetEquivalentLangValueType(Type nativeType, out Type equivalentType)
+    {
+        if (nativeType.IsArray)
+        {
+            equivalentType = typeof(ArrayLangValue);
+            return true;
+        }
+
+        if (typeof(Task).IsAssignableFrom(nativeType))
+        {
+            equivalentType = typeof(TaskLangValue);
+            return true;
+        }
+
+        if (nativeType.IsGenericType)
+        {
+            var genericDefinition = nativeType.GetGenericTypeDefinition();
+            if (genericDefinition == typeof(List<>))
+            {
+                equivalentType = typeof(ListLangValue);
+                return true;
+            }
+
+            if (genericDefinition == typeof(Dictionary<,>))
+            {
+                equivalentType = typeof(DictionaryLangValue);
+                return true;
+            }
+        }
+
+        equivalentType = typeof(LangValueType);
+        return false;
     }
 }

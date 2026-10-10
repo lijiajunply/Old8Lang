@@ -666,13 +666,26 @@ public partial class ThreadLangValue : LangValueType
     }
 
     /// <summary>
-    /// 实现线程重试机制
+    /// 实现线程重试机制：把原始线程入口逻辑重新执行，最多 <paramref name="retryCount"/> 次重试。
     /// </summary>
+    /// <remarks>
+    /// 线程本身只能启动一次，所以这里复用创建线程时保存的入口委托
+    /// （<see cref="_threadStart"/>）重新执行；带参数的线程（<see cref="ParameterizedThreadStart"/>）
+    /// 没有保存入口委托，会抛出 <see cref="NotSupportedException"/>。
+    /// </remarks>
     public ThreadLangValue Retry(int retryCount, int delayMs = 0)
     {
+        var originalStart = _threadStart;
         var tcs = new CancellationTokenSource();
-        var retryThread = new ThreadLangValue(() =>
+        ThreadLangValue? retryThread = null;
+
+        retryThread = new ThreadLangValue(() =>
         {
+            if (originalStart is null)
+            {
+                throw new NotSupportedException("该线程没有可重试的入口逻辑（带参数的线程不支持 Retry）");
+            }
+
             Exception? lastException = null;
 
             for (int i = 0; i <= retryCount; i++)
@@ -681,18 +694,23 @@ public partial class ThreadLangValue : LangValueType
 
                 try
                 {
-                    // 创建当前线程的副本
-                    // 注意：这里需要重新创建线程，因为原始线程只能执行一次
-                    // 实际上，我们需要重新执行原始的线程逻辑
-                    // 由于ThreadLangValue没有保存原始的线程逻辑，这里需要特殊处理
-                    // Retry 功能需要在创建线程时保存原始逻辑才能实现
-                    throw new NotSupportedException("线程 Retry 方法暂不支持，因为线程只能执行一次。建议在 FuncStatic.cs 中实现重试逻辑");
+                    originalStart();
+
+                    // 原始线程入口会把结果/异常写回原线程（this），重试线程要把结果转写到自己身上，
+                    // 这样对重试线程 Join() 才能拿到结果（与解释器的 ThreadRetryHelper 语义一致）。
+                    if (_exception is not null)
+                    {
+                        throw _exception;
+                    }
+
+                    retryThread?.SetResult(_result!);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     lastException = ex;
 
-                    if (i < retryCount)
+                    if (i < retryCount && delayMs > 0)
                     {
                         // 重试前延迟
                         Thread.Sleep(delayMs);

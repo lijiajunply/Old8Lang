@@ -14,8 +14,9 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitExtensionDeclaration(ExtensionDeclaration node)
     {
-        // IL 模式暂不支持扩展方法
-        throw new NotImplementedException("扩展方法的 IL 模式支持尚未实现，请使用解释模式");
+        // 扩展方法在编译前已由解释器预执行注册进实例方法表（见 ExtensionDeclaration.GenerateIl），
+        // 调用点按普通实例方法解析到 ExtensionMethodWrapper，这里无需生成 IL。
+        return null;
     }
 
     /// <summary>
@@ -117,10 +118,21 @@ public partial class CompilerVisitor
         for (int i = 0; i < node.Count; i++)
         {
             var statement = node[i];
-            if (statement is not null)
+            if (statement is null)
             {
-                statement.Accept(this);
+                continue;
             }
+
+            // FuncRunStatement 的 Accept 会把访问直接转发给内部表达式，绕过它自己 GenerateIl 里
+            // 「丢弃非 void 结果」的那段逻辑，导致裸调用语句在栈上留下一个值、生成无效 IL
+            // （例如 `d.ForEach(f)`、`l.Count()`）。这里直接走 GenerateIl。
+            if (statement is FuncRunStatement funcRunStatement)
+            {
+                funcRunStatement.GenerateIl(ilGenerator, local);
+                continue;
+            }
+
+            statement.Accept(this);
         }
 
         return null;

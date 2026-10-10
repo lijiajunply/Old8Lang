@@ -1,0 +1,37 @@
+// 虚拟机模式 Task 实例方法测试
+// 覆盖此前在 VM 模式下抛 NotSupportedException 的方法：Then / Catch / Finally / ContinueWith
+//
+// 运行：
+//   dotnet Old8Lang.App/bin/Debug/net10.0/Old8Lang.App.dll -vm TestFiles/VirtualMachine/task_methods_vm_test.old8
+//
+// 说明：
+//   - VM 下 Task.Delay / Task.Run 返回 TaskLangValue，回调是 VM 函数对象；
+//     continuation 在线程池线程执行，内部会切到 worker 虚拟机调用函数对象。
+//   - 断言失败直接 throw，全部通过时打印 All Task VM Tests Passed。
+
+t1 <- Task.Run(() -> 41)
+r1 <- await t1.Then((x:int) -> x + 1)
+if r1 != 42 { throw "Then 失败: " + r1 }
+PrintLine("Then OK")
+
+t2 <- Task.Run(() -> 3)
+r2 <- await t2.ContinueWith((x:int) -> x * 2)
+if r2 != 6 { throw "ContinueWith 失败: " + r2 }
+PrintLine("ContinueWith OK")
+
+t3 <- Task.Run(() -> 5)
+r3 <- await t3.Finally(() -> PrintLine("finally-ran"))
+if r3 != 5 { throw "Finally 返回值错误: " + r3 }
+PrintLine("Finally OK")
+
+t4 <- Task.Run(() -> { throw "boom" })
+r4 <- await t4.Catch((msg:string) -> "caught: " + msg)
+if r4 != "caught: boom" { throw "Catch 失败: " + r4 }
+PrintLine("Catch OK")
+
+t5 <- Task.Run(() -> 10)
+r5 <- await t5.Then((x:int) -> x + 1).Then((x:int) -> x * 2)
+if r5 != 22 { throw "链式 Then 失败: " + r5 }
+PrintLine("链式 Then OK")
+
+PrintLine("All Task VM Tests Passed")

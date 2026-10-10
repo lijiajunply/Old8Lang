@@ -32,6 +32,11 @@ public partial class FuncLangValue : ImportInfo
     // 函数类型：区分普通方法和Lambda表达式
     private bool IsLambda { get; init; }
 
+    /// <summary>
+    /// 是否为匿名函数（lambda 或无名函数字面量），即需要作为「函数值」传递的函数。
+    /// </summary>
+    public bool IsLambdaExpression => IsLambda || Id is null;
+
     // 默认参数值缓存：缓存常量表达式的默认值，避免重复求值
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 

@@ -157,8 +157,22 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// </summary>
     protected virtual Type? TryGetParameterType(LangExpression expression, LocalManager? local)
     {
+        // 匿名函数（lambda）作为参数时按「函数值」处理，而不是用它的返回类型参与重载解析。
+        // IL 模式下这类参数会被编译成 .NET 委托，解释器/虚拟机模式下就是 FuncLangValue。
+        if (expression is FuncLangValue { IsLambdaExpression: true })
+            return typeof(FuncLangValue);
+
         if (local == null)
             return null;
+
+        // IL 模式下的具名函数引用同样以委托形式传递
+        if (expression is LangId namedFunction &&
+            (local.DelegateVar.ContainsKey(namedFunction.IdName) ||
+             local.DelegateVar.Keys.Any(key =>
+                 key.StartsWith($"{namedFunction.IdName}$", StringComparison.Ordinal))))
+        {
+            return typeof(FuncLangValue);
+        }
 
         try
         {

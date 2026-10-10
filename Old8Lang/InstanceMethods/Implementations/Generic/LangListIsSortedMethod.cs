@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Implementations.Array;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -82,6 +83,19 @@ public class LangListIsSortedMethod : BaseLangListMethod
             return IsSortedHelper(langList);
         }
 
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        // VM 模式下数组字面量是原生 object?[]、列表是 List<object?>，都不实现 ILangList；
+        // 用 GetItemsForVM 兜底（与 LangListCountMethod 的 ICollection 兜底同一模式），
+        // 使 Array.IsSorted()/List.IsSorted() 在 VM 下可用。
+        var items = GetItemsForVM(instance);
+
+        for (var i = 0; i < items.Count - 1; i++)
+        {
+            if (ArraySortVmSupport.Compare(items[i], items[i + 1]) > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

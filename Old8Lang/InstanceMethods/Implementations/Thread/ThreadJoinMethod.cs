@@ -40,45 +40,56 @@ public class ThreadJoinMethod : BaseInstanceMethod
         return thread.Join();
     }
 
+    /// <summary>
+    /// IL 模式：IL 下的线程值是 <see cref="ThreadLangValue"/>（不是原生 Thread）。
+    /// </summary>
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
 
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+
+        var helperName = parameters.Count == 1 ? nameof(JoinWithTimeoutHelper) : nameof(JoinHelper);
         if (parameters.Count == 1)
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
-            var helperMethod = typeof(ThreadJoinMethod).GetMethod(nameof(JoinWithTimeoutHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
         }
-        else
-        {
-            var helperMethod = typeof(ThreadJoinMethod).GetMethod(nameof(JoinHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
-        }
+
+        var helperMethod = typeof(ThreadJoinMethod).GetMethod(helperName,
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static object? JoinHelper(System.Threading.Thread thread)
+    /// <summary>
+    /// IL 模式的辅助方法：等待线程结束并返回结果。
+    /// </summary>
+    public static LangValueType JoinHelper(LangValueType instance)
     {
-        thread.Join();
-        return null;
-    }
-
-    public static bool JoinWithTimeoutHelper(System.Threading.Thread thread, object timeoutObj)
-    {
-        if (timeoutObj is not int timeout)
+        if (instance is not ThreadLangValue thread)
         {
-            throw new ArgumentException("超时参数必须是整数类型");
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
         }
 
-        return thread.Join(timeout);
+        return thread.Join();
+    }
+
+    /// <summary>
+    /// IL 模式的辅助方法：带超时等待线程（返回是否在超时前结束）。
+    /// </summary>
+    public static bool JoinWithTimeoutHelper(LangValueType instance, LangValueType timeoutMs)
+    {
+        if (instance is not ThreadLangValue thread)
+        {
+            throw new ArgumentException($"实例必须是线程，实际是 {instance.GetType().Name}");
+        }
+
+        var result = thread.Join(new IntLangValue((int)IlValueBridge.ToInt64(timeoutMs)));
+        return result is BoolLangValue { Value: true };
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return parameters.Count == 1 ? typeof(bool) : typeof(object);
+        return parameters.Count == 1 ? typeof(bool) : typeof(LangValueType);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
