@@ -228,6 +228,9 @@ public sealed class SpawnFunction : BaseGlobalFunction
         // 保存 threadId 到包装器中
         threadIdHolder[0] = threadId;
 
+        // 登记负载：Retry 需要重新执行同一个函数对象与参数
+        Old8Lang.Concurrency.ResourceManager.RegisterThreadPayload(threadId, funcObj, funcArgs);
+
         // 返回 VMThreadLangValue
         return new VMThreadLangValue(threadId);
     }

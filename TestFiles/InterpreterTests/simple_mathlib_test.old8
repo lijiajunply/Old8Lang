@@ -1,5 +1,5 @@
 // 简单的 MathLib 测试 - 直接打印结果
-import MathLib
+import Math
 
 printLine("=== 简单 MathLib 测试 ===\n")
 

@@ -54,6 +54,11 @@ thread1 <- spawn(threadIncrement)
 thread2 <- spawn(threadIncrement)
 thread3 <- spawn(threadIncrement)
 
+// spawn 只创建线程，必须 Start() 才会执行
+thread1.Start()
+thread2.Start()
+thread3.Start()
+
 // 等待所有线程完成
 thread1.Wait()
 thread2.Wait()

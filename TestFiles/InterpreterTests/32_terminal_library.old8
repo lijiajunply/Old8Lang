@@ -2,6 +2,7 @@
 // 注意：某些功能需要交互式输入，自动化测试可能无法完全覆盖
 
 import Terminal
+import ColorfulTerminal
 
 PrintLine("=== Terminal 库函数测试 ===")
 

@@ -189,7 +189,7 @@
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
 | Thread API（静态类） | ✅ | ✅ | ⚠️ | 虚拟机仅 `Thread.Sleep` 可用，见「已知限制」第 3 条 |
-| Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ❌ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机线程对象是 `VMThreadLangValue`，与这 4 个方法的 `TargetType` 不同构，且 VM 线程模型没有取消/超时/重试原语，见「已知限制」第 11 条 |
+| Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ✅ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机同日起可用（`VMThreadLangValue` 专属实现）。`Cancel` 是**协作式**的：只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程 |
 
 ### 10. 异常处理
 
@@ -330,12 +330,12 @@
     均在 `Old8Lang/Bytecode/` 下各自定义，但全仓库找不到任何调用点，
     因此虚拟机模式目前**没有**可用的性能分析器、调试器与反汇编器。
     可用的调试与性能分析工具都在解释器侧（见上表）。
-11. **Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` 不可用**（2026-10-10 核查）：
-    这 4 个方法的 `TargetType` 是 `ThreadLangValue`，而 VM 的线程对象是 `VMThreadLangValue`
-    （整数线程 id + `Concurrency.ResourceManager`），分发时精确匹配与等价类型映射都命中不了，
-    报 `类 'VMThreadLangValue' 中未找到方法 'X'`；即便改 `TargetType`，VM 线程模型也没有
-    取消令牌 / 保存原始函数（Retry）/ 超时 Join 原语。需要先扩展 VM 线程模型，见 `Todo.md`。
-    附带：`PrintLine(线程)` 在 VM 下会栈溢出（`VMThreadLangValue.ToString` 自递归）。
+11. **Thread 实例方法自 2026-10-10 起可用**：`Then` / `WithTimeout` / `Retry` / `Cancel` 注册在
+    `VMThreadLangValue` 上（VM 的线程对象是整数线程 id + `Concurrency.ResourceManager`，
+    与解释器的 `ThreadLangValue` 不同构）。语义与解释器对齐，但有两条协作式限制：
+    `Cancel()` 只对尚未 `Start()` 的线程生效（启动后无法中断，解释器同样如此）；
+    `Retry(n)` 只能用于 `spawn(...)` 创建的线程（需要重新执行原始函数）。
+    顺带修复：`PrintLine(线程)` 不再栈溢出（`VMThreadLangValue` 补了 `ToString/ToDisplayString`）。
 12. **数组排序自 2026-10-10 起可用**：`Array.QuickSort`/`HeapSort`/`SelectionSort`/`InsertionSort`/
     `MergeSort`/`BubbleSort` 以及通用 `Sort()` / `IsSorted()` 在 `object?[]` 上已实现
     （字符串按长度排序，与解释器 `StringLangValue.Less` 语义一致）。
@@ -375,6 +375,10 @@
 
 ## 更新日志
 
+- **2026-10-10（续）**: 虚拟机模式补上 Thread 的 `Then` / `WithTimeout` / `Retry` / `Cancel`
+  （注册在 `VMThreadLangValue` 上，`ResourceManager`/`VMThreadWrapper` 增加取消、超时等待与 spawn 负载记录），
+  原「已知限制」第 11 条由「不可用」改为「可用 + 协作式限制」。**至此第 5 节清单的 14 个 VM 方法全部落地。**
+  测试报告：`Reports/2026-10-10-19-23-VM线程方法补齐测试.md`。
 - **2026-10-10**: 实例方法跨模式补齐。IL 模式新增「函数值」桥接（lambda / 具名函数 → 委托 → 函数值），
   29 个此前显式抛 `NotSupportedException` 的高阶实例方法、扩展方法、`spawn` 与
   `Thread.Start/Join/IsAlive/Then/Cancel/Retry/WithTimeout` 全部可用；虚拟机模式新增

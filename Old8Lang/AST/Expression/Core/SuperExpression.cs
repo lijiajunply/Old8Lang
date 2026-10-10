@@ -74,16 +74,48 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
-        return dotExpression switch
+        if (dotExpression is Instance instance)
         {
-            // super.ParentClassName(...) - 父类构造函数调用
-            Instance instance => CallParentConstructor(instance, manager),
+            // 只有 super.init(...) / super.父类名(...) 才是父类构造函数调用。
+            // 其它方法名必须按普通父类方法调用处理，否则 super.speak() 会被误当成构造函数
+            // （表现为去调用父类的 init，参数个数不符就报「缺少实参」，或者静默返回 null）。
+            var methodName = instance.Id.IdName;
+            var parentMetadata = GetDirectParentMetadata();
 
-            // super.methodName - 父类方法访问
-            LangId id => AccessParentMember(id),
+            if (parentMetadata is not null &&
+                (methodName == "init" || methodName == parentMetadata.ClassName))
+            {
+                return CallParentConstructor(instance, manager);
+            }
 
-            _ => throw new InvalidOperationError(this, $"不支持的super表达式: {dotExpression.GetType().Name}")
-        };
+            return CallParentMethod(instance, manager);
+        }
+
+        // super.methodName - 父类方法/字段访问
+        if (dotExpression is LangId id)
+        {
+            return AccessParentMember(id);
+        }
+
+        throw new InvalidOperationError(this, $"不支持的super表达式: {dotExpression.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 调用父类的普通方法：super.method(args)。
+    /// </summary>
+    private LangValueType CallParentMethod(Instance instance, VariateManager manager)
+    {
+        var parentMetadata = GetDirectParentMetadata()
+                             ?? throw new InvalidOperationError(this, "当前类没有父类");
+
+        var methods = parentMetadata.MethodTable.LookupMethod(instance.Id.IdName);
+        if (methods is null || methods.Count == 0)
+        {
+            throw new AttributeError(this, instance.Id.IdName, parentMetadata.ClassName);
+        }
+
+        var method = SelectMethod(methods, instance.Ids);
+        return ExecuteParentMethod(method, instance.Ids, manager);
     }
 
     /// <summary>

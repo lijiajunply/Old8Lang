@@ -583,8 +583,13 @@ public partial class ThreadLangValue : LangValueType
     }
 
     /// <summary>
-    /// 线程完成后执行下一个线程
+    /// 线程完成后执行下一个线程。
     /// </summary>
+    /// <remarks>
+    /// continuation 返回的线程会自动 <see cref="Start"/>（continuation 内一般只写
+    /// <c>spawn(f)</c>，而 spawn 只创建不启动），语义与虚拟机模式的
+    /// <c>VmThreadThenMethod</c> 保持一致。
+    /// </remarks>
     public ThreadLangValue Then(Func<LangValueType, ThreadLangValue> continuation)
     {
         var tcs = new CancellationTokenSource();
@@ -599,6 +604,9 @@ public partial class ThreadLangValue : LangValueType
 
                 // 执行下一个线程
                 var nextThread = continuation(result);
+
+                // continuation 返回的线程需要先启动再等待
+                nextThread.Start();
 
                 // 等待下一个线程完成
                 var nextResult = nextThread.Join();
@@ -622,8 +630,13 @@ public partial class ThreadLangValue : LangValueType
     }
 
     /// <summary>
-    /// 为线程添加超时限制
+    /// 为线程添加超时限制：超过 <paramref name="timeoutMs"/> 仍未结束则以
+    /// <see cref="TimeoutException"/> 结束。
     /// </summary>
+    /// <remarks>
+    /// 用 <see cref="Join(IntLangValue?)"/> 的带超时重载真正限制等待时长；
+    /// 超时后抛 <see cref="TimeoutException"/>（与虚拟机模式的 <c>VmThreadWithTimeoutMethod</c> 一致）。
+    /// </remarks>
     public ThreadLangValue WithTimeout(int timeoutMs)
     {
         var tcs = new CancellationTokenSource();
@@ -633,24 +646,17 @@ public partial class ThreadLangValue : LangValueType
         {
             try
             {
-                // 创建一个超时线程
-                var timer = new System.Timers.Timer(timeoutMs);
-                timer.Elapsed += (_, _) => tcs.Cancel();
-                timer.AutoReset = false;
-                timer.Start();
+                // 带超时等待当前线程
+                var joined = _thread.Join(timeoutMs);
 
-                // 等待当前线程完成，带有取消令牌
-                var result = Join();
+                if (!joined)
+                {
+                    tcs.Cancel();
+                    throw new TimeoutException($"线程等待超时（{timeoutMs}ms）");
+                }
 
-                // 取消超时定时器
-                timer.Stop();
-
-                // 设置结果
-                timeoutThread?.SetResult(result.GetValue());
-            }
-            catch (OperationCanceledException)
-            {
-                timeoutThread?.SetException(new TimeoutException($"线程等待超时（{timeoutMs}ms）"));
+                // 已结束：取回结果（若线程内部有异常，Join() 会抛出）
+                timeoutThread?.SetResult(Join().GetValue());
             }
             catch (Exception ex)
             {

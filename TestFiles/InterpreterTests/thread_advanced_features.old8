@@ -21,8 +21,17 @@ func task3(res) {
 }
 
 // 使用spawn创建线程并测试链式调用
+// 注意：spawn 只创建线程，必须 Start()；Then 返回的也是新线程，同样要 Start() 后再 Join
 thread1 <- spawn(task1)
-result1 <- thread1.Then((res) -> spawn(task2, res)).Then((res) -> spawn(task3, res)).Join()
+thread1.Start()
+
+then1 <- thread1.Then((res) -> spawn(task2, res))
+then1.Start()
+
+then2 <- then1.Then((res) -> spawn(task3, res))
+then2.Start()
+
+result1 <- then2.Join()
 PrintLine("链式调用最终结果: " + result1)
 
 // 2. 测试超时控制（WithTimeout）
@@ -37,11 +46,15 @@ func longRunningTask() {
 
 // 测试超时功能
 thread2 <- spawn(longRunningTask)
+thread2.Start()
+
 try {
-    result2 <- thread2.WithTimeout(1000).Join()
+    timeoutThread <- thread2.WithTimeout(1000)
+    timeoutThread.Start()
+    result2 <- timeoutThread.Join()
     PrintLine("超时测试成功结果: " + result2)
 } catch (e) {
-    PrintLine("超时测试捕获到异常: " + e.ToString())
+    PrintLine("超时测试捕获到异常: " + e.ToStr())
 }
 
 // 3. 测试取消机制（Cancel）
@@ -61,6 +74,7 @@ func cancelableTask() {
 
 // 测试取消功能
 thread3 <- spawn(cancelableTask)
+thread3.Start()
 PrintLine("等待1秒后取消任务")
 Thread.Sleep(1000)
 thread3.Cancel()
@@ -68,7 +82,7 @@ try {
     result3 <- thread3.Join()
     PrintLine("取消测试结果: " + result3)
 } catch (e) {
-    PrintLine("取消测试捕获到异常: " + e.ToString())
+    PrintLine("取消测试捕获到异常: " + e.ToStr())
 }
 
 // 4. 测试进度报告
@@ -89,6 +103,7 @@ func progressTask() {
 
 // 测试进度报告
 thread4 <- spawn(progressTask)
+thread4.Start()
 result4 <- thread4.Join()
 PrintLine("进度任务结果: " + result4)
 

@@ -79,6 +79,11 @@ public static class ResourceManager
 
     private static readonly ConcurrentDictionary<int, ResourceWrapper<VMThreadWrapper>> Threads = new();
 
+    /// <summary>
+    /// 线程负载表：线程 id -> (spawn 的函数对象, 参数)，供 Retry 重新执行。
+    /// </summary>
+    private static readonly ConcurrentDictionary<int, (object? FuncObject, object?[] Arguments)> ThreadPayloads = new();
+
     // ID 计数器
     private static int _mutexIdCounter;
     private static int _semaphoreIdCounter;
@@ -760,11 +765,65 @@ public static class ResourceManager
     }
 
     /// <summary>
+    /// 请求取消线程（协作式：只对尚未启动的线程生效）。
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    public static void CancelThread(int threadId)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.RequestCancel();
+    }
+
+    /// <summary>
+    /// 等待线程完成，返回是否在超时前完成。
+    /// </summary>
+    /// <param name="threadId">线程ID</param>
+    /// <param name="millisecondsTimeout">超时毫秒数</param>
+    public static bool WaitThreadCompletion(int threadId, int millisecondsTimeout)
+    {
+        var wrapper = ValidateAndGetResource(threadId, Threads, "Thread");
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.WaitCompletion(millisecondsTimeout);
+    }
+
+    /// <summary>
+    /// 记录 <c>spawn</c> 线程的函数与参数，供 <c>Retry</c> 重新执行。
+    /// </summary>
+    /// <remarks>
+    /// VM 的线程对象只保存线程 id，重新执行需要原始函数对象与参数，
+    /// 因此创建线程时把负载登记在这里。
+    /// </remarks>
+    public static void RegisterThreadPayload(int threadId, object? funcObject, object?[] arguments)
+    {
+        ThreadPayloads[threadId] = (funcObject, arguments);
+    }
+
+    /// <summary>
+    /// 取出 <see cref="RegisterThreadPayload"/> 记录的线程负载。
+    /// </summary>
+    public static bool TryGetThreadPayload(int threadId, out object? funcObject, out object?[] arguments)
+    {
+        if (ThreadPayloads.TryGetValue(threadId, out var payload))
+        {
+            funcObject = payload.FuncObject;
+            arguments = payload.Arguments;
+            return true;
+        }
+
+        funcObject = null;
+        arguments = [];
+        return false;
+    }
+
+    /// <summary>
     /// 释放线程资源
     /// </summary>
     /// <param name="threadId">线程ID</param>
     public static void DisposeThread(int threadId)
     {
+        ThreadPayloads.TryRemove(threadId, out _);
+
         if (Threads.TryRemove(threadId, out var wrapper))
         {
             wrapper.Resource.Dispose();

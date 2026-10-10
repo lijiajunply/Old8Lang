@@ -1,5 +1,5 @@
 // 测试扩展的 MathLib 功能
-import MathLib
+import Math
 
 printLine("=== 扩展 MathLib 功能测试 ===\n")
 

@@ -46,4 +46,3 @@ try {
 
 PrintLine("=== 所有错误处理测试通过 ===")
 
-// error

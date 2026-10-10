@@ -41,7 +41,7 @@ class CloneableString implements ICloneable {
     }
 
     func clone() -> any {
-        clone <- new CloneableString(this.value)
+        clone <- CloneableString(this.value)
         return clone
     }
 }
@@ -65,7 +65,7 @@ func testSingleConstraint<T: IComparable>(item: T) -> string {
 }
 
 // 测试单约束
-obj1 <- new ComparableInt(42)
+obj1 <- ComparableInt(42)
 result1 <- testSingleConstraint<ComparableInt>(obj1)
 PrintLine($"测试1 - 单约束函数: {result1}")
 
@@ -92,7 +92,7 @@ func processWithWhere<T>(value: T) -> string where T: ISerializable {
     return value.serialize()
 }
 
-obj3 <- new SerializableData("test data")
+obj3 <- SerializableData("test data")
 result3 <- processWithWhere<SerializableData>(obj3)
 PrintLine($"测试3 - where 子句函数: {result3}")
 
@@ -103,8 +103,8 @@ func combineWithWhere<K, V>(key: K, value: V) -> string where K: IComparable, V:
     return $"Key: {keySer}, Value: {valueSer}"
 }
 
-obj4 <- new ComparableInt(100)
-obj5 <- new SerializableData("combined")
+obj4 <- ComparableInt(100)
+obj5 <- SerializableData("combined")
 result4 <- combineWithWhere<ComparableInt, SerializableData>(obj4, obj5)
 PrintLine($"测试4 - 多参数 where 子句: {result4}")
 
@@ -138,9 +138,9 @@ class GenericContainer<T: ISerializable> {
     }
 }
 
-container <- new GenericContainer<SerializableData>()
-container.add(new SerializableData("item1"))
-container.add(new SerializableData("item2"))
+container <- GenericContainer<SerializableData>()
+container.add(SerializableData("item1"))
+container.add(SerializableData("item2"))
 result5 <- container.serializeAll()
 PrintLine($"测试6 - 泛型容器: {result5}")
 

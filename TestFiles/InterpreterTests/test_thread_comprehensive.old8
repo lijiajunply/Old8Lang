@@ -13,6 +13,7 @@ func testBasic() {
 }
 
 thread1 <- spawn(testBasic)
+thread1.Start()
 result1 <- thread1.Join()
 PrintLine("基础线程返回值: " + result1.ToStr())
 
@@ -32,6 +33,7 @@ func testConcurrent(id) {
 threads <- {}
 for i in [0~3] {
     thread <- spawn(testConcurrent, i)
+    thread.Start()
     threads.Add(thread)
 }
 
@@ -58,8 +60,11 @@ func testReturnBool() {
 }
 
 thread_int <- spawn(testReturnInt)
+thread_int.Start()
 thread_double <- spawn(testReturnDouble)
+thread_double.Start()
 thread_bool <- spawn(testReturnBool)
+thread_bool.Start()
 
 result_int <- thread_int.Join()
 result_double <- thread_double.Join()
@@ -76,6 +81,7 @@ func testWithParams(a, b, c) {
 }
 
 thread_params <- spawn(testWithParams, 10, 20, 30)
+thread_params.Start()
 result_params <- thread_params.Join()
 PrintLine("带参数线程结果: 10 + 20 + 30 = " + result_params.ToStr())
 
@@ -89,6 +95,7 @@ func testException() {
 
 try {
     thread_exception <- spawn(testException)
+    thread_exception.Start()
     result_exception <- thread_exception.Join()
     PrintLine("异常测试失败: 应该抛出异常")
 } catch (e) {
@@ -111,6 +118,7 @@ func testSharedData() {
 shared_threads <- {}
 for i in [0~4] {
     thread <- spawn(testSharedData)
+    thread.Start()
     shared_threads.Add(thread)
 }
 
@@ -130,6 +138,7 @@ func testReturnString() {
 }
 
 thread_string <- spawn(testReturnString)
+thread_string.Start()
 result_string <- thread_string.Join()
 PrintLine("字符串返回结果: " + result_string.ToStr())
 

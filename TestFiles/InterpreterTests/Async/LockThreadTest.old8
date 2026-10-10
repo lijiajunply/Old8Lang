@@ -18,6 +18,9 @@ func threadFunc() -> void {
 thread1 <- spawn(threadFunc)
 thread2 <- spawn(threadFunc)
 
+thread1.Start()
+thread2.Start()
+
 thread1.Wait()
 thread2.Wait()
 

@@ -11,7 +11,7 @@ class Dog extends Animal {
     func testSuper() {
         PrintLine("Before super.speak()")
         result <- super.speak()
-        PrintLine("After super.speak(), result type: " + result.GetType().ToStr())
+        PrintLine("After super.speak(), result type: " + type(result).ToStr())
         PrintLine("Result value: " + result.ToStr())
     }
 }

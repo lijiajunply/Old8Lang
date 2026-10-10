@@ -10,6 +10,7 @@ func testBasic() {
 }
 
 thread1 <- spawn(testBasic)
+thread1.Start()
 result1 <- thread1.Join()
 PrintLine("基础线程返回值: " + result1.ToStr())
 
@@ -20,6 +21,7 @@ func testReturnInt() {
 }
 
 thread2 <- spawn(testReturnInt)
+thread2.Start()
 result2 <- thread2.Join()
 PrintLine("整数线程返回值: " + result2.ToStr())
 
@@ -30,6 +32,7 @@ func testReturnDouble() {
 }
 
 thread3 <- spawn(testReturnDouble)
+thread3.Start()
 result3 <- thread3.Join()
 PrintLine("浮点数线程返回值: " + result3.ToStr())
 
@@ -40,6 +43,7 @@ func testWithParam(x) {
 }
 
 thread4 <- spawn(testWithParam, 10)
+thread4.Start()
 result4 <- thread4.Join()
 PrintLine("带参数线程返回值: " + result4.ToStr())
 

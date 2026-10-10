@@ -69,6 +69,8 @@ PrintLine("变量定义: a = " + a + ", b = " + b)
 
 // 导入 Terminal 库
 import Terminal
+// 彩色输出在单独的 ColorfulTerminal 模块里
+import ColorfulTerminal
 PrintLine("在代码中间导入 Terminal 库")
 Title("Import 测试")
 PrintLine("Terminal 库函数调用: Title 已设置")

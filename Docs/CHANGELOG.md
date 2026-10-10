@@ -19,6 +19,11 @@
 - 虚拟机模式闭包改为**按引用捕获**：闭包可写回外层局部变量，外层在闭包创建后的赋值闭包也能读到。
 - 虚拟机模式字典遍历语义与顺序对齐解释器 / IL：单变量绑定到 `(键, 值)` 元组，按插入顺序。
 - `spawn` 明确为「只创建线程，**必须再调用 `Start()`** 才会执行」；`Join()` 可取回线程函数的返回值。
+- **`super.method(args)` 修正**：此前任何 `super.xxx(...)` 都被当成父类构造函数调用（只查 `init`），
+  于是 `super.speak()` 会去调父类的 `init` 或静默返回 `null`；现在只有 `super.init(...)` /
+  `super.父类名(...)` 走构造函数，其余按普通父类方法调用并返回其结果。
+- 线程组合方法修正：`t.Then(f)` 会自动启动 continuation 返回的线程；`t.WithTimeout(ms)` 现在真的会超时
+  （超时抛 `TimeoutException`），此前只是启动定时器却仍然无限等待。
 
 **API**
 
@@ -37,7 +42,8 @@
 - **虚拟机模式支持数组排序与 Task 实例方法**：`Array` 的 `QuickSort` / `HeapSort` /
   `SelectionSort` / `InsertionSort` / `MergeSort` / `BubbleSort` 及通用 `Sort()` / `IsSorted()`；
   Task 的 `Then` / `Catch` / `Finally` / `ContinueWith`。字符串排序统一按长度（与解释器一致）。
-  虚拟机模式下 `Thread` 的 `Then` / `Cancel` / `Retry` / `WithTimeout` 仍不可用（线程模型缺口）。
+  虚拟机模式下 `Thread` 的 `Then` / `WithTimeout` / `Retry` / `Cancel` 同日起可用
+  （`Cancel` 只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程）。
 
 ---
 

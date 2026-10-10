@@ -29,7 +29,7 @@ PrintLine("=== 带参数的装饰器测试 ===")
 // 定义一个带参数的缓存装饰器
 func cache(timeout) {
     return (targetFunc) -> {
-        cacheDict <- {}
+        cacheDict <- Dict()
         wrapper <- (n) -> {
             key <- n.ToStr()
             if cacheDict.ContainsKey(key) {

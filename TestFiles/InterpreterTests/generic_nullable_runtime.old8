@@ -28,12 +28,12 @@ class Optional<T?> {
 }
 
 // 2. 测试 Optional 类的使用
-opt1 <- new Optional(42)
+opt1 <- Optional(42)
 hasValue1 <- opt1.hasValue()
 value1 <- opt1.getValue()
 PrintLine($"测试1 - Optional有值: hasValue={hasValue1.ToStr()}, value={value1.ToStr()}")
 
-opt2 <- new Optional(null)
+opt2 <- Optional(null)
 hasValue2 <- opt2.hasValue()
 defaultVal <- opt2.getOrDefault(999)
 PrintLine($"测试2 - Optional为null: hasValue={hasValue2.ToStr()}, default={defaultVal.ToStr()}")
@@ -66,7 +66,7 @@ class Container<T, U?> {
     }
 }
 
-container <- new Container(100, "optional")
+container <- Container(100, "optional")
 req <- container.getRequired()
 opt <- container.getOptional()
 PrintLine($"测试4 - 混合容器: required={req.ToStr()}, optional={opt}")

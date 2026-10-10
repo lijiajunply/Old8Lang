@@ -165,7 +165,13 @@
 
 ## A. 阻塞类（导致清单内方法在某个模式下不可用）
 
-- [ ] **VM 线程模型：`Thread.Then` / `Cancel` / `Retry` / `WithTimeout` 在 VM 下不可达。**
+- [x] **VM 线程模型：`Thread.Then` / `Cancel` / `Retry` / `WithTimeout` 在 VM 下不可达 → 2026-10-10 已补齐。**
+  - 做法：`VMThreadWrapper` 增加 `RequestCancel` / `WaitCompletion(ms)`，`ResourceManager` 增加
+    `CancelThread` / `WaitThreadCompletion` / 线程负载表，`spawn` 登记 `(函数对象, 参数)`；
+    4 个方法注册在 `VMThreadLangValue` 上（`InstanceMethods/Implementations/Thread/VmThreadMethods.cs`）。
+  - 语义：`Cancel` 只对尚未 `Start()` 的线程生效（协作式）；`Retry` 只能用于 `spawn(...)` 创建的线程。
+  - 顺带修复：`PrintLine(线程)` 的栈溢出（`VMThreadLangValue` 补 `ToString/ToDisplayString`）。
+  - 原始问题（存档）：
   - 现状：这 4 个方法 `TargetType = ThreadLangValue`，而 VM 的线程对象是 `VMThreadLangValue`
     （`Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs:183`，整数线程 id + `Concurrency.ResourceManager`）。
     VM 分发（`Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs:38/60/65`）
@@ -175,8 +181,12 @@
     取消令牌 / 保存原始函数（Retry）/ 超时 Join 原语。属于改线程模型。
   - 备注：`ThreadStartMethod` / `ThreadJoinMethod` / `ThreadIsAliveMethod` 的 VM 实现（要求原生
     `System.Threading.Thread`）同样是死代码；VM 下 `.Start()/.Join()/.IsAlive()` 实际走反射回退。
-  - 附带缺陷：`PrintLine(VMThreadLangValue)` 会栈溢出（`VMThreadLangValue.GetValue()` 返回自身，
-    `LangValueType.ToString()` 递归）。
+  - 附带缺陷：已随本次一并修复。
+
+- [ ] **陈旧测试文件**：`TestFiles/InterpreterTests/test_thread_basic.old8` / `test_thread_simple.old8` /
+  `test_thread_comprehensive.old8` / `thread_advanced_features.old8` / `ThreadSafetyTest.old8` 里
+  `spawn(...)` 之后直接 `Join()`，没有 `Start()`，按 2026-10 起明确的 spawn 语义必然报
+  `Thread has not been started`。这些文件没有被任何 xUnit/脚本引用，属于陈旧用例，未在本轮修改。
 
 ## B. IL 模式既有缺陷（本轮踩到、但非清单项）
 
@@ -199,6 +209,58 @@
 - [ ] **IL 模式 lambda 不能读写外层普通局部变量。**
   - 现状：`BuildLambdaDynamicMethod` 的 `funcLocal` 只带了外层**函数**委托表（本轮新增），
     普通局部变量仍不可见。既有边界。
+
+## D. 解释器用例目录（`TestFiles/InterpreterTests/`）的陈旧代码清理（2026-10-10）
+
+用 `run_interpreter_tests.sh` 的判定口径（非 0 退出即失败；末行含 `error` 视为期望失败）全量扫了 182 个
+`.old8`，原来的 16 个问题文件里已修好 **11 个**（另加 8 个线程用例 = 共 19 个文件）：
+
+已修（陈旧 API/导入名/语法）：
+
+- 线程类 8 个：`test_thread_basic` / `test_thread_simple` / `test_thread_comprehensive` /
+  `thread_advanced_features` / `thread_retry_test` / `ThreadSafetyTest` /
+  `Async/LockThreadTest` / `Async/LockVariableTests` —— 统一补 `Start()`（`spawn` 只创建线程；
+  `Then` / `WithTimeout` / `Retry` 返回的也是未启动线程），并把 `e.ToString()` 改成 `e.ToStr()`。
+- 标准库模块名：`import MathLib` → `import Math`（`56_mathlib_extended` / `simple_mathlib_test` /
+  `debug_mathlib_return`）；彩色输出补 `import ColorfulTerminal`（`32_terminal_library` /
+  `34_import_statements`）。
+- 反射函数已合并：`GetClassName` / `GetClassMethods` / `GetClassFields` → `GetClassInfo`（返回字典），
+  `HasMethod` / `HasField` → `HasMember`（`reflection_test`）。
+- `arr.Length()` → `arr.Count()`（`GlobalFunctionsTest`）；`result.getType()` / `result.toString()` →
+  `type(result).ToStr()` / `result.ToStr()`（`debug_mathlib_return`）；`result.GetType().ToStr()` →
+  `type(result).ToStr()`（`test_super_debug`）。
+- `new X(...)` → `X(...)`（4 个 `generic_*` 文件里的旧写法；`new` 关键字本就不存在）。
+- 空字典 `{}` → `Dict()`（`decorator_basic`）。
+- `operator_overload_error` 末尾的 `// error` 标记已过时（错误现在都被 `try/catch` 捕获）。
+
+顺带修掉一个真 bug（因此 `super` 4 个用例全绿）：
+
+- [x] **`super.method(args)` 被误当成父类构造函数调用**（`Old8Lang/AST/Expression/Core/SuperExpression.cs`
+  的 `SuperProxy.Dot`）：任何 `super.xxx(...)` 都走 `CallParentConstructor`（只查 `init`），
+  于是 `super.speak()` 会去调用父类 `init`（参数不符报「缺少实参」，父类没有 `init` 就静默返回 null）。
+  已改为：只有 `super.init(...)` / `super.父类名(...)` 走构造函数，其余按普通父类方法调用。
+  复现（修前）：`class A { func speak() -> string { return "A" } }` + `super.speak() + "B"` →
+  `不支持类型 'NullLangValue' 和 'StringLangValue' 的加法操作`。
+
+仍未修（**功能缺陷，不是陈旧用例**，测试保留以暴露缺口）：
+
+- [ ] **泛型约束不认识接口实现**：`class Container<T: ISerializable>` + `class SerializableData implements ISerializable`
+  → `类型 'SerializableData' 不满足泛型参数 'T' 的约束 'ISerializable'：类型没有实现接口`；
+  `Container(SerializableData(123))` 另外报 `类型不匹配: 期望 T，但得到 SerializableData`。
+  文件：`generic_constraints_simple.old8` / `generic_constraints_comprehensive.old8`。
+  语法与 `Docs/Old8Lang_Grammar.md:1526` 一致，属于约束检查/接口实现登记的缺口。
+- [ ] **泛型可空类型参数 `T?` 的类型检查过严**：`class Box<T?>` + `Box(123)` →
+  `类型不匹配: 期望 T?，但得到 int`。文件：`generic_nullable_simple.old8` / `generic_nullable_runtime.old8`。
+  语法与 `Docs/Old8Lang_Grammar.md:1666-1693` 一致。
+- [ ] **同一模块的符号无法重复导入**：`import { export_var1 } from "./m.old8"` 之后再
+  `import { export_var1 as again } from "./m.old8"` → `Cannot import symbols [export_var1] ...
+  symbols do not exist`（`SymbolExtractor.cs:206` 抛错）。最小复现见
+  `Reports/2026-10-10-19-40-解释器陈旧用例清理测试.md`。文件：`test_module_cache.old8`。
+
+- [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
+  让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
+  全量并行测试时线程池繁忙会翻转结果。单独运行稳定通过（3/3）。
+  建议把延迟差拉大（例如 10 vs 1000）或改为断言「结果是 fast 或 slow 之一」。
 
 ## C. 其它同类实现待迁移（同一套桥接机制可复用）
 

@@ -292,7 +292,13 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Thread.ThreadThenMethod());
             registry.Register(new Implementations.Thread.ThreadRetryMethod());
 
-            // Thread 方法迁移完成！共 7 个方法
+            // 注册 VM 专属线程方法（VMThreadLangValue 与 ThreadLangValue 不同构，见 VmThreadMethods.cs）
+            registry.Register(new Implementations.Thread.VmThreadThenMethod());
+            registry.Register(new Implementations.Thread.VmThreadWithTimeoutMethod());
+            registry.Register(new Implementations.Thread.VmThreadRetryMethod());
+            registry.Register(new Implementations.Thread.VmThreadCancelMethod());
+
+            // Thread 方法迁移完成！共 7 个 + 4 个 VM 专属
             // 注意：Abort 方法在 .NET Core 中不受支持，已移除
 
             // 注册 Tuple 方法

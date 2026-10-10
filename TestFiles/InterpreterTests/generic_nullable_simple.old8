@@ -18,7 +18,7 @@ class Box<T?> {
 }
 
 // 测试1：有值的情况
-box1 <- new Box(123)
+box1 <- Box(123)
 val1 <- box1.getValue()
 has1 <- box1.hasValue()
 PrintLine("测试1 - Box有值:")
@@ -26,7 +26,7 @@ PrintLine($"  value: {val1.ToStr()}")
 PrintLine($"  hasValue: {has1.ToStr()}")
 
 // 测试2：null 的情况
-box2 <- new Box(null)
+box2 <- Box(null)
 val2 <- box2.getValue()
 has2 <- box2.hasValue()
 PrintLine("")

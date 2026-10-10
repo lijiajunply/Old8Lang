@@ -11,8 +11,10 @@ func simpleTask() {
     return "任务成功"
 }
 
-// 使用Retry方法，最多重试3次
-result1 <- spawn(simpleTask).Retry(3).Join()
+// 使用Retry方法，最多重试3次（Retry 返回的是新线程，需要 Start 后再 Join）
+retryThread1 <- spawn(simpleTask).Retry(3)
+retryThread1.Start()
+result1 <- retryThread1.Join()
 PrintLine("Retry 结果: " + result1)
 
 // 2. 测试带参数的重试
@@ -25,7 +27,9 @@ func taskWithParams(a, b) {
 }
 
 // 使用Retry方法，最多重试2次
-result2 <- spawn(taskWithParams, 10, 20).Retry(2).Join()
+retryThread2 <- spawn(taskWithParams, 10, 20).Retry(2)
+retryThread2.Start()
+result2 <- retryThread2.Join()
 PrintLine("带参数Retry 结果: " + result2)
 
 // 3. 测试重试机制能处理异常
@@ -39,7 +43,9 @@ func failingTask() {
 
 try {
     // 最多重试1次，应该会失败
-    result3 <- spawn(failingTask).Retry(1).Join()
+    retryThread3 <- spawn(failingTask).Retry(1)
+    retryThread3.Start()
+    result3 <- retryThread3.Join()
     PrintLine("测试失败: 应该抛出异常")
 } catch (e) {
     PrintLine("测试成功: 捕获到预期异常")

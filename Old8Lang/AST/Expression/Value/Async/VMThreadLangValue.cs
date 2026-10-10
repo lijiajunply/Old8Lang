@@ -134,6 +134,18 @@ public class VMThreadLangValue(int threadId, SourcePosition position = default) 
         return this;
     }
 
+    /// <summary>
+    /// 文本表示。
+    /// </summary>
+    /// <remarks>
+    /// 必须重写：基类 <c>LangValueType.ToString()</c> 会取 <see cref="GetValue"/> 后再 <c>ToString()</c>，
+    /// 而这里 <see cref="GetValue"/> 返回自身，未重写会无限递归（打印线程对象时栈溢出）。
+    /// </remarks>
+    public override string ToString() => $"Thread#{threadId}";
+
+    /// <inheritdoc />
+    public override string ToDisplayString() => ToString();
+
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
         // VMThreadLangValue 是运行时值，不需要 Visitor 处理

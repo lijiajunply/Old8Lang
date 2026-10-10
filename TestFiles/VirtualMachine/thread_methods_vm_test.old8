@@ -1,0 +1,89 @@
+// 虚拟机模式 Thread 实例方法测试
+// 覆盖此前在 VM 模式下不可用的方法：Then / WithTimeout / Retry / Cancel
+//
+// 运行：
+//   dotnet Old8Lang.App/bin/Debug/net10.0/Old8Lang.App.dll -vm TestFiles/VirtualMachine/thread_methods_vm_test.old8
+//
+// 说明：
+//   - VM 的线程对象是 VMThreadLangValue（整数线程 id + ResourceManager），
+//     这 4 个方法注册在 VMThreadLangValue 上（见 Old8Lang/InstanceMethods/Implementations/Thread/VmThreadMethods.cs）。
+//   - spawn 只创建线程，必须再 Start()；Join() 取回结果。
+//   - Cancel 是协作式的：只对「尚未启动」的线程生效；已在运行的线程不会被中断（与解释器一致）。
+//   - Retry 只能用于 spawn(...) 创建的线程（需要重新执行原始函数）。
+//   - 断言失败直接 throw，全部通过时打印 All Thread VM Tests Passed。
+
+func work() -> int {
+    return 7
+}
+func nothing() -> void {
+}
+func slow() -> int {
+    Sleep(300)
+    return 1
+}
+
+// ---------- 1. Then ----------
+t1 <- spawn(nothing)
+t1.Start()
+t2 <- t1.Then((r) -> spawn(nothing))
+t2.Start()
+t2.Join()
+PrintLine("Then OK")
+
+// ---------- 2. WithTimeout（正常完成） ----------
+t3 <- spawn(work)
+t3.Start()
+t4 <- t3.WithTimeout(1000)
+t4.Start()
+r1 <- t4.Join()
+if r1 != 7 { throw "WithTimeout 正常路径失败: " + r1 }
+PrintLine("WithTimeout OK")
+
+// ---------- 3. WithTimeout（超时） ----------
+t5 <- spawn(slow)
+t5.Start()
+t6 <- t5.WithTimeout(20)
+t6.Start()
+timeoutCaught <- "no"
+try {
+    t6.Join()
+} catch (e) {
+    timeoutCaught <- "yes"
+}
+if timeoutCaught != "yes" { throw "WithTimeout 超时路径未抛异常" }
+PrintLine("WithTimeout 超时 OK")
+
+// ---------- 4. Retry ----------
+t7 <- spawn(work)
+t8 <- t7.Retry(2)
+t8.Start()
+r2 <- t8.Join()
+if r2 != 7 { throw "Retry 失败: " + r2 }
+PrintLine("Retry OK")
+
+// ---------- 5. Cancel（启动前取消） ----------
+t9 <- spawn(work)
+t9.Cancel()
+t9.Start()
+cancelCaught <- "no"
+try {
+    t9.Join()
+} catch (e) {
+    cancelCaught <- "yes"
+}
+if cancelCaught != "yes" { throw "Cancel 启动前取消未生效" }
+PrintLine("Cancel 启动前 OK")
+
+// ---------- 6. Cancel（运行中取消不生效，协作式） ----------
+t10 <- spawn(work)
+t10.Start()
+t10.Cancel()
+r3 <- t10.Join()
+if r3 != 7 { throw "Cancel 运行中不应影响结果: " + r3 }
+PrintLine("Cancel 运行中 OK")
+
+// ---------- 7. 打印线程对象不再栈溢出 ----------
+t11 <- spawn(work)
+PrintLine("线程对象可打印: " + t11.ToStr())
+
+PrintLine("All Thread VM Tests Passed")

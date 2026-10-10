@@ -10,6 +10,7 @@ func testThreadJoin() {
             result <- result + 1
         }
     })
+    thread.Start()
     
     // 等待线程完成
     thread.Join()
@@ -30,6 +31,7 @@ func testMultiThreadSafety() {
                 counter <- counter + 1
             }
         })
+        thread.Start()
         threads.Add(thread)
     }
     
@@ -48,6 +50,7 @@ func testIsCompletedSafety() {
         // 模拟耗时操作
         Thread.Sleep(1000)
     })
+    thread.Start()
     
     // 多次检查 IsCompleted 属性
     for i in [0~20] {
@@ -67,6 +70,7 @@ func testThreadException() {
         // 模拟异常
         throw "线程执行异常测试"
     })
+    thread.Start()
 
     try {
         thread.Join()

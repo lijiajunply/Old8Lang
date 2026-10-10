@@ -11,6 +11,7 @@ func testFunc() {
 // 1. 基础线程创建和使用
 PrintLine("测试1: 基础线程创建和执行")
 thread <- spawn(testFunc)
+thread.Start()  // spawn 只创建线程，必须 Start() 才会执行
 result <- thread.Join()  // 等待线程完成，获取返回值
 PrintLine("线程返回值: " + result.ToStr())
 

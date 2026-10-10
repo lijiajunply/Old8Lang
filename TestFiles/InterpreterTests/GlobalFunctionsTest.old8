@@ -49,7 +49,7 @@ PrintLine("")
 // ========== 数组扩展方法测试 ==========
 PrintLine("--- 数组扩展方法 ---")
 arr <- [10, 20, 30, 40]
-PrintLine("数组长度: " + arr.Length().ToStr())
+PrintLine("数组长度: " + arr.Count().ToStr())
 
 // 数组转列表
 arrList <- arr.ToList()
