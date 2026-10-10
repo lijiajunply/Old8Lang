@@ -1,0 +1,3 @@
+d <- {"a": 1}
+r <- d.Clear()
+PrintLine("Clear -> r == null -> " + (r == null).ToStr())

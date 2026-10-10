@@ -12,30 +12,83 @@ namespace Old8Lang.Bytecode.VM;
 /// </summary>
 public partial class VirtualMachine
 {
-    private LangValueType ConvertToLangValue(object? value)
+    /// <summary>
+    /// 把求值栈上的原生值无损地包成 <see cref="LangValueType"/>（异步任务结果、生成器 yield 值共用）。
+    /// </summary>
+    /// <remarks>
+    /// 原先这里用的是只认基本类型的转换，集合、类实例、函数值等会静默变成 <c>VoidLangValue</c>，
+    /// 表现为 <c>async func f() -&gt; list { return await g() }</c> 报「期望 list，但得到 VoidLangValue」、
+    /// <c>yield {1, 2}</c> 之后迭代到空值。null 仍表示「没有值」。
+    /// </remarks>
+    private LangValueType ConvertResultToLangValue(object? value)
     {
-        if (value == null) return new VoidLangValue();
-        if (value is LangValueType langValue) return langValue;
-        if (value is int intValue) return new IntLangValue(intValue);
-        if (value is double doubleValue) return new DoubleLangValue(doubleValue);
-        if (value is string stringValue) return new StringLangValue(stringValue);
-        if (value is bool boolValue) return new BoolLangValue(boolValue);
-        if (value is char charValue) return new CharLangValue(charValue);
-        if (value is long longValue) return longValue is >= int.MinValue and <= int.MaxValue
-            ? new IntLangValue((int)longValue)
-            : new DoubleLangValue(longValue);
-        if (value is short shortValue) return new IntLangValue(shortValue);
-        if (value is byte byteValue) return new IntLangValue(byteValue);
-        if (value is sbyte sbyteValue) return new IntLangValue(sbyteValue);
-        if (value is ushort ushortValue) return new IntLangValue(ushortValue);
-        if (value is uint uintValue) return uintValue <= int.MaxValue
-            ? new IntLangValue((int)uintValue)
-            : new DoubleLangValue(uintValue);
-        if (value is ulong ulongValue) return ulongValue <= int.MaxValue
-            ? new IntLangValue((int)ulongValue)
-            : new DoubleLangValue(ulongValue);
-        if (value is float floatValue) return new DoubleLangValue(floatValue);
-        return new VoidLangValue();
+        return value is null ? VoidLangValue.Instance : ToStaticClassArgument(value);
+    }
+
+    /// <summary>
+    /// 把 <see cref="ConvertResultToLangValue"/> 包出来的值还原成虚拟机栈上的原生表示（逆操作）。
+    /// </summary>
+    /// <remarks>
+    /// 只还原虚拟机以原生形式存储的类型；<c>TaskLangValue</c> / <c>VMThreadLangValue</c> /
+    /// 类型值 / 函数值等本身就是栈上的表示，原样保留。
+    /// </remarks>
+    internal static object? UnwrapToVmValue(object? value)
+    {
+        return value switch
+        {
+            null => null,
+            VoidLangValue => VoidLangValue.Instance,
+            NullLangValue => null,
+            NativeAnyLangValue native => native.GetNativeObject(),
+            IntLangValue intValue => intValue.Value,
+            DoubleLangValue doubleValue => doubleValue.Value,
+            BoolLangValue boolValue => boolValue.Value,
+            CharLangValue charValue => charValue.Value,
+            StringLangValue stringValue => stringValue.Value,
+            ListLangValue list => list.Values.Select(UnwrapToVmValue).ToList(),
+            ArrayLangValue array => array.RunResult.Select(UnwrapToVmValue).ToArray(),
+            DictionaryLangValue dict => UnwrapDictionary(dict),
+            TupleLangValue tuple => BuildVmTuple(tuple.ItemValues),
+            _ => value
+        };
+    }
+
+    private static Dictionary<object, object?> UnwrapDictionary(DictionaryLangValue dict)
+    {
+        var result = new Dictionary<object, object?>();
+        foreach (var (key, value) in dict.Value)
+        {
+            // 字典键不能为 null，与解释器 ValueToObj 的兜底一致
+            result[UnwrapToVmValue(key) ?? new object()] = UnwrapToVmValue(value);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 把元素列表编成虚拟机的嵌套元组表示（与 <c>OpCode.NewTuple</c> 的编码一致）
+    /// </summary>
+    private static object BuildVmTuple(List<LangValueType> items)
+    {
+        var elements = items.Select(UnwrapToVmValue).ToArray();
+        return elements.Length switch
+        {
+            0 => new Tuple<object?, object?>(null, null),
+            1 => new Tuple<object?, object?>(elements[0], null),
+            2 => new Tuple<object?, object?>(elements[0], elements[1]),
+            _ => BuildVmTupleChain(elements)
+        };
+    }
+
+    private static object BuildVmTupleChain(object?[] elements)
+    {
+        object current = new Tuple<object?, object?>(elements[^2], elements[^1]);
+        for (var i = elements.Length - 3; i >= 0; i--)
+        {
+            current = new Tuple<object?, object?>(elements[i], current);
+        }
+
+        return current;
     }
 
     /// <summary>

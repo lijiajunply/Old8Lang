@@ -30,6 +30,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitForInStatement(ForInStatement node)
     {
+        MarkPosition(node);
         // For-in 循环：for item in collection { ... }
         // 也支持多标识符解构：for key, value in dict { ... }
         // 获取字段（主构造函数参数）
@@ -42,7 +43,20 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        var ids = node.Ids;
+        return CompileForInLoop(expression, body, node.Ids);
+    }
+
+    /// <summary>
+    /// 生成 for-in / async for-in 共用的循环代码。
+    /// </summary>
+    /// <remarks>
+    /// 两种循环的迭代协议一致：<c>GetIterator</c> 取枚举器，<c>IteratorMoveNext</c> /
+    /// <c>IteratorCurrent</c> 逐个取值。异步生成器同时实现 <c>IEnumerable</c>，其非泛型枚举器
+    /// 直接产出虚拟机栈上的原生值，因此不再需要单独的异步迭代指令。
+    /// <paramref name="ids"/> 多于一个时按 <c>__for_in_unpack</c> 解构（如 <c>for k, v in dict</c>）。
+    /// </remarks>
+    private Instruction? CompileForInLoop(LangExpression expression, OldStatement body, IReadOnlyList<LangId> ids)
+    {
         bool isDestructuring = ids.Count > 1;
 
         // 创建循环标签
@@ -139,7 +153,7 @@ public partial class BytecodeVisitor
         else
         {
             // 将当前元素存储到循环变量（弹出 current）
-            string varName = id.IdName;
+            string varName = ids[0].IdName;
             // 先换新共享单元，再写入本轮的元素：此后新建的闭包捕获的是本轮绑定。
             // 下标要在声明之后再取，首轮此处会把变量声明成局部变量（槽位尚未装箱，
             // 该指令此时是空操作）。
@@ -196,6 +210,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitSwitchStatement(SwitchStatement node)
     {
+        MarkPosition(node);
         // 获取字段（主构造函数参数）
         var switchExpression = GetPrimaryConstructorParameter<LangExpression>(node, "switchExpression");
         var switchCaseList = GetPrimaryConstructorParameter<List<CaseStatement>>(node, "switchCaseList");
@@ -273,6 +288,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitCaseStatement(CaseStatement node)
     {
+        MarkPosition(node);
         // CaseStatement 在 SwitchStatement 中已完整处理
         // 这个方法不应该被直接调用
         return null;
@@ -281,8 +297,10 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncForInStatement(AsyncForInStatement node)
     {
+        MarkPosition(node);
         // 异步 for-in 循环：async for item in asyncGenerator { ... }
-        // 获取字段（主构造函数参数）
+        // 与普通 for-in 共用同一套迭代协议（异步生成器实现 IEnumerable，
+        // 其非泛型枚举器直接产出虚拟机栈上的原生值），因此这里只负责收集标识符。
         var id = GetPrimaryConstructorParameter<LangId>(node, "id");
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         var body = GetPrimaryConstructorParameter<OldStatement>(node, "body");
@@ -292,79 +310,7 @@ public partial class BytecodeVisitor
             return null;
         }
 
-        string varName = id.IdName;
-
-        // 创建循环标签
-        var loopLabels = new LoopLabels();
-        _loopLabels.Push(loopLabels);
-
-        // 生成异步生成器表达式的代码（栈上现在有异步生成器）
-        expression.Accept(this);
-
-        // 将异步生成器保存到一个临时局部变量
-        int asyncGenLocalIndex = _compiler.AllocateLocal("<async_generator>");
-        Emit(OpCode.StoreLocal, asyncGenLocalIndex);
-
-        // 循环开始标签
-        int loopStart = GetCurrentPosition();
-        loopLabels.ContinueTarget = loopStart;
-
-        // 加载异步生成器到栈
-        Emit(OpCode.LoadLocal, asyncGenLocalIndex);
-
-        // 调用异步生成器的 MoveNextAsync（这会返回一个 Task）
-        // 注意：这里需要虚拟机支持异步迭代器的 MoveNext 操作
-        // 简化实现：使用同步的 MoveNext
-        Emit(OpCode.IteratorMoveNext);
-
-        // 如果 MoveNext 返回 false，跳出循环
-        int jumpIfFalse = GetCurrentPosition();
-        Emit(OpCode.JumpIfFalse, -1);
-
-        // 加载异步生成器到栈
-        Emit(OpCode.LoadLocal, asyncGenLocalIndex);
-
-        // 获取当前元素
-        Emit(OpCode.IteratorCurrent);
-
-        // 将当前元素存储到循环变量
-        if (_compiler.IsLocalVariable(varName))
-        {
-            int localIndex = _compiler.GetLocalIndex(varName);
-            Emit(OpCode.StoreLocal, localIndex);
-        }
-        else
-        {
-            // 声明为局部变量
-            int localIndex = _compiler.DeclareLocalVariable(varName);
-            Emit(OpCode.StoreLocal, localIndex);
-        }
-
-        // 执行循环体
-        body.Accept(this);
-
-        // 跳回循环开始
-        Emit(OpCode.Jump, loopStart);
-
-        // 修补跳出循环的跳转
-        int loopEnd = GetCurrentPosition();
-        PatchJump(jumpIfFalse, loopEnd);
-
-        // 修补所有break跳转
-        foreach (var breakJump in loopLabels.BreakJumps)
-        {
-            PatchJump(breakJump, loopEnd);
-        }
-
-        // 修补所有continue跳转
-        foreach (var continueJump in loopLabels.ContinueJumps)
-        {
-            PatchJump(continueJump, loopStart);
-        }
-
-        _loopLabels.Pop();
-
-        return null;
+        return CompileForInLoop(expression, body, node.Ids);
     }
 
 

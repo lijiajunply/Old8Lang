@@ -1,3 +1,5 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Bytecode.VM;
 
@@ -18,6 +20,83 @@ public static class VMReflectionHelper
     }
 
     /// <summary>
+    /// 把运行期的「类型值」归一化成类型名。
+    /// </summary>
+    /// <remarks>
+    /// 虚拟机里表示类型值的方式不唯一：<c>GetType</c> / <c>TypeOf</c> / <c>GetAllTypes</c>
+    /// 返回装箱的 <see cref="TypeLangValue"/>，而 <c>TypeLangValue</c> 的实例方法在 VM 侧
+    /// 统一按「类型名字符串」实现。原先两套写法互不认识，导致 <c>GetType("A").IsClass()</c>
+    /// 抛「VM 模式下 TypeLangValue 应该是字符串类型」。这里做一次归一化，两种写法都能用。
+    /// </remarks>
+    /// <returns>类型名；无法识别时返回 null</returns>
+    public static string? ResolveTypeName(object? value)
+    {
+        return value switch
+        {
+            null => null,
+            string name => name,
+            TypeLangValue typeValue => typeValue.Value,
+            BytecodeObjectInstance instance => instance.ClassName,
+            ClassMetadata metadata => metadata.Name,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// 按任意形式的类型值取出类元数据
+    /// </summary>
+    public static ClassMetadata? GetClassMetadataFromTypeValue(VirtualMachine vm, object? value)
+    {
+        var typeName = ResolveTypeName(value);
+        return string.IsNullOrEmpty(typeName) ? null : GetClassMetadata(vm, typeName);
+    }
+
+    /// <summary>
+    /// 判断类型是否为泛型（虚拟机侧依据特化类名记录的类型参数映射）
+    /// </summary>
+    public static bool IsGenericType(ClassMetadata? classMetadata)
+    {
+        return classMetadata?.GenericTypeMapping is { Count: > 0 };
+    }
+
+    /// <summary>
+    /// 判断类型名是否是基本类型（口径与 <see cref="TypeLangValue.IsPrimitiveTypeName"/> 一致）
+    /// </summary>
+    public static bool IsPrimitiveTypeName(string? typeName)
+    {
+        return TypeLangValue.IsPrimitiveTypeName(typeName);
+    }
+
+    /// <summary>
+    /// 用语言口径描述一个运行期值的类型（用于 <c>TypeOf</c> 与报错信息）。
+    /// </summary>
+    /// <remarks>
+    /// 直接写 <c>value.GetType().Name</c> 会把 <c>Tuple`2</c>、<c>List`1</c> 这类
+    /// .NET 类型名泄露给使用者，这里统一换成语义相同的语言类型名
+    /// （与 <see cref="LangValueType.TypeToString"/> 一致）。
+    /// </remarks>
+    public static string DescribeValueType(object? value)
+    {
+        return value switch
+        {
+            null => "Null",
+            BytecodeObjectInstance instance => instance.ClassName,
+            LangValueType langValue => langValue.TypeToString(),
+            // object[] 也实现 IList，必须排在集合分支之前
+            object[] => "Array",
+            System.Collections.IDictionary => "Dictionary",
+            System.Collections.IList => "List",
+            Tuple<object?, object?> => "Tuple",
+            bool => "Bool",
+            char => "Char",
+            int => "Int",
+            double => "Double",
+            string => "String",
+            _ => value.GetType().Name
+        };
+    }
+
+    /// <summary>
     /// 从对象实例获取类元数据
     /// </summary>
     public static ClassMetadata? GetClassMetadataFromInstance(VirtualMachine vm, BytecodeObjectInstance instance)
@@ -26,69 +105,101 @@ public static class VMReflectionHelper
     }
 
     /// <summary>
-    /// 获取类的所有方法名（包括静态和实例方法）
+    /// 获取类的所有方法名（包括静态和实例方法，沿继承链向上）
     /// </summary>
-    public static List<string> GetAllMethodNames(ClassMetadata classMetadata)
+    public static List<string> GetAllMethodNames(VirtualMachine vm, ClassMetadata classMetadata)
     {
         var methodNames = new List<string>();
-        methodNames.AddRange(classMetadata.Methods.Select(m => m.Name));
-        methodNames.AddRange(classMetadata.StaticMethods.Select(m => m.Name));
+        foreach (var metadata in EnumerateClassChain(vm, classMetadata))
+        {
+            AddDistinct(methodNames, metadata.Methods.Select(m => m.Name));
+            AddDistinct(methodNames, metadata.StaticMethods.Select(m => m.Name));
+        }
+
         return methodNames;
     }
 
     /// <summary>
-    /// 获取类的所有字段名（包括静态和实例字段）
+    /// 获取类的所有字段名（包括静态和实例字段，沿继承链向上）
     /// </summary>
-    public static List<string> GetAllFieldNames(ClassMetadata classMetadata)
+    public static List<string> GetAllFieldNames(VirtualMachine vm, ClassMetadata classMetadata)
     {
         var fieldNames = new List<string>();
-        fieldNames.AddRange(classMetadata.Fields.Select(f => f.Name));
-        fieldNames.AddRange(classMetadata.StaticFields.Select(f => f.Name));
+        foreach (var metadata in EnumerateClassChain(vm, classMetadata))
+        {
+            AddDistinct(fieldNames, metadata.Fields.Select(f => f.Name));
+            AddDistinct(fieldNames, metadata.StaticFields.Select(f => f.Name));
+        }
+
         return fieldNames;
     }
 
     /// <summary>
-    /// 查找方法元数据
+    /// 查找方法元数据（沿继承链向上）
     /// </summary>
-    public static MethodMetadata? FindMethod(ClassMetadata classMetadata, string methodName)
+    public static MethodMetadata? FindMethod(VirtualMachine vm, ClassMetadata classMetadata, string methodName)
     {
-        // 先查找实例方法
-        var method = classMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
-        if (method != null) return method;
-
-        // 再查找静态方法
-        return classMetadata.StaticMethods.FirstOrDefault(m => m.Name == methodName);
+        return EnumerateClassChain(vm, classMetadata)
+            .Select(metadata => metadata.Methods.FirstOrDefault(m => m.Name == methodName)
+                                ?? metadata.StaticMethods.FirstOrDefault(m => m.Name == methodName))
+            .FirstOrDefault(method => method != null);
     }
 
     /// <summary>
-    /// 查找字段元数据
+    /// 查找字段元数据（沿继承链向上）
     /// </summary>
-    public static FieldMetadata? FindField(ClassMetadata classMetadata, string fieldName)
+    public static FieldMetadata? FindField(VirtualMachine vm, ClassMetadata classMetadata, string fieldName)
     {
-        // 先查找实例字段
-        var field = classMetadata.Fields.FirstOrDefault(f => f.Name == fieldName);
-        if (field != null) return field;
-
-        // 再查找静态字段
-        return classMetadata.StaticFields.FirstOrDefault(f => f.Name == fieldName);
+        return EnumerateClassChain(vm, classMetadata)
+            .Select(metadata => metadata.Fields.FirstOrDefault(f => f.Name == fieldName)
+                                ?? metadata.StaticFields.FirstOrDefault(f => f.Name == fieldName))
+            .FirstOrDefault(field => field != null);
     }
 
     /// <summary>
-    /// 检查方法是否存在
+    /// 检查方法是否存在（沿继承链向上）
     /// </summary>
-    public static bool HasMethod(ClassMetadata classMetadata, string methodName)
+    public static bool HasMethod(VirtualMachine vm, ClassMetadata classMetadata, string methodName)
     {
-        return classMetadata.Methods.Any(m => m.Name == methodName) ||
-               classMetadata.StaticMethods.Any(m => m.Name == methodName);
+        return EnumerateClassChain(vm, classMetadata).Any(metadata =>
+            metadata.Methods.Any(m => m.Name == methodName) ||
+            metadata.StaticMethods.Any(m => m.Name == methodName));
     }
 
     /// <summary>
-    /// 检查字段是否存在
+    /// 检查字段是否存在（沿继承链向上）
     /// </summary>
-    public static bool HasField(ClassMetadata classMetadata, string fieldName)
+    public static bool HasField(VirtualMachine vm, ClassMetadata classMetadata, string fieldName)
     {
-        return classMetadata.Fields.Any(f => f.Name == fieldName) ||
-               classMetadata.StaticFields.Any(f => f.Name == fieldName);
+        return EnumerateClassChain(vm, classMetadata).Any(metadata =>
+            metadata.Fields.Any(f => f.Name == fieldName) ||
+            metadata.StaticFields.Any(f => f.Name == fieldName));
+    }
+
+    /// <summary>
+    /// 自身 + 全部父类（按继承顺序，遇到环即停）
+    /// </summary>
+    private static IEnumerable<ClassMetadata> EnumerateClassChain(VirtualMachine vm, ClassMetadata classMetadata)
+    {
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        for (var current = classMetadata; current != null && visited.Add(current.Name);)
+        {
+            yield return current;
+            current = string.IsNullOrEmpty(current.BaseClassName)
+                ? null
+                : GetClassMetadata(vm, current.BaseClassName);
+        }
+    }
+
+    private static void AddDistinct(List<string> target, IEnumerable<string> names)
+    {
+        foreach (var name in names)
+        {
+            if (!target.Contains(name, StringComparer.Ordinal))
+            {
+                target.Add(name);
+            }
+        }
     }
 
     /// <summary>
@@ -160,9 +271,9 @@ public static class VMReflectionHelper
             ["baseClass"] = classMetadata.BaseClassName,
             ["interfaces"] = classMetadata.InterfaceNames,
             ["mixins"] = classMetadata.Mixins,
-            ["methods"] = GetAllMethodNames(classMetadata),
-            ["fields"] = GetAllFieldNames(classMetadata),
-            ["isGeneric"] = false // VM 模式下暂不支持泛型标记
+            ["methods"] = GetAllMethodNames(vm, classMetadata),
+            ["fields"] = GetAllFieldNames(vm, classMetadata),
+            ["isGeneric"] = IsGenericType(classMetadata)
         };
 
         return info;

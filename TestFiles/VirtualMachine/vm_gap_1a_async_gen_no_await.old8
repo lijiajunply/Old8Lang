@@ -1,0 +1,12 @@
+// 缺口1a：异步生成器（体内无 await）+ async for-in
+async func simpleStream() {
+    yield 1
+    yield 2
+    yield 3
+}
+
+stream1 <- simpleStream()
+async for item in stream1 {
+    PrintLine("Item: " + item.ToStr())
+}
+PrintLine("1a done")

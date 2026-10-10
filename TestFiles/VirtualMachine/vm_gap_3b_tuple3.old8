@@ -1,0 +1,3 @@
+t3 <- (1, 2, 3)
+PrintLine(t3)
+PrintLine(t3.ToStr())

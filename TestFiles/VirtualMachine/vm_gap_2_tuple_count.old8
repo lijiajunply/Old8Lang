@@ -1,0 +1,11 @@
+// 缺口2：元组 .Count() 与集合 Count()
+t2 <- (1, 2)
+t3 <- (1, 2, 3)
+t4 <- (1, 2, 3, 4)
+PrintLine("t2.Count() -> " + t2.Count().ToStr())
+PrintLine("t3.Count() -> " + t3.Count().ToStr())
+PrintLine("t4.Count() -> " + t4.Count().ToStr())
+lst <- {1, 2, 3}
+PrintLine("list.Count() -> " + lst.Count().ToStr())
+arr <- [1, 2, 3]
+PrintLine("array.Count() -> " + arr.Count().ToStr())

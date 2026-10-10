@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitTryStatement(TryStatement node)
     {
+        MarkPosition(node);
         // Try-Catch-Finally 异常处理
         // 完整实现：生成异常表和相应的字节码指令
 
@@ -213,6 +214,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitThrowStatement(ThrowStatement node)
     {
+        MarkPosition(node);
         // 获取 expression 字段（主构造函数参数）
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
 

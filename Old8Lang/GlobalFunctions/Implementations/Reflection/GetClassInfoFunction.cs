@@ -115,8 +115,8 @@ public sealed class GetClassInfoFunction : BaseGlobalFunction
                 throw new InvalidOperationException($"找不到类 {instance.ClassName} 的元数据");
             }
 
-            var methodNames = VMReflectionHelper.GetAllMethodNames(classMetadata);
-            var fieldNames = VMReflectionHelper.GetAllFieldNames(classMetadata);
+            var methodNames = VMReflectionHelper.GetAllMethodNames(vm, classMetadata);
+            var fieldNames = VMReflectionHelper.GetAllFieldNames(vm, classMetadata);
 
             // 构建字典
             var dict = new Dictionary<object, object?>

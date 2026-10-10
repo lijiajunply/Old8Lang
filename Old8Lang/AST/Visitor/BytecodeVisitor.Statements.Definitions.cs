@@ -14,6 +14,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitFuncInit(FuncInit node)
     {
+        MarkPosition(node);
         // 编译函数定义
         var funcValue = node.FuncValue;
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
@@ -127,6 +128,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitClassInit(ClassInit node)
     {
+        MarkPosition(node);
         // 类定义编译
         // 从 TypeTemplate 中提取类名、字段和方法
         var typeTemplate = node.AnyValue;

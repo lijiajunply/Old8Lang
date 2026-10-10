@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitImportStatement(ImportStatement node)
     {
+        MarkPosition(node);
         // 导入语句 - 生成模块加载和符号导入指令
 
         // 1. 生成LoadModule指令加载模块
@@ -65,6 +66,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitNativeStatement(NativeStatement node)
     {
+        MarkPosition(node);
         // ImportNative 指令：导入原生资源
         // 操作数格式: [dllNameIndex, classNameIndex, mode, p1, p2]
         // mode: 0=Single, 1=All, 2=Class

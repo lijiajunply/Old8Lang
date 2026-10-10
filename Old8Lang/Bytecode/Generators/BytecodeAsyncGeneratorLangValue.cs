@@ -15,7 +15,7 @@ namespace Old8Lang.Bytecode.Generators;
 /// 类似于 C# 的 IAsyncEnumerable&lt;T&gt;
 /// </summary>
 public class BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachine vm, SourcePosition position = default)
-    : LangValueType(position), IAsyncEnumerable<LangValueType>, IEnumerator
+    : LangValueType(position), IAsyncEnumerable<LangValueType>, IEnumerable<LangValueType>, IEnumerator
 {
     /// <summary>异步生成器ID</summary>
     public int AsyncGeneratorId { get; } = asyncGeneratorId;
@@ -153,14 +153,27 @@ public class BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachin
         }
     }
 
+    /// <summary>
+    /// 非泛型枚举器：虚拟机 for-in（GetIterator → IteratorMoveNext/Current）走这一支，
+    /// 产出栈上的原生表示；泛型枚举器保留给需要 <see cref="LangValueType"/> 的语言层消费者。
+    /// 本类必须实现 <see cref="IEnumerable"/>，否则虚拟机的 GetIterator 会判定它「不可迭代」。
+    /// </summary>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        while (MoveNext())
+        {
+            yield return VirtualMachine.UnwrapToVmValue(Current);
+        }
+    }
+
     // 释放资源
     public void Dispose()
     {
         _cancellationTokenSource?.Dispose();
     }
 
-    // IEnumerator 接口实现（用于同步迭代）
-    object IEnumerator.Current => Current ?? new VoidLangValue();
+    // IEnumerator 接口实现（用于同步迭代）：产出栈上的原生表示
+    object IEnumerator.Current => VirtualMachine.UnwrapToVmValue(Current);
 
     bool IEnumerator.MoveNext() => MoveNext();
 

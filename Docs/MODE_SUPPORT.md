@@ -1,6 +1,6 @@
 # Old8Lang 三种模式支持矩阵
 
-**最后更新**: 2026-10-09
+**最后更新**: 2026-10-10
 
 本文档是 Old8Lang 三种执行模式下**各特性可用性的唯一权威说明**。
 原先分散在 `MODE_COMPLETION_STATUS.md` 与 `Mode_Support_Summary.md` 两份文档里，
@@ -39,6 +39,19 @@
 >   「因环境而失败」的项已单独标注，未直接判为 ❌。
 
 ## 本次复核修正的条目
+
+### 2026-10-10（虚拟机模式缺口逐条实测）
+
+| 功能 | 旧标记 | 现标记 | 依据 |
+|-----|-------|-------|------|
+| 异步生成器（虚拟机） | ❌ | ✅ | 原判定把「体内含 `await`」当成整个特性不可用；实测不含 `await` 时本来就通过，含 `await` 的失败原因是恢复逻辑里的 `await` 会切线程（详见「已知限制」第 1 条），已修 |
+| `async for-in`（虚拟机） | ❌ | ✅ | 与异步生成器同一处缺陷；同时补齐多标识符解构 `async for k, v in ...` |
+| 元组 `.Count()`（虚拟机） | ⚠️ | ✅ | `(1,2,3).Count()` → `3`；顺带修好原生容器的负索引 |
+| 集合直接打印（虚拟机） | ⚠️ | ✅ | 直接打印与 `.ToStr()` 一致：`[1, 2, 3]` / `{"a": 1}` / `(1, 2, 3)` |
+| 原生函数「无返回值」与 `null`（虚拟机） | ⚠️ | ✅ | `r <- Sleep(1)` 后 `r == null` 为 `false`（与解释器一致） |
+| `TypeLangValue` 实例方法（虚拟机） | ⚠️ | ✅ | 原为整族抛 `ArgumentException`（不是「固定返回 false」），现 9 个方法全部可用 |
+| `TypeOf` / `GetType`（三模式） | 未记录 | ✅ | `TypeOf` 接受任意值，`GetType` 接受内建类型名（`int` / `list` / `dict` …） |
+| 运行期错误位置（虚拟机） | ⚠️ | ✅ | 编译期把源码位置写进指令，错误报告带行列与上下文；除零改为 `ZERO_DIVISION_ERROR` |
 
 ### 2026-10-09（合并两份旧文档时实测裁决）
 
@@ -99,10 +112,10 @@
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
 | 基本类型 | ✅ | ✅ | ✅ | `int` `double` `string` `char` `bool` `null` |
-| 数组 `[]` | ✅ | ✅ | ⚠️ | 创建/索引/长度正常；直接 `print` 输出 .NET 类型名 |
-| 列表 `{}` | ✅ | ✅ | ⚠️ | `Add`/`Remove`/`Count`/索引正常；直接 `print` 同上 |
-| 字典 | ✅ | ✅ | ⚠️ | 遍历语义与顺序 2026-10-09 起与解释器一致；直接 `print` 同上 |
-| 元组 `()` | ✅ | ✅ | ⚠️ | 索引可用，`.Count()` 不可用 |
+| 数组 `[]` | ✅ | ✅ | ✅ | 创建/索引/长度（含负索引）正常；直接 `print` 与 `.ToStr()` 一致 |
+| 列表 `{}` | ✅ | ✅ | ✅ | `Add`/`Remove`/`Count`/索引（含负索引）正常；直接 `print` 同上 |
+| 字典 | ✅ | ✅ | ✅ | 遍历语义与顺序 2026-10-09 起与解释器一致；直接 `print` 同上 |
+| 元组 `()` | ✅ | ✅ | ✅ | 索引（含负索引）与 `.Count()` 可用 |
 | 范围 `[1~10]` | ✅ | ✅ | ✅ | |
 | 可空类型 `int?` | ✅ | ✅ | ✅ | |
 | 泛型集合 `list<T>` 等 | ✅ | ✅ | ✅ | |
@@ -170,8 +183,8 @@
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
 | `async` / `await` | ✅ | ⚠️ | ✅ | |
-| 异步生成器 | ✅ | ❌ | ❌ | 虚拟机报 `STATE_ERROR` 求值栈为空（`IteratorMoveNext`） |
-| `async for-in` | ✅ | ❌ | ❌ | 与异步生成器是同一处缺陷 |
+| 异步生成器 | ✅ | ❌ | ✅ | 体内含 `await` 同样可用（2026-10-10 修复，见「已知限制」第 1 条） |
+| `async for-in` | ✅ | ❌ | ✅ | 支持 `async for k, v in ...` 多标识符解构 |
 | Task API | ✅ | ✅ | ✅ | 实例方法 `Then` / `Catch` / `Finally` / `ContinueWith` 自 2026-10-10 起三种模式都可用（IL 用原生 `Task` 表示，VM 用 `TaskLangValue`）；静态类仍见「已知限制」第 3 条 |
 
 ### 9. 并发编程
@@ -186,6 +199,8 @@
 | `CountDownLatch` | ✅ | ✅ | ✅ | 6 个函数 |
 | `CyclicBarrier` | ✅ | ✅ | ✅ | 6 个函数 |
 | `CancellationTokenSource`（函数形式） | ✅ | ✅ | ✅ | 4 个函数 |
+| `TaskCompletionSource`（类形式） | ✅ | ❌ | ✅ | 2026-10-10 起虚拟机登记了构造函数与 6 个实例方法（`SetResult` / `SetException` / `SetCanceled` / `TrySet*`）；`IL` 模式本就不支持该类型 |
+| `CancellationTokenSource`（类形式） | ✅ | ❌ | ✅ | 2026-10-10 起虚拟机支持 `CancellationTokenSource()` / `(timeout)` 及 `Cancel` / `CancelAfter` / `Dispose` / `IsCancellationRequested` |
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
 | Thread API（静态类） | ✅ | ✅ | ⚠️ | 虚拟机仅 `Thread.Sleep` 可用，见「已知限制」第 3 条 |
@@ -229,12 +244,12 @@
 
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
-| `Print` / `PrintLine` | ✅ | ✅ | ⚠️ | 直接打印数组/列表/字典输出 .NET 类型名，需改用 `.ToStr()` |
+| `Print` / `PrintLine` | ✅ | ✅ | ✅ | 2026-10-10 起虚拟机直接打印集合与 `.ToStr()` 一致（`[1, 2, 3]` / `{"a": 1}` / `(1, 2, 3)`） |
 | `ReadLine` | ✅ | ✅ | ✅ | |
 | `ToStr` / `ToInt` / `ToDouble` / `ToBool` | ✅ | ✅ | ✅ | |
-| 集合方法（`Add` `Remove` `Count` 等） | ✅ | ✅ | ✅ | |
+| 集合方法（`Add` `Remove` `Count` 等） | ✅ | ✅ | ✅ | 元组 `.Count()` 自 2026-10-10 起可用 |
 | 字符串方法（`Length` `ToUpper` `Split` 等） | ✅ | ✅ | ✅ | |
-| 反射函数与 `TypeLangValue` 实例方法 | ✅ | — | ⚠️ | 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) 的反射一节 |
+| 反射函数与 `TypeLangValue` 实例方法 | ✅ | — | ✅ | 虚拟机下 9 个类型值方法自 2026-10-10 起可用；`TypeOf` / `GetType` 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) |
 
 ### 15. 类型系统
 
@@ -302,29 +317,43 @@
 
 ### 虚拟机模式
 
-1. **异步生成器与 `async for-in` 不可用**：报 `STATE_ERROR` 求值栈为空（指令 `IteratorMoveNext`）。
-   同步生成器（`yield`）不受影响。
+1. **异步生成器与 `async for-in`（2026-10-10 修复）**：原先体内含 `await` 时报
+   `STATE_ERROR` 求值栈为空（指令 `IteratorMoveNext`）。真实原因是恢复异步生成器时用了
+   `await`：虚拟机的求值栈、调用栈与帧池都按线程存放，`await` 让线程池线程接管后，
+   恢复出来的是那个线程上的空栈（`_callStack.Pop()` 也会抛 `Stack empty`）。
+   现已改为同步恢复（生成器体内的 `await` 改为阻塞等待），并让异步生成器实现 `IEnumerable`
+   以复用普通 for-in 的迭代协议；`async for k, v in ...` 多标识符解构同时可用。
+   同步生成器（`yield`）不受影响；`yield` 集合/类实例也不再丢值。
 2. **异步函数的装饰器不可用**：`@decorator async func` 报 `VM_UNSUPPORTED_ERROR`
    （异步函数不走 `MakeFunction`/`StoreGlobal` 这条绑定路径）。普通函数的装饰器可用。
 3. **静态类 API 部分可用**：编译期把 `类名.方法(...)` 改写成静态类原生调用，支持集合集中在
    `VmStaticClassRegistry`。可用：`Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/
-   `Run`/`StartNew`、`Thread.Sleep`、`Assert` 的 24 个断言方法。
+   `Run`/`StartNew`、`Thread.Sleep`、`Assert` 的 24 个断言方法、
+   `TaskCompletionSource` / `CancellationTokenSource`（类形式，2026-10-10 起）。
    不支持（报 `VM_UNSUPPORTED_ERROR` 并给出位置）：裸引用 `Task`、`Task.Factory`、
-   `Thread.CurrentThread`、命名参数、`Task.Delay` 的第二个参数；
-   完全不可用的静态类还有 **TestRunner / Mock / TaskScheduler / TaskCompletionSource /
-   CancellationTokenSource（静态类形式）**。
-4. **`await` 的结果 + 函数返回类型注解**：`func f() -> int { return await g() }` 报
-   `类型不匹配: 期望 int，但得到 IntLangValue`。`await` 的结果是 `LangValueType`，
-   而 `CheckTypeMatch` 只按原始 CLR 类型匹配，不换算 `LangValueType`。**尚未修复**；
-   绕过办法是先赋值给变量再返回，或去掉返回类型注解。
-5. **集合直接打印**输出 .NET 类型名，需改用 `.ToStr()`。
-6. **元组**索引可用，`.Count()` 不可用。
-7. **原生函数无法区分「无返回值」与 `null`**：用户函数无返回值时虚拟机补 `VoidLangValue` 占位，
-   与解释器一致；但原生/内置函数（如 `Sleep`、`PrintLine`）统一返回 C# `null`，
-   因此 `print(Sleep(1))` 会输出 `null`（解释器不输出），`r <- Sleep(1)` 后 `r == null` 为 true
-   （解释器为 false）。彻底对齐需要各原生函数分别返回 `VoidLangValue` / `NullLangValue`。
-8. **运行期错误位置恒为 `0:0`**：`Instruction.LineNumber/ColumnNumber` 在整个编译器里从未被写入，
-   因此虚拟机运行期错误的位置信息与源代码上下文不可用。
+   `Thread.CurrentThread`、命名参数、`Task.Delay` 的第二个参数。
+   仍未登记的静态类是 **TestRunner / Mock / TaskScheduler**，原因是它们的核心方法要在
+   运行期执行传入的函数值（`Describe` / `It` / `RunTest` / `Mock.Verify`），
+   走的是解释器的 `FuncLangValue + VariateManager`；虚拟机的函数值是
+   `ClosureValue`/`FunctionMetadata`，转换后无法调用。`TaskScheduler` 只暴露一个
+   `Default` 属性（虚拟机静态类通道目前只支持 `类名.方法(...)`）。
+4. **`await` 的结果 + 函数返回类型注解（2026-10-10 修复）**：原先 `func f() -> int { return await g() }`
+   报 `类型不匹配: 期望 int，但得到 IntLangValue`。现在 `CheckTypeMatch` 会先拆开基本类型的
+   `LangValueType` 包装，且异步任务结果改为无损转换（集合/类实例不再退化成 `VoidLangValue`），
+   `-> int` / `-> string` / `-> list` 都能直接返回 `await` 的结果。
+5. **集合直接打印（2026-10-10 修复）**：原先输出 `System.Collections.Generic.List`1[System.Object]`
+   这类 .NET 类型名，现与 `.ToStr()` 用同一套格式化，输出 `[1, 2, 3]` / `{"a": 1}` / `(1, 2, 3)`。
+6. **元组（2026-10-10 修复）**：`.Count()` 已可用；顺带修好原生 `List<object?>` / `object[]` /
+   `string` / 元组的**负索引**（`l[-1]` 原先直接把 -1 交给 `IList` 索引器而抛
+   `ArgumentOutOfRangeException`）。
+7. **原生函数「无返回值」与 `null`（2026-10-10 修复）**：无返回值的原生/内置函数
+   （`Sleep`、`PrintLine`、并发原语等）现在统一归一化成 `VoidLangValue`，
+   因此 `r <- Sleep(1)` 后 `r == null` 为 `false`（与解释器一致）。
+   判定依据是 IL 侧声明的返回类型（`GetReturnTypeInternal` 返回 `typeof(void)`），不另设清单。
+8. **运行期错误位置（2026-10-10 修复）**：编译期现在把 AST 节点的位置写进每条指令
+   （`Instruction.LineNumber/ColumnNumber/SourceFile`），运行期错误会带行列与源码上下文。
+   同时整数除/模零改为语言层的 `ZERO_DIVISION_ERROR`（原先直接抛 .NET `DivideByZeroException`，
+   既没有位置信息也不可被语言层 `try/catch` 识别）。
 9. Python / JavaScript / C# DLL 三类 `extern` 未验证；C/C++ P/Invoke 已可用。
 10. **`VMProfiler` / `VMDebugger` / `Disassembler` 三个类是死代码**（2026-10-09 核查）：
     均在 `Old8Lang/Bytecode/` 下各自定义，但全仓库找不到任何调用点，
@@ -350,8 +379,8 @@
 | 模式 | 测试文件数 | 实测结果 |
 |------|-----------|---------|
 | 解释器 | 134（2026-10-08） | 通过 |
-| IL | 138（2026-10-08） | **737 失败 / 446 通过 / 25 跳过**（2026-10-09），见「已知限制」 |
-| 虚拟机 | 97（2026-10-08） | 非 IL 模式全量 **4700 通过 / 0 失败 / 3 跳过** |
+| IL | 138（2026-10-08） | **738 失败 / 2666 通过 / 28 跳过**（2026-10-10 全量档），见「已知限制」 |
+| 虚拟机 | 97（2026-10-08） | 非 IL 模式全量 **4782 通过 / 0 失败 / 3 跳过**（2026-10-10） |
 
 各模式测试文件的分类明细与覆盖缺口见 [Old8Lang.Tests/Compiler/TODO.md](../Old8Lang.Tests/Compiler/TODO.md)
 与 [Old8Lang.Tests/Interpreter/TODO.md](../Old8Lang.Tests/Interpreter/TODO.md)。
@@ -375,6 +404,14 @@
 
 ## 更新日志
 
+- **2026-10-10（续 2）**: 按「虚拟机模式缺口」逐条实测并修复 9 处：
+  异步生成器含 `await`（改成同步恢复，`async for-in` 支持多标识符解构）、元组 `.Count()`、
+  集合直接打印、原生函数「无返回值 vs `null`」、`await` 结果与返回类型注解（含异步结果无损转换）、
+  `TypeLangValue` 实例方法整族、`TypeOf`/`GetType` 的内建类型与非类实例、运行期错误源码位置
+  （并新增原生容器负索引、除零错误改为 `ZERO_DIVISION_ERROR`）、`TaskCompletionSource` /
+  `CancellationTokenSource` 类形式。其中三处是**文档纠正**：异步生成器的缺口只在「体内含 `await`」；
+  反射不是「固定返回 false」而是「整族抛错」；`TypeOf`/`GetType` 原文档未记录限制。
+  测试报告：`Reports/2026-10-10-23-40-虚拟机模式缺口修复测试.md`。
 - **2026-10-10（续）**: 虚拟机模式补上 Thread 的 `Then` / `WithTimeout` / `Retry` / `Cancel`
   （注册在 `VMThreadLangValue` 上，`ResourceManager`/`VMThreadWrapper` 增加取消、超时等待与 spawn 负载记录），
   原「已知限制」第 11 条由「不可用」改为「可用 + 协作式限制」。**至此第 5 节清单的 14 个 VM 方法全部落地。**

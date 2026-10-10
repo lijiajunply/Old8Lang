@@ -48,25 +48,24 @@ public class LangListCountMethod : BaseLangListMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
+        if (instance is ListLangValue listLangValue)
         {
-            if (instance is ListLangValue listLangValue)
+            lock (listLangValue.GetSyncRoot())
             {
-                lock (listLangValue.GetSyncRoot())
-                {
-                    return listLangValue.GetLength();
-                }
+                return listLangValue.GetLength();
             }
-
-            return langList.GetLength();
         }
 
-        // 兼容 VM 模式下的 List<object?>
-        if (instance is System.Collections.ICollection collection)
+        // VM 下的表示是原生对象：object[] / List<object?> / Tuple<,> / Dictionary……
+        // 走基类统一入口，元组（Tuple<object?, object?> 嵌套表示）也能取到长度。
+        try
         {
-            return collection.Count;
+            return GetLengthForVM(instance);
         }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口或 ICollection 接口，当前类型：{instance?.GetType().Name}");
+        catch (ArgumentException)
+        {
+            throw new ArgumentException(
+                $"Count 需要列表、数组或元组，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
+        }
     }
 }

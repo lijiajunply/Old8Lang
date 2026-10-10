@@ -11,6 +11,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitLangId(LangId node)
     {
+        MarkPosition(node);
         string varName = node.IdName;
 
         // 检查是否是局部变量

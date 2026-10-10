@@ -248,11 +248,51 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// <summary>
     /// 字节码模式执行（虚拟机模式）
     /// </summary>
+    /// <remarks>
+    /// 与全局函数同理：无返回值的原生实例方法（如 <c>Dictionary.Clear()</c>）在 C# 侧返回 <c>null</c>，
+    /// 语言层应看到「没有值」（<see cref="VoidLangValue"/>）而不是 <c>null</c>。
+    /// </remarks>
     public object? ExecuteInVM(object? instance, object?[] arguments)
     {
         ValidateInstanceForVM(instance);
         ValidateParameterCountForVM(arguments.Length);
-        return ExecuteInVMInternal(instance, arguments);
+        var result = ExecuteInVMInternal(instance, arguments);
+        return result ?? (ReturnsVoid(instance) ? VoidLangValue.Instance : null);
+    }
+
+    private readonly Dictionary<Type, bool> _returnsVoidCache = new();
+
+    /// <summary>
+    /// 该方法在语言层是否没有返回值（IL 侧声明 <c>typeof(void)</c>）
+    /// </summary>
+    private bool ReturnsVoid(object? instance)
+    {
+        var instanceType = instance?.GetType() ?? TargetType;
+        lock (_returnsVoidCache)
+        {
+            if (_returnsVoidCache.TryGetValue(instanceType, out var cached))
+            {
+                return cached;
+            }
+        }
+
+        bool returnsVoid;
+        try
+        {
+            // 返回类型声明不依赖实参（唯一依赖参数的 ThreadJoinMethod 返回的不是 void）
+            returnsVoid = GetReturnTypeInternal(instanceType, [], null!) == typeof(void);
+        }
+        catch
+        {
+            returnsVoid = false;
+        }
+
+        lock (_returnsVoidCache)
+        {
+            _returnsVoidCache[instanceType] = returnsVoid;
+        }
+
+        return returnsVoid;
     }
 
     /// <summary>

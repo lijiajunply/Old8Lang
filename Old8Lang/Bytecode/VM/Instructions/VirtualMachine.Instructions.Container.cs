@@ -10,6 +10,21 @@ namespace Old8Lang.Bytecode.VM;
 public partial class VirtualMachine
 {
     /// <summary>
+    /// 把可能为负的下标换算成实际下标并做越界检查
+    /// （与解释器一致：<c>-1</c> 表示最后一个元素）。
+    /// </summary>
+    private static int NormalizeIndex(int index, int count, SourcePosition position)
+    {
+        var normalized = index < 0 ? index + count : index;
+        if (normalized < 0 || normalized >= count)
+        {
+            throw new IndexError(position, index, count);
+        }
+
+        return normalized;
+    }
+
+    /// <summary>
     /// 执行容器操作指令
     /// </summary>
     private void ExecuteContainerOperation(Instruction instruction, CallFrame frame)
@@ -168,13 +183,12 @@ public partial class VirtualMachine
 
                 if (collection is Array array)
                 {
-                    int idx = Convert.ToInt32(index);
-                    _stack.Push(array.GetValue(idx));
+                    _stack.Push(array.GetValue(NormalizeIndex(Convert.ToInt32(index), array.Length,
+                        GetPosition(instruction))));
                 }
                 else if (collection is IList list)
                 {
-                    int idx = Convert.ToInt32(index);
-                    _stack.Push(list[idx]);
+                    _stack.Push(list[NormalizeIndex(Convert.ToInt32(index), list.Count, GetPosition(instruction))]);
                 }
                 else if (collection is IDictionary dict)
                 {
@@ -230,16 +244,12 @@ public partial class VirtualMachine
                 }
                 else if (collection is string str)
                 {
-                    int idx = Convert.ToInt32(index);
-                    _stack.Push(str[idx]);
+                    _stack.Push(str[NormalizeIndex(Convert.ToInt32(index), str.Length, GetPosition(instruction))]);
                 }
                 else if (collection is Tuple<object?, object?> tuple)
                 {
-                    int idx = Convert.ToInt32(index);
-                    int currentIdx = 0;
-                    bool found = false;
-
-                    // 使用栈进行迭代遍历，确保能处理任意嵌套结构的元组
+                    // 先把嵌套元组展平成元素列表，再按统一口径取下标（支持负索引与越界报错）
+                    var tupleItems = new List<object?>();
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
 
@@ -255,21 +265,12 @@ public partial class VirtualMachine
                         }
                         else if (current != null) // 跳过 null (与 TupleLangValue 行为一致)
                         {
-                            if (currentIdx == idx)
-                            {
-                                _stack.Push(current);
-                                found = true;
-                                break;
-                            }
-
-                            currentIdx++;
+                            tupleItems.Add(current);
                         }
                     }
 
-                    if (!found)
-                    {
-                        throw new IndexError(GetPosition(instruction), idx, currentIdx);
-                    }
+                    _stack.Push(tupleItems[NormalizeIndex(Convert.ToInt32(index), tupleItems.Count,
+                        GetPosition(instruction))]);
                 }
                 else
                 {
@@ -287,13 +288,12 @@ public partial class VirtualMachine
 
                 if (collection is Array array)
                 {
-                    int idx = Convert.ToInt32(index);
-                    array.SetValue(value, idx);
+                    array.SetValue(value, NormalizeIndex(Convert.ToInt32(index), array.Length,
+                        GetPosition(instruction)));
                 }
                 else if (collection is IList list)
                 {
-                    int idx = Convert.ToInt32(index);
-                    list[idx] = value;
+                    list[NormalizeIndex(Convert.ToInt32(index), list.Count, GetPosition(instruction))] = value;
                 }
                 else if (collection is IDictionary dict)
                 {

@@ -115,15 +115,24 @@ public class VMUnexpectedInputsTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void UnexpectedInputs_ArrayNegativeIndex_ThrowsException()
+    public void UnexpectedInputs_ArrayNegativeIndex_ReturnsLastElement()
     {
+        // 负索引在 Old8Lang 里是有效语法（-1 表示最后一个元素，见解释器
+        // Interpreter/EdgeCases/BoundaryTests.Boundary_ArrayIndexNegative_HandlesNegativeIndex）。
+        // 虚拟机原先把 -1 直接交给 IList/Array 索引器而抛 ArgumentOutOfRangeException，
+        // 本用例锁定修复后的跨模式一致行为。
         var code = @"
             arr <- [1, 2, 3]
-            result <- arr[-1]
+            list <- {4, 5, 6}
+            text <- ""abc""
+            tuple <- (7, 8, 9)
+            PrintLine(arr[-1].ToStr())
+            PrintLine(list[-1].ToStr())
+            PrintLine(text[-1])
+            PrintLine(tuple[-1].ToStr())
         ";
 
-        var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));
-        output.WriteLine($"Expected exception: {exception.Message}");
+        Assert.Equal("3\n6\nc\n9", ExecuteVMCode(code));
     }
 
     [Fact]

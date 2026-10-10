@@ -1,0 +1,6 @@
+// 缺口6：运行期错误位置
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+PrintLine(add("x", 1).ToStr())

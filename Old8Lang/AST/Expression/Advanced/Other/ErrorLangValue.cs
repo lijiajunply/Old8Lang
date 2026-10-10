@@ -27,6 +27,11 @@ public partial class ErrorLangValue(Old8Exception value) : LangValueType
     /// </summary>
     public string FriendlyMessage => value.FriendlyMessage;
 
+    /// <summary>
+    /// 类型名用异常类名（如 <c>ZeroDivisionError</c>），供 <c>TypeOf(e)</c> 判断错误种类。
+    /// </summary>
+    public override string TypeToString() => value.GetType().Name;
+
     public override string ToString()
     {
         const string reset = "\e[0m";

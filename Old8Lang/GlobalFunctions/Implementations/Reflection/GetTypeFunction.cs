@@ -40,6 +40,12 @@ public sealed class GetTypeFunction : BaseGlobalFunction
 
         if (template is null)
         {
+            // 内建类型没有 TypeTemplate，但同样能取到类型值（GetType("int") / GetType("list")）
+            if (TypeLangValue.TryResolveBuiltinTypeName(typeName, out var builtinName))
+            {
+                return new TypeLangValue(builtinName);
+            }
+
             throw new InvalidOperationError(position, $"找不到类型: {typeName}");
         }
 
@@ -72,6 +78,12 @@ public sealed class GetTypeFunction : BaseGlobalFunction
         if (string.IsNullOrEmpty(typeName))
         {
             throw new InvalidOperationException("类型名必须是字符串");
+        }
+
+        // 内建类型名归一化（int → Int），与解释器的 GetType 行为一致
+        if (TypeLangValue.TryResolveBuiltinTypeName(typeName, out var builtinName))
+        {
+            typeName = builtinName;
         }
 
         // 在 VM 模式下，返回 TypeLangValue

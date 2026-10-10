@@ -1,0 +1,6 @@
+l <- {"a", "b"}
+PrintLine(l)
+PrintLine(l.ToStr())
+d <- {"k": "v"}
+PrintLine(d)
+PrintLine(d.ToStr())

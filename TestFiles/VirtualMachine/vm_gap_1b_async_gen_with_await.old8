@@ -1,0 +1,15 @@
+// 缺口1b：异步生成器体内含 await
+async func delayedStream() {
+    i <- 1
+    while i <= 3 {
+        await Task.Delay(10)
+        yield i
+        i <- i + 1
+    }
+}
+
+stream1 <- delayedStream()
+async for item in stream1 {
+    PrintLine("Delayed item: " + item.ToStr())
+}
+PrintLine("1b done")

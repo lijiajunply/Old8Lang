@@ -341,3 +341,28 @@
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
 
+
+## D. 2026-10-10 虚拟机缺口修复后遗留
+
+来源：`Reports/2026-10-10-23-40-虚拟机模式缺口修复测试.md`。以下均为本轮实测发现、
+但**与本轮 9 条缺口不同源**的问题，未顺手修改：
+
+- [ ] **VM 静态类还缺 TestRunner / Mock / TaskScheduler**。前两者的核心方法要在运行期执行传入的
+  函数值（`TestRunner.Describe`/`It`/`RunTest`、`Mock.Verify` 等），依赖解释器的
+  `FuncLangValue + VariateManager`；VM 的函数值是 `ClosureValue`/`FunctionMetadata`，
+  经 `ToStaticClassArgument` 只能包成 `NativeAnyLangValue`，无法调用。
+  要支持需要一套「VM 函数值 → 可调用委托」的桥接（可参考 IL 模式 2026-10-10 的函数值桥接）。
+  `TaskScheduler` 只暴露 `Default` 属性，而 VM 静态类通道只处理 `类名.方法(...)`，需要额外的属性通道。
+- [ ] **错误信息仍会泄露 .NET 类型名**：VM 属性访问失败走反射后抛
+  `AttributeError(..., type.Name)`（如 `List`1`、`Int32`），解释器的
+  `类型 'IntLangValue' 没有属性 'Count'` 同理。本轮只把 `Count` 与「方法未找到」两条路径
+  换成了语言口径（`VMReflectionHelper.DescribeValueType`），其余几十处未动。
+- [ ] **异步函数显式 `return null` 在 VM 里仍是 `VoidLangValue`**：`Task().ToString()` 在解释器是
+  `Task(Completed: Null)`，VM 是 `Task(Completed: )`。原生 `null` 与「没有值」在任务结果里同样不可区分，
+  与已修的「原生函数 void vs null」是同一类问题的剩余面。
+- [ ] **`Task.Delay` 的第二个参数（CancellationToken）在 VM 下仍报 `VM_UNSUPPORTED_ERROR`**，
+  因为 VM 无法构造 `CancellationToken` 值；`Thread.CurrentThread`、裸引用 `Task`、
+  `Task.Factory`（需要多级 `Task.Factory.StartNew` 的属性通道）同样未支持。
+- [ ] **IL 模式的负索引**：解释器与虚拟机（本轮修复后）都支持 `arr[-1]`，IL 仍抛异常
+  （`Compiler/EdgeCases/UnexpectedInputsTests.NegativeIndex_CompilesAndExecutesCorrectly`
+  在 IL 档下失败，属既有的 IL 环境问题）。

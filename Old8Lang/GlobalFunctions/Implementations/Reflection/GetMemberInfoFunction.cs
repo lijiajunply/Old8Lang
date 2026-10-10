@@ -120,7 +120,7 @@ public sealed class GetMemberInfoFunction : BaseGlobalFunction
             }
 
             // 先尝试查找方法
-            var method = VMReflectionHelper.FindMethod(classMetadata, memberName);
+            var method = VMReflectionHelper.FindMethod(vm, classMetadata, memberName);
             if (method != null)
             {
                 var methodTuples = VMReflectionHelper.CreateMethodInfoTuples(method);
@@ -136,7 +136,7 @@ public sealed class GetMemberInfoFunction : BaseGlobalFunction
             }
 
             // 再尝试查找字段
-            var field = VMReflectionHelper.FindField(classMetadata, memberName);
+            var field = VMReflectionHelper.FindField(vm, classMetadata, memberName);
             if (field != null)
             {
                 var fieldTuples = VMReflectionHelper.CreateFieldInfoTuples(field);

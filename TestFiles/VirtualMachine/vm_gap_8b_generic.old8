@@ -1,0 +1,8 @@
+// 缺口8b：泛型类的 IsGeneric
+class Box<T> {
+    public v:T? <- null
+}
+
+b <- Box<int>()
+PrintLine("TypeOf(Box<int>()).IsGeneric -> " + TypeOf(b).IsGeneric().ToStr())
+PrintLine("TypeOf(Box<int>()).IsClass -> " + TypeOf(b).IsClass().ToStr())

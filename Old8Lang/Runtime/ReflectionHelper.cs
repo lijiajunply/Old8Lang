@@ -133,8 +133,8 @@ public static class ReflectionHelper
                 var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
                 if (classMetadata != null)
                 {
-                    bool hasMethod = VMReflectionHelper.HasMethod(classMetadata, memberName);
-                    bool hasField = VMReflectionHelper.HasField(classMetadata, memberName);
+                    bool hasMethod = VMReflectionHelper.HasMethod(vm, classMetadata, memberName);
+                    bool hasField = VMReflectionHelper.HasField(vm, classMetadata, memberName);
                     return hasMethod || hasField;
                 }
             }
@@ -476,7 +476,7 @@ public static class ReflectionHelper
                 var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
                 if (classMetadata != null)
                 {
-                    return VMReflectionHelper.HasMethod(classMetadata, methodName);
+                    return VMReflectionHelper.HasMethod(vm, classMetadata, methodName);
                 }
             }
         }
@@ -500,7 +500,7 @@ public static class ReflectionHelper
                 var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
                 if (classMetadata != null)
                 {
-                    return VMReflectionHelper.HasField(classMetadata, fieldName);
+                    return VMReflectionHelper.HasField(vm, classMetadata, fieldName);
                 }
             }
         }

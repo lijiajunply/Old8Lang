@@ -11,6 +11,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitYieldStatement(YieldStatement node)
     {
+        MarkPosition(node);
         // Yield 语句（生成器）
         // 1. 生成 yield 表达式的字节码（将值压入栈）
         node.YieldExpression.Accept(this);
@@ -33,6 +34,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncFuncInit(AsyncFuncInit node)
     {
+        MarkPosition(node);
         // 编译异步函数定义
         var funcValue = node.AsyncFuncValue;
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";

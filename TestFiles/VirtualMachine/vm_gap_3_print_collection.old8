@@ -1,0 +1,14 @@
+// 缺口3：集合直接打印不应输出 .NET 类型名
+l <- {1, 2, 3}
+d <- {"a": 1, "b": 2}
+a <- [1, 2, 3]
+t <- (1, 2)
+PrintLine(l)
+PrintLine(d)
+PrintLine(a)
+PrintLine(t)
+PrintLine("nested: " + {"x": {1, 2}}.ToStr())
+Print("print 无换行: ")
+Print(l)
+PrintLine("")
+PrintLine("ToStr 一致性 -> " + (l.ToStr() == "[" + "1, 2, 3" + "]").ToStr())

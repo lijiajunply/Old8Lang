@@ -15,6 +15,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitSelectStatement(SelectStatement node)
     {
+        MarkPosition(node);
         // Select 语句（Channel 多路选择）
         // 实现轮询策略：
         // 1. 循环检查所有 case
@@ -222,6 +223,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitDeferStatement(DeferStatement node)
     {
+        MarkPosition(node);
         // Defer 语句（延迟执行）
         // 实现策略：
         // 1. 跳过 defer 块的代码（不立即执行）
@@ -256,6 +258,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitEnumInit(EnumInit node)
     {
+        MarkPosition(node);
         // 计算枚举成员的实际值
         var enumValues = new Dictionary<string, int>();
         int currentValue = 0;
@@ -307,6 +310,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitExternStatement(ExternStatement node)
     {
+        MarkPosition(node);
         // 使用反射获取 ExternStatement 的私有字段
         var nodeType = node.GetType();
         var bindingFlags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
@@ -375,6 +379,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitFileHeaderDirective(FileHeaderDirective node)
     {
+        MarkPosition(node);
         // 文件头指令在字节码模式下不需要生成代码
         return null;
     }
@@ -382,6 +387,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitUsingStatement(UsingStatement node)
     {
+        MarkPosition(node);
         // Using 语句：自动资源管理
         // 实现策略：使用 try-finally 结构，在 finally 块中调用 DisposeResource
 

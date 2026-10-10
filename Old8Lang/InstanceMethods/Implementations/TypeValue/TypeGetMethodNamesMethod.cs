@@ -67,9 +67,11 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName)
+        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        if (string.IsNullOrEmpty(typeName))
         {
-            throw new ArgumentException("VM 模式下 TypeLangValue 应该是字符串类型");
+            throw new InvalidOperationException(
+                $"GetMethodNames 需要类型值，实际得到 {(instance is null ? "null" : instance.GetType().Name)}");
         }
 
         // 在 VM 模式下，需要从 VMContext 获取类型信息
@@ -85,6 +87,6 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
             return new List<string>();
         }
 
-        return Old8Lang.Runtime.VMReflectionHelper.GetAllMethodNames(classMetadata).Cast<object?>().ToList();
+        return Old8Lang.Runtime.VMReflectionHelper.GetAllMethodNames(vm, classMetadata).Cast<object?>().ToList();
     }
 }

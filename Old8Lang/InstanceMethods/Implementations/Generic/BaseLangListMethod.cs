@@ -25,7 +25,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return langList.GetItems().ToList();
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance.GetType().Name}");
+        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance.TypeToString()}");
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return langList.GetLength();
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance.GetType().Name}");
+        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance.TypeToString()}");
     }
 
     /// <summary>
@@ -75,7 +75,8 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return FlattenTuple(instance);
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{instance?.GetType().Name}");
+        throw new ArgumentException(
+            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
     }
 
     /// <summary>
@@ -105,7 +106,8 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         {
             return FlattenTuple(instance).Count;
         }
-        throw new ArgumentException($"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{instance?.GetType().Name}");
+        throw new ArgumentException(
+            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
     }
 
     /// <summary>

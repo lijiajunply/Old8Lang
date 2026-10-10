@@ -12,6 +12,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitOperation(Operation node)
     {
+        MarkPosition(node);
         // 特殊处理 Dot 运算符（成员访问和方法调用）
         if (node.Opera == LangTokenType.Dot)
         {

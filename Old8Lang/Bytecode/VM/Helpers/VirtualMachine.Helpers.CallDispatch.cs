@@ -184,6 +184,13 @@ public partial class VirtualMachine
                 return;
             }
 
+            // 虚拟机专属的静态类「构造函数」形式（CancellationTokenSource() / TaskCompletionSource()）
+            if (TryInvokeVmConstructor(funcName, fallbackArgs, out var constructed))
+            {
+                _stack.Push(constructed);
+                return;
+            }
+
             var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
             if (globalFunction != null)
             {

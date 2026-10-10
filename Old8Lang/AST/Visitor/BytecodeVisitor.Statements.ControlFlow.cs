@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitIfStatement(IfStatement node)
     {
+        MarkPosition(node);
         var elseLabel = new List<int>();
         var endLabel = -1;
 
@@ -91,6 +92,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitIfChild(IfChild node)
     {
+        MarkPosition(node);
         // 获取expression和blockStatement字段（主构造函数参数）
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "blockStatement");
@@ -119,6 +121,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitWhileStatement(WhileStatement node)
     {
+        MarkPosition(node);
         // 获取expression和blockStatement字段（主构造函数参数）
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         var blockStatement = GetPrimaryConstructorParameter<OldStatement>(node, "blockStatement");
@@ -172,6 +175,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitForStatement(ForStatement node)
     {
+        MarkPosition(node);
         // 获取ForStatement的字段（主构造函数参数）
         var setStatement = GetPrimaryConstructorParameter<SetStatement>(node, "setStatement");
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
@@ -270,6 +274,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitReturnStatement(ReturnStatement node)
     {
+        MarkPosition(node);
         // 获取returnExpression字段（主构造函数参数）
         var returnExpression = GetPrimaryConstructorParameter<LangExpression>(node, "returnExpression");
 
@@ -292,6 +297,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitBreakStatement(BreakStatement node)
     {
+        MarkPosition(node);
         // 检查是否在循环内部
         if (_loopLabels.Count == 0)
         {
@@ -311,6 +317,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitContinueStatement(ContinueStatement node)
     {
+        MarkPosition(node);
         // 检查是否在循环内部
         if (_loopLabels.Count == 0)
         {

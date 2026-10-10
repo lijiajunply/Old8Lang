@@ -29,6 +29,22 @@
 
 **API**
 
+- 虚拟机模式新增 `TaskCompletionSource()` 与 `CancellationTokenSource()`（含 `(timeout)` 重载）
+  的类形式：前者支持 `SetResult` / `SetException` / `SetCanceled` / `TrySet*` 与 `.Task`，
+  后者支持 `Cancel` / `CancelAfter` / `Dispose` / `IsCancellationRequested`。
+- **`GetType` 支持内建类型名**（`int` / `double` / `bool` / `char` / `string` / `null` /
+  `array` / `list` / `dict` / `tuple`），取到的类型值可用于 `.IsPrimitive()`；
+  **`TypeOf` 支持任意值**（非类实例返回 `Int` / `List` / `Dictionary` / `Tuple` 等类型名，
+  错误值返回异常类名如 `ZeroDivisionError`）。
+- 类型值现在可与同名的类型值或字符串比较（`GetType("A") == GetType("A")`）。
+- 虚拟机模式下 `TypeLangValue` 的 9 个实例方法（`IsClass` / `IsInterface` / `IsPrimitive` /
+  `IsGeneric` / `IsAssignableFrom` / `GetBaseType` / `GetInterfaces` / `GetMethodNames` /
+  `GetFieldNames`）全部可用，此前整族抛 `ArgumentException`。
+- **跨模式行为差异收敛（虚拟机模式）**：集合直接打印与 `.ToStr()` 一致；元组 `.Count()` 可用；
+  原生容器支持负索引；无返回值的原生函数归一化为 `VoidLangValue`（`r == null` 为 `false`）；
+  `await` 的结果可直接满足 `-> int` / `-> string` / `-> list` 等返回类型注解；
+  运行期错误带源码行列与上下文，整数除/模零改抛语言错误 `ZERO_DIVISION_ERROR`；
+  含 `await` 的异步生成器与 `async for k, v in ...` 多标识符解构均可用。
 - 虚拟机模式支持静态类 API：`Task.Delay` / `WhenAll` / `WhenAny` / `FromResult` / `FromException` /
   `Run` / `StartNew`，`Thread.Sleep`，以及 `Assert` 的 24 个断言方法。
 - 虚拟机模式下断言失败改抛 `AssertionError`（语言层 `try/catch` **可以**捕获；

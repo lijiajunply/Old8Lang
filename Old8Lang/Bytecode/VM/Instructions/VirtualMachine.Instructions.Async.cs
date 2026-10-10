@@ -55,7 +55,7 @@ public partial class VirtualMachine
                 {
                     var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
-                    return ConvertToLangValue(result);
+                    return asyncVm.ConvertResultToLangValue(result);
                 });
 
                 _stack.Push(new TaskLangValue(task));
@@ -156,7 +156,7 @@ public partial class VirtualMachine
                 {
                     var asyncVm = CreateWorkerVirtualMachine();
                     var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
-                    return ConvertToLangValue(result);
+                    return asyncVm.ConvertResultToLangValue(result);
                 });
 
                 // 将 Task 包装并压入栈
@@ -172,18 +172,18 @@ public partial class VirtualMachine
                 {
                     // 阻塞等待任务完成
                     var result = taskValue.Await();
-                    _stack.Push(result);
+                    _stack.Push(UnwrapToVmValue(result));
                 }
                 else if (value is VMThreadLangValue vmThreadValue)
                 {
                     // 等待虚拟机线程完成
                     var result = vmThreadValue.Join();
-                    _stack.Push(result);
+                    _stack.Push(UnwrapToVmValue(result));
                 }
                 else if (value is Task task)
                 {
                     task.GetAwaiter().GetResult();
-                    _stack.Push(task is Task<object?> objectTask ? objectTask.Result : null);
+                    _stack.Push(UnwrapToVmValue(task is Task<object?> objectTask ? objectTask.Result : null));
                 }
                 else
                 {
@@ -307,7 +307,7 @@ public partial class VirtualMachine
                             stackCopy
                         );
 
-                        generatorState.CurrentValue = ConvertToLangValue(yieldValue);
+                        generatorState.CurrentValue = ConvertResultToLangValue(yieldValue);
 
                         // 将值压回栈顶
                         _stack.Push(yieldValue);
@@ -338,7 +338,7 @@ public partial class VirtualMachine
                         );
 
                         // 4. 设置当前yield的值
-                        generatorState.CurrentValue = ConvertToLangValue(yieldValue);
+                        generatorState.CurrentValue = ConvertResultToLangValue(yieldValue);
 
                         // 5. 将yield的值压回栈顶（作为MoveNext的返回值）
                         _stack.Push(yieldValue);

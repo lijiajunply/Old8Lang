@@ -21,6 +21,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitIntLangValue(IntLangValue node)
     {
+        MarkPosition(node);
         int constIndex = _compiler.ConstantPool.AddConstant(node.Value);
         Emit(OpCode.LoadConst, constIndex);
         return null;
@@ -28,6 +29,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitDoubleLangValue(DoubleLangValue node)
     {
+        MarkPosition(node);
         int constIndex = _compiler.ConstantPool.AddConstant(node.Value);
         Emit(OpCode.LoadConst, constIndex);
         return null;
@@ -35,6 +37,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitStringLangValue(StringLangValue node)
     {
+        MarkPosition(node);
         int constIndex = _compiler.ConstantPool.AddConstant(node.Value);
         Emit(OpCode.LoadConst, constIndex);
         return null;
@@ -42,12 +45,14 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitBoolLangValue(BoolLangValue node)
     {
+        MarkPosition(node);
         Emit(node.Value ? OpCode.LoadTrue : OpCode.LoadFalse);
         return null;
     }
 
     public Instruction? VisitCharLangValue(CharLangValue node)
     {
+        MarkPosition(node);
         int constIndex = _compiler.ConstantPool.AddConstant(node.Value);
         Emit(OpCode.LoadConst, constIndex);
         return null;
@@ -55,12 +60,14 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitNullLangValue(NullLangValue node)
     {
+        MarkPosition(node);
         Emit(OpCode.LoadNull);
         return null;
     }
 
     public Instruction? VisitVoidLangValue(VoidLangValue node)
     {
+        MarkPosition(node);
         Emit(OpCode.LoadNull); // Void表示为null
         return null;
     }
@@ -69,6 +76,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitArrayLangValue(ArrayLangValue node)
     {
+        MarkPosition(node);
         // 为每个元素生成代码
         foreach (var value in node.Values)
         {
@@ -82,6 +90,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitListLangValue(ListLangValue node)
     {
+        MarkPosition(node);
         // 为每个元素生成代码
         foreach (var expr in node.Value)
         {
@@ -95,6 +104,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitDictionaryLangValue(DictionaryLangValue node)
     {
+        MarkPosition(node);
         // 生成所有键值对的代码
         foreach (var tuple in node.Tuples)
         {
@@ -109,6 +119,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitTupleLangValue(TupleLangValue node)
     {
+        MarkPosition(node);
         // 生成所有元素的代码
         foreach (var element in node.Elements)
         {
@@ -147,6 +158,7 @@ public partial class BytecodeVisitor
         throw new VmUnsupportedError(node, "生成器值");
     public Instruction? VisitInstance(Instance node)
     {
+        MarkPosition(node);
         // Instance 是函数调用表达式 a(b, c)
         string funcName = node.Id.IdName;
         int positionalCount = node.Ids.Count;
@@ -398,6 +410,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitLangListItem(LangListItem node)
     {
+        MarkPosition(node);
         // 访问列表/数组/字典变量
         node.ListId.Accept(this);
 
@@ -429,6 +442,7 @@ public partial class BytecodeVisitor
     /// </remarks>
     public Instruction? VisitListComprehension(ListComprehension node)
     {
+        MarkPosition(node);
         // 结果列表局部变量
         int resultLocalIndex = _compiler.AllocateLocal($"<comprehension_result_{GetCurrentPosition()}>");
 
@@ -533,6 +547,7 @@ public partial class BytecodeVisitor
     public Instruction? VisitMethodOverloadList(MethodOverloadList node) => null;
     public Instruction? VisitNestedIndexAccess(NestedIndexAccess node)
     {
+        MarkPosition(node);
         // 访问基础表达式 (例如 array[index1] 或更深的嵌套)
         node.BaseExpression.Accept(this);
 
@@ -546,6 +561,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitNestedSliceAccess(NestedSliceAccess node)
     {
+        MarkPosition(node);
         // 访问基础表达式
         node.BaseExpression.Accept(this);
 
@@ -583,6 +599,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitRangeLangValue(RangeLangValue node)
     {
+        MarkPosition(node);
         // 注意：LoadConst 的操作数是**常量池下标**，不是字面值。
         // 这里曾经直接写 Emit(LoadConst, 0/1)，等于假定常量池槽 0 放着 0、槽 1 放着 1。
         // 只要此前有别的常量占用了这两个槽（典型：extern 块先放入库名与函数名，
@@ -624,6 +641,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitSliceLangValue(SliceLangValue node)
     {
+        MarkPosition(node);
         // 访问集合变量
         node.Id.Accept(this);
 
@@ -670,6 +688,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitStringTemplateValue(StringTemplateValue node)
     {
+        MarkPosition(node);
         // 字符串模板: $"Hello {name}, you are {age} years old"
         // 策略: 将所有表达式结果压入栈，创建数组，然后调用string.Concat
 
@@ -699,6 +718,7 @@ public partial class BytecodeVisitor
     }
     public Instruction? VisitSuperExpression(SuperExpression node)
     {
+        MarkPosition(node);
         // 加载 super 引用（实际上是加载当前实例 this）
         // LoadSuper 指令会将当前实例压栈，并标记为 super 上下文
         Emit(OpCode.LoadSuper);
@@ -707,6 +727,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitThisExpression(ThisExpression node)
     {
+        MarkPosition(node);
         // 加载 this 引用
         // LoadThis 指令会将当前实例压栈
         Emit(OpCode.LoadThis);
@@ -768,6 +789,7 @@ public partial class BytecodeVisitor
         throw new VmUnsupportedError(node, "Mock API");
     public Instruction? VisitEnumLangValue(EnumLangValue node)
     {
+        MarkPosition(node);
         // 枚举值在字节码模式下加载其整数值
         Emit(OpCode.LoadConst, node.Value);
         return null;
@@ -799,6 +821,7 @@ public partial class BytecodeVisitor
     /// </summary>
     public Instruction? VisitFuncLangValue(FuncLangValue node)
     {
+        MarkPosition(node);
         // 1. 生成唯一的 Lambda 名称
         string lambdaName = $"<lambda_{Guid.NewGuid():N}>";
 

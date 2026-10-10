@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
+        MarkPosition(node);
         // 泛型实例化的字节码生成
         // 策略：在编译时进行泛型特化，生成具体类型的类或函数
 

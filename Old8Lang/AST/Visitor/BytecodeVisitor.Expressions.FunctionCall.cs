@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitFunctionCallExpression(FunctionCallExpression node)
     {
+        MarkPosition(node);
         int positionalCount = node.Arguments.Count;
         int namedCount = node.NamedArguments?.Count ?? 0;
 

@@ -202,6 +202,44 @@ public partial class TypeLangValue : LangValueType
     // ==================== 类型属性 ====================
 
     /// <summary>
+    /// 语言内建类型：规范化名字 → 可接受的写法（语言关键字与 <see cref="LangValueType.TypeToString"/> 的写法）
+    /// </summary>
+    /// <remarks>
+    /// <c>GetType</c> 原先只认用户类（走 <c>TypeTemplate</c> 注册表），
+    /// 于是 <c>GetType("int")</c> 报「找不到类型: int」，解释器与虚拟机还不一致。
+    /// 这张表让内建类型也能取到类型值，<c>IsPrimitive()</c> 才有意义。
+    /// </remarks>
+    private static readonly Dictionary<string, string> BuiltinTypeNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["int"] = "Int",
+        ["integer"] = "Int",
+        ["double"] = "Double",
+        ["float"] = "Double",
+        ["bool"] = "Bool",
+        ["boolean"] = "Bool",
+        ["char"] = "Char",
+        ["string"] = "String",
+        ["null"] = "Null",
+        ["array"] = "Array",
+        ["list"] = "List",
+        ["dict"] = "Dictionary",
+        ["dictionary"] = "Dictionary",
+        ["tuple"] = "Tuple"
+    };
+
+    /// <summary>
+    /// 把内建类型名解析成规范名（大小写不敏感，同时接受语言关键字写法）
+    /// </summary>
+    /// <param name="name">用户书写的类型名，如 <c>int</c> / <c>Int</c> / <c>dict</c></param>
+    /// <param name="canonicalName">规范化后的类型名，如 <c>Int</c> / <c>Dictionary</c></param>
+    /// <returns>是内建类型时返回 true</returns>
+    public static bool TryResolveBuiltinTypeName(string? name, out string canonicalName)
+    {
+        canonicalName = "";
+        return name is not null && BuiltinTypeNames.TryGetValue(name, out canonicalName!);
+    }
+
+    /// <summary>
     /// 是否为类类型
     /// </summary>
     public bool IsClass(VariateManager manager)
@@ -220,18 +258,21 @@ public partial class TypeLangValue : LangValueType
     }
 
     /// <summary>
+    /// 是否为基本类型名
+    /// </summary>
+    /// <remarks>
+    /// 集合类型名（<c>Array</c> / <c>List</c> / <c>Dictionary</c> / <c>Tuple</c>）不算基本类型。
+    /// <c>Float</c> 是历史遗留写法，等价于 <c>Double</c>。
+    /// </remarks>
+    public static bool IsPrimitiveTypeName(string? typeName)
+    {
+        return typeName is "Int" or "Double" or "Float" or "String" or "Bool" or "Char" or "Null";
+    }
+
+    /// <summary>
     /// 是否为基本类型
     /// </summary>
-    public bool IsPrimitive()
-    {
-        if (Value is null) return false;
-
-        return Value switch
-        {
-            "Int" or "Float" or "String" or "Bool" or "Null" => true,
-            _ => false
-        };
-    }
+    public bool IsPrimitive() => IsPrimitiveTypeName(Value);
 
     /// <summary>
     /// 是否为泛型类型
@@ -244,6 +285,24 @@ public partial class TypeLangValue : LangValueType
 
     public override string ToString() => Value ?? "";
     public override object GetValue() => Value ?? "";
+
+    /// <summary>
+    /// 类型值的相等比较。
+    /// </summary>
+    /// <remarks>
+    /// 原先没有重写，默认实现恒为 <c>false</c>，于是 <c>GetType("A") == GetType("A")</c> 与
+    /// <c>typeof(e) == "ZeroDivisionError"</c> 这类写法都不成立。这里按类型名比较：
+    /// 与另一个类型值比，或与类型名字符串比。
+    /// </remarks>
+    public override bool Equal(LangValueType? otherValueType)
+    {
+        return otherValueType switch
+        {
+            TypeLangValue other => string.Equals(Value, other.Value, StringComparison.Ordinal),
+            StringLangValue otherString => string.Equals(Value, otherString.Value, StringComparison.Ordinal),
+            _ => false
+        };
+    }
 
     /// <summary>
     /// 支持属性访问（如 typeValue.Value）

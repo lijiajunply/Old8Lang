@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -223,10 +224,42 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     /// <summary>
     /// 字节码模式执行（虚拟机模式）
     /// </summary>
+    /// <remarks>
+    /// 无返回值的原生函数（<c>Sleep</c> / <c>PrintLine</c> / 并发原语等）在 C# 侧返回 <c>null</c>，
+    /// 但语言层语义是「没有值」（<see cref="VoidLangValue"/>），与 <c>null</c> 不同
+    /// （解释器在 <c>ExecuteInternal</c> 里显式返回 <see cref="VoidLangValue"/>）。
+    /// 这里按 IL 侧声明的返回类型归一化，使 <c>r &lt;- Sleep(1)</c> 之后 <c>r == null</c> 为 false，
+    /// 与解释器一致。
+    /// </remarks>
     public object? ExecuteInVM(object?[] arguments)
     {
         ValidateParameterCountForVM(arguments.Length);
-        return ExecuteInVMInternal(arguments);
+        var result = ExecuteInVMInternal(arguments);
+        return result ?? (ReturnsVoid ? VoidLangValue.Instance : null);
+    }
+
+    private bool? _returnsVoid;
+
+    /// <summary>
+    /// 该函数在语言层是否没有返回值
+    /// </summary>
+    /// <remarks>
+    /// 与 IL 侧共用同一份声明（<see cref="GetReturnTypeInternal"/> 返回 <c>typeof(void)</c>），
+    /// 避免两处清单漂移；判定失败时按「有返回值」处理。
+    /// </remarks>
+    public bool ReturnsVoid => _returnsVoid ??= DetectReturnsVoid();
+
+    private bool DetectReturnsVoid()
+    {
+        try
+        {
+            // 全局函数的返回类型声明不依赖实参与局部变量表（仅用于取 typeof(void) 标记）
+            return GetReturnTypeInternal([], null!) == typeof(void);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>

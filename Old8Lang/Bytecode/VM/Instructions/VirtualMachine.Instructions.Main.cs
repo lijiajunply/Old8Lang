@@ -75,7 +75,17 @@ public partial class VirtualMachine
             case OpCode.Mod:
             case OpCode.Pow:
             case OpCode.Neg:
-                ExecuteArithmeticOperation(instruction, frame);
+                try
+                {
+                    ExecuteArithmeticOperation(instruction, frame);
+                }
+                catch (DivideByZeroException)
+                {
+                    // 整数除/模零在 C# 侧是原生异常（无位置信息），换成语言错误并带上源码位置
+                    // （与解释器的 ZERO_DIVISION_ERROR 一致）
+                    throw new ZeroDivisionError(GetPosition(instruction));
+                }
+
                 break;
 
             // === 比较运算 ===
@@ -269,6 +279,11 @@ public partial class VirtualMachine
 
     private bool CheckTypeMatch(string typeName, object? val)
     {
+        // await 等异步路径会把结果包在 LangValueType 里（如 IntLangValue），
+        // 而类型注解校验按底层 CLR 值判断；先拆包，否则 `func f() -> int { return await g() }`
+        // 会误报「期望 int，但得到 IntLangValue」。
+        val = UnwrapValueWrapper(val);
+
         // 基础类型零分配快速判定。
         // 通用分支会对类型名调用多次 ToLower()（每次都会分配一个新字符串），而
         // 返回值校验与参数校验在热路径上每次都调用本方法，因此这里先用精确匹配短路。
@@ -281,7 +296,8 @@ public partial class VirtualMachine
             case "bool": return val is bool;
             case "char": return val is char;
             case "any": return true;
-            case "object": return val != null;
+            // object 表示「任意值」，null 也算（与解释器 TypeChecker 及本方法下面的通用分支一致）
+            case "object": return true;
             case "null": return val == null;
             case "array": return val is Array;
             case "list": return val is IList;
@@ -556,6 +572,27 @@ public partial class VirtualMachine
 
         // 不是泛型类型参数，返回原类型
         return typePattern;
+    }
+
+    /// <summary>
+    /// 把基本类型的 <see cref="Old8Lang.AST.Expression.LangValueType"/> 包装拆成底层 CLR 值。
+    /// </summary>
+    /// <remarks>
+    /// 只拆基本类型与 null：<c>VoidLangValue</c> 表示「没有值」，
+    /// 集合/类实例等包装不在此处理，保持原有判定路径。
+    /// </remarks>
+    private static object? UnwrapValueWrapper(object? val)
+    {
+        return val switch
+        {
+            Old8Lang.AST.Expression.Value.IntLangValue i => i.Value,
+            Old8Lang.AST.Expression.Value.DoubleLangValue d => d.Value,
+            Old8Lang.AST.Expression.Value.StringLangValue s => s.Value,
+            Old8Lang.AST.Expression.Value.BoolLangValue b => b.Value,
+            Old8Lang.AST.Expression.Value.CharLangValue c => c.Value,
+            Old8Lang.AST.Expression.Value.NullLangValue => null,
+            _ => val
+        };
     }
 
     /// <summary>

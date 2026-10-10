@@ -11,6 +11,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitLinqExpression(LinqExpression node)
     {
+        MarkPosition(node);
         // 检查是否有 Join 子句
         var hasJoin = node.BodyClauses.Any(c => c is JoinClause);
 

@@ -24,6 +24,15 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
     /// <summary>当前值</summary>
     public LangValueType? Current { get; private set; }
 
+    /// <summary>
+    /// 当前 yield 值在虚拟机栈上的原生表示。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Current"/> 是给语言层看的包装视图；for-in 迭代要消费原生表示，
+    /// 否则 <c>yield {1, 2}</c> 之后循环体拿到的是包装类型而不是列表。
+    /// </remarks>
+    private object? _currentRaw;
+
     /// <summary>生成器是否已完成</summary>
     public bool IsCompleted { get; private set; } = false;
 
@@ -42,12 +51,14 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
         if (result != null)
         {
             Current = result;
+            _currentRaw = VirtualMachine.UnwrapToVmValue(result);
             return true;
         }
         else
         {
             IsCompleted = true;
             Current = null;
+            _currentRaw = null;
             return false;
         }
     }
@@ -79,7 +90,17 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
         }
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    /// <summary>
+    /// 非泛型枚举器：虚拟机 for-in 走这一支，产出栈上的原生表示
+    /// （泛型枚举器保留给需要 <see cref="LangValueType"/> 的语言层消费者）。
+    /// </summary>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        while (MoveNext())
+        {
+            yield return _currentRaw;
+        }
+    }
 
     // 不支持的操作
     public override LangValueType Plus(LangValueType otherLangValueType)

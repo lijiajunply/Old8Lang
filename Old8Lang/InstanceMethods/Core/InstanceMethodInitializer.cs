@@ -280,6 +280,18 @@ public static class InstanceMethodInitializer
             registry.Register(new Implementations.Task.TaskFinallyMethod());
             registry.Register(new Implementations.Task.TaskContinueWithMethod());
 
+            // 注册 TaskCompletionSource / CancellationTokenSource 的 VM 实现
+            // （解释器走各自 LangValueType.Dot，虚拟机没有 VariateManager，见 CompletionSourceVmMethods.cs）
+            registry.Register(new Implementations.Task.TaskCompletionSourceSetResultMethod());
+            registry.Register(new Implementations.Task.TaskCompletionSourceSetExceptionMethod());
+            registry.Register(new Implementations.Task.TaskCompletionSourceSetCanceledMethod());
+            registry.Register(new Implementations.Task.TaskCompletionSourceTrySetResultMethod());
+            registry.Register(new Implementations.Task.TaskCompletionSourceTrySetExceptionMethod());
+            registry.Register(new Implementations.Task.TaskCompletionSourceTrySetCanceledMethod());
+            registry.Register(new Implementations.Task.CancellationTokenSourceCancelMethod());
+            registry.Register(new Implementations.Task.CancellationTokenSourceCancelAfterMethod());
+            registry.Register(new Implementations.Task.CancellationTokenSourceDisposeMethod());
+
             // Task 方法迁移完成！共 5 个方法
             // 注意：Retry 方法在 Operation.cs 中有特殊处理，不需要注册为实例方法
 

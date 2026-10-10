@@ -50,47 +50,9 @@ public class TupleToStrMethod : LangListToStrMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // 对于 Tuple<object?, object?> 类型，格式化为 (item1, item2)
-        if (instance?.GetType().IsGenericType == true &&
-            instance.GetType().GetGenericTypeDefinition() == typeof(Tuple<,>))
-        {
-            var item1 = instance.GetType().GetProperty("Item1")?.GetValue(instance);
-            var item2 = instance.GetType().GetProperty("Item2")?.GetValue(instance);
-            var item1Str = FormatValueForDisplay(item1);
-            var item2Str = FormatValueForDisplay(item2);
-            return $"({item1Str}, {item2Str})";
-        }
-
-        // 使用基类的辅助方法获取元素列表（支持 object[], List<object?>, ILangList）
-        var items = GetItemsForVM(instance);
-        var strings = items.Select(item => FormatValueForDisplay(item));
-        return "(" + string.Join(", ", strings) + ")";
-    }
-
-    /// <summary>
-    /// 格式化值用于显示
-    /// </summary>
-    private static string FormatValueForDisplay(object? value)
-    {
-        if (value == null)
-        {
-            return "null";
-        }
-
-        // 字符串需要加引号
-        if (value is string str)
-        {
-            return $"\"{str}\"";
-        }
-
-        // bool 使用小写
-        if (value is bool b)
-        {
-            return b ? "true" : "false";
-        }
-
-        // 其他类型使用 ToString
-        return value.ToString() ?? "null";
+        // 虚拟机元组是嵌套的 Tuple<object?, object?>，交给共用格式化器展平并递归格式化，
+        // 与 PrintLine / ToStr 的解释器口径一致。
+        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(instance);
     }
 }
 

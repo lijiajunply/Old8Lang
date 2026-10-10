@@ -78,8 +78,8 @@ public sealed class HasMemberFunction : BaseGlobalFunction
                 var classMetadata = VMReflectionHelper.GetClassMetadataFromInstance(vm, instance);
                 if (classMetadata != null)
                 {
-                    bool hasMethod = VMReflectionHelper.HasMethod(classMetadata, memberName);
-                    bool hasField = VMReflectionHelper.HasField(classMetadata, memberName);
+                    bool hasMethod = VMReflectionHelper.HasMethod(vm, classMetadata, memberName);
+                    bool hasField = VMReflectionHelper.HasField(vm, classMetadata, memberName);
                     return hasMethod || hasField;
                 }
             }

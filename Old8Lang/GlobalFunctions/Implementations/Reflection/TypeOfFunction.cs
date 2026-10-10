@@ -31,9 +31,11 @@ public sealed class TypeOfFunction : BaseGlobalFunction
         var results = EvaluateParameters(parameters, manager);
         var obj = results[0];
 
+        // 非类实例（基本类型、集合、元组……）也支持：取值的类型名，
+        // 与 GetType 的内建类型名（Int / Double / List / Dictionary / Tuple…）保持一致。
         if (obj is not AnyLangValue anyValue)
         {
-            throw new InvalidOperationError(position, "对象不是类实例");
+            return new TypeLangValue(obj.TypeToString());
         }
 
         var className = anyValue.ClassId.IdName;
@@ -75,6 +77,7 @@ public sealed class TypeOfFunction : BaseGlobalFunction
             return new TypeLangValue(instance.ClassName);
         }
 
-        throw new InvalidOperationException("对象不是类实例");
+        // 与解释器一致：非类实例返回值的类型名（Int / Double / String / List / Dictionary / Tuple…）
+        return new TypeLangValue(VMReflectionHelper.DescribeValueType(obj));
     }
 }

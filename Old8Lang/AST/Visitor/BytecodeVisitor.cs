@@ -21,6 +21,16 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
     private readonly List<DeferBlock> _deferBlocks = [];
 
     /// <summary>
+    /// 当前正在编译的 AST 节点位置。
+    /// </summary>
+    /// <remarks>
+    /// 每个 <c>Visit*</c> 方法入口都会调用 <see cref="MarkPosition"/> 刷新它，
+    /// <see cref="Emit(OpCode, object?)"/> 再把它写进指令的调试信息。
+    /// 虚拟机运行期报错依赖这些字段给出源码位置（此前从未写入，位置恒为 <c>0:0</c>）。
+    /// </remarks>
+    private SourcePosition _currentPosition;
+
+    /// <summary>
     /// 循环标签 - 存储 break 和 continue 的跳转位置
     /// </summary>
     private class LoopLabels
@@ -52,11 +62,27 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
     public int MaxStackSize => _maxStackSize;
 
     /// <summary>
-    /// 添加指令
+    /// 记录当前编译到的源码位置（在 <c>Visit*</c> 入口调用）
+    /// </summary>
+    protected void MarkPosition(IOldLangTree node)
+    {
+        if (node is null) return;
+
+        var position = node.Position;
+        // 未知位置（解析器未填）不覆盖已知位置，避免把外层语句的位置冲掉
+        if (position.Line > 0 || position.Column > 0)
+        {
+            _currentPosition = position;
+        }
+    }
+
+    /// <summary>
+    /// 添加指令（带当前源码位置）
     /// </summary>
     protected void Emit(OpCode opCode, object? operand = null)
     {
-        _instructions.Add(new Instruction(opCode, operand));
+        _instructions.Add(new Instruction(opCode, operand)
+            .WithDebugInfo(_currentPosition.FileName, _currentPosition.Line, _currentPosition.Column));
         UpdateStackSize(opCode);
     }
 
@@ -147,14 +173,12 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
     }
 
     /// <summary>
-    /// 在指定位置插入跳转指令
+    /// 在指定位置插入跳转指令（保留原有调试信息）
     /// </summary>
     protected void PatchJump(int instructionIndex, int targetPosition)
     {
-        _instructions[instructionIndex] = new Instruction(
-            _instructions[instructionIndex].OpCode,
-            targetPosition
-        );
+        var instruction = _instructions[instructionIndex];
+        instruction.Operand = targetPosition;
     }
 
     /// <summary>

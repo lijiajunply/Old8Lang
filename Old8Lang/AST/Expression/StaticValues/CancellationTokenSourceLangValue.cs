@@ -21,6 +21,15 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     public CancellationTokenLangValue Token => new(_cts.Token, Position);
 
     /// <summary>
+    /// 是否已请求取消。
+    /// </summary>
+    /// <remarks>
+    /// 解释器的 <c>Dot</c> 会现算这个值；同时暴露成 .NET 属性，虚拟机模式的属性访问
+    /// （走反射，不查实例方法注册表）才能读到它。
+    /// </remarks>
+    public bool IsCancellationRequested => _cts.IsCancellationRequested;
+
+    /// <summary>
     /// 构造函数（无参）
     /// </summary>
     public CancellationTokenSourceLangValue(SourcePosition position = default)

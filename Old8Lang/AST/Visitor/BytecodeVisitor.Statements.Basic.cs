@@ -14,6 +14,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitExtensionDeclaration(ExtensionDeclaration node)
     {
+        MarkPosition(node);
         // 在字节码模式下，扩展方法在编译阶段已经被处理
         // 在 BytecodeCompiler.PreprocessExtensionDefinitions 中
         // 扩展方法被编译为普通函数并添加到 BytecodeFile.Extensions 列表
@@ -25,6 +26,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitBlockStatement(BlockStatement node)
     {
+        MarkPosition(node);
         // 先处理导入语句（函数定义、类定义等）
         foreach (var statement in node.ImportStatements)
         {
@@ -62,6 +64,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitSetStatement(SetStatement node)
     {
+        MarkPosition(node);
         // 检查是普通变量赋值还是索引/成员访问赋值
         if (node.Id != null)
         {

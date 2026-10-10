@@ -56,9 +56,11 @@ public class TypeIsClassMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName)
+        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        if (string.IsNullOrEmpty(typeName))
         {
-            throw new ArgumentException("VM 模式下 TypeLangValue 应该是字符串类型");
+            throw new InvalidOperationException(
+                $"IsClass 需要类型值，实际得到 {(instance is null ? "null" : instance.GetType().Name)}");
         }
 
         var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;

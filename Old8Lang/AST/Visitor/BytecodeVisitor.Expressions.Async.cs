@@ -11,6 +11,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitAwaitExpression(AwaitExpression node)
     {
+        MarkPosition(node);
         // 生成被 await 的表达式代码（应该返回 Task ID）
         node.Expression.Accept(this);
 
@@ -23,6 +24,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncStreamExpression(AsyncStreamExpression node)
     {
+        MarkPosition(node);
         // 异步流表达式: async { block }
         // 创建一个匿名异步生成器函数来包装块
 

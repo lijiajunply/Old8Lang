@@ -108,7 +108,7 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
         }
 
         // 查找方法
-        var method = VMReflectionHelper.FindMethod(classMetadata, methodName);
+        var method = VMReflectionHelper.FindMethod(vm, classMetadata, methodName);
         if (method == null)
         {
             throw new InvalidOperationException($"找不到方法 {methodName}");

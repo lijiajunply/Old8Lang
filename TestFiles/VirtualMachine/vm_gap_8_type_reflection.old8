@@ -1,0 +1,30 @@
+// 缺口8：VM 下 TypeLangValue 实例方法（整族）
+interface IDrawable {
+    func draw()
+}
+
+class Animal {
+    public species:string <- "unknown"
+}
+
+class Dog extends Animal implements IDrawable {
+    public breed:string <- "unknown"
+    public func bark() {}
+    public func draw() {}
+}
+
+t <- GetType("Dog")
+PrintLine("IsClass -> " + t.IsClass().ToStr())
+PrintLine("IsInterface -> " + t.IsInterface().ToStr())
+PrintLine("IsPrimitive -> " + t.IsPrimitive().ToStr())
+PrintLine("IsGeneric -> " + t.IsGeneric().ToStr())
+PrintLine("GetBaseType -> " + t.GetBaseType().ToStr())
+PrintLine("GetInterfaces -> " + t.GetInterfaces().ToStr())
+PrintLine("Assignable(Animal) -> " + t.IsAssignableFrom(GetType("Animal")).ToStr())
+PrintLine("Assignable(Dog) -> " + t.IsAssignableFrom(GetType("Dog")).ToStr())
+PrintLine("HasMethod bark -> " + t.GetMethodNames().ToStr().Contains("bark").ToStr())
+PrintLine("HasField species -> " + t.GetFieldNames().ToStr().Contains("species").ToStr())
+
+d <- Dog()
+PrintLine("TypeOf(d).IsClass -> " + TypeOf(d).IsClass().ToStr())
+PrintLine("GetType(Int).IsPrimitive -> " + GetType("Int").IsPrimitive().ToStr())

@@ -175,7 +175,15 @@ Regex.RegexIsMatch("a1", "\\d+", false)   // true
 **模式差异与当前限制**
 
 - 虚拟机下 `GetFunctionInfo(obj, methodName)`（类方法反射）暂不支持，会抛错。
-- 虚拟机下 `Type.IsGeneric()` 与 `Type.IsAssignableFrom()` 固定返回 `false`。
+- `GetType` 同时接受用户类名与内建类型名（`int` / `double` / `bool` / `char` / `string` / `null` /
+  `array` / `list` / `dict` / `tuple`，大小写不敏感），内建类型返回的类型值可参与
+  `.IsPrimitive()` 判断；`GetTypeInfo` 仍然只接受已注册的用户类。
+- `TypeOf` 接受**任意值**：类实例返回该类，其他值返回语言类型名
+  （`Int` / `Double` / `Bool` / `String` / `List` / `Dictionary` / `Tuple` / `Null`…）；
+  捕获到的错误值返回异常类名（如 `ZeroDivisionError`）。
+- 类型值可与同名的类型值或字符串比较：`GetType("A") == GetType("A")`、`typeof(e) == "ZeroDivisionError"` 均为 `true`。
+- 虚拟机下 `TypeLangValue` 的实例方法自 2026-10-10 起全部可用
+  （此前整族抛 `ArgumentException`，不是「固定返回 false」）。
 - `IsInstanceOf` 是**类名精确匹配**，不沿继承链或接口实现链判断。
 - 多数 API 在解释模式返回 `LangValue`（如 `DictionaryLangValue`），
   虚拟机模式返回原生 .NET 字典/列表；使用方需按运行模式适配。
@@ -387,7 +395,10 @@ IsLower  IsPunctuation  IsSymbol  IsUpper  IsWhiteSpace  ToInt  ToLower  ToUpper
 | `.GetMethodNames()` | 全部方法名 |
 | `.GetFieldNames()` | 全部字段名 |
 
-**模式差异**：虚拟机下 `.IsGeneric()` 与 `.IsAssignableFrom()` 目前**固定返回 `false`**（未实现完整检查）。
+**模式差异**：自 2026-10-10 起，以上 9 个方法在虚拟机下全部可用
+（`IsGeneric()` 依据虚拟机的特化类名 `Box$int` 上的类型参数映射判断；
+`GetBaseType()` / `GetInterfaces()` 返回类型值，`GetMethodNames()` / `GetFieldNames()` 会沿继承链向上收集）。
+此前虚拟机下调用任意一个都会抛 `ArgumentException: VM 模式下 TypeLangValue 应该是字符串类型`。
 
 ---
 

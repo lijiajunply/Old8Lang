@@ -54,8 +54,9 @@ public class LangListToStrMethod : BaseLangListMethod
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         // 使用基类的辅助方法获取元素列表（支持 object[], List<object?>, ILangList）
+        // 元素按显示口径格式化（字符串带引号），与解释器的 ToStr 一致
         var items = GetItemsForVM(instance);
-        var strings = items.Select(item => item?.ToString() ?? "null");
+        var strings = items.Select(Old8Lang.Runtime.VMValueFormatter.FormatValueForDisplay);
         return "[" + string.Join(", ", strings) + "]";
     }
 }

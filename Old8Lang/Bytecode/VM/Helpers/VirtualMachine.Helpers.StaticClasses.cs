@@ -86,6 +86,53 @@ public partial class VirtualMachine
     #region 复用解释器实现
 
     /// <summary>
+    /// 虚拟机专属的静态类「构造函数」形式。
+    /// </summary>
+    /// <remarks>
+    /// 解释器把 <c>CancellationTokenSource</c> / <c>TaskCompletionSource</c> 注册成可调用的全局对象
+    /// （不是普通函数），字节码模式没有这套对象；它们的实例方法又依赖 <c>VariateManager</c>，
+    /// 因此这里单独分发：构造出对应的 LangValue，实例方法走
+    /// <c>InstanceMethods/Implementations/Task/CompletionSourceVmMethods.cs</c> 的 VM 实现。
+    /// </remarks>
+    private bool TryInvokeVmConstructor(string funcName, object?[] args, out object? result)
+    {
+        result = null;
+        var position = new SourcePosition();
+
+        switch (funcName)
+        {
+            case "CancellationTokenSource":
+                if (args.Length == 0)
+                {
+                    result = new CancellationTokenSourceLangValue(position);
+                    return true;
+                }
+
+                if (args.Length == 1 && args[0] is int delayMs)
+                {
+                    result = new CancellationTokenSourceLangValue(position, delayMs);
+                    return true;
+                }
+
+                throw new ArgumentError(position,
+                    $"CancellationTokenSource 构造函数期望 0 个或 1 个整数参数（超时毫秒），但提供了 {args.Length} 个");
+
+            case "TaskCompletionSource":
+                if (args.Length != 0)
+                {
+                    throw new ArgumentError(position,
+                        $"TaskCompletionSource 构造函数期望 0 个参数，但提供了 {args.Length} 个");
+                }
+
+                result = new TaskCompletionSourceLangValue(position);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
     /// 调用静态类在 <c>VmReusableMethods</c> 里登记的、可以直接复用的实现。
     /// </summary>
     private object? InvokeReusableStaticClassMethod(string className, string canonicalMethod, object?[] args,
@@ -208,20 +255,10 @@ public partial class VirtualMachine
         var task = System.Threading.Tasks.Task.Run(() =>
         {
             var workerVm = CreateWorkerVirtualMachine();
-            return workerVm.ConvertCallableResultToLangValue(workerVm.CallCallableAndGetResult(callable, []));
+            return workerVm.ConvertResultToLangValue(workerVm.CallCallableAndGetResult(callable, []));
         });
 
         return new TaskLangValue(task, CancellationToken.None, position);
-    }
-
-    /// <summary>
-    /// 把函数返回值包装成 <see cref="TaskLangValue"/> 要求的 <see cref="LangValueType"/>。
-    /// </summary>
-    private LangValueType ConvertCallableResultToLangValue(object? value)
-    {
-        // null 用 VoidLangValue 表示“没有值”，与 OpCode.CallAsync 的既有约定一致
-        // （不能用 ConvertToLangValue：它对不认识的类型会静默返回 VoidLangValue，把结果丢掉）。
-        return value is null ? new VoidLangValue() : ToStaticClassArgument(value);
     }
 
     #endregion

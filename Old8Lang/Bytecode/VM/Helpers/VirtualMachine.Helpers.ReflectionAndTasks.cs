@@ -150,10 +150,10 @@ public partial class VirtualMachine
             }
         }
 
-        // 如果找不到方法，抛出异常
+        // 如果找不到方法，抛出异常（类型名用语言口径，避免泄露 Int32 / List`1 这类 .NET 名）
         if (method == null)
         {
-            throw new MethodNotFoundError(new SourcePosition(), methodName, obj.GetType().Name);
+            throw new MethodNotFoundError(new SourcePosition(), methodName, GetValueTypeName(obj));
         }
 
         // 准备方法调用参数

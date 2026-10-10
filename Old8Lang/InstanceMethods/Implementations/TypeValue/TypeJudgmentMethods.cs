@@ -48,7 +48,8 @@ public class TypeIsInterfaceMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName) return false;
+        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        if (string.IsNullOrEmpty(typeName)) return false;
         var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
         if (vm == null) return false;
         var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
@@ -94,12 +95,8 @@ public class TypeIsPrimitiveMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName) return false;
-        return typeName switch
-        {
-            "Int" or "Float" or "String" or "Bool" or "Null" => true,
-            _ => false
-        };
+        return Old8Lang.Runtime.VMReflectionHelper.IsPrimitiveTypeName(
+            Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance));
     }
 }
 
@@ -143,8 +140,12 @@ public class TypeIsGenericMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // VM 模式下暂不支持泛型检查
-        return false;
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null) return false;
+
+        // 虚拟机只编译泛型类的特化版本（如 Box$int），类元数据上留有类型参数映射
+        var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadataFromTypeValue(vm, instance);
+        return Old8Lang.Runtime.VMReflectionHelper.IsGenericType(classMetadata);
     }
 }
 
@@ -196,7 +197,18 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // VM 模式下暂不支持类型兼容性检查
-        return false;
+        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        if (vm == null) return false;
+
+        var targetTypeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        var sourceTypeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(
+            arguments.Length > 0 ? arguments[0] : null);
+
+        if (string.IsNullOrEmpty(targetTypeName) || string.IsNullOrEmpty(sourceTypeName))
+        {
+            return false;
+        }
+
+        return Old8Lang.Runtime.VMReflectionHelper.IsAssignableFrom(vm, targetTypeName, sourceTypeName);
     }
 }

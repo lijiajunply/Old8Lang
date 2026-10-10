@@ -10,6 +10,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitClassMemberId(ClassMemberId node)
     {
+        MarkPosition(node);
         // ClassMemberId 是带访问修饰符的成员ID
         // 在字节码层面，它和普通的 LangId 类似
         // 加载成员的值

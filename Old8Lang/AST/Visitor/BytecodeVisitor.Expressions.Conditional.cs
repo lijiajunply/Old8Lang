@@ -11,6 +11,7 @@ public partial class BytecodeVisitor
 {
     public Instruction? VisitTernaryExpression(TernaryExpression node)
     {
+        MarkPosition(node);
         // 三元运算符: condition ? trueExpr : falseExpr
         // 生成条件表达式代码
         node.Condition.Accept(this);
@@ -37,6 +38,7 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitMatchExpression(MatchExpression node)
     {
+        MarkPosition(node);
         // Match 表达式（模式匹配）
         // 实现完整的 match 支持：
         // 1. 值匹配

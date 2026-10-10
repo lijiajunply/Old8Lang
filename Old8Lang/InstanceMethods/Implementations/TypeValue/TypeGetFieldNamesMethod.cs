@@ -67,9 +67,11 @@ public class TypeGetFieldNamesMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName)
+        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        if (string.IsNullOrEmpty(typeName))
         {
-            throw new ArgumentException("VM 模式下 TypeLangValue 应该是字符串类型");
+            throw new InvalidOperationException(
+                $"GetFieldNames 需要类型值，实际得到 {(instance is null ? "null" : instance.GetType().Name)}");
         }
 
         var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
@@ -84,6 +86,6 @@ public class TypeGetFieldNamesMethod : BaseInstanceMethod
             return new List<string>();
         }
 
-        return Old8Lang.Runtime.VMReflectionHelper.GetAllFieldNames(classMetadata).Cast<object?>().ToList();
+        return Old8Lang.Runtime.VMReflectionHelper.GetAllFieldNames(vm, classMetadata).Cast<object?>().ToList();
     }
 }

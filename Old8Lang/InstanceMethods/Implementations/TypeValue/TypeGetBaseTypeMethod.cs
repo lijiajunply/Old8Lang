@@ -59,9 +59,11 @@ public class TypeGetBaseTypeMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is not string typeName)
+        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        if (string.IsNullOrEmpty(typeName))
         {
-            throw new ArgumentException("VM 模式下 TypeLangValue 应该是字符串类型");
+            throw new InvalidOperationException(
+                $"GetBaseType 需要类型值，实际得到 {(instance is null ? "null" : instance.GetType().Name)}");
         }
 
         var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
@@ -76,6 +78,7 @@ public class TypeGetBaseTypeMethod : BaseInstanceMethod
             return null;
         }
 
-        return classMetadata.BaseClassName;
+        // 与解释器一致：返回类型值而不是裸类型名
+        return new Old8Lang.AST.Expression.Value.TypeLangValue(classMetadata.BaseClassName);
     }
 }

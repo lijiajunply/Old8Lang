@@ -1,0 +1,45 @@
+// 缺口5：await 结果 + 返回类型注解
+async func gInt() -> int {
+    return 5
+}
+
+async func fInt() -> int {
+    return await gInt()
+}
+
+async func gStr() -> string {
+    return "ok"
+}
+
+async func fStr() -> string {
+    return await gStr()
+}
+
+async func gBool() -> bool {
+    return true
+}
+
+async func fBool() -> bool {
+    return await gBool()
+}
+
+async func gList() -> list {
+    return {1, 2, 3}
+}
+
+async func fList() -> list {
+    return await gList()
+}
+
+t1 <- fInt()
+PrintLine(t1.ToString())
+
+async func runAll() -> object {
+    PrintLine((await fInt()).ToStr())
+    PrintLine((await fStr()))
+    PrintLine((await fBool()).ToStr())
+    PrintLine((await fList()).ToStr())
+    return null
+}
+
+r <- runAll()

@@ -99,9 +99,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
 
     private static string ToString(object? value)
     {
-        if (value == null) return "null";
-        if (value is string s) return s;
-        if (value is LangValueType langValue) return langValue.ToDisplayString();
-        return value.ToString() ?? "";
+        // 与 ToStr() 同一套格式化：集合/字典/元组不再打印 .NET 类型名
+        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(value);
     }
 }

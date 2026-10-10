@@ -1,0 +1,19 @@
+// 缺口7b：TaskCompletionSource / CancellationTokenSource（原先 VM 未登记）
+tcs <- TaskCompletionSource()
+PrintLine(tcs)
+t <- tcs.Task
+PrintLine("TrySetResult -> " + tcs.TrySetResult(42).ToStr())
+PrintLine("again -> " + tcs.TrySetResult(43).ToStr())
+PrintLine(t)
+
+cts <- CancellationTokenSource()
+PrintLine(cts)
+PrintLine("IsCancellationRequested -> " + cts.IsCancellationRequested.ToStr())
+cts.Cancel()
+PrintLine("after cancel -> " + cts.IsCancellationRequested.ToStr())
+cts.Dispose()
+PrintLine("disposed")
+
+cts2 <- CancellationTokenSource(100)
+cts2.CancelAfter(50)
+PrintLine("cts2 -> " + cts2.IsCancellationRequested.ToStr())
