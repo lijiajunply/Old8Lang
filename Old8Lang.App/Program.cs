@@ -1,6 +1,7 @@
 using Old8Lang.App.Commands;
 using Old8Lang.App.Commands.Debug;
 using Old8Lang.App.Commands.Profiler;
+using Old8Lang.ExternProviders;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.App;
@@ -61,7 +62,14 @@ public abstract class Program
         // 交互式命令行模式
         if (args.Length == 0)
         {
-            return RunInteractiveMode();
+            try
+            {
+                return RunInteractiveMode();
+            }
+            finally
+            {
+                PythonProvider.Shutdown();
+            }
         }
 
         // 验证命令行参数
@@ -94,6 +102,10 @@ public abstract class Program
 #endif
                 Console.ResetColor();
                 return 1;
+            }
+            finally
+            {
+                PythonProvider.Shutdown();
             }
         }
 

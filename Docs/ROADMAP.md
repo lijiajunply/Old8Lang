@@ -58,23 +58,24 @@ IL 模式在一批用例上抛 `Common Language Runtime detected an invalid prog
   只取一个目标类型名，不处理类型参数与约束
 - 文档：`Old8Lang_Grammar.md` 的「泛型扩展方法」一节已标为语法草案
 
-#### Python 互操作：进程无法正常退出
+#### Python 互操作：进程无法正常退出（已修复）
 
-`extern "pymodule:..." { ... }` 声明之后，程序**逻辑与输出都正常**，
-但进程卡在**退出阶段**，不会自行结束：
+`extern "pymodule:..." { ... }` 声明之后，程序逻辑与输出都正常，
+此前进程会卡在退出阶段，现已在 CLI 收尾时释放 Python.NET 运行时并正常退出：
 
 ```bash
-$ Old8Lang.App -f py.old8
-声明完成
-# 然后就一直停在这里，不返回
+$ Old8Lang.App -f TestFiles/InterpreterTests/test_python_simple.old8
+Result: 30
+Done!
 ```
 
-**2026-10-09 实测**（30 秒超时被杀）：仅声明会挂；声明后调用也会挂，且调用结果正确
-——`sqrt(16.0)` 正常输出 `4` 之后才挂。因此问题**不在初始化、也不在调用，而在收尾**。
+**2026-10-09 修复验证**：`test_python_simple.old8` 输出 `Result: 30`、`Done!` 后以退出码 `0` 返回，
+未再出现收尾挂起。
 
 - 环境：pythonnet 3.0.5 + Python 3.13.9（pythonnet 3.0.x 官方支持到 Python 3.12）
-- 实现位置：`Old8Lang/ExternProviders/PythonProvider.cs`；csproj 已引用 `pythonnet` 3.0.5
-- 待查：是否为 `PythonEngine.Shutdown()` 死锁；换到受支持的 Python（≤ 3.12）能否复现
+- 实现位置：`Old8Lang/ExternProviders/PythonProvider.cs` 与 CLI 主流程；csproj 已引用 `pythonnet` 3.0.5
+- 兼容说明：pythonnet 3.0.5 在 .NET 10 的 `PythonEngine.Shutdown()` 会触发已移除的
+  `BinaryFormatter`；收尾逻辑捕获该兼容性异常并调用 pythonnet 的原生 Python finalizer。
 
 ### 4. 跨模式语义未对齐（已确认的分歧）
 

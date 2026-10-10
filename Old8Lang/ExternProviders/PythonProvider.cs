@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
@@ -16,6 +17,36 @@ namespace Old8Lang.ExternProviders;
 public class PythonProvider : IExternProvider
 {
     private readonly ExternType _pythonType;
+
+    /// <summary>
+    /// 关闭当前进程中的 Python 运行时。
+    /// Python.NET 初始化的是进程级运行时，必须在 CLI 结束前显式释放，否则其后台资源会阻止进程退出。
+    /// </summary>
+    public static void Shutdown()
+    {
+        if (!PythonEngine.IsInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            PythonEngine.Shutdown();
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // pythonnet 3.0.5 cannot serialize its shutdown state on .NET 10,
+            // because BinaryFormatter is removed. Invoke its native finalizer
+            // directly so the embedded interpreter does not keep the process alive.
+            var runtimeType = typeof(PythonEngine).Assembly.GetType("Python.Runtime.Runtime");
+            var finalizeProperty = runtimeType?.GetProperty(
+                "PyFinalize",
+                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var finalizeDelegate = finalizeProperty?.GetValue(null);
+            var invoke = finalizeDelegate?.GetType().GetMethod("Invoke", Type.EmptyTypes);
+            invoke?.Invoke(finalizeDelegate, null);
+        }
+    }
 
     /// <summary>
     /// 构造函数
