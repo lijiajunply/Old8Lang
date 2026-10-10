@@ -1,38 +1,40 @@
 {
-  "GeneratedAt": "2026-03-02T00:00:00Z",
-  "Note": "Static baseline representing expected post-optimization performance (Sprint A/B/C). Used as fallback when no dynamic baseline exists in reportsDir.",
+  "GeneratedAt": "2026-10-10T22:31:12+08:00",
+  "Note": "静态回退基线：reportsDir 中没有任何 VM_Quick_Performance_Report_*.json 时才会被使用。数值来自 2026-10-10 在 macOS arm64 (Apple Silicon, .NET 10.0.100) 上重跑的 VM Quick 报告的 Scenario Aggregate (Median)。注意：跨机器的绝对耗时不可比，因此 CI 不使用本文件，而是通过 OLD8LANG_VM_REPORT_BASELINE 指向按 runner 类别缓存的基线。",
+  "Machine": "macOS arm64 / .NET 10.0.100 / 10 logical cores",
+  "SourceReport": "Reports/VM_Quick_Performance_Report_20261010_223112.json",
   "Scenarios": [
     {
       "Scenario": "VMXQ_LargeFile_CompileAndExecute_10k",
-      "MeanMs": 7.2
+      "MeanMs": 1.861
     },
     {
       "Scenario": "VMXQ_LargeFile_CompileAndExecute_50k_Generated",
-      "MeanMs": 36.8
+      "MeanMs": 13.662
     },
     {
       "Scenario": "VMXQ_Edge_DeepRecursion_NearLimit",
-      "MeanMs": 0.155
+      "MeanMs": 0.041
     },
     {
       "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
-      "MeanMs": 36.0
+      "MeanMs": 10.867
     },
     {
       "Scenario": "VMXQ_Edge_HighThrowRate_TryCatch",
-      "MeanMs": 27.0
+      "MeanMs": 5.501
     },
     {
       "Scenario": "VMXQ_Edge_LargeClosureCapture_HighFreq",
-      "MeanMs": 26.5
+      "MeanMs": 15.842
     },
     {
       "Scenario": "VMXQ_Concurrency_Channel_MPMC_4Workers",
-      "MeanMs": 70.0
+      "MeanMs": 59.967
     },
     {
       "Scenario": "VMXQ_Concurrency_MutexAtomicCounter_4Workers",
-      "MeanMs": 115.0
+      "MeanMs": 195.381
     }
   ]
 }

@@ -269,6 +269,26 @@ public partial class VirtualMachine
 
     private bool CheckTypeMatch(string typeName, object? val)
     {
+        // 基础类型零分配快速判定。
+        // 通用分支会对类型名调用多次 ToLower()（每次都会分配一个新字符串），而
+        // 返回值校验与参数校验在热路径上每次都调用本方法，因此这里先用精确匹配短路。
+        // 语义与下面的通用分支完全一致（含 null 的处理差异）。
+        switch (typeName)
+        {
+            case "int": return val is int;
+            case "double": return val is double or int;
+            case "string": return val is string;
+            case "bool": return val is bool;
+            case "char": return val is char;
+            case "any": return true;
+            case "object": return val != null;
+            case "null": return val == null;
+            case "array": return val is Array;
+            case "list": return val is IList;
+            case "dict": return val is IDictionary or AST.Expression.Value.DictionaryLangValue;
+            case "tuple": return val is Tuple<object?, object?>;
+        }
+
         typeName = typeName.Trim();
 
         // 1. Intersection Types (A & B) - but only at top level, not inside generics

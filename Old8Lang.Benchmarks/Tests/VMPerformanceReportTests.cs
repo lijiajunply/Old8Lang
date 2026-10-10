@@ -196,6 +196,150 @@ public class VMPerformanceReportTests : IDisposable
         Assert.Contains("未找到 VM BenchmarkDotNet 报告 CSV", exception.Message);
     }
 
+    [Fact]
+    public void GetFailureSummary_WithRegressionFail_ReportsScenarioAndDelta()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-gate");
+        var reportsDir = Path.Combine(_tempRoot, "reports-gate");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickThresholdBaselineJson());
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickRegressionCsv());
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        var failures = VMPerformanceReport.GetFailureSummary(jsonPath);
+
+        Assert.True(VMPerformanceReport.HasFailStatus(jsonPath));
+        Assert.Contains(failures, entry => entry.StartsWith("job:", StringComparison.Ordinal));
+        Assert.Contains(failures, entry => entry.StartsWith("aggregate:", StringComparison.Ordinal));
+        Assert.Contains(failures, entry => entry.Contains("VMXQ_Edge_HighArgCount_CallHotPath", StringComparison.Ordinal));
+        Assert.Contains(failures, entry => entry.Contains("MeanΔ=", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void GetFailureSummary_WhenAllScenariosPass_ReturnsEmpty()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-gate-pass");
+        var reportsDir = Path.Combine(_tempRoot, "reports-gate-pass");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickThresholdBaselineJson());
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickPassingCsv());
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        Assert.False(VMPerformanceReport.HasFailStatus(jsonPath));
+        Assert.Empty(VMPerformanceReport.GetFailureSummary(jsonPath));
+    }
+
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithExplicitBaselineEnvironmentVariable_UsesOnlyThatFile()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-explicit-baseline");
+        var reportsDir = Path.Combine(_tempRoot, "reports-explicit-baseline");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        // 目录里存在一份会导致 FAIL 的历史报告，但显式基线指向一个缺失文件：
+        // 这种情况下必须「没有基线」（状态 N/A），不得回退到历史报告。
+        var staleBaseline = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(staleBaseline, BuildQuickThresholdBaselineJson());
+        File.SetLastWriteTimeUtc(staleBaseline, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickRegressionCsv());
+
+        var missingBaseline = Path.Combine(_tempRoot, "no-such-baseline.json");
+        var previous = Environment.GetEnvironmentVariable(VMPerformanceReport.ExplicitBaselineEnvironmentVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(
+                VMPerformanceReport.ExplicitBaselineEnvironmentVariable,
+                missingBaseline);
+
+            var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+            var json = File.ReadAllText(jsonPath);
+
+            Assert.Contains("\"BaselineJson\": null", json);
+            Assert.Contains("\"Status\": \"N/A\"", json);
+            Assert.False(VMPerformanceReport.HasFailStatus(jsonPath));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(
+                VMPerformanceReport.ExplicitBaselineEnvironmentVariable,
+                previous);
+        }
+    }
+
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithMultipleHistoricalReports_PicksNewestByFileName()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-baseline-order");
+        var reportsDir = Path.Combine(_tempRoot, "reports-baseline-order");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        // 两份历史报告 mtime 相同（模拟 git 检出后的状态），必须按文件名里的时间戳取最新那份。
+        var older = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        var newer = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260202_000000.json");
+        File.WriteAllText(older, BuildQuickThresholdBaselineJson());
+        File.WriteAllText(newer, BuildQuickMultiJobBaselineJson());
+        var sharedTimestamp = DateTime.UtcNow.AddMinutes(-5);
+        File.SetLastWriteTimeUtc(older, sharedTimestamp);
+        File.SetLastWriteTimeUtc(newer, sharedTimestamp);
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickMultiJobCsv());
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains($"\"BaselineJson\": \"{newer.Replace("\\", "\\\\")}\"", json);
+    }
+
+    private static string BuildQuickRegressionCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,4,150.000 ms,1.000 ms,2.00 MB");
+    }
+
+    private static string BuildQuickThresholdBaselineJson()
+    {
+        return """
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "MeanMs": 100.0
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildQuickPassingCsv()
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            "VMXQ_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,4,99.000 ms,1.000 ms,2.00 MB");
+    }
+
     private static string BuildSampleCsv()
     {
         return string.Join(

@@ -6,7 +6,11 @@
       这些用例断言的是墙钟耗时、GC/内存占用，或用 Sleep 同步线程，
       在与其他测试并行时会因 CPU 争抢而抖动，因此改为在单独的串行任务中运行，
       见 performance.runsettings。
+
+      Category=PerformanceSmoke 是例外：它们是 VM Quick 关键场景的「粗阈值」用例，
+      阈值放到实测值的 5~10 倍，只拦截灾难性退化（掉回慢路径、重复分配等），
+      因此与普通用例一起跑也不会抖动，放在默认档里可以先于 BenchmarkDotNet 挡住明显退化。
     -->
-    <TestCaseFilter>Category!=Performance</TestCaseFilter>
+    <TestCaseFilter>(Category!=Performance)|(Category=PerformanceSmoke)</TestCaseFilter>
   </RunConfiguration>
 </RunSettings>

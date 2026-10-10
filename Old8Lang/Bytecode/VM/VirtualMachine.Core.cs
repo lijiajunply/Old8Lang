@@ -299,6 +299,11 @@ public partial class VirtualMachine
         var function = frame.Function;
         var instructions = function.Instructions;
         var instructionCount = instructions.Count;
+        // 求值栈是 ThreadLocal 属性，逐指令访问要走一次线程本地查找。
+        // 同一次 ExecuteFrameLoop 内当前线程不会变化，因此把栈引用提到循环外，
+        // 让下面内联的极热指令零额外开销地读写栈。
+        var stack = _stack;
+        var locals = frame.Locals;
         while (frame.IP < instructionCount)
         {
             var instructionIndex = frame.IP;
@@ -307,7 +312,240 @@ public partial class VirtualMachine
 
             try
             {
-                ExecuteInstruction(instruction, frame);
+                // 极热指令内联分发：省掉 ExecuteInstruction 的一层 switch 与一次方法调用。
+                // 语义与各分派方法完全一致，未覆盖的指令仍走 ExecuteInstruction。
+                switch (instruction.OpCode)
+                {
+                    case OpCode.LoadConst:
+                        stack.Push((frame.ConstantPool ?? _bytecodeFile.ConstantPool)
+                            .GetConstant((int)instruction.Operand!));
+                        continue;
+
+                    case OpCode.LoadLocal:
+                    {
+                        var localValue = locals[(int)instruction.Operand!];
+                        stack.Push(localValue is UpValueCell cell ? cell.Value : localValue);
+                        continue;
+                    }
+
+                    case OpCode.StoreLocal:
+                    {
+                        int localIndex = (int)instruction.Operand!;
+                        var localValue = stack.Pop();
+                        if (locals[localIndex] is UpValueCell cell)
+                        {
+                            cell.Value = localValue;
+                        }
+                        else
+                        {
+                            locals[localIndex] = localValue;
+                        }
+
+                        continue;
+                    }
+
+                    case OpCode.RefreshLocalBinding:
+                    {
+                        int localIndex = (int)instruction.Operand!;
+                        if (locals[localIndex] is UpValueCell existing)
+                        {
+                            locals[localIndex] = new UpValueCell(existing.Value);
+                        }
+
+                        continue;
+                    }
+
+                    case OpCode.LoadGlobal:
+                        stack.Push(ResolveGlobalValue(frame, (string)instruction.Operand!, instruction));
+                        continue;
+
+                    case OpCode.StoreGlobal:
+                    {
+                        var varName = (string)instruction.Operand!;
+                        var globalValue = stack.Pop();
+                        if (frame.ClosureEnvironment == null ||
+                            !frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                        {
+                            _globals[varName] = globalValue;
+                        }
+
+                        continue;
+                    }
+
+                    case OpCode.LoadNull:
+                        stack.Push(null);
+                        continue;
+
+                    case OpCode.LoadTrue:
+                        stack.Push(true);
+                        continue;
+
+                    case OpCode.LoadFalse:
+                        stack.Push(false);
+                        continue;
+
+                    case OpCode.Pop:
+                        stack.Pop();
+                        continue;
+
+                    case OpCode.Dup:
+                        stack.Push(stack.Peek());
+                        continue;
+
+                    case OpCode.Add:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Add(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Sub:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Sub(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Mul:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Mul(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Mod:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Mod(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Equal:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Equals(a, b));
+                        continue;
+                    }
+
+                    case OpCode.NotEqual:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(!Equals(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Less:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Less(a, b));
+                        continue;
+                    }
+
+                    case OpCode.LessEqual:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(LessEqual(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Greater:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(Greater(a, b));
+                        continue;
+                    }
+
+                    case OpCode.GreaterEqual:
+                    {
+                        var b = stack.Pop();
+                        var a = stack.Pop();
+                        stack.Push(GreaterEqual(a, b));
+                        continue;
+                    }
+
+                    case OpCode.Jump:
+                        frame.IP = (int)instruction.Operand!;
+                        continue;
+
+                    case OpCode.JumpIfFalse:
+                    {
+                        var targetIP = (int)instruction.Operand!;
+                        if (!ToBool(stack.Pop()))
+                        {
+                            frame.IP = targetIP;
+                        }
+
+                        continue;
+                    }
+
+                    case OpCode.JumpIfTrue:
+                    {
+                        var targetIP = (int)instruction.Operand!;
+                        if (ToBool(stack.Pop()))
+                        {
+                            frame.IP = targetIP;
+                        }
+
+                        continue;
+                    }
+
+                    case OpCode.Throw:
+                    {
+                        // 与 ExecuteExceptionOperation 的 Throw 分支保持一致：
+                        // 帧内可捕获时直接跳转，否则抛 VmException 走跨帧慢路径
+                        // （由下面的 catch 交给 HandleException）。
+                        var exceptionValue = stack.Pop();
+                        if (TryHandleExceptionInline(exceptionValue, frame, function))
+                        {
+                            // 内联分发可能已经把 IP 改到 catch 块，重取局部变量数组无必要，
+                            // 但 frame.IP 的变更会自然反映到循环条件上。
+                            continue;
+                        }
+
+                        throw new VmException(exceptionValue);
+                    }
+
+                    case OpCode.Return:
+                    {
+                        // 返回值已在栈上；声明了非 void 返回类型时校验类型。
+                        if (!string.IsNullOrEmpty(function.ReturnType) && function.ReturnType != "void")
+                        {
+                            var returnValue = stack.Count > 0 ? stack.Peek() : null;
+                            if (!CheckTypeMatch(function.ReturnType, returnValue))
+                            {
+                                var actualType = GetValueTypeName(returnValue);
+                                throw new TypeError(
+                                    GetPosition(instruction),
+                                    function.ReturnType,
+                                    actualType,
+                                    $"函数 '{function.Name}' 返回值类型不匹配"
+                                );
+                            }
+                        }
+
+                        frame.LeftReturnValue = true;
+                        frame.IP = instructions.Count;
+                        continue;
+                    }
+
+                    case OpCode.ReturnVoid:
+                        frame.LeftReturnValue = false;
+                        frame.IP = instructions.Count;
+                        continue;
+
+                    default:
+                        ExecuteInstruction(instruction, frame);
+                        break;
+                }
             }
             catch (Exception ex)
             {

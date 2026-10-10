@@ -32,18 +32,23 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~Te
 [Trait("Category", "Performance")]
 ```
 
-它们被拆成两档，由 `Old8Lang.Tests/` 下的两个 runsettings 控制：
+**例外：关键场景的「粗阈值」用例**用 `Category=PerformanceSmoke`，它们同样断言耗时与分配量，
+但阈值放到实测值的 5~10 倍，只拦截灾难性退化（掉回慢路径、重复分配等），
+因此可以留在默认档里先于 BenchmarkDotNet 挡住明显退化。示例见
+`Old8Lang.Tests/VirtualMachine/Performance/VMPerformanceSmokeTests.cs`。
+
+它们被拆成三档，由 `Old8Lang.Tests/` 下的两个 runsettings 控制：
 
 | 档位 | runsettings | 过滤条件 | 如何启用 |
 |------|-------------|----------|----------|
-| 默认档 | `default.runsettings` | `Category!=Performance` | 无需额外参数，已通过 csproj 的 `RunSettingsFilePath` 自动生效 |
-| 性能档 | `performance.runsettings` | `Category=Performance` | 必须显式传 `--settings` |
+| 默认档 | `default.runsettings` | `(Category!=Performance)\|(Category=PerformanceSmoke)` | 无需额外参数，已通过 csproj 的 `RunSettingsFilePath` 自动生效 |
+| 性能档 | `performance.runsettings` | `(Category=Performance)\|(Category=PerformanceSmoke)` | 必须显式传 `--settings` |
 
 ```bash
-# 默认档：普通 dotnet test / --filter 即为这一档
+# 默认档：普通 dotnet test / --filter 即为这一档（含 PerformanceSmoke）
 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 
-# 性能档：只跑 Category=Performance 的用例
+# 性能档：跑 Category=Performance（含 PerformanceSmoke）的用例
 dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --settings Old8Lang.Tests/performance.runsettings
 
 # 性能档里再挑单个用例

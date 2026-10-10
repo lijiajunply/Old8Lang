@@ -13,6 +13,19 @@ public partial class VirtualMachine
 {
     private object? Add(object? a, object? b)
     {
+        // 热路径：整数加法优先判定，避免每次都先走运算符重载分支。
+        // 溢出时与后面的通用分支一致地升级为 long。
+        if (a is int fastIa && b is int fastIb)
+        {
+            long fastResult = (long)fastIa + (long)fastIb;
+            if (fastResult > int.MaxValue || fastResult < int.MinValue)
+            {
+                return fastResult;
+            }
+
+            return (int)fastResult;
+        }
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -68,14 +81,6 @@ public partial class VirtualMachine
         }
 
         // 原有的基本类型处理逻辑
-        if (a is int ia && b is int ib)
-        {
-            // 检查是否会溢出，如果会则使用 long
-            long result = (long)ia + (long)ib;
-            if (result > int.MaxValue || result < int.MinValue)
-                return result;
-            return (int)result;
-        }
         if (a is long la && b is long lb) return la + lb;
         if (a is int ia3 && b is long lb2) return (long)ia3 + lb2;
         if (a is long la2 && b is int ib3) return la2 + (long)ib3;
@@ -101,6 +106,9 @@ public partial class VirtualMachine
 
     private object? Sub(object? a, object? b)
     {
+        // 热路径：整数减法优先判定
+        if (a is int fastIa && b is int fastIb) return fastIa - fastIb;
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -153,6 +161,18 @@ public partial class VirtualMachine
 
     private object? Mul(object? a, object? b)
     {
+        // 热路径：整数乘法优先判定，溢出时与通用分支一致地升级为 long
+        if (a is int fastIa && b is int fastIb)
+        {
+            long fastResult = (long)fastIa * (long)fastIb;
+            if (fastResult > int.MaxValue || fastResult < int.MinValue)
+            {
+                return fastResult;
+            }
+
+            return (int)fastResult;
+        }
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {

@@ -1,5 +1,29 @@
 # VM 模式性能优化 TODO（基于 2026-03-02 Quick 报告）
 
+## 进度更新（2026-10-10，P3：VM 性能与基准门禁）
+
+详见 `Reports/2026-10-10-22-33-P3-VM性能与基准门禁.md`。
+
+- [x] 重跑 Quick 基准（macOS arm64）：`Reports/VM_Quick_Performance_Report_20261010_221552.{md,json}`（优化前）、
+  `Reports/VM_Quick_Performance_Report_20261010_223112.{md,json}`（优化后）。
+- [x] 20260425 报告里 4 个待收敛场景在本机**全部 PASS**，判定为跨机器伪回归：
+  Channel_MPMC -30.96%、MutexAtomic +1.45%、LargeFile_10k -60.27%、LargeFile_50k -58.79%。
+- [x] P1 高参数调用：同机中位数 37.877 → 10.867 ms（**-71.31%**，目标 ≥10% 达成）；
+  alloc/op 相对 20260302 基线 344.13 → 240.15 B（**-30.2%**，目标 ≥15% 达成）。
+- [x] P1 高异常率 try/catch：同机中位数 9.932 → 5.501 ms（**-44.39%**，目标 ≥15% 达成）；
+  alloc/op 252.09 → 126.11 B（**-50.0%**，目标 ≥20% 达成）。
+- [x] P1 闭包调用：同机中位数 22.979 → 15.842 ms（**-31.06%**，目标 ≥10% 达成）；
+  alloc/op 400.14 → 296.09 B（**-26.0%**，目标 ≥20% 达成）。
+- [x] 优化手段：解释循环内联极热指令 + 求值栈引用提到循环外（`_stack` 是 ThreadLocal 属性）；
+  `CheckTypeMatch` 基础类型零分配快速路径；`Add/Sub/Mul`、`Equals/Less/Greater` 整数快路径前置。
+- [x] P2 Quick 基线门禁：`--vm-report-quick` 出现 `FAIL` 时返回非零退出码（与 Nightly 一致）；
+  CI 增加显式门禁步骤 + 按 `runner.os/arch` 缓存的基线 + `OLD8LANG_VM_REPORT_BASELINE` 固定基线；
+  基线解析改为按文件名时间戳取最新（原先按 mtime，检出后 mtime 相同会导致基线漂移）。
+- [x] P2 关键场景性能单测阈值：`VMPerformanceSmokeTests` 扩展为 4 个粗阈值用例（耗时 + 分配 + 结果正确性
+  + Channel MPMC 不丢消息），新增 `Category=PerformanceSmoke` 并纳入默认测试档。
+- [x] 回归验证：VM 用例 1033/1033、性能 smoke 4/4、报告/门禁单测 11/11 通过；默认档全量与
+  `TestResults/fail-inventory.trx` 逐用例 diff，0 个基线失败消失、仅 3 个既有已知问题。
+
 ## 进度更新（2026-03-02）
 
 - [x] P0-1：修复 `ChannelSend` 在 VM 线程中的异步阻塞异常（已完成，基准不再因该异常直接 NA）。
@@ -27,7 +51,9 @@
 - [x] P1-1（补充）：位置参数调用 fast path 预计算缓存（`FunctionMetadata.TryGetPositionalFastCallTypeKinds`）+ 调度路径去重，移除每次调用重复的可用性判定循环。
 - [x] 回归验证：`Old8Lang.Tests.VirtualMachine.Functions.VM`（25/25）与 `VMLambdaExpressionTests`（15/15）通过。
 - [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_024032.{md,json}`。
-- [ ] 基准观察：`20260302_024032` 中 `VMXQ_Edge_HighThrowRate_TryCatch` 聚合状态为 `FAIL`（中位数约 `+7.52%`），需在后续排查是否为噪声还是异常路径回归。
+- [x] 基准观察：`20260302_024032` 中 `VMXQ_Edge_HighThrowRate_TryCatch` 聚合状态为 `FAIL`（中位数约 `+7.52%`）。
+  已于 2026-10-10 定案：该 `FAIL` 是跨机器/噪声造成的伪回归——本机重跑后该场景 `PASS`，
+  且优化后中位数再降 **-44.39%**（见 `Reports/2026-10-10-22-33-P3-VM性能与基准门禁.md`）。
 
 ## 结论摘要
 
@@ -68,7 +94,7 @@
 
 ## P1（高收益优化）
 
-- [ ] 优化高参数函数调用路径（减少每次调用的参数整理/查找成本）。
+- [x] 优化高参数函数调用路径（减少每次调用的参数整理/查找成本）。
   - 代码点：
     - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs`
     - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs`（`ArrangeArgumentsWithNamed`）
@@ -80,9 +106,13 @@
     - Job-EATLBP：`40.689 -> 40.049 ms`（约 **-1.57%**，`PASS`）
     - Job-LGHQEI：`45.983 -> 41.023 ms`（约 **-10.79%**，`PASS`）
     - 聚合中位数：约 **-6.18%**（`PASS`，但尚未达到 TODO 目标 `>=10%`）
-  - 验收：`VMXQ_Edge_HighArgCount_CallHotPath` 平均耗时下降 >= 10%，alloc/op 下降 >= 15%。
+  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
+    - 聚合中位数：`37.877 -> 10.867 ms`（**-71.31%**，达标）
+    - alloc/op：`344.13 -> 240.15 B/op`（相对 `20260302_024032` 基线 **-30.2%**，达标）
+    - 主要来源：解释循环内联极热指令 + 求值栈引用提到循环外 + `Add` 整数快路径 + `CheckTypeMatch` 零分配。
+  - 验收：`VMXQ_Edge_HighArgCount_CallHotPath` 平均耗时下降 >= 10%，alloc/op 下降 >= 15%。**（已达成）**
 
-- [ ] 优化高异常率 Try/Catch 路径，减少异常对象构造和包装层级。
+- [x] 优化高异常率 Try/Catch 路径，减少异常对象构造和包装层级。
   - 代码点：
     - `Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Exception.cs`
     - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs`（当前会把内部异常统一包装成 `InvalidOperationError`）
@@ -90,17 +120,26 @@
   - 建议：
     - 对受控 VM 异常路径采用轻量错误对象/错误码通路（仅在跨边界时构建重异常）。
     - 避免重复包装已是 `Old8Lang.Error.*` 的异常。
-  - 验收：`VMXQ_Edge_HighThrowRate_TryCatch` 平均耗时下降 >= 15%，alloc/op 下降 >= 20%。
+  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
+    - 聚合中位数：`9.932 -> 5.501 ms`（**-44.39%**）
+    - alloc/op：`252.09 -> 126.11 B/op`（相对 `20260302_024032` 基线 **-50.0%**）
+    - 主要来源：`Throw` 指令在解释循环内联（配合既有的 `TryHandleExceptionInline` 快路径）、
+      `Mod/Equal` 等比较指令内联与整数快路径。
+  - 验收：`VMXQ_Edge_HighThrowRate_TryCatch` 平均耗时下降 >= 15%，alloc/op 下降 >= 20%。**（已达成）**
 
-- [ ] 优化闭包调用路径，降低捕获环境访问和对象分配。
+- [x] 优化闭包调用路径，降低捕获环境访问和对象分配。
   - 代码点：
     - `Old8Lang/Bytecode/VM/VirtualMachine.Core.cs`（`CallClosureFunction`）
     - `Old8Lang/Bytecode/Closures/ClosureValue.cs`
   - 建议：
     - 闭包捕获变量按索引化存储（数组或紧凑结构）替代 `Dictionary<string, object?>` 热路径访问。
     - 对高频闭包函数增加“无变更捕获环境复用”策略。
-  - 当前进展（`20260302_021345`）：alloc/op 维持在 `19,535.88 KB/op`（相对 `20260302_012717` 下降约 **23.1%**，达标）；耗时为 `30.802 ms / 30.708 ms`（EATLBP/LGHQEI），较 `20260302_013755` 仅小幅改善，仍未达到下降 >=10% 的目标。
-  - 验收：`VMXQ_Edge_LargeClosureCapture_HighFreq` alloc/op 下降 >= 20%，耗时下降 >= 10%。
+  - 中间进展（`20260302_021345`）：alloc/op 维持在 `19,535.88 KB/op`（相对 `20260302_012717` 下降约 **23.1%**，达标）；耗时为 `30.802 ms / 30.708 ms`（EATLBP/LGHQEI），较 `20260302_013755` 仅小幅改善，仍未达到下降 >=10% 的目标。
+  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
+    - 聚合中位数：`22.979 -> 15.842 ms`（**-31.06%**，达标）
+    - alloc/op：`400.14 -> 296.09 B/op`（相对 `20260302_024032` 基线 **-26.0%**，达标）
+    - 主要来源：`CallDynamic` 闭包体内的 `LoadGlobal`/`Add`/`LoadLocal` 全部改为解释循环内联。
+  - 验收：`VMXQ_Edge_LargeClosureCapture_HighFreq` alloc/op 下降 >= 20%，耗时下降 >= 10%。**（已达成）**
 
 - [x] 并发互斥计数路径减少资源管理层字典查找频率（已完成）。
   - 代码点：
@@ -127,16 +166,42 @@
     - JSON 增加 `Job` 维度，避免后续分析丢信息。
   - 验收：报告中同一场景不再“看起来重复”，而是结构化展示差异。
 
-- [ ] 建立 Quick 基线文件并启用回归门禁。
+- [x] 建立 Quick 基线文件并启用回归门禁。
   - 代码点：`Reports/Baselines/` + `VMPerformanceReport.cs` 基线加载逻辑
   - 问题：当前 `BaselineJson: N/A`，`Status` 全是 `N/A`，无法自动回归判定。
   - 验收：下一次 Quick 报告出现 `PASS/WARN/FAIL`，并在 CI 中可阻断 `FAIL`。
+  - 完成情况（2026-10-10）：
+    - 报告已能算出 `PASS/WARN/FAIL`（`Reports/VM_Quick_Performance_Report_20261010_223112.md`）。
+    - `VMPerformanceReport.GetFailureSummary` 汇总 per-job 与聚合两个视图的 `FAIL`；
+      `--vm-report-quick` / `--vm-report-nightly` 出现 `FAIL` 时返回非零退出码。
+    - `OLD8LANG_VM_REPORT_BASELINE` 可把基线固定到指定文件（CI 用按 runner 缓存的基线，
+      避免跨机器比较）；基线解析改为按文件名时间戳取最新，消除 mtime 相同导致的基线漂移。
+    - `.github/workflows/ci-cd.yml` 的 `performance-benchmarks` 增加显式门禁步骤，
+      通过时才推进基线缓存，产物改为 `if: always()` 上传。
+    - `Reports/Baselines/vm_quick_baseline.json` 按本机 run2 实测值刷新（原值是过期的“预期值”，
+      在本机会直接算出 +70% 的伪 FAIL）。
 
-- [ ] 为关键场景添加性能单测阈值（非 BDN，快速 smoke）。
+- [x] 为关键场景添加性能单测阈值（非 BDN，快速 smoke）。
   - 建议测试：
     - Channel MPMC 基本可运行（不抛异常）
     - HighArgCount/HighThrowRate/LargeClosure 三场景的最大耗时与分配上限
   - 目标：在常规 `dotnet test` 阶段先挡住明显退化，再由 BenchmarkDotNet 做精确评估。
+  - 完成情况（2026-10-10）：`Old8Lang.Tests/VirtualMachine/Performance/VMPerformanceSmokeTests.cs`
+    四个用例（三场景耗时 + 分配上限 + 结果正确性，外加 Channel MPMC 4 生产者/4 消费者 100k 条不丢消息），
+    新增 `Category=PerformanceSmoke` 并纳入 `default.runsettings`，随常规 `dotnet test` 一起跑。
+
+## 后续项（2026-10-10 P3 期间发现，**非本任务范围**，按 AGENTS.md 规则记录而不顺手改）
+
+- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>`/`CallFrame.Locals` 里的整数每次运算都要重新装箱，
+  这是 `VMXQ_Edge_*` 三个场景 alloc/op 的主要来源（如 HighArgCount 240 B/op ≈ 10 个箱/迭代）。
+  本轮相对 2026-03-02 基线已达标，但相对「上一次报告」持平；若要再降一个数量级，
+  需要引入带类型的值表示（`struct` 标记联合 + 类型化栈），属跨模块改造。
+- [ ] **`_globals` 用 `ConcurrentDictionary<string, object?>`**：顶层脚本变量（`sum`/`i` 这类）读写都走它，
+  实测 1M 次全局自增比函数内局部变量慢约 60%（`GlobalInc_1M` 109ms vs `LocalInc_1M` 68ms），
+  在高参数/高抛异常场景里是除指令分发外最大的单项开销。可选方向：给每个全局名一个可变槽位（`GlobalSlot`），
+  在 `Instruction` 上缓存已解析的槽位引用，把「按名字哈希查找」降为「一次字段读取」。
+- [ ] **门禁对同机器噪声的敏感度**：基线取「上一次报告」，同机连跑的并发场景中位数波动可达 12% 量级。
+  CI 已用「按 runner 类别缓存基线」消除跨机器误差；若后续仍频繁误报，可考虑只在硬失败（`NA`/执行异常）时阻断。
 
 ## 建议执行顺序
 

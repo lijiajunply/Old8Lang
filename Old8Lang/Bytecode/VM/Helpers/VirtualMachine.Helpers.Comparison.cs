@@ -17,6 +17,9 @@ public partial class VirtualMachine
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
 
+        // 热路径：整数相等优先判定，避免每次都先走运算符重载分支
+        if (a is int fastIa && b is int fastIb) return fastIa == fastIb;
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -58,6 +61,9 @@ public partial class VirtualMachine
 
     private bool Greater(object? a, object? b)
     {
+        // 热路径：整数比较优先判定
+        if (a is int fastIa && b is int fastIb) return fastIa > fastIb;
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -91,6 +97,9 @@ public partial class VirtualMachine
 
     private bool Less(object? a, object? b)
     {
+        // 热路径：整数比较优先判定
+        if (a is int fastIa && b is int fastIb) return fastIa < fastIb;
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {

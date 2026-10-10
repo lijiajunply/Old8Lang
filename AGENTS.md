@@ -40,6 +40,8 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 3. **写 `.old8` 的约定**：注释用 `//` 而不是 `#`；用 `PrintLine` 打印结果；期望失败的用例在**文件最后一行**写 `error`。
 4. **每次测试结束都要生成测试报告**，放到 `Reports/`，文件名用 `日期-小时-分钟-测试类型.md`。
 5. **性能/并发用例**必须标 `[Trait("Category", "Performance")]`，它们只在 `performance.runsettings` 档下运行。
+   例外：关键场景的「粗阈值」用例（阈值放到实测值 5~10 倍）标 `[Trait("Category", "PerformanceSmoke")]`，
+   它们会随默认档一起跑。详见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md#11-性能并发用例分档)。
 6. **测试中发现与本任务无关的错误**，不要顺手改，记录到 `Todo.md`；不再使用的测试文件及时删除。
 
 以上规则的完整说明见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md)。

@@ -112,11 +112,12 @@ internal static class BenchmarkProgram
             return 0;
         }
 
-        GenerateVmReport(
+        var (_, quickJsonPath) = GenerateVmReport(
             "从 BenchmarkDotNet artifacts 生成 VM Quick 性能报告...\n",
             VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts,
             "VM Quick");
-        return 0;
+
+        return EvaluateRegressionGate(quickJsonPath, "VM Quick");
     }
 
     private static int RunNightlyVmBenchmarksAndOptionalReport(bool generateReport)
@@ -134,12 +135,28 @@ internal static class BenchmarkProgram
             VMPerformanceReport.GenerateNightlyFromBenchmarkArtifacts,
             "VM Nightly");
 
-        if (!VMPerformanceReport.HasFailStatus(nightlyJsonPath))
+        return EvaluateRegressionGate(nightlyJsonPath, "VM Nightly");
+    }
+
+    /// <summary>
+    /// 基准回归门禁：报告中出现 FAIL 场景时返回非零退出码，供 CI 阻断。
+    /// </summary>
+    private static int EvaluateRegressionGate(string reportJsonPath, string reportLabel)
+    {
+        var failures = VMPerformanceReport.GetFailureSummary(reportJsonPath);
+        if (failures.Count == 0)
         {
+            Console.WriteLine($"{reportLabel} 基准门禁通过：没有 FAIL 场景。");
             return 0;
         }
 
-        Console.WriteLine("检测到 VM Nightly 性能回归 FAIL，返回非零退出码。");
+        Console.WriteLine($"{reportLabel} 基准门禁未通过，检测到 {failures.Count} 个 FAIL 场景：");
+        foreach (var failure in failures)
+        {
+            Console.WriteLine($"  - {failure}");
+        }
+
+        Console.WriteLine("如需调整阈值或基线，请查看 Reports/Baselines/ 与基准报告中的 Threshold 列。");
         return 1;
     }
 

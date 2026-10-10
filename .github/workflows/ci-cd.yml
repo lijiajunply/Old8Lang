@@ -97,17 +97,54 @@ jobs:
       
     - name: Build benchmarks
       run: dotnet build Old8Lang.Benchmarks --configuration Release
-      
-    - name: Run PR/Push quick VM benchmarks
+
+    # 回归门禁的基线按 runner 类别缓存：Ubuntu 与 macOS/Windows 的绝对耗时不可比，
+    # 用仓库里提交的历史报告当基线会产生无意义的 FAIL。
+    - name: Restore VM quick baseline cache
+      id: vm-quick-baseline
+      uses: actions/cache/restore@v4
+      with:
+        path: ci-baselines
+        key: vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+        restore-keys: |
+          vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-
+
+    # 该步骤即门禁：报告出现 FAIL 场景时 --vm-report-quick 返回非零退出码，直接阻断作业。
+    # 基线取自上面的缓存；缓存未命中时没有基线（状态为 N/A），不会产生跨机器误报。
+    - name: Run PR/Push quick VM benchmarks (regression gate)
+      id: vm-quick-gate
       if: github.event_name != 'schedule'
+      env:
+        OLD8LANG_VM_REPORT_BASELINE: ci-baselines/vm_quick_baseline.json
       run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
 
     - name: Run nightly full VM benchmarks
       if: github.event_name == 'schedule'
       run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
-      
+
+    # 只在门禁通过时推进基线，避免把已经回归的数值固化成新的对比起点。
+    - name: Capture VM quick baseline
+      if: always() && github.event_name != 'schedule' && steps.vm-quick-gate.outcome == 'success'
+      run: |
+        mkdir -p ci-baselines
+        latest=$(ls -1t Reports/VM_Quick_Performance_Report_*.json 2>/dev/null | head -1)
+        if [ -n "$latest" ]; then
+          cp "$latest" ci-baselines/vm_quick_baseline.json
+          echo "VM quick baseline updated from $latest"
+        else
+          echo "未找到 Quick 报告，跳过基线更新"
+        fi
+
+    - name: Save VM quick baseline cache
+      if: always() && github.event_name != 'schedule' && steps.vm-quick-gate.outcome == 'success'
+      uses: actions/cache/save@v4
+      with:
+        path: ci-baselines
+        key: vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+
     - name: Upload benchmark results
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: benchmark-results
         path: |

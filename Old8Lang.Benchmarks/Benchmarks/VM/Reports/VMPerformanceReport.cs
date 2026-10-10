@@ -160,37 +160,90 @@ public static class VMPerformanceReport
     }
 
     /// <summary>
+    /// 指定回归基线报告的环境变量名。
+    /// </summary>
+    /// <remarks>
+    /// 设置后只使用该文件作为基线（文件不存在则视为没有基线，回归状态为 N/A），
+    /// 不再回退到历史报告或静态基线。CI 用它把基线固定到与当前 runner 同类的机器上，
+    /// 避免跨机器比较产生无意义的回归判定。
+    /// </remarks>
+    public const string ExplicitBaselineEnvironmentVariable = "OLD8LANG_VM_REPORT_BASELINE";
+
+    /// <summary>
     /// 检查报告 JSON 是否包含 FAIL 状态
     /// </summary>
     public static bool HasFailStatus(string reportJsonPath)
     {
+        return GetFailureSummary(reportJsonPath).Count > 0;
+    }
+
+    /// <summary>
+    /// 汇总报告 JSON 中的 FAIL 场景（用于基准门禁输出可读的阻断原因）
+    /// </summary>
+    /// <param name="reportJsonPath">报告 JSON 路径</param>
+    /// <returns>每个 FAIL 场景一行描述；没有 FAIL 时为空列表</returns>
+    public static IReadOnlyList<string> GetFailureSummary(string reportJsonPath)
+    {
+        var failures = new List<string>();
         if (string.IsNullOrWhiteSpace(reportJsonPath) || !File.Exists(reportJsonPath))
         {
-            return false;
+            return failures;
         }
 
         using var document = JsonDocument.Parse(File.ReadAllText(reportJsonPath));
-        if (!document.RootElement.TryGetProperty("Scenarios", out var scenariosElement) ||
+        var root = document.RootElement;
+        CollectFailures(root, "Scenarios", "job", failures);
+        CollectFailures(root, "AggregatedScenarios", "aggregate", failures);
+        return failures;
+    }
+
+    private static void CollectFailures(JsonElement root, string propertyName, string view, List<string> failures)
+    {
+        if (!root.TryGetProperty(propertyName, out var scenariosElement) ||
             scenariosElement.ValueKind != JsonValueKind.Array)
         {
-            return false;
+            return;
         }
 
         foreach (var scenario in scenariosElement.EnumerateArray())
         {
-            if (!scenario.TryGetProperty("Status", out var statusElement) ||
-                statusElement.ValueKind != JsonValueKind.String)
+            if (!TryReadString(scenario, "Status", out var status) ||
+                !string.Equals(status, "FAIL", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            if (string.Equals(statusElement.GetString(), "FAIL", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
+            var scenarioName = TryReadString(scenario, "Scenario", out var name) ? name : "<unknown>";
+            var jobSuffix = TryReadString(scenario, "Job", out var job) ? $" [{job}]" : string.Empty;
+            var delta = scenario.TryGetProperty("MeanDeltaPercent", out var deltaElement) &&
+                        deltaElement.ValueKind == JsonValueKind.Number
+                ? $"{deltaElement.GetDouble():+0.00;-0.00;0.00}%"
+                : "N/A";
+            var reason = TryReadString(scenario, "FailureReason", out var failureReason)
+                ? $" {failureReason}"
+                : string.Empty;
+
+            failures.Add($"{view}: {scenarioName}{jobSuffix} MeanΔ={delta}{reason}");
+        }
+    }
+
+    private static bool TryReadString(JsonElement element, string propertyName, out string value)
+    {
+        value = string.Empty;
+        if (!element.TryGetProperty(propertyName, out var property) ||
+            property.ValueKind != JsonValueKind.String)
+        {
+            return false;
         }
 
-        return false;
+        var raw = property.GetString();
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+
+        value = raw;
+        return true;
     }
 
     private static (string MarkdownPath, string JsonPath) GenerateTieredFromBenchmarkArtifacts(
@@ -212,7 +265,7 @@ public static class VMPerformanceReport
             .ToDictionary(group => group.Key, group => group.First().Value, StringComparer.Ordinal);
 
         Directory.CreateDirectory(reportsDir);
-        var baselineJson = ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix, fallbackBaselineFileName);
+        var baselineJson = ResolveTieredBaselineJson(reportsDir, reportFilePrefix, fallbackBaselineFileName);
         var baselineLookup = LoadBaselineLookup(baselineJson);
 
         var scenarios = parsed.Scenarios
@@ -761,20 +814,44 @@ public static class VMPerformanceReport
         File.WriteAllText(jsonPath, json);
     }
 
+    /// <summary>
+    /// 解析回归对比使用的基线报告。
+    /// </summary>
+    /// <remarks>
+    /// 若设置了 <see cref="ExplicitBaselineEnvironmentVariable"/>，只使用该文件：
+    /// 文件不存在时视为「没有基线」（状态为 N/A），不再回退到历史报告或静态基线，
+    /// 这样 CI 在缓存未命中时不会因为跨机器比较而误报 FAIL。
+    /// </remarks>
+    private static string? ResolveTieredBaselineJson(
+        string reportsDir,
+        string reportFilePrefix,
+        string? fallbackBaselineFileName)
+    {
+        var explicitBaseline = Environment.GetEnvironmentVariable(ExplicitBaselineEnvironmentVariable);
+        if (!string.IsNullOrWhiteSpace(explicitBaseline))
+        {
+            return File.Exists(explicitBaseline) ? Path.GetFullPath(explicitBaseline) : null;
+        }
+
+        return ResolveLatestTieredBaselineJson(reportsDir, reportFilePrefix, fallbackBaselineFileName);
+    }
+
     private static string? ResolveLatestTieredBaselineJson(string reportsDir, string reportFilePrefix, string? fallbackBaselineFileName = null)
     {
         if (Directory.Exists(reportsDir))
         {
             var pattern = $"{reportFilePrefix}_*.json";
+            // 报告文件名内嵌 yyyyMMdd_HHmmss 时间戳，按文件名倒序即为时间倒序；
+            // 仅按 mtime 排序在文件同时检出（mtime 相同）时结果不确定，会导致基线漂移。
             var candidates = Directory
                 .GetFiles(reportsDir, pattern, System.IO.SearchOption.TopDirectoryOnly)
-                .Select(path => new FileInfo(path))
-                .OrderByDescending(file => file.LastWriteTimeUtc)
+                .OrderByDescending(path => Path.GetFileNameWithoutExtension(path), StringComparer.Ordinal)
+                .ThenByDescending(path => File.GetLastWriteTimeUtc(path))
                 .ToArray();
 
             if (candidates.Length > 0)
             {
-                return candidates[0].FullName;
+                return Path.GetFullPath(candidates[0]);
             }
         }
 
