@@ -377,3 +377,18 @@
   `[IMPORT_ERROR] 加载模块 'Math' 失败: 无法读取模块文件 'Math'`。
   但 `Docs/MODE_SUPPORT.md` §11 标注三模式均为 ✅，现有 import 测试（`Old8Lang.Tests/Interpreter/Modules/`）
   只覆盖解释模式。需确认 IL/VM 是否应支持标准库 import，再决定修实现还是纠正文档。
+
+## F. 2026-10-22 依赖安全升级验证时发现
+
+来源：`Reports/2026-10-22-08-28-依赖安全升级验证.md`。以下失败与依赖升级无关
+（临时回退 `Microsoft.Data.Sqlite` 10.0.1 后同样复现），未顺手修改：
+
+- [ ] **DatabaseLib 编译器/解释器测试共用同名内存库**：同时运行
+  `Compiler.Modules.StandardLibrary.DatabaseLibTests` 与 `Interpreter...DatabaseLibTests` 时，
+  解释器侧 8 个用例因 `table users already exists` 失败；两个类各自单独运行均 12/12 通过。
+  两组测试使用相同的 `file:testdb_*?mode=memory&cache=shared` 库名，连接池使内存在 `Close()` 后仍存活。
+  建议为两组测试使用不同库名前缀，或显式 `Pooling=False` / `Dispose()`。
+- [ ] **SerializationLib 编译器/解释器测试共用临时文件**：同时运行两组
+  `SerializationLibTests` 时，编译器侧 `MsgPackSerializeToFile_ShouldSerializeToFile`
+  因 `./test_msgpack_data.bin` 已被另一组删除而失败；各自单独运行均通过。
+  建议文件名带模式或测试类前缀，并在清理时忽略文件不存在。
