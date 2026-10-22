@@ -22,7 +22,7 @@ public class RecursiveCallPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(RecursiveCallPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "recursive-calls.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "recursive-calls.old8");
 
         if (!File.Exists(scriptPath))
         {
@@ -62,7 +62,7 @@ public class RecursiveCallPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(RecursiveCallPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "recursive-calls.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "recursive-calls.old8");
 
         if (!File.Exists(scriptPath))
         {

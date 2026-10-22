@@ -7,8 +7,8 @@ success=0
 failed=0
 failed_files=()
 
-# 获取所有测试文件
-test_files=$(find ./VirtualMachine ./VMTests ./BytecodeTests -name "*.old8")
+# 获取所有测试文件（legacy/ 与 bytecode/ 是原 VMTests、BytecodeTests 并入的子目录）
+test_files=$(find ./VirtualMachine -name "*.old8")
 
 # 遍历所有测试文件
 for file in $test_files; do
@@ -20,7 +20,7 @@ for file in $test_files; do
     
     # 运行测试，添加10秒超时限制
     # 使用兼容bash 3.2的方式实现超时
-    dotnet run --project Old8Lang.App -- -vm "$file" &
+    dotnet run --project ../Old8Lang.App -- -vm "$file" &
     DOTNET_PID=$!
     
     # 设置超时时间（秒）

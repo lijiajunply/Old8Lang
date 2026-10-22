@@ -22,9 +22,13 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
     /// （例如 utils.old8、constants_module.old8）。如果共用同一个目录，并行写入会互相覆盖，
     /// 导致单跑通过、一起跑失败的偶发错误。因此每个测试类使用独立的子目录。
     /// </remarks>
+    /// <summary>
+    /// 所有模块测试共用的临时根目录。放在系统临时目录下，避免在仓库里生成 OldLib/temp。
+    /// </summary>
+    private static readonly string TempRoot = Path.Combine(Path.GetTempPath(), "old8lang-module-tests");
+
     private string TempDirectory => Path.Combine(
-        TestFilesDirectory,
-        "temp",
+        TempRoot,
         GetType().FullName!.Replace("Old8Lang.Tests.", string.Empty).Replace('.', '_'));
 
     /// <summary>
@@ -80,7 +84,7 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
             foreach (var candidate in new[]
                      {
                          Path.Combine(TempDirectory, relativeFilePath),
-                         Path.Combine(TestFilesDirectory, "temp", relativeFilePath)
+                         Path.Combine(TempRoot, relativeFilePath)
                      })
             {
                 if (!File.Exists(candidate)) continue;

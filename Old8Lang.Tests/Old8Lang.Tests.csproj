@@ -34,11 +34,4 @@
     <ProjectReference Include="..\Old8Lang.LanguageServer\Old8Lang.LanguageServer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="..\TestScripts\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>TestScripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -23,7 +23,7 @@ public class MediumProgramPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(MediumProgramPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "medium-program-1000lines.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "medium-program-1000lines.old8");
 
         if (!File.Exists(scriptPath))
         {
@@ -84,7 +84,7 @@ public class MediumProgramPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(MediumProgramPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "medium-program-1000lines.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "medium-program-1000lines.old8");
 
         if (!File.Exists(scriptPath))
         {
@@ -139,7 +139,7 @@ public class MediumProgramPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(MediumProgramPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "medium-program-1000lines.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "medium-program-1000lines.old8");
 
         if (!File.Exists(scriptPath))
         {

@@ -4,8 +4,12 @@ Old8Lang 项目（`o8package.json`）—— 运行时模式：`interpreter`。
 
 ## 内容
 
-- 用例数量：**182** 个 `.old8` 文件
+- 用例数量：**186** 个 `.old8` 文件
 - 入口文件：`01_basic_literals.old8`
+- 子目录：
+  - `Profiler/`（2 个）：性能分析器用例与示例
+  - `Verification/`（1 个）：三模式一致性验证
+  - `Async/`、`modules/`：异步与模块导入用例
 
 ## 运行
 

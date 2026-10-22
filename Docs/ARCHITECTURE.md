@@ -935,7 +935,9 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 | `TestFiles/CompilerTests/` | IL 模式测试用例 | `-il` |
 | `TestFiles/VirtualMachine/` | 虚拟机模式测试用例 | `-vm` |
 
-此外还有若干专项目录：`TestFiles/VMTests/`、`BytecodeTests/`、`DebuggerTests/`、`ExternTests/`、`ProfilerTests/`、`Verification/`。
+专项用例已并入模式目录：`InterpreterTests/Profiler/`、`InterpreterTests/Verification/`，
+以及 `VirtualMachine/legacy/`（原 `VMTests/`）、`VirtualMachine/bytecode/`（原 `BytecodeTests/`）。
+`ManualTests/` 存放刻意不接入 CI 的调试器（`Debugger/`）与 extern（`Extern/`）用例。
 单元测试与集成测试在 `Old8Lang.Tests`。
 
 ### 10.2 测试运行方式
@@ -961,7 +963,6 @@ dotnet run --project Old8Lang.App -- -vm <path-to-test-file.old8>
 ```
 Old8Lang/
 ├── .agent/                      # 代理（AI）规则
-├── .claude/                     # Claude Code 配置与命令
 ├── .github/workflows/           # CI/CD 工作流
 ├── .idea/                       # IDEA / Rider 编辑器配置
 ├── Docs/                        # 项目文档（架构、CLI、语法、测试、开发流程等）
@@ -976,10 +977,8 @@ Old8Lang/
 ├── Old8Lang.MachineLearningLib/ # 机器学习库
 ├── Old8Lang.LanguageServer/     # LSP 服务
 ├── Old8Lang.CodeGen/            # 代码生成器
-├── TestFiles/                   # .old8 测试用例（按模式分目录，见 10.1）
-├── TestScripts/                 # 测试脚本
+├── TestFiles/                   # .old8 测试用例（按模式分目录，见 10.1；驱动脚本与性能脚本也在其下）
 ├── Reports/                     # 测试报告
-├── examples/                    # 示例代码
 ├── vscode-old8lang/             # VS Code 扩展
 ├── AGENTS.md                    # 代理开发指南（AI 入口）
 ├── CLAUDE.md                    # Claude Code 入口（导入 AGENTS.md）

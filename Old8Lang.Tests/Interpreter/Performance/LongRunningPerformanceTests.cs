@@ -19,7 +19,7 @@ public class LongRunningPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(LongRunningPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "long-running-5min.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "long-running-5min.old8");
 
         if (!File.Exists(scriptPath))
         {
@@ -63,7 +63,7 @@ public class LongRunningPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(LongRunningPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "million-iterations.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "million-iterations.old8");
 
         if (!File.Exists(scriptPath))
         {

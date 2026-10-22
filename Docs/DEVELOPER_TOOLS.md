@@ -377,7 +377,7 @@ Old8Lang 调试器是一个功能强大的调试工具，支持断点、变量�
 old8lang debug-start <文件路径>
 
 # 示例
-old8lang debug-start TestFiles/DebuggerTests/test_breakpoints.old8
+old8lang debug-start TestFiles/ManualTests/Debugger/test_breakpoints.old8
 ```
 
 #### 断点管理
@@ -491,9 +491,9 @@ old8lang debug-watch list
 
 调试器包含以下测试文件：
 
-- `TestFiles/DebuggerTests/test_breakpoints.old8` - 断点功能测试
-- `TestFiles/DebuggerTests/test_variables.old8` - 变量监视测试
-- `TestFiles/DebuggerTests/test_callstack.old8` - 调用栈测试
+- `TestFiles/ManualTests/Debugger/test_breakpoints.old8` - 断点功能测试
+- `TestFiles/ManualTests/Debugger/test_variables.old8` - 变量监视测试
+- `TestFiles/ManualTests/Debugger/test_callstack.old8` - 调用栈测试
 
 #### 运行测试
 
@@ -505,7 +505,7 @@ dotnet build
 dotnet test Old8Lang.Tests --filter "Debugger"
 
 # 测试调试功能
-old8lang debug-start TestFiles/DebuggerTests/test_breakpoints.old8
+old8lang debug-start TestFiles/ManualTests/Debugger/test_breakpoints.old8
 ```
 
 ### 架构说明

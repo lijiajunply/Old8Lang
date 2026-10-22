@@ -28,7 +28,7 @@ for file in $test_files; do
     has_error_marker=$(tail -n 1 "$file" | grep -i "error")
 
     # 运行测试，10秒超时
-    timeout 10 dotnet run --project Old8Lang.App -- -f "$file" >/dev/null 2>&1
+    timeout 10 dotnet run --project ../Old8Lang.App -- -f "$file" >/dev/null 2>&1
     exit_code=$?
 
     if [ $exit_code -eq 124 ]; then

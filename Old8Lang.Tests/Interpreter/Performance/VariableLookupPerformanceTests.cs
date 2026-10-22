@@ -23,7 +23,7 @@ public class VariableLookupPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(VariableLookupPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "variable-lookup.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "variable-lookup.old8");
 
         if (!File.Exists(scriptPath))
         {

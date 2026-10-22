@@ -392,3 +392,25 @@
   `SerializationLibTests` 时，编译器侧 `MsgPackSerializeToFile_ShouldSerializeToFile`
   因 `./test_msgpack_data.bin` 已被另一组删除而失败；各自单独运行均通过。
   建议文件名带模式或测试类前缀，并在清理时忽略文件不存在。
+
+## G. 2026-10-22 目录合并验证时发现
+
+来源：`Reports/2026-10-22-20-27-目录合并与仓库清理验证.md`。以下为既有问题，与目录合并无关，本轮未修复：
+
+- [ ] **VM 模式 3 个用例直接失败**：
+  - `TestFiles/VirtualMachine/DestructuringAssignmentTest.old8`：解析阶段报错（`StatementParser.Main.cs:444`）。
+  - `TestFiles/VirtualMachine/vm_gap_6_error_position.old8`：VM 执行阶段抛异常（错误定位用例，末行没有 `error` 标记）。
+  - `TestFiles/VirtualMachine/legacy/vm_operator_overload.old8`：VM 执行阶段抛异常（原 `VMTests/`）。
+  另有 `legacy/control_flow.old8`、`legacy/vm_decorator.old8` 为原 `VMTests/` README 已记录的已知失败。
+
+- [x] **测试驱动脚本的 App 项目路径错误**（本轮已修）：`run_syntax_tests.sh`、`run_interpreter_tests.sh`、
+  `run_vm_tests.sh`、`test_interpreter_comprehensive.sh`、`run_comprehensive_compiler_tests.sh` 在
+  `TestFiles/` 下调用 `dotnet run --project Old8Lang.App`，实际应为 `../Old8Lang.App`；
+  否则所有用例都会被误判失败（脚本输出 `提供的文件路径不存在: Old8Lang.App`）。
+
+- [ ] **语法测试 5 个既有失败用例**（`run_syntax_tests.sh` 89 例中 5 失败，均与目录合并无关）：
+  - `TestFiles/SyntaxTests/test_syntax_structure_error.old8`、`test_lexical_error.old8`：期望失败的用例，
+    但末行没有 `error` 标记，被 runner 判为失败；
+  - `TestFiles/SyntaxTests/test_generics.old8`：文件里仍用 `#` 作注释（应为 `//`），解析直接失败；
+  - `TestFiles/SyntaxTests/test_simple_edge_cases.old8`、`test_more_edge_cases.old8`：
+    主表达式解析报错（`Colon` / `Assignment`）。

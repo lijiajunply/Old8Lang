@@ -25,7 +25,7 @@ public class SmallScriptPerformanceTests
         // 从当前程序集位置向上查找项目根目录
         var assemblyLocation = Path.GetDirectoryName(typeof(SmallScriptPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "small-script-50lines.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "small-script-50lines.old8");
 
         if (!File.Exists(scriptPath))
         {
@@ -68,7 +68,7 @@ public class SmallScriptPerformanceTests
         // Arrange
         var assemblyLocation = Path.GetDirectoryName(typeof(SmallScriptPerformanceTests).Assembly.Location)!;
         var projectRoot = Path.GetFullPath(Path.Combine(assemblyLocation, "..", "..", "..", ".."));
-        var scriptPath = Path.Combine(projectRoot, "TestScripts", "Performance", "small-script-50lines.old8");
+        var scriptPath = Path.Combine(projectRoot, "TestFiles", "Performance", "small-script-50lines.old8");
 
         if (!File.Exists(scriptPath))
         {

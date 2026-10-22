@@ -83,7 +83,10 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --settings Old8Lang.Tests/perfo
 | IL 模式测试 | `TestFiles/CompilerTests/` | `-il` |
 | 虚拟机模式测试 | `TestFiles/VirtualMachine/` | `-vm` |
 
-`TestFiles/` 下还有若干专项用例目录：`VMTests/`、`BytecodeTests/`、`DebuggerTests/`、`ExternTests/`、`ProfilerTests/`、`Verification/`。
+专项用例已并入模式目录：
+`InterpreterTests/Profiler/`（性能分析）、`InterpreterTests/Verification/`（三模式一致性）、
+`VirtualMachine/legacy/`（原 `VMTests/`）、`VirtualMachine/bytecode/`（原 `BytecodeTests/`）。
+`ManualTests/` 存放**刻意不接入 CI**的调试器（`Debugger/`）与 extern（`Extern/`）用例，只能手动运行。
 每个目录都有一份自己的 `README.md`，写明用例数量、入口文件和运行方式，动手前先看一眼。
 
 ---
@@ -118,7 +121,7 @@ cd TestFiles
 ./run_syntax_tests.sh                    # 语法测试
 ./run_interpreter_tests.sh               # 解释模式测试
 ./run_compiler_tests.sh                  # IL 模式测试
-./run_vm_tests.sh                        # 虚拟机模式测试（含 VirtualMachine/、VMTests/、BytecodeTests/）
+./run_vm_tests.sh                        # 虚拟机模式测试（递归扫描 VirtualMachine/ 及 legacy/、bytecode/）
 ./run_comprehensive_compiler_tests.sh    # IL 模式综合套件
 ```
 
