@@ -533,7 +533,7 @@ old8lang debug <命令>
 > 错误: 调试器未初始化
 > ```
 >
-> 断点与单步的**引擎能力是真实存在且有测试覆盖的**：`Old8Lang.Tests/Debugger/` 下的
+> 断点与单步的**引擎能力是真实存在且有测试覆盖的**：`Old8Lang.Tests/Diagnostics/` 下的
 > `BreakpointManagerTests`、`CallStackTests`、`VariableWatcherTests` 等 22 个用例全部通过，
 > 执行路径会在命中断点时经 `DebuggableInterpreter` 回调。缺的是把它们串起来的 CLI 工作流。
 >

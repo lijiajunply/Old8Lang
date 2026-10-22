@@ -414,3 +414,7 @@
   - `TestFiles/SyntaxTests/test_generics.old8`：文件里仍用 `#` 作注释（应为 `//`），解析直接失败；
   - `TestFiles/SyntaxTests/test_simple_edge_cases.old8`、`test_more_edge_cases.old8`：
     主表达式解析报错（`Colon` / `Assignment`）。
+
+- [ ] **全量 `dotnet test` 在结束前中止**：输出「测试运行已中止」，部分用例（如 `TypeSystem/`、`Error/` 分类）
+  未被执行，换 `--filter` 按分类运行则全部通过（65/65、37/37 等）。P1、P2 两次验证均复现，
+  与目录合并无直接关系；建议用 `dotnet test --blame` 定位是否有用例导致 runner 崩溃。

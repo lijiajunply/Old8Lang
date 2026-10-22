@@ -938,7 +938,9 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 专项用例已并入模式目录：`InterpreterTests/Profiler/`、`InterpreterTests/Verification/`，
 以及 `VirtualMachine/legacy/`（原 `VMTests/`）、`VirtualMachine/bytecode/`（原 `BytecodeTests/`）。
 `ManualTests/` 存放刻意不接入 CI 的调试器（`Debugger/`）与 extern（`Extern/`）用例。
-单元测试与集成测试在 `Old8Lang.Tests`。
+单元测试与集成测试在 `Old8Lang.Tests`，按被测对象分类：`Parser/`、`Interpreter/`、`Compiler/`、
+`VirtualMachine/`、`LanguageServer/`、`Libraries/`（标准库与扩展库）、`Diagnostics/`（调试器与性能分析器）、
+`TypeSystem/`、`Error/`、`EdgeCases/`、`InstanceMethods/`。
 
 ### 10.2 测试运行方式
 
