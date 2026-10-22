@@ -5,6 +5,8 @@ using Old8Lang.Error;
 using Old8Lang.LangParser;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.Profiler;
+
 namespace Old8Lang.Interpreter;
 
 /// <summary>

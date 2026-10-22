@@ -2,6 +2,8 @@ using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
 using Old8Lang.ProjectManagement;
 
+using Old8Lang.Profiler;
+
 namespace Old8Lang.App.Commands;
 
 /// <summary>

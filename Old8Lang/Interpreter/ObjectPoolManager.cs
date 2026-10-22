@@ -1,5 +1,7 @@
 using Old8Lang.AST.Expression.Value;
 
+using Old8Lang.Profiler;
+
 namespace Old8Lang.Interpreter;
 
 /// <summary>

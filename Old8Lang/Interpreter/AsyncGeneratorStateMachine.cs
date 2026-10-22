@@ -1,6 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Generators;
+using Old8Lang.AsyncGeneration;
 
 namespace Old8Lang.Interpreter;
 

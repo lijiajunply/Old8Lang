@@ -1013,8 +1013,8 @@ Old8Lang 的优化分解析器与解释器两层。完整的优化技术说明�
 | 层次 | 主要技术 | 实现位置 |
 |------|---------|---------|
 | 解析器 | 零拷贝切片（`Span<T>`）、内存池（`CharBufferPool` / `TokenListPool`）、字符串缓存、算法复杂度修复、递归深度保护、`SourceLines` 预切分 | `Old8Lang/LangParser/LangToken.cs`、`Old8Lang/LangParser/Optimization/`、`Old8Lang/LangParser/Core/ParserContext.cs` |
-| 解释器 | 值类型对象池、作用域字典缓存、函数引用缓存、变量查找多级缓存、递归深度上限 | `Old8Lang/AST/`、`Old8Lang/Interpreter/PerformanceMonitor.cs` |
-| 监控 | `ParserPerformanceMetrics`（解析器）、`PerformanceMonitor` + `PerformanceReporter`（解释器）、CLI 的 `--perf` 系列参数 | `Old8Lang/LangParser/Optimization/`、`Old8Lang/Interpreter/` |
+| 解释器 | 值类型对象池、作用域字典缓存、函数引用缓存、变量查找多级缓存、递归深度上限 | `Old8Lang/AST/`、`Old8Lang/Profiler/PerformanceMonitor.cs` |
+| 监控 | `ParserPerformanceMetrics`（解析器）、`PerformanceMonitor` + `PerformanceReporter`（解释器）、CLI 的 `--perf` 系列参数 | `Old8Lang/LangParser/Optimization/`、`Old8Lang/Profiler/` |
 
 性能目标、以及「优化前后对比数字」为何不再照抄历史快照，见
 [PERFORMANCE_GUIDE.md 的性能目标](./PERFORMANCE_GUIDE.md#性能目标)。基准测试代码在 `Old8Lang.Benchmarks/`。

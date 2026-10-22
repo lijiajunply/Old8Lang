@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Old8Lang.Utilities;
+namespace Old8Lang.Runtime;
 
 /// <summary>
 /// 方法调用委托缓存，用于优化反射调用性能

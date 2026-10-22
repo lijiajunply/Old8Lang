@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Profiler;
 
 /// <summary>
 /// 性能报告生成器，支持文本、JSON、CSV 格式

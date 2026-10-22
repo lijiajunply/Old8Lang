@@ -399,7 +399,7 @@ public partial class AsyncForInStatement(
     /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
     private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
-        Generators.GeneratorExecutionContext context, string loopPath)
+        AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -518,7 +518,7 @@ public partial class AsyncForInStatement(
     /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
     private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
-        Generators.GeneratorExecutionContext context, string loopPath)
+        AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -654,7 +654,7 @@ public partial class AsyncForInStatement(
     /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
     private void RunGeneratorContextList(VariateManager manager, ILangList oldList,
-        Generators.GeneratorExecutionContext context)
+        AsyncGeneration.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
 

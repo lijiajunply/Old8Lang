@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Old8Lang.Utilities;
+namespace Old8Lang.Runtime;
 
 /// <summary>
 /// 属性访问委托缓存

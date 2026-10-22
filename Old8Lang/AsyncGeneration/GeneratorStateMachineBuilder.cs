@@ -3,7 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Generators;
+namespace Old8Lang.AsyncGeneration;
 
 /// <summary>
 /// 生成器状态机构建器

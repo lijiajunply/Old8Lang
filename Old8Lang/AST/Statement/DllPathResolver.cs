@@ -1,5 +1,5 @@
 using System.Text;
-using Old8Lang.StandardLibrary;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.AST.Statement;

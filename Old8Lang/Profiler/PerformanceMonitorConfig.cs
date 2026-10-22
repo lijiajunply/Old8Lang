@@ -1,4 +1,4 @@
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Profiler;
 
 /// <summary>
 /// 性能监控配置

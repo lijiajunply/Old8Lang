@@ -5,7 +5,7 @@ using Old8Lang.LanguageServer.Services;
 using Old8Lang.AST.Statement;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using Old8Lang.ModuleSystem.Resolution;
-using Old8Lang.StandardLibrary;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.LanguageServer.Handlers;
 

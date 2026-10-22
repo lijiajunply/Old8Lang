@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Profiler;
 
 /// <summary>
 /// 性能指标数据，存储解释器执行的性能统计信息

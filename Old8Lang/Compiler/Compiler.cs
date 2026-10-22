@@ -171,10 +171,10 @@ public static class Compiler
             var tempLocal = new LocalManager();
 
             // 创建 AsyncStateMachineGenerator 并检查是否识别到 await
-            var generator = new Generators.AsyncStateMachineGenerator(tempIl, tempLocal, block);
+            var generator = new AsyncGeneration.AsyncStateMachineGenerator(tempIl, tempLocal, block);
 
             // 通过反射访问 AwaitInfos 字段
-            var awaitInfosField = typeof(Generators.AsyncStateMachineGenerator)
+            var awaitInfosField = typeof(AsyncGeneration.AsyncStateMachineGenerator)
                 .GetField("AwaitInfos", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             if (awaitInfosField != null)

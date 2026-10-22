@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
-using Old8Lang.Utilities;
+using Old8Lang.Runtime;
 
 namespace Old8Lang.Benchmarks.Benchmarks.Reflection;
 

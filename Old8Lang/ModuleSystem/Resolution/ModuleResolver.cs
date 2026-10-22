@@ -1,4 +1,4 @@
-using Old8Lang.StandardLibrary;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.ModuleSystem.Resolution;

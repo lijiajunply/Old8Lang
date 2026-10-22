@@ -1,6 +1,6 @@
 using Old8Lang.AST.Expression;
 
-namespace Old8Lang.Generators;
+namespace Old8Lang.AsyncGeneration;
 
 /// <summary>
 /// 生成器执行上下文（新架构）

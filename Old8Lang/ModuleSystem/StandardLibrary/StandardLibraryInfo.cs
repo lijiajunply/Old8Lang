@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Old8Lang.StandardLibrary;
+namespace Old8Lang.ModuleSystem.StandardLibrary;
 
 /// <summary>
 /// 标准库导入模式

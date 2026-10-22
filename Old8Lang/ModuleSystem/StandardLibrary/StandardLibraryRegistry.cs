@@ -4,7 +4,7 @@ using Old8Lang.NetLib;
 using Old8Lang.SerializationLib;
 using Old8LangLib;
 
-namespace Old8Lang.StandardLibrary;
+namespace Old8Lang.ModuleSystem.StandardLibrary;
 
 /// <summary>
 /// 标准库注册表，管理所有内置的标准库

@@ -398,7 +398,7 @@ public class AsyncFuncLangValue : ImportInfo
             typeof(ValueType));
 
         var stateMachineGenerator =
-            new Old8Lang.Generators.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement)
+            new Old8Lang.AsyncGeneration.AsyncStateMachineGenerator(ilGenerator, local, BlockStatement)
             {
                 TypeBuilder = typeBuilder
             };

@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 
+using Old8Lang.Profiler;
+
 namespace Old8Lang.Interpreter;
 
 /// <summary>

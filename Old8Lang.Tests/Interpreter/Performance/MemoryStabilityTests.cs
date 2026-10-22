@@ -4,6 +4,8 @@ using System.IO;
 using Old8Lang.Interpreter;
 using Xunit;
 
+using Old8Lang.Profiler;
+
 namespace Old8Lang.Tests.Interpreter.Performance;
 
 /// <summary>

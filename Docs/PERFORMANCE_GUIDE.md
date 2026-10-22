@@ -925,6 +925,8 @@ if (!TryGetCachedFunction(manager, out var func))
 
 命令行方式见上文的[性能分析工具](#性能分析工具)。以下是编程方式：
 
+> `PerformanceMonitor`、`PerformanceReporter`、`PerformanceMonitorConfig` 位于 `Old8Lang.Profiler` 命名空间。
+
 ```csharp
 var monitor = new PerformanceMonitor();
 monitor.StartMonitoring(PerformanceMonitorConfig.Detailed);

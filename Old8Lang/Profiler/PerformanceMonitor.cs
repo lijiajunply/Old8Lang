@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Old8Lang.Interpreter;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Profiler;
 
 /// <summary>
 /// 性能监控器实现

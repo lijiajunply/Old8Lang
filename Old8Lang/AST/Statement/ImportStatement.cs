@@ -4,7 +4,7 @@ using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.StandardLibrary;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.ModuleSystem.Core;
 using Old8Lang.ModuleSystem.Resolution;
 

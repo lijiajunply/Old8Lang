@@ -5,7 +5,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
-using Old8Lang.Generators;
+using Old8Lang.AsyncGeneration;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 

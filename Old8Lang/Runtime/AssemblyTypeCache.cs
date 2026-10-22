@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Old8Lang.Utilities;
+namespace Old8Lang.Runtime;
 
 /// <summary>
 /// 程序集和类型缓存，用于优化外部程序集加载和类型查询性能

@@ -6,7 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.StandardLibrary;
+namespace Old8Lang.ModuleSystem.StandardLibrary;
 
 /// <summary>
 /// 标准库加载器，负责加载内置的标准库

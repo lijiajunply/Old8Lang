@@ -2,7 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Generators;
+namespace Old8Lang.AsyncGeneration;
 
 /// <summary>
 /// 新的生成器状态机实现

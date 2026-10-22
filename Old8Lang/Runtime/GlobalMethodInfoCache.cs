@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Old8Lang.Utilities;
+namespace Old8Lang.Runtime;
 
 /// <summary>
 /// 全局方法信息缓存，用于优化 IL 生成时的反射调用性能
