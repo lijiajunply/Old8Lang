@@ -208,7 +208,6 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
                     ["Regex"] = "RegexLib.cs",
                     ["ColorfulTerminal"] = "ColorfulTerminal.cs",
                     ["TemplateEngine"] = "TemplateEngine.cs",
-                    ["Image"] = "ImageLib.cs",
                     ["AssertLib"] = "AssertLib.cs",
                     ["CollectionLib"] = "CollectionLib.cs",
                     ["MockLib"] = "MockLib.cs",

@@ -116,11 +116,7 @@ public static class NativeLibraryRegistry
             "Any", "All", "Sum", "Average", "Min", "Max",
 
             // Template Engine (TemplateEngine)
-            "RenderTemplate", "CompileTemplate",
-
-            // Image functions (ImageLib)
-            "LoadImage", "SaveImage", "ResizeImage", "CropImage",
-            "RotateImage", "FlipImage"
+            "RenderTemplate", "CompileTemplate"
         ];
     }
 }

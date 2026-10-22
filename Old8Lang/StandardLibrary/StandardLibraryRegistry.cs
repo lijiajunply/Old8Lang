@@ -76,11 +76,6 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(TemplateEngine))
         ),
 
-        ["Image"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(ImageLib))
-        ),
-
         // 来自 Old8Lang.NetLib 的网络库（多类库）
         ["Net"] = StandardLibraryInfo.FromTypes(
             "Old8Lang.NetLib",

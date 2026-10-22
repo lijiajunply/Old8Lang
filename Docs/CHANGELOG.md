@@ -62,6 +62,8 @@
   Task 的 `Then` / `Catch` / `Finally` / `ContinueWith`。字符串排序统一按长度（与解释器一致）。
   虚拟机模式下 `Thread` 的 `Then` / `WithTimeout` / `Retry` / `Cancel` 同日起可用
   （`Cancel` 只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程）。
+- **移除 `Image` 标准库**：图像读写与处理（加载/保存、缩放、裁剪、旋转、翻转、滤镜、绘制等）
+  已整体删除，`import "Image"` 不再可用。
 
 ---
 

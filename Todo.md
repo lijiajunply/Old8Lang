@@ -366,3 +366,14 @@
 - [ ] **IL 模式的负索引**：解释器与虚拟机（本轮修复后）都支持 `arr[-1]`，IL 仍抛异常
   （`Compiler/EdgeCases/UnexpectedInputsTests.NegativeIndex_CompilesAndExecutesCorrectly`
   在 IL 档下失败，属既有的 IL 环境问题）。
+
+## E. 2026-10-22 移除图像标准库时发现
+
+来源：`Reports/2026-10-22-08-20-移除图像标准库验证.md`。以下问题与本轮改动无关，
+在未改动的 `HEAD` 上同样复现，未顺手修改：
+
+- [ ] **IL / VM 模式下标准库 `import` 后访问模块名失败**：`import "Math"` + `Math.Sqrt(9)`
+  在解释模式输出 `3`；IL 报 `[NAME_ERROR] 名称 'Math' 未定义`；VM 报
+  `[IMPORT_ERROR] 加载模块 'Math' 失败: 无法读取模块文件 'Math'`。
+  但 `Docs/MODE_SUPPORT.md` §11 标注三模式均为 ✅，现有 import 测试（`Old8Lang.Tests/Interpreter/Modules/`）
+  只覆盖解释模式。需确认 IL/VM 是否应支持标准库 import，再决定修实现还是纠正文档。
