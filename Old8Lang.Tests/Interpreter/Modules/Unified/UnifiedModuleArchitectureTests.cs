@@ -15,7 +15,7 @@ public class UnifiedModuleArchitectureTests(ITestOutputHelper output)
     private readonly string TempDirectory = Path.Combine(
         Path.GetTempPath(),
         "old8lang-module-tests",
-        "Unified"
+        "Interpreter_UnifiedModuleArchitectureTests"
     );
 
     private LangInterpreter CreateInterpreter()

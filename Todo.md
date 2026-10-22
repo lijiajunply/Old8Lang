@@ -418,3 +418,15 @@
 - [ ] **全量 `dotnet test` 在结束前中止**：输出「测试运行已中止」，部分用例（如 `TypeSystem/`、`Error/` 分类）
   未被执行，换 `--filter` 按分类运行则全部通过（65/65、37/37 等）。P1、P2 两次验证均复现，
   与目录合并无直接关系；建议用 `dotnet test --blame` 定位是否有用例导致 runner 崩溃。
+
+- [x] **`TestFiles/TestProjects/ThirdPartyLibTest/tests/test_thirdparty.old8` 使用旧语法**（2026-10-22 已改写）：
+  已按实际包 API 重写，覆盖 Logger / HttpClient / SimpleLogger / SimpleMath；同时修正 `HttpClient` 包内
+  `Logger.Create` → `LoggerClass`，并让 `ModuleResolver` 从项目根的 `packages/` 解析第三方包。
+
+- [ ] **`ThirdPartyLibTest/packages/OldLib/index.old8` 为空**：`import "OldLib"` 不导出任何符号，
+  原用例里的 `Math.*` / `String.*` / `Collection.*` / `Time.*` / `Json.*` / `OS.*` / `Crypto.*` 调用都已失效。
+  需要补 index 导出（或从 `o8package.json` 移除该依赖），否则 OldLib 包无法被实际使用。
+
+- [ ] **模块测试 10 个既有失败**（HEAD 基线同样 10/48 失败）：`JsonLibTests` 4 个（`import "Json"` 找不到模块）、
+  `NetLibTests` 2 个、`SelectiveImportTests` 2 个（`lazy_math` 找不到）、`UnifiedModuleArchitectureTests` 1 个与
+  `LazyImportSyntaxTest` 1 个（懒导入别名 `tm` 未定义）。与本次改动无关，需单独排查标准库注册与懒导入实现。

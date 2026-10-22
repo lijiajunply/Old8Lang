@@ -13,14 +13,10 @@ namespace Old8Lang.Tests.Compiler.Modules.Unified;
 [Collection("Sequential")]
 public class UnifiedModuleArchitectureTests(ITestOutputHelper output)
 {
-    private readonly string TestFilesDirectory = Path.Combine(
-        Directory.GetCurrentDirectory(),
-        "..",
-        "..",
-        "..",
-        "OldLib",
-        "temp",
-        "Unified"
+    private readonly string TempDirectory = Path.Combine(
+        Path.GetTempPath(),
+        "old8lang-module-tests",
+        "Compiler_UnifiedModuleArchitectureTests"
     );
 
     private LangInterpreter CreateInterpreter()
@@ -61,7 +57,7 @@ public class UnifiedModuleArchitectureTests(ITestOutputHelper output)
 
     private string CreateTempModuleFile(string fileName, string content)
     {
-        var tempDir = TestFilesDirectory;
+        var tempDir = TempDirectory;
         Directory.CreateDirectory(tempDir);
 
         var filePath = Path.Combine(tempDir, fileName);

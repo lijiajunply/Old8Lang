@@ -1,5 +1,6 @@
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Interpreter;
+using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.ModuleSystem.Resolution;
 
@@ -109,7 +110,7 @@ public class ModuleResolutionResult
 
         if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
         {
-            suggestions.Add("  - 如果这是第三方包，请确认已安装该包到 ~/.old8lang/packages/ 或当前目录的 packages/");
+            suggestions.Add("  - 如果这是第三方包，请确认已安装该包到 ~/.old8lang/packages/ 或项目根（o8package.json 所在目录）的 packages/");
             suggestions.Add("  - 如果这是本地文件，请使用相对路径 (如 './module' 或 '../module')");
         }
 
@@ -535,7 +536,8 @@ public class ModuleResolver
         var globalPackagesDir = Path.Combine(homeDir, ".old8lang", "packages");
         searchPaths.Add(globalPackagesDir);
 
-        // 本地包目录
+        // 本地包目录：优先项目根（o8package.json 所在目录），再回退到脚本所在目录。
+        // 这样 tests/、src/ 等子目录下的脚本也能导入项目根的 packages/。
         if (!string.IsNullOrEmpty(currentFilePath))
         {
             try
@@ -543,11 +545,25 @@ public class ModuleResolver
                 var sourceDir = Path.GetDirectoryName(Path.GetFullPath(currentFilePath));
                 if (!string.IsNullOrEmpty(sourceDir))
                 {
-                    var localPackages = Path.Combine(sourceDir, "packages");
-                    if (Directory.Exists(localPackages))
+                    var localSearchPaths = new List<string>();
+
+                    var projectRoot = ProjectConfig.FindProjectRoot(sourceDir);
+                    if (!string.IsNullOrEmpty(projectRoot))
                     {
-                        searchPaths.Insert(0, localPackages); // 本地包优先级更高
+                        var projectPackages = Path.Combine(projectRoot, "packages");
+                        if (Directory.Exists(projectPackages))
+                        {
+                            localSearchPaths.Add(projectPackages);
+                        }
                     }
+
+                    var localPackages = Path.Combine(sourceDir, "packages");
+                    if (Directory.Exists(localPackages) && !localSearchPaths.Contains(localPackages))
+                    {
+                        localSearchPaths.Add(localPackages);
+                    }
+
+                    searchPaths.InsertRange(0, localSearchPaths); // 本地包优先级更高
                 }
             }
             catch

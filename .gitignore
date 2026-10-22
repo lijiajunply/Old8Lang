@@ -14,6 +14,9 @@ Old8Lang.Tests/OldLib/temp/
 # IDE 工作区状态（每人不同，不应入库）
 .idea/**/workspace.xml
 
+# 包夹具的 DLL 由 TestFiles/TestProjects/prepare-dlls.sh 从构建产物生成
+TestFiles/TestProjects/*/packages/OldLib/dll/*.dll
+
 nul
 
 # C#/.NET specific

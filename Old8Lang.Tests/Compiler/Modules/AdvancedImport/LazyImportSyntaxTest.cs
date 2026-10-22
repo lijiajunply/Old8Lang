@@ -15,15 +15,11 @@ public class LazyImportSyntaxTest(ITestOutputHelper output)
     public void LazyImportSyntax_ShouldBeParsed()
     {
         // 测试基本的懒导入语法解析
-        var testFilesDirectory = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "..",
-            "..",
-            "..",
-            "OldLib"
+        var tempDir = Path.Combine(
+            Path.GetTempPath(),
+            "old8lang-module-tests",
+            "Compiler_LazyImportSyntaxTest"
         );
-
-        var tempDir = Path.Combine(testFilesDirectory, "temp");
         Directory.CreateDirectory(tempDir);
 
         // 创建测试模块
@@ -81,15 +77,11 @@ lazy import ""test_lazy_module""
     public void LazyImportWithAlias_ShouldBeParsed()
     {
         // 测试带别名的懒导入语法
-        var testFilesDirectory = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "..",
-            "..",
-            "..",
-            "OldLib"
+        var tempDir = Path.Combine(
+            Path.GetTempPath(),
+            "old8lang-module-tests",
+            "Compiler_LazyImportSyntaxTest"
         );
-
-        var tempDir = Path.Combine(testFilesDirectory, "temp");
         Directory.CreateDirectory(tempDir);
 
         // 创建测试模块
