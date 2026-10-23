@@ -433,3 +433,51 @@
   - `UnifiedModuleArchitectureTests` / `LazyImportSyntaxTest` 别名：IL 模式实现模块别名
     （编译期注册模块、成员访问展开为同名符号、模块体内联），测试改传真实文件路径。
   - 附带修复 `DatabaseLibTests` 编译器/解释器两组共用内存库名导致的 8 个并发失败。
+
+## H. 2026-10-23 IL 模式缺陷（本轮已修 7 条，剩余 5 条）
+
+来源：`Reports/2026-10-23-19-19-项目现状与缺口排查.md` 与
+`Reports/2026-10-23-23-30-IL模式缺陷修复验证.md`。
+
+### 已修复（2026-10-23）
+
+- [x] **顶层 `Assert.*` 调用生成非法 IL**：`GenerateAssertMethodCall` 未给 `AssertHelper` 的可选
+  `message` 参数补默认值，导致 `call` 3 参数方法只压 2 个值。已补 `Ldnull` / `initobj`。
+  `Compiler.Expressions` 由 44 通过 / 176 失败变为 **179 通过 / 41 失败**。
+- [x] **IL 模式顶层语句被执行两次**：预执行改为 `BlockStatement.ExecuteDeclarations`，只跑
+  `FuncInit` / `ClassInit` / `AsyncFuncInit` / `ExternStatement` / `EnumInit` / `ExtensionDeclaration` / 动态导入。
+- [x] **无类型注解递归函数栈溢出**：`*` `/` `%` 统一走 `LoadAndConvertOperands`；`<=` / `>=` / `!=`
+  在 `object` 与 `int` 混用时走 `IComparable` / `object.Equals`。`factorial` / `fibonacci` 结果正确。
+- [x] **预执行不再填充 Manager 后测试断言失效**：新增 `RuntimeGlobalWriter`（`[ThreadStatic]`），
+  在编译产物 `ret` 前把顶层变量写回 `interpreter.Manager`，断言读的是 IL 执行结果。
+- [x] **列表字面量类型混淆导致 `AccessViolation`**：`ListLangValue` 统一生成 `List<object>`，
+  索引走 `IList`；`r <- {}; r.Add(1)` / `zip(list1, list2)` 不再崩溃。
+- [x] **`ListAddMethod` 对原生列表 `ldfld ListLangValue.Values`**：实现 `IIlNativeValueInstanceMethod`，
+  原生列表走 `IList.Add`（返回的下标要 `Pop` 掉）。
+- [x] **原生接收者的 `ToStr()` 生成无效 IL**：`ValueTypeToStrMethod` 改用
+  `IlValueBridge.EmitLoadWrapped` 桥接后再调用 helper；`x.ToStr()` 与 `match` 变量绑定用例恢复。
+
+### 仍未修复（IL 模式）
+
+- [ ] **IL 实例方法读取字段返回随机值**：
+  `class M { public v:int; func field()->int { return this.v } }` + `m <- M(9)`，
+  `PrintLine(m.field())` 在 `-il` 下每次输出不同的垃圾整数（`-f` 为 `9`）；顶层 `m.v` 读取正常。
+- [ ] **IL 函数无法访问顶层全局变量**：`g <- 10` + `func f() -> int { return g + 1 }` →
+  `变量 'g' 未声明`。顶层变量是 `OldLangRun` 的局部变量，函数是独立 `DynamicMethod`，编译函数体时不可见。
+- [ ] **IL 打印布尔值大小写不一致**：`PrintLine(true)` 解释器/VM 为 `true`，IL 编译产物为 `True`。
+- [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
+  `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
+- [ ] **3 处仍会让全量 `dotnet test` 中止的既有崩溃**（均已在 `d0142ed3` 基线复现）：
+  - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
+    `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
+  - `Compiler.Linq`：`LinqCompilerHelper.ConvertFromLangValue(LangValueType)` 收到原生值 →
+    `AccessViolationException`（`LinqLetOrderByTests.LinqQuery_LetSelectBoth_...`，基线同样崩溃）。
+  - `Compiler.Statements.SelectStatementTests.SelectStatement_ReceiveComplexObject`：
+    `select` + `ChannelSend` + 字典 → 段错误（基线同样崩溃）。
+
+补充（对已有条目的确认）：
+
+- `Todo.md` §G 的"全量 `dotnet test` 结束前中止"已确认直接原因是 §B 的无类型注解递归（已修）；
+  修好后暴露出上述 3 处独立崩溃，全量测试仍无法跑完。
+- 非 IL 档新增一条并行抖动用例：`Interpreter.Async.TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling`
+  全量并行时 `NullReferenceException`，单独连跑 8 次全过；2026-10-23 复跑时通过。

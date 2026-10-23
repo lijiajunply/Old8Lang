@@ -193,6 +193,32 @@ public static class Compiler
     }
 
     /// <summary>
+    /// 生成“把顶层变量写回解释器管理器”的 IL。
+    /// 这段代码放在返回标签之后，因此顶层 <c>return</c> 也会经过它。
+    /// </summary>
+    private static void EmitGlobalWriteBack(ILGenerator ilGenerator, LocalManager local)
+    {
+        var writeMethod = typeof(RuntimeGlobalWriter).GetMethod(nameof(RuntimeGlobalWriter.Write))!;
+
+        foreach (var (name, localBuilder) in local.LocalVar)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                continue;
+            }
+
+            ilGenerator.Emit(OpCodes.Ldstr, name);
+            ilGenerator.Emit(OpCodes.Ldloc, localBuilder);
+            if (localBuilder.LocalType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, localBuilder.LocalType);
+            }
+
+            ilGenerator.Emit(OpCodes.Call, writeMethod);
+        }
+    }
+
+    /// <summary>
     /// 注册全局静态类到LocalManager中
     /// </summary>
     /// <param name="local">局部变量管理器</param>
@@ -280,10 +306,11 @@ public static class Compiler
             }
         }
 
-        // 【装饰器支持】在编译之前，先使用解释器执行所有函数声明
-        // 这样装饰器函数就可以在应用装饰器时被找到
-        Log("预执行函数声明以支持装饰器", LogLevel.Debug);
-        statement.ExecuteModule(i.Manager, skipFunctionClassInit: false);
+        // 【装饰器 / 扩展方法支持】在编译之前，用解释器预执行声明类语句
+        // （函数、类、枚举、扩展方法），让装饰器与扩展方法在编译期可见。
+        // 注意：不能执行普通顶层语句，否则 PrintLine / 文件写入等副作用会随编译产物再发生一次。
+        Log("预执行声明语句以支持装饰器和扩展方法", LogLevel.Debug);
+        statement.ExecuteDeclarations(i.Manager);
 
         try
         {
@@ -294,6 +321,9 @@ public static class Compiler
 
             // 标记返回标签
             ilGenerator.MarkLabel(returnLabel);
+
+            // 顶层变量回写：把编译产物的最终结果写回解释器管理器的全局作用域
+            EmitGlobalWriteBack(ilGenerator, local);
 
             // 生成返回指令
             ilGenerator.Emit(OpCodes.Ret);
@@ -351,6 +381,8 @@ public static class Compiler
             // 包装委托以捕获并转换运行时异常
             return () =>
             {
+                // 顶层变量回写需要知道当前线程的解释器实例
+                RuntimeGlobalWriter.SetManager(i.Manager);
                 try
                 {
                     oldLangRun();

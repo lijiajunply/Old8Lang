@@ -317,9 +317,30 @@ internal static class ComparisonOpHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
+        var leftOpType = left?.OutputType(local);
+        var rightOpType = right?.OutputType(local);
+
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Ceq);
+
+        // 字符串按值比较，否则 Ceq 只比较引用
+        if (leftOpType == typeof(string) && rightOpType == typeof(string))
+        {
+            var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Call, equalsMethod);
+        }
+        // object 与 int 混用（如未注解的函数参数）：先装箱再按值比较
+        else if (IsObjectVsIntComparison(leftOpType, rightOpType))
+        {
+            BoxIntIfNeeded(ilGenerator, leftOpType, rightOpType);
+            var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Call, equalsMethod);
+        }
+        else
+        {
+            ilGenerator.Emit(OpCodes.Ceq);
+        }
+
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);
         return typeof(bool);
@@ -380,6 +401,20 @@ internal static class ComparisonOpHelper
 
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
+
+        // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
+        if (IsObjectVsIntComparison(leftType, rightType))
+        {
+            BoxIntIfNeeded(ilGenerator, leftType, rightType);
+            var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Cgt);
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+            ilGenerator.Emit(OpCodes.Xor);
+            return typeof(bool);
+        }
+
         ilGenerator.Emit(OpCodes.Cgt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);
@@ -441,6 +476,20 @@ internal static class ComparisonOpHelper
 
         left?.LoadIlValue(ilGenerator, local);
         right?.LoadIlValue(ilGenerator, local);
+
+        // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
+        if (IsObjectVsIntComparison(leftType, rightType))
+        {
+            BoxIntIfNeeded(ilGenerator, leftType, rightType);
+            var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Clt);
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+            ilGenerator.Emit(OpCodes.Xor);
+            return typeof(bool);
+        }
+
         ilGenerator.Emit(OpCodes.Clt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);

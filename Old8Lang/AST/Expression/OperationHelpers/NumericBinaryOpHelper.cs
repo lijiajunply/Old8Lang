@@ -250,9 +250,8 @@ internal static class NumericBinaryOpHelper
             return typeof(object);
         }
 
-        // 先加载操作数但不自动拆箱
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
+        // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
+        LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
         // 处理不同类型的乘法
         if (leftType == typeof(double) || rightType == typeof(double))
@@ -275,29 +274,6 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Mul);
             return typeof(double);
         }
-
-        // 特殊处理：如果两个操作数都是object类型，使用Convert.ToInt32进行安全转换
-        if (leftType == typeof(object) && rightType == typeof(object))
-        {
-            // 栈上有: [left_value, right_value]
-            // 先保存right到临时变量
-            var rightTemp = ilGenerator.DeclareLocal(typeof(object));
-            ilGenerator.Emit(OpCodes.Stloc, rightTemp);
-
-            // 转换left为int
-            var toInt32Method = typeof(Convert).GetMethod("ToInt32", [typeof(object)])!;
-            ilGenerator.Emit(OpCodes.Call, toInt32Method);
-
-            // 加载right并转换
-            ilGenerator.Emit(OpCodes.Ldloc, rightTemp);
-            ilGenerator.Emit(OpCodes.Call, toInt32Method);
-
-            ilGenerator.Emit(OpCodes.Mul);
-            return typeof(int);
-        }
-
-        // 确保操作数是int类型
-        // EnsureIntType(ilGenerator, leftType, rightType);
 
         ilGenerator.Emit(OpCodes.Mul);
         return typeof(int);
@@ -353,27 +329,15 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
-        if (leftType == typeof(double) || rightType == typeof(double))
+        // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
+        LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
+
+        if (ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType))
         {
-            // 确保两个操作数都是double类型
-            left?.LoadIlValue(ilGenerator, local);
-            if (leftType == typeof(int))
-            {
-                ilGenerator.Emit(OpCodes.Conv_R8);
-            }
-
-            right?.LoadIlValue(ilGenerator, local);
-            if (rightType == typeof(int))
-            {
-                ilGenerator.Emit(OpCodes.Conv_R8);
-            }
-
             ilGenerator.Emit(OpCodes.Div);
             return typeof(double);
         }
 
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Div);
         return typeof(int);
     }
@@ -428,47 +392,11 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
-        left?.LoadIlValue(ilGenerator, local);
-        right?.LoadIlValue(ilGenerator, local);
+        // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
+        LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
-        // 获取操作数类型
-        var modLeftType = left?.OutputType(local);
-        var modRightType = right?.OutputType(local);
-
-        // 处理 ForIn 循环中变量的特殊情况（object vs int）
-        if ((modLeftType == typeof(object) && modRightType == typeof(int)) ||
-            (modLeftType == typeof(int) && modRightType == typeof(object)))
+        if (ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType))
         {
-            // 对于 object vs int，拆箱 object 到 int
-            if (modLeftType == typeof(object))
-            {
-                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-            }
-            if (modRightType == typeof(object))
-            {
-                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-            }
-            ilGenerator.Emit(OpCodes.Rem);
-            return typeof(int);
-        }
-
-        if (modLeftType == typeof(double) || modRightType == typeof(double))
-        {
-            // 确保两个操作数都是double类型
-            if (modLeftType == typeof(int))
-            {
-                // 栈顶是right，需要交换
-                var rightTemp = ilGenerator.DeclareLocal(typeof(double));
-                ilGenerator.Emit(OpCodes.Stloc, rightTemp);
-                ilGenerator.Emit(OpCodes.Conv_R8);
-                ilGenerator.Emit(OpCodes.Ldloc, rightTemp);
-            }
-
-            if (modRightType == typeof(int))
-            {
-                ilGenerator.Emit(OpCodes.Conv_R8);
-            }
-
             ilGenerator.Emit(OpCodes.Rem);
             return typeof(double);
         }

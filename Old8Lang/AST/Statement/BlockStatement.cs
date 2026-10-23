@@ -280,6 +280,38 @@ public partial class BlockStatement : OldStatement
         }
     }
 
+    /// <summary>
+    /// 只执行声明类语句（函数、类、异步函数、extern、枚举、扩展方法、动态导入），
+    /// 跳过赋值、打印、循环等有副作用的顶层语句。
+    /// 用于 IL 模式编译前的解释器预执行：既要让装饰器 / 扩展方法在编译期可见，
+    /// 又不能把顶层代码执行两遍。
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    public void ExecuteDeclarations(VariateManager manager)
+    {
+        // ImportStatements 里只包含声明与导入；导入语句由调用方单独处理
+        foreach (var statement in ImportStatements)
+        {
+            if (statement is not ImportStatement && statement is not NativeStatement)
+            {
+                statement.Run(manager);
+            }
+        }
+
+        // OtherStatements 里绝大多数是有副作用的普通语句，只挑出声明类节点执行
+        foreach (var statement in OtherStatements)
+        {
+            switch (statement)
+            {
+                case EnumInit:
+                case ExtensionDeclaration:
+                case ImportStatement { IsDynamicImport: true }:
+                    statement.Run(manager);
+                    break;
+            }
+        }
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();

@@ -294,28 +294,13 @@ public partial class ListLangValue : LangValueType, ILangList
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 确定列表元素的类型
+        // IL 模式下统一用 List<object> 表示列表字面量。
+        // 之前会按元素推断出 List<int> / List<string>，但 `list` 参数的静态类型是 List<object>，
+        // 把 List<int> 传给 List<object> 形参后，索引器/Add 等 callvirt 会按错误的泛型实例解析，
+        // 运行期直接 AccessViolation。动态语言的列表本身就是异构的，统一装箱更安全。
         var itemType = typeof(object);
-        if (Value.Count > 0)
-        {
-            itemType = Value[0].OutputType(local);
-            // 检查所有元素是否为同一类型
-            if (Value.Select(expr => expr.OutputType(local)).Any(exprType => exprType != itemType))
-            {
-                itemType = typeof(object);
-            }
-        }
-        else if (Values.Count > 0)
-        {
-            itemType = Values[0].OutputType(local);
-            // 检查所有元素是否为同一类型
-            if (Values.Select(value => value.OutputType(local)).Any(valueType => valueType != itemType))
-            {
-                itemType = typeof(object);
-            }
-        }
 
-        var listType = typeof(List<>).MakeGenericType(itemType ?? typeof(object));
+        var listType = typeof(List<>).MakeGenericType(itemType);
         // 创建泛型List实例
         var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
         ilGenerator.Emit(OpCodes.Newobj, listConstructor);
@@ -331,7 +316,7 @@ public partial class ListLangValue : LangValueType, ILangList
         ilGenerator.Emit(OpCodes.Stloc, l);
 
         // 向List中添加元素
-        var addMethod = listType.GetMethod("Add", [itemType ?? typeof(object)])!;
+        var addMethod = listType.GetMethod("Add", [itemType])!;
         foreach (var expr in Value)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l);
@@ -351,29 +336,8 @@ public partial class ListLangValue : LangValueType, ILangList
 
     public override Type OutputType(LocalManager local)
     {
-        // 确定列表元素的类型
-        var itemType = typeof(object);
-        if (Value.Count > 0)
-        {
-            itemType = Value[0].OutputType(local);
-            // 检查所有元素是否为同一类型
-            if (Value.Select(expr => expr.OutputType(local)).Any(exprType => exprType != itemType))
-            {
-                itemType = typeof(object);
-            }
-        }
-        else if (Values.Count > 0)
-        {
-            itemType = Values[0].OutputType(local);
-            // 检查所有元素是否为同一类型
-            if (Values.Select(value => value.OutputType(local)).Any(valueType => valueType != itemType))
-            {
-                itemType = typeof(object);
-            }
-        }
-
-        // 返回泛型List类型
-        return typeof(List<>).MakeGenericType(itemType ?? typeof(object));
+        // 与 LoadIlValue 保持一致：列表字面量在 IL 模式下统一是 List<object>
+        return typeof(List<object>);
     }
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)

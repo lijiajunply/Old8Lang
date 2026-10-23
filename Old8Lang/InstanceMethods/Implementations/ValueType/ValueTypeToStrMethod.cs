@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.ValueType;
@@ -27,7 +28,9 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        // 接收者可能是原生 int/string/...（IL 模式），helper 的形参是 LangValueType，
+        // 必须先经过桥接装箱，否则会直接把 int32 传给引用类型形参，生成无效 IL。
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeToStrMethod).GetMethod(nameof(ConvertToStrHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

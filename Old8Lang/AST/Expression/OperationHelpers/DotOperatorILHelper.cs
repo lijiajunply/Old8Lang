@@ -302,6 +302,25 @@ public static class DotOperatorILHelper
                 }
             }
 
+            // 未显式传入的可选参数必须补上默认值：
+            // C# 的可选参数在 IL 层面仍是完整形参（如 AssertHelper.AssertEqual 的 message），
+            // 只压入实际实参会让 call 的栈深度不足，生成无效 IL。
+            for (var i = instance.Ids.Count; i < parameters.Length; i++)
+            {
+                var optionalParamType = parameters[i].ParameterType;
+                if (optionalParamType.IsValueType)
+                {
+                    var defaultLocal = ilGenerator.DeclareLocal(optionalParamType);
+                    ilGenerator.Emit(OpCodes.Ldloca, defaultLocal);
+                    ilGenerator.Emit(OpCodes.Initobj, optionalParamType);
+                    ilGenerator.Emit(OpCodes.Ldloc, defaultLocal);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Ldnull);
+                }
+            }
+
             ilGenerator.Emit(OpCodes.Call, assertMethod);
 
             // 处理 void 返回类型
@@ -868,10 +887,14 @@ public static class DotOperatorILHelper
             return typeof(object);
         }
 
-        if (leftType == typeof(List<object>))
+        if (leftType != null && typeof(System.Collections.IList).IsAssignableFrom(leftType) &&
+            !leftType.IsArray && leftType != typeof(string))
         {
-            // List<T>索引访问，调用索引器的getter方法
-            var indexer = typeof(List<object>).GetProperty("Item")!;
+            // 列表索引访问：走非泛型 IList 接口。
+            // 列表字面量可能是 List<int> / List<string> 等具体泛型，
+            // 而 list 参数在 IL 里静态类型是 List<object>；直接 callvirt List<object>.get_Item
+            // 会在运行期把 List<int> 当 List<object> 使用，导致内存访问越界。
+            var indexer = typeof(System.Collections.IList).GetProperty("Item")!;
             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
             return typeof(object);
         }
@@ -965,18 +988,18 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(OpCodes.Callvirt, dictIndexer.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Br, endLabel);
 
-        // 不是Dictionary，尝试List<object>
+        // 不是Dictionary，尝试任意 IList（List<int> / List<object> / int[] 等）
         ilGenerator.MarkLabel(notDictLabel);
         ilGenerator.Emit(OpCodes.Pop); // 弹出null
         ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(List<object>));
+        ilGenerator.Emit(OpCodes.Isinst, typeof(System.Collections.IList));
         ilGenerator.Emit(OpCodes.Dup);
         ilGenerator.Emit(OpCodes.Brfalse, notListLabel);
 
         // 是List
         ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
         ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-        var listIndexer = typeof(List<object>).GetProperty("Item")!;
+        var listIndexer = typeof(System.Collections.IList).GetProperty("Item")!;
         ilGenerator.Emit(OpCodes.Callvirt, listIndexer.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Br, endLabel);
 
