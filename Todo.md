@@ -423,10 +423,13 @@
   已按实际包 API 重写，覆盖 Logger / HttpClient / SimpleLogger / SimpleMath；同时修正 `HttpClient` 包内
   `Logger.Create` → `LoggerClass`，并让 `ModuleResolver` 从项目根的 `packages/` 解析第三方包。
 
-- [ ] **`ThirdPartyLibTest/packages/OldLib/index.old8` 为空**：`import "OldLib"` 不导出任何符号，
-  原用例里的 `Math.*` / `String.*` / `Collection.*` / `Time.*` / `Json.*` / `OS.*` / `Crypto.*` 调用都已失效。
-  需要补 index 导出（或从 `o8package.json` 移除该依赖），否则 OldLib 包无法被实际使用。
+- [x] **`ThirdPartyLibTest/packages/OldLib/index.old8` 为空**（2026-10-22 已修）：
+  入口改为直接声明 `Old8LangLib` 的 `extern`（MathLib / Time / CryptoLib / FileLib / OS / Csv / Terminal），
+  并删除已失效的 `Async.old8`、`CollectionLib.old8`、`Json.old8`；夹具用例新增 OldLib 覆盖。
 
-- [ ] **模块测试 10 个既有失败**（HEAD 基线同样 10/48 失败）：`JsonLibTests` 4 个（`import "Json"` 找不到模块）、
-  `NetLibTests` 2 个、`SelectiveImportTests` 2 个（`lazy_math` 找不到）、`UnifiedModuleArchitectureTests` 1 个与
-  `LazyImportSyntaxTest` 1 个（懒导入别名 `tm` 未定义）。与本次改动无关，需单独排查标准库注册与懒导入实现。
+- [x] **模块测试 10 个既有失败**（2026-10-22 已修，模块测试 520/520 通过）：
+  - `JsonLibTests`：`Json` 标准库已移除，删除该测试类；`NetLibTests` 改用全局 `JsonSerialize`。
+  - `SelectiveImportTests`：补 `CopyModuleFixture("lazy_math.old8")`，让相对导入能找到 fixture。
+  - `UnifiedModuleArchitectureTests` / `LazyImportSyntaxTest` 别名：IL 模式实现模块别名
+    （编译期注册模块、成员访问展开为同名符号、模块体内联），测试改传真实文件路径。
+  - 附带修复 `DatabaseLibTests` 编译器/解释器两组共用内存库名导致的 8 个并发失败。

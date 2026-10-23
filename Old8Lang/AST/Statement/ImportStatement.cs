@@ -239,7 +239,7 @@ public partial class ImportStatement(
             // 使用缓存的模块
             var cachedOriginalPath = local.FilePath;
             local.FilePath = moduleAbsolutePath;
-            cachedBlock.GenerateImportIl(ilGenerator, local);
+            cachedBlock.GenerateImportIl(ilGenerator, local, includeBody: true);
             local.FilePath = cachedOriginalPath;
             return;
         }
@@ -256,7 +256,7 @@ public partial class ImportStatement(
             local.Interpreter.ModuleCache[moduleAbsolutePath] = block;
         }
 
-        block?.GenerateImportIl(ilGenerator, local);
+        block?.GenerateImportIl(ilGenerator, local, includeBody: true);
         local.FilePath = importOriginalPath;
     }
 

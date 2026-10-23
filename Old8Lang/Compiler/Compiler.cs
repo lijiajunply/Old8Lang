@@ -269,6 +269,17 @@ public static class Compiler
         // 注册全局静态类
         RegisterGlobalStaticClasses(local);
 
+        // 【模块别名支持】IL 模式没有模块对象，先把带别名的导入注册到解释器作用域，
+        // 这样下面的 ExecuteModule 编译期求值（以及运行时的动态回退）都能找到别名。
+        foreach (var importStatement in statement.ImportStatements)
+        {
+            if (importStatement is ImportStatement { } import && import.GetModuleAlias() is { } alias)
+            {
+                import.Run(i.Manager);
+                local.ModuleAliases.Add(alias);
+            }
+        }
+
         // 【装饰器支持】在编译之前，先使用解释器执行所有函数声明
         // 这样装饰器函数就可以在应用装饰器时被找到
         Log("预执行函数声明以支持装饰器", LogLevel.Debug);

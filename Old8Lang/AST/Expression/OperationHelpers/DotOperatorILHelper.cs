@@ -54,25 +54,61 @@ public static class DotOperatorILHelper
             return GenerateThisMemberAccess(right, ilGenerator, local);
         }
 
-        // 2. 处理实例方法调用
+        // 2. 模块别名：import "m" as tm 后，tm.member 展开为模块内联后的同名符号
+        if (left is LangId aliasId && local.ModuleAliases.Contains(aliasId.IdName))
+        {
+            return GenerateModuleAliasMember(aliasId, right, ilGenerator, local);
+        }
+
+        // 3. 处理实例方法调用
         if (right is Instance instance)
         {
             return GenerateInstanceMethodCall(left, instance, ilGenerator, local, leftType, operation);
         }
 
-        // 3. 处理字段和属性访问
+        // 4. 处理字段和属性访问
         if (right is LangId id)
         {
             return GenerateFieldOrPropertyAccess(left, id, ilGenerator, local, leftType, operation);
         }
 
-        // 4. 处理索引访问
+        // 5. 处理索引访问
         if (rightType is not null)
         {
             return GenerateIndexAccess(left, right, ilGenerator, local, leftType, rightType, operation);
         }
 
         return typeof(void);
+    }
+
+    /// <summary>
+    /// 生成模块别名成员访问的 IL（IL 模式）：import "m" as tm 后，tm.member 等价于 member。
+    /// 模块体已被 GenerateImportIl 内联到当前方法，因此直接把成员名当作普通符号编译。
+    /// </summary>
+    private static Type GenerateModuleAliasMember(
+        LangId aliasId,
+        LangExpression? right,
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        if (right is Instance instance)
+        {
+            var memberName = instance.Id.IdName;
+            LangExpression call = instance.NamedArgs.Count > 0
+                ? new FunctionCallExpression(new LangId(memberName), instance.Ids, instance.NamedArgs, aliasId.Position)
+                : new FunctionCallExpression(new LangId(memberName), instance.Ids, aliasId.Position);
+            call.LoadIlValue(ilGenerator, local);
+            return call.OutputType(local) ?? typeof(object);
+        }
+
+        if (right is LangId memberId)
+        {
+            var value = new LangId(memberId.IdName, position: memberId.Position);
+            value.LoadIlValue(ilGenerator, local);
+            return value.OutputType(local) ?? typeof(object);
+        }
+
+        throw new InvalidOperationError(aliasId, $"不支持访问模块别名 '{aliasId.IdName}' 的成员");
     }
 
     /// <summary>

@@ -33,7 +33,7 @@ public class UnifiedModuleArchitectureTests(ITestOutputHelper output)
         try
         {
             var ast = interpreter.Build(File.ReadAllText(filePath), filePath);
-            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, filePath, interpreter);
 
             // Assert - 验证编译成功
             Assert.NotNull(compiledAction);

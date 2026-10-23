@@ -107,7 +107,7 @@ result <- tm.value
             output.WriteLine($"Testing alias code: {code}");
 
             var ast = interpreter.Build(code, testFilePath);
-            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, testFilePath, interpreter);
 
         // Assert - 验证编译成功
         Assert.NotNull(compiledAction);

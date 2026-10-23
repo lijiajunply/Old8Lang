@@ -1,0 +1,11 @@
+// OldLib 包入口：直接声明 Old8LangLib 的 extern，符号会导入到调用方作用域。
+// 注意：AsyncLib / SortLib / CollectionLib / JsonLib 已在 C# 侧移除，不再导出。
+
+extern "Old8LangLib" MathLib *
+extern "Old8LangLib" Time *
+extern "Old8LangLib" CryptoLib *
+extern "Old8LangLib" FileLib *
+extern "Old8LangLib" OS *
+extern "Old8LangLib" Csv *
+extern "Old8LangLib" Terminal *
+extern "Old8LangLib" ColorfulTerminal *

@@ -202,10 +202,26 @@ public partial class BlockStatement : OldStatement
         Accept(visitor);
     }
 
-    public void GenerateImportIl(ILGenerator ilGenerator, LocalManager local)
+    /// <summary>
+    /// 生成模块导入的 IL。
+    /// </summary>
+    /// <param name="includeBody">
+    /// 导入模块时传 true：模块顶层的变量赋值等语句也要内联，否则模块别名访问不到模块变量。
+    /// 主程序块传 false（其顶层语句由 VisitBlockStatement 正常编译）。
+    /// </param>
+    public void GenerateImportIl(ILGenerator ilGenerator, LocalManager local, bool includeBody = false)
     {
         foreach (var statement in ImportStatements)
         {
+            statement.GenerateIl(ilGenerator, local);
+        }
+
+        if (!includeBody) return;
+
+        foreach (var statement in OtherStatements)
+        {
+            // 导入语句已由上面的循环处理，避免重复
+            if (statement is ImportStatement) continue;
             statement.GenerateIl(ilGenerator, local);
         }
     }

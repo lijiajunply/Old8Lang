@@ -21,5 +21,6 @@ bash TestFiles/TestProjects/prepare-dlls.sh Release  # Release
 
 不生成也能运行：`DllPathResolver` 会回退到构建输出（`Old8Lang.App/bin/<Config>/net10.0/`）。
 
-> 注：`ThirdPartyLibTest/tests/test_thirdparty.old8` 仍使用旧语法（`var x = ...`），
-> 直接运行会报语法错误，与 DLL 无关（已记录在 `Todo.md` §G）。
+> `packages/OldLib/index.old8` 直接声明 `Old8LangLib` 的 `extern`，`import "OldLib"` 后
+> MathLib / Time / CryptoLib / FileLib / OS / Csv / Terminal 的静态方法进入当前作用域；
+> `Async` / `CollectionLib` / `Json` 模块因对应 C# 类已移除而删除。

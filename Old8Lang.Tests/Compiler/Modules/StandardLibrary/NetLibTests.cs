@@ -62,7 +62,6 @@ client.Dispose()
     {
         var code = @"
 import Net
-import Json
 
 // 创建 HttpWebClient 实例
 client <- Net.HttpWebClient()
@@ -78,7 +77,7 @@ postData <- {
 }
 
 // 将数据转换为 JSON 字符串
-jsonContent <- Json.Serialize(postData)
+jsonContent <- JsonSerialize(postData)
 
 // 发送 POST 请求，Task 会自动等待完成
 response <- client.PostAsync(""https://jsonplaceholder.typicode.com/posts"", jsonContent, ""application/json"")
@@ -205,7 +204,6 @@ client.Dispose()
     {
         var code = @"
 import Net
-import Json
 
 // 创建 HttpWebClient 实例
 client <- Net.HttpWebClient()
@@ -219,7 +217,7 @@ updateData <- {
     ""userId"": 1
 }
 
-jsonContent <- Json.Serialize(updateData)
+jsonContent <- JsonSerialize(updateData)
 
 // 发送 PUT 请求，Task 会自动等待完成
 response <- client.PutAsync(""https://jsonplaceholder.typicode.com/posts/1"", jsonContent, ""application/json"")

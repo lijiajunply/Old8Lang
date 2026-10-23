@@ -1,8 +1,6 @@
 // 第三方库集成测试（ThirdPartyLibTest 夹具）
-// 覆盖：Logger（类 API）、HttpClient（依赖 Logger）、SimpleLogger、SimpleMath
-//
-// 说明：OldLib 包的 index.old8 目前为空，import "OldLib" 不会导出任何符号，
-// 因此本文件不再测试 Math/String/Collection 等旧 API（见 Todo.md）。
+// 覆盖：Logger（类 API）、HttpClient（依赖 Logger）、SimpleLogger、SimpleMath、
+//       OldLib（Old8LangLib 的 C# 静态方法）
 
 PrintLine("=== 第三方库集成测试 ===")
 
@@ -51,7 +49,17 @@ PrintLine("abs(-5.0) = " + abs(-5.0).ToStr())
 PrintLine("max(3.0, 7.0) = " + max(3.0, 7.0).ToStr())
 PrintLine("min(3.0, 7.0) = " + min(3.0, 7.0).ToStr())
 
-// --- 5. 重复导入不应报错 ----------------------------------------------
+// --- 5. OldLib 包（Old8LangLib 的 C# 静态方法）---------------------------
+PrintLine("\n--- OldLib 包 ---")
+import "OldLib"
+
+PrintLine("Sqrt(9.0) = " + Sqrt(9.0).ToStr())
+PrintLine("Factorial(5) = " + Factorial(5).ToStr())
+PrintLine("SHA256(abc) = " + Sha256Hash("abc"))
+PrintLine("GetLocalTime = " + GetLocalTime("yyyy-MM-dd"))
+PrintLine("ParseCsvLine(a,b,c)[0] = " + ParseCsvLine("a,b,c")[0])
+
+// --- 6. 重复导入不应报错 ----------------------------------------------
 PrintLine("\n--- 重复导入 ---")
 import "SimpleLogger"
 Info("重复导入后仍可调用")

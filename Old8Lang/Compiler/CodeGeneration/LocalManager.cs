@@ -96,6 +96,12 @@ public class LocalManager
     public readonly Dictionary<string, LangValueType> GlobalStaticClasses = [];
 
     /// <summary>
+    /// 模块别名（import "module" as alias）。IL 模式下没有模块对象，
+    /// 别名的成员访问会被展开为模块内联后的同名符号。
+    /// </summary>
+    public readonly HashSet<string> ModuleAliases = [];
+
+    /// <summary>
     /// 当前正在构建的类的构造函数（如果存在）
     /// </summary>
     public ConstructorBuilder? CurrentConstructorBuilder { get; set; }

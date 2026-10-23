@@ -33,6 +33,7 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
             }
             """;
         CreateTempModuleFile("selective_import_test.old8", testContent);
+        CopyModuleFixture("lazy_math.old8");
 
         // Act
         var (interpreter, exception) = ExecuteCodeFile("selective_import_test.old8");
@@ -70,6 +71,7 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
             }
             """;
         CreateTempModuleFile("selective_from_module_test.old8", testContent);
+        CopyModuleFixture("lazy_math.old8");
 
         // Act
         var (interpreter, exception) = ExecuteCodeFile("selective_from_module_test.old8");

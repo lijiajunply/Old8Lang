@@ -121,7 +121,8 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
         try
         {
             var ast = interpreter.Build(code, fullPath);
-            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+            // 传入真实文件路径，模块解析（相对导入/包）依赖它
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, fullPath, interpreter);
 
             // Assert - 验证编译成功
             Assert.NotNull(compiledAction);
