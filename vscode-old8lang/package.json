@@ -2,7 +2,7 @@
   "name": "old8lang",
   "displayName": "Old8Lang",
   "description": "Old8Lang 语言支持",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "old8lang",
   "engines": {
     "vscode": "^1.75.0"
@@ -43,7 +43,59 @@
         "old8lang.languageServer.path": {
           "type": "string",
           "default": "",
-          "description": "Language Server 可执行文件路径（留空则使用默认路径）"
+          "description": "Language Server 可执行文件或 .dll 路径（留空则自动探测 server 目录或从源码启动）"
+        },
+        "old8lang.languageServer.project": {
+          "type": "string",
+          "default": "Old8Lang.LanguageServer",
+          "description": "源码开发模式下要启动的 Language Server 项目（相对于工作区根目录）"
+        },
+        "old8lang.compiler.path": {
+          "type": "string",
+          "default": "",
+          "description": "Old8Lang.App 可执行文件或 .dll 路径；留空时使用 dotnet run --project compiler.project"
+        },
+        "old8lang.compiler.project": {
+          "type": "string",
+          "default": "Old8Lang.App",
+          "description": "编译器项目路径（相对于工作区根目录），仅当 compiler.path 为空时使用"
+        },
+        "old8lang.compiler.mode": {
+          "type": "string",
+          "enum": [
+            "interpreter",
+            "il",
+            "vm"
+          ],
+          "enumDescriptions": [
+            "解释模式 -f（开发推荐）",
+            "IL 模式 -il（要求完整类型注解）",
+            "虚拟机模式 -vm（实验性）"
+          ],
+          "default": "interpreter",
+          "description": "“Old8Lang: 运行当前文件”使用的执行模式"
+        },
+        "old8lang.dotnet.path": {
+          "type": "string",
+          "default": "dotnet",
+          "description": "dotnet 可执行文件路径或命令名"
+        },
+        "old8lang.diagnostics.level": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warning",
+            "information",
+            "hint"
+          ],
+          "enumDescriptions": [
+            "仅错误",
+            "错误与警告",
+            "错误、警告与信息",
+            "显示全部诊断"
+          ],
+          "default": "hint",
+          "description": "客户端显示诊断的最高严重级别"
         },
         "old8lang.trace.server": {
           "type": "string",
@@ -56,25 +108,109 @@
           "description": "跟踪 Language Server 与客户端之间的通信"
         }
       }
-    }
+    },
+    "snippets": [
+      {
+        "language": "old8lang",
+        "path": "./snippets/old8lang.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "old8lang.runFile",
+        "title": "Old8Lang: 运行当前文件"
+      },
+      {
+        "command": "old8lang.checkFile",
+        "title": "Old8Lang: 语法检查当前文件"
+      },
+      {
+        "command": "old8lang.restartLanguageServer",
+        "title": "Old8Lang: 重启 Language Server"
+      },
+      {
+        "command": "old8lang.showReferences",
+        "title": "Old8Lang: 显示引用"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "old8lang.showReferences",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "old8lang.runFile",
+          "when": "editorLangId == old8lang",
+          "group": "navigation@1"
+        },
+        {
+          "command": "old8lang.checkFile",
+          "when": "editorLangId == old8lang",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "old8lang",
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "interpreter",
+              "il",
+              "vm",
+              "check"
+            ],
+            "description": "执行模式：interpreter(-f)、il(-il)、vm(-vm)、check(-s)"
+          },
+          "file": {
+            "type": "string",
+            "description": "要处理的 .old8 文件；省略时使用当前文件 (${file})"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "追加到命令行末尾的参数"
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run bundle",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node18 --external:vscode --outfile=out/extension.js --sourcemap",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "package:vsix": "npm run prepare:server && vsce package --no-dependencies",
+    "prepare:server": "dotnet publish ../Old8Lang.LanguageServer/Old8Lang.LanguageServer.csproj -c Release -o server --nologo"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.75.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.25.12",
     "eslint": "^8.0.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "vscode-languageclient": "^8.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lijiajunply/Old8Lang.git",
+    "directory": "vscode-old8lang"
+  },
+  "license": "MIT"
 }

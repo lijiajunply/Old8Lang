@@ -177,9 +177,9 @@ public class SymbolFinder
     }
 
     /// <summary>
-    /// 根据位置查找token
+    /// 根据 LSP 位置查找 token（行列号均从 0 开始）
     /// </summary>
-    private static LangToken? FindTokenAtPosition(List<LangToken> tokens, int line, int column, string? sourceCode = null)
+    public static LangToken? FindTokenAtPosition(List<LangToken> tokens, int line, int column, string? sourceCode = null)
     {
         // LSP的行列号从0开始
         var targetLine = line;
@@ -210,6 +210,20 @@ public class SymbolFinder
 
         System.Diagnostics.Debug.WriteLine($"  -> Not found");
         return null;
+    }
+
+    /// <summary>
+    /// 获取光标位置处的标识符名称，不要求该标识符已出现在符号表中
+    /// </summary>
+    public static string? FindIdentifierNameAtPosition(DocumentParseResult document, int line, int column)
+    {
+        if (document.Tokens == null)
+        {
+            return null;
+        }
+
+        var token = FindTokenAtPosition(document.Tokens, line, column, document.Text);
+        return token is { Type: LangTokenType.Identifier } ? token.Value.Value : null;
     }
 
     /// <summary>

@@ -1,0 +1,150 @@
+{
+  "Function": {
+    "prefix": ["func", "fn"],
+    "body": [
+      "func ${1:name}(${2:args}) -> ${3:void} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "声明 Old8Lang 函数"
+  },
+  "Async Function": {
+    "prefix": ["asyncfunc", "afunc"],
+    "body": [
+      "async func ${1:name}(${2:args}) -> ${3:Task} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "声明异步函数"
+  },
+  "Class": {
+    "prefix": ["class"],
+    "body": [
+      "class ${1:Name} {",
+      "\tpublic ${2:field}: ${3:int}",
+      "",
+      "\tpublic func init(${4:value}: ${3:int}) {",
+      "\t\tthis.${2:field} <- ${4:value}",
+      "\t}",
+      "",
+      "\tpublic func ${5:Method}() -> ${6:void} {",
+      "\t\t$0",
+      "\t}",
+      "}"
+    ],
+    "description": "声明带字段、构造函数和方法的类"
+  },
+  "If / Elif / Else": {
+    "prefix": ["if", "ifelse"],
+    "body": [
+      "if ${1:condition} {",
+      "\t$2",
+      "} elif ${3:condition} {",
+      "\t$0",
+      "} else {",
+      "\t",
+      "}"
+    ],
+    "description": "条件分支"
+  },
+  "For In": {
+    "prefix": ["forin", "foreach"],
+    "body": [
+      "for ${1:item} in ${2:collection} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "遍历集合"
+  },
+  "For (C style)": {
+    "prefix": ["for"],
+    "body": [
+      "for ${1:i} <- 0, ${1:i} < ${2:count}, ${1:i}++ {",
+      "\t$0",
+      "}"
+    ],
+    "description": "C 风格计数循环"
+  },
+  "While": {
+    "prefix": ["while"],
+    "body": [
+      "while ${1:condition} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "while 循环"
+  },
+  "Try / Catch": {
+    "prefix": ["try", "trycatch"],
+    "body": [
+      "try {",
+      "\t$1",
+      "} catch (${2:e}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "异常捕获"
+  },
+  "Try / Catch / Finally": {
+    "prefix": ["tryfinally"],
+    "body": [
+      "try {",
+      "\t$1",
+      "} catch (${2:e}) {",
+      "\t$3",
+      "} finally {",
+      "\t$0",
+      "}"
+    ],
+    "description": "带 finally 的异常处理"
+  },
+  "Switch": {
+    "prefix": ["switch"],
+    "body": [
+      "switch ${1:value} {",
+      "\tcase ${2:1} {",
+      "\t\t$3",
+      "\t}",
+      "\tdefault {",
+      "\t\t$0",
+      "\t}",
+      "}"
+    ],
+    "description": "switch 分支"
+  },
+  "Import Module": {
+    "prefix": ["import"],
+    "body": [
+      "import ${1:\"module\"}"
+    ],
+    "description": "导入模块"
+  },
+  "Import From": {
+    "prefix": ["importfrom"],
+    "body": [
+      "import { ${1:names} } from ${2:\"module\"}"
+    ],
+    "description": "从模块导入指定符号"
+  },
+  "Lambda": {
+    "prefix": ["lambda"],
+    "body": [
+      "${1:name} <- (${2:params}) -> ${3:expression}"
+    ],
+    "description": "Lambda 表达式"
+  },
+  "Await": {
+    "prefix": ["await"],
+    "body": [
+      "await ${1:task}"
+    ],
+    "description": "等待异步任务"
+  },
+  "PrintLine": {
+    "prefix": ["print", "println"],
+    "body": [
+      "PrintLine(${1:value})"
+    ],
+    "description": "打印一行输出"
+  }
+}

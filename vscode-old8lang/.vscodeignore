@@ -10,3 +10,13 @@ vsc-extension-quickstart.md
 **/*.ts
 !out/**/*.js
 node_modules/**
+.npm-cache/**
+*.vsix
+.DS_Store
+server/**/*.pdb
+server/ref/**
+server/refint/**
+server/*.cs
+server/*.cache
+server/*.editorconfig
+server/*.Up2Date

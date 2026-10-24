@@ -2,13 +2,14 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Old8Lang.LanguageServer.Services;
+using Old8Lang.LanguageServer.Models;
 
 namespace Old8Lang.LanguageServer.Handlers;
 
 /// <summary>
 /// 跳转定义处理器
 /// </summary>
-public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHandler
+public class DefinitionHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : IDefinitionHandler
 {
     public DefinitionRegistrationOptions GetRegistrationOptions(
         DefinitionCapability capability,
@@ -30,19 +31,29 @@ public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHan
             return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks());
         }
 
-        // 获取光标位置
-        var line = request.Position.Line;
-        var column = request.Position.Character;
+        var line = (int)request.Position.Line;
+        var column = (int)request.Position.Character;
 
-        // 查找光标位置的符号
+        // 先在本文件符号表中查找
         var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+
+        if (symbol == null)
+        {
+            // 本文件未声明该标识符时，尝试通过工作区索引解析到其他文件的顶层符号
+            var name = SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
+            if (name != null && workspaceIndex != null &&
+                workspaceIndex.TryResolveSymbol(name, uri, out var workspaceSymbol, out _) &&
+                workspaceSymbol != null)
+            {
+                symbol = workspaceSymbol;
+            }
+        }
 
         if (symbol == null)
         {
             return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks());
         }
 
-        // 构建定义位置
         var location = new Location
         {
             Uri = symbol.Location.Uri,
@@ -53,16 +64,14 @@ public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHan
             }
         };
 
-        var locations = new List<LocationOrLocationLink> { location };
-
-        return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks(locations));
+        return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks(location));
     }
 }
 
 /// <summary>
-/// 查找引用处理器
+/// 查找引用处理器 - 顶层符号支持跨文件查找
 /// </summary>
-public class ReferencesHandler(DocumentManager documentManager) : IReferencesHandler
+public class ReferencesHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : IReferencesHandler
 {
     public ReferenceRegistrationOptions GetRegistrationOptions(
         ReferenceCapability capability,
@@ -84,36 +93,53 @@ public class ReferencesHandler(DocumentManager documentManager) : IReferencesHan
             return Task.FromResult<LocationContainer?>(null);
         }
 
-        // 获取光标位置
-        var line = request.Position.Line;
-        var column = request.Position.Character;
+        var line = (int)request.Position.Line;
+        var column = (int)request.Position.Character;
 
-        // 查找光标位置的符号
         var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var symbolName = symbol?.Name ?? SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
+
+        if (symbolName == null)
+        {
+            return Task.FromResult<LocationContainer?>(new LocationContainer());
+        }
+
+        // 顶层符号（函数、类、全局变量）跨文件查找；成员与参数保持文件内作用域
+        if (workspaceIndex != null &&
+            workspaceIndex.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
+            workspaceSymbol != null && definitionFile != null &&
+            (symbol == null || IsSameDefinition(symbol, workspaceSymbol)))
+        {
+            var workspaceReferences = workspaceIndex.FindReferences(symbolName, definitionFile.Uri);
+            return Task.FromResult<LocationContainer?>(
+                new LocationContainer(BuildLocations(workspaceReferences, workspaceSymbol.Location,
+                    request.Context.IncludeDeclaration)));
+        }
 
         if (symbol == null)
         {
             return Task.FromResult<LocationContainer?>(new LocationContainer());
         }
 
-        // 查找该符号的所有引用
         var references = SymbolFinder.FindReferences(document, symbol.Name);
+        return Task.FromResult<LocationContainer?>(
+            new LocationContainer(BuildLocations(references, symbol.Location, request.Context.IncludeDeclaration)));
+    }
 
-        // 转换为 LSP Location 格式
-        var locations = new List<Location>();
-
+    private static IEnumerable<Location> BuildLocations(
+        IEnumerable<SourceLocation> references,
+        SourceLocation definition,
+        bool includeDeclaration)
+    {
         foreach (var reference in references)
         {
-            // 根据 request.Context.IncludeDeclaration 决定是否包含定义位置
-            bool isDefinition = reference.Line == symbol.Location.Line &&
-                               reference.Column == symbol.Location.Column;
-
-            if (isDefinition && !request.Context.IncludeDeclaration)
+            var isDefinition = IsSameLocation(reference, definition);
+            if (isDefinition && !includeDeclaration)
             {
-                continue; // 跳过定义位置
+                continue;
             }
 
-            locations.Add(new Location
+            yield return new Location
             {
                 Uri = reference.Uri,
                 Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
@@ -121,9 +147,17 @@ public class ReferencesHandler(DocumentManager documentManager) : IReferencesHan
                     Start = new Position(reference.Line, reference.Column),
                     End = new Position(reference.EndLine, reference.EndColumn)
                 }
-            });
+            };
         }
+    }
 
-        return Task.FromResult<LocationContainer?>(new LocationContainer(locations));
+    internal static bool IsSameDefinition(SymbolInfo left, SymbolInfo right)
+    {
+        return IsSameLocation(left.Location, right.Location);
+    }
+
+    internal static bool IsSameLocation(SourceLocation left, SourceLocation right)
+    {
+        return left.Uri == right.Uri && left.Line == right.Line && left.Column == right.Column;
     }
 }

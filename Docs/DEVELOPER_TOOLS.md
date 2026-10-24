@@ -33,18 +33,16 @@ cd Old8Lang.LanguageServer
 # 构建项目
 dotnet build -c Release
 
-# 发布为独立可执行文件（根据你的操作系统选择）
-# macOS (Apple Silicon)
-dotnet publish -c Release -r osx-arm64 --self-contained -o ../vscode-old8lang/server
+# 发布到扩展的 server/ 目录（框架依赖，需要目标机器安装 .NET 10 运行时）
+cd ../vscode-old8lang
+npm run prepare:server
+```
 
-# macOS (Intel)
-dotnet publish -c Release -r osx-x64 --self-contained -o ../vscode-old8lang/server
+需要独立分发的可执行文件时，再按目标平台发布：
 
-# Windows
-dotnet publish -c Release -r win-x64 --self-contained -o ../vscode-old8lang/server
-
-# Linux
-dotnet publish -c Release -r linux-x64 --self-contained -o ../vscode-old8lang/server
+```bash
+# macOS (Apple Silicon) / macOS (Intel) / Windows / Linux
+dotnet publish Old8Lang.LanguageServer -c Release -r osx-arm64 --self-contained -o vscode-old8lang/server
 ```
 
 #### 步骤 2: 构建 VSCode 扩展
@@ -71,14 +69,11 @@ npm run compile
 ##### 方法 B: 安装 VSIX（用户）
 
 ```bash
-# 安装打包工具
-npm install -g @vscode/vsce
-
-# 打包扩展
-vsce package
+# 打包扩展（会先发布 Language Server 到 server/）
+npm run package:vsix
 
 # 安装扩展
-code --install-extension old8lang-0.1.0.vsix
+code --install-extension old8lang-0.3.0.vsix
 ```
 
 #### 验证安装
@@ -126,8 +121,11 @@ Language Server 是一个独立的进程，负责提供语言智能功能：
 - **文档管理 (DocumentManager)**: 管理打开的文档，维护解析结果和符号表
 - **文档同步 (TextDocumentSyncHandler)**: 处理文档打开、修改、保存、关闭事件
 - **自动补全 (CompletionHandler)**: 提供关键字和符号的智能补全
-- **跳转定义 (DefinitionHandler)**: 支持跳转到符号定义
-- **查找引用 (ReferencesHandler)**: 查找符号的所有引用
+- **跳转定义 / 查找引用 / 重命名**: 顶层符号可跨文件，成员与参数在文件内
+- **工作区索引 (WorkspaceIndex)**: 扫描工作区中的 `.old8` 文件并缓存解析结果
+- **代码镜头 (CodeLensHandler)**: 在函数、类、方法上显示引用数量
+- **选择范围 (SelectionRangeHandler)**: token → 括号表达式 → 语句 → 声明块 → 文档
+- **参数名内联提示 (InlayHintHandler)**: 在调用点标注 `a:`、`b:`
 - **悬停提示 (HoverHandler)**: 显示符号的详细信息
 
 ##### 技术栈
@@ -209,25 +207,22 @@ npm run watch
 
 ##### 打包 Language Server
 
-将编译好的 Language Server 可执行文件复制到扩展的 `server` 目录：
+`package:vsix` 会自动把 Language Server 发布到扩展的 `server` 目录；
 
 ```bash
-mkdir -p vscode-old8lang/server
-cp Old8Lang.LanguageServer/bin/Release/net10.0/Old8Lang.LanguageServer* vscode-old8lang/server/
+cd vscode-old8lang
+npm run prepare:server
 ```
 
 ##### 打包 VSCode 扩展
 
-1. 安装打包工具：
-```bash
-npm install -g @vscode/vsce
-```
-
-2. 打包扩展：
 ```bash
 cd vscode-old8lang
-vsce package
+npm install
+npm run package:vsix
 ```
+
+脚本等价于先执行 `dotnet publish`，再执行 `vsce package --no-dependencies`。
 
 这会生成 `.vsix` 文件，可以分发给用户。
 
@@ -255,9 +250,22 @@ code --install-extension old8lang-0.1.0.vsix
 ```json
 {
   "old8lang.languageServer.path": "/path/to/Old8Lang.LanguageServer",
+  "old8lang.compiler.path": "/path/to/Old8Lang.App",
+  "old8lang.compiler.mode": "interpreter",
+  "old8lang.diagnostics.level": "warning",
   "old8lang.trace.server": "verbose"
 }
 ```
+
+| 配置项 | 说明 |
+| --- | --- |
+| `old8lang.languageServer.path` | 服务器可执行文件或 `.dll`；留空时自动探测 `server/` 或从源码项目启动 |
+| `old8lang.languageServer.project` | 源码开发模式下启动的项目 |
+| `old8lang.compiler.path` / `old8lang.compiler.project` | 编译器可执行文件或项目 |
+| `old8lang.compiler.mode` | 运行当前文件的模式：`interpreter` / `il` / `vm` |
+| `old8lang.dotnet.path` | `dotnet` 命令路径 |
+| `old8lang.diagnostics.level` | 客户端显示诊断的最高严重级别 |
+| `old8lang.trace.server` | LSP 通信跟踪 |
 
 #### 功能使用
 
@@ -282,25 +290,38 @@ code --install-extension old8lang-0.1.0.vsix
 6. **悬停提示**：
    - 鼠标悬停在符号上查看详细信息
 
+7. **代码镜头**：
+   - 函数、类和方法声明上显示引用数量，点击查看引用列表
+
+8. **选择范围**：
+   - `Shift+Alt+→` / `Shift+Alt+←` 在 token、表达式、语句、声明块之间扩展/收缩选区
+
+9. **参数名内联提示**：
+   - 调用 `add(1, 2)` 时显示 `add(a: 1, b: 2)`
+
+10. **任务与命令**：
+   - `Tasks: Run Task` 提供解释 / IL / VM / 语法检查任务
+   - 命令面板提供“运行当前文件”“语法检查当前文件”“重启 Language Server”
+
 #### 扩展功能
 
 ##### 当前已实现的功能
 
-- ✅ 语法高亮
-- ✅ 文档同步
-- ✅ 实时错误诊断
-- ✅ 智能补全（关键字）
-- ✅ LSP 基础框架
+- ✅ 语法高亮、代码片段
+- ✅ 文档同步、实时错误诊断（可按级别过滤）
+- ✅ 智能补全、签名帮助、文档符号
+- ✅ 跳转定义、查找引用、重命名（顶层符号跨文件）
+- ✅ 悬停提示、文档高亮、折叠范围、语义高亮、文档链接
+- ✅ 代码镜头、选择范围、参数名内联提示
+- ✅ 任务支持、命令与配置校验、VSIX 打包
 
 ##### 待完善的功能
 
-- ⏳ 符号表构建（变量、函数、类）
-- ⏳ 跳转定义（需要符号表支持）
-- ⏳ 查找引用（需要符号表支持）
-- ⏳ 悬停提示（需要符号表支持）
-- ⏳ 代码重构（重命名）
-- ⏳ 代码格式化
-- ⏳ 代码片段（Snippets）
+- ⏳ Debug Adapter（DAP）：需要运行时提供 `--dap` 模式或等价协议
+- ⏳ Inline Values：需要暂停中的调试变量快照
+- ⏳ Call Hierarchy / Type Hierarchy
+- ⏳ 作用域链、成员访问类型推断、诊断增强
+- ⏳ 实时诊断防抖与大文件性能基线
 
 #### 贡献指南
 

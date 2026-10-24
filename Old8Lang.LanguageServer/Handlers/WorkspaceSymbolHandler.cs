@@ -11,7 +11,7 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 工作区符号搜索处理器 - 支持跨文件符号搜索（已优化性能）
 /// </summary>
-public class WorkspaceSymbolHandler(DocumentManager documentManager) : WorkspaceSymbolsHandlerBase
+public class WorkspaceSymbolHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : WorkspaceSymbolsHandlerBase
 {
     public override Task<Container<WorkspaceSymbol>?> Handle(WorkspaceSymbolParams request,
         CancellationToken cancellationToken)
@@ -23,14 +23,17 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager) : Workspace
         const int maxSymbolsWithoutQuery = 100;
         bool hasQuery = !string.IsNullOrEmpty(query);
 
-        // 遍历所有已打开的文档
-        foreach (var (uri, parseResult) in documentManager.GetAllDocuments())
-        {
-            if (parseResult?.SymbolTable == null)
-                continue;
+        // 有工作区索引时覆盖磁盘上的未打开文件，否则退化为仅已打开文档
+        var sources = workspaceIndex != null
+            ? workspaceIndex.GetFiles().Select(file => file.Symbols)
+            : documentManager.GetAllDocuments()
+                .Where(pair => pair.Value?.SymbolTable != null)
+                .Select(pair => pair.Value!.SymbolTable!);
 
+        foreach (var symbolTable in sources)
+        {
             // 遍历符号表
-            foreach (var (symbolName, symbolInfo) in parseResult.SymbolTable)
+            foreach (var (symbolName, symbolInfo) in symbolTable)
             {
                 // 优化：如果没有查询且已经收集了足够多的符号，则停止
                 if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)

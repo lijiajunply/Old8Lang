@@ -1,3 +1,4 @@
+using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -6,9 +7,9 @@ using Old8Lang.LanguageServer.Services;
 namespace Old8Lang.LanguageServer.Handlers;
 
 /// <summary>
-/// 重命名处理器
+/// 重命名处理器 - 顶层符号支持跨文件重命名
 /// </summary>
-public class RenameHandler(DocumentManager documentManager) : IRenameHandler
+public class RenameHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : IRenameHandler
 {
     private readonly DocumentManager _documentManager = documentManager;
 
@@ -33,48 +34,72 @@ public class RenameHandler(DocumentManager documentManager) : IRenameHandler
             return Task.FromResult<WorkspaceEdit?>(null);
         }
 
-        // 获取光标位置
-        var line = request.Position.Line;
-        var column = request.Position.Character;
+        var line = (int)request.Position.Line;
+        var column = (int)request.Position.Character;
 
-        // 查找光标位置的符号
         var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var symbolName = symbol?.Name ?? SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
+
+        if (symbolName == null)
+        {
+            return Task.FromResult<WorkspaceEdit?>(null);
+        }
+
+        // 顶层符号跨文件重命名；成员/参数保持文件内作用域，避免误改其他文件的同名局部符号
+        if (workspaceIndex != null &&
+            workspaceIndex.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
+            workspaceSymbol != null && definitionFile != null &&
+            (symbol == null || ReferencesHandler.IsSameDefinition(symbol, workspaceSymbol)))
+        {
+            var grouped = workspaceIndex.FindRenameLocations(symbolName, definitionFile.Uri);
+            if (grouped.Count == 0)
+            {
+                return Task.FromResult<WorkspaceEdit?>(null);
+            }
+
+            var changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>();
+            foreach (var (fileUri, locations) in grouped)
+            {
+                changes[DocumentUri.From(fileUri)] = locations.Select(location => new TextEdit
+                {
+                    Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
+                    {
+                        Start = new Position(location.Line, location.Column),
+                        End = new Position(location.EndLine, location.EndColumn)
+                    },
+                    NewText = request.NewName
+                }).ToList();
+            }
+
+            return Task.FromResult<WorkspaceEdit?>(new WorkspaceEdit { Changes = changes });
+        }
 
         if (symbol == null)
         {
             return Task.FromResult<WorkspaceEdit?>(null);
         }
 
-        // 查找该符号的所有引用（包括定义位置）
         var references = SymbolFinder.FindReferences(document, symbol.Name);
-
         if (references.Count == 0)
         {
             return Task.FromResult<WorkspaceEdit?>(null);
         }
 
-        // 创建 WorkspaceEdit，包含所有需要修改的文本编辑
-        var textEdits = new List<TextEdit>();
-
-        foreach (var reference in references)
+        var textEdits = references.Select(reference => new TextEdit
         {
-            textEdits.Add(new TextEdit
+            Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
             {
-                Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
-                {
-                    Start = new Position(reference.Line, reference.Column),
-                    End = new Position(reference.EndLine, reference.EndColumn)
-                },
-                NewText = request.NewName
-            });
-        }
+                Start = new Position(reference.Line, reference.Column),
+                End = new Position(reference.EndLine, reference.EndColumn)
+            },
+            NewText = request.NewName
+        }).ToList();
 
-        // 创建 WorkspaceEdit
         var workspaceEdit = new WorkspaceEdit
         {
-            Changes = new Dictionary<OmniSharp.Extensions.LanguageServer.Protocol.DocumentUri, IEnumerable<TextEdit>>
+            Changes = new Dictionary<DocumentUri, IEnumerable<TextEdit>>
             {
-                [OmniSharp.Extensions.LanguageServer.Protocol.DocumentUri.From(uri)] = textEdits
+                [DocumentUri.From(uri)] = textEdits
             }
         };
 
