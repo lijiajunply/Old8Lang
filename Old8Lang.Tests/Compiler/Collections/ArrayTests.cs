@@ -137,7 +137,7 @@ public class ArrayTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.Throws<Old8Exception>(() => compiledAction());
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     [Fact]
@@ -218,12 +218,13 @@ public class ArrayTests
     }
 
     [Fact]
-    public void NegativeArrayIndex_ThrowsError()
+    public void NegativeArrayIndex_ReturnsLastElement()
     {
-        // Arrange
+        // Arrange：负索引 -1 表示最后一个元素（与解释器 / VM 一致）
         var code = @"
             arr <- [1, 2, 3]
             element <- arr[-1]
+            Assert.Equal(3, element)
         ";
         var interpreter = new LangInterpreter();
 
@@ -233,7 +234,8 @@ public class ArrayTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.Throws<Old8Exception>(() => compiledAction());
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]

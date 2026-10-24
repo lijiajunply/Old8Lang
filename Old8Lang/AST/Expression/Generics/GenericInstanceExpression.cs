@@ -112,7 +112,7 @@ public partial class GenericInstanceExpression : LangExpression
             }
 
             // 实例化泛型类
-            var instantiatedTemplate = typeTemplate.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager);
+            var instantiatedTemplate = typeTemplate.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager, manager);
 
             // 如果后面跟着调用参数，创建实例
             if (IsFunctionCall)

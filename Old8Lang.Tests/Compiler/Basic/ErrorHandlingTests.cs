@@ -112,12 +112,13 @@ public class ErrorHandlingTests
     }
 
     [Fact]
-    public void NegativeArrayIndex_ThrowsRuntimeException_WhenExecuted()
+    public void NegativeArrayIndex_ReadsFromEnd_WhenExecuted()
     {
-        // Arrange
+        // Arrange：负索引合法，-1 是最后一个元素（与解释器 / VM 一致）
         var code = @"
             arr <- [1, 2, 3]
             a <- arr[-1]
+            Assert.Equal(3, a)
         ";
         var interpreter = new LangInterpreter();
 
@@ -127,7 +128,8 @@ public class ErrorHandlingTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]

@@ -1,0 +1,21 @@
+// IL 模式负索引：-1 表示最后一个元素（与解释器 / 虚拟机一致）
+
+arr <- [1, 2, 3]
+list <- {4, 5, 6}
+text <- "abc"
+tuple <- (7, 8, 9)
+
+lastArr <- arr[-1]
+lastList <- list[-1]
+lastChar <- text[-1]
+lastTuple <- tuple[-1]
+
+PrintLine("arr[-1]=" + lastArr.ToStr())
+PrintLine("list[-1]=" + lastList.ToStr())
+PrintLine("text[-1]=" + lastChar.ToStr())
+PrintLine("tuple[-1]=" + lastTuple.ToStr())
+
+Assert.Equal(3, lastArr)
+Assert.Equal(6, lastList)
+Assert.Equal('c', lastChar)
+Assert.Equal(9, lastTuple)

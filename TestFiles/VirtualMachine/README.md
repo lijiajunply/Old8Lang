@@ -4,7 +4,7 @@ Old8Lang 项目（`o8package.json`）—— 运行时模式：`vm`。
 
 ## 内容
 
-- 用例数量：**77** 个 `.old8` 文件
+- 用例数量：**78** 个 `.old8` 文件
 - 入口文件：`GenericTest.old8`
 - 子目录：
   - `legacy/`（27 个）：原 `TestFiles/VMTests/` 的 `vm_*` 语言特性用例

@@ -85,12 +85,10 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
 
         if (listType == typeof(string))
         {
-            // 处理字符串索引访问
+            // 处理字符串索引访问。负索引由 IlIndexHelper 归一化（-1 表示最后一个字符）。
             ListId.LoadIlValue(ilGenerator, local); // 加载字符串
-            Key.LoadIlValue(ilGenerator, local); // 加载索引
-            // 使用字符串的索引器属性获取字符
-            var getStringItemMethod = typeof(string).GetMethod("get_Chars", [typeof(int)])!;
-            ilGenerator.Emit(OpCodes.Callvirt, getStringItemMethod);
+            EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetStringChar))!);
         }
         else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
@@ -149,72 +147,62 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         }
         else if (listType.IsArray)
         {
-            // 处理数组索引访问
+            // 处理数组索引访问（负索引 -1 表示最后一个元素）
             ListId.LoadIlValue(ilGenerator, local); // 加载数组
-            Key.LoadIlValue(ilGenerator, local); // 加载索引
-            // 根据元素类型选择适当的 Ldelem 指令
-            if (listType.GetElementType()!.IsValueType)
+            EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetArrayItem))!);
+            var arrayElementType = listType.GetElementType() ?? typeof(object);
+            if (arrayElementType.IsValueType)
             {
-                // 对于值类型数组，使用 Ldelem 指令
-                ilGenerator.Emit(OpCodes.Ldelem, listType.GetElementType()!);
+                ilGenerator.Emit(OpCodes.Unbox_Any, arrayElementType);
             }
-            else
+            else if (arrayElementType != typeof(object))
             {
-                // 对于引用类型数组，使用 Ldelem_Ref 指令
-                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                ilGenerator.Emit(OpCodes.Castclass, arrayElementType);
             }
         }
         else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
         {
-            // 处理List<T>索引访问
+            // 处理List<T>索引访问。索引器经非泛型 IList 调用，负索引由 IlIndexHelper 归一化，
+            // 避免 List<int> / List<object> 的泛型实例与静态类型不一致时解析错误。
             ListId.LoadIlValue(ilGenerator, local); // 加载List
-            Key.LoadIlValue(ilGenerator, local); // 加载索引
-            // 调用List<T>的索引器
-            var listItemMethod = listType.GetMethod("get_Item", [typeof(int)])!;
-            ilGenerator.Emit(OpCodes.Callvirt, listItemMethod);
+            EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetListItem))!);
+
+            var elementType = listType.GetGenericArguments()[0];
+            if (elementType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, elementType);
+            }
+            else if (elementType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, elementType);
+            }
         }
         else if (listType.FullName?.StartsWith("System.ValueTuple") == true)
         {
             // ValueTuple 索引访问
             ListId.LoadIlValue(ilGenerator, local);
 
-            if (Key is IntLangValue intVal)
+            if (Key is IntLangValue { Value: >= 0 } intVal)
             {
-                // 常量索引，优化为字段访问
+                // 非负常量索引，优化为字段访问
                 OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
             }
             else
             {
-                // 变量索引，装箱为 ITuple 并使用索引器
+                // 变量索引或负常量索引，装箱为 ITuple 并经 IlIndexHelper 归一化下标
                 ilGenerator.Emit(OpCodes.Box, listType);
-                Key.LoadIlValue(ilGenerator, local);
-                var keyType = Key.OutputType(local);
-                if (keyType == typeof(object))
-                {
-                    ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-                }
-
-                var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
-                ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+                EmitIntIndex(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetTupleItem))!);
             }
         }
         else if (listType == typeof(object))
         {
-            // 处理object类型的索引访问（运行时动态处理）
-            // 这种情况通常发生在嵌套数组或动态类型的场景中
-            ListId.LoadIlValue(ilGenerator, local); // 加载对象
-
-            // 尝试将object转换为数组
-            var objectArrayLocal = ilGenerator.DeclareLocal(typeof(object[]));
-            ilGenerator.Emit(OpCodes.Isinst, typeof(object[]));
-            ilGenerator.Emit(OpCodes.Stloc, objectArrayLocal);
-            ilGenerator.Emit(OpCodes.Ldloc, objectArrayLocal);
-
-            // 加载索引
-            Key.LoadIlValue(ilGenerator, local);
-
-            // 从数组中获取元素
-            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            // 静态类型为 object：运行期按列表 / 数组 / 元组 / 字符串分派，负索引同样生效
+            ListId.LoadIlValue(ilGenerator, local);
+            EmitIntIndex(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetObjectItem))!);
         }
         else if (listType == typeof(DictionaryLangValue))
         {
@@ -243,6 +231,24 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         }
     }
 
+    /// <summary>
+    /// 加载索引表达式并保证栈上是 <see cref="int"/>（IlIndexHelper 的参数类型）。
+    /// </summary>
+    private void EmitIntIndex(ILGenerator ilGenerator, LocalManager local)
+    {
+        Key.LoadIlValue(ilGenerator, local);
+        var keyType = Key.OutputType(local);
+
+        if (keyType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+        }
+        else if (keyType == typeof(long))
+        {
+            ilGenerator.Emit(OpCodes.Conv_I4);
+        }
+    }
+
     public override Type OutputType(LocalManager local)
     {
         var listType = ListId.OutputType(local);
@@ -267,8 +273,8 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         if (listType.FullName?.StartsWith("System.ValueTuple") == true)
         {
             // ValueTuple 索引访问
-            // 如果索引是常量，可以推断出具体的元素类型
-            if (Key is IntLangValue intValue)
+            // 如果索引是非负常量，可以推断出具体的元素类型；负数需要运行期才知道长度
+            if (Key is IntLangValue { Value: >= 0 } intValue)
             {
                 var index = intValue.Value;
                 var elementType = GetValueTupleElementType(listType, index);

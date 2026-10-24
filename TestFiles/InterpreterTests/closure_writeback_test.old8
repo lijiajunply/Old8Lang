@@ -1,0 +1,27 @@
+// lambda 写回外层局部变量 + 顶层 C 风格 for 循环的每轮闭包捕获
+// 解释器与虚拟机应当给出一致结果
+
+func makeCounter() -> int {
+    c <- 0
+    inc <- () -> {
+        c <- c + 1
+        return c
+    }
+    inc()
+    inc()
+    return c
+}
+
+result <- makeCounter()
+PrintLine("writeback=" + result.ToStr())
+
+fs <- {}
+for i <- 0, i < 3, i++ {
+    fs.Add(() -> i)
+}
+
+out <- ""
+for f in fs {
+    out <- out + f().ToStr()
+}
+PrintLine("loop=" + out)

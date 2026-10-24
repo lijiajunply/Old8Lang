@@ -113,10 +113,12 @@ public class CapturedScope
 
         // 恢复作用域（直接引用原始字典，不拷贝）
         manager.Scopes.Clear();
+        manager.ScopeTokens.Clear();
         foreach (var scope in Scopes)
         {
             // 将只读字典转换回可写字典
             manager.Scopes.Add(new Dictionary<string, LangValueType>(scope));
+            manager.ScopeTokens.Add(new object());
         }
 
         // 恢复导入信息

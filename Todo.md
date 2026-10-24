@@ -313,18 +313,19 @@
 
 仍未修（**功能缺陷，不是陈旧用例**，测试保留以暴露缺口）：
 
-- [ ] **泛型约束不认识接口实现**：`class Container<T: ISerializable>` + `class SerializableData implements ISerializable`
-  → `类型 'SerializableData' 不满足泛型参数 'T' 的约束 'ISerializable'：类型没有实现接口`；
-  `Container(SerializableData(123))` 另外报 `类型不匹配: 期望 T，但得到 SerializableData`。
+- [x] **泛型约束不认识接口实现**（2026-10-24 已修）：根因不是约束校验器，而是泛型类实例化时
+  没有从构造函数实参推断类型参数（`GenericTypeInference.InferClassTypeArguments` 原为返回 `null` 的桩），
+  于是 `init(v: T)` 的 `T` 未解析、直接报类型不匹配。现已按 `init` 形参推断，并让显式实例化也把
+  `manager` 传给约束校验器；`HasParameterlessInit` 同时识别重载的 `init`（`MethodOverloadList`）。
   文件：`generic_constraints_simple.old8` / `generic_constraints_comprehensive.old8`。
-  语法与 `Docs/Old8Lang_Grammar.md:1526` 一致，属于约束检查/接口实现登记的缺口。
-- [ ] **泛型可空类型参数 `T?` 的类型检查过严**：`class Box<T?>` + `Box(123)` →
-  `类型不匹配: 期望 T?，但得到 int`。文件：`generic_nullable_simple.old8` / `generic_nullable_runtime.old8`。
-  语法与 `Docs/Old8Lang_Grammar.md:1666-1693` 一致。
-- [ ] **同一模块的符号无法重复导入**：`import { export_var1 } from "./m.old8"` 之后再
-  `import { export_var1 as again } from "./m.old8"` → `Cannot import symbols [export_var1] ...
-  symbols do not exist`（`SymbolExtractor.cs:206` 抛错）。最小复现见
-  `Reports/2026-10-10-19-40-解释器陈旧用例清理测试.md`。文件：`test_module_cache.old8`。
+- [x] **泛型可空类型参数 `T?` 的类型检查过严**（2026-10-24 已修）：类型注解解析统一走
+  `TypeChecker.ResolveGenericTypeAnnotation`，查映射时用去掉 `?` 的 `T`、解析后再补回 `?`；
+  无法推断的可空参数（如 `Box(null)`）在没有约束时按 `any` 处理。
+  文件：`generic_nullable_simple.old8` / `generic_nullable_runtime.old8`。
+- [x] **同一模块的符号无法重复导入**（2026-10-24 已修）：`VariateManager` 新增
+  `LoadedModuleExports`，模块首次执行时记录导出符号；再次导入从记录里恢复、不再重复执行模块体
+  （旧实现重复执行时赋值会写回外层，导致符号"不存在"）。
+  文件：`test_module_cache.old8`（其中的缓存断言已按 import 提升语义改写）。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
@@ -363,9 +364,9 @@
 - [ ] **`Task.Delay` 的第二个参数（CancellationToken）在 VM 下仍报 `VM_UNSUPPORTED_ERROR`**，
   因为 VM 无法构造 `CancellationToken` 值；`Thread.CurrentThread`、裸引用 `Task`、
   `Task.Factory`（需要多级 `Task.Factory.StartNew` 的属性通道）同样未支持。
-- [ ] **IL 模式的负索引**：解释器与虚拟机（本轮修复后）都支持 `arr[-1]`，IL 仍抛异常
-  （`Compiler/EdgeCases/UnexpectedInputsTests.NegativeIndex_CompilesAndExecutesCorrectly`
-  在 IL 档下失败，属既有的 IL 环境问题）。
+- [x] **IL 模式的负索引**（2026-10-24 已修）：新增 `IlIndexHelper`，IL 的列表 / 数组 / 字符串 /
+  元组索引统一归一化负下标并抛语言层 `INDEX_ERROR`；解释器的元组索引同时补上负索引支持。
+  原先断言"负索引应抛异常"的 3 个 IL 用例已改为断言取末尾元素。
 
 ## E. 2026-10-22 移除图像标准库时发现
 
@@ -481,3 +482,20 @@
   修好后暴露出上述 3 处独立崩溃，全量测试仍无法跑完。
 - 非 IL 档新增一条并行抖动用例：`Interpreter.Async.TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling`
   全量并行时 `NullReferenceException`，单独连跑 8 次全过；2026-10-23 复跑时通过。
+
+## I. 2026-10-24 P1 修复后仍存在的问题
+
+来源：`Reports/2026-10-24-00-30-P1跨模式语义修复测试.md`。均为本轮实测发现、与 P1 六项不同源的问题，
+按 AGENTS.md 规则记录而未顺手修改：
+
+- [ ] **IL 模式顶层 C 风格 for 循环变量仍是全局变量**：解释器与虚拟机已把循环变量收进循环作用域
+  （每轮闭包捕获 `012`、循环结束后变量不可见），IL 仍把它声明为全局变量，因此：
+  `for i <- 0, i < 3, i++ {}` 之后 `PrintLine(i)` 输出 `3`（其余两模式报 `NAME_ERROR`）；
+  同名嵌套循环共用同一个 `i`，`loop_shadow.old8` 里 `total` 得 `2`（应为 `6`）。
+  这项工作依赖 IL 的全局变量 / 作用域模型（同 §B 的"IL 函数无法访问顶层全局变量"），一并处理更合适。
+- [ ] **IL 运行期错误的异常值无法 `.ToStr()`**：`try { arr[-5] } catch (e) { PrintLine(e.ToStr()) }`
+  报 `IL 模式暂不支持把原生类型 ExceptionWrapper 转换为 Old8Lang 值`；
+  只把 `e` 赋给变量 (`caught <- e`) 则正常。解释器 / 虚拟机都能直接 `e.ToStr()`。
+- [ ] **解释器负索引越界的错误信息用了归一化后的下标**：`arr <- [1,2,3]; arr[-5]` 报
+  `索引越界: 索引 -2 超出范围 [0, 2]`（应报原始的 `-5`）；IL 侧 `IlIndexHelper` 报的是原始下标。
+  涉及 `ListLangValue.Get` / `ArrayLangValue.Get` / `StringLangValue.Get` / `TupleLangValue.Get`。

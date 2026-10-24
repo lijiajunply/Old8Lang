@@ -74,11 +74,10 @@ public static class TypeChecker
             {
                 var expectedType = parameter.AssumptionType;
 
-                // 如果是泛型类型参数，尝试解析为实际类型
-                if (typeArgumentMapping is not null && typeArgumentMapping.TryGetValue(expectedType, out var value))
-                {
-                    expectedType = value.Name;
-                }
+                // 如果是泛型类型参数，尝试解析为实际类型。
+                // 可空泛型参数写成 T?，查映射时要用去掉问号的 T，
+                // 解析回实际类型后再把 ? 补上，才能同时接受 T 和 null。
+                expectedType = ResolveGenericTypeAnnotation(expectedType, typeArgumentMapping);
 
                 var actualType = GetLangValueType(argumentValue);
 
@@ -95,6 +94,35 @@ public static class TypeChecker
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 把类型注解中的泛型参数解析为实际类型。
+    /// </summary>
+    /// <remarks>
+    /// 可空泛型参数写作 <c>T?</c>：查映射时按 <c>T</c> 查，解析出实际类型后再把 <c>?</c> 补回去，
+    /// 这样 <c>T?</c> 既能接受 <c>T</c> 的值也能接受 null。
+    /// </remarks>
+    private static string ResolveGenericTypeAnnotation(
+        string typeAnnotation,
+        Dictionary<string, ITypeInfo>? typeArgumentMapping)
+    {
+        if (typeArgumentMapping is null)
+        {
+            return typeAnnotation;
+        }
+
+        var mappingKey = typeAnnotation;
+        var nullableSuffix = "";
+        if (mappingKey.EndsWith('?'))
+        {
+            mappingKey = mappingKey[..^1];
+            nullableSuffix = "?";
+        }
+
+        return typeArgumentMapping.TryGetValue(mappingKey, out var value)
+            ? value.Name + nullableSuffix
+            : typeAnnotation;
     }
 
     /// <summary>
@@ -623,11 +651,8 @@ public static class TypeChecker
     {
         if (string.IsNullOrEmpty(expectedReturnType)) return actualReturnValue; // 没有返回类型注解，跳过检查
 
-        // 如果是泛型类型参数，尝试解析为实际类型
-        if (typeArgumentMapping is not null && typeArgumentMapping.TryGetValue(expectedReturnType, out var value))
-        {
-            expectedReturnType = value.Name;
-        }
+        // 如果是泛型类型参数，尝试解析为实际类型（保留 T? 的可空标记）
+        expectedReturnType = ResolveGenericTypeAnnotation(expectedReturnType, typeArgumentMapping);
 
         var actualType = GetLangValueType(actualReturnValue);
 

@@ -389,13 +389,11 @@ public class VMClosureTests
     }
 
     [Fact]
-    public void Closure_TopLevelCStyleLoopVariable_SharesFinalValue()
+    public void Closure_TopLevelCStyleLoopVariable_PerIteration()
     {
-        // 已知分歧（本组用例之前就存在，与共享单元无关）：脚本顶层的 C 风格 for 循环
-        // 变量被声明为**全局**变量，闭包读到的是同一张全局表里的最终值，因此得到 333；
-        // 解释器同一段代码得到 012（每轮独立绑定）。此处显式钉住虚拟机现状，
-        // 避免行为变化时无人察觉；两模式对齐需要另行处理顶层循环变量的作用域。
-        var output = ExecuteVm("""
+        // 脚本顶层的 C 风格 for 循环变量属于循环自己的作用域（与解释器一致），
+        // 每轮换新共享单元，闭包读到的是本轮的值（012）。
+        var code = """
             fs <- {}
             for i <- 0, i < 3, i++ {
                 fs.Add(() -> i)
@@ -405,20 +403,10 @@ public class VMClosureTests
                 result <- result + f().ToStr()
             }
             print(result)
-            """);
+            """;
 
-        Assert.Equal("333", output);
-        Assert.Equal("012", ExecuteInterpreter("""
-            fs <- {}
-            for i <- 0, i < 3, i++ {
-                fs.Add(() -> i)
-            }
-            result <- ""
-            for f in fs {
-                result <- result + f().ToStr()
-            }
-            print(result)
-            """));
+        Assert.Equal("012", ExecuteVm(code));
+        Assert.Equal("012", ExecuteInterpreter(code));
     }
 
     #endregion
@@ -426,10 +414,7 @@ public class VMClosureTests
     #region 与解释器一致性
 
     /// <remarks>
-    /// 这里只收「两模式结论相同」的用例。解释器在 lambda 写回外层局部变量上自身不一致
-    /// （lambda 写回不传回外层，同等的具名嵌套函数却传回），因此那类断言写在下面
-    /// <see cref="Closure_LambdaWriteBack_IsVisibleToEnclosingScope"/> 等虚拟机专属用例里，
-    /// 以共享单元的语义为准，而不是拿解释器当基准。
+    /// 这里只收「两模式结论相同」的用例。
     /// </remarks>
     [Theory]
     [InlineData("""
@@ -488,14 +473,13 @@ public class VMClosureTests
 
     #endregion
 
-    #region 解释器侧尚不一致的场景（以共享单元语义为准）
+    #region lambda 写回外层局部变量（解释器已对齐）
 
     [Fact]
     public void Closure_LambdaWriteBack_IsVisibleToEnclosingScope()
     {
-        // 解释器对 lambda 的写回不传回外层（此处解释器会打印 1,2,0），而同等的具名嵌套
-        // 函数却传回。虚拟机两种写法都传回，语义自洽。
-        var output = ExecuteVm("""
+        // lambda 对局部变量的赋值必须写回外层；具名嵌套函数一直如此，现在 lambda 也一致。
+        var code = """
             func make() {
                 c <- 0
                 inc <- () -> {
@@ -507,16 +491,17 @@ public class VMClosureTests
                 print(c)
             }
             make()
-            """);
+            """;
 
-        Assert.Equal("122", output);
+        Assert.Equal("122", ExecuteVm(code));
+        Assert.Equal("122", ExecuteInterpreter(code));
     }
 
     [Fact]
     public void Closure_LambdaReadsLatestValue_AfterOuterAssignment()
     {
-        // 解释器此处打印 0（读到赋值前的旧值），虚拟机读到最新值 99
-        var output = ExecuteVm("""
+        // 外层在闭包创建之后重新赋值，闭包调用时应读到最新值
+        var code = """
             func make() {
                 c <- 0
                 read <- () -> c
@@ -524,15 +509,16 @@ public class VMClosureTests
                 print(read())
             }
             make()
-            """);
+            """;
 
-        Assert.Equal("99", output);
+        Assert.Equal("99", ExecuteVm(code));
+        Assert.Equal("99", ExecuteInterpreter(code));
     }
 
     [Fact]
     public void Closure_SiblingLambdaAndNamedFunction_ShareOuterLocal()
     {
-        var output = ExecuteVm("""
+        var code = """
             func outer() {
                 total <- 0
                 inc <- () -> { total <- total + 1 }
@@ -542,9 +528,10 @@ public class VMClosureTests
                 print(total)
             }
             outer()
-            """);
+            """;
 
-        Assert.Equal("11", output);
+        Assert.Equal("11", ExecuteVm(code));
+        Assert.Equal("11", ExecuteInterpreter(code));
     }
 
     #endregion

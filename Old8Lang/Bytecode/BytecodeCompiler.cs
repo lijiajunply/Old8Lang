@@ -1039,13 +1039,29 @@ public class BytecodeCompiler
     }
 
     /// <summary>
+    /// 局部槽位分配器：同一作用域链上的所有作用域共享一个分配器，
+    /// 保证子作用域分配的槽位不会被父作用域后续声明复用，LocalCount 也能覆盖全部槽位。
+    /// </summary>
+    private sealed class LocalSlotAllocator
+    {
+        public int Next;
+    }
+
+    /// <summary>
     /// 局部作用域
     /// </summary>
-    private class Scope(Scope? parent)
+    private class Scope
     {
         private readonly Dictionary<string, int> _locals = new();
         private readonly Dictionary<string, string> _localTypes = new();
-        private int _nextIndex = parent?._nextIndex ?? 0;
+        private readonly LocalSlotAllocator _allocator;
+        private readonly Scope? _parent;
+
+        public Scope(Scope? parent)
+        {
+            _parent = parent;
+            _allocator = parent?._allocator ?? new LocalSlotAllocator();
+        }
 
         public int DeclareLocal(string name, string type = "")
         {
@@ -1060,7 +1076,7 @@ public class BytecodeCompiler
                 return local;
             }
 
-            int index = _nextIndex++;
+            int index = _allocator.Next++;
             _locals[name] = index;
             if (!string.IsNullOrEmpty(type))
             {
@@ -1072,24 +1088,24 @@ public class BytecodeCompiler
 
         public bool HasLocal(string name)
         {
-            return _locals.ContainsKey(name) || (parent?.HasLocal(name) ?? false);
+            return _locals.ContainsKey(name) || (_parent?.HasLocal(name) ?? false);
         }
 
         public int GetLocalIndex(string name)
         {
             if (_locals.TryGetValue(name, out int index))
                 return index;
-            return parent?.GetLocalIndex(name) ?? -1;
+            return _parent?.GetLocalIndex(name) ?? -1;
         }
 
         public string GetLocalType(string name)
         {
             if (_localTypes.TryGetValue(name, out string? type))
                 return type;
-            return parent?.GetLocalType(name) ?? "";
+            return _parent?.GetLocalType(name) ?? "";
         }
 
-        public int LocalCount => _nextIndex;
+        public int LocalCount => _allocator.Next;
     }
 
     /// <summary>

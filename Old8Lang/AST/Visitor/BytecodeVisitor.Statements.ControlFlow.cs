@@ -176,11 +176,24 @@ public partial class BytecodeVisitor
     public Instruction? VisitForStatement(ForStatement node)
     {
         MarkPosition(node);
+
+        // C 风格 for 的循环变量属于循环自己的作用域（与解释器一致）：
+        // 进入独立作用域并把它声明成局部变量，而不是脚本顶层的全局变量。
+        // 这样循环体内创建的闭包按引用捕获到的是局部槽位，
+        // 配合 EmitLoopVariableRebind 每轮换新共享单元，闭包才能拿到本轮的值（0/1/2 而不是 3/3/3）。
+        _compiler.EnterScope();
+
         // 获取ForStatement的字段（主构造函数参数）
         var setStatement = GetPrimaryConstructorParameter<SetStatement>(node, "setStatement");
         var expression = GetPrimaryConstructorParameter<LangExpression>(node, "expression");
         var statement = GetPrimaryConstructorParameter<OldStatement>(node, "statement");
         var blockStatement = GetPrimaryConstructorParameter<BlockStatement>(node, "blockStatement");
+
+        // 循环变量在循环作用域中声明为新的局部变量（同名时遮蔽外层同名变量）
+        if (setStatement?.Id is not null)
+        {
+            _compiler.DeclareLocalVariable(setStatement.Id.IdName);
+        }
 
         // 创建循环标签
         var loopLabels = new LoopLabels();
@@ -210,7 +223,8 @@ public partial class BytecodeVisitor
             // 增量之前为循环变量换新共享单元：循环体内新建的闭包继续持有本轮那个盒子
             // （值停在当轮），增量写进新盒子，下一轮迭代的闭包才捕获到新值。
             // 若在循环体之前换盒子，增量会写进闭包仍持有的盒子，结果变成 1,2,3。
-            // 循环变量是全局变量时（脚本顶层）无槽位可换，因此只在函数内生效。
+            // 循环变量在 VisitForStatement 中已声明为循环作用域的局部变量（含脚本顶层），
+            // 因此这里总能拿到可换的槽位。
             EmitLoopVariableRebind(setStatement?.Id?.IdName);
 
             // 增量
@@ -267,6 +281,9 @@ public partial class BytecodeVisitor
         }
 
         _loopLabels.Pop();
+
+        // 退出循环变量所在的作用域
+        _compiler.LeaveScope();
 
         return null;
     }

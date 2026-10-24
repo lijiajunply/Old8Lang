@@ -4,7 +4,7 @@ Old8Lang 项目（`o8package.json`）—— 运行时模式：`compiler`。
 
 ## 内容
 
-- 用例数量：**161** 个 `.old8` 文件
+- 用例数量：**165** 个 `.old8` 文件
 - 入口文件：`01_basic_literals.old8`
 
 ## 运行

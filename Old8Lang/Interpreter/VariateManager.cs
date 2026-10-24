@@ -91,6 +91,25 @@ public class VariateManager
     internal List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
     /// <summary>
+    /// 与作用域栈一一对应的作用域令牌（仅用于闭包判断“外层帧是否仍然存活”）。
+    /// </summary>
+    /// <remarks>
+    /// 每次 <see cref="AddChildren"/> 都会压入一个新的对象，<see cref="RemoveChildren"/> 弹出。
+    /// 令牌对象不复用，因此闭包可以据此安全判断自己创建时捕获的帧是否已经退出：
+    /// 作用域字典在移除后会被清空并放回缓存池复用，不能用字典引用本身做这个判断。
+    /// </remarks>
+    internal List<object> ScopeTokens { get; } = [new()];
+
+    /// <summary>
+    /// 已在本管理器（或其克隆）中执行过的模块导出表：模块绝对路径 → 导出符号。
+    /// </summary>
+    /// <remarks>
+    /// 模块只应执行一次；再次导入同一模块时从这里取符号，避免重复执行模块体。
+    /// 同一路径的模块在不同解释器实例之间互不共享，保证测试隔离。
+    /// </remarks>
+    internal Dictionary<string, Dictionary<string, LangValueType>> LoadedModuleExports { get; } = new();
+
+    /// <summary>
     /// COW（Copy-On-Write）标记数组，记录每个作用域是否共享
     /// </summary>
     /// <remarks>
@@ -727,6 +746,9 @@ public class VariateManager
         // COW: 添加对应的共享标记（新作用域默认未共享）
         ScopeSharedFlags.Add(false);
 
+        // 新的作用域令牌，供闭包判断该帧是否仍然存活
+        ScopeTokens.Add(new object());
+
         // 作用域变化，清理查找缓存
         _lookupCache?.Clear();
     }
@@ -749,6 +771,12 @@ public class VariateManager
             if (ScopeSharedFlags.Count > 0)
             {
                 ScopeSharedFlags.RemoveAt(ScopeSharedFlags.Count - 1);
+            }
+
+            // 同步移除作用域令牌
+            if (ScopeTokens.Count > 1)
+            {
+                ScopeTokens.RemoveAt(ScopeTokens.Count - 1);
             }
 
             // 优化：清空作用域并将其归还到缓存池，以便复用
@@ -1087,6 +1115,20 @@ public class VariateManager
             }
         }
 
+        // 克隆出来的作用域是独立帧，令牌也必须是新的，
+        // 否则闭包会把自己创建时捕获的旧帧误判为仍然存活
+        newManager.ScopeTokens.Clear();
+        for (int i = 0; i < Scopes.Count; i++)
+        {
+            newManager.ScopeTokens.Add(new object());
+        }
+
+        // 模块导出表随管理器一起可见（模块只需执行一次）
+        foreach (var (modulePath, exports) in LoadedModuleExports)
+        {
+            newManager.LoadedModuleExports[modulePath] = exports;
+        }
+
         // 复制导入信息（线程安全）
         lock (ImportInfosLock)
         {
@@ -1306,6 +1348,13 @@ public class VariateManager
         foreach (var newScope in Scopes.Select(scope => new Dictionary<string, LangValueType>(scope)))
         {
             generatorManager.Scopes.Add(newScope);
+        }
+
+        // 作用域令牌与作用域一一对应（闭包据此判断外层帧是否存活）
+        generatorManager.ScopeTokens.Clear();
+        foreach (var _ in generatorManager.Scopes)
+        {
+            generatorManager.ScopeTokens.Add(new object());
         }
 
         // 复制导入信息（线程安全）

@@ -13,17 +13,11 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
     [Fact]
     public void NegativeIndex_CompilesAndExecutesCorrectly()
     {
+        // 负索引在 Old8Lang 里是有效语法：-1 表示最后一个元素（与解释器 / VM 一致）。
         var code = @"
             arr <- [1, 2, 3, 4, 5]
-            
-            caughtError <- """"
-            try {
-                item <- arr[-1]
-            } catch (e) {
-                caughtError <- e
-            }
-            
-            Assert.True(caughtError != """")
+            Assert.Equal(5, arr[-1])
+            Assert.Equal(4, arr[-2])
         ";
         var interpreter = new LangInterpreter();
 

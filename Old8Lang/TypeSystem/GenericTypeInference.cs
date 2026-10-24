@@ -1,5 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.TypeSystem;
@@ -29,9 +30,35 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
             return null;
         }
 
+        return InferTypeArgumentsFromParameters(
+            funcValue.GenericParameters!,
+            funcValue.Ids,
+            callArguments,
+            manager);
+    }
+
+    /// <summary>
+    /// 从参数列表与实参推断泛型类型（泛型函数与泛型类构造函数共用）。
+    /// </summary>
+    /// <param name="genericParameters">泛型参数定义</param>
+    /// <param name="parameters">形参列表</param>
+    /// <param name="callArguments">调用参数</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>推断出的类型参数映射，如果失败则返回 null</returns>
+    private Dictionary<string, ITypeInfo>? InferTypeArgumentsFromParameters(
+        IReadOnlyList<GenericParameter> genericParameters,
+        IReadOnlyList<LangId>? parameters,
+        List<LangExpression> callArguments,
+        Interpreter.VariateManager manager)
+    {
+        if (parameters is null)
+        {
+            return null;
+        }
+
         // 检查参数数量是否匹配（考虑默认参数）
-        var requiredParamCount = funcValue.Ids?.Count(id => id.DefaultValue is null) ?? 0;
-        var totalParamCount = funcValue.Ids?.Count ?? 0;
+        var requiredParamCount = parameters.Count(id => id.DefaultValue is null);
+        var totalParamCount = parameters.Count;
 
         if (callArguments.Count < requiredParamCount || callArguments.Count > totalParamCount)
         {
@@ -44,7 +71,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         // 遍历函数参数，尝试从调用参数推断类型
         for (int i = 0; i < callArguments.Count && i < totalParamCount; i++)
         {
-            var paramId = funcValue.Ids![i];
+            var paramId = parameters[i];
             var callArg = callArguments[i];
 
             // 获取参数的类型注解
@@ -76,7 +103,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         }
 
         // 检查是否所有泛型参数都已推断
-        foreach (var genericParam in funcValue.GenericParameters!)
+        foreach (var genericParam in genericParameters)
         {
             if (!typeArgMapping.ContainsKey(genericParam.Name))
             {
@@ -212,6 +239,13 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                     return null;
 
                 case Instance instance:
+                    // 类实例化：直接按类名推断，避免为了推断类型而把构造函数执行两次
+                    var calleeValue = manager.GetValue(instance.Id) ?? manager.GetAny(instance.Id);
+                    if (calleeValue is TypeTemplate typeTemplate)
+                    {
+                        return new ClassTypeInfo(typeTemplate.ClassName);
+                    }
+
                     // 对于函数调用，尝试执行并获取结果类型
                     // 注意：这可能有副作用，但对于推断泛型类型来说是必要的
                     try
@@ -270,6 +304,9 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
             StringLangValue => typeAnnotationManager.GetTypeFamily().GetType("string"),
             BoolLangValue => typeAnnotationManager.GetTypeFamily().GetType("bool"),
             CharLangValue => typeAnnotationManager.GetTypeFamily().GetType("char"),
+            // 用户定义类的实例：类型族里通常没有登记，直接按类名构造类型信息
+            AnyLangValue anyValue => new ClassTypeInfo(anyValue.ClassId.IdName),
+            TypeTemplate template => new ClassTypeInfo(template.ClassName),
             _ => null
         };
     }
@@ -284,11 +321,19 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         ITypeInfo actualType,
         Dictionary<string, ITypeInfo> typeArgMapping)
     {
+        // 可空泛型参数写作 T?：匹配时按去掉问号的 T 建立映射
+        var trimmedPattern = pattern.Trim();
+        if (trimmedPattern.EndsWith('?'))
+        {
+            trimmedPattern = trimmedPattern[..^1];
+        }
+
         // 检查是否是单个类型参数
-        if (pattern.Length <= 3 && char.IsUpper(pattern[0]) && !pattern.Contains('<'))
+        if (trimmedPattern.Length > 0 && trimmedPattern.Length <= 3 &&
+            char.IsUpper(trimmedPattern[0]) && !trimmedPattern.Contains('<'))
         {
             // 这是一个类型参数
-            if (typeArgMapping.TryGetValue(pattern, out var existingType))
+            if (typeArgMapping.TryGetValue(trimmedPattern, out var existingType))
             {
                 // 已经有映射，检查是否一致
                 return existingType.Name == actualType.Name;
@@ -296,7 +341,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
             else
             {
                 // 添加新的映射
-                typeArgMapping[pattern] = actualType;
+                typeArgMapping[trimmedPattern] = actualType;
                 return true;
             }
         }
@@ -348,10 +393,14 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
     }
 
     /// <summary>
-    /// 从类实例化参数推断泛型类型
+    /// 从类实例化参数推断泛型类型。
     /// </summary>
+    /// <remarks>
+    /// Old8Lang 的构造函数是用户定义的 init 方法，因此按 init 的形参注解推断：
+    /// <c>class Box&lt;T?&gt; { init(v: T?) }</c> + <c>Box(123)</c> → <c>{T: int}</c>。
+    /// </remarks>
     public Dictionary<string, ITypeInfo>? InferClassTypeArguments(
-        AST.Expression.AnyValues.TypeTemplate typeTemplate,
+        TypeTemplate typeTemplate,
         List<LangExpression> constructorArguments,
         Interpreter.VariateManager manager,
         SourcePosition position)
@@ -361,12 +410,27 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
             return null;
         }
 
-        // 类的类型推断通常需要从构造函数参数推断
-        // 但 Old8Lang 的构造函数是用户定义的 init 方法
-        // 因此这里的实现比较简单，主要留作未来扩展
+        // 找到用户定义的 init 构造函数
+        FuncLangValue? init = null;
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberId.IdName == "init" && memberExpr is FuncLangValue funcValue)
+            {
+                init = funcValue;
+                break;
+            }
+        }
 
-        // 暂时不支持类的自动类型推断
-        return null;
+        if (init?.Ids is null)
+        {
+            return null;
+        }
+
+        return InferTypeArgumentsFromParameters(
+            typeTemplate.GenericParameters!,
+            init.Ids,
+            constructorArguments,
+            manager);
     }
 
     /// <summary>

@@ -656,6 +656,54 @@ public partial class TypeTemplate(
         return instance;
     }
 
+    /// <summary>
+    /// 创建实例；泛型类在未显式给出类型参数时，从构造函数实参推断。
+    /// </summary>
+    /// <remarks>
+    /// 不支持推断时（例如实参全是 null）：
+    /// 无约束的泛型参数按 <c>any</c> 处理，让动态语义继续；
+    /// 有约束则保持未实例化，由参数类型检查给出明确错误。
+    /// </remarks>
+    public AnyLangValue CreateInstanceWithInference(List<LangExpression>? arguments, VariateManager manager)
+    {
+        if (!IsGeneric || TypeArgumentMapping is not null)
+        {
+            return CreateInstance(manager);
+        }
+
+        var annotationManager = manager.Interpreter?.TypeAnnotationManager;
+        if (annotationManager is null)
+        {
+            return CreateInstance(manager);
+        }
+
+        var inference = new GenericTypeInference(annotationManager);
+        var inferredArguments = inference.InferClassTypeArguments(this, arguments ?? [], manager, Position);
+
+        if (inferredArguments is null)
+        {
+            if (GenericParameters!.Any(p => p.HasConstraints))
+            {
+                return CreateInstance(manager);
+            }
+
+            var anyType = annotationManager.GetTypeFamily().GetType("any");
+            if (anyType is null)
+            {
+                return CreateInstance(manager);
+            }
+
+            inferredArguments = new Dictionary<string, ITypeInfo>();
+            foreach (var parameter in GenericParameters)
+            {
+                inferredArguments[parameter.Name] = anyType;
+            }
+        }
+
+        var instantiated = InstantiateGeneric(inferredArguments, annotationManager, manager);
+        return instantiated.CreateInstance(manager);
+    }
+
     // ==================== 反射支持：类型注册表 ====================
 
     /// <summary>

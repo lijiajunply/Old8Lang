@@ -388,23 +388,36 @@ public static class GenericConstraintValidator
     {
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
-            if (memberId.IdName == "init" && memberExpr is FuncLangValue funcValue)
+            if (memberId.IdName != "init")
             {
-                // 检查是否无参或所有参数都有默认值
-                if (funcValue.Ids == null || funcValue.Ids.Count == 0)
-                {
-                    return true;
-                }
+                continue;
+            }
 
-                // 检查所有参数是否都有默认值
-                if (funcValue.Ids.All(id => id.DefaultValue != null))
-                {
-                    return true;
-                }
+            // 单个 init
+            if (memberExpr is FuncLangValue funcValue && HasNoRequiredParameters(funcValue))
+            {
+                return true;
+            }
+
+            // 重载的 init（多个 init 会被合并成 MethodOverloadList）
+            if (memberExpr is MethodOverloadList overloadList &&
+                overloadList.Overloads.Any(HasNoRequiredParameters))
+            {
+                return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 函数是否没有必需参数（无参或所有参数都有默认值）。
+    /// </summary>
+    private static bool HasNoRequiredParameters(FuncLangValue funcValue)
+    {
+        return funcValue.Ids is null ||
+               funcValue.Ids.Count == 0 ||
+               funcValue.Ids.All(id => id.DefaultValue != null);
     }
 
     /// <summary>

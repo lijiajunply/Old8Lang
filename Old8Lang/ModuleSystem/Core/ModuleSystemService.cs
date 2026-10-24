@@ -157,21 +157,17 @@ public class ModuleSystemService
         result.Block = loadResult.Block;
         result.IsFromCache = loadResult.IsFromCache;
 
-        // 如果从缓存加载，不需要再执行和提取符号，直接使用缓存的模块对象
-        if (loadResult.IsFromCache && manager.Interpreter.ModuleCache.ContainsKey(absolutePath))
+        // 模块在当前管理器里已经执行过：只重新登记符号，不重复执行模块体。
+        // 重复执行会让模块里的赋值落回外层作用域（变量已存在时会向上写），
+        // 结果反而是"符号不存在"（旧实现就是这么失败的）。
+        if (manager.LoadedModuleExports.TryGetValue(absolutePath, out var knownExports))
         {
-            // 缓存的模块已经执行过，只需要注册符号
-            if (options.ModuleAlias is not null)
+            var cachedResult = RegisterKnownModuleSymbols(absolutePath, knownExports, manager, options, result);
+            if (cachedResult is not null)
             {
-                var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                var cachedSymbols = _symbolExtractor.ExtractSymbols(manager);
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, cachedSymbols);
-                _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
-                result.ModuleObject = moduleObj;
-                result.IsSuccess = true;
+                return cachedResult;
             }
-
-            return result;
+            // 无法从已知导出恢复时继续走下面的重新执行路径（防御性兜底）
         }
 
         // 执行模块代码（需要在 ImportStack 保护下执行，防止循环依赖）
@@ -224,6 +220,10 @@ public class ModuleSystemService
 
                     result.ExtractedSymbols = symbols;
 
+                    // 记录模块的完整导出，供后续重复导入复用（不重复执行模块体）
+                    manager.LoadedModuleExports[absolutePath] =
+                        ExtractSymbolsFromNewImportInfos(newImportInfos, manager);
+
                     // 注册到父作用域 - 使用别名（如果有）
                     if (options.SymbolAliases is { Count: > 0 })
                     {
@@ -261,6 +261,7 @@ public class ModuleSystemService
                 _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
+                manager.LoadedModuleExports[absolutePath] = symbols;
             }
             else
             {
@@ -276,6 +277,7 @@ public class ModuleSystemService
                 _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
+                manager.LoadedModuleExports[absolutePath] = symbols;
             }
         }
         finally
@@ -283,6 +285,74 @@ public class ModuleSystemService
             manager.ImportStack.Pop();
         }
 
+        return result;
+    }
+
+    /// <summary>
+    /// 已执行过的模块再次被导入时，直接从已知导出恢复符号，不再执行模块体。
+    /// </summary>
+    /// <returns>导入结果；如果无法从已知导出恢复（需要重新执行模块）则返回 null。</returns>
+    private ModuleImportResult? RegisterKnownModuleSymbols(
+        string absolutePath,
+        Dictionary<string, LangValueType> knownExports,
+        VariateManager manager,
+        ImportOptions options,
+        ModuleImportResult result)
+    {
+        var moduleName = Path.GetFileNameWithoutExtension(absolutePath);
+        var isWildcard = options.ImportSpecifiers is null || options.ImportSpecifiers.Count == 0;
+
+        // 命名导入按指定符号取；通配符导入取模块的全部导出
+        var requestedNames = isWildcard ? knownExports.Keys.ToList() : options.ImportSpecifiers!.ToList();
+
+        var symbols = new Dictionary<string, LangValueType>();
+        var missing = new List<string>();
+
+        foreach (var symbolName in requestedNames)
+        {
+            // 导入是值拷贝（与首次导入一致）：直接取模块导出时的值，
+            // 不去当前作用域找同名变量，避免误把无关的全局变量当成模块导出。
+            if (knownExports.TryGetValue(symbolName, out var storedValue))
+            {
+                symbols[symbolName] = storedValue;
+                continue;
+            }
+
+            missing.Add(symbolName);
+        }
+
+        if (missing.Count > 0)
+        {
+            return null;
+        }
+
+        if (options.ModuleAlias is not null)
+        {
+            // import "module" as alias：重建模块对象
+            var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
+            _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
+            result.ModuleObject = moduleObj;
+        }
+        else if (options.IsFromClause)
+        {
+            // import { a as b } from "module"：直接登记到当前作用域
+            var currentScope = manager.Scopes[^1];
+            foreach (var (originalName, value) in symbols)
+            {
+                var name = options.SymbolAliases?.GetValueOrDefault(originalName) ?? originalName;
+                currentScope[name] = value;
+            }
+        }
+        else
+        {
+            // import "module"：重建模块对象
+            var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
+            _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
+            result.ModuleObject = moduleObj;
+        }
+
+        result.ExtractedSymbols = symbols;
+        result.IsSuccess = true;
         return result;
     }
 

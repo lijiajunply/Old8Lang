@@ -882,8 +882,9 @@ public static class DotOperatorILHelper
         // 处理不同类型的索引访问
         if (leftType == typeof(object[]))
         {
-            // 数组索引访问
-            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            // 数组索引访问（负索引 -1 表示最后一个元素）
+            EmitIntIndexConversion(ilGenerator, rightType);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetArrayItem))!);
             return typeof(object);
         }
 
@@ -894,8 +895,9 @@ public static class DotOperatorILHelper
             // 列表字面量可能是 List<int> / List<string> 等具体泛型，
             // 而 list 参数在 IL 里静态类型是 List<object>；直接 callvirt List<object>.get_Item
             // 会在运行期把 List<int> 当 List<object> 使用，导致内存访问越界。
-            var indexer = typeof(System.Collections.IList).GetProperty("Item")!;
-            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+            // 负索引由 IlIndexHelper 归一化。
+            EmitIntIndexConversion(ilGenerator, rightType);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetListItem))!);
             return typeof(object);
         }
 
@@ -909,25 +911,25 @@ public static class DotOperatorILHelper
 
         if (leftType == typeof(string))
         {
-            // 字符串索引访问
-            var indexer = typeof(string).GetProperty("Chars")!;
-            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+            // 字符串索引访问（负索引 -1 表示最后一个字符）
+            EmitIntIndexConversion(ilGenerator, rightType);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetStringChar))!);
             return typeof(char);
         }
 
         if (leftType?.FullName?.StartsWith("System.ValueTuple") == true)
         {
             // ValueTuple 索引访问
-            if (right is IntLangValue intVal)
+            if (right is IntLangValue { Value: >= 0 } intVal)
             {
-                // 如果是常量索引，优化为字段访问
+                // 如果是非负常量索引，优化为字段访问
                 return GenerateValueTupleItemAccess(ilGenerator, leftType, intVal.Value);
             }
 
-            // 变量索引，装箱为 ITuple 并使用索引器
+            // 变量索引或负常量索引：装箱为 ITuple 并经 IlIndexHelper 归一化下标
             ilGenerator.Emit(OpCodes.Box, leftType);
-            var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
-            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+            EmitIntIndexConversion(ilGenerator, rightType);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetTupleItem))!);
             return typeof(object);
         }
 
@@ -952,6 +954,21 @@ public static class DotOperatorILHelper
     }
 
     /// <summary>
+    /// 保证栈上的索引值是 <see cref="int"/>（IlIndexHelper 的参数类型）。
+    /// </summary>
+    private static void EmitIntIndexConversion(ILGenerator ilGenerator, Type rightType)
+    {
+        if (rightType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+        }
+        else if (rightType == typeof(long))
+        {
+            ilGenerator.Emit(OpCodes.Conv_I4);
+        }
+    }
+
+    /// <summary>
     /// 生成动态索引访问的IL代码（用于 object 类型）
     /// </summary>
     public static Type GenerateDynamicIndexAccess(ILGenerator ilGenerator, Type rightType)
@@ -972,9 +989,6 @@ public static class DotOperatorILHelper
 
         var endLabel = ilGenerator.DefineLabel();
         var notDictLabel = ilGenerator.DefineLabel();
-        var notListLabel = ilGenerator.DefineLabel();
-        var notArrayLabel = ilGenerator.DefineLabel();
-        var notTupleLabel = ilGenerator.DefineLabel();
 
         // 尝试Dictionary<object, object>
         ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
@@ -988,54 +1002,14 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(OpCodes.Callvirt, dictIndexer.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Br, endLabel);
 
-        // 不是Dictionary，尝试任意 IList（List<int> / List<object> / int[] 等）
+        // 不是Dictionary：列表 / 数组 / 元组 / 字符串统一交给 IlIndexHelper，
+        // 负索引在那里归一化（与解释器和虚拟机一致）
         ilGenerator.MarkLabel(notDictLabel);
-        ilGenerator.Emit(OpCodes.Pop); // 弹出null
+        ilGenerator.Emit(OpCodes.Pop); // 弹出 Isinst 的 null
         ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(System.Collections.IList));
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Brfalse, notListLabel);
-
-        // 是List
         ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
         ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-        var listIndexer = typeof(System.Collections.IList).GetProperty("Item")!;
-        ilGenerator.Emit(OpCodes.Callvirt, listIndexer.GetGetMethod()!);
-        ilGenerator.Emit(OpCodes.Br, endLabel);
-
-        // 不是List，尝试object[]
-        ilGenerator.MarkLabel(notListLabel);
-        ilGenerator.Emit(OpCodes.Pop);
-        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(object[]));
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Brfalse, notArrayLabel);
-
-        // 是Array
-        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
-        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-        ilGenerator.Emit(OpCodes.Ldelem_Ref);
-        ilGenerator.Emit(OpCodes.Br, endLabel);
-
-        // 不是Array，尝试ITuple
-        ilGenerator.MarkLabel(notArrayLabel);
-        ilGenerator.Emit(OpCodes.Pop);
-        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(System.Runtime.CompilerServices.ITuple));
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Brfalse, notTupleLabel);
-
-        // 是Tuple
-        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
-        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-        var tupleIndexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
-        ilGenerator.Emit(OpCodes.Callvirt, tupleIndexer.GetGetMethod()!);
-        ilGenerator.Emit(OpCodes.Br, endLabel);
-
-        // 都不匹配
-        ilGenerator.MarkLabel(notTupleLabel);
-        ilGenerator.Emit(OpCodes.Pop);
-        ilGenerator.Emit(OpCodes.Ldnull); // 或者抛出异常
+        ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetObjectItem))!);
 
         ilGenerator.MarkLabel(endLabel);
         return typeof(object);

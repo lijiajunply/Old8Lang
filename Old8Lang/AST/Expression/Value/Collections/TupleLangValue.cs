@@ -232,6 +232,12 @@ public partial class TupleLangValue : LangValueType, ILangList
             throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
         }
 
+        // 与列表 / 数组 / 字符串一致：负索引表示从末尾开始（-1 是最后一个元素）
+        if (index < 0)
+        {
+            index += ItemValues.Count;
+        }
+
         if (index < 0 || index >= ItemValues.Count)
         {
             throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {ItemValues.Count - 1}");
@@ -502,6 +508,11 @@ public partial class TupleLangValue : LangValueType, ILangList
 
     public void Set(int index, LangValueType value)
     {
+        if (index < 0)
+        {
+            index += ItemValues.Count;
+        }
+
         if (index < 0 || index >= ItemValues.Count)
         {
             throw new InvalidOperationError(this, $"元组索引越界: {index}");

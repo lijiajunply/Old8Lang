@@ -16,6 +16,8 @@ export_var1 <- "修改后的值"
 PrintLine("export_var1 = " + export_var1)
 
 // 第二次导入同一个模块 - 只导入变量，不导入函数
+// 注意：块内的 import 语句会被提升到其它语句之前执行（与函数声明一致），
+// 并且导入是值拷贝而不是活绑定，因此 var1Again 得到的是模块导出时的值。
 PrintLine("\n第二次导入同一个模块...")
 import { export_var1 as var1Again } from "./test_import_module.old8"
 
@@ -23,12 +25,20 @@ PrintLine("直接调用函数 export_func1() = " + export_func1())
 PrintLine("export_var1 = " + export_var1)
 PrintLine("var1Again = " + var1Again)
 
-// 验证缓存是否生效（变量值应该保持修改后的值）
+// 验证重复导入：同一模块的符号可以再次导入，且拿到的是模块的导出值
 PrintLine("\n验证模块缓存...")
-if export_var1 == var1Again {
-    PrintLine("✅ 模块缓存生效，变量值保持一致")
+if var1Again == "This is export_var1" {
+    PrintLine("✅ 重复导入同一模块的符号成功")
 } else {
-    PrintLine("❌ 模块缓存未生效，变量值不一致")
+    PrintLine("❌ 重复导入的符号值不正确")
+}
+
+// 导入的是值拷贝：修改别名不影响原变量
+var1Again <- "别名修改后的值"
+if export_var1 == "修改后的值" {
+    PrintLine("✅ 导入的别名与原变量互相独立")
+} else {
+    PrintLine("❌ 修改别名影响了原变量")
 }
 
 // 测试重命名导入

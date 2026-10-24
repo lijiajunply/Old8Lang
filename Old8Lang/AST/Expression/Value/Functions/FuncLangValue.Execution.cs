@@ -45,11 +45,20 @@ public partial class FuncLangValue
                 return new GeneratorLangValue(noParamClosure, Position);
             }
 
+            // 外层管理器的作用域令牌必须与作用域一一对应，才能安全地判断帧是否存活；
+            // 生成器 / 异步恢复出来的管理器可能不维护令牌，此时只用快照。
+            var canUseHomeFrame = manager.ScopeTokens.Count == manager.Scopes.Count;
+
             var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
             {
                 // 使用深拷贝创建独立的作用域副本
                 // 这样即使外层函数返回，lambda 仍然可以访问捕获的变量
-                CapturedScope = manager.Clone()
+                CapturedScope = manager.Clone(),
+                // 同时记住外层管理器：外层帧还活着时直接在外层帧上执行，
+                // 闭包内对局部变量的赋值才能写回外层（见 ClosureFrameStillAlive）
+                CapturedHomeManager = canUseHomeFrame ? manager : null,
+                CapturedHomeTokens = canUseHomeFrame ? manager.ScopeTokens.ToArray() : null,
+                CapturedHomeThreadId = Environment.CurrentManagedThreadId
             };
 
             return closureFunc;
@@ -79,6 +88,41 @@ public partial class FuncLangValue
         {
             CapturedScope = manager.Clone()
         };
+    }
+
+    /// <summary>
+    /// 判断闭包创建时所在的外层帧是否仍然存活。
+    /// </summary>
+    /// <remarks>
+    /// 通过作用域令牌的身份比较来判断：作用域字典在退出后会被清空并放回缓存池复用，
+    /// 令牌对象则一次性分配、从不复用，因此不会把复用的帧误认成原来那个帧。
+    /// </remarks>
+    private bool ClosureFrameStillAlive(VariateManager home)
+    {
+        // 外层管理器不是线程安全的：只有同一线程上的调用才能写回外层帧
+        if (CapturedHomeThreadId != Environment.CurrentManagedThreadId)
+        {
+            return false;
+        }
+
+        var tokens = CapturedHomeTokens;
+        // 作用域与令牌必须仍一一对应，否则无法用令牌可靠判断帧的存活
+        if (tokens is null ||
+            home.ScopeTokens.Count != home.Scopes.Count ||
+            home.ScopeTokens.Count < tokens.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < tokens.Length; i++)
+        {
+            if (!ReferenceEquals(home.ScopeTokens[i], tokens[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -651,8 +695,18 @@ public partial class FuncLangValue
             // 这样函数体就能访问定义时的外部变量
             if (CapturedScope is not null)
             {
-                // 使用捕获的作用域作为基础
-                executionManager = CapturedScope;
+                // 若闭包定义时的外层帧还活着，就直接在外层帧上执行，
+                // 使闭包内对局部变量的赋值写回外层（具名嵌套函数一直如此）；
+                // 外层帧已退出时退回快照，保证闭包在函数返回后仍可使用。
+                if (CapturedHomeManager is not null && ClosureFrameStillAlive(CapturedHomeManager))
+                {
+                    executionManager = CapturedHomeManager;
+                }
+                else
+                {
+                    executionManager = CapturedScope;
+                }
+
                 // 增加递归深度
                 executionManager.RecursionDepth = variateManagerFunc.RecursionDepth;
             }
@@ -663,6 +717,9 @@ public partial class FuncLangValue
             }
 
             executionManager.AddChildren();
+
+            // 闭包在存活的调用者帧上执行时，不要污染调用者的返回值槽
+            var originalResult = executionManager.Result;
 
             // 保存当前的函数返回类型，避免嵌套调用时被覆盖
             var originalReturnType = executionManager.CurrentFunctionReturnType;
@@ -735,6 +792,10 @@ public partial class FuncLangValue
 
             // 保存返回值
             var result = executionManager.Result;
+
+            // 恢复调用者的返回值槽：闭包可能在外层帧上执行，返回值已存进 result，
+            // 不能让它覆盖外层函数稍后自己的 return 结果
+            executionManager.Result = originalResult;
 
             // 重置return标志为原始值，确保函数调用不会影响外部上下文
             // 特别重要：在生成器上下文中，函数的return不应该导致生成器退出

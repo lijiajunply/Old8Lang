@@ -330,4 +330,36 @@ result2 <- process2(24)
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result", "Deep import successful");
     }
+
+    [Fact]
+    public void Import_SameModuleTwice_ShouldReuseExportsWithoutReexecuting()
+    {
+        // 同一模块的符号允许重复导入：第二次导入从已执行过的模块导出表恢复，不再执行模块体
+        CreateTempModuleFile("repeat_module.old8", """
+            func getValue() {
+                return 7
+            }
+            export_value <- 41
+            """);
+
+        var testContent = """
+            import { export_value } from "repeat_module"
+            import { export_value as again } from "repeat_module"
+            import { getValue } from "repeat_module"
+
+            first <- export_value
+            second <- again
+            func_result <- getValue()
+            """;
+        CreateTempModuleFile("repeat_import_test.old8", testContent);
+
+        // Act
+        var (interpreter, exception) = ExecuteCodeFile("repeat_import_test.old8");
+
+        // Assert：不再抛 "symbols do not exist"
+        Assert.Null(exception);
+        AssertVariableValue(interpreter, "first", 41);
+        AssertVariableValue(interpreter, "second", 41);
+        AssertVariableValue(interpreter, "func_result", 7);
+    }
 }

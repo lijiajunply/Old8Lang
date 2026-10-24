@@ -25,6 +25,30 @@ public partial class FuncLangValue : ImportInfo
     internal VariateManager? CapturedScope { get; init; }
 
     /// <summary>
+    /// 闭包被创建时所在的外层变量管理器（仅在 lambda 求值时记录）。
+    /// </summary>
+    /// <remarks>
+    /// 如果外层帧在闭包调用时仍然存活，就直接在外层管理器上执行函数体，
+    /// 这样闭包内对局部变量的赋值会写回外层（与具名嵌套函数一致）；
+    /// 外层帧已退出时才退回到 <see cref="CapturedScope"/> 这份快照。
+    /// </remarks>
+    internal VariateManager? CapturedHomeManager { get; init; }
+
+    /// <summary>
+    /// 闭包创建时外层管理器的作用域令牌（用于判断外层帧是否仍然存活）。
+    /// </summary>
+    internal object[]? CapturedHomeTokens { get; init; }
+
+    /// <summary>
+    /// 闭包创建时所在的托管线程 ID。
+    /// </summary>
+    /// <remarks>
+    /// 外层管理器不是线程安全的：如果闭包在另一个线程（如 spawn）上调用，
+    /// 必须退回自己捕获的独立作用域快照，不能直接写回外层帧。
+    /// </remarks>
+    internal int CapturedHomeThreadId { get; init; }
+
+    /// <summary>
     /// 获取捕获的作用域（用于装饰器等场景）
     /// </summary>
     internal VariateManager? GetCapturedScope() => CapturedScope;

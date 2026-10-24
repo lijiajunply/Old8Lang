@@ -651,4 +651,108 @@ public class ClosureTests
         Assert.IsType<IntLangValue>(result);
         Assert.Equal(111, ((IntLangValue)result).Value); // 1 + 10 + 100
     }
+
+    [Fact]
+    public void Closure_LambdaWritesBackToEnclosingLocal()
+    {
+        // lambda 对局部变量的赋值必须写回外层（与具名嵌套函数一致）
+        var code = @"
+            func make() -> int {
+                c <- 0
+                inc <- () -> {
+                    c <- c + 1
+                    return c
+                }
+                inc()
+                inc()
+                return c
+            }
+            result <- make()
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(2, ((IntLangValue)result).Value);
+    }
+
+    [Fact]
+    public void Closure_LambdaReadsLatestValueOfEnclosingLocal()
+    {
+        // 闭包创建后外层重新赋值，调用时应读到最新值
+        var code = @"
+            func make() -> int {
+                c <- 0
+                read <- () -> c
+                c <- 99
+                return read()
+            }
+            result <- make()
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(99, ((IntLangValue)result).Value);
+    }
+
+    [Fact]
+    public void Closure_SiblingLambdaAndNamedFunctionShareEnclosingLocal()
+    {
+        // lambda 与具名嵌套函数应共享同一个外层局部变量
+        var code = @"
+            func outer() -> int {
+                total <- 0
+                inc <- () -> { total <- total + 1 }
+                func bump() { total <- total + 10 }
+                inc()
+                bump()
+                return total
+            }
+            result <- outer()
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(11, ((IntLangValue)result).Value);
+    }
+
+    [Fact]
+    public void Closure_ReturnedAfterFrameExit_StillWorksWithSnapshot()
+    {
+        // 外层函数返回后，闭包仍能读写自己捕获的变量（每次调用独立累加）
+        var code = @"
+            func make() -> function {
+                c <- 0
+                return () -> {
+                    c <- c + 1
+                    return c
+                }
+            }
+            counter <- make()
+            first <- counter()
+            second <- counter()
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var first = interpreter.Manager.GetValue(new LangId("first"));
+        var second = interpreter.Manager.GetValue(new LangId("second"));
+        Assert.IsType<IntLangValue>(first);
+        Assert.IsType<IntLangValue>(second);
+        Assert.Equal(1, ((IntLangValue)first).Value);
+        Assert.Equal(2, ((IntLangValue)second).Value);
+    }
 }

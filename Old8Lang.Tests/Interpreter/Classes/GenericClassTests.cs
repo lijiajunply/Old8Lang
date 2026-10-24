@@ -371,4 +371,151 @@ public class GenericClassTests
         Assert.IsType<DoubleLangValue>(c);
         Assert.Equal(3.0, ((DoubleLangValue)c).Value);
     }
+
+    [Fact]
+    public void GenericClass_InterfaceConstraint_InfersTypeArgumentFromConstructor()
+    {
+        // Arrange：不给显式类型参数，从构造函数实参推断 T，并验证它实现了接口约束
+        var code = @"
+            interface IShape {
+                func area() -> int {
+                    return 0
+                }
+            }
+
+            class Circle implements IShape {
+                public radius:int
+
+                func init(r:int) -> void {
+                    this.radius <- r
+                }
+
+                func area() -> int {
+                    return this.radius * this.radius
+                }
+            }
+
+            class Holder<T: IShape> {
+                public value:T
+
+                func init(v:T) -> void {
+                    this.value <- v
+                }
+
+                func getArea() -> int {
+                    return this.value.area()
+                }
+            }
+
+            holder <- Holder(Circle(3))
+            area <- holder.getArea()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var area = interpreter.Manager.GetValue(new LangId("area"));
+        Assert.IsType<IntLangValue>(area);
+        Assert.Equal(9, ((IntLangValue)area).Value);
+    }
+
+    [Fact]
+    public void GenericClass_NullableTypeParameter_AcceptsValueAndNull()
+    {
+        // Arrange：T? 既接受具体值也接受 null
+        var code = @"
+            class Maybe<T?> {
+                private value:T?
+
+                func init(v:T?) -> void {
+                    this.value <- v
+                }
+
+                func hasValue() -> bool {
+                    return this.value != null
+                }
+
+                func getValue() -> T? {
+                    return this.value
+                }
+            }
+
+            withValue <- Maybe(42)
+            hasValue <- withValue.hasValue()
+            value <- withValue.getValue()
+
+            empty <- Maybe(null)
+            emptyHasValue <- empty.hasValue()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var hasValue = interpreter.Manager.GetValue(new LangId("hasValue"));
+        var value = interpreter.Manager.GetValue(new LangId("value"));
+        var emptyHasValue = interpreter.Manager.GetValue(new LangId("emptyHasValue"));
+
+        Assert.IsType<BoolLangValue>(hasValue);
+        Assert.True(((BoolLangValue)hasValue).Value);
+        Assert.IsType<IntLangValue>(value);
+        Assert.Equal(42, ((IntLangValue)value).Value);
+        Assert.IsType<BoolLangValue>(emptyHasValue);
+        Assert.False(((BoolLangValue)emptyHasValue).Value);
+    }
+
+    [Fact]
+    public void GenericClass_ExplicitTypeArgument_ValidatesInterfaceConstraint()
+    {
+        // Arrange：显式类型参数同样要按接口实现校验约束
+        var code = @"
+            interface IShape {
+                func area() -> int {
+                    return 0
+                }
+            }
+
+            class Circle implements IShape {
+                public radius:int
+
+                func init(r:int) -> void {
+                    this.radius <- r
+                }
+
+                func area() -> int {
+                    return this.radius * this.radius
+                }
+            }
+
+            class Holder<T: IShape> {
+                public value:T
+
+                func init(v:T) -> void {
+                    this.value <- v
+                }
+
+                func getArea() -> int {
+                    return this.value.area()
+                }
+            }
+
+            holder <- Holder<Circle>(Circle(4))
+            area <- holder.getArea()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var area = interpreter.Manager.GetValue(new LangId("area"));
+        Assert.IsType<IntLangValue>(area);
+        Assert.Equal(16, ((IntLangValue)area).Value);
+    }
 }

@@ -245,7 +245,7 @@ public partial class Instance : LangValueType
                 if (idResult is TypeTemplate typeTemplate)
                 {
                     // 创建类的实例（使用 V2 架构）
-                    var instance = typeTemplate.CreateInstance(manager);
+                    var instance = typeTemplate.CreateInstanceWithInference(Ids, manager);
 
                     // 初始化实例，设置Interpreter
                     instance.Init(manager.Interpreter);
@@ -322,7 +322,7 @@ public partial class Instance : LangValueType
             if (idResult is TypeTemplate typeTemplate)
             {
                 // 创建类的实例（使用 V2 架构）
-                var instance = typeTemplate.CreateInstance(manager);
+                var instance = typeTemplate.CreateInstanceWithInference(Ids, manager);
 
                 // 初始化实例，设置Interpreter
                 instance.Init(manager.Interpreter);
