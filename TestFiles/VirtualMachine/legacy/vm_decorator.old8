@@ -1,7 +1,6 @@
-// 虚拟机模式装饰器测试 - 验证基本功能
+// 虚拟机模式：函数作为参数和返回值
 
-// 测试函数作为参数和返回值
-func getFunction() -> func {
+func getFunction() {
     func inner(x:int) -> int {
         return x * 2
     }

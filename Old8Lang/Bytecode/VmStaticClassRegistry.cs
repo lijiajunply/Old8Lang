@@ -37,10 +37,14 @@ public static class VmStaticClassRegistry
             ["FromException"] = "FromException",
             ["Run"] = "Run",
             ["StartNew"] = "StartNew",
+            // 属性：Task.Factory（返回 TaskFactory 对象）
+            ["Factory"] = "Factory",
         },
         ["Thread"] = new(StringComparer.Ordinal)
         {
             ["Sleep"] = "Sleep",
+            // 属性 / 无参方法两种写法，与解释器一致
+            ["CurrentThread"] = "CurrentThread",
         },
         ["Assert"] = new(StringComparer.Ordinal)
         {
@@ -93,12 +97,78 @@ public static class VmStaticClassRegistry
             ["NotInstanceOf"] = "AssertNotInstanceOf",
             ["AssertNotInstanceOf"] = "AssertNotInstanceOf",
         },
+        ["TestRunner"] = new(StringComparer.Ordinal)
+        {
+            ["Describe"] = "Describe",
+            ["It"] = "It",
+            ["Test"] = "Test",
+            ["RunTest"] = "RunTest",
+            ["RunAll"] = "RunAll",
+            ["RunSuite"] = "RunSuite",
+            ["Clear"] = "Clear",
+            ["GetSuiteCount"] = "GetSuiteCount",
+            ["GetTestCount"] = "GetTestCount",
+            ["PrintSummary"] = "PrintSummary",
+            ["PrintDetailed"] = "PrintDetailed",
+            ["RunAllWithReport"] = "RunAllWithReport",
+            ["GetStatistics"] = "GetStatistics",
+        },
+        ["Mock"] = new(StringComparer.Ordinal)
+        {
+            ["CreateMock"] = "CreateMock",
+            ["CreateMockWithReturns"] = "CreateMockWithReturns",
+            ["CreateStub"] = "CreateStub",
+            ["CreateSpy"] = "CreateSpy",
+            ["VerifyCalled"] = "VerifyCalled",
+            ["VerifyNotCalled"] = "VerifyNotCalled",
+            ["VerifyCallCount"] = "VerifyCallCount",
+            ["VerifyCalledOnce"] = "VerifyCalledOnce",
+            ["VerifyLastCallArgs"] = "VerifyLastCallArgs",
+            ["StubReturns"] = "StubReturns",
+            ["GetCallSummary"] = "GetCallSummary",
+            ["PrintCalls"] = "PrintCalls",
+        },
+        ["TaskScheduler"] = new(StringComparer.Ordinal)
+        {
+            ["Default"] = "Default",
+        },
     };
 
     /// <summary>
     /// 判断名称是否是虚拟机支持的静态类名。
     /// </summary>
     public static bool IsStaticClass(string name) => Methods.ContainsKey(name);
+
+    /// <summary>
+    /// 「静态类方法作为值」的限定名前缀。
+    /// </summary>
+    /// <remarks>
+    /// 编译期把裸引用 <c>Task.Delay</c> 改写成 <c>CallNative 0, 前缀 + "Task.Delay"</c>，
+    /// 运行期据此产出 <c>VmStaticMethodValue</c>，而不是真的调用。
+    /// 用控制字符开头，确保不会和用户/标准库的函数名冲突。
+    /// </remarks>
+    public const string StaticMethodValuePrefix = "\u0001staticmethod:";
+
+    /// <summary>
+    /// 类名 → 以「属性」形式访问的成员（不带括号）。
+    /// </summary>
+    /// <remarks>
+    /// 这些成员在解释器里既可以写成 <c>Thread.CurrentThread</c> 也可以写成
+    /// <c>Thread.CurrentThread()</c>；虚拟机把裸形式当作 0 参数调用处理。
+    /// 其余裸成员名一律视作「取方法值」，赋给变量后再调用。
+    /// </remarks>
+    private static readonly Dictionary<string, HashSet<string>> PropertyLikeMembers = new(StringComparer.Ordinal)
+    {
+        ["Task"] = new(StringComparer.Ordinal) { "Factory" },
+        ["Thread"] = new(StringComparer.Ordinal) { "CurrentThread" },
+        ["TaskScheduler"] = new(StringComparer.Ordinal) { "Default" },
+    };
+
+    /// <summary>
+    /// 判断成员是否按「属性」读取（裸形式即取值，而不是取方法值）。
+    /// </summary>
+    public static bool IsPropertyLikeMember(string className, string member) =>
+        PropertyLikeMembers.TryGetValue(className, out var members) && members.Contains(member);
 
     /// <summary>
     /// 把源码里的 <c>类名.方法名</c> 解析成规范方法名与运行期限定名。

@@ -376,6 +376,22 @@ public partial class ThreadLangValue : LangValueType
     }
 
     /// <summary>
+    /// 线程 id（<c>thread.Id</c> 的底层映射；虚拟机走反射读字段，也因此需要真实属性）
+    /// </summary>
+    public int Id => _thread.ManagedThreadId;
+
+    public override string TypeToString() => "Thread";
+
+    /// <summary>
+    /// 线程的文本表示。
+    /// </summary>
+    /// <remarks>
+    /// 必须重写：基类 <see cref="LangValueType.ToString"/> 走 <see cref="GetValue"/>，
+    /// 而本类返回 <c>this</c>，不重写会无限递归（栈溢出）。
+    /// </remarks>
+    public override string ToString() => $"Thread(Id: {ManagedThreadId})";
+
+    /// <summary>
     /// 处理点操作，直接调用 Join 方法，避免反射调用
     /// 其他方法调用委托给基类，由基类处理扩展方法
     /// </summary>

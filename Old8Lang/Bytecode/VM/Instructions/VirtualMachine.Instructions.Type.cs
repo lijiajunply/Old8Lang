@@ -50,7 +50,7 @@ public partial class VirtualMachine
                 }
                 catch (Exception ex)
                 {
-                    throw new CastError(GetPosition(instruction), value?.GetType().Name ?? "null", targetTypeName,
+                    throw new CastError(GetPosition(instruction), DescribeValueType(value), targetTypeName,
                         ex.Message);
                 }
             }
@@ -107,7 +107,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    typeName = value.GetType().Name;
+                    typeName = DescribeValueType(value);
                 }
 
                 _stack.Push(typeName);

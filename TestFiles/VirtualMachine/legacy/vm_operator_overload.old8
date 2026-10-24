@@ -1,4 +1,4 @@
-// 虚拟机模式运算符重载测试 - 最简化版
+// 虚拟机模式运算符重载测试
 
 class Number {
     public value
@@ -34,10 +34,8 @@ class Number {
 }
 
 // 测试加法
-n1 <- Number()
-n1.value <- 10
-n2 <- Number()
-n2.value <- 20
+n1 <- Number(10)
+n2 <- Number(20)
 result <- n1 + n2
 PrintLine("10 + 20 = " + result.ToStr())  // 应输出 30
 
@@ -50,8 +48,7 @@ result3 <- n1 * 3
 PrintLine("10 * 3 = " + result3.ToStr())  // 应输出 30
 
 // 测试相等比较
-n3 <- Number()
-n3.value <- 10
+n3 <- Number(10)
 if n1 == n3 {
     PrintLine("相等测试通过")
 }

@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Visitor;
@@ -172,7 +173,56 @@ public partial class BytecodeVisitor
             // 索引/成员访问赋值: array[i] <- value 或 obj.field <- value
             var leftExpr = node.LeftExpression;
 
-            if (leftExpr is LangListItem listItem)
+            if (leftExpr is Operation { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket }
+                arrayDestruct)
+            {
+                // 数组解构赋值: [a, b] <- 序列
+                // RHS 只求值一次，存进临时槽后按位置取出元素逐个赋值。
+                var identifiersStr = arrayDestruct.Right?.ToString()
+                                     ?? throw new InvalidOperationError(node, "数组解构赋值需要有效的标识符列表");
+                var identStrs = identifiersStr.Split(',');
+
+                node.Value.Accept(this);
+
+                int tempLocalIndex = _compiler.AllocateLocal("<temp_array_destruct>");
+                Emit(OpCode.StoreLocal, tempLocalIndex);
+
+                for (int i = 0; i < identStrs.Length; i++)
+                {
+                    var identName = identStrs[i].Trim();
+                    if (identName == "null" || identName.Length == 0) continue;
+
+                    Emit(OpCode.LoadLocal, tempLocalIndex);
+                    Emit(OpCode.LoadConst, _compiler.AddConstant(i));
+                    Emit(OpCode.GetIndex);
+
+                    if (_compiler.IsLocalVariable(identName))
+                    {
+                        Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(identName));
+                    }
+                    else if (_compiler.IsCapturedVariable(identName))
+                    {
+                        Emit(OpCode.StoreGlobal, identName);
+                    }
+                    else if (_compiler.IsGlobalVariable(identName))
+                    {
+                        Emit(OpCode.StoreGlobal, identName);
+                    }
+                    else if (_compiler.IsInMainFunctionTopLevel())
+                    {
+                        _compiler.DeclareGlobalVariable(identName);
+                        Emit(OpCode.StoreGlobal, identName);
+                    }
+                    else
+                    {
+                        int newLocal = _compiler.DeclareLocalVariable(identName);
+                        Emit(OpCode.StoreLocal, newLocal);
+                    }
+                }
+
+                _compiler.FreeLocal(tempLocalIndex);
+            }
+            else if (leftExpr is LangListItem listItem)
             {
                 // 简单索引赋值: array[index] <- value
                 // SetIndex期望栈布局(从栈顶到栈底): value, index, collection

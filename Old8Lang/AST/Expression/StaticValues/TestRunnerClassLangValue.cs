@@ -425,7 +425,10 @@ public partial class TestRunnerClassLangValue : LangValueType
                 tupleList.Add(new TupleLangValue(key, value));
             }
 
-            return new DictionaryLangValue(tupleList);
+            // 与 ConvertTestResult 同理：构造后必须 Run 才会展开成可读的键值对
+            var statisticsDictionary = new DictionaryLangValue(tupleList);
+            statisticsDictionary.Run(new VariateManager());
+            return statisticsDictionary;
         }
         catch (Exception ex)
         {
@@ -436,7 +439,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// 将 TestResult 转换为 LangValueType
     /// </summary>
-    private static LangValueType ConvertTestResult(TestRunner.TestResult result)
+    internal static LangValueType ConvertTestResult(TestRunner.TestResult result)
     {
         var tupleList = new List<TupleLangValue>
         {
@@ -450,7 +453,12 @@ public partial class TestRunnerClassLangValue : LangValueType
             tupleList.Add(new(new StringLangValue("errorMessage"), new StringLangValue(result.ErrorMessage)));
         }
 
-        return new DictionaryLangValue(tupleList);
+        // DictionaryLangValue 的构造函数只保存 Tuples，未展开的 Value 是空的；
+        // 不调用 Run 的话，调用方（RunAll / RunTest 的返回值、ConvertToTestResults）
+        // 会读到空字典，表现为测试名全为空、全部判失败。
+        var dictionary = new DictionaryLangValue(tupleList);
+        dictionary.Run(new VariateManager());
+        return dictionary;
     }
 
     /// <summary>
@@ -494,6 +502,28 @@ public partial class TestRunnerClassLangValue : LangValueType
 
         return results;
     }
+
+    /// <summary>
+    /// 虚拟机可直接复用的方法（不需要回调虚拟机里的函数值）。
+    /// </summary>
+    /// <remarks>
+    /// <c>Describe</c> / <c>It</c> / <c>Test</c> / <c>RunTest</c> 需要执行 VM 的
+    /// <c>ClosureValue</c> / <c>FunctionMetadata</c>，由虚拟机自己实现；
+    /// 其余方法只做统计与输出，直接复用这里的实现。
+    /// </remarks>
+    internal static readonly Dictionary<string, Func<List<LangValueType>, SourcePosition, LangValueType>>
+        VmReusableMethods = new(StringComparer.Ordinal)
+        {
+            ["RunAll"] = RunAll,
+            ["RunSuite"] = RunSuite,
+            ["Clear"] = Clear,
+            ["GetSuiteCount"] = GetSuiteCount,
+            ["GetTestCount"] = GetTestCount,
+            ["PrintSummary"] = PrintSummary,
+            ["PrintDetailed"] = PrintDetailed,
+            ["RunAllWithReport"] = RunAllWithReport,
+            ["GetStatistics"] = GetStatistics,
+        };
 }
 
 /// <summary>

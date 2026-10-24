@@ -18,12 +18,38 @@ public partial class VirtualMachine
     /// <remarks>
     /// 原先这里用的是只认基本类型的转换，集合、类实例、函数值等会静默变成 <c>VoidLangValue</c>，
     /// 表现为 <c>async func f() -&gt; list { return await g() }</c> 报「期望 list，但得到 VoidLangValue」、
-    /// <c>yield {1, 2}</c> 之后迭代到空值。null 仍表示「没有值」。
+    /// <c>yield {1, 2}</c> 之后迭代到空值。
+    ///
+    /// 显式 <c>return null</c> / <c>yield null</c> 与「没有返回值」必须区分：
+    /// 无返回值的函数在 <c>CallFunction</c> 收尾时已经补了 <c>VoidLangValue</c>，
+    /// 所以这里拿到裸 <c>null</c> 只可能来自显式 null，应包成 <c>NullLangValue</c>
+    /// （解释器模式下 <c>Task(Completed: Null)</c> 就是这个口径）。
     /// </remarks>
     private LangValueType ConvertResultToLangValue(object? value)
     {
-        return value is null ? VoidLangValue.Instance : ToStaticClassArgument(value);
+        return ToStaticClassArgument(value);
     }
+
+    /// <summary>
+    /// 用语言口径描述一个运行期值的类型，用于报错信息。
+    /// </summary>
+    /// <remarks>
+    /// 直接拼 <c>value.GetType().Name</c> 会把 <c>List`1</c>、<c>Int32</c>、<c>Tuple`2</c>
+    /// 这类 .NET 类型名泄露给使用者；统一走 <see cref="Old8Lang.Runtime.VMReflectionHelper"/>，
+    /// 得到与 <c>TypeOf</c> / <c>TypeToString</c> 一致的语言类型名（<c>List</c> / <c>Int</c> / <c>Tuple</c>）。
+    /// </remarks>
+    private static string DescribeValueType(object? value) => value switch
+    {
+        // 静态类方法值（Task.Delay 这类裸引用）对外表现为函数
+        VmStaticMethodValue => "Function",
+        _ => Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(value)
+    };
+
+    /// <summary>
+    /// 用语言口径描述一个 CLR 类型（只有 <see cref="Type"/> 可用时的报错场景）。
+    /// </summary>
+    private static string DescribeTypeName(Type type) =>
+        Old8Lang.Runtime.VMReflectionHelper.DescribeTypeName(type);
 
     /// <summary>
     /// 把 <see cref="ConvertResultToLangValue"/> 包出来的值还原成虚拟机栈上的原生表示（逆操作）。
@@ -154,7 +180,7 @@ public partial class VirtualMachine
             List<object?> list => ConvertListToLangValueType(list),
             object[] array => ConvertArrayToLangValueType(array),
             Dictionary<object, object?> dict => ConvertDictToLangValueType(dict),
-            _ => throw new CastError(new SourcePosition(), value.GetType().Name, "LangValueType")
+            _ => throw new CastError(new SourcePosition(), DescribeValueType(value), "LangValueType")
         };
     }
 

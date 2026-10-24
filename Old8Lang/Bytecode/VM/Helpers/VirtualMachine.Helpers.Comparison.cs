@@ -91,7 +91,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da > db;
         if (a is int ia2 && b is double db2) return ia2 > db2;
         if (a is double da2 && b is int ib2) return da2 > ib2;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行大于比较");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行大于比较");
     }
 
 
@@ -127,7 +127,7 @@ public partial class VirtualMachine
         if (a is double da && b is double db) return da < db;
         if (a is int ia2 && b is double db2) return ia2 < db2;
         if (a is double da2 && b is int ib2) return da2 < ib2;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行小于比较");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行小于比较");
     }
 
 

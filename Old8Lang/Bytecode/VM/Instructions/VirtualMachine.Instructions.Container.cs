@@ -168,7 +168,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"无法获取类型 {collection?.GetType().Name} 的长度");
+                    throw new TypeError(GetPosition(instruction), $"无法获取类型 {DescribeValueType(collection)} 的长度");
                 }
 
                 _stack.Push(length);
@@ -274,7 +274,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行索引访问");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {DescribeValueType(collection)} 执行索引访问");
                 }
             }
                 break;
@@ -334,7 +334,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行索引赋值");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {DescribeValueType(collection)} 执行索引赋值");
                 }
             }
                 break;

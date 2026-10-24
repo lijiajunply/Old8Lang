@@ -283,7 +283,7 @@ public partial class VirtualMachine
                             }
                             else
                             {
-                                throw new AttributeError(GetPosition(instruction), fieldName, type.Name);
+                                throw new AttributeError(GetPosition(instruction), fieldName, DescribeValueType(obj));
                             }
                         }
                     }
@@ -305,7 +305,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new Exception($"类型 {type.Name} 没有字段或属性 {fieldName}");
+                            throw new AttributeError(GetPosition(instruction), fieldName, DescribeValueType(obj));
                         }
                     }
                 }
@@ -337,7 +337,7 @@ public partial class VirtualMachine
                             }
                             else
                             {
-                                throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
+                                throw new AttributeError(GetPosition(instruction), fieldName, DescribeValueType(obj));
                             }
                         }
                     }
@@ -405,7 +405,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new AttributeError(GetPosition(instruction), fieldName, objType.Name);
+                            throw new AttributeError(GetPosition(instruction), fieldName, DescribeValueType(obj));
                         }
                     }
                 }
@@ -442,7 +442,7 @@ public partial class VirtualMachine
 
                     if (baseType == null || baseType == typeof(object))
                     {
-                        throw new TypeError(GetPosition(instruction), $"类型 {objType.Name} 没有父类");
+                        throw new TypeError(GetPosition(instruction), $"类型 {DescribeValueType(thisInstance)} 没有父类");
                     }
 
                     // 先尝试获取属性
@@ -461,7 +461,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new AttributeError(GetPosition(instruction), fieldName, baseType.Name);
+                            throw new AttributeError(GetPosition(instruction), fieldName, DescribeTypeName(baseType));
                         }
                     }
                 }
@@ -497,7 +497,7 @@ public partial class VirtualMachine
 
                     if (baseType == null || baseType == typeof(object))
                     {
-                        throw new TypeError(GetPosition(instruction), $"类型 {objType.Name} 没有父类");
+                        throw new TypeError(GetPosition(instruction), $"类型 {DescribeValueType(thisInstance)} 没有父类");
                     }
 
                     // 先尝试设置属性
@@ -516,7 +516,7 @@ public partial class VirtualMachine
                         }
                         else
                         {
-                            throw new AttributeError(GetPosition(instruction), fieldName, baseType.Name);
+                            throw new AttributeError(GetPosition(instruction), fieldName, DescribeTypeName(baseType));
                         }
                     }
                 }

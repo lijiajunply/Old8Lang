@@ -88,11 +88,21 @@ public class VMDebugger
     /// <summary>
     /// 添加指令偏移断点
     /// </summary>
-    public Breakpoint AddBreakpoint(int instructionOffset)
+    public Breakpoint AddBreakpoint(int instructionOffset) => AddFunctionBreakpoint(null, instructionOffset);
+
+    /// <summary>
+    /// 添加指令偏移断点（限定函数名）。
+    /// </summary>
+    /// <remarks>
+    /// 指令下标在每个函数内都从 0 开始，只按 offset 建断点会在别的函数里误命中；
+    /// 指定 <paramref name="functionName"/> 后只在同名函数内命中。
+    /// </remarks>
+    public Breakpoint AddFunctionBreakpoint(string? functionName, int instructionOffset)
     {
         var breakpoint = new Breakpoint
         {
             Id = _nextBreakpointId++,
+            FunctionName = functionName,
             InstructionOffset = instructionOffset,
             Enabled = true
         };
@@ -170,13 +180,20 @@ public class VMDebugger
     /// <summary>
     /// 检查指定位置是否有断点
     /// </summary>
-    public bool HasBreakpoint(int instructionOffset)
+    public bool HasBreakpoint(int instructionOffset) => HasBreakpoint(null, instructionOffset);
+
+    /// <summary>
+    /// 检查指定函数、指定位置是否有断点
+    /// </summary>
+    public bool HasBreakpoint(string? functionName, int instructionOffset)
     {
         foreach (var breakpoint in _breakpoints.Values)
         {
-            if (breakpoint.Enabled && breakpoint.InstructionOffset == instructionOffset)
+            if (breakpoint.Enabled && breakpoint.InstructionOffset == instructionOffset &&
+                (breakpoint.FunctionName is null || breakpoint.FunctionName == functionName))
                 return true;
         }
+
         return false;
     }
 
@@ -270,19 +287,27 @@ public class VMDebugger
     /// 在执行指令前检查是否应该暂停
     /// </summary>
     /// <returns>是否应该暂停执行</returns>
-    public bool ShouldPauseBeforeInstruction(int instructionOffset)
+    public bool ShouldPauseBeforeInstruction(int instructionOffset) =>
+        ShouldPauseBeforeInstruction(null, instructionOffset);
+
+    /// <summary>
+    /// 在执行指令前检查是否应该暂停（限定函数名）
+    /// </summary>
+    /// <returns>是否应该暂停执行</returns>
+    public bool ShouldPauseBeforeInstruction(string? functionName, int instructionOffset)
     {
         if (!Enabled) return false;
 
         CurrentInstructionOffset = instructionOffset;
 
         // 检查断点
-        if (HasBreakpoint(instructionOffset))
+        if (HasBreakpoint(functionName, instructionOffset))
         {
             // 更新断点命中次数
             foreach (var breakpoint in _breakpoints.Values)
             {
-                if (breakpoint.Enabled && breakpoint.InstructionOffset == instructionOffset)
+                if (breakpoint.Enabled && breakpoint.InstructionOffset == instructionOffset &&
+                    (breakpoint.FunctionName is null || breakpoint.FunctionName == functionName))
                 {
                     breakpoint.HitCount++;
                     break;

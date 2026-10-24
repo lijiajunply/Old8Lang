@@ -346,27 +346,51 @@
 ## D. 2026-10-10 虚拟机缺口修复后遗留
 
 来源：`Reports/2026-10-10-23-40-虚拟机模式缺口修复测试.md`。以下均为本轮实测发现、
-但**与本轮 9 条缺口不同源**的问题，未顺手修改：
+但**与本轮 9 条缺口不同源**的问题，未顺手修改。
 
-- [ ] **VM 静态类还缺 TestRunner / Mock / TaskScheduler**。前两者的核心方法要在运行期执行传入的
-  函数值（`TestRunner.Describe`/`It`/`RunTest`、`Mock.Verify` 等），依赖解释器的
-  `FuncLangValue + VariateManager`；VM 的函数值是 `ClosureValue`/`FunctionMetadata`，
-  经 `ToStaticClassArgument` 只能包成 `NativeAnyLangValue`，无法调用。
-  要支持需要一套「VM 函数值 → 可调用委托」的桥接（可参考 IL 模式 2026-10-10 的函数值桥接）。
-  `TaskScheduler` 只暴露 `Default` 属性，而 VM 静态类通道只处理 `类名.方法(...)`，需要额外的属性通道。
-- [ ] **错误信息仍会泄露 .NET 类型名**：VM 属性访问失败走反射后抛
-  `AttributeError(..., type.Name)`（如 `List`1`、`Int32`），解释器的
-  `类型 'IntLangValue' 没有属性 'Count'` 同理。本轮只把 `Count` 与「方法未找到」两条路径
-  换成了语言口径（`VMReflectionHelper.DescribeValueType`），其余几十处未动。
-- [ ] **异步函数显式 `return null` 在 VM 里仍是 `VoidLangValue`**：`Task().ToString()` 在解释器是
-  `Task(Completed: Null)`，VM 是 `Task(Completed: )`。原生 `null` 与「没有值」在任务结果里同样不可区分，
-  与已修的「原生函数 void vs null」是同一类问题的剩余面。
-- [ ] **`Task.Delay` 的第二个参数（CancellationToken）在 VM 下仍报 `VM_UNSUPPORTED_ERROR`**，
-  因为 VM 无法构造 `CancellationToken` 值；`Thread.CurrentThread`、裸引用 `Task`、
-  `Task.Factory`（需要多级 `Task.Factory.StartNew` 的属性通道）同样未支持。
+> 2026-10-24 P2 已处理大部分条目，见 `Reports/2026-10-24-09-40-P2虚拟机模式残留修复测试.md`。
+
+- [x] **VM 静态类补齐 TestRunner / Mock / TaskScheduler**（2026-10-24 已修）：
+  `TestRunner.Describe` / `It` / `Test` / `RunTest` 由虚拟机自己执行传入的
+  `ClosureValue` / `FunctionMetadata`（其余统计类方法复用解释器实现）；
+  `Mock` 的 12 个静态方法复用解释器实现；`TaskScheduler.Default` 走新增的「属性式成员」通道。
+  顺带修好 `TestRunner` 返回值里字典未展开（`Value` 为空）导致测试名全空、全部判失败的既有缺陷。
+- [x] **错误信息仍会泄露 .NET 类型名**（2026-10-24 已修）：虚拟机内统一改用
+  `DescribeValueType` / `DescribeTypeName`，覆盖属性访问、方法未找到、算术/比较、索引/切片、
+  类型转换、`TypeOf` 等路径；`GetValueTypeName` 的兜底也不再返回 `IntLangValue` / `Tuple`2`。
+- [x] **异步函数显式 `return null` 在 VM 里仍是 `VoidLangValue`**（2026-10-24 已修）：
+  `ConvertResultToLangValue` 不再把裸 `null` 当成「没有值」；无返回值仍由 `CallFunction` 补
+  `VoidLangValue`，两者可区分，输出与解释器一致（`Task(Completed: Null)`）。
+- [x] **`Task.Delay` 的第二个参数（CancellationToken）**（2026-10-24 已修）：
+  移除虚拟机的显式拒绝，`cts.Token` 得到的 `CancellationTokenLangValue` 可直接传入；
+  `Thread.CurrentThread`（属性 / 无参调用）、`Task.Factory` 与 `Task.Factory.StartNew`、
+  裸引用具体方法（`f <- Task.Delay`）也已支持。仍不支持的是**裸引用静态类名**（`value <- Task`）
+  与静态类方法的命名参数。
+- [ ] **异步函数的装饰器仍不可用**：不是虚拟机独有——装饰器必须返回「异步函数值」，
+  而 `async (x) -> ...` 异步 Lambda 目前在解释器下也会抛
+  `NullReferenceException`（`Instance.Run`）。三种模式都还没有异步函数值表示，
+  需要先补「异步 Lambda / 异步函数值」这一层能力，再让 VM 的 `CallAsync` 支持装饰器绑定。
+- [x] **`VMProfiler` / `VMDebugger` / `Disassembler` 是死代码**（2026-10-24 已接入）：
+  `-vm` 新增 `--disasm`（执行前反汇编）、`--profile`（执行后打印函数/指令统计）、
+  `--debug-session` + `--break <行号>`（交互式断点/单步，支持 `p` 查看参数、`bt` 调用栈）。
+  调试器新增按函数限定的断点，避免不同函数的同名指令下标误命中。
 - [x] **IL 模式的负索引**（2026-10-24 已修）：新增 `IlIndexHelper`，IL 的列表 / 数组 / 字符串 /
   元组索引统一归一化负下标并抛语言层 `INDEX_ERROR`；解释器的元组索引同时补上负索引支持。
   原先断言"负索引应抛异常"的 3 个 IL 用例已改为断言取末尾元素。
+- [x] **VM 数组解构赋值 `[a, b] <- 序列`**（2026-10-24 已修）：字节码此前只处理元组模式
+  `(a, b) <- ...`，解释器只处理数组模式，两者不互通。现字节码补齐数组解构
+  （列表 / 数组右值、多余元素忽略、局部/全局变量均可）。
+- [ ] **元组模式解构 `(a, b) <- ...` 在解释器下无效**：语法能解析，但 `SetStatement.Run`
+  没有对应分支，变量不会被赋值（`-f` 报 `NAME_ERROR`）；IL 生成也不正确。虚拟机的字节码路径
+  反而支持。属于跨模式语义分歧，需统一（建议以数组解构为准，或两者都支持）。
+- [ ] **`Thread.CurrentThread` 的裸属性写法只在虚拟机可用**：解释器下
+  `Thread.CurrentThread`（不带括号）报 `类型 'Thread' 没有属性 'CurrentThread'`，
+  `Thread.CurrentThread()` 正常；属于解释器的静态类属性通道缺失，非本轮范围。
+- [ ] **`StringLangValue` 之外的 `ThreadLangValue` 类型名**：`ThreadLangValue.GetValue()`
+  返回 `this`，而基类 `ToString()` 走 `GetValue()?.ToString()`，原先任何
+  `ThreadLangValue.ToString()` 都会无限递归（栈溢出）。2026-10-24 已补
+  `ToString` / `TypeToString` / `Id`；其它 `GetValue()` 返回 `this` 的 `LangValueType`
+  值得同类排查。
 
 ## E. 2026-10-22 移除图像标准库时发现
 

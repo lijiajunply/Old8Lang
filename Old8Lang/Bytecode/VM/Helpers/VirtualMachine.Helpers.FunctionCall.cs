@@ -15,6 +15,12 @@ public partial class VirtualMachine
 {
     private object? CallNativeFunction(string funcName, object?[] args)
     {
+        // 静态类方法「取值为函数」：编译期用前缀改写，这里只产出可调用值，不执行方法。
+        if (funcName.StartsWith(VmStaticClassRegistry.StaticMethodValuePrefix, StringComparison.Ordinal))
+        {
+            return new VmStaticMethodValue(funcName[VmStaticClassRegistry.StaticMethodValuePrefix.Length..]);
+        }
+
         // 静态类 API（Task.Delay / Thread.Sleep / Assert.Equal ...）用的是带限定名的原生调用，
         // 编译期由 BytecodeVisitor 的静态类分支改写而来。
         // 分发放在全局函数注册表之前：注册表分支会把非 Old8Exception 的异常包成 InvalidOperationError，
@@ -39,7 +45,7 @@ public partial class VirtualMachine
 
                 // 如果没有找到匹配的重载，抛出错误
                 throw new InvalidOperationError(new SourcePosition(),
-                    $"找不到与参数类型匹配的 {funcName} 函数重载。参数类型: {string.Join(", ", args.Select(a => a?.GetType().Name ?? "null"))}");
+                    $"找不到与参数类型匹配的 {funcName} 函数重载。参数类型: {string.Join(", ", args.Select(a => DescribeValueType(a)))}");
             }
             catch (Old8Exception)
             {
@@ -193,7 +199,7 @@ public partial class VirtualMachine
                 }
 
                 throw new TypeError(new SourcePosition(),
-                    $"无法将 {item?.GetType().Name ?? "null"} 解构为 {arity} 个变量，" +
+                    $"无法将 {DescribeValueType(item)} 解构为 {arity} 个变量，" +
                     "请确认迭代的是键值对集合（字典或由元组组成的列表）");
             }
 

@@ -1,4 +1,5 @@
 using System.Collections;
+using Old8Lang.AST.Expression;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Metadata;
@@ -615,7 +616,10 @@ public partial class VirtualMachine
             FunctionMetadata func => GetFunctionTypeString(func),
             ClosureValue closure => GetFunctionTypeString(closure.Function),
             BytecodeObjectInstance instance => instance.ClassName,
-            _ => value.GetType().Name
+            // 包成 LangValueType 的值（异步结果、生成器 yield 等）用语言类型名，
+            // 免得报错里出现 IntLangValue / ListLangValue 这类实现名。
+            LangValueType langValue => langValue.TypeToString(),
+            _ => DescribeValueType(value)
         };
     }
 

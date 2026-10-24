@@ -33,6 +33,9 @@ old8lang run <file.old8>    # 单文件，模式由 old8lang.runtime 决定
 覆盖解构赋值、异常过滤、泛型集合、闭包、切片、联合类型，以及 `vm_*` 语言特性与字节码泛型用例。
 `run_vm_tests.sh` 会递归扫描本目录（含 `legacy/`、`bytecode/`）并以 `-vm` 模式运行。
 
-⚠️ 当前全量运行有 5 个已知失败用例（均与目录合并无关，详见 `Todo.md` §G）：
-`DestructuringAssignmentTest.old8`、`vm_gap_6_error_position.old8`、
-`legacy/control_flow.old8`、`legacy/vm_operator_overload.old8`、`legacy/vm_decorator.old8`。
+全量运行应为 **78/78 通过**（2026-10-24 P2 修复后）。
+期望失败的用例在文件最后一行写 `error`（`run_vm_tests.sh` 只看最后一行是否含 `error`）；
+运行期才失败的用例用注释形式 `// error`，避免标记本身被当成语句而产生语法错误。
+
+解构赋值用例只覆盖语言当前支持的 `[a, b] <- 序列` 形式；
+元组模式 `(a, b) <- ...` 尚未实现（三种模式一致）。

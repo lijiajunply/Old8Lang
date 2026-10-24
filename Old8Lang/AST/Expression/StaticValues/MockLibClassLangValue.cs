@@ -485,6 +485,27 @@ public partial class MockLibClassLangValue : LangValueType
             _ => value.ToDisplayString()
         };
     }
+
+    /// <summary>
+    /// 虚拟机可直接复用的方法（Mock 的全部静态方法都只操作 <see cref="MockObjectLangValue"/>，
+    /// 不需要回调解释器里的函数值）。
+    /// </summary>
+    internal static readonly Dictionary<string, Func<List<LangValueType>, SourcePosition, LangValueType>>
+        VmReusableMethods = new(StringComparer.Ordinal)
+        {
+            ["CreateMock"] = CreateMock,
+            ["CreateMockWithReturns"] = CreateMockWithReturns,
+            ["CreateStub"] = CreateStub,
+            ["CreateSpy"] = CreateSpy,
+            ["VerifyCalled"] = VerifyCalled,
+            ["VerifyNotCalled"] = VerifyNotCalled,
+            ["VerifyCallCount"] = VerifyCallCount,
+            ["VerifyCalledOnce"] = VerifyCalledOnce,
+            ["VerifyLastCallArgs"] = VerifyLastCallArgs,
+            ["StubReturns"] = StubReturns,
+            ["GetCallSummary"] = GetCallSummary,
+            ["PrintCalls"] = PrintCalls,
+        };
 }
 
 /// <summary>

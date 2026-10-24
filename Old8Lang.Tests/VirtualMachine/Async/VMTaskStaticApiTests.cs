@@ -215,13 +215,17 @@ public class VMTaskStaticApiTests
     }
 
     [Fact]
-    public void TaskDelay_WithSecondArgument_ReportsUnsupported()
+    public void TaskDelay_WithCancellationToken_IsSupported()
     {
-        // 虚拟机下无法构造 CancellationToken，第二个参数只能明确拒绝
-        var bytecodeFile = Compile("await Task.Delay(1, 2)");
+        // 第二个参数可以是 cts.Token 得到的 CancellationToken
+        var bytecodeFile = Compile("""
+            cts <- CancellationTokenSource()
+            token <- cts.Token
+            await Task.Delay(1, token)
+            """);
         var vm = new VM(bytecodeFile);
 
-        Assert.Throws<Old8Lang.Error.VmUnsupportedError>(() => vm.Execute());
+        vm.Execute();
     }
 
     [Fact]

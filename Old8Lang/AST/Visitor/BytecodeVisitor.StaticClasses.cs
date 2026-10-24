@@ -27,6 +27,15 @@ public partial class BytecodeVisitor
     /// <returns>该节点已被处理时返回 true；返回 false 时调用方按普通成员访问继续处理</returns>
     private bool TryCompileStaticClassAccess(Operation node)
     {
+        // Task.Factory.StartNew(...)：左操作数本身是「静态属性」链，先于下面的单层判断处理。
+        if (node.Left is Operation { Left: LangId { IdName: var owner }, Right: LangId { IdName: "Factory" } }
+            && VmStaticClassRegistry.IsStaticClass(owner)
+            && !IsShadowedName(owner)
+            && node.Right is Instance factoryCall)
+        {
+            return CompileTaskFactoryCall(node, owner, factoryCall);
+        }
+
         if (node.Left is not LangId { IdName: var className } || !VmStaticClassRegistry.IsStaticClass(className))
         {
             return false;
@@ -66,11 +75,59 @@ public partial class BytecodeVisitor
             return true;
         }
 
-        // 裸引用：Task、Task.Delay、Task.Factory、Thread.CurrentThread ...
-        // 这些形式需要在栈上放一个函数值或静态类对象，虚拟机没有对应的值表示。
+        // 裸引用（不带括号）
+        if (node.Right is LangId { IdName: var memberName })
+        {
+            if (!VmStaticClassRegistry.TryCanonicalize(className, memberName, out _, out var qualifiedName))
+            {
+                throw new VmUnsupportedError(node,
+                    $"{className}.{memberName}（{className} 在虚拟机模式下支持：" +
+                    $"{VmStaticClassRegistry.DescribeSupportedMethods(className)}）");
+            }
+
+            // 属性式成员（Task.Factory、Thread.CurrentThread）：裸形式就是取值
+            if (VmStaticClassRegistry.IsPropertyLikeMember(className, memberName))
+            {
+                Emit(OpCode.CallNative, new object[] { 0, qualifiedName });
+                return true;
+            }
+
+            // 其余方法名：把方法物化成可调用值（f <- Task.Delay; await f(10)）
+            Emit(OpCode.CallNative,
+                new object[] { 0, VmStaticClassRegistry.StaticMethodValuePrefix + qualifiedName });
+            return true;
+        }
+
         throw new VmUnsupportedError(node,
-            $"把静态类 {className} 或其方法当作值使用（{className} 在虚拟机模式下只能写成 " +
+            $"把静态类 {className} 当作值使用（{className} 在虚拟机模式下只能写成 " +
             $"{className}.方法(...)，支持：{VmStaticClassRegistry.DescribeSupportedMethods(className)}）");
+    }
+
+    /// <summary>
+    /// 编译 <c>Task.Factory.StartNew(...)</c>：只有 <c>StartNew</c> 在解释器的
+    /// <c>TaskFactoryClassLangValue</c> 里可用，其余方法名直接给出可读的报错。
+    /// </summary>
+    private bool CompileTaskFactoryCall(Operation node, string owner, Instance factoryCall)
+    {
+        string methodName = factoryCall.Id.IdName;
+        if (methodName != "StartNew")
+        {
+            throw new VmUnsupportedError(node,
+                $"{owner}.Factory.{methodName}（TaskFactory 在虚拟机模式下只支持 StartNew）");
+        }
+
+        if (factoryCall.NamedArgs is { Count: > 0 })
+        {
+            throw new VmUnsupportedError(node, $"静态类方法 {owner}.Factory.StartNew 的命名参数");
+        }
+
+        foreach (var argument in factoryCall.Ids)
+        {
+            argument.Accept(this);
+        }
+
+        Emit(OpCode.CallNative, new object[] { factoryCall.Ids.Count, $"{owner}.Factory.StartNew" });
+        return true;
     }
 
     /// <summary>

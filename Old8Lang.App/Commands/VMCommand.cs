@@ -14,7 +14,7 @@ public class VMCommand : ICommand
 {
     public string Name => "-vm";
     public string Description => "使用虚拟机模式编译并执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug] [--no-type-check] [--no-type-inference] [--type-inference-debug]";
+    public string Help => "使用: Old8Lang.App -vm <文件名> [-D SYMBOL1] [-D SYMBOL2] ... [--debug] [--disasm] [--profile] [--debug-session] [--break 行号] [--no-type-check] [--no-type-inference] [--type-inference-debug]";
 
     public int Execute(string[] args)
     {
@@ -32,6 +32,10 @@ public class VMCommand : ICommand
         var enableTypeChecking = true; // 默认启用类型检查
         var enableTypeInference = true; // 默认启用类型推断
         var typeInferenceDebug = false; // 默认关闭类型推断调试输出
+        var disassemble = false;       // --disasm：执行前打印字节码反汇编
+        var profile = false;           // --profile：执行后打印性能报告
+        var debugSession = false;      // --debug-session：交互式断点/单步
+        var breakLines = new List<int>(); // --break <行号>（可重复）
 
         // 解析参数
         for (int i = 1; i < args.Length; i++)
@@ -44,6 +48,23 @@ public class VMCommand : ICommand
             else if (args[i] == "--debug")
             {
                 debugMode = true;
+            }
+            else if (args[i] == "--disasm" || args[i] == "--dump-bytecode")
+            {
+                disassemble = true;
+            }
+            else if (args[i] == "--profile")
+            {
+                profile = true;
+            }
+            else if (args[i] == "--debug-session" || args[i] == "--debugger")
+            {
+                debugSession = true;
+            }
+            else if (args[i] == "--break" && i + 1 < args.Length && int.TryParse(args[i + 1], out var breakLine))
+            {
+                breakLines.Add(breakLine);
+                i++;
             }
             else if (args[i] == "--no-type-check")
             {
@@ -115,9 +136,60 @@ public class VMCommand : ICommand
             // 执行字节码
             stopwatch.Restart();
             var vm = new VirtualMachine(bytecodeFile);
-            vm.Execute();
+
+            if (disassemble)
+            {
+                Console.WriteLine("\n=== 字节码反汇编 ===");
+                var disassembler = new Old8Lang.Bytecode.Debugger.Disassembler(
+                    bytecodeFile.ConstantPool, bytecodeFile.DebugInfo, showOffsets: true, showDebugInfo: true);
+                Console.Write(disassembler.DisassembleProgram(bytecodeFile.Functions));
+                Console.WriteLine("====================\n");
+            }
+
+            if (profile)
+            {
+                vm.Profiler = new Old8Lang.Bytecode.Profiler.VMProfiler();
+            }
+
+            if (debugSession)
+            {
+                var debugger = new Old8Lang.Bytecode.Debugger.VMDebugger(bytecodeFile.DebugInfo);
+                debugger.Start();
+                vm.Debugger = debugger;
+                vm.DebugPaused = VmDebugSession.CreateHandler(debugger);
+
+                foreach (var breakLine in breakLines)
+                {
+                    if (vm.AddBreakpointsAtLine(breakLine).Count == 0)
+                    {
+                        Console.WriteLine($"[调试] 行 {breakLine} 没有对应的指令，断点未生效");
+                    }
+                }
+            }
+            else if (breakLines.Count > 0)
+            {
+                Console.WriteLine("提示: --break 需要同时传入 --debug-session 才会生效");
+            }
+
+            try
+            {
+                vm.Execute();
+            }
+            catch (VmDebugSession.AbortException)
+            {
+                Console.WriteLine("[调试] 已退出调试会话");
+                return 0;
+            }
+
             stopwatch.Stop();
             var executionTime = stopwatch.Elapsed.TotalMilliseconds;
+
+            if (vm.Profiler is not null)
+            {
+                Console.WriteLine("\n=== 性能分析报告 ===");
+                Console.WriteLine(vm.Profiler.GenerateReport());
+                Console.WriteLine("====================");
+            }
 
             // 输出时间统计
             Console.WriteLine("------------------");

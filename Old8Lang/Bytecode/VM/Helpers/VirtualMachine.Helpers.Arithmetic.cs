@@ -62,7 +62,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行加法: {ex.Message}");
             }
         }
 
@@ -76,7 +76,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行加法: {ex.Message}");
             }
         }
 
@@ -100,7 +100,7 @@ public partial class VirtualMachine
             return result;
         }
 
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行加法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行加法");
     }
 
 
@@ -142,7 +142,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行减法: {ex.Message}");
             }
         }
 
@@ -155,7 +155,7 @@ public partial class VirtualMachine
         if (a is double da2 && b is int ib2) return da2 - ib2;
         if (a is long la3 && b is double db3) return la3 - db3;
         if (a is double da3 && b is long lb3) return da3 - lb3;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行减法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行减法");
     }
 
 
@@ -206,7 +206,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行乘法: {ex.Message}");
             }
         }
 
@@ -226,7 +226,7 @@ public partial class VirtualMachine
         if (a is double da2 && b is int ib2) return da2 * ib2;
         if (a is long la3 && b is double db3) return la3 * db3;
         if (a is double da3 && b is long lb3) return da3 * lb3;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行乘法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行乘法");
     }
 
 
@@ -265,7 +265,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行除法: {ex.Message}");
             }
         }
 
@@ -278,7 +278,7 @@ public partial class VirtualMachine
         if (a is double da2 && b is int ib2) return da2 / ib2;
         if (a is long la3 && b is double db3) return la3 / db3;
         if (a is double da3 && b is long lb3) return da3 / lb3;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行除法");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行除法");
     }
 
 
@@ -317,13 +317,13 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行取模: {ex.Message}");
             }
         }
 
         if (a is int ia && b is int ib) return ia % ib;
         if (a is double da && b is double db) return da % db;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行取模");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行取模");
     }
 
 
@@ -362,7 +362,7 @@ public partial class VirtualMachine
             }
             catch (InvalidOperationError ex)
             {
-                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 和 {b?.GetType().Name} 执行幂运算: {ex.Message}");
+                throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行幂运算: {ex.Message}");
             }
         }
 
@@ -376,7 +376,7 @@ public partial class VirtualMachine
     {
         if (a is int ia) return -ia;
         if (a is double da) return -da;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {a?.GetType().Name} 执行取反");
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 执行取反");
     }
 
 

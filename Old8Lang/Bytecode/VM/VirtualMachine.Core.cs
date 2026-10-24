@@ -310,6 +310,11 @@ public partial class VirtualMachine
             var instruction = instructions[instructionIndex];
             frame.IP++;
 
+            if (_toolingEnabled)
+            {
+                ProbeInstruction(instruction, frame);
+            }
+
             try
             {
                 // 极热指令内联分发：省掉 ExecuteInstruction 的一层 switch 与一次方法调用。
@@ -581,6 +586,7 @@ public partial class VirtualMachine
     private void ExecuteFrame(CallFrame frame)
     {
         _callStack.Push(frame);
+        OnFrameEnter(frame);
         try
         {
             ExecuteFrameLoop(frame);
@@ -598,13 +604,22 @@ public partial class VirtualMachine
         }
         finally
         {
-            if (frame.HasDeferredInstructions)
+            // defer 块本身可能再次抛异常；用嵌套 try/finally 保证调试器调用栈与
+            // 性能分析计时一定被回收，否则下一次复用帧时会串数据。
+            try
             {
-                ExecuteDefers(frame);
+                if (frame.HasDeferredInstructions)
+                {
+                    ExecuteDefers(frame);
+                }
             }
-            _callStack.Pop();
-            ReturnLocalsBuffer(frame);
-            ReturnCallFrame(frame);
+            finally
+            {
+                OnFrameExit(frame);
+                _callStack.Pop();
+                ReturnLocalsBuffer(frame);
+                ReturnCallFrame(frame);
+            }
         }
     }
 
@@ -802,7 +817,7 @@ public partial class VirtualMachine
             }
             else
             {
-                throw new Exception($"无效的函数对象类型: {funcObj?.GetType().Name ?? "null"}");
+                throw new Exception($"无效的函数对象类型: {DescribeValueType(funcObj)}");
             }
 
             // 返回栈顶的值（如果有）

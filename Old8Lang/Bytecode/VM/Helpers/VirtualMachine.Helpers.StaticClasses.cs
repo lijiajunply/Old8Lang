@@ -44,21 +44,33 @@ public partial class VirtualMachine
         string canonicalMethod = qualifiedName[(separator + 1)..];
         var position = new SourcePosition();
 
-        // 虚拟机下无法构造 CancellationToken（编译期遇到 CancellationToken 就会报 VmUnsupportedError），
-        // 所以 Task.Delay 只可能有一个参数。这里给出比“参数类型不匹配”更贴近原因的说明。
-        // 少于 1 个参数不在这里管：交给复用的实现报它自己的参数个数错误。
-        if (qualifiedName == "Task.Delay" && args.Length > 1)
-        {
-            throw new VmUnsupportedError(position,
-                $"Task.Delay 的第 2 个参数（CancellationToken）：本方法在虚拟机模式下只接受 1 个参数（毫秒），" +
-                $"但提供了 {args.Length} 个");
-        }
-
         switch (qualifiedName)
         {
             case "Task.Run":
             case "Task.StartNew":
                 result = InvokeTaskRun(args, position, qualifiedName);
+                return true;
+
+            case "Task.Factory":
+                // 属性访问：Task.Factory（返回 TaskFactory 对象，可用于 .StartNew）
+                result = new TaskFactoryClassLangValue();
+                return true;
+
+            case "Task.Factory.StartNew":
+                result = InvokeTaskFactoryStartNew(args, position);
+                return true;
+
+            case "TaskScheduler.Default":
+                // 属性访问：TaskScheduler.Default
+                result = new TaskSchedulerLangValue(TaskScheduler.Default);
+                return true;
+
+            case "TestRunner.Describe":
+            case "TestRunner.It":
+            case "TestRunner.Test":
+            case "TestRunner.RunTest":
+                // 这几个方法要执行 VM 的函数值，不能复用解释器实现
+                result = InvokeTestRunnerCallback(qualifiedName, args, position);
                 return true;
 
             case "Assert.AssertThrows":
@@ -163,6 +175,8 @@ public partial class VirtualMachine
         "Task" => TaskClassLangValue.VmReusableMethods.GetValueOrDefault(canonicalMethod),
         "Thread" => ThreadClassLangValue.VmReusableMethods.GetValueOrDefault(canonicalMethod),
         "Assert" => AssertClassLangValue.VmReusableMethods.GetValueOrDefault(canonicalMethod),
+        "TestRunner" => TestRunnerClassLangValue.VmReusableMethods.GetValueOrDefault(canonicalMethod),
+        "Mock" => MockLibClassLangValue.VmReusableMethods.GetValueOrDefault(canonicalMethod),
         _ => null,
     };
 
@@ -259,6 +273,78 @@ public partial class VirtualMachine
         });
 
         return new TaskLangValue(task, CancellationToken.None, position);
+    }
+
+    /// <summary>
+    /// <c>Task.Factory.StartNew</c>：与 <c>Task.Run</c> 相同，额外接受一个可选的
+    /// <see cref="TaskSchedulerLangValue"/>。（当前实现忽略调度器，语义与解释器一致。）
+    /// </summary>
+    private object? InvokeTaskFactoryStartNew(object?[] args, SourcePosition position)
+    {
+        if (args.Length is < 1 or > 2)
+        {
+            throw new ArgumentError(position,
+                $"Task.Factory.StartNew 期望 1-2 个参数(func, scheduler)，但提供了 {args.Length} 个");
+        }
+
+        if (args.Length == 2 && args[1] is not TaskSchedulerLangValue)
+        {
+            throw new TypeError(position, "TaskScheduler", GetValueTypeName(args[1]));
+        }
+
+        return InvokeTaskRun([args[0]], position, "Task.Factory.StartNew");
+    }
+
+    #endregion
+
+    #region TestRunner
+
+    /// <summary>
+    /// <c>TestRunner.Describe</c> / <c>It</c> / <c>Test</c> / <c>RunTest</c>：
+    /// 执行虚拟机里的函数值（解释器版本要求 <c>FuncLangValue</c> + <c>VariateManager</c>）。
+    /// </summary>
+    private object? InvokeTestRunnerCallback(string qualifiedName, object?[] args, SourcePosition position)
+    {
+        if (args.Length != 2)
+        {
+            throw new ArgumentError(position,
+                $"{qualifiedName[(qualifiedName.IndexOf('.') + 1)..]} 期望 2 个参数(name, action)，但提供了 {args.Length} 个");
+        }
+
+        if (args[0] is not string testName)
+        {
+            throw new TypeError(position, "string", GetValueTypeName(args[0]));
+        }
+
+        var callable = args[1];
+        if (callable is not (ClosureValue or FunctionMetadata))
+        {
+            throw new TypeError(position, "function", GetValueTypeName(callable));
+        }
+
+        // 回调在 TestRunner 自己的 try/catch 里执行（失败会记成测试失败而不是中断整个运行）
+        void RunTestAction() => CallCallableSafely(callable, [], position);
+
+        switch (qualifiedName)
+        {
+            case "TestRunner.Describe":
+                TestRunner.Describe(testName, RunTestAction);
+                return new VoidLangValue();
+
+            case "TestRunner.It":
+                TestRunner.It(testName, RunTestAction);
+                return new VoidLangValue();
+
+            case "TestRunner.Test":
+                TestRunner.Test(testName, RunTestAction);
+                return new VoidLangValue();
+
+            case "TestRunner.RunTest":
+                return TestRunnerClassLangValue.ConvertTestResult(TestRunner.RunTest(testName, RunTestAction));
+
+            default:
+                throw new InvalidOperationError(position, $"未处理的 TestRunner 方法：{qualifiedName}");
+        }
     }
 
     #endregion
@@ -496,7 +582,8 @@ public partial class VirtualMachine
             ILangList langList => langList.GetItems().Cast<object?>(),
             IList list => list.Cast<object?>(),
             _ => throw new TypeError(position, "collection",
-                collection?.GetType().Name ?? "null"),
+                "collection",
+                DescribeValueType(collection)),
         };
 
     #endregion
@@ -545,6 +632,10 @@ public partial class VirtualMachine
     {
         switch (callable)
         {
+            case VmStaticMethodValue staticMethod:
+                // 静态类方法值：复用同一套限定名分发，结果压回求值栈供调用方读取
+                _stack.Push(CallNativeFunction(staticMethod.QualifiedName, args));
+                break;
             case ClosureValue closure:
                 // 带上 ConstantPool：与 ExecuteCallDynamicInstruction 的动态调用路径一致
                 // （CallFunctionObject 会丢掉它）。

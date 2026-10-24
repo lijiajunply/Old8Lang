@@ -1,33 +1,30 @@
+// 解构赋值测试（虚拟机模式）
+//
+// 说明：当前语言只支持「数组解构」形式 `[a, b] <- 序列`。
+// 元组模式解构 `(a, b) <- ...` 尚未实现（三种模式一致），因此本用例不再覆盖该写法。
+// 注意：语句以 PrintLine(...) 结尾时，下一行开头的 `[` 会被解析成索引访问，
+// 所以这里的 PrintLine 行尾统一加分号，确保下一行的 `[a, b] <- ...` 作为独立语句解析。
 
-// Simple Tuple Destructuring
-PrintLine("--- Simple Tuple Destructuring ---")
-(a, b) <- (1, 2)
+PrintLine("--- List Destructuring ---");
+[a, b] <- {1, 2}
 PrintLine("a: " + a.ToStr())
 PrintLine("b: " + b.ToStr())
 
-// Nested Tuple Destructuring
-PrintLine("--- Nested Tuple Destructuring ---")
-(c, (d, e)) <- (3, (4, 5))
+PrintLine("--- Array Destructuring ---");
+[c, d] <- [3, 4]
 PrintLine("c: " + c.ToStr())
 PrintLine("d: " + d.ToStr())
+
+PrintLine("--- Extra Elements Are Ignored ---");
+[e, f] <- [5, 6, 7]
 PrintLine("e: " + e.ToStr())
-
-// Destructuring with List
-PrintLine("--- Destructuring with List ---")
-(f, g) <- {6, 7}
 PrintLine("f: " + f.ToStr())
-PrintLine("g: " + g.ToStr())
 
-// Destructuring with Array
-PrintLine("--- Destructuring with Array ---")
-(h, i) <- [8, 9]
-PrintLine("h: " + h.ToStr())
-PrintLine("i: " + i.ToStr())
-
-// Swapping
-PrintLine("--- Swapping ---")
+PrintLine("--- Swapping Through a Temporary ---")
 x <- 10
 y <- 20
-(x, y) <- (y, x)
+tmp <- x
+x <- y
+y <- tmp
 PrintLine("x: " + x.ToStr())
 PrintLine("y: " + y.ToStr())

@@ -158,9 +158,21 @@ dotnet run --project Old8Lang.App -- -compile scripts/app.old8 app.o8c
 
 # 执行字节码
 dotnet run --project Old8Lang.App -- -execute app.o8c
+
+# 执行前打印字节码反汇编
+dotnet run --project Old8Lang.App -- -vm scripts/app.old8 --disasm
+
+# 执行后打印函数 / 指令性能统计
+dotnet run --project Old8Lang.App -- -vm scripts/app.old8 --profile
+
+# 交互式调试：在源码第 12 行下断点
+dotnet run --project Old8Lang.App -- -vm scripts/app.old8 --debug-session --break 12
 ```
 
-**⚠️ 注意**: VM 模式仍有限制（异步生成器、`async for-in` 等不可用），详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md#虚拟机模式)。
+调试会话命令：`c` 继续、`s` 单步进入、`n` 单步跳过、`o` 跳出、`bt` 调用栈、
+`p <name>` 查看参数、`h` 帮助、`q` 退出。
+
+**⚠️ 注意**: VM 模式仍有限制（异步函数装饰器等），详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md#虚拟机模式)。
 
 ### 性能对比示例
 
@@ -480,7 +492,9 @@ old8lang cert export -c my-cert.pfx -p mypassword -o public-cert.cer
 > **先读这一段**（2026-10-09 逐条实测）：本节命令的名称与参数以下文为准。
 > 早期文档里出现过的 `debug-breakpoint`、`debug-control`、`(old8lang-debugger)` 提示符、
 > `profile <文件> -o report.json -f html` 等写法**都不存在**。
-> 另外，**可用的调试与性能测量能力在解释器侧**，虚拟机模式没有可用的调试器与性能分析器
+> 另外，**解释器侧与虚拟机侧各有一套调试 / 性能工具**：本节命令面向解释器；
+> 虚拟机侧的入口是 `-vm <文件> --debug-session --break <行号>`（调试）、
+> `--profile`（性能统计）与 `--disasm`（反汇编），见 §4 虚拟机模式。
 > （详见 [MODE_SUPPORT.md](./MODE_SUPPORT.md#虚拟机模式)）。
 
 ### 1. `debug-start` - 启动调试会话

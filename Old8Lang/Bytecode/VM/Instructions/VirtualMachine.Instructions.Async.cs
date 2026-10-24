@@ -47,7 +47,7 @@ public partial class VirtualMachine
                 else
                 {
                     throw new TypeError(GetPosition(instruction),
-                        $"Invalid function for NewTask: {funcObj?.GetType().Name}");
+                        $"Invalid function for NewTask: {DescribeValueType(funcObj)}");
                 }
 
                 // 创建并启动任务
@@ -188,7 +188,7 @@ public partial class VirtualMachine
                 else
                 {
                     throw new TypeError(GetPosition(instruction),
-                        $"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {value?.GetType().Name ?? "null"}");
+                        $"await 只能用于 Task 或 VMThreadLangValue 类型，实际类型为 {DescribeValueType(value)}");
                 }
             }
                 break;

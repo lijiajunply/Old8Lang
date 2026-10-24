@@ -17,6 +17,9 @@ public class Breakpoint
     /// <summary>指令偏移</summary>
     public int InstructionOffset { get; set; }
 
+    /// <summary>限定函数名（null 表示任意函数，按指令偏移命中）</summary>
+    public string? FunctionName { get; set; }
+
     /// <summary>是否启用</summary>
     public bool Enabled { get; set; } = true;
 

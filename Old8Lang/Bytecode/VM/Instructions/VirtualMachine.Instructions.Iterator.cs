@@ -46,7 +46,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"对象类型 {collection?.GetType().Name} 不可迭代");
+                    throw new TypeError(GetPosition(instruction), $"对象类型 {DescribeValueType(collection)} 不可迭代");
                 }
             }
                 break;
@@ -85,7 +85,7 @@ public partial class VirtualMachine
                 else
                 {
                     // 调试：输出栈的详细信息
-                    var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                    var stackContents = string.Join(", ", _stack.Select(x => x is null ? "null" : DescribeValueType(x)));
                     var topType = top?.GetType().FullName ?? "null";
                     throw new StateError(GetPosition(instruction),
                         $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
@@ -191,7 +191,7 @@ public partial class VirtualMachine
                 }
                 else
                 {
-                    throw new TypeError(GetPosition(instruction), $"无法对类型 {collection?.GetType().Name} 执行切片操作");
+                    throw new TypeError(GetPosition(instruction), $"无法对类型 {DescribeValueType(collection)} 执行切片操作");
                 }
             }
                 break;

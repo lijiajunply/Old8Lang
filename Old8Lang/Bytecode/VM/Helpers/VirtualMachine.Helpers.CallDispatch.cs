@@ -229,6 +229,13 @@ public partial class VirtualMachine
         var args = PopArguments(argCount);
         var funcObj = _stack.Pop();
 
+        // 静态类方法被当作函数值保存后调用（f <- Task.Delay; await f(10)）
+        if (funcObj is VmStaticMethodValue staticMethod)
+        {
+            _stack.Push(CallNativeFunction(staticMethod.QualifiedName, args));
+            return;
+        }
+
         if (funcObj is ClosureValue closure)
         {
             var funcMeta = closure.Function;
@@ -267,7 +274,7 @@ public partial class VirtualMachine
             return;
         }
 
-        throw new TypeError(GetPosition(instruction), $"尝试调用非函数对象: {funcObj?.GetType().Name}");
+        throw new TypeError(GetPosition(instruction), $"尝试调用非函数对象: {DescribeValueType(funcObj)}");
     }
 
     private void InvokeResolvedFunction(FunctionMetadata function, object?[] args,
@@ -376,7 +383,7 @@ public partial class VirtualMachine
             if (isDecoratedFunction)
             {
                 throw new TypeError(position,
-                    $"装饰器返回值不是函数，无法调用 '{funcName}'（实际类型: {funcObj?.GetType().Name ?? "null"}）");
+                    $"装饰器返回值不是函数，无法调用 '{funcName}'（实际类型: {DescribeValueType(funcObj)}）");
             }
         }
 

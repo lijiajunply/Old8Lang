@@ -24,23 +24,17 @@ public class VMUnsupportedFeatureTests
     }
 
     [Fact]
-    public void TaskApi_BareReference_ReportsVmUnsupported()
+    public void TaskApi_BareReference_CanBeStoredAndCalled()
     {
-        var exception = Assert.Throws<VmUnsupportedError>(() =>
-        {
-            var vm = new VM(Compile("""
-                func work() {
-                    value <- Task.Delay
-                }
-                work()
-                """));
-            vm.Execute();
-        });
+        var vm = new VM(Compile("""
+            func work() {
+                delayed <- Task.Delay
+                await delayed(1)
+            }
+            work()
+            """));
 
-        Assert.Contains("Task", exception.Message);
-        Assert.Equal(VmUnsupportedError.ErrorCode, ((Old8Exception)exception).ErrorCode);
-        // 位置必须指向真实出错的那一行
-        Assert.Equal(2, exception.Position.Line);
+        vm.Execute();
     }
 
     [Fact]
@@ -56,15 +50,13 @@ public class VMUnsupportedFeatureTests
     }
 
     [Fact]
-    public void ThreadApi_CurrentThread_ReportsVmUnsupported()
+    public void ThreadApi_CurrentThread_IsSupported()
     {
-        var exception = Assert.Throws<VmUnsupportedError>(() =>
-        {
-            var vm = new VM(Compile("value <- Thread.CurrentThread"));
-            vm.Execute();
-        });
+        var vm = new VM(Compile("value <- Thread.CurrentThread"));
+        vm.Execute();
 
-        Assert.Contains("Thread", exception.Message);
+        var value = Assert.IsType<Old8Lang.AST.Expression.Value.ThreadLangValue>(vm.GetGlobalVariable("value"));
+        Assert.True(value.Id > 0);
     }
 
     [Fact]

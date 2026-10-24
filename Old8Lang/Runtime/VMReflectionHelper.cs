@@ -97,6 +97,65 @@ public static class VMReflectionHelper
     }
 
     /// <summary>
+    /// 用语言口径描述一个 CLR 类型（只有 <see cref="Type"/> 可用时使用）。
+    /// </summary>
+    /// <remarks>
+    /// 与 <see cref="DescribeValueType"/> 同一口径：先按接口/基类归类，
+    /// 再退回类型名，避免出现 <c>List`1</c>、<c>Int32</c> 这类名字。
+    /// </remarks>
+    public static string DescribeTypeName(Type? type)
+    {
+        if (type is null)
+        {
+            return "Null";
+        }
+
+        if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
+            type == typeof(byte) || type == typeof(sbyte) || type == typeof(uint) ||
+            type == typeof(ulong) || type == typeof(ushort))
+        {
+            return "Int";
+        }
+
+        if (type == typeof(double) || type == typeof(float) || type == typeof(decimal))
+        {
+            return "Double";
+        }
+
+        if (type == typeof(string))
+        {
+            return "String";
+        }
+
+        if (type == typeof(bool))
+        {
+            return "Bool";
+        }
+
+        if (type == typeof(char))
+        {
+            return "Char";
+        }
+
+        if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
+        {
+            return "Dictionary";
+        }
+
+        if (typeof(System.Collections.IList).IsAssignableFrom(type) || type.IsArray)
+        {
+            return type.IsArray ? "Array" : "List";
+        }
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Tuple<,>))
+        {
+            return "Tuple";
+        }
+
+        return type.Name;
+    }
+
+    /// <summary>
     /// 从对象实例获取类元数据
     /// </summary>
     public static ClassMetadata? GetClassMetadataFromInstance(VirtualMachine vm, BytecodeObjectInstance instance)

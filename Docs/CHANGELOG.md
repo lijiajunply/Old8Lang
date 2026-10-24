@@ -22,10 +22,20 @@
 - **同一模块的符号可以重复导入**：模块体只执行一次，再次导入返回其导出符号。
 - **负索引在三模式统一**：数组 / 列表 / 字符串 / 元组都支持 `[-1]` 表示末尾元素，IL 模式同样生效；
   越界统一抛 `INDEX_ERROR`。
+- **虚拟机支持数组解构赋值** `[a, b] <- 序列`（此前只有解释器支持）；右值可以是列表或数组，
+  多余元素忽略。
+- **虚拟机异步函数显式 `return null` 保留为 null**：任务结果显示为 `Task(Completed: Null)`，
+  与解释器一致，不再与「没有返回值」混同。
 
 **API**
 
-- 无新增 API。
+- 虚拟机静态类补齐 `TestRunner`（`Describe` / `It` / `Test` / `RunTest` 可执行虚拟机里的函数值）、
+  `Mock`（全部静态方法）与 `TaskScheduler.Default`。
+- 虚拟机补齐 `Task.Factory.StartNew`、`Thread.CurrentThread`、`Task.Delay` 的 `CancellationToken` 参数；
+  静态类方法可取值为函数后调用（`f <- Task.Delay; await f(10)`）。
+- 虚拟机错误信息统一使用语言类型名（`List` / `Dict` / `Tuple` …），不再泄露 ``List`1`` / `Int32` 这类 .NET 名字。
+- `-vm` 新增工具参数：`--disasm` 执行前反汇编、`--profile` 执行后打印性能报告、
+  `--debug-session` + `--break <行号>` 启动交互式断点调试。
 
 ---
 

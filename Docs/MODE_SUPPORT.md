@@ -82,8 +82,8 @@
 |-----|-------|-------|------|
 | 运算符重载（虚拟机） | ❌ | ✅ | `_add`/`_mul`/`_eq` 均正确生效 |
 | 函数装饰器（IL 模式） | ⚠️ | ❌ | 编译期报「返回类型不匹配」（期望 `Int32`，实际 `Object`） |
-| Task API（虚拟机） | ✅ | ⚠️ | 部分可用，见「已知限制」第 3 条 |
-| Thread API（虚拟机） | ✅ | ⚠️ | 仅 `Thread.Sleep` 可用，见「已知限制」第 3 条 |
+| Task API（虚拟机） | ✅ | ✅ | 静态方法、`Task.Factory.StartNew`、`Task.Delay` 的 `CancellationToken`、`Task.Delay` 作为函数值均可用（2026-10-24） |
+| Thread API（虚拟机） | ✅ | ✅ | `Thread.Sleep` 与 `Thread.CurrentThread`（属性 / 无参调用两种写法）可用（2026-10-24） |
 | Assert 断言（虚拟机） | ✅ | ⚠️ | 24 个断言方法可用，但失败抛 `AssertionError`（解释器抛的普通异常语言层捕获不到） |
 | 原生库导入 extern（IL / 虚拟机） | ✅ | ⚠️ | 原生 C 库自 2026-10-09 起可用；Python / JavaScript / C# DLL 未验证 |
 | 数组 / 列表 / 字典直接打印（虚拟机） | ✅ | ⚠️ | 直接 `print` 输出 .NET 类型名，`.ToStr()` 正常 |
@@ -195,7 +195,7 @@
 | `async` / `await` | ✅ | ⚠️ | ✅ | |
 | 异步生成器 | ✅ | ❌ | ✅ | 体内含 `await` 同样可用（2026-10-10 修复，见「已知限制」第 1 条） |
 | `async for-in` | ✅ | ❌ | ✅ | 支持 `async for k, v in ...` 多标识符解构 |
-| Task API | ✅ | ✅ | ✅ | 实例方法 `Then` / `Catch` / `Finally` / `ContinueWith` 自 2026-10-10 起三种模式都可用（IL 用原生 `Task` 表示，VM 用 `TaskLangValue`）；静态类仍见「已知限制」第 3 条 |
+| Task API | ✅ | ✅ | ✅ | 实例方法 `Then` / `Catch` / `Finally` / `ContinueWith` 自 2026-10-10 起三种模式都可用（IL 用原生 `Task` 表示，VM 用 `TaskLangValue`）；静态方法见「已知限制」第 3 条 |
 
 ### 9. 并发编程
 
@@ -213,7 +213,7 @@
 | `CancellationTokenSource`（类形式） | ✅ | ❌ | ✅ | 2026-10-10 起虚拟机支持 `CancellationTokenSource()` / `(timeout)` 及 `Cancel` / `CancelAfter` / `Dispose` / `IsCancellationRequested` |
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
-| Thread API（静态类） | ✅ | ✅ | ⚠️ | 虚拟机仅 `Thread.Sleep` 可用，见「已知限制」第 3 条 |
+| Thread API（静态类） | ✅ | ✅ | ✅ | 虚拟机 `Thread.Sleep` / `Thread.CurrentThread` 可用（2026-10-24），见「已知限制」第 3 条 |
 | Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ✅ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机同日起可用（`VMThreadLangValue` 专属实现）。`Cancel` 是**协作式**的：只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程 |
 
 ### 10. 异常处理
@@ -336,23 +336,25 @@
    现已改为同步恢复（生成器体内的 `await` 改为阻塞等待），并让异步生成器实现 `IEnumerable`
    以复用普通 for-in 的迭代协议；`async for k, v in ...` 多标识符解构同时可用。
    同步生成器（`yield`）不受影响；`yield` 集合/类实例也不再丢值。
-2. **异步函数的装饰器不可用**：`@decorator async func` 报 `VM_UNSUPPORTED_ERROR`
-   （异步函数不走 `MakeFunction`/`StoreGlobal` 这条绑定路径）。普通函数的装饰器可用。
-3. **静态类 API 部分可用**：编译期把 `类名.方法(...)` 改写成静态类原生调用，支持集合集中在
+2. **异步函数的装饰器不可用**：`@decorator async func` 报 `VM_UNSUPPORTED_ERROR`。
+   普通函数的装饰器可用。根因不是虚拟机独有：装饰器必须返回「异步函数值」，而
+   `async (x) -> ...` 这种异步 Lambda 目前解释器下也会抛 `NullReferenceException`
+   （`Instance.Run`），三种模式都还没有异步函数值。等异步函数值落地后再处理。
+3. **静态类 API 大部分可用**：编译期把 `类名.方法(...)` 改写成静态类原生调用，支持集合集中在
    `VmStaticClassRegistry`。可用：`Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/
-   `Run`/`StartNew`、`Thread.Sleep`、`Assert` 的 24 个断言方法、
-   `TaskCompletionSource` / `CancellationTokenSource`（类形式，2026-10-10 起）。
-   不支持（报 `VM_UNSUPPORTED_ERROR` 并给出位置）：裸引用 `Task`、`Task.Factory`、
-   `Thread.CurrentThread`、命名参数、`Task.Delay` 的第二个参数。
-   仍未登记的静态类是 **TestRunner / Mock / TaskScheduler**，原因是它们的核心方法要在
-   运行期执行传入的函数值（`Describe` / `It` / `RunTest` / `Mock.Verify`），
-   走的是解释器的 `FuncLangValue + VariateManager`；虚拟机的函数值是
-   `ClosureValue`/`FunctionMetadata`，转换后无法调用。`TaskScheduler` 只暴露一个
-   `Default` 属性（虚拟机静态类通道目前只支持 `类名.方法(...)`）。
+   `Run`/`StartNew`、`Task.Factory`（属性）与 `Task.Factory.StartNew`、`TaskScheduler.Default`、
+   `Thread.Sleep`、`Thread.CurrentThread`（属性 / 无参调用）、`Assert` 的 24 个断言方法、
+   `TestRunner`（`Describe` / `It` / `Test` / `RunTest` 由虚拟机执行传入的函数值，其余复用解释器实现）、
+   `Mock` 的全部静态方法、`TaskCompletionSource` / `CancellationTokenSource`（类形式）。
+   剩余限制：静态类方法的命名参数、裸引用静态类名（如 `value <- Task`）仍报 `VM_UNSUPPORTED_ERROR`
+   （裸引用具体方法如 `f <- Task.Delay` 已可用）。
+   上述静态类/属性支持自 2026-10-24 起生效。
 4. **`await` 的结果 + 函数返回类型注解（2026-10-10 修复）**：原先 `func f() -> int { return await g() }`
    报 `类型不匹配: 期望 int，但得到 IntLangValue`。现在 `CheckTypeMatch` 会先拆开基本类型的
    `LangValueType` 包装，且异步任务结果改为无损转换（集合/类实例不再退化成 `VoidLangValue`），
    `-> int` / `-> string` / `-> list` 都能直接返回 `await` 的结果。
+   2026-10-24 起，异步函数里**显式 `return null`** 也会保留为 `NullLangValue`
+   （`Task(Completed: Null)`，与解释器一致），不再与「没有返回值」混为 `VoidLangValue`。
 5. **集合直接打印（2026-10-10 修复）**：原先输出 `System.Collections.Generic.List`1[System.Object]`
    这类 .NET 类型名，现与 `.ToStr()` 用同一套格式化，输出 `[1, 2, 3]` / `{"a": 1}` / `(1, 2, 3)`。
 6. **元组（2026-10-10 修复）**：`.Count()` 已可用；顺带修好原生 `List<object?>` / `object[]` /

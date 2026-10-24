@@ -232,6 +232,9 @@ public partial class ThreadClassLangValue : LangValueType
         VmReusableMethods = new(StringComparer.Ordinal)
         {
             ["Sleep"] = Sleep,
+            // 返回 ThreadLangValue（原生线程包装）；虚拟机线程对象另有 VMThreadLangValue，
+            // 但 CurrentThread 只用于读取当前原生线程的信息，两者不冲突。
+            ["CurrentThread"] = CurrentThread,
         };
 }
 

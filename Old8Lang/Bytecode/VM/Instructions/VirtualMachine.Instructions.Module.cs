@@ -94,7 +94,7 @@ public partial class VirtualMachine
             {
                 int messageIndex = (int)instruction.Operand!;
                 var message = _bytecodeFile.ConstantPool.GetConstant(messageIndex);
-                var stackContents = string.Join(", ", _stack.Select(x => x?.GetType().Name ?? "null"));
+                var stackContents = string.Join(", ", _stack.Select(x => x is null ? "null" : DescribeValueType(x)));
                 Console.WriteLine($"{message} - 栈深度:{_stack.Count}, 内容:[{stackContents}]");
             }
                 break;

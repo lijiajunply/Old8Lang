@@ -1,5 +1,6 @@
 using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Metadata;
+using System.Diagnostics;
 
 namespace Old8Lang.Bytecode.Core;
 
@@ -28,6 +29,11 @@ public class CallFrame
 
     /// <summary>函数参数(用于调试)</summary>
     public object?[]? Arguments { get; set; }
+
+    /// <summary>
+    /// 性能分析计时器（仅在虚拟机启用 <c>VMProfiler</c> 时非 null；帧池复用时必须清空）
+    /// </summary>
+    internal Stopwatch? ProfileStopwatch { get; set; }
 
     private Stack<int>? _deferStack;
 

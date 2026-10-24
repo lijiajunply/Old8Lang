@@ -44,7 +44,7 @@ public partial class VirtualMachine
                 else
                 {
                     throw new TypeError(GetPosition(instruction),
-                        $"Invalid function for ThreadCreate: {funcObj?.GetType().Name}");
+                        $"Invalid function for ThreadCreate: {DescribeValueType(funcObj)}");
                 }
 
                 // 创建线程

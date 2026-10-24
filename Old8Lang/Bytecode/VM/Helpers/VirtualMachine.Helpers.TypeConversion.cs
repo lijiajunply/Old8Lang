@@ -26,7 +26,7 @@ public partial class VirtualMachine
             return newDict;
         }
 
-        throw new InvalidCastException($"无法将类型 {value?.GetType().Name ?? "null"} 转换为 dict");
+        throw new InvalidCastException($"无法将类型 {DescribeValueType(value)} 转换为 dict");
     }
 
     private bool ToBool(object? value)
@@ -46,7 +46,7 @@ public partial class VirtualMachine
         if (value is int i) return i;
         if (value is double d) return d;
         if (value is string s && double.TryParse(s, out double result)) return result;
-        throw new CastError(new SourcePosition(), value?.GetType().Name ?? "null", "double");
+        throw new CastError(new SourcePosition(), DescribeValueType(value), "double");
     }
 
 
