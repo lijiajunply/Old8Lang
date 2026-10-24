@@ -143,7 +143,7 @@ public partial class VirtualMachine
             int functionIndexHint = ParseFunctionIndex(operands, 2);
 
             // extern 函数优先保持原有行为
-            if (_globals.TryGetValue(funcName, out var externFuncObj) &&
+            if (TryGetGlobalValue(funcName, out var externFuncObj) &&
                 externFuncObj is ExternFunctionWrapper externFunc)
             {
                 var externArgs = PopArguments(argCount);
@@ -361,7 +361,7 @@ public partial class VirtualMachine
             }
         }
 
-        if (_globals.TryGetValue(funcName, out var funcObj))
+        if (TryGetGlobalValue(funcName, out var funcObj))
         {
             if (funcObj is FunctionMetadata globalFunction)
             {
@@ -422,7 +422,7 @@ public partial class VirtualMachine
     {
         classMetadata = null!;
 
-        if (_globals.TryGetValue(className, out var globalValue) && globalValue is ClassMetadata globalClassMetadata)
+        if (TryGetGlobalValue(className, out var globalValue) && globalValue is ClassMetadata globalClassMetadata)
         {
             classMetadata = globalClassMetadata;
             return true;

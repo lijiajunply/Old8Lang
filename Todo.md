@@ -1,5 +1,20 @@
 # VM 模式性能优化 TODO（基于 2026-03-02 Quick 报告）
 
+## 进度更新（2026-10-24，P4：VM 性能后续）
+
+详见 `Reports/2026-10-24-11-25-P4-VM性能后续.md`。
+
+- [x] **全局变量槽位（GlobalSlot）**：`_globals` 改为 `ConcurrentDictionary<string, GlobalSlot>`，
+  `LoadGlobal` / `StoreGlobal` 把「解析到的槽位」缓存在 `Instruction` 上（带全局表归属校验，
+  同一份字节码被多个虚拟机实例复用时自动重新解析）。同进程 A/B（3M 次顶层全局自增）：
+  哈希查表 952~955ms → 槽位 861~870ms（**-9.3%**）。
+- [x] **共享装箱布尔值**：`VmBoxed.True/False` 替代比较指令与 `LoadTrue` / `LoadFalse` 的逐次装箱，
+  1M 次自增循环的分配从 68.67MB 降到 **45.78MB（-33.3%）**；剩余分配全部来自整数运算装箱。
+- [x] **门禁噪声容忍度**：基线与当前报告都带 `StdDevMs` 时，
+  `NoiseFloor = min(15, 2 × √(cv_基线² + cv_当前²) × 100)` 个百分点，有效阈值 = 分类阈值 + NoiseFloor；
+  Markdown/JSON 新增 `NoiseFloor(%)` / `NoiseFloorPercent`。
+- [ ] **类型化值表示**：本轮给出测量与分阶段方案，未实施（跨模块改造，见 P4 报告 §4）。
+
 ## 进度更新（2026-10-10，P3：VM 性能与基准门禁）
 
 详见 `Reports/2026-10-10-22-33-P3-VM性能与基准门禁.md`。
@@ -190,18 +205,21 @@
     四个用例（三场景耗时 + 分配上限 + 结果正确性，外加 Channel MPMC 4 生产者/4 消费者 100k 条不丢消息），
     新增 `Category=PerformanceSmoke` 并纳入 `default.runsettings`，随常规 `dotnet test` 一起跑。
 
-## 后续项（2026-10-10 P3 期间发现，**非本任务范围**，按 AGENTS.md 规则记录而不顺手改）
+## 后续项（2026-10-10 P3 期间发现；2026-10-24 P4 已处理其中两项）
 
-- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>`/`CallFrame.Locals` 里的整数每次运算都要重新装箱，
-  这是 `VMXQ_Edge_*` 三个场景 alloc/op 的主要来源（如 HighArgCount 240 B/op ≈ 10 个箱/迭代）。
-  本轮相对 2026-03-02 基线已达标，但相对「上一次报告」持平；若要再降一个数量级，
-  需要引入带类型的值表示（`struct` 标记联合 + 类型化栈），属跨模块改造。
-- [ ] **`_globals` 用 `ConcurrentDictionary<string, object?>`**：顶层脚本变量（`sum`/`i` 这类）读写都走它，
-  实测 1M 次全局自增比函数内局部变量慢约 60%（`GlobalInc_1M` 109ms vs `LocalInc_1M` 68ms），
-  在高参数/高抛异常场景里是除指令分发外最大的单项开销。可选方向：给每个全局名一个可变槽位（`GlobalSlot`），
-  在 `Instruction` 上缓存已解析的槽位引用，把「按名字哈希查找」降为「一次字段读取」。
-- [ ] **门禁对同机器噪声的敏感度**：基线取「上一次报告」，同机连跑的并发场景中位数波动可达 12% 量级。
-  CI 已用「按 runner 类别缓存基线」消除跨机器误差；若后续仍频繁误报，可考虑只在硬失败（`NA`/执行异常）时阻断。
+- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>` / `CallFrame.Locals` / `GlobalSlot` / `UpValueCell` 里的整数
+  每次运算都要重新装箱。2026-10-24 P4 实测：`sum <- sum + 1` 型循环 1M 次仍分配 **45.78 B/次**
+  （两次整数装箱；比较结果的布尔装箱已在 P4 用 `VmBoxed` 消除），`Bytecode/` 下共 417 处 `object?`。
+  要再降一个数量级需要类型化值表示（`struct` 标记联合 + 类型化栈 / 类型化局部变量 / 类型化闭包单元），
+  属跨模块改造；P4 报告 §4 给出分阶段方案（先栈与局部变量、保留 `object?` 边界、再逐步收紧）。
+- [x] **`_globals` 用 `ConcurrentDictionary<string, object?>`**：顶层脚本变量（`sum`/`i` 这类）读写都走它。
+  **已完成（2026-10-24 P4）**：改为 `ConcurrentDictionary<string, GlobalSlot>`，槽位引用缓存在
+  `LoadGlobal` / `StoreGlobal` 指令上，热路径从「按名字哈希查表」降为「一次字段读取 + 归属校验」；
+  同进程 A/B 3M 次全局自增 -9.3%。覆盖 `DoLoadGlobal`/`StoreGlobal` 以及模块导入、defer、类/枚举注册等冷路径。
+- [x] **门禁对同机器噪声的敏感度**：基线取「上一次报告」，同机连跑的并发场景中位数波动可达 12% 量级。
+  **已完成（2026-10-24 P4）**：基线与当前报告都带 `StdDevMs` 时按两次运行的相对标准差计算噪声容忍度
+  （上限 15 个百分点），有效阈值 = 分类阈值 + 噪声容忍度；`NA` / 执行异常仍直接 FAIL。
+  静态基线只记均值时退化为固定阈值。细节见 `Old8Lang.Benchmarks/README.md`。
 
 ## 建议执行顺序
 

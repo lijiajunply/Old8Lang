@@ -21,6 +21,16 @@ public class Instruction(OpCode opCode, object? operand = null)
     public int? ColumnNumber { get; set; }
 
     /// <summary>
+    /// 全局变量槽位的内联缓存（仅 <c>LoadGlobal</c> / <c>StoreGlobal</c> 使用）。
+    /// </summary>
+    /// <remarks>
+    /// 运行时按需填充，不参与序列化。缓存会校验槽位的归属（见
+    /// <see cref="Old8Lang.Bytecode.VM.GlobalSlot"/>），因此同一份字节码被多个虚拟机实例复用时
+    /// 只会退化为一次重新解析，不会读到别的实例的全局值。
+    /// </remarks>
+    internal Old8Lang.Bytecode.VM.GlobalSlot? CachedGlobalSlot;
+
+    /// <summary>
     /// 设置调试信息
     /// </summary>
     public Instruction WithDebugInfo(string? sourceFile, int? lineNumber, int? columnNumber = null)

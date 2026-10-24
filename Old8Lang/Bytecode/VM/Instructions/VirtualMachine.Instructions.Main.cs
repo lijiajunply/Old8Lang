@@ -268,9 +268,22 @@ public partial class VirtualMachine
             return closureValue;
         }
 
-        if (_globals.TryGetValue(varName, out var globalResolvedValue))
+        if (TryGetGlobalValue(varName, out var globalResolvedValue))
         {
             return globalResolvedValue;
+        }
+
+        throw new NameError(GetPosition(instruction), varName);
+    }
+
+    /// <summary>
+    /// 解析 <c>LoadGlobal</c> 要读取的槽位；名字不存在时与旧行为一致地抛 <see cref="NameError"/>。
+    /// </summary>
+    private GlobalSlot ResolveGlobalSlot(string varName, Instruction instruction)
+    {
+        if (_globals.TryGetValue(varName, out var slot))
+        {
+            return slot;
         }
 
         throw new NameError(GetPosition(instruction), varName);

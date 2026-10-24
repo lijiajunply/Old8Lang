@@ -243,6 +243,92 @@ public class VMPerformanceReportTests : IDisposable
         Assert.Empty(VMPerformanceReport.GetFailureSummary(jsonPath));
     }
 
+    /// <summary>
+    /// 基线带有 StdDev 时，略高于固定阈值但落在噪声范围内的回归不应阻断（NoiseFloor 生效）。
+    /// </summary>
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithNoisyBaseline_DoesNotFailWithinNoiseFloor()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-noise-floor-pass");
+        var reportsDir = Path.Combine(_tempRoot, "reports-noise-floor-pass");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickNoisyBaselineJson(meanMs: 100.0, stdDevMs: 6.0));
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        // +14%：超过 Edge 分类的 10% 固定阈值，但两次运行的相对标准差合成后约 16 个百分点，
+        // 有效阈值约 26%，应判为 PASS 而不是 FAIL。
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickHighVarCsv(meanMs: 114.0, stdDevMs: 6.0));
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("\"NoiseFloorPercent\":", json);
+        Assert.DoesNotContain("\"NoiseFloorPercent\": null", json);
+        Assert.False(VMPerformanceReport.HasFailStatus(jsonPath));
+        Assert.Empty(VMPerformanceReport.GetFailureSummary(jsonPath));
+    }
+
+    /// <summary>
+    /// 噪声容忍度只能吸收噪声，不能掩盖真实回归：远超「阈值 + 噪声容忍度」时仍然 FAIL。
+    /// </summary>
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithNoisyBaseline_StillFailsOnLargeRegression()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-noise-floor-fail");
+        var reportsDir = Path.Combine(_tempRoot, "reports-noise-floor-fail");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickNoisyBaselineJson(meanMs: 100.0, stdDevMs: 6.0));
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickHighVarCsv(meanMs: 160.0, stdDevMs: 6.0));
+
+        var (markdownPath, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+
+        Assert.True(VMPerformanceReport.HasFailStatus(jsonPath));
+        Assert.Contains("NoiseFloor(%)", File.ReadAllText(markdownPath));
+
+        var failures = VMPerformanceReport.GetFailureSummary(jsonPath);
+        Assert.NotEmpty(failures);
+        Assert.Contains(failures, entry => entry.Contains("Threshold=", StringComparison.Ordinal));
+        Assert.Contains(failures, entry =>
+            entry.StartsWith("job:", StringComparison.Ordinal) && entry.Contains("NoiseFloor=", StringComparison.Ordinal));
+        Assert.Contains(failures, entry =>
+            entry.StartsWith("aggregate:", StringComparison.Ordinal) && entry.Contains("NoiseFloor=", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// 静态基线只记均值（无 StdDev）时没有噪声容忍度，行为与旧版固定阈值一致。
+    /// </summary>
+    [Fact]
+    public void GenerateQuickFromBenchmarkArtifacts_WithMeanOnlyBaseline_HasNoNoiseFloor()
+    {
+        var artifactsDir = Path.Combine(_tempRoot, "artifacts-noise-floor-none");
+        var reportsDir = Path.Combine(_tempRoot, "reports-noise-floor-none");
+        Directory.CreateDirectory(artifactsDir);
+        Directory.CreateDirectory(reportsDir);
+
+        var baselinePath = Path.Combine(reportsDir, "VM_Quick_Performance_Report_20260101_000000.json");
+        File.WriteAllText(baselinePath, BuildQuickThresholdBaselineJson());
+        File.SetLastWriteTimeUtc(baselinePath, DateTime.UtcNow.AddMinutes(-1));
+
+        var quickCsvPath = Path.Combine(artifactsDir, "Old8Lang.Benchmarks.VMQuickPerformanceBenchmarks-report.csv");
+        File.WriteAllText(quickCsvPath, BuildQuickRegressionCsv());
+
+        var (_, jsonPath) = VMPerformanceReport.GenerateQuickFromBenchmarkArtifacts(artifactsDir, reportsDir);
+        var json = File.ReadAllText(jsonPath);
+
+        Assert.Contains("\"NoiseFloorPercent\": null", json);
+        Assert.True(VMPerformanceReport.HasFailStatus(jsonPath));
+    }
+
     [Fact]
     public void GenerateQuickFromBenchmarkArtifacts_WithExplicitBaselineEnvironmentVariable_UsesOnlyThatFile()
     {
@@ -470,6 +556,30 @@ public class VMPerformanceReportTests : IDisposable
                  ]
                }
                """;
+    }
+
+    private static string BuildQuickNoisyBaselineJson(double meanMs, double stdDevMs)
+    {
+        return $$"""
+               {
+                 "GeneratedAt": "2026-01-01T00:00:00+08:00",
+                 "Scenarios": [
+                   {
+                     "Scenario": "VMXQ_Edge_HighArgCount_CallHotPath",
+                     "MeanMs": {{meanMs}},
+                     "StdDevMs": {{stdDevMs}}
+                   }
+                 ]
+               }
+               """;
+    }
+
+    private static string BuildQuickHighVarCsv(double meanMs, double stdDevMs)
+    {
+        return string.Join(
+            Environment.NewLine,
+            "Method,Job,Runtime,WarmupCount,IterationCount,Mean,StdDev,Allocated",
+            $"VMXQ_Edge_HighArgCount_CallHotPath,DefaultJob,.NET 10.0,1,4,{meanMs:F3} ms,{stdDevMs:F3} ms,2.00 MB");
     }
 
     public void Dispose()

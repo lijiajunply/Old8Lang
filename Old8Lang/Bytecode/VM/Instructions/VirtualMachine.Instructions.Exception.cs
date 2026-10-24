@@ -143,7 +143,7 @@ public partial class VirtualMachine
                     var nestedClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == nestedClassName);
 
                     // 如果在当前字节码文件中没找到，从全局变量中查找
-                    if (nestedClass == null && _globals.TryGetValue(nestedClassName, out var globalNestedClass) &&
+                    if (nestedClass == null && TryGetGlobalValue(nestedClassName, out var globalNestedClass) &&
                         globalNestedClass is ClassMetadata importedNestedClass)
                     {
                         nestedClass = importedNestedClass;
@@ -534,7 +534,7 @@ public partial class VirtualMachine
                 // 如果在当前字节码文件中没找到，从全局变量中查找（可能是导入的类）
                 if (classMetadata == null)
                 {
-                    if (_globals.TryGetValue(className, out var globalClass) &&
+                    if (TryGetGlobalValue(className, out var globalClass) &&
                         globalClass is ClassMetadata importedClass)
                     {
                         classMetadata = importedClass;
@@ -682,7 +682,7 @@ public partial class VirtualMachine
                     var nestedClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == nestedClassName);
 
                     // 如果在当前字节码文件中没找到，从全局变量中查找
-                    if (nestedClass == null && _globals.TryGetValue(nestedClassName, out var globalNestedClass) &&
+                    if (nestedClass == null && TryGetGlobalValue(nestedClassName, out var globalNestedClass) &&
                         globalNestedClass is ClassMetadata importedNestedClass)
                     {
                         nestedClass = importedNestedClass;
@@ -832,7 +832,7 @@ public partial class VirtualMachine
                     // 如果在当前字节码文件中没找到，从全局变量和已加载模块中查找
                     if (classMetadata == null)
                     {
-                        if (_globals.TryGetValue(bytecodeObj.ClassName, out var globalClass) &&
+                        if (TryGetGlobalValue(bytecodeObj.ClassName, out var globalClass) &&
                             globalClass is ClassMetadata importedClass)
                         {
                             classMetadata = importedClass;

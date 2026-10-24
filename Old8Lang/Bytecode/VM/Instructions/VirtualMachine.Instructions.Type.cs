@@ -143,7 +143,7 @@ public partial class VirtualMachine
                     members);
 
                 // 将枚举模板存储到全局变量
-                _globals[enumName] = enumTemplate;
+                SetGlobalValue(enumName, enumTemplate);
             }
                 break;
 

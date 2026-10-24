@@ -27,8 +27,11 @@ public partial class VirtualMachine
     // CallFrame 对象池：复用帧实例，减少 GC 压力（每线程独立，最多缓存 32 个）
     private readonly ThreadLocal<Stack<CallFrame>> _threadFramePool = new(() => new Stack<CallFrame>(32));
 
-    // 线程安全的全局变量字典
-    private readonly ConcurrentDictionary<string, object?> _globals;
+    // 线程安全的全局变量表：名字 -> 槽位。
+    // 槽位解析结果会被指令缓存（见 GlobalSlot），热路径不再按名字查表。
+    private readonly ConcurrentDictionary<string, GlobalSlot> _globals;
+    private readonly int _globalsOwnerId;
+    private static int _nextGlobalsOwnerId;
     private readonly BytecodeFile _bytecodeFile;
     private readonly Dictionary<string, FunctionMetadata> _functionByName;
     private readonly Dictionary<string, ClassMetadata> _classByName;
@@ -57,14 +60,15 @@ public partial class VirtualMachine
     private readonly string? _baseDirectory;
 
     public VirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
-        : this(bytecodeFile, baseDirectory, null, null, null, null, initializeRuntimeMetadata: true)
+        : this(bytecodeFile, baseDirectory, null, 0, null, null, null, initializeRuntimeMetadata: true)
     {
     }
 
     private VirtualMachine(
         BytecodeFile bytecodeFile,
         string? baseDirectory,
-        ConcurrentDictionary<string, object?>? sharedGlobals,
+        ConcurrentDictionary<string, GlobalSlot>? sharedGlobals,
+        int sharedGlobalsOwnerId,
         Dictionary<string, FunctionMetadata>? sharedFunctionByName,
         Dictionary<string, ClassMetadata>? sharedClassByName,
         ConcurrentDictionary<(string ModuleName, string SymbolName), object>? sharedModuleSymbolCache,
@@ -73,7 +77,10 @@ public partial class VirtualMachine
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
         _baseDirectory = baseDirectory ?? Directory.GetCurrentDirectory();
         _moduleLoader = new ModuleLoader(_baseDirectory);
-        _globals = sharedGlobals ?? new ConcurrentDictionary<string, object?>();
+        _globals = sharedGlobals ?? new ConcurrentDictionary<string, GlobalSlot>(StringComparer.Ordinal);
+        _globalsOwnerId = sharedGlobals != null
+            ? sharedGlobalsOwnerId
+            : Interlocked.Increment(ref _nextGlobalsOwnerId);
         _functionByName = sharedFunctionByName ?? new Dictionary<string, FunctionMetadata>(StringComparer.Ordinal);
         _classByName = sharedClassByName ?? new Dictionary<string, ClassMetadata>(StringComparer.Ordinal);
         _moduleSymbolCache = sharedModuleSymbolCache ?? new ConcurrentDictionary<(string ModuleName, string SymbolName), object>();
@@ -88,7 +95,7 @@ public partial class VirtualMachine
         {
             foreach (var globalVar in _bytecodeFile.GlobalVariables)
             {
-                _globals[globalVar] = null;
+                GetOrCreateGlobalSlot(globalVar).Value = null;
             }
 
             foreach (var function in _bytecodeFile.Functions)
@@ -98,7 +105,7 @@ public partial class VirtualMachine
 
             foreach (var classMetadata in _bytecodeFile.Classes)
             {
-                _globals[classMetadata.Name] = classMetadata;
+                GetOrCreateGlobalSlot(classMetadata.Name).Value = classMetadata;
                 _classByName.TryAdd(classMetadata.Name, classMetadata);
 
                 foreach (var staticField in classMetadata.StaticFields)
@@ -129,6 +136,7 @@ public partial class VirtualMachine
             _bytecodeFile,
             _baseDirectory,
             _globals,
+            _globalsOwnerId,
             _functionByName,
             _classByName,
             _moduleSymbolCache,
@@ -219,7 +227,7 @@ public partial class VirtualMachine
     /// </summary>
     public object? GetGlobalVariable(string name)
     {
-        return _globals.GetValueOrDefault(name);
+        return TryGetGlobalValue(name, out var value) ? value : null;
     }
 
     /// <summary>
@@ -227,7 +235,58 @@ public partial class VirtualMachine
     /// </summary>
     public IEnumerable<KeyValuePair<string, object?>> GetAllGlobalVariables()
     {
-        return _globals;
+        foreach (var pair in _globals)
+        {
+            yield return new KeyValuePair<string, object?>(pair.Key, pair.Value.Value);
+        }
+    }
+
+    /// <summary>
+    /// 按名字解析全局变量槽位（冷路径；热路径走指令上的 <see cref="Instruction.CachedGlobalSlot"/>）。
+    /// </summary>
+    private GlobalSlot GetOrCreateGlobalSlot(string name)
+    {
+        return _globals.GetOrAdd(
+            name,
+            static (_, owner) => new GlobalSlot(owner, null),
+            _globalsOwnerId);
+    }
+
+    /// <summary>
+    /// 按名字读取全局变量（冷路径）。
+    /// </summary>
+    private bool TryGetGlobalValue(string name, out object? value)
+    {
+        if (_globals.TryGetValue(name, out var slot))
+        {
+            value = slot.Value;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// 按名字写入全局变量（冷路径；热路径直接写缓存槽位）。
+    /// </summary>
+    private void SetGlobalValue(string name, object? value)
+    {
+        GetOrCreateGlobalSlot(name).Value = value;
+    }
+
+    /// <summary>
+    /// 复制当前全局表的「名字 -> 值」快照（模块加载时用）。
+    /// </summary>
+    private Dictionary<string, object?> SnapshotGlobalValues()
+    {
+        var snapshot = new Dictionary<string, object?>(_globals.Count, StringComparer.Ordinal);
+        foreach (var pair in _globals)
+        {
+            snapshot[pair.Key] = pair.Value.Value;
+        }
+
+        return snapshot;
     }
 
     /// <summary>
@@ -361,17 +420,47 @@ public partial class VirtualMachine
                     }
 
                     case OpCode.LoadGlobal:
-                        stack.Push(ResolveGlobalValue(frame, (string)instruction.Operand!, instruction));
+                    {
+                        var varName = (string)instruction.Operand!;
+                        // 闭包环境优先：捕获了同名变量的帧必须读闭包里的值，不能走槽位缓存。
+                        if (frame.ClosureEnvironment != null)
+                        {
+                            stack.Push(ResolveGlobalValue(frame, varName, instruction));
+                            continue;
+                        }
+
+                        var slot = instruction.CachedGlobalSlot;
+                        if (slot == null || slot.Owner != _globalsOwnerId)
+                        {
+                            slot = ResolveGlobalSlot(varName, instruction);
+                            instruction.CachedGlobalSlot = slot;
+                        }
+
+                        stack.Push(slot.Value);
                         continue;
+                    }
 
                     case OpCode.StoreGlobal:
                     {
                         var varName = (string)instruction.Operand!;
                         var globalValue = stack.Pop();
-                        if (frame.ClosureEnvironment == null ||
-                            !frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                        if (frame.ClosureEnvironment == null)
                         {
-                            _globals[varName] = globalValue;
+                            var slot = instruction.CachedGlobalSlot;
+                            if (slot == null || slot.Owner != _globalsOwnerId)
+                            {
+                                slot = GetOrCreateGlobalSlot(varName);
+                                instruction.CachedGlobalSlot = slot;
+                            }
+
+                            slot.Value = globalValue;
+                            continue;
+                        }
+
+                        // 被闭包捕获的名字写进共享单元；否则写全局表。
+                        if (!frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                        {
+                            SetGlobalValue(varName, globalValue);
                         }
 
                         continue;
@@ -382,11 +471,11 @@ public partial class VirtualMachine
                         continue;
 
                     case OpCode.LoadTrue:
-                        stack.Push(true);
+                        stack.Push(VmBoxed.True);
                         continue;
 
                     case OpCode.LoadFalse:
-                        stack.Push(false);
+                        stack.Push(VmBoxed.False);
                         continue;
 
                     case OpCode.Pop:
@@ -433,7 +522,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(Equals(a, b));
+                        stack.Push(VmBoxed.Bool(Equals(a, b)));
                         continue;
                     }
 
@@ -441,7 +530,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(!Equals(a, b));
+                        stack.Push(VmBoxed.Bool(!Equals(a, b)));
                         continue;
                     }
 
@@ -449,7 +538,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(Less(a, b));
+                        stack.Push(VmBoxed.Bool(Less(a, b)));
                         continue;
                     }
 
@@ -457,7 +546,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(LessEqual(a, b));
+                        stack.Push(VmBoxed.Bool(LessEqual(a, b)));
                         continue;
                     }
 
@@ -465,7 +554,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(Greater(a, b));
+                        stack.Push(VmBoxed.Bool(Greater(a, b)));
                         continue;
                     }
 
@@ -473,7 +562,7 @@ public partial class VirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(GreaterEqual(a, b));
+                        stack.Push(VmBoxed.Bool(GreaterEqual(a, b)));
                         continue;
                     }
 

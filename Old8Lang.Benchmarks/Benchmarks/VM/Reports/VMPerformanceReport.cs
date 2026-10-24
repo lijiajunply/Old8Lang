@@ -44,6 +44,7 @@ public static class VMPerformanceReport
         double? BaselineMeanMs,
         double? MeanDeltaPercent,
         double? RegressionThresholdPercent,
+        double? NoiseFloorPercent,
         string Status,
         string? FailureReason,
         string RawMean,
@@ -62,6 +63,7 @@ public static class VMPerformanceReport
         double? MedianBaselineMeanMs,
         double? MedianMeanDeltaPercent,
         double? RegressionThresholdPercent,
+        double? MedianNoiseFloorPercent,
         string Status,
         string? FailureReason);
 
@@ -222,9 +224,31 @@ public static class VMPerformanceReport
             var reason = TryReadString(scenario, "FailureReason", out var failureReason)
                 ? $" {failureReason}"
                 : string.Empty;
+            var threshold = TryReadPercent(scenario, "RegressionThresholdPercent", out var thresholdValue)
+                ? $" Threshold={thresholdValue:F2}%"
+                : string.Empty;
+            // 明细视图用 NoiseFloorPercent，聚合视图用 MedianNoiseFloorPercent。
+            var noiseFloor = (TryReadPercent(scenario, "NoiseFloorPercent", out var noiseValue) ||
+                              TryReadPercent(scenario, "MedianNoiseFloorPercent", out noiseValue)) &&
+                             noiseValue > 0
+                ? $"+NoiseFloor={noiseValue:F2}%"
+                : string.Empty;
 
-            failures.Add($"{view}: {scenarioName}{jobSuffix} MeanΔ={delta}{reason}");
+            failures.Add($"{view}: {scenarioName}{jobSuffix} MeanΔ={delta}{threshold}{noiseFloor}{reason}");
         }
+    }
+
+    private static bool TryReadPercent(JsonElement element, string propertyName, out double value)
+    {
+        if (element.TryGetProperty(propertyName, out var property) &&
+            property.ValueKind == JsonValueKind.Number)
+        {
+            value = property.GetDouble();
+            return true;
+        }
+
+        value = 0d;
+        return false;
     }
 
     private static bool TryReadString(JsonElement element, string propertyName, out string value)
@@ -757,28 +781,28 @@ public static class VMPerformanceReport
             writer.WriteLine();
             writer.WriteLine("### Per-Job Details");
             writer.WriteLine();
-            writer.WriteLine("| Scenario | Job | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | Status | FailureReason |");
-            writer.WriteLine("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
+            writer.WriteLine("| Scenario | Job | Mean(ms) | StdDev(ms) | P95(ms) | Allocated(bytes) | Throughput(ops/s) | Alloc/Op(bytes) | MeanΔ(%) | Threshold(%) | NoiseFloor(%) | Status | FailureReason |");
+            writer.WriteLine("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
 
             foreach (var scenario in group)
             {
                 writer.WriteLine(
-                    $"| {scenario.Scenario} | {EscapeMarkdown(scenario.Job)} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
+                    $"| {scenario.Scenario} | {EscapeMarkdown(scenario.Job)} | {FormatNumber(scenario.MeanMs)} | {FormatNumber(scenario.StdDevMs)} | {FormatNumber(scenario.P95Ms)} | {FormatNumber(scenario.AllocatedBytes)} | {FormatNumber(scenario.ThroughputOpsPerSec)} | {FormatNumber(scenario.AllocatedBytesPerOp)} | {FormatPercent(scenario.MeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {FormatPercent(scenario.NoiseFloorPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
             }
 
             writer.WriteLine();
 
             writer.WriteLine("### Scenario Aggregate (Median)");
             writer.WriteLine();
-            writer.WriteLine("| Scenario | Jobs | MedianMean(ms) | MedianStdDev(ms) | MedianP95(ms) | MedianAllocated(bytes) | MedianThroughput(ops/s) | MedianAlloc/Op(bytes) | MedianMeanΔ(%) | Threshold(%) | Status | FailureReason |");
-            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
+            writer.WriteLine("| Scenario | Jobs | MedianMean(ms) | MedianStdDev(ms) | MedianP95(ms) | MedianAllocated(bytes) | MedianThroughput(ops/s) | MedianAlloc/Op(bytes) | MedianMeanΔ(%) | Threshold(%) | NoiseFloor(%) | Status | FailureReason |");
+            writer.WriteLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|");
 
             foreach (var scenario in report.AggregatedScenarios
                          .Where(s => string.Equals(s.Category, group.Key, StringComparison.Ordinal))
                          .OrderBy(s => s.Scenario, StringComparer.Ordinal))
             {
                 writer.WriteLine(
-                    $"| {scenario.Scenario} | {scenario.JobCount} | {FormatNumber(scenario.MedianMeanMs)} | {FormatNumber(scenario.MedianStdDevMs)} | {FormatNumber(scenario.MedianP95Ms)} | {FormatNumber(scenario.MedianAllocatedBytes)} | {FormatNumber(scenario.MedianThroughputOpsPerSec)} | {FormatNumber(scenario.MedianAllocatedBytesPerOp)} | {FormatPercent(scenario.MedianMeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
+                    $"| {scenario.Scenario} | {scenario.JobCount} | {FormatNumber(scenario.MedianMeanMs)} | {FormatNumber(scenario.MedianStdDevMs)} | {FormatNumber(scenario.MedianP95Ms)} | {FormatNumber(scenario.MedianAllocatedBytes)} | {FormatNumber(scenario.MedianThroughputOpsPerSec)} | {FormatNumber(scenario.MedianAllocatedBytesPerOp)} | {FormatPercent(scenario.MedianMeanDeltaPercent)} | {FormatPercent(scenario.RegressionThresholdPercent)} | {FormatPercent(scenario.MedianNoiseFloorPercent)} | {scenario.Status} | {EscapeMarkdown(scenario.FailureReason ?? "N/A")} |");
             }
 
             writer.WriteLine();
@@ -868,18 +892,21 @@ public static class VMPerformanceReport
         return null;
     }
 
+    /// <summary>基线中某个场景的样本（均值必填，标准差可能缺失——静态基线只记录均值）。</summary>
+    private sealed record BaselineSample(double? MeanMs, double? StdDevMs);
+
     private sealed record BaselineLookup(
-        IReadOnlyDictionary<(string Scenario, string Job), double?> ByScenarioAndJob,
-        IReadOnlyDictionary<string, double?> ByScenario);
+        IReadOnlyDictionary<(string Scenario, string Job), BaselineSample> ByScenarioAndJob,
+        IReadOnlyDictionary<string, BaselineSample> ByScenario);
 
     private static BaselineLookup LoadBaselineLookup(string? baselineJsonPath)
     {
-        var entries = new List<(string Scenario, string? Job, double? MeanMs)>();
+        var entries = new List<(string Scenario, string? Job, double? MeanMs, double? StdDevMs)>();
         if (string.IsNullOrWhiteSpace(baselineJsonPath) || !File.Exists(baselineJsonPath))
         {
             return new BaselineLookup(
-                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), double?>(),
-                ByScenario: new Dictionary<string, double?>(StringComparer.Ordinal));
+                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), BaselineSample>(),
+                ByScenario: new Dictionary<string, BaselineSample>(StringComparer.Ordinal));
         }
 
         using var document = JsonDocument.Parse(File.ReadAllText(baselineJsonPath));
@@ -887,8 +914,8 @@ public static class VMPerformanceReport
             scenariosElement.ValueKind != JsonValueKind.Array)
         {
             return new BaselineLookup(
-                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), double?>(),
-                ByScenario: new Dictionary<string, double?>(StringComparer.Ordinal));
+                ByScenarioAndJob: new Dictionary<(string Scenario, string Job), BaselineSample>(),
+                ByScenario: new Dictionary<string, BaselineSample>(StringComparer.Ordinal));
         }
 
         foreach (var item in scenariosElement.EnumerateArray())
@@ -910,23 +937,41 @@ public static class VMPerformanceReport
                 mean = meanElement.GetDouble();
             }
 
+            // 静态基线（Baselines/*.json）只记录均值；历史报告会带 StdDevMs，
+            // 有它才能估算噪声容忍度。
+            double? stdDev = null;
+            if (item.TryGetProperty("StdDevMs", out var stdDevElement) && stdDevElement.ValueKind == JsonValueKind.Number)
+            {
+                stdDev = stdDevElement.GetDouble();
+            }
+
             string? job = null;
             if (item.TryGetProperty("Job", out var jobElement) && jobElement.ValueKind == JsonValueKind.String)
             {
                 job = jobElement.GetString();
             }
 
-            entries.Add((scenario, job, mean));
+            entries.Add((scenario, job, mean, stdDev));
         }
 
         var byScenarioAndJob = entries
             .Where(entry => !string.IsNullOrWhiteSpace(entry.Job))
-            .GroupBy(entry => (entry.Scenario, Job: entry.Job!), tuple => tuple.MeanMs)
-            .ToDictionary(group => group.Key, group => SelectMedian(group), comparer: EqualityComparer<(string Scenario, string Job)>.Default);
+            .GroupBy(entry => (entry.Scenario, Job: entry.Job!))
+            .ToDictionary(
+                group => group.Key,
+                group => new BaselineSample(
+                    SelectMedian(group.Select(entry => entry.MeanMs)),
+                    SelectMedian(group.Select(entry => entry.StdDevMs))),
+                comparer: EqualityComparer<(string Scenario, string Job)>.Default);
 
         var byScenario = entries
-            .GroupBy(entry => entry.Scenario, entry => entry.MeanMs, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => SelectMedian(group), StringComparer.Ordinal);
+            .GroupBy(entry => entry.Scenario, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => new BaselineSample(
+                    SelectMedian(group.Select(entry => entry.MeanMs)),
+                    SelectMedian(group.Select(entry => entry.StdDevMs))),
+                StringComparer.Ordinal);
 
         return new BaselineLookup(byScenarioAndJob, byScenario);
     }
@@ -946,14 +991,16 @@ public static class VMPerformanceReport
             ? source.AllocatedBytes.Value / (double)operationCount.Value
             : null;
 
-        if (!baselineLookup.ByScenarioAndJob.TryGetValue((source.Scenario, source.Job), out var baselineMeanMs))
+        if (!baselineLookup.ByScenarioAndJob.TryGetValue((source.Scenario, source.Job), out var baselineSample))
         {
-            baselineLookup.ByScenario.TryGetValue(source.Scenario, out baselineMeanMs);
+            baselineLookup.ByScenario.TryGetValue(source.Scenario, out baselineSample);
         }
 
+        var baselineMeanMs = baselineSample?.MeanMs;
         var meanDeltaPercent = ComputeRegressionPercent(baselineMeanMs, source.MeanMs);
         var threshold = GetRegressionThresholdPercent(category);
-        var status = EvaluateScenarioStatus(source, meanDeltaPercent, threshold, ref failureReason);
+        var noiseFloorPercent = ComputeNoiseFloorPercent(baselineSample, source);
+        var status = EvaluateScenarioStatus(source, meanDeltaPercent, threshold, noiseFloorPercent, ref failureReason);
 
         return new TieredScenarioResult(
             Scenario: source.Scenario,
@@ -968,6 +1015,7 @@ public static class VMPerformanceReport
             BaselineMeanMs: baselineMeanMs,
             MeanDeltaPercent: meanDeltaPercent,
             RegressionThresholdPercent: threshold,
+            NoiseFloorPercent: noiseFloorPercent,
             Status: status,
             FailureReason: failureReason,
             RawMean: source.RawMean,
@@ -996,6 +1044,7 @@ public static class VMPerformanceReport
             MedianBaselineMeanMs: SelectMedian(list.Select(item => item.BaselineMeanMs)),
             MedianMeanDeltaPercent: SelectMedian(list.Select(item => item.MeanDeltaPercent)),
             RegressionThresholdPercent: first.RegressionThresholdPercent,
+            MedianNoiseFloorPercent: SelectMedian(list.Select(item => item.NoiseFloorPercent)),
             Status: status,
             FailureReason: failureReason);
     }
@@ -1035,6 +1084,12 @@ public static class VMPerformanceReport
         return "Core";
     }
 
+    /// <summary>噪声容忍度的标准差倍数（约 95% 置信区间）。</summary>
+    private const double NoiseFloorStdDevMultiplier = 2d;
+
+    /// <summary>噪声容忍度上限（百分点），防止高方差场景完全失去门禁作用。</summary>
+    private const double MaxNoiseFloorPercent = 15d;
+
     private static double GetRegressionThresholdPercent(string category)
     {
         return category switch
@@ -1053,6 +1108,7 @@ public static class VMPerformanceReport
         VmScenarioResult source,
         double? meanDeltaPercent,
         double thresholdPercent,
+        double? noiseFloorPercent,
         ref string? failureReason)
     {
         if (!source.MeanMs.HasValue)
@@ -1061,7 +1117,10 @@ public static class VMPerformanceReport
             return "FAIL";
         }
 
-        return EvaluateRegressionStatus(meanDeltaPercent, thresholdPercent);
+        // 噪声容忍度是「额外」的阈值，不替代分类阈值：
+        // 判定仍然只发生在 delta 超过 基础阈值 + 噪声容忍度 时。
+        var effectiveThreshold = thresholdPercent + (noiseFloorPercent ?? 0d);
+        return EvaluateRegressionStatus(meanDeltaPercent, effectiveThreshold);
     }
 
     private static string EvaluateRegressionStatus(double? meanDeltaPercent, double thresholdPercent)
@@ -1083,6 +1142,35 @@ public static class VMPerformanceReport
         }
 
         return "PASS";
+    }
+
+    /// <summary>
+    /// 估算同机噪声容忍度（百分点）。
+    /// </summary>
+    /// <remarks>
+    /// 基线取「上一次报告」时，同一台机器连跑的并发场景中位数波动可达 12% 量级，
+    /// 固定阈值会把纯噪声判成回归。这里用两次运行各自的相对标准差（StdDev / Mean）
+    /// 估算噪声：容忍度 = <see cref="NoiseFloorStdDevMultiplier"/> × 合成相对标准差，并封顶
+    /// <see cref="MaxNoiseFloorPercent"/> 个百分点，避免高方差场景把真实回归全部掩盖。
+    ///
+    /// 基线或当前报告缺少 StdDev（例如静态基线只记均值）时返回 null，退化为固定阈值。
+    /// </remarks>
+    private static double? ComputeNoiseFloorPercent(BaselineSample? baseline, VmScenarioResult current)
+    {
+        if (baseline is null ||
+            !baseline.MeanMs.HasValue || baseline.MeanMs.Value <= 0 ||
+            !baseline.StdDevMs.HasValue ||
+            !current.MeanMs.HasValue || current.MeanMs.Value <= 0 ||
+            !current.StdDevMs.HasValue)
+        {
+            return null;
+        }
+
+        var baselineCv = baseline.StdDevMs.Value / baseline.MeanMs.Value;
+        var currentCv = current.StdDevMs.Value / current.MeanMs.Value;
+        var combinedCv = Math.Sqrt(baselineCv * baselineCv + currentCv * currentCv);
+        var floor = Math.Min(MaxNoiseFloorPercent, NoiseFloorStdDevMultiplier * combinedCv * 100d);
+        return Math.Round(floor, 2);
     }
 
     private static long? GetOperationCount(string scenario)

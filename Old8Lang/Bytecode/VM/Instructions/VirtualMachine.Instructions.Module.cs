@@ -31,8 +31,8 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
 
                 // 将符号添加到当前全局变量
-                _globals[symbolName] = symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
-                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                SetGlobalValue(symbolName, symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
+                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'"));
             }
                 break;
 
@@ -47,8 +47,8 @@ public partial class VirtualMachine
                 var symbol = _moduleRegistry.GetModuleSymbol(moduleName, symbolName);
 
                 // 使用别名添加到全局变量
-                _globals[alias] = symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
-                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
+                SetGlobalValue(alias, symbol ?? throw new ImportError(GetPosition(instruction), moduleName,
+                    $"模块 '{moduleName}' 中未找到符号 '{symbolName}'"));
             }
                 break;
 
@@ -67,7 +67,7 @@ public partial class VirtualMachine
                 foreach (var symbolName in module.GetExportedSymbolNames())
                 {
                     var symbol = module.GetSymbol(symbolName);
-                    _globals[symbolName] = symbol;
+                    SetGlobalValue(symbolName, symbol);
                 }
             }
                 break;

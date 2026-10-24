@@ -16,7 +16,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Equals(a, b));
+                _stack.Push(VmBoxed.Bool(Equals(a, b)));
             }
                 break;
 
@@ -24,7 +24,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(!Equals(a, b));
+                _stack.Push(VmBoxed.Bool(!Equals(a, b)));
             }
                 break;
 
@@ -32,7 +32,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Greater(a, b));
+                _stack.Push(VmBoxed.Bool(Greater(a, b)));
             }
                 break;
 
@@ -40,7 +40,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(Less(a, b));
+                _stack.Push(VmBoxed.Bool(Less(a, b)));
             }
                 break;
 
@@ -48,7 +48,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(GreaterEqual(a, b));
+                _stack.Push(VmBoxed.Bool(GreaterEqual(a, b)));
             }
                 break;
 
@@ -56,7 +56,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(LessEqual(a, b));
+                _stack.Push(VmBoxed.Bool(LessEqual(a, b)));
             }
                 break;
 

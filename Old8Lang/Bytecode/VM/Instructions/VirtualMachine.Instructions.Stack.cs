@@ -71,7 +71,20 @@ public partial class VirtualMachine
             case OpCode.LoadGlobal:
             {
                 string varName = (string)instruction.Operand!;
-                _stack.Push(ResolveGlobalValue(frame, varName, instruction));
+                if (frame.ClosureEnvironment != null)
+                {
+                    _stack.Push(ResolveGlobalValue(frame, varName, instruction));
+                    break;
+                }
+
+                var slot = instruction.CachedGlobalSlot;
+                if (slot == null || slot.Owner != _globalsOwnerId)
+                {
+                    slot = ResolveGlobalSlot(varName, instruction);
+                    instruction.CachedGlobalSlot = slot;
+                }
+
+                _stack.Push(slot.Value);
             }
                 break;
 
@@ -80,10 +93,20 @@ public partial class VirtualMachine
                 string varName = (string)instruction.Operand!;
                 var globalValue = _stack.Pop();
                 // 被闭包捕获的名字写进共享单元；否则写全局表
-                if (frame.ClosureEnvironment == null ||
-                    !frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                if (frame.ClosureEnvironment == null)
                 {
-                    _globals[varName] = globalValue;
+                    var slot = instruction.CachedGlobalSlot;
+                    if (slot == null || slot.Owner != _globalsOwnerId)
+                    {
+                        slot = GetOrCreateGlobalSlot(varName);
+                        instruction.CachedGlobalSlot = slot;
+                    }
+
+                    slot.Value = globalValue;
+                }
+                else if (!frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                {
+                    SetGlobalValue(varName, globalValue);
                 }
             }
                 break;
@@ -101,11 +124,11 @@ public partial class VirtualMachine
                 break;
 
             case OpCode.LoadTrue:
-                _stack.Push(true);
+                _stack.Push(VmBoxed.True);
                 break;
 
             case OpCode.LoadFalse:
-                _stack.Push(false);
+                _stack.Push(VmBoxed.False);
                 break;
 
             case OpCode.Swap:

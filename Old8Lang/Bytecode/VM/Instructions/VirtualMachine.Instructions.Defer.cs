@@ -62,7 +62,7 @@ public partial class VirtualMachine
                 var funcName = (string)_bytecodeFile.ConstantPool.GetConstant(funcNameIndex);
 
                 // 从全局变量中获取 extern 函数
-                if (!_globals.TryGetValue(funcName, out var funcObj) || funcObj is not ExternFunctionWrapper externFunc)
+                if (!TryGetGlobalValue(funcName, out var funcObj) || funcObj is not ExternFunctionWrapper externFunc)
                 {
                     throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
@@ -178,7 +178,7 @@ public partial class VirtualMachine
                     if (methodInfo == null) throw new MethodNotFoundError(GetPosition(instruction), methodName);
 
                     var func = new FuncLangValue(registerName, methodInfo);
-                    _globals[registerName] = func;
+                    SetGlobalValue(registerName, func);
                 }
                 else if (mode == 1) // All Methods
                 {
@@ -192,7 +192,7 @@ public partial class VirtualMachine
                         // Old8Lang 目前对重载支持有限，但在 Native 绑定中通常支持。
                         // 这里简单覆盖或忽略。
                         var func = new FuncLangValue(method.Name, method);
-                        _globals[method.Name] = func;
+                        SetGlobalValue(method.Name, func);
                     }
                 }
                 else if (mode == 2) // Class Import
@@ -202,7 +202,7 @@ public partial class VirtualMachine
 
                     // 使用 NativeStaticAny 包装类型，支持静态成员访问
                     var nativeClass = new NativeStaticAny(registerName, type);
-                    _globals[registerName] = nativeClass;
+                    SetGlobalValue(registerName, nativeClass);
                 }
             }
                 break;
