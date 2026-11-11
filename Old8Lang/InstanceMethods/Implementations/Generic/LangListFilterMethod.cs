@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Filter(predicate) - 过滤列表元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListFilterMethod : BaseLangListMethod
+public class LangListFilterMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Filter", "filter", "Where", "where"];
     public override string[] ParameterNames => ["predicate"];
@@ -48,13 +49,42 @@ public class LangListFilterMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldnull);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Call, typeof(LangListFilterMethod).GetMethod(nameof(FilterHelper))!);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return typeof(List<object?>);
+    }
+
+    /// <summary>
+    /// IL 模式下过滤原生集合并返回原生列表。
+    /// </summary>
+    public static List<object?> FilterHelper(LangValueType instance, LangValueType predicate)
+    {
+        if (instance is not ILangList list)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        if (predicate is not FuncLangValue function)
+        {
+            throw new ArgumentException("Filter 方法的参数必须是函数");
+        }
+
+        var manager = new VariateManager();
+        var result = new List<object?>();
+        foreach (var item in list.GetItems())
+        {
+            if (function.Run(manager, [item]) is BoolLangValue { Value: true })
+            {
+                result.Add(IlValueBridge.Unwrap(item));
+            }
+        }
+
+        return result;
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

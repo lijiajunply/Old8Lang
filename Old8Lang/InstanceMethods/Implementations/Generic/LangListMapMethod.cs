@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Map(mapper) - 映射列表元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListMapMethod : BaseLangListMethod
+public class LangListMapMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Map", "map", "Select", "select"];
     public override string[] ParameterNames => ["mapper"];
@@ -44,13 +45,35 @@ public class LangListMapMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldnull);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Call, typeof(LangListMapMethod).GetMethod(nameof(MapHelper))!);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return typeof(List<object?>);
+    }
+
+    /// <summary>
+    /// IL 模式下映射原生集合并返回原生列表。
+    /// </summary>
+    public static List<object?> MapHelper(LangValueType instance, LangValueType mapper)
+    {
+        if (instance is not ILangList list)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        if (mapper is not FuncLangValue function)
+        {
+            throw new ArgumentException("Map 方法的参数必须是函数");
+        }
+
+        var manager = new VariateManager();
+        return list.GetItems()
+            .Select(item => IlValueBridge.Unwrap(function.Run(manager, [item])))
+            .ToList();
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
