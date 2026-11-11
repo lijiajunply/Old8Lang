@@ -10,12 +10,14 @@ public partial class LinqExpression
 {
     private bool CanGenerateStreamingQuery() =>
         Continuation is null && TerminationClause is SelectClause &&
-        BodyClauses.All(clause => clause is LetClause or WhereClause);
+        BodyClauses.Take(BodyClauses.LastOrDefault() is OrderByClause ? BodyClauses.Count - 1 : BodyClauses.Count)
+            .All(clause => clause is LetClause or WhereClause);
 
     // 顺序执行同一行的子句，让 let 值只属于当前范围变量。
     private void GenerateStreamingQuery(ILGenerator il, LocalManager local)
     {
         var select = (SelectClause)TerminationClause;
+        var orderBy = BodyClauses.LastOrDefault() as OrderByClause;
         var names = BodyClauses.OfType<LetClause>().Select(clause => clause.Variable)
             .Prepend(FromClause.RangeVariable).Distinct().ToArray();
         var previous = names.ToDictionary(name => name, name => local.GetLocalVar(name));
@@ -47,6 +49,13 @@ public partial class LinqExpression
             var result = il.DeclareLocal(typeof(List<object>));
             il.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
             il.Emit(OpCodes.Stloc, result);
+            LocalBuilder? rows = null;
+            if (orderBy is not null)
+            {
+                rows = il.DeclareLocal(typeof(List<LinqOrderedRow>));
+                il.Emit(OpCodes.Newobj, typeof(List<LinqOrderedRow>).GetConstructor(Type.EmptyTypes)!);
+                il.Emit(OpCodes.Stloc, rows);
+            }
             var range = il.DeclareLocal(typeof(object));
             Bind(FromClause.RangeVariable, range);
 
@@ -85,18 +94,106 @@ public partial class LinqExpression
                 }
             }
 
-            il.Emit(OpCodes.Ldloc, result);
-            select.Projection.LoadIlValue(il, local);
-            var projectionType = select.Projection.OutputType(local) ?? typeof(object);
-            if (projectionType.IsValueType)
+            void EmitProjection()
             {
-                il.Emit(OpCodes.Box, projectionType);
+                il.Emit(OpCodes.Ldloc, result);
+                select.Projection.LoadIlValue(il, local);
+                var projectionType = select.Projection.OutputType(local) ?? typeof(object);
+                if (projectionType.IsValueType)
+                {
+                    il.Emit(OpCodes.Box, projectionType);
+                }
+                il.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.Unwrap))!);
+                il.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod(nameof(List<object>.Add))!);
             }
-            il.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.Unwrap))!);
-            il.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod(nameof(List<object>.Add))!);
+
+            LocalBuilder[]? captured = null;
+            if (orderBy is null)
+            {
+                EmitProjection();
+            }
+            else
+            {
+                captured = names.Select(name => local.GetLocalVar(name)!).ToArray();
+                il.Emit(OpCodes.Ldloc, rows!);
+                EmitLocalArray(il, captured);
+                il.Emit(OpCodes.Ldc_I4, orderBy.Orderings.Count);
+                il.Emit(OpCodes.Newarr, typeof(object));
+                for (var i = 0; i < orderBy.Orderings.Count; i++)
+                {
+                    il.Emit(OpCodes.Dup);
+                    il.Emit(OpCodes.Ldc_I4, i);
+                    var expression = orderBy.Orderings[i].KeyExpression;
+                    expression.LoadIlValue(il, local);
+                    var type = expression.OutputType(local) ?? typeof(object);
+                    if (type.IsValueType)
+                    {
+                        il.Emit(OpCodes.Box, type);
+                    }
+                    il.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.Unwrap))!);
+                    il.Emit(OpCodes.Stelem_Ref);
+                }
+                il.Emit(OpCodes.Newobj, typeof(LinqOrderedRow).GetConstructor([typeof(object[]), typeof(object[])])!);
+                il.Emit(OpCodes.Callvirt, typeof(List<LinqOrderedRow>).GetMethod(nameof(List<LinqOrderedRow>.Add))!);
+            }
             il.MarkLabel(next);
             il.Emit(OpCodes.Br, loop);
             il.MarkLabel(done);
+            if (orderBy is not null)
+            {
+                il.Emit(OpCodes.Ldloc, rows!);
+                il.Emit(OpCodes.Ldc_I4, orderBy.Orderings.Count);
+                il.Emit(OpCodes.Newarr, typeof(bool));
+                for (var i = 0; i < orderBy.Orderings.Count; i++)
+                {
+                    il.Emit(OpCodes.Dup);
+                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.Emit(orderBy.Orderings[i].IsAscending ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+                    il.Emit(OpCodes.Stelem_I1);
+                }
+                il.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.SortRows))!);
+                il.Emit(OpCodes.Stloc, rows!);
+
+                var index = il.DeclareLocal(typeof(int));
+                var row = il.DeclareLocal(typeof(LinqOrderedRow));
+                var sortedLoop = il.DefineLabel();
+                var sortedDone = il.DefineLabel();
+                il.Emit(OpCodes.Ldc_I4_0);
+                il.Emit(OpCodes.Stloc, index);
+                il.MarkLabel(sortedLoop);
+                il.Emit(OpCodes.Ldloc, index);
+                il.Emit(OpCodes.Ldloc, rows!);
+                il.Emit(OpCodes.Callvirt, typeof(List<LinqOrderedRow>).GetProperty(nameof(List<LinqOrderedRow>.Count))!.GetMethod!);
+                il.Emit(OpCodes.Bge, sortedDone);
+                il.Emit(OpCodes.Ldloc, rows!);
+                il.Emit(OpCodes.Ldloc, index);
+                il.Emit(OpCodes.Callvirt, typeof(List<LinqOrderedRow>).GetProperty("Item")!.GetMethod!);
+                il.Emit(OpCodes.Stloc, row);
+                for (var i = 0; i < captured!.Length; i++)
+                {
+                    il.Emit(OpCodes.Ldloc, row);
+                    il.Emit(OpCodes.Callvirt, typeof(LinqOrderedRow).GetProperty(nameof(LinqOrderedRow.Values))!.GetMethod!);
+                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.Emit(OpCodes.Ldelem_Ref);
+                    var type = captured[i].LocalType;
+                    if (type.IsValueType)
+                    {
+                        il.Emit(OpCodes.Unbox_Any, type);
+                    }
+                    else if (type != typeof(object))
+                    {
+                        il.Emit(OpCodes.Castclass, type);
+                    }
+                    il.Emit(OpCodes.Stloc, captured[i]);
+                }
+                EmitProjection();
+                il.Emit(OpCodes.Ldloc, index);
+                il.Emit(OpCodes.Ldc_I4_1);
+                il.Emit(OpCodes.Add);
+                il.Emit(OpCodes.Stloc, index);
+                il.Emit(OpCodes.Br, sortedLoop);
+                il.MarkLabel(sortedDone);
+            }
             il.Emit(OpCodes.Ldloc, result);
         }
         finally
@@ -122,11 +219,55 @@ public partial class LinqExpression
             }
         }
     }
+
+    private static void EmitLocalArray(ILGenerator il, LocalBuilder[] locals)
+    {
+        il.Emit(OpCodes.Ldc_I4, locals.Length);
+        il.Emit(OpCodes.Newarr, typeof(object));
+        for (var i = 0; i < locals.Length; i++)
+        {
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Ldc_I4, i);
+            il.Emit(OpCodes.Ldloc, locals[i]);
+            if (locals[i].LocalType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, locals[i].LocalType);
+            }
+            il.Emit(OpCodes.Stelem_Ref);
+        }
+    }
+}
+
+/// <summary>查询排序时保存当前行的变量和排序键。</summary>
+/// <param name="values">当前行的变量值。</param>
+/// <param name="keys">当前行的排序键。</param>
+public sealed class LinqOrderedRow(object?[] values, object?[] keys)
+{
+    /// <summary>当前行的范围变量和 let 变量。</summary>
+    public object?[] Values { get; } = values;
+    /// <summary>当前行的排序键。</summary>
+    public object?[] Keys { get; } = keys;
 }
 
 /// <summary>IL 查询使用的原生集合和值转换。</summary>
 public static class LinqStreamingHelper
 {
+    /// <summary>按各排序键稳定排序查询行。</summary>
+    /// <param name="rows">待排序的查询行。</param>
+    /// <param name="ascending">每个排序键的升序标记。</param>
+    /// <returns>按排序键排列的查询行。</returns>
+    public static List<LinqOrderedRow> SortRows(List<LinqOrderedRow> rows, bool[] ascending)
+    {
+        IOrderedEnumerable<LinqOrderedRow>? sorted = null;
+        for (var i = 0; i < ascending.Length; i++)
+        {
+            var key = i;
+            sorted = sorted is null
+                ? ascending[i] ? rows.OrderBy(row => row.Keys[key]) : rows.OrderByDescending(row => row.Keys[key])
+                : ascending[i] ? sorted.ThenBy(row => row.Keys[key]) : sorted.ThenByDescending(row => row.Keys[key]);
+        }
+        return sorted?.ToList() ?? rows;
+    }
     /// <summary>获取查询数据源。</summary>
     public static IEnumerable GetEnumerable(object? source) => source switch
     {

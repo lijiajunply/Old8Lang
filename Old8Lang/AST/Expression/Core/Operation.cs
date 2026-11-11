@@ -915,6 +915,11 @@ public partial class Operation(
                     return typeof(bool);
                 case LangTokenType.Minus:
                     Right?.LoadIlValue(ilGenerator, local);
+                    if (rightType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        rightType = typeof(int);
+                    }
                     ilGenerator.Emit(OpCodes.Neg);
                     return rightType ?? throw new InvalidOperationError(this, "右操作数不能为空");
 

@@ -228,6 +228,11 @@ public class LinqLetOrderByTests
         var code = @"
             numbers <- [3, 1, 4, 2]
             result <- from x in numbers let neg <- -x orderby neg select -neg
+            Assert.Equal(4, result.Count())
+            Assert.Equal(4, result[0])
+            Assert.Equal(3, result[1])
+            Assert.Equal(2, result[2])
+            Assert.Equal(1, result[3])
         ";
         var interpreter = new LangInterpreter();
 
@@ -241,5 +246,38 @@ public class LinqLetOrderByTests
         // 执行编译后的代码 - 验证执行不抛出异常
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public void LinqQuery_OrderByMultipleKeys_PreservesRowVariables()
+    {
+        const string code = @"
+            numbers <- [1, 4, 3, 2, 5]
+            result <- from x in numbers let parity <- x % 2 where x > 1 orderby parity ascending, x descending select x + parity
+            Assert.Equal(4, result.Count())
+            Assert.Equal(4, result[0])
+            Assert.Equal(2, result[1])
+            Assert.Equal(6, result[2])
+            Assert.Equal(4, result[3])
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
+    }
+
+    [Fact]
+    public void LinqQuery_OrderByEqualKeys_PreservesInputOrder()
+    {
+        const string code = @"
+            values <- [3, 1, 5, 2]
+            result <- from x in values orderby x % 2 select x
+            Assert.Equal(2, result[0])
+            Assert.Equal(3, result[1])
+            Assert.Equal(1, result[2])
+            Assert.Equal(5, result[3])
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
     }
 }
