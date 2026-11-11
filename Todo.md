@@ -77,13 +77,13 @@
 - [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
   `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
 
-- [ ] **3 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
+- [ ] **2 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
   - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
     `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
   - `Compiler.Linq`：`LinqCompilerHelper.ConvertFromLangValue(LangValueType)` 收到原生值 →
     `AccessViolationException`（`LinqLetOrderByTests.LinqQuery_LetSelectBoth_...`，基线同样崩溃）。
-  - `Compiler.Statements.SelectStatementTests.SelectStatement_ReceiveComplexObject`：
-    `select` + `ChannelSend` + 字典 → 段错误（基线同样崩溃）。
+
+- [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 [测试报告](Reports/2026-11-11-08-49-IL-select回归测试.md)。
 
 历史记录还提及 `TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 曾发生并行抖动，单独运行及后续复跑通过；必要时重新核查。
 
@@ -108,6 +108,7 @@
 ## 测试与工程问题
 
 - [ ] **IL 类测试中的继承语法失败**：2026-11-11 运行 `Compiler.Classes` 时，多个 `InheritanceTests` 在 `class Derived : Base` 附近解析失败，错误信息包含格式字符串解析错误；测试主机随后因泛型类栈溢出中止，需单独复核。
+- [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；

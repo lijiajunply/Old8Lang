@@ -132,7 +132,8 @@ select {
     default -> {
         result <- 2
     }
-}";
+}
+Assert.Equal(2, result)";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -168,7 +169,8 @@ select {
     default -> {
         result <- 0
     }
-}";
+}
+Assert.Equal(1, result)";
         var interpreter = new LangInterpreter();
 
         // Act

@@ -300,11 +300,11 @@ public partial class SelectStatement(
                 ilGenerator.Emit(OpCodes.Stloc, receiveResultLocal);
 
                 // 检查 receiveResult.Success
-                ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
+                ilGenerator.Emit(OpCodes.Ldloca, receiveResultLocal);
                 var successProperty = typeof(ChannelReceiveResult).GetProperty(nameof(ChannelReceiveResult.Success));
                 if (successProperty?.GetMethod != null)
                 {
-                    ilGenerator.Emit(OpCodes.Callvirt, successProperty.GetMethod);
+                    ilGenerator.Emit(OpCodes.Call, successProperty.GetMethod);
 
                     // 如果 Success == false，跳过此 case
                     ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
@@ -313,11 +313,11 @@ public partial class SelectStatement(
                     if (selectCase.VariableName is not null)
                     {
                         // 获取 receiveResult.Value
-                        ilGenerator.Emit(OpCodes.Ldloc, receiveResultLocal);
+                        ilGenerator.Emit(OpCodes.Ldloca, receiveResultLocal);
                         var valueProperty =
                             typeof(ChannelReceiveResult).GetProperty(nameof(ChannelReceiveResult.Value));
                         if (valueProperty?.GetMethod != null)
-                            ilGenerator.Emit(OpCodes.Callvirt, valueProperty.GetMethod);
+                            ilGenerator.Emit(OpCodes.Call, valueProperty.GetMethod);
 
                         // 将值转换为 LangValueType
                         var objToValueMethod = typeof(LangValueType).GetMethod(
