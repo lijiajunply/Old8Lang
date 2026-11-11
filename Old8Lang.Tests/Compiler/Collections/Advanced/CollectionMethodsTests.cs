@@ -206,6 +206,26 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListUnion_CompilesForNativeListsAndArrays()
+    {
+        var code = @"
+            left <- {1, 2, 2, 3}
+            right <- {3, 4, 1}
+            array <- [2, 5]
+
+            union <- left.Union(right)
+            mixedUnion <- array.Union(left)
+            Assert.Equal({1, 2, 2, 3, 4}, union)
+            Assert.Equal({2, 5, 1, 3}, mixedUnion)
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
