@@ -247,6 +247,22 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void EmptyDictionaryWithAnnotation_CompilesAndExecutes()
+    {
+        var code = @"
+            empty:dict <- {}
+            Assert.Equal(0, empty.Keys().Count())
+            Assert.Equal(0, empty.Values().Count())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

@@ -552,8 +552,20 @@ public partial class SetStatement : OldStatement
                 return;
             }
 
-            // 普通变量赋值: name <- value
-            Value.SetValueToIl(ilGenerator, local, Id.IdName);
+            // 空花括号字面量在语法层默认是列表；显式 dict 注解应当消除该歧义，
+            // 在 IL 中生成真正的空 Dictionary，才能继续调用 Keys/Values 等字典方法。
+            if (Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
+                Id.AssumptionType is not null &&
+                (Id.AssumptionType.Equals("dict", StringComparison.OrdinalIgnoreCase) ||
+                 Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
+            {
+                new DictionaryLangValue(position: Value.Position).SetValueToIl(ilGenerator, local, Id.IdName);
+            }
+            else
+            {
+                // 普通变量赋值: name <- value
+                Value.SetValueToIl(ilGenerator, local, Id.IdName);
+            }
         }
         else if (_leftExpression is not null)
         {

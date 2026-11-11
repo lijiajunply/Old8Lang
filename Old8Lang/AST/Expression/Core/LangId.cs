@@ -412,6 +412,7 @@ public partial class LangId(
                 "void" => typeof(void),
                 "list" => typeof(List<object>),
                 "array" => typeof(object[]),
+                "dict" => typeof(Dictionary<object, object>),
                 "dictionary" => typeof(Dictionary<object, object>),
                 "tuple" => typeof(ValueTuple<object, object>),
                 "cancellationtoken" => typeof(CancellationToken),
