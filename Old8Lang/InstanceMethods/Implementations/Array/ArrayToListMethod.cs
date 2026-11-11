@@ -11,7 +11,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.ToList() - 将数组转换为列表
 /// </summary>
-public class ArrayToListMethod : BaseInstanceMethod
+public class ArrayToListMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ToList", "toList", "tolist"];
     public override Type TargetType => typeof(ArrayLangValue);

@@ -185,6 +185,27 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListRepresentationConversions_CompileForNativeListsAndArrays()
+    {
+        var code = @"
+            values <- {10, 20, 30}
+            array <- [4, 5, 6]
+            asArray <- values.ToArray()
+            asList <- array.ToList()
+
+            Assert.Equal(3, asArray.Length)
+            Assert.Equal(20, asArray.ElementAt(1))
+            Assert.Equal(3, asList.Count())
+            Assert.Equal(5, asList.ElementAt(1))
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

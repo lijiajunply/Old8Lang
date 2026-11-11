@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -11,7 +12,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// <summary>
 /// ILangList.ToList() - 转换为列表类型
 /// </summary>
-public class LangListToListMethod : BaseLangListMethod
+public class LangListToListMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ToList", "toList"];
     public override string[]? ParameterNames => null;
@@ -36,11 +37,18 @@ public class LangListToListMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListToListMethod).GetMethod(nameof(ToListHelper),
+        var helperMethod = typeof(LangListToListMethod).GetMethod(nameof(ToListNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static List<object?> ToListNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return ToListHelper(langList).GetItems().Select(IlValueBridge.Unwrap).ToList();
     }
 
     public static ListLangValue ToListHelper(ILangList langList)
@@ -56,7 +64,7 @@ public class LangListToListMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return typeof(List<object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

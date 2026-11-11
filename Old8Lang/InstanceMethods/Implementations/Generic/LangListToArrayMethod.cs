@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -11,7 +12,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// <summary>
 /// ILangList.ToArray() - 转换为数组类型
 /// </summary>
-public class LangListToArrayMethod : BaseLangListMethod
+public class LangListToArrayMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ToArray", "toArray"];
     public override string[]? ParameterNames => null;
@@ -36,11 +37,18 @@ public class LangListToArrayMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListToArrayMethod).GetMethod(nameof(ToArrayHelper),
+        var helperMethod = typeof(LangListToArrayMethod).GetMethod(nameof(ToArrayNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static object?[] ToArrayNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return ToArrayHelper(langList).GetItems().Select(IlValueBridge.Unwrap).ToArray();
     }
 
     public static ArrayLangValue ToArrayHelper(ILangList langList)
@@ -56,7 +64,7 @@ public class LangListToArrayMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
