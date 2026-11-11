@@ -29,13 +29,18 @@ public class StringLengthMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载字符串实例
-        instance.LoadIlValue(ilGenerator, local);
-
-        // 调用辅助方法
-        var helperMethod = typeof(StringLengthMethod).GetMethod(nameof(LengthHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        var instanceType = instance.OutputType(local);
+        if (instanceType == typeof(string))
+        {
+            instance.LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Castclass, typeof(StringLangValue));
+            ilGenerator.Emit(OpCodes.Callvirt, typeof(StringLangValue).GetProperty(nameof(StringLangValue.Value))!.GetMethod!);
+        }
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(string).GetProperty(nameof(string.Length))!.GetMethod!);
     }
 
     /// <summary>
@@ -48,7 +53,7 @@ public class StringLengthMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(IntLangValue);
+        return typeof(int);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

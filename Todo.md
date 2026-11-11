@@ -98,7 +98,8 @@
 
 ## 测试与工程问题
 
-- [ ] **IL 字符串 `Length()` 可能导致进程崩溃**：2026-11-11 运行 `TryCatchWithVariableAccess` 时，原生字符串传入 `StringLengthMethod.LengthHelper(StringLangValue)` 触发 `AccessViolationException`；需隔离修复并复测，见 [测试报告](Reports/2026-11-11-12-35-IL异常字符串测试.md)。
+- [x] **IL 字符串 `Length()` 可能导致进程崩溃**：原生字符串现在使用 CLR 字符串长度，返回原生整数；原崩溃用例及别名、链式调用回归通过，见 [测试报告](Reports/2026-11-11-12-37-IL字符串长度测试.md)。
+- [ ] **IL 嵌套异常测试的包含断言待复核**：`TryCatchTests.NestedTryCatch_CompilesAndExecutesCorrectly` 使用 `Assert.Contains(片段, result)`，与 `AssertHelper.AssertContains(text, substring)` 的参数顺序相反，导致包含关系失败；见 [测试报告](Reports/2026-11-11-12-37-IL字符串长度测试.md)。
 
 - [ ] **IL 类测试中的继承语法失败**：多个 `InheritanceTests` 使用 `class Derived : Base`，而当前语法使用 `extends`；错误提示中的格式字符串异常已修复，需逐项核实旧测试的语法与预期，见 [测试报告](Reports/2026-11-11-10-57-括号错误报告测试.md)。
 - [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。
