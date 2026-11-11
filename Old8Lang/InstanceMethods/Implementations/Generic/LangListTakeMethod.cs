@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Take(count) - 取前 N 个元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListTakeMethod : BaseLangListMethod
+public class LangListTakeMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Take", "take"];
     public override string[] ParameterNames => ["count"];
@@ -37,31 +38,41 @@ public class LangListTakeMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
-        var helperMethod = typeof(LangListTakeMethod).GetMethod(nameof(TakeHelper),
+        var helperName = TargetType == typeof(ArrayLangValue) ? nameof(TakeArrayHelper) : nameof(TakeHelper);
+        var helperMethod = typeof(LangListTakeMethod).GetMethod(helperName,
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ListLangValue TakeHelper(ILangList langList, int count)
+    /// <summary>IL 模式的辅助方法：取桥接后集合的前 N 项并返回原生列表。</summary>
+    public static List<object?> TakeHelper(LangValueType instance, LangValueType count)
     {
-        var items = langList.GetItems().Take(count).ToList();
-        return new ListLangValue(items);
+        if (instance is not ILangList langList || count is not IntLangValue integer)
+        {
+            throw new ArgumentException("Take 方法需要集合和整数参数");
+        }
+
+        return langList.GetItems().Take(integer.Value).Select(IlValueBridge.Unwrap).ToList();
     }
+
+    /// <summary>IL 模式下数组 Take 并保持数组返回表示。</summary>
+    public static object?[] TakeArrayHelper(LangValueType instance, LangValueType count) =>
+        TakeHelper(instance, count).ToArray();
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return TargetType == typeof(ArrayLangValue) ? typeof(object?[]) : typeof(List<object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is ILangList langList && arguments[0] is int count)
         {
-            var items = langList.GetItems().Take(count).ToList();
-            return new ListLangValue(items);
+            return new ListLangValue(TakeHelper((LangValueType)langList, new IntLangValue(count))
+                .Select(IlValueBridge.Wrap).ToList());
         }
 
         if (instance is List<object?> list && arguments[0] is int cnt)

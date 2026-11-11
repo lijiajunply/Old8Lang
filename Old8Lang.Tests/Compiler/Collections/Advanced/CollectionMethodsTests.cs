@@ -300,6 +300,23 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void CollectionTake_CompilesAndExecutesForListsAndArrays()
+    {
+        var code = @"
+            listValues <- {1, 2, 3, 4}
+            arrayValues <- [1, 2, 3, 4]
+            Assert.Equal({1, 2}, listValues.Take(2))
+            Assert.Equal([1, 2, 3], arrayValues.Take(3))
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
