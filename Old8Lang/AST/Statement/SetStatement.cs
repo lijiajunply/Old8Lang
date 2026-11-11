@@ -484,7 +484,46 @@ public partial class SetStatement : OldStatement
     /// <exception cref="InvalidOperationError">当尝试对字符串进行索引赋值时抛出</exception>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 1. 处理元组解构赋值 (a, b) <- (1, 2)
+        if (_leftExpression is TupleLangValue tuplePattern)
+        {
+            var tupleType = Value.OutputType(local);
+            if (tupleType is null || !tupleType.IsValueType ||
+                !typeof(System.Runtime.CompilerServices.ITuple).IsAssignableFrom(tupleType))
+                throw new InvalidOperationError(this, "IL 元组解构赋值右侧必须是元组");
+
+            Value.LoadIlValue(ilGenerator, local);
+            var tupleLocal = ilGenerator.DeclareLocal(tupleType);
+            ilGenerator.Emit(OpCodes.Stloc, tupleLocal);
+
+            for (var i = 0; i < tuplePattern.Elements.Count; i++)
+            {
+                if (tuplePattern.Elements[i] is not LangId id)
+                    throw new InvalidOperationError(this, "元组解构赋值只支持变量名");
+
+                var currentType = tupleType;
+                var index = i;
+                ilGenerator.Emit(OpCodes.Ldloca, tupleLocal);
+                while (index >= 7)
+                {
+                    var rest = currentType.GetField("Rest") ??
+                               throw new InvalidOperationError(this, $"元组解构赋值索引 {i} 超出范围");
+                    ilGenerator.Emit(OpCodes.Ldflda, rest);
+                    currentType = rest.FieldType;
+                    index -= 7;
+                }
+
+                var field = currentType.GetField($"Item{index + 1}") ??
+                            throw new InvalidOperationError(this, $"元组解构赋值索引 {i} 超出范围");
+                ilGenerator.Emit(OpCodes.Ldfld, field);
+                var target = local.GetOrCreateLocalVar(ilGenerator, id.IdName, field.FieldType);
+                if (target.LocalType == typeof(object) && field.FieldType.IsValueType)
+                    ilGenerator.Emit(OpCodes.Box, field.FieldType);
+                else if (target.LocalType != field.FieldType && !target.LocalType.IsAssignableFrom(field.FieldType))
+                    throw new InvalidOperationError(this, $"无法将 {field.FieldType.Name} 赋给 {id.IdName}");
+                ilGenerator.Emit(OpCodes.Stloc, target);
+            }
+            return;
+        }
 
         if (Id is not null && !string.IsNullOrEmpty(Id.IdName))
         {
