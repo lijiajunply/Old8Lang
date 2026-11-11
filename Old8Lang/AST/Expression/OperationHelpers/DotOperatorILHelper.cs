@@ -858,6 +858,28 @@ public static class DotOperatorILHelper
             }
         }
 
+        // 字典索引后的集合静态类型为 object；数组本身没有 Old8Lang 的 Reduce CLR 方法。
+        // 在运行期重新桥接为语言值，复用已验证的 Reduce helper。兼容历史的
+        // Reduce(initialValue, reducer) 调用形式，同时保留 API 文档的 reducer-first 形式。
+        if (methodName.Equals("Reduce", StringComparison.OrdinalIgnoreCase) && arguments.Length == 2 &&
+            receiver is IEnumerable)
+        {
+            var collection = IlValueBridge.Wrap(receiver);
+            var first = IlValueBridge.Wrap(arguments[0]);
+            var second = IlValueBridge.Wrap(arguments[1]);
+            if (first is FuncLangValue)
+            {
+                return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
+                    .ReduceWithInitialHelper(collection, first, second);
+            }
+
+            if (second is FuncLangValue)
+            {
+                return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
+                    .ReduceWithInitialHelper(collection, second, first);
+            }
+        }
+
         var method = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(candidate => candidate.Name == methodName && ParametersMatch(candidate.GetParameters(), arguments))
             .OrderBy(candidate => candidate.GetParameters().Length)
