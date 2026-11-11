@@ -68,6 +68,22 @@ result <- 42";
 
     #region Thread.CurrentThread 测试
 
+    [Fact]
+    public void Run_CurrentThreadPropertyAndCall_ReturnExecutingThread()
+    {
+        const string code = @"
+expected <- GetCurrentThreadId()
+property <- Thread.CurrentThread
+called <- Thread.CurrentThread()
+Assert.Equal(expected, property.ManagedThreadId)
+Assert.Equal(expected, called.ManagedThreadId)
+Assert.Equal(expected, Thread.CurrentThread.ManagedThreadId)
+Assert.Equal(expected, Thread.CurrentThread().ManagedThreadId)";
+        var interpreter = new LangInterpreter();
+        var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+        action();
+    }
+
     /// <summary>
     /// 测试获取当前线程
     /// </summary>

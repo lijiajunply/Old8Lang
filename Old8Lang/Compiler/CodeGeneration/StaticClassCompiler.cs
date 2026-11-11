@@ -536,8 +536,16 @@ public static class StaticClassCompiler
         return methodName switch
         {
             "Sleep" => CompileThreadSleep(instance, ilGenerator, local, out returnType),
+            "CurrentThread" when instance.Ids.Count == 0 => CompileCurrentThread(ilGenerator, out returnType),
             _ => false
         };
+    }
+
+    private static bool CompileCurrentThread(ILGenerator ilGenerator, out Type? returnType)
+    {
+        returnType = typeof(Thread);
+        ilGenerator.Emit(OpCodes.Call, typeof(Thread).GetProperty(nameof(Thread.CurrentThread))!.GetMethod!);
+        return true;
     }
 
     /// <summary>

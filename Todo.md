@@ -46,7 +46,8 @@
   反而支持。属于跨模式语义分歧，需统一（建议以数组解构为准，或两者都支持）。
 
 - [x] **解释器 `Thread.CurrentThread` 属性访问**：裸属性和无参调用现均返回执行中的线程；同时修正了无参调用原先包装新建线程的问题。见 [测试报告](Reports/2026-11-11-12-42-当前线程属性测试.md)。
-- [ ] **IL `Thread.CurrentThread()` 不受支持**：2026-11-11 定向测试报静态类方法不支持，与原模式矩阵的完整支持标记不符；裸属性及其他 Thread API 也需复核。
+- [x] **IL `Thread.CurrentThread` 属性与调用**：两种形式均返回实际执行线程，并支持继续访问其属性。见 [测试报告](Reports/2026-11-11-13-33-IL当前线程测试.md)。
+- [ ] **IL 其他 Thread API**：仍需逐项复核。
 
 - [ ] **排查返回自身的 LangValue 类型**：`ThreadLangValue.GetValue()`
   返回 `this`，而基类 `ToString()` 走 `GetValue()?.ToString()`，原先任何

@@ -704,6 +704,10 @@ public partial class Operation(
         var isThisField = Opera == LangTokenType.Dot &&
                           (Left is LangId { IdName: "this" } || Left is ThisExpression) && Right is LangId;
         if (Type is not null && !isThisField) return Type;
+        if (Opera == LangTokenType.Dot && Left is LangId { IdName: "Thread" } &&
+            (Right is LangId { IdName: "CurrentThread" } ||
+             Right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
+            return typeof(Thread);
         // 直接返回类型信息，不创建临时方法
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);

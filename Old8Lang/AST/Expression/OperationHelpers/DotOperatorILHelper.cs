@@ -48,6 +48,12 @@ public static class DotOperatorILHelper
         Type? rightType,
         Operation operation)
     {
+        if (left is LangId { IdName: "Thread" } && right is LangId { IdName: "CurrentThread" })
+        {
+            ilGenerator.Emit(OpCodes.Call, typeof(Thread).GetProperty(nameof(Thread.CurrentThread))!.GetMethod!);
+            return typeof(Thread);
+        }
+
         // 1. 处理 this.member 访问（类环境内）
         // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
         if (local.InClassEnv is not null && (left is LangId { IdName: "this" } || left is ThisExpression))

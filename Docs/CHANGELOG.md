@@ -22,7 +22,7 @@
 - IL 模式的 `Print` / `PrintLine` 会输出全部参数，布尔值和集合使用语言显示格式。
 - IL 模式中捕获的异常可调用 `ToStr()` 查看错误信息。
 - IL 模式的字符串 `Length()` / `Count()` 返回整数并可继续参与表达式。
-- 解释器支持通过 `Thread.CurrentThread` 和 `Thread.CurrentThread()` 获取实际执行线程。
+- 解释器和 IL 模式支持通过 `Thread.CurrentThread` 和 `Thread.CurrentThread()` 获取实际执行线程。
 
 ---
 
