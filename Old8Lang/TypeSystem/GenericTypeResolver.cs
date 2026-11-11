@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using Old8Lang.Compiler.Specialization;
 
 namespace Old8Lang.TypeSystem;
 
@@ -43,6 +44,25 @@ public class GenericTypeResolver(
                 return typeof(object[]);
             case "dict":
                 return typeof(Dictionary<object, object>);
+        }
+
+        // 自定义泛型类型保留实际类型参数，并复用正在生成的特化。
+        if (genericStart > 0 && loweredTypeName.EndsWith('>') &&
+            local.GenericClasses.TryGetValue(loweredBase, out var template) &&
+            template.GenericParameters is not null)
+        {
+            var arguments = SplitGenericArguments(loweredTypeName[(genericStart + 1)..^1]);
+            if (arguments.Count != template.GenericParameters.Count)
+            {
+                throw new ArgumentException($"泛型类型 {loweredBase} 的类型参数数量不匹配");
+            }
+
+            var mapping = new Dictionary<string, Type>();
+            for (var i = 0; i < arguments.Count; i++)
+            {
+                mapping[template.GenericParameters[i].Name] = ResolveType(arguments[i]);
+            }
+            return GenericClassSpecializer.CreateSpecialization(template, mapping, local);
         }
 
         // 否则尝试从类型注解管理器获取
@@ -93,6 +113,25 @@ public class GenericTypeResolver(
             "void" => typeof(void),
             _ => typeof(object)
         };
+    }
+
+    private static List<string> SplitGenericArguments(string text)
+    {
+        var arguments = new List<string>();
+        var start = 0;
+        var depth = 0;
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (text[i] == '<') depth++;
+            else if (text[i] == '>') depth--;
+            else if (text[i] == ',' && depth == 0)
+            {
+                arguments.Add(text[start..i].Trim());
+                start = i + 1;
+            }
+        }
+        arguments.Add(text[start..].Trim());
+        return arguments;
     }
 
     /// <summary>

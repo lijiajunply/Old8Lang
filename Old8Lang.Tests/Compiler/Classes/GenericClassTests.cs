@@ -11,6 +11,35 @@ public class GenericClassTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
+    public void GenericClass_SelfSpecializationReturnsIndependentInstance()
+    {
+        const string code = @"
+            class Box<T> {
+                public value:T
+                func copy() -> Box<T> { return Box<T>(this.value) }
+                func get() -> T { return this.value }
+                func set(value:T) { this.value <- value }
+                func init(value:T) { this.value <- value }
+            }
+            first <- Box<int>(13)
+            copy <- first.copy()
+            text <- Box<string>(""hello"")
+            textCopy <- text.copy()
+            Assert.Equal(13, copy.get())
+            Assert.Equal(""hello"", textCopy.get())
+            copy.set(22)
+            textCopy.set(""world"")
+            Assert.Equal(13, first.get())
+            Assert.Equal(""hello"", text.get())
+            Assert.Equal(22, copy.get())
+            Assert.Equal(""world"", textCopy.get())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
+    }
+
+    [Fact]
     public void BasicGenericClass_CompilesAndExecutesCorrectly()
     {
         var code = @"

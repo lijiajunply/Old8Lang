@@ -257,7 +257,9 @@ public partial class GenericInstanceExpression : LangExpression
         var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
 
         // 创建实例
-        var constructor = specializedType.GetConstructor(Type.EmptyTypes);
+        var constructor = specializedType is TypeBuilder
+            ? local.GenericClassConstructors.GetValueOrDefault(specializedType)
+            : specializedType.GetConstructor(Type.EmptyTypes);
         if (constructor is null)
         {
             throw new InvalidOperationError(this, $"找不到类 {className} 的无参构造函数");
@@ -283,7 +285,9 @@ public partial class GenericInstanceExpression : LangExpression
             // 查找 init 方法
             // 尝试查找任何名为 init 的方法（忽略参数类型精确匹配，依赖运行时/CLR检查或后续改进）
             // 这是一个简单的回退策略，更严谨的做法是实现完整的重载解析
-            var initMethod = specializedType.GetMethod("init", argTypes) ?? specializedType.GetMethod("init");
+            var initMethod = specializedType is TypeBuilder
+                ? local.GenericClassInitializers.GetValueOrDefault(specializedType)
+                : specializedType.GetMethod("init", argTypes) ?? specializedType.GetMethod("init");
 
             if (initMethod is null)
             {
@@ -343,7 +347,8 @@ public partial class GenericInstanceExpression : LangExpression
     private Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters, LocalManager local)
     {
         var typeMapping = new Dictionary<string, Type>();
-        var resolver = new GenericTypeResolver(new Dictionary<string, Type>(), local, local.Interpreter);
+        var resolver = local.CurrentGenericTypeResolver ??
+                       new GenericTypeResolver(new Dictionary<string, Type>(), local, local.Interpreter);
 
         if (genericParameters is not null)
         {

@@ -78,11 +78,8 @@
 - [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
   `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
 
-- [ ] **2 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
-  - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
-    `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
-    基础泛型类中同名参数遮蔽字段和不同特化复用字段类型的问题已修复；递归特化崩溃仍待处理，见 [测试报告](Reports/2026-11-11-10-44-IL泛型类字段遮蔽测试.md)。
-  - `Compiler.Linq`：基础 `let`/`where`/`select` 以及末尾 `orderby` 的路径已修复，历史崩溃用例现已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 [排序测试报告](Reports/2026-11-11-10-37-IL-LINQ排序测试.md)。
+- [x] **泛型类递归特化导致栈溢出**：原崩溃用例及自引用特化回归已通过；完整 `Compiler.Classes` 组正常结束，但仍有普通失败。见 [测试报告](Reports/2026-11-11-10-54-IL泛型递归特化测试.md)。
+- [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 [排序测试报告](Reports/2026-11-11-10-37-IL-LINQ排序测试.md)。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 [测试报告](Reports/2026-11-11-08-49-IL-select回归测试.md)。
 
@@ -135,7 +132,8 @@
   - `TestFiles/SyntaxTests/test_simple_edge_cases.old8`、`test_more_edge_cases.old8`：
     主表达式解析报错（`Colon` / `Assignment`）。
 
-- [ ] **全量测试完成性**：历史记录显示测试运行中止；无注解递归问题已修，但另有三处 IL 崩溃待复核。隔离问题后重新执行全量默认档。
+- [ ] **全量测试完成性**：三处历史崩溃的定向用例已通过；IL LINQ 其他路径及完整默认档仍需复核。
+- [ ] **IL 泛型类测试残留失败**：2026-11-11 `GenericClassTests` 11 项中 6 项失败，涉及泛型约束与继承解析、函数类型参数、嵌套集合元素及静态方法；详见 [测试报告](Reports/2026-11-11-10-54-IL泛型递归特化测试.md)。
 - [ ] **IL 测试覆盖复核**：原清单列出的 54 个具体文件中已有 53 个同名文件；未找到 `StandardLibraryImportTests.cs`。按实际场景核实标准库导入、并发和端到端覆盖，不以文件名作为充分证据。
 
 ## VM 性能

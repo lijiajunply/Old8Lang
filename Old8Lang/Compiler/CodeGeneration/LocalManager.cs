@@ -83,7 +83,13 @@ public class LocalManager
     /// 泛型类特化类型缓存
     /// 键为 "类名$类型参数1_类型参数2"，值为特化后的Type
     /// </summary>
-    public readonly Dictionary<string, Type> GenericClassSpecializations = [];
+    public Dictionary<string, Type> GenericClassSpecializations { get; init; } = [];
+
+    /// <summary>正在生成的泛型类的构造函数。</summary>
+    public Dictionary<Type, ConstructorInfo> GenericClassConstructors { get; init; } = [];
+
+    /// <summary>正在生成的泛型类的初始化方法。</summary>
+    public Dictionary<Type, MethodInfo> GenericClassInitializers { get; init; } = [];
 
     /// <summary>
     /// 当前泛型类型解析器，用于在特化方法生成时解析泛型参数

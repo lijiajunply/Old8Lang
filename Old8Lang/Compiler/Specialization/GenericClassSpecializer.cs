@@ -133,16 +133,27 @@ public static class GenericClassSpecializer
         // 缓存特化类型（提前缓存以支持递归引用）
         local.GenericClassSpecializations[specializationKey] = typeBuilder;
 
-        // 生成类的字段和方法
-        GenerateSpecializedClassMembers(typeTemplate, typeBuilder, resolver, local, typeArguments);
+        try
+        {
+            // 生成类的字段和方法
+            GenerateSpecializedClassMembers(typeTemplate, typeBuilder, resolver, local, typeArguments);
 
-        // 创建类型
-        var specializedType = typeBuilder.CreateType();
-
-        // 更新缓存为最终类型
-        local.GenericClassSpecializations[specializationKey] = specializedType;
-
-        return specializedType;
+            // 创建类型并将缓存更新为最终类型。
+            var specializedType = typeBuilder.CreateType();
+            local.GenericClassSpecializations[specializationKey] = specializedType;
+            return specializedType;
+        }
+        catch
+        {
+            // 失败的 TypeBuilder 不应作为有效特化留在当前编译上下文中。
+            local.GenericClassSpecializations.Remove(specializationKey);
+            throw;
+        }
+        finally
+        {
+            local.GenericClassConstructors.Remove(typeBuilder);
+            local.GenericClassInitializers.Remove(typeBuilder);
+        }
     }
 
     /// <summary>
@@ -179,7 +190,7 @@ public static class GenericClassSpecializer
         }
 
         // 2. 生成构造函数
-        GenerateConstructor(typeBuilder, fieldMap);
+        local.GenericClassConstructors[typeBuilder] = GenerateConstructor(typeBuilder, fieldMap);
 
         // 3. 生成实例方法
         GenerateInstanceMethods(typeTemplate, typeBuilder, resolver, local, typeArguments, fieldMap);
@@ -200,7 +211,7 @@ public static class GenericClassSpecializer
     /// <summary>
     /// 生成构造函数
     /// </summary>
-    private static void GenerateConstructor(TypeBuilder typeBuilder, Dictionary<string, FieldBuilder> fieldMap)
+    private static ConstructorBuilder GenerateConstructor(TypeBuilder typeBuilder, Dictionary<string, FieldBuilder> fieldMap)
     {
         var constructor = typeBuilder.DefineConstructor(
             MethodAttributes.Public,
@@ -225,6 +236,7 @@ public static class GenericClassSpecializer
         }
 
         ctorIL.Emit(OpCodes.Ret);
+        return constructor;
     }
 
     /// <summary>
@@ -238,7 +250,8 @@ public static class GenericClassSpecializer
         Dictionary<string, Type> typeArguments,
         Dictionary<string, FieldBuilder> fieldMap)
     {
-        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        // 初始化方法先定义，递归构造自身或相互引用的特化时才能取得 MethodBuilder。
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates.OrderBy(pair => pair.Key.IdName == "init" ? 0 : 1))
         {
             // 只处理方法
             if (memberExpr is not FuncLangValue funcValue)
@@ -256,6 +269,11 @@ public static class GenericClassSpecializer
                 MethodAttributes.Public,
                 returnType,
                 parameterTypes);
+
+            if (memberId.IdName == "init")
+            {
+                local.GenericClassInitializers[typeBuilder] = methodBuilder;
+            }
 
             var methodIL = methodBuilder.GetILGenerator();
 
@@ -280,6 +298,11 @@ public static class GenericClassSpecializer
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
+            DynamicAssembly = local.DynamicAssembly,
+            DynamicModule = local.DynamicModule,
+            GenericClassSpecializations = local.GenericClassSpecializations,
+            GenericClassConstructors = local.GenericClassConstructors,
+            GenericClassInitializers = local.GenericClassInitializers,
             CurrentGenericTypeResolver = resolver,
             InClassEnv = typeBuilder
         };
