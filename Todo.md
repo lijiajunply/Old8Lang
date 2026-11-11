@@ -93,7 +93,7 @@
 - [x] **IL 嵌套异常测试的包含断言**：调整为 `Assert.Contains(text, substring)` 的实际参数顺序，异常与字符串相关回归 13 项通过；见 [测试报告](Reports/2026-11-11-13-51-IL异常处理回归测试.md)。
 
 - [ ] **IL 类测试中的继承语法失败**：多个 `InheritanceTests` 使用 `class Derived : Base`，而当前语法使用 `extends`；错误提示中的格式字符串异常已修复，需逐项核实旧测试的语法与预期，见 [测试报告](Reports/2026-11-11-10-57-括号错误报告测试.md)。
-- [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。
+- [x] **`SelectStatementTests` 整组测试完成性**：带 10 秒挂起超时复跑 21 项全部通过；先前运行卡住的原因未复现。见 [测试报告](Reports/2026-11-11-13-55-IL-select整组复测.md)。
 - [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 6 项失败；其中方法重载测试的取值顺序有误，修正后定向通过。其余失败涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；见 [测试报告](Reports/2026-11-11-13-49-IL类实例化复测.md)。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
