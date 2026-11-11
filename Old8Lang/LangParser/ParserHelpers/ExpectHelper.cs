@@ -12,10 +12,10 @@ public static class ExpectHelper
     {
         [LangTokenType.RightParen] = "语法错误：缺少右括号 ')'。在 '{0}' 处期望右括号。",
         [LangTokenType.RightBracket] = "语法错误：缺少右方括号 ']'。在 '{0}' 处期望右方括号。",
-        [LangTokenType.RightBrace] = "语法错误：缺少右大括号 '}'。在 '{0}' 处期望右大括号。",
+        [LangTokenType.RightBrace] = "语法错误：缺少右大括号 '}}'。在 '{0}' 处期望右大括号。",
         [LangTokenType.LeftParen] = "语法错误：缺少左括号 '('。在 '{0}' 处期望左括号。",
         [LangTokenType.LeftBracket] = "语法错误：缺少左方括号 '['。在 '{0}' 处期望左方括号。",
-        [LangTokenType.LeftBrace] = "语法错误：缺少左大括号 '{'。在 '{0}' 处期望左大括号。",
+        [LangTokenType.LeftBrace] = "语法错误：缺少左大括号 '{{'。在 '{0}' 处期望左大括号。",
         [LangTokenType.Comma] = "语法错误：缺少逗号 ','。在 '{0}' 处期望逗号。",
         [LangTokenType.Arrow] = "语法错误：缺少箭头 '->'。在 '{0}' 处期望箭头。",
         [LangTokenType.Colon] = "语法错误：缺少冒号 ':'。在 '{0}' 处期望冒号。",

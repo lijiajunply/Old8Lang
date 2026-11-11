@@ -1,5 +1,7 @@
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.LangParser;
+using Old8Lang.LangParser.ParserHelpers;
 
 namespace Old8Lang.Tests.Parser;
 
@@ -9,6 +11,24 @@ namespace Old8Lang.Tests.Parser;
 [Collection("Sequential")]
 public class BracketMatchingTests
 {
+    [Theory]
+    [InlineData(LangTokenType.LeftBrace, "左大括号 '{'")]
+    [InlineData(LangTokenType.RightBrace, "右大括号 '}'")]
+    public void BraceErrorTemplate_FormatsLiteralAndActualToken(LangTokenType expected, string literal)
+    {
+        var message = ExpectHelper.GetDetailedMessage(expected, LangTokenType.Identifier, "actual");
+        Assert.Contains(literal, message);
+        Assert.Contains("actual", message);
+    }
+
+    [Fact]
+    public void ClassWithInvalidInheritanceSyntax_ReportsExpectedBrace()
+    {
+        const string code = "class Dog : Animal {}";
+        var error = Assert.Throws<SyntaxError>(() => new LangInterpreter().Build(code));
+        Assert.Contains("缺少左大括号 '{'", error.Message);
+        Assert.DoesNotContain("correct format", error.Message);
+    }
     /// <summary>
     /// 测试括号不匹配 - 缺少右括号
     /// </summary>
