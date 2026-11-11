@@ -10,6 +10,48 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 [Collection("Sequential")]
 public class ExtensionMethodInterpreterTests
 {
+    [Fact]
+    public void Execute_GenericListExtension_RejectsLaterElementViolatingConstraint()
+    {
+        const string code = @"
+extension list<T> where T: struct {
+    func phaseOneInterpreterMixedConstraint() -> int { return 1 }
+}
+values <- {1, ""text""}
+values.phaseOneInterpreterMixedConstraint()
+";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Assert.Throws<Old8Lang.Error.TypeError>(() => ast.Run(interpreter.Manager));
+    }
+    [Fact]
+    public void Execute_GenericTargetConstraintAndBinding_AreEnforced()
+    {
+        const string validCode = @"
+extension list<T> where T: struct {
+    func interpreterTargetValue() -> T { return this[0] }
+}
+values <- {7}
+result <- values.interpreterTargetValue()
+";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(validCode).Run(interpreter.Manager);
+
+        var result = Assert.IsType<IntLangValue>(interpreter.Manager.GetValue(new LangId("result")));
+        Assert.Equal(7, result.Value);
+
+        const string invalidCode = @"
+extension list<T> where T: struct {
+    func interpreterStructOnly() -> int { return 1 }
+}
+values <- {""text""}
+values.interpreterStructOnly()
+";
+        var invalidInterpreter = new LangInterpreter();
+        var program = invalidInterpreter.Build(invalidCode);
+        Assert.Throws<Old8Lang.Error.TypeError>(() => program.Run(invalidInterpreter.Manager));
+    }
+
     /// <summary>
     /// 测试基本扩展方法执行
     /// </summary>

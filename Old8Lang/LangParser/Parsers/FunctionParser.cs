@@ -465,7 +465,7 @@ public class FunctionParser(
     /// 语法：<T, U, V> 或 <T: IComparable, U> 或 <T?, U?> 或 <T: new() & class, U>
     /// </summary>
     /// <returns>泛型参数列表</returns>
-    private List<GenericParameter> ParseGenericParameters()
+    internal List<GenericParameter> ParseGenericParameters()
     {
         Expect(LangTokenType.LessThan);
         var parameters = new List<GenericParameter>();
@@ -929,7 +929,7 @@ public class FunctionParser(
     /// 支持：where T: new() & class & IComparable
     /// </summary>
     /// <param name="genericParameters">泛型参数列表的引用，将在其中更新约束</param>
-    private void ParseWhereClause(ref List<GenericParameter>? genericParameters)
+    internal void ParseWhereClause(ref List<GenericParameter>? genericParameters)
     {
         if (genericParameters is null || genericParameters.Count == 0)
         {

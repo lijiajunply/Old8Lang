@@ -1,5 +1,7 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
+using System.Collections;
 
 namespace Old8Lang.Compiler;
 
@@ -19,11 +21,17 @@ public static class RuntimeGlobalWriter
 {
     [ThreadStatic]
     private static VariateManager? _manager;
+    [ThreadStatic]
+    private static Dictionary<object, LangValueType>? _convertedCollections;
 
     /// <summary>
     /// 设置当前线程用于接收顶层变量的管理器。
     /// </summary>
-    public static void SetManager(VariateManager manager) => _manager = manager;
+    public static void SetManager(VariateManager manager)
+    {
+        _manager = manager;
+        _convertedCollections = new Dictionary<object, LangValueType>(ReferenceEqualityComparer.Instance);
+    }
 
     /// <summary>
     /// 把一个顶层变量的值写回管理器。
@@ -39,7 +47,48 @@ public static class RuntimeGlobalWriter
 
         // 已经是语言值的必须原样保留：ObjToValue 对 LangValueType 没有专门分支，
         // 会把它包成 NativeAnyLangValue，导致宿主侧 (IntLangValue) 强转失败。
-        var langValue = value as LangValueType ?? LangValueType.ObjToValue(value);
+        var langValue = ConvertValue(value);
         _manager.Set(new LangId(name), langValue);
+    }
+
+    private static LangValueType ConvertValue(object? value)
+    {
+        if (value is LangValueType languageValue)
+            return languageValue;
+        if (value is null)
+            return LangValueType.ObjToValue(null);
+
+        var converted = _convertedCollections!;
+        if (converted.TryGetValue(value, out var existing))
+            return existing;
+
+        if (value is Array { Rank: 1 } array && array.GetLowerBound(0) == 0)
+        {
+            var result = new ArrayLangValue(new LangValueType[array.Length]);
+            converted.Add(value, result);
+            for (var i = 0; i < array.Length; i++)
+                result.RunResult[i] = ConvertValue(array.GetValue(i));
+            return result;
+        }
+
+        if (value is IDictionary dictionary)
+        {
+            var result = new DictionaryLangValue();
+            converted.Add(value, result);
+            foreach (DictionaryEntry entry in dictionary)
+                result.Set(ConvertValue(entry.Key), ConvertValue(entry.Value));
+            return result;
+        }
+
+        if (value is IList list)
+        {
+            var result = new ListLangValue(new List<LangValueType>());
+            converted.Add(value, result);
+            foreach (var item in list)
+                result.Values.Add(ConvertValue(item));
+            return result;
+        }
+
+        return LangValueType.ObjToValue(value);
     }
 }

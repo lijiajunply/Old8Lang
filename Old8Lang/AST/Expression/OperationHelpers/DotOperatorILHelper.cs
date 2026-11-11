@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.ExceptionServices;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using System.Collections;
@@ -582,6 +583,13 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        // 集合索引和未标注的类字段在 IL 中可能只能得到 object。
+        // 这时不能在编译期用 object 查找成员；保留接收者和实参，在运行期按实际 CLR 类型分派。
+        if (leftType == typeof(object))
+        {
+            return GenerateDynamicObjectMethodCall(left!, instance, ilGenerator, local);
+        }
+
         // 首先尝试从实例方法注册表中查找
         // 注意：IL 代码生成不经过解释器的实例方法分派，某些程序（例如只用到 Thread 的
         // 原生 Dot 分派、从没触发过解释器实例方法查找的程序）不会初始化注册表，
@@ -592,7 +600,8 @@ public static class DotOperatorILHelper
         {
             // 使用实例方法系统生成 IL
             instanceMethod.GenerateIl(left!, instance.Ids, ilGenerator, local, operation.Position);
-            return instanceMethod.GetReturnType(mappedType, instance.Ids, local);
+            var returnReceiverType = instanceMethod is ExtensionMethodWrapper ? leftType! : mappedType;
+            return instanceMethod.GetReturnType(returnReceiverType, instance.Ids, local);
         }
 
         // 如果实例方法注册表中没有找到，继续使用原有的逻辑
@@ -779,11 +788,126 @@ public static class DotOperatorILHelper
         return m.ReturnType;
     }
 
+    /// <summary>
+    /// 为静态类型未知的接收者生成运行期实例方法调用。
+    /// </summary>
+    private static Type GenerateDynamicObjectMethodCall(
+        LangExpression left,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        left.LoadIlValue(ilGenerator, local);
+        var receiverType = left.OutputType(local);
+        if (receiverType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, receiverType);
+        }
+
+        ilGenerator.Emit(OpCodes.Ldstr, instance.Id.IdName);
+        ilGenerator.Emit(OpCodes.Ldc_I4, instance.Ids.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+
+        for (var index = 0; index < instance.Ids.Count; index++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+            instance.Ids[index].LoadIlValue(ilGenerator, local);
+            var argumentType = instance.Ids[index].OutputType(local);
+            if (argumentType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(DotOperatorILHelper).GetMethod(nameof(InvokeDynamicObjectMethod))!);
+        return typeof(object);
+    }
+
+    /// <summary>
+    /// 使用运行期 CLR 类型调用对象方法，供静态类型为 <see cref="object"/> 的链式访问使用。
+    /// </summary>
+    public static object? InvokeDynamicObjectMethod(object? receiver, string methodName, object?[] arguments)
+    {
+        if (receiver is null)
+        {
+            throw new NullReferenceException($"无法在 null 上调用方法 '{methodName}'");
+        }
+
+        if (methodName == "ToStr" && arguments.Length == 0)
+        {
+            return receiver.ToString();
+        }
+
+        var type = receiver.GetType();
+        if (arguments.Length == 0 && methodName is "Count" or "Length")
+        {
+            var property = type.GetProperty(methodName, BindingFlags.Public | BindingFlags.Instance);
+            if (property?.CanRead == true)
+            {
+                return property.GetValue(receiver);
+            }
+        }
+
+        var method = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(candidate => candidate.Name == methodName && ParametersMatch(candidate.GetParameters(), arguments))
+            .OrderBy(candidate => candidate.GetParameters().Length)
+            .FirstOrDefault();
+        if (method is null)
+        {
+            throw new MissingMethodException(type.FullName, methodName);
+        }
+
+        try
+        {
+            return method.Invoke(receiver, arguments);
+        }
+        catch (TargetInvocationException exception) when (exception.InnerException is not null)
+        {
+            ExceptionDispatchInfo.Capture(exception.InnerException).Throw();
+            throw;
+        }
+    }
+
+    private static bool ParametersMatch(ParameterInfo[] parameters, object?[] arguments)
+    {
+        if (parameters.Length != arguments.Length)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < parameters.Length; index++)
+        {
+            var argument = arguments[index];
+            var parameterType = parameters[index].ParameterType;
+            if (argument is null)
+            {
+                if (parameterType.IsValueType && Nullable.GetUnderlyingType(parameterType) is null)
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (!parameterType.IsInstanceOfType(argument))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // 类型推断与 IL 发射必须使用相同的注册表及原生接收者规则。
     internal static Type? InferInstanceMethodReturnType(Type receiverType, Instance instance, LocalManager local)
     {
         var method = ResolveInstanceMethod(receiverType, instance, local, out var mappedType);
-        return method?.GetReturnType(mappedType, instance.Ids, local);
+        var returnReceiverType = method is ExtensionMethodWrapper ? receiverType : mappedType;
+        return method?.GetReturnType(returnReceiverType, instance.Ids, local);
     }
 
     private static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,

@@ -143,6 +143,9 @@ public class ExtensionMethodTests
         var extension = Assert.IsType<ExtensionDeclaration>(program[0]);
         Assert.Equal(declaration.Contains("dict<", StringComparison.Ordinal) ? "dict" : "list",
             extension.TargetTypeName);
+        Assert.NotNull(extension.TargetGenericParameters);
+        Assert.Equal(declaration.Contains("dict<", StringComparison.Ordinal) ? 2 : 1,
+            extension.TargetGenericParameters.Count);
         Assert.Single(extension.ExtensionMethods);
     }
 

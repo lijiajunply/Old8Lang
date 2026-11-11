@@ -1,0 +1,24 @@
+extension list<T> {
+    func growFirst(value: int) -> list<T> {
+        this[0].Add(value)
+        return this
+    }
+
+    func appendTo(other: list<int>) -> void {
+        other.Add(9)
+    }
+}
+
+nested <- {{1, 2}}
+innerAlias <- nested[0]
+returned <- nested.growFirst(3)
+returned.growFirst(4)
+
+receiver <- {1}
+argument <- {2}
+argumentAlias <- argument
+receiver.appendTo(argument)
+
+PrintLine(nested)
+PrintLine(innerAlias)
+PrintLine(argumentAlias)

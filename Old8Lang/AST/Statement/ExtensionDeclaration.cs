@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler.CodeGeneration;
@@ -16,6 +17,7 @@ namespace Old8Lang.AST.Statement;
 /// <param name="position">源代码位置信息</param>
 public class ExtensionDeclaration(
     string targetTypeName,
+    List<GenericParameter>? targetGenericParameters,
     List<FuncLangValue> extensionMethods,
     SourcePosition position = default) : OldStatement(position)
 {
@@ -23,6 +25,11 @@ public class ExtensionDeclaration(
     /// 目标类型名称（被扩展的类型）
     /// </summary>
     public string TargetTypeName { get; } = targetTypeName;
+
+    /// <summary>
+    /// 目标类型的泛型参数及约束。
+    /// </summary>
+    public List<GenericParameter>? TargetGenericParameters { get; } = targetGenericParameters;
 
     /// <summary>
     /// 扩展方法列表
@@ -52,7 +59,8 @@ public class ExtensionDeclaration(
             var extensionMethod = new ExtensionMethodWrapper(
                 targetType,
                 method,
-                manager
+                manager,
+                TargetGenericParameters
             );
 
             // 注册到实例方法注册器

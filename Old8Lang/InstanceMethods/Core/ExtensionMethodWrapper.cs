@@ -1,18 +1,25 @@
+using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.InstanceMethods.Core;
 
 /// <summary>
 /// 扩展方法包装器，将 Old8Lang 函数包装为实例方法
 /// </summary>
-public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, VariateManager manager)
+public class ExtensionMethodWrapper(
+    Type targetType,
+    FuncLangValue function,
+    VariateManager manager,
+    List<GenericParameter>? targetGenericParameters = null)
     : IInstanceMethod, IIlNativeValueInstanceMethod
 {
     /// <summary>
@@ -23,6 +30,9 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
     /// 这里复用声明阶段的管理器（与解释器模式使用调用方 manager 的做法一致）。
     /// </remarks>
     private VariateManager DeclarationManager { get; } = manager;
+
+    private IReadOnlyList<GenericParameter> TargetGenericParameters { get; } =
+        targetGenericParameters ?? [];
 
     public string[] Names => [function.Id!.IdName];
 
@@ -84,11 +94,18 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
 
         try
         {
+            ValidateTargetGenericConstraints(instance);
+
             // 创建新的作用域
             manager.AddChildren();
+            var originalReturnType = manager.CurrentFunctionReturnType;
+            var originalTypeArgumentMapping = manager.CurrentFunctionTypeArgumentMapping;
 
             try
             {
+                manager.CurrentFunctionReturnType = function.Id?.AssumptionType;
+                manager.CurrentFunctionTypeArgumentMapping = GetTargetGenericTypeMapping(instance);
+
                 // 绑定 this 关键字到实例
                 manager.Set(new LangId("this"), instance);
 
@@ -116,6 +133,8 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             }
             finally
             {
+                manager.CurrentFunctionReturnType = originalReturnType;
+                manager.CurrentFunctionTypeArgumentMapping = originalTypeArgumentMapping;
                 manager.RemoveChildren();
             }
         }
@@ -148,29 +167,24 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             typeof(RuntimeConstantRegistry).GetMethod(nameof(RuntimeConstantRegistry.Get))!);
         ilGenerator.Emit(OpCodes.Castclass, typeof(ExtensionMethodWrapper));
 
-        // 接收者与参数：原生值 -> Old8Lang 值
-        instance.LoadIlValue(ilGenerator, local);
-        var instanceType = instance.OutputType(local);
-        if (instanceType?.IsValueType == true)
-            ilGenerator.Emit(OpCodes.Box, instanceType);
+        // 保留原生引用到运行期 helper；由 helper 统一包装，才能在接收者、参数和嵌套集合之间
+        // 保持别名关系，并把所有原地修改同步回原列表。
+        EmitLoadBoxed(instance, ilGenerator, local);
 
         ilGenerator.Emit(OpCodes.Ldc_I4, parameters.Count);
-        ilGenerator.Emit(OpCodes.Newarr, typeof(LangValueType));
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
 
         for (var i = 0; i < parameters.Count; i++)
         {
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i);
-            IlValueBridge.EmitLoadWrapped(parameters[i], ilGenerator, local);
+            EmitLoadBoxed(parameters[i], ilGenerator, local);
             ilGenerator.Emit(OpCodes.Stelem_Ref);
         }
 
         var helperMethod = typeof(ExtensionMethodWrapper).GetMethod(nameof(InvokeNativeExtension),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
-
-        // 结果转回 IL 模式的原生表示，避免后续按 LangValueType 处理导致跨模式输出差异
-        ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Unwrap))!);
     }
 
     /// <summary>
@@ -182,36 +196,46 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         return wrapper.ExecuteWithValues(instance, arguments, wrapper.DeclarationManager);
     }
 
-    public static LangValueType InvokeNativeExtension(ExtensionMethodWrapper wrapper, object? instance,
-        LangValueType[] arguments)
+    public static object? InvokeNativeExtension(ExtensionMethodWrapper wrapper, object? instance,
+        object?[] arguments)
     {
-        var wrapped = IlValueBridge.Wrap(instance);
-        var originalList = instance as System.Collections.IList;
-        var originalItems = originalList?.Cast<object?>().ToArray();
-        var wrappedItems = (wrapped as ListLangValue)?.Values.ToArray();
+        var bridge = new NativeExtensionBridge();
+        var wrapped = bridge.Wrap(instance);
+        var wrappedArguments = arguments.Select(bridge.Wrap).ToArray();
         try
         {
-            return wrapper.ExecuteWithValues(wrapped, arguments, wrapper.DeclarationManager);
+            wrapper.ValidateTargetGenericConstraints(wrapped);
+            var result = wrapper.ExecuteWithValues(wrapped, wrappedArguments, wrapper.DeclarationManager);
+            return bridge.Unwrap(result);
         }
         finally
         {
-            // IL 的原生列表与解释器包装值是不同对象，保留原列表身份以同步别名。
-            if (instance is System.Collections.IList { IsReadOnly: false, IsFixedSize: false } list &&
-                wrapped is ListLangValue wrappedList)
-            {
-                var values = wrappedList.Values.Select(value =>
-                {
-                    var originalIndex = Array.FindIndex(wrappedItems!, item => ReferenceEquals(item, value));
-                    return originalIndex >= 0 ? originalItems![originalIndex] : IlValueBridge.Unwrap(value);
-                }).ToArray();
-                var elementType = list.GetType().IsGenericType ? list.GetType().GetGenericArguments()[0] : typeof(object);
-                if (values.Any(value => value is null ? elementType.IsValueType && Nullable.GetUnderlyingType(elementType) is null
-                        : !elementType.IsInstanceOfType(value)))
-                    throw new InvalidOperationException($"扩展方法结果不兼容列表元素类型 {elementType.Name}");
-                list.Clear();
-                foreach (var value in values)
-                    list.Add(value);
-            }
+            bridge.Synchronize();
+        }
+    }
+
+    private static void EmitLoadBoxed(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
+    {
+        expression.LoadIlValue(ilGenerator, local);
+
+        if (expression is FuncLangValue)
+        {
+            return;
+        }
+
+        Type? expressionType;
+        try
+        {
+            expressionType = expression.OutputType(local);
+        }
+        catch
+        {
+            expressionType = null;
+        }
+
+        if (expressionType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, expressionType);
         }
     }
 
@@ -228,9 +252,14 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         try
         {
             manager.AddChildren();
+            var originalReturnType = manager.CurrentFunctionReturnType;
+            var originalTypeArgumentMapping = manager.CurrentFunctionTypeArgumentMapping;
 
             try
             {
+                manager.CurrentFunctionReturnType = function.Id?.AssumptionType;
+                manager.CurrentFunctionTypeArgumentMapping = GetTargetGenericTypeMapping(instance);
+
                 manager.Set(new LangId("this"), instance);
 
                 for (var i = 0; i < arguments.Length && i < function.Ids!.Count; i++)
@@ -251,6 +280,8 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             }
             finally
             {
+                manager.CurrentFunctionReturnType = originalReturnType;
+                manager.CurrentFunctionTypeArgumentMapping = originalTypeArgumentMapping;
                 manager.RemoveChildren();
             }
         }
@@ -260,9 +291,268 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         }
     }
 
+    private void ValidateTargetGenericConstraints(LangValueType instance)
+    {
+        if (TargetGenericParameters.Count == 0)
+        {
+            return;
+        }
+
+        var typeArguments = GetTargetGenericArgumentTypes(instance);
+        for (var index = 0; index < TargetGenericParameters.Count; index++)
+        {
+            if (!typeArguments.TryGetValue(TargetGenericParameters[index].Name, out var actualType))
+            {
+                // 空集合不携带足够的运行期元素类型信息；保留动态语言对空集合的可用性。
+                continue;
+            }
+
+            var parameter = TargetGenericParameters[index];
+            foreach (var candidate in GetTargetElementTypes(instance, index).DefaultIfEmpty(actualType))
+            {
+                var candidateArguments = new Dictionary<string, Type>(typeArguments, StringComparer.Ordinal)
+                {
+                    [parameter.Name] = candidate
+                };
+                var validation = GenericConstraintValidator.ValidateWithDotNetType(
+                    parameter, candidate, candidateArguments);
+                if (!validation.IsValid)
+                    throw new TypeError(function.Position, validation.ErrorMessage ?? "泛型目标类型不满足约束");
+            }
+        }
+    }
+
+    private static IEnumerable<Type> GetTargetElementTypes(LangValueType instance, int parameterIndex)
+    {
+        if (parameterIndex == 0 && instance is ListLangValue list)
+            return list.Values.Select(GetRuntimeType);
+        if (parameterIndex == 0 && instance is ArrayLangValue array)
+            return array.GetItems().Select(GetRuntimeType);
+        if (parameterIndex is 0 or 1 && instance is DictionaryLangValue dictionary)
+            return dictionary.Tuples.Select(tuple => GetRuntimeType(tuple.Get(parameterIndex)));
+        return [];
+    }
+
+    private Dictionary<string, Type> GetTargetGenericArgumentTypes(LangValueType instance)
+    {
+        var result = new Dictionary<string, Type>(StringComparer.Ordinal);
+        if (instance is ListLangValue list && TargetGenericParameters.Count >= 1 && list.Values.Count > 0)
+        {
+            result[TargetGenericParameters[0].Name] = GetRuntimeType(list.Values[0]);
+        }
+        else if (instance is ArrayLangValue array && TargetGenericParameters.Count >= 1)
+        {
+            var firstValue = array.GetItems().FirstOrDefault();
+            if (firstValue is not null)
+            {
+                result[TargetGenericParameters[0].Name] = GetRuntimeType(firstValue);
+            }
+        }
+        else if (instance is DictionaryLangValue dictionary && dictionary.Tuples.Count > 0)
+        {
+            if (TargetGenericParameters.Count >= 1)
+            {
+                result[TargetGenericParameters[0].Name] = GetRuntimeType(dictionary.Tuples[0].Get(0));
+            }
+
+            if (TargetGenericParameters.Count >= 2)
+            {
+                result[TargetGenericParameters[1].Name] = GetRuntimeType(dictionary.Tuples[0].Get(1));
+            }
+        }
+
+        return result;
+    }
+
+    private static Type GetRuntimeType(LangValueType value)
+    {
+        // 推断集合类型只需要类别，不应递归展开值；集合可能引用自身。
+        return value switch
+        {
+            ArrayLangValue => typeof(object[]),
+            ListLangValue => typeof(List<object>),
+            DictionaryLangValue => typeof(Dictionary<object, object>),
+            TupleLangValue => typeof(ValueTuple),
+            _ => value.GetValue()?.GetType() ?? value.GetType()
+        };
+    }
+
+    private Dictionary<string, ITypeInfo>? GetTargetGenericTypeMapping(LangValueType instance)
+    {
+        if (TargetGenericParameters.Count == 0)
+        {
+            return null;
+        }
+
+        LangValueType[] values = instance switch
+        {
+            ListLangValue list when list.Values.Count > 0 => [list.Values[0]],
+            ArrayLangValue array when array.GetItems().FirstOrDefault() is { } first => [first],
+            DictionaryLangValue dictionary when dictionary.Tuples.Count > 0 && TargetGenericParameters.Count >= 2 =>
+                [dictionary.Tuples[0].Get(0), dictionary.Tuples[0].Get(1)],
+            _ => []
+        };
+
+        var mapping = new Dictionary<string, ITypeInfo>(StringComparer.Ordinal);
+        for (var index = 0; index < Math.Min(values.Length, TargetGenericParameters.Count); index++)
+        {
+            mapping[TargetGenericParameters[index].Name] =
+                new PrimitiveTypeInfo(TypeChecker.GetLangValueType(values[index]));
+        }
+
+        return mapping;
+    }
+
+    /// <summary>
+    /// 在一次 IL 扩展调用中保持原生集合与语言值之间的一对一映射。
+    /// </summary>
+    /// <remarks>
+    /// 不能直接调用 <see cref="IlValueBridge.Wrap"/>：它会为每个出现位置创建新的列表包装器，
+    /// 从而让 <c>this</c>、参数和嵌套集合失去别名关系。同步时反向复用映射中的原生对象，
+    /// 以保证返回接收者及所有既有别名仍然指向同一集合。
+    /// </remarks>
+    private sealed class NativeExtensionBridge
+    {
+        private readonly Dictionary<object, LangValueType> _wrappedByNative =
+            new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<LangValueType, object> _nativeByWrapped =
+            new(ReferenceEqualityComparer.Instance);
+
+        public LangValueType Wrap(object? value)
+        {
+            if (value is null || value is LangValueType || value.GetType().IsValueType || value is string || value is Delegate || value is Task)
+            {
+                return IlValueBridge.Wrap(value);
+            }
+
+            if (_wrappedByNative.TryGetValue(value, out var existing))
+            {
+                return existing;
+            }
+
+            if (value is Array array)
+            {
+                if (array.Rank != 1 || array.GetLowerBound(0) != 0)
+                    throw new InvalidOperationException("扩展方法暂不支持多维数组或非零起始索引数组");
+                var wrappedArray = new ArrayLangValue(new LangValueType[array.Length]);
+                Remember(value, wrappedArray);
+                for (var index = 0; index < array.Length; index++)
+                    wrappedArray.RunResult[index] = Wrap(array.GetValue(index));
+                return wrappedArray;
+            }
+
+            if (value is IList list)
+            {
+                var wrappedList = new ListLangValue(new List<LangValueType>());
+                Remember(value, wrappedList);
+                foreach (var item in list)
+                {
+                    wrappedList.Values.Add(Wrap(item));
+                }
+
+                return wrappedList;
+            }
+
+            return IlValueBridge.Wrap(value);
+        }
+
+        public object? Unwrap(LangValueType value)
+        {
+            return _nativeByWrapped.TryGetValue(value, out var native)
+                ? native
+                : IlValueBridge.Unwrap(value);
+        }
+
+        public void Synchronize()
+        {
+            var visited = new HashSet<object>(ReferenceEqualityComparer.Instance);
+            foreach (var (native, wrapped) in _wrappedByNative)
+            {
+                Synchronize(native, wrapped, visited);
+            }
+        }
+
+        private void Remember(object native, LangValueType wrapped)
+        {
+            _wrappedByNative[native] = wrapped;
+            _nativeByWrapped[wrapped] = native;
+        }
+
+        private void Synchronize(object native, LangValueType wrapped, HashSet<object> visited)
+        {
+            if (!visited.Add(native))
+            {
+                return;
+            }
+
+            switch (native)
+            {
+                case Array array when wrapped is ArrayLangValue wrappedArray:
+                    SynchronizeArray(array, wrappedArray, visited);
+                    break;
+                case IList { IsReadOnly: false, IsFixedSize: false } list when wrapped is ListLangValue wrappedList:
+                    SynchronizeList(list, wrappedList, visited);
+                    break;
+            }
+        }
+
+        private void SynchronizeArray(Array array, ArrayLangValue wrappedArray, HashSet<object> visited)
+        {
+            var values = wrappedArray.GetItems().ToArray();
+            if (array.Length != values.Length)
+            {
+                throw new InvalidOperationException("扩展方法不能改变数组长度");
+            }
+
+            for (var index = 0; index < array.Length; index++)
+            {
+                SynchronizeNested(values[index], visited);
+                array.SetValue(Unwrap(values[index]), index);
+            }
+        }
+
+        private void SynchronizeList(IList list, ListLangValue wrappedList, HashSet<object> visited)
+        {
+            var values = wrappedList.Values.ToArray();
+            foreach (var value in values)
+            {
+                SynchronizeNested(value, visited);
+            }
+
+            list.Clear();
+            foreach (var value in values)
+            {
+                list.Add(Unwrap(value));
+            }
+        }
+
+        private void SynchronizeNested(LangValueType value, HashSet<object> visited)
+        {
+            if (_nativeByWrapped.TryGetValue(value, out var native))
+            {
+                Synchronize(native, value, visited);
+            }
+        }
+    }
+
     public Type GetReturnType(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        // 返回动态类型（IL 模式下结果已转回原生表示）
+        // 直接返回 this 的扩展方法保持接收者静态类型，允许继续链式调用。
+        // 运行期 bridge 也会把同一个原生接收者对象返回，类型和身份在两层都一致。
+        if (function.BlockStatement.OtherStatements
+            .OfType<ReturnStatement>()
+            .Any(statement => statement.Expression is LangId { IdName: "this" }))
+        {
+            return instanceType;
+        }
+
+        if (function.Id?.AssumptionType.StartsWith("list", StringComparison.OrdinalIgnoreCase) == true &&
+            TargetType == typeof(ListLangValue))
+        {
+            return instanceType;
+        }
+
+        // 其他返回值仍是动态类型（IL 模式下结果已转回原生表示）。
         return typeof(object);
     }
 
