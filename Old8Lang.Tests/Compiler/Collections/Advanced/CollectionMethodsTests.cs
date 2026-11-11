@@ -142,6 +142,30 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListDefaultElementReaders_CompileForNativeListsAndArrays()
+    {
+        var code = @"
+            values <- {10, 20, 30}
+            empty <- {}
+            array <- [4, 5, 6]
+
+            Assert.Equal(10, values.FirstOrDefault())
+            Assert.Equal(30, values.LastOrDefault())
+            Assert.Equal(4, array.FirstOrDefault())
+            Assert.Equal(6, array.LastOrDefault())
+            Assert.Equal(null, empty.FirstOrDefault())
+            Assert.Equal(null, empty.LastOrDefault())
+            Assert.Equal(99, empty.FirstOrDefault(99))
+            Assert.Equal(88, empty.LastOrDefault(88))
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.FirstOrDefault(defaultValue?) - 获取第一个元素或默认值
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListFirstOrDefaultMethod : BaseLangListMethod
+public class LangListFirstOrDefaultMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["FirstOrDefault", "firstOrDefault"];
     public override string[]? ParameterNames => ["defaultValue"];
@@ -41,21 +42,35 @@ public class LangListFirstOrDefaultMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         if (parameters.Count == 1)
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
-            var helperMethod = typeof(LangListFirstOrDefaultMethod).GetMethod(nameof(FirstOrDefaultWithValueHelper),
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+            var helperMethod = typeof(LangListFirstOrDefaultMethod).GetMethod(nameof(FirstOrDefaultWithValueNativeHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
         }
         else
         {
-            var helperMethod = typeof(LangListFirstOrDefaultMethod).GetMethod(nameof(FirstOrDefaultHelper),
+            var helperMethod = typeof(LangListFirstOrDefaultMethod).GetMethod(nameof(FirstOrDefaultNativeHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
         }
+    }
+
+    public static object? FirstOrDefaultNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IlValueBridge.Unwrap(FirstOrDefaultHelper(langList));
+    }
+
+    public static object? FirstOrDefaultWithValueNativeHelper(LangValueType instance, LangValueType defaultValue)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IlValueBridge.Unwrap(FirstOrDefaultWithValueHelper(langList, defaultValue));
     }
 
     public static LangValueType FirstOrDefaultHelper(ILangList langList)
@@ -72,7 +87,7 @@ public class LangListFirstOrDefaultMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

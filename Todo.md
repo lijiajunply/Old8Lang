@@ -35,6 +35,7 @@
   - 迁移方式：参照 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md` §2 的机制
     （实现 `IIlNativeValueInstanceMethod` + `IlValueBridge.EmitLoadWrapped` + 静态 helper）。
   - 2026-11-12：读取型 `First`、`Last`、`ElementAt` / `At` 现支持原生列表与数组，并保留负索引语义；见 [读取型集合测试报告](Reports/2026-11-12-00-40-IL集合读取方法.md)。
+  - 2026-11-12：`FirstOrDefault`、`LastOrDefault` 现支持原生列表与数组，无元素时可返回 `null` 或调用方提供的默认值；见 [默认读取测试报告](Reports/2026-11-12-00-50-IL集合默认读取.md)。
 
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
