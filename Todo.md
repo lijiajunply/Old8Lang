@@ -49,11 +49,7 @@
 - [x] **IL `Thread.CurrentThread` 属性与调用**：两种形式均返回实际执行线程，并支持继续访问其属性。见 [测试报告](Reports/2026-11-11-13-33-IL当前线程测试.md)。
 - [ ] **IL 其他 Thread API**：仍需逐项复核。
 
-- [ ] **排查返回自身的 LangValue 类型**：`ThreadLangValue.GetValue()`
-  返回 `this`，而基类 `ToString()` 走 `GetValue()?.ToString()`，原先任何
-  `ThreadLangValue.ToString()` 都会无限递归（栈溢出）。2026-10-24 已补
-  `ToString` / `TypeToString` / `Id`；其它 `GetValue()` 返回 `this` 的 `LangValueType`
-  值得同类排查。
+- [x] **排查直接返回自身的 LangValue 类型**：源码检索发现线程、VM 线程及三种 VM 生成器值的 `GetValue()` 直接返回自身，均已重写 `ToString()`；三种生成器的字符串转换回归通过。见 [测试报告](Reports/2026-11-11-13-35-自引用值排查测试.md)。
 
 - [ ] **IL / VM 模式下标准库 `import` 后访问模块名失败**：`import "Math"` + `Math.Sqrt(9)`
   在解释模式输出 `3`；IL 报 `[NAME_ERROR] 名称 'Math' 未定义`；VM 报
