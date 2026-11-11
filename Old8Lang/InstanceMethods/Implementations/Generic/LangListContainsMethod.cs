@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Contains(item) - 检查是否包含指定元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListContainsMethod : BaseLangListMethod
+public class LangListContainsMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Contains", "contains"];
     public override string[] ParameterNames => ["item"];
@@ -40,16 +41,22 @@ public class LangListContainsMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         var helperMethod = typeof(LangListContainsMethod).GetMethod(nameof(ContainsHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static bool ContainsHelper(ILangList langList, LangValueType item)
+    /// <summary>IL 模式的辅助方法：比较桥接后集合中的语言值。</summary>
+    public static bool ContainsHelper(LangValueType instance, LangValueType item)
     {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
         return langList.In(item);
     }
 
