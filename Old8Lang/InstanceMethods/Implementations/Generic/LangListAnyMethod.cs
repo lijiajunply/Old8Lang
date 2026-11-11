@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,9 +13,9 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Any(predicate?) - 检查是否有任意元素满足条件
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListAnyMethod : BaseLangListMethod
+public class LangListAnyMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
-    public override string[] Names => ["Any", "any"];
+    public override string[] Names => ["Any", "any", "Some", "some"];
     public override string[]? ParameterNames => ["predicate"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 1;
@@ -56,22 +57,32 @@ public class LangListAnyMethod : BaseLangListMethod
     {
         if (parameters.Count == 0)
         {
-            // 无参数版本：检查长度是否大于0
-            instance.LoadIlValue(ilGenerator, local);
-            var helperMethod = typeof(LangListAnyMethod).GetMethod(nameof(AnyHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
+            IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call, typeof(LangListAnyMethod).GetMethod(nameof(AnyHelper))!);
         }
         else
         {
-            // 有参数版本暂不支持
-            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call, typeof(LangListAnyMethod).GetMethod(nameof(AnyPredicateHelper))!);
         }
     }
 
-    public static bool AnyHelper(ILangList langList)
+    public static bool AnyHelper(LangValueType instance)
     {
-        return langList.GetLength() > 0;
+        return instance is ILangList list && list.GetLength() > 0;
+    }
+
+    /// <summary>IL 模式下检查是否有元素满足谓词。</summary>
+    public static bool AnyPredicateHelper(LangValueType instance, LangValueType predicate)
+    {
+        if (instance is not ILangList list || predicate is not FuncLangValue function)
+        {
+            throw new ArgumentException("Any 方法需要列表和函数参数");
+        }
+
+        var manager = new VariateManager();
+        return list.GetItems().Any(item => function.Run(manager, [item]) is BoolLangValue { Value: true });
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters,

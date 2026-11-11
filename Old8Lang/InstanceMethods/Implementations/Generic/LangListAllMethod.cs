@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,9 +13,9 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.All(predicate) - 检查是否所有元素都满足条件
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListAllMethod : BaseLangListMethod
+public class LangListAllMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
-    public override string[] Names => ["All", "all"];
+    public override string[] Names => ["All", "all", "Every", "every"];
     public override string[] ParameterNames => ["predicate"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
@@ -47,13 +48,26 @@ public class LangListAllMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Call, typeof(LangListAllMethod).GetMethod(nameof(AllHelper))!);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(bool);
+    }
+
+    /// <summary>IL 模式下检查是否所有元素满足谓词。</summary>
+    public static bool AllHelper(LangValueType instance, LangValueType predicate)
+    {
+        if (instance is not ILangList list || predicate is not FuncLangValue function)
+        {
+            throw new ArgumentException("All 方法需要列表和函数参数");
+        }
+
+        var manager = new VariateManager();
+        return list.GetItems().All(item => function.Run(manager, [item]) is BoolLangValue { Value: true });
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

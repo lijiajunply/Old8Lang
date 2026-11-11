@@ -31,7 +31,7 @@
 - [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
   在 `List<T>` 接收者下会「方法未找到」。
-  - 2026-11-11：`Map` 与 `Filter` 已改为原生值桥接实现，`List<T>` 接收者的定向回归通过；见 [测试报告](Reports/2026-11-11-20-40-IL集合MapFilter.md)。其余方法仍待迁移。
+  - 2026-11-11：`Map`、`Filter`、`Find`、`Any/Some` 与 `All/Every` 已改为原生值桥接实现，`List<T>` 接收者的定向回归通过；见 [Map/Filter 测试报告](Reports/2026-11-11-20-40-IL集合MapFilter.md) 与 [Find/Any/All 测试报告](Reports/2026-11-11-20-45-IL集合FindAnyAll.md)。`Reduce`、排序及其余方法仍待迁移。
   - 迁移方式：参照 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md` §2 的机制
     （实现 `IIlNativeValueInstanceMethod` + `IlValueBridge.EmitLoadWrapped` + 静态 helper）。
 

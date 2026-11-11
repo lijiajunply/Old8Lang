@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Find(predicate) - 查找满足条件的第一个元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListFindMethod : BaseLangListMethod
+public class LangListFindMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Find", "find"];
     public override string[] ParameterNames => ["predicate"];
@@ -48,13 +49,39 @@ public class LangListFindMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldnull);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Call, typeof(LangListFindMethod).GetMethod(nameof(FindHelper))!);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
+    }
+
+    /// <summary>IL 模式下查找首个满足条件的元素。</summary>
+    public static object? FindHelper(LangValueType instance, LangValueType predicate)
+    {
+        if (instance is not ILangList list)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        if (predicate is not FuncLangValue function)
+        {
+            throw new ArgumentException("Find 方法的参数必须是函数");
+        }
+
+        var manager = new VariateManager();
+        foreach (var item in list.GetItems())
+        {
+            if (function.Run(manager, [item]) is BoolLangValue { Value: true })
+            {
+                return IlValueBridge.Unwrap(item);
+            }
+        }
+
+        return null;
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
