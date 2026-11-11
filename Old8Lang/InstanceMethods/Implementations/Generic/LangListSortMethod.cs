@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Implementations.Array;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -14,7 +15,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Sort() - 排序（升序）
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListSortMethod : BaseLangListMethod
+public class LangListSortMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Sort", "sort"];
     public override string[]? ParameterNames => ["comparer"];
@@ -123,23 +124,56 @@ public class LangListSortMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListSortMethod).GetMethod(nameof(SortHelper),
+        if (parameters.Count == 1)
+        {
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        }
+        else
+        {
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
+
+        var helperName = TargetType == typeof(ArrayLangValue) ? nameof(SortArrayHelper) : nameof(SortHelper);
+        var helperMethod = typeof(LangListSortMethod).GetMethod(helperName,
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ListLangValue SortHelper(ILangList langList)
+    /// <summary>
+    /// IL 模式的辅助方法：对桥接后的集合排序并返回原生列表。
+    /// </summary>
+    public static List<object?> SortHelper(LangValueType instance, LangValueType? comparer)
     {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
         var items = langList.GetItems().ToList();
         var sortedItems = new List<LangValueType>(items);
 
-        // 使用 LINQ OrderBy
-        sortedItems = sortedItems.OrderBy(x => x, new LangValueComparer()).ToList();
+        if (comparer is FuncLangValue function)
+        {
+            var manager = new VariateManager();
+            sortedItems.Sort((left, right) =>
+            {
+                var result = function.Run(manager, [left, right]);
+                return result is IntLangValue integer ? integer.Value : 0;
+            });
+        }
+        else
+        {
+            sortedItems = sortedItems.OrderBy(x => x, new LangValueComparer()).ToList();
+        }
 
-        return new ListLangValue(sortedItems);
+        return sortedItems.Select(IlValueBridge.Unwrap).ToList();
     }
+
+    /// <summary>IL 模式下排序数组并保持数组返回表示。</summary>
+    public static object?[] SortArrayHelper(LangValueType instance, LangValueType? comparer) =>
+        SortHelper(instance, comparer).ToArray();
 
     private class LangValueComparer : IComparer<LangValueType>
     {
@@ -154,14 +188,14 @@ public class LangListSortMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return TargetType == typeof(ArrayLangValue) ? typeof(object?[]) : typeof(List<object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is ILangList langList)
         {
-            return SortHelper(langList);
+            return new ListLangValue(SortHelper((LangValueType)langList, null).Select(IlValueBridge.Wrap).ToList());
         }
 
         // VM 模式下数组字面量是原生 object?[]、列表是 List<object?>，都不实现 ILangList；
