@@ -283,6 +283,23 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void CollectionSum_CompilesAndExecutesForListsAndArrays()
+    {
+        var code = @"
+            integers <- {1, 2, 3}
+            decimals <- [1.5, 2.5, 3]
+            Assert.Equal(6, integers.Sum())
+            Assert.Equal(7.0, decimals.Sum())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

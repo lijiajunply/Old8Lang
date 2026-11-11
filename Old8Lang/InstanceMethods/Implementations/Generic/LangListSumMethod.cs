@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -13,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Sum() - 求和
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListSumMethod : BaseLangListMethod
+public class LangListSumMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Sum", "sum"];
     public override string[]? ParameterNames => null;
@@ -103,19 +104,25 @@ public class LangListSumMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(LangListSumMethod).GetMethod(nameof(SumHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static LangValueType SumHelper(ILangList langList)
+    /// <summary>IL 模式的辅助方法：对桥接后的数值集合求和并返回原生数值。</summary>
+    public static object SumHelper(LangValueType instance)
     {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
         var items = langList.GetItems().ToList();
         if (items.Count == 0)
         {
-            return IntLangValue.Create(0);
+            return 0;
         }
 
         bool isDouble = items[0] is DoubleLangValue;
@@ -129,7 +136,7 @@ public class LangListSumMethod : BaseLangListMethod
                 else if (item is IntLangValue iv)
                     sum += iv.Value;
             }
-            return DoubleLangValue.Create(sum);
+            return sum;
         }
         else
         {
@@ -139,23 +146,23 @@ public class LangListSumMethod : BaseLangListMethod
                 if (item is IntLangValue iv)
                     sum += iv.Value;
                 else if (item is DoubleLangValue dv)
-                    return DoubleLangValue.Create(sum + dv.Value + items.Skip(items.IndexOf(item) + 1)
-                        .Sum(x => x is IntLangValue i ? i.Value : (x as DoubleLangValue)?.Value ?? 0));
+                    return sum + dv.Value + items.Skip(items.IndexOf(item) + 1)
+                        .Sum(x => x is IntLangValue i ? i.Value : (x as DoubleLangValue)?.Value ?? 0);
             }
-            return IntLangValue.Create(sum);
+            return sum;
         }
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is ILangList langList)
         {
-            return SumHelper(langList);
+            return SumHelper((LangValueType)langList);
         }
 
         // VM模式下，列表可能是 object[] 类型
