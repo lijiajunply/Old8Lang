@@ -86,9 +86,7 @@
   同名嵌套循环共用同一个 `i`，`loop_shadow.old8` 里 `total` 得 `2`（应为 `6`）。
   这项工作依赖 IL 的全局变量 / 作用域模型（同本节的“IL 函数无法访问顶层全局变量”），一并处理更合适。
 
-- [ ] **IL 运行期错误的异常值无法 `.ToStr()`**：`try { arr[-5] } catch (e) { PrintLine(e.ToStr()) }`
-  报 `IL 模式暂不支持把原生类型 ExceptionWrapper 转换为 Old8Lang 值`；
-  只把 `e` 赋给变量 (`caught <- e`) 则正常。解释器 / 虚拟机都能直接 `e.ToStr()`。
+- [x] **IL 运行期错误的异常值无法 `.ToStr()`**：现已支持直接转换捕获的索引错误和抛出消息，见 [测试报告](Reports/2026-11-11-12-35-IL异常字符串测试.md)。
 
 - [x] **解释器负索引越界的错误信息用了归一化后的下标**：`arr <- [1,2,3]; arr[-5]` 原先报
   `索引越界: 索引 -2 超出范围 [0, 2]`（应报原始的 `-5`）；IL 侧 `IlIndexHelper` 报的是原始下标。
@@ -99,6 +97,8 @@
 - [ ] **VM 原生函数命名参数**：评估如何获取原生函数参数信息（`VirtualMachine.Instructions.ControlFlow.cs` 中的 TODO）。
 
 ## 测试与工程问题
+
+- [ ] **IL 字符串 `Length()` 可能导致进程崩溃**：2026-11-11 运行 `TryCatchWithVariableAccess` 时，原生字符串传入 `StringLengthMethod.LengthHelper(StringLangValue)` 触发 `AccessViolationException`；需隔离修复并复测，见 [测试报告](Reports/2026-11-11-12-35-IL异常字符串测试.md)。
 
 - [ ] **IL 类测试中的继承语法失败**：多个 `InheritanceTests` 使用 `class Derived : Base`，而当前语法使用 `extends`；错误提示中的格式字符串异常已修复，需逐项核实旧测试的语法与预期，见 [测试报告](Reports/2026-11-11-10-57-括号错误报告测试.md)。
 - [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。

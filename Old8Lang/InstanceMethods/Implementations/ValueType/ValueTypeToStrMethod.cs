@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Compiler.Helpers;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
@@ -28,18 +29,24 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 接收者可能是原生 int/string/...（IL 模式），helper 的形参是 LangValueType，
-        // 必须先经过桥接装箱，否则会直接把 int32 传给引用类型形参，生成无效 IL。
-        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        // 保留原始值，以便异常包装对象也能使用其 ToString 实现。
+        instance.LoadIlValue(ilGenerator, local);
+        var instanceType = instance.OutputType(local);
+        if (instance is not FuncLangValue && instanceType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, instanceType);
+        }
 
         var helperMethod = typeof(ValueTypeToStrMethod).GetMethod(nameof(ConvertToStrHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static string ConvertToStrHelper(LangValueType type)
+    public static string ConvertToStrHelper(object? value)
     {
-        return type.ToDisplayString();
+        return value is ExceptionWrapper exception
+            ? exception.ToString()
+            : IlValueBridge.Wrap(value).ToDisplayString();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
