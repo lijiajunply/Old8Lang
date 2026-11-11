@@ -704,6 +704,8 @@ public partial class Operation(
         var isThisField = Opera == LangTokenType.Dot &&
                           (Left is LangId { IdName: "this" } || Left is ThisExpression) && Right is LangId;
         if (Type is not null && !isThisField) return Type;
+        if (Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(Left, Right, local, out var library, out var libraryCall))
+            return StandardLibraryILHelper.GetReturnType(library, libraryCall);
         if (Opera == LangTokenType.Dot && Left is LangId { IdName: "Thread" } &&
             (Right is LangId { IdName: "CurrentThread" } ||
              Right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
@@ -896,6 +898,9 @@ public partial class Operation(
 
     private Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {
+        if (Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(Left, Right, local, out var library, out var libraryCall))
+            return StandardLibraryILHelper.EmitCall(library, libraryCall, ilGenerator, local);
+
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
 

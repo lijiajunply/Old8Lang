@@ -112,6 +112,9 @@ public partial class FuncLangValue
         // 创建一个新的 LocalManager 实例，专门用于函数体的 IL 生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
 
+        foreach (var (key, value) in local.GlobalStaticClasses)
+            funcLocal.GlobalStaticClasses[key] = value;
+
         // 继承外层的函数委托表：让 lambda 体内可以按名字调用已定义的函数
         // （例如 `spawn(f).Then((r:int) -> spawn(g))` 里的 g）。
         // 注意：这只覆盖「函数」，lambda 读写外层普通局部变量在 IL 模式下仍不支持。
@@ -231,6 +234,9 @@ public partial class FuncLangValue
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        foreach (var (key, value) in local.GlobalStaticClasses)
+            funcLocal.GlobalStaticClasses[key] = value;
 
         // 使用参数的类型注解来确定参数类型
         var parameterTypes = Ids!.Select(item => item.OutputType(funcLocal)).ToArray();

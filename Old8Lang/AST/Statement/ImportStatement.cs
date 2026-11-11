@@ -198,8 +198,10 @@ public partial class ImportStatement(
                     "请确保标准库程序集已正确部署到运行时目录。");
             }
 
-            // 标准库在 IL 模式下不需要生成 IL（运行时会处理）
-            // 但已经过验证，确保编译后能正常运行
+            if (!_fromClause && StandardLibraryLoader.TryLoadStandardLibrary(
+                    moduleName, new VariateManager(), out var standardModule))
+                local.GlobalStaticClasses[_moduleAlias ?? moduleName] = standardModule;
+
             return;
         }
 

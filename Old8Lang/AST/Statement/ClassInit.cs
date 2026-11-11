@@ -407,6 +407,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             methodLocal.DelegateVar[kvp.Key] = kvp.Value;
         }
 
+        foreach (var kvp in local.GlobalStaticClasses)
+            methodLocal.GlobalStaticClasses[kvp.Key] = kvp.Value;
+
         // 继承外部的类定义
         foreach (var kvp in local.ClassVar)
         {
