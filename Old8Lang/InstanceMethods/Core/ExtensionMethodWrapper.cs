@@ -149,7 +149,10 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         ilGenerator.Emit(OpCodes.Castclass, typeof(ExtensionMethodWrapper));
 
         // 接收者与参数：原生值 -> Old8Lang 值
-        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        instance.LoadIlValue(ilGenerator, local);
+        var instanceType = instance.OutputType(local);
+        if (instanceType?.IsValueType == true)
+            ilGenerator.Emit(OpCodes.Box, instanceType);
 
         ilGenerator.Emit(OpCodes.Ldc_I4, parameters.Count);
         ilGenerator.Emit(OpCodes.Newarr, typeof(LangValueType));
@@ -162,7 +165,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             ilGenerator.Emit(OpCodes.Stelem_Ref);
         }
 
-        var helperMethod = typeof(ExtensionMethodWrapper).GetMethod(nameof(InvokeExtension),
+        var helperMethod = typeof(ExtensionMethodWrapper).GetMethod(nameof(InvokeNativeExtension),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
 
@@ -177,6 +180,39 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         LangValueType[] arguments)
     {
         return wrapper.ExecuteWithValues(instance, arguments, wrapper.DeclarationManager);
+    }
+
+    public static LangValueType InvokeNativeExtension(ExtensionMethodWrapper wrapper, object? instance,
+        LangValueType[] arguments)
+    {
+        var wrapped = IlValueBridge.Wrap(instance);
+        var originalList = instance as System.Collections.IList;
+        var originalItems = originalList?.Cast<object?>().ToArray();
+        var wrappedItems = (wrapped as ListLangValue)?.Values.ToArray();
+        try
+        {
+            return wrapper.ExecuteWithValues(wrapped, arguments, wrapper.DeclarationManager);
+        }
+        finally
+        {
+            // IL 的原生列表与解释器包装值是不同对象，保留原列表身份以同步别名。
+            if (instance is System.Collections.IList { IsReadOnly: false, IsFixedSize: false } list &&
+                wrapped is ListLangValue wrappedList)
+            {
+                var values = wrappedList.Values.Select(value =>
+                {
+                    var originalIndex = Array.FindIndex(wrappedItems!, item => ReferenceEquals(item, value));
+                    return originalIndex >= 0 ? originalItems![originalIndex] : IlValueBridge.Unwrap(value);
+                }).ToArray();
+                var elementType = list.GetType().IsGenericType ? list.GetType().GetGenericArguments()[0] : typeof(object);
+                if (values.Any(value => value is null ? elementType.IsValueType && Nullable.GetUnderlyingType(elementType) is null
+                        : !elementType.IsInstanceOfType(value)))
+                    throw new InvalidOperationException($"扩展方法结果不兼容列表元素类型 {elementType.Name}");
+                list.Clear();
+                foreach (var value in values)
+                    list.Add(value);
+            }
+        }
     }
 
     /// <summary>
