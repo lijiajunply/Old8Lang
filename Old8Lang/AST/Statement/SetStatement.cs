@@ -75,6 +75,23 @@ public partial class SetStatement : OldStatement
     {
         var result = Value.Run(manager);
 
+        if (_leftExpression is TupleLangValue tuplePattern)
+        {
+            if (result is not ILangList values)
+                throw new TypeError(this, "元组解构赋值右侧必须是可索引的集合");
+
+            var items = values.GetItems().ToList();
+            for (var i = 0; i < tuplePattern.Elements.Count; i++)
+            {
+                if (tuplePattern.Elements[i] is not LangId id)
+                    throw new InvalidOperationError(this, "元组解构赋值只支持变量名");
+                if (i >= items.Count)
+                    throw new InvalidOperationError(this, $"元组解构赋值索引 {i} 超出范围");
+                manager.Set(id, items[i]);
+            }
+            return;
+        }
+
         // 检查是否为首次赋值
         if (Id is not null)
         {
