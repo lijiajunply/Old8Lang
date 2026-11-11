@@ -116,9 +116,9 @@ public partial class RangeLangValue(
         if (!includeEnd)
             endNum--;
 
-        // 检查范围是否有效
-        // 如果start原本就大于end,说明是反向范围
-        if (start > end)
+        // 与解释器一致：端点排除后的边界决定方向。比如 [1>~<1]
+        // 调整为 2~0，应产生 2, 1, 0，而不是因为原始端点相等而返回空数组。
+        if (startNum > endNum)
         {
             // 反向范围:从大到小
             for (var i = startNum; i >= endNum; i--)
@@ -134,8 +134,6 @@ public partial class RangeLangValue(
                 results.Add(i);
             }
         }
-        // 如果调整后startNum > endNum但原本start <= end,说明排除导致范围为空,返回空数组
-
         return results.ToArray();
     }
 

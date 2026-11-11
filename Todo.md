@@ -39,6 +39,8 @@
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
 
+- [x] **IL 排除端点后的反向范围生成错误**：IL 现在按调整后的端点确定范围方向，`[1>~<1]` 与解释器一致生成 `2, 1, 0`；`ExtendedRangeTests` 21 项通过。见 [测试报告](Reports/2026-11-11-22-50-IL扩展范围.md)。
+
 - [ ] **异步函数的装饰器仍不可用**：不是虚拟机独有——装饰器必须返回「异步函数值」，
   而 `async (x) -> ...` 异步 Lambda 目前在解释器下也会抛
   `NullReferenceException`（`Instance.Run`）。三种模式都还没有异步函数值表示，
