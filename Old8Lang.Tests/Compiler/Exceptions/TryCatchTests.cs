@@ -126,8 +126,8 @@ public class TryCatchTests(ITestOutputHelper output)
             } catch (outer) {
                 result <- result + ""; outer caught: "" + outer
             }
-            Assert.Contains(""inner caught: inner exception"", result)
-            Assert.Contains(""outer caught: outer exception"", result)
+            Assert.Contains(result, ""inner caught: inner exception"")
+            Assert.Contains(result, ""outer caught: outer exception"")
         ";
         var interpreter = new LangInterpreter();
 
