@@ -9,6 +9,39 @@ namespace Old8Lang.Tests.Compiler.Linq;
 public class LinqLetOrderByTests
 {
     [Fact]
+    public void LinqQuery_ChainedLetAndWhere_PreservesEachRowAndOuterScope()
+    {
+        const string code = @"
+            x <- 99
+            numbers <- [1, 2, 3, 4]
+            result <- from x in numbers let doubled <- x * 2 let squared <- doubled * doubled where squared > 20 select squared + x
+            Assert.Equal(2, result.Count())
+            Assert.Equal(39, result[0])
+            Assert.Equal(68, result[1])
+            Assert.Equal(99, x)
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
+    }
+
+    [Fact]
+    public void LinqQuery_WhereAndProjection_HandleEmptyAndMultipleResults()
+    {
+        const string code = @"
+            numbers <- [1, 2, 3, 4]
+            result <- from x in numbers where x > 2 select x * 10
+            empty <- from y in numbers where y > 10 select y
+            Assert.Equal(2, result.Count())
+            Assert.Equal(30, result[0])
+            Assert.Equal(40, result[1])
+            Assert.Equal(0, empty.Count())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
+    }
+    [Fact]
     public void LinqQuery_Let_CalculatesIntermediateValue()
     {
         // Arrange
@@ -81,6 +114,10 @@ public class LinqLetOrderByTests
         var code = @"
             numbers <- [2, 3, 4]
             result <- from x in numbers let squared <- x * x select x + squared
+            Assert.Equal(3, result.Count())
+            Assert.Equal(6, result[0])
+            Assert.Equal(12, result[1])
+            Assert.Equal(20, result[2])
         ";
         var interpreter = new LangInterpreter();
 

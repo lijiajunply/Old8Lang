@@ -43,6 +43,11 @@ public partial class LinqExpression(
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        if (CanGenerateStreamingQuery())
+        {
+            GenerateStreamingQuery(ilGenerator, local);
+            return;
+        }
         // 在 IL 模式下，LINQ 查询需要生成 IL 代码来执行查询逻辑
         // 由于 IL 模式下无法直接访问 VariateManager（生成的方法是无参数的 Action），
         // 我们需要通过 LocalManager.Interpreter.Manager 来访问
@@ -98,6 +103,10 @@ public partial class LinqExpression(
 
     public override Type OutputType(LocalManager local)
     {
+        if (CanGenerateStreamingQuery())
+        {
+            return typeof(List<object>);
+        }
         // LINQ 查询返回 IEnumerable<T>
         return typeof(System.Collections.IEnumerable);
     }

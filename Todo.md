@@ -81,8 +81,7 @@
 - [ ] **2 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
   - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
     `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
-  - `Compiler.Linq`：`LinqCompilerHelper.ConvertFromLangValue(LangValueType)` 收到原生值 →
-    `AccessViolationException`（`LinqLetOrderByTests.LinqQuery_LetSelectBoth_...`，基线同样崩溃）。
+  - `Compiler.Linq`：基础 `let`/`where`/`select` 路径已修复并验证历史崩溃用例的结果；含 `orderby` 的旧路径仍可触发访问冲突（`LinqQuery_LetOrderBy_UsesLetVariableForSorting`）。其他查询子句也需要逐一核实。见 [测试报告](Reports/2026-11-11-10-30-IL-LINQ基础查询测试.md)。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 [测试报告](Reports/2026-11-11-08-49-IL-select回归测试.md)。
 
