@@ -43,34 +43,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        if (parameters.Count == 0)
-        {
-            // 没有参数，调用 Console.WriteLine()
-            var writeLineNoArg = GlobalMethodInfoCache.GetMethod(typeof(Console), "WriteLine", Type.EmptyTypes);
-            if (writeLineNoArg is not null)
-            {
-                ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
-            }
-            return;
-        }
-
-        // 简化实现：只处理第一个参数，将其转换为字符串
-        var printLineExpr = parameters[0];
-        printLineExpr.LoadIlValue(ilGenerator, local);
-        var printLineType = printLineExpr.OutputType(local);
-
-        // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
-        var writeLineObject = GlobalMethodInfoCache.GetMethod(typeof(Console), "WriteLine", [typeof(object)]);
-        if (writeLineObject is not null)
-        {
-            // 如果是值类型，先装箱
-            if (printLineType is { IsValueType: true })
-            {
-                ilGenerator.Emit(OpCodes.Box, printLineType);
-            }
-
-            ilGenerator.Emit(OpCodes.Call, writeLineObject);
-        }
+        IlPrintHelper.Emit(ilGenerator, local, parameters, newline: true);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

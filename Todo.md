@@ -73,10 +73,9 @@
 - [ ] **IL 函数无法访问顶层全局变量**：`g <- 10` + `func f() -> int { return g + 1 }` →
   `变量 'g' 未声明`。顶层变量是 `OldLangRun` 的局部变量，函数是独立 `DynamicMethod`，编译函数体时不可见。
 
-- [ ] **IL 打印布尔值大小写不一致**：`PrintLine(true)` 解释器/VM 为 `true`，IL 编译产物为 `True`。
+- [x] **IL 打印布尔值大小写不一致**：`PrintLine(true)` 现在输出 `true`；见 [测试报告](Reports/2026-11-11-11-11-IL打印格式测试.md)。
 
-- [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
-  `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
+- [x] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` 现在输出 `[1, 2]`；`Print` / `PrintLine` 也会处理所有参数。
 
 - [x] **泛型类递归特化导致栈溢出**：原崩溃用例及自引用特化回归已通过；完整 `Compiler.Classes` 组正常结束，但仍有普通失败。见 [测试报告](Reports/2026-11-11-10-54-IL泛型递归特化测试.md)。
 - [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 [排序测试报告](Reports/2026-11-11-10-37-IL-LINQ排序测试.md)。

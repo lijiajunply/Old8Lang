@@ -37,23 +37,7 @@ public sealed class PrintFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        if (parameters.Count == 0) return;
-
-        var printExpr = parameters[0];
-        printExpr.LoadIlValue(ilGenerator, local);
-        var printType = printExpr.OutputType(local);
-
-        if (printType != typeof(string))
-        {
-            var toStringMethod = GlobalMethodInfoCache.GetMethod(typeof(object), "ToString", Type.EmptyTypes)!;
-            if (printType is { IsValueType: true })
-            {
-                ilGenerator.Emit(OpCodes.Box, printType);
-            }
-            ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
-        }
-
-        ilGenerator.Emit(OpCodes.Call, GlobalMethodInfoCache.GetMethod(typeof(Console), "Write", [typeof(string)])!);
+        IlPrintHelper.Emit(ilGenerator, local, parameters, newline: false);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
