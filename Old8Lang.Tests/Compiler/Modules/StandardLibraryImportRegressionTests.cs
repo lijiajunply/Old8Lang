@@ -20,4 +20,19 @@ Assert.Equal(4.0, phaseOneRoot(16))
         var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
         action();
     }
+
+    [Fact]
+    public void StandardLibraryModule_BridgesNonMathModuleMethods()
+    {
+        var code = @"
+import ""Regex"" as regex
+func isOld8(value: string) -> bool { return regex.RegexIsMatch(value, ""^Old8$"", false) }
+Assert.True(regex.RegexIsMatch(""Old8"", ""^Old8$"", false))
+Assert.True(isOld8(""Old8""))
+";
+        var interpreter = new LangInterpreter();
+        var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        action();
+    }
 }
