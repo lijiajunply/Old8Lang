@@ -378,6 +378,11 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
             }
             else if (CurrentToken.Type == LangTokenType.LeftParen)
             {
+                // 下一行的元组赋值是新语句，不是前一个表达式的调用参数。
+                if (CurrentIndex > 0 && CurrentToken.Line > Tokens[CurrentIndex - 1].Line &&
+                    IsFollowingTupleAssignment())
+                    break;
+
                 // 处理函数调用: left(arguments)
                 var leftParenToken = CurrentToken;
                 var position = new SourcePosition(leftParenToken.Line, leftParenToken.Column,
@@ -396,6 +401,24 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
         }
 
         return left;
+    }
+
+    private bool IsFollowingTupleAssignment()
+    {
+        var index = CurrentIndex + 1;
+        var identifiers = 0;
+        while (index < Tokens.Count && Tokens[index].Type == LangTokenType.Identifier)
+        {
+            identifiers++;
+            index++;
+            if (index >= Tokens.Count || Tokens[index].Type != LangTokenType.Comma)
+                break;
+            index++;
+        }
+
+        return identifiers >= 2 && index + 1 < Tokens.Count &&
+               Tokens[index].Type == LangTokenType.RightParen &&
+               Tokens[index + 1].Type == LangTokenType.Assignment;
     }
 
     #endregion
