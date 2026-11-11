@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.First() - 获取第一个元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListFirstMethod : BaseLangListMethod
+public class LangListFirstMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["First", "first"];
     public override string[]? ParameterNames => null;
@@ -50,11 +51,18 @@ public class LangListFirstMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListFirstMethod).GetMethod(nameof(FirstHelper),
+        var helperMethod = typeof(LangListFirstMethod).GetMethod(nameof(FirstNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static object? FirstNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IlValueBridge.Unwrap(FirstHelper(langList));
     }
 
     public static LangValueType FirstHelper(ILangList langList)
@@ -69,7 +77,7 @@ public class LangListFirstMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

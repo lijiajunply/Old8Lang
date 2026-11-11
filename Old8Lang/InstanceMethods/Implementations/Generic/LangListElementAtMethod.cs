@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -13,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.ElementAt(index) - 获取指定索引的元素
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListElementAtMethod : BaseLangListMethod
+public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ElementAt", "elementAt", "At", "at"];
     public override string[] ParameterNames => ["index"];
@@ -50,12 +51,19 @@ public class LangListElementAtMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
         parameters[0].LoadIlValue(ilGenerator, local);
 
-        var helperMethod = typeof(LangListElementAtMethod).GetMethod(nameof(ElementAtHelper),
+        var helperMethod = typeof(LangListElementAtMethod).GetMethod(nameof(ElementAtNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static object? ElementAtNativeHelper(LangValueType instance, int index)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IlValueBridge.Unwrap(ElementAtHelper(langList, index));
     }
 
     public static LangValueType ElementAtHelper(ILangList langList, int index)
@@ -78,7 +86,7 @@ public class LangListElementAtMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
