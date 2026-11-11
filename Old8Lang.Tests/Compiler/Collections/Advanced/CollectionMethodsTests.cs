@@ -185,10 +185,10 @@ public class CollectionMethodsTests(ITestOutputHelper output)
             numbers <- {1, 2, 3, 4, 5}
             empty <- {}
             
-            joinedFruits <- fruits.Join("", "")
-            joinedNumbers <- numbers.Join("", "", "")
-            joinedWithSeparator <- fruits.Join("", "", "")
-            emptyJoin <- empty.Join("", "")
+            joinedFruits <- fruits.Join("""")
+            joinedNumbers <- numbers.Join()
+            joinedWithSeparator <- fruits.Join("", "")
+            emptyJoin <- empty.Join()
             
             Assert.Equal(""applebananacherry"", joinedFruits)
             Assert.Equal(""1, 2, 3, 4, 5"", joinedNumbers)
@@ -543,7 +543,7 @@ public class CollectionMethodsTests(ITestOutputHelper output)
             sorted <- doubled.Sort()  // {10, 14, 16, 20, 24, 30, 36, 40}
             
             // 4. 计算总和
-            total <- sorted.Reduce(0, (acc:int, x:int) -> acc + x)
+            total <- sorted.Reduce((acc:int, x:int) -> acc + x, 0)
             
             Assert.Equal(8, filtered.Count())
             Assert.Equal(8, doubled.Count())
@@ -634,7 +634,7 @@ public class CollectionMethodsTests(ITestOutputHelper output)
             // 获取每个人平均分大于85的人
             qualifiedPeople <- people.Filter((person:dict) -> {
                 scores <- person[""scores""]
-                sum <- scores.Reduce(0, (acc:int, x:int) -> acc + x)
+                sum <- scores.Reduce((acc:int, x:int) -> acc + x, 0)
                 avg <- sum / scores.Length
                 return avg > 85
             })
@@ -667,10 +667,10 @@ public class CollectionMethodsTests(ITestOutputHelper output)
         var code = @"
             // 空集合的安全操作
             emptyList <- {}
-            emptyDict <- {}
+            emptyDict:dict <- {}
             
             // 空集合的 Reduce 应该使用初始值
-            emptySum <- emptyList.Reduce(0, (acc:int, x:int) -> acc + x)
+            emptySum <- emptyList.Reduce((acc:int, x:int) -> acc + x, 0)
             
             // 空集合的 Find 应该返回 null
             notFound <- emptyList.Find((x:int) -> x > 0)
