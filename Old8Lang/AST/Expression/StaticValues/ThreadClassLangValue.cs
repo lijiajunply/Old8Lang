@@ -59,7 +59,7 @@ public partial class ThreadClassLangValue : LangValueType
         }
 
         // 处理 Thread.WhenAll 形式的访问（不带调用）
-        if (dotExpression is ClassMemberId memberId)
+        if (dotExpression is LangId memberId)
         {
             var methodName = memberId.IdName;
 
@@ -70,7 +70,7 @@ public partial class ThreadClassLangValue : LangValueType
                 "WhenAny" => new ThreadStaticMethodWrapper("WhenAny", WhenAny),
                 "Delay" => new ThreadStaticMethodWrapper("Delay", Delay),
                 "Sleep" => new ThreadStaticMethodWrapper("Sleep", Sleep),
-                "CurrentThread" => new ThreadStaticMethodWrapper("CurrentThread", CurrentThread),
+                "CurrentThread" => CurrentThread([], dotExpression.Position),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "Thread")
             };
         }
@@ -201,19 +201,7 @@ public partial class ThreadClassLangValue : LangValueType
                 $"CurrentThread 不需要参数,但提供了 {args.Count} 个");
         }
 
-        // 获取当前 .NET 线程
-        var currentThread = Thread.CurrentThread;
-
-        // 创建一个特殊的 ThreadLangValue，包装当前线程
-        // 注意：由于 ThreadLangValue 构造函数需要 ThreadStart，我们需要提供一个空操作
-        var threadValue = new ThreadLangValue(() => { }, position);
-
-        // 使用反射设置内部的 Thread 字段为当前线程
-        var threadField = typeof(ThreadLangValue).GetField("Thread",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        threadField?.SetValue(threadValue, currentThread);
-
-        return threadValue;
+        return new ThreadLangValue(Thread.CurrentThread, position);
     }
 
     /// <summary>

@@ -64,6 +64,24 @@ result <- 42";
 
     #region Thread.CurrentThread 测试
 
+    [Fact]
+    public void Run_CurrentThreadPropertyAndMethod_ReturnExecutingThread()
+    {
+        const string code = @"
+propertyThread <- Thread.CurrentThread
+methodThread <- Thread.CurrentThread()
+sleepMethod <- Thread.Sleep";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+
+        var property = Assert.IsType<ThreadLangValue>(interpreter.Manager.GetValue(new LangId("propertyThread")));
+        var method = Assert.IsType<ThreadLangValue>(interpreter.Manager.GetValue(new LangId("methodThread")));
+        Assert.Equal(Environment.CurrentManagedThreadId, property.ManagedThreadId);
+        Assert.Equal(Environment.CurrentManagedThreadId, method.ManagedThreadId);
+        Assert.IsType<Old8Lang.AST.Expression.StaticValues.ThreadStaticMethodWrapper>(
+            interpreter.Manager.GetValue(new LangId("sleepMethod")));
+    }
+
     /// <summary>
     /// 测试获取当前线程
     /// </summary>

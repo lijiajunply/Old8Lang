@@ -16,6 +16,12 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     private readonly Thread _thread;
 
+    // 包装已存在的线程，不创建新的、尚未启动的线程。
+    internal ThreadLangValue(Thread thread, SourcePosition position = default) : base(position)
+    {
+        _thread = thread;
+    }
+
     /// <summary>
     /// 线程安全锁
     /// </summary>

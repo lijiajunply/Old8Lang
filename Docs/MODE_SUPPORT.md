@@ -213,7 +213,7 @@
 | `CancellationTokenSource`（类形式） | ✅ | ❌ | ✅ | 2026-10-10 起虚拟机支持 `CancellationTokenSource()` / `(timeout)` 及 `Cancel` / `CancelAfter` / `Dispose` / `IsCancellationRequested` |
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
-| Thread API（静态类） | ✅ | ✅ | ✅ | 虚拟机 `Thread.Sleep` / `Thread.CurrentThread` 可用（2026-10-24），见「已知限制」第 3 条 |
+| Thread API（静态类） | ✅ | ⚠️ | ✅ | IL 的 `Thread.CurrentThread()` 目前不受支持，其他成员需逐项复核；虚拟机支持 `Thread.Sleep` 和 `Thread.CurrentThread`。 |
 | Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ✅ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机同日起可用（`VMThreadLangValue` 专属实现）。`Cancel` 是**协作式**的：只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程 |
 
 ### 10. 异常处理
