@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Max() - 最大值
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListMaxMethod : BaseLangListMethod
+public class LangListMaxMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Max", "max"];
     public override string[]? ParameterNames => null;
@@ -59,11 +60,22 @@ public class LangListMaxMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListMaxMethod).GetMethod(nameof(MaxHelper),
+        var helperMethod = typeof(LangListMaxMethod).GetMethod(nameof(MaxNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>IL 模式的辅助方法：返回原生最大元素。</summary>
+    public static object? MaxNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        return IlValueBridge.Unwrap(MaxHelper(langList));
     }
 
     public static LangValueType MaxHelper(ILangList langList)
@@ -88,7 +100,7 @@ public class LangListMaxMethod : BaseLangListMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

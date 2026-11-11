@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -13,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Average() - 平均值
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListAverageMethod : BaseLangListMethod
+public class LangListAverageMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Average", "average", "Avg", "avg"];
     public override string[]? ParameterNames => null;
@@ -53,11 +54,22 @@ public class LangListAverageMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListAverageMethod).GetMethod(nameof(AverageHelper),
+        var helperMethod = typeof(LangListAverageMethod).GetMethod(nameof(AverageNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    /// <summary>IL 模式的辅助方法：计算桥接后集合的平均值。</summary>
+    public static double AverageNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        return AverageHelper(langList);
     }
 
     public static double AverageHelper(ILangList langList)

@@ -95,6 +95,31 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListNumericAggregates_CompileForNativeListsAndArrays()
+    {
+        var code = @"
+            integers <- {5, 2, 8, 1, 9}
+            decimals <- {1.5, 2.5, 0.5}
+            array <- [7, 3, 5]
+
+            Assert.Equal(1, integers.Min())
+            Assert.Equal(9, integers.Max())
+            Assert.Equal(5.0, integers.Average())
+            Assert.Equal(0.5, decimals.Min())
+            Assert.Equal(2.5, decimals.Max())
+            Assert.Equal(1.5, decimals.Average())
+            Assert.Equal(3, array.Min())
+            Assert.Equal(7, array.Max())
+            Assert.Equal(5.0, array.Average())
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
