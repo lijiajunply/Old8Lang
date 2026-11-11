@@ -263,6 +263,26 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void CollectionDistinct_CompilesAndExecutesForListsAndArrays()
+    {
+        var code = @"
+            listValues <- {1, 2, 1, 3, 2}
+            arrayValues <- [1, 2, 1, 3, 2]
+            listDistinct <- listValues.Distinct()
+            arrayDistinct <- arrayValues.Distinct()
+
+            Assert.Equal({1, 2, 3}, listDistinct)
+            Assert.Equal([1, 2, 3], arrayDistinct)
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
