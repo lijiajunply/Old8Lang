@@ -8,7 +8,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
-public class DictKeysMethod : BaseInstanceMethod
+public class DictKeysMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Keys", "keys"];
     public override Type TargetType => typeof(DictionaryLangValue);
@@ -26,21 +26,31 @@ public class DictKeysMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(DictKeysMethod).GetMethod(nameof(KeysHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static List<object?> KeysHelper(Dictionary<object, object> dict)
+    /// <summary>
+    /// IL 模式的辅助方法：从桥接后的字典取出键并返回原生列表。
+    /// </summary>
+    public static List<object?> KeysHelper(LangValueType instance)
     {
-        return dict.Keys.Cast<object?>().ToList();
+        if (instance is not DictionaryLangValue dict)
+        {
+            throw new ArgumentException($"实例必须是字典类型，实际是 {instance.GetType().Name}");
+        }
+
+        var manager = new VariateManager();
+        dict.Run(manager);
+        return dict.Value.Select(pair => IlValueBridge.Unwrap(pair.Key)).ToList();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(List<object>);
+        return typeof(List<object?>);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
