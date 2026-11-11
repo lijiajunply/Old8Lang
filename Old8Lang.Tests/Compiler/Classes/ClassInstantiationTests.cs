@@ -11,6 +11,50 @@ public class ClassInstantiationTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
+    public void InstanceMethod_ReadsFieldFromCorrectReceiver()
+    {
+        const string code = @"
+            class Meter {
+                public value:int
+                public dynamicValue
+                func init(v:int) {
+                    this.value <- v
+                    this.dynamicValue <- v
+                }
+                func field() -> int { return this.value }
+                func dynamicField() -> int { return this.dynamicValue }
+            }
+            first <- Meter(9)
+            second <- Meter(42)
+            Assert.Equal(9, first.field())
+            Assert.Equal(42, second.field())
+            Assert.Equal(9, first.field())
+            Assert.Equal(42, second.dynamicField())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var action = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        action();
+    }
+
+    [Fact]
+    public void InstanceMethod_BoxesValueForObjectReturn()
+    {
+        const string code = @"
+            class Meter {
+                public value:int <- 7
+                func boxed() -> object { return this.value }
+            }
+            meter <- Meter()
+            Assert.Equal(7, meter.boxed())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var action = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        action();
+    }
+
+    [Fact]
     public void BasicClassInstantiation_CompilesAndExecutesCorrectly()
     {
         // Arrange

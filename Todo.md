@@ -65,9 +65,10 @@
   但 `Docs/MODE_SUPPORT.md` §11 标注三模式均为 ✅，现有 import 测试（`Old8Lang.Tests/Interpreter/Modules/`）
   只覆盖解释模式。需确认 IL/VM 是否应支持标准库 import，再决定修实现还是纠正文档。
 
-- [ ] **IL 实例方法读取字段返回随机值**：
+- [x] **IL 实例方法读取字段返回随机值**：
   `class M { public v:int; func field()->int { return this.v } }` + `m <- M(9)`，
   `PrintLine(m.field())` 在 `-il` 下每次输出不同的垃圾整数（`-f` 为 `9`）；顶层 `m.v` 读取正常。
+  已修复有注解字段类型及方法返回值装箱/拆箱，覆盖多个实例及 `object` 返回值；见 [测试报告](Reports/2026-11-11-09-05-IL实例字段回归测试.md)。
 
 - [ ] **IL 函数无法访问顶层全局变量**：`g <- 10` + `func f() -> int { return g + 1 }` →
   `变量 'g' 未声明`。顶层变量是 `OldLangRun` 的局部变量，函数是独立 `DynamicMethod`，编译函数体时不可见。
@@ -109,6 +110,7 @@
 
 - [ ] **IL 类测试中的继承语法失败**：2026-11-11 运行 `Compiler.Classes` 时，多个 `InheritanceTests` 在 `class Derived : Base` 附近解析失败，错误信息包含格式字符串解析错误；测试主机随后因泛型类栈溢出中止，需单独复核。
 - [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。
+- [ ] **IL 类实例化测试残留问题**：2026-11-11 `ClassInstantiationTests` 13 项中 6 项失败，涉及集合元素与嵌套对象的链式调用、静态成员、方法重载和标准库方法；具体错误见 [测试报告](Reports/2026-11-11-09-05-IL实例字段回归测试.md)，需逐项复核。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；

@@ -279,7 +279,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             Type fieldType;
             try
             {
-                fieldType = expr.OutputType(local) ?? typeof(object);
+                fieldType = !string.IsNullOrEmpty(memberId.AssumptionType)
+                    ? memberId.OutputType(local) ?? typeof(object)
+                    : expr.OutputType(local) ?? typeof(object);
             }
             catch
             {
@@ -556,6 +558,12 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         // 创建方法的IL生成器
         var methodIl = methodBuilder.GetILGenerator();
 
+        // ReturnStatement 使用此类型校验并转换返回值，包括 object 到值类型的拆箱。
+        if (returnType != typeof(void))
+        {
+            methodLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
+        }
+
         // 处理方法参数
         // 对于实例方法，参数索引从 1 开始（0 是 this）
         // 对于静态方法，参数索引从 0 开始
@@ -721,6 +729,11 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         // 2. 初始化实例字段
         foreach (var (fieldBuilder, initExpr) in fieldBuilders)
         {
+            // 未初始化的值类型字段由 CLR 赋予默认值，不能向其写入 null。
+            if (initExpr is NullLangValue && fieldBuilder.FieldType.IsValueType)
+            {
+                continue;
+            }
             // 加载 this
             ctorIl.Emit(OpCodes.Ldarg_0);
 
@@ -733,6 +746,16 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
 
             // 加载字段的初始值
             initExpr.LoadIlValue(ctorIl, tempLocal);
+
+            var initializerType = initExpr.OutputType(tempLocal) ?? typeof(object);
+            if (fieldBuilder.FieldType == typeof(object) && initializerType.IsValueType)
+            {
+                ctorIl.Emit(OpCodes.Box, initializerType);
+            }
+            else if (fieldBuilder.FieldType.IsValueType && initializerType == typeof(object))
+            {
+                ctorIl.Emit(OpCodes.Unbox_Any, fieldBuilder.FieldType);
+            }
 
             // 存储到字段
             ctorIl.Emit(OpCodes.Stfld, fieldBuilder);

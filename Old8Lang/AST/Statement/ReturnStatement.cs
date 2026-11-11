@@ -58,7 +58,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                 // 检查类型是否兼容：完全匹配、可赋值、或基本类型转换
                 bool isCompatible = expectedReturnType == returnType ||
                                    expectedReturnType.IsAssignableFrom(returnType) ||
-                                   (!expectedReturnType.IsValueType && returnType == typeof(object)) ||
+                                   returnType == typeof(object) ||
                                    IsBasicTypeConversionAllowed(expectedReturnType, returnType);
 
                 // 如果返回类型不匹配且不能自动转换，报告错误
@@ -130,7 +130,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
             if (local.ReturnValueLocal is not null)
             {
                 var expectedReturnType = local.ReturnValueLocal.LocalType;
-                if (returnType != null && expectedReturnType != typeof(object) && returnType != expectedReturnType)
+                if (returnType != null && returnType != expectedReturnType)
                 {
                     if (expectedReturnType.IsValueType && returnType == typeof(object))
                     {
