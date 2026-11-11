@@ -334,6 +334,25 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void NestedCollectionLengthInLambda_CompilesAndExecutes()
+    {
+        var code = @"
+            people <- {{""scores"": [80, 90, 100]}}
+            qualified <- people.Filter((person:dict) -> {
+                scores <- person[""scores""]
+                return scores.Length > 2
+            })
+            Assert.Equal(1, qualified.Count())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
