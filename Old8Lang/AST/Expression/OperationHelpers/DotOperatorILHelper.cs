@@ -5,6 +5,7 @@ using Old8Lang.Error;
 using System.Collections;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
+using Old8Lang.InstanceMethods.Core;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
@@ -579,25 +580,7 @@ public static class DotOperatorILHelper
         // 注意：IL 代码生成不经过解释器的实例方法分派，某些程序（例如只用到 Thread 的
         // 原生 Dot 分派、从没触发过解释器实例方法查找的程序）不会初始化注册表，
         // 这里必须显式确保初始化，否则会查不到任何实例方法。
-        InstanceMethods.Core.InstanceMethodInitializer.EnsureInitialized();
-        var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
-
-        // 将 C# 原生类型映射到 LangValueType 以便查找实例方法
-        var mappedType = MapToLangValueType(leftType!);
-        var instanceMethod = registry.ResolveMethod(mappedType, instance.Id.IdName, instance.Ids, local);
-
-        // 原生集合（List<T> / T[] / Dictionary<K,V>）在 IL 模式下没有对应的 LangValueType 静态类型，
-        // 这里再按「等价类型」解析一次，但只接受显式声明支持原生接收者的方法，
-        // 避免让既有实现（假定接收者已经是 LangValueType）在栈类型不匹配时生成无效 IL。
-        if (instanceMethod is null && TryGetEquivalentLangValueType(leftType!, out var equivalentType))
-        {
-            var candidate = registry.ResolveMethod(equivalentType, instance.Id.IdName, instance.Ids, local);
-            if (candidate is InstanceMethods.Core.IIlNativeValueInstanceMethod)
-            {
-                instanceMethod = candidate;
-                mappedType = equivalentType;
-            }
-        }
+        var instanceMethod = ResolveInstanceMethod(leftType!, instance, local, out var mappedType);
 
         if (instanceMethod != null)
         {
@@ -788,6 +771,32 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
 
         return m.ReturnType;
+    }
+
+    // 类型推断与 IL 发射必须使用相同的注册表及原生接收者规则。
+    internal static Type? InferInstanceMethodReturnType(Type receiverType, Instance instance, LocalManager local)
+    {
+        var method = ResolveInstanceMethod(receiverType, instance, local, out var mappedType);
+        return method?.GetReturnType(mappedType, instance.Ids, local);
+    }
+
+    private static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,
+        LocalManager local, out Type mappedType)
+    {
+        InstanceMethodInitializer.EnsureInitialized();
+        var registry = InstanceMethodRegistry.Instance;
+        mappedType = MapToLangValueType(receiverType);
+        var method = registry.ResolveMethod(mappedType, instance.Id.IdName, instance.Ids, local);
+        if (method is null && TryGetEquivalentLangValueType(receiverType, out var equivalentType))
+        {
+            var candidate = registry.ResolveMethod(equivalentType, instance.Id.IdName, instance.Ids, local);
+            if (candidate is IIlNativeValueInstanceMethod)
+            {
+                method = candidate;
+                mappedType = equivalentType;
+            }
+        }
+        return method;
     }
 
     /// <summary>

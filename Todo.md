@@ -20,12 +20,8 @@
   - 本轮仅修复声明语法解析，未改变 IL 扩展方法注册与调用路径。
 
 - [ ] **方法调用结果上直接链式调用生成无效 IL。**
-  - 复现：`l.Count().ToStr()`、`l.FindAll((x:int) -> x % 2 == 0).Count()` → `IL001 invalid program`
-    （改动前同样失败）。
-  - 根因：`Old8Lang/AST/Expression/Core/Operation.cs:880` 的
-    `OutputType(ILGenerator, LocalManager)` 用 `Left.OutputType(local)`（非 IL 重载）取嵌套表达式类型，
-    对 `Operation` 恒为 `object`，于是外层按 `object` 解析实例方法/属性。
-  - 影响：所有「链式调用」写法在 IL 下不可用；测试需先赋给变量。
+  - 2026-11-11 复核：`Count().ToStr()` 已可用；`FindAll(...).Count()` 的注册方法返回类型推断已修复，验证了三层链式调用和接收者只求值一次。
+  - 集合元素、嵌套对象及其他链式调用仍需复核；见 [测试报告](Reports/2026-11-11-12-30-IL链式方法调用测试.md)。
 
 - [ ] **IL 模式 lambda 不能读写外层普通局部变量。**
   - 现状：`BuildLambdaDynamicMethod` 的 `funcLocal` 只带了外层**函数**委托表（本轮新增），

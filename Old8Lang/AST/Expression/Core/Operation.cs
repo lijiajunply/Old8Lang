@@ -801,6 +801,15 @@ public partial class Operation(
                 return builtInReturnType;
             }
 
+            if (leftType is not null)
+            {
+                var registeredReturnType = DotOperatorILHelper.InferInstanceMethodReturnType(leftType, instance, local);
+                if (registeredReturnType is not null)
+                {
+                    return registeredReturnType;
+                }
+            }
+
             // 对于其他方法调用，尝试查找方法并返回其返回类型
             if (leftType is not null)
             {
