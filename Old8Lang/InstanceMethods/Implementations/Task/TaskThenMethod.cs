@@ -116,7 +116,7 @@ public class TaskThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
             var args = new List<LangExpression> { t.Result };
             // 返回值转回 IL 模式的原生表示，保持与 Task<object> 的表示一致
-            return IlValueBridge.Unwrap(callbackFunc.Run(manager, args));
+            return IlValueBridge.Unwrap(callbackFunc.Run(manager, args))!;
         }, task.CancellationToken);
 
         return thenTask;

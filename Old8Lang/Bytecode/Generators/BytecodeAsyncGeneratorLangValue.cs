@@ -173,7 +173,7 @@ public class BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachin
     }
 
     // IEnumerator 接口实现（用于同步迭代）：产出栈上的原生表示
-    object IEnumerator.Current => VirtualMachine.UnwrapToVmValue(Current);
+    object IEnumerator.Current => VirtualMachine.UnwrapToVmValue(Current)!;
 
     bool IEnumerator.MoveNext() => MoveNext();
 

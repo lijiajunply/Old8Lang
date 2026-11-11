@@ -1,11 +1,10 @@
 using Old8Lang.LangParser;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Services;
-using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer.Services;
 
-public class SymbolTableBuilderTests(ITestOutputHelper testOutputHelper)
+public class SymbolTableBuilderTests
 {
     [Fact]
     public void TestBuild_Function()

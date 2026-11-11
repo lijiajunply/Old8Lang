@@ -13,6 +13,13 @@ public class ExecuteBytecodeCommand : ICommand
     public string Description => "执行已编译的 .o8c 字节码文件";
     public string Help => "使用: Old8Lang.App -execute <文件.o8c> [--debug]";
 
+    private static readonly bool IsDebugBuild =
+#if DEBUG
+        true;
+#else
+        false;
+#endif
+
     public int Execute(string[] args)
     {
         if (args.Length < 1)
@@ -81,17 +88,14 @@ public class ExecuteBytecodeCommand : ICommand
         }
         catch (Exception e)
         {
-#if DEBUG
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"执行错误: {e.Message}");
-            Console.WriteLine($"错误类型: {e.GetType().Name}");
-            Console.WriteLine($"堆栈跟踪: {e.StackTrace}");
+            if (debugMode || IsDebugBuild)
+            {
+                Console.WriteLine($"错误类型: {e.GetType().Name}");
+                Console.WriteLine($"堆栈跟踪: {e.StackTrace}");
+            }
             Console.ResetColor();
-#else
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"执行错误: {e.Message}");
-            Console.ResetColor();
-#endif
             return 1;
         }
     }

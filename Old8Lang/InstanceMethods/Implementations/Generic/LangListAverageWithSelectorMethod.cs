@@ -152,7 +152,7 @@ public class LangListAverageWithSelectorMethod : BaseLangListMethod, IIlNativeVa
         }
 
         var selector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
 
         double sum = 0;
 

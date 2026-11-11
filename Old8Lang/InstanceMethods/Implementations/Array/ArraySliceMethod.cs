@@ -127,7 +127,7 @@ public class ArraySliceMethod : BaseInstanceMethod
             throw new ArgumentException("切片步长不能为0");
         }
 
-        return result.ToArray();
+        return result.ToArray()!;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

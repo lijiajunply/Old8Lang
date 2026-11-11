@@ -398,7 +398,7 @@ public partial class BytecodeVisitor
             ? new LangId(originalMethod.Id.IdName, returnType, originalMethod.Id.DefaultValue, originalMethod.Id.IsParams, originalMethod.Id.Position)
             : null;
 
-        return new FuncLangValue(newId, newIds, originalMethod.BlockStatement);
+        return new FuncLangValue(newId, newIds ?? [], originalMethod.BlockStatement);
     }
 
     /// <summary>

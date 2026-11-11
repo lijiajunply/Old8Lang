@@ -55,7 +55,6 @@ public partial class BytecodeVisitor
 
         // 2. 为每个 case 创建标签
         var caseLabels = new List<int>();
-        var endLabel = -1; // 将在最后设置
 
         // 3. 生成每个 case 的匹配判断
         for (int i = 0; i < node.Cases.Count; i++)
@@ -253,7 +252,6 @@ public partial class BytecodeVisitor
         Emit(OpCode.JumpIfFalse, -1); // 占位
 
         // 逐个匹配元组元素
-        bool allMatched = true;
         var elementMismatchJumps = new List<int>();
 
         for (int i = 0; i < tuplePattern.Elements.Count; i++)

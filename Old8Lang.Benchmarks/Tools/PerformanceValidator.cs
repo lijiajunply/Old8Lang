@@ -8,7 +8,7 @@ namespace Old8Lang.Benchmarks.Tools;
 /// </summary>
 public class PerformanceValidator
 {
-    public static void Main(string[] args)
+    public static void Run(string[] args)
     {
         Console.WriteLine("=== Old8Lang 解析器性能验证 ===\n");
 

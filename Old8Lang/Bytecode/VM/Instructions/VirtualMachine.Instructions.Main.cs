@@ -479,14 +479,14 @@ public partial class VirtualMachine
                 // 检查 GenericTypeMapping 中是否包含泛型类型参数（如 Wrapper<T>）
                 // 这是编译器的一个 bug，会导致类型解析错误
                 // 作为临时变通方案，如果检测到这种情况，跳过类型检查
-                bool hasNestedGenericMapping = function.GenericTypeMapping.Values.Any(v => v.Contains('<'));
+                bool hasNestedGenericMapping = function.GenericTypeMapping?.Values.Any(v => v?.Contains('<') == true) == true;
                 if (hasNestedGenericMapping)
                 {
                     // 跳过类型检查，因为编译器生成的 GenericTypeMapping 可能不正确
                     continue;
                 }
 
-                resolvedType = ResolveGenericType(expectedType, function.GenericTypeMapping);
+                resolvedType = ResolveGenericType(expectedType, function.GenericTypeMapping!);
             }
 
             // 使用 CheckTypeMatch 进行类型检查

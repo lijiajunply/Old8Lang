@@ -9,7 +9,7 @@ namespace Old8Lang.Benchmarks.Benchmarks.Reflection;
 /// </summary>
 public class SimpleReflectionBenchmark
 {
-    public static void Main(string[] args)
+    public static void Run(string[] args)
     {
         Console.WriteLine("=== 反射性能优化 - 性能对比测试 ===\n");
 

@@ -1,9 +1,8 @@
 using Old8Lang.LanguageServer.Models;
-using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer.Services;
 
-public partial class SymbolInfoTests(ITestOutputHelper testOutputHelper)
+public partial class SymbolInfoTests
 {
     [Fact]
     public void TestSymbolInfo_BasicProperties()

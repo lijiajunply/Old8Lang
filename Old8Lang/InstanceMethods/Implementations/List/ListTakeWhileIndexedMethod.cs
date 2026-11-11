@@ -126,7 +126,7 @@ public class ListTakeWhileIndexedMethod : BaseInstanceMethod, IIlNativeValueInst
         if (instance is List<object?> list && arguments.Length > 0)
         {
             var predicate = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var result = new List<object?>();
 
             for (var i = 0; i < list.Count; i++)

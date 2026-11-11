@@ -163,7 +163,7 @@ public static class ReflectionHelper
         {
             if (funcValue.Method != null)
             {
-                return CreateNativeFunctionInfoDict(funcValue.Method, funcValue.Id.IdName);
+                return CreateNativeFunctionInfoDict(funcValue.Method, funcValue.Id!.IdName);
             }
             return CreateUserFunctionInfoDict(funcValue);
         }
@@ -215,14 +215,14 @@ public static class ReflectionHelper
     {
         var tuples = new List<TupleLangValue>
         {
-            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Id.IdName)]),
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Id!.IdName)]),
             new TupleLangValue([new StringLangValue("type"), new StringLangValue("user_function")]),
             new TupleLangValue([
                 new StringLangValue("parameters"),
-                new ListLangValue(func.Ids.Select(id => (LangValueType)new StringLangValue(id.IdName)).ToList())
+                new ListLangValue(func.Ids!.Select(id => (LangValueType)new StringLangValue(id.IdName)).ToList())
             ]),
-            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(func.Ids.Count)]),
-            new TupleLangValue([new StringLangValue("hasDefaultParams"), new BoolLangValue(func.Ids.Any(id => id.DefaultValue != null))]),
+            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(func.Ids!.Count)]),
+            new TupleLangValue([new StringLangValue("hasDefaultParams"), new BoolLangValue(func.Ids!.Any(id => id.DefaultValue != null))]),
             new TupleLangValue([new StringLangValue("isGeneric"), new BoolLangValue(func.GenericParameters?.Count > 0)])
         };
         return new DictionaryLangValue(tuples);
@@ -647,7 +647,7 @@ internal class ValueExpression(LangValueType value) : LangExpression
         value.LoadIlValue(ilGenerator, local);
     }
 
-    public override Type OutputType(LocalManager local) => value.OutputType(local);
+    public override Type OutputType(LocalManager local) => value.OutputType(local)!;
 
     public override TResult Accept<TResult>(AST.Visitor.IVisitor<TResult> visitor)
     {

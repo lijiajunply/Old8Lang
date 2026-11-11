@@ -42,7 +42,7 @@ public sealed class SleepFunction : BaseGlobalFunction
 
         // 调用 Thread.Sleep(int)
         var method = typeof(Thread).GetMethod(nameof(Thread.Sleep), [typeof(int)]);
-        ilGenerator.Emit(OpCodes.Call, method);
+        ilGenerator.Emit(OpCodes.Call, method!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -86,7 +86,7 @@ public sealed class GetCurrentThreadIdFunction : BaseGlobalFunction
         // 调用 Environment.CurrentManagedThreadId
         var property = typeof(Environment).GetProperty(nameof(Environment.CurrentManagedThreadId));
         var method = property!.GetGetMethod();
-        ilGenerator.Emit(OpCodes.Call, method);
+        ilGenerator.Emit(OpCodes.Call, method!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -128,7 +128,7 @@ public sealed class GetProcessorCountFunction : BaseGlobalFunction
         // 调用 Environment.ProcessorCount
         var property = typeof(Environment).GetProperty(nameof(Environment.ProcessorCount));
         var method = property!.GetGetMethod();
-        ilGenerator.Emit(OpCodes.Call, method);
+        ilGenerator.Emit(OpCodes.Call, method!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

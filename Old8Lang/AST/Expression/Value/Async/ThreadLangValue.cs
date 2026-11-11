@@ -628,7 +628,7 @@ public partial class ThreadLangValue : LangValueType
                 var nextResult = nextThread.Join();
 
                 // 设置结果
-                thenThread?.SetResult(nextResult.GetValue());
+                thenThread?.SetResult(nextResult.GetValue()!);
             }
             catch (Exception ex)
             {
@@ -672,7 +672,7 @@ public partial class ThreadLangValue : LangValueType
                 }
 
                 // 已结束：取回结果（若线程内部有异常，Join() 会抛出）
-                timeoutThread?.SetResult(Join().GetValue());
+                timeoutThread?.SetResult(Join().GetValue()!);
             }
             catch (Exception ex)
             {

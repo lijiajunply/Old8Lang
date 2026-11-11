@@ -115,7 +115,7 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
     {
         var results = EvaluateParameters(parameters, manager);
         int channelId = ((IntLangValue)results[0]).Value;
-        object value = results[1].GetValue();
+        var value = results[1].GetValue()!;
         ResourceManager.SendChannel(channelId, value);
         return new VoidLangValue();
     }
@@ -131,9 +131,10 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
 
         // 加载 value 参数并转换为 object
         parameters[1].LoadIlValue(ilGenerator, local);
-        if (parameters[1].OutputType(local).IsValueType)
+        var valueType = parameters[1].OutputType(local) ?? typeof(object);
+        if (valueType.IsValueType)
         {
-            ilGenerator.Emit(OpCodes.Box, parameters[1].OutputType(local));
+            ilGenerator.Emit(OpCodes.Box, valueType);
         }
 
         // 调用 ResourceManager.SendChannel(int, object)
@@ -172,7 +173,7 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
     {
         var results = EvaluateParameters(parameters, manager);
         int channelId = ((IntLangValue)results[0]).Value;
-        object value = results[1].GetValue();
+        var value = results[1].GetValue()!;
         int timeoutMs = ((IntLangValue)results[2]).Value;
         bool success = ResourceManager.TrySendChannel(channelId, value, timeoutMs);
         return new BoolLangValue(success);
@@ -189,9 +190,10 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
 
         // 加载 value 参数并转换为 object
         parameters[1].LoadIlValue(ilGenerator, local);
-        if (parameters[1].OutputType(local).IsValueType)
+        var valueType = parameters[1].OutputType(local) ?? typeof(object);
+        if (valueType.IsValueType)
         {
-            ilGenerator.Emit(OpCodes.Box, parameters[1].OutputType(local));
+            ilGenerator.Emit(OpCodes.Box, valueType);
         }
 
         // 加载 timeoutMs 参数

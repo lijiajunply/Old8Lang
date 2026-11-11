@@ -149,7 +149,7 @@ public class ArrayGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInst
         if (instance is object?[] array && arguments.Length > 0)
         {
             var keySelector = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var result = new List<object?>();
 
             if (array.Length == 0)

@@ -45,13 +45,17 @@ public class SyntaxTestCommand : ICommand
 
             return 0;
         }
+#if DEBUG
+        catch (Exception)
+        {
+            throw;
+        }
+#else
         catch (Exception e)
         {
-#if DEBUG
-            throw;
-#endif
             Console.WriteLine(e.Message);
             return 1;
         }
+#endif
     }
 }

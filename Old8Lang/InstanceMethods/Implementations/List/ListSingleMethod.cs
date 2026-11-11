@@ -211,7 +211,7 @@ public class ListSingleMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
             {
                 // 带谓词版本
                 var predicate = arguments[0];
-                var vm = VMContext.CurrentVM;
+                var vm = VMContext.CurrentVM!;
 
                 object? foundItem = null;
                 var foundCount = 0;

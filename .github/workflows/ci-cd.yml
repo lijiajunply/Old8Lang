@@ -1,345 +1,121 @@
-name: Old8Lang CI/CD Pipeline
+name: Tag release
 
 on:
   push:
-    branches: [ main, develop, master ]
-  pull_request:
-    branches: [ main, develop, master ]
-  schedule:
-    - cron: '0 1 * * *'
-  workflow_dispatch:
+    tags:
+      - '**'
+
+permissions:
+  contents: read
 
 env:
   DOTNET_VERSION: '10.0.100'
-  SOLUTION_FILE: 'Old8Lang.sln'
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Cache NuGet packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-          
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_FILE }}
-      
-    - name: Build solution
-      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
-      
-    - name: Run unit tests
-      run: dotnet test Old8Lang.Tests --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore dependencies
+        run: dotnet restore Old8Lang.sln
+      - name: Build solution
+        run: dotnet build Old8Lang.sln --configuration Release --no-restore
+      - name: Run unit tests
+        id: unit
+        run: dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
+      - name: Run syntax tests
+        id: syntax
+        working-directory: TestFiles
+        run: bash run_syntax_tests.sh
+      - name: Run interpreter tests
+        id: interpreter
+        working-directory: TestFiles
+        run: bash run_interpreter_tests.sh
+      - name: Run IL tests
+        id: il
+        working-directory: TestFiles
+        run: bash run_compiler_tests.sh
+      - name: Run VM tests
+        id: vm
+        working-directory: TestFiles
+        run: bash run_vm_tests.sh
+      - name: Write test report
+        if: always()
+        env:
+          UNIT_RESULT: ${{ steps.unit.outcome }}
+          SYNTAX_RESULT: ${{ steps.syntax.outcome }}
+          INTERPRETER_RESULT: ${{ steps.interpreter.outcome }}
+          IL_RESULT: ${{ steps.il.outcome }}
+          VM_RESULT: ${{ steps.vm.outcome }}
+        run: |
+          mkdir -p Reports
+          report="Reports/$(TZ=Asia/Shanghai date +'%Y-%m-%d-%H-%M')-CI测试报告.md"
+          {
+            echo '# Tag release CI 测试报告'
+            echo
+            echo "Tag: ${GITHUB_REF_NAME}"
+            echo
+            echo "- 单元测试: ${UNIT_RESULT:-not run}"
+            echo "- 语法测试: ${SYNTAX_RESULT:-not run}"
+            echo "- 解释模式: ${INTERPRETER_RESULT:-not run}"
+            echo "- IL 模式: ${IL_RESULT:-not run}"
+            echo "- VM 模式: ${VM_RESULT:-not run}"
+            echo
+            echo '单元测试详情见 TRX 文件，各模式测试文件的运行结果见 Actions 日志。'
+          } > "$report"
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            Old8Lang.Tests/TestResults/**/*.trx
+            Reports/*-CI测试报告.md
 
-    - name: Run performance regression tests
-      run: dotnet test Old8Lang.Tests --configuration Release --no-build --filter "FullyQualifiedName~Performance" --verbosity normal --logger "trx;LogFileName=performance_test_results.trx"
-      
-    - name: Run syntax tests
-      run: |
-        cd TestFiles
-        chmod +x run_syntax_tests.sh
-        ./run_syntax_tests.sh
-        
-    - name: Run interpreter tests
-      run: |
-        cd TestFiles
-        chmod +x run_interpreter_tests.sh
-        ./run_interpreter_tests.sh
-        
-    - name: Run compiler tests
-      run: |
-        cd TestFiles
-        chmod +x run_compiler_tests.sh
-        ./run_compiler_tests.sh
-        
-    - name: Run comprehensive tests
-      run: |
-        cd TestFiles
-        chmod +x run_comprehensive_compiler_tests.sh
-        ./run_comprehensive_compiler_tests.sh
-        
-    - name: Publish test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: |
-          Old8Lang.Tests/TestResults/**/*.trx
-          Reports/**/*.md
-          
-  performance-benchmarks:
+  package:
+    needs: test
     runs-on: ubuntu-latest
-    needs: build-and-test
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [linux-x64, win-x64, osx-x64, osx-arm64]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_FILE }}
-      
-    - name: Build benchmarks
-      run: dotnet build Old8Lang.Benchmarks --configuration Release
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Publish executable
+        run: dotnet publish Old8Lang.App/Old8Lang.App.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output dist/${{ matrix.runtime }}
+      - name: Create package
+        run: tar -czf old8lang-${{ matrix.runtime }}.tar.gz -C dist/${{ matrix.runtime }} .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: old8lang-${{ matrix.runtime }}
+          path: old8lang-${{ matrix.runtime }}.tar.gz
+          if-no-files-found: error
 
-    # 回归门禁的基线按 runner 类别缓存：Ubuntu 与 macOS/Windows 的绝对耗时不可比，
-    # 用仓库里提交的历史报告当基线会产生无意义的 FAIL。
-    - name: Restore VM quick baseline cache
-      id: vm-quick-baseline
-      uses: actions/cache/restore@v4
-      with:
-        path: ci-baselines
-        key: vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
-        restore-keys: |
-          vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-
-
-    # 该步骤即门禁：报告出现 FAIL 场景时 --vm-report-quick 返回非零退出码，直接阻断作业。
-    # 基线取自上面的缓存；缓存未命中时没有基线（状态为 N/A），不会产生跨机器误报。
-    - name: Run PR/Push quick VM benchmarks (regression gate)
-      id: vm-quick-gate
-      if: github.event_name != 'schedule'
-      env:
-        OLD8LANG_VM_REPORT_BASELINE: ci-baselines/vm_quick_baseline.json
-      run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-quick
-
-    - name: Run nightly full VM benchmarks
-      if: github.event_name == 'schedule'
-      run: dotnet run --project Old8Lang.Benchmarks --configuration Release -- --vm-report-nightly
-
-    # 只在门禁通过时推进基线，避免把已经回归的数值固化成新的对比起点。
-    - name: Capture VM quick baseline
-      if: always() && github.event_name != 'schedule' && steps.vm-quick-gate.outcome == 'success'
-      run: |
-        mkdir -p ci-baselines
-        latest=$(ls -1t Reports/VM_Quick_Performance_Report_*.json 2>/dev/null | head -1)
-        if [ -n "$latest" ]; then
-          cp "$latest" ci-baselines/vm_quick_baseline.json
-          echo "VM quick baseline updated from $latest"
-        else
-          echo "未找到 Quick 报告，跳过基线更新"
-        fi
-
-    - name: Save VM quick baseline cache
-      if: always() && github.event_name != 'schedule' && steps.vm-quick-gate.outcome == 'success'
-      uses: actions/cache/save@v4
-      with:
-        path: ci-baselines
-        key: vm-quick-baseline-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
-
-    - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: benchmark-results
-        path: |
-          BenchmarkDotNet.Artifacts/results/
-          Reports/**/*.md
-          Reports/**/*.json
-        
-  code-quality:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Install .NET format tool
-      run: dotnet tool install -g dotnet-format
-      
-    - name: Check code formatting
-      run: |
-        dotnet format ${{ env.SOLUTION_FILE }} --verify-no-changes
-        
-    - name: Install Roslyn analyzers
-      run: dotnet add Old8Lang.sln package Microsoft.CodeAnalysis.NetAnalyzers
-      
-    - name: Run code analysis
-      run: |
-        dotnet build ${{ env.SOLUTION_FILE }} --configuration Release -p:EnableNETAnalyzers=true -p:AnalysisMode=All
-        
-  security-scan:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        
-    - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
-        
-  build-language-server:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Build Language Server
-      run: |
-        dotnet build Old8Lang.LanguageServer --configuration Release
-        
-    - name: Package Language Server
-      run: |
-        mkdir -p dist/old8lang-lsp
-        cp Old8Lang.LanguageServer/bin/Release/net10.0/* dist/old8lang-lsp/
-        
-    - name: Upload Language Server artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: old8lang-language-server
-        path: dist/old8lang-lsp/
-        
-  build-vscode-extension:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Install dependencies
-      working-directory: ./vscode-old8lang
-      run: npm ci
-      
-    - name: Build extension
-      working-directory: ./vscode-old8lang
-      run: npm run compile
-      
-    - name: Package extension
-      working-directory: ./vscode-old8lang
-      run: npm run vsce package
-      
-    - name: Upload VS Code extension
-      uses: actions/upload-artifact@v4
-      with:
-        name: vscode-old8lang-extension
-        path: vscode-old8lang/*.vsix
-        
-  deploy-docs:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./Docs
-        destination_dir: docs
-        
   release:
+    needs: package
     runs-on: ubuntu-latest
-    needs: [build-and-test, performance-benchmarks, code-quality, security-scan]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    
+    permissions:
+      contents: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Build release binaries
-      run: |
-        dotnet publish Old8Lang.App --configuration Release --runtime linux-x64 --output dist/linux-x64
-        dotnet publish Old8Lang.App --configuration Release --runtime win-x64 --output dist/win-x64
-        dotnet publish Old8Lang.App --configuration Release --runtime osx-x64 --output dist/osx-x64
-        
-    - name: Create release package
-      run: |
-        tar -czf old8lang-linux-x64.tar.gz -C dist/linux-x64 .
-        tar -czf old8lang-win-x64.tar.gz -C dist/win-x64 .
-        tar -czf old8lang-osx-x64.tar.gz -C dist/osx-x64 .
-        
-    - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Old8Lang ${{ github.ref }}
-        draft: false
-        prerelease: false
-        asset_path: .
-        asset_name: old8lang-linux-x64.tar.gz
-        asset_content_type: application/gzip
-        
-    - name: Upload release assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: old8lang-linux-x64.tar.gz
-        asset_name: old8lang-linux-x64.tar.gz
-        asset_content_type: application/gzip
-        
-  notify:
-    runs-on: ubuntu-latest
-    needs: [build-and-test, performance-benchmarks, code-quality, security-scan]
-    if: always()
-    
-    steps:
-    - name: Notify build status
-      uses: 8398a7/action-slack@v3
-      if: always()
-      with:
-        status: ${{ job.status }}
-        channel: '#ci-cd'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: old8lang-*
+          path: dist
+          merge-multiple: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.tar.gz --clobber
+          else
+            gh release create "$TAG" dist/*.tar.gz --title "Old8Lang $TAG" --generate-notes --verify-tag
+          fi

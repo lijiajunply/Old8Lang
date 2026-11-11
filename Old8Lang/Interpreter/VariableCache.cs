@@ -58,7 +58,7 @@ public class VariableCache
 
             // 更新 LRU 列表
             _lruList.Remove(entry.ListNode!);
-            _lruList.AddFirst(entry.ListNode);
+            _lruList.AddFirst(entry.ListNode!);
 
             value = entry.Value;
             return true;
@@ -84,7 +84,7 @@ public class VariableCache
 
             // 更新 LRU 列表
             _lruList.Remove(existingEntry.ListNode!);
-            _lruList.AddFirst(existingEntry.ListNode);
+            _lruList.AddFirst(existingEntry.ListNode!);
         }
         else
         {

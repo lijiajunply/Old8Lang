@@ -46,18 +46,19 @@ public class DocumentFormattingHandler(DocumentManager documentManager, Formatti
         return Task.FromResult<TextEditContainer?>(new TextEditContainer(edits));
     }
 
-    public Task<TextEditContainer?> Handle(DocumentRangeFormattingParams request, CancellationToken cancellationToken)
+    public Task<TextEditContainer> Handle(DocumentRangeFormattingParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
         var document = documentManager.GetDocument(uri);
 
         if (document == null)
         {
-            return Task.FromResult<TextEditContainer?>(null);
+            // 范围格式化接口约定返回非 null：用空编辑列表表示「无需修改」
+            return Task.FromResult(new TextEditContainer());
         }
 
         var edits = formattingService.FormatRange(document.Text, request.Range, request.Options);
 
-        return Task.FromResult<TextEditContainer?>(new TextEditContainer(edits));
+        return Task.FromResult(new TextEditContainer(edits));
     }
 }

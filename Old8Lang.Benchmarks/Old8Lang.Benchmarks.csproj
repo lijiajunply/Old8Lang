@@ -5,6 +5,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Microsoft.NET.Test.Sdk 会生成一个入口点，但本工程用 Program.cs 的顶级语句作为入口；
+         被忽略的自动入口点是测试 SDK 的既有行为，与本工程代码无关。 -->
+    <NoWarn>$(NoWarn);CS7022</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

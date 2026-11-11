@@ -151,7 +151,7 @@ public class LangListMaxWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
         }
 
         var selector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
 
         var maxValue = vm.CallFunctionObject(selector, [items[0]]);
 

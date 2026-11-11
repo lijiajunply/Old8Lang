@@ -694,7 +694,7 @@ public partial class TypeTemplate(
             }
 
             inferredArguments = new Dictionary<string, ITypeInfo>();
-            foreach (var parameter in GenericParameters)
+            foreach (var parameter in GenericParameters!)
             {
                 inferredArguments[parameter.Name] = anyType;
             }

@@ -171,7 +171,7 @@ public class LangListSumWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
         }
 
         var selector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
 
         double sum = 0;
         bool hasDouble = false;

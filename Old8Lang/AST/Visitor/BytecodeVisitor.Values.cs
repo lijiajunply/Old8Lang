@@ -162,7 +162,7 @@ public partial class BytecodeVisitor
         // Instance 是函数调用表达式 a(b, c)
         string funcName = node.Id.IdName;
         int positionalCount = node.Ids.Count;
-        int namedCount = node.NamedArgs?.Count ?? 0;
+        int namedCount = node.NamedArgs!?.Count ?? 0;
 
         // 检查是否是类实例化
         bool isClassName = _compiler.IsClassName(funcName);
@@ -220,7 +220,7 @@ public partial class BytecodeVisitor
                 // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    foreach (var namedArg in node.NamedArgs)
+                    foreach (var namedArg in node.NamedArgs!)
                     {
                         namedArg.Value.Accept(this);
                     }
@@ -233,7 +233,7 @@ public partial class BytecodeVisitor
 
                 if (namedCount > 0)
                 {
-                    var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                    var namedArgNames = node.NamedArgs!.Select(na => na.Name).ToArray();
                     Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName, namedArgNames });
                 }
                 else
@@ -281,7 +281,7 @@ public partial class BytecodeVisitor
                 // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    foreach (var namedArg in node.NamedArgs)
+                    foreach (var namedArg in node.NamedArgs!)
                     {
                         namedArg.Value.Accept(this);
                     }
@@ -305,7 +305,7 @@ public partial class BytecodeVisitor
                 // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    foreach (var namedArg in node.NamedArgs)
+                    foreach (var namedArg in node.NamedArgs!)
                     {
                         namedArg.Value.Accept(this);
                     }
@@ -319,7 +319,7 @@ public partial class BytecodeVisitor
                     if (namedCount > 0)
                     {
                         // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        var namedArgNames = node.NamedArgs!.Select(na => na.Name).ToArray();
                         Emit(OpCode.CallNative, new object[] { positionalCount, namedCount, funcName, namedArgNames });
                     }
                     else
@@ -334,7 +334,7 @@ public partial class BytecodeVisitor
                 {
                     if (namedCount > 0)
                     {
-                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        var namedArgNames = node.NamedArgs!.Select(na => na.Name).ToArray();
                         if (hasFunctionIndex)
                         {
                             Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });
@@ -362,7 +362,7 @@ public partial class BytecodeVisitor
                     if (namedCount > 0)
                     {
                         // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        var namedArgNames = node.NamedArgs!.Select(na => na.Name).ToArray();
                         Emit(OpCode.CallAsync, new object[] { positionalCount, namedCount, funcName, namedArgNames });
                     }
                     else
@@ -381,7 +381,7 @@ public partial class BytecodeVisitor
                 {
                     if (namedCount > 0)
                     {
-                        var namedArgNames = node.NamedArgs.Select(na => na.Name).ToArray();
+                        var namedArgNames = node.NamedArgs!.Select(na => na.Name).ToArray();
                         if (hasFunctionIndex)
                         {
                             Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });

@@ -152,7 +152,7 @@ public class ListGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInsta
         if (arguments.Length > 0)
         {
             var keySelector = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var result = new List<object?>();
 
             if (list.Count == 0)

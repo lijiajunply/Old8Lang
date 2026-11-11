@@ -138,7 +138,7 @@ public partial class CompilerVisitor
                     
                     // 过滤器结果应该在栈顶
                     // 检查类型，如果是值类型需要装箱，因为 ToBool 接受 object
-                    var filterType = filter.OutputType(local);
+                    var filterType = filter.OutputType(local) ?? typeof(object);
                     if (filterType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, filterType);

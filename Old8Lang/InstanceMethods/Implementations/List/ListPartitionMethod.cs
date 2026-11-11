@@ -138,7 +138,7 @@ public class ListPartitionMethod : BaseInstanceMethod, IIlNativeValueInstanceMet
         if (instance is List<object?> list && arguments.Length > 0)
         {
             var predicate = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var trueList = new List<object?>();
             var falseList = new List<object?>();
 

@@ -109,7 +109,7 @@ public class DictForEachMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         if (instance is Dictionary<object, object> dict && arguments.Length > 0)
         {
             var action = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
 
             foreach (var (key, value) in dict)
             {

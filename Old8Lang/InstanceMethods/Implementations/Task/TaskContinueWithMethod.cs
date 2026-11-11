@@ -115,10 +115,10 @@ public class TaskContinueWithMethod : BaseInstanceMethod, IIlNativeValueInstance
 
             if (result is TaskLangValue taskValue)
             {
-                return IlValueBridge.Unwrap(await taskValue.AwaitAsync());
+                return IlValueBridge.Unwrap(await taskValue.AwaitAsync())!;
             }
 
-            return IlValueBridge.Unwrap(result);
+            return IlValueBridge.Unwrap(result)!;
         }, task.CancellationToken).Unwrap();
 
         return continueTask;

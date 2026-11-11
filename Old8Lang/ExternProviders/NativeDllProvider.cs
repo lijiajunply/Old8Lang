@@ -105,7 +105,7 @@ public class NativeDllProvider : IExternProvider
     {
         if (funcDecl.FunctionSignature is null)
         {
-            throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
+            throw new TypeError(default(SourcePosition), $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
         var signature = funcDecl.FunctionSignature.FuncValue;
@@ -157,7 +157,7 @@ public class NativeDllProvider : IExternProvider
     {
         if (funcDecl.FunctionSignature is null)
         {
-            throw new TypeError(null, $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
+            throw new TypeError(default(SourcePosition), $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
         var signature = funcDecl.FunctionSignature.FuncValue;
@@ -216,7 +216,7 @@ public class NativeDllProvider : IExternProvider
             "ulong" => typeof(ulong),
             "ushort" => typeof(ushort),
             null => typeof(void),
-            _ => throw new TypeError(null, $"不支持的 extern 类型: {old8Type}")
+            _ => throw new TypeError(default(SourcePosition), $"不支持的 extern 类型: {old8Type}")
         };
     }
 

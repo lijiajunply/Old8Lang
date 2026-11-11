@@ -39,14 +39,14 @@ internal static class BenchmarkProgram
     private static int RunValidate(string[] args)
     {
         Console.WriteLine("运行性能验证测试...\n");
-        PerformanceValidator.Main(args);
+        PerformanceValidator.Run(args);
         return 0;
     }
 
     private static int RunQuickCompare(string[] args)
     {
         Console.WriteLine("运行快速性能对比测试...\n");
-        SimpleReflectionBenchmark.Main(args);
+        SimpleReflectionBenchmark.Run(args);
         return 0;
     }
 

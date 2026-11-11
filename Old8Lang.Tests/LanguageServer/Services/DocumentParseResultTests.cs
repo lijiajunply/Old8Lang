@@ -1,10 +1,9 @@
 using Old8Lang.LangParser;
 using Old8Lang.LanguageServer.Models;
-using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer.Services;
 
-public class DocumentParseResultTests(ITestOutputHelper testOutputHelper)
+public class DocumentParseResultTests
 {
     [Fact]
     public void TestDocumentParseResult_Properties()

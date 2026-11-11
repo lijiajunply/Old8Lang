@@ -323,10 +323,10 @@ public class AsyncFuncLangValue : ImportInfo
         }
 
         // 处理参数
-        for (var i = 0; i < Ids.Count; i++)
+        for (var i = 0; i < Ids!.Count; i++)
         {
-            var id = Ids[i];
-            var paramType = parameterTypes[i];
+            var id = Ids![i];
+            var paramType = parameterTypes[i]!;
             var localVar = methodIl.DeclareLocal(paramType);
             funcLocal.AddLocalVar(id.IdName, localVar);
             funcLocal.LocalVarTypes[id.IdName] = paramType;

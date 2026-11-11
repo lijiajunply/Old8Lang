@@ -49,7 +49,7 @@ public static class ThreadRetryHelper
                     var result = newThread.Join();
 
                     // 执行成功，设置结果并返回
-                    retryThread?.SetResult(result.GetValue());
+                    retryThread?.SetResult(result.GetValue()!);
                     return;
                 }
                 catch (Exception ex)

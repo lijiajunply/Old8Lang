@@ -99,7 +99,7 @@ public class PostgresConnectionWrapper : IDisposable
     public T ExecuteScalar<T>(string sql, object? parameters = null)
     {
         EnsureConnectionOpen();
-        return _connection.ExecuteScalar<T>(sql, parameters);
+        return _connection.ExecuteScalar<T>(sql, parameters)!;
     }
 
     /// <summary>

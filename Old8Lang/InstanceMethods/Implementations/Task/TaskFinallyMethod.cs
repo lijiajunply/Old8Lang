@@ -67,10 +67,11 @@ public class TaskFinallyMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
             {
                 finallyHandler.Run(capturedManager, []);
             }
-            catch (Exception finallyEx)
+            catch (Exception)
             {
-                // 如果 finally 处理函数抛出异常，优先抛出 finally 的异常
-                throw finallyEx;
+                // 如果 finally 处理函数抛出异常，优先抛出 finally 的异常；
+                // 使用裸 throw 保留原始堆栈信息。
+                throw;
             }
 
             // 如果原任务有异常，重新抛出
@@ -160,7 +161,7 @@ public class TaskFinallyMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
                 throw exception;
             }
 
-            return IlValueBridge.Unwrap(result);
+            return IlValueBridge.Unwrap(result)!;
         }, task.CancellationToken);
 
         return finallyTask;

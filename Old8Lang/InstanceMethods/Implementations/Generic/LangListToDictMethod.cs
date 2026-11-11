@@ -142,7 +142,7 @@ public class LangListToDictMethod : BaseLangListMethod
             {
                 if (list[0] != null)
                 {
-                    dict[list[0]] = list[1];
+                    dict[list[0]!] = list[1];
                 }
             }
             else

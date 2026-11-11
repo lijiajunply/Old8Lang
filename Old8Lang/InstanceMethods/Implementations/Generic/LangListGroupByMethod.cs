@@ -115,7 +115,7 @@ public class LangListGroupByMethod : BaseLangListMethod
         }
 
         // 将分组结果转换为字典
-        var resultDict = new Dictionary<object?, object?>();
+        var resultDict = new Dictionary<object, object?>();
         foreach (var kvp in groups)
         {
             resultDict[kvp.Key] = kvp.Value;

@@ -121,13 +121,13 @@ public class TaskCatchMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
                 var errorMessage = exception?.Message ?? "Unknown error";
 
                 var args = new List<LangExpression> { new StringLangValue(errorMessage) };
-                return IlValueBridge.Unwrap(errorHandlerFunc.Run(manager, args));
+                return IlValueBridge.Unwrap(errorHandlerFunc.Run(manager, args))!;
             }
 
             if (t.IsCanceled)
             {
                 var args = new List<LangExpression> { new StringLangValue("Task was canceled") };
-                return IlValueBridge.Unwrap(errorHandlerFunc.Run(manager, args));
+                return IlValueBridge.Unwrap(errorHandlerFunc.Run(manager, args))!;
             }
 
             return (object)t.Result;

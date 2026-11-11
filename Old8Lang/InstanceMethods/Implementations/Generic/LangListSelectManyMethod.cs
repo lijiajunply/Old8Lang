@@ -204,7 +204,7 @@ public class LangListSelectManyMethod : BaseLangListMethod, IIlNativeValueInstan
         }
 
         var selector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
         var result = new List<object?>();
 
         // 如果有第二个参数（resultSelector）

@@ -132,7 +132,7 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
         if (instance is List<object?> list && arguments.Length > 0)
         {
             var comparer = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
 
             var sorted = new List<object?>(list);
             sorted.Sort((a, b) =>

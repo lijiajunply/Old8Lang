@@ -59,7 +59,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
         }
         else if (instance is object[] arr)
         {
-            return arr.ToList();
+            return [.. arr];
         }
         else if (instance is List<object?> list)
         {

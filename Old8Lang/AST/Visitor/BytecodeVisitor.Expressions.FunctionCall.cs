@@ -12,7 +12,7 @@ public partial class BytecodeVisitor
     {
         MarkPosition(node);
         int positionalCount = node.Arguments.Count;
-        int namedCount = node.NamedArguments?.Count ?? 0;
+        int namedCount = node.NamedArguments!?.Count ?? 0;
 
         // 检查函数表达式的类型
         bool isComplexExpression = node.FunctionExpression is not LangId;
@@ -65,7 +65,7 @@ public partial class BytecodeVisitor
                 // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    foreach (var namedArg in node.NamedArguments)
+                    foreach (var namedArg in node.NamedArguments!)
                     {
                         namedArg.Value.Accept(this);
                     }
@@ -78,7 +78,7 @@ public partial class BytecodeVisitor
 
                 if (namedCount > 0)
                 {
-                    var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
+                    var namedArgNames = node.NamedArguments!.Select(na => na.Name).ToArray();
                     Emit(OpCode.CallMethod, new object[] { totalArgCount, constructorName, namedArgNames });
                 }
                 else
@@ -150,7 +150,7 @@ public partial class BytecodeVisitor
                 // 生成命名参数的值
                 if (namedCount > 0)
                 {
-                    foreach (var namedArg in node.NamedArguments)
+                    foreach (var namedArg in node.NamedArguments!)
                     {
                         namedArg.Value.Accept(this);
                     }
@@ -172,7 +172,7 @@ public partial class BytecodeVisitor
                     }
 
                     // 有命名参数: [positionalCount, namedCount, funcName, namedArgNames[]]
-                    var namedArgNames = node.NamedArguments.Select(na => na.Name).ToArray();
+                    var namedArgNames = node.NamedArguments!.Select(na => na.Name).ToArray();
                     if (hasFunctionIndex)
                     {
                         Emit(OpCode.Call, new object[] { positionalCount, namedCount, funcName, namedArgNames, funcIndex });

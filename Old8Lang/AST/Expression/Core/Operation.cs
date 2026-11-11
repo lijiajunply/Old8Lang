@@ -832,8 +832,9 @@ public partial class Operation(
                 "bool" => typeof(bool),
                 "char" => typeof(char),
                 "list" => typeof(List<object>),
-                "array" => leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>)
-                    ? leftType.GetGenericArguments()[0].MakeArrayType()
+                "array" => leftType is { IsGenericType: true } listType &&
+                           listType.GetGenericTypeDefinition() == typeof(List<>)
+                    ? listType.GetGenericArguments()[0].MakeArrayType()
                     : typeof(object[]),
                 "dictionary" => typeof(Dictionary<object, object>),
                 _ => typeof(object)

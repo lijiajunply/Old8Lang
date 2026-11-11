@@ -49,7 +49,7 @@ public sealed class JsonSerializeFunction : BaseGlobalFunction
                     foreach (var (key, value) in dictValue.Value)
                     {
                         var keyStr = key.ToDisplayString();
-                        dict[keyStr] = value.GetValue();
+                        dict[keyStr] = value.GetValue()!;
                     }
 
                     var jsonStr = JsonSerializer.Serialize(dict, DefaultOptions);

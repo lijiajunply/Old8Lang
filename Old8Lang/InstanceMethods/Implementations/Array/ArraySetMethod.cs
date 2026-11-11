@@ -66,7 +66,7 @@ public class ArraySetMethod : BaseInstanceMethod
             throw new IndexOutOfRangeException($"索引 {index} 超出数组范围 [0, {array.Length})");
         }
 
-        array[index] = value;
+        array[index] = value!;
         return value;
     }
 
@@ -98,7 +98,7 @@ public class ArraySetMethod : BaseInstanceMethod
             throw new IndexOutOfRangeException($"索引 {index} 超出数组范围 [0, {array.Length})");
         }
 
-        array[index] = arguments[1];
+        array[index] = arguments[1]!;
         return arguments[1];
     }
 }

@@ -230,7 +230,7 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         }
 
         var keySelector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
 
         // 获取排序方向（默认升序）
         bool isAscending = true;

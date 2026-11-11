@@ -20,7 +20,7 @@ public class DocumentSymbolHandler(DocumentManager documentManager) : IDocumentS
         };
     }
 
-    public Task<SymbolInformationOrDocumentSymbolContainer> Handle(
+    public Task<SymbolInformationOrDocumentSymbolContainer?> Handle(
         DocumentSymbolParams request,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public class DocumentSymbolHandler(DocumentManager documentManager) : IDocumentS
 
         if (document?.SymbolTable == null)
         {
-            return Task.FromResult(new SymbolInformationOrDocumentSymbolContainer());
+            return Task.FromResult<SymbolInformationOrDocumentSymbolContainer?>(new SymbolInformationOrDocumentSymbolContainer());
         }
 
         var symbols = new List<SymbolInformationOrDocumentSymbol>();
@@ -47,7 +47,7 @@ public class DocumentSymbolHandler(DocumentManager documentManager) : IDocumentS
             symbols.Add(documentSymbol);
         }
 
-        return Task.FromResult(new SymbolInformationOrDocumentSymbolContainer(symbols));
+        return Task.FromResult<SymbolInformationOrDocumentSymbolContainer?>(new SymbolInformationOrDocumentSymbolContainer(symbols));
     }
 
     /// <summary>

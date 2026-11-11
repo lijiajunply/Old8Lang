@@ -116,7 +116,7 @@ public partial class VirtualMachine
                 {
                     if (pair is not null)
                     {
-                        dict[pair.Item1] = pair.Item2;
+                        dict[pair.Item1!] = pair.Item2;
                     }
                 }
 
@@ -192,12 +192,12 @@ public partial class VirtualMachine
                 }
                 else if (collection is IDictionary dict)
                 {
-                    if (!dict.Contains(index))
+                    if (!dict.Contains(index!))
                     {
-                        throw new KeyError(GetPosition(instruction), index);
+                        throw new KeyError(GetPosition(instruction), index!);
                     }
 
-                    _stack.Push(dict[index]);
+                    _stack.Push(dict[index!]);
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
                 {
@@ -219,7 +219,7 @@ public partial class VirtualMachine
 
                     if (!found)
                     {
-                        throw new KeyError(GetPosition(instruction), index);
+                        throw new KeyError(GetPosition(instruction), index!);
                     }
                 }
                 else if (collection is ILangList langList)
@@ -297,7 +297,7 @@ public partial class VirtualMachine
                 }
                 else if (collection is IDictionary dict)
                 {
-                    dict[index] = value;
+                    dict[index!] = value;
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
                 {

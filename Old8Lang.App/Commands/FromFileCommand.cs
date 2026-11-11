@@ -136,10 +136,12 @@ public class FromFileCommand : ICommand
         {
             monitor?.StopMonitoring();
 #if DEBUG
+            _ = e;
             throw;
-#endif
+#else
             Console.WriteLine(e.Message);
             return 1;
+#endif
         }
     }
 }

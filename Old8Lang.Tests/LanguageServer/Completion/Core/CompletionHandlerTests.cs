@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.LanguageServer.Completion.Core;
 public class CompletionHandlerTests(ITestOutputHelper testOutputHelper)
 {
     [Fact]
-    public void TestKeywordCompletions()
+    public async Task TestKeywordCompletions()
     {
         // Arrange
         var code = "";
@@ -25,7 +25,7 @@ public class CompletionHandlerTests(ITestOutputHelper testOutputHelper)
         };
 
         // Act
-        var result = handler.Handle(request, CancellationToken.None).Result;
+        var result = await handler.Handle(request, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);

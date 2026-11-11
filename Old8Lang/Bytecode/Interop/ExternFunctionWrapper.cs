@@ -248,7 +248,7 @@ public class ExternFunctionWrapper(
             {
                 _cachedFuncPtr = NativeLibrary.GetExport(_cachedLibHandle, funcName);
             }
-            catch (EntryPointNotFoundException ex)
+            catch (EntryPointNotFoundException)
             {
                 throw new MethodNotFoundError(new SourcePosition(), funcName);
             }

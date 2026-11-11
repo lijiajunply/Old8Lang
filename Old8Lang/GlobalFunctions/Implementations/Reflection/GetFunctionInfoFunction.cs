@@ -49,7 +49,7 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
             // 检查是否为原生函数
             if (funcValue.Method != null)
             {
-                return CreateNativeFunctionInfo(funcValue.Method, funcValue.Id.IdName);
+                return CreateNativeFunctionInfo(funcValue.Method, funcValue.Id!.IdName);
             }
             // 普通 Old8Lang 函数
             return CreateUserFunctionInfo(funcValue);
@@ -127,7 +127,7 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
         {
             if (funcValue.Method != null)
             {
-                return CreateNativeFunctionInfoForVM(funcValue.Method, funcValue.Id.IdName);
+                return CreateNativeFunctionInfoForVM(funcValue.Method, funcValue.Id!.IdName);
             }
             return CreateUserFunctionInfoForVM(funcValue);
         }
@@ -143,14 +143,14 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
     {
         var tuples = new List<TupleLangValue>
         {
-            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Id.IdName)]),
+            new TupleLangValue([new StringLangValue("name"), new StringLangValue(func.Id!.IdName)]),
             new TupleLangValue([new StringLangValue("type"), new StringLangValue("user_function")]),
             new TupleLangValue([
                 new StringLangValue("parameters"),
-                new ListLangValue(func.Ids.Select(id => (LangValueType)new StringLangValue(id.IdName)).ToList())
+                new ListLangValue(func.Ids!.Select(id => (LangValueType)new StringLangValue(id.IdName)).ToList())
             ]),
-            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(func.Ids.Count)]),
-            new TupleLangValue([new StringLangValue("hasDefaultParams"), new BoolLangValue(func.Ids.Any(id => id.DefaultValue != null))]),
+            new TupleLangValue([new StringLangValue("parameterCount"), new IntLangValue(func.Ids!.Count)]),
+            new TupleLangValue([new StringLangValue("hasDefaultParams"), new BoolLangValue(func.Ids!.Any(id => id.DefaultValue != null))]),
             new TupleLangValue([new StringLangValue("isGeneric"), new BoolLangValue(func.GenericParameters?.Count > 0)])
         };
 
@@ -209,11 +209,11 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
     {
         return new Dictionary<object, object?>
         {
-            ["name"] = func.Id.IdName,
+            ["name"] = func.Id!.IdName,
             ["type"] = "user_function",
-            ["parameters"] = func.Ids.Select(id => id.IdName).Cast<object?>().ToList(),
-            ["parameterCount"] = func.Ids.Count,
-            ["hasDefaultParams"] = func.Ids.Any(id => id.DefaultValue != null),
+            ["parameters"] = func.Ids!.Select(id => id.IdName).Cast<object?>().ToList(),
+            ["parameterCount"] = func.Ids!.Count,
+            ["hasDefaultParams"] = func.Ids!.Any(id => id.DefaultValue != null),
             ["isGeneric"] = func.GenericParameters?.Count > 0
         };
     }

@@ -70,7 +70,7 @@ public partial class NestedIndexAccess(
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 根据基础表达式的输出类型选择适当的索引访问方法
-        var baseType = BaseExpression.OutputType(local);
+        var baseType = BaseExpression.OutputType(local) ?? typeof(object);
 
         // 特殊处理 ValueTuple 的常量索引访问
         if (baseType.FullName?.StartsWith("System.ValueTuple") == true && NestedIndex is IntLangValue intValue)
@@ -168,7 +168,7 @@ public partial class NestedIndexAccess(
 
     public override Type OutputType(LocalManager local)
     {
-        var baseType = BaseExpression.OutputType(local);
+        var baseType = BaseExpression.OutputType(local) ?? typeof(object);
 
         if (baseType == typeof(string))
         {

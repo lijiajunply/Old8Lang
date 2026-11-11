@@ -30,14 +30,14 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
         };
     }
 
-    public Task<CommandOrCodeActionContainer> Handle(CodeActionParams request, CancellationToken cancellationToken)
+    public Task<CommandOrCodeActionContainer?> Handle(CodeActionParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
         var document = documentManager.GetDocument(uri);
 
         if (document == null)
         {
-            return Task.FromResult(new CommandOrCodeActionContainer());
+            return Task.FromResult<CommandOrCodeActionContainer?>(new CommandOrCodeActionContainer());
         }
 
         var codeActions = new List<CommandOrCodeAction>();
@@ -53,7 +53,7 @@ public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHan
         var refactorings = GenerateRefactorings(document, request.Range);
         codeActions.AddRange(refactorings);
 
-        return Task.FromResult(new CommandOrCodeActionContainer(codeActions));
+        return Task.FromResult<CommandOrCodeActionContainer?>(new CommandOrCodeActionContainer(codeActions));
     }
 
     /// <summary>

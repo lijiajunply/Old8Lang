@@ -151,7 +151,7 @@ public class LangListMinWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
         }
 
         var selector = arguments[0];
-        var vm = VMContext.CurrentVM;
+        var vm = VMContext.CurrentVM!;
 
         var minValue = vm.CallFunctionObject(selector, [items[0]]);
 

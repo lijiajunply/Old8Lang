@@ -193,7 +193,7 @@ public class ListSingleOrDefaultMethod : BaseInstanceMethod, IIlNativeValueInsta
                 // SingleOrDefault(predicate, defaultValue)
                 var predicate = arguments[0];
                 var defaultValue = arguments[1];
-                var vm = VMContext.CurrentVM;
+                var vm = VMContext.CurrentVM!;
 
                 object? foundItem = null;
                 var foundCount = 0;

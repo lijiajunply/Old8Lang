@@ -122,7 +122,7 @@ public class DictFilterMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         if (instance is Dictionary<object, object> dict && arguments.Length > 0)
         {
             var predicate = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var newDict = new Dictionary<object, object>();
 
             foreach (var (key, value) in dict)

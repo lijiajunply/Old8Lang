@@ -57,7 +57,7 @@ public class DictContainsKeyMethod : BaseInstanceMethod
         if (instance is System.Collections.IDictionary dict && arguments.Length > 0)
         {
             var key = arguments[0];
-            return dict.Contains(key);
+            return dict.Contains(key!);
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
     }

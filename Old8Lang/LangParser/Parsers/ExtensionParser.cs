@@ -10,8 +10,7 @@ namespace Old8Lang.LangParser.Parsers;
 /// </summary>
 public class ExtensionParser(
     ParserContext context,
-    Func<FunctionParser> functionParserFactory,
-    Func<StatementParser> statementParserFactory)
+    Func<FunctionParser> functionParserFactory)
     : ParserBase(context)
 {
     /// <summary>

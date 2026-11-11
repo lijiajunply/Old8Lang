@@ -1,11 +1,10 @@
 using Old8Lang.LanguageServer.Handlers;
 using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer.Handlers.Navigation;
 
-public class HoverHandlerTests(ITestOutputHelper testOutputHelper)
+public class HoverHandlerTests
 {
     [Fact]
     public async Task TestHover_Function()

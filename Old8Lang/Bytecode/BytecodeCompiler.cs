@@ -357,20 +357,20 @@ public class BytecodeCompiler
             // 将扩展方法编译为普通函数
             // 扩展方法的第一个隐式参数是 'this'
             var parameters = new List<string> { "this" };
-            parameters.AddRange(method.Ids.Select(id => id.IdName));
+            parameters.AddRange(method.Ids!.Select(id => id.IdName));
 
             var parameterTypes = new List<string> { extensionDecl.TargetTypeName };
             // 扩展方法通常没有显式类型注解，使用空字符串
-            parameterTypes.AddRange(Enumerable.Repeat("", method.Ids.Count));
+            parameterTypes.AddRange(Enumerable.Repeat("", method.Ids!.Count));
 
             var defaultValues = new List<object?>();
             // this 参数没有默认值
             defaultValues.Add(null);
             // 其他参数也没有默认值（扩展方法目前不支持默认参数）
-            defaultValues.AddRange(Enumerable.Repeat<object?>(null, method.Ids.Count));
+            defaultValues.AddRange(Enumerable.Repeat<object?>(null, method.Ids!.Count));
 
             // 生成唯一的函数名：TargetType$MethodName
-            var funcName = $"{extensionDecl.TargetTypeName}${method.Id.IdName}";
+            var funcName = $"{extensionDecl.TargetTypeName}${method.Id!.IdName}";
 
             var funcMetadata = CompileFunction(
                 funcName,
@@ -733,6 +733,8 @@ public class BytecodeCompiler
     /// </summary>
     public int AddConstant(object? value)
     {
+        if (value is null)
+            throw new ArgumentNullException(nameof(value), "常量池不接受 null 常量");
         return ConstantPool.AddConstant(value);
     }
 

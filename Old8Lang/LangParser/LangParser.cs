@@ -110,11 +110,10 @@ public class LangParser
             () => _expressionParser!,
             () => functionParser!);
 
-        // 创建ExtensionParser（需要延迟加载FunctionParser和StatementParser）
+        // 创建ExtensionParser（需要延迟加载FunctionParser）
         var extensionParser = new ExtensionParser(
             _context,
-            () => functionParser!,
-            () => _statementParser!);
+            () => functionParser!);
 
         // 最后创建StatementParser（依赖所有其他解析器）
         _statementParser = new StatementParser(

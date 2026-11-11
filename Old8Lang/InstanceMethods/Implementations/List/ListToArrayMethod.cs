@@ -39,7 +39,7 @@ public class ListToArrayMethod : BaseInstanceMethod
 
     public static object[] ToArrayHelper(List<object?> list)
     {
-        return list.ToArray();
+        return list.ToArray()!;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

@@ -10,7 +10,7 @@ namespace Old8LangLib;
 public class TemplateEngine
 {
     private readonly Dictionary<string, object> _globalVariables;
-    private string _template;
+    private string _template = string.Empty;
     private readonly Regex _variableRegex;
     private readonly Regex _ifRegex;
     private readonly Regex _forRegex;

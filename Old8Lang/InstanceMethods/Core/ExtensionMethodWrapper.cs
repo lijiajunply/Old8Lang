@@ -24,7 +24,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
     /// </remarks>
     private VariateManager DeclarationManager { get; } = manager;
 
-    public string[] Names => [function.Id.IdName];
+    public string[] Names => [function.Id!.IdName];
 
     public Type TargetType => targetType;
 
@@ -33,13 +33,13 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         get
         {
             // 所有参数都是用户定义的参数（不包括隐式的 this）
-            return function.Ids.Select(id => id.IdName).ToArray();
+            return function.Ids!.Select(id => id.IdName).ToArray();
         }
     }
 
-    public int MinParameterCount => function.Ids.Count;
+    public int MinParameterCount => function.Ids!.Count;
 
-    public int MaxParameterCount => function.Ids.Count;
+    public int MaxParameterCount => function.Ids!.Count;
 
     public Type?[]? ParameterTypes => null; // 接受任意类型
 
@@ -55,7 +55,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
     public bool CanAccept(List<LangExpression> parameters, LocalManager? local)
     {
         // 检查参数数量（不包括隐式的 this 参数）
-        var expectedParamCount = function.Ids.Count;
+        var expectedParamCount = function.Ids!.Count;
         return parameters.Count == expectedParamCount;
     }
 
@@ -77,7 +77,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
         SourcePosition position)
     {
         // 【修复】生成方法签名用于递归检测
-        var methodSignature = $"{instance.GetType().Name}.{function.Id.IdName}";
+        var methodSignature = $"{instance.GetType().Name}.{function.Id!.IdName}";
 
         // 【修复】进入扩展方法，启用递归检测
         manager.EnterExtensionMethod(methodSignature);
@@ -95,7 +95,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
                 // 绑定用户定义的参数
                 for (int i = 0; i < parameters.Count; i++)
                 {
-                    var paramName = function.Ids[i].IdName;
+                    var paramName = function.Ids![i].IdName;
                     var paramValue = parameters[i].Run(manager);
                     manager.Set(new LangId(paramName), paramValue);
                 }
@@ -185,7 +185,7 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
     private LangValueType ExecuteWithValues(LangValueType instance, LangValueType[] arguments,
         VariateManager manager)
     {
-        var methodSignature = $"{instance.GetType().Name}.{function.Id.IdName}";
+        var methodSignature = $"{instance.GetType().Name}.{function.Id!.IdName}";
 
         manager.EnterExtensionMethod(methodSignature);
 
@@ -197,9 +197,9 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             {
                 manager.Set(new LangId("this"), instance);
 
-                for (var i = 0; i < arguments.Length && i < function.Ids.Count; i++)
+                for (var i = 0; i < arguments.Length && i < function.Ids!.Count; i++)
                 {
-                    manager.Set(new LangId(function.Ids[i].IdName), arguments[i]);
+                    manager.Set(new LangId(function.Ids![i].IdName), arguments[i]);
                 }
 
                 function.BlockStatement.Run(manager);
@@ -245,9 +245,9 @@ public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, Var
             tempManager.Set(new LangId("this"), ConvertToLangValue(instance));
 
             // 绑定用户定义的参数
-            for (int i = 0; i < arguments.Length && i < function.Ids.Count; i++)
+            for (int i = 0; i < arguments.Length && i < function.Ids!.Count; i++)
             {
-                var paramName = function.Ids[i].IdName;
+                var paramName = function.Ids![i].IdName;
                 var paramValue = ConvertToLangValue(arguments[i]);
                 tempManager.Set(new LangId(paramName), paramValue);
             }

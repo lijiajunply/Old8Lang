@@ -119,7 +119,7 @@ public class ListFindAllMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         if (instance is List<object?> list && arguments.Length > 0)
         {
             var predicate = arguments[0];
-            var vm = VMContext.CurrentVM;
+            var vm = VMContext.CurrentVM!;
             var result = new List<object?>();
 
             foreach (var item in list)

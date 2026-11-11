@@ -1,11 +1,10 @@
 using Old8Lang.LanguageServer.Handlers;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Services;
-using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer.Handlers.Sync;
 
-public class TextDocumentSyncHandlerTests(ITestOutputHelper testOutputHelper)
+public class TextDocumentSyncHandlerTests
 {
     [Fact]
     public void TestHandlerCreation()

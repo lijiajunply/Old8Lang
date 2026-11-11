@@ -194,7 +194,7 @@ public partial class SelectStatement(
                         allCasesClosed = false;
 
                         var sendValue = selectCase.SendValueExpression!.Run(manager);
-                        if (ResourceManager.TrySendChannel(channelId, sendValue.GetValue(), 0))
+                        if (ResourceManager.TrySendChannel(channelId, sendValue.GetValue()!, 0))
                         {
                             // 发送成功
                             selectCase.BlockStatement.Run(manager);

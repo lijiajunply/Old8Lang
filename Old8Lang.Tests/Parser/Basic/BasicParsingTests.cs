@@ -134,7 +134,6 @@ public class BasicParsingTests
     public void ParseProgram_FuncDeclaration_ReturnsFuncInit()
     {
         // Arrange
-        var sourceCode = "func add(x, y) { return x + y }";
         var tokens = new List<LangToken>
         {
             new("func", LangTokenType.Func, 1),

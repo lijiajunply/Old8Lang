@@ -3,7 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <!--
+      测试工程只保留可空引用注解、不做流分析：
+      xUnit 2 的 Assert.NotNull/Assert.IsType 没有 [NotNull] 流特性，
+      大量「断言非空后解引用」「故意传 null 验证运行时行为」的用例会产生
+      CS8600/CS8602/CS8604 噪声，掩盖真正需要处理的核心工程警告。
+      核心工程（Old8Lang 及其库）保持 <Nullable>enable</Nullable> 全量分析。
+    -->
+    <Nullable>annotations</Nullable>
     <IsPackable>false</IsPackable>
     <!-- 默认排除 Category=Performance 的用例；这些用例由 performance.runsettings 单独跑 -->
     <RunSettingsFilePath>$(MSBuildProjectDirectory)/default.runsettings</RunSettingsFilePath>

@@ -5,7 +5,7 @@ namespace Old8Lang.Benchmarks.Tools;
 /// </summary>
 public class GenerateTestDataProgram
 {
-    public static void Main(string[] args)
+    public static void Run(string[] args)
     {
         Console.WriteLine("开始生成测试数据...");
 

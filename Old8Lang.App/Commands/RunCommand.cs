@@ -66,14 +66,18 @@ public class RunCommand : ICommand
                 return RunFileMode(args);
             }
         }
+#if DEBUG
+        catch (Exception)
+        {
+            throw;
+        }
+#else
         catch (Exception e)
         {
-#if DEBUG
-            throw;
-#endif
             Console.WriteLine($"运行错误: {e.Message}");
             return 1;
         }
+#endif
     }
 
     /// <summary>

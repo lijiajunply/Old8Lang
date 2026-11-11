@@ -16,7 +16,7 @@ public partial class CharLangValue(char value = '\0', SourcePosition position = 
     public char Value = value;
 
     public override LangValueType Plus(LangValueType otherLangValueType) =>
-        StringLangValue.Create(Value + (string)otherLangValueType.GetValue());
+        StringLangValue.Create(Value + (string)otherLangValueType.GetValue()!);
 
     public override LangValueType Times(LangValueType otherLangValueType)
     {

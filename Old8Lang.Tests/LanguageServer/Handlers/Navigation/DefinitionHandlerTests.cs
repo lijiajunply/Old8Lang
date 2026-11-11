@@ -251,7 +251,7 @@ PrintLine(""Hello"") // 光标在 PrintLine 上
 /// <summary>
 /// 查找引用处理器测试
 /// </summary>
-public class ReferencesHandlerTests(ITestOutputHelper testOutputHelper)
+public class ReferencesHandlerTests
 {
     [Fact]
     public async Task TestFindReferences_Function()
