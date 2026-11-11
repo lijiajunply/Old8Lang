@@ -5,6 +5,27 @@ namespace Old8Lang.Tests.Compiler.Collections;
 public class GenericListExtensionRegressionTests
 {
     [Fact]
+    public void GenericListExtension_ConditionalObjectReturn_PreservesRuntimeType()
+    {
+        const string code = @"
+extension list<T> {
+    func phaseOneMaybeReceiver(flag: bool) -> object {
+        if flag { return 7 }
+        return this
+    }
+}
+items <- {1, 2}
+result <- items.phaseOneMaybeReceiver(true)
+Assert.Equal(7, result)
+Assert.Equal(8, result + 1)
+Assert.Equal(1, result.CompareTo(6))
+";
+        var interpreter = new LangInterpreter();
+        var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+        action();
+    }
+
+    [Fact]
     public void GenericListExtension_SelfReferentialArrayDoesNotOverflow()
     {
         const string code = @"
