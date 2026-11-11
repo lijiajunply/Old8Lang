@@ -546,6 +546,11 @@ public partial class Instance : LangValueType
             return;
         }
 
+        if (TryEmitLocalDelegateCall(ilGenerator, local))
+        {
+            return;
+        }
+
         // 查找匹配的方法
         MethodInfo? matchingMethod = null;
         List<LangId>? funcParams = null;
@@ -1017,6 +1022,11 @@ public partial class Instance : LangValueType
             return globalFuncReturnType;
         }
 
+        if (local.LocalDelegateReturnTypes.TryGetValue(Id.IdName, out var localDelegateReturnType))
+        {
+            return localDelegateReturnType;
+        }
+
         // 尝试泛型类型推断
         if (local.GenericFunctions.TryGetValue(Id.IdName, out var genericFunc))
         {
@@ -1095,6 +1105,55 @@ public partial class Instance : LangValueType
         }
 
         return classType ?? typeof(object);
+    }
+
+    /// <summary>
+    /// 生成局部 lambda 委托的动态调用。闭包委托在创建时才绑定外层局部变量，
+    /// 因此不能像具名函数一样直接使用静态 DynamicMethod 调用。
+    /// </summary>
+    private bool TryEmitLocalDelegateCall(ILGenerator ilGenerator, LocalManager local)
+    {
+        if (NamedArgs.Count != 0 || local.GetLocalVar(Id.IdName) is not { LocalType: var type } lambdaLocal ||
+            !typeof(Delegate).IsAssignableFrom(type) ||
+            !local.LocalDelegateReturnTypes.TryGetValue(Id.IdName, out var returnType))
+        {
+            return false;
+        }
+
+        ilGenerator.Emit(OpCodes.Ldloc, lambdaLocal);
+        ilGenerator.Emit(OpCodes.Ldc_I4, Ids.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var i = 0; i < Ids.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            var argument = Ids[i];
+            argument.LoadIlValue(ilGenerator, local);
+            var argumentType = argument.OutputType(local);
+            if (argumentType?.IsValueType == true)
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Callvirt,
+            typeof(Delegate).GetMethod(nameof(Delegate.DynamicInvoke), [typeof(object[])])!);
+        if (returnType == typeof(void))
+        {
+            ilGenerator.Emit(OpCodes.Pop);
+        }
+        else if (returnType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, returnType);
+        }
+        else if (returnType != typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Castclass, returnType);
+        }
+
+        return true;
     }
 
     /// <summary>

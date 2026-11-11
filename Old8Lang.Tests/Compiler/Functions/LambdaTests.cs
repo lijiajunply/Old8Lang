@@ -83,4 +83,50 @@ public class LambdaTests
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void Lambda_ReadsEnclosingLocal_CompilesAndExecutes()
+    {
+        var code = @"
+            func test() -> int {
+                offset <- 5
+                addOffset <- (value:int) -> value + offset
+                return addOffset(7)
+            }
+
+            Assert.Equal(12, test())
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Lambda_WritesEnclosingLocal_CompilesAndExecutes()
+    {
+        var code = @"
+            func test() -> int {
+                total <- 10
+                addToTotal <- (value:int) -> {
+                    total <- total + value
+                    return total
+                }
+                addToTotal(5)
+                return addToTotal(3)
+            }
+
+            Assert.Equal(18, test())
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
 }

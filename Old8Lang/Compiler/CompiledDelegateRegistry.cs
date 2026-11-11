@@ -13,6 +13,8 @@ public static class CompiledDelegateRegistry
     /// </summary>
     private static readonly ConcurrentDictionary<int, Delegate> FunctionValues = new();
 
+    private static readonly ConcurrentDictionary<int, System.Reflection.Emit.DynamicMethod> ClosureTemplates = new();
+
     private static int _nextFunctionValueId;
 
     public static void Register(string key, System.Reflection.Emit.DynamicMethod method)
@@ -50,6 +52,31 @@ public static class CompiledDelegateRegistry
         }
 
         return del;
+    }
+
+    /// <summary>
+    /// 注册首个参数为闭包数组的 lambda 模板。
+    /// </summary>
+    public static int RegisterClosureTemplate(System.Reflection.Emit.DynamicMethod method)
+    {
+        var id = Interlocked.Increment(ref _nextFunctionValueId);
+        ClosureTemplates[id] = method;
+        return id;
+    }
+
+    /// <summary>
+    /// 将模板的首个闭包数组参数绑定为目标对象，创建独立的函数值。
+    /// </summary>
+    public static Delegate CreateClosure(int id, object?[] capturedValues)
+    {
+        if (!ClosureTemplates.TryGetValue(id, out var method))
+        {
+            throw new InvalidOperationException($"闭包模板 '{id}' 未注册");
+        }
+
+        var parameterTypes = method.GetParameters().Skip(1).Select(p => p.ParameterType).ToArray();
+        var delegateType = Expression.GetDelegateType(parameterTypes.Concat([method.ReturnType]).ToArray());
+        return method.CreateDelegate(delegateType, capturedValues);
     }
 
     public static object? Invoke(string key, object?[] args)

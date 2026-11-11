@@ -641,6 +641,23 @@ public partial class Operation(
     /// </remarks>
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
+        if (local.TryGetCapturedLocal(idName, out var captured))
+        {
+            var capturedValueType = OutputType(local) ?? typeof(object);
+            local.ValidateType(captured.Type, capturedValueType, Position);
+
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            LoadIlValue(ilGenerator, local);
+            if (capturedValueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, capturedValueType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+            return;
+        }
+
         // 首先生成计算值的IL指令，将结果压入栈中
         LoadIlValue(ilGenerator, local);
         // 然后获取结果类型

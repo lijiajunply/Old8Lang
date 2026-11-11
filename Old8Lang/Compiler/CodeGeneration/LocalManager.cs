@@ -51,6 +51,16 @@ public class LocalManager
     public readonly Dictionary<string, Type> LocalVarTypes = [];
 
     /// <summary>
+    /// 当前 lambda 的闭包变量。键为变量名，值为其在闭包数组中的槽位与静态类型。
+    /// </summary>
+    public readonly Dictionary<string, CapturedLocal> CapturedLocals = [];
+
+    /// <summary>
+    /// 保存局部委托变量的返回类型，使调用点无需依赖运行时反射推断类型。
+    /// </summary>
+    public readonly Dictionary<string, Type> LocalDelegateReturnTypes = [];
+
+    /// <summary>
     /// 存储函数的参数列表信息（用于支持默认参数）
     /// </summary>
     public readonly Dictionary<string, List<LangId>> FuncParameters = [];
@@ -482,6 +492,16 @@ public class LocalManager
             cloned.DelegateVar[name] = method;
         }
 
+        foreach (var (name, captured) in CapturedLocals)
+        {
+            cloned.CapturedLocals[name] = captured;
+        }
+
+        foreach (var (name, returnType) in LocalDelegateReturnTypes)
+        {
+            cloned.LocalDelegateReturnTypes[name] = returnType;
+        }
+
         // 克隆类变量
         foreach (var (name, type) in ClassVar)
         {
@@ -542,6 +562,18 @@ public class LocalManager
             DelegateVar[name] = method;
         }
 
+        CapturedLocals.Clear();
+        foreach (var (name, captured) in cloned.CapturedLocals)
+        {
+            CapturedLocals[name] = captured;
+        }
+
+        LocalDelegateReturnTypes.Clear();
+        foreach (var (name, returnType) in cloned.LocalDelegateReturnTypes)
+        {
+            LocalDelegateReturnTypes[name] = returnType;
+        }
+
         // 清空当前类变量
         ClassVar.Clear();
 
@@ -581,6 +613,14 @@ public class LocalManager
     public LocalBuilder? GetLocalVar(string name)
     {
         return LocalVar.GetValueOrDefault(name);
+    }
+
+    /// <summary>
+    /// 获取 lambda 闭包变量的槽位描述。
+    /// </summary>
+    public bool TryGetCapturedLocal(string name, out CapturedLocal captured)
+    {
+        return CapturedLocals.TryGetValue(name, out captured!);
     }
 
     /// <summary>

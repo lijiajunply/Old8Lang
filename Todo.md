@@ -24,9 +24,9 @@
   - 2026-11-11 复核：`Count().ToStr()` 已可用；`FindAll(...).Count()` 的注册方法返回类型推断已修复，验证了三层链式调用和接收者只求值一次。
   - 集合元素、嵌套对象及其他链式调用仍需复核；见 [测试报告](Reports/2026-11-11-12-30-IL链式方法调用测试.md)。
 
-- [ ] **IL 模式 lambda 不能读写外层普通局部变量。**
-  - 现状：`BuildLambdaDynamicMethod` 的 `funcLocal` 只带了外层**函数**委托表（本轮新增），
-    普通局部变量仍不可见。既有边界。
+- [ ] **IL 模式 lambda 的闭包函数值支持。**
+  - 2026-11-11：直接赋值的 lambda 现可读取及写回创建点可见的普通局部变量；闭包环境在运行时绑定，每个 lambda 实例独立。`LambdaTests` 24 项通过，见 [测试报告](Reports/2026-11-11-19-00-IL-lambda-闭包局部变量.md)。
+  - 仍待处理：具名函数以 `function` 返回 lambda 后，调用方尚未保留函数值返回类型与闭包委托元数据，因此返回闭包的调用链仍不可用。
 
 - [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），

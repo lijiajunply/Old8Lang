@@ -78,7 +78,7 @@ public partial class FuncLangValue
     /// IL 模式下函数值统一用 .NET 委托表示：匿名函数 / lambda 在这里现场编译成
     /// <see cref="DynamicMethod"/>，注册进 <see cref="CompiledDelegateRegistry"/> 后只把
     /// 委托 id 嵌进生成的 IL，运行期再取回委托实例。
-    /// 注意：lambda 体内引用外层 IL 局部变量仍不受支持（IL 模式的既有边界）。
+    /// lambda 会将创建点可见的局部变量绑定到独立闭包环境中。
     /// </remarks>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
@@ -96,18 +96,16 @@ public partial class FuncLangValue
                 $"函数 '{Id?.IdName}' 不能直接作为函数值参数，请改写为 lambda 表达式");
         }
 
-        var dynamicMethod = BuildLambdaDynamicMethod(local, Id?.IdName ?? "lambda");
-        var functionValueId = CompiledDelegateRegistry.RegisterFunctionValue(dynamicMethod);
-
-        ilGenerator.Emit(OpCodes.Ldc_I4, functionValueId);
-        ilGenerator.Emit(OpCodes.Call,
-            typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Get))!);
+        EmitLambdaClosure(ilGenerator, local, Id?.IdName ?? "lambda");
     }
 
     /// <summary>
     /// 把匿名函数 / lambda 编译成 <see cref="DynamicMethod"/>（不注册到 DelegateVar）。
     /// </summary>
-    private DynamicMethod BuildLambdaDynamicMethod(LocalManager local, string methodName)
+    private DynamicMethod BuildLambdaDynamicMethod(
+        LocalManager local,
+        string methodName,
+        IReadOnlyList<CapturedLocalValue> capturedValues)
     {
         // 创建一个新的 LocalManager 实例，专门用于函数体的 IL 生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
@@ -117,7 +115,6 @@ public partial class FuncLangValue
 
         // 继承外层的函数委托表：让 lambda 体内可以按名字调用已定义的函数
         // （例如 `spawn(f).Then((r:int) -> spawn(g))` 里的 g）。
-        // 注意：这只覆盖「函数」，lambda 读写外层普通局部变量在 IL 模式下仍不支持。
         foreach (var (key, value) in local.DelegateVar)
         {
             funcLocal.DelegateVar.TryAdd(key, value);
@@ -126,6 +123,13 @@ public partial class FuncLangValue
         foreach (var (key, value) in local.FuncParameters)
         {
             funcLocal.FuncParameters.TryAdd(key, value);
+        }
+
+        for (var i = 0; i < capturedValues.Count; i++)
+        {
+            var captured = capturedValues[i];
+            funcLocal.CapturedLocals[captured.Name] = new CapturedLocal(i, captured.Type);
+            funcLocal.LocalVarTypes[captured.Name] = captured.Type;
         }
 
         // 使用参数的类型注解来确定参数类型
@@ -141,7 +145,11 @@ public partial class FuncLangValue
         var returnType = GetItemType(BlockStatement, funcLocal);
 
         // 定义新的方法
-        var dynamicMethod = new DynamicMethod(methodName, returnType, parameterTypes, true);
+        var dynamicMethod = new DynamicMethod(
+            methodName,
+            returnType,
+            [typeof(object[]), .. parameterTypes],
+            true);
         var methodIl = dynamicMethod.GetILGenerator();
 
         // 处理参数
@@ -150,7 +158,7 @@ public partial class FuncLangValue
             var paramType = parameterTypes[i];
             var localVar = methodIl.DeclareLocal(paramType);
             funcLocal.AddLocalVar(Ids[i].IdName, localVar);
-            methodIl.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Ldarg, i + 1);
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
@@ -166,6 +174,43 @@ public partial class FuncLangValue
 
         return dynamicMethod;
     }
+
+    private DynamicMethod EmitLambdaClosure(ILGenerator ilGenerator, LocalManager local, string methodName)
+    {
+        var capturedValues = GetCapturedLocalValues(local);
+        var dynamicMethod = BuildLambdaDynamicMethod(local, methodName, capturedValues);
+        var templateId = CompiledDelegateRegistry.RegisterClosureTemplate(dynamicMethod);
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, templateId);
+        ilGenerator.Emit(OpCodes.Ldc_I4, capturedValues.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var i = 0; i < capturedValues.Count; i++)
+        {
+            var captured = capturedValues[i];
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            ilGenerator.Emit(OpCodes.Ldloc, captured.Local);
+            if (captured.Type.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, captured.Type);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.CreateClosure))!);
+        return dynamicMethod;
+    }
+
+    private static List<CapturedLocalValue> GetCapturedLocalValues(LocalManager local)
+    {
+        return local.LocalVar
+            .Select(pair => new CapturedLocalValue(pair.Key, pair.Value, pair.Value.LocalType))
+            .ToList();
+    }
+
+    private sealed record CapturedLocalValue(string Name, LocalBuilder Local, Type Type);
 
     /// <summary>
     /// 为没有显式 return 的函数体补一段默认返回。
@@ -255,14 +300,12 @@ public partial class FuncLangValue
         // 根据函数类型选择不同的处理方式
         if (IsLambda || Id is null)
         {
-            // Lambda 表达式处理：编译成 Delegate
-            var dynamicMethod = BuildLambdaDynamicMethod(local, methodName);
-
-            // 注册Lambda表达式到DelegateVar
-            var lambdaParamTypeNames = string.Join("_",
-                dynamicMethod.GetParameters().Select(p => p.ParameterType.Name));
-            var lambdaDelegateKey = $"{methodName}${lambdaParamTypeNames}";
-            local.DelegateVar.TryAdd(lambdaDelegateKey, dynamicMethod);
+            // Lambda 表达式处理：在运行时创建绑定当前局部变量的委托实例。
+            var dynamicMethod = EmitLambdaClosure(ilGenerator, local, methodName);
+            var lambdaLocal = local.GetOrCreateLocalVar(ilGenerator, idName, typeof(Delegate));
+            ilGenerator.Emit(OpCodes.Stloc, lambdaLocal);
+            local.LocalVarTypes[idName] = typeof(Delegate);
+            local.LocalDelegateReturnTypes[idName] = dynamicMethod.ReturnType;
         }
         else
         {

@@ -52,6 +52,23 @@ public abstract class LangExpression : IOldLangTree
 
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
+        if (local.TryGetCapturedLocal(idName, out var captured))
+        {
+            var capturedValueType = OutputType(local) ?? typeof(object);
+            local.ValidateType(captured.Type, capturedValueType, Position);
+
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            LoadIlValue(ilGenerator, local);
+            if (capturedValueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, capturedValueType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+            return;
+        }
+
         // 1. 检查是否为字段赋值 (在类的方法中)
         if (!local.LocalVar.ContainsKey(idName) && !local.ArgumentIndices.ContainsKey(idName) &&
             local.FieldVar.TryGetValue(idName, out var fieldInfo))

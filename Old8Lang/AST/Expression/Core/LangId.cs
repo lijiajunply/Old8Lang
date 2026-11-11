@@ -141,6 +141,23 @@ public partial class LangId(
             return;
         }
 
+        if (local.TryGetCapturedLocal(IdName, out var captured))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            if (captured.Type.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, captured.Type);
+            }
+            else if (captured.Type != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, captured.Type);
+            }
+
+            return;
+        }
+
         // 参数和局部变量遮蔽同名字段；字段可通过 this.member 显式访问。
         var value = local.GetLocalVar(IdName);
         if (value is not null)
