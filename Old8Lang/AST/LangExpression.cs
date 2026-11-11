@@ -150,6 +150,7 @@ public abstract class LangExpression : IOldLangTree
 
         // 先声明变量，确保在使用前已经存在
         var localVar = local.GetLocalVar(idName);
+        var isNewLocal = localVar is null;
         if (localVar is not null)
         {
             if (localVar.LocalType != valueType)
@@ -160,18 +161,25 @@ public abstract class LangExpression : IOldLangTree
                 local.AddLocalVar(idName, localVar);
             }
         }
-        else
+        if (isNewLocal)
         {
-            // 首次声明变量
+            // 先求值到不进入 LocalManager 的临时槽。右侧若创建 lambda，lambda 会捕获
+            // 当前可见变量；过早注册目标槽会使它捕获尚未初始化的 local，CLR 因而拒绝
+            // 生成的 DynamicMethod（InvalidProgramException）。
+            var evaluatedValue = ilGenerator.DeclareLocal(valueType);
+            LoadIlValue(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Stloc, evaluatedValue);
+
             localVar = ilGenerator.DeclareLocal(valueType);
             local.AddLocalVar(idName, localVar);
+            ilGenerator.Emit(OpCodes.Ldloc, evaluatedValue);
+            ilGenerator.Emit(OpCodes.Stloc, localVar);
+            return;
         }
 
-        // 然后加载值
+        // 已存在变量可直接求值后写回。
         LoadIlValue(ilGenerator, local);
-
-        // 最后存储到变量
-        ilGenerator.Emit(OpCodes.Stloc, localVar);
+        ilGenerator.Emit(OpCodes.Stloc, localVar!);
     }
 
     /// <summary>
