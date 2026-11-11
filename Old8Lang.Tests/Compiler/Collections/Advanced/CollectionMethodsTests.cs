@@ -11,6 +11,23 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
+    public void ListIsEmptyMethod_CompilesAndExecutesCorrectly()
+    {
+        var code = @"
+            empty <- {}
+            numbers <- {1, 2}
+
+            Assert.True(empty.IsEmpty())
+            Assert.True(!numbers.IsEmpty())
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListMapMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

@@ -11,7 +11,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.IsEmpty() - 检查列表是否为空
 /// </summary>
-public class ListIsEmptyMethod : BaseInstanceMethod
+public class ListIsEmptyMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["IsEmpty", "isEmpty"];
     public override Type TargetType => typeof(ListLangValue);
@@ -36,7 +36,7 @@ public class ListIsEmptyMethod : BaseInstanceMethod
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static bool IsEmptyHelper(List<object?> list)
+    public static bool IsEmptyHelper(System.Collections.ICollection list)
     {
         return list.Count == 0;
     }
