@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Core;
 /// 扩展方法包装器，将 Old8Lang 函数包装为实例方法
 /// </summary>
 public class ExtensionMethodWrapper(Type targetType, FuncLangValue function, VariateManager manager)
-    : IInstanceMethod
+    : IInstanceMethod, IIlNativeValueInstanceMethod
 {
     /// <summary>
     /// 声明扩展方法时的变量管理器（解释器预执行阶段）。
