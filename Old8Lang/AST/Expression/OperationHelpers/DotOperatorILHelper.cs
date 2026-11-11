@@ -850,6 +850,12 @@ public static class DotOperatorILHelper
             {
                 return property.GetValue(receiver);
             }
+
+            // Old8Lang 的集合同时允许 Count()/Length()；CLR List<T> 仅公开 Count。
+            if (receiver is ICollection collection)
+            {
+                return collection.Count;
+            }
         }
 
         var method = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -968,6 +974,16 @@ public static class DotOperatorILHelper
         // 普通实例成员访问
         left!.LoadIlValue(ilGenerator, local);
 
+        // 字典或列表索引的静态类型是 object 时，在运行期解析成员；否则嵌套
+        // 集合（例如 person["scores"].Length）无法进入下方的 CLR 属性分支。
+        if (leftType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Ldstr, id.IdName);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(DotOperatorILHelper).GetMethod(nameof(GetDynamicObjectProperty))!);
+            return typeof(object);
+        }
+
         // 特殊处理 ValueTuple 的 Length
         if (leftType!.FullName?.StartsWith("System.ValueTuple") == true && id.IdName == "Length")
         {
@@ -977,6 +993,16 @@ public static class DotOperatorILHelper
             // 计算长度
             int length = GetValueTupleLength(leftType);
             ilGenerator.Emit(OpCodes.Ldc_I4, length);
+            return typeof(int);
+        }
+
+        // Old8Lang 中 Length 是集合长度的通用属性；原生 List<T>、Dictionary<K,V>
+        // 等 CLR ICollection 只提供 Count 属性。保持该语言层别名，避免链式调用
+        // 结果在 IL 模式下因静态类型是 List<object?> 而无法访问 Length。
+        if (id.IdName == "Length" && typeof(ICollection).IsAssignableFrom(leftType) && !leftType.IsValueType)
+        {
+            var collectionCount = typeof(ICollection).GetProperty(nameof(ICollection.Count))!.GetGetMethod()!;
+            ilGenerator.Emit(OpCodes.Callvirt, collectionCount);
             return typeof(int);
         }
 
@@ -1001,6 +1027,38 @@ public static class DotOperatorILHelper
 
         ilGenerator.Emit(OpCodes.Ldfld, instanceField);
         return instanceField.FieldType;
+    }
+
+    /// <summary>
+    /// 获取静态类型为 <see cref="object"/> 的接收者成员。
+    /// 语言层把集合 <c>Length</c> 视为通用长度属性，CLR 集合则通常只公开 <c>Count</c>。
+    /// </summary>
+    public static object? GetDynamicObjectProperty(object? receiver, string propertyName)
+    {
+        if (receiver is null)
+        {
+            throw new NullReferenceException($"无法在 null 上访问属性 '{propertyName}'");
+        }
+
+        if (propertyName == "Length" && receiver is ICollection collection)
+        {
+            return collection.Count;
+        }
+
+        var receiverType = receiver.GetType();
+        var property = receiverType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (property?.CanRead == true)
+        {
+            return property.GetValue(receiver);
+        }
+
+        var field = receiverType.GetField(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (field is not null)
+        {
+            return field.GetValue(receiver);
+        }
+
+        throw new MissingMemberException(receiverType.FullName, propertyName);
     }
 
     /// <summary>

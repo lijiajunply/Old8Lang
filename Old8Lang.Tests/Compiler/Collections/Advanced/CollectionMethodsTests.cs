@@ -227,6 +227,26 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void CollectionLengthProperty_CompilesForNativeAndDynamicCollections()
+    {
+        var code = @"
+            values <- {1, 2, 3}
+            record <- {""scores"": [80, 90, 100]}
+            scores <- record[""scores""]
+
+            Assert.Equal(3, values.Length)
+            Assert.Equal(3, scores.Length)
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
