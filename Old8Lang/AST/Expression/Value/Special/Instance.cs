@@ -1114,11 +1114,12 @@ public partial class Instance : LangValueType
     private bool TryEmitLocalDelegateCall(ILGenerator ilGenerator, LocalManager local)
     {
         if (NamedArgs.Count != 0 || local.GetLocalVar(Id.IdName) is not { LocalType: var type } lambdaLocal ||
-            !typeof(Delegate).IsAssignableFrom(type) ||
-            !local.LocalDelegateReturnTypes.TryGetValue(Id.IdName, out var returnType))
+            !typeof(Delegate).IsAssignableFrom(type))
         {
             return false;
         }
+
+        var returnType = local.LocalDelegateReturnTypes.GetValueOrDefault(Id.IdName, typeof(object));
 
         ilGenerator.Emit(OpCodes.Ldloc, lambdaLocal);
         ilGenerator.Emit(OpCodes.Ldc_I4, Ids.Count);

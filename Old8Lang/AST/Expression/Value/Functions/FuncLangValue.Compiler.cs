@@ -15,6 +15,11 @@ public partial class FuncLangValue
 {
     public override Type OutputType(LocalManager local)
     {
+        if (IsLambdaExpression)
+        {
+            return typeof(Delegate);
+        }
+
         var idType = Id?.OutputType(local);
         if (idType is not null && idType != typeof(object)) return idType;
         var a = GetItemType(BlockStatement, local);
