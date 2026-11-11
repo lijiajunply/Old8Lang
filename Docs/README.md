@@ -57,12 +57,9 @@
 - **[变更日志 (CHANGELOG.md)](./CHANGELOG.md)**
   - 按日期的变更记录，含每项改动的起因、修复与已知限制。
 
-### 📊 各领域待办
+### 📊 项目待办
 
-- **[VM 性能优化](../Todo.md)** - 虚拟机调用路径、异常路径与基准回归门禁。
-- **[IL 模式测试覆盖](../Old8Lang.Tests/Compiler/TODO.md)** - IL 模式测试覆盖缺口。
-- **[解释模式测试覆盖](../Old8Lang.Tests/Interpreter/TODO.md)** - 解释模式测试覆盖缺口。
-- **[语言服务器 / LSP](../Old8Lang.LanguageServer/TODO.md)** - Language Server 与 VS Code 扩展的开发计划。
+- **[统一待办清单](../Todo.md)** - 运行时、测试、语言服务器、性能及待复核的问题。
 
 ---
 

@@ -70,7 +70,7 @@ public class ThreadWithTimeoutMethod : BaseInstanceMethod, IIlNativeValueInstanc
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // 见 Todo.md「VM 线程模型」：VM 的线程是 VMThreadLangValue，与本方法的 TargetType 不同构。
+        // VM 线程模型已在 2026-10-10 补齐：VM 的线程是 VMThreadLangValue，与本方法的 TargetType 不同构。
         throw new NotSupportedException(
             "Thread.WithTimeout 在 VM 模式下不可用：VM 的线程是 VMThreadLangValue（线程 id + ResourceManager），没有超时原语");
     }

@@ -1,282 +1,24 @@
-# VM 模式性能优化 TODO（基于 2026-03-02 Quick 报告）
+# Old8Lang 统一待办清单
 
-## 进度更新（2026-10-24，P4：VM 性能后续）
+核对日期：2026-11-11。此文档合并原根目录、解释器测试、IL 测试和语言服务器待办；历史测试报告保留在 `Reports/`。
 
-详见 `Reports/2026-10-24-11-25-P4-VM性能后续.md`。
+**状态约定**：下列历史缺陷除非注明本次验证，否则均为「待复核」，不是本次已复现；测试文件存在也不能证明对应场景覆盖完整。复现、修复后请更新本清单并按测试指南生成报告。
 
-- [x] **全局变量槽位（GlobalSlot）**：`_globals` 改为 `ConcurrentDictionary<string, GlobalSlot>`，
-  `LoadGlobal` / `StoreGlobal` 把「解析到的槽位」缓存在 `Instruction` 上（带全局表归属校验，
-  同一份字节码被多个虚拟机实例复用时自动重新解析）。同进程 A/B（3M 次顶层全局自增）：
-  哈希查表 952~955ms → 槽位 861~870ms（**-9.3%**）。
-- [x] **共享装箱布尔值**：`VmBoxed.True/False` 替代比较指令与 `LoadTrue` / `LoadFalse` 的逐次装箱，
-  1M 次自增循环的分配从 68.67MB 降到 **45.78MB（-33.3%）**；剩余分配全部来自整数运算装箱。
-- [x] **门禁噪声容忍度**：基线与当前报告都带 `StdDevMs` 时，
-  `NoiseFloor = min(15, 2 × √(cv_基线² + cv_当前²) × 100)` 个百分点，有效阈值 = 分类阈值 + NoiseFloor；
-  Markdown/JSON 新增 `NoiseFloor(%)` / `NoiseFloorPercent`。
-- [ ] **类型化值表示**：本轮给出测量与分阶段方案，未实施（跨模块改造，见 P4 报告 §4）。
+## 优先顺序
 
-## 进度更新（2026-10-10，P3：VM 性能与基准门禁）
+1. 排查会使测试进程崩溃的 IL 问题，再核实其他 IL 结果错误和跨模式差异。
+2. 修复测试隔离与不稳定问题，补齐关键场景覆盖。
+3. 完善 LSP 作用域、诊断及调试集成；按收益推进 VM 性能和长期能力。
 
-详见 `Reports/2026-10-10-22-33-P3-VM性能与基准门禁.md`。
+## IL 模式与跨模式缺陷
 
-- [x] 重跑 Quick 基准（macOS arm64）：`Reports/VM_Quick_Performance_Report_20261010_221552.{md,json}`（优化前）、
-  `Reports/VM_Quick_Performance_Report_20261010_223112.{md,json}`（优化后）。
-- [x] 20260425 报告里 4 个待收敛场景在本机**全部 PASS**，判定为跨机器伪回归：
-  Channel_MPMC -30.96%、MutexAtomic +1.45%、LargeFile_10k -60.27%、LargeFile_50k -58.79%。
-- [x] P1 高参数调用：同机中位数 37.877 → 10.867 ms（**-71.31%**，目标 ≥10% 达成）；
-  alloc/op 相对 20260302 基线 344.13 → 240.15 B（**-30.2%**，目标 ≥15% 达成）。
-- [x] P1 高异常率 try/catch：同机中位数 9.932 → 5.501 ms（**-44.39%**，目标 ≥15% 达成）；
-  alloc/op 252.09 → 126.11 B（**-50.0%**，目标 ≥20% 达成）。
-- [x] P1 闭包调用：同机中位数 22.979 → 15.842 ms（**-31.06%**，目标 ≥10% 达成）；
-  alloc/op 400.14 → 296.09 B（**-26.0%**，目标 ≥20% 达成）。
-- [x] 优化手段：解释循环内联极热指令 + 求值栈引用提到循环外（`_stack` 是 ThreadLocal 属性）；
-  `CheckTypeMatch` 基础类型零分配快速路径；`Add/Sub/Mul`、`Equals/Less/Greater` 整数快路径前置。
-- [x] P2 Quick 基线门禁：`--vm-report-quick` 出现 `FAIL` 时返回非零退出码（与 Nightly 一致）；
-  CI 增加显式门禁步骤 + 按 `runner.os/arch` 缓存的基线 + `OLD8LANG_VM_REPORT_BASELINE` 固定基线；
-  基线解析改为按文件名时间戳取最新（原先按 mtime，检出后 mtime 相同会导致基线漂移）。
-- [x] P2 关键场景性能单测阈值：`VMPerformanceSmokeTests` 扩展为 4 个粗阈值用例（耗时 + 分配 + 结果正确性
-  + Channel MPMC 不丢消息），新增 `Category=PerformanceSmoke` 并纳入默认测试档。
-- [x] 回归验证：VM 用例 1033/1033、性能 smoke 4/4、报告/门禁单测 11/11 通过；默认档全量与
-  `TestResults/fail-inventory.trx` 逐用例 diff，0 个基线失败消失、仅 3 个既有已知问题。
-
-## 进度更新（2026-03-02）
-
-- [x] P0-1：修复 `ChannelSend` 在 VM 线程中的异步阻塞异常（已完成，基准不再因该异常直接 NA）。
-- [x] P0-2：Quick 报告增加失败场景显式标记和 `FailureReason` 提取（已完成）。
-- [x] P0-3：修复 `TryReceiveChannel(timeout)` 超时后遗留挂起读取任务导致的通道消息丢失（已完成）。
-- [x] P1-1（部分）：命名参数绑定热路径优化（参数名索引缓存 + 参数数组填充优化）已完成并通过回归测试。
-- [x] P1-1（部分）：参数类型校验热路径优化（基础类型快速判定）已完成并通过回归测试。
-- [x] P1-1（剩余）：补充“仅位置参数且无需默认值补全”调度级 fast path（已完成）。
-- [x] P1-1（补充）：`CallAsync` 命名参数路径去重，避免重复 `NormalizeArguments/ValidateParameterTypes`（已完成）。
-- [x] P1-2（部分）：全局函数调用异常路径避免重复包装（`Old8Exception/VmException` 直通，未知异常再包装）。
-- [x] P1-2（部分）：`VmException` 消息延迟构建，降低高抛异常热路径的即时字符串开销。
-- [x] P1-2（部分）：按异常指令 IP 缓存候选处理器，避免高抛异常场景重复全表扫描 `ExceptionTable`。
-- [x] P1-4（完成）：并发资源热路径优化（`Mutex` 轻量实现 + 资源访问时间更新节流）。
-- [x] P1-3（补充）：`CallFrame` 的 `DeferStack` 改为惰性分配，减少无 `defer` 函数调用下的固定对象分配。
-- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_012717.{md,json}`，用于后续闭包/调用路径优化对比。
-- [x] P1-3（部分）：函数调用 `Locals` 数组改为 `ArrayPool<object?>` 复用（`CallFunction/CallClosureFunction` + `ExecuteFrame` 归还）。
-- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_013755.{md,json}`。
-- [x] P1-3（部分）：`MakeClosure` 改为链式闭包环境（`ClosureEnvironment.Parent`），移除创建子闭包时对父环境的 `SnapshotToDictionary()` 全量拷贝；无捕获场景复用 `ClosureEnvironment.Empty`。
-- [x] 回归验证：`VMLambdaExpressionTests`（15/15）与 `VMMemoryUsageTests`（26/26）通过。
-- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_021345.{md,json}`。
-- [x] P2-1：报告去重改造完成（Markdown 增加 `Per-Job Details` + `Scenario Aggregate (Median)` 双视图，Tiered JSON 保留 `Job` 维度并新增 `AggregatedScenarios`）。
-- [x] 回归验证：`dotnet test Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj --filter "FullyQualifiedName~VMPerformanceReportTests"` 通过（7/7）。
-- [x] P1-3（部分）：闭包环境读路径优化（`ClosureEnvironment` 对较大捕获集使用 `FrozenDictionary`，并为本地查找添加内联 fast path），减少高频闭包变量读取开销。
-- [x] 回归验证：`VMLambdaExpressionTests`（15/15）与 `VMMemoryUsageTests`（26/26）通过（串行执行，避免并发构建文件锁冲突）。
-- [x] P1-1（补充）：位置参数调用 fast path 预计算缓存（`FunctionMetadata.TryGetPositionalFastCallTypeKinds`）+ 调度路径去重，移除每次调用重复的可用性判定循环。
-- [x] 回归验证：`Old8Lang.Tests.VirtualMachine.Functions.VM`（25/25）与 `VMLambdaExpressionTests`（15/15）通过。
-- [x] 基准复测：已生成新 Quick 报告 `Reports/VM_Quick_Performance_Report_20260302_024032.{md,json}`。
-- [x] 基准观察：`20260302_024032` 中 `VMXQ_Edge_HighThrowRate_TryCatch` 聚合状态为 `FAIL`（中位数约 `+7.52%`）。
-  已于 2026-10-10 定案：该 `FAIL` 是跨机器/噪声造成的伪回归——本机重跑后该场景 `PASS`，
-  且优化后中位数再降 **-44.39%**（见 `Reports/2026-10-10-22-33-P3-VM性能与基准门禁.md`）。
-
-## 结论摘要
-
-- `VMXQ_Concurrency_Channel_MPMC_4Workers` 的 **NA/偶发错误已修复**（`99999/100000` 丢消息问题），2026-03-02 01:08 的 quick 报告两套 Job 均为有效 `PASS`。
-- 真实热点主要集中在：
-  - 互斥+原子计数并发（`VMXQ_Concurrency_MutexAtomicCounter_4Workers`: 128.296~146.315 ms，已从高风险区间显著下降）
-  - 50k 大文件编译执行（`VMXQ_LargeFile_CompileAndExecute_50k_Generated`: 41.976~43.733 ms）
-  - 高频闭包捕获（`VMXQ_Edge_LargeClosureCapture_HighFreq`: 31.343~31.413 ms，`PASS` 但 alloc 偏高）
-- 分配量偏高场景：
-  - `LargeClosureCapture`: 19,535.9 KB/op（`20260302_013755`，较 `20260302_012717` 的 `25,395.3 KB/op` 下降约 **23.1%**）
-  - `Channel_MPMC`: 28,896.3~29,788.4 KB/op（`20260302_013755`）
-  - `MutexAtomicCounter`: 60,719.5~60,722.9 KB/op（`20260302_013755`）
-
-## P0（必须先做）
-
-- [x] 修复 `ChannelSend` 在 VM 线程中抛出 `The asynchronous operation has not completed` 的问题。
-  - 证据：`BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-20260302-001859.log`
-  - 当前栈：`VirtualMachine.Helpers.FunctionCall.cs:36` 触发 `ChannelSend` 全局函数异常
-  - 代码点：
-    - `Old8Lang/Concurrency/ResourceManager.cs`（`SendChannel`）
-    - `Old8Lang/GlobalFunctions/Implementations/Concurrency/ChannelFunctions.cs`（`ChannelSendFunction`）
-  - 建议修复：避免直接对未完成 `ValueTask` 调 `GetAwaiter().GetResult()`；改为同步可等待路径（例如 `AsTask().GetAwaiter().GetResult()` 或 `WaitToWriteAsync + TryWrite`）。
-  - 验收：`VMXQ_Concurrency_Channel_MPMC_4Workers` 不再为 `NA`，两套 Job 都产生有效 `Mean/StdDev/Allocated`。
-
-- [x] 给 Quick 报告增加“失败场景显式标记”与“失败原因提取”。
-  - 代码点：`Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs`
-  - 问题：当前只显示 `N/A`，没有把失败原因（异常摘要）带入报告，不利于 CI 快速定位。
-  - 验收：报告中对 `NA` 场景新增 `FailureReason`（至少包含异常类型+关键消息）。
-
-- [x] 修复 `TryReceiveChannel(timeout)` 在超时场景下可能“吞消息”的并发正确性问题。
-  - 代码点：`Old8Lang/Concurrency/ResourceManager.cs`（`TryReceiveChannel`）
-  - 根因：旧实现对 `ReadAsync().AsTask().Wait(timeout)` 超时后不取消挂起读取，后续读取可能被遗留任务抢走，导致消费方统计缺失。
-  - 修复：改为 `TryRead` fast path + `WaitToReadAsync(cts.Token)` + `TryRead`，超时通过 `OperationCanceledException` 明确返回失败。
-  - 验收：
-    - `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~VMConcurrencyChannelTests"` 通过（14/14）。
-    - `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~VMConcurrencyPerformanceTests"` 通过（3/3）。
-    - `VMXQ_Concurrency_Channel_MPMC_4Workers` 在 `20260302_010825` 报告中两套 Job 均为 `PASS`（78.191 ms / 73.765 ms）。
-
-## P1（高收益优化）
-
-- [x] 优化高参数函数调用路径（减少每次调用的参数整理/查找成本）。
-  - 代码点：
-    - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.CallDispatch.cs`
-    - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs`（`ArrangeArgumentsWithNamed`）
-  - 现状：命名参数通过 `function.Parameters.IndexOf(paramName)` 线性查找；高频调用中会放大开销。
-  - 建议：
-    - 在 `FunctionMetadata` 预构建 `参数名 -> 索引` 映射缓存。
-    - 为“仅位置参数且无默认参数补全需求”走 fast path，绕过命名参数拼装逻辑。
-  - 当前进展（`20260302_024032`，基线 `20260302_023424`）：
-    - Job-EATLBP：`40.689 -> 40.049 ms`（约 **-1.57%**，`PASS`）
-    - Job-LGHQEI：`45.983 -> 41.023 ms`（约 **-10.79%**，`PASS`）
-    - 聚合中位数：约 **-6.18%**（`PASS`，但尚未达到 TODO 目标 `>=10%`）
-  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
-    - 聚合中位数：`37.877 -> 10.867 ms`（**-71.31%**，达标）
-    - alloc/op：`344.13 -> 240.15 B/op`（相对 `20260302_024032` 基线 **-30.2%**，达标）
-    - 主要来源：解释循环内联极热指令 + 求值栈引用提到循环外 + `Add` 整数快路径 + `CheckTypeMatch` 零分配。
-  - 验收：`VMXQ_Edge_HighArgCount_CallHotPath` 平均耗时下降 >= 10%，alloc/op 下降 >= 15%。**（已达成）**
-
-- [x] 优化高异常率 Try/Catch 路径，减少异常对象构造和包装层级。
-  - 代码点：
-    - `Old8Lang/Bytecode/VM/Instructions/VirtualMachine.Instructions.Exception.cs`
-    - `Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.FunctionCall.cs`（当前会把内部异常统一包装成 `InvalidOperationError`）
-  - 问题：高抛异常场景里，频繁包装异常会带来显著分配和栈开销。
-  - 建议：
-    - 对受控 VM 异常路径采用轻量错误对象/错误码通路（仅在跨边界时构建重异常）。
-    - 避免重复包装已是 `Old8Lang.Error.*` 的异常。
-  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
-    - 聚合中位数：`9.932 -> 5.501 ms`（**-44.39%**）
-    - alloc/op：`252.09 -> 126.11 B/op`（相对 `20260302_024032` 基线 **-50.0%**）
-    - 主要来源：`Throw` 指令在解释循环内联（配合既有的 `TryHandleExceptionInline` 快路径）、
-      `Mod/Equal` 等比较指令内联与整数快路径。
-  - 验收：`VMXQ_Edge_HighThrowRate_TryCatch` 平均耗时下降 >= 15%，alloc/op 下降 >= 20%。**（已达成）**
-
-- [x] 优化闭包调用路径，降低捕获环境访问和对象分配。
-  - 代码点：
-    - `Old8Lang/Bytecode/VM/VirtualMachine.Core.cs`（`CallClosureFunction`）
-    - `Old8Lang/Bytecode/Closures/ClosureValue.cs`
-  - 建议：
-    - 闭包捕获变量按索引化存储（数组或紧凑结构）替代 `Dictionary<string, object?>` 热路径访问。
-    - 对高频闭包函数增加“无变更捕获环境复用”策略。
-  - 中间进展（`20260302_021345`）：alloc/op 维持在 `19,535.88 KB/op`（相对 `20260302_012717` 下降约 **23.1%**，达标）；耗时为 `30.802 ms / 30.708 ms`（EATLBP/LGHQEI），较 `20260302_013755` 仅小幅改善，仍未达到下降 >=10% 的目标。
-  - 最终进展（`20261010_223112`，同机基线 `20261010_221552`）：
-    - 聚合中位数：`22.979 -> 15.842 ms`（**-31.06%**，达标）
-    - alloc/op：`400.14 -> 296.09 B/op`（相对 `20260302_024032` 基线 **-26.0%**，达标）
-    - 主要来源：`CallDynamic` 闭包体内的 `LoadGlobal`/`Add`/`LoadLocal` 全部改为解释循环内联。
-  - 验收：`VMXQ_Edge_LargeClosureCapture_HighFreq` alloc/op 下降 >= 20%，耗时下降 >= 10%。**（已达成）**
-
-- [x] 并发互斥计数路径减少资源管理层字典查找频率（已完成）。
-  - 代码点：
-    - `Old8Lang/Concurrency/ResourceManager.cs`
-    - `Old8Lang/Concurrency/ResourceWrapper.cs`
-    - `Old8Lang/Concurrency/MutexImpl.cs`
-  - 问题：每次 `MutexLock/Unlock`、`AtomicIntIncrement` 都经过 `ConcurrentDictionary + wrapper.UpdateLastAccessTime()`，在高频循环下开销明显。
-  - 建议：
-    - `Mutex` 资源从 `SemaphoreSlim` 替换为 `Monitor` 驱动的轻量 `MutexImpl`。
-    - `ResourceWrapper.UpdateLastAccessTime()` 改为秒级节流，减少热路径时间读取+字段写入。
-  - 验收：
-    - `VMXQ_Concurrency_MutexAtomicCounter_4Workers`（20260302_010825 -> 20260302_011433）：
-      - Job-EATLBP：`279.923 ms -> 146.315 ms`（约 **47.7%** 改善）
-      - Job-LGHQEI：`250.942 ms -> 128.296 ms`（约 **48.9%** 改善）
-    - 两套 Job 均为 `PASS`。
-
-## P2（基准与报告质量）
-
-- [x] 报告去重策略：按 `Scenario + Job` 保留明细，并输出聚合视图。
-  - 代码点：`Old8Lang.Benchmarks/Benchmarks/VM/Reports/VMPerformanceReport.cs`
-  - 问题：当前同一场景在不同 Job 下重复出现，阅读和趋势判断成本高。
-  - 建议：
-    - Markdown 展示两层：`Per-Job 明细` + `Scenario 聚合（median 或加权均值）`。
-    - JSON 增加 `Job` 维度，避免后续分析丢信息。
-  - 验收：报告中同一场景不再“看起来重复”，而是结构化展示差异。
-
-- [x] 建立 Quick 基线文件并启用回归门禁。
-  - 代码点：`Reports/Baselines/` + `VMPerformanceReport.cs` 基线加载逻辑
-  - 问题：当前 `BaselineJson: N/A`，`Status` 全是 `N/A`，无法自动回归判定。
-  - 验收：下一次 Quick 报告出现 `PASS/WARN/FAIL`，并在 CI 中可阻断 `FAIL`。
-  - 完成情况（2026-10-10）：
-    - 报告已能算出 `PASS/WARN/FAIL`（`Reports/VM_Quick_Performance_Report_20261010_223112.md`）。
-    - `VMPerformanceReport.GetFailureSummary` 汇总 per-job 与聚合两个视图的 `FAIL`；
-      `--vm-report-quick` / `--vm-report-nightly` 出现 `FAIL` 时返回非零退出码。
-    - `OLD8LANG_VM_REPORT_BASELINE` 可把基线固定到指定文件（CI 用按 runner 缓存的基线，
-      避免跨机器比较）；基线解析改为按文件名时间戳取最新，消除 mtime 相同导致的基线漂移。
-    - `.github/workflows/ci-cd.yml` 的 `performance-benchmarks` 增加显式门禁步骤，
-      通过时才推进基线缓存，产物改为 `if: always()` 上传。
-    - `Reports/Baselines/vm_quick_baseline.json` 按本机 run2 实测值刷新（原值是过期的“预期值”，
-      在本机会直接算出 +70% 的伪 FAIL）。
-
-- [x] 为关键场景添加性能单测阈值（非 BDN，快速 smoke）。
-  - 建议测试：
-    - Channel MPMC 基本可运行（不抛异常）
-    - HighArgCount/HighThrowRate/LargeClosure 三场景的最大耗时与分配上限
-  - 目标：在常规 `dotnet test` 阶段先挡住明显退化，再由 BenchmarkDotNet 做精确评估。
-  - 完成情况（2026-10-10）：`Old8Lang.Tests/VirtualMachine/Performance/VMPerformanceSmokeTests.cs`
-    四个用例（三场景耗时 + 分配上限 + 结果正确性，外加 Channel MPMC 4 生产者/4 消费者 100k 条不丢消息），
-    新增 `Category=PerformanceSmoke` 并纳入 `default.runsettings`，随常规 `dotnet test` 一起跑。
-
-## 后续项（2026-10-10 P3 期间发现；2026-10-24 P4 已处理其中两项）
-
-- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>` / `CallFrame.Locals` / `GlobalSlot` / `UpValueCell` 里的整数
-  每次运算都要重新装箱。2026-10-24 P4 实测：`sum <- sum + 1` 型循环 1M 次仍分配 **45.78 B/次**
-  （两次整数装箱；比较结果的布尔装箱已在 P4 用 `VmBoxed` 消除），`Bytecode/` 下共 417 处 `object?`。
-  要再降一个数量级需要类型化值表示（`struct` 标记联合 + 类型化栈 / 类型化局部变量 / 类型化闭包单元），
-  属跨模块改造；P4 报告 §4 给出分阶段方案（先栈与局部变量、保留 `object?` 边界、再逐步收紧）。
-- [x] **`_globals` 用 `ConcurrentDictionary<string, object?>`**：顶层脚本变量（`sum`/`i` 这类）读写都走它。
-  **已完成（2026-10-24 P4）**：改为 `ConcurrentDictionary<string, GlobalSlot>`，槽位引用缓存在
-  `LoadGlobal` / `StoreGlobal` 指令上，热路径从「按名字哈希查表」降为「一次字段读取 + 归属校验」；
-  同进程 A/B 3M 次全局自增 -9.3%。覆盖 `DoLoadGlobal`/`StoreGlobal` 以及模块导入、defer、类/枚举注册等冷路径。
-- [x] **门禁对同机器噪声的敏感度**：基线取「上一次报告」，同机连跑的并发场景中位数波动可达 12% 量级。
-  **已完成（2026-10-24 P4）**：基线与当前报告都带 `StdDevMs` 时按两次运行的相对标准差计算噪声容忍度
-  （上限 15 个百分点），有效阈值 = 分类阈值 + 噪声容忍度；`NA` / 执行异常仍直接 FAIL。
-  静态基线只记均值时退化为固定阈值。细节见 `Old8Lang.Benchmarks/README.md`。
-
-## 建议执行顺序
-
-1. 优先做 P1 的闭包捕获路径降分配。
-2. 接着补强函数调用/异常路径在新基线下的回归余量。
-3. 最后做 P2（报告聚合 + 基线门禁）。
-
-## 本次分析输入
-
-- `Reports/VM_Quick_Performance_Report_20260302_002147.md`
-- `Reports/VM_Quick_Performance_Report_20260302_002147.json`
-- `Reports/VM_Quick_Performance_Report_20260302_010825.md`
-- `Reports/VM_Quick_Performance_Report_20260302_010825.json`
-- `Reports/VM_Quick_Performance_Report_20260302_011433.md`
-- `Reports/VM_Quick_Performance_Report_20260302_011433.json`
-- `BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-report.csv`
-- `BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.Benchmarks.VM.Suites.VMQuickPerformanceBenchmarks-20260302-001859.log`
-
----
-
-# 跨模式实例方法补齐后的遗留 TODO（2026-10-10）
-
-背景：`Reports/2026-10-09-22-56-项目缺口排查.md` 第 5 节列出的 IL 29 个方法、VM 14 个方法以及两处
-代码级缺口已处理，详见 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md`。
-以下是执行过程中发现、但**与本轮清单无关**（按 AGENTS.md 规则不顺手改）的问题。
-
-## A. 阻塞类（导致清单内方法在某个模式下不可用）
-
-- [x] **VM 线程模型：`Thread.Then` / `Cancel` / `Retry` / `WithTimeout` 在 VM 下不可达 → 2026-10-10 已补齐。**
-  - 做法：`VMThreadWrapper` 增加 `RequestCancel` / `WaitCompletion(ms)`，`ResourceManager` 增加
-    `CancelThread` / `WaitThreadCompletion` / 线程负载表，`spawn` 登记 `(函数对象, 参数)`；
-    4 个方法注册在 `VMThreadLangValue` 上（`InstanceMethods/Implementations/Thread/VmThreadMethods.cs`）。
-  - 语义：`Cancel` 只对尚未 `Start()` 的线程生效（协作式）；`Retry` 只能用于 `spawn(...)` 创建的线程。
-  - 顺带修复：`PrintLine(线程)` 的栈溢出（`VMThreadLangValue` 补 `ToString/ToDisplayString`）。
-  - 原始问题（存档）：
-  - 现状：这 4 个方法 `TargetType = ThreadLangValue`，而 VM 的线程对象是 `VMThreadLangValue`
-    （`Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs:183`，整数线程 id + `Concurrency.ResourceManager`）。
-    VM 分发（`Old8Lang/Bytecode/VM/Helpers/VirtualMachine.Helpers.ReflectionAndTasks.cs:38/60/65`）
-    精确匹配与 `VMTypeMapper` 等价映射都得不到 `ThreadLangValue`，方法体不会执行（实测报
-    `类 'VMThreadLangValue' 中未找到方法 'X'`）。
-  - 需要：给 `VMThreadLangValue` 新增同名实例方法（并注册），以及 `ResourceManager` 侧的
-    取消令牌 / 保存原始函数（Retry）/ 超时 Join 原语。属于改线程模型。
-  - 备注：`ThreadStartMethod` / `ThreadJoinMethod` / `ThreadIsAliveMethod` 的 VM 实现（要求原生
-    `System.Threading.Thread`）同样是死代码；VM 下 `.Start()/.Join()/.IsAlive()` 实际走反射回退。
-  - 附带缺陷：已随本次一并修复。
-
-- [ ] **陈旧测试文件**：`TestFiles/InterpreterTests/test_thread_basic.old8` / `test_thread_simple.old8` /
-  `test_thread_comprehensive.old8` / `thread_advanced_features.old8` / `ThreadSafetyTest.old8` 里
-  `spawn(...)` 之后直接 `Join()`，没有 `Start()`，按 2026-10 起明确的 spawn 语义必然报
-  `Thread has not been started`。这些文件没有被任何 xUnit/脚本引用，属于陈旧用例，未在本轮修改。
-
-## B. IL 模式既有缺陷（本轮踩到、但非清单项）
+以下条目来自历史复现，尚未逐项重跑。报告见 [IL 缺陷验证](Reports/2026-10-23-23-30-IL模式缺陷修复验证.md)、[跨模式语义修复](Reports/2026-10-24-00-30-P1跨模式语义修复测试.md) 和 [VM 残留修复](Reports/2026-10-24-09-45-P2虚拟机模式残留修复测试.md)。
 
 - [ ] **泛型目标类型的扩展方法调用未接入 IL 方法解析。**
   - 复现：`extension list<T> { func marker() -> int { return 7 } }` 后调用
     `items.marker()`，IL 模式报无法在 `List\`1` 中找到方法 `marker`；解释器模式可正常调用。
   - 本轮仅修复声明语法解析，未改变 IL 扩展方法注册与调用路径。
+
 - [ ] **方法调用结果上直接链式调用生成无效 IL。**
   - 复现：`l.Count().ToStr()`、`l.FindAll((x:int) -> x % 2 == 0).Count()` → `IL001 invalid program`
     （改动前同样失败）。
@@ -284,136 +26,38 @@
     `OutputType(ILGenerator, LocalManager)` 用 `Left.OutputType(local)`（非 IL 重载）取嵌套表达式类型，
     对 `Operation` 恒为 `object`，于是外层按 `object` 解析实例方法/属性。
   - 影响：所有「链式调用」写法在 IL 下不可用；测试需先赋给变量。
-- [ ] **无类型注解的递归函数在 IL 下无限递归（栈溢出，会让 `dotnet test` 直接中止）。**
-  - 复现：`func factorial(n) { if n <= 1 { return 1 } return n * factorial(n - 1) }` + `factorial(5)`
-    用 `-il` 运行 → `Stack overflow ... at DynamicClass.factorial(System.Object)`；
-    **基线（HEAD 67005c8c）同样复现**，非本轮引入。
-  - 影响用例：`Old8Lang.Tests/Compiler/Integration/EndToEndTests.EndToEnd_FactorialCalculation_WorksCorrectly`、
-    `EndToEnd_FibonacciSequence_GeneratesCorrectValues`（这两例在基线 TRX 中也没有记录，
-    因为基线整轮测试同样在这里中止）。
-  - 根因方向：参数无注解时 DynamicMethod 形参为 `object`，`n <= 1` 的比较代码在 `object` 上语义错误，
-    递归没有基线条件。建议：IL 模式对无注解参数直接报编译错误（IL 本来就要求完整类型注解）。
+
 - [ ] **IL 模式 lambda 不能读写外层普通局部变量。**
   - 现状：`BuildLambdaDynamicMethod` 的 `funcLocal` 只带了外层**函数**委托表（本轮新增），
     普通局部变量仍不可见。既有边界。
-
-## D. 解释器用例目录（`TestFiles/InterpreterTests/`）的陈旧代码清理（2026-10-10）
-
-用 `run_interpreter_tests.sh` 的判定口径（非 0 退出即失败；末行含 `error` 视为期望失败）全量扫了 182 个
-`.old8`，原来的 16 个问题文件里已修好 **11 个**（另加 8 个线程用例 = 共 19 个文件）：
-
-已修（陈旧 API/导入名/语法）：
-
-- 线程类 8 个：`test_thread_basic` / `test_thread_simple` / `test_thread_comprehensive` /
-  `thread_advanced_features` / `thread_retry_test` / `ThreadSafetyTest` /
-  `Async/LockThreadTest` / `Async/LockVariableTests` —— 统一补 `Start()`（`spawn` 只创建线程；
-  `Then` / `WithTimeout` / `Retry` 返回的也是未启动线程），并把 `e.ToString()` 改成 `e.ToStr()`。
-- 标准库模块名：`import MathLib` → `import Math`（`56_mathlib_extended` / `simple_mathlib_test` /
-  `debug_mathlib_return`）；彩色输出补 `import ColorfulTerminal`（`32_terminal_library` /
-  `34_import_statements`）。
-- 反射函数已合并：`GetClassName` / `GetClassMethods` / `GetClassFields` → `GetClassInfo`（返回字典），
-  `HasMethod` / `HasField` → `HasMember`（`reflection_test`）。
-- `arr.Length()` → `arr.Count()`（`GlobalFunctionsTest`）；`result.getType()` / `result.toString()` →
-  `type(result).ToStr()` / `result.ToStr()`（`debug_mathlib_return`）；`result.GetType().ToStr()` →
-  `type(result).ToStr()`（`test_super_debug`）。
-- `new X(...)` → `X(...)`（4 个 `generic_*` 文件里的旧写法；`new` 关键字本就不存在）。
-- 空字典 `{}` → `Dict()`（`decorator_basic`）。
-- `operator_overload_error` 末尾的 `// error` 标记已过时（错误现在都被 `try/catch` 捕获）。
-
-顺带修掉一个真 bug（因此 `super` 4 个用例全绿）：
-
-- [x] **`super.method(args)` 被误当成父类构造函数调用**（`Old8Lang/AST/Expression/Core/SuperExpression.cs`
-  的 `SuperProxy.Dot`）：任何 `super.xxx(...)` 都走 `CallParentConstructor`（只查 `init`），
-  于是 `super.speak()` 会去调用父类 `init`（参数不符报「缺少实参」，父类没有 `init` 就静默返回 null）。
-  已改为：只有 `super.init(...)` / `super.父类名(...)` 走构造函数，其余按普通父类方法调用。
-  复现（修前）：`class A { func speak() -> string { return "A" } }` + `super.speak() + "B"` →
-  `不支持类型 'NullLangValue' 和 'StringLangValue' 的加法操作`。
-
-仍未修（**功能缺陷，不是陈旧用例**，测试保留以暴露缺口）：
-
-- [x] **泛型约束不认识接口实现**（2026-10-24 已修）：根因不是约束校验器，而是泛型类实例化时
-  没有从构造函数实参推断类型参数（`GenericTypeInference.InferClassTypeArguments` 原为返回 `null` 的桩），
-  于是 `init(v: T)` 的 `T` 未解析、直接报类型不匹配。现已按 `init` 形参推断，并让显式实例化也把
-  `manager` 传给约束校验器；`HasParameterlessInit` 同时识别重载的 `init`（`MethodOverloadList`）。
-  文件：`generic_constraints_simple.old8` / `generic_constraints_comprehensive.old8`。
-- [x] **泛型可空类型参数 `T?` 的类型检查过严**（2026-10-24 已修）：类型注解解析统一走
-  `TypeChecker.ResolveGenericTypeAnnotation`，查映射时用去掉 `?` 的 `T`、解析后再补回 `?`；
-  无法推断的可空参数（如 `Box(null)`）在没有约束时按 `any` 处理。
-  文件：`generic_nullable_simple.old8` / `generic_nullable_runtime.old8`。
-- [x] **同一模块的符号无法重复导入**（2026-10-24 已修）：`VariateManager` 新增
-  `LoadedModuleExports`，模块首次执行时记录导出符号；再次导入从记录里恢复、不再重复执行模块体
-  （旧实现重复执行时赋值会写回外层，导致符号"不存在"）。
-  文件：`test_module_cache.old8`（其中的缓存断言已按 import 提升语义改写）。
-
-- [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
-  让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
-  全量并行测试时线程池繁忙会翻转结果。单独运行稳定通过（3/3）。
-  建议把延迟差拉大（例如 10 vs 1000）或改为断言「结果是 fast 或 slow 之一」。
-
-## C. 其它同类实现待迁移（同一套桥接机制可复用）
 
 - [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
   在 `List<T>` 接收者下会「方法未找到」。
   - 迁移方式：参照 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md` §2 的机制
     （实现 `IIlNativeValueInstanceMethod` + `IlValueBridge.EmitLoadWrapped` + 静态 helper）。
+
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
 
-
-## D. 2026-10-10 虚拟机缺口修复后遗留
-
-来源：`Reports/2026-10-10-23-40-虚拟机模式缺口修复测试.md`。以下均为本轮实测发现、
-但**与本轮 9 条缺口不同源**的问题，未顺手修改。
-
-> 2026-10-24 P2 已处理大部分条目，见 `Reports/2026-10-24-09-40-P2虚拟机模式残留修复测试.md`。
-
-- [x] **VM 静态类补齐 TestRunner / Mock / TaskScheduler**（2026-10-24 已修）：
-  `TestRunner.Describe` / `It` / `Test` / `RunTest` 由虚拟机自己执行传入的
-  `ClosureValue` / `FunctionMetadata`（其余统计类方法复用解释器实现）；
-  `Mock` 的 12 个静态方法复用解释器实现；`TaskScheduler.Default` 走新增的「属性式成员」通道。
-  顺带修好 `TestRunner` 返回值里字典未展开（`Value` 为空）导致测试名全空、全部判失败的既有缺陷。
-- [x] **错误信息仍会泄露 .NET 类型名**（2026-10-24 已修）：虚拟机内统一改用
-  `DescribeValueType` / `DescribeTypeName`，覆盖属性访问、方法未找到、算术/比较、索引/切片、
-  类型转换、`TypeOf` 等路径；`GetValueTypeName` 的兜底也不再返回 `IntLangValue` / `Tuple`2`。
-- [x] **异步函数显式 `return null` 在 VM 里仍是 `VoidLangValue`**（2026-10-24 已修）：
-  `ConvertResultToLangValue` 不再把裸 `null` 当成「没有值」；无返回值仍由 `CallFunction` 补
-  `VoidLangValue`，两者可区分，输出与解释器一致（`Task(Completed: Null)`）。
-- [x] **`Task.Delay` 的第二个参数（CancellationToken）**（2026-10-24 已修）：
-  移除虚拟机的显式拒绝，`cts.Token` 得到的 `CancellationTokenLangValue` 可直接传入；
-  `Thread.CurrentThread`（属性 / 无参调用）、`Task.Factory` 与 `Task.Factory.StartNew`、
-  裸引用具体方法（`f <- Task.Delay`）也已支持。仍不支持的是**裸引用静态类名**（`value <- Task`）
-  与静态类方法的命名参数。
 - [ ] **异步函数的装饰器仍不可用**：不是虚拟机独有——装饰器必须返回「异步函数值」，
   而 `async (x) -> ...` 异步 Lambda 目前在解释器下也会抛
   `NullReferenceException`（`Instance.Run`）。三种模式都还没有异步函数值表示，
   需要先补「异步 Lambda / 异步函数值」这一层能力，再让 VM 的 `CallAsync` 支持装饰器绑定。
-- [x] **`VMProfiler` / `VMDebugger` / `Disassembler` 是死代码**（2026-10-24 已接入）：
-  `-vm` 新增 `--disasm`（执行前反汇编）、`--profile`（执行后打印函数/指令统计）、
-  `--debug-session` + `--break <行号>`（交互式断点/单步，支持 `p` 查看参数、`bt` 调用栈）。
-  调试器新增按函数限定的断点，避免不同函数的同名指令下标误命中。
-- [x] **IL 模式的负索引**（2026-10-24 已修）：新增 `IlIndexHelper`，IL 的列表 / 数组 / 字符串 /
-  元组索引统一归一化负下标并抛语言层 `INDEX_ERROR`；解释器的元组索引同时补上负索引支持。
-  原先断言"负索引应抛异常"的 3 个 IL 用例已改为断言取末尾元素。
-- [x] **VM 数组解构赋值 `[a, b] <- 序列`**（2026-10-24 已修）：字节码此前只处理元组模式
-  `(a, b) <- ...`，解释器只处理数组模式，两者不互通。现字节码补齐数组解构
-  （列表 / 数组右值、多余元素忽略、局部/全局变量均可）。
+
 - [ ] **元组模式解构 `(a, b) <- ...` 在解释器下无效**：语法能解析，但 `SetStatement.Run`
   没有对应分支，变量不会被赋值（`-f` 报 `NAME_ERROR`）；IL 生成也不正确。虚拟机的字节码路径
   反而支持。属于跨模式语义分歧，需统一（建议以数组解构为准，或两者都支持）。
+
 - [ ] **`Thread.CurrentThread` 的裸属性写法只在虚拟机可用**：解释器下
   `Thread.CurrentThread`（不带括号）报 `类型 'Thread' 没有属性 'CurrentThread'`，
   `Thread.CurrentThread()` 正常；属于解释器的静态类属性通道缺失，非本轮范围。
-- [ ] **`StringLangValue` 之外的 `ThreadLangValue` 类型名**：`ThreadLangValue.GetValue()`
+
+- [ ] **排查返回自身的 LangValue 类型**：`ThreadLangValue.GetValue()`
   返回 `this`，而基类 `ToString()` 走 `GetValue()?.ToString()`，原先任何
   `ThreadLangValue.ToString()` 都会无限递归（栈溢出）。2026-10-24 已补
   `ToString` / `TypeToString` / `Id`；其它 `GetValue()` 返回 `this` 的 `LangValueType`
   值得同类排查。
-
-## E. 2026-10-22 移除图像标准库时发现
-
-来源：`Reports/2026-10-22-08-20-移除图像标准库验证.md`。以下问题与本轮改动无关，
-在未改动的 `HEAD` 上同样复现，未顺手修改：
 
 - [ ] **IL / VM 模式下标准库 `import` 后访问模块名失败**：`import "Math"` + `Math.Sqrt(9)`
   在解释模式输出 `3`；IL 报 `[NAME_ERROR] 名称 'Math' 未定义`；VM 报
@@ -421,95 +65,18 @@
   但 `Docs/MODE_SUPPORT.md` §11 标注三模式均为 ✅，现有 import 测试（`Old8Lang.Tests/Interpreter/Modules/`）
   只覆盖解释模式。需确认 IL/VM 是否应支持标准库 import，再决定修实现还是纠正文档。
 
-## F. 2026-10-22 依赖安全升级验证时发现
-
-来源：`Reports/2026-10-22-08-28-依赖安全升级验证.md`。以下失败与依赖升级无关
-（临时回退 `Microsoft.Data.Sqlite` 10.0.1 后同样复现），未顺手修改：
-
-- [ ] **DatabaseLib 编译器/解释器测试共用同名内存库**：同时运行
-  `Compiler.Modules.StandardLibrary.DatabaseLibTests` 与 `Interpreter...DatabaseLibTests` 时，
-  解释器侧 8 个用例因 `table users already exists` 失败；两个类各自单独运行均 12/12 通过。
-  两组测试使用相同的 `file:testdb_*?mode=memory&cache=shared` 库名，连接池使内存在 `Close()` 后仍存活。
-  建议为两组测试使用不同库名前缀，或显式 `Pooling=False` / `Dispose()`。
-- [ ] **SerializationLib 编译器/解释器测试共用临时文件**：同时运行两组
-  `SerializationLibTests` 时，编译器侧 `MsgPackSerializeToFile_ShouldSerializeToFile`
-  因 `./test_msgpack_data.bin` 已被另一组删除而失败；各自单独运行均通过。
-  建议文件名带模式或测试类前缀，并在清理时忽略文件不存在。
-
-## G. 2026-10-22 目录合并验证时发现
-
-来源：`Reports/2026-10-22-20-27-目录合并与仓库清理验证.md`。以下为既有问题，与目录合并无关，本轮未修复：
-
-- [ ] **VM 模式 3 个用例直接失败**：
-  - `TestFiles/VirtualMachine/DestructuringAssignmentTest.old8`：解析阶段报错（`StatementParser.Main.cs:444`）。
-  - `TestFiles/VirtualMachine/vm_gap_6_error_position.old8`：VM 执行阶段抛异常（错误定位用例，末行没有 `error` 标记）。
-  - `TestFiles/VirtualMachine/legacy/vm_operator_overload.old8`：VM 执行阶段抛异常（原 `VMTests/`）。
-  另有 `legacy/control_flow.old8`、`legacy/vm_decorator.old8` 为原 `VMTests/` README 已记录的已知失败。
-
-- [x] **测试驱动脚本的 App 项目路径错误**（本轮已修）：`run_syntax_tests.sh`、`run_interpreter_tests.sh`、
-  `run_vm_tests.sh`、`test_interpreter_comprehensive.sh`、`run_comprehensive_compiler_tests.sh` 在
-  `TestFiles/` 下调用 `dotnet run --project Old8Lang.App`，实际应为 `../Old8Lang.App`；
-  否则所有用例都会被误判失败（脚本输出 `提供的文件路径不存在: Old8Lang.App`）。
-
-- [ ] **语法测试 5 个既有失败用例**（`run_syntax_tests.sh` 89 例中 5 失败，均与目录合并无关）：
-  - `TestFiles/SyntaxTests/test_syntax_structure_error.old8`、`test_lexical_error.old8`：期望失败的用例，
-    但末行没有 `error` 标记，被 runner 判为失败；
-  - `TestFiles/SyntaxTests/test_generics.old8`：文件里仍用 `#` 作注释（应为 `//`），解析直接失败；
-  - `TestFiles/SyntaxTests/test_simple_edge_cases.old8`、`test_more_edge_cases.old8`：
-    主表达式解析报错（`Colon` / `Assignment`）。
-
-- [ ] **全量 `dotnet test` 在结束前中止**：输出「测试运行已中止」，部分用例（如 `TypeSystem/`、`Error/` 分类）
-  未被执行，换 `--filter` 按分类运行则全部通过（65/65、37/37 等）。P1、P2 两次验证均复现，
-  与目录合并无直接关系；建议用 `dotnet test --blame` 定位是否有用例导致 runner 崩溃。
-
-- [x] **`TestFiles/TestProjects/ThirdPartyLibTest/tests/test_thirdparty.old8` 使用旧语法**（2026-10-22 已改写）：
-  已按实际包 API 重写，覆盖 Logger / HttpClient / SimpleLogger / SimpleMath；同时修正 `HttpClient` 包内
-  `Logger.Create` → `LoggerClass`，并让 `ModuleResolver` 从项目根的 `packages/` 解析第三方包。
-
-- [x] **`ThirdPartyLibTest/packages/OldLib/index.old8` 为空**（2026-10-22 已修）：
-  入口改为直接声明 `Old8LangLib` 的 `extern`（MathLib / Time / CryptoLib / FileLib / OS / Csv / Terminal），
-  并删除已失效的 `Async.old8`、`CollectionLib.old8`、`Json.old8`；夹具用例新增 OldLib 覆盖。
-
-- [x] **模块测试 10 个既有失败**（2026-10-22 已修，模块测试 520/520 通过）：
-  - `JsonLibTests`：`Json` 标准库已移除，删除该测试类；`NetLibTests` 改用全局 `JsonSerialize`。
-  - `SelectiveImportTests`：补 `CopyModuleFixture("lazy_math.old8")`，让相对导入能找到 fixture。
-  - `UnifiedModuleArchitectureTests` / `LazyImportSyntaxTest` 别名：IL 模式实现模块别名
-    （编译期注册模块、成员访问展开为同名符号、模块体内联），测试改传真实文件路径。
-  - 附带修复 `DatabaseLibTests` 编译器/解释器两组共用内存库名导致的 8 个并发失败。
-
-## H. 2026-10-23 IL 模式缺陷（本轮已修 7 条，剩余 5 条）
-
-来源：`Reports/2026-10-23-19-19-项目现状与缺口排查.md` 与
-`Reports/2026-10-23-23-30-IL模式缺陷修复验证.md`。
-
-### 已修复（2026-10-23）
-
-- [x] **顶层 `Assert.*` 调用生成非法 IL**：`GenerateAssertMethodCall` 未给 `AssertHelper` 的可选
-  `message` 参数补默认值，导致 `call` 3 参数方法只压 2 个值。已补 `Ldnull` / `initobj`。
-  `Compiler.Expressions` 由 44 通过 / 176 失败变为 **179 通过 / 41 失败**。
-- [x] **IL 模式顶层语句被执行两次**：预执行改为 `BlockStatement.ExecuteDeclarations`，只跑
-  `FuncInit` / `ClassInit` / `AsyncFuncInit` / `ExternStatement` / `EnumInit` / `ExtensionDeclaration` / 动态导入。
-- [x] **无类型注解递归函数栈溢出**：`*` `/` `%` 统一走 `LoadAndConvertOperands`；`<=` / `>=` / `!=`
-  在 `object` 与 `int` 混用时走 `IComparable` / `object.Equals`。`factorial` / `fibonacci` 结果正确。
-- [x] **预执行不再填充 Manager 后测试断言失效**：新增 `RuntimeGlobalWriter`（`[ThreadStatic]`），
-  在编译产物 `ret` 前把顶层变量写回 `interpreter.Manager`，断言读的是 IL 执行结果。
-- [x] **列表字面量类型混淆导致 `AccessViolation`**：`ListLangValue` 统一生成 `List<object>`，
-  索引走 `IList`；`r <- {}; r.Add(1)` / `zip(list1, list2)` 不再崩溃。
-- [x] **`ListAddMethod` 对原生列表 `ldfld ListLangValue.Values`**：实现 `IIlNativeValueInstanceMethod`，
-  原生列表走 `IList.Add`（返回的下标要 `Pop` 掉）。
-- [x] **原生接收者的 `ToStr()` 生成无效 IL**：`ValueTypeToStrMethod` 改用
-  `IlValueBridge.EmitLoadWrapped` 桥接后再调用 helper；`x.ToStr()` 与 `match` 变量绑定用例恢复。
-
-### 仍未修复（IL 模式）
-
 - [ ] **IL 实例方法读取字段返回随机值**：
   `class M { public v:int; func field()->int { return this.v } }` + `m <- M(9)`，
   `PrintLine(m.field())` 在 `-il` 下每次输出不同的垃圾整数（`-f` 为 `9`）；顶层 `m.v` 读取正常。
+
 - [ ] **IL 函数无法访问顶层全局变量**：`g <- 10` + `func f() -> int { return g + 1 }` →
   `变量 'g' 未声明`。顶层变量是 `OldLangRun` 的局部变量，函数是独立 `DynamicMethod`，编译函数体时不可见。
+
 - [ ] **IL 打印布尔值大小写不一致**：`PrintLine(true)` 解释器/VM 为 `true`，IL 编译产物为 `True`。
+
 - [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
   `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
+
 - [ ] **3 处仍会让全量 `dotnet test` 中止的既有崩溃**（均已在 `d0142ed3` 基线复现）：
   - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
     `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
@@ -518,26 +85,293 @@
   - `Compiler.Statements.SelectStatementTests.SelectStatement_ReceiveComplexObject`：
     `select` + `ChannelSend` + 字典 → 段错误（基线同样崩溃）。
 
-补充（对已有条目的确认）：
-
-- `Todo.md` §G 的"全量 `dotnet test` 结束前中止"已确认直接原因是 §B 的无类型注解递归（已修）；
-  修好后暴露出上述 3 处独立崩溃，全量测试仍无法跑完。
-- 非 IL 档新增一条并行抖动用例：`Interpreter.Async.TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling`
-  全量并行时 `NullReferenceException`，单独连跑 8 次全过；2026-10-23 复跑时通过。
-
-## I. 2026-10-24 P1 修复后仍存在的问题
-
-来源：`Reports/2026-10-24-00-30-P1跨模式语义修复测试.md`。均为本轮实测发现、与 P1 六项不同源的问题，
-按 AGENTS.md 规则记录而未顺手修改：
+历史记录还提及 `TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 曾发生并行抖动，单独运行及后续复跑通过；必要时重新核查。
 
 - [ ] **IL 模式顶层 C 风格 for 循环变量仍是全局变量**：解释器与虚拟机已把循环变量收进循环作用域
   （每轮闭包捕获 `012`、循环结束后变量不可见），IL 仍把它声明为全局变量，因此：
   `for i <- 0, i < 3, i++ {}` 之后 `PrintLine(i)` 输出 `3`（其余两模式报 `NAME_ERROR`）；
   同名嵌套循环共用同一个 `i`，`loop_shadow.old8` 里 `total` 得 `2`（应为 `6`）。
-  这项工作依赖 IL 的全局变量 / 作用域模型（同 §B 的"IL 函数无法访问顶层全局变量"），一并处理更合适。
+  这项工作依赖 IL 的全局变量 / 作用域模型（同本节的“IL 函数无法访问顶层全局变量”），一并处理更合适。
+
 - [ ] **IL 运行期错误的异常值无法 `.ToStr()`**：`try { arr[-5] } catch (e) { PrintLine(e.ToStr()) }`
   报 `IL 模式暂不支持把原生类型 ExceptionWrapper 转换为 Old8Lang 值`；
   只把 `e` 赋给变量 (`caught <- e`) 则正常。解释器 / 虚拟机都能直接 `e.ToStr()`。
+
 - [ ] **解释器负索引越界的错误信息用了归一化后的下标**：`arr <- [1,2,3]; arr[-5]` 报
   `索引越界: 索引 -2 超出范围 [0, 2]`（应报原始的 `-5`）；IL 侧 `IlIndexHelper` 报的是原始下标。
   涉及 `ListLangValue.Get` / `ArrayLangValue.Get` / `StringLangValue.Get` / `TupleLangValue.Get`。
+
+- [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
+- [ ] **VM 原生函数命名参数**：评估如何获取原生函数参数信息（`VirtualMachine.Instructions.ControlFlow.cs` 中的 TODO）。
+
+## 测试与工程问题
+
+- [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
+  让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
+  全量并行测试时线程池繁忙会翻转结果。单独运行稳定通过（3/3）。
+  建议把延迟差拉大（例如 10 vs 1000）或改为断言「结果是 fast 或 slow 之一」。
+
+- [ ] **SerializationLib 编译器/解释器测试共用临时文件**：同时运行两组
+  `SerializationLibTests` 时，编译器侧 `MsgPackSerializeToFile_ShouldSerializeToFile`
+  因 `./test_msgpack_data.bin` 已被另一组删除而失败；各自单独运行均通过。
+  建议文件名带模式或测试类前缀，并在清理时忽略文件不存在。
+
+- [ ] **VM 模式 3 个用例直接失败**：
+  - `TestFiles/VirtualMachine/DestructuringAssignmentTest.old8`：解析阶段报错（`StatementParser.Main.cs:444`）。
+  - `TestFiles/VirtualMachine/vm_gap_6_error_position.old8`：VM 执行阶段抛异常（错误定位用例，末行没有 `error` 标记）。
+  - `TestFiles/VirtualMachine/legacy/vm_operator_overload.old8`：VM 执行阶段抛异常（原 `VMTests/`）。
+  另有 `legacy/control_flow.old8`、`legacy/vm_decorator.old8` 为原 `VMTests/` README 已记录的已知失败。
+
+- [ ] **语法测试 5 个既有失败用例**（`run_syntax_tests.sh` 89 例中 5 失败，均与目录合并无关）：
+  - `TestFiles/SyntaxTests/test_syntax_structure_error.old8`、`test_lexical_error.old8`：期望失败的用例，
+    但末行没有 `error` 标记，被 runner 判为失败；
+  - `TestFiles/SyntaxTests/test_generics.old8`：文件里仍用 `#` 作注释（应为 `//`），解析直接失败；
+  - `TestFiles/SyntaxTests/test_simple_edge_cases.old8`、`test_more_edge_cases.old8`：
+    主表达式解析报错（`Colon` / `Assignment`）。
+
+- [ ] **全量测试完成性**：历史记录显示测试运行中止；无注解递归问题已修，但另有三处 IL 崩溃待复核。隔离问题后重新执行全量默认档。
+- [ ] **IL 测试覆盖复核**：原清单列出的 54 个具体文件中已有 53 个同名文件；未找到 `StandardLibraryImportTests.cs`。按实际场景核实标准库导入、并发和端到端覆盖，不以文件名作为充分证据。
+
+## VM 性能
+
+- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>` / `CallFrame.Locals` / `GlobalSlot` / `UpValueCell` 里的整数
+  每次运算都要重新装箱。2026-10-24 P4 实测：`sum <- sum + 1` 型循环 1M 次仍分配 **45.78 B/次**
+  （两次整数装箱；比较结果的布尔装箱已在 P4 用 `VmBoxed` 消除），`Bytecode/` 下共 417 处 `object?`。
+  要再降一个数量级需要类型化值表示（`struct` 标记联合 + 类型化栈 / 类型化局部变量 / 类型化闭包单元），
+  属跨模块改造；P4 报告 §4 给出分阶段方案（先栈与局部变量、保留 `object?` 边界、再逐步收紧）。
+
+## 解释器测试覆盖待复核
+
+以下是原清单提出的场景；本次核实 14 个所列专用文件名均不存在，但可能有其他文件覆盖部分场景，补测前先查现有测试。
+
+### 1. 线程同步与并发原语测试 (Threading/)
+
+**优先级**: 中高
+
+`ThreadTests.cs` 覆盖了线程本身，但语法文档 §8.4 列出的并发原语在解释器侧没有测试。
+
+- [ ] `ThreadSynchronizationTests.cs` - 线程同步测试
+  - 多线程访问共享资源
+  - 锁与临界区行为
+  - 同步顺序与竞态场景
+
+- [ ] `ConcurrentPrimitiveTests.cs` - 并发原语测试
+  - Mutex（互斥锁）加锁/释放
+  - Semaphore（信号量）计数与等待
+  - AtomicInt（原子整数）并发自增
+  - Channel（通道）收发
+  - ReadWriteLock（读写锁）、CountDownLatch（倒计时锁）、CyclicBarrier（循环栅栏）
+
+**AST 节点支持**: `LockedVariableLangValue`, `ThreadStaticMethodWrapper`
+
+### 2. .NET 托管方法绑定测试 (Integration/)
+
+**优先级**: 中高
+
+绑定 C# 方法原本写作 `native func ... from ...`，解析器现已统一为 `extern`，`native` 关键字不再存在
+（见 `LangParser/Parsers/StatementParser.ImportAndNative.cs`，其中 `Expect(LangTokenType.Extern)`）。
+`Modules/Extern/` 下已覆盖 C/C++ P/Invoke（`NativeDllExternTests.cs`）、Python（`PythonExternTests.cs`）、
+JavaScript（`JavaScriptExternTests.cs`），但语法文档 §5.15 的 .NET 托管程序集形式（`"C#:"` / `"cs:"` /
+`"csharp:"` / `"dotnetdll:"` 前缀）在解释器侧仍无测试。
+
+- [ ] `ManagedDllExternTests.cs` - .NET 托管 DLL 导入测试
+  - 方法块导入：`extern "C#:System" Math { func Pow(x:double, y:double) -> double, ... }`
+  - 单个方法导入：`extern "C#:System" Math func Pow(x:double, y:double) -> double`
+  - 带别名的导入：`func Pow(x:double, y:double) -> double as Power`
+  - 导入自定义 DLL：`extern "dotnetdll:MyLibrary.dll" MyMathClass { ... }`（需准备测试程序集）
+  - 命名参数调用：`Pow(y: 3.0, x: 2.0)`
+  - 程序集不存在时的异常处理（实测报 `IMPORT_ERROR`）
+  - `cs:` / `csharp:` 前缀与 `C#:` 的等价性
+
+> 已实测（2026-10-09，解释模式）：上述 `{ func ... }` 块、单个 `func`、`as` 别名、命名参数四种写法均可用；
+> 而 `extern "C#:System" Math *` 和 `extern "C#:System" Math as SysMath` 会报
+> `语法错误：缺少 'func' 关键字`——这两种写法属于 `NativeStatement` 解析路径，带 `C#:` 等托管前缀时走的是
+> `ParseExternStatement`，因此写用例时不要照搬 §5.14.2/§5.14.4 的 `*`、`as` 示例（语法文档 §5.14 的复核说明
+> 也已记录同类示例问题）。
+
+**AST 节点支持**: `NativeStatement`, `NativeAnyLangValue`, `NativeStaticAny`
+
+**示例测试场景**:
+```old8
+extern "C#:System" Math {
+    func Pow(x:double, y:double) -> double,
+    func Sqrt(x:double) -> double
+}
+result <- Pow(2.0, 10.0)
+```
+
+### 3. 模块命名空间与重载测试 (Modules/)
+
+**优先级**: 中
+
+`Modules/AdvancedImport/` 已覆盖条件导入、动态导入、惰性导入，但命名空间隔离与模块重载仍无测试。
+
+- [ ] `ModuleNamespaceTests.cs` - 模块命名空间测试
+  - 模块命名空间隔离
+  - 跨模块符号访问
+  - 模块符号冲突处理
+
+- [ ] `ModuleReloadTests.cs` - 模块重载测试
+  - 模块热重载
+  - 模块缓存管理
+  - 模块依赖更新
+
+**AST 节点支持**: `UnifiedModule`, `ImportInfo`, `LazySymbolProxy`
+
+### 4. LINQ 查询语法 group by / into 延续测试 (Linq/)
+
+**优先级**: 中低
+
+`ListAdvancedMethodsTests.cs` 覆盖的是 `List.GroupBy` 方法形式，`LinqJoinTests.cs` 中带 `into g` 的用例只有一条；
+查询语法 `group x by ...` 在解释器侧尚无执行用例（解析器侧有 `Parser/Linq/LinqAdvancedParsingTests.cs`）。
+
+- [ ] `LinqGroupByTests.cs` - 查询语法 group by 测试
+  - `group x by <key>` 基础用法
+  - 分组后聚合（Count / Sum / Max）
+  - 多键分组
+  - 分组后过滤
+
+- [ ] `LinqQueryContinuationTests.cs` - 查询延续测试
+  - `into` 关键字用法
+  - 查询延续链式调用
+
+**AST 节点支持**: `GroupByClause`, `QueryContinuation`
+
+### 5. Super 表达式测试 (Classes/)
+
+**优先级**: 中低
+
+`super` 目前只在 `MemberAccessTests.cs`、`MixinTests.cs` 中顺带出现，没有专门用例。
+
+- [ ] `SuperExpressionTests.cs` - super 关键字测试
+  - super 调用父类方法
+  - super 访问父类字段
+  - super 在构造函数中的使用
+  - super 链式调用
+
+**AST 节点支持**: `SuperExpression`, `SuperProxy`
+
+### 6. 错误处理增强测试 (EdgeCases/)
+
+**优先级**: 中
+
+`EdgeCases/TypeErrorsTests.cs` 已覆盖常见的类型不匹配运算，以下场景仍缺测试。
+
+- [ ] `ParserErrorTests.cs` - 解析器错误测试
+  - 语法错误恢复
+  - 不完整语句处理
+  - 错误提示信息准确性
+
+- [ ] `RuntimeTypeErrorTests.cs` - 运行时类型错误测试
+  - 空引用错误
+  - 越界访问错误
+
+- [ ] `CircularReferenceTests.cs` - 循环引用测试
+  - 数据结构循环引用
+  - 函数递归深度
+  - 类实例循环引用
+
+> 注：`Modules/ErrorHandling/CircularDependencyTests.cs` 测的是模块循环依赖，与此处的数据结构循环引用不是同一类场景。
+
+### 7. 测试工具类测试 (Testing/)
+
+**优先级**: 中低
+
+AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLangValue` 等节点，解释器侧无测试。
+
+- [ ] `TestUtilitiesTests.cs` - 测试工具类测试
+  - Assert 类用法
+  - TestRunner 类用法
+  - MockLib 类用法
+  - 测试辅助功能
+
+**AST 节点支持**: `AssertClassLangValue`, `TestRunnerClassLangValue`, `MockLibClassLangValue`
+
+### 8. 类型模板测试 (Types/)
+
+**优先级**: 中
+
+AST 中有 `TypeTemplate` 节点，用于类型参数和泛型。
+
+- [ ] `TypeTemplateTests.cs` - 类型模板测试
+  - 泛型类型参数
+  - 类型约束
+  - 类型参数推断
+  - 嵌套泛型类型
+
+**AST 节点支持**: `TypeTemplate`, `GenericParameter`, `GenericInstanceExpression`
+
+### 9. 常量优化测试 (Expressions/)
+
+**优先级**: 低
+
+AST 中有 `ConstantLangValue` 节点，用于常量折叠。
+
+- [ ] `ConstantFoldingTests.cs` - 常量折叠测试
+  - 编译时常量计算
+  - 常量表达式优化
+  - 常量传播
+
+**AST 节点支持**: `ConstantLangValue`
+
+### 10. 枚举增强测试 (Statements/)
+
+**优先级**: 低
+
+`EnumTests.cs` 已覆盖声明、取值、比较、switch，但以下场景仍缺：
+
+- [ ] 在现有 `EnumTests.cs` 中补充：
+  - 枚举标志位组合
+  - 枚举方法和属性
+
+**AST 节点支持**: `EnumInit`, `EnumTemplate`
+
+## Language Server 与 VS Code 扩展
+
+### P0：可靠性与已有能力完善
+
+- [ ] 为所有已注册 Handler 补齐稳定的单元测试和协议级测试（新增的 CodeLens / SelectionRange /
+      InlayHint / WorkspaceIndex 已有单元测试，其余 Handler 仍需体系化回归）。
+- [ ] 为符号表引入作用域链，正确处理局部变量、变量遮蔽和同名符号。
+- [ ] 完善成员访问的类型推断，覆盖继承成员和静态成员补全。
+- [ ] 改善诊断：类型不匹配、未使用变量、成员不存在，以及跨文件语义分析。
+- [ ] 评估并逐步替换 token-based location workaround；Parser 修复后保留回归测试再移除。
+
+### P1：尚未实现的 LSP 能力
+
+- [ ] 实现 Inline Values，并与可用的调试运行时状态建立协议映射（依赖 DAP 或变量快照）。
+- [ ] 实现 Call Hierarchy / Type Hierarchy（OmniSharp 0.19.9 提供协议 API）。
+
+实现新 Handler 时需要同时完成：协议注册、能力声明（如需要）、单元测试、集成测试和文档更新。
+
+### P2：性能与工程质量
+
+- [ ] 为 token 按行建立索引，降低位置查找的线性扫描成本。
+- [ ] 为实时诊断增加防抖和后台执行，避免大文件编辑卡顿。
+- [ ] 增加 Language Client ↔ Language Server 的端到端测试。
+- [ ] 增加大文件和实时诊断延迟的性能基线。
+
+### 尚未完成
+
+- [ ] 实现 Debug Adapter；当前扩展没有 `debugAdapter.ts`、调试贡献点或 DAP 配置。
+      运行时目前只有 VM 的交互式终端调试器（`-vm --debug-session`）和 LSP 自定义调试请求，
+      需要先确定 DAP 与运行时的对接方式（建议新增一个 `--dap` 模式），再实现适配器。
+- [ ] 语法高亮的字符串插值、文档注释和嵌套结构可作为独立的 grammar 改进项。
+
+- [ ] **私有成员补全**：按访问位置决定是否展示私有成员（`CompletionHandler.cs` 中的 TODO）。
+- [ ] **补全测试**：核查泛型、表达式、Extern、预处理指令、联合/交叉类型及成员链、类型推断和文档注释的覆盖；评估并发、性能和模糊测试。参考 `Old8Lang.Tests/LanguageServer/Docs/` 中的测试计划。
+
+## 长期研究与调试方向
+
+- [ ] 评估类型推断的调用处推断、泛型及联合类型、多分支控制流和类型缩窄；先核实当前实现。[高级主题](Docs/ADVANCED_TOPICS.md#限制和已知问题)
+- [ ] 评估图形调试界面、增强条件表达式、IL 和远程调试、内存监控。[开发者工具](Docs/DEVELOPER_TOOLS.md)
+
+## 本次核对中移出的过期条目
+
+- 线程样例缺少 `Start()`：所列五个文件现已包含启动调用。
+- DatabaseLib 跨模式测试同名内存库：解释器使用 `itestdb_`、IL 使用 `testdb_` 前缀。本次相关筛选测试通过。
+- 无类型注解递归栈溢出：原文后续明确记为已修，相关测试仍应在后续全量验证中覆盖。
+- 原 IL 清单中的已有同名测试文件不再逐一列为“缺失”；其余覆盖仍需按场景审查。
+- 原 VM 性能中的全局槽位、布尔装箱和基准噪声门禁已有完成记录；性能报告与原始复现保留在 `Reports/`。
+
+本次测试结果见 [待办核对测试报告](Reports/2026-11-11-08-30-待办核对测试.md)。

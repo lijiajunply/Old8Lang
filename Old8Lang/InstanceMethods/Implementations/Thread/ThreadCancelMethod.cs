@@ -64,7 +64,7 @@ public class ThreadCancelMethod : BaseInstanceMethod, IIlNativeValueInstanceMeth
     {
         // VM 模式的线程对象是 VMThreadLangValue（整数线程 id + Concurrency.ResourceManager），
         // 与解释器的 ThreadLangValue 不同构，且 ResourceManager 没有取消原语，
-        // 因此该方法在 VM 下不可达（TargetType 是 ThreadLangValue）。见 Todo.md「VM 线程模型」。
+        // 因此该方法在 VM 下不可达（TargetType 是 ThreadLangValue）。VM 的对应方法由 VMThreadLangValue 实现。
         throw new NotSupportedException(
             "Thread.Cancel 在 VM 模式下不可用：VM 的线程是 VMThreadLangValue（线程 id + ResourceManager），没有取消原语");
     }
