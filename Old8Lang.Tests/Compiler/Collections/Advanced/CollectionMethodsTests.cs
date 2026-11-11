@@ -77,8 +77,8 @@ public class CollectionMethodsTests(ITestOutputHelper output)
         // Arrange
         var code = @"
             numbers <- {1, 2, 3, 4, 5}
-            sum <- numbers.Reduce(0, (acc:int, x:int) -> acc + x)
-            product <- numbers.Reduce(1, (acc:int, x:int) -> acc * x)
+            sum <- numbers.Reduce((acc:int, x:int) -> acc + x, 0)
+            product <- numbers.Reduce((acc:int, x:int) -> acc * x, 1)
             
             Assert.Equal(15, sum)      // 0 + 1 + 2 + 3 + 4 + 5 = 15
             Assert.Equal(120, product) // 1 * 1 * 2 * 3 * 4 * 5 = 120

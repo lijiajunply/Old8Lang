@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Reduce(reducer) - 归约
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListReduceMethod : BaseLangListMethod
+public class LangListReduceMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Reduce", "reduce"];
     public override string[] ParameterNames => ["reducer", "initialValue"];
@@ -59,13 +60,64 @@ public class LangListReduceMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldnull);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        if (parameters.Count == 1)
+        {
+            ilGenerator.Emit(OpCodes.Call, typeof(LangListReduceMethod).GetMethod(nameof(ReduceWithoutInitialHelper))!);
+        }
+        else
+        {
+            IlValueBridge.EmitLoadWrapped(parameters[1], ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call, typeof(LangListReduceMethod).GetMethod(nameof(ReduceWithInitialHelper))!);
+        }
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(LangValueType);
+        return typeof(object);
+    }
+
+    /// <summary>IL 模式下以首元素作为初始值进行归约。</summary>
+    public static object? ReduceWithoutInitialHelper(LangValueType instance, LangValueType reducer)
+    {
+        if (instance is not ILangList list || reducer is not FuncLangValue function)
+        {
+            throw new ArgumentException("Reduce 方法需要列表和函数参数");
+        }
+
+        var items = list.GetItems().ToList();
+        if (items.Count == 0)
+        {
+            throw new InvalidOperationException("序列不包含任何元素");
+        }
+
+        var manager = new VariateManager();
+        var accumulator = items[0];
+        for (var i = 1; i < items.Count; i++)
+        {
+            accumulator = function.Run(manager, [accumulator, items[i]]);
+        }
+
+        return IlValueBridge.Unwrap(accumulator);
+    }
+
+    /// <summary>IL 模式下以显式初始值进行归约。</summary>
+    public static object? ReduceWithInitialHelper(LangValueType instance, LangValueType reducer, LangValueType initialValue)
+    {
+        if (instance is not ILangList list || reducer is not FuncLangValue function)
+        {
+            throw new ArgumentException("Reduce 方法需要列表和函数参数");
+        }
+
+        var manager = new VariateManager();
+        var accumulator = initialValue;
+        foreach (var item in list.GetItems())
+        {
+            accumulator = function.Run(manager, [accumulator, item]);
+        }
+
+        return IlValueBridge.Unwrap(accumulator);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
