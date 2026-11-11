@@ -152,6 +152,16 @@ public partial class VirtualMachine
                 return;
             }
 
+            if (externFuncObj is Old8Lang.AST.Expression.Value.FuncLangValue { Method: not null } nativeFunction)
+            {
+                var nativeArgs = PopArguments(argCount);
+                var expressions = nativeArgs.Select(value => (Old8Lang.AST.LangExpression)
+                    (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
+                var result = nativeFunction.Run(new Old8Lang.Interpreter.VariateManager(), expressions);
+                _stack.Push(UnwrapToVmValue(result));
+                return;
+            }
+
             if (TryResolveCallableFunction(frame, funcName, functionIndexHint, position, out var function, out var closureEnvironment,
                     out var closureConstantPool))
             {

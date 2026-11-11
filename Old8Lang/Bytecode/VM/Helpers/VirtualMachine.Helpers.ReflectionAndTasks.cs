@@ -42,6 +42,16 @@ public partial class VirtualMachine
             throw new NullReferenceError(new SourcePosition(), methodName);
         }
 
+        if (obj is Old8Lang.AST.Expression.ModuleObjects.UnifiedModule module)
+        {
+            var manager = new Old8Lang.Interpreter.VariateManager();
+            var arguments = args.Select(value => (Old8Lang.AST.LangExpression)
+                (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
+            var call = new Old8Lang.AST.Expression.Value.Instance(
+                new Old8Lang.AST.Expression.LangId(methodName), arguments, []);
+            return UnwrapToVmValue(module.Dot(call, manager));
+        }
+
         // 如果没有参数，先尝试作为属性访问
         if (args.Length == 0)
         {

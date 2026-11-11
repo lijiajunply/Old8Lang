@@ -50,11 +50,7 @@
 
 - [x] **排查直接返回自身的 LangValue 类型**：源码检索发现线程、VM 线程及三种 VM 生成器值的 `GetValue()` 直接返回自身，均已重写 `ToString()`；三种生成器的字符串转换回归通过。见 [测试报告](Reports/2026-11-11-13-35-自引用值排查测试.md)。
 
-- [ ] **IL / VM 模式下标准库 `import` 后访问模块名失败**：`import "Math"` + `Math.Sqrt(9)`
-  在解释模式输出 `3`；IL 报 `[NAME_ERROR] 名称 'Math' 未定义`；VM 报
-  `[IMPORT_ERROR] 加载模块 'Math' 失败: 无法读取模块文件 'Math'`。
-  但 `Docs/MODE_SUPPORT.md` §11 标注三模式均为 ✅，现有 import 测试（`Old8Lang.Tests/Interpreter/Modules/`）
-  只覆盖解释模式。需确认 IL/VM 是否应支持标准库 import，再决定修实现还是纠正文档。
+- [ ] **IL / VM 标准库 `import` 差异**：VM 的 `Math` 模块名、模块别名、选择性导入和符号别名调用已通过，包括字节码序列化；其他标准库、命名参数、属性及类导出仍需验证。IL 的 `import "Math"` 后 `Math.Sqrt(9)` 仍报名称未定义。见 [测试报告](Reports/2026-11-11-16-37-VM标准库字节码回归.md)。
 
 - [x] **IL 实例方法读取字段返回随机值**：
   `class M { public v:int; func field()->int { return this.v } }` + `m <- M(9)`，

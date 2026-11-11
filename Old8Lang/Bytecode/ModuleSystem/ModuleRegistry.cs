@@ -7,6 +7,7 @@ namespace Old8Lang.Bytecode.ModuleSystem;
 /// </summary>
 public class ModuleRegistry
 {
+    internal const string ModuleObjectSymbol = "\u0001module-object";
     private readonly Dictionary<string, LoadedModule> _modules = new();
     private readonly HashSet<string> _loadingModules = [];
 
@@ -201,6 +202,6 @@ public class LoadedModule(string name, BytecodeFile bytecodeFile, Dictionary<str
         {
             GetSymbol(""); // 触发缓存构建
         }
-        return _exportCache?.Keys ?? Enumerable.Empty<string>();
+        return _exportCache?.Keys.Where(name => name != ModuleRegistry.ModuleObjectSymbol) ?? Enumerable.Empty<string>();
     }
 }

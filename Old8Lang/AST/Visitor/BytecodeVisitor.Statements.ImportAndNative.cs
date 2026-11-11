@@ -1,5 +1,7 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.ModuleSystem;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -16,6 +18,13 @@ public partial class BytecodeVisitor
         // 1. 生成LoadModule指令加载模块
         string moduleName = node.GetImportString();
         Emit(OpCode.LoadModule, moduleName);
+
+        if (StandardLibraryRegistry.IsStandardLibrary(moduleName) && !node.GetFromClause())
+        {
+            Emit(OpCode.GetModuleSymbol, new object[] { moduleName, ModuleRegistry.ModuleObjectSymbol });
+            Emit(OpCode.StoreGlobal, node.GetModuleAlias() ?? moduleName);
+            return null;
+        }
 
         // 2. 根据导入类型生成相应的导入指令
         if (node.GetFromClause())

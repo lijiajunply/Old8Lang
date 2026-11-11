@@ -1,5 +1,9 @@
 using Old8Lang.Bytecode.Metadata;
+using Old8Lang.Bytecode.ModuleSystem;
 using Old8Lang.Error;
+using Old8Lang.AST.Expression.ModuleObjects;
+using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 // ReSharper disable once CheckNamespace
@@ -26,6 +30,25 @@ public partial class VirtualMachine
 
         try
         {
+            if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+            {
+                var manager = new VariateManager();
+                if (!StandardLibraryLoader.TryLoadStandardLibrary(moduleName, manager, out var loaded) ||
+                    loaded is not UnifiedModule standardModule)
+                    throw new InvalidOperationException($"无法加载标准库 '{moduleName}'");
+
+                var symbols = standardModule.GetExportedSymbols().ToDictionary(
+                    name => name, name => (object?)standardModule.GetSymbol(name));
+                symbols[ModuleRegistry.ModuleObjectSymbol] = standardModule;
+                var bytecode = new BytecodeFile
+                {
+                    Exports = symbols.Keys.ToDictionary(name => name,
+                        name => new ExportedSymbol(name, ExportedSymbolType.Variable))
+                };
+                _moduleRegistry.RegisterModule(moduleName, bytecode, symbols);
+                return;
+            }
+
             // 加载并编译模块
             var moduleBytecode = _moduleLoader.LoadModule(moduleName);
 
