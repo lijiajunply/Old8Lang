@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.Join(separator?) - 连接为字符串
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListJoinMethod : BaseLangListMethod
+public class LangListJoinMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Join", "join"];
     public override string[]? ParameterNames => ["separator"];
@@ -47,11 +48,11 @@ public class LangListJoinMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         if (parameters.Count == 1)
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
+            IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
             var helperMethod = typeof(LangListJoinMethod).GetMethod(nameof(JoinWithSeparatorHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
@@ -64,18 +65,32 @@ public class LangListJoinMethod : BaseLangListMethod
         }
     }
 
-    public static string JoinHelper(ILangList langList)
+    /// <summary>IL 模式的辅助方法：用默认分隔符连接桥接后的集合。</summary>
+    public static string JoinHelper(LangValueType instance)
     {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
         var items = langList.GetItems();
-        var strings = items.Select(item => item.ToString() ?? "null");
+        var strings = items.Select(item => item.ToDisplayString() ?? "null");
         return string.Join(", ", strings);
     }
 
-    public static string JoinWithSeparatorHelper(ILangList langList, string separator)
+    /// <summary>IL 模式的辅助方法：使用指定分隔符连接桥接后的集合。</summary>
+    public static string JoinWithSeparatorHelper(LangValueType instance, LangValueType separator)
     {
-        var items = langList.GetItems();
-        var strings = items.Select(item => item.ToString() ?? "null");
-        return string.Join(separator, strings);
+        var separatorText = separator is StringLangValue stringValue
+            ? stringValue.Value
+            : separator.ToDisplayString() ?? ", ";
+
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
+        return string.Join(separatorText, langList.GetItems().Select(item => item.ToDisplayString() ?? "null"));
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
@@ -89,7 +104,7 @@ public class LangListJoinMethod : BaseLangListMethod
 
         if (instance is ILangList langList)
         {
-            return JoinWithSeparatorHelper(langList, separator);
+            return string.Join(separator, langList.GetItems().Select(item => item.ToDisplayString() ?? "null"));
         }
 
         // 支持 object[] 类型

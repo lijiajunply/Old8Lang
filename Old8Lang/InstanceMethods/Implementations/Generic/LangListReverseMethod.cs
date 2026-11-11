@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -13,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// 适用于所有实现 ILangList 接口的类型
 /// 注意：返回新的 ListLangValue，不修改原列表
 /// </summary>
-public class LangListReverseMethod : BaseLangListMethod
+public class LangListReverseMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Reverse", "reverse"];
     public override string[]? ParameterNames => null;
@@ -34,32 +35,40 @@ public class LangListReverseMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListReverseMethod).GetMethod(nameof(ReverseHelper),
+        var helperName = TargetType == typeof(ArrayLangValue) ? nameof(ReverseArrayHelper) : nameof(ReverseHelper);
+        var helperMethod = typeof(LangListReverseMethod).GetMethod(helperName,
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ListLangValue ReverseHelper(ILangList langList)
+    /// <summary>IL 模式的辅助方法：反转桥接后的集合并返回原生列表。</summary>
+    public static List<object?> ReverseHelper(LangValueType instance)
     {
+        if (instance is not ILangList langList)
+        {
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        }
+
         var items = langList.GetItems().ToList();
         items.Reverse();
-        return new ListLangValue(items);
+        return items.Select(IlValueBridge.Unwrap).ToList();
     }
+
+    /// <summary>IL 模式下反转数组并保持数组返回表示。</summary>
+    public static object?[] ReverseArrayHelper(LangValueType instance) => ReverseHelper(instance).ToArray();
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return TargetType == typeof(ArrayLangValue) ? typeof(object?[]) : typeof(List<object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
         if (instance is ILangList langList)
         {
-            var items = langList.GetItems().ToList();
-            items.Reverse();
-            return new ListLangValue(items);
+            return new ListLangValue(ReverseHelper((LangValueType)langList).Select(IlValueBridge.Wrap).ToList());
         }
 
         // 兼容 VM 模式下的 List<object?>

@@ -207,6 +207,26 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListJoinMethod_WithSupportedArity_CompilesAndExecutesCorrectly()
+    {
+        var code = @"
+            items <- {""apple"", ""banana""}
+            withDefaultSeparator <- items.Join()
+            withCustomSeparator <- items.Join(""|"")
+
+            Assert.Equal(""apple, banana"", withDefaultSeparator)
+            Assert.Equal(""apple|banana"", withCustomSeparator)
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
