@@ -553,8 +553,8 @@ public class ClassInstantiationTests(ITestOutputHelper output)
             test <- OverloadTest()
             result1 <- test.process()           // no parameters
             result2 <- test.process(42)         // int parameter
-            result3 <- test.process(""hello"")    // string parameter
             valueAfterInt <- test.getValue()
+            result3 <- test.process(""hello"")    // string parameter
             valueAfterString <- test.getValue()
             
             Assert.Equal(""no parameters"", result1)

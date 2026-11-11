@@ -94,7 +94,7 @@
 
 - [ ] **IL 类测试中的继承语法失败**：多个 `InheritanceTests` 使用 `class Derived : Base`，而当前语法使用 `extends`；错误提示中的格式字符串异常已修复，需逐项核实旧测试的语法与预期，见 [测试报告](Reports/2026-11-11-10-57-括号错误报告测试.md)。
 - [ ] **`SelectStatementTests` 整组测试未完成**：2026-11-11 运行该组时长时间无结果并被手动中止，具体阻塞用例及原因尚未定位。
-- [ ] **IL 类实例化测试残留问题**：2026-11-11 `ClassInstantiationTests` 13 项中 6 项失败，涉及集合元素与嵌套对象的链式调用、静态成员、方法重载和标准库方法；具体错误见 [测试报告](Reports/2026-11-11-09-05-IL实例字段回归测试.md)，需逐项复核。
+- [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 6 项失败；其中方法重载测试的取值顺序有误，修正后定向通过。其余失败涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；见 [测试报告](Reports/2026-11-11-13-49-IL类实例化复测.md)。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
