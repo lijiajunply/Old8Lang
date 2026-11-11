@@ -51,12 +51,13 @@ public class LangListFilterMethod : BaseLangListMethod, IIlNativeValueInstanceMe
     {
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
         IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Call, typeof(LangListFilterMethod).GetMethod(nameof(FilterHelper))!);
+        var helperName = TargetType == typeof(ArrayLangValue) ? nameof(FilterArrayHelper) : nameof(FilterHelper);
+        ilGenerator.Emit(OpCodes.Call, typeof(LangListFilterMethod).GetMethod(helperName)!);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(List<object?>);
+        return TargetType == typeof(ArrayLangValue) ? typeof(object?[]) : typeof(List<object?>);
     }
 
     /// <summary>
@@ -85,6 +86,12 @@ public class LangListFilterMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         }
 
         return result;
+    }
+
+    /// <summary>IL 模式下过滤数组并保持数组返回表示。</summary>
+    public static object?[] FilterArrayHelper(LangValueType instance, LangValueType predicate)
+    {
+        return FilterHelper(instance, predicate).ToArray();
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

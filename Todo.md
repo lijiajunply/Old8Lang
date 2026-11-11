@@ -31,7 +31,7 @@
 - [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
   在 `List<T>` 接收者下会「方法未找到」。
-  - 2026-11-11：`Map`、`Filter`、`Find`、`Any/Some`、`All/Every`、`IsEmpty` 与 `Reduce` 已在原生 `List<T>` 接收者上支持；见 [Map/Filter 测试报告](Reports/2026-11-11-20-40-IL集合MapFilter.md)、[Find/Any/All 测试报告](Reports/2026-11-11-20-45-IL集合FindAnyAll.md)、[IsEmpty 测试报告](Reports/2026-11-11-20-50-IL集合IsEmpty.md) 与 [Reduce 测试报告](Reports/2026-11-11-21-00-IL集合Reduce.md)。排序、字典/数组及其余方法仍待迁移。
+  - 2026-11-11：`Map`、`Filter`、`Find`、`Any/Some`、`All/Every`、`IsEmpty` 与 `Reduce` 已在原生 `List<T>` 接收者上支持；`Map` / `Filter` 也会保持数组返回表示。见 [Map/Filter 测试报告](Reports/2026-11-11-20-40-IL集合MapFilter.md)、[Find/Any/All 测试报告](Reports/2026-11-11-20-45-IL集合FindAnyAll.md)、[IsEmpty 测试报告](Reports/2026-11-11-20-50-IL集合IsEmpty.md)、[Reduce 测试报告](Reports/2026-11-11-21-00-IL集合Reduce.md) 与 [数组测试报告](Reports/2026-11-11-21-10-IL数组MapFilter.md)。排序、字典及其余方法仍待迁移。
   - 迁移方式：参照 `Reports/2026-10-10-19-03-实例方法跨模式补齐测试.md` §2 的机制
     （实现 `IIlNativeValueInstanceMethod` + `IlValueBridge.EmitLoadWrapped` + 静态 helper）。
 
