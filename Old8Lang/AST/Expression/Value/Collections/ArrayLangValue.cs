@@ -94,7 +94,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
         if (index < 0)
             index = RunResult.Length + index;
         if (index < 0 || index >= RunResult.Length)
-            throw new IndexError(this, index, RunResult.Length);
+            throw new IndexError(this, a.Value, RunResult.Length);
         return RunResult[index];
     }
 

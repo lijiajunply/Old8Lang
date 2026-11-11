@@ -77,7 +77,7 @@
 - [ ] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` →
   `System.Collections.Generic.List`1[System.Object]`（VM 已修，IL 未修）。
 
-- [ ] **3 处仍会让全量 `dotnet test` 中止的既有崩溃**（均已在 `d0142ed3` 基线复现）：
+- [ ] **3 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
   - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
     `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
   - `Compiler.Linq`：`LinqCompilerHelper.ConvertFromLangValue(LangValueType)` 收到原生值 →
@@ -97,14 +97,17 @@
   报 `IL 模式暂不支持把原生类型 ExceptionWrapper 转换为 Old8Lang 值`；
   只把 `e` 赋给变量 (`caught <- e`) 则正常。解释器 / 虚拟机都能直接 `e.ToStr()`。
 
-- [ ] **解释器负索引越界的错误信息用了归一化后的下标**：`arr <- [1,2,3]; arr[-5]` 报
+- [x] **解释器负索引越界的错误信息用了归一化后的下标**：`arr <- [1,2,3]; arr[-5]` 原先报
   `索引越界: 索引 -2 超出范围 [0, 2]`（应报原始的 `-5`）；IL 侧 `IlIndexHelper` 报的是原始下标。
   涉及 `ListLangValue.Get` / `ArrayLangValue.Get` / `StringLangValue.Get` / `TupleLangValue.Get`。
+  已修正读取及列表、元组赋值的越界信息，并增加回归测试。
 
 - [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
 - [ ] **VM 原生函数命名参数**：评估如何获取原生函数参数信息（`VirtualMachine.Instructions.ControlFlow.cs` 中的 TODO）。
 
 ## 测试与工程问题
+
+- [ ] **IL 类测试中的继承语法失败**：2026-11-11 运行 `Compiler.Classes` 时，多个 `InheritanceTests` 在 `class Derived : Base` 附近解析失败，错误信息包含格式字符串解析错误；测试主机随后因泛型类栈溢出中止，需单独复核。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；

@@ -136,7 +136,7 @@ public partial class StringLangValue(string context = "", SourcePosition positio
         if (i < 0)
             i = Value.Length + i;
         if (i < 0 || i >= Value.Length)
-            throw new IndexError(this, i, Value.Length);
+            throw new IndexError(this, index.Value, Value.Length);
         return CharLangValue.Create(Value[i]);
     }
 

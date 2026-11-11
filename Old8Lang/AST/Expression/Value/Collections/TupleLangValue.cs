@@ -227,6 +227,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
     public LangValueType Get(int index)
     {
+        var originalIndex = index;
         if (IsEmpty)
         {
             throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
@@ -240,7 +241,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
         if (index < 0 || index >= ItemValues.Count)
         {
-            throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {ItemValues.Count - 1}");
+            throw new InvalidOperationError(this, $"元组索引越界: {originalIndex}，当前元组只支持索引 0 到 {ItemValues.Count - 1}");
         }
 
         return ItemValues[index];
@@ -508,6 +509,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
     public void Set(int index, LangValueType value)
     {
+        var originalIndex = index;
         if (index < 0)
         {
             index += ItemValues.Count;
@@ -515,7 +517,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
         if (index < 0 || index >= ItemValues.Count)
         {
-            throw new InvalidOperationError(this, $"元组索引越界: {index}");
+            throw new InvalidOperationError(this, $"元组索引越界: {originalIndex}");
         }
 
         // 元组在 C# 中通常是不可变的（ValueTuple 的字段是可变的，但作为整体值类型...）

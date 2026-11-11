@@ -69,7 +69,7 @@ public partial class ListLangValue : LangValueType, ILangList
         if (idx < 0)
             idx = Values.Count + idx;
         if (idx < 0 || idx >= Values.Count)
-            throw new IndexError(this, idx, Values.Count);
+            throw new IndexError(this, i.Value, Values.Count);
         return Values[idx];
     }
 
@@ -81,7 +81,7 @@ public partial class ListLangValue : LangValueType, ILangList
             if (idx < 0)
                 idx = Values.Count + idx;
             if (idx < 0 || idx >= Values.Count)
-                throw new IndexError(this, idx, Values.Count);
+                throw new IndexError(this, i.Value, Values.Count);
 
             // 类型检查和转换：确保添加的元素类型与列表中已有的元素类型一致
             // 如果类型不一致，尝试进行类型转换
