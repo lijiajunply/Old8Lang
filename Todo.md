@@ -81,6 +81,7 @@
 - [ ] **2 处仍会让全量 `dotnet test` 中止的既有崩溃**（2026-11-11 再次复现，见 [测试报告](Reports/2026-11-11-08-45-第一阶段排查测试.md)）：
   - `Compiler.Classes`：`GenericClassSpecializer.CreateSpecialization` 与
     `GenericInstanceExpression.OutputType` 相互递归 → `Stack overflow`（基线同批次直接卡死）。
+    基础泛型类中同名参数遮蔽字段和不同特化复用字段类型的问题已修复；递归特化崩溃仍待处理，见 [测试报告](Reports/2026-11-11-10-44-IL泛型类字段遮蔽测试.md)。
   - `Compiler.Linq`：基础 `let`/`where`/`select` 以及末尾 `orderby` 的路径已修复，历史崩溃用例现已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 [排序测试报告](Reports/2026-11-11-10-37-IL-LINQ排序测试.md)。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 [测试报告](Reports/2026-11-11-08-49-IL-select回归测试.md)。

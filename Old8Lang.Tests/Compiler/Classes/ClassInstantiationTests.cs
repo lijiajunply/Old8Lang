@@ -11,6 +11,29 @@ public class ClassInstantiationTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
+    public void MethodParameter_ShadowsFieldForReadsAndAssignments()
+    {
+        const string code = @"
+            class Counter {
+                public value:int <- 1
+                func update(value:int) -> int {
+                    value <- value + 2
+                    value <- 7
+                    this.value <- value + 1
+                    return value
+                }
+                func getValue() -> int { return this.value }
+            }
+            counter <- Counter()
+            Assert.Equal(7, counter.update(5))
+            Assert.Equal(8, counter.getValue())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter)();
+    }
+
+    [Fact]
     public void InstanceMethod_ReadsFieldFromCorrectReceiver()
     {
         const string code = @"

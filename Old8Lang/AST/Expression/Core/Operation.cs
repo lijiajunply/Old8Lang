@@ -700,7 +700,10 @@ public partial class Operation(
     /// </remarks>
     public override Type? OutputType(LocalManager local)
     {
-        if (Type is not null) return Type;
+        // 同一个方法 AST 会被多个泛型类特化复用；this 的字段类型依当前特化而变。
+        var isThisField = Opera == LangTokenType.Dot &&
+                          (Left is LangId { IdName: "this" } || Left is ThisExpression) && Right is LangId;
+        if (Type is not null && !isThisField) return Type;
         // 直接返回类型信息，不创建临时方法
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);

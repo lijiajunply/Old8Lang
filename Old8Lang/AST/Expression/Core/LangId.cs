@@ -141,17 +141,7 @@ public partial class LangId(
             return;
         }
 
-        // 检查是否为字段 (在类的方法中)
-        if (local.FieldVar.TryGetValue(IdName, out var field))
-        {
-            // 确保我们在实例方法中（有 this 指针）
-            // 加载 this
-            ilGenerator.Emit(OpCodes.Ldarg_0);
-            // 加载字段
-            ilGenerator.Emit(OpCodes.Ldfld, field);
-            return;
-        }
-
+        // 参数和局部变量遮蔽同名字段；字段可通过 this.member 显式访问。
         var value = local.GetLocalVar(IdName);
         if (value is not null)
         {
@@ -159,7 +149,6 @@ public partial class LangId(
             return;
         }
 
-        // 检查是否是函数参数 (优化访问)
         if (local.ArgumentIndices.TryGetValue(IdName, out var argIndex))
         {
             if (argIndex == 0) ilGenerator.Emit(OpCodes.Ldarg_0);
@@ -168,6 +157,17 @@ public partial class LangId(
             else if (argIndex == 3) ilGenerator.Emit(OpCodes.Ldarg_3);
             else if (argIndex <= 255) ilGenerator.Emit(OpCodes.Ldarg_S, (byte)argIndex);
             else ilGenerator.Emit(OpCodes.Ldarg, argIndex);
+            return;
+        }
+
+        // 检查是否为字段 (在类的方法中)
+        if (local.FieldVar.TryGetValue(IdName, out var field))
+        {
+            // 确保我们在实例方法中（有 this 指针）
+            // 加载 this
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            // 加载字段
+            ilGenerator.Emit(OpCodes.Ldfld, field);
             return;
         }
 

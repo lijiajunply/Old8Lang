@@ -53,7 +53,8 @@ public abstract class LangExpression : IOldLangTree
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 1. 检查是否为字段赋值 (在类的方法中)
-        if (local.FieldVar.TryGetValue(idName, out var fieldInfo))
+        if (!local.LocalVar.ContainsKey(idName) && !local.ArgumentIndices.ContainsKey(idName) &&
+            local.FieldVar.TryGetValue(idName, out var fieldInfo))
         {
             // 确保我们在实例方法中（有 this 指针）
             // 在 IL 模式下，实例方法的参数0是this
