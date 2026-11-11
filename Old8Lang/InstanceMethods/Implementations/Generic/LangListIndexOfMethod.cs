@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.IndexOf(item) - 查找元素索引
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListIndexOfMethod : BaseLangListMethod
+public class LangListIndexOfMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["IndexOf", "indexOf"];
     public override string[] ParameterNames => ["item"];
@@ -40,12 +41,19 @@ public class LangListIndexOfMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
-        var helperMethod = typeof(LangListIndexOfMethod).GetMethod(nameof(IndexOfHelper),
+        var helperMethod = typeof(LangListIndexOfMethod).GetMethod(nameof(IndexOfNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static int IndexOfNativeHelper(LangValueType instance, LangValueType item)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IndexOfHelper(langList, item);
     }
 
     public static int IndexOfHelper(ILangList langList, LangValueType item)
