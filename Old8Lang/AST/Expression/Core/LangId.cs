@@ -199,6 +199,14 @@ public partial class LangId(
             return;
         }
 
+        // 被函数体访问的顶层变量存放在运行期全局槽位中：
+        // 读取时按变量名从全局环境取回，而不是复用 OldLangRun 的 LocalBuilder。
+        if (local.Globals is { } globals && globals.IsSlot(IdName))
+        {
+            RuntimeGlobals.EmitLoad(ilGenerator, IdName, globals.GetType(IdName));
+            return;
+        }
+
         // 如果找不到，且没有其他匹配，抛出错误
         // 之前的实现盲目使用 Ldarg_0，这可能掩盖了错误
         local.ReportError($"变量 '{IdName}' 未声明", Position);
@@ -472,6 +480,12 @@ public partial class LangId(
         if (local.ClassVar.TryGetValue(IdName, out var classType))
         {
             return classType;
+        }
+
+        // 被函数体访问的顶层变量：使用分析阶段记录的静态类型。
+        if (local.Globals is { } globals && globals.IsSlot(IdName))
+        {
+            return globals.GetType(IdName);
         }
 
         return typeof(object);

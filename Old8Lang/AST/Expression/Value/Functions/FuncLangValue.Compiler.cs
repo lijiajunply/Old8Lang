@@ -113,7 +113,12 @@ public partial class FuncLangValue
         IReadOnlyList<CapturedLocalValue> capturedValues)
     {
         // 创建一个新的 LocalManager 实例，专门用于函数体的 IL 生成
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            Globals = local.Globals
+        };
 
         foreach (var (key, value) in local.GlobalStaticClasses)
             funcLocal.GlobalStaticClasses[key] = value;
@@ -283,7 +288,12 @@ public partial class FuncLangValue
         }
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            Globals = local.Globals
+        };
 
         foreach (var (key, value) in local.GlobalStaticClasses)
             funcLocal.GlobalStaticClasses[key] = value;

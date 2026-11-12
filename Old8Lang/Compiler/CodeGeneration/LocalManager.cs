@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST;
+using Old8Lang.Compiler;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -49,6 +50,17 @@ public class LocalManager
     /// 局部变量类型字典，键为变量名，值为Type实例
     /// </summary>
     public readonly Dictionary<string, Type> LocalVarTypes = [];
+
+    /// <summary>
+    /// 顶层变量的全局槽位信息。函数体、lambda 等子作用域共享同一个实例。
+    /// </summary>
+    public GlobalVariableScope? Globals { get; init; }
+
+    /// <summary>
+    /// 当前管理器是否对应该次编译的顶层方法（<c>OldLangRun</c>）。
+    /// 顶层管理器把被函数引用的变量存放在全局槽位中；函数管理器只读取这些槽位。
+    /// </summary>
+    public bool IsTopLevelScope { get; init; }
 
     /// <summary>
     /// 当前 lambda 的闭包变量。键为变量名，值为其在闭包数组中的槽位与静态类型。
@@ -457,7 +469,12 @@ public class LocalManager
     /// <returns>新的LocalManager实例</returns>
     public LocalManager New()
     {
-        return new LocalManager() { FilePath = FilePath, Interpreter = Interpreter };
+        return new LocalManager()
+        {
+            FilePath = FilePath,
+            Interpreter = Interpreter,
+            Globals = Globals
+        };
     }
 
     /// <summary>
@@ -477,7 +494,9 @@ public class LocalManager
             BreakLabel = BreakLabel,
             ContinueLabel = ContinueLabel,
             DynamicAssembly = DynamicAssembly,
-            DynamicModule = DynamicModule
+            DynamicModule = DynamicModule,
+            Globals = Globals,
+            IsTopLevelScope = IsTopLevelScope
         };
 
         // 克隆局部变量

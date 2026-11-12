@@ -406,7 +406,12 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         // 这样可以避免函数内部的局部变量与外部的局部变量冲突
         // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            Globals = local.Globals
+        };
 
         // 复制全局信息：委托、类、全局静态类、泛型函数
         foreach (var (key, value) in local.DelegateVar)

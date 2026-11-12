@@ -216,6 +216,18 @@ public static class Compiler
 
             ilGenerator.Emit(OpCodes.Call, writeMethod);
         }
+
+        // 被具名函数 / lambda 引用的顶层变量存放在全局槽位中，同样写回管理器，
+        // 使宿主能够看到函数修改后的最终值。
+        if (local.Globals is not null)
+        {
+            var writeBackMethod = typeof(RuntimeGlobals).GetMethod(nameof(RuntimeGlobals.WriteBack))!;
+            foreach (var name in local.Globals.SlotNames)
+            {
+                ilGenerator.Emit(OpCodes.Ldstr, name);
+                ilGenerator.Emit(OpCodes.Call, writeBackMethod);
+            }
+        }
     }
 
     /// <summary>
@@ -226,7 +238,7 @@ public static class Compiler
     /// 该方法将所有全局静态类实例注册到LocalManager的GlobalStaticClasses字典中，
     /// 使得在 IL 模式下可以像解释模式一样访问这些静态类
     /// </remarks>
-    private static void RegisterGlobalStaticClasses(LocalManager local)
+    internal static void RegisterGlobalStaticClasses(LocalManager local)
     {
         // 注册异步任务相关静态类
         local.GlobalStaticClasses["Task"] = TaskClassLangValue.GetInstance();
@@ -283,10 +295,19 @@ public static class Compiler
                 new SourcePosition(0, 0));
         }
 
+        // 分析哪些顶层变量会被函数体访问，需要作为运行期全局槽位共享。
+        var globals = GlobalVariableAnalysis.Analyze(statement, path, i);
+
         // 创建动态方法，用于生成和执行IL代码
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
-        var local = new LocalManager() { FilePath = path, Interpreter = i };
+        var local = new LocalManager()
+        {
+            FilePath = path,
+            Interpreter = i,
+            Globals = globals,
+            IsTopLevelScope = true
+        };
 
         // 创建主程序返回标签，用于处理顶层 return 语句
         var returnLabel = ilGenerator.DefineLabel();
@@ -381,8 +402,10 @@ public static class Compiler
             // 包装委托以捕获并转换运行时异常
             return () =>
             {
-                // 顶层变量回写需要知道当前线程的解释器实例
+                // 顶层变量回写需要知道当前线程的解释器实例；
+                // 全局槽位每次执行前重置，避免上一次运行的值残留。
                 RuntimeGlobalWriter.SetManager(i.Manager);
+                RuntimeGlobals.Initialize(globals.GetSlotTypes());
                 try
                 {
                     oldLangRun();

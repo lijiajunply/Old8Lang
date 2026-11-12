@@ -214,7 +214,8 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
-            InClassEnv = typeBuilder
+            InClassEnv = typeBuilder,
+            Globals = local.Globals
         };
 
         // 6. 定义类或接口的成员
@@ -398,7 +399,8 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             Interpreter = local.Interpreter,
             InClassEnv = typeBuilder,
             CurrentConstructorBuilder = local.CurrentConstructorBuilder,
-            CurrentInitMethodBuilder = local.CurrentInitMethodBuilder
+            CurrentInitMethodBuilder = local.CurrentInitMethodBuilder,
+            Globals = local.Globals
         };
 
         // 继承外部的函数定义（包括内置函数如 PrintLine）
@@ -495,7 +497,8 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
             InClassEnv = typeBuilder,
-            CurrentConstructorBuilder = local.CurrentConstructorBuilder
+            CurrentConstructorBuilder = local.CurrentConstructorBuilder,
+            Globals = local.Globals
         };
 
         // 继承外部的函数定义（包括内置函数如 PrintLine）
@@ -744,7 +747,8 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             var tempLocal = new LocalManager
             {
                 FilePath = "",
-                Interpreter = null
+                Interpreter = null,
+                Globals = local.Globals
             };
 
             // 加载字段的初始值

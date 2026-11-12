@@ -116,7 +116,14 @@ public partial class ForStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        setStatement.GenerateIl(ilGenerator, local);
+        // 循环变量在解释器中属于循环作用域。若同名顶层变量已被提升为全局槽位，
+        // 循环内必须用局部变量遮蔽它，否则循环结束后函数会读到循环变量的最终值。
+        var shadow = BeginLoopVariableShadow(ilGenerator, local);
+        // 初始化表达式与循环变量的局部槽位已在 BeginLoopVariableShadow 中处理。
+        if (shadow is null)
+        {
+            setStatement.GenerateIl(ilGenerator, local);
+        }
 
         // 创建循环标签
         var loopStart = ilGenerator.DefineLabel();
@@ -153,6 +160,77 @@ public partial class ForStatement(
         // 恢复之前的break和continue标签
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;
+
+        EndLoopVariableShadow(local, shadow);
+    }
+
+    /// <summary>
+    /// 循环变量名与全局槽位重名时，预先求值初始化表达式并建立局部遮蔽。
+    /// </summary>
+    /// <remarks>
+    /// 初始化表达式在创建循环变量之前求值（解释器语义），因此读取同名全局变量时应当看到全局值，
+    /// 而不是尚未初始化的局部遮蔽。返回 <c>null</c> 表示无需遮蔽。
+    /// </remarks>
+    private (string Name, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        var name = setStatement.Id?.IdName;
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        if (local.LocalVar.ContainsKey(name) || local.Globals?.IsSlot(name) != true)
+        {
+            return null;
+        }
+
+        Type? type = null;
+        if (!string.IsNullOrEmpty(setStatement.Id!.AssumptionType))
+        {
+            type = setStatement.Id.OutputType(local);
+        }
+
+        if (type is null || type == typeof(void))
+        {
+            type = setStatement.Value.OutputType(local);
+        }
+
+        if (type is null || type == typeof(void))
+        {
+            type = typeof(object);
+        }
+
+        // 先按未遮蔽的状态求值 `for i <- ...` 的右侧。
+        setStatement.Value.LoadIlValue(ilGenerator, local);
+        var loopLocal = ilGenerator.DeclareLocal(type);
+        ilGenerator.Emit(OpCodes.Stloc, loopLocal);
+
+        var hadPreviousType = local.LocalVarTypes.TryGetValue(name, out var previousType);
+        local.LocalVar[name] = loopLocal;
+        local.LocalVarTypes[name] = type;
+        return (name, previousType, hadPreviousType);
+    }
+
+    private static void EndLoopVariableShadow(
+        LocalManager local,
+        (string Name, Type? PreviousType, bool HadPreviousType)? shadow)
+    {
+        if (shadow is not { } info)
+        {
+            return;
+        }
+
+        local.LocalVar.Remove(info.Name);
+        if (info.HadPreviousType && info.PreviousType is not null)
+        {
+            local.LocalVarTypes[info.Name] = info.PreviousType;
+        }
+        else
+        {
+            local.LocalVarTypes.Remove(info.Name);
+        }
     }
 
     public override OldStatement this[int index] => blockStatement[index];

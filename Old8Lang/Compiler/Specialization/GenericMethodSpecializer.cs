@@ -237,11 +237,12 @@ public static class GenericMethodSpecializer
         var methodIl = dynamicMethod.GetILGenerator();
 
         // 创建专门的函数本地管理器
-        var funcLocal = new LocalManager() 
-        { 
-            FilePath = local.FilePath, 
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
             Interpreter = local.Interpreter,
-            CurrentGenericTypeResolver = resolver
+            CurrentGenericTypeResolver = resolver,
+            Globals = local.Globals
         };
 
         // 复制全局信息

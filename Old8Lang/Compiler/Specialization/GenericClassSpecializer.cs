@@ -304,7 +304,8 @@ public static class GenericClassSpecializer
             GenericClassConstructors = local.GenericClassConstructors,
             GenericClassInitializers = local.GenericClassInitializers,
             CurrentGenericTypeResolver = resolver,
-            InClassEnv = typeBuilder
+            InClassEnv = typeBuilder,
+            Globals = local.Globals
         };
 
         // 复制全局信息
