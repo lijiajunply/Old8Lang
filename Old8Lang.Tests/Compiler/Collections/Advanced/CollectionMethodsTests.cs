@@ -296,6 +296,22 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListIsSorted_CompilesForNativeListsAndArrays()
+    {
+        var code = @"
+            sorted <- {1, 2, 2, 3}
+            unsorted <- [3, 1, 2]
+            Assert.Equal(true, sorted.IsSorted())
+            Assert.Equal(false, unsorted.IsSorted())
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange

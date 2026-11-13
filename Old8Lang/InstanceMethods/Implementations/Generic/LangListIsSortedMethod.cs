@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.InstanceMethods.Implementations.Array;
 using Old8Lang.Interpreter;
 
@@ -13,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.IsSorted() - 检查是否已排序
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListIsSortedMethod : BaseLangListMethod
+public class LangListIsSortedMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["IsSorted", "isSorted"];
     public override string[]? ParameterNames => null;
@@ -44,11 +45,18 @@ public class LangListIsSortedMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListIsSortedMethod).GetMethod(nameof(IsSortedHelper),
+        var helperMethod = typeof(LangListIsSortedMethod).GetMethod(nameof(IsSortedNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static bool IsSortedNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return IsSortedHelper(langList);
     }
 
     public static bool IsSortedHelper(ILangList langList)
