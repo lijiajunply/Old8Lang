@@ -35,6 +35,10 @@
 
 - 节点上的执行方法（`Run/GenerateIl/LoadIlValue/OutputType/SetValueToIl`）已全部迁出，
   语法节点不再引用解释器/IL/VM 类型（`SyntaxBackendBoundaryTests` 证明）。
+- 引入 `Old8Lang.AST.ILiteralSyntax` 标记接口与 `LiteralValue` 属性，标量字面量
+  （`IntLangValue`/`DoubleLangValue`/`StringLangValue`/`BoolLangValue`/`CharLangValue`/
+  `NullLangValue`/`VoidLangValue`）已实现，明确「语法字面量」与「运行时值」的区分；
+  架构测试 `ScalarLiteralNodes_AreMarkedAsLiteralSyntax` 固化该约定。
 - 语句与表达式结构节点的后端辅助方法已移至 `Old8Lang.Runtime/Execution`。
 - Visitor 生成器已可重复运行（88 节点），生成代码与手工扩展通过 `partial interface` 共存。
 

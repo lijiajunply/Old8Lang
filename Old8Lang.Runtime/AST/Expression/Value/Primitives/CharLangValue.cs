@@ -11,9 +11,12 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="value"></param>
 /// <param name="position"></param>
 public partial class CharLangValue(char value = '\0', SourcePosition position = default)
-    : LangValueType(position), IPoolable
+    : LangValueType(position), ILiteralSyntax, IPoolable
 {
     public char Value = value;
+
+    /// <inheritdoc />
+    public object? LiteralValue => Value;
 
     public override LangValueType Plus(LangValueType otherLangValueType) =>
         StringLangValue.Create(Value + (string)otherLangValueType.GetValue()!);

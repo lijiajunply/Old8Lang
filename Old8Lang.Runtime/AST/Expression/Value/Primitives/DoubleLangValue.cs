@@ -12,9 +12,12 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="doubleValue"></param>
 /// <param name="position"></param>
 public partial class DoubleLangValue(double doubleValue = 0, SourcePosition position = default)
-    : LangValueType(position), IPoolable
+    : LangValueType(position), IPoolable, ILiteralSyntax
 {
     public double Value = doubleValue;
+
+    /// <inheritdoc />
+    public object? LiteralValue => Value;
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {

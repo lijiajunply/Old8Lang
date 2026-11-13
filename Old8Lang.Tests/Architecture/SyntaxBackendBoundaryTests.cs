@@ -1,6 +1,8 @@
 using System.Reflection;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
@@ -111,6 +113,28 @@ public class SyntaxBackendBoundaryTests
         }
 
         Assert.Empty(violations);
+    }
+
+
+    /// <summary>
+    /// 标量字面量节点应实现 ILiteralSyntax，明确其「语法字面量」身份（阶段 1 的区分）。
+    /// </summary>
+    [Fact]
+    public void ScalarLiteralNodes_AreMarkedAsLiteralSyntax()
+    {
+        Type[] literalTypes =
+        [
+            typeof(IntLangValue), typeof(DoubleLangValue), typeof(StringLangValue),
+            typeof(BoolLangValue), typeof(CharLangValue), typeof(NullLangValue),
+            typeof(VoidLangValue)
+        ];
+
+        Assert.All(literalTypes, t =>
+            Assert.True(typeof(ILiteralSyntax).IsAssignableFrom(t), $"{t.Name} 应实现 ILiteralSyntax"));
+
+        Assert.Equal(42, new IntLangValue(42).LiteralValue);
+        Assert.Equal("hi", new StringLangValue("hi").LiteralValue);
+        Assert.Null(new NullLangValue().LiteralValue);
     }
 
     private static string? FindRepositoryRoot()

@@ -9,8 +9,11 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// 静态值，不可访问
 /// </summary>
 /// <param name="position">位置信息</param>
-public partial class VoidLangValue(SourcePosition position = default) : LangValueType(position)
+public partial class VoidLangValue(SourcePosition position = default) : LangValueType(position), ILiteralSyntax
 {
+
+    /// <inheritdoc />
+    public object? LiteralValue => null;
 
     /// <summary>
     /// 单例实例，用于减少对象创建开销（VoidLangValue 是无状态的）

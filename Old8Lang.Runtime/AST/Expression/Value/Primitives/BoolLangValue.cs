@@ -10,9 +10,12 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="value"></param>
 /// <param name="position"></param>
-public partial class BoolLangValue(bool value = false, SourcePosition position = default) : LangValueType(position), IPoolable
+public partial class BoolLangValue(bool value = false, SourcePosition position = default) : LangValueType(position), IPoolable, ILiteralSyntax
 {
     public bool Value = value;
+
+    /// <inheritdoc />
+    public object? LiteralValue => Value;
     public override string ToString() => Value ? "true" : "false";
 
     public override bool Equal(LangValueType? otherValueType)

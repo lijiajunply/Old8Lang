@@ -12,9 +12,12 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="intValue">int数据</param>
 /// <param name="position">位置</param>
 public partial class IntLangValue(int intValue = 0, SourcePosition position = default)
-    : LangValueType(position), IPoolable
+    : LangValueType(position), IPoolable, ILiteralSyntax
 {
     public int Value = intValue;
+
+    /// <inheritdoc />
+    public object? LiteralValue => Value;
 
     public override string ToString() => Value.ToString();
 

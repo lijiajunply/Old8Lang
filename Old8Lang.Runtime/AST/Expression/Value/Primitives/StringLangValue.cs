@@ -13,10 +13,13 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="context"></param>
 /// <param name="position"></param>
 public partial class StringLangValue(string context = "", SourcePosition position = default)
-    : LangValueType(position), ILangList, IPoolable
+    : LangValueType(position), ILangList, IPoolable, ILiteralSyntax
 {
     public string Value { get; private set; } = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");
+
+    /// <inheritdoc />
+    public object? LiteralValue => Value;
 
 
     public override string ToString() => $"\"{Value}\""; // 带引号的字符串，符合 Old8Lang 语法
