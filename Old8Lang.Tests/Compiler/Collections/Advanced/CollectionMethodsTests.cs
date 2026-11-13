@@ -262,6 +262,24 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListConcat_CompilesForNativeListsAndArrays()
+    {
+        var code = @"
+            left <- {1, 2}
+            right <- [3, 4]
+            joined <- left.Concat(right)
+            reverseJoined <- right.Concat(left)
+            Assert.Equal({1, 2, 3, 4}, joined)
+            Assert.Equal({3, 4, 1, 2}, reverseJoined)
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
