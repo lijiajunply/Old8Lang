@@ -60,7 +60,7 @@
 
 - [x] **解释器 `Thread.CurrentThread` 属性访问**：裸属性和无参调用现均返回执行中的线程；同时修正了无参调用原先包装新建线程的问题。见 [测试报告](Reports/2026-11-11-12-42-当前线程属性测试.md)。
 - [x] **IL `Thread.CurrentThread` 属性与调用**：两种形式均返回实际执行线程，并支持继续访问其属性。见 [测试报告](Reports/2026-11-11-13-33-IL当前线程测试.md)。
-- [ ] **IL 其他 Thread API**：仍需逐项复核。
+- [ ] **IL 其他 Thread API**：`Thread.Sleep` 与 `Time.GetUnixTimeMilliseconds()` 的组合现已通过；标准库 CLR `long` 返回值会归一化为语言 `double`，避免时间差计算按 `int` 拆箱。锁变量 (`lock`) 的 `Value` / `Set` / `Add` IL 桥接及其余线程 API 仍待处理；见 [测试报告](Reports/2026-11-13-11-10-IL标准库long数值归一化.md)。
 
 - [x] **排查直接返回自身的 LangValue 类型**：源码检索发现线程、VM 线程及三种 VM 生成器值的 `GetValue()` 直接返回自身，均已重写 `ToString()`；三种生成器的字符串转换回归通过。见 [测试报告](Reports/2026-11-11-13-35-自引用值排查测试.md)。
 

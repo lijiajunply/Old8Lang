@@ -74,7 +74,9 @@ public static class StandardLibraryILHelper
         if (type == typeof(void) || type == typeof(int) || type == typeof(double) || type == typeof(bool) ||
             type == typeof(char) || type == typeof(string)) return type;
         if (type == typeof(byte) || type == typeof(short) || type == typeof(sbyte)) return typeof(int);
-        if (type == typeof(float) || type == typeof(decimal)) return typeof(double);
+        // Old8Lang IL 的数值运算以 int / double 为边界；标准库的 long（例如
+        // Unix 毫秒时间戳）需要在此处统一为 double，不能作为 object 泄漏。
+        if (type == typeof(long) || type == typeof(float) || type == typeof(decimal)) return typeof(double);
         return typeof(object);
     }
 
@@ -82,6 +84,7 @@ public static class StandardLibraryILHelper
     {
         var manager = new VariateManager();
         var expressions = args.Select(value => (LangExpression)IlValueBridge.Wrap(value)).ToList();
-        return IlValueBridge.Unwrap(module.Dot(new Instance(new LangId(methodName), expressions), manager));
+        var value = IlValueBridge.Unwrap(module.Dot(new Instance(new LangId(methodName), expressions), manager));
+        return value is long longValue ? (double)longValue : value;
     }
 }
