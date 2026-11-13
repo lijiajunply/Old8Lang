@@ -5,6 +5,41 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.ModuleObjects;
+using Old8Lang.AST.Expression.OperationHelpers;
+using Old8Lang.AST.Expression.ValueFunctions;
+using Old8Lang.AST.Statement;
+using Old8Lang.AST.Visitor;
+using Old8Lang.AsyncGeneration;
+using Old8Lang.Compiler;
+using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Compiler.Helpers;
+using Old8Lang.Compiler.Specialization;
+using Old8Lang.Compiler.Verification;
+using Old8Lang.Concurrency;
+using Old8Lang.Error;
+using Old8Lang.ExternProviders;
+using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.InstanceMethods.Core;
+using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.Core;
+using Old8Lang.ModuleSystem.Loading;
+using Old8Lang.ModuleSystem.Resolution;
+using Old8Lang.ModuleSystem.StandardLibrary;
+using Old8Lang.ModuleSystem.Symbols;
+using Old8Lang.ProjectManagement;
+using Old8Lang.Runtime;
+using Old8Lang.TypeSystem;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.ExceptionServices;
+using System.Text;
+using System.Text.Json;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -17,30 +52,197 @@ public partial class CompilerVisitor
 
     public object? VisitAsyncStreamExpression(AsyncStreamExpression node)
     {
-        // 简化实现：加载表达式的IL值
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于异步流，生成类似于异步函数的 IL 代码
+        // 目前实现一个简化版本
+        ilGenerator.Emit(OpCodes.Ldnull);
+
         return null;
+    
     }
 
     public object? VisitAwaitExpression(AwaitExpression node)
     {
-        // 简化实现：委托给节点的LoadIlValue方法
-        node.LoadIlValue(ilGenerator, local);
+
+        // 加载表达式的值
+        node.Expression.Accept(this);
+
+        // 获取表达式的输出类型
+        var exprType = node.Expression.OutputType(local);
+
+        // 检查是否在异步状态机中
+        if (local.AsyncStateMachineGenerator != null && Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
+        {
+            if (exprType != null) node.GenerateAsyncAwait(ilGenerator, local, exprType);
+            return null;
+        }
+
+        // --- 同步等待逻辑 (不在异步函数中) ---
+
+        // 确保表达式类型是 Task 或 Task<object>
+        if (exprType == typeof(Task))
+        {
+            // 对于 Task 类型，简化处理：直接调用 GetAwaiter() 和 GetResult()
+            // Task.GetAwaiter() 返回 TaskAwaiter（非泛型）
+            // 我们需要等待任务完成，然后返回 null
+
+            // 栈上现在是 Task 对象
+            // 保存 Task 到局部变量
+            var taskLocal = ilGenerator.DeclareLocal(typeof(Task));
+            ilGenerator.Emit(OpCodes.Stloc, taskLocal);
+
+            // 加载 Task，调用 GetAwaiter()
+            ilGenerator.Emit(OpCodes.Ldloc, taskLocal);
+            var taskGetAwaiterMethod = typeof(Task).GetMethod("GetAwaiter")!;
+            ilGenerator.Emit(OpCodes.Callvirt, taskGetAwaiterMethod);
+
+            // 获取 TaskAwaiter（非泛型）
+            var taskAwaiterType = taskGetAwaiterMethod.ReturnType;
+            var taskAwaiterLocal = ilGenerator.DeclareLocal(taskAwaiterType);
+            ilGenerator.Emit(OpCodes.Stloc, taskAwaiterLocal);
+
+            // 调用 GetResult() 等待完成（同步等待）
+            ilGenerator.Emit(OpCodes.Ldloca, taskAwaiterLocal);
+            var taskGetResultMethod = taskAwaiterType.GetMethod("GetResult")!;
+            ilGenerator.Emit(OpCodes.Call, taskGetResultMethod);
+
+            // Task.GetResult() 返回 void，我们需要返回 null（object）
+            ilGenerator.Emit(OpCodes.Ldnull);
+
+            // 直接返回，跳过后续的 Task<object> 处理
+            return null;
+        }
+
+        // 现在栈上是 Task<object>，调用 GetAwaiter() 方法获取等待器
+        // 注意：这里假设如果是泛型 Task，一定是 Task<object>，或者至少有 GetAwaiter
+        // 如果是 Task<T>，GetAwaiter 返回 TaskAwaiter<T>
+        var getAwaiterMethod = exprType?.GetMethod("GetAwaiter")!;
+        ilGenerator.Emit(OpCodes.Callvirt, getAwaiterMethod);
+
+        // 获取等待器类型
+        var awaiterType = getAwaiterMethod.ReturnType;
+
+        // 将等待器保存到局部变量
+        var awaiterLocal = ilGenerator.DeclareLocal(awaiterType);
+        ilGenerator.Emit(OpCodes.Stloc, awaiterLocal);
+
+        // 检查等待器是否已完成
+        var isCompletedProperty = awaiterType.GetProperty("IsCompleted")!;
+        var isCompletedGetMethod = isCompletedProperty.GetGetMethod()!;
+
+        // 定义标签
+        var completedLabel = ilGenerator.DefineLabel();
+        var endLabel = ilGenerator.DefineLabel();
+
+        // 加载等待器地址，调用 IsCompleted 属性
+        // TaskAwaiter<T> 是结构体，需要使用 Ldloca 和 Call
+        ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
+        ilGenerator.Emit(OpCodes.Call, isCompletedGetMethod);
+
+        // 如果已完成，跳转到获取结果
+        ilGenerator.Emit(OpCodes.Brtrue_S, completedLabel);
+
+        // 未完成，这里需要异步状态机支持
+        // 目前生成同步等待代码，后续将替换为异步状态机切换
+
+        // 加载等待器地址，调用 GetResult() 方法获取结果（同步等待，直到任务完成）
+        ilGenerator.MarkLabel(completedLabel);
+        ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
+        var getResultMethod = awaiterType.GetMethod("GetResult")!;
+        ilGenerator.Emit(OpCodes.Call, getResultMethod);
+
+        // 结束
+        ilGenerator.MarkLabel(endLabel);
+    
+    
         return null;
     }
 
     public object? VisitFunctionCallExpression(FunctionCallExpression node)
     {
-        // 简化实现：委托给节点的LoadIlValue方法
-        node.LoadIlValue(ilGenerator, local);
-        return null;
+
+        // 1. 优先尝试直接方法调用（针对 LangId 且在 DelegateVar 中存在的情况）
+        if (node.FunctionExpression is LangId functionId)
+        {
+            var funcName = functionId.IdName;
+            var paramTypes = node.Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
+            var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
+            var delegateKey = $"{funcName}${paramTypeNames}";
+
+            if (local.DelegateVar.TryGetValue(delegateKey, out var method))
+            {
+                foreach (var arg in node.Arguments)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+
+                ilGenerator.Emit(OpCodes.Call, method);
+                return null;
+            }
+        }
+
+        // 2. 通用委托调用逻辑
+        // 加载函数表达式（期望是一个委托实例）
+        node.FunctionExpression.LoadIlValue(ilGenerator, local);
+        var funcType = node.FunctionExpression.OutputType(local);
+
+        if (typeof(Delegate).IsAssignableFrom(funcType))
+        {
+            var invokeMethod = funcType.GetMethod("Invoke");
+            if (invokeMethod != null)
+            {
+                // 加载参数
+                foreach (var arg in node.Arguments)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+
+                // 调用委托的 Invoke 方法
+                ilGenerator.Emit(OpCodes.Callvirt, invokeMethod);
+                return null;
+            }
+        }
+
+        // 集合索引、字典读取等表达式在编译期通常只能推断为 object，但运行期可能保存
+        // lambda / 函数值。保留接收者与实参，通过 Delegate.DynamicInvoke 进行动态调用。
+        if (funcType == typeof(object) && node.NamedArguments.Count == 0)
+        {
+            ilGenerator.Emit(OpCodes.Ldc_I4, node.Arguments.Count);
+            ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+            for (var index = 0; index < node.Arguments.Count; index++)
+            {
+                ilGenerator.Emit(OpCodes.Dup);
+                ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                var argument = node.Arguments[index];
+                argument.LoadIlValue(ilGenerator, local);
+                var argumentType = argument.OutputType(local);
+                if (argumentType?.IsValueType == true)
+                {
+                    ilGenerator.Emit(OpCodes.Box, argumentType);
+                }
+
+                ilGenerator.Emit(OpCodes.Stelem_Ref);
+            }
+
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(FunctionCallExpression).GetMethod(nameof(node.InvokeDynamicDelegate))!);
+            return null;
+        }
+
+        // 如果是复杂的表达式函数调用且无法解析为委托，抛出异常
+        throw new InvalidOperationError(node, $"无法调用类型为 {funcType} 的表达式");
+    
+    
     }
 
     public object? VisitOperation(Operation node)
     {
-        // 简化实现：委托给节点的LoadIlValue方法
-        node.LoadIlValue(ilGenerator, local);
+
+        // 调用带有ILGenerator参数的OutputType方法，该方法会生成实际的IL指令
+        node.Type = node.OutputType(ilGenerator, local);
+
         return null;
+    
     }
 
     public object? VisitSuperExpression(SuperExpression node)
@@ -52,16 +254,56 @@ public partial class CompilerVisitor
 
     public object? VisitThisExpression(ThisExpression node)
     {
-        // 加载 this 指针（ldarg.0）
-        node.LoadIlValue(ilGenerator, local);
+
+        // Lambda 的第 0 个参数是闭包数组，不是实例本身。类方法中创建的
+        // lambda 会把 node 作为捕获值保存，因此应从对应槽位读取实例。
+        if (local.TryGetCapturedLocal("node", out var captured))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            if (captured.Type != typeof(object) && captured.Type is not TypeBuilder)
+            {
+                ilGenerator.Emit(OpCodes.Castclass, captured.Type);
+            }
+
+            return null;
+        }
+
+        // 加载 node 指针（ldarg.0）
+        // 在实例方法中，第一个参数（索引 0）总是 node 指针
+        ilGenerator.Emit(OpCodes.Ldarg_0);
+    
+    
         return null;
     }
 
     public object? VisitTernaryExpression(TernaryExpression node)
     {
-        // 简化实现：委托给节点的LoadIlValue方法
-        node.LoadIlValue(ilGenerator, local);
+
+        // 条件表达式
+        node.Condition.LoadIlValue(ilGenerator, local);
+
+        // 创建条件分支
+        var elseLabel = ilGenerator.DefineLabel();
+        var endLabel = ilGenerator.DefineLabel();
+
+        // 如果条件为假，跳转到else分支
+        ilGenerator.Emit(OpCodes.Brfalse, elseLabel);
+
+        // 条件为真时执行的表达式
+        node.TrueExpression.LoadIlValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Br, endLabel);
+
+        // 条件为假时执行的表达式
+        ilGenerator.MarkLabel(elseLabel);
+        node.FalseExpression.LoadIlValue(ilGenerator, local);
+
+        // 结束标签
+        ilGenerator.MarkLabel(endLabel);
+
         return null;
+    
     }
 
     // ===== Value 节点实现 =====
@@ -69,44 +311,230 @@ public partial class CompilerVisitor
 
     public object? VisitAnyLangValue(AnyLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // IL 代码生成（IL 模式）
+        var dictType = typeof(Dictionary<string, object>);
+        var constructor = dictType.GetConstructor(Type.EmptyTypes)!;
+
+        ilGenerator.Emit(OpCodes.Newobj, constructor);
+
+        foreach (var (fieldName, fieldValue) in node.InstanceData)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldstr, fieldName);
+
+            fieldValue.LoadIlValue(ilGenerator, local);
+
+            var valueType = fieldValue.OutputType(local);
+            if (valueType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+
+            var addMethod = dictType.GetMethod("Add", [typeof(string), typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod);
+        }
+
         return null;
+    
     }
 
     public object? VisitArrayLangValue(ArrayLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 创建一个长度为 len 的对象数组
+        var len = node.RunResult.Length;
+        ilGenerator.Emit(OpCodes.Ldc_I4, len); // 加载数组长度
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object)); // 创建新数组
+
+        for (var i = 0; i < len; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
+            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引
+
+            Type t;
+            if (len == node.Values.Count)
+            {
+                // 如果Values列表有元素，使用Values[i]
+                node.Values[i].LoadIlValue(ilGenerator, local);
+                t = node.Values[i].OutputType(local)!;
+            }
+            else
+            {
+                // 否则，使用RunResult[i]，但要确保它不为null
+                var item = node.RunResult[i];
+                if (item is null)
+                {
+                    // 如果item为null，加载一个null值
+                    ilGenerator.Emit(OpCodes.Ldnull);
+                    t = typeof(object);
+                }
+                else
+                {
+                    item.LoadIlValue(ilGenerator, local);
+                    t = item.OutputType(local)!;
+                }
+            }
+
+            ilGenerator.Emit(OpCodes.Box, t); // 将值转换为object
+            ilGenerator.Emit(OpCodes.Stelem_Ref); // 将值存入数组
+        }
+
         return null;
+    
     }
 
     public object? VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 异步生成器在 IL 模式下返回一个可以迭代的对象
+        // 我们创建一个委托，当调用时会返回一个IAsyncEnumerable<object>
+        
+        // 1. 确定参数类型和返回类型
+        var parameterTypes = node.AsyncFunc.Ids?.Select(item => item.OutputType(local)).ToArray() ?? Array.Empty<Type>();
+        var returnType = typeof(IAsyncEnumerable<object>);
+
+        // 2. 创建 DynamicMethod
+        var dynamicMethod = new DynamicMethod(
+            $"AsyncGenerator_{node.AsyncFunc.Id?.IdName ?? "Anonymous"}",
+            returnType,
+            parameterTypes,
+            true
+        );
+
+        // 3. 生成方法体
+        var methodIl = dynamicMethod.GetILGenerator();
+
+        // 创建新的LocalManager实例，专门用于生成器函数体的IL生成
+        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        foreach (var (key, value) in local.DelegateVar)
+        {
+            funcLocal.DelegateVar[key] = value;
+        }
+
+        foreach (var (key, value) in local.ClassVar)
+        {
+            funcLocal.ClassVar[key] = value;
+        }
+
+        foreach (var (key, value) in local.GlobalStaticClasses)
+        {
+            funcLocal.GlobalStaticClasses[key] = value;
+        }
+
+        foreach (var (key, value) in local.FuncParameters)
+        {
+            funcLocal.FuncParameters[key] = value;
+        }
+
+        foreach (var (key, value) in local.GenericFunctions)
+        {
+            funcLocal.GenericFunctions[key] = value;
+        }
+
+        // 处理参数
+        if (node.AsyncFunc.Ids != null)
+        {
+            for (var i = 0; i < node.AsyncFunc.Ids.Count; i++)
+            {
+                var id = node.AsyncFunc.Ids[i];
+                var paramType = parameterTypes[i];
+                var localVar = methodIl.DeclareLocal(paramType);
+                funcLocal.AddLocalVar(id.IdName, localVar);
+                funcLocal.LocalVarTypes[id.IdName] = paramType;
+
+                methodIl.Emit(OpCodes.Ldarg, i);
+                methodIl.Emit(OpCodes.Stloc, localVar);
+            }
+        }
+
+        // 生成异步生成器的方法体
+        node.GenerateGeneratorMethodBody(methodIl, funcLocal);
+
+        // 4. 创建委托并加载到栈上
+        var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
+            parameterTypes.Concat([returnType]).ToArray());
+
+        ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
+        ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
+        ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
+
         return null;
+    
     }
 
     public object? VisitAsyncStreamLangValue(AsyncStreamLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 异步流的 IL 代码生成（后续实现）
+        ilGenerator.Emit(OpCodes.Ldnull);
+
         return null;
+    
     }
 
     public object? VisitCancellationTokenLangValue(CancellationTokenLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        throw new NotImplementedError(
+            node.Position,
+            "IL 模式暂不支持 CancellationToken 类型"
+        );
+
         return null;
+    
     }
 
     public object? VisitCancellationTokenSourceLangValue(CancellationTokenSourceLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        throw new NotImplementedError(
+            node.Position,
+            "IL 模式暂不支持 CancellationTokenSource 类型"
+        );
+
         return null;
+    
     }
 
     public object? VisitDictionaryLangValue(DictionaryLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        var listConstructor = typeof(Dictionary<object, object>).GetConstructor(Type.EmptyTypes)!;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
+
+        var l = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
+        ilGenerator.Emit(OpCodes.Stloc, l);
+
+        // 向 Dictionary<object, object> 中添加元素
+        var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
+        foreach (var expr in node.Tuples)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, l);
+            expr.Elements[0].LoadIlValue(ilGenerator, local);
+            var keyType = expr.Elements[0].OutputType(local);
+            // 只有值类型才需要装箱
+            if (keyType!.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType);
+            }
+
+            expr.Elements[1].LoadIlValue(ilGenerator, local);
+            var valueType = expr.Elements[1].OutputType(local);
+            // 只有值类型才需要装箱
+            if (valueType!.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
+        }
+
+        ilGenerator.Emit(OpCodes.Ldloc, l);
+
         return null;
+    
     }
 
     public object? VisitErrorLangValue(ErrorLangValue node)
@@ -117,31 +545,730 @@ public partial class CompilerVisitor
 
     public object? VisitGeneratorLangValue(GeneratorLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 生成器的IL代码生成（后续实现）
+
         return null;
+    
     }
 
     public object? VisitInstance(Instance node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 首先尝试通过全局函数注册器生成 IL 代码
+        if (node.TryGenerateGlobalFunctionIl(ilGenerator, local))
+        {
+            return null;
+        }
+
+        if (node.TryEmitLocalDelegateCall(ilGenerator, local))
+        {
+            return null;
+        }
+
+        // 查找匹配的方法
+        MethodInfo? matchingMethod = null;
+        List<LangId>? funcParams = null;
+        string? matchedDelegateKey = null;
+
+        // 首先，尝试通过实际参数类型构建键进行精确匹配
+        var actualParamTypes = node.Ids.Select(id => id.OutputType(local)).ToArray();
+        var actualParamTypeNames = string.Join("_", actualParamTypes.Select(t => t?.Name ?? "object"));
+        var exactDelegateKey = $"{node.Id.IdName}${actualParamTypeNames}";
+
+        if (local.DelegateVar.TryGetValue(exactDelegateKey, out var exactResult))
+        {
+            matchingMethod = exactResult;
+            local.FuncParameters.TryGetValue(exactDelegateKey, out funcParams);
+            matchedDelegateKey = exactDelegateKey;
+        }
+        else
+        {
+            // 如果精确匹配失败，尝试查找参数数量匹配的方法（支持默认参数）
+            // 对于带默认参数的情况，从实际参数数量开始，逐步增加参数数量尝试匹配
+            for (int paramCount = node.Ids.Count; matchingMethod is null && paramCount <= node.Ids.Count + 10; paramCount++)
+            {
+                // 遍历所有委托变量，查找参数数量匹配的方法
+                foreach (var (key, result) in local.DelegateVar)
+                {
+                    if (!key.StartsWith($"{node.Id.IdName}$"))
+                        continue;
+
+                    // 获取方法参数信息
+                    var methodParams = result.GetParameters();
+
+                    // 检查参数数量是否匹配
+                    if (methodParams.Length == paramCount)
+                    {
+                        // 获取函数的参数列表信息
+                        local.FuncParameters.TryGetValue(key, out funcParams);
+
+                        // 检查是否有默认参数可以补充
+                        if (funcParams is not null && node.Ids.Count <= methodParams.Length)
+                        {
+                            // 计算必需参数的数量（没有默认值的参数）
+                            int requiredParamsCount = funcParams.Count(t => t.DefaultValue is null);
+
+                            // 如果实际参数数量大于等于必需参数数量，则可以匹配
+                            if (node.Ids.Count >= requiredParamsCount)
+                            {
+                                matchingMethod = result;
+                                matchedDelegateKey = key;
+                                break;
+                            }
+                        }
+                        else if (methodParams.Length == node.Ids.Count)
+                        {
+                            // 完全匹配
+                            matchingMethod = result;
+                            matchedDelegateKey = key;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (matchingMethod is null && local.GenericFunctions.TryGetValue(node.Id.IdName, out var genericFunc))
+        {
+            var argTypes = node.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
+            var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
+
+            if (typeArgs != null)
+            {
+                // 创建特化版本
+                matchingMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeArgs, local);
+                // 使用函数定义的 Ids 作为参数信息
+                funcParams = genericFunc.Ids;
+                matchedDelegateKey = $"{node.Id.IdName}${string.Join("_", typeArgs.Values.Select(t => t.Name))}";
+            }
+        }
+
+        if (matchingMethod is null)
+        {
+            var classType = local.ClassVar.GetValueOrDefault(node.Id.IdName);
+            if (classType is null)
+            {
+                // 如果找不到类类型，可能是因为类还在编译中
+                // 检查是否有对应的TypeBuilder
+                if (local.InClassEnv?.Name == node.Id.IdName && local.InClassEnv is TypeBuilder builder)
+                {
+                    classType = builder;
+                }
+                else
+                {
+                    // 在当前编译上下文中查找未完成的类型
+                    foreach (var kv in local.ClassVar)
+                    {
+                        if (kv.Key == node.Id.IdName && kv.Value is TypeBuilder)
+                        {
+                            classType = kv.Value;
+                            break;
+                        }
+                    }
+
+                    if (classType is null)
+                    {
+                        // 创建一个临时的object类型引用，允许编译继续进行
+                        // 这是一个临时解决方案，IL 模式下类前向引用的处理需要改进
+                        classType = typeof(object);
+
+                        // 生成临时的null对象，实际运行时将通过解释器处理
+                        ilGenerator.Emit(OpCodes.Ldnull);
+                        return null;
+                    }
+                }
+            }
+
+            // 获取默认构造函数
+            ConstructorInfo? constructorInfo = null;
+            if (classType is TypeBuilder)
+            {
+                if (local.CurrentConstructorBuilder != null && local.InClassEnv == classType)
+                {
+                    // 如果是在当前正在编译的类中，使用ConstructorBuilder
+                    constructorInfo = local.CurrentConstructorBuilder;
+                }
+                else
+                {
+                    constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+                }
+            }
+            else
+            {
+                constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+            }
+
+            if (constructorInfo is not null)
+            {
+                ilGenerator.Emit(OpCodes.Newobj, constructorInfo);
+            }
+
+            var localA = ilGenerator.DeclareLocal(classType);
+            ilGenerator.Emit(OpCodes.Stloc, localA);
+
+            // 使用BindingFlags.DeclaredOnly来只查找当前类声明的方法，避免与继承的方法冲突
+            MethodInfo? initFunc = null;
+
+            if (classType is TypeBuilder && local.CurrentInitMethodBuilder != null && local.InClassEnv == classType)
+            {
+                // 如果是在当前正在编译的类中，使用CurrentInitMethodBuilder
+                initFunc = local.CurrentInitMethodBuilder;
+            }
+            else
+            {
+                try
+                {
+                    var initMethods = classType
+                        .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                        .Where(m => m.Name == "init")
+                        .ToArray();
+
+                    if (initMethods.Length == 1)
+                    {
+                        initFunc = initMethods[0];
+                    }
+                    else if (initMethods.Length > 1)
+                    {
+                        var argTypes = node.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+
+                        static int Score(ParameterInfo[] ps, Type[] args)
+                        {
+                            if (ps.Length != args.Length)
+                            {
+                                return -1;
+                            }
+
+                            var score = 0;
+                            for (var i = 0; i < ps.Length; i++)
+                            {
+                                var pt = ps[i].ParameterType;
+                                var at = args[i];
+                                if (pt == typeof(object))
+                                {
+                                    continue;
+                                }
+
+                                if (pt == at)
+                                {
+                                    score += 2;
+                                    continue;
+                                }
+
+                                if (pt.IsAssignableFrom(at))
+                                {
+                                    score += 1;
+                                    continue;
+                                }
+
+                                return -1;
+                            }
+
+                            return score;
+                        }
+
+                        initFunc = initMethods
+                            .Select(m => (method: m, ps: m.GetParameters()))
+                            .Where(x => x.ps.Length == argTypes.Length)
+                            .Select(x => (x.method, x.ps, score: Score(x.ps, argTypes)))
+                            .Where(x => x.score >= 0)
+                            .OrderByDescending(x => x.score)
+                            .Select(x => x.method)
+                            .FirstOrDefault();
+                    }
+                }
+                catch
+                {
+                    // 忽略错误，可能是类型尚未创建
+                }
+            }
+
+            // 子类未声明 init 时，构造调用应继承父类的可匹配初始化方法。
+            // DeclaredOnly 仅用于优先选择子类自己的 init；不能使 Parent.init
+            // 在 Child(args) 场景中静默丢失。
+            if (initFunc is null && classType is not TypeBuilder)
+            {
+                var argumentTypes = node.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+                initFunc = classType
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(method => method.Name == "init")
+                    .FirstOrDefault(method =>
+                    {
+                        var parameters = method.GetParameters();
+                        return parameters.Length == argumentTypes.Length &&
+                               parameters.Zip(argumentTypes).All(pair =>
+                                   pair.First.ParameterType == pair.Second ||
+                                   pair.First.ParameterType.IsAssignableFrom(pair.Second) ||
+                                   pair.Second == typeof(object));
+                    });
+            }
+
+            if (initFunc is not null)
+            {
+                // 加载 node 指针
+                ilGenerator.Emit(OpCodes.Ldloc, localA);
+
+                // 加载参数
+                var a = initFunc.GetParameters();
+                for (var i = 0; i < node.Ids.Count; i++)
+                {
+                    var id = node.Ids[i];
+                    id.LoadIlValue(ilGenerator, local);
+                    var idType = id.OutputType(local);
+                    if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, idType);
+                    }
+                }
+
+                // 调用 init 方法（实例方法使用 Callvirt）
+                ilGenerator.Emit(OpCodes.Callvirt, initFunc);
+            }
+
+            // 加载对象实例作为返回值
+            ilGenerator.Emit(OpCodes.Ldloc, localA);
+
+            return null;
+        }
+
+        // 处理所有类型的方法调用，包括DynamicMethod和MethodBuilder
+        var matchingParams = matchingMethod.GetParameters();
+
+        // 检查是否有 params 参数
+        int paramsIndex = -1;
+        if (funcParams is not null)
+        {
+            for (int i = 0; i < funcParams.Count; i++)
+            {
+                if (funcParams[i].IsParams)
+                {
+                    paramsIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // 如果有 params 参数，需要特殊处理
+        if (paramsIndex >= 0)
+        {
+            // 加载 params 之前的普通参数
+            for (var i = 0; i < paramsIndex; i++)
+            {
+                if (i < node.Ids.Count)
+                {
+                    var id = node.Ids[i];
+                    id.LoadIlValue(ilGenerator, local);
+
+                    // 参数类型匹配和转换
+                    if (i < matchingParams.Length)
+                    {
+                        var paramType = matchingParams[i].ParameterType;
+                        var idType = id.OutputType(local);
+                        node.LoadParameterWithConversion(ilGenerator, local, id, idType, paramType);
+                    }
+                }
+            }
+
+            // 处理 params 参数：创建数组
+            var paramsParam = matchingParams[paramsIndex];
+            var arrayElementType = paramsParam.ParameterType.GetElementType()!;
+            var paramsArgsCount = Math.Max(0, node.Ids.Count - paramsIndex);
+
+            // 创建数组：ldc.i4 <count>; newarr <elementType>
+            ilGenerator.Emit(OpCodes.Ldc_I4, paramsArgsCount);
+            ilGenerator.Emit(OpCodes.Newarr, arrayElementType);
+
+            // 填充数组元素
+            for (var i = 0; i < paramsArgsCount; i++)
+            {
+                var argIndex = paramsIndex + i;
+                var id = node.Ids[argIndex];
+
+                // dup 数组引用
+                ilGenerator.Emit(OpCodes.Dup);
+                // 加载索引
+                ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                // 加载参数值
+                id.LoadIlValue(ilGenerator, local);
+
+                // 类型转换
+                var idType = id.OutputType(local);
+                if (idType is not null && arrayElementType != idType)
+                {
+                    if (arrayElementType == typeof(object) && idType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, idType);
+                    }
+                    else if (arrayElementType == typeof(int) && idType == typeof(double))
+                    {
+                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
+                    }
+                    else if (arrayElementType == typeof(double) && idType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                }
+
+                // 存储到数组：stelem <elementType>
+                if (arrayElementType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+                else if (arrayElementType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_I4);
+                }
+                else if (arrayElementType == typeof(double))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_R8);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Stelem, arrayElementType);
+                }
+            }
+            // 此时栈顶是填充好的数组，作为 params 参数传递
+        }
+        else
+        {
+            // 没有 params 参数，使用原有逻辑
+            // 加载实际传递的参数
+            for (var i = 0; i < node.Ids.Count; i++)
+            {
+                var id = node.Ids[i];
+                id.LoadIlValue(ilGenerator, local);
+
+                // 确保参数类型匹配
+                if (i < matchingParams.Length)
+                {
+                    var paramType = matchingParams[i].ParameterType;
+                    var idType = id.OutputType(local);
+                    node.LoadParameterWithConversion(ilGenerator, local, id, idType, paramType);
+                }
+            }
+        }
+
+        // 如果有默认参数需要补充
+        if (funcParams is not null && node.Ids.Count < matchingParams.Length)
+        {
+            // 补充默认参数值
+            for (var i = node.Ids.Count; i < funcParams.Count; i++)
+            {
+                var param = funcParams[i];
+                if (param.DefaultValue is not null)
+                {
+                    // 加载默认参数值
+                    param.DefaultValue.LoadIlValue(ilGenerator, local);
+
+                    // 确保类型匹配
+                    var paramType = matchingParams[i].ParameterType;
+                    var defaultType = param.DefaultValue.OutputType(local);
+
+                    // 使用LocalManager的ValidateType方法验证默认参数类型
+                    if (defaultType is not null)
+                    {
+                        local.ValidateType(paramType, defaultType, param.Position);
+                    }
+
+                    // 处理必要的类型转换
+                    if (defaultType is not null && paramType != defaultType)
+                    {
+                        if (paramType == typeof(object) && defaultType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, defaultType);
+                        }
+                        else if (paramType == typeof(int) && defaultType == typeof(double))
+                        {
+                            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
+                        }
+                        else if (paramType == typeof(double) && defaultType == typeof(int))
+                        {
+                            ilGenerator.Emit(OpCodes.Conv_R8);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 调用方法：根据方法类型采用不同的调用方式
+        if (matchingMethod is DynamicMethod dynamicMethod)
+        {
+            if (local.AsyncStateMachineGenerator != null && matchedDelegateKey is not null)
+            {
+                var parameterTypes = matchingParams.Select(p => p.ParameterType).ToArray();
+                var argLocals = new LocalBuilder[parameterTypes.Length];
+                for (int i = parameterTypes.Length - 1; i >= 0; i--)
+                {
+                    argLocals[i] = ilGenerator.DeclareLocal(parameterTypes[i]);
+                    ilGenerator.Emit(OpCodes.Stloc, argLocals[i]);
+                }
+
+                var argsArrayLocal = ilGenerator.DeclareLocal(typeof(object[]));
+                ilGenerator.Emit(OpCodes.Ldc_I4, parameterTypes.Length);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                ilGenerator.Emit(OpCodes.Stloc, argsArrayLocal);
+
+                for (int i = 0; i < parameterTypes.Length; i++)
+                {
+                    ilGenerator.Emit(OpCodes.Ldloc, argsArrayLocal);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                    ilGenerator.Emit(OpCodes.Ldloc, argLocals[i]);
+                    if (parameterTypes[i].IsValueType) ilGenerator.Emit(OpCodes.Box, parameterTypes[i]);
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Ldstr, matchedDelegateKey);
+                ilGenerator.Emit(OpCodes.Ldloc, argsArrayLocal);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.Invoke))!);
+
+                var returnType = matchingMethod.ReturnType;
+                if (returnType == typeof(void))
+                {
+                    ilGenerator.Emit(OpCodes.Pop);
+                }
+                else if (returnType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, returnType);
+                }
+                else if (returnType != typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, returnType);
+                }
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Call, dynamicMethod);
+            }
+        }
+        else
+        {
+            // 对于普通方法，使用Call指令直接调用
+            ilGenerator.Emit(OpCodes.Call, matchingMethod);
+        }
+    
+    
         return null;
     }
 
     public object? VisitLangListItem(LangListItem node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        var listType = node.ListId.OutputType(local);
+
+        if (listType == typeof(string))
+        {
+            // 处理字符串索引访问。负索引由 IlIndexHelper 归一化（-1 表示最后一个字符）。
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载字符串
+            node.EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetStringChar))!);
+        }
+        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            // 处理Dictionary<TKey, TValue>类型的字典索引访问
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载字典
+            node.Key.LoadIlValue(ilGenerator, local); // 加载键
+
+            // 获取字典的泛型参数
+            var genericArgs = listType.GetGenericArguments();
+            var dictKeyType = genericArgs[0];
+
+            // 确保键类型匹配
+            var keyType = node.Key.OutputType(local);
+            if (keyType != dictKeyType)
+            {
+                if (dictKeyType.IsValueType && !keyType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, dictKeyType);
+                }
+                else if (!dictKeyType.IsValueType && keyType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, keyType);
+                }
+            }
+
+            // 调用字典的索引器（get_Item方法）
+            var getDictionaryItemMethod = listType.GetMethod("get_Item", [dictKeyType])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+        }
+        else if (listType == typeof(Dictionary<string, object>))
+        {
+            // 处理Dictionary<string, object>类型的字典索引访问
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载字典
+
+            // 处理键
+            if (node.Key is StringLangValue stringKey)
+            {
+                // 键是字符串字面量，直接加载字符串值
+                ilGenerator.Emit(OpCodes.Ldstr, stringKey.Value);
+            }
+            else
+            {
+                // 键不是字符串字面量，加载并转换为字符串
+                node.Key.LoadIlValue(ilGenerator, local);
+                var keyType = node.Key.OutputType(local);
+                if (keyType != typeof(string))
+                {
+                    // 如果键不是字符串类型，转换为字符串
+                    ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(object)])!);
+                }
+            }
+
+            // 调用字典的索引器（get_Item方法）
+            var getDictionaryItemMethod = typeof(Dictionary<string, object>).GetMethod("get_Item", [typeof(string)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+        }
+        else if (listType.IsArray)
+        {
+            // 处理数组索引访问（负索引 -1 表示最后一个元素）
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载数组
+            node.EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetArrayItem))!);
+            var arrayElementType = listType.GetElementType() ?? typeof(object);
+            if (arrayElementType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, arrayElementType);
+            }
+            else if (arrayElementType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, arrayElementType);
+            }
+        }
+        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            // 处理List<T>索引访问。索引器经非泛型 IList 调用，负索引由 IlIndexHelper 归一化，
+            // 避免 List<int> / List<object> 的泛型实例与静态类型不一致时解析错误。
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载List
+            node.EmitIntIndex(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetListItem))!);
+
+            var elementType = listType.GetGenericArguments()[0];
+            if (elementType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, elementType);
+            }
+            else if (elementType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, elementType);
+            }
+        }
+        else if (listType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问
+            node.ListId.LoadIlValue(ilGenerator, local);
+
+            if (node.Key is IntLangValue { Value: >= 0 } intVal)
+            {
+                // 非负常量索引，优化为字段访问
+                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
+            }
+            else
+            {
+                // 变量索引或负常量索引，装箱为 ITuple 并经 IlIndexHelper 归一化下标
+                ilGenerator.Emit(OpCodes.Box, listType);
+                node.EmitIntIndex(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetTupleItem))!);
+            }
+        }
+        else if (listType == typeof(object))
+        {
+            // 静态类型为 object：运行期按字典 / 列表 / 数组 / 元组 / 字符串分派。
+            node.ListId.LoadIlValue(ilGenerator, local);
+            node.Key.LoadIlValue(ilGenerator, local);
+            var keyType = node.Key.OutputType(local) ?? typeof(object);
+            if (keyType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType);
+            }
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDynamicObjectItem))!);
+        }
+        else if (listType == typeof(DictionaryLangValue))
+        {
+            // 处理 DictionaryLangValue 类型的索引访问
+            node.ListId.LoadIlValue(ilGenerator, local); // 加载字典
+
+            // 加载键
+            node.Key.LoadIlValue(ilGenerator, local);
+
+            // 调用 DictionaryLangValue.Get 方法
+            var getMethod = typeof(DictionaryLangValue).GetMethod("Get",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+            if (getMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Callvirt, getMethod);
+            }
+            else
+            {
+                throw new InvalidOperationError(node, "无法找到 DictionaryLangValue.Get 方法");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(node, "不支持的集合类型: " + listType.Name);
+        }
+
         return null;
+    
     }
 
     public object? VisitListComprehension(ListComprehension node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 为列表推导式创建一个空的List<object>实例
+        // 这是一个简化的实现，实际的列表推导式IL生成需要更复杂的逻辑
+        var listType = typeof(List<object>);
+        var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor);
+
         return null;
+    
     }
 
     public object? VisitListLangValue(ListLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // IL 模式下统一用 List<object> 表示列表字面量。
+        // 之前会按元素推断出 List<int> / List<string>，但 `list` 参数的静态类型是 List<object>，
+        // 把 List<int> 传给 List<object> 形参后，索引器/Add 等 callvirt 会按错误的泛型实例解析，
+        // 运行期直接 AccessViolation。动态语言的列表本身就是异构的，统一装箱更安全。
+        var itemType = typeof(object);
+
+        var listType = typeof(List<>).MakeGenericType(itemType);
+        // 创建泛型List实例
+        var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor);
+
+        // 如果没有元素需要添加，直接返回List实例
+        if (node.Value.Count == 0)
+        {
+            return null;
+        }
+
+        // 否则，将List实例存储到局部变量
+        var l = ilGenerator.DeclareLocal(listType);
+        ilGenerator.Emit(OpCodes.Stloc, l);
+
+        // 向List中添加元素
+        var addMethod = listType.GetMethod("Add", [itemType])!;
+        foreach (var expr in node.Value)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, l);
+            expr.LoadIlValue(ilGenerator, local);
+            var t = expr.OutputType(local);
+            if (t != itemType)
+            {
+                ilGenerator.Emit(OpCodes.Box, t!);
+            }
+
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用Add方法
+        }
+
+        // 将填充好的List实例加载到堆栈
+        ilGenerator.Emit(OpCodes.Ldloc, l);
+    
+    
         return null;
     }
 
@@ -155,32 +1282,323 @@ public partial class CompilerVisitor
 
     public object? VisitNestedIndexAccess(NestedIndexAccess node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 根据基础表达式的输出类型选择适当的索引访问方法
+        var baseType = node.BaseExpression.OutputType(local) ?? typeof(object);
+
+        // 特殊处理 ValueTuple 的常量索引访问
+        if (baseType.FullName?.StartsWith("System.ValueTuple") == true && node.NestedIndex is IntLangValue intValue)
+        {
+            var index = intValue.Value;
+
+            // 只加载基础表达式的结果，不加载索引值
+            node.BaseExpression.LoadIlValue(ilGenerator, local);
+
+            // 使用递归方法加载字段（支持超过 7 个元素）
+            node.LoadValueTupleField(ilGenerator, baseType, index);
+            return null;
+        }
+
+        // 对于其他情况，先加载基础表达式的结果和索引值
+        node.BaseExpression.LoadIlValue(ilGenerator, local);
+        node.NestedIndex.LoadIlValue(ilGenerator, local);
+
+        if (baseType == typeof(string))
+        {
+            // 字符串索引访问
+            var getCharMethod = typeof(string).GetMethod("get_Chars", [typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getCharMethod);
+        }
+        else if (baseType.IsArray)
+        {
+            // 数组索引访问
+            var elementType = baseType.GetElementType()!;
+            if (elementType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Ldelem, elementType);
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            }
+        }
+        else if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            // List<T> 索引访问
+            var getItemMethod = baseType.GetMethod("get_Item", [typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
+        }
+        else if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            // Dictionary<TKey, TValue> 索引访问
+            var keyType = baseType.GetGenericArguments()[0];
+            var getItemMethod = baseType.GetMethod("get_Item", [keyType])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
+        }
+        else if (baseType.FullName?.StartsWith("System.ValueTuple") == true)
+        {
+            // ValueTuple 索引访问（非常量索引）
+            // 使用 ITuple 索引器
+            var indexType = node.NestedIndex.OutputType(local);
+            if (indexType == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            }
+
+            var indexLocal = ilGenerator.DeclareLocal(typeof(int));
+            ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
+
+            // Box Tuple
+            ilGenerator.Emit(OpCodes.Box, baseType);
+
+            // Load Index
+            ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
+
+            var indexer = typeof(System.Runtime.CompilerServices.ITuple).GetProperty("Item")!;
+            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+        }
+        else if (baseType == typeof(object))
+        {
+            // 动态索引访问
+            // 调用 DotOperatorILHelper.GenerateDynamicIndexAccess
+            // 该方法假设栈上有 [Left] [Right]，并生成动态分发代码
+            // 我们的栈上正好有 BaseIndex 和 NestedIndex 的值
+
+            var indexType = node.NestedIndex.OutputType(local);
+
+            if (indexType != null)
+            {
+                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateDynamicIndexAccess(
+                    ilGenerator,
+                    indexType
+                );
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(node, "不支持的嵌套索引访问类型: " + baseType.Name);
+        }
+    
+    
         return null;
     }
 
     public object? VisitNestedSliceAccess(NestedSliceAccess node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 首先加载基础表达式的结果
+        node.BaseExpression.LoadIlValue(ilGenerator, local);
+
+        // 如果基础表达式不是object类型，需要装箱
+        var baseType = node.BaseExpression.OutputType(local);
+        if (baseType is not null && baseType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, baseType);
+        }
+
+        // 加载切片参数 - start
+        node.SliceStart.LoadIlValue(ilGenerator, local);
+        var startType = node.SliceStart.OutputType(local);
+        // 转换为int
+        if (startType is not null && startType != typeof(int))
+        {
+            TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), node.SliceStart);
+        }
+
+        // 处理结束索引（可能为null）
+        if (node.SliceEnd is not null)
+        {
+            node.SliceEnd.LoadIlValue(ilGenerator, local);
+            var endType = node.SliceEnd.OutputType(local);
+            // 转换为int
+            if (endType is not null && endType != typeof(int))
+            {
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), node.SliceEnd);
+            }
+        }
+        else
+        {
+            // 如果没有指定结束索引，使用int.MaxValue表示到末尾
+            ilGenerator.Emit(OpCodes.Ldc_I4, int.MaxValue);
+        }
+
+        // 处理步长（可能为null）
+        if (node.SliceStep is not null)
+        {
+            node.SliceStep.LoadIlValue(ilGenerator, local);
+            var stepType = node.SliceStep.OutputType(local);
+            // 转换为int
+            if (stepType is not null && stepType != typeof(int))
+            {
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), node.SliceStep);
+            }
+        }
+        else
+        {
+            // 如果没有指定步长，默认为1
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        }
+
+        // 调用CollectionHelper.Slice方法
+        var sliceMethod = typeof(CollectionHelper).GetMethod(
+            nameof(CollectionHelper.Slice),
+            [typeof(object), typeof(int), typeof(int), typeof(int)]);
+
+        if (sliceMethod is null)
+        {
+            throw new InvalidOperationError(node, "无法找到CollectionHelper.Slice方法");
+        }
+
+        ilGenerator.Emit(OpCodes.Call, sliceMethod);
+
         return null;
+    
     }
 
     public object? VisitRangeLangValue(RangeLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 我们需要生成与解释器相同的行为：
+        // 1. 根据 includeStart 和 includeEnd 调整范围
+        // 2. 检查是正向还是反向
+        // 3. 生成相应的数组
+
+        // 为了简化，我们直接调用一个辅助方法来生成范围数组
+        // 加载起始值
+        node.Start?.LoadIlValue(ilGenerator, local);
+
+        // 加载结束值
+        node.End?.LoadIlValue(ilGenerator, local);
+
+        // 加载 includeStart
+        ilGenerator.Emit(node.IncludeStart ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+
+        // 加载 includeEnd
+        ilGenerator.Emit(node.IncludeEnd ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+
+        // 调用辅助方法 CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
+        var createRangeMethod = typeof(RangeLangValue).GetMethod(nameof(node.CreateRangeArray),
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!;
+
+        ilGenerator.Emit(OpCodes.Call, createRangeMethod);
+
         return null;
+    
     }
 
     public object? VisitSliceLangValue(SliceLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 加载集合（id）
+        node.Id.LoadIlValue(ilGenerator, local);
+
+        // 加载起始索引
+        if (node.Start is not null)
+        {
+            node.Start.LoadIlValue(ilGenerator, local);
+            var startType = node.Start.OutputType(local);
+            if (startType is not null && startType != typeof(int))
+            {
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), node.Start);
+            }
+        }
+        else
+        {
+            // 默认起始索引为 0
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+        }
+
+        // 加载结束索引
+        if (node.End is not null)
+        {
+            node.End.LoadIlValue(ilGenerator, local);
+            var endType = node.End.OutputType(local);
+            if (endType is not null && endType != typeof(int))
+            {
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), node.End);
+            }
+        }
+        else
+        {
+            // 默认结束索引为 int.MaxValue (表示到末尾)
+            ilGenerator.Emit(OpCodes.Ldc_I4, int.MaxValue);
+        }
+
+        // 加载步长
+        if (node.Step is not null)
+        {
+            node.Step.LoadIlValue(ilGenerator, local);
+            var stepType = node.Step.OutputType(local);
+            if (stepType is not null && stepType != typeof(int))
+            {
+                TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), node.Step);
+            }
+        }
+        else
+        {
+            // 默认步长为 1
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        }
+
+        // 调用 CollectionHelper.Slice 方法
+        var sliceMethod = typeof(CollectionHelper).GetMethod(
+            nameof(CollectionHelper.Slice),
+            [typeof(object), typeof(int), typeof(int), typeof(int)]);
+
+        if (sliceMethod is null)
+        {
+            throw new InvalidOperationError(node, "无法找到CollectionHelper.Slice方法");
+        }
+
+        ilGenerator.Emit(OpCodes.Call, sliceMethod);
+
         return null;
+    
     }
 
     public object? VisitStringTemplateValue(StringTemplateValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于字符串模板，我们将所有部分转换为字符串，然后使用string.Concat方法连接
+        // 我们将使用string.Concat(object[])方法，这样可以处理不同类型的参数
+
+        // 首先创建一个数组，大小为List的长度
+        ilGenerator.Emit(OpCodes.Ldc_I4, node.ExpressionList.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+
+        // 遍历所有字符串片段和表达式，将它们添加到数组中
+        for (int i = 0; i < node.ExpressionList.Count; i++)
+        {
+            var item = node.ExpressionList[i];
+
+            // 复制数组引用到栈顶
+            ilGenerator.Emit(OpCodes.Dup);
+
+            // 加载索引i
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+
+            // 加载当前项的值
+            item.LoadIlValue(ilGenerator, local);
+
+            // 将值转换为object类型（如果需要）
+            var itemType = item.OutputType(local);
+            if (itemType is { IsValueType: true })
+            {
+                // 值类型需要装箱
+                ilGenerator.Emit(OpCodes.Box, itemType);
+            }
+            // 引用类型不需要转换，直接可以作为object
+
+            // 将值存储到数组的第i个位置
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        // 调用string.Concat(object[])方法将所有部分连接起来
+        var concatMethod = typeof(string).GetMethod("Concat", [typeof(object[])])!;
+        ilGenerator.Emit(OpCodes.Call, concatMethod);
+
         return null;
+    
     }
 
     public object? VisitSuperProxy(SuperProxy node)
@@ -191,14 +1609,26 @@ public partial class CompilerVisitor
 
     public object? VisitTaskClassLangValue(TaskClassLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 Task 类静态方法，我们不需要加载实例
+        // 直接返回 Task 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(Task));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitTaskCompletionSourceLangValue(TaskCompletionSourceLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        throw new NotImplementedError(
+            node.Position,
+            "IL 模式暂不支持 TaskCompletionSource 类型"
+        );
+
         return null;
+    
     }
 
     public object? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node)
@@ -215,8 +1645,16 @@ public partial class CompilerVisitor
 
     public object? VisitTaskLangValue(TaskLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 加载 node 指针
+        ilGenerator.Emit(OpCodes.Ldarg_0);
+        // 调用 GetValue() 方法获取底层 Task 对象
+        ilGenerator.Emit(OpCodes.Call, GetType().GetMethod("GetValue")!);
+        // 将 Task<LangValueType> 转换为 Task<object>
+        ilGenerator.Emit(OpCodes.Castclass, typeof(Task<object>));
+
         return null;
+    
     }
 
     public object? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node)
@@ -233,8 +1671,14 @@ public partial class CompilerVisitor
 
     public object? VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 Task 类静态方法，我们不需要加载实例
+        // 直接返回 Task 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(Task));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitThreadClassLangValue(ThreadClassLangValue node)
@@ -245,8 +1689,12 @@ public partial class CompilerVisitor
 
     public object? VisitThreadLangValue(ThreadLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 加载当前线程对象到 IL 栈
+        ilGenerator.Emit(OpCodes.Ldarg_0);
+
         return null;
+    
     }
 
     public object? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node)
@@ -257,70 +1705,172 @@ public partial class CompilerVisitor
 
     public object? VisitTupleLangValue(TupleLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 获取所有元素的类型
+        var types = node.Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
+
+        // 递归生成创建代码
+        node.EmitValueTupleCreation(ilGenerator, local, node.Elements, types);
+
         return null;
+    
     }
 
     public object? VisitTypeLangValue(TypeLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 在 IL 模式下，创建 TypeLangValue 对象
+        ilGenerator.Emit(OpCodes.Ldstr, node.Value ?? "");
+        ilGenerator.Emit(OpCodes.Newobj, typeof(TypeLangValue).GetConstructor([typeof(string)])!);
+
         return null;
+    
     }
 
     public object? VisitGenericInstanceExpression(GenericInstanceExpression node)
     {
-        // 泛型实例化在 IL 模式下暂不支持
-        node.LoadIlValue(ilGenerator, local);
+
+        // IL 模式下的IL生成
+        // 处理泛型类实例化和泛型函数调用
+
+        // 获取基础表达式名称
+        if (node.BaseExpression is not LangId identifier)
+        {
+            throw new InvalidOperationError(node, "IL 模式下泛型表达式必须使用简单的标识符");
+        }
+
+        var name = identifier.IdName;
+
+        // 尝试判断是泛型类还是泛型函数
+        bool isGenericClass = local.GenericClasses.ContainsKey(name);
+        bool isGenericFunction = local.GenericFunctions.ContainsKey(name);
+
+        if (isGenericClass)
+        {
+            // 处理泛型类实例化
+            node.HandleGenericClassInstantiation(ilGenerator, local, name);
+        }
+        else if (isGenericFunction)
+        {
+            // 处理泛型函数调用
+            node.HandleGenericFunctionCall(ilGenerator, local, name);
+        }
+        else
+        {
+            throw new InvalidOperationError(node, $"找不到泛型类或泛型函数定义：{name}");
+        }
+
         return null;
+    
     }
 
     public object? VisitLinqExpression(LinqExpression node)
     {
-        // 调用 LinqExpression 的 LoadIlValue 方法生成 IL 代码
-        node.LoadIlValue(ilGenerator, local);
+
+        if (node.CanGenerateStreamingQuery())
+        {
+            node.GenerateStreamingQuery(ilGenerator, local);
+            return null;
+        }
+        // 在 IL 模式下，LINQ 查询需要生成 IL 代码来执行查询逻辑
+        // 由于 IL 模式下无法直接访问 VariateManager（生成的方法是无参数的 Action），
+        // 我们需要通过 LocalManager.Interpreter.Manager 来访问
+
+        // 检查是否有 Interpreter
+        if (local.Interpreter?.Manager == null)
+        {
+            throw new NotSupportedException("LINQ 查询在 IL 模式下需要 Interpreter 支持");
+        }
+
+        // 将 LINQ 查询转换为手动的循环和过滤逻辑
+        node.GenerateLinqMethodCalls(ilGenerator, local);
+    
+    
         return null;
     }
 
     public object? VisitAssertClassLangValue(AssertClassLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 Assert 类静态方法，我们不需要加载实例
+        // 直接返回 Assert 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertHelper));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitAssertStaticMethodWrapper(AssertStaticMethodWrapper node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 Assert 类静态方法，我们不需要加载实例
+        // 直接返回 Assert 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertHelper));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitMockLibClassLangValue(MockLibClassLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 MockLib 类静态方法，我们不需要加载实例
+        // 直接返回 MockLib 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(MockLibClassLangValue));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitMockObjectLangValue(MockObjectLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 MockLib 类静态方法，我们不需要加载实例
+        // 直接返回 MockLib 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(MockLibClassLangValue));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitMockLibStaticMethodWrapper(MockLibStaticMethodWrapper node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 MockLib 类静态方法，我们不需要加载实例
+        // 直接返回 MockLib 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(MockLibClassLangValue));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitTestRunnerClassLangValue(TestRunnerClassLangValue node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 TestRunner 类静态方法，我们不需要加载实例
+        // 直接返回 TestRunner 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(TestRunnerClassLangValue));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitTestRunnerStaticMethodWrapper(TestRunnerStaticMethodWrapper node)
     {
-        node.LoadIlValue(ilGenerator, local);
+
+        // 对于 TestRunner 类静态方法，我们不需要加载实例
+        // 直接返回 TestRunner 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(TestRunnerClassLangValue));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+
         return null;
+    
     }
 
     public object? VisitLockedVariableLangValue(LockedVariableLangValue node)

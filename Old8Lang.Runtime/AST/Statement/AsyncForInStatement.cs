@@ -22,6 +22,9 @@ public partial class AsyncForInStatement(
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
+    internal LangExpression Expression => expression;
+    internal OldStatement Body => body;
+
     // 获取所有标识符，包括主标识符和附加标识符
     internal List<LangId> AllIds { get; } = [id, .. (additionalIds ?? [])];
 

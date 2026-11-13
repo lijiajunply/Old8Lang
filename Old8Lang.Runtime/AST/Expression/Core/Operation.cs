@@ -100,7 +100,7 @@ public partial class Operation(
     /// <summary>
     /// 操作的输出类型缓存
     /// </summary>
-    public Type? Type { get; private set; }
+    public Type? Type { get; internal set; }
 
     /// <summary>
     /// 左操作数
