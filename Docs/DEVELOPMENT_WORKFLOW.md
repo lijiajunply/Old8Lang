@@ -67,8 +67,8 @@ Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按�
   |------|----------|------|
   | `Run` | `LangExpression` | `virtual LangValueType Run(VariateManager manager)` |
   | `LoadIlValue` | `LangExpression` | `virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)` |
-  | `Run` | `OldStatement` | `abstract void Run(VariateManager manager)` |
-  | `GenerateIl` | `OldStatement` | `abstract void GenerateIl(ILGenerator ilGenerator, LocalManager local)` |
+  | `Run` | `OldStatement` | `virtual void Run(VariateManager manager)` |
+  | `GenerateIl` | `OldStatement` | `virtual void GenerateIl(ILGenerator ilGenerator, LocalManager local)` |
   | `Accept` | 两者 | `abstract TResult Accept<TResult>(IVisitor<TResult> visitor)` |
 
   注意表达式与语句的 IL 入口不同：表达式是 `LoadIlValue`（把值压栈），语句是 `GenerateIl`。
