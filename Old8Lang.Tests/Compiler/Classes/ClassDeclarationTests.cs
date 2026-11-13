@@ -124,6 +124,33 @@ public class ClassDeclarationTests
     }
 
     [Fact]
+    public void Class_MethodCanReadBareField_CompilesAndExecutes()
+    {
+        // Arrange
+        var code = @"
+            class Counter {
+                public value:int <- 5
+
+                func get() -> int {
+                    return value
+                }
+            }
+
+            counter <- Counter()
+            Assert.Equal(5, counter.get())
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void Class_StaticMembers_CompilesAndExecutes()
     {
         // Arrange

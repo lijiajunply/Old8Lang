@@ -463,6 +463,14 @@ public partial class LangId(
             return varType;
         }
 
+        // 与 LoadIlValue 保持一致：类实例方法内没有同名局部变量或参数时，
+        // 裸标识符解析为当前实例字段。若把字段误报为 object，返回语句会对
+        // 已在栈上的值类型再执行 Unbox_Any，生成无效 IL 或在运行时抛出异常。
+        if (local.FieldVar.TryGetValue(IdName, out var field))
+        {
+            return field.FieldType;
+        }
+
         // 检查是否是全局静态类（Assert, Task, Thread等）
         if (local.GlobalStaticClasses.ContainsKey(IdName))
         {

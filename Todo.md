@@ -78,9 +78,9 @@
   顶层变量继续使用局部变量。异步函数尚未接入该模型，跨线程调用时槽位环境不可见。见
   [测试报告](Reports/2026-11-11-22-40-IL具名函数读取顶层变量.md)。
 
-- [ ] **IL 实例方法读取裸字段仍是 `NullReferenceException`**（2026-11-11 顺带发现，与本轮顶层变量修复无关）：
-  `class C { field:int <- 5; func get() -> int { return field } }` + `c <- C()`，`PrintLine(c.get())`
-  在 `-il` 下运行期抛 `NullReferenceException`（`-f` 输出 `5`）；写成 `this.field` 则正常。顶层 `c.field` 也正常。
+- [x] **IL 实例方法读取裸字段仍是 `NullReferenceException`**：裸字段现在在静态类型推断中返回其字段类型，
+  避免返回路径对已加载的值类型重复拆箱；读取型回归通过。见
+  [测试报告](Reports/2026-11-13-08-50-IL裸字段访问.md)。
 - [ ] **IL 集合 `Length` 参与比较会生成无效 IL/运行期 NRE**（2026-11-11 顺带发现）：
   `items <- {1,2,3}; PrintLine(items.Length > 0)` 在 `-il` 下顶层报 IL 验证失败，在函数体内抛
   `NullReferenceException`；单独 `PrintLine(items.Length)` 正常。原因是 `Operation.OutputType` 把
