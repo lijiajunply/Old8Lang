@@ -11,14 +11,6 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public partial class IfChild
 {
-    public void Run(VariateManager manager, ref bool r)
-    {
-        if (!r) return;
-        var exprValue = expression.Accept(new InterpreterVisitor(manager));
-        if (exprValue is not BoolLangValue { Value: true }) return;
-        blockStatement.Accept(new InterpreterVisitor(manager));
-        r = false;
-    }
     public void GenerateConditionIl(ILGenerator ilGenerator, LocalManager local)
     {
         expression.Accept(new CompilerVisitor(ilGenerator, local));

@@ -239,7 +239,7 @@ public partial class CompilerVisitor
     {
 
         // 调用带有ILGenerator参数的OutputType方法，该方法会生成实际的IL指令
-        node.Type = node.OutputType(ilGenerator, local);
+        node.Type = EmitOperationOutputType(node);
 
         return null;
     
@@ -1880,5 +1880,131 @@ public partial class CompilerVisitor
     {
         // InterpreterVisitor 不应该在 IL 模式下访问
         throw new NotSupportedException("InterpreterVisitor 不应该在 IL 模式下访问");
+    }
+
+    private Type EmitOperationOutputType(Operation operation)
+    {
+        if (operation.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(operation.Left, operation.Right, local, out var library, out var libraryCall))
+            return StandardLibraryILHelper.EmitCall(library, libraryCall, ilGenerator, local);
+
+        var leftType = operation.Left?.Accept(new TypeInferenceVisitor(local));
+        var rightType = operation.Right?.Accept(new TypeInferenceVisitor(local));
+
+        // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
+        if (leftType is TypeBuilder typeBuilder && typeBuilder != local.InClassEnv)
+        {
+            // 尝试从local.ClassVar中查找对应的已完成类型
+            var typeName = typeBuilder.Name;
+            leftType = local.ClassVar.TryGetValue(typeName, out var completedType)
+                ? completedType
+                : typeof(object); // 如果找不到对应的类型，说明类还在编译中，返回object
+        }
+
+        // 如果rightType是TypeBuilder，需要查找对应的已完成的类型
+        if (rightType is TypeBuilder rightTypeBuilder)
+        {
+            // 尝试从local.ClassVar中查找对应的已完成类型
+            var typeName = rightTypeBuilder.Name;
+            rightType = local.ClassVar.TryGetValue(typeName, out var completedType)
+                ? completedType
+                : typeof(object); // 如果找不到对应的类型，说明类还在编译中，返回object
+        }
+
+        if (operation.Left is null)
+        {
+            // 处理单目运算符
+            switch (operation.Opera)
+            {
+                case LangTokenType.Exclamation:
+                    operation.Right?.Accept(new CompilerVisitor(ilGenerator, local));
+                    ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
+                    ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
+                    return typeof(bool);
+                case LangTokenType.Minus:
+                    operation.Right?.Accept(new CompilerVisitor(ilGenerator, local));
+                    if (rightType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        rightType = typeof(int);
+                    }
+                    ilGenerator.Emit(OpCodes.Neg);
+                    return rightType ?? throw new InvalidOperationError(operation, "右操作数不能为空");
+
+                default:
+                    throw new InvalidOperationError(operation, $"不支持的一元运算符: {operation.Opera}");
+            }
+        }
+
+        switch (operation.Opera)
+        {
+            case LangTokenType.Plus:
+                if (leftType == typeof(string) || rightType == typeof(string))
+                {
+                    // 处理字符串连接 - 需要调用string.Concat方法
+                    // 加载左操作数并立即装箱（如果需要）
+                    operation.Left?.Accept(new CompilerVisitor(ilGenerator, local));
+                    if (leftType != typeof(string))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, leftType!);
+                    }
+
+                    // 加载右操作数并立即装箱（如果需要）
+                    operation.Right?.Accept(new CompilerVisitor(ilGenerator, local));
+                    if (rightType != typeof(string))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, rightType!);
+                    }
+
+                    // 调用string.Concat(object, object)
+                    var concatMethod = typeof(string).GetMethod("Concat", [typeof(object), typeof(object)])!;
+                    ilGenerator.Emit(OpCodes.Call, concatMethod);
+                    return typeof(string);
+                }
+
+                // 处理数值类型加法
+                return NumericBinaryOpHelper.GenerateAddition(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
+            case LangTokenType.Minus:
+                return NumericBinaryOpHelper.GenerateSubtraction(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
+            case LangTokenType.Star:
+                return NumericBinaryOpHelper.GenerateMultiplication(operation.Left, operation.Right, ilGenerator, local, leftType, rightType, operation);
+            case LangTokenType.Slash:
+                return NumericBinaryOpHelper.GenerateDivision(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
+            case LangTokenType.Percent:
+                return NumericBinaryOpHelper.GenerateModulo(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
+            case LangTokenType.Caret:
+                return NumericBinaryOpHelper.GeneratePower(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
+            case LangTokenType.GreaterThan:
+                return ComparisonOpHelper.GenerateGreaterThan(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.LessThan:
+                return ComparisonOpHelper.GenerateLessThan(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.Equals:
+                return ComparisonOpHelper.GenerateEquals(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.NotEquals:
+                return ComparisonOpHelper.GenerateNotEquals(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.And:
+                return LogicalOpILHelper.GenerateAnd(operation.Left!, operation.Right!, ilGenerator, local);
+            case LangTokenType.Or:
+                return LogicalOpILHelper.GenerateOr(operation.Left!, operation.Right!, ilGenerator, local);
+            case LangTokenType.Xor:
+                return LogicalOpILHelper.GenerateXor(operation.Left!, operation.Right!, ilGenerator, local);
+            case LangTokenType.LessThanEquals:
+                return ComparisonOpHelper.GenerateLessThanEquals(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.GreaterThanEquals:
+                return ComparisonOpHelper.GenerateGreaterThanEquals(operation.Left, operation.Right, ilGenerator, local);
+            case LangTokenType.In:
+                return InOperatorHelper.GenerateInOperator(operation.Left!, operation.Right!, ilGenerator, local, rightType, operation);
+            case LangTokenType.As:
+                return TypeCheckILHelper.GenerateAsOperator(operation.Left!, operation.Right!, ilGenerator, local, leftType, operation);
+            case LangTokenType.Is:
+                return TypeCheckILHelper.GenerateIsOperator(operation.Left!, operation.Right!, ilGenerator, local, leftType);
+            case LangTokenType.IsNot:
+                return TypeCheckILHelper.GenerateIsNotOperator(operation.Left!, operation.Right!, ilGenerator, local, leftType);
+            case LangTokenType.NullishCoalescing:
+                return NullishCoalescingILHelper.GenerateNullishCoalescing(operation.Left!, operation.Right!, ilGenerator, local, leftType!);
+            case LangTokenType.Dot:
+                return DotOperatorILHelper.GenerateDotOperator(operation.Left, operation.Right, ilGenerator, local, leftType, rightType, operation);
+            default:
+                throw new InvalidOperationError(operation, $"不支持的二元运算符: {operation.Opera}");
+        }
     }
 }
