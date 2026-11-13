@@ -127,7 +127,7 @@ public static class DotOperatorILHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        ilGenerator.Emit(OpCodes.Ldarg_0);
+        new ThisExpression().LoadIlValue(ilGenerator, local);
         if (right is not LangId rightId) return local.InClassEnv!;
 
         // 优先从 FieldVar 中查找字段（支持 TypeBuilder）
@@ -156,6 +156,25 @@ public static class DotOperatorILHelper
 
         if (fieldInfo is not null)
         {
+            // DynamicMethod 中不能直接引用尚未完成 TypeBuilder 的 FieldBuilder。
+            // 捕获 this 的 lambda 在类创建后运行，改由运行期反射读取该字段。
+            if (fieldInfo is FieldBuilder && local.TryGetCapturedLocal("this", out _))
+            {
+                ilGenerator.Emit(OpCodes.Ldstr, rightId.IdName);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(DotOperatorILHelper).GetMethod(nameof(GetDynamicObjectProperty))!);
+                if (fieldInfo.FieldType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
+                }
+                else if (fieldInfo.FieldType != typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, fieldInfo.FieldType);
+                }
+
+                return fieldInfo.FieldType;
+            }
+
             ilGenerator.Emit(OpCodes.Ldfld, fieldInfo);
             return fieldInfo.FieldType;
         }
@@ -1126,19 +1145,49 @@ public static class DotOperatorILHelper
         }
 
         var receiverType = receiver.GetType();
-        var property = receiverType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        var property = receiverType.GetProperty(propertyName,
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         if (property?.CanRead == true)
         {
             return property.GetValue(receiver);
         }
 
-        var field = receiverType.GetField(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        var field = receiverType.GetField(propertyName,
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         if (field is not null)
         {
             return field.GetValue(receiver);
         }
 
         throw new MissingMemberException(receiverType.FullName, propertyName);
+    }
+
+    /// <summary>
+    /// 为捕获类实例的动态 lambda 写入字段或属性。
+    /// </summary>
+    public static void SetDynamicObjectProperty(object? receiver, string propertyName, object? value)
+    {
+        if (receiver is null)
+        {
+            throw new NullReferenceException($"无法在 null 上设置成员 '{propertyName}'");
+        }
+
+        var type = receiver.GetType();
+        var field = type.GetField(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (field is not null)
+        {
+            field.SetValue(receiver, value);
+            return;
+        }
+
+        var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (property?.CanWrite == true)
+        {
+            property.SetValue(receiver, value);
+            return;
+        }
+
+        throw new MissingMemberException(type.FullName, propertyName);
     }
 
     /// <summary>

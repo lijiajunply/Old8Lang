@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.OperationHelpers;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
@@ -685,8 +686,8 @@ public partial class SetStatement : OldStatement
                     if ((operation.Left is LangId { IdName: "this" } || operation.Left is ThisExpression) &&
                         local.InClassEnv is not null)
                     {
-                        // 加载 this（参数0）
-                        ilGenerator.Emit(OpCodes.Ldarg_0);
+                        // 加载 this；捕获 this 的 lambda 会从闭包环境读取实例。
+                        new ThisExpression().LoadIlValue(ilGenerator, local);
 
                         // 从 FieldVar 中获取字段信息
                         if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
@@ -715,6 +716,21 @@ public partial class SetStatement : OldStatement
 
                         if (fieldInfo is not null)
                         {
+                            if (fieldInfo is FieldBuilder && local.TryGetCapturedLocal("this", out _))
+                            {
+                                ilGenerator.Emit(OpCodes.Ldstr, memberId.IdName);
+                                Value.LoadIlValue(ilGenerator, local);
+                                var dynamicValueType = Value.OutputType(local);
+                                if (dynamicValueType?.IsValueType == true)
+                                {
+                                    ilGenerator.Emit(OpCodes.Box, dynamicValueType);
+                                }
+
+                                ilGenerator.Emit(OpCodes.Call,
+                                    typeof(DotOperatorILHelper).GetMethod(nameof(DotOperatorILHelper.SetDynamicObjectProperty))!);
+                                return;
+                            }
+
                             // 加载右值
                             Value.LoadIlValue(ilGenerator, local);
 

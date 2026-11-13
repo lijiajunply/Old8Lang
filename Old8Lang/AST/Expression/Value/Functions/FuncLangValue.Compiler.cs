@@ -117,7 +117,8 @@ public partial class FuncLangValue
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
-            Globals = local.Globals
+            Globals = local.Globals,
+            InClassEnv = local.InClassEnv
         };
 
         foreach (var (key, value) in local.GlobalStaticClasses)
@@ -133,6 +134,11 @@ public partial class FuncLangValue
         foreach (var (key, value) in local.FuncParameters)
         {
             funcLocal.FuncParameters.TryAdd(key, value);
+        }
+
+        foreach (var (key, value) in local.FieldVar)
+        {
+            funcLocal.FieldVar.TryAdd(key, value);
         }
 
         for (var i = 0; i < capturedValues.Count; i++)
@@ -199,7 +205,30 @@ public partial class FuncLangValue
             var captured = capturedValues[i];
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i);
-            ilGenerator.Emit(OpCodes.Ldloc, captured.Local);
+            if (captured.Name == "this" && captured.Local is null)
+            {
+                // 当前类实例方法的 this 位于参数 0；若由嵌套 lambda 创建，
+                // 则先从外层闭包槽位取得已捕获的 this。
+                if (local.TryGetCapturedLocal("this", out var outerThis))
+                {
+                    ilGenerator.Emit(OpCodes.Ldarg_0);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, outerThis.Index);
+                    ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                    if (outerThis.Type != typeof(object) && outerThis.Type is not TypeBuilder)
+                    {
+                        ilGenerator.Emit(OpCodes.Castclass, outerThis.Type);
+                    }
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Ldarg_0);
+                }
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, captured.Local!);
+            }
+
             if (captured.Type.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, captured.Type);
@@ -215,12 +244,22 @@ public partial class FuncLangValue
 
     private static List<CapturedLocalValue> GetCapturedLocalValues(LocalManager local)
     {
-        return local.LocalVar
+        var captured = local.LocalVar
             .Select(pair => new CapturedLocalValue(pair.Key, pair.Value, pair.Value.LocalType))
             .ToList();
+
+        if (local.InClassEnv is not null && captured.All(value => value.Name != "this"))
+        {
+            // DynamicMethod 不能将尚未完成的 TypeBuilder 用作 castclass 目标；
+            // 字段解析仍由 InClassEnv / FieldVar 保留，捕获槽位只需保存 object。
+            var thisType = local.InClassEnv is TypeBuilder ? typeof(object) : local.InClassEnv;
+            captured.Add(new CapturedLocalValue("this", null, thisType));
+        }
+
+        return captured;
     }
 
-    private sealed record CapturedLocalValue(string Name, LocalBuilder Local, Type Type);
+    private sealed record CapturedLocalValue(string Name, LocalBuilder? Local, Type Type);
 
     /// <summary>
     /// 为没有显式 return 的函数体补一段默认返回。

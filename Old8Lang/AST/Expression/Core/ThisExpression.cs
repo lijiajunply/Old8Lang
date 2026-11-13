@@ -46,6 +46,21 @@ public partial class ThisExpression(SourcePosition position = default) : LangExp
     /// <param name="local">局部变量管理器</param>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // Lambda 的第 0 个参数是闭包数组，不是实例本身。类方法中创建的
+        // lambda 会把 this 作为捕获值保存，因此应从对应槽位读取实例。
+        if (local.TryGetCapturedLocal("this", out var captured))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            if (captured.Type != typeof(object) && captured.Type is not TypeBuilder)
+            {
+                ilGenerator.Emit(OpCodes.Castclass, captured.Type);
+            }
+
+            return;
+        }
+
         // 加载 this 指针（ldarg.0）
         // 在实例方法中，第一个参数（索引 0）总是 this 指针
         ilGenerator.Emit(OpCodes.Ldarg_0);
