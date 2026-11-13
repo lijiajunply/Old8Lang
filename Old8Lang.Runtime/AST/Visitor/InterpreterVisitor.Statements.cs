@@ -120,9 +120,14 @@ public partial class InterpreterVisitor
 
         // 访问 ifChildBlock（直接调用其逻辑，因为 IfChild 不支持 Visitor）
         var ifChild = node[0] as IfChild;
-        if (ifChild is not null)
+        if (ifChild is not null && r)
         {
-            ifChild.Run(manager, ref r);
+            var predicate = ifChild.Condition.Accept(this);
+            if (predicate is BoolLangValue { Value: true })
+            {
+                ifChild.Block.Accept(this);
+                r = false;
+            }
         }
 
         manager.RemoveChildren();
@@ -136,7 +141,15 @@ public partial class InterpreterVisitor
                 manager.AddChildren();
                 // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
                 manager.IsFunc = false;
-                elifChild.Run(manager, ref r);
+                if (r)
+                {
+                    var predicate = elifChild.Condition.Accept(this);
+                    if (predicate is BoolLangValue { Value: true })
+                    {
+                        elifChild.Block.Accept(this);
+                        r = false;
+                    }
+                }
                 manager.RemoveChildren();
             }
             else if (node[i] is BlockStatement elseBlock)

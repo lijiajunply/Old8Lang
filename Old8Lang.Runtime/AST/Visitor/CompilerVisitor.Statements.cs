@@ -106,11 +106,11 @@ public partial class CompilerVisitor
         var ifChild = node[0] as IfChild;
         if (ifChild is not null)
         {
-            ifChild.GenerateConditionIl(ilGenerator, local);
+            ifChild.Condition.Accept(this);
             ilGenerator.Emit(OpCodes.Brfalse, labelElse);
 
             // if 部分
-            ifChild.Accept(this);
+            ifChild.Block.Accept(this);
             ilGenerator.Emit(OpCodes.Br, labelEnd);
         }
 
@@ -122,11 +122,11 @@ public partial class CompilerVisitor
             if (elifChild is not null)
             {
                 var nextElif = ilGenerator.DefineLabel();
-                elifChild.GenerateConditionIl(ilGenerator, local);
+                elifChild.Condition.Accept(this);
                 ilGenerator.Emit(OpCodes.Brfalse, nextElif);
 
                 // elif 部分
-                elifChild.Accept(this);
+                elifChild.Block.Accept(this);
                 ilGenerator.Emit(OpCodes.Br, labelEnd);
 
                 ilGenerator.MarkLabel(nextElif);
