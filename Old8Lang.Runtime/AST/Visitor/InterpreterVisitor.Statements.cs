@@ -103,8 +103,7 @@ public partial class InterpreterVisitor
         // 检查是否有生成器上下文，决定执行模式
         if (manager.GeneratorContext is not null)
         {
-            // 生成器模式需要调用原方法（暂不迁移复杂逻辑）
-            node.RunWithGeneratorContext(manager);
+            RunWithGeneratorContext(node);
         }
         else
         {
@@ -137,6 +136,108 @@ public partial class InterpreterVisitor
         }
 
         return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 使用新架构运行（基于路径的状态恢复）
+    /// </summary>
+    /// <param name="node">正在执行的块语句。</param>
+    private void RunWithGeneratorContext(BlockStatement node)
+    {
+        var context = manager.GeneratorContext!;
+
+        // 先执行导入语句
+        node.ImportRun(manager);
+
+        // 检查是否需要恢复执行
+        bool isResuming = !string.IsNullOrEmpty(context.ExecutionPath);
+
+        // 从头开始执行，使用路径匹配决定是否跳过语句
+        for (int i = 0; i < node.OtherStatements.Count; i++)
+        {
+            var statement = node.OtherStatements[i];
+
+            // 构建当前语句的路径
+            var statementPath = $"/block[{i}]";
+            context.PathStack.Push(statementPath);
+
+            try
+            {
+                var currentPath = context.GetCurrentPath();
+
+                // 如果正在恢复执行，检查是否应该跳过当前语句
+                if (isResuming)
+                {
+                    // 如果执行路径等于当前路径+"/yield"，说明这是上次yield的位置
+                    // 应该跳过这个语句，从下一个语句开始执行
+                    if (context.ExecutionPath == currentPath + "/yield")
+                    {
+                        // 清除 ExecutionPath 和恢复标志，从下一个语句开始正常执行
+                        context.ExecutionPath = "";
+                        isResuming = false;
+                        continue;
+                    }
+
+                    // 如果执行路径不以当前路径开头，说明这个语句在恢复点之前，跳过
+                    if (!context.ExecutionPath!.StartsWith(currentPath))
+                    {
+                        continue;
+                    }
+                }
+
+                // 保存当前的 IsReturn 标志，以防止嵌套函数调用影响生成器的控制流
+                var savedIsReturn = manager.IsReturn;
+
+                // 执行语句
+                statement.Run(manager);
+
+                // 恢复 IsReturn 标志（如果语句是普通函数调用，它会设置并重置 IsReturn，但我们需要确保生成器的 IsReturn 不受影响）
+                // 注意：如果语句本身是 return 语句，我们需要保留它设置的 IsReturn
+                if (statement is not ReturnStatement)
+                {
+                    manager.IsReturn = savedIsReturn;
+                }
+
+                // 检查是否遇到yield
+                if (context.HasYielded)
+                {
+                    return;
+                }
+
+                // 执行完语句后，如果 ExecutionPath 被清除，说明该语句已完成（比如循环结束）
+                // 此时应该取消恢复模式，继续正常执行后续语句
+                if (isResuming && string.IsNullOrEmpty(context.ExecutionPath))
+                {
+                    isResuming = false;
+                }
+
+                // 检查是否遇到return或其他控制流
+                if (manager.IsReturn || context.IsCompleted)
+                {
+                    context.IsCompleted = true;
+                    return;
+                }
+
+                // 检查 break 和 continue 语句
+                if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                // 弹出当前路径
+                context.PathStack.Pop();
+            }
+        }
+
+        // 执行完毕，只有主函数体的 BlockStatement 才设置 IsCompleted
+        // 循环体等嵌套的 BlockStatement 不应该设置 IsCompleted
+        // 通过检查路径栈来判断：如果栈为空，说明是主函数体
+        if (context.PathStack.Count == 0)
+        {
+            context.IsCompleted = true;
+        }
     }
 
     /// <summary>
