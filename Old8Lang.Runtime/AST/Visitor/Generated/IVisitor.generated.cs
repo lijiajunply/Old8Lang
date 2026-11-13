@@ -83,6 +83,11 @@ public interface IVisitor<out TResult>
     TResult VisitFileHeaderDirective(FileHeaderDirective node);
 
     /// <summary>
+    /// 访问 FuncRunStatement 节点
+    /// </summary>
+    TResult VisitFuncRunStatement(FuncRunStatement node);
+
+    /// <summary>
     /// 访问 ForInStatement 节点
     /// </summary>
     TResult VisitForInStatement(ForInStatement node);

@@ -1498,4 +1498,38 @@ public partial class InterpreterVisitor
         return new VoidLangValue();
     
     }
+
+    /// <summary>
+    /// 访问 FuncRunStatement 节点（表达式语句）
+    /// </summary>
+    public LangValueType VisitFuncRunStatement(FuncRunStatement node)
+    {
+        // 迁移自 FuncRunStatement.Run()
+        if (node._expression is not null)
+        {
+            node._expression.Accept(this);
+            return new VoidLangValue();
+        }
+
+        if (node._awaitExpr is not null)
+        {
+            node._awaitExpr.Accept(this);
+            return new VoidLangValue();
+        }
+
+        if (node._genericInstance is not null)
+        {
+            node._genericInstance.Accept(this);
+            return new VoidLangValue();
+        }
+
+        if (node._operation is null)
+        {
+            node._instance?.Accept(this);
+            return new VoidLangValue();
+        }
+
+        node._operation.Accept(this);
+        return new VoidLangValue();
+    }
 }

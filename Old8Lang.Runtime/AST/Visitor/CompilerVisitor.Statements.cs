@@ -1657,4 +1657,49 @@ public partial class CompilerVisitor
         return null;
     
     }
+
+    /// <summary>
+    /// 访问 FuncRunStatement 节点（表达式语句，按原实现销毁调用结果）
+    /// </summary>
+    public object? VisitFuncRunStatement(FuncRunStatement node)
+    {
+        // 迁移自 FuncRunStatement.GenerateIl()
+        if (node._genericInstance is not null)
+        {
+            var genericOutputType = node._genericInstance.Accept(new TypeInferenceVisitor(local));
+            node._genericInstance.Accept(this);
+            if (genericOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return null;
+        }
+
+        if (node._expression is not null)
+        {
+            node._expression.Accept(this);
+            var outputType = node._expression.Accept(new TypeInferenceVisitor(local));
+            if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return null;
+        }
+
+        if (node._awaitExpr is not null)
+        {
+            node._awaitExpr.Accept(this);
+            var outputType = node._awaitExpr.Accept(new TypeInferenceVisitor(local));
+            if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return null;
+        }
+
+        if (node._operation is null)
+        {
+            if (node._instance is null) return null;
+            var outputType = node._instance.Accept(new TypeInferenceVisitor(local));
+            node._instance.Accept(this);
+            if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            return null;
+        }
+
+        node._operation.Accept(this);
+        var opOutputType = node._operation.Type ?? node._operation.Accept(new TypeInferenceVisitor(local));
+        if (opOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+        return null;
+    }
 }

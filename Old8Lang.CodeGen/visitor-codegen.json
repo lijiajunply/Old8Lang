@@ -13,7 +13,6 @@
     "LangValueType",
     "IfChild",
     "DllPathResolver",
-    "FuncRunStatement",
     "ClassFieldSetStatement",
     "ClassFuncInitStatement"
   ],

@@ -38,6 +38,8 @@ public partial class TypeInferenceVisitor
     public Type VisitUsingStatement(UsingStatement node) => typeof(void);
 
     // ReturnStatement返回其表达式的类型
+        public Type VisitFuncRunStatement(FuncRunStatement node) => typeof(void);
+
     public Type VisitReturnStatement(ReturnStatement node)
     {
 

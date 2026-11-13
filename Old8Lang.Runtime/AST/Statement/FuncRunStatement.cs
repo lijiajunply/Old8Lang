@@ -53,34 +53,6 @@ public class FuncRunStatement : OldStatement
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        // FuncRunStatement 是一个包装表达式作为语句的节点
-        // 它内部只包含一个表达式,我们让这个表达式接受visitor,然后丢弃结果
-        if (_expression != null)
-        {
-            return _expression.Accept(visitor);
-        }
-
-        if (_instance != null)
-        {
-            return _instance.Accept(visitor);
-        }
-
-        if (_operation != null)
-        {
-            return _operation.Accept(visitor);
-        }
-
-        if (_awaitExpr != null)
-        {
-            return _awaitExpr.Accept(visitor);
-        }
-
-        if (_genericInstance != null)
-        {
-            return _genericInstance.Accept(visitor);
-        }
-
-        // 如果都为空,返回默认值
-        return default(TResult)!;
+        return visitor.VisitFuncRunStatement(this);
     }
 }

@@ -224,4 +224,17 @@ public partial class BytecodeVisitor
     }
 
 
+
+    /// <summary>
+    /// 访问 FuncRunStatement 节点（字节码模式：委托给内部表达式）
+    /// </summary>
+    public Instruction? VisitFuncRunStatement(FuncRunStatement node)
+    {
+        if (node._expression != null) return node._expression.Accept(this);
+        if (node._instance != null) return node._instance.Accept(this);
+        if (node._operation != null) return node._operation.Accept(this);
+        if (node._awaitExpr != null) return node._awaitExpr.Accept(this);
+        if (node._genericInstance != null) return node._genericInstance.Accept(this);
+        return null;
+    }
 }
