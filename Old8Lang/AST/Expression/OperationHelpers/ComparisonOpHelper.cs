@@ -13,32 +13,36 @@ namespace Old8Lang.AST.Expression.OperationHelpers;
 internal static class ComparisonOpHelper
 {
     /// <summary>
-    /// 处理 object vs int 的特殊比较情况
-    /// 将 int 装箱后使用 IComparable.CompareTo 或 object.Equals
+    /// 处理 object 与数值的比较：集合索引和动态调用会返回 object，
+    /// 但其运行期值仍可能是任意 CLR 数值类型。
     /// </summary>
     /// <param name="leftType">左操作数类型</param>
     /// <param name="rightType">右操作数类型</param>
     /// <returns>如果是 object vs int 特殊情况返回 true</returns>
-    private static bool IsObjectVsIntComparison(Type? leftType, Type? rightType)
+    private static bool IsObjectVsNumericComparison(Type? leftType, Type? rightType)
     {
-        return (leftType == typeof(object) && rightType == typeof(int)) ||
-               (leftType == typeof(int) && rightType == typeof(object));
+        return (leftType == typeof(object) && IsNumericType(rightType)) ||
+               (IsNumericType(leftType) && rightType == typeof(object));
     }
 
     /// <summary>
-    /// 装箱 int 类型为 object
+    /// 装箱数值类型为 object
     /// </summary>
-    private static void BoxIntIfNeeded(ILGenerator ilGenerator, Type? leftType, Type? rightType)
+    private static void BoxNumericIfNeeded(ILGenerator ilGenerator, Type? leftType, Type? rightType)
     {
-        if (leftType == typeof(int))
+        if (leftType is not null && IsNumericType(leftType))
         {
-            ilGenerator.Emit(OpCodes.Box, typeof(int));
+            ilGenerator.Emit(OpCodes.Box, leftType);
         }
-        if (rightType == typeof(int))
+        if (rightType is not null && IsNumericType(rightType))
         {
-            ilGenerator.Emit(OpCodes.Box, typeof(int));
+            ilGenerator.Emit(OpCodes.Box, rightType);
         }
     }
+
+    private static bool IsNumericType(Type? type) => type == typeof(int) || type == typeof(double) ||
+                                                     type == typeof(float) || type == typeof(long) ||
+                                                     type == typeof(short) || type == typeof(byte);
 
     /// <summary>
     /// 将基本类型转换为 LangValueType
@@ -134,10 +138,10 @@ internal static class ComparisonOpHelper
         right?.LoadIlValue(ilGenerator, local);
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
-        if (IsObjectVsIntComparison(gtLeftType, gtRightType))
+        if (IsObjectVsNumericComparison(gtLeftType, gtRightType))
         {
             // 装箱 int
-            BoxIntIfNeeded(ilGenerator, gtLeftType, gtRightType);
+            BoxNumericIfNeeded(ilGenerator, gtLeftType, gtRightType);
 
             // 使用 IComparable.CompareTo 方法进行比较
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
@@ -209,10 +213,10 @@ internal static class ComparisonOpHelper
         right?.LoadIlValue(ilGenerator, local);
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
-        if (IsObjectVsIntComparison(ltLeftType, ltRightType))
+        if (IsObjectVsNumericComparison(ltLeftType, ltRightType))
         {
             // 装箱 int
-            BoxIntIfNeeded(ilGenerator, ltLeftType, ltRightType);
+            BoxNumericIfNeeded(ilGenerator, ltLeftType, ltRightType);
 
             // 使用 IComparable.CompareTo 方法进行比较
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
@@ -290,10 +294,10 @@ internal static class ComparisonOpHelper
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
-        else if (IsObjectVsIntComparison(leftOpType, rightOpType))
+        else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
         {
             // 装箱 int
-            BoxIntIfNeeded(ilGenerator, leftOpType, rightOpType);
+            BoxNumericIfNeeded(ilGenerator, leftOpType, rightOpType);
 
             // 使用 object.Equals 方法进行比较
             var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
@@ -330,9 +334,9 @@ internal static class ComparisonOpHelper
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
         // object 与 int 混用（如未注解的函数参数）：先装箱再按值比较
-        else if (IsObjectVsIntComparison(leftOpType, rightOpType))
+        else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
         {
-            BoxIntIfNeeded(ilGenerator, leftOpType, rightOpType);
+            BoxNumericIfNeeded(ilGenerator, leftOpType, rightOpType);
             var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
@@ -403,9 +407,9 @@ internal static class ComparisonOpHelper
         right?.LoadIlValue(ilGenerator, local);
 
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
-        if (IsObjectVsIntComparison(leftType, rightType))
+        if (IsObjectVsNumericComparison(leftType, rightType))
         {
-            BoxIntIfNeeded(ilGenerator, leftType, rightType);
+            BoxNumericIfNeeded(ilGenerator, leftType, rightType);
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);
@@ -478,9 +482,9 @@ internal static class ComparisonOpHelper
         right?.LoadIlValue(ilGenerator, local);
 
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
-        if (IsObjectVsIntComparison(leftType, rightType))
+        if (IsObjectVsNumericComparison(leftType, rightType))
         {
-            BoxIntIfNeeded(ilGenerator, leftType, rightType);
+            BoxNumericIfNeeded(ilGenerator, leftType, rightType);
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);

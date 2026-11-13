@@ -129,7 +129,7 @@
   `InheritanceTests` 全组 10 项通过，见 [前序测试报告](Reports/2026-11-13-10-00-IL继承语法与super调用.md) 与
   [成员访问测试报告](Reports/2026-11-13-10-30-IL继承成员访问.md)。
 - [x] **`SelectStatementTests` 整组测试完成性**：带 10 秒挂起超时复跑 21 项全部通过；先前运行卡住的原因未复现。见 [测试报告](Reports/2026-11-11-13-55-IL-select整组复测.md)。
-- [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 9 项通过、5 项失败，涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；方法重载测试取值顺序修正后已通过。字段初始值与初始化器参数为不同数值类型时现会显式转换，构造器链回归已通过；类方法中的 `number.Sqrt()` 现映射到 `Math.Sqrt(double)`。当前 `ClassInstantiationTests` 剩余字典对象无效 IL、字典字段被推断为列表及数组索引结果的数值比较三项待处理；见 [构造器数值转换报告](Reports/2026-11-13-10-40-IL构造器数值转换.md)、[数值 Sqrt 报告](Reports/2026-11-13-10-50-IL数值Sqrt实例调用.md) 与 [既有测试报告](Reports/2026-11-11-16-24-IL类实例化扩展回归.md)。
+- [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 9 项通过、5 项失败，涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；方法重载测试取值顺序修正后已通过。字段初始值与初始化器参数为不同数值类型时现会显式转换，构造器链回归已通过；类方法中的 `number.Sqrt()` 现映射到 `Math.Sqrt(double)`；动态数组索引结果可与所有 CLR 数值类型比较。当前 `ClassInstantiationTests` 剩余字典对象无效 IL、字典字段被推断为列表两项待处理；见 [构造器数值转换报告](Reports/2026-11-13-10-40-IL构造器数值转换.md)、[数值 Sqrt 报告](Reports/2026-11-13-10-50-IL数值Sqrt实例调用.md)、[动态数值比较报告](Reports/2026-11-13-11-00-IL动态数值比较.md) 与 [既有测试报告](Reports/2026-11-11-16-24-IL类实例化扩展回归.md)。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
