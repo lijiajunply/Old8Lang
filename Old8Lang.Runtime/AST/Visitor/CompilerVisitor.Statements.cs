@@ -1009,7 +1009,7 @@ public partial class CompilerVisitor
                 }
 
                 // 对于字典，需要在加载键和值时进行类型转换
-                if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                if (listType!.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
                     var genericArgs = listType.GetGenericArguments();
                     var dictKeyType = genericArgs[0];

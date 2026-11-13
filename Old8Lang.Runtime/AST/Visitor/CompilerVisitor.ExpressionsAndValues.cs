@@ -398,7 +398,7 @@ public partial class CompilerVisitor
         var dynamicMethod = new DynamicMethod(
             $"AsyncGenerator_{node.AsyncFunc.Id?.IdName ?? "Anonymous"}",
             returnType,
-            parameterTypes,
+            parameterTypes!,
             true
         );
 
@@ -440,9 +440,9 @@ public partial class CompilerVisitor
             {
                 var id = node.AsyncFunc.Ids[i];
                 var paramType = parameterTypes[i];
-                var localVar = methodIl.DeclareLocal(paramType);
+                var localVar = methodIl.DeclareLocal(paramType!);
                 funcLocal.AddLocalVar(id.IdName, localVar);
-                funcLocal.LocalVarTypes[id.IdName] = paramType;
+                funcLocal.LocalVarTypes[id.IdName] = paramType!;
 
                 methodIl.Emit(OpCodes.Ldarg, i);
                 methodIl.Emit(OpCodes.Stloc, localVar);
@@ -454,7 +454,7 @@ public partial class CompilerVisitor
 
         // 4. 创建委托并加载到栈上
         var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
+            parameterTypes!.Cast<Type>().Concat([returnType]).ToArray());
 
         ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
         ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
@@ -482,7 +482,6 @@ public partial class CompilerVisitor
             "IL 模式暂不支持 CancellationToken 类型"
         );
 
-        return null;
     
     }
 
@@ -494,7 +493,6 @@ public partial class CompilerVisitor
             "IL 模式暂不支持 CancellationTokenSource 类型"
         );
 
-        return null;
     
     }
 
@@ -1063,7 +1061,7 @@ public partial class CompilerVisitor
             node.EmitIntIndex(ilGenerator, local); // 加载索引
             ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetStringChar))!);
         }
-        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        else if (listType!.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
             // 处理Dictionary<TKey, TValue>类型的字典索引访问
             node.ListId.Accept(this); // 加载字典
@@ -1627,7 +1625,6 @@ public partial class CompilerVisitor
             "IL 模式暂不支持 TaskCompletionSource 类型"
         );
 
-        return null;
     
     }
 

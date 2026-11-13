@@ -164,7 +164,7 @@ public partial class CompilerVisitor
         var dynamicMethod = new DynamicMethod(
             node.Id?.IdName ?? "AnonymousAsync",
             returnType,
-            parameterTypes,
+            parameterTypes!,
             true
         );
 
@@ -216,7 +216,7 @@ public partial class CompilerVisitor
 
         // 4. 创建委托并加载到栈上
         var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
+            parameterTypes!.Cast<Type>().Concat([returnType]).ToArray());
 
         ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
         ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);

@@ -918,7 +918,6 @@ public partial class InterpreterVisitor
             node,
             value.ToDisplayString());
 
-        return new VoidLangValue();
     
     }
 

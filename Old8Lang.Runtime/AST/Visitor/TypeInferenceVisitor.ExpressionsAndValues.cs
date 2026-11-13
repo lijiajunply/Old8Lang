@@ -888,7 +888,7 @@ return node.Value.GetType();
             return typeof(char); // 字符串索引访问返回 char 类型
         }
 
-        if (listType.IsArray)
+        if (listType!.IsArray)
         {
             // 数组索引访问返回数组元素类型
             return listType.GetElementType() ?? typeof(object);
@@ -1308,7 +1308,7 @@ return node.Value.GetType();
             .ToArray();
         var returnType = typeof(Task<object>);
         return System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
+            parameterTypes!.Cast<Type>().Concat([returnType]).ToArray());
     }
 
     public Type? VisitNativeAnyLangValue(NativeAnyLangValue node)

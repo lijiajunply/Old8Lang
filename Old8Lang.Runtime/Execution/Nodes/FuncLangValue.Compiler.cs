@@ -34,7 +34,7 @@ public partial class FuncLangValue
 
             if (item is ReturnStatement returnStatement)
             {
-                return returnStatement.Accept(new TypeInferenceVisitor(local));
+                return returnStatement.Accept(new TypeInferenceVisitor(local))!;
             }
 
             if (item is null || item.Count == 0)
@@ -114,7 +114,7 @@ public partial class FuncLangValue
         // 先处理参数，将它们添加到 funcLocal 中，这样 GetItemType 才能正确推断返回类型
         for (var i = 0; i < Ids!.Count; i++)
         {
-            funcLocal.LocalVarTypes[Ids[i].IdName] = parameterTypes[i];
+            funcLocal.LocalVarTypes[Ids[i].IdName] = parameterTypes[i]!;
         }
 
         // 获取返回类型
@@ -124,7 +124,7 @@ public partial class FuncLangValue
         var dynamicMethod = new DynamicMethod(
             methodName,
             returnType,
-            [typeof(object[]), .. parameterTypes],
+            [typeof(object[]), .. parameterTypes!],
             true);
         var methodIl = dynamicMethod.GetILGenerator();
 
@@ -132,7 +132,7 @@ public partial class FuncLangValue
         for (var i = 0; i < Ids!.Count; i++)
         {
             var paramType = parameterTypes[i];
-            var localVar = methodIl.DeclareLocal(paramType);
+            var localVar = methodIl.DeclareLocal(paramType!);
             funcLocal.AddLocalVar(Ids[i].IdName, localVar);
             methodIl.Emit(OpCodes.Ldarg, i + 1);
             methodIl.Emit(OpCodes.Stloc, localVar);

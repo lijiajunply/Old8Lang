@@ -202,7 +202,7 @@ public partial class CompilerVisitor
             var id = node.AsyncFuncValue.Ids[i];
             var paramType = parameterTypes[i];
             // 存储参数类型，用于后续推断返回类型
-            funcLocal.LocalVarTypes[id.IdName] = paramType;
+            funcLocal.LocalVarTypes[id.IdName] = paramType!;
         }
 
         // 异步函数返回Task<object>
@@ -212,7 +212,7 @@ public partial class CompilerVisitor
         var dynamicMethod = new DynamicMethod(
             methodName,
             returnType,
-            parameterTypes,
+            parameterTypes!,
             true
         );
 
@@ -228,7 +228,7 @@ public partial class CompilerVisitor
             var id = node.AsyncFuncValue.Ids[i];
             // 使用实际的参数类型声明局部变量
             var paramType = parameterTypes[i];
-            var localVar = methodIl.DeclareLocal(paramType);
+            var localVar = methodIl.DeclareLocal(paramType!);
             funcLocal.AddLocalVar(id.IdName, localVar);
             // 加载参数并存储到局部变量
             methodIl.Emit(OpCodes.Ldarg, i);
@@ -240,7 +240,7 @@ public partial class CompilerVisitor
 
         // 将方法添加到本地变量管理器
         // 使用函数名+参数类型作为键，支持更准确的函数重载
-        var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+        var paramTypeNames = string.Join("_", parameterTypes!.Select(t => t!.Name));
         var delegateKey = $"{methodName}${paramTypeNames}";
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
@@ -886,7 +886,7 @@ public partial class CompilerVisitor
             // 创建一个临时的LocalBuilder来表示参数
             // 注意：这里我们不能使用真正的LocalBuilder，因为还没有创建ILGenerator
             // 所以我们使用一个占位符，稍后会替换
-            funcLocal.LocalVarTypes[id.IdName] = paramType;
+            funcLocal.LocalVarTypes[id.IdName] = paramType!;
         }
 
         // 优先使用显式声明的返回类型
@@ -902,7 +902,7 @@ public partial class CompilerVisitor
         var dynamicMethod = new DynamicMethod(
             methodName,
             returnType,
-            parameterTypes,
+            parameterTypes!,
             true
         );
 
@@ -914,7 +914,7 @@ public partial class CompilerVisitor
         var delegateKey = methodName;
         if (funcToCompile.Ids is not null)
         {
-            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+            var paramTypeNames = string.Join("_", parameterTypes!.Select(t => t!.Name));
             delegateKey = $"{methodName}${paramTypeNames}";
         }
 

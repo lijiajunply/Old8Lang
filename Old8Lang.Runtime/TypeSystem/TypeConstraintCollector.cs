@@ -152,7 +152,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
             var returnType = returnStmt.Accept(new TypeInferenceVisitor(localManager));
             if (returnType != typeof(void))
             {
-                returnTypes.Add(returnType);
+                returnTypes.Add(returnType!);
             }
         }
 

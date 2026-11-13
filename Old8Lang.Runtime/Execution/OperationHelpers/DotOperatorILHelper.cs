@@ -1038,7 +1038,7 @@ public static class DotOperatorILHelper
         if (receiver is IDictionary dictionary &&
             methodName.Equals("GetOrElse", StringComparison.OrdinalIgnoreCase) && arguments.Length == 2)
         {
-            return dictionary.Contains(arguments[0]) ? dictionary[arguments[0]] : arguments[1];
+            return dictionary.Contains(arguments[0]!) ? dictionary[arguments[0]!] : arguments[1];
         }
 
         var type = receiver.GetType();

@@ -6,27 +6,15 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
+public partial class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public LangExpression Condition => expression;
     public BlockStatement Block => blockStatement;
 
-    public void Run(VariateManager manager, ref bool r)
-    {
-        if (!r) return;
-        var exprValue = expression.Accept(new InterpreterVisitor(manager));
-        if (exprValue is not BoolLangValue { Value: true }) return;
-        blockStatement.Accept(new InterpreterVisitor(manager));
-        r = false;
-    }
 
     public override string ToString() => $"{expression}\n {{ {blockStatement} }}";
 
-    public void GenerateConditionIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
-    }
 
     public override OldStatement this[int index] => blockStatement[index];
 
