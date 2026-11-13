@@ -12,6 +12,13 @@ namespace Old8Lang.Tests.Architecture;
 public class ModuleCompositionTests
 {
     [Fact]
+    public void SourceContracts_AreProvidedByCoreAssembly()
+    {
+        Assert.Equal("Old8Lang.Core", typeof(SourcePosition).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangInfo).Assembly.GetName().Name);
+    }
+
+    [Fact]
     public void OfficialModules_AreRegisteredByTheHostCompositionRoot()
     {
         var expectedNames = new[]
