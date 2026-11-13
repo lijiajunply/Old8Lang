@@ -88,6 +88,10 @@ public class LangInterpreter : ISourceContextProvider
     {
         ArgumentNullException.ThrowIfNull(standardLibraries);
         PerformanceMonitor = performanceMonitor;
+        if (performanceMonitor is global::Old8Lang.Profiler.PerformanceMonitor concretePerformanceMonitor)
+        {
+            concretePerformanceMonitor.SetObjectPoolStatisticsSource(ObjectPoolManager.Instance.GetAllStats);
+        }
         Manager.StandardLibraries = standardLibraries;
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Old8Lang.Interpreter;
 
 namespace Old8Lang.Profiler;
 
@@ -29,6 +28,16 @@ public class PerformanceMonitor : IPerformanceMonitor
 
     // 性能基线（用于退化检测）
     private PerformanceMetrics? _baselineMetrics;
+    private Func<IEnumerable<ObjectPoolStats>>? _objectPoolStatisticsSource;
+
+    /// <summary>
+    /// 配置对象池统计来源。观测程序集不依赖具体执行后端；解释器在创建时提供自己的对象池。
+    /// </summary>
+    public void SetObjectPoolStatisticsSource(Func<IEnumerable<ObjectPoolStats>> objectPoolStatisticsSource)
+    {
+        ArgumentNullException.ThrowIfNull(objectPoolStatisticsSource);
+        _objectPoolStatisticsSource = objectPoolStatisticsSource;
+    }
 
     /// <summary>
     /// 检查监控是否启用
@@ -124,7 +133,10 @@ public class PerformanceMonitor : IPerformanceMonitor
 
             // 收集对象池统计信息
             _metrics.ObjectPoolStats.Clear();
-            _metrics.ObjectPoolStats.AddRange(ObjectPoolManager.Instance.GetAllStats());
+            if (_objectPoolStatisticsSource is not null)
+            {
+                _metrics.ObjectPoolStats.AddRange(_objectPoolStatisticsSource());
+            }
 
             IsMonitoring = false;
         }

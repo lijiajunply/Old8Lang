@@ -34,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Old8Lang.SerializationLib\Old8Lang.SerializationLib.csproj" />
     <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
+    <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
     <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
     <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
     <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />

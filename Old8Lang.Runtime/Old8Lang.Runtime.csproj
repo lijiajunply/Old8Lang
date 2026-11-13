@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Old8Lang.Core\Old8Lang.Core.csproj" />
     <ProjectReference Include="..\Old8Lang.Concurrency\Old8Lang.Concurrency.csproj" />
     <ProjectReference Include="..\Old8Lang.Modules.Abstractions\Old8Lang.Modules.Abstractions.csproj" />
+    <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
   </ItemGroup>
 
 </Project>
