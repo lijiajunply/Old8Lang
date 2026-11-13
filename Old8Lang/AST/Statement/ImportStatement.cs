@@ -188,10 +188,11 @@ public partial class ImportStatement(
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
         // 在 IL 模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
-        if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+        var standardLibraries = local.Interpreter?.Manager.StandardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
+        if (standardLibraries.IsStandardLibrary(moduleName))
         {
             // 验证标准库是否可用（程序集和类是否存在）
-            if (!StandardLibraryLoader.ValidateStandardLibrary(moduleName, out var errorMessage))
+            if (!StandardLibraryLoader.ValidateStandardLibrary(moduleName, out var errorMessage, standardLibraries))
             {
                 throw new ImportError(Position, moduleName,
                     $"编译时验证失败: {errorMessage}\n\n" +
@@ -199,14 +200,14 @@ public partial class ImportStatement(
             }
 
             if (!_fromClause && StandardLibraryLoader.TryLoadStandardLibrary(
-                    moduleName, new VariateManager(), out var standardModule))
+                    moduleName, new VariateManager { StandardLibraries = standardLibraries }, out var standardModule))
                 local.GlobalStaticClasses[_moduleAlias ?? moduleName] = standardModule;
 
             return;
         }
 
         // 使用 ModuleResolver 进行统一的模块解析
-        var resolver = new ModuleResolver();
+        var resolver = new ModuleResolver(standardLibraries);
         var resolution = resolver.ResolveModule(moduleName, local.FilePath);
 
         // 如果解析失败，抛出详细错误

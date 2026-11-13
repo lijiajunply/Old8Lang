@@ -19,7 +19,6 @@ namespace Old8Lang.ModuleSystem.Core;
 /// </summary>
 public class ModuleSystemService
 {
-    private readonly ModuleResolver _resolver = new();
     private readonly ModuleLoader _loader = new();
     private readonly SymbolExtractor _symbolExtractor = new();
     private readonly SymbolRegistry _symbolRegistry = new();
@@ -38,7 +37,8 @@ public class ModuleSystemService
         try
         {
             // 1. 解析模块
-            var resolution = _resolver.ResolveModule(moduleName, manager.Path, manager);
+            var resolver = new ModuleResolver(manager.StandardLibraries);
+            var resolution = resolver.ResolveModule(moduleName, manager.Path, manager);
             result.ResolutionResult = resolution;
 
             if (!resolution.IsSuccess)
@@ -359,7 +359,7 @@ public class ModuleSystemService
     /// <summary>
     /// 获取解析器
     /// </summary>
-    public ModuleResolver Resolver => _resolver;
+    public ModuleResolver Resolver => new();
 
     /// <summary>
     /// 获取加载器

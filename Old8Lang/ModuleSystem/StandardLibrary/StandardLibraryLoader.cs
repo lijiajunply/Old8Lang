@@ -35,7 +35,7 @@ public static class StandardLibraryLoader
         VariateManager manager,
         out LangValueType module)
     {
-        if (!StandardLibraryRegistry.IsStandardLibrary(libraryName))
+        if (!manager.StandardLibraries.IsStandardLibrary(libraryName))
         {
             module = new VoidLangValue();
             return false;
@@ -43,7 +43,7 @@ public static class StandardLibraryLoader
 
         try
         {
-            var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
+            var libInfo = manager.StandardLibraries.GetLibraryInfo(libraryName)!;
             var assembly = libInfo.GetAssembly();
 
             // 根据导入模式加载
@@ -72,12 +72,16 @@ public static class StandardLibraryLoader
     /// <param name="libraryName">库名称</param>
     /// <param name="errorMessage">如果验证失败，返回错误信息</param>
     /// <returns>是否验证成功</returns>
-    public static bool ValidateStandardLibrary(string libraryName, out string? errorMessage)
+    public static bool ValidateStandardLibrary(
+        string libraryName,
+        out string? errorMessage,
+        StandardLibraryCatalog? standardLibraries = null)
     {
         errorMessage = null;
+        standardLibraries ??= StandardLibraryRegistry.DefaultCatalog;
 
         // 检查是否为标准库
-        if (!StandardLibraryRegistry.IsStandardLibrary(libraryName))
+        if (!standardLibraries.IsStandardLibrary(libraryName))
         {
             errorMessage = $"'{libraryName}' 不是已注册的标准库";
             return false;
@@ -85,7 +89,7 @@ public static class StandardLibraryLoader
 
         try
         {
-            var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
+            var libInfo = standardLibraries.GetLibraryInfo(libraryName)!;
 
             // 尝试加载程序集（不抛出异常，只验证）
             libInfo.GetAssembly();

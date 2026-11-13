@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.AsyncGeneration;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.Interpreter;
 
@@ -28,6 +29,11 @@ public class VariateManager
     /// 语言信息，包含库信息和导入路径等
     /// </summary>
     public LangInfo? LangInfo { get; set; }
+
+    /// <summary>
+    /// 当前执行上下文可见的标准库目录。
+    /// </summary>
+    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryRegistry.DefaultCatalog;
 
     /// <summary>
     /// 当前源代码文件路径
@@ -1070,6 +1076,7 @@ public class VariateManager
         var newManager = new VariateManager
         {
             LangInfo = LangInfo,
+            StandardLibraries = StandardLibraries,
             Path = Path,
             Interpreter = Interpreter,
             IsFunc = IsFunc,

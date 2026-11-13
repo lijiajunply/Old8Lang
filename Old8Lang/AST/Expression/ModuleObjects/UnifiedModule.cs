@@ -297,7 +297,7 @@ public class UnifiedModule(
         manager = manager ?? initialManager;
 
         // 1. 解析模块路径
-        var resolver = new ModuleResolver();
+        var resolver = new ModuleResolver(manager.StandardLibraries);
         var resolutionResult = resolver.ResolveModule(ModuleName, manager.Path, manager);
 
         if (!resolutionResult.IsSuccess || resolutionResult.ResolvedPath is null)
@@ -320,6 +320,7 @@ public class UnifiedModule(
         {
             Path = resolutionResult.ResolvedPath, // 使用已解析的模块路径，而不是父文件路径
             LangInfo = manager.LangInfo,
+            StandardLibraries = manager.StandardLibraries,
             Interpreter = manager.Interpreter
         };
 

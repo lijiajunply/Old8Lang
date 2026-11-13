@@ -3,8 +3,8 @@ using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.TypeSystem;
-
 using Old8Lang.Profiler;
 
 namespace Old8Lang.Interpreter;
@@ -57,7 +57,7 @@ public class LangInterpreter
     /// <summary>
     /// 初始化LangInterpreter实例
     /// </summary>
-    public LangInterpreter() : this(null)
+    public LangInterpreter() : this((IPerformanceMonitor?)null)
     {
     }
 
@@ -66,8 +66,29 @@ public class LangInterpreter
     /// </summary>
     /// <param name="performanceMonitor">性能监控器（可选）</param>
     public LangInterpreter(IPerformanceMonitor? performanceMonitor)
+        : this(performanceMonitor, StandardLibraryRegistry.DefaultCatalog)
     {
+    }
+
+    /// <summary>
+    /// 初始化使用指定标准库目录的解释器。
+    /// </summary>
+    /// <param name="standardLibraries">宿主提供的模块目录。</param>
+    public LangInterpreter(StandardLibraryCatalog standardLibraries)
+        : this((IPerformanceMonitor?)null, standardLibraries)
+    {
+    }
+
+    /// <summary>
+    /// 初始化解释器，并指定性能监控器和模块目录。
+    /// </summary>
+    /// <param name="performanceMonitor">性能监控器（可选）。</param>
+    /// <param name="standardLibraries">宿主提供的模块目录。</param>
+    public LangInterpreter(IPerformanceMonitor? performanceMonitor, StandardLibraryCatalog standardLibraries)
+    {
+        ArgumentNullException.ThrowIfNull(standardLibraries);
         PerformanceMonitor = performanceMonitor;
+        Manager.StandardLibraries = standardLibraries;
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
 

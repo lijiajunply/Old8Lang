@@ -1,5 +1,7 @@
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Abstractions;
+using Old8Lang.Interpreter;
+using Old8Lang.Profiler;
 
 namespace Old8Lang.Hosting;
 
@@ -55,5 +57,15 @@ public sealed class Old8Host
     public void InstallAsDefault()
     {
         StandardLibraryRegistry.SetDefaultCatalog(StandardLibraries);
+    }
+
+    /// <summary>
+    /// 创建使用此 Host 模块目录的解释器。
+    /// </summary>
+    /// <param name="performanceMonitor">可选性能监控器。</param>
+    /// <returns>隔离的解释器实例。</returns>
+    public LangInterpreter CreateInterpreter(IPerformanceMonitor? performanceMonitor = null)
+    {
+        return new LangInterpreter(performanceMonitor, StandardLibraries);
     }
 }

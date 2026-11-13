@@ -236,6 +236,16 @@ public class ModuleResolver
 {
     private readonly PathResolver _pathResolver = new();
     private readonly VersionResolver _versionResolver = new();
+    private readonly StandardLibraryCatalog _standardLibraries;
+
+    /// <summary>
+    /// 创建模块解析器。
+    /// </summary>
+    /// <param name="standardLibraries">解析时可见的标准库目录；省略时使用默认目录。</param>
+    public ModuleResolver(StandardLibraryCatalog? standardLibraries = null)
+    {
+        _standardLibraries = standardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
+    }
 
     /// <summary>
     /// 解析模块
@@ -302,7 +312,7 @@ public class ModuleResolver
 
         // 3. 优先级 1: 标准库
         stepNumber++;
-        var isStandardLib = StandardLibraryRegistry.IsStandardLibrary(moduleName);
+        var isStandardLib = _standardLibraries.IsStandardLibrary(moduleName);
         result.ResolutionAttempts.Add(new ResolutionAttempt
         {
             StepNumber = stepNumber,

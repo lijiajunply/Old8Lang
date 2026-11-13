@@ -56,4 +56,16 @@ public class ModuleCompositionTests
         Assert.True(first.StandardLibraries.IsStandardLibrary("Database"));
         Assert.False(second.StandardLibraries.IsStandardLibrary("Database"));
     }
+
+    [Fact]
+    public void HostCreatedInterpreter_UsesItsOwnModuleCatalog()
+    {
+        var configuredBuilder = new Old8HostBuilder();
+        OfficialModules.RegisterAll(configuredBuilder);
+        var configuredInterpreter = configuredBuilder.Build().CreateInterpreter();
+        var emptyInterpreter = new Old8HostBuilder().Build().CreateInterpreter();
+
+        Assert.True(configuredInterpreter.Manager.StandardLibraries.IsStandardLibrary("Math"));
+        Assert.False(emptyInterpreter.Manager.StandardLibraries.IsStandardLibrary("Math"));
+    }
 }
