@@ -2,13 +2,8 @@ using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST;
 
-public interface IOldLangTree
+public interface IOldLangTree : ISourceLocated
 {
-    /// <summary>
-    /// 源代码位置信息
-    /// </summary>
-    SourcePosition Position { get; }
-
     /// <summary>
     /// 接受 Visitor 访问（Visitor 模式）
     /// </summary>

@@ -16,7 +16,7 @@ namespace Old8Lang.Interpreter;
 /// 解释器是Old8Lang的核心组件之一，提供了代码的词法分析、语法分析和执行功能。
 /// 它支持两种运行模式：解释模式和 IL 模式（通过与编译器协同工作）。
 /// </remarks>
-public class LangInterpreter
+public class LangInterpreter : ISourceContextProvider
 {
     /// <summary>
     /// 变量管理器，负责管理解释器运行时的变量和作用域
@@ -135,7 +135,7 @@ public class LangInterpreter
         Manager.Path = fileName ?? "";
 
         // 设置当前解释器，以便在错误处理中使用
-        Old8Exception.CurrentInterpreter = this;
+        Old8Exception.CurrentSourceContextProvider = this;
 
         // 词法分析：将代码转换为标记流和文件头指令（支持预编译指令）
         var (tokens, headerDirectives) = LangTokenizer.TokenizeWithDirectives(code, preprocessorSymbols);

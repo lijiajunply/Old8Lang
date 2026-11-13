@@ -142,29 +142,29 @@ public class ExceptionCreationTests
     }
     
     [Fact]
-    public void Old8Exception_CurrentInterpreter_CanBeSetAndGet()
+    public void Old8Exception_CurrentSourceContextProvider_CanBeSetAndGet()
     {
         // Arrange
         var interpreter = new LangInterpreter();
         
         // Act
-        Old8Exception.CurrentInterpreter = interpreter;
-        var result = Old8Exception.CurrentInterpreter;
+        Old8Exception.CurrentSourceContextProvider = interpreter;
+        var result = Old8Exception.CurrentSourceContextProvider;
         
         // Assert
         Assert.Equal(interpreter, result);
     }
     
     [Fact]
-    public void Old8Exception_CurrentInterpreter_CanBeResetToNull()
+    public void Old8Exception_CurrentSourceContextProvider_CanBeResetToNull()
     {
         // Arrange
         var interpreter = new LangInterpreter();
-        Old8Exception.CurrentInterpreter = interpreter;
+        Old8Exception.CurrentSourceContextProvider = interpreter;
         
         // Act
-        Old8Exception.CurrentInterpreter = null;
-        var result = Old8Exception.CurrentInterpreter;
+        Old8Exception.CurrentSourceContextProvider = null;
+        var result = Old8Exception.CurrentSourceContextProvider;
         
         // Assert
         Assert.Null(result);

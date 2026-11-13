@@ -1,6 +1,3 @@
-using Old8Lang.AST;
-using Old8Lang.Interpreter;
-
 namespace Old8Lang.Error;
 
 /// <summary>
@@ -44,7 +41,7 @@ public class Old8Exception : Exception
     /// 当前解释器实例，用于获取源代码上下文（线程隔离，避免并行测试互相污染）
     /// </summary>
     [field: ThreadStatic]
-    public static LangInterpreter? CurrentInterpreter { get; set; }
+    public static ISourceContextProvider? CurrentSourceContextProvider { get; set; }
 
     /// <summary>
     /// 错误代码
@@ -64,7 +61,7 @@ public class Old8Exception : Exception
     /// <summary>
     /// AST节点
     /// </summary>
-    public IOldLangTree? Node { get; }
+    public ISourceLocated? Node { get; }
 
     /// <summary>
     /// 源代码上下文
@@ -175,7 +172,7 @@ public class Old8Exception : Exception
         string errorCode,
         string message,
         SourcePosition position,
-        IOldLangTree? node = null,
+        ISourceLocated? node = null,
         string? suggestion = null,
         string[]? sourceContext = null,
         Guid? requestId = null,
@@ -200,7 +197,7 @@ public class Old8Exception : Exception
         string errorCode,
         string message,
         SourcePosition position,
-        IOldLangTree? node,
+        ISourceLocated? node,
         string? suggestion,
         string[]? sourceContext,
         Guid? requestId,
@@ -227,7 +224,7 @@ public class Old8Exception : Exception
         string errorCode,
         string message,
         SourcePosition position,
-        IOldLangTree? node,
+        ISourceLocated? node,
         string? suggestion,
         SourceContextWindow sourceContext,
         Guid? requestId,
@@ -266,7 +263,7 @@ public class Old8Exception : Exception
     public Old8Exception(
         string errorCode,
         string message,
-        IOldLangTree node,
+        ISourceLocated node,
         string? suggestion = null,
         string[]? sourceContext = null,
         Guid? requestId = null,
@@ -290,7 +287,7 @@ public class Old8Exception : Exception
     public Old8Exception(
         string errorCode,
         string message,
-        IOldLangTree node,
+        ISourceLocated node,
         string? suggestion,
         string[]? sourceContext,
         Guid? requestId,
@@ -337,9 +334,9 @@ public class Old8Exception : Exception
         }
 
         // 否则从当前解释器获取
-        if (CurrentInterpreter is not null)
+        if (CurrentSourceContextProvider is not null)
         {
-            return CurrentInterpreter.GetSourceContextWindow(position);
+            return CurrentSourceContextProvider.GetSourceContextWindow(position);
         }
 
         // 如果没有解释器，返回空窗口
