@@ -109,7 +109,7 @@ public partial class InterpreterVisitor
         {
             // 标准执行模式（非生成器）
             // 先执行导入语句
-            node.ImportRun(manager);
+            ExecuteImports(node);
 
             // 顺序执行所有语句
             for (int i = 0; i < node.Count; i++)
@@ -138,6 +138,14 @@ public partial class InterpreterVisitor
         return new VoidLangValue();
     }
 
+    private void ExecuteImports(BlockStatement node)
+    {
+        foreach (var statement in node.ImportStatements)
+        {
+            statement.Run(manager);
+        }
+    }
+
     /// <summary>
     /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
@@ -147,7 +155,7 @@ public partial class InterpreterVisitor
         var context = manager.GeneratorContext!;
 
         // 先执行导入语句
-        node.ImportRun(manager);
+        ExecuteImports(node);
 
         // 检查是否需要恢复执行
         bool isResuming = !string.IsNullOrEmpty(context.ExecutionPath);

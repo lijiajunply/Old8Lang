@@ -82,17 +82,6 @@ public partial class BlockStatement : OldStatement
         }
     }
 
-    public void ImportRun(VariateManager manager)
-    {
-        // 直接运行ImportStatements列表中的语句，不管IsCompileOptimization属性的值是什么
-        foreach (var statement in ImportStatements)
-        {
-            statement.Run(manager);
-            // 不要在ImportRun中检查IsReturn，因为这会导致主函数体无法执行
-            // if (manager.IsReturn) return;
-        }
-    }
-
     /// <summary>
     /// 执行模块的非导入语句，包括函数定义、类定义和变量赋值
     /// 但跳过导入语句，避免递归导入
