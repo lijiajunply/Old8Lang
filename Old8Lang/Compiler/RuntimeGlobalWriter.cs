@@ -34,6 +34,24 @@ public static class RuntimeGlobalWriter
     }
 
     /// <summary>
+    /// 捕获当前回写目标，供 Spawn 创建的 CLR 线程在完成时刷新共享全局变量。
+    /// </summary>
+    public static object? CaptureContext() => _manager;
+
+    /// <summary>
+    /// 在当前 CLR 线程安装回写目标，并返回该线程原有的目标。
+    /// </summary>
+    public static object? InstallContext(object? context)
+    {
+        var previous = _manager;
+        _manager = context as VariateManager;
+        _convertedCollections = _manager is null
+            ? null
+            : new Dictionary<object, LangValueType>(ReferenceEqualityComparer.Instance);
+        return previous;
+    }
+
+    /// <summary>
     /// 把一个顶层变量的值写回管理器。
     /// </summary>
     /// <param name="name">变量名</param>

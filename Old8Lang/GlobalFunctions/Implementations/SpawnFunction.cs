@@ -178,14 +178,17 @@ public sealed class SpawnFunction : BaseGlobalFunction
         }
 
         var globalContext = RuntimeGlobals.CaptureContext();
+        var writerContext = RuntimeGlobalWriter.CaptureContext();
         ThreadLangValue? thread = null;
         thread = new ThreadLangValue(() =>
         {
             var previousContext = RuntimeGlobals.InstallContext(globalContext);
+            var previousWriterContext = RuntimeGlobalWriter.InstallContext(writerContext);
             try
             {
                 var result = spawnFunc.Run(new VariateManager(), [.. arguments]);
                 thread?.SetResult(result);
+                RuntimeGlobals.WriteBackAll();
             }
             catch (Exception ex)
             {
@@ -193,6 +196,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
             }
             finally
             {
+                RuntimeGlobalWriter.InstallContext(previousWriterContext);
                 RuntimeGlobals.InstallContext(previousContext);
             }
         });

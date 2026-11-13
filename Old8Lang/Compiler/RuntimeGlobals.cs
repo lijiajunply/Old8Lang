@@ -122,6 +122,23 @@ public static class RuntimeGlobals
     }
 
     /// <summary>
+    /// 把当前执行上下文中的全部全局槽位写回宿主变量管理器。
+    /// Spawn 的子线程完成时调用，避免顶层方法先结束而留下过期的集合快照。
+    /// </summary>
+    public static void WriteBackAll()
+    {
+        if (_slots is null)
+        {
+            return;
+        }
+
+        foreach (var name in _slots.Keys)
+        {
+            WriteBack(name);
+        }
+    }
+
+    /// <summary>
     /// 生成「读取全局变量」的 IL：返回装箱的 object，再按槽位静态类型拆箱/转换。
     /// </summary>
     public static void EmitLoad(ILGenerator ilGenerator, string name, Type slotType)
