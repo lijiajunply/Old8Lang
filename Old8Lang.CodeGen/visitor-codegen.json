@@ -1,6 +1,6 @@
 {
-  "scanDirectory": "../Old8Lang/AST",
-  "outputDirectory": "../Old8Lang/AST/Visitor/Generated",
+  "scanDirectory": "../Old8Lang.Runtime/AST",
+  "outputDirectory": "../Old8Lang.Runtime/AST/Visitor/Generated",
   "excludePatterns": [
     "**/ValueFunctions/**",
     "**/ModuleObjects/**",
