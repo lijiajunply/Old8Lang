@@ -5,13 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Old8Lang\**\*.cs"
-             Exclude="..\Old8Lang\bin\**\*;..\Old8Lang\obj\**\*" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Jint" Version="4.4.2" />

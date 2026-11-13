@@ -62,7 +62,7 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
 ## 架构速览
 
-`LangParser` 把源码解析成 AST；同一棵 AST 由不同 Visitor 处理成三种执行方式——`InterpreterVisitor`（解释）、`CompilerVisitor`（生成 IL）、`BytecodeVisitor`（生成字节码），另有 `TypeInferenceVisitor` 做类型推断。四个 Visitor 都在 `Old8Lang/AST/Visitor/`，`IVisitor` 接口是自动生成的，新增 AST 节点后需要重新生成。
+`LangParser` 把源码解析成 AST；同一棵 AST 由不同 Visitor 处理成三种执行方式——`InterpreterVisitor`（解释）、`CompilerVisitor`（生成 IL）、`BytecodeVisitor`（生成字节码），另有 `TypeInferenceVisitor` 做类型推断。四个 Visitor 都在 `Old8Lang.Runtime/AST/Visitor/`，`IVisitor` 接口是自动生成的，新增 AST 节点后需要重新生成。
 
 详细内容见 [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md)：
 
@@ -75,7 +75,8 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
 | 项目 | 说明 |
 |------|------|
-| `Old8Lang/` | 核心语言实现（AST、解析器、解释器、编译器、VM、类型系统） |
+| `Old8Lang.Core/` | 后端无关基础（源位置、诊断、词法、预处理、解析上下文与文档注释模型） |
+| `Old8Lang.Runtime/` | 语言执行实现（AST、语法解析、解释器、IL、VM、类型系统） |
 | `Old8Lang.App/` | 命令行应用 |
 | `Old8LangLib/` | 标准库（数学、字符串、文件、集合） |
 | `Old8Lang.Tests/` | xUnit 单元测试 |

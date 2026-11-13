@@ -1,5 +1,9 @@
 # Old8Lang 项目架构文档
 
+> 路径迁移说明（2026-11-13）：剩余语言实现的源码根已从历史 `Old8Lang/` 迁至
+> `Old8Lang.Runtime/`。下文尚未逐段改写的 `Old8Lang/...` 路径应读作
+> `Old8Lang.Runtime/...`；明确标为 `Old8Lang.Core/` 的路径除外。
+
 ## 1. 项目概述
 
 ### 1.1 项目简介
