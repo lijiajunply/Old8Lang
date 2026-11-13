@@ -50,6 +50,8 @@ public class ModuleCompositionTests
     [Fact]
     public void CoreAssembly_DoesNotReferenceOfficialExtensionAssemblies()
     {
+        Assert.Equal("Old8Lang.Runtime", typeof(LangInterpreter).Assembly.GetName().Name);
+
         var references = typeof(LangInterpreter).Assembly
             .GetReferencedAssemblies()
             .Select(reference => reference.Name)

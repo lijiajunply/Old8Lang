@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
+        <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
         <ProjectReference Include="..\Old8Lang.Hosting\Old8Lang.Hosting.csproj" />
         <ProjectReference Include="..\Old8Lang.Modules.Official\Old8Lang.Modules.Official.csproj" />
     </ItemGroup>
