@@ -27,6 +27,21 @@ public static class RuntimeGlobals
     [ThreadStatic]
     private static Dictionary<string, Slot>? _slots;
 
+    /// <summary>
+    /// 捕获当前执行所使用的全局槽位，使 Spawn 创建的 CLR 线程能够访问同一份语言全局变量。
+    /// </summary>
+    public static object? CaptureContext() => _slots;
+
+    /// <summary>
+    /// 在当前 CLR 线程安装先前捕获的全局槽位，并返回该线程原有的上下文。
+    /// </summary>
+    public static object? InstallContext(object? context)
+    {
+        var previous = _slots;
+        _slots = context as Dictionary<string, Slot>;
+        return previous;
+    }
+
     private static readonly System.Reflection.MethodInfo GetMethod =
         typeof(RuntimeGlobals).GetMethod(nameof(Get))!;
 

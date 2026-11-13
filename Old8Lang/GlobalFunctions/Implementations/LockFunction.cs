@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.GlobalFunctions.Implementations;
@@ -52,8 +53,18 @@ public sealed class LockFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持锁定变量
-        ilGenerator.Emit(OpCodes.Ldnull);
+        var value = parameters[0];
+        value.LoadIlValue(ilGenerator, local);
+        var valueType = value.OutputType(local) ?? typeof(object);
+        if (valueType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, valueType);
+        }
+
+        var variableName = value is LangId id ? id.IdName : "anonymous";
+        ilGenerator.Emit(OpCodes.Ldstr, variableName);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(LockedVariableLangValue).GetMethod(nameof(LockedVariableLangValue.CreateForIl))!);
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)

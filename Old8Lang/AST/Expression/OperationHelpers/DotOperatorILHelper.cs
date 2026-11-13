@@ -241,6 +241,13 @@ public static class DotOperatorILHelper
             return GenerateSuperInstanceMethodCall(instance, ilGenerator, local, operation);
         }
 
+        // Lock(value) 在 IL 中保留为 CLR 锁对象；其读取和写入必须经由
+        // 原子桥接方法，不能走解释器实例方法注册表。
+        if (leftType == typeof(LockedVariableLangValue))
+        {
+            return GenerateLockedVariableMethodCall(left!, instance, ilGenerator, local, operation);
+        }
+
         // 在类定义尚未 CreateType 时，TypeBuilder 无法可靠地枚举当前类正在
         // 构造的方法。对 this 的调用先按签名从父类解析；使用 Callvirt 保留
         // 同签名重写的动态分派，也支持 this.init(...) 和受保护父类方法。
@@ -928,6 +935,46 @@ public static class DotOperatorILHelper
         return m.ReturnType;
     }
 
+    private static Type GenerateLockedVariableMethodCall(
+        LangExpression left,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        Operation operation)
+    {
+        var methodName = instance.Id.IdName;
+        var method = methodName switch
+        {
+            "Set" when instance.Ids.Count == 1 => typeof(LockedVariableLangValue)
+                .GetMethod(nameof(LockedVariableLangValue.SetIlValue)),
+            "Get" when instance.Ids.Count == 0 => typeof(LockedVariableLangValue)
+                .GetMethod(nameof(LockedVariableLangValue.GetIlValue)),
+            "Add" when instance.Ids.Count == 1 => typeof(LockedVariableLangValue)
+                .GetMethod(nameof(LockedVariableLangValue.AddIlValue)),
+            _ => null
+        };
+
+        if (method is null)
+        {
+            throw new InvalidOperationError(operation,
+                $"锁定变量不支持方法 '{methodName}'");
+        }
+
+        left.LoadIlValue(ilGenerator, local);
+        foreach (var argument in instance.Ids)
+        {
+            argument.LoadIlValue(ilGenerator, local);
+            var argumentType = argument.OutputType(local) ?? typeof(object);
+            if (argumentType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
+        }
+
+        ilGenerator.Emit(OpCodes.Callvirt, method);
+        return method.ReturnType;
+    }
+
     private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
@@ -1112,6 +1159,14 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        if (leftType == typeof(LockedVariableLangValue) && id.IdName == "Value")
+        {
+            left!.LoadIlValue(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(LockedVariableLangValue).GetMethod(nameof(LockedVariableLangValue.GetIlValue))!);
+            return typeof(object);
+        }
+
         // 检查是否是枚举类型的静态成员访问
         if (leftType is not null && leftType.IsEnum)
         {

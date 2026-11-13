@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -150,6 +151,11 @@ public sealed class SpawnFunction : BaseGlobalFunction
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i - 1);
             parameters[i].LoadIlValue(ilGenerator, local);
+            var argumentType = parameters[i].OutputType(local) ?? typeof(object);
+            if (argumentType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
             ilGenerator.Emit(OpCodes.Call,
                 typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
                     nameof(InstanceMethods.Core.IlValueBridge.Wrap))!);
@@ -171,9 +177,11 @@ public sealed class SpawnFunction : BaseGlobalFunction
             throw new ArgumentException("spawn 函数需要一个函数参数");
         }
 
+        var globalContext = RuntimeGlobals.CaptureContext();
         ThreadLangValue? thread = null;
         thread = new ThreadLangValue(() =>
         {
+            var previousContext = RuntimeGlobals.InstallContext(globalContext);
             try
             {
                 var result = spawnFunc.Run(new VariateManager(), [.. arguments]);
@@ -182,6 +190,10 @@ public sealed class SpawnFunction : BaseGlobalFunction
             catch (Exception ex)
             {
                 thread?.SetException(ex);
+            }
+            finally
+            {
+                RuntimeGlobals.InstallContext(previousContext);
             }
         });
 

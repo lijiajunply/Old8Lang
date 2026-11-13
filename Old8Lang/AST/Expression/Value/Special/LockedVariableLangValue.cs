@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -73,6 +74,34 @@ public partial class LockedVariableLangValue : LangValueType
         lock (_lock)
         {
             _value = value;
+        }
+    }
+
+    /// <summary>
+    /// 创建供 IL 模式使用的锁定变量。
+    /// </summary>
+    public static LockedVariableLangValue CreateForIl(object? value, string variableName)
+        => new(IlValueBridge.Wrap(value), variableName);
+
+    /// <summary>
+    /// 以 IL 原生值读取内部值。
+    /// </summary>
+    public object? GetIlValue() => IlValueBridge.Unwrap(GetLockedValue());
+
+    /// <summary>
+    /// 以 IL 原生值写入内部值。
+    /// </summary>
+    public void SetIlValue(object? value) => SetValue(IlValueBridge.Wrap(value));
+
+    /// <summary>
+    /// 以 IL 原生值执行原子加法。
+    /// </summary>
+    public object? AddIlValue(object? value)
+    {
+        lock (_lock)
+        {
+            _value = _value.Plus(IlValueBridge.Wrap(value));
+            return IlValueBridge.Unwrap(_value);
         }
     }
 

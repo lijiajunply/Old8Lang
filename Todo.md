@@ -60,7 +60,7 @@
 
 - [x] **解释器 `Thread.CurrentThread` 属性访问**：裸属性和无参调用现均返回执行中的线程；同时修正了无参调用原先包装新建线程的问题。见 [测试报告](Reports/2026-11-11-12-42-当前线程属性测试.md)。
 - [x] **IL `Thread.CurrentThread` 属性与调用**：两种形式均返回实际执行线程，并支持继续访问其属性。见 [测试报告](Reports/2026-11-11-13-33-IL当前线程测试.md)。
-- [ ] **IL 其他 Thread API**：`Thread.Sleep` 与 `Time.GetUnixTimeMilliseconds()` 的组合现已通过；标准库 CLR `long` 返回值会归一化为语言 `double`，避免时间差计算按 `int` 拆箱。锁变量 (`lock`) 的 `Value` / `Set` / `Add` IL 桥接及其余线程 API 仍待处理；见 [测试报告](Reports/2026-11-13-11-10-IL标准库long数值归一化.md)。
+- [ ] **IL 其他 Thread API**：`Thread.Sleep` 与 `Time.GetUnixTimeMilliseconds()` 的组合现已通过；标准库 CLR `long` 返回值会归一化为语言 `double`，避免时间差计算按 `int` 拆箱。`Lock(value)` 现可在 IL 模式下创建共享锁变量，支持 `.Value`、`.Get()`、`.Set(value)` 与原子 `.Add(value)`；`Spawn` 也会把运行期全局槽位安装到子线程。`ThreadTests` 已通过 14/15，剩余 `ThreadExecutionOrder` 是共享空列表在子线程变更未回写的问题，归入集合全局状态处理；见 [long 数值报告](Reports/2026-11-13-11-10-IL标准库long数值归一化.md) 与 [锁变量报告](Reports/2026-11-13-11-20-IL锁变量与Spawn全局上下文.md)。
 
 - [x] **排查直接返回自身的 LangValue 类型**：源码检索发现线程、VM 线程及三种 VM 生成器值的 `GetValue()` 直接返回自身，均已重写 `ToString()`；三种生成器的字符串转换回归通过。见 [测试报告](Reports/2026-11-11-13-35-自引用值排查测试.md)。
 
@@ -75,7 +75,7 @@
   `变量 'g' 未声明`。顶层变量是 `OldLangRun` 的局部变量，函数是独立 `DynamicMethod`，编译函数体时不可见。
   2026-11-11：被函数体引用的顶层变量现提升为运行期全局槽位，具名函数、lambda、类方法和字段初始化器都可读写，
   支持函数声明早于变量赋值的前向引用；同名参数、局部变量、闭包单元和字段仍然遮蔽全局变量。未被函数引用的
-  顶层变量继续使用局部变量。异步函数尚未接入该模型，跨线程调用时槽位环境不可见。见
+  顶层变量继续使用局部变量。`Spawn` 创建的子线程现在会继承该执行的槽位环境；异步函数尚未接入该模型。见
   [测试报告](Reports/2026-11-11-22-40-IL具名函数读取顶层变量.md)。
 
 - [x] **IL 实例方法读取裸字段仍是 `NullReferenceException`**：裸字段现在在静态类型推断中返回其字段类型，
