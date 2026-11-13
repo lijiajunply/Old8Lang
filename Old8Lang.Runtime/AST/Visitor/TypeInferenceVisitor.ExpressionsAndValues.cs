@@ -1315,4 +1315,9 @@ return node.Value.GetType();
     {
         return typeof(object);
     }
+
+    public Type? VisitVMThreadLangValue(VMThreadLangValue node)
+    {
+        return typeof(object);
+    }
 }

@@ -15,7 +15,7 @@ namespace Old8Lang.AST.Statement;
 /// <param name="targetTypeName">目标类型名称</param>
 /// <param name="extensionMethods">扩展方法列表</param>
 /// <param name="position">源代码位置信息</param>
-public class ExtensionDeclaration(
+public partial class ExtensionDeclaration(
     string targetTypeName,
     List<GenericParameter>? targetGenericParameters,
     List<FuncLangValue> extensionMethods,
@@ -41,10 +41,6 @@ public class ExtensionDeclaration(
 
     public override int Count => 0;
 
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        return visitor.VisitExtensionDeclaration(this);
-    }
 
     /// <summary>
     /// 解析目标类型名称到 .NET Type

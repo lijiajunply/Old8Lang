@@ -7,7 +7,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class FuncRunStatement : OldStatement
+public partial class FuncRunStatement : OldStatement
 {
     internal readonly Instance? _instance;
     internal readonly Operation? _operation;
@@ -51,8 +51,4 @@ public class FuncRunStatement : OldStatement
         _genericInstance is not null ? _genericInstance.ToString() :
         _instance is null ? _operation is null ? "" : _operation.ToString() : _instance.ToString();
 
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        return visitor.VisitFuncRunStatement(this);
-    }
 }

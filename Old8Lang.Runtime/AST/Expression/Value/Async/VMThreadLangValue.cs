@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 虚拟机模式下的线程值类型
 /// </summary>
-public class VMThreadLangValue(int threadId, SourcePosition position = default) : LangValueType(position)
+public partial class VMThreadLangValue(int threadId, SourcePosition position = default) : LangValueType(position)
 {
 
     public int ThreadId => threadId;
@@ -130,10 +130,4 @@ public class VMThreadLangValue(int threadId, SourcePosition position = default) 
     /// <inheritdoc />
     public override string ToDisplayString() => ToString();
 
-    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
-    {
-        // VMThreadLangValue 是运行时值，不需要 Visitor 处理
-        // 返回默认值
-        return default!;
-    }
 }

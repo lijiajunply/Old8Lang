@@ -230,4 +230,10 @@ public partial class CompilerVisitor
     {
         return null;
     }
+
+    public object? VisitVMThreadLangValue(VMThreadLangValue node)
+    {
+        // VM 线程句柄没有 IL 表示
+        return null;
+    }
 }

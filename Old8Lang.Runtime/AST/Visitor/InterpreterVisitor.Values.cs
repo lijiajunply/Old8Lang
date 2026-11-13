@@ -1457,4 +1457,10 @@ public partial class InterpreterVisitor
         manager.Clone();
         return node;
     }
+
+    public LangValueType VisitVMThreadLangValue(VMThreadLangValue node)
+    {
+        // VMThreadLangValue 是 VM 线程句柄，解释模式下按值返回自身
+        return node;
+    }
 }

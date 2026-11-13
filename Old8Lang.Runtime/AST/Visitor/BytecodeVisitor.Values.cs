@@ -984,4 +984,9 @@ public partial class BytecodeVisitor
     {
         return null;
     }
+
+    public Instruction? VisitVMThreadLangValue(VMThreadLangValue node)
+    {
+        return null;
+    }
 }
