@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -14,6 +15,8 @@ public partial class NullLangValue(SourcePosition position = default) : LangValu
 
     /// <inheritdoc />
     public object? LiteralValue => null;
+
+    public LiteralKind Kind => LiteralKind.Null;
 
     /// <summary>
     /// 单例实例，用于减少对象创建

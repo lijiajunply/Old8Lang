@@ -27,6 +27,7 @@ Old8Lang.App / LanguageServer / Benchmarks / Tests
 
 ## 后续允许的方向
 
-目标是引入只依赖 `Core` 的 `Old8Lang.Syntax`，由 Runtime/后端依赖它。Syntax 不得引用 Runtime、Hosting、官方模块或任何执行后端。共享运行时契约将在实际循环被定位后从 Runtime 抽出；在此之前不得以 Runtime 的反向引用伪造独立程序集。
+本阶段已引入只依赖 `Core` 的 `Old8Lang.Syntax`，由 Runtime 依赖它。首批内容是标量
+`LiteralSyntax`、`LiteralKind` 与 `ILiteralSyntax`；Syntax 不得引用 Runtime、Hosting、官方模块或任何执行后端。共享运行时契约将在实际循环被定位后从 Runtime 抽出；在此之前不得以 Runtime 的反向引用伪造独立程序集。
 
 `ArchitectureProjectDependencyTests` 将当前 Runtime 共享层引用、官方模块方向以及 partial 归档位置固定为可执行门禁。

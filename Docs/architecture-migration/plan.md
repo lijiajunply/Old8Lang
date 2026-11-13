@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14（阶段 2，首批）：固定程序集基线并将 31 个阶段 1 遗留
+  `Execution/Nodes/*.Split.cs` 归档至 `Execution/LegacyNodeExtensions`，新增项目引用图门禁。
+  新建只引用 Core 的 `Old8Lang.Syntax`：标量 `LiteralSyntax`/`LiteralKind`/`ILiteralSyntax`
+  已独立，`PrimaryParser` 经唯一 Runtime 转换工厂恢复既有标量运行时值；Syntax、Runtime 与
+  语法/三模式代表性回归通过。集合字面量与完整 AST/解析器程序集迁移尚未完成，阶段 2 不标记完成。
+
 - 2026-11-14：阶段 0 基线已采集（构建 0 错误；测试按命名空间分组结果记录在
   `Reports/2026-11-14-00-20-第一阶段节点迁移进展.md`）。Compiler 组存在既有挂起/中止用例，尚未完全定位。
 - 2026-11-14：阶段 1 门禁已通过：类型推断、解释执行、IL 生成实现迁入 Visitor；删除 212 个节点旧执行入口

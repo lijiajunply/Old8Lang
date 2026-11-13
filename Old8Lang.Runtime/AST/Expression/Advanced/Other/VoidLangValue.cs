@@ -2,6 +2,7 @@ using Old8Lang.Error;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -14,6 +15,8 @@ public partial class VoidLangValue(SourcePosition position = default) : LangValu
 
     /// <inheritdoc />
     public object? LiteralValue => null;
+
+    public LiteralKind Kind => LiteralKind.Void;
 
     /// <summary>
     /// 单例实例，用于减少对象创建开销（VoidLangValue 是无状态的）

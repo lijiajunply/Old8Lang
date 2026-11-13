@@ -1,7 +1,7 @@
 # 语法字面量与运行时值的边界盘点
 
 日期：2026-11-14
-状态：阶段 1 盘点结论（实施移交阶段 2/3）
+状态：阶段 2 首批标量字面量已迁移；集合与运行时值仍待阶段 2/3。
 依据：`Docs/architecture-migration/design.md`「语法与运行时分界」
 
 ## 1. 现状
@@ -35,7 +35,7 @@
 
 - 节点上的执行方法（`Run/GenerateIl/LoadIlValue/OutputType/SetValueToIl`）已全部迁出，
   语法节点不再引用解释器/IL/VM 类型（`SyntaxBackendBoundaryTests` 证明）。
-- 引入 `Old8Lang.AST.ILiteralSyntax` 标记接口与 `LiteralValue` 属性，标量字面量
+- 引入 `ILiteralSyntax` 标记接口与 `LiteralValue` 属性，标量字面量
   （`IntLangValue`/`DoubleLangValue`/`StringLangValue`/`BoolLangValue`/`CharLangValue`/
   `NullLangValue`/`VoidLangValue`）已实现，明确「语法字面量」与「运行时值」的区分；
   架构测试 `ScalarLiteralNodes_AreMarkedAsLiteralSyntax` 固化该约定。
@@ -44,13 +44,18 @@
 
 ## 4. 分离实施建议（阶段 2/3）
 
-1. **引入语法字面量节点**（如 `LiteralExpression(SourcePosition, LiteralKind, object? rawValue)`），
-   解析器只产出语法字面量，不再直接构造 `IntLangValue` 等运行时值。
-2. **求值边界**：`InterpreterVisitor`/`CompilerVisitor`/`BytecodeVisitor` 在访问字面量节点时
+1. **标量语法字面量（已完成首批）**：`Old8Lang.Syntax` 提供
+   `LiteralSyntax(LiteralKind, object? rawValue, SourcePosition)`、`LiteralKind` 与 `ILiteralSyntax`，
+   只依赖 Core。`PrimaryParser` 先产出该语法数据，再由 Runtime 中唯一的
+   `ScalarLiteralRuntimeValueFactory` 转换为既有 `IntLangValue` 等值，避免解析规则直接构造运行时值。
+   标量运行时值暂时实现同一接口，以保持现有公开 AST/Visitor 兼容；它们尚未从 Runtime 移出。
+2. **后续 AST 节点化**：将 `LiteralSyntax` 作为可被 Visitor 分派的独立表达式节点，届时解析器
+   不再在同一轮调用中转换为 `LangValueType`。
+3. **求值边界**：`InterpreterVisitor`/`CompilerVisitor`/`BytecodeVisitor` 在访问字面量节点时
    创建或复用运行时值；保持现有对象身份、闭包与可变集合语义（同一字面量多次求值不应共享可变状态）。
-3. **类型推断**：`TypeInferenceVisitor` 对字面量节点直接返回静态类型，不再依赖运行时值对象。
-4. **兼容期**：保留 `LangValueType` 子类的公开构造（已声明接受 C# 源码 API 不兼容，需提供迁移说明）。
-5. **验证**：以三模式代表性测试 + 字节码兼容样本 + 闭包/可变集合回归为门禁，
+4. **类型推断**：`TypeInferenceVisitor` 对字面量节点直接返回静态类型，不再依赖运行时值对象。
+5. **兼容期**：保留 `LangValueType` 子类的公开构造（已声明接受 C# 源码 API 不兼容，需提供迁移说明）。
+6. **验证**：以三模式代表性测试 + 字节码兼容样本 + 闭包/可变集合回归为门禁，
    并新增「解析器不引用运行时值类型」的边界测试。
 
 ## 5. 风险

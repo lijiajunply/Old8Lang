@@ -19,7 +19,8 @@ public class ArchitectureProjectDependencyTests
                 "Old8Lang.Core/Old8Lang.Core.csproj",
                 "Old8Lang.Modules.Abstractions/Old8Lang.Modules.Abstractions.csproj",
                 "Old8Lang.Observability/Old8Lang.Observability.csproj",
-                "Old8Lang.ProjectSystem/Old8Lang.ProjectSystem.csproj"
+                "Old8Lang.ProjectSystem/Old8Lang.ProjectSystem.csproj",
+                "Old8Lang.Syntax/Old8Lang.Syntax.csproj"
             ],
             references);
 
@@ -40,6 +41,17 @@ public class ArchitectureProjectDependencyTests
 
         Assert.DoesNotContain("Old8Lang.Modules.Official/Old8Lang.Modules.Official.csproj", runtimeReferences);
         Assert.Contains("Old8Lang.Runtime/Old8Lang.Runtime.csproj", officialReferences);
+    }
+
+    [Fact]
+    public void Syntax_ReferencesOnlyCore_AndNeverRuntime()
+    {
+        var root = RequireRepositoryRoot();
+        var syntaxReferences = GetProjectReferences(root, "Old8Lang.Syntax/Old8Lang.Syntax.csproj");
+
+        Assert.Equal(["Old8Lang.Core/Old8Lang.Core.csproj"], syntaxReferences);
+        Assert.DoesNotContain("Old8Lang.Syntax/Old8Lang.Syntax.csproj",
+            GetProjectReferences(root, "Old8Lang.Core/Old8Lang.Core.csproj"));
     }
 
     [Fact]

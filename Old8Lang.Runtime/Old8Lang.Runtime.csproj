@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Old8Lang.Modules.Abstractions\Old8Lang.Modules.Abstractions.csproj" />
     <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
     <ProjectReference Include="..\Old8Lang.ProjectSystem\Old8Lang.ProjectSystem.csproj" />
+    <ProjectReference Include="..\Old8Lang.Syntax\Old8Lang.Syntax.csproj" />
   </ItemGroup>
 
 </Project>

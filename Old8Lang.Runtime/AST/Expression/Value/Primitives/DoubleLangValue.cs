@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -18,6 +19,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     /// <inheritdoc />
     public object? LiteralValue => Value;
+
+    public LiteralKind Kind => LiteralKind.Double;
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {

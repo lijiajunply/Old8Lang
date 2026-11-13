@@ -3,6 +3,7 @@ using System.Text;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -18,6 +19,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     /// <inheritdoc />
     public object? LiteralValue => Value;
+
+    public LiteralKind Kind => LiteralKind.Int;
 
     public override string ToString() => Value.ToString();
 

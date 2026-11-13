@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -17,6 +18,8 @@ public partial class CharLangValue(char value = '\0', SourcePosition position = 
 
     /// <inheritdoc />
     public object? LiteralValue => Value;
+
+    public LiteralKind Kind => LiteralKind.Char;
 
     public override LangValueType Plus(LangValueType otherLangValueType) =>
         StringLangValue.Create(Value + (string)otherLangValueType.GetValue()!);

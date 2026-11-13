@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.Tests.Architecture;
 
@@ -133,6 +134,7 @@ public class SyntaxBackendBoundaryTests
             Assert.True(typeof(ILiteralSyntax).IsAssignableFrom(t), $"{t.Name} 应实现 ILiteralSyntax"));
 
         Assert.Equal(42, new IntLangValue(42).LiteralValue);
+        Assert.Equal(LiteralKind.Int, new IntLangValue(42).Kind);
         Assert.Equal("hi", new StringLangValue("hi").LiteralValue);
         Assert.Null(new NullLangValue().LiteralValue);
     }

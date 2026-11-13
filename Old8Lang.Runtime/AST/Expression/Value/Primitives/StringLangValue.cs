@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -20,6 +21,8 @@ public partial class StringLangValue(string context = "", SourcePosition positio
 
     /// <inheritdoc />
     public object? LiteralValue => Value;
+
+    public LiteralKind Kind => LiteralKind.String;
 
 
     public override string ToString() => $"\"{Value}\""; // 带引号的字符串，符合 Old8Lang 语法
