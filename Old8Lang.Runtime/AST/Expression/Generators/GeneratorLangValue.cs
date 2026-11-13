@@ -28,12 +28,12 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 生成器当前状态
     /// </summary>
-    public GeneratorState State { get; private set; } = GeneratorState.Suspended;
+    public GeneratorState State { get; internal set; } = GeneratorState.Suspended;
 
     /// <summary>
     /// 生成器迭代器的下一个值
     /// </summary>
-    public LangValueType? NextValue { get; private set; }
+    public LangValueType? NextValue { get; internal set; }
 
     /// <summary>
     /// 生成器函数的参数值

@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// 原生映射 适用于有构造函数的类
 /// 也可以直接包装已有的 .NET 对象实例
 /// </summary>
-public class NativeAnyLangValue : ImportInfo
+public partial class NativeAnyLangValue : ImportInfo
 {
     internal Type? ClassType { get; set; }
     public readonly string ClassName;
@@ -241,7 +241,7 @@ public class NativeAnyLangValue : ImportInfo
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotSupportedException("NativeAnyLangValue 暂不支持 Visitor 模式访问");
+        return visitor.VisitNativeAnyLangValue(this);
     }
 
     /// <summary>

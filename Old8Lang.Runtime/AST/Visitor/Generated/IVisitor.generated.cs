@@ -113,6 +113,11 @@ public interface IVisitor<out TResult>
     TResult VisitNativeStatement(NativeStatement node);
 
     /// <summary>
+    /// 访问 NativeAnyLangValue 节点
+    /// </summary>
+    TResult VisitNativeAnyLangValue(NativeAnyLangValue node);
+
+    /// <summary>
     /// 访问 ReturnStatement 节点
     /// </summary>
     TResult VisitReturnStatement(ReturnStatement node);

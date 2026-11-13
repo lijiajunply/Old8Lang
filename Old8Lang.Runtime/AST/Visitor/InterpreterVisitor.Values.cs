@@ -643,13 +643,11 @@ public partial class InterpreterVisitor
     /// </summary>
     public LangValueType VisitTypeLangValue(TypeLangValue node)
     {
-
-        var result = node._expression?.Accept(new InterpreterVisitor(manager));
+        // 迁移自 TypeLangValue.Run()
+        var result = node._expression?.Accept(this);
         if (result is null) throw new InvalidOperationError(node, "类型表达式求值失败");
         node.Value = result.TypeToString();
         return node;
-    
-    
     }
 
     /// <summary>
@@ -1016,8 +1014,36 @@ public partial class InterpreterVisitor
     public LangValueType VisitGeneratorLangValue(GeneratorLangValue node)
     {
         // 迁移自 GeneratorLangValue.Run()
-        // 生成器值节点在解释器模式下直接返回自身
-        return node;
+        if (node.StateMachine is null)
+        {
+            var generatorManager = manager.CloneForGenerator();
+
+            foreach (var (paramName, paramValue) in node.ParameterValues)
+            {
+                var id = new LangId(paramName);
+                generatorManager.Set(id, paramValue);
+            }
+
+            try
+            {
+                node.StateMachine = GeneratorStateMachineBuilder.BuildFromFunc(node.Func, generatorManager);
+            }
+            catch (InvalidOperationException)
+            {
+                node.State = GeneratorLangValue.GeneratorState.Completed;
+                return new VoidLangValue();
+            }
+        }
+
+        if (node.StateMachine.MoveNext())
+        {
+            node.State = GeneratorLangValue.GeneratorState.Suspended;
+            node.NextValue = node.StateMachine.CurrentValue;
+            return node.NextValue ?? new VoidLangValue();
+        }
+
+        node.State = GeneratorLangValue.GeneratorState.Completed;
+        return new VoidLangValue();
     }
 
     /// <summary>
@@ -1025,9 +1051,9 @@ public partial class InterpreterVisitor
     /// </summary>
     public LangValueType VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node)
     {
-        // 迁移自 AsyncGeneratorLangValue.Run()
-        // 异步生成器值节点在解释器模式下直接返回自身
-        return node;
+        // 迁移自 AsyncGeneratorLangValue.Run()：阻塞等待异步生成器下一步
+        var taskResult = node.RunAsync(manager);
+        return taskResult.Await();
     }
 
     /// <summary>
@@ -1036,8 +1062,7 @@ public partial class InterpreterVisitor
     public LangValueType VisitAsyncStreamLangValue(AsyncStreamLangValue node)
     {
         // 迁移自 AsyncStreamLangValue.Run()
-        // 异步流值节点在解释器模式下直接返回自身
-        return node;
+        return node._generator.Accept(this);
     }
 
     // ==================== CancellationToken 相关节点 ====================
@@ -1380,6 +1405,56 @@ public partial class InterpreterVisitor
 
     public LangValueType VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
-        return node.Accept(this);
+        // 迁移自 AsyncFuncLangValue.Run()
+        if (node.IsAsyncGenerator)
+        {
+            var generatorClosure = new AsyncFuncLangValue(node.Id, node.Ids, node.BlockStatement, node.Position)
+            {
+                CapturedScope = manager.Clone()
+            };
+
+            return new AsyncGeneratorLangValue(generatorClosure, node.Position);
+        }
+
+        var closureFunc = new AsyncFuncLangValue(node.Id, node.Ids, node.BlockStatement, node.Position)
+        {
+            CapturedScope = manager
+        };
+        return closureFunc;
+    }
+
+    /// <summary>
+    /// 访问 NativeAnyLangValue 节点（无需 DLL 时返回自身，否则加载类型信息）
+    /// </summary>
+    public LangValueType VisitNativeAnyLangValue(NativeAnyLangValue node)
+    {
+        if (node.InstanceObj is not null && node.ClassType is not null)
+        {
+            manager.Clone();
+            return node;
+        }
+
+        if (node._path is null || node._dllName is null)
+        {
+            throw new InvalidOperationError(node, "无法加载类型：缺少 DLL 路径或名称");
+        }
+
+        var assembly = System.Reflection.Assembly.LoadFile(node._path);
+        node.ClassType = assembly.GetType(node.ClassName);
+        if (node.ClassType is null && node._dllName is not null)
+        {
+            node.ClassType = assembly.GetType($"{node._dllName}.{node.ClassName}");
+        }
+
+        if (node.ClassType is null)
+        {
+            throw new InvalidOperationError(node, $"无法加载类型：在程序集中找不到类型 '{node.ClassName}' 或 '{node._dllName}.{node.ClassName}'");
+        }
+
+        var constructors = node.ClassType.GetConstructors();
+        if (constructors is { Length: > 0 })
+            node.Constructor = constructors[0];
+        manager.Clone();
+        return node;
     }
 }

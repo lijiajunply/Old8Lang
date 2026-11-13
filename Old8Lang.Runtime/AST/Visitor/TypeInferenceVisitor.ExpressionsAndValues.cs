@@ -729,7 +729,7 @@ return node.Value.GetType();
 
     public Type VisitClassMemberId(ClassMemberId node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitDictionaryLangValue(DictionaryLangValue node)
@@ -748,7 +748,7 @@ return node.Value.GetType();
 
     public Type? VisitErrorLangValue(ErrorLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitFuncLangValue(FuncLangValue node)
@@ -1091,12 +1091,12 @@ return node.Value.GetType();
 
     public Type? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type? VisitTaskFactoryStaticMethodWrapper(TaskFactoryStaticMethodWrapper node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitTaskLangValue(TaskLangValue node)
@@ -1109,12 +1109,12 @@ return node.Value.GetType();
 
     public Type? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type? VisitTaskSchedulerLangValue(TaskSchedulerLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node)
@@ -1127,7 +1127,7 @@ return node.Value.GetType();
 
     public Type? VisitThreadClassLangValue(ThreadClassLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitThreadLangValue(ThreadLangValue node)
@@ -1140,7 +1140,7 @@ return node.Value.GetType();
 
     public Type? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type VisitTupleLangValue(TupleLangValue node)
@@ -1257,7 +1257,7 @@ return node.Value.GetType();
 
     public Type? VisitLockedVariableLangValue(LockedVariableLangValue node)
     {
-        return node.Accept(this);
+        return typeof(object);
     }
 
     public Type? VisitMockLibClassLangValue(MockLibClassLangValue node)
@@ -1302,6 +1302,17 @@ return node.Value.GetType();
 
     public Type? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
-        return node.Accept(this);
+        // 迁移自 AsyncFuncLangValue.OutputType()
+        var parameterTypes = node.Ids!
+            .Select(item => item.Accept(new TypeInferenceVisitor(local)))
+            .ToArray();
+        var returnType = typeof(Task<object>);
+        return System.Linq.Expressions.Expression.GetDelegateType(
+            parameterTypes.Concat([returnType]).ToArray());
+    }
+
+    public Type? VisitNativeAnyLangValue(NativeAnyLangValue node)
+    {
+        return typeof(object);
     }
 }

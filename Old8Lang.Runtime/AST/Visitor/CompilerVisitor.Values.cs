@@ -225,4 +225,9 @@ public partial class CompilerVisitor
         return null;
     
     }
+
+    public object? VisitNativeAnyLangValue(NativeAnyLangValue node)
+    {
+        return null;
+    }
 }

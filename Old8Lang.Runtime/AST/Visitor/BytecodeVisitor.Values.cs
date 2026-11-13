@@ -979,4 +979,9 @@ public partial class BytecodeVisitor
         // 异步函数值在字节码模式中没有直接对应的指令
         return null;
     }
+
+    public Instruction? VisitNativeAnyLangValue(NativeAnyLangValue node)
+    {
+        return null;
+    }
 }
