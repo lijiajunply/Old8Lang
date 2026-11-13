@@ -27,25 +27,6 @@ public class ClassFieldSetStatement : OldStatement
         Value = value;
     }
 
-    public override void Run(VariateManager manager)
-    {
-        var result = Value.Run(manager);
-
-        // 如果有类型注解，进行类型检查
-        if (!string.IsNullOrEmpty(Id.AssumptionType))
-        {
-            TypeChecker.ValidateVariableAssignment(Id.AssumptionType, result, this, Id.IdName);
-        }
-
-        // 类成员声明直接存储在ClassMemberId中，由BlockStatement的ToAnyData和ToStaticData方法处理
-        manager.Set(Id, result);
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        Value.SetValueToIl(ilGenerator, local, Id.IdName);
-    }
-
     public override OldStatement this[int index] => this;
 
     public override int Count => 0;

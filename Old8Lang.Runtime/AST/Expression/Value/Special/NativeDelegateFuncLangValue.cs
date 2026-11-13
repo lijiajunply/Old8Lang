@@ -26,7 +26,7 @@ public class NativeDelegateFuncLangValue(
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         // 计算所有参数的值
-        var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
+        var values = ids.Select(expr => expr.Accept(new InterpreterVisitor(variateManagerFunc))).ToList();
         var convertedValues = Apis.ListToObjects(values).ToArray();
 
         object? result;

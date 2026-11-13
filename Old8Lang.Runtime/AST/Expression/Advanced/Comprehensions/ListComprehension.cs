@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
@@ -63,94 +65,6 @@ public partial class ListComprehension : LangValueType
     }
 
     /// <summary>
-    /// 执行列表推导式
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>生成的列表</returns>
-    public override LangValueType Run(VariateManager manager)
-    {
-        var resultList = new List<LangValueType>();
-
-        // 执行最外层的可迭代对象
-        var iterableValue = Iterable.Run(manager);
-
-        // 获取可迭代对象的元素
-        IEnumerable<LangValueType> items;
-
-        if (iterableValue is ILangList list)
-        {
-            items = list.GetItems();
-        }
-        else if (iterableValue is ArrayLangValue array)
-        {
-            items = array.GetItems();
-        }
-        else if (iterableValue is ListLangValue listValue)
-        {
-            items = listValue.GetItems();
-        }
-        else if (iterableValue is RangeLangValue range)
-        {
-            // 处理范围类型，执行range表达式获取实际的数组
-            var rangeResult = range.Run(manager);
-            if (rangeResult is ArrayLangValue rangeArray)
-            {
-                items = rangeArray.GetItems();
-            }
-            else
-            {
-                throw new TypeError(
-                    Iterable,
-                    "范围表达式必须返回数组类型");
-            }
-        }
-        else if (iterableValue is StringLangValue str)
-        {
-            // 处理字符串，生成字符列表
-            items = str.Value
-                .Select(c => new CharLangValue(c) as LangValueType);
-        }
-        else
-        {
-            throw new TypeError(
-                Iterable,
-                $"类型不匹配: 列表推导式的可迭代对象必须是数组、列表、范围或字符串，但得到 {iterableValue.GetType().Name}");
-        }
-
-        // 遍历可迭代对象的每个元素
-        foreach (var item in items)
-        {
-            // 创建一个全新的变量管理器，复制当前的变量状态
-            var newManager = manager.NewManger();
-
-            // 设置当前变量的值
-            newManager.Set(Variable, item);
-
-            // 如果有嵌套的for循环，递归处理
-            if (NestedLoops is { Count: > 0 })
-            {
-                // 处理嵌套的for循环，收集结果
-                var nestedResults = ProcessNestedLoops(newManager, NestedLoops);
-                resultList.AddRange(nestedResults);
-            }
-            else
-            {
-                // 没有嵌套循环，直接处理当前元素
-                if (CheckCondition(newManager))
-                {
-                    // 条件满足，计算表达式值并添加到结果列表
-                    var exprValue = Expression.Run(newManager);
-                    resultList.Add(exprValue);
-                }
-            }
-        }
-
-        // 返回生成的列表
-        // 创建一个新的ListLangValue，使用对象列表构造函数
-        return new ListLangValue(resultList.Select(v => v.GetValue()!).ToList(), position: Position);
-    }
-
-    /// <summary>
     /// 处理嵌套的for循环
     /// </summary>
     /// <param name="manager">变量管理器</param>
@@ -164,7 +78,7 @@ public partial class ListComprehension : LangValueType
         var currentLoop = loops[0];
 
         // 执行当前循环的可迭代对象
-        var iterableValue = currentLoop.Iterable.Run(manager);
+        var iterableValue = currentLoop.Iterable.Accept(new InterpreterVisitor(manager));
 
         // 获取可迭代对象的元素
         IEnumerable<LangValueType> items;
@@ -184,7 +98,7 @@ public partial class ListComprehension : LangValueType
         else if (iterableValue is RangeLangValue range)
         {
             // 处理范围类型，执行range表达式获取实际的数组
-            var rangeResult = range.Run(manager);
+            var rangeResult = range.Accept(new InterpreterVisitor(manager));
             if (rangeResult is ArrayLangValue rangeArray)
             {
                 items = rangeArray.GetItems();
@@ -248,7 +162,7 @@ public partial class ListComprehension : LangValueType
                 if (allConditionsMet)
                 {
                     // 使用最外层的表达式，而不是当前循环的表达式
-                    var exprValue = Expression.Run(newManager);
+                    var exprValue = Expression.Accept(new InterpreterVisitor(newManager));
                     resultList.Add(exprValue);
                 }
             }
@@ -271,7 +185,7 @@ public partial class ListComprehension : LangValueType
         }
 
         // 执行条件表达式
-        var conditionValue = Condition.Run(manager);
+        var conditionValue = Condition.Accept(new InterpreterVisitor(manager));
 
         // 检查条件结果是否为布尔值
         if (conditionValue is BoolLangValue boolValue)
@@ -283,20 +197,6 @@ public partial class ListComprehension : LangValueType
         throw new TypeError(
             Condition,
             $"类型不匹配: 期望布尔表达式，但得到 {conditionValue.GetType().Name}");
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 为列表推导式创建一个空的List<object>实例
-        // 这是一个简化的实现，实际的列表推导式IL生成需要更复杂的逻辑
-        var listType = typeof(List<object>);
-        var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
-        ilGenerator.Emit(OpCodes.Newobj, listConstructor);
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(List<object>);
     }
 
     public override string ToString()

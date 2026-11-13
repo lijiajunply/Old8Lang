@@ -10,6 +10,8 @@ using Old8Lang.Error;
 using Old8Lang.Bytecode.Closures;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Visitor;
 
 /// <summary>

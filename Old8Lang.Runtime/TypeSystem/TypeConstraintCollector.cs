@@ -4,6 +4,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
@@ -46,7 +48,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
             // 情况2：默认值推断
             else if (param.DefaultValue is not null)
             {
-                var defaultType = param.DefaultValue.OutputType(localManager);
+                var defaultType = param.DefaultValue.Accept(new TypeInferenceVisitor(localManager));
                 if (defaultType is not null && defaultType != typeof(object))
                 {
                     context.AddConstraint(new TypeConstraint(
@@ -147,7 +149,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     {
         if (tree is ReturnStatement returnStmt)
         {
-            var returnType = returnStmt.OutputType(localManager);
+            var returnType = returnStmt.Accept(new TypeInferenceVisitor(localManager));
             if (returnType != typeof(void))
             {
                 returnTypes.Add(returnType);
@@ -178,7 +180,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         for (int i = 0; i < callExpr.Arguments.Count; i++)
         {
             var arg = callExpr.Arguments[i];
-            var argType = arg.OutputType(localManager);
+            var argType = arg.Accept(new TypeInferenceVisitor(localManager));
 
             if (argType is not null)
             {
@@ -209,7 +211,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     public void CollectFromAssignment(SetStatement setStmt)
     {
         var varName = setStmt.Id?.IdName;
-        var valueType = setStmt.Value.OutputType(localManager);
+        var valueType = setStmt.Value.Accept(new TypeInferenceVisitor(localManager));
 
         if (valueType is not null)
         {

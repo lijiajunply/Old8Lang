@@ -5,6 +5,8 @@ using Old8Lang.Runtime;
 using System.Collections.Concurrent;
 using System.Reflection;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
@@ -87,7 +89,7 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
             }
 
             // 计算参数值
-            var arguments = orderedArgs.Select(arg => arg.Run(manager)).ToList();
+            var arguments = orderedArgs.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
             var a = Apis.ListToObjects(arguments.OfType<LangValueType>().ToList()).ToArray();
 
             // 使用委托缓存优化静态方法调用

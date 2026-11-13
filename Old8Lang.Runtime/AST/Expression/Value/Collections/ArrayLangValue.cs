@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -52,13 +54,6 @@ public partial class ArrayLangValue : LangValueType, ILangList
     {
         RunResult = [.. a.Select(ObjToValue)];
         ElementType = elementType;
-    }
-
-    public override LangValueType Run(VariateManager manager)
-    {
-        for (var i = 0; i < Values.Count; i++)
-            RunResult[i] = Values[i].Run(manager);
-        return this;
     }
 
     public void Set(LangValueType index, LangValueType value)
@@ -114,7 +109,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
         }
 
         // 如果是其他类型的表达式，尝试将其作为索引（可能需要运行表达式）
-        var result = dotExpression.Run(manager);
+        var result = dotExpression.Accept(new InterpreterVisitor(manager));
 
         if (result is IntLangValue idx)
         {
@@ -238,49 +233,6 @@ public partial class ArrayLangValue : LangValueType, ILangList
             RunResult[start + i] = valuesList[i];
         }
     }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 创建一个长度为 len 的对象数组
-        var len = RunResult.Length;
-        ilGenerator.Emit(OpCodes.Ldc_I4, len); // 加载数组长度
-        ilGenerator.Emit(OpCodes.Newarr, typeof(object)); // 创建新数组
-
-        for (var i = 0; i < len; i++)
-        {
-            ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
-            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引
-
-            Type t;
-            if (len == Values.Count)
-            {
-                // 如果Values列表有元素，使用Values[i]
-                Values[i].LoadIlValue(ilGenerator, local);
-                t = Values[i].OutputType(local)!;
-            }
-            else
-            {
-                // 否则，使用RunResult[i]，但要确保它不为null
-                var item = RunResult[i];
-                if (item is null)
-                {
-                    // 如果item为null，加载一个null值
-                    ilGenerator.Emit(OpCodes.Ldnull);
-                    t = typeof(object);
-                }
-                else
-                {
-                    item.LoadIlValue(ilGenerator, local);
-                    t = item.OutputType(local)!;
-                }
-            }
-
-            ilGenerator.Emit(OpCodes.Box, t); // 将值转换为object
-            ilGenerator.Emit(OpCodes.Stelem_Ref); // 将值存入数组
-        }
-    }
-
-    public override Type OutputType(LocalManager local) => typeof(object[]);
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {

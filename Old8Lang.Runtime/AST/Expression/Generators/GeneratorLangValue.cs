@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.AsyncGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Generators;
 
 /// <summary>
@@ -69,53 +71,6 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 运行生成器，返回下一个值
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>生成器的下一个值</returns>
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 如果状态机尚未创建，创建新状态机
-        if (StateMachine is null)
-        {
-            // 为生成器创建独立的变量环境
-            var generatorManager = manager.CloneForGenerator();
-
-            // 设置参数值到生成器环境中
-            foreach (var (paramName, paramValue) in ParameterValues)
-            {
-                var id = new LangId(paramName);
-                generatorManager.Set(id, paramValue);
-            }
-
-            // 创建新状态机
-            try
-            {
-                StateMachine = GeneratorStateMachineBuilder.BuildFromFunc(Func, generatorManager);
-            }
-            catch (InvalidOperationException)
-            {
-                // 不是生成器函数，返回空值
-                State = GeneratorState.Completed;
-                return new VoidLangValue();
-            }
-        }
-
-        // 调用状态机的MoveNext
-        if (StateMachine.MoveNext())
-        {
-            // 还有更多值
-            State = GeneratorState.Suspended;
-            NextValue = StateMachine.CurrentValue;
-            return NextValue ?? new VoidLangValue();
-        }
-
-        // 生成器完成
-        State = GeneratorState.Completed;
-        return new VoidLangValue();
-    }
-
-    /// <summary>
     /// 作为可调用对象执行，返回下一个值
     /// </summary>
     /// <param name="manager">变量管理器</param>
@@ -125,7 +80,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     public LangValueType Run(VariateManager manager, List<LangExpression> args, object? obj = null)
     {
         // 生成器调用不需要参数，忽略args
-        return Run(manager);
+        return Accept(new InterpreterVisitor(manager));
     }
 
     /// <summary>
@@ -136,34 +91,6 @@ public partial class GeneratorLangValue : LangValueType, ILangList
         State = GeneratorState.Suspended;
         NextValue = null;
         StateMachine?.Reset();
-    }
-
-    /// <summary>
-    /// 获取生成器的输出类型
-    /// </summary>
-    /// <param name="local">局部变量管理器</param>
-    /// <returns>生成器的输出类型</returns>
-    public override Type OutputType(LocalManager local) => typeof(object);
-
-    /// <summary>
-    /// 生成IL代码（后续实现）
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 生成器的IL代码生成（后续实现）
-    }
-
-    /// <summary>
-    /// 设置值到IL代码（后续实现）
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    /// <param name="idName">标识符名称</param>
-    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        // 生成器的IL代码生成（后续实现）
     }
 
     /// <summary>

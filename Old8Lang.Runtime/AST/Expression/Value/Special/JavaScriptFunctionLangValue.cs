@@ -5,6 +5,8 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -73,7 +75,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
         {
             // 转换参数
             var jsArgs = positionalArgs
-                .Select(arg => ConvertToJavaScript(arg.Run(variateManagerFunc)))
+                .Select(arg => ConvertToJavaScript(arg.Accept(new InterpreterVisitor(variateManagerFunc))))
                 .ToArray();
 
             // 调用 JavaScript 函数

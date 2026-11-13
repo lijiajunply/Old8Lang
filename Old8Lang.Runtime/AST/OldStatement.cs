@@ -19,26 +19,6 @@ public abstract class OldStatement : IOldLangTree
         Position = position;
     }
 
-    /// <summary>
-    /// 解释器模式执行
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <remarks>
-    /// 注意：Visitor 模式已实现。推荐使用 Accept 方法配合 InterpreterVisitor。
-    /// </remarks>
-    public virtual void Run(VariateManager manager) => Accept(new InterpreterVisitor(manager));
-
-    /// <summary>
-    /// IL 代码生成
-    /// </summary>
-    /// <param name="ilGenerator">IL 生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    /// <remarks>
-    /// 注意：Visitor 模式已实现。推荐使用 Accept 方法配合 CompilerVisitor。
-    /// </remarks>
-    public virtual void GenerateIl(ILGenerator ilGenerator, LocalManager local) =>
-        Accept(new CompilerVisitor(ilGenerator, local));
-
     public abstract OldStatement? this[int index] { get; }
     public abstract int Count { get; }
 

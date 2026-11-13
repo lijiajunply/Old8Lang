@@ -202,7 +202,7 @@ public class BytecodeCompiler
         {
             if (statement is FuncInit or ClassInit or AsyncFuncInit)
             {
-                statement.Run(manager);
+                statement.Accept(new InterpreterVisitor(manager));
             }
         }
 
@@ -211,7 +211,7 @@ public class BytecodeCompiler
         {
             if (statement is FuncInit or ClassInit or AsyncFuncInit)
             {
-                statement.Run(manager);
+                statement.Accept(new InterpreterVisitor(manager));
             }
         }
     }

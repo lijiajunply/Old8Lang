@@ -11,6 +11,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
 /// <summary>
@@ -84,10 +86,10 @@ public sealed class GetMemberInfoFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载成员名参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ReflectionHelper.GetMemberInfo(object, string)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetMemberInfo));

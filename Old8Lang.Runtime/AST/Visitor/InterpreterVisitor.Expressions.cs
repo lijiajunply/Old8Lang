@@ -91,14 +91,14 @@ public partial class InterpreterVisitor
         {
             if (node.Opera == LangTokenType.Exclamation)
             {
-                var rightValue = node.Right?.Run(manager) as BoolLangValue ??
+                var rightValue = node.Right?.Accept(new InterpreterVisitor(manager)) as BoolLangValue ??
                                  throw new InvalidOperationError(node, "NOT运算符只支持布尔类型");
                 return BoolLangValue.Create(!rightValue.Value, node.Position);
             }
 
             if (node.Opera == LangTokenType.Minus)
             {
-                var rightValue = node.Right?.Run(manager);
+                var rightValue = node.Right?.Accept(new InterpreterVisitor(manager));
                 if (rightValue is IntLangValue intValue)
                     return new IntLangValue(-intValue.Value);
                 if (rightValue is DoubleLangValue doubleValue)
@@ -112,7 +112,7 @@ public partial class InterpreterVisitor
         // 处理this.id => dot_value
         if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "node" } && node.Right is not null)
         {
-            var thisValue = node.Left.Run(manager);
+            var thisValue = node.Left.Accept(this);
             if (thisValue is AnyLangValue anyValue)
             {
                 // V2 架构：直接调用 Dot，访问控制由内部实现
@@ -125,14 +125,14 @@ public partial class InterpreterVisitor
         // 处理逻辑AND操作 - 短路求值
         if (node.Opera == LangTokenType.And)
         {
-            var leftValue = node.Left.Run(manager) as BoolLangValue ??
+            var leftValue = node.Left.Accept(this) as BoolLangValue ??
                             throw new InvalidOperationError(node, "AND运算符只支持布尔类型");
             if (!leftValue.Value)
             {
                 return BoolLangValue.Create(false, node.Position);
             }
 
-            var rightValue = node.Right?.Run(manager) as BoolLangValue ??
+            var rightValue = node.Right?.Accept(new InterpreterVisitor(manager)) as BoolLangValue ??
                              throw new InvalidOperationError(node, "AND运算符只支持布尔类型");
             return BoolLangValue.Create(leftValue.Value && rightValue.Value, node.Position);
         }
@@ -140,13 +140,13 @@ public partial class InterpreterVisitor
         // 处理逻辑OR操作 - 短路求值
         if (node.Opera == LangTokenType.Or)
         {
-            var leftValue = node.Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(node, "OR运算符只支持布尔类型");
+            var leftValue = node.Left.Accept(this) as BoolLangValue ?? throw new InvalidOperationError(node, "OR运算符只支持布尔类型");
             if (leftValue.Value)
             {
                 return BoolLangValue.Create(true, node.Position);
             }
 
-            var rightValue = node.Right?.Run(manager) as BoolLangValue ??
+            var rightValue = node.Right?.Accept(new InterpreterVisitor(manager)) as BoolLangValue ??
                              throw new InvalidOperationError(node, "OR运算符只支持布尔类型");
             return BoolLangValue.Create(leftValue.Value || rightValue.Value, node.Position);
         }
@@ -154,7 +154,7 @@ public partial class InterpreterVisitor
         // 处理点操作
         if (node.Opera == LangTokenType.Dot)
         {
-            var dotLeftResult = node.Left.Run(manager);
+            var dotLeftResult = node.Left.Accept(this);
             if (dotLeftResult is AnyLangValue any)
             {
                 if (node.Right is Instance r1)
@@ -185,7 +185,7 @@ public partial class InterpreterVisitor
                     catch (InvalidOperationError)
                     {
                         // 如果 Dot 方法无法处理，则尝试作为索引访问
-                        var listIndexResult = node.Right.Run(manager);
+                        var listIndexResult = node.Right.Accept(this);
                         if (listIndexResult is IntLangValue intValue)
                         {
                             return list.Get(intValue);
@@ -238,7 +238,7 @@ public partial class InterpreterVisitor
                 // 处理数组索引访问，需要先运行Right表达式
                 if (node.Right is not null)
                 {
-                    var arrayIndexResult = node.Right.Run(manager);
+                    var arrayIndexResult = node.Right.Accept(this);
                     if (arrayIndexResult is IntLangValue intValue)
                     {
                         return array.Get(intValue);
@@ -294,7 +294,7 @@ public partial class InterpreterVisitor
                                 $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
                         }
 
-                        var retryCountValue = instance.Ids[0].Run(manager);
+                        var retryCountValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                         if (retryCountValue is not IntLangValue retryCount)
                         {
                             throw new TypeError(instance, "Retry 的第一个参数必须是整数");
@@ -303,7 +303,7 @@ public partial class InterpreterVisitor
                         var delayMs = 0;
                         if (instance.Ids.Count == 2)
                         {
-                            var delayValue = instance.Ids[1].Run(manager);
+                            var delayValue = instance.Ids[1].Accept(new InterpreterVisitor(manager));
                             if (delayValue is IntLangValue delayInt)
                             {
                                 delayMs = delayInt.Value;
@@ -350,7 +350,7 @@ public partial class InterpreterVisitor
                                 $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
                         }
 
-                        var retryCountValue = instance.Ids[0].Run(manager);
+                        var retryCountValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                         if (retryCountValue is not IntLangValue retryCount)
                         {
                             throw new TypeError(instance, "Retry 的第一个参数必须是整数");
@@ -359,7 +359,7 @@ public partial class InterpreterVisitor
                         var delayMs = 0;
                         if (instance.Ids.Count == 2)
                         {
-                            var delayValue = instance.Ids[1].Run(manager);
+                            var delayValue = instance.Ids[1].Accept(new InterpreterVisitor(manager));
                             if (delayValue is IntLangValue delayInt)
                             {
                                 delayMs = delayInt.Value;
@@ -404,7 +404,7 @@ public partial class InterpreterVisitor
         // 处理其他二元运算符，运行左右操作数
         // 注意：直接在当前作用域中运行两个操作数
         // Set方法已经被修复，只在当前作用域中设置变量，不会修改外部变量
-        var leftResult = node.Left.Run(manager);
+        var leftResult = node.Left.Accept(this);
 
         if (node.Opera == LangTokenType.As)
         {
@@ -423,7 +423,7 @@ public partial class InterpreterVisitor
                 default:
                 {
                     // 如果是其他表达式，尝试获取其值作为类型
-                    var rightAsResult = node.Right?.Run(manager) ?? throw new InvalidOperationError(node, "右操作数不能为空");
+                    var rightAsResult = node.Right?.Accept(new InterpreterVisitor(manager)) ?? throw new InvalidOperationError(node, "右操作数不能为空");
 
                     if (rightAsResult is TypeLangValue typeLangValue)
                     {
@@ -472,7 +472,7 @@ public partial class InterpreterVisitor
                 default:
                 {
                     // 如果是其他表达式，尝试获取其值作为类型
-                    var rightIsResult = node.Right?.Run(manager) ?? throw new InvalidOperationError(node, "右操作数不能为空");
+                    var rightIsResult = node.Right?.Accept(new InterpreterVisitor(manager)) ?? throw new InvalidOperationError(node, "右操作数不能为空");
 
                     if (rightIsResult is TypeLangValue typeLangValue)
                     {
@@ -507,7 +507,7 @@ public partial class InterpreterVisitor
                 default:
                 {
                     // 如果是其他表达式，尝试获取其值作为类型
-                    var rightIsNotResult = node.Right?.Run(manager) ?? throw new InvalidOperationError(node, "右操作数不能为空");
+                    var rightIsNotResult = node.Right?.Accept(new InterpreterVisitor(manager)) ?? throw new InvalidOperationError(node, "右操作数不能为空");
 
                     if (rightIsNotResult is TypeLangValue typeLangValue)
                     {
@@ -526,7 +526,7 @@ public partial class InterpreterVisitor
             return new BoolLangValue(!node.CheckIsInstance(leftResult, typeName, manager));
         }
 
-        var rightResult = node.Right?.Run(manager) ?? throw new InvalidOperationError(node, "右操作数不能为空");
+        var rightResult = node.Right?.Accept(new InterpreterVisitor(manager)) ?? throw new InvalidOperationError(node, "右操作数不能为空");
 
         // 处理空值合并运算符 ??
         if (node.Opera == LangTokenType.NullishCoalescing)
@@ -733,7 +733,7 @@ public partial class InterpreterVisitor
 
         // 运行异步函数以捕获闭包
         // 对于包含 yield 的异步函数，Run() 会返回 AsyncGeneratorLangValue
-        var result = asyncFunc.Run(manager);
+        var result = asyncFunc.Accept(this);
 
         // 如果返回的是 AsyncGeneratorLangValue，直接包装为 AsyncStreamLangValue
         if (result is AsyncGeneratorLangValue asyncGen)
@@ -803,7 +803,7 @@ public partial class InterpreterVisitor
     {
 
         // 计算被匹配的值
-        var matchValue = node.MatchValue.Run(manager);
+        var matchValue = node.MatchValue.Accept(this);
 
         // 依次检查每个 case
         foreach (var matchCase in node.Cases)

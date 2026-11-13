@@ -1,6 +1,8 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
 /// <summary>
@@ -58,12 +60,12 @@ public static class NullishCoalescingILHelper
         // 值类型不能为null，直接返回左侧值
         if (leftType.IsValueType)
         {
-            left.LoadIlValue(ilGenerator, local);
+            left.Accept(new CompilerVisitor(ilGenerator, local));
             return leftType;
         }
 
         // 引用类型，加载左侧值
-        left.LoadIlValue(ilGenerator, local);
+        left.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 检查左侧值是否为null
         ilGenerator.Emit(OpCodes.Dup); // 复制左侧值到栈顶
@@ -81,7 +83,7 @@ public static class NullishCoalescingILHelper
         // 左侧值为null，弹出栈上的左侧值，加载右侧值
         ilGenerator.MarkLabel(rightLabel);
         ilGenerator.Emit(OpCodes.Pop); // 弹出栈上的左侧值
-        right.LoadIlValue(ilGenerator, local);
+        right.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 结束标签
         ilGenerator.MarkLabel(endLabel);

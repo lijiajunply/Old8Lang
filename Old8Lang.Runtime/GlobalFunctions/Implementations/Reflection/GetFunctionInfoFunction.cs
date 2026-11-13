@@ -10,6 +10,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Reflection;
 
 /// <summary>
@@ -78,12 +80,12 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载第一个参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 如果有第二个参数，也加载
         if (parameters.Count == 2)
         {
-            parameters[1].LoadIlValue(ilGenerator, local);
+            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
             // 调用 ReflectionHelper.GetFunctionInfo(object, string)
             var method = GlobalMethodInfoCache.GetMethod(
                 typeof(ReflectionHelper),

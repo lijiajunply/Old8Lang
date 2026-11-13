@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -22,17 +24,6 @@ public partial class TestRunnerClassLangValue : LangValueType
     public override string TypeToString() => "TestRunnerClass";
 
     public override string ToDisplayString() => "TestRunner";
-
-    /// <summary>
-    /// 生成 IL 代码，返回 TestRunner 类型本身
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 对于 TestRunner 类静态方法，我们不需要加载实例
-        // 直接返回 TestRunner 类型本身
-        ilGenerator.Emit(OpCodes.Ldtoken, typeof(TestRunnerClassLangValue));
-        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -72,7 +63,7 @@ public partial class TestRunnerClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Run(currentManager)).ToList();
+            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
             return method(args, instance.Position);
         }
 
@@ -427,7 +418,7 @@ public partial class TestRunnerClassLangValue : LangValueType
 
             // 与 ConvertTestResult 同理：构造后必须 Run 才会展开成可读的键值对
             var statisticsDictionary = new DictionaryLangValue(tupleList);
-            statisticsDictionary.Run(new VariateManager());
+            statisticsDictionary.Accept(new InterpreterVisitor(new VariateManager()));
             return statisticsDictionary;
         }
         catch (Exception ex)
@@ -457,7 +448,7 @@ public partial class TestRunnerClassLangValue : LangValueType
         // 不调用 Run 的话，调用方（RunAll / RunTest 的返回值、ConvertToTestResults）
         // 会读到空字典，表现为测试名全为空、全部判失败。
         var dictionary = new DictionaryLangValue(tupleList);
-        dictionary.Run(new VariateManager());
+        dictionary.Accept(new InterpreterVisitor(new VariateManager()));
         return dictionary;
     }
 
@@ -546,21 +537,4 @@ public partial class TestRunnerStaticMethodWrapper(
         return method(args, position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码，返回对应TestRunner静态方法的委托
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // TestRunner 静态方法在 IL 中通常通过直接调用来实现
-        // 这里返回 null 作为占位符
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Delegate);
-    }
 }

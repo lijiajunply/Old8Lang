@@ -1,6 +1,8 @@
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -34,7 +36,7 @@ public static class TaskRetryHelper
                 try
                 {
                     // 重新执行函数调用以获取新的 Task
-                    var newTaskValue = funcCall.Run(manager);
+                    var newTaskValue = funcCall.Accept(new InterpreterVisitor(manager));
                     if (newTaskValue is not TaskLangValue newTask)
                     {
                         throw new TypeError(funcCall, "Retry 只能用于返回 Task 的异步函数");

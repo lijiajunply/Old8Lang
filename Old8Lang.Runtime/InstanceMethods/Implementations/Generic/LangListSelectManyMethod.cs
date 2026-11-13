@@ -9,6 +9,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class LangListSelectManyMethod : BaseLangListMethod, IIlNativeValueInstan
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var selector = parameters[0].Run(manager) as FuncLangValue;
+        var selector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (selector == null)
         {
@@ -37,7 +39,7 @@ public class LangListSelectManyMethod : BaseLangListMethod, IIlNativeValueInstan
         // 如果有第二个参数（resultSelector）
         if (parameters.Count > 1)
         {
-            var resultSelector = parameters[1].Run(manager) as FuncLangValue;
+            var resultSelector = parameters[1].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
             if (resultSelector == null)
             {
                 throw new ArgumentError(position, "resultSelector 参数必须是函数类型");

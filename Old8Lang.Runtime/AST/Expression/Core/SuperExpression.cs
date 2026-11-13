@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression;
 
 /// <summary>
@@ -19,47 +21,9 @@ namespace Old8Lang.AST.Expression;
 public partial class SuperExpression(SourcePosition position = default) : LangExpression(position)
 {
 
-    /// <summary>
-    /// 在当前上下文中解析super表达式
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>父类实例或成员的值</returns>
-    /// <exception cref="InvalidOperationError">当super不在类实例中调用时抛出</exception>
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 获取当前实例（this）
-        var currentInstance = manager.GetCurrentInstance();
-
-        if (currentInstance is null)
-        {
-            throw new InvalidOperationError(Position, "super只能在类实例方法中使用");
-        }
-
-        // 返回一个特殊的SuperProxy对象，用于延迟解析父类成员访问
-        return new SuperProxy(currentInstance, manager, Position);
-    }
-
     public override string ToString()
     {
         return "super";
-    }
-
-    /// <summary>
-    /// 返回 super 表达式的类型（返回 object 类型）
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        // super 表达式返回父类实例，类型为 object
-        return typeof(object);
-    }
-
-    /// <summary>
-    /// 生成 IL 代码加载 super 引用
-    /// </summary>
-    public override void LoadIlValue(System.Reflection.Emit.ILGenerator ilGenerator, LocalManager local)
-    {
-        // 加载 this 指针（ldarg.0）
-        ilGenerator.Emit(System.Reflection.Emit.OpCodes.Ldarg_0);
     }
 }
 
@@ -236,7 +200,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     internal LangValueType ExecuteParentMethod(LangMethodInfo methodInfo, List<LangExpression> arguments, VariateManager manager)
     {
         // 计算参数值（在调用者作用域中）
-        var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
+        var parameterValues = arguments.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
         var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
 
         // 创建方法执行作用域(基于调用者作用域,能访问外部变量和类型定义)

@@ -303,7 +303,7 @@ public partial class InterpreterVisitor
             {
                 // 有多个重载且有位置参数时，进行类型匹配
                 // 计算位置参数的实际值和类型
-                var paramValues = node.Ids.Select(t => t.Run(manager)).ToList();
+                var paramValues = node.Ids.Select(t => t.Accept(this)).ToList();
 
                 foreach (var func in matchingFunctions)
                 {
@@ -378,13 +378,13 @@ public partial class InterpreterVisitor
                 if (bestMatch is AsyncFuncLangValue asyncFunc)
                 {
                     // 先调用 Run() 捕获闭包（可能返回AsyncFuncLangValue或AsyncGeneratorLangValue）
-                    var closedFunc = asyncFunc.Run(manager);
+                    var closedFunc = asyncFunc.Accept(this);
 
                     // 如果是异步生成器，需要设置参数
                     if (closedFunc is AsyncGeneratorLangValue asyncGen)
                     {
                         // 计算参数值
-                        var paramValuesCopy = node.Ids.Select(t => t.Run(manager)).ToList();
+                        var paramValuesCopy = node.Ids.Select(t => t.Accept(this)).ToList();
 
                         // 处理默认参数，补全缺失的参数值
                         if (asyncFunc.Ids is { Count: > 0 })
@@ -394,7 +394,7 @@ public partial class InterpreterVisitor
                                 var id = asyncFunc.Ids[i];
                                 if (id.DefaultValue is not null)
                                 {
-                                    var defaultValue = id.DefaultValue.Run(manager);
+                                    var defaultValue = id.DefaultValue.Accept(this);
                                     paramValuesCopy.Add(defaultValue);
                                 }
                             }
@@ -460,13 +460,13 @@ public partial class InterpreterVisitor
                 else
                 {
                     // 其他类型的 ImportInfo，使用单参数 Run
-                    result = ((ImportInfo)bestMatch).Run(manager);
+                    result = ((ImportInfo)bestMatch).Accept(new InterpreterVisitor(manager));
                 }
             }
             else
             {
                 // 没有找到匹配的函数，使用原来的方式查找
-                var idResult = node.Id.Run(manager);
+                var idResult = node.Id.Accept(this);
                 result = idResult;
 
                 // 后续处理...
@@ -521,21 +521,21 @@ public partial class InterpreterVisitor
                 else if (idResult is AsyncFuncLangValue asyncFuncValue)
                 {
                     // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
-                    var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Run(manager);
+                    var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Accept(this);
                     result = closedAsyncFunc.RunAsync(manager, node.Ids);
                 }
                 // 如果idResult是TaskStaticMethodWrapper，则调用它
                 else if (idResult is TaskStaticMethodWrapper taskMethodWrapper)
                 {
                     // 执行静态方法
-                    var args = node.Ids.Select(id => id.Run(manager)).ToList();
+                    var args = node.Ids.Select(id => id.Accept(this)).ToList();
                     result = taskMethodWrapper.Invoke(args, node.Position);
                 }
                 // 如果idResult是ThreadStaticMethodWrapper，则调用它
                 else if (idResult is ThreadStaticMethodWrapper threadMethodWrapper)
                 {
                     // 执行静态方法
-                    var args = node.Ids.Select(id => id.Run(manager)).ToList();
+                    var args = node.Ids.Select(id => id.Accept(this)).ToList();
                     result = threadMethodWrapper.Invoke(args, node.Position);
                 }
             }
@@ -543,7 +543,7 @@ public partial class InterpreterVisitor
         else
         {
             // 如果没有找到重载函数，使用原来的方式查找
-            var idResult = node.Id.Run(manager);
+            var idResult = node.Id.Accept(this);
             result = idResult;
 
             // 如果idResult是TypeTemplate，则创建其实例
@@ -603,21 +603,21 @@ public partial class InterpreterVisitor
             else if (idResult is AsyncFuncLangValue asyncFuncValue)
             {
                 // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
-                var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Run(manager);
+                var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Accept(this);
                 result = closedAsyncFunc.RunAsync(manager, node.Ids);
             }
             // 如果idResult是TaskStaticMethodWrapper，则调用它
             else if (idResult is TaskStaticMethodWrapper taskMethodWrapper)
             {
                 // 执行静态方法
-                var args = node.Ids.Select(id => id.Run(manager)).ToList();
+                var args = node.Ids.Select(id => id.Accept(this)).ToList();
                 result = taskMethodWrapper.Invoke(args, node.Position);
             }
             // 如果idResult是ThreadStaticMethodWrapper，则调用它
             else if (idResult is ThreadStaticMethodWrapper threadMethodWrapper)
             {
                 // 执行静态方法
-                var args = node.Ids.Select(id => id.Run(manager)).ToList();
+                var args = node.Ids.Select(id => id.Accept(this)).ToList();
                 result = threadMethodWrapper.Invoke(args, node.Position);
             }
         }
@@ -628,7 +628,7 @@ public partial class InterpreterVisitor
         if (result is NativeAnyLangValue nativeAnyValue)
         {
             List<LangValueType> a = [];
-            a.AddRange(node.Ids.Select(id => id.Run(manager)));
+            a.AddRange(node.Ids.Select(id => id.Accept(this)));
             nativeAnyValue.New([.. Apis.ListToObjects(a)]);
             result = nativeAnyValue;
         }
@@ -644,7 +644,7 @@ public partial class InterpreterVisitor
     public LangValueType VisitTypeLangValue(TypeLangValue node)
     {
 
-        var result = node._expression?.Run(manager);
+        var result = node._expression?.Accept(new InterpreterVisitor(manager));
         if (result is null) throw new InvalidOperationError(node, "类型表达式求值失败");
         node.Value = result.TypeToString();
         return node;
@@ -674,7 +674,7 @@ public partial class InterpreterVisitor
         var resultList = new List<LangValueType>();
 
         // 执行最外层的可迭代对象
-        var iterableValue = node.Iterable.Run(manager);
+        var iterableValue = node.Iterable.Accept(this);
 
         // 获取可迭代对象的元素
         IEnumerable<LangValueType> items;
@@ -694,7 +694,7 @@ public partial class InterpreterVisitor
         else if (iterableValue is RangeLangValue range)
         {
             // 处理范围类型，执行range表达式获取实际的数组
-            var rangeResult = range.Run(manager);
+            var rangeResult = range.Accept(this);
             if (rangeResult is ArrayLangValue rangeArray)
             {
                 items = rangeArray.GetItems();
@@ -766,36 +766,36 @@ public partial class InterpreterVisitor
         // 检查基础结果是否支持索引访问
         if (baseResult is ListLangValue list)
         {
-            if (node.NestedIndex.Run(manager) is not IntLangValue intResult)
-                throw new TypeError(node, "IntValue", node.NestedIndex.Run(manager).GetType().Name);
+            if (node.NestedIndex.Accept(this) is not IntLangValue intResult)
+                throw new TypeError(node, "IntValue", node.NestedIndex.Accept(this).GetType().Name);
             return list.Get(intResult);
         }
 
         if (baseResult is ArrayLangValue array)
         {
-            if (node.NestedIndex.Run(manager) is not IntLangValue intResult)
-                throw new TypeError(node, "IntValue", node.NestedIndex.Run(manager).GetType().Name);
+            if (node.NestedIndex.Accept(this) is not IntLangValue intResult)
+                throw new TypeError(node, "IntValue", node.NestedIndex.Accept(this).GetType().Name);
             return array.Get(intResult);
         }
 
         if (baseResult is DictionaryLangValue dict)
         {
-            if (node.NestedIndex.Run(manager) is not { } keyResult)
-                throw new TypeError(node, "ValueType", node.NestedIndex.Run(manager).GetType().Name);
+            if (node.NestedIndex.Accept(this) is not { } keyResult)
+                throw new TypeError(node, "ValueType", node.NestedIndex.Accept(this).GetType().Name);
             return dict.Get(keyResult);
         }
 
         if (baseResult is StringLangValue str)
         {
-            if (node.NestedIndex.Run(manager) is not IntLangValue intResult)
-                throw new TypeError(node, "IntValue", node.NestedIndex.Run(manager).GetType().Name);
+            if (node.NestedIndex.Accept(this) is not IntLangValue intResult)
+                throw new TypeError(node, "IntValue", node.NestedIndex.Accept(this).GetType().Name);
             return str.Get(intResult);
         }
 
         if (baseResult is TupleLangValue tuple)
         {
-            return node.NestedIndex.Run(manager) is not IntLangValue intResult
-                ? throw new TypeError(node, "IntValue", node.NestedIndex.Run(manager).GetType().Name)
+            return node.NestedIndex.Accept(this) is not IntLangValue intResult
+                ? throw new TypeError(node, "IntValue", node.NestedIndex.Accept(this).GetType().Name)
                 : tuple.Get(intResult);
         }
 
@@ -814,9 +814,9 @@ public partial class InterpreterVisitor
         var baseResult = node.BaseExpression.Accept(this);
 
         // 将切片参数转换为值
-        var startValue = node.SliceStart.Run(manager);
-        var endValue = node.SliceEnd?.Run(manager);
-        var stepValue = node.SliceStep?.Run(manager);
+        var startValue = node.SliceStart.Accept(this);
+        var endValue = node.SliceEnd?.Accept(new InterpreterVisitor(manager));
+        var stepValue = node.SliceStep?.Accept(new InterpreterVisitor(manager));
 
         var start = startValue.GetValue<int>();
         var end = endValue?.GetValue<int>() ?? int.MaxValue;
@@ -891,7 +891,7 @@ public partial class InterpreterVisitor
     {
 
         var a = manager.GetValue(node.ListId);
-        LangExpression result = node.Key.Run(manager);
+        LangExpression result = node.Key.Accept(this);
 
         // 检查是否是 AnyLangValue（类实例）且定义了 _getitem 方法
         if (a is AnyLangValue anyValue)
@@ -1380,6 +1380,6 @@ public partial class InterpreterVisitor
 
     public LangValueType VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
-        return node.Run(manager);
+        return node.Accept(this);
     }
 }

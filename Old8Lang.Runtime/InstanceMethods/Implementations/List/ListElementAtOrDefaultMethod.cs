@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -24,8 +26,8 @@ public class ListElementAtOrDefaultMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var indexValue = parameters[0].Run(manager);
-        var defaultValue = parameters[1].Run(manager);
+        var indexValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (indexValue is not IntLangValue indexInt)
         {
@@ -49,9 +51,9 @@ public class ListElementAtOrDefaultMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
-        parameters[1].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ListElementAtOrDefaultMethod).GetMethod(nameof(ElementAtOrDefaultHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

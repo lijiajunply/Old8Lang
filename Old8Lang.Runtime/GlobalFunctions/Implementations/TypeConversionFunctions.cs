@@ -8,6 +8,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -23,7 +25,7 @@ public sealed class IntFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (value is IntLangValue intValue)
         {
@@ -57,8 +59,8 @@ public sealed class IntFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.LoadIlValue(ilGenerator, local);
-        var paramType = param.OutputType(local)!;
+        param.Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 int 类型，直接返回
         if (paramType == typeof(int))
@@ -157,7 +159,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (value is DoubleLangValue doubleValue)
         {
@@ -191,8 +193,8 @@ public sealed class DoubleFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.LoadIlValue(ilGenerator, local);
-        var paramType = param.OutputType(local)!;
+        param.Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 double 类型，直接返回
         if (paramType == typeof(double))
@@ -292,7 +294,7 @@ public sealed class CharFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (value is CharLangValue charValue)
         {
@@ -318,8 +320,8 @@ public sealed class CharFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.LoadIlValue(ilGenerator, local);
-        var paramType = param.OutputType(local)!;
+        param.Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 char 类型，直接返回
         if (paramType == typeof(char))
@@ -398,7 +400,7 @@ public sealed class BoolFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (value is BoolLangValue boolValue)
         {
@@ -439,8 +441,8 @@ public sealed class BoolFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.LoadIlValue(ilGenerator, local);
-        var paramType = param.OutputType(local)!;
+        param.Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 bool 类型，直接返回
         if (paramType == typeof(bool))

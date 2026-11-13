@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Thread;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class ThreadWithTimeoutMethod : BaseInstanceMethod, IIlNativeValueInstanc
         VariateManager manager, SourcePosition position)
     {
         var thread = (ThreadLangValue)instance;
-        var timeoutParam = parameters[0].Run(manager);
+        var timeoutParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (timeoutParam is not IntLangValue timeout)
         {

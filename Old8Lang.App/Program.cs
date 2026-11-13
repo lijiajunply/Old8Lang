@@ -6,6 +6,8 @@ using Old8Lang.Hosting;
 using Old8Lang.Interpreter;
 using Old8Lang.Modules.Official;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.App;
 
 /// <summary>
@@ -296,7 +298,7 @@ public abstract class Program
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 var ast = interpreter.Build(code: code);
-                ast.Run(interpreter.Manager);
+                ast.Accept(new InterpreterVisitor(interpreter.Manager));
             }
             catch (Exception e)
             {

@@ -274,39 +274,6 @@ public partial class ExternStatement : OldStatement
     }
 
     /// <summary>
-    /// 在解释模式下执行 extern 导入
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public override void Run(VariateManager manager)
-    {
-        // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(_externType);
-
-        // 委托给提供者执行
-        provider.LoadFunctions(_dllName, _functions, _defaultCallingConvention, manager);
-    }
-
-    /// <summary>
-    /// 在 IL 模式下生成 extern 导入的 IL 代码
-    /// </summary>
-    /// <param name="ilGenerator">IL 指令生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(_externType);
-
-        // 检查是否支持 IL 模式
-        if (!provider.SupportsCompilation)
-        {
-            throw new NotSupportedException($"{_externType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
-        }
-
-        // 委托给提供者生成 IL 代码
-        provider.GenerateIL(_dllName, _functions, _defaultCallingConvention, ilGenerator, local);
-    }
-
-    /// <summary>
     /// 获取指定索引处的语句
     /// </summary>
     public override OldStatement this[int index] => this;

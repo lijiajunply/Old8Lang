@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 public partial class ForStatement(
@@ -30,56 +32,6 @@ public partial class ForStatement(
         return expression is Expression.Operation;
     }
 
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 循环变量在解释器中属于循环作用域。若同名顶层变量已被提升为全局槽位，
-        // 循环内必须用局部变量遮蔽它，否则循环结束后函数会读到循环变量的最终值。
-        var shadow = BeginLoopVariableShadow(ilGenerator, local);
-        // 初始化表达式与循环变量的局部槽位已在 BeginLoopVariableShadow 中处理。
-        if (shadow is null)
-        {
-            setStatement.GenerateIl(ilGenerator, local);
-        }
-
-        // 创建循环标签
-        var loopStart = ilGenerator.DefineLabel();
-        var loopEnd = ilGenerator.DefineLabel();
-        var continueLabel = ilGenerator.DefineLabel();
-
-        // 保存当前的break和continue标签，以便嵌套循环使用
-        var oldBreakLabel = local.BreakLabel;
-        var oldContinueLabel = local.ContinueLabel;
-
-        // 设置当前循环的break和continue标签
-        local.BreakLabel = loopEnd;
-        local.ContinueLabel = continueLabel;
-
-        // 跳转到循环开始
-        ilGenerator.MarkLabel(loopStart);
-
-        // 检查循环条件
-        expression.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
-
-        blockStatement.GenerateIl(ilGenerator, local);
-
-        // continue标签：执行循环迭代语句
-        ilGenerator.MarkLabel(continueLabel);
-        statement.GenerateIl(ilGenerator, local);
-
-        // 跳转回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
-
-        // 循环结束标签
-        ilGenerator.MarkLabel(loopEnd);
-
-        // 恢复之前的break和continue标签
-        local.BreakLabel = oldBreakLabel;
-        local.ContinueLabel = oldContinueLabel;
-
-        EndLoopVariableShadow(local, shadow);
-    }
-
     /// <summary>
     /// 为 C 风格循环变量建立独立局部作用域。
     /// </summary>
@@ -100,12 +52,12 @@ public partial class ForStatement(
         Type? type = null;
         if (!string.IsNullOrEmpty(setStatement.Id!.AssumptionType))
         {
-            type = setStatement.Id.OutputType(local);
+            type = setStatement.Id.Accept(new TypeInferenceVisitor(local));
         }
 
         if (type is null || type == typeof(void))
         {
-            type = setStatement.Value.OutputType(local);
+            type = setStatement.Value.Accept(new TypeInferenceVisitor(local));
         }
 
         if (type is null || type == typeof(void))
@@ -114,7 +66,7 @@ public partial class ForStatement(
         }
 
         // 先按未遮蔽的状态求值 `for i <- ...` 的右侧。
-        setStatement.Value.LoadIlValue(ilGenerator, local);
+        setStatement.Value.Accept(new CompilerVisitor(ilGenerator, local));
         var loopLocal = ilGenerator.DeclareLocal(type);
         ilGenerator.Emit(OpCodes.Stloc, loopLocal);
 

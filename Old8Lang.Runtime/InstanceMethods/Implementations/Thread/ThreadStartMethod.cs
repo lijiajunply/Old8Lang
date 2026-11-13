@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Thread;
 
 /// <summary>
@@ -27,7 +29,7 @@ public class ThreadStartMethod : BaseInstanceMethod
         // 如果有参数
         if (parameters.Count == 1)
         {
-            var paramValue = parameters[0].Run(manager);
+            var paramValue = parameters[0].Accept(new InterpreterVisitor(manager));
             thread.Start(paramValue.GetValue());
         }
         else

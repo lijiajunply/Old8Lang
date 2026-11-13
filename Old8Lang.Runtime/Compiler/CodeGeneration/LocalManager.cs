@@ -10,6 +10,8 @@ using Old8Lang.AsyncGeneration;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>
@@ -252,7 +254,7 @@ public class LocalManager
             ilGenerator.BeginExceptionBlock();
 
             // 生成defer语句的IL代码
-            deferStatement.GenerateIl(ilGenerator, this);
+            deferStatement.Accept(new CompilerVisitor(ilGenerator, this));
 
             // catch块：捕获但不处理异常（符合defer语义）
             ilGenerator.BeginCatchBlock(typeof(Exception));
@@ -730,7 +732,7 @@ public class LocalManager
             var param = paramList.FirstOrDefault(p => p.IdName == variableName);
             if (param is not null)
             {
-                return param.OutputType(this);
+                return param.Accept(new TypeInferenceVisitor(this));
             }
         }
 

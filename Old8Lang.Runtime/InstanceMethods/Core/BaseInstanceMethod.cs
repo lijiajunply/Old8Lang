@@ -8,6 +8,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Core;
 
 /// <summary>
@@ -176,7 +178,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
 
         try
         {
-            return expression.OutputType(local);
+            return expression.Accept(new TypeInferenceVisitor(local));
         }
         catch
         {
@@ -411,7 +413,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// </summary>
     protected List<LangValueType> EvaluateParameters(List<LangExpression> parameters, VariateManager manager)
     {
-        return parameters.Select(p => p.Run(manager)).ToList();
+        return parameters.Select(p => p.Accept(new InterpreterVisitor(manager))).ToList();
     }
 
     /// <summary>

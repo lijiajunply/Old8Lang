@@ -68,11 +68,6 @@ public partial class CancellationTokenLangValue : LangValueType
     }
 
     /// <summary>
-    /// Run 方法：返回自身
-    /// </summary>
-    public override LangValueType Run(VariateManager manager) => this;
-
-    /// <summary>
     /// Dot 方法：支持属性访问和方法调用
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
@@ -116,22 +111,4 @@ public partial class CancellationTokenLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码（IL 模式暂不支持）
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotImplementedError(
-            Position,
-            "IL 模式暂不支持 CancellationToken 类型"
-        );
-    }
-
-    /// <summary>
-    /// 获取 .NET 类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(CancellationToken);
-    }
 }

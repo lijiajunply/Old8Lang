@@ -27,19 +27,6 @@ public class ClassFuncInitStatement : OldStatement
         FuncValue = funcValue;
     }
 
-    public override void Run(VariateManager manager)
-    {
-        // 类函数声明直接存储在ClassMemberId中，由BlockStatement的ToAnyData和ToStaticData方法处理
-        manager.Set(Id, FuncValue);
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 类方法的IL生成由ClassInit.GenerateIl()中的DefineMethod方法处理
-        // 这里不需要生成任何IL代码，因为类方法已经在类定义时编译完成
-        // 这个语句主要用于将方法信息添加到类的TypeTemplate中，实际IL生成在ClassInit中完成
-    }
-
     public override OldStatement this[int index] => this;
 
     public override int Count => 0;

@@ -78,13 +78,6 @@ public partial class CharLangValue(char value = '\0', SourcePosition position = 
         };
     }
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        ilGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(Value));
-    }
-
-    public override Type OutputType(LocalManager local) => Value.GetType();
-
     /// <summary>
     /// 重置对象状态，使其可以被复用
     /// </summary>

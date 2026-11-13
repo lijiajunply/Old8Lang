@@ -6,6 +6,8 @@ using Old8Lang.ModuleSystem.Loading;
 using Old8Lang.ModuleSystem.Resolution;
 using Old8Lang.ModuleSystem.Symbols;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
@@ -325,7 +327,7 @@ public class UnifiedModule(
         };
 
         // 4. 在隔离作用域中执行模块代码
-        loadResult.Block.Run(moduleManager);
+        loadResult.Block.Accept(new InterpreterVisitor(moduleManager));
 
         // 5. 提取符号
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
@@ -397,7 +399,7 @@ public class UnifiedModule(
         {
             // Handle native class instantiation
             List<LangValueType> args = [];
-            args.AddRange(instance.Ids.Select(id => id.Run(currentManager)));
+            args.AddRange(instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))));
             nativeAnyValue.New([.. Apis.ListToObjects(args)]);
             return nativeAnyValue;
         }

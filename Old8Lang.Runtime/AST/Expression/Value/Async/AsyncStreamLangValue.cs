@@ -41,14 +41,6 @@ public partial class AsyncStreamLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 执行异步流，返回下一个值
-    /// </summary>
-    public override LangValueType Run(VariateManager manager)
-    {
-        return _generator.Run(manager);
-    }
-
-    /// <summary>
     /// 异步执行，返回包含下一个值的 Task
     /// </summary>
     public TaskLangValue RunAsync(VariateManager manager)
@@ -135,31 +127,6 @@ public partial class AsyncStreamLangValue : LangValueType, ILangList
     #endregion
 
     #region 编译器支持
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(AsyncStreamLangValue);
-    }
-
-    /// <summary>
-    /// 生成 IL 代码
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 异步流的 IL 代码生成（后续实现）
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
-    /// <summary>
-    /// 设置值到 IL 代码
-    /// </summary>
-    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        // 异步流的 IL 代码生成（后续实现）
-    }
 
     #endregion
 

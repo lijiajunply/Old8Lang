@@ -7,6 +7,8 @@ using Old8Lang.Compiler.Helpers;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.ValueType;
 
 /// <summary>
@@ -30,8 +32,8 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 保留原始值，以便异常包装对象也能使用其 ToString 实现。
-        instance.LoadIlValue(ilGenerator, local);
-        var instanceType = instance.OutputType(local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        var instanceType = instance.Accept(new TypeInferenceVisitor(local));
         if (instance is not FuncLangValue && instanceType is { IsValueType: true })
         {
             ilGenerator.Emit(OpCodes.Box, instanceType);

@@ -3,6 +3,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 public partial class ThreadClassLangValue : LangValueType
@@ -50,10 +52,10 @@ public partial class ThreadClassLangValue : LangValueType
             var args =
                 // 使用 ExternalManager 执行参数
                 ExternalManager is not null
-                    ? instance.Ids.Select(id => id.Run(ExternalManager)).ToList()
+                    ? instance.Ids.Select(id => id.Accept(new InterpreterVisitor(ExternalManager))).ToList()
                     :
                     // 对于简单的静态方法（如 Sleep），直接执行参数
-                    instance.Ids.Select(id => id.Run(manager)).ToList();
+                    instance.Ids.Select(id => id.Accept(new InterpreterVisitor(manager))).ToList();
 
             return method(args, instance.Position);
         }

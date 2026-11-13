@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -38,23 +40,6 @@ public partial class AsyncForInStatement(
     public IReadOnlyList<LangId> Ids => AllIds;
 
     /// <summary>
-    /// 执行异步 for-in 循环
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public override void Run(VariateManager manager)
-    {
-        // 检查是否在生成器上下文中
-        if (manager.GeneratorContext is not null)
-        {
-            RunWithGeneratorContext(manager);
-        }
-        else
-        {
-            RunStandard(manager);
-        }
-    }
-
-    /// <summary>
     /// 标准异步 for-in 循环（非生成器）
     /// </summary>
     internal void RunStandard(VariateManager manager)
@@ -65,7 +50,7 @@ public partial class AsyncForInStatement(
 
         try
         {
-            var value = expression.Run(manager);
+            var value = expression.Accept(new InterpreterVisitor(manager));
 
             // 处理 TaskLangValue - await 任务并获取结果
             if (value is TaskLangValue taskValue)
@@ -84,7 +69,7 @@ public partial class AsyncForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    asyncStream.Run(manager);
+                    asyncStream.Accept(new InterpreterVisitor(manager));
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -111,7 +96,7 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     // 运行元组，获取实际值
-                                    tupleValue.Run(manager);
+                                    tupleValue.Accept(new InterpreterVisitor(manager));
 
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
@@ -129,7 +114,7 @@ public partial class AsyncForInStatement(
                             }
 
                             // 执行循环体
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -187,7 +172,7 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     // 运行元组，获取实际值
-                                    tupleValue.Run(manager);
+                                    tupleValue.Accept(new InterpreterVisitor(manager));
 
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
@@ -205,7 +190,7 @@ public partial class AsyncForInStatement(
                             }
 
                             // 执行循环体
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -224,7 +209,7 @@ public partial class AsyncForInStatement(
                 {
                     manager.ControlFlowManager.ResetCurrentState();
 
-                    generator.Run(manager);
+                    generator.Accept(new InterpreterVisitor(manager));
 
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
@@ -245,7 +230,7 @@ public partial class AsyncForInStatement(
                             {
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
-                                    tupleValue.Run(manager);
+                                    tupleValue.Accept(new InterpreterVisitor(manager));
                                     var values = tupleValue.GetItems().ToList();
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
@@ -259,7 +244,7 @@ public partial class AsyncForInStatement(
                                 }
                             }
 
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -284,7 +269,7 @@ public partial class AsyncForInStatement(
                     {
                         if (idValue is TupleLangValue tupleValue)
                         {
-                            tupleValue.Run(manager);
+                            tupleValue.Accept(new InterpreterVisitor(manager));
                             var values = tupleValue.GetItems().ToList();
 
                             for (int i = 0; i < AllIds.Count && i < values.Count; i++)
@@ -298,7 +283,7 @@ public partial class AsyncForInStatement(
                         }
                     }
 
-                    body.Run(manager);
+                    body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -347,7 +332,7 @@ public partial class AsyncForInStatement(
             // 如果缓存中没有，则evaluate表达式并缓存
             if (value is null)
             {
-                value = expression.Run(manager);
+                value = expression.Accept(new InterpreterVisitor(manager));
 
                 // 处理 TaskLangValue - await 任务并获取结果
                 if (value is TaskLangValue taskValue)
@@ -435,7 +420,7 @@ public partial class AsyncForInStatement(
             {
                 manager.ControlFlowManager.ResetCurrentState();
 
-                asyncStream.Run(manager);
+                asyncStream.Accept(new InterpreterVisitor(manager));
 
                 if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
@@ -460,7 +445,7 @@ public partial class AsyncForInStatement(
                         {
                             if (currentValue is TupleLangValue tupleValue)
                             {
-                                tupleValue.Run(manager);
+                                tupleValue.Accept(new InterpreterVisitor(manager));
                                 var values = tupleValue.GetItems().ToList();
                                 for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                 {
@@ -473,7 +458,7 @@ public partial class AsyncForInStatement(
                             }
                         }
 
-                        body.Run(manager);
+                        body.Accept(new InterpreterVisitor(manager));
 
                         // 如果循环体中发生了yield，我们需要：
                         // 1. 标记循环状态为"从yield恢复"
@@ -589,7 +574,7 @@ public partial class AsyncForInStatement(
                             {
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
-                                    tupleValue.Run(manager);
+                                    tupleValue.Accept(new InterpreterVisitor(manager));
                                     var values = tupleValue.GetItems().ToList();
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -602,7 +587,7 @@ public partial class AsyncForInStatement(
                                 }
                             }
 
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 如果循环体中发生了yield，我们需要：
                             // 1. 标记循环状态为"从yield恢复"
@@ -691,7 +676,7 @@ public partial class AsyncForInStatement(
                 {
                     if (idValue is TupleLangValue tupleValue)
                     {
-                        tupleValue.Run(manager);
+                        tupleValue.Accept(new InterpreterVisitor(manager));
                         var values = tupleValue.GetItems().ToList();
                         for (var j = 0; j < AllIds.Count && j < values.Count; j++)
                         {
@@ -705,7 +690,7 @@ public partial class AsyncForInStatement(
                 }
 
                 // 执行循环体
-                body.Run(manager);
+                body.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)
@@ -740,122 +725,12 @@ public partial class AsyncForInStatement(
     }
 
     /// <summary>
-    /// 生成 IL 代码（IL 模式）
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        var ty = expression.OutputType(local) ?? typeof(object);
-
-        // 对于字典类型，使用特殊处理
-        if (ty == typeof(Dictionary<object, object>))
-        {
-            GenerateDictionaryIl(ilGenerator, local);
-            return;
-        }
-
-        // 检查是否是异步枚举类型
-        if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-        {
-            GenerateAsyncEnumerableIl(ilGenerator, local, ty);
-            return;
-        }
-
-        // 非字典类型，使用普通的IEnumerator处理
-        var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        var current = ilGenerator.DeclareLocal(typeof(object));
-
-        // 获取枚举器
-        var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        expression.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
-        ilGenerator.Emit(OpCodes.Stloc, enumerator);
-
-        // 定义循环标签
-        var loopStart = ilGenerator.DefineLabel();
-        var loopEnd = ilGenerator.DefineLabel();
-        var continueLabel = ilGenerator.DefineLabel();
-
-        // 保存当前的break和continue标签
-        var oldBreakLabel = local.BreakLabel;
-        var oldContinueLabel = local.ContinueLabel;
-
-        // 设置当前循环的break和continue标签
-        local.BreakLabel = loopEnd;
-        local.ContinueLabel = continueLabel;
-
-        // 循环开始
-        ilGenerator.MarkLabel(loopStart);
-
-        // 调用MoveNext
-        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
-
-        // 获取当前元素
-        var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
-        var getCurrentMethod = currentProperty.GetGetMethod()!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
-        ilGenerator.Emit(OpCodes.Stloc, current);
-
-        // 处理标识符赋值
-        if (AllIds.Count == 1)
-        {
-            // 单个标识符，直接赋值
-            // 在异步状态机中，需要定义变量并存储
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
-            }
-            else
-            {
-                local.AddLocalVar(AllIds[0].IdName, current);
-            }
-        }
-        else
-        {
-            // 多个标识符，只赋值给第一个
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
-            }
-            else
-            {
-                local.AddLocalVar(AllIds[0].IdName, current);
-            }
-        }
-
-        // 生成循环体
-        body.GenerateIl(ilGenerator, local);
-
-        // 继续标签
-        ilGenerator.MarkLabel(continueLabel);
-
-        // 跳回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart);
-
-        // 循环结束
-        ilGenerator.MarkLabel(loopEnd);
-
-        // 恢复之前的break和continue标签
-        local.BreakLabel = oldBreakLabel;
-        local.ContinueLabel = oldContinueLabel;
-    }
-
-    /// <summary>
     /// 生成字典类型的IL代码
     /// </summary>
     internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        expression.LoadIlValue(ilGenerator, local);
+        expression.Accept(new CompilerVisitor(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -928,7 +803,7 @@ public partial class AsyncForInStatement(
         }
 
         // 生成循环体
-        body.GenerateIl(ilGenerator, local);
+        body.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
@@ -962,7 +837,7 @@ public partial class AsyncForInStatement(
         
         // 获取异步枚举器
         var getAsyncEnumeratorMethod = asyncEnumerableType.GetMethod("GetAsyncEnumerator", [typeof(CancellationToken)])!;
-        expression.LoadIlValue(ilGenerator, local);
+        expression.Accept(new CompilerVisitor(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldc_I4_0); // 默认的CancellationToken
         ilGenerator.Emit(OpCodes.Newobj, typeof(CancellationToken).GetConstructor(Type.EmptyTypes)!);
         ilGenerator.Emit(OpCodes.Callvirt, getAsyncEnumeratorMethod);
@@ -1034,7 +909,7 @@ public partial class AsyncForInStatement(
         }
         
         // 生成循环体
-        body.GenerateIl(ilGenerator, local);
+        body.Accept(new CompilerVisitor(ilGenerator, local));
         
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

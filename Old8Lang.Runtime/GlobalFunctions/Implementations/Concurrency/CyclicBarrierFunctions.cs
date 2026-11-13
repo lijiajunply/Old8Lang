@@ -9,6 +9,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
@@ -39,7 +41,7 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 participantCount 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CreateCyclicBarrier(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCyclicBarrier));
@@ -86,7 +88,7 @@ public sealed class CyclicBarrierAwaitFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.AwaitCyclicBarrier(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AwaitCyclicBarrier));
@@ -135,10 +137,10 @@ public sealed class CyclicBarrierAwaitTimeoutFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.AwaitCyclicBarrierTimeout(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AwaitCyclicBarrierTimeout));
@@ -186,7 +188,7 @@ public sealed class CyclicBarrierGetParticipantCountFunction : BaseGlobalFunctio
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.GetCyclicBarrierParticipantCount(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCyclicBarrierParticipantCount));
@@ -233,7 +235,7 @@ public sealed class CyclicBarrierGetWaitingCountFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.GetCyclicBarrierWaitingCount(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCyclicBarrierWaitingCount));
@@ -280,7 +282,7 @@ public sealed class CyclicBarrierDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeCyclicBarrier(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCyclicBarrier));

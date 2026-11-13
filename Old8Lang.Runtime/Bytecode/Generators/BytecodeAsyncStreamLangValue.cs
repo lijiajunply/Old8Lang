@@ -45,19 +45,6 @@ public class BytecodeAsyncStreamLangValue(int asyncGeneratorId, VirtualMachine v
     {
         return _asyncGenerator.MoveNext();
     }
-
-    /// <summary>
-    /// 执行异步流，返回下一个值（同步等待）
-    /// </summary>
-    public override LangValueType Run(VariateManager manager)
-    {
-        if (MoveNext())
-        {
-            return Current ?? new VoidLangValue();
-        }
-        return new VoidLangValue();
-    }
-
     /// <summary>
     /// 取消异步流的执行
     /// </summary>
@@ -82,14 +69,6 @@ public class BytecodeAsyncStreamLangValue(int asyncGeneratorId, VirtualMachine v
     }
 
     public override object GetValue() => this;
-
-    public override Type OutputType(LocalManager local) => typeof(BytecodeAsyncStreamLangValue);
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotSupportedException("异步流对象不支持IL代码生成");
-    }
-
     // IAsyncEnumerable实现
     public async IAsyncEnumerator<LangValueType> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {

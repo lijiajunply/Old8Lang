@@ -7,6 +7,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -22,7 +24,7 @@ public sealed class LockFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
         var expr = parameters[0];
-        var result = expr.Run(manager);
+        var result = expr.Accept(new InterpreterVisitor(manager));
 
         // 获取变量名（用于标识和调试）
         string varName;
@@ -54,8 +56,8 @@ public sealed class LockFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var value = parameters[0];
-        value.LoadIlValue(ilGenerator, local);
-        var valueType = value.OutputType(local) ?? typeof(object);
+        value.Accept(new CompilerVisitor(ilGenerator, local));
+        var valueType = value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (valueType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, valueType);

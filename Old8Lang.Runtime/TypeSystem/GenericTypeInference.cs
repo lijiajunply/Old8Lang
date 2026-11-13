@@ -3,6 +3,8 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
@@ -250,7 +252,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                     // 注意：这可能有副作用，但对于推断泛型类型来说是必要的
                     try
                     {
-                        var result = instance.Run(manager);
+                        var result = instance.Accept(new InterpreterVisitor(manager));
                         return GetTypeInfoFromValue(result);
                     }
                     catch

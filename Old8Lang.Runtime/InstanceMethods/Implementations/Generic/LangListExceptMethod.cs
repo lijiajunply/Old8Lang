@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class LangListExceptMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var otherValue = parameters[0].Run(manager);
+        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (otherValue is not ILangList otherList)
         {

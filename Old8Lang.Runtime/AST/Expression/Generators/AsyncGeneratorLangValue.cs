@@ -5,6 +5,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Generators;
 
 /// <summary>
@@ -121,18 +123,6 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 同步运行方法，用于向后兼容，实际会阻塞等待异步操作完成
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>生成器的下一个值</returns>
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 调用异步方法并阻塞等待
-        var taskResult = RunAsync(manager);
-        return taskResult.Await();
-    }
-
-    /// <summary>
     /// 作为可调用对象执行，返回下一个值
     /// </summary>
     /// <param name="manager">变量管理器</param>
@@ -142,7 +132,7 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     public LangValueType Run(VariateManager manager, List<LangExpression> args, object? obj = null)
     {
         // 异步生成器调用不需要参数，忽略args
-        return Run(manager);
+        return Accept(new InterpreterVisitor(manager));
     }
 
     /// <summary>
@@ -165,95 +155,6 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
         // 创建新的取消令牌源
         CancellationTokenSource?.Dispose();
         CancellationTokenSource = new CancellationTokenSource();
-    }
-
-    /// <summary>
-    /// 获取生成器的输出类型
-    /// </summary>
-    /// <param name="local">局部变量管理器</param>
-    /// <returns>生成器的输出类型</returns>
-    public override Type OutputType(LocalManager local) => typeof(object);
-
-    /// <summary>
-    /// 生成IL代码（IL 模式）
-    /// 生成异步生成器的委托，支持异步生成器的编译
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 异步生成器在 IL 模式下返回一个可以迭代的对象
-        // 我们创建一个委托，当调用时会返回一个IAsyncEnumerable<object>
-        
-        // 1. 确定参数类型和返回类型
-        var parameterTypes = AsyncFunc.Ids?.Select(item => item.OutputType(local)).ToArray() ?? Array.Empty<Type>();
-        var returnType = typeof(IAsyncEnumerable<object>);
-
-        // 2. 创建 DynamicMethod
-        var dynamicMethod = new DynamicMethod(
-            $"AsyncGenerator_{AsyncFunc.Id?.IdName ?? "Anonymous"}",
-            returnType,
-            parameterTypes,
-            true
-        );
-
-        // 3. 生成方法体
-        var methodIl = dynamicMethod.GetILGenerator();
-
-        // 创建新的LocalManager实例，专门用于生成器函数体的IL生成
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
-
-        foreach (var (key, value) in local.DelegateVar)
-        {
-            funcLocal.DelegateVar[key] = value;
-        }
-
-        foreach (var (key, value) in local.ClassVar)
-        {
-            funcLocal.ClassVar[key] = value;
-        }
-
-        foreach (var (key, value) in local.GlobalStaticClasses)
-        {
-            funcLocal.GlobalStaticClasses[key] = value;
-        }
-
-        foreach (var (key, value) in local.FuncParameters)
-        {
-            funcLocal.FuncParameters[key] = value;
-        }
-
-        foreach (var (key, value) in local.GenericFunctions)
-        {
-            funcLocal.GenericFunctions[key] = value;
-        }
-
-        // 处理参数
-        if (AsyncFunc.Ids != null)
-        {
-            for (var i = 0; i < AsyncFunc.Ids.Count; i++)
-            {
-                var id = AsyncFunc.Ids[i];
-                var paramType = parameterTypes[i];
-                var localVar = methodIl.DeclareLocal(paramType);
-                funcLocal.AddLocalVar(id.IdName, localVar);
-                funcLocal.LocalVarTypes[id.IdName] = paramType;
-
-                methodIl.Emit(OpCodes.Ldarg, i);
-                methodIl.Emit(OpCodes.Stloc, localVar);
-            }
-        }
-
-        // 生成异步生成器的方法体
-        GenerateGeneratorMethodBody(methodIl, funcLocal);
-
-        // 4. 创建委托并加载到栈上
-        var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
-
-        ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
-        ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
-        ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
     }
 
     /// <summary>
@@ -350,20 +251,6 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
         // 在原始方法中创建实例
         ilGenerator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes)!);
         ilGenerator.Emit(OpCodes.Ret);
-    }
-
-
-
-    /// <summary>
-    /// 设置值到IL代码
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    /// <param name="idName">标识符名称</param>
-    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        // 异步生成器不支持赋值操作
-        throw new NotSupportedException("异步生成器不支持赋值操作");
     }
 
     /// <summary>

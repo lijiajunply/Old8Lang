@@ -85,7 +85,7 @@ public partial class TypeTemplate(
             {
                 // 创建一个临时管理器来初始化静态变量
                 var tempManager = manager.NewManger();
-                var initialValue = value.Run(tempManager);
+                var initialValue = value.Accept(new InterpreterVisitor(tempManager));
                 _staticVariableValues[variableName] = initialValue;
                 return initialValue;
             }
@@ -170,11 +170,6 @@ public partial class TypeTemplate(
         return baseStr;
     }
 
-    public override LangValueType Run(VariateManager manager)
-    {
-        return this;
-    }
-
     /// <summary>
     /// 接受 Visitor 访问
     /// </summary>
@@ -240,7 +235,7 @@ public partial class TypeTemplate(
                 if (memberId.IdName == id.IdName && memberExpr is TypeTemplate)
                 {
                     // 找到嵌套类，执行并返回类型模板
-                    return memberExpr.Run(manager);
+                    return memberExpr.Accept(new InterpreterVisitor(manager));
                 }
             }
         }
@@ -392,7 +387,7 @@ public partial class TypeTemplate(
                 if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
                 {
                     // 找到嵌套类，创建实例（使用 V2）
-                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
+                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Accept(new InterpreterVisitor(manager));
                     var nestedInstance = nestedTypeTemplate.CreateInstance(manager);
                     nestedInstance.Init(manager.Interpreter);
                     return nestedInstance;
@@ -405,7 +400,7 @@ public partial class TypeTemplate(
                 if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
                 {
                     // 找到嵌套类，创建实例（使用 V2）
-                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
+                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Accept(new InterpreterVisitor(manager));
                     var nestedInstance = nestedTypeTemplate.CreateInstance(manager);
                     nestedInstance.Init(manager.Interpreter);
                     return nestedInstance;
@@ -458,7 +453,7 @@ public partial class TypeTemplate(
         {
             if (expr is not FuncLangValue)
             {
-                var value = expr.Run(manager);
+                var value = expr.Accept(new InterpreterVisitor(manager));
                 MetadataCache.StaticMembers[memberId.IdName] = value;
             }
         }
@@ -898,7 +893,7 @@ public partial class MethodOverloadList : LangValueType
                     }
                     else
                     {
-                        var argValue = args[i].Run(manager);
+                        var argValue = args[i].Accept(new InterpreterVisitor(manager));
                         string actualTypeName = argValue.GetType().Name;
                         if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {

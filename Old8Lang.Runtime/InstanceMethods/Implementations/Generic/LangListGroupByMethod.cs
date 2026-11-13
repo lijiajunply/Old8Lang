@@ -6,6 +6,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class LangListGroupByMethod : BaseLangListMethod
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var keySelectorExpr = parameters[0].Run(manager);
+        var keySelectorExpr = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (keySelectorExpr is not FuncLangValue keySelector)
         {

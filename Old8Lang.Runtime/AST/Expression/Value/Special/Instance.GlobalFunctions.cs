@@ -4,6 +4,8 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -255,7 +257,7 @@ public partial class Instance
             return overloadGroup.Overloads[0];
 
         // 先执行参数表达式获取运行时值
-        var paramValues = parameters.Select(p => p.Run(manager)).ToList();
+        var paramValues = parameters.Select(p => p.Accept(new InterpreterVisitor(manager))).ToList();
 
         // 获取参数的 Old8Lang 类型名称
         var paramTypes = paramValues.Select(v => OverloadResolver.GetRuntimeValueType(v)).ToList();

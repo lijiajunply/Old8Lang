@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -90,7 +92,7 @@ public class ListBubbleSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(ListBubbleSortMethod).GetMethod(nameof(BubbleSortHelper),

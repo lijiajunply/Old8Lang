@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 /// <summary>
@@ -28,7 +30,7 @@ public class DictUpdateMethod : BaseInstanceMethod
         if (parameters.Count == 1)
         {
             // Update(otherDictionary) 形式
-            var otherDict = parameters[0].Run(manager) as DictionaryLangValue;
+            var otherDict = parameters[0].Accept(new InterpreterVisitor(manager)) as DictionaryLangValue;
             if (otherDict == null)
             {
                 throw new ArgumentException("参数必须是 Dictionary 类型");
@@ -59,8 +61,8 @@ public class DictUpdateMethod : BaseInstanceMethod
         else
         {
             // Update(key, value) 形式
-            var key = parameters[0].Run(manager);
-            var value = parameters[1].Run(manager);
+            var key = parameters[0].Accept(new InterpreterVisitor(manager));
+            var value = parameters[1].Accept(new InterpreterVisitor(manager));
 
             // 查找并更新现有的键值对
             var keyFound = false;
@@ -88,19 +90,19 @@ public class DictUpdateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         if (parameters.Count == 1)
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
+            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
             var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateDictHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
         }
         else
         {
-            parameters[0].LoadIlValue(ilGenerator, local);
-            parameters[1].LoadIlValue(ilGenerator, local);
+            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
             var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateKeyValueHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);

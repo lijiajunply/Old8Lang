@@ -19,8 +19,6 @@ public partial class NullLangValue(SourcePosition position = default) : LangValu
 
     public override string ToString() => "Null";
 
-    public override LangValueType Run(VariateManager manager) => this;
-
     public override bool Equal(LangValueType? otherValueType)
     {
         return otherValueType is NullLangValue;
@@ -44,10 +42,4 @@ public partial class NullLangValue(SourcePosition position = default) : LangValu
 
     public override object? GetValue() => null;
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
-    public override Type OutputType(LocalManager local) => typeof(object);
 }

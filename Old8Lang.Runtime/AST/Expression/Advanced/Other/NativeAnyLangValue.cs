@@ -143,7 +143,7 @@ public class NativeAnyLangValue : ImportInfo
                 }
 
                 // 计算参数值
-                var arguments = orderedArgs.Select(arg => arg.Run(manager)).ToList();
+                var arguments = orderedArgs.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
 
                 // 将 Old8Lang 值转换为 .NET 对象
                 var nativeArguments = arguments.Select(ValueToObj).ToArray();
@@ -165,45 +165,6 @@ public class NativeAnyLangValue : ImportInfo
         }
 
         throw new InvalidOperationError(this, "不支持的点操作表达式类型");
-    }
-
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 如果已经有实例对象（通过第二个构造函数创建），则直接返回
-        if (InstanceObj is not null && ClassType is not null)
-        {
-            manager.Clone();
-            return this;
-        }
-
-        // 否则从 DLL 加载类型
-        if (_path is null || _dllName is null)
-        {
-            throw new InvalidOperationError(this, "无法加载类型：缺少 DLL 路径或名称");
-        }
-
-        var assembly = Assembly.LoadFile(_path);
-
-        // ClassName 可能是简单类名（如 "Container"）或完整类型名（如 "FirstUI.Layout.Container"）
-        // 先尝试使用 ClassName 直接获取类型
-        ClassType = assembly.GetType(ClassName);
-
-        // 如果失败，尝试拼接 DllName 和 ClassName
-        if (ClassType is null && _dllName is not null)
-        {
-            ClassType = assembly.GetType($"{_dllName}.{ClassName}");
-        }
-
-        if (ClassType is null)
-        {
-            throw new InvalidOperationError(this, $"无法加载类型：在程序集中找不到类型 '{ClassName}' 或 '{_dllName}.{ClassName}'");
-        }
-
-        var constructors = ClassType.GetConstructors();
-        if (constructors is { Length: > 0 })
-            Constructor = constructors[0];
-        manager.Clone();
-        return this;
     }
 
     public void New(object[] pa)

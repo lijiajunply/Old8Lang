@@ -40,14 +40,6 @@ public class LazySymbolProxy(
     }
 
     /// <summary>
-    /// 运行符号 - 对于常量直接返回值，对于函数返回函数对象
-    /// </summary>
-    public override LangValueType Run(VariateManager manager)
-    {
-        return ResolveSymbol();
-    }
-
-    /// <summary>
     /// 处理点访问 - 转发到真实符号
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)

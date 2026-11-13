@@ -4,6 +4,8 @@ using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
 // ReSharper disable CheckNamespace
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -50,7 +52,7 @@ public partial class FuncLangValue
                 CachedDefaultValues ??= new Dictionary<int, LangValueType>();
 
                 // 预先求值并缓存
-                var defaultValue = param.DefaultValue.Run(manager);
+                var defaultValue = param.DefaultValue.Accept(new InterpreterVisitor(manager));
                 CachedDefaultValues[i] = defaultValue;
             }
         }
@@ -127,7 +129,7 @@ public partial class FuncLangValue
         if (Ids is null) return [];
 
         // 1. 计算所有传入参数的值
-        var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
+        var paramValues = argumentExpressions.Select(expr => expr.Accept(new InterpreterVisitor(variManager))).ToList();
 
         // 检查是否有 params 参数
         var paramsIndex = -1;
@@ -193,7 +195,7 @@ public partial class FuncLangValue
                 {
                     // 非常量表达式，需要每次计算
                     var defaultValueManager = executionManager ?? variManager;
-                    var defaultValue = parameter.DefaultValue.Run(defaultValueManager);
+                    var defaultValue = parameter.DefaultValue.Accept(new InterpreterVisitor(defaultValueManager));
                     paramValues.Add(defaultValue);
                 }
             }

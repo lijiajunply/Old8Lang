@@ -6,6 +6,8 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
 // ReSharper disable CheckNamespace
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -13,60 +15,6 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class FuncLangValue
 {
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 如果这个函数没有方法引用（即是 Old8Lang 函数而非原生方法）
-        if (Method is null && Ids is not null)
-        {
-            // 对于生成器函数，我们需要特殊处理
-            if (ContainsYieldStatement(BlockStatement))
-            {
-                // 检查是否有参数需要处理
-                if (Ids.Count > 0)
-                {
-                    // 对于生成器函数，我们需要创建一个闭包，捕获当前作用域
-                    var generatorClosure =
-                        new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
-                        {
-                            // 生成器需要独立的作用域副本，使用深拷贝
-                            CapturedScope = manager.Clone()
-                        };
-
-                    return new GeneratorLangValue(generatorClosure, Position);
-                }
-
-                // 没有参数的生成器函数
-                var noParamClosure = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
-                {
-                    // 生成器需要独立的作用域副本，使用深拷贝
-                    CapturedScope = manager.Clone()
-                };
-
-                return new GeneratorLangValue(noParamClosure, Position);
-            }
-
-            // 外层管理器的作用域令牌必须与作用域一一对应，才能安全地判断帧是否存活；
-            // 生成器 / 异步恢复出来的管理器可能不维护令牌，此时只用快照。
-            var canUseHomeFrame = manager.ScopeTokens.Count == manager.Scopes.Count;
-
-            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
-            {
-                // 使用深拷贝创建独立的作用域副本
-                // 这样即使外层函数返回，lambda 仍然可以访问捕获的变量
-                CapturedScope = manager.Clone(),
-                // 同时记住外层管理器：外层帧还活着时直接在外层帧上执行，
-                // 闭包内对局部变量的赋值才能写回外层（见 ClosureFrameStillAlive）
-                CapturedHomeManager = canUseHomeFrame ? manager : null,
-                CapturedHomeTokens = canUseHomeFrame ? manager.ScopeTokens.ToArray() : null,
-                CapturedHomeThreadId = Environment.CurrentManagedThreadId
-            };
-
-            return closureFunc;
-        }
-
-        // 原生方法或其他情况直接返回自身
-        return this;
-    }
 
     /// <summary>
     /// 创建一个带有捕获作用域的函数副本
@@ -157,7 +105,7 @@ public partial class FuncLangValue
         }
 
         // 运行函数体
-        BlockStatement.Run(generatorManager);
+        BlockStatement.Accept(new InterpreterVisitor(generatorManager));
 
         return generatorManager.Result;
     }
@@ -509,7 +457,7 @@ public partial class FuncLangValue
                 }
             }
 
-            var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
+            var values = ids.Select(expr => expr.Accept(new InterpreterVisitor(variateManagerFunc))).ToList();
             var convertedValues = Apis.ListToObjects(values).ToArray();
 
             // 根据目标参数类型转换参数
@@ -754,7 +702,7 @@ public partial class FuncLangValue
                     {
                         foreach (var staticMember in typeTemplate.StaticVariates)
                         {
-                            executionManager.Set(staticMember.Key, staticMember.Value.Run(executionManager));
+                            executionManager.Set(staticMember.Key, staticMember.Value.Accept(new InterpreterVisitor(executionManager)));
                         }
                     }
                 }
@@ -788,7 +736,7 @@ public partial class FuncLangValue
             executionManager.Result = VoidLangValue.Instance;
 
             // 运行方法体
-            BlockStatement.Run(executionManager);
+            BlockStatement.Accept(new InterpreterVisitor(executionManager));
 
             // 保存返回值
             var result = executionManager.Result;
@@ -887,7 +835,7 @@ public partial class FuncLangValue
                 decorator.Arguments,
                 decorator.Position
             );
-            var wrapperFunc = decoratorCallExpr.Run(manager);
+            var wrapperFunc = decoratorCallExpr.Accept(new InterpreterVisitor(manager));
 
             if (wrapperFunc is not FuncLangValue wrapper)
             {
@@ -918,7 +866,7 @@ public partial class FuncLangValue
                 [new LangId(tempFuncName, position: decorator.Position)],
                 decorator.Position
             );
-            result = callExpr.Run(manager);
+            result = callExpr.Accept(new InterpreterVisitor(manager));
         }
 
         // 装饰器应该返回一个新的函数

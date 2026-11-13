@@ -72,14 +72,6 @@ public class BytecodeGeneratorLangValue(int generatorId, VirtualMachine vm, Sour
     }
 
     public override object GetValue() => this;
-
-    public override Type OutputType(LocalManager local) => typeof(BytecodeGeneratorLangValue);
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotSupportedException("生成器对象不支持IL代码生成");
-    }
-
     // IEnumerable实现，支持for-in循环
     public IEnumerator<LangValueType> GetEnumerator()
     {

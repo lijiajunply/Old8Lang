@@ -10,6 +10,8 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Core;
 
 /// <summary>
@@ -113,12 +115,12 @@ public class ExtensionMethodWrapper(
                 for (int i = 0; i < parameters.Count; i++)
                 {
                     var paramName = function.Ids![i].IdName;
-                    var paramValue = parameters[i].Run(manager);
+                    var paramValue = parameters[i].Accept(new InterpreterVisitor(manager));
                     manager.Set(new LangId(paramName), paramValue);
                 }
 
                 // 执行函数体
-                function.BlockStatement.Run(manager);
+                function.BlockStatement.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否有返回值
                 if (manager.IsReturn)
@@ -216,7 +218,7 @@ public class ExtensionMethodWrapper(
 
     private static void EmitLoadBoxed(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
     {
-        expression.LoadIlValue(ilGenerator, local);
+        expression.Accept(new CompilerVisitor(ilGenerator, local));
 
         if (expression is FuncLangValue)
         {
@@ -226,7 +228,7 @@ public class ExtensionMethodWrapper(
         Type? expressionType;
         try
         {
-            expressionType = expression.OutputType(local);
+            expressionType = expression.Accept(new TypeInferenceVisitor(local));
         }
         catch
         {
@@ -267,7 +269,7 @@ public class ExtensionMethodWrapper(
                     manager.Set(new LangId(function.Ids![i].IdName), arguments[i]);
                 }
 
-                function.BlockStatement.Run(manager);
+                function.BlockStatement.Accept(new InterpreterVisitor(manager));
 
                 if (manager.IsReturn)
                 {
@@ -579,7 +581,7 @@ public class ExtensionMethodWrapper(
             }
 
             // 执行函数体
-            function.BlockStatement.Run(tempManager);
+            function.BlockStatement.Accept(new InterpreterVisitor(tempManager));
 
             // 检查是否有返回值
             if (tempManager.IsReturn)

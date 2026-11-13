@@ -342,11 +342,6 @@ public partial class TaskLangValue : LangValueType
     }
 
     /// <summary>
-    /// Run 方法：返回自身
-    /// </summary>
-    public override LangValueType Run(VariateManager manager) => this;
-
-    /// <summary>
     /// Dot 方法：支持属性访问和方法调用
     /// </summary>
     /// <remarks>
@@ -378,27 +373,6 @@ public partial class TaskLangValue : LangValueType
 
         // 其他情况使用基类实现
         return base.Dot(dotExpression, manager);
-    }
-
-    /// <summary>
-    /// 生成 IL 代码，返回包装的 .NET Task&lt;object&gt; 类型
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 加载 this 指针
-        ilGenerator.Emit(OpCodes.Ldarg_0);
-        // 调用 GetValue() 方法获取底层 Task 对象
-        ilGenerator.Emit(OpCodes.Call, GetType().GetMethod("GetValue")!);
-        // 将 Task<LangValueType> 转换为 Task<object>
-        ilGenerator.Emit(OpCodes.Castclass, typeof(Task<object>));
-    }
-
-    /// <summary>
-    /// 获取 .NET 类型（IL 模式暂不支持）
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Task<object>);
     }
 
     /// <summary>

@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -30,7 +32,7 @@ public class StringToLowerMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(StringToLowerMethod).GetMethod(nameof(ToLowerHelper),

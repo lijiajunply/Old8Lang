@@ -62,7 +62,7 @@ public partial class TypeInferenceVisitor
     {
 
         // await Task<T> 返回 T
-        var exprType = node.Expression.OutputType(local);
+        var exprType = node.Expression.Accept(this);
         if (exprType == typeof(Task)) return typeof(object); // Task 返回 void -> null
 
         // 检查是否是泛型 Task<T>
@@ -94,7 +94,7 @@ public partial class TypeInferenceVisitor
     {
 
         // 1. 尝试分析函数表达式的类型
-        var funcType = node.FunctionExpression.OutputType(local);
+        var funcType = node.FunctionExpression.Accept(this);
 
         // 2. 如果是委托类型（包括 Action/Func），获取 Invoke 方法的返回类型
         if (typeof(Delegate).IsAssignableFrom(funcType))
@@ -114,7 +114,7 @@ public partial class TypeInferenceVisitor
             // 通常参数类型是独立的。
             try
             {
-                var paramTypes = node.Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
+                var paramTypes = node.Arguments.Select(arg => arg.Accept(this) ?? typeof(object)).ToArray();
                 var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
                 var delegateKey = $"{funcId.IdName}${paramTypeNames}";
 
@@ -349,7 +349,7 @@ public partial class TypeInferenceVisitor
         // 如果没有显式类型注解，但有默认值，从默认值推断类型
         if (node.DefaultValue is not null)
         {
-            return node.DefaultValue.OutputType(local) ?? typeof(object);
+            return node.DefaultValue.Accept(this) ?? typeof(object);
         }
 
         var value = local.GetLocalVar(node.IdName);
@@ -416,8 +416,8 @@ public partial class TypeInferenceVisitor
              node.Right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
             return typeof(Thread);
         // 直接返回类型信息，不创建临时方法
-        var leftType = node.Left?.OutputType(local);
-        var rightType = node.Right?.OutputType(local);
+        var leftType = node.Left?.Accept(new TypeInferenceVisitor(local));
+        var rightType = node.Right?.Accept(new TypeInferenceVisitor(local));
 
         // 处理 node.member 访问（类环境内）- 需要在 TypeBuilder 转换之前处理
         // 支持 LangId { IdName: "node" } 和 ThisExpression 两种形式
@@ -543,7 +543,7 @@ public partial class TypeInferenceVisitor
             // 对于其他方法调用，尝试查找方法并返回其返回类型
             if (leftType is not null)
             {
-                var paramTypes = instance.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+                var paramTypes = instance.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToArray();
                 var method = leftType.GetMethod(instance.Id.IdName, paramTypes);
                 if (method is not null)
                 {
@@ -650,8 +650,8 @@ public partial class TypeInferenceVisitor
     {
 
         // 三元表达式的输出类型是两个分支类型的公共父类型
-        var trueType = node.TrueExpression.OutputType(local);
-        var falseType = node.FalseExpression.OutputType(local);
+        var trueType = node.TrueExpression.Accept(this);
+        var falseType = node.FalseExpression.Accept(this);
 
         if (trueType == falseType)
         {
@@ -729,7 +729,7 @@ return node.Value.GetType();
 
     public Type VisitClassMemberId(ClassMemberId node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitDictionaryLangValue(DictionaryLangValue node)
@@ -748,7 +748,7 @@ return node.Value.GetType();
 
     public Type? VisitErrorLangValue(ErrorLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitFuncLangValue(FuncLangValue node)
@@ -759,7 +759,7 @@ return node.Value.GetType();
             return typeof(Delegate);
         }
 
-        var idType = node.Id?.OutputType(local);
+        var idType = node.Id?.Accept(new TypeInferenceVisitor(local));
         if (idType is not null && idType != typeof(object)) return idType;
         var a = FuncLangValue.GetItemType(node.BlockStatement, local);
         return a;
@@ -794,7 +794,7 @@ return typeof(object);
         {
             // 注意：OutputType 不应该有副作用，也不应该修改 AST
             // 我们只需要推断返回类型
-            var argTypes = node.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
+            var argTypes = node.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToList();
             var typeArgs = GenericMethodSpecializer.InferTypeArguments(genericFunc, argTypes, local);
 
             if (typeArgs != null)
@@ -807,7 +807,7 @@ return typeof(object);
 
         // 尝试使用函数名+参数类型查找（支持重载）
         // 先尝试精确匹配参数类型
-        var actualParamTypes = node.Ids.Select(id => id.OutputType(local)).ToArray();
+        var actualParamTypes = node.Ids.Select(id => id.Accept(this)).ToArray();
         var actualParamTypeNames = string.Join("_", actualParamTypes.Select(t => t?.Name ?? "object"));
         var exactDelegateKey = $"{node.Id.IdName}${actualParamTypeNames}";
         var result = local.DelegateVar.GetValueOrDefault(exactDelegateKey);
@@ -881,7 +881,7 @@ return node.Value.GetType();
     public Type VisitLangListItem(LangListItem node)
     {
 
-        var listType = node.ListId.OutputType(local);
+        var listType = node.ListId.Accept(this);
 
         if (listType == typeof(string))
         {
@@ -955,7 +955,7 @@ return node.Value.GetType();
     public Type VisitNestedIndexAccess(NestedIndexAccess node)
     {
 
-        var baseType = node.BaseExpression.OutputType(local) ?? typeof(object);
+        var baseType = node.BaseExpression.Accept(this) ?? typeof(object);
 
         if (baseType == typeof(string))
         {
@@ -1002,7 +1002,7 @@ return node.Value.GetType();
     public Type VisitNestedSliceAccess(NestedSliceAccess node)
     {
 
-        var baseType = node.BaseExpression.OutputType(local);
+        var baseType = node.BaseExpression.Accept(this);
 
         // 如果基础类型为null，返回object类型
         if (baseType is null)
@@ -1035,7 +1035,7 @@ return typeof(int[]);
     {
 
         // 获取 Id 的类型
-        var idType = node.Id.OutputType(local);
+        var idType = node.Id.Accept(this);
 
         // 如果类型为 null，返回 object 类型
         if (idType is null)
@@ -1091,12 +1091,12 @@ return node.Value.GetType();
 
     public Type? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type? VisitTaskFactoryStaticMethodWrapper(TaskFactoryStaticMethodWrapper node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitTaskLangValue(TaskLangValue node)
@@ -1109,12 +1109,12 @@ return node.Value.GetType();
 
     public Type? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type? VisitTaskSchedulerLangValue(TaskSchedulerLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitTaskStaticMethodWrapper(TaskStaticMethodWrapper node)
@@ -1127,7 +1127,7 @@ return node.Value.GetType();
 
     public Type? VisitThreadClassLangValue(ThreadClassLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitThreadLangValue(ThreadLangValue node)
@@ -1140,13 +1140,13 @@ return node.Value.GetType();
 
     public Type? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type VisitTupleLangValue(TupleLangValue node)
     {
 
-        var types = node.Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
+        var types = node.Elements.Select(e => e.Accept(this) ?? typeof(object)).ToArray();
         return node.GetValueTupleTypeForCompiler(types);
     
     
@@ -1175,7 +1175,7 @@ return node.Value.GetType();
         // 返回第一个 case 的结果类型（假设所有 case 返回相同类型）
         if (node.Cases.Count > 0)
         {
-            return node.Cases[0].ResultExpression.OutputType(local) ?? typeof(object);
+            return node.Cases[0].ResultExpression.Accept(this) ?? typeof(object);
         }
 
         return typeof(object);
@@ -1257,7 +1257,7 @@ return node.Value.GetType();
 
     public Type? VisitLockedVariableLangValue(LockedVariableLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 
     public Type? VisitMockLibClassLangValue(MockLibClassLangValue node)
@@ -1302,6 +1302,6 @@ return node.Value.GetType();
 
     public Type? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
-        return node.OutputType(local);
+        return node.Accept(this);
     }
 }

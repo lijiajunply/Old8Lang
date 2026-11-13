@@ -5,6 +5,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.ValueType;
 
 /// <summary>
@@ -21,15 +23,15 @@ public class ValueTypeEqualMethod : BaseValueTypeMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var otherValue = parameters[0].Run(manager);
+        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
         return new BoolLangValue(instance.Equal(otherValue));
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ValueTypeEqualMethod).GetMethod(nameof(EqualHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

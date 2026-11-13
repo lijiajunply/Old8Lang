@@ -14,7 +14,6 @@ public partial class BoolLangValue(bool value = false, SourcePosition position =
 {
     public bool Value = value;
     public override string ToString() => Value ? "true" : "false";
-    public override LangValueType Run(VariateManager manager) => this;
 
     public override bool Equal(LangValueType? otherValueType)
     {
@@ -40,13 +39,6 @@ public partial class BoolLangValue(bool value = false, SourcePosition position =
             _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        ilGenerator.Emit(Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-    }
-
-    public override Type OutputType(LocalManager local) => Value.GetType();
 
     /// <summary>
     /// 重置对象状态，使其可以被复用

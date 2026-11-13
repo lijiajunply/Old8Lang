@@ -9,6 +9,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
@@ -79,7 +81,7 @@ public sealed class CancelFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.Cancel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.Cancel));
@@ -128,10 +130,10 @@ public sealed class CancelAfterFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 delayMs 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CancelAfter(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CancelAfter));
@@ -180,7 +182,7 @@ public sealed class DisposeCancellationTokenSourceFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeCancellationTokenSource(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCancellationTokenSource));

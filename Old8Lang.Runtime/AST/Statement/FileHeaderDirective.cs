@@ -37,16 +37,6 @@ public partial class FileHeaderDirective(string directiveName, string directiveV
         return $"#!{DirectiveName} {DirectiveValue}";
     }
 
-    public override void Run(VariateManager manager)
-    {
-        // 文件头指令在解析时已经处理，运行时不需要执行任何操作
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 文件头指令在编译时已经处理，不需要生成IL代码
-    }
-
     public override OldStatement? this[int index] => null;
 
     public override int Count => 0;

@@ -113,23 +113,6 @@ public class VMThreadLangValue(int threadId, SourcePosition position = default) 
         };
     }
 
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(VMThreadLangValue);
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        ilGenerator.Emit(OpCodes.Ldarg_0);
-    }
-
-    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        var localVar = ilGenerator.DeclareLocal(typeof(VMThreadLangValue));
-        local.AddLocalVar(idName, localVar);
-        ilGenerator.Emit(OpCodes.Stloc, localVar);
-    }
-
     public override object GetValue()
     {
         return this;

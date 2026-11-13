@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class DictMergeMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var otherDict = parameters[0].Run(manager) as DictionaryLangValue;
+        var otherDict = parameters[0].Accept(new InterpreterVisitor(manager)) as DictionaryLangValue;
 
         if (otherDict == null)
         {
@@ -64,8 +66,8 @@ public class DictMergeMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(DictMergeMethod).GetMethod(nameof(MergeHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

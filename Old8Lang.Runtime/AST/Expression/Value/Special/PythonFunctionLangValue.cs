@@ -7,6 +7,8 @@ using Python.Runtime;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -69,7 +71,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 // 处理位置参数
                 foreach (var arg in positionalArgs)
                 {
-                    var argValue = arg.Run(variateManagerFunc);
+                    var argValue = arg.Accept(new InterpreterVisitor(variateManagerFunc));
                     pythonArgs.Add(argValue);
                 }
 
@@ -105,7 +107,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 var pyArgs = new List<PyObject>();
                 foreach (var arg in positionalArgs)
                 {
-                    var argValue = arg.Run(variateManagerFunc);
+                    var argValue = arg.Accept(new InterpreterVisitor(variateManagerFunc));
                     pyArgs.Add(ConvertToPython(argValue));
                 }
 
@@ -113,7 +115,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 var pyKwargs = new PyDict();
                 foreach (var namedArg in namedArgs)
                 {
-                    var argValue = namedArg.Value.Run(variateManagerFunc);
+                    var argValue = namedArg.Value.Accept(new InterpreterVisitor(variateManagerFunc));
                     var pyValue = ConvertToPython(argValue);
                     pyKwargs.SetItem(new PyString(namedArg.Name), pyValue);
                 }
@@ -334,22 +336,6 @@ public class PythonFunctionLangValue : FuncLangValue
         }
 
         return new ListLangValue(items);
-    }
-
-    /// <summary>
-    /// 在 IL 模式下生成 IL 代码（暂不支持）
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotSupportedException("IL 模式暂不支持 Python 函数调用");
-    }
-
-    /// <summary>
-    /// 返回输出类型（暂不支持）
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        throw new NotSupportedException("IL 模式暂不支持 Python 函数调用");
     }
 
     public override string ToString()

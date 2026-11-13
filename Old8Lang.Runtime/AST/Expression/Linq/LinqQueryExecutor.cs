@@ -4,6 +4,8 @@ using Old8Lang.Interpreter;
 using Old8Lang.Error;
 using System.Collections;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Linq;
 
 /// <summary>
@@ -18,7 +20,7 @@ public class LinqQueryExecutor(VariateManager manager)
     public LangValueType ExecuteQuery(LinqExpression linqExpr)
     {
         // 获取初始数据源
-        var sourceValue = linqExpr.FromClause.DataSource.Run(manager);
+        var sourceValue = linqExpr.FromClause.DataSource.Accept(new InterpreterVisitor(manager));
         var dataSource = ConvertToEnumerable(sourceValue);
 
         // 检查是否有 OrderBy 子句
@@ -56,7 +58,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     if (clause is LetClause letClause)
                     {
                         // 计算并设置 let 变量
-                        var letValue = letClause.Expression.Run(manager);
+                        var letValue = letClause.Expression.Accept(new InterpreterVisitor(manager));
                         var letId = new LangId(letClause.Variable);
                         manager.Set(letId, letValue);
                         letVariables[letClause.Variable] = letValue;
@@ -64,7 +66,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     else if (clause is WhereClause whereClause)
                     {
                         // 检查 where 条件
-                        var conditionResult = whereClause.Condition.Run(manager);
+                        var conditionResult = whereClause.Condition.Accept(new InterpreterVisitor(manager));
                         if (!IsTruthy(conditionResult))
                         {
                             shouldInclude = false;
@@ -91,7 +93,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         // 如果没有 OrderBy，直接执行 select
                         if (linqExpr.TerminationClause is SelectClause selectClause)
                         {
-                            var projectedValue = selectClause.Projection.Run(manager);
+                            var projectedValue = selectClause.Projection.Accept(new InterpreterVisitor(manager));
                             result.Add(ConvertFromLangValue(projectedValue));
                         }
                         else if (linqExpr.TerminationClause is GroupByClause)
@@ -137,7 +139,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     // 执行 select
                     if (linqExpr.TerminationClause is SelectClause selectClause)
                     {
-                        var projectedValue = selectClause.Projection.Run(manager);
+                        var projectedValue = selectClause.Projection.Accept(new InterpreterVisitor(manager));
                         result.Add(ConvertFromLangValue(projectedValue));
                     }
                     else if (linqExpr.TerminationClause is GroupByClause)
@@ -202,11 +204,11 @@ public class LinqQueryExecutor(VariateManager manager)
                         var innerRangeLangId = new LangId(joinClause.RangeVariable);
 
                         // 获取内部数据源
-                        var innerSourceValue = joinClause.InnerDataSource.Run(manager);
+                        var innerSourceValue = joinClause.InnerDataSource.Accept(new InterpreterVisitor(manager));
                         var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
 
                         // 计算外部键
-                        var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                        var outerKeyValue = joinClause.OuterKeyExpression.Accept(new InterpreterVisitor(manager));
                         var outerKey = ConvertFromLangValue(outerKeyValue);
 
                         if (joinClause.IsGroupJoin && joinClause.GroupVariable is not null)
@@ -221,7 +223,7 @@ public class LinqQueryExecutor(VariateManager manager)
 
                                 try
                                 {
-                                    var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                                    var innerKeyValue = joinClause.InnerKeyExpression.Accept(new InterpreterVisitor(manager));
                                     var innerKey = ConvertFromLangValue(innerKeyValue);
 
                                     if (KeysEqual(outerKey, innerKey))
@@ -260,7 +262,7 @@ public class LinqQueryExecutor(VariateManager manager)
 
                                 try
                                 {
-                                    var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                                    var innerKeyValue = joinClause.InnerKeyExpression.Accept(new InterpreterVisitor(manager));
                                     var innerKey = ConvertFromLangValue(innerKeyValue);
 
                                     if (KeysEqual(outerKey, innerKey))
@@ -294,7 +296,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                     else if (clause is LetClause letClause)
                     {
-                        var letValue = letClause.Expression.Run(manager);
+                        var letValue = letClause.Expression.Accept(new InterpreterVisitor(manager));
                         var letId = new LangId(letClause.Variable);
                         manager.Set(letId, letValue);
                         letVariables[letClause.Variable] = letValue;
@@ -313,7 +315,7 @@ public class LinqQueryExecutor(VariateManager manager)
                                     manager.Set(new LangId(varName), ConvertToLangValue(varValue));
                             }
 
-                            var conditionResult = whereClause.Condition.Run(manager);
+                            var conditionResult = whereClause.Condition.Accept(new InterpreterVisitor(manager));
                             if (IsTruthy(conditionResult))
                             {
                                 filteredItems.Add(currentItem);
@@ -360,7 +362,7 @@ public class LinqQueryExecutor(VariateManager manager)
 
                         if (linqExpr.TerminationClause is SelectClause selectClause)
                         {
-                            var projectedValue = selectClause.Projection.Run(manager);
+                            var projectedValue = selectClause.Projection.Accept(new InterpreterVisitor(manager));
                             result.Add(ConvertFromLangValue(projectedValue));
                         }
                         else if (linqExpr.TerminationClause is GroupByClause)
@@ -418,7 +420,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         manager.Set(new LangId(varName), varValue);
                     }
 
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    var keyValue = firstOrdering.KeyExpression.Accept(new InterpreterVisitor(manager));
                     return ConvertFromLangValue(keyValue);
                 }
                 finally
@@ -443,7 +445,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         manager.Set(new LangId(varName), varValue);
                     }
 
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    var keyValue = firstOrdering.KeyExpression.Accept(new InterpreterVisitor(manager));
                     return ConvertFromLangValue(keyValue);
                 }
                 finally
@@ -473,7 +475,7 @@ public class LinqQueryExecutor(VariateManager manager)
                             manager.Set(new LangId(varName), varValue);
                         }
 
-                        var keyValue = ordering.KeyExpression.Run(manager);
+                        var keyValue = ordering.KeyExpression.Accept(new InterpreterVisitor(manager));
                         return ConvertFromLangValue(keyValue);
                     }
                     finally
@@ -498,7 +500,7 @@ public class LinqQueryExecutor(VariateManager manager)
                             manager.Set(new LangId(varName), varValue);
                         }
 
-                        var keyValue = ordering.KeyExpression.Run(manager);
+                        var keyValue = ordering.KeyExpression.Accept(new InterpreterVisitor(manager));
                         return ConvertFromLangValue(keyValue);
                     }
                     finally
@@ -518,7 +520,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// </summary>
     internal IEnumerable ExecuteFromClause(FromClause fromClause)
     {
-        var sourceValue = fromClause.DataSource.Run(manager);
+        var sourceValue = fromClause.DataSource.Accept(new InterpreterVisitor(manager));
         return ConvertToEnumerable(sourceValue);
     }
 
@@ -568,7 +570,7 @@ public class LinqQueryExecutor(VariateManager manager)
             try
             {
                 // 执行 where 条件表达式
-                var conditionResult = whereClause.Condition.Run(manager);
+                var conditionResult = whereClause.Condition.Accept(new InterpreterVisitor(manager));
 
                 // 判断条件是否为真
                 if (IsTruthy(conditionResult))
@@ -604,7 +606,7 @@ public class LinqQueryExecutor(VariateManager manager)
             try
             {
                 // 执行 select 投影表达式
-                var projectedValue = selectClause.Projection.Run(manager);
+                var projectedValue = selectClause.Projection.Accept(new InterpreterVisitor(manager));
                 result.Add(ConvertFromLangValue(projectedValue));
             }
             finally
@@ -641,7 +643,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 manager.Set(rangeLangId, ConvertToLangValue(item));
                 try
                 {
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    var keyValue = firstOrdering.KeyExpression.Accept(new InterpreterVisitor(manager));
                     return ConvertFromLangValue(keyValue);
                 }
                 finally
@@ -659,7 +661,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 manager.Set(rangeLangId, ConvertToLangValue(item));
                 try
                 {
-                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    var keyValue = firstOrdering.KeyExpression.Accept(new InterpreterVisitor(manager));
                     return ConvertFromLangValue(keyValue);
                 }
                 finally
@@ -682,7 +684,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     manager.Set(rangeLangId, ConvertToLangValue(item));
                     try
                     {
-                        var keyValue = ordering.KeyExpression.Run(manager);
+                        var keyValue = ordering.KeyExpression.Accept(new InterpreterVisitor(manager));
                         return ConvertFromLangValue(keyValue);
                     }
                     finally
@@ -700,7 +702,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     manager.Set(rangeLangId, ConvertToLangValue(item));
                     try
                     {
-                        var keyValue = ordering.KeyExpression.Run(manager);
+                        var keyValue = ordering.KeyExpression.Accept(new InterpreterVisitor(manager));
                         return ConvertFromLangValue(keyValue);
                     }
                     finally
@@ -731,11 +733,11 @@ public class LinqQueryExecutor(VariateManager manager)
             try
             {
                 // 计算分组键
-                var keyValue = groupByClause.KeyExpression.Run(manager);
+                var keyValue = groupByClause.KeyExpression.Accept(new InterpreterVisitor(manager));
                 var key = ConvertFromLangValue(keyValue);
 
                 // 计算分组元素
-                var elementValue = groupByClause.ElementExpression.Run(manager);
+                var elementValue = groupByClause.ElementExpression.Accept(new InterpreterVisitor(manager));
                 var element = ConvertFromLangValue(elementValue);
 
                 // 添加到分组
@@ -774,7 +776,7 @@ public class LinqQueryExecutor(VariateManager manager)
             try
             {
                 // 计算 let 表达式的值
-                var letValue = letClause.Expression.Run(manager);
+                var letValue = letClause.Expression.Accept(new InterpreterVisitor(manager));
 
                 // 在作用域中设置 let 变量
                 manager.Set(letLangId, letValue);
@@ -803,7 +805,7 @@ public class LinqQueryExecutor(VariateManager manager)
         var innerRangeLangId = new LangId(joinClause.RangeVariable);
 
         // 获取内部数据源
-        var innerSourceValue = joinClause.InnerDataSource.Run(manager);
+        var innerSourceValue = joinClause.InnerDataSource.Accept(new InterpreterVisitor(manager));
         var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
 
         // 如果是 group join（join ... into groupVar）
@@ -820,7 +822,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 try
                 {
                     // 计算外部键
-                    var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                    var outerKeyValue = joinClause.OuterKeyExpression.Accept(new InterpreterVisitor(manager));
                     var outerKey = ConvertFromLangValue(outerKeyValue);
 
                     // 查找所有匹配的内部元素
@@ -835,7 +837,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         try
                         {
                             // 计算内部键
-                            var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                            var innerKeyValue = joinClause.InnerKeyExpression.Accept(new InterpreterVisitor(manager));
                             var innerKey = ConvertFromLangValue(innerKeyValue);
 
                             // 比较键是否相等
@@ -876,7 +878,7 @@ public class LinqQueryExecutor(VariateManager manager)
                 try
                 {
                     // 计算外部键
-                    var outerKeyValue = joinClause.OuterKeyExpression.Run(manager);
+                    var outerKeyValue = joinClause.OuterKeyExpression.Accept(new InterpreterVisitor(manager));
                     var outerKey = ConvertFromLangValue(outerKeyValue);
 
                     foreach (var innerItem in innerSource)
@@ -888,7 +890,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         try
                         {
                             // 计算内部键
-                            var innerKeyValue = joinClause.InnerKeyExpression.Run(manager);
+                            var innerKeyValue = joinClause.InnerKeyExpression.Accept(new InterpreterVisitor(manager));
                             var innerKey = ConvertFromLangValue(innerKeyValue);
 
                             // 比较键是否相等

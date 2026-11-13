@@ -20,20 +20,6 @@ public partial class DeferStatement(
     /// </summary>
     public OldStatement Statement => statement;
 
-    public override void Run(VariateManager manager)
-    {
-        // defer语句不立即执行，而是注册到defer栈中
-        // 由函数执行器负责在函数返回前执行
-        manager.RegisterDefer(statement);
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // IL 模式下的defer实现
-        // 将defer语句添加到LocalManager的defer栈中
-        local.RegisterDefer(statement);
-    }
-
     public override OldStatement this[int index]
     {
         get

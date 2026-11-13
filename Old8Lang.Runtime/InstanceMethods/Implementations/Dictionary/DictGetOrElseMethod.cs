@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 /// <summary>
@@ -23,8 +25,8 @@ public class DictGetOrElseMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Run(manager);
-        var defaultValue = parameters[1].Run(manager);
+        var key = parameters[0].Accept(new InterpreterVisitor(manager));
+        var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
         foreach (var (k, v) in dict.Value)
         {
@@ -40,9 +42,9 @@ public class DictGetOrElseMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
-        parameters[1].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(DictGetOrElseMethod).GetMethod(nameof(GetOrElseHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

@@ -157,7 +157,7 @@ public partial class CompilerVisitor
     {
 
         // 1. 确定参数类型和返回类型
-        var parameterTypes = node.Ids!.Select(item => item.OutputType(local)).ToArray();
+        var parameterTypes = node.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
         var returnType = typeof(Task<object>);
 
         // 2. 创建 DynamicMethod

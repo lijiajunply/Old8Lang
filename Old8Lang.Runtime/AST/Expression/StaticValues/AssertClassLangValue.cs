@@ -6,6 +6,8 @@ using Old8Lang.Compiler.Helpers;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -23,18 +25,6 @@ public partial class AssertClassLangValue : LangValueType
     public override string TypeToString() => "AssertClass";
 
     public override string ToDisplayString() => "Assert";
-
-    /// <summary>
-    /// 生成 IL 代码，返回 Assert 类型本身
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 对于 Assert 类静态方法，我们不需要加载实例
-        // 直接返回 Assert 类型本身
-        ilGenerator.Emit(OpCodes.Ldtoken, typeof(AssertHelper));
-        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
-
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -86,7 +76,7 @@ public partial class AssertClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Run(currentManager)).ToList();
+            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
             return method(args, instance.Position);
         }
 
@@ -1031,22 +1021,4 @@ public partial class AssertStaticMethodWrapper(
         return method(args, position);
     }
 
-
-    /// <summary>
-    /// 生成 IL 代码，返回对应Assert静态方法的委托
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // Assert 静态方法在 IL 中通常通过直接调用来实现
-        // 这里返回 null 作为占位符
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Delegate);
-    }
 }

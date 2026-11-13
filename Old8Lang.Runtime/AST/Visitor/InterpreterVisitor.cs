@@ -1,6 +1,8 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Visitor;
 
 /// <summary>

@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Concurrency;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -37,26 +39,13 @@ public partial class UsingStatement(
     /// </summary>
     public BlockStatement BlockStatement => blockStatement;
 
-    public override void Run(VariateManager manager)
-    {
-        // 检查是否在生成器上下文中
-        if (manager.GeneratorContext is not null)
-        {
-            RunWithGeneratorContext(manager);
-        }
-        else
-        {
-            RunStandard(manager);
-        }
-    }
-
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
     internal void RunStandard(VariateManager manager)
     {
         // 1. 执行资源表达式
-        var resource = resourceExpression.Run(manager);
+        var resource = resourceExpression.Accept(new InterpreterVisitor(manager));
 
         // 2. 如果有变量名，注册到作用域
         if (variableName is not null)
@@ -67,7 +56,7 @@ public partial class UsingStatement(
         try
         {
             // 3. 执行using块
-            blockStatement.Run(manager);
+            blockStatement.Accept(new InterpreterVisitor(manager));
         }
         finally
         {
@@ -92,7 +81,7 @@ public partial class UsingStatement(
             // 从using块内恢复，继续执行
             try
             {
-                blockStatement.Run(manager);
+                blockStatement.Accept(new InterpreterVisitor(manager));
             }
             finally
             {
@@ -107,7 +96,7 @@ public partial class UsingStatement(
         else
         {
             // 首次进入using语句
-            var resource = resourceExpression.Run(manager);
+            var resource = resourceExpression.Accept(new InterpreterVisitor(manager));
 
             if (variableName is not null)
             {
@@ -120,7 +109,7 @@ public partial class UsingStatement(
 
             try
             {
-                blockStatement.Run(manager);
+                blockStatement.Accept(new InterpreterVisitor(manager));
             }
             finally
             {
@@ -153,85 +142,6 @@ public partial class UsingStatement(
         {
             disposable.Dispose();
         }
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 1. 创建局部变量存储资源
-        resourceExpression.LoadIlValue(ilGenerator, local);
-        var resourceType = resourceExpression.OutputType(local);
-        if (resourceType != null)
-        {
-            var resourceLocal = ilGenerator.DeclareLocal(resourceType);
-            ilGenerator.Emit(OpCodes.Stloc, resourceLocal);
-
-            // 2. 如果有变量名，添加到局部变量
-            if (variableName is not null)
-            {
-                local.AddLocalVar(variableName, resourceLocal);
-                local.LocalVarTypes[variableName] = resourceType;
-            }
-
-            // 3. 生成try-finally
-            ilGenerator.BeginExceptionBlock();
-
-            // try块：执行BlockStatement
-            blockStatement.GenerateIl(ilGenerator, local);
-
-            // finally块
-            ilGenerator.BeginFinallyBlock();
-
-            // 加载资源
-            ilGenerator.Emit(OpCodes.Ldloc, resourceLocal);
-        }
-
-        // 根据资源类型调用不同的 Dispose 方法
-        if (resourceType == typeof(int))
-        {
-            // 1. 整数资源：调用 ResourceManager.TryDispose(id)
-            var disposeMethod = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryDispose));
-            if (disposeMethod != null) ilGenerator.Emit(OpCodes.Call, disposeMethod);
-        }
-        else if (typeof(AnyLangValue).IsAssignableFrom(resourceType))
-        {
-            // 2. AnyLangValue 资源：调用 AnyLangValue.TryDispose()
-            var tryDisposeMethod = typeof(AnyLangValue).GetMethod(
-                nameof(AnyLangValue.TryDispose),
-                Type.EmptyTypes);
-            if (tryDisposeMethod is not null)
-            {
-                ilGenerator.Emit(OpCodes.Callvirt, tryDisposeMethod);
-            }
-            else
-            {
-                ilGenerator.Emit(OpCodes.Pop);
-            }
-        }
-        else
-        {
-            // 3. IDisposable 资源：调用 IDisposable.Dispose
-            var disposableType = typeof(IDisposable);
-            if (disposableType.IsAssignableFrom(resourceType))
-            {
-                var disposeMethod = disposableType.GetMethod(nameof(IDisposable.Dispose));
-                if (disposeMethod is not null)
-                {
-                    if (resourceType.IsValueType)
-                    {
-                        ilGenerator.Emit(OpCodes.Box, resourceType);
-                    }
-
-                    ilGenerator.Emit(OpCodes.Callvirt, disposeMethod);
-                }
-            }
-            else
-            {
-                // 不支持Dispose的类型，丢弃栈顶值
-                ilGenerator.Emit(OpCodes.Pop);
-            }
-        }
-
-        ilGenerator.EndExceptionBlock();
     }
 
     public override OldStatement this[int index]

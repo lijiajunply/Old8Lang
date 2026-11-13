@@ -2,6 +2,8 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AsyncGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Interpreter;
 
 /// <summary>
@@ -95,7 +97,7 @@ public class AsyncGeneratorStateMachine
         try
         {
             // 执行函数体直到下一个 yield
-            AsyncFunc.BlockStatement.Run(Manager);
+            AsyncFunc.BlockStatement.Accept(new InterpreterVisitor(Manager));
 
             // 检查是否 yield
             if (context.HasYielded)

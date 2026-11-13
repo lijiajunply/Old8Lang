@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -24,8 +26,8 @@ public class StringReplaceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var oldValue = parameters[0].Run(manager);
-        var newValue = parameters[1].Run(manager);
+        var oldValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var newValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (oldValue is not StringLangValue oldStr)
         {
@@ -44,13 +46,13 @@ public class StringReplaceMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载旧值
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载新值
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(StringReplaceMethod).GetMethod(nameof(ReplaceHelper),

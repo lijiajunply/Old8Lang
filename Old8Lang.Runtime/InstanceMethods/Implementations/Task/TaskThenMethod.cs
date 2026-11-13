@@ -10,6 +10,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Task;
 
 /// <summary>
@@ -29,7 +31,7 @@ public class TaskThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         var task = (TaskLangValue)instance;
 
         // 在当前作用域中评估回调参数
-        var callbackParam = parameters[0].Run(manager);
+        var callbackParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (callbackParam is not FuncLangValue callback)
         {

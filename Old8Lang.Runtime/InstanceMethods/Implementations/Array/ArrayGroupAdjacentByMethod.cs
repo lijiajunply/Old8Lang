@@ -9,6 +9,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Array;
 
 /// <summary>
@@ -26,7 +28,7 @@ public class ArrayGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInst
         VariateManager manager, SourcePosition position)
     {
         var array = (ArrayLangValue)instance;
-        var keySelector = parameters[0].Run(manager) as FuncLangValue;
+        var keySelector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (keySelector == null)
         {

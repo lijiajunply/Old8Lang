@@ -4,6 +4,8 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.Helpers;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>
@@ -264,7 +266,7 @@ public static class StaticClassCompiler
         }
 
         // 加载延迟时间参数
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 Task.Delay(int)
         var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
@@ -314,8 +316,8 @@ public static class StaticClassCompiler
         }
 
         // 加载参数
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var paramType = instance.Ids[0].OutputType(local);
+        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = instance.Ids[0].Accept(new TypeInferenceVisitor(local));
 
         // 如果是值类型，装箱为object
         if (paramType is not null && paramType.IsValueType)
@@ -334,7 +336,7 @@ public static class StaticClassCompiler
     }
 
     /// <summary>
-    /// 编译 Task.Run(action)
+    /// 编译 Task.Accept(new InterpreterVisitor(action))
     /// </summary>
     private static bool CompileTaskRun(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
     {
@@ -346,8 +348,8 @@ public static class StaticClassCompiler
         }
 
         // 加载委托参数
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
-        var paramType = instance.Ids[0].OutputType(local);
+        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        var paramType = instance.Ids[0].Accept(new TypeInferenceVisitor(local));
 
         // 检查参数类型，应该是 Func<object> 或 Action
         if (paramType == typeof(Func<object>))
@@ -364,7 +366,7 @@ public static class StaticClassCompiler
         }
         else if (paramType == typeof(Action))
         {
-            // 调用 Task.Run(Action)，然后转换为 Task<object>
+            // 调用 Task.Accept(new InterpreterVisitor(Action))，然后转换为 Task<object>
             var runMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m is { Name: "Run", IsGenericMethodDefinition: false } &&
@@ -414,10 +416,10 @@ public static class StaticClassCompiler
 
         // 加载任务列表/数组参数
         var listExpr = instance.Ids[0];
-        listExpr.LoadIlValue(ilGenerator, local);
+        listExpr.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 获取列表/数组类型
-        var listType = listExpr.OutputType(local);
+        var listType = listExpr.Accept(new TypeInferenceVisitor(local));
 
         if (listType == typeof(List<object>))
         {
@@ -472,10 +474,10 @@ public static class StaticClassCompiler
 
         // 加载任务列表/数组参数
         var listExpr = instance.Ids[0];
-        listExpr.LoadIlValue(ilGenerator, local);
+        listExpr.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 获取列表/数组类型
-        var listType = listExpr.OutputType(local);
+        var listType = listExpr.Accept(new TypeInferenceVisitor(local));
 
         if (listType == typeof(List<object>))
         {
@@ -561,7 +563,7 @@ public static class StaticClassCompiler
         }
 
         // 加载延迟时间参数
-        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 System.Threading.Thread.Sleep(int)
         var sleepMethod = typeof(Thread).GetMethod("Sleep", [typeof(int)])!;
@@ -583,8 +585,8 @@ public static class StaticClassCompiler
 
         foreach (var param in parameters)
         {
-            param.LoadIlValue(ilGenerator, local);
-            var paramType = param.OutputType(local);
+            param.Accept(new CompilerVisitor(ilGenerator, local));
+            var paramType = param.Accept(new TypeInferenceVisitor(local));
 
             // 如果是值类型，需要装箱
             if (paramType is not null && paramType.IsValueType)
@@ -632,11 +634,11 @@ public static class StaticClassCompiler
         // 2. 加载参数并装箱（如果需要）
         for (var i = 0; i < requiredParamCount; i++)
         {
-            instance.Ids[i].LoadIlValue(ilGenerator, local);
+            instance.Ids[i].Accept(new CompilerVisitor(ilGenerator, local));
 
             if (shouldBoxParams)
             {
-                var paramType = instance.Ids[i].OutputType(local);
+                var paramType = instance.Ids[i].Accept(new TypeInferenceVisitor(local));
                 if (paramType is not null && paramType.IsValueType)
                 {
                     ilGenerator.Emit(OpCodes.Box, paramType);
@@ -647,7 +649,7 @@ public static class StaticClassCompiler
         // 3. 处理可选的 message 参数
         if (instance.Ids.Count == requiredParamCount + 1)
         {
-            instance.Ids[requiredParamCount].LoadIlValue(ilGenerator, local);
+            instance.Ids[requiredParamCount].Accept(new CompilerVisitor(ilGenerator, local));
         }
         else
         {

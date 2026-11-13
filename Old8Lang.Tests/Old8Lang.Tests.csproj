@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="Old8Lang.Tests" />
   </ItemGroup>
 
   <ItemGroup>

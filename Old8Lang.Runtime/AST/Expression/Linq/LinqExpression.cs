@@ -2,6 +2,8 @@ using Old8Lang.Interpreter;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Linq;
 
 /// <summary>
@@ -36,40 +38,13 @@ public partial class LinqExpression(
     /// </summary>
     public QueryContinuation? Continuation { get; set; } = continuation;
 
-    public override LangValueType Run(VariateManager manager)
-    {
-        var executor = new LinqQueryExecutor(manager);
-        return executor.ExecuteQuery(this);
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        if (CanGenerateStreamingQuery())
-        {
-            GenerateStreamingQuery(ilGenerator, local);
-            return;
-        }
-        // 在 IL 模式下，LINQ 查询需要生成 IL 代码来执行查询逻辑
-        // 由于 IL 模式下无法直接访问 VariateManager（生成的方法是无参数的 Action），
-        // 我们需要通过 LocalManager.Interpreter.Manager 来访问
-
-        // 检查是否有 Interpreter
-        if (local.Interpreter?.Manager == null)
-        {
-            throw new NotSupportedException("LINQ 查询在 IL 模式下需要 Interpreter 支持");
-        }
-
-        // 将 LINQ 查询转换为手动的循环和过滤逻辑
-        GenerateLinqMethodCalls(ilGenerator, local);
-    }
-
     /// <summary>
     /// 生成 LINQ 方法调用链的 IL 代码
     /// </summary>
     internal void GenerateLinqMethodCalls(ILGenerator ilGenerator, LocalManager local)
     {
         // 1. 加载数据源
-        FromClause.DataSource.LoadIlValue(ilGenerator, local);
+        FromClause.DataSource.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 2. 转换为 IEnumerable
         ConvertToEnumerable(ilGenerator);
@@ -100,16 +75,6 @@ public partial class LinqExpression(
     {
         // 使用辅助方法进行转换，简化 IL 代码生成
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        if (CanGenerateStreamingQuery())
-        {
-            return typeof(List<object>);
-        }
-        // LINQ 查询返回 IEnumerable<T>
-        return typeof(System.Collections.IEnumerable);
     }
 
     /// <summary>

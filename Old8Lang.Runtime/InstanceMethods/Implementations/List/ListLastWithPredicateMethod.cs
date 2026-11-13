@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -39,7 +41,7 @@ public class ListLastWithPredicateMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var predicateParam = parameters[0].Run(manager);
+        var predicateParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (predicateParam is not FuncLangValue predicate)
         {
@@ -71,10 +73,10 @@ public class ListLastWithPredicateMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载谓词函数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(ListLastWithPredicateMethod).GetMethod(nameof(LastWithPredicateHelper),

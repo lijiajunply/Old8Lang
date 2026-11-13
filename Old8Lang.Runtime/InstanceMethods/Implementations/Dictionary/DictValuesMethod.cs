@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 public class DictValuesMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
@@ -44,7 +46,7 @@ public class DictValuesMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         }
 
         var manager = new VariateManager();
-        dict.Run(manager);
+        dict.Accept(new InterpreterVisitor(manager));
         return dict.Value.Select(pair => IlValueBridge.Unwrap(pair.Value)).ToList();
     }
 

@@ -9,6 +9,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -46,7 +48,7 @@ public class LangListMaxWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
             throw new InvalidOperationError(position, "无法对空列表求最大值");
         }
 
-        var selector = parameters[0].Run(manager) as FuncLangValue;
+        var selector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
         if (selector == null)
         {
             throw new ArgumentError(position, "selector 参数必须是函数类型");

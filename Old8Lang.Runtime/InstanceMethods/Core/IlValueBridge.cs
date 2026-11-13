@@ -10,6 +10,8 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Core;
 
 /// <summary>
@@ -159,7 +161,7 @@ public static class IlValueBridge
     /// </remarks>
     public static void EmitLoadWrapped(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
     {
-        expression.LoadIlValue(ilGenerator, local);
+        expression.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 函数字面量：栈上是编译好的委托，直接按函数值包装。
         // 不能走下面的 OutputType 判断——lambda 的 OutputType 是它函数体的返回类型（可能是值类型），
@@ -174,7 +176,7 @@ public static class IlValueBridge
         Type? expressionType;
         try
         {
-            expressionType = expression.OutputType(local);
+            expressionType = expression.Accept(new TypeInferenceVisitor(local));
         }
         catch
         {
@@ -317,12 +319,9 @@ internal sealed class IlDelegateFuncLangValue(Delegate function)
         function.Method.GetParameters()
             .Select(parameter => new LangId(parameter.Name ?? "arg"))
             .ToList();
-
-    public override LangValueType Run(VariateManager manager) => Run(manager, []);
-
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
-        var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Run(variateManagerFunc))).ToArray();
+        var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Accept(new InterpreterVisitor(variateManagerFunc)))).ToArray();
         var result = IlValueBridge.InvokeDelegate(Function, arguments);
         return IlValueBridge.Wrap(result);
     }

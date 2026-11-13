@@ -9,6 +9,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
@@ -79,7 +81,7 @@ public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 capacity 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CreateBoundedChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateBoundedChannel));
@@ -127,11 +129,11 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 value 参数并转换为 object
-        parameters[1].LoadIlValue(ilGenerator, local);
-        var valueType = parameters[1].OutputType(local) ?? typeof(object);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        var valueType = parameters[1].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (valueType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, valueType);
@@ -186,18 +188,18 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 value 参数并转换为 object
-        parameters[1].LoadIlValue(ilGenerator, local);
-        var valueType = parameters[1].OutputType(local) ?? typeof(object);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        var valueType = parameters[1].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (valueType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, valueType);
         }
 
         // 加载 timeoutMs 参数
-        parameters[2].LoadIlValue(ilGenerator, local);
+        parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.TrySendChannel(int, object, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TrySendChannel));
@@ -246,7 +248,7 @@ public sealed class ChannelReceiveFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.ReceiveChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReceiveChannel));
@@ -294,10 +296,10 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.TryReceiveChannel(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryReceiveChannel));
@@ -347,7 +349,7 @@ public sealed class ChannelCloseFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CloseChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CloseChannel));
@@ -395,7 +397,7 @@ public sealed class ChannelDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeChannel));

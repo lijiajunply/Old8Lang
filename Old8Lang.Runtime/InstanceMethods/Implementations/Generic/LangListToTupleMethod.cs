@@ -6,6 +6,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -57,7 +59,7 @@ public class LangListToTupleMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(LangListToTupleMethod).GetMethod(nameof(ToTupleHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.AsyncGeneration;
 using Old8Lang.ModuleSystem.StandardLibrary;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Interpreter;
 
 /// <summary>
@@ -405,7 +407,7 @@ public class VariateManager
                 try
                 {
                     // 在混合的作用域上执行defer语句
-                    deferEntry.Statement.Run(this);
+                    deferEntry.Statement.Accept(new InterpreterVisitor(this));
                 }
                 finally
                 {

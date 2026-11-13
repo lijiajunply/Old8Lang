@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -81,11 +83,6 @@ public partial class TaskCompletionSourceLangValue : LangValueType
     }
 
     /// <summary>
-    /// Run 方法：返回自身
-    /// </summary>
-    public override LangValueType Run(VariateManager manager) => this;
-
-    /// <summary>
     /// Dot 方法：支持属性访问和方法调用
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
@@ -129,7 +126,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"SetResult 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var resultValue = args[0].Run(manager);
+        var resultValue = args[0].Accept(new InterpreterVisitor(manager));
         SetResult(resultValue);
         return new VoidLangValue(Position);
     }
@@ -141,7 +138,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"SetException 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var exceptionArg = args[0].Run(manager);
+        var exceptionArg = args[0].Accept(new InterpreterVisitor(manager));
         string exceptionMessage;
 
         if (exceptionArg is StringLangValue stringValue)
@@ -175,7 +172,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"TrySetResult 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var resultValue = args[0].Run(manager);
+        var resultValue = args[0].Accept(new InterpreterVisitor(manager));
         var success = SetResult(resultValue);
         return new BoolLangValue(success, Position);
     }
@@ -187,7 +184,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"TrySetException 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var exceptionArg = args[0].Run(manager);
+        var exceptionArg = args[0].Accept(new InterpreterVisitor(manager));
         string exceptionMessage;
 
         if (exceptionArg is StringLangValue stringValue)
@@ -214,22 +211,4 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new BoolLangValue(success, Position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码（IL 模式暂不支持）
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotImplementedError(
-            Position,
-            "IL 模式暂不支持 TaskCompletionSource 类型"
-        );
-    }
-
-    /// <summary>
-    /// 获取 .NET 类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(TaskCompletionSource<LangValueType>);
-    }
 }

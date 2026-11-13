@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class ListSymmetricExceptMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var otherValue = parameters[0].Run(manager);
+        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (otherValue is not ListLangValue otherList)
         {
@@ -65,8 +67,8 @@ public class ListSymmetricExceptMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ListSymmetricExceptMethod).GetMethod(nameof(SymmetricExceptHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

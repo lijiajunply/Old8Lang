@@ -11,6 +11,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Task;
 
 /// <summary>
@@ -30,7 +32,7 @@ public class TaskFinallyMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         var task = (TaskLangValue)instance;
 
         // 在当前作用域中评估 finally 处理函数参数
-        var finallyHandlerParam = parameters[0].Run(manager);
+        var finallyHandlerParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (finallyHandlerParam is not FuncLangValue finallyHandler)
         {

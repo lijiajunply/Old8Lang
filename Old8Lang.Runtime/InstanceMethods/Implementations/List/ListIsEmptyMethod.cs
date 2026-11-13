@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -29,7 +31,7 @@ public class ListIsEmptyMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ListIsEmptyMethod).GetMethod(nameof(IsEmptyHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

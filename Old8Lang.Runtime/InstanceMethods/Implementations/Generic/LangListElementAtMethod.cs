@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanc
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var indexValue = parameters[0].Run(manager);
+        var indexValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (indexValue is not IntLangValue index)
         {
@@ -52,7 +54,7 @@ public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanc
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(LangListElementAtMethod).GetMethod(nameof(ElementAtNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

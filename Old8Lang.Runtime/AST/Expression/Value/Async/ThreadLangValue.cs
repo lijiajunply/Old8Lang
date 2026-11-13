@@ -4,6 +4,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -355,27 +357,6 @@ public partial class ThreadLangValue : LangValueType
         };
     }
 
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(ThreadLangValue);
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 加载当前线程对象到 IL 栈
-        ilGenerator.Emit(OpCodes.Ldarg_0);
-    }
-
-    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        // 声明局部变量
-        var localVar = ilGenerator.DeclareLocal(typeof(ThreadLangValue));
-        // 添加到局部变量管理器
-        local.AddLocalVar(idName, localVar);
-        // 设置线程对象到 IL 变量
-        ilGenerator.Emit(OpCodes.Stloc, localVar);
-    }
-
     public override object GetValue()
     {
         return this;
@@ -415,7 +396,7 @@ public partial class ThreadLangValue : LangValueType
                     // 直接调用 Join 方法，避免反射
                     if (instance.Ids.Count > 0)
                     {
-                        var timeoutValue = instance.Ids[0].Run(manager);
+                        var timeoutValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                         return Join(timeoutValue as IntLangValue);
                     }
 
@@ -425,7 +406,7 @@ public partial class ThreadLangValue : LangValueType
                     // 直接调用 Join 方法（Wait 等同于 Join）
                     if (instance.Ids.Count > 0)
                     {
-                        var timeoutValue = instance.Ids[0].Run(manager);
+                        var timeoutValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                         return Join(timeoutValue as IntLangValue);
                     }
 
@@ -435,7 +416,7 @@ public partial class ThreadLangValue : LangValueType
                     // 启动线程
                     if (instance.Ids.Count > 0)
                     {
-                        var param = instance.Ids[0].Run(manager);
+                        var param = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                         Start(param.GetValue());
                     }
                     else

@@ -16,44 +16,6 @@ public partial class YieldStatement(LangExpression yieldExpression, SourcePositi
     public LangExpression YieldExpression { get; init; } = yieldExpression;
 
     /// <summary>
-    /// 运行yield语句
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public override void Run(VariateManager manager)
-    {
-        // 计算yield表达式的值
-        var yieldValue = YieldExpression.Run(manager);
-
-        // 通过生成器上下文设置yield值和标志
-        var genContext = manager.GeneratorContext;
-        if (genContext is not null)
-        {
-            genContext.CurrentValue = yieldValue;
-            genContext.HasYielded = true;
-
-            // 保存当前执行路径，以便下次从这里恢复
-            genContext.ExecutionPath = genContext.GetCurrentPath() + "/yield";
-        }
-        else
-        {
-            // 如果在非生成器上下文中使用yield，设置全局标志（用于兼容旧代码）
-            manager.Result = yieldValue;
-            manager.IsYield = true;
-        }
-    }
-
-    /// <summary>
-    /// 生成IL代码
-    /// </summary>
-    /// <param name="ilGenerator">IL生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 生成器的IL代码生成（后续实现）
-        // 这里需要实现状态机逻辑
-    }
-
-    /// <summary>
     /// 获取子语句
     /// </summary>
     /// <param name="index">索引</param>

@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Array;
 
 /// <summary>
@@ -24,8 +26,8 @@ public class ArraySliceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var array = (ArrayLangValue)instance;
-        var startValue = parameters[0].Run(manager);
-        var endValue = parameters[1].Run(manager);
+        var startValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var endValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (startValue is not IntLangValue startInt)
         {
@@ -40,7 +42,7 @@ public class ArraySliceMethod : BaseInstanceMethod
         int step = 1;
         if (parameters.Count == 3)
         {
-            var stepValue = parameters[2].Run(manager);
+            var stepValue = parameters[2].Accept(new InterpreterVisitor(manager));
             if (stepValue is not IntLangValue stepInt)
             {
                 throw new TypeError(position, "IntValue", stepValue.GetType().Name);
@@ -54,13 +56,13 @@ public class ArraySliceMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
-        parameters[1].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         if (parameters.Count == 3)
         {
-            parameters[2].LoadIlValue(ilGenerator, local);
+            parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
         }
         else
         {

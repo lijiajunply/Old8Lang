@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -28,7 +30,7 @@ public sealed class ExecFunction : BaseGlobalFunction
             throw new TypeError(parameters[0], "StringValue", results[0].GetType().Name);
             
         var statement = manager.Interpreter.Build(code: execStringValue.Value);
-        statement.Run(manager);
+        statement.Accept(new InterpreterVisitor(manager));
         return new VoidLangValue();
     }
 

@@ -1,5 +1,7 @@
 using Old8Lang.AST.Statement;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Visitor;
 
 /// <summary>
@@ -39,7 +41,7 @@ public partial class TypeInferenceVisitor
     public Type VisitReturnStatement(ReturnStatement node)
     {
 
-return node.Expression.OutputType(local)!;
+return node.Expression.Accept(this)!;
     
     }
 }

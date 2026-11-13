@@ -4,6 +4,8 @@ using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Linq;
 
 /// <summary>
@@ -57,7 +59,7 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算条件表达式
-        whereClause.Condition.LoadIlValue(ilGenerator, local);
+        whereClause.Condition.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 检查条件是否为真
         GenerateIsTruthy(ilGenerator);
@@ -129,7 +131,7 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算投影表达式
-        selectClause.Projection.LoadIlValue(ilGenerator, local);
+        selectClause.Projection.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 保存投影结果
         ilGenerator.Emit(OpCodes.Stloc, projectionLocal);
@@ -244,7 +246,7 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算let表达式
-        letClause.Expression.LoadIlValue(ilGenerator, local);
+        letClause.Expression.Accept(new CompilerVisitor(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Stloc, letVarLocal);
 
         // 添加当前元素到结果列表
@@ -308,12 +310,12 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算分组键
-        groupByClause.KeyExpression.LoadIlValue(ilGenerator, local);
+        groupByClause.KeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
         GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 计算分组元素
-        groupByClause.ElementExpression.LoadIlValue(ilGenerator, local);
+        groupByClause.ElementExpression.Accept(new CompilerVisitor(ilGenerator, local));
         GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, elementLocal);
 
@@ -368,7 +370,7 @@ public partial class LinqExpression
         ilGenerator.MarkLabel(copyOuterLoopEnd);
 
         // 加载内部数据源
-        joinClause.InnerDataSource.LoadIlValue(ilGenerator, local);
+        joinClause.InnerDataSource.Accept(new CompilerVisitor(ilGenerator, local));
         ConvertToEnumerableStatic(ilGenerator);
 
         // 将内部数据源复制到列表
@@ -438,7 +440,7 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, outerRangeVarLocal);
 
         // 计算外部键
-        joinClause.OuterKeyExpression.LoadIlValue(ilGenerator, local);
+        joinClause.OuterKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
         GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, outerKeyLocal);
 
@@ -473,7 +475,7 @@ public partial class LinqExpression
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
-            joinClause.InnerKeyExpression.LoadIlValue(ilGenerator, local);
+            joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
             GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
@@ -537,7 +539,7 @@ public partial class LinqExpression
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
-            joinClause.InnerKeyExpression.LoadIlValue(ilGenerator, local);
+            joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
             GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 

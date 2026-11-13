@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -39,7 +41,7 @@ public class StringSubstringMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var startValue = parameters[0].Run(manager);
+        var startValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (startValue is not IntLangValue start)
         {
@@ -54,7 +56,7 @@ public class StringSubstringMethod : BaseInstanceMethod
         // 如果提供了长度参数
         if (parameters.Count > 1)
         {
-            var lengthValue = parameters[1].Run(manager);
+            var lengthValue = parameters[1].Accept(new InterpreterVisitor(manager));
             if (lengthValue is not IntLangValue length)
             {
                 throw new TypeError(position, $"Substring 方法的第二个参数必须是整数类型，但实际是 {lengthValue.GetType().Name}");
@@ -76,15 +78,15 @@ public class StringSubstringMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载起始索引
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         if (parameters.Count > 1)
         {
             // 加载长度
-            parameters[1].LoadIlValue(ilGenerator, local);
+            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
             var helperMethod = typeof(StringSubstringMethod).GetMethod(nameof(SubstringWithLengthHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

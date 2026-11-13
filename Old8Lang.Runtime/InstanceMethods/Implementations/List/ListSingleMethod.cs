@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -44,7 +46,7 @@ public class ListSingleMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         else
         {
             // 带谓词版本：返回满足条件的唯一元素
-            var predicate = parameters[0].Run(manager) as FuncLangValue;
+            var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
             if (predicate == null)
             {
                 throw new ArgumentError(position, "predicate 参数必须是函数类型");

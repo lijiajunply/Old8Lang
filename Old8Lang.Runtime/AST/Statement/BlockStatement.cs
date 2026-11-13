@@ -52,12 +52,6 @@ public partial class BlockStatement : OldStatement
         }
     }
 
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        var visitor = new CompilerVisitor(ilGenerator, local);
-        Accept(visitor);
-    }
-
     /// <summary>
     /// 生成模块导入的 IL。
     /// </summary>
@@ -69,7 +63,7 @@ public partial class BlockStatement : OldStatement
     {
         foreach (var statement in ImportStatements)
         {
-            statement.GenerateIl(ilGenerator, local);
+            statement.Accept(new CompilerVisitor(ilGenerator, local));
         }
 
         if (!includeBody) return;
@@ -78,7 +72,7 @@ public partial class BlockStatement : OldStatement
         {
             // 导入语句已由上面的循环处理，避免重复
             if (statement is ImportStatement) continue;
-            statement.GenerateIl(ilGenerator, local);
+            statement.Accept(new CompilerVisitor(ilGenerator, local));
         }
     }
 
@@ -102,13 +96,13 @@ public partial class BlockStatement : OldStatement
                     // 跳过 FuncInit 和 ClassInit，只执行其他类型的语句
                     if (statement is not FuncInit && statement is not ClassInit)
                     {
-                        statement.Run(manager);
+                        statement.Accept(new InterpreterVisitor(manager));
                     }
                 }
                 else
                 {
                     // 执行所有非导入语句，包括 FuncInit 和 ClassInit
-                    statement.Run(manager);
+                    statement.Accept(new InterpreterVisitor(manager));
                 }
             }
         }
@@ -116,7 +110,7 @@ public partial class BlockStatement : OldStatement
         // 执行所有OtherStatements（变量赋值等）
         foreach (var statement in OtherStatements)
         {
-            statement.Run(manager);
+            statement.Accept(new InterpreterVisitor(manager));
 
             if (manager.IsReturn)
             {
@@ -139,7 +133,7 @@ public partial class BlockStatement : OldStatement
         {
             if (statement is not ImportStatement && statement is not NativeStatement)
             {
-                statement.Run(manager);
+                statement.Accept(new InterpreterVisitor(manager));
             }
         }
 
@@ -151,7 +145,7 @@ public partial class BlockStatement : OldStatement
                 case EnumInit:
                 case ExtensionDeclaration:
                 case ImportStatement { IsDynamicImport: true }:
-                    statement.Run(manager);
+                    statement.Accept(new InterpreterVisitor(manager));
                     break;
             }
         }

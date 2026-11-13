@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class StringIndexOfMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var valueParam = parameters[0].Run(manager);
+        var valueParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (valueParam is not StringLangValue value)
         {
@@ -37,8 +39,8 @@ public class StringIndexOfMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(StringIndexOfMethod).GetMethod(nameof(IndexOfHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

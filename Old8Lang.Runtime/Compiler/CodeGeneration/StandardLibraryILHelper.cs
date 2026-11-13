@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler.CodeGeneration;
 
 /// <summary>IL 模式下调用已导入的标准库模块。</summary>
@@ -52,8 +54,8 @@ public static class StandardLibraryILHelper
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, index);
             var argument = call.Ids[index];
-            argument.LoadIlValue(il, local);
-            var type = argument.OutputType(local);
+            argument.Accept(new CompilerVisitor(il, local));
+            var type = argument.Accept(new TypeInferenceVisitor(local));
             if (type?.IsValueType == true)
                 il.Emit(OpCodes.Box, type);
             il.Emit(OpCodes.Stelem_Ref);

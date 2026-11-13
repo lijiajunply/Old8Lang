@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Array;
 
 /// <summary>
@@ -52,7 +54,7 @@ public class ArrayGroupAdjacentMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ArrayGroupAdjacentMethod).GetMethod(nameof(GroupAdjacentHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

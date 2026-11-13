@@ -125,14 +125,6 @@ public class BytecodeAsyncGeneratorLangValue(int asyncGeneratorId, VirtualMachin
     }
 
     public override object GetValue() => this;
-
-    public override Type OutputType(LocalManager local) => typeof(BytecodeAsyncGeneratorLangValue);
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotSupportedException("异步生成器对象不支持IL代码生成");
-    }
-
     // IAsyncEnumerable实现，支持异步for-in循环
     public async IAsyncEnumerator<LangValueType> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {

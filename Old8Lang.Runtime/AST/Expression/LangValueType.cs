@@ -160,13 +160,6 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 转换为 '{otherLangValueType.GetType().Name}'");
 
     /// <summary>
-    /// 执行表达式，返回自身
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>自身实例</returns>
-    public override LangValueType Run(VariateManager manager) => this;
-
-    /// <summary>
     /// 将值类型转换为字符串表示
     /// </summary>
     /// <returns>值类型的字符串表示</returns>

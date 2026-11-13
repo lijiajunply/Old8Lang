@@ -5,6 +5,8 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -49,18 +51,6 @@ public partial class ListLangValue : LangValueType, ILangList
         Values.AddRange(value);
         Value = [];
         ElementType = elementType;
-    }
-
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 只有当Values为空且Value中有表达式时才需要执行，且没有被手动清空过
-        if (Values.Count == 0 && Value.Count > 0 && !_hasBeenCleared)
-        {
-            foreach (var expr in Value)
-                Values.Add(expr.Run(manager));
-        }
-
-        return this;
     }
 
     public LangValueType Get(IntLangValue i)
@@ -145,7 +135,7 @@ public partial class ListLangValue : LangValueType, ILangList
         // 如果是其他类型的表达式，尝试将其作为索引
         if (dotExpression is not Instance)
         {
-            var result = dotExpression.Run(manager);
+            var result = dotExpression.Accept(new InterpreterVisitor(manager));
 
             if (result is IntLangValue idx)
             {
@@ -290,54 +280,6 @@ public partial class ListLangValue : LangValueType, ILangList
         {
             Values.InsertRange(start, valuesList);
         }
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // IL 模式下统一用 List<object> 表示列表字面量。
-        // 之前会按元素推断出 List<int> / List<string>，但 `list` 参数的静态类型是 List<object>，
-        // 把 List<int> 传给 List<object> 形参后，索引器/Add 等 callvirt 会按错误的泛型实例解析，
-        // 运行期直接 AccessViolation。动态语言的列表本身就是异构的，统一装箱更安全。
-        var itemType = typeof(object);
-
-        var listType = typeof(List<>).MakeGenericType(itemType);
-        // 创建泛型List实例
-        var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
-        ilGenerator.Emit(OpCodes.Newobj, listConstructor);
-
-        // 如果没有元素需要添加，直接返回List实例
-        if (Value.Count == 0)
-        {
-            return;
-        }
-
-        // 否则，将List实例存储到局部变量
-        var l = ilGenerator.DeclareLocal(listType);
-        ilGenerator.Emit(OpCodes.Stloc, l);
-
-        // 向List中添加元素
-        var addMethod = listType.GetMethod("Add", [itemType])!;
-        foreach (var expr in Value)
-        {
-            ilGenerator.Emit(OpCodes.Ldloc, l);
-            expr.LoadIlValue(ilGenerator, local);
-            var t = expr.OutputType(local);
-            if (t != itemType)
-            {
-                ilGenerator.Emit(OpCodes.Box, t!);
-            }
-
-            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用Add方法
-        }
-
-        // 将填充好的List实例加载到堆栈
-        ilGenerator.Emit(OpCodes.Ldloc, l);
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        // 与 LoadIlValue 保持一致：列表字面量在 IL 模式下统一是 List<object>
-        return typeof(List<object>);
     }
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)

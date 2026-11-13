@@ -3,6 +3,8 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
@@ -160,7 +162,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
             // 添加实例成员
             foreach (var member in typeTemplate.Variates)
             {
-                var value = member.Value.Run(manager);
+                var value = member.Value.Accept(new InterpreterVisitor(manager));
                 members.TryAdd(member.Key.IdName, value);
             }
 

@@ -110,7 +110,7 @@ public partial class CompilerVisitor
             ilGenerator.Emit(OpCodes.Brfalse, labelElse);
 
             // if 部分
-            ifChild.GenerateIl(ilGenerator, local);
+            ifChild.Accept(this);
             ilGenerator.Emit(OpCodes.Br, labelEnd);
         }
 
@@ -126,7 +126,7 @@ public partial class CompilerVisitor
                 ilGenerator.Emit(OpCodes.Brfalse, nextElif);
 
                 // elif 部分
-                elifChild.GenerateIl(ilGenerator, local);
+                elifChild.Accept(this);
                 ilGenerator.Emit(OpCodes.Br, labelEnd);
 
                 ilGenerator.MarkLabel(nextElif);
@@ -166,7 +166,7 @@ public partial class CompilerVisitor
             // （例如 `d.ForEach(f)`、`l.Count()`）。这里直接走 GenerateIl。
             if (statement is FuncRunStatement funcRunStatement)
             {
-                funcRunStatement.GenerateIl(ilGenerator, local);
+                funcRunStatement.Accept(this);
                 continue;
             }
 
@@ -198,10 +198,10 @@ public partial class CompilerVisitor
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        node.Condition.LoadIlValue(ilGenerator, local);
+        node.Condition.Accept(this);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
 
-        node.Block.GenerateIl(ilGenerator, local);
+        node.Block.Accept(this);
 
         // 跳转回循环开始
         ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
@@ -229,7 +229,7 @@ public partial class CompilerVisitor
         // 初始化表达式与循环变量的局部槽位已在 BeginLoopVariableShadow 中处理。
         if (shadow is null)
         {
-            node.Init.GenerateIl(ilGenerator, local);
+            node.Init.Accept(this);
         }
 
         // 创建循环标签
@@ -249,14 +249,14 @@ public partial class CompilerVisitor
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        node.Condition.LoadIlValue(ilGenerator, local);
+        node.Condition.Accept(this);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
 
-        node.Block.GenerateIl(ilGenerator, local);
+        node.Block.Accept(this);
 
         // continue标签：执行循环迭代语句
         ilGenerator.MarkLabel(continueLabel);
-        node.Operation.GenerateIl(ilGenerator, local);
+        node.Operation.Accept(this);
 
         // 跳转回循环开始
         ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
@@ -280,7 +280,7 @@ public partial class CompilerVisitor
     public object? VisitForInStatement(ForInStatement node)
     {
 
-        var ty = node.Expression.OutputType(local) ?? typeof(object);
+        var ty = node.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
 
         // 对于字典类型，使用特殊处理
         if (ty == typeof(Dictionary<object, object>))
@@ -295,7 +295,7 @@ public partial class CompilerVisitor
 
         // 获取枚举器
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        node.Expression.LoadIlValue(ilGenerator, local);
+        node.Expression.Accept(this);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
 
@@ -328,7 +328,7 @@ public partial class CompilerVisitor
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
 
         // 尝试确定元素类型并进行类型转换
-        var exprType = node.Expression.OutputType(local);
+        var exprType = node.Expression.Accept(new TypeInferenceVisitor(local));
         if (exprType is not null)
         {
             // 如果是数组类型
@@ -380,7 +380,7 @@ public partial class CompilerVisitor
         }
 
         // 生成循环体
-        node.Body.GenerateIl(ilGenerator, local);
+        node.Body.Accept(this);
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
@@ -407,12 +407,12 @@ public partial class CompilerVisitor
 
         if (node._leftExpression is TupleLangValue tuplePattern)
         {
-            var tupleType = node.Value.OutputType(local);
+            var tupleType = node.Value.Accept(new TypeInferenceVisitor(local));
             if (tupleType is null || !tupleType.IsValueType ||
                 !typeof(System.Runtime.CompilerServices.ITuple).IsAssignableFrom(tupleType))
                 throw new InvalidOperationError(node, "IL 元组解构赋值右侧必须是元组");
 
-            node.Value.LoadIlValue(ilGenerator, local);
+            node.Value.Accept(this);
             var tupleLocal = ilGenerator.DeclareLocal(tupleType);
             ilGenerator.Emit(OpCodes.Stloc, tupleLocal);
 
@@ -451,22 +451,22 @@ public partial class CompilerVisitor
             // 成员或方法结果后再索引的赋值（例如 node.data_dict[key]）会被解析成
             // NestedIndexAccess。静态元素类型在这里通常不可知，交给运行期分派，
             // 既可写字典也保留列表/数组的负索引行为。
-            nestedIndexAccess.BaseExpression.LoadIlValue(ilGenerator, local);
-            var baseType = nestedIndexAccess.BaseExpression.OutputType(local) ?? typeof(object);
+            nestedIndexAccess.BaseExpression.Accept(this);
+            var baseType = nestedIndexAccess.BaseExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (baseType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, baseType);
             }
 
-            nestedIndexAccess.NestedIndex.LoadIlValue(ilGenerator, local);
-            var keyType = nestedIndexAccess.NestedIndex.OutputType(local) ?? typeof(object);
+            nestedIndexAccess.NestedIndex.Accept(this);
+            var keyType = nestedIndexAccess.NestedIndex.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (keyType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, keyType);
             }
 
-            node.Value.LoadIlValue(ilGenerator, local);
-            var valueType = node.Value.OutputType(local) ?? typeof(object);
+            node.Value.Accept(this);
+            var valueType = node.Value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (valueType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, valueType);
@@ -502,8 +502,8 @@ public partial class CompilerVisitor
             // 异步模式：使用变量提升
             if (local.AsyncStateMachineGenerator != null)
             {
-                node.Value.LoadIlValue(ilGenerator, local);
-                var valueType = node.Value.OutputType(local);
+                node.Value.Accept(this);
+                var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
                 // 确保 void 类型被视为 object (null)
                 if (valueType == typeof(void)) valueType = typeof(object);
 
@@ -519,21 +519,21 @@ public partial class CompilerVisitor
                 (node.Id.AssumptionType.Equals("dict", StringComparison.OrdinalIgnoreCase) ||
                  node.Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
             {
-                new DictionaryLangValue(position: node.Value.Position).SetValueToIl(ilGenerator, local, node.Id.IdName);
+                EmitSetValueToIl(new DictionaryLangValue(position: node.Value.Position), node.Id.IdName);
             }
             // 未加类型注解的空花括号可能在首次索引写入时成为列表或字典。以 object
             // 保存，避免先固定为 List<object> 后再以字符串键写入而生成无效 IL。
             else if (node.Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
                      local.GetLocalVar(node.Id.IdName) is null)
             {
-                node.Value.LoadIlValue(ilGenerator, local);
+                node.Value.Accept(this);
                 var target = local.GetOrCreateLocalVar(ilGenerator, node.Id.IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Stloc, target);
             }
             else
             {
                 // 普通变量赋值: name <- value
-                node.Value.SetValueToIl(ilGenerator, local, node.Id.IdName);
+                EmitSetValueToIl(node.Value, node.Id.IdName);
             }
         }
         else if (node._leftExpression is not null)
@@ -549,7 +549,7 @@ public partial class CompilerVisitor
                     var identStrs = identifiersStr.Split(',');
 
                     // 生成右侧数组值的IL
-                    node.Value.LoadIlValue(ilGenerator, local);
+                    node.Value.Accept(this);
 
                     // 保存右侧数组值到局部变量
                     var arrayLocal = ilGenerator.DeclareLocal(typeof(object));
@@ -587,7 +587,7 @@ public partial class CompilerVisitor
                     var propStrings = propertiesStr.Split(',');
 
                     // 生成右侧对象值的IL
-                    node.Value.LoadIlValue(ilGenerator, local);
+                    node.Value.Accept(this);
 
                     // 保存右侧对象值到局部变量
                     var objLocal = ilGenerator.DeclareLocal(typeof(object));
@@ -658,8 +658,8 @@ public partial class CompilerVisitor
                         }
                         if (staticField is not null)
                         {
-                            node.Value.LoadIlValue(ilGenerator, local);
-                            var valueType = node.Value.OutputType(local);
+                            node.Value.Accept(this);
+                            var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
                             if (staticField.FieldType == typeof(object) && valueType?.IsValueType == true)
                             {
                                 ilGenerator.Emit(OpCodes.Box, valueType);
@@ -678,7 +678,7 @@ public partial class CompilerVisitor
                         var staticSetter = staticProperty?.GetSetMethod();
                         if (staticSetter is not null && staticSetter.IsStatic)
                         {
-                            node.Value.LoadIlValue(ilGenerator, local);
+                            node.Value.Accept(this);
                             ilGenerator.Emit(OpCodes.Call, staticSetter);
                             return null;
                         }
@@ -688,7 +688,7 @@ public partial class CompilerVisitor
                     // 已是具体特化类型，仍应直接写入静态字段，不能先实例化接收者。
                     if (operation.Left is GenericInstanceExpression { IsFunctionCall: false })
                     {
-                        var specializedType = operation.Left.OutputType(local);
+                        var specializedType = operation.Left.Accept(new TypeInferenceVisitor(local));
                         FieldInfo? staticField = local.FieldVar.GetValueOrDefault(memberId.IdName);
                         if (staticField?.IsStatic != true)
                         {
@@ -703,8 +703,8 @@ public partial class CompilerVisitor
                         }
                         if (staticField is not null)
                         {
-                            node.Value.LoadIlValue(ilGenerator, local);
-                            var valueType = node.Value.OutputType(local);
+                            node.Value.Accept(this);
+                            var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
                             if (staticField.FieldType == typeof(object) && valueType?.IsValueType == true)
                             {
                                 ilGenerator.Emit(OpCodes.Box, valueType);
@@ -724,7 +724,7 @@ public partial class CompilerVisitor
                         local.InClassEnv is not null)
                     {
                         // 加载 node；捕获 node 的 lambda 会从闭包环境读取实例。
-                        new ThisExpression().LoadIlValue(ilGenerator, local);
+                        new ThisExpression().Accept(new CompilerVisitor(ilGenerator, local));
 
                         // 从 FieldVar 中获取字段信息
                         if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
@@ -756,8 +756,8 @@ public partial class CompilerVisitor
                             if (fieldInfo is FieldBuilder && local.TryGetCapturedLocal("node", out _))
                             {
                                 ilGenerator.Emit(OpCodes.Ldstr, memberId.IdName);
-                                node.Value.LoadIlValue(ilGenerator, local);
-                                var dynamicValueType = node.Value.OutputType(local);
+                                node.Value.Accept(this);
+                                var dynamicValueType = node.Value.Accept(new TypeInferenceVisitor(local));
                                 if (dynamicValueType?.IsValueType == true)
                                 {
                                     ilGenerator.Emit(OpCodes.Box, dynamicValueType);
@@ -769,10 +769,10 @@ public partial class CompilerVisitor
                             }
 
                             // 加载右值
-                            node.Value.LoadIlValue(ilGenerator, local);
+                            node.Value.Accept(this);
 
                             // 检查值类型是否与字段类型匹配
-                            var valueType = node.Value.OutputType(local);
+                            var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
                             if (valueType is not null && fieldInfo.FieldType != valueType)
                             {
                                 // 如果值类型与字段类型不匹配，进行类型转换
@@ -800,11 +800,11 @@ public partial class CompilerVisitor
 
                     // 非this访问，正常处理
                     // 加载左对象
-                    operation.Left!.LoadIlValue(ilGenerator, local);
+                    operation.Left!.Accept(new CompilerVisitor(ilGenerator, local));
                     // 加载右值
-                    node.Value.LoadIlValue(ilGenerator, local);
+                    node.Value.Accept(this);
                     // 获取字段或属性
-                    var leftType = operation.Left.OutputType(local)!;
+                    var leftType = operation.Left.Accept(new TypeInferenceVisitor(local))!;
 
                     // 检查leftType是否是TypeBuilder或typeof(object)（表示this访问）
                     if (leftType is not TypeBuilder && leftType != typeof(object))
@@ -830,8 +830,8 @@ public partial class CompilerVisitor
                     // 解析器将 obj.field[key] 表示为 obj . LangListItem(field, key)，
                     // 而不是以 obj.field 作为索引表达式。先在运行期读取该字段，再用
                     // 动态集合写入器完成索引赋值；这也覆盖初始类型为 object 的空字段。
-                    operation.Left!.LoadIlValue(ilGenerator, local);
-                    var receiverType = operation.Left.OutputType(local) ?? typeof(object);
+                    operation.Left!.Accept(new CompilerVisitor(ilGenerator, local));
+                    var receiverType = operation.Left.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (receiverType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, receiverType);
@@ -841,15 +841,15 @@ public partial class CompilerVisitor
                     ilGenerator.Emit(OpCodes.Call,
                         typeof(DotOperatorILHelper).GetMethod(nameof(DotOperatorILHelper.GetDynamicObjectProperty))!);
 
-                    nestedListItem.Key.LoadIlValue(ilGenerator, local);
-                    var keyType = nestedListItem.Key.OutputType(local) ?? typeof(object);
+                    nestedListItem.Key.Accept(this);
+                    var keyType = nestedListItem.Key.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (keyType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, keyType);
                     }
 
-                    node.Value.LoadIlValue(ilGenerator, local);
-                    var valueType = node.Value.OutputType(local) ?? typeof(object);
+                    node.Value.Accept(this);
+                    var valueType = node.Value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (valueType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, valueType);
@@ -864,22 +864,22 @@ public partial class CompilerVisitor
                 {
                     // 索引访问赋值: left[right] <- value
                     // 加载左对象
-                    operation.Left!.LoadIlValue(ilGenerator, local);
+                    operation.Left!.Accept(new CompilerVisitor(ilGenerator, local));
                     // 获取左对象类型
-                    var leftType = operation.Left.OutputType(local)!;
+                    var leftType = operation.Left.Accept(new TypeInferenceVisitor(local))!;
                     // 加载索引
-                    operation.Right!.LoadIlValue(ilGenerator, local);
+                    operation.Right!.Accept(new CompilerVisitor(ilGenerator, local));
 
                     if (leftType == typeof(object))
                     {
-                        var rightType = operation.Right.OutputType(local) ?? typeof(object);
+                        var rightType = operation.Right.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                         if (rightType.IsValueType)
                         {
                             ilGenerator.Emit(OpCodes.Box, rightType);
                         }
 
-                        node.Value.LoadIlValue(ilGenerator, local);
-                        var dynamicValueType = node.Value.OutputType(local) ?? typeof(object);
+                        node.Value.Accept(this);
+                        var dynamicValueType = node.Value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                         if (dynamicValueType.IsValueType)
                         {
                             ilGenerator.Emit(OpCodes.Box, dynamicValueType);
@@ -892,14 +892,14 @@ public partial class CompilerVisitor
                     }
 
                     // 非动态集合保留其原生索引和值类型，直接由下方分支发射。
-                    node.Value.LoadIlValue(ilGenerator, local);
+                    node.Value.Accept(this);
 
                     if (leftType.IsArray)
                     {
                         // 数组索引赋值
                         var elementType = leftType.GetElementType()!;
                         // 获取值的类型
-                        var valueType = node.Value.OutputType(local)!;
+                        var valueType = node.Value.Accept(new TypeInferenceVisitor(local))!;
                         // 如果值类型与元素类型不匹配，添加类型转换或装箱指令
                         if (valueType != elementType)
                         {
@@ -934,7 +934,7 @@ public partial class CompilerVisitor
                         var genericArguments = leftType.GetGenericArguments();
                         var itemType = genericArguments[0];
                         // 获取值的类型
-                        var valueType = node.Value.OutputType(local)!;
+                        var valueType = node.Value.Accept(new TypeInferenceVisitor(local))!;
                         // 如果值类型与列表元素类型不匹配，添加类型转换或装箱指令
                         if (valueType != itemType)
                         {
@@ -966,22 +966,22 @@ public partial class CompilerVisitor
             {
                 // 处理LangListItem索引赋值: listId[key] <- value
                 // 获取集合类型
-                var listType = listItem.ListId.OutputType(local);
+                var listType = listItem.ListId.Accept(new TypeInferenceVisitor(local));
 
                 // 加载集合对象
-                listItem.ListId.LoadIlValue(ilGenerator, local);
+                listItem.ListId.Accept(this);
 
                 if (listType == typeof(object))
                 {
-                    listItem.Key.LoadIlValue(ilGenerator, local);
-                    var keyType = listItem.Key.OutputType(local) ?? typeof(object);
+                    listItem.Key.Accept(this);
+                    var keyType = listItem.Key.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (keyType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, keyType);
                     }
 
-                    node.Value.LoadIlValue(ilGenerator, local);
-                    var valueType = node.Value.OutputType(local) ?? typeof(object);
+                    node.Value.Accept(this);
+                    var valueType = node.Value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (valueType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, valueType);
@@ -1016,8 +1016,8 @@ public partial class CompilerVisitor
                     var dictValueType = genericArgs[1];
 
                     // 加载键并进行类型转换
-                    listItem.Key.LoadIlValue(ilGenerator, local);
-                    var keyType = listItem.Key.OutputType(local);
+                    listItem.Key.Accept(this);
+                    var keyType = listItem.Key.Accept(new TypeInferenceVisitor(local));
                     if (keyType != dictKeyType)
                     {
                         if (dictKeyType.IsValueType && !keyType!.IsValueType)
@@ -1031,8 +1031,8 @@ public partial class CompilerVisitor
                     }
 
                     // 加载值并进行类型转换
-                    node.Value.LoadIlValue(ilGenerator, local);
-                    var valueType = node.Value.OutputType(local);
+                    node.Value.Accept(this);
+                    var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
                     if (valueType != dictValueType)
                     {
                         if (dictValueType.IsValueType && !valueType!.IsValueType)
@@ -1052,8 +1052,8 @@ public partial class CompilerVisitor
                 }
 
                 // 对于非字典类型，按原来的方式加载
-                listItem.Key.LoadIlValue(ilGenerator, local);
-                node.Value.LoadIlValue(ilGenerator, local);
+                listItem.Key.Accept(this);
+                node.Value.Accept(this);
 
                 if (listType == typeof(string))
                 {
@@ -1065,7 +1065,7 @@ public partial class CompilerVisitor
                     // 数组索引赋值
                     var elementType = listType.GetElementType()!;
                     // 获取值的类型
-                    var valueType = node.Value.OutputType(local)!;
+                    var valueType = node.Value.Accept(new TypeInferenceVisitor(local))!;
                     // 如果值类型与元素类型不匹配，添加类型转换或装箱指令
                     if (valueType != elementType)
                     {
@@ -1100,7 +1100,7 @@ public partial class CompilerVisitor
                     var genericArguments = listType.GetGenericArguments();
                     var itemType = genericArguments[0];
                     // 获取值的类型
-                    var valueType = node.Value.OutputType(local)!;
+                    var valueType = node.Value.Accept(new TypeInferenceVisitor(local))!;
                     // 如果值类型与列表元素类型不匹配，添加类型转换或装箱指令
                     if (valueType != itemType)
                     {
@@ -1140,7 +1140,7 @@ public partial class CompilerVisitor
         }
 
         // 获取返回值表达式的类型
-        var returnType = node.Expression.OutputType(local);
+        var returnType = node.Expression.Accept(new TypeInferenceVisitor(local));
 
         // 验证返回类型是否与函数声明的返回类型匹配
         if (local.ReturnValueLocal is not null)
@@ -1171,12 +1171,12 @@ public partial class CompilerVisitor
         }
 
         // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）
-        node.Expression.LoadIlValue(ilGenerator, local);
+        node.Expression.Accept(this);
 
         // 检查是否在异步状态机中且没有被 finally 块捕获
         if (local is { AsyncStateMachineGenerator: not null, ReturnLabel: null })
         {
-            var type = node.Expression.OutputType(local) ?? typeof(void);
+            var type = node.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(void);
             local.AsyncStateMachineGenerator.EmitReturn(ilGenerator, type);
             return null;
         }
@@ -1269,10 +1269,10 @@ public partial class CompilerVisitor
     {
 
         // IL 模式下的实现
-        node.Expression.LoadIlValue(ilGenerator, local);
+        node.Expression.Accept(this);
 
         // 获取表达式的类型
-        var exprType = node.Expression.OutputType(local);
+        var exprType = node.Expression.Accept(new TypeInferenceVisitor(local));
 
         // 如果表达式是ExceptionWrapper类型,提取内部的Exception并重新抛出
         if (exprType == typeof(ExceptionWrapper))
@@ -1353,7 +1353,7 @@ public partial class CompilerVisitor
                 // if (receiveResult.Success) { 执行块; return; }
 
                 // 加载 channelId
-                selectCase.ChannelExpression.LoadIlValue(ilGenerator, local);
+                selectCase.ChannelExpression.Accept(this);
 
                 // 加载超时时间 0（非阻塞）
                 ilGenerator.Emit(OpCodes.Ldc_I4_0);
@@ -1402,7 +1402,7 @@ public partial class CompilerVisitor
                 }
 
                 // 执行 case 块
-                selectCase.BlockStatement.GenerateIl(ilGenerator, local);
+                selectCase.BlockStatement.Accept(this);
 
                 // 跳转到循环结束（退出 select）
                 ilGenerator.Emit(OpCodes.Br, loopEnd);
@@ -1413,11 +1413,11 @@ public partial class CompilerVisitor
                 // if (ResourceManager.TrySendChannel(channelId, value, 0)) { 执行块; return; }
 
                 // 加载 channelId
-                selectCase.ChannelExpression.LoadIlValue(ilGenerator, local);
+                selectCase.ChannelExpression.Accept(this);
 
                 // 加载要发送的值
-                selectCase.SendValueExpression!.LoadIlValue(ilGenerator, local);
-                var sendValueType = selectCase.SendValueExpression.OutputType(local);
+                selectCase.SendValueExpression!.Accept(new CompilerVisitor(ilGenerator, local));
+                var sendValueType = selectCase.SendValueExpression.Accept(new TypeInferenceVisitor(local));
                 if (sendValueType is { IsValueType: true })
                 {
                     ilGenerator.Emit(OpCodes.Box, sendValueType);
@@ -1436,7 +1436,7 @@ public partial class CompilerVisitor
                 ilGenerator.Emit(OpCodes.Brfalse, caseBlockEnd);
 
                 // 返回 true: 执行 case 块
-                selectCase.BlockStatement.GenerateIl(ilGenerator, local);
+                selectCase.BlockStatement.Accept(this);
 
                 // 跳转到循环结束（退出 select）
                 ilGenerator.Emit(OpCodes.Br, loopEnd);
@@ -1451,7 +1451,7 @@ public partial class CompilerVisitor
         {
             // 有 default 分支：执行 default 并退出
             ilGenerator.MarkLabel(defaultLabel);
-            node.DefaultCase.GenerateIl(ilGenerator, local);
+            node.DefaultCase.Accept(this);
             ilGenerator.Emit(OpCodes.Br, loopEnd);
         }
         else
@@ -1579,8 +1579,8 @@ public partial class CompilerVisitor
     {
 
         // 1. 创建局部变量存储资源
-        node.ResourceExpression.LoadIlValue(ilGenerator, local);
-        var resourceType = node.ResourceExpression.OutputType(local);
+        node.ResourceExpression.Accept(this);
+        var resourceType = node.ResourceExpression.Accept(new TypeInferenceVisitor(local));
         if (resourceType != null)
         {
             var resourceLocal = ilGenerator.DeclareLocal(resourceType);
@@ -1597,7 +1597,7 @@ public partial class CompilerVisitor
             ilGenerator.BeginExceptionBlock();
 
             // try块：执行BlockStatement
-            node.BlockStatement.GenerateIl(ilGenerator, local);
+            node.BlockStatement.Accept(this);
 
             // finally块
             ilGenerator.BeginFinallyBlock();

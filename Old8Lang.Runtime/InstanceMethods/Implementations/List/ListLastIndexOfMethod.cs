@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class ListLastIndexOfMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var element = parameters[0].Run(manager);
+        var element = parameters[0].Accept(new InterpreterVisitor(manager));
 
         // 从后向前查找
         for (var i = list.Values.Count - 1; i >= 0; i--)
@@ -40,8 +42,8 @@ public class ListLastIndexOfMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(ListLastIndexOfMethod).GetMethod(nameof(LastIndexOfHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

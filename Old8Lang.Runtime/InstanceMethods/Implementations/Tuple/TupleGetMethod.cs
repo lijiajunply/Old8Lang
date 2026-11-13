@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Tuple;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class TupleGetMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var tuple = (TupleLangValue)instance;
-        var indexValue = parameters[0].Run(manager);
+        var indexValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (indexValue is not IntLangValue index)
         {
@@ -37,8 +39,8 @@ public class TupleGetMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(TupleGetMethod).GetMethod(nameof(GetHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

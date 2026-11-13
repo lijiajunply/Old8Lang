@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Thread;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class ThreadThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var thread = (ThreadLangValue)instance;
-        var continuationParam = parameters[0].Run(manager);
+        var continuationParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (continuationParam is not FuncLangValue continuation)
         {
@@ -40,7 +42,7 @@ public class ThreadThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
         return thread.Then(result =>
         {
-            var closedFunc = continuation.Run(capturedManager);
+            var closedFunc = continuation.Accept(new InterpreterVisitor(capturedManager));
             if (closedFunc is FuncLangValue closedFuncValue)
             {
                 continuation = closedFuncValue;

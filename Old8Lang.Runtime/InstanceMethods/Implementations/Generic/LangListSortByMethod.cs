@@ -9,6 +9,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -40,7 +42,7 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var func = parameters[0].Run(manager) as FuncLangValue;
+        var func = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (func == null)
         {
@@ -66,7 +68,7 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         bool isAscending = true;
         if (parameters.Count > 1)
         {
-            var ascendingValue = parameters[1].Run(manager);
+            var ascendingValue = parameters[1].Accept(new InterpreterVisitor(manager));
             if (ascendingValue is BoolLangValue boolValue)
             {
                 isAscending = boolValue.Value;

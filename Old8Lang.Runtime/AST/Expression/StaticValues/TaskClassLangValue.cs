@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -22,25 +24,6 @@ public partial class TaskClassLangValue : LangValueType
     public override string TypeToString() => "TaskClass";
 
     public override string ToDisplayString() => "Task";
-
-    /// <summary>
-    /// 生成 IL 代码，返回 Task 类型本身
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 对于 Task 类静态方法，我们不需要加载实例
-        // 直接返回 Task 类型本身
-        ilGenerator.Emit(OpCodes.Ldtoken, typeof(Task));
-        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Type);
-    }
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -74,7 +57,7 @@ public partial class TaskClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Run(currentManager)).ToList();
+            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
             return method(args, instance.Position);
         }
 
@@ -343,61 +326,4 @@ public partial class TaskStaticMethodWrapper(
         return method(args, position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码，返回对应Task静态方法的委托
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 根据方法名生成对应的Task静态方法委托
-        switch (methodName)
-        {
-            case "WhenAll":
-                // 获取Task.WhenAll方法
-                var whenAllMethod = typeof(Task).GetMethod("WhenAll", [typeof(IEnumerable<Task<object>>)])!;
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "WhenAny":
-                // 获取Task.WhenAny方法
-                var whenAnyMethod = typeof(Task).GetMethod("WhenAny", [typeof(IEnumerable<Task<object>>)])!;
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "Delay":
-                // 获取Task.Delay方法
-                var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "FromResult":
-                // 获取Task.FromResult方法
-                var fromResultMethod = typeof(Task).GetMethods()
-                    .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "FromException":
-                // 获取Task.FromException方法
-                var fromExceptionMethod = typeof(Task).GetMethods()
-                    .First(m => m is { Name: "FromException", IsGenericMethodDefinition: true });
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "Run":
-                // 获取Task.Run方法
-                var runMethod = typeof(Task).GetMethod("Run", [typeof(Func<object>)])!;
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            case "StartNew":
-                // 获取Task.Factory.StartNew方法
-                var startNewMethod = typeof(TaskFactory).GetMethod("StartNew", [typeof(Func<object>)])!;
-                ilGenerator.Emit(OpCodes.Ldnull);
-                break;
-            default:
-                throw new InvalidOperationError(Position, $"不支持的Task静态方法: {methodName}");
-        }
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Delegate);
-    }
 }

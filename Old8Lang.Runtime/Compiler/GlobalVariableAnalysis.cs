@@ -7,6 +7,8 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler;
 
 /// <summary>
@@ -340,7 +342,7 @@ public static class GlobalVariableAnalysis
                 continue;
             }
 
-            var returnType = function.Id.OutputType(analysisLocal);
+            var returnType = function.Id.Accept(new TypeInferenceVisitor(analysisLocal));
             if (returnType is not null && returnType != typeof(void))
             {
                 analysisLocal.LocalDelegateReturnTypes.TryAdd(function.Id.IdName, returnType);
@@ -357,12 +359,12 @@ public static class GlobalVariableAnalysis
 
                 if (!string.IsNullOrEmpty(assignment.Id.AssumptionType))
                 {
-                    type = assignment.Id.OutputType(analysisLocal);
+                    type = assignment.Id.Accept(new TypeInferenceVisitor(analysisLocal));
                 }
 
                 if (type is null || type == typeof(object) || type == typeof(void))
                 {
-                    type = assignment.Value.OutputType(analysisLocal);
+                    type = assignment.Value.Accept(new TypeInferenceVisitor(analysisLocal));
                 }
 
                 if (type is null || type == typeof(void))

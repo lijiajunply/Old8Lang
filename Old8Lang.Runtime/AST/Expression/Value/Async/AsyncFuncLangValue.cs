@@ -84,36 +84,6 @@ public partial class AsyncFuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// Run 方法：返回捕获了闭包的异步函数副本或异步生成器
-    /// </summary>
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 检查是否为异步生成器函数
-        if (IsAsyncGenerator)
-        {
-            // 创建异步生成器，捕获当前作用域
-            var generatorClosure = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
-            {
-                // 对于异步生成器，使用深拷贝创建独立作用域
-                // 这样生成器内部的变量修改不会影响外部作用域
-                // 生成器需要保持自己的局部状态（如循环变量）
-                CapturedScope = manager.Clone()
-            };
-
-            return new AsyncGeneratorLangValue(generatorClosure, Position);
-        }
-
-        // 创建新的异步函数副本，捕获当前作用域
-        var closureFunc = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
-        {
-            // 直接引用原始 manager，允许异步函数访问和修改外部作用域变量
-            // 并发安全性通过在 RunAsync 中为每个任务创建独立的参数作用域来保证
-            CapturedScope = manager
-        };
-        return closureFunc;
-    }
-
-    /// <summary>
     /// 调用异步函数，返回 Task
     /// </summary>
     /// <param name="variateManagerFunc">调用时的变量管理器</param>
@@ -173,7 +143,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                         }
 
                         // 评估参数
-                        var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+                        var paramValues = ids.Select(t => t.Accept(new InterpreterVisitor(variateManagerFunc))).ToList();
 
                         // 补全默认参数
                         for (var i = paramValues.Count; i < Ids.Count; i++)
@@ -187,7 +157,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                                 // 优先使用缓存值（常量表达式）
                                 paramValues.Add(CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true
                                     ? cachedValue
-                                    : id.DefaultValue.Run(executionManager));
+                                    : id.DefaultValue.Accept(new InterpreterVisitor(executionManager)));
                             }
                             else
                             {
@@ -210,7 +180,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                     executionManager.IsFunc = false;
 
                     // 执行函数体
-                    BlockStatement.Run(executionManager);
+                    BlockStatement.Accept(new InterpreterVisitor(executionManager));
 
                     // 保存返回值（在清理之前）
                     var result = executionManager.Result;
@@ -254,7 +224,7 @@ public partial class AsyncFuncLangValue : ImportInfo
             var param = Ids[i];
             if (param.DefaultValue is not null && IsConstantExpression(param.DefaultValue))
             {
-                var defaultValue = param.DefaultValue.Run(manager);
+                var defaultValue = param.DefaultValue.Accept(new InterpreterVisitor(manager));
                 CachedDefaultValues[i] = defaultValue;
             }
         }
@@ -274,79 +244,6 @@ public partial class AsyncFuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// 生成 IL 代码（IL 模式）
-    /// 生成异步函数的委托，支持异步函数的编译
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 1. 确定参数类型和返回类型
-        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
-        var returnType = typeof(Task<object>);
-
-        // 2. 创建 DynamicMethod
-        var dynamicMethod = new DynamicMethod(
-            Id?.IdName ?? "AnonymousAsync",
-            returnType,
-            parameterTypes,
-            true
-        );
-
-        // 3. 生成方法体
-        var methodIl = dynamicMethod.GetILGenerator();
-
-        // 创建新的LocalManager实例，专门用于函数体的IL生成
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
-
-        foreach (var (key, value) in local.DelegateVar)
-        {
-            funcLocal.DelegateVar[key] = value;
-        }
-
-        foreach (var (key, value) in local.ClassVar)
-        {
-            funcLocal.ClassVar[key] = value;
-        }
-
-        foreach (var (key, value) in local.GlobalStaticClasses)
-        {
-            funcLocal.GlobalStaticClasses[key] = value;
-        }
-
-        foreach (var (key, value) in local.FuncParameters)
-        {
-            funcLocal.FuncParameters[key] = value;
-        }
-
-        foreach (var (key, value) in local.GenericFunctions)
-        {
-            funcLocal.GenericFunctions[key] = value;
-        }
-
-        // 处理参数
-        for (var i = 0; i < Ids!.Count; i++)
-        {
-            var id = Ids![i];
-            var paramType = parameterTypes[i]!;
-            var localVar = methodIl.DeclareLocal(paramType);
-            funcLocal.AddLocalVar(id.IdName, localVar);
-            funcLocal.LocalVarTypes[id.IdName] = paramType;
-
-            methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar);
-        }
-
-        GenerateMethodBody(methodIl, funcLocal);
-
-        // 4. 创建委托并加载到栈上
-        var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
-
-        ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
-        ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
-        ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
-    }
-
-    /// <summary>
     /// 生成异步方法体（状态机启动代码）
     /// </summary>
     public void GenerateMethodBody(ILGenerator ilGenerator, LocalManager local)
@@ -361,7 +258,7 @@ public partial class AsyncFuncLangValue : ImportInfo
             local.ReturnLabel = returnLabel;
 
             ilGenerator.BeginExceptionBlock();
-            BlockStatement.GenerateIl(ilGenerator, local);
+            BlockStatement.Accept(new CompilerVisitor(ilGenerator, local));
 
             if (BlockStatement.Count == 0 || BlockStatement[^1] is not ReturnStatement)
             {
@@ -477,17 +374,6 @@ public partial class AsyncFuncLangValue : ImportInfo
             typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder<object>).GetProperty("Task")!
                 .GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Ret);
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
-        var returnType = typeof(Task<object>);
-        return System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes.Concat([returnType]).ToArray());
     }
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)

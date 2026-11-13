@@ -6,6 +6,8 @@ using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -38,19 +40,6 @@ public partial class TryStatement(
     /// </summary>
     public BlockStatement? FinallyBlock => finallyBlock;
 
-    public override void Run(VariateManager manager)
-    {
-        // 检查是否在生成器上下文中
-        if (manager.GeneratorContext is not null)
-        {
-            RunWithGeneratorContext(manager);
-        }
-        else
-        {
-            RunStandard(manager);
-        }
-    }
-
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
@@ -58,7 +47,7 @@ public partial class TryStatement(
     {
         try
         {
-            tryBlock.Run(manager);
+            tryBlock.Accept(new InterpreterVisitor(manager));
             // 检查try块是否执行了return语句
             if (manager.IsReturn)
             {
@@ -89,7 +78,7 @@ public partial class TryStatement(
                         manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                     }
 
-                    var filterResult = filter.Run(manager);
+                    var filterResult = filter.Accept(new InterpreterVisitor(manager));
                     if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                     {
                         // 过滤器不匹配，继续下一个catch块
@@ -111,7 +100,7 @@ public partial class TryStatement(
                 }
 
                 // 执行catch块
-                catchBlock.Run(manager);
+                catchBlock.Accept(new InterpreterVisitor(manager));
                 // 检查catch块是否执行了return语句
                 if (manager.IsReturn)
                 {
@@ -126,7 +115,7 @@ public partial class TryStatement(
         finally
         {
             // 执行finally块（如果存在）
-            finallyBlock?.Run(manager);
+            finallyBlock?.Accept(new InterpreterVisitor(manager));
         }
     }
 
@@ -153,7 +142,7 @@ public partial class TryStatement(
                 context.PathStack.Push("/catch");
                 try
                 {
-                    catchBlock.Run(manager);
+                    catchBlock.Accept(new InterpreterVisitor(manager));
 
                     // 检查是否 yield
                     if (context.HasYielded)
@@ -178,7 +167,7 @@ public partial class TryStatement(
             context.PathStack.Push("/try");
             try
             {
-                tryBlock.Run(manager);
+                tryBlock.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否 yield
                 if (context.HasYielded)
@@ -218,7 +207,7 @@ public partial class TryStatement(
                                     manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                                 }
 
-                                var filterResult = filter.Run(manager);
+                                var filterResult = filter.Accept(new InterpreterVisitor(manager));
                                 if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                                 {
                                     continue;
@@ -238,7 +227,7 @@ public partial class TryStatement(
                             }
 
                             // 执行catch块
-                            catchBlock.Run(manager);
+                            catchBlock.Accept(new InterpreterVisitor(manager));
 
                             // 检查是否 yield
                             if (context.HasYielded)
@@ -286,13 +275,6 @@ public partial class TryStatement(
         // 1. 如果 try 块中 yield 了，生成器会暂停，不应该执行 finally
         // 2. finally 块需要在生成器真正完成时才执行
         // 目前的架构中，生成器状态机会负责在适当时机执行 finally 块
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 委托给 CompilerVisitor 处理，以支持更复杂的逻辑（如多重 catch 块分发）
-        var visitor = new Visitor.CompilerVisitor(ilGenerator, local);
-        Accept(visitor);
     }
 
     internal static bool IsMatch(Old8Exception exception, string exceptionType)

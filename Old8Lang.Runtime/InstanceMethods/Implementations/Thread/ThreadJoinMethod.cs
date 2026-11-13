@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Thread;
 
 /// <summary>
@@ -27,7 +29,7 @@ public class ThreadJoinMethod : BaseInstanceMethod
         // 如果有超时参数
         if (parameters.Count == 1)
         {
-            var timeoutParam = parameters[0].Run(manager);
+            var timeoutParam = parameters[0].Accept(new InterpreterVisitor(manager));
             if (timeoutParam is not IntLangValue timeout)
             {
                 throw new Error.TypeError(position, "IntValue", timeoutParam.GetType().Name);

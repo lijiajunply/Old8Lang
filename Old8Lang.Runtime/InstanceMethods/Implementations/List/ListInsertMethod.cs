@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -24,8 +26,8 @@ public class ListInsertMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var indexParam = parameters[0].Run(manager);
-        var element = parameters[1].Run(manager);
+        var indexParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var element = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (indexParam is not IntLangValue indexValue)
         {
@@ -41,13 +43,13 @@ public class ListInsertMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载索引参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载元素参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var insertHelperMethod = typeof(ListInsertMethod).GetMethod(nameof(InsertHelper),

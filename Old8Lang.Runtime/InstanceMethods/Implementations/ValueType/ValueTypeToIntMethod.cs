@@ -5,6 +5,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.ValueType;
 
 /// <summary>
@@ -27,10 +29,10 @@ public class ValueTypeToIntMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 获取实例类型
-        var instanceType = instance.OutputType(local);
+        var instanceType = instance.Accept(new TypeInferenceVisitor(local));
 
         // 根据类型选择合适的辅助方法
         if (instanceType == typeof(int))

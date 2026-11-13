@@ -9,6 +9,8 @@ using Old8Lang.Error;
 using Old8Lang.AsyncGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 public partial class ForInStatement(
@@ -38,19 +40,6 @@ public partial class ForInStatement(
     /// </remarks>
     public IReadOnlyList<LangId> Ids => AllIds;
 
-    public override void Run(VariateManager manager)
-    {
-        // 检查是否在生成器上下文中
-        if (manager.GeneratorContext is not null)
-        {
-            RunWithGeneratorContext(manager);
-        }
-        else
-        {
-            RunStandard(manager);
-        }
-    }
-
     /// <summary>
     /// 标准 for-in 循环（非生成器）
     /// </summary>
@@ -62,7 +51,7 @@ public partial class ForInStatement(
 
         try
         {
-            var value = expression.Run(manager);
+            var value = expression.Accept(new InterpreterVisitor(manager));
 
             // 处理异步生成器对象（异步流）
             if (value is AsyncGeneratorLangValue asyncGenerator)
@@ -74,7 +63,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步生成器，获取下一个值（同步等待）
-                    asyncGenerator.Run(manager);
+                    asyncGenerator.Accept(new InterpreterVisitor(manager));
 
                     // 检查异步生成器是否已完成
                     if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -94,7 +83,7 @@ public partial class ForInStatement(
                             manager.Set(id, currentValue);
 
                             // 执行循环体
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -122,7 +111,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    asyncStream.Run(manager);
+                    asyncStream.Accept(new InterpreterVisitor(manager));
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -142,7 +131,7 @@ public partial class ForInStatement(
                             manager.Set(id, currentValue);
 
                             // 执行循环体
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -170,7 +159,7 @@ public partial class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行生成器，获取下一个值
-                    generator.Run(manager);
+                    generator.Accept(new InterpreterVisitor(manager));
 
                     // 检查生成器是否已完成
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
@@ -191,7 +180,7 @@ public partial class ForInStatement(
                             manager.Set(id, currentValue);
 
                             // 执行循环体
-                            body.Run(manager);
+                            body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -230,7 +219,7 @@ public partial class ForInStatement(
                         // 必须先求值再绑定，否则绑定到的元组 ItemValues 为空，读取时会得到空元组
                         if (idValue is TupleLangValue singleTuple)
                         {
-                            singleTuple.Run(manager);
+                            singleTuple.Accept(new InterpreterVisitor(manager));
                         }
 
                         manager.Set(id, idValue);
@@ -241,7 +230,7 @@ public partial class ForInStatement(
                         if (idValue is TupleLangValue tupleValue)
                         {
                             // 运行元组，获取实际值
-                            tupleValue.Run(manager);
+                            tupleValue.Accept(new InterpreterVisitor(manager));
 
                             // 字典键值对，赋值给多个标识符
                             var values = tupleValue.GetItems().ToList();
@@ -259,7 +248,7 @@ public partial class ForInStatement(
                     }
 
                     // 执行循环体
-                    body.Run(manager);
+                    body.Accept(new InterpreterVisitor(manager));
 
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
@@ -313,7 +302,7 @@ public partial class ForInStatement(
             }
 
             // 首次执行，运行表达式获取值
-            var value = expression.Run(manager);
+            var value = expression.Accept(new InterpreterVisitor(manager));
 
             // 对于生成器和异步生成器，保持原有逻辑（它们自己管理状态）
             if (value is AsyncGeneratorLangValue asyncGenerator)
@@ -387,7 +376,7 @@ public partial class ForInStatement(
                         {
                             if (idValue is TupleLangValue tupleValue)
                             {
-                                tupleValue.Run(manager);
+                                tupleValue.Accept(new InterpreterVisitor(manager));
                                 var values = tupleValue.GetItems().ToList();
                                 for (var j = 0; j < AllIds.Count && j < values.Count; j++)
                                 {
@@ -417,7 +406,7 @@ public partial class ForInStatement(
                         // else: 从当前迭代内部的 yield 恢复，保持 ExecutionPath
 
                         // 执行循环体
-                        body.Run(manager);
+                        body.Accept(new InterpreterVisitor(manager));
 
                         // 检查是否遇到 yield
                         if (context.HasYielded)
@@ -476,7 +465,7 @@ public partial class ForInStatement(
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            asyncGenerator.Run(manager);
+            asyncGenerator.Accept(new InterpreterVisitor(manager));
 
             if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -490,7 +479,7 @@ public partial class ForInStatement(
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(id, currentValue);
-                    body.Run(manager);
+                    body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -515,7 +504,7 @@ public partial class ForInStatement(
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            asyncStream.Run(manager);
+            asyncStream.Accept(new InterpreterVisitor(manager));
 
             if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -529,7 +518,7 @@ public partial class ForInStatement(
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(id, currentValue);
-                    body.Run(manager);
+                    body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -586,7 +575,7 @@ public partial class ForInStatement(
                 }
 
                 // 调用生成器的 Run 方法获取下一个值
-                generator.Run(manager);
+                generator.Accept(new InterpreterVisitor(manager));
 
                 if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                 {
@@ -602,7 +591,7 @@ public partial class ForInStatement(
                     if (currentValue is not null && currentValue is not VoidLangValue)
                     {
                         manager.Set(id, currentValue);
-                        body.Run(manager);
+                        body.Accept(new InterpreterVisitor(manager));
 
                         // 检查外部生成器是否 yield
                         if (context.HasYielded)
@@ -647,131 +636,13 @@ public partial class ForInStatement(
         }
     }
 
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        var ty = expression.OutputType(local) ?? typeof(object);
-
-        // 对于字典类型，使用特殊处理
-        if (ty == typeof(Dictionary<object, object>))
-        {
-            GenerateDictionaryIl(ilGenerator, local);
-            return;
-        }
-
-        // 非字典类型，使用普通的IEnumerator处理
-        var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        var current = ilGenerator.DeclareLocal(typeof(object));
-
-        // 获取枚举器
-        var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        expression.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
-        ilGenerator.Emit(OpCodes.Stloc, enumerator);
-
-        // 定义循环标签
-        var loopStart = ilGenerator.DefineLabel();
-        var loopEnd = ilGenerator.DefineLabel();
-        var continueLabel = ilGenerator.DefineLabel();
-
-        // 保存当前的break和continue标签
-        var oldBreakLabel = local.BreakLabel;
-        var oldContinueLabel = local.ContinueLabel;
-
-        // 设置当前循环的break和continue标签
-        local.BreakLabel = loopEnd;
-        local.ContinueLabel = continueLabel;
-
-        // 循环开始
-        ilGenerator.MarkLabel(loopStart);
-
-        // 调用MoveNext
-        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
-
-        // 获取当前元素
-        var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
-        var getCurrentMethod = currentProperty.GetGetMethod()!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
-
-        // 尝试确定元素类型并进行类型转换
-        var exprType = expression.OutputType(local);
-        if (exprType is not null)
-        {
-            // 如果是数组类型
-            if (exprType.IsArray && exprType.GetElementType() == typeof(int))
-            {
-                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-                ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
-            }
-            // 如果是泛型集合且元素类型是 int
-            else if (exprType.IsGenericType && exprType.GetGenericArguments().Length > 0
-                     && exprType.GetGenericArguments()[0] == typeof(int))
-            {
-                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-                ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
-            }
-        }
-
-        ilGenerator.Emit(OpCodes.Stloc, current);
-
-        // 处理标识符赋值
-        if (AllIds.Count == 1)
-        {
-            // 单个标识符，直接赋值
-            // 在异步状态机中，需要定义变量并存储
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
-            }
-            else
-            {
-                local.AddLocalVar(AllIds[0].IdName, current);
-            }
-        }
-        else
-        {
-            // 多个标识符，只赋值给第一个
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
-            }
-            else
-            {
-                local.AddLocalVar(AllIds[0].IdName, current);
-            }
-        }
-
-        // 生成循环体
-        body.GenerateIl(ilGenerator, local);
-
-        // 继续标签
-        ilGenerator.MarkLabel(continueLabel);
-
-        // 跳回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart);
-
-        // 循环结束
-        ilGenerator.MarkLabel(loopEnd);
-
-        // 恢复之前的break和continue标签
-        local.BreakLabel = oldBreakLabel;
-        local.ContinueLabel = oldContinueLabel;
-    }
-
     /// <summary>
     /// 生成字典类型的IL代码，使用更简单可靠的方式
     /// </summary>
     internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        expression.LoadIlValue(ilGenerator, local);
+        expression.Accept(new CompilerVisitor(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -868,7 +739,7 @@ public partial class ForInStatement(
         }
 
         // 生成循环体
-        body.GenerateIl(ilGenerator, local);
+        body.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

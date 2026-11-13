@@ -4,6 +4,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Linq;
 
 public partial class LinqExpression
@@ -35,8 +37,8 @@ public partial class LinqExpression
 
         try
         {
-            FromClause.DataSource.LoadIlValue(il, local);
-            var sourceType = FromClause.DataSource.OutputType(local) ?? typeof(object);
+            FromClause.DataSource.Accept(new CompilerVisitor(il, local));
+            var sourceType = FromClause.DataSource.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (sourceType.IsValueType)
             {
                 il.Emit(OpCodes.Box, sourceType);
@@ -75,16 +77,16 @@ public partial class LinqExpression
             {
                 if (clause is LetClause let)
                 {
-                    let.Expression.LoadIlValue(il, local);
-                    var type = let.Expression.OutputType(local) ?? typeof(object);
+                    let.Expression.Accept(new CompilerVisitor(il, local));
+                    var type = let.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     var variable = il.DeclareLocal(type);
                     il.Emit(OpCodes.Stloc, variable);
                     Bind(let.Variable, variable);
                 }
                 else if (clause is WhereClause where)
                 {
-                    where.Condition.LoadIlValue(il, local);
-                    var type = where.Condition.OutputType(local) ?? typeof(object);
+                    where.Condition.Accept(new CompilerVisitor(il, local));
+                    var type = where.Condition.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (type.IsValueType)
                     {
                         il.Emit(OpCodes.Box, type);
@@ -97,8 +99,8 @@ public partial class LinqExpression
             void EmitProjection()
             {
                 il.Emit(OpCodes.Ldloc, result);
-                select.Projection.LoadIlValue(il, local);
-                var projectionType = select.Projection.OutputType(local) ?? typeof(object);
+                select.Projection.Accept(new CompilerVisitor(il, local));
+                var projectionType = select.Projection.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                 if (projectionType.IsValueType)
                 {
                     il.Emit(OpCodes.Box, projectionType);
@@ -124,8 +126,8 @@ public partial class LinqExpression
                     il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Ldc_I4, i);
                     var expression = orderBy.Orderings[i].KeyExpression;
-                    expression.LoadIlValue(il, local);
-                    var type = expression.OutputType(local) ?? typeof(object);
+                    expression.Accept(new CompilerVisitor(il, local));
+                    var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (type.IsValueType)
                     {
                         il.Emit(OpCodes.Box, type);

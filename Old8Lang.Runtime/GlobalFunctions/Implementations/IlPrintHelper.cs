@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>IL 模式打印值的辅助方法。</summary>
@@ -18,8 +20,8 @@ public static class IlPrintHelper
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, i);
             var expression = parameters[i];
-            expression.LoadIlValue(il, local);
-            var type = expression.OutputType(local) ?? typeof(object);
+            expression.Accept(new CompilerVisitor(il, local));
+            var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (type == typeof(void))
             {
                 throw new CompilerException("打印参数不能是无返回值的表达式", expression.Position);

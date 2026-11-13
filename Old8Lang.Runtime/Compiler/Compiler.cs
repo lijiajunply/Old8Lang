@@ -9,6 +9,8 @@ using Old8Lang.Execution;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler;
 
 /// <summary>
@@ -323,7 +325,7 @@ public static class Compiler
         {
             if (importStatement is ImportStatement { } import && import.GetModuleAlias() is { } alias)
             {
-                import.Run(i.Manager);
+                import.Accept(new InterpreterVisitor(i.Manager));
                 local.ModuleAliases.Add(alias);
             }
         }

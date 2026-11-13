@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -29,10 +31,10 @@ public class StringLengthMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        var instanceType = instance.OutputType(local);
+        var instanceType = instance.Accept(new TypeInferenceVisitor(local));
         if (instanceType == typeof(string))
         {
-            instance.LoadIlValue(ilGenerator, local);
+            instance.Accept(new CompilerVisitor(ilGenerator, local));
         }
         else
         {

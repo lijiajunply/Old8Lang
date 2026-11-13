@@ -9,6 +9,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
@@ -39,7 +41,7 @@ public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 count 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CreateCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCountDownLatch));
@@ -86,7 +88,7 @@ public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CountDown(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CountDown));
@@ -134,7 +136,7 @@ public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.WaitCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatch));
@@ -183,10 +185,10 @@ public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.WaitCountDownLatchTimeout(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatchTimeout));
@@ -234,7 +236,7 @@ public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.GetCountDownLatchCount(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCountDownLatchCount));
@@ -281,7 +283,7 @@ public sealed class CountDownLatchDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCountDownLatch));

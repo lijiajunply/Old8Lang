@@ -9,6 +9,8 @@ using Old8Lang.InstanceMethods.Implementations.Array;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -45,7 +47,7 @@ public class LangListSortMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
 
         if (parameters.Count == 1)
         {
-            var comparerParam = parameters[0].Run(manager);
+            var comparerParam = parameters[0].Accept(new InterpreterVisitor(manager));
             if (comparerParam is not FuncLangValue comparer)
             {
                 throw new ArgumentException("Sort 方法的 comparer 参数必须是函数");

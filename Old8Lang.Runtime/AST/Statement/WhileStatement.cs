@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -31,7 +33,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
             {
 
                 // 获取条件表达式的值
-                var value = expression.Run(manager);
+                var value = expression.Accept(new InterpreterVisitor(manager));
                 if (value is not BoolLangValue varBool)
                 {
                     throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
@@ -51,7 +53,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                 manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
 
                 // 执行循环体
-                blockStatement.Run(manager);
+                blockStatement.Accept(new InterpreterVisitor(manager));
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)
@@ -105,7 +107,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                 manager.ControlFlowManager.ResetCurrentState();
 
                 // 获取条件表达式的值
-                var value = expression.Run(manager);
+                var value = expression.Accept(new InterpreterVisitor(manager));
                 if (value is not BoolLangValue varBool)
                 {
                     throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
@@ -120,7 +122,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                 }
 
                 // 执行循环体
-                blockStatement.Run(manager);
+                blockStatement.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)
@@ -159,40 +161,6 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
             context.PathStack.Pop();
             manager.ControlFlowManager.PopState();
         }
-    }
-
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 创建循环标签
-        var loopStart = ilGenerator.DefineLabel();
-        var loopEnd = ilGenerator.DefineLabel();
-
-        // 保存当前的break和continue标签，以便嵌套循环使用
-        var oldBreakLabel = local.BreakLabel;
-        var oldContinueLabel = local.ContinueLabel;
-
-        // 设置当前循环的break和continue标签
-        local.BreakLabel = loopEnd;
-        local.ContinueLabel = loopStart; // while循环中continue直接跳转到循环开始
-
-        // 循环开始标签
-        ilGenerator.MarkLabel(loopStart);
-
-        // 检查循环条件
-        expression.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
-
-        blockStatement.GenerateIl(ilGenerator, local);
-
-        // 跳转回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
-
-        // 循环结束标签
-        ilGenerator.MarkLabel(loopEnd);
-
-        // 恢复之前的break和continue标签
-        local.BreakLabel = oldBreakLabel;
-        local.ContinueLabel = oldContinueLabel;
     }
 
     public override OldStatement this[int index] => blockStatement[index] ?? throw new IndexOutOfRangeException();

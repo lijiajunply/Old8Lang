@@ -1,6 +1,8 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
@@ -158,7 +160,7 @@ public class MatchCase
                 // 值匹配：计算 pattern 表达式并比较
                 if (Pattern is not null)
                 {
-                    var patternValue = Pattern.Run(manager);
+                    var patternValue = Pattern.Accept(new InterpreterVisitor(manager));
                     return value.Equal(patternValue);
                 }
                 return false;
@@ -225,7 +227,7 @@ public class MatchCase
             // 值匹配：比较值是否相等
             if (patternElement.Value is not null)
             {
-                var patternValue = patternElement.Value.Run(manager);
+                var patternValue = patternElement.Value.Accept(new InterpreterVisitor(manager));
                 if (!tupleElement.Equal(patternValue))
                 {
                     return false;
@@ -267,7 +269,7 @@ public class MatchCase
                 manager.Set(tempId, value);
 
                 // 评估守卫条件
-                var guardResult = GuardCondition.Run(manager);
+                var guardResult = GuardCondition.Accept(new InterpreterVisitor(manager));
 
                 // 守卫条件必须是布尔类型
                 if (guardResult is BoolLangValue boolValue)
@@ -296,8 +298,8 @@ public class MatchCase
             return false;
 
         // 计算范围的起始值和结束值
-        var startValue = RangePattern.Start.Run(manager);
-        var endValue = RangePattern.End.Run(manager);
+        var startValue = RangePattern.Start.Accept(new InterpreterVisitor(manager));
+        var endValue = RangePattern.End.Accept(new InterpreterVisitor(manager));
 
         // 只支持数值类型的范围匹配
         if (!TryGetNumericValue(value, out var numValue))

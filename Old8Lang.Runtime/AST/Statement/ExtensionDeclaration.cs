@@ -37,51 +37,6 @@ public class ExtensionDeclaration(
     /// </summary>
     public List<FuncLangValue> ExtensionMethods { get; } = extensionMethods;
 
-    /// <summary>
-    /// 在解释模式下执行扩展方法声明
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public override void Run(VariateManager manager)
-    {
-        // 确保实例方法系统已初始化
-        InstanceMethodInitializer.EnsureInitialized();
-
-        // 获取目标类型
-        var targetType = ResolveTargetType(TargetTypeName);
-        if (targetType == null)
-        {
-            throw new InvalidOperationError(this, $"无法找到类型 '{TargetTypeName}'");
-        }
-
-        // 注册每个扩展方法
-        foreach (var method in ExtensionMethods)
-        {
-            // 创建扩展方法包装器
-            var extensionMethod = new ExtensionMethodWrapper(
-                targetType,
-                method,
-                manager,
-                TargetGenericParameters
-            );
-
-            // 注册到实例方法注册器
-            InstanceMethodRegistry.Instance.Register(extensionMethod);
-        }
-    }
-
-    /// <summary>
-    /// 在 IL 模式下生成扩展方法声明的 IL 代码
-    /// </summary>
-    /// <param name="ilGenerator">IL 生成器</param>
-    /// <param name="local">局部变量管理器</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 扩展方法的注册发生在编译前的解释器预执行阶段（Compiler.Compile 里的
-        // statement.ExecuteModule 会调用 Run），调用点此时已经能在实例方法表里找到
-        // ExtensionMethodWrapper。因此这里不需要生成任何 IL：
-        // 扩展方法本身的调用由 ExtensionMethodWrapper.GenerateIl 生成。
-    }
-
     public override OldStatement? this[int index] => this;
 
     public override int Count => 0;

@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.AnyValues;
 
 /// <summary>
@@ -92,7 +94,7 @@ public partial class AnyLangValue : LangValueType
                 continue;
 
             // 执行初始化表达式，获取初始值
-            var initialValue = fieldDef.InitialValueExpression.Run(manager);
+            var initialValue = fieldDef.InitialValueExpression.Accept(new InterpreterVisitor(manager));
 
             // 存储到实例数据中
             InstanceData[fieldDef.FieldName] = initialValue;
@@ -299,13 +301,13 @@ public partial class AnyLangValue : LangValueType
             var funcValue = methodInfo.Implementation;
             // 参数表达式必须在调用方作用域中先求值，避免 this 绑定到被调对象后导致作用域错位。
             var evaluatedArguments = arguments
-                .Select(arg => arg is LangValueType value ? value : arg.Run(manager))
+                .Select(arg => arg is LangValueType value ? value : arg.Accept(new InterpreterVisitor(manager)))
                 .Cast<LangExpression>()
                 .ToList();
             var evaluatedNamedArgs = (namedArgs ?? [])
                 .Select(arg =>
                 {
-                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Run(manager);
+                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Accept(new InterpreterVisitor(manager));
                     return new NamedArgument(arg.Name, evaluated, arg.Position);
                 })
                 .ToList();
@@ -377,7 +379,7 @@ public partial class AnyLangValue : LangValueType
             if (getitemMethod is not null && getitemMethod.Count > 0)
             {
                 // 计算索引值
-                var indexValue = listItem.Key.Run(manager);
+                var indexValue = listItem.Key.Accept(new InterpreterVisitor(manager));
 
                 // 调用 _getitem 方法
                 var result = CallOperatorOverloadMethod("_getitem", indexValue);
@@ -396,7 +398,7 @@ public partial class AnyLangValue : LangValueType
         }
 
         // 计算索引值
-        var keyValue = listItem.Key.Run(manager);
+        var keyValue = listItem.Key.Accept(new InterpreterVisitor(manager));
 
         // 根据集合类型进行索引访问
         return collectionValue switch
@@ -474,7 +476,7 @@ public partial class AnyLangValue : LangValueType
                     else
                     {
                         // 运行参数表达式获取实际类型
-                        var argValue = positionalArgs[i].Run(manager);
+                        var argValue = positionalArgs[i].Accept(new InterpreterVisitor(manager));
                         string actualTypeName = argValue.GetType().Name;
                         if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {
@@ -640,7 +642,7 @@ public partial class AnyLangValue : LangValueType
             return;
         }
 
-        var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
+        var parameterValues = arguments.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
 
         // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
         var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
@@ -766,17 +768,6 @@ public partial class AnyLangValue : LangValueType
 
         return fieldValue;
     }
-
-    /// <summary>
-    /// 运行表达式（通常用于构造函数）
-    /// </summary>
-    public sealed override LangValueType Run(VariateManager manager)
-    {
-        // 在 V2 版本中，Run 方法不再负责初始化字段
-        // 初始化由 InitializeFields 方法完成
-        return this;
-    }
-
     /// <summary>
     /// 类型转换
     /// </summary>
@@ -890,37 +881,6 @@ public partial class AnyLangValue : LangValueType
         return $"Class {ClassId}";
     }
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // IL 代码生成（IL 模式）
-        var dictType = typeof(Dictionary<string, object>);
-        var constructor = dictType.GetConstructor(Type.EmptyTypes)!;
-
-        ilGenerator.Emit(OpCodes.Newobj, constructor);
-
-        foreach (var (fieldName, fieldValue) in InstanceData)
-        {
-            ilGenerator.Emit(OpCodes.Dup);
-            ilGenerator.Emit(OpCodes.Ldstr, fieldName);
-
-            fieldValue.LoadIlValue(ilGenerator, local);
-
-            var valueType = fieldValue.OutputType(local);
-            if (valueType is { IsValueType: true })
-            {
-                ilGenerator.Emit(OpCodes.Box, valueType);
-            }
-
-            var addMethod = dictType.GetMethod("Add", [typeof(string), typeof(object)])!;
-            ilGenerator.Emit(OpCodes.Callvirt, addMethod);
-        }
-    }
-
-    public override Type? OutputType(LocalManager local)
-    {
-        return local.ClassVar.GetValueOrDefault(ClassId.IdName);
-    }
-
     /// <summary>
     /// 尝试调用对象的 dispose 方法（如果存在）
     /// 实现重复调用保护，多次调用只执行一次
@@ -961,7 +921,7 @@ public partial class AnyLangValue : LangValueType
             }
 
             // 执行 dispose 方法
-            disposeMethod.Implementation.BlockStatement.Run(InstanceScope);
+            disposeMethod.Implementation.BlockStatement.Accept(new InterpreterVisitor(InstanceScope));
 
             // 同步字段修改回实例数据
             foreach (var fieldName in InstanceData.Keys.ToList())

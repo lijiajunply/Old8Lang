@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class ListRemoveAtMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var indexParam = parameters[0].Run(manager);
+        var indexParam = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (indexParam is not IntLangValue indexValue)
         {
@@ -45,14 +47,14 @@ public class ListRemoveAtMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 获取 Values 字段
         var valuesField = typeof(ListLangValue).GetField("Values");
         ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
 
         // 加载索引参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var removeAtHelperMethod = typeof(ListRemoveAtMethod).GetMethod(nameof(RemoveAtHelper),

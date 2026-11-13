@@ -7,6 +7,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -63,20 +65,6 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         ValueType = valueType;
     }
 
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 清空之前的值，避免重复添加
-        Value.Clear();
-
-        foreach (var tuple in Tuples)
-        {
-            tuple.Run(manager);
-            Value.Add((tuple.Get(0), tuple.Get(1)));
-        }
-
-        return this;
-    }
-
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 优先检查是否是字符串键的索引访问
@@ -89,7 +77,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         if (dotExpression is not Instance and not LangId)
         {
             // 尝试运行表达式获取键值
-            var result = dotExpression.Run(manager);
+            var result = dotExpression.Accept(new InterpreterVisitor(manager));
             return Get(result);
         }
 
@@ -138,7 +126,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
                 if (registeredMethod == null)
                 {
                     // 没有注册的方法，当作索引访问
-                    var result = a.Ids[0].Run(manager);
+                    var result = a.Ids[0].Accept(new InterpreterVisitor(manager));
                     return Get(result);
                 }
             }
@@ -260,8 +248,8 @@ public partial class DictionaryLangValue : LangValueType, ILangList
 
         foreach (var a in Value)
         {
-            var key = a.Key.Run(manager);
-            var value = a.Value.Run(manager);
+            var key = a.Key.Accept(new InterpreterVisitor(manager));
+            var value = a.Value.Accept(new InterpreterVisitor(manager));
             if (key is not StringLangValue s) continue;
             typeAny.SetField(s.Value, value, manager);
         }
@@ -277,44 +265,6 @@ public partial class DictionaryLangValue : LangValueType, ILangList
     public LangValueType Slice(int start, int end, int step)
     {
         throw new InvalidOperationError(this, "字典类型不支持切片操作");
-    }
-
-
-    public override Type OutputType(LocalManager local) => typeof(Dictionary<object, object>);
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        var listConstructor = typeof(Dictionary<object, object>).GetConstructor(Type.EmptyTypes)!;
-        ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
-
-        var l = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
-        ilGenerator.Emit(OpCodes.Stloc, l);
-
-        // 向 Dictionary<object, object> 中添加元素
-        var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
-        foreach (var expr in Tuples)
-        {
-            ilGenerator.Emit(OpCodes.Ldloc, l);
-            expr.Elements[0].LoadIlValue(ilGenerator, local);
-            var keyType = expr.Elements[0].OutputType(local);
-            // 只有值类型才需要装箱
-            if (keyType!.IsValueType)
-            {
-                ilGenerator.Emit(OpCodes.Box, keyType);
-            }
-
-            expr.Elements[1].LoadIlValue(ilGenerator, local);
-            var valueType = expr.Elements[1].OutputType(local);
-            // 只有值类型才需要装箱
-            if (valueType!.IsValueType)
-            {
-                ilGenerator.Emit(OpCodes.Box, valueType);
-            }
-
-            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
-        }
-
-        ilGenerator.Emit(OpCodes.Ldloc, l);
     }
 
     /// <summary>

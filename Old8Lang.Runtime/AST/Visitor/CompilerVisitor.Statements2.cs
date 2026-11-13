@@ -53,7 +53,7 @@ public partial class CompilerVisitor
     public object? VisitAsyncForInStatement(AsyncForInStatement node)
     {
 
-        var ty = node.Expression.OutputType(local) ?? typeof(object);
+        var ty = node.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
 
         // 对于字典类型，使用特殊处理
         if (ty == typeof(Dictionary<object, object>))
@@ -75,7 +75,7 @@ public partial class CompilerVisitor
 
         // 获取枚举器
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        node.Expression.LoadIlValue(ilGenerator, local);
+        node.Expression.Accept(this);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
 
@@ -140,7 +140,7 @@ public partial class CompilerVisitor
         }
 
         // 生成循环体
-        node.Body.GenerateIl(ilGenerator, local);
+        node.Body.Accept(this);
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
@@ -169,7 +169,7 @@ public partial class CompilerVisitor
         var methodName = node.AsyncFuncValue.Id!.IdName;
 
         // 使用参数的类型注解来确定参数类型
-        var parameterTypes = node.AsyncFuncValue.Ids!.Select(item => item.OutputType(local)).ToArray();
+        var parameterTypes = node.AsyncFuncValue.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
@@ -271,8 +271,8 @@ public partial class CompilerVisitor
         var defaultLabel = node.DefaultBlockStatement is not null ? ilGenerator.DefineLabel() : labelEnd;
 
         // 保存switch表达式的值到局部变量
-        node.SwitchExpression.LoadIlValue(ilGenerator, local);
-        var switchValueType = node.SwitchExpression.OutputType(local) ?? typeof(object);
+        node.SwitchExpression.Accept(this);
+        var switchValueType = node.SwitchExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         var switchValueLocal = ilGenerator.DeclareLocal(switchValueType);
         ilGenerator.Emit(OpCodes.Stloc, switchValueLocal);
 
@@ -299,7 +299,7 @@ public partial class CompilerVisitor
                 {
                     // 范围匹配：检查 switchValue 是否在范围数组中
                     // 加载case值（数组）
-                    oldCase.Expression.LoadIlValue(ilGenerator, local);
+                    oldCase.Expression.Accept(this);
 
                     // 加载switch值
                     ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
@@ -328,7 +328,7 @@ public partial class CompilerVisitor
                     ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
 
                     // 加载case值并比较
-                    oldCase.Expression.LoadIlValue(ilGenerator, local);
+                    oldCase.Expression.Accept(this);
 
                     // 比较操作
                     if (switchValueType == typeof(int) || switchValueType == typeof(bool) ||
@@ -387,7 +387,7 @@ public partial class CompilerVisitor
             ilGenerator.MarkLabel(caseLabel);
 
             // 生成case块的IL代码
-            oldCase.BlockStatement.GenerateIl(ilGenerator, local);
+            oldCase.BlockStatement.Accept(this);
 
             // 检查case块是否以return语句结尾
             var lastStatement = oldCase.BlockStatement.Count > 0
@@ -405,7 +405,7 @@ public partial class CompilerVisitor
         if (node.DefaultBlockStatement is not null)
         {
             ilGenerator.MarkLabel(defaultLabel);
-            node.DefaultBlockStatement.GenerateIl(ilGenerator, local);
+            node.DefaultBlockStatement.Accept(this);
         }
 
         // 结束标签
@@ -513,7 +513,7 @@ public partial class CompilerVisitor
                     
                     // 过滤器结果应该在栈顶
                     // 检查类型，如果是值类型需要装箱，因为 ToBool 接受 object
-                    var filterType = filter.OutputType(local) ?? typeof(object);
+                    var filterType = filter.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (filterType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, filterType);
@@ -835,7 +835,7 @@ public partial class CompilerVisitor
 
         // 使用参数的类型注解来确定参数类型
         // 对于 params 参数，类型应该是数组类型（已经是 array<T>）
-        var parameterTypes = funcToCompile.Ids!.Select(item => item.OutputType(local)).ToArray();
+        var parameterTypes = funcToCompile.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         // 这样可以避免函数内部的局部变量与外部的局部变量冲突
@@ -891,7 +891,7 @@ public partial class CompilerVisitor
 
         // 优先使用显式声明的返回类型
         // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
-        var returnType = funcToCompile.Id?.OutputType(local);
+        var returnType = funcToCompile.Id?.Accept(new TypeInferenceVisitor(local));
         if (returnType is null || returnType == typeof(object))
         {
             // 如果OutputType无法解析，尝试从函数体推断
@@ -958,7 +958,7 @@ public partial class CompilerVisitor
         methodIl.BeginExceptionBlock();
 
         // 生成方法体的 IL 代码
-        funcToCompile.BlockStatement.GenerateIl(methodIl, funcLocal);
+        funcToCompile.BlockStatement.Accept(new CompilerVisitor(methodIl, funcLocal));
 
         // 检查函数体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcToCompile.BlockStatement.Count > 0

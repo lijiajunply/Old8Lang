@@ -20,18 +20,6 @@ public partial class VoidLangValue(SourcePosition position = default) : LangValu
 
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
 
-    public override LangValueType Run(VariateManager manager) => this;
-
     public override string ToString() => ""; // VoidValue 转换为字符串时返回空字符串，而不是抛出异常
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // void 类型不需要加载任何值到栈上
-        // 什么都不做
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(void);
-    }
 }

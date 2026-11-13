@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -38,8 +40,8 @@ public class ListAggregateWithSeedMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var accumulatorParam = parameters[0].Run(manager);
-        var seed = parameters[1].Run(manager);
+        var accumulatorParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var seed = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (accumulatorParam is not FuncLangValue accumulator)
         {
@@ -61,13 +63,13 @@ public class ListAggregateWithSeedMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载累加器函数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载初始值
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(ListAggregateWithSeedMethod).GetMethod(nameof(AggregateWithSeedHelper),

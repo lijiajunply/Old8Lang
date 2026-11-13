@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -92,11 +94,6 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     }
 
     /// <summary>
-    /// Run 方法：返回自身
-    /// </summary>
-    public override LangValueType Run(VariateManager manager) => this;
-
-    /// <summary>
     /// Dot 方法：支持属性访问和方法调用
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
@@ -149,7 +146,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"CancelAfter 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var delayArg = args[0].Run(manager);
+        var delayArg = args[0].Accept(new InterpreterVisitor(manager));
         if (delayArg is not IntLangValue delayMs)
         {
             throw new TypeError(args[0], "int", delayArg.TypeToString());
@@ -170,22 +167,4 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码（IL 模式暂不支持）
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        throw new NotImplementedError(
-            Position,
-            "IL 模式暂不支持 CancellationTokenSource 类型"
-        );
-    }
-
-    /// <summary>
-    /// 获取 .NET 类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(CancellationTokenSource);
-    }
 }

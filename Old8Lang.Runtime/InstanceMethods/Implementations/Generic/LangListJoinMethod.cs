@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -28,7 +30,7 @@ public class LangListJoinMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
         string separator = ", ";
         if (parameters.Count == 1)
         {
-            var separatorValue = parameters[0].Run(manager);
+            var separatorValue = parameters[0].Accept(new InterpreterVisitor(manager));
             if (separatorValue is StringLangValue strValue)
             {
                 separator = strValue.Value;

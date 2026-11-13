@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -29,7 +31,7 @@ public class ListSingleOrDefaultMethod : BaseInstanceMethod, IIlNativeValueInsta
         if (parameters.Count == 1)
         {
             // SingleOrDefault(defaultValue)
-            var defaultValue = parameters[0].Run(manager);
+            var defaultValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
             if (list.Values.Count == 0 || list.Values.Count > 1)
             {
@@ -41,8 +43,8 @@ public class ListSingleOrDefaultMethod : BaseInstanceMethod, IIlNativeValueInsta
         else
         {
             // SingleOrDefault(predicate, defaultValue)
-            var predicate = parameters[0].Run(manager) as FuncLangValue;
-            var defaultValue = parameters[1].Run(manager);
+            var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+            var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
             if (predicate == null)
             {

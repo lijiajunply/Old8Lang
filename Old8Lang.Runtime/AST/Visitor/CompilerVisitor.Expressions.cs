@@ -57,7 +57,7 @@ public partial class CompilerVisitor
         if (local.GlobalStaticClasses.TryGetValue(node.IdName, out var staticClassInstance))
         {
             // 将静态类实例加载到栈上
-            staticClassInstance.LoadIlValue(ilGenerator, local);
+            staticClassInstance.Accept(this);
             return null;
         }
 
@@ -154,8 +154,8 @@ public partial class CompilerVisitor
         var resultLocal = ilGenerator.DeclareLocal(typeof(object)); // 用于存储结果
 
         // 保存 match 表达式值到局部变量
-        node.MatchValue.LoadIlValue(ilGenerator, local);
-        var matchValueType = node.MatchValue.OutputType(local) ?? typeof(object);
+        node.MatchValue.Accept(this);
+        var matchValueType = node.MatchValue.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         var matchValueLocal = ilGenerator.DeclareLocal(matchValueType);
         ilGenerator.Emit(OpCodes.Stloc, matchValueLocal);
 
@@ -183,7 +183,7 @@ public partial class CompilerVisitor
 
             // 普通值匹配：比较 match 值和 case 值
             ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-            matchCase.Pattern!.LoadIlValue(ilGenerator, local);
+            matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
 
             // 根据类型选择合适的比较指令
             if (matchValueType == typeof(int) || matchValueType == typeof(bool) || matchValueType == typeof(char))
@@ -202,7 +202,7 @@ public partial class CompilerVisitor
                 if (matchValueType.IsValueType)
                     ilGenerator.Emit(OpCodes.Box, matchValueType);
 
-                var patternType = matchCase.Pattern.OutputType(local);
+                var patternType = matchCase.Pattern.Accept(new TypeInferenceVisitor(local));
                 if (patternType is not null && patternType.IsValueType)
                     ilGenerator.Emit(OpCodes.Box, patternType);
 
@@ -243,8 +243,8 @@ public partial class CompilerVisitor
             }
 
             // 计算并存储结果
-            matchCase.ResultExpression.LoadIlValue(ilGenerator, local);
-            var resultType = matchCase.ResultExpression.OutputType(local);
+            matchCase.ResultExpression.Accept(this);
+            var resultType = matchCase.ResultExpression.Accept(new TypeInferenceVisitor(local));
             if (resultType is not null && resultType.IsValueType)
                 ilGenerator.Emit(OpCodes.Box, resultType);
 

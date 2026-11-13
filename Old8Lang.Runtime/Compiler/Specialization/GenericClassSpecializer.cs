@@ -6,6 +6,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler.Specialization;
 
 /// <summary>
@@ -243,8 +245,8 @@ public static class GenericClassSpecializer
         foreach (var (memberId, expression) in initializers)
         {
             var field = fieldMap[memberId.IdName];
-            expression.LoadIlValue(ilGenerator, initializerLocal);
-            var valueType = expression.OutputType(initializerLocal) ?? typeof(object);
+            expression.Accept(new CompilerVisitor(ilGenerator, initializerLocal));
+            var valueType = expression.Accept(new TypeInferenceVisitor(initializerLocal)) ?? typeof(object);
             if (field.FieldType == typeof(object) && valueType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, valueType);
@@ -461,7 +463,7 @@ public static class GenericClassSpecializer
         }
 
         // 生成方法体的IL代码
-        funcValue.BlockStatement.GenerateIl(methodIL, methodLocal);
+        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIL, methodLocal));
 
         // 检查方法体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcValue.BlockStatement.Count > 0

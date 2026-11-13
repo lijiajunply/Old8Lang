@@ -3,6 +3,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -128,7 +130,7 @@ public partial class LockedVariableLangValue : LangValueType
             // 处理 .Set() 方法 - 直接设置值
             if (instance.Id.IdName == "Set" && instance.Ids.Count == 1)
             {
-                var newValue = instance.Ids[0].Run(manager);
+                var newValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                 SetValue(newValue);
                 return new VoidLangValue();
             }
@@ -142,7 +144,7 @@ public partial class LockedVariableLangValue : LangValueType
             // 处理 .Update() 方法 - 原子更新：接受一个函数，在锁内执行
             if (instance.Id.IdName == "Update" && instance.Ids.Count == 1)
             {
-                var funcExpr = instance.Ids[0].Run(manager);
+                var funcExpr = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                 if (funcExpr is not FuncLangValue func)
                 {
                     throw new TypeError(this, "Function", funcExpr.GetType().Name);
@@ -193,7 +195,7 @@ public partial class LockedVariableLangValue : LangValueType
             // 处理 .Add() 方法 - 原子加法
             if (instance.Id.IdName == "Add" && instance.Ids.Count == 1)
             {
-                var deltaExpr = instance.Ids[0].Run(manager);
+                var deltaExpr = instance.Ids[0].Accept(new InterpreterVisitor(manager));
                 lock (_lock)
                 {
                     var newValue = _value.Plus(deltaExpr);

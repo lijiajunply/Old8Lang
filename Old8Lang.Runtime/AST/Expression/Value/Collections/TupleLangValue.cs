@@ -4,6 +4,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -77,18 +79,6 @@ public partial class TupleLangValue : LangValueType, ILangList
                 }
             }
         }
-    }
-
-    public override LangValueType Run(VariateManager manager)
-    {
-        ItemValues.Clear();
-        foreach (var expr in Elements)
-        {
-            var result = expr.Run(manager);
-            ItemValues.Add(result);
-        }
-
-        return this;
     }
 
     public override string ToString()
@@ -323,15 +313,6 @@ public partial class TupleLangValue : LangValueType, ILangList
         return true;
     }
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 获取所有元素的类型
-        var types = Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
-
-        // 递归生成创建代码
-        EmitValueTupleCreation(ilGenerator, local, Elements, types);
-    }
-
     internal void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements,
         Type[] types)
     {
@@ -356,7 +337,7 @@ public partial class TupleLangValue : LangValueType, ILangList
             // 加载前7个元素
             for (int i = 0; i < 7; i++)
             {
-                elements[i].LoadIlValue(ilGenerator, local);
+                elements[i].Accept(new CompilerVisitor(ilGenerator, local));
             }
 
             // 递归加载剩余元素作为第8个参数
@@ -380,7 +361,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
             foreach (var element in elements)
             {
-                element.LoadIlValue(ilGenerator, local);
+                element.Accept(new CompilerVisitor(ilGenerator, local));
             }
 
             ilGenerator.Emit(OpCodes.Newobj, constructor);
@@ -414,12 +395,6 @@ public partial class TupleLangValue : LangValueType, ILangList
             7 => typeof(ValueTuple<,,,,,,>).MakeGenericType(types),
             _ => throw new InvalidOperationException("不支持异常长度的元组类型生成")
         };
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        var types = Elements.Select(e => e.OutputType(local) ?? typeof(object)).ToArray();
-        return GetValueTupleTypeForCompiler(types);
     }
 
     // 实现ILangList接口

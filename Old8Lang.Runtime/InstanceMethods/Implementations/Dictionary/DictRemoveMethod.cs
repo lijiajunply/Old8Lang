@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 public class DictRemoveMethod : BaseInstanceMethod
@@ -20,7 +22,7 @@ public class DictRemoveMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Run(manager);
+        var key = parameters[0].Accept(new InterpreterVisitor(manager));
 
         // 查找并移除键值对
         var index = dict.Value.FindIndex(x => x.Key.Equal(key));
@@ -35,8 +37,8 @@ public class DictRemoveMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(DictRemoveMethod).GetMethod(nameof(RemoveHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

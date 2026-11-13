@@ -10,6 +10,8 @@ using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 using LangObject = Old8Lang.Runtime.LangObject;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -29,34 +31,6 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// 公共属性，用于访问类模板信息
     /// </summary>
     public TypeTemplate AnyValue => _anyValue;
-    
-    /// <summary>
-    /// 在解释模式下执行类定义
-    /// </summary>
-    /// <param name="manager">变量管理器，用于管理类的声明和访问</param>
-    /// <exception cref="DuplicateNameError">当类名已存在时抛出</exception>
-    public override void Run(VariateManager manager)
-    {
-        // 注册类型到类型假注系统
-        RegisterTypeToTypeSystem();
-
-        // 首先注册所有嵌套类
-        RegisterNestedClasses(manager);
-
-        // 检查类是否已存在
-        var existingClass = manager.GetAny(new LangId(_anyValue.ClassName));
-
-        if (existingClass is not null)
-        {
-            throw new DuplicateNameError(this, _anyValue.ClassName, "类");
-        }
-
-        // 立即将类添加到ImportInfos中，以便在类定义内部访问
-        manager.AddClassAndFunc(_anyValue);
-
-        // 注册类型到全局反射注册表（用于反射功能）
-        TypeTemplate.RegisterType(_anyValue.ClassName, _anyValue);
-    }
 
     /// <summary>
     /// 注册类类型到类型假注系统
@@ -135,127 +109,6 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     ];
 
     /// <summary>
-    /// 在 IL 模式下生成类或接口的IL代码
-    /// </summary>
-    /// <param name="ilGenerator">IL指令生成器</param>
-    /// <param name="local">局部变量管理器，用于管理类或接口的声明和访问</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 0. 如果是泛型类，注册到泛型类缓存中，不立即生成类型
-        if (_anyValue.IsGeneric)
-        {
-            local.GenericClasses.TryAdd(_anyValue.ClassName, _anyValue);
-            return;
-        }
-
-        // 1. 检查类或接口是否已经存在
-        if (local.ClassVar.ContainsKey(_anyValue.ClassName))
-        {
-            // 类或接口已经存在，跳过生成
-            return;
-        }
-
-        // 2. 检查是否已经有动态程序集和模块
-        // 如果没有，创建一个全局的动态程序集和模块
-        ModuleBuilder moduleBuilder;
-        
-        if (local.DynamicAssembly is null || local.DynamicModule is null)
-        {
-            var assemblyName = new AssemblyName("Old8LangDynamicAssembly");
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-            moduleBuilder = assemblyBuilder.DefineDynamicModule("Old8LangDynamicModule");
-            
-            // 保存到local中，以便其他类和接口使用
-            local.DynamicAssembly = assemblyBuilder;
-            local.DynamicModule = moduleBuilder;
-        }
-        else
-        {
-            // 使用现有的动态程序集和模块
-            moduleBuilder = local.DynamicModule;
-        }
-
-        // 3. 定义基类或接口的基础类型
-        Type? baseType = null;
-        TypeAttributes typeAttributes;
-        
-        if (_anyValue.IsInterface)
-        {
-            // 接口的处理
-            typeAttributes = TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract;
-        }
-        else
-        {
-            // 类的处理
-            typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
-
-            // 定义基类
-            if (_anyValue.ParentClassName is not null &&
-                local.ClassVar.TryGetValue(_anyValue.ParentClassName, out var parentType))
-            {
-                baseType = parentType;
-            }
-            else
-            {
-                // 如果没有指定父类，使用 LangObject 作为基类
-                // 这样所有 Old8Lang 自定义类都有统一的基类，方便运算符重载
-                baseType = typeof(LangObject);
-            }
-        }
-
-        // 4. 定义类型（类或接口）
-        var typeBuilder = moduleBuilder.DefineType(
-            _anyValue.ClassName,
-            typeAttributes,
-            baseType);
-
-        // 5. 创建一个新的LocalManager实例，用于生成当前类或接口的IL代码
-        // 这样可以避免不同类之间的方法混淆
-        var classLocal = new LocalManager
-        {
-            FilePath = local.FilePath,
-            Interpreter = local.Interpreter,
-            InClassEnv = typeBuilder,
-            Globals = local.Globals
-        };
-
-        // 类体中的方法、字段初始化器同样需要可见此前已创建的类（例如
-        // Derived 的静态方法引用 Base.count）。同时登记正在创建的类型，
-        // 使类自身的静态成员可在声明体内解析。
-        foreach (var (name, knownType) in local.ClassVar)
-        {
-            classLocal.ClassVar[name] = knownType;
-        }
-
-        classLocal.ClassVar[_anyValue.ClassName] = typeBuilder;
-
-        // 6. 定义类或接口的成员
-        if (_anyValue.IsInterface)
-        {
-            // 接口只能有方法，不能有字段
-            DefineInterfaceMembers(typeBuilder, classLocal);
-        }
-        else
-        {
-            // 类可以有字段和方法
-            // 6.1 定义字段
-            var fieldBuilders = DefineFields(typeBuilder, classLocal);
-
-            // 6.2 定义类的构造函数 (先于方法定义，以便方法中可以创建类的实例)
-            DefineConstructor(typeBuilder, baseType!, fieldBuilders, classLocal);
-
-            // 6.3 定义方法
-            DefineMethods(typeBuilder, classLocal);
-        }
-
-        // 8. 创建类型
-        var createdType = typeBuilder.CreateType();
-
-        // 9. 将类型添加到原始LocalManager中，以便其他类可以访问
-        local.ClassVar[_anyValue.ClassName] = createdType;
-    }
-
-    /// <summary>
     /// 定义类的字段
     /// </summary>
     internal List<(FieldBuilder, LangExpression)> DefineFields(TypeBuilder typeBuilder, LocalManager local)
@@ -293,10 +146,10 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             try
             {
                 fieldType = !string.IsNullOrEmpty(memberId.AssumptionType)
-                    ? memberId.OutputType(local) ?? typeof(object)
+                    ? memberId.Accept(new TypeInferenceVisitor(local)) ?? typeof(object)
                     : expr is ListLangValue { Value.Count: 0, Values.Count: 0 }
                         ? typeof(object)
-                        : expr.OutputType(local) ?? typeof(object);
+                        : expr.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             }
             catch
             {
@@ -454,7 +307,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
                 Type paramType;
                 try
                 {
-                    paramType = paramId.OutputType(methodLocal);
+                    paramType = paramId.Accept(new TypeInferenceVisitor(methodLocal));
                 }
                 catch
                 {
@@ -471,7 +324,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         Type returnType;
         try
         {
-            returnType = funcValue.OutputType(methodLocal);
+            returnType = funcValue.Accept(new TypeInferenceVisitor(methodLocal));
         }
         catch
         {
@@ -555,7 +408,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
                 Type paramType;
                 try
                 {
-                    paramType = paramId.OutputType(methodLocal);
+                    paramType = paramId.Accept(new TypeInferenceVisitor(methodLocal));
                 }
                 catch
                 {
@@ -572,7 +425,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         Type returnType;
         try
         {
-            returnType = funcValue.OutputType(methodLocal);
+            returnType = funcValue.Accept(new TypeInferenceVisitor(methodLocal));
         }
         catch
         {
@@ -621,7 +474,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         }
 
         // 生成方法体的IL代码
-        funcValue.BlockStatement.GenerateIl(methodIl, methodLocal);
+        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIl, methodLocal));
 
         // 检查方法体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcValue.BlockStatement.Count > 0
@@ -777,9 +630,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             };
 
             // 加载字段的初始值
-            initExpr.LoadIlValue(ctorIl, tempLocal);
+            initExpr.Accept(new CompilerVisitor(ctorIl, tempLocal));
 
-            var initializerType = initExpr.OutputType(tempLocal) ?? typeof(object);
+            var initializerType = initExpr.Accept(new TypeInferenceVisitor(tempLocal)) ?? typeof(object);
             if (fieldBuilder.FieldType == typeof(object) && initializerType.IsValueType)
             {
                 ctorIl.Emit(OpCodes.Box, initializerType);

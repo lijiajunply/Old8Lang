@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class StringRepeatMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var countValue = parameters[0].Run(manager);
+        var countValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (countValue is not IntLangValue count)
         {
@@ -54,8 +56,8 @@ public class StringRepeatMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(StringRepeatMethod).GetMethod(nameof(RepeatHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

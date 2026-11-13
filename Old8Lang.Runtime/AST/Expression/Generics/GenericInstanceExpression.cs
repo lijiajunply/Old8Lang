@@ -7,6 +7,8 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Specialization;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression;
 
 /// <summary>
@@ -67,181 +69,6 @@ public partial class GenericInstanceExpression : LangExpression
     /// </summary>
     public bool IsFunctionCall => CallArguments is not null;
 
-    public override LangValueType Run(VariateManager manager)
-    {
-        // 获取基础类型或函数
-        var baseValue = BaseExpression.Run(manager);
-
-        // 从解释器获取类型注解管理器
-        if (manager.Interpreter is null)
-        {
-            throw new InvalidOperationError(this, "无法获取 TypeAnnotationManager：解释器未初始化");
-        }
-
-        var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
-
-        var resolvedTypeArgs = new Dictionary<string, ITypeInfo>();
-
-        // 处理泛型类
-        if (baseValue is TypeTemplate typeTemplate)
-        {
-            if (typeTemplate.GenericParameters is null || typeTemplate.GenericParameters.Count == 0)
-            {
-                throw new InvalidOperationError(this, $"类型 {typeTemplate.ClassName} 不是泛型类");
-            }
-
-            // 验证类型参数数量
-            if (TypeArguments.Count != typeTemplate.GenericParameters.Count)
-            {
-                throw new InvalidOperationError(this,
-                    $"类型参数数量不匹配：期望 {typeTemplate.GenericParameters.Count} 个，实际 {TypeArguments.Count} 个");
-            }
-
-            // 解析类型参数
-            for (int i = 0; i < TypeArguments.Count; i++)
-            {
-                var paramName = typeTemplate.GenericParameters[i].Name;
-                var typeArgName = TypeArguments[i];
-
-                // 使用 ParseTypeAnnotation 来正确处理可空类型和其他复杂类型
-                var parsedType = typeAnnotationManager.ParseTypeAnnotation(typeArgName);
-                var typeInfo = ConvertParsedTypeToTypeInfo(parsedType, typeAnnotationManager, manager);
-
-                resolvedTypeArgs[paramName] =
-                    typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
-            }
-
-            // 实例化泛型类
-            var instantiatedTemplate = typeTemplate.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager, manager);
-
-            // 如果后面跟着调用参数，创建实例
-            if (IsFunctionCall)
-            {
-                var instance = instantiatedTemplate.CreateInstance(manager);
-                instance.Init(manager.Interpreter);
-
-                // 调用用户定义的 init 构造函数
-                instance.CallInit(CallArguments!, manager);
-
-                return instance;
-            }
-
-            // 否则返回实例化的类模板
-            return instantiatedTemplate;
-        }
-
-        // 处理泛型函数
-        if (baseValue is FuncLangValue funcValue)
-        {
-            if (funcValue.GenericParameters is null || funcValue.GenericParameters.Count == 0)
-            {
-                throw new InvalidOperationError(this, $"函数 {funcValue.Id?.IdName} 不是泛型函数");
-            }
-
-            // 验证类型参数数量
-            if (TypeArguments.Count != funcValue.GenericParameters.Count)
-            {
-                throw new InvalidOperationError(this,
-                    $"类型参数数量不匹配：期望 {funcValue.GenericParameters.Count} 个，实际 {TypeArguments.Count} 个");
-            }
-
-            // 解析类型参数
-            for (int i = 0; i < TypeArguments.Count; i++)
-            {
-                var paramName = funcValue.GenericParameters[i].Name;
-                var typeArgName = TypeArguments[i];
-
-                // 使用 ParseTypeAnnotation 来正确处理可空类型和其他复杂类型
-                var parsedType = typeAnnotationManager.ParseTypeAnnotation(typeArgName);
-                var typeInfo = ConvertParsedTypeToTypeInfo(parsedType, typeAnnotationManager, manager);
-
-                resolvedTypeArgs[paramName] =
-                    typeInfo ?? throw new InvalidOperationError(this, $"未知的类型: {typeArgName}");
-            }
-
-            // 实例化泛型函数
-            var instantiatedFunc = funcValue.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager, manager);
-
-            // 调用实例化后的函数
-            if (IsFunctionCall)
-            {
-                return instantiatedFunc.Run(manager, CallArguments!);
-            }
-
-            // 返回实例化的函数（作为一等公民）
-            return instantiatedFunc;
-        }
-
-        throw new InvalidOperationError(this, $"表达式 {BaseExpression} 不是泛型类型或泛型函数");
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        // IL 模式下的类型推断
-        // 对于泛型实例，需要根据基础表达式和类型参数推断最终类型
-
-        // 获取基础表达式名称
-        if (BaseExpression is not LangId identifier)
-        {
-            return typeof(object);
-        }
-
-        var name = identifier.IdName;
-
-        // 判断是泛型类还是泛型函数
-        if (local.GenericClasses.TryGetValue(name, out var typeTemplate))
-        {
-            // 泛型类实例化：返回特化后的类型
-            var typeMapping = CreateTypeMapping(typeTemplate.GenericParameters, local);
-            var specializedType = GenericClassSpecializer.CreateSpecialization(typeTemplate, typeMapping, local);
-            return specializedType;
-        }
-
-        if (local.GenericFunctions.TryGetValue(name, out var genericFunc))
-        {
-            // 泛型函数调用：返回函数的返回类型
-            var typeMapping = CreateTypeMapping(genericFunc.GenericParameters, local);
-            var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
-            return resolver.ResolveReturnType(genericFunc.Id?.AssumptionType);
-        }
-
-        // 默认返回 object 类型
-        return typeof(object);
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // IL 模式下的IL生成
-        // 处理泛型类实例化和泛型函数调用
-
-        // 获取基础表达式名称
-        if (BaseExpression is not LangId identifier)
-        {
-            throw new InvalidOperationError(this, "IL 模式下泛型表达式必须使用简单的标识符");
-        }
-
-        var name = identifier.IdName;
-
-        // 尝试判断是泛型类还是泛型函数
-        bool isGenericClass = local.GenericClasses.ContainsKey(name);
-        bool isGenericFunction = local.GenericFunctions.ContainsKey(name);
-
-        if (isGenericClass)
-        {
-            // 处理泛型类实例化
-            HandleGenericClassInstantiation(ilGenerator, local, name);
-        }
-        else if (isGenericFunction)
-        {
-            // 处理泛型函数调用
-            HandleGenericFunctionCall(ilGenerator, local, name);
-        }
-        else
-        {
-            throw new InvalidOperationError(this, $"找不到泛型类或泛型函数定义：{name}");
-        }
-    }
-
     /// <summary>
     /// 处理泛型类实例化
     /// </summary>
@@ -278,8 +105,8 @@ public partial class GenericInstanceExpression : LangExpression
             var argTypes = new Type[argCount];
             for (int i = 0; i < argCount; i++)
             {
-                CallArguments![i].LoadIlValue(ilGenerator, local);
-                argTypes[i] = CallArguments[i].OutputType(local) ?? typeof(object);
+                CallArguments![i].Accept(new CompilerVisitor(ilGenerator, local));
+                argTypes[i] = CallArguments[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             }
 
             // 查找 init 方法
@@ -333,7 +160,7 @@ public partial class GenericInstanceExpression : LangExpression
         {
             foreach (var arg in CallArguments)
             {
-                arg.LoadIlValue(ilGenerator, local);
+                arg.Accept(new CompilerVisitor(ilGenerator, local));
             }
         }
 

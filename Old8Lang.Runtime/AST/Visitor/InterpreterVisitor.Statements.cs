@@ -347,12 +347,12 @@ public partial class InterpreterVisitor
             // 例如：外层 for i <- 0, i < 20 调用函数，函数内 for i <- 0, i < 5 不应修改外层 i
             if (node.Init.Id is not null)
             {
-                var initValue = node.Init.Value.Run(manager);
+                var initValue = node.Init.Value.Accept(this);
                 manager.SetLocal(node.Init.Id, initValue);
             }
             else
             {
-                node.Init.Run(manager);
+                node.Init.Accept(this);
             }
 
             // 性能优化：检测简单循环模式（可以优化的循环）
@@ -363,7 +363,7 @@ public partial class InterpreterVisitor
                 // 重置控制流状态，确保每次循环迭代开始时清除之前的break/continue标志
                 manager.ControlFlowManager.ResetCurrentState();
 
-                var varExpr = node.Condition.Run(manager);
+                var varExpr = node.Condition.Accept(this);
                 bool expr1;
                 if (varExpr is BoolLangValue value)
                 {
@@ -379,13 +379,13 @@ public partial class InterpreterVisitor
                     // 记录循环迭代（性能监控）
                     manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
 
-                    node.Block.Run(manager);
+                    node.Block.Accept(this);
 
                     // 处理yield：如果循环体中遇到yield，返回以暂停执行
                     if (manager.IsYield)
                     {
                         // 提前执行循环增量，确保生成器恢复时继续推进
-                        node.Operation.Run(manager);
+                        node.Operation.Accept(this);
                         return new VoidLangValue();
                     }
 
@@ -400,12 +400,12 @@ public partial class InterpreterVisitor
                     if (manager.ControlFlowManager.ContinueFlag)
                     {
                         manager.ControlFlowManager.ContinueFlag = false;
-                        node.Operation.Run(manager);
+                        node.Operation.Accept(this);
                         continue;
                     }
 
                     // 正常执行，执行循环增量操作
-                    node.Operation.Run(manager);
+                    node.Operation.Accept(this);
                 }
                 else
                     break;
@@ -773,9 +773,9 @@ public partial class InterpreterVisitor
 
             // 计算切片参数
             var length = listCollection.GetLength();
-            var start1 = sliceValue.Start?.Run(manager);
-            var end1 = sliceValue.End?.Run(manager);
-            var step1 = sliceValue.Step?.Run(manager);
+            var start1 = sliceValue.Start?.Accept(new InterpreterVisitor(manager));
+            var end1 = sliceValue.End?.Accept(new InterpreterVisitor(manager));
+            var step1 = sliceValue.Step?.Accept(new InterpreterVisitor(manager));
 
             var stepValue = step1?.GetValue<int>() ?? 1;
 

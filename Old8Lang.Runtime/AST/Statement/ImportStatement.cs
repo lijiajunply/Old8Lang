@@ -8,6 +8,8 @@ using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.ModuleSystem.Core;
 using Old8Lang.ModuleSystem.Resolution;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
@@ -119,149 +121,6 @@ public partial class ImportStatement(
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
     internal readonly LangExpression? _dynamicModuleExpression = dynamicModuleExpression;
-
-    /// <summary>
-    /// 在解释模式下执行导入语句
-    /// </summary>
-    /// <param name="manager">变量管理器，用于管理导入的模块和变量</param>
-    /// <exception cref="ImportError">当导入失败时抛出</exception>
-    public override void Run(VariateManager manager)
-    {
-        var moduleName = _importString;
-
-        // 动态导入处理
-        if (_isDynamic)
-        {
-            HandleDynamicImport(manager);
-            return;
-        }
-
-        // 懒导入处理
-        if (_isLazy)
-        {
-            HandleLazyImport(manager);
-            return;
-        }
-
-        var symbolAliases = _importSpecifiers
-            .Where(item => item.Name != item.Alias)
-            .ToDictionary(item => item.Name, item => item.Alias);
-
-        var options = new ImportOptions
-        {
-            IsFromClause = _fromClause,
-            ModuleAlias = _moduleAlias,
-            ImportSpecifiers = _importSpecifiers.Select(item => item.Name).ToList(),
-            SymbolAliases = symbolAliases.Count > 0 ? symbolAliases : null,
-            IsLazy = _isLazy,
-            IsSelective = _isSelective
-        };
-
-        var result = ModuleService.ImportModule(moduleName, manager, options);
-
-        if (!result.IsSuccess)
-        {
-            if (result.Error is not null)
-            {
-                throw result.Error;
-            }
-
-            // 使用 ModuleResolutionResult 提供详细错误信息
-            if (result.ResolutionResult is not null)
-            {
-                throw new ImportError(this, moduleName, result.ResolutionResult);
-            }
-
-            throw new ImportError(this, moduleName, "模块导入失败");
-        }
-    }
-
-    /// <summary>
-    /// 在 IL 模式下生成导入语句的IL代码
-    /// </summary>
-    /// <param name="ilGenerator">IL指令生成器</param>
-    /// <param name="local">局部变量管理器，用于管理导入的模块和变量</param>
-    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        string moduleName = _importString;
-        bool isDirectory = false;
-
-        // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
-        // 在 IL 模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
-        var standardLibraries = local.Interpreter?.Manager.StandardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
-        if (standardLibraries.IsStandardLibrary(moduleName))
-        {
-            // 验证标准库是否可用（程序集和类是否存在）
-            if (!StandardLibraryLoader.ValidateStandardLibrary(moduleName, out var errorMessage, standardLibraries))
-            {
-                throw new ImportError(Position, moduleName,
-                    $"编译时验证失败: {errorMessage}\n\n" +
-                    "请确保标准库程序集已正确部署到运行时目录。");
-            }
-
-            if (!_fromClause && StandardLibraryLoader.TryLoadStandardLibrary(
-                    moduleName, new VariateManager { StandardLibraries = standardLibraries }, out var standardModule))
-                local.GlobalStaticClasses[_moduleAlias ?? moduleName] = standardModule;
-
-            return;
-        }
-
-        // 使用 ModuleResolver 进行统一的模块解析
-        var resolver = new ModuleResolver(standardLibraries);
-        var resolution = resolver.ResolveModule(moduleName, local.FilePath);
-
-        // 如果解析失败，抛出详细错误
-        if (!resolution.IsSuccess)
-        {
-            throw new ImportError(Position, moduleName, resolution);
-        }
-
-        // 处理不同类型的模块
-        string? resolvedPath = resolution.ResolvedPath;
-
-        // 如果是网络模块，IL 模式暂不支持
-        if (resolution.ModuleType == ModuleType.NetworkModule)
-        {
-            throw new ImportError(Position, moduleName,
-                "IL 模式暂不支持从网络URL导入模块。请使用解释模式 (-f) 或将模块下载到本地。");
-        }
-
-        // 对于本地文件、第三方包和子模块，继续处理
-        if (string.IsNullOrEmpty(resolvedPath))
-        {
-            // 这种情况不应该发生，因为 IsSuccess 为 false 时已经抛出异常
-            throw new ImportError(Position, moduleName, "模块解析失败，但未提供详细信息");
-        }
-
-        // 获取绝对路径作为缓存键
-        var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
-
-        // 检查模块缓存
-        if (local.Interpreter?.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock) == true)
-        {
-            // 使用缓存的模块
-            var cachedOriginalPath = local.FilePath;
-            local.FilePath = moduleAbsolutePath;
-            cachedBlock.GenerateImportIl(ilGenerator, local, includeBody: true);
-            local.FilePath = cachedOriginalPath;
-            return;
-        }
-
-        // 执行导入并缓存
-        var code = isDirectory ? Apis.FromDirectory(moduleAbsolutePath) : Apis.FromFile(moduleAbsolutePath);
-        var importOriginalPath = local.FilePath;
-        local.FilePath = moduleAbsolutePath;
-        var block = local.Interpreter?.Build(code: code);
-
-        // 缓存模块
-        if (block is not null && local.Interpreter is not null)
-        {
-            local.Interpreter.ModuleCache[moduleAbsolutePath] = block;
-        }
-
-        block?.GenerateImportIl(ilGenerator, local, includeBody: true);
-        local.FilePath = importOriginalPath;
-    }
 
     /// <summary>
     /// 获取指定索引处的语句（实现OldStatement接口）
@@ -419,7 +278,7 @@ public partial class ImportStatement(
         try
         {
             // 运行动态模块表达式来获取模块名
-            var dynamicResult = _dynamicModuleExpression.Run(manager);
+            var dynamicResult = _dynamicModuleExpression.Accept(new InterpreterVisitor(manager));
 
             if (dynamicResult is StringLangValue stringModuleValue)
             {

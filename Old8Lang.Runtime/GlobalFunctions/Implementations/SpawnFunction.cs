@@ -10,6 +10,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -39,14 +41,14 @@ public sealed class SpawnFunction : BaseGlobalFunction
         if (funcExpr is Operation { Opera: LangTokenType.Dot } dotOp)
         {
             // 获取实例（左操作数）
-            var instanceValue = dotOp.Left?.Run(manager);
+            var instanceValue = dotOp.Left?.Accept(new InterpreterVisitor(manager));
             if (instanceValue is AnyLangValue anyInstance)
             {
                 instanceContext = anyInstance;
             }
         }
 
-        var funcValue = funcExpr.Run(manager);
+        var funcValue = funcExpr.Accept(new InterpreterVisitor(manager));
 
         // 检查函数类型
         FuncLangValue? spawnFunc = null;
@@ -137,7 +139,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         // spawn(f, args...)：把函数编译成委托、额外参数打包成 Old8Lang 值数组，交给运行期 helper 创建线程
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Call,
             typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
                 nameof(InstanceMethods.Core.IlValueBridge.WrapFunction))!);
@@ -150,8 +152,8 @@ public sealed class SpawnFunction : BaseGlobalFunction
         {
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i - 1);
-            parameters[i].LoadIlValue(ilGenerator, local);
-            var argumentType = parameters[i].OutputType(local) ?? typeof(object);
+            parameters[i].Accept(new CompilerVisitor(ilGenerator, local));
+            var argumentType = parameters[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (argumentType.IsValueType)
             {
                 ilGenerator.Emit(OpCodes.Box, argumentType);

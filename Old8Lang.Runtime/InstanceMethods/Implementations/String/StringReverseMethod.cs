@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.String;
 
 public class StringReverseMethod : BaseInstanceMethod
@@ -28,7 +30,7 @@ public class StringReverseMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
         var helperMethod = typeof(StringReverseMethod).GetMethod(nameof(ReverseHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);

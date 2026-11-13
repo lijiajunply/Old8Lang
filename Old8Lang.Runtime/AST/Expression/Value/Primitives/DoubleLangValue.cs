@@ -215,13 +215,6 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
         };
     }
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        ilGenerator.Emit(OpCodes.Ldc_R8, Value);
-    }
-
-    public override Type OutputType(LocalManager local) => Value.GetType();
-
     /// <summary>
     /// 重置对象状态，使其可以被复用
     /// </summary>

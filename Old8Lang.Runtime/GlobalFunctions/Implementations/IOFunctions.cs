@@ -8,6 +8,8 @@ using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -116,7 +118,7 @@ public sealed class InputFunction : BaseGlobalFunction
     {
         if (parameters.Count == 1)
         {
-            var prompt = parameters[0].Run(manager).ToDisplayString();
+            var prompt = parameters[0].Accept(new InterpreterVisitor(manager)).ToDisplayString();
             manager.Interpreter.OutputProvider.Write(prompt);
         }
 
@@ -197,8 +199,8 @@ public sealed class ErrorFunction : BaseGlobalFunction
         }
 
         var expr = parameters[0];
-        expr.LoadIlValue(ilGenerator, local);
-        var exprType = expr.OutputType(local);
+        expr.Accept(new CompilerVisitor(ilGenerator, local));
+        var exprType = expr.Accept(new TypeInferenceVisitor(local));
 
         if (exprType != typeof(string))
         {

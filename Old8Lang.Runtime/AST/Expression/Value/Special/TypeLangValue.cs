@@ -45,14 +45,6 @@ public partial class TypeLangValue : LangValueType
         Value = metadata.ClassName;
     }
 
-    public override LangValueType Run(VariateManager manager)
-    {
-        var result = _expression?.Run(manager);
-        if (result is null) throw new InvalidOperationError(this, "类型表达式求值失败");
-        Value = result.TypeToString();
-        return this;
-    }
-
     /// <summary>
     /// 懒加载获取 TypeTemplate
     /// </summary>
@@ -322,16 +314,4 @@ public partial class TypeLangValue : LangValueType
         return base.Dot(right, manager);
     }
 
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 在 IL 模式下，创建 TypeLangValue 对象
-        ilGenerator.Emit(OpCodes.Ldstr, Value ?? "");
-        ilGenerator.Emit(OpCodes.Newobj, typeof(TypeLangValue).GetConstructor([typeof(string)])!);
-    }
-
-    public override Type OutputType(LocalManager local)
-    {
-        // TypeLangValue 表示类型信息，输出为 TypeLangValue 类型
-        return typeof(TypeLangValue);
-    }
 }

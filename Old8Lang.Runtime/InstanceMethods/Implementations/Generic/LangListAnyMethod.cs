@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -32,7 +34,7 @@ public class LangListAnyMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
         }
 
         // 有参数：检查是否有元素满足条件
-        var predicateExpr = parameters[0].Run(manager);
+        var predicateExpr = parameters[0].Accept(new InterpreterVisitor(manager));
         if (predicateExpr is not FuncLangValue predicate)
         {
             throw new ArgumentException("Any 方法的参数必须是函数");

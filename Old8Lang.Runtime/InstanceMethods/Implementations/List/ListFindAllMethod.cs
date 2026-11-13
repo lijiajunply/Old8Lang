@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class ListFindAllMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var predicate = parameters[0].Run(manager) as FuncLangValue;
+        var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (predicate == null)
         {
@@ -64,7 +66,7 @@ public class ListFindAllMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 谓词：编译好的委托 -> 函数值
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.WrapFunction))!);
 
         var helperMethod = typeof(ListFindAllMethod).GetMethod(nameof(FindAllHelper),

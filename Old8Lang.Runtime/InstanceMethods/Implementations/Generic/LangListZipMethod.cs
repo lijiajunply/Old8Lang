@@ -6,6 +6,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class LangListZipMethod : BaseLangListMethod
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var otherValue = parameters[0].Run(manager);
+        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (otherValue is not ILangList otherList)
         {
@@ -36,7 +38,7 @@ public class LangListZipMethod : BaseLangListMethod
         // 如果提供了 zipper 函数
         if (parameters.Count == 2)
         {
-            var zipperExpr = parameters[1].Run(manager);
+            var zipperExpr = parameters[1].Accept(new InterpreterVisitor(manager));
             if (zipperExpr is not FuncLangValue zipper)
             {
                 throw new ArgumentException("Zip 方法的第二个参数必须是函数");
@@ -71,8 +73,8 @@ public class LangListZipMethod : BaseLangListMethod
     {
         if (parameters.Count == 1)
         {
-            instance.LoadIlValue(ilGenerator, local);
-            parameters[0].LoadIlValue(ilGenerator, local);
+            instance.Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
             var helperMethod = typeof(LangListZipMethod).GetMethod(nameof(ZipHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

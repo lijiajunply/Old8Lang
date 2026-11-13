@@ -5,6 +5,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
@@ -22,17 +24,6 @@ public partial class MockLibClassLangValue : LangValueType
     public override string TypeToString() => "MockLibClass";
 
     public override string ToDisplayString() => "MockLib";
-
-    /// <summary>
-    /// 生成 IL 代码，返回 MockLib 类型本身
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 对于 MockLib 类静态方法，我们不需要加载实例
-        // 直接返回 MockLib 类型本身
-        ilGenerator.Emit(OpCodes.Ldtoken, typeof(MockLibClassLangValue));
-        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
-    }
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -71,7 +62,7 @@ public partial class MockLibClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Run(currentManager)).ToList();
+            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
             return method(args, instance.Position);
         }
 
@@ -521,23 +512,12 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
 
     public override string ToDisplayString() => $"MockObject('{MockObject.Name}')";
 
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(MockLib.MockObject);
-    }
-
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // MockObject 在 IL 中的加载是复杂的，这里简化处理
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         if (dotExpression is Instance instance)
         {
             var methodName = instance.Id.IdName;
-            var args = instance.Ids.Select(id => id.Run(manager)).ToList();
+            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(manager))).ToList();
 
             return methodName switch
             {
@@ -733,21 +713,4 @@ public partial class MockLibStaticMethodWrapper(
         return method(args, position);
     }
 
-    /// <summary>
-    /// 生成 IL 代码，返回对应MockLib静态方法的委托
-    /// </summary>
-    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        // MockLib 静态方法在 IL 中通常通过直接调用来实现
-        // 这里返回 null 作为占位符
-        ilGenerator.Emit(OpCodes.Ldnull);
-    }
-
-    /// <summary>
-    /// 获取输出类型
-    /// </summary>
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(Delegate);
-    }
 }

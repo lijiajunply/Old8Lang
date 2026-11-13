@@ -9,6 +9,8 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
@@ -40,10 +42,10 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 initialCount 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 maxCount 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.CreateSemaphore(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateSemaphore));
@@ -91,7 +93,7 @@ public sealed class SemaphoreAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 semaphoreId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.AcquireSemaphore(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireSemaphore));
@@ -140,10 +142,10 @@ public sealed class SemaphoreTryAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 semaphoreId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].LoadIlValue(ilGenerator, local);
+        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.TryAcquireSemaphore(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireSemaphore));
@@ -191,7 +193,7 @@ public sealed class SemaphoreReleaseFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 semaphoreId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.ReleaseSemaphore(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseSemaphore));
@@ -239,7 +241,7 @@ public sealed class SemaphoreDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 semaphoreId 参数
-        parameters[0].LoadIlValue(ilGenerator, local);
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeSemaphore(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeSemaphore));

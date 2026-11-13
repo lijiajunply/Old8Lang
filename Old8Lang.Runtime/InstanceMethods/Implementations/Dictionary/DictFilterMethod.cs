@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class DictFilterMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var predicate = parameters[0].Run(manager) as FuncLangValue;
+        var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (predicate == null)
         {
@@ -88,7 +90,7 @@ public class DictFilterMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
         var manager = new VariateManager();
         // IL 模式下字典由 IlValueBridge.Wrap 构造，Value 列表尚未填充
-        dict.Run(manager);
+        dict.Accept(new InterpreterVisitor(manager));
 
         var newDict = new Dictionary<object, object?>();
 

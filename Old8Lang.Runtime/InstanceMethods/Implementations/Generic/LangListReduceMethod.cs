@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class LangListReduceMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var reducerExpr = parameters[0].Run(manager);
+        var reducerExpr = parameters[0].Accept(new InterpreterVisitor(manager));
 
         if (reducerExpr is not FuncLangValue reducer)
         {
@@ -37,7 +39,7 @@ public class LangListReduceMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         if (parameters.Count >= 2)
         {
             // 有初始值
-            accumulator = parameters[1].Run(manager);
+            accumulator = parameters[1].Accept(new InterpreterVisitor(manager));
             startIndex = 0;
         }
         else

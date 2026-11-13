@@ -2,6 +2,8 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.AST.Expression.OperationHelpers;
 
 /// <summary>
@@ -165,8 +167,8 @@ internal static class InOperatorHelper
         Operation operation)
     {
         // 加载左侧值
-        left.LoadIlValue(ilGenerator, local);
-        var leftInType = left.OutputType(local);
+        left.Accept(new CompilerVisitor(ilGenerator, local));
+        var leftInType = left.Accept(new TypeInferenceVisitor(local));
 
         // 确保左侧值是 object 类型（装箱值类型）
         if (leftInType is { IsValueType: true })
@@ -175,7 +177,7 @@ internal static class InOperatorHelper
         }
 
         // 加载右侧集合
-        right.LoadIlValue(ilGenerator, local);
+        right.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 根据集合类型生成不同的检查代码
         if (rightType is null)

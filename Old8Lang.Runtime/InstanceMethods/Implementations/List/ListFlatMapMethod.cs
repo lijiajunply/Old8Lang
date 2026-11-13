@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class ListFlatMapMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var transform = parameters[0].Run(manager) as FuncLangValue;
+        var transform = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
 
         if (transform == null)
         {

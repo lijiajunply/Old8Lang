@@ -4,6 +4,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.TypeSystem;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.Compiler.Specialization;
 
 /// <summary>
@@ -353,7 +355,7 @@ public static class GenericMethodSpecializer
         GenericTypeResolver resolver)
     {
         // 使用特化的类型信息生成方法体
-        funcValue.BlockStatement.GenerateIl(methodIl, funcLocal);
+        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIl, funcLocal));
     }
 
     /// <summary>

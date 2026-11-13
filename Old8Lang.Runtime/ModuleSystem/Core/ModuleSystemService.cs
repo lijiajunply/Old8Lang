@@ -11,6 +11,8 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.AnyValues;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.ModuleSystem.Core;
 
 /// <summary>
@@ -184,7 +186,7 @@ public class ModuleSystemService
                     // 记录执行前的 ImportInfos
                     var importInfosBefore = manager.ImportInfos.ToList();
 
-                    loadResult.Block.Run(manager);
+                    loadResult.Block.Accept(new InterpreterVisitor(manager));
 
                     // 找出新增的 ImportInfos（只属于当前模块的）
                     var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
@@ -251,7 +253,7 @@ public class ModuleSystemService
             {
                 // 带别名的导入: import "module" as alias
                 // 直接在当前作用域执行模块代码，这样函数可以访问模块变量
-                loadResult.Block.Run(manager);
+                loadResult.Block.Accept(new InterpreterVisitor(manager));
 
                 // 提取符号创建模块对象
                 var symbols = _symbolExtractor.ExtractSymbols(manager);
@@ -267,7 +269,7 @@ public class ModuleSystemService
             {
                 // 普通导入: import "module"
                 // 直接在当前作用域执行模块代码，这样函数可以访问模块变量
-                loadResult.Block.Run(manager);
+                loadResult.Block.Accept(new InterpreterVisitor(manager));
 
                 // 提取符号创建模块对象
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);

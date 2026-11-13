@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -24,8 +26,8 @@ public class LangListZip3Method : BaseLangListMethod, IIlNativeValueInstanceMeth
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var secondValue = parameters[0].Run(manager);
-        var thirdValue = parameters[1].Run(manager);
+        var secondValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var thirdValue = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (!IsLangList(secondValue))
         {

@@ -8,6 +8,8 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -22,7 +24,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
         if (value is ILangList list)
         {
             return new IntLangValue(list.GetLength());
@@ -33,8 +35,8 @@ public sealed class LenFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var lenId = parameters[0];
-        lenId.LoadIlValue(ilGenerator, local);
-        var lenType = lenId.OutputType(local)!;
+        lenId.Accept(new CompilerVisitor(ilGenerator, local));
+        var lenType = lenId.Accept(new TypeInferenceVisitor(local))!;
 
         // 尝试获取Length属性，适用于数组、字符串等
         var lengthProp = lenType.GetProperty("Length");
@@ -206,14 +208,14 @@ public sealed class TypeFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        return new TypeLangValue(parameters[0].Run(manager)).Run(manager);
+        return new TypeLangValue(parameters[0].Accept(new InterpreterVisitor(manager))).Accept(new InterpreterVisitor(manager));
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // IL 模式下type()函数返回类型名称字符串
         var typeId = parameters[0];
-        var typeIdType = typeId.OutputType(local);
+        var typeIdType = typeId.Accept(new TypeInferenceVisitor(local));
         // 直接返回类型名称字符串，不调用GetType()
         ilGenerator.Emit(OpCodes.Ldstr, typeIdType is not null ? typeIdType.Name : "object");
     }
@@ -242,8 +244,8 @@ public sealed class AssertFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        var value = parameters[0].Run(manager);
-        var value1 = parameters[1].Run(manager);
+        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value1 = parameters[1].Accept(new InterpreterVisitor(manager));
 
         if (!value.Equal(value1))
         {

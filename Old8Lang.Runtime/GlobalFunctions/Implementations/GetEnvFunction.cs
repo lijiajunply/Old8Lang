@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.GlobalFunctions.Implementations;
 
 /// <summary>
@@ -33,10 +35,10 @@ public sealed class GetEnvFunction : BaseGlobalFunction
     {
         // 加载参数（环境变量名）
         var keyExpr = parameters[0];
-        keyExpr.LoadIlValue(ilGenerator, local);
+        keyExpr.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 转换为字符串
-        var keyType = keyExpr.OutputType(local);
+        var keyType = keyExpr.Accept(new TypeInferenceVisitor(local));
         if (keyType != typeof(string))
         {
             if (keyType is { IsValueType: true })

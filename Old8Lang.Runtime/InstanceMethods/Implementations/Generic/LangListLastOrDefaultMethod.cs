@@ -7,6 +7,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
 
 /// <summary>
@@ -30,7 +32,7 @@ public class LangListLastOrDefaultMethod : BaseLangListMethod, IIlNativeValueIns
             // 如果提供了默认值，返回默认值
             if (parameters.Count == 1)
             {
-                return parameters[0].Run(manager);
+                return parameters[0].Accept(new InterpreterVisitor(manager));
             }
             // 否则返回 null
             return NullLangValue.Instance;

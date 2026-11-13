@@ -6,6 +6,8 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
+using Old8Lang.AST.Visitor;
+
 namespace Old8Lang.InstanceMethods.Implementations.Dictionary;
 
 public class DictContainsKeyMethod : BaseInstanceMethod
@@ -20,7 +22,7 @@ public class DictContainsKeyMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Run(manager);
+        var key = parameters[0].Accept(new InterpreterVisitor(manager));
         var contains = dict.Value.Any(x => x.Key.Equal(key));
         return new BoolLangValue(contains);
     }
@@ -28,8 +30,8 @@ public class DictContainsKeyMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
-        parameters[0].LoadIlValue(ilGenerator, local);
+        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
 
         var helperMethod = typeof(DictContainsKeyMethod).GetMethod(nameof(ContainsKeyHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
