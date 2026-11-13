@@ -699,10 +699,10 @@ public partial class InterpreterVisitor
                 }
 
                 // 处理 node.member <- value 形式的赋值
-                if (operation is { Left: LangId { IdName: "node" }, Right: LangId memberName })
+                if (operation is { Left: LangId { IdName: "this" }, Right: LangId memberName })
                 {
                     // 查找当前实例 - 支持 V1 和 V2
-                    var thisValue = manager.GetValue(new LangId("node"));
+                    var thisValue = manager.GetValue(new LangId("this"));
 
                     if (thisValue is AnyLangValue anyValue)
                     {
@@ -722,7 +722,7 @@ public partial class InterpreterVisitor
                             return new VoidLangValue();
                         }
 
-                        throw new NameError(node, "node");
+                        throw new NameError(node, "this");
                     }
                 }
                 // 处理普通对象成员访问：person.name <- value
@@ -879,7 +879,7 @@ public partial class InterpreterVisitor
         if (!string.IsNullOrEmpty(manager.CurrentFunctionReturnType))
         {
             var functionName = "anonymous";
-            if (manager.GetValue(new LangId("node")) is AnyLangValue anyValue)
+            if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
             {
                 functionName = anyValue.ClassId.IdName;
             }

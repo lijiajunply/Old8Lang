@@ -110,7 +110,7 @@ public partial class InterpreterVisitor
         }
 
         // 处理this.id => dot_value
-        if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "node" } && node.Right is not null)
+        if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "this" } && node.Right is not null)
         {
             var thisValue = node.Left.Accept(this);
             if (thisValue is AnyLangValue anyValue)
@@ -119,7 +119,7 @@ public partial class InterpreterVisitor
                 return anyValue.Dot(node.Right, manager);
             }
 
-            throw new NameError(node.Left, "node");
+            throw new NameError(node.Left, "this");
         }
 
         // 处理逻辑AND操作 - 短路求值

@@ -152,7 +152,7 @@ public partial class TypeInferenceVisitor
     {
 
         // 处理 node 关键字
-        if (node.IdName == "node")
+        if (node.IdName == "this")
         {
             // 如果在类环境中，返回当前类类型
             if (local.InClassEnv is not null)
@@ -407,7 +407,7 @@ public partial class TypeInferenceVisitor
 
         // 同一个方法 AST 会被多个泛型类特化复用；node 的字段类型依当前特化而变。
         var isThisField = node.Opera == LangTokenType.Dot &&
-                          (node.Left is LangId { IdName: "node" } || node.Left is ThisExpression) && node.Right is LangId;
+                          (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && node.Right is LangId;
         if (node.Type is not null && !isThisField) return node.Type;
         if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, node.Right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.GetReturnType(library, libraryCall);
@@ -420,8 +420,8 @@ public partial class TypeInferenceVisitor
         var rightType = node.Right?.Accept(new TypeInferenceVisitor(local));
 
         // 处理 node.member 访问（类环境内）- 需要在 TypeBuilder 转换之前处理
-        // 支持 LangId { IdName: "node" } 和 ThisExpression 两种形式
-        if (node.Opera == LangTokenType.Dot && (node.Left is LangId { IdName: "node" } || node.Left is ThisExpression) && node.Right is LangId thisMemberId)
+        // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
+        if (node.Opera == LangTokenType.Dot && (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && node.Right is LangId thisMemberId)
         {
             // 优先从 FieldVar 中查找字段类型
             if (local.FieldVar.TryGetValue(thisMemberId.IdName, out var fieldInfo))

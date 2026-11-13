@@ -257,7 +257,7 @@ public partial class CompilerVisitor
 
         // Lambda 的第 0 个参数是闭包数组，不是实例本身。类方法中创建的
         // lambda 会把 node 作为捕获值保存，因此应从对应槽位读取实例。
-        if (local.TryGetCapturedLocal("node", out var captured))
+        if (local.TryGetCapturedLocal("this", out var captured))
         {
             ilGenerator.Emit(OpCodes.Ldarg_0);
             ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);

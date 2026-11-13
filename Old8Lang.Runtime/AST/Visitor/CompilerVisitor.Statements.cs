@@ -720,7 +720,7 @@ public partial class CompilerVisitor
                     }
 
                     // 检查是否是this访问（如this.name <- value）
-                    if ((operation.Left is LangId { IdName: "node" } || operation.Left is ThisExpression) &&
+                    if ((operation.Left is LangId { IdName: "this" } || operation.Left is ThisExpression) &&
                         local.InClassEnv is not null)
                     {
                         // 加载 node；捕获 node 的 lambda 会从闭包环境读取实例。
@@ -753,7 +753,7 @@ public partial class CompilerVisitor
 
                         if (fieldInfo is not null)
                         {
-                            if (fieldInfo is FieldBuilder && local.TryGetCapturedLocal("node", out _))
+                            if (fieldInfo is FieldBuilder && local.TryGetCapturedLocal("this", out _))
                             {
                                 ilGenerator.Emit(OpCodes.Ldstr, memberId.IdName);
                                 node.Value.Accept(this);
