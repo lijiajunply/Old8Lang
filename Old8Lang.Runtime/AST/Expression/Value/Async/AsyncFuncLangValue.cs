@@ -15,7 +15,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// 异步函数值类型
 /// 表示一个异步函数，可以被调用并返回 TaskLangValue
 /// </summary>
-public class AsyncFuncLangValue : ImportInfo
+public partial class AsyncFuncLangValue : ImportInfo
 {
     public readonly LangId? Id;
     public readonly List<LangId>? Ids;
@@ -492,6 +492,6 @@ public class AsyncFuncLangValue : ImportInfo
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        throw new NotSupportedException("AsyncFuncLangValue 暂不支持 Visitor 模式访问");
+        return visitor.VisitAsyncFuncLangValue(this);
     }
 }

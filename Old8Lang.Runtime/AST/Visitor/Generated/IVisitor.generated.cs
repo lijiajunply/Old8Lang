@@ -242,6 +242,11 @@ public interface IVisitor<out TResult>
     TResult VisitAsyncGeneratorLangValue(AsyncGeneratorLangValue node);
 
     /// <summary>
+    /// 访问 AsyncFuncLangValue 节点
+    /// </summary>
+    TResult VisitAsyncFuncLangValue(AsyncFuncLangValue node);
+
+    /// <summary>
     /// 访问 AsyncStreamLangValue 节点
     /// </summary>
     TResult VisitAsyncStreamLangValue(AsyncStreamLangValue node);

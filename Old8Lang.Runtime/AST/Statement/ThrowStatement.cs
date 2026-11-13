@@ -9,6 +9,8 @@ namespace Old8Lang.AST.Statement;
 
 public partial class ThrowStatement(LangExpression expression, SourcePosition position = default) : OldStatement(position)
 {
+    internal LangExpression Expression => expression;
+
     
     public override void Run(VariateManager manager)
     {

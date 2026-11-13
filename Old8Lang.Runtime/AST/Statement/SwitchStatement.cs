@@ -13,6 +13,10 @@ public partial class SwitchStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
+    internal LangExpression SwitchExpression => switchExpression;
+    internal List<CaseStatement> SwitchCaseList => switchCaseList;
+    internal BlockStatement? DefaultBlockStatement => defaultBlockStatement;
+
     public override void Run(VariateManager manager)
     {
         var switchValue = switchExpression.Run(manager);

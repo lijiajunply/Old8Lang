@@ -1299,4 +1299,9 @@ return node.Value.GetType();
     
     
     }
+
+    public Type? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
+    {
+        return node.OutputType(local);
+    }
 }

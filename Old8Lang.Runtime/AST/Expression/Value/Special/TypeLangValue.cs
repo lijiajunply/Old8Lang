@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 public partial class TypeLangValue : LangValueType
 {
     internal readonly LangExpression? _expression;
-    public string? Value { get; private set; }
+    public string? Value { get; internal set; }
 
     /// <summary>
     /// 类型模板引用（懒加载）

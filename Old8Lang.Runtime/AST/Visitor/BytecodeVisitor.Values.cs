@@ -971,4 +971,10 @@ public partial class BytecodeVisitor
 
         Emit(OpCode.MakeClosure, operand);
     }
+
+    public Instruction? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
+    {
+        // 异步函数值在字节码模式中没有直接对应的指令
+        return null;
+    }
 }

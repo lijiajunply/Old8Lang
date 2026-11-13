@@ -98,4 +98,10 @@ public partial class CompilerVisitor
         node.LoadIlValue(ilGenerator, local);
         return null;
     }
+
+    public object? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
+    {
+        node.LoadIlValue(ilGenerator, local);
+        return null;
+    }
 }
