@@ -23,6 +23,7 @@ public class ModuleCompositionTests
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.LangTokenType).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.PreprocessorSymbols).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.PreprocessorTokenizer).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.LangTokenizer).Assembly.GetName().Name);
     }
 
     [Fact]
