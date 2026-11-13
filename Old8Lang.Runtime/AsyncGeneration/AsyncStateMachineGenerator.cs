@@ -5,6 +5,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Execution;
 
 namespace Old8Lang.AsyncGeneration;
 
@@ -346,7 +347,7 @@ public class AsyncStateMachineGenerator
 
         // --- 生成函数体 ---
         LocalManager.AsyncStateMachineGenerator = this;
-        BlockStatement.GenerateIl(il, LocalManager);
+        ExecutionModeDispatcher.GenerateIl(BlockStatement, il, LocalManager);
         
         // --- 完成处理 ---
         // 只有当函数体中没有执行 return 语句时，才调用 EmitReturnInternal

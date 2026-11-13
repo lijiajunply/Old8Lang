@@ -1,6 +1,7 @@
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
 using Old8Lang.ProjectManagement;
+using Old8Lang.Execution;
 
 using Old8Lang.Profiler;
 
@@ -103,7 +104,7 @@ public class FromFileCommand : ICommand
         {
             var code = Apis.FromFile(fileName);
             var ast = langInterpreter.Build(code, fileName, preprocessorSymbols);
-            ast.Run(langInterpreter.Manager);
+            ExecutionModeDispatcher.Execute(ast, langInterpreter.Manager);
 
             // 输出性能报告
             if (enablePerf && monitor != null)

@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Execution;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
 
@@ -38,7 +39,7 @@ public sealed class CompilerFunction : BaseGlobalFunction
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager();
-        statement.GenerateIl(ilGenerator, local);
+        ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
         foreach (var info in local.DelegateVar)
         {

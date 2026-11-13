@@ -122,6 +122,8 @@
 
 - [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 [Core 诊断与预处理报告](Reports/2026-11-13-16-35-Core诊断与预处理拆分测试.md)。
 
+- [ ] **IL 数组回归失败**：2026-11-13 执行入口迁移定向测试中，`ArrayConcatenation_CompilesAndExecutesCorrectly` 因 `Len` 推断为 `Int32` 失败，`NestedArrays_CompilesAndExecutesCorrectly` 生成无效 IL。旧块入口与新入口均调用同一 `CompilerVisitor`；需独立基线复现。见 [执行入口测试报告](Reports/2026-11-13-22-17-执行入口迁移测试.md)。
+
 - [ ] **`Compiler.Basic.ErrorHandlingTests` 的 IL 异常预期已失配**：2026-11-13 在 Core 基础异常契约迁移的定向回归中，因筛选条件同时匹配该类，70 项中 10 项失败、2 项跳过。失败包括期望 `Old8Exception` 但实际抛出 `CompilerException`、期望运行期异常但未抛出，以及生成无效 IL。此次改动仅调整 `CompilerException` 与 `SourceContextWindow` 的程序集归属，未改异常继承或 IL 生成逻辑；需在独立基线中复现并按当前 IL 语义更新实现或断言。见 [Core 基础异常契约报告](Reports/2026-11-13-16-20-Core基础异常契约测试.md)。
 
 - [x] **IL 字符串 `Length()` 可能导致进程崩溃**：原生字符串现在使用 CLR 字符串长度，返回原生整数；原崩溃用例及别名、链式调用回归通过，见 [测试报告](Reports/2026-11-11-12-37-IL字符串长度测试.md)。

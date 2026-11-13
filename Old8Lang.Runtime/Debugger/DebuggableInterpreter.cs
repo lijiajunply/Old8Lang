@@ -1,4 +1,5 @@
 using Old8Lang.AST.Statement;
+using Old8Lang.Execution;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Debugger;
@@ -20,7 +21,7 @@ public class DebuggableInterpreter(LangInterpreter interpreter, Debugger debugge
             debugger.EnterFunction("main", interpreter.Manager.Path, statement.Position, interpreter.Manager);
 
             // 执行整个块（简化版本）
-            statement.Run(interpreter.Manager);
+            ExecutionModeDispatcher.Execute(statement, interpreter.Manager);
 
             // 离开主函数
             debugger.ExitFunction();

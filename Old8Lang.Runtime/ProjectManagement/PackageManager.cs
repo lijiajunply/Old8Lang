@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.ModuleObjects;
+using Old8Lang.Execution;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.ProjectManagement;
@@ -207,7 +208,7 @@ public class PackageManager
                 try
                 {
                     // 执行包代码
-                    block.Run(manager);
+                    ExecutionModeDispatcher.Execute(block, manager);
 
                     // 提取符号（函数和变量）
                     var symbols = new Dictionary<string, LangValueType>();

@@ -5,6 +5,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Verification;
 using Old8Lang.Error;
+using Old8Lang.Execution;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
 
@@ -336,8 +337,8 @@ public static class Compiler
         try
         {
             Log("开始生成IL代码", LogLevel.Debug);
-            // 调用块语句的GenerateIl方法生成IL代码
-            statement.GenerateIl(ilGenerator, local);
+            // 宿主级 IL 生成统一通过 Visitor 调度器进入，旧 AST GenerateIl 仅保留逐节点迁移兼容。
+            ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
             Log("IL代码生成完成", LogLevel.Debug);
 
             // 标记返回标签
@@ -503,7 +504,7 @@ public static class Compiler
             Log("开始生成异步 IL 代码", LogLevel.Debug);
 
             // 生成语句的 IL 代码
-            statement.GenerateIl(ilGenerator, local);
+            ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
 
             // 清空栈（如果有值的话）
             // 注意：BlockStatement.GenerateIl 通常不会在栈上留下值

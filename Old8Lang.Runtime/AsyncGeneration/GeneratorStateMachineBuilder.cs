@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Execution;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AsyncGeneration;
@@ -99,7 +100,7 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
             try
             {
                 // 执行函数体直到下一个 yield
-                function.BlockStatement.Run(manager);
+                ExecutionModeDispatcher.Execute(function.BlockStatement, manager);
 
                 // 检查是否 yield
                 if (context.HasYielded)
