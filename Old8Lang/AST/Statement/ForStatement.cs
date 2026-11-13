@@ -165,23 +165,18 @@ public partial class ForStatement(
     }
 
     /// <summary>
-    /// 循环变量名与全局槽位重名时，预先求值初始化表达式并建立局部遮蔽。
+    /// 为 C 风格循环变量建立独立局部作用域。
     /// </summary>
     /// <remarks>
-    /// 初始化表达式在创建循环变量之前求值（解释器语义），因此读取同名全局变量时应当看到全局值，
-    /// 而不是尚未初始化的局部遮蔽。返回 <c>null</c> 表示无需遮蔽。
+    /// 初始化表达式在创建循环变量之前求值（解释器语义），因此读取同名外层局部或全局变量时应当看到
+    /// 外层值，而不是尚未初始化的循环变量。完成后由 <see cref="EndLoopVariableShadow"/> 恢复外层绑定。
     /// </remarks>
-    private (string Name, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
+    private (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
         ILGenerator ilGenerator,
         LocalManager local)
     {
         var name = setStatement.Id?.IdName;
         if (string.IsNullOrEmpty(name))
-        {
-            return null;
-        }
-
-        if (local.LocalVar.ContainsKey(name) || local.Globals?.IsSlot(name) != true)
         {
             return null;
         }
@@ -207,22 +202,31 @@ public partial class ForStatement(
         var loopLocal = ilGenerator.DeclareLocal(type);
         ilGenerator.Emit(OpCodes.Stloc, loopLocal);
 
+        var hadPreviousLocal = local.LocalVar.TryGetValue(name, out var previousLocal);
         var hadPreviousType = local.LocalVarTypes.TryGetValue(name, out var previousType);
         local.LocalVar[name] = loopLocal;
         local.LocalVarTypes[name] = type;
-        return (name, previousType, hadPreviousType);
+        return (name, previousLocal, hadPreviousLocal, previousType, hadPreviousType);
     }
 
     private static void EndLoopVariableShadow(
         LocalManager local,
-        (string Name, Type? PreviousType, bool HadPreviousType)? shadow)
+        (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? shadow)
     {
         if (shadow is not { } info)
         {
             return;
         }
 
-        local.LocalVar.Remove(info.Name);
+        if (info.HadPreviousLocal && info.PreviousLocal is not null)
+        {
+            local.LocalVar[info.Name] = info.PreviousLocal;
+        }
+        else
+        {
+            local.LocalVar.Remove(info.Name);
+        }
+
         if (info.HadPreviousType && info.PreviousType is not null)
         {
             local.LocalVarTypes[info.Name] = info.PreviousType;

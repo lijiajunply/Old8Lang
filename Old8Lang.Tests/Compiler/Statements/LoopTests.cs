@@ -38,6 +38,47 @@ public class LoopTests
     }
 
     [Fact]
+    public void NestedForLoops_WithSameVariableName_UseIndependentLoopScopes()
+    {
+        const string code = @"
+            i <- 100
+            total <- 0
+
+            for i <- 0, i < 3, i++ {
+                for i <- 0, i < 2, i++ {
+                    total <- total + 1
+                }
+            }
+
+            Assert.Equal(6, total)
+            Assert.Equal(100, i)
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void ForLoopVariable_IsNotVisibleAfterLoop()
+    {
+        const string code = @"
+            for i <- 0, i < 1, i++ {
+            }
+            PrintLine(i)
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+
+        var exception = Record.Exception(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+
+        Assert.NotNull(exception);
+        Assert.Contains("变量 'i' 未声明", exception.Message);
+    }
+
+    [Fact]
     public void ForLoop_WithInitialization_ExecutesCorrectly()
     {
         // Arrange
