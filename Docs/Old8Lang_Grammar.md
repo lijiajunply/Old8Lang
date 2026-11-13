@@ -2020,6 +2020,14 @@ class ObjectFactory<T: class & new()> {
 }
 ```
 
+类也可以把约束写在类型参数列表之后的 `where` 子句中：
+
+```old8
+class NumericBox<T> where T: int {
+    private value: T
+}
+```
+
 **实用示例 - 泛型栈**：
 
 ```old8

@@ -154,6 +154,19 @@ func create<T>() -> T where T: class & new() {
     }
 
     [Fact]
+    public void ParseGenericClassWhereClause_Success()
+    {
+        var code = @"
+class NumericBox<T> where T: int {
+    public value:T
+}
+";
+        var interpreter = new LangInterpreter();
+
+        interpreter.Build(code);
+    }
+
+    [Fact]
     public void ParseClassWithNewConstraint_Success()
     {
         // 测试类中的 new() 约束

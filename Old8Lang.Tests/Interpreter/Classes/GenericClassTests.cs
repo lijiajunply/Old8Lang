@@ -12,6 +12,28 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 public class GenericClassTests
 {
     [Fact]
+    public void GenericClass_WhereConstraint_ExecutesCorrectly()
+    {
+        var code = @"
+            class NumericBox<T> where T: int {
+                public value:T
+            }
+
+            box <- NumericBox<int>()
+            box.value <- 42
+            result <- box.value
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(42, ((IntLangValue)result).Value);
+    }
+
+    [Fact]
     public void GenericClass_SingleTypeParameter_CreatesInstanceCorrectly()
     {
         // Arrange

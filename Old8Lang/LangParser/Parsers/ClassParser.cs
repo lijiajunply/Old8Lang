@@ -60,6 +60,14 @@ public class ClassParser(
             genericParameters = ParseGenericParameters();
         }
 
+        // 类的泛型参数和函数、扩展方法一样可以通过 where 子句补充约束。
+        // 这一子句必须在 extends / implements 之前解析，避免 where 被误当成
+        // 类体的起始位置而报“缺少左大括号”。
+        if (CurrentToken.Type == LangTokenType.Where)
+        {
+            ParseWhereClause(ref genericParameters);
+        }
+
         string? parentClassName = null;
         List<string>? parentGenericTypeParameters = null;
         List<string> mixinNames = [];
@@ -786,6 +794,57 @@ public class ClassParser(
         }
 
         return constraints;
+    }
+
+    /// <summary>
+    /// 解析类声明上的 where 子句，并把约束合并到对应的泛型参数。
+    /// 语法：where T: IComparable, U: ICloneable
+    /// </summary>
+    private void ParseWhereClause(ref List<GenericParameter>? genericParameters)
+    {
+        if (genericParameters is null || genericParameters.Count == 0)
+        {
+            throw CreateSyntaxError("where 子句只能用于泛型类");
+        }
+
+        Expect(LangTokenType.Where);
+        var genericParamNames = new HashSet<string>(genericParameters.Select(p => p.Name));
+
+        while (true)
+        {
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+            }
+
+            var typeParamName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            var genericParam = genericParameters.FirstOrDefault(p => p.Name == typeParamName);
+            if (genericParam is null)
+            {
+                throw CreateSyntaxError($"未定义的类型参数 '{typeParamName}'");
+            }
+
+            Expect(LangTokenType.Colon);
+            var constraints = ParseGenericConstraintsStructured(genericParamNames);
+            var mergedConstraints = genericParam.StructuredConstraints ?? [];
+            mergedConstraints.AddRange(constraints);
+
+            var index = genericParameters.IndexOf(genericParam);
+            genericParameters[index] = new GenericParameter(
+                genericParam.Name,
+                mergedConstraints,
+                genericParam.Position,
+                genericParam.IsNullable);
+
+            if (CurrentToken.Type != LangTokenType.Comma)
+            {
+                break;
+            }
+
+            Expect(LangTokenType.Comma);
+        }
     }
 
     /// <summary>

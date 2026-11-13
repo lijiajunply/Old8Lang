@@ -130,6 +130,7 @@ genericTypeArguments = "<" type ( "," type )* ">" ;
 classDeclaration = accessModifier*
                   "class" identifier
                   genericTypeParameters?
+                  ( "where" whereClause )?
                   ( "extends" identifier )?
                   ( "implements" identifierList )?
                   classBlock ;
@@ -137,6 +138,7 @@ classDeclaration = accessModifier*
 mixinDeclaration = accessModifier*
                   "mixin" identifier
                   genericTypeParameters?
+                  ( "where" whereClause )?
                   ( "extends" identifier )?
                   classBlock ;
 

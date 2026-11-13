@@ -8,6 +8,26 @@ namespace Old8Lang.Tests.VirtualMachine.Generics;
 public class VMGenericClassTests
 {
     [Fact]
+    public void GenericClass_WhereConstraint_ExecutesCorrectly()
+    {
+        var code = @"
+            class NumericBox<T> where T: int {
+                public value:T
+            }
+
+            box <- NumericBox<int>()
+            box.value <- 42
+            result <- box.value
+        ";
+
+        var bytecodeFile = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        Assert.Equal(42, vm.GetGlobalVariable("result"));
+    }
+
+    [Fact]
     public void GenericClass_SimpleBox_ExecutesCorrectly()
     {
         // Arrange - 暂时跳过此测试，因为字节码模式下 this 关键字存在问题
