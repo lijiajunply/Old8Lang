@@ -320,33 +320,27 @@ Error模块定义了Old8Lang语言的错误类型和异常处理机制。
 
 Old8Lang 使用 Visitor 模式作为核心设计模式，实现了对 AST 的多种处理方式。这种设计允许在不修改 AST 节点类的情况下，添加新的操作和执行模式。
 
-### 4.2 IVisitor 接口定义
+### 4.2 IVisitor 接口定义与生成
 
-**位置**: `Old8Lang/AST/Visitor/IVisitor.cs`
+Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 
-```csharp
-public interface IVisitor<out TResult>
-{
-    // 表达式访问
-    TResult VisitLiteralExpression(LiteralExpression expr);
-    TResult VisitBinaryExpression(BinaryExpression expr);
-    TResult VisitFunctionCallExpression(FunctionCallExpression expr);
-    TResult VisitLambdaExpression(LambdaExpression expr);
-    TResult VisitArrayExpression(ArrayExpression expr);
-    TResult VisitDictionaryExpression(DictionaryExpression expr);
+- 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
+  （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
+- 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
+  `<Node>.Accept.generated.cs`；当前识别 **88 个节点**。
+- 接口声明为 `public partial interface IVisitor<out TResult>`，生成器不覆盖的部分（如继承自
+  `ImportInfo`、基类字面名不含 `LangExpression` 的运行时值）放在
+  `Old8Lang.Runtime/AST/Visitor/IVisitor.Extensions.cs` 手工扩展中。
+- `Accept` 方法只做分派：`public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+  => visitor.VisitXxx(this);`。节点不再提供 `Run/GenerateIl/LoadIlValue/OutputType/SetValueToIl`
+  等执行入口（阶段 1 完成，见 §4.5）。
 
-    // 语句访问
-    TResult VisitAssignmentStatement(AssignmentStatement stmt);
-    TResult VisitIfStatement(IfStatement stmt);
-    TResult VisitForStatement(ForStatement stmt);
-    TResult VisitWhileStatement(WhileStatement stmt);
-    TResult VisitFunctionDeclarationStatement(FunctionDeclarationStatement stmt);
-    TResult VisitClassDeclarationStatement(ClassDeclarationStatement stmt);
-    TResult VisitReturnStatement(ReturnStatement stmt);
-    TResult VisitTryStatement(TryStatement stmt);
+重新生成：
 
-    // ... 其他 Visit 方法
-}
+```bash
+cd Old8Lang.CodeGen
+dotnet run            # 生成 IVisitor 与 Accept 文件（幂等）
+dotnet run -- --preview   # 仅预览
 ```
 
 ### 4.3 四个主要 Visitor 实现
@@ -496,6 +490,22 @@ public TypeInfo VisitBinaryExpression(BinaryExpression expr)
 3. **代码复用**: 同一 AST 可用于多种处理方式
 4. **类型安全**: 泛型接口提供编译时类型检查
 5. **维护性**: 修改执行逻辑不影响 AST 定义
+
+### 4.5 语法节点与执行后端的边界（阶段 1）
+
+阶段 1「消除节点执行反向依赖」完成后的边界：
+
+- **语法节点不持有执行实现**：`AST/Statement/**`、`AST/Expression/{Core,Advanced,Generics,Async,Linq,Generators}/**`
+  的源码不出现 `VariateManager`、`ILGenerator`、`LocalManager`；节点类型也不声明依赖这些类型的
+  `Run/GenerateIl/LoadIlValue/OutputType/SetValueToIl` 方法。
+- **执行实现位置**：解释器/IL 实现在 `AST/Visitor/InterpreterVisitor.*`、`CompilerVisitor.*`，
+  类型推断在 `TypeInferenceVisitor.*`，VM 在 `BytecodeVisitor.*`；
+  节点的编译/执行辅助方法（类型构建、异步状态机、字典/集合 IL 等）位于
+  `Old8Lang.Runtime/Execution/**`（partial class 文件），物理上位于 AST 目录之外。
+- **门禁测试**：`Old8Lang.Tests/Architecture/SyntaxBackendBoundaryTests.cs`
+  以源码扫描 + 反射检查两条测试保证上述边界。
+- **尚未完成**：`LangValueType` 子类仍同时承担语法字面量与运行时值职责；
+  分离方案与盘点见 `Docs/architecture-migration/literal-runtime-boundary.md`，实施属后续阶段。
 
 ## 5. AST 节点组织
 
