@@ -201,14 +201,20 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 ### 2.2 各模块详细描述
 
 #### 2.2.1 Old8Lang.Runtime（语言执行实现）
-**功能**: 当前承载 AST、语法解析、解释执行、IL 生成和 VM。词法与通用诊断已迁移到 `Old8Lang.Core`；AST
-仍同时含 Visitor 分派和历史执行方法，执行后端的物理拆分将以消除这些反向依赖为前提。
+**功能**: 当前承载大部分 AST、语法解析、解释执行、IL 生成和 VM。词法与通用诊断已迁移到
+`Old8Lang.Core`；标量字面量的纯语法数据已迁至 `Old8Lang.Syntax`。完整 AST、解析器与执行后端的
+物理拆分仍在迁移中。
 
 **组成模块**:
 - **AST**: 抽象语法树定义，包括表达式和语句的各种节点类型
 - **Compiler**: 编译成中间代码的实现
 - **Error**: 上层运行时、类型和模块错误类型
 - **LangParser**: AST 语法构造和解析状态
+
+#### 2.2.1.1 Old8Lang.Syntax（后端无关语法模型，迁移中）
+**功能**: 当前只包含标量 `LiteralSyntax`、`LiteralKind` 与 `ILiteralSyntax`，仅引用
+`Old8Lang.Core`。`Old8Lang.Runtime` 通过显式转换边界将其映射为既有运行时值；该项目不得引用 Runtime、
+官方模块或执行后端。
 
 #### 2.2.2 Old8Lang.Core（无执行后端的语言基础）
 **功能**: 供解析器、语言服务器与三个执行后端共享，不能引用 `Old8Lang.Runtime`、AST 或任一执行后端。
@@ -501,11 +507,13 @@ public TypeInfo VisitBinaryExpression(BinaryExpression expr)
 - **执行实现位置**：解释器/IL 实现在 `AST/Visitor/InterpreterVisitor.*`、`CompilerVisitor.*`，
   类型推断在 `TypeInferenceVisitor.*`，VM 在 `BytecodeVisitor.*`；
   节点的编译/执行辅助方法（类型构建、异步状态机、字典/集合 IL 等）位于
-  `Old8Lang.Runtime/Execution/**`（partial class 文件），物理上位于 AST 目录之外。
+  `Old8Lang.Runtime/Execution/LegacyNodeExtensions/**`（partial class 文件），物理上位于 AST 目录之外；
+  这是阶段 2 的过渡归档，不属于 Syntax。
 - **门禁测试**：`Old8Lang.Tests/Architecture/SyntaxBackendBoundaryTests.cs`
   以源码扫描 + 反射检查两条测试保证上述边界。
-- **尚未完成**：`LangValueType` 子类仍同时承担语法字面量与运行时值职责；
-  分离方案与盘点见 `Docs/architecture-migration/literal-runtime-boundary.md`，实施属后续阶段。
+- **首批字面量边界**：标量字面量已先生成 `Old8Lang.Syntax.LiteralSyntax`，再由 Runtime 的唯一转换点
+  生成既有运行时值；集合与其他 `LangValueType` 子类仍同时承担语法/运行时职责。详见
+  `Docs/architecture-migration/literal-runtime-boundary.md`。
 
 ## 5. AST 节点组织
 

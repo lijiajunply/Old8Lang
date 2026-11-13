@@ -48,6 +48,8 @@
 
 - **[架构文档 (ARCHITECTURE.md)](./ARCHITECTURE.md)**
   - 模块划分、Visitor 模式、AST/Parser 结构、类型系统、目录结构。
+- **[架构迁移](./architecture-migration/spec.md)**
+  - 剩余程序集拆分的需求、设计、阶段计划、依赖基线与 C# API 迁移说明。
 - **[开发流程 (DEVELOPMENT_WORKFLOW.md)](./DEVELOPMENT_WORKFLOW.md)**
   - 新语法添加流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 问题排查。
 - **[测试指南 (TESTING_GUIDE.md)](./TESTING_GUIDE.md)**
