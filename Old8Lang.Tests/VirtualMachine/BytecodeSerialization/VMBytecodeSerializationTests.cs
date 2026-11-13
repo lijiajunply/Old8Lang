@@ -6,6 +6,31 @@ namespace Old8Lang.Tests.VirtualMachine.BytecodeSerialization;
 [Collection("Sequential")]
 public class VMBytecodeSerializationTests
 {
+    [Fact]
+    public void MigrationBaseline_LoadsHistoricalBytecodeAndExecutes()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Old8Lang.sln")))
+            directory = directory.Parent;
+        Assert.NotNull(directory);
+
+        var path = Path.Combine(directory.FullName, "TestFiles", "VirtualMachine", "bytecode", "migration_baseline.o8c");
+        var bytecode = BytecodeFile.LoadFromFile(path);
+        var originalOut = Console.Out;
+        using var output = new StringWriter();
+        try
+        {
+            Console.SetOut(output);
+            new Bytecode.VM.VirtualMachine(bytecode).Execute();
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        Assert.Equal($"migration baseline{Environment.NewLine}42", output.ToString().Trim());
+    }
+
     private string ExecuteVMCode(string code)
     {
         var interpreter = new LangInterpreter();

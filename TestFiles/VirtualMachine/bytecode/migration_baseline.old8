@@ -1,0 +1,6 @@
+// 固定字节码兼容样本：函数调用、整数运算和字符串常量
+func add(a:int, b:int) -> int {
+    return a + b
+}
+PrintLine("migration baseline")
+PrintLine(add(20, 22))
