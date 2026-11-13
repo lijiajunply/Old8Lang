@@ -825,6 +825,12 @@ public partial class Operation(
                 return typeof(string);
             }
 
+            if (instance.Id.IdName == "Sqrt" && instance.Ids.Count == 0 &&
+                leftType is not null && IsNumericType(leftType))
+            {
+                return typeof(double);
+            }
+
             // 特殊处理Assert静态方法调用，返回void类型
             if (Left is LangId { IdName: "Assert" })
             {
@@ -926,6 +932,10 @@ public partial class Operation(
 
         return leftType == typeof(object) ? rightType : leftType;
     }
+
+    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+                                                     type == typeof(float) || type == typeof(long) ||
+                                                     type == typeof(short) || type == typeof(byte);
 
     private Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {

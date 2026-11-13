@@ -709,6 +709,20 @@ public static class DotOperatorILHelper
         Type? leftType,
         Operation operation)
     {
+        // 历史语言用法允许 number.Sqrt()；CLR 只提供 Math.Sqrt(double)。
+        if (instance.Id.IdName == "Sqrt" && instance.Ids.Count == 0 &&
+            leftType is not null && IsNumericType(leftType))
+        {
+            left!.LoadIlValue(ilGenerator, local);
+            if (leftType != typeof(double))
+            {
+                ilGenerator.Emit(OpCodes.Conv_R8);
+            }
+
+            ilGenerator.Emit(OpCodes.Call, typeof(Math).GetMethod(nameof(Math.Sqrt), [typeof(double)])!);
+            return typeof(double);
+        }
+
         // 集合索引和未标注的类字段在 IL 中可能只能得到 object。
         // 这时不能在编译期用 object 查找成员；保留接收者和实参，在运行期按实际 CLR 类型分派。
         if (leftType == typeof(object))
@@ -913,6 +927,10 @@ public static class DotOperatorILHelper
 
         return m.ReturnType;
     }
+
+    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+                                                     type == typeof(float) || type == typeof(long) ||
+                                                     type == typeof(short) || type == typeof(byte);
 
     /// <summary>
     /// 为静态类型未知的接收者生成运行期实例方法调用。

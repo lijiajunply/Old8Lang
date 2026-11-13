@@ -573,4 +573,31 @@ public class ClassInstantiationTests(ITestOutputHelper output)
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void ClassMethod_NumberSqrt_CompilesAndExecutesCorrectly()
+    {
+        var code = @"
+            class Point {
+                public x <- 0
+                public y <- 0
+
+                func init(x:int, y:int) {
+                    this.x <- x
+                    this.y <- y
+                }
+
+                func distance() -> double {
+                    return (this.x * this.x + this.y * this.y).Sqrt()
+                }
+            }
+
+            point <- Point(3, 4)
+            Assert.Equal(5.0, point.distance())
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        Assert.Null(Record.Exception(() => compiledAction()));
+    }
 }
