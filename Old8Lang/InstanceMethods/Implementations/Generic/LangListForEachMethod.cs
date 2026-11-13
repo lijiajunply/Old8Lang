@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.ForEach(action) - 遍历执行
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListForEachMethod : BaseLangListMethod
+public class LangListForEachMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ForEach", "forEach", "Each", "each"];
     public override string[] ParameterNames => ["action"];
@@ -43,9 +44,31 @@ public class LangListForEachMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+
+        var helperName = TargetType == typeof(ArrayLangValue) ? nameof(ForEachArrayHelper) : nameof(ForEachHelper);
+        var helperMethod = typeof(LangListForEachMethod).GetMethod(helperName,
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
+
+    public static List<object?> ForEachHelper(LangValueType instance, LangValueType action)
+    {
+        if (instance is not ILangList list)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        if (action is not FuncLangValue function)
+            throw new ArgumentException("ForEach 方法的参数必须是函数");
+
+        var manager = new VariateManager();
+        foreach (var item in list.GetItems())
+            function.Run(manager, [item]);
+
+        return list.GetItems().Select(IlValueBridge.Unwrap).ToList();
+    }
+
+    public static object?[] ForEachArrayHelper(LangValueType instance, LangValueType action) =>
+        ForEachHelper(instance, action).ToArray();
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {

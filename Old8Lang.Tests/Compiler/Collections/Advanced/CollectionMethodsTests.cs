@@ -312,6 +312,24 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListForEach_CompilesForNativeListsAndArrays()
+    {
+        var code = @"
+            values <- {1, 2, 3}
+            array <- [4, 5]
+            sum <- 0
+            values.ForEach((x:int) -> { sum <- sum + x })
+            array.ForEach((x:int) -> { sum <- sum + x })
+            Assert.Equal(15, sum)
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
