@@ -794,8 +794,12 @@ public partial class Operation(
                     }
                 }
 
-                // 尝试获取字段类型
-                var field = leftType.GetField(rightId.IdName);
+                // 正在构建的类还不能通过 TypeBuilder 反射查询字段；类自身的
+                // FieldBuilder 已登记在 FieldVar 中，供静态成员访问和类型推断复用。
+                FieldInfo? field = leftType is TypeBuilder && leftType == local.InClassEnv &&
+                                   Left is LangId
+                    ? local.FieldVar.GetValueOrDefault(rightId.IdName)
+                    : leftType.GetField(rightId.IdName);
                 if (field is not null)
                 {
                     return field.FieldType;

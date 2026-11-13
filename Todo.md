@@ -123,12 +123,13 @@
 - [x] **IL 字符串 `Length()` 可能导致进程崩溃**：原生字符串现在使用 CLR 字符串长度，返回原生整数；原崩溃用例及别名、链式调用回归通过，见 [测试报告](Reports/2026-11-11-12-37-IL字符串长度测试.md)。
 - [x] **IL 嵌套异常测试的包含断言**：调整为 `Assert.Contains(text, substring)` 的实际参数顺序，异常与字符串相关回归 13 项通过；见 [测试报告](Reports/2026-11-11-13-51-IL异常处理回归测试.md)。
 
-- [ ] **IL 类测试中的继承语法失败**：`InheritanceTests` 已由已废弃的 `class Derived : Base` 迁移为
+- [x] **IL 类测试中的继承语法失败**：`InheritanceTests` 已由已废弃的 `class Derived : Base` 迁移为
   `class Derived extends Base`；同时 `super.method()` / `super.init()` 改为直接调用父类实现，避免虚分派回到
-  子类重写方法而栈溢出。基础、多层、重写、多态、构造器链及抽象方法场景通过；受保护字段初始化和静态继承成员
-  仍待处理，见 [测试报告](Reports/2026-11-13-10-00-IL继承语法与super调用.md)。
+  子类重写方法而栈溢出。现已支持受保护字段、静态字段/方法继承，以及子类中按签名调用父类初始化器和方法；
+  `InheritanceTests` 全组 10 项通过，见 [前序测试报告](Reports/2026-11-13-10-00-IL继承语法与super调用.md) 与
+  [成员访问测试报告](Reports/2026-11-13-10-30-IL继承成员访问.md)。
 - [x] **`SelectStatementTests` 整组测试完成性**：带 10 秒挂起超时复跑 21 项全部通过；先前运行卡住的原因未复现。见 [测试报告](Reports/2026-11-11-13-55-IL-select整组复测.md)。
-- [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 9 项通过、5 项失败，涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；方法重载测试取值顺序修正后已通过。见 [测试报告](Reports/2026-11-11-16-24-IL类实例化扩展回归.md)。
+- [ ] **IL 类实例化测试残留问题**：2026-11-11 复测 14 项中 9 项通过、5 项失败，涉及集合元素与嵌套对象的链式调用、静态成员及集合方法；方法重载测试取值顺序修正后已通过。2026-11-13 另确认 `ConstructorChaining_CompilesAndExecutesCorrectly` 仍会将以整数默认值声明、但在 `double` 初始化器中赋值的字段错误按 `int` 发射，导致读取值失真；需补字段类型推断/赋值转换。见 [测试报告](Reports/2026-11-11-16-24-IL类实例化扩展回归.md)。
 
 - [ ] **抖动用例**：`Old8Lang.Tests/Interpreter/Async/TaskAPITests.TaskAPI_WhenAny_HandlesFirstCompletedTask`
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；

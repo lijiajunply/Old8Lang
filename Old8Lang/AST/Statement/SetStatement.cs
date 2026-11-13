@@ -682,6 +682,48 @@ public partial class SetStatement : OldStatement
                 {
                     // 成员访问赋值: left.right <- value
 
+                    // 类名仅用于解析静态成员，并不是可加载的运行期变量。
+                    if (operation.Left is LangId classId &&
+                        local.ClassVar.TryGetValue(classId.IdName, out var classType))
+                    {
+                        // TypeBuilder 在 CreateType 前不支持反射查询字段；当前类的
+                        // FieldVar 已持有相应的 FieldBuilder。
+                        FieldInfo? staticField = classType is TypeBuilder && classType == local.InClassEnv
+                            ? local.FieldVar.GetValueOrDefault(memberId.IdName)
+                            : classType.GetField(memberId.IdName,
+                                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                        if (staticField is not null && !staticField.IsStatic)
+                        {
+                            staticField = null;
+                        }
+                        if (staticField is not null)
+                        {
+                            Value.LoadIlValue(ilGenerator, local);
+                            var valueType = Value.OutputType(local);
+                            if (staticField.FieldType == typeof(object) && valueType?.IsValueType == true)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, valueType);
+                            }
+                            else if (staticField.FieldType.IsValueType && valueType == typeof(object))
+                            {
+                                ilGenerator.Emit(OpCodes.Unbox_Any, staticField.FieldType);
+                            }
+
+                            ilGenerator.Emit(OpCodes.Stsfld, staticField);
+                            return;
+                        }
+
+                        var staticProperty = classType.GetProperty(memberId.IdName,
+                            BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                        var staticSetter = staticProperty?.GetSetMethod();
+                        if (staticSetter is not null && staticSetter.IsStatic)
+                        {
+                            Value.LoadIlValue(ilGenerator, local);
+                            ilGenerator.Emit(OpCodes.Call, staticSetter);
+                            return;
+                        }
+                    }
+
                     // 检查是否是this访问（如this.name <- value）
                     if ((operation.Left is LangId { IdName: "this" } || operation.Left is ThisExpression) &&
                         local.InClassEnv is not null)

@@ -57,7 +57,8 @@ public static class DotOperatorILHelper
 
         // 1. 处理 this.member 访问（类环境内）
         // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
-        if (local.InClassEnv is not null && (left is LangId { IdName: "this" } || left is ThisExpression))
+        if (local.InClassEnv is not null && right is LangId &&
+            (left is LangId { IdName: "this" } || left is ThisExpression))
         {
             return GenerateThisMemberAccess(right, ilGenerator, local);
         }
@@ -238,6 +239,54 @@ public static class DotOperatorILHelper
         if (left is SuperExpression)
         {
             return GenerateSuperInstanceMethodCall(instance, ilGenerator, local, operation);
+        }
+
+        // 在类定义尚未 CreateType 时，TypeBuilder 无法可靠地枚举当前类正在
+        // 构造的方法。对 this 的调用先按签名从父类解析；使用 Callvirt 保留
+        // 同签名重写的动态分派，也支持 this.init(...) 和受保护父类方法。
+        if (left is ThisExpression or LangId { IdName: "this" } &&
+            local.InClassEnv is TypeBuilder buildingType &&
+            buildingType.BaseType is { } baseType && baseType != typeof(object))
+        {
+            var argumentTypes = instance.Ids
+                .Select(argument => argument.OutputType(local) ?? typeof(object))
+                .ToArray();
+            var baseMethod = baseType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(candidate => candidate.Name == instance.Id.IdName)
+                .FirstOrDefault(candidate => ParametersMatch(candidate.GetParameters(), argumentTypes));
+            if (baseMethod is not null)
+            {
+                new ThisExpression().LoadIlValue(ilGenerator, local);
+                foreach (var argument in instance.Ids)
+                {
+                    argument.LoadIlValue(ilGenerator, local);
+                }
+
+                ilGenerator.Emit(OpCodes.Callvirt, baseMethod);
+                return baseMethod.ReturnType;
+            }
+        }
+
+        // 用户定义类的静态方法需要直接从类型调用，不能把类名当作局部变量加载。
+        if (left is LangId && leftType is not null)
+        {
+            var argumentTypes = instance.Ids
+                .Select(argument => argument.OutputType(local) ?? typeof(object))
+                .ToArray();
+            var staticMethod = leftType
+                .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(candidate => candidate.Name == instance.Id.IdName)
+                .FirstOrDefault(candidate => ParametersMatch(candidate.GetParameters(), argumentTypes));
+            if (staticMethod is not null)
+            {
+                foreach (var argument in instance.Ids)
+                {
+                    argument.LoadIlValue(ilGenerator, local);
+                }
+
+                ilGenerator.Emit(OpCodes.Call, staticMethod);
+                return staticMethod.ReturnType;
+            }
         }
 
         // 普通实例方法调用
@@ -1068,6 +1117,36 @@ public static class DotOperatorILHelper
             }
 
             return leftType; // 返回枚举类型
+        }
+
+        // 用户定义类的静态字段/属性访问。这里不能先加载 left：类名仅用于
+        // 类型解析，在运行期没有对应的局部变量。
+        if (left is LangId && leftType is not null)
+        {
+            // TypeBuilder 在 CreateType 前不支持 GetField；当前类的字段已经由
+            // ClassInit 放进 FieldVar，可直接复用 FieldBuilder。
+            FieldInfo? staticField = leftType is TypeBuilder && leftType == local.InClassEnv
+                ? local.FieldVar.GetValueOrDefault(id.IdName)
+                : leftType.GetField(id.IdName,
+                    BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (staticField is not null && !staticField.IsStatic)
+            {
+                staticField = null;
+            }
+            if (staticField is not null)
+            {
+                ilGenerator.Emit(OpCodes.Ldsfld, staticField);
+                return staticField.FieldType;
+            }
+
+            var staticProperty = leftType.GetProperty(id.IdName,
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            var staticGetter = staticProperty?.GetGetMethod();
+            if (staticGetter is not null && staticGetter.IsStatic)
+            {
+                ilGenerator.Emit(OpCodes.Call, staticGetter);
+                return staticProperty!.PropertyType;
+            }
         }
 
         // 普通实例成员访问

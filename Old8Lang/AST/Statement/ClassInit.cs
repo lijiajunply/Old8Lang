@@ -218,6 +218,16 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             Globals = local.Globals
         };
 
+        // 类体中的方法、字段初始化器同样需要可见此前已创建的类（例如
+        // Derived 的静态方法引用 Base.count）。同时登记正在创建的类型，
+        // 使类自身的静态成员可在声明体内解析。
+        foreach (var (name, knownType) in local.ClassVar)
+        {
+            classLocal.ClassVar[name] = knownType;
+        }
+
+        classLocal.ClassVar[_anyValue.ClassName] = typeBuilder;
+
         // 6. 定义类或接口的成员
         if (_anyValue.IsInterface)
         {
@@ -256,8 +266,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         if (_anyValue.ParentClassName is not null &&
             local.ClassVar.TryGetValue(_anyValue.ParentClassName, out var parentType))
         {
-            // 获取父类的所有公共字段
-            var parentFields = parentType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            // 继承字段（含 protected）需要在子类方法中参与类型推断与直接访问。
+            var parentFields = parentType.GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var parentField in parentFields)
             {
                 // 将父类字段添加到FieldVar中，这样子类方法就能访问父类字段
@@ -265,7 +276,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             }
         }
 
-        foreach (var variate in _anyValue.Variates)
+        foreach (var variate in _anyValue.Variates.Concat(_anyValue.StaticVariates))
         {
             if (variate.Value is not FuncLangValue && variate.Value is not MethodOverloadList)
             {
@@ -358,6 +369,17 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         foreach (var (memberId, funcValue) in methods)
         {
             DefineMethod(typeBuilder, memberId, funcValue, local);
+        }
+
+        // 静态成员存放在独立的 StaticVariates 表中，不能遗漏，否则 IL 类型只会
+        // 声明实例成员，诸如 Base.count / Derived.increment() 会被当作普通变量处理。
+        foreach (var (memberId, memberValue) in _anyValue.StaticVariates)
+        {
+            if (memberValue is FuncLangValue funcValue)
+            {
+                DefineMethodInternal(typeBuilder, memberId, funcValue, local,
+                    MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig);
+            }
         }
     }
     
