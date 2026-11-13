@@ -79,6 +79,28 @@ public class LoopTests
     }
 
     [Fact]
+    public void ForLoopClosures_CaptureEachIterationValue()
+    {
+        const string code = @"
+            functions <- {}
+
+            for i <- 0, i < 3, i++ {
+                functions.Add((value:int) -> value + i)
+            }
+
+            Assert.Equal(10, functions[0](10))
+            Assert.Equal(11, functions[1](10))
+            Assert.Equal(12, functions[2](10))
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ForLoop_WithInitialization_ExecutesCorrectly()
     {
         // Arrange

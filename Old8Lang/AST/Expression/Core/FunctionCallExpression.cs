@@ -229,7 +229,50 @@ public partial class FunctionCallExpression : LangExpression
             }
         }
 
+        // 集合索引、字典读取等表达式在编译期通常只能推断为 object，但运行期可能保存
+        // lambda / 函数值。保留接收者与实参，通过 Delegate.DynamicInvoke 进行动态调用。
+        if (funcType == typeof(object) && NamedArguments.Count == 0)
+        {
+            ilGenerator.Emit(OpCodes.Ldc_I4, Arguments.Count);
+            ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+            for (var index = 0; index < Arguments.Count; index++)
+            {
+                ilGenerator.Emit(OpCodes.Dup);
+                ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                var argument = Arguments[index];
+                argument.LoadIlValue(ilGenerator, local);
+                var argumentType = argument.OutputType(local);
+                if (argumentType?.IsValueType == true)
+                {
+                    ilGenerator.Emit(OpCodes.Box, argumentType);
+                }
+
+                ilGenerator.Emit(OpCodes.Stelem_Ref);
+            }
+
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(FunctionCallExpression).GetMethod(nameof(InvokeDynamicDelegate))!);
+            return;
+        }
+
         // 如果是复杂的表达式函数调用且无法解析为委托，抛出异常
         throw new InvalidOperationError(this, $"无法调用类型为 {funcType} 的表达式");
+    }
+
+    /// <summary>
+    /// 调用运行期才可确定类型的函数值。
+    /// </summary>
+    /// <param name="callable">待调用的函数值。</param>
+    /// <param name="arguments">位置参数。</param>
+    /// <returns>委托调用结果。</returns>
+    /// <exception cref="InvalidOperationException">当值不是委托时抛出。</exception>
+    public static object? InvokeDynamicDelegate(object? callable, object?[] arguments)
+    {
+        if (callable is not Delegate function)
+        {
+            throw new InvalidOperationException("表达式结果不是可调用的函数值");
+        }
+
+        return function.DynamicInvoke(arguments);
     }
 }
