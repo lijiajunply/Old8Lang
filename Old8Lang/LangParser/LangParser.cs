@@ -67,7 +67,7 @@ public class LangParser
                 var parts = directiveToken.Value.Split(':', 2);
                 if (parts.Length == 2)
                 {
-                    var directive = new FileHeaderDirective(parts[0], parts[1], directiveToken.Line);
+                    var directive = new FileHeaderDirectiveInfo(parts[0], parts[1], directiveToken.Line);
                     _context.HeaderDirectives.AddDirective(directive);
                 }
             }

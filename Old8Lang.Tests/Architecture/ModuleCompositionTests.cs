@@ -28,6 +28,8 @@ public class ModuleCompositionTests
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.ParserHelpers.ExpectHelper).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.DocCommentParser).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.AST.DocCommentInfo).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.Core.ParserContext).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(FileHeaderDirectives).Assembly.GetName().Name);
     }
 
     [Fact]
