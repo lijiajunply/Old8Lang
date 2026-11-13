@@ -3,6 +3,7 @@ using Old8Lang.Hosting;
 using Old8Lang.Bytecode;
 using Old8Lang.Concurrency;
 using Old8Lang.Profiler;
+using Old8Lang.ProjectManagement;
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Official;
 
@@ -83,6 +84,14 @@ public class ModuleCompositionTests
     {
         Assert.Equal("Old8Lang.Observability", typeof(PerformanceMonitor).Assembly.GetName().Name);
         Assert.DoesNotContain("Old8Lang.Runtime", typeof(PerformanceMonitor).Assembly
+            .GetReferencedAssemblies().Select(reference => reference.Name));
+    }
+
+    [Fact]
+    public void ProjectConfiguration_IsIndependentFromRuntime()
+    {
+        Assert.Equal("Old8Lang.ProjectSystem", typeof(ProjectConfig).Assembly.GetName().Name);
+        Assert.DoesNotContain("Old8Lang.Runtime", typeof(ProjectConfig).Assembly
             .GetReferencedAssemblies().Select(reference => reference.Name));
     }
 
