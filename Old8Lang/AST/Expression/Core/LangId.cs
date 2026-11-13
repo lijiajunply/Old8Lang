@@ -278,6 +278,20 @@ public partial class LangId(
 
         if (!string.IsNullOrEmpty(AssumptionType))
         {
+            // 在泛型类特化的方法体中，注解可能引用当前正在创建的类型，
+            // 例如 ComparableBox<T>。必须先交给当前泛型解析器，它会复用
+            // 已缓存的 TypeBuilder；否则下面的集合类型分支会把未知泛型类型
+            // 降级为 object，进而让字段访问和数值比较发射出无效 IL。
+            if (local.CurrentGenericTypeResolver is not null)
+            {
+                var resolvedType = local.CurrentGenericTypeResolver.ResolveType(AssumptionType.Trim());
+                if (resolvedType != typeof(object) ||
+                    string.Equals(AssumptionType.Trim(), "object", StringComparison.OrdinalIgnoreCase))
+                {
+                    return resolvedType;
+                }
+            }
+
             // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
             var typeName = AssumptionType.Trim().ToLower();
 

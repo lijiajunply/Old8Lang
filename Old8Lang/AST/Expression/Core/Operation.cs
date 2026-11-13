@@ -759,7 +759,7 @@ public partial class Operation(
         }
 
         // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
-        if (leftType is TypeBuilder typeBuilder)
+        if (leftType is TypeBuilder typeBuilder && typeBuilder != local.InClassEnv)
         {
             // 尝试从local.ClassVar中查找对应的已完成类型
             var typeName = typeBuilder.Name;
@@ -796,8 +796,7 @@ public partial class Operation(
 
                 // 正在构建的类还不能通过 TypeBuilder 反射查询字段；类自身的
                 // FieldBuilder 已登记在 FieldVar 中，供静态成员访问和类型推断复用。
-                FieldInfo? field = leftType is TypeBuilder && leftType == local.InClassEnv &&
-                                   Left is LangId
+                FieldInfo? field = leftType is TypeBuilder && leftType == local.InClassEnv
                     ? local.FieldVar.GetValueOrDefault(rightId.IdName)
                     : leftType.GetField(rightId.IdName);
                 if (field is not null)
@@ -946,7 +945,7 @@ public partial class Operation(
         var rightType = Right?.OutputType(local);
 
         // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
-        if (leftType is TypeBuilder typeBuilder)
+        if (leftType is TypeBuilder typeBuilder && typeBuilder != local.InClassEnv)
         {
             // 尝试从local.ClassVar中查找对应的已完成类型
             var typeName = typeBuilder.Name;

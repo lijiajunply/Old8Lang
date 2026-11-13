@@ -1225,18 +1225,44 @@ public static class DotOperatorILHelper
                 return staticField.FieldType;
             }
 
-            var staticProperty = leftType.GetProperty(id.IdName,
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-            var staticGetter = staticProperty?.GetGetMethod();
-            if (staticGetter is not null && staticGetter.IsStatic)
+            // 未完成的 TypeBuilder 不支持反射查询属性；该路径随后会按实例字段
+            // 的运行期反射回退处理。
+            if (leftType is not TypeBuilder)
             {
-                ilGenerator.Emit(OpCodes.Call, staticGetter);
-                return staticProperty!.PropertyType;
+                var staticProperty = leftType.GetProperty(id.IdName,
+                    BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                var staticGetter = staticProperty?.GetGetMethod();
+                if (staticGetter is not null && staticGetter.IsStatic)
+                {
+                    ilGenerator.Emit(OpCodes.Call, staticGetter);
+                    return staticProperty!.PropertyType;
+                }
             }
         }
 
         // 普通实例成员访问
         left!.LoadIlValue(ilGenerator, local);
+
+        // 泛型类特化尚未完成时，参数类型可能是当前的 TypeBuilder（例如
+        // ComparableBox<T>.compare(other: ComparableBox<T>)）。DynamicMethod
+        // 不能可靠地把该未完成类型的 FieldBuilder 直接作为 ldfld 操作数；
+        // 运行期通过反射读取，并按字段的已知类型还原栈值，避免生成无效 IL。
+        if (leftType is TypeBuilder && local.FieldVar.TryGetValue(id.IdName, out var pendingField))
+        {
+            ilGenerator.Emit(OpCodes.Ldstr, id.IdName);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(DotOperatorILHelper).GetMethod(nameof(GetDynamicObjectProperty))!);
+            if (pendingField.FieldType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, pendingField.FieldType);
+            }
+            else if (pendingField.FieldType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, pendingField.FieldType);
+            }
+
+            return pendingField.FieldType;
+        }
 
         // 字典或列表索引的静态类型是 object 时，在运行期解析成员；否则嵌套
         // 集合（例如 person["scores"].Length）无法进入下方的 CLR 属性分支。
