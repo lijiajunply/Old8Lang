@@ -48,6 +48,9 @@
 
 ## 进度记录
 
+- 2026-11-14：将不依赖后端的泛型参数和约束模型迁入 Syntax；保持命名空间，记录程序集级 API 迁移。
+  完整 AST 与解析器拆分仍未完成。
+
 - 2026-11-14（阶段 2，首批）：固定程序集基线并将 31 个阶段 1 遗留
   `Execution/Nodes/*.Split.cs` 归档至 `Execution/LegacyNodeExtensions`，新增项目引用图门禁。
   新建只引用 Core 的 `Old8Lang.Syntax`：标量 `LiteralSyntax`/`LiteralKind`/`ILiteralSyntax`
