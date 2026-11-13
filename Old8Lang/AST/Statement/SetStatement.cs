@@ -527,6 +527,38 @@ public partial class SetStatement : OldStatement
             return;
         }
 
+        if (_leftExpression is NestedIndexAccess nestedIndexAccess)
+        {
+            // 成员或方法结果后再索引的赋值（例如 this.data_dict[key]）会被解析成
+            // NestedIndexAccess。静态元素类型在这里通常不可知，交给运行期分派，
+            // 既可写字典也保留列表/数组的负索引行为。
+            nestedIndexAccess.BaseExpression.LoadIlValue(ilGenerator, local);
+            var baseType = nestedIndexAccess.BaseExpression.OutputType(local) ?? typeof(object);
+            if (baseType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, baseType);
+            }
+
+            nestedIndexAccess.NestedIndex.LoadIlValue(ilGenerator, local);
+            var keyType = nestedIndexAccess.NestedIndex.OutputType(local) ?? typeof(object);
+            if (keyType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType);
+            }
+
+            Value.LoadIlValue(ilGenerator, local);
+            var valueType = Value.OutputType(local) ?? typeof(object);
+            if (valueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.SetObjectItem))!);
+            ilGenerator.Emit(OpCodes.Pop);
+            return;
+        }
+
         if (Id is not null && !string.IsNullOrEmpty(Id.IdName))
         {
             // 如果有类型注解,进行编译时类型检查
@@ -569,6 +601,15 @@ public partial class SetStatement : OldStatement
                  Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
             {
                 new DictionaryLangValue(position: Value.Position).SetValueToIl(ilGenerator, local, Id.IdName);
+            }
+            // 未加类型注解的空花括号可能在首次索引写入时成为列表或字典。以 object
+            // 保存，避免先固定为 List<object> 后再以字符串键写入而生成无效 IL。
+            else if (Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
+                     local.GetLocalVar(Id.IdName) is null)
+            {
+                Value.LoadIlValue(ilGenerator, local);
+                var target = local.GetOrCreateLocalVar(ilGenerator, Id.IdName, typeof(object));
+                ilGenerator.Emit(OpCodes.Stloc, target);
             }
             else
             {
@@ -830,17 +871,74 @@ public partial class SetStatement : OldStatement
                     }
                     // 如果是TypeBuilder或typeof(object)，跳过此操作
                 }
+                else if (operation is { Opera: LangTokenType.Dot, Right: LangListItem nestedListItem })
+                {
+                    // 解析器将 obj.field[key] 表示为 obj . LangListItem(field, key)，
+                    // 而不是以 obj.field 作为索引表达式。先在运行期读取该字段，再用
+                    // 动态集合写入器完成索引赋值；这也覆盖初始类型为 object 的空字段。
+                    operation.Left!.LoadIlValue(ilGenerator, local);
+                    var receiverType = operation.Left.OutputType(local) ?? typeof(object);
+                    if (receiverType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, receiverType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Ldstr, nestedListItem.ListId.IdName);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(DotOperatorILHelper).GetMethod(nameof(DotOperatorILHelper.GetDynamicObjectProperty))!);
+
+                    nestedListItem.Key.LoadIlValue(ilGenerator, local);
+                    var keyType = nestedListItem.Key.OutputType(local) ?? typeof(object);
+                    if (keyType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, keyType);
+                    }
+
+                    Value.LoadIlValue(ilGenerator, local);
+                    var valueType = Value.OutputType(local) ?? typeof(object);
+                    if (valueType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, valueType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.SetObjectItem))!);
+                    ilGenerator.Emit(OpCodes.Pop);
+                    return;
+                }
                 else if (operation.Opera == LangTokenType.Dot)
                 {
                     // 索引访问赋值: left[right] <- value
                     // 加载左对象
                     operation.Left!.LoadIlValue(ilGenerator, local);
-                    // 加载索引
-                    operation.Right!.LoadIlValue(ilGenerator, local);
-                    // 加载右值
-                    Value.LoadIlValue(ilGenerator, local);
                     // 获取左对象类型
                     var leftType = operation.Left.OutputType(local)!;
+                    // 加载索引
+                    operation.Right!.LoadIlValue(ilGenerator, local);
+
+                    if (leftType == typeof(object))
+                    {
+                        var rightType = operation.Right.OutputType(local) ?? typeof(object);
+                        if (rightType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, rightType);
+                        }
+
+                        Value.LoadIlValue(ilGenerator, local);
+                        var dynamicValueType = Value.OutputType(local) ?? typeof(object);
+                        if (dynamicValueType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, dynamicValueType);
+                        }
+
+                        ilGenerator.Emit(OpCodes.Call,
+                            typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.SetObjectItem))!);
+                        ilGenerator.Emit(OpCodes.Pop);
+                        return;
+                    }
+
+                    // 非动态集合保留其原生索引和值类型，直接由下方分支发射。
+                    Value.LoadIlValue(ilGenerator, local);
 
                     if (leftType.IsArray)
                     {
@@ -918,6 +1016,43 @@ public partial class SetStatement : OldStatement
 
                 // 加载集合对象
                 listItem.ListId.LoadIlValue(ilGenerator, local);
+
+                if (listType == typeof(object))
+                {
+                    listItem.Key.LoadIlValue(ilGenerator, local);
+                    var keyType = listItem.Key.OutputType(local) ?? typeof(object);
+                    if (keyType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, keyType);
+                    }
+
+                    Value.LoadIlValue(ilGenerator, local);
+                    var valueType = Value.OutputType(local) ?? typeof(object);
+                    if (valueType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, valueType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.SetObjectItem))!);
+
+                    if (local.GetLocalVar(listItem.ListId.IdName) is { } target)
+                    {
+                        ilGenerator.Emit(OpCodes.Stloc, target);
+                    }
+                    else if (local.Globals is { } globals && globals.IsSlot(listItem.ListId.IdName))
+                    {
+                        RuntimeGlobals.EmitStore(ilGenerator, listItem.ListId.IdName,
+                            globals.GetType(listItem.ListId.IdName), typeof(object));
+                    }
+                    else
+                    {
+                        throw new InvalidOperationError(this,
+                            $"无法写回动态集合 '{listItem.ListId.IdName}'");
+                    }
+
+                    return;
+                }
 
                 // 对于字典，需要在加载键和值时进行类型转换
                 if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))

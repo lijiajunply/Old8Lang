@@ -199,10 +199,16 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
         }
         else if (listType == typeof(object))
         {
-            // 静态类型为 object：运行期按列表 / 数组 / 元组 / 字符串分派，负索引同样生效
+            // 静态类型为 object：运行期按字典 / 列表 / 数组 / 元组 / 字符串分派。
             ListId.LoadIlValue(ilGenerator, local);
-            EmitIntIndex(ilGenerator, local);
-            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetObjectItem))!);
+            Key.LoadIlValue(ilGenerator, local);
+            var keyType = Key.OutputType(local) ?? typeof(object);
+            if (keyType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType);
+            }
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDynamicObjectItem))!);
         }
         else if (listType == typeof(DictionaryLangValue))
         {

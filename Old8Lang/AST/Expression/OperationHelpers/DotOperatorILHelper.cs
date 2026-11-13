@@ -1033,6 +1033,12 @@ public static class DotOperatorILHelper
             return receiver.ToString();
         }
 
+        if (receiver is IDictionary dictionary &&
+            methodName.Equals("GetOrElse", StringComparison.OrdinalIgnoreCase) && arguments.Length == 2)
+        {
+            return dictionary.Contains(arguments[0]) ? dictionary[arguments[0]] : arguments[1];
+        }
+
         var type = receiver.GetType();
         if (arguments.Length == 0 && methodName is "Count" or "Length")
         {
@@ -1451,45 +1457,14 @@ public static class DotOperatorILHelper
     /// </summary>
     public static Type GenerateDynamicIndexAccess(ILGenerator ilGenerator, Type rightType)
     {
-        // 栈上已经有: leftValue, rightValue
-        // 先保存rightValue
-        var rightLocal = ilGenerator.DeclareLocal(typeof(object));
+        // 栈上已经有: leftValue, rightValue。字典键不必是 int，因此统一把两个
+        // 值装箱后交给运行期辅助器分派。
         if (rightType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, rightType);
         }
-
-        ilGenerator.Emit(OpCodes.Stloc, rightLocal);
-
-        // leftValue仍在栈上，保存它
-        var leftLocal = ilGenerator.DeclareLocal(typeof(object));
-        ilGenerator.Emit(OpCodes.Stloc, leftLocal);
-
-        var endLabel = ilGenerator.DefineLabel();
-        var notDictLabel = ilGenerator.DefineLabel();
-
-        // 尝试Dictionary<object, object>
-        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Isinst, typeof(Dictionary<object, object>));
-        ilGenerator.Emit(OpCodes.Dup);
-        ilGenerator.Emit(OpCodes.Brfalse, notDictLabel);
-
-        // 是Dictionary
-        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
-        var dictIndexer = typeof(Dictionary<object, object>).GetProperty("Item")!;
-        ilGenerator.Emit(OpCodes.Callvirt, dictIndexer.GetGetMethod()!);
-        ilGenerator.Emit(OpCodes.Br, endLabel);
-
-        // 不是Dictionary：列表 / 数组 / 元组 / 字符串统一交给 IlIndexHelper，
-        // 负索引在那里归一化（与解释器和虚拟机一致）
-        ilGenerator.MarkLabel(notDictLabel);
-        ilGenerator.Emit(OpCodes.Pop); // 弹出 Isinst 的 null
-        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
-        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
-        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-        ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetObjectItem))!);
-
-        ilGenerator.MarkLabel(endLabel);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDynamicObjectItem))!);
         return typeof(object);
     }
 

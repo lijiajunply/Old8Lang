@@ -293,7 +293,9 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
             {
                 fieldType = !string.IsNullOrEmpty(memberId.AssumptionType)
                     ? memberId.OutputType(local) ?? typeof(object)
-                    : expr.OutputType(local) ?? typeof(object);
+                    : expr is ListLangValue { Value.Count: 0, Values.Count: 0 }
+                        ? typeof(object)
+                        : expr.OutputType(local) ?? typeof(object);
             }
             catch
             {

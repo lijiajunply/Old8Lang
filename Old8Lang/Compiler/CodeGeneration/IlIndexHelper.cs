@@ -88,4 +88,61 @@ public static class IlIndexHelper
                 $"类型 '{collection.GetType().Name}' 不支持索引访问")
         };
     }
+
+    /// <summary>
+    /// 用运行期键读取静态类型未知的集合。字符串等非数值键仅用于字典；数值键沿用
+    /// 列表、数组、元组和字符串的负索引规则。
+    /// </summary>
+    public static object? GetDynamicObjectItem(object? collection, object? key)
+    {
+        if (collection is IDictionary dictionary)
+        {
+            return dictionary[key!];
+        }
+
+        if (key is int index)
+        {
+            return GetObjectItem(collection, index);
+        }
+
+        throw new InvalidOperationException(
+            $"类型 '{collection?.GetType().Name ?? "null"}' 不支持键类型 '{key?.GetType().Name ?? "null"}' 的索引访问");
+    }
+
+    /// <summary>
+    /// 写入静态类型未知的集合，并返回实际承载写入结果的集合。
+    /// 空列表以非整数键首次写入时会提升为字典，保留空花括号的延迟类型语义。
+    /// </summary>
+    public static object SetObjectItem(object? collection, object? key, object? value)
+    {
+        if (collection is IDictionary dictionary)
+        {
+            dictionary[key!] = value;
+            return collection;
+        }
+
+        if (collection is IList list)
+        {
+            if (key is int index)
+            {
+                list[NormalizeChecked(index, list.Count)] = value;
+                return collection;
+            }
+
+            if (list.Count == 0)
+            {
+                var dictionaryResult = new Dictionary<object, object>
+                {
+                    [key!] = value!
+                };
+                return dictionaryResult;
+            }
+
+            throw new InvalidOperationException(
+                $"不能用 {key?.GetType().Name ?? "null"} 索引非空列表");
+        }
+
+        throw new InvalidOperationException(
+            $"类型 '{collection?.GetType().Name ?? "null"}' 不支持索引赋值");
+    }
 }
