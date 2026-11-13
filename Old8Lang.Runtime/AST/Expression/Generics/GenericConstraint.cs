@@ -63,7 +63,7 @@ public class GenericConstraint
     /// <summary>
     /// 私有构造函数，使用工厂方法创建实例
     /// </summary>
-    private GenericConstraint(GenericConstraintKind kind, string? typeName, SourcePosition position)
+    internal GenericConstraint(GenericConstraintKind kind, string? typeName, SourcePosition position)
     {
         Kind = kind;
         TypeName = typeName;

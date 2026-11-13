@@ -17,6 +17,7 @@ public partial class TernaryExpression(
     SourcePosition position = default)
     : LangExpression(position)
 {
+
     
     /// <summary>
     /// 条件表达式

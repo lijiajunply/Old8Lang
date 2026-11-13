@@ -16,7 +16,7 @@ public partial class AsyncStreamLangValue : LangValueType, ILangList
     /// <summary>
     /// 内部的异步生成器
     /// </summary>
-    private readonly AsyncGeneratorLangValue _generator;
+    internal readonly AsyncGeneratorLangValue _generator;
 
     /// <summary>
     /// 构造函数（从 AsyncFuncLangValue 创建）

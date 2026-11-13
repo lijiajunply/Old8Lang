@@ -21,6 +21,7 @@ public class ExtensionDeclaration(
     List<FuncLangValue> extensionMethods,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 目标类型名称（被扩展的类型）
     /// </summary>
@@ -95,7 +96,7 @@ public class ExtensionDeclaration(
     /// </summary>
     /// <param name="typeName">类型名称</param>
     /// <returns>解析后的类型，如果无法解析则返回 null</returns>
-    private static Type? ResolveTargetType(string typeName)
+    internal static Type? ResolveTargetType(string typeName)
     {
         // 内置类型映射到 Old8Lang 的包装类型
         return typeName.ToLower() switch

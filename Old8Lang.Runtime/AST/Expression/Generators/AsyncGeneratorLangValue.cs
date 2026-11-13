@@ -21,7 +21,7 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 异步生成器状态机
     /// </summary>
-    private AsyncGeneratorStateMachine? StateMachine { get; set; }
+    internal AsyncGeneratorStateMachine? StateMachine { get; set; }
 
     /// <summary>
     /// 生成器当前状态
@@ -36,12 +36,12 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 生成器函数的参数值
     /// </summary>
-    private Dictionary<string, LangValueType> ParameterValues { get; } = new();
+    internal Dictionary<string, LangValueType> ParameterValues { get; } = new();
 
     /// <summary>
     /// 取消令牌源，用于取消异步操作
     /// </summary>
-    private CancellationTokenSource? CancellationTokenSource { get; set; }
+    internal CancellationTokenSource? CancellationTokenSource { get; set; }
 
     /// <summary>
     /// 异步生成器状态枚举
@@ -259,7 +259,7 @@ public partial class AsyncGeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 生成异步生成器方法体
     /// </summary>
-    private void GenerateGeneratorMethodBody(ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateGeneratorMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
         // 对于异步生成器，我们需要生成一个返回IAsyncEnumerable<object>的方法
         // 创建一个简单的空异步枚举器实现
@@ -465,7 +465,7 @@ public class EmptyAsyncEnumerable : IAsyncEnumerable<object>
     /// <summary>
     /// 空的异步枚举器实现
     /// </summary>
-    private class EmptyAsyncEnumerator : IAsyncEnumerator<object>
+    internal class EmptyAsyncEnumerator : IAsyncEnumerator<object>
     {
         /// <summary>
         /// 当前值

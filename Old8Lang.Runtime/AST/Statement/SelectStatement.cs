@@ -86,6 +86,7 @@ public partial class SelectStatement(
     BlockStatement? defaultCase,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 获取所有case分支
     /// </summary>
@@ -112,7 +113,7 @@ public partial class SelectStatement(
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         // 使用轮询策略实现多路选择
         while (true)
@@ -225,7 +226,7 @@ public partial class SelectStatement(
     /// <summary>
     /// 生成器上下文模式执行
     /// </summary>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 

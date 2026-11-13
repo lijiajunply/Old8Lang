@@ -13,12 +13,12 @@ public class MethodTable
     /// key: 方法名
     /// value: 方法信息列表（支持重载）
     /// </summary>
-    private readonly Dictionary<string, List<LangMethodInfo>> _methodMap = new();
+    internal readonly Dictionary<string, List<LangMethodInfo>> _methodMap = new();
 
     /// <summary>
     /// 所有方法的列表（用于遍历）
     /// </summary>
-    private readonly List<LangMethodInfo> _allMethods = [];
+    internal readonly List<LangMethodInfo> _allMethods = [];
 
     /// <summary>
     /// 添加方法到查找表

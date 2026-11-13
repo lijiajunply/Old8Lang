@@ -335,7 +335,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理 long 类型转换，避免溢出
     /// </summary>
-    private static LangValueType HandleLongConversion(long value)
+    internal static LangValueType HandleLongConversion(long value)
     {
         if (value is >= int.MinValue and <= int.MaxValue)
         {
@@ -349,7 +349,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理 uint 类型转换，避免溢出
     /// </summary>
-    private static LangValueType HandleUIntConversion(uint value)
+    internal static LangValueType HandleUIntConversion(uint value)
     {
         if (value <= int.MaxValue)
         {
@@ -363,7 +363,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理 ulong 类型转换，避免溢出
     /// </summary>
-    private static LangValueType HandleULongConversion(ulong value)
+    internal static LangValueType HandleULongConversion(ulong value)
     {
         if (value <= int.MaxValue)
         {
@@ -377,7 +377,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理 Task 类型转换
     /// </summary>
-    private static LangValueType HandleTaskConversion(object task, SourcePosition position)
+    internal static LangValueType HandleTaskConversion(object task, SourcePosition position)
     {
         try
         {
@@ -402,7 +402,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理数组转换
     /// </summary>
-    private static LangValueType HandleArrayConversion(object array)
+    internal static LangValueType HandleArrayConversion(object array)
     {
         try
         {
@@ -423,7 +423,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理集合类型转换
     /// </summary>
-    private static LangValueType HandleCollectionConversion(object collection)
+    internal static LangValueType HandleCollectionConversion(object collection)
     {
         try
         {
@@ -444,7 +444,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理字典类型转换（泛型版本）
     /// </summary>
-    private static LangValueType HandleDictionaryConversionGeneric(object dictionary,
+    internal static LangValueType HandleDictionaryConversionGeneric(object dictionary,
         SourcePosition position)
     {
         try
@@ -484,7 +484,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理字典转换（向后兼容）
     /// </summary>
-    private static LangValueType HandleDictionaryConversion(Dictionary<object, object> dict, SourcePosition position)
+    internal static LangValueType HandleDictionaryConversion(Dictionary<object, object> dict, SourcePosition position)
     {
         return new DictionaryLangValue(dict.Select(x =>
         {
@@ -497,7 +497,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理元组类型转换
     /// </summary>
-    private static LangValueType HandleTupleConversion(object tuple, SourcePosition position)
+    internal static LangValueType HandleTupleConversion(object tuple, SourcePosition position)
     {
         try
         {
@@ -533,7 +533,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 尝试自定义类型转换
     /// 对于 C# 自定义类和未识别的类型，使用 NativeAnyLangValue 包装
     /// </summary>
-    private static LangValueType TryCustomConversion(object value, SourcePosition position)
+    internal static LangValueType TryCustomConversion(object value, SourcePosition position)
     {
         try
         {
@@ -561,7 +561,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为泛型集合类型（排除 string）
     /// </summary>
-    private static bool IsGenericCollectionType(Type type)
+    internal static bool IsGenericCollectionType(Type type)
     {
         // 排除 string 类型，虽然它实现了 IEnumerable<char>
         if (type == typeof(string))
@@ -590,7 +590,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为字典类型
     /// </summary>
-    private static bool IsDictionaryType(Type type)
+    internal static bool IsDictionaryType(Type type)
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
@@ -613,7 +613,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为元组类型
     /// </summary>
-    private static bool IsTupleType(Type type)
+    internal static bool IsTupleType(Type type)
     {
         return type.FullName?.StartsWith("System.Tuple") == true ||
                type.FullName?.StartsWith("System.ValueTuple") == true;
@@ -696,7 +696,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 将 ListLangValue 转换为 List&lt;object&gt;
     /// </summary>
-    private static List<object> ValueToObjList(ListLangValue listVal)
+    internal static List<object> ValueToObjList(ListLangValue listVal)
     {
         var result = new List<object>();
 
@@ -715,7 +715,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 将 ArrayLangValue 转换为 object[]
     /// </summary>
-    private static object[] ValueToObjArray(ArrayLangValue arrayVal)
+    internal static object[] ValueToObjArray(ArrayLangValue arrayVal)
     {
         var runResult = arrayVal.RunResult;
         if (runResult.Length == 0)
@@ -735,7 +735,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 将 DictionaryLangValue 转换为 Dictionary&lt;object, object&gt;
     /// </summary>
-    private static Dictionary<object, object> ValueToObjDictionary(DictionaryLangValue dictVal)
+    internal static Dictionary<object, object> ValueToObjDictionary(DictionaryLangValue dictVal)
     {
         var result = new Dictionary<object, object>();
 
@@ -753,7 +753,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 回退转换方法，用于处理无法直接转换的类型
     /// </summary>
-    private static object? ValueToObjFallback(LangValueType value)
+    internal static object? ValueToObjFallback(LangValueType value)
     {
         try
         {

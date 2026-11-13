@@ -9,12 +9,12 @@ public class FieldDefinitionTable
     /// <summary>
     /// 字段名到字段定义的映射
     /// </summary>
-    private readonly Dictionary<string, FieldDefinition> _fieldMap = new();
+    internal readonly Dictionary<string, FieldDefinition> _fieldMap = new();
 
     /// <summary>
     /// 所有字段的列表（用于遍历）
     /// </summary>
-    private readonly List<FieldDefinition> _allFields = [];
+    internal readonly List<FieldDefinition> _allFields = [];
 
     /// <summary>
     /// 添加字段定义

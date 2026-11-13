@@ -18,6 +18,7 @@ namespace Old8Lang.AST.Expression;
 /// </remarks>
 public partial class SuperExpression(SourcePosition position = default) : LangExpression(position)
 {
+
     /// <summary>
     /// 在当前上下文中解析super表达式
     /// </summary>
@@ -103,7 +104,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 调用父类的普通方法：super.method(args)。
     /// </summary>
-    private LangValueType CallParentMethod(Instance instance, VariateManager manager)
+    internal LangValueType CallParentMethod(Instance instance, VariateManager manager)
     {
         var parentMetadata = GetDirectParentMetadata()
                              ?? throw new InvalidOperationError(this, "当前类没有父类");
@@ -121,7 +122,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 调用父类构造函数
     /// </summary>
-    private LangValueType CallParentConstructor(Instance instance, VariateManager manager)
+    internal LangValueType CallParentConstructor(Instance instance, VariateManager manager)
     {
         // 获取父类元数据（使用当前实例的直接父类）
         var parentMetadata = GetDirectParentMetadata();
@@ -153,7 +154,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 访问父类成员
     /// </summary>
-    private LangValueType AccessParentMember(LangId id)
+    internal LangValueType AccessParentMember(LangId id)
     {
         var memberName = id.IdName;
         var parentMetadata = GetDirectParentMetadata();
@@ -187,7 +188,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 获取指定名称的父类元数据
     /// </summary>
-    private ClassMetadata? GetParentMetadata(string parentClassName, VariateManager manager)
+    internal ClassMetadata? GetParentMetadata(string parentClassName, VariateManager manager)
     {
         // 从管理器中获取父类类型模板
         var parentType = manager.GetAny(new LangId(parentClassName));
@@ -201,7 +202,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 获取直接父类的元数据
     /// </summary>
-    private ClassMetadata? GetDirectParentMetadata()
+    internal ClassMetadata? GetDirectParentMetadata()
     {
         var parentClassName = currentInstance.Metadata.ParentClassName;
         if (string.IsNullOrEmpty(parentClassName))
@@ -215,7 +216,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 选择匹配的方法（处理重载）
     /// </summary>
-    private LangMethodInfo SelectMethod(List<LangMethodInfo> methods, List<LangExpression> arguments)
+    internal LangMethodInfo SelectMethod(List<LangMethodInfo> methods, List<LangExpression> arguments)
     {
         if (methods.Count == 1)
         {
@@ -232,7 +233,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 执行父类方法
     /// </summary>
-    private LangValueType ExecuteParentMethod(LangMethodInfo methodInfo, List<LangExpression> arguments, VariateManager manager)
+    internal LangValueType ExecuteParentMethod(LangMethodInfo methodInfo, List<LangExpression> arguments, VariateManager manager)
     {
         // 计算参数值（在调用者作用域中）
         var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();

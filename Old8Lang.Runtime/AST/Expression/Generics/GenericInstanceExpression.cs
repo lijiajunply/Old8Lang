@@ -245,7 +245,7 @@ public partial class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 处理泛型类实例化
     /// </summary>
-    private void HandleGenericClassInstantiation(ILGenerator ilGenerator, LocalManager local, string className)
+    internal void HandleGenericClassInstantiation(ILGenerator ilGenerator, LocalManager local, string className)
     {
         // 获取泛型类模板
         var typeTemplate = local.GenericClasses[className];
@@ -307,7 +307,7 @@ public partial class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 处理泛型函数调用
     /// </summary>
-    private void HandleGenericFunctionCall(ILGenerator ilGenerator, LocalManager local, string funcName)
+    internal void HandleGenericFunctionCall(ILGenerator ilGenerator, LocalManager local, string funcName)
     {
         // 获取泛型函数定义
         var genericFunc = local.GenericFunctions[funcName];
@@ -344,7 +344,7 @@ public partial class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 创建类型参数映射
     /// </summary>
-    private Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters, LocalManager local)
+    internal Dictionary<string, Type> CreateTypeMapping(List<GenericParameter>? genericParameters, LocalManager local)
     {
         var typeMapping = new Dictionary<string, Type>();
         var resolver = local.CurrentGenericTypeResolver ??
@@ -378,7 +378,7 @@ public partial class GenericInstanceExpression : LangExpression
     /// <summary>
     /// 将 ParsedTypeAnnotation 转换为 ITypeInfo
     /// </summary>
-    private ITypeInfo? ConvertParsedTypeToTypeInfo(ParsedTypeAnnotation parsedType, TypeAnnotationManager typeAnnotationManager, VariateManager manager)
+    internal ITypeInfo? ConvertParsedTypeToTypeInfo(ParsedTypeAnnotation parsedType, TypeAnnotationManager typeAnnotationManager, VariateManager manager)
     {
         // 对于可空类型、联合类型、交叉类型，我们直接使用完整的类型名称字符串
         // 因为 TypeSystem 目前没有专门的 NullableTypeInfo、UnionTypeInfo、IntersectionTypeInfo 类

@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 /// </summary>
 public static class ExecutionContext
 {
-    private static readonly AsyncLocal<VariateManager?> CurrentManager = new();
+    internal static readonly AsyncLocal<VariateManager?> CurrentManager = new();
 
     /// <summary>
     /// 设置当前的 VariateManager

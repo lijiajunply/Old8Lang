@@ -11,18 +11,18 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class TypeLangValue : LangValueType
 {
-    private readonly LangExpression? _expression;
+    internal readonly LangExpression? _expression;
     public string? Value { get; private set; }
 
     /// <summary>
     /// 类型模板引用（懒加载）
     /// </summary>
-    private TypeTemplate? _typeTemplate;
+    internal TypeTemplate? _typeTemplate;
 
     /// <summary>
     /// 类型元数据引用（懒加载）
     /// </summary>
-    private ClassMetadata? _metadata;
+    internal ClassMetadata? _metadata;
 
     public TypeLangValue(LangExpression expression) => _expression = expression;
     public TypeLangValue(string value) => Value = value;
@@ -209,7 +209,7 @@ public partial class TypeLangValue : LangValueType
     /// 于是 <c>GetType("int")</c> 报「找不到类型: int」，解释器与虚拟机还不一致。
     /// 这张表让内建类型也能取到类型值，<c>IsPrimitive()</c> 才有意义。
     /// </remarks>
-    private static readonly Dictionary<string, string> BuiltinTypeNames = new(StringComparer.OrdinalIgnoreCase)
+    internal static readonly Dictionary<string, string> BuiltinTypeNames = new(StringComparer.OrdinalIgnoreCase)
     {
         ["int"] = "Int",
         ["integer"] = "Int",

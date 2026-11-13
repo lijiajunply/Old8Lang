@@ -30,7 +30,7 @@ public class AsyncFuncLangValue : ImportInfo
     internal VariateManager? GetCapturedScope() => CapturedScope;
 
     // 默认参数值缓存
-    private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
+    internal Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 
     /// <summary>
     /// 文档注释内容
@@ -62,12 +62,12 @@ public class AsyncFuncLangValue : ImportInfo
     /// <summary>
     /// 检查函数是否是异步生成器函数（包含yield语句）
     /// </summary>
-    private bool IsAsyncGenerator => ContainsYieldStatement(BlockStatement);
+    internal bool IsAsyncGenerator => ContainsYieldStatement(BlockStatement);
 
     /// <summary>
     /// 递归检查语句是否包含yield语句
     /// </summary>
-    private bool ContainsYieldStatement(OldStatement stmt)
+    internal bool ContainsYieldStatement(OldStatement stmt)
     {
         if (stmt is YieldStatement)
             return true;
@@ -245,7 +245,7 @@ public class AsyncFuncLangValue : ImportInfo
     /// <summary>
     /// 初始化默认参数值缓存
     /// </summary>
-    private void InitializeDefaultValueCache(VariateManager manager)
+    internal void InitializeDefaultValueCache(VariateManager manager)
     {
         CachedDefaultValues = new Dictionary<int, LangValueType>();
 
@@ -263,7 +263,7 @@ public class AsyncFuncLangValue : ImportInfo
     /// <summary>
     /// 判断是否为常量表达式
     /// </summary>
-    private static bool IsConstantExpression(LangExpression? expr)
+    internal static bool IsConstantExpression(LangExpression? expr)
     {
         return expr switch
         {

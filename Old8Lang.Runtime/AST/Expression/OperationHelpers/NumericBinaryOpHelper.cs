@@ -491,7 +491,7 @@ internal static class NumericBinaryOpHelper
     /// <summary>
     /// 将基本类型转换为 LangValueType
     /// </summary>
-    private static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
+    internal static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
     {
         if (type == typeof(int))
         {

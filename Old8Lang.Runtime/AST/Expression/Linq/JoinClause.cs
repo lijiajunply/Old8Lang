@@ -17,6 +17,7 @@ public class JoinClause(
     SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 连接范围变量名
     /// </summary>

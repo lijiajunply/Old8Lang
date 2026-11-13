@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class TestRunnerClassLangValue : LangValueType
 {
-    private static readonly TestRunnerClassLangValue Instance = new();
+    internal static readonly TestRunnerClassLangValue Instance = new();
 
     /// <summary>
     /// 获取 TestRunner 类的全局单例
@@ -108,7 +108,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// Describe 静态方法实现
     /// </summary>
-    private static LangValueType Describe(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Describe(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -143,7 +143,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// It 静态方法实现
     /// </summary>
-    private static LangValueType It(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType It(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -178,7 +178,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// Test 静态方法实现（It 的别名）
     /// </summary>
-    private static LangValueType Test(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Test(List<LangValueType> args, SourcePosition position)
     {
         return It(args, position);
     }
@@ -186,7 +186,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// RunAll 静态方法实现
     /// </summary>
-    private static LangValueType RunAll(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType RunAll(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {
@@ -209,7 +209,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// RunSuite 静态方法实现
     /// </summary>
-    private static LangValueType RunSuite(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType RunSuite(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -231,7 +231,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// RunTest 静态方法实现
     /// </summary>
-    private static LangValueType RunTest(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType RunTest(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -265,7 +265,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// Clear 静态方法实现
     /// </summary>
-    private static LangValueType Clear(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Clear(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {
@@ -280,7 +280,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// GetSuiteCount 静态方法实现
     /// </summary>
-    private static LangValueType GetSuiteCount(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType GetSuiteCount(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {
@@ -294,7 +294,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// GetTestCount 静态方法实现
     /// </summary>
-    private static LangValueType GetTestCount(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType GetTestCount(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {
@@ -308,7 +308,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// PrintSummary 静态方法实现
     /// </summary>
-    private static LangValueType PrintSummary(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType PrintSummary(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -338,7 +338,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// PrintDetailed 静态方法实现
     /// </summary>
-    private static LangValueType PrintDetailed(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType PrintDetailed(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -368,7 +368,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// RunAllWithReport 静态方法实现
     /// </summary>
-    private static LangValueType RunAllWithReport(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType RunAllWithReport(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {
@@ -391,7 +391,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// GetStatistics 静态方法实现
     /// </summary>
-    private static LangValueType GetStatistics(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType GetStatistics(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -464,7 +464,7 @@ public partial class TestRunnerClassLangValue : LangValueType
     /// <summary>
     /// 将 LangValueType 列表转换为 TestResult 列表
     /// </summary>
-    private static List<TestRunner.TestResult> ConvertToTestResults(ILangList resultList)
+    internal static List<TestRunner.TestResult> ConvertToTestResults(ILangList resultList)
     {
         var results = new List<TestRunner.TestResult>();
 

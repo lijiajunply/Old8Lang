@@ -34,7 +34,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
     /// 标准 while 循环（非生成器）
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
@@ -93,7 +93,7 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
     /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         manager.ControlFlowManager.PushState();
         var context = manager.GeneratorContext!;

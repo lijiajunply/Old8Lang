@@ -18,9 +18,9 @@ public partial class ListLangValue : LangValueType, ILangList
     public List<LangExpression> Value { get; }
 
     public readonly List<LangValueType> Values = [];
-    private readonly object _syncRoot = new();
+    internal readonly object _syncRoot = new();
 
-    private bool _hasBeenCleared;
+    internal bool _hasBeenCleared;
 
     /// <summary>
     /// 元素类型（泛型参数），null 表示非泛型或未推断

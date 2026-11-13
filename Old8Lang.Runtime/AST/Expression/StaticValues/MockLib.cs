@@ -11,8 +11,8 @@ public static class MockLib
     public class MockObject(string name)
     {
         public string Name { get; } = name;
-        private readonly Dictionary<string, List<object?[]>> _callHistory = new();
-        private readonly Dictionary<string, object?> _returnValues = new();
+        internal readonly Dictionary<string, List<object?[]>> _callHistory = new();
+        internal readonly Dictionary<string, object?> _returnValues = new();
 
         /// <summary>
         /// 记录方法调用

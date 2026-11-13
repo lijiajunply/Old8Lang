@@ -22,19 +22,19 @@ public class UnifiedModule(
 ) : ImportInfo(position), IModuleValueType
 {
     // 符号存储 - 使用双字典优化查找性能
-    private readonly Dictionary<string, LangValueType> _symbols = new();
+    internal readonly Dictionary<string, LangValueType> _symbols = new();
 
-    private readonly Dictionary<string, LangValueType> _caseInsensitiveSymbols =
+    internal readonly Dictionary<string, LangValueType> _caseInsensitiveSymbols =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private readonly Lock _loadLock = new();
-    private readonly List<string> _selectedSymbols = [];
-    private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
-    private Exception? _loadException;
+    internal readonly Lock _loadLock = new();
+    internal readonly List<string> _selectedSymbols = [];
+    internal ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
+    internal Exception? _loadException;
 
     // 服务依赖
-    private static readonly ModuleLoader ModuleLoaderInstance = new();
-    private static readonly SymbolExtractor SymbolExtractorInstance = new();
+    internal static readonly ModuleLoader ModuleLoaderInstance = new();
+    internal static readonly SymbolExtractor SymbolExtractorInstance = new();
 
     /// <summary>
     /// 模块加载模式
@@ -291,7 +291,7 @@ public class UnifiedModule(
     /// <summary>
     /// 内部加载逻辑（使用新的服务架构）
     /// </summary>
-    private void LoadModuleInternal(VariateManager? manager)
+    internal void LoadModuleInternal(VariateManager? manager)
     {
         // 使用初始的 manager 或传入的 manager
         manager = manager ?? initialManager;
@@ -362,7 +362,7 @@ public class UnifiedModule(
     /// <summary>
     /// 处理符号访问（优化版本 - O(1) 查找，不回退到全局作用域）
     /// </summary>
-    private LangValueType HandleSymbolAccess(LangId langId)
+    internal LangValueType HandleSymbolAccess(LangId langId)
     {
         var symbolName = langId.IdName;
         var symbol = GetSymbol(symbolName);
@@ -378,7 +378,7 @@ public class UnifiedModule(
     /// <summary>
     /// 处理函数调用
     /// </summary>
-    private LangValueType HandleFunctionCall(Instance instance, VariateManager currentManager)
+    internal LangValueType HandleFunctionCall(Instance instance, VariateManager currentManager)
     {
         var functionName = instance.Id.IdName;
         var func = GetSymbol(functionName);

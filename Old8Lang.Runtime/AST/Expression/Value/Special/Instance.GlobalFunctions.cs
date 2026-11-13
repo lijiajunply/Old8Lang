@@ -15,7 +15,7 @@ public partial class Instance
     /// 尝试通过全局函数注册器执行函数（解释器模式）
     /// </summary>
     /// <returns>如果找到并执行了全局函数返回 true，否则返回 false</returns>
-    private bool TryExecuteGlobalFunction(VariateManager manager, out LangValueType? result)
+    internal bool TryExecuteGlobalFunction(VariateManager manager, out LangValueType? result)
     {
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
@@ -61,7 +61,7 @@ public partial class Instance
     /// 尝试通过全局函数注册器生成 IL 代码（IL 模式）
     /// </summary>
     /// <returns>如果找到并生成了 IL 代码返回 true，否则返回 false</returns>
-    private bool TryGenerateGlobalFunctionIl(ILGenerator ilGenerator, LocalManager local)
+    internal bool TryGenerateGlobalFunctionIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
@@ -92,7 +92,7 @@ public partial class Instance
     /// 尝试通过全局函数注册器获取返回类型（IL 模式）
     /// </summary>
     /// <returns>如果找到了全局函数返回其返回类型，否则返回 null</returns>
-    private Type? TryGetGlobalFunctionReturnType(LocalManager local)
+    internal Type? TryGetGlobalFunctionReturnType(LocalManager local)
     {
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
@@ -126,7 +126,7 @@ public partial class Instance
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
     /// <returns>重新排序后的参数列表</returns>
-    private List<LangExpression> ReorderGlobalFunctionArguments(
+    internal List<LangExpression> ReorderGlobalFunctionArguments(
         IGlobalFunction globalFunc,
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
@@ -231,7 +231,7 @@ public partial class Instance
     /// </summary>
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
-    private void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
+    internal void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
     {
         // 检查命名参数是否重复
         var seenNames = new HashSet<string>();
@@ -245,7 +245,7 @@ public partial class Instance
     /// <summary>
     /// 在解释器模式下基于运行时参数值解析重载
     /// </summary>
-    private IGlobalFunction? ResolveOverloadForInterpreter(OverloadGroup overloadGroup, List<LangExpression> parameters, VariateManager manager)
+    internal IGlobalFunction? ResolveOverloadForInterpreter(OverloadGroup overloadGroup, List<LangExpression> parameters, VariateManager manager)
     {
         if (overloadGroup.Overloads.Count == 0)
             return null;

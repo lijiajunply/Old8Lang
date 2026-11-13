@@ -24,7 +24,7 @@ public partial class ForInStatement(
     public OldStatement Body => body;
 
     // 获取所有标识符，包括主标识符和附加标识符
-    private List<LangId> AllIds
+    internal List<LangId> AllIds
     {
         get => [id, .. field];
     } = additionalIds ?? [];
@@ -54,7 +54,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 标准 for-in 循环（非生成器）
     /// </summary>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         manager.AddChildren();
         // 压入新的控制流状态
@@ -291,7 +291,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 生成器上下文中的 for-in 循环（新架构）
     /// </summary>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         // 不要在这里调用 AddChildren()，生成器需要跨yield保持所有变量状态
         manager.ControlFlowManager.PushState();
@@ -471,7 +471,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 在生成器上下文中处理异步生成器（保持原有逻辑）
     /// </summary>
-    private void RunStandardAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator)
+    internal void RunStandardAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator)
     {
         while (true)
         {
@@ -510,7 +510,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 在生成器上下文中处理异步流（保持原有逻辑）
     /// </summary>
-    private void RunStandardAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream)
+    internal void RunStandardAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream)
     {
         while (true)
         {
@@ -549,7 +549,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 在生成器上下文中处理同步生成器（新架构：支持嵌套生成器状态保存）
     /// </summary>
-    private void RunStandardGenerator(VariateManager manager, GeneratorLangValue generatorValue, GeneratorExecutionContext context)
+    internal void RunStandardGenerator(VariateManager manager, GeneratorLangValue generatorValue, GeneratorExecutionContext context)
     {
         // 获取当前循环路径
         var loopPath = context.GetCurrentPath() + "/for-in";
@@ -768,7 +768,7 @@ public partial class ForInStatement(
     /// <summary>
     /// 生成字典类型的IL代码，使用更简单可靠的方式
     /// </summary>
-    private void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
         expression.LoadIlValue(ilGenerator, local);

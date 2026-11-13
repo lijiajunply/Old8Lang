@@ -14,7 +14,7 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程对象
     /// </summary>
-    private readonly Thread _thread;
+    internal readonly Thread _thread;
 
     // 包装已存在的线程，不创建新的、尚未启动的线程。
     internal ThreadLangValue(Thread thread, SourcePosition position = default) : base(position)
@@ -25,22 +25,22 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程安全锁
     /// </summary>
-    private readonly Lock _lock = new();
+    internal readonly Lock _lock = new();
 
     /// <summary>
     /// 线程入口点委托（ThreadStart）
     /// </summary>
-    private readonly ThreadStart? _threadStart;
+    internal readonly ThreadStart? _threadStart;
 
     /// <summary>
     /// 线程入口点委托（ParameterizedThreadStart）
     /// </summary>
-    private readonly ParameterizedThreadStart? _parameterizedThreadStart;
+    internal readonly ParameterizedThreadStart? _parameterizedThreadStart;
 
     /// <summary>
     /// 线程执行结果
     /// </summary>
-    private object? _result;
+    internal object? _result;
 
     /// <summary>
     /// 获取线程执行结果（等同于Join但不阻塞）
@@ -73,22 +73,22 @@ public partial class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程执行是否完成
     /// </summary>
-    private bool _isCompleted;
+    internal bool _isCompleted;
 
     /// <summary>
     /// 线程执行过程中发生的异常
     /// </summary>
-    private Exception? _exception;
+    internal Exception? _exception;
 
     /// <summary>
     /// 取消令牌
     /// </summary>
-    private readonly CancellationToken _cancellationToken;
+    internal readonly CancellationToken _cancellationToken;
 
     /// <summary>
     /// 取消令牌源
     /// </summary>
-    private readonly CancellationTokenSource? _cancellationTokenSource;
+    internal readonly CancellationTokenSource? _cancellationTokenSource;
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -174,7 +174,7 @@ public partial class ThreadLangValue : LangValueType
     /// <param name="threadStart">线程入口点</param>
     /// <param name="cancellationTokenSource">取消令牌源</param>
     /// <param name="position">源代码位置</param>
-    private ThreadLangValue(ThreadStart threadStart, CancellationTokenSource cancellationTokenSource,
+    internal ThreadLangValue(ThreadStart threadStart, CancellationTokenSource cancellationTokenSource,
         SourcePosition position = default) : base(position)
     {
         _cancellationTokenSource = cancellationTokenSource;
@@ -335,7 +335,7 @@ public partial class ThreadLangValue : LangValueType
     /// </summary>
     /// <param name="obj">要转换的对象</param>
     /// <returns>转换后的语言值类型</returns>
-    private new static LangValueType ObjToValue(object obj)
+    internal new static LangValueType ObjToValue(object obj)
     {
         // 如果已经是 LangValueType，直接返回
         if (obj is LangValueType langValue)

@@ -359,7 +359,7 @@ public static class AssertLib
     /// <summary>
     /// 比较两个对象是否相等
     /// </summary>
-    private static bool AreEqual(object? a, object? b)
+    internal static bool AreEqual(object? a, object? b)
     {
         if (ReferenceEquals(a, b)) return true;
         if (a == null || b == null) return false;
@@ -376,7 +376,7 @@ public static class AssertLib
     /// <summary>
     /// 比较两个集合是否相等
     /// </summary>
-    private static bool CollectionsEqual(IEnumerable a, IEnumerable b)
+    internal static bool CollectionsEqual(IEnumerable a, IEnumerable b)
     {
         var listA = a.Cast<object?>().ToList();
         var listB = b.Cast<object?>().ToList();

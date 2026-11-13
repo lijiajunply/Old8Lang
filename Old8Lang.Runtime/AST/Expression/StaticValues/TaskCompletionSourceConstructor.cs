@@ -9,19 +9,19 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public class TaskCompletionSourceConstructor : TaskStaticMethodWrapper
 {
-    private static readonly TaskCompletionSourceConstructor Instance = new();
+    internal static readonly TaskCompletionSourceConstructor Instance = new();
 
     /// <summary>
     /// 获取 TaskCompletionSource 构造函数的全局单例
     /// </summary>
     public static TaskCompletionSourceConstructor GetInstance() => Instance;
 
-    private TaskCompletionSourceConstructor()
+    internal TaskCompletionSourceConstructor()
         : base("TaskCompletionSource", CreateInstance)
     {
     }
 
-    private static LangValueType CreateInstance(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateInstance(List<LangValueType> args, SourcePosition position)
     {
         // 验证参数：TaskCompletionSource() 不接受参数
         if (args.Count != 0)

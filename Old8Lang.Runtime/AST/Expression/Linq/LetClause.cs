@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Expression.Linq;
 public class LetClause(string variable, LangExpression expression, SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 变量名
     /// </summary>

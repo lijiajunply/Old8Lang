@@ -8,8 +8,8 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// </summary>
 public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTree
 {
-    private readonly Dictionary<string, LangValueType> _symbols = new();
-    private readonly Lock _loadLock = new();
+    internal readonly Dictionary<string, LangValueType> _symbols = new();
+    internal readonly Lock _loadLock = new();
 
     /// <summary>
     /// 源码位置
@@ -82,7 +82,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
             string.Equals(kvp.Key, symbolName, StringComparison.OrdinalIgnoreCase)).Value;
     }
 
-    private void EnsureLoadedInternal()
+    internal void EnsureLoadedInternal()
     {
         if (!IsLoaded)
         {
@@ -90,7 +90,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
         }
     }
 
-    private void PerformModuleLoad(VariateManager manager)
+    internal void PerformModuleLoad(VariateManager manager)
     {
         try
         {

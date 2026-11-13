@@ -10,8 +10,8 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class LazyItemWrapper(string moduleNameItem, string itemName, VariateManager manager, SourcePosition position)
     : LangValueType(position), IModuleWrapper
 {
-    private bool _loaded;
-    private LangValueType? _loadedItem;
+    internal bool _loaded;
+    internal LangValueType? _loadedItem;
 
     /// <summary>
     /// 模块名称
@@ -134,7 +134,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
     /// <summary>
     /// 执行实际的项目加载
     /// </summary>
-    private void LoadItem()
+    internal void LoadItem()
     {
         if (_loaded) return;
 

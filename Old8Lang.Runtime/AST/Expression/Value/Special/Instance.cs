@@ -1131,7 +1131,7 @@ public partial class Instance : LangValueType
     /// 生成局部 lambda 委托的动态调用。闭包委托在创建时才绑定外层局部变量，
     /// 因此不能像具名函数一样直接使用静态 DynamicMethod 调用。
     /// </summary>
-    private bool TryEmitLocalDelegateCall(ILGenerator ilGenerator, LocalManager local)
+    internal bool TryEmitLocalDelegateCall(ILGenerator ilGenerator, LocalManager local)
     {
         if (NamedArgs.Count != 0 || local.GetLocalVar(Id.IdName) is not { LocalType: var type } lambdaLocal ||
             !typeof(Delegate).IsAssignableFrom(type))
@@ -1180,7 +1180,7 @@ public partial class Instance : LangValueType
     /// <summary>
     /// 加载参数并进行必要的类型转换
     /// </summary>
-    private void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id,
+    internal void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id,
         Type? idType, Type paramType)
     {
         // 使用LocalManager的ValidateType方法验证参数类型

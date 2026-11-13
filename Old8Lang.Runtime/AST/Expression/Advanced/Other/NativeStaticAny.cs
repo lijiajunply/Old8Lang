@@ -17,12 +17,12 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
     public readonly string ClassName = className;
 
     // 成员信息缓存 - 按类型缓存，所有同类型实例共享
-    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
+    internal static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
 
     /// <summary>
     /// 获取缓存的成员信息（属性、字段或方法）
     /// </summary>
-    private MemberInfo? GetCachedMember(string memberName)
+    internal MemberInfo? GetCachedMember(string memberName)
     {
         // 获取或创建该类型的缓存字典
         var typeCache = MemberCache.GetOrAdd(classType, _ => new ConcurrentDictionary<string, MemberInfo?>());
@@ -111,7 +111,7 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
     /// <returns>重新排序后的参数列表</returns>
-    private List<LangExpression> ReorderArgumentsWithNamedParameters(
+    internal List<LangExpression> ReorderArgumentsWithNamedParameters(
         MethodInfo method,
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
@@ -227,7 +227,7 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
     /// </summary>
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
-    private void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
+    internal void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
     {
         // 检查命名参数是否重复
         var seenNames = new HashSet<string>();

@@ -167,7 +167,7 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
     /// <summary>
     /// 检查是否允许基本类型转换
     /// </summary>
-    private static bool IsBasicTypeConversionAllowed(Type expected, Type actual)
+    internal static bool IsBasicTypeConversionAllowed(Type expected, Type actual)
     {
         // 数值类型之间的转换
         var numericTypes = new[] { typeof(int), typeof(long), typeof(double), typeof(float), typeof(short), typeof(byte) };
@@ -181,11 +181,11 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         return false;
     }
 
-    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+    internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
-    private static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    internal static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
     {
         ilGenerator.Emit(targetType == typeof(double) ? OpCodes.Conv_R8 :
             targetType == typeof(float) ? OpCodes.Conv_R4 :

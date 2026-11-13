@@ -25,6 +25,7 @@ public partial class TypeTemplate(
     SourcePosition position = default)
     : ImportInfo(position)
 {
+
     public readonly string ClassName = className;
     public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
     public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
@@ -62,7 +63,7 @@ public partial class TypeTemplate(
     /// <summary>
     /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
     /// </summary>
-    private readonly Dictionary<string, LangValueType> _staticVariableValues = [];
+    internal readonly Dictionary<string, LangValueType> _staticVariableValues = [];
 
     /// <summary>
     /// 获取静态变量的当前值，如果已修改则返回存储的值，否则返回初始值
@@ -70,7 +71,7 @@ public partial class TypeTemplate(
     /// <param name="variableName">变量名</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>静态变量的值</returns>
-    private LangValueType GetStaticVariableValue(string variableName, VariateManager manager)
+    internal LangValueType GetStaticVariableValue(string variableName, VariateManager manager)
     {
         if (_staticVariableValues.TryGetValue(variableName, out var storedValue))
         {
@@ -205,7 +206,7 @@ public partial class TypeTemplate(
     /// <param name="id">成员名称</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>成员值</returns>
-    private LangValueType GetStaticMember(LangId id, VariateManager manager)
+    internal LangValueType GetStaticMember(LangId id, VariateManager manager)
     {
         // 查找实际的 ClassMemberId（包含修饰符信息）
         ClassMemberId? actualMemberId = null;
@@ -289,7 +290,7 @@ public partial class TypeTemplate(
     /// <param name="instance">方法调用实例</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>方法调用结果</returns>
-    private LangValueType CallStaticMethod(Instance instance, VariateManager manager)
+    internal LangValueType CallStaticMethod(Instance instance, VariateManager manager)
     {
         // 查找静态方法
         foreach (var (key, value) in StaticVariates)
@@ -380,7 +381,7 @@ public partial class TypeTemplate(
     /// <param name="instance">实例表达式</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>创建的实例或方法调用结果</returns>
-    private LangValueType TryCreateInstanceOrCallStaticMethod(Instance instance, VariateManager manager)
+    internal LangValueType TryCreateInstanceOrCallStaticMethod(Instance instance, VariateManager manager)
     {
         // 首先检查是否是嵌套类的实例化
         if (instance.Ids.Count == 0) // 没有参数，可能是类实例化
@@ -422,7 +423,7 @@ public partial class TypeTemplate(
     /// 类型元数据缓存（V2 架构）
     /// 只构建一次，所有实例共享
     /// </summary>
-    private ClassMetadata? MetadataCache;
+    internal ClassMetadata? MetadataCache;
 
     /// <summary>
     /// 元数据属性（V2 架构）
@@ -468,7 +469,7 @@ public partial class TypeTemplate(
     /// <summary>
     /// 递归构建方法表和字段表（包括继承的成员）
     /// </summary>
-    private void BuildMethodTableAndFieldTable(
+    internal void BuildMethodTableAndFieldTable(
         VariateManager manager,
         TypeTemplate type,
         MethodTable methodTable,
@@ -509,7 +510,7 @@ public partial class TypeTemplate(
     /// <summary>
     /// 将类型的成员添加到方法表和字段表
     /// </summary>
-    private void AddMembersToTables(
+    internal void AddMembersToTables(
         TypeTemplate type,
         MethodTable methodTable,
         FieldDefinitionTable fieldTable)
@@ -711,13 +712,13 @@ public partial class TypeTemplate(
     /// 用于反射功能中通过类名查找类型
     /// </summary>
     [ThreadStatic]
-    private static Dictionary<string, TypeTemplate>? _typeRegistry;
-    private static Dictionary<string, TypeTemplate> TypeRegistry => _typeRegistry ??= new();
+    internal static Dictionary<string, TypeTemplate>? _typeRegistry;
+    internal static Dictionary<string, TypeTemplate> TypeRegistry => _typeRegistry ??= new();
 
     /// <summary>
     /// 类型注册表锁（线程隔离后不再需要跨线程锁，保留为空操作兼容）
     /// </summary>
-    private static readonly Lock RegistryLock = new();
+    internal static readonly Lock RegistryLock = new();
 
     /// <summary>
     /// 注册类型到全局注册表
@@ -878,7 +879,7 @@ public partial class MethodOverloadList : LangValueType
     /// <summary>
     /// 通过类型匹配选择最佳的重载
     /// </summary>
-    private FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args,
+    internal FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args,
         VariateManager manager)
     {
         var scoredCandidates = new List<(FuncLangValue candidate, int score)>();
@@ -925,7 +926,7 @@ public partial class MethodOverloadList : LangValueType
     /// <summary>
     /// 检查重载是否能处理给定的参数
     /// </summary>
-    private bool CanHandleArguments(FuncLangValue overload, List<LangExpression> args)
+    internal bool CanHandleArguments(FuncLangValue overload, List<LangExpression> args)
     {
         var expectedParams = overload.Ids?.Count ?? 0;
         var actualParams = args.Count;
@@ -954,7 +955,7 @@ public partial class MethodOverloadList : LangValueType
     /// <summary>
     /// 检查类型是否兼容
     /// </summary>
-    private bool IsCompatibleType(string actualType, string expectedType)
+    internal bool IsCompatibleType(string actualType, string expectedType)
     {
         return actualType.ToLowerInvariant().Contains(expectedType.ToLowerInvariant()) ||
                expectedType.ToLowerInvariant().Contains(actualType.ToLowerInvariant());

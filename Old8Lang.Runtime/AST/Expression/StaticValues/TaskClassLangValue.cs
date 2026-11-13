@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class TaskClassLangValue : LangValueType
 {
-    private static readonly TaskClassLangValue Instance = new();
+    internal static readonly TaskClassLangValue Instance = new();
 
     /// <summary>
     /// 获取 Task 类的全局单例
@@ -105,7 +105,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// WhenAll 静态方法实现
     /// </summary>
-    private static LangValueType WhenAll(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType WhenAll(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -139,7 +139,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// WhenAny 静态方法实现
     /// </summary>
-    private static LangValueType WhenAny(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType WhenAny(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -173,7 +173,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// Delay 静态方法实现
     /// </summary>
-    private static LangValueType Delay(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Delay(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -208,7 +208,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// FromResult 静态方法实现
     /// </summary>
-    private static LangValueType FromResult(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType FromResult(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -223,7 +223,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// StartNew 静态方法实现
     /// </summary>
-    private static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -243,7 +243,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// FromException 静态方法实现
     /// </summary>
-    private static LangValueType FromException(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType FromException(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -271,7 +271,7 @@ public partial class TaskClassLangValue : LangValueType
     /// <summary>
     /// Run 静态方法实现
     /// </summary>
-    private static LangValueType Run(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Run(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {

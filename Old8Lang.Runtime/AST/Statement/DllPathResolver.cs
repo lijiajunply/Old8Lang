@@ -13,7 +13,7 @@ public static class DllPathResolver
     /// <summary>
     /// 搜索路径的优先级顺序
     /// </summary>
-    private static readonly Func<string, string, string?>[] SearchStrategies =
+    internal static readonly Func<string, string, string?>[] SearchStrategies =
     [
         // 1. 运行时标准库路径（最高优先级）
         (dllName, _) =>
@@ -67,7 +67,7 @@ public static class DllPathResolver
     /// <summary>
     /// 检查是否为标准库程序集
     /// </summary>
-    private static bool IsStandardLibraryAssembly(string assemblyName)
+    internal static bool IsStandardLibraryAssembly(string assemblyName)
     {
         // 检查是否为已注册标准库使用的程序集
         return StandardLibraryRegistry.Libraries.Values
@@ -137,7 +137,7 @@ public static class DllPathResolver
     /// <summary>
     /// 构建详细的错误消息
     /// </summary>
-    private static string BuildErrorMessage(string dllName, List<string> attemptedPaths)
+    internal static string BuildErrorMessage(string dllName, List<string> attemptedPaths)
     {
         var sb = new StringBuilder();
         sb.AppendLine($"❌ 无法找到 DLL 文件: {dllName}.dll");

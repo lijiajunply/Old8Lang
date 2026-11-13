@@ -167,7 +167,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行包含 Join 子句的 LINQ 查询
     /// </summary>
-    private LangValueType ExecuteQueryWithJoin(LinqExpression linqExpr, IEnumerable dataSource)
+    internal LangValueType ExecuteQueryWithJoin(LinqExpression linqExpr, IEnumerable dataSource)
     {
         var result = new List<object?>();
         var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
@@ -389,7 +389,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 在中间结果上执行 OrderBy（包含 let 变量）
     /// </summary>
-    private List<(object? item, Dictionary<string, LangValueType> letVariables)> ExecuteOrderByOnIntermediateResults(
+    internal List<(object? item, Dictionary<string, LangValueType> letVariables)> ExecuteOrderByOnIntermediateResults(
         OrderByClause orderByClause,
         List<(object? item, Dictionary<string, LangValueType> letVariables)> intermediateResults,
         string rangeVariable)
@@ -516,7 +516,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 from 子句
     /// </summary>
-    private IEnumerable ExecuteFromClause(FromClause fromClause)
+    internal IEnumerable ExecuteFromClause(FromClause fromClause)
     {
         var sourceValue = fromClause.DataSource.Run(manager);
         return ConvertToEnumerable(sourceValue);
@@ -525,7 +525,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行查询体子句
     /// </summary>
-    private IEnumerable ExecuteBodyClause(LinqClause clause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteBodyClause(LinqClause clause, IEnumerable source, string rangeVariable)
     {
         return clause switch
         {
@@ -541,7 +541,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行终止子句
     /// </summary>
-    private IEnumerable ExecuteTerminationClause(LinqClause clause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteTerminationClause(LinqClause clause, IEnumerable source, string rangeVariable)
     {
         return clause switch
         {
@@ -554,7 +554,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 where 子句（转换为 .NET Where）
     /// </summary>
-    private IEnumerable ExecuteWhere(WhereClause whereClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteWhere(WhereClause whereClause, IEnumerable source, string rangeVariable)
     {
         var result = new List<object?>();
         var rangeLangId = new LangId(rangeVariable);
@@ -590,7 +590,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 select 子句（转换为 .NET Select）
     /// </summary>
-    private IEnumerable ExecuteSelect(SelectClause selectClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteSelect(SelectClause selectClause, IEnumerable source, string rangeVariable)
     {
         var result = new List<object?>();
         var rangeLangId = new LangId(rangeVariable);
@@ -621,7 +621,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 orderby 子句（转换为 .NET OrderBy/ThenBy）
     /// </summary>
-    private IEnumerable ExecuteOrderBy(OrderByClause orderByClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteOrderBy(OrderByClause orderByClause, IEnumerable source, string rangeVariable)
     {
         var list = source.Cast<object?>().ToList();
         var rangeLangId = new LangId(rangeVariable);
@@ -718,7 +718,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 group by 子句（转换为 .NET GroupBy）
     /// </summary>
-    private IEnumerable ExecuteGroupBy(GroupByClause groupByClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteGroupBy(GroupByClause groupByClause, IEnumerable source, string rangeVariable)
     {
         var groups = new Dictionary<object, List<object?>>();
         var rangeLangId = new LangId(rangeVariable);
@@ -758,7 +758,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行 let 子句
     /// </summary>
-    private IEnumerable ExecuteLet(LetClause letClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteLet(LetClause letClause, IEnumerable source, string rangeVariable)
     {
         // let 子句需要创建新的匿名对象，包含原有变量和新变量
         // 暂时简化实现：直接在作用域中设置新变量
@@ -796,7 +796,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// 执行 join 子句
     /// 支持 inner join 和 group join 两种模式
     /// </summary>
-    private IEnumerable ExecuteJoin(JoinClause joinClause, IEnumerable source, string rangeVariable)
+    internal IEnumerable ExecuteJoin(JoinClause joinClause, IEnumerable source, string rangeVariable)
     {
         var result = new List<object?>();
         var rangeLangId = new LangId(rangeVariable);
@@ -924,7 +924,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 比较两个键是否相等
     /// </summary>
-    private static bool KeysEqual(object? key1, object? key2)
+    internal static bool KeysEqual(object? key1, object? key2)
     {
         if (key1 is null && key2 is null)
             return true;
@@ -942,7 +942,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 执行查询延续（into）
     /// </summary>
-    private IEnumerable ExecuteContinuation(QueryContinuation continuation, IEnumerable source)
+    internal IEnumerable ExecuteContinuation(QueryContinuation continuation, IEnumerable source)
     {
         // 设置延续变量
         var continuationId = new LangId(continuation.Variable);
@@ -964,7 +964,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 将 Old8Lang 值转换为 IEnumerable
     /// </summary>
-    private IEnumerable ConvertToEnumerable(LangValueType value)
+    internal IEnumerable ConvertToEnumerable(LangValueType value)
     {
         if (value is ILangList langList)
         {
@@ -987,7 +987,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 将对象转换为 Old8Lang 值
     /// </summary>
-    private LangValueType ConvertToLangValue(object? obj)
+    internal LangValueType ConvertToLangValue(object? obj)
     {
         return obj switch
         {
@@ -1004,7 +1004,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 将 Old8Lang 值转换为对象
     /// </summary>
-    private object? ConvertFromLangValue(LangValueType value)
+    internal object? ConvertFromLangValue(LangValueType value)
     {
         return value switch
         {
@@ -1020,7 +1020,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 将 IEnumerable 转换为 Old8Lang List
     /// </summary>
-    private LangValueType ConvertToLangList(IEnumerable enumerable)
+    internal LangValueType ConvertToLangList(IEnumerable enumerable)
     {
         var list = new List<LangValueType>();
 
@@ -1035,7 +1035,7 @@ public class LinqQueryExecutor(VariateManager manager)
     /// <summary>
     /// 判断值是否为真
     /// </summary>
-    private bool IsTruthy(LangValueType value)
+    internal bool IsTruthy(LangValueType value)
     {
         return value switch
         {

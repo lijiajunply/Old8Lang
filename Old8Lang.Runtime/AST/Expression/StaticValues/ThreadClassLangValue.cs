@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 
 public partial class ThreadClassLangValue : LangValueType
 {
-    private static readonly ThreadClassLangValue Instance = new();
+    internal static readonly ThreadClassLangValue Instance = new();
 
     /// <summary>
     /// 获取 Task 类的全局单例
@@ -82,7 +82,7 @@ public partial class ThreadClassLangValue : LangValueType
     /// <summary>
     /// WhenAll 静态方法实现
     /// </summary>
-    private static LangValueType WhenAll(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType WhenAll(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -116,7 +116,7 @@ public partial class ThreadClassLangValue : LangValueType
     /// <summary>
     /// WhenAny 静态方法实现
     /// </summary>
-    private static LangValueType WhenAny(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType WhenAny(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -150,7 +150,7 @@ public partial class ThreadClassLangValue : LangValueType
     /// <summary>
     /// Delay 静态方法实现
     /// </summary>
-    private static LangValueType Delay(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Delay(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -170,7 +170,7 @@ public partial class ThreadClassLangValue : LangValueType
     /// <summary>
     /// Sleep 静态方法实现
     /// </summary>
-    private static LangValueType Sleep(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType Sleep(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -193,7 +193,7 @@ public partial class ThreadClassLangValue : LangValueType
     /// <summary>
     /// CurrentThread 静态方法实现 - 返回当前线程的 ThreadLangValue 包装
     /// </summary>
-    private static LangValueType CurrentThread(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CurrentThread(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 0)
         {

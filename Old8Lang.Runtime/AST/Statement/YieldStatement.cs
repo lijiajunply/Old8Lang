@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public partial class YieldStatement(LangExpression yieldExpression, SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// yield表达式
     /// </summary>

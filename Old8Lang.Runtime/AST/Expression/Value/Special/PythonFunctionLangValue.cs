@@ -14,8 +14,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class PythonFunctionLangValue : FuncLangValue
 {
-    private readonly dynamic _pythonFunction;
-    private readonly string _functionName;
+    internal readonly dynamic _pythonFunction;
+    internal readonly string _functionName;
 
     /// <summary>
     /// 构造 Python 函数包装器
@@ -57,7 +57,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 执行 Python 函数调用
     /// </summary>
-    private LangValueType ExecutePythonFunction(VariateManager variateManagerFunc, List<LangExpression> positionalArgs)
+    internal LangValueType ExecutePythonFunction(VariateManager variateManagerFunc, List<LangExpression> positionalArgs)
     {
         using (Py.GIL())
         {
@@ -92,7 +92,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 执行 Python 函数调用（支持命名参数）
     /// </summary>
-    private LangValueType ExecutePythonFunctionWithNamedArgs(
+    internal LangValueType ExecutePythonFunctionWithNamedArgs(
         VariateManager variateManagerFunc,
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs)
@@ -145,7 +145,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Old8Lang 值转换为 Python 对象
     /// </summary>
-    private PyObject ConvertToPython(LangValueType value)
+    internal PyObject ConvertToPython(LangValueType value)
     {
         return value switch
         {
@@ -163,7 +163,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将列表转换为 Python list
     /// </summary>
-    private PyObject ConvertListToPython(ILangList list)
+    internal PyObject ConvertListToPython(ILangList list)
     {
         var pyList = new PyList();
         foreach (var item in list.GetItems())
@@ -177,7 +177,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将字典转换为 Python dict
     /// </summary>
-    private PyObject ConvertDictToPython(DictionaryLangValue dict)
+    internal PyObject ConvertDictToPython(DictionaryLangValue dict)
     {
         var pyDict = new PyDict();
         foreach (var kvp in dict.Value)
@@ -193,7 +193,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Python 对象转换为 Old8Lang 值
     /// </summary>
-    private LangValueType ConvertFromPython(dynamic? pyObj)
+    internal LangValueType ConvertFromPython(dynamic? pyObj)
     {
         // 检查是否为 null 或 Python None
         if (pyObj is null)
@@ -292,7 +292,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Python list 转换为 Old8Lang 列表
     /// </summary>
-    private LangValueType ConvertListFromPython(dynamic pyList)
+    internal LangValueType ConvertListFromPython(dynamic pyList)
     {
         var list = new List<LangValueType>();
         foreach (var item in pyList)
@@ -306,7 +306,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Python dict 转换为 Old8Lang 字典
     /// </summary>
-    private LangValueType ConvertDictFromPython(dynamic pyDict)
+    internal LangValueType ConvertDictFromPython(dynamic pyDict)
     {
         // 创建空字典并直接填充运行时值
         var dict = new DictionaryLangValue();
@@ -325,7 +325,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// 将 Python tuple 转换为 Old8Lang 列表
     /// （因为 TupleLangValue 是 AST 节点需要表达式，我们用列表表示运行时元组）
     /// </summary>
-    private LangValueType ConvertTupleFromPython(dynamic pyTuple)
+    internal LangValueType ConvertTupleFromPython(dynamic pyTuple)
     {
         var items = new List<LangValueType>();
         foreach (var item in pyTuple)

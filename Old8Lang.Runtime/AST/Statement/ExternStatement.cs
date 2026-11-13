@@ -199,22 +199,22 @@ public partial class ExternStatement : OldStatement
     /// <summary>
     /// DLL/模块名称（对于 C/C++ 是 DLL 名，对于 Python 是脚本路径或模块名）
     /// </summary>
-    private readonly string _dllName;
+    internal readonly string _dllName;
 
     /// <summary>
     /// 外部函数声明列表
     /// </summary>
-    private readonly List<ExternFunctionDeclaration> _functions;
+    internal readonly List<ExternFunctionDeclaration> _functions;
 
     /// <summary>
     /// 默认调用约定（仅用于 C/C++ P/Invoke）
     /// </summary>
-    private readonly CallingConventionType _defaultCallingConvention;
+    internal readonly CallingConventionType _defaultCallingConvention;
 
     /// <summary>
     /// Extern 类型（C/C++ DLL、Python 脚本或 Python 模块）
     /// </summary>
-    private readonly ExternType _externType;
+    internal readonly ExternType _externType;
 
     /// <summary>
     /// 构造函数：创建 extern 语句
@@ -353,7 +353,7 @@ public partial class ExternStatement : OldStatement
     /// <summary>
     /// 格式化函数签名为字符串
     /// </summary>
-    private string FormatFunctionSignature(ExternFunctionDeclaration func)
+    internal string FormatFunctionSignature(ExternFunctionDeclaration func)
     {
         if (func.FunctionSignature is null)
             return "()";

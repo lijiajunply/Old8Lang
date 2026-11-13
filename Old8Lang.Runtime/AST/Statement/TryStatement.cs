@@ -21,6 +21,7 @@ public partial class TryStatement(
     BlockStatement? finallyBlock = null,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 获取 try 块
     /// </summary>
@@ -53,7 +54,7 @@ public partial class TryStatement(
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         try
         {
@@ -132,7 +133,7 @@ public partial class TryStatement(
     /// <summary>
     /// 生成器上下文模式执行
     /// </summary>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 
@@ -294,7 +295,7 @@ public partial class TryStatement(
         Accept(visitor);
     }
 
-    private static bool IsMatch(Old8Exception exception, string exceptionType)
+    internal static bool IsMatch(Old8Exception exception, string exceptionType)
     {
         if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception" || exceptionType == "Old8Exception")
         {

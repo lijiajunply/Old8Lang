@@ -105,7 +105,7 @@ public partial class FuncLangValue
     /// 例如: "T?" -> "int?" (当 T 映射到 int 时)
     /// </summary>
 
-    private static string ReplaceGenericTypeParameters(string typeString, Dictionary<string, ITypeInfo> typeArguments)
+    internal static string ReplaceGenericTypeParameters(string typeString, Dictionary<string, ITypeInfo> typeArguments)
     {
         if (string.IsNullOrEmpty(typeString))
             return typeString;
@@ -186,7 +186,7 @@ public partial class FuncLangValue
     /// 查找匹配的右尖括号
     /// </summary>
 
-    private static int FindMatchingBracket(string text, int startIndex)
+    internal static int FindMatchingBracket(string text, int startIndex)
     {
         int depth = 0;
         for (int i = startIndex; i < text.Length; i++)
@@ -202,7 +202,7 @@ public partial class FuncLangValue
     /// 分割泛型参数（考虑嵌套）
     /// </summary>
 
-    private static List<string> SplitGenericParameters(string parameters)
+    internal static List<string> SplitGenericParameters(string parameters)
     {
         var result = new List<string>();
         var current = new System.Text.StringBuilder();
@@ -233,7 +233,7 @@ public partial class FuncLangValue
     /// 按顶层分隔符分割（不分割泛型括号内的内容）
     /// </summary>
 
-    private static List<string> SplitTopLevelSeparator(string text, char separator)
+    internal static List<string> SplitTopLevelSeparator(string text, char separator)
     {
         var result = new List<string>();
         var current = new System.Text.StringBuilder();

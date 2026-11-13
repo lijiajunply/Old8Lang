@@ -19,7 +19,7 @@ public partial class FuncLangValue : ImportInfo
 
     public readonly MethodInfo? Method;
 
-    private readonly FuncLangValue? _func;
+    internal readonly FuncLangValue? _func;
 
     // 闭包环境：捕获的作用域，用于支持闭包变量访问
     internal VariateManager? CapturedScope { get; init; }
@@ -54,7 +54,7 @@ public partial class FuncLangValue : ImportInfo
     internal VariateManager? GetCapturedScope() => CapturedScope;
 
     // 函数类型：区分普通方法和Lambda表达式
-    private bool IsLambda { get; init; }
+    internal bool IsLambda { get; init; }
 
     /// <summary>
     /// 是否为匿名函数（lambda 或无名函数字面量），即需要作为「函数值」传递的函数。
@@ -62,7 +62,7 @@ public partial class FuncLangValue : ImportInfo
     public bool IsLambdaExpression => IsLambda || Id is null;
 
     // 默认参数值缓存：缓存常量表达式的默认值，避免重复求值
-    private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
+    internal Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 
     /// <summary>
     /// 泛型参数列表
@@ -97,12 +97,12 @@ public partial class FuncLangValue : ImportInfo
     /// 应用装饰器后的函数（延迟应用）
     /// 在函数第一次被调用时应用装饰器，并缓存结果
     /// </summary>
-    private FuncLangValue? _decoratedFunc;
+    internal FuncLangValue? _decoratedFunc;
 
     /// <summary>
     /// 装饰器是否已经应用
     /// </summary>
-    private bool _decoratorsApplied;
+    internal bool _decoratorsApplied;
 
     public FuncLangValue(
         LangId? id,

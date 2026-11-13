@@ -38,6 +38,8 @@ public partial class TypeInferenceVisitor
     // ReturnStatement返回其表达式的类型
     public Type VisitReturnStatement(ReturnStatement node)
     {
-        return node.OutputType(local);
+
+return node.Expression.OutputType(local)!;
+    
     }
 }

@@ -30,12 +30,12 @@ public partial class LockedVariableLangValue : LangValueType
     /// <summary>
     /// 用于同步访问的锁对象
     /// </summary>
-    private readonly Lock _lock = new();
+    internal readonly Lock _lock = new();
 
     /// <summary>
     /// 内部存储的值
     /// </summary>
-    private LangValueType _value;
+    internal LangValueType _value;
 
     /// <summary>
     /// 变量名（用于错误报告和调试）

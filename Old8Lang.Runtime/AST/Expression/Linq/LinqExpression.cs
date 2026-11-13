@@ -15,6 +15,7 @@ public partial class LinqExpression(
     SourcePosition position = default)
     : LangExpression(position)
 {
+
     /// <summary>
     /// From 子句
     /// </summary>
@@ -65,7 +66,7 @@ public partial class LinqExpression(
     /// <summary>
     /// 生成 LINQ 方法调用链的 IL 代码
     /// </summary>
-    private void GenerateLinqMethodCalls(ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateLinqMethodCalls(ILGenerator ilGenerator, LocalManager local)
     {
         // 1. 加载数据源
         FromClause.DataSource.LoadIlValue(ilGenerator, local);
@@ -95,7 +96,7 @@ public partial class LinqExpression(
     /// <summary>
     /// 将值转换为 IEnumerable
     /// </summary>
-    private void ConvertToEnumerable(ILGenerator ilGenerator)
+    internal void ConvertToEnumerable(ILGenerator ilGenerator)
     {
         // 使用辅助方法进行转换，简化 IL 代码生成
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
@@ -114,7 +115,7 @@ public partial class LinqExpression(
     /// <summary>
     /// 生成查询体子句的 IL 代码
     /// </summary>
-    private void GenerateClauseIL(LinqClause clause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateClauseIL(LinqClause clause, ILGenerator ilGenerator, LocalManager local)
     {
         switch (clause)
         {
@@ -138,7 +139,7 @@ public partial class LinqExpression(
     /// <summary>
     /// 生成终止子句的 IL 代码
     /// </summary>
-    private void GenerateTerminationClauseIL(LinqClause clause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateTerminationClauseIL(LinqClause clause, ILGenerator ilGenerator, LocalManager local)
     {
         switch (clause)
         {

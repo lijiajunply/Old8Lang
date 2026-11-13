@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression;
 /// </summary>
 public partial class AsyncStreamExpression : LangExpression
 {
-    private readonly BlockStatement _block;
+    internal readonly BlockStatement _block;
 
     /// <summary>
     /// 构造函数

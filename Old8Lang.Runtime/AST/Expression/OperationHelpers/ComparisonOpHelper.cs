@@ -19,7 +19,7 @@ internal static class ComparisonOpHelper
     /// <param name="leftType">左操作数类型</param>
     /// <param name="rightType">右操作数类型</param>
     /// <returns>如果是 object vs int 特殊情况返回 true</returns>
-    private static bool IsObjectVsNumericComparison(Type? leftType, Type? rightType)
+    internal static bool IsObjectVsNumericComparison(Type? leftType, Type? rightType)
     {
         return (leftType == typeof(object) && IsNumericType(rightType)) ||
                (IsNumericType(leftType) && rightType == typeof(object));
@@ -28,7 +28,7 @@ internal static class ComparisonOpHelper
     /// <summary>
     /// 装箱数值类型为 object
     /// </summary>
-    private static void BoxNumericIfNeeded(ILGenerator ilGenerator, Type? leftType, Type? rightType)
+    internal static void BoxNumericIfNeeded(ILGenerator ilGenerator, Type? leftType, Type? rightType)
     {
         if (leftType is not null && IsNumericType(leftType))
         {
@@ -40,14 +40,14 @@ internal static class ComparisonOpHelper
         }
     }
 
-    private static bool IsNumericType(Type? type) => type == typeof(int) || type == typeof(double) ||
+    internal static bool IsNumericType(Type? type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
     /// <summary>
     /// 将基本类型转换为 LangValueType
     /// </summary>
-    private static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
+    internal static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
     {
         if (type == typeof(int))
         {

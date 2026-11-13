@@ -97,7 +97,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <summary>
     /// 应用装饰器到函数
     /// </summary>
-    private FuncLangValue ApplyDecorators(FuncLangValue originalFunc, VariateManager manager)
+    internal FuncLangValue ApplyDecorators(FuncLangValue originalFunc, VariateManager manager)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {
@@ -119,7 +119,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <summary>
     /// 应用单个装饰器
     /// </summary>
-    private FuncLangValue ApplySingleDecorator(FunctionDecorator decorator, FuncLangValue targetFunc,
+    internal FuncLangValue ApplySingleDecorator(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
     {
         // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
@@ -220,7 +220,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// 在 IL 模式下应用装饰器到函数
     /// 策略：使用解释器执行装饰器函数，获取包装后的函数
     /// </summary>
-    private FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
+    internal FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {
@@ -243,7 +243,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <summary>
     /// 在 IL 模式下应用单个装饰器
     /// </summary>
-    private FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc,
+    internal FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
     {
         // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
@@ -603,7 +603,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// 验证函数的类型注解完整性（IL 模式要求）
     /// </summary>
     /// <param name="local">局部变量管理器，用于报告错误</param>
-    private void ValidateTypeAnnotations(LocalManager local)
+    internal void ValidateTypeAnnotations(LocalManager local)
     {
         var inferenceEnabled = TypeInferenceConfig.Instance.EnableTypeInference;
 
@@ -712,7 +712,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <param name="statement">要分析的语句块</param>
     /// <param name="local">局部变量管理器</param>
     /// <returns>推断出的返回类型</returns>
-    private static Type GetItemType(OldStatement statement, LocalManager local)
+    internal static Type GetItemType(OldStatement statement, LocalManager local)
     {
         for (var i = 0; i < statement.Count; i++)
         {
@@ -780,7 +780,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// 验证 params 参数的合法性
     /// </summary>
     /// <exception cref="SyntaxError">当 params 参数使用不当时抛出</exception>
-    private void ValidateParamsParameter()
+    internal void ValidateParamsParameter()
     {
         if (FuncValue.Ids is null || FuncValue.Ids.Count == 0)
         {

@@ -12,6 +12,7 @@ public class GroupByClause(
     SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 分组元素表达式
     /// </summary>

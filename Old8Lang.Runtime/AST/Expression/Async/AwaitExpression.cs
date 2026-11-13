@@ -157,7 +157,7 @@ public partial class AwaitExpression : LangExpression
     /// <summary>
     /// 生成异步状态机相关的等待代码
     /// </summary>
-    private void GenerateAsyncAwait(ILGenerator il, LocalManager local, Type exprType)
+    internal void GenerateAsyncAwait(ILGenerator il, LocalManager local, Type exprType)
     {
         var generator = local.AsyncStateMachineGenerator!;
         var stateIndex = generator.GetStateIndex(this);

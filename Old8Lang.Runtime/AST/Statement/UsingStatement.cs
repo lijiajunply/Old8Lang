@@ -21,6 +21,7 @@ public partial class UsingStatement(
     BlockStatement blockStatement,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 获取变量名（可能为null）
     /// </summary>
@@ -52,7 +53,7 @@ public partial class UsingStatement(
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         // 1. 执行资源表达式
         var resource = resourceExpression.Run(manager);
@@ -78,7 +79,7 @@ public partial class UsingStatement(
     /// <summary>
     /// 生成器上下文模式执行
     /// </summary>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 
@@ -135,7 +136,7 @@ public partial class UsingStatement(
     /// <summary>
     /// 释放资源
     /// </summary>
-    private void DisposeResource(LangValueType resource)
+    internal void DisposeResource(LangValueType resource)
     {
         // 1. 如果是整数值（资源ID），尝试通过ResourceManager释放
         if (resource is IntLangValue intVal)

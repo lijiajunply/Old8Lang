@@ -21,15 +21,16 @@ public partial class EnumInit(
     List<(string name, LangExpression? value)> members,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 枚举名称
     /// </summary>
-    private readonly string _enumName = enumName;
+    internal readonly string _enumName = enumName;
 
     /// <summary>
     /// 枚举成员列表（成员名和可选的显式值）
     /// </summary>
-    private readonly List<(string name, LangExpression? value)> _members = members;
+    internal readonly List<(string name, LangExpression? value)> _members = members;
 
     /// <summary>
     /// 公共属性，用于访问枚举名称

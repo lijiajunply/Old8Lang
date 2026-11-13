@@ -13,15 +13,15 @@ public class LazySymbolProxy(
     SourcePosition position = default
 ) : LangValueType(position)
 {
-    private LangValueType? _cachedSymbol;
-    private bool _isResolved;
-    private readonly Lock _resolveLock = new();
+    internal LangValueType? _cachedSymbol;
+    internal bool _isResolved;
+    internal readonly Lock _resolveLock = new();
 
     /// <summary>
     /// 解析并获取真实符号
     /// </summary>
     /// <returns>真实符号值</returns>
-    private LangValueType ResolveSymbol()
+    internal LangValueType ResolveSymbol()
     {
         if (_isResolved) return _cachedSymbol!;
         lock (_resolveLock)

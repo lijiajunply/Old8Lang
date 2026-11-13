@@ -18,7 +18,7 @@ public static class AnyValueFuncStatic
     /// <param name="element">要转换的JsonElement</param>
     /// <param name="node">用于错误报告的节点</param>
     /// <returns>转换后的Old8Lang值类型</returns>
-    private static LangValueType GetJsonElement(JsonElement element, IOldLangTree node)
+    internal static LangValueType GetJsonElement(JsonElement element, IOldLangTree node)
     {
         return element.ValueKind switch
         {

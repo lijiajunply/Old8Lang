@@ -11,6 +11,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position">位置信息</param>
 public partial class VoidLangValue(SourcePosition position = default) : LangValueType(position)
 {
+
     /// <summary>
     /// 单例实例，用于减少对象创建开销（VoidLangValue 是无状态的）
     /// </summary>

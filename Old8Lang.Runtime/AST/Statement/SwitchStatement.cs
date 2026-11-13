@@ -211,7 +211,7 @@ public partial class SwitchStatement(
         ilGenerator.MarkLabel(labelEnd);
     }
 
-    private bool TryGenerateIntSwitch(ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel,
+    internal bool TryGenerateIntSwitch(ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel,
         List<Label> caseLabels)
     {
         // 1. 检查是否所有 case 都是整数常量
@@ -290,6 +290,7 @@ public partial class CaseStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
+
     public LangExpression Expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;
 

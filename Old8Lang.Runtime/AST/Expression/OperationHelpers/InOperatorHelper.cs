@@ -17,7 +17,7 @@ internal static class InOperatorHelper
     /// <param name="ilGenerator">IL生成器</param>
     /// <param name="collectionType">集合类型</param>
     /// <param name="valueType">值类型</param>
-    private static void SwapStackOrder(ILGenerator ilGenerator, Type collectionType, Type valueType)
+    internal static void SwapStackOrder(ILGenerator ilGenerator, Type collectionType, Type valueType)
     {
         var collectionLocal = ilGenerator.DeclareLocal(collectionType);
         var valueLocal = ilGenerator.DeclareLocal(valueType);
@@ -34,7 +34,7 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成 List&lt;T&gt; 的 Contains 检查
     /// </summary>
-    private static void GenerateListContains(ILGenerator ilGenerator, Type listType)
+    internal static void GenerateListContains(ILGenerator ilGenerator, Type listType)
     {
         // 交换栈顺序：[value, list] -> [list, value]
         SwapStackOrder(ilGenerator, listType, typeof(object));
@@ -47,7 +47,7 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成数组的 IndexOf 检查
     /// </summary>
-    private static void GenerateArrayIndexOf(ILGenerator ilGenerator, Type arrayType)
+    internal static void GenerateArrayIndexOf(ILGenerator ilGenerator, Type arrayType)
     {
         // 交换栈顺序：[value, array] -> [array, value]
         SwapStackOrder(ilGenerator, arrayType, typeof(object));
@@ -66,7 +66,7 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成 Dictionary&lt;TKey, TValue&gt; 的 ContainsKey 检查
     /// </summary>
-    private static void GenerateDictionaryContainsKey(ILGenerator ilGenerator, Type dictType)
+    internal static void GenerateDictionaryContainsKey(ILGenerator ilGenerator, Type dictType)
     {
         // 交换栈顺序：[value, dict] -> [dict, value]
         SwapStackOrder(ilGenerator, dictType, typeof(object));
@@ -79,7 +79,7 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成字符串的 Contains 检查
     /// </summary>
-    private static void GenerateStringContains(ILGenerator ilGenerator)
+    internal static void GenerateStringContains(ILGenerator ilGenerator)
     {
         // 交换栈顺序：[value, string] -> [string, value]
         SwapStackOrder(ilGenerator, typeof(string), typeof(object));
@@ -97,7 +97,7 @@ internal static class InOperatorHelper
     /// <param name="leftType">左侧值类型</param>
     /// <param name="operation">操作节点（用于错误报告）</param>
     /// <returns>如果成功生成返回 true，否则返回 false</returns>
-    private static bool TryGenerateGenericContains(
+    internal static bool TryGenerateGenericContains(
         ILGenerator ilGenerator,
         Type collectionType,
         Type? leftType,

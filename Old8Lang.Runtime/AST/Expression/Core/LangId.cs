@@ -30,6 +30,7 @@ public partial class LangId(
     bool isParams = false,
     SourcePosition position = default) : LangExpression(position)
 {
+
     /// <summary>
     /// 标识符名称
     /// </summary>
@@ -218,7 +219,7 @@ public partial class LangId(
     /// <remarks>
     /// 如果同名函数存在多个重载，返回 false，避免静默选中错误的重载。
     /// </remarks>
-    private static bool TryGetFunctionMethod(string name, LocalManager local, out MethodInfo method)
+    internal static bool TryGetFunctionMethod(string name, LocalManager local, out MethodInfo method)
     {
         if (local.DelegateVar.TryGetValue(name, out var exactMatch))
         {

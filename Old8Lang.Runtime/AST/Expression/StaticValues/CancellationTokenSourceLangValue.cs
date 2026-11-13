@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class CancellationTokenSourceLangValue : LangValueType
 {
-    private readonly CancellationTokenSource _cts;
+    internal readonly CancellationTokenSource _cts;
 
     /// <summary>
     /// 获取取消令牌
@@ -131,7 +131,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return base.Dot(dotExpression, manager);
     }
 
-    private LangValueType CallCancel(List<LangExpression> args)
+    internal LangValueType CallCancel(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -142,7 +142,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallCancelAfter(List<LangExpression> args, VariateManager manager)
+    internal LangValueType CallCancelAfter(List<LangExpression> args, VariateManager manager)
     {
         if (args.Count != 1)
         {
@@ -159,7 +159,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallDispose(List<LangExpression> args)
+    internal LangValueType CallDispose(List<LangExpression> args)
     {
         if (args.Count != 0)
         {

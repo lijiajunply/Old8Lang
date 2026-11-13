@@ -18,6 +18,7 @@ public partial class NestedIndexAccess(
     SourcePosition position = default)
     : LangValueType(position)
 {
+
     public readonly LangExpression BaseExpression = baseExpression;
     public readonly LangExpression NestedIndex = nestedIndex;
 
@@ -213,7 +214,7 @@ public partial class NestedIndexAccess(
     /// <summary>
     /// 获取 ValueTuple 指定索引位置的元素类型
     /// </summary>
-    private Type? GetValueTupleElementType(Type tupleType, int index)
+    internal Type? GetValueTupleElementType(Type tupleType, int index)
     {
         if (index < 0) return null;
 
@@ -241,7 +242,7 @@ public partial class NestedIndexAccess(
     /// <summary>
     /// 获取 ValueTuple 字段名称
     /// </summary>
-    private string GetValueTupleFieldName(int index)
+    internal string GetValueTupleFieldName(int index)
     {
         return $"Item{index + 1}";
     }
@@ -250,7 +251,7 @@ public partial class NestedIndexAccess(
     /// 在 IL 中加载 ValueTuple 指定索引位置的字段
     /// 处理超过 7 个元素的情况（递归访问 Rest 字段）
     /// </summary>
-    private void LoadValueTupleField(ILGenerator ilGenerator, Type tupleType, int index)
+    internal void LoadValueTupleField(ILGenerator ilGenerator, Type tupleType, int index)
     {
         if (index < 0)
         {

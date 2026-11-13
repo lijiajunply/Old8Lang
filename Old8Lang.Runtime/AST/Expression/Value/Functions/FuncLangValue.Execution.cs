@@ -97,7 +97,7 @@ public partial class FuncLangValue
     /// 通过作用域令牌的身份比较来判断：作用域字典在退出后会被清空并放回缓存池复用，
     /// 令牌对象则一次性分配、从不复用，因此不会把复用的帧误认成原来那个帧。
     /// </remarks>
-    private bool ClosureFrameStillAlive(VariateManager home)
+    internal bool ClosureFrameStillAlive(VariateManager home)
     {
         // 外层管理器不是线程安全的：只有同一线程上的调用才能写回外层帧
         if (CapturedHomeThreadId != Environment.CurrentManagedThreadId)
@@ -204,7 +204,7 @@ public partial class FuncLangValue
     /// <param name="callPosition">调用位置</param>
     /// <returns>重新排序后的参数列表</returns>
 
-    private List<LangExpression> ReorderArgumentsWithNamedParameters(
+    internal List<LangExpression> ReorderArgumentsWithNamedParameters(
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
         SourcePosition callPosition)
@@ -318,7 +318,7 @@ public partial class FuncLangValue
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
 
-    private void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
+    internal void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
     {
         // 检查命名参数是否重复
         var seenNames = new HashSet<string>();
@@ -352,7 +352,7 @@ public partial class FuncLangValue
     /// <param name="callPosition">调用位置</param>
     /// <param name="obj">对象实例（方法调用时使用）</param>
     /// <returns>重新排序后的参数列表</returns>
-    private List<LangExpression> ReorderNativeMethodArguments(
+    internal List<LangExpression> ReorderNativeMethodArguments(
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
         SourcePosition callPosition,
@@ -836,7 +836,7 @@ public partial class FuncLangValue
     /// </summary>
     /// <param name="manager">变量管理器</param>
     /// <returns>应用装饰器后的函数</returns>
-    private FuncLangValue ApplyDecoratorsLazy(VariateManager manager)
+    internal FuncLangValue ApplyDecoratorsLazy(VariateManager manager)
     {
         if (Decorators is null || Decorators.Count == 0)
         {
@@ -858,7 +858,7 @@ public partial class FuncLangValue
     /// <summary>
     /// 延迟应用单个装饰器
     /// </summary>
-    private FuncLangValue ApplySingleDecoratorLazy(FunctionDecorator decorator, FuncLangValue targetFunc,
+    internal FuncLangValue ApplySingleDecoratorLazy(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
     {
         // 将目标函数临时注册到全局作用域，以便装饰器可以引用它

@@ -63,7 +63,7 @@ public partial class AsyncFuncInit : OldStatement
     /// <summary>
     /// 应用装饰器到异步函数
     /// </summary>
-    private AsyncFuncLangValue ApplyDecorators(AsyncFuncLangValue originalFunc, VariateManager manager)
+    internal AsyncFuncLangValue ApplyDecorators(AsyncFuncLangValue originalFunc, VariateManager manager)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {
@@ -95,7 +95,7 @@ public partial class AsyncFuncInit : OldStatement
     /// <summary>
     /// 应用单个装饰器
     /// </summary>
-    private LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)
+    internal LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)
     {
         // 将目标函数临时注册
         var tempVarName = $"__decorator_target_{Guid.NewGuid():N}";
@@ -276,7 +276,7 @@ public partial class AsyncFuncInit : OldStatement
     /// <summary>
     /// 生成异步方法体的IL代码
     /// </summary>
-    private void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
         AsyncFuncValue.GenerateMethodBody(ilGenerator, local);
     }

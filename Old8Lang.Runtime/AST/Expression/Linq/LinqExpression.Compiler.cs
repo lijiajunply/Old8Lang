@@ -15,7 +15,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 Where 子句的 IL 代码
     /// </summary>
-    private void GenerateWhereClauseIL(WhereClause whereClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateWhereClauseIL(WhereClause whereClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 我们需要生成类似于 source.Where(x => condition) 的代码
@@ -86,7 +86,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 Select 子句的 IL 代码
     /// </summary>
-    private void GenerateSelectClauseIL(SelectClause selectClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateSelectClauseIL(SelectClause selectClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 我们需要生成类似于 source.Select(x => projection) 的代码
@@ -153,7 +153,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 OrderBy 子句的 IL 代码
     /// </summary>
-    private void GenerateOrderByClauseIL(OrderByClause orderByClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateOrderByClauseIL(OrderByClause orderByClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 首先将其转换为 List<object>
@@ -200,7 +200,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 Let 子句的 IL 代码
     /// </summary>
-    private void GenerateLetClauseIL(LetClause letClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateLetClauseIL(LetClause letClause, ILGenerator ilGenerator, LocalManager local)
     {
         // Let 子句需要在遍历过程中计算表达式并存储到变量
         // 由于Let子句在循环内部执行，我们需要在循环外部声明变量
@@ -265,7 +265,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 GroupBy 子句的 IL 代码
     /// </summary>
-    private void GenerateGroupByClauseIL(GroupByClause groupByClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateGroupByClauseIL(GroupByClause groupByClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 创建分组字典
@@ -338,7 +338,7 @@ public partial class LinqExpression
     /// 生成 Join 子句的 IL 代码
     /// 支持 Inner Join 和 Group Join
     /// </summary>
-    private void GenerateJoinClauseIL(JoinClause joinClause, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateJoinClauseIL(JoinClause joinClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是外部数据源的 IEnumerable
         // 保存外部数据源
@@ -582,7 +582,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成查询延续（into 子句）的 IL 代码
     /// </summary>
-    private void GenerateContinuationIL(QueryContinuation continuation, ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateContinuationIL(QueryContinuation continuation, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是前一个查询的结果（List<object>）
         // 将结果转换为 ListLangValue 并存储到延续变量
@@ -608,7 +608,7 @@ public partial class LinqExpression
     /// <summary>
     /// 静态方法：将值转换为 IEnumerable（用于 Join 子句中的内部数据源）
     /// </summary>
-    private static void ConvertToEnumerableStatic(ILGenerator ilGenerator)
+    internal static void ConvertToEnumerableStatic(ILGenerator ilGenerator)
     {
         // 调用辅助方法进行转换
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
@@ -617,7 +617,7 @@ public partial class LinqExpression
     /// <summary>
     /// 获取或创建范围变量的局部变量
     /// </summary>
-    private LocalBuilder GetOrCreateRangeVariable(ILGenerator ilGenerator, LocalManager local, string variableName)
+    internal LocalBuilder GetOrCreateRangeVariable(ILGenerator ilGenerator, LocalManager local, string variableName)
     {
         // 检查是否已经存在
         var existingVar = local.GetLocalVar(variableName);
@@ -635,7 +635,7 @@ public partial class LinqExpression
     /// <summary>
     /// 将结果转换为 ListLangValue
     /// </summary>
-    private void ConvertToListLangValue(ILGenerator ilGenerator, LocalManager local)
+    internal void ConvertToListLangValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 List<object> 或 IEnumerable
         // 需要转换为 ListLangValue
@@ -647,7 +647,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成将 object 转换为 LangValueType 的 IL 代码
     /// </summary>
-    private void GenerateConvertToLangValue(ILGenerator ilGenerator)
+    internal void GenerateConvertToLangValue(ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToLangValue")!);
@@ -656,7 +656,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成将 LangValueType 转换为 object 的 IL 代码
     /// </summary>
-    private void GenerateConvertFromLangValue(ILGenerator ilGenerator)
+    internal void GenerateConvertFromLangValue(ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertFromLangValue")!);
@@ -665,7 +665,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成判断 LangValueType 是否为真的 IL 代码
     /// </summary>
-    private void GenerateIsTruthy(ILGenerator ilGenerator)
+    internal void GenerateIsTruthy(ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("IsTruthy")!);
@@ -748,7 +748,7 @@ public static class LinqCompilerHelper
     /// <summary>
     /// 比较两个对象
     /// </summary>
-    private static int CompareObjects(object? a, object? b)
+    internal static int CompareObjects(object? a, object? b)
     {
         if (a == null && b == null) return 0;
         if (a == null) return -1;

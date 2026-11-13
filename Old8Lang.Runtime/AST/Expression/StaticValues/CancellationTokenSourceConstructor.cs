@@ -10,19 +10,19 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public class CancellationTokenSourceConstructor : TaskStaticMethodWrapper
 {
-    private static readonly CancellationTokenSourceConstructor Instance = new();
+    internal static readonly CancellationTokenSourceConstructor Instance = new();
 
     /// <summary>
     /// 获取 CancellationTokenSource 构造函数的全局单例
     /// </summary>
     public static CancellationTokenSourceConstructor GetInstance() => Instance;
 
-    private CancellationTokenSourceConstructor()
+    internal CancellationTokenSourceConstructor()
         : base("CancellationTokenSource", CreateInstance)
     {
     }
 
-    private static LangValueType CreateInstance(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateInstance(List<LangValueType> args, SourcePosition position)
     {
         // 验证参数：CancellationTokenSource() 或 CancellationTokenSource(timeout)
         if (args.Count > 1)

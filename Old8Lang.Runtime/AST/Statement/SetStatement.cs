@@ -28,7 +28,7 @@ public partial class SetStatement : OldStatement
     /// <summary>
     /// 左侧表达式（用于成员访问或索引访问赋值）
     /// </summary>
-    private readonly LangExpression? _leftExpression;
+    internal readonly LangExpression? _leftExpression;
 
     /// <summary>
     /// 获取左侧表达式（用于成员访问或索引访问赋值）
@@ -1213,7 +1213,7 @@ public partial class SetStatement : OldStatement
     /// 「在顶层声明过但尚未提升」的变量写槽位，后者由分析阶段兜底提升。
     /// 参数、局部变量、闭包单元和字段始终优先，不能被全局槽位遮蔽。
     /// </remarks>
-    private bool TryEmitGlobalStore(ILGenerator ilGenerator, LocalManager local)
+    internal bool TryEmitGlobalStore(ILGenerator ilGenerator, LocalManager local)
     {
         if (Id is null || string.IsNullOrEmpty(Id.IdName))
         {
@@ -1279,11 +1279,11 @@ public partial class SetStatement : OldStatement
     /// <summary>
     /// 计算全局槽位赋值右侧表达式的静态类型。
     /// </summary>
-    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+    internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
-    private static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    internal static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
     {
         ilGenerator.Emit(targetType == typeof(double) ? OpCodes.Conv_R8 :
             targetType == typeof(float) ? OpCodes.Conv_R4 :
@@ -1292,7 +1292,7 @@ public partial class SetStatement : OldStatement
             targetType == typeof(byte) ? OpCodes.Conv_U1 : OpCodes.Conv_I4);
     }
 
-    private Type ComputeGlobalValueType(LocalManager local)
+    internal Type ComputeGlobalValueType(LocalManager local)
     {
         if (Id is not null && !string.IsNullOrEmpty(Id.AssumptionType))
         {

@@ -7,6 +7,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public partial class BreakStatement(SourcePosition position = default) : OldStatement(position)
 {
+
     public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(),
         "Indexer not implemented for BreakStatement", "BreakStatement不支持索引访问");
 

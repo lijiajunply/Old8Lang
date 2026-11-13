@@ -14,25 +14,25 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// </summary>
 public class NativeAnyLangValue : ImportInfo
 {
-    private Type? ClassType { get; set; }
+    internal Type? ClassType { get; set; }
     public readonly string ClassName;
 
     // 注册名称（用于别名功能，如果为null则使用ClassName）
     public readonly string RegisterName;
 
-    private readonly string? _dllName;
-    private readonly string? _path;
+    internal readonly string? _dllName;
+    internal readonly string? _path;
 
-    private ConstructorInfo? Constructor { get; set; }
-    private object? InstanceObj { get; set; }
+    internal ConstructorInfo? Constructor { get; set; }
+    internal object? InstanceObj { get; set; }
 
     // 成员信息缓存 - 按类型缓存，所有同类型实例共享
-    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
+    internal static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
 
     /// <summary>
     /// 获取缓存的成员信息（属性、字段或方法）
     /// </summary>
-    private MemberInfo? GetCachedMember(string memberName)
+    internal MemberInfo? GetCachedMember(string memberName)
     {
         if (ClassType is null) return null;
 
@@ -291,7 +291,7 @@ public class NativeAnyLangValue : ImportInfo
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
     /// <returns>重新排序后的参数列表</returns>
-    private List<LangExpression> ReorderArgumentsWithNamedParameters(
+    internal List<LangExpression> ReorderArgumentsWithNamedParameters(
         MethodInfo method,
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
@@ -407,7 +407,7 @@ public class NativeAnyLangValue : ImportInfo
     /// </summary>
     /// <param name="namedArgs">命名参数列表</param>
     /// <param name="callPosition">调用位置</param>
-    private void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
+    internal void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
     {
         // 检查命名参数是否重复
         var seenNames = new HashSet<string>();

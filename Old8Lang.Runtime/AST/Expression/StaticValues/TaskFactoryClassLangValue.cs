@@ -60,7 +60,7 @@ public partial class TaskFactoryClassLangValue : LangValueType
     /// <summary>
     /// StartNew 静态方法实现
     /// </summary>
-    private static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {

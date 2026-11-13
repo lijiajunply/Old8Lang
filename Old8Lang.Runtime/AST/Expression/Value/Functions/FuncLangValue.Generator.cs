@@ -8,9 +8,9 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class FuncLangValue
 {
-    private bool IsGenerator => ContainsYieldStatement(BlockStatement);
+    internal bool IsGenerator => ContainsYieldStatement(BlockStatement);
 
-    private bool ContainsYieldStatement(OldStatement stmt)
+    internal bool ContainsYieldStatement(OldStatement stmt)
     {
         if (stmt is YieldStatement)
             return true;

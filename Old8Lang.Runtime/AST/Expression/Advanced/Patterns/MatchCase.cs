@@ -183,7 +183,7 @@ public class MatchCase
     /// <summary>
     /// 执行元组解构匹配
     /// </summary>
-    private bool MatchTuple(LangValueType value, VariateManager manager, out Dictionary<string, LangValueType>? boundValues)
+    internal bool MatchTuple(LangValueType value, VariateManager manager, out Dictionary<string, LangValueType>? boundValues)
     {
         boundValues = null;
 
@@ -239,7 +239,7 @@ public class MatchCase
     /// <summary>
     /// 执行类型匹配（带可选守卫条件）
     /// </summary>
-    private bool MatchType(LangValueType value, VariateManager manager, out Dictionary<string, LangValueType>? boundValues)
+    internal bool MatchType(LangValueType value, VariateManager manager, out Dictionary<string, LangValueType>? boundValues)
     {
         boundValues = null;
 
@@ -290,7 +290,7 @@ public class MatchCase
     /// <summary>
     /// 执行范围匹配
     /// </summary>
-    private bool MatchRange(LangValueType value, VariateManager manager)
+    internal bool MatchRange(LangValueType value, VariateManager manager)
     {
         if (RangePattern is null)
             return false;
@@ -336,7 +336,7 @@ public class MatchCase
     /// <summary>
     /// 检查值的类型是否匹配给定的类型注解
     /// </summary>
-    private static bool CheckTypeMatch(LangValueType value, string typeAnnotation)
+    internal static bool CheckTypeMatch(LangValueType value, string typeAnnotation)
     {
         return typeAnnotation.ToLower() switch
         {
@@ -356,7 +356,7 @@ public class MatchCase
     /// <summary>
     /// 尝试从值中获取数值
     /// </summary>
-    private static bool TryGetNumericValue(LangValueType value, out double numValue)
+    internal static bool TryGetNumericValue(LangValueType value, out double numValue)
     {
         numValue = 0;
 
@@ -379,7 +379,7 @@ public class MatchCase
     /// <summary>
     /// 获取元组的元素列表
     /// </summary>
-    private static List<LangValueType> FlattenTuple(TupleLangValue tuple)
+    internal static List<LangValueType> FlattenTuple(TupleLangValue tuple)
     {
         return tuple.GetItems().ToList();
     }

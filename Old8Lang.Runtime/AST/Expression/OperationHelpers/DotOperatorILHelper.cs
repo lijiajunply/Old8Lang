@@ -94,7 +94,7 @@ public static class DotOperatorILHelper
     /// 生成模块别名成员访问的 IL（IL 模式）：import "m" as tm 后，tm.member 等价于 member。
     /// 模块体已被 GenerateImportIl 内联到当前方法，因此直接把成员名当作普通符号编译。
     /// </summary>
-    private static Type GenerateModuleAliasMember(
+    internal static Type GenerateModuleAliasMember(
         LangId aliasId,
         LangExpression? right,
         ILGenerator ilGenerator,
@@ -123,7 +123,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 this.member 访问的IL代码
     /// </summary>
-    private static Type GenerateThisMemberAccess(
+    internal static Type GenerateThisMemberAccess(
         LangExpression? right,
         ILGenerator ilGenerator,
         LocalManager local)
@@ -198,7 +198,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成实例方法调用的IL代码
     /// </summary>
-    private static Type GenerateInstanceMethodCall(
+    internal static Type GenerateInstanceMethodCall(
         LangExpression? left,
         Instance instance,
         ILGenerator ilGenerator,
@@ -303,7 +303,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成直接调用父类实例方法的 IL，绕开 CLR 虚分派以实现语言层 <c>super</c> 语义。
     /// </summary>
-    private static Type GenerateSuperInstanceMethodCall(
+    internal static Type GenerateSuperInstanceMethodCall(
         Instance instance,
         ILGenerator ilGenerator,
         LocalManager local,
@@ -337,7 +337,7 @@ public static class DotOperatorILHelper
         return method.ReturnType;
     }
 
-    private static bool ParametersMatch(ParameterInfo[] parameters, Type[] argumentTypes)
+    internal static bool ParametersMatch(ParameterInfo[] parameters, Type[] argumentTypes)
     {
         if (parameters.Length != argumentTypes.Length)
         {
@@ -353,7 +353,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Assert 静态方法调用的IL代码
     /// </summary>
-    private static Type GenerateAssertMethodCall(
+    internal static Type GenerateAssertMethodCall(
         Instance instance,
         ILGenerator ilGenerator,
         LocalManager local,
@@ -477,7 +477,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task 静态方法调用的IL代码
     /// </summary>
-    private static Type GenerateTaskStaticMethodCall(
+    internal static Type GenerateTaskStaticMethodCall(
         Instance instance,
         ILGenerator ilGenerator,
         LocalManager local)
@@ -519,7 +519,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.Delay 的IL代码
     /// </summary>
-    private static Type GenerateTaskDelay(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskDelay(List<Type> paramTypes, ILGenerator ilGenerator)
     {
         MethodInfo methodInfo;
         if (paramTypes.Count == 1 && paramTypes[0] == typeof(int))
@@ -545,7 +545,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.FromResult 的IL代码
     /// </summary>
-    private static Type GenerateTaskFromResult(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskFromResult(List<Type> paramTypes, ILGenerator ilGenerator)
     {
         if (paramTypes.Count == 1)
         {
@@ -564,7 +564,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.FromException 的IL代码
     /// </summary>
-    private static Type GenerateTaskFromException(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskFromException(List<Type> paramTypes, ILGenerator ilGenerator)
     {
         if (paramTypes.Count == 1)
         {
@@ -589,7 +589,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.Run 的IL代码
     /// </summary>
-    private static Type GenerateTaskRun(ILGenerator ilGenerator)
+    internal static Type GenerateTaskRun(ILGenerator ilGenerator)
     {
         // 这里简化处理，直接返回一个已完成的 Task<object>
         var fromResultMethod = typeof(Task)
@@ -604,7 +604,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.StartNew 的IL代码
     /// </summary>
-    private static Type GenerateTaskStartNew(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    internal static Type GenerateTaskStartNew(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
         // Task.StartNew 实际上是 Task.Factory.StartNew 的简写
         // 这里简化处理，直接返回一个已完成的 Task<object>
@@ -640,7 +640,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.WhenAll 的IL代码
     /// </summary>
-    private static Type GenerateTaskWhenAll(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    internal static Type GenerateTaskWhenAll(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
         if (instance.Ids.Count == 1)
         {
@@ -674,7 +674,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.WhenAny 的IL代码
     /// </summary>
-    private static Type GenerateTaskWhenAny(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    internal static Type GenerateTaskWhenAny(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
         if (instance.Ids.Count == 1)
         {
@@ -708,7 +708,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成普通实例方法调用的IL代码
     /// </summary>
-    private static Type GenerateRegularInstanceMethodCall(
+    internal static Type GenerateRegularInstanceMethodCall(
         LangExpression? left,
         Instance instance,
         ILGenerator ilGenerator,
@@ -935,7 +935,7 @@ public static class DotOperatorILHelper
         return m.ReturnType;
     }
 
-    private static Type GenerateLockedVariableMethodCall(
+    internal static Type GenerateLockedVariableMethodCall(
         LangExpression left,
         Instance instance,
         ILGenerator ilGenerator,
@@ -975,14 +975,14 @@ public static class DotOperatorILHelper
         return method.ReturnType;
     }
 
-    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+    internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
     /// <summary>
     /// 为静态类型未知的接收者生成运行期实例方法调用。
     /// </summary>
-    private static Type GenerateDynamicObjectMethodCall(
+    internal static Type GenerateDynamicObjectMethodCall(
         LangExpression left,
         Instance instance,
         ILGenerator ilGenerator,
@@ -1097,7 +1097,7 @@ public static class DotOperatorILHelper
         }
     }
 
-    private static bool ParametersMatch(ParameterInfo[] parameters, object?[] arguments)
+    internal static bool ParametersMatch(ParameterInfo[] parameters, object?[] arguments)
     {
         if (parameters.Length != arguments.Length)
         {
@@ -1135,7 +1135,7 @@ public static class DotOperatorILHelper
         return method?.GetReturnType(returnReceiverType, instance.Ids, local);
     }
 
-    private static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,
+    internal static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,
         LocalManager local, out Type mappedType)
     {
         InstanceMethodInitializer.EnsureInitialized();
@@ -1157,7 +1157,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成字段和属性访问的IL代码
     /// </summary>
-    private static Type GenerateFieldOrPropertyAccess(
+    internal static Type GenerateFieldOrPropertyAccess(
         LangExpression? left,
         LangId id,
         ILGenerator ilGenerator,
@@ -1384,7 +1384,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成索引访问的IL代码
     /// </summary>
-    private static Type GenerateIndexAccess(
+    internal static Type GenerateIndexAccess(
         LangExpression? left,
         LangExpression? right,
         ILGenerator ilGenerator,
@@ -1473,7 +1473,7 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 保证栈上的索引值是 <see cref="int"/>（IlIndexHelper 的参数类型）。
     /// </summary>
-    private static void EmitIntIndexConversion(ILGenerator ilGenerator, Type rightType)
+    internal static void EmitIntIndexConversion(ILGenerator ilGenerator, Type rightType)
     {
         if (rightType == typeof(object))
         {
@@ -1546,7 +1546,7 @@ public static class DotOperatorILHelper
     /// 将 C# 原生类型映射到对应的 LangValueType
     /// 用于在实例方法注册表中查找方法
     /// </summary>
-    private static Type MapToLangValueType(Type nativeType)
+    internal static Type MapToLangValueType(Type nativeType)
     {
         // int/long 映射到 IntLangValue
         if (nativeType == typeof(int) || nativeType == typeof(long))
@@ -1595,7 +1595,7 @@ public static class DotOperatorILHelper
     /// 只用于「按等价类型再解析一次实例方法」的回退路径，且调用方只会采纳
     /// 显式实现 <see cref="InstanceMethods.Core.IIlNativeValueInstanceMethod"/> 的方法。
     /// </remarks>
-    private static bool TryGetEquivalentLangValueType(Type nativeType, out Type equivalentType)
+    internal static bool TryGetEquivalentLangValueType(Type nativeType, out Type equivalentType)
     {
         if (nativeType.IsArray)
         {

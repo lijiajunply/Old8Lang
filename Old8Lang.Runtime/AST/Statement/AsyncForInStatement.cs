@@ -23,7 +23,7 @@ public partial class AsyncForInStatement(
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
     // 获取所有标识符，包括主标识符和附加标识符
-    private List<LangId> AllIds { get; } = [id, .. (additionalIds ?? [])];
+    internal List<LangId> AllIds { get; } = [id, .. (additionalIds ?? [])];
 
     /// <summary>
     /// 循环绑定的全部标识符（首个标识符 + 附加标识符）
@@ -54,7 +54,7 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 标准异步 for-in 循环（非生成器）
     /// </summary>
-    private void RunStandard(VariateManager manager)
+    internal void RunStandard(VariateManager manager)
     {
         manager.AddChildren();
         // 压入新的控制流状态
@@ -321,7 +321,7 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 生成器上下文中的异步 for-in 循环
     /// </summary>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         // 不要在这里调用 AddChildren()！
         // 异步 for-in 循环的变量应该在外层作用域中
@@ -398,7 +398,7 @@ public partial class AsyncForInStatement(
     /// 但将ExecutionPath修改为指向async-for语句本身，
     /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
-    private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
+    internal void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
         AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
@@ -517,7 +517,7 @@ public partial class AsyncForInStatement(
     /// 在生成器上下文中迭代异步生成器
     /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
-    private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
+    internal void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
         AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
@@ -653,7 +653,7 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
-    private void RunGeneratorContextList(VariateManager manager, ILangList oldList,
+    internal void RunGeneratorContextList(VariateManager manager, ILangList oldList,
         AsyncGeneration.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
@@ -849,7 +849,7 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 生成字典类型的IL代码
     /// </summary>
-    private void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
+    internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
         expression.LoadIlValue(ilGenerator, local);
@@ -948,7 +948,7 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 生成异步枚举类型的IL代码
     /// </summary>
-    private void GenerateAsyncEnumerableIl(ILGenerator ilGenerator, LocalManager local, Type asyncEnumerableType)
+    internal void GenerateAsyncEnumerableIl(ILGenerator ilGenerator, LocalManager local, Type asyncEnumerableType)
     {
         // 获取元素类型（IAsyncEnumerable<T>中的T）
         var elementType = asyncEnumerableType.GetGenericArguments()[0];

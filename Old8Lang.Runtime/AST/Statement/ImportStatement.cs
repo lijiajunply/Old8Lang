@@ -53,42 +53,42 @@ public partial class ImportStatement(
 ) : OldStatement(position)
 {
     // 静态模块系统服务实例
-    private static readonly ModuleSystemService ModuleService = new();
+    internal static readonly ModuleSystemService ModuleService = new();
 
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>
-    private readonly string _importString = importString;
+    internal readonly string _importString = importString;
 
     /// <summary>
     /// 是否使用from子句
     /// </summary>
-    private readonly bool _fromClause = fromClause;
+    internal readonly bool _fromClause = fromClause;
 
     /// <summary>
     /// 导入指定符列表，用于命名导入
     /// </summary>
-    private readonly List<ImportItem> _importSpecifiers = importSpecifiers ?? [];
+    internal readonly List<ImportItem> _importSpecifiers = importSpecifiers ?? [];
 
     /// <summary>
     /// 模块别名，如import "module" as alias
     /// </summary>
-    private readonly string? _moduleAlias = moduleAlias;
+    internal readonly string? _moduleAlias = moduleAlias;
 
     /// <summary>
     /// 是否为懒导入，只在首次使用时加载模块
     /// </summary>
-    private readonly bool _isLazy = isLazy;
+    internal readonly bool _isLazy = isLazy;
 
     /// <summary>
     /// 是否为选择导入，如 from module import a, b, c
     /// </summary>
-    private readonly bool _isSelective = isSelective;
+    internal readonly bool _isSelective = isSelective;
 
     /// <summary>
     /// 是否为动态导入，模块名在运行时计算
     /// </summary>
-    private readonly bool _isDynamic = isDynamic;
+    internal readonly bool _isDynamic = isDynamic;
 
     /// <summary>
     /// 公共属性：是否为动态导入
@@ -118,7 +118,7 @@ public partial class ImportStatement(
     /// <summary>
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
-    private readonly LangExpression? _dynamicModuleExpression = dynamicModuleExpression;
+    internal readonly LangExpression? _dynamicModuleExpression = dynamicModuleExpression;
 
     /// <summary>
     /// 在解释模式下执行导入语句
@@ -280,7 +280,7 @@ public partial class ImportStatement(
     /// 处理懒导入
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void HandleLazyImport(VariateManager manager)
+    internal void HandleLazyImport(VariateManager manager)
     {
         // 检查是否启用新的统一工厂
         // 使用新的统一模块工厂创建模块对象
@@ -307,7 +307,7 @@ public partial class ImportStatement(
     /// </summary>
     /// <param name="moduleValue">模块值对象</param>
     /// <param name="manager">变量管理器</param>
-    private void RegisterModuleValue(UnifiedModule moduleValue, VariateManager manager)
+    internal void RegisterModuleValue(UnifiedModule moduleValue, VariateManager manager)
     {
         ArgumentNullException.ThrowIfNull(moduleValue);
         if (_moduleAlias is not null)
@@ -409,7 +409,7 @@ public partial class ImportStatement(
     /// </summary>
     /// <param name="manager">变量管理器</param>
     /// <exception cref="ImportError">当动态导入失败时抛出</exception>
-    private void HandleDynamicImport(VariateManager manager)
+    internal void HandleDynamicImport(VariateManager manager)
     {
         if (_dynamicModuleExpression is null)
         {

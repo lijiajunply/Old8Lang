@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Expression.Linq;
 public class OrderByClause(List<OrderingItem> orderings, SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 排序项列表
     /// </summary>

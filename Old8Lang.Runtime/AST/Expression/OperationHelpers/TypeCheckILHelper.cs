@@ -20,7 +20,7 @@ public static class TypeCheckILHelper
     /// <summary>
     /// 类型名称到 .NET 类型的映射
     /// </summary>
-    private static readonly Dictionary<string, Type?> TypeNameMap = new()
+    internal static readonly Dictionary<string, Type?> TypeNameMap = new()
     {
         { "int", typeof(int) },
         { "double", typeof(double) },
@@ -38,7 +38,7 @@ public static class TypeCheckILHelper
     /// </summary>
     /// <param name="typeName">类型名称（Old8Lang类型名）</param>
     /// <returns>.NET 类型，如果是 null 或未识别的自定义类型则返回 null</returns>
-    private static Type? GetTargetType(string typeName)
+    internal static Type? GetTargetType(string typeName)
     {
         return TypeNameMap.GetValueOrDefault(typeName);
     }
@@ -278,7 +278,7 @@ public static class TypeCheckILHelper
     /// <remarks>
     /// 该方法生成实际的类型检查IL代码，处理值类型和引用类型的不同情况。
     /// </remarks>
-    private static void GenerateTypeCheck(
+    internal static void GenerateTypeCheck(
         LangExpression left,
         ILGenerator ilGenerator,
         LocalManager local,
@@ -307,7 +307,7 @@ public static class TypeCheckILHelper
     /// <summary>
     /// 生成值类型检查的IL代码
     /// </summary>
-    private static void GenerateValueTypeCheck(
+    internal static void GenerateValueTypeCheck(
         LangExpression left,
         ILGenerator ilGenerator,
         LocalManager local,
@@ -352,7 +352,7 @@ public static class TypeCheckILHelper
     /// <summary>
     /// 生成引用类型检查的IL代码
     /// </summary>
-    private static void GenerateReferenceTypeCheck(
+    internal static void GenerateReferenceTypeCheck(
         ILGenerator ilGenerator,
         Type targetType,
         bool isNegated)

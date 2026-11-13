@@ -13,6 +13,7 @@ public class FromClause(
     SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 范围变量名（例如 x）
     /// </summary>

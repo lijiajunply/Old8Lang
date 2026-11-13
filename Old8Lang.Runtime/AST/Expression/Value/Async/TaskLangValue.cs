@@ -34,9 +34,9 @@ public enum TaskStatus
 public partial class TaskLangValue : LangValueType
 {
     public readonly Task<LangValueType> Task;
-    private readonly CancellationToken _cancellationToken;
-    private LangValueType? _result;
-    private Exception? _exception;
+    internal readonly CancellationToken _cancellationToken;
+    internal LangValueType? _result;
+    internal Exception? _exception;
 
     /// <summary>
     /// 外部变量管理器，用于访问外部作用域和Interpreter

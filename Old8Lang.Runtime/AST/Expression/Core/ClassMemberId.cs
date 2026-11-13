@@ -22,7 +22,7 @@ public class ClassMemberId : LangId
     /// <summary>
     /// 互斥的修饰符组
     /// </summary>
-    private static readonly List<HashSet<AccessModifierType>> MutuallyExclusiveModifiers =
+    internal static readonly List<HashSet<AccessModifierType>> MutuallyExclusiveModifiers =
     [
         [AccessModifierType.Public, AccessModifierType.Private, AccessModifierType.Protected]
     ];
@@ -76,7 +76,7 @@ public class ClassMemberId : LangId
     /// 验证修饰符是否合法
     /// </summary>
     /// <exception cref="SyntaxError">当修饰符互斥时抛出</exception>
-    private void ValidateModifiers()
+    internal void ValidateModifiers()
     {
         // 检查互斥修饰符
         foreach (var conflictingModifiers in from exclusiveGroup in MutuallyExclusiveModifiers

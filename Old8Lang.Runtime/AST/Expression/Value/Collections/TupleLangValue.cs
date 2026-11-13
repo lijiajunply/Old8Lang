@@ -23,13 +23,13 @@ public partial class TupleLangValue : LangValueType, ILangList
     public List<LangValueType> ItemValues { get; private set; } = [];
 
     // 命名字段支持 - 存储字段名称
-    private readonly Dictionary<string, int>? _fieldNames;
+    internal readonly Dictionary<string, int>? _fieldNames;
 
     // 标记是否有命名字段
     public bool HasNamedFields => _fieldNames is not null && _fieldNames.Count > 0;
 
     // 标记是否为空元组
-    private readonly bool IsEmpty;
+    internal readonly bool IsEmpty;
 
     /// <summary>
     /// 构造函数：双元素元组（向后兼容）
@@ -143,7 +143,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         return CreateValueTupleRecursiveStatic(values);
     }
 
-    private static object CreateValueTupleRecursiveStatic(object[] values)
+    internal static object CreateValueTupleRecursiveStatic(object[] values)
     {
         var count = values.Length;
         if (count > 7)
@@ -171,7 +171,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         }
     }
 
-    private static Type GetValueTupleTypeStatic(Type[] types)
+    internal static Type GetValueTupleTypeStatic(Type[] types)
     {
         if (types.Length > 7)
         {
@@ -202,17 +202,17 @@ public partial class TupleLangValue : LangValueType, ILangList
     /// <summary>
     /// 动态创建 ValueTuple 实例
     /// </summary>
-    private object CreateValueTuple(object[] values)
+    internal object CreateValueTuple(object[] values)
     {
         return CreateValueTupleStatic(values);
     }
 
-    private object CreateValueTupleRecursive(object[] values)
+    internal object CreateValueTupleRecursive(object[] values)
     {
         return CreateValueTupleRecursiveStatic(values);
     }
 
-    private Type GetValueTupleType(Type[] types)
+    internal Type GetValueTupleType(Type[] types)
     {
         return GetValueTupleTypeStatic(types);
     }
@@ -332,7 +332,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         EmitValueTupleCreation(ilGenerator, local, Elements, types);
     }
 
-    private void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements,
+    internal void EmitValueTupleCreation(ILGenerator ilGenerator, LocalManager local, List<LangExpression> elements,
         Type[] types)
     {
         var count = elements.Count;
@@ -387,7 +387,7 @@ public partial class TupleLangValue : LangValueType, ILangList
         }
     }
 
-    private Type GetValueTupleTypeForCompiler(Type[] types)
+    internal Type GetValueTupleTypeForCompiler(Type[] types)
     {
         if (types.Length > 7)
         {

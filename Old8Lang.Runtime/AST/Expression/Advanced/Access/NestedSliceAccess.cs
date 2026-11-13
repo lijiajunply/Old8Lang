@@ -22,6 +22,7 @@ public partial class NestedSliceAccess(
     SourcePosition position = default)
     : LangValueType(position)
 {
+
     public readonly LangExpression BaseExpression = baseExpression;
     public readonly LangExpression SliceStart = sliceStart;
     public readonly LangExpression? SliceEnd = sliceEnd;

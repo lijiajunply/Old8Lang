@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class CancellationTokenLangValue : LangValueType
 {
-    private readonly CancellationToken _token;
+    internal readonly CancellationToken _token;
 
     /// <summary>
     /// 获取底层 CancellationToken 对象
@@ -105,7 +105,7 @@ public partial class CancellationTokenLangValue : LangValueType
         return base.Dot(dotExpression, manager);
     }
 
-    private LangValueType CallThrowIfCancellationRequested(List<LangExpression> args)
+    internal LangValueType CallThrowIfCancellationRequested(List<LangExpression> args)
     {
         if (args.Count != 0)
         {

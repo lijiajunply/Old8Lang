@@ -27,7 +27,7 @@ public partial class FuncLangValue
     }
 
 
-    private static Type GetItemType(OldStatement statement, LocalManager local)
+    internal static Type GetItemType(OldStatement statement, LocalManager local)
     {
         for (var i = 0; i < statement.Count; i++)
         {
@@ -107,7 +107,7 @@ public partial class FuncLangValue
     /// <summary>
     /// 把匿名函数 / lambda 编译成 <see cref="DynamicMethod"/>（不注册到 DelegateVar）。
     /// </summary>
-    private DynamicMethod BuildLambdaDynamicMethod(
+    internal DynamicMethod BuildLambdaDynamicMethod(
         LocalManager local,
         string methodName,
         IReadOnlyList<CapturedLocalValue> capturedValues)
@@ -191,7 +191,7 @@ public partial class FuncLangValue
         return dynamicMethod;
     }
 
-    private DynamicMethod EmitLambdaClosure(ILGenerator ilGenerator, LocalManager local, string methodName)
+    internal DynamicMethod EmitLambdaClosure(ILGenerator ilGenerator, LocalManager local, string methodName)
     {
         var capturedValues = GetCapturedLocalValues(local);
         var dynamicMethod = BuildLambdaDynamicMethod(local, methodName, capturedValues);
@@ -242,7 +242,7 @@ public partial class FuncLangValue
         return dynamicMethod;
     }
 
-    private static List<CapturedLocalValue> GetCapturedLocalValues(LocalManager local)
+    internal static List<CapturedLocalValue> GetCapturedLocalValues(LocalManager local)
     {
         var captured = local.LocalVar
             .Select(pair => new CapturedLocalValue(pair.Key, pair.Value, pair.Value.LocalType))
@@ -259,12 +259,12 @@ public partial class FuncLangValue
         return captured;
     }
 
-    private sealed record CapturedLocalValue(string Name, LocalBuilder? Local, Type Type);
+    internal sealed record CapturedLocalValue(string Name, LocalBuilder? Local, Type Type);
 
     /// <summary>
     /// 为没有显式 return 的函数体补一段默认返回。
     /// </summary>
-    private static void EmitDefaultReturn(ILGenerator methodIl, Type returnType)
+    internal static void EmitDefaultReturn(ILGenerator methodIl, Type returnType)
     {
         if (returnType == typeof(void))
         {

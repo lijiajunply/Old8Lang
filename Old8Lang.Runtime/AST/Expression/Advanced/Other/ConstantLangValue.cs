@@ -13,6 +13,7 @@ public class ConstantLangValue(
     SourcePosition position = default
 ) : ImportInfo(position)
 {
+
     /// <summary>
     /// 常量名称
     /// </summary>

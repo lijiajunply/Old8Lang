@@ -7,6 +7,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public partial class ContinueStatement(SourcePosition position = default) : OldStatement(position)
 {
+
     public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(),
         "Indexer not implemented for ContinueStatement", "ContinueStatement不支持索引访问");
 

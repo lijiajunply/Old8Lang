@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class TaskCompletionSourceLangValue : LangValueType
 {
-    private readonly TaskCompletionSource<LangValueType> _tcs;
+    internal readonly TaskCompletionSource<LangValueType> _tcs;
 
     /// <summary>
     /// 获取关联的 Task
@@ -122,7 +122,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return base.Dot(dotExpression, manager);
     }
 
-    private LangValueType CallSetResult(List<LangExpression> args, VariateManager manager)
+    internal LangValueType CallSetResult(List<LangExpression> args, VariateManager manager)
     {
         if (args.Count != 1)
         {
@@ -134,7 +134,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallSetException(List<LangExpression> args, VariateManager manager)
+    internal LangValueType CallSetException(List<LangExpression> args, VariateManager manager)
     {
         if (args.Count != 1)
         {
@@ -157,7 +157,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallSetCanceled(List<LangExpression> args)
+    internal LangValueType CallSetCanceled(List<LangExpression> args)
     {
         if (args.Count != 0)
         {
@@ -168,7 +168,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new VoidLangValue(Position);
     }
 
-    private LangValueType CallTrySetResult(List<LangExpression> args, VariateManager manager)
+    internal LangValueType CallTrySetResult(List<LangExpression> args, VariateManager manager)
     {
         if (args.Count != 1)
         {
@@ -180,7 +180,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new BoolLangValue(success, Position);
     }
 
-    private LangValueType CallTrySetException(List<LangExpression> args, VariateManager manager)
+    internal LangValueType CallTrySetException(List<LangExpression> args, VariateManager manager)
     {
         if (args.Count != 1)
         {
@@ -203,7 +203,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
         return new BoolLangValue(success, Position);
     }
 
-    private LangValueType CallTrySetCanceled(List<LangExpression> args)
+    internal LangValueType CallTrySetCanceled(List<LangExpression> args)
     {
         if (args.Count != 0)
         {

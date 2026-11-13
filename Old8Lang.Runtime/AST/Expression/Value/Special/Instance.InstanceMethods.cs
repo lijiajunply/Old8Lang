@@ -14,7 +14,7 @@ public partial class Instance
     /// <summary>
     /// 尝试通过实例方法注册器执行方法
     /// </summary>
-    private bool TryExecuteInstanceMethod(LangValueType instance, VariateManager manager, out LangValueType? result)
+    internal bool TryExecuteInstanceMethod(LangValueType instance, VariateManager manager, out LangValueType? result)
     {
         result = null;
 
@@ -61,7 +61,7 @@ public partial class Instance
     /// <summary>
     /// 尝试通过实例方法注册器生成 IL 代码
     /// </summary>
-    private bool TryGenerateInstanceMethodIl(LangExpression instance, ILGenerator ilGenerator, LocalManager local)
+    internal bool TryGenerateInstanceMethodIl(LangExpression instance, ILGenerator ilGenerator, LocalManager local)
     {
         // 确保实例方法系统已初始化
         InstanceMethodInitializer.EnsureInitialized();
@@ -124,7 +124,7 @@ public partial class Instance
     /// <summary>
     /// 重排序实例方法参数以支持命名参数
     /// </summary>
-    private List<LangExpression> ReorderInstanceMethodArguments(
+    internal List<LangExpression> ReorderInstanceMethodArguments(
         IInstanceMethod instanceMethod,
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs)

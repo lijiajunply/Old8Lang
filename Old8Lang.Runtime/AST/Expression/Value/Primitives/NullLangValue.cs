@@ -11,6 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position">位置</param>
 public partial class NullLangValue(SourcePosition position = default) : LangValueType(position)
 {
+
     /// <summary>
     /// 单例实例，用于减少对象创建
     /// </summary>

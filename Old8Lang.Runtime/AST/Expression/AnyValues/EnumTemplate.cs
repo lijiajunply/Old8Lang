@@ -14,6 +14,7 @@ public partial class EnumTemplate(
     SourcePosition position = default)
     : ImportInfo(position)
 {
+
     /// <summary>
     /// 枚举名称
     /// </summary>

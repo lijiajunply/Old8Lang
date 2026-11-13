@@ -37,11 +37,12 @@ public partial class Operation(
     SourcePosition position = default)
     : LangExpression(position)
 {
+
     /// <summary>
     /// 将运算符类型转换为字符串表示
     /// </summary>
     /// <returns>运算符的字符串表示</returns>
-    private string OperaToString()
+    internal string OperaToString()
     {
         if (Opera == LangTokenType.Plus)
             return "+";
@@ -932,11 +933,11 @@ public partial class Operation(
         return leftType == typeof(object) ? rightType : leftType;
     }
 
-    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+    internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
-    private Type OutputType(ILGenerator ilGenerator, LocalManager local)
+    internal Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {
         if (Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(Left, Right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.EmitCall(library, libraryCall, ilGenerator, local);
@@ -1069,7 +1070,7 @@ public partial class Operation(
     /// <param name="typeName">类型名称</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>如果值是指定类型的实例则返回true,否则返回false</returns>
-    private bool CheckIsInstance(LangValueType value, string typeName, VariateManager manager)
+    internal bool CheckIsInstance(LangValueType value, string typeName, VariateManager manager)
     {
         // 处理基本类型
         switch (typeName.ToLower())
@@ -1131,7 +1132,7 @@ public partial class Operation(
     /// <param name="methodName">方法名</param>
     /// <param name="paramCount">参数数量</param>
     /// <returns>方法的返回类型，如果不是内置方法则返回null</returns>
-    private static Type? GetBuiltInMethodReturnType(Type? leftType, string methodName, int paramCount)
+    internal static Type? GetBuiltInMethodReturnType(Type? leftType, string methodName, int paramCount)
     {
         if (leftType is null) return null;
 

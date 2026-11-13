@@ -156,7 +156,7 @@ public partial class ListComprehension : LangValueType
     /// <param name="manager">变量管理器</param>
     /// <param name="loops">嵌套的for循环列表</param>
     /// <returns>生成的元素列表</returns>
-    private List<LangValueType> ProcessNestedLoops(VariateManager manager, List<ListComprehension> loops)
+    internal List<LangValueType> ProcessNestedLoops(VariateManager manager, List<ListComprehension> loops)
     {
         var resultList = new List<LangValueType>();
 
@@ -262,7 +262,7 @@ public partial class ListComprehension : LangValueType
     /// </summary>
     /// <param name="manager">变量管理器</param>
     /// <returns>条件是否满足</returns>
-    private bool CheckCondition(VariateManager manager)
+    internal bool CheckCondition(VariateManager manager)
     {
         // 如果没有条件，直接返回true
         if (Condition is null)

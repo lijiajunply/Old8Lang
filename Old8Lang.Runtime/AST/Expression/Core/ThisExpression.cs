@@ -15,6 +15,7 @@ namespace Old8Lang.AST.Expression;
 /// </remarks>
 public partial class ThisExpression(SourcePosition position = default) : LangExpression(position)
 {
+
     /// <summary>
     /// 在当前上下文中解析this表达式
     /// </summary>

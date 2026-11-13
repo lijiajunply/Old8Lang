@@ -14,6 +14,7 @@ public partial class DeferStatement(
     OldStatement statement,
     SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 获取要延迟执行的语句
     /// </summary>

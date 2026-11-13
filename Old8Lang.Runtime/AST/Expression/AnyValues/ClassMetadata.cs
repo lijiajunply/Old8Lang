@@ -72,7 +72,7 @@ public class ClassMetadata(
     /// 继承深度缓存
     /// 用于优化继承链遍历
     /// </summary>
-    private int? InheritanceDepth;
+    internal int? InheritanceDepth;
 
     /// <summary>
     /// 获取继承深度（0表示无父类，1表示直接继承，以此类推）

@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Expression.Linq;
 public class WhereClause(LangExpression condition, SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 过滤条件表达式
     /// </summary>

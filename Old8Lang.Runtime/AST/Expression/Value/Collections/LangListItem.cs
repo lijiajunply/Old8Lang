@@ -16,6 +16,7 @@ namespace Old8Lang.AST.Expression.Value;
 public partial class LangListItem(LangId listId, LangExpression key, SourcePosition position = default)
     : LangValueType(position)
 {
+
     public readonly LangId ListId = listId;
     public readonly LangExpression Key = key;
 
@@ -240,7 +241,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
     /// <summary>
     /// 加载索引表达式并保证栈上是 <see cref="int"/>（IlIndexHelper 的参数类型）。
     /// </summary>
-    private void EmitIntIndex(ILGenerator ilGenerator, LocalManager local)
+    internal void EmitIntIndex(ILGenerator ilGenerator, LocalManager local)
     {
         Key.LoadIlValue(ilGenerator, local);
         var keyType = Key.OutputType(local);
@@ -305,7 +306,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
     /// <summary>
     /// 获取 ValueTuple 指定索引位置的元素类型
     /// </summary>
-    private Type? GetValueTupleElementType(Type tupleType, int index)
+    internal Type? GetValueTupleElementType(Type tupleType, int index)
     {
         if (index < 0) return null;
 

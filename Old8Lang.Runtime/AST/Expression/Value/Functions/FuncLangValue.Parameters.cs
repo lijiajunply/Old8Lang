@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class FuncLangValue
 {
-    private static bool IsConstantExpression(LangExpression? expr)
+    internal static bool IsConstantExpression(LangExpression? expr)
     {
         if (expr is null) return false;
 
@@ -37,7 +37,7 @@ public partial class FuncLangValue
     /// 初始化默认参数值缓存
     /// </summary>
 
-    private void InitializeDefaultValueCache(VariateManager manager)
+    internal void InitializeDefaultValueCache(VariateManager manager)
     {
         if (Ids is null || Ids.Count == 0) return;
 
@@ -60,7 +60,7 @@ public partial class FuncLangValue
     /// 验证Lambda表达式的类型注解完整性（IL 模式要求）
     /// </summary>
 
-    private void ValidateLambdaTypeAnnotations(LocalManager local, string variableName)
+    internal void ValidateLambdaTypeAnnotations(LocalManager local, string variableName)
     {
         // 验证Lambda参数的类型注解
         if (Ids is not null)
@@ -92,7 +92,7 @@ public partial class FuncLangValue
     /// <param name="argumentValues">计算后的参数值列表</param>
     /// <param name="executionManager">执行管理器，用于获取泛型类型参数映射</param>
 
-    private void ValidateParameterTypes(
+    internal void ValidateParameterTypes(
         List<LangExpression> argumentExpressions,
         List<LangValueType> argumentValues,
         VariateManager? executionManager = null)
@@ -119,7 +119,7 @@ public partial class FuncLangValue
     /// <param name="executionManager">执行管理器，用于获取缓存的默认值</param>
     /// <returns>处理完成的参数值列表</returns>
 
-    private List<LangValueType> ProcessAndValidateParameters(
+    internal List<LangValueType> ProcessAndValidateParameters(
         List<LangExpression> argumentExpressions,
         VariateManager variManager,
         VariateManager? executionManager = null)

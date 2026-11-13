@@ -8,13 +8,13 @@ namespace Old8Lang.AST.Expression.Linq;
 
 public partial class LinqExpression
 {
-    private bool CanGenerateStreamingQuery() =>
+    internal bool CanGenerateStreamingQuery() =>
         Continuation is null && TerminationClause is SelectClause &&
         BodyClauses.Take(BodyClauses.LastOrDefault() is OrderByClause ? BodyClauses.Count - 1 : BodyClauses.Count)
             .All(clause => clause is LetClause or WhereClause);
 
     // 顺序执行同一行的子句，让 let 值只属于当前范围变量。
-    private void GenerateStreamingQuery(ILGenerator il, LocalManager local)
+    internal void GenerateStreamingQuery(ILGenerator il, LocalManager local)
     {
         var select = (SelectClause)TerminationClause;
         var orderBy = BodyClauses.LastOrDefault() as OrderByClause;
@@ -220,7 +220,7 @@ public partial class LinqExpression
         }
     }
 
-    private static void EmitLocalArray(ILGenerator il, LocalBuilder[] locals)
+    internal static void EmitLocalArray(ILGenerator il, LocalBuilder[] locals)
     {
         il.Emit(OpCodes.Ldc_I4, locals.Length);
         il.Emit(OpCodes.Newarr, typeof(object));

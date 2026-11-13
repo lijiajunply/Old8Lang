@@ -12,6 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class VMThreadLangValue(int threadId, SourcePosition position = default) : LangValueType(position)
 {
+
     public int ThreadId => threadId;
 
     /// <summary>
@@ -93,7 +94,7 @@ public class VMThreadLangValue(int threadId, SourcePosition position = default) 
     /// <summary>
     /// 将对象转换为语言值类型
     /// </summary>
-    private static LangValueType ConvertToLangValue(object? obj)
+    internal static LangValueType ConvertToLangValue(object? obj)
     {
         if (obj is null)
             return new VoidLangValue();

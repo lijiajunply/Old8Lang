@@ -54,7 +54,7 @@ public partial class AnyLangValue : LangValueType
     /// 标记对象是否已被 dispose
     /// 用于防止重复调用 dispose 方法
     /// </summary>
-    private bool _isDisposed;
+    internal bool _isDisposed;
 
     /// <summary>
     /// 构造函数
@@ -133,7 +133,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 通过标识符访问成员（字段或方法）
     /// </summary>
-    private LangValueType AccessMemberById(LangId id, VariateManager manager)
+    internal LangValueType AccessMemberById(LangId id, VariateManager manager)
     {
         var memberName = id.IdName;
         bool isInternalAccess = CheckInternalAccess(manager);
@@ -174,7 +174,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 调用方法
     /// </summary>
-    private LangValueType CallMethod(Instance instance, VariateManager manager)
+    internal LangValueType CallMethod(Instance instance, VariateManager manager)
     {
         var methodName = instance.Id.IdName;
         bool isInternalAccess = CheckInternalAccess(manager);
@@ -218,7 +218,7 @@ public partial class AnyLangValue : LangValueType
     /// <param name="instance">实例调用表达式</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>如果找到嵌套类则返回新实例，否则返回 null</returns>
-    private LangValueType? TryInstantiateNestedClass(Instance instance, VariateManager manager)
+    internal LangValueType? TryInstantiateNestedClass(Instance instance, VariateManager manager)
     {
         var className = instance.Id.IdName;
 
@@ -337,7 +337,7 @@ public partial class AnyLangValue : LangValueType
     /// 从执行作用域同步字段修改
     /// 只同步那些通过直接赋值（field &lt;- value）而非 SetField（this.field &lt;- value）修改的字段
     /// </summary>
-    private void SyncFieldsFromExecutionScope(VariateManager executionManager)
+    internal void SyncFieldsFromExecutionScope(VariateManager executionManager)
     {
         // 遍历所有实例字段，检查是否被修改
         foreach (var fieldName in InstanceData.Keys.ToList())
@@ -364,7 +364,7 @@ public partial class AnyLangValue : LangValueType
         }
     }
 
-    private LangValueType AccessCollectionItem(LangListItem listItem, VariateManager manager)
+    internal LangValueType AccessCollectionItem(LangListItem listItem, VariateManager manager)
     {
         var collectionName = listItem.ListId.IdName;
         bool isInternalAccess = CheckInternalAccess(manager);
@@ -413,7 +413,7 @@ public partial class AnyLangValue : LangValueType
     /// 方法重载解析
     /// 根据参数数量和类型选择最匹配的方法
     /// </summary>
-    private LangMethodInfo ResolveMethodOverload(List<LangMethodInfo> overloads, List<LangExpression> positionalArgs,
+    internal LangMethodInfo ResolveMethodOverload(List<LangMethodInfo> overloads, List<LangExpression> positionalArgs,
         List<NamedArgument>? namedArgs, VariateManager manager)
     {
         // 计算总参数数量（位置参数 + 命名参数）
@@ -450,7 +450,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 通过类型匹配选择最佳重载
     /// </summary>
-    private LangMethodInfo ResolveByTypeMatching(List<LangMethodInfo> candidates, List<LangExpression> positionalArgs,
+    internal LangMethodInfo ResolveByTypeMatching(List<LangMethodInfo> candidates, List<LangExpression> positionalArgs,
         VariateManager manager)
     {
         // 计算每个候选的匹配得分
@@ -503,7 +503,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 检查方法是否能处理给定的参数
     /// </summary>
-    private bool CanHandleArguments(LangMethodInfo method, List<LangExpression> positionalArgs,
+    internal bool CanHandleArguments(LangMethodInfo method, List<LangExpression> positionalArgs,
         List<NamedArgument>? namedArgs)
     {
         var expectedParams = method.ParameterCount;
@@ -548,7 +548,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 检查类型是否兼容
     /// </summary>
-    private bool IsCompatibleType(string actualType, string expectedType)
+    internal bool IsCompatibleType(string actualType, string expectedType)
     {
         return actualType.Contains(expectedType, StringComparison.InvariantCultureIgnoreCase) ||
                expectedType.Contains(actualType, StringComparison.InvariantCultureIgnoreCase);
@@ -557,7 +557,7 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 检查调用上下文是否在类内部
     /// </summary>
-    private bool CheckInternalAccess(VariateManager manager)
+    internal bool CheckInternalAccess(VariateManager manager)
     {
         // 检查 this 指针是否指向当前实例
         try
@@ -606,7 +606,7 @@ public partial class AnyLangValue : LangValueType
     /// <param name="arguments">构造函数参数</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>匹配的 init 方法，如果不存在则返回 null</returns>
-    private FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
+    internal FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
     {
         // 首先查找名为 "init" 的方法
         var methods = Metadata.MethodTable.LookupMethod("init");
@@ -854,7 +854,7 @@ public partial class AnyLangValue : LangValueType
     /// 用于检测 ToString 中的循环引用，防止无限递归
     /// </summary>
     [ThreadStatic]
-    private static HashSet<AnyLangValue>? _toStringVisited;
+    internal static HashSet<AnyLangValue>? _toStringVisited;
 
     public override string ToString()
     {
@@ -996,7 +996,7 @@ public partial class AnyLangValue : LangValueType
     /// <param name="methodName">特殊方法名（如 _add, _sub 等）</param>
     /// <param name="operand">右操作数</param>
     /// <returns>运算结果，如果方法不存在则返回 null</returns>
-    private LangValueType? CallOperatorOverloadMethod(string methodName, LangValueType operand)
+    internal LangValueType? CallOperatorOverloadMethod(string methodName, LangValueType operand)
     {
         // 1. 查找方法
         var methods = Metadata.MethodTable.LookupMethod(methodName);

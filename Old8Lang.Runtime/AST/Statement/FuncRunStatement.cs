@@ -9,11 +9,11 @@ namespace Old8Lang.AST.Statement;
 
 public class FuncRunStatement : OldStatement
 {
-    private readonly Instance? _instance;
-    private readonly Operation? _operation;
-    private readonly AwaitExpression? _awaitExpr;
-    private readonly GenericInstanceExpression? _genericInstance;
-    private readonly LangExpression? _expression;
+    internal readonly Instance? _instance;
+    internal readonly Operation? _operation;
+    internal readonly AwaitExpression? _awaitExpr;
+    internal readonly GenericInstanceExpression? _genericInstance;
+    internal readonly LangExpression? _expression;
 
     public LangExpression? Expression =>
         _expression ??

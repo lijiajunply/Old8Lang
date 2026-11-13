@@ -107,7 +107,7 @@ public partial class ForStatement(
     /// <summary>
     /// 检测是否为简单的计数循环（可以优化）
     /// </summary>
-    private bool IsSimpleCountingLoop()
+    internal bool IsSimpleCountingLoop()
     {
         // 简单启发式：检查是否是二元比较表达式
         // 这是一个简化版本，实际实现可以更复杂
@@ -171,7 +171,7 @@ public partial class ForStatement(
     /// 初始化表达式在创建循环变量之前求值（解释器语义），因此读取同名外层局部或全局变量时应当看到
     /// 外层值，而不是尚未初始化的循环变量。完成后由 <see cref="EndLoopVariableShadow"/> 恢复外层绑定。
     /// </remarks>
-    private (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
+    internal (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
         ILGenerator ilGenerator,
         LocalManager local)
     {
@@ -209,7 +209,7 @@ public partial class ForStatement(
         return (name, previousLocal, hadPreviousLocal, previousType, hadPreviousType);
     }
 
-    private static void EndLoopVariableShadow(
+    internal static void EndLoopVariableShadow(
         LocalManager local,
         (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? shadow)
     {

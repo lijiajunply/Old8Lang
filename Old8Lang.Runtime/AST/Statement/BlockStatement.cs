@@ -274,7 +274,7 @@ public partial class BlockStatement : OldStatement
         return c;
     }
 
-    private static (ClassMemberId? id, LangExpression? Expr) GetTuple(IOldLangTree a)
+    internal static (ClassMemberId? id, LangExpression? Expr) GetTuple(IOldLangTree a)
     {
         switch (a)
         {
@@ -313,7 +313,7 @@ public partial class BlockStatement : OldStatement
     /// </summary>
     /// <param name="expr">要检查的表达式</param>
     /// <returns>如果是函数返回true，否则返回false</returns>
-    private static bool IsFunction(LangExpression expr)
+    internal static bool IsFunction(LangExpression expr)
     {
         return expr is FuncLangValue or AsyncFuncLangValue;
     }

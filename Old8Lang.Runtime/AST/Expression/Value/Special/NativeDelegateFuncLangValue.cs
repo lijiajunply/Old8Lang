@@ -18,7 +18,7 @@ public class NativeDelegateFuncLangValue(
     : ImportInfo(position)
 {
     public readonly LangId Id = new(idName);
-    private readonly Delegate _delegateInstance = delegateInstance;
+    internal readonly Delegate _delegateInstance = delegateInstance;
 
     /// <summary>
     /// 执行原生委托函数
@@ -94,7 +94,7 @@ public class NativeDelegateFuncLangValue(
     /// <summary>
     /// 将位置参数和命名参数重新排序为完整的位置参数列表
     /// </summary>
-    private List<LangExpression> ReorderArgumentsWithNamedParameters(
+    internal List<LangExpression> ReorderArgumentsWithNamedParameters(
         List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs,
         SourcePosition callPosition)

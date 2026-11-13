@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Expression.Linq;
 public class SelectClause(LangExpression projection, SourcePosition position = default)
     : LinqClause(position)
 {
+
     /// <summary>
     /// 投影表达式
     /// </summary>

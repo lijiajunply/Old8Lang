@@ -58,7 +58,7 @@ public partial class FileHeaderDirective(string directiveName, string directiveV
 /// </summary>
 public class FileHeaderDirectives
 {
-    private readonly Dictionary<string, string> _directivesDict = new();
+    internal readonly Dictionary<string, string> _directivesDict = new();
 
     /// <summary>
     /// 所有指令的列表（保持顺序）

@@ -19,10 +19,11 @@ namespace Old8Lang.AST.Statement;
 /// <param name="position">源代码位置信息，用于错误报告</param>
 public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = default) : OldStatement(position)
 {
+
     /// <summary>
     /// 类模板信息，包含类的完整定义
     /// </summary>
-    private readonly TypeTemplate _anyValue = anyValue;
+    internal readonly TypeTemplate _anyValue = anyValue;
 
     /// <summary>
     /// 公共属性，用于访问类模板信息
@@ -60,7 +61,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <summary>
     /// 注册类类型到类型假注系统
     /// </summary>
-    private void RegisterTypeToTypeSystem()
+    internal void RegisterTypeToTypeSystem()
     {
         try
         {
@@ -95,7 +96,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// 递归注册嵌套类
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void RegisterNestedClasses(VariateManager manager)
+    internal void RegisterNestedClasses(VariateManager manager)
     {
         // 查找Variates中的嵌套类
         foreach (var (_, memberExpr) in _anyValue.Variates)
@@ -126,7 +127,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
         }
     }
 
-    private static readonly HashSet<string> OperatorNames =
+    internal static readonly HashSet<string> OperatorNames =
     [
         "_add", "_sub", "_mul", "_div", "_mod", "_pow",
         "_eq", "_lt", "_gt", "_le", "_ge",
@@ -257,7 +258,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <summary>
     /// 定义类的字段
     /// </summary>
-    private List<(FieldBuilder, LangExpression)> DefineFields(TypeBuilder typeBuilder, LocalManager local)
+    internal List<(FieldBuilder, LangExpression)> DefineFields(TypeBuilder typeBuilder, LocalManager local)
     {
         var fields = new List<(ClassMemberId, LangExpression)>();
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
@@ -348,7 +349,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <summary>
     /// 定义类的方法
     /// </summary>
-    private void DefineMethods(TypeBuilder typeBuilder, LocalManager local)
+    internal void DefineMethods(TypeBuilder typeBuilder, LocalManager local)
     {
         var methods = new List<(ClassMemberId, FuncLangValue)>();
 
@@ -390,7 +391,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// </summary>
     /// <param name="typeBuilder">类型构建器</param>
     /// <param name="local">局部变量管理器</param>
-    private void DefineInterfaceMembers(TypeBuilder typeBuilder, LocalManager local)
+    internal void DefineInterfaceMembers(TypeBuilder typeBuilder, LocalManager local)
     {
         // 接口只能有方法，不能有字段
         foreach (var variate in _anyValue.Variates)
@@ -410,7 +411,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <param name="memberId">成员ID</param>
     /// <param name="funcValue">函数值</param>
     /// <param name="local">局部变量管理器</param>
-    private void DefineInterfaceMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal void DefineInterfaceMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local)
     {
         // 获取方法名称
@@ -493,7 +494,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <param name="funcValue">函数值</param>
     /// <param name="local">局部变量管理器</param>
     /// <returns>方法构建器</returns>
-    private MethodBuilder DefineMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal MethodBuilder DefineMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local)
     {
         return DefineMethodInternal(typeBuilder, memberId, funcValue, local, 
@@ -509,7 +510,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <param name="local">局部变量管理器</param>
     /// <param name="attributes">方法属性</param>
     /// <returns>方法构建器</returns>
-    private MethodBuilder DefineMethodInternal(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal MethodBuilder DefineMethodInternal(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local, MethodAttributes attributes)
     {
         // 获取方法名称
@@ -653,7 +654,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <summary>
     /// 生成运算符重载的桥接方法
     /// </summary>
-    private void GenerateOperatorBridge(TypeBuilder typeBuilder, string methodName, MethodBuilder userMethod, Type[] paramTypes, Type returnType)
+    internal void GenerateOperatorBridge(TypeBuilder typeBuilder, string methodName, MethodBuilder userMethod, Type[] paramTypes, Type returnType)
     {
         // 1. 确定期望的方法签名
         Type expectedReturnType = typeof(object);
@@ -732,7 +733,7 @@ public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = 
     /// <param name="baseType">基类类型</param>
     /// <param name="fieldBuilders">字段列表</param>
     /// <param name="local">局部变量管理器</param>
-    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders, LocalManager local)
+    internal void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders, LocalManager local)
     {
         // 定义无参数构造函数
         var constructorBuilder = typeBuilder.DefineConstructor(

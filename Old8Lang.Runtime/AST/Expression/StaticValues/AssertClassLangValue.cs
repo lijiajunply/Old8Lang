@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class AssertClassLangValue : LangValueType
 {
-    private static readonly AssertClassLangValue Instance = new();
+    internal static readonly AssertClassLangValue Instance = new();
 
     /// <summary>
     /// 获取 Assert 类的全局单例
@@ -134,7 +134,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertEqual 静态方法实现
     /// </summary>
-    private static LangValueType AssertEqual(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertEqual(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -159,7 +159,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotEqual 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotEqual(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotEqual(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -184,7 +184,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertTrue 静态方法实现
     /// </summary>
-    private static LangValueType AssertTrue(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertTrue(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -212,7 +212,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertFalse 静态方法实现
     /// </summary>
-    private static LangValueType AssertFalse(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertFalse(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -240,7 +240,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNull 静态方法实现
     /// </summary>
-    private static LangValueType AssertNull(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNull(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -263,7 +263,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotNull 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotNull(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotNull(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -286,7 +286,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertGreater 静态方法实现
     /// </summary>
-    private static LangValueType AssertGreater(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertGreater(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -317,7 +317,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertGreaterOrEqual 静态方法实现
     /// </summary>
-    private static LangValueType AssertGreaterOrEqual(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertGreaterOrEqual(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -348,7 +348,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertLess 静态方法实现
     /// </summary>
-    private static LangValueType AssertLess(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertLess(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -379,7 +379,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertLessOrEqual 静态方法实现
     /// </summary>
-    private static LangValueType AssertLessOrEqual(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertLessOrEqual(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -410,7 +410,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertContains 静态方法实现
     /// </summary>
-    private static LangValueType AssertContains(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertContains(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -444,7 +444,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotContains 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotContains(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotContains(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -478,7 +478,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertStartsWith 静态方法实现
     /// </summary>
-    private static LangValueType AssertStartsWith(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertStartsWith(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -512,7 +512,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertEndsWith 静态方法实现
     /// </summary>
-    private static LangValueType AssertEndsWith(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertEndsWith(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -546,7 +546,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertMatches 静态方法实现
     /// </summary>
-    private static LangValueType AssertMatches(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertMatches(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -580,7 +580,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertContainsItem 静态方法实现
     /// </summary>
-    private static LangValueType AssertContainsItem(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertContainsItem(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -619,7 +619,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotContainsItem 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotContainsItem(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotContainsItem(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -651,7 +651,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertEmpty 静态方法实现
     /// </summary>
-    private static LangValueType AssertEmpty(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertEmpty(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -679,7 +679,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotEmpty 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotEmpty(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotEmpty(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -707,7 +707,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertLength 静态方法实现
     /// </summary>
-    private static LangValueType AssertLength(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertLength(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -742,7 +742,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertThrows 静态方法实现
     /// </summary>
-    private static LangValueType AssertThrows(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertThrows(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -775,7 +775,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotThrows 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotThrows(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotThrows(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -807,7 +807,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertInstanceOf 静态方法实现
     /// </summary>
-    private static LangValueType AssertInstanceOf(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertInstanceOf(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -838,7 +838,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// AssertNotInstanceOf 静态方法实现
     /// </summary>
-    private static LangValueType AssertNotInstanceOf(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType AssertNotInstanceOf(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 2 or > 3)
         {
@@ -913,7 +913,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// 比较两个集合是否相等
     /// </summary>
-    private static bool CollectionsEqual(List<LangValueType> a, List<LangValueType> b)
+    internal static bool CollectionsEqual(List<LangValueType> a, List<LangValueType> b)
     {
         if (a.Count != b.Count) return false;
 
@@ -928,7 +928,7 @@ public partial class AssertClassLangValue : LangValueType
     /// <summary>
     /// 尝试比较两个值，返回比较结果
     /// </summary>
-    private static bool TryCompare(LangValueType a, LangValueType b, out int result)
+    internal static bool TryCompare(LangValueType a, LangValueType b, out int result)
     {
         result = 0;
 

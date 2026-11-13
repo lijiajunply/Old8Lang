@@ -21,7 +21,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 新生成器状态机
     /// </summary>
-    private GeneratorStateMachine? StateMachine { get; set; }
+    internal GeneratorStateMachine? StateMachine { get; set; }
 
     /// <summary>
     /// 生成器当前状态
@@ -36,7 +36,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 生成器函数的参数值
     /// </summary>
-    private Dictionary<string, LangValueType> ParameterValues { get; } = new();
+    internal Dictionary<string, LangValueType> ParameterValues { get; } = new();
 
     /// <summary>
     /// 生成器状态枚举

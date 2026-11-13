@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// </summary>
 public partial class MockLibClassLangValue : LangValueType
 {
-    private static readonly MockLibClassLangValue Instance = new();
+    internal static readonly MockLibClassLangValue Instance = new();
 
     /// <summary>
     /// 获取 MockLib 类的全局单例
@@ -107,7 +107,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// CreateMock 静态方法实现
     /// </summary>
-    private static LangValueType CreateMock(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateMock(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is 0 or > 1)
         {
@@ -131,7 +131,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// CreateMockWithReturns 静态方法实现
     /// </summary>
-    private static LangValueType CreateMockWithReturns(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateMockWithReturns(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is < 1 or > 2)
         {
@@ -167,7 +167,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// CreateStub 静态方法实现
     /// </summary>
-    private static LangValueType CreateStub(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateStub(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is 0 or > 1)
         {
@@ -191,7 +191,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// CreateSpy 静态方法实现
     /// </summary>
-    private static LangValueType CreateSpy(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType CreateSpy(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count is 0 or > 1)
         {
@@ -215,7 +215,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// VerifyCalled 静态方法实现
     /// </summary>
-    private static LangValueType VerifyCalled(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType VerifyCalled(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -243,7 +243,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// VerifyNotCalled 静态方法实现
     /// </summary>
-    private static LangValueType VerifyNotCalled(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType VerifyNotCalled(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -271,7 +271,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// VerifyCallCount 静态方法实现
     /// </summary>
-    private static LangValueType VerifyCallCount(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType VerifyCallCount(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 3)
         {
@@ -302,7 +302,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// VerifyCalledOnce 静态方法实现
     /// </summary>
-    private static LangValueType VerifyCalledOnce(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType VerifyCalledOnce(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -330,7 +330,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// VerifyLastCallArgs 静态方法实现
     /// </summary>
-    private static LangValueType VerifyLastCallArgs(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType VerifyLastCallArgs(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count < 2)
         {
@@ -360,7 +360,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// StubReturns 静态方法实现
     /// </summary>
-    private static LangValueType StubReturns(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType StubReturns(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -399,7 +399,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// GetCallSummary 静态方法实现
     /// </summary>
-    private static LangValueType GetCallSummary(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType GetCallSummary(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 1)
         {
@@ -423,7 +423,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// PrintCalls 静态方法实现
     /// </summary>
-    private static LangValueType PrintCalls(List<LangValueType> args, SourcePosition position)
+    internal static LangValueType PrintCalls(List<LangValueType> args, SourcePosition position)
     {
         if (args.Count != 2)
         {
@@ -451,7 +451,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// 将 MockObject 转换为 LangValueType
     /// </summary>
-    private static LangValueType ConvertMockObject(MockLib.MockObject mock)
+    internal static LangValueType ConvertMockObject(MockLib.MockObject mock)
     {
         // 创建一个包装对象来存储 MockObject 实例
         return new MockObjectLangValue(mock);
@@ -460,7 +460,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// 从 LangValueType 中提取 MockObject
     /// </summary>
-    private static MockLib.MockObject ExtractMockObject(LangValueType value, SourcePosition position)
+    internal static MockLib.MockObject ExtractMockObject(LangValueType value, SourcePosition position)
     {
         if (value is MockObjectLangValue mockValue)
         {
@@ -473,7 +473,7 @@ public partial class MockLibClassLangValue : LangValueType
     /// <summary>
     /// 将 LangValueType 转换为原生 .NET 对象
     /// </summary>
-    private static object? ConvertLangValueToNative(LangValueType value)
+    internal static object? ConvertLangValueToNative(LangValueType value)
     {
         return value switch
         {
@@ -514,6 +514,7 @@ public partial class MockLibClassLangValue : LangValueType
 public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePosition position = default)
     : LangValueType(position)
 {
+
     public MockLib.MockObject MockObject { get; } = mockObject;
 
     public override string TypeToString() => "MockObject";
@@ -565,7 +566,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         throw new AttributeError(dotExpression.Position, dotExpression.ToString() ?? "unknown", "MockObject");
     }
 
-    private LangValueType RecordCall(List<LangValueType> args)
+    internal LangValueType RecordCall(List<LangValueType> args)
     {
         if (args.Count == 0)
             throw new ArgumentError(Position, "RecordCall 期望至少 1 个参数(methodName)");
@@ -580,7 +581,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new VoidLangValue();
     }
 
-    private LangValueType SetReturnValue(List<LangValueType> args)
+    internal LangValueType SetReturnValue(List<LangValueType> args)
     {
         if (args.Count != 2)
             throw new ArgumentError(Position, "SetReturnValue 期望 2 个参数(methodName, returnValue)");
@@ -595,7 +596,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new VoidLangValue();
     }
 
-    private LangValueType GetReturnValue(List<LangValueType> args)
+    internal LangValueType GetReturnValue(List<LangValueType> args)
     {
         if (args.Count != 1)
             throw new ArgumentError(Position, "GetReturnValue 期望 1 个参数(methodName)");
@@ -608,7 +609,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return ConvertFromNative(result);
     }
 
-    private LangValueType Call(List<LangValueType> args)
+    internal LangValueType Call(List<LangValueType> args)
     {
         if (args.Count == 0)
             throw new ArgumentError(Position, "Call 期望至少 1 个参数(methodName)");
@@ -623,7 +624,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return ConvertFromNative(result);
     }
 
-    private LangValueType GetCallCount(List<LangValueType> args)
+    internal LangValueType GetCallCount(List<LangValueType> args)
     {
         if (args.Count != 1)
             throw new ArgumentError(Position, "GetCallCount 期望 1 个参数(methodName)");
@@ -636,7 +637,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new IntLangValue(count);
     }
 
-    private LangValueType GetCalls(List<LangValueType> args)
+    internal LangValueType GetCalls(List<LangValueType> args)
     {
         if (args.Count != 1)
             throw new ArgumentError(Position, "GetCalls 期望 1 个参数(methodName)");
@@ -653,7 +654,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new ListLangValue(callLists);
     }
 
-    private LangValueType GetLastCall(List<LangValueType> args)
+    internal LangValueType GetLastCall(List<LangValueType> args)
     {
         if (args.Count != 1)
             throw new ArgumentError(Position, "GetLastCall 期望 1 个参数(methodName)");
@@ -666,13 +667,13 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new ListLangValue(lastCall.Select(ConvertFromNative).ToList());
     }
 
-    private LangValueType Reset()
+    internal LangValueType Reset()
     {
         MockObject.Reset();
         return new VoidLangValue();
     }
 
-    private LangValueType ResetMethod(List<LangValueType> args)
+    internal LangValueType ResetMethod(List<LangValueType> args)
     {
         if (args.Count != 1)
             throw new ArgumentError(Position, "ResetMethod 期望 1 个参数(methodName)");
@@ -685,7 +686,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         return new VoidLangValue();
     }
 
-    private static object? ConvertToNative(LangValueType value)
+    internal static object? ConvertToNative(LangValueType value)
     {
         return value switch
         {
@@ -698,7 +699,7 @@ public partial class MockObjectLangValue(MockLib.MockObject mockObject, SourcePo
         };
     }
 
-    private static LangValueType ConvertFromNative(object? value)
+    internal static LangValueType ConvertFromNative(object? value)
     {
         return value switch
         {

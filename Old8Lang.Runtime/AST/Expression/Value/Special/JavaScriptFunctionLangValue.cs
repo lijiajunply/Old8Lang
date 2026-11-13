@@ -13,9 +13,9 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class JavaScriptFunctionLangValue : FuncLangValue
 {
-    private readonly Engine _engine;
-    private readonly string _functionName;
-    private readonly string? _returnType;
+    internal readonly Engine _engine;
+    internal readonly string _functionName;
+    internal readonly string? _returnType;
 
     /// <summary>
     /// 构造函数
@@ -65,7 +65,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 核心执行逻辑：调用 JavaScript 函数
     /// </summary>
-    private LangValueType ExecuteJavaScriptFunction(
+    internal LangValueType ExecuteJavaScriptFunction(
         VariateManager variateManagerFunc,
         List<LangExpression> positionalArgs)
     {
@@ -93,7 +93,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Old8Lang 值转换为 JavaScript 值
     /// </summary>
-    private object? ConvertToJavaScript(LangValueType value)
+    internal object? ConvertToJavaScript(LangValueType value)
     {
         return value switch
         {
@@ -111,7 +111,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Old8Lang 列表转换为 JavaScript 数组
     /// </summary>
-    private object?[] ConvertListToJavaScript(ILangList listVal)
+    internal object?[] ConvertListToJavaScript(ILangList listVal)
     {
         return listVal.GetItems()
             .Select(ConvertToJavaScript)
@@ -121,7 +121,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 Old8Lang 字典转换为 JavaScript 对象
     /// </summary>
-    private Dictionary<string, object?> ConvertDictToJavaScript(DictionaryLangValue dictVal)
+    internal Dictionary<string, object?> ConvertDictToJavaScript(DictionaryLangValue dictVal)
     {
         var result = new Dictionary<string, object?>();
         foreach (var (key, value) in dictVal.Value)
@@ -136,7 +136,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 将 JavaScript 值转换为 Old8Lang 值
     /// </summary>
-    private LangValueType ConvertFromJavaScript(JsValue jsValue)
+    internal LangValueType ConvertFromJavaScript(JsValue jsValue)
     {
         // null 或 undefined
         if (jsValue.IsNull() || jsValue.IsUndefined())
