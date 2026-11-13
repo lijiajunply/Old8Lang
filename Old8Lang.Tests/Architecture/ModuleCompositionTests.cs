@@ -1,0 +1,59 @@
+using Old8Lang.Interpreter;
+using Old8Lang.Hosting;
+using Old8Lang.ModuleSystem.StandardLibrary;
+using Old8Lang.Modules.Official;
+
+namespace Old8Lang.Tests.Architecture;
+
+/// <summary>
+/// 验证核心与官方扩展模块之间的依赖边界。
+/// </summary>
+public class ModuleCompositionTests
+{
+    [Fact]
+    public void OfficialModules_AreRegisteredByTheHostCompositionRoot()
+    {
+        var expectedNames = new[]
+        {
+            "OS", "File", "Terminal", "Time", "Math", "Crypto", "Csv", "Vector", "Regex",
+            "ColorfulTerminal", "TemplateEngine", "Net", "MachineLearning", "Serialization", "Database"
+        };
+
+        foreach (var name in expectedNames)
+        {
+            Assert.True(StandardLibraryRegistry.IsStandardLibrary(name), $"模块 '{name}' 未由官方模块注册。");
+        }
+    }
+
+    [Fact]
+    public void CoreAssembly_DoesNotReferenceOfficialExtensionAssemblies()
+    {
+        var references = typeof(LangInterpreter).Assembly
+            .GetReferencedAssemblies()
+            .Select(reference => reference.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var extensions = new[]
+        {
+            "Old8LangLib", "Old8Lang.NetLib", "Old8Lang.DatabaseLib",
+            "Old8Lang.MachineLearningLib", "Old8Lang.SerializationLib"
+        };
+
+        foreach (var extension in extensions)
+        {
+            Assert.DoesNotContain(extension, references);
+        }
+    }
+
+    [Fact]
+    public void Hosts_KeepModuleCatalogsIsolatedUntilExplicitlyInstalled()
+    {
+        var firstBuilder = new Old8HostBuilder();
+        OfficialModules.RegisterAll(firstBuilder);
+        var first = firstBuilder.Build();
+        var second = new Old8HostBuilder().Build();
+
+        Assert.True(first.StandardLibraries.IsStandardLibrary("Database"));
+        Assert.False(second.StandardLibraries.IsStandardLibrary("Database"));
+    }
+}

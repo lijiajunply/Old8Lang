@@ -39,6 +39,8 @@
     <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />
     <ProjectReference Include="..\Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj" />
     <ProjectReference Include="..\Old8Lang.LanguageServer\Old8Lang.LanguageServer.csproj" />
+    <ProjectReference Include="..\Old8Lang.Hosting\Old8Lang.Hosting.csproj" />
+    <ProjectReference Include="..\Old8Lang.Modules.Official\Old8Lang.Modules.Official.csproj" />
   </ItemGroup>
 
 </Project>

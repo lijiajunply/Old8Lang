@@ -6,6 +6,8 @@ using OmniSharp.Extensions.LanguageServer.Server;
 using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
 using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.Hosting;
+using Old8Lang.Modules.Official;
 
 namespace Old8Lang.LanguageServer;
 
@@ -13,6 +15,11 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        // LSP 需要与 CLI 暴露相同的官方模块目录，用于补全和导入诊断。
+        var hostBuilder = new Old8HostBuilder();
+        OfficialModules.RegisterAll(hostBuilder);
+        hostBuilder.Build().InstallAsDefault();
+
         // 在启动时立即初始化全局函数，避免在请求处理时阻塞
         GlobalFunctionInitializer.EnsureInitialized();
 

@@ -15,6 +15,11 @@
 
 - 泛型 `class` 与 `mixin` 声明支持在类型参数列表后使用 `where` 子句声明约束，例如 `class Box<T> where T: int { ... }`；三种执行模式均可解析和执行已验证的约束类。
 
+**API**
+
+- .NET 宿主可通过 `Old8HostBuilder` 显式注册标准库模块并创建独立的模块目录；官方模块注册入口为
+  `Old8Lang.Modules.Official.OfficialModules.RegisterAll(...)`。CLI 的现有命令和 Old8 `import` 名称不变。
+
 ---
 
 ## 2026-11-11

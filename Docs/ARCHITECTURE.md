@@ -146,6 +146,16 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 
 ## 2. 模块架构
 
+### 2.0 宿主与官方模块装配
+
+语言核心不再直接引用网络、数据库、机器学习、序列化或标准库程序集。标准库通过
+`Old8Lang.Modules.Abstractions` 的模块描述由宿主显式注册；官方发行版的具体类型绑定位于
+`Old8Lang.Modules.Official`。CLI、LSP、测试和基准各自在组合根创建 `Old8HostBuilder`、注册官方模块，
+再安装生成的 Host。
+
+`Old8Lang.Hosting` 提供可独立创建的模块目录。当前旧执行路径仍通过
+`StandardLibraryRegistry` 读取默认 Host 目录，这是后续把执行上下文注入三种后端前的兼容适配层。
+
 ### 2.1 模块关系图
 
 ```

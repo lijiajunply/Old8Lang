@@ -2,7 +2,9 @@ using Old8Lang.App.Commands;
 using Old8Lang.App.Commands.Debug;
 using Old8Lang.App.Commands.Profiler;
 using Old8Lang.ExternProviders;
+using Old8Lang.Hosting;
 using Old8Lang.Interpreter;
+using Old8Lang.Modules.Official;
 
 namespace Old8Lang.App;
 
@@ -21,6 +23,11 @@ public abstract class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        // 应用组合根显式装配官方模块；语言核心本身不再引用扩展库程序集。
+        var hostBuilder = new Old8HostBuilder();
+        OfficialModules.RegisterAll(hostBuilder);
+        hostBuilder.Build().InstallAsDefault();
+
         // 注册所有命令
         RegisterCommands();
 

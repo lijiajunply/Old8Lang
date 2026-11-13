@@ -1,131 +1,71 @@
-using Old8Lang.DatabaseLib;
-using Old8Lang.MachineLearningLib;
-using Old8Lang.NetLib;
-using Old8Lang.SerializationLib;
-using Old8LangLib;
+using Old8Lang.Modules.Abstractions;
 
 namespace Old8Lang.ModuleSystem.StandardLibrary;
 
 /// <summary>
-/// 标准库注册表，管理所有内置的标准库
-/// 替代原有的 LangInfo.json 配置文件
+/// 默认宿主使用的标准库目录。
+/// 新的嵌入式宿主应创建 <see cref="StandardLibraryCatalog"/> 并通过 Hosting 项目显式安装；
+/// 此静态入口仅用于 CLI 与尚未迁移的执行路径。
 /// </summary>
 public static class StandardLibraryRegistry
 {
+    private static StandardLibraryCatalog _defaultCatalog = new();
+
     /// <summary>
-    /// 所有标准库的注册信息
+    /// 当前默认模块目录。
     /// </summary>
-    public static readonly Dictionary<string, StandardLibraryInfo> Libraries = new()
+    public static StandardLibraryCatalog DefaultCatalog => Volatile.Read(ref _defaultCatalog);
+
+    /// <summary>
+    /// 当前默认目录中的模块只读视图。
+    /// </summary>
+    public static IReadOnlyDictionary<string, StandardLibraryInfo> Libraries => DefaultCatalog.Libraries;
+
+    /// <summary>
+    /// 替换默认模块目录。仅应用组合根应调用此方法。
+    /// </summary>
+    /// <param name="catalog">要安装的目录。</param>
+    public static void SetDefaultCatalog(StandardLibraryCatalog catalog)
     {
-        // 来自 Old8LangLib 的标准库（使用延迟加载）
-        ["OS"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(OS))
-        ),
-
-        ["File"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(FileLib))
-        ),
-
-        ["Terminal"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(Terminal))
-        ),
-
-        ["Time"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(Time))
-        ),
-
-        ["Math"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(MathLib))
-        ),
-
-        ["Crypto"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(CryptoLib))
-        ),
-
-        ["Csv"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(Csv))
-        ),
-
-        ["Vector"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.NormalClass(typeof(Vector2)), 
-            TypeImportConfig.NormalClass(typeof(Vector3)),
-            TypeImportConfig.NormalClass(typeof(Vector4)),
-            TypeImportConfig.NormalClass(typeof(VectorN))
-        ),
-
-        ["Regex"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(RegexLib))
-        ),
-
-        ["ColorfulTerminal"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(ColorfulTerminal))
-        ),
-
-        ["TemplateEngine"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(TemplateEngine))
-        ),
-
-        // 来自 Old8Lang.NetLib 的网络库（多类库）
-        ["Net"] = StandardLibraryInfo.FromTypes(
-            "Old8Lang.NetLib",
-            TypeImportConfig.NormalClass(typeof(SocketClient)),
-            TypeImportConfig.NormalClass(typeof(HttpWebClient)),
-            TypeImportConfig.NormalClass(typeof(MqttClientWrapper)),
-            TypeImportConfig.NormalClass(typeof(WebSocketClient)),
-            TypeImportConfig.NormalClass(typeof(WebApiClient))
-        ),
-
-        // 其他扩展库（延迟加载）
-        ["MachineLearning"] = StandardLibraryInfo.FromTypes(
-            "Old8Lang.MachineLearningLib",
-            TypeImportConfig.StaticClass(
-                typeof(MachineLearningLibBinding)
-            )
-        ),
-
-        ["Serialization"] = StandardLibraryInfo.FromTypes(
-            "Old8Lang.SerializationLib",
-            TypeImportConfig.StaticClass(
-                typeof(SerializationLibBinding)
-            )
-        ),
-
-        ["Database"] = StandardLibraryInfo.FromTypes(
-            "Old8Lang.DatabaseLib",
-            TypeImportConfig.StaticClass(
-                typeof(DatabaseLibBinding)
-            )
-        ),
-
-        // ["FirstUI"] = StandardLibraryInfo.FromAssembly(assembly: new FirstUIApplication().GetType().Assembly)
-    };
-
-    /// <summary>
-    /// 检查指定名称是否为标准库
-    /// </summary>
-    public static bool IsStandardLibrary(string name) => Libraries.ContainsKey(name);
-
-    /// <summary>
-    /// 获取标准库信息
-    /// </summary>
-    public static StandardLibraryInfo? GetLibraryInfo(string name)
-    {
-        return Libraries.GetValueOrDefault(name);
+        ArgumentNullException.ThrowIfNull(catalog);
+        Interlocked.Exchange(ref _defaultCatalog, catalog);
     }
 
     /// <summary>
-    /// 获取所有标准库名称列表
+    /// 向默认目录注册模块。
     /// </summary>
-    public static IEnumerable<string> GetAllLibraryNames() => Libraries.Keys;
+    /// <param name="module">模块实现。</param>
+    public static void Register(IStandardLibraryModule module)
+    {
+        DefaultCatalog.Register(module);
+    }
+
+    /// <summary>
+    /// 向默认目录注册模块描述。
+    /// </summary>
+    /// <param name="descriptor">模块描述。</param>
+    public static void Register(StandardLibraryModuleDescriptor descriptor)
+    {
+        DefaultCatalog.Register(descriptor);
+    }
+
+    /// <summary>
+    /// 判断模块名是否已注册。
+    /// </summary>
+    /// <param name="name">Old8Lang 模块名。</param>
+    /// <returns>已注册时为 true。</returns>
+    public static bool IsStandardLibrary(string name) => DefaultCatalog.IsStandardLibrary(name);
+
+    /// <summary>
+    /// 获取默认目录中的模块信息。
+    /// </summary>
+    /// <param name="name">Old8Lang 模块名。</param>
+    /// <returns>模块信息；未注册时为 null。</returns>
+    public static StandardLibraryInfo? GetLibraryInfo(string name) => DefaultCatalog.GetLibraryInfo(name);
+
+    /// <summary>
+    /// 获取默认目录中的全部模块名。
+    /// </summary>
+    /// <returns>模块名序列。</returns>
+    public static IEnumerable<string> GetAllLibraryNames() => DefaultCatalog.GetAllLibraryNames();
 }
