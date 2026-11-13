@@ -76,6 +76,7 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 | 项目 | 说明 |
 |------|------|
 | `Old8Lang.Core/` | 后端无关基础（源位置、诊断、词法、预处理、解析上下文与文档注释模型） |
+| `Old8Lang.Concurrency/` | 并发资源、线程调度与同步原语（不依赖语言执行后端） |
 | `Old8Lang.Runtime/` | 语言执行实现（AST、语法解析、解释器、IL、VM、类型系统） |
 | `Old8Lang.App/` | 命令行应用 |
 | `Old8LangLib/` | 标准库（数学、字符串、文件、集合） |

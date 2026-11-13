@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Core", "Old8Lang.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Runtime", "Old8Lang.Runtime\Old8Lang.Runtime.csproj", "{9BF46672-8C0F-49CC-9CDD-501F400950BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Concurrency", "Old8Lang.Concurrency\Old8Lang.Concurrency.csproj", "{3B351F9F-6D8F-4BA8-9C86-7094565C929D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -220,6 +222,18 @@ Global
 		{9BF46672-8C0F-49CC-9CDD-501F400950BF}.Release|x64.Build.0 = Release|Any CPU
 		{9BF46672-8C0F-49CC-9CDD-501F400950BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{9BF46672-8C0F-49CC-9CDD-501F400950BF}.Release|x86.Build.0 = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|x64.Build.0 = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B351F9F-6D8F-4BA8-9C86-7094565C929D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

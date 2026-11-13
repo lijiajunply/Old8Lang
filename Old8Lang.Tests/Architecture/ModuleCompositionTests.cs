@@ -1,6 +1,7 @@
 using Old8Lang.Interpreter;
 using Old8Lang.Hosting;
 using Old8Lang.Bytecode;
+using Old8Lang.Concurrency;
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Official;
 
@@ -67,6 +68,13 @@ public class ModuleCompositionTests
         {
             Assert.DoesNotContain(extension, references);
         }
+    }
+
+    [Fact]
+    public void ConcurrencyResources_AreProvidedByDedicatedAssembly()
+    {
+        Assert.Equal("Old8Lang.Concurrency", typeof(ResourceManager).Assembly.GetName().Name);
+        Assert.NotEqual(typeof(LangInterpreter).Assembly, typeof(ResourceManager).Assembly);
     }
 
     [Fact]
