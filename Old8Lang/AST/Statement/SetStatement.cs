@@ -791,6 +791,10 @@ public partial class SetStatement : OldStatement
                                     // object到值类型，需要拆箱
                                     ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
                                 }
+                                else if (IsNumericType(fieldInfo.FieldType) && IsNumericType(valueType))
+                                {
+                                    EmitNumericConversion(ilGenerator, fieldInfo.FieldType);
+                                }
                             }
 
                             ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
@@ -1105,6 +1109,19 @@ public partial class SetStatement : OldStatement
     /// <summary>
     /// 计算全局槽位赋值右侧表达式的静态类型。
     /// </summary>
+    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+                                                     type == typeof(float) || type == typeof(long) ||
+                                                     type == typeof(short) || type == typeof(byte);
+
+    private static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    {
+        ilGenerator.Emit(targetType == typeof(double) ? OpCodes.Conv_R8 :
+            targetType == typeof(float) ? OpCodes.Conv_R4 :
+            targetType == typeof(long) ? OpCodes.Conv_I8 :
+            targetType == typeof(short) ? OpCodes.Conv_I2 :
+            targetType == typeof(byte) ? OpCodes.Conv_U1 : OpCodes.Conv_I4);
+    }
+
     private Type ComputeGlobalValueType(LocalManager local)
     {
         if (Id is not null && !string.IsNullOrEmpty(Id.AssumptionType))

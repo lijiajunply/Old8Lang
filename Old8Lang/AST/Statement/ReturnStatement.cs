@@ -140,6 +140,10 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                     {
                         ilGenerator.Emit(OpCodes.Box, returnType);
                     }
+                    else if (IsNumericType(expectedReturnType) && IsNumericType(returnType))
+                    {
+                        EmitNumericConversion(ilGenerator, expectedReturnType);
+                    }
                     else if (!expectedReturnType.IsValueType && !returnType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Castclass, expectedReturnType);
@@ -175,6 +179,19 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
             return true;
 
         return false;
+    }
+
+    private static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
+                                                     type == typeof(float) || type == typeof(long) ||
+                                                     type == typeof(short) || type == typeof(byte);
+
+    private static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    {
+        ilGenerator.Emit(targetType == typeof(double) ? OpCodes.Conv_R8 :
+            targetType == typeof(float) ? OpCodes.Conv_R4 :
+            targetType == typeof(long) ? OpCodes.Conv_I8 :
+            targetType == typeof(short) ? OpCodes.Conv_I2 :
+            targetType == typeof(byte) ? OpCodes.Conv_U1 : OpCodes.Conv_I4);
     }
 
     public override OldStatement? this[int index] => null;
