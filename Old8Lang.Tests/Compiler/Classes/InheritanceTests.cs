@@ -26,7 +26,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Dog : Animal {
+            class Dog extends Animal {
                 public breed <- """"
                 
                 func init(name:string, breed:string) {
@@ -72,7 +72,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Rectangle : Shape {
+            class Rectangle extends Shape {
                 public width <- 0.0
                 public height <- 0.0
                 
@@ -90,7 +90,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Circle : Shape {
+            class Circle extends Shape {
                 public radius <- 0.0
                 
                 func init(radius:double) {
@@ -139,7 +139,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Car : Vehicle {
+            class Car extends Vehicle {
                 public fuel <- 0
                 
                 func init(speed:int, fuel:int) {
@@ -152,7 +152,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class ElectricCar : Car {
+            class ElectricCar extends Car {
                 public battery <- 0
                 
                 func init(speed:int, fuel:int, battery:int) {
@@ -202,7 +202,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class DerivedClass : BaseClass {
+            class DerivedClass extends BaseClass {
                 public func doubleValue() -> int {
                     return this.value * 2
                 }
@@ -243,7 +243,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Child : Parent {
+            class Child extends Parent {
                 func greet() -> string {
                     parentGreeting <- super.greet()
                     return parentGreeting + "" and Child""
@@ -284,7 +284,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Manager : Employee {
+            class Manager extends Employee {
                 public bonus <- 0.0
                 
                 func init(name:string, bonus:double) {
@@ -298,7 +298,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Developer : Employee {
+            class Developer extends Employee {
                 public overtimeHours <- 0
                 
                 func init(name:string, overtimeHours:int) {
@@ -346,7 +346,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Parent : Grandparent {
+            class Parent extends Grandparent {
                 public parentField <- ""parent""
                 
                 func init() {
@@ -359,7 +359,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Child : Parent {
+            class Child extends Parent {
                 public childField <- ""child""
                 
                 func init() {
@@ -397,7 +397,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Triangle : Shape {
+            class Triangle extends Shape {
                 public base <- 0.0
                 public height <- 0.0
                 
@@ -439,7 +439,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Cat : Animal {
+            class Cat extends Animal {
                 func speak() -> string {
                     return ""Meow""
                 }
@@ -478,7 +478,7 @@ public class InheritanceTests(ITestOutputHelper output)
                 }
             }
             
-            class Derived : Base {
+            class Derived extends Base {
                 public static func doubleIncrement() -> int {
                     Base.count <- Base.count + 2
                     return Base.count

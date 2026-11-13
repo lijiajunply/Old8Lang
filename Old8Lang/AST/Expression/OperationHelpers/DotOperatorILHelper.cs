@@ -213,8 +213,66 @@ public static class DotOperatorILHelper
                 $"静态类 '{leftId.IdName}' 不支持方法 '{methodName}'。请检查方法名是否正确。");
         }
 
+        // super.method(...) 必须以非虚调用直接绑定到父类实现。若按普通实例方法
+        // 进行运行期分派，接收者仍是子类实例，重写的 init/method 会再次进入自身，
+        // 例如 Child.init() 中的 super.init() 会无限递归。
+        if (left is SuperExpression)
+        {
+            return GenerateSuperInstanceMethodCall(instance, ilGenerator, local, operation);
+        }
+
         // 普通实例方法调用
         return GenerateRegularInstanceMethodCall(left, instance, ilGenerator, local, leftType, operation);
+    }
+
+    /// <summary>
+    /// 生成直接调用父类实例方法的 IL，绕开 CLR 虚分派以实现语言层 <c>super</c> 语义。
+    /// </summary>
+    private static Type GenerateSuperInstanceMethodCall(
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        Operation operation)
+    {
+        var parentType = local.InClassEnv?.BaseType;
+        if (parentType is null || parentType == typeof(object))
+        {
+            throw new InvalidOperationError(operation, "super 只能在具有父类的实例方法中使用");
+        }
+
+        var argumentTypes = instance.Ids
+            .Select(argument => argument.OutputType(local) ?? typeof(object))
+            .ToArray();
+        var method = parentType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(candidate => candidate.Name == instance.Id.IdName)
+            .FirstOrDefault(candidate => ParametersMatch(candidate.GetParameters(), argumentTypes));
+        if (method is null)
+        {
+            throw new InvalidOperationError(operation,
+                $"父类 '{parentType.Name}' 中未找到方法 '{instance.Id.IdName}'");
+        }
+
+        ilGenerator.Emit(OpCodes.Ldarg_0);
+        foreach (var argument in instance.Ids)
+        {
+            argument.LoadIlValue(ilGenerator, local);
+        }
+
+        ilGenerator.Emit(OpCodes.Call, method);
+        return method.ReturnType;
+    }
+
+    private static bool ParametersMatch(ParameterInfo[] parameters, Type[] argumentTypes)
+    {
+        if (parameters.Length != argumentTypes.Length)
+        {
+            return false;
+        }
+
+        return parameters.Zip(argumentTypes).All(pair =>
+            pair.First.ParameterType == pair.Second ||
+            pair.First.ParameterType.IsAssignableFrom(pair.Second) ||
+            pair.Second == typeof(object));
     }
 
     /// <summary>

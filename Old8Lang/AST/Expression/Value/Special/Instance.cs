@@ -768,6 +768,26 @@ public partial class Instance : LangValueType
                 }
             }
 
+            // 子类未声明 init 时，构造调用应继承父类的可匹配初始化方法。
+            // DeclaredOnly 仅用于优先选择子类自己的 init；不能使 Parent.init
+            // 在 Child(args) 场景中静默丢失。
+            if (initFunc is null && classType is not TypeBuilder)
+            {
+                var argumentTypes = Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+                initFunc = classType
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(method => method.Name == "init")
+                    .FirstOrDefault(method =>
+                    {
+                        var parameters = method.GetParameters();
+                        return parameters.Length == argumentTypes.Length &&
+                               parameters.Zip(argumentTypes).All(pair =>
+                                   pair.First.ParameterType == pair.Second ||
+                                   pair.First.ParameterType.IsAssignableFrom(pair.Second) ||
+                                   pair.Second == typeof(object));
+                    });
+            }
+
             if (initFunc is not null)
             {
                 // 加载 this 指针
