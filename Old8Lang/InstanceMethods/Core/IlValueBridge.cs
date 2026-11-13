@@ -99,8 +99,10 @@ public static class IlValueBridge
                 return new ListLangValue(items);
             }
             default:
-                throw new ArgumentException(
-                    $"IL 模式暂不支持把原生类型 {value.GetType().Name} 转换为 Old8Lang 值");
+                // 已特化的 Old8Lang 类与宿主 CLR 对象都可能作为集合元素流经
+                // 语言层实例方法。保留原对象的 NativeAny 包装，使其能够再次
+                // Unwrap 回原生对象，而不是在桥接边界直接失败。
+                return new NativeAnyLangValue(value);
         }
     }
 
@@ -140,6 +142,8 @@ public static class IlValueBridge
             }
             case IlDelegateFuncLangValue delegateFunc:
                 return delegateFunc.Function;
+            case NativeAnyLangValue nativeValue:
+                return nativeValue.GetNativeObject();
             default:
                 return value;
         }
