@@ -247,8 +247,8 @@ public partial class CompilerVisitor
 
     public object? VisitSuperExpression(SuperExpression node)
     {
-        // 简化实现
-        node.Accept(this);
+        // 迁移自 SuperExpression.LoadIlValue()
+        ilGenerator.Emit(OpCodes.Ldarg_0);
         return null;
     }
 
@@ -539,7 +539,7 @@ public partial class CompilerVisitor
 
     public object? VisitErrorLangValue(ErrorLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1603,7 +1603,7 @@ public partial class CompilerVisitor
 
     public object? VisitSuperProxy(SuperProxy node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1633,13 +1633,13 @@ public partial class CompilerVisitor
 
     public object? VisitTaskFactoryClassLangValue(TaskFactoryClassLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
     public object? VisitTaskFactoryStaticMethodWrapper(TaskFactoryStaticMethodWrapper node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1659,13 +1659,13 @@ public partial class CompilerVisitor
 
     public object? VisitTaskSchedulerClassLangValue(TaskSchedulerClassLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
     public object? VisitTaskSchedulerLangValue(TaskSchedulerLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1683,7 +1683,7 @@ public partial class CompilerVisitor
 
     public object? VisitThreadClassLangValue(ThreadClassLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1699,7 +1699,7 @@ public partial class CompilerVisitor
 
     public object? VisitThreadStaticMethodWrapper(ThreadStaticMethodWrapper node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
@@ -1875,7 +1875,7 @@ public partial class CompilerVisitor
 
     public object? VisitLockedVariableLangValue(LockedVariableLangValue node)
     {
-        node.Accept(this);
+        // 该节点没有 IL 实现，与旧实现一致地不生成代码
         return null;
     }
 
