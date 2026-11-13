@@ -81,10 +81,9 @@
 - [x] **IL 实例方法读取裸字段仍是 `NullReferenceException`**：裸字段现在在静态类型推断中返回其字段类型，
   避免返回路径对已加载的值类型重复拆箱；读取型回归通过。见
   [测试报告](Reports/2026-11-13-08-50-IL裸字段访问.md)。
-- [ ] **IL 集合 `Length` 参与比较会生成无效 IL/运行期 NRE**（2026-11-11 顺带发现）：
-  `items <- {1,2,3}; PrintLine(items.Length > 0)` 在 `-il` 下顶层报 IL 验证失败，在函数体内抛
-  `NullReferenceException`；单独 `PrintLine(items.Length)` 正常。原因是 `Operation.OutputType` 把
-  `List<object>.Length` 推断为 `object`，比较路径据此生成拆箱代码。解释器本身不支持列表 `.Length`。
+- [x] **IL 集合 `Length` 参与比较会生成无效 IL/运行期 NRE**：集合 `Length` 在发射路径和
+  静态类型推断路径中均统一为 `int`，顶层与函数体中的比较回归均通过。见
+  [测试报告](Reports/2026-11-13-09-40-IL集合Length比较.md)。
 
 - [x] **IL 打印布尔值大小写不一致**：`PrintLine(true)` 现在输出 `true`；见 [测试报告](Reports/2026-11-11-11-11-IL打印格式测试.md)。
 

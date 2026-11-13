@@ -773,6 +773,16 @@ public partial class Operation(
         {
             if (leftType is not null)
             {
+                // IL 发射阶段会把集合的语言层 Length 属性映射到 CLR ICollection.Count。
+                // 这里必须同步返回 int，否则 Length 参与比较时会被当作 object，
+                // 进而生成错误的装箱/比较 IL。
+                if (rightId.IdName == "Length" &&
+                    typeof(System.Collections.ICollection).IsAssignableFrom(leftType) &&
+                    !leftType.IsValueType)
+                {
+                    return typeof(int);
+                }
+
                 // 检查是否是枚举类型的成员访问
                 if (leftType.IsEnum)
                 {

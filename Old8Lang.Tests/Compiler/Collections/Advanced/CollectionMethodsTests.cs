@@ -588,6 +588,27 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void CollectionLengthComparison_CompilesAndExecutesAtTopLevelAndInFunction()
+    {
+        var code = @"
+            items <- {1, 2, 3}
+
+            func hasItems(values:list) -> bool {
+                return values.Length > 0
+            }
+
+            Assert.True(items.Length > 0)
+            Assert.True(hasItems(items))
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListSortMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
