@@ -166,9 +166,11 @@ public static class GenericClassSpecializer
         LocalManager local,
         Dictionary<string, Type> typeArguments)
     {
-        // 1. 生成实例字段
+        // 1. 生成实例字段与静态字段
         var fieldMap = new Dictionary<string, FieldBuilder>();
-        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        foreach (var (memberId, memberExpr, isStatic) in typeTemplate.Variates
+                     .Select(pair => (pair.Key, pair.Value, false))
+                     .Concat(typeTemplate.StaticVariates.Select(pair => (pair.Key, pair.Value, true))))
         {
             // 跳过方法（FuncLangValue）
             if (memberExpr is FuncLangValue)
@@ -181,6 +183,10 @@ public static class GenericClassSpecializer
             var fieldAttributes = memberId.HasModifier(AccessModifierType.Private)
                 ? FieldAttributes.Private
                 : FieldAttributes.Public;
+            if (isStatic)
+            {
+                fieldAttributes |= FieldAttributes.Static;
+            }
             var fieldBuilder = typeBuilder.DefineField(
                 memberId.IdName,
                 fieldType,
@@ -189,11 +195,14 @@ public static class GenericClassSpecializer
             fieldMap[memberId.IdName] = fieldBuilder;
         }
 
+        GenerateStaticFieldInitializer(typeTemplate, typeBuilder, resolver, local, fieldMap);
+
         // 2. 生成构造函数
         local.GenericClassConstructors[typeBuilder] = GenerateConstructor(typeBuilder, fieldMap);
 
-        // 3. 生成实例方法
+        // 3. 生成实例方法与静态方法
         GenerateInstanceMethods(typeTemplate, typeBuilder, resolver, local, typeArguments, fieldMap);
+        GenerateStaticMethods(typeTemplate, typeBuilder, resolver, local, typeArguments, fieldMap);
     }
 
     /// <summary>
@@ -206,6 +215,49 @@ public static class GenericClassSpecializer
             return resolver.ResolveType(memberId.AssumptionType);
         }
         return typeof(object);
+    }
+
+    /// <summary>
+    /// 为泛型特化类型发射静态字段初始化器。CLR 对 object 静态字段只给 null，
+    /// 不能丢失模板中诸如 <c>count &lt;- 0</c> 的显式初始值。
+    /// </summary>
+    private static void GenerateStaticFieldInitializer(
+        TypeTemplate typeTemplate,
+        TypeBuilder typeBuilder,
+        GenericTypeResolver resolver,
+        LocalManager local,
+        Dictionary<string, FieldBuilder> fieldMap)
+    {
+        var initializers = typeTemplate.StaticVariates
+            .Where(pair => pair.Value is not FuncLangValue && fieldMap.TryGetValue(pair.Key.IdName, out var field) && field.IsStatic)
+            .ToList();
+        if (initializers.Count == 0)
+        {
+            return;
+        }
+
+        var initializer = typeBuilder.DefineTypeInitializer();
+        var ilGenerator = initializer.GetILGenerator();
+        var initializerLocal = CreateMethodLocalManager(local, resolver, typeBuilder, fieldMap);
+
+        foreach (var (memberId, expression) in initializers)
+        {
+            var field = fieldMap[memberId.IdName];
+            expression.LoadIlValue(ilGenerator, initializerLocal);
+            var valueType = expression.OutputType(initializerLocal) ?? typeof(object);
+            if (field.FieldType == typeof(object) && valueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+            else if (field.FieldType.IsValueType && valueType == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, field.FieldType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stsfld, field);
+        }
+
+        ilGenerator.Emit(OpCodes.Ret);
     }
 
     /// <summary>
@@ -286,6 +338,38 @@ public static class GenericClassSpecializer
     }
 
     /// <summary>
+    /// 生成泛型特化类型的静态方法。泛型模板把这类成员保存在 StaticVariates，
+    /// 必须与普通类的静态成员一样生成真正的 CLR static 方法。
+    /// </summary>
+    private static void GenerateStaticMethods(
+        TypeTemplate typeTemplate,
+        TypeBuilder typeBuilder,
+        GenericTypeResolver resolver,
+        LocalManager local,
+        Dictionary<string, Type> typeArguments,
+        Dictionary<string, FieldBuilder> fieldMap)
+    {
+        foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
+        {
+            if (memberExpr is not FuncLangValue funcValue)
+            {
+                continue;
+            }
+
+            var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
+            var returnType = resolver.ResolveReturnType(funcValue.Id?.AssumptionType);
+            var methodBuilder = typeBuilder.DefineMethod(
+                memberId.IdName,
+                MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
+                returnType,
+                parameterTypes);
+            var methodLocal = CreateMethodLocalManager(local, resolver, typeBuilder, fieldMap);
+            GenerateMethodBody(funcValue, methodBuilder.GetILGenerator(), methodLocal,
+                parameterTypes, returnType, isStatic: true);
+        }
+    }
+
+    /// <summary>
     /// 创建方法的局部管理器
     /// </summary>
     private static LocalManager CreateMethodLocalManager(
@@ -346,7 +430,8 @@ public static class GenericClassSpecializer
         ILGenerator methodIL,
         LocalManager methodLocal,
         Type[] parameterTypes,
-        Type returnType)
+        Type returnType,
+        bool isStatic = false)
     {
         if (returnType != typeof(void))
         {
@@ -354,8 +439,8 @@ public static class GenericClassSpecializer
         }
 
         // 处理参数：为方法创建参数局部变量
-        // 对于实例方法，参数索引从 1 开始（0 是 this）
-        int paramIndex = 1;
+        // 实例方法的参数索引从 1 开始（0 是 this）；静态方法从 0 开始。
+        int paramIndex = isStatic ? 0 : 1;
         if (funcValue.Ids is not null)
         {
             for (var i = 0; i < funcValue.Ids.Count; i++)

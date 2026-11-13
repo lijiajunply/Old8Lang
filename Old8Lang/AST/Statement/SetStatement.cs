@@ -765,6 +765,41 @@ public partial class SetStatement : OldStatement
                         }
                     }
 
+                    // 泛型类型引用（如 Counter<T>.count）不是 LangId；其 OutputType
+                    // 已是具体特化类型，仍应直接写入静态字段，不能先实例化接收者。
+                    if (operation.Left is GenericInstanceExpression { IsFunctionCall: false })
+                    {
+                        var specializedType = operation.Left.OutputType(local);
+                        FieldInfo? staticField = local.FieldVar.GetValueOrDefault(memberId.IdName);
+                        if (staticField?.IsStatic != true)
+                        {
+                            staticField = specializedType is TypeBuilder && specializedType == local.InClassEnv
+                                ? local.FieldVar.GetValueOrDefault(memberId.IdName)
+                                : specializedType?.GetField(memberId.IdName,
+                                    BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                        }
+                        if (staticField is not null && !staticField.IsStatic)
+                        {
+                            staticField = null;
+                        }
+                        if (staticField is not null)
+                        {
+                            Value.LoadIlValue(ilGenerator, local);
+                            var valueType = Value.OutputType(local);
+                            if (staticField.FieldType == typeof(object) && valueType?.IsValueType == true)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, valueType);
+                            }
+                            else if (staticField.FieldType.IsValueType && valueType == typeof(object))
+                            {
+                                ilGenerator.Emit(OpCodes.Unbox_Any, staticField.FieldType);
+                            }
+
+                            ilGenerator.Emit(OpCodes.Stsfld, staticField);
+                            return;
+                        }
+                    }
+
                     // 检查是否是this访问（如this.name <- value）
                     if ((operation.Left is LangId { IdName: "this" } || operation.Left is ThisExpression) &&
                         local.InClassEnv is not null)

@@ -275,7 +275,7 @@ public static class DotOperatorILHelper
         }
 
         // 用户定义类的静态方法需要直接从类型调用，不能把类名当作局部变量加载。
-        if (left is LangId && leftType is not null)
+        if ((left is LangId || left is GenericInstanceExpression { IsFunctionCall: false }) && leftType is not null)
         {
             var argumentTypes = instance.Ids
                 .Select(argument => argument.OutputType(local) ?? typeof(object))
@@ -1200,7 +1200,14 @@ public static class DotOperatorILHelper
 
         // 用户定义类的静态字段/属性访问。这里不能先加载 left：类名仅用于
         // 类型解析，在运行期没有对应的局部变量。
-        if (left is LangId && leftType is not null)
+        if (left is GenericInstanceExpression { IsFunctionCall: false } &&
+            local.FieldVar.TryGetValue(id.IdName, out var genericStaticField) && genericStaticField.IsStatic)
+        {
+            ilGenerator.Emit(OpCodes.Ldsfld, genericStaticField);
+            return genericStaticField.FieldType;
+        }
+
+        if ((left is LangId || left is GenericInstanceExpression { IsFunctionCall: false }) && leftType is not null)
         {
             // TypeBuilder 在 CreateType 前不支持 GetField；当前类的字段已经由
             // ClassInit 放进 FieldVar，可直接复用 FieldBuilder。
