@@ -52,53 +52,11 @@ public partial class BlockStatement : OldStatement
         }
     }
 
-    public override void Run(VariateManager manager)
-    {
-        // 检查是否有生成器上下文，决定执行模式
-        if (manager.GeneratorContext is not null)
-        {
-            RunWithGeneratorContext(manager);
-        }
-        else
-        {
-            RunStandard(manager);
-        }
-    }
-
-    /// <summary>
-    /// 标准执行模式（非生成器）
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    private void RunStandard(VariateManager manager)
-    {
-        // 先执行导入语句
-        ImportRun(manager);
-
-        // 顺序执行所有语句
-        foreach (var statement in OtherStatements)
-        {
-            statement.Run(manager);
-
-            // 检查 return 语句
-            if (manager.IsReturn)
-            {
-                return;
-            }
-
-            // 检查 break 和 continue 语句
-            // 如果在块内遇到 break 或 continue，应该立即停止执行后续语句
-            if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
-            {
-                return;
-            }
-        }
-    }
-
     /// <summary>
     /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void RunWithGeneratorContext(VariateManager manager)
+    internal void RunWithGeneratorContext(VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 

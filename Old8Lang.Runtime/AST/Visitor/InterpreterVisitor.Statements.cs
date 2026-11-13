@@ -104,7 +104,7 @@ public partial class InterpreterVisitor
         if (manager.GeneratorContext is not null)
         {
             // 生成器模式需要调用原方法（暂不迁移复杂逻辑）
-            node.Run(manager);
+            node.RunWithGeneratorContext(manager);
         }
         else
         {
@@ -118,7 +118,8 @@ public partial class InterpreterVisitor
                 var statement = node[i];
                 if (statement is not null)
                 {
-                    statement.Accept(this);
+                    // 未迁移的节点仍使用其旧执行方法；逐节点切换到 Visitor。
+                    statement.Run(manager);
 
                     // 检查 return 语句
                     if (manager.IsReturn)

@@ -23,9 +23,7 @@ public static class ExecutionModeDispatcher
         ArgumentNullException.ThrowIfNull(statement);
         ArgumentNullException.ThrowIfNull(manager);
 
-        // 现有 InterpreterVisitor 对部分循环与函数调用尚不能等价替代旧执行路径。
-        // 入口先集中在此，待这些节点迁移并通过回归后再切换 Visitor。
-        statement.Run(manager);
+        _ = statement.Accept(new InterpreterVisitor(manager));
     }
 
     /// <summary>
