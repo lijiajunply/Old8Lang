@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Implementations.Generic;
@@ -12,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Generic;
 /// ILangList.ToStr() - 转换为字符串
 /// 适用于所有实现 ILangList 接口的类型
 /// </summary>
-public class LangListToStrMethod : BaseLangListMethod
+public class LangListToStrMethod : BaseLangListMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["ToStr", "toStr", "ToString", "toString"];
     public override string[]? ParameterNames => null;
@@ -32,11 +33,18 @@ public class LangListToStrMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.LoadIlValue(ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        var helperMethod = typeof(LangListToStrMethod).GetMethod(nameof(ToStrHelper),
+        var helperMethod = typeof(LangListToStrMethod).GetMethod(nameof(ToStrNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static string ToStrNativeHelper(LangValueType instance)
+    {
+        if (instance is not ILangList langList)
+            throw new ArgumentException($"实例必须实现 ILangList 接口，实际是 {instance.GetType().Name}");
+        return ToStrHelper(langList);
     }
 
     public static string ToStrHelper(ILangList langList)

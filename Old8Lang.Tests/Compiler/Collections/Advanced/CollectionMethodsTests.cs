@@ -280,6 +280,22 @@ public class CollectionMethodsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ListToStr_CompilesForNativeListsAndArrays()
+    {
+        var code = @"
+            values <- {1, 2, 3}
+            array <- [4, 5]
+            Assert.Equal(""[1, 2, 3]"", values.ToStr())
+            Assert.Equal(""[4, 5]"", array.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ListFindMethod_CompilesAndExecutesCorrectly()
     {
         // Arrange
