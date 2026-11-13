@@ -19,7 +19,7 @@ public partial class BytecodeVisitor
         string moduleName = node.GetImportString();
         Emit(OpCode.LoadModule, moduleName);
 
-        if (StandardLibraryRegistry.IsStandardLibrary(moduleName) && !node.GetFromClause())
+        if (compiler.StandardLibraries.IsStandardLibrary(moduleName) && !node.GetFromClause())
         {
             Emit(OpCode.GetModuleSymbol, new object[] { moduleName, ModuleRegistry.ModuleObjectSymbol });
             Emit(OpCode.StoreGlobal, node.GetModuleAlias() ?? moduleName);

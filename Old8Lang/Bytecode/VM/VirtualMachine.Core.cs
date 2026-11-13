@@ -8,6 +8,7 @@ using Old8Lang.Bytecode.ModuleSystem;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using System.Buffers;
 using System.Collections.Concurrent;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
@@ -58,9 +59,19 @@ public partial class VirtualMachine
     private readonly ModuleRegistry _moduleRegistry = new();
     private readonly ModuleLoader _moduleLoader;
     private readonly string? _baseDirectory;
+    private readonly StandardLibraryCatalog _standardLibraries;
 
-    public VirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
-        : this(bytecodeFile, baseDirectory, null, 0, null, null, null, initializeRuntimeMetadata: true)
+    /// <summary>
+    /// 此虚拟机执行模块导入时使用的标准库目录。
+    /// </summary>
+    public StandardLibraryCatalog StandardLibraries => _standardLibraries;
+
+    public VirtualMachine(
+        BytecodeFile bytecodeFile,
+        string? baseDirectory = null,
+        StandardLibraryCatalog? standardLibraries = null)
+        : this(bytecodeFile, baseDirectory, null, 0, null, null, null,
+            standardLibraries ?? StandardLibraryRegistry.DefaultCatalog, initializeRuntimeMetadata: true)
     {
     }
 
@@ -72,11 +83,13 @@ public partial class VirtualMachine
         Dictionary<string, FunctionMetadata>? sharedFunctionByName,
         Dictionary<string, ClassMetadata>? sharedClassByName,
         ConcurrentDictionary<(string ModuleName, string SymbolName), object>? sharedModuleSymbolCache,
+        StandardLibraryCatalog standardLibraries,
         bool initializeRuntimeMetadata)
     {
         _bytecodeFile = bytecodeFile ?? throw new ArgumentNullException(nameof(bytecodeFile));
         _baseDirectory = baseDirectory ?? Directory.GetCurrentDirectory();
-        _moduleLoader = new ModuleLoader(_baseDirectory);
+        _standardLibraries = standardLibraries;
+        _moduleLoader = new ModuleLoader(_baseDirectory, _standardLibraries);
         _globals = sharedGlobals ?? new ConcurrentDictionary<string, GlobalSlot>(StringComparer.Ordinal);
         _globalsOwnerId = sharedGlobals != null
             ? sharedGlobalsOwnerId
@@ -140,6 +153,7 @@ public partial class VirtualMachine
             _functionByName,
             _classByName,
             _moduleSymbolCache,
+            _standardLibraries,
             initializeRuntimeMetadata: false);
     }
 

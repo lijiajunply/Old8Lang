@@ -1,14 +1,16 @@
 using Old8Lang.ModuleSystem.Resolution;
 using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.Bytecode.ModuleSystem;
 
 /// <summary>
 /// 模块加载器 - 负责加载和编译模块
 /// </summary>
-public class ModuleLoader(string? baseDirectory = null)
+public class ModuleLoader(string? baseDirectory = null, StandardLibraryCatalog? standardLibraries = null)
 {
-    private readonly ModuleResolver _moduleResolver = new();
+    private readonly StandardLibraryCatalog _standardLibraries = standardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
+    private readonly ModuleResolver _moduleResolver = new(standardLibraries);
 
     /// <summary>
     /// 加载模块并编译为字节码
@@ -36,11 +38,11 @@ public class ModuleLoader(string? baseDirectory = null)
         }
 
         // 解析模块代码
-        var interpreter = new LangInterpreter();
+        var interpreter = new LangInterpreter(_standardLibraries);
         var ast = interpreter.Build(moduleCode);
 
         // 编译为字节码
-        var compiler = new BytecodeCompiler();
+        var compiler = new BytecodeCompiler(_standardLibraries);
         var bytecodeFile = compiler.Compile(ast);
 
         // 设置模块名称

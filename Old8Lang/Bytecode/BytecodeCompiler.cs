@@ -8,6 +8,7 @@ using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.TypeSystem;
 using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
@@ -27,7 +28,37 @@ public class BytecodeCompiler
     /// <summary>
     /// 解释器实例，用于类型检查
     /// </summary>
-    public LangInterpreter? Interpreter { get; set; }
+    private LangInterpreter? _interpreter;
+
+    /// <summary>
+    /// 解释器实例，用于类型检查；赋值时同步使用其模块目录。
+    /// </summary>
+    public LangInterpreter? Interpreter
+    {
+        get => _interpreter;
+        set
+        {
+            _interpreter = value;
+            if (value is not null)
+            {
+                StandardLibraries = value.Manager.StandardLibraries;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 编译字节码时可见的标准库目录。
+    /// </summary>
+    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryRegistry.DefaultCatalog;
+
+    /// <summary>
+    /// 创建使用指定模块目录的字节码编译器。
+    /// </summary>
+    /// <param name="standardLibraries">宿主提供的模块目录。</param>
+    public BytecodeCompiler(StandardLibraryCatalog standardLibraries) : this()
+    {
+        StandardLibraries = standardLibraries ?? throw new ArgumentNullException(nameof(standardLibraries));
+    }
 
     /// <summary>
     /// 是否启用类型检查（默认：true）

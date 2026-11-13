@@ -30,9 +30,9 @@ public partial class VirtualMachine
 
         try
         {
-            if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+            if (_standardLibraries.IsStandardLibrary(moduleName))
             {
-                var manager = new VariateManager();
+                var manager = new VariateManager { StandardLibraries = _standardLibraries };
                 if (!StandardLibraryLoader.TryLoadStandardLibrary(moduleName, manager, out var loaded) ||
                     loaded is not UnifiedModule standardModule)
                     throw new InvalidOperationException($"无法加载标准库 '{moduleName}'");
@@ -63,7 +63,7 @@ public partial class VirtualMachine
             if (moduleBytecode.EntryPointIndex >= 0)
             {
                 // 创建临时虚拟机执行模块初始化
-                var moduleVM = new VirtualMachine(moduleBytecode, _baseDirectory);
+                var moduleVM = new VirtualMachine(moduleBytecode, _baseDirectory, _standardLibraries);
 
                 // 复制模块注册表（避免重复加载依赖）
                 foreach (var loadedModuleName in _moduleRegistry.GetLoadedModuleNames())

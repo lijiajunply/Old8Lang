@@ -2,6 +2,9 @@ using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Abstractions;
 using Old8Lang.Interpreter;
 using Old8Lang.Profiler;
+using Old8Lang.Bytecode;
+using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.VM;
 
 namespace Old8Lang.Hosting;
 
@@ -68,4 +71,19 @@ public sealed class Old8Host
     {
         return new LangInterpreter(performanceMonitor, StandardLibraries);
     }
+
+    /// <summary>
+    /// 创建使用此 Host 模块目录的字节码编译器。
+    /// </summary>
+    /// <returns>字节码编译器。</returns>
+    public BytecodeCompiler CreateBytecodeCompiler() => new(StandardLibraries);
+
+    /// <summary>
+    /// 创建使用此 Host 模块目录的虚拟机。
+    /// </summary>
+    /// <param name="bytecodeFile">待执行的字节码文件。</param>
+    /// <param name="baseDirectory">模块解析基目录。</param>
+    /// <returns>虚拟机实例。</returns>
+    public VirtualMachine CreateVirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
+        => new(bytecodeFile, baseDirectory, StandardLibraries);
 }

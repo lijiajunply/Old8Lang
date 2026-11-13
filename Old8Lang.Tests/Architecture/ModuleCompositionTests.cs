@@ -1,5 +1,6 @@
 using Old8Lang.Interpreter;
 using Old8Lang.Hosting;
+using Old8Lang.Bytecode;
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Official;
 
@@ -67,5 +68,19 @@ public class ModuleCompositionTests
 
         Assert.True(configuredInterpreter.Manager.StandardLibraries.IsStandardLibrary("Math"));
         Assert.False(emptyInterpreter.Manager.StandardLibraries.IsStandardLibrary("Math"));
+    }
+
+    [Fact]
+    public void HostCreatedVmTools_UseItsOwnModuleCatalog()
+    {
+        var configuredBuilder = new Old8HostBuilder();
+        OfficialModules.RegisterAll(configuredBuilder);
+        var configuredHost = configuredBuilder.Build();
+        var emptyHost = new Old8HostBuilder().Build();
+
+        Assert.True(configuredHost.CreateBytecodeCompiler().StandardLibraries.IsStandardLibrary("Math"));
+        Assert.False(emptyHost.CreateBytecodeCompiler().StandardLibraries.IsStandardLibrary("Math"));
+        Assert.True(configuredHost.CreateVirtualMachine(new BytecodeFile()).StandardLibraries.IsStandardLibrary("Math"));
+        Assert.False(emptyHost.CreateVirtualMachine(new BytecodeFile()).StandardLibraries.IsStandardLibrary("Math"));
     }
 }
