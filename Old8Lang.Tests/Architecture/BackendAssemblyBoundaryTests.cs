@@ -97,6 +97,15 @@ public class BackendAssemblyBoundaryTests
     }
 
     [Fact]
+    public void AsyncStateMachineGenerator_LivesInCompilerAssembly_AndRuntimeOnlySeesContract()
+    {
+        Assert.Equal("Old8Lang.Compiler",
+            typeof(Old8Lang.AsyncGeneration.AsyncStateMachineGenerator).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime",
+            typeof(Old8Lang.AsyncGeneration.IAsyncStateMachineGenerator).Assembly.GetName().Name);
+    }
+
+    [Fact]
     public void IlCompilerDriver_LivesInCompilerAssembly_AndOptionsInRuntime()
     {
         Assert.Equal("Old8Lang.Compiler", typeof(Old8Lang.Compiler.Compiler).Assembly.GetName().Name);

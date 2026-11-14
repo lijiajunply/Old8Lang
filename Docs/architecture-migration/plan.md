@@ -56,9 +56,9 @@
     `IVirtualMachine`/`IBytecodeCompiler` 契约；`CompiledDelegateRegistry`、`StaticClassCompiler`、
     四个仅 IL 后端使用的辅助类，以及 `Compiler.Compile`/`GlobalVariableAnalysis`/`ILVerifier`
     已迁入 `Old8Lang.Compiler`，编译开关抽为 Runtime 的 `IlCompilerOptions`；
-    `AsyncFuncLangValue` 的异步状态机 IL 与 `IlDisassembler` 也已迁入 IL 后端，Runtime 的
-    `Compiler/` 只剩共享编译契约。解释期作用域状态、`AsyncStateMachineGenerator` 与其余
-    运行时值 partial 仍待处理。见
+    `AsyncFuncLangValue` 的异步状态机 IL 与 `IlDisassembler` 也已迁入 IL 后端，
+    `AsyncStateMachineGenerator` 通过 `IAsyncStateMachineGenerator` 契约迁出；Runtime 的
+    `Compiler/` 只剩共享编译契约。解释期作用域状态与其余运行时值 partial 仍待处理。见
     `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
     `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`、
     `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`、
@@ -67,7 +67,8 @@
     `Reports/2026-11-14-17-20-VM引擎与字节码编译器迁出.md`、
     `Reports/2026-11-14-17-30-编译器辅助类迁入IL后端.md`、
     `Reports/2026-11-14-17-40-IL编译器驱动迁入IL后端.md`、
-    `Reports/2026-11-14-17-50-异步函数体IL发射迁入IL后端.md`。
+    `Reports/2026-11-14-17-50-异步函数体IL发射迁入IL后端.md`、
+    `Reports/2026-11-14-17-25-异步状态机生成器迁入IL后端.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
   契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
@@ -86,6 +87,12 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.14 异步状态机）：`AsyncStateMachineGenerator` 迁入
+  `Old8Lang.Compiler`，`LocalManager` 与 Runtime 的 IL 辅助改为依赖
+  `IAsyncStateMachineGenerator`。Architecture 62、VM 1083、Interpreter（排除外部网络用例）
+  1959/1960 通过；Compiler.Expressions 41 项、Compiler.Async 65 项失败均与 HEAD 逐项一致。
+  见 `Reports/2026-11-14-17-25-异步状态机生成器迁入IL后端.md`。阶段 3 不标记完成。
 
 - 2026-11-14（阶段 3.13 异步函数体 IL）：`AsyncFuncLangValue.GenerateMethodBody` 与
   `IlDisassembler` 迁入 `Old8Lang.Compiler`；Runtime 的 `Compiler/` 只剩共享编译契约。

@@ -204,3 +204,9 @@ Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.Cur
 `LocalManager`、`GlobalVariableScope`、IL 生成缓存、`RuntimeGlobals`/常量注册表、
 `AssertHelper`/`ExceptionWrapper`、泛型特化与 `IlCompilerOptions` 等共享编译契约。
 `AsyncStateMachineGenerator` 因 `LocalManager` 直接持有其类型仍暂留 Runtime。
+
+## 阶段 3.14：异步状态机生成器迁入 IL 后端（2026-11-14）
+
+`AsyncStateMachineGenerator` 迁入 `Old8Lang.Compiler/AsyncGeneration/`；Runtime 新增
+`IAsyncStateMachineGenerator` 契约，`LocalManager` 的变量提升/读写路径只依赖接口。
+Runtime 的 `AsyncGeneration/` 只剩解释器生成器与共享接口。

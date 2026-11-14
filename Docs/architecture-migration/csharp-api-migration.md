@@ -109,3 +109,10 @@ Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 
 |---|---|---|
 | `AsyncFuncLangValue.GenerateMethodBody(ILGenerator, LocalManager)`（Runtime 公开方法） | 无公开等价物（`Old8Lang.Compiler` 内部扩展方法） | 该方法是 IL 后端实现细节；外部调用方应使用 `Compiler.Compile`。Runtime 不再提供回退。 |
 | `Old8Lang.Compiler.Verification.IlDisassembler`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。 |
+
+### 阶段 3.14：异步状态机生成器（2026-11-14）
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `Old8Lang.AsyncGeneration.AsyncStateMachineGenerator`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。 |
+| `LocalManager.AsyncStateMachineGenerator` 的具体类型 | `IAsyncStateMachineGenerator`（Runtime） | 共享代码只使用变量提升、await 状态与 return 发射接口；具体实现由 IL 后端提供。 |

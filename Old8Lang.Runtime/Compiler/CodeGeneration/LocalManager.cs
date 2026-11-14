@@ -169,7 +169,7 @@ public class LocalManager
     /// <summary>
     /// 异步状态机生成器
     /// </summary>
-    public AsyncStateMachineGenerator? AsyncStateMachineGenerator { get; set; }
+    public IAsyncStateMachineGenerator? AsyncStateMachineGenerator { get; set; }
 
     /// <summary>
     /// IL 代码生成缓存

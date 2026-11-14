@@ -14,7 +14,7 @@ namespace Old8Lang.AsyncGeneration;
 /// 异步状态机生成器
 /// 负责为异步函数生成状态机代码
 /// </summary>
-public class AsyncStateMachineGenerator
+public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
 {
     private readonly ILGenerator IlGenerator;
     private readonly LocalManager LocalManager;
