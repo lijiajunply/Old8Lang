@@ -48,6 +48,11 @@
 
 ## 进度记录
 
+- 2026-11-14：9 个 LINQ 子句类型（`LinqClause` 及 From/Where/Select/OrderBy/Let/Join/GroupBy/
+  QueryContinuation）迁入 Syntax；`LinqExpression` 及其 IL 编译器 partial 暂留 Runtime。
+  Parser 889、Compiler.Linq 45、Interpreter 1967/1968（1 跳过）、VM 1082、Architecture 43 通过。
+  见 `Reports/2026-11-14-14-55-linq子句语法迁移测试.md`。
+
 - 2026-11-14：`FunctionDecorator` 迁入 Syntax（纯语法数据，无后端依赖）；为后续函数声明语法节点做准备。
   Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082（一次并发用例抖动，重跑通过）、
   Architecture 43 通过。见 `Reports/2026-11-14-14-54-装饰器语法迁移测试.md`。
