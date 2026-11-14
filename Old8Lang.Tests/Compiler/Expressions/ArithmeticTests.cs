@@ -209,8 +209,10 @@ public class ArithmeticTests
     {
         // Arrange
         var negatedValue = -value;
+        // 负数参数必须加括号：`--1` 会被解析成自减（三种模式都得 0），
+        // 而不是「负负得正」，用例要验证的是一元负号本身。
         var code = $@"
-            result <- -{value}
+            result <- -({value})
             Assert.Equal({negatedValue}, result)
         ";
         var interpreter = new LangInterpreter();

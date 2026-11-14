@@ -207,6 +207,11 @@
   通过；`Compiler.Classes` 21→20 失败，其余 18 个子组不变。
   见 change（`2026-11-14-IL静态字段初值/test.md`）。
 
+- [x] **`ArithmeticTests.UnaryMinus_Integer_*` 生成 `--1` 的用例缺陷**：Theory 用
+  `result <- -{value}` 拼源码，负数参数会得到 `--1`/`--100`，被解析成自减，
+  三种模式都输出 `0`/`99`（已在 `-f`/`-il`/`-vm` 实测），不是一元负号。
+  已改为 `-({value})`，4 项通过；`Compiler.Expressions` 37→35 失败。
+
 - [ ] **解释器无法在类内访问 `private static` 字段**：
 
   ```old8
