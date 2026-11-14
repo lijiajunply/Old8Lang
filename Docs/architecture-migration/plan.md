@@ -48,6 +48,13 @@
 
 ## 进度记录
 
+- 2026-11-14：`BlockStatement` 迁入 Syntax，改用 `IBlockDeclaration`/`IBlockImportDeclaration` 标记接口
+  分类声明与导入，去掉对 `FuncInit`/`ClassInit` 等 Runtime 声明节点的类型分支；执行、IL 生成与类成员收集
+  移入 `BlockStatementRuntimeExtensions`。Runtime 生成节点 76 → 75，遗留 partial 基线 27 → 26。
+  新增 4 项块分类/程序集测试；Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476
+  （2 跳过）、Architecture 41 通过；Compiler.Statements 的 4 项失败与上一提交逐项一致。
+  尚未完成：解析器与剩余声明/控制流节点，见 `Reports/2026-11-14-14-08-块语句节点迁移测试.md`。
+
 - 2026-11-14：`BreakStatement`、`ContinueStatement`、`ReturnStatement`、`YieldStatement` 迁入 Syntax，
   语法接口新增四个 Visit 方法，Runtime 生成节点降至 76；`ReturnStatement` 的 IL 辅助方法
   （数值转换、类型兼容判断）移入 `ReturnStatementRuntimeExtensions`，遗留 partial 基线由 28 降为 27。

@@ -52,7 +52,7 @@ public partial class ImportStatement(
     bool isSelective = false,
     bool isDynamic = false,
     LangExpression? dynamicModuleExpression = null
-) : OldStatement(position)
+) : OldStatement(position), IBlockImportDeclaration
 {
     // 静态模块系统服务实例
     internal static readonly ModuleSystemService ModuleService = new();

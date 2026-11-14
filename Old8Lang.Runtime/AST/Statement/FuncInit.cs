@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 /// <param name="a">函数值对象</param>
 /// <param name="position">源代码位置信息，用于错误报告</param>
-public partial class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
+public partial class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position), IBlockDeclaration
 {
     /// <summary>
     /// 函数值对象，包含函数的完整定义

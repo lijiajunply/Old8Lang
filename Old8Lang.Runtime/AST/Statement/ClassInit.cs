@@ -19,7 +19,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 /// <param name="anyValue">类模板信息，包含类名、父类、成员变量和方法等</param>
 /// <param name="position">源代码位置信息，用于错误报告</param>
-public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = default) : OldStatement(position)
+public partial class ClassInit(TypeTemplate anyValue, SourcePosition position = default) : OldStatement(position), IBlockDeclaration
 {
 
     /// <summary>

@@ -333,8 +333,10 @@ Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
   （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
-  `<Node>.Accept.generated.cs`；当前识别 **76 个 Runtime 节点**（阶段 2 已迁入
-  `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。
+  `<Node>.Accept.generated.cs`；当前识别 **75 个 Runtime 节点**（阶段 2 已迁入
+  `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。生成目录另有
+  `SuperProxy.Accept.generated.cs`，其 `VisitSuperProxy` 由 `IVisitor.Extensions.cs` 手工声明，
+  因此文件数会比接口方法数多 1。
 - 基础语法接口为 `Old8Lang.Syntax` 的 `IVisitor<out TResult>`；Runtime 的
   `public partial interface IRuntimeVisitor<out TResult> : IVisitor<TResult>` 由生成器补全 Runtime 节点方法。
   生成器不覆盖的部分（如继承自
@@ -552,7 +554,7 @@ Old8Lang 的 AST 节点分为两大类：
 
 **位置**: 未迁移节点在 `Old8Lang.Runtime/AST/Statement/`；已迁移节点在
 `Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
-`BreakStatement`、`ContinueStatement`）。
+`BreakStatement`、`ContinueStatement`、`BlockStatement`）。
 
 **基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 
@@ -573,6 +575,11 @@ Old8Lang 的 AST 节点分为两大类：
 | ImportStatement | ImportStatement.cs | 模块导入 | `import "Math"` |
 | BreakStatement | BreakStatement.cs（Syntax） | 跳出循环 | `break` |
 | ContinueStatement | ContinueStatement.cs（Syntax） | 继续循环 | `continue` |
+| BlockStatement | BlockStatement.cs（Syntax） | 语句块，分离声明/导入与普通语句 | `{ x <- 1; print(x) }` |
+
+`BlockStatement` 通过语法层的 `IBlockDeclaration` / `IBlockImportDeclaration` 标记接口分类声明与导入语句，
+不引用具体声明节点类型；其解释执行、IL 生成与类成员收集逻辑位于 Runtime 的
+`BlockStatementRuntimeExtensions`。
 
 ### 5.2 AST 节点接口
 

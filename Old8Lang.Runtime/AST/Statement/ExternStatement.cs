@@ -116,7 +116,7 @@ public class CSharpDllImportDeclaration
 /// Extern 语句类，用于处理外部函数调用
 /// 支持 C/C++ 原生库函数导入（P/Invoke）和 Python 函数导入
 /// </summary>
-public partial class ExternStatement : OldStatement
+public partial class ExternStatement : OldStatement, IBlockDeclaration
 {
     /// <summary>
     /// DLL/模块名称（对于 C/C++ 是 DLL 名，对于 Python 是脚本路径或模块名）

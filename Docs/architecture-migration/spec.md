@@ -18,7 +18,9 @@ Old8Lang 支持解释、IL 和字节码 VM。当前 `Old8Lang.Runtime` 仍同时
 
 截至提交 `191ba4ba`，Core、Concurrency、Observability、ProjectSystem、模块抽象/官方装配和 Runtime 已分离；执行入口已集中，块语句的普通和生成器解释执行已迁往 Visitor。`OldStatement` / `LangExpression` 及许多具体节点仍引用解释器或 IL 类型；Visitor 也仍回调旧节点方法。因而目前并未具备独立 AST 或后端程序集。
 
-工作区中的 `BlockStatement` / `InterpreterVisitor` 导入迁移尚未完成测试和提交；它不是已完成基线。已有报告记录 IL 数组相关失败和其他已知失败，必须先复现基线并区别迁移引入的回归。
+工作区中的 `BlockStatement` / `InterpreterVisitor` 导入迁移尚未完成测试和提交；它不是已完成基线。
+（该段为 `191ba4ba` 时点快照；`BlockStatement` 已在阶段 2 迁入 `Old8Lang.Syntax`，后续进展见
+[plan.md](plan.md) 的进度记录。）已有报告记录 IL 数组相关失败和其他已知失败，必须先复现基线并区别迁移引入的回归。
 
 ## 验收标准
 
