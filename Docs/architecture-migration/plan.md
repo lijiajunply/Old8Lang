@@ -48,6 +48,10 @@
 
 ## 进度记录
 
+- 2026-11-14：`FunctionDecorator` 迁入 Syntax（纯语法数据，无后端依赖）；为后续函数声明语法节点做准备。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082（一次并发用例抖动，重跑通过）、
+  Architecture 43 通过。见 `Reports/2026-11-14-14-54-装饰器语法迁移测试.md`。
+
 - 2026-11-14：lambda 改为 Syntax 的 `LambdaExpression` 语法节点；解析器不再直接构造
   `FuncLangValue`/`AsyncFuncLangValue`，求值端由 `LambdaExpressionRuntimeFactory` 适配。同步更新
   VM 闭包捕获分析、IL 顶层变量分析、IL 委托包装与 lambda 赋值路径。Runtime 生成节点保持 57。

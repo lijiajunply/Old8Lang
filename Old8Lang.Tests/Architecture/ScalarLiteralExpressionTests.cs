@@ -228,6 +228,7 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.GenericInstanceExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.StringTemplateValue).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.LambdaExpression).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.FunctionDecorator).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
