@@ -92,6 +92,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问列表推导式。</summary>
     TResult VisitListComprehension(ListComprehension node);
 
+    /// <summary>访问 match 表达式。</summary>
+    TResult VisitMatchExpression(MatchExpression node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

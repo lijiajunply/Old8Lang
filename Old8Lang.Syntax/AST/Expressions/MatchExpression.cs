@@ -1,7 +1,5 @@
-using System.Reflection.Emit;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
+
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -25,4 +23,5 @@ public partial class MatchExpression(
     /// </summary>
     public List<MatchCase> Cases { get; } = matchCases;
 
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitMatchExpression(this);
 }
