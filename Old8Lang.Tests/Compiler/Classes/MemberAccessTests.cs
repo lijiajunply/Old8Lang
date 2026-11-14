@@ -358,6 +358,10 @@ public class MemberAccessTests(ITestOutputHelper output)
             strings <- collection.getStrings()
             mappings <- collection.getMappings()
             
+            Assert.Equal(5, numbers.Count())
+            Assert.Equal(3, strings.Count())
+            Assert.Equal(""value1"", mappings[""key1""])
+            
             // 修改复杂类型
             collection.addNumber(6)
             collection.updateMapping(""key3"", ""value3"")
@@ -365,10 +369,10 @@ public class MemberAccessTests(ITestOutputHelper output)
             updatedNumbers <- collection.getNumbers()
             updatedMappings <- collection.getMappings()
             
-            Assert.Equal(5, numbers.Count())
-            Assert.Equal(3, strings.Count())
-            Assert.Equal(""value1"", mappings[""key1""])
+            // 集合是引用类型：getNumbers() 返回的就是字段本身，
+            // 因此新增元素后 numbers 与 updatedNumbers 都能看到 6 个元素。
             Assert.Equal(6, updatedNumbers.Count())
+            Assert.Equal(6, numbers.Count())
             Assert.Equal(""value3"", updatedMappings[""key3""])
         ";
         var interpreter = new LangInterpreter();

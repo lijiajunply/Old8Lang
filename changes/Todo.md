@@ -210,11 +210,12 @@
   直接放进常量池又会让所有实例共享同一个集合对象）。`-f` / `-il` 正常。
   见 change（`2026-11-14-IL静态字段初值/test.md` §5.2）。
 
-- [ ] **`MemberAccessWithComplexTypes_CompilesAndExecutesCorrectly` 的断言与语言语义冲突**：
+- [x] **`MemberAccessWithComplexTypes_CompilesAndExecutesCorrectly` 的断言与语言语义冲突**：
   用例先取 `numbers <- collection.getNumbers()`，随后 `collection.addNumber(6)`，再断言
   `Assert.Equal(5, numbers.Count())`。集合是引用类型，`getNumbers()` 返回的正是字段本身，
-  解释器与 IL 都得到 `6`（已用同一段代码在 `-f` / `-il` 实测）。需要把期望值改为 `6`
-  或改用复制语义的写法，不能按「IL 结果错误」处理。
+  解释器与 IL 都得到 `6`（已用同一段代码在 `-f` / `-il` 实测）。已改为「修改前断言 5，
+  修改后断言 `numbers` 与 `updatedNumbers` 都是 6」并注明别名语义；`MemberAccessTests`
+  整组 7→8 通过。这条不是 IL 结果错误。
 
 - [ ] **IL 链式比较 `a < b < c` 结果为 false**：`a <- 5; b <- 10; c <- 15; a < b < c` 期望 `true`，
   IL 模式得到 `false`（`ComparisonTests.ChainedComparisons_CompilesAndExecutesCorrectly`，已在
