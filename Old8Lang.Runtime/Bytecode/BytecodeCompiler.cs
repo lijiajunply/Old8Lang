@@ -385,7 +385,7 @@ public class BytecodeCompiler
         };
 
         // 编译每个扩展方法
-        foreach (var method in extensionDecl.ExtensionMethods)
+        foreach (var method in extensionDecl.GetExtensionMethods())
         {
             // 将扩展方法编译为普通函数
             // 扩展方法的第一个隐式参数是 'this'

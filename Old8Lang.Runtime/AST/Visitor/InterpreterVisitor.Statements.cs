@@ -57,14 +57,14 @@ public partial class InterpreterVisitor
         InstanceMethodInitializer.EnsureInitialized();
 
         // 获取目标类型
-        var targetType = ExtensionDeclaration.ResolveTargetType(node.TargetTypeName);
+        var targetType = ExtensionDeclarationRuntimeExtensions.ResolveTargetType(node.TargetTypeName);
         if (targetType == null)
         {
             throw new InvalidOperationError(node, $"无法找到类型 '{node.TargetTypeName}'");
         }
 
         // 注册每个扩展方法
-        foreach (var method in node.ExtensionMethods)
+        foreach (var method in node.GetExtensionMethods())
         {
             // 创建扩展方法包装器
             var extensionMethod = new ExtensionMethodWrapper(

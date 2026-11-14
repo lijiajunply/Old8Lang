@@ -179,13 +179,13 @@ public class ExtensionMethodTests
         Assert.Equal(2, extension.ExtensionMethods.Count);
 
         // 检查第一个方法的参数
-        Assert.Equal(1, extension.ExtensionMethods[0].Ids.Count);
-        Assert.Equal("n", extension.ExtensionMethods[0].Ids[0].IdName);
+        Assert.Equal(1, extension.ExtensionMethods[0].Parameters.Count);
+        Assert.Equal("n", extension.ExtensionMethods[0].Parameters[0].IdName);
 
         // 检查第二个方法的参数
-        Assert.Equal(2, extension.ExtensionMethods[1].Ids.Count);
-        Assert.Equal("a", extension.ExtensionMethods[1].Ids[0].IdName);
-        Assert.Equal("b", extension.ExtensionMethods[1].Ids[1].IdName);
+        Assert.Equal(2, extension.ExtensionMethods[1].Parameters.Count);
+        Assert.Equal("a", extension.ExtensionMethods[1].Parameters[0].IdName);
+        Assert.Equal("b", extension.ExtensionMethods[1].Parameters[1].IdName);
     }
 
     /// <summary>

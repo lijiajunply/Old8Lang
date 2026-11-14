@@ -51,7 +51,7 @@ public class ExtensionParser(
         Expect(LangTokenType.LeftBrace);
 
         // 解析扩展方法列表
-        var extensionMethods = new List<FuncLangValue>();
+        var extensionMethods = new List<FunctionSyntax>();
 
         while (CurrentToken.Type != LangTokenType.RightBrace)
         {
@@ -68,8 +68,8 @@ public class ExtensionParser(
                 var funcParser = functionParserFactory();
                 var funcInit = funcParser.ParseFuncDeclaration();
 
-                // 提取 FuncLangValue
-                extensionMethods.Add(funcInit.GetFuncValue());
+                // 只收集语法模型，运行时函数值由工厂按需创建
+                extensionMethods.Add(funcInit.Syntax);
             }
             else if (CurrentToken.Type == LangTokenType.Async)
             {

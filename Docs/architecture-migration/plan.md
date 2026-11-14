@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`ExtensionDeclaration` 迁入 Syntax，扩展方法改为 `FunctionSyntax` 列表；运行时函数值列表
+  经 `GetExtensionMethods()` 缓存创建，`ResolveTargetType` 移入 Runtime 扩展。Runtime 生成节点
+  54 → 53。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、
+  Architecture 43 通过；Compiler 各分组与基线一致。见
+  `Reports/2026-11-14-15-22-扩展方法声明迁移测试.md`。
+
 - 2026-11-14：引入 `ClassSyntax` 并迁移 `ClassInit`/`ClassFuncInitStatement` 到 Syntax；解析器不再构造
   `TypeTemplate`，运行时模板与类方法函数值经 `GetTypeTemplate()`/`GetFuncValue()` 按语法节点缓存创建。
   同步更新类执行/IL 定义辅助、嵌套类重算、LSP、测试与 Visitor。Runtime 生成节点 55 → 54，遗留

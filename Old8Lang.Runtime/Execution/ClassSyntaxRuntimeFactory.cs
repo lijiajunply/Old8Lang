@@ -101,9 +101,7 @@ public static partial class ClassInitRuntimeExtensions
 /// </summary>
 public static class ClassFuncInitRuntimeExtensions
 {
-    private static readonly ConditionalWeakTable<FunctionSyntax, FuncLangValue> Cache = new();
-
     /// <summary>获取该方法的运行时函数值（同一语法节点返回同一实例）。</summary>
     public static FuncLangValue GetFuncValue(this ClassFuncInitStatement init) =>
-        Cache.GetValue(init.Function, FunctionSyntaxRuntimeFactory.CreateFunc);
+        FunctionSyntaxRuntimeFactory.GetOrCreateFunc(init.Function);
 }

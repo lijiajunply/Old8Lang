@@ -9,6 +9,12 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public static class FunctionSyntaxRuntimeFactory
 {
+    private static readonly ConditionalWeakTable<FunctionSyntax, FuncLangValue> FuncCache = new();
+
+    /// <summary>获取函数语法节点对应的运行时函数值（同一语法节点返回同一实例）。</summary>
+    public static FuncLangValue GetOrCreateFunc(FunctionSyntax syntax) =>
+        FuncCache.GetValue(syntax, CreateFunc);
+
     /// <summary>创建普通函数值，并复制装饰器与文档注释。</summary>
     public static FuncLangValue CreateFunc(FunctionSyntax syntax)
     {
@@ -39,11 +45,9 @@ public static class FunctionSyntaxRuntimeFactory
 /// </summary>
 public static partial class FuncInitRuntimeExtensions
 {
-    private static readonly ConditionalWeakTable<FunctionSyntax, FuncLangValue> Cache = new();
-
     /// <summary>获取该函数声明的运行时函数值（同一语法节点返回同一实例）。</summary>
     public static FuncLangValue GetFuncValue(this FuncInit init) =>
-        Cache.GetValue(init.Syntax, FunctionSyntaxRuntimeFactory.CreateFunc);
+        FunctionSyntaxRuntimeFactory.GetOrCreateFunc(init.Syntax);
 }
 
 /// <summary>

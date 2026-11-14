@@ -47,6 +47,7 @@
 | 无 | `FunctionSyntax`（Syntax） | 函数声明的纯语法模型；装饰器与文档注释由工厂复制到运行时函数值。 |
 | `ClassInit(TypeTemplate)`、`ClassFuncInitStatement(ClassMemberId, FuncLangValue)`（Runtime 程序集） | `ClassInit(ClassSyntax)`、`ClassFuncInitStatement(ClassMemberId, FunctionSyntax)`（Syntax 程序集） | 直接构造类声明的项目需先建 `ClassSyntax`（类名、类体、父类、mixin/接口、泛型、文档注释）。`ClassInit.AnyValue` 移除：引用 Runtime 并保留 `using Old8Lang.AST.Statement;` 后改用公开扩展 `GetTypeTemplate()`（同一语法节点返回同一 TypeTemplate）；`RegisterTypeToTypeSystem` 也改为扩展方法。`ClassFuncInitStatement.FuncValue` 改用 `GetFuncValue()`。`ClassInitRuntimeExtensions.CreateForTemplate` 供内部嵌套类重算使用。自定义 `IVisitor<TResult>` 实现需补 `VisitClassInit`。 |
 | 无 | `ClassSyntax`（Syntax） | 类/接口/混入声明的纯语法模型。 |
+| `ExtensionDeclaration`（Runtime 程序集，`List<FuncLangValue>`） | 同名类型（Syntax 程序集，`List<FunctionSyntax>`） | 构造参数中的扩展方法改为语法模型；引用 Runtime 后可用 `GetExtensionMethods()` 取得缓存的运行时函数值列表。`ExtensionDeclaration.ResolveTargetType` 移为 `ExtensionDeclarationRuntimeExtensions.ResolveTargetType`。自定义 `IVisitor<TResult>` 实现需补 `VisitExtensionDeclaration`。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 
