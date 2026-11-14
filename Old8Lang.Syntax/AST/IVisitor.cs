@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Statement;
 
 namespace Old8Lang.AST.Visitor;
@@ -130,6 +131,9 @@ public interface IVisitor<out TResult>
 
     /// <summary>访问导入语句。</summary>
     TResult VisitImportStatement(ImportStatement node);
+
+    /// <summary>访问 LINQ 查询表达式。</summary>
+    TResult VisitLinqExpression(LinqExpression node);
 
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);

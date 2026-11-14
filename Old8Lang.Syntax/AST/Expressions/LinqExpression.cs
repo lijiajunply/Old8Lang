@@ -1,6 +1,3 @@
-using Old8Lang.Interpreter;
-using System.Reflection.Emit;
-using Old8Lang.Compiler.CodeGeneration;
 
 using Old8Lang.AST.Visitor;
 
@@ -37,6 +34,8 @@ public partial class LinqExpression(
     /// 查询延续（into 子句）
     /// </summary>
     public QueryContinuation? Continuation { get; set; } = continuation;
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitLinqExpression(this);
 
 
 

@@ -12,12 +12,12 @@ namespace Old8Lang.AST.Expression.Linq;
 /// LinqExpression 的编译器支持部分
 /// 使用纯IL实现，不依赖VariateManager
 /// </summary>
-public partial class LinqExpression
+internal static partial class LinqExpressionRuntimeExtensions
 {
     /// <summary>
     /// 生成 Where 子句的 IL 代码
     /// </summary>
-    internal void GenerateWhereClauseIL(WhereClause whereClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateWhereClauseIL(this LinqExpression node, WhereClause whereClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 我们需要生成类似于 source.Where(x => condition) 的代码
@@ -34,7 +34,7 @@ public partial class LinqExpression
 
         // 预先声明循环内使用的局部变量
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
-        var rangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, FromClause.RangeVariable);
+        var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
 
         // 循环标签
         var loopStart = ilGenerator.DefineLabel();
@@ -55,14 +55,14 @@ public partial class LinqExpression
 
         // 将当前元素转换为LangValueType并存储到范围变量
         ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        GenerateConvertToLangValue(ilGenerator);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算条件表达式
         whereClause.Condition.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 检查条件是否为真
-        GenerateIsTruthy(ilGenerator);
+        node.GenerateIsTruthy(ilGenerator);
 
         // 如果条件为假，跳过添加
         var skipAdd = ilGenerator.DefineLabel();
@@ -88,7 +88,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 Select 子句的 IL 代码
     /// </summary>
-    internal void GenerateSelectClauseIL(SelectClause selectClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateSelectClauseIL(this LinqExpression node, SelectClause selectClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 我们需要生成类似于 source.Select(x => projection) 的代码
@@ -106,7 +106,7 @@ public partial class LinqExpression
         // 预先声明循环内使用的局部变量
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
         var projectionLocal = ilGenerator.DeclareLocal(typeof(LangValueType));
-        var rangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, FromClause.RangeVariable);
+        var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
 
         // 循环标签
         var loopStart = ilGenerator.DefineLabel();
@@ -127,7 +127,7 @@ public partial class LinqExpression
 
         // 将当前元素转换为LangValueType并存储到范围变量
         ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        GenerateConvertToLangValue(ilGenerator);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算投影表达式
@@ -139,7 +139,7 @@ public partial class LinqExpression
         // 添加到结果列表
         ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
         ilGenerator.Emit(OpCodes.Ldloc, projectionLocal);
-        GenerateConvertFromLangValue(ilGenerator);
+        node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
 
         // 继续循环
@@ -155,7 +155,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 OrderBy 子句的 IL 代码
     /// </summary>
-    internal void GenerateOrderByClauseIL(OrderByClause orderByClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateOrderByClauseIL(this LinqExpression node, OrderByClause orderByClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 首先将其转换为 List<object>
@@ -202,7 +202,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 Let 子句的 IL 代码
     /// </summary>
-    internal void GenerateLetClauseIL(LetClause letClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateLetClauseIL(this LinqExpression node, LetClause letClause, ILGenerator ilGenerator, LocalManager local)
     {
         // Let 子句需要在遍历过程中计算表达式并存储到变量
         // 由于Let子句在循环内部执行，我们需要在循环外部声明变量
@@ -220,8 +220,8 @@ public partial class LinqExpression
 
         // 预先声明循环内使用的局部变量
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
-        var letVarLocal = GetOrCreateRangeVariable(ilGenerator, local, letClause.Variable);
-        var rangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, FromClause.RangeVariable);
+        var letVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, letClause.Variable);
+        var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
 
         // 循环标签
         var loopStart = ilGenerator.DefineLabel();
@@ -242,7 +242,7 @@ public partial class LinqExpression
 
         // 将当前元素转换为LangValueType并存储到范围变量
         ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        GenerateConvertToLangValue(ilGenerator);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算let表达式
@@ -267,7 +267,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成 GroupBy 子句的 IL 代码
     /// </summary>
-    internal void GenerateGroupByClauseIL(GroupByClause groupByClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateGroupByClauseIL(this LinqExpression node, GroupByClause groupByClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 IEnumerable
         // 创建分组字典
@@ -285,7 +285,7 @@ public partial class LinqExpression
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
         var keyLocal = ilGenerator.DeclareLocal(typeof(object));
         var elementLocal = ilGenerator.DeclareLocal(typeof(object));
-        var rangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, FromClause.RangeVariable);
+        var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
 
         // 循环标签
         var loopStart = ilGenerator.DefineLabel();
@@ -306,17 +306,17 @@ public partial class LinqExpression
 
         // 将当前元素转换为LangValueType并存储到范围变量
         ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        GenerateConvertToLangValue(ilGenerator);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算分组键
         groupByClause.KeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
-        GenerateConvertFromLangValue(ilGenerator);
+        node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 计算分组元素
         groupByClause.ElementExpression.Accept(new CompilerVisitor(ilGenerator, local));
-        GenerateConvertFromLangValue(ilGenerator);
+        node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, elementLocal);
 
         // 调用辅助方法添加到分组
@@ -340,7 +340,7 @@ public partial class LinqExpression
     /// 生成 Join 子句的 IL 代码
     /// 支持 Inner Join 和 Group Join
     /// </summary>
-    internal void GenerateJoinClauseIL(JoinClause joinClause, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateJoinClauseIL(this LinqExpression node, JoinClause joinClause, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是外部数据源的 IEnumerable
         // 保存外部数据源
@@ -404,8 +404,8 @@ public partial class LinqExpression
         ilGenerator.Emit(OpCodes.Stloc, resultLocal);
 
         // 获取或创建范围变量
-        var outerRangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, FromClause.RangeVariable);
-        var innerRangeVarLocal = GetOrCreateRangeVariable(ilGenerator, local, joinClause.RangeVariable);
+        var outerRangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
+        var innerRangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, joinClause.RangeVariable);
 
         // 预先声明循环内使用的局部变量（避免在循环内重复声明）
         var outerIndexLocal = ilGenerator.DeclareLocal(typeof(int));
@@ -436,12 +436,12 @@ public partial class LinqExpression
 
         // 设置外部范围变量
         ilGenerator.Emit(OpCodes.Ldloc, outerItemLocal);
-        GenerateConvertToLangValue(ilGenerator);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, outerRangeVarLocal);
 
         // 计算外部键
         joinClause.OuterKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
-        GenerateConvertFromLangValue(ilGenerator);
+        node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, outerKeyLocal);
 
         if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
@@ -471,12 +471,12 @@ public partial class LinqExpression
 
             // 设置内部范围变量
             ilGenerator.Emit(OpCodes.Ldloc, innerItemLocal);
-            GenerateConvertToLangValue(ilGenerator);
+            node.GenerateConvertToLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
             joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
-            GenerateConvertFromLangValue(ilGenerator);
+            node.GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
             // 比较键
@@ -503,7 +503,7 @@ public partial class LinqExpression
             ilGenerator.MarkLabel(innerLoopEnd);
 
             // 设置分组变量
-            var groupVarLocal = GetOrCreateRangeVariable(ilGenerator, local, joinClause.GroupVariable);
+            var groupVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, joinClause.GroupVariable);
             ilGenerator.Emit(OpCodes.Ldloc, matchingItemsLocal);
             ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToListLangValue")!);
             ilGenerator.Emit(OpCodes.Stloc, groupVarLocal);
@@ -535,12 +535,12 @@ public partial class LinqExpression
 
             // 设置内部范围变量
             ilGenerator.Emit(OpCodes.Ldloc, innerItemLocal);
-            GenerateConvertToLangValue(ilGenerator);
+            node.GenerateConvertToLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
             joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
-            GenerateConvertFromLangValue(ilGenerator);
+            node.GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
             // 比较键
@@ -584,11 +584,11 @@ public partial class LinqExpression
     /// <summary>
     /// 生成查询延续（into 子句）的 IL 代码
     /// </summary>
-    internal void GenerateContinuationIL(QueryContinuation continuation, ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateContinuationIL(this LinqExpression node, QueryContinuation continuation, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是前一个查询的结果（List<object>）
         // 将结果转换为 ListLangValue 并存储到延续变量
-        var continuationVarLocal = GetOrCreateRangeVariable(ilGenerator, local, continuation.Variable);
+        var continuationVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, continuation.Variable);
 
         // 复制栈顶的结果
         ilGenerator.Emit(OpCodes.Dup);
@@ -600,11 +600,11 @@ public partial class LinqExpression
         // 处理延续后的查询体子句
         foreach (var clause in continuation.BodyClauses)
         {
-            GenerateClauseIL(clause, ilGenerator, local);
+            node.GenerateClauseIL(clause, ilGenerator, local);
         }
 
         // 处理延续后的终止子句
-        GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
+        node.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
     }
 
     /// <summary>
@@ -619,7 +619,7 @@ public partial class LinqExpression
     /// <summary>
     /// 获取或创建范围变量的局部变量
     /// </summary>
-    internal LocalBuilder GetOrCreateRangeVariable(ILGenerator ilGenerator, LocalManager local, string variableName)
+    internal static LocalBuilder GetOrCreateRangeVariable(this LinqExpression node, ILGenerator ilGenerator, LocalManager local, string variableName)
     {
         // 检查是否已经存在
         var existingVar = local.GetLocalVar(variableName);
@@ -637,7 +637,7 @@ public partial class LinqExpression
     /// <summary>
     /// 将结果转换为 ListLangValue
     /// </summary>
-    internal void ConvertToListLangValue(ILGenerator ilGenerator, LocalManager local)
+    internal static void ConvertToListLangValue(this LinqExpression node, ILGenerator ilGenerator, LocalManager local)
     {
         // 栈顶是 List<object> 或 IEnumerable
         // 需要转换为 ListLangValue
@@ -649,7 +649,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成将 object 转换为 LangValueType 的 IL 代码
     /// </summary>
-    internal void GenerateConvertToLangValue(ILGenerator ilGenerator)
+    internal static void GenerateConvertToLangValue(this LinqExpression node, ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToLangValue")!);
@@ -658,7 +658,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成将 LangValueType 转换为 object 的 IL 代码
     /// </summary>
-    internal void GenerateConvertFromLangValue(ILGenerator ilGenerator)
+    internal static void GenerateConvertFromLangValue(this LinqExpression node, ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertFromLangValue")!);
@@ -667,7 +667,7 @@ public partial class LinqExpression
     /// <summary>
     /// 生成判断 LangValueType 是否为真的 IL 代码
     /// </summary>
-    internal void GenerateIsTruthy(ILGenerator ilGenerator)
+    internal static void GenerateIsTruthy(this LinqExpression node, ILGenerator ilGenerator)
     {
         // 调用辅助方法
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("IsTruthy")!);

@@ -8,20 +8,20 @@ using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression.Linq;
 
-public partial class LinqExpression
+internal static partial class LinqExpressionRuntimeExtensions
 {
-    internal bool CanGenerateStreamingQuery() =>
-        Continuation is null && TerminationClause is SelectClause &&
-        BodyClauses.Take(BodyClauses.LastOrDefault() is OrderByClause ? BodyClauses.Count - 1 : BodyClauses.Count)
+    internal static bool CanGenerateStreamingQuery(this LinqExpression node) =>
+        node.Continuation is null && node.TerminationClause is SelectClause &&
+        node.BodyClauses.Take(node.BodyClauses.LastOrDefault() is OrderByClause ? node.BodyClauses.Count - 1 : node.BodyClauses.Count)
             .All(clause => clause is LetClause or WhereClause);
 
     // 顺序执行同一行的子句，让 let 值只属于当前范围变量。
-    internal void GenerateStreamingQuery(ILGenerator il, LocalManager local)
+    internal static void GenerateStreamingQuery(this LinqExpression node, ILGenerator il, LocalManager local)
     {
-        var select = (SelectClause)TerminationClause;
-        var orderBy = BodyClauses.LastOrDefault() as OrderByClause;
-        var names = BodyClauses.OfType<LetClause>().Select(clause => clause.Variable)
-            .Prepend(FromClause.RangeVariable).Distinct().ToArray();
+        var select = (SelectClause)node.TerminationClause;
+        var orderBy = node.BodyClauses.LastOrDefault() as OrderByClause;
+        var names = node.BodyClauses.OfType<LetClause>().Select(clause => clause.Variable)
+            .Prepend(node.FromClause.RangeVariable).Distinct().ToArray();
         var previous = names.ToDictionary(name => name, name => local.GetLocalVar(name));
         var previousFields = names.Where(local.FieldVar.ContainsKey)
             .ToDictionary(name => name, name => local.FieldVar[name]);
@@ -37,8 +37,8 @@ public partial class LinqExpression
 
         try
         {
-            FromClause.DataSource.Accept(new CompilerVisitor(il, local));
-            var sourceType = FromClause.DataSource.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            node.FromClause.DataSource.Accept(new CompilerVisitor(il, local));
+            var sourceType = node.FromClause.DataSource.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (sourceType.IsValueType)
             {
                 il.Emit(OpCodes.Box, sourceType);
@@ -59,7 +59,7 @@ public partial class LinqExpression
                 il.Emit(OpCodes.Stloc, rows);
             }
             var range = il.DeclareLocal(typeof(object));
-            Bind(FromClause.RangeVariable, range);
+            Bind(node.FromClause.RangeVariable, range);
 
             var loop = il.DefineLabel();
             var done = il.DefineLabel();
@@ -73,7 +73,7 @@ public partial class LinqExpression
             il.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.Unwrap))!);
             il.Emit(OpCodes.Stloc, range);
 
-            foreach (var clause in BodyClauses)
+            foreach (var clause in node.BodyClauses)
             {
                 if (clause is LetClause let)
                 {

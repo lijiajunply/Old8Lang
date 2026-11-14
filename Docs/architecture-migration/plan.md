@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`LinqExpression` 迁入 Syntax；约 1200 行 IL/Streaming 编译逻辑转为 Runtime 的
+  `LinqExpressionRuntimeExtensions`。Runtime 生成节点 49 → 48，遗留 partial 基线 7 → 6。
+  解析器构造的类型已全部位于 Syntax/Core。Parser 889、Compiler.Linq 45、Interpreter 1967/1968
+  （1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过。见
+  `Reports/2026-11-14-15-46-linq表达式迁移测试.md`。
+
 - 2026-11-14：`ImportStatement` 迁入 Syntax；懒导入/选择导入/动态导入的模块加载逻辑与静态
   `ModuleService` 移入 `ImportStatementRuntimeExtensions`，内部字段改为公开只读属性。Runtime 生成节点
   50 → 49，遗留 partial 基线 8 → 7。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、

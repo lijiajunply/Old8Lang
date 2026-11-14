@@ -52,6 +52,7 @@
 | 解析器产出的简单调用 `Instance(Id, args, namedArgs)` | Syntax 的 `CallExpression` | 解析树中的 `identifier(...)` 只承载调用语法；求值/编译时经 `CallSyntaxAdapter.Normalize`/`ToInstance` 适配为既有 `Instance`。Dot 分派、静态类调用、闭包捕获、泛型推断与 LSP 成员分析均按此适配。依赖解析树节点类型判断调用的代码应同时接受 `Instance` 与 `CallExpression`。 |
 | `AsyncStreamExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；`_block` 字段改为公开只读属性 `Block`。自定义 `IVisitor<TResult>` 实现需补 `VisitAsyncStreamExpression`。 |
 | `ImportStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；模块加载逻辑移入 `ImportStatementRuntimeExtensions`。原内部字段改为公开只读属性 `ImportString`/`FromClause`/`Specifiers`/`ModuleAlias`/`IsLazy`/`IsSelective`/`DynamicModuleExpression`（`Get*` 方法保留）。`ImportStatement.ModuleService` 改为 `ImportStatementRuntimeExtensions.ModuleService`；`HandleLazyImport`/`RegisterModuleValue`/`HandleDynamicImport` 改为扩展方法。自定义 `IVisitor<TResult>` 实现需补 `VisitImportStatement`。 |
+| `LinqExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间与构造方式不变；IL/Streaming 编译逻辑（约 1200 行）移入 Runtime 的 `LinqExpressionRuntimeExtensions`。自定义 `IVisitor<TResult>` 实现需补 `VisitLinqExpression`。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 

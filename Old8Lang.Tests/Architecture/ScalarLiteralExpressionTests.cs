@@ -244,6 +244,7 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.CallExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.AsyncStreamExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ImportStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.LinqExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -320,6 +321,10 @@ public class ScalarLiteralExpressionTests
         Assert.Equal("stream", new Old8Lang.AST.Expression.AsyncStreamExpression(
             new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
         Assert.Equal("import", new Old8Lang.AST.Statement.ImportStatement("module").Accept(visitor));
+        Assert.Equal("linq", new Old8Lang.AST.Expression.Linq.LinqExpression(
+            new Old8Lang.AST.Expression.Linq.FromClause("x", literal),
+            [],
+            new Old8Lang.AST.Expression.Linq.SelectClause(literal)).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -372,6 +377,7 @@ public class ScalarLiteralExpressionTests
         public string VisitCallExpression(Old8Lang.AST.Expression.CallExpression node) => "call";
         public string VisitAsyncStreamExpression(Old8Lang.AST.Expression.AsyncStreamExpression node) => "stream";
         public string VisitImportStatement(Old8Lang.AST.Statement.ImportStatement node) => "import";
+        public string VisitLinqExpression(Old8Lang.AST.Expression.Linq.LinqExpression node) => "linq";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;
