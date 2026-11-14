@@ -14,6 +14,11 @@
 
 以下条目来自历史复现，尚未逐项重跑。报告见 [IL 缺陷验证](Reports/2026-10-23-23-30-IL模式缺陷修复验证.md)、[跨模式语义修复](Reports/2026-10-24-00-30-P1跨模式语义修复测试.md) 和 [VM 残留修复](Reports/2026-10-24-09-45-P2虚拟机模式残留修复测试.md)。
 
+- [ ] **IL 函数 `return` 的类型转换既有缺口（待复现）**：2026-11-14 迁移 `ReturnStatement`
+  辅助代码时发现，`CompilerVisitor.VisitReturnStatement` 的 try/finally 分支只做装箱/拆箱、
+  没有数值转换；`string` 返回的兼容判断比实际 IL 转换更宽松；`IsNumericType` 不含
+  `uint`/`ulong`/`ushort`/`sbyte`/`decimal`/`char`。迁移前后行为一致，未在本轮修复。
+
 - [ ] **泛型目标类型的扩展方法 IL 支持**：`extension list<T>` 现会保留目标泛型参数及
   `where` 约束；IL 桥接在接收者、参数和嵌套集合之间保留引用关系并同步原地修改，`return this`
   可继续链式调用。覆盖嵌套集合、返回接收者、参数别名和 `struct` 约束；见

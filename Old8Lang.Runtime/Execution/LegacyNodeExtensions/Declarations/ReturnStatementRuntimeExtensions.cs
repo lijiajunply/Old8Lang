@@ -1,16 +1,12 @@
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Interpreter;
-using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Statement;
 
-public partial class ReturnStatement(LangExpression returnExpression, SourcePosition position = default) : OldStatement(position)
+/// <summary>
+/// ReturnStatement 的编译期辅助实现（阶段 2 从语法节点迁出，语法节点不再引用 IL 类型）。
+/// </summary>
+internal static class ReturnStatementRuntimeExtensions
 {
-    public LangExpression Expression => returnExpression;
-
     /// <summary>
     /// 检查是否允许基本类型转换
     /// </summary>
@@ -32,10 +28,12 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
                                                      type == typeof(float) || type == typeof(long) ||
                                                      type == typeof(short) || type == typeof(byte);
 
-
-    public override OldStatement? this[int index] => null;
-
-    public override int Count => 0;
-
-    public override string ToString() => $"return {returnExpression}";
+    internal static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    {
+        ilGenerator.Emit(targetType == typeof(double) ? OpCodes.Conv_R8 :
+            targetType == typeof(float) ? OpCodes.Conv_R4 :
+            targetType == typeof(long) ? OpCodes.Conv_I8 :
+            targetType == typeof(short) ? OpCodes.Conv_I2 :
+            targetType == typeof(byte) ? OpCodes.Conv_U1 : OpCodes.Conv_I4);
+    }
 }

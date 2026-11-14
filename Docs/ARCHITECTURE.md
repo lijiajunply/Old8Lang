@@ -333,8 +333,11 @@ Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
   （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
-  `<Node>.Accept.generated.cs`；当前识别 **88 个节点**。
-- 接口声明为 `public partial interface IVisitor<out TResult>`，生成器不覆盖的部分（如继承自
+  `<Node>.Accept.generated.cs`；当前识别 **76 个 Runtime 节点**（阶段 2 已迁入
+  `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。
+- 基础语法接口为 `Old8Lang.Syntax` 的 `IVisitor<out TResult>`；Runtime 的
+  `public partial interface IRuntimeVisitor<out TResult> : IVisitor<TResult>` 由生成器补全 Runtime 节点方法。
+  生成器不覆盖的部分（如继承自
   `ImportInfo`、基类字面名不含 `LangExpression` 的运行时值）放在
   `Old8Lang.Runtime/AST/Visitor/IVisitor.Extensions.cs` 手工扩展中。
 - `Accept` 方法只做分派：`public override TResult Accept<TResult>(IVisitor<TResult> visitor)
@@ -547,9 +550,11 @@ Old8Lang 的 AST 节点分为两大类：
 
 #### 5.1.2 Statement (语句节点)
 
-**位置**: `Old8Lang/AST/Statement/`
+**位置**: 未迁移节点在 `Old8Lang.Runtime/AST/Statement/`；已迁移节点在
+`Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
+`BreakStatement`、`ContinueStatement`）。
 
-**基类**: `OldStatement`
+**基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 
 **特点**: 无返回值，控制程序流程
 
@@ -563,11 +568,11 @@ Old8Lang 的 AST 节点分为两大类：
 | WhileStatement | WhileStatement.cs | While 循环 | `while x > 0 { ... }` |
 | FunctionDeclarationStatement | FunctionDeclarationStatement.cs | 函数声明 | `func add(a, b) { return a + b }` |
 | ClassDeclarationStatement | ClassDeclarationStatement.cs | 类声明 | `class Point { ... }` |
-| ReturnStatement | ReturnStatement.cs | 返回语句 | `return result` |
+| ReturnStatement | ReturnStatement.cs（Syntax） | 返回语句 | `return result` |
 | TryStatement | TryStatement.cs | 异常处理 | `try { ... } catch (e) { ... }` |
 | ImportStatement | ImportStatement.cs | 模块导入 | `import "Math"` |
-| BreakStatement | BreakStatement.cs | 跳出循环 | `break` |
-| ContinueStatement | ContinueStatement.cs | 继续循环 | `continue` |
+| BreakStatement | BreakStatement.cs（Syntax） | 跳出循环 | `break` |
+| ContinueStatement | ContinueStatement.cs（Syntax） | 继续循环 | `continue` |
 
 ### 5.2 AST 节点接口
 

@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`BreakStatement`、`ContinueStatement`、`ReturnStatement`、`YieldStatement` 迁入 Syntax，
+  语法接口新增四个 Visit 方法，Runtime 生成节点降至 76；`ReturnStatement` 的 IL 辅助方法
+  （数值转换、类型兼容判断）移入 `ReturnStatementRuntimeExtensions`，遗留 partial 基线由 28 降为 27。
+  架构测试 37 项通过；Interpreter 1967 通过/1 跳过、VM 1082 通过、LSP 474 通过/2 跳过，均无失败；Compiler.Async 失败数 65 与基线一致。其余语句、表达式、
+  解析器及运行时值仍待拆分，阶段 2 未完成，见 `Reports/2026-11-14-13-53-叶子语句节点迁移测试.md`。
+
 - 2026-11-14：标识符索引改由 Syntax 的 `IndexExpression` 表示，读取、赋值与对象成员索引暂经 Runtime 适配，保留旧类型兼容；其余 AST 与解析器仍待拆分，见 `Reports/2026-11-14-12-39-索引表达式迁移测试.md`。
 
 - 2026-11-14：标识符切片改为 Syntax 的 `SliceExpression`，保留现有切片赋值及三模式行为，并适配切片端点和步长中的 await 扫描；其余 AST 与解析器仍待拆分，见 `Reports/2026-11-14-12-36-切片表达式迁移测试.md`。

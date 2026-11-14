@@ -23,6 +23,7 @@
 | `Operation`（Runtime 程序集） | 同名类型（Syntax 程序集） | 引用 Syntax 并重新编译。原 `Type` 编译期缓存已移入 Runtime，不再是语法节点 API；需推断类型时使用对应后端的类型推断服务。 |
 | `FunctionCallExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间与构造方式不变；直接使用的项目需引用 Syntax 并重新编译。原静态方法 `InvokeDynamicDelegate` 已迁为 `Old8Lang.Runtime.DynamicDelegateInvoker.Invoke`。 |
 | `AwaitExpression`、`ThrowStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间不变；直接使用的项目需引用 Syntax 并重新编译。`ThrowStatement.Expression` 现公开为只读属性。 |
+| `BreakStatement`、`ContinueStatement`、`ReturnStatement`、`YieldStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补四个 `Visit*` 方法。`BreakStatement`/`ContinueStatement` 的子语句索引器未实现，现抛 `NotSupportedException`（原为运行时的 `InvalidOperationError`）；这两个节点没有子语句，`Count == 0`，正常遍历不会触发。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 
 Runtime 中的 `IntLangValue`、`DoubleLangValue`、`StringLangValue`、`BoolLangValue`、`CharLangValue`、

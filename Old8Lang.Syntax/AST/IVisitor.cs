@@ -43,6 +43,18 @@ public interface IVisitor<out TResult>
     /// <summary>访问 throw 语句。</summary>
     TResult VisitThrowStatement(ThrowStatement node);
 
+    /// <summary>访问 return 语句。</summary>
+    TResult VisitReturnStatement(ReturnStatement node);
+
+    /// <summary>访问 yield 语句。</summary>
+    TResult VisitYieldStatement(YieldStatement node);
+
+    /// <summary>访问 break 语句。</summary>
+    TResult VisitBreakStatement(BreakStatement node);
+
+    /// <summary>访问 continue 语句。</summary>
+    TResult VisitContinueStatement(ContinueStatement node);
+
     /// <summary>访问函数调用表达式。</summary>
     TResult VisitFunctionCallExpression(FunctionCallExpression node);
 

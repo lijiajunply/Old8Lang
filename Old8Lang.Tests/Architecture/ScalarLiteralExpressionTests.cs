@@ -197,6 +197,10 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(FunctionCallExpression).Assembly);
         Assert.Same(assembly, typeof(AwaitExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ThrowStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ReturnStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.YieldStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.BreakStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ContinueStatement).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
         Assert.Same(assembly, typeof(ClassMemberId).Assembly);
         Assert.Same(assembly, typeof(ThisExpression).Assembly);
@@ -211,6 +215,10 @@ public class ScalarLiteralExpressionTests
         Assert.Equal("call name", new FunctionCallExpression(new LangId("name"), []).Accept(visitor));
         Assert.Equal("await name", new AwaitExpression(new LangId("name")).Accept(visitor));
         Assert.Equal("throw name", new Old8Lang.AST.Statement.ThrowStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("return name", new Old8Lang.AST.Statement.ReturnStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("yield name", new Old8Lang.AST.Statement.YieldStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("break", new Old8Lang.AST.Statement.BreakStatement().Accept(visitor));
+        Assert.Equal("continue", new Old8Lang.AST.Statement.ContinueStatement().Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -230,6 +238,10 @@ public class ScalarLiteralExpressionTests
         public string VisitArrayLiteralExpression(ArrayLiteralExpression node) => node.ToString();
         public string VisitAwaitExpression(AwaitExpression node) => $"await {node.Expression.Accept(this)}";
         public string VisitThrowStatement(Old8Lang.AST.Statement.ThrowStatement node) => $"throw {node.Expression.Accept(this)}";
+        public string VisitReturnStatement(Old8Lang.AST.Statement.ReturnStatement node) => $"return {node.Expression.Accept(this)}";
+        public string VisitYieldStatement(Old8Lang.AST.Statement.YieldStatement node) => $"yield {node.YieldExpression.Accept(this)}";
+        public string VisitBreakStatement(Old8Lang.AST.Statement.BreakStatement node) => "break";
+        public string VisitContinueStatement(Old8Lang.AST.Statement.ContinueStatement node) => "continue";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;

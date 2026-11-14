@@ -1161,7 +1161,7 @@ public partial class CompilerVisitor
                 bool isCompatible = expectedReturnType == returnType ||
                                    expectedReturnType.IsAssignableFrom(returnType) ||
                                    returnType == typeof(object) ||
-                                   ReturnStatement.IsBasicTypeConversionAllowed(expectedReturnType, returnType);
+                                   ReturnStatementRuntimeExtensions.IsBasicTypeConversionAllowed(expectedReturnType, returnType);
 
                 // 如果返回类型不匹配且不能自动转换，报告错误
                 if (!isCompatible)
@@ -1242,9 +1242,9 @@ public partial class CompilerVisitor
                     {
                         ilGenerator.Emit(OpCodes.Box, returnType);
                     }
-                    else if (ReturnStatement.IsNumericType(expectedReturnType) && ReturnStatement.IsNumericType(returnType))
+                    else if (ReturnStatementRuntimeExtensions.IsNumericType(expectedReturnType) && ReturnStatementRuntimeExtensions.IsNumericType(returnType))
                     {
-                        ReturnStatement.EmitNumericConversion(ilGenerator, expectedReturnType);
+                        ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, expectedReturnType);
                     }
                     else if (!expectedReturnType.IsValueType && !returnType.IsValueType)
                     {
