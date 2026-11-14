@@ -98,12 +98,12 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>函数调用或实例化</returns>
 
-    public Instance ParseInstantiate()
+    public LangExpression ParseInstantiate()
     {
         var identifier = ParseIdentifier();
         Expect(LangTokenType.LeftParen);
         functionParser.ParseArgList(out var positionalArgs, out var namedArgs);
         Expect(LangTokenType.RightParen);
-        return new Instance(identifier, positionalArgs, namedArgs);
+        return new CallExpression(identifier, positionalArgs, namedArgs);
     }
 }

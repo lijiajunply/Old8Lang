@@ -154,38 +154,39 @@ public partial class InterpreterVisitor
         // 处理点操作
         if (node.Opera == LangTokenType.Dot)
         {
+            var dotRight = CallSyntaxAdapter.Normalize(node.Right);
             var dotLeftResult = node.Left.Accept(this);
             if (dotLeftResult is AnyLangValue any)
             {
-                if (node.Right is Instance r1)
+                if (dotRight is Instance r1)
                 {
                     return any.Dot(r1, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
-                    return any.Dot(node.Right, manager);
+                    return any.Dot(dotRight, manager);
                 }
             }
             else if (dotLeftResult is ListLangValue list)
             {
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     return list.Dot(instance, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
                     // 先尝试将 Right 作为属性或方法调用传递给 Dot 方法
                     // 这样可以处理像 .Count 这样的属性访问
                     try
                     {
-                        return list.Dot(node.Right, manager);
+                        return list.Dot(dotRight, manager);
                     }
                     catch (InvalidOperationError)
                     {
                         // 如果 Dot 方法无法处理，则尝试作为索引访问
-                        var listIndexResult = node.Right.Accept(this);
+                        var listIndexResult = dotRight.Accept(this);
                         if (listIndexResult is IntLangValue intValue)
                         {
                             return list.Get(intValue);
@@ -196,30 +197,30 @@ public partial class InterpreterVisitor
             }
             else if (dotLeftResult is NativeStaticAny native)
             {
-                if (node.Right is not Instance r1) throw new InvalidOperationError(node, "原生静态类型操作需要实例");
+                if (dotRight is not Instance r1) throw new InvalidOperationError(node, "原生静态类型操作需要实例");
                 var newInstance = new Instance(r1.Id, r1.Ids, r1.NamedArgs);
                 return native.Dot(newInstance, manager);
             }
             // 处理静态成员访问：ClassName.staticMember
             else if (dotLeftResult is TypeTemplate typeTemplate)
             {
-                if (node.Right is Instance r1)
+                if (dotRight is Instance r1)
                 {
                     // 处理静态方法调用
                     var newInstance = new Instance(r1.Id, r1.Ids, r1.NamedArgs, r1.Position);
                     return typeTemplate.Dot(newInstance, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
                     // 处理静态成员访问
-                    return typeTemplate.Dot(node.Right, manager);
+                    return typeTemplate.Dot(dotRight, manager);
                 }
             }
             // 处理枚举成员访问：EnumName.MemberName
             else if (dotLeftResult is EnumTemplate enumTemplate)
             {
-                if (node.Right is LangId memberId)
+                if (dotRight is LangId memberId)
                 {
                     // 访问枚举成员
                     return enumTemplate.GetMemberValue(memberId.IdName);
@@ -230,52 +231,52 @@ public partial class InterpreterVisitor
             else if (dotLeftResult is ArrayLangValue array)
             {
                 // 处理数组方法调用
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     return array.Dot(instance, manager);
                 }
 
                 // 处理数组索引访问，需要先运行Right表达式
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
-                    var arrayIndexResult = node.Right.Accept(this);
+                    var arrayIndexResult = dotRight.Accept(this);
                     if (arrayIndexResult is IntLangValue intValue)
                     {
                         return array.Get(intValue);
                     }
 
                     // 如果不是整数索引，则作为方法调用处理
-                    return array.Dot(node.Right, manager);
+                    return array.Dot(dotRight, manager);
                 }
             }
             else if (dotLeftResult is DictionaryLangValue dict)
             {
                 // 处理字典方法调用
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     return dict.Dot(instance, manager);
                 }
 
                 // 处理字典属性访问和方法调用
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
-                    return dict.Dot(node.Right, manager);
+                    return dict.Dot(dotRight, manager);
                 }
             }
             else if (dotLeftResult is TaskClassLangValue taskClassValue)
             {
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     taskClassValue.ExternalManager = manager;
                     return taskClassValue.Dot(instance, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     taskClassValue.ExternalManager = manager;
-                    return taskClassValue.Dot(node.Right, manager);
+                    return taskClassValue.Dot(dotRight, manager);
                 }
             }
             else if (dotLeftResult is TaskLangValue taskValue)
@@ -283,7 +284,7 @@ public partial class InterpreterVisitor
                 // 设置外部管理器，确保 Then 等方法能访问有效的 Interpreter
                 taskValue.ExternalManager = manager;
 
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     // Retry 方法需要特殊处理，因为需要重新执行原始函数调用
                     if (instance.Id.IdName == "Retry")
@@ -329,9 +330,9 @@ public partial class InterpreterVisitor
                     return taskValue.Dot(instance, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
-                    return taskValue.Dot(node.Right, manager);
+                    return taskValue.Dot(dotRight, manager);
                 }
             }
             else if (dotLeftResult is ThreadLangValue threadValue)
@@ -339,7 +340,7 @@ public partial class InterpreterVisitor
                 // 设置外部管理器，确保 Then 等方法能访问有效的 Interpreter
                 threadValue.ExternalManager = manager;
 
-                if (node.Right is Instance instance)
+                if (dotRight is Instance instance)
                 {
                     // Retry 方法需要特殊处理，因为需要重新执行原始函数调用
                     if (instance.Id.IdName == "Retry")
@@ -385,14 +386,14 @@ public partial class InterpreterVisitor
                     return threadValue.Dot(instance, manager);
                 }
 
-                if (node.Right is not null)
+                if (dotRight is not null)
                 {
-                    return threadValue.Dot(node.Right, manager);
+                    return threadValue.Dot(dotRight, manager);
                 }
             }
-            else if (dotLeftResult is not null && node.Right is not null)
+            else if (dotLeftResult is not null && dotRight is not null)
             {
-                return dotLeftResult.Dot(node.Right, manager);
+                return dotLeftResult.Dot(dotRight, manager);
                 // throw new InvalidOperationError(node, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
             }
             else

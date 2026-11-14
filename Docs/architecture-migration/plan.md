@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：引入 Syntax 的 `CallExpression`，解析器不再构造运行时 `Instance`；求值与各分析入口通过
+  `CallSyntaxAdapter.Normalize` 归一化为原 `Instance`。补齐解释器/字节码 Dot 分派、静态类调用、
+  类型推断、泛型参数推断、VM 闭包捕获与 LSP 成员分析中的调用识别。Runtime 生成节点保持 51。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
+  Compiler 各分组与基线一致。见 `Reports/2026-11-14-15-35-调用语法迁移测试.md`。
+
 - 2026-11-14：`NativeStatement`、`ExternStatement` 与 extern 声明模型迁入 Syntax；native 函数签名改为
   `FunctionSyntax?` 并经 `GetFuncValue()` 适配，extern 内部字段改为公开只读属性。Runtime 生成节点
   53 → 51，遗留 partial 保持 8。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476

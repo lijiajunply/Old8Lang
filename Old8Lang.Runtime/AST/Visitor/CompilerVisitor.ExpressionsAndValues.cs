@@ -2003,7 +2003,7 @@ public partial class CompilerVisitor
             case LangTokenType.NullishCoalescing:
                 return NullishCoalescingILHelper.GenerateNullishCoalescing(operation.Left!, operation.Right!, ilGenerator, local, leftType!);
             case LangTokenType.Dot:
-                return DotOperatorILHelper.GenerateDotOperator(operation.Left, operation.Right, ilGenerator, local, leftType, rightType, operation);
+                return DotOperatorILHelper.GenerateDotOperator(operation.Left, CallSyntaxAdapter.Normalize(operation.Right), ilGenerator, local, leftType, rightType, operation);
             default:
                 throw new InvalidOperationError(operation, $"不支持的二元运算符: {operation.Opera}");
         }

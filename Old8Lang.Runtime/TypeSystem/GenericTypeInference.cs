@@ -207,6 +207,9 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
     /// </summary>
     private ITypeInfo? InferArgumentType(LangExpression expr, Interpreter.VariateManager manager)
     {
+        // 调用语法在类型推断内部统一按运行时 Instance 处理（与 Dot/静态类分派保持一致）。
+        if (expr is CallExpression callExpression) expr = callExpression.ToInstance();
+
         try
         {
             // 对于字面量，直接返回其类型

@@ -619,13 +619,13 @@ public partial class StatementParser(
             if (expr is not null)
             {
                 // 如果是函数调用表达式（Instance），返回 FuncRunStatement
-                if (expr is Instance instance)
+                if (expr is Instance or CallExpression)
                 {
-                    return new FuncRunStatement(instance, expr.Position);
+                    return new FuncRunStatement(expr, expr.Position);
                 }
 
                 // 如果是成员方法调用（Operation，且操作符为 Dot，右侧为 Instance），返回 FuncRunStatement
-                if (expr is Operation { Opera: LangTokenType.Dot, Right: Instance } operation)
+                if (expr is Operation { Opera: LangTokenType.Dot, Right: Instance or CallExpression } operation)
                     // 检查右侧是否是函数调用（Instance）
                 {
                     return new FuncRunStatement(operation, expr.Position);
@@ -634,7 +634,7 @@ public partial class StatementParser(
                 // 如果是super方法调用（Operation，且操作符为 Dot，左侧为 SuperExpression，右侧为 Instance），返回 FuncRunStatement
                 if (expr is Operation
                     {
-                        Opera: LangTokenType.Dot, Left: SuperExpression, Right: Instance
+                        Opera: LangTokenType.Dot, Left: SuperExpression, Right: Instance or CallExpression
                     } superOperation)
                 {
                     return new FuncRunStatement(superOperation, expr.Position);
@@ -643,7 +643,7 @@ public partial class StatementParser(
                 // 如果是this方法调用（Operation，且操作符为 Dot，左侧为 LangId { IdName: "this" }，右侧为 Instance），返回 FuncRunStatement
                 if (expr is Operation
                     {
-                        Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance
+                        Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance or CallExpression
                     } thisOperation)
                 {
                     return new FuncRunStatement(thisOperation, expr.Position);

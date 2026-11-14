@@ -18,6 +18,7 @@ public partial class BytecodeVisitor
         // 特殊处理 Dot 运算符（成员访问和方法调用）
         if (node.Opera == LangTokenType.Dot)
         {
+            var dotRight = CallSyntaxAdapter.Normalize(node.Right);
             // 静态类 API（Task.Delay / Thread.Sleep / Assert.Equal ...）必须在访问左操作数之前拦截：
             // 解释器把这些静态类注册为全局对象，字节码模式没有对应对象，按普通成员访问走只会报
             // “名称 'Task' 未定义”。
@@ -34,7 +35,7 @@ public partial class BytecodeVisitor
                 node.Left.Accept(this);
 
             // 检查右操作数是否是方法调用（Instance）
-            if (node.Right is Instance instance)
+            if (dotRight is Instance instance)
             {
                 // 这是方法调用：object.method(args) 或 super.method(args)
                 // 左操作数（对象或super）已经在栈上
@@ -60,7 +61,7 @@ public partial class BytecodeVisitor
                     Emit(OpCode.CallMethod, new object[] { argCount, methodName });
                 }
             }
-            else if (node.Right is LangId memberId)
+            else if (dotRight is LangId memberId)
             {
                 // 这是字段访问：object.field 或 super.field
                 // 左操作数（对象或super）已经在栈上
@@ -77,7 +78,7 @@ public partial class BytecodeVisitor
                     Emit(OpCode.GetField, fieldName);
                 }
             }
-            else if (node.Right is ClassMemberId classMemberId)
+            else if (dotRight is ClassMemberId classMemberId)
             {
                 // 这是字段访问：object.field 或 super.field（字段带访问修饰符）
                 // 左操作数（对象或super）已经在栈上
@@ -97,8 +98,8 @@ public partial class BytecodeVisitor
             else
             {
                 // 其他情况：生成右操作数代码
-                if (node.Right != null)
-                    node.Right.Accept(this);
+                if (dotRight != null)
+                    dotRight.Accept(this);
                 Emit(OpCode.Nop);
             }
 

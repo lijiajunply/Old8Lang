@@ -405,24 +405,25 @@ public partial class TypeInferenceVisitor
 
     public Type? VisitOperation(Operation node)
     {
+        var right = node.Opera == LangTokenType.Dot ? CallSyntaxAdapter.Normalize(node.Right) : node.Right;
 
         // 同一个方法 AST 会被多个泛型类特化复用；node 的字段类型依当前特化而变。
         var isThisField = node.Opera == LangTokenType.Dot &&
-                          (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && node.Right is LangId;
+                          (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && right is LangId;
         if (!isThisField && OperationTypeCache.Get(node) is { } cachedType) return cachedType;
-        if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, node.Right, local, out var library, out var libraryCall))
+        if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.GetReturnType(library, libraryCall);
         if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "Thread" } &&
-            (node.Right is LangId { IdName: "CurrentThread" } ||
-             node.Right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
+            (right is LangId { IdName: "CurrentThread" } ||
+             right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
             return typeof(Thread);
         // 直接返回类型信息，不创建临时方法
         var leftType = node.Left?.Accept(new TypeInferenceVisitor(local));
-        var rightType = node.Right?.Accept(new TypeInferenceVisitor(local));
+        var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         // 处理 node.member 访问（类环境内）- 需要在 TypeBuilder 转换之前处理
         // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
-        if (node.Opera == LangTokenType.Dot && (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && node.Right is LangId thisMemberId)
+        if (node.Opera == LangTokenType.Dot && (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && right is LangId thisMemberId)
         {
             // 优先从 FieldVar 中查找字段类型
             if (local.FieldVar.TryGetValue(thisMemberId.IdName, out var fieldInfo))
@@ -458,7 +459,7 @@ public partial class TypeInferenceVisitor
         }
 
         // 处理成员访问（Dot操作符）
-        if (node.Opera == LangTokenType.Dot && node.Right is LangId rightId)
+        if (node.Opera == LangTokenType.Dot && right is LangId rightId)
         {
             if (leftType is not null)
             {
@@ -505,7 +506,7 @@ public partial class TypeInferenceVisitor
         }
 
         // 处理方法调用（Dot操作符 + Instance）
-        if (node.Opera == LangTokenType.Dot && node.Right is Instance instance)
+        if (node.Opera == LangTokenType.Dot && right is Instance instance)
         {
             // 特殊处理ToStr()方法，返回string类型
             if (instance.Id.IdName == "ToStr" && instance.Ids.Count == 0)
@@ -563,7 +564,7 @@ public partial class TypeInferenceVisitor
         }
 
         // 处理类型转换运算符 as
-        if (node.Opera == LangTokenType.As && node.Right is LangId rightAsId)
+        if (node.Opera == LangTokenType.As && right is LangId rightAsId)
         {
             // 返回目标类型
             var typeName = rightAsId.IdName;

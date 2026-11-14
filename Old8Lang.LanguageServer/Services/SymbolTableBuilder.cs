@@ -539,13 +539,16 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             // 实例化表达式 User()
             case Instance instance:
                 // Instance 表达式用于类构造函数调用
-                var className = instance.Id.IdName;
-                return className;
+                return instance.Id.IdName;
+
+            // 简单调用语法（解析器对 User() 的产出）
+            case CallExpression call:
+                return call.Id.IdName;
 
             // 操作表达式 - 处理成员方法调用：outer.createInner()
             case Operation { Opera: LangTokenType.Dot } dotOp:
-                // 成员方法调用：Operation(Dot, objectId, Instance(methodName()))
-                if (dotOp is { Left: LangId objectId, Right: Instance methodCall })
+                // 成员方法调用：Operation(Dot, objectId, Instance/CallExpression(methodName()))
+                if (dotOp is { Left: LangId objectId, Right: Instance or CallExpression })
                 {
                     // 获取对象的类型
                     if (_symbolTable.TryGetValue(objectId.IdName, out var objectSymbol))
@@ -556,7 +559,12 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                             classSymbol.Kind == SymbolKind.Class)
                         {
                             // 查找方法
-                            var memberName = methodCall.Id.IdName;
+                            var memberName = dotOp.Right switch
+                            {
+                                Instance methodCall => methodCall.Id.IdName,
+                                CallExpression methodCall => methodCall.Id.IdName,
+                                _ => ""
+                            };
                             if (classSymbol.Members.TryGetValue(memberName, out var memberSymbol) &&
                                 memberSymbol.Kind == SymbolKind.Method)
                             {

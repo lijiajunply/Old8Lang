@@ -167,9 +167,14 @@ public class ClosureCaptureAnalyzer
         {
             AnalyzeNode(dotExpression.Left);
 
-            if (dotExpression.Right is Instance methodCall)
+            switch (dotExpression.Right)
             {
-                AnalyzeArguments(methodCall.Ids, methodCall.NamedArgs);
+                case Instance methodCall:
+                    AnalyzeArguments(methodCall.Ids, methodCall.NamedArgs);
+                    break;
+                case CallExpression callExpression:
+                    AnalyzeArguments(callExpression.Arguments, callExpression.NamedArguments);
+                    break;
             }
 
             return;
@@ -184,6 +189,14 @@ public class ClosureCaptureAnalyzer
         {
             AnalyzeNode(instance.Id);
             AnalyzeArguments(instance.Ids, instance.NamedArgs);
+            return;
+        }
+
+        // 简单调用语法（解析器对 identifier(...) 的产出）
+        if (node is CallExpression callSyntax)
+        {
+            AnalyzeNode(callSyntax.Id);
+            AnalyzeArguments(callSyntax.Arguments, callSyntax.NamedArguments);
             return;
         }
 

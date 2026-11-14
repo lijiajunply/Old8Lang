@@ -122,6 +122,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问 extern 声明。</summary>
     TResult VisitExternStatement(ExternStatement node);
 
+    /// <summary>访问简单函数调用表达式。</summary>
+    TResult VisitCallExpression(CallExpression node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

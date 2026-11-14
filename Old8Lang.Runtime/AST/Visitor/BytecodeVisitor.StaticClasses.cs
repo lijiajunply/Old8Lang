@@ -31,7 +31,7 @@ public partial class BytecodeVisitor
         if (node.Left is Operation { Left: LangId { IdName: var owner }, Right: LangId { IdName: "Factory" } }
             && VmStaticClassRegistry.IsStaticClass(owner)
             && !IsShadowedName(owner)
-            && node.Right is Instance factoryCall)
+            && CallSyntaxAdapter.Normalize(node.Right) is Instance factoryCall)
         {
             return CompileTaskFactoryCall(node, owner, factoryCall);
         }
@@ -48,7 +48,7 @@ public partial class BytecodeVisitor
             return false;
         }
 
-        if (node.Right is Instance instance)
+        if (CallSyntaxAdapter.Normalize(node.Right) is Instance instance)
         {
             string methodName = instance.Id.IdName;
 

@@ -519,7 +519,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Instance>(setStmt.Value);
+        Assert.IsType<CallExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -540,7 +540,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Instance>(setStmt.Value);
+        Assert.IsType<CallExpression>(setStmt.Value);
     }
 
     #endregion

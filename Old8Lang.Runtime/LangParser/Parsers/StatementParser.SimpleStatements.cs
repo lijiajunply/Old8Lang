@@ -165,7 +165,7 @@ public partial class StatementParser
         Expect(LangTokenType.RightParen);
 
         // 创建初始的函数调用表达式
-        LangExpression expr = new Instance(new LangId(funcName), positionalArgs, namedArgs);
+        LangExpression expr = new CallExpression(new LangId(funcName), positionalArgs, namedArgs);
 
         // 处理链式调用：spawn(worker).Start() 或 func().method().property
         expr = expressionParser.ParseDotExpr(expr);

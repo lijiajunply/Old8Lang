@@ -542,7 +542,8 @@ Old8Lang 的 AST 节点分为两大类：
 | VariableExpression | VariableExpression.cs | 变量引用 | `x`, `count` |
 | BinaryExpression | BinaryExpression.cs | 二元运算 | `a + b`, `x * y` |
 | UnaryExpression | UnaryExpression.cs | 一元运算 | `-x`, `!flag` |
-| FunctionCallExpression | FunctionCallExpression.cs | 函数调用 | `print("hello")` |
+| FunctionCallExpression | FunctionCallExpression.cs | 链式/任意表达式调用 | `obj.get()(arg)` |
+| CallExpression | CallExpression.cs（Syntax） | 标识符简单调用（求值时适配为运行时 Instance） | `print("hello")` |
 | LambdaExpression | LambdaExpression.cs（Syntax） | Lambda 表达式语法（求值时转换为函数值） | `(x) => x * 2` |
 | ArrayExpression | ArrayExpression.cs | 数组字面量 | `[1, 2, 3]` |
 | DictionaryExpression | DictionaryExpression.cs | 字典字面量 | `{"key": "value"}` |
