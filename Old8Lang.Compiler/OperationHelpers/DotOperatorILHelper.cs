@@ -739,6 +739,16 @@ public static class DotOperatorILHelper
             return GenerateDynamicObjectMethodCall(left!, instance, ilGenerator, local);
         }
 
+        // 类体内部对自身方法的调用（this.method()）：
+        // 当前类还是 TypeBuilder，CreateType 之前既不能用 GetMethod 解析，
+        // 也无法提前拿到 MethodBuilder（方法与调用顺序无关地互相引用）。
+        // 与 object 接收者一样改由运行期按实际类型分派，避免编译期直接抛
+        // NotSupportedException: The invoked member is not supported before the type is created。
+        if (leftType is TypeBuilder)
+        {
+            return GenerateDynamicObjectMethodCall(left!, instance, ilGenerator, local);
+        }
+
         // 首先尝试从实例方法注册表中查找
         // 注意：IL 代码生成不经过解释器的实例方法分派，某些程序（例如只用到 Thread 的
         // 原生 Dot 分派、从没触发过解释器实例方法查找的程序）不会初始化注册表，
@@ -1177,6 +1187,14 @@ public static class DotOperatorILHelper
             .Where(candidate => candidate.Name == methodName && ParametersMatch(candidate.GetParameters(), arguments))
             .OrderBy(candidate => candidate.GetParameters().Length)
             .FirstOrDefault();
+
+        // 类体内的 this.method() 走这里分派：语言层的 private 方法在 CLR 上是私有方法，
+        // 只在公有方法里找不到时再退到非公有成员，避免误绑到基类的内部方法。
+        method ??= type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Where(candidate => candidate.Name == methodName && ParametersMatch(candidate.GetParameters(), arguments))
+            .OrderBy(candidate => candidate.GetParameters().Length)
+            .FirstOrDefault();
+
         if (method is null)
         {
             throw new MissingMethodException(type.FullName, methodName);

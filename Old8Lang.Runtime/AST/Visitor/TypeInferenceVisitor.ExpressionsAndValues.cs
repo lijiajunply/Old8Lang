@@ -541,8 +541,12 @@ public partial class TypeInferenceVisitor
                 }
             }
 
-            // 对于其他方法调用，尝试查找方法并返回其返回类型
-            if (leftType is not null)
+            // 对于其他方法调用，尝试查找方法并返回其返回类型。
+            // 正在创建的类型（TypeBuilder）在 CreateType 之前不支持反射查询，
+            // 类体内 this.method() 的调用改由运行期按实际类型分派，这里只能给出 object，
+            // 与 DotOperatorILHelper 的发射路径保持一致（否则会在编译期抛
+            // NotSupportedException: The invoked member is not supported before the type is created）。
+            if (leftType is not null && leftType is not TypeBuilder)
             {
                 var paramTypes = instance.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToArray();
                 var method = leftType.GetMethod(instance.Id.IdName, paramTypes);

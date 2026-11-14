@@ -169,12 +169,16 @@
   `MemberAccessTests.MemberAccessErrorHandling_*` 因此仍失败。需先确认 `int?` 的返回类型映射与
   `ReturnStatement` 对 `null` 的处理，再补回归。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.1）。
 
-- [ ] **IL 类型推断在未完成的 `TypeBuilder` 上调用 `GetMethod`**：`TypeInferenceVisitor.VisitOperation`
-  末尾按 `leftType.GetMethod(...)` 兜底查找方法，而类方法编译时 `this` 的类型是尚未 `CreateType`
-  的 `TypeBuilder`，直接抛 `NotSupportedException : The invoked member is not supported before the type
-  is created`（`TypeInferenceVisitor.ExpressionsAndValues.cs:548`，复现用例
-  `MemberAccessTests.PublicPrivateAccess_CompilesAndExecutesCorrectly`）。应在 `leftType is TypeBuilder`
-  时改走 `FieldVar`/`LocalManager` 已知信息或返回 `object`。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.2）。
+- [x] **IL 类型推断在未完成的 `TypeBuilder` 上调用 `GetMethod`**：类方法体内 `this.method()`
+  的接收者类型是尚未 `CreateType` 的 `TypeBuilder`，`VisitOperation` 兜底与
+  `DotOperatorILHelper` 都调用 `leftType.GetMethod(...)`，编译期直接抛
+  `NotSupportedException : The invoked member is not supported before the type is created`。
+  现在 `TypeBuilder` 接收者与 `object` 接收者一样走运行期分派（推断返回 `object`、
+  发射 `InvokeDynamicObjectMethod`，并允许匹配 CLR 私有方法）。
+  `MemberAccessTests` 4→6 项通过，`ErrorPropagatesThroughClassMethods` 一并修复；
+  `Compiler.Classes` 23→21 失败、`Compiler.Exceptions` 12→11 失败，其余 17 组不变。
+  见 change（`2026-11-14-IL类内方法调用/test.md`）。遗留：`this.method()` 目前是反射分派，
+  后续可在 `LocalManager` 预登记 `MethodBuilder` 恢复直接 `callvirt`。
 
 - [ ] **IL 链式比较 `a < b < c` 结果为 false**：`a <- 5; b <- 10; c <- 15; a < b < c` 期望 `true`，
   IL 模式得到 `false`（`ComparisonTests.ChainedComparisons_CompilesAndExecutesCorrectly`，已在
