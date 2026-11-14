@@ -236,7 +236,7 @@ public partial class CompilerVisitor
         }
 
         // 生成异步方法体
-        node.GenerateAsyncMethodBody(methodIl, funcLocal);
+        node.GetAsyncFuncValue().GenerateMethodBody(methodIl, funcLocal);
 
         // 将方法添加到本地变量管理器
         // 使用函数名+参数类型作为键，支持更准确的函数重载

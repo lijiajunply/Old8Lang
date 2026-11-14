@@ -15,13 +15,6 @@ namespace Old8Lang.AST.Statement;
 public static partial class AsyncFuncInitRuntimeExtensions
 {
     /// <summary>
-    /// 生成异步方法体的IL代码
-    /// </summary>
-    internal static void GenerateAsyncMethodBody(this AsyncFuncInit node, ILGenerator ilGenerator, LocalManager local)
-    {
-        node.GetAsyncFuncValue().GenerateMethodBody(ilGenerator, local);
-    }
-    /// <summary>
     /// 应用单个装饰器
     /// </summary>
     internal static LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)

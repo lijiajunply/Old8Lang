@@ -196,3 +196,11 @@ Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.Cur
 文件头指令应用），`Compiler` 的同名属性委托到该选项。Runtime 的 `Compiler/` 只剩
 `LocalManager`、IL 生成缓存、`GlobalVariableScope`、`RuntimeGlobals`/常量注册表、
 `AssertHelper`/`ExceptionWrapper`、泛型特化与 `IlDisassembler` 等共享契约。
+
+## 阶段 3.13：异步函数体 IL 迁入 IL 后端（2026-11-14）
+
+`AsyncFuncLangValue.GenerateMethodBody` 改为 `Old8Lang.Compiler` 的扩展方法，
+`IlDisassembler` 随迁入 `Old8Lang.Compiler/Verification/`。Runtime 的 `Compiler/` 只剩
+`LocalManager`、`GlobalVariableScope`、IL 生成缓存、`RuntimeGlobals`/常量注册表、
+`AssertHelper`/`ExceptionWrapper`、泛型特化与 `IlCompilerOptions` 等共享编译契约。
+`AsyncStateMachineGenerator` 因 `LocalManager` 直接持有其类型仍暂留 Runtime。

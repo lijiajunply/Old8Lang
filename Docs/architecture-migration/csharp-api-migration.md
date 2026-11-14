@@ -102,3 +102,10 @@ Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 
 | `Old8Lang.Compiler.Compiler`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 `Old8Lang.Compiler` 并重新编译；`Compile`、`LogLevel`、`CurrentLogLevel` 等公开 API 不变。 |
 | `Old8Lang.Compiler.GlobalVariableAnalysis`、`Old8Lang.Compiler.Verification.ILVerifier` | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。`GlobalVariableScope` 仍在 Runtime，供 `LocalManager` 共享。 |
 | 无 | `Old8Lang.Compiler.IlCompilerOptions`（Runtime） | 共享编译开关与文件头指令入口；`Compiler` 的同名属性委托到该类型。 |
+
+### 阶段 3.13：异步函数体 IL（2026-11-14）
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `AsyncFuncLangValue.GenerateMethodBody(ILGenerator, LocalManager)`（Runtime 公开方法） | 无公开等价物（`Old8Lang.Compiler` 内部扩展方法） | 该方法是 IL 后端实现细节；外部调用方应使用 `Compiler.Compile`。Runtime 不再提供回退。 |
+| `Old8Lang.Compiler.Verification.IlDisassembler`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。 |

@@ -15,7 +15,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
 using Old8Lang.Compiler.Specialization;
-using Old8Lang.Compiler.Verification;
+
 using Old8Lang.Concurrency;
 using Old8Lang.ExternProviders;
 using Old8Lang.GlobalFunctions.Core;
