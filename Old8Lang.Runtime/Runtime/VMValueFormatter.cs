@@ -57,6 +57,19 @@ public static class VMValueFormatter
             return "[" + string.Join(", ", list.Select(FormatValueForDisplay)) + "]";
         }
 
+        // Range / Range() 返回的是原生 int[] 这类强类型集合，元素不是 object，
+        // 上面的 List<object?> / object?[] 分支匹配不到，会落到 ToString() 打印成
+        // System.Int32[]。这里按语言格式递归格式化，与解释器一致。
+        if (value is Array typedArray)
+        {
+            return "[" + string.Join(", ", typedArray.Cast<object?>().Select(FormatValueForDisplay)) + "]";
+        }
+
+        if (value is System.Collections.IList typedList)
+        {
+            return "[" + string.Join(", ", typedList.Cast<object?>().Select(FormatValueForDisplay)) + "]";
+        }
+
         if (IsTuple(value))
         {
             return FormatTuple((Tuple<object?, object?>)value);
@@ -144,8 +157,9 @@ public static class VMValueFormatter
                 : d.ToString(CultureInfo.InvariantCulture);
         }
 
-        // 递归处理嵌套集合
-        if (value is Dictionary<object, object?> || value is object?[] || value is List<object?> || IsTuple(value))
+        // 递归处理嵌套集合（强类型数组 / 非 object 元素的 List<T> 同样要按语言格式展开）
+        if (value is Dictionary<object, object?> || value is object?[] || value is List<object?> ||
+            IsTuple(value) || value is Array || value is System.Collections.IList)
         {
             return ToDisplayString(value);
         }
