@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`ForInStatement` 迁入 Syntax；集合、生成器、异步生成器/流的分支执行与 IL 字典遍历
+  移入 `ForInStatementRuntimeExtensions`（两个 partial 合并为 partial static class）。Runtime 生成节点
+  63 → 62，遗留 partial 基线 17 → 15。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、
+  LSP 474/476（2 跳过）、Architecture 43 通过；Compiler.Statements 4 / Expressions 41 /
+  Async 65 项失败与基线一致。见 `Reports/2026-11-14-14-36-forin节点迁移测试.md`。
+
 - 2026-11-14：解析器为自增/自减、未初始化字段、字符串模板、动态导入和空 `return` 生成的合成
   运行时字面量改为 `ScalarLiteralExpression`，解析器不再直接构造这些 `LangValueType`。
   Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）通过；

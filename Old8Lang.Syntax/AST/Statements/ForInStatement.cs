@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Generators;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.AsyncGeneration;
-using Old8Lang.Interpreter;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// for-in 循环语句。
+/// </summary>
 public partial class ForInStatement(
     LangId id,
     LangExpression expression,
@@ -40,11 +33,7 @@ public partial class ForInStatement(
     /// </remarks>
     public IReadOnlyList<LangId> Ids => AllIds;
 
-
-
-
-
-
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitForInStatement(this);
 
     public override OldStatement this[int index] => body[index]!;
 

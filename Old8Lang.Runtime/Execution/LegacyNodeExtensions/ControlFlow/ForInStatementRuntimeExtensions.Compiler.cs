@@ -13,17 +13,17 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// ForInStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// ForInStatement 的执行/编译辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class ForInStatement
+internal static partial class ForInStatementRuntimeExtensions
 {
     /// <summary>
     /// 生成字典类型的IL代码，使用更简单可靠的方式
     /// </summary>
-    internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateDictionaryIl(this ForInStatement node, ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -45,7 +45,7 @@ public partial class ForInStatement
         // 在循环外部声明键和值的局部变量
         var keyLocal = ilGenerator.DeclareLocal(typeof(object));
         LocalBuilder? valueLocal = null;
-        if (AllIds.Count > 1)
+        if (node.Ids.Count > 1)
         {
             valueLocal = ilGenerator.DeclareLocal(typeof(object));
         }
@@ -82,17 +82,17 @@ public partial class ForInStatement
         // 将键添加到局部变量管理器
         if (local.AsyncStateMachineGenerator != null)
         {
-            local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+            local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
             ilGenerator.Emit(OpCodes.Ldloc, keyLocal);
-            local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+            local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
         }
         else
         {
-            local.AddLocalVar(AllIds[0].IdName, keyLocal);
+            local.AddLocalVar(node.Ids[0].IdName, keyLocal);
         }
 
         // 如果有多个标识符（键值对遍历），获取值
-        if (AllIds.Count > 1)
+        if (node.Ids.Count > 1)
         {
             // 获取字典的索引器方法
             var itemProperty = typeof(Dictionary<object, object>).GetProperty("Item")!;
@@ -109,18 +109,18 @@ public partial class ForInStatement
             // 将值添加到局部变量管理器
             if (local.AsyncStateMachineGenerator != null)
             {
-                local.DefineVariable(ilGenerator, AllIds[1].IdName, typeof(object));
+                local.DefineVariable(ilGenerator, node.Ids[1].IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, valueLocal!);
-                local.StoreVariable(ilGenerator, AllIds[1].IdName, Position);
+                local.StoreVariable(ilGenerator, node.Ids[1].IdName, node.Position);
             }
             else
             {
-                local.AddLocalVar(AllIds[1].IdName, valueLocal!);
+                local.AddLocalVar(node.Ids[1].IdName, valueLocal!);
             }
         }
 
         // 生成循环体
-        body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

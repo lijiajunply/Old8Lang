@@ -333,7 +333,7 @@ Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
   （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
-  `<Node>.Accept.generated.cs`；当前识别 **63 个 Runtime 节点**（阶段 2 已迁入
+  `<Node>.Accept.generated.cs`；当前识别 **62 个 Runtime 节点**（阶段 2 已迁入
   `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。生成目录另有
   `SuperProxy.Accept.generated.cs`，其 `VisitSuperProxy` 由 `IVisitor.Extensions.cs` 手工声明，
   因此文件数会比接口方法数多 1。
@@ -557,7 +557,7 @@ Old8Lang 的 AST 节点分为两大类：
 `BreakStatement`、`ContinueStatement`、`BlockStatement`、`IfChild`、`IfStatement`、`DeferStatement`、
 `WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。另有 `SelectCase`、`ImportItem`、
 `ClassFieldSetStatement`、`FuncRunStatement`、`SwitchStatement`/`CaseStatement`、`TryStatement`、
-`EnumInit`、`SelectStatement` 等语句节点位于同一目录。
+`EnumInit`、`SelectStatement`、`ForInStatement` 等语句节点位于同一目录。
 
 **基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 
@@ -579,6 +579,7 @@ Old8Lang 的 AST 节点分为两大类：
 | CaseStatement | CaseStatement.cs（Syntax） | switch 分支 | `case 1 { ... }` |
 | EnumInit | EnumInit.cs（Syntax） | 枚举声明 | `enum Color { Red, Green }` |
 | SelectStatement | SelectStatement.cs（Syntax） | Channel 多路选择 | `select { case v <- ch { ... } }` |
+| ForInStatement | ForInStatement.cs（Syntax） | 遍历集合/生成器 | `for x in items { ... }` |
 | ImportStatement | ImportStatement.cs | 模块导入 | `import "Math"` |
 | BreakStatement | BreakStatement.cs（Syntax） | 跳出循环 | `break` |
 | ContinueStatement | ContinueStatement.cs（Syntax） | 继续循环 | `continue` |

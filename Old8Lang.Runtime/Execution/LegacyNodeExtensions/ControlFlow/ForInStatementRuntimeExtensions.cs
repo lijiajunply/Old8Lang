@@ -13,14 +13,14 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// ForInStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// ForInStatement 的执行/编译辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class ForInStatement
+internal static partial class ForInStatementRuntimeExtensions
 {
     /// <summary>
     /// 标准 for-in 循环（非生成器）
     /// </summary>
-    internal void RunStandard(VariateManager manager)
+    internal static void RunStandard(this ForInStatement node, VariateManager manager)
     {
         manager.AddChildren();
         // 压入新的控制流状态
@@ -28,7 +28,7 @@ public partial class ForInStatement
 
         try
         {
-            var value = expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(new InterpreterVisitor(manager));
 
             // 处理异步生成器对象（异步流）
             if (value is AsyncGeneratorLangValue asyncGenerator)
@@ -57,10 +57,10 @@ public partial class ForInStatement
                         if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
-                            manager.Set(id, currentValue);
+                            manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -105,10 +105,10 @@ public partial class ForInStatement
                         if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
-                            manager.Set(id, currentValue);
+                            manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -154,10 +154,10 @@ public partial class ForInStatement
                         {
                             // 赋值给标识符
                             // 多个标识符的情况，只赋值给第一个
-                            manager.Set(id, currentValue);
+                            manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -190,7 +190,7 @@ public partial class ForInStatement
             {
                 foreach (var idValue in oldList.GetItems())
                 {
-                    if (AllIds.Count == 1)
+                    if (node.Ids.Count == 1)
                     {
                         // 单个标识符的情况：迭代元素若是元组（例如字典迭代产出的键值对），
                         // 必须先求值再绑定，否则绑定到的元组 ItemValues 为空，读取时会得到空元组
@@ -199,7 +199,7 @@ public partial class ForInStatement
                             singleTuple.Accept(new InterpreterVisitor(manager));
                         }
 
-                        manager.Set(id, idValue);
+                        manager.Set(node.Id, idValue);
                     }
                     else
                     {
@@ -212,20 +212,20 @@ public partial class ForInStatement
                             // 字典键值对，赋值给多个标识符
                             var values = tupleValue.GetItems().ToList();
 
-                            for (var i = 0; i < AllIds.Count && i < values.Count; i++)
+                            for (var i = 0; i < node.Ids.Count && i < values.Count; i++)
                             {
-                                manager.Set(AllIds[i], values[i]);
+                                manager.Set(node.Ids[i], values[i]);
                             }
                         }
                         else
                         {
                             // 不是键值对，只赋值给第一个标识符
-                            manager.Set(id, idValue);
+                            manager.Set(node.Id, idValue);
                         }
                     }
 
                     // 执行循环体
-                    body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(new InterpreterVisitor(manager));
 
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
@@ -243,7 +243,7 @@ public partial class ForInStatement
             }
             else
             {
-                throw new TypeError(this, "IOldList或GeneratorLangValue", value.GetType().Name);
+                throw new TypeError(node, "IOldList或GeneratorLangValue", value.GetType().Name);
             }
         }
         finally
@@ -256,7 +256,7 @@ public partial class ForInStatement
     /// <summary>
     /// 生成器上下文中的 for-in 循环（新架构）
     /// </summary>
-    internal void RunWithGeneratorContext(VariateManager manager)
+    internal static void RunWithGeneratorContext(this ForInStatement node, VariateManager manager)
     {
         // 不要在这里调用 AddChildren()，生成器需要跨yield保持所有变量状态
         manager.ControlFlowManager.PushState();
@@ -272,30 +272,30 @@ public partial class ForInStatement
                 if (context.AsyncStreamCache.TryGetValue(cacheKey, out var cachedObj) && cachedObj is GeneratorLangValue cachedGenerator)
                 {
                     // 从缓存恢复，直接使用缓存的生成器，不重新执行 expression
-                    RunStandardGenerator(manager, cachedGenerator, context);
+                    node.RunStandardGenerator(manager, cachedGenerator, context);
                     return;
                 }
             }
 
             // 首次执行，运行表达式获取值
-            var value = expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(new InterpreterVisitor(manager));
 
             // 对于生成器和异步生成器，保持原有逻辑（它们自己管理状态）
             if (value is AsyncGeneratorLangValue asyncGenerator)
             {
-                RunStandardAsyncGenerator(manager, asyncGenerator);
+                node.RunStandardAsyncGenerator(manager, asyncGenerator);
                 return;
             }
 
             if (value is AsyncStreamLangValue asyncStream)
             {
-                RunStandardAsyncStream(manager, asyncStream);
+                node.RunStandardAsyncStream(manager, asyncStream);
                 return;
             }
 
             if (value is GeneratorLangValue generator)
             {
-                RunStandardGenerator(manager, generator, context);
+                node.RunStandardGenerator(manager, generator, context);
                 return;
             }
 
@@ -344,9 +344,9 @@ public partial class ForInStatement
                         var idValue = items[i];
 
                         // 设置循环变量
-                        if (AllIds.Count == 1)
+                        if (node.Ids.Count == 1)
                         {
-                            manager.Set(id, idValue);
+                            manager.Set(node.Id, idValue);
                         }
                         else
                         {
@@ -354,14 +354,14 @@ public partial class ForInStatement
                             {
                                 tupleValue.Accept(new InterpreterVisitor(manager));
                                 var values = tupleValue.GetItems().ToList();
-                                for (var j = 0; j < AllIds.Count && j < values.Count; j++)
+                                for (var j = 0; j < node.Ids.Count && j < values.Count; j++)
                                 {
-                                    manager.Set(AllIds[j], values[j]);
+                                    manager.Set(node.Ids[j], values[j]);
                                 }
                             }
                             else
                             {
-                                manager.Set(id, idValue);
+                                manager.Set(node.Id, idValue);
                             }
                         }
 
@@ -382,7 +382,7 @@ public partial class ForInStatement
                         // else: 从当前迭代内部的 yield 恢复，保持 ExecutionPath
 
                         // 执行循环体
-                        body.Accept(new InterpreterVisitor(manager));
+                        node.Body.Accept(new InterpreterVisitor(manager));
 
                         // 检查是否遇到 yield
                         if (context.HasYielded)
@@ -424,7 +424,7 @@ public partial class ForInStatement
             }
             else
             {
-                throw new TypeError(this, "IOldList或GeneratorLangValue", value.GetType().Name);
+                throw new TypeError(node, "IOldList或GeneratorLangValue", value.GetType().Name);
             }
         }
         finally
@@ -435,7 +435,7 @@ public partial class ForInStatement
     /// <summary>
     /// 在生成器上下文中处理异步生成器（保持原有逻辑）
     /// </summary>
-    internal void RunStandardAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator)
+    private static void RunStandardAsyncGenerator(this ForInStatement node, VariateManager manager, AsyncGeneratorLangValue asyncGenerator)
     {
         while (true)
         {
@@ -453,8 +453,8 @@ public partial class ForInStatement
 
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
-                    manager.Set(id, currentValue);
-                    body.Accept(new InterpreterVisitor(manager));
+                    manager.Set(node.Id, currentValue);
+                    node.Body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -473,7 +473,7 @@ public partial class ForInStatement
     /// <summary>
     /// 在生成器上下文中处理异步流（保持原有逻辑）
     /// </summary>
-    internal void RunStandardAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream)
+    private static void RunStandardAsyncStream(this ForInStatement node, VariateManager manager, AsyncStreamLangValue asyncStream)
     {
         while (true)
         {
@@ -491,8 +491,8 @@ public partial class ForInStatement
 
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
-                    manager.Set(id, currentValue);
-                    body.Accept(new InterpreterVisitor(manager));
+                    manager.Set(node.Id, currentValue);
+                    node.Body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -511,7 +511,7 @@ public partial class ForInStatement
     /// <summary>
     /// 在生成器上下文中处理同步生成器（新架构：支持嵌套生成器状态保存）
     /// </summary>
-    internal void RunStandardGenerator(VariateManager manager, GeneratorLangValue generatorValue, GeneratorExecutionContext context)
+    private static void RunStandardGenerator(this ForInStatement node, VariateManager manager, GeneratorLangValue generatorValue, GeneratorExecutionContext context)
     {
         // 获取当前循环路径
         var loopPath = context.GetCurrentPath() + "/for-in";
@@ -563,8 +563,8 @@ public partial class ForInStatement
 
                     if (currentValue is not null && currentValue is not VoidLangValue)
                     {
-                        manager.Set(id, currentValue);
-                        body.Accept(new InterpreterVisitor(manager));
+                        manager.Set(node.Id, currentValue);
+                        node.Body.Accept(new InterpreterVisitor(manager));
 
                         // 检查外部生成器是否 yield
                         if (context.HasYielded)
