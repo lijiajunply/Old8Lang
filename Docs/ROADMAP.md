@@ -1,6 +1,6 @@
 # Old8Lang 开发路线图
 
-具体待办和验证状态统一维护在 [Todo.md](../Todo.md)；历史执行与测试结果保留在 `Reports/`。
+具体待办和验证状态统一维护在 [Todo.md](../changes/Todo.md)；历史执行与测试结果保留在 `archive/Reports/`。
 
 ## 方向性重点
 

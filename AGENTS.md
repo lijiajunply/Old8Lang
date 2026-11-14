@@ -2,6 +2,7 @@
 
 本文件是代理（AI）的入口索引：只放「必须知道的要点」和「必须遵守的硬规则」，细节一律在 `Docs/` 下。
 **动手前请按需打开对应文档，不要凭记忆臆测**——尤其是测试与开发流程两类。
+要读细节时，先用文末「[文档索引与按需阅读](#文档索引与按需阅读)」定位到**具体文档的具体章节**，只读那一节，不要通读整个 `Docs/`。
 
 ## 项目概述
 
@@ -38,15 +39,20 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 1. **新增语法必须按顺序测试**：语法测试 → 解释模式 → IL 模式 → 虚拟机模式，逐级推进，前一级不过不进下一级。完整流程见 [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md#1-新功能新语法添加流程)。
 2. **测试用 `.old8` 文件按模式放目录**：语法 → `TestFiles/SyntaxTests/`，解释 → `TestFiles/InterpreterTests/`，IL → `TestFiles/CompilerTests/`，VM → `TestFiles/VirtualMachine/`。
 3. **写 `.old8` 的约定**：注释用 `//` 而不是 `#`；用 `PrintLine` 打印结果；期望失败的用例在**文件最后一行**写 `error`。
-4. **每次测试结束都要生成测试报告**，放到 `Reports/`，文件名用 `日期-小时-分钟-测试类型.md`。
+4. **测试报告进对应的 change 文件夹**：报告写成 `changes/<日期>-<简述>/test.md`，**不要**再往 `Reports/` 里放新报告；没有建 change 的一次性小改动，在当次回复里给出测试结论即可。
 5. **性能/并发用例**必须标 `[Trait("Category", "Performance")]`，它们只在 `performance.runsettings` 档下运行。
    例外：关键场景的「粗阈值」用例（阈值放到实测值 5~10 倍）标 `[Trait("Category", "PerformanceSmoke")]`，
    它们会随默认档一起跑。详见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md#11-性能并发用例分档)。
-6. **测试中发现与本任务无关的错误**，不要顺手改，记录到 `Todo.md`；不再使用的测试文件及时删除。
+6. **测试中发现与本任务无关的错误**，不要顺手改，记录到 `changes/Todo.md`；不再使用的测试文件及时删除。
 7. **新增代码先定程序集**：语法节点/解析器进 `Old8Lang.Syntax`，运行时值与共享契约进 `Old8Lang.Runtime`，
    各执行能力进各自后端；Runtime 不引用后端，三个后端互不引用，官方模块只由 `Old8Lang.Hosting` 的
    组合根注册。对照表与约束见 [Docs/DEVELOPMENT_WORKFLOW.md §4.1](Docs/DEVELOPMENT_WORKFLOW.md#41-程序集边界与宿主模块迁移后)，
    改动模块装配或作用域派生后跑 `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~Old8Lang.Tests.Architecture"`。
+8. **长期开发必须留痕**：跨多次会话/多阶段推进、或需要先定方案再动手的任务，先在 `changes/<日期>-<简述>/` 下
+   按 `spec` → `design` → `plan` → `task` → `test` 建文件，产物与测试报告都写在里面；废弃的 change 整体
+   **移动**到 `archive/`，不删除。规则见下文「长期开发：changes 目录」。
+9. **细节先查索引再读文档**：涉及语法、API、模式支持、测试流程、程序集归属的问题，一律按
+   「[文档索引与按需阅读](#文档索引与按需阅读)」定位到对应文档章节后回答，不凭记忆；读到够回答问题就停。
 
 以上规则的完整说明见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md)。
 
@@ -63,6 +69,33 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
   不贴大段代码、不逐个罗列函数签名、不把已经能用的能力再数一遍。
 - **反例**：写「`MakeClosure` 原先把外层局部变量的当前值快照进闭包环境……」是实现说明，
   应写成「闭包可写回外层局部变量」。
+
+## 长期开发：changes 目录
+
+**什么时候建**：任务预计跨多次会话或多阶段推进、需要先定方案再动手、或要留下决策依据时，先建一个 change 文件夹。
+单点的文本/配置修改、一次就能验收完的小改动不建。
+
+**命名**：`changes/<日期>-<简述>/`，日期用 `YYYY-MM-DD`，例如 `changes/2026-11-14-解释后端拆分/`。
+同一天有多个任务时靠简述区分，不要在日期后追加时分。
+`changes/Todo.md` 是全局待办清单，**唯一不放在子文件夹里的文件**，不要给它建同名文件夹。
+
+**里面放什么**（按需写，不要求每份都满）：
+
+| 文件 | 内容 |
+|------|------|
+| `spec.md` | 需求与约束：要解决什么问题、范围与明确不做的部分、验收标准 |
+| `design.md` | 方案与取舍：备选方案、选定理由、受影响的程序集与接口 |
+| `plan.md` | 阶段划分：每步做什么、依赖关系、回滚点 |
+| `task.md` | 可勾选的执行清单与当前进度 |
+| `test.md` | 测试计划与实测记录（即测试报告）：命令、结果、失败项与结论 |
+
+**测试报告**一律写进 `changes/<日期>-<简述>/test.md`，不再在 `Reports/` 下新建报告文件。
+`Reports/` 仅剩 VM 性能基准的输出目录用途（`Old8Lang.Benchmarks` 写入），历史功能测试报告已归档到 `archive/Reports/`。
+
+**归档**：任务完成已久、被新方案取代、或决定不做时，把整个 change 文件夹**移动**到仓库根的
+`archive/<原文件夹名>/`，保持原文件名以便追溯；不要删除。归档目录不参与当前任务，也不要往里面补写内容。
+
+同一个任务里发现的、与本次无关的遗留问题仍按硬规则 6 记到 `changes/Todo.md`，不要散落在 change 文件夹里。
 
 ## 架构速览
 
@@ -130,18 +163,36 @@ Old8Lang.Syntax（语法节点 + 解析器）→ Old8Lang.Core（源位置、诊
 | 测试 | `Old8Lang.Tests/` | xUnit 单元测试（含 `Architecture/` 程序集边界测试） |
 | 测试 | `Old8Lang.Benchmarks/` | 性能基准测试 |
 
-## 文档索引
+## 文档索引与按需阅读
 
-| 文档 | 内容 |
-|------|------|
-| [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md) | **测试必读**：单测分档、`.old8` 文件规范、测试目录、测试报告 |
-| [Docs/DEVELOPMENT_WORKFLOW.md](Docs/DEVELOPMENT_WORKFLOW.md) | **开发必读**：新语法流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 排查、代码规范与提交规范 |
-| [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md) | 架构总览 |
-| [Docs/CLI_GUIDE.md](Docs/CLI_GUIDE.md) | CLI 全量命令、包管理 |
-| [Docs/LANGUAGE_FEATURES.md](Docs/LANGUAGE_FEATURES.md) | 语言特性 |
-| [Docs/Old8Lang_Grammar.md](Docs/Old8Lang_Grammar.md)、[Docs/Old8Lang.ebnf](Docs/Old8Lang.ebnf) | 语法参考 |
-| [Docs/API_REFERENCE.md](Docs/API_REFERENCE.md) | **API 唯一出处**：全局函数、实例方法、标准库模块方法 |
-| [Docs/MODE_SUPPORT.md](Docs/MODE_SUPPORT.md) | **模式必读**：三种模式逐行实测的支持矩阵与已知限制 |
-| [Docs/PERFORMANCE_GUIDE.md](Docs/PERFORMANCE_GUIDE.md) | 性能优化 |
-| [Docs/CHANGELOG.md](Docs/CHANGELOG.md) | 语法与 API 变更记录（收录规则见上文） |
-| [Docs/README.md](Docs/README.md) | 文档中心（全部文档的索引） |
+本文件只放**入口索引**与**硬规则**；任何细节都在 `Docs/` 里。**不要凭记忆回答，也不要一次通读整个 `Docs/`。**
+
+按需阅读三条：
+
+1. 先用下表定位到**具体文档的具体章节**，只读那一节。
+2. 读到能回答当前问题就停；不要顺手翻相邻文档、旧快照或无关章节（那属于发散）。
+3. 语法、API、模式支持的结论必须来自文件或实测命令，记忆不算依据；查不到就直说查不到。
+
+| 你要做的事 | 读哪里 | 重点 |
+|---|---|---|
+| 加/改语法、加 AST 节点 | [DEVELOPMENT_WORKFLOW §1–§2](Docs/DEVELOPMENT_WORKFLOW.md#1-新功能新语法添加流程) | 四级测试顺序、节点规范、重生成 `IVisitor` |
+| 判断代码该放哪个程序集 | [DEVELOPMENT_WORKFLOW §4.1](Docs/DEVELOPMENT_WORKFLOW.md#41-程序集边界与宿主模块迁移后) | 程序集对照表与跨层约束 |
+| 跑测试、用例分档、`.old8` 放哪 | [TESTING_GUIDE §1–§4](Docs/TESTING_GUIDE.md#1-单元测试xunit) | 性能分档、目录归属、测试顺序 |
+| 某语法在三种模式支不支持 | [MODE_SUPPORT 支持矩阵](Docs/MODE_SUPPORT.md#支持矩阵)、[已知限制](Docs/MODE_SUPPORT.md#已知限制) | **唯一权威**，逐行实测 |
+| 函数/方法签名 | [API_REFERENCE](Docs/API_REFERENCE.md) | **API 唯一出处**，三种调用形式 |
+| CLI 参数、包管理 | [CLI_GUIDE](Docs/CLI_GUIDE.md) | 运行命令、`pack`/`publish`/`sign`/`cert` |
+| 三种模式怎么选、执行流程 | [ARCHITECTURE §1.3](Docs/ARCHITECTURE.md#13-执行模式-execution-modes) | 模式对比与选择 |
+| Visitor 结构、重生成接口 | [ARCHITECTURE §4](Docs/ARCHITECTURE.md#4-visitor-模式详解) | 接口生成与四个实现 |
+| 模块划分、目录结构 | [ARCHITECTURE §2](Docs/ARCHITECTURE.md#2-模块架构)、[§11](Docs/ARCHITECTURE.md#11-项目目录结构) | 模块图与目录树 |
+| 类型系统 | [ARCHITECTURE §7](Docs/ARCHITECTURE.md#7-type-system-类型系统) | 推断、检查、泛型 |
+| 性能优化与基准 | [PERFORMANCE_GUIDE](Docs/PERFORMANCE_GUIDE.md) | 写法优化 + 运行时内部优化 |
+| 环境变量、`o8package.json` 环境段 | [ENVIRONMENT_GUIDE](Docs/ENVIRONMENT_GUIDE.md) | 加载优先级、`env` 命令 |
+| LSP、调试器、性能分析器 | [DEVELOPER_TOOLS](Docs/DEVELOPER_TOOLS.md) | 编辑器集成与调试工具 |
+| extern、包开发、扩展语言 | [ADVANCED_TOPICS](Docs/ADVANCED_TOPICS.md) | Extern 工厂、包发布、扩展点 |
+| 语法怎么写 | [Old8Lang_Grammar](Docs/Old8Lang_Grammar.md)、[EBNF](Docs/Old8Lang.ebnf) | 每节带模式标记 |
+| 语言特性清单 | [LANGUAGE_FEATURES](Docs/LANGUAGE_FEATURES.md) | 特性总览 |
+| 语法/API 变更史 | [CHANGELOG](Docs/CHANGELOG.md) | 只收语法与 API（规则见上文） |
+| 待办与已知缺口 | [Todo.md](changes/Todo.md)、[ROADMAP](Docs/ROADMAP.md) | 未完成项与方向 |
+| 全部文档地图 | [Docs/README.md](Docs/README.md) | 完整索引 |
+
+表里没有的问题：先看 [Docs/README.md](Docs/README.md) 找到对应文档，再回到上表的读法。**新写文档时同步在本表补一行**，否则等于没写。

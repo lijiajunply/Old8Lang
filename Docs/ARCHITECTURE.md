@@ -4,7 +4,7 @@
 > `Old8Lang.Syntax`，三个执行后端分别位于 `Old8Lang.Interpreter`、
 > `Old8Lang.Compiler`、`Old8Lang.VirtualMachine`；`Old8Lang.Runtime` 只保留运行时值、
 > 内置函数、模块/类型系统、字节码格式与最小共享契约。宿主通过 `Old8Lang.Hosting`
-> 组合根显式注册后端与官方模块。阶段验收记录见 `Reports/` 中的阶段报告。
+> 组合根显式注册后端与官方模块。阶段验收记录见 `archive/Reports/` 中的阶段报告。
 
 ## 1. 项目概述
 
@@ -1112,13 +1112,14 @@ Old8Lang/
 ├── Old8Lang.LanguageServer/     # LSP 服务
 ├── Old8Lang.CodeGen/            # 代码生成器
 ├── TestFiles/                   # .old8 测试用例（按模式分目录，见 10.1；驱动脚本与性能脚本也在其下）
-├── Reports/                     # 测试报告
+├── changes/                     # 长期开发留档（「日期-简述」子文件夹：spec/design/plan/task/test）＋全局 Todo.md
+├── archive/                     # 归档：废弃的 change 与历史测试报告（archive/Reports/）
+├── Reports/                     # VM 性能基准输出目录（由 Old8Lang.Benchmarks 写入）
 ├── vscode-old8lang/             # VS Code 扩展
 ├── AGENTS.md                    # 代理开发指南（AI 入口）
 ├── CLAUDE.md                    # Claude Code 入口（导入 AGENTS.md）
 ├── Old8Lang.sln                 # 解决方案文件
 ├── README.md                    # 项目说明
-├── Todo.md                      # 待办事项
 └── LICENSE                      # 许可证
 ```
 

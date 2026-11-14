@@ -9,7 +9,7 @@ namespace Old8Lang.Bytecode.VM;
 ///
 /// <para>
 /// 这是「VM 值仍是 object 装箱」问题的一个低成本裁剪：整数运算的装箱需要类型化值表示才能消除，
-/// 见 <c>Todo.md</c> 的后续项。
+/// 见 <c>changes/Todo.md</c> 的后续项。
 /// </para>
 /// </remarks>
 internal static class VmBoxed
