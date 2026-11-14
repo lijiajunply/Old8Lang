@@ -95,6 +95,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问 match 表达式。</summary>
     TResult VisitMatchExpression(MatchExpression node);
 
+    /// <summary>访问泛型实例化表达式。</summary>
+    TResult VisitGenericInstanceExpression(GenericInstanceExpression node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 
