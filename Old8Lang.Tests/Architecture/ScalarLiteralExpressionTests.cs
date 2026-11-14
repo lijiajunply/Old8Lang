@@ -207,6 +207,8 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.DeferStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.WhileStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.UsingStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.SetStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ForStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -237,6 +239,11 @@ public class ScalarLiteralExpressionTests
             new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
         Assert.Equal("using", new Old8Lang.AST.Statement.UsingStatement(null, literal,
             new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
+        var init = new Old8Lang.AST.Statement.SetStatement(new LangId("i"), literal);
+        Assert.Equal("assign", init.Accept(visitor));
+        Assert.Equal("for", new Old8Lang.AST.Statement.ForStatement(init, literal,
+            new Old8Lang.AST.Statement.SetStatement(new LangId("i"), literal),
+            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -265,6 +272,8 @@ public class ScalarLiteralExpressionTests
         public string VisitDeferStatement(Old8Lang.AST.Statement.DeferStatement node) => "defer";
         public string VisitWhileStatement(Old8Lang.AST.Statement.WhileStatement node) => "while";
         public string VisitUsingStatement(Old8Lang.AST.Statement.UsingStatement node) => "using";
+        public string VisitSetStatement(Old8Lang.AST.Statement.SetStatement node) => "assign";
+        public string VisitForStatement(Old8Lang.AST.Statement.ForStatement node) => "for";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;

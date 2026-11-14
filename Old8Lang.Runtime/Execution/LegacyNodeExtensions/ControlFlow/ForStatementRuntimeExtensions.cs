@@ -1,18 +1,24 @@
 using System.Reflection.Emit;
-using System.Text;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Visitor;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// ForStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// ForStatement 的编译期辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class ForStatement
+internal static class ForStatementRuntimeExtensions
 {
+    /// <summary>
+    /// 检测是否为简单的计数循环（可以优化）
+    /// </summary>
+    internal static bool IsSimpleCountingLoop(this ForStatement node)
+    {
+        // 简单启发式：检查是否是二元比较表达式
+        return node.Condition is Operation;
+    }
+
     internal static void EndLoopVariableShadow(
         LocalManager local,
         (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? shadow)
@@ -40,6 +46,7 @@ public partial class ForStatement
             local.LocalVarTypes.Remove(info.Name);
         }
     }
+
     /// <summary>
     /// 为 C 风格循环变量建立独立局部作用域。
     /// </summary>
@@ -47,25 +54,26 @@ public partial class ForStatement
     /// 初始化表达式在创建循环变量之前求值（解释器语义），因此读取同名外层局部或全局变量时应当看到
     /// 外层值，而不是尚未初始化的循环变量。完成后由 <see cref="EndLoopVariableShadow"/> 恢复外层绑定。
     /// </remarks>
-    internal (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
+    internal static (string Name, LocalBuilder? PreviousLocal, bool HadPreviousLocal, Type? PreviousType, bool HadPreviousType)? BeginLoopVariableShadow(
+        this ForStatement node,
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        var name = setStatement.Id?.IdName;
+        var name = node.Init.Id?.IdName;
         if (string.IsNullOrEmpty(name))
         {
             return null;
         }
 
         Type? type = null;
-        if (!string.IsNullOrEmpty(setStatement.Id!.AssumptionType))
+        if (!string.IsNullOrEmpty(node.Init.Id!.AssumptionType))
         {
-            type = setStatement.Id.Accept(new TypeInferenceVisitor(local));
+            type = node.Init.Id.Accept(new TypeInferenceVisitor(local));
         }
 
         if (type is null || type == typeof(void))
         {
-            type = setStatement.Value.Accept(new TypeInferenceVisitor(local));
+            type = node.Init.Value.Accept(new TypeInferenceVisitor(local));
         }
 
         if (type is null || type == typeof(void))
@@ -74,7 +82,7 @@ public partial class ForStatement
         }
 
         // 先按未遮蔽的状态求值 `for i <- ...` 的右侧。
-        setStatement.Value.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Init.Value.Accept(new CompilerVisitor(ilGenerator, local));
         var loopLocal = ilGenerator.DeclareLocal(type);
         ilGenerator.Emit(OpCodes.Stloc, loopLocal);
 

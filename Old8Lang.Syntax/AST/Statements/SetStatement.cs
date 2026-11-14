@@ -1,17 +1,4 @@
-using Old8Lang.LangParser;
-using System.Reflection;
-using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.OperationHelpers;
-using Old8Lang.Compiler;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-using Old8Lang.TypeSystem;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
@@ -69,15 +56,7 @@ public partial class SetStatement : OldStatement
         Value = value;
     }
 
-
-    /// <summary>
-    /// 计算全局槽位赋值右侧表达式的静态类型。
-    /// </summary>
-    internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
-                                                     type == typeof(float) || type == typeof(long) ||
-                                                     type == typeof(short) || type == typeof(byte);
-
-
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitSetStatement(this);
 
     /// <summary>
     /// 获取指定索引处的语句（实现OldStatement接口）

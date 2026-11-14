@@ -73,11 +73,11 @@ public class ArchitectureProjectDependencyTests
         var legacyRoot = Path.Combine(executionRoot, "LegacyNodeExtensions");
         var oldNodesRoot = Path.Combine(executionRoot, "Nodes");
 
-        // ReturnStatement、BlockStatement 的 partial 已在阶段 2 转为独立辅助类，
-        // WhileStatement、UsingStatement 的 partial 也转为扩展类，IfChild 的无人调用
-        // helper 随节点迁移归档；遗留 partial 基线由 28 降为 23，数量只允许随迁移减少。
+        // 已迁移节点的 partial 在阶段 2 陆续转为独立辅助类（Return/Block/While/Using/Set/For），
+        // IfChild 的无人调用 helper 随节点迁移归档；遗留 partial 基线由 28 降为 21，
+        // 数量只允许随迁移减少。
         var archivedFiles = Directory.EnumerateFiles(legacyRoot, "*.Split.cs", SearchOption.AllDirectories).ToArray();
-        Assert.Equal(23, archivedFiles.Length);
+        Assert.Equal(21, archivedFiles.Length);
         Assert.Empty(Directory.EnumerateFiles(oldNodesRoot, "*.Split.cs", SearchOption.AllDirectories));
 
         Assert.All(archivedFiles, file =>

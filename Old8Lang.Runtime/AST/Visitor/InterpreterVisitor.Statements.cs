@@ -463,7 +463,7 @@ public partial class InterpreterVisitor
 
         var result = node.Value.Accept(this);
 
-        var tuplePattern = node._leftExpression switch
+        var tuplePattern = node.LeftExpression switch
         {
             TupleLiteralExpression syntax => syntax.Elements,
             TupleLangValue legacy => (IReadOnlyList<LangExpression>)legacy.Elements,
@@ -509,7 +509,7 @@ public partial class InterpreterVisitor
         }
 
         // 处理嵌套索引访问赋值：array[0][0] <- value
-        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node._leftExpression, out var nestedIndexAccess))
+        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
         {
             // 运行基础表达式，获取容器对象
             var baseResult = nestedIndexAccess.BaseExpression.Accept(this);
@@ -528,7 +528,7 @@ public partial class InterpreterVisitor
         }
 
         // 处理成员访问赋值：node.name <- value, person.name <- value
-        if (node._leftExpression is Operation operation)
+        if (node.LeftExpression is Operation operation)
         {
             // 处理数组解构赋值：[a, b] <- [1, 2]
             if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
@@ -778,11 +778,11 @@ public partial class InterpreterVisitor
             }
         }
         // 处理切片赋值：array[start:end] <- values
-        else if (node._leftExpression is SliceExpression or SliceLangValue)
+        else if (node.LeftExpression is SliceExpression or SliceLangValue)
         {
-            var sliceValue = node._leftExpression is SliceExpression syntax
+            var sliceValue = node.LeftExpression is SliceExpression syntax
                 ? Old8Lang.Runtime.LiteralCollectionRuntimeFactory.CreateSlice(syntax)
-                : (SliceLangValue)node._leftExpression;
+                : (SliceLangValue)node.LeftExpression;
             // 获取集合对象
             var collectionValue = sliceValue.Id.Accept(this);
 
@@ -831,7 +831,7 @@ public partial class InterpreterVisitor
             return new VoidLangValue();
         }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
-        else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node._leftExpression, out var listItem))
+        else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
         {
             // 获取集合对象
             var collectionValue = manager.GetValue(listItem.ListId);

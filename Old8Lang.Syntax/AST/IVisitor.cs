@@ -58,6 +58,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问 using 语句。</summary>
     TResult VisitUsingStatement(UsingStatement node);
 
+    /// <summary>访问赋值语句。</summary>
+    TResult VisitSetStatement(SetStatement node);
+
+    /// <summary>访问 for 语句。</summary>
+    TResult VisitForStatement(ForStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

@@ -269,7 +269,7 @@ public partial class CompilerVisitor
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;
 
-        ForStatement.EndLoopVariableShadow(local, shadow);
+        ForStatementRuntimeExtensions.EndLoopVariableShadow(local, shadow);
 
         return null;
     
@@ -406,7 +406,7 @@ public partial class CompilerVisitor
     public object? VisitSetStatement(SetStatement node)
     {
 
-        var tuplePattern = node._leftExpression switch
+        var tuplePattern = node.LeftExpression switch
         {
             TupleLiteralExpression syntax => syntax.Elements,
             TupleLangValue legacy => (IReadOnlyList<LangExpression>)legacy.Elements,
@@ -453,7 +453,7 @@ public partial class CompilerVisitor
             return null;
         }
 
-        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node._leftExpression, out var nestedIndexAccess))
+        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
         {
             // 成员或方法结果后再索引的赋值（例如 node.data_dict[key]）会被解析成
             // NestedIndexAccess。静态元素类型在这里通常不可知，交给运行期分派，
@@ -543,9 +543,9 @@ public partial class CompilerVisitor
                 EmitSetValueToIl(node.Value, node.Id.IdName);
             }
         }
-        else if (node._leftExpression is not null)
+        else if (node.LeftExpression is not null)
         {
-            if (node._leftExpression is Operation operation)
+            if (node.LeftExpression is Operation operation)
             {
                 // 处理数组解构赋值: [a, b, c] <- array
                 if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
@@ -793,9 +793,9 @@ public partial class CompilerVisitor
                                     // object到值类型，需要拆箱
                                     ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
                                 }
-                                else if (SetStatement.IsNumericType(fieldInfo.FieldType) && SetStatement.IsNumericType(valueType))
+                                else if (SetStatementRuntimeExtensions.IsNumericType(fieldInfo.FieldType) && SetStatementRuntimeExtensions.IsNumericType(valueType))
                                 {
-                                    SetStatement.EmitNumericConversion(ilGenerator, fieldInfo.FieldType);
+                                    SetStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, fieldInfo.FieldType);
                                 }
                             }
 
@@ -969,7 +969,7 @@ public partial class CompilerVisitor
                     }
                 }
             }
-            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node._leftExpression, out var listItem))
+            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
             {
                 // 处理LangListItem索引赋值: listId[key] <- value
                 // 获取集合类型

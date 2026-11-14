@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`SetStatement`、`ForStatement` 迁入 Syntax；全局槽位写入、数值转换与循环变量遮蔽
+  辅助移入 Runtime 的 `SetStatementRuntimeExtensions`/`ForStatementRuntimeExtensions`。Runtime 生成节点
+  71 → 69，遗留 partial 基线 23 → 21。Parser 889、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
+  Interpreter 1966 通过 + 1 个网络用例首跑失败（单独重跑通过）；Compiler.Statements 4 项与
+  Compiler.Async 65 项失败与基线一致。见 `Reports/2026-11-14-14-23-赋值与for节点迁移测试.md`。
+
 - 2026-11-14：`WhileStatement`、`UsingStatement` 迁入 Syntax；生成器路径执行与 using 资源释放辅助
   移入 Runtime 的 `WhileStatementRuntimeExtensions`/`UsingStatementRuntimeExtensions`。Runtime 生成节点
   73 → 71，遗留 partial 基线 25 → 23。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、

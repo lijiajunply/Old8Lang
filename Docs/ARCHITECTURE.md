@@ -333,7 +333,7 @@ Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
   （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
-  `<Node>.Accept.generated.cs`；当前识别 **71 个 Runtime 节点**（阶段 2 已迁入
+  `<Node>.Accept.generated.cs`；当前识别 **69 个 Runtime 节点**（阶段 2 已迁入
   `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。生成目录另有
   `SuperProxy.Accept.generated.cs`，其 `VisitSuperProxy` 由 `IVisitor.Extensions.cs` 手工声明，
   因此文件数会比接口方法数多 1。
@@ -555,7 +555,7 @@ Old8Lang 的 AST 节点分为两大类：
 **位置**: 未迁移节点在 `Old8Lang.Runtime/AST/Statement/`；已迁移节点在
 `Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
 `BreakStatement`、`ContinueStatement`、`BlockStatement`、`IfChild`、`IfStatement`、`DeferStatement`、
-`WhileStatement`、`UsingStatement`）。
+`WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。
 
 **基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 
@@ -565,9 +565,9 @@ Old8Lang 的 AST 节点分为两大类：
 
 | 节点类型 | 文件 | 描述 | 示例 |
 |---------|------|------|------|
-| AssignmentStatement | AssignmentStatement.cs | 赋值语句 | `x <- 10` |
+| SetStatement | SetStatement.cs（Syntax） | 赋值语句 | `x <- 10` |
 | IfStatement | IfStatement.cs（Syntax） | 条件语句 | `if x > 0 { ... }` |
-| ForStatement | ForStatement.cs | For 循环 | `for i <- 0, i < 10, i <- i + 1 { ... }` |
+| ForStatement | ForStatement.cs（Syntax） | For 循环 | `for i <- 0, i < 10, i <- i + 1 { ... }` |
 | WhileStatement | WhileStatement.cs（Syntax） | While 循环 | `while x > 0 { ... }` |
 | FunctionDeclarationStatement | FunctionDeclarationStatement.cs | 函数声明 | `func add(a, b) { return a + b }` |
 | ClassDeclarationStatement | ClassDeclarationStatement.cs | 类声明 | `class Point { ... }` |
