@@ -1,7 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
-using Old8Lang.Bytecode.VM;
 
 namespace Old8Lang.Runtime;
 
@@ -13,7 +13,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 从虚拟机获取类元数据
     /// </summary>
-    public static ClassMetadata? GetClassMetadata(VirtualMachine vm, string className)
+    public static ClassMetadata? GetClassMetadata(IVirtualMachine vm, string className)
     {
         var classMetadata = vm.GetGlobalVariable(className);
         return classMetadata as ClassMetadata;
@@ -45,7 +45,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 按任意形式的类型值取出类元数据
     /// </summary>
-    public static ClassMetadata? GetClassMetadataFromTypeValue(VirtualMachine vm, object? value)
+    public static ClassMetadata? GetClassMetadataFromTypeValue(IVirtualMachine vm, object? value)
     {
         var typeName = ResolveTypeName(value);
         return string.IsNullOrEmpty(typeName) ? null : GetClassMetadata(vm, typeName);
@@ -158,7 +158,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 从对象实例获取类元数据
     /// </summary>
-    public static ClassMetadata? GetClassMetadataFromInstance(VirtualMachine vm, BytecodeObjectInstance instance)
+    public static ClassMetadata? GetClassMetadataFromInstance(IVirtualMachine vm, BytecodeObjectInstance instance)
     {
         return GetClassMetadata(vm, instance.ClassName);
     }
@@ -166,7 +166,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取类的所有方法名（包括静态和实例方法，沿继承链向上）
     /// </summary>
-    public static List<string> GetAllMethodNames(VirtualMachine vm, ClassMetadata classMetadata)
+    public static List<string> GetAllMethodNames(IVirtualMachine vm, ClassMetadata classMetadata)
     {
         var methodNames = new List<string>();
         foreach (var metadata in EnumerateClassChain(vm, classMetadata))
@@ -181,7 +181,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取类的所有字段名（包括静态和实例字段，沿继承链向上）
     /// </summary>
-    public static List<string> GetAllFieldNames(VirtualMachine vm, ClassMetadata classMetadata)
+    public static List<string> GetAllFieldNames(IVirtualMachine vm, ClassMetadata classMetadata)
     {
         var fieldNames = new List<string>();
         foreach (var metadata in EnumerateClassChain(vm, classMetadata))
@@ -196,7 +196,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 查找方法元数据（沿继承链向上）
     /// </summary>
-    public static MethodMetadata? FindMethod(VirtualMachine vm, ClassMetadata classMetadata, string methodName)
+    public static MethodMetadata? FindMethod(IVirtualMachine vm, ClassMetadata classMetadata, string methodName)
     {
         return EnumerateClassChain(vm, classMetadata)
             .Select(metadata => metadata.Methods.FirstOrDefault(m => m.Name == methodName)
@@ -207,7 +207,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 查找字段元数据（沿继承链向上）
     /// </summary>
-    public static FieldMetadata? FindField(VirtualMachine vm, ClassMetadata classMetadata, string fieldName)
+    public static FieldMetadata? FindField(IVirtualMachine vm, ClassMetadata classMetadata, string fieldName)
     {
         return EnumerateClassChain(vm, classMetadata)
             .Select(metadata => metadata.Fields.FirstOrDefault(f => f.Name == fieldName)
@@ -218,7 +218,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 检查方法是否存在（沿继承链向上）
     /// </summary>
-    public static bool HasMethod(VirtualMachine vm, ClassMetadata classMetadata, string methodName)
+    public static bool HasMethod(IVirtualMachine vm, ClassMetadata classMetadata, string methodName)
     {
         return EnumerateClassChain(vm, classMetadata).Any(metadata =>
             metadata.Methods.Any(m => m.Name == methodName) ||
@@ -228,7 +228,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 检查字段是否存在（沿继承链向上）
     /// </summary>
-    public static bool HasField(VirtualMachine vm, ClassMetadata classMetadata, string fieldName)
+    public static bool HasField(IVirtualMachine vm, ClassMetadata classMetadata, string fieldName)
     {
         return EnumerateClassChain(vm, classMetadata).Any(metadata =>
             metadata.Fields.Any(f => f.Name == fieldName) ||
@@ -238,7 +238,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 自身 + 全部父类（按继承顺序，遇到环即停）
     /// </summary>
-    private static IEnumerable<ClassMetadata> EnumerateClassChain(VirtualMachine vm, ClassMetadata classMetadata)
+    private static IEnumerable<ClassMetadata> EnumerateClassChain(IVirtualMachine vm, ClassMetadata classMetadata)
     {
         var visited = new HashSet<string>(StringComparer.Ordinal);
         for (var current = classMetadata; current != null && visited.Add(current.Name);)
@@ -293,7 +293,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取所有已注册的类名
     /// </summary>
-    public static List<string> GetAllClassNames(VirtualMachine vm)
+    public static List<string> GetAllClassNames(IVirtualMachine vm)
     {
         var classNames = new List<string>();
 
@@ -313,7 +313,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取类型的详细信息
     /// </summary>
-    public static Dictionary<string, object?> GetTypeInfo(VirtualMachine vm, string className)
+    public static Dictionary<string, object?> GetTypeInfo(IVirtualMachine vm, string className)
     {
         var classMetadata = GetClassMetadata(vm, className);
         if (classMetadata == null)
@@ -341,7 +341,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 检查类型兼容性（是否可以从 sourceType 赋值给 targetType）
     /// </summary>
-    public static bool IsAssignableFrom(VirtualMachine vm, string targetTypeName, string sourceTypeName)
+    public static bool IsAssignableFrom(IVirtualMachine vm, string targetTypeName, string sourceTypeName)
     {
         // 同一类型
         if (targetTypeName == sourceTypeName)
@@ -371,7 +371,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取父类型名
     /// </summary>
-    public static string? GetBaseType(VirtualMachine vm, string className)
+    public static string? GetBaseType(IVirtualMachine vm, string className)
     {
         var classMetadata = GetClassMetadata(vm, className);
         return classMetadata?.BaseClassName;
@@ -380,7 +380,7 @@ public static class VMReflectionHelper
     /// <summary>
     /// 获取实现的接口列表（VM 模式下暂不支持）
     /// </summary>
-    public static List<string> GetInterfaces(VirtualMachine vm, string className)
+    public static List<string> GetInterfaces(IVirtualMachine vm, string className)
     {
         // VM 模式下暂不支持接口，返回空列表
         return new List<string>();

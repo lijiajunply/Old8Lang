@@ -162,3 +162,22 @@ Runtime 的模块加载、编译器、反射与调试代码依赖契约，并通
 `Old8Lang.Debugger` 命名空间下的 `Debugger`、`BreakpointManager`、`VariableWatcher`、
 `DebuggableInterpreter` 已从 Runtime 迁入 `Old8Lang.Interpreter`。Runtime 不再保存解释器
 调试状态；App、LanguageServer 与测试通过解释后端项目引用继续使用。
+
+## 阶段 3.10：VM 引擎与字节码编译器迁入 VM 后端（2026-11-14）
+
+```text
+Old8Lang.VirtualMachine
+  ├─ Visitors/BytecodeVisitor
+  ├─ VM/（VirtualMachine 全部 partial、GlobalSlot/VMTypeMapper 经 friend 复用 Runtime）
+  ├─ Generators/（字节码生成器值）
+  └─ Bytecode/（BytecodeCompiler、ModuleSystem、Interop、Debugger、Profiler、VmStaticClassRegistry）
+                    ↓ 只引用
+              Old8Lang.Runtime
+  ├─ Bytecode/Core（Instruction、OpCode、CallFrame、VMContext、IVirtualMachine、IBytecodeCompiler）
+  ├─ Bytecode/Metadata、Bytecode/Closures、BytecodeFile（字节码格式与序列化）
+  └─ 运行时值、实例/全局函数、模块系统、类型系统
+```
+
+Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.CurrentVM` 与
+`VMReflectionHelper` 只依赖 `IVirtualMachine`。`ModuleDependency`/`ExportedSymbol` 作为
+`BytecodeFile` 的格式类型留在 Runtime，`ModuleLoader`/`ModuleRegistry` 位于 VM 后端。

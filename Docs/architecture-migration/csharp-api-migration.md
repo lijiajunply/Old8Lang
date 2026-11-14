@@ -80,3 +80,17 @@ Runtime 中的 `IntLangValue`、`DoubleLangValue`、`StringLangValue`、`BoolLan
 行为不变的验证：解释器 1959/1960（排除并发访问外部 HTTP 服务的 `NetLibTests`，1 跳过）、VM 1082、
 Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 逐项一致，属 `Todo.md`
 记录的 IL 既有问题。
+
+### 阶段 3.10：VM 引擎与字节码编译器（2026-11-14）
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `Old8Lang.Bytecode.VM.VirtualMachine`（Runtime 程序集） | 同名类型（`Old8Lang.VirtualMachine` 程序集） | 引用 `Old8Lang.VirtualMachine`；命名空间与构造方式不变。Runtime 侧只保留 `IVirtualMachine` 契约。 |
+| `Old8Lang.Bytecode.BytecodeCompiler`（Runtime 程序集） | 同名类型（`Old8Lang.VirtualMachine` 程序集） | 引用 `Old8Lang.VirtualMachine`；实现 `IBytecodeCompiler`，`RuntimeVisitors.CreateBytecode` 接收该接口。 |
+| `Old8Lang.Bytecode.ModuleSystem.ModuleLoader`/`ModuleRegistry`、`Bytecode.Debugger.VMDebugger`、`Bytecode.Profiler.VMProfiler`、`Bytecode.Interop.ExternFunctionWrapper`、`Bytecode.VmStaticClassRegistry` | 同名类型（`Old8Lang.VirtualMachine` 程序集） | 引用 VM 后端并重新编译；命名空间不变。 |
+| `VMContext.CurrentVM`、`VMReflectionHelper` 的 `VirtualMachine` 参数 | `IVirtualMachine`（Runtime） | 共享运行时只依赖接口；需要具体虚拟机能力时由 VM 后端实现。 |
+| 无 | `IBytecodeCompiler`（Runtime） | 字节码编译器的最小标记契约，用于 Runtime 与 VM 后端解耦。 |
+
+字节码格式与共享执行模型（`BytecodeFile`、`Instruction`、`OpCode`、`CallFrame`、`FunctionMetadata`、
+`ClassMetadata`、闭包类型）仍在 `Old8Lang.Runtime`；`ModuleDependency`/`ExportedSymbol` 作为
+`BytecodeFile` 的格式类型留在 Runtime，模块加载实现位于 VM 后端。

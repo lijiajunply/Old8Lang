@@ -16,7 +16,7 @@ public static class VirtualMachineBackend
     /// </summary>
     public static void Register()
     {
-        RuntimeVisitors.RegisterBytecode(static compiler => new BytecodeVisitor(compiler));
+        RuntimeVisitors.RegisterBytecode(static compiler => new BytecodeVisitor((Old8Lang.Bytecode.BytecodeCompiler)compiler));
     }
 }
 

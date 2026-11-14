@@ -51,13 +51,16 @@
     作为运行时值与三个后端共享的执行状态；完整迁出需先抽象共享契约。
     2026-11-14：编译器专用的 IL 运算辅助、LINQ IL 生成、`DotOperatorILHelper` 与
     `FuncLangValue` lambda IL 辅助已迁入 `Old8Lang.Compiler`；`LangInterpreter` 与解释器
-    调试器已迁入 `Old8Lang.Interpreter`，Runtime 只依赖 `ILangInterpreter` 契约与宿主工厂。
-    `Compiler.Compile` 引擎、解释期作用域状态与其余运行时值 partial 仍待处理。见
+    调试器已迁入 `Old8Lang.Interpreter`；VM 执行引擎、字节码编译器、模块加载、VM 调试/分析、
+    Interop 与静态类注册已迁入 `Old8Lang.VirtualMachine`，Runtime 只保留字节码格式与
+    `IVirtualMachine`/`IBytecodeCompiler` 契约。`Compiler.Compile` 引擎、解释期作用域状态与
+    其余运行时值 partial 仍待处理。见
     `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
     `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`、
     `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`、
     `Reports/2026-11-14-17-09-LangInterpreter迁入解释后端.md`、
-    `Reports/2026-11-14-17-12-解释器调试器迁入解释后端.md`。
+    `Reports/2026-11-14-17-12-解释器调试器迁入解释后端.md`、
+    `Reports/2026-11-14-17-20-VM引擎与字节码编译器迁出.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
   契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
@@ -76,6 +79,14 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.10 VM 引擎）：`VirtualMachine`、字节码生成器值、`BytecodeCompiler`、
+  模块加载、VM 调试/分析、Interop 与 `VmStaticClassRegistry` 迁入 `Old8Lang.VirtualMachine`；
+  Runtime 新增 `IVirtualMachine`/`IBytecodeCompiler` 契约并只保留字节码格式与共享执行模型。
+  Architecture 60、VM 1083、Interpreter（排除外部网络用例）1959/1960 通过；
+  Compiler.Expressions 41 项失败与 HEAD 一致。见
+  `Reports/2026-11-14-17-20-VM引擎与字节码编译器迁出.md`。编译器与解释期作用域余量仍在
+  Runtime，阶段 3 不标记完成。
 
 - 2026-11-14（阶段 3.9 解释器调试器）：`Debugger`、`BreakpointManager`、`VariableWatcher`、
   `DebuggableInterpreter` 迁入 `Old8Lang.Interpreter`；App/LSP 调用代码不变。Architecture 57、

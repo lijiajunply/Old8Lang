@@ -19,7 +19,7 @@ namespace Old8Lang.Bytecode;
 /// <summary>
 /// 字节码编译器 - 将AST编译为字节码
 /// </summary>
-public class BytecodeCompiler
+public class BytecodeCompiler : IBytecodeCompiler
 {
     public ConstantPool ConstantPool { get; } = new();
     private readonly BytecodeFile _bytecodeFile = new();

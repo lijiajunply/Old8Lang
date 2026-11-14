@@ -1,6 +1,8 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Bytecode;
+using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.BytecodeBackend;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
@@ -82,6 +84,31 @@ public class BackendAssemblyBoundaryTests
             typeof(Old8Lang.Debugger.DebuggableInterpreter).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Interpreter",
             typeof(Old8Lang.Debugger.Debugger).Assembly.GetName().Name);
+    }
+
+    [Fact]
+    public void VirtualMachineEngine_LivesInVirtualMachineAssembly_AndRuntimeOnlySeesContract()
+    {
+        Assert.Equal("Old8Lang.VirtualMachine",
+            typeof(Old8Lang.Bytecode.VM.VirtualMachine).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime", typeof(IVirtualMachine).Assembly.GetName().Name);
+        Assert.NotEqual(typeof(Old8Lang.Bytecode.VM.VirtualMachine).Assembly,
+            typeof(IVirtualMachine).Assembly);
+    }
+
+    [Fact]
+    public void BytecodeCompiler_LivesInVirtualMachineAssembly_AndRuntimeOnlySeesContract()
+    {
+        Assert.Equal("Old8Lang.VirtualMachine", typeof(BytecodeCompiler).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime", typeof(IBytecodeCompiler).Assembly.GetName().Name);
+    }
+
+    [Fact]
+    public void BytecodeFormat_TypesStayInRuntime()
+    {
+        Assert.Equal("Old8Lang.Runtime", typeof(BytecodeFile).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime", typeof(Instruction).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime", typeof(FunctionMetadata).Assembly.GetName().Name);
     }
 
     [Fact]

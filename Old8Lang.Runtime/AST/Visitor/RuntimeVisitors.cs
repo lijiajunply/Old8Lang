@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Interpreter;
 using Old8Lang.ModuleSystem.StandardLibrary;
 
@@ -75,12 +76,12 @@ public static class RuntimeVisitors
     /// </summary>
     public static bool HasCompiler => _compilerFactory is not null;
 
-    private static Func<Old8Lang.Bytecode.BytecodeCompiler, IBytecodeVisitor>? _bytecodeFactory;
+    private static Func<IBytecodeCompiler, IBytecodeVisitor>? _bytecodeFactory;
 
     /// <summary>
     /// 注册字节码/VM 后端访问器工厂。
     /// </summary>
-    public static void RegisterBytecode(Func<Old8Lang.Bytecode.BytecodeCompiler, IBytecodeVisitor> factory)
+    public static void RegisterBytecode(Func<IBytecodeCompiler, IBytecodeVisitor> factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
         _bytecodeFactory = factory;
@@ -89,7 +90,7 @@ public static class RuntimeVisitors
     /// <summary>
     /// 创建一个字节码生成访问器。未注册时说明组合根缺少 VM 后端程序集。
     /// </summary>
-    public static IBytecodeVisitor CreateBytecode(Old8Lang.Bytecode.BytecodeCompiler compiler)
+    public static IBytecodeVisitor CreateBytecode(IBytecodeCompiler compiler)
     {
         ArgumentNullException.ThrowIfNull(compiler);
 

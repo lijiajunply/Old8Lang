@@ -18,7 +18,7 @@ namespace Old8Lang.Bytecode.VM;
 /// <summary>
 /// 虚拟机 - 执行字节码指令
 /// </summary>
-public partial class VirtualMachine
+public partial class VirtualMachine : IVirtualMachine
 {
     // 使用 ThreadLocal 为每个线程创建独立的栈和调用栈
     private readonly ThreadLocal<Stack<object?>> _threadStack = new(() => new Stack<object?>());

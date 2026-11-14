@@ -1,5 +1,3 @@
-using Old8Lang.Bytecode.VM;
-
 namespace Old8Lang.Bytecode.Core;
 
 /// <summary>
@@ -8,12 +6,12 @@ namespace Old8Lang.Bytecode.Core;
 public static class VMContext
 {
     [ThreadStatic]
-    private static VirtualMachine? _currentVM;
+    private static IVirtualMachine? _currentVM;
 
     /// <summary>
     /// 获取或设置当前线程的虚拟机实例
     /// </summary>
-    public static VirtualMachine? CurrentVM
+    public static IVirtualMachine? CurrentVM
     {
         get => _currentVM;
         set => _currentVM = value;
