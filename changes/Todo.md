@@ -163,11 +163,25 @@
   读取时把 `NullLangValue` 转成 `Int32` 失败；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
   `ArrayConcatenation`、`NestedArrays` 也是独立缺口。这些路径与本次集合实例方法桥接无关，需另行复现。
 
-- [ ] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
-  暴露。`class A { public func f(i:int) -> int? { return null } }` + `a.f(1)` 在 `-il` 下抛
-  `RUNTIME_ERROR: Object reference not set to an instance of an object`（`-f` 正常返回 `null`）。
-  `MemberAccessTests.MemberAccessErrorHandling_*` 因此仍失败。需先确认 `int?` 的返回类型映射与
-  `ReturnStatement` 对 `null` 的处理，再补回归。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.1）。
+- [x] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
+  暴露。可空类型注解在 IL 里被解析成基础值类型（`int?` → `int`），`return null` 的返回路径
+  对空引用执行 `unbox.any int32`，运行期抛 NRE（`-f` / `-vm` 都返回 null）。
+  现在「单个可空值类型」的**返回类型**统一用 `object` 承载（`IlReturnTypeHelper`），
+  值走装箱、null 就是空引用；只影响返回类型，参数/字段/局部变量不变。
+  `MemberAccessTests` 8→9 项全通过，`Compiler.Classes` 19→18 失败，其余 18 组不变。
+  见 change（`2026-11-14-IL可空返回值/test.md`）。
+
+- [ ] **`null` 的显示大小写跨模式不一致**：`PrintLine(null)` 与集合/字典里的 `null` 元素，
+  解释器输出 `Null`（`NullLangValue.ToString()`），IL 与虚拟机输出 `null`
+  （`VMValueFormatter` 的空引用分支）。而 `NullLangValue.Converse(String)` 又返回 `null`，
+  文档里写的是 `Task(Completed: Null)`。需要先确定统一口径（改解释器还是改 IL/VM 与文档），
+  再一并调整测试。见 change（`2026-11-14-IL可空返回值/test.md` §5.1）。
+
+- [ ] **`null.ToStr()` 只在解释器可用**：`null.ToStr()` 在 `-f` 返回 `Null`，
+  `-il` 报 `RUNTIME_ERROR: 无法在 null 上调用方法 'ToStr'`，
+  `-vm` 报 `NULL_REFERENCE_ERROR: ToStr`。解释器的联合类型用例
+  （`UnionTypesInterpreterTests.Run_NullableUnionTypeNullAssignment_...`）依赖这一行为。
+  见 change（`2026-11-14-IL可空返回值/test.md` §5.2）。
 
 - [x] **IL 类型推断在未完成的 `TypeBuilder` 上调用 `GetMethod`**：类方法体内 `this.method()`
   的接收者类型是尚未 `CreateType` 的 `TypeBuilder`，`VisitOperation` 兜底与

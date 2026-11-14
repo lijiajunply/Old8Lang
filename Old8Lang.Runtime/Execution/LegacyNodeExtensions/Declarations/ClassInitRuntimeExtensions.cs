@@ -512,6 +512,9 @@ public static partial class ClassInitRuntimeExtensions
             returnType = typeof(void);
         }
 
+        // int? / bool? 等可空值类型返回没有 CLR 载体，改用 object 承载 null。
+        returnType = IlReturnTypeHelper.Resolve(funcValue.Id, returnType);
+
         // 定义方法
         var methodBuilder = typeBuilder.DefineMethod(
             methodName,

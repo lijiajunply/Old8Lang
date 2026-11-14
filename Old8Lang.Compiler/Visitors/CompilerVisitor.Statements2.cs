@@ -902,6 +902,10 @@ public partial class CompilerVisitor
             returnType = FuncLangValue.GetItemType(funcToCompile.BlockStatement, funcLocal);
         }
 
+        // int? / bool? 等可空值类型返回没有 CLR 载体，改用 object 承载 null，
+        // 否则 return null 会在返回路径对空引用 unbox.any 而抛 NRE。
+        returnType = IlReturnTypeHelper.Resolve(funcToCompile.Id, returnType);
+
         // 定义新的方法
         var dynamicMethod = new DynamicMethod(
             methodName,
