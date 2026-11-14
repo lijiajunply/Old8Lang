@@ -210,3 +210,23 @@ Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.Cur
 `AsyncStateMachineGenerator` 迁入 `Old8Lang.Compiler/AsyncGeneration/`；Runtime 新增
 `IAsyncStateMachineGenerator` 契约，`LocalManager` 的变量提升/读写路径只依赖接口。
 Runtime 的 `AsyncGeneration/` 只剩解释器生成器与共享接口。
+
+## 阶段 3 完成：最终依赖图（2026-11-14）
+
+```text
+Old8Lang.App / LanguageServer / Benchmarks / Tests
+                     ↓
+                   Hosting（显式注册三个后端）
+        ↙                ↓                 ↘
+Old8Lang.Interpreter  Old8Lang.Compiler  Old8Lang.VirtualMachine
+        ↘                ↓                 ↙
+                 Old8Lang.Runtime
+   ↙        ↓         ↓          ↘
+Core  Concurrency  Modules.Abstractions  Observability / ProjectSystem / Syntax
+```
+
+三个后端程序集互不引用，只引用 Runtime；Runtime 不引用任何后端。Runtime 保留共享运行时值、
+内置函数、模块/类型系统、字节码格式与最小契约（`RuntimeVisitors`、`ILangInterpreter`、
+`IVirtualMachine`、`IBytecodeCompiler`、`IAsyncStateMachineGenerator`、`IlCompilerOptions`），
+以及共享执行状态（`VariateManager`/`ScopeLayer`、`LocalManager`/类型推断/泛型特化）。
+`BackendAssemblyBoundaryTests` 固化程序集引用、契约归属与 Runtime 源码边界。

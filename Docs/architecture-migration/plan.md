@@ -1,6 +1,6 @@
 # 架构迁移实施计划
 
-状态：草案。目标与约束见 [spec.md](spec.md)，依赖设计见 [design.md](design.md)。每阶段完成后运行适用测试、在 `Reports/` 写报告并独立提交；测试发现无关问题记入 `Todo.md`。不要把未完成的阶段标成完成。
+状态：阶段 3 已完成（2026-11-14）。目标与约束见 [spec.md](spec.md)，依赖设计见 [design.md](design.md)。每阶段完成后运行适用测试、在 `Reports/` 写报告并独立提交；测试发现无关问题记入 `Todo.md`。不要把未完成的阶段标成完成。
 
 ## 0. 固定基线与工作区
 
@@ -36,7 +36,8 @@
 
 ## 3. 拆分执行后端
 
-- [ ] 逐个拆分解释器、IL 和字节码/VM；将跨后端反射、函数、模块及编译期预执行依赖改为明确契约或组合服务。
+- [x] 逐个拆分解释器、IL 和字节码/VM；将跨后端反射、函数、模块及编译期预执行依赖改为明确契约或组合服务。
+  （2026-11-14 完成：三个后端的访问器与执行引擎均已独立程序集，详见下方共享运行时边界与最终报告。）
   - [x] 解释后端（2026-11-14）：`InterpreterVisitor` 及解释器专属语法适配迁入
     `Old8Lang.Interpreter`；Runtime 以 `RuntimeVisitors` 工厂契约创建访问器，364 处直接构造改为契约调用；
     `Old8HostBuilder` 显式注册。见 `Reports/2026-11-14-16-44-解释后端拆分测试.md`。
@@ -47,27 +48,14 @@
     `Old8Lang.VirtualMachine`；Runtime 以 `IBytecodeVisitor` 契约 + `RuntimeVisitors.CreateBytecode`
     创建访问器，6 处直接构造改为契约调用；组合根同时注册三个后端。见
     `Reports/2026-11-14-16-54-VM后端拆分测试.md`。
-  - [ ] 引擎余量：`VariateManager`/`ScopeLayer`、`Compiler/`、`Bytecode/` 仍在 Runtime，
-    作为运行时值与三个后端共享的执行状态；完整迁出需先抽象共享契约。
-    2026-11-14：编译器专用的 IL 运算辅助、LINQ IL 生成、`DotOperatorILHelper` 与
-    `FuncLangValue` lambda IL 辅助已迁入 `Old8Lang.Compiler`；`LangInterpreter` 与解释器
-    调试器已迁入 `Old8Lang.Interpreter`；VM 执行引擎、字节码编译器、模块加载、VM 调试/分析、
-    Interop 与静态类注册已迁入 `Old8Lang.VirtualMachine`，Runtime 只保留字节码格式与
-    `IVirtualMachine`/`IBytecodeCompiler` 契约；`CompiledDelegateRegistry`、`StaticClassCompiler`、
-    四个仅 IL 后端使用的辅助类，以及 `Compiler.Compile`/`GlobalVariableAnalysis`/`ILVerifier`
-    已迁入 `Old8Lang.Compiler`，编译开关抽为 Runtime 的 `IlCompilerOptions`；
-    `AsyncFuncLangValue` 的异步状态机 IL 与 `IlDisassembler` 也已迁入 IL 后端，
-    `AsyncStateMachineGenerator` 通过 `IAsyncStateMachineGenerator` 契约迁出；Runtime 的
-    `Compiler/` 只剩共享编译契约。解释期作用域状态与其余运行时值 partial 仍待处理。见
-    `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
-    `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`、
-    `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`、
-    `Reports/2026-11-14-17-09-LangInterpreter迁入解释后端.md`、
-    `Reports/2026-11-14-17-12-解释器调试器迁入解释后端.md`、
-    `Reports/2026-11-14-17-20-VM引擎与字节码编译器迁出.md`、
-    `Reports/2026-11-14-17-30-编译器辅助类迁入IL后端.md`、
-    `Reports/2026-11-14-17-40-IL编译器驱动迁入IL后端.md`、
-    `Reports/2026-11-14-17-50-异步函数体IL发射迁入IL后端.md`、
+  - [x] 共享运行时边界（2026-11-14）：三个后端的访问器与执行引擎均已独立；Runtime 只保留
+    运行时值/内置函数/模块/类型系统、字节码格式，以及三个后端共同依赖的最小契约
+    （`RuntimeVisitors`、`ILangInterpreter`、`IVirtualMachine`、`IBytecodeCompiler`、
+    `IAsyncStateMachineGenerator`、`IlCompilerOptions`）与共享执行状态
+    （`VariateManager`/`ScopeLayer`、`LocalManager`/类型推断/泛型特化）。
+    `BackendAssemblyBoundaryTests` 证明 Runtime 不引用任何后端、后端互不引用、Runtime 源码不再
+    直接构造三种 Visitor。完整报告见 `Reports/2026-11-14-17-55-第三阶段完成测试.md`；
+    子阶段报告见 `Reports/2026-11-14-16-44-解释后端拆分测试.md` 至
     `Reports/2026-11-14-17-25-异步状态机生成器迁入IL后端.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
@@ -87,6 +75,14 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3 完成）：解释、IL、字节码/VM 三个后端的访问器与执行引擎均已独立成
+  `Old8Lang.Interpreter` / `Old8Lang.Compiler` / `Old8Lang.VirtualMachine`，Runtime 只保留
+  共享运行时值、字节码格式与最小契约。最终构建 0 错误；Architecture 62、Parser 889、
+  Interpreter 1959/1960（1 跳过）、VM 1083、LanguageServer 474/476（2 跳过）通过；
+  Compiler.Expressions 41 项、Compiler.Async 65 项、Lambda 组 4 项失败均与 HEAD 逐项一致
+  （既有 IL/测试问题）。阶段 3 共 14 个独立提交。见
+  `Reports/2026-11-14-17-55-第三阶段完成测试.md`。
 
 - 2026-11-14（阶段 3.14 异步状态机）：`AsyncStateMachineGenerator` 迁入
   `Old8Lang.Compiler`，`LocalManager` 与 Runtime 的 IL 辅助改为依赖
