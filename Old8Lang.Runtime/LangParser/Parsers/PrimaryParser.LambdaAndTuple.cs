@@ -69,11 +69,11 @@ public partial class PrimaryParser
                 // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
                 if (isAsync)
                 {
-                    return new AsyncFuncLangValue(returnTypeAnnotation, [], block, position);
+                    return new LambdaExpression(returnTypeAnnotation, [], block, isAsync: true, position);
                 }
                 else
                 {
-                    return new FuncLangValue(returnTypeAnnotation, [], block, null, position, true);
+                    return new LambdaExpression(returnTypeAnnotation, [], block, isAsync: false, position);
                 }
             }
         }
@@ -199,11 +199,11 @@ public partial class PrimaryParser
                     // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
                     if (isAsync)
                     {
-                        return new AsyncFuncLangValue(returnTypeAnnotation, ids, block, position);
+                        return new LambdaExpression(returnTypeAnnotation, ids, block, isAsync: true, position);
                     }
                     else
                     {
-                        return new FuncLangValue(returnTypeAnnotation, ids, block, null, position, true);
+                        return new LambdaExpression(returnTypeAnnotation, ids, block, isAsync: false, position);
                     }
                 }
             }

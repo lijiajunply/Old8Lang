@@ -203,42 +203,21 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
-        // 处理 FuncLangValue（Lambda 表达式）
+        // 处理 lambda 语法节点
+        if (node is LambdaExpression lambdaExpression)
+        {
+            AnalyzeNestedFunction(
+                lambdaExpression.Parameters.Select(id => id.IdName).ToList(),
+                lambdaExpression.Body);
+            return;
+        }
+
+        // 处理 FuncLangValue（运行时可调用值，作为函数声明/原生函数的载体）
         if (node is AST.Expression.Value.FuncLangValue funcValue)
         {
-            // 对于嵌套 Lambda，需要分析其函数体中引用的变量
-            // 但要排除 Lambda 自己的参数
-            var nestedParameters = funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>();
-
-            // 记录本层需要为它准备的名字（本层局部变量若在其中就要按引用捕获）
-            RecordNestedClosureNeeds(funcValue.BlockStatement, nestedParameters);
-
-            // 嵌套闭包内部的赋值属于嵌套闭包自身，不应算作当前闭包的赋值，
-            // 否则会把 "只有内层闭包才写回外层变量" 的情况误判到当前层。
-            // 嵌套闭包在编译到它自己时会被单独分析，因此这里做快照隔离。
-            var outerAssignedSnapshot = new HashSet<string>(_localVariables, StringComparer.Ordinal);
-
-            // 将嵌套 Lambda 的参数临时添加到局部变量集合（避免被捕获）
-            foreach (var param in nestedParameters)
-            {
-                _localVariables.Add(param);
-            }
-
-            // 分析嵌套 Lambda 的函数体
-            AnalyzeNode(funcValue.BlockStatement);
-
-            // 内层闭包自己声明的名字（形参、以及它内部赋值建立的局部变量）只属于它自己。
-            // 若把它们留在当前闭包的捕获集合里，外层闭包就会凭空多出一个同名局部变量：
-            // 内层闭包随后在“闭包写外层局部变量”的检查里看到这个名字，会误判成写回外层变量
-            // 而直接报错（典型触发：内层闭包里的 result <- f(x)，外层恰有同名全局/局部）。
-            var nestedDeclared = new HashSet<string>(_localVariables, StringComparer.Ordinal);
-            nestedDeclared.ExceptWith(outerAssignedSnapshot);
-            _capturedVariables.ExceptWith(nestedDeclared);
-
-            // 恢复赋值集合：嵌套闭包的赋值不回传给当前闭包
-            _localVariables.Clear();
-            _localVariables.UnionWith(outerAssignedSnapshot);
-
+            AnalyzeNestedFunction(
+                funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>(),
+                funcValue.BlockStatement);
             return;
         }
 
@@ -296,5 +275,40 @@ public class ClosureCaptureAnalyzer
                 AnalyzeNode(statement[i]);
             }
         }
+    }
+
+    /// <summary>
+    /// 分析嵌套函数/闭包：记录本层需要准备的名字、隔离其内部赋值，并递归分析函数体。
+    /// </summary>
+    private void AnalyzeNestedFunction(List<string> nestedParameters, BlockStatement body)
+    {
+        // 记录本层需要为它准备的名字（本层局部变量若在其中就要按引用捕获）
+        RecordNestedClosureNeeds(body, nestedParameters);
+
+        // 嵌套闭包内部的赋值属于嵌套闭包自身，不应算作当前闭包的赋值，
+        // 否则会把 "只有内层闭包才写回外层变量" 的情况误判到当前层。
+        // 嵌套闭包在编译到它自己时会被单独分析，因此这里做快照隔离。
+        var outerAssignedSnapshot = new HashSet<string>(_localVariables, StringComparer.Ordinal);
+
+        // 将嵌套 Lambda 的参数临时添加到局部变量集合（避免被捕获）
+        foreach (var param in nestedParameters)
+        {
+            _localVariables.Add(param);
+        }
+
+        // 分析嵌套 Lambda 的函数体
+        AnalyzeNode(body);
+
+        // 内层闭包自己声明的名字（形参、以及它内部赋值建立的局部变量）只属于它自己。
+        // 若把它们留在当前闭包的捕获集合里，外层闭包就会凭空多出一个同名局部变量：
+        // 内层闭包随后在“闭包写外层局部变量”的检查里看到这个名字，会误判成写回外层变量
+        // 而直接报错（典型触发：内层闭包里的 result <- f(x)，外层恰有同名全局/局部）。
+        var nestedDeclared = new HashSet<string>(_localVariables, StringComparer.Ordinal);
+        nestedDeclared.ExceptWith(outerAssignedSnapshot);
+        _capturedVariables.ExceptWith(nestedDeclared);
+
+        // 恢复赋值集合：嵌套闭包的赋值不回传给当前闭包
+        _localVariables.Clear();
+        _localVariables.UnionWith(outerAssignedSnapshot);
     }
 }

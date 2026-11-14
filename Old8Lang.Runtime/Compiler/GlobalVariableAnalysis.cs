@@ -160,6 +160,11 @@ public static class GlobalVariableAnalysis
                     CollectIdentifiers(function, names);
                     return true;
 
+                case LambdaExpression lambda:
+                    // lambda 语法节点在求值时同样是独立 DynamicMethod，其中的顶层变量必须提升。
+                    CollectIdentifiers(lambda, names);
+                    return true;
+
                 case ClassInit classInit:
                     // 字段初始化表达式与方法体编译进动态类型的方法，不能访问 OldLangRun 的局部变量。
                     CollectIdentifiers(classInit, names);

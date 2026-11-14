@@ -166,7 +166,7 @@ public static class IlValueBridge
         // 函数字面量：栈上是编译好的委托，直接按函数值包装。
         // 不能走下面的 OutputType 判断——lambda 的 OutputType 是它函数体的返回类型（可能是值类型），
         // 按它装箱会把委托对象当成值类型处理。
-        if (expression is FuncLangValue)
+        if (expression is FuncLangValue or LambdaExpression)
         {
             ilGenerator.Emit(OpCodes.Call,
                 typeof(IlValueBridge).GetMethod(nameof(WrapFunction))!);

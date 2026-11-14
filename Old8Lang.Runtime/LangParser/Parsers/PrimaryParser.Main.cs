@@ -89,7 +89,7 @@ public partial class PrimaryParser(
                 }
 
                 // 创建异步Lambda表达式
-                return new AsyncFuncLangValue(null, [], block, position);
+                return new LambdaExpression(null, [], block, isAsync: true, position);
             }
 
             // 有参数异步Lambda
@@ -141,7 +141,7 @@ public partial class PrimaryParser(
                     }
 
                     // 创建异步Lambda表达式
-                    return new AsyncFuncLangValue(null, ids, block, position);
+                    return new LambdaExpression(null, ids, block, isAsync: true, position);
                 }
             }
 

@@ -220,7 +220,7 @@ public class ExtensionMethodWrapper(
     {
         expression.Accept(new CompilerVisitor(ilGenerator, local));
 
-        if (expression is FuncLangValue)
+        if (expression is FuncLangValue or LambdaExpression)
         {
             return;
         }

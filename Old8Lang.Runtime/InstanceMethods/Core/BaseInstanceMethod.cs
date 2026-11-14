@@ -161,7 +161,7 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     {
         // 匿名函数（lambda）作为参数时按「函数值」处理，而不是用它的返回类型参与重载解析。
         // IL 模式下这类参数会被编译成 .NET 委托，解释器/虚拟机模式下就是 FuncLangValue。
-        if (expression is FuncLangValue { IsLambdaExpression: true })
+        if (expression is FuncLangValue { IsLambdaExpression: true } or LambdaExpression)
             return typeof(FuncLangValue);
 
         if (local == null)

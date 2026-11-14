@@ -101,6 +101,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问字符串模板。</summary>
     TResult VisitStringTemplateValue(StringTemplateValue node);
 
+    /// <summary>访问 lambda 表达式。</summary>
+    TResult VisitLambdaExpression(LambdaExpression node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

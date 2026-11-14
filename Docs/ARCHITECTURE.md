@@ -543,7 +543,7 @@ Old8Lang 的 AST 节点分为两大类：
 | BinaryExpression | BinaryExpression.cs | 二元运算 | `a + b`, `x * y` |
 | UnaryExpression | UnaryExpression.cs | 一元运算 | `-x`, `!flag` |
 | FunctionCallExpression | FunctionCallExpression.cs | 函数调用 | `print("hello")` |
-| LambdaExpression | LambdaExpression.cs | Lambda 表达式 | `(x) => x * 2` |
+| LambdaExpression | LambdaExpression.cs（Syntax） | Lambda 表达式语法（求值时转换为函数值） | `(x) => x * 2` |
 | ArrayExpression | ArrayExpression.cs | 数组字面量 | `[1, 2, 3]` |
 | DictionaryExpression | DictionaryExpression.cs | 字典字面量 | `{"key": "value"}` |
 | IndexExpression | IndexExpression.cs | 索引访问 | `arr[0]`, `dict["key"]` |

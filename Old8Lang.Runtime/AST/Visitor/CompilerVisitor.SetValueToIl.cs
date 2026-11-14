@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Runtime;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -41,6 +42,9 @@ public partial class CompilerVisitor
             }
             case FuncLangValue func:
                 EmitFuncSetValueToIl(func, idName);
+                return;
+            case LambdaExpression lambda:
+                EmitFuncSetValueToIl(LambdaExpressionRuntimeFactory.Create(lambda) as FuncLangValue ?? throw new InvalidOperationException("async lambda 不能直接赋值为普通函数值"), idName);
                 return;
             case Operation operation:
                 EmitOperationSetValueToIl(operation, idName);

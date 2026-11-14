@@ -48,6 +48,14 @@
 
 ## 进度记录
 
+- 2026-11-14：lambda 改为 Syntax 的 `LambdaExpression` 语法节点；解析器不再直接构造
+  `FuncLangValue`/`AsyncFuncLangValue`，求值端由 `LambdaExpressionRuntimeFactory` 适配。同步更新
+  VM 闭包捕获分析、IL 顶层变量分析、IL 委托包装与 lambda 赋值路径。Runtime 生成节点保持 57。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
+  Compiler.Basic 16 / Collections+Exceptions 27 / Functions 57 / Statements 4 / Expressions 41 /
+  Async 65 / Types 51 项失败与 e46a7f5d 基线逐项一致。见
+  `Reports/2026-11-14-14-52-lambda语法节点迁移测试.md`。
+
 - 2026-11-14：`StringTemplateValue` 由 `LangValueType` 改为 `LangExpression` 并迁入 Syntax；
   Runtime 生成节点 58 → 57，遗留 partial 保持 11。Parser 889、Interpreter 1967/1968（1 跳过）、
   VM 1082、LSP 474/476（2 跳过）通过；Compiler.Expressions 41 项失败与基线一致。见
