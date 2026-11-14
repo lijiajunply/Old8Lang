@@ -1,13 +1,20 @@
 # Old8Lang 项目架构文档
 
-> 路径迁移说明（2026-11-13）：剩余语言实现的源码根已从历史 `Old8Lang/` 迁至
+> 迁移状态（2026-11-14）：架构迁移阶段 1–4 已完成。语法模型与解析器位于
+> `Old8Lang.Syntax`，三个执行后端分别位于 `Old8Lang.Interpreter`、
+> `Old8Lang.Compiler`、`Old8Lang.VirtualMachine`；`Old8Lang.Runtime` 只保留运行时值、
+> 内置函数、模块/类型系统、字节码格式与最小共享契约。宿主通过 `Old8Lang.Hosting`
+> 组合根显式注册后端与官方模块。详细验收见
+> `Docs/architecture-migration/plan.md` 与 `Reports/` 中的阶段报告。
+>
+> 路径说明（2026-11-13）：语言实现的源码根已从历史 `Old8Lang/` 迁至
 > `Old8Lang.Runtime/`。下文尚未逐段改写的 `Old8Lang/...` 路径应读作
 > `Old8Lang.Runtime/...`；明确标为 `Old8Lang.Core/` 的路径除外。
 
 ## 1. 项目概述
 
 ### 1.1 项目简介
-Old8Lang 是一种简单的动态类型编程语言，支持解释模式和 IL 模式两种运行方式。它设计简洁，易于学习和使用，同时提供了完整的编程语言特性，包括函数、类、异常处理等。
+Old8Lang 是一种动态类型编程语言，支持解释、IL 和字节码虚拟机三种运行方式。它设计简洁，易于学习和使用，同时提供了完整的编程语言特性，包括函数、类、异常处理、异步与生成器等。
 
 ### 1.2 技术栈
 - **开发语言**: C#
@@ -27,9 +34,9 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 #### 1.3.1 解释模式 (Interpretation Mode)
 
 **实现位置**:
-- 核心类: `Old8Lang/Interpreter/LangInterpreter.cs`
-- Visitor: `Old8Lang/AST/Visitor/InterpreterVisitor.cs`
-- 变量管理: `Old8Lang/Interpreter/VariateManager.cs`
+- 核心类: `Old8Lang.Interpreter/LangInterpreter.cs`
+- Visitor: `Old8Lang.Interpreter/Visitors/InterpreterVisitor*.cs`
+- 变量管理: `Old8Lang.Runtime/Interpreter/VariateManager.cs`（共享执行状态）
 
 **工作机制**:
 ```
@@ -60,9 +67,9 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 #### 1.3.2 IL 模式 (IL Mode)
 
 **实现位置**:
-- 核心类: `Old8Lang/Compiler/Compiler.cs` (静态类)
-- Visitor: `Old8Lang/AST/Visitor/CompilerVisitor.cs`
-- 局部变量管理: `Old8Lang/Compiler/CodeGeneration/LocalManager.cs`
+- 核心类: `Old8Lang.Compiler/Compiler.cs` (静态类)
+- Visitor: `Old8Lang.Compiler/Visitors/CompilerVisitor*.cs`
+- 局部变量管理: `Old8Lang.Runtime/Compiler/CodeGeneration/LocalManager.cs`（共享编译状态）
 
 **工作机制**:
 ```
@@ -93,10 +100,10 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 #### 1.3.3 VM 模式 (Bytecode VM Mode) ⚠️ 实验性
 
 **实现位置**:
-- 核心类: `Old8Lang/Bytecode/VM/VirtualMachine.Core.cs`
-- 编译器: `Old8Lang/Bytecode/BytecodeCompiler.cs`
-- Visitor: `Old8Lang/AST/Visitor/BytecodeVisitor.cs`
-- 操作码: `Old8Lang/Bytecode/Core/OpCode.cs`
+- 核心类: `Old8Lang.VirtualMachine/VM/VirtualMachine*.cs`
+- 编译器: `Old8Lang.VirtualMachine/Bytecode/BytecodeCompiler.cs`
+- Visitor: `Old8Lang.VirtualMachine/Visitors/BytecodeVisitor*.cs`
+- 操作码: `Old8Lang.Runtime/Bytecode/Core/OpCode.cs`（共享字节码格式）
 
 **工作机制**:
 ```
@@ -157,64 +164,69 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 `Old8Lang.Modules.Official`。CLI、LSP、测试和基准各自在组合根创建 `Old8HostBuilder`、注册官方模块，
 再安装生成的 Host。
 
-`Old8Lang.Hosting` 提供可独立创建的模块目录。当前旧执行路径仍通过
-`StandardLibraryRegistry` 读取默认 Host 目录，这是后续把执行上下文注入三种后端前的兼容适配层。
+`Old8Lang.Hosting` 为每个宿主创建独立的 `StandardLibraryCatalog`，并通过
+`CreateInterpreter` / `CreateBytecodeCompiler` / `CreateVirtualMachine` 把目录注入执行实例。
+执行上下文克隆出的作用域、闭包捕获与生成器沿用宿主目录；没有宿主上下文的辅助作用域使用
+冻结空目录（失败关闭）。进程级 `StandardLibraryRegistry` 仅作为 CLI/LSP 与无参构造器的兼容边界，
+入口清单与隔离测试见 [architecture-migration/host-module-registry.md](architecture-migration/host-module-registry.md)。
 
 ### 2.1 模块关系图
 
+```text
+CLI / LSP / 基准 / 测试
+            ↓
+   Old8Lang.Hosting（组合根：显式注册后端与官方模块）
+   ├── Old8Lang.Interpreter
+   ├── Old8Lang.Compiler
+   └── Old8Lang.VirtualMachine
+            ↓（三者互不引用）
+   Old8Lang.Runtime（运行时值、内置函数、模块/类型系统、字节码格式、最小契约）
+            ↓
+   Old8Lang.Syntax（纯语法模型与解析器）
+            ↓
+   Old8Lang.Core（源位置、诊断、词法、预处理）
 ```
-                         ┌────────────────────────────┐
-                         │       Old8Lang.Core         │
-                         │ 源位置、诊断、词法、预处理、 │
-                         │ 解析基础设施、文档注释模型   │
-                         └──────────────▲─────────────┘
-                                        │
-┌─────────────────┐     ┌───────────────┴─────────────┐
-│  Old8Lang.App   │────▶│     Old8Lang.Runtime         │
-│       LSP       │     │ AST、语法解析、解释/IL/VM    │
-└─────────────────┘     └───────────────▲─────────────┘
-                                        │
-                         ┌──────────────┴─────────────┐
-                         │   Old8Lang.Concurrency      │
-                         │ 同步原语、资源与线程调度     │
-                         └────────────────────────────┘
-                         ┌────────────────────────────┐
-                         │ Old8Lang.Observability      │
-                         │ 性能监控、分析与报告         │
-                         └────────────────────────────┘
-                         ┌────────────────────────────┐
-                         │  Old8Lang.ProjectSystem     │
-                         │ 项目与环境配置              │
-                         └────────────────────────────┘
-                                        │
-                         ┌──────────────┴─────────────┐
-                         │      Old8Lang.Hosting       │
-                         │ Old8Lang.Modules.Abstractions│
-                         └──────────────▲─────────────┘
-                                        │
-                         ┌──────────────┴─────────────┐
-                         │  Old8Lang.Modules.Official  │
-                         │  标准库与扩展库具体绑定      │
-                         └────────────────────────────┘
-```
+
+侧向依赖：`Old8Lang.Concurrency`、`Old8Lang.Observability`、`Old8Lang.ProjectSystem`、
+`Old8Lang.Modules.Abstractions` 不引用执行后端；官方模块绑定
+`Old8Lang.Modules.Official` 只由组合根引用。程序集引用图由
+`Old8Lang.Tests/Architecture/` 的边界测试固定。
 
 ### 2.2 各模块详细描述
 
-#### 2.2.1 Old8Lang.Runtime（语言执行实现）
-**功能**: 当前承载大部分 AST、语法解析、解释执行、IL 生成和 VM。词法与通用诊断已迁移到
-`Old8Lang.Core`；标量字面量的纯语法数据已迁至 `Old8Lang.Syntax`。完整 AST、解析器与执行后端的
-物理拆分仍在迁移中。
+#### 2.2.1 Old8Lang.Runtime（共享运行时与执行模型）
+**功能**: 承载运行时值（`LangValueType` 及其子类）、内置函数、模块/类型系统、反射与实例方法、
+字节码格式（`BytecodeFile` 与指令/元数据），以及后端共享的最小契约
+（`RuntimeVisitors`、`ILangInterpreter`、`IVirtualMachine`、`IBytecodeCompiler`、
+`IAsyncStateMachineGenerator`、`IlCompilerOptions`）和共享执行状态
+（`VariateManager`/`ScopeLayer`、`LocalManager`、类型推断与泛型特化）。
+它不引用任何执行后端、官方扩展或宿主组合根。
 
-**组成模块**:
-- **AST**: 抽象语法树定义，包括表达式和语句的各种节点类型
-- **Compiler**: 编译成中间代码的实现
-- **Error**: 上层运行时、类型和模块错误类型
-- **LangParser**: AST 语法构造和解析状态
+语法节点、解析器、解释器、IL 编译器与 VM 引擎均已迁出，详见下表。
 
-#### 2.2.1.1 Old8Lang.Syntax（后端无关语法模型，迁移中）
-**功能**: 当前只包含标量 `LiteralSyntax`、`LiteralKind` 与 `ILiteralSyntax`，仅引用
-`Old8Lang.Core`。`Old8Lang.Runtime` 通过显式转换边界将其映射为既有运行时值；该项目不得引用 Runtime、
-官方模块或执行后端。
+#### 2.2.1.1 Old8Lang.Syntax（后端无关语法模型与解析器）
+**功能**: 承载 `LangExpression`/`OldStatement` 等语法节点、`IVisitor` 接口自动生成模型、
+`LangParser` 及全部专用解析器。仅引用 `Old8Lang.Core`，不得引用 Runtime、官方模块或执行后端。
+运行时值由 Runtime 的工厂/扩展按语法节点缓存适配。
+
+#### 2.2.1.2 三个执行后端
+
+| 项目 | 内容 | 边界 |
+|---|---|---|
+| `Old8Lang.Interpreter` | `InterpreterVisitor`、`LangInterpreter`、解释器调试器 | 直接引用 Runtime（间接 Core/Syntax） |
+| `Old8Lang.Compiler` | `CompilerVisitor`、`Compiler.Compile` 驱动、IL 辅助、异步状态机、`ILVerifier` | 直接引用 Runtime（间接 Core/Syntax） |
+| `Old8Lang.VirtualMachine` | `BytecodeVisitor`、`BytecodeCompiler`、`VirtualMachine`、VM 调试/分析/Interop、模块加载 | 直接引用 Runtime（间接 Core/Syntax） |
+
+三个后端互不引用；Runtime 通过 `RuntimeVisitors` 等契约创建访问器，组合根在
+`Old8Lang.Hosting` 中显式注册。`BackendAssemblyBoundaryTests` 与
+`SyntaxParserBoundaryTests` 固化这些约束。
+
+#### 2.2.1.3 宿主与官方模块
+
+`Old8Lang.Hosting` 的 `Old8HostBuilder` 收集官方模块并生成独立目录的 `Old8Host`；
+`Old8Lang.Modules.Official` 提供标准库与扩展库的具体类型绑定；
+`Old8Lang.Modules.Abstractions` 只包含模块描述接口，不引用任何扩展程序集。
+模块目录的隔离与兼容边界见阶段 4.1 的审计文档。
 
 #### 2.2.2 Old8Lang.Core（无执行后端的语言基础）
 **功能**: 供解析器、语言服务器与三个执行后端共享，不能引用 `Old8Lang.Runtime`、AST 或任一执行后端。
@@ -529,7 +541,8 @@ Old8Lang 的 AST 节点分为两大类：
 
 #### 5.1.1 Expression (表达式节点)
 
-**位置**: `Old8Lang/AST/Expression/`
+**位置**: 已迁移语法节点在 `Old8Lang.Syntax/AST/Expressions/`；仍在 Runtime 的运行时值节点在
+`Old8Lang.Runtime/AST/Expression/`。
 
 **基类**: `LangExpression`
 
@@ -554,10 +567,8 @@ Old8Lang 的 AST 节点分为两大类：
 
 #### 5.1.2 Statement (语句节点)
 
-**位置**: 未迁移节点在 `Old8Lang.Runtime/AST/Statement/`；已迁移节点在
-`Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
-`BreakStatement`、`ContinueStatement`、`BlockStatement`、`IfChild`、`IfStatement`、`DeferStatement`、
-`WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。另有 `SelectCase`、`ImportItem`、
+**位置**: 语法语句节点在 `Old8Lang.Syntax/AST/Statements/`；仍承载执行辅助的运行时节点在
+`Old8Lang.Runtime/AST/Statement/`。另有 `SelectCase`、`ImportItem`、
 `ClassFieldSetStatement`、`FuncRunStatement`、`SwitchStatement`/`CaseStatement`、`TryStatement`、
 `EnumInit`、`SelectStatement`、`ForInStatement`、`AsyncForInStatement`、`FuncInit`、
 `AsyncFuncInit`、`ClassInit`、`ExtensionDeclaration`、`NativeStatement`、`ExternStatement`、
@@ -951,9 +962,9 @@ PrintLine(strings.ToStr())
 #### 7.4.1 解释模式
 
 **核心文件**:
-- `Old8Lang/Interpreter/LangInterpreter.cs` - 解释器主类
-- `Old8Lang/Interpreter/InterpreterVisitor.cs` - 解释执行 Visitor
-- `Old8Lang/Interpreter/VariateManager.cs` - 变量管理
+- `Old8Lang.Interpreter/LangInterpreter.cs` - 解释器宿主
+- `Old8Lang.Interpreter/Visitors/InterpreterVisitor*.cs` - 解释执行 Visitor
+- `Old8Lang.Runtime/Interpreter/VariateManager.cs` - 共享变量/作用域管理
 
 **执行流程**:
 ```
@@ -963,9 +974,9 @@ AST → InterpreterVisitor.Visit() → 直接执行 → 返回结果
 #### 7.4.2 IL 模式
 
 **核心文件**:
-- `Old8Lang/Compiler/Compiler.cs` - 编译器主类
-- `Old8Lang/Compiler/CompilerVisitor.cs` - IL 生成 Visitor
-- `Old8Lang/Compiler/LocalManager.cs` - 局部变量管理
+- `Old8Lang.Compiler/Compiler.cs` - 编译器驱动
+- `Old8Lang.Compiler/Visitors/CompilerVisitor*.cs` - IL 生成 Visitor
+- `Old8Lang.Runtime/Compiler/CodeGeneration/LocalManager.cs` - 共享局部变量/类型状态
 
 **执行流程**:
 ```
@@ -975,9 +986,10 @@ AST → CompilerVisitor.Visit() → IL 代码 → .NET Runtime → 执行
 #### 7.4.3 VM 模式
 
 **核心文件**:
-- `Old8Lang/Bytecode/VirtualMachine.Core.cs` - VM 核心
-- `Old8Lang/Bytecode/BytecodeVisitor.cs` - 字节码生成 Visitor
-- `Old8Lang/Bytecode/BytecodeInstruction.cs` - 指令定义
+- `Old8Lang.VirtualMachine/VM/VirtualMachine*.cs` - VM 核心与指令
+- `Old8Lang.VirtualMachine/Visitors/BytecodeVisitor*.cs` - 字节码生成 Visitor
+- `Old8Lang.VirtualMachine/Bytecode/BytecodeCompiler.cs` - 字节码编译器
+- `Old8Lang.Runtime/Bytecode/` - 字节码格式与共享指令模型
 
 **执行流程**:
 ```
@@ -990,9 +1002,18 @@ AST → BytecodeVisitor.Visit() → 字节码 → VirtualMachine.Execute() → �
 
 | 项目 | 依赖项目 |
 |------|----------|
-| Old8Lang.App | Old8Lang |
-| Old8LangLib | Old8Lang.NetLib |
-| Old8Lang.Tests | Old8Lang, Old8LangLib |
+| Old8Lang.Core | 无（仅 BCL） |
+| Old8Lang.Syntax | Old8Lang.Core |
+| Old8Lang.Runtime | Old8Lang.Core、Old8Lang.Syntax、Old8Lang.Modules.Abstractions、Concurrency、Observability、ProjectSystem |
+| Old8Lang.Interpreter | Old8Lang.Runtime、Old8Lang.Syntax、Old8Lang.Core |
+| Old8Lang.Compiler | Old8Lang.Runtime、Old8Lang.Syntax、Old8Lang.Core |
+| Old8Lang.VirtualMachine | Old8Lang.Runtime、Old8Lang.Syntax、Old8Lang.Core |
+| Old8Lang.Hosting | 三个后端、Old8Lang.Modules.Abstractions |
+| Old8Lang.Modules.Official | Old8Lang.Modules.Abstractions、官方扩展库 |
+| Old8Lang.App / LanguageServer / Benchmarks | Old8Lang.Hosting、Old8Lang.Modules.Official |
+| Old8Lang.Tests | 上述项目（含扩展库与 LSP） |
+
+三个后端互不引用，Runtime 不引用任何后端；该表由 `Architecture` 测试验证。
 
 ### 8.2 外部库依赖
 
@@ -1072,7 +1093,18 @@ Old8Lang/
 ├── .github/workflows/           # CI/CD 工作流
 ├── .idea/                       # IDEA / Rider 编辑器配置
 ├── Docs/                        # 项目文档（架构、CLI、语法、测试、开发流程等）
-├── Old8Lang/                    # 核心语言实现（AST、解析器、解释器、编译器、VM、类型系统）
+├── Old8Lang.Core/               # 源位置、诊断、词法、预处理
+├── Old8Lang.Syntax/             # 语法节点与解析器
+├── Old8Lang.Runtime/            # 运行时值、内置函数、模块/类型系统、字节码格式、共享契约
+├── Old8Lang.Interpreter/        # 解释后端
+├── Old8Lang.Compiler/           # IL 后端
+├── Old8Lang.VirtualMachine/     # 字节码编译器与 VM 后端
+├── Old8Lang.Hosting/            # 宿主组合根与显式后端/模块注册
+├── Old8Lang.Modules.Abstractions/ # 模块描述接口
+├── Old8Lang.Modules.Official/   # 官方模块绑定
+├── Old8Lang.Concurrency/        # 并发资源
+├── Old8Lang.Observability/      # 性能观测
+├── Old8Lang.ProjectSystem/      # 项目与环境配置
 ├── Old8Lang.App/                # 命令行应用
 ├── Old8Lang.Tests/              # xUnit 单元测试项目
 ├── Old8Lang.Benchmarks/         # 性能基准测试

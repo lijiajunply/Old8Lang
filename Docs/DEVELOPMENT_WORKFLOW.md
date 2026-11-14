@@ -83,11 +83,38 @@ Visitor 四个实现（`InterpreterVisitor` / `CompilerVisitor` / `BytecodeVisit
 - 词法：`LangTokenizer.TokenizeWithDirectives(code, preprocessorSymbols)` 返回 `(tokens, headerDirectives)`；
   Token 定义与词法实现在 `Old8Lang.Core/LangParser/LangToken.cs` / `LangTokenType.cs`。
 - 语法：`new LangParser(tokens, headerDirectives, sourceCode, fileName)`，调用 `ParseProgram()` 得到 `BlockStatement`。
-  两段衔接的实际样例见 `Old8Lang/Interpreter/LangInterpreter.cs`。
+  两段衔接的实际样例见 `Old8Lang.Interpreter/LangInterpreter.cs`。
 - 采用**递归下降**解析：主文件 `Old8Lang.Syntax/LangParser/LangParser.cs`，公共基类在 `Old8Lang.Syntax/LangParser/Core/ParserBase.cs`；
   每种语言结构在 `Old8Lang.Syntax/LangParser/Parsers/` 下有独立解析器，且普遍以 `partial class` 拆成多个文件
   （`StatementParser.*`、`PrimaryParser.*`、`ExpressionParser`、`FunctionParser`、`ClassParser`、`ExtensionParser`、`LinqParser`）。
 - 改语法时，`Docs/Old8Lang.ebnf` 要同步改（见第 1 节里更新语法文档那一步）。
+
+### 4.1 程序集边界与宿主模块（迁移后）
+
+代码该放哪：
+
+| 内容 | 程序集 |
+|------|--------|
+| 语法节点、`IVisitor`、解析器 | `Old8Lang.Syntax`（只引用 Core） |
+| 运行时值、内置函数、模块/类型系统、字节码格式、共享契约与执行状态 | `Old8Lang.Runtime` |
+| 解释执行与调试器 | `Old8Lang.Interpreter` |
+| IL 生成、编译驱动、IL 验证、异步状态机 | `Old8Lang.Compiler` |
+| 字节码生成、VM 引擎、VM 调试/分析、模块加载 | `Old8Lang.VirtualMachine` |
+| 组合根、模块目录 | `Old8Lang.Hosting` |
+| 官方模块的具体类型绑定 | `Old8Lang.Modules.Official` |
+
+- Runtime 不得引用三个后端；后端之间不得互相引用。需要跨层能力时用 Runtime 的最小契约
+  （`RuntimeVisitors`、`ILangInterpreter`、`IVirtualMachine`、`IBytecodeCompiler`、
+  `IAsyncStateMachineGenerator`），不要直接 `new` 另一种 Visitor/后端类型。
+- 官方模块只由组合根注册：`OfficialModules.RegisterAll(builder)`（宿主目录），不要在执行代码里
+  调用会修改进程默认目录的 `RegisterAll()`。
+- 执行实例只使用宿主传入的 `StandardLibraryCatalog`：新建 `VariateManager`、捕获闭包、克隆生成器时
+  必须带上宿主目录；不要读取 `StandardLibraryRegistry`。没有宿主上下文的临时作用域使用
+  `StandardLibraryCatalog.Empty`（失败关闭）。
+- 改动模块装配或作用域派生后，运行：
+  `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~Old8Lang.Tests.Architecture"`。
+  边界约束由 `SyntaxParserBoundaryTests`、`BackendAssemblyBoundaryTests` 与
+  `HostModuleIsolationTests` 固化。
 
 ---
 
