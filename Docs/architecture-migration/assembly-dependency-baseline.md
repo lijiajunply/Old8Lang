@@ -156,3 +156,9 @@ ILD 发射与 Runtime 类型推断共享同一套解析规则，避免两条路�
 Runtime 的模块加载、编译器、反射与调试代码依赖契约，并通过
 `RuntimeVisitors.CreateInterpreterHost(StandardLibraryCatalog)` 创建解释器宿主。
 `VariateManager`、`ScopeLayer` 等解释期状态仍留在 Runtime，是后续接口化的对象。
+
+## 阶段 3.9：解释器调试器迁入解释后端（2026-11-14）
+
+`Old8Lang.Debugger` 命名空间下的 `Debugger`、`BreakpointManager`、`VariableWatcher`、
+`DebuggableInterpreter` 已从 Runtime 迁入 `Old8Lang.Interpreter`。Runtime 不再保存解释器
+调试状态；App、LanguageServer 与测试通过解释后端项目引用继续使用。

@@ -76,6 +76,15 @@ public class BackendAssemblyBoundaryTests
     }
 
     [Fact]
+    public void InterpreterDebugger_LivesInInterpreterAssembly()
+    {
+        Assert.Equal("Old8Lang.Interpreter",
+            typeof(Old8Lang.Debugger.DebuggableInterpreter).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Interpreter",
+            typeof(Old8Lang.Debugger.Debugger).Assembly.GetName().Name);
+    }
+
+    [Fact]
     public void CompilerAssembly_ReferencesRuntimeAndNoOtherBackend()
     {
         var referenced = typeof(CompilerBackend).Assembly
