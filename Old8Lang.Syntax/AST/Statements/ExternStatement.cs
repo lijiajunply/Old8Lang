@@ -1,7 +1,4 @@
-using System.Reflection.Emit;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.ExternProviders;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
@@ -128,6 +125,18 @@ public partial class ExternStatement : OldStatement, IBlockDeclaration
     /// </summary>
     internal readonly List<ExternFunctionDeclaration> _functions;
 
+    /// <summary>DLL/模块名称。</summary>
+    public string DllName => _dllName;
+
+    /// <summary>外部函数声明列表。</summary>
+    public List<ExternFunctionDeclaration> Functions => _functions;
+
+    /// <summary>默认调用约定。</summary>
+    public CallingConventionType DefaultCallingConvention => _defaultCallingConvention;
+
+    /// <summary>Extern 类型。</summary>
+    public ExternType ExternType => _externType;
+
     /// <summary>
     /// 默认调用约定（仅用于 C/C++ P/Invoke）
     /// </summary>
@@ -195,6 +204,8 @@ public partial class ExternStatement : OldStatement, IBlockDeclaration
         return ExternType.NativeDll;
     }
 
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitExternStatement(this);
+
     /// <summary>
     /// 获取指定索引处的语句
     /// </summary>
@@ -247,16 +258,16 @@ public partial class ExternStatement : OldStatement, IBlockDeclaration
         if (func.FunctionSignature is null)
             return "()";
 
-        var funcValue = func.FunctionSignature.GetFuncValue();
-        var parameters = funcValue.Ids is not null
-            ? string.Join(", ", funcValue.Ids.Select(p =>
+        var syntax = func.FunctionSignature.Syntax;
+        var parameters = syntax.Parameters.Count > 0
+            ? string.Join(", ", syntax.Parameters.Select(p =>
             {
                 var type = !string.IsNullOrEmpty(p.AssumptionType) ? $":{p.AssumptionType}" : "";
                 return $"{p.IdName}{type}";
             }))
             : "";
 
-        var returnType = funcValue.Id?.AssumptionType ?? "void";
+        var returnType = syntax.Id?.AssumptionType ?? "void";
         return $"({parameters}) -> {returnType}";
     }
 }

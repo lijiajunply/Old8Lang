@@ -51,6 +51,16 @@ public static partial class FuncInitRuntimeExtensions
 }
 
 /// <summary>
+/// <see cref="NativeStatement"/> 的函数签名访问入口。
+/// </summary>
+public static class NativeStatementRuntimeExtensions
+{
+    /// <summary>获取 native 声明的运行时函数签名（无签名时返回 null）。</summary>
+    public static FuncLangValue? GetFuncValue(this NativeStatement node) =>
+        node.Function is null ? null : FunctionSyntaxRuntimeFactory.GetOrCreateFunc(node.Function);
+}
+
+/// <summary>
 /// <see cref="AsyncFuncInit"/> 的运行时可调用值访问入口；按语法节点缓存以保持原对象身份。
 /// </summary>
 public static partial class AsyncFuncInitRuntimeExtensions

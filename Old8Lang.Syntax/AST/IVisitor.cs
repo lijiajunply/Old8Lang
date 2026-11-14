@@ -116,6 +116,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问扩展方法声明。</summary>
     TResult VisitExtensionDeclaration(ExtensionDeclaration node);
 
+    /// <summary>访问 native 导入声明。</summary>
+    TResult VisitNativeStatement(NativeStatement node);
+
+    /// <summary>访问 extern 声明。</summary>
+    TResult VisitExternStatement(ExternStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`NativeStatement`、`ExternStatement` 与 extern 声明模型迁入 Syntax；native 函数签名改为
+  `FunctionSyntax?` 并经 `GetFuncValue()` 适配，extern 内部字段改为公开只读属性。Runtime 生成节点
+  53 → 51，遗留 partial 保持 8。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476
+  （2 跳过）、Architecture 43 通过；Compiler 各分组与基线一致。见
+  `Reports/2026-11-14-15-25-native与extern声明迁移测试.md`。
+
 - 2026-11-14：`ExtensionDeclaration` 迁入 Syntax，扩展方法改为 `FunctionSyntax` 列表；运行时函数值列表
   经 `GetExtensionMethods()` 缓存创建，`ResolveTargetType` 移入 Runtime 扩展。Runtime 生成节点
   54 → 53。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、

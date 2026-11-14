@@ -1293,7 +1293,7 @@ public partial class InterpreterVisitor
             if (methodInfo is null) throw new InvalidOperationError(node, $"找不到方法 {node.MethodName} 在 {node.ClassName} 类中");
             if (string.IsNullOrEmpty(node.NativeName))
                 node.NativeName = node.MethodName;
-            var func = new FuncLangValue(node.NativeName, methodInfo, node.FuncValue);
+            var func = new FuncLangValue(node.NativeName, methodInfo, node.GetFuncValue());
             manager.AddClassAndFunc(func);
             return new VoidLangValue();
         }
@@ -1469,10 +1469,10 @@ public partial class InterpreterVisitor
     {
 
         // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(node._externType);
+        var provider = ExternProviderFactory.CreateProvider(node.ExternType);
 
         // 委托给提供者执行
-        provider.LoadFunctions(node._dllName, node._functions, node._defaultCallingConvention, manager);
+        provider.LoadFunctions(node.DllName, node.Functions, node.DefaultCallingConvention, manager);
 
         return new VoidLangValue();
     

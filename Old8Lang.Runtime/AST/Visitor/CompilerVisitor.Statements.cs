@@ -1555,16 +1555,16 @@ public partial class CompilerVisitor
     {
 
         // 使用工厂创建对应的提供者
-        var provider = ExternProviderFactory.CreateProvider(node._externType);
+        var provider = ExternProviderFactory.CreateProvider(node.ExternType);
 
         // 检查是否支持 IL 模式
         if (!provider.SupportsCompilation)
         {
-            throw new NotSupportedException($"{node._externType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
+            throw new NotSupportedException($"{node.ExternType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
         }
 
         // 委托给提供者生成 IL 代码
-        provider.GenerateIL(node._dllName, node._functions, node._defaultCallingConvention, ilGenerator, local);
+        provider.GenerateIL(node.DllName, node.Functions, node.DefaultCallingConvention, ilGenerator, local);
 
         return null;
     

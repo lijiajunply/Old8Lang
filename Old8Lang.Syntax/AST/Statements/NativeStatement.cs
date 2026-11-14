@@ -1,10 +1,4 @@
-using System.Reflection;
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
@@ -40,9 +34,9 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     public readonly string? Name;
 
     /// <summary>
-    /// 函数值（可选）
+    /// 函数签名语法（可选）
     /// </summary>
-    public readonly FuncLangValue? FuncValue;
+    public readonly FunctionSyntax? Function;
 
     /// <summary>
     /// 是否导入所有方法 (*)
@@ -84,13 +78,13 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="methodName">方法名称</param>
     /// <param name="nativeName">原生方法别名</param>
     /// <param name="a">函数初始化对象</param>
-    public NativeStatement(string dllName, string className, string methodName, string nativeName, FuncInit a)
+    public NativeStatement(string dllName, string className, string methodName, string nativeName, FunctionSyntax function)
     {
         DllName = dllName;
         ClassName = className;
         MethodName = methodName;
         NativeName = nativeName;
-        FuncValue = a.GetFuncValue();
+        Function = function;
         ImportAll = false;
         MethodList = null;
     }
@@ -159,6 +153,8 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// </summary>
     /// <param name="index">语句索引</param>
     /// <returns>返回当前语句本身，因为NativeStatement是单个语句</returns>
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitNativeStatement(this);
+
     public override OldStatement this[int index] => this;
 
     /// <summary>
@@ -181,7 +177,7 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
         if (!string.IsNullOrEmpty(MethodName))
         {
             var funcName = string.IsNullOrEmpty(NativeName) ? MethodName : NativeName;
-            return $"import extern {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
+            return $"import extern {DllName}.{ClassName}.{MethodName} as {funcName}\n{Function}";
         }
 
         // 批量导入所有方法

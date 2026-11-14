@@ -238,6 +238,9 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassInit).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassFuncInitStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExtensionDeclaration).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.NativeStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternStatement).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternFunctionDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -308,6 +311,8 @@ public class ScalarLiteralExpressionTests
             .Accept(visitor));
         Assert.Equal("extension", new Old8Lang.AST.Statement.ExtensionDeclaration("string", null, [])
             .Accept(visitor));
+        Assert.Equal("native", new Old8Lang.AST.Statement.NativeStatement("d", "C").Accept(visitor));
+        Assert.Equal("extern", new Old8Lang.AST.Statement.ExternStatement("d", []).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -355,6 +360,8 @@ public class ScalarLiteralExpressionTests
         public string VisitAsyncFuncInit(Old8Lang.AST.Statement.AsyncFuncInit node) => "asyncfunc";
         public string VisitClassInit(Old8Lang.AST.Statement.ClassInit node) => "class";
         public string VisitExtensionDeclaration(Old8Lang.AST.Statement.ExtensionDeclaration node) => "extension";
+        public string VisitNativeStatement(Old8Lang.AST.Statement.NativeStatement node) => "native";
+        public string VisitExternStatement(Old8Lang.AST.Statement.ExternStatement node) => "extern";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;
