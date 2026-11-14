@@ -7,12 +7,6 @@ namespace Old8Lang.AST.Visitor;
 /// <summary>
 /// 调用语法节点在各后端的求值入口：适配为既有 <c>Instance</c> 后交给原 Visitor 处理。
 /// </summary>
-public partial class BytecodeVisitor
-{
-    /// <summary>访问简单函数调用。</summary>
-    public Instruction? VisitCallExpression(CallExpression node) => node.ToInstance().Accept(this);
-}
-
 public partial class TypeInferenceVisitor
 {
     /// <summary>访问简单函数调用。</summary>

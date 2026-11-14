@@ -73,4 +73,33 @@ public static class RuntimeVisitors
     /// 是否存在已注册的 IL 后端。
     /// </summary>
     public static bool HasCompiler => _compilerFactory is not null;
+
+    private static Func<Old8Lang.Bytecode.BytecodeCompiler, IBytecodeVisitor>? _bytecodeFactory;
+
+    /// <summary>
+    /// 注册字节码/VM 后端访问器工厂。
+    /// </summary>
+    public static void RegisterBytecode(Func<Old8Lang.Bytecode.BytecodeCompiler, IBytecodeVisitor> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        _bytecodeFactory = factory;
+    }
+
+    /// <summary>
+    /// 创建一个字节码生成访问器。未注册时说明组合根缺少 VM 后端程序集。
+    /// </summary>
+    public static IBytecodeVisitor CreateBytecode(Old8Lang.Bytecode.BytecodeCompiler compiler)
+    {
+        ArgumentNullException.ThrowIfNull(compiler);
+
+        var factory = _bytecodeFactory ?? throw new InvalidOperationException(
+            "字节码后端尚未注册：请引用 Old8Lang.VirtualMachine 并在组合根调用 VirtualMachineBackend.Register()。");
+
+        return factory(compiler);
+    }
+
+    /// <summary>
+    /// 是否存在已注册的字节码/VM 后端。
+    /// </summary>
+    public static bool HasBytecode => _bytecodeFactory is not null;
 }

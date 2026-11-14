@@ -23,6 +23,7 @@ public sealed class Old8HostBuilder : IStandardLibraryRegistry
     {
         InterpreterBackend.Register();
         CompilerBackend.Register();
+        Old8Lang.BytecodeBackend.VirtualMachineBackend.Register();
     }
 
     /// <summary>
@@ -94,6 +95,6 @@ public sealed class Old8Host
     /// <param name="bytecodeFile">待执行的字节码文件。</param>
     /// <param name="baseDirectory">模块解析基目录。</param>
     /// <returns>虚拟机实例。</returns>
-    public VirtualMachine CreateVirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
+    public Old8Lang.Bytecode.VM.VirtualMachine CreateVirtualMachine(BytecodeFile bytecodeFile, string? baseDirectory = null)
         => new(bytecodeFile, baseDirectory, StandardLibraries);
 }

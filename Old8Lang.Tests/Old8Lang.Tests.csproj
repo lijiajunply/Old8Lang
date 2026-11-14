@@ -36,6 +36,7 @@
     <ProjectReference Include="..\Old8Lang.SerializationLib\Old8Lang.SerializationLib.csproj" />
         <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
 <ProjectReference Include="..\Old8Lang.Compiler\Old8Lang.Compiler.csproj" />
+<ProjectReference Include="..\Old8Lang.VirtualMachine\Old8Lang.VirtualMachine.csproj" />
 <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
     <ProjectReference Include="..\Old8Lang.Syntax\Old8Lang.Syntax.csproj" />
     <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />

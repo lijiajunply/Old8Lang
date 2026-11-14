@@ -43,7 +43,10 @@
   - [x] IL 后端（2026-11-14）：`CompilerVisitor` 及 IL 语法适配迁入 `Old8Lang.Compiler`；
     Runtime 以 `RuntimeVisitors.CreateCompiler` 契约创建访问器，449 处直接构造改为契约调用；
     组合根同时注册解释与 IL 后端。见 `Reports/2026-11-14-16-48-IL后端拆分测试.md`。
-  - [ ] 字节码/VM 后端。
+  - [x] 字节码/VM 后端（2026-11-14）：`BytecodeVisitor` 及字节码语法适配迁入
+    `Old8Lang.VirtualMachine`；Runtime 以 `IBytecodeVisitor` 契约 + `RuntimeVisitors.CreateBytecode`
+    创建访问器，6 处直接构造改为契约调用；组合根同时注册三个后端。见
+    `Reports/2026-11-14-16-54-VM后端拆分测试.md`。
 - [ ] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
 - [ ] 验证历史字节码样本、导入与三模式代表性行为；记录公开 C# API 的迁移路径。
 
@@ -58,6 +61,13 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.3 VM 后端）：`BytecodeVisitor` 与三个共享 visitor 文件中的字节码片段迁入
+  `Old8Lang.VirtualMachine`；Runtime 新增 `IBytecodeVisitor` 与 `RuntimeVisitors.CreateBytecode`
+  契约，`BytecodeCompiler` 的 6 处直接构造改为契约调用，组合根同时注册解释、IL 与 VM 后端。
+  Architecture 55、VM 1082、Interpreter（排除外部网络用例）1959/1960 通过；
+  Compiler.Expressions 的 41 项失败与 HEAD 基线一致。见
+  `Reports/2026-11-14-16-54-VM后端拆分测试.md`。字节码引擎与 IL 引擎仍在 Runtime，阶段 3 不标记完成。
 
 - 2026-11-14（阶段 3.2 IL 后端）：`CompilerVisitor` 与三个共享 visitor 文件中的 IL 片段迁入
   `Old8Lang.Compiler`；Runtime 新增 `RuntimeVisitors.CreateCompiler` 契约，449 处

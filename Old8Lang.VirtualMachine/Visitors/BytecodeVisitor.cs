@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Visitor;
 /// <summary>
 /// 字节码访问者 - 将AST节点转换为字节码指令
 /// </summary>
-public partial class BytecodeVisitor(BytecodeCompiler compiler) : IRuntimeVisitor<Instruction?>
+public partial class BytecodeVisitor(BytecodeCompiler compiler) : IBytecodeVisitor
 {
     private readonly BytecodeCompiler _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
     private readonly List<Instruction> _instructions = [];

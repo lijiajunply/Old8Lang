@@ -91,3 +91,27 @@ Hosting 组合根同时注册解释与 IL 后端。`BackendAssemblyBoundaryTests
 `Compiler/` 引擎（`Compiler.Compile`、`LocalManager`、`RuntimeGlobals`、异步状态机、
 特化/验证辅助）仍在 Runtime：`LocalManager` 是 `IInstanceMethod` 与类型推断共用的编译契约，
 运行时值也保留 IL 辅助方法。完整引擎迁移需要先抽象这些契约。VM 后端仍在 Runtime 中。
+
+## 阶段 3.3：三个后端访问器独立（2026-11-14）
+
+```text
+Old8Lang.App / LanguageServer / Benchmarks / Tests
+                     ↓
+                   Hosting
+        ↙            ↓             ↘
+Old8Lang.Interpreter  Old8Lang.Compiler  Old8Lang.VirtualMachine
+        ↘             ↓             ↙
+                 Old8Lang.Runtime
+        ↘             ↓             ↙
+   Core / Concurrency / Modules.Abstractions / Observability / ProjectSystem / Syntax
+```
+
+三个后端程序集都只引用 `Old8Lang.Runtime`，互不引用；Runtime 通过
+`RuntimeVisitors` 的解释/IL/字节码工厂契约创建访问器，源码中不再直接构造
+`InterpreterVisitor`、`CompilerVisitor`、`BytecodeVisitor`。`Old8Lang.VirtualMachine`
+的注册类位于 `Old8Lang.BytecodeBackend` 命名空间，避免新增 `Old8Lang.VirtualMachine`
+命名空间后与 `Old8Lang.Bytecode.VM.VirtualMachine` 类型名冲突。
+
+仍留在 Runtime 的执行状态：解释期的 `LangInterpreter`/`VariateManager`/`ScopeLayer`，
+IL 期的 `Compiler/`（`Compiler.Compile`、`LocalManager`、`RuntimeGlobals`、异步状态机），
+VM 期的 `Bytecode/`（`BytecodeCompiler`、`VirtualMachine`、指令/元数据）。

@@ -147,7 +147,7 @@ public class BytecodeCompiler
         EnterScope();
 
         // 使用BytecodeVisitor生成字节码
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
         ast.Accept(visitor);
 
         mainFunc.Instructions = visitor.GetInstructions();
@@ -283,7 +283,7 @@ public class BytecodeCompiler
     {
         // 第一遍：遍历所有语句，找到类定义并编译它们
         // 这样在编译类实例化表达式时，类元数据已经存在
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
 
         // 遍历 ImportStatements 中的类定义
         foreach (var statement in ast.ImportStatements)
@@ -313,7 +313,7 @@ public class BytecodeCompiler
     {
         // 遍历所有语句，找到函数定义并编译它们
         // 这样在编译 Spawn(funcName) 时，函数索引已经存在
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
 
         // 遍历 ImportStatements 中的函数定义
         foreach (var statement in ast.ImportStatements)
@@ -497,7 +497,7 @@ public class BytecodeCompiler
         }
 
         // 编译函数体
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
         body.Accept(visitor);
         func.Instructions = visitor.GetInstructions();
         func.MaxStackSize = visitor.MaxStackSize;
@@ -542,7 +542,7 @@ public class BytecodeCompiler
         PredeclareLocalsCapturedByNestedClosures(body, parameters);
 
         // 编译函数体
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
         body.Accept(visitor);
 
         func.Instructions = visitor.GetInstructions();
@@ -590,7 +590,7 @@ public class BytecodeCompiler
         PredeclareLocalsCapturedByNestedClosures(body, parameters);
 
         // 编译函数体
-        var visitor = new BytecodeVisitor(this);
+        var visitor = RuntimeVisitors.CreateBytecode(this);
         body.Accept(visitor);
 
         func.Instructions = visitor.GetInstructions();

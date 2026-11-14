@@ -1,5 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Visitor;
+using Old8Lang.Bytecode;
+using Old8Lang.BytecodeBackend;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
@@ -101,6 +103,46 @@ public class BackendAssemblyBoundaryTests
             .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
                            && !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
             .Where(file => File.ReadAllText(file).Contains("new CompilerVisitor(", StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void VirtualMachineAssembly_ReferencesRuntimeAndNoOtherBackend()
+    {
+        var referenced = typeof(VirtualMachineBackend).Assembly
+            .GetReferencedAssemblies()
+            .Select(name => name.Name)
+            .ToArray();
+
+        Assert.Contains("Old8Lang.Runtime", referenced);
+        Assert.DoesNotContain("Old8Lang.Interpreter", referenced);
+        Assert.DoesNotContain("Old8Lang.Compiler", referenced);
+        Assert.DoesNotContain("Old8Lang.Modules.Official", referenced);
+        Assert.DoesNotContain("Old8Lang.Hosting", referenced);
+    }
+
+    [Fact]
+    public void VirtualMachineBackend_IsRegisteredThroughRuntimeContract()
+    {
+        VirtualMachineBackend.Register();
+
+        Assert.True(RuntimeVisitors.HasBytecode);
+        var compiler = new BytecodeCompiler();
+        Assert.IsType<BytecodeVisitor>(RuntimeVisitors.CreateBytecode(compiler));
+    }
+
+    [Fact]
+    public void RuntimeSource_DoesNotConstructBytecodeVisitorDirectly()
+    {
+        var root = RequireRepositoryRoot();
+        var runtimeRoot = Path.Combine(root, "Old8Lang.Runtime");
+        var offenders = Directory
+            .EnumerateFiles(runtimeRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
+                           && !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+            .Where(file => File.ReadAllText(file).Contains("new BytecodeVisitor(", StringComparison.Ordinal))
             .ToArray();
 
         Assert.Empty(offenders);

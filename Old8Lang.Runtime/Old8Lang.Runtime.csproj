@@ -21,6 +21,7 @@
          公开 API 收敛后再移除。 -->
     <InternalsVisibleTo Include="Old8Lang.Interpreter" />
     <InternalsVisibleTo Include="Old8Lang.Compiler" />
+    <InternalsVisibleTo Include="Old8Lang.VirtualMachine" />
   </ItemGroup>
 
   <ItemGroup>
