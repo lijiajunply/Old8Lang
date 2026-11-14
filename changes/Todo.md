@@ -33,7 +33,7 @@
   - 2026-11-11：直接赋值的 lambda 现可读取及写回创建点可见的普通局部变量；闭包环境在运行时绑定，每个 lambda 实例独立。`LambdaTests` 24 项通过，见 测试报告（`2026-11-11-19-00-IL-lambda-闭包局部变量.md`）。
   - 具名函数返回 `function` 的简单闭包链路现已可用，多个返回闭包实例彼此隔离；见 测试报告（`2026-11-11-20-27-IL-返回闭包函数值.md`）。2026-11-11 进一步确认：字典索引后的嵌套集合 `Length` 可在 `Filter` lambda 内使用；lambda 内继续创建并传给 `Reduce` 的嵌套 lambda 已避免捕获未初始化局部变量，嵌套数组以动态类型调用 `Reduce` 也可桥接执行。见 隔离报告（`2026-11-11-23-40-IL嵌套Lambda隔离.md`） 与 嵌套集合回归（`2026-11-12-00-10-IL嵌套集合Reduce.md`）。2026-11-13：集合索引得到的 `object` 函数值现可在运行期作为 .NET 委托调用；循环内保存的 lambda 分别捕获各轮局部快照，带参数调用得到 `10/11/12`；捕获 `this` 的 lambda 可读写其类实例私有字段。嵌套返回闭包、跨具名函数的顶层捕获和函数类型参数仍待处理，见 集合函数值测试（`2026-11-13-10-10-IL集合函数值调用.md`） 与 this 捕获测试（`2026-11-13-10-20-IL闭包捕获this.md`）。
 
-- [ ] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
+- [x] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
   在 `List<T>` 接收者下会「方法未找到」。
   - 2026-11-11：`Map`、`Filter`、`Find`、`Contains`、`Distinct`、`Sum`、`Take`、`Skip`、`Any/Some`、`All/Every`、`IsEmpty`、`Reduce`、`Sort`、`Min`、`Max` 与 `Average` 已在原生 `List<T>` 接收者上支持；`Map` / `Filter` / `Sort` / `Distinct` / `Take` / `Skip` 及数值聚合也覆盖数组表示。字典的 `Keys` / `Values` 已支持原生 `Dictionary<K,V>` 接收者并返回可继续调用集合方法的列表；显式 `dict` / `dictionary` 注解可将空花括号编译为字典。`Length` 属性现也可用于原生与经字典索引得到的集合。见 Map/Filter 测试报告（`2026-11-11-20-40-IL集合MapFilter.md`）、Find/Any/All 测试报告（`2026-11-11-20-45-IL集合FindAnyAll.md`）、IsEmpty 测试报告（`2026-11-11-20-50-IL集合IsEmpty.md`）、Reduce 测试报告（`2026-11-11-21-00-IL集合Reduce.md`）、数组测试报告（`2026-11-11-21-10-IL数组MapFilter.md`）、字典键值测试报告（`2026-11-11-21-20-IL字典KeysValues.md`）、排序测试报告（`2026-11-11-21-30-IL集合Sort.md`）、集合长度测试报告（`2026-11-11-22-00-IL集合Length.md`）、空字典注解测试报告（`2026-11-11-22-30-IL空字典注解.md`）、Contains 测试报告（`2026-11-11-22-40-IL集合Contains.md`）、Distinct 测试报告（`2026-11-11-23-00-IL集合Distinct.md`）、Sum 测试报告（`2026-11-11-23-10-IL集合Sum.md`）、Take 测试报告（`2026-11-11-23-20-IL集合Take.md`）、Skip 测试报告（`2026-11-11-23-30-IL集合Skip.md`） 与 数值聚合测试报告（`2026-11-12-00-30-IL集合数值聚合.md`）。其余字典及集合方法仍待迁移。
@@ -50,6 +50,21 @@
   - 2026-11-13：`ToStr` 现支持原生列表与数组，输出与解释器的集合显示格式一致；见 集合字符串化测试报告（`2026-11-13-09-10-IL集合ToStr.md`）。
   - 2026-11-13：`IsSorted` 现支持原生列表与数组，保留升序（含重复值）判断语义；见 集合有序性测试报告（`2026-11-13-09-20-IL集合IsSorted.md`）。
   - 2026-11-13：`ForEach` 现支持原生列表与数组，回调可写回创建点可见的局部变量；见 集合遍历测试报告（`2026-11-13-09-30-IL集合ForEach.md`）。
+  - 2026-11-14：其余 63 个未实现 `IIlNativeValueInstanceMethod` 的 List / Dictionary / Array 方法改为
+    统一运行期桥接（`IlNativeCollectionBridge`）：编译期解析到语言方法后发射「包装接收者与实参 → 解释器实现 →
+    还原结果」，`GroupBy` 与带 zipper 的 `Zip` 的 `Ldnull` 桩不再触发。重载由编译期解析出的具体方法类型决定，
+    类型推断与 IL 栈类型共用同一返回类型映射。变异方法（列表增删改清与 `Pop`、字典 `Add`/`Remove`/`Clear`/`Update`、
+    数组 `Set`）会同步回原生集合，别名可见修改。26 项定向测试通过；`Compiler/Collections` 复跑无新增失败，
+    并顺带修复 6 项既有失败（`ListIsEmpty`、`List_AddAndRemove`、`ListJoin`、`ListDefaultElementReaders`、
+    `CollectionErrorHandling`、`Dictionary_Remove`）。见 change（`2026-11-14-IL原生集合实例方法桥接/test.md`）。
+  - 遗留：桥接保证语义一致，但未做专用 IL 优化；63 个方法旧的失效 `GenerateIlInternal`/helper 仍待清理。
+
+- [ ] **剩余集合实例方法的专用 IL 迁移与死代码清理**：`IlNativeCollectionBridge` 已让全部 List / Dictionary /
+  Array 实例方法在 IL 模式下可用，但热点方法（`Chunk` / `Flatten` / `Slice` / 排序等）目前每次调用都要包装、
+  解析并走解释器实现；后续应按 `IIlNativeValueInstanceMethod` 机制恢复专用 IL，并删除 63 个方法中已失效的
+  `GenerateIlInternal` 与 helper。嵌套字典元素在桥接边界也尚未做深度填充；桥接结果中的元组
+  （`Zip()` 无 zipper、`WithIndex()`、`Dict.ToList()` 的元素）在 IL 侧还原为 `object?[]`，尚不支持直接按元组解构；
+  IL 模式的原生字典无法表示解释器允许的重复键，`Add` 同键后 `Count` 语义与解释器不同。
 
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
@@ -128,6 +143,13 @@
 - [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 Core 诊断与预处理报告（`2026-11-13-16-35-Core诊断与预处理拆分测试.md`）。
 
 - [ ] **IL 数组回归失败**：2026-11-13 执行入口迁移定向测试中，`ArrayConcatenation_CompilesAndExecutesCorrectly` 因 `Len` 推断为 `Int32` 失败，`NestedArrays_CompilesAndExecutesCorrectly` 生成无效 IL。旧块入口与新入口均调用同一 `CompilerVisitor`；需独立基线复现。见 执行入口测试报告（`2026-11-13-22-17-执行入口迁移测试.md`）。
+
+- [ ] **`Compiler/Collections` 与表达式组既有 IL 失败（2026-11-14 基线核对）**：以 `HEAD` 工作树对比，
+  `Compiler/Collections` 9 项、`Compiler.Expressions|Linq|Modules` 41 项、`Functions.HigherOrderTests` 8 项
+  在集合桥接改动前后失败集合完全一致；`Compiler.Classes` 组会使测试主机因生成无效 IL 崩溃（基线与当前一致）。
+  其中 `Dictionary_EmptyDictionary_CompilesAndExecutes` 表现为 `dict()` 空字典首次写入字符串键后，
+  读取时把 `NullLangValue` 转成 `Int32` 失败；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
+  `ArrayConcatenation`、`NestedArrays` 也是独立缺口。这些路径与本次集合实例方法桥接无关，需另行复现。
 
 - [ ] **`Compiler.Basic.ErrorHandlingTests` 的 IL 异常预期已失配**：2026-11-13 在 Core 基础异常契约迁移的定向回归中，因筛选条件同时匹配该类，70 项中 10 项失败、2 项跳过。失败包括期望 `Old8Exception` 但实际抛出 `CompilerException`、期望运行期异常但未抛出，以及生成无效 IL。此次改动仅调整 `CompilerException` 与 `SourceContextWindow` 的程序集归属，未改异常继承或 IL 生成逻辑；需在独立基线中复现并按当前 IL 语义更新实现或断言。见 Core 基础异常契约报告（`2026-11-13-16-20-Core基础异常契约测试.md`）。
 

@@ -9,6 +9,16 @@
 
 ---
 
+## 2026-11-14
+
+**API**
+
+- IL 模式的 `List` / `Dictionary` / `Array` 其余实例方法（如 `Chunk`、`Flatten`、`Slice`、`Pairwise`、
+  `Aggregate`、`GroupBy`、`Zip`、`Clone`、`Merge`、`Permutations` 等）现在可以在集合字面量或原生集合接收者上调用，
+  行为与解释器一致；列表与字典的增删改清、数组的 `Set` 会作用到原集合本身，别名可见修改。
+
+---
+
 ## 2026-11-13
 
 **语法 / 语义**

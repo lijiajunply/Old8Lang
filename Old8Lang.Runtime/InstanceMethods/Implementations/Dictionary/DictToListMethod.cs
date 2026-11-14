@@ -41,28 +41,42 @@ public class DictToListMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(DictToListMethod).GetMethod(nameof(ToListHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static object[] ToListHelper(Dictionary<object, object> dict)
+    /// <summary>
+    /// IL 模式的辅助方法：把桥接后的字典转成键值对列表（每个元素是 <c>[key, value]</c>）。
+    /// </summary>
+    public static List<object?> ToListHelper(LangValueType instance)
     {
-        var list = new List<object>();
-
-        foreach (var (key, value) in dict)
+        if (instance is not DictionaryLangValue dict)
         {
-            list.Add(new object[] { key, value });
+            throw new ArgumentException($"实例必须是字典类型，实际是 {instance.GetType().Name}");
         }
 
-        return list.ToArray();
+        if (dict.Value.Count == 0 && dict.Tuples.Count > 0)
+        {
+            dict.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+        }
+
+        var result = new List<object?>();
+        foreach (var (key, value) in dict.Value)
+        {
+            result.Add(new object?[] { IlValueBridge.Unwrap(key), IlValueBridge.Unwrap(value) });
+        }
+
+        return result;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(object[]);
+        // 解释器实现返回 ListLangValue（元素是 (key, value) 元组）；
+        // IL 桥接按该声明映射为原生 List<object?>，与解释器表示保持一致。
+        return typeof(List<object?>);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

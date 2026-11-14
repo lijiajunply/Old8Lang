@@ -134,13 +134,30 @@ public static class IlValueBridge
                 return arrayValue.GetItems().Select(Unwrap).ToArray();
             case DictionaryLangValue dictionaryValue:
             {
-                var result = new Dictionary<object, object?>();
-                foreach (var tuple in dictionaryValue.Tuples)
+                // 解释器实现可能只填充 Tuples（Wrap 构造的字典）或只填充 Value（新建的字典），
+                // 统一以 Value 为准，必要时先按 Tuples 求值一次。
+                if (dictionaryValue.Value.Count == 0 && dictionaryValue.Tuples.Count > 0)
                 {
-                    result[Unwrap(tuple.Get(0))!] = Unwrap(tuple.Get(1));
+                    dictionaryValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                }
+
+                var result = new Dictionary<object, object?>();
+                foreach (var (key, itemValue) in dictionaryValue.Value)
+                {
+                    result[Unwrap(key)!] = Unwrap(itemValue);
                 }
 
                 return result;
+            }
+            case TupleLangValue tupleValue:
+            {
+                // 解释器实现返回的元组只带元素表达式，ItemValues 需要先经解释器访问填充。
+                if (tupleValue.ItemValues.Count == 0)
+                {
+                    tupleValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                }
+
+                return tupleValue.ItemValues.Select(Unwrap).ToArray();
             }
             case IlDelegateFuncLangValue delegateFunc:
                 return delegateFunc.Function;

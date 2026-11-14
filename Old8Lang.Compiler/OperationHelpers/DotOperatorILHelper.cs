@@ -753,6 +753,14 @@ public static class DotOperatorILHelper
             return instanceMethod.GetReturnType(returnReceiverType, instance.Ids, local);
         }
 
+        // 注册表里有对应语言方法、但该方法只有解释器实现（未实现 IIlNativeValueInstanceMethod）时，
+        // 在运行期桥接回解释器实现，避免原生 List<T> / T[] / Dictionary<K,V> 接收者报「方法未找到」。
+        if (leftType is not null &&
+            TryEmitIlBridgeInstanceMethodCall(left!, instance, ilGenerator, local, leftType, out var bridgeReturnType))
+        {
+            return bridgeReturnType;
+        }
+
         // 如果实例方法注册表中没有找到，继续使用原有的逻辑
         left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var types = new List<Type>();
@@ -937,6 +945,83 @@ public static class DotOperatorILHelper
         return m.ReturnType;
     }
 
+    /// <summary>
+    /// 为「原生集合接收者 + 只有解释器实现的实例方法」发射运行期桥接调用。
+    /// </summary>
+    /// <remarks>
+    /// 方法解析、实参包装与结果还原都在
+    /// <see cref="IlNativeCollectionBridge"/> 中完成；这里只负责按解析出的
+    /// 声明返回类型决定 <c>pop</c> / <c>unbox.any</c> / <c>castclass</c>，
+    /// 并与 <see cref="InstanceMethodTypeResolver.InferIlBridgeReturnType"/>
+    /// （类型推断）保持同一映射。
+    /// </remarks>
+    internal static bool TryEmitIlBridgeInstanceMethodCall(
+        LangExpression left,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        Type leftType,
+        out Type returnType)
+    {
+        returnType = typeof(object);
+        var method = InstanceMethodTypeResolver.ResolveIlBridgeMethod(leftType, instance, local, out var mappedType);
+        if (method is null)
+        {
+            return false;
+        }
+
+        Type declaredType;
+        try
+        {
+            declaredType = method.GetReturnType(mappedType, instance.Ids, local);
+        }
+        catch
+        {
+            declaredType = typeof(object);
+        }
+
+        returnType = InstanceMethodTypeResolver.MapIlBridgeReturnType(declaredType);
+
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        if (leftType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, leftType);
+        }
+
+        ilGenerator.Emit(OpCodes.Ldstr, instance.Id.IdName);
+        ilGenerator.Emit(OpCodes.Ldc_I4, instance.Ids.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var index = 0; index < instance.Ids.Count; index++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+            IlValueBridge.EmitLoadWrapped(instance.Ids[index], ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        // 把编译期解析出的具体方法类型传给运行期：同一方法名可能有多个重载
+        // （例如 First() / First(predicate)），仅凭参数个数在运行期重新解析会选错。
+        ilGenerator.Emit(OpCodes.Ldtoken, method.GetType());
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlNativeCollectionBridge).GetMethod(nameof(IlNativeCollectionBridge.Invoke))!);
+
+        if (returnType == typeof(void))
+        {
+            ilGenerator.Emit(OpCodes.Pop);
+        }
+        else if (returnType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, returnType);
+        }
+        else if (returnType != typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Castclass, returnType);
+        }
+
+        return true;
+    }
+
     internal static Type GenerateLockedVariableMethodCall(
         LangExpression left,
         Instance instance,
@@ -1077,6 +1162,15 @@ public static class DotOperatorILHelper
                 return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
                     .ReduceWithInitialHelper(collection, second, first);
             }
+        }
+
+        // 字典索引或动态变量得到的集合静态类型是 object；运行期再判定它是否为原生集合，
+        // 是则复用语言实例方法桥接，保证与解释器一致的方法集合（Chunk / GroupBy / Permutations 等）。
+        if ((receiver is Array || receiver is IDictionary || receiver is IList) &&
+            IlNativeCollectionBridge.TryInvoke(receiver, methodName, arguments, methodType: null,
+                out var languageResult))
+        {
+            return languageResult;
         }
 
         var method = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)

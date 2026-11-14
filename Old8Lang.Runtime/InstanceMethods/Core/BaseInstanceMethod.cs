@@ -159,6 +159,13 @@ public abstract class BaseInstanceMethod : IInstanceMethod
     /// </summary>
     protected virtual Type? TryGetParameterType(LangExpression expression, LocalManager? local)
     {
+        // IL 桥接把已经求值的语言值作为表达式传入；此时按值本身判断类型，
+        // 否则运行期（没有 LocalManager）无法在重载组里选中带谓词/比较器的版本。
+        if (expression is BridgedArgumentExpression bridged)
+        {
+            return bridged.Value is FuncLangValue ? typeof(FuncLangValue) : bridged.Value.GetType();
+        }
+
         // 匿名函数（lambda）作为参数时按「函数值」处理，而不是用它的返回类型参与重载解析。
         // IL 模式下这类参数会被编译成 .NET 委托，解释器/虚拟机模式下就是 FuncLangValue。
         if (expression is FuncLangValue { IsLambdaExpression: true } or LambdaExpression)

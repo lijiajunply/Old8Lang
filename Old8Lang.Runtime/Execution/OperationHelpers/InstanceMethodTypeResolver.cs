@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
@@ -19,8 +20,113 @@ internal static class InstanceMethodTypeResolver
     internal static Type? InferInstanceMethodReturnType(Type receiverType, Instance instance, LocalManager local)
     {
         var method = ResolveInstanceMethod(receiverType, instance, local, out var mappedType);
+        if (method is null)
+        {
+            return InferIlBridgeReturnType(receiverType, instance, local);
+        }
+
         var returnReceiverType = method is ExtensionMethodWrapper ? receiverType : mappedType;
         return method?.GetReturnType(returnReceiverType, instance.Ids, local);
+    }
+
+    /// <summary>
+    /// 推断「原生集合接收者 + 解释器实现桥接」这条 IL 路径的返回类型。
+    /// </summary>
+    internal static Type? InferIlBridgeReturnType(Type receiverType, Instance instance, LocalManager local)
+    {
+        var method = ResolveIlBridgeMethod(receiverType, instance, local, out var mappedType);
+        if (method is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return MapIlBridgeReturnType(method.GetReturnType(mappedType, instance.Ids, local));
+        }
+        catch
+        {
+            return typeof(object);
+        }
+    }
+
+    /// <summary>
+    /// 解析 IL 模式下由 <see cref="IlNativeCollectionBridge"/> 承接的实例方法。
+    /// </summary>
+    /// <remarks>
+    /// 只在接收者是原生 <c>List&lt;T&gt;</c> / <c>T[]</c> / <c>Dictionary&lt;K,V&gt;</c>、
+    /// 且等价 LangValueType 上存在对应方法时返回；已实现
+    /// <see cref="IIlNativeValueInstanceMethod"/> 的方法走各自的专用 IL，不进入该路径。
+    /// </remarks>
+    internal static IInstanceMethod? ResolveIlBridgeMethod(Type receiverType, Instance instance,
+        LocalManager local, out Type mappedType)
+    {
+        mappedType = typeof(LangValueType);
+        if (!TryGetEquivalentLangValueType(receiverType, out var equivalentType))
+        {
+            return null;
+        }
+
+        if (equivalentType != typeof(ListLangValue) &&
+            equivalentType != typeof(ArrayLangValue) &&
+            equivalentType != typeof(DictionaryLangValue))
+        {
+            return null;
+        }
+
+        mappedType = equivalentType;
+        InstanceMethodInitializer.EnsureInitialized();
+        return InstanceMethodRegistry.Instance.ResolveMethod(equivalentType, instance.Id.IdName, instance.Ids, local);
+    }
+
+    /// <summary>
+    /// 把实例方法声明的返回类型映射为 IL 栈上的实际类型。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="IlNativeCollectionBridge.Invoke"/> 返回的是已还原的原生值，
+    /// 因此这里必须返回与运行期结果一致的 IL 类型，编译期据此决定是否
+    /// <c>pop</c> / <c>unbox.any</c> / <c>castclass</c>。类型推断也复用同一映射，
+    /// 避免「推断是 object、栈上是 List」产生无效 IL。
+    /// </remarks>
+    internal static Type MapIlBridgeReturnType(Type declared)
+    {
+        if (declared == typeof(void) || declared == typeof(VoidLangValue))
+        {
+            return typeof(void);
+        }
+
+        if (declared == typeof(ListLangValue) || declared == typeof(List<object?>))
+        {
+            return typeof(List<object?>);
+        }
+
+        if (declared == typeof(ArrayLangValue))
+        {
+            return typeof(object?[]);
+        }
+
+        if (declared == typeof(DictionaryLangValue) || declared == typeof(Dictionary<object, object>))
+        {
+            return typeof(Dictionary<object, object?>);
+        }
+
+        if (declared == typeof(TupleLangValue))
+        {
+            return typeof(object?[]);
+        }
+
+        if (declared == typeof(int) || declared == typeof(bool) || declared == typeof(double) ||
+            declared == typeof(char) || declared == typeof(string))
+        {
+            return declared;
+        }
+
+        if (declared.IsArray)
+        {
+            return declared;
+        }
+
+        return typeof(object);
     }
 
     /// <summary>
