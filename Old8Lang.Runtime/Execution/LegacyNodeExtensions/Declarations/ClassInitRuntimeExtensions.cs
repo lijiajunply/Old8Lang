@@ -582,9 +582,95 @@ public static partial class ClassInitRuntimeExtensions
         if (methodName == "init")
         {
             local.CurrentInitMethodBuilder = methodBuilder;
+
+            // 类实例化（U("Alice")）走的是「按实参个数找 init」的路径，
+            // 那里没有补默认参数的逻辑：少传参数会留下未压栈的形参，生成无效 IL。
+            // 这里为带默认值的 init 生成「前缀重载」，让少传参数的构造也能调用完整实现。
+            node.DefineInitializerOverloads(typeBuilder, methodBuilder, parameterTypes, returnType,
+                attributes, funcValue, methodLocal);
         }
 
         return methodBuilder;
+    }
+
+    /// <summary>
+    /// 为带默认参数的 <c>init</c> 生成「前缀重载」。
+    /// </summary>
+    /// <remarks>
+    /// 例如 <c>init(name:string, age: 18, email: "")</c> 会额外生成
+    /// <c>init(name)</c> 与 <c>init(name, age)</c>，内部补上默认值后调用完整实现。
+    /// 这样类实例化路径按实参个数就能找到匹配的构造，不必在调用点补默认值。
+    /// </remarks>
+    private static void DefineInitializerOverloads(
+        this ClassInit node,
+        TypeBuilder typeBuilder,
+        MethodBuilder fullMethod,
+        List<Type> parameterTypes,
+        Type returnType,
+        MethodAttributes attributes,
+        FuncLangValue funcValue,
+        LocalManager local)
+    {
+        if (funcValue.Ids is null || funcValue.Ids.Count == 0 ||
+            !funcValue.Ids.Any(static id => id.DefaultValue is not null))
+        {
+            return;
+        }
+
+        var requiredCount = funcValue.Ids.Count(static id => id.DefaultValue is null);
+
+        for (var supplied = requiredCount; supplied < funcValue.Ids.Count; supplied++)
+        {
+            var overload = typeBuilder.DefineMethod(
+                fullMethod.Name,
+                attributes & ~MethodAttributes.NewSlot | MethodAttributes.HideBySig,
+                returnType,
+                parameterTypes.Take(supplied).ToArray());
+
+            var il = overload.GetILGenerator();
+            il.Emit(OpCodes.Ldarg_0);
+            for (var i = 0; i < supplied; i++)
+            {
+                il.Emit(OpCodes.Ldarg, i + 1);
+            }
+
+            var defaultLocal = new LocalManager
+            {
+                FilePath = local.FilePath,
+                Interpreter = local.Interpreter,
+                InClassEnv = typeBuilder,
+                Globals = local.Globals
+            };
+            foreach (var kvp in local.ClassVar)
+                defaultLocal.ClassVar[kvp.Key] = kvp.Value;
+            foreach (var kvp in local.FieldVar)
+                defaultLocal.FieldVar[kvp.Key] = kvp.Value;
+
+            for (var i = supplied; i < funcValue.Ids.Count; i++)
+            {
+                var defaultExpression = funcValue.Ids[i].DefaultValue!;
+                defaultExpression.Accept(RuntimeVisitors.CreateCompiler(il, defaultLocal));
+
+                var defaultValueType = defaultExpression.Accept(new TypeInferenceVisitor(defaultLocal)) ?? typeof(object);
+                var targetType = parameterTypes[i];
+                if (targetType == typeof(object) && defaultValueType.IsValueType)
+                {
+                    il.Emit(OpCodes.Box, defaultValueType);
+                }
+                else if (targetType.IsValueType && defaultValueType == typeof(object))
+                {
+                    il.Emit(OpCodes.Unbox_Any, targetType);
+                }
+            }
+
+            il.Emit(OpCodes.Call, fullMethod);
+            if (returnType != typeof(void))
+            {
+                il.Emit(OpCodes.Pop);
+            }
+
+            il.Emit(OpCodes.Ret);
+        }
     }
     /// <summary>
     /// 生成运算符重载的桥接方法
