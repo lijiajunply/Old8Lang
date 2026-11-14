@@ -52,6 +52,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问 defer 语句。</summary>
     TResult VisitDeferStatement(DeferStatement node);
 
+    /// <summary>访问 while 语句。</summary>
+    TResult VisitWhileStatement(WhileStatement node);
+
+    /// <summary>访问 using 语句。</summary>
+    TResult VisitUsingStatement(UsingStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

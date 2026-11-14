@@ -1,22 +1,21 @@
-using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// WhileStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// WhileStatement 的解释执行辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class WhileStatement
+internal static class WhileStatementRuntimeExtensions
 {
     /// <summary>
     /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
+    /// <param name="node">while 语句</param>
     /// <param name="manager">变量管理器</param>
-    internal void RunWithGeneratorContext(VariateManager manager)
+    internal static void RunWithGeneratorContext(this WhileStatement node, VariateManager manager)
     {
         manager.ControlFlowManager.PushState();
         var context = manager.GeneratorContext!;
@@ -43,10 +42,10 @@ public partial class WhileStatement
                 manager.ControlFlowManager.ResetCurrentState();
 
                 // 获取条件表达式的值
-                var value = expression.Accept(new InterpreterVisitor(manager));
+                var value = node.Condition.Accept(new InterpreterVisitor(manager));
                 if (value is not BoolLangValue varBool)
                 {
-                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                    throw new TypeError(node, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
                 }
 
                 bool conditionResult = varBool.Value;
@@ -58,7 +57,7 @@ public partial class WhileStatement
                 }
 
                 // 执行循环体
-                blockStatement.Accept(new InterpreterVisitor(manager));
+                node.Block.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)
@@ -98,11 +97,13 @@ public partial class WhileStatement
             manager.ControlFlowManager.PopState();
         }
     }
+
     /// <summary>
     /// 标准 while 循环（非生成器）
     /// </summary>
+    /// <param name="node">while 语句</param>
     /// <param name="manager">变量管理器</param>
-    internal void RunStandard(VariateManager manager)
+    internal static void RunStandard(this WhileStatement node, VariateManager manager)
     {
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
@@ -112,12 +113,11 @@ public partial class WhileStatement
             // 标准 while 循环
             while (true)
             {
-
                 // 获取条件表达式的值
-                var value = expression.Accept(new InterpreterVisitor(manager));
+                var value = node.Condition.Accept(new InterpreterVisitor(manager));
                 if (value is not BoolLangValue varBool)
                 {
-                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                    throw new TypeError(node, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
                 }
 
                 bool conditionResult = varBool.Value;
@@ -134,7 +134,7 @@ public partial class WhileStatement
                 manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
 
                 // 执行循环体
-                blockStatement.Accept(new InterpreterVisitor(manager));
+                node.Block.Accept(new InterpreterVisitor(manager));
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)

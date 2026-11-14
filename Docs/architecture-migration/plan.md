@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`WhileStatement`、`UsingStatement` 迁入 Syntax；生成器路径执行与 using 资源释放辅助
+  移入 Runtime 的 `WhileStatementRuntimeExtensions`/`UsingStatementRuntimeExtensions`。Runtime 生成节点
+  73 → 71，遗留 partial 基线 25 → 23。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、
+  LSP 474/476（2 跳过）、Architecture 43 通过；Compiler.Statements 4 项与 Compiler.Async 65 项失败
+  与基线一致。见 `Reports/2026-11-14-14-20-while与using节点迁移测试.md`。
+
 - 2026-11-14：`IfChild`、`IfStatement`、`DeferStatement` 迁入 Syntax；移除无人调用的
   `IfChild.GenerateConditionIl`。Runtime 生成节点 75 → 73，遗留 partial 基线 26 → 25。
   Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082（并发用例首跑抖动，重跑通过）、
