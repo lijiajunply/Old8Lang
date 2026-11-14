@@ -37,6 +37,7 @@ public class CodeGenConfig
         "LangExpression",
         "LangValueType",
         "IfChild",
+        "ScalarLiteralExpression",
         "DllPathResolver"
     ];
 

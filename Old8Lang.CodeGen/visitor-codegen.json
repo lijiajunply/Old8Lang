@@ -13,6 +13,7 @@
     "LangExpression",
     "LangValueType",
     "IfChild",
+    "ScalarLiteralExpression",
     "DllPathResolver",
     "ClassFieldSetStatement",
     "ClassFuncInitStatement"

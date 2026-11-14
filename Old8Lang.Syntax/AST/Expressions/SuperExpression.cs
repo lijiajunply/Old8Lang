@@ -1,9 +1,3 @@
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression;
@@ -20,6 +14,9 @@ namespace Old8Lang.AST.Expression;
 /// </remarks>
 public partial class SuperExpression(SourcePosition position = default) : LangExpression(position)
 {
+    /// <inheritdoc />
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitSuperExpression(this);
+
 
     public override string ToString()
     {

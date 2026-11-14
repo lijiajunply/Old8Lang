@@ -17,6 +17,6 @@ public partial class YieldStatement
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitYieldStatement(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitYieldStatement(this);
     }
 }

@@ -17,6 +17,6 @@ public partial class FileHeaderDirective
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitFileHeaderDirective(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitFileHeaderDirective(this);
     }
 }

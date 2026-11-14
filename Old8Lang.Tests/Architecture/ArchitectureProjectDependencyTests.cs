@@ -55,6 +55,17 @@ public class ArchitectureProjectDependencyTests
     }
 
     [Fact]
+    public void SyntaxModelEnums_AreDefinedInSyntaxAssembly()
+    {
+        var syntaxAssembly = typeof(Old8Lang.Syntax.LiteralSyntax).Assembly;
+        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Expression.Intermediates.PatternType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Expression.AccessModifierType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.ExternType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.CallingConventionType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.CSharpImportMode).Assembly);
+    }
+
+    [Fact]
     public void LegacyPartialExecutionExtensions_AreArchivedOutsideNodes()
     {
         var root = RequireRepositoryRoot();
@@ -63,7 +74,7 @@ public class ArchitectureProjectDependencyTests
         var oldNodesRoot = Path.Combine(executionRoot, "Nodes");
 
         var archivedFiles = Directory.EnumerateFiles(legacyRoot, "*.Split.cs", SearchOption.AllDirectories).ToArray();
-        Assert.Equal(31, archivedFiles.Length);
+        Assert.Equal(29, archivedFiles.Length);
         Assert.Empty(Directory.EnumerateFiles(oldNodesRoot, "*.Split.cs", SearchOption.AllDirectories));
 
         Assert.All(archivedFiles, file =>

@@ -17,6 +17,6 @@ public partial class VMThreadLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitVMThreadLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitVMThreadLangValue(this);
     }
 }

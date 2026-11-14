@@ -17,6 +17,6 @@ public partial class IfStatement
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitIfStatement(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitIfStatement(this);
     }
 }

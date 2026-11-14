@@ -17,6 +17,6 @@ public partial class TaskLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitTaskLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitTaskLangValue(this);
     }
 }

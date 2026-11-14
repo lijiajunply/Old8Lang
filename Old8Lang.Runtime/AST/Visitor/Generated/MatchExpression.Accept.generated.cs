@@ -17,6 +17,6 @@ public partial class MatchExpression
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitMatchExpression(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitMatchExpression(this);
     }
 }

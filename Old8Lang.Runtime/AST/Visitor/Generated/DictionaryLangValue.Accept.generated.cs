@@ -17,6 +17,6 @@ public partial class DictionaryLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitDictionaryLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitDictionaryLangValue(this);
     }
 }

@@ -17,6 +17,6 @@ public partial class BoolLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitBoolLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitBoolLangValue(this);
     }
 }

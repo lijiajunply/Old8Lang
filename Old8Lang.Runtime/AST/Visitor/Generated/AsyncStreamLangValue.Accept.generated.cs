@@ -17,6 +17,6 @@ public partial class AsyncStreamLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitAsyncStreamLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitAsyncStreamLangValue(this);
     }
 }

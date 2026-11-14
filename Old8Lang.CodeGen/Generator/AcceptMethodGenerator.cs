@@ -58,7 +58,7 @@ public class AcceptMethodGenerator(List<AstNodeInfo> nodes)
         sb.AppendLine("    /// </summary>");
         sb.AppendLine("    public override TResult Accept<TResult>(IVisitor<TResult> visitor)");
         sb.AppendLine("    {");
-        sb.AppendLine($"        return visitor.Visit{node.ClassName}(this);");
+        sb.AppendLine($"        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).Visit{node.ClassName}(this);");
         sb.AppendLine("    }");
 
         sb.AppendLine("}");

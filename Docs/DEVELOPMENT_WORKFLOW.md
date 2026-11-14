@@ -59,19 +59,10 @@ Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按�
 
 - **继承**：表达式继承 `LangExpression`，语句继承 `OldStatement`；两者都实现 `IOldLangTree`，带 `Position`（类型 `SourcePosition`）。
 - **构造函数**：接受 `SourcePosition position`（基类默认参数为 `default`），便于报错定位。
-- **实现 `Accept`**：`Accept<TResult>(IVisitor<TResult> visitor)` 是 Visitor 分发入口，必须由节点自己实现。
-  基类已经给出其余方法的默认实现——`Run()` / `LoadIlValue()` 会各自构造 `InterpreterVisitor` / `CompilerVisitor` 再转发给 `Accept`，
-  所以通常不必在节点里手写解释与 IL 逻辑：
-
-  | 方法 | 所属基类 | 签名 |
-  |------|----------|------|
-  | `Run` | `LangExpression` | `virtual LangValueType Run(VariateManager manager)` |
-  | `LoadIlValue` | `LangExpression` | `virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)` |
-  | `Run` | `OldStatement` | `virtual void Run(VariateManager manager)` |
-  | `GenerateIl` | `OldStatement` | `virtual void GenerateIl(ILGenerator ilGenerator, LocalManager local)` |
-  | `Accept` | 两者 | `abstract TResult Accept<TResult>(IVisitor<TResult> visitor)` |
-
-  注意表达式与语句的 IL 入口不同：表达式是 `LoadIlValue`（把值压栈），语句是 `GenerateIl`。
+- **实现 `Accept`**：`Accept<TResult>(IVisitor<TResult> visitor)` 是 Visitor 分发入口。
+  `LangExpression`、`OldStatement` 和基础 `IVisitor` 位于 `Old8Lang.Syntax`。标量字面量直接调用
+  Syntax 的 Visitor 方法；尚未迁出的 Runtime 节点暂通过 `IRuntimeVisitor` 分发，生成器负责生成这些节点的 `Accept`。
+  执行与 IL 生成逻辑属于各 Visitor，节点基类不再提供 `Run`、`LoadIlValue` 或 `GenerateIl`。
 - **重写 `ToString()`**，用于调试时打印。
 - 新增节点后记得重新生成 `IVisitor`（见第 1 节第 2 步）。
 

@@ -17,6 +17,6 @@ public partial class FuncRunStatement
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitFuncRunStatement(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitFuncRunStatement(this);
     }
 }

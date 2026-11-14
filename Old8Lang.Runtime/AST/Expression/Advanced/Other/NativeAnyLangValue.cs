@@ -153,7 +153,7 @@ public partial class NativeAnyLangValue : ImportInfo
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitNativeAnyLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitNativeAnyLangValue(this);
     }
 
     /// <summary>

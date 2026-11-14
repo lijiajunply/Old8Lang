@@ -76,11 +76,11 @@ public class SyntaxBackendBoundaryTests
     [Fact]
     public void AstNodes_DoNotExposeLegacyExecutionMethods()
     {
-        var assembly = typeof(OldStatement).Assembly;
+        var assemblies = new[] { typeof(OldStatement).Assembly, typeof(LangValueType).Assembly }.Distinct();
         var legacyNames = new[] { "Run", "GenerateIl", "LoadIlValue", "OutputType", "SetValueToIl" };
 
         var violations = new List<string>();
-        foreach (var type in assembly.GetTypes())
+        foreach (var type in assemblies.SelectMany(assembly => assembly.GetTypes()))
         {
             if (type.IsAbstract || type.IsInterface)
             {

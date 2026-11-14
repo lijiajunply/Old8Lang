@@ -17,6 +17,6 @@ public partial class SuperProxy
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitSuperProxy(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitSuperProxy(this);
     }
 }

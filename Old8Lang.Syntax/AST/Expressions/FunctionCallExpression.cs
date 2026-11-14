@@ -1,8 +1,4 @@
-using Old8Lang.Error;
-using Old8Lang.AST.Expression.Value;
-using System.Reflection.Emit;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression;
 
@@ -13,6 +9,9 @@ namespace Old8Lang.AST.Expression;
 /// </summary>
 public partial class FunctionCallExpression : LangExpression
 {
+    /// <inheritdoc />
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitFunctionCallExpression(this);
+
     /// <summary>
     /// 要调用的函数表达式
     /// </summary>
@@ -68,20 +67,4 @@ public partial class FunctionCallExpression : LangExpression
         return $"{FunctionExpression}({argsStr})";
     }
 
-    /// <summary>
-    /// 调用运行期才可确定类型的函数值。
-    /// </summary>
-    /// <param name="callable">待调用的函数值。</param>
-    /// <param name="arguments">位置参数。</param>
-    /// <returns>委托调用结果。</returns>
-    /// <exception cref="InvalidOperationException">当值不是委托时抛出。</exception>
-    public static object? InvokeDynamicDelegate(object? callable, object?[] arguments)
-    {
-        if (callable is not Delegate function)
-        {
-            throw new InvalidOperationException("表达式结果不是可调用的函数值");
-        }
-
-        return function.DynamicInvoke(arguments);
-    }
 }

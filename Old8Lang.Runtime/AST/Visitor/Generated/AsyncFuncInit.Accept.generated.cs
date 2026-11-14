@@ -17,6 +17,6 @@ public partial class AsyncFuncInit
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitAsyncFuncInit(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitAsyncFuncInit(this);
     }
 }

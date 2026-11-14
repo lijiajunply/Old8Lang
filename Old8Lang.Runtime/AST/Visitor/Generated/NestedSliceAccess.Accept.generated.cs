@@ -17,6 +17,6 @@ public partial class NestedSliceAccess
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitNestedSliceAccess(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitNestedSliceAccess(this);
     }
 }

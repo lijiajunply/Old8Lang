@@ -17,6 +17,6 @@ public partial class LinqExpression
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitLinqExpression(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitLinqExpression(this);
     }
 }

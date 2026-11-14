@@ -9,7 +9,7 @@ public partial class FuncLangValue
 {
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
     {
-        return visitor.VisitFuncLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitFuncLangValue(this);
     }
 
 }

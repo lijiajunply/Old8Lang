@@ -12,9 +12,9 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Expression;
 
 /// <summary>
-/// LangId 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// 标识符编译的后端辅助实现。
 /// </summary>
-public partial class LangId
+internal static class LangIdCompilerHelper
 {
     /// <summary>
     /// 在已编译的委托表中查找具名函数（支持 <c>名称$参数类型</c> 形式的带签名键）。

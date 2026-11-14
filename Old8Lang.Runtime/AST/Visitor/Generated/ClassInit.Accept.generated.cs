@@ -17,6 +17,6 @@ public partial class ClassInit
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitClassInit(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitClassInit(this);
     }
 }

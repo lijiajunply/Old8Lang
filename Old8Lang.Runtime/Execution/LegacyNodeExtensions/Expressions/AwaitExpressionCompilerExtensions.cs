@@ -8,17 +8,17 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Expression;
 
 /// <summary>
-/// AwaitExpression 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// await 表达式的 IL 编译辅助实现。
 /// </summary>
-public partial class AwaitExpression
+internal static class AwaitExpressionCompilerExtensions
 {
     /// <summary>
     /// 生成异步状态机相关的等待代码
     /// </summary>
-    internal void GenerateAsyncAwait(ILGenerator il, LocalManager local, Type exprType)
+    internal static void GenerateAsyncAwait(this AwaitExpression node, ILGenerator il, LocalManager local, Type exprType)
     {
         var generator = local.AsyncStateMachineGenerator!;
-        var stateIndex = generator.GetStateIndex(this);
+        var stateIndex = generator.GetStateIndex(node);
 
         // 1. 获取 Awaiter
         // 栈上已有 Task 对象

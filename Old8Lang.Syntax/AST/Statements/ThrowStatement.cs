@@ -1,15 +1,14 @@
-using Old8Lang.Error;
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Compiler.Helpers;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
 public partial class ThrowStatement(LangExpression expression, SourcePosition position = default) : OldStatement(position)
 {
-    internal LangExpression Expression => expression;
+    /// <inheritdoc />
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitThrowStatement(this);
+
+    /// <summary>要抛出的表达式。</summary>
+    public LangExpression Expression => expression;
 
     public override OldStatement? this[int index] => null;
 

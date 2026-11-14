@@ -1,7 +1,7 @@
 # 语法字面量与运行时值的边界盘点
 
 日期：2026-11-14
-状态：阶段 2 首批标量字面量已迁移；集合与运行时值仍待阶段 2/3。
+状态：标量表达式及基础 Visitor 已迁入 Syntax；其余 AST 节点、解析器、集合及运行时值仍待迁移。
 依据：`Docs/architecture-migration/design.md`「语法与运行时分界」
 
 ## 1. 现状
@@ -44,13 +44,15 @@
 
 ## 4. 分离实施建议（阶段 2/3）
 
-1. **标量语法字面量（已完成首批）**：`Old8Lang.Syntax` 提供
+1. **标量语法字面量（进行中）**：`Old8Lang.Syntax` 提供
    `LiteralSyntax(LiteralKind, object? rawValue, SourcePosition)`、`LiteralKind` 与 `ILiteralSyntax`，
-   只依赖 Core。`PrimaryParser` 先产出该语法数据，再由 Runtime 中唯一的
-   `ScalarLiteralRuntimeValueFactory` 转换为既有 `IntLangValue` 等值，避免解析规则直接构造运行时值。
+   只依赖 Core。`PrimaryParser` 产出承载该数据的 `ScalarLiteralExpression`；Visitor 求值或生成代码时
+   经 `ScalarLiteralRuntimeValueFactory` 转换为既有 `IntLangValue` 等值。`LangExpression`、`OldStatement`、
+   `ScalarLiteralExpression` 与标量 Visitor 契约位于 Syntax，解释器以弱键缓存保持同一节点重复求值的
+   原有对象身份。其他 AST 节点、合成字面量与解析器尚未完成程序集级分离。
    标量运行时值暂时实现同一接口，以保持现有公开 AST/Visitor 兼容；它们尚未从 Runtime 移出。
-2. **后续 AST 节点化**：将 `LiteralSyntax` 作为可被 Visitor 分派的独立表达式节点，届时解析器
-   不再在同一轮调用中转换为 `LangValueType`。
+2. **后续 AST 程序集迁移**：将剩余表达式与语句节点及其 Visitor 方法逐步迁入 Syntax，
+   移除临时 `IRuntimeVisitor` 分派；将解析器迁入独立程序集，其余合成字面量与集合也需逐步迁移。
 3. **求值边界**：`InterpreterVisitor`/`CompilerVisitor`/`BytecodeVisitor` 在访问字面量节点时
    创建或复用运行时值；保持现有对象身份、闭包与可变集合语义（同一字面量多次求值不应共享可变状态）。
 4. **类型推断**：`TypeInferenceVisitor` 对字面量节点直接返回静态类型，不再依赖运行时值对象。

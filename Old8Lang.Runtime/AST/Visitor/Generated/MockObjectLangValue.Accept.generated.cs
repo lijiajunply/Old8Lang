@@ -17,6 +17,6 @@ public partial class MockObjectLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitMockObjectLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitMockObjectLangValue(this);
     }
 }

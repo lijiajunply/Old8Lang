@@ -17,6 +17,6 @@ public partial class SetStatement
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitSetStatement(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitSetStatement(this);
     }
 }

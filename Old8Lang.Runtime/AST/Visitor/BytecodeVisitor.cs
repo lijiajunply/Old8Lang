@@ -1,3 +1,5 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.Runtime;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
 using Old8Lang.Bytecode.Core;
@@ -7,7 +9,7 @@ namespace Old8Lang.AST.Visitor;
 /// <summary>
 /// 字节码访问者 - 将AST节点转换为字节码指令
 /// </summary>
-public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instruction?>
+public partial class BytecodeVisitor(BytecodeCompiler compiler) : IRuntimeVisitor<Instruction?>
 {
     private readonly BytecodeCompiler _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
     private readonly List<Instruction> _instructions = [];
@@ -188,6 +190,7 @@ public partial class BytecodeVisitor(BytecodeCompiler compiler) : IVisitor<Instr
     {
         return expr switch
         {
+            ScalarLiteralExpression literal => EvaluateConstantExpression(ScalarLiteralRuntimeValueFactory.Create(literal)),
             IntLangValue intVal => intVal.Value,
             DoubleLangValue doubleVal => doubleVal.Value,
             StringLangValue stringVal => stringVal.Value,

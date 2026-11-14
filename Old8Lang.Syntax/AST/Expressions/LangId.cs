@@ -1,12 +1,4 @@
-using System.Reflection;
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Compiler.Helpers;
-using Old8Lang.Compiler.Specialization;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression;
 
@@ -30,6 +22,9 @@ public partial class LangId(
     bool isParams = false,
     SourcePosition position = default) : LangExpression(position)
 {
+    /// <inheritdoc />
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitLangId(this);
+
 
     /// <summary>
     /// 标识符名称

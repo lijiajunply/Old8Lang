@@ -21,9 +21,9 @@ Old8Lang.App / LanguageServer / Benchmarks / Tests
 
 ## 阶段 1 残留的执行代码
 
-31 个 `Execution/Nodes/*.Split.cs` 已归档到
+基线时 31 个 `Execution/Nodes/*.Split.cs` 已归档到
 `Old8Lang.Runtime/Execution/LegacyNodeExtensions/`，按控制流、声明、表达式和运行时值分类。
-它们仍通过 partial 类型进入 Runtime，因此**不能**被编入未来的语法程序集；这是下一轮按后端迁出的清单，而不是可复制到 Syntax 的源码。
+迁移 `LangId` 与 `AwaitExpression` 时，两个 partial 已改为独立的 Runtime 编译器辅助类，剩余 29 个仍通过 partial 类型进入 Runtime，因此**不能**被编入未来的语法程序集；它们是后续按后端迁出的清单，而不是可复制到 Syntax 的源码。
 
 ## 后续允许的方向
 

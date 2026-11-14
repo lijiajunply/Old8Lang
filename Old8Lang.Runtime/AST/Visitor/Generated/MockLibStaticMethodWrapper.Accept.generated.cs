@@ -17,6 +17,6 @@ public partial class MockLibStaticMethodWrapper
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitMockLibStaticMethodWrapper(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitMockLibStaticMethodWrapper(this);
     }
 }

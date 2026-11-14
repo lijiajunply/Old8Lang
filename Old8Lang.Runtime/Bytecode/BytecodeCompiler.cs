@@ -1,3 +1,5 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.Runtime;
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression.Value;
@@ -1061,6 +1063,7 @@ public class BytecodeCompiler
     {
         return expr switch
         {
+            ScalarLiteralExpression literal => EvaluateConstantExpression(ScalarLiteralRuntimeValueFactory.Create(literal)),
             IntLangValue intVal => intVal.Value,
             DoubleLangValue doubleVal => doubleVal.Value,
             StringLangValue stringVal => stringVal.Value,

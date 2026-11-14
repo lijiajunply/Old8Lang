@@ -48,6 +48,18 @@
 
 ## 进度记录
 
+- 2026-11-14：`FunctionCallExpression` 迁入 Syntax，动态委托执行逻辑移入 Runtime；该节点批次的测试与基线比较见 `Reports/2026-11-14-12-08-函数调用节点迁移测试.md`。第二阶段整体仍未完成。
+
+- 2026-11-14：`AwaitExpression` 与 `ThrowStatement` 迁入 Syntax；await 的 IL 辅助代码改为 Runtime 扩展类。语法、LSP、异步及异常筛选结果见 `Reports/2026-11-14-07-16-await与throw程序集迁移测试.md`；其余节点和解析器仍待拆分。
+
+- 2026-11-14：`LangId`、`ClassMemberId`、`ThisExpression`、`SuperExpression`、`TernaryExpression` 与 `NamedArgument` 迁入 Syntax；`LangId` 的编译器查找辅助方法已脱离 partial。Runtime Visitor 生成节点减至 84，剩余节点及解析器尚待迁移，见 `Reports/2026-11-14-07-11-表达式程序集迁移测试.md`。
+
+- 2026-11-14：`LangExpression`、`OldStatement`、`IOldLangTree`、标量表达式与基础 `IVisitor` 已迁至 Syntax；Runtime 节点暂经 `IRuntimeVisitor` 分派。Syntax-only 宿主、语法/LSP 与解释器/VM 回归通过，完整 AST 与解析器仍未迁移，详见 `Reports/2026-11-14-07-05-语法Visitor程序集测试.md`。
+
+- 2026-11-14：标量源码字面量的解析结果改为 `ScalarLiteralExpression`，四个 Visitor 处理该节点；解释器保留同节点的值身份，VM 默认参数和字段常量支持该节点。此节点仍位于 Runtime，解析器与其他 AST 节点尚未拆分，见 `Reports/2026-11-14-06-56-标量语法迁移测试.md`。
+
+- 2026-11-14：将模式匹配、访问修饰符及 extern 声明的五个纯语法枚举迁入 Syntax，保留命名空间与枚举值；程序集归属门禁通过。完整 AST 和解析器仍待拆分，见 `Reports/2026-11-14-06-54-阶段二语法模型测试.md`。
+
 - 2026-11-14：保存固定字节码样本并新增读取执行回归，编译、序列化及读取执行均通过；
   样本来源和哈希见 `Reports/2026-11-14-07-10-字节码固定样本.md`。公开 API 的完整盘点仍未完成。
 

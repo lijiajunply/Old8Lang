@@ -3,18 +3,6 @@ using Old8Lang.Error;
 namespace Old8Lang.AST.Expression;
 
 /// <summary>
-/// 访问修饰符类型
-/// </summary>
-public enum AccessModifierType
-{
-    Public,
-    Private,
-    Protected,
-    Static,
-    Abstract
-}
-
-/// <summary>
 /// 类成员ID，扩展LangId，支持访问修饰符
 /// </summary>
 public class ClassMemberId : LangId

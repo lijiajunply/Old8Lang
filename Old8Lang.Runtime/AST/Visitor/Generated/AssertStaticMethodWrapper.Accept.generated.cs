@@ -17,6 +17,6 @@ public partial class AssertStaticMethodWrapper
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitAssertStaticMethodWrapper(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitAssertStaticMethodWrapper(this);
     }
 }

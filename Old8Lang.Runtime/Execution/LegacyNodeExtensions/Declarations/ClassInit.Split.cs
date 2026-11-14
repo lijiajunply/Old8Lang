@@ -1,3 +1,4 @@
+using Old8Lang.Syntax;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -233,7 +234,7 @@ public partial class ClassInit
         foreach (var (fieldBuilder, initExpr) in fieldBuilders)
         {
             // 未初始化的值类型字段由 CLR 赋予默认值，不能向其写入 null。
-            if (initExpr is NullLangValue && fieldBuilder.FieldType.IsValueType)
+            if (initExpr is ILiteralSyntax { Kind: LiteralKind.Null } && fieldBuilder.FieldType.IsValueType)
             {
                 continue;
             }

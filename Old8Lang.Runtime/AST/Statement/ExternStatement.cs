@@ -6,58 +6,6 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// Extern 导入类型
-/// </summary>
-public enum ExternType
-{
-    /// <summary>
-    /// C# DLL（托管程序集）
-    /// </summary>
-    CSharpDll,
-
-    /// <summary>
-    /// C/C++ 原生 DLL（P/Invoke）
-    /// </summary>
-    NativeDll,
-
-    /// <summary>
-    /// Python 脚本文件
-    /// </summary>
-    PythonScript,
-
-    /// <summary>
-    /// Python 全局模块
-    /// </summary>
-    PythonModule,
-
-    /// <summary>
-    /// JavaScript 脚本文件
-    /// </summary>
-    JavaScript
-}
-
-/// <summary>
-/// P/Invoke 调用约定类型
-/// </summary>
-public enum CallingConventionType
-{
-    /// <summary>
-    /// Cdecl 调用约定（默认，C 标准）
-    /// </summary>
-    Cdecl,
-
-    /// <summary>
-    /// StdCall 调用约定（Windows API 标准）
-    /// </summary>
-    StdCall,
-
-    /// <summary>
-    /// WinApi 调用约定（等同于 StdCall）
-    /// </summary>
-    WinApi
-}
-
-/// <summary>
 /// 外部函数声明
 /// </summary>
 public class ExternFunctionDeclaration(
@@ -85,32 +33,6 @@ public class ExternFunctionDeclaration(
     /// 调用约定
     /// </summary>
     public CallingConventionType CallingConvention { get; } = callingConvention;
-}
-
-/// <summary>
-/// C# DLL 导入模式
-/// </summary>
-public enum CSharpImportMode
-{
-    /// <summary>
-    /// 单个方法导入
-    /// </summary>
-    SingleMethod,
-
-    /// <summary>
-    /// 批量导入所有方法 (*)
-    /// </summary>
-    AllMethods,
-
-    /// <summary>
-    /// 选择性导入多个方法 { Method1, Method2 }
-    /// </summary>
-    SelectiveMethods,
-
-    /// <summary>
-    /// 类导入
-    /// </summary>
-    ClassImport
 }
 
 /// <summary>

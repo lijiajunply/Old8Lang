@@ -1,3 +1,4 @@
+using Old8Lang.Syntax;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Generators;
@@ -225,7 +226,7 @@ public partial class CompilerVisitor
             }
 
             ilGenerator.Emit(OpCodes.Call,
-                typeof(FunctionCallExpression).GetMethod(nameof(node.InvokeDynamicDelegate))!);
+                typeof(Old8Lang.Runtime.DynamicDelegateInvoker).GetMethod(nameof(Old8Lang.Runtime.DynamicDelegateInvoker.Invoke))!);
             return null;
         }
 
@@ -1155,10 +1156,10 @@ public partial class CompilerVisitor
             // ValueTuple 索引访问
             node.ListId.Accept(this);
 
-            if (node.Key is IntLangValue { Value: >= 0 } intVal)
+            if (node.Key is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int and >= 0 } intLiteral)
             {
                 // 非负常量索引，优化为字段访问
-                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, intVal.Value);
+                Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper.GenerateValueTupleItemAccess(ilGenerator, listType, (int)intLiteral.LiteralValue!);
             }
             else
             {
@@ -1285,9 +1286,9 @@ public partial class CompilerVisitor
         var baseType = node.BaseExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
 
         // 特殊处理 ValueTuple 的常量索引访问
-        if (baseType.FullName?.StartsWith("System.ValueTuple") == true && node.NestedIndex is IntLangValue intValue)
+        if (baseType.FullName?.StartsWith("System.ValueTuple") == true && node.NestedIndex is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int indexValue })
         {
-            var index = intValue.Value;
+            var index = indexValue;
 
             // 只加载基础表达式的结果，不加载索引值
             node.BaseExpression.Accept(this);

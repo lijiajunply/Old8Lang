@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Runtime;
 using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
@@ -38,13 +37,13 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>字符串值</returns>
 
-    public StringLangValue ParseStringLiteral()
+    public ScalarLiteralExpression ParseStringLiteral()
     {
         var stringToken = CurrentToken;
         var position = new SourcePosition(stringToken.Line, stringToken.Column, tokenValue: stringToken.Value);
         var value = stringToken.Value;
         Expect(LangTokenType.String);
-        return (StringLangValue)ScalarLiteralRuntimeValueFactory.Create(LiteralSyntax.String(value, position));
+        return new ScalarLiteralExpression(LiteralSyntax.String(value, position));
     }
 
     /// <summary>
@@ -52,14 +51,14 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>字符值</returns>
 
-    public CharLangValue ParseCharLiteral()
+    public ScalarLiteralExpression ParseCharLiteral()
     {
         var charToken = CurrentToken;
         var position = new SourcePosition(charToken.Line, charToken.Column, tokenValue: charToken.Value);
         var value = charToken.Value;
         Expect(LangTokenType.Char);
 
-        return (CharLangValue)ScalarLiteralRuntimeValueFactory.Create(LiteralSyntax.Char(value, position));
+        return new ScalarLiteralExpression(LiteralSyntax.Char(value, position));
     }
 
     /// <summary>
@@ -67,7 +66,7 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>整数值或双精度浮点数值</returns>
 
-    public LangValueType ParseIntLiteral()
+    public ScalarLiteralExpression ParseIntLiteral()
     {
         var numberToken = CurrentToken;
         var position = CreateSourcePosition(numberToken);
@@ -75,7 +74,7 @@ public partial class PrimaryParser
         Expect(LangTokenType.Number);
 
         if (LiteralSyntax.TryParseInteger(value, position, out var literal))
-            return ScalarLiteralRuntimeValueFactory.Create(literal);
+            return new ScalarLiteralExpression(literal);
 
         throw CreateSyntaxError($"无法解析数字字面量 '{value}'");
     }
@@ -85,14 +84,14 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>双精度值</returns>
 
-    public DoubleLangValue ParseDoubleLiteral()
+    public ScalarLiteralExpression ParseDoubleLiteral()
     {
         var numberToken = CurrentToken;
         var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
         if (LiteralSyntax.TryParseDouble(value, position, out var literal))
-            return (DoubleLangValue)ScalarLiteralRuntimeValueFactory.Create(literal);
+            return new ScalarLiteralExpression(literal);
 
         throw CreateSyntaxError("无法解析双精度字面量");
     }
@@ -102,21 +101,21 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>布尔值</returns>
 
-    public BoolLangValue ParseBoolLiteral()
+    public ScalarLiteralExpression ParseBoolLiteral()
     {
         var boolToken = CurrentToken;
         var position = CreateSourcePosition(boolToken);
         var value = boolToken.Type == LangTokenType.True;
         Expect(boolToken.Type);
-        return (BoolLangValue)ScalarLiteralRuntimeValueFactory.Create(LiteralSyntax.Bool(value, position));
+        return new ScalarLiteralExpression(LiteralSyntax.Bool(value, position));
     }
 
 
-    public NullLangValue ParseNullLiteral()
+    public ScalarLiteralExpression ParseNullLiteral()
     {
         var nullToken = CurrentToken;
         var position = CreateSourcePosition(nullToken);
         Expect(LangTokenType.Null);
-        return (NullLangValue)ScalarLiteralRuntimeValueFactory.Create(LiteralSyntax.Null(position));
+        return new ScalarLiteralExpression(LiteralSyntax.Null(position));
     }
 }

@@ -17,6 +17,6 @@ public partial class TestRunnerStaticMethodWrapper
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitTestRunnerStaticMethodWrapper(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitTestRunnerStaticMethodWrapper(this);
     }
 }

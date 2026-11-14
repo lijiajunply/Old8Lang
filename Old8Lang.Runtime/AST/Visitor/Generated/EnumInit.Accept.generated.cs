@@ -17,6 +17,6 @@ public partial class EnumInit
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitEnumInit(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitEnumInit(this);
     }
 }

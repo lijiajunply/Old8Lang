@@ -42,13 +42,13 @@ public class BasicParsingTests
         
         var setStmt = (SetStatement)result[0];
         Assert.IsType<LangId>(setStmt.Id);
-        Assert.IsType<IntLangValue>(setStmt.Value);
+        Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
         
         var id = (LangId)setStmt.Id;
-        var value = (IntLangValue)setStmt.Value;
+        var value = (ScalarLiteralExpression)setStmt.Value;
         
         Assert.Equal("a", id.IdName);
-        Assert.Equal(10, value.Value);
+        Assert.Equal(10, value.LiteralValue);
     }
     
     [Fact]

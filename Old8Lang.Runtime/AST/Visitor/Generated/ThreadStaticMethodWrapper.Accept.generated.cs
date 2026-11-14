@@ -17,6 +17,6 @@ public partial class ThreadStaticMethodWrapper
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitThreadStaticMethodWrapper(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitThreadStaticMethodWrapper(this);
     }
 }

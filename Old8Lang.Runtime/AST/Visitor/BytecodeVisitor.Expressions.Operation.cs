@@ -1,3 +1,5 @@
+using Old8Lang.Syntax;
+using Old8Lang.Runtime;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
@@ -122,9 +124,9 @@ public partial class BytecodeVisitor
             {
                 typeName = typeValue.ToString();
             }
-            else if (node.Right is StringLangValue stringValue)
+            else if (node.Right is ILiteralSyntax { Kind: LiteralKind.String } stringValue)
             {
-                typeName = stringValue.Value;
+                typeName = ((StringLangValue)ScalarLiteralRuntimeValueFactory.Create(stringValue)).Value;
             }
             else
             {
@@ -153,9 +155,9 @@ public partial class BytecodeVisitor
             {
                 typeName = typeValue.ToString();
             }
-            else if (node.Right is StringLangValue stringValue)
+            else if (node.Right is ILiteralSyntax { Kind: LiteralKind.String } stringValue)
             {
-                typeName = stringValue.Value;
+                typeName = ((StringLangValue)ScalarLiteralRuntimeValueFactory.Create(stringValue)).Value;
             }
             else
             {

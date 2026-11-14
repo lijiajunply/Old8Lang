@@ -17,6 +17,6 @@ public partial class TaskFactoryStaticMethodWrapper
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitTaskFactoryStaticMethodWrapper(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitTaskFactoryStaticMethodWrapper(this);
     }
 }

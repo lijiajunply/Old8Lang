@@ -17,6 +17,6 @@ public partial class MethodOverloadList
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitMethodOverloadList(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitMethodOverloadList(this);
     }
 }

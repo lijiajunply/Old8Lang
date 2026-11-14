@@ -117,7 +117,7 @@ public partial class CompilerVisitor
 
         // 具名函数在 IL 模式下也可以作为「函数值」传递（例如传入 List.FindAll 这类高阶方法）。
         // 这里从已编译的委托表里取出对应的 DynamicMethod，注册成一个委托常量后加载。
-        if (LangId.TryGetFunctionMethod(node.IdName, local, out var functionMethod))
+        if (LangIdCompilerHelper.TryGetFunctionMethod(node.IdName, local, out var functionMethod))
         {
             var functionValueId = CompiledDelegateRegistry.RegisterFunctionValue(functionMethod);
             ilGenerator.Emit(OpCodes.Ldc_I4, functionValueId);

@@ -17,6 +17,6 @@ public partial class DoubleLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitDoubleLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitDoubleLangValue(this);
     }
 }

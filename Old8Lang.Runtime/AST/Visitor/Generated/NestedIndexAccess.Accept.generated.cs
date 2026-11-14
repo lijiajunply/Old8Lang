@@ -17,6 +17,6 @@ public partial class NestedIndexAccess
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitNestedIndexAccess(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitNestedIndexAccess(this);
     }
 }

@@ -1,3 +1,4 @@
+using Old8Lang.Syntax;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
@@ -32,8 +33,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var intValue = Assert.IsType<IntLangValue>(setStmt.Value);
-        Assert.Equal(123, intValue.Value);
+        var intValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Int, intValue.Kind);
+        Assert.Equal(123, (int)intValue.LiteralValue!);
     }
 
     /// <summary>
@@ -54,8 +56,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var intValue = Assert.IsType<IntLangValue>(setStmt.Value);
-        Assert.Equal(0, intValue.Value);
+        var intValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Int, intValue.Kind);
+        Assert.Equal(0, (int)intValue.LiteralValue!);
     }
 
     /// <summary>
@@ -76,8 +79,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var doubleValue = Assert.IsType<DoubleLangValue>(setStmt.Value);
-        Assert.Equal(3.14, doubleValue.Value, 2);
+        var doubleValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Double, doubleValue.Kind);
+        Assert.Equal(3.14, (double)doubleValue.LiteralValue!, 2);
     }
 
     /// <summary>
@@ -98,8 +102,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var doubleValue = Assert.IsType<DoubleLangValue>(setStmt.Value);
-        Assert.Equal(1.23e10, doubleValue.Value, 2);
+        var doubleValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Double, doubleValue.Kind);
+        Assert.Equal(1.23e10, (double)doubleValue.LiteralValue!, 2);
     }
 
     /// <summary>
@@ -120,8 +125,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var doubleValue = Assert.IsType<DoubleLangValue>(setStmt.Value);
-        Assert.Equal(1.23e-5, doubleValue.Value, 10);
+        var doubleValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Double, doubleValue.Kind);
+        Assert.Equal(1.23e-5, (double)doubleValue.LiteralValue!, 10);
     }
 
     #endregion
@@ -146,8 +152,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var stringValue = Assert.IsType<StringLangValue>(setStmt.Value);
-        Assert.Equal("hello", stringValue.Value);
+        var stringValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, stringValue.Kind);
+        Assert.Equal("hello", (string)stringValue.LiteralValue!);
     }
 
     /// <summary>
@@ -168,8 +175,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var stringValue = Assert.IsType<StringLangValue>(setStmt.Value);
-        Assert.Equal("", stringValue.Value);
+        var stringValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, stringValue.Kind);
+        Assert.Equal("", (string)stringValue.LiteralValue!);
     }
 
     /// <summary>
@@ -190,7 +198,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<StringLangValue>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, Assert.IsType<ScalarLiteralExpression>(setStmt.Value).Kind);
     }
 
     #endregion
@@ -215,8 +223,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var charValue = Assert.IsType<CharLangValue>(setStmt.Value);
-        Assert.Equal('x', charValue.Value);
+        var charValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Char, charValue.Kind);
+        Assert.Equal('x', (char)charValue.LiteralValue!);
     }
 
     /// <summary>
@@ -237,7 +246,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<CharLangValue>(setStmt.Value);
+        Assert.Equal(LiteralKind.Char, Assert.IsType<ScalarLiteralExpression>(setStmt.Value).Kind);
     }
 
     #endregion
@@ -262,8 +271,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var boolValue = Assert.IsType<BoolLangValue>(setStmt.Value);
-        Assert.True(boolValue.Value);
+        var boolValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Bool, boolValue.Kind);
+        Assert.True((bool)boolValue.LiteralValue!);
     }
 
     /// <summary>
@@ -284,8 +294,9 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var boolValue = Assert.IsType<BoolLangValue>(setStmt.Value);
-        Assert.False(boolValue.Value);
+        var boolValue = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Bool, boolValue.Kind);
+        Assert.False((bool)boolValue.LiteralValue!);
     }
 
     #endregion
@@ -310,7 +321,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<NullLangValue>(setStmt.Value);
+        Assert.Equal(LiteralKind.Null, Assert.IsType<ScalarLiteralExpression>(setStmt.Value).Kind);
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using Old8Lang.Syntax;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
@@ -211,6 +212,18 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
             // 对于字面量，直接返回其类型
             switch (expr)
             {
+                case ScalarLiteralExpression literal:
+                    var typeName = literal.Kind switch
+                    {
+                        LiteralKind.Int => "int",
+                        LiteralKind.Double => "double",
+                        LiteralKind.String => "string",
+                        LiteralKind.Bool => "bool",
+                        LiteralKind.Char => "char",
+                        _ => null
+                    };
+                    return typeName is null ? null : typeAnnotationManager.GetTypeFamily().GetType(typeName);
+
                 case IntLangValue:
                     return typeAnnotationManager.GetTypeFamily().GetType("int");
 

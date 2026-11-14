@@ -61,7 +61,7 @@ public class VisitorInterfaceGenerator(List<AstNodeInfo> nodes)
         sb.AppendLine("/// Visitor 模式基础接口");
         sb.AppendLine("/// </summary>");
         sb.AppendLine("/// <typeparam name=\"TResult\">返回结果类型</typeparam>");
-        sb.AppendLine("public partial interface IVisitor<out TResult>");
+        sb.AppendLine("public partial interface IRuntimeVisitor<out TResult> : IVisitor<TResult>");
         sb.AppendLine("{");
 
         // Statement 节点

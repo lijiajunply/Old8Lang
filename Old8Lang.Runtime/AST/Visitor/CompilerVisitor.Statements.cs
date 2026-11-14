@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Syntax;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.AST.Expression;
@@ -1515,9 +1516,9 @@ public partial class CompilerVisitor
             {
                 // 有显式赋值，计算表达式的值
                 // 注意：IL 模式下，表达式必须是常量
-                if (memberValueExpr is IntLangValue intValue)
+                if (memberValueExpr is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int intValue })
                 {
-                    currentValue = intValue.Value;
+                    currentValue = intValue;
                 }
                 else
                 {

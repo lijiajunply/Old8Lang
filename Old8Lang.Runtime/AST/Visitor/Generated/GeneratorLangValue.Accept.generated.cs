@@ -17,6 +17,6 @@ public partial class GeneratorLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitGeneratorLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitGeneratorLangValue(this);
     }
 }

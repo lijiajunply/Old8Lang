@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Visitor;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Statement;
 
@@ -20,9 +21,9 @@ public partial class SwitchStatement
         for (int i = 0; i < switchCaseList.Count; i++)
         {
             var oldCase = switchCaseList[i];
-            if (oldCase.Expression is IntLangValue intVal)
+            if (oldCase.Expression is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int intVal })
             {
-                caseValues.Add((intVal.Value, i));
+                caseValues.Add((intVal, i));
             }
             else
             {

@@ -17,6 +17,6 @@ public partial class LangListItem
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitLangListItem(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitLangListItem(this);
     }
 }

@@ -17,6 +17,6 @@ public partial class TaskSchedulerLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitTaskSchedulerLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitTaskSchedulerLangValue(this);
     }
 }

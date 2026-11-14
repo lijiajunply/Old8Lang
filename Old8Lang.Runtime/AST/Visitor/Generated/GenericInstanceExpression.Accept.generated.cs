@@ -17,6 +17,6 @@ public partial class GenericInstanceExpression
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitGenericInstanceExpression(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitGenericInstanceExpression(this);
     }
 }

@@ -5,10 +5,10 @@ using Old8Lang.AST.Expression.Value;
 namespace Old8Lang.AST.Visitor;
 
 /// <summary>
-/// Visitor 接口的手工扩展：这些运行时值类继承自 ImportInfo，
+/// Runtime Visitor 接口的手工扩展：这些运行时值类继承自 ImportInfo，
 /// 生成器按基类字面名筛选时不会纳入，因此在这里显式声明访问方法。
 /// </summary>
-public partial interface IVisitor<out TResult>
+public partial interface IRuntimeVisitor<out TResult> : IVisitor<TResult>
 {
     /// <summary>访问异步函数值节点</summary>
     TResult VisitAsyncFuncLangValue(AsyncFuncLangValue node);

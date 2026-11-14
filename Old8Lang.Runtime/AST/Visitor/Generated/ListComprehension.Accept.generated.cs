@@ -17,6 +17,6 @@ public partial class ListComprehension
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitListComprehension(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitListComprehension(this);
     }
 }

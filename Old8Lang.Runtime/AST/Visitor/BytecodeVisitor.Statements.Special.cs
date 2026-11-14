@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Syntax;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
@@ -268,9 +269,9 @@ public partial class BytecodeVisitor
             if (memberValueExpr is not null)
             {
                 // 有显式赋值，必须是整数常量
-                if (memberValueExpr is IntLangValue intValue)
+                if (memberValueExpr is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int intValue })
                 {
-                    currentValue = intValue.Value;
+                    currentValue = intValue;
                 }
                 else
                 {

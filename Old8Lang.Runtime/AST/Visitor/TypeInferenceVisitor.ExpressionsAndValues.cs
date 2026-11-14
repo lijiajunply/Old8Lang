@@ -1,3 +1,4 @@
+using Old8Lang.Syntax;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Generators;
@@ -904,9 +905,9 @@ return node.Value.GetType();
         {
             // ValueTuple 索引访问
             // 如果索引是非负常量，可以推断出具体的元素类型；负数需要运行期才知道长度
-            if (node.Key is IntLangValue { Value: >= 0 } intValue)
+            if (node.Key is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int and >= 0 } intLiteral)
             {
-                var index = intValue.Value;
+                var index = (int)intLiteral.LiteralValue!;
                 var elementType = node.GetValueTupleElementType(listType, index);
                 if (elementType != null)
                 {
@@ -981,9 +982,9 @@ return node.Value.GetType();
         if (baseType.FullName?.StartsWith("System.ValueTuple") == true)
         {
             // 如果索引是常量，我们可以推断出具体的元素类型
-            if (node.NestedIndex is IntLangValue intValue)
+            if (node.NestedIndex is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int indexValue })
             {
-                var index = intValue.Value;
+                var index = indexValue;
                 var elementType = node.GetValueTupleElementType(baseType, index);
                 if (elementType != null)
                 {

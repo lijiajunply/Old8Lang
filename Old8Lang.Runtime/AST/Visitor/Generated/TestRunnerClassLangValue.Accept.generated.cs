@@ -17,6 +17,6 @@ public partial class TestRunnerClassLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitTestRunnerClassLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitTestRunnerClassLangValue(this);
     }
 }

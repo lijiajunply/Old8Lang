@@ -17,6 +17,6 @@ public partial class CancellationTokenSourceLangValue
     /// </summary>
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return visitor.VisitCancellationTokenSourceLangValue(this);
+        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitCancellationTokenSourceLangValue(this);
     }
 }
