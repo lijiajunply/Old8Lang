@@ -29,14 +29,29 @@ public static class Compiler
     /// <summary>
     /// 调试输出开关，默认为关闭
     /// </summary>
-    public static bool DebugOutputEnabled { get; set; }
+    public static bool DebugOutputEnabled
+    {
+        get => IlCompilerOptions.DebugOutputEnabled;
+        set => IlCompilerOptions.DebugOutputEnabled = value;
+    }
 
     /// <summary>
     /// IL代码验证开关，默认为开启
     /// </summary>
-    public static bool IlVerificationEnabled { get; set; } = true;
+    public static bool IlVerificationEnabled
+    {
+        get => IlCompilerOptions.IlVerificationEnabled;
+        set => IlCompilerOptions.IlVerificationEnabled = value;
+    }
 
-    public static bool EnableAsyncStateMachineAwait { get; set; } = true;
+    /// <summary>
+    /// 启用异步状态机 await 编译。
+    /// </summary>
+    public static bool EnableAsyncStateMachineAwait
+    {
+        get => IlCompilerOptions.EnableAsyncStateMachineAwait;
+        set => IlCompilerOptions.EnableAsyncStateMachineAwait = value;
+    }
 
     /// <summary>
     /// 日志级别枚举，用于控制编译过程中的日志输出
@@ -636,17 +651,7 @@ public static class Compiler
     /// <param name="directives">文件头指令集合</param>
     public static void ApplyHeaderDirectives(FileHeaderDirectives directives)
     {
-        // 处理 debug 指令
-        if (directives.HasDirective("debug"))
-        {
-            DebugOutputEnabled = directives.GetBoolDirective("debug");
-        }
-
-        // 处理 verify-il 指令
-        if (directives.HasDirective("verify-il"))
-        {
-            IlVerificationEnabled = directives.GetBoolDirective("verify-il", true);
-        }
+        IlCompilerOptions.ApplyHeaderDirectives(directives);
 
         // 处理 optimize 指令 (保留用于将来)
         if (directives.HasDirective("optimize"))
@@ -654,18 +659,6 @@ public static class Compiler
             var optimizeLevel = directives.GetIntDirective("optimize");
             // 优化级别处理逻辑将来实现
             LogFormat("优化级别设置为: {0}", LogLevel.Info, optimizeLevel);
-        }
-
-        // 处理 type-inference 指令
-        if (directives.HasDirective("type-inference"))
-        {
-            EnableTypeInference = directives.GetBoolDirective("type-inference", true);
-        }
-
-        // 处理 type-inference-debug 指令
-        if (directives.HasDirective("type-inference-debug"))
-        {
-            TypeInferenceDebugOutput = directives.GetBoolDirective("type-inference-debug");
         }
     }
 }

@@ -1,3 +1,4 @@
+using Old8Lang.Compiler;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
@@ -248,7 +249,7 @@ public partial class AsyncFuncLangValue : ImportInfo
     /// </summary>
     public void GenerateMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
-        if (!Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
+        if (!IlCompilerOptions.EnableAsyncStateMachineAwait)
         {
             local.AsyncStateMachineGenerator = null;
 
@@ -322,7 +323,7 @@ public partial class AsyncFuncLangValue : ImportInfo
         var stateField = stateMachineType.GetField(stateMachineGenerator.StateField!.Name)!;
         var builderField = stateMachineType.GetField(stateMachineGenerator.BuilderField!.Name)!;
 
-        if (Old8Lang.Compiler.Compiler.DebugOutputEnabled)
+        if (IlCompilerOptions.DebugOutputEnabled)
         {
             var moveNext = stateMachineType.GetMethod("MoveNext", BindingFlags.Public | BindingFlags.Instance);
             if (moveNext != null) Console.WriteLine(IlDisassembler.Disassemble(moveNext));

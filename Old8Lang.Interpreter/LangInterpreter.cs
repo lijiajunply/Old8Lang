@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
+using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 using Old8Lang.ModuleSystem.StandardLibrary;
@@ -233,7 +234,7 @@ public class LangInterpreter : ILangInterpreter, ISourceContextProvider
     private void ApplyHeaderDirectives(FileHeaderDirectives directives)
     {
         // 应用到编译器配置
-        Compiler.Compiler.ApplyHeaderDirectives(directives);
+        IlCompilerOptions.ApplyHeaderDirectives(directives);
 
         // 注意：编码指令（encoding）在词法分析阶段已经处理
         // 这里主要处理影响解释器行为的指令

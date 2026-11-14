@@ -188,3 +188,11 @@ Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.Cur
 `Helpers/ExceptionHelper`、`Helpers/TypeConversion`、`Helpers/TaskHelper` 已从 Runtime 迁入
 `Old8Lang.Compiler`。Runtime 保留 `LocalManager` 及 IL 生成缓存、`RuntimeGlobals`/常量注册表、
 `AssertHelper`/`ExceptionWrapper`、泛型特化与类型推断辅助等共享编译契约。
+
+## 阶段 3.12：IL 编译器驱动迁入 IL 后端（2026-11-14）
+
+`Compiler.Compile`、`GlobalVariableAnalysis`、`ILVerifier` 已从 Runtime 迁入
+`Old8Lang.Compiler`。Runtime 新增 `IlCompilerOptions`（调试/IL 验证/异步状态机/类型推断开关与
+文件头指令应用），`Compiler` 的同名属性委托到该选项。Runtime 的 `Compiler/` 只剩
+`LocalManager`、IL 生成缓存、`GlobalVariableScope`、`RuntimeGlobals`/常量注册表、
+`AssertHelper`/`ExceptionWrapper`、泛型特化与 `IlDisassembler` 等共享契约。

@@ -53,16 +53,18 @@
     `FuncLangValue` lambda IL 辅助已迁入 `Old8Lang.Compiler`；`LangInterpreter` 与解释器
     调试器已迁入 `Old8Lang.Interpreter`；VM 执行引擎、字节码编译器、模块加载、VM 调试/分析、
     Interop 与静态类注册已迁入 `Old8Lang.VirtualMachine`，Runtime 只保留字节码格式与
-    `IVirtualMachine`/`IBytecodeCompiler` 契约；`CompiledDelegateRegistry`、`StaticClassCompiler`
-    与四个仅 IL 后端使用的辅助类已迁入 `Old8Lang.Compiler`。`Compiler.Compile` 引擎、
-    解释期作用域状态与其余运行时值 partial 仍待处理。见
+    `IVirtualMachine`/`IBytecodeCompiler` 契约；`CompiledDelegateRegistry`、`StaticClassCompiler`、
+    四个仅 IL 后端使用的辅助类，以及 `Compiler.Compile`/`GlobalVariableAnalysis`/`ILVerifier`
+    已迁入 `Old8Lang.Compiler`，编译开关抽为 Runtime 的 `IlCompilerOptions`。解释期作用域状态、
+    `AsyncFuncLangValue.GenerateMethodBody` 与其余运行时值 partial 仍待处理。见
     `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
     `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`、
     `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`、
     `Reports/2026-11-14-17-09-LangInterpreter迁入解释后端.md`、
     `Reports/2026-11-14-17-12-解释器调试器迁入解释后端.md`、
     `Reports/2026-11-14-17-20-VM引擎与字节码编译器迁出.md`、
-    `Reports/2026-11-14-17-30-编译器辅助类迁入IL后端.md`。
+    `Reports/2026-11-14-17-30-编译器辅助类迁入IL后端.md`、
+    `Reports/2026-11-14-17-40-IL编译器驱动迁入IL后端.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
   契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
@@ -81,6 +83,13 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.12 IL 编译器驱动）：`Compiler.Compile`、`GlobalVariableAnalysis`、`ILVerifier`
+  迁入 `Old8Lang.Compiler`；Runtime 新增 `IlCompilerOptions` 承载编译开关与文件头指令，
+  `AsyncFuncLangValue`/`AsyncStateMachineGenerator` 不再引用具体编译器类型。Architecture 61、
+  VM 1083、Interpreter（排除外部网络用例）1959/1960 通过；Compiler.Expressions 41 项与
+  Lambda 过滤组 4 项失败均与 HEAD 一致。见
+  `Reports/2026-11-14-17-40-IL编译器驱动迁入IL后端.md`。阶段 3 不标记完成。
 
 - 2026-11-14（阶段 3.11 编译器辅助）：`CompiledDelegateRegistry`、`StaticClassCompiler` 与
   `CollectionHelper`/`ExceptionHelper`/`TypeConversion`/`TaskHelper` 迁入 `Old8Lang.Compiler`；

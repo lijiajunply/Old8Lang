@@ -97,6 +97,14 @@ public class BackendAssemblyBoundaryTests
     }
 
     [Fact]
+    public void IlCompilerDriver_LivesInCompilerAssembly_AndOptionsInRuntime()
+    {
+        Assert.Equal("Old8Lang.Compiler", typeof(Old8Lang.Compiler.Compiler).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime",
+            typeof(Old8Lang.Compiler.IlCompilerOptions).Assembly.GetName().Name);
+    }
+
+    [Fact]
     public void BytecodeCompiler_LivesInVirtualMachineAssembly_AndRuntimeOnlySeesContract()
     {
         Assert.Equal("Old8Lang.VirtualMachine", typeof(BytecodeCompiler).Assembly.GetName().Name);

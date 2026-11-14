@@ -1,3 +1,4 @@
+using Old8Lang.Compiler;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -385,7 +386,7 @@ public class AsyncStateMachineGenerator
         il.BeginExceptionBlock();
 
         // --- 状态分发 (Switch) ---
-        int stateCount = Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait ? AwaitStateMap.Count : 0;
+        int stateCount = IlCompilerOptions.EnableAsyncStateMachineAwait ? AwaitStateMap.Count : 0;
         var labels = stateCount > 0 ? new Label[stateCount] : Array.Empty<Label>();
         if (stateCount > 0)
         {

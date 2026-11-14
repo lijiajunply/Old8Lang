@@ -94,3 +94,11 @@ Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 
 字节码格式与共享执行模型（`BytecodeFile`、`Instruction`、`OpCode`、`CallFrame`、`FunctionMetadata`、
 `ClassMetadata`、闭包类型）仍在 `Old8Lang.Runtime`；`ModuleDependency`/`ExportedSymbol` 作为
 `BytecodeFile` 的格式类型留在 Runtime，模块加载实现位于 VM 后端。
+
+### 阶段 3.12：IL 编译器驱动（2026-11-14）
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `Old8Lang.Compiler.Compiler`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 `Old8Lang.Compiler` 并重新编译；`Compile`、`LogLevel`、`CurrentLogLevel` 等公开 API 不变。 |
+| `Old8Lang.Compiler.GlobalVariableAnalysis`、`Old8Lang.Compiler.Verification.ILVerifier` | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。`GlobalVariableScope` 仍在 Runtime，供 `LocalManager` 共享。 |
+| 无 | `Old8Lang.Compiler.IlCompilerOptions`（Runtime） | 共享编译开关与文件头指令入口；`Compiler` 的同名属性委托到该类型。 |
