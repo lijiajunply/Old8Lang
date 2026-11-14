@@ -127,3 +127,11 @@ VM 期的 `Bytecode/`（`BytecodeCompiler`、`VirtualMachine`、指令/元数据
 
 引擎余量（`LangInterpreter`/`VariateManager`、`Compiler/`、`Bytecode/`）仍在 Runtime，
 是下一子阶段的拆分对象。
+
+## 阶段 3.5：编译器专用 IL 代码迁入 IL 后端（2026-11-14）
+
+`ComparisonOpHelper`、`LogicalOpILHelper`、`InOperatorHelper`、
+`NullishCoalescingILHelper`、`NumericBinaryOpHelper`、`TypeCheckILHelper` 与 LINQ 的
+IL 生成（`LinqExpressionRuntimeExtensions`）已从 Runtime 迁入 `Old8Lang.Compiler`。
+Runtime 只保留同时被类型推断使用的 `CanGenerateStreamingQuery` 判定，以及
+`DotOperatorILHelper`（其中 `InferInstanceMethodReturnType` 仍被类型推断调用）。

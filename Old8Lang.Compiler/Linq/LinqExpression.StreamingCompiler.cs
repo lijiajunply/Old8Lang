@@ -10,11 +10,6 @@ namespace Old8Lang.AST.Expression.Linq;
 
 internal static partial class LinqExpressionRuntimeExtensions
 {
-    internal static bool CanGenerateStreamingQuery(this LinqExpression node) =>
-        node.Continuation is null && node.TerminationClause is SelectClause &&
-        node.BodyClauses.Take(node.BodyClauses.LastOrDefault() is OrderByClause ? node.BodyClauses.Count - 1 : node.BodyClauses.Count)
-            .All(clause => clause is LetClause or WhereClause);
-
     // 顺序执行同一行的子句，让 let 值只属于当前范围变量。
     internal static void GenerateStreamingQuery(this LinqExpression node, ILGenerator il, LocalManager local)
     {
