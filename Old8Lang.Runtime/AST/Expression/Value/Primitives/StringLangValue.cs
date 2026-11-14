@@ -204,7 +204,15 @@ public partial class StringLangValue(string context = "", SourcePosition positio
 
     public bool In(LangValueType value)
     {
-        return Value.Contains(value.GetValue<char>());
+        // in 的右操作数是本字符串：左操作数可以是字符（'a' in "abc"），
+        // 也可以是子串（"bc" in "abc"）。原先一律按 char 取值，
+        // 传字符串时会抛 InvalidCastException（String→Char）。
+        return value switch
+        {
+            StringLangValue stringValue => Value.Contains(stringValue.Value, StringComparison.Ordinal),
+            CharLangValue charValue => Value.Contains(charValue.Value),
+            _ => Value.Contains(value.ToString() ?? string.Empty, StringComparison.Ordinal)
+        };
     }
 
     /// <summary>

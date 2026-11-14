@@ -86,9 +86,28 @@ internal static class InOperatorHelper
         // 交换栈顺序：[value, string] -> [string, value]
         SwapStackOrder(ilGenerator, typeof(string), typeof(object));
 
-        // 调用 string.Contains(string) 方法
-        var stringContainsMethod = typeof(string).GetMethod("Contains", [typeof(string)])!;
-        ilGenerator.Emit(OpCodes.Callvirt, stringContainsMethod);
+        // 字符串的 in 既支持字符（'a' in "abc"），也支持子串（"bc" in "abc"）。
+        // 之前固定调用 string.Contains(string)，左操作数若是装箱的 char 会得到 false，
+        // 与解释器不一致。
+        ilGenerator.Emit(OpCodes.Call, typeof(InOperatorHelper).GetMethod(nameof(ContainsText))!);
+    }
+
+    /// <summary>
+    /// 字符串 <c>in</c> 的运行期实现，供 IL 模式调用。
+    /// </summary>
+    /// <remarks>
+    /// 语义与解释器一致：字符按单字符包含判断，字符串按子串（序数）判断，
+    /// 其它类型按显示文本判断。
+    /// </remarks>
+    public static bool ContainsText(string text, object? value)
+    {
+        return value switch
+        {
+            char character => text.Contains(character),
+            string substring => text.Contains(substring, StringComparison.Ordinal),
+            null => false,
+            _ => text.Contains(value.ToString() ?? string.Empty, StringComparison.Ordinal)
+        };
     }
 
     /// <summary>
@@ -199,6 +218,13 @@ internal static class InOperatorHelper
         else if (rightType.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
             GenerateDictionaryContainsKey(ilGenerator, rightType);
+        }
+        // String：必须先于通用 Contains 回退处理。string.Contains(char) 存在，
+        // 通用回退会按左操作数类型（char）选中它，但栈上的值其实是装箱的 object，
+        // 传参类型不符，运行期得到 false（'a' in "abc" 因此恒为 false）。
+        else if (rightType == typeof(string))
+        {
+            GenerateStringContains(ilGenerator);
         }
         // 其他类型：尝试调用 Contains 方法
         else

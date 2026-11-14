@@ -245,6 +245,14 @@
   这样的 3 个元素（`[1>~<1]` → `[2, 1, 0]`，见已完成的扩展范围修复），虚拟机则是空数组。
   两条都需要先定语义再动用例。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
 
+- [ ] **虚拟机 `in` 运算符未实现**：`BytecodeVisitor.VisitOperation` 的二元运算符 switch
+  没有 `LangTokenType.In` 分支，落到 `default: Emit(OpCode.Nop)`，左右操作数都留在栈上，
+  表达式结果就是右操作数：`1 in [1,2,3]` 在 `-vm` 输出 `[1, 2, 3]`、
+  `"a" in {"a":1}` 输出 `{"a": 1}`（解释器与 IL 都是 true）。
+  解释器侧字符串子串 `in` 与 IL 侧字符串 `in` 已于 2026-11-14 修好
+  （见 change `2026-11-14-字符串in运算符/test.md`）；虚拟机需要新增指令并处理字节码序列化。
+  见 change（`2026-11-14-字符串in运算符/test.md` §5）。
+
 - [ ] **IL 模式 match 不支持范围 / 类型 / 元组解构模式与 guard**：
   `MatchExpressionEnhancedTests` 25 项失败（`Match_Range_*`、`Match_TypeMatch_*`、
   `Match_TupleDeconstruction_*`、`Match_Guard_*`）。`VisitMatchExpression` 只识别
