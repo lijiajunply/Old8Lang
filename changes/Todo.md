@@ -212,6 +212,34 @@
   三种模式都输出 `0`/`99`（已在 `-f`/`-il`/`-vm` 实测），不是一元负号。
   已改为 `-({value})`，4 项通过；`Compiler.Expressions` 37→35 失败。
 
+- [x] **IL 模式把 object 当布尔用**：`if obj.method()`、`obj && obj`、`!obj.method()`
+  直接把装箱 bool 的引用交给 `brfalse` / `xor`，按引用判空得到恒真 / 垃圾结果
+  （`if` 值 false 时仍走 true 分支，`!false` 返回 false）。现在只对静态类型为 `object`
+  的操作数追加运行期 `IlValueBridge.ToBoolean`，接入条件（if/elif/while/for/三元）、
+  逻辑运算与一元 `!`；非 object 类型保持原有真值语义。`Compiler.Classes` 16→15、
+  `Compiler.Functions` 57→56 失败，其余组不变。见 change（`2026-11-14-IL布尔条件/test.md`）。
+
+- [ ] **解释器在「循环内 if 里 return + 索引访问字段」时死循环**：
+
+  ```old8
+  class RM {
+      private resources <- {}
+      func init() { this.resources.Add("a") }
+      func has(name:string) -> bool {
+          i <- 0
+          while i < this.resources.Count() {
+              if this.resources[i] == name { return true }
+              i <- i + 1
+          }
+          return false
+      }
+  }
+  ```
+
+  `-f` 无限循环（每次迭代 `i` 都是 0，`i <- i + 1` 不生效），`-il` / `-vm` 正常。
+  去掉循环内的 `if ... return true`，或单独执行 `this.resources[0] == name` 都正常。
+  见 change（`2026-11-14-IL布尔条件/test.md` §5）。
+
 - [ ] **解释器无法在类内访问 `private static` 字段**：
 
   ```old8

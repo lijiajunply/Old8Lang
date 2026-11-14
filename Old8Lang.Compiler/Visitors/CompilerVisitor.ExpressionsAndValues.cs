@@ -282,8 +282,8 @@ public partial class CompilerVisitor
     public object? VisitTernaryExpression(TernaryExpression node)
     {
 
-        // 条件表达式
-        node.Condition.Accept(this);
+        // 条件表达式（object 静态类型统一转换成原生 bool）
+        ConditionIlHelper.EmitBoolOperand(node.Condition, ilGenerator, local);
 
         // 创建条件分支
         var elseLabel = ilGenerator.DefineLabel();
@@ -1907,7 +1907,9 @@ public partial class CompilerVisitor
             switch (operation.Opera)
             {
                 case LangTokenType.Exclamation:
-                    operation.Right?.Accept(new CompilerVisitor(ilGenerator, local));
+                    // object 静态类型（动态方法调用结果等）必须转成原生 bool 再取反，
+                    // 否则 xor 作用在引用上会得到垃圾结果。
+                    ConditionIlHelper.EmitBoolOperand(operation.Right, ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
                     ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
                     return typeof(bool);

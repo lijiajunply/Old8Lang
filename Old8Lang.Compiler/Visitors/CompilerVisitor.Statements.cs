@@ -107,7 +107,7 @@ public partial class CompilerVisitor
         var ifChild = node[0] as IfChild;
         if (ifChild is not null)
         {
-            ifChild.Condition.Accept(this);
+            ConditionIlHelper.EmitBoolOperand(ifChild.Condition, ilGenerator, local);
             ilGenerator.Emit(OpCodes.Brfalse, labelElse);
 
             // if 部分
@@ -123,7 +123,7 @@ public partial class CompilerVisitor
             if (elifChild is not null)
             {
                 var nextElif = ilGenerator.DefineLabel();
-                elifChild.Condition.Accept(this);
+                ConditionIlHelper.EmitBoolOperand(elifChild.Condition, ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Brfalse, nextElif);
 
                 // elif 部分
@@ -198,8 +198,8 @@ public partial class CompilerVisitor
         // 循环开始标签
         ilGenerator.MarkLabel(loopStart);
 
-        // 检查循环条件
-        node.Condition.Accept(this);
+        // 检查循环条件（object 静态类型统一转换成原生 bool）
+        ConditionIlHelper.EmitBoolOperand(node.Condition, ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
 
         node.Block.Accept(this);
@@ -249,8 +249,8 @@ public partial class CompilerVisitor
         // 跳转到循环开始
         ilGenerator.MarkLabel(loopStart);
 
-        // 检查循环条件
-        node.Condition.Accept(this);
+        // 检查循环条件（object 静态类型统一转换成原生 bool）
+        ConditionIlHelper.EmitBoolOperand(node.Condition, ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
 
         node.Block.Accept(this);

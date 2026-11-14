@@ -8,6 +8,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 using Old8Lang.AST.Visitor;
@@ -166,6 +167,27 @@ public static class IlValueBridge
             default:
                 return value;
         }
+    }
+
+    /// <summary>
+    /// 把 IL 运行期的动态值转换为逻辑 / 条件判断所需的原生 <see cref="bool"/>。
+    /// </summary>
+    /// <remarks>
+    /// 静态类型为 <c>object</c> 的表达式（未标注类字段上的方法调用、字典索引结果等）
+    /// 运行期可能是装箱的 <see cref="bool"/> 或语言值 <see cref="BoolLangValue"/>。
+    /// 直接把这种引用当作 <c>bool</c> 参与 <c>brfalse</c> / <c>xor</c> 会按引用是否为空判断，
+    /// 得到恒真或垃圾结果。这里按语言语义严格转换，非布尔值报错（与解释器一致）。
+    /// </remarks>
+    public static bool ToBoolean(object? value)
+    {
+        return value switch
+        {
+            bool boolean => boolean,
+            BoolLangValue boolValue => boolValue.Value,
+            null => false,
+            _ => throw new InvalidOperationError(new SourcePosition(0, 0),
+                $"期望布尔类型，实际得到了 {value.GetType().Name}")
+        };
     }
 
     /// <summary>

@@ -53,12 +53,12 @@ public static class LogicalOpILHelper
         var endLabel = ilGenerator.DefineLabel();
         var falseLabel = ilGenerator.DefineLabel();
 
-        // 加载左操作数
-        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        // 加载左操作数（object 静态类型统一转换成原生 bool）
+        ConditionIlHelper.EmitBoolOperand(left, ilGenerator, local);
         // 如果左操作数为false，跳转到falseLabel
         ilGenerator.Emit(OpCodes.Brfalse, falseLabel);
         // 加载右操作数
-        right.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConditionIlHelper.EmitBoolOperand(right, ilGenerator, local);
         // 右操作数已经在栈上，直接跳转到endLabel
         ilGenerator.Emit(OpCodes.Br, endLabel);
         // 左操作数为false的情况
@@ -103,12 +103,12 @@ public static class LogicalOpILHelper
         var endLabel = ilGenerator.DefineLabel();
         var trueLabel = ilGenerator.DefineLabel();
 
-        // 加载左操作数
-        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        // 加载左操作数（object 静态类型统一转换成原生 bool）
+        ConditionIlHelper.EmitBoolOperand(left, ilGenerator, local);
         // 如果左操作数为true，跳转到trueLabel
         ilGenerator.Emit(OpCodes.Brtrue, trueLabel);
         // 加载右操作数
-        right.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConditionIlHelper.EmitBoolOperand(right, ilGenerator, local);
         // 右操作数已经在栈上，直接跳转到endLabel
         ilGenerator.Emit(OpCodes.Br, endLabel);
         // 左操作数为true的情况
@@ -144,8 +144,8 @@ public static class LogicalOpILHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConditionIlHelper.EmitBoolOperand(left, ilGenerator, local);
+        ConditionIlHelper.EmitBoolOperand(right, ilGenerator, local);
         ilGenerator.Emit(OpCodes.Xor);
         return typeof(bool);
     }

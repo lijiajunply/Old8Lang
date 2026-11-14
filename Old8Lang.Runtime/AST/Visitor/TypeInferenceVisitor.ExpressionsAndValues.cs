@@ -457,6 +457,13 @@ public partial class TypeInferenceVisitor
                 : typeof(object); // 如果找不到对应的类型，说明类还在编译中，返回object
         }
 
+        // 一元 not / ! 恒返回 bool（此前落到末尾返回 null，调用方再兜底成 object，
+        // 条件发射就会对原生 bool 再调一次 ToBoolean，生成无效 IL）
+        if (node.Left is null && node.Opera == LangTokenType.Exclamation)
+        {
+            return typeof(bool);
+        }
+
         // 处理成员访问（Dot操作符）
         if (node.Opera == LangTokenType.Dot && right is LangId rightId)
         {
