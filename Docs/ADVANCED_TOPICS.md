@@ -1717,7 +1717,7 @@ dotnet run --project Old8Lang.App -- jit test.old8
 
 #### 示例代码
 
-- `Old8Lang/AST/Visitor/` - Visitor 实现示例
+- `Old8Lang.Interpreter/Visitors/`、`Old8Lang.Compiler/Visitors/`、`Old8Lang.VirtualMachine/Visitors/` - 四个 Visitor 实现示例
 - `Old8LangLib/` - 标准库实现示例
 - `Old8Lang.Tests/` - 测试用例示例
 

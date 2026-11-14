@@ -16,10 +16,11 @@
 Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按顺序走完，**前一步没过不要进下一步**：
 
 1. **定义 AST 节点**
-   在 `Old8Lang/AST/Expression/` 或 `Old8Lang/AST/Statement/` 新建节点类并实现 `Accept()`，规范见第 2 节。
+   在 `Old8Lang.Syntax/AST/Expressions/` 或 `Old8Lang.Syntax/AST/Statements/` 新建节点类并实现 `Accept()`，规范见第 2 节。
+   （尚未迁出的运行时值节点仍在 `Old8Lang.Runtime/AST/` 下，改动前先看第 4.1 节的程序集对照表。）
 
 2. **重新生成 Visitor 接口**
-   `IVisitor<TResult>` 是**自动生成**的（`Old8Lang/AST/Visitor/Generated/IVisitor.generated.cs`）。新增节点后必须重新生成，
+   `IVisitor<TResult>` 是**自动生成**的（`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs`）。新增节点后必须重新生成，
    否则接口里没有对应的方法：
 
    ```bash
@@ -55,7 +56,7 @@ Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按�
 
 ## 2. AST 节点规范
 
-新建 AST 节点时逐条对照（基类见 `Old8Lang/AST/LangExpression.cs`、`Old8Lang/AST/OldStatement.cs`）：
+新建 AST 节点时逐条对照（基类见 `Old8Lang.Syntax/AST/LangExpression.cs`、`Old8Lang.Syntax/AST/OldStatement.cs`）：
 
 - **继承**：表达式继承 `LangExpression`，语句继承 `OldStatement`；两者都实现 `IOldLangTree`，带 `Position`（类型 `SourcePosition`）。
 - **构造函数**：接受 `SourcePosition position`（基类默认参数为 `default`），便于报错定位。
@@ -66,13 +67,16 @@ Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按�
 - **重写 `ToString()`**，用于调试时打印。
 - 新增节点后记得重新生成 `IVisitor`（见第 1 节第 2 步）。
 
-Visitor 四个实现（`InterpreterVisitor` / `CompilerVisitor` / `BytecodeVisitor` / `TypeInferenceVisitor`，均在 `Old8Lang/AST/Visitor/`）与接口的关系见 [ARCHITECTURE.md §4](./ARCHITECTURE.md#4-visitor-模式详解)。
+Visitor 四个实现与接口的关系见 [ARCHITECTURE.md §4](./ARCHITECTURE.md#4-visitor-模式详解)。它们不在同一个程序集：
+`InterpreterVisitor` 在 `Old8Lang.Interpreter/Visitors/`、`CompilerVisitor` 在 `Old8Lang.Compiler/Visitors/`、
+`BytecodeVisitor` 在 `Old8Lang.VirtualMachine/Visitors/`、`TypeInferenceVisitor` 在 `Old8Lang.Runtime/AST/Visitor/`。
 
 ---
 
 ## 3. 错误处理规范
 
-- 使用 `Old8Lang.Error` 命名空间下的自定义异常（源码在 `Old8Lang/Error/`，按 `Syntax`、`Runtime`、`Semantic`、`IO`、`Concurrency` 等分目录），基类是 `Old8Exception`。不要直接抛 `Exception`。
+- 使用 `Old8Lang.Error` 命名空间下的自定义异常（基类 `Old8Exception` 与 `SyntaxError` 在 `Old8Lang.Core/Error/`，
+  其余按 `Common`、`Runtime`、`Syntax`、`IO`、`TypeSystem` 分目录放在 `Old8Lang.Runtime/Error/`）。不要直接抛 `Exception`。
 - 异常必须携带位置信息，构造函数要能接受 `SourcePosition`，例如 `SyntaxError(SourcePosition position, string message)`。
 - 优先选具体异常类型而非基类：语法错误用 `SyntaxError`，类型错误用 `TypeError` / `TypeInferenceError`，运行时错误用 `RuntimeError`，名称解析用 `NameError`，VM 不支持的特性用 `VmUnsupportedError`。
 

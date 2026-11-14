@@ -48,8 +48,6 @@
 
 - **[架构文档 (ARCHITECTURE.md)](./ARCHITECTURE.md)**
   - 模块划分、Visitor 模式、AST/Parser 结构、类型系统、目录结构。
-- **[架构迁移](./architecture-migration/spec.md)**
-  - 剩余程序集拆分的需求、设计、阶段计划、依赖基线与 C# API 迁移说明。
 - **[开发流程 (DEVELOPMENT_WORKFLOW.md)](./DEVELOPMENT_WORKFLOW.md)**
   - 新语法添加流程、AST 节点与错误处理规范、解析器/类型系统要点、调试与 IL 问题排查。
 - **[测试指南 (TESTING_GUIDE.md)](./TESTING_GUIDE.md)**
@@ -57,7 +55,7 @@
 - **[开发路线图 (ROADMAP.md)](./ROADMAP.md)**
   - 方向性的当前重点与各领域待办入口。
 - **[变更日志 (CHANGELOG.md)](./CHANGELOG.md)**
-  - 按日期的变更记录，含每项改动的起因、修复与已知限制。
+  - 只收「语法」与「API」两类变更的精简记录（收录规则见 [AGENTS.md](../AGENTS.md#changelog-规则)）。
 
 ### 📊 项目待办
 
@@ -67,17 +65,17 @@
 
 ## 快速开始
 
-运行一个 Old8Lang 脚本（示例见 [`examples/`](../examples/)）：
+运行一个 Old8Lang 脚本（示例见 [`examples/`](./examples/)）：
 
 ```bash
-dotnet run --project Old8Lang.App -- -f examples/interpretation_mode_example.old8
+dotnet run --project Old8Lang.App -- -f Docs/examples/interpretation_mode_example.old8
 ```
 
 另外两种模式：
 
 ```bash
-dotnet run --project Old8Lang.App -- -il examples/compilation_mode_example.old8
-dotnet run --project Old8Lang.App -- -vm examples/vm_mode_example.old8
+dotnet run --project Old8Lang.App -- -il Docs/examples/compilation_mode_example.old8
+dotnet run --project Old8Lang.App -- -vm Docs/examples/vm_mode_example.old8
 ```
 
 更多命令请参考 [CLI 指南](./CLI_GUIDE.md)。

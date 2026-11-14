@@ -4,12 +4,7 @@
 > `Old8Lang.Syntax`，三个执行后端分别位于 `Old8Lang.Interpreter`、
 > `Old8Lang.Compiler`、`Old8Lang.VirtualMachine`；`Old8Lang.Runtime` 只保留运行时值、
 > 内置函数、模块/类型系统、字节码格式与最小共享契约。宿主通过 `Old8Lang.Hosting`
-> 组合根显式注册后端与官方模块。详细验收见
-> `Docs/architecture-migration/plan.md` 与 `Reports/` 中的阶段报告。
->
-> 路径说明（2026-11-13）：语言实现的源码根已从历史 `Old8Lang/` 迁至
-> `Old8Lang.Runtime/`。下文尚未逐段改写的 `Old8Lang/...` 路径应读作
-> `Old8Lang.Runtime/...`；明确标为 `Old8Lang.Core/` 的路径除外。
+> 组合根显式注册后端与官方模块。阶段验收记录见 `Reports/` 中的阶段报告。
 
 ## 1. 项目概述
 
@@ -168,7 +163,7 @@ Old8Lang 支持三种执行模式，每种模式有不同的实现机制、性�
 `CreateInterpreter` / `CreateBytecodeCompiler` / `CreateVirtualMachine` 把目录注入执行实例。
 执行上下文克隆出的作用域、闭包捕获与生成器沿用宿主目录；没有宿主上下文的辅助作用域使用
 冻结空目录（失败关闭）。进程级 `StandardLibraryRegistry` 仅作为 CLI/LSP 与无参构造器的兼容边界，
-入口清单与隔离测试见 [architecture-migration/host-module-registry.md](architecture-migration/host-module-registry.md)。
+入口清单与隔离测试由 `Old8Lang.Tests/Architecture/HostModuleIsolationTests.cs` 覆盖。
 
 ### 2.1 模块关系图
 
@@ -371,7 +366,7 @@ dotnet run -- --preview   # 仅预览
 
 #### 4.3.1 InterpreterVisitor (解释执行)
 
-**位置**: `Old8Lang/Interpreter/InterpreterVisitor.cs`
+**位置**: `Old8Lang.Interpreter/Visitors/InterpreterVisitor.cs`
 
 **返回类型**: `object` (运行时值)
 
@@ -401,7 +396,7 @@ public object VisitBinaryExpression(BinaryExpression expr)
 
 #### 4.3.2 CompilerVisitor (IL 代码生成)
 
-**位置**: `Old8Lang/Compiler/CompilerVisitor.cs`
+**位置**: `Old8Lang.Compiler/Visitors/CompilerVisitor.cs`
 
 **返回类型**: `void` (生成 IL 指令到 ILGenerator)
 
@@ -435,7 +430,7 @@ public void VisitBinaryExpression(BinaryExpression expr)
 
 #### 4.3.3 BytecodeVisitor (字节码生成)
 
-**位置**: `Old8Lang/Bytecode/BytecodeVisitor.cs`
+**位置**: `Old8Lang.VirtualMachine/Visitors/BytecodeVisitor.cs`
 
 **返回类型**: `List<Instruction>` (字节码指令序列)
 
@@ -473,7 +468,7 @@ public List<Instruction> VisitBinaryExpression(BinaryExpression expr)
 
 #### 4.3.4 TypeInferenceVisitor (类型推断)
 
-**位置**: `Old8Lang/TypeSystem/TypeInferenceVisitor.cs`
+**位置**: `Old8Lang.Runtime/AST/Visitor/TypeInferenceVisitor.cs`
 
 **返回类型**: `TypeInfo` (推断的类型信息)
 
@@ -522,16 +517,17 @@ public TypeInfo VisitBinaryExpression(BinaryExpression expr)
 - **语法节点不持有执行实现**：`AST/Statement/**`、`AST/Expression/{Core,Advanced,Generics,Async,Linq,Generators}/**`
   的源码不出现 `VariateManager`、`ILGenerator`、`LocalManager`；节点类型也不声明依赖这些类型的
   `Run/GenerateIl/LoadIlValue/OutputType/SetValueToIl` 方法。
-- **执行实现位置**：解释器/IL 实现在 `AST/Visitor/InterpreterVisitor.*`、`CompilerVisitor.*`，
-  类型推断在 `TypeInferenceVisitor.*`，VM 在 `BytecodeVisitor.*`；
+- **执行实现位置**：解释器实现在 `Old8Lang.Interpreter/Visitors/InterpreterVisitor.*`，IL 在
+  `Old8Lang.Compiler/Visitors/CompilerVisitor.*`，VM 在 `Old8Lang.VirtualMachine/Visitors/BytecodeVisitor.*`；
+  类型推断仍在 Runtime，位于 `Old8Lang.Runtime/AST/Visitor/TypeInferenceVisitor.*`。
   节点的编译/执行辅助方法（类型构建、异步状态机、字典/集合 IL 等）位于
   `Old8Lang.Runtime/Execution/LegacyNodeExtensions/**`（partial class 文件），物理上位于 AST 目录之外；
   这是阶段 2 的过渡归档，不属于 Syntax。
 - **门禁测试**：`Old8Lang.Tests/Architecture/SyntaxBackendBoundaryTests.cs`
   以源码扫描 + 反射检查两条测试保证上述边界。
 - **首批字面量边界**：标量字面量已先生成 `Old8Lang.Syntax.LiteralSyntax`，再由 Runtime 的唯一转换点
-  生成既有运行时值；集合与其他 `LangValueType` 子类仍同时承担语法/运行时职责。详见
-  `Docs/architecture-migration/literal-runtime-boundary.md`。
+  生成既有运行时值；集合与其他 `LangValueType` 子类仍同时承担语法/运行时职责。
+  门禁测试见 `Old8Lang.Tests/Architecture/ScalarLiteralSyntaxTests.cs`。
 
 ## 5. AST 节点组织
 
@@ -812,7 +808,7 @@ Old8Lang 支持两种类型系统模式：
 
 #### 7.2.1 TypeChecker (类型检查器)
 
-**位置**: `Old8Lang/TypeSystem/TypeChecker.cs`
+**位置**: `Old8Lang.Runtime/TypeSystem/TypeChecker.cs`
 
 **职责**:
 - 验证类型正确性
@@ -848,7 +844,7 @@ public class TypeChecker
 
 #### 7.2.2 TypeInferenceEngine (类型推断引擎)
 
-**位置**: `Old8Lang/TypeSystem/TypeInferenceEngine.cs`
+**位置**: `Old8Lang.Runtime/TypeSystem/TypeInferenceEngine.cs`
 
 **职责**:
 - 从上下文推断类型
@@ -889,7 +885,7 @@ public class TypeInferenceEngine
 
 #### 7.2.3 GenericTypeInference (泛型类型推断)
 
-**位置**: `Old8Lang/TypeSystem/GenericTypeInference.cs`
+**位置**: `Old8Lang.Runtime/TypeSystem/GenericTypeInference.cs`
 
 **职责**:
 - 推断泛型类型参数
@@ -1149,7 +1145,7 @@ Old8Lang 的优化分解析器与解释器两层。完整的优化技术说明�
 | 层次 | 主要技术 | 实现位置 |
 |------|---------|---------|
 | 解析器 | 零拷贝切片（`Span<T>`）、内存池（`CharBufferPool` / `TokenListPool`）、字符串缓存、算法复杂度修复、递归深度保护、`SourceLines` 预切分 | `Old8Lang.Core/LangParser/LangToken.cs`、`Old8Lang.Core/LangParser/`、`Old8Lang.Syntax/LangParser/Core/ParserContext.cs` |
-| 解释器 | 值类型对象池、作用域字典缓存、函数引用缓存、变量查找多级缓存、递归深度上限 | `Old8Lang.Runtime/AST/`、`Old8Lang.Observability/Profiler/PerformanceMonitor.cs` |
+| 解释器 | 值类型对象池、作用域字典缓存、函数引用缓存、变量查找多级缓存、递归深度上限 | `Old8Lang.Runtime/Interpreter/VariateManager.cs`、`Old8Lang.Runtime/AST/Expression/Value/`、`Old8Lang.Observability/Profiler/PerformanceMonitor.cs` |
 | 监控 | `ParserPerformanceMetrics`（解析器）、`PerformanceMonitor` + `PerformanceReporter`（解释器）、CLI 的 `--perf` 系列参数 | `Old8Lang.Core/LangParser/Optimization/`、`Old8Lang.Observability/Profiler/` |
 
 性能目标、以及「优化前后对比数字」为何不再照抄历史快照，见

@@ -54,9 +54,9 @@ public interface IGlobalFunction
 
 ### 2.3 代码参考
 
-- **接口定义**: `Old8Lang/GlobalFunctions/IGlobalFunction.cs`
-- **函数注册**: `Old8Lang/GlobalFunctions/GlobalFunctionRegistry.cs`
-- **具体实现**: `Old8Lang/GlobalFunctions/Implementations/` (如 `IOFunctions.cs`)
+- **接口定义**: `Old8Lang.Runtime/GlobalFunctions/Core/IGlobalFunction.cs`
+- **函数注册**: `Old8Lang.Runtime/GlobalFunctions/Core/GlobalFunctionRegistry.cs`
+- **具体实现**: `Old8Lang.Runtime/GlobalFunctions/Implementations/` (如 `IOFunctions.cs`)
 
 ---
 

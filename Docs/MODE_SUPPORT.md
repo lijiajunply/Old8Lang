@@ -19,7 +19,7 @@
 
 2026-11 的架构迁移只调整 C# 程序集与宿主组合方式（语法/后端/宿主拆分、模块目录隔离），
 不改变本矩阵中任何语言可见行为；三种模式的执行结果仍以本表为准。宿主模块目录的 C# API
-边界见 [architecture-migration/host-module-registry.md](./architecture-migration/host-module-registry.md)。
+边界由 `Old8Lang.Tests/Architecture/HostModuleIsolationTests.cs` 固化。
 
 ## 图例
 
@@ -377,7 +377,7 @@
    既没有位置信息也不可被语言层 `try/catch` 识别）。
 9. Python / JavaScript / C# DLL 三类 `extern` 未验证；C/C++ P/Invoke 已可用。
 10. **`VMProfiler` / `VMDebugger` / `Disassembler` 三个类是死代码**（2026-10-09 核查）：
-    均在 `Old8Lang/Bytecode/` 下各自定义，但全仓库找不到任何调用点，
+    均在 `Old8Lang.VirtualMachine/Bytecode/` 下设目录各自定义，但全仓库找不到任何调用点，
     因此虚拟机模式目前**没有**可用的性能分析器、调试器与反汇编器。
     可用的调试与性能分析工具都在解释器侧（见上表）。
 11. **Thread 实例方法自 2026-10-10 起可用**：`Then` / `WithTimeout` / `Retry` / `Cancel` 注册在

@@ -771,7 +771,7 @@ dotnet run --project Old8Lang.App -- -f test_performance.old8 --perf --perf-outp
 
 **原理**：用 `Span<T>` / `ReadOnlySpan<char>` 直接在原字符串上切片，避免 `StringBuilder` 与 `Substring` 的对象分配。
 
-**实现位置**：`Old8Lang/LangParser/LangToken.cs`
+**实现位置**：`Old8Lang.Core/LangParser/LangToken.cs`
 
 ```csharp
 // 优化前：逐字符 Append 再 ToString
@@ -788,7 +788,7 @@ var numberStr = new string(numberSpan);
 
 ### 内存池化 (Memory Pooling)
 
-**实现位置**：`Old8Lang/LangParser/Optimization/CharBufferPool.cs`、`TokenListPool.cs`
+**实现位置**：`Old8Lang.Core/LangParser/Optimization/CharBufferPool.cs`、`TokenListPool.cs`
 
 ```csharp
 // 字符缓冲区：Dispose 时自动归还
@@ -812,7 +812,7 @@ finally
 
 ### 字符串缓存 (String Caching)
 
-**实现位置**：`Old8Lang/LangParser/Optimization/StringCache.cs`
+**实现位置**：`Old8Lang.Core/LangParser/Optimization/StringCache.cs`
 
 用 `ConcurrentDictionary` 缓存**长度 ≤ 64** 的字符串，默认上限 10000 条，缓存满时拒绝新条目。
 
@@ -828,7 +828,7 @@ Console.WriteLine($"命中率: {stats.HitRate:P2}");
 
 ### 算法优化：文档注释合并的 O(n²) → O(n)
 
-**实现位置**：`Old8Lang/LangParser/LangToken.cs:818-879`
+**实现位置**：`Old8Lang.Core/LangParser/LangToken.cs:818-879`
 
 ```csharp
 // 优化前：每次 InsertRange(0, group) 都要移动全部已有元素
@@ -843,7 +843,7 @@ relevantDocs.Reverse();
 
 ### 递归深度保护
 
-**实现位置**：`Old8Lang/LangParser/Core/ParserContext.cs`、`Old8Lang/LangParser/Parsers/ExpressionParser.cs`
+**实现位置**：`Old8Lang.Core/LangParser/Core/ParserContext.cs`、`Old8Lang.Syntax/LangParser/Parsers/ExpressionParser.cs`
 
 ```csharp
 Context.EnterRecursion();
@@ -861,7 +861,7 @@ finally
 
 ### 预计算：SourceLines 提前切分
 
-**实现位置**：`Old8Lang/LangParser/Core/ParserContext.cs`
+**实现位置**：`Old8Lang.Core/LangParser/Core/ParserContext.cs`
 
 ```csharp
 // 优化前：延迟初始化，报错路径上可能重复切分
@@ -954,7 +954,7 @@ Console.WriteLine(reporter.GenerateTextReport(metrics));
 
 ### 解析器：ParserPerformanceMetrics
 
-**实现位置**：`Old8Lang/LangParser/Optimization/ParserPerformanceMetrics.cs`
+**实现位置**：`Old8Lang.Core/LangParser/Optimization/ParserPerformanceMetrics.cs`
 
 ```csharp
 var (metrics, stopwatch, memoryBefore, gc0Before, gc1Before, gc2Before) =

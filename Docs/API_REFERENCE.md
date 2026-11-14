@@ -8,7 +8,7 @@
 > 以及**标准库方法名与实现对不上**（如 `File.Read` 实际叫 `File.FileRead`，
 > `Time.Now` 实际叫 `Time.GetLocalTime`）。
 >
-> 重建办法：从 `Old8LangLib/`、`Old8Lang/GlobalFunctions/`、`Old8Lang/InstanceMethods/`
+> 重建办法：从 `Old8LangLib/`、`Old8Lang.Runtime/GlobalFunctions/`、`Old8Lang.Runtime/InstanceMethods/`
 > 与 `StandardLibraryRegistry` 提取真实签名，再抽样实跑验证。本文档中的方法名均取自实现。
 >
 > **注意**：用 `-s` 做语法检查**不能**发现这类错误——动态类型语言里未定义的函数照样通过解析。

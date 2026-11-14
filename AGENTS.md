@@ -43,6 +43,10 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
    例外：关键场景的「粗阈值」用例（阈值放到实测值 5~10 倍）标 `[Trait("Category", "PerformanceSmoke")]`，
    它们会随默认档一起跑。详见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md#11-性能并发用例分档)。
 6. **测试中发现与本任务无关的错误**，不要顺手改，记录到 `Todo.md`；不再使用的测试文件及时删除。
+7. **新增代码先定程序集**：语法节点/解析器进 `Old8Lang.Syntax`，运行时值与共享契约进 `Old8Lang.Runtime`，
+   各执行能力进各自后端；Runtime 不引用后端，三个后端互不引用，官方模块只由 `Old8Lang.Hosting` 的
+   组合根注册。对照表与约束见 [Docs/DEVELOPMENT_WORKFLOW.md §4.1](Docs/DEVELOPMENT_WORKFLOW.md#41-程序集边界与宿主模块迁移后)，
+   改动模块装配或作用域派生后跑 `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --filter "FullyQualifiedName~Old8Lang.Tests.Architecture"`。
 
 以上规则的完整说明见 [Docs/TESTING_GUIDE.md](Docs/TESTING_GUIDE.md)。
 
@@ -62,7 +66,36 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
 ## 架构速览
 
-`LangParser` 把源码解析成 AST；同一棵 AST 由不同 Visitor 处理成三种执行方式——`InterpreterVisitor`（解释）、`CompilerVisitor`（生成 IL）、`BytecodeVisitor`（生成字节码），另有 `TypeInferenceVisitor` 做类型推断。四个 Visitor 都在 `Old8Lang.Runtime/AST/Visitor/`，`IVisitor` 接口是自动生成的，新增 AST 节点后需要重新生成。
+`Old8Lang.Syntax/LangParser/LangParser.cs` 把源码解析成 AST，语法节点在 `Old8Lang.Syntax/AST/Expressions/`、
+`Old8Lang.Syntax/AST/Statements/`，基类 `LangExpression`、`OldStatement` 在 `Old8Lang.Syntax/AST/`。
+同一棵 AST 由不同 Visitor 处理成三种执行方式，**四个 Visitor 分属不同程序集**：
+
+| Visitor | 位置 | 作用 |
+|---------|------|------|
+| `InterpreterVisitor` | `Old8Lang.Interpreter/Visitors/` | 解释执行 |
+| `CompilerVisitor` | `Old8Lang.Compiler/Visitors/` | 生成 IL |
+| `BytecodeVisitor` | `Old8Lang.VirtualMachine/Visitors/` | 生成字节码 |
+| `TypeInferenceVisitor` | `Old8Lang.Runtime/AST/Visitor/` | 类型推断（仍在 Runtime） |
+
+`IVisitor<TResult>` 接口是自动生成的（`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs`），
+新增 AST 节点后必须用 `Old8Lang.CodeGen` 重新生成；扫描目录与输出目录见 `Old8Lang.CodeGen/visitor-codegen.json`。
+
+程序集分层（箭头指向被引用方，下层不得引用上层，三个后端互不引用）：
+
+```text
+Old8Lang.App / LanguageServer / Benchmarks / Tests
+        ↓
+Old8Lang.Hosting（组合根：显式注册后端与官方模块）+ Old8Lang.Modules.Official（官方模块绑定）
+        ↓
+Old8Lang.Interpreter / Old8Lang.Compiler / Old8Lang.VirtualMachine
+        ↓
+Old8Lang.Runtime（运行时值、内置函数、模块/类型系统、字节码格式、共享契约）
+        ↓
+Old8Lang.Syntax（语法节点 + 解析器）→ Old8Lang.Core（源位置、诊断、词法、预处理）
+```
+
+侧向不依赖执行后端的程序集：`Old8Lang.Concurrency`、`Old8Lang.Observability`、`Old8Lang.ProjectSystem`、
+`Old8Lang.Modules.Abstractions`。
 
 详细内容见 [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md)：
 
@@ -73,19 +106,29 @@ dotnet run --project Old8Lang.App -- -s  <file.old8>   # 只做语法检查
 
 ## 主要项目
 
-| 项目 | 说明 |
-|------|------|
-| `Old8Lang.Core/` | 后端无关基础（源位置、诊断、词法、预处理、解析上下文与文档注释模型） |
-| `Old8Lang.Concurrency/` | 并发资源、线程调度与同步原语（不依赖语言执行后端） |
-| `Old8Lang.Observability/` | 性能监控、分析与报告模型（通过 Runtime 注入对象池统计） |
-| `Old8Lang.ProjectSystem/` | 项目配置与环境配置（不含运行时包加载） |
-| `Old8Lang.Runtime/` | 语言执行实现（AST、语法解析、解释器、IL、VM、类型系统） |
-| `Old8Lang.App/` | 命令行应用 |
-| `Old8LangLib/` | 标准库（数学、字符串、文件、集合） |
-| `Old8Lang.Tests/` | xUnit 单元测试 |
-| `Old8Lang.Benchmarks/` | 性能基准测试 |
-| `Old8Lang.NetLib/`、`Old8Lang.SerializationLib/`、`Old8Lang.DatabaseLib/`、`Old8Lang.MachineLearningLib/` | 扩展库 |
-| `Old8Lang.LanguageServer/`、`vscode-old8lang/` | LSP 服务与 VS Code 扩展 |
+解决方案共 22 个程序集，按层列出（依赖方向见上方「架构速览」的分层图）：
+
+| 层 | 项目 | 说明 |
+|----|------|------|
+| 基础 | `Old8Lang.Core/` | 源位置、语言元数据、`Old8Exception`/`SyntaxError`、词法与预处理器、文档注释模型（只引用 BCL） |
+| 语法 | `Old8Lang.Syntax/` | `LangParser` 与全部专用解析器、AST 语法节点、`IVisitor` 生成模型（只引用 Core） |
+| 运行时 | `Old8Lang.Runtime/` | 运行时值（`LangValueType` 及子类）、内置函数、实例方法与模块/类型系统、字节码格式、共享契约与执行状态（`RuntimeVisitors`、`ILangInterpreter`、`IVirtualMachine`、`IBytecodeCompiler`）、`TypeInferenceVisitor` |
+| 后端 | `Old8Lang.Interpreter/` | `InterpreterVisitor`、`LangInterpreter`、解释器调试器 |
+| 后端 | `Old8Lang.Compiler/` | `CompilerVisitor`、`Compiler` 驱动、IL 辅助与验证、异步状态机 |
+| 后端 | `Old8Lang.VirtualMachine/` | `BytecodeVisitor`、`BytecodeCompiler`、VM 引擎、VM 调试/分析/Interop |
+| 装配 | `Old8Lang.Hosting/` | 组合根：`Old8HostBuilder`/`Old8Host`，逐宿主装配三个后端与官方模块目录（`StandardLibraryCatalog`，类型在 Runtime） |
+| 装配 | `Old8Lang.Modules.Abstractions/` | 模块描述接口（不含任何扩展程序集绑定） |
+| 装配 | `Old8Lang.Modules.Official/` | 官方模块的具体类型绑定（标准库与扩展库） |
+| 侧向 | `Old8Lang.Concurrency/` | 并发资源、线程调度与同步原语（不依赖执行后端） |
+| 侧向 | `Old8Lang.Observability/` | 性能监控、分析与报告模型（对象池统计由 Runtime 注入） |
+| 侧向 | `Old8Lang.ProjectSystem/` | `o8package.json` 与环境配置（不含运行时包加载） |
+| 工具 | `Old8Lang.CodeGen/` | 生成 `IVisitor` 接口、标记 `partial`、生成 Visitor 骨架 |
+| 应用 | `Old8Lang.App/` | 命令行应用 |
+| 应用 | `Old8Lang.LanguageServer/`、`vscode-old8lang/` | LSP 服务与 VS Code 扩展 |
+| 扩展库 | `Old8LangLib/` | 标准库（数学、字符串、文件、集合、JSON、向量） |
+| 扩展库 | `Old8Lang.NetLib/`、`Old8Lang.SerializationLib/`、`Old8Lang.DatabaseLib/`、`Old8Lang.MachineLearningLib/` | 网络、序列化、数据库、机器学习 |
+| 测试 | `Old8Lang.Tests/` | xUnit 单元测试（含 `Architecture/` 程序集边界测试） |
+| 测试 | `Old8Lang.Benchmarks/` | 性能基准测试 |
 
 ## 文档索引
 
