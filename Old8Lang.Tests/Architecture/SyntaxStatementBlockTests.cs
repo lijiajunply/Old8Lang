@@ -57,8 +57,7 @@ public class SyntaxStatementBlockTests
     {
         var func = new FuncInit(new FunctionSyntax(new LangId("f"), [], new BlockStatement([]), null, null, null, isAsync: false));
         var asyncFunc = new AsyncFuncInit(new FunctionSyntax(new LangId("g"), [], new BlockStatement([]), null, null, null, isAsync: true));
-        var classInit = new ClassInit(new TypeTemplate("C",
-            new Dictionary<ClassMemberId, LangExpression>(), new Dictionary<ClassMemberId, LangExpression>()));
+        var classInit = new ClassInit(new ClassSyntax("C", new BlockStatement([])));
         var native = new NativeStatement("native.dll", "NativeClass", "Method", "method");
         var externStatement = new ExternStatement("extern.dll", []);
 
@@ -81,7 +80,7 @@ public class SyntaxStatementBlockTests
         var program = new Old8Lang.LangParser.LangParser(LangInterpreter.Tokenize(code), code).ParseProgram();
         var classInit = Assert.IsType<ClassInit>(Assert.Single(program.ImportStatements));
 
-        var template = classInit.AnyValue;
+        var template = classInit.GetTypeTemplate();
         Assert.Contains(template.Variates.Keys, id => id.IdName == "x");
         Assert.Contains(template.Variates.Keys, id => id.IdName == "get");
         Assert.Contains(template.StaticVariates.Keys, id => id.IdName == "PI");

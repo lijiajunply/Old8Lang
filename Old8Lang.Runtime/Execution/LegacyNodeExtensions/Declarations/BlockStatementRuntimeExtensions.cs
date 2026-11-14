@@ -210,12 +210,12 @@ public static class BlockStatementRuntimeExtensions
                 return (memberId2, Expr: init.GetFuncValue());
             case ClassFuncInitStatement classFuncInit:
                 // 直接使用 ClassFuncInitStatement 中的 ClassMemberId
-                return (id: classFuncInit.Id, Expr: classFuncInit.FuncValue);
+                return (id: classFuncInit.Id, Expr: classFuncInit.GetFuncValue());
             case ClassInit classInit:
                 // 对于嵌套类，创建一个特殊的ClassMemberId来标识它
-                var nestedClassId = new ClassMemberId(classInit.AnyValue.ClassName, "", [], classInit.Position);
+                var nestedClassId = new ClassMemberId(classInit.GetTypeTemplate().ClassName, "", [], classInit.Position);
                 // 将嵌套类作为TypeTemplate存储
-                return (id: nestedClassId, Expr: classInit.AnyValue);
+                return (id: nestedClassId, Expr: classInit.GetTypeTemplate());
             default:
                 return (null, null);
         }

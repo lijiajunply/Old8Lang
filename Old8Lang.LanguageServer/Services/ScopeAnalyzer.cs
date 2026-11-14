@@ -215,7 +215,7 @@ public class ScopeAnalyzer(
     /// </summary>
     private void FindLocalSymbolsInClass(ClassInit classInit)
     {
-        var typeTemplate = classInit.AnyValue;
+        var typeTemplate = classInit.GetTypeTemplate();
         var cursorLine = position.Line + 1;
 
         // 检查是否在类的某个方法内

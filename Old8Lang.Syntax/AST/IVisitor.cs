@@ -110,6 +110,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问异步函数声明。</summary>
     TResult VisitAsyncFuncInit(AsyncFuncInit node);
 
+    /// <summary>访问类声明。</summary>
+    TResult VisitClassInit(ClassInit node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

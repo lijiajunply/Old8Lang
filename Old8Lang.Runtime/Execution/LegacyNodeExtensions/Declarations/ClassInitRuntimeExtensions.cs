@@ -15,23 +15,31 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// ClassInit 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// ClassInit 的执行/编译辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class ClassInit
+public static partial class ClassInitRuntimeExtensions
 {
+    /// <summary>运算符方法名集合。</summary>
+    private static readonly HashSet<string> OperatorNames =
+    [
+        "_add", "_sub", "_mul", "_div", "_mod", "_pow",
+        "_eq", "_lt", "_gt", "_le", "_ge",
+        "_getitem", "_setitem"
+    ];
+
     /// <summary>
     /// 递归注册嵌套类
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    internal void RegisterNestedClasses(VariateManager manager)
+    internal static void RegisterNestedClasses(this ClassInit node, VariateManager manager)
     {
         // 查找Variates中的嵌套类
-        foreach (var (_, memberExpr) in _anyValue.Variates)
+        foreach (var (_, memberExpr) in node.GetTypeTemplate().Variates)
         {
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
                 // 递归注册嵌套类的嵌套类
-                var nestedClassInit = new ClassInit(nestedTypeTemplate, nestedTypeTemplate.Position);
+                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(nestedTypeTemplate);
                 nestedClassInit.RegisterNestedClasses(manager);
 
                 // 注册嵌套类到管理器
@@ -40,12 +48,12 @@ public partial class ClassInit
         }
 
         // 查找StaticVariates中的嵌套类
-        foreach (var (_, memberExpr) in _anyValue.StaticVariates)
+        foreach (var (_, memberExpr) in node.GetTypeTemplate().StaticVariates)
         {
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
                 // 递归注册嵌套类的嵌套类
-                var nestedClassInit = new ClassInit(nestedTypeTemplate, nestedTypeTemplate.Position);
+                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(nestedTypeTemplate);
                 nestedClassInit.RegisterNestedClasses(manager);
 
                 // 注册嵌套类到管理器
@@ -56,14 +64,14 @@ public partial class ClassInit
     /// <summary>
     /// 定义类的字段
     /// </summary>
-    internal List<(FieldBuilder, LangExpression)> DefineFields(TypeBuilder typeBuilder, LocalManager local)
+    internal static List<(FieldBuilder, LangExpression)> DefineFields(this ClassInit node, TypeBuilder typeBuilder, LocalManager local)
     {
         var fields = new List<(ClassMemberId, LangExpression)>();
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
-        if (_anyValue.ParentClassName is not null &&
-            local.ClassVar.TryGetValue(_anyValue.ParentClassName, out var parentType))
+        if (node.GetTypeTemplate().ParentClassName is not null &&
+            local.ClassVar.TryGetValue(node.GetTypeTemplate().ParentClassName, out var parentType))
         {
             // 继承字段（含 protected）需要在子类方法中参与类型推断与直接访问。
             var parentFields = parentType.GetFields(
@@ -75,7 +83,7 @@ public partial class ClassInit
             }
         }
 
-        foreach (var variate in _anyValue.Variates.Concat(_anyValue.StaticVariates))
+        foreach (var variate in node.GetTypeTemplate().Variates.Concat(node.GetTypeTemplate().StaticVariates))
         {
             if (variate.Value is not FuncLangValue && variate.Value is not MethodOverloadList)
             {
@@ -146,11 +154,11 @@ public partial class ClassInit
     /// <summary>
     /// 定义类的方法
     /// </summary>
-    internal void DefineMethods(TypeBuilder typeBuilder, LocalManager local)
+    internal static void DefineMethods(this ClassInit node, TypeBuilder typeBuilder, LocalManager local)
     {
         var methods = new List<(ClassMemberId, FuncLangValue)>();
 
-        foreach (var variate in _anyValue.Variates)
+        foreach (var variate in node.GetTypeTemplate().Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
@@ -168,16 +176,16 @@ public partial class ClassInit
         // 定义实例方法
         foreach (var (memberId, funcValue) in methods)
         {
-            DefineMethod(typeBuilder, memberId, funcValue, local);
+            node.DefineMethod(typeBuilder, memberId, funcValue, local);
         }
 
         // 静态成员存放在独立的 StaticVariates 表中，不能遗漏，否则 IL 类型只会
         // 声明实例成员，诸如 Base.count / Derived.increment() 会被当作普通变量处理。
-        foreach (var (memberId, memberValue) in _anyValue.StaticVariates)
+        foreach (var (memberId, memberValue) in node.GetTypeTemplate().StaticVariates)
         {
             if (memberValue is FuncLangValue funcValue)
             {
-                DefineMethodInternal(typeBuilder, memberId, funcValue, local,
+                node.DefineMethodInternal(typeBuilder, memberId, funcValue, local,
                     MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig);
             }
         }
@@ -187,15 +195,15 @@ public partial class ClassInit
     /// </summary>
     /// <param name="typeBuilder">类型构建器</param>
     /// <param name="local">局部变量管理器</param>
-    internal void DefineInterfaceMembers(TypeBuilder typeBuilder, LocalManager local)
+    internal static void DefineInterfaceMembers(this ClassInit node, TypeBuilder typeBuilder, LocalManager local)
     {
         // 接口只能有方法，不能有字段
-        foreach (var variate in _anyValue.Variates)
+        foreach (var variate in node.GetTypeTemplate().Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
                 // 接口方法必须是抽象的，不能有实现
-                DefineInterfaceMethod(typeBuilder, variate.Key, funcValue, local);
+                node.DefineInterfaceMethod(typeBuilder, variate.Key, funcValue, local);
             }
         }
     }
@@ -206,7 +214,7 @@ public partial class ClassInit
     /// <param name="baseType">基类类型</param>
     /// <param name="fieldBuilders">字段列表</param>
     /// <param name="local">局部变量管理器</param>
-    internal void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders, LocalManager local)
+    internal static void DefineConstructor(this ClassInit node, TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders, LocalManager local)
     {
         // 定义无参数构造函数
         var constructorBuilder = typeBuilder.DefineConstructor(
@@ -276,7 +284,7 @@ public partial class ClassInit
     /// <param name="memberId">成员ID</param>
     /// <param name="funcValue">函数值</param>
     /// <param name="local">局部变量管理器</param>
-    internal void DefineInterfaceMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal static void DefineInterfaceMethod(this ClassInit node, TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local)
     {
         // 获取方法名称
@@ -358,10 +366,10 @@ public partial class ClassInit
     /// <param name="funcValue">函数值</param>
     /// <param name="local">局部变量管理器</param>
     /// <returns>方法构建器</returns>
-    internal MethodBuilder DefineMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal static MethodBuilder DefineMethod(this ClassInit node, TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local)
     {
-        return DefineMethodInternal(typeBuilder, memberId, funcValue, local, 
+        return node.DefineMethodInternal(typeBuilder, memberId, funcValue, local, 
             MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig);
     }
     /// <summary>
@@ -373,7 +381,7 @@ public partial class ClassInit
     /// <param name="local">局部变量管理器</param>
     /// <param name="attributes">方法属性</param>
     /// <returns>方法构建器</returns>
-    internal MethodBuilder DefineMethodInternal(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
+    internal static MethodBuilder DefineMethodInternal(this ClassInit node, TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local, MethodAttributes attributes)
     {
         // 获取方法名称
@@ -502,7 +510,7 @@ public partial class ClassInit
         // 检查是否是运算符重载方法，如果是，生成桥接方法
         if (OperatorNames.Contains(methodName))
         {
-            GenerateOperatorBridge(typeBuilder, methodName, methodBuilder, parameterTypes.ToArray(), returnType);
+            node.GenerateOperatorBridge(typeBuilder, methodName, methodBuilder, parameterTypes.ToArray(), returnType);
         }
 
         // 如果是 init 方法，保存到 LocalManager
@@ -516,7 +524,7 @@ public partial class ClassInit
     /// <summary>
     /// 生成运算符重载的桥接方法
     /// </summary>
-    internal void GenerateOperatorBridge(TypeBuilder typeBuilder, string methodName, MethodBuilder userMethod, Type[] paramTypes, Type returnType)
+    internal static void GenerateOperatorBridge(this ClassInit node, TypeBuilder typeBuilder, string methodName, MethodBuilder userMethod, Type[] paramTypes, Type returnType)
     {
         // 1. 确定期望的方法签名
         Type expectedReturnType = typeof(object);

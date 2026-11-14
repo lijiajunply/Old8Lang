@@ -1047,18 +1047,18 @@ public partial class InterpreterVisitor
         node.RegisterNestedClasses(manager);
 
         // 检查类是否已存在
-        var existingClass = manager.GetAny(new LangId(node._anyValue.ClassName));
+        var existingClass = manager.GetAny(new LangId(node.GetTypeTemplate().ClassName));
 
         if (existingClass is not null)
         {
-            throw new DuplicateNameError(node, node._anyValue.ClassName, "类");
+            throw new DuplicateNameError(node, node.GetTypeTemplate().ClassName, "类");
         }
 
         // 立即将类添加到ImportInfos中，以便在类定义内部访问
-        manager.AddClassAndFunc(node._anyValue);
+        manager.AddClassAndFunc(node.GetTypeTemplate());
 
         // 注册类型到全局反射注册表（用于反射功能）
-        TypeTemplate.RegisterType(node._anyValue.ClassName, node._anyValue);
+        TypeTemplate.RegisterType(node.GetTypeTemplate().ClassName, node.GetTypeTemplate());
 
         return new VoidLangValue();
     

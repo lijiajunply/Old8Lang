@@ -131,7 +131,7 @@ public partial class BytecodeVisitor
         MarkPosition(node);
         // 类定义编译
         // 从 TypeTemplate 中提取类名、字段和方法
-        var typeTemplate = node.AnyValue;
+        var typeTemplate = node.GetTypeTemplate();
         string className = typeTemplate.ClassName;
 
         // 检查类是否已经被编译过（在PreprocessClassDefinitions阶段）

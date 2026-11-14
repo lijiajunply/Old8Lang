@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：引入 `ClassSyntax` 并迁移 `ClassInit`/`ClassFuncInitStatement` 到 Syntax；解析器不再构造
+  `TypeTemplate`，运行时模板与类方法函数值经 `GetTypeTemplate()`/`GetFuncValue()` 按语法节点缓存创建。
+  同步更新类执行/IL 定义辅助、嵌套类重算、LSP、测试与 Visitor。Runtime 生成节点 55 → 54，遗留
+  partial 基线 9 → 8。全量测试与 e46a7f5d 基线对照无新增失败。见
+  `Reports/2026-11-14-15-07-类声明语法迁移测试.md`。
+
 - 2026-11-14：`FunctionSyntax` 引入并迁移 `FuncInit`/`AsyncFuncInit` 到 Syntax；解析器只产出函数语法，
   运行时函数值经 `FunctionSyntaxRuntimeFactory`/`GetFuncValue()` 按语法节点缓存创建。同步更新
   IL 顶层变量分析、VM 闭包分析、LSP、类型推断/约束收集与测试调用点。Runtime 生成节点 57 → 55，

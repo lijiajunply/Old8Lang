@@ -650,14 +650,14 @@ public partial class CompilerVisitor
     {
 
         // 0. 如果是泛型类，注册到泛型类缓存中，不立即生成类型
-        if (node._anyValue.IsGeneric)
+        if (node.GetTypeTemplate().IsGeneric)
         {
-            local.GenericClasses.TryAdd(node._anyValue.ClassName, node._anyValue);
+            local.GenericClasses.TryAdd(node.GetTypeTemplate().ClassName, node.GetTypeTemplate());
             return null;
         }
 
         // 1. 检查类或接口是否已经存在
-        if (local.ClassVar.ContainsKey(node._anyValue.ClassName))
+        if (local.ClassVar.ContainsKey(node.GetTypeTemplate().ClassName))
         {
             // 类或接口已经存在，跳过生成
             return null;
@@ -687,7 +687,7 @@ public partial class CompilerVisitor
         Type? baseType = null;
         TypeAttributes typeAttributes;
         
-        if (node._anyValue.IsInterface)
+        if (node.GetTypeTemplate().IsInterface)
         {
             // 接口的处理
             typeAttributes = TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract;
@@ -698,8 +698,8 @@ public partial class CompilerVisitor
             typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
 
             // 定义基类
-            if (node._anyValue.ParentClassName is not null &&
-                local.ClassVar.TryGetValue(node._anyValue.ParentClassName, out var parentType))
+            if (node.GetTypeTemplate().ParentClassName is not null &&
+                local.ClassVar.TryGetValue(node.GetTypeTemplate().ParentClassName, out var parentType))
             {
                 baseType = parentType;
             }
@@ -713,7 +713,7 @@ public partial class CompilerVisitor
 
         // 4. 定义类型（类或接口）
         var typeBuilder = moduleBuilder.DefineType(
-            node._anyValue.ClassName,
+            node.GetTypeTemplate().ClassName,
             typeAttributes,
             baseType);
 
@@ -735,10 +735,10 @@ public partial class CompilerVisitor
             classLocal.ClassVar[name] = knownType;
         }
 
-        classLocal.ClassVar[node._anyValue.ClassName] = typeBuilder;
+        classLocal.ClassVar[node.GetTypeTemplate().ClassName] = typeBuilder;
 
         // 6. 定义类或接口的成员
-        if (node._anyValue.IsInterface)
+        if (node.GetTypeTemplate().IsInterface)
         {
             // 接口只能有方法，不能有字段
             node.DefineInterfaceMembers(typeBuilder, classLocal);
@@ -760,7 +760,7 @@ public partial class CompilerVisitor
         var createdType = typeBuilder.CreateType();
 
         // 9. 将类型添加到原始LocalManager中，以便其他类可以访问
-        local.ClassVar[node._anyValue.ClassName] = createdType;
+        local.ClassVar[node.GetTypeTemplate().ClassName] = createdType;
     
     
         return null;

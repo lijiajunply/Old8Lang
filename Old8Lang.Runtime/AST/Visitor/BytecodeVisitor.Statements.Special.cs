@@ -476,7 +476,7 @@ public partial class BytecodeVisitor
                 );
 
                 // 递归编译嵌套类
-                var nestedClassInit = new ClassInit(updatedNestedTemplate, updatedNestedTemplate.Position);
+                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(updatedNestedTemplate);
                 nestedClassInit.Accept(this);
             }
         }
@@ -506,7 +506,7 @@ public partial class BytecodeVisitor
                 );
 
                 // 递归编译嵌套类
-                var nestedClassInit = new ClassInit(updatedNestedTemplate, updatedNestedTemplate.Position);
+                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(updatedNestedTemplate);
                 nestedClassInit.Accept(this);
             }
         }

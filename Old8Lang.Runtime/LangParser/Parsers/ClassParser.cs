@@ -170,17 +170,21 @@ public class ClassParser(
         }
 
         var classBlock = ParseClassBlock();
-        var typeTemplate = new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
-            parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract,
-            genericParameters: genericParameters, parentGenericTypeParameters: parentGenericTypeParameters);
+        var classSyntax = new ClassSyntax(
+            className,
+            classBlock,
+            parentClassName,
+            isMixin,
+            mixinNames,
+            implementsNames,
+            isInterface: false,
+            isAbstract: isAbstract,
+            genericParameters: genericParameters,
+            parentGenericTypeParameters: parentGenericTypeParameters,
+            docComment: docComment,
+            position: startPosition);
 
-        // 设置文档注释
-        if (docComment is not null)
-        {
-            typeTemplate.DocComment = docComment;
-        }
-
-        return new ClassInit(typeTemplate, startPosition);
+        return new ClassInit(classSyntax, startPosition);
     }
 
     public ClassInit ParseInterfaceDeclaration()
@@ -244,17 +248,21 @@ public class ClassParser(
         var interfaceBlock = ParseClassBlock();
 
         // 接口作为特殊的类处理，isInterface 标志为 true
-        // 接口的父接口通过 implementsNames 参数传递（复用implements机制）
-        var typeTemplate = new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
-            null, false, [], extendsNames, true, genericParameters: genericParameters);
+        // 接口的父接口通过 implementsNames 参数传递（复用 implements 机制）
+        var classSyntax = new ClassSyntax(
+            interfaceName,
+            interfaceBlock,
+            parentClassName: null,
+            isMixin: false,
+            mixinNames: [],
+            implementsNames: extendsNames,
+            isInterface: true,
+            isAbstract: false,
+            genericParameters: genericParameters,
+            docComment: docComment,
+            position: startPosition);
 
-        // 设置文档注释
-        if (docComment is not null)
-        {
-            typeTemplate.DocComment = docComment;
-        }
-
-        return new ClassInit(typeTemplate, startPosition);
+        return new ClassInit(classSyntax, startPosition);
     }
 
     /// <summary>
@@ -420,10 +428,10 @@ public class ClassParser(
                             break;
                         case FuncInit funcInit when funcInit.Syntax.Id is not null:
                             // 带有修饰符的类函数声明
-                            var memberId2 = new ClassMemberId(funcInit.GetFuncValue().Id.IdName,
-                                funcInit.GetFuncValue().Id.AssumptionType, modifiers, funcInit.Position);
+                            var memberId2 = new ClassMemberId(funcInit.Syntax.Id!.IdName,
+                                funcInit.Syntax.Id.AssumptionType, modifiers, funcInit.Position);
                             classMemberStatement =
-                                new ClassFuncInitStatement(memberId2, funcInit.GetFuncValue(), funcInit.Position);
+                                new ClassFuncInitStatement(memberId2, funcInit.Syntax, funcInit.Position);
                             break;
                         default:
                             classMemberStatement = statement;
@@ -637,16 +645,23 @@ public class ClassParser(
             throw CreateSyntaxError("抽象方法不能有方法体");
         }
 
-        // 创建抽象方法的FuncLangValue（没有方法体）
+        // 创建抽象方法的语法模型（没有方法体）
         var methodId = new LangId(methodName, returnType, position: position);
-        var funcLangValue =
-            new FuncLangValue(methodId, parameters, new BlockStatement([]), null, position, isLambda: false);
+        var functionSyntax = new FunctionSyntax(
+            methodId,
+            parameters,
+            new BlockStatement([]),
+            null,
+            null,
+            null,
+            isAsync: false,
+            position);
 
         // 创建类成员ID
         var memberId = new ClassMemberId(methodName, returnType, modifiers, position);
 
         // 创建抽象方法声明
-        return new ClassFuncInitStatement(memberId, funcLangValue, position);
+        return new ClassFuncInitStatement(memberId, functionSyntax, position);
     }
 
     /// <summary>
