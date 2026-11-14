@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -26,7 +27,7 @@ public partial class StatementParser
             }
 
             // 只有类型注解，没有赋值，创建赋值 Null 的语句
-            var nullExpr = new NullLangValue(id.Position);
+            var nullExpr = new ScalarLiteralExpression(LiteralSyntax.Null(id.Position));
             return new SetStatement(id, nullExpr, id.Position);
         }
 
@@ -53,7 +54,7 @@ public partial class StatementParser
             // 只有类型注解，没有赋值，创建一个赋值 Null 的语句
             if (leftExpr is LangId leftLangId)
             {
-                var nullExpr = new NullLangValue(leftLangId.Position);
+                var nullExpr = new ScalarLiteralExpression(LiteralSyntax.Null(leftLangId.Position));
                 return new SetStatement(
                     new LangId(leftLangId.IdName, assumptionType, position: leftLangId.Position), nullExpr,
                     leftLangId.Position);
@@ -225,7 +226,7 @@ public partial class StatementParser
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.PlusPlus);
         return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), LangTokenType.Plus, new IntLangValue(1)));
+            new Operation(new LangId(identifier), LangTokenType.Plus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, default))));
     }
 
     /// <summary>
@@ -238,6 +239,6 @@ public partial class StatementParser
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.MinusMinus);
         return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), LangTokenType.Minus, new IntLangValue(1)));
+            new Operation(new LangId(identifier), LangTokenType.Minus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, default))));
     }
 }

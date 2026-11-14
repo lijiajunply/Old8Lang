@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -24,7 +25,7 @@ public partial class StatementParser
             CurrentIndex >= Tokens.Count)
         {
             // void 返回，使用 VoidLangValue
-            return new ReturnStatement(new VoidLangValue(position), position);
+            return new ReturnStatement(new ScalarLiteralExpression(LiteralSyntax.Void(position)), position);
         }
 
         var expression = expressionParser.ParseExpression();

@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.LangParser.Core;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -179,7 +180,7 @@ public partial class PrimaryParser(
                 new SourcePosition(plusPlusToken.Line, plusPlusToken.Column, tokenValue: plusPlusToken.Value);
             Expect(LangTokenType.PlusPlus);
             var expr = ParsePrimary();
-            return new Operation(expr, LangTokenType.Plus, new IntLangValue(1), position);
+            return new Operation(expr, LangTokenType.Plus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, position)), position);
         }
 
         // 处理前缀自减 --i
@@ -190,7 +191,7 @@ public partial class PrimaryParser(
                 tokenValue: minusMinusToken.Value);
             Expect(LangTokenType.MinusMinus);
             var expr = ParsePrimary();
-            return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
+            return new Operation(expr, LangTokenType.Minus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, position)), position);
         }
 
         // 处理 match 表达式

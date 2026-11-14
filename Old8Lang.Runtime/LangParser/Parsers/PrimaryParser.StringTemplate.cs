@@ -1,7 +1,9 @@
 using Old8Lang.AST;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -43,7 +45,7 @@ public partial class PrimaryParser
                         if (next == '{')
                         {
                             // 转义的 {{，添加一个 {
-                            parts.Add(new StringLangValue("{", position));
+                            parts.Add(new ScalarLiteralExpression(LiteralSyntax.String("{", position)));
                             i += 2;
                         }
                         else
@@ -163,13 +165,13 @@ public partial class PrimaryParser
                         if (i + 1 < len && stringValue[i + 1] == '}')
                         {
                             // 转义的 }}，添加一个 }
-                            parts.Add(new StringLangValue("}", position));
+                            parts.Add(new ScalarLiteralExpression(LiteralSyntax.String("}", position)));
                             i += 2;
                         }
                         else
                         {
                             // 普通的 }，直接添加
-                            parts.Add(new StringLangValue("}", position));
+                            parts.Add(new ScalarLiteralExpression(LiteralSyntax.String("}", position)));
                             i++;
                         }
                     }
@@ -185,7 +187,7 @@ public partial class PrimaryParser
                         var text = stringValue.Substring(start, i - start);
                         if (!string.IsNullOrEmpty(text))
                         {
-                            parts.Add(new StringLangValue(text, position));
+                            parts.Add(new ScalarLiteralExpression(LiteralSyntax.String(text, position)));
                         }
                     }
                 }

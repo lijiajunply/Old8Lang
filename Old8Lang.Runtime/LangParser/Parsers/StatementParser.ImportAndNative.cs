@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -112,8 +113,8 @@ public partial class StatementParser
         else if (isDynamic && CurrentToken.Type == LangTokenType.String)
         {
             // 动态导入：字符串字面量应该创建为动态表达式
-            dynamicModuleExpression = new StringLangValue(CurrentToken.Value,
-                new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+            dynamicModuleExpression = new ScalarLiteralExpression(LiteralSyntax.String(CurrentToken.Value,
+                new SourcePosition(CurrentToken.Line, CurrentToken.Column)));
             Expect(LangTokenType.String); // 消耗字符串
             moduleName = "__dynamic_module__";
         }

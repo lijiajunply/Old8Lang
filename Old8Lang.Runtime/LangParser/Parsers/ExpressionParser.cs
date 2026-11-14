@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.LangParser.Core;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -182,14 +183,14 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.PlusPlus);
-            left = new Operation(left, LangTokenType.Plus, new IntLangValue(1), position);
+            left = new Operation(left, LangTokenType.Plus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, position)), position);
         }
         else if (CurrentToken.Type == LangTokenType.MinusMinus)
         {
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.MinusMinus);
-            left = new Operation(left, LangTokenType.Minus, new IntLangValue(1), position);
+            left = new Operation(left, LangTokenType.Minus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, position)), position);
         }
 
         // 处理 as 操作符

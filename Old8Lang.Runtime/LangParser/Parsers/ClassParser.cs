@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.LangParser.Core;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -378,7 +379,7 @@ public class ClassParser(
                         CurrentIndex++;
 
                         var memberId = new ClassMemberId(fieldName, "", modifiers, position);
-                        var defaultExpr = new NullLangValue(position);
+                        var defaultExpr = new ScalarLiteralExpression(LiteralSyntax.Null(position));
                         var classMemberStatement = new ClassFieldSetStatement(memberId, defaultExpr, position);
                         statements.Add(classMemberStatement);
                         continue;
@@ -393,7 +394,7 @@ public class ClassParser(
                         CurrentIndex++;
 
                         var memberId = new ClassMemberId(fieldName, "", modifiers, position);
-                        var defaultExpr = new NullLangValue(position);
+                        var defaultExpr = new ScalarLiteralExpression(LiteralSyntax.Null(position));
                         var classMemberStatement = new ClassFieldSetStatement(memberId, defaultExpr, position);
                         statements.Add(classMemberStatement);
                         continue;
@@ -527,7 +528,7 @@ public class ClassParser(
         foreach (var (name, type, position) in fieldInfos)
         {
             var memberId = new ClassMemberId(name, type, modifiers, position);
-            var fieldValue = initValue ?? new NullLangValue(position);
+            var fieldValue = initValue ?? new ScalarLiteralExpression(LiteralSyntax.Null(position));
             var fieldStatement = new ClassFieldSetStatement(memberId, fieldValue, position);
             fields.Add(fieldStatement);
         }

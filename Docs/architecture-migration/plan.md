@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：解析器为自增/自减、未初始化字段、字符串模板、动态导入和空 `return` 生成的合成
+  运行时字面量改为 `ScalarLiteralExpression`，解析器不再直接构造这些 `LangValueType`。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）通过；
+  Compiler.Basic/Expressions/Functions/Statements/Collections/Exceptions/Async 的失败数量与失败用例
+  和 `e46a7f5d` 临时基线逐项一致。见 `Reports/2026-11-14-14-34-解析器合成字面量迁移测试.md`。
+
 - 2026-11-14：`EnumInit`、`SelectStatement` 迁入 Syntax；Select 的通道轮询与生成器路径执行移入
   `SelectStatementRuntimeExtensions`。Runtime 生成节点 65 → 63，遗留 partial 基线 18 → 17。
   Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
