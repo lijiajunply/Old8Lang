@@ -1177,13 +1177,31 @@ return node.Value.GetType();
     public Type VisitMatchExpression(MatchExpression node)
     {
 
-        // 返回第一个 case 的结果类型（假设所有 case 返回相同类型）
-        if (node.Cases.Count > 0)
+        // 各分支结果类型一致时才采用该类型，否则退回 object。
+        // 只取第一个分支会与实际运行结果不符：混合类型的 match 在 IL 里统一按
+        // object 存储，推断出具体值类型会让调用方对装箱引用做 unbox.any。
+        if (node.Cases.Count == 0)
         {
-            return node.Cases[0].ResultExpression.Accept(this) ?? typeof(object);
+            return typeof(object);
         }
 
-        return typeof(object);
+        Type? commonType = null;
+        foreach (var matchCase in node.Cases)
+        {
+            var caseType = matchCase.ResultExpression.Accept(this) ?? typeof(object);
+            if (commonType is null)
+            {
+                commonType = caseType;
+                continue;
+            }
+
+            if (commonType != caseType)
+            {
+                return typeof(object);
+            }
+        }
+
+        return commonType ?? typeof(object);
     
     
     }

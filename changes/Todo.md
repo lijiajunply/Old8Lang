@@ -164,8 +164,10 @@
   读路径用原生键调用语言方法）；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
   `NestedArrays` 已在 2026-11-14 修复（`Len` 的 object 分支先压栈再 `ldc.i4.0` 返回，
   栈上残留参数值）；`ArrayConcatenation` 则是「数组/列表 `+` 只有虚拟机支持」的跨模式差异，
-  见下面单独条目。见 change（`2026-11-14-IL语言字典索引/test.md`）与
-  change（`2026-11-14-IL-Len动态长度/test.md`）。
+  见下面单独条目。`MatchExpression_*` 与 `MatchTests` 的「结果类型 / 装箱顺序」问题也已在
+  2026-11-14 修复（`MatchTests` 17/17 通过）；剩下的 `MatchExpressionEnhancedTests`
+  属模式种类未实现的功能缺口，见下面单独条目。见 change（`2026-11-14-IL语言字典索引/test.md`）、
+  change（`2026-11-14-IL-Len动态长度/test.md`）与 change（`2026-11-14-IL-match结果/test.md`）。
 
 - [x] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
   暴露。可空类型注解在 IL 里被解析成基础值类型（`int?` → `int`），`return null` 的返回路径
@@ -242,6 +244,13 @@
   `.Length` 属性，用 `len(a)` 或 `a.Count()`」；`[5>~<5]` 在解释器与 IL 都是 `[4, 3, 2]`
   这样的 3 个元素（`[1>~<1]` → `[2, 1, 0]`，见已完成的扩展范围修复），虚拟机则是空数组。
   两条都需要先定语义再动用例。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
+
+- [ ] **IL 模式 match 不支持范围 / 类型 / 元组解构模式与 guard**：
+  `MatchExpressionEnhancedTests` 25 项失败（`Match_Range_*`、`Match_TypeMatch_*`、
+  `Match_TupleDeconstruction_*`、`Match_Guard_*`）。`VisitMatchExpression` 只识别
+  通配符、变量绑定和普通值比较，其余模式被当作普通值比较，因此永远不匹配
+  （解释器与虚拟机都支持这些模式）。属功能缺口，需要按模式种类补齐 IL 发射。
+  见 change（`2026-11-14-IL-match结果/test.md` §5）。
 
 - [ ] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
   在 `-f` 报 `INVALID_OPERATION_ERROR: 不支持类型 ... 的加法操作`，`-il` 被推断成数值加法后

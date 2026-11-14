@@ -181,29 +181,33 @@ public partial class CompilerVisitor
                 continue;
             }
 
-            // 普通值匹配：比较 match 值和 case 值
-            ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-            matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
-
-            // 根据类型选择合适的比较指令
+            // 普通值匹配：比较 match 值和 case 值。
+            // 装箱必须按操作数位置逐个发射：两个操作数都压栈后再 box 只会装箱栈顶，
+            // match 值（在左）会保持未装箱，生成的 IL 无效。
             if (matchValueType == typeof(int) || matchValueType == typeof(bool) || matchValueType == typeof(char))
             {
+                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
+                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
                 ilGenerator.Emit(OpCodes.Ceq);
             }
             else if (matchValueType == typeof(string))
             {
+                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
+                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
                 var equalsMethod = typeof(string).GetMethod("Equals",
                     [typeof(string), typeof(string)])!;
                 ilGenerator.Emit(OpCodes.Call, equalsMethod);
             }
             else
             {
-                // 其他类型：装箱后调用 Equals
+                // 其他类型：逐个操作数装箱后调用 object.Equals
+                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
                 if (matchValueType.IsValueType)
                     ilGenerator.Emit(OpCodes.Box, matchValueType);
 
+                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
                 var patternType = matchCase.Pattern.Accept(new TypeInferenceVisitor(local));
-                if (patternType is not null && patternType.IsValueType)
+                if (patternType is { IsValueType: true })
                     ilGenerator.Emit(OpCodes.Box, patternType);
 
                 var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
@@ -257,8 +261,15 @@ public partial class CompilerVisitor
         // 结束标签
         ilGenerator.MarkLabel(endLabel);
 
-        // 加载结果
+        // 加载结果。各分支结果都装箱存进了 object 局部变量，这里必须按类型推断给出的
+        // 静态类型还原：否则 `return match ...` 会把装箱引用当成值类型返回，
+        // 调用方读到的是垃圾值（整数分支曾稳定输出 853912040 这类数字）。
         ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
+        var matchResultType = node.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (matchResultType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, matchResultType);
+        }
 
         return null;
     
