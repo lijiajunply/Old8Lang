@@ -17,6 +17,7 @@ public static class InterpreterBackend
     public static void Register()
     {
         RuntimeVisitors.RegisterInterpreter(static manager => new InterpreterVisitor(manager));
+        RuntimeVisitors.RegisterInterpreterHost(static standardLibraries => new LangInterpreter(standardLibraries));
     }
 }
 

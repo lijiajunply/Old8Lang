@@ -11,7 +11,7 @@ namespace Old8Lang.TypeSystem;
 public class GenericTypeResolver(
     Dictionary<string, Type> typeMapping,
     LocalManager local,
-    LangInterpreter? interpreter = null)
+    ILangInterpreter? interpreter = null)
 {
     /// <summary>
     /// 解析类型，如果是泛型参数则替换为具体类型

@@ -57,7 +57,7 @@ public static class GlobalVariableAnalysis
     /// <summary>
     /// 扫描程序，收集顶层变量、静态类型，以及被函数体引用的变量名。
     /// </summary>
-    public static GlobalVariableScope Analyze(BlockStatement program, string path, LangInterpreter interpreter)
+    public static GlobalVariableScope Analyze(BlockStatement program, string path, ILangInterpreter interpreter)
     {
         var scope = new GlobalVariableScope();
 
@@ -332,7 +332,7 @@ public static class GlobalVariableAnalysis
         List<FuncLangValue> functions,
         GlobalVariableScope scope,
         string path,
-        LangInterpreter interpreter)
+        ILangInterpreter interpreter)
     {
         var analysisLocal = new LocalManager
         {

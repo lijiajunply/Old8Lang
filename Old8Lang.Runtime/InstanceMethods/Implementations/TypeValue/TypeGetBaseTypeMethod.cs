@@ -37,7 +37,7 @@ public class TypeGetBaseTypeMethod : BaseInstanceMethod
 
         // 加载 VariateManager
         ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(LangInterpreter).GetProperty("Manager")!.GetMethod!);
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
 
         // 调用辅助方法
         var helperMethod = typeof(TypeGetBaseTypeMethod).GetMethod(nameof(GetBaseTypeHelper),

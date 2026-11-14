@@ -148,3 +148,11 @@ ILD 发射与 Runtime 类型推断共享同一套解析规则，避免两条路�
 （`FuncLangValueIlCompilerExtensions`）；Runtime 的 `FuncLangValue.Shared.cs` 只保留
 `GetItemType` 与 `ToString`。其余运行时代码 partial（`FuncLangValue.Execution`、
 `Instance.InstanceMethods`、`AnyLangValue.Reflection`、`SuperProxy`）仍待按后端拆分。
+
+## 阶段 3.8：LangInterpreter 迁入解释后端（2026-11-14）
+
+`LangInterpreter` 位于 `Old8Lang.Interpreter`；Runtime 只定义 `ILangInterpreter` 契约
+（Manager、TypeAnnotationManager、PerformanceMonitor、ModuleCache、OutputProvider、Build）。
+Runtime 的模块加载、编译器、反射与调试代码依赖契约，并通过
+`RuntimeVisitors.CreateInterpreterHost(StandardLibraryCatalog)` 创建解释器宿主。
+`VariateManager`、`ScopeLayer` 等解释期状态仍留在 Runtime，是后续接口化的对象。

@@ -30,12 +30,12 @@ public class BytecodeCompiler
     /// <summary>
     /// 解释器实例，用于类型检查
     /// </summary>
-    private LangInterpreter? _interpreter;
+    private ILangInterpreter? _interpreter;
 
     /// <summary>
     /// 解释器实例，用于类型检查；赋值时同步使用其模块目录。
     /// </summary>
-    public LangInterpreter? Interpreter
+    public ILangInterpreter? Interpreter
     {
         get => _interpreter;
         set

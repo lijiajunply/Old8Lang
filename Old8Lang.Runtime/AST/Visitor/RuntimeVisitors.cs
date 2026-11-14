@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -102,4 +103,33 @@ public static class RuntimeVisitors
     /// 是否存在已注册的字节码/VM 后端。
     /// </summary>
     public static bool HasBytecode => _bytecodeFactory is not null;
+
+    private static Func<StandardLibraryCatalog, ILangInterpreter>? _interpreterHostFactory;
+
+    /// <summary>
+    /// 注册解释器宿主工厂（用于模块加载等需要新建解释器的共享路径）。
+    /// </summary>
+    public static void RegisterInterpreterHost(Func<StandardLibraryCatalog, ILangInterpreter> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        _interpreterHostFactory = factory;
+    }
+
+    /// <summary>
+    /// 创建一个使用指定模块目录的解释器宿主。未注册时说明组合根缺少解释后端程序集。
+    /// </summary>
+    public static ILangInterpreter CreateInterpreterHost(StandardLibraryCatalog standardLibraries)
+    {
+        ArgumentNullException.ThrowIfNull(standardLibraries);
+
+        var factory = _interpreterHostFactory ?? throw new InvalidOperationException(
+            "解释后端尚未注册：请引用 Old8Lang.Interpreter 并在组合根调用 InterpreterBackend.Register()。");
+
+        return factory(standardLibraries);
+    }
+
+    /// <summary>
+    /// 是否存在已注册的解释器宿主工厂。
+    /// </summary>
+    public static bool HasInterpreterHost => _interpreterHostFactory is not null;
 }

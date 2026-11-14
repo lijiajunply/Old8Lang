@@ -72,7 +72,7 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         // 加载 manager 参数
         var interpreterField = typeof(LocalManager).GetField("Interpreter");
         ilGenerator.Emit(OpCodes.Ldsfld, interpreterField!);
-        var managerProperty = typeof(LangInterpreter).GetProperty("Manager");
+        var managerProperty = typeof(ILangInterpreter).GetProperty("Manager");
         ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
 
         // 调用 ReflectionHelper.CreateInstance(string, object, VariateManager)

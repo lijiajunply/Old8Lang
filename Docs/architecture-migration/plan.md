@@ -47,14 +47,16 @@
     `Old8Lang.VirtualMachine`；Runtime 以 `IBytecodeVisitor` 契约 + `RuntimeVisitors.CreateBytecode`
     创建访问器，6 处直接构造改为契约调用；组合根同时注册三个后端。见
     `Reports/2026-11-14-16-54-VM后端拆分测试.md`。
-  - [ ] 引擎余量：`LangInterpreter`/`VariateManager`、`Compiler/`、`Bytecode/` 仍在 Runtime，
+  - [ ] 引擎余量：`VariateManager`/`ScopeLayer`、`Compiler/`、`Bytecode/` 仍在 Runtime，
     作为运行时值与三个后端共享的执行状态；完整迁出需先抽象共享契约。
-    2026-11-14：编译器专用的六个 IL 运算辅助、LINQ IL 生成与 `DotOperatorILHelper` 已迁入
-    `Old8Lang.Compiler`；`FuncLangValue` 的 lambda IL 辅助改为 Compiler 扩展方法，Runtime 只留
-    共享的 `GetItemType`/`ToString`。`InstanceMethodTypeResolver` 留在 Runtime。`Compiler.Compile`
-    引擎与其余运行时值 partial 仍待处理。见 `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
+    2026-11-14：编译器专用的 IL 运算辅助、LINQ IL 生成、`DotOperatorILHelper` 与
+    `FuncLangValue` lambda IL 辅助已迁入 `Old8Lang.Compiler`；`LangInterpreter` 已迁入
+    `Old8Lang.Interpreter`，Runtime 只依赖 `ILangInterpreter` 契约与宿主工厂。
+    `Compiler.Compile` 引擎、解释期作用域状态与其余运行时值 partial 仍待处理。见
+    `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
     `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`、
-    `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`。
+    `Reports/2026-11-14-17-06-FuncLangValue编译器代码迁入IL后端.md`、
+    `Reports/2026-11-14-17-09-LangInterpreter迁入解释后端.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
   契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
@@ -73,6 +75,13 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.8 解释器宿主）：`LangInterpreter` 迁入 `Old8Lang.Interpreter`；Runtime 新增
+  `ILangInterpreter` 契约与 `CreateInterpreterHost` 工厂，模块加载、编译、反射与调试路径改为
+  依赖契约。Architecture 56、VM 1083、Interpreter（排除外部网络用例）1959/1960 通过；
+  Compiler.Expressions 41 项失败与 HEAD 一致。见
+  `Reports/2026-11-14-17-09-LangInterpreter迁入解释后端.md`。作用域状态仍在 Runtime，阶段 3
+  不标记完成。
 
 - 2026-11-14（阶段 3.7 FuncLangValue）：lambda 的 IL 方法体/闭包发射从 Runtime 的
   `FuncLangValue.Compiler` partial 迁入 `Old8Lang.Compiler` 扩展方法，Runtime 只保留共享的

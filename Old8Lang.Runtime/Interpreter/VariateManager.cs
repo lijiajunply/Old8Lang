@@ -46,7 +46,7 @@ public class VariateManager
     /// 关联的解释器实例
     /// </summary>
     [NotNull]
-    public LangInterpreter? Interpreter { get; set; }
+    public ILangInterpreter? Interpreter { get; set; }
 
     /// <summary>
     /// 第三方包管理器实例（延迟初始化）

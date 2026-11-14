@@ -598,7 +598,7 @@ public partial class AnyLangValue : LangValueType
     /// 兼容 V1 接口
     /// </summary>
     /// <param name="interpreter">解释器实例</param>
-    public void Init(LangInterpreter interpreter)
+    public void Init(ILangInterpreter interpreter)
     {
         InstanceScope.Interpreter = interpreter;
     }

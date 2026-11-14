@@ -1,3 +1,4 @@
+using Old8Lang.AST.Visitor;
 using Old8Lang.ModuleSystem.Resolution;
 using Old8Lang.Interpreter;
 using Old8Lang.ModuleSystem.StandardLibrary;
@@ -38,7 +39,7 @@ public class ModuleLoader(string? baseDirectory = null, StandardLibraryCatalog? 
         }
 
         // 解析模块代码
-        var interpreter = new LangInterpreter(_standardLibraries);
+        var interpreter = RuntimeVisitors.CreateInterpreterHost(_standardLibraries);
         var ast = interpreter.Build(moduleCode);
 
         // 编译为字节码

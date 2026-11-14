@@ -71,7 +71,7 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
         // 由于 IL 模式下没有直接的 manager，我们需要使用 Interpreter.Manager
         var interpreterField = typeof(LocalManager).GetField("Interpreter");
         ilGenerator.Emit(OpCodes.Ldsfld, interpreterField!);
-        var managerProperty = typeof(LangInterpreter).GetProperty("Manager");
+        var managerProperty = typeof(ILangInterpreter).GetProperty("Manager");
         ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
 
         // 调用 ReflectionHelper.InvokeMethod(object, string, object, VariateManager)

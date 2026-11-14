@@ -154,7 +154,7 @@ public class LocalManager
     /// <summary>
     /// 关联的解释器实例
     /// </summary>
-    public LangInterpreter? Interpreter { get; init; }
+    public ILangInterpreter? Interpreter { get; init; }
     
     /// <summary>
     /// 动态程序集

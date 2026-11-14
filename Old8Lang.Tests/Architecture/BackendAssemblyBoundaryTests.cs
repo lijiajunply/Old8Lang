@@ -17,7 +17,7 @@ public class BackendAssemblyBoundaryTests
     [Fact]
     public void RuntimeAssembly_DoesNotReferenceInterpreterBackend()
     {
-        var referenced = typeof(LangInterpreter).Assembly
+        var referenced = typeof(VariateManager).Assembly
             .GetReferencedAssemblies()
             .Select(name => name.Name)
             .ToArray();
@@ -65,6 +65,14 @@ public class BackendAssemblyBoundaryTests
             .ToArray();
 
         Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void LangInterpreter_LivesInInterpreterAssembly_AndRuntimeOnlySeesContract()
+    {
+        Assert.Equal("Old8Lang.Interpreter", typeof(LangInterpreter).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Runtime", typeof(ILangInterpreter).Assembly.GetName().Name);
+        Assert.NotEqual(typeof(LangInterpreter).Assembly, typeof(ILangInterpreter).Assembly);
     }
 
     [Fact]

@@ -7,7 +7,7 @@ namespace Old8Lang.Debugger;
 /// <summary>
 /// 可调试的解释器包装器 - 简化版本
 /// </summary>
-public class DebuggableInterpreter(LangInterpreter interpreter, Debugger debugger)
+public class DebuggableInterpreter(ILangInterpreter interpreter, Debugger debugger)
 {
     /// <summary>
     /// 执行带有调试功能的AST

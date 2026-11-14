@@ -273,7 +273,7 @@ public static class Compiler
     /// 3. 验证IL代码（如果启用）
     /// 4. 创建并返回可执行委托
     /// </remarks>
-    public static Action Compile(BlockStatement statement, string path, LangInterpreter i)
+    public static Action Compile(BlockStatement statement, string path, ILangInterpreter i)
     {
         LogFormat("开始编译: {0}", LogLevel.Debug, path);
         LogFormat("语句类型: {0}", LogLevel.Debug, statement.GetType().Name);
@@ -489,7 +489,7 @@ public static class Compiler
     /// <remarks>
     /// 该方法将顶层代码包装成异步方法，然后同步等待其完成
     /// </remarks>
-    private static Action CompileWithTopLevelAwait(BlockStatement statement, string path, LangInterpreter i)
+    private static Action CompileWithTopLevelAwait(BlockStatement statement, string path, ILangInterpreter i)
     {
         Log("编译包含顶层 await 的代码", LogLevel.Debug);
 
@@ -577,7 +577,7 @@ public static class Compiler
     /// 2. 解析源代码生成抽象语法树
     /// 3. 调用另一个Compile重载方法编译AST
     /// </remarks>
-    public static Action Compile(string path, LangInterpreter i)
+    public static Action Compile(string path, ILangInterpreter i)
     {
         LogFormat("开始编译文件: {0}", LogLevel.Debug, path);
 
