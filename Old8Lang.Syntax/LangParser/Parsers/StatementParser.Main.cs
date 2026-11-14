@@ -1,6 +1,5 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.LangParser.Core;
@@ -618,32 +617,32 @@ public partial class StatementParser(
             var expr = expressionParser.ParseExpression();
             if (expr is not null)
             {
-                // 如果是函数调用表达式（Instance），返回 FuncRunStatement
-                if (expr is Instance or CallExpression)
+                // 如果是函数调用表达式（CallExpression），返回 FuncRunStatement
+                if (expr is CallExpression)
                 {
                     return new FuncRunStatement(expr, expr.Position);
                 }
 
-                // 如果是成员方法调用（Operation，且操作符为 Dot，右侧为 Instance），返回 FuncRunStatement
-                if (expr is Operation { Opera: LangTokenType.Dot, Right: Instance or CallExpression } operation)
-                    // 检查右侧是否是函数调用（Instance）
+                // 如果是成员方法调用（Operation，且操作符为 Dot，右侧为 CallExpression），返回 FuncRunStatement
+                if (expr is Operation { Opera: LangTokenType.Dot, Right: CallExpression } operation)
+                    // 检查右侧是否是函数调用（CallExpression）
                 {
                     return new FuncRunStatement(operation, expr.Position);
                 }
 
-                // 如果是super方法调用（Operation，且操作符为 Dot，左侧为 SuperExpression，右侧为 Instance），返回 FuncRunStatement
+                // 如果是super方法调用（Operation，且操作符为 Dot，左侧为 SuperExpression，右侧为 CallExpression），返回 FuncRunStatement
                 if (expr is Operation
                     {
-                        Opera: LangTokenType.Dot, Left: SuperExpression, Right: Instance or CallExpression
+                        Opera: LangTokenType.Dot, Left: SuperExpression, Right: CallExpression
                     } superOperation)
                 {
                     return new FuncRunStatement(superOperation, expr.Position);
                 }
 
-                // 如果是this方法调用（Operation，且操作符为 Dot，左侧为 LangId { IdName: "this" }，右侧为 Instance），返回 FuncRunStatement
+                // 如果是this方法调用（Operation，且操作符为 Dot，左侧为 LangId { IdName: "this" }，右侧为 CallExpression），返回 FuncRunStatement
                 if (expr is Operation
                     {
-                        Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance or CallExpression
+                        Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: CallExpression
                     } thisOperation)
                 {
                     return new FuncRunStatement(thisOperation, expr.Position);

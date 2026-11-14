@@ -31,7 +31,7 @@ Old8Lang 一个特性要同时落进三种执行模式，所以流程必须按�
    同目录下还有 `make-partial`（把 AST 节点类标记为 `partial`）和 `generate-stubs`（生成四个 Visitor 的实现骨架）两个命令。
 
 3. **实现解析**
-   在 `Old8Lang/LangParser/Parsers/` 里加入对应语法结构的解析逻辑，然后先跑**语法测试**，确认新语法能被正确解析。
+   在 `Old8Lang.Syntax/LangParser/Parsers/` 里加入对应语法结构的解析逻辑，然后先跑**语法测试**，确认新语法能被正确解析。
 
 4. **解释模式测试**
    确认新语法在解释模式下运行结果正确。
@@ -81,11 +81,11 @@ Visitor 四个实现（`InterpreterVisitor` / `CompilerVisitor` / `BytecodeVisit
 ## 4. 解析器要点
 
 - 词法：`LangTokenizer.TokenizeWithDirectives(code, preprocessorSymbols)` 返回 `(tokens, headerDirectives)`；
-  Token 定义与词法实现都在 `Old8Lang/LangParser/LangToken.cs` / `LangTokenType.cs`。
+  Token 定义与词法实现在 `Old8Lang.Core/LangParser/LangToken.cs` / `LangTokenType.cs`。
 - 语法：`new LangParser(tokens, headerDirectives, sourceCode, fileName)`，调用 `ParseProgram()` 得到 `BlockStatement`。
   两段衔接的实际样例见 `Old8Lang/Interpreter/LangInterpreter.cs`。
-- 采用**递归下降**解析：主文件 `Old8Lang/LangParser/LangParser.cs`，公共基类在 `Old8Lang/LangParser/Core/ParserBase.cs`；
-  每种语言结构在 `Old8Lang/LangParser/Parsers/` 下有独立解析器，且普遍以 `partial class` 拆成多个文件
+- 采用**递归下降**解析：主文件 `Old8Lang.Syntax/LangParser/LangParser.cs`，公共基类在 `Old8Lang.Syntax/LangParser/Core/ParserBase.cs`；
+  每种语言结构在 `Old8Lang.Syntax/LangParser/Parsers/` 下有独立解析器，且普遍以 `partial class` 拆成多个文件
   （`StatementParser.*`、`PrimaryParser.*`、`ExpressionParser`、`FunctionParser`、`ClassParser`、`ExtensionParser`、`LinqParser`）。
 - 改语法时，`Docs/Old8Lang.ebnf` 要同步改（见第 1 节里更新语法文档那一步）。
 

@@ -25,8 +25,12 @@
 
 ## 2. 拆分语法与共享契约
 
-- [ ] 依据实际依赖图拆出语法模型、解析器及最小共享运行时契约，处理类型、诊断、模块接口和运行时值的循环依赖。
-- [ ] 更新生成器、LSP、测试和项目引用；建立可独立构建与程序集依赖约束测试。
+- [x] 依据实际依赖图拆出语法模型、解析器及最小共享运行时契约，处理类型、诊断、模块接口和运行时值的循环依赖。
+  （2026-11-14：`Old8Lang.Syntax` 现包含全部语句/表达式语法节点与 `LangParser`；
+  运行时值通过 Runtime 工厂/扩展按语法节点缓存适配，解析器不再引用任何执行后端。）
+- [x] 更新生成器、LSP、测试和项目引用；建立可独立构建与程序集依赖约束测试。
+  （生成器仍扫描 Runtime 的运行时值节点；`SyntaxParserBoundaryTests` 固化「Syntax 只引用 Core、
+  解析器位于 Syntax、Syntax 源码不出现执行后端类型」三条门禁。）
 
 **门禁**：语法/解析项目独立构建，不引用任何执行后端或官方扩展；语法、诊断、LSP 回归通过或与基线一致。
 
@@ -47,6 +51,12 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 2 完成）：`LangParser` 目录整体迁入 `Old8Lang.Syntax`，`ScopeLayer` 移回 Runtime；
+  删除解析器中最后的 `Instance`/`LangListItem` 等运行时类型分支。新增 `SyntaxParserBoundaryTests`
+  验证解析器程序集归属、Syntax 仅引用 Core、源码不出现执行后端类型。`Old8Lang.Syntax` 可独立构建；
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 45、
+  Compiler 各分组与基线一致。见 `Reports/2026-11-14-15-52-解析器迁移与阶段2完成测试.md`。
 
 - 2026-11-14：`LinqExpression` 迁入 Syntax；约 1200 行 IL/Streaming 编译逻辑转为 Runtime 的
   `LinqExpressionRuntimeExtensions`。Runtime 生成节点 49 → 48，遗留 partial 基线 7 → 6。

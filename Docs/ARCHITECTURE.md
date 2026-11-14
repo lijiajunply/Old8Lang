@@ -331,7 +331,8 @@ Old8Lang 使用 Visitor 模式作为核心设计模式，实现了对 AST 的多
 Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
-  （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
+  （扫描 `Old8Lang.Runtime/AST` 中的运行时值节点，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录；
+  AST 语法节点与解析器已位于 `Old8Lang.Syntax`，不参与生成）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
   `<Node>.Accept.generated.cs`；当前识别 **48 个 Runtime 节点**（阶段 2 已迁入
   `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。生成目录另有
@@ -655,13 +656,13 @@ AST 节点构建
 
 Old8Lang 的 Parser 使用 **Facade 模式** 和 **递归下降解析** 实现。
 
-**主入口**: `Old8Lang/LangParser/LangParser.cs`
+**主入口**: `Old8Lang.Syntax/LangParser/LangParser.cs`
 
 ### 6.2 Parser 组件
 
 #### 6.2.1 LangParser (Facade)
 
-**位置**: `Old8Lang/LangParser/Core/LangParser.cs`
+**位置**: `Old8Lang.Syntax/LangParser/LangParser.cs`
 
 **职责**:
 - 提供统一的解析入口
@@ -690,7 +691,7 @@ public class LangParser
 
 #### 6.2.2 专用解析器
 
-**位置**: `Old8Lang/LangParser/Parsers/`
+**位置**: `Old8Lang.Syntax/LangParser/Parsers/`
 
 | 解析器 | 文件 | 职责 |
 |--------|------|------|
@@ -703,7 +704,7 @@ public class LangParser
 
 #### 6.2.3 Token 定义
 
-**位置**: `Old8Lang/LangParser/LangToken.cs`, `LangTokenType.cs`
+**位置**: `Old8Lang.Core/LangParser/LangToken.cs`, `LangTokenType.cs`
 
 **Token 类型**:
 ```csharp
@@ -1115,7 +1116,7 @@ Old8Lang 的优化分解析器与解释器两层。完整的优化技术说明�
 
 | 层次 | 主要技术 | 实现位置 |
 |------|---------|---------|
-| 解析器 | 零拷贝切片（`Span<T>`）、内存池（`CharBufferPool` / `TokenListPool`）、字符串缓存、算法复杂度修复、递归深度保护、`SourceLines` 预切分 | `Old8Lang/LangParser/LangToken.cs`、`Old8Lang/LangParser/Optimization/`、`Old8Lang/LangParser/Core/ParserContext.cs` |
+| 解析器 | 零拷贝切片（`Span<T>`）、内存池（`CharBufferPool` / `TokenListPool`）、字符串缓存、算法复杂度修复、递归深度保护、`SourceLines` 预切分 | `Old8Lang.Core/LangParser/LangToken.cs`、`Old8Lang.Core/LangParser/`、`Old8Lang.Syntax/LangParser/Core/ParserContext.cs` |
 | 解释器 | 值类型对象池、作用域字典缓存、函数引用缓存、变量查找多级缓存、递归深度上限 | `Old8Lang.Runtime/AST/`、`Old8Lang.Observability/Profiler/PerformanceMonitor.cs` |
 | 监控 | `ParserPerformanceMetrics`（解析器）、`PerformanceMonitor` + `PerformanceReporter`（解释器）、CLI 的 `--perf` 系列参数 | `Old8Lang.Core/LangParser/Optimization/`、`Old8Lang.Observability/Profiler/` |
 

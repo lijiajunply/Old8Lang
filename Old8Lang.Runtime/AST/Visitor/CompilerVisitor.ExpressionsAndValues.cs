@@ -1885,11 +1885,15 @@ public partial class CompilerVisitor
 
     private Type EmitOperationOutputType(Operation operation)
     {
-        if (operation.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(operation.Left, operation.Right, local, out var library, out var libraryCall))
+        var right = operation.Opera == LangTokenType.Dot
+            ? CallSyntaxAdapter.Normalize(operation.Right)
+            : operation.Right;
+
+        if (operation.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(operation.Left, right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.EmitCall(library, libraryCall, ilGenerator, local);
 
         var leftType = operation.Left?.Accept(new TypeInferenceVisitor(local));
-        var rightType = operation.Right?.Accept(new TypeInferenceVisitor(local));
+        var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
         if (leftType is TypeBuilder typeBuilder && typeBuilder != local.InClassEnv)
@@ -2003,7 +2007,7 @@ public partial class CompilerVisitor
             case LangTokenType.NullishCoalescing:
                 return NullishCoalescingILHelper.GenerateNullishCoalescing(operation.Left!, operation.Right!, ilGenerator, local, leftType!);
             case LangTokenType.Dot:
-                return DotOperatorILHelper.GenerateDotOperator(operation.Left, CallSyntaxAdapter.Normalize(operation.Right), ilGenerator, local, leftType, rightType, operation);
+                return DotOperatorILHelper.GenerateDotOperator(operation.Left, right, ilGenerator, local, leftType, rightType, operation);
             default:
                 throw new InvalidOperationError(operation, $"不支持的二元运算符: {operation.Opera}");
         }

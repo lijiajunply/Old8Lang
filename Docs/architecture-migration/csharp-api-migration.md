@@ -53,6 +53,7 @@
 | `AsyncStreamExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；`_block` 字段改为公开只读属性 `Block`。自定义 `IVisitor<TResult>` 实现需补 `VisitAsyncStreamExpression`。 |
 | `ImportStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；模块加载逻辑移入 `ImportStatementRuntimeExtensions`。原内部字段改为公开只读属性 `ImportString`/`FromClause`/`Specifiers`/`ModuleAlias`/`IsLazy`/`IsSelective`/`DynamicModuleExpression`（`Get*` 方法保留）。`ImportStatement.ModuleService` 改为 `ImportStatementRuntimeExtensions.ModuleService`；`HandleLazyImport`/`RegisterModuleValue`/`HandleDynamicImport` 改为扩展方法。自定义 `IVisitor<TResult>` 实现需补 `VisitImportStatement`。 |
 | `LinqExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间与构造方式不变；IL/Streaming 编译逻辑（约 1200 行）移入 Runtime 的 `LinqExpressionRuntimeExtensions`。自定义 `IVisitor<TResult>` 实现需补 `VisitLinqExpression`。 |
+| `LangParser`、`PrimaryParser`、`StatementParser`、`ExpressionParser`、`FunctionParser`、`ClassParser`、`LinqParser`、`ExtensionParser`、`ParserBase`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间 `Old8Lang.LangParser` 不变；直接使用解析器的项目需引用 `Old8Lang.Syntax` 并重新编译。`ScopeLayer` 留在 `Old8Lang.Runtime`。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 

@@ -1,7 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.LangParser.Core;
 using Old8Lang.Syntax;
 
@@ -335,14 +334,14 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                     {
                         left = new SliceExpression(leftId, start, end, step);
                     }
-                    else if (left is IndexExpression or LangListItem or NestedIndexExpression or NestedSliceExpression or NestedIndexAccess or NestedSliceAccess)
+                    else if (left is IndexExpression or NestedIndexExpression or NestedSliceExpression)
                     {
                         // 任何可以返回集合的表达式都可以进行切片
                         left = new NestedSliceExpression(left, start, end, step, position);
                     }
                     else
                     {
-                        // 其他类型的表达式也可能返回集合，统一使用 NestedSliceAccess
+                        // 其他类型的表达式也可能返回集合，统一使用 NestedSliceExpression
                         left = new NestedSliceExpression(left, start, end, step, position);
                     }
                 }
@@ -352,20 +351,20 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                     var right = ParseExpression(); // 允许索引是复杂表达式
                     Expect(LangTokenType.RightBracket);
 
-                    // 创建LangListItem而不是Operation
-                    // 如果left是LangId，直接创建LangListItem
+                    // 创建 IndexExpression
+                    // 如果left是LangId，直接创建 IndexExpression
                     if (left is LangId leftId)
                     {
                         left = new IndexExpression(leftId, right, position);
                     }
-                    // 如果left是LangListItem，这是嵌套索引访问，需要特殊处理
-                    else if (left is IndexExpression or LangListItem)
+                    // 如果left是 IndexExpression，这是嵌套索引访问
+                    else if (left is IndexExpression)
                     {
                         // 创建一个特殊的嵌套索引访问表达式
                         left = new NestedIndexExpression(left, right, position);
                     }
-                    // 如果left是NestedIndexAccess，继续嵌套
-                    else if (left is NestedIndexExpression or NestedIndexAccess)
+                    // 如果left是 NestedIndexExpression，继续嵌套
+                    else if (left is NestedIndexExpression)
                     {
                         // 创建更深层的嵌套索引访问
                         left = new NestedIndexExpression(left, right, position);
