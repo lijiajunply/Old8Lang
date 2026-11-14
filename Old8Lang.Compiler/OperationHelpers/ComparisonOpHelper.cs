@@ -28,17 +28,34 @@ internal static class ComparisonOpHelper
     }
 
     /// <summary>
-    /// 装箱数值类型为 object
+    /// 在 object 与数值混合比较时，按「发射一个操作数、立即装箱一个」的顺序压栈。
     /// </summary>
-    internal static void BoxNumericIfNeeded(ILGenerator ilGenerator, Type? leftType, Type? rightType)
+    /// <remarks>
+    /// 不能先把两个操作数都压栈再统一 <c>box</c>：<c>box</c> 只作用于栈顶，
+    /// 数值在左侧时会把引用类型的右操作数当成装箱目标，左侧整数保持未装箱。
+    /// 随后 <c>callvirt IComparable.CompareTo(object)</c> 会把未装箱整数当作
+    /// <c>this</c> 引用传入，生成的是无效 IL，运行期直接使进程崩溃而不是抛托管异常。
+    /// 另外这里的装箱顺序必须与 <c>Box</c> 的目标类型严格对应，
+    /// 因此按操作数位置逐个发射。
+    /// </remarks>
+    internal static void EmitBoxedOperands(
+        LangExpression? left,
+        LangExpression? right,
+        Type? leftType,
+        Type? rightType,
+        ILGenerator ilGenerator,
+        LocalManager local)
     {
-        if (leftType is not null && IsNumericType(leftType))
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        if (IsNumericType(leftType))
         {
-            ilGenerator.Emit(OpCodes.Box, leftType);
+            ilGenerator.Emit(OpCodes.Box, leftType!);
         }
-        if (rightType is not null && IsNumericType(rightType))
+
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        if (IsNumericType(rightType))
         {
-            ilGenerator.Emit(OpCodes.Box, rightType);
+            ilGenerator.Emit(OpCodes.Box, rightType!);
         }
     }
 
@@ -136,14 +153,11 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsNumericComparison(gtLeftType, gtRightType))
         {
-            // 装箱 int
-            BoxNumericIfNeeded(ilGenerator, gtLeftType, gtRightType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, gtLeftType, gtRightType, ilGenerator, local);
 
             // 使用 IComparable.CompareTo 方法进行比较
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
@@ -153,6 +167,8 @@ internal static class ComparisonOpHelper
         }
         else
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             ilGenerator.Emit(OpCodes.Cgt);
         }
 
@@ -211,14 +227,11 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsNumericComparison(ltLeftType, ltRightType))
         {
-            // 装箱 int
-            BoxNumericIfNeeded(ilGenerator, ltLeftType, ltRightType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, ltLeftType, ltRightType, ilGenerator, local);
 
             // 使用 IComparable.CompareTo 方法进行比较
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
@@ -228,6 +241,8 @@ internal static class ComparisonOpHelper
         }
         else
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             ilGenerator.Emit(OpCodes.Clt);
         }
 
@@ -286,20 +301,19 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // 如果都是字符串，使用字符串比较
         if (leftOpType == typeof(string) && rightOpType == typeof(string))
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
         {
-            // 装箱 int
-            BoxNumericIfNeeded(ilGenerator, leftOpType, rightOpType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, leftOpType, rightOpType, ilGenerator, local);
 
             // 使用 object.Equals 方法进行比较
             var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
@@ -307,6 +321,8 @@ internal static class ComparisonOpHelper
         }
         else
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             // 其他类型使用 Ceq 指令
             ilGenerator.Emit(OpCodes.Ceq);
         }
@@ -326,24 +342,26 @@ internal static class ComparisonOpHelper
         var leftOpType = left?.Accept(new TypeInferenceVisitor(local));
         var rightOpType = right?.Accept(new TypeInferenceVisitor(local));
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // 字符串按值比较，否则 Ceq 只比较引用
         if (leftOpType == typeof(string) && rightOpType == typeof(string))
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
         // object 与 int 混用（如未注解的函数参数）：先装箱再按值比较
         else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
         {
-            BoxNumericIfNeeded(ilGenerator, leftOpType, rightOpType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, leftOpType, rightOpType, ilGenerator, local);
             var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
         else
         {
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             ilGenerator.Emit(OpCodes.Ceq);
         }
 
@@ -405,13 +423,11 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
         if (IsObjectVsNumericComparison(leftType, rightType))
         {
-            BoxNumericIfNeeded(ilGenerator, leftType, rightType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, leftType, rightType, ilGenerator, local);
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);
@@ -421,6 +437,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Cgt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);
@@ -480,13 +498,11 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
         if (IsObjectVsNumericComparison(leftType, rightType))
         {
-            BoxNumericIfNeeded(ilGenerator, leftType, rightType);
+            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            EmitBoxedOperands(left, right, leftType, rightType, ilGenerator, local);
             var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);
@@ -496,6 +512,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Clt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);

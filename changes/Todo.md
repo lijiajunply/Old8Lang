@@ -14,6 +14,16 @@
 
 以下条目来自历史复现，尚未逐项重跑。报告见 IL 缺陷验证（`2026-10-23-23-30-IL模式缺陷修复验证.md`）、跨模式语义修复（`2026-10-24-00-30-P1跨模式语义修复测试.md`） 和 VM 残留修复（`2026-10-24-09-45-P2虚拟机模式残留修复测试.md`）。
 
+- [x] **IL 比较运算装箱顺序错误导致测试进程崩溃**：`object` 与数值混合比较时先把两个操作数都压栈、
+  再统一 `box`，`box` 只作用于栈顶，因此「数值在左、`object` 在右」（如
+  `i >= this.data.Count()`，`data` 是未标注的空集合字段）会把右侧 `object` 装箱、左侧整数保持未装箱，
+  随后 `callvirt IComparable.CompareTo` 把整数当 `this` 引用使用，生成无效 IL，运行期直接段错误、
+  测试主机消失。六个比较运算符的该分支现改为「发射一个操作数就按位置装箱」。
+  `Compiler.Classes` 与 `Compiler.Expressions` 两组由「测试运行中止」恢复为可完整运行
+  （Classes 110 项、Expressions 232 项），其余 17 组通过/失败数与基线完全一致。
+  见 change（`2026-11-14-IL比较装箱崩溃/test.md`）。修复后暴露的 `int?` 返回 `null` 触发 NRE
+  仍是独立缺口（见下文“可空返回类型”一条）。
+
 - [ ] **IL 函数 `return` 的类型转换既有缺口（待复现）**：2026-11-14 迁移 `ReturnStatement`
   辅助代码时发现，`CompilerVisitor.VisitReturnStatement` 的 try/finally 分支只做装箱/拆箱、
   没有数值转换；`string` 返回的兼容判断比实际 IL 转换更宽松；`IsNumericType` 不含
@@ -146,10 +156,30 @@
 
 - [ ] **`Compiler/Collections` 与表达式组既有 IL 失败（2026-11-14 基线核对）**：以 `HEAD` 工作树对比，
   `Compiler/Collections` 9 项、`Compiler.Expressions|Linq|Modules` 41 项、`Functions.HigherOrderTests` 8 项
-  在集合桥接改动前后失败集合完全一致；`Compiler.Classes` 组会使测试主机因生成无效 IL 崩溃（基线与当前一致）。
+  在集合桥接改动前后失败集合完全一致。~~`Compiler.Classes` 组会使测试主机因生成无效 IL 崩溃~~
+  ——该崩溃已于 2026-11-14 定位为比较运算装箱顺序错误并修复（见上文“IL 比较运算装箱顺序错误”），
+  现在 `Compiler.Classes`（110 项）与 `Compiler.Expressions`（232 项）均可完整运行。
   其中 `Dictionary_EmptyDictionary_CompilesAndExecutes` 表现为 `dict()` 空字典首次写入字符串键后，
   读取时把 `NullLangValue` 转成 `Int32` 失败；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
   `ArrayConcatenation`、`NestedArrays` 也是独立缺口。这些路径与本次集合实例方法桥接无关，需另行复现。
+
+- [ ] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
+  暴露。`class A { public func f(i:int) -> int? { return null } }` + `a.f(1)` 在 `-il` 下抛
+  `RUNTIME_ERROR: Object reference not set to an instance of an object`（`-f` 正常返回 `null`）。
+  `MemberAccessTests.MemberAccessErrorHandling_*` 因此仍失败。需先确认 `int?` 的返回类型映射与
+  `ReturnStatement` 对 `null` 的处理，再补回归。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.1）。
+
+- [ ] **IL 类型推断在未完成的 `TypeBuilder` 上调用 `GetMethod`**：`TypeInferenceVisitor.VisitOperation`
+  末尾按 `leftType.GetMethod(...)` 兜底查找方法，而类方法编译时 `this` 的类型是尚未 `CreateType`
+  的 `TypeBuilder`，直接抛 `NotSupportedException : The invoked member is not supported before the type
+  is created`（`TypeInferenceVisitor.ExpressionsAndValues.cs:548`，复现用例
+  `MemberAccessTests.PublicPrivateAccess_CompilesAndExecutesCorrectly`）。应在 `leftType is TypeBuilder`
+  时改走 `FieldVar`/`LocalManager` 已知信息或返回 `object`。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.2）。
+
+- [ ] **IL 链式比较 `a < b < c` 结果为 false**：`a <- 5; b <- 10; c <- 15; a < b < c` 期望 `true`，
+  IL 模式得到 `false`（`ComparisonTests.ChainedComparisons_CompilesAndExecutesCorrectly`，已在
+  `HEAD` 基线上复现，与装箱修复无关）。第二段比较的左侧实际是 `bool`，需要明确链式比较的语义
+  （逐段布尔还是数学链式）后再改发射逻辑。见 change（`2026-11-14-IL比较装箱崩溃/test.md` §6.3）。
 
 - [ ] **`Compiler.Basic.ErrorHandlingTests` 的 IL 异常预期已失配**：2026-11-13 在 Core 基础异常契约迁移的定向回归中，因筛选条件同时匹配该类，70 项中 10 项失败、2 项跳过。失败包括期望 `Old8Exception` 但实际抛出 `CompilerException`、期望运行期异常但未抛出，以及生成无效 IL。此次改动仅调整 `CompilerException` 与 `SourceContextWindow` 的程序集归属，未改异常继承或 IL 生成逻辑；需在独立基线中复现并按当前 IL 语义更新实现或断言。见 Core 基础异常契约报告（`2026-11-13-16-20-Core基础异常契约测试.md`）。
 

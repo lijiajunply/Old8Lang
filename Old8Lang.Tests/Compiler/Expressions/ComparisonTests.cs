@@ -302,4 +302,80 @@ public class ComparisonTests
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
+
+    /// <summary>
+    /// 数值在左、object 在右的比较（未标注的类字段 / 动态方法结果）。
+    /// </summary>
+    /// <remarks>
+    /// 回归用例：装箱必须按操作数位置逐个发射。此前两个操作数都压栈后才统一
+    /// <c>box</c>，数值在左侧时实际装箱的是栈顶的 object，左侧整数保持未装箱，
+    /// 随后 <c>IComparable.CompareTo</c> 把整数位模式当作 <c>this</c> 指针使用，
+    /// 生成的无效 IL 会让测试主机以段错误崩溃而不是抛托管异常。
+    /// </remarks>
+    [Theory]
+    [InlineData(">=", true)]
+    [InlineData("<=", false)]
+    [InlineData(">", true)]
+    [InlineData("<", false)]
+    [InlineData("==", false)]
+    [InlineData("!=", true)]
+    public void NumericLeftObjectRight_BoxesEachOperandIndividually(string op, bool expected)
+    {
+        // Arrange：data 是未标注类型字段，Count() 的静态类型为 object，运行期值为 0
+        var code = $@"
+            class Holder {{
+                public data <- {{}}
+                public func check(i:int) -> bool {{
+                    return i {op} this.data.Count()
+                }}
+            }}
+            h <- Holder()
+            result <- h.check(1)
+            Assert.Equal({expected.ToString().ToLower()}, result)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// 反向操作数顺序（object 在左、数值在右）同样按位置装箱，保持原有语义。
+    /// </summary>
+    [Theory]
+    [InlineData(">=", false)]
+    [InlineData("<=", true)]
+    [InlineData(">", false)]
+    [InlineData("<", true)]
+    [InlineData("==", false)]
+    [InlineData("!=", true)]
+    public void ObjectLeftNumericRight_BoxesEachOperandIndividually(string op, bool expected)
+    {
+        // Arrange
+        var code = $@"
+            class Holder {{
+                public data <- {{}}
+                public func check(i:int) -> bool {{
+                    return this.data.Count() {op} i
+                }}
+            }}
+            h <- Holder()
+            result <- h.check(1)
+            Assert.Equal({expected.ToString().ToLower()}, result)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
 }
