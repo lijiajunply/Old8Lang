@@ -1,8 +1,3 @@
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Interpreter;
-
-using Old8Lang.AST.Visitor;
-
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
@@ -126,60 +121,5 @@ public partial class MatchCase
         Type = PatternType.Range;
         RangePattern = rangePattern;
         ResultExpression = resultExpression;
-    }
-
-
-
-
-
-    /// <summary>
-    /// 检查值的类型是否匹配给定的类型注解
-    /// </summary>
-    internal static bool CheckTypeMatch(LangValueType value, string typeAnnotation)
-    {
-        return typeAnnotation.ToLower() switch
-        {
-            "int" => value is IntLangValue,
-            "double" => value is DoubleLangValue,
-            "string" => value is StringLangValue,
-            "bool" => value is BoolLangValue,
-            "char" => value is CharLangValue,
-            "list" => value is ListLangValue,
-            "dict" => value is DictionaryLangValue,
-            "tuple" => value is TupleLangValue,
-            "array" => value is ArrayLangValue,
-            _ => false
-        };
-    }
-
-    /// <summary>
-    /// 尝试从值中获取数值
-    /// </summary>
-    internal static bool TryGetNumericValue(LangValueType value, out double numValue)
-    {
-        numValue = 0;
-
-        switch (value)
-        {
-            case IntLangValue intVal:
-                numValue = intVal.Value;
-                return true;
-            case DoubleLangValue doubleVal:
-                numValue = doubleVal.Value;
-                return true;
-            case CharLangValue charVal:
-                numValue = charVal.Value;
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    /// <summary>
-    /// 获取元组的元素列表
-    /// </summary>
-    internal static List<LangValueType> FlattenTuple(TupleLangValue tuple)
-    {
-        return tuple.GetItems().ToList();
     }
 }

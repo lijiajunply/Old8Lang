@@ -555,7 +555,8 @@ Old8Lang 的 AST 节点分为两大类：
 **位置**: 未迁移节点在 `Old8Lang.Runtime/AST/Statement/`；已迁移节点在
 `Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
 `BreakStatement`、`ContinueStatement`、`BlockStatement`、`IfChild`、`IfStatement`、`DeferStatement`、
-`WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。
+`WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。另有 `SelectCase`、`ImportItem`、
+`ClassFieldSetStatement` 等纯语法模型位于同一目录。
 
 **基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 

@@ -48,6 +48,13 @@
 
 ## 进度记录
 
+- 2026-11-14：`MatchCase`、`TuplePattern`、`TuplePatternElement`、`RangePattern`、`SelectCase`、
+  `ImportItem`、`ClassFieldSetStatement` 迁入 Syntax；`MatchCase` 的模式匹配执行与运行时值判定移入
+  `MatchCaseRuntimeExtensions`。Runtime 生成节点保持 69（本批无 Visitor 节点），遗留 partial 基线
+  21 → 20。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、
+  Architecture 43 通过；Compiler.Statements 4 项与 Compiler.Async 65 项失败与基线一致。
+  见 `Reports/2026-11-14-14-25-匹配与导入模型迁移测试.md`。
+
 - 2026-11-14：`SetStatement`、`ForStatement` 迁入 Syntax；全局槽位写入、数值转换与循环变量遮蔽
   辅助移入 Runtime 的 `SetStatementRuntimeExtensions`/`ForStatementRuntimeExtensions`。Runtime 生成节点
   71 → 69，遗留 partial 基线 23 → 21。Parser 889、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
