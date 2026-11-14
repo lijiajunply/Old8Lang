@@ -1,17 +1,10 @@
-using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// Try语句，用于异常处理
+/// try 语句，用于异常处理。
 /// </summary>
 /// <param name="tryBlock">try块中的语句</param>
 /// <param name="catchBlocks">catch块列表，每个catch块包含异常类型、变量名、过滤器和处理语句</param>
@@ -23,7 +16,6 @@ public partial class TryStatement(
     BlockStatement? finallyBlock = null,
     SourcePosition position = default) : OldStatement(position)
 {
-
     /// <summary>
     /// 获取 try 块
     /// </summary>
@@ -40,43 +32,7 @@ public partial class TryStatement(
     /// </summary>
     public BlockStatement? FinallyBlock => finallyBlock;
 
-
-
-    internal static bool IsMatch(Old8Exception exception, string exceptionType)
-    {
-        if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception" || exceptionType == "Old8Exception")
-        {
-            return true;
-        }
-
-        var currentType = exception.GetType();
-        while (currentType is not null)
-        {
-            // 精确匹配类型名称
-            if (currentType.Name == exceptionType)
-            {
-                return true;
-            }
-
-            // 精确匹配完整类型名称（包括命名空间）
-            if (currentType.FullName == exceptionType)
-            {
-                return true;
-            }
-
-            // 检查完整命名空间路径中的类型（支持"Error.RuntimeError"格式）
-            if (currentType.FullName?.EndsWith($".{exceptionType}") == true ||
-                currentType.FullName?.Contains($".{exceptionType}.") == true)
-            {
-                return true;
-            }
-
-            // 移动到父类，支持异常继承关系匹配
-            currentType = currentType.BaseType;
-        }
-
-        return false;
-    }
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitTryStatement(this);
 
     public override OldStatement this[int index]
     {

@@ -10,14 +10,14 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// TryStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// TryStatement 的解释执行辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class TryStatement
+internal static class TryStatementRuntimeExtensions
 {
     /// <summary>
     /// 生成器上下文模式执行
     /// </summary>
-    internal void RunWithGeneratorContext(VariateManager manager)
+    internal static void RunWithGeneratorContext(this TryStatement node, VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 
@@ -29,9 +29,9 @@ public partial class TryStatement
         if (isResumingFromCatch)
         {
             // 执行第一个 catch 块（简化处理，假设只有一个 catch）
-            if (catchBlocks.Count > 0)
+            if (node.CatchBlocks.Count > 0)
             {
-                var (_, _, _, catchBlock) = catchBlocks[0];
+                var (_, _, _, catchBlock) = node.CatchBlocks[0];
 
                 // 压入 catch 路径
                 context.PathStack.Push("/catch");
@@ -58,11 +58,11 @@ public partial class TryStatement
         }
         else
         {
-            // 正常���行 try 块
+            // 正常运行 try 块
             context.PathStack.Push("/try");
             try
             {
-                tryBlock.Accept(new InterpreterVisitor(manager));
+                node.TryBlock.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否 yield
                 if (context.HasYielded)
@@ -84,7 +84,7 @@ public partial class TryStatement
                 try
                 {
                     // 遍历所有catch块，查找匹配的异常类型
-                    foreach (var (exceptionType, exceptionVar, filter, catchBlock) in catchBlocks)
+                    foreach (var (exceptionType, exceptionVar, filter, catchBlock) in node.CatchBlocks)
                     {
                         // 如果异常类型为null，则匹配所有异常
                         if (exceptionType is null || IsMatch(ex, exceptionType))
@@ -174,11 +174,11 @@ public partial class TryStatement
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
-    internal void RunStandard(VariateManager manager)
+    internal static void RunStandard(this TryStatement node, VariateManager manager)
     {
         try
         {
-            tryBlock.Accept(new InterpreterVisitor(manager));
+            node.TryBlock.Accept(new InterpreterVisitor(manager));
             // 检查try块是否执行了return语句
             if (manager.IsReturn)
             {
@@ -187,7 +187,7 @@ public partial class TryStatement
         catch (Old8Exception ex)
         {
             // 遍历所有catch块，查找匹配的异常类型
-            foreach (var (exceptionType, exceptionVar, filter, catchBlock) in catchBlocks)
+            foreach (var (exceptionType, exceptionVar, filter, catchBlock) in node.CatchBlocks)
             {
                 // 如果异常类型为null，则匹配所有异常
                 if (exceptionType is not null &&
@@ -246,7 +246,46 @@ public partial class TryStatement
         finally
         {
             // 执行finally块（如果存在）
-            finallyBlock?.Accept(new InterpreterVisitor(manager));
+            node.FinallyBlock?.Accept(new InterpreterVisitor(manager));
         }
+    }
+
+    /// <summary>
+    /// 判断异常类型名是否匹配捕获声明。
+    /// </summary>
+    internal static bool IsMatch(Old8Exception exception, string exceptionType)
+    {
+        if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception" || exceptionType == "Old8Exception")
+        {
+            return true;
+        }
+
+        var currentType = exception.GetType();
+        while (currentType is not null)
+        {
+            // 精确匹配类型名称
+            if (currentType.Name == exceptionType)
+            {
+                return true;
+            }
+
+            // 精确匹配完整类型名称（包括命名空间）
+            if (currentType.FullName == exceptionType)
+            {
+                return true;
+            }
+
+            // 检查完整命名空间路径中的类型（支持"Error.RuntimeError"格式）
+            if (currentType.FullName?.EndsWith($".{exceptionType}") == true ||
+                currentType.FullName?.Contains($".{exceptionType}.") == true)
+            {
+                return true;
+            }
+
+            // 移动到父类，支持异常继承关系匹配
+            currentType = currentType.BaseType;
+        }
+
+        return false;
     }
 }

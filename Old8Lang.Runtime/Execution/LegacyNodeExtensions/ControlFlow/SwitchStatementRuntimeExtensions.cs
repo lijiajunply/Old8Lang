@@ -9,18 +9,18 @@ using Old8Lang.Syntax;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// SwitchStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// SwitchStatement 的编译期辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class SwitchStatement
+internal static class SwitchStatementRuntimeExtensions
 {
-    internal bool TryGenerateIntSwitch(ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel,
+    internal static bool TryGenerateIntSwitch(this SwitchStatement node, ILGenerator ilGenerator, LocalBuilder switchValueLocal, Label defaultLabel,
         List<Label> caseLabels)
     {
         // 1. 检查是否所有 case 都是整数常量
         var caseValues = new List<(int Value, int Index)>();
-        for (int i = 0; i < switchCaseList.Count; i++)
+        for (int i = 0; i < node.SwitchCaseList.Count; i++)
         {
-            var oldCase = switchCaseList[i];
+            var oldCase = node.SwitchCaseList[i];
             if (oldCase.Expression is ILiteralSyntax { Kind: LiteralKind.Int, LiteralValue: int intVal })
             {
                 caseValues.Add((intVal, i));

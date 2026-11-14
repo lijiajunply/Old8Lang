@@ -333,7 +333,7 @@ Visitor 接口由旧 `Old8Lang.CodeGen` 生成器产出：
 - 生成配置：`Old8Lang.CodeGen/visitor-codegen.json`
   （扫描 `Old8Lang.Runtime/AST`，排除 `Visitor/`、`ValueFunctions/`、`ModuleObjects/` 等目录）。
 - 生成产物：`Old8Lang.Runtime/AST/Visitor/Generated/IVisitor.generated.cs` 与每个节点的
-  `<Node>.Accept.generated.cs`；当前识别 **68 个 Runtime 节点**（阶段 2 已迁入
+  `<Node>.Accept.generated.cs`；当前识别 **65 个 Runtime 节点**（阶段 2 已迁入
   `Old8Lang.Syntax` 的节点自带 `Accept`，不再出现在生成结果中）。生成目录另有
   `SuperProxy.Accept.generated.cs`，其 `VisitSuperProxy` 由 `IVisitor.Extensions.cs` 手工声明，
   因此文件数会比接口方法数多 1。
@@ -556,7 +556,8 @@ Old8Lang 的 AST 节点分为两大类：
 `Old8Lang.Syntax/AST/Statements/`（当前为 `ThrowStatement`、`ReturnStatement`、`YieldStatement`、
 `BreakStatement`、`ContinueStatement`、`BlockStatement`、`IfChild`、`IfStatement`、`DeferStatement`、
 `WhileStatement`、`UsingStatement`、`SetStatement`、`ForStatement`）。另有 `SelectCase`、`ImportItem`、
-`ClassFieldSetStatement`、`FuncRunStatement` 等纯语法模型位于同一目录。
+`ClassFieldSetStatement`、`FuncRunStatement`、`SwitchStatement`/`CaseStatement`、`TryStatement`
+等语句节点位于同一目录。
 
 **基类**: `OldStatement`（位于 `Old8Lang.Syntax`）
 
@@ -573,7 +574,9 @@ Old8Lang 的 AST 节点分为两大类：
 | FunctionDeclarationStatement | FunctionDeclarationStatement.cs | 函数声明 | `func add(a, b) { return a + b }` |
 | ClassDeclarationStatement | ClassDeclarationStatement.cs | 类声明 | `class Point { ... }` |
 | ReturnStatement | ReturnStatement.cs（Syntax） | 返回语句 | `return result` |
-| TryStatement | TryStatement.cs | 异常处理 | `try { ... } catch (e) { ... }` |
+| TryStatement | TryStatement.cs（Syntax） | 异常处理 | `try { ... } catch (e) { ... }` |
+| SwitchStatement | SwitchStatement.cs（Syntax） | 多分支选择 | `switch x { case 1 { ... } }` |
+| CaseStatement | CaseStatement.cs（Syntax） | switch 分支 | `case 1 { ... }` |
 | ImportStatement | ImportStatement.cs | 模块导入 | `import "Math"` |
 | BreakStatement | BreakStatement.cs（Syntax） | 跳出循环 | `break` |
 | ContinueStatement | ContinueStatement.cs（Syntax） | 继续循环 | `continue` |
