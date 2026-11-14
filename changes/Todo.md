@@ -235,6 +235,14 @@
   修改后断言 `numbers` 与 `updatedNumbers` 都是 6」并注明别名语义；`MemberAccessTests`
   整组 7→8 通过。这条不是 IL 结果错误。
 
+- [ ] **`RangeEdgeCases_CompilesAndExecutesCorrectly` 依赖两处未统一的语义**：用例用
+  `single_range.Length`（属性形式）与 `Assert.Equal(0, single_exclusive.Length)`
+  （`[5>~<5]`）。实测：属性形式的 `.Length` 只有 IL 与虚拟机接受，解释器报
+  `NAME_ERROR: 名称 'Length' 未定义`，而 `Docs/API_REFERENCE.md` 明确写的是「数组没有
+  `.Length` 属性，用 `len(a)` 或 `a.Count()`」；`[5>~<5]` 在解释器与 IL 都是 `[4, 3, 2]`
+  这样的 3 个元素（`[1>~<1]` → `[2, 1, 0]`，见已完成的扩展范围修复），虚拟机则是空数组。
+  两条都需要先定语义再动用例。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
+
 - [ ] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
   在 `-f` 报 `INVALID_OPERATION_ERROR: 不支持类型 ... 的加法操作`，`-il` 被推断成数值加法后
   `Len` 报 `类型 Int32 没有 Length 或 Count 属性`，`-vm` 输出拼接结果（

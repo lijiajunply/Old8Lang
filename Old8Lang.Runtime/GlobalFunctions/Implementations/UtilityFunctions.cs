@@ -152,9 +152,31 @@ public sealed class RangeFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持动态构建 Range，返回空数组
-        ilGenerator.Emit(OpCodes.Ldc_I4_0);
-        ilGenerator.Emit(OpCodes.Newarr, typeof(int));
+        // 参数按原生值压栈后交给运行期构建（与 VM 的 ExecuteInVMInternal 同一实现）。
+        // 之前这里直接返回空数组，IL 模式下 Range(...) 永远是 []，与 -f / -vm 不一致。
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            var parameter = parameters[i];
+            parameter.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var parameterType = parameter.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            if (parameterType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, parameterType);
+            }
+        }
+
+        ilGenerator.Emit(OpCodes.Call, typeof(RangeFunction).GetMethod(nameof(BuildIlRange))!);
+    }
+
+    /// <summary>
+    /// 运行期构建 Range 结果，供 IL 模式调用。
+    /// </summary>
+    public static int[] BuildIlRange(object? startValue, object? endValue, object? stepValue)
+    {
+        var start = Convert.ToInt32(startValue);
+        var end = Convert.ToInt32(endValue);
+        var step = Convert.ToInt32(stepValue);
+        return BuildRangeIntegers(start, end, step, new SourcePosition()).ToArray();
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
