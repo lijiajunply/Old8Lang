@@ -728,7 +728,7 @@ public partial class InterpreterVisitor
         var asyncFunc = new AsyncFuncLangValue(
             id: null,
             ids: [], // 无参数
-            blockStatement: node._block,
+            blockStatement: node.Block,
             position: node.Position
         );
 

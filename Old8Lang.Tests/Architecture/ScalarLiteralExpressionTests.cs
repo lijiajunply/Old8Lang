@@ -242,6 +242,7 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternFunctionDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.CallExpression).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.AsyncStreamExpression).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -315,6 +316,8 @@ public class ScalarLiteralExpressionTests
         Assert.Equal("native", new Old8Lang.AST.Statement.NativeStatement("d", "C").Accept(visitor));
         Assert.Equal("extern", new Old8Lang.AST.Statement.ExternStatement("d", []).Accept(visitor));
         Assert.Equal("call", new Old8Lang.AST.Expression.CallExpression(new LangId("f"), []).Accept(visitor));
+        Assert.Equal("stream", new Old8Lang.AST.Expression.AsyncStreamExpression(
+            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -365,6 +368,7 @@ public class ScalarLiteralExpressionTests
         public string VisitNativeStatement(Old8Lang.AST.Statement.NativeStatement node) => "native";
         public string VisitExternStatement(Old8Lang.AST.Statement.ExternStatement node) => "extern";
         public string VisitCallExpression(Old8Lang.AST.Expression.CallExpression node) => "call";
+        public string VisitAsyncStreamExpression(Old8Lang.AST.Expression.AsyncStreamExpression node) => "stream";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;

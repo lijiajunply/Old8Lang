@@ -48,6 +48,10 @@
 
 ## 进度记录
 
+- 2026-11-14：`AsyncStreamExpression` 迁入 Syntax；Runtime 生成节点 51 → 50。Parser 889、
+  Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
+  Compiler.Async 65 项失败与基线一致。见 `Reports/2026-11-14-15-37-异步流表达式迁移测试.md`。
+
 - 2026-11-14：引入 Syntax 的 `CallExpression`，解析器不再构造运行时 `Instance`；求值与各分析入口通过
   `CallSyntaxAdapter.Normalize` 归一化为原 `Instance`。补齐解释器/字节码 Dot 分派、静态类调用、
   类型推断、泛型参数推断、VM 闭包捕获与 LSP 成员分析中的调用识别。Runtime 生成节点保持 51。
