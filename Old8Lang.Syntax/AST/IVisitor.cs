@@ -85,6 +85,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问 for-in 语句。</summary>
     TResult VisitForInStatement(ForInStatement node);
 
+    /// <summary>访问异步 for-in 语句。</summary>
+    TResult VisitAsyncForInStatement(AsyncForInStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

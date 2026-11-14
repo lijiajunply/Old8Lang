@@ -12,14 +12,14 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// AsyncForInStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// AsyncForInStatement 的执行/编译辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class AsyncForInStatement
+internal static partial class AsyncForInStatementRuntimeExtensions
 {
     /// <summary>
     /// 标准异步 for-in 循环（非生成器）
     /// </summary>
-    internal void RunStandard(VariateManager manager)
+    internal static void RunStandard(this AsyncForInStatement node, VariateManager manager)
     {
         manager.AddChildren();
         // 压入新的控制流状态
@@ -27,7 +27,7 @@ public partial class AsyncForInStatement
 
         try
         {
-            var value = expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(new InterpreterVisitor(manager));
 
             // 处理 TaskLangValue - await 任务并获取结果
             if (value is TaskLangValue taskValue)
@@ -63,9 +63,9 @@ public partial class AsyncForInStatement
                         if (currentValue is not null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
-                            if (AllIds.Count == 1)
+                            if (node.Ids.Count == 1)
                             {
-                                manager.Set(id, currentValue);
+                                manager.Set(node.Id, currentValue);
                             }
                             else
                             {
@@ -78,20 +78,20 @@ public partial class AsyncForInStatement
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
 
-                                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                    for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                     {
-                                        manager.Set(AllIds[i], values[i]);
+                                        manager.Set(node.Ids[i], values[i]);
                                     }
                                 }
                                 else
                                 {
                                     // 不是键值对，只赋值给第一个标识符
-                                    manager.Set(id, currentValue);
+                                    manager.Set(node.Id, currentValue);
                                 }
                             }
 
                             // 执行循环体
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -139,9 +139,9 @@ public partial class AsyncForInStatement
                         if (currentValue is not null && !(currentValue is VoidLangValue))
                         {
                             // 赋值给标识符
-                            if (AllIds.Count == 1)
+                            if (node.Ids.Count == 1)
                             {
-                                manager.Set(id, currentValue);
+                                manager.Set(node.Id, currentValue);
                             }
                             else
                             {
@@ -154,20 +154,20 @@ public partial class AsyncForInStatement
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
 
-                                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                    for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                     {
-                                        manager.Set(AllIds[i], values[i]);
+                                        manager.Set(node.Ids[i], values[i]);
                                     }
                                 }
                                 else
                                 {
                                     // 不是键值对，只赋值给第一个标识符
-                                    manager.Set(id, currentValue);
+                                    manager.Set(node.Id, currentValue);
                                 }
                             }
 
                             // 执行循环体
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -199,9 +199,9 @@ public partial class AsyncForInStatement
 
                         if (currentValue is not null && !(currentValue is VoidLangValue))
                         {
-                            if (AllIds.Count == 1)
+                            if (node.Ids.Count == 1)
                             {
-                                manager.Set(id, currentValue);
+                                manager.Set(node.Id, currentValue);
                             }
                             else
                             {
@@ -210,18 +210,18 @@ public partial class AsyncForInStatement
                                     tupleValue.Accept(new InterpreterVisitor(manager));
                                     var values = tupleValue.GetItems().ToList();
 
-                                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                    for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                     {
-                                        manager.Set(AllIds[i], values[i]);
+                                        manager.Set(node.Ids[i], values[i]);
                                     }
                                 }
                                 else
                                 {
-                                    manager.Set(id, currentValue);
+                                    manager.Set(node.Id, currentValue);
                                 }
                             }
 
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -238,9 +238,9 @@ public partial class AsyncForInStatement
                 {
                     manager.ControlFlowManager.ResetCurrentState();
 
-                    if (AllIds.Count == 1)
+                    if (node.Ids.Count == 1)
                     {
-                        manager.Set(id, idValue);
+                        manager.Set(node.Id, idValue);
                     }
                     else
                     {
@@ -249,18 +249,18 @@ public partial class AsyncForInStatement
                             tupleValue.Accept(new InterpreterVisitor(manager));
                             var values = tupleValue.GetItems().ToList();
 
-                            for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                            for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                             {
-                                manager.Set(AllIds[i], values[i]);
+                                manager.Set(node.Ids[i], values[i]);
                             }
                         }
                         else
                         {
-                            manager.Set(id, idValue);
+                            manager.Set(node.Id, idValue);
                         }
                     }
 
-                    body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(new InterpreterVisitor(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -270,7 +270,7 @@ public partial class AsyncForInStatement
             }
             else
             {
-                throw new TypeError(this,
+                throw new TypeError(node,
                     "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue",
                     value.GetType().Name);
             }
@@ -285,7 +285,7 @@ public partial class AsyncForInStatement
     /// <summary>
     /// 生成器上下文中的异步 for-in 循环
     /// </summary>
-    internal void RunWithGeneratorContext(VariateManager manager)
+    internal static void RunWithGeneratorContext(this AsyncForInStatement node, VariateManager manager)
     {
         // 不要在这里调用 AddChildren()！
         // 异步 for-in 循环的变量应该在外层作用域中
@@ -308,7 +308,7 @@ public partial class AsyncForInStatement
             // 如果缓存中没有，则evaluate表达式并缓存
             if (value is null)
             {
-                value = expression.Accept(new InterpreterVisitor(manager));
+                value = node.Expression.Accept(new InterpreterVisitor(manager));
 
                 // 处理 TaskLangValue - await 任务并获取结果
                 if (value is TaskLangValue taskValue)
@@ -326,25 +326,25 @@ public partial class AsyncForInStatement
             // 处理 AsyncStreamLangValue
             if (value is AsyncStreamLangValue asyncStream)
             {
-                RunGeneratorContextAsyncStream(manager, asyncStream, context, loopPath);
+                node.RunGeneratorContextAsyncStream(manager, asyncStream, context, loopPath);
                 return;
             }
 
             // 处理 AsyncGeneratorLangValue
             if (value is AsyncGeneratorLangValue asyncGenerator)
             {
-                RunGeneratorContextAsyncGenerator(manager, asyncGenerator, context, loopPath);
+                node.RunGeneratorContextAsyncGenerator(manager, asyncGenerator, context, loopPath);
                 return;
             }
 
             // 处理普通列表对象：需要支持从上次 yield 位置恢复
             if (value is ILangList oldList)
             {
-                RunGeneratorContextList(manager, oldList, context);
+                node.RunGeneratorContextList(manager, oldList, context);
                 return;
             }
 
-            throw new TypeError(this,
+            throw new TypeError(node,
                 "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue",
                 value.GetType().Name);
         }
@@ -361,7 +361,7 @@ public partial class AsyncForInStatement
     /// 但将ExecutionPath修改为指向async-for语句本身，
     /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
-    internal void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
+    private static void RunGeneratorContextAsyncStream(this AsyncForInStatement node, VariateManager manager, AsyncStreamLangValue asyncStream,
         AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
@@ -412,9 +412,9 @@ public partial class AsyncForInStatement
                     if (currentValue is not null && !(currentValue is VoidLangValue))
                     {
                         // 设置循环变量
-                        if (AllIds.Count == 1)
+                        if (node.Ids.Count == 1)
                         {
-                            manager.Set(id, currentValue);
+                            manager.Set(node.Id, currentValue);
                         }
                         else
                         {
@@ -422,18 +422,18 @@ public partial class AsyncForInStatement
                             {
                                 tupleValue.Accept(new InterpreterVisitor(manager));
                                 var values = tupleValue.GetItems().ToList();
-                                for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                 {
-                                    manager.Set(AllIds[i], values[i]);
+                                    manager.Set(node.Ids[i], values[i]);
                                 }
                             }
                             else
                             {
-                                manager.Set(id, currentValue);
+                                manager.Set(node.Id, currentValue);
                             }
                         }
 
-                        body.Accept(new InterpreterVisitor(manager));
+                        node.Body.Accept(new InterpreterVisitor(manager));
 
                         // 如果循环体中发生了yield，我们需要：
                         // 1. 标记循环状态为"从yield恢复"
@@ -479,7 +479,7 @@ public partial class AsyncForInStatement
     /// 在生成器上下文中迭代异步生成器
     /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
-    internal void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
+    private static void RunGeneratorContextAsyncGenerator(this AsyncForInStatement node, VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
         AsyncGeneration.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
@@ -540,9 +540,9 @@ public partial class AsyncForInStatement
                         try
                         {
                             // 设置循环变量
-                            if (AllIds.Count == 1)
+                            if (node.Ids.Count == 1)
                             {
-                                manager.Set(id, currentValue);
+                                manager.Set(node.Id, currentValue);
                             }
                             else
                             {
@@ -550,18 +550,18 @@ public partial class AsyncForInStatement
                                 {
                                     tupleValue.Accept(new InterpreterVisitor(manager));
                                     var values = tupleValue.GetItems().ToList();
-                                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                    for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                     {
-                                        manager.Set(AllIds[i], values[i]);
+                                        manager.Set(node.Ids[i], values[i]);
                                     }
                                 }
                                 else
                                 {
-                                    manager.Set(id, currentValue);
+                                    manager.Set(node.Id, currentValue);
                                 }
                             }
 
-                            body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(new InterpreterVisitor(manager));
 
                             // 如果循环体中发生了yield，我们需要：
                             // 1. 标记循环状态为"从yield恢复"
@@ -614,7 +614,7 @@ public partial class AsyncForInStatement
     /// <summary>
     /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
-    internal void RunGeneratorContextList(VariateManager manager, ILangList oldList,
+    private static void RunGeneratorContextList(this AsyncForInStatement node, VariateManager manager, ILangList oldList,
         AsyncGeneration.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
@@ -641,9 +641,9 @@ public partial class AsyncForInStatement
                 var idValue = items[i];
 
                 // 设置循环变量
-                if (AllIds.Count == 1)
+                if (node.Ids.Count == 1)
                 {
-                    manager.Set(id, idValue);
+                    manager.Set(node.Id, idValue);
                 }
                 else
                 {
@@ -651,19 +651,19 @@ public partial class AsyncForInStatement
                     {
                         tupleValue.Accept(new InterpreterVisitor(manager));
                         var values = tupleValue.GetItems().ToList();
-                        for (var j = 0; j < AllIds.Count && j < values.Count; j++)
+                        for (var j = 0; j < node.Ids.Count && j < values.Count; j++)
                         {
-                            manager.Set(AllIds[j], values[j]);
+                            manager.Set(node.Ids[j], values[j]);
                         }
                     }
                     else
                     {
-                        manager.Set(id, idValue);
+                        manager.Set(node.Id, idValue);
                     }
                 }
 
                 // 执行循环体
-                body.Accept(new InterpreterVisitor(manager));
+                node.Body.Accept(new InterpreterVisitor(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)

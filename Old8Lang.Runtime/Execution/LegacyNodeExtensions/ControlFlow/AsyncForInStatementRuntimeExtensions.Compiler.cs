@@ -12,17 +12,17 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// AsyncForInStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// AsyncForInStatement 的执行/编译辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class AsyncForInStatement
+internal static partial class AsyncForInStatementRuntimeExtensions
 {
     /// <summary>
     /// 生成字典类型的IL代码
     /// </summary>
-    internal void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateDictionaryIl(this AsyncForInStatement node, ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -72,10 +72,10 @@ public partial class AsyncForInStatement
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 将键添加到局部变量管理器
-        local.AddLocalVar(AllIds[0].IdName, keyLocal);
+        local.AddLocalVar(node.Ids[0].IdName, keyLocal);
 
         // 如果有多个标识符（键值对遍历），获取值
-        if (AllIds.Count > 1)
+        if (node.Ids.Count > 1)
         {
             // 获取字典的索引器方法
             var itemProperty = typeof(Dictionary<object, object>).GetProperty("Item")!;
@@ -91,11 +91,11 @@ public partial class AsyncForInStatement
             ilGenerator.Emit(OpCodes.Stloc, valueLocal);
 
             // 将值添加到局部变量管理器
-            local.AddLocalVar(AllIds[1].IdName, valueLocal);
+            local.AddLocalVar(node.Ids[1].IdName, valueLocal);
         }
 
         // 生成循环体
-        body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
@@ -113,7 +113,7 @@ public partial class AsyncForInStatement
     /// <summary>
     /// 生成异步枚举类型的IL代码
     /// </summary>
-    internal void GenerateAsyncEnumerableIl(ILGenerator ilGenerator, LocalManager local, Type asyncEnumerableType)
+    internal static void GenerateAsyncEnumerableIl(this AsyncForInStatement node, ILGenerator ilGenerator, LocalManager local, Type asyncEnumerableType)
     {
         // 获取元素类型（IAsyncEnumerable<T>中的T）
         var elementType = asyncEnumerableType.GetGenericArguments()[0];
@@ -124,7 +124,7 @@ public partial class AsyncForInStatement
         
         // 获取异步枚举器
         var getAsyncEnumeratorMethod = asyncEnumerableType.GetMethod("GetAsyncEnumerator", [typeof(CancellationToken)])!;
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldc_I4_0); // 默认的CancellationToken
         ilGenerator.Emit(OpCodes.Newobj, typeof(CancellationToken).GetConstructor(Type.EmptyTypes)!);
         ilGenerator.Emit(OpCodes.Callvirt, getAsyncEnumeratorMethod);
@@ -165,19 +165,19 @@ public partial class AsyncForInStatement
         ilGenerator.Emit(OpCodes.Stloc, current);
         
         // 处理标识符赋值
-        if (AllIds.Count == 1)
+        if (node.Ids.Count == 1)
         {
             // 单个标识符，直接赋值
             // 在异步状态机中，需要定义变量并存储
             if (local.AsyncStateMachineGenerator != null)
             {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
             }
             else
             {
-                local.AddLocalVar(AllIds[0].IdName, current);
+                local.AddLocalVar(node.Ids[0].IdName, current);
             }
         }
         else
@@ -185,18 +185,18 @@ public partial class AsyncForInStatement
             // 多个标识符，只赋值给第一个
             if (local.AsyncStateMachineGenerator != null)
             {
-                local.DefineVariable(ilGenerator, AllIds[0].IdName, typeof(object));
+                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, AllIds[0].IdName, Position);
+                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
             }
             else
             {
-                local.AddLocalVar(AllIds[0].IdName, current);
+                local.AddLocalVar(node.Ids[0].IdName, current);
             }
         }
         
         // 生成循环体
-        body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
         
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

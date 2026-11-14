@@ -109,19 +109,19 @@ public partial class CompilerVisitor
         ilGenerator.Emit(OpCodes.Stloc, current);
 
         // 处理标识符赋值
-        if (node.AllIds.Count == 1)
+        if (node.Ids.Count == 1)
         {
             // 单个标识符，直接赋值
             // 在异步状态机中，需要定义变量并存储
             if (local.AsyncStateMachineGenerator != null)
             {
-                local.DefineVariable(ilGenerator, node.AllIds[0].IdName, typeof(object));
+                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, node.AllIds[0].IdName, node.Position);
+                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
             }
             else
             {
-                local.AddLocalVar(node.AllIds[0].IdName, current);
+                local.AddLocalVar(node.Ids[0].IdName, current);
             }
         }
         else
@@ -129,13 +129,13 @@ public partial class CompilerVisitor
             // 多个标识符，只赋值给第一个
             if (local.AsyncStateMachineGenerator != null)
             {
-                local.DefineVariable(ilGenerator, node.AllIds[0].IdName, typeof(object));
+                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, node.AllIds[0].IdName, node.Position);
+                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
             }
             else
             {
-                local.AddLocalVar(node.AllIds[0].IdName, current);
+                local.AddLocalVar(node.Ids[0].IdName, current);
             }
         }
 

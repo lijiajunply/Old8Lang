@@ -1,12 +1,4 @@
-using System.Collections;
-using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Generators;
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-using Old8Lang.Compiler.CodeGeneration;
 
 using Old8Lang.AST.Visitor;
 
@@ -24,8 +16,9 @@ public partial class AsyncForInStatement(
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
-    internal LangExpression Expression => expression;
-    internal OldStatement Body => body;
+    public LangId Id => id;
+    public LangExpression Expression => expression;
+    public OldStatement Body => body;
 
     // 获取所有标识符，包括主标识符和附加标识符
     internal List<LangId> AllIds { get; } = [id, .. (additionalIds ?? [])];
@@ -44,6 +37,8 @@ public partial class AsyncForInStatement(
 
 
 
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitAsyncForInStatement(this);
 
     public override OldStatement this[int index] => body[index]!;
 
