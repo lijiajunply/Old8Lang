@@ -57,7 +57,7 @@ public partial class TaskClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
+            var args = instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(currentManager))).ToList();
             return method(args, instance.Position);
         }
 

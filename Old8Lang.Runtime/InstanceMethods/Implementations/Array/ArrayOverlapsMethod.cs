@@ -26,7 +26,7 @@ public class ArrayOverlapsMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var array = (ArrayLangValue)instance;
-        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (otherValue is not ArrayLangValue otherArray)
         {

@@ -75,7 +75,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
         {
             // 转换参数
             var jsArgs = positionalArgs
-                .Select(arg => ConvertToJavaScript(arg.Accept(new InterpreterVisitor(variateManagerFunc))))
+                .Select(arg => ConvertToJavaScript(arg.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc))))
                 .ToArray();
 
             // 调用 JavaScript 函数

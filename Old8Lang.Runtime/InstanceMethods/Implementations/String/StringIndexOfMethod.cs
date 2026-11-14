@@ -26,7 +26,7 @@ public class StringIndexOfMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var valueParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var valueParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (valueParam is not StringLangValue value)
         {

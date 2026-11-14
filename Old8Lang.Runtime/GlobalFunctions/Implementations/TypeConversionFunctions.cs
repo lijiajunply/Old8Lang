@@ -25,7 +25,7 @@ public sealed class IntFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (value is IntLangValue intValue)
         {
@@ -159,7 +159,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (value is DoubleLangValue doubleValue)
         {
@@ -294,7 +294,7 @@ public sealed class CharFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (value is CharLangValue charValue)
         {
@@ -400,7 +400,7 @@ public sealed class BoolFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager,
         SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (value is BoolLangValue boolValue)
         {

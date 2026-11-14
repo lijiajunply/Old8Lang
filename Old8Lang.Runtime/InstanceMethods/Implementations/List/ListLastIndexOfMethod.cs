@@ -25,7 +25,7 @@ public class ListLastIndexOfMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var element = parameters[0].Accept(new InterpreterVisitor(manager));
+        var element = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 从后向前查找
         for (var i = list.Values.Count - 1; i >= 0; i--)

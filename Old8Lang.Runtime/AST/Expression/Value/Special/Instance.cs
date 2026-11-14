@@ -114,11 +114,11 @@ public partial class Instance : LangValueType
             }
             else if (baseLangValue is TaskLangValue { ExternalManager: not null } taskLangValue)
             {
-                argValue = Ids[i].Accept(new InterpreterVisitor(taskLangValue.ExternalManager));
+                argValue = Ids[i].Accept(RuntimeVisitors.CreateInterpreter(taskLangValue.ExternalManager));
             }
             else if (baseLangValue is ThreadLangValue { ExternalManager: not null } threadLangValue)
             {
-                argValue = Ids[i].Accept(new InterpreterVisitor(threadLangValue.ExternalManager));
+                argValue = Ids[i].Accept(RuntimeVisitors.CreateInterpreter(threadLangValue.ExternalManager));
             }
             else if (baseLangValue is FuncLangValue funcLangValue)
             {
@@ -127,7 +127,7 @@ public partial class Instance : LangValueType
             else
             {
                 // 使用传入的 manager 参数来运行表达式，而不是 null
-                argValue = Ids[i].Accept(new InterpreterVisitor(manager ?? new VariateManager()));
+                argValue = Ids[i].Accept(RuntimeVisitors.CreateInterpreter(manager ?? new VariateManager()));
             }
 
             os.Add(argValue);

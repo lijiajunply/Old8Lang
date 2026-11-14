@@ -48,7 +48,7 @@ public class LangListSumWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
             throw new InvalidOperationError(position, "无法对空列表求和");
         }
 
-        var selector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var selector = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
         if (selector == null)
         {
             throw new ArgumentError(position, "selector 参数必须是函数类型");

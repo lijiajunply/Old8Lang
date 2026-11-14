@@ -121,7 +121,7 @@ public static class ImportStatementRuntimeExtensions
         try
         {
             // 运行动态模块表达式来获取模块名
-            var dynamicResult = node.DynamicModuleExpression.Accept(new InterpreterVisitor(manager));
+            var dynamicResult = node.DynamicModuleExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (dynamicResult is StringLangValue stringModuleValue)
             {

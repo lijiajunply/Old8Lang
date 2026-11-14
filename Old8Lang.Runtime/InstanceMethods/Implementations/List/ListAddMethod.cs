@@ -40,7 +40,7 @@ public class ListAddMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var item = parameters[0].Accept(new InterpreterVisitor(manager));
+        var item = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         lock (list.GetSyncRoot())
         {
             list.Values.Add(item);

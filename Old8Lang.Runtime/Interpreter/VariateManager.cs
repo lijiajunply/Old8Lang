@@ -407,7 +407,7 @@ public class VariateManager
                 try
                 {
                     // 在混合的作用域上执行defer语句
-                    deferEntry.Statement.Accept(new InterpreterVisitor(this));
+                    deferEntry.Statement.Accept(RuntimeVisitors.CreateInterpreter(this));
                 }
                 finally
                 {

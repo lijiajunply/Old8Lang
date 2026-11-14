@@ -41,7 +41,7 @@ public class ListFirstWithPredicateMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var predicateParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var predicateParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (predicateParam is not FuncLangValue predicate)
         {

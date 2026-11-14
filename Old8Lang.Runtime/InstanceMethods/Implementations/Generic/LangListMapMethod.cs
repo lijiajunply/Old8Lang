@@ -26,7 +26,7 @@ public class LangListMapMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var mapperExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var mapperExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (mapperExpr is not FuncLangValue mapper)
         {

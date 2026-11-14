@@ -26,7 +26,7 @@ public class StringSplitMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var separatorValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var separatorValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (separatorValue is not StringLangValue separator)
         {

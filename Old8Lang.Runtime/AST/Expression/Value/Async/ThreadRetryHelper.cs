@@ -38,7 +38,7 @@ public static class ThreadRetryHelper
                 try
                 {
                     // 重新执行函数调用以获取新的 Thread
-                    var newThreadValue = funcCall.Accept(new InterpreterVisitor(manager));
+                    var newThreadValue = funcCall.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     if (newThreadValue is not ThreadLangValue newThread)
                     {
                         throw new TypeError(funcCall, "Retry 只能用于返回 Thread 的函数");

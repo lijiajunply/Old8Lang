@@ -26,7 +26,7 @@ public class LangListContainsMethod : BaseLangListMethod, IIlNativeValueInstance
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var searchItem = parameters[0].Accept(new InterpreterVisitor(manager));
+        var searchItem = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 使用 In 方法检查是否包含
         if (instance is ILangList langList)

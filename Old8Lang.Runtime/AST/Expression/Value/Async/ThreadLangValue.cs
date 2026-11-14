@@ -396,7 +396,7 @@ public partial class ThreadLangValue : LangValueType
                     // 直接调用 Join 方法，避免反射
                     if (instance.Ids.Count > 0)
                     {
-                        var timeoutValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
+                        var timeoutValue = instance.Ids[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
                         return Join(timeoutValue as IntLangValue);
                     }
 
@@ -406,7 +406,7 @@ public partial class ThreadLangValue : LangValueType
                     // 直接调用 Join 方法（Wait 等同于 Join）
                     if (instance.Ids.Count > 0)
                     {
-                        var timeoutValue = instance.Ids[0].Accept(new InterpreterVisitor(manager));
+                        var timeoutValue = instance.Ids[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
                         return Join(timeoutValue as IntLangValue);
                     }
 
@@ -416,7 +416,7 @@ public partial class ThreadLangValue : LangValueType
                     // 启动线程
                     if (instance.Ids.Count > 0)
                     {
-                        var param = instance.Ids[0].Accept(new InterpreterVisitor(manager));
+                        var param = instance.Ids[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
                         Start(param.GetValue());
                     }
                     else

@@ -97,7 +97,7 @@ public class AsyncGeneratorStateMachine
         try
         {
             // 执行函数体直到下一个 yield
-            AsyncFunc.BlockStatement.Accept(new InterpreterVisitor(Manager));
+            AsyncFunc.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(Manager));
 
             // 检查是否 yield
             if (context.HasYielded)

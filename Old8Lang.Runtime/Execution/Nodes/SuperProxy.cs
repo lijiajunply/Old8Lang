@@ -183,7 +183,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     internal LangValueType ExecuteParentMethod(LangMethodInfo methodInfo, List<LangExpression> arguments, VariateManager manager)
     {
         // 计算参数值（在调用者作用域中）
-        var parameterValues = arguments.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
+        var parameterValues = arguments.Select(arg => arg.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
         var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
 
         // 创建方法执行作用域(基于调用者作用域,能访问外部变量和类型定义)

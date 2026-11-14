@@ -26,7 +26,7 @@ public class DictMapMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var func = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var func = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (func == null)
         {
@@ -87,7 +87,7 @@ public class DictMapMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
         var manager = new VariateManager();
         // IL 模式下字典由 IlValueBridge.Wrap 构造，Value 列表尚未填充
-        dict.Accept(new InterpreterVisitor(manager));
+        dict.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         var newDict = new Dictionary<object, object?>();
 

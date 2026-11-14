@@ -42,7 +42,7 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var func = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var func = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (func == null)
         {
@@ -68,7 +68,7 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         bool isAscending = true;
         if (parameters.Count > 1)
         {
-            var ascendingValue = parameters[1].Accept(new InterpreterVisitor(manager));
+            var ascendingValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (ascendingValue is BoolLangValue boolValue)
             {
                 isAscending = boolValue.Value;

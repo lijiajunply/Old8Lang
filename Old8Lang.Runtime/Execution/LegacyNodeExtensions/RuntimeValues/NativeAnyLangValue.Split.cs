@@ -78,7 +78,7 @@ public partial class NativeAnyLangValue
                 }
 
                 // 计算参数值
-                var arguments = orderedArgs.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
+                var arguments = orderedArgs.Select(arg => arg.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
 
                 // 将 Old8Lang 值转换为 .NET 对象
                 var nativeArguments = arguments.Select(ValueToObj).ToArray();

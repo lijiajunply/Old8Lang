@@ -24,6 +24,6 @@ public partial class GeneratorLangValue
     public LangValueType Run(VariateManager manager, List<LangExpression> args, object? obj = null)
     {
         // 生成器调用不需要参数，忽略args
-        return Accept(new InterpreterVisitor(manager));
+        return Accept(RuntimeVisitors.CreateInterpreter(manager));
     }
 }

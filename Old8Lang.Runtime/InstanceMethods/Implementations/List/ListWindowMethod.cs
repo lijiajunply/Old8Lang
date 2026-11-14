@@ -26,7 +26,7 @@ public class ListWindowMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var sizeValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var sizeValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (sizeValue is not IntLangValue sizeInt)
         {

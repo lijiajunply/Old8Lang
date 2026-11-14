@@ -145,7 +145,7 @@ public class LazyItemWrapper(string moduleNameItem, string itemName, VariateMana
             // 执行实际的导入
             var importItems = new List<ImportItem> { new(itemName) };
             var importStatement = new ImportStatement(moduleNameItem, Position, importItems, fromClause: true);
-            importStatement.Accept(new InterpreterVisitor(manager));
+            importStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 查找导入的项目
             if (manager.Scopes.Count > 0 && manager.Scopes[^1].TryGetValue(itemName, out var item))

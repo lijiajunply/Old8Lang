@@ -135,7 +135,7 @@ public partial class ListLangValue : LangValueType, ILangList
         // 如果是其他类型的表达式，尝试将其作为索引
         if (dotExpression is not Instance)
         {
-            var result = dotExpression.Accept(new InterpreterVisitor(manager));
+            var result = dotExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (result is IntLangValue idx)
             {

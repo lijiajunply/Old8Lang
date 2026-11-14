@@ -321,7 +321,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     /// </summary>
     protected List<LangValueType> EvaluateParameters(List<LangExpression> parameters, VariateManager manager)
     {
-        return parameters.Select(p => p.Accept(new InterpreterVisitor(manager))).ToList();
+        return parameters.Select(p => p.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
     }
 
     /// <summary>

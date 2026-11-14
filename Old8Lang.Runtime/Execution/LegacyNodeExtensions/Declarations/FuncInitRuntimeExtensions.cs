@@ -154,7 +154,7 @@ public static partial class FuncInitRuntimeExtensions
                 decorator.Arguments,
                 decorator.Position
             );
-            var wrapperFunc = decoratorCallExpr.Accept(new InterpreterVisitor(manager));
+            var wrapperFunc = decoratorCallExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (wrapperFunc is not FuncLangValue wrapper)
             {
@@ -185,7 +185,7 @@ public static partial class FuncInitRuntimeExtensions
                 [new LangId(tempFuncName, position: decorator.Position)],
                 decorator.Position
             );
-            result = callExpr.Accept(new InterpreterVisitor(manager));
+            result = callExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
 
         // 装饰器应该返回一个新的函数
@@ -272,7 +272,7 @@ public static partial class FuncInitRuntimeExtensions
                 decorator.Arguments,
                 decorator.Position
             );
-            var wrapperFunc = decoratorCallExpr.Accept(new InterpreterVisitor(manager));
+            var wrapperFunc = decoratorCallExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (wrapperFunc is not FuncLangValue wrapper)
             {
@@ -306,7 +306,7 @@ public static partial class FuncInitRuntimeExtensions
                 [new LangId(tempFuncName, position: decorator.Position)],
                 decorator.Position
             );
-            result = callExpr.Accept(new InterpreterVisitor(manager));
+            result = callExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
 
         // 装饰器应该返回一个新的函数

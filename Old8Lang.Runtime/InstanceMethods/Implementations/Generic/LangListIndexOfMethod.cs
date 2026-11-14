@@ -26,7 +26,7 @@ public class LangListIndexOfMethod : BaseLangListMethod, IIlNativeValueInstanceM
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var searchItem = parameters[0].Accept(new InterpreterVisitor(manager));
+        var searchItem = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         for (int i = 0; i < items.Count; i++)
         {

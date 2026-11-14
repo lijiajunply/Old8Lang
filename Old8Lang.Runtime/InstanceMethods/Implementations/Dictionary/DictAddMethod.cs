@@ -25,8 +25,8 @@ public class DictAddMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Accept(new InterpreterVisitor(manager));
-        var value = parameters[1].Accept(new InterpreterVisitor(manager));
+        var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var value = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         dict.Value.Add((key, value));
         return new TupleLangValue(key, value);

@@ -27,7 +27,7 @@ public class ListSkipWhileIndexedMethod : BaseInstanceMethod, IIlNativeValueInst
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var predicate = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (predicate == null)
         {

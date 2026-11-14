@@ -50,3 +50,23 @@ Old8Lang.App / LanguageServer / Benchmarks / Tests
 `Old8Lang.Syntax` 现在同时包含语法节点与 `LangParser`，只引用 `Old8Lang.Core`；`ScopeLayer`
 等解释器作用域类型已移回 `Old8Lang.Runtime`。`SyntaxParserBoundaryTests` 固定三条门禁：
 解析器类型位于 Syntax、Syntax 仅引用 Core、Syntax 源码不出现执行后端类型。
+
+## 阶段 3.1：解释后端程序集（2026-11-14）
+
+```text
+Old8Lang.App / LanguageServer / Benchmarks / Tests
+                     ↓
+                   Hosting
+          ↙                     ↘
+Old8Lang.Interpreter      Old8Lang.Runtime
+          ↘                     ↙
+   Core / Concurrency / Modules.Abstractions / Observability / ProjectSystem / Syntax
+```
+
+`Old8Lang.Interpreter` 只引用 `Old8Lang.Runtime`，不再引用 IL、VM 后端或官方模块；
+Runtime 通过 `Old8Lang.AST.Visitor.RuntimeVisitors` 契约接收解释执行访问器，不再在编译期
+引用 `InterpreterVisitor`。`BackendAssemblyBoundaryTests` 固定了这两条门禁以及「Runtime 源码
+不得直接构造解释访问器」。Hosting 作为组合根显式调用 `InterpreterBackend.Register()`。
+
+`LangInterpreter`、`VariateManager`、`ScopeLayer` 仍位于 Runtime：它们是运行时值与实例方法
+共同依赖的解释期状态，尚未完成接口化。IL 与 VM 后端仍在 Runtime 中。

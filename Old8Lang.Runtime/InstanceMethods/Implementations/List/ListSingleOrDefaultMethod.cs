@@ -31,7 +31,7 @@ public class ListSingleOrDefaultMethod : BaseInstanceMethod, IIlNativeValueInsta
         if (parameters.Count == 1)
         {
             // SingleOrDefault(defaultValue)
-            var defaultValue = parameters[0].Accept(new InterpreterVisitor(manager));
+            var defaultValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (list.Values.Count == 0 || list.Values.Count > 1)
             {
@@ -43,8 +43,8 @@ public class ListSingleOrDefaultMethod : BaseInstanceMethod, IIlNativeValueInsta
         else
         {
             // SingleOrDefault(predicate, defaultValue)
-            var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
-            var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
+            var predicate = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
+            var defaultValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (predicate == null)
             {

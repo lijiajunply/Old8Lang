@@ -41,7 +41,7 @@ public class StringSubstringMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var startValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var startValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (startValue is not IntLangValue start)
         {
@@ -56,7 +56,7 @@ public class StringSubstringMethod : BaseInstanceMethod
         // 如果提供了长度参数
         if (parameters.Count > 1)
         {
-            var lengthValue = parameters[1].Accept(new InterpreterVisitor(manager));
+            var lengthValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (lengthValue is not IntLangValue length)
             {
                 throw new TypeError(position, $"Substring 方法的第二个参数必须是整数类型，但实际是 {lengthValue.GetType().Name}");

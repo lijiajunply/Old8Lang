@@ -143,7 +143,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                         }
 
                         // 评估参数
-                        var paramValues = ids.Select(t => t.Accept(new InterpreterVisitor(variateManagerFunc))).ToList();
+                        var paramValues = ids.Select(t => t.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc))).ToList();
 
                         // 补全默认参数
                         for (var i = paramValues.Count; i < Ids.Count; i++)
@@ -157,7 +157,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                                 // 优先使用缓存值（常量表达式）
                                 paramValues.Add(CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true
                                     ? cachedValue
-                                    : id.DefaultValue.Accept(new InterpreterVisitor(executionManager)));
+                                    : id.DefaultValue.Accept(RuntimeVisitors.CreateInterpreter(executionManager)));
                             }
                             else
                             {
@@ -180,7 +180,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                     executionManager.IsFunc = false;
 
                     // 执行函数体
-                    BlockStatement.Accept(new InterpreterVisitor(executionManager));
+                    BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(executionManager));
 
                     // 保存返回值（在清理之前）
                     var result = executionManager.Result;
@@ -224,7 +224,7 @@ public partial class AsyncFuncLangValue : ImportInfo
             var param = Ids[i];
             if (param.DefaultValue is not null && IsConstantExpression(param.DefaultValue))
             {
-                var defaultValue = param.DefaultValue.Accept(new InterpreterVisitor(manager));
+                var defaultValue = param.DefaultValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 CachedDefaultValues[i] = defaultValue;
             }
         }

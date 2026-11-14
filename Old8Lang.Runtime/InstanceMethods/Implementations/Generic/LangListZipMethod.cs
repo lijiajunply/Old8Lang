@@ -25,7 +25,7 @@ public class LangListZipMethod : BaseLangListMethod
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (otherValue is not ILangList otherList)
         {
@@ -38,7 +38,7 @@ public class LangListZipMethod : BaseLangListMethod
         // 如果提供了 zipper 函数
         if (parameters.Count == 2)
         {
-            var zipperExpr = parameters[1].Accept(new InterpreterVisitor(manager));
+            var zipperExpr = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (zipperExpr is not FuncLangValue zipper)
             {
                 throw new ArgumentException("Zip 方法的第二个参数必须是函数");

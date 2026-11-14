@@ -26,7 +26,7 @@ public class ListRemoveMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var itemToRemove = parameters[0].Accept(new InterpreterVisitor(manager));
+        var itemToRemove = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         for (var i = 0; i < list.Values.Count; i++)
         {

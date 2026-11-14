@@ -94,7 +94,7 @@ public partial class AnyLangValue : LangValueType
                 continue;
 
             // 执行初始化表达式，获取初始值
-            var initialValue = fieldDef.InitialValueExpression.Accept(new InterpreterVisitor(manager));
+            var initialValue = fieldDef.InitialValueExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 存储到实例数据中
             InstanceData[fieldDef.FieldName] = initialValue;
@@ -302,13 +302,13 @@ public partial class AnyLangValue : LangValueType
             var funcValue = methodInfo.Implementation;
             // 参数表达式必须在调用方作用域中先求值，避免 this 绑定到被调对象后导致作用域错位。
             var evaluatedArguments = arguments
-                .Select(arg => arg is LangValueType value ? value : arg.Accept(new InterpreterVisitor(manager)))
+                .Select(arg => arg is LangValueType value ? value : arg.Accept(RuntimeVisitors.CreateInterpreter(manager)))
                 .Cast<LangExpression>()
                 .ToList();
             var evaluatedNamedArgs = (namedArgs ?? [])
                 .Select(arg =>
                 {
-                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Accept(new InterpreterVisitor(manager));
+                    var evaluated = arg.Value is LangValueType value ? value : arg.Value.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     return new NamedArgument(arg.Name, evaluated, arg.Position);
                 })
                 .ToList();
@@ -380,7 +380,7 @@ public partial class AnyLangValue : LangValueType
             if (getitemMethod is not null && getitemMethod.Count > 0)
             {
                 // 计算索引值
-                var indexValue = listItem.Key.Accept(new InterpreterVisitor(manager));
+                var indexValue = listItem.Key.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 调用 _getitem 方法
                 var result = CallOperatorOverloadMethod("_getitem", indexValue);
@@ -399,7 +399,7 @@ public partial class AnyLangValue : LangValueType
         }
 
         // 计算索引值
-        var keyValue = listItem.Key.Accept(new InterpreterVisitor(manager));
+        var keyValue = listItem.Key.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 根据集合类型进行索引访问
         return collectionValue switch
@@ -477,7 +477,7 @@ public partial class AnyLangValue : LangValueType
                     else
                     {
                         // 运行参数表达式获取实际类型
-                        var argValue = positionalArgs[i].Accept(new InterpreterVisitor(manager));
+                        var argValue = positionalArgs[i].Accept(RuntimeVisitors.CreateInterpreter(manager));
                         string actualTypeName = argValue.GetType().Name;
                         if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {
@@ -643,7 +643,7 @@ public partial class AnyLangValue : LangValueType
             return;
         }
 
-        var parameterValues = arguments.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
+        var parameterValues = arguments.Select(arg => arg.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
 
         // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
         var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
@@ -922,7 +922,7 @@ public partial class AnyLangValue : LangValueType
             }
 
             // 执行 dispose 方法
-            disposeMethod.Implementation.BlockStatement.Accept(new InterpreterVisitor(InstanceScope));
+            disposeMethod.Implementation.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(InstanceScope));
 
             // 同步字段修改回实例数据
             foreach (var fieldName in InstanceData.Keys.ToList())

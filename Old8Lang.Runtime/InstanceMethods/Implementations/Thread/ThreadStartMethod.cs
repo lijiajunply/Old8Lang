@@ -29,7 +29,7 @@ public class ThreadStartMethod : BaseInstanceMethod
         // 如果有参数
         if (parameters.Count == 1)
         {
-            var paramValue = parameters[0].Accept(new InterpreterVisitor(manager));
+            var paramValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
             thread.Start(paramValue.GetValue());
         }
         else

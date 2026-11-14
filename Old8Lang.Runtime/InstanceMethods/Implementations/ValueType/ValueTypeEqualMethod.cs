@@ -23,7 +23,7 @@ public class ValueTypeEqualMethod : BaseValueTypeMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         return new BoolLangValue(instance.Equal(otherValue));
     }
 

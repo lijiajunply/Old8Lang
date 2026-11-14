@@ -27,7 +27,7 @@ public class DictForEachMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var action = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var action = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (action == null)
         {
@@ -84,7 +84,7 @@ public class DictForEachMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
 
         var manager = new VariateManager();
         // IL 模式下字典由 IlValueBridge.Wrap 构造，Value 列表尚未填充
-        dict.Accept(new InterpreterVisitor(manager));
+        dict.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         foreach (var (key, value) in dict.Value)
         {

@@ -812,13 +812,6 @@ public partial class BytecodeVisitor
         throw new VmUnsupportedError(node, "锁变量（lock）");
 
     /// <summary>
-    /// InterpreterVisitor 是解释器的访问者对象，不属于可求值的 AST 节点，
-    /// 出现在表达式位置说明代码结构异常（与 CompilerVisitor 的处理保持一致）
-    /// </summary>
-    public Instruction? VisitInterpreterVisitor(InterpreterVisitor node) =>
-        throw new NotSupportedException("虚拟机模式下不应访问 InterpreterVisitor 对象");
-
-    /// <summary>
     /// 访问 FuncLangValue 节点
     /// </summary>
     public Instruction? VisitFuncLangValue(FuncLangValue node)

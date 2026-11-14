@@ -16,6 +16,14 @@ public sealed class Old8HostBuilder : IStandardLibraryRegistry
     private readonly StandardLibraryCatalog _catalog = new();
 
     /// <summary>
+    /// 组合根构造时显式注册默认的执行后端。
+    /// </summary>
+    public Old8HostBuilder()
+    {
+        InterpreterBackend.Register();
+    }
+
+    /// <summary>
     /// 注册一个标准库模块。
     /// </summary>
     /// <param name="module">模块实现。</param>

@@ -30,7 +30,7 @@ public class DictUpdateMethod : BaseInstanceMethod
         if (parameters.Count == 1)
         {
             // Update(otherDictionary) 形式
-            var otherDict = parameters[0].Accept(new InterpreterVisitor(manager)) as DictionaryLangValue;
+            var otherDict = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as DictionaryLangValue;
             if (otherDict == null)
             {
                 throw new ArgumentException("参数必须是 Dictionary 类型");
@@ -61,8 +61,8 @@ public class DictUpdateMethod : BaseInstanceMethod
         else
         {
             // Update(key, value) 形式
-            var key = parameters[0].Accept(new InterpreterVisitor(manager));
-            var value = parameters[1].Accept(new InterpreterVisitor(manager));
+            var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+            var value = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 查找并更新现有的键值对
             var keyFound = false;

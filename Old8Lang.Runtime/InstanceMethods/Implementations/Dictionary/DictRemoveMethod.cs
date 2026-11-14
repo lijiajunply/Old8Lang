@@ -22,7 +22,7 @@ public class DictRemoveMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Accept(new InterpreterVisitor(manager));
+        var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 查找并移除键值对
         var index = dict.Value.FindIndex(x => x.Key.Equal(key));

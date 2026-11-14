@@ -41,7 +41,7 @@ public class StringSubstringOneParamMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var startParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var startParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (startParam is not IntLangValue start)
         {

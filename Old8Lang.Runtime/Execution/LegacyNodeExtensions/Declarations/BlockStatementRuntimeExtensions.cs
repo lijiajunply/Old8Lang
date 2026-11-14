@@ -28,7 +28,7 @@ public static class BlockStatementRuntimeExtensions
         {
             if (statement is not ImportStatement && statement is not NativeStatement)
             {
-                statement.Accept(new InterpreterVisitor(manager));
+                statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
             }
         }
 
@@ -40,7 +40,7 @@ public static class BlockStatementRuntimeExtensions
                 case EnumInit:
                 case ExtensionDeclaration:
                 case ImportStatement { IsDynamicImport: true }:
-                    statement.Accept(new InterpreterVisitor(manager));
+                    statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     break;
             }
         }
@@ -67,13 +67,13 @@ public static class BlockStatementRuntimeExtensions
                     // 跳过 FuncInit 和 ClassInit，只执行其他类型的语句
                     if (statement is not FuncInit && statement is not ClassInit)
                     {
-                        statement.Accept(new InterpreterVisitor(manager));
+                        statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     }
                 }
                 else
                 {
                     // 执行所有非导入语句，包括 FuncInit 和 ClassInit
-                    statement.Accept(new InterpreterVisitor(manager));
+                    statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 }
             }
         }
@@ -81,7 +81,7 @@ public static class BlockStatementRuntimeExtensions
         // 执行所有OtherStatements（变量赋值等）
         foreach (var statement in block.OtherStatements)
         {
-            statement.Accept(new InterpreterVisitor(manager));
+            statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (manager.IsReturn)
             {

@@ -43,7 +43,7 @@ internal static class MatchCaseRuntimeExtensions
                 // 值匹配：计算 pattern 表达式并比较
                 if (node.Pattern is not null)
                 {
-                    var patternValue = node.Pattern.Accept(new InterpreterVisitor(manager));
+                    var patternValue = node.Pattern.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     return value.Equal(patternValue);
                 }
                 return false;
@@ -111,7 +111,7 @@ internal static class MatchCaseRuntimeExtensions
             // 值匹配：比较值是否相等
             if (patternElement.Value is not null)
             {
-                var patternValue = patternElement.Value.Accept(new InterpreterVisitor(manager));
+                var patternValue = patternElement.Value.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 if (!tupleElement.Equal(patternValue))
                 {
                     return false;
@@ -154,7 +154,7 @@ internal static class MatchCaseRuntimeExtensions
                 manager.Set(tempId, value);
 
                 // 评估守卫条件
-                var guardResult = node.GuardCondition.Accept(new InterpreterVisitor(manager));
+                var guardResult = node.GuardCondition.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 守卫条件必须是布尔类型
                 if (guardResult is BoolLangValue boolValue)
@@ -183,8 +183,8 @@ internal static class MatchCaseRuntimeExtensions
             return false;
 
         // 计算范围的起始值和结束值
-        var startValue = node.RangePattern.Start.Accept(new InterpreterVisitor(manager));
-        var endValue = node.RangePattern.End.Accept(new InterpreterVisitor(manager));
+        var startValue = node.RangePattern.Start.Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var endValue = node.RangePattern.End.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 只支持数值类型的范围匹配
         if (!TryGetNumericValue(value, out var numValue))

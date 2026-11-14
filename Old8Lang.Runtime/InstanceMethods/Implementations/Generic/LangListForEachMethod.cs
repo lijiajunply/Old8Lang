@@ -26,7 +26,7 @@ public class LangListForEachMethod : BaseLangListMethod, IIlNativeValueInstanceM
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var actionExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var actionExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (actionExpr is not FuncLangValue action)
         {

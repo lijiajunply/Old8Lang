@@ -27,7 +27,7 @@ public class ListGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInsta
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var keySelector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var keySelector = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (keySelector == null)
         {

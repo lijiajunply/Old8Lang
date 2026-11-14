@@ -32,7 +32,7 @@ public class LangListLastOrDefaultMethod : BaseLangListMethod, IIlNativeValueIns
             // 如果提供了默认值，返回默认值
             if (parameters.Count == 1)
             {
-                return parameters[0].Accept(new InterpreterVisitor(manager));
+                return parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
             }
             // 否则返回 null
             return NullLangValue.Instance;

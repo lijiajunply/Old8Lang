@@ -26,8 +26,8 @@ public class ArraySliceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var array = (ArrayLangValue)instance;
-        var startValue = parameters[0].Accept(new InterpreterVisitor(manager));
-        var endValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var startValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var endValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (startValue is not IntLangValue startInt)
         {
@@ -42,7 +42,7 @@ public class ArraySliceMethod : BaseInstanceMethod
         int step = 1;
         if (parameters.Count == 3)
         {
-            var stepValue = parameters[2].Accept(new InterpreterVisitor(manager));
+            var stepValue = parameters[2].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (stepValue is not IntLangValue stepInt)
             {
                 throw new TypeError(position, "IntValue", stepValue.GetType().Name);

@@ -25,7 +25,7 @@ public class DictMergeMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var otherDict = parameters[0].Accept(new InterpreterVisitor(manager)) as DictionaryLangValue;
+        var otherDict = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as DictionaryLangValue;
 
         if (otherDict == null)
         {

@@ -23,7 +23,7 @@ public static class ExecutionModeDispatcher
         ArgumentNullException.ThrowIfNull(statement);
         ArgumentNullException.ThrowIfNull(manager);
 
-        _ = statement.Accept(new InterpreterVisitor(manager));
+        _ = statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
     }
 
     /// <summary>

@@ -327,7 +327,7 @@ public class UnifiedModule(
         };
 
         // 4. 在隔离作用域中执行模块代码
-        loadResult.Block.Accept(new InterpreterVisitor(moduleManager));
+        loadResult.Block.Accept(RuntimeVisitors.CreateInterpreter(moduleManager));
 
         // 5. 提取符号
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
@@ -399,7 +399,7 @@ public class UnifiedModule(
         {
             // Handle native class instantiation
             List<LangValueType> args = [];
-            args.AddRange(instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))));
+            args.AddRange(instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(currentManager))));
             nativeAnyValue.New([.. Apis.ListToObjects(args)]);
             return nativeAnyValue;
         }

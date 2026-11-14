@@ -25,7 +25,7 @@ public class CharCompareToMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var charValue = (CharLangValue)instance;
-        var other = parameters[0].Accept(new InterpreterVisitor(manager)) as CharLangValue;
+        var other = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as CharLangValue;
 
         if (other == null)
         {

@@ -29,7 +29,7 @@ public class ThreadJoinMethod : BaseInstanceMethod
         // 如果有超时参数
         if (parameters.Count == 1)
         {
-            var timeoutParam = parameters[0].Accept(new InterpreterVisitor(manager));
+            var timeoutParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (timeoutParam is not IntLangValue timeout)
             {
                 throw new Error.TypeError(position, "IntValue", timeoutParam.GetType().Name);

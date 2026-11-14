@@ -28,7 +28,7 @@ internal static partial class ForInStatementRuntimeExtensions
 
         try
         {
-            var value = node.Expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 处理异步生成器对象（异步流）
             if (value is AsyncGeneratorLangValue asyncGenerator)
@@ -40,7 +40,7 @@ internal static partial class ForInStatementRuntimeExtensions
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步生成器，获取下一个值（同步等待）
-                    asyncGenerator.Accept(new InterpreterVisitor(manager));
+                    asyncGenerator.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 检查异步生成器是否已完成
                     if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -60,7 +60,7 @@ internal static partial class ForInStatementRuntimeExtensions
                             manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -88,7 +88,7 @@ internal static partial class ForInStatementRuntimeExtensions
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    asyncStream.Accept(new InterpreterVisitor(manager));
+                    asyncStream.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -108,7 +108,7 @@ internal static partial class ForInStatementRuntimeExtensions
                             manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -136,7 +136,7 @@ internal static partial class ForInStatementRuntimeExtensions
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行生成器，获取下一个值
-                    generator.Accept(new InterpreterVisitor(manager));
+                    generator.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 检查生成器是否已完成
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
@@ -157,7 +157,7 @@ internal static partial class ForInStatementRuntimeExtensions
                             manager.Set(node.Id, currentValue);
 
                             // 执行循环体
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -196,7 +196,7 @@ internal static partial class ForInStatementRuntimeExtensions
                         // 必须先求值再绑定，否则绑定到的元组 ItemValues 为空，读取时会得到空元组
                         if (idValue is TupleLangValue singleTuple)
                         {
-                            singleTuple.Accept(new InterpreterVisitor(manager));
+                            singleTuple.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         }
 
                         manager.Set(node.Id, idValue);
@@ -207,7 +207,7 @@ internal static partial class ForInStatementRuntimeExtensions
                         if (idValue is TupleLangValue tupleValue)
                         {
                             // 运行元组，获取实际值
-                            tupleValue.Accept(new InterpreterVisitor(manager));
+                            tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 字典键值对，赋值给多个标识符
                             var values = tupleValue.GetItems().ToList();
@@ -225,7 +225,7 @@ internal static partial class ForInStatementRuntimeExtensions
                     }
 
                     // 执行循环体
-                    node.Body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
@@ -278,7 +278,7 @@ internal static partial class ForInStatementRuntimeExtensions
             }
 
             // 首次执行，运行表达式获取值
-            var value = node.Expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 对于生成器和异步生成器，保持原有逻辑（它们自己管理状态）
             if (value is AsyncGeneratorLangValue asyncGenerator)
@@ -352,7 +352,7 @@ internal static partial class ForInStatementRuntimeExtensions
                         {
                             if (idValue is TupleLangValue tupleValue)
                             {
-                                tupleValue.Accept(new InterpreterVisitor(manager));
+                                tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                                 var values = tupleValue.GetItems().ToList();
                                 for (var j = 0; j < node.Ids.Count && j < values.Count; j++)
                                 {
@@ -382,7 +382,7 @@ internal static partial class ForInStatementRuntimeExtensions
                         // else: 从当前迭代内部的 yield 恢复，保持 ExecutionPath
 
                         // 执行循环体
-                        node.Body.Accept(new InterpreterVisitor(manager));
+                        node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                         // 检查是否遇到 yield
                         if (context.HasYielded)
@@ -440,7 +440,7 @@ internal static partial class ForInStatementRuntimeExtensions
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            asyncGenerator.Accept(new InterpreterVisitor(manager));
+            asyncGenerator.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -454,7 +454,7 @@ internal static partial class ForInStatementRuntimeExtensions
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(node.Id, currentValue);
-                    node.Body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -478,7 +478,7 @@ internal static partial class ForInStatementRuntimeExtensions
         while (true)
         {
             manager.ControlFlowManager.ResetCurrentState();
-            asyncStream.Accept(new InterpreterVisitor(manager));
+            asyncStream.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
             {
@@ -492,7 +492,7 @@ internal static partial class ForInStatementRuntimeExtensions
                 if (currentValue is not null && currentValue is not VoidLangValue)
                 {
                     manager.Set(node.Id, currentValue);
-                    node.Body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -548,7 +548,7 @@ internal static partial class ForInStatementRuntimeExtensions
                 }
 
                 // 调用生成器的 Run 方法获取下一个值
-                generator.Accept(new InterpreterVisitor(manager));
+                generator.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                 {
@@ -564,7 +564,7 @@ internal static partial class ForInStatementRuntimeExtensions
                     if (currentValue is not null && currentValue is not VoidLangValue)
                     {
                         manager.Set(node.Id, currentValue);
-                        node.Body.Accept(new InterpreterVisitor(manager));
+                        node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                         // 检查外部生成器是否 yield
                         if (context.HasYielded)

@@ -268,7 +268,7 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
                     // 注意：这可能有副作用，但对于推断泛型类型来说是必要的
                     try
                     {
-                        var result = instance.Accept(new InterpreterVisitor(manager));
+                        var result = instance.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         return GetTypeInfoFromValue(result);
                     }
                     catch

@@ -27,7 +27,7 @@ public class ListFlatMapMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var transform = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var transform = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (transform == null)
         {

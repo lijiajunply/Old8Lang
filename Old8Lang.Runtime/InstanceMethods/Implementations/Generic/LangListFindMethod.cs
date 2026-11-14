@@ -26,7 +26,7 @@ public class LangListFindMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var predicateExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var predicateExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (predicateExpr is not FuncLangValue predicate)
         {

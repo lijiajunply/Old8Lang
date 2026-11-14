@@ -23,13 +23,13 @@ public class StringPadRightMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var widthParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var widthParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (widthParam is not IntLangValue width)
             throw new TypeError(position, $"PadRight 方法的第一个参数必须是整数类型");
 
         if (parameters.Count > 1)
         {
-            var charParam = parameters[1].Accept(new InterpreterVisitor(manager));
+            var charParam = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (charParam is StringLangValue charStr && charStr.Value.Length > 0)
                 return new StringLangValue(str.Value.PadRight(width.Value, charStr.Value[0]));
             else if (charParam is CharLangValue charVal)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -34,7 +34,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Old8Lang.SerializationLib\Old8Lang.SerializationLib.csproj" />
-    <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
+        <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
+<ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
     <ProjectReference Include="..\Old8Lang.Syntax\Old8Lang.Syntax.csproj" />
     <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
     <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />

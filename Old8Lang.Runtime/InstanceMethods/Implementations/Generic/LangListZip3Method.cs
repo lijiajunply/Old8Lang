@@ -26,8 +26,8 @@ public class LangListZip3Method : BaseLangListMethod, IIlNativeValueInstanceMeth
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var secondValue = parameters[0].Accept(new InterpreterVisitor(manager));
-        var thirdValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var secondValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var thirdValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (!IsLangList(secondValue))
         {

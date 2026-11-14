@@ -118,7 +118,7 @@ public sealed class InputFunction : BaseGlobalFunction
     {
         if (parameters.Count == 1)
         {
-            var prompt = parameters[0].Accept(new InterpreterVisitor(manager)).ToDisplayString();
+            var prompt = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)).ToDisplayString();
             manager.Interpreter.OutputProvider.Write(prompt);
         }
 

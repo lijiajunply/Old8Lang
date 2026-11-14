@@ -46,7 +46,7 @@ public class DictKeysMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         }
 
         var manager = new VariateManager();
-        dict.Accept(new InterpreterVisitor(manager));
+        dict.Accept(RuntimeVisitors.CreateInterpreter(manager));
         return dict.Value.Select(pair => IlValueBridge.Unwrap(pair.Key)).ToList();
     }
 

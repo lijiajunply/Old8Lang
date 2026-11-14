@@ -25,7 +25,7 @@ public class ListIsSubsetOfMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (otherValue is not ListLangValue otherList)
         {

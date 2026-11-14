@@ -28,7 +28,7 @@ public class ArrayGroupAdjacentByMethod : BaseInstanceMethod, IIlNativeValueInst
         VariateManager manager, SourcePosition position)
     {
         var array = (ArrayLangValue)instance;
-        var keySelector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var keySelector = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (keySelector == null)
         {

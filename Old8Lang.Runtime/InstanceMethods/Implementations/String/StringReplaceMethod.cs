@@ -26,8 +26,8 @@ public class StringReplaceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var oldValue = parameters[0].Accept(new InterpreterVisitor(manager));
-        var newValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var oldValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var newValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (oldValue is not StringLangValue oldStr)
         {

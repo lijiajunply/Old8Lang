@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
       <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
       <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
       <ProjectReference Include="..\Old8Lang.ProjectSystem\Old8Lang.ProjectSystem.csproj" />

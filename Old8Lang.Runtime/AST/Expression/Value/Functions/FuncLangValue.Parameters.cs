@@ -52,7 +52,7 @@ public partial class FuncLangValue
                 CachedDefaultValues ??= new Dictionary<int, LangValueType>();
 
                 // 预先求值并缓存
-                var defaultValue = param.DefaultValue.Accept(new InterpreterVisitor(manager));
+                var defaultValue = param.DefaultValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 CachedDefaultValues[i] = defaultValue;
             }
         }
@@ -129,7 +129,7 @@ public partial class FuncLangValue
         if (Ids is null) return [];
 
         // 1. 计算所有传入参数的值
-        var paramValues = argumentExpressions.Select(expr => expr.Accept(new InterpreterVisitor(variManager))).ToList();
+        var paramValues = argumentExpressions.Select(expr => expr.Accept(RuntimeVisitors.CreateInterpreter(variManager))).ToList();
 
         // 检查是否有 params 参数
         var paramsIndex = -1;
@@ -195,7 +195,7 @@ public partial class FuncLangValue
                 {
                     // 非常量表达式，需要每次计算
                     var defaultValueManager = executionManager ?? variManager;
-                    var defaultValue = parameter.DefaultValue.Accept(new InterpreterVisitor(defaultValueManager));
+                    var defaultValue = parameter.DefaultValue.Accept(RuntimeVisitors.CreateInterpreter(defaultValueManager));
                     paramValues.Add(defaultValue);
                 }
             }

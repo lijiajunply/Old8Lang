@@ -25,8 +25,8 @@ public class DictGetOrElseMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Accept(new InterpreterVisitor(manager));
-        var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var defaultValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         foreach (var (k, v) in dict.Value)
         {

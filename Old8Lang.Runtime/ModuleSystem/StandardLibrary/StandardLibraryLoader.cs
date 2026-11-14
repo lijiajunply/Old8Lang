@@ -293,7 +293,7 @@ public static class StandardLibraryLoader
                     assemblyLocation, type.Name);
 
                 // 执行初始化
-                nativeAny.Accept(new InterpreterVisitor(manager));
+                nativeAny.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 symbols[type.Name] = nativeAny;
             }
         }
@@ -325,7 +325,7 @@ public static class StandardLibraryLoader
                 assemblyLocation, type.Name);
 
             // 执行初始化
-            nativeAny.Accept(new InterpreterVisitor(manager));
+            nativeAny.Accept(RuntimeVisitors.CreateInterpreter(manager));
             symbols[type.Name] = nativeAny;
         }
     }

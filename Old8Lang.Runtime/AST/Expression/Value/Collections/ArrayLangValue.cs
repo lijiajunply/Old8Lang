@@ -109,7 +109,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
         }
 
         // 如果是其他类型的表达式，尝试将其作为索引（可能需要运行表达式）
-        var result = dotExpression.Accept(new InterpreterVisitor(manager));
+        var result = dotExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (result is IntLangValue idx)
         {

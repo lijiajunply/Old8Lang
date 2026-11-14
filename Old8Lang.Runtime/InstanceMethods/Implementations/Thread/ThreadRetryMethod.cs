@@ -26,7 +26,7 @@ public class ThreadRetryMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         VariateManager manager, SourcePosition position)
     {
         var thread = (ThreadLangValue)instance;
-        var retryCountParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var retryCountParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (retryCountParam is not IntLangValue retryCount)
         {
@@ -36,7 +36,7 @@ public class ThreadRetryMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         int delayMs = 0;
         if (parameters.Count > 1)
         {
-            var delayParam = parameters[1].Accept(new InterpreterVisitor(manager));
+            var delayParam = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (delayParam is not IntLangValue delay)
             {
                 throw new TypeError(position, "int", delayParam.TypeToString());

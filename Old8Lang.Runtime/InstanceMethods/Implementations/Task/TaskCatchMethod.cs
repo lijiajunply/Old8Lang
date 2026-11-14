@@ -31,7 +31,7 @@ public class TaskCatchMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         var task = (TaskLangValue)instance;
 
         // 在当前作用域中评估错误处理函数参数
-        var errorHandlerParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var errorHandlerParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (errorHandlerParam is not FuncLangValue errorHandler)
         {

@@ -26,7 +26,7 @@ public class ThreadThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var thread = (ThreadLangValue)instance;
-        var continuationParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var continuationParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (continuationParam is not FuncLangValue continuation)
         {
@@ -42,7 +42,7 @@ public class ThreadThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
         return thread.Then(result =>
         {
-            var closedFunc = continuation.Accept(new InterpreterVisitor(capturedManager));
+            var closedFunc = continuation.Accept(RuntimeVisitors.CreateInterpreter(capturedManager));
             if (closedFunc is FuncLangValue closedFuncValue)
             {
                 continuation = closedFuncValue;

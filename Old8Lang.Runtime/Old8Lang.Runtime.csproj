@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- 解释后端迁出后仍复用 Runtime 内部的执行辅助，先以 friend assembly 固定边界；
+         公开 API 收敛后再移除。 -->
+    <InternalsVisibleTo Include="Old8Lang.Interpreter" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Old8Lang.Core\Old8Lang.Core.csproj" />
     <ProjectReference Include="..\Old8Lang.Concurrency\Old8Lang.Concurrency.csproj" />
     <ProjectReference Include="..\Old8Lang.Modules.Abstractions\Old8Lang.Modules.Abstractions.csproj" />

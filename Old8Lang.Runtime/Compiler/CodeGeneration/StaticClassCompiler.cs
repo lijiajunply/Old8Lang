@@ -336,7 +336,7 @@ public static class StaticClassCompiler
     }
 
     /// <summary>
-    /// 编译 Task.Accept(new InterpreterVisitor(action))
+    /// 编译 Task.Accept(RuntimeVisitors.CreateInterpreter(action))
     /// </summary>
     private static bool CompileTaskRun(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
     {
@@ -366,7 +366,7 @@ public static class StaticClassCompiler
         }
         else if (paramType == typeof(Action))
         {
-            // 调用 Task.Accept(new InterpreterVisitor(Action))，然后转换为 Task<object>
+            // 调用 Task.Accept(RuntimeVisitors.CreateInterpreter(Action))，然后转换为 Task<object>
             var runMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m is { Name: "Run", IsGenericMethodDefinition: false } &&

@@ -325,7 +325,7 @@ public static class Compiler
         {
             if (importStatement is ImportStatement { } import && import.GetModuleAlias() is { } alias)
             {
-                import.Accept(new InterpreterVisitor(i.Manager));
+                import.Accept(RuntimeVisitors.CreateInterpreter(i.Manager));
                 local.ModuleAliases.Add(alias);
             }
         }

@@ -105,7 +105,7 @@ public partial class FuncLangValue
         }
 
         // 运行函数体
-        BlockStatement.Accept(new InterpreterVisitor(generatorManager));
+        BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(generatorManager));
 
         return generatorManager.Result;
     }
@@ -457,7 +457,7 @@ public partial class FuncLangValue
                 }
             }
 
-            var values = ids.Select(expr => expr.Accept(new InterpreterVisitor(variateManagerFunc))).ToList();
+            var values = ids.Select(expr => expr.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc))).ToList();
             var convertedValues = Apis.ListToObjects(values).ToArray();
 
             // 根据目标参数类型转换参数
@@ -702,7 +702,7 @@ public partial class FuncLangValue
                     {
                         foreach (var staticMember in typeTemplate.StaticVariates)
                         {
-                            executionManager.Set(staticMember.Key, staticMember.Value.Accept(new InterpreterVisitor(executionManager)));
+                            executionManager.Set(staticMember.Key, staticMember.Value.Accept(RuntimeVisitors.CreateInterpreter(executionManager)));
                         }
                     }
                 }
@@ -736,7 +736,7 @@ public partial class FuncLangValue
             executionManager.Result = VoidLangValue.Instance;
 
             // 运行方法体
-            BlockStatement.Accept(new InterpreterVisitor(executionManager));
+            BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(executionManager));
 
             // 保存返回值
             var result = executionManager.Result;
@@ -835,7 +835,7 @@ public partial class FuncLangValue
                 decorator.Arguments,
                 decorator.Position
             );
-            var wrapperFunc = decoratorCallExpr.Accept(new InterpreterVisitor(manager));
+            var wrapperFunc = decoratorCallExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (wrapperFunc is not FuncLangValue wrapper)
             {
@@ -866,7 +866,7 @@ public partial class FuncLangValue
                 [new LangId(tempFuncName, position: decorator.Position)],
                 decorator.Position
             );
-            result = callExpr.Accept(new InterpreterVisitor(manager));
+            result = callExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
 
         // 装饰器应该返回一个新的函数

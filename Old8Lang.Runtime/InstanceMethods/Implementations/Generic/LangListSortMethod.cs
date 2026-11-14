@@ -47,7 +47,7 @@ public class LangListSortMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
 
         if (parameters.Count == 1)
         {
-            var comparerParam = parameters[0].Accept(new InterpreterVisitor(manager));
+            var comparerParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (comparerParam is not FuncLangValue comparer)
             {
                 throw new ArgumentException("Sort 方法的 comparer 参数必须是函数");

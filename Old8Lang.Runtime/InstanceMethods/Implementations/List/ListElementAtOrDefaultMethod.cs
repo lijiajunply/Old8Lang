@@ -26,8 +26,8 @@ public class ListElementAtOrDefaultMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var indexValue = parameters[0].Accept(new InterpreterVisitor(manager));
-        var defaultValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var indexValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var defaultValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (indexValue is not IntLangValue indexInt)
         {

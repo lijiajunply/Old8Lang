@@ -115,12 +115,12 @@ public class ExtensionMethodWrapper(
                 for (int i = 0; i < parameters.Count; i++)
                 {
                     var paramName = function.Ids![i].IdName;
-                    var paramValue = parameters[i].Accept(new InterpreterVisitor(manager));
+                    var paramValue = parameters[i].Accept(RuntimeVisitors.CreateInterpreter(manager));
                     manager.Set(new LangId(paramName), paramValue);
                 }
 
                 // 执行函数体
-                function.BlockStatement.Accept(new InterpreterVisitor(manager));
+                function.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 检查是否有返回值
                 if (manager.IsReturn)
@@ -269,7 +269,7 @@ public class ExtensionMethodWrapper(
                     manager.Set(new LangId(function.Ids![i].IdName), arguments[i]);
                 }
 
-                function.BlockStatement.Accept(new InterpreterVisitor(manager));
+                function.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 if (manager.IsReturn)
                 {
@@ -581,7 +581,7 @@ public class ExtensionMethodWrapper(
             }
 
             // 执行函数体
-            function.BlockStatement.Accept(new InterpreterVisitor(tempManager));
+            function.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(tempManager));
 
             // 检查是否有返回值
             if (tempManager.IsReturn)

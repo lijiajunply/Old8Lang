@@ -30,7 +30,7 @@ public class LangListJoinMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
         string separator = ", ";
         if (parameters.Count == 1)
         {
-            var separatorValue = parameters[0].Accept(new InterpreterVisitor(manager));
+            var separatorValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (separatorValue is StringLangValue strValue)
             {
                 separator = strValue.Value;

@@ -32,7 +32,7 @@ public class TaskFinallyMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         var task = (TaskLangValue)instance;
 
         // 在当前作用域中评估 finally 处理函数参数
-        var finallyHandlerParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var finallyHandlerParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (finallyHandlerParam is not FuncLangValue finallyHandler)
         {

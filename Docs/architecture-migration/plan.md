@@ -37,6 +37,11 @@
 ## 3. 拆分执行后端
 
 - [ ] 逐个拆分解释器、IL 和字节码/VM；将跨后端反射、函数、模块及编译期预执行依赖改为明确契约或组合服务。
+  - [x] 解释后端（2026-11-14）：`InterpreterVisitor` 及解释器专属语法适配迁入
+    `Old8Lang.Interpreter`；Runtime 以 `RuntimeVisitors` 工厂契约创建访问器，364 处直接构造改为契约调用；
+    `Old8HostBuilder` 显式注册。见 `Reports/2026-11-14-16-44-解释后端拆分测试.md`。
+  - [ ] IL 后端。
+  - [ ] 字节码/VM 后端。
 - [ ] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
 - [ ] 验证历史字节码样本、导入与三模式代表性行为；记录公开 C# API 的迁移路径。
 
@@ -51,6 +56,13 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.1 解释后端）：`InterpreterVisitor` 与三个共享 visitor 文件中的解释片段迁入
+  `Old8Lang.Interpreter`；Runtime 新增 `RuntimeVisitors` 工厂契约，364 处 `new InterpreterVisitor`
+  替换为契约调用，组合根 `Old8HostBuilder` 显式注册。新增 `BackendAssemblyBoundaryTests`。
+  Architecture 49、Interpreter 1967/1968（1 跳过）、VM 1082 通过；Compiler.Expressions 的 41 项失败
+  与 HEAD 基线逐项一致（`Todo.md` 已记录的 IL 既有问题）。见
+  `Reports/2026-11-14-16-44-解释后端拆分测试.md`。IL 与 VM 后端尚未拆分，阶段 3 不标记完成。
 
 - 2026-11-14（阶段 2 完成）：`LangParser` 目录整体迁入 `Old8Lang.Syntax`，`ScopeLayer` 移回 Runtime；
   删除解析器中最后的 `Instance`/`LangListItem` 等运行时类型分支。新增 `SyntaxParserBoundaryTests`

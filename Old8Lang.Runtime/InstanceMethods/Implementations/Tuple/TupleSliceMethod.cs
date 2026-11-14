@@ -27,8 +27,8 @@ public class TupleSliceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var tuple = (TupleLangValue)instance;
-        var startParam = parameters[0].Accept(new InterpreterVisitor(manager));
-        var endParam = parameters[1].Accept(new InterpreterVisitor(manager));
+        var startParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var endParam = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (startParam is not IntLangValue start)
         {

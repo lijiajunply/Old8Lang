@@ -22,7 +22,7 @@ public class DictContainsKeyMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var key = parameters[0].Accept(new InterpreterVisitor(manager));
+        var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         var contains = dict.Value.Any(x => x.Key.Equal(key));
         return new BoolLangValue(contains);
     }

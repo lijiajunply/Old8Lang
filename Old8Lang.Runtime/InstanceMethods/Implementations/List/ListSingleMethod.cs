@@ -46,7 +46,7 @@ public class ListSingleMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         else
         {
             // 带谓词版本：返回满足条件的唯一元素
-            var predicate = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+            var predicate = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
             if (predicate == null)
             {
                 throw new ArgumentError(position, "predicate 参数必须是函数类型");

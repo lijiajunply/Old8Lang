@@ -26,7 +26,7 @@ public class LangListConcatMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var otherValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (otherValue is not ILangList otherList)
         {

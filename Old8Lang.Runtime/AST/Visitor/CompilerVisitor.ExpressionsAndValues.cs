@@ -1877,12 +1877,6 @@ public partial class CompilerVisitor
         return null;
     }
 
-    public object VisitInterpreterVisitor(InterpreterVisitor node)
-    {
-        // InterpreterVisitor 不应该在 IL 模式下访问
-        throw new NotSupportedException("InterpreterVisitor 不应该在 IL 模式下访问");
-    }
-
     private Type EmitOperationOutputType(Operation operation)
     {
         var right = operation.Opera == LangTokenType.Dot

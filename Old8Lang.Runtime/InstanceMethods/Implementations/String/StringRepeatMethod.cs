@@ -27,7 +27,7 @@ public class StringRepeatMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var countValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var countValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (countValue is not IntLangValue count)
         {

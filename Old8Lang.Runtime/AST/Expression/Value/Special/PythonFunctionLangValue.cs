@@ -71,7 +71,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 // 处理位置参数
                 foreach (var arg in positionalArgs)
                 {
-                    var argValue = arg.Accept(new InterpreterVisitor(variateManagerFunc));
+                    var argValue = arg.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc));
                     pythonArgs.Add(argValue);
                 }
 
@@ -107,7 +107,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 var pyArgs = new List<PyObject>();
                 foreach (var arg in positionalArgs)
                 {
-                    var argValue = arg.Accept(new InterpreterVisitor(variateManagerFunc));
+                    var argValue = arg.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc));
                     pyArgs.Add(ConvertToPython(argValue));
                 }
 
@@ -115,7 +115,7 @@ public class PythonFunctionLangValue : FuncLangValue
                 var pyKwargs = new PyDict();
                 foreach (var namedArg in namedArgs)
                 {
-                    var argValue = namedArg.Value.Accept(new InterpreterVisitor(variateManagerFunc));
+                    var argValue = namedArg.Value.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc));
                     var pyValue = ConvertToPython(argValue);
                     pyKwargs.SetItem(new PyString(namedArg.Name), pyValue);
                 }

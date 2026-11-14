@@ -39,7 +39,7 @@ internal static class SelectStatementRuntimeExtensions
                         } funcCall)
                     {
                         // 提取实际的 channel ID 参数
-                        var channelIdValue = funcCall.Ids[0].Accept(new InterpreterVisitor(manager));
+                        var channelIdValue = funcCall.Ids[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
                         if (channelIdValue is not IntLangValue intVal)
                         {
                             continue;
@@ -50,7 +50,7 @@ internal static class SelectStatementRuntimeExtensions
                     else
                     {
                         // 直接执行 ChannelExpression 获取 channel ID
-                        var channelIdValue = selectCase.ChannelExpression.Accept(new InterpreterVisitor(manager));
+                        var channelIdValue = selectCase.ChannelExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         if (channelIdValue is not IntLangValue intVal)
                         {
                             continue;
@@ -78,14 +78,14 @@ internal static class SelectStatementRuntimeExtensions
                                 LangValueType.ObjToValue(receiveResult.Value));
                         }
 
-                        selectCase.BlockStatement.Accept(new InterpreterVisitor(manager));
+                        selectCase.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         return;
                     }
                 }
                 else
                 {
                     // 发送case：尝试非阻塞发送
-                    var channelIdValue = selectCase.ChannelExpression.Accept(new InterpreterVisitor(manager));
+                    var channelIdValue = selectCase.ChannelExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     if (channelIdValue is IntLangValue intVal)
                     {
                         int channelId = intVal.Value;
@@ -98,11 +98,11 @@ internal static class SelectStatementRuntimeExtensions
 
                         allCasesClosed = false;
 
-                        var sendValue = selectCase.SendValueExpression!.Accept(new InterpreterVisitor(manager));
+                        var sendValue = selectCase.SendValueExpression!.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         if (ResourceManager.TrySendChannel(channelId, sendValue.GetValue()!, 0))
                         {
                             // 发送成功
-                            selectCase.BlockStatement.Accept(new InterpreterVisitor(manager));
+                            selectCase.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
                             return;
                         }
                     }
@@ -112,7 +112,7 @@ internal static class SelectStatementRuntimeExtensions
             // 如果有default分支，立即执行
             if (node.DefaultCase is not null)
             {
-                node.DefaultCase.Accept(new InterpreterVisitor(manager));
+                node.DefaultCase.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 return;
             }
 

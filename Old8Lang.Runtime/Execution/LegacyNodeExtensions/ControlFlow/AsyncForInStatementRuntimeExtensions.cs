@@ -27,7 +27,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
 
         try
         {
-            var value = node.Expression.Accept(new InterpreterVisitor(manager));
+            var value = node.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             // 处理 TaskLangValue - await 任务并获取结果
             if (value is TaskLangValue taskValue)
@@ -46,7 +46,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行异步流，获取下一个值（同步等待）
-                    asyncStream.Accept(new InterpreterVisitor(manager));
+                    asyncStream.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 检查异步流是否已完成
                     if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
@@ -73,7 +73,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     // 运行元组，获取实际值
-                                    tupleValue.Accept(new InterpreterVisitor(manager));
+                                    tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
@@ -91,7 +91,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                             }
 
                             // 执行循环体
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -149,7 +149,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     // 运行元组，获取实际值
-                                    tupleValue.Accept(new InterpreterVisitor(manager));
+                                    tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                                     // 字典键值对，赋值给多个标识符
                                     var values = tupleValue.GetItems().ToList();
@@ -167,7 +167,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                             }
 
                             // 执行循环体
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -186,7 +186,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                 {
                     manager.ControlFlowManager.ResetCurrentState();
 
-                    generator.Accept(new InterpreterVisitor(manager));
+                    generator.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
@@ -207,7 +207,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                             {
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
-                                    tupleValue.Accept(new InterpreterVisitor(manager));
+                                    tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                                     var values = tupleValue.GetItems().ToList();
 
                                     for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
@@ -221,7 +221,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                                 }
                             }
 
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -246,7 +246,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                     {
                         if (idValue is TupleLangValue tupleValue)
                         {
-                            tupleValue.Accept(new InterpreterVisitor(manager));
+                            tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                             var values = tupleValue.GetItems().ToList();
 
                             for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
@@ -260,7 +260,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                         }
                     }
 
-                    node.Body.Accept(new InterpreterVisitor(manager));
+                    node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -308,7 +308,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
             // 如果缓存中没有，则evaluate表达式并缓存
             if (value is null)
             {
-                value = node.Expression.Accept(new InterpreterVisitor(manager));
+                value = node.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 处理 TaskLangValue - await 任务并获取结果
                 if (value is TaskLangValue taskValue)
@@ -395,7 +395,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
             {
                 manager.ControlFlowManager.ResetCurrentState();
 
-                asyncStream.Accept(new InterpreterVisitor(manager));
+                asyncStream.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
@@ -420,7 +420,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                         {
                             if (currentValue is TupleLangValue tupleValue)
                             {
-                                tupleValue.Accept(new InterpreterVisitor(manager));
+                                tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                                 var values = tupleValue.GetItems().ToList();
                                 for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                 {
@@ -433,7 +433,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                             }
                         }
 
-                        node.Body.Accept(new InterpreterVisitor(manager));
+                        node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                         // 如果循环体中发生了yield，我们需要：
                         // 1. 标记循环状态为"从yield恢复"
@@ -548,7 +548,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                             {
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
-                                    tupleValue.Accept(new InterpreterVisitor(manager));
+                                    tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                                     var values = tupleValue.GetItems().ToList();
                                     for (int i = 0; i < node.Ids.Count && i < values.Count; i++)
                                     {
@@ -561,7 +561,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                                 }
                             }
 
-                            node.Body.Accept(new InterpreterVisitor(manager));
+                            node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 如果循环体中发生了yield，我们需要：
                             // 1. 标记循环状态为"从yield恢复"
@@ -649,7 +649,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                 {
                     if (idValue is TupleLangValue tupleValue)
                     {
-                        tupleValue.Accept(new InterpreterVisitor(manager));
+                        tupleValue.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         var values = tupleValue.GetItems().ToList();
                         for (var j = 0; j < node.Ids.Count && j < values.Count; j++)
                         {
@@ -663,7 +663,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
                 }
 
                 // 执行循环体
-                node.Body.Accept(new InterpreterVisitor(manager));
+                node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)

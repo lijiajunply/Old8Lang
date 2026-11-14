@@ -26,7 +26,7 @@ public class ListCombinationsMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var kValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var kValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (kValue is not IntLangValue kInt)
         {

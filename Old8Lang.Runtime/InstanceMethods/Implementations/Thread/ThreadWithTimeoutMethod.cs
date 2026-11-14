@@ -26,7 +26,7 @@ public class ThreadWithTimeoutMethod : BaseInstanceMethod, IIlNativeValueInstanc
         VariateManager manager, SourcePosition position)
     {
         var thread = (ThreadLangValue)instance;
-        var timeoutParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var timeoutParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (timeoutParam is not IntLangValue timeout)
         {

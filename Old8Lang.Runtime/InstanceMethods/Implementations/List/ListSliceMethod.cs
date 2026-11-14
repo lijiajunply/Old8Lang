@@ -26,8 +26,8 @@ public class ListSliceMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var startValue = parameters[0].Accept(new InterpreterVisitor(manager));
-        var endValue = parameters[1].Accept(new InterpreterVisitor(manager));
+        var startValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var endValue = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (startValue is not IntLangValue startInt)
         {

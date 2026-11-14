@@ -63,7 +63,7 @@ public partial class TestRunnerClassLangValue : LangValueType
 
             // 使用 ExternalManager 或传入的 manager 执行参数
             var currentManager = ExternalManager ?? manager;
-            var args = instance.Ids.Select(id => id.Accept(new InterpreterVisitor(currentManager))).ToList();
+            var args = instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(currentManager))).ToList();
             return method(args, instance.Position);
         }
 
@@ -418,7 +418,7 @@ public partial class TestRunnerClassLangValue : LangValueType
 
             // 与 ConvertTestResult 同理：构造后必须 Run 才会展开成可读的键值对
             var statisticsDictionary = new DictionaryLangValue(tupleList);
-            statisticsDictionary.Accept(new InterpreterVisitor(new VariateManager()));
+            statisticsDictionary.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
             return statisticsDictionary;
         }
         catch (Exception ex)
@@ -448,7 +448,7 @@ public partial class TestRunnerClassLangValue : LangValueType
         // 不调用 Run 的话，调用方（RunAll / RunTest 的返回值、ConvertToTestResults）
         // 会读到空字典，表现为测试名全为空、全部判失败。
         var dictionary = new DictionaryLangValue(tupleList);
-        dictionary.Accept(new InterpreterVisitor(new VariateManager()));
+        dictionary.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
         return dictionary;
     }
 

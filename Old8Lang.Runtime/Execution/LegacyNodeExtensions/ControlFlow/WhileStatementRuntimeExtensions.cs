@@ -42,7 +42,7 @@ internal static class WhileStatementRuntimeExtensions
                 manager.ControlFlowManager.ResetCurrentState();
 
                 // 获取条件表达式的值
-                var value = node.Condition.Accept(new InterpreterVisitor(manager));
+                var value = node.Condition.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 if (value is not BoolLangValue varBool)
                 {
                     throw new TypeError(node, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
@@ -57,7 +57,7 @@ internal static class WhileStatementRuntimeExtensions
                 }
 
                 // 执行循环体
-                node.Block.Accept(new InterpreterVisitor(manager));
+                node.Block.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 检查是否遇到 yield
                 if (context.HasYielded)
@@ -114,7 +114,7 @@ internal static class WhileStatementRuntimeExtensions
             while (true)
             {
                 // 获取条件表达式的值
-                var value = node.Condition.Accept(new InterpreterVisitor(manager));
+                var value = node.Condition.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 if (value is not BoolLangValue varBool)
                 {
                     throw new TypeError(node, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
@@ -134,7 +134,7 @@ internal static class WhileStatementRuntimeExtensions
                 manager.Interpreter?.PerformanceMonitor?.RecordLoopIteration();
 
                 // 执行循环体
-                node.Block.Accept(new InterpreterVisitor(manager));
+                node.Block.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)

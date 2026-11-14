@@ -25,7 +25,7 @@ public class LangListGroupByMethod : BaseLangListMethod
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var keySelectorExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var keySelectorExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (keySelectorExpr is not FuncLangValue keySelector)
         {

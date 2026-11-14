@@ -40,8 +40,8 @@ public class ListAggregateWithSeedMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var accumulatorParam = parameters[0].Accept(new InterpreterVisitor(manager));
-        var seed = parameters[1].Accept(new InterpreterVisitor(manager));
+        var accumulatorParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var seed = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (accumulatorParam is not FuncLangValue accumulator)
         {

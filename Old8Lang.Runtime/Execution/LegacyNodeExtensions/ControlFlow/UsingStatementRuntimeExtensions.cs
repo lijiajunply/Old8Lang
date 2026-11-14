@@ -28,7 +28,7 @@ internal static class UsingStatementRuntimeExtensions
             // 从using块内恢复，继续执行
             try
             {
-                node.BlockStatement.Accept(new InterpreterVisitor(manager));
+                node.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
             }
             finally
             {
@@ -43,7 +43,7 @@ internal static class UsingStatementRuntimeExtensions
         else
         {
             // 首次进入using语句
-            var resource = node.ResourceExpression.Accept(new InterpreterVisitor(manager));
+            var resource = node.ResourceExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (node.VariableName is not null)
             {
@@ -56,7 +56,7 @@ internal static class UsingStatementRuntimeExtensions
 
             try
             {
-                node.BlockStatement.Accept(new InterpreterVisitor(manager));
+                node.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
             }
             finally
             {
@@ -75,7 +75,7 @@ internal static class UsingStatementRuntimeExtensions
     internal static void RunStandard(this UsingStatement node, VariateManager manager)
     {
         // 1. 执行资源表达式
-        var resource = node.ResourceExpression.Accept(new InterpreterVisitor(manager));
+        var resource = node.ResourceExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 2. 如果有变量名，注册到作用域
         if (node.VariableName is not null)
@@ -86,7 +86,7 @@ internal static class UsingStatementRuntimeExtensions
         try
         {
             // 3. 执行using块
-            node.BlockStatement.Accept(new InterpreterVisitor(manager));
+            node.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
         finally
         {

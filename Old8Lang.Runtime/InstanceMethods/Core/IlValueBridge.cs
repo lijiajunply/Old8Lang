@@ -321,7 +321,7 @@ internal sealed class IlDelegateFuncLangValue(Delegate function)
             .ToList();
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
-        var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Accept(new InterpreterVisitor(variateManagerFunc)))).ToArray();
+        var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc)))).ToArray();
         var result = IlValueBridge.InvokeDelegate(Function, arguments);
         return IlValueBridge.Wrap(result);
     }

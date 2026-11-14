@@ -126,7 +126,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"SetResult 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var resultValue = args[0].Accept(new InterpreterVisitor(manager));
+        var resultValue = args[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         SetResult(resultValue);
         return new VoidLangValue(Position);
     }
@@ -138,7 +138,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"SetException 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var exceptionArg = args[0].Accept(new InterpreterVisitor(manager));
+        var exceptionArg = args[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         string exceptionMessage;
 
         if (exceptionArg is StringLangValue stringValue)
@@ -172,7 +172,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"TrySetResult 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var resultValue = args[0].Accept(new InterpreterVisitor(manager));
+        var resultValue = args[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         var success = SetResult(resultValue);
         return new BoolLangValue(success, Position);
     }
@@ -184,7 +184,7 @@ public partial class TaskCompletionSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"TrySetException 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var exceptionArg = args[0].Accept(new InterpreterVisitor(manager));
+        var exceptionArg = args[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         string exceptionMessage;
 
         if (exceptionArg is StringLangValue stringValue)

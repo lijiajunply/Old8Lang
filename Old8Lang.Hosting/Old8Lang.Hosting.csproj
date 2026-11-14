@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Old8Lang.Modules.Abstractions\Old8Lang.Modules.Abstractions.csproj" />
     <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
+    <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
     <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
   </ItemGroup>
 

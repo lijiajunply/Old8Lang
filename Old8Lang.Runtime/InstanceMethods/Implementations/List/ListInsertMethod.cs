@@ -26,8 +26,8 @@ public class ListInsertMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var indexParam = parameters[0].Accept(new InterpreterVisitor(manager));
-        var element = parameters[1].Accept(new InterpreterVisitor(manager));
+        var indexParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var element = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (indexParam is not IntLangValue indexValue)
         {

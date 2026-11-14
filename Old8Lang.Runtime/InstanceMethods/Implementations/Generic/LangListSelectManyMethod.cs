@@ -27,7 +27,7 @@ public class LangListSelectManyMethod : BaseLangListMethod, IIlNativeValueInstan
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var selector = parameters[0].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+        var selector = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
 
         if (selector == null)
         {
@@ -39,7 +39,7 @@ public class LangListSelectManyMethod : BaseLangListMethod, IIlNativeValueInstan
         // 如果有第二个参数（resultSelector）
         if (parameters.Count > 1)
         {
-            var resultSelector = parameters[1].Accept(new InterpreterVisitor(manager)) as FuncLangValue;
+            var resultSelector = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager)) as FuncLangValue;
             if (resultSelector == null)
             {
                 throw new ArgumentError(position, "resultSelector 参数必须是函数类型");

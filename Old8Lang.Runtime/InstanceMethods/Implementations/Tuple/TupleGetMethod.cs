@@ -26,7 +26,7 @@ public class TupleGetMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var tuple = (TupleLangValue)instance;
-        var indexValue = parameters[0].Accept(new InterpreterVisitor(manager));
+        var indexValue = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (indexValue is not IntLangValue index)
         {

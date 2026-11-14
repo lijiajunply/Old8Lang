@@ -42,7 +42,7 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var comparerParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var comparerParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (comparerParam is not FuncLangValue comparer)
         {

@@ -41,14 +41,14 @@ public sealed class SpawnFunction : BaseGlobalFunction
         if (funcExpr is Operation { Opera: LangTokenType.Dot } dotOp)
         {
             // 获取实例（左操作数）
-            var instanceValue = dotOp.Left?.Accept(new InterpreterVisitor(manager));
+            var instanceValue = dotOp.Left?.Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (instanceValue is AnyLangValue anyInstance)
             {
                 instanceContext = anyInstance;
             }
         }
 
-        var funcValue = funcExpr.Accept(new InterpreterVisitor(manager));
+        var funcValue = funcExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 检查函数类型
         FuncLangValue? spawnFunc = null;

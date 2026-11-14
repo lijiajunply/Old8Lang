@@ -31,7 +31,7 @@ public class TaskThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
         var task = (TaskLangValue)instance;
 
         // 在当前作用域中评估回调参数
-        var callbackParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var callbackParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (callbackParam is not FuncLangValue callback)
         {

@@ -58,7 +58,7 @@ public class TaskCompletionSourceSetResultMethod : CompletionSourceVmMethodBase
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        ((TaskCompletionSourceLangValue)instance).SetResult(parameters[0].Accept(new InterpreterVisitor(manager)));
+        ((TaskCompletionSourceLangValue)instance).SetResult(parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)));
         return new VoidLangValue(position);
     }
 
@@ -83,7 +83,7 @@ public class TaskCompletionSourceSetExceptionMethod : CompletionSourceVmMethodBa
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var message = ToExceptionMessage(parameters[0].Accept(new InterpreterVisitor(manager)));
+        var message = ToExceptionMessage(parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)));
         ((TaskCompletionSourceLangValue)instance).SetException(new Exception(message));
         return new VoidLangValue(position);
     }
@@ -139,7 +139,7 @@ public class TaskCompletionSourceTrySetResultMethod : CompletionSourceVmMethodBa
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var success = ((TaskCompletionSourceLangValue)instance).SetResult(parameters[0].Accept(new InterpreterVisitor(manager)));
+        var success = ((TaskCompletionSourceLangValue)instance).SetResult(parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)));
         return new BoolLangValue(success, position);
     }
 
@@ -163,7 +163,7 @@ public class TaskCompletionSourceTrySetExceptionMethod : CompletionSourceVmMetho
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var message = TaskCompletionSourceSetExceptionMethod.ToExceptionMessage(parameters[0].Accept(new InterpreterVisitor(manager)));
+        var message = TaskCompletionSourceSetExceptionMethod.ToExceptionMessage(parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager)));
         var success = ((TaskCompletionSourceLangValue)instance).SetException(new Exception(message));
         return new BoolLangValue(success, position);
     }
@@ -240,7 +240,7 @@ public class CancellationTokenSourceCancelAfterMethod : CompletionSourceVmMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        var delay = parameters[0].Accept(new InterpreterVisitor(manager));
+        var delay = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (delay is not IntLangValue delayMs)
         {
             throw new TypeError(parameters[0], "int", delay.TypeToString());

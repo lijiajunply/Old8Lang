@@ -30,7 +30,7 @@ public sealed class ExecFunction : BaseGlobalFunction
             throw new TypeError(parameters[0], "StringValue", results[0].GetType().Name);
             
         var statement = manager.Interpreter.Build(code: execStringValue.Value);
-        statement.Accept(new InterpreterVisitor(manager));
+        statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
         return new VoidLangValue();
     }
 

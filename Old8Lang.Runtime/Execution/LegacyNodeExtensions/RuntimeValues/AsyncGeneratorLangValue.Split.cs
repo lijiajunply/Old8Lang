@@ -118,7 +118,7 @@ public partial class AsyncGeneratorLangValue
     public LangValueType Run(VariateManager manager, List<LangExpression> args, object? obj = null)
     {
         // 异步生成器调用不需要参数，忽略args
-        return Accept(new InterpreterVisitor(manager));
+        return Accept(RuntimeVisitors.CreateInterpreter(manager));
     }
     /// <summary>
     /// 异步运行生成器，返回下一个值的 Task

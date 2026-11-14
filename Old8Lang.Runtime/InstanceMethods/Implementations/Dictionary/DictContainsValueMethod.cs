@@ -25,7 +25,7 @@ public class DictContainsValueMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var dict = (DictionaryLangValue)instance;
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         var contains = dict.Value.Any(x => x.Value.Equal(value));
         return new BoolLangValue(contains);

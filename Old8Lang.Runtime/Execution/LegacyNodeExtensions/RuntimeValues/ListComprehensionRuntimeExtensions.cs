@@ -26,7 +26,7 @@ internal static class ListComprehensionRuntimeExtensions
         }
 
         // 执行条件表达式
-        var conditionValue = node.Condition.Accept(new InterpreterVisitor(manager));
+        var conditionValue = node.Condition.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 检查条件结果是否为布尔值
         if (conditionValue is BoolLangValue boolValue)
@@ -53,7 +53,7 @@ internal static class ListComprehensionRuntimeExtensions
         var currentLoop = loops[0];
 
         // 执行当前循环的可迭代对象
-        var iterableValue = currentLoop.Iterable.Accept(new InterpreterVisitor(manager));
+        var iterableValue = currentLoop.Iterable.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 获取可迭代对象的元素
         IEnumerable<LangValueType> items;
@@ -73,7 +73,7 @@ internal static class ListComprehensionRuntimeExtensions
         else if (iterableValue is RangeLangValue range)
         {
             // 处理范围类型，执行range表达式获取实际的数组
-            var rangeResult = range.Accept(new InterpreterVisitor(manager));
+            var rangeResult = range.Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (rangeResult is ArrayLangValue rangeArray)
             {
                 items = rangeArray.GetItems();
@@ -137,7 +137,7 @@ internal static class ListComprehensionRuntimeExtensions
                 if (allConditionsMet)
                 {
                     // 使用最外层的表达式，而不是当前循环的表达式
-                    var exprValue = node.Expression.Accept(new InterpreterVisitor(newManager));
+                    var exprValue = node.Expression.Accept(RuntimeVisitors.CreateInterpreter(newManager));
                     resultList.Add(exprValue);
                 }
             }

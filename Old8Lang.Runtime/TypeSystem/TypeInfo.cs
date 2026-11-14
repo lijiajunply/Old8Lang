@@ -162,7 +162,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>
             // 添加实例成员
             foreach (var member in typeTemplate.Variates)
             {
-                var value = member.Value.Accept(new InterpreterVisitor(manager));
+                var value = member.Value.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 members.TryAdd(member.Key.IdName, value);
             }
 

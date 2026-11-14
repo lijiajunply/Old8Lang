@@ -58,7 +58,7 @@ public partial class NativeStaticAny
             }
 
             // 计算参数值
-            var arguments = orderedArgs.Select(arg => arg.Accept(new InterpreterVisitor(manager))).ToList();
+            var arguments = orderedArgs.Select(arg => arg.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
             var a = Apis.ListToObjects(arguments.OfType<LangValueType>().ToList()).ToArray();
 
             // 使用委托缓存优化静态方法调用

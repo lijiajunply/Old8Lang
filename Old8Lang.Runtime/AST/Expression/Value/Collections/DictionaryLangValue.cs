@@ -77,7 +77,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         if (dotExpression is not Instance and not LangId)
         {
             // 尝试运行表达式获取键值
-            var result = dotExpression.Accept(new InterpreterVisitor(manager));
+            var result = dotExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
             return Get(result);
         }
 
@@ -126,7 +126,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
                 if (registeredMethod == null)
                 {
                     // 没有注册的方法，当作索引访问
-                    var result = a.Ids[0].Accept(new InterpreterVisitor(manager));
+                    var result = a.Ids[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
                     return Get(result);
                 }
             }
@@ -248,8 +248,8 @@ public partial class DictionaryLangValue : LangValueType, ILangList
 
         foreach (var a in Value)
         {
-            var key = a.Key.Accept(new InterpreterVisitor(manager));
-            var value = a.Value.Accept(new InterpreterVisitor(manager));
+            var key = a.Key.Accept(RuntimeVisitors.CreateInterpreter(manager));
+            var value = a.Value.Accept(RuntimeVisitors.CreateInterpreter(manager));
             if (key is not StringLangValue s) continue;
             typeAny.SetField(s.Value, value, manager);
         }

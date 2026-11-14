@@ -26,7 +26,7 @@ public class ListAddListMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var list = (ListLangValue)instance;
-        var otherParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var otherParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (otherParam is not ListLangValue otherList)
         {

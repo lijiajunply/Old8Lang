@@ -52,10 +52,10 @@ public partial class ThreadClassLangValue : LangValueType
             var args =
                 // 使用 ExternalManager 执行参数
                 ExternalManager is not null
-                    ? instance.Ids.Select(id => id.Accept(new InterpreterVisitor(ExternalManager))).ToList()
+                    ? instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(ExternalManager))).ToList()
                     :
                     // 对于简单的静态方法（如 Sleep），直接执行参数
-                    instance.Ids.Select(id => id.Accept(new InterpreterVisitor(manager))).ToList();
+                    instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
 
             return method(args, instance.Position);
         }

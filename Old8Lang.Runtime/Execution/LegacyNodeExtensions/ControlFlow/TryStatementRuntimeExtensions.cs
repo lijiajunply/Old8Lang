@@ -37,7 +37,7 @@ internal static class TryStatementRuntimeExtensions
                 context.PathStack.Push("/catch");
                 try
                 {
-                    catchBlock.Accept(new InterpreterVisitor(manager));
+                    catchBlock.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                     // 检查是否 yield
                     if (context.HasYielded)
@@ -62,7 +62,7 @@ internal static class TryStatementRuntimeExtensions
             context.PathStack.Push("/try");
             try
             {
-                node.TryBlock.Accept(new InterpreterVisitor(manager));
+                node.TryBlock.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                 // 检查是否 yield
                 if (context.HasYielded)
@@ -102,7 +102,7 @@ internal static class TryStatementRuntimeExtensions
                                     manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                                 }
 
-                                var filterResult = filter.Accept(new InterpreterVisitor(manager));
+                                var filterResult = filter.Accept(RuntimeVisitors.CreateInterpreter(manager));
                                 if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                                 {
                                     continue;
@@ -122,7 +122,7 @@ internal static class TryStatementRuntimeExtensions
                             }
 
                             // 执行catch块
-                            catchBlock.Accept(new InterpreterVisitor(manager));
+                            catchBlock.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
                             // 检查是否 yield
                             if (context.HasYielded)
@@ -178,7 +178,7 @@ internal static class TryStatementRuntimeExtensions
     {
         try
         {
-            node.TryBlock.Accept(new InterpreterVisitor(manager));
+            node.TryBlock.Accept(RuntimeVisitors.CreateInterpreter(manager));
             // 检查try块是否执行了return语句
             if (manager.IsReturn)
             {
@@ -209,7 +209,7 @@ internal static class TryStatementRuntimeExtensions
                         manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
                     }
 
-                    var filterResult = filter.Accept(new InterpreterVisitor(manager));
+                    var filterResult = filter.Accept(RuntimeVisitors.CreateInterpreter(manager));
                     if (filterResult is not BoolLangValue boolValue || !boolValue.Value)
                     {
                         // 过滤器不匹配，继续下一个catch块
@@ -231,7 +231,7 @@ internal static class TryStatementRuntimeExtensions
                 }
 
                 // 执行catch块
-                catchBlock.Accept(new InterpreterVisitor(manager));
+                catchBlock.Accept(RuntimeVisitors.CreateInterpreter(manager));
                 // 检查catch块是否执行了return语句
                 if (manager.IsReturn)
                 {
@@ -246,7 +246,7 @@ internal static class TryStatementRuntimeExtensions
         finally
         {
             // 执行finally块（如果存在）
-            node.FinallyBlock?.Accept(new InterpreterVisitor(manager));
+            node.FinallyBlock?.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
     }
 

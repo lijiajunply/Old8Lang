@@ -24,7 +24,7 @@ public sealed class LenFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (value is ILangList list)
         {
             return new IntLangValue(list.GetLength());
@@ -208,7 +208,7 @@ public sealed class TypeFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        return new TypeLangValue(parameters[0].Accept(new InterpreterVisitor(manager))).Accept(new InterpreterVisitor(manager));
+        return new TypeLangValue(parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager))).Accept(RuntimeVisitors.CreateInterpreter(manager));
     }
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
@@ -244,8 +244,8 @@ public sealed class AssertFunction : BaseGlobalFunction
 
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
-        var value = parameters[0].Accept(new InterpreterVisitor(manager));
-        var value1 = parameters[1].Accept(new InterpreterVisitor(manager));
+        var value = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
+        var value1 = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (!value.Equal(value1))
         {

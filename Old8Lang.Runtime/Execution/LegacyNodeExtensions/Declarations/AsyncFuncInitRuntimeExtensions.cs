@@ -63,7 +63,7 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 decorator.Arguments,
                 decorator.Position
             );
-            var wrapperFunc = decoratorCallExpr.Accept(new InterpreterVisitor(manager));
+            var wrapperFunc = decoratorCallExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
             if (wrapperFunc is not FuncLangValue wrapper)
             {
@@ -88,7 +88,7 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 [new LangId(tempVarName, position: decorator.Position)],
                 decorator.Position
             );
-            result = wrapperCallExpr.Accept(new InterpreterVisitor(manager));
+            result = wrapperCallExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
         else
         {
@@ -98,7 +98,7 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 [new LangId(tempVarName, position: decorator.Position)],
                 decorator.Position
             );
-            result = callExpr.Accept(new InterpreterVisitor(manager));
+            result = callExpr.Accept(RuntimeVisitors.CreateInterpreter(manager));
         }
 
         return result;

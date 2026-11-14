@@ -165,7 +165,7 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var typeValue = (TypeLangValue)instance;
-        var arg = parameters[0].Accept(new InterpreterVisitor(manager));
+        var arg = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (arg is not TypeLangValue otherType)
         {

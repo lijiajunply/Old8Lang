@@ -146,7 +146,7 @@ public partial class CancellationTokenSourceLangValue : LangValueType
             throw new ArgumentError(Position, $"CancelAfter 期望 1 个参数，但提供了 {args.Count} 个");
         }
 
-        var delayArg = args[0].Accept(new InterpreterVisitor(manager));
+        var delayArg = args[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (delayArg is not IntLangValue delayMs)
         {
             throw new TypeError(args[0], "int", delayArg.TypeToString());

@@ -26,7 +26,7 @@ public class LangListReduceMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         VariateManager manager, SourcePosition position)
     {
         var items = GetItems(instance);
-        var reducerExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var reducerExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (reducerExpr is not FuncLangValue reducer)
         {
@@ -39,7 +39,7 @@ public class LangListReduceMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         if (parameters.Count >= 2)
         {
             // 有初始值
-            accumulator = parameters[1].Accept(new InterpreterVisitor(manager));
+            accumulator = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
             startIndex = 0;
         }
         else

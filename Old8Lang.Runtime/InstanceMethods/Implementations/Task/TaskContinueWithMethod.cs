@@ -30,7 +30,7 @@ public class TaskContinueWithMethod : BaseInstanceMethod, IIlNativeValueInstance
     {
         var task = (TaskLangValue)instance;
 
-        var callbackParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var callbackParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         if (callbackParam is not FuncLangValue callback)
         {

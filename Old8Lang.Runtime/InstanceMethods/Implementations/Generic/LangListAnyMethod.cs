@@ -34,7 +34,7 @@ public class LangListAnyMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
         }
 
         // 有参数：检查是否有元素满足条件
-        var predicateExpr = parameters[0].Accept(new InterpreterVisitor(manager));
+        var predicateExpr = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (predicateExpr is not FuncLangValue predicate)
         {
             throw new ArgumentException("Any 方法的参数必须是函数");

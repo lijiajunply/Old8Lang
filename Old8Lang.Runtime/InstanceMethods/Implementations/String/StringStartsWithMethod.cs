@@ -23,7 +23,7 @@ public class StringStartsWithMethod : BaseInstanceMethod
         VariateManager manager, SourcePosition position)
     {
         var str = (StringLangValue)instance;
-        var valueParam = parameters[0].Accept(new InterpreterVisitor(manager));
+        var valueParam = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         if (valueParam is not StringLangValue value)
             throw new TypeError(position, $"StartsWith 方法的参数必须是字符串类型");
         return new BoolLangValue(str.Value.StartsWith(value.Value));

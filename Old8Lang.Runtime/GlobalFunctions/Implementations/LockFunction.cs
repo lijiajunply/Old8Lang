@@ -24,7 +24,7 @@ public sealed class LockFunction : BaseGlobalFunction
     protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
     {
         var expr = parameters[0];
-        var result = expr.Accept(new InterpreterVisitor(manager));
+        var result = expr.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
         // 获取变量名（用于标识和调试）
         string varName;
