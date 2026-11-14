@@ -36,6 +36,7 @@
 | 解析器合成字面量（`++/--` 的 `IntLangValue(1)`、未初始化字段的 `NullLangValue`、字符串模板片段、动态导入字符串、空 `return` 的 `VoidLangValue`） | `ScalarLiteralExpression`（Syntax） | 解析结果统一为语法节点；求值后仍是原来的运行时值类型。依赖解析树节点的 C# 代码应按 `ScalarLiteralExpression.Kind` 判断，而不是按 `IntLangValue`/`NullLangValue`/`VoidLangValue` 子类判断。 |
 | `ForInStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补 `VisitForInStatement`。解释执行的生成器/流/集合分支与 IL 字典遍历辅助移入 `ForInStatementRuntimeExtensions`。 |
 | `AsyncForInStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。`Expression`/`Body` 由 internal 改为公开只读属性（另有公开 `Id`）；Visitor 使用公开 `Ids`。自定义 `IVisitor<TResult>` 实现需补 `VisitAsyncForInStatement`。异步流/生成器/列表分支与 IL 生成移入 `AsyncForInStatementRuntimeExtensions`。 |
+| `ListComprehension`（Runtime 程序集，`LangValueType` 子类） | 同名类型（Syntax 程序集，`LangExpression` 子类） | 解析树中的列表推导式不再是运行时值：它只表示语法，求值由 Visitor 产出列表。直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译；自定义 `IVisitor<TResult>` 实现需补 `VisitListComprehension`。原 `CheckCondition`/`ProcessNestedLoops` 移入 Runtime 的 `ListComprehensionRuntimeExtensions`。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 

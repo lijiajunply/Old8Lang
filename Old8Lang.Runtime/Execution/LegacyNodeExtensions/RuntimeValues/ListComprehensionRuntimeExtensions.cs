@@ -8,25 +8,25 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
-/// ListComprehension 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// ListComprehension 的解释执行辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class ListComprehension
+internal static class ListComprehensionRuntimeExtensions
 {
     /// <summary>
     /// 检查条件是否满足
     /// </summary>
     /// <param name="manager">变量管理器</param>
     /// <returns>条件是否满足</returns>
-    internal bool CheckCondition(VariateManager manager)
+    internal static bool CheckCondition(this ListComprehension node, VariateManager manager)
     {
         // 如果没有条件，直接返回true
-        if (Condition is null)
+        if (node.Condition is null)
         {
             return true;
         }
 
         // 执行条件表达式
-        var conditionValue = Condition.Accept(new InterpreterVisitor(manager));
+        var conditionValue = node.Condition.Accept(new InterpreterVisitor(manager));
 
         // 检查条件结果是否为布尔值
         if (conditionValue is BoolLangValue boolValue)
@@ -36,7 +36,7 @@ public partial class ListComprehension
 
         // 如果条件结果不是布尔值，抛出错误
         throw new TypeError(
-            Condition,
+            node.Condition,
             $"类型不匹配: 期望布尔表达式，但得到 {conditionValue.GetType().Name}");
     }
     /// <summary>
@@ -45,7 +45,7 @@ public partial class ListComprehension
     /// <param name="manager">变量管理器</param>
     /// <param name="loops">嵌套的for循环列表</param>
     /// <returns>生成的元素列表</returns>
-    internal List<LangValueType> ProcessNestedLoops(VariateManager manager, List<ListComprehension> loops)
+    internal static List<LangValueType> ProcessNestedLoops(this ListComprehension node, VariateManager manager, List<ListComprehension> loops)
     {
         var resultList = new List<LangValueType>();
 
@@ -110,7 +110,7 @@ public partial class ListComprehension
             // 如果还有更多嵌套循环，递归处理
             if (loops.Count > 1)
             {
-                var nestedResults = ProcessNestedLoops(newManager, loops.Skip(1).ToList());
+                var nestedResults = node.ProcessNestedLoops(newManager, loops.Skip(1).ToList());
                 resultList.AddRange(nestedResults);
             }
             else
@@ -121,7 +121,7 @@ public partial class ListComprehension
                 // 检查当前循环的条件
 
                 // 检查所有外层循环的条件（如果有）
-                var outerLoop = this;
+                ListComprehension? outerLoop = node;
                 while (outerLoop is not null)
                 {
                     if (!outerLoop.CheckCondition(newManager))
@@ -137,7 +137,7 @@ public partial class ListComprehension
                 if (allConditionsMet)
                 {
                     // 使用最外层的表达式，而不是当前循环的表达式
-                    var exprValue = Expression.Accept(new InterpreterVisitor(newManager));
+                    var exprValue = node.Expression.Accept(new InterpreterVisitor(newManager));
                     resultList.Add(exprValue);
                 }
             }

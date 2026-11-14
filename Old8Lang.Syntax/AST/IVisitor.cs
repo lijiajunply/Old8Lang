@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 
 namespace Old8Lang.AST.Visitor;
@@ -87,6 +88,9 @@ public interface IVisitor<out TResult>
 
     /// <summary>访问异步 for-in 语句。</summary>
     TResult VisitAsyncForInStatement(AsyncForInStatement node);
+
+    /// <summary>访问列表推导式。</summary>
+    TResult VisitListComprehension(ListComprehension node);
 
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);

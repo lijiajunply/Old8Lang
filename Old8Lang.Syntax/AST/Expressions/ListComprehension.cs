@@ -1,9 +1,3 @@
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression.Intermediates;
@@ -11,7 +5,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 列表推导式
 /// </summary>
-public partial class ListComprehension : LangValueType
+public partial class ListComprehension : LangExpression
 {
     
     /// <summary>
@@ -65,6 +59,8 @@ public partial class ListComprehension : LangValueType
     }
 
 
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitListComprehension(this);
 
     public override string ToString()
     {

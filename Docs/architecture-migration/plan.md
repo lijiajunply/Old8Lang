@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`ListComprehension` 由 `LangValueType` 运行时值改为 `LangExpression` 语法节点并迁入 Syntax；
+  条件判断与嵌套循环执行移入 `ListComprehensionRuntimeExtensions`。Runtime 生成节点 61 → 60，
+  遗留 partial 基线 13 → 12。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、
+  LSP 474/476（2 跳过）通过；Compiler.Collections 15 / Expressions 41 项失败与基线一致。
+  见 `Reports/2026-11-14-14-40-列表推导式迁移测试.md`。
+
 - 2026-11-14：`AsyncForInStatement` 迁入 Syntax；异步流/异步生成器/列表分支与 IL 生成移入
   `AsyncForInStatementRuntimeExtensions`。Runtime 生成节点 62 → 61，遗留 partial 基线 15 → 13。
   Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
