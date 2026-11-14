@@ -10,8 +10,8 @@ namespace Old8Lang.Bytecode.ModuleSystem;
 /// </summary>
 public class ModuleLoader(string? baseDirectory = null, StandardLibraryCatalog? standardLibraries = null)
 {
-    private readonly StandardLibraryCatalog _standardLibraries = standardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
-    private readonly ModuleResolver _moduleResolver = new(standardLibraries);
+    private readonly StandardLibraryCatalog _standardLibraries = standardLibraries ?? StandardLibraryCatalog.Empty;
+    private readonly ModuleResolver _moduleResolver = new(standardLibraries ?? StandardLibraryCatalog.Empty);
 
     /// <summary>
     /// 加载模块并编译为字节码

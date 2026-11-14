@@ -58,6 +58,7 @@ public class LangInterpreter : ILangInterpreter, ISourceContextProvider
     /// <summary>
     /// 初始化LangInterpreter实例
     /// </summary>
+    /// <remarks>使用进程默认模块目录，这是 CLI 与既有测试的兼容路径。</remarks>
     public LangInterpreter() : this((IPerformanceMonitor?)null)
     {
     }
@@ -66,6 +67,10 @@ public class LangInterpreter : ILangInterpreter, ISourceContextProvider
     /// 初始化LangInterpreter实例，并指定性能监控器
     /// </summary>
     /// <param name="performanceMonitor">性能监控器（可选）</param>
+    /// <remarks>
+    /// 未指定模块目录时使用进程默认目录，这是 CLI 与既有测试的兼容路径。
+    /// 嵌入式宿主应通过宿主组合根创建解释器并传入自己的模块目录。
+    /// </remarks>
     public LangInterpreter(IPerformanceMonitor? performanceMonitor)
         : this(performanceMonitor, StandardLibraryRegistry.DefaultCatalog)
     {

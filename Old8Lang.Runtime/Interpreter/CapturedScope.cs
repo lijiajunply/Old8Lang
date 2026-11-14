@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.Interpreter;
 
@@ -30,6 +31,11 @@ public class CapturedScope
     public string Path { get; }
 
     /// <summary>
+    /// 捕获时可见的标准库目录。
+    /// </summary>
+    public StandardLibraryCatalog StandardLibraries { get; }
+
+    /// <summary>
     /// 是否是不可变的闭包（用于优化）
     /// </summary>
     public bool IsImmutable { get; }
@@ -47,12 +53,14 @@ public class CapturedScope
     /// <param name="langInfo">语言信息</param>
     /// <param name="path">源代码路径</param>
     /// <param name="isImmutable">是否不可变</param>
+    /// <param name="standardLibraries">捕获时可见的标准库目录；省略时使用共享空目录。</param>
     public CapturedScope(
         List<Dictionary<string, LangValueType>> scopes,
         List<ImportInfo> importInfos,
         LangInfo? langInfo,
         string path,
-        bool isImmutable = false)
+        bool isImmutable = false,
+        StandardLibraryCatalog? standardLibraries = null)
     {
         // 创建作用域的只读包装
         Scopes = scopes.Select(IReadOnlyDictionary<string, LangValueType> (s) => s.AsReadOnly()).ToList();
@@ -60,6 +68,7 @@ public class CapturedScope
         LangInfo = langInfo;
         Path = path;
         IsImmutable = isImmutable;
+        StandardLibraries = standardLibraries ?? StandardLibraryCatalog.Empty;
 
         // 预计算哈希码用于快速比较
         HashCode = ComputeHashCode();
@@ -95,7 +104,8 @@ public class CapturedScope
             importInfosCopy,
             manager.LangInfo,
             manager.Path,
-            isImmutable: false // 默认可变，允许函数体修改外部变量
+            isImmutable: false, // 默认可变，允许函数体修改外部变量
+            standardLibraries: manager.StandardLibraries
         );
     }
 
@@ -108,7 +118,8 @@ public class CapturedScope
         {
             LangInfo = LangInfo,
             Path = Path,
-            Interpreter = interpreter?.Interpreter
+            Interpreter = interpreter?.Interpreter,
+            StandardLibraries = StandardLibraries
         };
 
         // 恢复作用域（直接引用原始字典，不拷贝）
@@ -135,6 +146,7 @@ public class CapturedScope
         var hash = new HashCode();
         hash.Add(Path);
         hash.Add(Scopes.Count);
+        hash.Add(StandardLibraries);
 
         // 只使用前几个作用域的信息来计算哈希码（避免过于昂贵）
         var scopeCount = Math.Min(Scopes.Count, 3);
@@ -157,8 +169,10 @@ public class CapturedScope
         if (ReferenceEquals(this, other)) return true;
         if (HashCode != other.HashCode) return false;
 
-        // 快速检查：路径和作用域数量
-        if (Path != other.Path || Scopes.Count != other.Scopes.Count)
+        // 快速检查：路径、作用域数量与模块目录（不同宿主的捕获不能互相复用）
+        if (Path != other.Path ||
+            Scopes.Count != other.Scopes.Count ||
+            !ReferenceEquals(StandardLibraries, other.StandardLibraries))
             return false;
 
         // 详细比较需要时才进行（通常不需要）

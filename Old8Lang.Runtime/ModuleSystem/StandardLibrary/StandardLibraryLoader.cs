@@ -73,6 +73,7 @@ public static class StandardLibraryLoader
     /// </summary>
     /// <param name="libraryName">库名称</param>
     /// <param name="errorMessage">如果验证失败，返回错误信息</param>
+    /// <param name="standardLibraries">模块目录；省略时使用共享空目录，不会隐式回退到进程默认目录。</param>
     /// <returns>是否验证成功</returns>
     public static bool ValidateStandardLibrary(
         string libraryName,
@@ -80,7 +81,7 @@ public static class StandardLibraryLoader
         StandardLibraryCatalog? standardLibraries = null)
     {
         errorMessage = null;
-        standardLibraries ??= StandardLibraryRegistry.DefaultCatalog;
+        standardLibraries ??= StandardLibraryCatalog.Empty;
 
         // 检查是否为标准库
         if (!standardLibraries.IsStandardLibrary(libraryName))

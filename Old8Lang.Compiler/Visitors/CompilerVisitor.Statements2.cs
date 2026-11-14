@@ -1047,7 +1047,8 @@ public partial class CompilerVisitor
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
         // 在 IL 模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
-        var standardLibraries = local.Interpreter?.Manager.StandardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
+        // 编译器始终由宿主创建的解释器驱动；没有解释器时使用共享空目录，绝不读取进程默认目录。
+        var standardLibraries = local.Interpreter?.Manager.StandardLibraries ?? StandardLibraryCatalog.Empty;
         if (standardLibraries.IsStandardLibrary(moduleName))
         {
             // 验证标准库是否可用（程序集和类是否存在）
@@ -1138,7 +1139,8 @@ public partial class CompilerVisitor
             path = DllPathResolver.ResolveDllPath(
                 node.DllName,
                 null, // 不再使用 importPath
-                local.FilePath);
+                local.FilePath,
+                local.Interpreter?.Manager.StandardLibraries ?? StandardLibraryCatalog.Empty);
         }
         catch (FileNotFoundException ex)
         {

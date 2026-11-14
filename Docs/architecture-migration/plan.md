@@ -68,13 +68,26 @@
 
 ## 4. 宿主隔离与最终验收
 
-- [ ] 审计并处理默认静态模块注册表的所有入口；验证多宿主隔离与官方模块显式注册。
+- [x] 审计并处理默认静态模块注册表的所有入口；验证多宿主隔离与官方模块显式注册。
+  （2026-11-14：默认目录收敛为显式兼容边界；宿主创建的解释器/IL/VM 使用宿主目录，
+  由执行上下文克隆的作用域、闭包捕获与生成器沿用该目录，无宿主上下文的辅助作用域
+  使用空目录（失败关闭）；新增 `HostModuleIsolationTests` 覆盖三条执行路径。
+  入口清单见 [host-module-registry.md](host-module-registry.md)。）
 - [ ] 运行 `dotnet build Old8Lang.sln`、默认单元测试和适当的三模式端到端测试；对照基线审查每个失败及跳过项。
 - [ ] 更新架构、开发、API 迁移和模式支持文档，检查项目引用与工作区；生成最终测试报告并提交。
 
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 4.1 宿主隔离）：`StandardLibraryRegistry` 收敛为 CLI/LSP 等组合根的显式兼容
+  边界；`VariateManager` 默认改用冻结空目录，克隆、闭包捕获、生成器与函数执行显式继承宿主目录；
+  `ModuleResolver`、`StandardLibraryLoader`、`CompilerVisitor`、VM 模块加载器与 `DllPathResolver`
+  不再隐式读取进程默认目录。新增 11 项 `HostModuleIsolationTests`，覆盖解释器、IL 编译路径、VM
+  三条导入路径、两个非空宿主的互斥、函数/生成器体内导入及目录继承。Architecture 73、
+  Interpreter 1959/1960（1 跳过）、VM 1083、Compiler.Modules 263 通过；闭包/生成器过滤组
+  12 项失败与 HEAD 逐项一致（既有 IL 问题）。
+  见 `Reports/2026-11-14-19-14-阶段4.1宿主隔离与模块目录审计.md`。
 
 - 2026-11-14（阶段 3 完成）：解释、IL、字节码/VM 三个后端的访问器与执行引擎均已独立成
   `Old8Lang.Interpreter` / `Old8Lang.Compiler` / `Old8Lang.VirtualMachine`，Runtime 只保留

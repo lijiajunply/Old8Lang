@@ -138,7 +138,7 @@ public partial class VirtualMachine
                 string dllPath;
                 try
                 {
-                    dllPath = DllPathResolver.ResolveDllPath(dllName, null, basePath);
+                    dllPath = DllPathResolver.ResolveDllPath(dllName, null, basePath, _standardLibraries);
                 }
                 catch (FileNotFoundException)
                 {

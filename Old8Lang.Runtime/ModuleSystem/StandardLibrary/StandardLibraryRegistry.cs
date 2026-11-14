@@ -3,10 +3,13 @@ using Old8Lang.Modules.Abstractions;
 namespace Old8Lang.ModuleSystem.StandardLibrary;
 
 /// <summary>
-/// 默认宿主使用的标准库目录。
+/// 进程默认的标准库目录（兼容边界）。
 /// 新的嵌入式宿主应创建 <see cref="StandardLibraryCatalog"/> 并通过 Hosting 项目显式安装；
-/// 此静态入口仅用于 CLI 与尚未迁移的执行路径。
+/// 此静态入口仅用于 CLI、语言服务器与尚未迁移的构造器。宿主创建的执行实例不读取此目录。
 /// </summary>
+/// <remarks>
+/// 剩余入口的审计与处理结论见 Docs/architecture-migration/host-module-registry.md。
+/// </remarks>
 public static class StandardLibraryRegistry
 {
     private static StandardLibraryCatalog _defaultCatalog = new();

@@ -8,8 +8,30 @@ namespace Old8Lang.ModuleSystem.StandardLibrary;
 /// </summary>
 public sealed class StandardLibraryCatalog : IStandardLibraryRegistry
 {
+    /// <summary>
+    /// 共享的空目录。
+    /// </summary>
+    /// <remarks>
+    /// 用于没有宿主上下文的临时执行状态，使这些状态不会隐式看到进程默认目录。
+    /// 这是共享实例，不应向其中注册模块；需要注册时请通过宿主创建独立目录。
+    /// </remarks>
+    public static StandardLibraryCatalog Empty { get; } = new(isFrozen: true);
+
     private readonly Dictionary<string, StandardLibraryInfo> _libraries = new(StringComparer.Ordinal);
+    private readonly bool _isFrozen;
     private readonly Lock _registrationLock = new();
+
+    /// <summary>
+    /// 创建宿主私有的标准库目录。
+    /// </summary>
+    public StandardLibraryCatalog()
+    {
+    }
+
+    private StandardLibraryCatalog(bool isFrozen)
+    {
+        _isFrozen = isFrozen;
+    }
 
     /// <summary>
     /// 已注册标准库的只读视图。
@@ -23,6 +45,11 @@ public sealed class StandardLibraryCatalog : IStandardLibraryRegistry
     public void Register(IStandardLibraryModule module)
     {
         ArgumentNullException.ThrowIfNull(module);
+        if (_isFrozen)
+        {
+            throw new InvalidOperationException("共享的空标准库目录不可注册模块；请使用宿主创建的标准库目录。");
+        }
+
         module.Register(this);
     }
 
@@ -30,6 +57,11 @@ public sealed class StandardLibraryCatalog : IStandardLibraryRegistry
     public void Register(StandardLibraryModuleDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
+
+        if (_isFrozen)
+        {
+            throw new InvalidOperationException("共享的空标准库目录不可注册模块；请使用宿主创建的标准库目录。");
+        }
 
         var info = StandardLibraryInfo.FromTypes(
             descriptor.AssemblyName,

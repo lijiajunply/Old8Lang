@@ -102,6 +102,7 @@ public partial class AnyLangValue : LangValueType
 
         // 设置解释器
         InstanceScope.Interpreter = manager.Interpreter;
+        InstanceScope.StandardLibraries = manager.StandardLibraries;
 
         // 将全局类型定义添加到实例作用域
         InstanceScope.AddImportInfoRange(manager.ImportInfos);

@@ -19,6 +19,10 @@ public static class OfficialModules
     /// 向当前进程的默认运行时注册全部官方模块。
     /// 可重复调用；重复注册相同模块不会改变已注册的描述。
     /// </summary>
+    /// <remarks>
+    /// 这是兼容入口，会修改进程级默认目录。嵌入式宿主应改用
+    /// <see cref="RegisterAll(IStandardLibraryRegistry)"/> 只注册到自己的目录。
+    /// </remarks>
     public static void RegisterAll()
     {
         StandardLibraryRegistry.Register(Module);

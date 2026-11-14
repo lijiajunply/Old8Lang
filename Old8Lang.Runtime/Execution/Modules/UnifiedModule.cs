@@ -4,6 +4,7 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.ModuleSystem.Loading;
 using Old8Lang.ModuleSystem.Resolution;
+using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.ModuleSystem.Symbols;
 
 using Old8Lang.AST.Visitor;
@@ -251,7 +252,13 @@ public class UnifiedModule(
         SourcePosition position = default,
         VariateManager? captureScope = null)
     {
-        var module = new UnifiedModule(moduleName, new VariateManager(), ModuleLoadMode.Eager, position);
+        var module = new UnifiedModule(moduleName,
+            new VariateManager
+            {
+                StandardLibraries = captureScope?.StandardLibraries ?? StandardLibraryCatalog.Empty
+            },
+            ModuleLoadMode.Eager,
+            position);
 
         // 如果提供了捕获作用域，克隆一份作为所有函数共享的作用域
         // 这样所有函数都能访问和修改同一个模块级变量

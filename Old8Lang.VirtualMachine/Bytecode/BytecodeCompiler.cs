@@ -51,15 +51,18 @@ public class BytecodeCompiler : IBytecodeCompiler
     /// <summary>
     /// 编译字节码时可见的标准库目录。
     /// </summary>
-    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryRegistry.DefaultCatalog;
+    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryCatalog.Empty;
 
     /// <summary>
     /// 创建使用指定模块目录的字节码编译器。
     /// </summary>
     /// <param name="standardLibraries">宿主提供的模块目录。</param>
-    public BytecodeCompiler(StandardLibraryCatalog standardLibraries) : this()
+    public BytecodeCompiler(StandardLibraryCatalog standardLibraries)
     {
         StandardLibraries = standardLibraries ?? throw new ArgumentNullException(nameof(standardLibraries));
+
+        // 初始化全局作用域
+        _scopes.Push(new Scope(null));
     }
 
     /// <summary>
@@ -105,10 +108,17 @@ public class BytecodeCompiler : IBytecodeCompiler
     /// </summary>
     public bool IsCurrentFunctionAsync => _currentFunction?.IsAsync ?? false;
 
+    /// <summary>
+    /// 创建使用进程默认模块目录的字节码编译器。
+    /// </summary>
+    /// <remarks>
+    /// 这是 CLI 与既有测试使用的兼容路径：构造时快照
+    /// <see cref="StandardLibraryRegistry.DefaultCatalog"/>。嵌入式宿主应通过宿主组合根创建
+    /// 字节码编译器，或使用传入目录的构造器，避免读取进程默认目录。
+    /// </remarks>
     public BytecodeCompiler()
+        : this(StandardLibraryRegistry.DefaultCatalog)
     {
-        // 初始化全局作用域
-        _scopes.Push(new Scope(null));
     }
 
     /// <summary>

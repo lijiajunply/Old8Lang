@@ -35,7 +35,11 @@ public class VariateManager
     /// <summary>
     /// 当前执行上下文可见的标准库目录。
     /// </summary>
-    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryRegistry.DefaultCatalog;
+    /// <remarks>
+    /// 默认是共享的空目录：没有宿主上下文的管理器不会隐式看到进程默认目录。
+    /// 宿主创建解释器、克隆作用域或捕获闭包时必须显式传入目录。
+    /// </remarks>
+    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryCatalog.Empty;
 
     /// <summary>
     /// 当前源代码文件路径
@@ -1273,6 +1277,9 @@ public class VariateManager
 
         // 清理只读变量记录
         ReadonlyVariables.Clear();
+
+        // 临时管理器归还池中后不得保留上一个宿主的模块目录。
+        StandardLibraries = StandardLibraryCatalog.Empty;
     }
 
     /// <summary>
@@ -1304,7 +1311,8 @@ public class VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
-            Interpreter = Interpreter
+            Interpreter = Interpreter,
+            StandardLibraries = StandardLibraries
         };
 
         // COW优化：直接引用所有作用域（零拷贝），并标记为共享
@@ -1348,6 +1356,7 @@ public class VariateManager
             LangInfo = LangInfo,
             Path = Path,
             Interpreter = Interpreter,
+            StandardLibraries = StandardLibraries,
             // 创建生成器专用的执行上下文
             GeneratorContext = new GeneratorExecutionContext()
         };

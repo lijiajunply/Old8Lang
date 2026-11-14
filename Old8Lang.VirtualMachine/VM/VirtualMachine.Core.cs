@@ -66,6 +66,10 @@ public partial class VirtualMachine : IVirtualMachine
     /// </summary>
     public StandardLibraryCatalog StandardLibraries => _standardLibraries;
 
+    /// <remarks>
+    /// 未提供模块目录时使用进程默认目录，这是 CLI 与既有测试的兼容路径；
+    /// 嵌入式宿主应通过宿主组合根创建虚拟机，或显式传入目录。
+    /// </remarks>
     public VirtualMachine(
         BytecodeFile bytecodeFile,
         string? baseDirectory = null,

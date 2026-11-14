@@ -89,6 +89,7 @@ public partial class FuncLangValue
             LangInfo = variateManagerFunc.LangInfo,
             Path = variateManagerFunc.Path,
             Interpreter = variateManagerFunc.Interpreter,
+            StandardLibraries = variateManagerFunc.StandardLibraries,
             IsFunc = true
         };
 
@@ -570,7 +571,7 @@ public partial class FuncLangValue
             if (invoke is null)
                 return VoidLangValue.Instance;
 
-            var manager = new VariateManager();
+            var manager = new VariateManager { StandardLibraries = variateManagerFunc.StandardLibraries };
             var convertedValue = ObjToValue(invoke);
             manager.Init(new Dictionary<string, LangValueType> { { "base", convertedValue } });
             manager.IsClass = false;

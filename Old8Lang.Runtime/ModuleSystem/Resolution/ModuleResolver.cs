@@ -45,6 +45,11 @@ public class ModuleResolutionResult
     public List<ResolutionAttempt> ResolutionAttempts { get; set; } = [];
 
     /// <summary>
+    /// 解析时使用的标准库目录，用于生成名称建议。
+    /// </summary>
+    public StandardLibraryCatalog StandardLibraries { get; set; } = StandardLibraryCatalog.Empty;
+
+    /// <summary>
     /// 获取友好的错误信息
     /// </summary>
     public string GetFriendlyErrorMessage(string moduleName)
@@ -132,7 +137,7 @@ public class ModuleResolutionResult
     /// </summary>
     private List<string> FindSimilarStandardLibraries(string moduleName)
     {
-        var allLibs = StandardLibraryRegistry.GetAllLibraryNames();
+        var allLibs = StandardLibraries.GetAllLibraryNames();
         var similar = new List<string>();
 
         var lowerModuleName = moduleName.ToLowerInvariant();
@@ -241,10 +246,10 @@ public class ModuleResolver
     /// <summary>
     /// 创建模块解析器。
     /// </summary>
-    /// <param name="standardLibraries">解析时可见的标准库目录；省略时使用默认目录。</param>
+    /// <param name="standardLibraries">解析时可见的标准库目录；省略时使用共享空目录。</param>
     public ModuleResolver(StandardLibraryCatalog? standardLibraries = null)
     {
-        _standardLibraries = standardLibraries ?? StandardLibraryRegistry.DefaultCatalog;
+        _standardLibraries = standardLibraries ?? StandardLibraryCatalog.Empty;
     }
 
     /// <summary>
@@ -257,7 +262,7 @@ public class ModuleResolver
     public ModuleResolutionResult ResolveModule(string moduleName, string? currentFilePath,
         VariateManager? manager = null)
     {
-        var result = new ModuleResolutionResult();
+        var result = new ModuleResolutionResult { StandardLibraries = _standardLibraries };
         int stepNumber = 0;
 
         // 1. 检查是否为网络路径

@@ -174,7 +174,8 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
     /// </summary>
     private string? ResolveStandardLibrarySourcePath(string libraryName)
     {
-        // 获取标准库信息
+        // 源码链接是 LSP 的进程级能力：语言服务器组合根在启动时把官方模块目录安装为默认目录。
+        // 这里读取的是该已安装目录，不是执行实例的目录。
         var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName);
         if (libInfo == null)
         {

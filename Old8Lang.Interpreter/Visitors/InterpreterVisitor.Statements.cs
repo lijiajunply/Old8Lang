@@ -1252,7 +1252,8 @@ public partial class InterpreterVisitor
             path = DllPathResolver.ResolveDllPath(
                 node.DllName,
                 null, // 不再使用 importPath
-                manager.Path);
+                manager.Path,
+                manager.StandardLibraries);
         }
         catch (FileNotFoundException ex)
         {

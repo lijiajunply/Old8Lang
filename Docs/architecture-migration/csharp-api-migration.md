@@ -116,3 +116,17 @@ Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 
 |---|---|---|
 | `Old8Lang.AsyncGeneration.AsyncStateMachineGenerator`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 IL 后端；命名空间不变。 |
 | `LocalManager.AsyncStateMachineGenerator` 的具体类型 | `IAsyncStateMachineGenerator`（Runtime） | 共享代码只使用变量提升、await 状态与 return 发射接口；具体实现由 IL 后端提供。 |
+
+### 阶段 4.1：宿主模块目录（2026-11-14）
+
+宿主模块目录的审计与行为边界见 [host-module-registry.md](host-module-registry.md)。
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `VariateManager.StandardLibraries` 默认使用进程默认目录 | 默认使用 `StandardLibraryCatalog.Empty` | 直接 `new VariateManager()` 后仍要导入标准库/原生库的代码，必须显式赋目录：`new VariateManager { StandardLibraries = host.StandardLibraries }`；由解释器/克隆/闭包/生成器派生的管理器会自动继承。 |
+| 无 | `StandardLibraryCatalog.Empty`（冻结空目录） | 没有宿主上下文的临时状态使用它；向它注册模块（模块或描述符入口）会抛 `InvalidOperationException`。需要注册时使用 `new StandardLibraryCatalog()` 或宿主的目录。 |
+| `new ModuleResolver()`、`StandardLibraryLoader.ValidateStandardLibrary(name, out error)` 的缺省目录 | 缺省为 `StandardLibraryCatalog.Empty` | 依赖标准库解析/验证的调用方必须传入目录；模块名建议只来自传入目录。 |
+| `DllPathResolver.ResolveDllPath(dll, importPath, currentFilePath)`、`GetSearchPaths(dll, importPath)` | 新增接收 `StandardLibraryCatalog` 的重载 | 解释器、IL 与 VM 内部调用点已传入各自目录；外部调用方若需要“标准库程序集优先”的路径，使用新重载。旧签名保留，使用进程默认目录。 |
+| `BytecodeCompiler.StandardLibraries` 属性默认进程默认目录 | 属性默认 `StandardLibraryCatalog.Empty` | 无参构造器仍快照进程默认目录（兼容路径）；嵌入式宿主使用 `Old8Host.CreateBytecodeCompiler()` 或 `new BytecodeCompiler(catalog)`。 |
+| `CapturedScope(...)` 构造器 | 末尾新增可选参数 `StandardLibraryCatalog? standardLibraries = null` | 直接构造捕获作用域的代码可传入宿主目录；省略时为空目录。`CapturedScope.FromManager` 与 `ToManager` 自动传递目录。 |
+| `ModuleResolutionResult` | 新增 `StandardLibraries` 属性 | 解析失败建议基于该目录生成；一般调用方无需修改。 |
