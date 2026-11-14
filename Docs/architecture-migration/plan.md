@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`EnumInit`、`SelectStatement` 迁入 Syntax；Select 的通道轮询与生成器路径执行移入
+  `SelectStatementRuntimeExtensions`。Runtime 生成节点 65 → 63，遗留 partial 基线 18 → 17。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
+  Compiler.Statements 4 项与 Compiler.Async 65 项失败与基线一致。见
+  `Reports/2026-11-14-14-32-enum与select节点迁移测试.md`。
+
 - 2026-11-14：`SwitchStatement`、`CaseStatement`、`TryStatement` 迁入 Syntax；switch 跳转表生成与
   try 的生成器/标准执行、异常类型匹配移入 Runtime 扩展类。Runtime 生成节点 68 → 65，遗留 partial
   基线 20 → 18。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、

@@ -1,12 +1,4 @@
-using System.Reflection;
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-using Old8Lang.TypeSystem;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
@@ -21,7 +13,6 @@ public partial class EnumInit(
     List<(string name, LangExpression? value)> members,
     SourcePosition position = default) : OldStatement(position)
 {
-
     /// <summary>
     /// 枚举名称
     /// </summary>
@@ -41,6 +32,8 @@ public partial class EnumInit(
     /// 公共属性，用于访问枚举成员
     /// </summary>
     public List<(string name, LangExpression? value)> Members => _members;
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitEnumInit(this);
 
     /// <summary>
     /// 获取指定索引处的语句

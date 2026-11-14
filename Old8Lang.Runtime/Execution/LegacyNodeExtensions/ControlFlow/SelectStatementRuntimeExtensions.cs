@@ -10,14 +10,14 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// SelectStatement 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// SelectStatement 的解释执行辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class SelectStatement
+internal static class SelectStatementRuntimeExtensions
 {
     /// <summary>
     /// 标准模式执行（非生成器）
     /// </summary>
-    internal void RunStandard(VariateManager manager)
+    internal static void RunStandard(this SelectStatement node, VariateManager manager)
     {
         // 使用轮询策略实现多路选择
         while (true)
@@ -25,7 +25,7 @@ public partial class SelectStatement
             // 检查每个case
             bool allCasesClosed = true;
 
-            foreach (var selectCase in cases)
+            foreach (var selectCase in node.Cases)
             {
                 if (selectCase.IsReceive)
                 {
@@ -110,16 +110,16 @@ public partial class SelectStatement
             }
 
             // 如果有default分支，立即执行
-            if (defaultCase is not null)
+            if (node.DefaultCase is not null)
             {
-                defaultCase.Accept(new InterpreterVisitor(manager));
+                node.DefaultCase.Accept(new InterpreterVisitor(manager));
                 return;
             }
 
             // 所有 Channel 都已关闭，抛出异常
-            if (allCasesClosed && cases.Count > 0)
+            if (allCasesClosed && node.Cases.Count > 0)
             {
-                throw new ChannelClosedError(this, "select 语句中所有 Channel 已关闭，无法进行任何操作");
+                throw new ChannelClosedError(node, "select 语句中所有 Channel 已关闭，无法进行任何操作");
             }
 
             // 短暂休眠避免CPU 100%占用
@@ -129,7 +129,7 @@ public partial class SelectStatement
     /// <summary>
     /// 生成器上下文模式执行
     /// </summary>
-    internal void RunWithGeneratorContext(VariateManager manager)
+    internal static void RunWithGeneratorContext(this SelectStatement node, VariateManager manager)
     {
         var context = manager.GeneratorContext!;
 
@@ -140,7 +140,7 @@ public partial class SelectStatement
         if (isResumingFromSelectBlock)
         {
             // 从select块内恢复，继续执行
-            RunStandard(manager);
+            node.RunStandard(manager);
         }
         else
         {
@@ -150,7 +150,7 @@ public partial class SelectStatement
 
             try
             {
-                RunStandard(manager);
+                node.RunStandard(manager);
             }
             finally
             {

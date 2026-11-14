@@ -76,6 +76,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问 try 语句。</summary>
     TResult VisitTryStatement(TryStatement node);
 
+    /// <summary>访问枚举声明。</summary>
+    TResult VisitEnumInit(EnumInit node);
+
+    /// <summary>访问 select 语句。</summary>
+    TResult VisitSelectStatement(SelectStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

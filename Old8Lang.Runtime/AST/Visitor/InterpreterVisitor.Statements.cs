@@ -1409,17 +1409,17 @@ public partial class InterpreterVisitor
     {
 
         // 检查枚举是否已存在
-        var existingEnum = manager.GetAny(new LangId(node._enumName));
+        var existingEnum = manager.GetAny(new LangId(node.EnumName));
         if (existingEnum is not null)
         {
-            throw new DuplicateNameError(node, node._enumName, "枚举");
+            throw new DuplicateNameError(node, node.EnumName, "枚举");
         }
 
         // 计算枚举成员的实际值
         var enumValues = new Dictionary<string, int>();
         int currentValue = 0;
 
-        foreach (var (memberName, memberValueExpr) in node._members)
+        foreach (var (memberName, memberValueExpr) in node.Members)
         {
             if (memberValueExpr is not null)
             {
@@ -1445,13 +1445,13 @@ public partial class InterpreterVisitor
         }
 
         // 创建枚举模板并注册
-        var enumTemplate = new EnumTemplate(node._enumName, enumValues, node.Position);
+        var enumTemplate = new EnumTemplate(node.EnumName, enumValues, node.Position);
         manager.AddClassAndFunc(enumTemplate);
 
         // 注册枚举类型到类型系统
         try
         {
-            TypeChecker.RegisterEnumType(node._enumName, enumValues.Keys.ToList());
+            TypeChecker.RegisterEnumType(node.EnumName, enumValues.Keys.ToList());
         }
         catch
         {

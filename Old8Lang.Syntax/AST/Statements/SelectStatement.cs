@@ -1,11 +1,3 @@
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Concurrency;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
@@ -18,7 +10,6 @@ public partial class SelectStatement(
     BlockStatement? defaultCase,
     SourcePosition position = default) : OldStatement(position)
 {
-
     /// <summary>
     /// 获取所有case分支
     /// </summary>
@@ -29,7 +20,7 @@ public partial class SelectStatement(
     /// </summary>
     public BlockStatement? DefaultCase => defaultCase;
 
-
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitSelectStatement(this);
 
     public override OldStatement this[int index]
     {

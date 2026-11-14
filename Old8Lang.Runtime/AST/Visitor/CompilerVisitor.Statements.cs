@@ -1491,7 +1491,7 @@ public partial class CompilerVisitor
     {
 
         // 检查枚举是否已经存在
-        if (local.ClassVar.ContainsKey(node._enumName))
+        if (local.ClassVar.ContainsKey(node.EnumName))
         {
             return null;
         }
@@ -1508,7 +1508,7 @@ public partial class CompilerVisitor
 
         // 定义枚举类型
         var enumBuilder = moduleBuilder.DefineEnum(
-            node._enumName,
+            node.EnumName,
             TypeAttributes.Public,
             typeof(int)); // 枚举基础类型为 int
 
@@ -1516,7 +1516,7 @@ public partial class CompilerVisitor
         int currentValue = 0;
         var enumValues = new Dictionary<string, int>();
 
-        foreach (var (memberName, memberValueExpr) in node._members)
+        foreach (var (memberName, memberValueExpr) in node.Members)
         {
             if (memberValueExpr is not null)
             {
@@ -1542,7 +1542,7 @@ public partial class CompilerVisitor
         var createdEnumType = enumBuilder.CreateType();
 
         // 将枚举类型添加到 LocalManager
-        local.ClassVar[node._enumName] = createdEnumType;
+        local.ClassVar[node.EnumName] = createdEnumType;
     
     
         return null;
