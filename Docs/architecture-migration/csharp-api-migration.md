@@ -1,6 +1,6 @@
 # 架构迁移的 C# API 迁移说明
 
-状态：阶段 2 首批，2026-11-14。
+状态：阶段 2 首批、阶段 3 后端拆分，2026-11-14。
 
 本文只记录已发生的公开 C# 源码 API 变更；Old8 源码语法、CLI 参数和三种执行模式的可见行为不变。
 
@@ -62,3 +62,21 @@ Runtime 中的 `IntLangValue`、`DoubleLangValue`、`StringLangValue`、`BoolLan
 在独立 AST 字面量节点稳定后移除这层兼容关系；那一轮会在本文补充构造器和访问策略的替代路径。
 
 仓库内已更新的直接使用方是上述七个运行时值类与架构测试；搜索 `ILiteralSyntax` 可定位外部源码使用方。
+
+## 阶段 3：执行后端程序集拆分（2026-11-14）
+
+三个执行后端的 Visitor 已从 Runtime 迁出，Runtime 只保留 `RuntimeVisitors` 工厂契约与共享执行状态。
+`Old8HostBuilder` 构造时显式注册三个后端；不经过 Hosting 的宿主必须自行注册所需后端。
+
+| 旧 API | 新 API | 使用方迁移方式 |
+|---|---|---|
+| `Old8Lang.AST.Visitor.InterpreterVisitor`（Runtime 程序集） | 同名类型（`Old8Lang.Interpreter` 程序集） | 引用 `Old8Lang.Interpreter`，组合根调用 `InterpreterBackend.Register()`。需要在 Runtime 内部或自定义代码中按 manager 求值时，改用 `RuntimeVisitors.CreateInterpreter(manager)`，返回 `IRuntimeVisitor<LangValueType>`。 |
+| `Old8Lang.AST.Visitor.CompilerVisitor`（Runtime 程序集） | 同名类型（`Old8Lang.Compiler` 程序集） | 引用 `Old8Lang.Compiler`，组合根调用 `CompilerBackend.Register()`。按 IL 生成器与局部管理器执行时使用 `RuntimeVisitors.CreateCompiler(ilGenerator, local)`，返回 `IRuntimeVisitor<object?>`。 |
+| `Old8Lang.AST.Visitor.BytecodeVisitor`（Runtime 程序集） | 同名类型（`Old8Lang.VirtualMachine` 程序集），并实现 `IBytecodeVisitor` | 引用 `Old8Lang.VirtualMachine`，组合根调用 `VirtualMachineBackend.Register()`。`BytecodeCompiler` 经 `RuntimeVisitors.CreateBytecode(compiler)` 获取 `IBytecodeVisitor`，再读取 `GetInstructions()`/`MaxStackSize`。注册类位于 `Old8Lang.BytecodeBackend` 命名空间，避免 `Old8Lang.VirtualMachine` 命名空间与 `Bytecode.VM.VirtualMachine` 类型同名。 |
+| 无 | `Old8Lang.AST.Visitor.RuntimeVisitors`（Runtime） | 三个后端的工厂契约；`HasInterpreter`/`HasCompiler`/`HasBytecode` 用于诊断组合根是否注册。未注册时抛出带后端指引的 `InvalidOperationException`。 |
+| 无 | `Old8Lang.AST.Visitor.IBytecodeVisitor`（Runtime） | 字节码后端的最小契约：`IRuntimeVisitor<Instruction?>` + 指令列表 + 最大栈深。自定义字节码后端可实现该接口并注册。 |
+| Runtime 的 internal 执行辅助（迁移期） | `InternalsVisibleTo` 解释、IL、VM 三个后端程序集 | 后端程序集暂可访问 Runtime internal 成员；第三方扩展不应依赖这些成员。后续收敛为公开契约时会在本文补充替代路径。 |
+
+行为不变的验证：解释器 1959/1960（排除并发访问外部 HTTP 服务的 `NetLibTests`，1 跳过）、VM 1082、
+Architecture 55 通过；Compiler.Expressions 的 41 项失败与迁移前 HEAD 逐项一致，属 `Todo.md`
+记录的 IL 既有问题。

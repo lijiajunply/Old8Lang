@@ -47,8 +47,14 @@
     `Old8Lang.VirtualMachine`；Runtime 以 `IBytecodeVisitor` 契约 + `RuntimeVisitors.CreateBytecode`
     创建访问器，6 处直接构造改为契约调用；组合根同时注册三个后端。见
     `Reports/2026-11-14-16-54-VM后端拆分测试.md`。
-- [ ] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
-- [ ] 验证历史字节码样本、导入与三模式代表性行为；记录公开 C# API 的迁移路径。
+  - [ ] 引擎余量：`LangInterpreter`/`VariateManager`、`Compiler/`、`Bytecode/` 仍在 Runtime，
+    作为运行时值与三个后端共享的执行状态；完整迁出需先抽象共享契约。
+- [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
+  （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
+  契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
+- [x] 验证历史字节码样本、导入与三模式代表性行为；记录公开 C# API 的迁移路径。
+  （2026-11-14：新增字节码文件写入/读取/执行往返用例，VM 1083 通过；API 迁移说明新增阶段 3
+  小节。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
 
 **门禁**：每个后端单独构建及针对性回归，程序集依赖测试通过；按后端分别提交。
 
@@ -61,6 +67,12 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3 验收证据）：三个后端项目分别构建 0 错误；新增字节码文件往返用例
+  `BytecodePersistenceTests`（VM 1083 通过）；移除后端模块初始化器，改为组合根显式注册；
+  API 迁移说明补充阶段 3 小节。Architecture 55、Interpreter（排除外部网络用例）1959/1960、
+  VM 1083 通过；Compiler.Expressions 41 项失败与 HEAD 一致。引擎余量仍在 Runtime，阶段 3
+  第 1 项不标记完成。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。
 
 - 2026-11-14（阶段 3.3 VM 后端）：`BytecodeVisitor` 与三个共享 visitor 文件中的字节码片段迁入
   `Old8Lang.VirtualMachine`；Runtime 新增 `IBytecodeVisitor` 与 `RuntimeVisitors.CreateBytecode`

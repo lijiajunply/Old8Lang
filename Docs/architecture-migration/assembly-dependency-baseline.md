@@ -115,3 +115,15 @@ Old8Lang.Interpreter  Old8Lang.Compiler  Old8Lang.VirtualMachine
 仍留在 Runtime 的执行状态：解释期的 `LangInterpreter`/`VariateManager`/`ScopeLayer`，
 IL 期的 `Compiler/`（`Compiler.Compile`、`LocalManager`、`RuntimeGlobals`、异步状态机），
 VM 期的 `Bytecode/`（`BytecodeCompiler`、`VirtualMachine`、指令/元数据）。
+
+## 阶段 3 验收证据（2026-11-14）
+
+- 三个后端项目分别构建 0 错误，互不引用，只引用 Runtime。
+- `BackendAssemblyBoundaryTests` 校验程序集引用、契约注册与 Runtime 源码边界。
+- 组合根 `Old8HostBuilder` 显式注册三个后端；后端程序集不再使用 `ModuleInitializer`。
+- `BytecodePersistenceTests` 验证字节码文件写入、读取与执行往返（VM 1083 通过）。
+- 回归：Architecture 55、Interpreter 1959/1960（1 跳过，排除外部 HTTP 用例）、VM 1083；
+  Compiler.Expressions 41 项既有失败与 HEAD 一致。
+
+引擎余量（`LangInterpreter`/`VariateManager`、`Compiler/`、`Bytecode/`）仍在 Runtime，
+是下一子阶段的拆分对象。
