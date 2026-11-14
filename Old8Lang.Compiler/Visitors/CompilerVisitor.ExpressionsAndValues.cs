@@ -1184,24 +1184,16 @@ public partial class CompilerVisitor
         }
         else if (listType == typeof(DictionaryLangValue))
         {
-            // 处理 DictionaryLangValue 类型的索引访问
+            // 处理 DictionaryLangValue 类型的索引访问。
+            // 键必须在语言值层面传递（Get 的形参是 LangValueType），
+            // 结果再还原成原生对象，才能与索引读取的静态类型 object 保持一致；
+            // 之前直接把原始 string/int 当作 LangValueType 传入，会生成无效 IL。
             node.ListId.Accept(this); // 加载字典
-
-            // 加载键
-            node.Key.Accept(this);
-
-            // 调用 DictionaryLangValue.Get 方法
-            var getMethod = typeof(DictionaryLangValue).GetMethod("Get",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-            if (getMethod != null)
-            {
-                ilGenerator.Emit(OpCodes.Callvirt, getMethod);
-            }
-            else
-            {
-                throw new InvalidOperationError(node, "无法找到 DictionaryLangValue.Get 方法");
-            }
+            IlValueBridge.EmitLoadWrapped(node.Key, ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(DictionaryLangValue).GetMethod(nameof(DictionaryLangValue.Get))!);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Unwrap))!);
         }
         else
         {

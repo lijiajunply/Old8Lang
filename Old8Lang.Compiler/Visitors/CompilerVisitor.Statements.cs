@@ -1015,6 +1015,17 @@ public partial class CompilerVisitor
                     return null;
                 }
 
+                // DictionaryLangValue 是解释器的语言值：键与值都要包装成语言值后调用 Set，
+                // 否则原生 string/int 会被当作 LangValueType 传入，生成无效 IL。
+                if (listType == typeof(DictionaryLangValue))
+                {
+                    IlValueBridge.EmitLoadWrapped(listItem.Key, ilGenerator, local);
+                    IlValueBridge.EmitLoadWrapped(node.Value, ilGenerator, local);
+                    ilGenerator.Emit(OpCodes.Callvirt,
+                        typeof(DictionaryLangValue).GetMethod(nameof(DictionaryLangValue.Set))!);
+                    return null;
+                }
+
                 // 对于字典，需要在加载键和值时进行类型转换
                 if (listType!.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {

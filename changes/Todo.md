@@ -159,9 +159,10 @@
   在集合桥接改动前后失败集合完全一致。~~`Compiler.Classes` 组会使测试主机因生成无效 IL 崩溃~~
   ——该崩溃已于 2026-11-14 定位为比较运算装箱顺序错误并修复（见上文“IL 比较运算装箱顺序错误”），
   现在 `Compiler.Classes`（110 项）与 `Compiler.Expressions`（232 项）均可完整运行。
-  其中 `Dictionary_EmptyDictionary_CompilesAndExecutes` 表现为 `dict()` 空字典首次写入字符串键后，
-  读取时把 `NullLangValue` 转成 `Int32` 失败；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
-  `ArrayConcatenation`、`NestedArrays` 也是独立缺口。这些路径与本次集合实例方法桥接无关，需另行复现。
+  `dict()` 空字典的 `Dictionary_EmptyDictionary_CompilesAndExecutes` 已在
+  2026-11-14 修复（索引读写没有按 `DictionaryLangValue` 语言值处理，写路径残留栈值、
+  读路径用原生键调用语言方法）；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
+  `ArrayConcatenation`、`NestedArrays` 仍是独立缺口。见 change（`2026-11-14-IL语言字典索引/test.md`）。
 
 - [x] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
   暴露。可空类型注解在 IL 里被解析成基础值类型（`int?` → `int`），`return null` 的返回路径
@@ -230,6 +231,12 @@
   解释器与 IL 都得到 `6`（已用同一段代码在 `-f` / `-il` 实测）。已改为「修改前断言 5，
   修改后断言 `numbers` 与 `updatedNumbers` 都是 6」并注明别名语义；`MemberAccessTests`
   整组 7→8 通过。这条不是 IL 结果错误。
+
+- [ ] **字典缺失键的行为三模式不一致**：`d <- {"a": 1}; d["missing"]` 在 `-f` 返回
+  `NullLangValue`（`== null` 为 true），`-vm` 抛 `KEY_ERROR`；`-il` 内部还不一致——
+  原生 `Dictionary<object,object>` 分支抛 .NET `The given key ... was not present`，
+  而 `dict()` 创建的 `DictionaryLangValue` 分支返回 `null`。需要先定「缺失键返回 null 还是报错」
+  的约定，再统一实现与测试。见 change（`2026-11-14-IL语言字典索引/test.md` §5）。
 
 - [ ] **IL 链式比较 `a < b < c` 结果为 false**：`a <- 5; b <- 10; c <- 15; a < b < c` 期望 `true`，
   IL 模式得到 `false`（`ComparisonTests.ChainedComparisons_CompilesAndExecutesCorrectly`，已在
