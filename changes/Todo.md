@@ -162,7 +162,10 @@
   `dict()` 空字典的 `Dictionary_EmptyDictionary_CompilesAndExecutes` 已在
   2026-11-14 修复（索引读写没有按 `DictionaryLangValue` 语言值处理，写路径残留栈值、
   读路径用原生键调用语言方法）；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
-  `ArrayConcatenation`、`NestedArrays` 仍是独立缺口。见 change（`2026-11-14-IL语言字典索引/test.md`）。
+  `NestedArrays` 已在 2026-11-14 修复（`Len` 的 object 分支先压栈再 `ldc.i4.0` 返回，
+  栈上残留参数值）；`ArrayConcatenation` 则是「数组/列表 `+` 只有虚拟机支持」的跨模式差异，
+  见下面单独条目。见 change（`2026-11-14-IL语言字典索引/test.md`）与
+  change（`2026-11-14-IL-Len动态长度/test.md`）。
 
 - [x] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
   暴露。可空类型注解在 IL 里被解析成基础值类型（`int?` → `int`），`return null` 的返回路径
@@ -231,6 +234,14 @@
   解释器与 IL 都得到 `6`（已用同一段代码在 `-f` / `-il` 实测）。已改为「修改前断言 5，
   修改后断言 `numbers` 与 `updatedNumbers` 都是 6」并注明别名语义；`MemberAccessTests`
   整组 7→8 通过。这条不是 IL 结果错误。
+
+- [ ] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
+  在 `-f` 报 `INVALID_OPERATION_ERROR: 不支持类型 ... 的加法操作`，`-il` 被推断成数值加法后
+  `Len` 报 `类型 Int32 没有 Length 或 Count 属性`，`-vm` 输出拼接结果（
+  `VirtualMachine.Helpers.Arithmetic.cs` 有专门的数组拼接实现）。
+  `Compiler/Collections/ArrayTests.ArrayConcatenation_CompilesAndExecutesCorrectly` 因此只能在
+  虚拟机下成立。需要先决定该运算是否是语言特性，再统一实现或调整用例。
+  见 change（`2026-11-14-IL-Len动态长度/test.md` §5）。
 
 - [ ] **字典缺失键的行为三模式不一致**：`d <- {"a": 1}; d["missing"]` 在 `-f` 返回
   `NullLangValue`（`== null` 为 true），`-vm` 抛 `KEY_ERROR`；`-il` 内部还不一致——

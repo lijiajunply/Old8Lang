@@ -70,14 +70,35 @@ public sealed class LenFunction : BaseGlobalFunction
             return;
         }
 
-        // 如果是object类型，使用默认值0
+        // 静态类型为 object（未加注解的局部变量、集合索引结果等）时无法在编译期确定
+        // Length/Count 成员，改为运行期按实际值求长度。这里不能再压 Ldc_I4_0：
+        // 参数值已经压栈，直接返回会留下悬空栈值，生成无效 IL。
         if (lenType == typeof(object))
         {
-            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Call, typeof(LenFunction).GetMethod(nameof(GetLengthDynamic))!);
             return;
         }
 
         throw new InvalidOperationError(position, $"类型 {lenType.Name} 没有 Length 或 Count 属性");
+    }
+
+    /// <summary>
+    /// 运行期求长度，供静态类型为 <see cref="object"/> 的 <c>Len</c> 调用。
+    /// </summary>
+    /// <remarks>
+    /// 与 <see cref="ExecuteInternal"/> 的解释器口径一致：语言列表 / 字符串 / 集合都按元素数，
+    /// 其它类型报错。
+    /// </remarks>
+    public static int GetLengthDynamic(object? value)
+    {
+        return value switch
+        {
+            null => throw new InvalidOperationError(new SourcePosition(0, 0), "Null 不是列表类型"),
+            string text => text.Length,
+            ILangList list => list.GetLength(),
+            System.Collections.ICollection collection => collection.Count,
+            _ => throw new InvalidOperationError(new SourcePosition(0, 0), $"{value} 不是列表类型")
+        };
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
