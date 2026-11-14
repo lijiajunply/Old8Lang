@@ -180,6 +180,42 @@
   见 change（`2026-11-14-IL类内方法调用/test.md`）。遗留：`this.method()` 目前是反射分派，
   后续可在 `LocalManager` 预登记 `MethodBuilder` 恢复直接 `callvirt`。
 
+- [x] **IL 静态字段声明期初值从不写入**：`DefineFields` 只把实例字段初值交给构造函数，
+  静态字段既没有 `.cctor` 也没有其它写入口，`class M { public static PI <- 3.14159 }` 在
+  `-il` 下读到 `0`（`-f`/`-vm` 为 `3.14159`）。现已补齐非泛型类的 `.cctor` 初始化
+  （与 `GenericClassSpecializer` 的泛型特化路径一致），`MemberAccessTests.StaticMemberAccess_...`
+  通过；`Compiler.Classes` 21→20 失败，其余 18 个子组不变。
+  见 change（`2026-11-14-IL静态字段初值/test.md`）。
+
+- [ ] **解释器无法在类内访问 `private static` 字段**：
+
+  ```old8
+  class M {
+      private static counter <- 0
+      public static func inc() -> int {
+          M.counter <- M.counter + 1
+          return M.counter
+      }
+  }
+  PrintLine(M.inc())
+  ```
+
+  `-f` 报 `NAME_ERROR: 名称 'counter' 未定义`，`-il` / `-vm` 输出 `1`；
+  改成 `public static` 后三种模式一致。属解释器侧静态成员可见性缺口。
+  见 change（`2026-11-14-IL静态字段初值/test.md` §5.1）。
+
+- [ ] **虚拟机不支持集合字面量作为字段初值**：`class C { public items <- {1, 2, 3} }` 在 `-vm` 下
+  字节码编译期抛 `NotSupportedException: 虚拟机模式不支持非常量默认参数表达式: ListLiteralExpression`
+  （`BytecodeCompiler.EvaluateConstantExpression` 只接受标量；字段初值被当作常量池常量，
+  直接放进常量池又会让所有实例共享同一个集合对象）。`-f` / `-il` 正常。
+  见 change（`2026-11-14-IL静态字段初值/test.md` §5.2）。
+
+- [ ] **`MemberAccessWithComplexTypes_CompilesAndExecutesCorrectly` 的断言与语言语义冲突**：
+  用例先取 `numbers <- collection.getNumbers()`，随后 `collection.addNumber(6)`，再断言
+  `Assert.Equal(5, numbers.Count())`。集合是引用类型，`getNumbers()` 返回的正是字段本身，
+  解释器与 IL 都得到 `6`（已用同一段代码在 `-f` / `-il` 实测）。需要把期望值改为 `6`
+  或改用复制语义的写法，不能按「IL 结果错误」处理。
+
 - [ ] **IL 链式比较 `a < b < c` 结果为 false**：`a <- 5; b <- 10; c <- 15; a < b < c` 期望 `true`，
   IL 模式得到 `false`（`ComparisonTests.ChainedComparisons_CompilesAndExecutesCorrectly`，已在
   `HEAD` 基线上复现，与装箱修复无关）。第二段比较的左侧实际是 `bool`，需要明确链式比较的语义

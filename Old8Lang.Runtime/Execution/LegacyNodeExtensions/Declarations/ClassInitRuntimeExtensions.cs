@@ -151,6 +151,68 @@ public static partial class ClassInitRuntimeExtensions
 
         return fieldBuilders;
     }
+
+    /// <summary>
+    /// 生成静态字段初始化器（<c>.cctor</c>）。
+    /// </summary>
+    /// <remarks>
+    /// 实例字段的初值在构造函数里写入，静态字段此前没有任何写入口，
+    /// 因此 <c>class M { public static PI &lt;- 3.14159 }</c> 在 IL 模式下读到的是
+    /// CLR 默认值（0 / null），与解释器和虚拟机不一致。
+    /// 泛型类的特化路径已有对应的生成逻辑（<c>GenericClassSpecializer</c>），
+    /// 这里给非泛型类补齐同一套处理。
+    /// </remarks>
+    internal static void DefineStaticFieldInitializer(this ClassInit node, TypeBuilder typeBuilder, LocalManager local)
+    {
+        var initializers = node.GetTypeTemplate().StaticVariates
+            .Where(pair => pair.Value is not FuncLangValue
+                           && pair.Value is not MethodOverloadList
+                           && pair.Value is not TypeTemplate
+                           && local.FieldVar.TryGetValue(pair.Key.IdName, out var field)
+                           && field.IsStatic)
+            .ToList();
+        if (initializers.Count == 0)
+        {
+            return;
+        }
+
+        var initializer = typeBuilder.DefineTypeInitializer();
+        var ilGenerator = initializer.GetILGenerator();
+
+        // 静态字段初始化表达式的求值环境不带类实例，但仍需能解析已声明的类与静态成员。
+        var initializerLocal = new LocalManager
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            InClassEnv = typeBuilder,
+            Globals = local.Globals
+        };
+        foreach (var kvp in local.ClassVar)
+            initializerLocal.ClassVar[kvp.Key] = kvp.Value;
+        foreach (var kvp in local.FieldVar)
+            initializerLocal.FieldVar[kvp.Key] = kvp.Value;
+
+        foreach (var (memberId, expression) in initializers)
+        {
+            var field = local.FieldVar[memberId.IdName];
+
+            expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, initializerLocal));
+            var valueType = expression.Accept(new TypeInferenceVisitor(initializerLocal)) ?? typeof(object);
+            if (field.FieldType == typeof(object) && valueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+            else if (field.FieldType.IsValueType && valueType == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, field.FieldType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stsfld, field);
+        }
+
+        ilGenerator.Emit(OpCodes.Ret);
+    }
+
     /// <summary>
     /// 定义类的方法
     /// </summary>

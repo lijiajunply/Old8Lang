@@ -754,6 +754,10 @@ public partial class CompilerVisitor
 
             // 6.3 定义方法
             node.DefineMethods(typeBuilder, classLocal);
+
+            // 6.4 静态字段初值：实例字段的初值由构造函数写入，静态字段必须在
+            // .cctor 里初始化，否则 IL 模式下读到的是 CLR 默认值。
+            node.DefineStaticFieldInitializer(typeBuilder, classLocal);
         }
 
         // 8. 创建类型
