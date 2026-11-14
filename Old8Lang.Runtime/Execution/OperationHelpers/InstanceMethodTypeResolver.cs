@@ -1,0 +1,126 @@
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
+
+namespace Old8Lang.AST.Expression.OperationHelpers;
+
+/// <summary>
+/// 实例方法的共享类型解析：IL 后端发射方法调用与 Runtime 类型推断必须使用同一套规则。
+/// </summary>
+/// <remarks>
+/// 该解析只依赖实例方法注册表与运行时值类型，不发射 IL，因此保留在 Runtime；
+/// 具体 IL 发射位于 <c>Old8Lang.Compiler</c> 的 <c>DotOperatorILHelper</c>。
+/// </remarks>
+internal static class InstanceMethodTypeResolver
+{
+    /// <summary>
+    /// 推断实例方法调用在 IL 模式下的返回类型。
+    /// </summary>
+    internal static Type? InferInstanceMethodReturnType(Type receiverType, Instance instance, LocalManager local)
+    {
+        var method = ResolveInstanceMethod(receiverType, instance, local, out var mappedType);
+        var returnReceiverType = method is ExtensionMethodWrapper ? receiverType : mappedType;
+        return method?.GetReturnType(returnReceiverType, instance.Ids, local);
+    }
+
+    /// <summary>
+    /// 按接收者类型解析实例方法，并给出实际匹配的运行时值类型。
+    /// </summary>
+    internal static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,
+        LocalManager local, out Type mappedType)
+    {
+        InstanceMethodInitializer.EnsureInitialized();
+        var registry = InstanceMethodRegistry.Instance;
+        mappedType = MapToLangValueType(receiverType);
+        var method = registry.ResolveMethod(mappedType, instance.Id.IdName, instance.Ids, local);
+        if (method is null && TryGetEquivalentLangValueType(receiverType, out var equivalentType))
+        {
+            var candidate = registry.ResolveMethod(equivalentType, instance.Id.IdName, instance.Ids, local);
+            if (candidate is IIlNativeValueInstanceMethod)
+            {
+                method = candidate;
+                mappedType = equivalentType;
+            }
+        }
+        return method;
+    }
+
+    /// <summary>
+    /// 将 C# 原生类型映射到对应的 LangValueType，用于在实例方法注册表中查找方法。
+    /// </summary>
+    internal static Type MapToLangValueType(Type nativeType)
+    {
+        if (nativeType == typeof(int) || nativeType == typeof(long))
+        {
+            return typeof(IntLangValue);
+        }
+
+        if (nativeType == typeof(double))
+        {
+            return typeof(DoubleLangValue);
+        }
+
+        if (nativeType == typeof(bool))
+        {
+            return typeof(BoolLangValue);
+        }
+
+        if (nativeType == typeof(char))
+        {
+            return typeof(CharLangValue);
+        }
+
+        if (nativeType == typeof(string))
+        {
+            return typeof(StringLangValue);
+        }
+
+        if (typeof(LangValueType).IsAssignableFrom(nativeType))
+        {
+            return nativeType;
+        }
+
+        return typeof(LangValueType);
+    }
+
+    /// <summary>
+    /// 尝试把 IL 模式下的原生集合类型映射到等价的 LangValueType。
+    /// </summary>
+    /// <remarks>
+    /// 只用于「按等价类型再解析一次实例方法」的回退路径，且调用方只会采纳
+    /// 显式实现 <see cref="IIlNativeValueInstanceMethod"/> 的方法。
+    /// </remarks>
+    internal static bool TryGetEquivalentLangValueType(Type nativeType, out Type equivalentType)
+    {
+        if (nativeType.IsArray)
+        {
+            equivalentType = typeof(ArrayLangValue);
+            return true;
+        }
+
+        if (typeof(Task).IsAssignableFrom(nativeType))
+        {
+            equivalentType = typeof(TaskLangValue);
+            return true;
+        }
+
+        if (nativeType.IsGenericType)
+        {
+            var genericDefinition = nativeType.GetGenericTypeDefinition();
+            if (genericDefinition == typeof(List<>))
+            {
+                equivalentType = typeof(ListLangValue);
+                return true;
+            }
+
+            if (genericDefinition == typeof(Dictionary<,>))
+            {
+                equivalentType = typeof(DictionaryLangValue);
+                return true;
+            }
+        }
+
+        equivalentType = typeof(LangValueType);
+        return false;
+    }
+}

@@ -49,9 +49,10 @@
     `Reports/2026-11-14-16-54-VM后端拆分测试.md`。
   - [ ] 引擎余量：`LangInterpreter`/`VariateManager`、`Compiler/`、`Bytecode/` 仍在 Runtime，
     作为运行时值与三个后端共享的执行状态；完整迁出需先抽象共享契约。
-    2026-11-14：编译器专用的六个 IL 运算辅助与 LINQ IL 生成已迁入 `Old8Lang.Compiler`；
-    `DotOperatorILHelper`、`Compiler.Compile` 引擎与运行时值 partial 仍待处理。见
-    `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`。
+    2026-11-14：编译器专用的六个 IL 运算辅助、LINQ IL 生成与 `DotOperatorILHelper` 已迁入
+    `Old8Lang.Compiler`；共享的 `InstanceMethodTypeResolver` 留在 Runtime。`Compiler.Compile`
+    引擎与运行时值 partial 仍待处理。见 `Reports/2026-11-14-17-01-编译器辅助迁入IL后端.md`、
+    `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`。
 - [x] 验证后端分别构建、独立组合、无循环依赖；更新 CLI、LSP 和基准引用。
   （2026-11-14：三个后端项目分别构建 0 错误；`BackendAssemblyBoundaryTests` 固化程序集边界与
   契约注册；组合根改为显式注册，不再使用模块初始化器。见 `Reports/2026-11-14-16-57-阶段3验收证据.md`。）
@@ -70,6 +71,12 @@
 **完成条件**：逐条满足规格的验收标准；未解决的回归、未验证的字节码兼容或残留后端循环依赖均不能视为完成。
 
 ## 进度记录
+
+- 2026-11-14（阶段 3.6 DotOperator）：`DotOperatorILHelper` 迁入 `Old8Lang.Compiler`；
+  Runtime 新增共享 `InstanceMethodTypeResolver` 供 IL 发射与类型推断共同使用。
+  Architecture 55、VM 1083、Interpreter（排除外部网络用例）1959/1960 通过；
+  Compiler.Expressions 41 项失败与 HEAD 一致。见
+  `Reports/2026-11-14-17-03-DotOperator迁入IL后端.md`。阶段 3 不标记完成。
 
 - 2026-11-14（阶段 3.5 编译器辅助）：六个仅被 IL 后端使用的运算辅助与 LINQ IL 生成代码
   迁入 `Old8Lang.Compiler`；`CanGenerateStreamingQuery` 保留在 Runtime 供类型推断共享。

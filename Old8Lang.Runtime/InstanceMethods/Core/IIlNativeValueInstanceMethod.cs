@@ -6,7 +6,7 @@ namespace Old8Lang.InstanceMethods.Core;
 /// <remarks>
 /// IL 模式下集合字面量（<c>{...}</c>、<c>[...]</c>、字典字面量）在栈上是原生
 /// <c>List&lt;T&gt;</c> / <c>T[]</c> / <c>Dictionary&lt;K,V&gt;</c>，
-/// 而 <see cref="Old8Lang.AST.Expression.OperationHelpers.DotOperatorILHelper"/> 默认按
+/// 而 <see cref="Old8Lang.AST.Expression.OperationHelpers.InstanceMethodTypeResolver"/> 默认按
 /// <see cref="Old8Lang.AST.Expression.Value.LangValueType"/> 家族解析实例方法。
 /// <para>
 /// 实现该接口表示两件事：

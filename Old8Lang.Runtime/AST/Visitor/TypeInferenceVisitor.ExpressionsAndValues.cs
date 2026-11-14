@@ -535,7 +535,7 @@ public partial class TypeInferenceVisitor
 
             if (leftType is not null)
             {
-                var registeredReturnType = DotOperatorILHelper.InferInstanceMethodReturnType(leftType, instance, local);
+                var registeredReturnType = InstanceMethodTypeResolver.InferInstanceMethodReturnType(leftType, instance, local);
                 if (registeredReturnType is not null)
                 {
                     return registeredReturnType;
