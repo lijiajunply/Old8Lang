@@ -11,59 +11,17 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// FuncInit 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// FuncInit 的编译/装饰器辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class FuncInit
+public static partial class FuncInitRuntimeExtensions
 {
-    /// <summary>
-    /// 从语句块中推断返回类型
-    /// </summary>
-    /// <param name="statement">要分析的语句块</param>
-    /// <param name="local">局部变量管理器</param>
-    /// <returns>推断出的返回类型</returns>
-    internal static Type GetItemType(OldStatement statement, LocalManager local)
-    {
-        for (var i = 0; i < statement.Count; i++)
-        {
-            var item = statement[i];
-
-            // 如果是SetStatement，记录局部变量的类型
-            if (item is SetStatement { Id: not null } setStatement)
-            {
-                var varType = setStatement.Value.Accept(new TypeInferenceVisitor(local));
-                if (varType is not null)
-                {
-                    local.LocalVarTypes[setStatement.Id.IdName] = varType;
-                }
-            }
-
-            if (item is ReturnStatement returnStatement)
-            {
-                // 确保返回类型不为null
-                var returnType = returnStatement.Accept(new TypeInferenceVisitor(local));
-                return returnType!;
-            }
-
-            if (item is null || item.Count == 0)
-            {
-                continue;
-            }
-
-            var innerType = GetItemType(item, local);
-            if (innerType != typeof(void))
-            {
-                return innerType;
-            }
-        }
-
-        return typeof(void); // 默认返回void类型
-    }
     /// <summary>
     /// 验证函数的类型注解完整性（IL 模式要求）
     /// </summary>
     /// <param name="local">局部变量管理器，用于报告错误</param>
-    internal void ValidateTypeAnnotations(LocalManager local)
+    internal static void ValidateTypeAnnotations(this FuncInit node, LocalManager local)
     {
+        var FuncValue = node.GetFuncValue();
         var inferenceEnabled = TypeInferenceConfig.Instance.EnableTypeInference;
 
         // 1. 验证所有参数的类型注解
@@ -125,7 +83,7 @@ public partial class FuncInit
         if (FuncValue.Id is not null && string.IsNullOrEmpty(FuncValue.Id.AssumptionType))
         {
             // 对于Lambda表达式，如果没有显式的返回类型注解，尝试从函数体推断
-            if (!IsLambda)
+            if (!node.IsLambda)
             {
                 // 如果启用了类型推断，允许缺少返回类型注解
                 if (inferenceEnabled && TypeInferenceConfig.Instance.InferReturnTypesFromBody)
@@ -167,7 +125,7 @@ public partial class FuncInit
     /// <summary>
     /// 在 IL 模式下应用单个装饰器
     /// </summary>
-    internal FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc,
+    internal static FuncLangValue ApplySingleDecoratorForCompiler(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
     {
         // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
@@ -258,7 +216,7 @@ public partial class FuncInit
     /// 在 IL 模式下应用装饰器到函数
     /// 策略：使用解释器执行装饰器函数，获取包装后的函数
     /// </summary>
-    internal FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
+    internal static FuncLangValue ApplyDecoratorsForCompiler(FuncLangValue originalFunc, LocalManager local)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {
@@ -280,7 +238,7 @@ public partial class FuncInit
     /// <summary>
     /// 应用单个装饰器
     /// </summary>
-    internal FuncLangValue ApplySingleDecorator(FunctionDecorator decorator, FuncLangValue targetFunc,
+    internal static FuncLangValue ApplySingleDecorator(FunctionDecorator decorator, FuncLangValue targetFunc,
         VariateManager manager)
     {
         // 将目标函数临时注册到全局作用域，以便装饰器可以引用它
@@ -379,7 +337,7 @@ public partial class FuncInit
     /// <summary>
     /// 应用装饰器到函数
     /// </summary>
-    internal FuncLangValue ApplyDecorators(FuncLangValue originalFunc, VariateManager manager)
+    internal static FuncLangValue ApplyDecorators(FuncLangValue originalFunc, VariateManager manager)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {

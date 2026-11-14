@@ -36,7 +36,7 @@ public partial class BytecodeVisitor
     {
         MarkPosition(node);
         // 编译异步函数定义
-        var funcValue = node.AsyncFuncValue;
+        var funcValue = node.GetAsyncFuncValue();
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
 
         // 异步函数的装饰器尚未实现。这里必须显式报错：异步函数不走

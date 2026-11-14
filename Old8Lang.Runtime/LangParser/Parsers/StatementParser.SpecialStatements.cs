@@ -374,8 +374,9 @@ public partial class StatementParser
 
         // 创建函数签名（使用 FuncInit 来存储签名信息）
         var funcName = new LangId(functionName, returnType);
-        var funcValue = new FuncLangValue(funcName, parameters, new BlockStatement(new List<IOldLangTree>()), null, default, false);
-        var funcSignature = new FuncInit(funcValue);
+        var funcSyntax = new FunctionSyntax(funcName, parameters, new BlockStatement(new List<IOldLangTree>()),
+            null, null, null, isAsync: false);
+        var funcSignature = new FuncInit(funcSyntax);
 
         // 解析可选的别名
         string? alias = null;

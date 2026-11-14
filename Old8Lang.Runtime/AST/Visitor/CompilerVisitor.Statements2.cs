@@ -166,10 +166,10 @@ public partial class CompilerVisitor
     {
 
         // 获取方法的名称
-        var methodName = node.AsyncFuncValue.Id!.IdName;
+        var methodName = node.GetAsyncFuncValue().Id!.IdName;
 
         // 使用参数的类型注解来确定参数类型
-        var parameterTypes = node.AsyncFuncValue.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
+        var parameterTypes = node.GetAsyncFuncValue().Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
@@ -197,9 +197,9 @@ public partial class CompilerVisitor
         }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
-        for (var i = 0; i < node.AsyncFuncValue.Ids!.Count; i++)
+        for (var i = 0; i < node.GetAsyncFuncValue().Ids!.Count; i++)
         {
-            var id = node.AsyncFuncValue.Ids[i];
+            var id = node.GetAsyncFuncValue().Ids[i];
             var paramType = parameterTypes[i];
             // 存储参数类型，用于后续推断返回类型
             funcLocal.LocalVarTypes[id.IdName] = paramType!;
@@ -223,9 +223,9 @@ public partial class CompilerVisitor
         funcLocal.LocalVar.Clear();
 
         // 处理参数
-        for (var i = 0; i < node.AsyncFuncValue.Ids!.Count; i++)
+        for (var i = 0; i < node.GetAsyncFuncValue().Ids!.Count; i++)
         {
-            var id = node.AsyncFuncValue.Ids[i];
+            var id = node.GetAsyncFuncValue().Ids[i];
             // 使用实际的参数类型声明局部变量
             var paramType = parameterTypes[i];
             var localVar = methodIl.DeclareLocal(paramType!);
@@ -251,10 +251,10 @@ public partial class CompilerVisitor
         }
 
         // 同时存储函数的参数列表信息
-        if (node.AsyncFuncValue.Ids is not null)
+        if (node.GetAsyncFuncValue().Ids is not null)
         {
-            local.FuncParameters.TryAdd(delegateKey, node.AsyncFuncValue.Ids);
-            funcLocal.FuncParameters.TryAdd(delegateKey, node.AsyncFuncValue.Ids);
+            local.FuncParameters.TryAdd(delegateKey, node.GetAsyncFuncValue().Ids);
+            funcLocal.FuncParameters.TryAdd(delegateKey, node.GetAsyncFuncValue().Ids);
         }
 
         return null;
@@ -778,14 +778,14 @@ public partial class CompilerVisitor
         // 应用装饰器（如果有）
         // 在 IL 模式下，我们需要在编译时应用装饰器
         // 策略：使用解释器执行装饰器函数，获取包装后的函数，然后编译包装后的函数
-        var funcToCompile = node.FuncValue;
-        if (node.FuncValue.Decorators is not null && node.FuncValue.Decorators.Count > 0)
+        var funcToCompile = node.GetFuncValue();
+        if (node.GetFuncValue().Decorators is not null && node.GetFuncValue().Decorators.Count > 0)
         {
             // 需要一个 VariateManager 来执行装饰器
             // 从 LocalManager 的 Interpreter 获取 VariateManager
             if (local.Interpreter?.Manager is not null)
             {
-                funcToCompile = node.ApplyDecoratorsForCompiler(node.FuncValue, local);
+                funcToCompile = FuncInitRuntimeExtensions.ApplyDecoratorsForCompiler(node.GetFuncValue(), local);
             }
             else
             {
@@ -895,7 +895,7 @@ public partial class CompilerVisitor
         if (returnType is null || returnType == typeof(object))
         {
             // 如果OutputType无法解析，尝试从函数体推断
-            returnType = FuncInit.GetItemType(funcToCompile.BlockStatement, funcLocal);
+            returnType = FuncLangValue.GetItemType(funcToCompile.BlockStatement, funcLocal);
         }
 
         // 定义新的方法

@@ -10,21 +10,21 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// AsyncFuncInit 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
+/// AsyncFuncInit 的编译/装饰器辅助实现（阶段 2 从语法节点迁出）。
 /// </summary>
-public partial class AsyncFuncInit
+public static partial class AsyncFuncInitRuntimeExtensions
 {
     /// <summary>
     /// 生成异步方法体的IL代码
     /// </summary>
-    internal void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
+    internal static void GenerateAsyncMethodBody(this AsyncFuncInit node, ILGenerator ilGenerator, LocalManager local)
     {
-        AsyncFuncValue.GenerateMethodBody(ilGenerator, local);
+        node.GetAsyncFuncValue().GenerateMethodBody(ilGenerator, local);
     }
     /// <summary>
     /// 应用单个装饰器
     /// </summary>
-    internal LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)
+    internal static LangValueType ApplySingleDecorator(FunctionDecorator decorator, LangValueType targetFunc, VariateManager manager)
     {
         // 将目标函数临时注册
         var tempVarName = $"__decorator_target_{Guid.NewGuid():N}";
@@ -106,7 +106,7 @@ public partial class AsyncFuncInit
     /// <summary>
     /// 应用装饰器到异步函数
     /// </summary>
-    internal AsyncFuncLangValue ApplyDecorators(AsyncFuncLangValue originalFunc, VariateManager manager)
+    internal static AsyncFuncLangValue ApplyDecorators(AsyncFuncLangValue originalFunc, VariateManager manager)
     {
         if (originalFunc.Decorators is null || originalFunc.Decorators.Count == 0)
         {

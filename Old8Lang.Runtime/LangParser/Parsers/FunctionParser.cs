@@ -114,22 +114,18 @@ public class FunctionParser(
             block = stmtParser.ParseBlock();
         }
 
-        // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
-        var funcLangValue = new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false);
+        // 普通函数声明：只产出语法模型，运行时函数值由 Runtime 工厂按需创建
+        var syntax = new FunctionSyntax(
+            updatedFuncName,
+            parameters,
+            block,
+            genericParameters,
+            decorators,
+            docComment,
+            isAsync: false,
+            startPosition);
 
-        // 设置装饰器
-        if (decorators is not null)
-        {
-            funcLangValue.Decorators = decorators;
-        }
-
-        // 设置文档注释
-        if (docComment is not null)
-        {
-            funcLangValue.DocComment = docComment;
-        }
-
-        return new FuncInit(funcLangValue, startPosition);
+        return new FuncInit(syntax, startPosition);
     }
 
     /// <summary>
@@ -213,22 +209,18 @@ public class FunctionParser(
         var stmtParser = statementParserFactory();
         var block = stmtParser.ParseBlock();
 
-        // 异步函数声明，生成 AsyncFuncInit
-        var asyncFuncLangValue = new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position);
+        // 异步函数声明：只产出语法模型，运行时函数值由 Runtime 工厂按需创建
+        var syntax = new FunctionSyntax(
+            updatedFuncName,
+            parameters,
+            block,
+            genericParameters,
+            decorators,
+            docComment,
+            isAsync: true,
+            startPosition);
 
-        // 设置装饰器
-        if (decorators is not null)
-        {
-            asyncFuncLangValue.Decorators = decorators;
-        }
-
-        // 设置文档注释
-        if (docComment is not null)
-        {
-            asyncFuncLangValue.DocComment = docComment;
-        }
-
-        return new AsyncFuncInit(asyncFuncLangValue, startPosition);
+        return new AsyncFuncInit(syntax, startPosition);
     }
 
     /// <summary>

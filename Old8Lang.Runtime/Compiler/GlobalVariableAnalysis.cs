@@ -121,9 +121,9 @@ public static class GlobalVariableAnalysis
                 return;
 
             case FuncInit funcInit:
-                if (funcInit.FuncValue.Id is not null && funcInit.FuncValue.Method is null)
+                if (funcInit.GetFuncValue().Id is not null && funcInit.GetFuncValue().Method is null)
                 {
-                    functions.Add(funcInit.FuncValue);
+                    functions.Add(funcInit.GetFuncValue());
                 }
 
                 return;
@@ -163,6 +163,14 @@ public static class GlobalVariableAnalysis
                 case LambdaExpression lambda:
                     // lambda 语法节点在求值时同样是独立 DynamicMethod，其中的顶层变量必须提升。
                     CollectIdentifiers(lambda, names);
+                    return true;
+
+                case FuncInit funcInit:
+                    CollectIdentifiers(funcInit.Syntax, names);
+                    return true;
+
+                case AsyncFuncInit asyncFuncInit:
+                    CollectIdentifiers(asyncFuncInit.Syntax, names);
                     return true;
 
                 case ClassInit classInit:

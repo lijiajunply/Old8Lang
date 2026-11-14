@@ -209,7 +209,7 @@ public class PythonProvider : IExternProvider
     private PythonFunctionLangValue CreatePythonFunctionWrapper(dynamic pyFunc, ExternFunctionDeclaration funcDecl, string targetName)
     {
         // 创建一个 Old8Lang 函数，该函数内部调用 Python 函数
-        var signature = funcDecl.FunctionSignature?.FuncValue;
+        var signature = funcDecl.FunctionSignature?.GetFuncValue();
         var parameters = signature?.Ids ?? [];
 
         // 创建包装函数

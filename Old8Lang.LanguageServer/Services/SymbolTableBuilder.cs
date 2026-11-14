@@ -85,7 +85,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// </summary>
     private void VisitFunction(FuncInit funcInit)
     {
-        var funcValue = funcInit.FuncValue;
+        var funcValue = funcInit.GetFuncValue();
         if (funcValue.Id == null) return; // 跳过Lambda
 
         var funcName = funcValue.Id.IdName;
@@ -168,7 +168,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// </summary>
     private void VisitAsyncFunction(AsyncFuncInit asyncFuncInit)
     {
-        var funcValue = asyncFuncInit.AsyncFuncValue;
+        var funcValue = asyncFuncInit.GetAsyncFuncValue();
         if (funcValue.Id == null) return;
 
         var funcName = funcValue.Id.IdName;
@@ -1124,7 +1124,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 string funcSignature;
                 if (func.FunctionSignature != null)
                 {
-                    var funcValue = func.FunctionSignature.FuncValue;
+                    var funcValue = func.FunctionSignature.GetFuncValue();
                     var paramList = funcValue.Ids != null
                         ? string.Join(", ",
                             funcValue.Ids.Select(p =>

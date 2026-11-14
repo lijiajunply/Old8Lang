@@ -16,7 +16,7 @@ public partial class BytecodeVisitor
     {
         MarkPosition(node);
         // 编译函数定义
-        var funcValue = node.FuncValue;
+        var funcValue = node.GetFuncValue();
         var funcName = funcValue.Id?.IdName ?? "<lambda>";
 
         // 检查是否是泛型函数

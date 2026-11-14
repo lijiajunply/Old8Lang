@@ -122,7 +122,7 @@ public class CSharpDllProvider : IExternProvider
                 }
 
                 // 构建参数类型签名
-                var signature = funcDecl.FunctionSignature?.FuncValue;
+                var signature = funcDecl.FunctionSignature?.GetFuncValue();
                 var paramTypes = signature?.Ids?
                     .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
                     .ToArray() ?? [];
@@ -226,7 +226,7 @@ public class CSharpDllProvider : IExternProvider
         var methodName = funcDecl.FunctionName;
 
         // 获取参数类型
-        var signature = funcDecl.FunctionSignature?.FuncValue;
+        var signature = funcDecl.FunctionSignature?.GetFuncValue();
         var paramTypes = signature?.Ids?
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray();

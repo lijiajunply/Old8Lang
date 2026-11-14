@@ -247,7 +247,7 @@ public partial class ExternStatement : OldStatement, IBlockDeclaration
         if (func.FunctionSignature is null)
             return "()";
 
-        var funcValue = func.FunctionSignature.FuncValue;
+        var funcValue = func.FunctionSignature.GetFuncValue();
         var parameters = funcValue.Ids is not null
             ? string.Join(", ", funcValue.Ids.Select(p =>
             {

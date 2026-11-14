@@ -1,3 +1,4 @@
+using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Classes;
@@ -63,7 +64,7 @@ public class FuncLessMethodReturnTypeTests
 
         var func = FindFunction(program, "add");
 
-        Assert.Equal("int", func.FuncValue.Id.AssumptionType);
+        Assert.Equal("int", func.GetFuncValue().Id.AssumptionType);
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public class FuncLessMethodReturnTypeTests
 
         var func = FindFunction(program, "add");
 
-        Assert.Equal("int", func.FuncValue.Id.AssumptionType);
+        Assert.Equal("int", func.GetFuncValue().Id.AssumptionType);
     }
 
     private static Old8Lang.AST.Statement.FuncInit FindFunction(
@@ -86,6 +87,6 @@ public class FuncLessMethodReturnTypeTests
         return program.ImportStatements
             .Concat(program.OtherStatements)
             .OfType<Old8Lang.AST.Statement.FuncInit>()
-            .Single(func => func.FuncValue.Id.IdName == name);
+            .Single(func => func.GetFuncValue().Id.IdName == name);
     }
 }

@@ -104,6 +104,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问 lambda 表达式。</summary>
     TResult VisitLambdaExpression(LambdaExpression node);
 
+    /// <summary>访问函数声明。</summary>
+    TResult VisitFuncInit(FuncInit node);
+
+    /// <summary>访问异步函数声明。</summary>
+    TResult VisitAsyncFuncInit(AsyncFuncInit node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

@@ -83,7 +83,7 @@ public class NativeDllProvider : IExternProvider
             var pinvokeMethod = CreatePInvokeMethod(source, funcDecl, callingConv);
 
             // 构建参数类型签名（与 FunctionCallExpression 中的格式一致）
-            var signature = funcDecl.FunctionSignature?.FuncValue;
+            var signature = funcDecl.FunctionSignature?.GetFuncValue();
             var paramTypes = signature?.Ids?
                 .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
                 .ToArray() ?? [];
@@ -108,7 +108,7 @@ public class NativeDllProvider : IExternProvider
             throw new TypeError(default(SourcePosition), $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
-        var signature = funcDecl.FunctionSignature.FuncValue;
+        var signature = funcDecl.FunctionSignature.GetFuncValue();
         var paramTypes = signature.Ids?
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray() ?? [];
@@ -160,7 +160,7 @@ public class NativeDllProvider : IExternProvider
             throw new TypeError(default(SourcePosition), $"extern 函数 {funcDecl.FunctionName} 必须指定函数签名（参数类型和返回类型）");
         }
 
-        var signature = funcDecl.FunctionSignature.FuncValue;
+        var signature = funcDecl.FunctionSignature.GetFuncValue();
         var paramTypes = signature.Ids?
             .Select(p => ConvertOld8TypeToCSharpType(p.AssumptionType))
             .ToArray() ?? [];

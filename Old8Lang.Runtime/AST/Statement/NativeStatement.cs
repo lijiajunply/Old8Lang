@@ -90,7 +90,7 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
         ClassName = className;
         MethodName = methodName;
         NativeName = nativeName;
-        FuncValue = a.FuncValue;
+        FuncValue = a.GetFuncValue();
         ImportAll = false;
         MethodList = null;
     }

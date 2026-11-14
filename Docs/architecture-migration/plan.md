@@ -48,6 +48,14 @@
 
 ## 进度记录
 
+- 2026-11-14：`FunctionSyntax` 引入并迁移 `FuncInit`/`AsyncFuncInit` 到 Syntax；解析器只产出函数语法，
+  运行时函数值经 `FunctionSyntaxRuntimeFactory`/`GetFuncValue()` 按语法节点缓存创建。同步更新
+  IL 顶层变量分析、VM 闭包分析、LSP、类型推断/约束收集与测试调用点。Runtime 生成节点 57 → 55，
+  遗留 partial 基线 11 → 9。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476
+  （2 跳过）、Architecture 43 通过；Compiler.Basic 16 / Collections+Exceptions 27 / Functions 57 /
+  Statements 4 / Expressions 41 / Async 65 / Types 51 项失败与基线逐项一致。见
+  `Reports/2026-11-14-15-02-函数声明语法迁移测试.md`。
+
 - 2026-11-14：9 个 LINQ 子句类型（`LinqClause` 及 From/Where/Select/OrderBy/Let/Join/GroupBy/
   QueryContinuation）迁入 Syntax；`LinqExpression` 及其 IL 编译器 partial 暂留 Runtime。
   Parser 889、Compiler.Linq 45、Interpreter 1967/1968（1 跳过）、VM 1082、Architecture 43 通过。

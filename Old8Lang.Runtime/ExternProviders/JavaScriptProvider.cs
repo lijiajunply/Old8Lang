@@ -125,7 +125,7 @@ public class JavaScriptProvider : IExternProvider
         ExternFunctionDeclaration funcDecl,
         string targetName)
     {
-        var signature = funcDecl.FunctionSignature?.FuncValue;
+        var signature = funcDecl.FunctionSignature?.GetFuncValue();
         var parameters = signature?.Ids ?? [];
         var returnType = signature?.Id?.AssumptionType;
 

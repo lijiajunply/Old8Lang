@@ -41,7 +41,7 @@ public static class GeneratorStateMachineBuilder
     {
         // 1. 扫描 AST
         var scanner = new GeneratorAstScanner();
-        var scanResult = scanner.Scan(function.FuncValue.BlockStatement);
+        var scanResult = scanner.Scan(function.GetFuncValue().BlockStatement);
 
         if (!scanResult.IsGenerator)
         {
@@ -49,7 +49,7 @@ public static class GeneratorStateMachineBuilder
         }
 
         // 2. 创建执行器
-        var executor = new FlatGeneratorExecutor(function.FuncValue, scanResult);
+        var executor = new FlatGeneratorExecutor(function.GetFuncValue(), scanResult);
 
         // 3. 创建并返回状态机
         return new GeneratorStateMachine(function, manager, executor);

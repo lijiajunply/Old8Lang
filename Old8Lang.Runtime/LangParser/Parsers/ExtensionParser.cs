@@ -69,7 +69,7 @@ public class ExtensionParser(
                 var funcInit = funcParser.ParseFuncDeclaration();
 
                 // 提取 FuncLangValue
-                extensionMethods.Add(funcInit.FuncValue);
+                extensionMethods.Add(funcInit.GetFuncValue());
             }
             else if (CurrentToken.Type == LangTokenType.Async)
             {

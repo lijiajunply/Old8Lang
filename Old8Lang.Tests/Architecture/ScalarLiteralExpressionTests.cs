@@ -231,6 +231,9 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.FunctionDecorator).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.LinqClause).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.FromClause).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FunctionSyntax).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FuncInit).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.AsyncFuncInit).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -289,6 +292,13 @@ public class ScalarLiteralExpressionTests
             .Accept(visitor));
         Assert.Equal("lambda", new Old8Lang.AST.Expression.LambdaExpression(
             null, [], new Old8Lang.AST.Statement.BlockStatement([]), false).Accept(visitor));
+        var functionSyntax = new Old8Lang.AST.Statement.FunctionSyntax(
+            new LangId("f"), [], new Old8Lang.AST.Statement.BlockStatement([]), null, null, null, false);
+        Assert.Equal("func", new Old8Lang.AST.Statement.FuncInit(functionSyntax).Accept(visitor));
+        Assert.Equal("asyncfunc", new Old8Lang.AST.Statement.AsyncFuncInit(
+            new Old8Lang.AST.Statement.FunctionSyntax(
+                new LangId("g"), [], new Old8Lang.AST.Statement.BlockStatement([]), null, null, null, true))
+            .Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -332,6 +342,8 @@ public class ScalarLiteralExpressionTests
         public string VisitGenericInstanceExpression(Old8Lang.AST.Expression.GenericInstanceExpression node) => "generic";
         public string VisitStringTemplateValue(Old8Lang.AST.Expression.Intermediates.StringTemplateValue node) => "template";
         public string VisitLambdaExpression(Old8Lang.AST.Expression.LambdaExpression node) => "lambda";
+        public string VisitFuncInit(Old8Lang.AST.Statement.FuncInit node) => "func";
+        public string VisitAsyncFuncInit(Old8Lang.AST.Statement.AsyncFuncInit node) => "asyncfunc";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;

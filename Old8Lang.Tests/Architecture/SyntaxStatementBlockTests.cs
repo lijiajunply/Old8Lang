@@ -55,8 +55,8 @@ public class SyntaxStatementBlockTests
     [Fact]
     public void BlockStatement_ClassifiesEveryDeclarationKind()
     {
-        var func = new FuncInit(new FuncLangValue(new LangId("f"), [], new BlockStatement([])));
-        var asyncFunc = new AsyncFuncInit(new AsyncFuncLangValue(new LangId("g"), [], new BlockStatement([])));
+        var func = new FuncInit(new FunctionSyntax(new LangId("f"), [], new BlockStatement([]), null, null, null, isAsync: false));
+        var asyncFunc = new AsyncFuncInit(new FunctionSyntax(new LangId("g"), [], new BlockStatement([]), null, null, null, isAsync: true));
         var classInit = new ClassInit(new TypeTemplate("C",
             new Dictionary<ClassMemberId, LangExpression>(), new Dictionary<ClassMemberId, LangExpression>()));
         var native = new NativeStatement("native.dll", "NativeClass", "Method", "method");

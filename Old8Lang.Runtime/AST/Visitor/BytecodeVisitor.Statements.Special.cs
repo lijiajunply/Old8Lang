@@ -354,7 +354,7 @@ public partial class BytecodeVisitor
             string? signatureStr = null;
             if (funcDecl.FunctionSignature != null)
             {
-                var sig = funcDecl.FunctionSignature.FuncValue;
+                var sig = funcDecl.FunctionSignature.GetFuncValue();
                 var paramTypes = sig.Ids?.Select(p => p.AssumptionType).ToList() ?? [];
                 var returnType = sig.Id?.AssumptionType ?? "void";
                 signatureStr = $"{string.Join(",", paramTypes)}:{returnType}";

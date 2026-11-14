@@ -235,13 +235,13 @@ public class ClosureCaptureAnalyzer
                 {
                     case FuncInit nestedInit:
                         RecordNestedClosureNeeds(
-                            nestedInit.FuncValue.BlockStatement,
-                            nestedInit.FuncValue.Ids?.Select(id => id.IdName).ToList() ?? []);
+                            nestedInit.GetFuncValue().BlockStatement,
+                            nestedInit.GetFuncValue().Ids?.Select(id => id.IdName).ToList() ?? []);
                         break;
                     case AsyncFuncInit asyncInit:
                         RecordNestedClosureNeeds(
-                            asyncInit.AsyncFuncValue.BlockStatement,
-                            asyncInit.AsyncFuncValue.Ids?.Select(id => id.IdName).ToList() ?? []);
+                            asyncInit.GetAsyncFuncValue().BlockStatement,
+                            asyncInit.GetAsyncFuncValue().Ids?.Select(id => id.IdName).ToList() ?? []);
                         break;
                 }
             }
@@ -261,7 +261,7 @@ public class ClosureCaptureAnalyzer
         // 提前分配槽位，闭包才能按引用捕获（嵌套函数声明在字节码里被提升到兄弟语句之前）。
         if (node is FuncInit funcInit)
         {
-            var initValue = funcInit.FuncValue;
+            var initValue = funcInit.GetFuncValue();
             var initParameters = initValue.Ids?.Select(id => id.IdName).ToList() ?? [];
             RecordNestedClosureNeeds(initValue.BlockStatement, initParameters);
             return;

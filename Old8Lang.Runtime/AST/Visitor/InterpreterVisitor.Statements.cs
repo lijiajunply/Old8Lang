@@ -942,27 +942,27 @@ public partial class InterpreterVisitor
         // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
         // 但对于来自不同模块的函数，允许重复（它们可能通过别名导入）
         // 在函数内部定义的函数（嵌套函数）不检查重复，因为每次调用外层函数都会重新定义
-        if (node.FuncValue.Id is not null && !manager.IsFunc)
+        if (node.GetFuncValue().Id is not null && !manager.IsFunc)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is FuncLangValue func &&
-                func.Id?.IdName == node.FuncValue.Id.IdName &&
-                func.Ids?.Count == node.FuncValue.Ids?.Count &&
-                func.Ids?.Zip(node.FuncValue.Ids!, (a, b) => a.AssumptionType == b.AssumptionType).All(x => x) == true &&
-                func.Id?.AssumptionType == node.FuncValue.Id?.AssumptionType);
+                func.Id?.IdName == node.GetFuncValue().Id.IdName &&
+                func.Ids?.Count == node.GetFuncValue().Ids?.Count &&
+                func.Ids?.Zip(node.GetFuncValue().Ids!, (a, b) => a.AssumptionType == b.AssumptionType).All(x => x) == true &&
+                func.Id?.AssumptionType == node.GetFuncValue().Id?.AssumptionType);
 
             // 只有当存在完全相同的函数，并且正在导入栈为空时（即在主文件中重复定义），才报错
             // 如果导入栈不为空，说明是在导入的模块中定义函数，允许不同模块的同名函数共存
             if (existingFunc is not null && manager.ImportStack.Count == 0)
             {
-                throw new DuplicateNameError(node, node.FuncValue.Id.IdName, "函数");
+                throw new DuplicateNameError(node, node.GetFuncValue().Id.IdName, "函数");
             }
         }
 
         // 不立即应用装饰器，而是保留装饰器信息
         // 装饰器将在函数第一次被调用时应用（延迟应用）
         // 这样可以确保装饰器可以访问全局变量
-        var finalFunc = node.FuncValue;
+        var finalFunc = node.GetFuncValue();
 
         // 如果函数还没有捕获作用域，并且当前在模块导入上下文中（ImportStack不为空），
         // 则捕获当前作用域，以便函数能访问模块中导入的符号
@@ -987,9 +987,9 @@ public partial class InterpreterVisitor
         // 注册函数
         // 在函数内部定义的嵌套函数：添加到当前作用域（函数返回时自动清理）
         // 在顶层定义的函数：添加到 ImportInfosList（全局可见）
-        if (manager.IsFunc && node.FuncValue.Id is not null)
+        if (manager.IsFunc && node.GetFuncValue().Id is not null)
         {
-            manager.SetLocal(node.FuncValue.Id, finalFunc);
+            manager.SetLocal(node.GetFuncValue().Id, finalFunc);
         }
         else
         {
@@ -1007,25 +1007,25 @@ public partial class InterpreterVisitor
     {
 
         // 检查函数重复声明
-        if (node.AsyncFuncValue.Id is not null)
+        if (node.GetAsyncFuncValue().Id is not null)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is AsyncFuncLangValue func &&
-                func.Id?.IdName == node.AsyncFuncValue.Id.IdName &&
-                func.Ids?.Count == node.AsyncFuncValue.Ids?.Count);
+                func.Id?.IdName == node.GetAsyncFuncValue().Id.IdName &&
+                func.Ids?.Count == node.GetAsyncFuncValue().Ids?.Count);
 
             if (existingFunc is not null)
             {
                 throw new DuplicateNameError(
                     node,
-                    node.AsyncFuncValue.Id.IdName,
+                    node.GetAsyncFuncValue().Id.IdName,
                     "异步函数"
                 );
             }
         }
 
         // 应用装饰器（如果有）
-        var finalFunc = node.ApplyDecorators(node.AsyncFuncValue, manager);
+        var finalFunc = AsyncFuncInitRuntimeExtensions.ApplyDecorators(node.GetAsyncFuncValue(), manager);
 
         // 添加到导入信息列表
         manager.AddClassAndFunc(finalFunc);

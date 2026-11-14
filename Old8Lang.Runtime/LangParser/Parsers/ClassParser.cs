@@ -418,12 +418,12 @@ public class ClassParser(
                             classMemberStatement =
                                 new ClassFieldSetStatement(memberId, setStmt.Value, setStmt.Position);
                             break;
-                        case FuncInit { FuncValue.Id: not null } funcInit:
+                        case FuncInit funcInit when funcInit.Syntax.Id is not null:
                             // 带有修饰符的类函数声明
-                            var memberId2 = new ClassMemberId(funcInit.FuncValue.Id.IdName,
-                                funcInit.FuncValue.Id.AssumptionType, modifiers, funcInit.Position);
+                            var memberId2 = new ClassMemberId(funcInit.GetFuncValue().Id.IdName,
+                                funcInit.GetFuncValue().Id.AssumptionType, modifiers, funcInit.Position);
                             classMemberStatement =
-                                new ClassFuncInitStatement(memberId2, funcInit.FuncValue, funcInit.Position);
+                                new ClassFuncInitStatement(memberId2, funcInit.GetFuncValue(), funcInit.Position);
                             break;
                         default:
                             classMemberStatement = statement;
