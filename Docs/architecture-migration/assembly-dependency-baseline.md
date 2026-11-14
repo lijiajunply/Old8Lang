@@ -141,3 +141,10 @@ Runtime 只保留同时被类型推断使用的 `CanGenerateStreamingQuery` 判�
 `DotOperatorILHelper` 已从 Runtime 迁入 `Old8Lang.Compiler/OperationHelpers/`，Runtime 只保留
 `InstanceMethodTypeResolver`（实例方法返回类型推断、注册表解析与原生类型映射）。
 ILD 发射与 Runtime 类型推断共享同一套解析规则，避免两条路径分叉。
+
+## 阶段 3.7：FuncLangValue lambda IL 辅助迁入 IL 后端（2026-11-14）
+
+`FuncLangValue.Compiler` partial 中的 IL 代码已改为 `Old8Lang.Compiler` 的扩展方法
+（`FuncLangValueIlCompilerExtensions`）；Runtime 的 `FuncLangValue.Shared.cs` 只保留
+`GetItemType` 与 `ToString`。其余运行时代码 partial（`FuncLangValue.Execution`、
+`Instance.InstanceMethods`、`AnyLangValue.Reflection`、`SuperProxy`）仍待按后端拆分。

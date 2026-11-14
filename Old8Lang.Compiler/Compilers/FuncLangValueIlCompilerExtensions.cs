@@ -1,79 +1,33 @@
+using System.Reflection;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-
-// ReSharper disable CheckNamespace
-
-using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
-/// FuncLangValue - 编译器支持
+/// <see cref="FuncLangValue"/> 的 IL 后端辅助：lambda 方法体生成与闭包捕获槽位发射。
 /// </summary>
-public partial class FuncLangValue
+/// <remarks>
+/// 这些成员原先是 Runtime 中的 <c>FuncLangValue</c> partial；它们只被 IL 后端使用，
+/// 因此改为 <c>Old8Lang.Compiler</c> 中的扩展方法，Runtime 不再包含 IL 发射代码。
+/// </remarks>
+internal static class FuncLangValueIlCompilerExtensions
 {
-
-    internal static Type GetItemType(OldStatement statement, LocalManager local)
-    {
-        for (var i = 0; i < statement.Count; i++)
-        {
-            var item = statement[i];
-
-            // 如果是SetStatement，记录局部变量的类型
-            if (item is SetStatement { Id: not null } setStatement)
-            {
-                var varType = setStatement.Value.Accept(new TypeInferenceVisitor(local));
-                if (varType is not null)
-                {
-                    local.LocalVarTypes[setStatement.Id.IdName] = varType;
-                }
-            }
-
-            if (item is ReturnStatement returnStatement)
-            {
-                return returnStatement.Accept(new TypeInferenceVisitor(local))!;
-            }
-
-            if (item is null || item.Count == 0)
-            {
-                continue;
-            }
-
-            var innerType = GetItemType(item, local);
-            if (innerType != typeof(void))
-            {
-                return innerType;
-            }
-        }
-
-        return typeof(void);
-    }
-
-
-    public override string ToString()
-    {
-        if (Method is not null)
-        {
-            return $"{Method}";
-        }
-
-        var paramList = Ids is not null ? string.Join(", ", Ids) : string.Empty;
-        return $"func {Id}({paramList}) \n {{ {BlockStatement} }}";
-    }
-
     /// <summary>
     /// 把匿名函数 / lambda 编译成 <see cref="DynamicMethod"/>（不注册到 DelegateVar）。
     /// </summary>
-    internal DynamicMethod BuildLambdaDynamicMethod(
+    internal static DynamicMethod BuildLambdaDynamicMethod(
+        this FuncLangValue func,
         LocalManager local,
         string methodName,
         IReadOnlyList<CapturedLocalValue> capturedValues)
     {
         // 创建一个新的 LocalManager 实例，专门用于函数体的 IL 生成
-        var funcLocal = new LocalManager()
+        var funcLocal = new LocalManager
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
@@ -109,16 +63,16 @@ public partial class FuncLangValue
         }
 
         // 使用参数的类型注解来确定参数类型
-        var parameterTypes = Ids!.Select(item => item.Accept(new TypeInferenceVisitor(funcLocal))).ToArray();
+        var parameterTypes = func.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(funcLocal))).ToArray();
 
         // 先处理参数，将它们添加到 funcLocal 中，这样 GetItemType 才能正确推断返回类型
-        for (var i = 0; i < Ids!.Count; i++)
+        for (var i = 0; i < func.Ids!.Count; i++)
         {
-            funcLocal.LocalVarTypes[Ids[i].IdName] = parameterTypes[i]!;
+            funcLocal.LocalVarTypes[func.Ids[i].IdName] = parameterTypes[i]!;
         }
 
         // 获取返回类型
-        var returnType = GetItemType(BlockStatement, funcLocal);
+        var returnType = FuncLangValue.GetItemType(func.BlockStatement, funcLocal);
 
         // 定义新的方法
         var dynamicMethod = new DynamicMethod(
@@ -129,20 +83,20 @@ public partial class FuncLangValue
         var methodIl = dynamicMethod.GetILGenerator();
 
         // 处理参数
-        for (var i = 0; i < Ids!.Count; i++)
+        for (var i = 0; i < func.Ids!.Count; i++)
         {
             var paramType = parameterTypes[i];
             var localVar = methodIl.DeclareLocal(paramType!);
-            funcLocal.AddLocalVar(Ids[i].IdName, localVar);
+            funcLocal.AddLocalVar(func.Ids[i].IdName, localVar);
             methodIl.Emit(OpCodes.Ldarg, i + 1);
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         // 生成方法体的 IL 代码
-        BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, funcLocal));
+        func.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, funcLocal));
 
         // 检查函数体的最后一个语句是否是 ReturnStatement
-        var lastStatement = BlockStatement.Count > 0 ? BlockStatement[^1] : null;
+        var lastStatement = func.BlockStatement.Count > 0 ? func.BlockStatement[^1] : null;
         if (lastStatement is not ReturnStatement)
         {
             EmitDefaultReturn(methodIl, returnType);
@@ -151,10 +105,17 @@ public partial class FuncLangValue
         return dynamicMethod;
     }
 
-    internal DynamicMethod EmitLambdaClosure(ILGenerator ilGenerator, LocalManager local, string methodName)
+    /// <summary>
+    /// 发射创建 lambda 闭包的 IL，并把捕获槽位打包成 object[]。
+    /// </summary>
+    internal static DynamicMethod EmitLambdaClosure(
+        this FuncLangValue func,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        string methodName)
     {
         var capturedValues = GetCapturedLocalValues(local);
-        var dynamicMethod = BuildLambdaDynamicMethod(local, methodName, capturedValues);
+        var dynamicMethod = func.BuildLambdaDynamicMethod(local, methodName, capturedValues);
         var templateId = CompiledDelegateRegistry.RegisterClosureTemplate(dynamicMethod);
 
         ilGenerator.Emit(OpCodes.Ldc_I4, templateId);
@@ -202,6 +163,9 @@ public partial class FuncLangValue
         return dynamicMethod;
     }
 
+    /// <summary>
+    /// 收集当前 IL 作用域需要打包进闭包的局部变量。
+    /// </summary>
     internal static List<CapturedLocalValue> GetCapturedLocalValues(LocalManager local)
     {
         var captured = local.LocalVar
@@ -219,6 +183,9 @@ public partial class FuncLangValue
         return captured;
     }
 
+    /// <summary>
+    /// 一个捕获槽位：局部变量名、对应的 <see cref="LocalBuilder"/> 与类型。
+    /// </summary>
     internal sealed record CapturedLocalValue(string Name, LocalBuilder? Local, Type Type);
 
     /// <summary>
@@ -263,9 +230,4 @@ public partial class FuncLangValue
 
         methodIl.Emit(OpCodes.Ret);
     }
-
-    /// <summary>
-    /// 检查表达式是否为常量表达式（可以安全缓存）
-    /// </summary>
-
 }
