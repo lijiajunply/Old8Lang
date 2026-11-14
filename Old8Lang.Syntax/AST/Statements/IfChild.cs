@@ -1,20 +1,17 @@
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Visitor;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// if / elif 分支：条件与语句块。
+/// </summary>
 public partial class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public LangExpression Condition => expression;
     public BlockStatement Block => blockStatement;
 
-
     public override string ToString() => $"{expression}\n {{ {blockStatement} }}";
-
 
     public override OldStatement this[int index] => blockStatement[index];
 

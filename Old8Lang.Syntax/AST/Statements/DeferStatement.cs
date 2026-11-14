@@ -1,12 +1,10 @@
-using System.Reflection.Emit;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Interpreter;
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// Defer语句，用于延迟执行（类似于Go的defer语句）
-/// 在函数返回前执行，多个defer按后进先出（LIFO）顺序执行
+/// defer 语句，用于延迟执行（类似于 Go 的 defer 语句）。
+/// 在函数返回前执行，多个 defer 按后进先出（LIFO）顺序执行。
 /// </summary>
 /// <param name="statement">要延迟执行的语句</param>
 /// <param name="position">位置信息</param>
@@ -14,11 +12,12 @@ public partial class DeferStatement(
     OldStatement statement,
     SourcePosition position = default) : OldStatement(position)
 {
-
     /// <summary>
     /// 获取要延迟执行的语句
     /// </summary>
     public OldStatement Statement => statement;
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitDeferStatement(this);
 
     public override OldStatement this[int index]
     {

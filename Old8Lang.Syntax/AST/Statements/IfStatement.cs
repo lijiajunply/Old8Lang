@@ -1,13 +1,10 @@
-using System.Reflection.Emit;
 using System.Text;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Interpreter;
-
+using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
 
 /// <summary>
-/// if语句
+/// if 语句。
 /// </summary>
 public partial class IfStatement(
     IfChild ifChildBlock,
@@ -49,6 +46,8 @@ public partial class IfStatement(
     }
 
     public override int Count => 1 + elifBlock.Count + (elseBlockStatement is null ? 0 : 1);
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitIfStatement(this);
 
     public override string ToString()
     {

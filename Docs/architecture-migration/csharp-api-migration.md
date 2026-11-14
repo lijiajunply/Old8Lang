@@ -26,6 +26,7 @@
 | `BreakStatement`、`ContinueStatement`、`ReturnStatement`、`YieldStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补四个 `Visit*` 方法。`BreakStatement`/`ContinueStatement` 的子语句索引器未实现，现抛 `NotSupportedException`（原为运行时的 `InvalidOperationError`）；这两个节点没有子语句，`Count == 0`，正常遍历不会触发。 |
 | `BlockStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补 `VisitBlockStatement`。块内声明分类改由标记接口完成，不再依赖具体声明节点类型。 |
 | `BlockStatement.ExecuteDeclarations/ExecuteModule/GenerateImportIl/ToAnyData/ToStaticData`（公开实例方法） | `BlockStatementRuntimeExtensions`（Runtime 公开扩展方法） | 引用 Runtime 并保留 `using Old8Lang.AST.Statement;` 后，原调用写法 `block.ExecuteModule(manager)` 仍然有效；扩展方法依赖解释器/IL/运行时值，按设计归 Runtime。 |
+| `IfStatement`、`IfChild`、`DeferStatement`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补 `VisitIfStatement`、`VisitDeferStatement`；`IfChild` 是内部辅助节点，仍不支持 Visitor 访问。不再使用的 `IfChild.GenerateConditionIl` 已随节点迁移移除。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 

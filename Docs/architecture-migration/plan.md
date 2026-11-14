@@ -48,6 +48,13 @@
 
 ## 进度记录
 
+- 2026-11-14：`IfChild`、`IfStatement`、`DeferStatement` 迁入 Syntax；移除无人调用的
+  `IfChild.GenerateConditionIl`。Runtime 生成节点 75 → 73，遗留 partial 基线 26 → 25。
+  Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082（并发用例首跑抖动，重跑通过）、
+  LSP 474/476（2 跳过）、Architecture 43 通过；Compiler.Statements 4 项失败与上一提交一致，
+  Compiler.Async 65 项失败与基线一致。其余语句、表达式、解析器仍待拆分，见
+  `Reports/2026-11-14-14-18-if与defer节点迁移测试.md`。
+
 - 2026-11-14：`BlockStatement` 迁入 Syntax，改用 `IBlockDeclaration`/`IBlockImportDeclaration` 标记接口
   分类声明与导入，去掉对 `FuncInit`/`ClassInit` 等 Runtime 声明节点的类型分支；执行、IL 生成与类成员收集
   移入 `BlockStatementRuntimeExtensions`。Runtime 生成节点 76 → 75，遗留 partial 基线 27 → 26。

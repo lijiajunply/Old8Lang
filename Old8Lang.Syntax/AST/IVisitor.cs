@@ -46,6 +46,12 @@ public interface IVisitor<out TResult>
     /// <summary>访问块语句。</summary>
     TResult VisitBlockStatement(BlockStatement node);
 
+    /// <summary>访问 if 语句。</summary>
+    TResult VisitIfStatement(IfStatement node);
+
+    /// <summary>访问 defer 语句。</summary>
+    TResult VisitDeferStatement(DeferStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 
