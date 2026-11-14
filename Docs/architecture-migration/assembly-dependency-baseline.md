@@ -181,3 +181,10 @@ Old8Lang.VirtualMachine
 Runtime 不再包含 VM 执行引擎或字节码编译器源码；`VMContext.CurrentVM` 与
 `VMReflectionHelper` 只依赖 `IVirtualMachine`。`ModuleDependency`/`ExportedSymbol` 作为
 `BytecodeFile` 的格式类型留在 Runtime，`ModuleLoader`/`ModuleRegistry` 位于 VM 后端。
+
+## 阶段 3.11：编译器辅助类迁入 IL 后端（2026-11-14）
+
+`CompiledDelegateRegistry`、`CodeGeneration/StaticClassCompiler`、`Helpers/CollectionHelper`、
+`Helpers/ExceptionHelper`、`Helpers/TypeConversion`、`Helpers/TaskHelper` 已从 Runtime 迁入
+`Old8Lang.Compiler`。Runtime 保留 `LocalManager` 及 IL 生成缓存、`RuntimeGlobals`/常量注册表、
+`AssertHelper`/`ExceptionWrapper`、泛型特化与类型推断辅助等共享编译契约。
