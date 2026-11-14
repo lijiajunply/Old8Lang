@@ -1,12 +1,3 @@
-using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.ModuleObjects;
-using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
-using Old8Lang.Interpreter;
-using Old8Lang.ModuleSystem.StandardLibrary;
-using Old8Lang.ModuleSystem.Core;
-using Old8Lang.ModuleSystem.Resolution;
 
 using Old8Lang.AST.Visitor;
 
@@ -36,9 +27,6 @@ public partial class ImportStatement(
     LangExpression? dynamicModuleExpression = null
 ) : OldStatement(position), IBlockImportDeclaration
 {
-    // 静态模块系统服务实例
-    internal static readonly ModuleSystemService ModuleService = new();
-
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>
@@ -74,6 +62,27 @@ public partial class ImportStatement(
     /// </summary>
     internal readonly bool _isDynamic = isDynamic;
 
+    /// <summary>导入的模块名称或路径。</summary>
+    public string ImportString => _importString;
+
+    /// <summary>是否使用 from 子句。</summary>
+    public bool FromClause => _fromClause;
+
+    /// <summary>导入指定符列表。</summary>
+    public List<ImportItem> Specifiers => _importSpecifiers;
+
+    /// <summary>模块别名。</summary>
+    public string? ModuleAlias => _moduleAlias;
+
+    /// <summary>是否为懒导入。</summary>
+    public bool IsLazy => _isLazy;
+
+    /// <summary>是否为选择导入。</summary>
+    public bool IsSelective => _isSelective;
+
+    /// <summary>动态模块表达式。</summary>
+    public LangExpression? DynamicModuleExpression => _dynamicModuleExpression;
+
     /// <summary>
     /// 公共属性：是否为动态导入
     /// </summary>
@@ -103,6 +112,8 @@ public partial class ImportStatement(
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
     internal readonly LangExpression? _dynamicModuleExpression = dynamicModuleExpression;
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor) => visitor.VisitImportStatement(this);
 
     /// <summary>
     /// 获取指定索引处的语句（实现OldStatement接口）

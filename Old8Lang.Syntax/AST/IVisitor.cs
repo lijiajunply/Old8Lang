@@ -128,6 +128,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问异步流表达式。</summary>
     TResult VisitAsyncStreamExpression(AsyncStreamExpression node);
 
+    /// <summary>访问导入语句。</summary>
+    TResult VisitImportStatement(ImportStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

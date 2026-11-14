@@ -48,6 +48,12 @@
 
 ## 进度记录
 
+- 2026-11-14：`ImportStatement` 迁入 Syntax；懒导入/选择导入/动态导入的模块加载逻辑与静态
+  `ModuleService` 移入 `ImportStatementRuntimeExtensions`，内部字段改为公开只读属性。Runtime 生成节点
+  50 → 49，遗留 partial 基线 8 → 7。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、
+  LSP 474/476（2 跳过）、Architecture 43 通过；Compiler 各分组与基线一致。见
+  `Reports/2026-11-14-15-42-导入语句迁移测试.md`。
+
 - 2026-11-14：`AsyncStreamExpression` 迁入 Syntax；Runtime 生成节点 51 → 50。Parser 889、
   Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、Architecture 43 通过；
   Compiler.Async 65 项失败与基线一致。见 `Reports/2026-11-14-15-37-异步流表达式迁移测试.md`。

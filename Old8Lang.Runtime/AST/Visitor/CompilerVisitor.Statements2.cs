@@ -1042,7 +1042,7 @@ public partial class CompilerVisitor
     public object? VisitImportStatement(ImportStatement node)
     {
 
-        string moduleName = node._importString;
+        string moduleName = node.ImportString;
         bool isDirectory = false;
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
@@ -1058,9 +1058,9 @@ public partial class CompilerVisitor
                     "请确保标准库程序集已正确部署到运行时目录。");
             }
 
-            if (!node._fromClause && StandardLibraryLoader.TryLoadStandardLibrary(
+            if (!node.FromClause && StandardLibraryLoader.TryLoadStandardLibrary(
                     moduleName, new VariateManager { StandardLibraries = standardLibraries }, out var standardModule))
-                local.GlobalStaticClasses[node._moduleAlias ?? moduleName] = standardModule;
+                local.GlobalStaticClasses[node.ModuleAlias ?? moduleName] = standardModule;
 
             return null;
         }

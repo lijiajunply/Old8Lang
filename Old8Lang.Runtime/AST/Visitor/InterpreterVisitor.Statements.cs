@@ -1187,37 +1187,37 @@ public partial class InterpreterVisitor
     public LangValueType VisitImportStatement(ImportStatement node)
     {
 
-        var moduleName = node._importString;
+        var moduleName = node.ImportString;
 
         // 动态导入处理
-        if (node._isDynamic)
+        if (node.IsDynamicImport)
         {
             node.HandleDynamicImport(manager);
             return new VoidLangValue();
         }
 
         // 懒导入处理
-        if (node._isLazy)
+        if (node.IsLazy)
         {
             node.HandleLazyImport(manager);
             return new VoidLangValue();
         }
 
-        var symbolAliases = node._importSpecifiers
+        var symbolAliases = node.Specifiers
             .Where(item => item.Name != item.Alias)
             .ToDictionary(item => item.Name, item => item.Alias);
 
         var options = new ImportOptions
         {
-            IsFromClause = node._fromClause,
-            ModuleAlias = node._moduleAlias,
-            ImportSpecifiers = node._importSpecifiers.Select(item => item.Name).ToList(),
+            IsFromClause = node.FromClause,
+            ModuleAlias = node.ModuleAlias,
+            ImportSpecifiers = node.Specifiers.Select(item => item.Name).ToList(),
             SymbolAliases = symbolAliases.Count > 0 ? symbolAliases : null,
-            IsLazy = node._isLazy,
-            IsSelective = node._isSelective
+            IsLazy = node.IsLazy,
+            IsSelective = node.IsSelective
         };
 
-        var result = ImportStatement.ModuleService.ImportModule(moduleName, manager, options);
+        var result = ImportStatementRuntimeExtensions.ModuleService.ImportModule(moduleName, manager, options);
 
         if (!result.IsSuccess)
         {
