@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
@@ -44,7 +45,7 @@ public partial class PrimaryParser
             }
 
             Expect(LangTokenType.RightBracket);
-            return new SliceLangValue(identifier, null, end, step);
+            return new SliceExpression(identifier, null, end, step);
         }
 
         // 处理切片或索引访问：list[start:end], list[start:end:step], list[start:], list[start::step], list[index]
@@ -77,14 +78,14 @@ public partial class PrimaryParser
             }
 
             Expect(LangTokenType.RightBracket);
-            return new SliceLangValue(identifier, start, end, step);
+            return new SliceExpression(identifier, start, end, step);
         }
 
         if (CurrentToken.Type == LangTokenType.RightBracket)
         {
             // 列表访问：list[index] - 使用 OldItem
             Expect(LangTokenType.RightBracket);
-            return new LangListItem(identifier, start, position);
+            return new IndexExpression(identifier, start, position);
         }
 
         // 如果既不是冒号也不是右方括号，则为语法错误

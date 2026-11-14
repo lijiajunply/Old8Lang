@@ -87,7 +87,7 @@ public partial class SetStatement
         Type valueType;
 
         // 空花括号在语法层默认是列表；显式 dict 注解仍需生成真正的空字典。
-        if (Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
+        if ((Value is ListLiteralExpression { Elements.Count: 0 } or ListLangValue { Value.Count: 0, Values.Count: 0 }) &&
             Id.AssumptionType is not null &&
             (Id.AssumptionType.Equals("dict", StringComparison.OrdinalIgnoreCase) ||
              Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))

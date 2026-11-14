@@ -222,7 +222,7 @@ public partial class BytecodeVisitor
 
                 _compiler.FreeLocal(tempLocalIndex);
             }
-            else if (leftExpr is LangListItem listItem)
+            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(leftExpr, out var listItem))
             {
                 // 简单索引赋值: array[index] <- value
                 // SetIndex期望栈布局(从栈顶到栈底): value, index, collection
@@ -240,7 +240,7 @@ public partial class BytecodeVisitor
                 // 发出SetIndex指令
                 Emit(OpCode.SetIndex);
             }
-            else if (leftExpr is NestedIndexAccess nestedIndexAccess)
+            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(leftExpr, out var nestedIndexAccess))
             {
                 // 嵌套索引赋值: array[i][j] <- value
                 // 需要分解为两步：
@@ -273,7 +273,7 @@ public partial class BytecodeVisitor
                 {
                     fieldName = rightClassMemberId.IdName;
                 }
-                else if (operation.Right is LangListItem nestedListItem)
+                else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
                 {
                     // 这是索引赋值：obj.field[index] <- value
                     // 例如：this.groups[key] <- newGroup
@@ -337,7 +337,7 @@ public partial class BytecodeVisitor
                     Emit(OpCode.SetField, fieldName);
                 }
             }
-            else if (leftExpr is TupleLangValue tupleLHS)
+            else if (leftExpr is TupleLiteralExpression or TupleLangValue)
             {
                 // 元组解构赋值: (a, b) <- (1, 2)
                 // 1. 生成 RHS 代码 (栈顶: Tuple)
@@ -350,7 +350,9 @@ public partial class BytecodeVisitor
                 // 3. 展平并赋值
                 // 注意：新版 TupleLangValue 已经是扁平存储的，直接使用 Elements
                 
-                var elements = tupleLHS.Elements;
+                var elements = leftExpr is TupleLiteralExpression syntax
+                    ? syntax.Elements
+                    : ((TupleLangValue)leftExpr).Elements;
                 
                 for (int i = 0; i < elements.Count; i++)
                 {

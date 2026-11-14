@@ -346,7 +346,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<ArrayLangValue>(setStmt.Value);
+        Assert.IsType<ArrayLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<ArrayLangValue>(setStmt.Value);
+        Assert.IsType<ArrayLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -388,7 +388,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<ArrayLangValue>(setStmt.Value);
+        Assert.IsType<ArrayLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -410,7 +410,7 @@ public class PrimaryParserTests
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
         // {} 现在解析为空列表而不是空字典
-        Assert.IsType<ListLangValue>(setStmt.Value);
+        Assert.IsType<ListLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -431,7 +431,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<DictionaryLangValue>(setStmt.Value);
+        Assert.IsType<DictionaryLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -452,7 +452,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<DictionaryLangValue>(setStmt.Value);
+        Assert.IsType<DictionaryLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -473,7 +473,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<RangeLangValue>(setStmt.Value);
+        Assert.IsType<RangeLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -494,7 +494,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<RangeLangValue>(setStmt.Value);
+        Assert.IsType<RangeLiteralExpression>(setStmt.Value);
     }
 
     #endregion
@@ -634,7 +634,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<TupleLangValue>(setStmt.Value);
+        Assert.IsType<TupleLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -655,7 +655,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<TupleLangValue>(setStmt.Value);
+        Assert.IsType<TupleLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -676,7 +676,7 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<TupleLangValue>(setStmt.Value);
+        Assert.IsType<TupleLiteralExpression>(setStmt.Value);
     }
 
     #endregion

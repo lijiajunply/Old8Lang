@@ -92,7 +92,7 @@ public partial class ClassInit
             {
                 fieldType = !string.IsNullOrEmpty(memberId.AssumptionType)
                     ? memberId.Accept(new TypeInferenceVisitor(local)) ?? typeof(object)
-                    : expr is ListLangValue { Value.Count: 0, Values.Count: 0 }
+                    : expr is ListLiteralExpression { Elements.Count: 0 } or ListLangValue { Value.Count: 0, Values.Count: 0 }
                         ? typeof(object)
                         : expr.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             }

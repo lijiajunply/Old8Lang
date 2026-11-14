@@ -74,7 +74,7 @@ public class ArchitectureProjectDependencyTests
         var oldNodesRoot = Path.Combine(executionRoot, "Nodes");
 
         var archivedFiles = Directory.EnumerateFiles(legacyRoot, "*.Split.cs", SearchOption.AllDirectories).ToArray();
-        Assert.Equal(29, archivedFiles.Length);
+        Assert.Equal(28, archivedFiles.Length);
         Assert.Empty(Directory.EnumerateFiles(oldNodesRoot, "*.Split.cs", SearchOption.AllDirectories));
 
         Assert.All(archivedFiles, file =>

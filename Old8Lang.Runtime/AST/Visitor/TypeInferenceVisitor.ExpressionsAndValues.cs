@@ -409,7 +409,7 @@ public partial class TypeInferenceVisitor
         // 同一个方法 AST 会被多个泛型类特化复用；node 的字段类型依当前特化而变。
         var isThisField = node.Opera == LangTokenType.Dot &&
                           (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && node.Right is LangId;
-        if (node.Type is not null && !isThisField) return node.Type;
+        if (!isThisField && OperationTypeCache.Get(node) is { } cachedType) return cachedType;
         if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, node.Right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.GetReturnType(library, libraryCall);
         if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "Thread" } &&
@@ -514,7 +514,7 @@ public partial class TypeInferenceVisitor
             }
 
             if (instance.Id.IdName == "Sqrt" && instance.Ids.Count == 0 &&
-                leftType is not null && Operation.IsNumericType(leftType))
+                leftType is not null && OperationTypeHelper.IsNumericType(leftType))
             {
                 return typeof(double);
             }
@@ -526,7 +526,7 @@ public partial class TypeInferenceVisitor
             }
 
             // 处理内置类型的扩展方法返回类型
-            var builtInReturnType = Operation.GetBuiltInMethodReturnType(leftType, instance.Id.IdName, instance.Ids.Count);
+            var builtInReturnType = OperationTypeHelper.GetBuiltInMethodReturnType(leftType, instance.Id.IdName, instance.Ids.Count);
             if (builtInReturnType is not null)
             {
                 return builtInReturnType;

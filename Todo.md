@@ -94,7 +94,7 @@
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 [测试报告](Reports/2026-11-11-08-49-IL-select回归测试.md)。
 
-历史记录还提及 `TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 曾发生并行抖动，单独运行及后续复跑通过；必要时重新核查。
+- [ ] **解释器并发任务克隆作用域时可能抖动**：`TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 在默认档一次失败，`VariateManager.CloneInternal` 枚举字典时报告 `Collection was modified`；单独复跑通过。历史记录亦有并行抖动，需复核同步与测试分档。见 `Reports/2026-11-14-12-23-字典字面量迁移测试.md`。
 
 - [ ] **IL 模式顶层 C 风格 for 循环变量仍是全局变量**：解释器与虚拟机已把循环变量收进循环作用域
   （每轮闭包捕获 `012`、循环结束后变量不可见），IL 仍把它声明为全局变量，因此：

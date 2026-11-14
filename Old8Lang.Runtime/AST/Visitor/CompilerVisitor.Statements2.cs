@@ -295,7 +295,7 @@ public partial class CompilerVisitor
                 var caseLabel = caseLabels[i];
 
                 // 检查是否是范围匹配
-                if (oldCase.Expression is RangeLangValue)
+                if (oldCase.Expression is RangeLiteralExpression or RangeLangValue)
                 {
                     // 范围匹配：检查 switchValue 是否在范围数组中
                     // 加载case值（数组）

@@ -9,6 +9,23 @@ namespace Old8Lang.Tests.Compiler.Statements;
 [Collection("Sequential")]
 public class SwitchTests
 {
+    [Fact]
+    public void Switch_WithRangeLiteral_MatchesAnIncludedValue()
+    {
+        const string code = """
+            value <- 2
+            result <- 0
+            switch value {
+                case [1~3] { result <- 1 }
+                default { result <- 2 }
+            }
+            Assert.Equal(1, result)
+            """;
+        var interpreter = new LangInterpreter();
+        var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
+        action();
+    }
+
     #region 基础匹配测试
 
     [Fact]

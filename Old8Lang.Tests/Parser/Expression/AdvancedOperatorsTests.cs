@@ -303,8 +303,8 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        // 数组索引被解析为 LangListItem
-        Assert.NotNull(setStmt.Value);
+        // 数组索引由语法节点表示
+        Assert.IsType<IndexExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -325,7 +325,7 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<NestedIndexAccess>(setStmt.Value);
+        Assert.IsType<NestedIndexExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<NestedIndexAccess>(setStmt.Value);
+        Assert.IsType<NestedIndexExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -388,8 +388,8 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        // 字典键访问被解析为 LangListItem
-        Assert.NotNull(setStmt.Value);
+        // 字典键访问由语法节点表示
+        Assert.IsType<IndexExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -410,8 +410,8 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        // 复杂索引表达式被解析为 LangListItem
-        Assert.NotNull(setStmt.Value);
+        // 复杂索引表达式由语法节点表示
+        Assert.IsType<IndexExpression>(setStmt.Value);
     }
 
     #endregion
@@ -594,7 +594,7 @@ public class AdvancedOperatorsTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<NestedIndexAccess>(setStmt.Value);
+        Assert.IsType<NestedIndexExpression>(setStmt.Value);
     }
 
     /// <summary>

@@ -48,6 +48,22 @@
 
 ## 进度记录
 
+- 2026-11-14：标识符索引改由 Syntax 的 `IndexExpression` 表示，读取、赋值与对象成员索引暂经 Runtime 适配，保留旧类型兼容；其余 AST 与解析器仍待拆分，见 `Reports/2026-11-14-12-39-索引表达式迁移测试.md`。
+
+- 2026-11-14：标识符切片改为 Syntax 的 `SliceExpression`，保留现有切片赋值及三模式行为，并适配切片端点和步长中的 await 扫描；其余 AST 与解析器仍待拆分，见 `Reports/2026-11-14-12-36-切片表达式迁移测试.md`。
+
+- 2026-11-14：区间字面量改为 Syntax 的 `RangeLiteralExpression`，保留端点包含选项与三模式行为，IL switch 范围分支已适配；其他 AST 节点与解析器仍待拆分，见 `Reports/2026-11-14-12-31-区间表达式迁移测试.md`。
+
+- 2026-11-14：元组字面量和解构目标改由 Syntax 的 `TupleLiteralExpression` 表示，保留命名字段、运行时对象身份和三模式解构；其他节点及解析器仍待拆分，见 `Reports/2026-11-14-12-28-元组字面量迁移测试.md`。
+
+- 2026-11-14：字典字面量改由 Syntax 的 `DictionaryLiteralExpression` 表示，Visitor 保留键值求值顺序、对象身份和字典更新后的既有行为；元组与解析器仍待拆分，见 `Reports/2026-11-14-12-23-字典字面量迁移测试.md`。
+
+- 2026-11-14：列表字面量改由 Syntax 的 `ListLiteralExpression` 表示，保留空列表/字典注解、解释器身份与既有重新求值行为，并适配集合内 await 扫描；字典、元组及解析器仍待拆分，见 `Reports/2026-11-14-12-19-列表字面量迁移测试.md`。
+
+- 2026-11-14：数组字面量改由 Syntax 的 `ArrayLiteralExpression` 表示；Visitor 转换为既有运行时数组，解释器保留同节点身份和重复求值行为。其他集合与解析器仍待拆分，见 `Reports/2026-11-14-12-15-数组字面量迁移测试.md`。
+
+- 2026-11-14：`Operation` 迁入 Syntax；运行时类型检查、编译期类型辅助方法与缓存迁入 Runtime，生成器的 Runtime 节点数降至 80。集合字面量、其余 AST 节点及解析器仍待拆分；测试见 `Reports/2026-11-14-12-12-运算节点迁移测试.md`。
+
 - 2026-11-14：`FunctionCallExpression` 迁入 Syntax，动态委托执行逻辑移入 Runtime；该节点批次的测试与基线比较见 `Reports/2026-11-14-12-08-函数调用节点迁移测试.md`。第二阶段整体仍未完成。
 
 - 2026-11-14：`AwaitExpression` 与 `ThrowStatement` 迁入 Syntax；await 的 IL 辅助代码改为 Runtime 扩展类。语法、LSP、异步及异常筛选结果见 `Reports/2026-11-14-07-16-await与throw程序集迁移测试.md`；其余节点和解析器仍待拆分。

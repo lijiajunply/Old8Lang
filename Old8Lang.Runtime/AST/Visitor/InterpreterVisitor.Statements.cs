@@ -463,15 +463,21 @@ public partial class InterpreterVisitor
 
         var result = node.Value.Accept(this);
 
-        if (node._leftExpression is TupleLangValue tuplePattern)
+        var tuplePattern = node._leftExpression switch
+        {
+            TupleLiteralExpression syntax => syntax.Elements,
+            TupleLangValue legacy => (IReadOnlyList<LangExpression>)legacy.Elements,
+            _ => null
+        };
+        if (tuplePattern is not null)
         {
             if (result is not ILangList values)
                 throw new TypeError(node, "元组解构赋值右侧必须是可索引的集合");
 
             var items = values.GetItems().ToList();
-            for (var i = 0; i < tuplePattern.Elements.Count; i++)
+            for (var i = 0; i < tuplePattern.Count; i++)
             {
-                if (tuplePattern.Elements[i] is not LangId id)
+                if (tuplePattern[i] is not LangId id)
                     throw new InvalidOperationError(node, "元组解构赋值只支持变量名");
                 if (i >= items.Count)
                     throw new InvalidOperationError(node, $"元组解构赋值索引 {i} 超出范围");
@@ -503,7 +509,7 @@ public partial class InterpreterVisitor
         }
 
         // 处理嵌套索引访问赋值：array[0][0] <- value
-        if (node._leftExpression is NestedIndexAccess nestedIndexAccess)
+        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node._leftExpression, out var nestedIndexAccess))
         {
             // 运行基础表达式，获取容器对象
             var baseResult = nestedIndexAccess.BaseExpression.Accept(this);
@@ -642,7 +648,7 @@ public partial class InterpreterVisitor
             {
                 // 首先检查是否是嵌套索引赋值：matrix[0][1] <- value
                 // 左侧应该是LangListItem（第一层索引），右侧应该是索引表达式
-                if (operation is { Left: LangListItem outerListItem, Right: { } finalIndex })
+                if (operation.Right is { } finalIndex && Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Left, out var outerListItem))
                 {
                     // 获取外层索引的值：matrix[0] 返回内层数组
                     var outerCollectionValue = manager.GetValue(outerListItem.ListId);
@@ -772,8 +778,11 @@ public partial class InterpreterVisitor
             }
         }
         // 处理切片赋值：array[start:end] <- values
-        else if (node._leftExpression is SliceLangValue sliceValue)
+        else if (node._leftExpression is SliceExpression or SliceLangValue)
         {
+            var sliceValue = node._leftExpression is SliceExpression syntax
+                ? Old8Lang.Runtime.LiteralCollectionRuntimeFactory.CreateSlice(syntax)
+                : (SliceLangValue)node._leftExpression;
             // 获取集合对象
             var collectionValue = sliceValue.Id.Accept(this);
 
@@ -822,7 +831,7 @@ public partial class InterpreterVisitor
             return new VoidLangValue();
         }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
-        else if (node._leftExpression is LangListItem listItem)
+        else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node._leftExpression, out var listItem))
         {
             // 获取集合对象
             var collectionValue = manager.GetValue(listItem.ListId);

@@ -125,6 +125,7 @@ public partial class AnyLangValue : LangValueType
             Instance instance => CallMethod(instance, manager),
 
             // 3. 索引访问：obj.list[index]
+            IndexExpression syntax => AccessCollectionItem(Old8Lang.Runtime.LiteralCollectionRuntimeFactory.CreateIndex(syntax), manager),
             LangListItem listItem => AccessCollectionItem(listItem, manager),
 
             // 4. 其他表达式（不常见）

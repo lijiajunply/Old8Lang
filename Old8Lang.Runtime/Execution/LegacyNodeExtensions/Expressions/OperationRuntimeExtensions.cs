@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Expression;
 /// <summary>
 /// Operation 的执行/编译辅助实现（原位于 AST 目录，阶段 1 迁出）。
 /// </summary>
-public partial class Operation
+internal static class OperationRuntimeExtensions
 {
     /// <summary>
     /// 检查值是否是指定类型的实例
@@ -25,7 +25,7 @@ public partial class Operation
     /// <param name="typeName">类型名称</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>如果值是指定类型的实例则返回true,否则返回false</returns>
-    internal bool CheckIsInstance(LangValueType value, string typeName, VariateManager manager)
+    internal static bool CheckIsInstance(this Operation node, LangValueType value, string typeName, VariateManager manager)
     {
         // 处理基本类型
         switch (typeName.ToLower())

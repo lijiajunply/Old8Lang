@@ -195,6 +195,70 @@ public class AsyncStateMachineGenerator
         }
         
         // 检查 List/Array 字面量
+        if (expression is AST.Expression.NestedIndexExpression nestedIndexSyntax)
+        {
+            IdentifyAwaitInExpression(nestedIndexSyntax.Target);
+            IdentifyAwaitInExpression(nestedIndexSyntax.Index);
+            return;
+        }
+        if (expression is AST.Expression.NestedSliceExpression nestedSliceSyntax)
+        {
+            IdentifyAwaitInExpression(nestedSliceSyntax.Target);
+            IdentifyAwaitInExpression(nestedSliceSyntax.Start);
+            if (nestedSliceSyntax.End is not null) IdentifyAwaitInExpression(nestedSliceSyntax.End);
+            if (nestedSliceSyntax.Step is not null) IdentifyAwaitInExpression(nestedSliceSyntax.Step);
+            return;
+        }
+
+        if (expression is AST.Expression.IndexExpression indexSyntax)
+        {
+            IdentifyAwaitInExpression(indexSyntax.Key);
+            return;
+        }
+
+        if (expression is AST.Expression.SliceExpression sliceSyntax)
+        {
+            if (sliceSyntax.Start is not null) IdentifyAwaitInExpression(sliceSyntax.Start);
+            if (sliceSyntax.End is not null) IdentifyAwaitInExpression(sliceSyntax.End);
+            if (sliceSyntax.Step is not null) IdentifyAwaitInExpression(sliceSyntax.Step);
+            return;
+        }
+
+        if (expression is AST.Expression.RangeLiteralExpression rangeSyntax)
+        {
+            if (rangeSyntax.Start is not null) IdentifyAwaitInExpression(rangeSyntax.Start);
+            if (rangeSyntax.End is not null) IdentifyAwaitInExpression(rangeSyntax.End);
+            return;
+        }
+
+        if (expression is AST.Expression.TupleLiteralExpression tupleSyntax)
+        {
+            foreach (var element in tupleSyntax.Elements) IdentifyAwaitInExpression(element);
+            return;
+        }
+
+        if (expression is AST.Expression.DictionaryLiteralExpression dictionarySyntax)
+        {
+            foreach (var entry in dictionarySyntax.Entries)
+            {
+                IdentifyAwaitInExpression(entry.Key);
+                IdentifyAwaitInExpression(entry.Value);
+            }
+            return;
+        }
+
+        if (expression is AST.Expression.ListLiteralExpression listSyntax)
+        {
+            foreach (var element in listSyntax.Elements) IdentifyAwaitInExpression(element);
+            return;
+        }
+
+        if (expression is AST.Expression.ArrayLiteralExpression arraySyntax)
+        {
+            foreach (var element in arraySyntax.Elements) IdentifyAwaitInExpression(element);
+            return;
+        }
+
         if (expression is AST.Expression.Value.ListLangValue { Values: not null } listVal)
         {
              foreach (var val in listVal.Values) IdentifyAwaitInExpression(val);

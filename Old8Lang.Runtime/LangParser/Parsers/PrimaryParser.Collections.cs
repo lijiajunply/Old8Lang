@@ -10,7 +10,7 @@ namespace Old8Lang.LangParser.Parsers;
 /// </summary>
 public partial class PrimaryParser
 {
-    public LangValueType ParseListOrDictionary()
+    public LangExpression ParseListOrDictionary()
     {
         var leftBraceToken = CurrentToken;
         var position = new SourcePosition(leftBraceToken.Line, leftBraceToken.Column, tokenValue: leftBraceToken.Value);
@@ -20,7 +20,7 @@ public partial class PrimaryParser
         if (CurrentToken.Type == LangTokenType.RightBrace)
         {
             Expect(LangTokenType.RightBrace);
-            return new ListLangValue(new List<LangExpression>(), position: position);
+            return new ListLiteralExpression([], position);
         }
 
         // 保存当前位置，用于判断是列表还是字典
@@ -33,12 +33,12 @@ public partial class PrimaryParser
         if (CurrentToken.Type == LangTokenType.Colon)
         {
             // 是字典，解析为字典
-            var elements = new List<TupleLangValue>();
+            var elements = new List<KeyValuePair<LangExpression, LangExpression>>();
 
             // 解析第一个键值对
             Expect(LangTokenType.Colon);
             var firstValue = expressionParserFactory().ParseExpression();
-            elements.Add(new TupleLangValue(firstExpr, firstValue, position));
+            elements.Add(new KeyValuePair<LangExpression, LangExpression>(firstExpr, firstValue));
 
             // 解析剩余的键值对
             while (CurrentToken.Type == LangTokenType.Comma)
@@ -54,11 +54,11 @@ public partial class PrimaryParser
                 var key = expressionParserFactory().ParseExpression();
                 Expect(LangTokenType.Colon);
                 var value = expressionParserFactory().ParseExpression();
-                elements.Add(new TupleLangValue(key, value, position));
+                elements.Add(new KeyValuePair<LangExpression, LangExpression>(key, value));
             }
 
             Expect(LangTokenType.RightBrace);
-            return new DictionaryLangValue(elements, null, null, position);
+            return new DictionaryLiteralExpression(elements, position);
         }
         else
         {
@@ -80,7 +80,7 @@ public partial class PrimaryParser
             }
 
             Expect(LangTokenType.RightBrace);
-            return new ListLangValue(elements, position: position);
+            return new ListLiteralExpression(elements, position);
         }
     }
 
@@ -91,7 +91,7 @@ public partial class PrimaryParser
     /// </summary>
     /// <returns>数组初始化、Range或者列表推导式</returns>
 
-    public LangValueType ParseArrayOrRange()
+    public LangExpression ParseArrayOrRange()
     {
         var leftBracketToken = CurrentToken;
         var position = new SourcePosition(leftBracketToken.Line, leftBracketToken.Column,
@@ -103,7 +103,7 @@ public partial class PrimaryParser
         {
             Expect(LangTokenType.RightBracket);
             // 空数组，返回ArrayValue
-            return new ArrayLangValue(elements, null, position);
+            return new ArrayLiteralExpression(elements, position);
         }
 
         // 保存当前位置，用于回退
@@ -147,7 +147,7 @@ public partial class PrimaryParser
             elements.Add(expressionParserFactory().ParseExpression());
             Expect(LangTokenType.RightBracket);
 
-            return new RangeLangValue(elements[0], elements[1], rangePosition, includeStart, includeEnd);
+            return new RangeLiteralExpression(elements[0], elements[1], rangePosition, includeStart, includeEnd);
         }
 
         // 检查是否是列表推导式
@@ -194,7 +194,7 @@ public partial class PrimaryParser
 
         Expect(LangTokenType.RightBracket);
         // 返回ArrayValue表示数组
-        return new ArrayLangValue(elements, null, position);
+        return new ArrayLiteralExpression(elements, position);
     }
 
     /// <summary>

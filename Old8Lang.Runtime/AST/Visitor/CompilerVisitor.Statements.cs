@@ -406,7 +406,13 @@ public partial class CompilerVisitor
     public object? VisitSetStatement(SetStatement node)
     {
 
-        if (node._leftExpression is TupleLangValue tuplePattern)
+        var tuplePattern = node._leftExpression switch
+        {
+            TupleLiteralExpression syntax => syntax.Elements,
+            TupleLangValue legacy => (IReadOnlyList<LangExpression>)legacy.Elements,
+            _ => null
+        };
+        if (tuplePattern is not null)
         {
             var tupleType = node.Value.Accept(new TypeInferenceVisitor(local));
             if (tupleType is null || !tupleType.IsValueType ||
@@ -417,9 +423,9 @@ public partial class CompilerVisitor
             var tupleLocal = ilGenerator.DeclareLocal(tupleType);
             ilGenerator.Emit(OpCodes.Stloc, tupleLocal);
 
-            for (var i = 0; i < tuplePattern.Elements.Count; i++)
+            for (var i = 0; i < tuplePattern.Count; i++)
             {
-                if (tuplePattern.Elements[i] is not LangId id)
+                if (tuplePattern[i] is not LangId id)
                     throw new InvalidOperationError(node, "元组解构赋值只支持变量名");
 
                 var currentType = tupleType;
@@ -447,7 +453,7 @@ public partial class CompilerVisitor
             return null;
         }
 
-        if (node._leftExpression is NestedIndexAccess nestedIndexAccess)
+        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node._leftExpression, out var nestedIndexAccess))
         {
             // 成员或方法结果后再索引的赋值（例如 node.data_dict[key]）会被解析成
             // NestedIndexAccess。静态元素类型在这里通常不可知，交给运行期分派，
@@ -515,7 +521,7 @@ public partial class CompilerVisitor
 
             // 空花括号字面量在语法层默认是列表；显式 dict 注解应当消除该歧义，
             // 在 IL 中生成真正的空 Dictionary，才能继续调用 Keys/Values 等字典方法。
-            if (node.Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
+            if ((node.Value is ListLiteralExpression { Elements.Count: 0 } or ListLangValue { Value.Count: 0, Values.Count: 0 }) &&
                 node.Id.AssumptionType is not null &&
                 (node.Id.AssumptionType.Equals("dict", StringComparison.OrdinalIgnoreCase) ||
                  node.Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
@@ -524,7 +530,7 @@ public partial class CompilerVisitor
             }
             // 未加类型注解的空花括号可能在首次索引写入时成为列表或字典。以 object
             // 保存，避免先固定为 List<object> 后再以字符串键写入而生成无效 IL。
-            else if (node.Value is ListLangValue { Value.Count: 0, Values.Count: 0 } &&
+            else if ((node.Value is ListLiteralExpression { Elements.Count: 0 } or ListLangValue { Value.Count: 0, Values.Count: 0 }) &&
                      local.GetLocalVar(node.Id.IdName) is null)
             {
                 node.Value.Accept(this);
@@ -826,7 +832,7 @@ public partial class CompilerVisitor
                     }
                     // 如果是TypeBuilder或typeof(object)，跳过此操作
                 }
-                else if (operation is { Opera: LangTokenType.Dot, Right: LangListItem nestedListItem })
+                else if (operation.Opera == LangTokenType.Dot && Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
                 {
                     // 解析器将 obj.field[key] 表示为 obj . LangListItem(field, key)，
                     // 而不是以 obj.field 作为索引表达式。先在运行期读取该字段，再用
@@ -963,7 +969,7 @@ public partial class CompilerVisitor
                     }
                 }
             }
-            else if (node._leftExpression is LangListItem listItem)
+            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node._leftExpression, out var listItem))
             {
                 // 处理LangListItem索引赋值: listId[key] <- value
                 // 获取集合类型
@@ -1699,7 +1705,7 @@ public partial class CompilerVisitor
         }
 
         node._operation.Accept(this);
-        var opOutputType = node._operation.Type ?? node._operation.Accept(new TypeInferenceVisitor(local));
+        var opOutputType = OperationTypeCache.Get(node._operation) ?? node._operation.Accept(new TypeInferenceVisitor(local));
         if (opOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
         return null;
     }
