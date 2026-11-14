@@ -64,6 +64,9 @@ public interface IVisitor<out TResult>
     /// <summary>访问 for 语句。</summary>
     TResult VisitForStatement(ForStatement node);
 
+    /// <summary>访问表达式语句。</summary>
+    TResult VisitFuncRunStatement(FuncRunStatement node);
+
     /// <summary>访问 return 语句。</summary>
     TResult VisitReturnStatement(ReturnStatement node);
 

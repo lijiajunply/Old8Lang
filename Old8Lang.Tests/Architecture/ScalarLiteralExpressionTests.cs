@@ -215,6 +215,7 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.MatchCase).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.TuplePattern).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.RangePattern).Assembly);
+        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FuncRunStatement).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
         Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
@@ -250,6 +251,7 @@ public class ScalarLiteralExpressionTests
         Assert.Equal("for", new Old8Lang.AST.Statement.ForStatement(init, literal,
             new Old8Lang.AST.Statement.SetStatement(new LangId("i"), literal),
             new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("run", new Old8Lang.AST.Statement.FuncRunStatement(literal).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -280,6 +282,7 @@ public class ScalarLiteralExpressionTests
         public string VisitUsingStatement(Old8Lang.AST.Statement.UsingStatement node) => "using";
         public string VisitSetStatement(Old8Lang.AST.Statement.SetStatement node) => "assign";
         public string VisitForStatement(Old8Lang.AST.Statement.ForStatement node) => "for";
+        public string VisitFuncRunStatement(Old8Lang.AST.Statement.FuncRunStatement node) => "run";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;
