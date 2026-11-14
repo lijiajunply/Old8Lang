@@ -39,6 +39,7 @@
 | `ListComprehension`（Runtime 程序集，`LangValueType` 子类） | 同名类型（Syntax 程序集，`LangExpression` 子类） | 解析树中的列表推导式不再是运行时值：它只表示语法，求值由 Visitor 产出列表。直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译；自定义 `IVisitor<TResult>` 实现需补 `VisitListComprehension`。原 `CheckCondition`/`ProcessNestedLoops` 移入 Runtime 的 `ListComprehensionRuntimeExtensions`。 |
 | `MatchExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补 `VisitMatchExpression`。 |
 | `GenericInstanceExpression`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和构造方式不变；直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译。自定义 `IVisitor<TResult>` 实现需补 `VisitGenericInstanceExpression`。类型注解转换、类型映射与泛型调用/实例化 IL 辅助移入 Runtime 的 `GenericInstanceExpressionRuntimeExtensions`。 |
+| `StringTemplateValue`（Runtime 程序集，`LangValueType` 子类） | 同名类型（Syntax 程序集，`LangExpression` 子类） | 解析树中的字符串模板不再是运行时值；求值由 Visitor 产出字符串。直接使用的项目需引用 `Old8Lang.Syntax` 并重新编译；自定义 `IVisitor<TResult>` 实现需补 `VisitStringTemplateValue`。 |
 | 无 | `IBlockDeclaration`、`IBlockImportDeclaration`（Syntax） | 新增语法层标记接口：`FuncInit`、`ClassInit`、`AsyncFuncInit`、`NativeStatement`、`ExternStatement` 实现前者；`ImportStatement` 实现后者并保留 `IsDynamicImport`。自定义声明节点若要参与块内声明/导入分类，需实现对应接口。 |
 | `PatternType`、`AccessModifierType`、`ExternType`、`CallingConventionType`、`CSharpImportMode`（Runtime 程序集） | 同名类型（Syntax 程序集） | 命名空间和枚举值不变；直接使用这些类型的项目需引用 `Old8Lang.Syntax`，已编译的程序集需重新编译。 |
 

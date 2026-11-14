@@ -48,6 +48,11 @@
 
 ## 进度记录
 
+- 2026-11-14：`StringTemplateValue` 由 `LangValueType` 改为 `LangExpression` 并迁入 Syntax；
+  Runtime 生成节点 58 → 57，遗留 partial 保持 11。Parser 889、Interpreter 1967/1968（1 跳过）、
+  VM 1082、LSP 474/476（2 跳过）通过；Compiler.Expressions 41 项失败与基线一致。见
+  `Reports/2026-11-14-14-45-字符串模板迁移测试.md`。
+
 - 2026-11-14：`GenericInstanceExpression` 迁入 Syntax；类型注解转换、类型映射与泛型调用/实例化
   IL 辅助移入 `GenericInstanceExpressionRuntimeExtensions`。Runtime 生成节点 59 → 58，遗留 partial
   基线 12 → 11。Parser 889、Interpreter 1967/1968（1 跳过）、VM 1082、LSP 474/476（2 跳过）、

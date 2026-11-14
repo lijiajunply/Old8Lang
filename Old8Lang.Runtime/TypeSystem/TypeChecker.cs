@@ -158,7 +158,6 @@ public static class TypeChecker
             ThreadLangValue => "thread",
             TypeTemplate => "class",
             TypeLangValue => "type",
-            StringTemplateValue => "string",
             ErrorLangValue => "error",
             _ => "object"
         };
