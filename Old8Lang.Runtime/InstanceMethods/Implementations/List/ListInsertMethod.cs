@@ -43,13 +43,13 @@ public class ListInsertMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载索引参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载元素参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法
         var insertHelperMethod = typeof(ListInsertMethod).GetMethod(nameof(InsertHelper),

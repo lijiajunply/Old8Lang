@@ -245,7 +245,7 @@ public static class GenericClassSpecializer
         foreach (var (memberId, expression) in initializers)
         {
             var field = fieldMap[memberId.IdName];
-            expression.Accept(new CompilerVisitor(ilGenerator, initializerLocal));
+            expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, initializerLocal));
             var valueType = expression.Accept(new TypeInferenceVisitor(initializerLocal)) ?? typeof(object);
             if (field.FieldType == typeof(object) && valueType.IsValueType)
             {
@@ -463,7 +463,7 @@ public static class GenericClassSpecializer
         }
 
         // 生成方法体的IL代码
-        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIL, methodLocal));
+        funcValue.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIL, methodLocal));
 
         // 检查方法体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcValue.BlockStatement.Count > 0

@@ -16,7 +16,7 @@ internal static partial class LinqExpressionRuntimeExtensions
     internal static void GenerateLinqMethodCalls(this LinqExpression node, ILGenerator ilGenerator, LocalManager local)
     {
         // 1. 加载数据源
-        node.FromClause.DataSource.Accept(new CompilerVisitor(ilGenerator, local));
+        node.FromClause.DataSource.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 2. 转换为 IEnumerable
         node.ConvertToEnumerable(ilGenerator);

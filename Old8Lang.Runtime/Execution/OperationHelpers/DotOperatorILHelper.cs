@@ -108,14 +108,14 @@ public static class DotOperatorILHelper
             LangExpression call = instance.NamedArgs.Count > 0
                 ? new FunctionCallExpression(new LangId(memberName), instance.Ids, instance.NamedArgs, aliasId.Position)
                 : new FunctionCallExpression(new LangId(memberName), instance.Ids, aliasId.Position);
-            call.Accept(new CompilerVisitor(ilGenerator, local));
+            call.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             return call.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         }
 
         if (right is LangId memberId)
         {
             var value = new LangId(memberId.IdName, position: memberId.Position);
-            value.Accept(new CompilerVisitor(ilGenerator, local));
+            value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             return value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         }
 
@@ -130,7 +130,7 @@ public static class DotOperatorILHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        new ThisExpression().Accept(new CompilerVisitor(ilGenerator, local));
+        new ThisExpression().Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         if (right is not LangId rightId) return local.InClassEnv!;
 
         // 优先从 FieldVar 中查找字段（支持 TypeBuilder）
@@ -265,10 +265,10 @@ public static class DotOperatorILHelper
                 .FirstOrDefault(candidate => ParametersMatch(candidate.GetParameters(), argumentTypes));
             if (baseMethod is not null)
             {
-                new ThisExpression().Accept(new CompilerVisitor(ilGenerator, local));
+                new ThisExpression().Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
                 foreach (var argument in instance.Ids)
                 {
-                    argument.Accept(new CompilerVisitor(ilGenerator, local));
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
                 }
 
                 ilGenerator.Emit(OpCodes.Callvirt, baseMethod);
@@ -290,7 +290,7 @@ public static class DotOperatorILHelper
             {
                 foreach (var argument in instance.Ids)
                 {
-                    argument.Accept(new CompilerVisitor(ilGenerator, local));
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
                 }
 
                 ilGenerator.Emit(OpCodes.Call, staticMethod);
@@ -332,7 +332,7 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(OpCodes.Ldarg_0);
         foreach (var argument in instance.Ids)
         {
-            argument.Accept(new CompilerVisitor(ilGenerator, local));
+            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -428,7 +428,7 @@ public static class DotOperatorILHelper
             var parameters = assertMethod.GetParameters();
             for (int i = 0; i < instance.Ids.Count; i++)
             {
-                instance.Ids[i].Accept(new CompilerVisitor(ilGenerator, local));
+                instance.Ids[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
                 var idType = instance.Ids[i].Accept(new TypeInferenceVisitor(local));
                 var paramType = parameters[i].ParameterType;
 
@@ -491,7 +491,7 @@ public static class DotOperatorILHelper
         // 加载参数
         foreach (var instanceId in instance.Ids)
         {
-            instanceId.Accept(new CompilerVisitor(ilGenerator, local));
+            instanceId.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var idType = instanceId.Accept(new TypeInferenceVisitor(local));
             paramTypes.Add(idType!);
         }
@@ -648,7 +648,7 @@ public static class DotOperatorILHelper
         {
             // 加载列表/数组参数
             var listExpr = instance.Ids[0];
-            listExpr.Accept(new CompilerVisitor(ilGenerator, local));
+            listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 获取列表/数组类型
             var listType = listExpr.Accept(new TypeInferenceVisitor(local));
@@ -682,7 +682,7 @@ public static class DotOperatorILHelper
         {
             // 加载列表/数组参数
             var listExpr = instance.Ids[0];
-            listExpr.Accept(new CompilerVisitor(ilGenerator, local));
+            listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 获取列表/数组类型
             var listType = listExpr.Accept(new TypeInferenceVisitor(local));
@@ -722,7 +722,7 @@ public static class DotOperatorILHelper
         if (instance.Id.IdName == "Sqrt" && instance.Ids.Count == 0 &&
             leftType is not null && IsNumericType(leftType))
         {
-            left!.Accept(new CompilerVisitor(ilGenerator, local));
+            left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             if (leftType != typeof(double))
             {
                 ilGenerator.Emit(OpCodes.Conv_R8);
@@ -754,11 +754,11 @@ public static class DotOperatorILHelper
         }
 
         // 如果实例方法注册表中没有找到，继续使用原有的逻辑
-        left!.Accept(new CompilerVisitor(ilGenerator, local));
+        left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var types = new List<Type>();
         foreach (var instanceId in instance.Ids)
         {
-            instanceId.Accept(new CompilerVisitor(ilGenerator, local));
+            instanceId.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var idType = instanceId.Accept(new TypeInferenceVisitor(local));
             // 不装箱，保持原始类型
             types.Add(idType!);
@@ -962,10 +962,10 @@ public static class DotOperatorILHelper
                 $"锁定变量不支持方法 '{methodName}'");
         }
 
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         foreach (var argument in instance.Ids)
         {
-            argument.Accept(new CompilerVisitor(ilGenerator, local));
+            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var argumentType = argument.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (argumentType.IsValueType)
             {
@@ -990,7 +990,7 @@ public static class DotOperatorILHelper
         ILGenerator ilGenerator,
         LocalManager local)
     {
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var receiverType = left.Accept(new TypeInferenceVisitor(local));
         if (receiverType is { IsValueType: true })
         {
@@ -1005,7 +1005,7 @@ public static class DotOperatorILHelper
         {
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, index);
-            instance.Ids[index].Accept(new CompilerVisitor(ilGenerator, local));
+            instance.Ids[index].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var argumentType = instance.Ids[index].Accept(new TypeInferenceVisitor(local));
             if (argumentType is { IsValueType: true })
             {
@@ -1169,7 +1169,7 @@ public static class DotOperatorILHelper
     {
         if (leftType == typeof(LockedVariableLangValue) && id.IdName == "Value")
         {
-            left!.Accept(new CompilerVisitor(ilGenerator, local));
+            left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             ilGenerator.Emit(OpCodes.Callvirt,
                 typeof(LockedVariableLangValue).GetMethod(nameof(LockedVariableLangValue.GetIlValue))!);
             return typeof(object);
@@ -1243,7 +1243,7 @@ public static class DotOperatorILHelper
         }
 
         // 普通实例成员访问
-        left!.Accept(new CompilerVisitor(ilGenerator, local));
+        left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 泛型类特化尚未完成时，参数类型可能是当前的 TypeBuilder（例如
         // ComparableBox<T>.compare(other: ComparableBox<T>)）。DynamicMethod
@@ -1395,8 +1395,8 @@ public static class DotOperatorILHelper
         Type rightType,
         Operation operation)
     {
-        left!.Accept(new CompilerVisitor(ilGenerator, local));
-        right!.Accept(new CompilerVisitor(ilGenerator, local));
+        left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 处理不同类型的索引访问
         if (leftType == typeof(object[]))

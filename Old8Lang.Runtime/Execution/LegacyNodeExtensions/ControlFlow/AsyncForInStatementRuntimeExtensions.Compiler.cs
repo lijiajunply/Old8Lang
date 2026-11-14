@@ -22,7 +22,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
     internal static void GenerateDictionaryIl(this AsyncForInStatement node, ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -95,7 +95,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
         }
 
         // 生成循环体
-        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
@@ -124,7 +124,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
         
         // 获取异步枚举器
         var getAsyncEnumeratorMethod = asyncEnumerableType.GetMethod("GetAsyncEnumerator", [typeof(CancellationToken)])!;
-        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldc_I4_0); // 默认的CancellationToken
         ilGenerator.Emit(OpCodes.Newobj, typeof(CancellationToken).GetConstructor(Type.EmptyTypes)!);
         ilGenerator.Emit(OpCodes.Callvirt, getAsyncEnumeratorMethod);
@@ -196,7 +196,7 @@ internal static partial class AsyncForInStatementRuntimeExtensions
         }
         
         // 生成循环体
-        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

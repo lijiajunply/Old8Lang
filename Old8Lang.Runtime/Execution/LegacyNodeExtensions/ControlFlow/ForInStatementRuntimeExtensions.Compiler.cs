@@ -23,7 +23,7 @@ internal static partial class ForInStatementRuntimeExtensions
     internal static void GenerateDictionaryIl(this ForInStatement node, ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        node.Expression.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
 
@@ -120,7 +120,7 @@ internal static partial class ForInStatementRuntimeExtensions
         }
 
         // 生成循环体
-        node.Body.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Body.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);

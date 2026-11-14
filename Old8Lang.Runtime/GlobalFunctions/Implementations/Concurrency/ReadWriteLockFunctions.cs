@@ -81,7 +81,7 @@ public sealed class ReadLockAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.AcquireReadLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireReadLock));
@@ -129,7 +129,7 @@ public sealed class ReadLockReleaseFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.ReleaseReadLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseReadLock));
@@ -177,7 +177,7 @@ public sealed class WriteLockAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.AcquireWriteLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireWriteLock));
@@ -225,7 +225,7 @@ public sealed class WriteLockReleaseFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.ReleaseWriteLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReleaseWriteLock));
@@ -274,10 +274,10 @@ public sealed class ReadLockTryAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.TryAcquireReadLock(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireReadLock));
@@ -326,10 +326,10 @@ public sealed class WriteLockTryAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 timeoutMs 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.TryAcquireWriteLock(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryAcquireWriteLock));
@@ -377,7 +377,7 @@ public sealed class ReadWriteLockDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeReadWriteLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeReadWriteLock));

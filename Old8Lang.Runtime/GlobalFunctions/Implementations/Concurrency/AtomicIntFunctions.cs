@@ -41,7 +41,7 @@ public sealed class AtomicIntCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 initialValue 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.CreateAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateAtomicInt));
@@ -88,7 +88,7 @@ public sealed class AtomicIntGetFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.GetAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetAtomicInt));
@@ -136,10 +136,10 @@ public sealed class AtomicIntSetFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 newValue 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.SetAtomicInt(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.SetAtomicInt));
@@ -188,7 +188,7 @@ public sealed class AtomicIntIncrementFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.IncrementAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.IncrementAtomicInt));
@@ -235,7 +235,7 @@ public sealed class AtomicIntDecrementFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.DecrementAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DecrementAtomicInt));
@@ -283,10 +283,10 @@ public sealed class AtomicIntAddFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 delta 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.AddAtomicInt(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AddAtomicInt));
@@ -336,13 +336,13 @@ public sealed class AtomicIntCompareAndSetFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 expectedValue 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 newValue 参数
-        parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.CompareAndSetAtomicInt(int, int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CompareAndSetAtomicInt));
@@ -391,7 +391,7 @@ public sealed class AtomicIntDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeAtomicInt));

@@ -64,10 +64,10 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载类名参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载参数列表
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 manager 参数
         var interpreterField = typeof(LocalManager).GetField("Interpreter");
@@ -205,10 +205,10 @@ public sealed class IsInstanceOfFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载类名参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.IsInstanceOf(object, string)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.IsInstanceOf));

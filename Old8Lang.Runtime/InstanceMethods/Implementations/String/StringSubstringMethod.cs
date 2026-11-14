@@ -78,15 +78,15 @@ public class StringSubstringMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载起始索引
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         if (parameters.Count > 1)
         {
             // 加载长度
-            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             var helperMethod = typeof(StringSubstringMethod).GetMethod(nameof(SubstringWithLengthHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

@@ -167,7 +167,7 @@ internal static class InOperatorHelper
         Operation operation)
     {
         // 加载左侧值
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var leftInType = left.Accept(new TypeInferenceVisitor(local));
 
         // 确保左侧值是 object 类型（装箱值类型）
@@ -177,7 +177,7 @@ internal static class InOperatorHelper
         }
 
         // 加载右侧集合
-        right.Accept(new CompilerVisitor(ilGenerator, local));
+        right.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 根据集合类型生成不同的检查代码
         if (rightType is null)

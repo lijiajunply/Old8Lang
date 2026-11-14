@@ -54,7 +54,7 @@ public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanc
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         var helperMethod = typeof(LangListElementAtMethod).GetMethod(nameof(ElementAtNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

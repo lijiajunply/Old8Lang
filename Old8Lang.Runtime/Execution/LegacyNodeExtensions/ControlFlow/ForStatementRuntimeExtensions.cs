@@ -82,7 +82,7 @@ internal static class ForStatementRuntimeExtensions
         }
 
         // 先按未遮蔽的状态求值 `for i <- ...` 的右侧。
-        node.Init.Value.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Init.Value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var loopLocal = ilGenerator.DeclareLocal(type);
         ilGenerator.Emit(OpCodes.Stloc, loopLocal);
 

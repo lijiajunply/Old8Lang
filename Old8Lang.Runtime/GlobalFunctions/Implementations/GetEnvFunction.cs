@@ -35,7 +35,7 @@ public sealed class GetEnvFunction : BaseGlobalFunction
     {
         // 加载参数（环境变量名）
         var keyExpr = parameters[0];
-        keyExpr.Accept(new CompilerVisitor(ilGenerator, local));
+        keyExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 转换为字符串
         var keyType = keyExpr.Accept(new TypeInferenceVisitor(local));

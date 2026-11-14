@@ -81,7 +81,7 @@ public sealed class CancelFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.Cancel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.Cancel));
@@ -130,10 +130,10 @@ public sealed class CancelAfterFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 delayMs 参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.CancelAfter(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CancelAfter));
@@ -182,7 +182,7 @@ public sealed class DisposeCancellationTokenSourceFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 ctsId 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ResourceManager.DisposeCancellationTokenSource(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCancellationTokenSource));

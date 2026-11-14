@@ -1,5 +1,6 @@
 using Old8Lang.ModuleSystem.StandardLibrary;
 using Old8Lang.Modules.Abstractions;
+using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using Old8Lang.Profiler;
 using Old8Lang.Bytecode;
@@ -21,6 +22,7 @@ public sealed class Old8HostBuilder : IStandardLibraryRegistry
     public Old8HostBuilder()
     {
         InterpreterBackend.Register();
+        CompilerBackend.Register();
     }
 
     /// <summary>

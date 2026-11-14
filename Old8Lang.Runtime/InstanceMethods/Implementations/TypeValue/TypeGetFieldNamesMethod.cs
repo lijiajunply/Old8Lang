@@ -37,7 +37,7 @@ public class TypeGetFieldNamesMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载 TypeLangValue 实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 VariateManager
         ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);

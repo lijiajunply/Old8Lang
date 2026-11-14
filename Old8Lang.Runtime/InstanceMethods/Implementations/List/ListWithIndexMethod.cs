@@ -41,7 +41,7 @@ public class ListWithIndexMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         var helperMethod = typeof(ListWithIndexMethod).GetMethod(nameof(WithIndexHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

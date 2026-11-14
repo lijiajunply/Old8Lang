@@ -98,10 +98,10 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载比较器函数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(ListSortWithComparerMethod).GetMethod(nameof(SortWithComparerHelper),

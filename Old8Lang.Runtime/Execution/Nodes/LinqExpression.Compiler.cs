@@ -59,7 +59,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算条件表达式
-        whereClause.Condition.Accept(new CompilerVisitor(ilGenerator, local));
+        whereClause.Condition.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 检查条件是否为真
         node.GenerateIsTruthy(ilGenerator);
@@ -131,7 +131,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算投影表达式
-        selectClause.Projection.Accept(new CompilerVisitor(ilGenerator, local));
+        selectClause.Projection.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 保存投影结果
         ilGenerator.Emit(OpCodes.Stloc, projectionLocal);
@@ -246,7 +246,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算let表达式
-        letClause.Expression.Accept(new CompilerVisitor(ilGenerator, local));
+        letClause.Expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Stloc, letVarLocal);
 
         // 添加当前元素到结果列表
@@ -310,12 +310,12 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
 
         // 计算分组键
-        groupByClause.KeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
+        groupByClause.KeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 计算分组元素
-        groupByClause.ElementExpression.Accept(new CompilerVisitor(ilGenerator, local));
+        groupByClause.ElementExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, elementLocal);
 
@@ -370,7 +370,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.MarkLabel(copyOuterLoopEnd);
 
         // 加载内部数据源
-        joinClause.InnerDataSource.Accept(new CompilerVisitor(ilGenerator, local));
+        joinClause.InnerDataSource.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ConvertToEnumerableStatic(ilGenerator);
 
         // 将内部数据源复制到列表
@@ -440,7 +440,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, outerRangeVarLocal);
 
         // 计算外部键
-        joinClause.OuterKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
+        joinClause.OuterKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         node.GenerateConvertFromLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, outerKeyLocal);
 
@@ -475,7 +475,7 @@ internal static partial class LinqExpressionRuntimeExtensions
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
-            joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
+            joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             node.GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
@@ -539,7 +539,7 @@ internal static partial class LinqExpressionRuntimeExtensions
             ilGenerator.Emit(OpCodes.Stloc, innerRangeVarLocal);
 
             // 计算内部键
-            joinClause.InnerKeyExpression.Accept(new CompilerVisitor(ilGenerator, local));
+            joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             node.GenerateConvertFromLangValue(ilGenerator);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 

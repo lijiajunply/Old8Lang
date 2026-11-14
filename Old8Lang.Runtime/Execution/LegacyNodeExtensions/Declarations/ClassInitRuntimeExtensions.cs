@@ -258,7 +258,7 @@ public static partial class ClassInitRuntimeExtensions
             };
 
             // 加载字段的初始值
-            initExpr.Accept(new CompilerVisitor(ctorIl, tempLocal));
+            initExpr.Accept(RuntimeVisitors.CreateCompiler(ctorIl, tempLocal));
 
             var initializerType = initExpr.Accept(new TypeInferenceVisitor(tempLocal)) ?? typeof(object);
             if (fieldBuilder.FieldType == typeof(object) && initializerType.IsValueType)
@@ -492,7 +492,7 @@ public static partial class ClassInitRuntimeExtensions
         }
 
         // 生成方法体的IL代码
-        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIl, methodLocal));
+        funcValue.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, methodLocal));
 
         // 检查方法体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcValue.BlockStatement.Count > 0

@@ -70,3 +70,24 @@ Runtime 通过 `Old8Lang.AST.Visitor.RuntimeVisitors` 契约接收解释执行�
 
 `LangInterpreter`、`VariateManager`、`ScopeLayer` 仍位于 Runtime：它们是运行时值与实例方法
 共同依赖的解释期状态，尚未完成接口化。IL 与 VM 后端仍在 Runtime 中。
+
+## 阶段 3.2：IL 后端程序集（2026-11-14）
+
+```text
+Old8Lang.App / LanguageServer / Benchmarks / Tests
+                     ↓
+                   Hosting
+        ↙            ↓             ↘
+Old8Lang.Interpreter  Old8Lang.Compiler  Old8Lang.Runtime
+        ↘             ↓             ↙
+   Core / Concurrency / Modules.Abstractions / Observability / ProjectSystem / Syntax
+```
+
+`Old8Lang.Compiler` 只引用 `Old8Lang.Runtime`，不引用解释、VM 后端或官方模块；Runtime 通过
+`RuntimeVisitors.CreateCompiler` 契约接收 IL 访问器，不再直接构造 `CompilerVisitor`。
+Hosting 组合根同时注册解释与 IL 后端。`BackendAssemblyBoundaryTests` 固化三个后端的
+「只依赖 Runtime」与「Runtime 不直接构造访问器」门禁。
+
+`Compiler/` 引擎（`Compiler.Compile`、`LocalManager`、`RuntimeGlobals`、异步状态机、
+特化/验证辅助）仍在 Runtime：`LocalManager` 是 `IInstanceMethod` 与类型推断共用的编译契约，
+运行时值也保留 IL 辅助方法。完整引擎迁移需要先抽象这些契约。VM 后端仍在 Runtime 中。

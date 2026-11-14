@@ -35,6 +35,6 @@ public static class ExecutionModeDispatcher
         ArgumentNullException.ThrowIfNull(ilGenerator);
         ArgumentNullException.ThrowIfNull(local);
 
-        _ = statement.Accept(new CompilerVisitor(ilGenerator, local));
+        _ = statement.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
     }
 }

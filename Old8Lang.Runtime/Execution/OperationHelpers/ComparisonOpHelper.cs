@@ -101,8 +101,8 @@ internal static class ComparisonOpHelper
         if (gtLeftType != null && typeof(LangObject).IsAssignableFrom(gtLeftType))
         {
             // 生成调用 _gt 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (gtRightType is { IsValueType: true })
@@ -120,8 +120,8 @@ internal static class ComparisonOpHelper
         if (gtLeftType == typeof(AnyLangValue) || gtLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Greater 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (gtRightType != null && !typeof(LangValueType).IsAssignableFrom(gtRightType))
@@ -136,8 +136,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsNumericComparison(gtLeftType, gtRightType))
@@ -176,8 +176,8 @@ internal static class ComparisonOpHelper
         if (ltLeftType != null && typeof(LangObject).IsAssignableFrom(ltLeftType))
         {
             // 生成调用 _lt 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (ltRightType is { IsValueType: true })
@@ -195,8 +195,8 @@ internal static class ComparisonOpHelper
         if (ltLeftType == typeof(AnyLangValue) || ltLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Less 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (ltRightType != null && !typeof(LangValueType).IsAssignableFrom(ltRightType))
@@ -211,8 +211,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 处理 ForIn 循环中变量的特殊情况（object vs int）
         if (IsObjectVsNumericComparison(ltLeftType, ltRightType))
@@ -251,8 +251,8 @@ internal static class ComparisonOpHelper
         if (leftOpType != null && typeof(LangObject).IsAssignableFrom(leftOpType))
         {
             // 生成调用 _eq 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightOpType is { IsValueType: true })
@@ -270,8 +270,8 @@ internal static class ComparisonOpHelper
         if (leftOpType == typeof(AnyLangValue) || leftOpType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Equals 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightOpType != null && !typeof(LangValueType).IsAssignableFrom(rightOpType))
@@ -286,8 +286,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 如果都是字符串，使用字符串比较
         if (leftOpType == typeof(string) && rightOpType == typeof(string))
@@ -326,8 +326,8 @@ internal static class ComparisonOpHelper
         var leftOpType = left?.Accept(new TypeInferenceVisitor(local));
         var rightOpType = right?.Accept(new TypeInferenceVisitor(local));
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 字符串按值比较，否则 Ceq 只比较引用
         if (leftOpType == typeof(string) && rightOpType == typeof(string))
@@ -370,8 +370,8 @@ internal static class ComparisonOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _le 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -389,8 +389,8 @@ internal static class ComparisonOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 LessEqual 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -405,8 +405,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
         if (IsObjectVsNumericComparison(leftType, rightType))
@@ -445,8 +445,8 @@ internal static class ComparisonOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _ge 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -464,8 +464,8 @@ internal static class ComparisonOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 GreaterEqual 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -480,8 +480,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // object 与 int 混用（如未注解的函数参数）：装箱后按 IComparable 比较
         if (IsObjectVsNumericComparison(leftType, rightType))

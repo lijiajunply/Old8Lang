@@ -20,6 +20,7 @@
     <!-- 解释后端迁出后仍复用 Runtime 内部的执行辅助，先以 friend assembly 固定边界；
          公开 API 收敛后再移除。 -->
     <InternalsVisibleTo Include="Old8Lang.Interpreter" />
+    <InternalsVisibleTo Include="Old8Lang.Compiler" />
   </ItemGroup>
 
   <ItemGroup>

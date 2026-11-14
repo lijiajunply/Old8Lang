@@ -73,8 +73,8 @@ public class LangListZipMethod : BaseLangListMethod
     {
         if (parameters.Count == 1)
         {
-            instance.Accept(new CompilerVisitor(ilGenerator, local));
-            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+            instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             var helperMethod = typeof(LangListZipMethod).GetMethod(nameof(ZipHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

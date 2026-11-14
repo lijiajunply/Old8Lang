@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Syntax", "Old8Lang
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Interpreter", "Old8Lang.Interpreter\Old8Lang.Interpreter.csproj", "{97DA632E-9103-4D42-A4DD-61A0C357A662}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Compiler", "Old8Lang.Compiler\Old8Lang.Compiler.csproj", "{831C941E-C73F-4631-8D27-4FAE59B1648E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -290,6 +292,18 @@ Global
 		{97DA632E-9103-4D42-A4DD-61A0C357A662}.Release|x64.Build.0 = Release|Any CPU
 		{97DA632E-9103-4D42-A4DD-61A0C357A662}.Release|x86.ActiveCfg = Release|Any CPU
 		{97DA632E-9103-4D42-A4DD-61A0C357A662}.Release|x86.Build.0 = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|x64.Build.0 = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Debug|x86.Build.0 = Debug|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|x64.ActiveCfg = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|x64.Build.0 = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|x86.ActiveCfg = Release|Any CPU
+		{831C941E-C73F-4631-8D27-4FAE59B1648E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

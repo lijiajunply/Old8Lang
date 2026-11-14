@@ -40,7 +40,7 @@ public class StringToBase64Method : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         var helperMethod = typeof(StringToBase64Method).GetMethod(nameof(ToBase64Helper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

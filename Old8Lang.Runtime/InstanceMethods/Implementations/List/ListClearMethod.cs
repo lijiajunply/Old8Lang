@@ -34,7 +34,7 @@ public class ListClearMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取 Values 字段
         var valuesField = typeof(ListLangValue).GetField("Values");

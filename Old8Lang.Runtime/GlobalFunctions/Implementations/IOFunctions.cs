@@ -199,7 +199,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
         }
 
         var expr = parameters[0];
-        expr.Accept(new CompilerVisitor(ilGenerator, local));
+        expr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var exprType = expr.Accept(new TypeInferenceVisitor(local));
 
         if (exprType != typeof(string))

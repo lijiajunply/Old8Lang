@@ -86,10 +86,10 @@ public sealed class GetMemberInfoFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载成员名参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.GetMemberInfo(object, string)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetMemberInfo));

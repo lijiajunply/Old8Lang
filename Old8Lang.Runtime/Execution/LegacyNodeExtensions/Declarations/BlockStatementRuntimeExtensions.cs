@@ -105,7 +105,7 @@ public static class BlockStatementRuntimeExtensions
     {
         foreach (var statement in block.ImportStatements)
         {
-            statement.Accept(new CompilerVisitor(ilGenerator, local));
+            statement.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
 
         if (!includeBody) return;
@@ -114,7 +114,7 @@ public static class BlockStatementRuntimeExtensions
         {
             // 导入语句已由上面的循环处理，避免重复
             if (statement is ImportStatement) continue;
-            statement.Accept(new CompilerVisitor(ilGenerator, local));
+            statement.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
     }
 

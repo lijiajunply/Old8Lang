@@ -56,13 +56,13 @@ public class ArraySliceMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         if (parameters.Count == 3)
         {
-            parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
         else
         {

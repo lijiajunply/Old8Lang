@@ -29,7 +29,7 @@ public class ValueTypeToIntMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取实例类型
         var instanceType = instance.Accept(new TypeInferenceVisitor(local));

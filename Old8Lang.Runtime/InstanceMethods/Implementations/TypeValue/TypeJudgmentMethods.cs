@@ -30,7 +30,7 @@ public class TypeIsInterfaceMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(LangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsInterfaceMethod).GetMethod(nameof(IsInterfaceHelper),
@@ -79,7 +79,7 @@ public class TypeIsPrimitiveMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var helperMethod = typeof(TypeIsPrimitiveMethod).GetMethod(nameof(IsPrimitiveHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
@@ -122,7 +122,7 @@ public class TypeIsGenericMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(LangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsGenericMethod).GetMethod(nameof(IsGenericHelper),
@@ -178,8 +178,8 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(LangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsAssignableFromMethod).GetMethod(nameof(IsAssignableFromHelper),

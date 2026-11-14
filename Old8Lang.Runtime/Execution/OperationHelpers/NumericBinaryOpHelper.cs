@@ -34,7 +34,7 @@ internal static class NumericBinaryOpHelper
         bool allowObjectUnboxing = true)
     {
         // 加载左操作数
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 如果左操作数是object类型且允许拆箱，拆箱为int
         if (allowObjectUnboxing && leftType == typeof(object))
@@ -44,7 +44,7 @@ internal static class NumericBinaryOpHelper
         }
 
         // 加载右操作数
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 如果右操作数是object类型且允许拆箱，拆箱为int
         if (allowObjectUnboxing && rightType == typeof(object))
@@ -110,8 +110,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _add 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -129,8 +129,8 @@ internal static class NumericBinaryOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Plus 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -173,8 +173,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _sub 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -192,8 +192,8 @@ internal static class NumericBinaryOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Minus 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -237,8 +237,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _mul 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -296,8 +296,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _div 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -315,8 +315,8 @@ internal static class NumericBinaryOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Divide 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -359,8 +359,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _mod 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -378,8 +378,8 @@ internal static class NumericBinaryOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Mod 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -422,8 +422,8 @@ internal static class NumericBinaryOpHelper
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
             // 生成调用 _pow 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数是值类型，需要装箱
             if (rightType is { IsValueType: true })
@@ -441,8 +441,8 @@ internal static class NumericBinaryOpHelper
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
             // 生成调用 Power 方法的 IL 代码
-            left?.Accept(new CompilerVisitor(ilGenerator, local));
-            right?.Accept(new CompilerVisitor(ilGenerator, local));
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 如果右操作数不是 LangValueType，需要装箱
             if (rightType != null && !typeof(LangValueType).IsAssignableFrom(rightType))
@@ -457,8 +457,8 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
-        left?.Accept(new CompilerVisitor(ilGenerator, local));
-        right?.Accept(new CompilerVisitor(ilGenerator, local));
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 确保两个操作数都是double类型，因为Math.Pow需要double参数
         if (leftType == typeof(int))

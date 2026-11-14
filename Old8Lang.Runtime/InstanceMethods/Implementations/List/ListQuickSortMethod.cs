@@ -95,7 +95,7 @@ public class ListQuickSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(ListQuickSortMethod).GetMethod(nameof(QuickSortHelper),

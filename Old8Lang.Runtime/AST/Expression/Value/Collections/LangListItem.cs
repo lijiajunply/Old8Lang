@@ -29,7 +29,7 @@ public partial class LangListItem(LangId listId, LangExpression key, SourcePosit
     /// </summary>
     internal void EmitIntIndex(ILGenerator ilGenerator, LocalManager local)
     {
-        Key.Accept(new CompilerVisitor(ilGenerator, local));
+        Key.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var keyType = Key.Accept(new TypeInferenceVisitor(local));
 
         if (keyType == typeof(object))

@@ -81,7 +81,7 @@ public static class TypeCheckILHelper
         {
             var typeName = rightLangId.IdName;
             // 加载左侧值
-            left.Accept(new CompilerVisitor(ilGenerator, local));
+            left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             // 根据类型名称生成转换指令
             var targetType = GetTargetType(typeName) ?? typeof(object);
@@ -112,7 +112,7 @@ public static class TypeCheckILHelper
         }
 
         // 非LangId类型，返回object类型
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         return typeof(object);
     }
 
@@ -172,7 +172,7 @@ public static class TypeCheckILHelper
             var targetType = GetTargetType(typeName);
 
             // 加载左侧值
-            left.Accept(new CompilerVisitor(ilGenerator, local));
+            left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             if (targetType is null && typeName == "null")
             {
@@ -195,7 +195,7 @@ public static class TypeCheckILHelper
         }
 
         // 非LangId类型，返回false
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Pop);
         ilGenerator.Emit(OpCodes.Ldc_I4_0);
         return typeof(bool);
@@ -237,7 +237,7 @@ public static class TypeCheckILHelper
             var targetType = GetTargetType(typeName);
 
             // 加载左侧值
-            left.Accept(new CompilerVisitor(ilGenerator, local));
+            left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             if (targetType is null && typeName == "null")
             {
@@ -262,7 +262,7 @@ public static class TypeCheckILHelper
         }
 
         // 非LangId类型，返回true
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Pop);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         return typeof(bool);
@@ -326,7 +326,7 @@ public static class TypeCheckILHelper
 
         // 不是 null，检查具体类型
         ilGenerator.Emit(OpCodes.Pop); // 弹出栈顶
-        left.Accept(new CompilerVisitor(ilGenerator, local));
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         if (leftType is not null && leftType.IsValueType)
         {
             ilGenerator.Emit(OpCodes.Box, leftType);

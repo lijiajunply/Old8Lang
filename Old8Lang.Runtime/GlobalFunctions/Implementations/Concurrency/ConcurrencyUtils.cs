@@ -40,7 +40,7 @@ public sealed class SleepFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 milliseconds 参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 Thread.Sleep(int)
         var method = typeof(Thread).GetMethod(nameof(Thread.Sleep), [typeof(int)]);

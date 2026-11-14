@@ -41,14 +41,14 @@ public class ListAddListMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取 Values 字段
         var valuesField = typeof(ListLangValue).GetField("Values");
         ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
 
         // 加载另一个列表参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法
         var addListHelperMethod = typeof(ListAddListMethod).GetMethod(nameof(AddListHelper),

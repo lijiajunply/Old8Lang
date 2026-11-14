@@ -20,7 +20,7 @@ public static class IlPrintHelper
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, i);
             var expression = parameters[i];
-            expression.Accept(new CompilerVisitor(il, local));
+            expression.Accept(RuntimeVisitors.CreateCompiler(il, local));
             var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (type == typeof(void))
             {

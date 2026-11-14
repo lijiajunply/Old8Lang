@@ -1,4 +1,6 @@
+using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Visitor;
@@ -41,4 +43,34 @@ public static class RuntimeVisitors
     /// 是否存在已注册的解释后端。
     /// </summary>
     public static bool HasInterpreter => _interpreterFactory is not null;
+
+    private static Func<ILGenerator, LocalManager, IRuntimeVisitor<object?>>? _compilerFactory;
+
+    /// <summary>
+    /// 注册 IL 后端访问器工厂。
+    /// </summary>
+    public static void RegisterCompiler(Func<ILGenerator, LocalManager, IRuntimeVisitor<object?>> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        _compilerFactory = factory;
+    }
+
+    /// <summary>
+    /// 创建一个 IL 生成访问器。未注册时说明组合根缺少 IL 后端程序集。
+    /// </summary>
+    public static IRuntimeVisitor<object?> CreateCompiler(ILGenerator ilGenerator, LocalManager local)
+    {
+        ArgumentNullException.ThrowIfNull(ilGenerator);
+        ArgumentNullException.ThrowIfNull(local);
+
+        var factory = _compilerFactory ?? throw new InvalidOperationException(
+            "IL 后端尚未注册：请引用 Old8Lang.Compiler 并在组合根调用 CompilerBackend.Register()。");
+
+        return factory(ilGenerator, local);
+    }
+
+    /// <summary>
+    /// 是否存在已注册的 IL 后端。
+    /// </summary>
+    public static bool HasCompiler => _compilerFactory is not null;
 }

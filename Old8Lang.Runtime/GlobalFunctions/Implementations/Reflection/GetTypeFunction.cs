@@ -60,7 +60,7 @@ public sealed class GetTypeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载类型名参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.GetType(string)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetType));

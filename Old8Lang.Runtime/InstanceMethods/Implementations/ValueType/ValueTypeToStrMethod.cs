@@ -32,7 +32,7 @@ public class ValueTypeToStrMethod : BaseValueTypeMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 保留原始值，以便异常包装对象也能使用其 ToString 实现。
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var instanceType = instance.Accept(new TypeInferenceVisitor(local));
         if (instance is not FuncLangValue && instanceType is { IsValueType: true })
         {

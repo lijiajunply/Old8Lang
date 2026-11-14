@@ -140,7 +140,7 @@ internal static class GenericInstanceExpressionRuntimeExtensions
         {
             foreach (var arg in node.CallArguments)
             {
-                arg.Accept(new CompilerVisitor(ilGenerator, local));
+                arg.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             }
         }
 
@@ -183,7 +183,7 @@ internal static class GenericInstanceExpressionRuntimeExtensions
             var argTypes = new Type[argCount];
             for (int i = 0; i < argCount; i++)
             {
-                node.CallArguments![i].Accept(new CompilerVisitor(ilGenerator, local));
+                node.CallArguments![i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
                 argTypes[i] = node.CallArguments[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             }
 

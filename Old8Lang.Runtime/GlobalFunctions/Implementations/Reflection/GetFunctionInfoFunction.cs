@@ -80,12 +80,12 @@ public sealed class GetFunctionInfoFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载第一个参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 如果有第二个参数，也加载
         if (parameters.Count == 2)
         {
-            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             // 调用 ReflectionHelper.GetFunctionInfo(object, string)
             var method = GlobalMethodInfoCache.GetMethod(
                 typeof(ReflectionHelper),

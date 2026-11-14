@@ -50,10 +50,10 @@ public sealed class GetFieldFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载字段名参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.GetField(object, string)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetField));
@@ -131,13 +131,13 @@ public sealed class SetFieldFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载字段名参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载值参数
-        parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.SetField(object, string, object)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.SetField));

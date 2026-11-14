@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Old8Lang.Modules.Abstractions\Old8Lang.Modules.Abstractions.csproj" />
     <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
     <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
+    <ProjectReference Include="..\Old8Lang.Compiler\Old8Lang.Compiler.csproj" />
     <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
   </ItemGroup>
 

@@ -218,7 +218,7 @@ public class ExtensionMethodWrapper(
 
     private static void EmitLoadBoxed(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
     {
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
+        expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         if (expression is FuncLangValue or LambdaExpression)
         {

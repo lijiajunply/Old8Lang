@@ -66,7 +66,7 @@ public class ListFindAllMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 谓词：编译好的委托 -> 函数值
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.WrapFunction))!);
 
         var helperMethod = typeof(ListFindAllMethod).GetMethod(nameof(FindAllHelper),

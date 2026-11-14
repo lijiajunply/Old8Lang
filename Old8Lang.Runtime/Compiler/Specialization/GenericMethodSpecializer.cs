@@ -355,7 +355,7 @@ public static class GenericMethodSpecializer
         GenericTypeResolver resolver)
     {
         // 使用特化的类型信息生成方法体
-        funcValue.BlockStatement.Accept(new CompilerVisitor(methodIl, funcLocal));
+        funcValue.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, funcLocal));
     }
 
     /// <summary>

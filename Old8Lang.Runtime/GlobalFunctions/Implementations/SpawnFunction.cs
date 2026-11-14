@@ -139,7 +139,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         // spawn(f, args...)：把函数编译成委托、额外参数打包成 Old8Lang 值数组，交给运行期 helper 创建线程
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         ilGenerator.Emit(OpCodes.Call,
             typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
                 nameof(InstanceMethods.Core.IlValueBridge.WrapFunction))!);
@@ -152,7 +152,7 @@ public sealed class SpawnFunction : BaseGlobalFunction
         {
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i - 1);
-            parameters[i].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var argumentType = parameters[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (argumentType.IsValueType)
             {

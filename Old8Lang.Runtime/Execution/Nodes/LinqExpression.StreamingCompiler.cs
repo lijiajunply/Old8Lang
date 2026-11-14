@@ -37,7 +37,7 @@ internal static partial class LinqExpressionRuntimeExtensions
 
         try
         {
-            node.FromClause.DataSource.Accept(new CompilerVisitor(il, local));
+            node.FromClause.DataSource.Accept(RuntimeVisitors.CreateCompiler(il, local));
             var sourceType = node.FromClause.DataSource.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             if (sourceType.IsValueType)
             {
@@ -77,7 +77,7 @@ internal static partial class LinqExpressionRuntimeExtensions
             {
                 if (clause is LetClause let)
                 {
-                    let.Expression.Accept(new CompilerVisitor(il, local));
+                    let.Expression.Accept(RuntimeVisitors.CreateCompiler(il, local));
                     var type = let.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     var variable = il.DeclareLocal(type);
                     il.Emit(OpCodes.Stloc, variable);
@@ -85,7 +85,7 @@ internal static partial class LinqExpressionRuntimeExtensions
                 }
                 else if (clause is WhereClause where)
                 {
-                    where.Condition.Accept(new CompilerVisitor(il, local));
+                    where.Condition.Accept(RuntimeVisitors.CreateCompiler(il, local));
                     var type = where.Condition.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (type.IsValueType)
                     {
@@ -99,7 +99,7 @@ internal static partial class LinqExpressionRuntimeExtensions
             void EmitProjection()
             {
                 il.Emit(OpCodes.Ldloc, result);
-                select.Projection.Accept(new CompilerVisitor(il, local));
+                select.Projection.Accept(RuntimeVisitors.CreateCompiler(il, local));
                 var projectionType = select.Projection.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                 if (projectionType.IsValueType)
                 {
@@ -126,7 +126,7 @@ internal static partial class LinqExpressionRuntimeExtensions
                     il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Ldc_I4, i);
                     var expression = orderBy.Orderings[i].KeyExpression;
-                    expression.Accept(new CompilerVisitor(il, local));
+                    expression.Accept(RuntimeVisitors.CreateCompiler(il, local));
                     var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                     if (type.IsValueType)
                     {

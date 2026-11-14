@@ -258,7 +258,7 @@ public partial class AsyncFuncLangValue : ImportInfo
             local.ReturnLabel = returnLabel;
 
             ilGenerator.BeginExceptionBlock();
-            BlockStatement.Accept(new CompilerVisitor(ilGenerator, local));
+            BlockStatement.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             if (BlockStatement.Count == 0 || BlockStatement[^1] is not ReturnStatement)
             {

@@ -93,12 +93,12 @@ internal static class SetStatementRuntimeExtensions
             (node.Id.AssumptionType.Equals("dict", StringComparison.OrdinalIgnoreCase) ||
              node.Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
         {
-            new DictionaryLangValue(position: node.Value.Position).Accept(new CompilerVisitor(ilGenerator, local));
+            new DictionaryLangValue(position: node.Value.Position).Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             valueType = typeof(Dictionary<object, object>);
         }
         else
         {
-            node.Value.Accept(new CompilerVisitor(ilGenerator, local));
+            node.Value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             valueType = node.ComputeGlobalValueType(local);
         }
 

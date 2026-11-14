@@ -57,7 +57,7 @@ public sealed class TypeOfFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.TypeOf(object)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.TypeOf));

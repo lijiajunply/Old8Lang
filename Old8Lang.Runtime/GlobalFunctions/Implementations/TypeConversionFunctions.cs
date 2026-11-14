@@ -59,7 +59,7 @@ public sealed class IntFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.Accept(new CompilerVisitor(ilGenerator, local));
+        param.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 int 类型，直接返回
@@ -193,7 +193,7 @@ public sealed class DoubleFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.Accept(new CompilerVisitor(ilGenerator, local));
+        param.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 double 类型，直接返回
@@ -320,7 +320,7 @@ public sealed class CharFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.Accept(new CompilerVisitor(ilGenerator, local));
+        param.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 char 类型，直接返回
@@ -441,7 +441,7 @@ public sealed class BoolFunction : BaseGlobalFunction
         LocalManager local, SourcePosition position)
     {
         var param = parameters[0];
-        param.Accept(new CompilerVisitor(ilGenerator, local));
+        param.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = param.Accept(new TypeInferenceVisitor(local))!;
 
         // 如果已经是 bool 类型，直接返回

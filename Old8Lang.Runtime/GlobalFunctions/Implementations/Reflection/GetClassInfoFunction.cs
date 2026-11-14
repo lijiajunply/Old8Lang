@@ -86,7 +86,7 @@ public sealed class GetClassInfoFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 ReflectionHelper.GetClassInfo(object)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.GetClassInfo));

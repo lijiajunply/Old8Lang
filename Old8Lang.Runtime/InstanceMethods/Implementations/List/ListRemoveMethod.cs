@@ -86,14 +86,14 @@ public class ListRemoveMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载列表实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取 Values 字段
         var valuesField = typeof(ListLangValue).GetField("Values");
         ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
 
         // 加载要移除的元素
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法来移除元素
         var removeHelperMethod = typeof(ListRemoveMethod).GetMethod(nameof(RemoveHelper),

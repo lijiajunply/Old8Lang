@@ -58,13 +58,13 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载对象参数
-        parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载方法名参数
-        parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载参数列表
-        parameters[2].Accept(new CompilerVisitor(ilGenerator, local));
+        parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 manager 参数（需要从某处获取）
         // 这里我们需要传递当前的 VariateManager

@@ -194,7 +194,7 @@ public partial class Instance : LangValueType
             ilGenerator.Emit(OpCodes.Dup);
             ilGenerator.Emit(OpCodes.Ldc_I4, i);
             var argument = Ids[i];
-            argument.Accept(new CompilerVisitor(ilGenerator, local));
+            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var argumentType = argument.Accept(new TypeInferenceVisitor(local));
             if (argumentType?.IsValueType == true)
             {

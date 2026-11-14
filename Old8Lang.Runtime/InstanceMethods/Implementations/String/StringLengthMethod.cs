@@ -34,7 +34,7 @@ public class StringLengthMethod : BaseInstanceMethod
         var instanceType = instance.Accept(new TypeInferenceVisitor(local));
         if (instanceType == typeof(string))
         {
-            instance.Accept(new CompilerVisitor(ilGenerator, local));
+            instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
         else
         {

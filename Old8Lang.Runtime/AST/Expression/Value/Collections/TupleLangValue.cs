@@ -337,7 +337,7 @@ public partial class TupleLangValue : LangValueType, ILangList
             // 加载前7个元素
             for (int i = 0; i < 7; i++)
             {
-                elements[i].Accept(new CompilerVisitor(ilGenerator, local));
+                elements[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             }
 
             // 递归加载剩余元素作为第8个参数
@@ -361,7 +361,7 @@ public partial class TupleLangValue : LangValueType, ILangList
 
             foreach (var element in elements)
             {
-                element.Accept(new CompilerVisitor(ilGenerator, local));
+                element.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             }
 
             ilGenerator.Emit(OpCodes.Newobj, constructor);

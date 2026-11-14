@@ -16,6 +16,7 @@
 
     <ItemGroup>
           <ProjectReference Include="..\Old8Lang.Interpreter\Old8Lang.Interpreter.csproj" />
+        <ProjectReference Include="..\Old8Lang.Compiler\Old8Lang.Compiler.csproj" />
         <ProjectReference Include="..\Old8Lang.Runtime\Old8Lang.Runtime.csproj" />
         <ProjectReference Include="..\Old8Lang.Observability\Old8Lang.Observability.csproj" />
         <ProjectReference Include="..\Old8Lang.Hosting\Old8Lang.Hosting.csproj" />

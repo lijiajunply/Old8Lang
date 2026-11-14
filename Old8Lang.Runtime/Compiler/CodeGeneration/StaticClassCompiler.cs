@@ -266,7 +266,7 @@ public static class StaticClassCompiler
         }
 
         // 加载延迟时间参数
-        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Ids[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 Task.Delay(int)
         var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
@@ -316,7 +316,7 @@ public static class StaticClassCompiler
         }
 
         // 加载参数
-        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Ids[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = instance.Ids[0].Accept(new TypeInferenceVisitor(local));
 
         // 如果是值类型，装箱为object
@@ -348,7 +348,7 @@ public static class StaticClassCompiler
         }
 
         // 加载委托参数
-        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Ids[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var paramType = instance.Ids[0].Accept(new TypeInferenceVisitor(local));
 
         // 检查参数类型，应该是 Func<object> 或 Action
@@ -416,7 +416,7 @@ public static class StaticClassCompiler
 
         // 加载任务列表/数组参数
         var listExpr = instance.Ids[0];
-        listExpr.Accept(new CompilerVisitor(ilGenerator, local));
+        listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取列表/数组类型
         var listType = listExpr.Accept(new TypeInferenceVisitor(local));
@@ -474,7 +474,7 @@ public static class StaticClassCompiler
 
         // 加载任务列表/数组参数
         var listExpr = instance.Ids[0];
-        listExpr.Accept(new CompilerVisitor(ilGenerator, local));
+        listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 获取列表/数组类型
         var listType = listExpr.Accept(new TypeInferenceVisitor(local));
@@ -563,7 +563,7 @@ public static class StaticClassCompiler
         }
 
         // 加载延迟时间参数
-        instance.Ids[0].Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Ids[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用 System.Threading.Thread.Sleep(int)
         var sleepMethod = typeof(Thread).GetMethod("Sleep", [typeof(int)])!;
@@ -585,7 +585,7 @@ public static class StaticClassCompiler
 
         foreach (var param in parameters)
         {
-            param.Accept(new CompilerVisitor(ilGenerator, local));
+            param.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var paramType = param.Accept(new TypeInferenceVisitor(local));
 
             // 如果是值类型，需要装箱
@@ -634,7 +634,7 @@ public static class StaticClassCompiler
         // 2. 加载参数并装箱（如果需要）
         for (var i = 0; i < requiredParamCount; i++)
         {
-            instance.Ids[i].Accept(new CompilerVisitor(ilGenerator, local));
+            instance.Ids[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
             if (shouldBoxParams)
             {
@@ -649,7 +649,7 @@ public static class StaticClassCompiler
         // 3. 处理可选的 message 参数
         if (instance.Ids.Count == requiredParamCount + 1)
         {
-            instance.Ids[requiredParamCount].Accept(new CompilerVisitor(ilGenerator, local));
+            instance.Ids[requiredParamCount].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         }
         else
         {

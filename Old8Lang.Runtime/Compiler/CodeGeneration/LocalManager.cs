@@ -254,7 +254,7 @@ public class LocalManager
             ilGenerator.BeginExceptionBlock();
 
             // 生成defer语句的IL代码
-            deferStatement.Accept(new CompilerVisitor(ilGenerator, this));
+            deferStatement.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, this));
 
             // catch块：捕获但不处理异常（符合defer语义）
             ilGenerator.BeginCatchBlock(typeof(Exception));

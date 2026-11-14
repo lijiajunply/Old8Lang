@@ -35,7 +35,7 @@ public sealed class LenFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var lenId = parameters[0];
-        lenId.Accept(new CompilerVisitor(ilGenerator, local));
+        lenId.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var lenType = lenId.Accept(new TypeInferenceVisitor(local))!;
 
         // 尝试获取Length属性，适用于数组、字符串等

@@ -161,7 +161,7 @@ public static class IlValueBridge
     /// </remarks>
     public static void EmitLoadWrapped(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
     {
-        expression.Accept(new CompilerVisitor(ilGenerator, local));
+        expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 函数字面量：栈上是编译好的委托，直接按函数值包装。
         // 不能走下面的 OutputType 判断——lambda 的 OutputType 是它函数体的返回类型（可能是值类型），

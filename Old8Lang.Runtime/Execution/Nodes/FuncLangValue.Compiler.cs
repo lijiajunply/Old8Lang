@@ -139,7 +139,7 @@ public partial class FuncLangValue
         }
 
         // 生成方法体的 IL 代码
-        BlockStatement.Accept(new CompilerVisitor(methodIl, funcLocal));
+        BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, funcLocal));
 
         // 检查函数体的最后一个语句是否是 ReturnStatement
         var lastStatement = BlockStatement.Count > 0 ? BlockStatement[^1] : null;

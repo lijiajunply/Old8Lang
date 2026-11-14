@@ -54,7 +54,7 @@ public static class StandardLibraryILHelper
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Ldc_I4, index);
             var argument = call.Ids[index];
-            argument.Accept(new CompilerVisitor(il, local));
+            argument.Accept(RuntimeVisitors.CreateCompiler(il, local));
             var type = argument.Accept(new TypeInferenceVisitor(local));
             if (type?.IsValueType == true)
                 il.Emit(OpCodes.Box, type);

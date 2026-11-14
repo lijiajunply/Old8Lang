@@ -90,19 +90,19 @@ public class DictUpdateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         if (parameters.Count == 1)
         {
-            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateDictHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
         }
         else
         {
-            parameters[0].Accept(new CompilerVisitor(ilGenerator, local));
-            parameters[1].Accept(new CompilerVisitor(ilGenerator, local));
+            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateKeyValueHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);

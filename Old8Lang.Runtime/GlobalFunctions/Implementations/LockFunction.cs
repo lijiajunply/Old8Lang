@@ -56,7 +56,7 @@ public sealed class LockFunction : BaseGlobalFunction
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var value = parameters[0];
-        value.Accept(new CompilerVisitor(ilGenerator, local));
+        value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var valueType = value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (valueType.IsValueType)
         {

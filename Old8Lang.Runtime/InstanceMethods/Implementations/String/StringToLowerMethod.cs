@@ -32,7 +32,7 @@ public class StringToLowerMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(new CompilerVisitor(ilGenerator, local));
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 调用辅助方法
         var helperMethod = typeof(StringToLowerMethod).GetMethod(nameof(ToLowerHelper),
