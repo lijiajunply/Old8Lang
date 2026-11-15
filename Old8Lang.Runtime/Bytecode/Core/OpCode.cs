@@ -94,6 +94,9 @@ public enum OpCode : byte
     /// <summary>小于等于: b, a → (a &lt;= b)</summary>
     LessEqual = 0x25,
 
+    /// <summary>成员检查: b, a → (a in b)</summary>
+    In = 0x26,
+
     // ===== 逻辑运算 (0x30-0x3F) =====
     /// <summary>逻辑与: b, a → (a && b)</summary>
     And = 0x30,

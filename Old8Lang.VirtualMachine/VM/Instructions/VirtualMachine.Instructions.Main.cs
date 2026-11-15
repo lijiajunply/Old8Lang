@@ -96,6 +96,7 @@ public partial class VirtualMachine
             case OpCode.Less:
             case OpCode.GreaterEqual:
             case OpCode.LessEqual:
+            case OpCode.In:
                 ExecuteComparisonOperation(instruction, frame);
                 break;
 

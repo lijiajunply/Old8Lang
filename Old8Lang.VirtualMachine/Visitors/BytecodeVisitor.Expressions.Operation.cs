@@ -239,6 +239,9 @@ public partial class BytecodeVisitor
                 case LangTokenType.LessThanEquals:  // <=
                     Emit(OpCode.LessEqual);
                     break;
+                case LangTokenType.In:  // in
+                    Emit(OpCode.In);
+                    break;
                 case LangTokenType.And:  // &&
                     Emit(OpCode.And);
                     break;
