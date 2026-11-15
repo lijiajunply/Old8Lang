@@ -252,6 +252,37 @@ internal static class NumericBinaryOpHelper
             return typeof(object);
         }
 
+        // 非数值类型不能做乘法：以前直接发 mul，会在运行时对引用做整数乘法，
+        // 得到无意义的结果（"hello" * 2 -> 1560537200）。与 VM 一致改为运行期错误。
+        // object 视为「运行期再判断」：未注解的参数/变量走旧的拆箱路径，
+        // 只有静态已知的引用类型（string/集合/数组等）才直接报错。
+        static bool IsNumericType(Type? type) => type is null || type == typeof(object) ||
+            type == typeof(int) || type == typeof(double) || type == typeof(char) ||
+            type == typeof(long) || type == typeof(float) || type == typeof(decimal) ||
+            type == typeof(short) || type == typeof(byte) || type == typeof(sbyte) ||
+            type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort);
+
+        static string DisplayName(Type? type) => type switch
+        {
+            null => "null",
+            _ when type == typeof(string) => "String",
+            _ when type.IsArray => "Array",
+            _ when type.Name.StartsWith("List") => "Array",
+            _ => type.Name
+        };
+
+        if ((leftType is not null && !IsNumericType(leftType)) ||
+            (rightType is not null && !IsNumericType(rightType)))
+        {
+            ilGenerator.Emit(OpCodes.Ldstr,
+                $"无法对类型 {DisplayName(leftType)} 和 {DisplayName(rightType)} 执行乘法");
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowInvalidOperation))!);
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            return typeof(int);
+        }
+
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 

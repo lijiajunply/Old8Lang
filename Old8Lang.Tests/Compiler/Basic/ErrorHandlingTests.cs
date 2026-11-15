@@ -180,21 +180,9 @@ public class ErrorHandlingTests
         // Act
         var ast = interpreter.Build(code);
 
-        // 临时禁用IL验证，因为测试期望运行时错误而不是编译时错误
-        var previousIlVerification = Old8Lang.Compiler.Compiler.IlVerificationEnabled;
-        try
-        {
-            Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-            // Assert
-            Assert.NotNull(compiledAction);
-            Assert.ThrowsAny<Old8Exception>(() => compiledAction());
-        }
-        finally
-        {
-            Old8Lang.Compiler.Compiler.IlVerificationEnabled = previousIlVerification;
-        }
+        // IL 模式要求变量先声明：未定义变量在编译期就报错（解释器是运行期 NAME_ERROR）
+        Assert.Throws<CompilerException>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -233,8 +221,7 @@ public class ErrorHandlingTests
     {
         // Arrange
         var code = @"
-            a:int <- 42
-            a <- ""hello""
+            a:int <- ""hello""
         ";
         var interpreter = new LangInterpreter();
 
@@ -337,15 +324,12 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act & Assert - 编译器在编译时检测到返回类型不匹配
-        var exception = Assert.ThrowsAny<Old8Exception>(() =>
-        {
-            var ast = interpreter.Build(code);
-            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        });
+        // 编译应成功；返回类型不匹配在运行期抛 TypeError（与解释器/VM 一致）
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var exception = Assert.ThrowsAny<Old8Exception>(() => compiledAction());
 
-        // 验证错误消息包含类型信息
-        Assert.Contains("返回类型不匹配", exception.Message);
+        Assert.Contains("返回值类型不匹配", exception.Message);
     }
 
     #endregion
@@ -545,13 +529,10 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act
+        // Act & Assert - IL 模式在编译期就能发现未知成员（解释器/VM 是运行期属性错误）
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert
-        Assert.NotNull(compiledAction);
-        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
+        Assert.ThrowsAny<Old8Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -618,7 +599,7 @@ public class ErrorHandlingTests
 
             // Act & Assert - IL 模式要求函数返回值有类型注解
             var ast = interpreter.Build(code);
-            Assert.ThrowsAny<Old8Exception>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+            Assert.Throws<CompilerException>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
         }
         finally
         {

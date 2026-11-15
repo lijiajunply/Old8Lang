@@ -404,6 +404,36 @@ public partial class CompilerVisitor
     /// <summary>
     /// 访问 SetStatement 节点（编译器）
     /// </summary>
+
+    /// <summary>
+    /// 赋值场景的类型兼容判断（与解释器/VM 的自动转换保持一致）。
+    /// </summary>
+    private static bool IsTypeCompatibleForAssignment(Type expected, Type actual)
+    {
+        if (expected == actual || expected.IsAssignableFrom(actual))
+        {
+            return true;
+        }
+
+        // 数值/字符之间按解释器语义允许赋值（运行时做转换/截断）
+        static bool IsNumeric(Type type) =>
+            type == typeof(int) || type == typeof(double) || type == typeof(char) ||
+            type == typeof(long) || type == typeof(float);
+
+        if (IsNumeric(expected) && IsNumeric(actual))
+        {
+            return true;
+        }
+
+        // 值类型写入 string 注解时有 ToString 转换
+        if (expected == typeof(string) && actual.IsValueType)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public object? VisitSetStatement(SetStatement node)
     {
 
@@ -498,6 +528,37 @@ public partial class CompilerVisitor
                     node.Id.IdName,
                     node.Position
                 );
+            }
+
+            // 带类型注解的赋值：静态已知的不兼容类型在运行期报 TYPE_ERROR
+            // （与解释器/VM 一致），而不是把值强写进错误类型的局部变量/槽位。
+            if (!string.IsNullOrEmpty(node.Id.AssumptionType))
+            {
+                var annotatedType = node.Id.Accept(new TypeInferenceVisitor(local));
+                var assignedType = node.Value.Accept(new TypeInferenceVisitor(local));
+                // 空列表/空字典字面量由后面的专门分支生成目标容器类型，不在此判断。
+                var isEmptyCollectionLiteral =
+                    node.Value is ListLiteralExpression { Elements.Count: 0 } ||
+                    node.Value is ListLangValue { Value.Count: 0, Values.Count: 0 };
+
+                if (!isEmptyCollectionLiteral &&
+                    annotatedType is not null && assignedType is not null &&
+                    annotatedType != typeof(object) && assignedType != typeof(object) &&
+                    !IsTypeCompatibleForAssignment(annotatedType, assignedType))
+                {
+                    ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(annotatedType));
+                    ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(assignedType));
+                    ilGenerator.Emit(OpCodes.Ldstr, node.Id.IdName);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ThrowAssignmentMismatch))!);
+                    ilGenerator.Emit(OpCodes.Pop);
+
+                    // 运行期必然抛错；声明占位局部变量，保证后续读取仍能通过编译。
+                    var fallbackLocal = ilGenerator.DeclareLocal(annotatedType);
+                    local.AddLocalVar(node.Id.IdName, fallbackLocal);
+                    local.LocalVarTypes[node.Id.IdName] = annotatedType;
+                    return null;
+                }
             }
 
             // 被函数体访问的顶层变量存放在运行期全局槽位中：
@@ -1202,6 +1263,8 @@ public partial class CompilerVisitor
         // 获取返回值表达式的类型
         var returnType = node.Expression.Accept(new TypeInferenceVisitor(local));
 
+        var runtimeTypeErrorEmitted = false;
+
         // 验证返回类型是否与函数声明的返回类型匹配
         if (local.ReturnValueLocal is not null)
         {
@@ -1218,22 +1281,43 @@ public partial class CompilerVisitor
                                    (expectedReturnType.IsEnum && returnType == typeof(int)) ||
                                    ReturnStatementRuntimeExtensions.IsBasicTypeConversionAllowed(expectedReturnType, returnType);
 
-                // 如果返回类型不匹配且不能自动转换，报告错误
+                // 如果返回类型不匹配且不能自动转换：不要生成无效 IL，也不做编译期拒绝——
+                // 解释器/虚拟机是在运行期报 TYPE_ERROR。这里发射运行期 TypeError，
+                // 并压入一个默认值占位（helper 不会返回）。
                 if (!isCompatible)
                 {
-                    var errorMsg = $"[IL 模式错误] 返回类型不匹配\n\n" +
-                                  $"期望返回类型: {expectedReturnType.Name}\n" +
-                                  $"实际返回类型: {returnType.Name}\n\n" +
-                                  $"修复建议：\n" +
-                                  $"- 确保return语句返回的值类型与函数声明的返回类型一致\n" +
-                                  $"- 或者修改函数的返回类型注解以匹配实际返回值";
-                    local.ReportError(errorMsg, node.Position);
+                    ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(expectedReturnType));
+                    ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(returnType));
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ThrowReturnMismatch))!);
+
+                    if (expectedReturnType.IsValueType)
+                    {
+                        var defaultLocal = ilGenerator.DeclareLocal(expectedReturnType);
+                        ilGenerator.Emit(OpCodes.Ldloca, defaultLocal);
+                        ilGenerator.Emit(OpCodes.Initobj, expectedReturnType);
+                        ilGenerator.Emit(OpCodes.Ldloc, defaultLocal);
+                    }
+                    else
+                    {
+                        ilGenerator.Emit(OpCodes.Ldnull);
+                    }
+
+                    runtimeTypeErrorEmitted = true;
                 }
             }
         }
 
-        // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）
-        node.Expression.Accept(this);
+        // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）。
+        // 已经压入运行期 TypeError 的默认值占位时跳过求值。
+        if (runtimeTypeErrorEmitted)
+        {
+            // 占位值已在栈上
+        }
+        else
+        {
+            node.Expression.Accept(this);
+        }
 
         // 检查是否在异步状态机中且没有被 finally 块捕获
         if (local is { AsyncStateMachineGenerator: not null, ReturnLabel: null })

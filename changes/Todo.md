@@ -618,6 +618,17 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
+- [x] **IL 类型错误：无效 IL / 编译期拒绝 / 静默写入**：参数类型不匹配会生成
+  `call int(int,int)` 收到 string 的无效 IL；返回不匹配在编译期拒绝；带注解赋值静默接受；
+  非数值 `*` 把引用当整数乘出垃圾结果。现在统一由 `IlTypeErrors` 在运行期抛 TYPE_ERROR /
+  INVALID_OPERATION（与解释器/VM 对齐），`Compiler.Basic` 11 → 0 失败。
+  见 change（`2026-11-15-IL类型错误运行期化/test.md`）。
+
+- [ ] **未定义变量/成员在 IL 是编译期错误**：解释器/VM 分别是运行期 NAME_ERROR /
+  属性错误；IL 在编译期就拒绝（`变量 'x' 未声明`、`类型 Test 没有属性 y`）。
+  用例已按 IL 语义迁移；若要与其它模式完全一致，需要在未知名字处发射运行期查找/错误
+  （会牺牲编译期拼写检查，暂不处理）。
+
 - [x] **IL mixin / 接口默认方法未合并**：`class C with M` 的 mixin 字段/方法、
   `implements I` 的接口默认实现都没并入类模板（解释器/VM 在方法表里合并）。
   现在 `MergeMixinMembers` 在生成 IL 前递归合并 mixin（含父 mixin）与接口默认方法，

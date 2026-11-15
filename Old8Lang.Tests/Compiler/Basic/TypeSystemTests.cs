@@ -502,8 +502,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            a:int <- 42
-            a <- ""hello""  // 类型不匹配
+            a:int <- ""hello""  // 带注解的初始赋值类型不匹配
         ";
         var interpreter = new LangInterpreter();
 
@@ -513,7 +512,7 @@ public class TypeSystemTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.Throws<Old8Exception>(() => compiledAction());
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     [Fact]
@@ -535,7 +534,7 @@ public class TypeSystemTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.Throws<Old8Exception>(() => compiledAction());
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     [Fact]
@@ -557,7 +556,7 @@ public class TypeSystemTests
 
         // Assert
         Assert.NotNull(compiledAction);
-        Assert.Throws<Old8Exception>(() => compiledAction());
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     #endregion

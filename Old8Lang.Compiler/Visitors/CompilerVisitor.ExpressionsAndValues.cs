@@ -550,6 +550,69 @@ public partial class CompilerVisitor
     
     }
 
+
+    /// <summary>
+    /// 检查函数调用的实参静态类型是否与形参不兼容；是则发射运行期 TypeError 并返回 true。
+    /// </summary>
+    private static bool TryEmitArgumentTypeMismatch(Instance node, System.Reflection.ParameterInfo[] parameters,
+        List<LangId>? funcParams, ILGenerator ilGenerator, LocalManager local,
+        Type returnType, out Type emittedReturnType)
+    {
+        emittedReturnType = returnType;
+
+        for (var index = 0; index < node.Ids.Count && index < parameters.Length; index++)
+        {
+            var argumentType = node.Ids[index].Accept(new TypeInferenceVisitor(local));
+            if (argumentType is null)
+            {
+                continue;
+            }
+
+            var parameterType = parameters[index].ParameterType;
+            var compatible = parameterType == argumentType ||
+                             parameterType == typeof(object) || argumentType == typeof(object) ||
+                             parameterType.IsAssignableFrom(argumentType) ||
+                             (parameterType == typeof(double) &&
+                              (argumentType == typeof(int) || argumentType == typeof(char))) ||
+                             (parameterType == typeof(int) && argumentType == typeof(char)) ||
+                             // 枚举成员在 IL 里是底层 int32
+                             (parameterType.IsEnum && argumentType == typeof(int)) ||
+                             (parameterType == typeof(int) && argumentType.IsEnum) ||
+                             (parameterType == typeof(string) && argumentType.IsValueType);
+            if (compatible)
+            {
+                continue;
+            }
+
+            var parameterName = index < (funcParams?.Count ?? 0)
+                ? funcParams![index].IdName
+                : parameters[index].Name ?? $"参数{index + 1}";
+
+            ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(parameterType));
+            ilGenerator.Emit(OpCodes.Ldstr, IlTypeErrors.TypeName(argumentType));
+            ilGenerator.Emit(OpCodes.Ldstr, parameterName);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ThrowParameterMismatch))!);
+
+            if (returnType == typeof(void))
+            {
+                ilGenerator.Emit(OpCodes.Pop);
+            }
+            else if (returnType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, returnType);
+            }
+            else if (returnType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Castclass, returnType);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     public object? VisitInstance(Instance node)
     {
 
@@ -980,6 +1043,14 @@ public partial class CompilerVisitor
 
         // 处理所有类型的方法调用，包括DynamicMethod和MethodBuilder
         var matchingParams = matchingMethod.GetParameters();
+
+        // 静态已知的参数类型不匹配：不能直接把 int/string 等不同栈类型 call 进委托，
+        // 那会生成无效 IL。改为发运行期 TypeError（与解释器/VM 的 TYPE_ERROR 一致）。
+        if (TryEmitArgumentTypeMismatch(node, matchingParams, funcParams, ilGenerator, local,
+                matchingMethod.ReturnType, out var mismatchReturnType))
+        {
+            return mismatchReturnType == typeof(void) ? null : mismatchReturnType;
+        }
 
         // 检查是否有 params 参数
         int paramsIndex = -1;
