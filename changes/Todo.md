@@ -120,6 +120,12 @@
 - [x] **IL 直接打印原生列表输出 .NET 类型名**：`PrintLine({1, 2})` 现在输出 `[1, 2]`；`Print` / `PrintLine` 也会处理所有参数。
 
 - [x] **泛型类递归特化导致栈溢出**：原崩溃用例及自引用特化回归已通过；完整 `Compiler.Classes` 组正常结束，但仍有普通失败。见 测试报告（`2026-11-11-10-54-IL泛型递归特化测试.md`）。
+- [x] **IL 字符串拼接直接用 CLR ToString 导致显示不一致**：`"x" + true` 输出 `xTrue`、
+  `"x" + {1, 2}` 输出 `xSystem.Collections.Generic.List…`（CLR 类型名），解释器分别是
+  `xtrue` 与 `x[1, 2]`。现在拼接前先经 `VMValueFormatter.ToDisplayString` 转成语言显示文本，
+  bool/列表/字典/字符串元素引号都与解释器一致；`"x" + null` 仍为 IL 的 `null`（见 null 显示条目）。
+  新增 4 项回归。见 change（`2026-11-15-IL字符串拼接显示/test.md`）。
+
 - [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 排序测试报告（`2026-11-11-10-37-IL-LINQ排序测试.md`）。
   2026-11-15：`join ... where` / `orderby ... where` 的无效 IL 已修（见上一条）。剩余是**语义**差异：
   join 结果只保留外层元素，后续子句引用内层范围变量时取到的是 join 循环结束后的最后一个值
@@ -373,10 +379,10 @@
   `join ... where`、`orderby ... where` 结果与解释器一致；新增 4 项回归。
   见 change（`2026-11-15-IL-LINQ-where无效IL/test.md`）。
 
-- [ ] **`'h' in "abc"`（右侧为字符串字面量）在 IL 下返回 false**：解释器与虚拟机为 true；
-  右侧换成变量（`str <- "abc"; 'h' in str`）时 IL 正常。属字面量接收者的类型推断/分派缺口，
-  需要先定位 `GenerateInOperator` 在字面量右侧时走的分支。见 change
-  （`2026-11-15-IL-in运算符无效IL/test.md` §5.1）。
+- [x] **`'h' in "abc"` 的"跨模式差异"已核实为误记**：`"abc"` 不含 `'h'`，三种模式都返回
+  `false`（2026-11-15 复测：`-f` / `-il` / `-vm` 一致）；此前记录为「解释器 true」是把
+  `'h' in "hello"` 的输出看串了。`'h' in "hello"`、`'h' in str`、`"he" in "hello"`
+  三种模式均为 `true`，无需修改实现。
 
 - [ ] **字符串拼接里的 bool 显示大小写跨模式不一致**：`"x" + (1 in list)` 在 IL 下输出
   `xTrue`（`string.Concat(object,object)` 调用 CLR `ToString`），解释器输出 `xtrue`。

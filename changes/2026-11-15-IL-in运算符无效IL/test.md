@@ -109,9 +109,9 @@ ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
 
 ## 5. 遗留
 
-1. `'h' in "abc"`（右侧是**字符串字面量**）在 IL 下仍返回 `false`，解释器为 `true`；
-   右侧换成变量 `str` 则正常（`'h' in str` → true）。属字面量接收者的类型推断/分派问题，
-   未在本轮修复。
+1. ~~`'h' in "abc"` 在 IL 下返回 `false`，解释器为 `true`~~ —— 2026-11-15 复测为误记：
+   `"abc"` 本就不含 `'h'`，三种模式都是 `false`；`'h' in "hello"`、`'h' in str` 三种模式都是
+   `true`，不存在该差异。
 2. 字符串拼接里的 `bool` 显示为 `True`/`False`，解释器为 `true`/`false`
    （`string.Concat(object,object)` 调用的是 CLR `ToString`），属跨模式显示差异。
 3. `from x in list1 join y in list2 on x == y where x > 2 select x`

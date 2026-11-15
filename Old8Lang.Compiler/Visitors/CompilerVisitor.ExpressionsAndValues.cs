@@ -1897,6 +1897,23 @@ public partial class CompilerVisitor
         return null;
     }
 
+    /// <summary>
+    /// 把字符串拼接的操作数转换成语言显示文本（string 保持不变）。
+    /// </summary>
+    private static void EmitConcatOperand(ILGenerator ilGenerator, Type? operandType)
+    {
+        if (operandType == typeof(string)) return;
+
+        if (operandType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, operandType);
+        }
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(Old8Lang.Runtime.VMValueFormatter).GetMethod(
+                nameof(Old8Lang.Runtime.VMValueFormatter.ToDisplayString))!);
+    }
+
     private Type EmitOperationOutputType(Operation operation)
     {
         var right = operation.Opera == LangTokenType.Dot
@@ -1961,23 +1978,17 @@ public partial class CompilerVisitor
             case LangTokenType.Plus:
                 if (leftType == typeof(string) || rightType == typeof(string))
                 {
-                    // 处理字符串连接 - 需要调用string.Concat方法
-                    // 加载左操作数并立即装箱（如果需要）
+                    // 处理字符串连接：先按语言的显示规则把操作数转成字符串，再拼接。
+                    // 直接 string.Concat(object, object) 会走 CLR ToString(),
+                    // bool 会输出 True/False、原生集合会输出 System.Collections.Generic.List`1[...]，
+                    // 与解释器的 true/false 和 [1, 2] 不一致。
                     operation.Left?.Accept(new CompilerVisitor(ilGenerator, local));
-                    if (leftType != typeof(string))
-                    {
-                        ilGenerator.Emit(OpCodes.Box, leftType!);
-                    }
+                    EmitConcatOperand(ilGenerator, leftType);
 
-                    // 加载右操作数并立即装箱（如果需要）
                     operation.Right?.Accept(new CompilerVisitor(ilGenerator, local));
-                    if (rightType != typeof(string))
-                    {
-                        ilGenerator.Emit(OpCodes.Box, rightType!);
-                    }
+                    EmitConcatOperand(ilGenerator, rightType);
 
-                    // 调用string.Concat(object, object)
-                    var concatMethod = typeof(string).GetMethod("Concat", [typeof(object), typeof(object)])!;
+                    var concatMethod = typeof(string).GetMethod("Concat", [typeof(string), typeof(string)])!;
                     ilGenerator.Emit(OpCodes.Call, concatMethod);
                     return typeof(string);
                 }
