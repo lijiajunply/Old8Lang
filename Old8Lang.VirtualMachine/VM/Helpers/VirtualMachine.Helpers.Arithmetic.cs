@@ -89,7 +89,13 @@ public partial class VirtualMachine
         if (a is double da2 && b is int ib2) return da2 + ib2;
         if (a is long la3 && b is double db3) return la3 + db3;
         if (a is double da3 && b is long lb3) return da3 + lb3;
-        if (a is string sa || b is string sb) return ToString(a) + ToString(b);
+        // 字符串 + 任意值：按语言显示规则转换（bool -> true、列表 -> [1, 2]、null -> null），
+        // 与解释器/IL 一致；CLR ToString 会得到 True / System.Int32[]。
+        if (a is string || b is string)
+        {
+            return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(a) +
+                   Old8Lang.Runtime.VMValueFormatter.ToDisplayString(b);
+        }
 
         // 数组拼接：arr + [item] 或 [item] + arr
         if (a is object[] arrA && b is object[] arrB)

@@ -70,13 +70,14 @@ public partial class VirtualMachine
         {
             case "System.String::Concat":
             {
-                // 字符串拼接
+                // 字符串拼接/插值：按语言显示规则转换（bool -> true、列表 -> [1, 2]、
+                // null -> null），与解释器/IL 一致；CLR ToString 会得到 True / System.Int32[]。
                 if (args.Length > 0 && args[0] is object[] array)
                 {
-                    return string.Concat(array.Select(ToString));
+                    return string.Concat(array.Select(Old8Lang.Runtime.VMValueFormatter.ToDisplayString));
                 }
 
-                return string.Concat(args.Select(ToString));
+                return string.Concat(args.Select(Old8Lang.Runtime.VMValueFormatter.ToDisplayString));
             }
 
             case "CheckRange":

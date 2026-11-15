@@ -438,9 +438,11 @@
   `'h' in "hello"` 的输出看串了。`'h' in "hello"`、`'h' in str`、`"he" in "hello"`
   三种模式均为 `true`，无需修改实现。
 
-- [ ] **字符串拼接里的 bool 显示大小写跨模式不一致**：`"x" + (1 in list)` 在 IL 下输出
-  `xTrue`（`string.Concat(object,object)` 调用 CLR `ToString`），解释器输出 `xtrue`。
-  与已有的 `null` 显示差异同类，需要统一拼接的显示转换（走语言的显示规则而不是 CLR ToString）。
+- [x] **字符串拼接里的 bool 显示大小写跨模式不一致**：`"x" + (1 in list)` 曾输出 `xTrue`。
+  IL 侧已在 2026-11-15 的字符串拼接修复中改用 `VMValueFormatter`；本轮补上 VM：
+  `Add` 的字符串分支与 `System.String::Concat`（插值）都按语言显示规则格式化。
+  三模式现在都输出 `xtrue` / `xnull` / `v=[1, 2]`；新增 VM 1 项回归。
+  见 change（`2026-11-15-VM字符串显示/test.md`）。
 
 - [x] **虚拟机混合数值比较偏差**：`b <- 3; b >= 3.0` 在 `-vm` 下返回 `false`,
   解释器与 IL 都是 `true`。根因是 VM 的 `Equals` 只处理同类型，`int == double` 落到
