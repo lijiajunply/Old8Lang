@@ -77,7 +77,11 @@ public static class IlValueBridge
                         Wrap(entry.Key), Wrap(entry.Value)));
                 }
 
-                return new DictionaryLangValue(pairs);
+                var dictionaryValue = new DictionaryLangValue(pairs);
+                // 构造只填 Tuples；语言层操作（ToStr / 索引 / 遍历）读的是 Value，
+                // 不先解释器访问一次会得到 {(), ()} 或把已有键当缺失。
+                dictionaryValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                return dictionaryValue;
             }
             case Array array:
             {

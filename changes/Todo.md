@@ -606,6 +606,11 @@
   （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
   见 change（`2026-11-15-集合拼接统一/test.md`）。
 
+- [x] **IL 包装字典的 ToStr 输出空元组**：`d.ToStr()` 在 IL 下得到 `{(), ()}`——`IlValueBridge.Wrap`
+  构造的 `DictionaryLangValue` 只填 `Tuples`、`Value` 为空，而显示/索引读的是 `Value`。
+  现在包装后立即解释器求值一次填充；`d.ToStr()`、字段字典 ToStr、`d["a"]` 均与解释器一致。
+  新增 1 项 IL 回归。见 change（`2026-11-15-IL字典包装显示/test.md`）。
+
 - [x] **字典缺失键的行为三模式不一致**：`d["missing"]` 此前解释器返回 null、VM 抛
   `KEY_ERROR`、IL 原生字典抛 CLR `KeyNotFoundException`（`dict()` 分支返回 null）。
   2026-11-15 定为「缺失键报错」（安全访问用 `GetOrElse` / `TryGet`）：解释器
