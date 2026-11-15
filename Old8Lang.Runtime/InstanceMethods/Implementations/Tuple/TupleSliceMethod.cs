@@ -67,6 +67,12 @@ public class TupleSliceMethod : BaseInstanceMethod
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
+        // VM 分派前会把原生嵌套元组转成 TupleLangValue，这里直接复用解释器语义。
+        if (instance is TupleLangValue tupleValue && arguments[0] is int vmStart && arguments[1] is int vmEnd)
+        {
+            return tupleValue.Slice(vmStart, vmEnd);
+        }
+
         if (instance is ITuple tuple && arguments[0] is int start && arguments[1] is int end)
         {
             int length = tuple.Length;

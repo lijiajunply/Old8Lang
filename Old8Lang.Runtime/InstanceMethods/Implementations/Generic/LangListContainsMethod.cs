@@ -71,11 +71,11 @@ public class LangListContainsMethod : BaseLangListMethod, IIlNativeValueInstance
     {
         if (instance is ILangList langList)
         {
-            var item = arguments[0];
-            if (item is LangValueType langValue)
-            {
-                return langList.In(langValue);
-            }
+            // VM 实参可能是原生 int/string；元组等语言值集合需要先包成 LangValueType。
+            var item = arguments[0] is LangValueType langValue
+                ? langValue
+                : LangValueType.ObjToValue(arguments[0]);
+            return langList.In(item);
         }
 
         // 兼容 VM 模式下的 List<object?>

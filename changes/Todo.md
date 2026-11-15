@@ -388,6 +388,14 @@
   但 EOF 位置不会前进。现在直接抛 `SyntaxError`「类定义缺少右花括号」。新增 2 项回归。
   见 change（`2026-11-15-解析器类体EOF死循环/test.md`）。
 
+- [x] **元组实例方法只有解释器可用**：`(1,2,3).Get(1)` / `Slice` / `ToList` / `Reverse` /
+  `Contains` / `All` / `Any` / `Filter` / `Map` 在解释器正常，IL 报「方法 'Get' 未找到」，
+  VM 报「实例必须是 Tuple 类型」。IL 侧扩展 `IlNativeCollectionBridge` 把原生
+  `ValueTuple` 包装成 `TupleLangValue`；VM 侧先把右嵌套原生 `Tuple` 按 VM 编码展平再走
+  VM 分派（lambda 参数走 `vm.CallFunctionObject`），并修了 `TupleSlice` 的 VM 分支与
+  `LangListContains` 的原生实参转换。新增 IL/VM 各 1 项回归。
+  见 change（`2026-11-15-元组实例方法跨模式/test.md`）。
+
 - [x] **字符串实例方法的 IL 操作数未包装**：`"abc".StartsWith("a")` 等 19 个方法把原生
   string/int 直接传给 `StringLangValue`/`IntLangValue` 形参，生成无效 IL；模板结果上的
   `result.StartsWith(...)` 甚至触发 `AccessViolationException`。现在统一改用

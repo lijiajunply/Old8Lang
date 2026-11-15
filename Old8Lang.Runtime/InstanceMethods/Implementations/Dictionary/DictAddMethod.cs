@@ -44,15 +44,17 @@ public class DictAddMethod : BaseInstanceMethod
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static object?[] AddHelper(Dictionary<object, object> dict, object key, object value)
+    public static TupleLangValue AddHelper(Dictionary<object, object> dict, object key, object value)
     {
         dict[key] = value;
-        return [key, value];
+        // 解释器的 ExecuteInternal 返回 (key, value) 元组；IL 侧保持一致，
+        // 不能声明 object[] 却返回元组（桥接会 cast 失败）。
+        return new TupleLangValue(IlValueBridge.Wrap(key), IlValueBridge.Wrap(value));
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(object[]);
+        return typeof(TupleLangValue);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
@@ -62,7 +64,7 @@ public class DictAddMethod : BaseInstanceMethod
             var key = arguments[0];
             var value = arguments[1];
             dict[key!] = value!;
-            return new[] { key, value };
+            return new TupleLangValue(IlValueBridge.Wrap(key), IlValueBridge.Wrap(value));
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
     }

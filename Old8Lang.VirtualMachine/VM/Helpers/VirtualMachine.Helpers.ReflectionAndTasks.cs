@@ -1,8 +1,10 @@
 using System.Globalization;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
@@ -46,6 +48,22 @@ public partial class VirtualMachine
             }
 
             throw new NullReferenceError(new SourcePosition(), methodName);
+        }
+
+        // VM 的元组字面量是右嵌套原生 Tuple，实例方法注册在 TupleLangValue 上。
+        // 先按 VM 的元组编码展平并转成语言值，再按普通实例方法分派：这样
+        // Get/ToList 拿到 TupleLangValue，All/Filter/Map 的 lambda 也会走
+        // ExecuteInVMInternal（vm.CallFunctionObject），而不是解释器路径。
+        if (obj is System.Runtime.CompilerServices.ITuple nativeTuple && obj is not TupleLangValue)
+        {
+            var tupleItems = FlattenVmTuple(nativeTuple)
+                .Where(item => item is not null)
+                .Select(item => (LangExpression)IlValueBridge.Wrap(item))
+                .ToList();
+            var tupleValue = new TupleLangValue(tupleItems);
+            tupleValue.Accept(Old8Lang.AST.Visitor.RuntimeVisitors.CreateInterpreter(
+                new Old8Lang.Interpreter.VariateManager()));
+            return InvokeTypeMethod(tupleValue, methodName, args);
         }
 
         if (obj is Old8Lang.AST.Expression.ModuleObjects.UnifiedModule module)

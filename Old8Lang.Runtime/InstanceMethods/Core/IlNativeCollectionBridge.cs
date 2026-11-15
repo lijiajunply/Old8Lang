@@ -92,8 +92,10 @@ public static class IlNativeCollectionBridge
             return false;
         }
 
-        var wrapped = WrapFully(receiver);
-        if (wrapped is not (ListLangValue or ArrayLangValue or DictionaryLangValue))
+        var wrapped = receiver is System.Runtime.CompilerServices.ITuple && receiver is not TupleLangValue
+            ? WrapFlatTuple((System.Runtime.CompilerServices.ITuple)receiver)
+            : WrapFully(receiver);
+        if (wrapped is not (ListLangValue or ArrayLangValue or DictionaryLangValue or TupleLangValue))
         {
             return false;
         }
@@ -125,7 +127,8 @@ public static class IlNativeCollectionBridge
         // 别名（例如字典的 Delete / delete）通过方法自身的规范名判断，而不是调用点写法。
         var canonicalName = method.Names.Length > 0 ? method.Names[0] : methodName;
         SyncBack(wrapped, receiver, canonicalName);
-        result = IlValueBridge.Unwrap(value);
+        // 元组保持语言值，链式 .ToStr() / 切片显示才与解释器一致；其余结果还原成原生值。
+        result = value is TupleLangValue ? value : IlValueBridge.Unwrap(value);
         return true;
     }
 
@@ -244,6 +247,45 @@ public static class IlNativeCollectionBridge
 
         return null;
     }
+    /// <summary>
+    /// 把原生元组转成语言值元组。
+    /// </summary>
+    /// <remarks>
+    /// 虚拟机的多元组是右嵌套 <c>Tuple&lt;object?, object?&gt;</c>（<c>(1,2,3)</c> 实为
+    /// <c>(1, (2, 3))</c>），直接按 <see cref="System.Runtime.CompilerServices.ITuple.Length"/>
+    /// 枚举会得到 2 个元素。这里按 VM 的编码递归展开末尾元组，并沿用 VM 的
+    /// 「null 视为占位/忽略」约定；IL 的 <c>ValueTuple</c> 是扁平的，不受影响。
+    /// </remarks>
+    private static TupleLangValue WrapFlatTuple(System.Runtime.CompilerServices.ITuple tuple)
+    {
+        var items = new List<object?>();
+
+        void Collect(System.Runtime.CompilerServices.ITuple current)
+        {
+            for (var i = 0; i < current.Length; i++)
+            {
+                var element = current[i];
+                if (i == current.Length - 1 && element is Tuple<object?, object?> nested)
+                {
+                    Collect(nested);
+                }
+                else if (element is not null)
+                {
+                    items.Add(element);
+                }
+            }
+        }
+
+        Collect(tuple);
+
+        var elements = items
+            .Select(item => (LangExpression)IlValueBridge.Wrap(item))
+            .ToList();
+        var value = new TupleLangValue(elements);
+        value.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+        return value;
+    }
+
 }
 
 /// <summary>
@@ -261,4 +303,5 @@ internal sealed class BridgedArgumentExpression(LangValueType value) : LangExpre
 
     /// <inheritdoc />
     public override TResult Accept<TResult>(IVisitor<TResult> visitor) => (TResult)(object)Value;
+
 }

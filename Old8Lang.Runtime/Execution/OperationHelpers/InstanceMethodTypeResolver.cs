@@ -69,7 +69,8 @@ internal static class InstanceMethodTypeResolver
 
         if (equivalentType != typeof(ListLangValue) &&
             equivalentType != typeof(ArrayLangValue) &&
-            equivalentType != typeof(DictionaryLangValue))
+            equivalentType != typeof(DictionaryLangValue) &&
+            equivalentType != typeof(TupleLangValue))
         {
             return null;
         }
@@ -110,10 +111,7 @@ internal static class InstanceMethodTypeResolver
             return typeof(Dictionary<object, object?>);
         }
 
-        if (declared == typeof(TupleLangValue))
-        {
-            return typeof(object?[]);
-        }
+        // 元组结果保留为 TupleLangValue（object），否则显示会变成数组的 "[1, 2]"。
 
         if (declared == typeof(int) || declared == typeof(bool) || declared == typeof(double) ||
             declared == typeof(char) || declared == typeof(string))
@@ -201,6 +199,14 @@ internal static class InstanceMethodTypeResolver
         if (nativeType.IsArray)
         {
             equivalentType = typeof(ArrayLangValue);
+            return true;
+        }
+
+        // IL 里的元组是 ValueTuple / Tuple；解释器实例方法注册在 TupleLangValue 上。
+        if (typeof(System.Runtime.CompilerServices.ITuple).IsAssignableFrom(nativeType) &&
+            !typeof(TupleLangValue).IsAssignableFrom(nativeType))
+        {
+            equivalentType = typeof(TupleLangValue);
             return true;
         }
 

@@ -69,6 +69,7 @@ public class TupleGetMethod : BaseInstanceMethod
             throw new ArgumentException("Get 方法需要一个整数参数");
         }
 
-        return tuple.Get(index);
+        // VM 调用点按原生值使用结果（与列表 Get 一致），避免得到装箱的语言值。
+        return IlValueBridge.Unwrap(tuple.Get(index));
     }
 }
