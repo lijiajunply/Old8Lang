@@ -392,12 +392,17 @@
   （见 change `2026-11-14-字符串in运算符/test.md`）；虚拟机需要新增指令并处理字节码序列化。
   见 change（`2026-11-14-字符串in运算符/test.md` §5）。
 
-- [ ] **IL 模式 match 不支持范围 / 类型 / 元组解构模式与 guard**：
-  `MatchExpressionEnhancedTests` 25 项失败（`Match_Range_*`、`Match_TypeMatch_*`、
-  `Match_TupleDeconstruction_*`、`Match_Guard_*`）。`VisitMatchExpression` 只识别
-  通配符、变量绑定和普通值比较，其余模式被当作普通值比较，因此永远不匹配
-  （解释器与虚拟机都支持这些模式）。属功能缺口，需要按模式种类补齐 IL 发射。
-  见 change（`2026-11-14-IL-match结果/test.md` §5）。
+- [x] **IL 模式 match 不支持范围 / 类型 / 元组解构模式与 guard**：
+  `MatchExpressionEnhancedTests` 曾 25 项失败。现在新增 `IlMatchRegistry`：
+  编译期登记 `MatchCase`、运行期直接调用解释器的 `IsMatch`（复用值 / 绑定 / 元组解构 /
+  类型 / 范围 / guard 全部语义），`VisitMatchExpression` 只负责按 id 询问、写回绑定变量、
+  计算分支结果；`IlValueBridge.Wrap` 也补了 `ITuple` 分支把 `ValueTuple` 包成
+  `TupleLangValue`。`Compiler.Expressions` 35→11 失败，其余组不变。
+  见 change（`2026-11-15-IL-match高级模式/test.md`）。
+
+- [ ] **虚拟机元组解构 match 不匹配**：`match (1,2,3) { case (x,y,z) -> ... }` 在 `-vm` 下报
+  `Match 表达式没有匹配的分支`，解释器与 IL 正常（2026-11-15 实测）。
+  见 change（`2026-11-15-IL-match高级模式/test.md` §5）。
 
 - [ ] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
   在 `-f` 报 `INVALID_OPERATION_ERROR: 不支持类型 ... 的加法操作`，`-il` 被推断成数值加法后

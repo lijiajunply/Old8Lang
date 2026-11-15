@@ -147,123 +147,76 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitMatchExpression(MatchExpression node)
     {
-
-        // 定义标签
+        // 各分支的模式匹配统一交给运行期（复用解释器的 IsMatch 语义），
+        // IL 只负责「按 id 询问是否匹配 → 写回绑定变量 → 算结果」。
         var endLabel = ilGenerator.DefineLabel();
-        var caseLabels = node.Cases.Select(_ => ilGenerator.DefineLabel()).ToList();
-        var resultLocal = ilGenerator.DeclareLocal(typeof(object)); // 用于存储结果
+        var resultLocal = ilGenerator.DeclareLocal(typeof(object));
 
-        // 保存 match 表达式值到局部变量
+        // 保存 match 值（统一装箱成 object，模式匹配按语言值语义判定）
         node.MatchValue.Accept(this);
         var matchValueType = node.MatchValue.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
-        var matchValueLocal = ilGenerator.DeclareLocal(matchValueType);
-        ilGenerator.Emit(OpCodes.Stloc, matchValueLocal);
-
-        // 生成每个 case 的匹配判断
-        for (int i = 0; i < node.Cases.Count; i++)
+        if (matchValueType.IsValueType)
         {
-            var matchCase = node.Cases[i];
-            var caseLabel = caseLabels[i];
-
-            // 检查是否是通配符 (匹配所有)
-            if (matchCase.IsWildcard)
-            {
-                // 通配符直接跳转到对应的 case
-                ilGenerator.Emit(OpCodes.Br, caseLabel);
-                continue;
-            }
-
-            // 检查是否是变量绑定 (匹配所有并绑定变量)
-            if (matchCase.IsVariableBinding)
-            {
-                // 变量绑定也直接跳转到对应的 case
-                ilGenerator.Emit(OpCodes.Br, caseLabel);
-                continue;
-            }
-
-            // 普通值匹配：比较 match 值和 case 值。
-            // 装箱必须按操作数位置逐个发射：两个操作数都压栈后再 box 只会装箱栈顶，
-            // match 值（在左）会保持未装箱，生成的 IL 无效。
-            if (matchValueType == typeof(int) || matchValueType == typeof(bool) || matchValueType == typeof(char))
-            {
-                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
-                ilGenerator.Emit(OpCodes.Ceq);
-            }
-            else if (matchValueType == typeof(string))
-            {
-                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
-                var equalsMethod = typeof(string).GetMethod("Equals",
-                    [typeof(string), typeof(string)])!;
-                ilGenerator.Emit(OpCodes.Call, equalsMethod);
-            }
-            else
-            {
-                // 其他类型：逐个操作数装箱后调用 object.Equals
-                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-                if (matchValueType.IsValueType)
-                    ilGenerator.Emit(OpCodes.Box, matchValueType);
-
-                matchCase.Pattern!.Accept(new CompilerVisitor(ilGenerator, local));
-                var patternType = matchCase.Pattern.Accept(new TypeInferenceVisitor(local));
-                if (patternType is { IsValueType: true })
-                    ilGenerator.Emit(OpCodes.Box, patternType);
-
-                var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
-                ilGenerator.Emit(OpCodes.Call, equalsMethod);
-            }
-
-            // 若匹配，跳转到对应的 case
-            ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
+            ilGenerator.Emit(OpCodes.Box, matchValueType);
         }
 
-        // 所有 case 都不匹配，抛出异常
-        var exceptionType = typeof(InvalidOperationError);
-        var exceptionCtor = exceptionType.GetConstructor([typeof(IOldLangTree), typeof(string)])!;
-        ilGenerator.Emit(OpCodes.Ldnull); // IOldLangTree 参数
-        ilGenerator.Emit(OpCodes.Ldstr, "Match 表达式没有匹配的分支");
-        ilGenerator.Emit(OpCodes.Newobj, exceptionCtor);
-        ilGenerator.Emit(OpCodes.Throw);
+        var matchValueLocal = ilGenerator.DeclareLocal(typeof(object));
+        ilGenerator.Emit(OpCodes.Stloc, matchValueLocal);
 
-        // 生成各个 case 的 IL 代码
-        for (var i = 0; i < node.Cases.Count; i++)
+        var boundValuesLocal = ilGenerator.DeclareLocal(typeof(object[]));
+
+        foreach (var matchCase in node.Cases)
         {
-            var matchCase = node.Cases[i];
-            var caseLabel = caseLabels[i];
+            var nextCaseLabel = ilGenerator.DefineLabel();
+            var bindingNames = CollectMatchBindingNames(matchCase);
+            var caseId = IlMatchRegistry.Register(matchCase, bindingNames);
 
-            ilGenerator.MarkLabel(caseLabel);
+            ilGenerator.Emit(OpCodes.Ldc_I4, caseId);
+            ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
+            ilGenerator.Emit(OpCodes.Ldloca, boundValuesLocal);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlMatchRegistry).GetMethod(nameof(IlMatchRegistry.TryMatch))!);
+            ilGenerator.Emit(OpCodes.Brfalse, nextCaseLabel);
 
-            // 如果有变量绑定，将 match 值赋给变量
-            if (matchCase.BindingVariable is not null)
+            // 写回绑定变量（object 槽位，后续按动态语义使用）
+            for (var index = 0; index < bindingNames.Length; index++)
             {
-                ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
-                if (matchValueType.IsValueType)
-                    ilGenerator.Emit(OpCodes.Box, matchValueType);
-
-                var localVar = ilGenerator.DeclareLocal(typeof(object));
-                local.AddLocalVar(matchCase.BindingVariable, localVar);
-                ilGenerator.Emit(OpCodes.Stloc, localVar);
+                var bindingLocal = ilGenerator.DeclareLocal(typeof(object));
+                ilGenerator.Emit(OpCodes.Ldloc, boundValuesLocal);
+                ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                ilGenerator.Emit(OpCodes.Stloc, bindingLocal);
+                local.AddLocalVar(bindingNames[index], bindingLocal);
             }
 
             // 计算并存储结果
             matchCase.ResultExpression.Accept(this);
             var resultType = matchCase.ResultExpression.Accept(new TypeInferenceVisitor(local));
-            if (resultType is not null && resultType.IsValueType)
+            if (resultType is { IsValueType: true })
+            {
                 ilGenerator.Emit(OpCodes.Box, resultType);
+            }
 
             ilGenerator.Emit(OpCodes.Stloc, resultLocal);
-
-            // 跳转到结束
             ilGenerator.Emit(OpCodes.Br, endLabel);
+
+            ilGenerator.MarkLabel(nextCaseLabel);
+            foreach (var bindingName in bindingNames)
+            {
+                local.RemoveLocalVar(bindingName);
+            }
         }
+
+        // 所有 case 都不匹配，抛出异常
+        var exceptionCtor = typeof(InvalidOperationError).GetConstructor([typeof(IOldLangTree), typeof(string)])!;
+        ilGenerator.Emit(OpCodes.Ldnull); // IOldLangTree 参数
+        ilGenerator.Emit(OpCodes.Ldstr, "Match 表达式没有匹配的分支");
+        ilGenerator.Emit(OpCodes.Newobj, exceptionCtor);
+        ilGenerator.Emit(OpCodes.Throw);
 
         // 结束标签
         ilGenerator.MarkLabel(endLabel);
 
-        // 加载结果。各分支结果都装箱存进了 object 局部变量，这里必须按类型推断给出的
-        // 静态类型还原：否则 `return match ...` 会把装箱引用当成值类型返回，
-        // 调用方读到的是垃圾值（整数分支曾稳定输出 853912040 这类数字）。
+        // 加载结果并按推断类型还原（与各分支的装箱对应）
         ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
         var matchResultType = node.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (matchResultType.IsValueType)
@@ -272,6 +225,23 @@ public partial class CompilerVisitor
         }
 
         return null;
-    
+    }
+
+    /// <summary>
+    /// 收集一个 match 分支会绑定的变量名（顺序即运行期返回值顺序）。
+    /// </summary>
+    private static string[] CollectMatchBindingNames(MatchCase matchCase)
+    {
+        return matchCase.Type switch
+        {
+            PatternType.VariableBinding or PatternType.TypeMatch =>
+                matchCase.BindingVariable is { Length: > 0 } name ? [name] : [],
+            PatternType.Tuple =>
+                matchCase.TuplePattern?.Elements
+                    .Where(element => element.Variable is not null)
+                    .Select(element => element.Variable!)
+                    .ToArray() ?? [],
+            _ => []
+        };
     }
 }

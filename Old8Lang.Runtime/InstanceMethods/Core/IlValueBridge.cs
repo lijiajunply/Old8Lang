@@ -91,6 +91,21 @@ public static class IlValueBridge
 
                 return new ArrayLangValue(elements);
             }
+            case System.Runtime.CompilerServices.ITuple nativeTuple:
+            {
+                // IL 里的元组是 ValueTuple / Tuple，直接包成 NativeAny 会让
+                // 「元组解构 match」「元组实例方法」这些语言层逻辑认不出来。
+                var tupleElements = new List<LangExpression>();
+                for (var index = 0; index < nativeTuple.Length; index++)
+                {
+                    tupleElements.Add(Wrap(nativeTuple[index]));
+                }
+
+                var tupleValue = new TupleLangValue(tupleElements);
+                // 语言层的 TupleLangValue 需要解释器访问一次来填充 ItemValues
+                tupleValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                return tupleValue;
+            }
             case IEnumerable enumerable:
             {
                 var items = new List<LangValueType>();
