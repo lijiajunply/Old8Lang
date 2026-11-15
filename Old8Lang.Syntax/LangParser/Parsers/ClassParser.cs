@@ -312,11 +312,11 @@ public class ClassParser(
         var statements = new List<IOldLangTree>();
         while (CurrentToken.Type != LangTokenType.RightBrace)
         {
-            // 跳过空白行和注释
+            // 文件在类体里结束：必须报语法错误。此前这里是 CurrentIndex++ 后 continue，
+            // 但词法器的 EOF 位置不会前进，`class A {` 这类截断文件会让解析器死循环。
             if (CurrentToken.Type == LangTokenType.EndOfFile)
             {
-                CurrentIndex++;
-                continue;
+                throw CreateSyntaxError("类定义缺少右花括号 '}'：文件在类体内结束");
             }
 
             // 跳过文档注释（文档注释会在后续解析时通过 CollectPrecedingDocComments 收集）
