@@ -43,10 +43,10 @@ public class StringSplitMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 加载分隔符
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringSplitMethod).GetMethod(nameof(SplitHelper),

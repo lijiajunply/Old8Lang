@@ -39,8 +39,8 @@ public class StringIndexOfMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         var helperMethod = typeof(StringIndexOfMethod).GetMethod(nameof(IndexOfHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

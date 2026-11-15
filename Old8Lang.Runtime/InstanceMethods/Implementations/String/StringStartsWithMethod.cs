@@ -32,21 +32,23 @@ public class StringStartsWithMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
         var helperMethod = typeof(StringStartsWithMethod).GetMethod(nameof(StartsWithHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static BoolLangValue StartsWithHelper(StringLangValue str, StringLangValue value)
+    public static bool StartsWithHelper(StringLangValue str, StringLangValue value)
     {
-        return new BoolLangValue(str.Value.StartsWith(value.Value));
+        // IL 路径统一用原生 bool 返回：与其他返回 bool 的实例方法一致，
+        // 这样 Assert.True(...) / if 条件等原生布尔上下文可以直接使用。
+        return str.Value.StartsWith(value.Value);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(BoolLangValue);
+        return typeof(bool);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

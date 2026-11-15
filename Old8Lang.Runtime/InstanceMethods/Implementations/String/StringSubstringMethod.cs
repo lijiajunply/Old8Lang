@@ -78,15 +78,15 @@ public class StringSubstringMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 加载起始索引
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         if (parameters.Count > 1)
         {
             // 加载长度
-            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            IlValueBridge.EmitLoadWrapped(parameters[1], ilGenerator, local);
 
             var helperMethod = typeof(StringSubstringMethod).GetMethod(nameof(SubstringWithLengthHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
@@ -103,20 +103,20 @@ public class StringSubstringMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：获取子字符串（只有起始索引）
     /// </summary>
-    public static StringLangValue SubstringHelper(StringLangValue str, IntLangValue start)
+    public static string SubstringHelper(StringLangValue str, IntLangValue start)
     {
         if (start.Value < 0 || start.Value > str.Value.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(start), $"起始索引 {start.Value} 超出范围");
         }
 
-        return new StringLangValue(str.Value.Substring(start.Value));
+        return str.Value.Substring(start.Value);
     }
 
     /// <summary>
     /// 辅助方法：获取子字符串（带长度）
     /// </summary>
-    public static StringLangValue SubstringWithLengthHelper(StringLangValue str, IntLangValue start, IntLangValue length)
+    public static string SubstringWithLengthHelper(StringLangValue str, IntLangValue start, IntLangValue length)
     {
         if (start.Value < 0 || start.Value > str.Value.Length)
         {
@@ -128,12 +128,12 @@ public class StringSubstringMethod : BaseInstanceMethod
             throw new ArgumentOutOfRangeException(nameof(length), $"长度 {length.Value} 超出范围");
         }
 
-        return new StringLangValue(str.Value.Substring(start.Value, length.Value));
+        return str.Value.Substring(start.Value, length.Value);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

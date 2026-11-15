@@ -32,7 +32,7 @@ public class StringToUpperMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringToUpperMethod).GetMethod(nameof(ToUpperHelper),
@@ -43,14 +43,14 @@ public class StringToUpperMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：转换为大写
     /// </summary>
-    public static StringLangValue ToUpperHelper(StringLangValue str)
+    public static string ToUpperHelper(StringLangValue str)
     {
-        return new StringLangValue(str.Value.ToUpper());
+        return str.Value.ToUpper();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

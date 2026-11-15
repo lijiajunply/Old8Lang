@@ -46,13 +46,13 @@ public class StringReplaceMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 加载旧值
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         // 加载新值
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(parameters[1], ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringReplaceMethod).GetMethod(nameof(ReplaceHelper),
@@ -63,14 +63,14 @@ public class StringReplaceMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：替换字符串
     /// </summary>
-    public static StringLangValue ReplaceHelper(StringLangValue str, StringLangValue oldValue, StringLangValue newValue)
+    public static string ReplaceHelper(StringLangValue str, StringLangValue oldValue, StringLangValue newValue)
     {
-        return new StringLangValue(str.Value.Replace(oldValue.Value, newValue.Value));
+        return str.Value.Replace(oldValue.Value, newValue.Value);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

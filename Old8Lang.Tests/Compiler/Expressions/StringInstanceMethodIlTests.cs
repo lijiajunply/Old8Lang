@@ -25,6 +25,36 @@ public class StringInstanceMethodIlTests
         CompileAndRun(code);
     }
 
+    [Fact]
+    public void StringMethods_OnNativeLiteralReceiver_Work()
+    {
+        // 接收者是原生 string、实参也是原生的（字面量或字符串变量），
+        // 这些方法原先把原生值直接传给 LangValueType helper，导致无效 IL 或访问越界。
+        const string code = @"
+            Assert.True(""abc"".StartsWith(""a""))
+            Assert.True(""abc"".EndsWith(""c""))
+            Assert.True(""abc"".Contains(""b""))
+            Assert.Equal(1, ""abc"".IndexOf(""b""))
+            Assert.Equal(""aXc"", ""abc"".Replace(""b"", ""X""))
+            Assert.Equal(2, ""a,b"".Split("","").Count())
+            Assert.Equal(""a"", ""  a  "".Trim())
+            Assert.Equal(""ab"", ""AB"".ToLower())
+            Assert.Equal(""AB"", ""ab"".ToUpper())
+            Assert.Equal(""bcd"", ""abcd"".Substring(1))
+            Assert.Equal(""cba"", ""abc"".Reverse())
+            Assert.Equal(""  a"", ""a"".PadLeft(3))
+            Assert.Equal(3, ""abc"".ToCharArray().Count())
+            Assert.Equal(""YWJj"", ""abc"".ToBase64())
+
+            // 模板结果是原生 string，链式调用同样要走包装路径
+            line <- ""hello world""
+            text <- $""{line}!""
+            Assert.True(text.StartsWith(""hello""))
+            Assert.True(text.Contains(""world""))
+        ";
+        CompileAndRun(code);
+    }
+
     private static void CompileAndRun(string code)
     {
         var interpreter = new LangInterpreter();

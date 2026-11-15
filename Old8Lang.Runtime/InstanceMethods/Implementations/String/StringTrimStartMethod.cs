@@ -31,21 +31,21 @@ public class StringTrimStartMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(StringTrimStartMethod).GetMethod(nameof(TrimStartHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static StringLangValue TrimStartHelper(StringLangValue str)
+    public static string TrimStartHelper(StringLangValue str)
     {
-        return new StringLangValue(str.Value.TrimStart());
+        return str.Value.TrimStart();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

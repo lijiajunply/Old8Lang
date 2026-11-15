@@ -358,12 +358,13 @@
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
-   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2009 例 →
-   **207 失败 / 1777 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2010 例 →
+   **206 失败 / 1779 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
    且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
    期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where` /
    字符串实例方法与语言值相等 / 泛型 `T?` 实参 / 并发函数 int 实参等一批无效 IL；
-   并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算、范围端点排除语义、`.Length` 属性与 null 显示。
+   并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算、范围端点排除语义、`.Length` 属性、null 显示，
+   以及字符串实例方法的 IL 操作数包装（`"abc".StartsWith("a")` 曾生成无效 IL）。
    其余失败以异步、函数、类、表达式、集合的结果/类型推断缺口为主。另修掉「类体在文件结尾
    被截断时解析器死循环」的进程挂死问题。
    对 `TestFiles/CompilerTests`（157）、`InterpreterTests`（188）、`SyntaxTests`（91）

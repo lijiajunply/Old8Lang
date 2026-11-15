@@ -32,7 +32,7 @@ public class StringToLowerMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringToLowerMethod).GetMethod(nameof(ToLowerHelper),
@@ -43,14 +43,14 @@ public class StringToLowerMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：转换为小写
     /// </summary>
-    public static StringLangValue ToLowerHelper(StringLangValue str)
+    public static string ToLowerHelper(StringLangValue str)
     {
-        return new StringLangValue(str.Value.ToLower());
+        return str.Value.ToLower();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

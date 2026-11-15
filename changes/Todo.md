@@ -163,6 +163,11 @@
 - [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
 - [ ] **VM 原生函数命名参数**：评估如何获取原生函数参数信息（`VirtualMachine.Instructions.ControlFlow.cs` 中的 TODO）。
 
+- [ ] **其余实例方法的 IL 操作数包装审计**：`Dictionary` / `List` / `Array` / `Char` 等
+  命名空间下仍有约 100 个 `GenerateIlInternal` 使用裸 `CreateCompiler`，其中形参是语言值、
+  实参是原生值的同样会生成无效 IL（字符串命名空间已于 2026-11-15 修完）。
+  需要按目录逐个核对 helper 签名，或在常见方法矩阵上先扫描崩溃点。
+
 ## 测试与工程问题
 
 - [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 Core 诊断与预处理报告（`2026-11-13-16-35-Core诊断与预处理拆分测试.md`）。
@@ -372,15 +377,23 @@
   不再产生无效 IL；新增 4 项回归。
   见 change（`2026-11-15-IL类方法实参与生成器无效IL/test.md`）。
 
-- [ ] **模板插值中的嵌套同种引号会让词法器死循环**：`PrintLine($"s={"ab"}")` 在 `-s`
-  下 8 秒超时（`-f` / `-il` / `-vm` 同样挂死，只能杀进程）。插值表达式里出现同种双引号时
-  词法状态没有推进，属进程挂死级问题；需要定位字符串模板的词法/括号匹配逻辑，至少改为
-  明确报语法错误。2026-11-15 实测。
+- [x] **模板插值中的嵌套同种引号会让词法器死循环**：`PrintLine($"s={"ab"}")` 在 `-s`
+  下 8 秒超时（`-f` / `-il` / `-vm` 同样挂死）。根因是词法把模板截成 `s={`，解析器扫到
+  末尾的 `{` 时循环不推进。现在抛 `SyntaxError「字符串模板中的花括号未闭合」`，
+  并加「本轮未推进」兜底；词法仍不支持插值内的同种引号（改用单引号或先赋值）。
+  新增 1 项 Parser 回归。见 change（`2026-11-15-模板插值死循环/test.md`）。
 
 - [x] **解析器在类体被文件结尾截断时死循环**：`class A {` 这类截断文件会让整个进程挂死
   （`-s` 也挂住，只能 kill）。`ParseClassBlock` 遇到 EOF 时执行 `CurrentIndex++` 后 `continue`，
   但 EOF 位置不会前进。现在直接抛 `SyntaxError`「类定义缺少右花括号」。新增 2 项回归。
   见 change（`2026-11-15-解析器类体EOF死循环/test.md`）。
+
+- [x] **字符串实例方法的 IL 操作数未包装**：`"abc".StartsWith("a")` 等 19 个方法把原生
+  string/int 直接传给 `StringLangValue`/`IntLangValue` 形参，生成无效 IL；模板结果上的
+  `result.StartsWith(...)` 甚至触发 `AccessViolationException`。现在统一改用
+  `IlValueBridge.EmitLoadWrapped`；三个谓词（`StartsWith`/`EndsWith`/`Contains`）改返回原生 bool，
+  13 个字符串方法改返回原生 string（`Assert.Equal` 不再看到带引号显示）。
+  新增 1 项覆盖 16 个方法的 IL 回归。见 change（`2026-11-15-字符串方法操作数包装/test.md`）。
 
 - [x] **IL 字符串实例方法 `Repeat` 与语言值相等比较**：`"=".Repeat(5)` 生成无效 IL
   （`StringRepeatMethod` 把原生 string/int 直接传给 `StringLangValue`/`IntLangValue` 形参）；

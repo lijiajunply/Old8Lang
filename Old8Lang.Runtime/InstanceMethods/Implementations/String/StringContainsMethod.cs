@@ -40,10 +40,10 @@ public class StringContainsMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 加载要查找的值
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringContainsMethod).GetMethod(nameof(ContainsHelper),
@@ -54,14 +54,16 @@ public class StringContainsMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：检查是否包含子字符串
     /// </summary>
-    public static BoolLangValue ContainsHelper(StringLangValue str, StringLangValue value)
+    public static bool ContainsHelper(StringLangValue str, StringLangValue value)
     {
-        return new BoolLangValue(str.Value.Contains(value.Value));
+        // IL 路径统一用原生 bool 返回：与其他返回 bool 的实例方法一致，
+        // 这样 Assert.True(...) / if 条件等原生布尔上下文可以直接使用。
+        return str.Value.Contains(value.Value);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(BoolLangValue);
+        return typeof(bool);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

@@ -32,7 +32,7 @@ public class StringTrimMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 加载字符串实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         // 调用辅助方法
         var helperMethod = typeof(StringTrimMethod).GetMethod(nameof(TrimHelper),
@@ -43,14 +43,14 @@ public class StringTrimMethod : BaseInstanceMethod
     /// <summary>
     /// 辅助方法：去除首尾空白字符
     /// </summary>
-    public static StringLangValue TrimHelper(StringLangValue str)
+    public static string TrimHelper(StringLangValue str)
     {
-        return new StringLangValue(str.Value.Trim());
+        return str.Value.Trim();
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

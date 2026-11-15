@@ -40,19 +40,19 @@ public class StringFromBase64Method : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(StringFromBase64Method).GetMethod(nameof(FromBase64Helper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static StringLangValue FromBase64Helper(StringLangValue str)
+    public static string FromBase64Helper(StringLangValue str)
     {
         try
         {
             byte[] bytes = Convert.FromBase64String(str.Value);
-            return new StringLangValue(Encoding.UTF8.GetString(bytes));
+            return Encoding.UTF8.GetString(bytes);
         }
         catch (Exception ex)
         {
@@ -62,7 +62,7 @@ public class StringFromBase64Method : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)

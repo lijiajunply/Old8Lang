@@ -43,11 +43,11 @@ public class StringPadRightMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
         if (parameters.Count > 1)
         {
-            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            IlValueBridge.EmitLoadWrapped(parameters[1], ilGenerator, local);
             var helperMethod = typeof(StringPadRightMethod).GetMethod(nameof(PadRightWithCharHelper),
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
             ilGenerator.Emit(OpCodes.Call, helperMethod!);
@@ -60,24 +60,24 @@ public class StringPadRightMethod : BaseInstanceMethod
         }
     }
 
-    public static StringLangValue PadRightHelper(StringLangValue str, IntLangValue width)
+    public static string PadRightHelper(StringLangValue str, IntLangValue width)
     {
-        return new StringLangValue(str.Value.PadRight(width.Value));
+        return str.Value.PadRight(width.Value);
     }
 
-    public static StringLangValue PadRightWithCharHelper(StringLangValue str, IntLangValue width, LangValueType charParam)
+    public static string PadRightWithCharHelper(StringLangValue str, IntLangValue width, LangValueType charParam)
     {
         char paddingChar = ' ';
         if (charParam is StringLangValue charStr && charStr.Value.Length > 0)
             paddingChar = charStr.Value[0];
         else if (charParam is CharLangValue charVal)
             paddingChar = charVal.Value;
-        return new StringLangValue(str.Value.PadRight(width.Value, paddingChar));
+        return str.Value.PadRight(width.Value, paddingChar);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(StringLangValue);
+        return typeof(string);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
