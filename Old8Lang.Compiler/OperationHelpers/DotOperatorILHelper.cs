@@ -416,6 +416,11 @@ public static class DotOperatorILHelper
                     if (actualType == typeof(object) && expectedType.IsValueType)
                         continue;
 
+                    // string 形参接受任意实参：运行期按语言的显示规则转换，
+                    // 例如 Assert.Contains("Error:", 捕获到的异常)。
+                    if (expectedType == typeof(string))
+                        continue;
+
                     return false;
                 }
 
@@ -442,6 +447,19 @@ public static class DotOperatorILHelper
                 if (paramType.IsValueType && idType == typeof(object))
                 {
                     ilGenerator.Emit(OpCodes.Unbox_Any, paramType);
+                }
+
+                // string 形参但实参不是 string：先装箱再按语言的显示规则转成字符串
+                if (paramType == typeof(string) && idType != typeof(string))
+                {
+                    if (idType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, idType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(Old8Lang.Runtime.VMValueFormatter).GetMethod(
+                            nameof(Old8Lang.Runtime.VMValueFormatter.ToDisplayString))!);
                 }
             }
 

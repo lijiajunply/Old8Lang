@@ -28,4 +28,22 @@ public class ExceptionWrapper
     {
         return Exception.Message;
     }
+
+    /// <summary>
+    /// 把捕获到的异常绑定成 catch 变量应持有的值。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="LangThrownException"/> 携带的是语言层 <c>throw</c> 的原始值
+    /// （字符串、字典、类实例等），这里解包回原生值；
+    /// 其余异常（运行期错误等）仍然包装成 <see cref="ExceptionWrapper"/>。
+    /// </remarks>
+    public static object? Bind(Exception exception)
+    {
+        if (exception is LangThrownException thrown)
+        {
+            return Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(thrown.Value);
+        }
+
+        return new ExceptionWrapper(exception);
+    }
 }

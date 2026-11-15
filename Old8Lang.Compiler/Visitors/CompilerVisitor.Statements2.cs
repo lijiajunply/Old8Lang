@@ -486,17 +486,17 @@ public partial class CompilerVisitor
                     if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
                          ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
-                         ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
+                         ilGenerator.Emit(OpCodes.Call, typeof(ExceptionWrapper).GetMethod(nameof(ExceptionWrapper.Bind))!);
 
                          // 在异步状态机中，需要定义变量并存储
                          if (local.AsyncStateMachineGenerator != null)
                          {
-                             local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(ExceptionWrapper));
+                             local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(object));
                              local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
                          }
                          else
                          {
-                             var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
+                             var wrapperLocal = ilGenerator.DeclareLocal(typeof(object));
                              ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
                              local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
                          }
@@ -547,18 +547,18 @@ public partial class CompilerVisitor
                 if (filter == null && exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
                 {
                      ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
-                     // 包装异常
-                     ilGenerator.Emit(OpCodes.Newobj, typeof(ExceptionWrapper).GetConstructor([typeof(Exception)])!);
+                     // 解包成 catch 变量应持有的值（语言层 throw 的原始值，或异常包装）
+                     ilGenerator.Emit(OpCodes.Call, typeof(ExceptionWrapper).GetMethod(nameof(ExceptionWrapper.Bind))!);
 
                      // 在异步状态机中，需要定义变量并存储
                      if (local.AsyncStateMachineGenerator != null)
                      {
-                         local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(ExceptionWrapper));
+                         local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(object));
                          local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
                      }
                      else
                      {
-                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(ExceptionWrapper));
+                         var wrapperLocal = ilGenerator.DeclareLocal(typeof(object));
                          ilGenerator.Emit(OpCodes.Stloc, wrapperLocal);
                          local.AddLocalVar(exceptionVar.IdName, wrapperLocal);
                      }

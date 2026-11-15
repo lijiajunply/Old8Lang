@@ -301,13 +301,16 @@
   这会与「值类型变量动态改数值宽度靠重绑定」的既有行为冲突，需要先定语义。
   见 `Docs/MODE_SUPPORT.md` 的跨模式差异小节第 1 条。
 
-- [ ] **IL 的 `throw` 丢弃被抛出的值，catch 只能拿到异常包装**：`throw "msg"` 在 IL 里被编译成
+- [x] **IL 的 `throw` 丢弃被抛出的值，catch 只能拿到异常包装**：`throw "msg"` 在 IL 里被编译成
   「ToString 后 `new Exception(string)`」，catch 绑定的是 `ExceptionWrapper`，原始值无从取回。
   于是 `try { Account("Bob", -500.0) } catch (e) { caughtError <- e }` 之后
   `Assert.Equal("Initial balance cannot be negative", caughtError)` 失败（实际为空），
   而解释器里 `e` 就是被抛出的字符串。`ThrowComplexObject`（抛字典后 `e["field"]`）同源。
   需要新增「携带原始语言值的异常」并在 catch 处解包回原始值（同时确认 `e.ToStr()` 等用法）。
-  见 `Docs/MODE_SUPPORT.md` 的跨模式差异小节与 `changes/2026-11-15-IL-try局部变量/test.md`。
+  已修复（2026-11-15）：新增 `LangThrownException` 携带原始语言值，catch 处用
+  `ExceptionWrapper.Bind` 解包回原生值，catch 变量槽位改为 `object`；
+  `Assert` 的 `string` 形参改为接受任意实参（按显示文本转换）。
+  `Compiler.Exceptions` 10→9 失败。见 change（`2026-11-15-IL抛出值保留/test.md`）。
 
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」

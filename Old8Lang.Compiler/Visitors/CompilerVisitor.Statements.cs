@@ -1311,15 +1311,15 @@ public partial class CompilerVisitor
             return null;
         }
 
-        // 如果是值类型，需要装箱后才能调用ToString()
+        // 值类型先装箱，再包装成语言值挂到异常上：catch 处可以解包回原始值
         if (exprType is { IsValueType: true })
         {
             ilGenerator.Emit(OpCodes.Box, exprType);
         }
 
-        // 将抛出的值转换为字符串
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(object).GetMethod("ToString")!);
-        ilGenerator.Emit(OpCodes.Newobj, typeof(Exception).GetConstructor([typeof(string)])!);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Wrap))!);
+        ilGenerator.Emit(OpCodes.Newobj, typeof(LangThrownException).GetConstructor([typeof(LangValueType)])!);
         ilGenerator.Emit(OpCodes.Throw);
     
     
