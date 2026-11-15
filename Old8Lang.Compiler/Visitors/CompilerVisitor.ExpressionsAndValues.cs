@@ -645,6 +645,35 @@ public partial class CompilerVisitor
 
         if (matchingMethod is null)
         {
+            // 名字不是委托类型的局部变量、也不是已知函数：可能是静态类型为 object 的
+            // 函数值（函数返回值、集合里取出的函数值）。此时按运行期实际委托调用，
+            // 不能落到下面的「当类名构造实例」分支（那里找不到类会发 ldnull，
+            // 结果静默变成 null）。
+            if (local.GetLocalVar(node.Id.IdName) is { } functionLocal)
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, functionLocal);
+                ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                for (var index = 0; index < node.Ids.Count; index++)
+                {
+                    ilGenerator.Emit(OpCodes.Dup);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                    var argument = node.Ids[index];
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                    var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                    if (argumentType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, argumentType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                return null;
+            }
+
             var classType = local.ClassVar.GetValueOrDefault(node.Id.IdName);
             if (classType is null)
             {

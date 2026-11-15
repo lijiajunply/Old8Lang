@@ -273,6 +273,15 @@
   `BasicClosure`、`ClosureWithHigherOrderFunction` 通过。
   见 change（`2026-11-15-IL闭包捕获形参/test.md`）。遗留：嵌套闭包返回函数值仍为 null。
 
+- [x] **IL 模式调用 object 静态类型的函数值静默返回 null**：`m2 <- f2(); m2(5)`
+  （`f2` 返回一个 lambda）在 `VisitInstance` 里既不是委托类型的局部变量、也不在
+  `DelegateVar`，于是落到「按类名构造实例」兜底，找不到类就发 `ldnull` 返回 null。
+  现在先在「按类名构造」之前识别已存在的局部变量并走新增的
+  `IlValueBridge.InvokeFunctionValue`；同时修正嵌套闭包读取外层捕获值的拆箱
+  （值类型必须 `unbox.any`，`castclass int` 曾产出垃圾整数）。
+  `Compiler.Functions` 54→53 失败，`ClosureReturningClosure` 通过。
+  见 change（`2026-11-15-IL函数值调用/test.md`）。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。

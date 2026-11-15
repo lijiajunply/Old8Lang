@@ -135,7 +135,11 @@ internal static class FuncLangValueIlCompilerExtensions
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                     ilGenerator.Emit(OpCodes.Ldc_I4, outerThis.Index);
                     ilGenerator.Emit(OpCodes.Ldelem_Ref);
-                    if (outerThis.Type != typeof(object) && outerThis.Type is not TypeBuilder)
+                    if (outerThis.Type.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, outerThis.Type);
+                    }
+                    else if (outerThis.Type != typeof(object) && outerThis.Type is not TypeBuilder)
                     {
                         ilGenerator.Emit(OpCodes.Castclass, outerThis.Type);
                     }
@@ -156,11 +160,16 @@ internal static class FuncLangValueIlCompilerExtensions
             }
             else if (local.TryGetCapturedLocal(captured.Name, out var outerCaptured))
             {
-                // 外层闭包已经捕获过：从当前闭包环境数组里取出，再打包进新闭包
+                // 外层闭包已经捕获过：从当前闭包环境数组里取出，再打包进新闭包。
+                // 环境数组是 object[]，值类型必须拆箱（castclass 对 int/bool 这类会产出无效 IL）。
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Ldc_I4, outerCaptured.Index);
                 ilGenerator.Emit(OpCodes.Ldelem_Ref);
-                if (outerCaptured.Type != typeof(object) && outerCaptured.Type is not TypeBuilder)
+                if (outerCaptured.Type.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, outerCaptured.Type);
+                }
+                else if (outerCaptured.Type != typeof(object) && outerCaptured.Type is not TypeBuilder)
                 {
                     ilGenerator.Emit(OpCodes.Castclass, outerCaptured.Type);
                 }

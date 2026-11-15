@@ -283,6 +283,25 @@ public static class IlValueBridge
     }
 
     /// <summary>
+    /// 调用静态类型未知（例如 <c>object</c> 槽位）的函数值。
+    /// </summary>
+    /// <remarks>
+    /// 函数返回值、字典 / 集合里取出的函数值在 IL 里的静态类型通常是 <c>object</c>，
+    /// 无法走「已知委托类型的局部变量」那条快路径。这里按运行期实际类型调用；
+    /// 非函数值报错而不是静默返回 null。
+    /// </remarks>
+    public static object? InvokeFunctionValue(object? function, object?[] arguments)
+    {
+        return function switch
+        {
+            null => null,
+            Delegate del => InvokeDelegate(del, arguments),
+            IlDelegateFuncLangValue wrapped => InvokeDelegate(wrapped.Function, arguments),
+            _ => throw new InvalidOperationException($"对象 '{function}' 不是函数值，无法调用")
+        };
+    }
+
+    /// <summary>
     /// 调用委托并把结果当作布尔值使用。
     /// </summary>
     public static bool InvokePredicate(Delegate function, object? argument)
