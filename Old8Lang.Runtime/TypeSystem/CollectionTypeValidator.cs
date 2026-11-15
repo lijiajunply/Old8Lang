@@ -1,4 +1,5 @@
 using Old8Lang.AST;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
@@ -84,16 +85,22 @@ public static class CollectionTypeValidator
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
     {
-        if (value is not ListLangValue listValue)
+        // IL 模式下的 `{...}` / `[...]` 是字面量表达式节点，不是解释器的 ListLangValue；
+        // 两种表示都要接受，否则带元素类型的注解会被判成「实际值不是列表」。
+        ListLangValue? listValue = value as ListLangValue;
+        IReadOnlyList<LangExpression> elements = value switch
         {
-            throw new CompilerException(
+            ListLangValue list => list.Value,
+            ListLiteralExpression literal => literal.Elements,
+            ArrayLiteralExpression arrayLiteral => arrayLiteral.Elements,
+            _ => throw new CompilerException(
                 $"变量 '{variableName}' 类型注解为 {parsedAnnotation.GetFullName()},但实际值不是列表。期望类型: {parsedAnnotation.GetFullName()}, 实际类型: {GetExpressionTypeName(value)}",
                 position
-            );
-        }
+            )
+        };
 
         // 空列表跳过元素验证
-        if (listValue.Value.Count == 0)
+        if (elements.Count == 0)
         {
             return;
         }
@@ -102,9 +109,9 @@ public static class CollectionTypeValidator
         var expectedElementType = parsedAnnotation.GenericArguments![0];
 
         // 验证每个元素
-        for (int i = 0; i < listValue.Value.Count; i++)
+        for (int i = 0; i < elements.Count; i++)
         {
-            var element = listValue.Value[i];
+            var element = elements[i];
             var actualElementTypeName = GetExpressionTypeName(element);
             var actualElementType = typeAnnotationManager.ParseTypeAnnotation(actualElementTypeName);
 
@@ -119,8 +126,11 @@ public static class CollectionTypeValidator
             }
         }
 
-        // 应用类型信息到 AST 节点
-        listValue.ElementType = expectedElementType.GetFullName();
+        // 应用类型信息到 AST 节点（只有解释器的运行时列表才需要记录元素类型）
+        if (listValue is not null)
+        {
+            listValue.ElementType = expectedElementType.GetFullName();
+        }
     }
 
     /// <summary>
@@ -133,16 +143,20 @@ public static class CollectionTypeValidator
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
     {
-        if (value is not ArrayLangValue arrayValue)
+        ArrayLangValue? arrayValue = value as ArrayLangValue;
+        IReadOnlyList<LangExpression> arrayElements = value switch
         {
-            throw new CompilerException(
+            ArrayLangValue array => array.Values,
+            ArrayLiteralExpression literal => literal.Elements,
+            ListLiteralExpression listLiteral => listLiteral.Elements,
+            _ => throw new CompilerException(
                 $"变量 '{variableName}' 类型注解为 {parsedAnnotation.GetFullName()},但实际值不是数组。期望类型: {parsedAnnotation.GetFullName()}, 实际类型: {GetExpressionTypeName(value)}",
                 position
-            );
-        }
+            )
+        };
 
         // 空数组跳过元素验证
-        if (arrayValue.Values.Count == 0)
+        if (arrayElements.Count == 0)
         {
             return;
         }
@@ -151,9 +165,9 @@ public static class CollectionTypeValidator
         var expectedElementType = parsedAnnotation.GenericArguments![0];
 
         // 验证每个元素
-        for (int i = 0; i < arrayValue.Values.Count; i++)
+        for (int i = 0; i < arrayElements.Count; i++)
         {
-            var element = arrayValue.Values[i];
+            var element = arrayElements[i];
             var actualElementTypeName = GetExpressionTypeName(element);
             var actualElementType = typeAnnotationManager.ParseTypeAnnotation(actualElementTypeName);
 
@@ -168,8 +182,11 @@ public static class CollectionTypeValidator
             }
         }
 
-        // 应用类型信息到 AST 节点
-        arrayValue.ElementType = expectedElementType.GetFullName();
+        // 应用类型信息到 AST 节点（只有解释器的运行时数组才需要记录元素类型）
+        if (arrayValue is not null)
+        {
+            arrayValue.ElementType = expectedElementType.GetFullName();
+        }
     }
 
     /// <summary>
@@ -182,16 +199,24 @@ public static class CollectionTypeValidator
         SourcePosition position,
         TypeAnnotationManager typeAnnotationManager)
     {
-        if (value is not DictionaryLangValue dictValue)
+        // IL 模式下的 `{k: v}` 是 DictionaryLiteralExpression，同样要接受。
+        var dictValue = value as DictionaryLangValue;
+        List<(LangExpression Key, LangExpression Value)> entries = value switch
         {
-            throw new CompilerException(
+            DictionaryLangValue runtime => runtime.Tuples
+                .Select(tuple => (tuple.Elements[0], tuple.Elements[1]))
+                .ToList(),
+            DictionaryLiteralExpression literal => literal.Entries
+                .Select(entry => (entry.Key, entry.Value))
+                .ToList(),
+            _ => throw new CompilerException(
                 $"变量 '{variableName}' 类型注解为 {parsedAnnotation.GetFullName()},但实际值不是字典。期望类型: {parsedAnnotation.GetFullName()}, 实际类型: {GetExpressionTypeName(value)}",
                 position
-            );
-        }
+            )
+        };
 
         // 空字典跳过元素验证
-        if (dictValue.Tuples.Count == 0)
+        if (entries.Count == 0)
         {
             return;
         }
@@ -201,12 +226,12 @@ public static class CollectionTypeValidator
         var expectedValueType = parsedAnnotation.GenericArguments[1];
 
         // 验证每个键值对
-        for (int i = 0; i < dictValue.Tuples.Count; i++)
+        for (int i = 0; i < entries.Count; i++)
         {
-            var tuple = dictValue.Tuples[i];
+            var tuple = entries[i];
 
             // 验证键类型
-            var actualKeyTypeName = GetExpressionTypeName(tuple.Elements[0]);
+            var actualKeyTypeName = GetExpressionTypeName(tuple.Key);
             var actualKeyType = typeAnnotationManager.ParseTypeAnnotation(actualKeyTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
@@ -220,7 +245,7 @@ public static class CollectionTypeValidator
             }
 
             // 验证值类型
-            var actualValueTypeName = GetExpressionTypeName(tuple.Elements[1]);
+            var actualValueTypeName = GetExpressionTypeName(tuple.Value);
             var actualValueType = typeAnnotationManager.ParseTypeAnnotation(actualValueTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
@@ -234,9 +259,12 @@ public static class CollectionTypeValidator
             }
         }
 
-        // 应用类型信息到 AST 节点
-        dictValue.KeyType = expectedKeyType.GetFullName();
-        dictValue.ValueType = expectedValueType.GetFullName();
+        // 应用类型信息到 AST 节点（只有解释器的运行时字典才需要记录键值类型）
+        if (dictValue is not null)
+        {
+            dictValue.KeyType = expectedKeyType.GetFullName();
+            dictValue.ValueType = expectedValueType.GetFullName();
+        }
     }
 
     /// <summary>
@@ -256,6 +284,9 @@ public static class CollectionTypeValidator
             DictionaryLangValue dict => dict.KeyType is not null && dict.ValueType is not null
                 ? $"dict<{dict.KeyType},{dict.ValueType}>"
                 : "dict",
+            ListLiteralExpression => "list",
+            ArrayLiteralExpression => "array",
+            DictionaryLiteralExpression => "dict",
             NullLangValue => "null",
             _ => "any"
         };

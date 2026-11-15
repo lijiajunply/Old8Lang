@@ -235,6 +235,21 @@
   `Compiler.Statements` 3→0 失败（186/186 全通过），其余 18 组不变。
   见 change（`2026-11-15-IL-switch与try跳转/test.md`）。
 
+- [x] **带元素类型的集合注解在 IL 模式被误判「实际值不是列表」**：
+  `CollectionTypeValidator` 只认解释器的 `ListLangValue` / `ArrayLangValue` /
+  `DictionaryLangValue`，而 IL 模式下 `{...}` / `[...]` / `{k: v}` 是
+  `ListLiteralExpression` / `ArrayLiteralExpression` / `DictionaryLiteralExpression`，
+  于是 `intList: list<int> <- {1, 2, 3}` 直接报「实际值不是列表（实际类型 any）」。
+  现在三个校验方法同时接受两种表示。`Compiler.Types` 51→17 失败、`Compiler.Basic` 16→13 失败，
+  其余组不变。见 change（`2026-11-15-集合类型注解校验/test.md`）。
+
+- [ ] **集合注解的元素类型不匹配仍未在编译期报错**：
+  `items: list<int> <- {1, "hello", 3}` 在 `-f` 与 `-il` 下都能通过（返回第一个元素），
+  只有 `-vm` 报 `list<int>` 类型不匹配；`GenericCollectionTypesCompilerTests` 有 6 项
+  `*TypeMismatch_ThrowsCompilerException` 依赖这个编译期校验。
+  需要先定「集合注解是否严格校验元素类型」，再统一三模式与用例。
+  见 change（`2026-11-15-集合类型注解校验/test.md` §5）。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。
