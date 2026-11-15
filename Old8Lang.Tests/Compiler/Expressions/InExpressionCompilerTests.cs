@@ -251,4 +251,87 @@ public class InExpressionCompilerTests
     }
 
     #endregion
+
+    #region in 运算符的类型转换与拼接回归
+
+    /// <summary>
+    /// 列表的 in 必须按元素类型拆箱：左侧值在主入口统一装箱成 object，
+    /// 直接传给 List&lt;T&gt;.Contains(T) 会生成无效 IL。
+    /// </summary>
+    [Fact]
+    public void InExpression_ListWithValueTypeElements_UsesElementConversion()
+    {
+        var code = @"
+            numbers <- {10, 20, 30}
+            Assert.True(10 in numbers)
+            Assert.False(25 in numbers)
+        ";
+
+        Assert.Null(CompileAndInvoke(code));
+    }
+
+    /// <summary>
+    /// 字典的 in 必须按键类型拆箱；混合值类型的字典字面量尤其容易触发无效 IL。
+    /// </summary>
+    [Fact]
+    public void InExpression_DictionaryWithStringKeys_UsesKeyConversion()
+    {
+        var code = @"
+            data <- {""name"": ""Alice"", ""age"": 30}
+            Assert.True(""name"" in data)
+            Assert.False(""city"" in data)
+        ";
+
+        Assert.Null(CompileAndInvoke(code));
+    }
+
+    /// <summary>
+    /// in 作为字符串拼接的右操作数：类型推断必须给出 bool。
+    /// 此前推断成左操作数类型，会让 string.Concat(object, object) 收到未装箱的 bool。
+    /// </summary>
+    [Fact]
+    public void InExpression_AsStringConcatOperand_DoesNotProduceInvalidIl()
+    {
+        var code = @"
+            numbers <- {1, 2}
+            text <- ""x"" + (1 in numbers)
+            PrintLine(text)
+        ";
+
+        Assert.Null(CompileAndInvoke(code));
+    }
+
+    /// <summary>
+    /// 字典混合值类型 + 拼接组合曾稳定生成无效 IL（JIT 直接拒绝）。
+    /// </summary>
+    [Fact]
+    public void InExpression_DictionaryInsideConcat_DoesNotProduceInvalidIl()
+    {
+        var code = @"
+            data <- {""a"": 1}
+            text <- ""x"" + (""a"" in data)
+            PrintLine(text)
+        ";
+
+        Assert.Null(CompileAndInvoke(code));
+    }
+
+    private static Exception? CompileAndInvoke(string code)
+    {
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+        try
+        {
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+            return Record.Exception(() => compiledAction());
+        }
+        finally
+        {
+            Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
+        }
+    }
+
+    #endregion
 }

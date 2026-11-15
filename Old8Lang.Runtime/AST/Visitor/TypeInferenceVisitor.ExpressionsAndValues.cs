@@ -602,10 +602,15 @@ public partial class TypeInferenceVisitor
         }
 
         // 处理比较运算符和逻辑运算符
+        // `in` 也在这里：它恒返回 bool。此前漏掉后落到末尾「返回左操作数类型」，
+        // 于是 `"x" + (1 in list)` 会把右侧的 bool 当作 int/string 处理，
+        // 轻则拼出错误文本（"x1"），重则 `string.Concat(object, object)` 收到未装箱的
+        // bool，生成无效 IL（InvalidProgramException）。
         if (node.Opera == LangTokenType.GreaterThan || node.Opera == LangTokenType.LessThan || 
             node.Opera == LangTokenType.Equals || node.Opera == LangTokenType.NotEquals || 
             node.Opera == LangTokenType.GreaterThanEquals || node.Opera == LangTokenType.LessThanEquals ||
-            node.Opera == LangTokenType.And || node.Opera == LangTokenType.Or || node.Opera == LangTokenType.Xor)
+            node.Opera == LangTokenType.And || node.Opera == LangTokenType.Or || node.Opera == LangTokenType.Xor ||
+            node.Opera == LangTokenType.In)
         {
             return typeof(bool);
         }

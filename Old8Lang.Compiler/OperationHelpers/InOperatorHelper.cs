@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
+using Old8Lang.InstanceMethods.Core;
 
 using Old8Lang.AST.Visitor;
 
@@ -36,14 +37,69 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成 List&lt;T&gt; 的 Contains 检查
     /// </summary>
-    internal static void GenerateListContains(ILGenerator ilGenerator, Type listType)
+    /// <remarks>
+    /// 左侧值在主入口统一装箱成了 object，而 <c>List&lt;T&gt;.Contains(T)</c> 的形参是 T。
+    /// 直接传 object 会生成无效 IL（JIT 报 <c>InvalidProgramException</c>），
+    /// 因此必须按元素类型拆箱、引用类型则 castclass。
+    /// </remarks>
+    internal static void GenerateListContains(ILGenerator ilGenerator, Type listType, Type? valueType)
     {
         // 交换栈顺序：[value, list] -> [list, value]
         SwapStackOrder(ilGenerator, listType, typeof(object));
 
+        var elementType = listType.GetGenericArguments()[0];
+        EmitValueConversion(ilGenerator, elementType, valueType);
+
         // 调用 List<T>.Contains(T) 方法
-        var containsMethod = listType.GetMethod("Contains", [listType.GetGenericArguments()[0]])!;
+        var containsMethod = listType.GetMethod("Contains", [elementType])!;
         ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
+    }
+
+    /// <summary>
+    /// 把栈顶装箱值转换成目标元素/键类型。
+    /// </summary>
+    private static void EmitValueConversion(ILGenerator ilGenerator, Type targetType, Type? sourceType)
+    {
+        if (targetType == typeof(object)) return;
+
+        if (targetType.IsValueType)
+        {
+            // 数值宽度不一致时先按实际装箱类型拆箱，再转成目标类型。
+            var unboxType = sourceType is { IsValueType: true } && sourceType != targetType
+                ? sourceType
+                : targetType;
+
+            if (unboxType != targetType && IsNumericType(unboxType) && IsNumericType(targetType))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, unboxType);
+                EmitNumericConversion(ilGenerator, targetType);
+                return;
+            }
+
+            ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+            return;
+        }
+
+        ilGenerator.Emit(OpCodes.Castclass, targetType);
+    }
+
+    private static bool IsNumericType(Type type) =>
+        type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte) ||
+        type == typeof(sbyte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong) ||
+        type == typeof(float) || type == typeof(double) || type == typeof(decimal);
+
+    private static void EmitNumericConversion(ILGenerator ilGenerator, Type targetType)
+    {
+        if (targetType == typeof(double)) ilGenerator.Emit(OpCodes.Conv_R8);
+        else if (targetType == typeof(float)) ilGenerator.Emit(OpCodes.Conv_R4);
+        else if (targetType == typeof(long)) ilGenerator.Emit(OpCodes.Conv_I8);
+        else if (targetType == typeof(short)) ilGenerator.Emit(OpCodes.Conv_I2);
+        else if (targetType == typeof(byte)) ilGenerator.Emit(OpCodes.Conv_U1);
+        else if (targetType == typeof(sbyte)) ilGenerator.Emit(OpCodes.Conv_I1);
+        else if (targetType == typeof(ushort)) ilGenerator.Emit(OpCodes.Conv_U2);
+        else if (targetType == typeof(uint)) ilGenerator.Emit(OpCodes.Conv_U4);
+        else if (targetType == typeof(ulong)) ilGenerator.Emit(OpCodes.Conv_U8);
+        else ilGenerator.Emit(OpCodes.Conv_I4);
     }
 
     /// <summary>
@@ -68,13 +124,16 @@ internal static class InOperatorHelper
     /// <summary>
     /// 生成 Dictionary&lt;TKey, TValue&gt; 的 ContainsKey 检查
     /// </summary>
-    internal static void GenerateDictionaryContainsKey(ILGenerator ilGenerator, Type dictType)
+    internal static void GenerateDictionaryContainsKey(ILGenerator ilGenerator, Type dictType, Type? valueType)
     {
         // 交换栈顺序：[value, dict] -> [dict, value]
         SwapStackOrder(ilGenerator, dictType, typeof(object));
 
+        var keyType = dictType.GetGenericArguments()[0];
+        EmitValueConversion(ilGenerator, keyType, valueType);
+
         // 调用 Dictionary<TKey, TValue>.ContainsKey(TKey) 方法
-        var containsMethod = dictType.GetMethod("ContainsKey", [dictType.GetGenericArguments()[0]])!;
+        var containsMethod = dictType.GetMethod("ContainsKey", [keyType])!;
         ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
     }
 
@@ -108,6 +167,28 @@ internal static class InOperatorHelper
             null => false,
             _ => text.Contains(value.ToString() ?? string.Empty, StringComparison.Ordinal)
         };
+    }
+
+    /// <summary>
+    /// 运行期 <c>in</c> 回退：按语言的相等语义枚举集合。
+    /// </summary>
+    /// <remarks>
+    /// 栈上顺序是 [左侧值(object), 右侧集合(object)]，因此形参顺序为 value、collection。
+    /// </remarks>
+    public static bool RuntimeContains(object? value, object? collection)
+    {
+        if (collection is null) return false;
+        if (collection is string text) return ContainsText(text, value);
+
+        if (collection is System.Collections.IEnumerable enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                if (IlValueBridge.Wrap(item).Equal(IlValueBridge.Wrap(value))) return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -207,7 +288,7 @@ internal static class InOperatorHelper
         // List<T>
         if (rightType.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(List<>))
         {
-            GenerateListContains(ilGenerator, rightType);
+            GenerateListContains(ilGenerator, rightType, leftInType);
         }
         // Array
         else if (rightType.IsArray)
@@ -217,7 +298,7 @@ internal static class InOperatorHelper
         // Dictionary<TKey, TValue>
         else if (rightType.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
-            GenerateDictionaryContainsKey(ilGenerator, rightType);
+            GenerateDictionaryContainsKey(ilGenerator, rightType, leftInType);
         }
         // String：必须先于通用 Contains 回退处理。string.Contains(char) 存在，
         // 通用回退会按左操作数类型（char）选中它，但栈上的值其实是装箱的 object，
@@ -226,10 +307,12 @@ internal static class InOperatorHelper
         {
             GenerateStringContains(ilGenerator);
         }
-        // 其他类型：尝试调用 Contains 方法
-        else
+        // 其他类型：尝试调用 Contains 方法；找不到重载时退回运行期枚举，
+        // 不能「什么都不发射却声明返回 bool」——那会留下未消费的栈值，生成无效 IL。
+        else if (!TryGenerateGenericContains(ilGenerator, rightType, leftInType, operation))
         {
-            TryGenerateGenericContains(ilGenerator, rightType, leftInType, operation);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(InOperatorHelper).GetMethod(nameof(RuntimeContains))!);
         }
 
         return typeof(bool);
