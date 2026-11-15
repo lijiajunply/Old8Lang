@@ -606,6 +606,14 @@
   （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
   见 change（`2026-11-15-集合拼接统一/test.md`）。
 
+- [x] **IL 两个 `object` 操作数的大小比较恒为 false**：数组/字典元素赋给变量后静态类型是
+  `object`，`item < min` 两侧都是 object 时没有动态分支，落到数值/引用比较恒 false
+  （for-in 求 min/max 得到首元素）。新增 `IlDynamicComparison`，四个顺序运算符在
+  「两侧都是 object」时按语言值语义分派；`SyncIterator_ArrayElementIteration` 转通过。
+  另两个同步生成器用例按 MODE_SUPPORT 改为断言明确的编译期错误。
+  新增 2 项回归；`Compiler.Collections` 3 → 0 失败。
+  见 change（`2026-11-15-IL动态比较/test.md`）。
+
 - [x] **IL 枚举成员访问返回枚举类型**：`EmitStaticMemberAccess` 发射 `ldc.i4` 却返回 `Color`，
   调用方按枚举装箱：`PrintLine(Color.Red)` 显示 `Red`、`Color.Red.ToStr()` 为
   `NativeObject(Red)`、`match` 匹配不到 `case 0`。现在返回 `typeof(int)`，类型推断同步为 int；

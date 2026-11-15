@@ -129,6 +129,12 @@ internal static class ComparisonOpHelper
         var gtLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var gtRightType = right?.Accept(new TypeInferenceVisitor(local));
         RejectBooleanOrderingOperands(left, right, gtLeftType, gtRightType);
+        if (gtLeftType == typeof(object) && gtRightType == typeof(object))
+        {
+            EmitDynamicComparison(">", left, right, gtLeftType, gtRightType, ilGenerator, local);
+            return typeof(bool);
+        }
+
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (gtLeftType != null && typeof(LangObject).IsAssignableFrom(gtLeftType))
@@ -205,6 +211,12 @@ internal static class ComparisonOpHelper
         var ltLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var ltRightType = right?.Accept(new TypeInferenceVisitor(local));
         RejectBooleanOrderingOperands(left, right, ltLeftType, ltRightType);
+        if (ltLeftType == typeof(object) && ltRightType == typeof(object))
+        {
+            EmitDynamicComparison("<", left, right, ltLeftType, ltRightType, ilGenerator, local);
+            return typeof(bool);
+        }
+
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (ltLeftType != null && typeof(LangObject).IsAssignableFrom(ltLeftType))
@@ -423,6 +435,12 @@ internal static class ComparisonOpHelper
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         RejectBooleanOrderingOperands(left, right, leftType, rightType);
+        if (leftType == typeof(object) && rightType == typeof(object))
+        {
+            EmitDynamicComparison("<=", left, right, leftType, rightType, ilGenerator, local);
+            return typeof(bool);
+        }
+
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
@@ -501,6 +519,12 @@ internal static class ComparisonOpHelper
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         RejectBooleanOrderingOperands(left, right, leftType, rightType);
+        if (leftType == typeof(object) && rightType == typeof(object))
+        {
+            EmitDynamicComparison(">=", left, right, leftType, rightType, ilGenerator, local);
+            return typeof(bool);
+        }
+
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
@@ -581,5 +605,35 @@ internal static class ComparisonOpHelper
         {
             throw new InvalidOperationError(left ?? right!, "布尔值不支持大小比较");
         }
+    }
+
+    /// <summary>
+    /// 发射两个静态类型为 object 的操作数的大小比较（运行期分派）。
+    /// </summary>
+    private static void EmitDynamicComparison(
+        string op,
+        LangExpression? left,
+        LangExpression? right,
+        Type? leftType,
+        Type? rightType,
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        ilGenerator.Emit(OpCodes.Ldstr, op);
+
+        left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        if (leftType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, leftType);
+        }
+
+        right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        if (rightType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, rightType);
+        }
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlDynamicComparison).GetMethod(nameof(IlDynamicComparison.Evaluate))!);
     }
 }

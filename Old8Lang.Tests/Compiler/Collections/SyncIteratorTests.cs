@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Error;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 
@@ -65,20 +66,12 @@ public class SyncIteratorTests
         
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 验证编译成功
-        Assert.NotNull(compiledAction);
-
-        // 执行编译后的代码 - 验证执行不抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-        
-        var sum = (IntLangValue)interpreter.Manager.GetValue(new LangId("sum"))!;
-        var count = (IntLangValue)interpreter.Manager.GetValue(new LangId("count"))!;
-        
-        Assert.Equal(60, sum.Value); // 10+20+30=60
-        Assert.Equal(3, count.Value);
+        // IL 模式不支持同步生成器（yield）：按 MODE_SUPPORT 的已知限制，
+        // 编译期应给出明确的 CompilerException，而不是生成无效 IL。
+        var exception = Assert.Throws<CompilerException>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        Assert.Contains("同步生成器", exception.Message);
     }
 
     [Fact]
@@ -127,16 +120,11 @@ public class SyncIteratorTests
         
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 验证编译成功
-        Assert.NotNull(compiledAction);
-
-        // 执行编译后的代码 - 验证执行不抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-        
-        Assert.True(((BoolLangValue)interpreter.Manager.GetValue(new LangId("is_gen"))!).Value);
+        // 同步生成器在 IL 模式不支持：编译期给出明确错误（见 MODE_SUPPORT 已知限制）。
+        var exception = Assert.Throws<CompilerException>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        Assert.Contains("同步生成器", exception.Message);
     }
 
     [Fact]
