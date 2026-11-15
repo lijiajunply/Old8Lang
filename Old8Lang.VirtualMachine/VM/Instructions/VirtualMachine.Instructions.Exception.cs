@@ -309,6 +309,11 @@ public partial class VirtualMachine
                         }
                     }
                 }
+                else if (obj is System.Collections.IDictionary dictionaryAttr && fieldName == "Length")
+                {
+                    // 字典：Length 与 Count 等价（其他属性继续走下面的反射路径）
+                    _stack.Push(dictionaryAttr.Count);
+                }
                 else
                 {
                     // 使用反射获取字段或属性（用于内置类型）

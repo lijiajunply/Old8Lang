@@ -317,7 +317,7 @@
 |------|--------|-----|--------|------|
 | `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | 正确 | `InvalidCastException` | 正确 | IL 的 `LoadAndConvertOperands` 一律按 `int` 拆箱 |
 | 数组 / 列表 `+` 拼接 | ✅（2026-11-15 起） | ✅（2026-11-15 起） | ✅ | 同类型拼接；数组 + 列表混合仍报错 |
-| 集合的 `.Length` 属性（无括号） | ❌ `NAME_ERROR` | ✅ | ✅ | [API_REFERENCE](./API_REFERENCE.md#24-反射) 明确写「数组没有 `.Length` 属性」 |
+| 集合的 `.Length` 属性（无括号） | ✅（2026-11-15 起） | ✅ | ✅ | 数组/列表/字符串/字典均支持，等价 `len(x)`；字典键名 `"Length"` 用 `d["Length"]` |
 | `PrintLine(null)` 与集合里的 `null` 元素 | `Null` | `null` | `null` | 显示大小写不同 |
 | `null.ToStr()` | `Null` | ❌ 无法在 null 上调用方法 | ❌ `NULL_REFERENCE_ERROR` | |
 | 字典缺失键 `d["missing"]` | 返回 `Null` | 原生字典抛 `KeyNotFoundException`；`dict()` 的结果返回 `null` | `KEY_ERROR` | IL 内部两种表示也不一致 |
@@ -358,12 +358,12 @@
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
-   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2007 例 →
-   **208 失败 / 1774 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2008 例 →
+   **208 失败 / 1775 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
    且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
    期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where` /
    字符串实例方法与语言值相等 / 泛型 `T?` 实参 / 并发函数 int 实参等一批无效 IL；
-   并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算与范围端点排除语义。
+   并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算、范围端点排除语义与 `.Length` 属性。
    其余失败以异步、函数、类、表达式、集合的结果/类型推断缺口为主。另修掉「类体在文件结尾
    被截断时解析器死循环」的进程挂死问题。
    对 `TestFiles/CompilerTests`（157）、`InterpreterTests`（188）、`SyntaxTests`（91）

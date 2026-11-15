@@ -88,7 +88,8 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             switch (langId.IdName)
             {
                 case "Count":
-                    // 返回字典的键值对数量
+                case "Length":
+                    // 返回字典的键值对数量（Length 与 Count 等价；键 "Length" 请用 d["Length"]）
                     return new IntLangValue(Value.Count);
                 case "Keys":
                     // 返回字典的键集合

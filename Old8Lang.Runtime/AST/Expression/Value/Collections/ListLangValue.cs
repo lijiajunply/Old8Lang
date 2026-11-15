@@ -138,8 +138,8 @@ public partial class ListLangValue : LangValueType, ILangList
         }
 
         // 处理属性访问：obj.property
-        if (dotExpression is LangId { IdName: "Count" })
-            // 特殊处理 Count 属性
+        if (dotExpression is LangId { IdName: "Count" or "Length" })
+            // 特殊处理 Count / Length 属性（等价 len(list)）
         {
             // 返回列表的元素数量
             return new IntLangValue(Values.Count);

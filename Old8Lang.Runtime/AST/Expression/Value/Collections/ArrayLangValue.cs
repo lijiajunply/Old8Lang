@@ -118,6 +118,12 @@ public partial class ArrayLangValue : LangValueType, ILangList
             return instance.FromClassToResult(this, manager);
         }
 
+        // 属性访问：array.Length（等价 len(array)）
+        if (dotExpression is LangId { IdName: "Length" })
+        {
+            return new IntLangValue(RunResult.Length);
+        }
+
         // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问
         if (dotExpression is IntLangValue intValue)
         {

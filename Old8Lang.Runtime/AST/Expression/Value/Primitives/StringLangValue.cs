@@ -31,6 +31,19 @@ public partial class StringLangValue(string context = "", SourcePosition positio
     public override LangValueType Plus(LangValueType otherLangValueType) =>
         Create(Value + otherLangValueType.ToDisplayString());
 
+    /// <summary>
+    /// 字符串的 <c>.Length</c> 属性（等价 len(string)）。
+    /// </summary>
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
+    {
+        if (dotExpression is LangId { IdName: "Length" })
+        {
+            return new IntLangValue(Value.Length);
+        }
+
+        return base.Dot(dotExpression, manager);
+    }
+
     public override bool Equal(LangValueType? otherValueType)
     {
         if (otherValueType is StringLangValue b)

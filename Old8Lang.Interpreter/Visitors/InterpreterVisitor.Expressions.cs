@@ -236,6 +236,13 @@ public partial class InterpreterVisitor
                     return array.Dot(instance, manager);
                 }
 
+                // 属性访问（array.Length）或变量索引：LangId 交给 Dot 处理，
+                // 直接按表达式运行会把 Length 当成未定义名称。
+                if (dotRight is LangId)
+                {
+                    return array.Dot(dotRight, manager);
+                }
+
                 // 处理数组索引访问，需要先运行Right表达式
                 if (dotRight is not null)
                 {

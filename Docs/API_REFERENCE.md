@@ -361,7 +361,7 @@ MergeSort  Overlaps  Permutations  QuickSort  SelectionSort  Set  SetEquals
 Slice  ToList
 ```
 
-数组取长度用 `len(a)` 或 `a.Count()`，**没有 `.Length` 属性**。
+数组取长度用 `len(a)`、`a.Count()` 或 `a.Length`（属性形式，2026-11-15 起三种模式一致）。
 
 ### 3.7 元组（`Tuple`）
 

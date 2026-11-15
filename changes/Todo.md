@@ -517,11 +517,11 @@
   `ExtendedRangeTests.EmptyRange_...` 里按旧行为写的断言已修正。
   新增 14 项解释器/虚拟机回归。见 change（`2026-11-15-范围端点语义/test.md`）。
 
-- [ ] **集合 `.Length` 属性的解释器缺口**：`RangeEdgeCases_...` 等用例使用 `array.Length`
-  （属性形式），IL 与虚拟机接受，解释器报 `NAME_ERROR: 名称 'Length' 未定义`；
-  而 `Docs/API_REFERENCE.md` 写的是「数组没有 `.Length` 属性，用 `len(a)` 或 `a.Count()`」。
-  需要决定是给解释器补 `.Length` 属性（并更新 API 文档），还是把 IL/VM 的属性访问也收回。
-  范围语义部分已解决，本条只剩属性形式。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
+- [x] **集合 `.Length` 属性的解释器缺口**：`array.Length` 在 IL 与虚拟机可用，解释器报
+  `NAME_ERROR`。2026-11-15 决定保留并统一为语言属性：数组/列表/字符串/字典的 `.Length`
+  等价 `len(x)`；解释器在 `Dot` 里补属性、VM 补字典 `Length`，API_REFERENCE 同步改为支持。
+  字典键名 `"Length"` 仍可用 `d["Length"]`。解释器/IL/VM 各新增回归（共 10 项）。
+  见 change（`2026-11-15-Length属性统一/test.md`）。
 
 - [x] **虚拟机 `in` 运算符未实现**：`BytecodeVisitor.VisitOperation` 的二元运算符 switch
   没有 `LangTokenType.In` 分支，落到 `default: Emit(OpCode.Nop)`，表达式结果变成右操作数。
