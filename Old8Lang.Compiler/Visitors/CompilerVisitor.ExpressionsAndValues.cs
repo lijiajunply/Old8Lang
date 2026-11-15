@@ -696,6 +696,16 @@ public partial class CompilerVisitor
 
                     if (classType is null)
                     {
+                        // 泛型类没有带类型参数时，IL 模式不做「由构造函数实参推断」，
+                        // 此前会静默发 ldnull，随后调用实例方法变成 NRE。这里明确报错。
+                        if (local.GenericClasses.ContainsKey(node.Id.IdName))
+                        {
+                            throw new CompilerException(
+                                $"IL 模式暂不支持由构造函数实参推断泛型类 '{node.Id.IdName}' 的类型参数；" +
+                                $"请显式写成 {node.Id.IdName}<int>(...)",
+                                node.Position);
+                        }
+
                         // 创建一个临时的object类型引用，允许编译继续进行
                         // 这是一个临时解决方案，IL 模式下类前向引用的处理需要改进
                         classType = typeof(object);

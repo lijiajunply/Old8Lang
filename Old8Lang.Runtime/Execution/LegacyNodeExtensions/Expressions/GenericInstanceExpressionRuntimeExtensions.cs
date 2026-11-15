@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Specialization;
@@ -135,14 +136,22 @@ internal static class GenericInstanceExpressionRuntimeExtensions
             specializedMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeMapping, local);
         }
 
-        // 生成所有调用参数的IL代码
+        // 生成所有调用参数的IL代码（记录类型，供按形参转换）
+        var argumentTypes = Array.Empty<Type>();
         if (node.CallArguments is not null)
         {
-            foreach (var arg in node.CallArguments)
+            argumentTypes = new Type[node.CallArguments.Count];
+            for (var i = 0; i < node.CallArguments.Count; i++)
             {
+                var arg = node.CallArguments[i];
                 arg.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                argumentTypes[i] = arg.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
             }
         }
+
+        // 特化方法的形参可能比实参宽（例如 `T?` 解析成 object，而实参是原生 int），
+        // 不转换会生成无效 IL。
+        EmitInitArgumentConversions(ilGenerator, specializedMethod, argumentTypes);
 
         // 调用特化方法
         ilGenerator.Emit(OpCodes.Call, specializedMethod);
@@ -199,6 +208,26 @@ internal static class GenericInstanceExpressionRuntimeExtensions
                 throw new InvalidOperationError(node, $"找不到类 {className} 的匹配 init 方法");
             }
 
+            // init 的形参类型可能比实参宽（例如泛型字段写成 T? 时形参解析成 object，
+            // 而实参是原生 int）。不转换会让 JIT 判为无效 IL。
+            // TypeBuilder 特化的 MethodBuilder 在 CreateType 前不能 GetParameters，
+            // 这里从泛型模板 + 类型映射解析形参类型。
+            Type[]? initParameterTypes = null;
+            if (specializedType is TypeBuilder)
+            {
+                var initTemplate = typeTemplate.Variates
+                    .Select(pair => pair.Value)
+                    .OfType<FuncLangValue>()
+                    .FirstOrDefault(func => func.Id?.IdName == "init");
+                if (initTemplate?.Ids is not null)
+                {
+                    var resolver = new GenericTypeResolver(typeMapping, local, local.Interpreter);
+                    initParameterTypes = resolver.ResolveParameterTypes(initTemplate.Ids);
+                }
+            }
+
+            EmitInitArgumentConversions(ilGenerator, initMethod, argTypes, initParameterTypes);
+
             ilGenerator.Emit(OpCodes.Callvirt, initMethod);
 
             // 如果 init 方法有返回值（虽然通常是 void），需要弹出
@@ -208,4 +237,87 @@ internal static class GenericInstanceExpressionRuntimeExtensions
             }
         }
     }
+
+    /// <summary>
+    /// 按 init 形参类型转换已压栈的实参（栈上接收者在最下面）。
+    /// </summary>
+    private static void EmitInitArgumentConversions(
+        ILGenerator ilGenerator,
+        MethodInfo initMethod,
+        Type[] argumentTypes,
+        Type[]? explicitParameterTypes = null)
+    {
+        Type[] parameterTypes;
+        if (explicitParameterTypes is not null)
+        {
+            parameterTypes = explicitParameterTypes;
+        }
+        else
+        {
+            try
+            {
+                parameterTypes = initMethod.GetParameters().Select(p => p.ParameterType).ToArray();
+            }
+            catch (NotSupportedException)
+            {
+                // 未 CreateType 的 MethodBuilder 无法枚举形参，调用方应传显式类型。
+                return;
+            }
+        }
+
+        if (parameterTypes.Length != argumentTypes.Length) return;
+
+        var needed = false;
+        for (var i = 0; i < parameterTypes.Length; i++)
+        {
+            if (NeedInitConversion(argumentTypes[i], parameterTypes[i])) needed = true;
+        }
+
+        if (!needed) return;
+
+        var locals = new LocalBuilder[argumentTypes.Length];
+        for (var i = argumentTypes.Length - 1; i >= 0; i--)
+        {
+            locals[i] = ilGenerator.DeclareLocal(argumentTypes[i]);
+            ilGenerator.Emit(OpCodes.Stloc, locals[i]);
+        }
+
+        for (var i = 0; i < argumentTypes.Length; i++)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, locals[i]);
+            var from = argumentTypes[i];
+            var to = parameterTypes[i];
+            if (from == to) continue;
+
+            if (to == typeof(object))
+            {
+                if (from.IsValueType) ilGenerator.Emit(OpCodes.Box, from);
+            }
+            else if (to.IsValueType)
+            {
+                if (from == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, to);
+                }
+                else if (IsNumericInitType(from) && IsNumericInitType(to))
+                {
+                    ilGenerator.Emit(to == typeof(double) ? OpCodes.Conv_R8 :
+                        to == typeof(float) ? OpCodes.Conv_R4 :
+                        to == typeof(long) ? OpCodes.Conv_I8 : OpCodes.Conv_I4);
+                }
+            }
+        }
+    }
+
+    private static bool NeedInitConversion(Type from, Type to)
+    {
+        if (from == to) return false;
+        if (to == typeof(object)) return from.IsValueType;
+        if (to.IsValueType) return from == typeof(object) || IsNumericInitType(from) || IsNumericInitType(to);
+        return false;
+    }
+
+    private static bool IsNumericInitType(Type type) =>
+        type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte) ||
+        type == typeof(double) || type == typeof(float);
 }
