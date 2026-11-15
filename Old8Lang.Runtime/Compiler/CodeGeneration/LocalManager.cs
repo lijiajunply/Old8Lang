@@ -216,6 +216,15 @@ public class LocalManager
     public bool IsInFinallyBlock { get; set; }
 
     /// <summary>
+    /// 当前是否正在生成受保护区域（try 块或 catch 块）内的代码。
+    /// </summary>
+    /// <remarks>
+    /// 从 try/catch 内部跳出必须用 <c>leave</c> 而不是 <c>br</c>：
+    /// <c>br</c> 不允许跨越受保护区域边界，会生成无法验证的 IL。
+    /// </remarks>
+    public bool IsInProtectedRegion { get; set; }
+
+    /// <summary>
     /// 函数返回值的局部变量（用于defer支持）
     /// </summary>
     /// <remarks>

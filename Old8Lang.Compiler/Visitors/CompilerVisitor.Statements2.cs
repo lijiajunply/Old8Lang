@@ -324,47 +324,43 @@ public partial class CompilerVisitor
                 else
                 {
                     // 普通匹配
-                    // 重新加载switch值
-                    ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
-
-                    // 加载case值并比较
-                    oldCase.Expression.Accept(this);
-
-                    // 比较操作
                     if (switchValueType == typeof(int) || switchValueType == typeof(bool) ||
-                        switchValueType == typeof(char))
+                        switchValueType == typeof(char) || switchValueType == typeof(double))
                     {
-                        // 整数、布尔值和字符使用Ceq指令比较
-                        ilGenerator.Emit(OpCodes.Ceq);
-                    }
-                    else if (switchValueType == typeof(double))
-                    {
-                        // double 类型使用 Ceq 进行直接比较（虽然可能不精确，但与解释器行为一致）
+                        // 值类型：重新加载 switch 值后直接 Ceq
+                        ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
+                        oldCase.Expression.Accept(this);
                         ilGenerator.Emit(OpCodes.Ceq);
                     }
                     else if (switchValueType == typeof(string))
                     {
-                        // 字符串比较需要调用string.Equals方法
+                        // 字符串比较需要调用 string.Equals(string, string)
+                        ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
+                        oldCase.Expression.Accept(this);
                         var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
                         ilGenerator.Emit(OpCodes.Call, equalsMethod);
                     }
                     else
                     {
-                        // 其他类型比较，调用Equals方法
-                        // 尝试获取精确匹配的Equals方法
-                        // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
-                        var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]) ??
-                                           switchValueType.GetMethod("Equals", [typeof(object)]);
+                        // 其他类型（含静态类型 object，例如 for-in 循环变量）：
+                        // 逐个操作数装箱后调用 object.Equals(object, object)。
+                        // 之前按「实例方法 object.Equals(object)」调用，只压了实参、且
+                        // 实参未装箱，生成无效 IL（for-in 里的 switch 整段无法验证）。
+                        ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal);
+                        if (switchValueType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, switchValueType);
+                        }
 
-                        if (equalsMethod is not null)
+                        oldCase.Expression.Accept(this);
+                        var caseType = oldCase.Expression.Accept(new TypeInferenceVisitor(local));
+                        if (caseType is { IsValueType: true })
                         {
-                            ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                            ilGenerator.Emit(OpCodes.Box, caseType);
                         }
-                        else
-                        {
-                            // 如果都没有找到，使用引用比较
-                            ilGenerator.Emit(OpCodes.Ceq);
-                        }
+
+                        var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
+                        ilGenerator.Emit(OpCodes.Call, equalsMethod);
                     }
 
                     // 如果相等，跳转到对应的case标签
@@ -444,8 +440,11 @@ public partial class CompilerVisitor
         // 开始异常处理块
         ilGenerator.BeginExceptionBlock();
 
-        // 生成try块的IL代码
+        // 生成try块的IL代码（记录受保护区域：内部 break/continue 必须用 leave）
+        var wasInProtectedRegion = local.IsInProtectedRegion;
+        local.IsInProtectedRegion = true;
         node.TryBlock.Accept(this);
+        local.IsInProtectedRegion = wasInProtectedRegion;
         
         // Try 块结束，跳出（如果不是 return）
         // 但 IL 自动处理 try 块结束到 finally/end 的流转吗？
@@ -565,8 +564,11 @@ public partial class CompilerVisitor
                      }
                 }
                 
-                // 执行块
+                // 执行块（catch 块同样是受保护区域）
+                var catchWasInProtectedRegion = local.IsInProtectedRegion;
+                local.IsInProtectedRegion = true;
                 catchBlock.Accept(this);
+                local.IsInProtectedRegion = catchWasInProtectedRegion;
                 
                 // 清理变量
                 if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))

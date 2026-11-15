@@ -226,6 +226,15 @@
   槽位承载；相等比较只要任一侧静态类型是 `object` 就走 `object.Equals`。
   `Compiler.Exceptions` 11→10 失败，其余 18 组不变。见 change（`2026-11-15-IL-try局部变量/test.md`）。
 
+- [x] **IL 模式 for-in 里的 switch 与 try 内的 break/continue 生成无效 IL**：
+  switch 值静态类型为 `object`（for-in 循环变量来自 `IEnumerator.Current`）时，
+  `VisitSwitchStatement` 按实例方法调用 `object.Equals(object)`，只压了 case 值且未装箱；
+  `break` / `continue` 在 try 块里仍发 `br`，而 CLR 要求跨受保护区域用 `leave`。
+  现在普通匹配按「值类型 ceq / 字符串 string.Equals / 其它 object.Equals」三路发射，
+  并新增 `LocalManager.IsInProtectedRegion` 让 try/catch 内的跳转发 `leave`。
+  `Compiler.Statements` 3→0 失败（186/186 全通过），其余 18 组不变。
+  见 change（`2026-11-15-IL-switch与try跳转/test.md`）。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。

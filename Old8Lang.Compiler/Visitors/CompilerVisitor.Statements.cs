@@ -66,7 +66,8 @@ public partial class CompilerVisitor
         // 迁移自 BreakStatement.GenerateIl()
         if (local.BreakLabel.HasValue)
         {
-            ilGenerator.Emit(OpCodes.Br, local.BreakLabel.Value);
+            // 从 try/catch 内部跳出必须用 leave（br 不能跨越受保护区域边界）
+            ilGenerator.Emit(local.IsInProtectedRegion ? OpCodes.Leave : OpCodes.Br, local.BreakLabel.Value);
         }
         else
         {
@@ -84,7 +85,7 @@ public partial class CompilerVisitor
         // 迁移自 ContinueStatement.GenerateIl()
         if (local.ContinueLabel.HasValue)
         {
-            ilGenerator.Emit(OpCodes.Br, local.ContinueLabel.Value);
+            ilGenerator.Emit(local.IsInProtectedRegion ? OpCodes.Leave : OpCodes.Br, local.ContinueLabel.Value);
         }
         else
         {
