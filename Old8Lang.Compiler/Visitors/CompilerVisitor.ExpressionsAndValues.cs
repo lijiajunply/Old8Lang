@@ -551,6 +551,137 @@ public partial class CompilerVisitor
     }
 
 
+
+
+    /// <summary>按名字查找所有已注册重载的形参列表（用于命名实参的编译期校验）。</summary>
+    private static List<List<LangId>> FindFunctionParameterCandidates(string name, LocalManager local)
+    {
+        var candidates = new List<List<LangId>>();
+        foreach (var (key, parameters) in local.FuncParameters)
+        {
+            if (key == name || key.StartsWith($"{name}$", StringComparison.Ordinal))
+            {
+                candidates.Add(parameters);
+            }
+        }
+
+        return candidates;
+    }
+
+    /// <summary>
+    /// 命名实参的编译期校验：参数名存在、不重复、不与位置参数冲突、必需参数已提供。
+    /// </summary>
+    private static void ValidateNamedArguments(Instance node, List<LangId> parameters)
+    {
+        var functionName = node.Id.IdName;
+        if (parameters.Any(parameter => parameter.IsParams))
+        {
+            throw new ArgumentError(node.Position,
+                $"函数 '{functionName}' 不支持对 params 参数使用命名参数");
+        }
+
+        var seenNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var namedArgument in node.NamedArgs!)
+        {
+            if (!seenNames.Add(namedArgument.Name))
+            {
+                throw new ArgumentError(node.Position,
+                    $"命名参数 '{namedArgument.Name}' 重复指定");
+            }
+
+            var index = parameters.FindIndex(parameter => parameter.IdName == namedArgument.Name);
+            if (index < 0)
+            {
+                throw new ArgumentError(node.Position,
+                    $"函数 '{functionName}' 没有名为 '{namedArgument.Name}' 的参数");
+            }
+
+            if (index < node.Ids.Count)
+            {
+                throw new ArgumentError(node.Position,
+                    $"参数 '{namedArgument.Name}' 已经通过位置参数提供");
+            }
+        }
+
+        if (node.Ids.Count + node.NamedArgs!.Count > parameters.Count)
+        {
+            throw new ArgumentError(node.Position,
+                $"函数 '{functionName}' 的参数数量不匹配：期望最多 {parameters.Count} 个，" +
+                $"实际 {node.Ids.Count + node.NamedArgs.Count} 个");
+        }
+
+        for (var index = node.Ids.Count; index < parameters.Count; index++)
+        {
+            var parameter = parameters[index];
+            if (node.NamedArgs.Any(named => named.Name == parameter.IdName))
+            {
+                continue;
+            }
+
+            if (parameter.DefaultValue is null)
+            {
+                throw new ArgumentError(node.Position,
+                    $"函数 '{functionName}' 的必需参数 '{parameter.IdName}' 未提供值");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 把一次函数调用（位置 + 命名实参）重建为解释器 Instance 执行。
+    /// </summary>
+    private static void EmitInstanceCallViaInterpreter(Instance node, ILGenerator ilGenerator, LocalManager local)
+    {
+        ilGenerator.Emit(OpCodes.Ldstr, node.Id.IdName);
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var index = 0; index < node.Ids.Count; index++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+            var argument = node.Ids[index];
+            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+            if (argumentType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        var namedArguments = node.NamedArgs ?? [];
+        ilGenerator.Emit(OpCodes.Ldc_I4, namedArguments.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(string));
+        for (var index = 0; index < namedArguments.Count; index++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+            ilGenerator.Emit(OpCodes.Ldstr, namedArguments[index].Name);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, namedArguments.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var index = 0; index < namedArguments.Count; index++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+            var argument = namedArguments[index].Value;
+            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+            if (argumentType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, argumentType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.InvokeInstance))!);
+    }
+
     /// <summary>
     /// 检查函数调用的实参静态类型是否与形参不兼容；是则发射运行期 TypeError 并返回 true。
     /// </summary>
@@ -615,6 +746,75 @@ public partial class CompilerVisitor
 
     public object? VisitInstance(Instance node)
     {
+
+        // 命名实参统一交给解释器语义执行：编译后的委托按位置调用，
+        // 这里由 IlRuntimeFunctions.InvokeInstance 重建 Instance，
+        // 完成命名重排/默认值/重复参数等校验（与解释器一致）。
+        if ((node.NamedArgs?.Count ?? 0) > 0)
+        {
+            var candidates = FindFunctionParameterCandidates(node.Id.IdName, local);
+            if (candidates.Count > 0)
+            {
+                Exception? firstError = null;
+                var matched = false;
+                foreach (var candidate in candidates)
+                {
+                    try
+                    {
+                        ValidateNamedArguments(node, candidate);
+                        matched = true;
+                        break;
+                    }
+                    catch (Exception error)
+                    {
+                        firstError ??= error;
+                    }
+                }
+
+                if (!matched && firstError is not null)
+                {
+                    throw firstError;
+                }
+
+                // 接收者是局部函数值（lambda 赋值）时，编译期按形参名重排成位置调用。
+                if (matched && local.GetLocalVar(node.Id.IdName) is not null)
+                {
+                    var declared = candidates.First(candidate =>
+                    {
+                        try
+                        {
+                            ValidateNamedArguments(node, candidate);
+                            return true;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    });
+
+                    var ordered = new List<LangExpression>();
+                    for (var index = 0; index < declared.Count; index++)
+                    {
+                        if (index < node.Ids.Count)
+                        {
+                            ordered.Add(node.Ids[index]);
+                            continue;
+                        }
+
+                        var named = node.NamedArgs!.FirstOrDefault(argument =>
+                            argument.Name == declared[index].IdName);
+                        ordered.Add(named?.Value ?? declared[index].DefaultValue!);
+                    }
+
+                    var reordered = new Instance(node.Id, ordered, [], node.Position);
+                    reordered.Accept(this);
+                    return typeof(object);
+                }
+            }
+
+            EmitInstanceCallViaInterpreter(node, ilGenerator, local);
+            return typeof(object);
+        }
 
         // 首先尝试通过全局函数注册器生成 IL 代码
         if (node.TryGenerateGlobalFunctionIl(ilGenerator, local))

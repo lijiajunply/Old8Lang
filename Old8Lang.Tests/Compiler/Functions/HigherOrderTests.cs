@@ -79,7 +79,7 @@ public class HigherOrderTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            func reduce(list:list, initial:int, accumulator:(int, int) -> int) -> int {
+            func reduce(list:list, initial:int, accumulator:object) -> int {
                 result <- initial
                 i <- 0
                 while i < list.Count() {
@@ -113,7 +113,7 @@ public class HigherOrderTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            func compose(f:(int) -> int, g:(int) -> int) -> (int) -> int {
+            func compose(f:object, g:object) -> object {
                 return (x:int) -> f(g(x))
             }
             
@@ -145,7 +145,7 @@ public class HigherOrderTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            func curry(func:(int, int) -> int) -> (int) -> (int) -> int {
+            func curry(func:object) -> object {
                 return (a:int) -> (b:int) -> func(a, b)
             }
             
@@ -367,7 +367,7 @@ public class HigherOrderTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            func chain(functions:list) -> (int) -> int {
+            func chain(functions:list) -> object {
                 return (x:int) -> {
                     result <- x
                     i <- 0

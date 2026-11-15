@@ -618,6 +618,22 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
+- [x] **IL 命名实参校验/局部函数支持**：命名实参此前被忽略或只按位置处理，
+  `NamedArgumentsErrorTests` 不报错、局部 lambda 调用报 NAME_ERROR。
+  现在带命名实参的调用统一走解释器语义，并在编译期校验参数名/重复/冲突/必需参数/params；
+  局部 lambda 的形参名登记后按名重排。`Compiler.Functions` 26 → 17 失败。
+  见 change（`2026-11-15-IL命名实参/test.md`）。
+
+- [ ] **类方法命名实参 + 高阶函数命名 lambda**：`obj.method(x: 1)` 的 Dot 路径未重排；
+  命名实参里传 lambda 给 `IlDelegateFuncLangValue` 时仍报参数缺失（2 项用例）。
+  另：纯位置调用缺参数（`test()`）仍在运行期报 ArgumentError。
+
+- [ ] **IL 动态调用结果赋给已有变量后循环内不更新**：`r <- fn(r, item)`（`fn` 是
+  函数值参数）在 while 循环里，表达式静态类型 object 会把 `r` 的局部槽换成新槽，
+  但循环体早期生成的 `ldloc` 仍指向旧槽，表现为 `r` 每次都是初值、最终结果错误。
+  reduce 用例（`HigherOrderTests.ReduceFunction`）因此失败。修法需要预扫描循环内
+  类型会变化的变量并预先用 object 槽（或让循环体共享槽位），不要中途替换 LocalBuilder。
+
 - [x] **Exceptions 组旧语法 + catch 变量拿到 reflection 消息**：5 项用例用旧的
   裸 `throw`/`case ->`/匿名函数/`:` 继承/match 分支 throw 语法；lambda 内语言的 throw
   经反射调用被包成 `TargetInvocationException`，catch 变量拿到通用 reflection 消息。

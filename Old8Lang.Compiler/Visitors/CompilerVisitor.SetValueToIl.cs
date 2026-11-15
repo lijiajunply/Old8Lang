@@ -294,6 +294,8 @@ public partial class CompilerVisitor
             ilGenerator.Emit(OpCodes.Stloc, lambdaLocal);
             local.LocalVarTypes[idName] = typeof(Delegate);
             local.LocalDelegateReturnTypes[idName] = lambdaDynamic.ReturnType;
+            // 记录 lambda 的形参名，支持对局部队列函数值使用命名实参。
+            local.FuncParameters[idName] = funcIds;
         }
         else
         {
