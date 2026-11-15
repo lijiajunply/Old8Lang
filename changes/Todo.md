@@ -461,6 +461,14 @@
   2026-11-15 补充：类方法未注解参数（CLR 签名为 object）收到 `double` / `string` 实参后，
   方法体里的 `a + b` 也会走到同一处按 int 拆箱，`Unable to cast object of type
   'System.Double' to type 'System.Int32'`；类方法实参装箱已修，但这条数值/字符串语义缺口仍在。
+  2026-11-15 第二轮尝试（已回退，实验代码归档在 `backups/trash-2026-11-15-IL动态算术/`）：
+  新增 `IlDynamicArithmetic.Evaluate` + 在 `NumericBinaryOpHelper` 六种运算里对 object 操作数
+  改走运行期分派，并把类型推断改为返回 `object`。`func addOne(v) { return v + 1 }` 与
+  `addOne("ab")` 单独验证通过，但回归实测：Async 54→57、Collections 4→9、EdgeCases 22→24、
+  Statements 0→3（`sum <- sum + item` 的 for-in 累加得到错误结果）。
+  根因：`sum` 局部变量被重新推断为 object 后，把 object 结果 `stloc` 到 int 槽位，JIT 按位拷贝，
+  下一轮读到垃圾值。可行方向仍是「object 结果写入已定型局部变量时做运行期拆箱/数值转换」，
+  但需要同时处理「值类型变量动态改宽度」的既有行为；在定下这个语义前不要再单独改算术分支。
 
 - [x] **IL 的 `throw` 丢弃被抛出的值，catch 只能拿到异常包装**：`throw "msg"` 在 IL 里被编译成
   「ToString 后 `new Exception(string)`」，catch 绑定的是 `ExceptionWrapper`，原始值无从取回。
