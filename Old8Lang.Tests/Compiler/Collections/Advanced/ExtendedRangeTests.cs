@@ -325,13 +325,11 @@ public class ExtendedRangeTests(ITestOutputHelper output)
             Assert.Equal(1, emptyRange1[9])
 
             // 排除两端 [1>~<1]
-            // 1 (不包含) ~ 1 (不包含) => 2 ~ 0 (降序) => [2, 1, 0]
+            // 方向由原始端点决定（1 <= 1 视为正向），排除端点只收窄区间：
+            // 区间 (1, 1) 为空。此前先把边界改成 2~0 再判成降序，得到 [2, 1, 0]。
             emptyRange2 <- [1>~<1]
 
-            Assert.Equal(3, emptyRange2.Length)
-            Assert.Equal(2, emptyRange2[0])
-            Assert.Equal(1, emptyRange2[1])
-            Assert.Equal(0, emptyRange2[2])
+            Assert.Equal(0, emptyRange2.Length)
         ";
         var interpreter = new LangInterpreter();
 

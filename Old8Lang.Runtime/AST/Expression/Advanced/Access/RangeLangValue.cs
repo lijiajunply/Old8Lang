@@ -42,33 +42,28 @@ public partial class RangeLangValue(
     {
         var results = new List<int>();
 
-        // 根据包含规则调整起始值
-        var startNum = start;
-        var endNum = end;
-
-        if (!includeStart)
-            startNum++;
-        if (!includeEnd)
-            endNum--;
-
-        // 与解释器一致：端点排除后的边界决定方向。比如 [1>~<1]
-        // 调整为 2~0，应产生 2, 1, 0，而不是因为原始端点相等而返回空数组。
-        if (startNum > endNum)
+        // 方向由**原始端点**决定，排除端点只会收窄区间，不能把方向翻转。
+        // 例如 [5>~<5] 的区间是 (5, 5)，应为空；此前先 +1/-1 得到 6~4，
+        // 再按 6 > 4 判成反向范围，错误地产生 [6, 5, 4]。
+        if (start <= end)
         {
-            // 反向范围:从大到小
-            for (var i = startNum; i >= endNum; i--)
+            var lo = includeStart ? start : start + 1;
+            var hi = includeEnd ? end : end - 1;
+            for (var i = lo; i <= hi; i++)
             {
                 results.Add(i);
             }
         }
-        else if (startNum <= endNum)
+        else
         {
-            // 正向范围:从小到大
-            for (var i = startNum; i <= endNum; i++)
+            var hi = includeStart ? start : start - 1;
+            var lo = includeEnd ? end : end + 1;
+            for (var i = hi; i >= lo; i--)
             {
                 results.Add(i);
             }
         }
+
         return results.ToArray();
     }
 

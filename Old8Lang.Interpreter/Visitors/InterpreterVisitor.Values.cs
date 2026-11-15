@@ -196,29 +196,13 @@ public partial class InterpreterVisitor
             throw new TypeError(node, "IntValue",
                 $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
 
-        // 根据包含规则调整起始值
-        var startNum = startIntValue.Value;
-        var endNum = endIntValue.Value;
-
-        if (!node.IncludeStart)
-            startNum++;
-        if (!node.IncludeEnd)
-            endNum--;
-
-        // 检查范围是否有效
-        if (startNum > endNum)
+        // 与 IL 模式共用同一套区间算法：方向由原始端点决定，排除端点只收窄区间。
+        // 不要在这里各自实现——两份实现曾对 [5>~<5] 给出 [6, 5, 4]（应为空）。
+        var rangeValues = RangeLangValue.CreateRangeArray(
+            startIntValue.Value, endIntValue.Value, node.IncludeStart, node.IncludeEnd);
+        foreach (var value in rangeValues)
         {
-            for (var i = startNum; i >= endNum; i--)
-            {
-                results.Add(new IntLangValue(i));
-            }
-        }
-        else
-        {
-            for (var i = startNum; i <= endNum; i++)
-            {
-                results.Add(new IntLangValue(i));
-            }
+            results.Add(new IntLangValue(value));
         }
 
         return new ArrayLangValue(results);

@@ -79,7 +79,7 @@
 - [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
   只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
 
-- [x] **IL 排除端点后的反向范围生成错误**：IL 现在按调整后的端点确定范围方向，`[1>~<1]` 与解释器一致生成 `2, 1, 0`；`ExtendedRangeTests` 21 项通过。见 测试报告（`2026-11-11-22-50-IL扩展范围.md`）。
+- [x] **IL 排除端点后的反向范围生成错误**：2026-11-11 先让 IL 与解释器的旧算法对齐（`[1>~<1]` 生成 `2, 1, 0`）；2026-11-15 复核发现旧算法本身与语法文档冲突（`>`/`<` 只应排除端点、不应翻转方向），已改为区间收窄、等端点排他为空，见下方条目。历史报告：`2026-11-11-22-50-IL扩展范围.md`。
 
 - [ ] **异步函数的装饰器仍不可用**：不是虚拟机独有——装饰器必须返回「异步函数值」，
   而 `async (x) -> ...` 异步 Lambda 目前在解释器下也会抛
@@ -510,13 +510,18 @@
   修改后断言 `numbers` 与 `updatedNumbers` 都是 6」并注明别名语义；`MemberAccessTests`
   整组 7→8 通过。这条不是 IL 结果错误。
 
-- [ ] **`RangeEdgeCases_CompilesAndExecutesCorrectly` 依赖两处未统一的语义**：用例用
-  `single_range.Length`（属性形式）与 `Assert.Equal(0, single_exclusive.Length)`
-  （`[5>~<5]`）。实测：属性形式的 `.Length` 只有 IL 与虚拟机接受，解释器报
-  `NAME_ERROR: 名称 'Length' 未定义`，而 `Docs/API_REFERENCE.md` 明确写的是「数组没有
-  `.Length` 属性，用 `len(a)` 或 `a.Count()`」；`[5>~<5]` 在解释器与 IL 都是 `[4, 3, 2]`
-  这样的 3 个元素（`[1>~<1]` → `[2, 1, 0]`，见已完成的扩展范围修复），虚拟机则是空数组。
-  两条都需要先定语义再动用例。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
+- [x] **范围字面量：端点相等且被排除时方向错误**：`[5>~<5]`、`[5>~5]`、`[5~<5]` 在解释器与 IL
+  下分别得到 `[6, 5, 4]`、`[6, 5]`、`[5, 4]`（虚拟机为空）。根因是两份实现都先把边界 ±1、
+  再按调整后的值判方向，端点相等时被误判成降序。现在方向由原始端点决定、排除端点只收窄区间，
+  解释器直接复用 `RangeLangValue.CreateRangeArray`。三模式结果一致；
+  `ExtendedRangeTests.EmptyRange_...` 里按旧行为写的断言已修正。
+  新增 14 项解释器/虚拟机回归。见 change（`2026-11-15-范围端点语义/test.md`）。
+
+- [ ] **集合 `.Length` 属性的解释器缺口**：`RangeEdgeCases_...` 等用例使用 `array.Length`
+  （属性形式），IL 与虚拟机接受，解释器报 `NAME_ERROR: 名称 'Length' 未定义`；
+  而 `Docs/API_REFERENCE.md` 写的是「数组没有 `.Length` 属性，用 `len(a)` 或 `a.Count()`」。
+  需要决定是给解释器补 `.Length` 属性（并更新 API 文档），还是把 IL/VM 的属性访问也收回。
+  范围语义部分已解决，本条只剩属性形式。见 change（`2026-11-14-IL-Range实现/test.md` 关联记录）。
 
 - [x] **虚拟机 `in` 运算符未实现**：`BytecodeVisitor.VisitOperation` 的二元运算符 switch
   没有 `LangTokenType.In` 分支，落到 `default: Emit(OpCode.Nop)`，表达式结果变成右操作数。
