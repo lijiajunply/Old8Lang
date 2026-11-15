@@ -1080,6 +1080,16 @@ public class BytecodeCompiler : IBytecodeCompiler
             BoolLangValue boolVal => boolVal.Value,
             CharLangValue charVal => charVal.Value,
             NullLangValue => null,
+            // 字段/默认参数的集合字面量：递归求值后按 VM 运行期表示构造，
+            // 与 NewList / NewArray / NewDict 指令压栈的类型一致。
+            ListLiteralExpression list =>
+                list.Elements.Select(EvaluateConstantExpression).ToList(),
+            ArrayLiteralExpression array =>
+                array.Elements.Select(EvaluateConstantExpression).ToArray(),
+            DictionaryLiteralExpression dictionary =>
+                dictionary.Entries.ToDictionary(
+                    entry => EvaluateConstantExpression(entry.Key)!,
+                    entry => EvaluateConstantExpression(entry.Value)),
             _ => throw new NotSupportedException($"虚拟机模式不支持非常量默认参数表达式: {expr.GetType().Name}")
         };
     }

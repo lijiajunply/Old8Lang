@@ -539,11 +539,11 @@
   改成 `public static` 后三种模式一致。属解释器侧静态成员可见性缺口。
   见 change（`2026-11-14-IL静态字段初值/test.md` §5.1）。
 
-- [ ] **虚拟机不支持集合字面量作为字段初值**：`class C { public items <- {1, 2, 3} }` 在 `-vm` 下
-  字节码编译期抛 `NotSupportedException: 虚拟机模式不支持非常量默认参数表达式: ListLiteralExpression`
-  （`BytecodeCompiler.EvaluateConstantExpression` 只接受标量；字段初值被当作常量池常量，
-  直接放进常量池又会让所有实例共享同一个集合对象）。`-f` / `-il` 正常。
-  见 change（`2026-11-14-IL静态字段初值/test.md` §5.2）。
+- [x] **虚拟机不支持集合字面量作为字段初值**：`BytecodeCompiler.EvaluateConstantExpression`
+  现在递归求值列表/数组/字典字面量（`List<object?>` / `object[]` / `Dictionary<object,object>`），
+  `class C { public items <- {1,2,3} }` 在 `-vm` 下可用；新增 1 项 VM 回归。
+  注意：字段集合在解释器与 VM 中仍是「所有实例共享同一个对象」，IL 是每实例独立，
+  该语义差异未变，已记在遗留里。见 change（`2026-11-15-VM字段集合初值/test.md`）。
 
 - [x] **`MemberAccessWithComplexTypes_CompilesAndExecutesCorrectly` 的断言与语言语义冲突**：
   用例先取 `numbers <- collection.getNumbers()`，随后 `collection.addNumber(6)`，再断言
