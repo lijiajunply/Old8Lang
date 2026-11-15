@@ -131,6 +131,10 @@ public static class IlValueBridge
     /// <summary>
     /// 把 Old8Lang 值转换回 IL 模式下的原生值。
     /// </summary>
+    /// <summary>运行期判断：语言值取出底层原生值，其它值原样返回。</summary>
+    public static object? UnwrapDynamic(object? value) =>
+        value is LangValueType langValue ? Unwrap(langValue) : value;
+
     public static object? Unwrap(LangValueType value)
     {
         switch (value)

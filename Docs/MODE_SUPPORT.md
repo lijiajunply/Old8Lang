@@ -359,7 +359,7 @@
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
    `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2017 例 →
-   **111 失败 / 1880 通过 / 26 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   **106 失败 / 1885 通过 / 26 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
    且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
    期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where` /
    字符串实例方法与语言值相等 / 泛型 `T?` 实参 / 并发函数 int 实参等一批无效 IL；

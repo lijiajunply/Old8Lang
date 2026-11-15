@@ -618,12 +618,13 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
-- [ ] **IL spawn 带参调用仍不互通**：迁移后 4 项失败——线程里调用编译函数时
-  double/int/bool/list 实参被当作 `LangValueType`（`Unable to cast 'System.Double'
-  to 'LangValueType'`），以及线程内 `throw` 的异常消息与解释器不一致。
-  需要在 `SpawnFunction.SpawnHelper`/`IlDelegateFuncLangValue` 一侧统一解包或按
-  委托签名转换。`SpawnWithParameters`、`SpawnWithCollections`、`SpawnWithConditional`、
-  `SpawnWithErrorHandling` 四项待修。
+- [ ] **IL spawn 带参调用仍不互通**（部分修复）：`Thread.Join` 返回类型改为 object，
+  `Assert` 的 object 实参动态解包，`InvokeDynamicObjectMethod` 支持 `LangValueType`
+  接收者后，`SpawnWithCollections`、`SpawnWithConditional` 已通过（Async 33 → 28）。
+  仍剩两项：`SpawnWithParameters`（函数内局部 `result` 与顶层槽位同名，报
+  `StringLangValue -> double` 转换错误）、`SpawnWithErrorHandling`（线程异常消息
+  口径：解释器 `线程执行异常: CustomError...`、IL `LangThrownException`、VM 原文）。
+  见 change（`2026-11-15-Join结果动态分派/test.md`）。
 
 - [x] **IL 集合注解元素类型不匹配不报错**：`items:list<int> <- {1, "hello"}` 在 IL 下被接受
   （VM 编译期报错）。`CollectionTypeValidator` 不认识 IL 的标量/嵌套字面量，

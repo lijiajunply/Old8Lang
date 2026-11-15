@@ -443,6 +443,15 @@ public static class DotOperatorILHelper
                     ilGenerator.Emit(OpCodes.Box, idType);
                 }
 
+                // 静态类型为 object 的实参可能是运行期语言值（如 Thread.Join 的结果）：
+                // 先取出底层原生值，Assert.Equal("x", joinResult) 才能按字符串/数值比较。
+                if (paramType == typeof(object) &&
+                    (idType == typeof(object) || idType == typeof(LangValueType)))
+                {
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.UnwrapDynamic))!);
+                }
+
                 // 如果参数类型是值类型,且栈上是 object,需要拆箱
                 if (paramType.IsValueType && idType == typeof(object))
                 {
@@ -1363,6 +1372,25 @@ public static class DotOperatorILHelper
             {
                 return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
                     .ReduceWithInitialHelper(collection, second, first);
+            }
+        }
+
+        // 静态类型为 object 的运行期值是语言值（如 Thread.Join 返回的结果）：
+        // 用解释器的实例方法表分派，保证 list.Count() / list.Add() 等与解释器一致。
+        if (receiver is LangValueType languageReceiver)
+        {
+            var wrappedArguments = arguments
+                .Select(argument => (Old8Lang.AST.LangExpression)IlValueBridge.Wrap(argument))
+                .ToList();
+            var instanceMethod = Old8Lang.InstanceMethods.Core.InstanceMethodRegistry.Instance
+                .ResolveMethod(languageReceiver.GetType(), methodName, wrappedArguments, local: null);
+
+            if (instanceMethod is not null)
+            {
+                var manager = Old8Lang.Compiler.RuntimeGlobalWriter.CurrentManager ??
+                              new Old8Lang.Interpreter.VariateManager();
+                var result = instanceMethod.Execute(languageReceiver, wrappedArguments, manager, new SourcePosition());
+                return IlValueBridge.Unwrap(result);
             }
         }
 

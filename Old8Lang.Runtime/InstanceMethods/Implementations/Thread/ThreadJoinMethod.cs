@@ -91,7 +91,9 @@ public class ThreadJoinMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return parameters.Count == 1 ? typeof(bool) : typeof(LangValueType);
+        // Join 的结果类型取决于线程函数返回值：声明为 object，调用点按运行期
+        // 实际值分派（例如 `task.Join().Count()`），不要静态锁成 LangValueType。
+        return parameters.Count == 1 ? typeof(bool) : typeof(object);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
