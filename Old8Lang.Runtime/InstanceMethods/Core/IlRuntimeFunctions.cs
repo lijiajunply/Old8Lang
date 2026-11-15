@@ -2,6 +2,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 
@@ -19,6 +20,27 @@ namespace Old8Lang.InstanceMethods.Core;
 /// </remarks>
 public static class IlRuntimeFunctions
 {
+    /// <summary>按名字调用解释器里的同步函数（参数为位置实参）。</summary>
+    public static object? InvokeByName(string name, object?[] arguments)
+    {
+        var manager = RuntimeGlobalWriter.CurrentManager ?? new VariateManager();
+
+        var candidate = manager.ImportInfos
+            .OfType<FuncLangValue>()
+            .FirstOrDefault(func => func.Id?.IdName == name && func.Ids?.Count == arguments.Length);
+
+        if (candidate is null)
+        {
+            throw new NameError(new SourcePosition(), name);
+        }
+
+        var parameters = arguments
+            .Select(argument => (LangExpression)IlValueBridge.Wrap(argument))
+            .ToList();
+
+        return IlValueBridge.Unwrap(candidate.Run(manager, parameters));
+    }
+
     /// <summary>按解释器语义执行一次函数调用。</summary>
     public static object? InvokeInstance(
         string name,

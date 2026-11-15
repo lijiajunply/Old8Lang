@@ -673,6 +673,44 @@ public partial class CompilerVisitor
                 return null;
             }
 
+            // 闭包捕获的函数值：lambda 里调用外层变量（如装饰器的 f）时，
+            // 从当前闭包环境数组取值，再按函数值动态调用。
+            if (local.TryGetCapturedLocal(node.Id.IdName, out var capturedFunction))
+            {
+                ilGenerator.Emit(OpCodes.Ldarg_0);
+                ilGenerator.Emit(OpCodes.Ldc_I4, capturedFunction.Index);
+                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                if (capturedFunction.Type.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, capturedFunction.Type);
+                }
+                else if (capturedFunction.Type != typeof(object) && capturedFunction.Type is not TypeBuilder)
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, capturedFunction.Type);
+                }
+
+                ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                for (var index = 0; index < node.Ids.Count; index++)
+                {
+                    ilGenerator.Emit(OpCodes.Dup);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                    var argument = node.Ids[index];
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                    var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                    if (argumentType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, argumentType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                return typeof(object);
+            }
+
             // 函数参数调用（高阶函数）：命名函数的参数记录在 ArgumentIndices 里，
             // 不在 LocalVar；直接 ldarg 后按函数值动态调用。
             if (local.ArgumentIndices.TryGetValue(node.Id.IdName, out var parameterIndex))

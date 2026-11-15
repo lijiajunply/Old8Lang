@@ -937,6 +937,67 @@ public partial class CompilerVisitor
         // 否则 return null 会在返回路径对空引用 unbox.any 而抛 NRE。
         returnType = IlReturnTypeHelper.Resolve(funcToCompile.Id, returnType);
 
+        // 装饰器应用后的函数体是解释器里构造的 wrapper 闭包（自由变量不在当前
+        // IL 作用域），直接编译会解析不到被装饰函数。这里改为生成转发委托：
+        // 运行期按名字调用解释器管理器里已装饰好的函数。
+        if (node.GetFuncValue().Decorators is { Count: > 0 })
+        {
+            var forwarder = new DynamicMethod(
+                methodName,
+                returnType,
+                parameterTypes!,
+                true);
+
+            var forwarderIl = forwarder.GetILGenerator();
+            forwarderIl.Emit(OpCodes.Ldstr, methodName);
+            forwarderIl.Emit(OpCodes.Ldc_I4, parameterTypes!.Length);
+            forwarderIl.Emit(OpCodes.Newarr, typeof(object));
+            for (var index = 0; index < parameterTypes.Length; index++)
+            {
+                forwarderIl.Emit(OpCodes.Dup);
+                forwarderIl.Emit(OpCodes.Ldc_I4, index);
+                forwarderIl.Emit(OpCodes.Ldarg, index);
+                if (parameterTypes[index].IsValueType)
+                {
+                    forwarderIl.Emit(OpCodes.Box, parameterTypes[index]);
+                }
+
+                forwarderIl.Emit(OpCodes.Stelem_Ref);
+            }
+
+            forwarderIl.Emit(OpCodes.Call,
+                typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.InvokeByName))!);
+
+            if (returnType == typeof(void))
+            {
+                forwarderIl.Emit(OpCodes.Pop);
+            }
+            else if (returnType.IsValueType)
+            {
+                forwarderIl.Emit(OpCodes.Unbox_Any, returnType);
+            }
+            else if (returnType != typeof(object))
+            {
+                forwarderIl.Emit(OpCodes.Castclass, returnType);
+            }
+
+            forwarderIl.Emit(OpCodes.Ret);
+
+            var forwarderKey = methodName;
+            if (funcToCompile.Ids is not null)
+            {
+                forwarderKey = $"{methodName}${string.Join("_", parameterTypes.Select(t => t.Name))}";
+            }
+
+            local.DelegateVar.TryAdd(forwarderKey, forwarder);
+            if (funcToCompile.Ids is not null)
+            {
+                local.FuncParameters.TryAdd(forwarderKey, funcToCompile.Ids);
+            }
+
+            return null;
+        }
+
         // 定义新的方法
         var dynamicMethod = new DynamicMethod(
             methodName,

@@ -612,6 +612,14 @@
   「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
   见 change（`2026-11-15-IL除零错误/test.md`）。
 
+- [x] **IL 装饰器无法调用被装饰函数**：装饰器应用后拿到的是解释器 wrapper 闭包，
+  自由变量 `f` 不在 IL 作用域，编译后运行报 `NAME_ERROR 'f' 未定义`。
+  现在装饰器函数不直接编译函数体，改为生成转发委托：
+  `IlRuntimeFunctions.InvokeByName(函数名, 参数)` 运行期调用解释器里已装饰的函数；
+  返回类型/参数类型沿用原注解并按原规则注册。
+  `Compiler.Functions` 45 → 35 失败；剩余装饰器用例是未标注 lambda 参数/旧语法。
+  见 change（`2026-11-15-IL装饰器转发/test.md`）。
+
 - [x] **IL 命名实参 / params / 高阶函数参数调用**：这些调用编译期匹配不到签名，
   落入 `VisitInstance` 兜底后静默返回 null（相关测试此前是假通过）。现在兜底重建
   `Instance` 交给解释器执行（`IlRuntimeFunctions.InvokeInstance`），命名实参重排、
