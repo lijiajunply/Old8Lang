@@ -29,7 +29,20 @@ internal static class IlReturnTypeHelper
         }
 
         var annotation = id?.AssumptionType?.Trim();
-        if (string.IsNullOrEmpty(annotation) || !annotation.EndsWith('?'))
+        if (string.IsNullOrEmpty(annotation))
+        {
+            return resolvedType;
+        }
+
+        // 联合类型 / 交叉类型（`int | string`、`A & B`）没有单一 CLR 载体，
+        // 必须用 object 承载。否则注解被解析成 object 后又会回退到「按函数体第一个
+        // return 推断」，得到 Int32 这类单一类型，另一个分支的返回值就会报类型不匹配。
+        if (annotation.Contains('|') || annotation.Contains('&'))
+        {
+            return typeof(object);
+        }
+
+        if (!annotation.EndsWith('?'))
         {
             return resolvedType;
         }

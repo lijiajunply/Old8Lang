@@ -243,6 +243,12 @@
   现在三个校验方法同时接受两种表示。`Compiler.Types` 51→17 失败、`Compiler.Basic` 16→13 失败，
   其余组不变。见 change（`2026-11-15-集合类型注解校验/test.md`）。
 
+- [x] **IL 模式联合类型返回值被收窄成第一个分支的类型**：`func f(flag:bool) -> int | string`
+  的注解解析成 `object` 后，返回类型解析又回退到「按函数体第一个 return 推断」，
+  变成 `int`，另一个分支 `return "text"` 报「返回类型不匹配」。现在
+  `IlReturnTypeHelper.Resolve` 对含 `|` / `&` 的注解固定返回 `object`。
+  `Compiler.Types` 17→15 失败。见 change（`2026-11-15-IL联合类型返回/test.md`）。
+
 - [ ] **集合注解的元素类型不匹配仍未在编译期报错**：
   `items: list<int> <- {1, "hello", 3}` 在 `-f` 与 `-il` 下都能通过（返回第一个元素），
   只有 `-vm` 报 `list<int>` 类型不匹配；`GenericCollectionTypesCompilerTests` 有 6 项
