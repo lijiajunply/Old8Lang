@@ -50,6 +50,13 @@ public partial class VirtualMachine
             throw new NullReferenceError(new SourcePosition(), methodName);
         }
 
+        // 历史语言用法 number.Sqrt()：与 Math.Sqrt 相同，负数要报错而不是 NaN。
+        if (methodName == "Sqrt" && args.Length == 0 &&
+            obj is double or int or long or float or decimal)
+        {
+            return IlNumericHelper.Sqrt(Convert.ToDouble(obj, System.Globalization.CultureInfo.InvariantCulture));
+        }
+
         // VM 的元组字面量是右嵌套原生 Tuple，实例方法注册在 TupleLangValue 上。
         // 先按 VM 的元组编码展平并转成语言值，再按普通实例方法分派：这样
         // Get/ToList 拿到 TupleLangValue，All/Filter/Map 的 lambda 也会走

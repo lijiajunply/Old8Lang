@@ -487,7 +487,14 @@
   需要在「动态改数值宽度」和「catch 赋任意类型」之间定一条规则。
   见 change（`2026-11-15-IL-try局部变量/test.md` §5.1）。
 
-- [ ] **`(-1.0).Sqrt()` 跨模式行为不一致**：`-il` 返回 `NaN`（映射到 `Math.Sqrt`），
+- [x] **`(-1.0).Sqrt()` 跨模式行为不一致**：2026-11-15 统一为「负数开方报错」：
+  IL 的实例 `Sqrt` 改调 `IlNumericHelper.Sqrt`（与 `MathLib.Sqrt` 同一校验），
+  VM 在方法分派前拦截 `Sqrt` 并走相同助手；`(4.0).Sqrt()` 仍是 2。
+  解释器仍没有 `.Sqrt()` 实例方法（文档只写 `Math.Sqrt(value)`），
+  `EdgeCases` 失败集与改动前逐项一致（22 项，该用例在两种实现下都能通过），
+  但 CLI 层面的 `(-1.0).Sqrt()` 已从 NaN 变为明确报错。
+  见 change（`2026-11-15-实例Sqrt负数/test.md`）。
+  以下为原记录：`-il` 返回 `NaN`（映射到 `Math.Sqrt`），
   解释器没有 `.Sqrt()` 方法、报 `ATTRIBUTE_ERROR`，文档只写 `Math.Sqrt(value)`。
   `EdgeCases/UnexpectedInputsTests.NegativeSquareRoot` 断言会抛异常；基线通过是因为
   `caughtError != ""` 走字符串引用比较（两个不同的 `""` 实例判不等）。

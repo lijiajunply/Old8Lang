@@ -805,7 +805,10 @@ public static class DotOperatorILHelper
                 ilGenerator.Emit(OpCodes.Conv_R8);
             }
 
-            ilGenerator.Emit(OpCodes.Call, typeof(Math).GetMethod(nameof(Math.Sqrt), [typeof(double)])!);
+            // 与 Math.Sqrt(...) 同一语义：负数抛「平方根函数的参数必须是非负数」，
+            // 不能直接 Math.Sqrt 返回 NaN。
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlNumericHelper).GetMethod(nameof(IlNumericHelper.Sqrt))!);
             return typeof(double);
         }
 
