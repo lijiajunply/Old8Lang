@@ -347,13 +347,19 @@
    `InvalidCastException`（见「三种模式共同的跨模式差异」第 1 条）。
 2. 不支持泛型函数、泛型类、运算符重载、装饰器。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
-4. 异步功能支持不完整。
+4. **异步功能支持不完整**（2026-11-15 更新）：异步状态机在 try / try-finally / using 区域内的
+   `await` 已能正确恢复（此前会生成无效 IL，`InvalidProgramException`），用户 `finally` 与
+   using 的 Dispose 也只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
+   `catch` / `finally` 块中的 `await`、`defer` / `yield` 中的 `await`，以及表达式内部的 `await`
+   （如 `1 + await f()`、`PrintLine(await f())`，请先把结果赋给变量）。
+   `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
 5. **IL 校验失败已大幅收敛**：`Common Language Runtime detected an invalid program` 仍可能在
    尚未迁移的路径出现（生成器 `yield`、match 高级模式、mixin、部分装饰器用例）。
    **2026-11-15 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
-   逐组运行共 1955 例 → **252 失败 / 1678 通过 / 25 跳过**
-   （2026-11-15 修复轮次开始时为 323 失败，且 `Compiler.Classes` / `Compiler.Expressions`
-   两组会让测试主机直接崩溃）。
+   逐组运行共 1976 例 → **212 失败 / 1739 通过 / 25 跳过**
+   （含本日新增用例）。当天失败数从 252（更早尚有 323 失败，且
+   `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到本轮修复前的 224，
+   本轮修复后为 212。
 6. **高阶实例方法自 2026-10-10 起可用**：`List` 的 `FindAll`/`FlatMap`/`GroupAdjacentBy`/`Partition`/
    `Single`/`SingleOrDefault`/`SkipWhile(Indexed)`/`TakeWhile(Indexed)`、`Dictionary` 的
    `Map`/`Filter`/`ForEach`、泛型列表的 `SelectMany`/`SortBy`/`Zip3`/`Sum(selector)`/
