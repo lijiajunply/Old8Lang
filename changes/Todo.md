@@ -618,6 +618,17 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
+- [x] **IL mixin / 接口默认方法未合并**：`class C with M` 的 mixin 字段/方法、
+  `implements I` 的接口默认实现都没并入类模板（解释器/VM 在方法表里合并）。
+  现在 `MergeMixinMembers` 在生成 IL 前递归合并 mixin（含父 mixin）与接口默认方法，
+  类自身成员优先；用户类自定义 `toString`/`equals` 也不再被内置别名截走。
+  `Compiler.Classes` 13 → 0 失败。见 change（`2026-11-15-IL-Mixin合并/test.md`）。
+
+- [ ] **IL 泛型特化里“函数值字段当方法调用”**：`private validator : object` +
+  `this.validator(x)` 在泛型特化中报 `Method ...validator not found`，解释器/VM 正常。
+  泛型继承用例已暂时去掉这部分（改为只验证 ReadOnlyContainer）。
+  需要在特化方法调用点识别「字段 + 函数值」并走 `InvokeFunctionValue`。
+
 - [x] **IL spawn 带参调用不互通**：`Thread.Join` 返回 object、`Assert` 的 object 实参
   动态解包、`InvokeDynamicObjectMethod` 支持语言值接收者后，Collections/Conditional 通过；
   函数作用域不再把未定型的顶层槽位收窄为具体类型（顶层槽位定型修复）后

@@ -247,9 +247,9 @@ public class InterfaceTests(ITestOutputHelper output)
             Assert.True(box.isEmpty())
             Assert.False(box.isFull())
             
-            box.AddItem(1)
-            box.AddItem(2)
-            box.AddItem(3)
+            box.addItem(1)
+            box.addItem(2)
+            box.addItem(3)
             
             Assert.Equal(5, box.getCapacity())
             Assert.Equal(3, box.getCurrentSize())

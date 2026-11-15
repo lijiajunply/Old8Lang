@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Runtime;
 using Old8Lang.InstanceMethods.Core;
 
 namespace Old8Lang.AST.Expression.OperationHelpers;
@@ -133,6 +134,27 @@ internal static class InstanceMethodTypeResolver
     internal static IInstanceMethod? ResolveInstanceMethod(Type receiverType, Instance instance,
         LocalManager local, out Type mappedType)
     {
+        // 用户类自带的同名方法优先于内置实例方法（例如类里定义的 toString/equals）：
+        // 返回 null 让调用方走 CLR 方法解析，避免被 registry 里的 ToString 别名截走。
+        // 仅限 Old8Lang 自定义类（LangObject 子类）；string/native 集合等框架类型
+        // 仍走内置实例方法，避免 Split/Trim 等被 CLR 同名方法截走。
+        if (receiverType is not System.Reflection.Emit.TypeBuilder &&
+            typeof(LangObject).IsAssignableFrom(receiverType))
+        {
+            var declared = receiverType
+                .GetMethods(System.Reflection.BindingFlags.Public |
+                            System.Reflection.BindingFlags.NonPublic |
+                            System.Reflection.BindingFlags.Instance)
+                .Any(method => method.Name == instance.Id.IdName &&
+                               method.DeclaringType != typeof(object) &&
+                               method.DeclaringType != typeof(LangObject));
+            if (declared)
+            {
+                mappedType = receiverType;
+                return null;
+            }
+        }
+
         InstanceMethodInitializer.EnsureInitialized();
         var registry = InstanceMethodRegistry.Instance;
         mappedType = MapToLangValueType(receiverType);

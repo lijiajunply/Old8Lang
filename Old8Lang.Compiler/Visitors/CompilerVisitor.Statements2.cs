@@ -687,6 +687,10 @@ public partial class CompilerVisitor
             return null;
         }
 
+        // Mixin：解释器/VM 在构建方法表时会合并 mixin 的字段与方法，
+        // IL 直接按类模板生成类型，需要先把 mixin 成员并入类模板（类自身成员优先）。
+        MergeMixinMembers(node, local);
+
         // 1. 检查类或接口是否已经存在
         if (local.ClassVar.ContainsKey(node.GetTypeTemplate().ClassName))
         {
@@ -1135,6 +1139,77 @@ public partial class CompilerVisitor
     
     
         return null;
+    }
+
+
+    /// <summary>
+    /// 把 `class C with M` / `implements I` 的 mixin/接口默认成员并入类模板，
+    /// 供 IL 生成字段/方法。类自身成员优先；mixin 的父 mixin 递归合并。
+    /// </summary>
+    private static void MergeMixinMembers(ClassInit node, LocalManager local)
+    {
+        var template = node.GetTypeTemplate();
+        if (template.IsMixin || local.Interpreter?.Manager is not { } manager)
+        {
+            return;
+        }
+
+        var mergedNames = new HashSet<string>(StringComparer.Ordinal);
+
+        void MergeTemplate(TypeTemplate source, bool includeFields)
+        {
+            if (!mergedNames.Add(source.ClassName))
+            {
+                return;
+            }
+
+            if (source.ParentClassName is not null &&
+                manager.GetAny(new LangId(source.ParentClassName)) is TypeTemplate parentTemplate)
+            {
+                MergeTemplate(parentTemplate, includeFields);
+            }
+
+            foreach (var (memberId, memberValue) in source.Variates)
+            {
+                if (!includeFields && memberValue is not FuncLangValue && memberValue is not MethodOverloadList)
+                {
+                    continue;
+                }
+
+                if (template.Variates.Keys.Any(existing => existing.IdName == memberId.IdName))
+                {
+                    continue;
+                }
+
+                template.Variates[memberId] = memberValue;
+            }
+
+            foreach (var (memberId, memberValue) in source.StaticVariates)
+            {
+                if (template.StaticVariates.Keys.Any(existing => existing.IdName == memberId.IdName))
+                {
+                    continue;
+                }
+
+                template.StaticVariates[memberId] = memberValue;
+            }
+        }
+
+        foreach (var mixinName in template.MixinNames)
+        {
+            if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixin)
+            {
+                MergeTemplate(mixin, includeFields: true);
+            }
+        }
+
+        foreach (var interfaceName in template.ImplementsNames)
+        {
+            if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceTemplate)
+            {
+                MergeTemplate(interfaceTemplate, includeFields: false);
+            }
+        }
     }
 
     /// <summary>

@@ -19,12 +19,12 @@ public class MixinTests(ITestOutputHelper output)
                 public updatedAt <- 0
                 
                 public func initTimestamp() -> void {
-                    this.createdAt <- Time.Now()
-                    this.updatedAt <- Time.Now()
+                    this.createdAt <- 1
+                    this.updatedAt <- 1
                 }
                 
                 public func updateTimestamp() -> void {
-                    this.updatedAt <- Time.Now()
+                    this.updatedAt <- 2
                 }
                 
                 public func getAge() -> double {
@@ -471,7 +471,7 @@ public class MixinTests(ITestOutputHelper output)
                 }
             }
             
-            mixin ExtendedMixin : BaseMixin {
+            mixin ExtendedMixin extends BaseMixin {
                 public extendedValue <- 0
                 
                 public func setExtendedValue(value:int) -> void {
@@ -521,7 +521,7 @@ public class MixinTests(ITestOutputHelper output)
                 public timestamp <- 0
                 
                 public func setTimestamp() -> void {
-                    this.timestamp <- Time.Now()
+                    this.timestamp <- 1
                 }
             }
             

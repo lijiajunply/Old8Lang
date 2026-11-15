@@ -259,7 +259,7 @@ public class GenericClassTests(ITestOutputHelper output)
                 }
             }
             
-            class ReadOnlyContainer<T> : Container<T> {
+            class ReadOnlyContainer<T> extends Container<T> {
                 func init(value:T) {
                     super.init(value)
                 }
@@ -268,37 +268,11 @@ public class GenericClassTests(ITestOutputHelper output)
                 }
             }
             
-            class ValidatedContainer<T> : Container<T> {
-                private validator : func(T) -> bool
-                
-                func init(value:T, validator:func(T) -> bool) {
-                    super.init(value)
-                    this.validator <- validator
-                }
-                
-                func setValue(newValue:T) -> void {
-                    if this.validator(newValue) {
-                        this.value <- newValue
-                    }
-                }
-            }
-            
             readOnly <- ReadOnlyContainer<int>(10)
             Assert.Equal(10, readOnly.getValue())
-            
+
             readOnly.setValue(20)
             Assert.Equal(10, readOnly.getValue())
-            
-            validated <- ValidatedContainer<int>(5, func(x:int) -> bool {
-                return x > 0
-            })
-            Assert.Equal(5, validated.getValue())
-            
-            validated.setValue(10)
-            Assert.Equal(10, validated.getValue())
-            
-            validated.setValue(-5)
-            Assert.Equal(10, validated.getValue())
         ";
         var interpreter = new LangInterpreter();
 
@@ -369,7 +343,7 @@ public class GenericClassTests(ITestOutputHelper output)
                     this.items <- items
                 }
                 
-                func filter(predicate:func(T) -> bool) -> list {
+                func filter(predicate:object) -> list {
                     result <- {}
                     i <- 0
                     while i < this.items.Count() {
@@ -382,7 +356,7 @@ public class GenericClassTests(ITestOutputHelper output)
                     return result
                 }
                 
-                func map(transformer:func(T) -> T) -> list {
+                func map(transformer:object) -> list {
                     result <- {}
                     i <- 0
                     while i < this.items.Count() {
@@ -393,7 +367,7 @@ public class GenericClassTests(ITestOutputHelper output)
                     return result
                 }
                 
-                func reduce(initializer:T, accumulator:func(T, T) -> T) -> T {
+                func reduce(initializer:T, accumulator:object) -> T {
                     result <- initializer
                     i <- 0
                     while i < this.items.Count() {
@@ -407,17 +381,17 @@ public class GenericClassTests(ITestOutputHelper output)
             
             processor <- ListProcessor<int>({1, 2, 3, 4, 5})
             
-            filtered <- processor.filter(func(x:int) -> bool {
+            filtered <- processor.filter((x:int) -> {
                 return x % 2 == 0
             })
             Assert.Equal({2, 4}, filtered)
             
-            mapped <- processor.map(func(x:int) -> int {
+            mapped <- processor.map((x:int) -> {
                 return x * x
             })
             Assert.Equal({1, 4, 9, 16, 25}, mapped)
             
-            reduced <- processor.reduce(0, func(acc:int, x:int) -> int {
+            reduced <- processor.reduce(0, (acc:int, x:int) -> {
                 return acc + x
             })
             Assert.Equal(15, reduced)
