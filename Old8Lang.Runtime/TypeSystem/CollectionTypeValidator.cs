@@ -1,5 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.Syntax;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
@@ -117,7 +118,8 @@ public static class CollectionTypeValidator
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
                     expectedElementType.GetFullName(),
-                    actualElementType.GetFullName()))
+                    actualElementType.GetFullName()) ||
+                !CollectionShapesCompatible(expectedElementType.GetFullName(), actualElementTypeName))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 列表元素类型不匹配: 第 {i} 个元素期望类型 {expectedElementType.GetFullName()},实际类型 {actualElementTypeName}",
@@ -173,7 +175,8 @@ public static class CollectionTypeValidator
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
                     expectedElementType.GetFullName(),
-                    actualElementType.GetFullName()))
+                    actualElementType.GetFullName()) ||
+                !CollectionShapesCompatible(expectedElementType.GetFullName(), actualElementTypeName))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 数组元素类型不匹配: 第 {i} 个元素期望类型 {expectedElementType.GetFullName()},实际类型 {actualElementTypeName}",
@@ -236,7 +239,8 @@ public static class CollectionTypeValidator
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
                     expectedKeyType.GetFullName(),
-                    actualKeyType.GetFullName()))
+                    actualKeyType.GetFullName()) ||
+                !CollectionShapesCompatible(expectedKeyType.GetFullName(), actualKeyTypeName))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 字典键类型不匹配: 第 {i} 个键期望类型 {expectedKeyType.GetFullName()},实际类型 {actualKeyTypeName}",
@@ -250,7 +254,8 @@ public static class CollectionTypeValidator
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
                     expectedValueType.GetFullName(),
-                    actualValueType.GetFullName()))
+                    actualValueType.GetFullName()) ||
+                !CollectionShapesCompatible(expectedValueType.GetFullName(), actualValueTypeName))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 字典值类型不匹配: 第 {i} 个值期望类型 {expectedValueType.GetFullName()},实际类型 {actualValueTypeName}",
@@ -279,16 +284,81 @@ public static class CollectionTypeValidator
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
+            // IL 模式的标量字面量是 ScalarLiteralExpression，不识别会让元素类型退化成 any，
+            // `list<int> <- {1, "hello"}` 这类注解就不会报错。
+            ScalarLiteralExpression literal => literal.Kind switch
+            {
+                LiteralKind.Int => "int",
+                LiteralKind.Double => "double",
+                LiteralKind.String => "string",
+                LiteralKind.Bool => "bool",
+                LiteralKind.Char => "char",
+                LiteralKind.Null => "null",
+                LiteralKind.Void => "void",
+                _ => "any"
+            },
             ListLangValue list => list.ElementType is not null ? $"list<{list.ElementType}>" : "list",
             ArrayLangValue array => array.ElementType is not null ? $"array<{array.ElementType}>" : "array",
             DictionaryLangValue dict => dict.KeyType is not null && dict.ValueType is not null
                 ? $"dict<{dict.KeyType},{dict.ValueType}>"
                 : "dict",
-            ListLiteralExpression => "list",
-            ArrayLiteralExpression => "array",
-            DictionaryLiteralExpression => "dict",
+            ListLiteralExpression listLiteral => $"list<{DescribeLiteralElements(listLiteral.Elements)}>",
+            ArrayLiteralExpression arrayLiteral => $"array<{DescribeLiteralElements(arrayLiteral.Elements)}>",
+            DictionaryLiteralExpression dictLiteral => DescribeDictionaryLiteral(dictLiteral),
             NullLangValue => "null",
             _ => "any"
         };
+    }
+
+    /// <summary>同一集合内元素的公共类型名（嵌套字面量继续递归）。</summary>
+    private static string DescribeLiteralElements(IReadOnlyList<LangExpression> elements)
+    {
+        if (elements.Count == 0) return "any";
+        var names = elements.Select(GetExpressionTypeName).Distinct().ToList();
+        return names.Count == 1 ? names[0] : "any";
+    }
+
+    private static string DescribeDictionaryLiteral(DictionaryLiteralExpression literal)
+    {
+        if (literal.Entries.Count == 0) return "dict";
+        var keyNames = literal.Entries.Select(entry => GetExpressionTypeName(entry.Key)).Distinct().ToList();
+        var valueNames = literal.Entries.Select(entry => GetExpressionTypeName(entry.Value)).Distinct().ToList();
+        return $"dict<{(keyNames.Count == 1 ? keyNames[0] : "any")},{(valueNames.Count == 1 ? valueNames[0] : "any")}>";
+    }
+
+    /// <summary>
+    /// 嵌套集合的形状比较：`list<int>` 与 `list<string>` 这类同基类型但元素不同的
+    /// 组合，类型兼容性判断会放行，需要在集合注解校验里单独拒绝。
+    /// </summary>
+    private static bool CollectionShapesCompatible(string expected, string actual)
+    {
+        var expectedBase = GetCollectionBaseName(expected);
+        var actualBase = GetCollectionBaseName(actual);
+        if (expectedBase is null || actualBase is null)
+        {
+            return true;
+        }
+
+        if (!expectedBase.Equals(actualBase, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // 实际类型含 any 说明元素类型推断不完整（例如局部变量/自定义类实例），
+        // 交给 ValidateTypeCompatibility 处理，不能当成集合形状不匹配。
+        if (actual.Contains("any", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string? GetCollectionBaseName(string typeName)
+    {
+        var index = typeName.IndexOf('<');
+        if (index <= 0) return null;
+        var baseName = typeName[..index].Trim().ToLowerInvariant();
+        return baseName is "list" or "array" or "dict" or "dictionary" ? baseName : null;
     }
 }

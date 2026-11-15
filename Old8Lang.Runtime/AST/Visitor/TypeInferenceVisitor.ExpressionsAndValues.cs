@@ -240,12 +240,15 @@ public partial class TypeInferenceVisitor
                     };
                 }
 
-                // 返回泛型类型
+                // 返回泛型类型。IL 运行期集合统一用 object 容器（字面量
+                // `{1,2,3}` 生成 List<object>、`[...]` 生成 object[]），
+                // 注解 `list<int>` / `array<int>` 若映射成 List<int> / int[]
+                // 会与实参/返回值类型不一致（返回类型不匹配或无效 IL）。
                 return baseTypeName switch
                 {
-                    "list" => typeof(List<>).MakeGenericType(argType),
-                    "array" => argType.MakeArrayType(),
-                    "dictionary" => typeof(Dictionary<,>).MakeGenericType(typeof(object), argType),
+                    "list" => typeof(List<object>),
+                    "array" => typeof(object[]),
+                    "dictionary" => typeof(Dictionary<object, object>),
                     _ => typeof(object) // 未知泛型类型，默认为object
                 };
             }

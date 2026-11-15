@@ -396,9 +396,8 @@ secondArraySecondElement <- arrays[1][1]
 mixed <- {1, ""hello"", 3.14, true}
 result1 <- len(mixed)
 
-// 带类型注解的混合类型列表（解释器模式下也允许）
-typedMixed:list<int> <- {1, ""world"", 2, false}
-result2 <- len(typedMixed)
+// 带类型注解的混合类型列表在 IL 编译期会被拒绝（见 Compile_ListTypeMismatch_*），
+// 这里只验证无注解的混合集合仍然可用。
 
 // 混合类型数组
 arr <- [1, ""test"", true]

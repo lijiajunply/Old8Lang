@@ -460,6 +460,8 @@ public static class GenericConstraintValidator
             "object" => typeof(object),
             "list" => typeof(List<object>),
             "dictionary" or "dict" => typeof(Dictionary<object, object>),
+            // 语言层约束名（`where T: comparable`）不是 CLR 类型名。
+            "comparable" or "icomparable" => typeof(IComparable),
             _ => Type.GetType(typeName)
         };
     }

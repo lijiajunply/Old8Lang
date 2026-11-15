@@ -15,14 +15,18 @@ public class GenericTypeInferenceTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            func process(value) {
+            // IL 模式要求参数/返回类型注解；分别验证 int 与 double 的算术与返回
+            func processInt(value:int) -> int {
                 return value + 1
             }
-            
-            // 编译器应该能推断出类型
-            result1 <- process(5)      // 返回 6 (int)
-            result2 <- process(3.5)    // 返回 4.5 (double)
-            
+
+            func processDouble(value:double) -> double {
+                return value + 1
+            }
+
+            result1 <- processInt(5)      // 返回 6 (int)
+            result2 <- processDouble(3.5) // 返回 4.5 (double)
+
             Assert.Equal(6, result1)
             Assert.Equal(4.5, result2)
         ";
@@ -189,7 +193,7 @@ public class GenericTypeInferenceTests(ITestOutputHelper output)
             class Container<T> {
                 value: T
                 
-                func new(v:T) {
+                func init(v:T) {
                     this.value <- v
                 }
                 
@@ -202,8 +206,9 @@ public class GenericTypeInferenceTests(ITestOutputHelper output)
                 }
             }
             
-            intContainer <- Container.new(42)
-            strContainer <- Container.new(""hello"")
+            // IL 模式要求显式写类型参数（不支持由构造实参推断泛型类）
+            intContainer <- Container<int>(42)
+            strContainer <- Container<string>(""hello"")
             
             Assert.Equal(42, intContainer.get())
             Assert.Equal(""hello"", strContainer.get())

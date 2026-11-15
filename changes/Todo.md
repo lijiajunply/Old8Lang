@@ -612,6 +612,13 @@
   「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
   见 change（`2026-11-15-IL除零错误/test.md`）。
 
+- [x] **IL 集合注解元素类型不匹配不报错**：`items:list<int> <- {1, "hello"}` 在 IL 下被接受
+  （VM 编译期报错）。`CollectionTypeValidator` 不认识 IL 的标量/嵌套字面量，
+  元素类型退化成 `any`；`list<int>` 注解又被解析成 CLR `List<int>`，与字面量
+  `List<object>` 不一致。现在补标量/嵌套类型描述、同基集合形状比较（`any` 放行），
+  泛型集合注解统一映射到 object 容器；`comparable` 约束映射 `IComparable`。
+  `Compiler.Types` 10 → 0 失败。见 change（`2026-11-15-集合注解类型检查/test.md`）。
+
 - [x] **lambda 参数注解 `object` 解析失败**：`(f:object) -> ...` 被预读逻辑误判成命名元组，
   报「无法识别的主表达式类型 'Arrow'」；`Object` 还报「不支持的类型注解」。
   两处类型表补 `object`/`function` 并改为大小写不敏感匹配。
