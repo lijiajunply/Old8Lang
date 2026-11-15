@@ -966,6 +966,7 @@ public partial class CompilerVisitor
         methodIl.BeginExceptionBlock();
 
         // 生成方法体的 IL 代码
+        funcLocal.CatchAssignedVariables.UnionWith(CatchAssignmentScanner.Collect(funcToCompile.BlockStatement));
         funcToCompile.BlockStatement.Accept(new CompilerVisitor(methodIl, funcLocal));
 
         // 检查函数体的最后一个语句是否是 ReturnStatement

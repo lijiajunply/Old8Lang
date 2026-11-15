@@ -28,6 +28,19 @@ internal static class ComparisonOpHelper
     }
 
     /// <summary>
+    /// 相等比较是否必须走 <c>object.Equals</c>：任一侧的静态类型是 <see cref="object"/>。
+    /// </summary>
+    /// <remarks>
+    /// 静态类型为 object 的值在运行期可能是装箱值类型、字符串或任意引用。
+    /// 直接用 <c>ceq</c> 只会比较引用，`"success" == result`（result 是 object 槽位）
+    /// 这类比较会得到 false。object.Equals 才能按值比较，也与解释器的语义一致。
+    /// </remarks>
+    internal static bool HasObjectOperand(Type? leftType, Type? rightType)
+    {
+        return leftType == typeof(object) || rightType == typeof(object);
+    }
+
+    /// <summary>
     /// 在 object 与数值混合比较时，按「发射一个操作数、立即装箱一个」的顺序压栈。
     /// </summary>
     /// <remarks>
@@ -47,15 +60,15 @@ internal static class ComparisonOpHelper
         LocalManager local)
     {
         left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        if (IsNumericType(leftType))
+        if (leftType is { IsValueType: true })
         {
-            ilGenerator.Emit(OpCodes.Box, leftType!);
+            ilGenerator.Emit(OpCodes.Box, leftType);
         }
 
         right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        if (IsNumericType(rightType))
+        if (rightType is { IsValueType: true })
         {
-            ilGenerator.Emit(OpCodes.Box, rightType!);
+            ilGenerator.Emit(OpCodes.Box, rightType);
         }
     }
 
@@ -309,10 +322,10 @@ internal static class ComparisonOpHelper
             var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
-        // 处理 ForIn 循环中变量的特殊情况（object vs int）
-        else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
+        // 任一侧静态类型为 object：运行期按值比较（装箱值 / 字符串 / 任意引用）
+        else if (HasObjectOperand(leftOpType, rightOpType))
         {
-            // 按位置装箱：数值在左侧时必须先装箱左操作数
+            // 按位置装箱：值类型操作数必须各自装箱
             EmitBoxedOperands(left, right, leftOpType, rightOpType, ilGenerator, local);
 
             // 使用 object.Equals 方法进行比较
@@ -350,10 +363,9 @@ internal static class ComparisonOpHelper
             var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);
         }
-        // object 与 int 混用（如未注解的函数参数）：先装箱再按值比较
-        else if (IsObjectVsNumericComparison(leftOpType, rightOpType))
+        // 任一侧静态类型为 object：运行期按值比较
+        else if (HasObjectOperand(leftOpType, rightOpType))
         {
-            // 按位置装箱：数值在左侧时必须先装箱左操作数
             EmitBoxedOperands(left, right, leftOpType, rightOpType, ilGenerator, local);
             var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
             ilGenerator.Emit(OpCodes.Call, equalsMethod);

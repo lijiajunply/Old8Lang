@@ -116,6 +116,15 @@ public partial class CompilerVisitor
         // 3. 局部变量赋值处理
         var valueType = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(int);
 
+        // catch 块会把捕获的异常赋给外层变量（类型与初始值不同）。这类变量的槽位
+        // 一律用 object 承载：否则 catch 处的赋值会在编译期换掉槽位，
+        // 成功路径上写入的值在后续读取时变成未初始化的 null。
+        // 只对引用类型值放宽，值类型仍按原值类型收窄（保持数值宽度的动态重赋值）。
+        if (!valueType.IsValueType && local.CatchAssignedVariables.Contains(idName))
+        {
+            valueType = typeof(object);
+        }
+
         if (local.LocalVarTypes.TryGetValue(idName, out var existingType))
         {
             if (local.ValidateType(existingType, valueType, expression.Position))
@@ -137,6 +146,21 @@ public partial class CompilerVisitor
         {
             if (localVar.LocalType != valueType)
             {
+                // object 槽位天然能接收任何值：装箱后写入即可，不要换成新槽位，
+                // 否则其它路径上已写入的值会丢失。
+                if (localVar.LocalType == typeof(object))
+                {
+                    expression.Accept(this);
+                    if (valueType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, valueType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stloc, localVar);
+                    local.LocalVarTypes[idName] = typeof(object);
+                    return;
+                }
+
                 local.RemoveLocalVar(idName);
                 localVar = ilGenerator.DeclareLocal(valueType);
                 local.AddLocalVar(idName, localVar);
@@ -190,6 +214,20 @@ public partial class CompilerVisitor
         {
             if (existingLocal.LocalType != type)
             {
+                // object 槽位能接收任何值：值类型装箱后写入，不能换成新槽位，
+                // 否则其它路径（例如 try 成功分支）上写入的值会丢失。
+                if (existingLocal.LocalType == typeof(object))
+                {
+                    if (type.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, type);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stloc, existingLocal);
+                    local.LocalVarTypes[idName] = typeof(object);
+                    return;
+                }
+
                 local.RemoveLocalVar(idName);
                 var newLocal = ilGenerator.DeclareLocal(type);
                 local.AddLocalVar(idName, newLocal);

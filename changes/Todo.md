@@ -219,6 +219,26 @@
   逻辑运算与一元 `!`；非 object 类型保持原有真值语义。`Compiler.Classes` 16→15、
   `Compiler.Functions` 57→56 失败，其余组不变。见 change（`2026-11-14-IL布尔条件/test.md`）。
 
+- [x] **IL 模式 try/catch 赋值把局部变量槽位换掉，丢失成功分支的值**：变量在 try 与 catch
+  里都被赋值且两处类型不同时（`result <- ""; try { result <- "valid" } catch (e) { result <- e }`），
+  catch 的赋值会在编译期把变量重绑定成 `ExceptionWrapper` 槽位，成功分支写入的值因此丢失
+  （`-il` 读到空，`-f`/`-vm` 正常）。现在扫描「try + catch 都赋值」的变量并改用 `object`
+  槽位承载；相等比较只要任一侧静态类型是 `object` 就走 `object.Equals`。
+  `Compiler.Exceptions` 11→10 失败，其余 18 组不变。见 change（`2026-11-15-IL-try局部变量/test.md`）。
+
+- [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
+  后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
+  的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。
+  需要在「动态改数值宽度」和「catch 赋任意类型」之间定一条规则。
+  见 change（`2026-11-15-IL-try局部变量/test.md` §5.1）。
+
+- [ ] **`(-1.0).Sqrt()` 跨模式行为不一致**：`-il` 返回 `NaN`（映射到 `Math.Sqrt`），
+  解释器没有 `.Sqrt()` 方法、报 `ATTRIBUTE_ERROR`，文档只写 `Math.Sqrt(value)`。
+  `EdgeCases/UnexpectedInputsTests.NegativeSquareRoot` 断言会抛异常；基线通过是因为
+  `caughtError != ""` 走字符串引用比较（两个不同的 `""` 实例判不等）。
+  需要先定「负数开方」的语义（NaN 还是抛错），再统一三模式与用例。
+  见 change（`2026-11-15-IL-try局部变量/test.md` §5.2）。
+
 - [ ] **解释器在「循环内 if 里 return + 索引访问字段」时死循环**：
 
   ```old8

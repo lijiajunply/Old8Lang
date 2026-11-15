@@ -556,6 +556,9 @@ public static partial class ClassInitRuntimeExtensions
             }
         }
 
+        // catch 块里被赋值的变量需要 object 槽位承载异常值。
+        methodLocal.CatchAssignedVariables.UnionWith(CatchAssignmentScanner.Collect(funcValue.BlockStatement));
+
         // 生成方法体的IL代码
         funcValue.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, methodLocal));
 

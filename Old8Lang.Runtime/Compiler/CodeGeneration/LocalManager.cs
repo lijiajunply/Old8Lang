@@ -54,6 +54,18 @@ public class LocalManager
     public readonly Dictionary<string, Type> LocalVarTypes = [];
 
     /// <summary>
+    /// 在 catch 块里被赋值的变量名。
+    /// </summary>
+    /// <remarks>
+    /// catch 块通常把捕获到的异常赋给外层变量（<c>caughtError &lt;- e</c>），
+    /// 异常值类型（<c>ExceptionWrapper</c>）与变量初始值（常见是空字符串）不一致。
+    /// 若按初始值的类型收窄槽位，编译期就会在 catch 处换掉槽位，
+    /// 导致成功路径上写入的值在后续读取时丢失（读到未初始化的 null）。
+    /// 因此这类变量一律用 <c>object</c> 槽位承载，保持动态语义。
+    /// </remarks>
+    public readonly HashSet<string> CatchAssignedVariables = [];
+
+    /// <summary>
     /// 顶层变量的全局槽位信息。函数体、lambda 等子作用域共享同一个实例。
     /// </summary>
     public GlobalVariableScope? Globals { get; init; }

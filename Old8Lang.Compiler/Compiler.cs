@@ -354,6 +354,8 @@ public static class Compiler
         try
         {
             Log("开始生成IL代码", LogLevel.Debug);
+            // catch 块里被赋值的变量需要 object 槽位承载异常值，先按语句树收集。
+            local.CatchAssignedVariables.UnionWith(CatchAssignmentScanner.Collect(statement));
             // 宿主级 IL 生成统一通过 Visitor 调度器进入，旧 AST GenerateIl 仅保留逐节点迁移兼容。
             ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
             Log("IL代码生成完成", LogLevel.Debug);
@@ -521,6 +523,7 @@ public static class Compiler
             Log("开始生成异步 IL 代码", LogLevel.Debug);
 
             // 生成语句的 IL 代码
+            local.CatchAssignedVariables.UnionWith(CatchAssignmentScanner.Collect(statement));
             ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
 
             // 清空栈（如果有值的话）
