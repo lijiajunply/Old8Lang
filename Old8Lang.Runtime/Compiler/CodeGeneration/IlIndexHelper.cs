@@ -93,6 +93,21 @@ public static class IlIndexHelper
     /// 用运行期键读取静态类型未知的集合。字符串等非数值键仅用于字典；数值键沿用
     /// 列表、数组、元组和字符串的负索引规则。
     /// </summary>
+    /// <summary>
+    /// 读取原生字典；键不存在时抛语言 <see cref="KeyError"/>（KEY_ERROR），
+    /// 与解释器 / 虚拟机一致，而不是 CLR <see cref="KeyNotFoundException"/>。
+    /// </summary>
+    public static object? GetDictionaryItem(IDictionary dictionary, object? key)
+    {
+        var actualKey = key ?? "null";
+        if (dictionary.Contains(actualKey))
+        {
+            return dictionary[actualKey];
+        }
+
+        throw new KeyError(new Old8Lang.SourcePosition(), actualKey);
+    }
+
     public static object? GetDynamicObjectItem(object? collection, object? key)
     {
         if (collection is IDictionary dictionary)

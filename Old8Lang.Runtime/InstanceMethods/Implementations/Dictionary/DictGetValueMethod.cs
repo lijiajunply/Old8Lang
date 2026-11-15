@@ -35,7 +35,7 @@ public class DictGetValueMethod : BaseInstanceMethod
             }
         }
 
-        throw new KeyNotFoundException($"字典中不存在键: {key.ToDisplayString()}");
+        throw new Old8Lang.Error.KeyError(instance, key.ToDisplayString());
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
@@ -72,7 +72,7 @@ public class DictGetValueMethod : BaseInstanceMethod
             {
                 return value;
             }
-            throw new KeyNotFoundException($"字典中不存在键: {key}");
+            throw new Old8Lang.Error.KeyError(new Old8Lang.SourcePosition(), key ?? "null");
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
     }

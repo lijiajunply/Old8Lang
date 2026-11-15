@@ -171,15 +171,24 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         return true;
     }
 
+    /// <summary>
+    /// 按键取值；键不存在时抛 <see cref="Old8Lang.Error.KeyError"/>（KEY_ERROR）。
+    /// </summary>
+    /// <remarks>
+    /// 2026-11-15 统一：此前解释器返回 null、IL 抛 CLR KeyNotFoundException、VM 抛 KEY_ERROR。
+    /// 语义上缺失键属于错误（安全访问用 <c>GetOrElse</c> / <c>TryGet</c>），现在三模式一致。
+    /// </remarks>
     public LangValueType Get(LangValueType key)
     {
-        var a = Value.Where(x => x.Key.Equal(key)).ToList();
-        if (a.Count == 0)
+        foreach (var (k, value) in Value)
         {
-            return NullLangValue.Instance;
+            if (k.Equal(key))
+            {
+                return value;
+            }
         }
 
-        return a[0].Value;
+        throw new Old8Lang.Error.KeyError(this, key.ToDisplayString());
     }
 
     public void Set(LangValueType key, LangValueType value)

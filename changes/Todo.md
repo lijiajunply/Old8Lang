@@ -591,11 +591,13 @@
   （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
   见 change（`2026-11-15-集合拼接统一/test.md`）。
 
-- [ ] **字典缺失键的行为三模式不一致**：`d <- {"a": 1}; d["missing"]` 在 `-f` 返回
-  `NullLangValue`（`== null` 为 true），`-vm` 抛 `KEY_ERROR`；`-il` 内部还不一致——
-  原生 `Dictionary<object,object>` 分支抛 .NET `The given key ... was not present`，
-  而 `dict()` 创建的 `DictionaryLangValue` 分支返回 `null`。需要先定「缺失键返回 null 还是报错」
-  的约定，再统一实现与测试。见 change（`2026-11-14-IL语言字典索引/test.md` §5）。
+- [x] **字典缺失键的行为三模式不一致**：`d["missing"]` 此前解释器返回 null、VM 抛
+  `KEY_ERROR`、IL 原生字典抛 CLR `KeyNotFoundException`（`dict()` 分支返回 null）。
+  2026-11-15 定为「缺失键报错」（安全访问用 `GetOrElse` / `TryGet`）：解释器
+  `DictionaryLangValue.Get` 与 `GetValue` 抛语言 `KeyError`，IL 原生字典索引改走
+  `IlIndexHelper.GetDictionaryItem`（内部 `Contains` 检查后抛 `KeyError`），VM 的
+  `GetValue` 也改为 `KeyError`。三模式统一输出 `KEY_ERROR`；新增 9 项跨模式回归。
+  见 change（`2026-11-15-字典缺失键语义/test.md`）。
 
 - [x] **IL 链式比较 `a < b < c` 的行为错误**：`a <- 5; b <- 10; c <- 15; a < b < c` 在 IL 下
   曾得到 `true`（把第二段的 bool 当 int32 用 Clt 比较），而解释器与虚拟机都会报

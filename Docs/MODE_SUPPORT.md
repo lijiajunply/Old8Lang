@@ -320,7 +320,7 @@
 | 集合的 `.Length` 属性（无括号） | ✅（2026-11-15 起） | ✅ | ✅ | 数组/列表/字符串/字典均支持，等价 `len(x)`；字典键名 `"Length"` 用 `d["Length"]` |
 | `PrintLine(null)` 与集合里的 `null` 元素 | `null` | `null` | `null` | 2026-11-15 起统一为小写；类型名仍是 `Null` |
 | `null.ToStr()` | `null` | `null` | `null` | 2026-11-15 起三种模式一致 |
-| 字典缺失键 `d["missing"]` | 返回 `Null` | 原生字典抛 `KeyNotFoundException`；`dict()` 的结果返回 `null` | `KEY_ERROR` | IL 内部两种表示也不一致 |
+| 字典缺失键 `d["missing"]` | `KEY_ERROR` | `KEY_ERROR` | `KEY_ERROR` | 2026-11-15 统一；安全访问用 `GetOrElse` / `TryGet` |
 | `(-1.0).Sqrt()` | ❌ 没有该方法 | `NaN`（映射到 `Math.Sqrt`） | — | 负数开方应 `NaN` 还是报错未定 |
 | `int?` / `string?` 联合类型的返回值 | ✅ | ✅（2026-11-15 起用 `object` 承载） | ✅ | |
 | 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | 接受 | 接受 | ❌ 编译期报错 | |
@@ -358,14 +358,14 @@
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
-   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2011 例 →
-   **205 失败 / 1781 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2014 例 →
+   **205 失败 / 1784 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
    且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
    期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where` /
    字符串实例方法与语言值相等 / 泛型 `T?` 实参 / 并发函数 int 实参等一批无效 IL；
    并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算、范围端点排除语义、`.Length` 属性、null 显示，
    字符串实例方法的 IL 操作数包装（`"abc".StartsWith("a")` 曾生成无效 IL），
-   元组实例方法在 IL / 虚拟机下的跨模式支持，以及链式比较 `a < b < c` 的 bool 比较拒绝。
+   元组实例方法在 IL / 虚拟机下的跨模式支持，链式比较 `a < b < c` 的 bool 比较拒绝，以及字典缺失键统一为 `KEY_ERROR`。
    其余失败以异步、函数、类、表达式、集合的结果/类型推断缺口为主。另修掉「类体在文件结尾
    被截断时解析器死循环」的进程挂死问题。
    对 `TestFiles/CompilerTests`（157）、`InterpreterTests`（188）、`SyntaxTests`（91）

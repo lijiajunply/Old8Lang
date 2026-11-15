@@ -135,26 +135,20 @@ public class UnexpectedInputsTests
     [Fact]
     public void UnexpectedInputs_InvalidKey_HandlesInvalidDictionaryKey()
     {
-        // Arrange
+        // Arrange：2026-11-15 起缺失键统一抛 KEY_ERROR（安全访问用 GetOrElse/TryGet），
+        // 不再返回 null。
         var code = @"
             dict <- {""a"": 1, ""b"": 2}
             result <- dict[""nonexistent""]
-            type <- ""null_value""
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
+        var exception = Assert.Throws<Old8Lang.Error.KeyError>(() => ast.Run(interpreter.Manager));
 
         // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        var typeResult = interpreter.Manager.GetValue(new LangId("type"));
-        Assert.NotNull(result);
-        Assert.NotNull(typeResult);
-        Assert.IsType<NullLangValue>(result);
-        Assert.IsType<StringLangValue>(typeResult);
-        Assert.Equal("null_value", ((StringLangValue)typeResult).Value);
+        Assert.Contains("nonexistent", exception.Message);
     }
 
     [Fact]

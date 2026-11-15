@@ -1124,9 +1124,14 @@ public partial class CompilerVisitor
                 }
             }
 
-            // 调用字典的索引器（get_Item方法）
-            var getDictionaryItemMethod = listType.GetMethod("get_Item", [dictKeyType])!;
-            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+            // 原生字典读取：缺失键要抛语言 KEY_ERROR（而不是 CLR KeyNotFoundException）。
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDictionaryItem))!);
+            var dictValueType = genericArgs[1];
+            if (dictValueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, dictValueType);
+            }
         }
         else if (listType == typeof(Dictionary<string, object>))
         {
@@ -1151,9 +1156,9 @@ public partial class CompilerVisitor
                 }
             }
 
-            // 调用字典的索引器（get_Item方法）
-            var getDictionaryItemMethod = typeof(Dictionary<string, object>).GetMethod("get_Item", [typeof(string)])!;
-            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+            // 原生字典读取：缺失键统一抛语言 KEY_ERROR。
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDictionaryItem))!);
         }
         else if (listType.IsArray)
         {
