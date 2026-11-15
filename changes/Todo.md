@@ -121,10 +121,12 @@
 
 - [x] **泛型类递归特化导致栈溢出**：原崩溃用例及自引用特化回归已通过；完整 `Compiler.Classes` 组正常结束，但仍有普通失败。见 测试报告（`2026-11-11-10-54-IL泛型递归特化测试.md`）。
 - [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 排序测试报告（`2026-11-11-10-37-IL-LINQ排序测试.md`）。
-  2026-11-15 语料扫描确认：`from x in list1 join y in list2 on x == y select x` 正常，
-  但 `from x in list1 join y in list2 on x == y where x > 2 select x` 仍生成无效 IL
-  （`TestFiles/CompilerTests/linq_join_compiler.old8`），join 后再接 where 的分派是重点。
-  同一文件里 `join ... into g` 可执行但结果与解释器不一致，需一并核对。
+  2026-11-15：`join ... where` / `orderby ... where` 的无效 IL 已修（见上一条）。剩余是**语义**差异：
+  join 结果只保留外层元素，后续子句引用内层范围变量时取到的是 join 循环结束后的最后一个值
+  （`join ... where y > 2 select x` 在 IL 为 `[2, 3, 4]`、解释器为 `[3, 4]`）；
+  `join ... into g` 的分组结果也与解释器不一致（`[[3],[3],[3]]` vs `[[1, 1], [2, 2, 2], [3]]`）。
+  需要让 join 生成「配对行」并让后续子句按当前配对求值。见 change
+  （`2026-11-15-IL-LINQ-where无效IL/test.md` §5）。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 测试报告（`2026-11-11-08-49-IL-select回归测试.md`）。
 
@@ -361,6 +363,15 @@
   「IL 模式暂不支持同步生成器（yield）」。`15_class_declaration.old8` 与 5 个 generator 用例
   不再产生无效 IL；新增 4 项回归。
   见 change（`2026-11-15-IL类方法实参与生成器无效IL/test.md`）。
+
+- [x] **IL 非流式 LINQ 查询里的 `where` 生成无效 IL**：含 join 或非末尾 orderby 的查询走旧的手写
+  `GenerateWhereClauseIL`，其中 `x > 2` 拿 `LangValueType` 引用直接发 `cgt`（`ComparisonOpHelper`
+  只识别 `AnyLangValue` 子类），且条件值没按类型装箱就传给 `IsTruthy(LangValueType)`。
+  现在六个比较分支识别 `LangValueType` 基类、操作数转换改用 `IlValueBridge.Wrap`、
+  真值判定按条件类型装箱并改用 `LinqStreamingHelper.IsTruthy(object?)`。
+  语料里最后一个 `invalid program`（`linq_join_compiler.old8`）消失，
+  `join ... where`、`orderby ... where` 结果与解释器一致；新增 4 项回归。
+  见 change（`2026-11-15-IL-LINQ-where无效IL/test.md`）。
 
 - [ ] **`'h' in "abc"`（右侧为字符串字面量）在 IL 下返回 false**：解释器与虚拟机为 true；
   右侧换成变量（`str <- "abc"; 'h' in str`）时 IL 正常。属字面量接收者的类型推断/分派缺口，

@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using LangObject = Old8Lang.Runtime.LangObject;
 
 using Old8Lang.AST.Visitor;
@@ -100,37 +101,18 @@ internal static class ComparisonOpHelper
     /// </summary>
     internal static void ConvertToLangValueType(ILGenerator ilGenerator, Type type)
     {
-        if (type == typeof(int))
+        if (typeof(LangValueType).IsAssignableFrom(type)) return;
+
+        // 统一走运行期包装：IntLangValue/DoubleLangValue 等构造函数都带可选的
+        // SourcePosition 参数，按单参数 GetConstructor 找不到；IlValueBridge.Wrap
+        // 覆盖全部基础类型、集合、元组与原生对象。
+        if (type.IsValueType)
         {
-            // new IntLangValue(value)
-            var ctor = typeof(IntLangValue).GetConstructor([typeof(int)])!;
-            ilGenerator.Emit(OpCodes.Newobj, ctor);
+            ilGenerator.Emit(OpCodes.Box, type);
         }
-        else if (type == typeof(double))
-        {
-            // new DoubleLangValue(value)
-            var ctor = typeof(DoubleLangValue).GetConstructor([typeof(double)])!;
-            ilGenerator.Emit(OpCodes.Newobj, ctor);
-        }
-        else if (type == typeof(string))
-        {
-            // new StringLangValue(value)
-            var ctor = typeof(StringLangValue).GetConstructor([typeof(string)])!;
-            ilGenerator.Emit(OpCodes.Newobj, ctor);
-        }
-        else if (type == typeof(bool))
-        {
-            // new BoolLangValue(value)
-            var ctor = typeof(BoolLangValue).GetConstructor([typeof(bool)])!;
-            ilGenerator.Emit(OpCodes.Newobj, ctor);
-        }
-        else if (type == typeof(char))
-        {
-            // new CharLangValue(value)
-            var ctor = typeof(CharLangValue).GetConstructor([typeof(char)])!;
-            ilGenerator.Emit(OpCodes.Newobj, ctor);
-        }
-        // 如果已经是 LangValueType，不需要转换
+
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Wrap))!);
     }
 
     /// <summary>
@@ -165,8 +147,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        // 检查是否是 AnyLangValue（解释器模式）运算符重载
-        if (gtLeftType == typeof(AnyLangValue) || gtLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        // 语言值（LangValueType / AnyLangValue）走语言层比较方法
+        if (gtLeftType is not null && typeof(LangValueType).IsAssignableFrom(gtLeftType))
         {
             // 生成调用 Greater 方法的 IL 代码
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -240,8 +222,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        // 检查是否是 AnyLangValue 运算符重载
-        if (ltLeftType == typeof(AnyLangValue) || ltLeftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        // 语言值（LangValueType / AnyLangValue）走语言层比较方法
+        if (ltLeftType is not null && typeof(LangValueType).IsAssignableFrom(ltLeftType))
         {
             // 生成调用 Less 方法的 IL 代码
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -315,8 +297,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        // 检查是否是 AnyLangValue 运算符重载
-        if (leftOpType == typeof(AnyLangValue) || leftOpType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        // 语言值（LangValueType / AnyLangValue）走语言层比较方法
+        if (leftOpType is not null && typeof(LangValueType).IsAssignableFrom(leftOpType))
         {
             // 生成调用 Equals 方法的 IL 代码
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -438,8 +420,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        // 检查是否是 AnyLangValue 运算符重载
-        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        // 语言值（LangValueType / AnyLangValue）走语言层比较方法
+        if (leftType is not null && typeof(LangValueType).IsAssignableFrom(leftType))
         {
             // 生成调用 LessEqual 方法的 IL 代码
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -514,8 +496,8 @@ internal static class ComparisonOpHelper
             return typeof(bool);
         }
 
-        // 检查是否是 AnyLangValue 运算符重载
-        if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
+        // 语言值（LangValueType / AnyLangValue）走语言层比较方法
+        if (leftType is not null && typeof(LangValueType).IsAssignableFrom(leftType))
         {
             // 生成调用 GreaterEqual 方法的 IL 代码
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));

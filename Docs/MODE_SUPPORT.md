@@ -325,6 +325,8 @@
 | `int?` / `string?` 联合类型的返回值 | ✅ | ✅（2026-11-15 起用 `object` 承载） | ✅ | |
 | 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | 接受 | 接受 | ❌ 编译期报错 | |
 | `try { } catch (e) { x <- e }` 之后读 `x` | 保持 `1` | ✅（2026-11-15 修复槽位替换） | 保持 | 值类型变量在 IL 下仍会按新类型重绑定 |
+| `join` 后引用内层范围变量（`... let z <- y where z > 2 select z`） | `[3]` | `[4, 4, 4]` | `[3, 4]` | join 结果只保留外层元素，内层变量是循环残留值，三模式配对语义都未统一 |
+| `join ... into g` 分组结果 | `[[1, 1], [2, 2, 2], [3]]` | `[[3], [3], [3]]` | 同解释器 | IL 的 group join 没有按外层元素分别收集匹配项 |
 
 ### 三种模式共同
 
@@ -353,16 +355,13 @@
    `catch` / `finally` 块中的 `await`、`defer` / `yield` 中的 `await`，以及表达式内部的 `await`
    （如 `1 + await f()`、`PrintLine(await f())`，请先把结果赋给变量）。
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
-5. **IL 校验失败已大幅收敛**：`Common Language Runtime detected an invalid program` 仍可能在
-   尚未迁移的路径出现（生成器 `yield`、match 高级模式、mixin、部分装饰器用例）。
-   **2026-11-15 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
-   逐组运行共 1989 例 → **212 失败 / 1752 通过 / 25 跳过**
-   （含本日新增用例）。当天失败数从 252（更早尚有 323 失败，且
-   `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到本轮修复前的 224，
-   本轮修复后仍为 212，但消除了一类会让进程段错误的字段写入问题。
-   对 `TestFiles/CompilerTests/` 的 157 个用例逐个用 `-il` 运行（10 秒超时）：
-   段错误、超时均为 0，仍报 `invalid program` 的只剩 `linq_join_compiler.old8`
-   （`join ... where` 组合，见 [统一待办](../changes/Todo.md)）。
+5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
+   在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
+   `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 1993 例 →
+   **212 失败 / 1756 通过 / 25 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
+   期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where`
+   等一批无效 IL。其余失败以异步、函数、类、表达式、集合的结果/类型推断缺口为主。
 6. **高阶实例方法自 2026-10-10 起可用**：`List` 的 `FindAll`/`FlatMap`/`GroupAdjacentBy`/`Partition`/
    `Single`/`SingleOrDefault`/`SkipWhile(Indexed)`/`TakeWhile(Indexed)`、`Dictionary` 的
    `Map`/`Filter`/`ForEach`、泛型列表的 `SelectMany`/`SortBy`/`Zip3`/`Sum(selector)`/

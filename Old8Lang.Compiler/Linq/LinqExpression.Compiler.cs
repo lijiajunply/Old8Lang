@@ -27,7 +27,8 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
         ilGenerator.Emit(OpCodes.Stloc, resultLocal);
 
-        // 获取枚举器
+        // 统一转换成 IEnumerable 再取枚举器（上游 join/orderby 的静态栈类型不一定是接口）
+        ConvertToEnumerableStatic(ilGenerator);
         var enumeratorLocal = ilGenerator.DeclareLocal(typeof(IEnumerator));
         ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerable).GetMethod("GetEnumerator")!);
         ilGenerator.Emit(OpCodes.Stloc, enumeratorLocal);
@@ -35,7 +36,6 @@ internal static partial class LinqExpressionRuntimeExtensions
         // 预先声明循环内使用的局部变量
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
         var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
-
         // 循环标签
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
@@ -61,8 +61,9 @@ internal static partial class LinqExpressionRuntimeExtensions
         // 计算条件表达式
         whereClause.Condition.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
-        // 检查条件是否为真
-        node.GenerateIsTruthy(ilGenerator);
+        // 检查条件是否为真（需要按条件类型装箱：语言值比较返回的是原生 bool）
+        var conditionType = whereClause.Condition.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        node.GenerateIsTruthy(ilGenerator, conditionType);
 
         // 如果条件为假，跳过添加
         var skipAdd = ilGenerator.DefineLabel();
@@ -667,10 +668,16 @@ internal static partial class LinqExpressionRuntimeExtensions
     /// <summary>
     /// 生成判断 LangValueType 是否为真的 IL 代码
     /// </summary>
-    internal static void GenerateIsTruthy(this LinqExpression node, ILGenerator ilGenerator)
+    internal static void GenerateIsTruthy(this LinqExpression node, ILGenerator ilGenerator, Type conditionType)
     {
-        // 调用辅助方法
-        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("IsTruthy")!);
+        // 条件可能是 LangValueType（语言值比较）也可能是原生 bool（object 静态类型的比较），
+        // 值类型必须先装箱；运行期助手统一接受 object?。
+        if (conditionType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, conditionType);
+        }
+
+        ilGenerator.Emit(OpCodes.Call, typeof(LinqStreamingHelper).GetMethod(nameof(LinqStreamingHelper.IsTruthy))!);
     }
 }
 
