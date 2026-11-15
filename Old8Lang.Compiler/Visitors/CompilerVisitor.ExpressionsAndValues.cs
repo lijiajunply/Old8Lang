@@ -2003,6 +2003,30 @@ public partial class CompilerVisitor
                     return typeof(string);
                 }
 
+                // 数组 / 列表的 + 按顺序拼接（解释器与虚拟机同样支持）。
+                if (leftType is { IsArray: true } && rightType is { IsArray: true })
+                {
+                    operation.Left!.Accept(new CompilerVisitor(ilGenerator, local));
+                    operation.Right!.Accept(new CompilerVisitor(ilGenerator, local));
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(Old8Lang.Runtime.LangCollectionOperations).GetMethod(
+                            nameof(Old8Lang.Runtime.LangCollectionOperations.ConcatArrays))!);
+                    return typeof(object[]);
+                }
+
+                static bool IsListType(Type? type) =>
+                    type is { IsGenericType: true } && type.GetGenericTypeDefinition() == typeof(List<>);
+
+                if (IsListType(leftType) && IsListType(rightType))
+                {
+                    operation.Left!.Accept(new CompilerVisitor(ilGenerator, local));
+                    operation.Right!.Accept(new CompilerVisitor(ilGenerator, local));
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(Old8Lang.Runtime.LangCollectionOperations).GetMethod(
+                            nameof(Old8Lang.Runtime.LangCollectionOperations.ConcatLists))!);
+                    return typeof(List<object>);
+                }
+
                 // 处理数值类型加法
                 return NumericBinaryOpHelper.GenerateAddition(operation.Left, operation.Right, ilGenerator, local, leftType, rightType);
             case LangTokenType.Minus:

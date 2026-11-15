@@ -551,13 +551,13 @@
   `Match 表达式没有匹配的分支`，解释器与 IL 正常（2026-11-15 实测）。
   见 change（`2026-11-15-IL-match高级模式/test.md` §5）。
 
-- [ ] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
-  在 `-f` 报 `INVALID_OPERATION_ERROR: 不支持类型 ... 的加法操作`，`-il` 被推断成数值加法后
-  `Len` 报 `类型 Int32 没有 Length 或 Count 属性`，`-vm` 输出拼接结果（
-  `VirtualMachine.Helpers.Arithmetic.cs` 有专门的数组拼接实现）。
-  `Compiler/Collections/ArrayTests.ArrayConcatenation_CompilesAndExecutesCorrectly` 因此只能在
-  虚拟机下成立。需要先决定该运算是否是语言特性，再统一实现或调整用例。
-  见 change（`2026-11-14-IL-Len动态长度/test.md` §5）。
+- [x] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
+  在 `-f` 报 `INVALID_OPERATION_ERROR`，`-il` 被推断成数值加法，`-vm` 正常。
+  2026-11-15 定为语言特性（同类型按顺序拼接，数组 + 列表仍一致报错）：解释器新增
+  `ArrayLangValue.Plus` / `ListLangValue.Plus`，IL 走 `LangCollectionOperations`，
+  VM 补原生 `List<object?>` 拼接。`Compiler.Collections` 6 → 5 失败
+  （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
+  见 change（`2026-11-15-集合拼接统一/test.md`）。
 
 - [ ] **字典缺失键的行为三模式不一致**：`d <- {"a": 1}; d["missing"]` 在 `-f` 返回
   `NullLangValue`（`== null` 为 true），`-vm` 抛 `KEY_ERROR`；`-il` 内部还不一致——
@@ -866,7 +866,7 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 ## 2026-11-15 复核更新
 
 `Docs/MODE_SUPPORT.md` 已按 2026-11-15（IL 缺陷修复轮次）的逐条实测刷新：
-矩阵里修正了 `in` 运算符（虚拟机 ❌）、数组/列表 `+` 拼接（仅虚拟机）、集合 `.Length` 属性
+矩阵里修正了 `in` 运算符（2026-11-15 起虚拟机 ✅）、数组/列表 `+` 拼接（2026-11-15 起三模式 ✅）、集合 `.Length` 属性
 （解释器 ❌）、match 高级模式（IL ⚠️）、`yield`（IL ❌）、Mixin（IL ❌ / 虚拟机 ⚠️）、
 带默认实现的接口（IL ⚠️）、反射 API（IL ✅）等单元格；IL 已知限制里过时的
 「lambda 不能读写外层局部变量 / 不能在调用结果上链式调用」与旧失败数已更新；

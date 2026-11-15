@@ -100,6 +100,15 @@ public partial class VirtualMachine
             return result;
         }
 
+        // 列表拼接：VM 的列表字面量是原生 List<object?>（与解释器 ListLangValue 对应）。
+        if (a is List<object?> listA && b is List<object?> listB)
+        {
+            var result = new List<object?>(listA.Count + listB.Count);
+            result.AddRange(listA);
+            result.AddRange(listB);
+            return result;
+        }
+
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行加法");
     }
 

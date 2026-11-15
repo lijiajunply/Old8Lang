@@ -113,6 +113,19 @@ public partial class ListLangValue : LangValueType, ILangList
         return Values.Any(v => v.Equal(value));
     }
 
+    /// <summary>
+    /// 列表的 <c>+</c>：与另一个列表按顺序拼接（与虚拟机/IL 模式一致）。
+    /// </summary>
+    public override LangValueType Plus(LangValueType otherLangValueType)
+    {
+        if (otherLangValueType is ListLangValue other)
+        {
+            return new ListLangValue([.. Values, .. other.Values], ElementType, Position);
+        }
+
+        return base.Plus(otherLangValueType);
+    }
+
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 

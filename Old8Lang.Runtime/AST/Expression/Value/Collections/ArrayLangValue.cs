@@ -83,6 +83,22 @@ public partial class ArrayLangValue : LangValueType, ILangList
         return RunResult.Any(t => t.Equal(value));
     }
 
+    /// <summary>
+    /// 数组的 <c>+</c>：与另一个数组按顺序拼接（与虚拟机/IL 模式一致）。
+    /// </summary>
+    public override LangValueType Plus(LangValueType otherLangValueType)
+    {
+        if (otherLangValueType is ArrayLangValue other)
+        {
+            var items = new List<LangValueType>();
+            items.AddRange(GetItems());
+            items.AddRange(other.GetItems());
+            return new ArrayLangValue(items, ElementType, Position);
+        }
+
+        return base.Plus(otherLangValueType);
+    }
+
     public LangValueType Get(IntLangValue a)
     {
         var index = a.Value;
