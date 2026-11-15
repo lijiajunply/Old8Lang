@@ -46,6 +46,21 @@
 
 ## 本次复核修正的条目
 
+### 2026-11-15（IL 缺陷修复轮次复核）
+
+按 `changes/Todo.md` 的优先顺序逐项实测了 IL 模式，并把结论落回本文件：
+
+- **不再崩溃**：`Compiler.Classes` 与 `Compiler.Expressions` 两组原先会让测试主机段错误退出
+  （比较运算装箱顺序错误导致 `InvalidProgram`），现已完整跑完；`Compiler` 树合计
+  252 失败 / 1678 通过 / 25 跳过。
+- **整组转绿**：`Compiler.Statements`（186/186）、`Compiler.Reflection`（17/17）；
+  `Compiler.Modules`、`Compiler.Linq`、`Compiler.Threading`、`Compiler.Unit`、
+  `Compiler.FileHeader` 本就全通过。
+- **矩阵修正**：`in` 运算符（虚拟机 ❌）、数组/列表 `+` 拼接（仅虚拟机 ✅）、
+  集合 `.Length` 属性（解释器 ❌）、match 高级模式（IL ⚠️）、`yield`（IL ❌）、
+  Mixin（IL ❌ / 虚拟机 ⚠️）、带默认实现的接口（IL ⚠️）、反射 API（IL ✅）。
+- **新增**「三种模式共同的跨模式差异」小节，列出 10 条尚未统一的语义。
+
 ### 2026-10-24（P1 跨模式语义修复）
 
 | 功能 | 旧标记 | 现标记 | 依据 |
@@ -115,8 +130,9 @@
 
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
-| 算术 (`+ - * / % ^`) | ✅ | ✅ | ✅ | |
+| 算术 (`+ - * / % ^`) | ✅ | ✅ | ✅ | 数组/列表的 `+` 拼接只有虚拟机支持；解释器报 `INVALID_OPERATION_ERROR`，IL 按数值加法推断（见 [已知限制](#已知限制)） |
 | 比较 (`== != < > <= >=`) | ✅ | ✅ | ✅ | |
+| `in` 运算符 | ✅ | ✅ | ❌ | 虚拟机未实现该指令，`1 in [1, 2, 3]` 返回右操作数本身（2026-11-15 实测） |
 | 逻辑 (`and` `or` `xor` `not`) | ✅ | ✅ | ✅ | |
 | 赋值 (`<-`) | ✅ | ✅ | ✅ | |
 | 成员访问 (`.`) / 索引 (`[]`) | ✅ | ✅ | ✅ | |
@@ -147,7 +163,7 @@
 | 类型转换 `as` | ✅ | ✅ | ✅ | |
 | 三元表达式 | ✅ | ✅ | ✅ | |
 | 字符串模板 `$"..."` | ✅ | ✅ | ✅ | |
-| Match 表达式 | ✅ | ✅ | ✅ | 语法为 `x <- match v { case p -> e ... }`，分支必须带 `case` 关键字 |
+| Match 表达式 | ✅ | ⚠️ | ✅ | 语法为 `x <- match v { case p -> e ... }`，分支必须带 `case` 关键字；IL 只支持通配符、变量绑定与普通值模式，范围 / 类型 / 元组解构模式与 `guard` 未实现 |
 | 列表推导式 | ✅ | ✅ | ✅ | |
 
 ### 5. 语句与控制流
@@ -162,7 +178,7 @@
 | `using` 语句 | ✅ | ✅ | ✅ | |
 | `select` 语句 | ✅ | ✅ | ✅ | Channel 多路选择 |
 | `defer` 语句 | ✅ | ✅ | ✅ | |
-| `yield`（同步生成器） | ✅ | ✅ | ✅ | |
+| `yield`（同步生成器） | ✅ | ❌ | ✅ | IL 的 `VisitYieldStatement` 未生成状态机，含 `yield` 的函数会产出无法验证的 IL |
 
 ### 6. 函数
 
@@ -189,8 +205,8 @@
 | 构造函数 (`init`) | ✅ | ✅ | ✅ | |
 | 访问修饰符 | ✅ | ✅ | ✅ | |
 | 类继承 (`extends`) | ✅ | ✅ | ✅ | |
-| 接口 / 接口实现 | ✅ | ✅ | ✅ | `interface` / `implements` |
-| Mixin (`mixin` / `with`) | ✅ | ✅ | ✅ | |
+| 接口 / 接口实现 | ✅ | ⚠️ | ✅ | IL 不支持带默认实现的接口方法（`implements` 的类未覆盖时找不到方法） |
+| Mixin (`mixin` / `with`) | ✅ | ❌ | ⚠️ | IL 未把 mixin 成员并入类（方法未找到）；虚拟机可绑定 mixin 方法但读不到 mixin 字段（2026-11-15 实测） |
 | 泛型类 | ✅ | ❌ | ✅ | 可显式写 `Box<int>()`，解释器也支持由构造函数实参推断（`Box(123)`）；**`new` 关键字不存在** |
 | `this` / `super` | ✅ | ✅ | ✅ | |
 | 枚举 | ✅ | ✅ | ✅ | 含显式值、混合值、成员访问 |
@@ -266,7 +282,7 @@
 | `ToStr` / `ToInt` / `ToDouble` / `ToBool` | ✅ | ✅ | ✅ | |
 | 集合方法（`Add` `Remove` `Count` 等） | ✅ | ✅ | ✅ | 元组 `.Count()` 自 2026-10-10 起可用 |
 | 字符串方法（`Length` `ToUpper` `Split` 等） | ✅ | ✅ | ✅ | |
-| 反射函数与 `TypeLangValue` 实例方法 | ✅ | — | ✅ | 虚拟机下 9 个类型值方法自 2026-10-10 起可用；`TypeOf` / `GetType` 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) |
+| 反射函数与 `TypeLangValue` 实例方法 | ✅ | ✅ | ✅ | 虚拟机下 9 个类型值方法自 2026-10-10 起可用；IL 的 `CreateInstance` / `GetField` / `SetField` / `InvokeMethod` 自 2026-11-15 起对原生对象可用；`TypeOf` / `GetType` 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) |
 
 ### 15. 类型系统
 
@@ -293,6 +309,23 @@
 
 ## 已知限制
 
+### 三种模式共同的跨模式差异（2026-11-15 逐条实测）
+
+下列行为在三种模式下不一致，且都还没有统一的语义约定，改动前请先确认：
+
+| 场景 | 解释器 | IL | 虚拟机 | 说明 |
+|------|--------|-----|--------|------|
+| `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | 正确 | `InvalidCastException` | 正确 | IL 的 `LoadAndConvertOperands` 一律按 `int` 拆箱 |
+| 数组 / 列表 `+` 拼接 | ❌ `INVALID_OPERATION_ERROR` | ❌ 按数值加法推断 | ✅ | 只有虚拟机实现了拼接 |
+| 集合的 `.Length` 属性（无括号） | ❌ `NAME_ERROR` | ✅ | ✅ | [API_REFERENCE](./API_REFERENCE.md#24-反射) 明确写「数组没有 `.Length` 属性」 |
+| `PrintLine(null)` 与集合里的 `null` 元素 | `Null` | `null` | `null` | 显示大小写不同 |
+| `null.ToStr()` | `Null` | ❌ 无法在 null 上调用方法 | ❌ `NULL_REFERENCE_ERROR` | |
+| 字典缺失键 `d["missing"]` | 返回 `Null` | 原生字典抛 `KeyNotFoundException`；`dict()` 的结果返回 `null` | `KEY_ERROR` | IL 内部两种表示也不一致 |
+| `(-1.0).Sqrt()` | ❌ 没有该方法 | `NaN`（映射到 `Math.Sqrt`） | — | 负数开方应 `NaN` 还是报错未定 |
+| `int?` / `string?` 联合类型的返回值 | ✅ | ✅（2026-11-15 起用 `object` 承载） | ✅ | |
+| 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | 接受 | 接受 | ❌ 编译期报错 | |
+| `try { } catch (e) { x <- e }` 之后读 `x` | 保持 `1` | ✅（2026-11-15 修复槽位替换） | 保持 | 值类型变量在 IL 下仍会按新类型重绑定 |
+
 ### 三种模式共同
 
 1. **`new` 关键字不存在**：类实例化直接写 `ClassName()` 或 `Box<int>()`。
@@ -307,14 +340,20 @@
 ### IL 模式
 
 1. **类型注解要求**：函数参数与返回值必须有类型注解或默认值。lambda 也必须有参数类型注解，
-   否则生成的委托形参是 `object`，参与算术/比较会失败。
+   否则生成的委托形参是 `object`。
+   **2026-11-15 更新**：lambda 参数注解的白名单已补上 `array` / `dictionary` / `object` / `function`；
+   lambda 现在也能捕获外层局部变量、函数形参以及外层闭包已捕获的变量。
+   `object` 静态类型的操作数参与算术时仍按 `int` 拆箱，装箱的 `double` 会抛
+   `InvalidCastException`（见「三种模式共同的跨模式差异」第 1 条）。
 2. 不支持泛型函数、泛型类、运算符重载、装饰器。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
 4. 异步功能支持不完整。
-5. **本机环境下存在既有的 IL 校验失败**：`Common Language Runtime detected an invalid program`。
-   **2026-10-09 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
-   → **737 失败 / 446 通过 / 25 跳过，共 1208 例**。
-   与单个特性无关，IL 模式列的 ❌/⚠️ 需在可正常验证 IL 的环境中复核。
+5. **IL 校验失败已大幅收敛**：`Common Language Runtime detected an invalid program` 仍可能在
+   尚未迁移的路径出现（生成器 `yield`、match 高级模式、mixin、部分装饰器用例）。
+   **2026-11-15 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
+   逐组运行共 1955 例 → **252 失败 / 1678 通过 / 25 跳过**
+   （2026-11-15 修复轮次开始时为 323 失败，且 `Compiler.Classes` / `Compiler.Expressions`
+   两组会让测试主机直接崩溃）。
 6. **高阶实例方法自 2026-10-10 起可用**：`List` 的 `FindAll`/`FlatMap`/`GroupAdjacentBy`/`Partition`/
    `Single`/`SingleOrDefault`/`SkipWhile(Indexed)`/`TakeWhile(Indexed)`、`Dictionary` 的
    `Map`/`Filter`/`ForEach`、泛型列表的 `SelectMany`/`SortBy`/`Zip3`/`Sum(selector)`/
@@ -322,9 +361,10 @@
    （lambda / 具名函数会被编译成委托，运行期以「函数值」传给解释器语义的 helper）。
    用法限制：
    - lambda 必须有类型注解；
-   - lambda 内部**不能读写外层普通局部变量**（可以按名字调用已定义的函数）；
-   - **不能在方法调用结果上直接链式调用**（`l.FindAll(f).Count()`、`l.Count().ToStr()` 会生成无效 IL，
-     既有缺陷，见 [统一待办](../changes/Todo.md)），需要先赋值给变量。
+   - ~~lambda 内部不能读写外层普通局部变量~~：2026-11-11 起可读写，2026-11-15 起还能捕获
+     函数形参与外层闭包的捕获变量；
+   - ~~不能在方法调用结果上直接链式调用~~：2026-11-11 起 `l.Count().ToStr()`、
+     `l.FindAll(f).Count()` 可用。
 7. **扩展方法自 2026-10-10 起可用**：`extension X { func f(...) }` 的声明在编译前的解释器预执行阶段
    注册，调用点按普通实例方法解析，扩展方法体仍由解释器执行（因此函数体内可以使用全局函数/变量）。
 8. **线程自 2026-10-10 起可用**：`spawn(f)` 会真的创建线程对象，

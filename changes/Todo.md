@@ -282,6 +282,23 @@
   `Compiler.Functions` 54→53 失败，`ClosureReturningClosure` 通过。
   见 change（`2026-11-15-IL函数值调用/test.md`）。
 
+- [ ] **IL 算术对 `object` 操作数一律按 `int` 拆箱**：`func process(v) { return v + 1 }` +
+  `process(3.5)` 抛 `InvalidCastException`（`NumericBinaryOpHelper.LoadAndConvertOperands`）。
+  2026-11-15 试过「任一操作数静态类型为 object 时调用运行期数值运算助手并返回 object」，
+  单看该用例通过，但让 `sum <- sum + i` 这类「int 局部变量接收 object 结果」的写法整批回归
+  （Async、Collections、Statements、EdgeCases 共 −15 项），已整体回退。
+  可行的方向是同时让「object 结果写入已定型局部变量」走拆箱/数值转换，而不是换槽位；
+  这会与「值类型变量动态改数值宽度靠重绑定」的既有行为冲突，需要先定语义。
+  见 `Docs/MODE_SUPPORT.md` 的跨模式差异小节第 1 条。
+
+- [ ] **IL 的 `throw` 丢弃被抛出的值，catch 只能拿到异常包装**：`throw "msg"` 在 IL 里被编译成
+  「ToString 后 `new Exception(string)`」，catch 绑定的是 `ExceptionWrapper`，原始值无从取回。
+  于是 `try { Account("Bob", -500.0) } catch (e) { caughtError <- e }` 之后
+  `Assert.Equal("Initial balance cannot be negative", caughtError)` 失败（实际为空），
+  而解释器里 `e` 就是被抛出的字符串。`ThrowComplexObject`（抛字典后 `e["field"]`）同源。
+  需要新增「携带原始语言值的异常」并在 catch 处解包回原始值（同时确认 `e.ToStr()` 等用法）。
+  见 `Docs/MODE_SUPPORT.md` 的跨模式差异小节与 `changes/2026-11-15-IL-try局部变量/test.md`。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。
@@ -677,3 +694,12 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 - 原 VM 性能中的全局槽位、布尔装箱和基准噪声门禁已有完成记录；性能报告与原始复现的现存部分在 `archive/Reports/`。
 
 本次测试结果见 待办核对测试报告（`2026-11-11-08-30-待办核对测试.md`）。
+
+## 2026-11-15 复核更新
+
+`Docs/MODE_SUPPORT.md` 已按 2026-11-15（IL 缺陷修复轮次）的逐条实测刷新：
+矩阵里修正了 `in` 运算符（虚拟机 ❌）、数组/列表 `+` 拼接（仅虚拟机）、集合 `.Length` 属性
+（解释器 ❌）、match 高级模式（IL ⚠️）、`yield`（IL ❌）、Mixin（IL ❌ / 虚拟机 ⚠️）、
+带默认实现的接口（IL ⚠️）、反射 API（IL ✅）等单元格；IL 已知限制里过时的
+「lambda 不能读写外层局部变量 / 不能在调用结果上链式调用」与旧失败数已更新；
+并新增「三种模式共同的跨模式差异」小节，把 10 条尚未统一的语义集中列出。
