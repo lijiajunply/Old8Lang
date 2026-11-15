@@ -4,233 +4,177 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Compiler.Error.Compilation;
 
 /// <summary>
-/// 编译器错误处理测试
+/// IL 编译器错误处理测试。
 /// </summary>
+/// <remarks>
+/// 2026-11-15 按当前语言语义重写：旧版本假设编译器会在编译期检查
+/// 「缺少注解 / 类型不兼容 / 循环引用 / 除零 / 越界 / 缺 return」等并抛错，
+/// 但这些要么已经是合法代码，要么是运行期错误。现在按真实阶段断言：
+/// 能编译的验证编译+执行；名字解析错误断言 CompilerException；
+/// 除零/越界断言执行期语言错误；语法错误断言 Build 阶段 SyntaxError。
+/// </remarks>
 [Collection("Sequential")]
 public class ErrorCompilationTests
 {
     [Fact]
-    public void MissingTypeAnnotation_CompilesCorrectly()
+    public void MissingTypeAnnotation_CompilesAndExecutes()
     {
-        // Arrange
-        var code = @"
+        AssertCompilesAndRuns(@"
             func processData(value:int) -> int {
                 return value * 2
             }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因缺少返回类型注解而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("函数必须包含类型注解", exception.Message);
+        ");
     }
 
     [Fact]
-    public void InvalidTypeAnnotation_CompilesCorrectly()
+    public void InvalidTypeAnnotation_CompilesAndExecutes()
     {
-        // Arrange
-        var code = @"
+        AssertCompilesAndRuns(@"
             func processData(value:int) -> string {
                 return value.ToStr()
             }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因无效类型注解而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("无效的类型注解", exception.Message);
+        ");
     }
 
     [Fact]
-    public void IncompatibleType_CompilesCorrectly()
+    public void IncompatibleType_CompilesAndExecutes()
     {
-        // Arrange
-        var code = @"
+        AssertCompilesAndRuns(@"
             func processData(a:int, b:string) -> int {
                 return a + b.Length
             }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因不兼容类型而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("类型不兼容", exception.Message);
+        ");
     }
 
     [Fact]
-    public void UnresolvedVariable_CompilesCorrectly()
+    public void UnresolvedVariable_ReportsCompileError()
     {
-        // Arrange
-        var code = @"
+        var exception = AssertCompileFails(@"
             result <- undefined_var + 1
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因未解析的变量而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("未定义的变量", exception.Message);
+        ");
+        Assert.Contains("未声明", exception.Message);
     }
 
     [Fact]
-    public void UndefinedMethod_CompilesCorrectly()
+    public void UndefinedMethod_ThrowsAtExecutionStage()
     {
-        // Arrange
-        var code = @"
+        // 编译期未注册的名字在运行期按名查找；确实不存在时抛 NAME_ERROR
+        // （与解释器一致，同时支持相互递归里后定义的函数）。
+        var exception = AssertExecutionFails(@"
             result <- SomeMethod()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因未解析的方法而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("未定义的方法", exception.Message);
+        ");
+        Assert.Contains("SomeMethod", exception.Message);
     }
 
     [Fact]
-    public void CircularReference_CompilesCorrectly()
+    public void CircularReference_CompilesAndExecutes()
     {
-        // Arrange
-        var code = @"
-            func A() -> int {
-                return B()
+        // 相互递归本身是合法定义；只要不执行无限递归即可。
+        AssertCompilesAndRuns(@"
+            func A(n:int) -> int {
+                if n <= 0 { return 0 }
+                return B(n - 1)
             }
-            
-            func B() -> int {
-                return A()
-            }
-        ";
-        var interpreter = new LangInterpreter();
 
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因循环引用而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("循环引用", exception.Message);
+            func B(n:int) -> int {
+                if n <= 0 { return 0 }
+                return A(n - 1)
+            }
+        ");
     }
 
     [Fact]
-    public void DivisionByZero_CompilesCorrectly()
+    public void DivisionByZero_ThrowsAtExecutionStage()
     {
-        // Arrange
-        var code = @"
+        var exception = AssertExecutionFails(@"
             result <- 10 / 0
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因除零而报错
-        var exception = Assert.Throws<Old8Exception>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("除零错误", exception.Message);
+        ");
+        Assert.IsType<ZeroDivisionError>(exception);
     }
 
     [Fact]
-    public void IndexOutOfBounds_CompilesCorrectly()
+    public void IndexOutOfBounds_ThrowsAtExecutionStage()
     {
-        // Arrange
-        var code = @"
+        var exception = AssertExecutionFails(@"
             arr <- [1, 2, 3]
             element <- arr[5]
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因索引越界而报错
-        var exception = Assert.Throws<IndexOutOfRangeException>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        ");
+        Assert.IsType<IndexError>(exception);
     }
 
     [Fact]
-    public void InvalidSyntax_CompilesCorrectly()
+    public void InvalidSyntax_ReportsCompileError()
     {
-        // Arrange
-        var code = @"
-            // This should cause a syntax error
+        // 未声明的 a；print 也不存在，但 a 的解析先失败。
+        var exception = AssertCompileFails(@"
             if a > 0 {
                 print(""a is greater than 0"")
             } else {
                 print(""a is not greater than 0"")
             }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因语法错误而报错
-        var exception = Assert.Throws<SyntaxError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("语法错误", exception.Message);
+        ");
+        Assert.Contains("未声明", exception.Message);
     }
 
     [Fact]
-    public void MissingReturnStatement_CompilesCorrectly()
+    public void MissingReturnStatement_CompilesAndExecutes()
     {
-        // Arrange
-        var code = @"
+        AssertCompilesAndRuns(@"
             func ShouldReturn() -> int {
                 // Missing return statement
             }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因缺少return语句而报错
-        var exception = Assert.Throws<InvalidOperationError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("return", exception.Message);
+        ");
     }
 
     [Fact]
-    public void DuplicateIdentifier_CompilesCorrectly()
+    public void DuplicateIdentifier_ReportsSyntaxError()
     {
-        // Arrange
-        var code = @"
-            // Duplicate identifier
-            var a <- 1
-            var a <- 2
-        ";
+        // `var` 不是 Old8Lang 关键字，解析阶段即报语法错误。
         var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因重复标识符而报错
-        var exception = Assert.Throws<SyntaxError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("重复标识符", exception.Message);
+        var exception = Assert.Throws<SyntaxError>(() =>
+            interpreter.Build(@"
+                var a <- 1
+                var a <- 2
+            "));
+        Assert.Contains("var", exception.Message);
     }
 
     [Fact]
-    public void InvalidKeyword_CompilesCorrectly()
+    public void InvalidKeyword_ReportsCompileError()
     {
-        // Arrange
-        var code = @"
+        // `True` 是普通标识符，不是 bool 关键字。
+        var exception = AssertCompileFails(@"
             if True { print(""test"") }
-        ";
-        var interpreter = new LangInterpreter();
+        ");
+        Assert.Contains("True", exception.Message);
+    }
 
-        // Act
+    private static void AssertCompilesAndRuns(string code)
+    {
+        var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
-        
-        // Assert - 编译器应因无效关键字而报错
-        var exception = Assert.Throws<SyntaxError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
-        Assert.Contains("无效关键字", exception.Message);
+        var action = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        Assert.NotNull(action);
+        var exception = Record.Exception(() => action());
+        Assert.Null(exception);
+    }
+
+    private static Exception AssertCompileFails(string code)
+    {
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+
+        return Assert.ThrowsAny<Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+    }
+
+    private static Exception AssertExecutionFails(string code)
+    {
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var action = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        return Assert.ThrowsAny<Exception>(() => action());
     }
 }

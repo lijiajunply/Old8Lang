@@ -30,7 +30,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
     public void IntToDoubleConversion_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            result <- 42.ToDouble()
+            result <- (42).ToDouble()
             Assert.Equal(42.0, result)
         ";
         var interpreter = new LangInterpreter();
@@ -46,7 +46,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
     public void DoubleToIntConversion_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            result <- 3.14.ToInt()
+            result <- (3.14).ToInt()
             Assert.Equal(3, result)
         ";
         var interpreter = new LangInterpreter();

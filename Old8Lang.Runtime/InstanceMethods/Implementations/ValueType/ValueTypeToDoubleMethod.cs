@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 using Old8Lang.AST.Visitor;
@@ -29,21 +30,21 @@ public class ValueTypeToDoubleMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeToDoubleMethod).GetMethod(nameof(ConvertToDoubleHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static DoubleLangValue ConvertToDoubleHelper(LangValueType type)
+    public static double ConvertToDoubleHelper(LangValueType type)
     {
-        return ConvertToDouble(type);
+        return ConvertToDouble(type).Value;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(DoubleLangValue);
+        return typeof(double);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

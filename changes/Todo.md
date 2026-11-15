@@ -612,10 +612,22 @@
   「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
   见 change（`2026-11-15-IL除零错误/test.md`）。
 
-- [ ] **`Compiler.Error.Compilation.ErrorCompilationTests` 整组过时**：12 个用例按旧契约
-  断言编译期错误（如 `value:int -> int` 报「函数必须包含类型注解」、除法/越界在编译期报错、
-  `var a <- 1` 重复标识符等），与当前语言语义不符，整组 12 项全失败。
-  需要按当前实现逐条重写（哪些是运行期错误、哪些已合法），而不是当作 IL 缺陷。
+- [x] **IL 命名实参 / params / 高阶函数参数调用**：这些调用编译期匹配不到签名，
+  落入 `VisitInstance` 兜底后静默返回 null（相关测试此前是假通过）。现在兜底重建
+  `Instance` 交给解释器执行（`IlRuntimeFunctions.InvokeInstance`），命名实参重排、
+  params 收集、未定义函数 NAME_ERROR 全部与解释器一致；函数参数调用补
+  `ArgumentIndices` → `ldarg` 分支。
+  `ValueTypeTo{Double,Char,Bool}Method` 改用 `EmitLoadWrapped` 并返回原生值，
+  `(42).ToDouble()` 不再生成无效 IL。`Compiler.Functions` 53 → 45 失败。
+  见 change（`2026-11-15-IL函数调用回退/test.md`）。
+
+- [x] **IL 相互递归函数无法编译 / 未定义函数静默返回 null**：编译函数体时后定义的函数还没
+  注册，`isEven` 调用 `isOdd` 被当类名处理，旧行为发 `ldnull` 静默返回 null。
+  现在未知名字改为运行期 `IlRuntimeFunctions.InvokeGlobal`（按名字+参数个数查
+  `ImportInfos`），相互递归可用、真正未定义的函数报 `NAME_ERROR`。
+  `ErrorCompilationTests` 12 项按当前语义重写（合法代码断言成功、名字错误断言编译错误、
+  除零/越界/未定义函数断言执行期错误、`var` 断言语法错误），`Compiler.Error` 12 → 0 失败。
+  见 change（`2026-11-15-IL相互递归/test.md`）。
 
 - [x] **枚举作为函数参数/返回类型在 IL/VM 下不可用**：函数体先于顶层枚举声明编译，
   `ResultType.Success` 解析为「变量未声明」；返回类型 `-> ResultType` 又因成员推断为 int

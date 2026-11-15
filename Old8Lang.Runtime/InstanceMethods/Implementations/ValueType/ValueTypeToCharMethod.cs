@@ -3,6 +3,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
 using Old8Lang.AST.Visitor;
@@ -29,21 +30,21 @@ public class ValueTypeToCharMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeToCharMethod).GetMethod(nameof(ConvertToCharHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static CharLangValue ConvertToCharHelper(LangValueType type)
+    public static char ConvertToCharHelper(LangValueType type)
     {
-        return ConvertToChar(type);
+        return ConvertToChar(type).Value;
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(CharLangValue);
+        return typeof(char);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

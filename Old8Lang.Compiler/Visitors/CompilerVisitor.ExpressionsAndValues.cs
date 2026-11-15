@@ -673,6 +673,33 @@ public partial class CompilerVisitor
                 return null;
             }
 
+            // 函数参数调用（高阶函数）：命名函数的参数记录在 ArgumentIndices 里，
+            // 不在 LocalVar；直接 ldarg 后按函数值动态调用。
+            if (local.ArgumentIndices.TryGetValue(node.Id.IdName, out var parameterIndex))
+            {
+                ilGenerator.Emit(OpCodes.Ldarg, parameterIndex);
+                ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                for (var index = 0; index < node.Ids.Count; index++)
+                {
+                    ilGenerator.Emit(OpCodes.Dup);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                    var argument = node.Ids[index];
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                    var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                    if (argumentType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, argumentType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                return typeof(object);
+            }
+
             var classType = local.ClassVar.GetValueOrDefault(node.Id.IdName);
             if (classType is null)
             {
@@ -706,13 +733,58 @@ public partial class CompilerVisitor
                                 node.Position);
                         }
 
-                        // 创建一个临时的object类型引用，允许编译继续进行
-                        // 这是一个临时解决方案，IL 模式下类前向引用的处理需要改进
-                        classType = typeof(object);
+                        // 编译期无法直接解析（相互递归的后定义函数、命名实参、params 变参、
+                        // 或真正未定义的函数）：重建 Instance 交给解释器执行。
+                        ilGenerator.Emit(OpCodes.Ldstr, node.Id.IdName);
 
-                        // 生成临时的null对象，实际运行时将通过解释器处理
-                        ilGenerator.Emit(OpCodes.Ldnull);
-                        return null;
+                        ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                        for (var index = 0; index < node.Ids.Count; index++)
+                        {
+                            ilGenerator.Emit(OpCodes.Dup);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                            var argument = node.Ids[index];
+                            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                            var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                            if (argumentType is { IsValueType: true })
+                            {
+                                ilGenerator.Emit(OpCodes.Box, argumentType);
+                            }
+
+                            ilGenerator.Emit(OpCodes.Stelem_Ref);
+                        }
+
+                        var namedArguments = node.NamedArgs ?? [];
+                        ilGenerator.Emit(OpCodes.Ldc_I4, namedArguments.Count);
+                        ilGenerator.Emit(OpCodes.Newarr, typeof(string));
+                        for (var index = 0; index < namedArguments.Count; index++)
+                        {
+                            ilGenerator.Emit(OpCodes.Dup);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                            ilGenerator.Emit(OpCodes.Ldstr, namedArguments[index].Name);
+                            ilGenerator.Emit(OpCodes.Stelem_Ref);
+                        }
+
+                        ilGenerator.Emit(OpCodes.Ldc_I4, namedArguments.Count);
+                        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                        for (var index = 0; index < namedArguments.Count; index++)
+                        {
+                            ilGenerator.Emit(OpCodes.Dup);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                            var argument = namedArguments[index].Value;
+                            argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                            var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                            if (argumentType is { IsValueType: true })
+                            {
+                                ilGenerator.Emit(OpCodes.Box, argumentType);
+                            }
+
+                            ilGenerator.Emit(OpCodes.Stelem_Ref);
+                        }
+
+                        ilGenerator.Emit(OpCodes.Call,
+                            typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.InvokeInstance))!);
+                        return typeof(object);
                     }
                 }
             }
