@@ -282,6 +282,42 @@
   `Compiler.Functions` 54→53 失败，`ClosureReturningClosure` 通过。
   见 change（`2026-11-15-IL函数值调用/test.md`）。
 
+- [x] **IL 异步状态机在 try 区域里的 await 生成无效 IL**：`async func f() { try { await Task.Delay(5) } catch (e) {} }`
+  在 IL 模式下抛 `InvalidProgramException`（`AsyncStateMachine_f.MoveNext()`）。根因是 `MoveNext` 开头用一次
+  `switch` 派发状态，而 await 的恢复标签位于 try 区域内部；CLR 拒绝从 try 外部跳进区域中间，
+  JIT 直接把方法判为无效 IL（已用 `DynamicMethod` 对照实验确认：从区域内跳到区域中间正常）。
+  现在改为在每个 await 站点内联 `if (state == idx) goto resume`（与 Roslyn 相同的结构），
+  分支源与恢复标签处于同一组受保护区域。`Compiler.Async` 的 `InvalidProgramException` 由 32 处降为 0，
+  原有 111 项中 65 失败→54 失败（11 项转通过），`Compiler.Exceptions` 9→8 失败。
+  见 change（`2026-11-15-IL异步try无效IL/test.md`）。遗留：await 真正挂起时 `finally` 会提前执行
+  （缺少 `state < 0` 守卫），已单独记录。
+
+- [x] **IL 模式 Task 静态方法实参发射错误导致无效 IL**：`Task.FromResult(42)` 统一实例化为
+  `FromResult<object>(object)` 却没把 `int` 装箱；`Task.WhenAll` / `Task.WhenAny` 在分派前预压实参、
+  分支里又求值一次，留下未消费的栈值；`Task.Run` / `Task.StartNew` 忽略实参；未知静态方法
+  （`Task.Completed` 等）什么都不发射却声明返回 `Task<object>`。现在各分支自己求值与转换
+  （装箱/拆箱/数值转换），`WhenAll` / `WhenAny` 只求值一次，未知方法改为抛
+  `InvalidOperationError`。8 项 Task 相关用例转通过。
+  见 change（`2026-11-15-IL-Task静态方法实参/test.md`）。
+
+- [ ] **`Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都没有实现**：
+  `TaskClassLangValue` 的静态方法表里没有这三个方法，解释器会报 `ATTRIBUTE_ERROR`；
+  IL 现在给出编译期 `INVALID_OPERATION_ERROR`（此前是无效 IL 或「偶然通过」）。
+  `TaskAPITests.TaskCompleted_/TaskWaitAll_/TaskWaitAny_CompilesAndExecutesCorrectly`
+  依赖这些不存在的 API，需要先定是否补 `Task` 静态 API，再实现或改用例。
+  见 change（`2026-11-15-IL-Task静态方法实参/test.md` §5）。
+
+- [ ] **IL 异步函数在挂起时提前执行用户 `finally`**：`EmitAwaitYield` 用 `leave` 离开受保护区域，
+  CLR 会沿路执行 finally；Roslyn 会在 finally 体前加 `if (state < 0)` 守卫，当前实现没有。
+  结果是 await 真正挂起时 finally 先跑一次、恢复完成后可能再跑一次。需要单独实现状态守卫，
+  并补「挂起后才完成」的确定性用例。
+
+- [ ] **IL 异步剩余失败**：修完上述两项无效 IL 后，`Compiler.Async` 仍有 54 项失败，
+  以 `NullReferenceException`（30）与 `CompilerException`（22）为主，另有少量断言失败；
+  典型如 `AsyncFunctionWithFinally_...` 报 `Variable 'cleanupExecuted' not found in async
+  state machine fields`（全局变量提升与 finally 组合）、`TaskCancellation*` 系列的类型/成员分派。
+  属异步结果错误，不是无效 IL。
+
 - [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
   （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
   静默不抛、catch 不执行。比较运算此前没有像算术那样做 double 提升。

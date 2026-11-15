@@ -440,6 +440,12 @@ public partial class CompilerVisitor
         // 开始异常处理块
         ilGenerator.BeginExceptionBlock();
 
+        // 异步状态机：try 区域的首指令处发射本区域的恢复派发链
+        if (local.AsyncStateMachineGenerator is not null)
+        {
+            local.AsyncStateMachineGenerator.EnterProtectedRegion(ilGenerator, node);
+        }
+
         // 生成try块的IL代码（记录受保护区域：内部 break/continue 必须用 leave）
         var wasInProtectedRegion = local.IsInProtectedRegion;
         local.IsInProtectedRegion = true;
@@ -591,9 +597,26 @@ public partial class CompilerVisitor
         if (node.FinallyBlock is not null)
         {
             ilGenerator.BeginFinallyBlock();
+
+            // 异步状态机在 await 处挂起时用 leave 离开受保护区域，CLR 会顺带执行 finally。
+            // 挂起不是函数退出，用户 finally 只能执行一次；与 Roslyn 一致，
+            // 在 finally 体前按 state < 0 守卫，挂起返回时跳过用户代码。
+            Label? suspendedSkipLabel = null;
+            if (local.AsyncStateMachineGenerator is not null)
+            {
+                suspendedSkipLabel = ilGenerator.DefineLabel();
+                local.AsyncStateMachineGenerator.EmitSuspendedFinallyGuard(
+                    ilGenerator, suspendedSkipLabel.Value);
+            }
+
             local.IsInFinallyBlock = true;
             node.FinallyBlock.Accept(this);
             local.IsInFinallyBlock = false;
+
+            if (suspendedSkipLabel is not null)
+            {
+                ilGenerator.MarkLabel(suspendedSkipLabel.Value);
+            }
         }
 
         ilGenerator.EndExceptionBlock();

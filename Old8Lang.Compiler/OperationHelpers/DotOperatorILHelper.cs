@@ -497,6 +497,12 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task 静态方法调用的IL代码
     /// </summary>
+    /// <remarks>
+    /// 实参由各分支自己求值：不同静态方法的形参个数与类型不同，
+    /// 在分派前统一压栈会让「不需要实参的分支」留下未消费的栈值
+    /// （<c>Task.Run</c>/<c>Task.StartNew</c> 会多压一个值，
+    /// <c>WhenAll</c>/<c>WhenAny</c> 则会把同一个实参压两遍），生成无效 IL。
+    /// </remarks>
     internal static Type GenerateTaskStaticMethodCall(
         Instance instance,
         ILGenerator ilGenerator,
@@ -504,78 +510,127 @@ public static class DotOperatorILHelper
     {
         // Task静态方法调用，如Task.Delay(100)
         var methodName = instance.Id.IdName;
-        var paramTypes = new List<Type>();
 
-        // 加载参数
+        return methodName switch
+        {
+            "Delay" => GenerateTaskDelay(instance, ilGenerator, local),
+            "FromResult" => GenerateTaskFromResult(instance, ilGenerator, local),
+            "FromException" => GenerateTaskFromException(instance, ilGenerator, local),
+            "Run" => GenerateTaskRun(instance, ilGenerator, local),
+            "StartNew" => GenerateTaskStartNew(instance, ilGenerator, local),
+            "WhenAll" => GenerateTaskWhenAll(instance, ilGenerator, local),
+            "WhenAny" => GenerateTaskWhenAny(instance, ilGenerator, local),
+            // 未知的 Task 静态方法不能「什么都不发射却声明返回 Task<object>」：
+            // 那样调用方会按有一个返回值来用栈，生成无效 IL。
+            _ => throw new InvalidOperationError(instance,
+                $"Task 静态方法 '{methodName}' 未在 IL 模式实现",
+                "可用方法：Delay、FromResult、FromException、Run、StartNew、WhenAll、WhenAny")
+        };
+    }
+
+    /// <summary>
+    /// 按顺序求值实参，返回每个实参的静态类型。
+    /// </summary>
+    private static List<Type> EmitTaskArguments(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        var paramTypes = new List<Type>();
         foreach (var instanceId in instance.Ids)
         {
             instanceId.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            var idType = instanceId.Accept(new TypeInferenceVisitor(local));
-            paramTypes.Add(idType!);
+            paramTypes.Add(instanceId.Accept(new TypeInferenceVisitor(local)) ?? typeof(object));
         }
 
-        // 根据方法名调用对应的Task静态方法
-        switch (methodName)
+        return paramTypes;
+    }
+
+    /// <summary>
+    /// 把栈顶实参转换成形参期望的类型；无法静态确定时保持原样。
+    /// </summary>
+    private static void EmitTaskArgumentConversion(ILGenerator ilGenerator, Type actualType, Type expectedType)
+    {
+        if (actualType == expectedType) return;
+
+        if (expectedType == typeof(object))
         {
-            case "Delay":
-                return GenerateTaskDelay(paramTypes, ilGenerator);
-            case "FromResult":
-                return GenerateTaskFromResult(paramTypes, ilGenerator);
-            case "FromException":
-                return GenerateTaskFromException(paramTypes, ilGenerator);
-            case "Run":
-                return GenerateTaskRun(ilGenerator);
-            case "StartNew":
-                return GenerateTaskStartNew(instance, ilGenerator, local);
-            case "WhenAll":
-                return GenerateTaskWhenAll(instance, ilGenerator, local);
-            case "WhenAny":
-                return GenerateTaskWhenAny(instance, ilGenerator, local);
+            if (actualType.IsValueType) ilGenerator.Emit(OpCodes.Box, actualType);
+            return;
         }
 
-        return typeof(Task<object>);
+        if (actualType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, expectedType);
+            return;
+        }
+
+        if (expectedType == typeof(int) &&
+            actualType is { IsValueType: true } &&
+            actualType != typeof(bool) && actualType != typeof(char))
+        {
+            ilGenerator.Emit(OpCodes.Conv_I4);
+            return;
+        }
+
+        if (expectedType == typeof(double) && actualType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Conv_R8);
+        }
     }
 
     /// <summary>
     /// 生成 Task.Delay 的IL代码
     /// </summary>
-    internal static Type GenerateTaskDelay(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskDelay(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        MethodInfo methodInfo;
-        if (paramTypes.Count == 1 && paramTypes[0] == typeof(int))
+        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
+
+        if (paramTypes.Count == 1)
         {
             // 调用 Task.Delay(int)
-            methodInfo = typeof(Task).GetMethod("Delay", [typeof(int)])!;
-            ilGenerator.Emit(OpCodes.Call, methodInfo);
+            EmitTaskArgumentConversion(ilGenerator, paramTypes[0], typeof(int));
+            ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("Delay", [typeof(int)])!);
             return typeof(Task);
         }
 
         if (paramTypes.Count == 2)
         {
             // 调用 Task.Delay(int, CancellationToken)
-            methodInfo = typeof(Task).GetMethod("Delay",
-                [typeof(int), typeof(CancellationToken)])!;
-            ilGenerator.Emit(OpCodes.Call, methodInfo);
+            EmitTaskArgumentConversion(ilGenerator, paramTypes[1], typeof(CancellationToken));
+            EmitTaskArgumentConversion(ilGenerator, paramTypes[0], typeof(int));
+            ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("Delay",
+                [typeof(int), typeof(CancellationToken)])!);
             return typeof(Task);
         }
 
+        // 参数个数不匹配：实参已经求值，先平衡栈再退化成已完成的 Task。
+        for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
+        EmitCompletedTaskFromNull(ilGenerator);
         return typeof(Task<object>);
     }
 
     /// <summary>
     /// 生成 Task.FromResult 的IL代码
     /// </summary>
-    internal static Type GenerateTaskFromResult(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskFromResult(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
+        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
+
         if (paramTypes.Count == 1)
         {
-            // 对于任何参数类型，直接返回 Task<object>
+            // 统一实例化为 Task.FromResult<object>(object)：
+            // 形参是 object，值类型实参必须先装箱。漏掉 box 会让栈上的 int
+            // 直接当 object 传入，生成无效 IL。
+            EmitTaskArgumentConversion(ilGenerator, paramTypes[0], typeof(object));
+
             var fromResultMethod = typeof(Task)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
             fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-            // 参数已经在栈上，直接调用
             ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+        }
+        else
+        {
+            for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
+            EmitCompletedTaskFromNull(ilGenerator);
         }
 
         return typeof(Task<object>);
@@ -584,15 +639,14 @@ public static class DotOperatorILHelper
     /// <summary>
     /// 生成 Task.FromException 的IL代码
     /// </summary>
-    internal static Type GenerateTaskFromException(List<Type> paramTypes, ILGenerator ilGenerator)
+    internal static Type GenerateTaskFromException(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
+        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
+
         if (paramTypes.Count == 1)
         {
-            // 参数已经在栈上：先按解释器语义转成 Exception（允许传字符串），再调用 FromException<object>
-            if (paramTypes[0].IsValueType)
-            {
-                ilGenerator.Emit(OpCodes.Box, paramTypes[0]);
-            }
+            // 先按解释器语义转成 Exception（允许传字符串），再调用 FromException<object>
+            EmitTaskArgumentConversion(ilGenerator, paramTypes[0], typeof(object));
 
             ilGenerator.Emit(OpCodes.Call, typeof(TaskHelper).GetMethod(nameof(TaskHelper.ToException))!);
 
@@ -602,22 +656,38 @@ public static class DotOperatorILHelper
             fromExceptionMethod = fromExceptionMethod.MakeGenericMethod(typeof(object));
             ilGenerator.Emit(OpCodes.Call, fromExceptionMethod);
         }
+        else
+        {
+            for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
+            EmitCompletedTaskFromNull(ilGenerator);
+        }
 
         return typeof(Task<object>);
     }
 
     /// <summary>
-    /// 生成 Task.Run 的IL代码
+    /// 生成 <c>Task.FromResult&lt;object&gt;(null)</c> 作为已完成任务。
     /// </summary>
-    internal static Type GenerateTaskRun(ILGenerator ilGenerator)
+    private static void EmitCompletedTaskFromNull(ILGenerator ilGenerator)
     {
-        // 这里简化处理，直接返回一个已完成的 Task<object>
         var fromResultMethod = typeof(Task)
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
             .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
         fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
         ilGenerator.Emit(OpCodes.Ldnull);
         ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+    }
+
+    /// <summary>
+    /// 生成 Task.Run 的IL代码
+    /// </summary>
+    internal static Type GenerateTaskRun(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        // 这里简化处理，直接返回一个已完成的 Task<object>；
+        // 实参仍需求值以保持副作用，随后弹栈平衡栈。
+        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
+        for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
+        EmitCompletedTaskFromNull(ilGenerator);
         return typeof(Task<object>);
     }
 
@@ -627,13 +697,10 @@ public static class DotOperatorILHelper
     internal static Type GenerateTaskStartNew(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
         // Task.StartNew 实际上是 Task.Factory.StartNew 的简写
-        // 这里简化处理，直接返回一个已完成的 Task<object>
-        var fromResultMethod = typeof(Task)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-        fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-        ilGenerator.Emit(OpCodes.Ldnull);
-        ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+        // 这里简化处理，直接返回一个已完成的 Task<object>（实参求值后弹栈）。
+        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
+        for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
+        EmitCompletedTaskFromNull(ilGenerator);
         return typeof(Task<object>);
     }
 
@@ -671,21 +738,17 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.Accept(new TypeInferenceVisitor(local));
 
-            if (listType != null && typeof(IEnumerable).IsAssignableFrom(listType))
+            if (listType != null && (listType == typeof(object) || typeof(IEnumerable).IsAssignableFrom(listType)))
             {
-                // 调用 RuntimeWhenAll
+                // 调用 RuntimeWhenAll（运行期按实际对象转成 IEnumerable）
                 var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAll))!;
                 ilGenerator.Emit(OpCodes.Call, runtimeMethod);
                 return typeof(Task<object[]>);
             }
 
-            // 其他类型，简化处理，返回 Task.FromResult<object>(null)
-            ilGenerator.Emit(OpCodes.Ldnull);
-            var fromResultMethod = typeof(Task)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+            // 其他类型，简化处理：先弹掉已求值的实参，再返回已完成任务
+            ilGenerator.Emit(OpCodes.Pop);
+            EmitCompletedTaskFromNull(ilGenerator);
         }
 
         return typeof(Task<object>);
@@ -705,21 +768,17 @@ public static class DotOperatorILHelper
             // 获取列表/数组类型
             var listType = listExpr.Accept(new TypeInferenceVisitor(local));
 
-            if (listType != null && typeof(IEnumerable).IsAssignableFrom(listType))
+            if (listType != null && (listType == typeof(object) || typeof(IEnumerable).IsAssignableFrom(listType)))
             {
-                // 调用 RuntimeWhenAny
+                // 调用 RuntimeWhenAny（运行期按实际对象转成 IEnumerable）
                 var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWhenAny))!;
                 ilGenerator.Emit(OpCodes.Call, runtimeMethod);
                 return typeof(Task<Task<object>>);
             }
 
-            // 其他类型，简化处理，返回 Task.FromResult<object>(null)
-            ilGenerator.Emit(OpCodes.Ldnull);
-            var fromResultMethod = typeof(Task)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
-            fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+            // 其他类型，简化处理：先弹掉已求值的实参，再返回已完成任务
+            ilGenerator.Emit(OpCodes.Pop);
+            EmitCompletedTaskFromNull(ilGenerator);
         }
 
         return typeof(Task<object>);

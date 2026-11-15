@@ -64,7 +64,6 @@ public partial class CompilerVisitor
 
     public object? VisitAwaitExpression(AwaitExpression node)
     {
-
         // 加载表达式的值
         node.Expression.Accept(this);
 

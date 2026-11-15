@@ -1598,6 +1598,7 @@ public partial class CompilerVisitor
     {
 
         // 1. 创建局部变量存储资源
+        Label? suspendedDisposeSkipLabel = null;
         node.ResourceExpression.Accept(this);
         var resourceType = node.ResourceExpression.Accept(new TypeInferenceVisitor(local));
         if (resourceType != null)
@@ -1615,11 +1616,25 @@ public partial class CompilerVisitor
             // 3. 生成try-finally
             ilGenerator.BeginExceptionBlock();
 
+            // 异步状态机：using 体也是可恢复的受保护区域，首指令处发射派发链
+            if (local.AsyncStateMachineGenerator is not null)
+            {
+                local.AsyncStateMachineGenerator.EnterProtectedRegion(ilGenerator, node);
+            }
+
             // try块：执行BlockStatement
             node.BlockStatement.Accept(this);
 
             // finally块
             ilGenerator.BeginFinallyBlock();
+
+            // 挂起返回时不要提前释放资源（与用户 finally 同理）
+            if (local.AsyncStateMachineGenerator is not null)
+            {
+                suspendedDisposeSkipLabel = ilGenerator.DefineLabel();
+                local.AsyncStateMachineGenerator.EmitSuspendedFinallyGuard(
+                    ilGenerator, suspendedDisposeSkipLabel.Value);
+            }
 
             // 加载资源
             ilGenerator.Emit(OpCodes.Ldloc, resourceLocal);
@@ -1669,6 +1684,11 @@ public partial class CompilerVisitor
                 // 不支持Dispose的类型，丢弃栈顶值
                 ilGenerator.Emit(OpCodes.Pop);
             }
+        }
+
+        if (suspendedDisposeSkipLabel is not null)
+        {
+            ilGenerator.MarkLabel(suspendedDisposeSkipLabel.Value);
         }
 
         ilGenerator.EndExceptionBlock();
