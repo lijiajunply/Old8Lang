@@ -400,6 +400,13 @@
   `TupleLangValue`。`Compiler.Expressions` 35→11 失败，其余组不变。
   见 change（`2026-11-15-IL-match高级模式/test.md`）。
 
+- [x] **IL 的 match 解构绑定污染外层作用域、guard 读不到外层变量**：
+  `case (x, y)` 会覆盖同名外层局部变量并在分支结束后把它删掉；guard 在只含绑定变量的
+  子作用域里求值，`if x > threshold` 解析不到 `threshold`。现在绑定前记录被遮蔽的槽位、
+  分支结束后恢复，并把当前局部变量打包成 names/values 传给 `IlMatchRegistry`，
+  运行期在求值 guard 前恢复成一个子作用域。`Compiler.Expressions` 11→9 失败。
+  见 change（`2026-11-15-IL-match作用域/test.md`）。
+
 - [ ] **虚拟机元组解构 match 不匹配**：`match (1,2,3) { case (x,y,z) -> ... }` 在 `-vm` 下报
   `Match 表达式没有匹配的分支`，解释器与 IL 正常（2026-11-15 实测）。
   见 change（`2026-11-15-IL-match高级模式/test.md` §5）。

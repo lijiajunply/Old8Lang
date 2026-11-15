@@ -165,6 +165,12 @@ public partial class CompilerVisitor
 
         var boundValuesLocal = ilGenerator.DeclareLocal(typeof(object[]));
 
+        // guard 条件可能需要引用外层变量：把当前可见的局部变量/形参打包成
+        // names[] + values[] 传给运行期，由它在子作用域里恢复。
+        var scopeNamesLocal = ilGenerator.DeclareLocal(typeof(string[]));
+        var scopeValuesLocal = ilGenerator.DeclareLocal(typeof(object[]));
+        EmitMatchScopeArrays(ilGenerator, local, scopeNamesLocal, scopeValuesLocal);
+
         foreach (var matchCase in node.Cases)
         {
             var nextCaseLabel = ilGenerator.DefineLabel();
@@ -173,19 +179,32 @@ public partial class CompilerVisitor
 
             ilGenerator.Emit(OpCodes.Ldc_I4, caseId);
             ilGenerator.Emit(OpCodes.Ldloc, matchValueLocal);
+            ilGenerator.Emit(OpCodes.Ldloc, scopeNamesLocal);
+            ilGenerator.Emit(OpCodes.Ldloc, scopeValuesLocal);
             ilGenerator.Emit(OpCodes.Ldloca, boundValuesLocal);
             ilGenerator.Emit(OpCodes.Call, typeof(IlMatchRegistry).GetMethod(nameof(IlMatchRegistry.TryMatch))!);
             ilGenerator.Emit(OpCodes.Brfalse, nextCaseLabel);
 
-            // 写回绑定变量（object 槽位，后续按动态语义使用）
+            // 写回绑定变量（object 槽位，后续按动态语义使用）。
+            // 同名外层变量要记下来，分支结束后恢复——解构绑定不能污染外层作用域。
+            var shadowedLocals = new Dictionary<string, (LocalBuilder Local, Type? Type)>();
             for (var index = 0; index < bindingNames.Length; index++)
             {
+                var bindingName = bindingNames[index];
+                var outerLocal = local.GetLocalVar(bindingName);
+                if (outerLocal is not null)
+                {
+                    shadowedLocals[bindingName] = (outerLocal,
+                        local.LocalVarTypes.TryGetValue(bindingName, out var outerType) ? outerType : outerLocal.LocalType);
+                }
+
                 var bindingLocal = ilGenerator.DeclareLocal(typeof(object));
                 ilGenerator.Emit(OpCodes.Ldloc, boundValuesLocal);
                 ilGenerator.Emit(OpCodes.Ldc_I4, index);
                 ilGenerator.Emit(OpCodes.Ldelem_Ref);
                 ilGenerator.Emit(OpCodes.Stloc, bindingLocal);
-                local.AddLocalVar(bindingNames[index], bindingLocal);
+                local.AddLocalVar(bindingName, bindingLocal);
+                local.LocalVarTypes[bindingName] = typeof(object);
             }
 
             // 计算并存储结果
@@ -202,7 +221,18 @@ public partial class CompilerVisitor
             ilGenerator.MarkLabel(nextCaseLabel);
             foreach (var bindingName in bindingNames)
             {
-                local.RemoveLocalVar(bindingName);
+                if (shadowedLocals.TryGetValue(bindingName, out var shadowed))
+                {
+                    local.AddLocalVar(bindingName, shadowed.Local);
+                    if (shadowed.Type is not null)
+                    {
+                        local.LocalVarTypes[bindingName] = shadowed.Type;
+                    }
+                }
+                else
+                {
+                    local.RemoveLocalVar(bindingName);
+                }
             }
         }
 
@@ -225,6 +255,49 @@ public partial class CompilerVisitor
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 把当前作用域可见的变量打包成（名字数组，值数组），供 match 的 guard 条件使用。
+    /// </summary>
+    private static void EmitMatchScopeArrays(ILGenerator ilGenerator, LocalManager local,
+        LocalBuilder namesLocal, LocalBuilder valuesLocal)
+    {
+        // 只打包局部变量：函数形参在不同编译上下文里的 ldarg 下标并不一致
+        // （普通函数从 0 开始，类方法与 lambda 的 0 号是 this / 闭包环境数组），
+        // 盲目按 ArgumentIndices 发 ldarg 会生成无效 IL。
+        var variables = local.LocalVar.ToList();
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, variables.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(string));
+        var slot = 0;
+        foreach (var (name, _) in variables)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, slot++);
+            ilGenerator.Emit(OpCodes.Ldstr, name);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Stloc, namesLocal);
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, variables.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        slot = 0;
+        foreach (var (_, variable) in variables)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, slot++);
+            ilGenerator.Emit(OpCodes.Ldloc, variable);
+            if (variable.LocalType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, variable.LocalType);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Stloc, valuesLocal);
     }
 
     /// <summary>

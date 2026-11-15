@@ -38,7 +38,13 @@ public static class IlMatchRegistry
     /// <summary>
     /// 判断值是否匹配指定分支，并返回绑定变量的值（顺序与登记时一致）。
     /// </summary>
-    public static bool TryMatch(int id, object? value, out object?[]? boundValues)
+    /// <param name="id">分支 id</param>
+    /// <param name="value">被匹配的值</param>
+    /// <param name="scopeNames">调用点可见的变量名（用于 guard 条件引用外层变量）</param>
+    /// <param name="scopeValues">与 <paramref name="scopeNames"/> 一一对应的变量值</param>
+    /// <param name="boundValues">匹配成功时，按登记顺序返回的绑定变量值</param>
+    public static bool TryMatch(int id, object? value, string[]? scopeNames, object?[]? scopeValues,
+        out object?[]? boundValues)
     {
         boundValues = null;
 
@@ -56,7 +62,36 @@ public static class IlMatchRegistry
 
         var manager = RuntimeGlobalWriter.CurrentManager ?? new VariateManager();
         var wrapped = IlValueBridge.Wrap(value);
-        if (!matchCase.IsMatch(wrapped, manager, out var bound))
+
+        // 把调用点可见的变量塞进一个子作用域：guard 条件里引用外层变量
+        // （`case x:int if x > threshold ->`）时解释器才解析得到。
+        var addedScope = false;
+        if (scopeNames is { Length: > 0 } && scopeValues is not null &&
+            scopeValues.Length == scopeNames.Length)
+        {
+            manager.AddChildren();
+            addedScope = true;
+            for (var index = 0; index < scopeNames.Length; index++)
+            {
+                manager.Set(new LangId(scopeNames[index]), IlValueBridge.Wrap(scopeValues[index]));
+            }
+        }
+
+        bool matched;
+        Dictionary<string, LangValueType>? bound;
+        try
+        {
+            matched = matchCase.IsMatch(wrapped, manager, out bound);
+        }
+        finally
+        {
+            if (addedScope)
+            {
+                manager.RemoveChildren();
+            }
+        }
+
+        if (!matched)
         {
             return false;
         }
