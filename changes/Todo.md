@@ -286,11 +286,14 @@
   在 IL 模式下抛 `InvalidProgramException`（`AsyncStateMachine_f.MoveNext()`）。根因是 `MoveNext` 开头用一次
   `switch` 派发状态，而 await 的恢复标签位于 try 区域内部；CLR 拒绝从 try 外部跳进区域中间，
   JIT 直接把方法判为无效 IL（已用 `DynamicMethod` 对照实验确认：从区域内跳到区域中间正常）。
-  现在改为在每个 await 站点内联 `if (state == idx) goto resume`（与 Roslyn 相同的结构），
-  分支源与恢复标签处于同一组受保护区域。`Compiler.Async` 的 `InvalidProgramException` 由 32 处降为 0，
-  原有 111 项中 65 失败→54 失败（11 项转通过），`Compiler.Exceptions` 9→8 失败。
-  见 change（`2026-11-15-IL异步try无效IL/test.md`）。遗留：await 真正挂起时 `finally` 会提前执行
-  （缺少 `state < 0` 守卫），已单独记录。
+  现在改为**按受保护区域派发**：方法体入口、每个含 await 的 try 块入口与 using 体入口各发射
+  一条派发链，外层只跳到内层区域的**首指令**，内层再跳到自己区域内的恢复标签
+  （与 Roslyn 的结构一致）。同时给用户 `finally` 体与 using 的 Dispose 加 `if (state < 0)` 守卫，
+  避免挂起返回时提前执行。`Compiler.Async` 的 `InvalidProgramException` 由 32 处降为 0，
+  原有 111 项中 65 失败→54 失败（11 项转通过），`Compiler.Exceptions` 9→8 失败；
+  连续两个 await、循环内 try+await、嵌套/并列 try、using 体、finally 执行次数均已用
+  CLI 与新增 15 项用例验证。
+  见 change（`2026-11-15-IL异步try无效IL/test.md`）。无法恢复的 await 位置改为明确报错，见下一条。
 
 - [x] **IL 模式 Task 静态方法实参发射错误导致无效 IL**：`Task.FromResult(42)` 统一实例化为
   `FromResult<object>(object)` 却没把 `int` 装箱；`Task.WhenAll` / `Task.WhenAny` 在分派前预压实参、
@@ -307,16 +310,22 @@
   依赖这些不存在的 API，需要先定是否补 `Task` 静态 API，再实现或改用例。
   见 change（`2026-11-15-IL-Task静态方法实参/test.md` §5）。
 
-- [ ] **IL 异步函数在挂起时提前执行用户 `finally`**：`EmitAwaitYield` 用 `leave` 离开受保护区域，
-  CLR 会沿路执行 finally；Roslyn 会在 finally 体前加 `if (state < 0)` 守卫，当前实现没有。
-  结果是 await 真正挂起时 finally 先跑一次、恢复完成后可能再跑一次。需要单独实现状态守卫，
-  并补「挂起后才完成」的确定性用例。
+- [ ] **IL 模式暂不支持部分位置的 await**：以下位置会在编译期给出明确错误
+  （`CompilerException`，不再生成无效 IL 或错误控制流）：
+  - `catch` / `finally`（含 catch 过滤器）：只能由异常机制进入，恢复标签无法用分支到达
+    （Roslyn 通过把处理器体搬出异常块、用 `<>s__` 记录待执行处理器来支持）；
+  - `defer` / `yield`：IL 后端不生成这些语句的指令，其中的 await 无从恢复；
+  - 表达式内部的 await（挂起时求值栈非空）：`1 + await f()`、`PrintLine(await f())`
+    会被拒绝，`x <- await f()`、`await f() + 1`、三元分支中的 await 仍允许。
+    支持它需要把挂起点的中间值提升为状态机字段（Roslyn 的临时变量提升）。
+  受影响用例：`AsyncFunctionWithFinally_...`、`AsyncGeneratorWithResourceCleanup_...`
+  （两者此前也失败，只是错误不同）。
 
-- [ ] **IL 异步剩余失败**：修完上述两项无效 IL 后，`Compiler.Async` 仍有 54 项失败，
-  以 `NullReferenceException`（30）与 `CompilerException`（22）为主，另有少量断言失败；
-  典型如 `AsyncFunctionWithFinally_...` 报 `Variable 'cleanupExecuted' not found in async
-  state machine fields`（全局变量提升与 finally 组合）、`TaskCancellation*` 系列的类型/成员分派。
-  属异步结果错误，不是无效 IL。
+- [ ] **IL 异步剩余失败**：修完上述无效 IL 与 finally 语义后，`Compiler.Async` 仍有 54 项失败
+  （按首条错误分类）：24 项经 `Assert.Null` 暴露的 `RUNTIME_ERROR`（内部含 NRE、全局变量提升、
+  API 缺口等）、10 项 `CompilerException`、9 项 `Variable '...' not found in async state machine
+  fields`（`Spawn`/全局变量提升与异步状态机的组合）、4 项用例自身旧语法、3 项未实现的
+  `Task` 静态 API、2 项暂不支持的 await 位置、2 项其它。属异步结果错误，不是无效 IL。
 
 - [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
   （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
