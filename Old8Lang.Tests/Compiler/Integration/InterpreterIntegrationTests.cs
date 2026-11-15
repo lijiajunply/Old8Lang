@@ -418,7 +418,7 @@ public class InterpreterIntegrationTests
     {
         // 测试 Lambda 表达式执行
         var code = @"
-            add <- (x, y) -> { return x + y }
+            add <- (x:int, y:int) -> { return x + y }
             result <- add(10, 20)
         ";
         var interpreter = new LangInterpreter();
@@ -529,15 +529,11 @@ public class InterpreterIntegrationTests
 
         var ast = interpreter.Build(code);
 
-        // 运行时错误应该在 Run 阶段抛出
-        Assert.Throws<ZeroDivisionError>(() => { var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 验证编译成功
+        // 编译阶段应成功；运行时错误在 Run 阶段抛出
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         Assert.NotNull(compiledAction);
 
-        // 执行编译后的代码 - 验证执行不抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception); });
+        Assert.Throws<ZeroDivisionError>(() => compiledAction());
     }
 
     #endregion

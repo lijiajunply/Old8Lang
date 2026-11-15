@@ -442,10 +442,8 @@ public static class Compiler
                 }
                 catch (DivideByZeroException)
                 {
-                    throw new Old8Exception(
-                        "RUNTIME_ERROR",
-                        "除数不能为零",
-                        new SourcePosition(0, 0));
+                    // 与解释器/虚拟机一致：ZERO_DIVISION_ERROR，而不是通用 RUNTIME_ERROR。
+                    throw new ZeroDivisionError(new SourcePosition(0, 0));
                 }
                 catch (Old8Exception)
                 {

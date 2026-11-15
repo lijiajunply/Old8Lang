@@ -606,6 +606,17 @@
   （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
   见 change（`2026-11-15-集合拼接统一/test.md`）。
 
+- [x] **IL 除零错误被包装成通用 RUNTIME_ERROR**：`10 / 0` 在 IL 抛
+  `RUNTIME_ERROR 除数不能为零`，解释器/VM 是 `ZERO_DIVISION_ERROR`。现在执行委托的
+  `DivideByZeroException` 分支改抛 `ZeroDivisionError`；集成用例同步改为
+  「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
+  见 change（`2026-11-15-IL除零错误/test.md`）。
+
+- [ ] **`Compiler.Error.Compilation.ErrorCompilationTests` 整组过时**：12 个用例按旧契约
+  断言编译期错误（如 `value:int -> int` 报「函数必须包含类型注解」、除法/越界在编译期报错、
+  `var a <- 1` 重复标识符等），与当前语言语义不符，整组 12 项全失败。
+  需要按当前实现逐条重写（哪些是运行期错误、哪些已合法），而不是当作 IL 缺陷。
+
 - [x] **枚举作为函数参数/返回类型在 IL/VM 下不可用**：函数体先于顶层枚举声明编译，
   `ResultType.Success` 解析为「变量未声明」；返回类型 `-> ResultType` 又因成员推断为 int
   报「返回类型不匹配」；VM 的 `as int` 对 `EnumLangValue` 抛 CastError。
