@@ -81,7 +81,7 @@ public sealed class ChannelCreateBoundedFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 capacity 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CreateBoundedChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateBoundedChannel));
@@ -397,7 +397,7 @@ public sealed class ChannelDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeChannel));

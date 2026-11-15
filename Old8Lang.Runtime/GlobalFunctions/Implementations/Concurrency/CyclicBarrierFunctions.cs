@@ -41,7 +41,7 @@ public sealed class CyclicBarrierCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 participantCount 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CreateCyclicBarrier(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCyclicBarrier));
@@ -282,7 +282,7 @@ public sealed class CyclicBarrierDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 barrierId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeCyclicBarrier(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCyclicBarrier));

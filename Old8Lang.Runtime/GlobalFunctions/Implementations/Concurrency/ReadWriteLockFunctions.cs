@@ -81,7 +81,7 @@ public sealed class ReadLockAcquireFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.AcquireReadLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.AcquireReadLock));
@@ -377,7 +377,7 @@ public sealed class ReadWriteLockDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 lockId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeReadWriteLock(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeReadWriteLock));

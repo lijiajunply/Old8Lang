@@ -41,7 +41,7 @@ public sealed class AtomicIntCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 initialValue 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CreateAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateAtomicInt));
@@ -391,7 +391,7 @@ public sealed class AtomicIntDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 atomicId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeAtomicInt(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeAtomicInt));

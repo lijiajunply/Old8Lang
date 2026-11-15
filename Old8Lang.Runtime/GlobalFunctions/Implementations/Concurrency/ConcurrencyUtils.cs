@@ -13,6 +13,57 @@ using Old8Lang.AST.Visitor;
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>
+/// 并发全局函数在 IL 调用点的参数转换助手。
+/// </summary>
+/// <remarks>
+/// 并发函数把「加载实参 + call ResourceManager.xxx(int)」直接发射到调用方 IL 里。
+/// 实参静态类型可能是 <c>object</c>（例如 for-in 循环变量），直接 call 会生成无效 IL；
+/// 这里按目标形参 <c>int</c> 做拆箱/数值转换。
+/// </remarks>
+public static class ConcurrencyIlHelpers
+{
+    /// <summary>加载一个会被当作 <c>int</c> 形参传入的实参。</summary>
+    public static void EmitLoadIntArgument(
+        LangExpression argument,
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+        if (argumentType is null || argumentType == typeof(int)) return;
+
+        if (typeof(LangValueType).IsAssignableFrom(argumentType))
+        {
+            // for-in 循环变量可能是语言值（LangValueType 引用）。
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlValueBridge).GetMethod(
+                    nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap))!);
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            return;
+        }
+
+        if (argumentType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            return;
+        }
+
+        if (argumentType.IsValueType)
+        {
+            if (argumentType == typeof(double) || argumentType == typeof(float))
+            {
+                ilGenerator.Emit(OpCodes.Conv_I4);
+            }
+            else if (argumentType == typeof(long) || argumentType == typeof(short) ||
+                     argumentType == typeof(byte) || argumentType == typeof(ushort))
+            {
+                ilGenerator.Emit(OpCodes.Conv_I4);
+            }
+        }
+    }
+}
+
+/// <summary>
 /// Sleep 函数 - 暂停当前线程
 /// </summary>
 public sealed class SleepFunction : BaseGlobalFunction

@@ -41,7 +41,7 @@ public sealed class CountDownLatchCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 count 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CreateCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CreateCountDownLatch));
@@ -283,7 +283,7 @@ public sealed class CountDownLatchDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeCountDownLatch));

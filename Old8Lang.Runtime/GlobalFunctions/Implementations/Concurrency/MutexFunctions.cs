@@ -81,7 +81,7 @@ public sealed class MutexLockFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 mutexId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.LockMutex(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.LockMutex));
@@ -229,7 +229,7 @@ public sealed class MutexDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 mutexId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeMutex(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeMutex));

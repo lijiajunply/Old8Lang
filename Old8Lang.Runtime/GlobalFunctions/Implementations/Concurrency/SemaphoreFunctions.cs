@@ -42,7 +42,7 @@ public sealed class SemaphoreCreateFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 initialCount 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 maxCount 参数
         parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -241,7 +241,7 @@ public sealed class SemaphoreDisposeFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 semaphoreId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.DisposeSemaphore(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.DisposeSemaphore));
