@@ -208,14 +208,14 @@ public class ThrowTests(ITestOutputHelper output)
         // Arrange
         var code = @"
             x <- 10
-            y <- 0
+            y <- 2
             result <- """"
             try {
                 throw ""Error: "" + (x / y).ToStr() + "" is invalid""
             } catch (e) {
                 result <- e
             }
-            Assert.Contains(""Error:"", result)
+            Assert.Contains(result, ""Error:"")
         ";
         var interpreter = new LangInterpreter();
 

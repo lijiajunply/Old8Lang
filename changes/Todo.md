@@ -618,6 +618,12 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
+- [x] **Exceptions 组旧语法 + catch 变量拿到 reflection 消息**：5 项用例用旧的
+  裸 `throw`/`case ->`/匿名函数/`:` 继承/match 分支 throw 语法；lambda 内语言的 throw
+  经反射调用被包成 `TargetInvocationException`，catch 变量拿到通用 reflection 消息。
+  `ExceptionWrapper.Bind` 现在逐层解包；用例迁移到当前语法与真实语义。
+  `Compiler.Exceptions` 8 → 0 失败。见 change（`2026-11-15-异常传播用例/test.md`）。
+
 - [x] **IL 类型错误：无效 IL / 编译期拒绝 / 静默写入**：参数类型不匹配会生成
   `call int(int,int)` 收到 string 的无效 IL；返回不匹配在编译期拒绝；带注解赋值静默接受；
   非数值 `*` 把引用当整数乘出垃圾结果。现在统一由 `IlTypeErrors` 在运行期抛 TYPE_ERROR /

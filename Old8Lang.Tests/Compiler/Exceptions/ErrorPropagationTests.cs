@@ -181,7 +181,7 @@ public class ErrorPropagationTests(ITestOutputHelper output)
     public void ErrorPropagatesThroughLambda_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            processor <- func(value:int) -> int {
+            processor <- (value:int) -> {
                 if value == 5 {
                     throw ""Invalid value 5""
                 }
@@ -252,7 +252,7 @@ public class ErrorPropagationTests(ITestOutputHelper output)
                 }
             }
             
-            class DerivedClass : BaseClass {
+            class DerivedClass extends BaseClass {
                 public func doWork() -> int {
                     return super.doWork()
                 }
@@ -285,16 +285,16 @@ public class ErrorPropagationTests(ITestOutputHelper output)
             func processSwitch(value:int) -> string {
                 result <- """"
                 switch value {
-                    case 1 -> {
+                    case 1 {
                         result <- ""one""
                     }
-                    case 2 -> {
+                    case 2 {
                         throw ""Error at case 2""
                     }
-                    case 3 -> {
+                    case 3 {
                         result <- ""three""
                     }
-                    default -> {
+                    default {
                         result <- ""other""
                     }
                 }
@@ -323,12 +323,14 @@ public class ErrorPropagationTests(ITestOutputHelper output)
     public void ErrorPropagatesThroughMatch_CompilesAndExecutesCorrectly()
     {
         var code = @"
+            func failAtTwo() -> string {
+                throw ""Error at case 2""
+            }
+
             func processMatch(value:int) -> string {
                 result <- match value {
                     case 1 -> ""one""
-                    case 2 -> {
-                        throw ""Error at case 2""
-                    }
+                    case 2 -> failAtTwo()
                     case 3 -> ""three""
                     case _ -> ""other""
                 }

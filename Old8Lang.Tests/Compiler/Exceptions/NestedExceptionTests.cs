@@ -49,7 +49,7 @@ public class NestedExceptionTests(ITestOutputHelper output)
                     throw ""inner exception""
                 } catch (inner) {
                     result <- result + ""inner caught: "" + inner
-                    throw  // 重新抛出异常
+                    throw inner  // 重新抛出异常
                 }
             } catch (outer) {
                 result <- result + ""; outer caught: "" + outer
@@ -326,7 +326,7 @@ public class NestedExceptionTests(ITestOutputHelper output)
                     }
                 } catch (e) {
                     // 只在特定条件下重新抛出
-                    if value == 50 {
+                    if value == 150 {
                         throw ""critical error: "" + e
                     } else {
                         result <- result + ""handled: "" + e + "";""
@@ -336,13 +336,12 @@ public class NestedExceptionTests(ITestOutputHelper output)
             
             try {
                 processValue(-5)    // 被处理
-                processValue(50)    // 被重新抛出
-                processValue(150)   // 不会执行到这里
+                processValue(150)   // 被重新抛出
             } catch (e) {
                 result <- result + ""rethrown: "" + e
             }
             
-            Assert.Equal(""handled: negative value: -5;rethrown: critical error: negative value: -5"", result)
+            Assert.Equal(""handled: negative value: -5;rethrown: critical error: value too large: 150"", result)
         ";
         var interpreter = new LangInterpreter();
 

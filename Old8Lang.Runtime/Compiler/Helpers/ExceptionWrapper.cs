@@ -39,6 +39,13 @@ public class ExceptionWrapper
     /// </remarks>
     public static object? Bind(Exception exception)
     {
+        // 反射/委托调用会把语言异常再包一层 TargetInvocationException，
+        // 逐层剥掉，否则 catch 变量拿到的是通用 reflection 消息。
+        while (exception is System.Reflection.TargetInvocationException { InnerException: not null } invocation)
+        {
+            exception = invocation.InnerException;
+        }
+
         if (exception is LangThrownException thrown)
         {
             return Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(thrown.Value);

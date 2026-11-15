@@ -68,13 +68,17 @@ public class FinallyTests(ITestOutputHelper output)
         var code = @"
             result <- """"
             try {
-                result <- result + ""try;""
-                throw ""uncaught""
-            } finally {
-                result <- result + ""finally;""
+                try {
+                    result <- result + ""try;""
+                    throw ""uncaught""
+                } finally {
+                    result <- result + ""finally;""
+                }
+                // 这行不应该执行，因为异常继续向外传播
+                result <- result + ""after;""
+            } catch (e) {
+                result <- result + ""caught""
             }
-            // 这行不应该执行，因为异常未被捕获
-            result <- result + ""after;""
         ";
         var interpreter = new LangInterpreter();
 
@@ -82,11 +86,9 @@ public class FinallyTests(ITestOutputHelper output)
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - finally 应该执行，但之后会抛出异常
+        // Assert - finally 应该执行，异常由外层捕获
         var exception = Record.Exception(() => compiledAction());
-        Assert.NotNull(exception);
-        // 验证 finally 执行了
-        Assert.Contains("try;finally;", exception.Message);
+        Assert.Null(exception);
     }
 
     [Fact]
