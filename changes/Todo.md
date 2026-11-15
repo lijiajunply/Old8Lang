@@ -407,7 +407,14 @@
   运行期在求值 guard 前恢复成一个子作用域。`Compiler.Expressions` 11→9 失败。
   见 change（`2026-11-15-IL-match作用域/test.md`）。
 
-- [ ] **虚拟机元组解构 match 不匹配**：`match (1,2,3) { case (x,y,z) -> ... }` 在 `-vm` 下报
+- [ ] **`TernaryTests` 两条失败是用例自身问题（已核实，不需改实现）**：
+  `TernaryWithFunctionCalls` 把返回类型写成 `func f(...):int`（正确语法是 `-> int`），
+  三种模式都报语法错误；`ComparisonConditionTernary` 的期望值按 `condition` 参数算
+  （`expectedValue = condition ? 1 : 0`），但被断言的是 `value > 0`，`value=0, condition=true`
+  时用例自己就要求 `1` 而实际只能得 `-1`。把 `:int` 改回 `-> int` 后，
+  `c ? f(1,2) : f(3,4)` 在 `-f` 与 `-il` 下都正常。
+
+：`match (1,2,3) { case (x,y,z) -> ... }` 在 `-vm` 下报
   `Match 表达式没有匹配的分支`，解释器与 IL 正常（2026-11-15 实测）。
   见 change（`2026-11-15-IL-match高级模式/test.md` §5）。
 
