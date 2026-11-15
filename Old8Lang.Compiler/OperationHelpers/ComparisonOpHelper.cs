@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using LangObject = Old8Lang.Runtime.LangObject;
 
@@ -127,6 +128,7 @@ internal static class ComparisonOpHelper
         // 获取操作数类型
         var gtLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var gtRightType = right?.Accept(new TypeInferenceVisitor(local));
+        RejectBooleanOrderingOperands(left, right, gtLeftType, gtRightType);
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (gtLeftType != null && typeof(LangObject).IsAssignableFrom(gtLeftType))
@@ -202,6 +204,7 @@ internal static class ComparisonOpHelper
         // 获取操作数类型
         var ltLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var ltRightType = right?.Accept(new TypeInferenceVisitor(local));
+        RejectBooleanOrderingOperands(left, right, ltLeftType, ltRightType);
 
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (ltLeftType != null && typeof(LangObject).IsAssignableFrom(ltLeftType))
@@ -419,6 +422,8 @@ internal static class ComparisonOpHelper
         var leftType = left?.Accept(new TypeInferenceVisitor(local));
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
+        RejectBooleanOrderingOperands(left, right, leftType, rightType);
+
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
@@ -495,6 +500,8 @@ internal static class ComparisonOpHelper
         var leftType = left?.Accept(new TypeInferenceVisitor(local));
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
+        RejectBooleanOrderingOperands(left, right, leftType, rightType);
+
         // 检查是否是 LangObject（IL 模式的自定义类）运算符重载
         if (leftType != null && typeof(LangObject).IsAssignableFrom(leftType))
         {
@@ -555,5 +562,24 @@ internal static class ComparisonOpHelper
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);
         return typeof(bool);
+    }
+
+    /// <summary>
+    /// 大小比较（&lt; / &gt; / &lt;= / &gt;=）拒绝布尔操作数。
+    /// </summary>
+    /// <remarks>
+    /// 解释器与虚拟机的 BoolLangValue 没有重写大小比较，`true &gt; false` 会报
+    /// INVALID_OPERATION_ERROR；IL 之前把 bool 当 int32 用 Clt/Cgt 比较，`a &lt; b &lt; c`
+    /// 甚至静默得到 true。这里在编译期直接报错，避免静默错误结果。
+    /// </remarks>
+    private static void RejectBooleanOrderingOperands(
+        LangExpression? left, LangExpression? right, Type? leftType, Type? rightType)
+    {
+        if (leftType is null && rightType is null) return;
+        if (leftType == typeof(bool) || rightType == typeof(bool) ||
+            leftType == typeof(BoolLangValue) || rightType == typeof(BoolLangValue))
+        {
+            throw new InvalidOperationError(left ?? right!, "布尔值不支持大小比较");
+        }
     }
 }

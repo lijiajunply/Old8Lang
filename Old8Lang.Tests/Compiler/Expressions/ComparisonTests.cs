@@ -285,22 +285,18 @@ public class ComparisonTests
             b <- 10
             c <- 15
             result1 <- a < b < c
-            result2 <- a <= b <= c
-            result3 <- c > b > a
-
-            Assert.True(result1)  // 5 < 10 < 15 = true < 15 = true
-            Assert.True(result2)  // 5 <= 10 <= 15 = true <= 15 = true
-            Assert.True(result3)  // 15 > 10 > 5 = true > 5 = true
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        // Assert：链式比较等价于 (a < b) < c，第二段是 bool < int。
+        // 解释器与虚拟机都会报「不支持 Less / bool 与 int 不能比较」，
+        // IL 之前把 bool 当 int32 静默得到 true；现在同样在编译期拒绝。
+        var exception = Assert.ThrowsAny<Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        Assert.Contains("布尔值不支持大小比较", exception.Message);
     }
 
     /// <summary>
