@@ -612,6 +612,19 @@
   「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
   见 change（`2026-11-15-IL除零错误/test.md`）。
 
+- [x] **SpawnTests 使用已移除的 spawn 关键字语法**：`task <- spawn f()` 在三种模式下都报
+  `NAME_ERROR 'spawn' 未定义`，整组 14 项失败是用例停留在旧 API。已迁移为
+  `spawn(f, args...)` + `Start()` + `Join()`，匿名函数改 lambda，方法调用改
+  `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
+  `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
+
+- [ ] **IL spawn 带参调用仍不互通**：迁移后 4 项失败——线程里调用编译函数时
+  double/int/bool/list 实参被当作 `LangValueType`（`Unable to cast 'System.Double'
+  to 'LangValueType'`），以及线程内 `throw` 的异常消息与解释器不一致。
+  需要在 `SpawnFunction.SpawnHelper`/`IlDelegateFuncLangValue` 一侧统一解包或按
+  委托签名转换。`SpawnWithParameters`、`SpawnWithCollections`、`SpawnWithConditional`、
+  `SpawnWithErrorHandling` 四项待修。
+
 - [x] **IL 集合注解元素类型不匹配不报错**：`items:list<int> <- {1, "hello"}` 在 IL 下被接受
   （VM 编译期报错）。`CollectionTypeValidator` 不认识 IL 的标量/嵌套字面量，
   元素类型退化成 `any`；`list<int>` 注解又被解析成 CLR `List<int>`，与字面量

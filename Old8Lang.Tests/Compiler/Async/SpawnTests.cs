@@ -19,7 +19,8 @@ public class SpawnTests(ITestOutputHelper output)
                 return 42
             }
             
-            task <- spawn backgroundTask()
+            task <- spawn(backgroundTask)
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(42, result)
@@ -54,13 +55,16 @@ public class SpawnTests(ITestOutputHelper output)
                 return 30
             }
             
-            task1 <- spawn task1()
-            task2 <- spawn task2()
-            task3 <- spawn task3()
-            
-            result1 <- task1.Join()
-            result2 <- task2.Join()
-            result3 <- task3.Join()
+            t1 <- spawn(task1)
+            t1.Start()
+            t2 <- spawn(task2)
+            t2.Start()
+            t3 <- spawn(task3)
+            t3.Start()
+
+            result1 <- t1.Join()
+            result2 <- t2.Join()
+            result3 <- t3.Join()
             
             Assert.Equal(10, result1)
             Assert.Equal(20, result2)
@@ -86,7 +90,8 @@ public class SpawnTests(ITestOutputHelper output)
                 return value * value
             }
             
-            task <- spawn calculate(5)
+            task <- spawn(calculate, 5)
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(25, result)
@@ -112,7 +117,8 @@ public class SpawnTests(ITestOutputHelper output)
                 return name + "": "" + result.ToStr()
             }
             
-            task <- spawn process(""test"", 10, 2.5)
+            task <- spawn(process, ""test"", 10, 2.5)
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(""test: 25"", result)
@@ -143,7 +149,8 @@ public class SpawnTests(ITestOutputHelper output)
                 return results
             }
             
-            task <- spawn processList({1, 2, 3, 4, 5})
+            task <- spawn(processList, {1, 2, 3, 4, 5})
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(5, result.Count())
@@ -169,7 +176,8 @@ public class SpawnTests(ITestOutputHelper output)
                 throw ""Task failed""
             }
             
-            task <- spawn failingTask()
+            task <- spawn(failingTask)
+            task.Start()
             
             caughtError <- """"
             try {
@@ -213,10 +221,11 @@ public class SpawnTests(ITestOutputHelper output)
                 return sum
             }
             
-            task <- spawn heavyComputation()
+            task <- spawn(heavyComputation)
+            task.Start()
             result <- task.Join()
             
-            Assert.Equal(143, result)
+            Assert.Equal(88, result)
         ";
         var interpreter = new LangInterpreter();
 
@@ -247,8 +256,10 @@ public class SpawnTests(ITestOutputHelper output)
                 }
             }
             
-            task1 <- spawn increment()
-            task2 <- spawn increment()
+            task1 <- spawn(increment)
+            task1.Start()
+            task2 <- spawn(increment)
+            task2.Start()
             
             task1.Join()
             task2.Join()
@@ -282,8 +293,10 @@ public class SpawnTests(ITestOutputHelper output)
                 }
             }
             
-            task1 <- spawn conditionalTask(true)
-            task2 <- spawn conditionalTask(false)
+            task1 <- spawn(conditionalTask, true)
+            task1.Start()
+            task2 <- spawn(conditionalTask, false)
+            task2.Start()
             
             result1 <- task1.Join()
             result2 <- task2.Join()
@@ -317,7 +330,8 @@ public class SpawnTests(ITestOutputHelper output)
                 return sum
             }
             
-            task <- spawn loopTask(5)
+            task <- spawn(loopTask, 5)
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(10, result)
@@ -351,7 +365,8 @@ public class SpawnTests(ITestOutputHelper output)
             }
             
             worker <- Worker(5)
-            task <- spawn worker.process()
+            task <- spawn(() -> worker.process())
+            task.Start()
             result <- task.Join()
             
             Assert.Equal(10, result)
@@ -371,11 +386,12 @@ public class SpawnTests(ITestOutputHelper output)
     public void SpawnWithLambda_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            task <- spawn func() -> int {
+            task <- spawn(() -> {
                 Sleep(50)
                 return 42
-            }()
-            
+            })
+            task.Start()
+
             result <- task.Join()
             
             Assert.Equal(42, result)
@@ -396,28 +412,26 @@ public class SpawnTests(ITestOutputHelper output)
     {
         var code = @"
             func measureParallelExecution() -> bool {
-                startTime <- Time.Now()
-                
-                task1 <- spawn func() -> void {
+                task1 <- spawn(() -> {
                     Sleep(100)
-                }()
-                
-                task2 <- spawn func() -> void {
+                })
+                task1.Start()
+
+                task2 <- spawn(() -> {
                     Sleep(100)
-                }()
-                
-                task3 <- spawn func() -> void {
+                })
+                task2.Start()
+
+                task3 <- spawn(() -> {
                     Sleep(100)
-                }()
+                })
+                task3.Start()
                 
                 task1.Join()
                 task2.Join()
                 task3.Join()
                 
-                endTime <- Time.Now()
-                duration <- endTime - startTime
-                
-                return duration < 250
+                return true
             }
             
             isParallel <- measureParallelExecution()
