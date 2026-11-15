@@ -612,6 +612,12 @@
   「编译成功、执行阶段抛错」。`Compiler.Integration` 2 → 0 失败。
   见 change（`2026-11-15-IL除零错误/test.md`）。
 
+- [x] **lambda 参数注解 `object` 解析失败**：`(f:object) -> ...` 被预读逻辑误判成命名元组，
+  报「无法识别的主表达式类型 'Arrow'」；`Object` 还报「不支持的类型注解」。
+  两处类型表补 `object`/`function` 并改为大小写不敏感匹配。
+  装饰器 wrapper lambda 补 `:int` 注解后，装饰器两组测试 19 → 10 失败。
+  见 change（`2026-11-15-lambda-object类型/test.md`）。
+
 - [x] **IL 装饰器无法调用被装饰函数**：装饰器应用后拿到的是解释器 wrapper 闭包，
   自由变量 `f` 不在 IL 作用域，编译后运行报 `NAME_ERROR 'f' 未定义`。
   现在装饰器函数不直接编译函数体，改为生成转发委托：

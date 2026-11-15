@@ -49,7 +49,7 @@ public class DecoratorInterpreterTests
         // Arrange
         var code = @"
             func double(f) {
-                wrapper <- (x) -> {
+                wrapper <- (x:int) -> {
                     result <- f(x)
                     return result * 2
                 }
@@ -84,7 +84,7 @@ public class DecoratorInterpreterTests
         var code = @"
             func multiply(factor) {
                 return (f) -> {
-                    wrapper <- (x) -> {
+                    wrapper <- (x:int) -> {
                         result <- f(x)
                         return result * factor
                     }
@@ -119,7 +119,7 @@ public class DecoratorInterpreterTests
         // Arrange
         var code = @"
             func addOne(f) {
-                wrapper <- (x) -> {
+                wrapper <- (x:int) -> {
                     result <- f(x)
                     return result + 1
                 }
@@ -127,7 +127,7 @@ public class DecoratorInterpreterTests
             }
 
             func double(f) {
-                wrapper <- (x) -> {
+                wrapper <- (x:int) -> {
                     result <- f(x)
                     return result * 2
                 }
@@ -169,7 +169,7 @@ public class DecoratorInterpreterTests
 
             func cache(f) {
                 cacheDict <- dict()
-                wrapper <- (n) -> {
+                wrapper <- (n:int) -> {
                     key <- n.ToStr()
                     if cacheDict.ContainsKey(key) {
                         return cacheDict[key]
@@ -222,7 +222,7 @@ public class DecoratorInterpreterTests
         // Arrange
         var code = @"
             func log(f) {
-                wrapper <- (a, b) -> {
+                wrapper <- (a:int, b:int) -> {
                     result <- f(a, b)
                     return result
                 }
@@ -290,7 +290,7 @@ public class DecoratorInterpreterTests
         // Arrange
         var code = @"
             func stringify(f) {
-                wrapper <- (x) -> {
+                wrapper <- (x:int) -> {
                     result <- f(x)
                     return result.ToStr() + ""!""
                 }
@@ -379,7 +379,7 @@ public class DecoratorInterpreterTests
         var code = @"
             func config(timeout, enabled, name) {
                 return (f) -> {
-                    wrapper <- (x) -> {
+                    wrapper <- (x:int) -> {
                         if enabled {
                             return f(x) + timeout
                         }
@@ -417,7 +417,7 @@ public class DecoratorInterpreterTests
         var code = @"
             func multiply(factor) {
                 return (f) -> {
-                    wrapper <- (x) -> {
+                    wrapper <- (x:int) -> {
                         return f(x) * factor
                     }
                     return wrapper
@@ -637,7 +637,7 @@ public class DecoratorInterpreterTests
             multiplier <- 10
 
             func useMultiplier(f) {
-                wrapper <- (x) -> {
+                wrapper <- (x:int) -> {
                     result <- f(x)
                     return result * multiplier
                 }

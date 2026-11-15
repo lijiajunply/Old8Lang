@@ -107,10 +107,17 @@ public partial class PrimaryParser
                 {
                     // 冒号后是标识符，但需要检查是否为支持的类型名称
                     var potentialType = tokenAfterColon.Value;
-                    var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict", "any", "tuple", "array" };
+                    // object / function 同样是合法类型注解；漏掉它们会把 (f:object) -> ... 
+                    // 误判成命名元组，随后在箭头处报「无法识别的主表达式类型 'Arrow'」。
+                    var supportedTypes = new[]
+                    {
+                        "int", "double", "string", "bool", "char", "void", "list", "dict",
+                        "any", "tuple", "array", "object", "function"
+                    };
                     var isGenericTypeParameter = potentialType.Length == 1 && char.IsUpper(potentialType[0]);
 
-                    if (!supportedTypes.Contains(potentialType) && !isGenericTypeParameter)
+                    if (!supportedTypes.Contains(potentialType, StringComparer.OrdinalIgnoreCase) &&
+                        !isGenericTypeParameter)
                     {
                         // 不是支持的类型，说明是命名元组
                         isLambda = false;
@@ -158,11 +165,14 @@ public partial class PrimaryParser
 
                         // 验证是否为支持的类型
                         var supportedTypes = new[]
-                            { "int", "double", "string", "bool", "char", "void", "list", "dict" };
-                        if (!supportedTypes.Contains(returnTypeName))
+                        {
+                            "int", "double", "string", "bool", "char", "void", "list", "dict",
+                            "any", "tuple", "array", "object", "function"
+                        };
+                        if (!supportedTypes.Contains(returnTypeName, StringComparer.OrdinalIgnoreCase))
                         {
                             throw CreateSyntaxError(
-                                $"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict");
+                                $"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict, any, tuple, array, object, function");
                         }
 
                         returnTypeAnnotation = new LangId("", returnTypeName, null, position: position);
@@ -398,7 +408,8 @@ public partial class PrimaryParser
                 // 允许单个大写字母作为泛型类型参数（如 T, U, V）
                 var isGenericTypeParameter = typeAnnotation.Length == 1 && char.IsUpper(typeAnnotation[0]);
 
-                if (!supportedTypes.Contains(typeAnnotation) && !isGenericTypeParameter)
+                if (!supportedTypes.Contains(typeAnnotation, StringComparer.OrdinalIgnoreCase) &&
+                    !isGenericTypeParameter)
                 {
                     throw CreateSyntaxError(
                         $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, array, dict, dictionary, object, function, any 或单个大写字母作为泛型类型参数");
