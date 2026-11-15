@@ -1618,6 +1618,15 @@ public partial class CompilerVisitor
             }
             // 引用类型不需要转换，直接可以作为object
 
+            // 非字符串按语言显示规则转换：string.Concat 会把 null 变成空串，
+            // 而语言口径是 "null"；同时统一 bool/list 等显示形式。
+            if (itemType != typeof(string))
+            {
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(Old8Lang.Runtime.VMValueFormatter).GetMethod(
+                        nameof(Old8Lang.Runtime.VMValueFormatter.ToDisplayString))!);
+            }
+
             // 将值存储到数组的第i个位置
             ilGenerator.Emit(OpCodes.Stelem_Ref);
         }

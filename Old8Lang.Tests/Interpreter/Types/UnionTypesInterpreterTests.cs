@@ -94,7 +94,7 @@ result <- a.ToStr()";
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Null", ((StringLangValue)result).Value);
+        Assert.Equal("null", ((StringLangValue)result).Value);
     }
 
     /// <summary>

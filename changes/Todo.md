@@ -192,17 +192,16 @@
   `MemberAccessTests` 8→9 项全通过，`Compiler.Classes` 19→18 失败，其余 18 组不变。
   见 change（`2026-11-14-IL可空返回值/test.md`）。
 
-- [ ] **`null` 的显示大小写跨模式不一致**：`PrintLine(null)` 与集合/字典里的 `null` 元素，
-  解释器输出 `Null`（`NullLangValue.ToString()`），IL 与虚拟机输出 `null`
-  （`VMValueFormatter` 的空引用分支）。而 `NullLangValue.Converse(String)` 又返回 `null`，
-  文档里写的是 `Task(Completed: Null)`。需要先确定统一口径（改解释器还是改 IL/VM 与文档），
-  再一并调整测试。见 change（`2026-11-14-IL可空返回值/test.md` §5.1）。
+- [x] **`null` 的显示大小写跨模式不一致**：`NullLangValue.ToString()` 原返回 `Null`，
+  IL/虚拟机返回 `null`，而 `Converse(String)` 又返回 `"null"`。2026-11-15 统一为小写
+  `null`（与字面量、JSON 风格、2/3 模式一致）；类型名仍由 `TypeToString()` 返回 `Null`。
+  更新了 `UnionTypesInterpreterTests` 的期望，新增解释器/IL/VM 各 1 项显示回归。
+  见 change（`2026-11-15-null显示统一/test.md`）。
 
-- [ ] **`null.ToStr()` 只在解释器可用**：`null.ToStr()` 在 `-f` 返回 `Null`，
-  `-il` 报 `RUNTIME_ERROR: 无法在 null 上调用方法 'ToStr'`，
-  `-vm` 报 `NULL_REFERENCE_ERROR: ToStr`。解释器的联合类型用例
-  （`UnionTypesInterpreterTests.Run_NullableUnionTypeNullAssignment_...`）依赖这一行为。
-  见 change（`2026-11-14-IL可空返回值/test.md` §5.2）。
+- [x] **`null.ToStr()` 只在解释器可用**：2026-11-15 起三种模式都返回 `null`：
+  IL 在 `DotOperatorILHelper` 的两条 ToStr 路径（静态发射与 `InvokeDynamicObjectMethod`）
+  加空引用分支，VM 在 `CallMethod` 与 `InvokeTypeMethod` 的空引用检查里放行 ToStr。
+  见 change（`2026-11-15-null显示统一/test.md`）。
 
 - [x] **IL 类型推断在未完成的 `TypeBuilder` 上调用 `GetMethod`**：类方法体内 `this.method()`
   的接收者类型是尚未 `CreateType` 的 `TypeBuilder`，`VisitOperation` 兜底与
@@ -372,6 +371,11 @@
   「IL 模式暂不支持同步生成器（yield）」。`15_class_declaration.old8` 与 5 个 generator 用例
   不再产生无效 IL；新增 4 项回归。
   见 change（`2026-11-15-IL类方法实参与生成器无效IL/test.md`）。
+
+- [ ] **模板插值中的嵌套同种引号会让词法器死循环**：`PrintLine($"s={"ab"}")` 在 `-s`
+  下 8 秒超时（`-f` / `-il` / `-vm` 同样挂死，只能杀进程）。插值表达式里出现同种双引号时
+  词法状态没有推进，属进程挂死级问题；需要定位字符串模板的词法/括号匹配逻辑，至少改为
+  明确报语法错误。2026-11-15 实测。
 
 - [x] **解析器在类体被文件结尾截断时死循环**：`class A {` 这类截断文件会让整个进程挂死
   （`-s` 也挂住，只能 kill）。`ParseClassBlock` 遇到 EOF 时执行 `CurrentIndex++` 后 `continue`，

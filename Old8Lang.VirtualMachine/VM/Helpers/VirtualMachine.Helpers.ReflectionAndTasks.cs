@@ -39,6 +39,12 @@ public partial class VirtualMachine
     {
         if (obj == null)
         {
+            // 与解释器/IL 一致：空引用的 ToStr() 返回 "null"。
+            if (methodName == "ToStr" && args.Length == 0)
+            {
+                return "null";
+            }
+
             throw new NullReferenceError(new SourcePosition(), methodName);
         }
 

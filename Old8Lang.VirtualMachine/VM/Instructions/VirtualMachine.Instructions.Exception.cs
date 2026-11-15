@@ -675,6 +675,13 @@ public partial class VirtualMachine
                 var obj = _stack.Pop();
                 if (obj == null)
                 {
+                    // 与解释器/IL 一致：空引用的 ToStr() 返回 "null"。
+                    if (methodName == "ToStr" && args.Length == 0)
+                    {
+                        _stack.Push("null");
+                        break;
+                    }
+
                     throw new NullReferenceError(GetPosition(instruction), methodName);
                 }
 

@@ -23,7 +23,10 @@ public partial class NullLangValue(SourcePosition position = default) : LangValu
     /// </summary>
     public static readonly NullLangValue Instance = new();
 
-    public override string ToString() => "Null";
+    /// <summary>
+    /// 语言显示形式与字面量一致（小写 null）。类型名仍是 <c>Null</c>（<see cref="TypeToString"/>）。
+    /// </summary>
+    public override string ToString() => "null";
 
     public override bool Equal(LangValueType? otherValueType)
     {

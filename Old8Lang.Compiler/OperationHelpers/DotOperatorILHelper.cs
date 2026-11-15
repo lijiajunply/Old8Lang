@@ -872,7 +872,17 @@ public static class DotOperatorILHelper
                 ilGenerator.Emit(OpCodes.Box, leftType);
             }
 
+            // 空引用的 ToStr() 与解释器一致返回 "null"，不再抛 NRE。
+            var nonNullLabel = ilGenerator.DefineLabel();
+            var doneLabel = ilGenerator.DefineLabel();
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Brtrue, nonNullLabel);
+            ilGenerator.Emit(OpCodes.Pop);
+            ilGenerator.Emit(OpCodes.Ldstr, "null");
+            ilGenerator.Emit(OpCodes.Br, doneLabel);
+            ilGenerator.MarkLabel(nonNullLabel);
             ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+            ilGenerator.MarkLabel(doneLabel);
             return typeof(string);
         }
 
@@ -1295,6 +1305,12 @@ public static class DotOperatorILHelper
     {
         if (receiver is null)
         {
+            // 与解释器/VM 一致：空引用的 ToStr() 返回 "null"。
+            if (methodName == "ToStr" && arguments.Length == 0)
+            {
+                return "null";
+            }
+
             throw new NullReferenceException($"无法在 null 上调用方法 '{methodName}'");
         }
 

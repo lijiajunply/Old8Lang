@@ -249,9 +249,11 @@ public class VMUnexpectedInputsTests(ITestOutputHelper output)
     [Fact]
     public void UnexpectedInputs_NullReference_ThrowsException()
     {
+        // ToStr() 对 null 已定义为返回 "null"（与解释器/IL 一致），
+        // 这里换一个普通方法验证空引用仍然报错。
         var code = @"
             x <- null
-            result <- x.ToStr()
+            result <- x.Count()
         ";
 
         var exception = Assert.ThrowsAny<System.Exception>(() => ExecuteVMCode(code));

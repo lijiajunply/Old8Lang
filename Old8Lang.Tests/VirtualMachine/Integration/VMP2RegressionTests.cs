@@ -95,7 +95,7 @@ public class VMP2RegressionTests
             PrintLine(t.ToString())
             """);
 
-        Assert.Equal("Task(Completed: Null)", output);
+        Assert.Equal("Task(Completed: null)", output);
     }
 
     [Fact]
