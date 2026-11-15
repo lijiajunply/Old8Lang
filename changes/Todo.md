@@ -265,6 +265,14 @@
   `SetField` 补 `box`，`FindNativeType` 倒序取最新程序集。`Compiler.Reflection` 14→0 失败
   （17/17 通过）。见 change（`2026-11-15-IL反射原生对象/test.md`）。
 
+- [x] **IL 模式 lambda 无法捕获函数形参**：`func makeAdder(n:int) -> function { return (x:int) -> x + n }`
+  报「变量 'n' 未声明」——`GetCapturedLocalValues` 只从 `LocalVar` 收集捕获，
+  而形参在 `ArgumentIndices` 里、没有 LocalBuilder。现在捕获列表补上形参与外层 `CapturedLocals`，
+  发射端按索引发 `ldarg` / 读外层闭包环境；解析器对 lambda 参数注解的白名单也补了
+  `array`/`dictionary`/`object`/`function`。`Compiler.Functions` 56→54 失败，
+  `BasicClosure`、`ClosureWithHigherOrderFunction` 通过。
+  见 change（`2026-11-15-IL闭包捕获形参/test.md`）。遗留：嵌套闭包返回函数值仍为 null。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。

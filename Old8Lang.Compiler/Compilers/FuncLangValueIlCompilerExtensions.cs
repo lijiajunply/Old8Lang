@@ -145,9 +145,29 @@ internal static class FuncLangValueIlCompilerExtensions
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                 }
             }
+            else if (captured.Local is not null)
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, captured.Local);
+            }
+            else if (local.ArgumentIndices.TryGetValue(captured.Name, out var capturedArgIndex))
+            {
+                // 形参没有 LocalBuilder，直接从参数槽位取值做成闭包快照
+                ilGenerator.Emit(OpCodes.Ldarg, capturedArgIndex);
+            }
+            else if (local.TryGetCapturedLocal(captured.Name, out var outerCaptured))
+            {
+                // 外层闭包已经捕获过：从当前闭包环境数组里取出，再打包进新闭包
+                ilGenerator.Emit(OpCodes.Ldarg_0);
+                ilGenerator.Emit(OpCodes.Ldc_I4, outerCaptured.Index);
+                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                if (outerCaptured.Type != typeof(object) && outerCaptured.Type is not TypeBuilder)
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, outerCaptured.Type);
+                }
+            }
             else
             {
-                ilGenerator.Emit(OpCodes.Ldloc, captured.Local!);
+                throw new InvalidOperationException($"无法捕获变量 '{captured.Name}'");
             }
 
             if (captured.Type.IsValueType)
@@ -171,6 +191,33 @@ internal static class FuncLangValueIlCompilerExtensions
         var captured = local.LocalVar
             .Select(pair => new CapturedLocalValue(pair.Key, pair.Value, pair.Value.LocalType))
             .ToList();
+
+        // 形参不在 LocalVar 里（走 ArgumentIndices），但闭包同样要能读取它们：
+        // 例如 `func makeAdder(n:int) -> function { return (x:int) -> x + n }`。
+        // 这里登记成「无 LocalBuilder 的捕获槽位」，由 EmitLambdaClosure 用 ldarg 取值。
+        foreach (var (argumentName, _) in local.ArgumentIndices)
+        {
+            if (captured.Any(value => value.Name == argumentName))
+            {
+                continue;
+            }
+
+            var argumentType = local.LocalVarTypes.TryGetValue(argumentName, out var registered)
+                ? registered
+                : typeof(object);
+            captured.Add(new CapturedLocalValue(argumentName, null, argumentType ?? typeof(object)));
+        }
+
+        // 外层闭包已经捕获的变量，嵌套 lambda 也要能继续引用（再打包进新闭包）
+        foreach (var (capturedName, capturedLocal) in local.CapturedLocals)
+        {
+            if (capturedName == "this" || captured.Any(value => value.Name == capturedName))
+            {
+                continue;
+            }
+
+            captured.Add(new CapturedLocalValue(capturedName, null, capturedLocal.Type));
+        }
 
         if (local.InClassEnv is not null && captured.All(value => value.Name != "this"))
         {
