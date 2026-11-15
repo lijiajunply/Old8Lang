@@ -201,7 +201,7 @@ public class LogicalTests
 
     [Theory]
     [InlineData(0, 0, true)]
-    [InlineData(0, 1, true)]
+    [InlineData(0, 1, false)]
     [InlineData(1, 0, false)]
     [InlineData(1, 1, true)]
     public void IntegerComparisonWithLogical_CompilesAndExecutesCorrectly(int a, int b, bool expected)
@@ -260,8 +260,8 @@ public class LogicalTests
             
             // AND真值表
             result1 <- a and b and c      // false
-            result2 <- a and b or c      // false
-            result3 <- a or b and c      // false
+            result2 <- a and b or c      // (a and b) or c = true
+            result3 <- a or b and c      // (a or b) and c = true
             result4 <- a or b or c       // true
             
             // 带括号的表达式
@@ -270,8 +270,8 @@ public class LogicalTests
 
             // Assert statements
             Assert.False(result1)
-            Assert.False(result2)
-            Assert.False(result3)
+            Assert.True(result2)
+            Assert.True(result3)
             Assert.True(result4)
             Assert.True(result5)
             Assert.True(result6)

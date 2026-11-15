@@ -26,7 +26,10 @@ public static class BlockStatementRuntimeExtensions
         // ImportStatements 里只包含声明与导入；导入语句由调用方单独处理
         foreach (var statement in block.ImportStatements)
         {
-            if (statement is not ImportStatement && statement is not NativeStatement)
+            // extern 由各后端自行处理（IL 对 JS/Python 等给出「不支持 IL 模式」错误）；
+            // 预执行会真的去加载脚本文件，导致报错变成「文件不存在」。
+            if (statement is not ImportStatement && statement is not NativeStatement &&
+                statement is not ExternStatement)
             {
                 statement.Accept(RuntimeVisitors.CreateInterpreter(manager));
             }

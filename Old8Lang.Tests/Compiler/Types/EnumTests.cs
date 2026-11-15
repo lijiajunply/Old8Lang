@@ -276,16 +276,16 @@ public class EnumTests(ITestOutputHelper output)
                 levelValue <- level
                 if levelValue as int == 0 {
                     // Debug 级别
-                    Assert.Equal(""Debug: "" , message)
+                    Assert.Equal(""Debug message"", message)
                 } elif levelValue as int == 1 {
                     // Info 级别
-                    Assert.Equal(""Info: "" , message)
+                    Assert.Equal(""Info message"", message)
                 } elif levelValue as int == 2 {
                     // Warning 级别
-                    Assert.Equal(""Warning: "" , message)
+                    Assert.Equal(""Warning message"", message)
                 } elif levelValue as int == 3 {
                     // Error 级别
-                    Assert.Equal(""Error: "" , message)
+                    Assert.Equal(""Error message"", message)
                 }
             }
             

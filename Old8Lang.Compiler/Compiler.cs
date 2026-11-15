@@ -356,6 +356,16 @@ public static class Compiler
             Log("开始生成IL代码", LogLevel.Debug);
             // catch 块里被赋值的变量需要 object 槽位承载异常值，先按语句树收集。
             local.CatchAssignedVariables.UnionWith(CatchAssignmentScanner.Collect(statement));
+
+            // 函数可能先于枚举声明被编译（函数体里写 ResultType.Success 会解析不到类型）；
+            // 先把顶层枚举定义注册进 local.ClassVar，VisitEnumInit 后续会因已存在而跳过。
+            foreach (var topLevelStatement in statement.OtherStatements)
+            {
+                if (topLevelStatement is EnumInit enumInit)
+                {
+                    enumInit.Accept(new CompilerVisitor(ilGenerator, local));
+                }
+            }
             // 宿主级 IL 生成统一通过 Visitor 调度器进入，旧 AST GenerateIl 仅保留逐节点迁移兼容。
             ExecutionModeDispatcher.GenerateIl(statement, ilGenerator, local);
             Log("IL代码生成完成", LogLevel.Debug);

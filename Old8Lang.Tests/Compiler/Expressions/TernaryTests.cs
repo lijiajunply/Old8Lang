@@ -49,18 +49,16 @@ public class TernaryTests
     }
 
     [Theory]
-    [InlineData(0, true, true)]
-    [InlineData(0, false, false)]
-    [InlineData(1, true, true)]
-    [InlineData(1, false, false)]
-    public void ComparisonConditionTernary_CompilesAndExecutesCorrectly(int value, bool condition, bool expected)
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(-1, 0)]
+    public void ComparisonConditionTernary_CompilesAndExecutesCorrectly(int value, int expected)
     {
         // Arrange
-        var expectedValue = condition ? 1 : 0;
         var code = $@"
             value <- {value}
-            result <- value > 0 ? {expectedValue} : {-expectedValue}
-            Assert.Equal({expectedValue}, result)
+            result <- value > 0 ? 1 : 0
+            Assert.Equal({expected}, result)
         ";
         var interpreter = new LangInterpreter();
 
@@ -210,7 +208,7 @@ public class TernaryTests
     {
         // Arrange
         var code = @"
-            func getValue(a:int, b:int):int {
+            func getValue(a:int, b:int) -> int {
                 return a + b
             }
             

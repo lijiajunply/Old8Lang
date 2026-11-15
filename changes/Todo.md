@@ -606,6 +606,24 @@
   （`ArrayConcatenation` 转通过），新增 7 项跨模式回归。
   见 change（`2026-11-15-集合拼接统一/test.md`）。
 
+- [x] **枚举作为函数参数/返回类型在 IL/VM 下不可用**：函数体先于顶层枚举声明编译，
+  `ResultType.Success` 解析为「变量未声明」；返回类型 `-> ResultType` 又因成员推断为 int
+  报「返回类型不匹配」；VM 的 `as int` 对 `EnumLangValue` 抛 CastError。
+  现在编译器在生成 IL 前预注册顶层枚举；返回类型兼容 `enum ← int`；
+  VM CastType 先取出语言值的底层原生值。三模式均可运行，`Compiler.Types` 14 → 10 失败。
+  见 change（`2026-11-15-IL-as转换/test.md` 第 5 节补充）。
+
+- [x] **IL 的 `as` 转换对 object / string 直接拆箱**：`"1" as int` 在 IL 抛
+  `InvalidCastException`，解释器会解析字符串得到 1。现在 `object` / `string` /
+  `LangValueType` 左侧改走 `IlConversionHelper`（Wrap 后 `Converse` 再 Unwrap），
+  与解释器一致，无效字符串报语言 `FORMAT_ERROR`。新增/修正 6 个表达式用例。
+  见 change（`2026-11-15-IL-as转换/test.md`）。
+
+- [ ] **IL 整数溢出语义与解释器/VM 不同**：`2147483647 + 2147483646` 在 IL 是 unchecked
+  32 位回绕（-3），解释器/虚拟机提升为 double（4294967293）。让 IL 也提升需要表达式
+  静态类型从 int 变为 double/object，与「int 局部变量接收」冲突，需先定语义。
+  `ArithmeticTests.VeryLargeNumbers_...` 已标记 `Skip` 并注明原因。
+
 - [x] **IL 两个 `object` 操作数的大小比较恒为 false**：数组/字典元素赋给变量后静态类型是
   `object`，`item < min` 两侧都是 object 时没有动态分支，落到数值/引用比较恒 false
   （for-in 求 min/max 得到首元素）。新增 `IlDynamicComparison`，四个顺序运算符在

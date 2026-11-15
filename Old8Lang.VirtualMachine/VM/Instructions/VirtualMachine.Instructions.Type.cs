@@ -29,18 +29,31 @@ public partial class VirtualMachine
 
                 try
                 {
+                    // 语言值（EnumLangValue / IntLangValue 等）先取出底层原生值，
+                    // 否则 Convert.ToInt32(EnumLangValue) 会因不实现 IConvertible 抛 CastError。
+                    var rawValue = value switch
+                    {
+                        Old8Lang.AST.Expression.Value.EnumLangValue enumValue => enumValue.Value,
+                        Old8Lang.AST.Expression.Value.IntLangValue intValue => intValue.Value,
+                        Old8Lang.AST.Expression.Value.DoubleLangValue doubleValue => doubleValue.Value,
+                        Old8Lang.AST.Expression.Value.BoolLangValue boolValue => boolValue.Value,
+                        Old8Lang.AST.Expression.Value.CharLangValue charValue => charValue.Value,
+                        Old8Lang.AST.Expression.Value.StringLangValue stringValue => stringValue.Value,
+                        _ => value
+                    };
+
                     // 执行类型转换
                     object? convertedValue = targetTypeName.ToLower() switch
                     {
                         "int" => value == null
                             ? throw new InvalidCastException("Cannot cast null to int")
-                            : Convert.ToInt32(value),
+                            : Convert.ToInt32(rawValue),
                         "double" => value == null
                             ? throw new InvalidCastException("Cannot cast null to double")
-                            : Convert.ToDouble(value),
-                        "string" => value?.ToString() ?? "",
-                        "bool" => Convert.ToBoolean(value),
-                        "char" => Convert.ToChar(value),
+                            : Convert.ToDouble(rawValue),
+                        "string" => rawValue?.ToString() ?? "",
+                        "bool" => Convert.ToBoolean(rawValue),
+                        "char" => Convert.ToChar(rawValue),
                         "list" => ConvertToList(value),
                         "array" => ConvertToArray(value),
                         "dict" => ConvertToDict(value),

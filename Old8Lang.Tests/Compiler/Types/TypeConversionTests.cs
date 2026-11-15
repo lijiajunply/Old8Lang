@@ -193,10 +193,10 @@ public class TypeConversionTests(ITestOutputHelper output)
         var code = @"
             nullValue <- null
 
-            // null转换为引用类型应该返回null
+            // null 转 string 得到字面量 null（与解释器一致）
             stringFromNull <- nullValue as string
 
-            Assert.Equal(null, stringFromNull)
+            Assert.Equal(""null"", stringFromNull)
 
             // 基本类型转换测试
             intVal <- 42
@@ -431,11 +431,11 @@ public class TypeConversionTests(ITestOutputHelper output)
             // 验证错误处理
             Assert.True(caughtError)
 
-            // 测试null转换为string（引用类型）
+            // null 转 string 得到字面量 null（与解释器一致）
             nullValue <- null
             stringFromNull <- nullValue as string
 
-            Assert.Equal(null, stringFromNull)
+            Assert.Equal(""null"", stringFromNull)
         ";
         var interpreter = new LangInterpreter();
 

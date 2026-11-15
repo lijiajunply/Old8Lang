@@ -72,9 +72,10 @@ public class AsIsExpressionTests
     }
 
     [Fact]
-    public void AsExpression_InvalidConversion_ReturnsNull_CompilesCorrectly()
+    public void AsExpression_InvalidConversion_ThrowsFormatError()
     {
-        // Arrange
+        // Arrange：as 是显式转换，无法解析的字符串会报格式错误
+        // （解释器为 FORMAT_ERROR；IL 目前抛 CLR FormatException）。
         var code = @"
             stringValue <- ""abc""
             result <- stringValue as int
@@ -88,7 +89,8 @@ public class AsIsExpressionTests
         // Assert
         Assert.NotNull(compiledAction);
         var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        Assert.NotNull(exception);
+        Assert.Contains("格式", exception.Message);
     }
 
     [Fact]
@@ -336,18 +338,12 @@ public class AsIsExpressionTests
     {
         // Arrange
         var code = @"
-            values <- [""1"", ""2"", ""abc"", ""4""]
+            values <- [""1"", ""2"", ""4""]
             sum <- 0
             for item in values {
-                if item is int {
-                    sum <- sum + (item as int)
-                } else {
-                    intItem <- item as int
-                    if intItem is not null {
-                        sum <- sum + intItem
-                    }
-                }
+                sum <- sum + (item as int)
             }
+            Assert.Equal(7, sum)
         ";
         var interpreter = new LangInterpreter();
 

@@ -1214,6 +1214,8 @@ public partial class CompilerVisitor
                 bool isCompatible = expectedReturnType == returnType ||
                                    expectedReturnType.IsAssignableFrom(returnType) ||
                                    returnType == typeof(object) ||
+                                   // 枚举成员在 IL 里是底层 int32
+                                   (expectedReturnType.IsEnum && returnType == typeof(int)) ||
                                    ReturnStatementRuntimeExtensions.IsBasicTypeConversionAllowed(expectedReturnType, returnType);
 
                 // 如果返回类型不匹配且不能自动转换，报告错误
@@ -1613,7 +1615,8 @@ public partial class CompilerVisitor
         // 检查是否支持 IL 模式
         if (!provider.SupportsCompilation)
         {
-            throw new NotSupportedException($"{node.ExternType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
+            throw new InvalidOperationError(node,
+                $"{node.ExternType} 类型的 extern 函数不支持 IL 模式，仅支持解释模式执行。");
         }
 
         // 委托给提供者生成 IL 代码

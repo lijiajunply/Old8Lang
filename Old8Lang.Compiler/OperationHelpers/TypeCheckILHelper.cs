@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Compiler.Helpers;
 
 using Old8Lang.AST.Visitor;
@@ -85,6 +86,33 @@ public static class TypeCheckILHelper
 
             // 根据类型名称生成转换指令
             var targetType = GetTargetType(typeName) ?? typeof(object);
+
+            // 静态类型为 object：运行期可能是字符串/数字，走解释器 Converse 语义，
+            // 不能直接 unbox.any（`"1" as int` 会 InvalidCastException）。
+            if (leftType == typeof(object) || leftType == typeof(string) ||
+                leftType == typeof(Old8Lang.AST.Expression.LangValueType))
+            {
+                if (leftType == typeof(Old8Lang.AST.Expression.LangValueType))
+                {
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Unwrap))!);
+                }
+
+                ilGenerator.Emit(OpCodes.Ldstr, typeName);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlConversionHelper).GetMethod(nameof(IlConversionHelper.ConvertTo))!);
+
+                if (targetType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+                }
+                else if (targetType != typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Castclass, targetType);
+                }
+
+                return targetType;
+            }
 
             // 确保leftType不为null
             leftType ??= typeof(object);
