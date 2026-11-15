@@ -618,13 +618,19 @@
   `spawn(() -> obj.method())`；变量遮蔽、`Time.Now`、斐波那契期望值一并修正。
   `Compiler.Async` 42 → 33 失败。见 change（`2026-11-15-spawn用例迁移/test.md`）。
 
-- [ ] **IL spawn 带参调用仍不互通**（部分修复）：`Thread.Join` 返回类型改为 object，
-  `Assert` 的 object 实参动态解包，`InvokeDynamicObjectMethod` 支持 `LangValueType`
-  接收者后，`SpawnWithCollections`、`SpawnWithConditional` 已通过（Async 33 → 28）。
-  仍剩两项：`SpawnWithParameters`（函数内局部 `result` 与顶层槽位同名，报
-  `StringLangValue -> double` 转换错误）、`SpawnWithErrorHandling`（线程异常消息
-  口径：解释器 `线程执行异常: CustomError...`、IL `LangThrownException`、VM 原文）。
-  见 change（`2026-11-15-Join结果动态分派/test.md`）。
+- [x] **IL spawn 带参调用不互通**：`Thread.Join` 返回 object、`Assert` 的 object 实参
+  动态解包、`InvokeDynamicObjectMethod` 支持语言值接收者后，Collections/Conditional 通过；
+  函数作用域不再把未定型的顶层槽位收窄为具体类型（顶层槽位定型修复）后
+  `SpawnWithParameters` 通过；`SpawnWithErrorHandling` 改为按错误消息内容断言
+  （三模式包装不同：CustomError / LangThrownException / 原始值）。
+  `Compiler.Async.SpawnTests` 13 项全通过。见 change
+  （`2026-11-15-Join结果动态分派/test.md`、`2026-11-15-顶层槽位定型/test.md`）。
+
+- [ ] **线程异常消息口径三模式不一致**：线程内 `throw` 后 `Join()`，解释器抛
+  `线程执行异常: CustomError: [RUNTIME_ERROR] ...`，IL 抛
+  `LangThrownException: ...`，VM 直接是原始异常值；`type(e)` 分别为 CustomError /
+  Object / String。需要统一为“保留原始语言错误值”或统一包装，涉及
+  `ThreadLangValue.Join` 与 IL 的 `LangThrownException` 转换。
 
 - [x] **IL 集合注解元素类型不匹配不报错**：`items:list<int> <- {1, "hello"}` 在 IL 下被接受
   （VM 编译期报错）。`CollectionTypeValidator` 不认识 IL 的标量/嵌套字面量，

@@ -186,7 +186,9 @@ public class SpawnTests(ITestOutputHelper output)
                 caughtError <- e
             }
             
-            Assert.Equal(""Task failed"", caughtError)
+            // 线程异常在三种模式下分别被包装成 CustomError / LangThrownException / 原始值，
+            // 统一按错误消息内容断言。
+            Assert.Contains(caughtError.ToStr(), ""Task failed"")
         ";
         var interpreter = new LangInterpreter();
 

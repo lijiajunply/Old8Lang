@@ -73,26 +73,6 @@ internal static class SetStatementRuntimeExtensions
             return false;
         }
 
-        // 函数体内首次出现的同名变量应视为局部变量：如果顶层槽位的类型与
-        // 该赋值表达式的静态类型不兼容，就不要把值强塞进顶层槽位。
-        // 例：`t.Join()` 的顶层 result 槽位是 LangValueType，函数内
-        // `result <- value * multiplier` 是 double，强塞会生成 InvalidCastException。
-        if (!local.IsTopLevelScope)
-        {
-            var declaredSlotType = globals.GetType(name);
-            if (declaredSlotType is not null && declaredSlotType != typeof(object) &&
-                declaredSlotType != typeof(void))
-            {
-                var predictedType = node.Value.Accept(
-                    new Old8Lang.AST.Visitor.TypeInferenceVisitor(local));
-                if (predictedType is not null && predictedType != declaredSlotType &&
-                    !declaredSlotType.IsAssignableFrom(predictedType))
-                {
-                    return false;
-                }
-            }
-        }
-
         if (!globals.IsSlot(name))
         {
             // 函数体给顶层变量赋值：分析阶段通常已经提升过；这里兜底处理遗漏。
@@ -126,6 +106,13 @@ internal static class SetStatementRuntimeExtensions
         if (slotType == typeof(object) || slotType == typeof(void))
         {
             slotType = valueType;
+            globals.Types[name] = slotType;
+        }
+        else if (slotType != valueType && !slotType.IsAssignableFrom(valueType))
+        {
+            // 同名变量在不同路径上类型不一致（如函数内 double、顶层 Join 结果是语言值）：
+            // 槽位退化为 object，避免把值强转成槽位类型。
+            slotType = typeof(object);
             globals.Types[name] = slotType;
         }
 
