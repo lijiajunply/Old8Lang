@@ -35,6 +35,7 @@ public partial class PrimaryParser
 
                 while (i < len)
                 {
+                    var iterationStart = i;
                     var c = stringValue[i];
 
                     if (c == '{' && i + 1 < len)
@@ -174,6 +175,12 @@ public partial class PrimaryParser
                             i++;
                         }
                     }
+                    else if (c == '{' && i + 1 >= len)
+                    {
+                        // 模板以 `{` 结束（例如词法把 `$"s={"ab"}"` 截成 `s={`）：
+                        // 这里必须报错，否则 i 不前进会死循环。
+                        throw CreateSyntaxError("字符串模板中的花括号未闭合：缺少 '}'");
+                    }
                     else
                     {
                         // 普通字符，添加到结果中
@@ -188,6 +195,12 @@ public partial class PrimaryParser
                         {
                             parts.Add(new ScalarLiteralExpression(LiteralSyntax.String(text, position)));
                         }
+                    }
+
+                    // 兜底：任何分支都不能原地打转（否则整个进程挂死）。
+                    if (i == iterationStart)
+                    {
+                        throw CreateSyntaxError("字符串模板无法继续解析：请检查花括号与引号是否配对");
                     }
                 }
 
