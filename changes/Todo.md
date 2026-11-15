@@ -370,6 +370,32 @@
   不再产生无效 IL；新增 4 项回归。
   见 change（`2026-11-15-IL类方法实参与生成器无效IL/test.md`）。
 
+- [x] **解析器在类体被文件结尾截断时死循环**：`class A {` 这类截断文件会让整个进程挂死
+  （`-s` 也挂住，只能 kill）。`ParseClassBlock` 遇到 EOF 时执行 `CurrentIndex++` 后 `continue`，
+  但 EOF 位置不会前进。现在直接抛 `SyntaxError`「类定义缺少右花括号」。新增 2 项回归。
+  见 change（`2026-11-15-解析器类体EOF死循环/test.md`）。
+
+- [x] **IL 字符串实例方法 `Repeat` 与语言值相等比较**：`"=".Repeat(5)` 生成无效 IL
+  （`StringRepeatMethod` 把原生 string/int 直接传给 `StringLangValue`/`IntLangValue` 形参）；
+  `"a".Repeat(1) == "a"` 为 false（语言值分支用了 `GetMethod("Equals",[LangValueType])`，
+  实际绑定到 `object.Equals(object)` 的引用比较）；`!=` 也没有语言值分支。
+  现在 `Repeat` 用 `IlValueBridge.EmitLoadWrapped` 包装，`==`/`!=` 调用 `LangValueType.Equal`。
+  `class_modifiers_test.old8` 由 invalid program 变为正常退出；新增 1 项回归。
+  见 change（`2026-11-15-IL字符串方法与值相等/test.md`）。
+
+- [x] **IL 泛型可空参数（`T?`）的构造/调用实参未转换**：`Box<int>(5)`、`identity<int>(456)`
+  生成无效 IL——`T?` 在特化里解析成 `object`，而调用点按原生 int 压栈后直接调用。
+  现在构造 `init` 与泛型函数调用都按形参类型装箱/数值转换；`Box(123)`（不写类型参数）
+  改为明确报「IL 模式暂不支持由构造函数实参推断泛型类」而不是静默返回 null。
+  新增 4 项回归。见 change（`2026-11-15-IL泛型可空实参/test.md`）。
+
+- [x] **IL 并发全局函数的 int 实参缺少拆箱**：`for lock in locks { ReadWriteLockDispose(lock) }`
+  生成无效 IL——for-in 变量静态类型是 `object`，`DisposeXxx(int)` 调用点没有拆箱。
+  新增 `ConcurrencyIlHelpers.EmitLoadIntArgument`（int/object/LangValueType/其他数值），
+  七个 `*Dispose` 与同文件的 int 参数调用点接入。`concurrency_primitives_test.old8`
+  由 invalid program 变为正常退出；新增 3 项回归。
+  见 change（`2026-11-15-IL并发函数int实参/test.md`）。
+
 - [x] **IL 非流式 LINQ 查询里的 `where` 生成无效 IL**：含 join 或非末尾 orderby 的查询走旧的手写
   `GenerateWhereClauseIL`，其中 `x > 2` 拿 `LangValueType` 引用直接发 `cgt`（`ComparisonOpHelper`
   只识别 `AnyLangValue` 子类），且条件值没按类型装箱就传给 `IsTruthy(LangValueType)`。
@@ -388,9 +414,11 @@
   `xTrue`（`string.Concat(object,object)` 调用 CLR `ToString`），解释器输出 `xtrue`。
   与已有的 `null` 显示差异同类，需要统一拼接的显示转换（走语言的显示规则而不是 CLR ToString）。
 
-- [ ] **虚拟机混合数值比较偏差**：`b <- 3; b >= 3.0` 在 `-vm` 下返回 `false`，
-  解释器与 IL 都是 `true`（2026-11-15 实测）。属虚拟机比较实现缺口。
-  见 change（`2026-11-15-IL混合数值比较/test.md` §4）。
+- [x] **虚拟机混合数值比较偏差**：`b <- 3; b >= 3.0` 在 `-vm` 下返回 `false`,
+  解释器与 IL 都是 `true`。根因是 VM 的 `Equals` 只处理同类型，`int == double` 落到
+  `object.Equals` 恒为 false，而 `>=` / `<=` 由「大于/小于 或 相等」拼成。
+  现在混合原生数值先转 `double` 比较。`VMMixedNumericComparisonTests` 2 项通过，
+  VM 全组 1085 项通过。见 change（`2026-11-15-VM混合数值比较/test.md`）。
 
 - [ ] **IL 算术对 `object` 操作数一律按 `int` 拆箱**：`func process(v) { return v + 1 }` +
   `process(3.5)` 抛 `InvalidCastException`（`NumericBinaryOpHelper.LoadAndConvertOperands`）。
@@ -585,6 +613,9 @@
 - [ ] **IL SpawnTests 使用过时调用形式及全局状态**：默认档中多项以 `spawn backgroundTask()` 报 `spawn` 未声明；当前 API 使用 `spawn(backgroundTask)` 并需 `Start()`。这些测试在编译前关闭全局 `IlVerificationEnabled`，若编译抛错则不会恢复，也未标记并发用例；需按当前 API 与测试分档重写并确保全局状态恢复。
 - [ ] **IL 泛型类测试残留失败**：泛型特化类型现会生成静态字段、静态方法与静态初始化器，`Counter<T>.field/method` 可按每个特化独立读写；嵌套泛型类对象也可作为集合元素往返桥接。类级 `where` 约束与同一特化类型参数的字段比较均已通过，现有 `GenericClassTests` 11 项中 9 项通过。剩余两项仍使用旧式冒号继承与未支持的 `func(...) ->` 函数类型参数；将其迁移为 `extends`、`function` 与括号 lambda 后，另暴露两个 IL 缺口：特化泛型继承类中调用自身函数值字段会在未完成 `TypeBuilder` 上查询方法，泛型类 `Reduce` 的函数参数在运行时为 `null`。见 迁移排查报告（`2026-11-13-12-40-IL泛型类测试迁移排查.md`）、自引用参数报告（`2026-11-13-12-30-IL泛型类自引用参数.md`）、约束报告（`2026-11-13-12-20-泛型类where约束.md`）、静态成员报告（`2026-11-13-12-00-IL泛型类静态成员.md`）、桥接报告（`2026-11-13-12-10-IL泛型类对象桥接.md`） 与 既有报告（`2026-11-11-10-54-IL泛型递归特化测试.md`）。
 - [ ] **IL 测试覆盖复核**：原清单列出的 54 个具体文件中已有 53 个同名文件；未找到 `StandardLibraryImportTests.cs`。按实际场景核实标准库导入、并发和端到端覆盖，不以文件名作为充分证据。
+  2026-11-15 补充：并发全局函数里仍有约 40 处手写 `parameters[i].Accept(...)` + `Call`，
+  若形参是 `int` 且实参可能是 `object`/`LangValueType`，同样需要拆箱；本轮只覆盖了
+  `*Dispose` 及同文件的 int 参数调用点，其余未逐一核对。
 
 ## VM 性能
 
