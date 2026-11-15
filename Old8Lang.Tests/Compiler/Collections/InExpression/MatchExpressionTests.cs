@@ -39,19 +39,19 @@ public class MatchExpressionTests
         // Arrange
         var code = @"
             enum Color {
-                Red <- 0
-                Green <- 1
-                Blue <- 2
-                Purple <- 3
+                Red <- 0,
+                Green <- 1,
+                Blue <- 2,
+                Purple <- 3,
                 Yellow <- 4
             }
             
             result <- match Color.Red {
-                case Color.Red -> ""red""
-                case Color.Green -> ""green""
-                case Color.Blue -> ""blue""
-                case Color.Yellow -> ""yellow""
-                case Color.Purple -> ""purple""
+                case 0 -> ""red""
+                case 1 -> ""green""
+                case 2 -> ""blue""
+                case 3 -> ""purple""
+                case 4 -> ""yellow""
                 case _ -> ""unknown""
             }
             Assert.Equal(""red"", result)

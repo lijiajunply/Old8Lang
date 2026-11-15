@@ -420,6 +420,23 @@ public partial class TypeInferenceVisitor
         var leftType = node.Left?.Accept(new TypeInferenceVisitor(local));
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
+        // 枚举成员（Color.Red）的底层类型是 int；IL 发射的也是 ldc.i4。
+        // 此前这里返回枚举类型本身，match / ToStr / 赋值都会按引用类型处理。
+        if (node.Opera == LangTokenType.Dot && right is LangId)
+        {
+            // 枚举名可能没有局部变量类型记录，需要从编译期类表里取。
+            if (leftType is { IsEnum: true })
+            {
+                return typeof(int);
+            }
+
+            if (node.Left is LangId enumId &&
+                local.ClassVar.TryGetValue(enumId.IdName, out var enumType) && enumType.IsEnum)
+            {
+                return typeof(int);
+            }
+        }
+
         // 处理 node.member 访问（类环境内）- 需要在 TypeBuilder 转换之前处理
         // 支持 LangId { IdName: "this" } 和 ThisExpression 两种形式
         if (node.Opera == LangTokenType.Dot && (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && right is LangId thisMemberId)

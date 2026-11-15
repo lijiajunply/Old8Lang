@@ -1474,7 +1474,9 @@ public static class DotOperatorILHelper
                 throw new InvalidOperationError(operation, $"无法获取枚举成员 {id.IdName} 的值");
             }
 
-            return leftType; // 返回枚举类型
+            // 成员在 IL 里是 int32 常量；返回枚举类型会让调用方按 Color 装箱，
+            // 显示成 "Red"（CLR enum ToString），match/ToStr/算术也随之错位。
+            return typeof(int);
         }
 
         // 用户定义类的静态字段/属性访问。这里不能先加载 left：类名仅用于
