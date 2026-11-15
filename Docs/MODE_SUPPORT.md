@@ -356,10 +356,13 @@
 5. **IL 校验失败已大幅收敛**：`Common Language Runtime detected an invalid program` 仍可能在
    尚未迁移的路径出现（生成器 `yield`、match 高级模式、mixin、部分装饰器用例）。
    **2026-11-15 实测**：`dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"`
-   逐组运行共 1976 例 → **212 失败 / 1739 通过 / 25 跳过**
+   逐组运行共 1989 例 → **212 失败 / 1752 通过 / 25 跳过**
    （含本日新增用例）。当天失败数从 252（更早尚有 323 失败，且
    `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到本轮修复前的 224，
-   本轮修复后为 212。
+   本轮修复后仍为 212，但消除了一类会让进程段错误的字段写入问题。
+   对 `TestFiles/CompilerTests/` 的 157 个用例逐个用 `-il` 运行（10 秒超时）：
+   段错误、超时均为 0，仍报 `invalid program` 的只剩 `linq_join_compiler.old8`
+   （`join ... where` 组合，见 [统一待办](../changes/Todo.md)）。
 6. **高阶实例方法自 2026-10-10 起可用**：`List` 的 `FindAll`/`FlatMap`/`GroupAdjacentBy`/`Partition`/
    `Single`/`SingleOrDefault`/`SkipWhile(Indexed)`/`TakeWhile(Indexed)`、`Dictionary` 的
    `Map`/`Filter`/`ForEach`、泛型列表的 `SelectMany`/`SortBy`/`Zip3`/`Sum(selector)`/
