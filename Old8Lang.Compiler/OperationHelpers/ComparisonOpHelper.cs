@@ -15,6 +15,25 @@ namespace Old8Lang.AST.Expression.OperationHelpers;
 internal static class ComparisonOpHelper
 {
     /// <summary>
+    /// 比较前把数值操作数提升到 double。
+    /// </summary>
+    /// <remarks>
+    /// <c>clt</c> / <c>cgt</c> 要求两个操作数是同一类型。若一侧是 double、另一侧是 int，
+    /// 直接比较会按位解释 int（例如 -500.0 &lt; 0 被判成 false），静默得到错误结果。
+    /// 这里复用算术运算的 double 提升逻辑。
+    /// </remarks>
+    private static void EmitNumericPromotion(ILGenerator ilGenerator, Type? leftType, Type? rightType)
+    {
+        if (leftType is null || rightType is null ||
+            leftType == typeof(object) || rightType == typeof(object))
+        {
+            return;
+        }
+
+        NumericBinaryOpHelper.ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType);
+    }
+
+    /// <summary>
     /// 处理 object 与数值的比较：集合索引和动态调用会返回 object，
     /// 但其运行期值仍可能是任意 CLR 数值类型。
     /// </summary>
@@ -182,6 +201,7 @@ internal static class ComparisonOpHelper
         {
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            EmitNumericPromotion(ilGenerator, gtLeftType, gtRightType);
             ilGenerator.Emit(OpCodes.Cgt);
         }
 
@@ -256,6 +276,7 @@ internal static class ComparisonOpHelper
         {
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            EmitNumericPromotion(ilGenerator, ltLeftType, ltRightType);
             ilGenerator.Emit(OpCodes.Clt);
         }
 
@@ -336,6 +357,7 @@ internal static class ComparisonOpHelper
         {
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            EmitNumericPromotion(ilGenerator, leftOpType, rightOpType);
             // 其他类型使用 Ceq 指令
             ilGenerator.Emit(OpCodes.Ceq);
         }
@@ -374,6 +396,7 @@ internal static class ComparisonOpHelper
         {
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            EmitNumericPromotion(ilGenerator, leftOpType, rightOpType);
             ilGenerator.Emit(OpCodes.Ceq);
         }
 
@@ -451,6 +474,7 @@ internal static class ComparisonOpHelper
 
         left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        EmitNumericPromotion(ilGenerator, leftType, rightType);
         ilGenerator.Emit(OpCodes.Cgt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);
@@ -526,6 +550,7 @@ internal static class ComparisonOpHelper
 
         left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        EmitNumericPromotion(ilGenerator, leftType, rightType);
         ilGenerator.Emit(OpCodes.Clt);
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
         ilGenerator.Emit(OpCodes.Xor);

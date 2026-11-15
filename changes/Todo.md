@@ -282,6 +282,16 @@
   `Compiler.Functions` 54→53 失败，`ClosureReturningClosure` 通过。
   见 change（`2026-11-15-IL函数值调用/test.md`）。
 
+- [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
+  （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
+  静默不抛、catch 不执行。比较运算此前没有像算术那样做 double 提升。
+  现在四个顺序比较与相等比较的普通数值分支都会先 `ConvertToDoubleIfNeeded`。
+  `Compiler.Classes` 15→14 失败。见 change（`2026-11-15-IL混合数值比较/test.md`）。
+
+- [ ] **虚拟机混合数值比较偏差**：`b <- 3; b >= 3.0` 在 `-vm` 下返回 `false`，
+  解释器与 IL 都是 `true`（2026-11-15 实测）。属虚拟机比较实现缺口。
+  见 change（`2026-11-15-IL混合数值比较/test.md` §4）。
+
 - [ ] **IL 算术对 `object` 操作数一律按 `int` 拆箱**：`func process(v) { return v + 1 }` +
   `process(3.5)` 抛 `InvalidCastException`（`NumericBinaryOpHelper.LoadAndConvertOperands`）。
   2026-11-15 试过「任一操作数静态类型为 object 时调用运行期数值运算助手并返回 object」，
