@@ -364,7 +364,7 @@ public class VMTypeConversionTests
         Assert.NotNull(result);
         Assert.Contains("x=42", result.ToString());
         Assert.Contains("y=3.14", result.ToString());
-        Assert.Contains("z=True", result.ToString());
+        Assert.Contains("z=true", result.ToString());
     }
 
     [Fact]

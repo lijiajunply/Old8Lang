@@ -131,7 +131,7 @@ public class VMStringTemplateTests
         // Assert
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
-        Assert.Equal("Flag is: True", result);
+        Assert.Equal("Flag is: true", result);
     }
 
     [Fact]
