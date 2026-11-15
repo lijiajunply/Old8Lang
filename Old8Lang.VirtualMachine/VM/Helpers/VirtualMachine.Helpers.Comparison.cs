@@ -46,6 +46,14 @@ public partial class VirtualMachine
 
         if (a is int ia && b is int ib) return ia == ib;
         if (a is double da && b is double db) return Math.Abs(da - db) < 1e-10;
+        // 混合数值类型按数值比较：解释器里 `3 == 3.0` 为 true。
+        // 这里不处理会落到 object.Equals，int 与 double 永远是 false，
+        // 连带 `3 >= 3.0` / `3.0 <= 3` 也被判成 false。
+        if (IsNumericValue(a) && IsNumericValue(b))
+        {
+            return Convert.ToDouble(a) == Convert.ToDouble(b);
+        }
+
         if (a is bool ba && b is bool bb) return ba == bb;
         if (a is string sa && b is string sb) return sa == sb;
 
@@ -58,6 +66,13 @@ public partial class VirtualMachine
         return object.Equals(a, b);
     }
 
+
+    /// <summary>
+    /// 判断值是否是 CLR 原生数值（用于混合数值类型的相等比较）。
+    /// </summary>
+    private static bool IsNumericValue(object? value) =>
+        value is byte or sbyte or short or ushort or int or uint or long or ulong
+            or float or double or decimal;
 
     private bool Greater(object? a, object? b)
     {
