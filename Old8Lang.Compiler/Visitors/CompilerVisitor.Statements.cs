@@ -820,6 +820,14 @@ public partial class CompilerVisitor
                         var field = leftType.GetField(memberId.IdName);
                         if (field is not null)
                         {
+                            // 非 this 形式的字段写入同样要按字段类型转换：
+                            // 未标注类型的字段是 object，写入 int 时若不装箱，
+                            // 字段里存的就是裸 int32，读取时会被当作对象引用，
+                            // 运行期直接段错误（而不是抛托管异常）。
+                            EmitFieldValueConversion(
+                                field.FieldType,
+                                node.Value.Accept(new TypeInferenceVisitor(local)));
+
                             ilGenerator.Emit(OpCodes.Stfld, field);
                         }
                         else
@@ -827,6 +835,9 @@ public partial class CompilerVisitor
                             var property = leftType.GetProperty(memberId.IdName);
                             if (property is not null && property.GetSetMethod() is not null)
                             {
+                                EmitFieldValueConversion(
+                                    property.PropertyType,
+                                    node.Value.Accept(new TypeInferenceVisitor(local)));
                                 ilGenerator.Emit(OpCodes.Callvirt, property.GetSetMethod()!);
                             }
                         }
@@ -1144,6 +1155,36 @@ public partial class CompilerVisitor
     
     
         return null;
+    }
+
+    /// <summary>
+    /// 按目标字段/属性类型转换栈顶值（非 this 形式的成员写入）。
+    /// </summary>
+    /// <remarks>
+    /// 未标注类型的字段在 IL 里是 <c>object</c>；写入值类型时必须装箱，
+    /// 否则字段保存的是裸值类型，后续读取会把它当作对象引用，直接使进程崩溃。
+    /// </remarks>
+    private void EmitFieldValueConversion(Type targetType, Type? valueType)
+    {
+        if (valueType is null || valueType == targetType) return;
+
+        if (targetType == typeof(object) && valueType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, valueType);
+            return;
+        }
+
+        if (targetType.IsValueType && valueType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+            return;
+        }
+
+        if (SetStatementRuntimeExtensions.IsNumericType(targetType) &&
+            SetStatementRuntimeExtensions.IsNumericType(valueType))
+        {
+            SetStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, targetType);
+        }
     }
 
     /// <summary>
