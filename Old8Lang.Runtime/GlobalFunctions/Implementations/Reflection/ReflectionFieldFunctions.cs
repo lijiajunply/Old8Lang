@@ -136,8 +136,13 @@ public sealed class SetFieldFunction : BaseGlobalFunction
         // 加载字段名参数
         parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
-        // 加载值参数
+        // 加载值参数（形参是 object，值类型必须显式装箱）
         parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var valueType = parameters[2].Accept(new TypeInferenceVisitor(local));
+        if (valueType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, valueType);
+        }
 
         // 调用 ReflectionHelper.SetField(object, string, object)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.SetField));

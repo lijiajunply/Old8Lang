@@ -256,6 +256,15 @@
   需要先定「集合注解是否严格校验元素类型」，再统一三模式与用例。
   见 change（`2026-11-15-集合类型注解校验/test.md` §5）。
 
+- [x] **IL 模式反射 API 不可用**：`CreateInstance` / `InvokeMethod` 的 IL 发射用
+  `ldsfld LocalManager.Interpreter`（该成员是实例属性，没有同名字段），编译期直接抛
+  `ArgumentNullException (Parameter 'field')`；`ReflectionHelper` 的字段/方法/实例化
+  又一律要求 `AnyLangValue`，对 IL 的原生对象报「对象不是类实例」；`SetField` 的值类型实参
+  未装箱；`CreateInstance` 按类名扫全部动态程序集还会命中上一个用例的同名类。
+  现在改用 `RuntimeGlobalWriter.CurrentManager`，为反射助手补原生对象分支，
+  `SetField` 补 `box`，`FindNativeType` 倒序取最新程序集。`Compiler.Reflection` 14→0 失败
+  （17/17 通过）。见 change（`2026-11-15-IL反射原生对象/test.md`）。
+
 - [ ] **IL 模式值类型变量在 catch 里被赋异常仍会丢值**：`x <- 1` 之后 `catch (e) { x <- e }`，
   后续读取 `x` 得到 `null`（`-f` 为 `1`）。当前只把「引用类型初值」且「try + catch 都赋值」
   的变量提升为 `object`；值类型槽位保留按新类型重绑定，因为 `x <- 1; x <- 2.5` 依赖该行为。

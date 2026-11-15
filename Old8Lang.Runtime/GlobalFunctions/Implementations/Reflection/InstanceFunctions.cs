@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
@@ -70,10 +71,7 @@ public sealed class CreateInstanceFunction : BaseGlobalFunction
         parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 manager 参数
-        var interpreterField = typeof(LocalManager).GetField("Interpreter");
-        ilGenerator.Emit(OpCodes.Ldsfld, interpreterField!);
-        var managerProperty = typeof(ILangInterpreter).GetProperty("Manager");
-        ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
 
         // 调用 ReflectionHelper.CreateInstance(string, object, VariateManager)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.CreateInstance));

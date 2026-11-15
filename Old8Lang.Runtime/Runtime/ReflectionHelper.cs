@@ -367,59 +367,147 @@ public static class ReflectionHelper
     /// <summary>
     /// 动态调用方法
     /// </summary>
-    public static object InvokeMethod(object obj, string methodName, object args, VariateManager manager)
+    public static object? InvokeMethod(object obj, string methodName, object args, VariateManager? manager)
     {
-        if (obj is not AnyLangValue anyValue)
+        if (obj is AnyLangValue anyValue)
         {
-            throw new InvalidOperationException("对象不是类实例");
+            if (args is not ListLangValue argsList)
+            {
+                throw new InvalidOperationException("参数必须是列表");
+            }
+
+            // 将 LangValueType 转换为 LangExpression
+            var arguments = argsList.Values.Select(v => new ValueExpression(v)).Cast<LangExpression>().ToList();
+
+            return anyValue.ReflectionInvokeMethod(methodName, arguments, manager);
         }
 
-        if (args is not ListLangValue argsList)
+        // IL 模式下对象是动态程序集里的原生类型：按名称在 CLR 类型上查找并调用
+        var nativeArguments = ToNativeArguments(args);
+        var method = obj.GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            .Where(candidate => candidate.Name == methodName &&
+                                candidate.GetParameters().Length == nativeArguments.Length)
+            .OrderBy(candidate => candidate.GetParameters().Length)
+            .FirstOrDefault();
+        if (method is null)
         {
-            throw new InvalidOperationException("参数必须是列表");
+            throw new InvalidOperationException($"找不到方法 {methodName}");
         }
 
-        // 将 LangValueType 转换为 LangExpression
-        var arguments = argsList.Values.Select(v => new ValueExpression(v)).Cast<LangExpression>().ToList();
-
-        return anyValue.ReflectionInvokeMethod(methodName, arguments, manager);
+        return method.Invoke(obj, nativeArguments);
     }
+
+    /// <summary>
+    /// 把解释器的参数列表或 IL 的原生集合统一成反射调用需要的实参数组。
+    /// </summary>
+    private static object?[] ToNativeArguments(object? args)
+    {
+        return args switch
+        {
+            null => [],
+            ListLangValue list => list.Values.Select(UnwrapLangValue).ToArray(),
+            object?[] array => array,
+            System.Collections.IEnumerable enumerable => enumerable.Cast<object?>().ToArray(),
+            _ => throw new InvalidOperationException("参数必须是列表")
+        };
+    }
+
+    /// <summary>
+    /// 把解释器的语言值转换成反射调用可用的原生值。
+    /// </summary>
+    private static object? UnwrapLangValue(LangValueType value) => value.GetValue();
 
     /// <summary>
     /// 动态获取字段值
     /// </summary>
-    public static object GetField(object obj, string fieldName)
+    public static object? GetField(object obj, string fieldName)
     {
         if (obj is AnyLangValue anyValue)
         {
             return anyValue.ReflectionGetField(fieldName);
         }
-        throw new InvalidOperationException("对象不是类实例");
+
+        var field = FindNativeField(obj, fieldName);
+        return field.GetValue(obj);
+    }
+
+    /// <summary>
+    /// 在原生对象的 CLR 类型（含基类链）上查找字段。
+    /// </summary>
+    private static FieldInfo FindNativeField(object obj, string fieldName)
+    {
+        var type = obj.GetType();
+        while (type is not null && type != typeof(object))
+        {
+            var field = type.GetField(fieldName,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            if (field is not null)
+            {
+                return field;
+            }
+
+            type = type.BaseType;
+        }
+
+        throw new AttributeError(new NullLangValue(), fieldName, obj.GetType().Name);
     }
 
     /// <summary>
     /// 动态设置字段值
     /// </summary>
-    public static void SetField(object obj, string fieldName, object value)
+    public static void SetField(object obj, string fieldName, object? value)
     {
-        if (obj is not AnyLangValue anyValue)
+        if (obj is AnyLangValue anyValue)
         {
-            throw new InvalidOperationException("对象不是类实例");
+            if (value is not LangValueType langValue)
+            {
+                throw new InvalidOperationException("值必须是 LangValueType");
+            }
+
+            anyValue.ReflectionSetField(fieldName, langValue);
+            return;
         }
 
-        if (value is not LangValueType langValue)
+        var field = FindNativeField(obj, fieldName);
+        var fieldType = field.FieldType;
+        var nativeValue = value is LangValueType langValue2 ? UnwrapLangValue(langValue2) : value;
+        if (nativeValue is not null && fieldType.IsInstanceOfType(nativeValue))
         {
-            throw new InvalidOperationException("值必须是 LangValueType");
+            field.SetValue(obj, nativeValue);
+            return;
         }
 
-        anyValue.ReflectionSetField(fieldName, langValue);
+        // 数值等可转换的场景交给 Convert
+        field.SetValue(obj, nativeValue is null
+            ? null
+            : Convert.ChangeType(nativeValue, Nullable.GetUnderlyingType(fieldType) ?? fieldType));
     }
 
     /// <summary>
     /// 动态创建实例
     /// </summary>
-    public static object CreateInstance(string className, object args, VariateManager manager)
+    public static object? CreateInstance(string className, object args, VariateManager? manager)
     {
+        // 先按 IL 动态程序集里的原生类型创建；找不到再回退到解释器的类模板。
+        var nativeType = FindNativeType(className);
+        if (nativeType is not null)
+        {
+            var instance = Activator.CreateInstance(nativeType);
+            var nativeArguments = ToNativeArguments(args);
+            if (nativeArguments.Length > 0)
+            {
+                var init = nativeType
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(method => method.Name == "init" &&
+                                     method.GetParameters().Length == nativeArguments.Length)
+                    .FirstOrDefault();
+                init?.Invoke(instance, nativeArguments);
+            }
+
+            return instance;
+        }
+
         if (args is not ListLangValue argsList)
         {
             throw new InvalidOperationException("参数必须是列表");
@@ -433,14 +521,45 @@ public static class ReflectionHelper
         }
 
         // 创建实例
-        var instance = typeTemplate.CreateInstance(manager);
-        instance.Init(manager.Interpreter);
+        var created = typeTemplate.CreateInstance(manager!);
+        created.Init(manager!.Interpreter);
 
         // 调用 init 构造函数
         var arguments = argsList.Values.Select(v => new ValueExpression(v)).Cast<LangExpression>().ToList();
-        instance.CallInit(arguments, manager);
+        created.CallInit(arguments, manager);
 
-        return instance;
+        return created;
+    }
+
+    /// <summary>
+    /// 在 IL 动态程序集里按类名查找已生成的类型。
+    /// </summary>
+    private static Type? FindNativeType(string className)
+    {
+        // 同一进程里多次编译会生成多个同名动态程序集（测试逐条编译/执行），
+        // 必须优先取最近创建的那个，否则可能命中上一个用例里的同名类。
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Reverse())
+        {
+            if (assembly.GetName().Name != "Old8LangDynamicAssembly")
+            {
+                continue;
+            }
+
+            try
+            {
+                var type = assembly.GetTypes().FirstOrDefault(candidate => candidate.Name == className);
+                if (type is not null)
+                {
+                    return type;
+                }
+            }
+            catch (ReflectionTypeLoadException)
+            {
+                // 动态程序集里可能还有未完成的类型，忽略后继续
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

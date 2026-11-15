@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -31,7 +32,7 @@ public class TypeIsInterfaceMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsInterfaceMethod).GetMethod(nameof(IsInterfaceHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
@@ -123,7 +124,7 @@ public class TypeIsGenericMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsGenericMethod).GetMethod(nameof(IsGenericHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
@@ -180,7 +181,7 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
         var helperMethod = typeof(TypeIsAssignableFromMethod).GetMethod(nameof(IsAssignableFromHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

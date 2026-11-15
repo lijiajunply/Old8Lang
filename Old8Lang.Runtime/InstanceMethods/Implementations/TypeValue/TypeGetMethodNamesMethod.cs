@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -40,7 +41,7 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
         // 加载 VariateManager（需要从 LocalManager 获取）
-        ilGenerator.Emit(OpCodes.Ldsfld, typeof(LocalManager).GetField("Interpreter")!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
 
         // 调用辅助方法

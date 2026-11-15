@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
@@ -69,10 +70,7 @@ public sealed class InvokeMethodFunction : BaseGlobalFunction
         // 加载 manager 参数（需要从某处获取）
         // 这里我们需要传递当前的 VariateManager
         // 由于 IL 模式下没有直接的 manager，我们需要使用 Interpreter.Manager
-        var interpreterField = typeof(LocalManager).GetField("Interpreter");
-        ilGenerator.Emit(OpCodes.Ldsfld, interpreterField!);
-        var managerProperty = typeof(ILangInterpreter).GetProperty("Manager");
-        ilGenerator.Emit(OpCodes.Callvirt, managerProperty!.GetMethod!);
+        ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
 
         // 调用 ReflectionHelper.InvokeMethod(object, string, object, VariateManager)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.InvokeMethod));

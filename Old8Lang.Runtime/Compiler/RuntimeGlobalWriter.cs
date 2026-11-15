@@ -25,6 +25,11 @@ public static class RuntimeGlobalWriter
     private static Dictionary<object, LangValueType>? _convertedCollections;
 
     /// <summary>
+    /// 当前线程正在执行的解释器管理器；IL 产物里的反射类内置函数需要它。
+    /// </summary>
+    public static VariateManager? CurrentManager => _manager;
+
+    /// <summary>
     /// 设置当前线程用于接收顶层变量的管理器。
     /// </summary>
     public static void SetManager(VariateManager manager)
