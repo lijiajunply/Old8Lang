@@ -56,8 +56,10 @@ public class StringRepeatMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        // 原生 string 接收者与 int 实参在 IL 里是 CLR 原生值，而 RepeatHelper
+        // 的形参是 StringLangValue / IntLangValue，必须先包装，否则生成无效 IL。
+        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         var helperMethod = typeof(StringRepeatMethod).GetMethod(nameof(RepeatHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);

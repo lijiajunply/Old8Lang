@@ -311,8 +311,12 @@ internal static class ComparisonOpHelper
                 ConvertToLangValueType(ilGenerator, rightOpType);
             }
 
-            // 调用 Equals 方法: AnyLangValue.Equals(LangValueType)
-            var equalsMethod = typeof(LangValueType).GetMethod("Equals", [typeof(LangValueType)])!;
+            // 调用语言层比较方法。必须用 Equal 而不是 Equals：
+            // GetMethod("Equals", [LangValueType]) 会按可赋值规则绑定到
+            // object.Equals(object)，而 StringLangValue 等只重写了 Equal，
+            // 结果变成引用比较（"a".Repeat(1) == "a" 恒为 false）。
+            var equalsMethod = typeof(LangValueType).GetMethod(
+                nameof(LangValueType.Equal), [typeof(LangValueType)])!;
             ilGenerator.Emit(OpCodes.Callvirt, equalsMethod);
             return typeof(bool);
         }
@@ -359,8 +363,22 @@ internal static class ComparisonOpHelper
         var leftOpType = left?.Accept(new TypeInferenceVisitor(local));
         var rightOpType = right?.Accept(new TypeInferenceVisitor(local));
 
+        if (leftOpType is not null && typeof(LangValueType).IsAssignableFrom(leftOpType))
+        {
+            // 语言值走 Equal；否则 Ceq 只比较引用。
+            left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            if (rightOpType != null && !typeof(LangValueType).IsAssignableFrom(rightOpType))
+            {
+                ConvertToLangValueType(ilGenerator, rightOpType);
+            }
+
+            var equalMethod = typeof(LangValueType).GetMethod(
+                nameof(LangValueType.Equal), [typeof(LangValueType)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, equalMethod);
+        }
         // 字符串按值比较，否则 Ceq 只比较引用
-        if (leftOpType == typeof(string) && rightOpType == typeof(string))
+        else if (leftOpType == typeof(string) && rightOpType == typeof(string))
         {
             left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
             right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
