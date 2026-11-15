@@ -121,6 +121,10 @@
 
 - [x] **泛型类递归特化导致栈溢出**：原崩溃用例及自引用特化回归已通过；完整 `Compiler.Classes` 组正常结束，但仍有普通失败。见 测试报告（`2026-11-11-10-54-IL泛型递归特化测试.md`）。
 - [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 排序测试报告（`2026-11-11-10-37-IL-LINQ排序测试.md`）。
+  2026-11-15 语料扫描确认：`from x in list1 join y in list2 on x == y select x` 正常，
+  但 `from x in list1 join y in list2 on x == y where x > 2 select x` 仍生成无效 IL
+  （`TestFiles/CompilerTests/linq_join_compiler.old8`），join 后再接 where 的分派是重点。
+  同一文件里 `join ... into g` 可执行但结果与解释器不一致，需一并核对。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 测试报告（`2026-11-11-08-49-IL-select回归测试.md`）。
 
@@ -333,6 +337,40 @@
   现在四个顺序比较与相等比较的普通数值分支都会先 `ConvertToDoubleIfNeeded`。
   `Compiler.Classes` 15→14 失败。见 change（`2026-11-15-IL混合数值比较/test.md`）。
 
+- [x] **IL 未标注类型字段写入不装箱导致进程段错误**：`class C { public x }` + `c.x <- 100`
+  之后任何读取（`"x=" + c.x`、`s <- c.x`、`c.x == 100`）都会 SIGSEGV——非 this 形式的
+  实例字段写入只发 `stfld`、不做装箱，`object` 字段里存的是裸 int32，读取时被当成对象引用。
+  现在字段与属性 setter 都按目标类型转换（值类型 → object 装箱、object → 值类型拆箱、
+  数值宽度转换）。`TestFiles/CompilerTests/40_uninitialized_fields.old8` 段错误 → 正常退出；
+  157 个 CompilerTests 语料扫描的段错误数 1 → 0；新增 5 项回归。
+  见 change（`2026-11-15-IL未初始化字段崩溃/test.md`）。
+
+- [x] **IL `in` 运算符生成无效 IL**：`"x" + ("a" in dict)` 直接无效 IL，`"x" + (1 in list)`
+  则拼出 `x1`。三处根因：类型推断漏了 `In`（落到「返回左操作数类型」）、
+  `List<T>.Contains(T)` / `Dictionary<K,V>.ContainsKey(TKey)` 收到装箱的 `object`、
+  通用回退找不到 `Contains(object)` 时什么都不发射却声明返回 bool。现在 `In` 恒推断为 bool，
+  按元素/键类型拆箱（数值宽度转换），回退改为运行期 `RuntimeContains` 按语言相等语义枚举。
+  `12_in_expression.old8` 从无效 IL 变为跑完；新增 4 项回归。
+  见 change（`2026-11-15-IL-in运算符无效IL/test.md`）。遗留：右侧是字符串字面量时
+  `'h' in "abc"` 仍返回 false，见下一条。
+
+- [x] **IL 类方法 object 形参与同步生成器 yield 生成无效 IL**：`func add(a, b) { return a + b }`
+  的形参在 CLR 签名里是 `object`，调用点按原始类型压栈后直接 `callvirt`，未装箱的 int 被当
+  object 传入；同步生成器的 `yield` 没有 IL 实现、不发射任何指令。现在实例方法调用按形参类型
+  重新加载实参（装箱/拆箱/数值转换，引用类型之间不 castclass），同步生成器在编译期报
+  「IL 模式暂不支持同步生成器（yield）」。`15_class_declaration.old8` 与 5 个 generator 用例
+  不再产生无效 IL；新增 4 项回归。
+  见 change（`2026-11-15-IL类方法实参与生成器无效IL/test.md`）。
+
+- [ ] **`'h' in "abc"`（右侧为字符串字面量）在 IL 下返回 false**：解释器与虚拟机为 true；
+  右侧换成变量（`str <- "abc"; 'h' in str`）时 IL 正常。属字面量接收者的类型推断/分派缺口，
+  需要先定位 `GenerateInOperator` 在字面量右侧时走的分支。见 change
+  （`2026-11-15-IL-in运算符无效IL/test.md` §5.1）。
+
+- [ ] **字符串拼接里的 bool 显示大小写跨模式不一致**：`"x" + (1 in list)` 在 IL 下输出
+  `xTrue`（`string.Concat(object,object)` 调用 CLR `ToString`），解释器输出 `xtrue`。
+  与已有的 `null` 显示差异同类，需要统一拼接的显示转换（走语言的显示规则而不是 CLR ToString）。
+
 - [ ] **虚拟机混合数值比较偏差**：`b <- 3; b >= 3.0` 在 `-vm` 下返回 `false`，
   解释器与 IL 都是 `true`（2026-11-15 实测）。属虚拟机比较实现缺口。
   见 change（`2026-11-15-IL混合数值比较/test.md` §4）。
@@ -345,6 +383,9 @@
   可行的方向是同时让「object 结果写入已定型局部变量」走拆箱/数值转换，而不是换槽位；
   这会与「值类型变量动态改数值宽度靠重绑定」的既有行为冲突，需要先定语义。
   见 `Docs/MODE_SUPPORT.md` 的跨模式差异小节第 1 条。
+  2026-11-15 补充：类方法未注解参数（CLR 签名为 object）收到 `double` / `string` 实参后，
+  方法体里的 `a + b` 也会走到同一处按 int 拆箱，`Unable to cast object of type
+  'System.Double' to type 'System.Int32'`；类方法实参装箱已修，但这条数值/字符串语义缺口仍在。
 
 - [x] **IL 的 `throw` 丢弃被抛出的值，catch 只能拿到异常包装**：`throw "msg"` 在 IL 里被编译成
   「ToString 后 `new Exception(string)`」，catch 绑定的是 `ExceptionWrapper`，原始值无从取回。

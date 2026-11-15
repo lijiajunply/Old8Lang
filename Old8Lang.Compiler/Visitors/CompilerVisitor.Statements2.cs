@@ -646,12 +646,18 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitYieldStatement(YieldStatement node)
     {
+        // 同步生成器在 IL 后端没有实现：`yield` 不会发射任何指令，
+        // 而调用方仍按「函数返回生成器对象」使用，整个方法会被 JIT 判为无效 IL。
+        // 这里给出明确错误，避免把无效 IL 留到运行期。
+        if (local.AsyncStateMachineGenerator is null)
+        {
+            throw new CompilerException(
+                "IL 模式暂不支持同步生成器（yield）：该语句没有 IL 实现，请改用解释器或虚拟机模式执行",
+                node.Position);
+        }
 
-        // 生成器的IL代码生成（后续实现）
-        // 这里需要实现状态机逻辑
-
+        // 异步生成器的 yield 目前由异步状态机路径处理（语义仍不完整）。
         return null;
-    
     }
 
     /// <summary>

@@ -1026,10 +1026,106 @@ public static class DotOperatorILHelper
             }
         }
 
+        // 实参在查找方法前已按「原始类型」压栈，但形参可能是 object（未标注类型的参数）
+        // 或更窄的数值类型。直接 callvirt 会生成无效 IL（把未装箱的 int 当 object 传），
+        // 因此需要时把实参落到局部变量，再按形参类型重新加载。
+        EmitInstanceArgumentConversions(ilGenerator, m, types);
+
         // 对于实例方法使用 Callvirt，对于静态方法（包括扩展方法）使用 Call
         ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
 
         return m.ReturnType;
+    }
+
+    /// <summary>
+    /// 按目标方法形参类型转换已压栈的实参。
+    /// </summary>
+    /// <remarks>
+    /// 实参先在调用点按原始类型求值（栈上已经有接收者），这里把它们按逆序落到局部变量，
+    /// 再按形参类型逐个装箱/拆箱/数值转换后重新压栈；不需要转换时保持原样。
+    /// </remarks>
+    private static void EmitInstanceArgumentConversions(
+        ILGenerator ilGenerator,
+        MethodInfo method,
+        List<Type> argumentTypes)
+    {
+        var parameters = method.GetParameters();
+        if (parameters.Length != argumentTypes.Count) return;
+
+        var conversions = new (Type From, Type To)[parameters.Length];
+        var anyNeeded = false;
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            var from = argumentTypes[i];
+            var to = parameters[i].ParameterType;
+            conversions[i] = (from, to);
+            if (NeedConversion(from, to)) anyNeeded = true;
+        }
+
+        if (!anyNeeded) return;
+
+        var locals = new LocalBuilder[argumentTypes.Count];
+        for (var i = argumentTypes.Count - 1; i >= 0; i--)
+        {
+            locals[i] = ilGenerator.DeclareLocal(argumentTypes[i]);
+            ilGenerator.Emit(OpCodes.Stloc, locals[i]);
+        }
+
+        for (var i = 0; i < argumentTypes.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, locals[i]);
+            EmitArgumentConversion(ilGenerator, conversions[i].From, conversions[i].To);
+        }
+    }
+
+    private static bool NeedConversion(Type from, Type to)
+    {
+        if (from == to) return false;
+        if (to == typeof(object)) return from.IsValueType;
+        if (to.IsValueType) return from == typeof(object) || IsNumericType(from) || IsNumericType(to);
+
+        // 引用类型之间不做 castclass：`{1, 2, 3}` 的静态类型是 List<object>，
+        // 而形参可能写成 list<int>；强行 castclass 会在运行期抛 InvalidCastException，
+        // 而这类「集合字面量 vs 具体泛型」的宽松匹配是既有行为，保持原样。
+        return false;
+    }
+
+    private static void EmitArgumentConversion(ILGenerator ilGenerator, Type from, Type to)
+    {
+        if (from == to) return;
+
+        if (to == typeof(object))
+        {
+            if (from.IsValueType) ilGenerator.Emit(OpCodes.Box, from);
+            return;
+        }
+
+        if (to.IsValueType)
+        {
+            if (from == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, to);
+                return;
+            }
+
+            if (IsNumericType(from) && IsNumericType(to))
+            {
+                if (to == typeof(double)) ilGenerator.Emit(OpCodes.Conv_R8);
+                else if (to == typeof(float)) ilGenerator.Emit(OpCodes.Conv_R4);
+                else if (to == typeof(long)) ilGenerator.Emit(OpCodes.Conv_I8);
+                else if (to == typeof(short)) ilGenerator.Emit(OpCodes.Conv_I2);
+                else if (to == typeof(byte)) ilGenerator.Emit(OpCodes.Conv_U1);
+                else if (to == typeof(sbyte)) ilGenerator.Emit(OpCodes.Conv_I1);
+                else if (to == typeof(ushort)) ilGenerator.Emit(OpCodes.Conv_U2);
+                else if (to == typeof(uint)) ilGenerator.Emit(OpCodes.Conv_U4);
+                else if (to == typeof(ulong)) ilGenerator.Emit(OpCodes.Conv_U8);
+                else ilGenerator.Emit(OpCodes.Conv_I4);
+                return;
+            }
+
+            return;
+        }
+
     }
 
     /// <summary>
