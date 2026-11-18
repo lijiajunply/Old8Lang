@@ -20,6 +20,11 @@ namespace Old8Lang.InstanceMethods.Core;
 /// </remarks>
 public static class IlRuntimeFunctions
 {
+    private static LangExpression WrapArgument(object? argument)
+        => argument is Delegate function
+            ? IlValueBridge.WrapFunction(function)
+            : IlValueBridge.Wrap(argument);
+
     /// <summary>按名字调用解释器里的同步函数（参数为位置实参）。</summary>
     public static object? InvokeByName(string name, object?[] arguments)
     {
@@ -77,7 +82,7 @@ public static class IlRuntimeFunctions
         var manager = RuntimeGlobalWriter.CurrentManager ?? new VariateManager();
 
         var positional = positionalArguments
-            .Select(argument => (LangExpression)IlValueBridge.Wrap(argument))
+            .Select(WrapArgument)
             .ToList();
 
         var named = new List<NamedArgument>();

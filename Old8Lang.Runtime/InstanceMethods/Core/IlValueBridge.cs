@@ -441,10 +441,19 @@ internal sealed class IlDelegateFuncLangValue(Delegate function)
     /// </summary>
     public Delegate Function { get; } = function;
 
-    private static List<LangId> BuildParameterIds(Delegate function) =>
-        function.Method.GetParameters()
-            .Select(parameter => new LangId(parameter.Name ?? "arg"))
+    private static List<LangId> BuildParameterIds(Delegate function)
+    {
+        // DynamicMethod 的参数名通常为 null；若全部回落成同一个 "arg"，
+        // 解释器按名字绑定时会把参数个数算错（高阶函数调用报“参数 'arg' 缺少实参”）。
+        // 用委托类型自身的 Invoke 签名：闭包委托的 Method 还包含捕获环境参数，
+        // 与实际调用实参数量不一致。
+        var parameters = function.GetType().GetMethod("Invoke")?.GetParameters()
+                         ?? function.Method.GetParameters();
+        return parameters
+            .Select((parameter, index) =>
+                new LangId(parameter.Name ?? $"arg{index}"))
             .ToList();
+    }
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc)))).ToArray();

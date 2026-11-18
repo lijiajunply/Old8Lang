@@ -748,6 +748,37 @@ public partial class CompilerVisitor
     public object? VisitInstance(Instance node)
     {
 
+        // 纯位置调用：已注册函数但实参数量少于必需参数时，编译期就报 ArgumentError
+        // （解释器/VM 在运行期报；这里属于 IL 类型检查的一部分，避免生成错误调用）。
+        if ((node.NamedArgs?.Count ?? 0) == 0)
+        {
+            var positionalCandidates = FindFunctionParameterCandidates(node.Id.IdName, local);
+            if (positionalCandidates.Count > 0)
+            {
+                var canAccept = positionalCandidates.Any(parameters =>
+                {
+                    if (parameters.Any(parameter => parameter.IsParams))
+                    {
+                        return true;
+                    }
+
+                    var required = parameters.Count(parameter => parameter.DefaultValue is null);
+                    return node.Ids.Count >= required && node.Ids.Count <= parameters.Count;
+                });
+
+                if (!canAccept)
+                {
+                    var maxRequired = positionalCandidates.Min(parameters =>
+                        parameters.Any(parameter => parameter.IsParams)
+                            ? 0
+                            : parameters.Count(parameter => parameter.DefaultValue is null));
+                    throw new Old8Lang.Error.ArgumentError(node.Position,
+                        $"函数 '{node.Id.IdName}' 的必需参数未全部提供：" +
+                        $"期望至少 {maxRequired} 个，实际 {node.Ids.Count} 个");
+                }
+            }
+        }
+
         // 命名实参统一交给解释器语义执行：编译后的委托按位置调用，
         // 这里由 IlRuntimeFunctions.InvokeInstance 重建 Instance，
         // 完成命名重排/默认值/重复参数等校验（与解释器一致）。

@@ -674,9 +674,14 @@
   局部 lambda 的形参名登记后按名重排。`Compiler.Functions` 26 → 17 失败。
   见 change（`2026-11-15-IL命名实参/test.md`）。
 
-- [ ] **类方法命名实参 + 高阶函数命名 lambda**：`obj.method(x: 1)` 的 Dot 路径未重排；
-  命名实参里传 lambda 给 `IlDelegateFuncLangValue` 时仍报参数缺失（2 项用例）。
-  另：纯位置调用缺参数（`test()`）仍在运行期报 ArgumentError。
+- [x] **纯位置调用缺参数的编译期校验**：`test()` 缺少必需参数现在在编译期抛
+  `ArgumentError`（`NamedArguments_AllParametersMissing` 通过）。
+
+- [ ] **类方法命名实参 + 高阶函数命名 lambda**：`obj.method(x: 1)` 的 Dot 路径未重排
+  （生成方法没有参数名可查，需要编译器侧维护「方法 → 形参名」映射）；
+  命名实参里传 lambda 已改用 `WrapFunction` 并修正 `IlDelegateFuncLangValue` 的形参
+  列表，但解释器随后把匿名包装函数判为 void 返回值，仍报类型不匹配（待继续）。
+
 
 - [ ] **IL 动态调用结果循环回写（工作区修复待验收）**：原来 `r <- fn(r, item)`
   会替换局部槽，循环前半段继续读取旧槽。当前未提交改动用 `CoerceDynamic` 转换结果并写回原槽，

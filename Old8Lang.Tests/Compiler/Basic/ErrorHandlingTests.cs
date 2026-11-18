@@ -283,13 +283,10 @@ public class ErrorHandlingTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act
+        // Act & Assert - IL 对已注册函数的实参数量做编译期检查
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert
-        Assert.NotNull(compiledAction);
-        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
+        Assert.Throws<ArgumentError>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
