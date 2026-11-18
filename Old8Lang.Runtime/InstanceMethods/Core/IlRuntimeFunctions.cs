@@ -38,7 +38,33 @@ public static class IlRuntimeFunctions
             .Select(argument => (LangExpression)IlValueBridge.Wrap(argument))
             .ToList();
 
-        return IlValueBridge.Unwrap(candidate.Run(manager, parameters));
+        // 装饰器 wrapper 是解释器函数，读顶层变量走解释器管理器；IL 顶层变量
+        // 存在 RuntimeGlobals 槽位里。调用前同步槽位 → 管理器，调用后再写回。
+        var slotSnapshot = RuntimeGlobals.Snapshot();
+        foreach (var (slotName, slotValue) in slotSnapshot)
+        {
+            RuntimeGlobalWriter.Write(slotName, slotValue);
+        }
+
+        var result = candidate.Run(manager, parameters);
+
+        foreach (var slotName in slotSnapshot.Keys)
+        {
+            try
+            {
+                var slotValue = manager.GetValue(new LangId(slotName));
+                if (slotValue is not null)
+                {
+                    RuntimeGlobals.Set(slotName, IlValueBridge.Unwrap(slotValue));
+                }
+            }
+            catch
+            {
+                // 管理器里没有该变量（例如本次调用未涉及）：保留原槽位值。
+            }
+        }
+
+        return IlValueBridge.Unwrap(result);
     }
 
     /// <summary>按解释器语义执行一次函数调用。</summary>

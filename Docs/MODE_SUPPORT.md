@@ -359,14 +359,14 @@
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
    `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2017 例 →
-   **39 失败 / 1952 通过 / 26 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
+   **32 失败 / 1959 通过 / 26 跳过**（含本日新增用例）。当天失败数从 252（更早尚有 323 失败，
    且 `Compiler.Classes` / `Compiler.Expressions` 会让测试主机直接崩溃）逐步降到 224，再到 212；
    期间修掉了字段写入段错误、`in` / `Task` 静态方法 / 类方法实参 / 异步状态机 / LINQ `where` /
    字符串实例方法与语言值相等 / 泛型 `T?` 实参 / 并发函数 int 实参等一批无效 IL；
    并统一了数组/列表 `+` 拼接、虚拟机 `in` 运算、范围端点排除语义、`.Length` 属性、null 显示，
    字符串实例方法的 IL 操作数包装（`"abc".StartsWith("a")` 曾生成无效 IL），
    元组实例方法在 IL / 虚拟机下的跨模式支持，链式比较 `a < b < c` 的 bool 比较拒绝，字典缺失键统一为 `KEY_ERROR`，以及实例 `Sqrt` 负数、VM 集合字段初值、
-   IL 包装字典显示、枚举成员按 int 返回、object 间动态比较、`as` 转换走解释器语义、枚举函数签名、extern 提示、除零错误码、未解析函数调用回退、装饰器转发、lambda `object` 类型注解、集合注解元素类型检查、mixin/接口默认方法合并、类型错误运行期化、异常反射解包、命名实参校验、循环动态槽收敛、边界用例与逻辑运算校验等修复。
+   IL 包装字典显示、枚举成员按 int 返回、object 间动态比较、`as` 转换走解释器语义、枚举函数签名、extern 提示、除零错误码、未解析函数调用回退、装饰器转发、lambda `object` 类型注解、集合注解元素类型检查、mixin/接口默认方法合并、类型错误运行期化、异常反射解包、命名实参校验、循环动态槽收敛、边界用例、逻辑运算校验、装饰器槽位同步等修复。
    其余失败以异步、函数、类、表达式、集合的结果/类型推断缺口为主。另修掉「类体在文件结尾
    被截断时解析器死循环」的进程挂死问题。
    对 `TestFiles/CompilerTests`（157）、`InterpreterTests`（188）、`SyntaxTests`（91）

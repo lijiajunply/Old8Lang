@@ -96,6 +96,29 @@ public static class RuntimeGlobals
     }
 
     /// <summary>
+    /// 当前线程已赋值的全部全局槽位快照（名称 → 原生值）。
+    /// 供「IL 装饰器转发到解释器」等需要在两种表示之间同步的场景使用。
+    /// </summary>
+    public static IReadOnlyDictionary<string, object?> Snapshot()
+    {
+        var result = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (_slots is null)
+        {
+            return result;
+        }
+
+        foreach (var (name, slot) in _slots)
+        {
+            if (slot.HasValue)
+            {
+                result[name] = slot.Value;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// 尝试读取一个全局变量，未初始化的槽位返回 false。
     /// </summary>
     public static bool TryGet(string name, out object? value)

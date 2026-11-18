@@ -549,8 +549,9 @@ public class DecoratorInterpreterTests
         // Act
         var ast = interpreter.Build(code);
 
-        // Assert
-        Assert.Throws<NameError>(() => ast.Run(interpreter.Manager));
+        // Assert - IL 模式在编译期预执行声明时就会对未定义装饰器报 NAME_ERROR
+        Assert.Throws<NameError>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]

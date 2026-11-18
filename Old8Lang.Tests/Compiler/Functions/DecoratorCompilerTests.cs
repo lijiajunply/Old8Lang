@@ -415,10 +415,10 @@ public class DecoratorCompilerTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert
-        Assert.Throws<RuntimeError>(() => compiledAction());
+        // Assert - 编译期应用装饰器时即校验返回值必须是函数
+        Assert.Throws<InvalidOperationError>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -437,7 +437,7 @@ public class DecoratorCompilerTests(ITestOutputHelper output)
         var ast = interpreter.Build(code);
 
         // Assert
-        Assert.Throws<RuntimeError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
+        Assert.Throws<NameError>(() => Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -460,10 +460,10 @@ public class DecoratorCompilerTests(ITestOutputHelper output)
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert
-        Assert.Throws<RuntimeError>(() => compiledAction());
+        // Assert - 编译期应用装饰器时即校验返回值必须是函数
+        Assert.Throws<InvalidOperationError>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     #endregion
