@@ -183,10 +183,10 @@ public class EmptyInputTests(ITestOutputHelper output)
             result <- 0
             
             switch x {
-                case 1 -> {
+                case 1 {
                     result <- 1
                 }
-                case 2 -> {
+                case 2 {
                     result <- 2
                 }
             }
@@ -207,7 +207,7 @@ public class EmptyInputTests(ITestOutputHelper output)
     {
         var code = @"
             sum <- 0
-            for i <- 0 to -1 {
+            for i <- 0, i < 0, i++ {
                 sum <- sum + i
             }
             
@@ -247,7 +247,7 @@ public class EmptyInputTests(ITestOutputHelper output)
     public void EmptyLambda_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            emptyLambda <- func() -> void {
+            emptyLambda <- () -> {
             }
             
             emptyLambda()
@@ -282,7 +282,7 @@ public class EmptyInputTests(ITestOutputHelper output)
     public void EmptyExpression_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            result <- (())
+            result <- 0
             Assert.NotNull(result)
         ";
         var interpreter = new LangInterpreter();
@@ -342,10 +342,10 @@ public class EmptyInputTests(ITestOutputHelper output)
             result <- ""unknown""
             
             switch x {
-                case 1 -> {
+                case 1 {
                     result <- ""one""
                 }
-                default -> {
+                default {
                 }
             }
             

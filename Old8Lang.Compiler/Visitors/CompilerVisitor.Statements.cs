@@ -840,26 +840,10 @@ public partial class CompilerVisitor
                             // 加载右值
                             node.Value.Accept(this);
 
-                            // 检查值类型是否与字段类型匹配
-                            var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
-                            if (valueType is not null && fieldInfo.FieldType != valueType)
-                            {
-                                // 如果值类型与字段类型不匹配，进行类型转换
-                                if (fieldInfo.FieldType == typeof(object) && valueType.IsValueType)
-                                {
-                                    // 值类型到object，需要装箱
-                                    ilGenerator.Emit(OpCodes.Box, valueType);
-                                }
-                                else if (fieldInfo.FieldType.IsValueType && valueType == typeof(object))
-                                {
-                                    // object到值类型，需要拆箱
-                                    ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
-                                }
-                                else if (SetStatementRuntimeExtensions.IsNumericType(fieldInfo.FieldType) && SetStatementRuntimeExtensions.IsNumericType(valueType))
-                                {
-                                    SetStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, fieldInfo.FieldType);
-                                }
-                            }
+                            // 值类型与字段类型不匹配时按字段类型转换（含语言值解包）
+                            EmitFieldValueConversion(
+                                fieldInfo.FieldType,
+                                node.Value.Accept(new TypeInferenceVisitor(local)));
 
                             ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
                         }
@@ -1237,6 +1221,15 @@ public partial class CompilerVisitor
 
         if (targetType.IsValueType && valueType == typeof(object))
         {
+            ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+            return;
+        }
+
+        if (targetType.IsValueType && typeof(LangValueType).IsAssignableFrom(valueType))
+        {
+            // 语言值（IntLangValue/StringLangValue…）写入原生类型字段：先解包再 unbox。
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.UnwrapDynamic))!);
             ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
             return;
         }

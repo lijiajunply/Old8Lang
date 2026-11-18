@@ -50,6 +50,26 @@ public static class LogicalOpILHelper
         LocalManager local)
     {
         // 实现短路求值：如果左操作数为false，则跳过右操作数
+        // 逻辑运算符要求 bool 操作数（解释器/VM 都拒绝 int 等类型）；
+        // 静态已知非 bool 时发运行期 TypeError，而不是按真值静默计算。
+        foreach (var operand in new[] { left, right })
+        {
+            var operandType = operand.Accept(new TypeInferenceVisitor(local));
+            if (operandType is null || operandType == typeof(object) || operandType == typeof(bool))
+            {
+                continue;
+            }
+
+            ilGenerator.Emit(OpCodes.Ldstr,
+                Old8Lang.InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
+            ilGenerator.Emit(OpCodes.Pop);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            return typeof(bool);
+        }
+
         var endLabel = ilGenerator.DefineLabel();
         var falseLabel = ilGenerator.DefineLabel();
 
@@ -100,6 +120,26 @@ public static class LogicalOpILHelper
         LocalManager local)
     {
         // 实现短路求值：如果左操作数为true，则跳过右操作数
+        // 逻辑运算符要求 bool 操作数（解释器/VM 都拒绝 int 等类型）；
+        // 静态已知非 bool 时发运行期 TypeError，而不是按真值静默计算。
+        foreach (var operand in new[] { left, right })
+        {
+            var operandType = operand.Accept(new TypeInferenceVisitor(local));
+            if (operandType is null || operandType == typeof(object) || operandType == typeof(bool))
+            {
+                continue;
+            }
+
+            ilGenerator.Emit(OpCodes.Ldstr,
+                Old8Lang.InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
+            ilGenerator.Emit(OpCodes.Pop);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            return typeof(bool);
+        }
+
         var endLabel = ilGenerator.DefineLabel();
         var trueLabel = ilGenerator.DefineLabel();
 

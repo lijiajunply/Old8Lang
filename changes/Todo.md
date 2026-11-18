@@ -41,6 +41,16 @@
   需要让调用点对被装饰函数的返回类型也按 object 推断，属较大的类型系统改动。
 - [x] **动态结果循环回写**：`CoerceDynamic` 转换后写回原槽位，`reduce3` 中间值与
   解释器一致，`HigherOrderTests.ReduceFunction` 通过。object 算术和整数溢出仍是独立缺口。
+- [x] **EdgeCases 组边界用例**：20 项失败中大多数是旧语法（`for ... to`、`case ->`、
+  空 lambda、`()`、`2.0.Pow`）或与当前语义不符的期望（null.ToStr 返回 "null"、
+  越界切片返回空、`[10~5]` 合法降序、`[]` 是数组没有 Add）。真实 IL 修复两处：
+  语言值写入原生字段先解包（否则读回垃圾整数）、`&&`/`||` 的非 bool 操作数运行期
+  报 TYPE_ERROR。`Compiler.EdgeCases` 20 → 0。
+
+- [ ] **模式差异记录（EdgeCases 相关）**：私有成员访问/未声明变量/未知方法在 IL 是
+  编译期错误、解释器是运行期错误、VM 对私有字段甚至静默放行；`.Match` 不是字符串
+  API（正则是 `Regex.RegexIsMatch` 等）。用例已按 IL 语义迁移，跨模式口径待统一。
+
 - [x] **Sort 对字符串列表的跨模式差异**：根因是 `StringLangValue.Less/Greater` 按
   **长度**比较，长度相同的字符串无法排序（解释器 QuickSort/IL SortHelper 都因此保持原序）。
   现在改为 `CompareOrdinal` 字典序，VM 的小于/大于也补上字符串分支；三模式

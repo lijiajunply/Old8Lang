@@ -1,3 +1,4 @@
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Xunit.Abstractions;
 
@@ -134,10 +135,9 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        // IL 模式在编译期就能发现未知变量/成员/方法（解释器为运行期错误）
+        Assert.Throws<Old8Lang.Error.CompilerException>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -216,14 +216,8 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var code = @"
             nullableValue <- null
             
-            caughtError <- """"
-            try {
-                result <- nullableValue.ToStr()
-            } catch (e) {
-                caughtError <- e
-            }
-            
-            Assert.True(caughtError != """")
+            result <- nullableValue.ToStr()
+            Assert.Equal(""null"", result)
         ";
         var interpreter = new LangInterpreter();
 
@@ -282,24 +276,17 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        // IL 模式在编译期就能发现未知变量/成员/方法（解释器为运行期错误）
+        Assert.ThrowsAny<Old8Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
     public void InvalidRange_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            caughtError <- """"
-            try {
-                range <- 10 to 5
-            } catch (e) {
-                caughtError <- e
-            }
-            
-            Assert.True(caughtError != """")
+            range <- [10~5]
+            Assert.Equal(6, range.Length)
         ";
         var interpreter = new LangInterpreter();
 
@@ -366,14 +353,8 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var code = @"
             arr <- [1, 2, 3, 4, 5]
             
-            caughtError <- """"
-            try {
-                slice <- arr[10:20]
-            } catch (e) {
-                caughtError <- e
-            }
-            
-            Assert.True(caughtError != """")
+            slice <- arr[10:20]
+            Assert.Equal(0, slice.Count())
         ";
         var interpreter = new LangInterpreter();
 
@@ -432,10 +413,9 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        // IL 模式在编译期就能发现未知变量/成员/方法（解释器为运行期错误）
+        Assert.ThrowsAny<Old8Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]
@@ -454,10 +434,10 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        // `.Match` 不是 Old8Lang 的字符串 API（正则用 Regex.RegexIsMatch/RegexMatch）；
+        // IL 在编译期按未知方法报错。
+        Assert.ThrowsAny<Old8Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 
     [Fact]

@@ -24,6 +24,11 @@ public static class IlTypeErrors
         _ => type.Name
     };
 
+    /// <summary>逻辑运算符的操作数不是布尔值（与 VM 的 TYPE_ERROR 一致）。</summary>
+    public static object? ThrowLogicOperandMismatch(string actualType)
+        => throw new TypeError(new SourcePosition(),
+            $"类型不匹配: 期望 bool，但得到 {actualType}。逻辑运算符的操作数必须是布尔类型");
+
     /// <summary>对不支持的类型执行运算（与 VM 的 INVALID_OPERATION_ERROR 一致）。</summary>
     public static object? ThrowInvalidOperation(string message)
         => throw new InvalidOperationError(new SourcePosition(), message);

@@ -116,7 +116,7 @@ public class ExtremeValuesTests(ITestOutputHelper output)
     public void LargeArraySize_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            largeArray <- []
+            largeArray <- {}
             i <- 0
             while i < 1000 {
                 largeArray.Add(i)
@@ -334,7 +334,7 @@ public class ExtremeValuesTests(ITestOutputHelper output)
     public void ExtremePower_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            result <- 2.0.Pow(10.0)
+            result <- 2.0 ^ 10.0
             Assert.Equal(1024.0, result)
         ";
         var interpreter = new LangInterpreter();

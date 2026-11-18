@@ -1,3 +1,4 @@
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Xunit.Abstractions;
 
@@ -114,8 +115,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     [Fact]
@@ -322,8 +322,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        Assert.ThrowsAny<Old8Exception>(() => compiledAction());
     }
 
     [Fact]
@@ -351,7 +350,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
     {
         var code = @"
             x <- 10
-            result <- if x > 5 { ""greater"" } else { ""less"" }
+            result <- if x > 5 then ""greater"" else ""less""
             
             Assert.Equal(""greater"", result)
         ";
@@ -369,7 +368,7 @@ public class TypeErrorsTests(ITestOutputHelper output)
     {
         var code = @"
             sum <- 0
-            for i <- 0 to 5 {
+            for i <- 0, i <= 5, i++ {
                 sum <- sum + i
             }
             
@@ -410,13 +409,13 @@ public class TypeErrorsTests(ITestOutputHelper output)
             result <- 0
             
             switch x {
-                case 1 -> {
+                case 1 {
                     result <- 10
                 }
-                case 2 -> {
+                case 2 {
                     result <- 20
                 }
-                default -> {
+                default {
                     result <- 0
                 }
             }
