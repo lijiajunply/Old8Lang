@@ -41,11 +41,11 @@
   需要让调用点对被装饰函数的返回类型也按 object 推断，属较大的类型系统改动。
 - [x] **动态结果循环回写**：`CoerceDynamic` 转换后写回原槽位，`reduce3` 中间值与
   解释器一致，`HigherOrderTests.ReduceFunction` 通过。object 算术和整数溢出仍是独立缺口。
-- [ ] **Sort 对字符串列表的跨模式差异**：`strings.Sort()` 解释器得到
-  `["c","z","a","x","b","y"]`（未按字典序），IL 保持原顺序，VM 正确排序。
-  IL 的 `LangListSortMethod.SortHelper` 对 StringLangValue 的 Less 比较/桥接路径需排查；
-  当前 `Assert.Equal` 对「同为 List」的两侧仍按 ToString 比较，所以该用例仍是假通过。
-  另：本轮把数组 vs 列表的断言改成元素级比较（`Assert.Equal([1,2], {1,2})` 与解释器一致）。
+- [x] **Sort 对字符串列表的跨模式差异**：根因是 `StringLangValue.Less/Greater` 按
+  **长度**比较，长度相同的字符串无法排序（解释器 QuickSort/IL SortHelper 都因此保持原序）。
+  现在改为 `CompareOrdinal` 字典序，VM 的小于/大于也补上字符串分支；三模式
+  `{"z","a","x","b","y","c"}.Sort()` 均得到 `["a","b","c","x","y","z"]`。
+  见 change（`2026-11-18-字符串序/test.md`）。
 
 - [x] **高阶函数链用例使用关键字作为变量名**：`func <- functions[i]` 改名为 `fn`，
   `ChainFunction` 通过。

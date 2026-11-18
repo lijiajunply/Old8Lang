@@ -445,7 +445,7 @@
     顺带修复：`PrintLine(线程)` 不再栈溢出（`VMThreadLangValue` 补了 `ToString/ToDisplayString`）。
 12. **数组排序自 2026-10-10 起可用**：`Array.QuickSort`/`HeapSort`/`SelectionSort`/`InsertionSort`/
     `MergeSort`/`BubbleSort` 以及通用 `Sort()` / `IsSorted()` 在 `object?[]` 上已实现
-    （字符串按长度排序，与解释器 `StringLangValue.Less` 语义一致）。
+    （字符串按字典序排序，与解释器 `StringLangValue.Less` 的 `CompareOrdinal` 语义一致）。
 13. **Task 实例方法自 2026-10-10 起可用**：`Then` / `Catch` / `Finally` / `ContinueWith` 在
     `TaskLangValue` 上已实现；continuation 会切到 worker 虚拟机执行（`VMContext.CurrentVM` 是
     `[ThreadStatic]`，不能在线程池线程上复用当前 VM 的求值栈）。

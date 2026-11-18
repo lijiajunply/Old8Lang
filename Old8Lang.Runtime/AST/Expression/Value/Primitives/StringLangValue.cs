@@ -64,10 +64,12 @@ public partial class StringLangValue(string context = "", SourcePosition positio
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
     }
 
+    // 字符串按字典序（ordinal）比较：解释器的 Sort 与 IL/VM 保持一致。
+    // 旧实现按长度比较，长度相同的字符串无法排序（list<{z,a,x}> 保持原序）。
     public override bool Less(LangValueType? otherValue)
     {
         if (otherValue is StringLangValue b)
-            return Value.Length < b.Value.Length;
+            return string.CompareOrdinal(Value, b.Value) < 0;
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
     }
@@ -75,7 +77,7 @@ public partial class StringLangValue(string context = "", SourcePosition positio
     public override bool LessEqual(LangValueType? otherValue)
     {
         if (otherValue is StringLangValue b)
-            return Value.Length <= b.Value.Length;
+            return string.CompareOrdinal(Value, b.Value) <= 0;
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
     }
@@ -83,7 +85,7 @@ public partial class StringLangValue(string context = "", SourcePosition positio
     public override bool Greater(LangValueType? otherValue)
     {
         if (otherValue is StringLangValue b)
-            return Value.Length > b.Value.Length;
+            return string.CompareOrdinal(Value, b.Value) > 0;
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
     }
@@ -91,7 +93,7 @@ public partial class StringLangValue(string context = "", SourcePosition positio
     public override bool GreaterEqual(LangValueType? otherValue)
     {
         if (otherValue is StringLangValue b)
-            return Value.Length >= b.Value.Length;
+            return string.CompareOrdinal(Value, b.Value) >= 0;
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
     }
