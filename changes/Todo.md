@@ -47,6 +47,10 @@
   语言值写入原生字段先解包（否则读回垃圾整数）、`&&`/`||` 的非 bool 操作数运行期
   报 TYPE_ERROR。`Compiler.EdgeCases` 20 → 0。
 
+- [ ] **解释器模块导入用例偶发失败**：`Interpreter.Modules.AdvancedImport.ConditionalImportTests`
+  的复杂条件导入用例单独复跑仍失败（2 例），与 IL 无关（本轮只改编译器与测试），
+  疑似测试环境/临时目录或顺序依赖，需单独排查。
+
 - [ ] **模式差异记录（EdgeCases 相关）**：私有成员访问/未声明变量/未知方法在 IL 是
   编译期错误、解释器是运行期错误、VM 对私有字段甚至静默放行；`.Match` 不是字符串
   API（正则是 `Regex.RegexIsMatch` 等）。用例已按 IL 语义迁移，跨模式口径待统一。
