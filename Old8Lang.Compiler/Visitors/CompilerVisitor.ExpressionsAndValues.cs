@@ -705,7 +705,8 @@ public partial class CompilerVisitor
                              parameterType.IsAssignableFrom(argumentType) ||
                              (parameterType == typeof(double) &&
                               (argumentType == typeof(int) || argumentType == typeof(char))) ||
-                             (parameterType == typeof(int) && argumentType == typeof(char)) ||
+                             (parameterType == typeof(int) &&
+                              (argumentType == typeof(char) || argumentType == typeof(double))) ||
                              // 枚举成员在 IL 里是底层 int32
                              (parameterType.IsEnum && argumentType == typeof(int)) ||
                              (parameterType == typeof(int) && argumentType.IsEnum) ||

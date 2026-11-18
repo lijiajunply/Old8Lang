@@ -372,8 +372,8 @@ public class HigherOrderTests(ITestOutputHelper output)
                     result <- x
                     i <- 0
                     while i < functions.Count() {
-                        func <- functions[i]
-                        result <- func(result)
+                        fn <- functions[i]
+                        result <- fn(result)
                         i <- i + 1
                     }
                     return result

@@ -1,3 +1,4 @@
+using Old8Lang.InstanceMethods.Core;
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
@@ -92,6 +93,15 @@ public partial class CompilerVisitor
                 {
                     ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
                 }
+                else if (fieldInfo.FieldType.IsValueType &&
+                         typeof(LangValueType).IsAssignableFrom(fieldValueType))
+                {
+                    // 语言值（如 "42".ToInt() 的 IntLangValue）写入原生类型字段：
+                    // 先解包再 unbox，否则会把对象指针写进 int 字段。
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.UnwrapDynamic))!);
+                    ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
+                }
             }
 
             ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
@@ -158,6 +168,31 @@ public partial class CompilerVisitor
 
                     ilGenerator.Emit(OpCodes.Stloc, localVar);
                     local.LocalVarTypes[idName] = typeof(object);
+                    return;
+                }
+
+                // 动态结果（object）写回具体类型槽：运行期收敛到槽位类型。
+                // 不能在中途替换 LocalBuilder——循环开头已生成的 ldloc 仍指向旧槽，
+                // 会出现 `r <- fn(r, item)` 每次迭代都读到初值的问题。
+                if (valueType == typeof(object) && localVar.LocalType != typeof(object))
+                {
+                    expression.Accept(this);
+                    ilGenerator.Emit(OpCodes.Ldtoken, localVar.LocalType);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.CoerceDynamic))!);
+                    if (localVar.LocalType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, localVar.LocalType);
+                    }
+                    else
+                    {
+                        ilGenerator.Emit(OpCodes.Castclass, localVar.LocalType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stloc, localVar);
+                    local.LocalVarTypes[idName] = localVar.LocalType;
                     return;
                 }
 

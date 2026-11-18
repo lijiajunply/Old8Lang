@@ -238,7 +238,8 @@ public class ErrorHandlingTests
     public void InvalidOperationOnType_ThrowsRuntimeException_WhenExecuted()
     {
         // Arrange
-        var code = "a <- \"hello\" * 2";
+        // 字符串 * 整数是合法的重复语义（解释器支持），这里用 string * bool 触发非法运算
+        var code = "a <- \"hello\" * true";
         var interpreter = new LangInterpreter();
 
         // Act

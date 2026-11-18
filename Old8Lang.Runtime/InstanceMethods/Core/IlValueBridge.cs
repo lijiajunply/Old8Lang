@@ -305,6 +305,51 @@ public static class IlValueBridge
         }
     }
 
+    /// <summary>字符串重复（`"ab" * 3` 的解释器语义）。</summary>
+    public static string RepeatString(string value, int count)
+    {
+        if (count <= 0 || value.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        return string.Concat(Enumerable.Repeat(value, count));
+    }
+
+    /// <summary>
+    /// 把动态类型的结果收敛到已有具体类型的槽位（循环内变量重赋值用）。
+    /// </summary>
+    /// <remarks>
+    /// 未注解变量先按推断类型声明槽位；之后若被动态调用结果（object）重赋值，
+    /// IL 不能在循环中途替换 LocalBuilder（循环开头已生成的 ldloc 仍指向旧槽）。
+    /// 这里把运行期值转换成槽位类型再写回旧槽，保证循环内读到的始终是最新值。
+    /// </remarks>
+    public static object? CoerceDynamic(object? value, Type targetType)
+    {
+        if (value is LangValueType langValue)
+        {
+            value = Unwrap(langValue);
+        }
+
+        if (value is null)
+        {
+            return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
+        }
+
+        if (targetType.IsInstanceOfType(value))
+        {
+            return value;
+        }
+
+        if (targetType == typeof(int)) return Convert.ToInt32(value);
+        if (targetType == typeof(double)) return Convert.ToDouble(value);
+        if (targetType == typeof(bool)) return Convert.ToBoolean(value);
+        if (targetType == typeof(char)) return Convert.ToChar(value);
+        if (targetType == typeof(string)) return value.ToString();
+
+        return Convert.ChangeType(value, targetType);
+    }
+
     /// <summary>
     /// 调用静态类型未知（例如 <c>object</c> 槽位）的函数值。
     /// </summary>

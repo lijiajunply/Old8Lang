@@ -1,14 +1,56 @@
 # Old8Lang 统一待办清单
 
-核对日期：2026-11-11。此文档合并原根目录、解释器测试、IL 测试和语言服务器待办；现存的历史测试报告已归档到 `archive/Reports/`；更早的报告已不在仓库中，下文只保留其文件名以便追溯（需要时从 git 历史取回）。
+核对日期：2026-11-18（结合 2026-11-15 修复记录与当前工作区定向复测）。此文档合并原根目录、解释器测试、IL 测试和语言服务器待办；现存的历史测试报告已归档到 `archive/Reports/`；更早的报告已不在仓库中，下文只保留其文件名以便追溯（需要时从 git 历史取回）。
 
-**状态约定**：下列历史缺陷除非注明本次验证，否则均为「待复核」，不是本次已复现；测试文件存在也不能证明对应场景覆盖完整。复现、修复后请更新本清单并按测试指南生成报告。
+**状态约定**：`[x]` 表示对应范围已有修复或通过记录，`[ ]` 表示仍需处理或待复核。历史数字只表示当时基线；未注明本次复测的条目不代表当前仍能复现，测试文件存在也不能证明场景覆盖完整。工作区未提交改动的通过结果不等于已提交版本通过。
 
 ## 优先顺序
 
 1. 排查会使测试进程崩溃的 IL 问题，再核实其他 IL 结果错误和跨模式差异。
 2. 修复测试隔离与不稳定问题，补齐关键场景覆盖。
 3. 完善 LSP 作用域、诊断及调试集成；按收益推进 VM 性能和长期能力。
+
+## 当前核对摘要（2026-11-18）
+
+本次只更新清单，没有修改实现。测试针对当前工作区（含原有未提交的
+`CompilerVisitor.SetValueToIl.cs`、`CompilerVisitor.Statements2.cs`、`IlValueBridge.cs` 改动），
+使用默认档；没有重跑全量测试、性能档或全部三模式语料。
+
+| 本次筛选范围 | 通过 | 失败 | 跳过 |
+|---|---:|---:|---:|
+| `Compiler.Collections` | 183 | 0 | 3 |
+| `Compiler.Types` | 106 | 0 | 0 |
+| `Compiler.Classes` | 117 | 0 | 0 |
+| `Compiler.Async` | 103 | 26 | 3 |
+| `Compiler.Functions` | 147 | 19 | 12 |
+| `Compiler.Basic.ErrorHandlingTests` | 28 | 0 | 2 |
+| `Compiler.Expressions.TernaryTests` | 15 | 0 | 0 |
+| `Error.ExceptionCreationTests` | 14 | 1 | 0 |
+
+前五组同次运行：719 项，656 通过、45 失败、18 跳过。另一次定向运行包含
+`Compiler.Collections.ArrayTests`（12 通过）和 `Compiler.Functions.HigherOrderTests`
+（10 通过、1 失败），与上表有重叠，不能相加当作唯一测试总数。
+命令均为 `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --no-restore --filter '<对应完整命名空间或类名，以 | 连接>'`；
+前五组复用首次构建，另加 `--no-build`。本次未出现测试主机崩溃。
+
+当前优先处理：
+
+- [ ] **装饰器可以改变返回类型（IL 不支持）**：转发委托按原注解返回；若装饰器把 int
+  改成 string，调用点仍按 int 处理而 cast 失败。试过让转发委托统一返回 object，
+  但调用点静态推断仍是 int，会把装箱对象写进 int 槽（得到垃圾整数），已回退。
+  需要让调用点对被装饰函数的返回类型也按 object 推断，属较大的类型系统改动。
+- [x] **动态结果循环回写**：`CoerceDynamic` 转换后写回原槽位，`reduce3` 中间值与
+  解释器一致，`HigherOrderTests.ReduceFunction` 通过。object 算术和整数溢出仍是独立缺口。
+- [ ] **Sort 对字符串列表的跨模式差异**：`strings.Sort()` 解释器得到
+  `["c","z","a","x","b","y"]`（未按字典序），IL 保持原顺序，VM 正确排序。
+  IL 的 `LangListSortMethod.SortHelper` 对 StringLangValue 的 Less 比较/桥接路径需排查；
+  当前 `Assert.Equal` 对「同为 List」的两侧仍按 ToString 比较，所以该用例仍是假通过。
+  另：本轮把数组 vs 列表的断言改成元素级比较（`Assert.Equal([1,2], {1,2})` 与解释器一致）。
+
+- [x] **高阶函数链用例使用关键字作为变量名**：`func <- functions[i]` 改名为 `fn`，
+  `ChainFunction` 通过。
+- [ ] 继续拆分异步 26 项失败；函数剩余 13 项（装饰器 10、命名实参 3）与边界值 20 项。
+  既有测试基线已过期的条目以下方复核说明为准。
 
 ## IL 模式与跨模式缺陷
 
@@ -41,7 +83,7 @@
 
 - [ ] **IL 模式 lambda 的闭包函数值支持。**
   - 2026-11-11：直接赋值的 lambda 现可读取及写回创建点可见的普通局部变量；闭包环境在运行时绑定，每个 lambda 实例独立。`LambdaTests` 24 项通过，见 测试报告（`2026-11-11-19-00-IL-lambda-闭包局部变量.md`）。
-  - 具名函数返回 `function` 的简单闭包链路现已可用，多个返回闭包实例彼此隔离；见 测试报告（`2026-11-11-20-27-IL-返回闭包函数值.md`）。2026-11-11 进一步确认：字典索引后的嵌套集合 `Length` 可在 `Filter` lambda 内使用；lambda 内继续创建并传给 `Reduce` 的嵌套 lambda 已避免捕获未初始化局部变量，嵌套数组以动态类型调用 `Reduce` 也可桥接执行。见 隔离报告（`2026-11-11-23-40-IL嵌套Lambda隔离.md`） 与 嵌套集合回归（`2026-11-12-00-10-IL嵌套集合Reduce.md`）。2026-11-13：集合索引得到的 `object` 函数值现可在运行期作为 .NET 委托调用；循环内保存的 lambda 分别捕获各轮局部快照，带参数调用得到 `10/11/12`；捕获 `this` 的 lambda 可读写其类实例私有字段。嵌套返回闭包、跨具名函数的顶层捕获和函数类型参数仍待处理，见 集合函数值测试（`2026-11-13-10-10-IL集合函数值调用.md`） 与 this 捕获测试（`2026-11-13-10-20-IL闭包捕获this.md`）。
+  - 具名函数返回 `function` 的简单闭包链路现已可用，多个返回闭包实例彼此隔离；见 测试报告（`2026-11-11-20-27-IL-返回闭包函数值.md`）。2026-11-11 进一步确认：字典索引后的嵌套集合 `Length` 可在 `Filter` lambda 内使用；lambda 内继续创建并传给 `Reduce` 的嵌套 lambda 已避免捕获未初始化局部变量，嵌套数组以动态类型调用 `Reduce` 也可桥接执行。见 隔离报告（`2026-11-11-23-40-IL嵌套Lambda隔离.md`） 与 嵌套集合回归（`2026-11-12-00-10-IL嵌套集合Reduce.md`）。2026-11-13：集合索引得到的 `object` 函数值现可在运行期作为 .NET 委托调用；循环内保存的 lambda 分别捕获各轮局部快照，带参数调用得到 `10/11/12`；捕获 `this` 的 lambda 可读写其类实例私有字段。2026-11-15 已补函数形参捕获与 object 函数值调用，`ClosureReturningClosure` 通过；嵌套返回闭包不再整体列为未实现。跨具名函数的顶层捕获和函数类型参数仍需按场景复核，见 集合函数值测试（`2026-11-13-10-10-IL集合函数值调用.md`） 与 this 捕获测试（`2026-11-13-10-20-IL闭包捕获this.md`）。
 
 - [x] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
@@ -136,7 +178,7 @@
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 测试报告（`2026-11-11-08-49-IL-select回归测试.md`）。
 
-- [ ] **解释器并发任务克隆作用域时可能抖动**：`TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 在默认档一次失败，`VariateManager.CloneInternal` 枚举字典时报告 `Collection was modified`；单独复跑通过。历史记录亦有并行抖动，需复核同步与测试分档。见 `Reports/2026-11-14-12-23-字典字面量迁移测试.md`。
+- [ ] **解释器并发任务克隆作用域时可能抖动**：`TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 在默认档一次失败，`VariateManager.CloneInternal` 枚举字典时报告 `Collection was modified`；单独复跑通过。历史记录亦有并行抖动，需复核同步与测试分档。见 `archive/Reports/2026-11-14-12-23-字典字面量迁移测试.md`。
 
 - [x] **IL 模式顶层 C 风格 for 循环变量仍是全局变量**：解释器与虚拟机已把循环变量收进循环作用域
   （每轮闭包捕获 `012`、循环结束后变量不可见），IL 仍把它声明为全局变量，因此：
@@ -160,7 +202,7 @@
   涉及 `ListLangValue.Get` / `ArrayLangValue.Get` / `StringLangValue.Get` / `TupleLangValue.Get`。
   已修正读取及列表、元组赋值的越界信息，并增加回归测试。
 
-- [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
+- [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang.Syntax/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
 - [ ] **VM 原生函数命名参数**：评估如何获取原生函数参数信息（`VirtualMachine.Instructions.ControlFlow.cs` 中的 TODO）。
 
 - [ ] **其余实例方法的 IL 操作数包装审计**：`Dictionary` / `List` / `Array` / `Char` 等
@@ -170,24 +212,18 @@
 
 ## 测试与工程问题
 
-- [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 Core 诊断与预处理报告（`2026-11-13-16-35-Core诊断与预处理拆分测试.md`）。
+- [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 Core 诊断与预处理报告（`2026-11-13-16-35-Core诊断与预处理拆分测试.md`）。2026-11-18 定向复测仍因异常文本不含 `10` 失败。
 
-- [ ] **IL 数组回归失败**：2026-11-13 执行入口迁移定向测试中，`ArrayConcatenation_CompilesAndExecutesCorrectly` 因 `Len` 推断为 `Int32` 失败，`NestedArrays_CompilesAndExecutesCorrectly` 生成无效 IL。旧块入口与新入口均调用同一 `CompilerVisitor`；需独立基线复现。见 执行入口测试报告（`2026-11-13-22-17-执行入口迁移测试.md`）。
+- [x] **IL 数组回归失败已关闭**：`Len` 残留栈值与集合 `+` 拼接已分别修复，见
+  [动态长度报告](2026-11-14-IL-Len动态长度/test.md) 与
+  [集合拼接报告](2026-11-15-集合拼接统一/test.md)。2026-11-18 当前工作区
+  `Compiler.Collections.ArrayTests` 12 项通过，含原 `ArrayConcatenation` / `NestedArrays`。
 
-- [ ] **`Compiler/Collections` 与表达式组既有 IL 失败（2026-11-14 基线核对）**：以 `HEAD` 工作树对比，
-  `Compiler/Collections` 9 项、`Compiler.Expressions|Linq|Modules` 41 项、`Functions.HigherOrderTests` 8 项
-  在集合桥接改动前后失败集合完全一致。~~`Compiler.Classes` 组会使测试主机因生成无效 IL 崩溃~~
-  ——该崩溃已于 2026-11-14 定位为比较运算装箱顺序错误并修复（见上文“IL 比较运算装箱顺序错误”），
-  现在 `Compiler.Classes`（110 项）与 `Compiler.Expressions`（232 项）均可完整运行。
-  `dict()` 空字典的 `Dictionary_EmptyDictionary_CompilesAndExecutes` 已在
-  2026-11-14 修复（索引读写没有按 `DictionaryLangValue` 语言值处理，写路径残留栈值、
-  读路径用原生键调用语言方法）；`RangeEdgeCases`、`MatchExpression_*`、`SyncIterator_*`、
-  `NestedArrays` 已在 2026-11-14 修复（`Len` 的 object 分支先压栈再 `ldc.i4.0` 返回，
-  栈上残留参数值）；`ArrayConcatenation` 则是「数组/列表 `+` 只有虚拟机支持」的跨模式差异，
-  见下面单独条目。`MatchExpression_*` 与 `MatchTests` 的「结果类型 / 装箱顺序」问题也已在
-  2026-11-14 修复（`MatchTests` 17/17 通过）；剩下的 `MatchExpressionEnhancedTests`
-  属模式种类未实现的功能缺口，见下面单独条目。见 change（`2026-11-14-IL语言字典索引/test.md`）、
-  change（`2026-11-14-IL-Len动态长度/test.md`）与 change（`2026-11-14-IL-match结果/test.md`）。
+- [ ] **旧 IL 失败基线的后续复核**：2026-11-14 的 Collections 9 项、
+  Expressions/Linq/Modules 41 项、HigherOrder 8 项失败已被多轮修复取代，不能作为当前失败数。
+  2026-11-18 当前工作区 Collections 为 183 通过、3 跳过，Classes 为 117 全通过；
+  HigherOrder 仅剩 `ChainFunction` 的关键字变量名解析失败。Expressions/Linq/Modules
+  本次未整组重跑，仍需按当前版本重建基线。
 
 - [x] **IL 可空返回类型 `int?` 返回 `null` 触发 `NullReferenceException`**：2026-11-14 修掉比较装箱崩溃后
   暴露。可空类型注解在 IL 里被解析成基础值类型（`int?` → `int`），`return null` 的返回路径
@@ -268,12 +304,11 @@
   `IlReturnTypeHelper.Resolve` 对含 `|` / `&` 的注解固定返回 `object`。
   `Compiler.Types` 17→15 失败。见 change（`2026-11-15-IL联合类型返回/test.md`）。
 
-- [ ] **集合注解的元素类型不匹配仍未在编译期报错**：
-  `items: list<int> <- {1, "hello", 3}` 在 `-f` 与 `-il` 下都能通过（返回第一个元素），
-  只有 `-vm` 报 `list<int>` 类型不匹配；`GenericCollectionTypesCompilerTests` 有 6 项
-  `*TypeMismatch_ThrowsCompilerException` 依赖这个编译期校验。
-  需要先定「集合注解是否严格校验元素类型」，再统一三模式与用例。
-  见 change（`2026-11-15-集合类型注解校验/test.md` §5）。
+- [ ] **集合注解元素校验仍有跨模式差异**：IL 的字面量元素检查已修复，
+  `Compiler.Types` 2026-11-18 当前工作区 106 项全通过；不再把 IL 不报错列作待办。
+  解释器仍接受 `list<int> <- {1, "hello"}`，嵌套混合列表的 VM 校验也不完整，
+  需统一三模式对显式集合注解的约束。见
+  [集合注解类型检查报告 §4–§6](2026-11-15-集合注解类型检查/test.md#4-验证)。
 
 - [x] **IL 模式反射 API 不可用**：`CreateInstance` / `InvokeMethod` 的 IL 发射用
   `ldsfld LocalManager.Interpreter`（该成员是实例属性，没有同名字段），编译期直接抛
@@ -290,7 +325,7 @@
   发射端按索引发 `ldarg` / 读外层闭包环境；解析器对 lambda 参数注解的白名单也补了
   `array`/`dictionary`/`object`/`function`。`Compiler.Functions` 56→54 失败，
   `BasicClosure`、`ClosureWithHigherOrderFunction` 通过。
-  见 change（`2026-11-15-IL闭包捕获形参/test.md`）。遗留：嵌套闭包返回函数值仍为 null。
+  见 change（`2026-11-15-IL闭包捕获形参/test.md`）。该阶段发现的嵌套闭包返回 null 已由下条函数值调用修复，不再作为遗留。
 
 - [x] **IL 模式调用 object 静态类型的函数值静默返回 null**：`m2 <- f2(); m2(5)`
   （`f2` 返回一个 lambda）在 `VisitInstance` 里既不是委托类型的局部变量、也不在
@@ -340,11 +375,11 @@
   受影响用例：`AsyncFunctionWithFinally_...`、`AsyncGeneratorWithResourceCleanup_...`
   （两者此前也失败，只是错误不同）。
 
-- [ ] **IL 异步剩余失败**：修完上述无效 IL 与 finally 语义后，`Compiler.Async` 仍有 54 项失败
-  （按首条错误分类）：24 项经 `Assert.Null` 暴露的 `RUNTIME_ERROR`（内部含 NRE、全局变量提升、
-  API 缺口等）、10 项 `CompilerException`、9 项 `Variable '...' not found in async state machine
-  fields`（`Spawn`/全局变量提升与异步状态机的组合）、4 项用例自身旧语法、3 项未实现的
-  `Task` 静态 API、2 项暂不支持的 await 位置、2 项其它。属异步结果错误，不是无效 IL。
+- [ ] **IL 异步剩余失败**：2026-11-18 当前工作区 `Compiler.Async` 为
+  103 通过、26 失败、3 跳过，取代早期 54 失败的阶段数字。
+  失败集中于 async/await 状态与结果、生成器/流清理、Task API 和取消/并发场景；
+  `Task.Completed` / `WaitAll` / `WaitAny` 与暂不支持的 await 位置仍需单独处理。
+  `SpawnTests` 已通过，不再归入旧 spawn 语法或带参互操作缺口。
 
 - [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
   （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
@@ -587,16 +622,12 @@
   运行期在求值 guard 前恢复成一个子作用域。`Compiler.Expressions` 11→9 失败。
   见 change（`2026-11-15-IL-match作用域/test.md`）。
 
-- [ ] **`TernaryTests` 两条失败是用例自身问题（已核实，不需改实现）**：
-  `TernaryWithFunctionCalls` 把返回类型写成 `func f(...):int`（正确语法是 `-> int`），
-  三种模式都报语法错误；`ComparisonConditionTernary` 的期望值按 `condition` 参数算
-  （`expectedValue = condition ? 1 : 0`），但被断言的是 `value > 0`，`value=0, condition=true`
-  时用例自己就要求 `1` 而实际只能得 `-1`。把 `:int` 改回 `-> int` 后，
-  `c ? f(1,2) : f(3,4)` 在 `-f` 与 `-il` 下都正常。
+- [x] **`TernaryTests` 旧用例问题已关闭**：返回类型语法及比较条件期望已修正，
+  2026-11-18 当前工作区 `Compiler.Expressions.TernaryTests` 15 项全通过。
 
-：`match (1,2,3) { case (x,y,z) -> ... }` 在 `-vm` 下报
-  `Match 表达式没有匹配的分支`，解释器与 IL 正常（2026-11-15 实测）。
-  见 change（`2026-11-15-IL-match高级模式/test.md` §5）。
+- [ ] **VM match 三元组解构仍待复核**：`match (1,2,3) { case (x,y,z) -> ... }`
+  在 2026-11-15 实测中报「Match 表达式没有匹配的分支」，解释器与 IL 正常。
+  见 [match 高级模式报告 §5](2026-11-15-IL-match高级模式/test.md)。
 
 - [x] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
   在 `-f` 报 `INVALID_OPERATION_ERROR`，`-il` 被推断成数值加法，`-vm` 正常。
@@ -628,11 +659,10 @@
   命名实参里传 lambda 给 `IlDelegateFuncLangValue` 时仍报参数缺失（2 项用例）。
   另：纯位置调用缺参数（`test()`）仍在运行期报 ArgumentError。
 
-- [ ] **IL 动态调用结果赋给已有变量后循环内不更新**：`r <- fn(r, item)`（`fn` 是
-  函数值参数）在 while 循环里，表达式静态类型 object 会把 `r` 的局部槽换成新槽，
-  但循环体早期生成的 `ldloc` 仍指向旧槽，表现为 `r` 每次都是初值、最终结果错误。
-  reduce 用例（`HigherOrderTests.ReduceFunction`）因此失败。修法需要预扫描循环内
-  类型会变化的变量并预先用 object 槽（或让循环体共享槽位），不要中途替换 LocalBuilder。
+- [ ] **IL 动态调用结果循环回写（工作区修复待验收）**：原来 `r <- fn(r, item)`
+  会替换局部槽，循环前半段继续读取旧槽。当前未提交改动用 `CoerceDynamic` 转换结果并写回原槽，
+  2026-11-18 `HigherOrderTests.ReduceFunction` 已通过；尚需验证动态类型变化及 null 等边界，
+  不能据此关闭 object 算术或 catch 赋值的独立语义问题。
 
 - [x] **Exceptions 组旧语法 + catch 变量拿到 reflection 消息**：5 项用例用旧的
   裸 `throw`/`case ->`/匿名函数/`:` 继承/match 分支 throw 语法；lambda 内语言的 throw
@@ -664,7 +694,7 @@
 
 - [x] **IL spawn 带参调用不互通**：`Thread.Join` 返回 object、`Assert` 的 object 实参
   动态解包、`InvokeDynamicObjectMethod` 支持语言值接收者后，Collections/Conditional 通过；
-  函数作用域不再把未定型的顶层槽位收窄为具体类型（顶层槽位定型修复）后
+  槽位类型与写入值不兼容时退化为 object（顶层槽位定型修复）后
   `SpawnWithParameters` 通过；`SpawnWithErrorHandling` 改为按错误消息内容断言
   （三模式包装不同：CustomError / LangThrownException / 原始值）。
   `Compiler.Async.SpawnTests` 13 项全通过。见 change
@@ -694,7 +724,8 @@
   现在装饰器函数不直接编译函数体，改为生成转发委托：
   `IlRuntimeFunctions.InvokeByName(函数名, 参数)` 运行期调用解释器里已装饰的函数；
   返回类型/参数类型沿用原注解并按原规则注册。
-  `Compiler.Functions` 45 → 35 失败；剩余装饰器用例是未标注 lambda 参数/旧语法。
+  `Compiler.Functions` 当时 45 → 35 失败；该阶段仍有未标注 lambda 参数/旧语法用例。
+  2026-11-18 当前工作区另有错误整数返回值、闭包变量不可见与异常断言差异，见顶部核对摘要。
   见 change（`2026-11-15-IL装饰器转发/test.md`）。
 
 - [x] **IL 命名实参 / params / 高阶函数参数调用**：这些调用编译期匹配不到签名，
@@ -768,7 +799,9 @@
   `InvalidOperationError「布尔值不支持大小比较」`（`<` / `>` / `<=` / `>=` 四处都拒绝），
   `ChainedComparisons_...` 改为断言该错误。见 change（`2026-11-15-IL链式比较/test.md`）。
 
-- [ ] **`Compiler.Basic.ErrorHandlingTests` 的 IL 异常预期已失配**：2026-11-13 在 Core 基础异常契约迁移的定向回归中，因筛选条件同时匹配该类，70 项中 10 项失败、2 项跳过。失败包括期望 `Old8Exception` 但实际抛出 `CompilerException`、期望运行期异常但未抛出，以及生成无效 IL。此次改动仅调整 `CompilerException` 与 `SourceContextWindow` 的程序集归属，未改异常继承或 IL 生成逻辑；需在独立基线中复现并按当前 IL 语义更新实现或断言。见 Core 基础异常契约报告（`2026-11-13-16-20-Core基础异常契约测试.md`）。
+- [x] **`Compiler.Basic.ErrorHandlingTests` 旧异常预期已关闭**：
+  [类型错误运行期化](2026-11-15-IL类型错误运行期化/test.md) 后，
+  2026-11-18 当前工作区该类 28 通过、2 跳过，未再复现早期 10 项失败。
 
 - [x] **IL 字符串 `Length()` 可能导致进程崩溃**：原生字符串现在使用 CLR 字符串长度，返回原生整数；原崩溃用例及别名、链式调用回归通过，见 测试报告（`2026-11-11-12-37-IL字符串长度测试.md`）。
 - [x] **IL 嵌套异常测试的包含断言**：调整为 `Assert.Contains(text, substring)` 的实际参数顺序，异常与字符串相关回归 13 项通过；见 测试报告（`2026-11-11-13-51-IL异常处理回归测试.md`）。
@@ -810,8 +843,16 @@
     隔离或重跑可恢复；排除该组后解释器 1959 通过、1 跳过。属测试隔离/外部依赖问题，
     未在本轮修改。
   - 2026-11-14 架构迁移阶段 2 基线复跑：测试主机在 IL 编译异常后中止，已报告 565 通过、28 失败、1 跳过。可见失败包括可选参数构造器 `InvalidProgramException`、枚举/异步返回、以及原生 `List<object>` 上 `IsEmpty`/`Find`/`Join`/`FirstOrDefault` 的分派；本轮未改这些路径，详见 阶段 2 基线报告（`2026-11-14-01-10-阶段2固定基线与依赖图.md`）。
-- [ ] **IL SpawnTests 使用过时调用形式及全局状态**：默认档中多项以 `spawn backgroundTask()` 报 `spawn` 未声明；当前 API 使用 `spawn(backgroundTask)` 并需 `Start()`。这些测试在编译前关闭全局 `IlVerificationEnabled`，若编译抛错则不会恢复，也未标记并发用例；需按当前 API 与测试分档重写并确保全局状态恢复。
-- [ ] **IL 泛型类测试残留失败**：泛型特化类型现会生成静态字段、静态方法与静态初始化器，`Counter<T>.field/method` 可按每个特化独立读写；嵌套泛型类对象也可作为集合元素往返桥接。类级 `where` 约束与同一特化类型参数的字段比较均已通过，现有 `GenericClassTests` 11 项中 9 项通过。剩余两项仍使用旧式冒号继承与未支持的 `func(...) ->` 函数类型参数；将其迁移为 `extends`、`function` 与括号 lambda 后，另暴露两个 IL 缺口：特化泛型继承类中调用自身函数值字段会在未完成 `TypeBuilder` 上查询方法，泛型类 `Reduce` 的函数参数在运行时为 `null`。见 迁移排查报告（`2026-11-13-12-40-IL泛型类测试迁移排查.md`）、自引用参数报告（`2026-11-13-12-30-IL泛型类自引用参数.md`）、约束报告（`2026-11-13-12-20-泛型类where约束.md`）、静态成员报告（`2026-11-13-12-00-IL泛型类静态成员.md`）、桥接报告（`2026-11-13-12-10-IL泛型类对象桥接.md`） 与 既有报告（`2026-11-11-10-54-IL泛型递归特化测试.md`）。
+- [ ] **IL SpawnTests 全局状态恢复与分档仍需整理**：旧 spawn 调用与带参互操作已修，
+  2026-11-18 当前工作区 13 项全通过。源码仍在编译前后直接切换全局
+  `IlVerificationEnabled`，缺少 `try/finally` 恢复；使用线程/Sleep 的用例仍未标
+  `Category=Performance`，需按测试指南分档。不要把这些工程问题与已关闭的 API 迁移混为一项。
+
+- [ ] **IL 泛型类的函数值字段调用仍待实现**：旧继承/函数类型注解用例已迁移，
+  2026-11-18 `Compiler.Classes` 117 项全通过；原泛型继承用例已移除函数值字段调用部分，
+  因而通过不能证明此场景已支持。保留上文「IL 泛型特化里函数值字段当方法调用」
+  作为实际缺口，修复后恢复对应覆盖。见 [Mixin 合并报告 §4](2026-11-15-IL-Mixin合并/test.md#4-用例迁移)。
+
 - [ ] **IL 测试覆盖复核**：原清单列出的 54 个具体文件中已有 53 个同名文件；未找到 `StandardLibraryImportTests.cs`。按实际场景核实标准库导入、并发和端到端覆盖，不以文件名作为充分证据。
   2026-11-15 补充：并发全局函数里仍有约 40 处手写 `parameters[i].Accept(...)` + `Call`，
   若形参是 `int` 且实参可能是 `object`/`LangValueType`，同样需要拆箱；本轮只覆盖了
@@ -827,7 +868,7 @@
 
 ## 解释器测试覆盖待复核
 
-以下是原清单提出的场景；本次核实 14 个所列专用文件名均不存在，但可能有其他文件覆盖部分场景，补测前先查现有测试。
+以下保留历史清单提出的场景，2026-11-18 未逐项审计覆盖；原来按 14 个专用文件名判断的缺口不能代替场景核对，补测前先查现有测试。
 
 ### 1. 线程同步与并发原语测试 (Threading/)
 
@@ -1051,7 +1092,7 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 - [ ] 评估类型推断的调用处推断、泛型及联合类型、多分支控制流和类型缩窄；先核实当前实现。[高级主题](../Docs/ADVANCED_TOPICS.md#限制和已知问题)
 - [ ] 评估图形调试界面、增强条件表达式、IL 和远程调试、内存监控。[开发者工具](../Docs/DEVELOPER_TOOLS.md)
 
-## 本次核对中移出的过期条目
+## 历史核对中移出的过期条目（2026-11-11）
 
 - 线程样例缺少 `Start()`：所列五个文件现已包含启动调用。
 - DatabaseLib 跨模式测试同名内存库：解释器使用 `itestdb_`、IL 使用 `testdb_` 前缀。本次相关筛选测试通过。
@@ -1059,13 +1100,12 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 - 原 IL 清单中的已有同名测试文件不再逐一列为“缺失”；其余覆盖仍需按场景审查。
 - 原 VM 性能中的全局槽位、布尔装箱和基准噪声门禁已有完成记录；性能报告与原始复现的现存部分在 `archive/Reports/`。
 
-本次测试结果见 待办核对测试报告（`2026-11-11-08-30-待办核对测试.md`）。
+2026-11-11 测试结果见 待办核对测试报告（`2026-11-11-08-30-待办核对测试.md`）。
 
 ## 2026-11-15 复核更新
 
-`Docs/MODE_SUPPORT.md` 已按 2026-11-15（IL 缺陷修复轮次）的逐条实测刷新：
-矩阵里修正了 `in` 运算符（2026-11-15 起虚拟机 ✅）、数组/列表 `+` 拼接（2026-11-15 起三模式 ✅）、集合 `.Length` 属性
-（解释器 ❌）、match 高级模式（IL ⚠️）、`yield`（IL ❌）、Mixin（IL ❌ / 虚拟机 ⚠️）、
-带默认实现的接口（IL ⚠️）、反射 API（IL ✅）等单元格；IL 已知限制里过时的
-「lambda 不能读写外层局部变量 / 不能在调用结果上链式调用」与旧失败数已更新；
-并新增「三种模式共同的跨模式差异」小节，把 10 条尚未统一的语义集中列出。
+该轮修复已覆盖 VM `in`、同类型集合 `+`、范围端点排除、集合 `.Length`、null 显示、
+字典缺失键错误、IL match 高级模式与作用域、mixin/接口默认方法、反射及命名实参校验等。
+逐项范围以对应 change 的 `test.md` 为准；本次没有把这些历史结果当作三模式全量复测。
+`Docs/MODE_SUPPORT.md` 仍有历史说明与后续修复记录不一致（例如 IL 泛型/装饰器总括限制、
+顶层 for 作用域，以及“共同差异”表中的已统一行为），后续需按现有报告逐项校正。

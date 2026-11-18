@@ -187,6 +187,17 @@ public static class AssertHelper
         if (ReferenceEquals(a, b)) return true;
         if (a is null || b is null) return false;
 
+        // 比较前把语言值解包成原生值（列表元素可能是 IntLangValue/StringLangValue）
+        if (a is Old8Lang.AST.Expression.LangValueType leftLangValue)
+        {
+            return AreEqual(Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(leftLangValue), b);
+        }
+
+        if (b is Old8Lang.AST.Expression.LangValueType rightLangValue)
+        {
+            return AreEqual(a, Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(rightLangValue));
+        }
+
         // 处理字符串比较
         if (a is string strA && b is string strB)
             return strA == strB;
@@ -207,6 +218,29 @@ public static class AssertHelper
         // 处理布尔比较
         if (a is bool boolA && b is bool boolB)
             return boolA == boolB;
+
+        // 列表/数组按元素比较（解释器/VM 的 Assert.Equal 把 list 与 array 视为相等）。
+        // 仅限「有一侧是数组」：同为 List 时沿用原有的 ToString 比较，
+        // 避免把 Sort 等集合行为的跨模式差异混进断言层。
+        if ((a is Array || b is Array) &&
+            a is System.Collections.IList listA && b is System.Collections.IList listB &&
+            a is not System.Collections.IDictionary && b is not System.Collections.IDictionary)
+        {
+            if (listA.Count != listB.Count)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < listA.Count; index++)
+            {
+                if (!AreEqual(listA[index], listB[index]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         // 默认使用ToString比较
         return a.ToString() == b.ToString();

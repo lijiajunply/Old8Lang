@@ -271,6 +271,23 @@ internal static class NumericBinaryOpHelper
             _ => type.Name
         };
 
+        // 字符串重复（"ab" * 3）是解释器支持的语义，先生成重复 helper。
+        if (leftType == typeof(string) && rightType is not null &&
+            (rightType == typeof(int) || rightType == typeof(object)))
+        {
+            left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            right!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            if (rightType == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            }
+
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlValueBridge).GetMethod(
+                    nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.RepeatString))!);
+            return typeof(string);
+        }
+
         if ((leftType is not null && !IsNumericType(leftType)) ||
             (rightType is not null && !IsNumericType(rightType)))
         {

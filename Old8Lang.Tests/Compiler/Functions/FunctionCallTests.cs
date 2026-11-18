@@ -68,7 +68,7 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func double(x:int) -> int {
+            func twice(x:int) -> int {
                 return x * 2
             }
 
@@ -77,7 +77,7 @@ public class FunctionCallTests
             }
 
             func test() -> int {
-                return addTen(double(5))
+                return addTen(twice(5))
             }
 
             Assert.True(test() == 20)
