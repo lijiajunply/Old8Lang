@@ -68,6 +68,15 @@
 
 - [x] **高阶函数链用例使用关键字作为变量名**：`func <- functions[i]` 改名为 `fn`，
   `ChainFunction` 通过。
+- [x] **AwaitTests 顶层调用缺少 await**：`finalResults <- testAwaitInLoop()` 拿到的是
+  Task/AsyncStateMachineBox。补 await 后 `AwaitTests` 0 失败，Async 26 → 21。
+
+- [ ] **async 函数访问顶层全局变量会崩溃（已回退实验）**：让 async 函数体的
+  LocalManager 继承 Globals、并允许 VisitLangId 回退到全局槽位后，批量运行
+  `AsyncStateMachineResume/finally/using` 用例出现测试进程栈溢出（单独运行通过）。
+  已完整回退；若要支持 async 访问/写顶层变量，需要独立设计状态机 + 全局槽位同步，
+  并先保证批量运行不崩溃。
+
 - [ ] 继续拆分异步 26 项失败；函数剩余 13 项（装饰器 10、命名实参 3）与边界值 20 项。
   既有测试基线已过期的条目以下方复核说明为准。
 

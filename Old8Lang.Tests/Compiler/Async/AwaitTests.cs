@@ -241,7 +241,7 @@ public class AwaitTests(ITestOutputHelper output)
                 return ""all completed""
             }
             
-            finalResult <- testSequentialAwaits()
+            finalResult <- await testSequentialAwaits()
             Assert.Equal(""all completed"", finalResult)
         ";
         var interpreter = new LangInterpreter();
@@ -284,8 +284,8 @@ public class AwaitTests(ITestOutputHelper output)
             }
             
             // 测试两种情况
-            result1 <- testConditionalAwait(true)
-            result2 <- testConditionalAwait(false)
+            result1 <- await testConditionalAwait(true)
+            result2 <- await testConditionalAwait(false)
             
             Assert.Equal(""fast"", result1)
             Assert.Equal(""slow"", result2)
@@ -329,7 +329,7 @@ public class AwaitTests(ITestOutputHelper output)
                 return results
             }
             
-            finalResults <- testAwaitInLoop()
+            finalResults <- await testAwaitInLoop()
             Assert.Equal({2, 4, 6, 8, 10}, finalResults)
         ";
         var interpreter = new LangInterpreter();
@@ -647,7 +647,7 @@ public class AwaitTests(ITestOutputHelper output)
                 return result1 + result2 + result3  // 10 + 15 + 2 = 27
             }
             
-            finalResult <- testComplexExpressions()
+            finalResult <- await testComplexExpressions()
             Assert.Equal(27, finalResult)
         ";
         var interpreter = new LangInterpreter();
@@ -690,7 +690,7 @@ public class AwaitTests(ITestOutputHelper output)
                 return result
             }
             
-            result <- testMethodChaining()
+            result <- await testMethodChaining()
             Assert.Equal(""prefix_10"", result)
         ";
         var interpreter = new LangInterpreter();
