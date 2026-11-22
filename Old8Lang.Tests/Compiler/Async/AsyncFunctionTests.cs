@@ -135,7 +135,7 @@ public class AsyncFunctionTests(ITestOutputHelper output)
                 return ""all fetched""
             }
             
-            result <- fetchMultipleValues()
+            result <- await fetchMultipleValues()
             Assert.Equal(""all fetched"", result)
         ";
         var interpreter = new LangInterpreter();
@@ -173,7 +173,7 @@ public class AsyncFunctionTests(ITestOutputHelper output)
                 }
             }
             
-            handleAsyncError()
+            await handleAsyncError()
             Assert.Equal(""Something went wrong"", caughtError)
         ";
         var interpreter = new LangInterpreter();
@@ -326,8 +326,8 @@ public class AsyncFunctionTests(ITestOutputHelper output)
     {
         // Arrange
         var code = @"
-            async func processArray(data:array) -> array {
-                results <- []
+            async func processArray(data:array) -> list {
+                results <- {}
                 i <- 0
                 while i < data.Length {
                     value <- data[i]
@@ -338,13 +338,13 @@ public class AsyncFunctionTests(ITestOutputHelper output)
                 }
                 return results
             }
-            
+
             async func testArrayProcessing() {
                 input <- [1, 2, 3, 4, 5]
                 results <- await processArray(input)
-                
+
                 Assert.Equal(5, results.Length)
-                Assert.Equal([101, 102, 103, 104, 105], results)
+                Assert.Equal({101, 102, 103, 104, 105}, results)
             }
             
             testArrayProcessing()

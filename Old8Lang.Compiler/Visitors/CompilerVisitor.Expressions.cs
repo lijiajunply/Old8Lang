@@ -61,11 +61,19 @@ public partial class CompilerVisitor
             return null;
         }
 
-        // 如果在异步状态机中，使用变量提升机制
-        if (local.AsyncStateMachineGenerator != null)
+        // 如果在异步状态机中，优先读取已提升的字段；不是提升变量时继续走常规解析链，
+        // 让模块静态类、具名函数值等标识符仍能按普通 IL 路径解析。
+        if (local.AsyncStateMachineGenerator is { } asyncStateMachine)
         {
-            local.LoadVariable(ilGenerator, node.IdName, node.Position);
-            return null;
+            if (asyncStateMachine.TryLoadVariable(ilGenerator, node.IdName)) return null;
+
+            // 顶层变量由运行期全局槽位承载；异步函数也要和同步函数读同一份槽位，
+            // 否则续体线程只能看到自己的状态机字段。
+            if (local.Globals is { } globalScope && globalScope.IsSlot(node.IdName))
+            {
+                RuntimeGlobals.EmitLoad(ilGenerator, node.IdName, globalScope.GetType(node.IdName));
+                return null;
+            }
         }
 
         if (local.TryGetCapturedLocal(node.IdName, out var captured))

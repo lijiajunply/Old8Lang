@@ -305,6 +305,29 @@ public static class IlValueBridge
         }
     }
 
+    /// <summary>
+    /// IL 模式 <c>Task.Run</c> / <c>Task.StartNew</c>：在线程池上调用语言函数值，
+    /// 并把函数返回的 <see cref="Task"/> / <see cref="Task{TResult}"/> 继续等待到结果。
+    /// </summary>
+    public static Task<object?> RunAsync(object? function, object?[] arguments)
+    {
+        return Task.Run(async () => await AwaitResultAsync(InvokeFunctionValue(function, arguments)));
+    }
+
+    private static async Task<object?> AwaitResultAsync(object? result)
+    {
+        switch (result)
+        {
+            case Task<object> objectTask:
+                return await objectTask;
+            case Task task:
+                await task;
+                return null;
+            default:
+                return result;
+        }
+    }
+
     /// <summary>字符串重复（`"ab" * 3` 的解释器语义）。</summary>
     public static string RepeatString(string value, int count)
     {

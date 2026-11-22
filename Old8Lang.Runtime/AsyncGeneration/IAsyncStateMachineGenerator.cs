@@ -19,6 +19,15 @@ public interface IAsyncStateMachineGenerator
     /// <summary>加载已提升的变量。</summary>
     void LoadVariable(ILGenerator il, string name);
 
+    /// <summary>
+    /// 尝试加载已提升的变量；变量未被提升为状态机字段时返回 <c>false</c> 且不发射指令。
+    /// </summary>
+    /// <remarks>
+    /// 异步函数体里的标识符不一定是提升变量：模块静态类、具名函数值等需要回退到
+    /// 常规定义解析链，不能直接按「字段不存在」报错。
+    /// </remarks>
+    bool TryLoadVariable(ILGenerator il, string name);
+
     /// <summary>保存已提升的变量。</summary>
     void StoreVariable(ILGenerator il, string name);
 
@@ -39,6 +48,16 @@ public interface IAsyncStateMachineGenerator
     /// 内层区域入口，内层区域在自己的入口处派发到本区域的恢复标签。
     /// </remarks>
     void EnterProtectedRegion(ILGenerator il, object regionNode);
+
+    /// <summary>
+    /// 标记受保护区域在 <c>BeginExceptionBlock</c> 之前的落点。
+    /// </summary>
+    /// <remarks>
+    /// 父区域派发应跳到这个落点，再由顺序执行进入 <c>try</c> 首指令；
+    /// 不要让外层派发直接分支到受保护区域的首指令（部分 JIT 会把它当成
+    /// 「跳进区域」而生成损坏的流图）。
+    /// </remarks>
+    void MarkProtectedRegionPreEntry(ILGenerator il, object regionNode);
 
     /// <summary>
     /// 在用户 finally 体之前发射守卫：状态机处于挂起状态（state ≥ 0）时跳过 finally 体。

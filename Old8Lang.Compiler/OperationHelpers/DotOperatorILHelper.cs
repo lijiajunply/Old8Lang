@@ -691,25 +691,41 @@ public static class DotOperatorILHelper
     /// 生成 Task.Run 的IL代码
     /// </summary>
     internal static Type GenerateTaskRun(Instance instance, ILGenerator ilGenerator, LocalManager local)
-    {
-        // 这里简化处理，直接返回一个已完成的 Task<object>；
-        // 实参仍需求值以保持副作用，随后弹栈平衡栈。
-        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
-        for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
-        EmitCompletedTaskFromNull(ilGenerator);
-        return typeof(Task<object>);
-    }
+        => EmitTaskStartFunction(instance, ilGenerator, local);
 
     /// <summary>
     /// 生成 Task.StartNew 的IL代码
     /// </summary>
     internal static Type GenerateTaskStartNew(Instance instance, ILGenerator ilGenerator, LocalManager local)
+        => EmitTaskStartFunction(instance, ilGenerator, local);
+
+    /// <summary>
+    /// Task.Run / Task.StartNew：在线程池上调用语言函数值，等待其返回的 Task 并取回结果。
+    /// </summary>
+    private static Type EmitTaskStartFunction(Instance instance, ILGenerator ilGenerator, LocalManager local)
     {
-        // Task.StartNew 实际上是 Task.Factory.StartNew 的简写
-        // 这里简化处理，直接返回一个已完成的 Task<object>（实参求值后弹栈）。
-        var paramTypes = EmitTaskArguments(instance, ilGenerator, local);
-        for (var i = 0; i < paramTypes.Count; i++) ilGenerator.Emit(OpCodes.Pop);
-        EmitCompletedTaskFromNull(ilGenerator);
+        if (instance.Ids.Count == 0)
+        {
+            EmitCompletedTaskFromNull(ilGenerator);
+            return typeof(Task<object>);
+        }
+
+        // 第一个实参是函数值，其余实参收集成 object[] 交给运行期调用。
+        instance.Ids[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ilGenerator.Emit(OpCodes.Ldc_I4, instance.Ids.Count - 1);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+
+        for (var i = 1; i < instance.Ids.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i - 1);
+            instance.Ids[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var argumentType = instance.Ids[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            if (argumentType.IsValueType) ilGenerator.Emit(OpCodes.Box, argumentType);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.RunAsync))!);
         return typeof(Task<object>);
     }
 

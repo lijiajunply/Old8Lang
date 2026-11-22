@@ -81,14 +81,17 @@ public class TaskStaticMethodIlTests
     [Fact]
     public void Run_ArgumentIsStillConsumed()
     {
-        // Run 目前简化为「已完成任务」，但实参仍被求值后弹栈，不能留下栈值。
-        // 这里用标量实参：把函数值作为实参仍属另一个缺口（IL 的函数值调用）。
+        // Task.Run 会在线程池上调用函数值并等待结果；实参数组不能留下栈值。
         var code = @"
-            async func run() {
-                result <- await Task.Run(42)
+            async func work(value:int) -> int {
+                return value
             }
 
-            run()
+            async func run() {
+                result <- await Task.Run(work, 42)
+            }
+
+            await run()
         ";
 
         Assert.Null(CompileAndInvoke(code));

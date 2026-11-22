@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using System.Threading;
 using Old8Lang.AST;
 using Old8Lang.Error;
 
@@ -12,8 +13,10 @@ namespace Old8Lang.Compiler;
 /// 会被编译成独立的 <see cref="DynamicMethod"/>，无法直接读取这些 <c>LocalBuilder</c>。
 /// 当分析发现某个顶层变量会被函数体访问时，它会被提升为「全局槽位」：顶层代码和函数体
 /// 都通过本类读写同一份运行期存储，而不是把 <c>LocalBuilder</c> 跨动态方法复用。</para>
-/// <para>与 <see cref="RuntimeGlobalWriter"/> 一样使用 <see cref="ThreadStaticAttribute"/>，
-/// 使并行执行的编译产物（例如并行测试）互不干扰。槽位在编译产物每次执行前重置，
+/// <para>与 <see cref="RuntimeGlobalWriter"/> 不同，这里使用 <see cref="AsyncLocal{T}"/>：
+/// 异步函数 <c>await</c> 后可能在线程池线程恢复，<see cref="ThreadStaticAttribute"/>
+/// 会让续体看不到主线程的槽位。槽位字典本身通过引用共享，续体里的写入对主线程可见；
+/// 并行执行的编译产物仍靠各自的执行上下文隔离。槽位在编译产物每次执行前重置，
 /// 未赋值的槽位读取时按「变量未声明」处理。</para>
 /// </remarks>
 public static class RuntimeGlobals
@@ -24,8 +27,13 @@ public static class RuntimeGlobals
         public bool HasValue;
     }
 
-    [ThreadStatic]
-    private static Dictionary<string, Slot>? _slots;
+    private static readonly AsyncLocal<Dictionary<string, Slot>?> Slots = new();
+
+    private static Dictionary<string, Slot>? _slots
+    {
+        get => Slots.Value;
+        set => Slots.Value = value;
+    }
 
     /// <summary>
     /// 捕获当前执行所使用的全局槽位，使 Spawn 创建的 CLR 线程能够访问同一份语言全局变量。

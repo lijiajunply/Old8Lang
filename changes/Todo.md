@@ -403,11 +403,27 @@
   受影响用例：`AsyncFunctionWithFinally_...`、`AsyncGeneratorWithResourceCleanup_...`
   （两者此前也失败，只是错误不同）。
 
-- [ ] **IL 异步剩余失败**：2026-11-18 当前工作区 `Compiler.Async` 为
-  103 通过、26 失败、3 跳过，取代早期 54 失败的阶段数字。
-  失败集中于 async/await 状态与结果、生成器/流清理、Task API 和取消/并发场景；
-  `Task.Completed` / `WaitAll` / `WaitAny` 与暂不支持的 await 位置仍需单独处理。
+- [ ] **IL 异步剩余失败**：2026-11-22 当前工作区 `Compiler.Async` 为
+  123 通过、6 失败、3 跳过（共 132 项），取代早期 103/26/3 与 113/16/3 的基线。
+  失败只剩 6 项：`Task.WaitAll` / `Task.WaitAny` / `Task.Completed`、
+  `catch`/`finally` 内的 `await`（2 项）与 IL `async for-in` 自身的枚举缺陷（1 项）。
   `SpawnTests` 已通过，不再归入旧 spawn 语法或带参互操作缺口。
+  分阶段清理见 change（`2026-11-22-IL异步失败清理/`）：
+  - [x] 阶段 1：修正 5 项过期用例（`TaskContinueWith` 旧 lambda、`TaskCancellation`
+        取消令牌源 API、`TaskDelay` 的 `Time` 导入/API、`MultipleAsyncCalls` 顶层 await、
+        `AsyncFunctionWithArray` 数组当列表用）。
+  - [x] 阶段 2：异步状态机里的模块静态类/函数值标识符回退到正常解析链（`TaskRun`），
+        并把 `Task.Run` / `Task.StartNew` 从「返回空任务」的桩改为线程池真实调用函数值并等待结果。
+  - [x] 阶段 3：异步函数读写顶层变量（A 类 10 项全部通过）；`RuntimeGlobals`
+        改用 `AsyncLocal`，续体读写与主线程共享同一份槽位。
+  - [x] 顺带修复：异步 `try/catch/finally + await` 的 JIT 崩溃（父区域派发改为先跳到
+        `try` 外的 `nop` 落点）；`return` 在 try 中先存返回值、finally 执行完再 `SetResult`。
+  - [ ] IL `async for-in` 枚举协议本身不可用：不抛异常的
+        `async for x in gen()` 也报 `Entry point was not found.`。当前
+        `GenerateAsyncEnumerableIl` 直接 `callvirt` 接口方法并在 `ValueTask.Result`
+        上同步阻塞，尚未按运行时对象形态适配；`AsyncGeneratorWithError` 因此仍失败。
+  - [ ] `catch` / `finally` 中的 await（2 项，需搬移处理器体）。
+  - [ ] `Task.WaitAll` / `Task.WaitAny` / `Task.Completed`（3 项，先定是否作为语言 API）。
 
 - [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
   （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
@@ -851,6 +867,11 @@
   让 `Task.Delay(10)` 与 `Task.Delay(100)` 竞争 `Task.WhenAny` 并断言 10ms 的先完成；
   全量并行测试时线程池繁忙会翻转结果。单独运行稳定通过（3/3）。
   建议把延迟差拉大（例如 10 vs 1000）或改为断言「结果是 fast 或 slow 之一」。
+
+- [ ] **抖动用例**：`Old8Lang.Tests/Compiler/Threading/ThreadTests.Run_ThreadExecutionOrder_WorksCorrectly`
+  三个线程各自 `Thread.Sleep(10)` 后向同一个 `ListLangValue` 追加元素，测试固定等待 100ms
+  再断言数量为 3。单独复跑 3 次有 1 次得到 2（全量运行时也会偶发）；
+  列表追加本身没有同步，等待时间也偏短。建议改用锁/原子计数，或把等待改为轮询直至 3 个元素。
 
 - [ ] **SerializationLib 编译器/解释器测试共用临时文件**：同时运行两组
   `SerializationLibTests` 时，编译器侧 `MsgPackSerializeToFile_ShouldSerializeToFile`

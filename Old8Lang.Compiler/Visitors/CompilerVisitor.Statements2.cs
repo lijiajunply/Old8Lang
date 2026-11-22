@@ -172,8 +172,14 @@ public partial class CompilerVisitor
         var parameterTypes = node.GetAsyncFuncValue().Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
-        // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数；
+        // Globals 也必须传下去，异步函数才能和同步函数一样读写顶层变量的运行期槽位。
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            Globals = local.Globals
+        };
 
         foreach (var (key, value) in local.DelegateVar)
         {
@@ -436,6 +442,13 @@ public partial class CompilerVisitor
 
         // 定义结束标签
         var endOfTryCatchLabel = ilGenerator.DefineLabel();
+
+        // 父区域派发跳到 try 之前的落点，再顺序进入 try 首指令，
+        // 避免外层派发直接分支进受保护区域（部分 JIT 会生成损坏的流图）。
+        if (local.AsyncStateMachineGenerator is not null)
+        {
+            local.AsyncStateMachineGenerator.MarkProtectedRegionPreEntry(ilGenerator, node);
+        }
 
         // 开始异常处理块
         ilGenerator.BeginExceptionBlock();

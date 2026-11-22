@@ -83,6 +83,16 @@ internal static class ForStatementRuntimeExtensions
 
         // 先按未遮蔽的状态求值 `for i <- ...` 的右侧。
         node.Init.Value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+
+        // 异步状态机里普通 IL 局部变量不会跨 await 保留：循环变量必须提升为字段，
+        // 否则挂起恢复后 MoveNext 会读到未初始化/上一轮的槽位。
+        if (local.AsyncStateMachineGenerator is not null)
+        {
+            local.DefineVariable(ilGenerator, name, type);
+            local.StoreVariable(ilGenerator, name, node.Position);
+            return null;
+        }
+
         var loopLocal = ilGenerator.DeclareLocal(type);
         ilGenerator.Emit(OpCodes.Stloc, loopLocal);
 

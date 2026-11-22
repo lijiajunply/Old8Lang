@@ -379,7 +379,7 @@ public class AwaitTests(ITestOutputHelper output)
                 }
             }
             
-            testAwaitWithError()
+            await testAwaitWithError()
             Assert.Equal(""Task failed"", caughtError)
         ";
         var interpreter = new LangInterpreter();

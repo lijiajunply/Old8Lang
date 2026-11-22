@@ -67,6 +67,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     private readonly AwaitRegion _rootRegion = new();
     private readonly Dictionary<object, AwaitRegion> _regions = [];
     private readonly Dictionary<object, Label> _regionEntryLabels = [];
+    private readonly Dictionary<object, Label> _regionPreEntryLabels = [];
     private bool _analysisComplete;
 
     // 当前正在生成的 MoveNext ILGenerator
@@ -74,6 +75,12 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     
     // 返回标签（用于退出 try 块）
     private Label? _retLabel;
+
+    // 完成标签：return 与隐式完成都先离开受保护区域，最后在这里统一 SetResult。
+    private Label? _completeLabel;
+
+    // return 的值先存这里，等 finally 执行完再交给 builder。
+    private LocalBuilder? _returnValueLocal;
 
     // 是否已经执行了 return 语句（避免重复的 leave 指令）
     private bool HasReturned { get; set; }
@@ -520,7 +527,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             if (!_regions.TryGetValue(childRegionNode, out var childRegion)) continue;
             foreach (var stateIndex in CollectAwaitStates(childRegion))
             {
-                EmitStateCheck(il, stateIndex, GetOrCreateRegionEntryLabel(childRegionNode));
+                EmitStateCheck(il, stateIndex, GetOrCreateRegionPreEntryLabel(childRegionNode));
             }
         }
 
@@ -557,6 +564,26 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         label = MoveNextIl.DefineLabel();
         _regionEntryLabels[regionNode] = label;
         return label;
+    }
+
+    private Label GetOrCreateRegionPreEntryLabel(object regionNode)
+    {
+        if (_regionPreEntryLabels.TryGetValue(regionNode, out var label)) return label;
+        if (MoveNextIl == null) throw new InvalidOperationException("MoveNext ILGenerator not initialized");
+        label = MoveNextIl.DefineLabel();
+        _regionPreEntryLabels[regionNode] = label;
+        return label;
+    }
+
+    /// <summary>
+    /// 标记受保护区域在 <c>BeginExceptionBlock</c> 之前的落点。
+    /// </summary>
+    public void MarkProtectedRegionPreEntry(ILGenerator il, object regionNode)
+    {
+        il.MarkLabel(GetOrCreateRegionPreEntryLabel(regionNode));
+        // 落点必须位于 try 之外且是可执行指令：没有这条 nop 时，
+        // BeginExceptionBlock 不推进偏移，落点会和 try 首指令重合。
+        il.Emit(OpCodes.Nop);
     }
 
     /// <summary>
@@ -603,15 +630,19 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     /// </summary>
     public void LoadVariable(ILGenerator il, string name)
     {
-        if (VariableFields.TryGetValue(name, out var field))
-        {
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, field);
-        }
-        else
-        {
-            throw new Exception($"Variable '{name}' not found in async state machine fields");
-        }
+        if (TryLoadVariable(il, name)) return;
+        throw new Exception($"Variable '{name}' not found in async state machine fields");
+    }
+
+    /// <summary>
+    /// 尝试从状态机字段加载变量；未提升时返回 false，不发射任何指令。
+    /// </summary>
+    public bool TryLoadVariable(ILGenerator il, string name)
+    {
+        if (!VariableFields.TryGetValue(name, out var field)) return false;
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldfld, field);
+        return true;
     }
 
     /// <summary>
@@ -679,7 +710,9 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         
         // 定义返回标签
         _retLabel = il.DefineLabel();
-        
+        _completeLabel = il.DefineLabel();
+        _returnValueLocal = il.DeclareLocal(typeof(object));
+
         var exceptionLocal = il.DeclareLocal(typeof(Exception));
         il.BeginExceptionBlock();
 
@@ -702,20 +735,31 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         // --- 异常处理 ---
         il.BeginCatchBlock(typeof(Exception));
         il.Emit(OpCodes.Stloc, exceptionLocal);
-        
+
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, StateCompleted);
         il.Emit(OpCodes.Stfld, StateField!);
-        
+
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldflda, BuilderField!);
         il.Emit(OpCodes.Ldloc, exceptionLocal);
         il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetException")!);
         il.Emit(OpCodes.Leave, _retLabel.Value);
-        
+
         il.EndExceptionBlock();
-        
-        // 标记返回标签
+
+        // 正常完成 / return：离开受保护区域（finally 已执行完）后再完成任务。
+        il.MarkLabel(_completeLabel!.Value);
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldflda, BuilderField!);
+        il.Emit(OpCodes.Ldloc, _returnValueLocal!);
+        il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetResult")!);
+
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldc_I4, StateCompleted);
+        il.Emit(OpCodes.Stfld, StateField!);
+
+        // 挂起返回与异常处理的出口：只结束 MoveNext，不改任务状态。
         il.MarkLabel(_retLabel.Value);
         il.Emit(OpCodes.Ret);
     }
@@ -820,36 +864,28 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
 
     public void EmitReturn(ILGenerator il, Type returnType)
     {
-        var resultLocal = il.DeclareLocal(typeof(object));
         if (returnType == typeof(void))
         {
             il.Emit(OpCodes.Ldnull);
-            il.Emit(OpCodes.Stloc, resultLocal);
         }
         else
         {
             if (returnType.IsValueType) il.Emit(OpCodes.Box, returnType);
-            il.Emit(OpCodes.Stloc, resultLocal);
         }
-        
-        EmitReturnInternal(il, typeof(object), resultLocal);
+
+        il.Emit(OpCodes.Stloc, _returnValueLocal!);
+        il.Emit(OpCodes.Leave, _completeLabel!.Value);
+
+        HasReturned = true;
     }
-    
+
     private void EmitReturnInternal(ILGenerator il, Type resultType, LocalBuilder? resultLocal = null)
     {
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldflda, BuilderField!);
-        
         if (resultLocal != null) il.Emit(OpCodes.Ldloc, resultLocal);
         else il.Emit(OpCodes.Ldnull);
-        
-        il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetResult")!);
-        
-        il.Emit(OpCodes.Ldarg_0);
-        il.Emit(OpCodes.Ldc_I4, StateCompleted);
-        il.Emit(OpCodes.Stfld, StateField!);
-        
-        il.Emit(OpCodes.Leave, _retLabel!.Value);
+
+        il.Emit(OpCodes.Stloc, _returnValueLocal!);
+        il.Emit(OpCodes.Leave, _completeLabel!.Value);
 
         HasReturned = true;
     }

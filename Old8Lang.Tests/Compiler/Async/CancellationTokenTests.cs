@@ -367,6 +367,7 @@ async func countWithCancellation(token) -> int {
         if token.IsCancellationRequested {
             return counter
         }
+        await Task.Delay(1)
         counter <- counter + 1
     }
     return counter

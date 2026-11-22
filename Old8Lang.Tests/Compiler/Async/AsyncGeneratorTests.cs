@@ -258,7 +258,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 }
             }
             
-            consumeGeneratorWithError()
+            await consumeGeneratorWithError()
             Assert.Equal(""Error at iteration 3"", caughtError)
         ";
         var interpreter = new LangInterpreter();

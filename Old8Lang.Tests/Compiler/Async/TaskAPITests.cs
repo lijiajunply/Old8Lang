@@ -14,16 +14,18 @@ public class TaskAPITests(ITestOutputHelper output)
     public void TaskDelay_CompilesAndExecutesCorrectly()
     {
         var code = @"
+            import Time
+
             async func testDelay() {
-                startTime <- Time.Now()
+                startTime <- Time.GetUnixTimeMilliseconds()
                 await Task.Delay(100)
-                endTime <- Time.Now()
+                endTime <- Time.GetUnixTimeMilliseconds()
                 duration <- endTime - startTime
-                
+
                 Assert.True(duration >= 90)
             }
-            
-            testDelay()
+
+            await testDelay()
         ";
         var interpreter = new LangInterpreter();
 
@@ -50,7 +52,7 @@ public class TaskAPITests(ITestOutputHelper output)
                 Assert.Equal(100, result)
             }
             
-            testRun()
+            await testRun()
         ";
         var interpreter = new LangInterpreter();
 
@@ -173,8 +175,8 @@ public class TaskAPITests(ITestOutputHelper output)
             
             async func testContinueWith() {
                 task1 <- compute(5)
-                task2 <- task1.ContinueWith(func(t) -> int {
-                    return t.Result + 10
+                task2 <- task1.ContinueWith((t:int) -> {
+                    return t + 10
                 })
                 
                 result1 <- await task1
@@ -336,7 +338,7 @@ public class TaskAPITests(ITestOutputHelper output)
             }
             
             async func testCancellation() {
-                cts <- CreateCancellationTokenSource()
+                cts <- CancellationTokenSource()
                 task <- longRunningTask(cts.Token)
                 
                 await Task.Delay(50)

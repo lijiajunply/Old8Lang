@@ -1735,6 +1735,12 @@ public partial class CompilerVisitor
             }
 
             // 3. 生成try-finally
+            // 父区域派发先落到 try 之前的落点，再顺序进入 try 首指令。
+            if (local.AsyncStateMachineGenerator is not null)
+            {
+                local.AsyncStateMachineGenerator.MarkProtectedRegionPreEntry(ilGenerator, node);
+            }
+
             ilGenerator.BeginExceptionBlock();
 
             // 异步状态机：using 体也是可恢复的受保护区域，首指令处发射派发链
