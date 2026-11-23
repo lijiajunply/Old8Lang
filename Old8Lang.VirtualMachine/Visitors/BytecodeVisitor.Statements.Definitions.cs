@@ -167,8 +167,8 @@ public partial class BytecodeVisitor
         }
 
         // 非泛型类：正常编译
-        var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
-        var staticFields = new List<(string fieldName, string fieldType, LangExpression initialValue)>();
+        var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue, AccessModifier accessModifier)>();
+        var staticFields = new List<(string fieldName, string fieldType, LangExpression initialValue, AccessModifier accessModifier)>();
         var methods = new List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)>();
 
         // 遍历实例成员，提取字段和方法
@@ -187,9 +187,10 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 这是一个实例字段，保存字段名、类型和初始值
+                // 这是一个实例字段，保存字段名、类型、初始值和访问修饰符
                 var fieldType = memberId.AssumptionType ?? "";
-                fields.Add((memberId.IdName, fieldType, memberExpr));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                fields.Add((memberId.IdName, fieldType, memberExpr, accessModifier));
             }
         }
 
@@ -209,9 +210,10 @@ public partial class BytecodeVisitor
             }
             else
             {
-                // 这是一个静态字段，保存字段名、类型和初始值
+                // 这是一个静态字段，保存字段名、类型、初始值和访问修饰符
                 var fieldType = memberId.AssumptionType ?? "";
-                staticFields.Add((memberId.IdName, fieldType, memberExpr));
+                var accessModifier = GetAccessModifier(memberId.Modifiers);
+                staticFields.Add((memberId.IdName, fieldType, memberExpr, accessModifier));
             }
         }
 

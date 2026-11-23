@@ -376,7 +376,8 @@ IsLower  IsPunctuation  IsSymbol  IsUpper  IsWhiteSpace  ToInt  ToLower  ToUpper
 
 ### 3.9 任务与线程（`Task` / `Thread`）
 
-`Task`：`Await` `Catch` `ContinueWith` `Finally` `Then`
+`Task` 静态方法：`Delay` `FromResult` `FromException` `Run` `StartNew` `WhenAll` `WhenAny` `WaitAll` `WaitAny` `Completed`
+`Task` 实例方法：`Await` `Catch` `ContinueWith` `Finally` `Then`
 `Thread`：`Cancel` `IsAlive` `Join` `Retry` `Start` `Then` `WithTimeout`
 
 ### 3.10 类型值实例方法（`TypeLangValue`）

@@ -529,11 +529,14 @@ public static class DotOperatorILHelper
             "StartNew" => GenerateTaskStartNew(instance, ilGenerator, local),
             "WhenAll" => GenerateTaskWhenAll(instance, ilGenerator, local),
             "WhenAny" => GenerateTaskWhenAny(instance, ilGenerator, local),
+            "WaitAll" => GenerateTaskWaitAll(instance, ilGenerator, local),
+            "WaitAny" => GenerateTaskWaitAny(instance, ilGenerator, local),
+            "Completed" => GenerateTaskCompleted(instance, ilGenerator, local),
             // 未知的 Task 静态方法不能「什么都不发射却声明返回 Task<object>」：
             // 那样调用方会按有一个返回值来用栈，生成无效 IL。
             _ => throw new InvalidOperationError(instance,
                 $"Task 静态方法 '{methodName}' 未在 IL 模式实现",
-                "可用方法：Delay、FromResult、FromException、Run、StartNew、WhenAll、WhenAny")
+                "可用方法：Delay、FromResult、FromException、Run、StartNew、WhenAll、WhenAny、WaitAll、WaitAny、Completed")
         };
     }
 
@@ -747,6 +750,115 @@ public static class DotOperatorILHelper
         var enumerable = (IEnumerable)tasks;
         var casted = enumerable.Cast<Task<object>>();
         return Task.WhenAny(casted);
+    }
+
+    private static Task[] ExtractRuntimeTasks(object tasks)
+    {
+        if (tasks is not IEnumerable enumerable)
+        {
+            throw new InvalidOperationError(new SourcePosition(), $"Task.WaitAll/WaitAny 期望任务集合，实际类型: {tasks?.GetType().Name ?? "null"}");
+        }
+
+        var taskList = new List<Task>();
+        foreach (var item in enumerable)
+        {
+            switch (item)
+            {
+                case Task clrTask:
+                    taskList.Add(clrTask);
+                    break;
+                case TaskLangValue langTask:
+                    taskList.Add(langTask.Task);
+                    break;
+                default:
+                    throw new InvalidOperationError(new SourcePosition(), $"Task.WaitAll/WaitAny 集合元素必须是 Task，实际类型: {item?.GetType().Name ?? "null"}");
+            }
+        }
+
+        return taskList.ToArray();
+    }
+
+    /// <summary>
+    /// 运行时辅助方法：Task.WaitAll
+    /// </summary>
+    public static void RuntimeWaitAll(object tasks)
+    {
+        var taskArray = ExtractRuntimeTasks(tasks);
+        if (taskArray.Length == 0) return;
+
+        try
+        {
+            Task.WaitAll(taskArray);
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.Count == 1)
+        {
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
+        }
+    }
+
+    /// <summary>
+    /// 运行时辅助方法：Task.WaitAny
+    /// </summary>
+    public static int RuntimeWaitAny(object tasks)
+    {
+        var taskArray = ExtractRuntimeTasks(tasks);
+        if (taskArray.Length == 0) return -1;
+        return Task.WaitAny(taskArray);
+    }
+
+    /// <summary>
+    /// 生成 Task.Completed 的 IL 代码
+    /// </summary>
+    internal static Type GenerateTaskCompleted(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        if (instance.Ids.Count != 0)
+        {
+            throw new ArgumentError(instance.Position, $"Completed 期望 0 个参数,但提供了 {instance.Ids.Count} 个");
+        }
+
+        var completedTaskGetter = typeof(Task).GetProperty(nameof(Task.CompletedTask))!.GetGetMethod()!;
+        ilGenerator.Emit(OpCodes.Call, completedTaskGetter);
+        return typeof(Task);
+    }
+
+    /// <summary>
+    /// 生成 Task.WaitAll 的 IL 代码
+    /// </summary>
+    internal static Type GenerateTaskWaitAll(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        if (instance.Ids.Count != 1)
+        {
+            throw new ArgumentError(instance.Position, $"WaitAll 期望 1 个参数(任务数组),但提供了 {instance.Ids.Count} 个");
+        }
+
+        var listExpr = instance.Ids[0];
+        listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var listType = listExpr.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (listType.IsValueType) ilGenerator.Emit(OpCodes.Box, listType);
+
+        var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWaitAll))!;
+        ilGenerator.Emit(OpCodes.Call, runtimeMethod);
+        return typeof(void);
+    }
+
+    /// <summary>
+    /// 生成 Task.WaitAny 的 IL 代码
+    /// </summary>
+    internal static Type GenerateTaskWaitAny(Instance instance, ILGenerator ilGenerator, LocalManager local)
+    {
+        if (instance.Ids.Count != 1)
+        {
+            throw new ArgumentError(instance.Position, $"WaitAny 期望 1 个参数(任务数组),但提供了 {instance.Ids.Count} 个");
+        }
+
+        var listExpr = instance.Ids[0];
+        listExpr.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var listType = listExpr.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (listType.IsValueType) ilGenerator.Emit(OpCodes.Box, listType);
+
+        var runtimeMethod = typeof(DotOperatorILHelper).GetMethod(nameof(RuntimeWaitAny))!;
+        ilGenerator.Emit(OpCodes.Call, runtimeMethod);
+        return typeof(int);
     }
 
     /// <summary>

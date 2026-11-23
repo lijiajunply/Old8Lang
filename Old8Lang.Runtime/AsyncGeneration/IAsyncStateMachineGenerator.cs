@@ -34,8 +34,17 @@ public interface IAsyncStateMachineGenerator
     /// <summary>生成状态机的 return 序列。</summary>
     void EmitReturn(ILGenerator il, Type returnType);
 
+    /// <summary>当前状态机是否为异步生成器（含 yield）。</summary>
+    bool IsAsyncGenerator { get; }
+
+    /// <summary>在异步生成器中将栈顶的值产出到异步流。</summary>
+    void EmitYield(ILGenerator il, Type valueType);
+
     /// <summary>获取 await 表达式的状态编号。</summary>
     int GetStateIndex(AwaitExpression expr);
+
+    /// <summary>获取任意异步挂起点节点（如 <c>AwaitExpression</c> 或 <c>AsyncForInStatement</c>）的状态编号。</summary>
+    int GetAwaitNodeStateIndex(object node);
 
     /// <summary>
     /// 进入受保护区域（try 块 / using 块）：标记区域首指令，并发射该区域内部的状态派发链。
@@ -74,4 +83,22 @@ public interface IAsyncStateMachineGenerator
 
     /// <summary>生成 await 的恢复序列。</summary>
     void EmitAwaitResume(ILGenerator il, int stateIndex, LocalBuilder awaiterLocal);
+
+    /// <summary>判断指定的 <see cref="TryStatement"/> 是否需要将 catch 块体搬移出 CLR 异常块以支持 await。</summary>
+    bool RequiresAsyncCatch(TryStatement tryStmt);
+
+    /// <summary>判断指定的 <see cref="TryStatement"/> 是否需要将 finally 块体搬移出 CLR 异常块以支持 await。</summary>
+    bool RequiresAsyncFinally(TryStatement tryStmt);
+
+    /// <summary>获取异步 finally 外层异常捕获保护区域的键。</summary>
+    object GetFinallyGuardRegionKey(TryStatement tryStmt);
+
+    /// <summary>压入当前生效的异步 finally 拦截作用域（用于拦截 try/catch 内的 return）。</summary>
+    void PushAsyncFinallyScope(string reasonFieldName, Label finallyLabel);
+
+    /// <summary>弹出当前异步 finally 拦截作用域。</summary>
+    void PopAsyncFinallyScope();
+
+    /// <summary>在异步 finally 尾部处理待决 return：若外层仍有异步 finally 则接力，否则完成任务。</summary>
+    void EmitAsyncFinallyReturnContinuation(ILGenerator il);
 }

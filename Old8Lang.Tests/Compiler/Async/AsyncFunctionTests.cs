@@ -438,7 +438,7 @@ public class AsyncFunctionTests(ITestOutputHelper output)
                 Assert.True(cleanupExecuted)
             }
             
-            testFinally()
+            await testFinally()
         ";
         var interpreter = new LangInterpreter();
 

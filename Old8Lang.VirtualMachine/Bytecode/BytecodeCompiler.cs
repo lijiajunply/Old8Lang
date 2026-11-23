@@ -866,6 +866,20 @@ public class BytecodeCompiler : IBytecodeCompiler
         List<string>? implementsNames = null,
         List<string>? mixinNames = null)
     {
+        var fieldsWithAccess = fields.Select(f => (f.fieldName, f.fieldType, f.initialValue, AccessModifier.Public)).ToList();
+        var staticFieldsWithAccess = staticFields.Select(f => (f.fieldName, f.fieldType, f.initialValue, AccessModifier.Public)).ToList();
+        DeclareClass(className, fieldsWithAccess, staticFieldsWithAccess, methods, parentClassName, implementsNames, mixinNames);
+    }
+
+    public void DeclareClass(
+        string className,
+        List<(string fieldName, string fieldType, LangExpression? initialValue, AccessModifier accessModifier)> fields,
+        List<(string fieldName, string fieldType, LangExpression initialValue, AccessModifier accessModifier)> staticFields,
+        List<(string methodName, FuncLangValue funcValue, bool isStatic, AccessModifier accessModifier)> methods,
+        string? parentClassName,
+        List<string>? implementsNames = null,
+        List<string>? mixinNames = null)
+    {
         var classMetadata = new ClassMetadata
         {
             Name = className,
@@ -879,11 +893,12 @@ public class BytecodeCompiler : IBytecodeCompiler
         };
 
         // 处理实例字段
-        foreach (var (fieldName, fieldType, initialValue) in fields)
+        foreach (var (fieldName, fieldType, initialValue, accessModifier) in fields)
         {
             var fieldMetadata = new FieldMetadata
             {
                 Name = fieldName,
+                AccessModifier = accessModifier,
                 IsStatic = false,
                 TypeName = string.IsNullOrEmpty(fieldType) ? null : fieldType
             };
@@ -916,7 +931,7 @@ public class BytecodeCompiler : IBytecodeCompiler
         }
 
         // 处理静态字段
-        foreach (var (fieldName, fieldType, initialValue) in staticFields)
+        foreach (var (fieldName, fieldType, initialValue, accessModifier) in staticFields)
         {
             // 计算静态字段的初始值并添加到常量池
             var constantValue = EvaluateConstantExpression(initialValue);
@@ -925,6 +940,7 @@ public class BytecodeCompiler : IBytecodeCompiler
             var staticFieldMetadata = new FieldMetadata
             {
                 Name = fieldName,
+                AccessModifier = accessModifier,
                 IsStatic = true,
                 TypeName = string.IsNullOrEmpty(fieldType) ? null : fieldType
             };

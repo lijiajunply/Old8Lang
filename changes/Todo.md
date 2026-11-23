@@ -56,9 +56,7 @@
   并非环境/顺序抖动，而是字符串比较改为字典序后 `"1.5" < "2.0"` 由 `false` 变为 `true`，
   原用例断言停留在旧的长度比较分支；已修正期望，`ConditionalImportTests` 全通过。
 
-- [ ] **模式差异记录（EdgeCases 相关）**：私有成员访问/未声明变量/未知方法在 IL 是
-  编译期错误、解释器是运行期错误、VM 对私有字段甚至静默放行；`.Match` 不是字符串
-  API（正则是 `Regex.RegexIsMatch` 等）。用例已按 IL 语义迁移，跨模式口径待统一。
+- [x] **模式差异记录（EdgeCases 相关）**：VM 私有字段访问检查及跨模式阶段差异已补齐，`.Match` 的正则 API 口径已写入 `Docs/MODE_SUPPORT.md`。见 `2026-11-23-当前优先处理清零/test.md`。
 
 - [x] **Sort 对字符串列表的跨模式差异**：根因是 `StringLangValue.Less/Greater` 按
   **长度**比较，长度相同的字符串无法排序（解释器 QuickSort/IL SortHelper 都因此保持原序）。
@@ -74,10 +72,7 @@
 - [x] **async 函数访问顶层全局变量**：已在 `2026-11-22-IL异步失败清理` 阶段 3 通过
   `RuntimeGlobals` 改用 `AsyncLocal` 解决（见下文「IL 异步剩余失败」条目）。
 
-- [ ] 继续处理 `Compiler.Async` 剩余 6 项（`Task.WaitAll`/`WaitAny`/`Completed` 3 项、
-  `catch`/`finally` 内 await 2 项、IL `async for-in` / 异步生成器 1 项）；
-  `Compiler.Functions`（166 通过、0 失败、12 跳过）与 `Compiler.EdgeCases`（0 失败）已清零。
-  既有测试基线已过期的条目以下方复核说明为准。
+- [x] `Compiler.Async` 剩余 6 项已处理，涵盖 Task 静态 API、异步 catch/finally 和异步生成器；验收详见 `2026-11-23-当前优先处理清零/test.md`。
 
 ## IL 模式与跨模式缺陷
 
@@ -1166,3 +1161,5 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 逐项范围以对应 change 的 `test.md` 为准；本次没有把这些历史结果当作三模式全量复测。
 `Docs/MODE_SUPPORT.md` 仍有历史说明与后续修复记录不一致（例如 IL 泛型/装饰器总括限制、
 顶层 for 作用域，以及“共同差异”表中的已统一行为），后续需按现有报告逐项校正。
+
+- [ ] **IL 异步生成器的线程占用**：当前逐项握手在 yield 等待消费者时占用线程池线程；大量并发或长期暂停的生成器可能造成线程池压力。后续应将 yield 纳入异步状态机实现真正的非阻塞挂起，并补并发压力测试。

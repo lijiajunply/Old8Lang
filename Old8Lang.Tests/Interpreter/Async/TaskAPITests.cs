@@ -701,4 +701,42 @@ public class TaskAPITests
         Assert.IsType<IntLangValue>(result);
         Assert.Equal(500500, ((IntLangValue)result).Value); // 1+2+...+1000 = 500500
     }
+
+    [Fact]
+    public void TaskAPI_Completed_WaitAll_WaitAny_WorkInInterpreter()
+    {
+        var code = @"
+            completed <- Task.Completed()
+            isDone <- completed.IsCompleted
+
+            async func fastTask() {
+                await Task.Delay(10)
+            }
+            async func slowTask() {
+                await Task.Delay(80)
+            }
+
+            allTasks <- {fastTask(), fastTask()}
+            Task.WaitAll(allTasks)
+            allDone <- allTasks[0].IsCompleted && allTasks[1].IsCompleted
+
+            anyTasks <- {fastTask(), slowTask()}
+            firstIndex <- Task.WaitAny(anyTasks)
+        ";
+        var interpreter = new LangInterpreter();
+
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        var isDone = interpreter.Manager.GetValue(new LangId("isDone"));
+        var allDone = interpreter.Manager.GetValue(new LangId("allDone"));
+        var firstIndex = interpreter.Manager.GetValue(new LangId("firstIndex"));
+
+        Assert.IsType<BoolLangValue>(isDone);
+        Assert.True(((BoolLangValue)isDone).Value);
+        Assert.IsType<BoolLangValue>(allDone);
+        Assert.True(((BoolLangValue)allDone).Value);
+        Assert.IsType<IntLangValue>(firstIndex);
+        Assert.Equal(0, ((IntLangValue)firstIndex).Value);
+    }
 }

@@ -35,7 +35,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(5, count)
             }
             
-            consumeGenerator()
+            await consumeGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -78,7 +78,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal({""apple"", ""banana"", ""cherry""}, results)
             }
             
-            consumeStringGenerator()
+            await consumeStringGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -119,7 +119,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal({0, 2, 4, 6, 8, 10}, results)
             }
             
-            consumeConditionalGenerator()
+            await consumeConditionalGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -164,7 +164,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(5, count)
             }
             
-            consumeLimitedGenerator()
+            await consumeLimitedGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -211,7 +211,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal({20, 22, 24}, results)  // (10+0)*2, (10+1)*2, (10+2)*2
             }
             
-            consumeNestedGenerator()
+            await consumeNestedGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -311,7 +311,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(expected, results)
             }
             
-            consumeFibonacciGenerator()
+            await consumeFibonacciGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -380,7 +380,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(expected, results)
             }
             
-            consumeFilteredPrimes()
+            await consumeFilteredPrimes()
         ";
         var interpreter = new LangInterpreter();
 
@@ -438,7 +438,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(expected, results)
             }
             
-            consumeStatefulGenerator()
+            await consumeStatefulGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -496,7 +496,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.True(resourceClosed)
             }
             
-            consumeResourceGenerator()
+            await consumeResourceGenerator()
         ";
         var interpreter = new LangInterpreter();
 
@@ -544,7 +544,7 @@ public class AsyncGeneratorTests(ITestOutputHelper output)
                 Assert.Equal(expected, results)
             }
             
-            consumeProcessingGenerator()
+            await consumeProcessingGenerator()
         ";
         var interpreter = new LangInterpreter();
 

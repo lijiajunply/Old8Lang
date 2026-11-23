@@ -52,111 +52,160 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitAsyncForInStatement(AsyncForInStatement node)
     {
-
-        var ty = node.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
-
-        // 对于字典类型，使用特殊处理
-        if (ty == typeof(Dictionary<object, object>))
-        {
-            node.GenerateDictionaryIl(ilGenerator, local);
-            return null;
-        }
-
-        // 检查是否是异步枚举类型
-        if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-        {
-            node.GenerateAsyncEnumerableIl(ilGenerator, local, ty);
-            return null;
-        }
-
-        // 非字典类型，使用普通的IEnumerator处理
-        var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        var current = ilGenerator.DeclareLocal(typeof(object));
-
-        // 获取枚举器
-        var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
+        // 求值可迭代对象，通过 IlAsyncLoopEnumerator 统一适配 IAsyncEnumerable<T> 与 IEnumerable
         node.Expression.Accept(this);
-        ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
-        ilGenerator.Emit(OpCodes.Stloc, enumerator);
+        var sourceType = node.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (sourceType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, sourceType);
+        }
 
-        // 定义循环标签
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.Create))!);
+
+        var asyncStateMachine = local.AsyncStateMachineGenerator;
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
         var continueLabel = ilGenerator.DefineLabel();
 
-        // 保存当前的break和continue标签
         var oldBreakLabel = local.BreakLabel;
         var oldContinueLabel = local.ContinueLabel;
-
-        // 设置当前循环的break和continue标签
         local.BreakLabel = loopEnd;
         local.ContinueLabel = continueLabel;
 
-        // 循环开始
-        ilGenerator.MarkLabel(loopStart);
+        var currentLocal = ilGenerator.DeclareLocal(typeof(object));
 
-        // 调用MoveNext
-        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
-
-        // 获取当前元素
-        var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
-        var getCurrentMethod = currentProperty.GetGetMethod()!;
-        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
-        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
-        ilGenerator.Emit(OpCodes.Stloc, current);
-
-        // 处理标识符赋值
-        if (node.Ids.Count == 1)
+        if (asyncStateMachine is not null)
         {
-            // 单个标识符，直接赋值
-            // 在异步状态机中，需要定义变量并存储
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
-            }
-            else
-            {
-                local.AddLocalVar(node.Ids[0].IdName, current);
-            }
+            var moveNextState = asyncStateMachine.GetAwaitNodeStateIndex(node);
+            var enumVarName = $"<>async_enum_{moveNextState}";
+            local.DefineVariable(ilGenerator, enumVarName, typeof(IlAsyncLoopEnumerator));
+            local.StoreVariable(ilGenerator, enumVarName, node.Position);
+
+            ilGenerator.MarkLabel(loopStart);
+
+            // task = enumerator.MoveNextTask()
+            local.LoadVariable(ilGenerator, enumVarName, node.Position);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.MoveNextTask))!);
+
+            // awaiter = task.GetAwaiter()
+            var awaiterType = typeof(System.Runtime.CompilerServices.TaskAwaiter<bool>);
+            var awaiterLocal = ilGenerator.DeclareLocal(awaiterType);
+            ilGenerator.Emit(OpCodes.Callvirt, typeof(Task<bool>).GetMethod("GetAwaiter")!);
+            ilGenerator.Emit(OpCodes.Stloc, awaiterLocal);
+
+            // if (!awaiter.IsCompleted) { yield; }
+            var completedLabel = ilGenerator.DefineLabel();
+            ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
+            ilGenerator.Emit(OpCodes.Call, awaiterType.GetProperty("IsCompleted")!.GetGetMethod()!);
+            ilGenerator.Emit(OpCodes.Brtrue, completedLabel);
+
+            asyncStateMachine.EmitAwaitYield(ilGenerator, moveNextState, awaiterLocal);
+            asyncStateMachine.EmitAwaitResume(ilGenerator, moveNextState, awaiterLocal);
+
+            ilGenerator.MarkLabel(completedLabel);
+            ilGenerator.Emit(OpCodes.Ldloca, awaiterLocal);
+            ilGenerator.Emit(OpCodes.Call, awaiterType.GetMethod("GetResult")!);
+            ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+
+            // current = enumerator.Current
+            local.LoadVariable(ilGenerator, enumVarName, node.Position);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetProperty(nameof(IlAsyncLoopEnumerator.Current))!.GetGetMethod()!);
+            ilGenerator.Emit(OpCodes.Stloc, currentLocal);
+
+            BindAsyncForInVariables(node, currentLocal);
+
+            node.Body.Accept(this);
+
+            ilGenerator.MarkLabel(continueLabel);
+            ilGenerator.Emit(OpCodes.Br, loopStart);
+
+            ilGenerator.MarkLabel(loopEnd);
+
+            // 释放异步枚举器（通知生成器取消）
+            local.LoadVariable(ilGenerator, enumVarName, node.Position);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.Dispose))!);
         }
         else
         {
-            // 多个标识符，只赋值给第一个
-            if (local.AsyncStateMachineGenerator != null)
-            {
-                local.DefineVariable(ilGenerator, node.Ids[0].IdName, typeof(object));
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                local.StoreVariable(ilGenerator, node.Ids[0].IdName, node.Position);
-            }
-            else
-            {
-                local.AddLocalVar(node.Ids[0].IdName, current);
-            }
+            var enumLocal = ilGenerator.DeclareLocal(typeof(IlAsyncLoopEnumerator));
+            ilGenerator.Emit(OpCodes.Stloc, enumLocal);
+
+            ilGenerator.MarkLabel(loopStart);
+
+            ilGenerator.Emit(OpCodes.Ldloc, enumLocal);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.MoveNextBlocking))!);
+            ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+
+            ilGenerator.Emit(OpCodes.Ldloc, enumLocal);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetProperty(nameof(IlAsyncLoopEnumerator.Current))!.GetGetMethod()!);
+            ilGenerator.Emit(OpCodes.Stloc, currentLocal);
+
+            BindAsyncForInVariables(node, currentLocal);
+
+            node.Body.Accept(this);
+
+            ilGenerator.MarkLabel(continueLabel);
+            ilGenerator.Emit(OpCodes.Br, loopStart);
+
+            ilGenerator.MarkLabel(loopEnd);
+
+            ilGenerator.Emit(OpCodes.Ldloc, enumLocal);
+            ilGenerator.Emit(OpCodes.Callvirt,
+                typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.Dispose))!);
         }
 
-        // 生成循环体
-        node.Body.Accept(this);
-
-        // 继续标签
-        ilGenerator.MarkLabel(continueLabel);
-
-        // 跳回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart);
-
-        // 循环结束
-        ilGenerator.MarkLabel(loopEnd);
-
-        // 恢复之前的break和continue标签
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;
-    
-    
         return null;
+    }
+
+    private void BindAsyncForInVariables(AsyncForInStatement node, LocalBuilder currentLocal)
+    {
+        if (node.Ids.Count == 1)
+        {
+            var varName = node.Ids[0].IdName;
+            ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.ExtractSingleOrSelf))!);
+            StoreAsyncForInVariable(varName, node.Position);
+            return;
+        }
+
+        var extractMethod = typeof(IlAsyncLoopEnumerator).GetMethod(nameof(IlAsyncLoopEnumerator.ExtractItem))!;
+        for (var i = 0; i < node.Ids.Count; i++)
+        {
+            var varName = node.Ids[i].IdName;
+            ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            ilGenerator.Emit(OpCodes.Call, extractMethod);
+            StoreAsyncForInVariable(varName, node.Position);
+        }
+    }
+
+    private void StoreAsyncForInVariable(string varName, SourcePosition position)
+    {
+        if (local.AsyncStateMachineGenerator is not null)
+        {
+            local.DefineVariable(ilGenerator, varName, typeof(object));
+            if (local.LocalVarTypes.TryGetValue(varName, out var fieldType) && fieldType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, fieldType);
+            }
+
+            local.StoreVariable(ilGenerator, varName, position);
+        }
+        else
+        {
+            var varLocal = ilGenerator.DeclareLocal(typeof(object));
+            ilGenerator.Emit(OpCodes.Stloc, varLocal);
+            local.AddLocalVar(varName, varLocal);
+        }
     }
 
     /// <summary>
@@ -211,8 +260,10 @@ public partial class CompilerVisitor
             funcLocal.LocalVarTypes[id.IdName] = paramType!;
         }
 
-        // 异步函数返回Task<object>
-        var returnType = typeof(Task<object>);
+        // 判断是否为异步生成器（函数体内含 yield）：返回 IAsyncEnumerable<object>，否则返回 Task<object>
+        var asyncFuncValue = node.GetAsyncFuncValue();
+        var isAsyncGenerator = ContainsYieldStatement(asyncFuncValue.BlockStatement);
+        var returnType = isAsyncGenerator ? typeof(IAsyncEnumerable<object>) : typeof(Task<object>);
 
         // 定义新的动态方法
         var dynamicMethod = new DynamicMethod(
@@ -229,9 +280,9 @@ public partial class CompilerVisitor
         funcLocal.LocalVar.Clear();
 
         // 处理参数
-        for (var i = 0; i < node.GetAsyncFuncValue().Ids!.Count; i++)
+        for (var i = 0; i < asyncFuncValue.Ids!.Count; i++)
         {
-            var id = node.GetAsyncFuncValue().Ids[i];
+            var id = asyncFuncValue.Ids[i];
             // 使用实际的参数类型声明局部变量
             var paramType = parameterTypes[i];
             var localVar = methodIl.DeclareLocal(paramType!);
@@ -241,8 +292,15 @@ public partial class CompilerVisitor
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
-        // 生成异步方法体
-        node.GetAsyncFuncValue().GenerateMethodBody(methodIl, funcLocal);
+        // 生成异步方法体（普通异步函数 vs 异步生成器）
+        if (isAsyncGenerator)
+        {
+            asyncFuncValue.GenerateAsyncGeneratorMethodBody(methodIl, funcLocal);
+        }
+        else
+        {
+            asyncFuncValue.GenerateMethodBody(methodIl, funcLocal);
+        }
 
         // 将方法添加到本地变量管理器
         // 使用函数名+参数类型作为键，支持更准确的函数重载
@@ -417,11 +475,20 @@ public partial class CompilerVisitor
     
     }
 
+    private static int _asyncTryFieldCounter;
+
     /// <summary>
     /// 访问 TryStatement 节点（编译器）
     /// </summary>
     public object? VisitTryStatement(TryStatement node)
     {
+        if (local.AsyncStateMachineGenerator is { } asyncSm &&
+            (asyncSm.RequiresAsyncCatch(node) || asyncSm.RequiresAsyncFinally(node)))
+        {
+            EmitAsyncTryStatement(node, asyncSm);
+            return null;
+        }
+
         // 检查是否有finally块且try/catch中包含return
         // 注意：在异步状态机模式下，return 语句会编译为 Leave 指令，这是合法的，所以跳过检查
         if (node.FinallyBlock is not null && local.AsyncStateMachineGenerator == null && local.ReturnLabel == null)
@@ -639,6 +706,328 @@ public partial class CompilerVisitor
         
         return null;
     }
+
+    /// <summary>
+    /// 在异步状态机中发射含 await 的 catch / finally 块（Roslyn 风格处理器体搬移）。
+    /// </summary>
+    private void EmitAsyncTryStatement(TryStatement node, IAsyncStateMachineGenerator sm)
+    {
+        var id = Interlocked.Increment(ref _asyncTryFieldCounter);
+        var hasAsyncCatch = sm.RequiresAsyncCatch(node);
+        var hasAsyncFinally = sm.RequiresAsyncFinally(node);
+
+        if (!hasAsyncFinally)
+        {
+            // 仅异步 catch（无 finally）
+            EmitAsyncCatchCore(node, sm, id);
+            return;
+        }
+
+        // 异步 finally：使用外层 guard try/catch 捕获异常，把 finally 体搬到异常块之外
+        var reasonVar = $"<>f_reason_{id}";
+        var pendingExVar = $"<>f_ex_{id}";
+        local.DefineVariable(ilGenerator, reasonVar, typeof(int));
+        local.DefineVariable(ilGenerator, pendingExVar, typeof(Exception));
+
+        var finallyLabel = ilGenerator.DefineLabel();
+        var endOfTryCatchLabel = ilGenerator.DefineLabel();
+
+        var oldBreakLabel = local.BreakLabel;
+        var oldContinueLabel = local.ContinueLabel;
+        Label? breakInterceptLabel = oldBreakLabel.HasValue ? ilGenerator.DefineLabel() : null;
+        Label? continueInterceptLabel = oldContinueLabel.HasValue ? ilGenerator.DefineLabel() : null;
+
+        // 初始化待决原因与异常
+        ilGenerator.Emit(OpCodes.Ldc_I4_0);
+        local.StoreVariable(ilGenerator, reasonVar, node.Position);
+        ilGenerator.Emit(OpCodes.Ldnull);
+        local.StoreVariable(ilGenerator, pendingExVar, node.Position);
+
+        sm.PushAsyncFinallyScope(reasonVar, finallyLabel);
+        if (breakInterceptLabel.HasValue) local.BreakLabel = breakInterceptLabel.Value;
+        if (continueInterceptLabel.HasValue) local.ContinueLabel = continueInterceptLabel.Value;
+
+        var guardKey = sm.GetFinallyGuardRegionKey(node);
+        sm.MarkProtectedRegionPreEntry(ilGenerator, guardKey);
+
+        ilGenerator.BeginExceptionBlock();
+        sm.EnterProtectedRegion(ilGenerator, guardKey);
+
+        var outerProtected = local.IsInProtectedRegion;
+        local.IsInProtectedRegion = true;
+
+        if (node.CatchBlocks.Count == 0)
+        {
+            node.TryBlock.Accept(this);
+        }
+        else if (hasAsyncCatch)
+        {
+            EmitAsyncCatchCore(node, sm, id);
+        }
+        else
+        {
+            EmitSyncCatchInsideGuard(node, sm);
+        }
+
+        // 正常离开：reason = 0，跳到异步 finally 体
+        ilGenerator.Emit(OpCodes.Ldc_I4_0);
+        local.StoreVariable(ilGenerator, reasonVar, node.Position);
+        ilGenerator.Emit(OpCodes.Leave, finallyLabel);
+
+        // 拦截跳出本 try 的 break / continue
+        if (breakInterceptLabel.HasValue)
+        {
+            ilGenerator.MarkLabel(breakInterceptLabel.Value);
+            ilGenerator.Emit(OpCodes.Ldc_I4_3);
+            local.StoreVariable(ilGenerator, reasonVar, node.Position);
+            ilGenerator.Emit(OpCodes.Leave, finallyLabel);
+        }
+
+        if (continueInterceptLabel.HasValue)
+        {
+            ilGenerator.MarkLabel(continueInterceptLabel.Value);
+            ilGenerator.Emit(OpCodes.Ldc_I4_4);
+            local.StoreVariable(ilGenerator, reasonVar, node.Position);
+            ilGenerator.Emit(OpCodes.Leave, finallyLabel);
+        }
+
+        // 外层 guard catch：捕获任意未处理异常并转交异步 finally
+        ilGenerator.BeginCatchBlock(typeof(Exception));
+        var guardExLocal = ilGenerator.DeclareLocal(typeof(Exception));
+        ilGenerator.Emit(OpCodes.Stloc, guardExLocal);
+        ilGenerator.Emit(OpCodes.Ldloc, guardExLocal);
+        local.StoreVariable(ilGenerator, pendingExVar, node.Position);
+        ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        local.StoreVariable(ilGenerator, reasonVar, node.Position);
+        ilGenerator.Emit(OpCodes.Leave, finallyLabel);
+
+        ilGenerator.EndExceptionBlock();
+
+        local.IsInProtectedRegion = outerProtected;
+        local.BreakLabel = oldBreakLabel;
+        local.ContinueLabel = oldContinueLabel;
+        sm.PopAsyncFinallyScope();
+
+        // 异步 finally 体（位于外层 guard 异常块外部，可自由 await）
+        ilGenerator.MarkLabel(finallyLabel);
+        node.FinallyBlock?.Accept(this);
+
+        // 根据待决原因继续控制流：
+        // 1 = 重抛异常，2 = return，3 = break，4 = continue，0 = 正常继续
+        var checkReturnLabel = ilGenerator.DefineLabel();
+        local.LoadVariable(ilGenerator, reasonVar, node.Position);
+        ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        ilGenerator.Emit(OpCodes.Bne_Un, checkReturnLabel);
+        local.LoadVariable(ilGenerator, pendingExVar, node.Position);
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod(
+                nameof(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture))!);
+        ilGenerator.Emit(OpCodes.Callvirt,
+            typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod(
+                nameof(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw), Type.EmptyTypes)!);
+        ilGenerator.Emit(OpCodes.Br, endOfTryCatchLabel);
+
+        ilGenerator.MarkLabel(checkReturnLabel);
+        var checkBreakLabel = ilGenerator.DefineLabel();
+        local.LoadVariable(ilGenerator, reasonVar, node.Position);
+        ilGenerator.Emit(OpCodes.Ldc_I4_2);
+        ilGenerator.Emit(OpCodes.Bne_Un, checkBreakLabel);
+        sm.EmitAsyncFinallyReturnContinuation(ilGenerator);
+
+        ilGenerator.MarkLabel(checkBreakLabel);
+        if (oldBreakLabel.HasValue)
+        {
+            var checkContinueLabel = ilGenerator.DefineLabel();
+            local.LoadVariable(ilGenerator, reasonVar, node.Position);
+            ilGenerator.Emit(OpCodes.Ldc_I4_3);
+            ilGenerator.Emit(OpCodes.Bne_Un, checkContinueLabel);
+            ilGenerator.Emit(local.IsInProtectedRegion ? OpCodes.Leave : OpCodes.Br, oldBreakLabel.Value);
+            ilGenerator.MarkLabel(checkContinueLabel);
+        }
+
+        if (oldContinueLabel.HasValue)
+        {
+            local.LoadVariable(ilGenerator, reasonVar, node.Position);
+            ilGenerator.Emit(OpCodes.Ldc_I4_4);
+            ilGenerator.Emit(OpCodes.Bne_Un, endOfTryCatchLabel);
+            ilGenerator.Emit(local.IsInProtectedRegion ? OpCodes.Leave : OpCodes.Br, oldContinueLabel.Value);
+        }
+
+        ilGenerator.MarkLabel(endOfTryCatchLabel);
+    }
+
+    /// <summary>
+    /// 在外层异步 finally guard 内部发射同步 try/catch 块（catch 体本身不含挂起点）。
+    /// </summary>
+    private void EmitSyncCatchInsideGuard(TryStatement node, IAsyncStateMachineGenerator sm)
+    {
+        var innerEndLabel = ilGenerator.DefineLabel();
+
+        sm.MarkProtectedRegionPreEntry(ilGenerator, node);
+        ilGenerator.BeginExceptionBlock();
+        sm.EnterProtectedRegion(ilGenerator, node);
+
+        var prevProtected = local.IsInProtectedRegion;
+        local.IsInProtectedRegion = true;
+        node.TryBlock.Accept(this);
+
+        ilGenerator.BeginCatchBlock(typeof(Exception));
+        var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
+        ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
+
+        foreach (var (exceptionType, exceptionVar, filter, catchBlock) in node.CatchBlocks)
+        {
+            var nextCatchLabel = ilGenerator.DefineLabel();
+
+            if (!string.IsNullOrEmpty(exceptionType) && exceptionType != "Exception" && exceptionType != "Old8Exception")
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
+                ilGenerator.Emit(OpCodes.Ldstr, exceptionType);
+                ilGenerator.Emit(OpCodes.Call, typeof(ExceptionHelper).GetMethod("IsMatch")!);
+                ilGenerator.Emit(OpCodes.Brfalse, nextCatchLabel);
+            }
+
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
+                ilGenerator.Emit(OpCodes.Call, typeof(ExceptionWrapper).GetMethod(nameof(ExceptionWrapper.Bind))!);
+                local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(object));
+                local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
+            }
+
+            if (filter is not null)
+            {
+                filter.Accept(this);
+                var filterType = filter.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+                if (filterType.IsValueType) ilGenerator.Emit(OpCodes.Box, filterType);
+                ilGenerator.Emit(OpCodes.Call, typeof(TypeConversion).GetMethod("ToBool")!);
+                ilGenerator.Emit(OpCodes.Brfalse, nextCatchLabel);
+            }
+
+            catchBlock.Accept(this);
+
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                local.RemoveLocalVar(exceptionVar.IdName);
+            }
+
+            ilGenerator.Emit(OpCodes.Leave, innerEndLabel);
+            ilGenerator.MarkLabel(nextCatchLabel);
+        }
+
+        ilGenerator.Emit(OpCodes.Rethrow);
+        ilGenerator.EndExceptionBlock();
+
+        local.IsInProtectedRegion = prevProtected;
+        ilGenerator.MarkLabel(innerEndLabel);
+    }
+
+    /// <summary>
+    /// 发射异步 catch 降级：CLR catch 块仅保存异常并匹配索引，catch 块体搬移到 EndExceptionBlock 之后。
+    /// </summary>
+    private void EmitAsyncCatchCore(TryStatement node, IAsyncStateMachineGenerator sm, int id)
+    {
+        var caughtExVar = $"<>c_ex_{id}";
+        var matchedIdxVar = $"<>c_idx_{id}";
+        local.DefineVariable(ilGenerator, caughtExVar, typeof(Exception));
+        local.DefineVariable(ilGenerator, matchedIdxVar, typeof(int));
+
+        var catchDispatchLabel = ilGenerator.DefineLabel();
+        var afterCatchLabel = ilGenerator.DefineLabel();
+
+        ilGenerator.Emit(OpCodes.Ldc_I4_M1);
+        local.StoreVariable(ilGenerator, matchedIdxVar, node.Position);
+        ilGenerator.Emit(OpCodes.Ldnull);
+        local.StoreVariable(ilGenerator, caughtExVar, node.Position);
+
+        sm.MarkProtectedRegionPreEntry(ilGenerator, node);
+        ilGenerator.BeginExceptionBlock();
+        sm.EnterProtectedRegion(ilGenerator, node);
+
+        var prevProtected = local.IsInProtectedRegion;
+        local.IsInProtectedRegion = true;
+        node.TryBlock.Accept(this);
+        ilGenerator.Emit(OpCodes.Leave, afterCatchLabel);
+
+        ilGenerator.BeginCatchBlock(typeof(Exception));
+        var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
+        ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
+        ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
+        local.StoreVariable(ilGenerator, caughtExVar, node.Position);
+
+        for (var i = 0; i < node.CatchBlocks.Count; i++)
+        {
+            var (exceptionType, exceptionVar, filter, _) = node.CatchBlocks[i];
+            var nextCatchLabel = ilGenerator.DefineLabel();
+
+            if (!string.IsNullOrEmpty(exceptionType) && exceptionType != "Exception" && exceptionType != "Old8Exception")
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
+                ilGenerator.Emit(OpCodes.Ldstr, exceptionType);
+                ilGenerator.Emit(OpCodes.Call, typeof(ExceptionHelper).GetMethod("IsMatch")!);
+                ilGenerator.Emit(OpCodes.Brfalse, nextCatchLabel);
+            }
+
+            if (filter is not null)
+            {
+                if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+                {
+                    ilGenerator.Emit(OpCodes.Ldloc, exceptionLocal);
+                    ilGenerator.Emit(OpCodes.Call, typeof(ExceptionWrapper).GetMethod(nameof(ExceptionWrapper.Bind))!);
+                    local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(object));
+                    local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
+                }
+
+                filter.Accept(this);
+                var filterType = filter.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+                if (filterType.IsValueType) ilGenerator.Emit(OpCodes.Box, filterType);
+                ilGenerator.Emit(OpCodes.Call, typeof(TypeConversion).GetMethod("ToBool")!);
+                ilGenerator.Emit(OpCodes.Brfalse, nextCatchLabel);
+            }
+
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            local.StoreVariable(ilGenerator, matchedIdxVar, node.Position);
+            ilGenerator.Emit(OpCodes.Leave, catchDispatchLabel);
+
+            ilGenerator.MarkLabel(nextCatchLabel);
+        }
+
+        ilGenerator.Emit(OpCodes.Rethrow);
+        ilGenerator.EndExceptionBlock();
+        local.IsInProtectedRegion = prevProtected;
+
+        // 搬移到 CLR 异常块外部的 catch 体分派（可自由 await）
+        ilGenerator.MarkLabel(catchDispatchLabel);
+        for (var i = 0; i < node.CatchBlocks.Count; i++)
+        {
+            var (_, exceptionVar, _, catchBlock) = node.CatchBlocks[i];
+            var nextDispatchLabel = ilGenerator.DefineLabel();
+
+            local.LoadVariable(ilGenerator, matchedIdxVar, node.Position);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            ilGenerator.Emit(OpCodes.Bne_Un, nextDispatchLabel);
+
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                local.LoadVariable(ilGenerator, caughtExVar, node.Position);
+                ilGenerator.Emit(OpCodes.Call, typeof(ExceptionWrapper).GetMethod(nameof(ExceptionWrapper.Bind))!);
+                local.DefineVariable(ilGenerator, exceptionVar.IdName, typeof(object));
+                local.StoreVariable(ilGenerator, exceptionVar.IdName, node.Position);
+            }
+
+            catchBlock.Accept(this);
+
+            if (exceptionVar is not null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                local.RemoveLocalVar(exceptionVar.IdName);
+            }
+
+            ilGenerator.Emit(OpCodes.Br, afterCatchLabel);
+            ilGenerator.MarkLabel(nextDispatchLabel);
+        }
+
+        ilGenerator.MarkLabel(afterCatchLabel);
+    }
     
     /// <summary>
     /// 检查语句是否包含 Return 语句
@@ -659,18 +1048,85 @@ public partial class CompilerVisitor
     /// </summary>
     public object? VisitYieldStatement(YieldStatement node)
     {
+        if (local.AsyncStateMachineGenerator is { IsAsyncGenerator: true } asyncGen)
+        {
+            node.YieldExpression.Accept(this);
+            var valueType = node.YieldExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            asyncGen.EmitYield(ilGenerator, valueType);
+            return null;
+        }
+
         // 同步生成器在 IL 后端没有实现：`yield` 不会发射任何指令，
         // 而调用方仍按「函数返回生成器对象」使用，整个方法会被 JIT 判为无效 IL。
         // 这里给出明确错误，避免把无效 IL 留到运行期。
-        if (local.AsyncStateMachineGenerator is null)
-        {
-            throw new CompilerException(
-                "IL 模式暂不支持同步生成器（yield）：该语句没有 IL 实现，请改用解释器或虚拟机模式执行",
-                node.Position);
-        }
+        throw new CompilerException(
+            "IL 模式暂不支持同步生成器（yield）：该语句没有 IL 实现，请改用解释器或虚拟机模式执行",
+            node.Position);
+    }
 
-        // 异步生成器的 yield 目前由异步状态机路径处理（语义仍不完整）。
-        return null;
+    private static bool ContainsYieldStatement(OldStatement? statement)
+    {
+        switch (statement)
+        {
+            case null:
+            case FuncInit:
+            case AsyncFuncInit:
+            case ClassInit:
+                return false;
+            case YieldStatement:
+                return true;
+            case BlockStatement block:
+                for (var i = 0; i < block.Count; i++)
+                {
+                    if (ContainsYieldStatement(block[i])) return true;
+                }
+                return false;
+            case IfStatement ifStmt:
+                foreach (var child in ifStmt.Children)
+                {
+                    if (ContainsYieldStatement(child.Block)) return true;
+                }
+                return ContainsYieldStatement(ifStmt.ElseBlock);
+            case WhileStatement whileStmt:
+                return ContainsYieldStatement(whileStmt.Block);
+            case ForStatement forStmt:
+                return ContainsYieldStatement(forStmt.Block);
+            case ForInStatement forInStmt:
+                return ContainsYieldStatement(forInStmt.Body);
+            case AsyncForInStatement asyncForInStmt:
+                return ContainsYieldStatement(asyncForInStmt.Body);
+            case SwitchStatement switchStmt:
+                foreach (var caseStmt in switchStmt.SwitchCaseList)
+                {
+                    if (ContainsYieldStatement(caseStmt.BlockStatement)) return true;
+                }
+                return ContainsYieldStatement(switchStmt.DefaultBlockStatement);
+            case CaseStatement caseStmt:
+                return ContainsYieldStatement(caseStmt.BlockStatement);
+            case SelectStatement selectStmt:
+                foreach (var selectCase in selectStmt.Cases)
+                {
+                    if (ContainsYieldStatement(selectCase.BlockStatement)) return true;
+                }
+                return ContainsYieldStatement(selectStmt.DefaultCase);
+            case TryStatement tryStmt:
+                if (ContainsYieldStatement(tryStmt.TryBlock)) return true;
+                foreach (var (_, _, _, catchBlock) in tryStmt.CatchBlocks)
+                {
+                    if (ContainsYieldStatement(catchBlock)) return true;
+                }
+                return ContainsYieldStatement(tryStmt.FinallyBlock);
+            case UsingStatement usingStmt:
+                return ContainsYieldStatement(usingStmt.BlockStatement);
+            case DeferStatement deferStmt:
+                return ContainsYieldStatement(deferStmt.Statement);
+            default:
+                for (var i = 0; i < statement.Count; i++)
+                {
+                    if (ContainsYieldStatement(statement[i])) return true;
+                }
+                return false;
+        }
     }
 
     /// <summary>

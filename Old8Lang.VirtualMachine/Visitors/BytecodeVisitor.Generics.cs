@@ -37,20 +37,21 @@ public partial class BytecodeVisitor
             // 设置新的类型参数映射
             _compiler.CurrentTypeParameterMapping = typeMapping;
 
-            // 收集字段名称、类型和初始值（从实例成员中提取）
-            var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue)>();
+            // 收集字段名称、类型、初始值和访问修饰符（从实例成员中提取）
+            var fields = new List<(string fieldName, string fieldType, LangExpression? initialValue, AccessModifier accessModifier)>();
             foreach (var (memberId, memberExpr) in typeTemplate.Variates)
             {
                 if (memberExpr is not FuncLangValue)
                 {
-                    // 这是一个字段，保存字段名、类型和初始值
+                    // 这是一个字段，保存字段名、类型、初始值和访问修饰符
                     // 替换泛型类型参数（包括嵌套泛型）
                     var fieldType = memberId.AssumptionType ?? "";
                     if (!string.IsNullOrEmpty(fieldType))
                     {
                         fieldType = ReplaceTypeParameters(fieldType, typeMapping);
                     }
-                    fields.Add((memberId.IdName, fieldType, memberExpr));
+                    var accessModifier = GetAccessModifier(memberId.Modifiers);
+                    fields.Add((memberId.IdName, fieldType, memberExpr, accessModifier));
                 }
             }
 

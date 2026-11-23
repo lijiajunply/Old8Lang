@@ -552,6 +552,22 @@ public partial class TypeInferenceVisitor
                 return typeof(void);
             }
 
+            // 特殊处理 Task 静态方法调用，确保返回类型与 DotOperatorILHelper 发射一致
+            if (node.Left is LangId { IdName: "Task" })
+            {
+                return instance.Id.IdName switch
+                {
+                    "Completed" => typeof(Task),
+                    "WaitAll" => typeof(void),
+                    "WaitAny" => typeof(int),
+                    "Delay" => typeof(Task),
+                    "FromResult" or "FromException" or "Run" or "StartNew" => typeof(Task<object>),
+                    "WhenAll" => typeof(Task<object[]>),
+                    "WhenAny" => typeof(Task<Task<object>>),
+                    _ => typeof(object)
+                };
+            }
+
             // 处理内置类型的扩展方法返回类型
             var builtInReturnType = OperationTypeHelper.GetBuiltInMethodReturnType(leftType, instance.Id.IdName, instance.Ids.Count);
             if (builtInReturnType is not null)

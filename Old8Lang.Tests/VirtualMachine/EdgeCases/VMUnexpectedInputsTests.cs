@@ -323,6 +323,81 @@ public class VMUnexpectedInputsTests(ITestOutputHelper output)
         output.WriteLine($"Expected exception: {exception.Message}");
     }
 
+    [Fact]
+    public void UnexpectedInputs_PrivateFieldRead_ThrowsAccessViolation()
+    {
+        var code = @"
+            class MyClass {
+                private privateField <- 0
+
+                func init() {
+                    this.privateField <- 10
+                }
+
+                func getVal() -> int {
+                    return this.privateField
+                }
+            }
+            obj <- MyClass()
+            Assert.Equal(10, obj.getVal())
+            value <- obj.privateField
+        ";
+
+        var exception = Assert.Throws<Old8Lang.Error.AccessViolationError>(() => ExecuteVMCode(code));
+        output.WriteLine($"Expected exception: {exception.Message}");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PrivateField_ExternalFunctionCannotBorrowAccess(bool invokedFromMethod)
+    {
+        var call = invokedFromMethod ? "obj.invoke()" : "leak(obj)";
+        var code = @"
+            class MyClass {
+                private secret <- 1
+                func invoke() -> int { return leak(this) }
+            }
+            func leak(obj) -> int { return obj.secret }
+            obj <- MyClass()
+        " + call;
+        Assert.Throws<Old8Lang.Error.AccessViolationError>(() => ExecuteVMCode(code));
+    }
+
+    [Fact]
+    public void UnexpectedInputs_PrivateFieldWrite_ThrowsAccessViolation()
+    {
+        var code = @"
+            class MyClass {
+                private secret <- 1
+            }
+            obj <- MyClass()
+            obj.secret <- 99
+        ";
+
+        var exception = Assert.Throws<Old8Lang.Error.AccessViolationError>(() => ExecuteVMCode(code));
+        output.WriteLine($"Expected exception: {exception.Message}");
+    }
+
+    [Fact]
+    public void UnexpectedInputs_PrivateStaticFieldAccess_ThrowsAccessViolation()
+    {
+        var code = @"
+            class MyClass {
+                private static secret <- 42
+
+                public static func readSecret() -> int {
+                    return MyClass.secret
+                }
+            }
+            Assert.Equal(42, MyClass.readSecret())
+            x <- MyClass.secret
+        ";
+
+        var exception = Assert.Throws<Old8Lang.Error.AccessViolationError>(() => ExecuteVMCode(code));
+        output.WriteLine($"Expected exception: {exception.Message}");
+    }
+
     #endregion
 
     #region 无效赋值测试

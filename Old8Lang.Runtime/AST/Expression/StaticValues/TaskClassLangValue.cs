@@ -42,6 +42,9 @@ public partial class TaskClassLangValue : LangValueType
             {
                 "WhenAll" => WhenAll,
                 "WhenAny" => WhenAny,
+                "WaitAll" => WaitAll,
+                "WaitAny" => WaitAny,
+                "Completed" => Completed,
                 "Delay" => Delay,
                 "FromResult" => FromResult,
                 "FromException" => FromException,
@@ -71,6 +74,9 @@ public partial class TaskClassLangValue : LangValueType
             {
                 "WhenAll" => new TaskStaticMethodWrapper("WhenAll", WhenAll),
                 "WhenAny" => new TaskStaticMethodWrapper("WhenAny", WhenAny),
+                "WaitAll" => new TaskStaticMethodWrapper("WaitAll", WaitAll),
+                "WaitAny" => new TaskStaticMethodWrapper("WaitAny", WaitAny),
+                "Completed" => new TaskStaticMethodWrapper("Completed", Completed),
                 "Delay" => new TaskStaticMethodWrapper("Delay", Delay),
                 "FromResult" => new TaskStaticMethodWrapper("FromResult", FromResult),
                 "FromException" => new TaskStaticMethodWrapper("FromException", FromException),
@@ -151,6 +157,107 @@ public partial class TaskClassLangValue : LangValueType
         }
 
         return TaskLangValue.WhenAny(tasks, position);
+    }
+
+    /// <summary>
+    /// WaitAll 静态方法实现：同步阻塞等待所有任务完成
+    /// </summary>
+    internal static LangValueType WaitAll(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"WaitAll 期望 1 个参数(任务数组),但提供了 {args.Count} 个");
+        }
+
+        var taskList = args[0];
+        if (taskList is not ILangList list)
+        {
+            var tempNode = new NullLangValue(position);
+            throw new TypeError(tempNode, "Array/List", taskList.TypeToString());
+        }
+
+        var clrTasks = new List<Task>();
+        foreach (var item in list.GetItems())
+        {
+            if (item is not TaskLangValue task)
+            {
+                var tempNode = new NullLangValue(position);
+                throw new TypeError(tempNode, "Task", item.TypeToString());
+            }
+
+            clrTasks.Add(task.Task);
+        }
+
+        if (clrTasks.Count > 0)
+        {
+            try
+            {
+                Task.WaitAll(clrTasks.ToArray());
+            }
+            catch (AggregateException ex) when (ex.InnerExceptions.Count == 1)
+            {
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
+            }
+        }
+
+        return new VoidLangValue(position);
+    }
+
+    /// <summary>
+    /// WaitAny 静态方法实现：同步阻塞等待任意一个任务完成并返回其 0 基索引
+    /// </summary>
+    internal static LangValueType WaitAny(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"WaitAny 期望 1 个参数(任务数组),但提供了 {args.Count} 个");
+        }
+
+        var taskList = args[0];
+        if (taskList is not ILangList list)
+        {
+            var tempNode = new NullLangValue(position);
+            throw new TypeError(tempNode, "Array/List", taskList.TypeToString());
+        }
+
+        var clrTasks = new List<Task>();
+        foreach (var item in list.GetItems())
+        {
+            if (item is not TaskLangValue task)
+            {
+                var tempNode = new NullLangValue(position);
+                throw new TypeError(tempNode, "Task", item.TypeToString());
+            }
+
+            clrTasks.Add(task.Task);
+        }
+
+        if (clrTasks.Count == 0)
+        {
+            return new IntLangValue(-1, position);
+        }
+
+        var completedIndex = Task.WaitAny(clrTasks.ToArray());
+        return new IntLangValue(completedIndex, position);
+    }
+
+    /// <summary>
+    /// Completed 静态方法实现：返回一个已完成的任务
+    /// </summary>
+    internal static LangValueType Completed(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 0)
+        {
+            throw new ArgumentError(position,
+                $"Completed 期望 0 个参数,但提供了 {args.Count} 个");
+        }
+
+        return new TaskLangValue(
+            Task.FromResult<LangValueType>(new VoidLangValue(position)),
+            CancellationToken.None,
+            position);
     }
 
     /// <summary>
@@ -301,6 +408,9 @@ public partial class TaskClassLangValue : LangValueType
             ["Delay"] = Delay,
             ["WhenAll"] = WhenAll,
             ["WhenAny"] = WhenAny,
+            ["WaitAll"] = WaitAll,
+            ["WaitAny"] = WaitAny,
+            ["Completed"] = Completed,
             ["FromResult"] = FromResult,
             ["FromException"] = FromException,
         };

@@ -45,6 +45,93 @@ public partial class VirtualMachine
     }
 
     /// <summary>
+    /// 验证实例/静态字段的访问权限（private / protected）。
+    /// </summary>
+    private void ValidateFieldAccess(string className, string fieldName, bool isStatic, Instruction instruction)
+    {
+        var startClass = FindClassMetadata(className);
+        if (startClass == null) return;
+
+        ClassMetadata? declaringClass = null;
+        FieldMetadata? fieldMetadata = null;
+        var currentClass = startClass;
+        while (currentClass != null)
+        {
+            var list = isStatic ? currentClass.StaticFields : currentClass.Fields;
+            fieldMetadata = list.FirstOrDefault(f => f.Name == fieldName);
+            if (fieldMetadata != null)
+            {
+                declaringClass = currentClass;
+                break;
+            }
+
+            if (!string.IsNullOrEmpty(currentClass.BaseClassName))
+            {
+                currentClass = FindClassMetadata(currentClass.BaseClassName);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (fieldMetadata == null || declaringClass == null || fieldMetadata.AccessModifier == AccessModifier.Public)
+        {
+            return;
+        }
+
+        var allowDerived = fieldMetadata.AccessModifier == AccessModifier.Protected;
+        if (IsAccessAllowedFromCallStack(declaringClass.Name, allowDerived))
+        {
+            return;
+        }
+
+        var modifierName = fieldMetadata.AccessModifier == AccessModifier.Private ? "private" : "protected";
+        throw new AccessViolationError(GetPosition(instruction), fieldName, declaringClass.Name, modifierName);
+    }
+
+    private ClassMetadata? FindClassMetadata(string className)
+    {
+        var metadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
+        if (metadata != null) return metadata;
+        if (TryGetGlobalValue(className, out var globalVal) && globalVal is ClassMetadata importedClass)
+        {
+            return importedClass;
+        }
+
+        return null;
+    }
+
+    private bool IsAccessAllowedFromCallStack(string declaringClassName, bool allowDerived)
+    {
+        if (!_callStack.TryPeek(out var callFrame)) return false;
+        var funcName = callFrame.Function.Name;
+        var dotIndex = funcName?.IndexOf('.') ?? -1;
+        if (dotIndex > 0)
+        {
+            var callerClassName = funcName![..dotIndex];
+            return callerClassName == declaringClassName ||
+                   (allowDerived && IsSubclassOf(callerClassName, declaringClassName));
+        }
+
+        return false;
+    }
+
+    private bool IsSubclassOf(string candidateClassName, string baseClassName)
+    {
+        var current = FindClassMetadata(candidateClassName);
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        while (current != null && !string.IsNullOrEmpty(current.BaseClassName))
+        {
+            if (!visited.Add(current.Name)) break;
+            if (current.BaseClassName == baseClassName) return true;
+            current = FindClassMetadata(current.BaseClassName);
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// 验证字段赋值类型
     /// </summary>
 

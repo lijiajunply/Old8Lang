@@ -276,4 +276,34 @@ public class VMTaskStaticApiTests
 
         Assert.Equal("after delay\ndone", output);
     }
+
+    [Fact]
+    public void TaskCompleted_WaitAll_WaitAny_WorkInVM()
+    {
+        var bytecodeFile = Compile("""
+            completed <- Task.Completed()
+            isDone <- completed.IsCompleted
+
+            async func t1() {
+                await Task.Delay(10)
+            }
+            async func t2() {
+                await Task.Delay(80)
+            }
+
+            allTasks <- {t1(), t1()}
+            Task.WaitAll(allTasks)
+            allDone <- allTasks[0].IsCompleted && allTasks[1].IsCompleted
+
+            anyTasks <- {t1(), t2()}
+            firstIndex <- Task.WaitAny(anyTasks)
+            """);
+
+        var vm = new VM(bytecodeFile);
+        vm.Execute();
+
+        Assert.Equal(true, vm.GetGlobalVariable("isDone"));
+        Assert.Equal(true, vm.GetGlobalVariable("allDone"));
+        Assert.Equal(0, ToInt(vm.GetGlobalVariable("firstIndex")));
+    }
 }

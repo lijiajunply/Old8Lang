@@ -103,7 +103,7 @@ public class TaskStaticMethodIlTests
         // 未实现的 Task 静态方法不能「什么都不发射却声明有返回值」。
         var code = @"
             async func run() {
-                task <- Task.Completed()
+                task <- Task.NonExistentMethod()
             }
 
             run()
@@ -119,7 +119,7 @@ public class TaskStaticMethodIlTests
                 Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
 
             Assert.DoesNotContain("InvalidProgram", error.GetType().Name);
-            Assert.Contains("Completed", error.Message);
+            Assert.Contains("NonExistentMethod", error.Message);
         }
         finally
         {

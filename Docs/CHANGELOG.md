@@ -9,6 +9,19 @@
 
 ---
 
+## 2026-11-23
+
+**语法 / 语义**
+
+- IL 模式的异步函数现已支持在 `catch` 与 `finally` 块中使用 `await`，并支持含 `yield` 的异步生成器与 `async for-in` 迭代。
+- 虚拟机模式对类的 `private` / `protected` 实例字段与静态字段补齐了运行期访问控制，外部读写私有字段现在会报 `ACCESS_VIOLATION_ERROR`（不再静默放行）。
+
+**API**
+
+- 三种执行模式统一新增 `Task.Completed()`、`Task.WaitAll(tasks)` 与 `Task.WaitAny(tasks)` 静态方法。
+
+---
+
 ## 2026-11-22
 
 **语法 / 语义**

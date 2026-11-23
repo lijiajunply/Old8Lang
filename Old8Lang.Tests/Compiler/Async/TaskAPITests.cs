@@ -254,7 +254,7 @@ public class TaskAPITests(ITestOutputHelper output)
                 Assert.True(tasks[2].IsCompleted)
             }
             
-            testWaitAll()
+            await testWaitAll()
         ";
         var interpreter = new LangInterpreter();
 
@@ -286,7 +286,7 @@ public class TaskAPITests(ITestOutputHelper output)
                 Assert.Equal(0, index)
             }
             
-            testWaitAny()
+            await testWaitAny()
         ";
         var interpreter = new LangInterpreter();
 
@@ -308,7 +308,7 @@ public class TaskAPITests(ITestOutputHelper output)
                 Assert.True(task.IsCompleted)
             }
             
-            testCompleted()
+            await testCompleted()
         ";
         var interpreter = new LangInterpreter();
 

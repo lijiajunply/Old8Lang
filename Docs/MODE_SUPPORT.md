@@ -328,6 +328,7 @@
 | `join` 后引用内层范围变量（`... let z <- y where z > 2 select z`） | `[3]` | `[4, 4, 4]` | `[3, 4]` | join 结果只保留外层元素，内层变量是循环残留值，三模式配对语义都未统一 |
 | `join ... into g` 分组结果 | `[[1, 1], [2, 2, 2], [3]]` | `[[3], [3], [3]]` | 同解释器 | IL 的 group join 没有按外层元素分别收集匹配项 |
 | 字符串拼接的 bool / 集合显示（`"x" + true`、`"x" + {1, 2}`） | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | 2026-11-15 起三模式统一走语言显示规则 |
+| 私有成员访问 / 未声明变量 / 未知方法（如 `"".Match(...)`） | 运行期报错 | 编译期报错 | 运行期报错 | 2026-11-23 起 VM 补齐私有字段访问控制（不再静默放行），与解释器一致抛 `ACCESS_VIOLATION_ERROR`；编译期 vs 运行期阶段差异属后端模型本身；正则请用 `Regex.RegexIsMatch` / `Regex.RegexMatch` |
 
 ### 三种模式共同
 
@@ -350,12 +351,12 @@
    `InvalidCastException`（见「三种模式共同的跨模式差异」第 1 条）。
 2. 不支持泛型函数、泛型类、运算符重载、装饰器。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
-4. **异步功能支持不完整**（2026-11-15 更新）：异步状态机在 try / try-finally / using 区域内的
-   `await` 已能正确恢复（此前会生成无效 IL，`InvalidProgramException`），用户 `finally` 与
-   using 的 Dispose 也只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
-   `catch` / `finally` 块中的 `await`、`defer` / `yield` 中的 `await`，以及表达式内部的 `await`
+4. **异步功能支持不完整**（2026-11-23 更新）：异步状态机在 `try` / `catch` / `finally` / `using` 区域内的
+   `await` 均已支持，含 `yield` 的异步生成器与 `async for-in` 迭代也已可用；用户 `finally` 与
+   using 的 Dispose 只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
+   `catch` 过滤器中的 `await`、`defer` 中的 `await`，以及表达式内部的 `await`
    （如 `1 + await f()`、`PrintLine(await f())`，请先把结果赋给变量）。
-   `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都未实现。
+   `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 已于 2026-11-23 在三种模式下统一实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
    `dotnet test Old8Lang.Tests --filter "FullyQualifiedName~Compiler"` 逐组运行共 2017 例 →
@@ -405,7 +406,7 @@
    `async (x) -> ...` 这种异步 Lambda 目前解释器下也会抛 `NullReferenceException`
    （`Instance.Run`），三种模式都还没有异步函数值。等异步函数值落地后再处理。
 3. **静态类 API 大部分可用**：编译期把 `类名.方法(...)` 改写成静态类原生调用，支持集合集中在
-   `VmStaticClassRegistry`。可用：`Task.Delay`/`WhenAll`/`WhenAny`/`FromResult`/`FromException`/
+   `VmStaticClassRegistry`。可用：`Task.Delay`/`WhenAll`/`WhenAny`/`WaitAll`/`WaitAny`/`Completed`/`FromResult`/`FromException`/
    `Run`/`StartNew`、`Task.Factory`（属性）与 `Task.Factory.StartNew`、`TaskScheduler.Default`、
    `Thread.Sleep`、`Thread.CurrentThread`（属性 / 无参调用）、`Assert` 的 24 个断言方法、
    `TestRunner`（`Describe` / `It` / `Test` / `RunTest` 由虚拟机执行传入的函数值，其余复用解释器实现）、

@@ -6,6 +6,7 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Compiler.Helpers;
 using Old8Lang.Error;
 using Old8Lang.Execution;
 
@@ -24,6 +25,10 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     // 状态机字段
     public FieldBuilder? StateField { get; private set; }
     public FieldBuilder? BuilderField { get; private set; }
+    public FieldBuilder? YieldEmitterField { get; private set; }
+
+    /// <summary>当前状态机是否为异步生成器（含 yield）。</summary>
+    public bool IsAsyncGenerator { get; }
     
     // 每个 await 表达式对应一个专用的 awaiter 字段
     private readonly Dictionary<int, FieldBuilder> AwaiterFields = [];
@@ -36,8 +41,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     public Dictionary<string, FieldBuilder> VariableFields { get; } = new Dictionary<string, FieldBuilder>();
     public TypeBuilder? TypeBuilder { get; set; }
 
-    // Await 表达式到状态索引的映射
-    private readonly Dictionary<AwaitExpression, int> AwaitStateMap = [];
+    // 挂起点节点（AwaitExpression / AsyncForInStatement）到状态索引的映射
+    private readonly Dictionary<object, int> AwaitStateMap = new(ReferenceEqualityComparer.Instance);
     
     // 状态索引到标签的映射
     private readonly Dictionary<int, Label> StateLabels = [];
@@ -60,14 +65,18 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     /// <summary>
     /// await 不允许出现的位置描述；null 表示允许。
     /// </summary>
-    private static readonly object UnsupportedCatchFinally = "catch / finally 块";
+    private static readonly object UnsupportedCatchFilter = "catch 过滤器";
     private static readonly object UnsupportedDefer = "defer 块";
     private static readonly object UnsupportedYield = "yield 表达式";
 
     private readonly AwaitRegion _rootRegion = new();
-    private readonly Dictionary<object, AwaitRegion> _regions = [];
-    private readonly Dictionary<object, Label> _regionEntryLabels = [];
-    private readonly Dictionary<object, Label> _regionPreEntryLabels = [];
+    private readonly Dictionary<object, AwaitRegion> _regions = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<object, Label> _regionEntryLabels = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<object, Label> _regionPreEntryLabels = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<TryStatement> _asyncCatchTryStatements = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<TryStatement> _asyncFinallyTryStatements = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<TryStatement, object> _finallyGuardRegionKeys = new(ReferenceEqualityComparer.Instance);
+    private readonly Stack<(string ReasonFieldName, Label FinallyLabel)> _asyncFinallyStack = new();
     private bool _analysisComplete;
 
     // 当前正在生成的 MoveNext ILGenerator
@@ -79,8 +88,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     // 完成标签：return 与隐式完成都先离开受保护区域，最后在这里统一 SetResult。
     private Label? _completeLabel;
 
-    // return 的值先存这里，等 finally 执行完再交给 builder。
-    private LocalBuilder? _returnValueLocal;
+    // return 的值存状态机字段：即使在异步 finally 中挂起再恢复，返回值也不会丢失。
+    private FieldBuilder? _returnValueField;
 
     // 是否已经执行了 return 语句（避免重复的 leave 指令）
     private bool HasReturned { get; set; }
@@ -91,11 +100,16 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     /// <param name="ilGenerator">IL生成器</param>
     /// <param name="localManager">局部变量管理器</param>
     /// <param name="blockStatement">异步函数体</param>
-    public AsyncStateMachineGenerator(ILGenerator ilGenerator, LocalManager localManager, BlockStatement blockStatement)
+    public AsyncStateMachineGenerator(
+        ILGenerator ilGenerator,
+        LocalManager localManager,
+        BlockStatement blockStatement,
+        bool isAsyncGenerator = false)
     {
         IlGenerator = ilGenerator;
         LocalManager = localManager;
         BlockStatement = blockStatement;
+        IsAsyncGenerator = isAsyncGenerator;
 
         // 初始化：识别 await 位置，并按所在受保护区域分组
         AnalyzeStatement(blockStatement, _rootRegion, unsupportedContext: null);
@@ -148,9 +162,16 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
                 return;
 
             case YieldStatement yieldStmt:
-                // yield 在 IL 后端没有生成任何指令，其中的 await 也无从恢复。
-                AnalyzeExpression(yieldStmt.YieldExpression, region,
-                    unsupportedContext ?? UnsupportedYield);
+                if (IsAsyncGenerator)
+                {
+                    AnalyzeExpression(yieldStmt.YieldExpression, region, unsupportedContext);
+                }
+                else
+                {
+                    // 非异步生成器中的 yield 没有 IL 实现，其中的 await 也无从恢复。
+                    AnalyzeExpression(yieldStmt.YieldExpression, region,
+                        unsupportedContext ?? UnsupportedYield);
+                }
                 return;
 
             case DeferStatement deferStmt:
@@ -192,6 +213,19 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
 
             case AsyncForInStatement asyncForInStmt:
                 AnalyzeExpression(asyncForInStmt.Expression, region, unsupportedContext);
+                if (unsupportedContext is not null)
+                {
+                    throw new CompilerException(
+                        $"IL 模式暂不支持 {unsupportedContext} 中的 async for-in：该位置无法从 MoveNext 入口恢复",
+                        asyncForInStmt.Position);
+                }
+
+                var asyncForState = GetAwaitNodeStateIndex(asyncForInStmt);
+                if (!region.DirectAwaitStates.Contains(asyncForState))
+                {
+                    region.DirectAwaitStates.Add(asyncForState);
+                }
+
                 AnalyzeStatement(asyncForInStmt.Body, region, unsupportedContext);
                 return;
 
@@ -235,28 +269,84 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
 
             case TryStatement tryStmt:
                 {
-                    // try 块是一个可恢复区域：记录父子关系，await 归属到 try 块。
-                    var tryRegion = GetOrCreateRegion(tryStmt);
-                    region.ChildRegions.Add(tryStmt);
-                    AnalyzeStatement(tryStmt.TryBlock, tryRegion, unsupportedContext);
+                    var hasAsyncCatch = tryStmt.CatchBlocks.Any(cb => ContainsSuspendPoint(cb.catchBlock));
+                    var hasAsyncFinally = tryStmt.FinallyBlock is not null &&
+                                          (ContainsSuspendPoint(tryStmt.FinallyBlock) || hasAsyncCatch);
 
-                    // catch / finally（含 catch 过滤器）只能由异常机制进入，
-                    // 恢复标签无法到达；出现 await 时给出明确的编译错误。
-                    foreach (var (_, _, filter, catchBlock) in tryStmt.CatchBlocks)
+                    if (hasAsyncCatch) _asyncCatchTryStatements.Add(tryStmt);
+                    if (hasAsyncFinally) _asyncFinallyTryStatements.Add(tryStmt);
+
+                    if (!hasAsyncCatch && !hasAsyncFinally)
                     {
-                        AnalyzeExpression(filter, region,
-                            unsupportedContext ?? UnsupportedCatchFinally);
-                        AnalyzeStatement(catchBlock, region,
-                            unsupportedContext ?? UnsupportedCatchFinally);
+                        // 普通 try/catch/finally：catch/finally 不含挂起点，维持原 CLR 结构。
+                        var tryRegion = GetOrCreateRegion(tryStmt);
+                        region.ChildRegions.Add(tryStmt);
+                        AnalyzeStatement(tryStmt.TryBlock, tryRegion, unsupportedContext);
+
+                        foreach (var (_, _, filter, catchBlock) in tryStmt.CatchBlocks)
+                        {
+                            AnalyzeExpression(filter, region, unsupportedContext ?? UnsupportedCatchFilter);
+                            AnalyzeStatement(catchBlock, region, unsupportedContext);
+                        }
+
+                        if (tryStmt.FinallyBlock != null)
+                        {
+                            AnalyzeStatement(tryStmt.FinallyBlock, region, unsupportedContext);
+                        }
+
+                        return;
                     }
 
-                    if (tryStmt.FinallyBlock != null)
+                    if (hasAsyncFinally)
                     {
-                        AnalyzeStatement(tryStmt.FinallyBlock, region,
-                            unsupportedContext ?? UnsupportedCatchFinally);
+                        // 异步 finally：外层 guard try 捕获异常并转交搬移到外部的 finally 体。
+                        var guardKey = GetFinallyGuardRegionKey(tryStmt);
+                        var guardRegion = GetOrCreateRegion(guardKey);
+                        region.ChildRegions.Add(guardKey);
+
+                        if (tryStmt.CatchBlocks.Count == 0)
+                        {
+                            // 无 catch 块：try 体直接位于 guard try 内部。
+                            AnalyzeStatement(tryStmt.TryBlock, guardRegion, unsupportedContext);
+                        }
+                        else
+                        {
+                            // 有 catch 块：内层 try 位于 guard try 内部。
+                            var innerTryRegion = GetOrCreateRegion(tryStmt);
+                            guardRegion.ChildRegions.Add(tryStmt);
+                            AnalyzeStatement(tryStmt.TryBlock, innerTryRegion, unsupportedContext);
+
+                            foreach (var (_, _, filter, catchBlock) in tryStmt.CatchBlocks)
+                            {
+                                AnalyzeExpression(filter, guardRegion, unsupportedContext ?? UnsupportedCatchFilter);
+                                // 异步 catch 体搬移到内层 EndExceptionBlock 之后、外层 guard try 之内。
+                                AnalyzeStatement(catchBlock, guardRegion, unsupportedContext);
+                            }
+                        }
+
+                        // 异步 finally 体搬移到外层 guard EndExceptionBlock 之后，归属外层 region。
+                        if (tryStmt.FinallyBlock != null)
+                        {
+                            AnalyzeStatement(tryStmt.FinallyBlock, region, unsupportedContext);
+                        }
+
+                        return;
                     }
 
-                    return;
+                    // 仅异步 catch（无 finally）：try 在内层受保护块，catch 体搬移到外层 region。
+                    {
+                        var tryRegion = GetOrCreateRegion(tryStmt);
+                        region.ChildRegions.Add(tryStmt);
+                        AnalyzeStatement(tryStmt.TryBlock, tryRegion, unsupportedContext);
+
+                        foreach (var (_, _, filter, catchBlock) in tryStmt.CatchBlocks)
+                        {
+                            AnalyzeExpression(filter, region, unsupportedContext ?? UnsupportedCatchFilter);
+                            AnalyzeStatement(catchBlock, region, unsupportedContext);
+                        }
+
+                        return;
+                    }
                 }
 
             default:
@@ -671,6 +761,209 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     {
         StateField = typeBuilder.DefineField("<>1__state", typeof(int), FieldAttributes.Public);
         BuilderField = typeBuilder.DefineField("<>t__builder", typeof(AsyncTaskMethodBuilder<object>), FieldAttributes.Public);
+        _returnValueField = typeBuilder.DefineField("<>r__returnValue", typeof(object), FieldAttributes.Public);
+        if (IsAsyncGenerator)
+        {
+            YieldEmitterField = typeBuilder.DefineField("<>y__emitter", typeof(IlAsyncYieldEmitter), FieldAttributes.Public);
+        }
+    }
+
+    public bool RequiresAsyncCatch(TryStatement tryStmt) => _asyncCatchTryStatements.Contains(tryStmt);
+
+    public bool RequiresAsyncFinally(TryStatement tryStmt) => _asyncFinallyTryStatements.Contains(tryStmt);
+
+    public object GetFinallyGuardRegionKey(TryStatement tryStmt)
+    {
+        if (_finallyGuardRegionKeys.TryGetValue(tryStmt, out var key)) return key;
+        key = new object();
+        _finallyGuardRegionKeys[tryStmt] = key;
+        return key;
+    }
+
+    public void PushAsyncFinallyScope(string reasonFieldName, Label finallyLabel)
+    {
+        _asyncFinallyStack.Push((reasonFieldName, finallyLabel));
+    }
+
+    public void PopAsyncFinallyScope()
+    {
+        if (_asyncFinallyStack.Count > 0)
+        {
+            _asyncFinallyStack.Pop();
+        }
+    }
+
+    public void EmitAsyncFinallyReturnContinuation(ILGenerator il)
+    {
+        if (_asyncFinallyStack.Count > 0)
+        {
+            var (outerReasonFieldName, outerFinallyLabel) = _asyncFinallyStack.Peek();
+            il.Emit(OpCodes.Ldc_I4_2);
+            StoreVariable(il, outerReasonFieldName);
+            il.Emit(OpCodes.Leave, outerFinallyLabel);
+            return;
+        }
+
+        il.Emit(OpCodes.Leave, _completeLabel!.Value);
+    }
+
+    private static bool ContainsSuspendPoint(OldStatement? statement)
+    {
+        switch (statement)
+        {
+            case null:
+            case FuncInit:
+            case AsyncFuncInit:
+            case ClassInit:
+                return false;
+            case AsyncForInStatement:
+                return true;
+            case BlockStatement block:
+                for (var i = 0; i < block.Count; i++)
+                {
+                    if (ContainsSuspendPoint(block[i])) return true;
+                }
+                return false;
+            case SetStatement setStmt:
+                return ContainsSuspendPoint(setStmt.Value);
+            case FuncRunStatement funcRunStmt:
+                return ContainsSuspendPoint(funcRunStmt.Expression);
+            case ReturnStatement returnStmt:
+                return ContainsSuspendPoint(returnStmt.Expression);
+            case ThrowStatement throwStmt:
+                return ContainsSuspendPoint(throwStmt.Expression);
+            case YieldStatement yieldStmt:
+                return ContainsSuspendPoint(yieldStmt.YieldExpression);
+            case DeferStatement deferStmt:
+                return ContainsSuspendPoint(deferStmt.Statement);
+            case IfStatement ifStmt:
+                foreach (var child in ifStmt.Children)
+                {
+                    if (ContainsSuspendPoint(child.Condition) || ContainsSuspendPoint(child.Block)) return true;
+                }
+                return ContainsSuspendPoint(ifStmt.ElseBlock);
+            case WhileStatement whileStmt:
+                return ContainsSuspendPoint(whileStmt.Condition) || ContainsSuspendPoint(whileStmt.Block);
+            case ForStatement forStmt:
+                return ContainsSuspendPoint(forStmt.Init) ||
+                       ContainsSuspendPoint(forStmt.Condition) ||
+                       ContainsSuspendPoint(forStmt.Operation) ||
+                       ContainsSuspendPoint(forStmt.Block);
+            case ForInStatement forInStmt:
+                return ContainsSuspendPoint(forInStmt.Expression) || ContainsSuspendPoint(forInStmt.Body);
+            case SwitchStatement switchStmt:
+                if (ContainsSuspendPoint(switchStmt.SwitchExpression)) return true;
+                foreach (var c in switchStmt.SwitchCaseList)
+                {
+                    if (ContainsSuspendPoint(c.Expression) || ContainsSuspendPoint(c.BlockStatement)) return true;
+                }
+                return ContainsSuspendPoint(switchStmt.DefaultBlockStatement);
+            case SelectStatement selectStmt:
+                foreach (var c in selectStmt.Cases)
+                {
+                    if (ContainsSuspendPoint(c.BlockStatement)) return true;
+                }
+                return ContainsSuspendPoint(selectStmt.DefaultCase);
+            case UsingStatement usingStmt:
+                return ContainsSuspendPoint(usingStmt.ResourceExpression) || ContainsSuspendPoint(usingStmt.BlockStatement);
+            case TryStatement tryStmt:
+                if (ContainsSuspendPoint(tryStmt.TryBlock)) return true;
+                foreach (var (_, _, filter, catchBlock) in tryStmt.CatchBlocks)
+                {
+                    if (ContainsSuspendPoint(filter) || ContainsSuspendPoint(catchBlock)) return true;
+                }
+                return ContainsSuspendPoint(tryStmt.FinallyBlock);
+            default:
+                for (var i = 0; i < statement.Count; i++)
+                {
+                    if (ContainsSuspendPoint(statement[i])) return true;
+                }
+                return false;
+        }
+    }
+
+    private static bool ContainsSuspendPoint(LangExpression? expression)
+    {
+        switch (expression)
+        {
+            case null:
+                return false;
+            case AwaitExpression:
+                return true;
+            case Operation op:
+                return ContainsSuspendPoint(op.Left) || ContainsSuspendPoint(op.Right);
+            case CallExpression call:
+                return (call.Arguments?.Any(ContainsSuspendPoint) ?? false) ||
+                       (call.NamedArguments?.Any(a => ContainsSuspendPoint(a.Value)) ?? false);
+            case FunctionCallExpression funcCall:
+                return ContainsSuspendPoint(funcCall.FunctionExpression) ||
+                       (funcCall.Arguments?.Any(ContainsSuspendPoint) ?? false) ||
+                       (funcCall.NamedArguments?.Any(a => ContainsSuspendPoint(a.Value)) ?? false);
+            case TernaryExpression ternary:
+                return ContainsSuspendPoint(ternary.Condition) ||
+                       ContainsSuspendPoint(ternary.TrueExpression) ||
+                       ContainsSuspendPoint(ternary.FalseExpression);
+            case AST.Expression.Intermediates.MatchExpression match:
+                return ContainsSuspendPoint(match.MatchValue) ||
+                       match.Cases.Any(c => ContainsSuspendPoint(c.Pattern) ||
+                                            ContainsSuspendPoint(c.GuardCondition) ||
+                                            ContainsSuspendPoint(c.ResultExpression));
+            case AST.Expression.Intermediates.StringTemplateValue template:
+                return template.ExpressionList.Any(ContainsSuspendPoint);
+            case NestedIndexExpression nestedIndex:
+                return ContainsSuspendPoint(nestedIndex.Target) || ContainsSuspendPoint(nestedIndex.Index);
+            case NestedSliceExpression nestedSlice:
+                return ContainsSuspendPoint(nestedSlice.Target) ||
+                       ContainsSuspendPoint(nestedSlice.Start) ||
+                       ContainsSuspendPoint(nestedSlice.End) ||
+                       ContainsSuspendPoint(nestedSlice.Step);
+            case IndexExpression indexExpr:
+                return ContainsSuspendPoint(indexExpr.Key);
+            case SliceExpression sliceExpr:
+                return ContainsSuspendPoint(sliceExpr.Start) ||
+                       ContainsSuspendPoint(sliceExpr.End) ||
+                       ContainsSuspendPoint(sliceExpr.Step);
+            case RangeLiteralExpression rangeExpr:
+                return ContainsSuspendPoint(rangeExpr.Start) || ContainsSuspendPoint(rangeExpr.End);
+            case TupleLiteralExpression tupleExpr:
+                return tupleExpr.Elements.Any(ContainsSuspendPoint);
+            case DictionaryLiteralExpression dictExpr:
+                return dictExpr.Entries.Any(e => ContainsSuspendPoint(e.Key) || ContainsSuspendPoint(e.Value));
+            case ListLiteralExpression listExpr:
+                return listExpr.Elements.Any(ContainsSuspendPoint);
+            case ArrayLiteralExpression arrayExpr:
+                return arrayExpr.Elements.Any(ContainsSuspendPoint);
+            case AST.Expression.Value.ListLangValue { Values: not null } listVal:
+                return listVal.Values.Any(ContainsSuspendPoint);
+            case AST.Expression.Value.ArrayLangValue { Values: not null } arrayVal:
+                return arrayVal.Values.Any(ContainsSuspendPoint);
+            default:
+                return false;
+        }
+    }
+
+    public void EmitYield(ILGenerator il, Type valueType)
+    {
+        if (YieldEmitterField is null)
+        {
+            throw new InvalidOperationException("当前异步状态机不是异步生成器，无法发射 yield");
+        }
+
+        var tempValue = il.DeclareLocal(typeof(object));
+        if (valueType == typeof(void))
+        {
+            il.Emit(OpCodes.Ldnull);
+        }
+        else if (valueType.IsValueType)
+        {
+            il.Emit(OpCodes.Box, valueType);
+        }
+        il.Emit(OpCodes.Stloc, tempValue);
+
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldfld, YieldEmitterField);
+        il.Emit(OpCodes.Ldloc, tempValue);
+        il.Emit(OpCodes.Callvirt, typeof(IlAsyncYieldEmitter).GetMethod(nameof(IlAsyncYieldEmitter.Yield))!);
     }
     
     /// <summary>
@@ -711,7 +1004,6 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         // 定义返回标签
         _retLabel = il.DefineLabel();
         _completeLabel = il.DefineLabel();
-        _returnValueLocal = il.DeclareLocal(typeof(object));
 
         var exceptionLocal = il.DeclareLocal(typeof(Exception));
         il.BeginExceptionBlock();
@@ -726,11 +1018,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         ExecutionModeDispatcher.GenerateIl(BlockStatement, il, LocalManager);
         
         // --- 完成处理 ---
-        // 只有当函数体中没有执行 return 语句时，才调用 EmitReturnInternal
-        if (!HasReturned)
-        {
-            EmitReturnInternal(il, typeof(object));
-        }
+        // 兜底：若控制流顺序到达函数体末尾（例如条件分支未 return），按返回 null 正常结束。
+        EmitReturnInternal(il, typeof(object));
         
         // --- 异常处理 ---
         il.BeginCatchBlock(typeof(Exception));
@@ -752,7 +1041,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         il.MarkLabel(_completeLabel!.Value);
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldflda, BuilderField!);
-        il.Emit(OpCodes.Ldloc, _returnValueLocal!);
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldfld, _returnValueField!);
         il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetResult")!);
 
         il.Emit(OpCodes.Ldarg_0);
@@ -764,21 +1054,24 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         il.Emit(OpCodes.Ret);
     }
     
-    public int GetStateIndex(AwaitExpression expr)
+    public int GetStateIndex(AwaitExpression expr) => GetAwaitNodeStateIndex(expr);
+
+    public int GetAwaitNodeStateIndex(object node)
     {
-        if (AwaitStateMap.TryGetValue(expr, out int index)) return index;
+        if (AwaitStateMap.TryGetValue(node, out int index)) return index;
 
         // 扫描阶段结束后不应再出现新的 await：那说明分析端漏掉了某个表达式节点，
         // 该状态不会出现在任何派发链里，恢复时会从函数体开头重跑（表现为重复求值或挂死）。
         if (_analysisComplete)
         {
+            var position = node is IOldLangTree tree ? tree.Position : new SourcePosition();
             throw new CompilerException(
                 "await 位于异步状态机无法恢复的表达式位置（分析阶段未登记该节点）",
-                expr.Position);
+                position);
         }
 
         int newIndex = AwaitStateMap.Count;
-        AwaitStateMap[expr] = newIndex;
+        AwaitStateMap[node] = newIndex;
         return newIndex;
     }
 
@@ -864,29 +1157,42 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
 
     public void EmitReturn(ILGenerator il, Type returnType)
     {
+        var tempResult = il.DeclareLocal(typeof(object));
         if (returnType == typeof(void))
         {
             il.Emit(OpCodes.Ldnull);
         }
-        else
+        else if (returnType.IsValueType)
         {
-            if (returnType.IsValueType) il.Emit(OpCodes.Box, returnType);
+            il.Emit(OpCodes.Box, returnType);
         }
 
-        il.Emit(OpCodes.Stloc, _returnValueLocal!);
-        il.Emit(OpCodes.Leave, _completeLabel!.Value);
+        il.Emit(OpCodes.Stloc, tempResult);
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldloc, tempResult);
+        il.Emit(OpCodes.Stfld, _returnValueField!);
 
+        if (_asyncFinallyStack.Count > 0)
+        {
+            var (reasonFieldName, finallyLabel) = _asyncFinallyStack.Peek();
+            il.Emit(OpCodes.Ldc_I4_2);
+            StoreVariable(il, reasonFieldName);
+            il.Emit(OpCodes.Leave, finallyLabel);
+            return;
+        }
+
+        il.Emit(OpCodes.Leave, _completeLabel!.Value);
         HasReturned = true;
     }
 
     private void EmitReturnInternal(ILGenerator il, Type resultType, LocalBuilder? resultLocal = null)
     {
+        il.Emit(OpCodes.Ldarg_0);
         if (resultLocal != null) il.Emit(OpCodes.Ldloc, resultLocal);
         else il.Emit(OpCodes.Ldnull);
+        il.Emit(OpCodes.Stfld, _returnValueField!);
 
-        il.Emit(OpCodes.Stloc, _returnValueLocal!);
         il.Emit(OpCodes.Leave, _completeLabel!.Value);
-
         HasReturned = true;
     }
 

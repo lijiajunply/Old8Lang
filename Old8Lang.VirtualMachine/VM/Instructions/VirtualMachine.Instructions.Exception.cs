@@ -156,6 +156,7 @@ public partial class VirtualMachine
                     }
                     else if (classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
                     {
+                        ValidateFieldAccess(classMetadata.Name, fieldName, isStatic: true, instruction);
                         _stack.Push(staticValue);
                     }
                     else
@@ -168,6 +169,7 @@ public partial class VirtualMachine
                 {
                     if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
                     {
+                        ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction);
                         _stack.Push(value);
                     }
                     else
@@ -368,6 +370,7 @@ public partial class VirtualMachine
                 {
                     if (classMetadata.StaticFieldValues.ContainsKey(fieldName))
                     {
+                        ValidateFieldAccess(classMetadata.Name, fieldName, isStatic: true, instruction);
                         // 检查静态字段类型
                         ValidateStaticFieldType(classMetadata, fieldName, value, instruction);
                         classMetadata.StaticFieldValues[fieldName] = value;
@@ -380,6 +383,7 @@ public partial class VirtualMachine
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
                 else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
+                    ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction);
                     // 检查字段类型
                     ValidateFieldType(bytecodeObj.ClassName, fieldName, value, instruction);
                     bytecodeObj.Fields[fieldName] = value;
