@@ -28,6 +28,9 @@ public interface IAsyncStateMachineGenerator
     /// </remarks>
     bool TryLoadVariable(ILGenerator il, string name);
 
+    /// <summary>获取已提升变量的字段类型；不存在时返回 null。</summary>
+    Type? GetVariableType(string name);
+
     /// <summary>保存已提升的变量。</summary>
     void StoreVariable(ILGenerator il, string name);
 

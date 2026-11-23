@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 using Old8Lang.Error;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.InstanceMethods.Core;
 
 namespace Old8Lang.Compiler.CodeGeneration;
 
@@ -17,6 +20,31 @@ namespace Old8Lang.Compiler.CodeGeneration;
 /// </remarks>
 public static class IlIndexHelper
 {
+    /// <summary>读取解构右侧的元素，限制为语言的序列或元组。</summary>
+    public static object? GetDestructuringItem(object? value, int index)
+    {
+        if (value is ILangList languageList)
+        {
+            var items = languageList.GetItems().ToList();
+            if (index >= items.Count)
+                throw new InvalidOperationError(default(SourcePosition), $"元组解构赋值索引 {index} 超出范围");
+            return IlValueBridge.Unwrap(items[index]);
+        }
+
+        var count = value switch
+        {
+            Array array => array.Length,
+            IList list => list.Count,
+            ITuple tuple => tuple.Length,
+            _ => -1
+        };
+        if (count < 0)
+            throw new TypeError(default(SourcePosition), "元组解构赋值右侧必须是可索引的集合");
+        if (index >= count)
+            throw new InvalidOperationError(default(SourcePosition), $"元组解构赋值索引 {index} 超出范围");
+        return GetObjectItem(value, index);
+    }
+
     /// <summary>
     /// 把负索引归一化为从 0 开始的下标；非负索引原样返回。
     /// </summary>
@@ -82,6 +110,7 @@ public static class IlIndexHelper
             Array array => GetArrayItem(array, index),
             IList list => GetListItem(list, index),
             ITuple tuple => GetTupleItem(tuple, index),
+            ILangList list => IlValueBridge.Unwrap(list.GetItems().ToList()[NormalizeChecked(index, list.GetLength())]),
             string text => GetStringChar(text, index),
             null => throw new IndexError(default(SourcePosition), $"索引访问的目标为 null（索引 {index}）"),
             _ => throw new InvalidOperationException(
@@ -110,6 +139,8 @@ public static class IlIndexHelper
 
     public static object? GetDynamicObjectItem(object? collection, object? key)
     {
+        if (collection is DictionaryLangValue languageDictionary)
+            return IlValueBridge.Unwrap(languageDictionary.Get(IlValueBridge.Wrap(key)));
         if (collection is IDictionary dictionary)
         {
             return dictionary[key!];

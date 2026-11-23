@@ -52,8 +52,14 @@ blockStatement = "{" statement* "}" ;
 declarationStatement = identifier ( ":" type )? "<-" expression ;
 
 assignmentStatement = expression ( ":" type )? "<-" expression
+                   | tupleAssignment
                    | indexAssignment
                    | classMemberAssignment ;
+
+tupleAssignment = tupleAssignmentPattern "<-" expression ;
+tupleAssignmentPattern = "(" tupleAssignmentTarget ","
+                         ( tupleAssignmentTarget ( "," tupleAssignmentTarget )* ","? )? ")" ;
+tupleAssignmentTarget = identifier | tupleAssignmentPattern ;
 
 indexAssignment = identifier "[" expression "]" "<-" expression ;
 

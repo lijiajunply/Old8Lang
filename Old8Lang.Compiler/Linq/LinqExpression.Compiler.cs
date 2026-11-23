@@ -54,9 +54,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, currentLocal);
 
         // 将当前元素转换为LangValueType并存储到范围变量
-        ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        node.GenerateConvertToLangValue(ilGenerator);
-        ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
+        node.EmitBindRow(ilGenerator, local, currentLocal, whereClause);
 
         // 计算条件表达式
         whereClause.Condition.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -127,12 +125,14 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, currentLocal);
 
         // 将当前元素转换为LangValueType并存储到范围变量
-        ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        node.GenerateConvertToLangValue(ilGenerator);
-        ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
+        node.EmitBindRow(ilGenerator, local, currentLocal, null);
 
         // 计算投影表达式
         selectClause.Projection.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+
+        var projectionType = selectClause.Projection.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (projectionType.IsValueType) ilGenerator.Emit(OpCodes.Box, projectionType);
+        node.GenerateConvertToLangValue(ilGenerator);
 
         // 保存投影结果
         ilGenerator.Emit(OpCodes.Stloc, projectionLocal);
@@ -158,46 +158,53 @@ internal static partial class LinqExpressionRuntimeExtensions
     /// </summary>
     internal static void GenerateOrderByClauseIL(this LinqExpression node, OrderByClause orderByClause, ILGenerator ilGenerator, LocalManager local)
     {
-        // 栈顶是 IEnumerable
-        // 首先将其转换为 List<object>
-        var sourceLocal = ilGenerator.DeclareLocal(typeof(List<object>));
-
-        // 创建新列表
+        var rows = ilGenerator.DeclareLocal(typeof(List<object>));
         ilGenerator.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
-        ilGenerator.Emit(OpCodes.Stloc, sourceLocal);
-
-        // 获取枚举器
-        var enumeratorLocal = ilGenerator.DeclareLocal(typeof(IEnumerator));
+        ilGenerator.Emit(OpCodes.Stloc, rows);
+        ConvertToEnumerableStatic(ilGenerator);
+        var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
         ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerable).GetMethod("GetEnumerator")!);
-        ilGenerator.Emit(OpCodes.Stloc, enumeratorLocal);
-
-        // 复制所有元素到列表
-        var copyLoopStart = ilGenerator.DefineLabel();
-        var copyLoopEnd = ilGenerator.DefineLabel();
-
-        ilGenerator.MarkLabel(copyLoopStart);
-        ilGenerator.Emit(OpCodes.Ldloc, enumeratorLocal);
+        ilGenerator.Emit(OpCodes.Stloc, enumerator);
+        var current = ilGenerator.DeclareLocal(typeof(object));
+        var loop = ilGenerator.DefineLabel();
+        var end = ilGenerator.DefineLabel();
+        ilGenerator.MarkLabel(loop);
+        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetMethod("MoveNext")!);
-        ilGenerator.Emit(OpCodes.Brfalse, copyLoopEnd);
-
-        ilGenerator.Emit(OpCodes.Ldloc, sourceLocal);
-        ilGenerator.Emit(OpCodes.Ldloc, enumeratorLocal);
+        ilGenerator.Emit(OpCodes.Brfalse, end);
+        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetProperty("Current")!.GetMethod!);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
+        ilGenerator.Emit(OpCodes.Stloc, current);
+        node.EmitBindRow(ilGenerator, local, current, orderByClause);
 
-        ilGenerator.Emit(OpCodes.Br, copyLoopStart);
-        ilGenerator.MarkLabel(copyLoopEnd);
-
-        // 调用排序辅助方法
-        // 由于IL中实现复杂的排序逻辑很困难，我们调用一个静态辅助方法
-        ilGenerator.Emit(OpCodes.Ldloc, sourceLocal);
-
-        // 加载排序方向（第一个排序键）
-        var firstOrdering = orderByClause.Orderings.FirstOrDefault();
-        ilGenerator.Emit(firstOrdering?.IsAscending ?? true ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-
-        // 调用 LinqCompilerHelper.SortList
-        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("SortList")!);
+        ilGenerator.Emit(OpCodes.Ldloc, rows);
+        ilGenerator.Emit(OpCodes.Ldloc, current);
+        ilGenerator.Emit(OpCodes.Ldc_I4, orderByClause.Orderings.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var i = 0; i < orderByClause.Orderings.Count; i++)
+        {
+            var expression = orderByClause.Orderings[i].KeyExpression;
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            if (type.IsValueType) ilGenerator.Emit(OpCodes.Box, type);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.AddSortRow))!);
+        ilGenerator.Emit(OpCodes.Br, loop);
+        ilGenerator.MarkLabel(end);
+        ilGenerator.Emit(OpCodes.Ldloc, rows);
+        ilGenerator.Emit(OpCodes.Ldc_I4, orderByClause.Orderings.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(bool));
+        for (var i = 0; i < orderByClause.Orderings.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            ilGenerator.Emit(orderByClause.Orderings[i].IsAscending ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Stelem_I1);
+        }
+        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.SortRows))!);
     }
 
     /// <summary>
@@ -242,17 +249,22 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, currentLocal);
 
         // 将当前元素转换为LangValueType并存储到范围变量
-        ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        node.GenerateConvertToLangValue(ilGenerator);
-        ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
+        node.EmitBindRow(ilGenerator, local, currentLocal, letClause);
 
         // 计算let表达式
         letClause.Expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var letType = letClause.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (letType.IsValueType) ilGenerator.Emit(OpCodes.Box, letType);
+        node.GenerateConvertToLangValue(ilGenerator);
         ilGenerator.Emit(OpCodes.Stloc, letVarLocal);
 
         // 添加当前元素到结果列表
         ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
         ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
+        ilGenerator.Emit(OpCodes.Ldstr, node.FromClause.RangeVariable);
+        ilGenerator.Emit(OpCodes.Ldstr, letClause.Variable);
+        ilGenerator.Emit(OpCodes.Ldloc, letVarLocal);
+        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.AddRowBinding))!);
         ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
 
         // 继续循环
@@ -306,18 +318,22 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, currentLocal);
 
         // 将当前元素转换为LangValueType并存储到范围变量
-        ilGenerator.Emit(OpCodes.Ldloc, currentLocal);
-        node.GenerateConvertToLangValue(ilGenerator);
-        ilGenerator.Emit(OpCodes.Stloc, rangeVarLocal);
+        node.EmitBindRow(ilGenerator, local, currentLocal, null);
 
         // 计算分组键
         groupByClause.KeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        node.GenerateConvertFromLangValue(ilGenerator);
+        var keyType = groupByClause.KeyExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (keyType.IsValueType) ilGenerator.Emit(OpCodes.Box, keyType);
+        ilGenerator.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 计算分组元素
         groupByClause.ElementExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        node.GenerateConvertFromLangValue(ilGenerator);
+        var elementType = groupByClause.ElementExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (elementType.IsValueType) ilGenerator.Emit(OpCodes.Box, elementType);
+        ilGenerator.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
         ilGenerator.Emit(OpCodes.Stloc, elementLocal);
 
         // 调用辅助方法添加到分组
@@ -436,9 +452,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Stloc, outerItemLocal);
 
         // 设置外部范围变量
-        ilGenerator.Emit(OpCodes.Ldloc, outerItemLocal);
-        node.GenerateConvertToLangValue(ilGenerator);
-        ilGenerator.Emit(OpCodes.Stloc, outerRangeVarLocal);
+        node.EmitBindRow(ilGenerator, local, outerItemLocal, joinClause);
 
         // 计算外部键
         joinClause.OuterKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -509,9 +523,13 @@ internal static partial class LinqExpressionRuntimeExtensions
             ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToListLangValue")!);
             ilGenerator.Emit(OpCodes.Stloc, groupVarLocal);
 
-            // 添加外部元素到结果（分组变量已设置）
+            // 每一行保存自己的外部值和分组值，后续子句按当前行恢复。
             ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
             ilGenerator.Emit(OpCodes.Ldloc, outerItemLocal);
+            ilGenerator.Emit(OpCodes.Ldstr, node.FromClause.RangeVariable);
+            ilGenerator.Emit(OpCodes.Ldstr, joinClause.GroupVariable);
+            ilGenerator.Emit(OpCodes.Ldloc, groupVarLocal);
+            ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.AddRowBinding))!);
             ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
         }
         else
@@ -551,10 +569,13 @@ internal static partial class LinqExpressionRuntimeExtensions
             var skipAddLabel = ilGenerator.DefineLabel();
             ilGenerator.Emit(OpCodes.Brfalse, skipAddLabel);
 
-            // 键匹配，添加外部元素到结果
-            // 注意：内部范围变量已设置，后续子句可以访问
+            // 键匹配时保存外部行和当前内层值。
             ilGenerator.Emit(OpCodes.Ldloc, resultLocal);
             ilGenerator.Emit(OpCodes.Ldloc, outerItemLocal);
+            ilGenerator.Emit(OpCodes.Ldstr, node.FromClause.RangeVariable);
+            ilGenerator.Emit(OpCodes.Ldstr, joinClause.RangeVariable);
+            ilGenerator.Emit(OpCodes.Ldloc, innerRangeVarLocal);
+            ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.AddRowBinding))!);
             ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
 
             ilGenerator.MarkLabel(skipAddLabel);
@@ -587,25 +608,20 @@ internal static partial class LinqExpressionRuntimeExtensions
     /// </summary>
     internal static void GenerateContinuationIL(this LinqExpression node, QueryContinuation continuation, ILGenerator ilGenerator, LocalManager local)
     {
-        // 栈顶是前一个查询的结果（List<object>）
-        // 将结果转换为 ListLangValue 并存储到延续变量
-        var continuationVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, continuation.Variable);
-
-        // 复制栈顶的结果
-        ilGenerator.Emit(OpCodes.Dup);
-
-        // 转换为 ListLangValue 并存储到延续变量
-        ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToListLangValue")!);
-        ilGenerator.Emit(OpCodes.Stloc, continuationVarLocal);
+        // 栈顶是前一阶段的结果。延续变量代表每个元素，而不是整个结果集合；
+        // 用独立查询上下文复用逐行绑定逻辑。
+        var continuationNode = new LinqExpression(
+            new FromClause(continuation.Variable, node.FromClause.DataSource),
+            continuation.BodyClauses, continuation.TerminationClause);
 
         // 处理延续后的查询体子句
         foreach (var clause in continuation.BodyClauses)
         {
-            node.GenerateClauseIL(clause, ilGenerator, local);
+            continuationNode.GenerateClauseIL(clause, ilGenerator, local);
         }
 
         // 处理延续后的终止子句
-        node.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
+        continuationNode.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
     }
 
     /// <summary>
@@ -615,6 +631,30 @@ internal static partial class LinqExpressionRuntimeExtensions
     {
         // 调用辅助方法进行转换
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
+    }
+
+    private static void EmitBindRow(this LinqExpression node, ILGenerator ilGenerator, LocalManager local,
+        LocalBuilder row, LinqClause? stopBefore)
+    {
+        void Bind(string name, bool primary)
+        {
+            var slot = node.GetOrCreateRangeVariable(ilGenerator, local, name);
+            ilGenerator.Emit(OpCodes.Ldloc, row);
+            ilGenerator.Emit(OpCodes.Ldstr, name);
+            ilGenerator.Emit(primary ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod(nameof(LinqCompilerHelper.GetRowBinding))!);
+            ilGenerator.Emit(OpCodes.Stloc, slot);
+        }
+
+        Bind(node.FromClause.RangeVariable, true);
+        foreach (var clause in node.BodyClauses)
+        {
+            if (ReferenceEquals(clause, stopBefore)) break;
+            if (clause is JoinClause join)
+                Bind(join.IsGroupJoin && join.GroupVariable != null ? join.GroupVariable : join.RangeVariable, false);
+            else if (clause is LetClause let)
+                Bind(let.Variable, false);
+        }
     }
 
     /// <summary>
@@ -687,6 +727,60 @@ internal static partial class LinqExpressionRuntimeExtensions
 /// </summary>
 public static class LinqCompilerHelper
 {
+    private sealed class QueryRow
+    {
+        public readonly Dictionary<string, LangValueType> Bindings = new(StringComparer.Ordinal);
+    }
+
+    private sealed record SortRow(object? Value, object?[] Keys, int Index);
+
+    /// <summary>记录排序键，保持每行的原始范围变量。</summary>
+    public static void AddSortRow(List<object> rows, object? value, object?[] keys)
+    {
+        for (var i = 0; i < keys.Length; i++)
+            if (keys[i] is LangValueType langValue) keys[i] = ConvertFromLangValue(langValue);
+        rows.Add(new SortRow(value, keys, rows.Count));
+    }
+
+    /// <summary>按全部排序键稳定排序，并返回原查询行。</summary>
+    public static List<object> SortRows(List<object> rows, bool[] ascending)
+    {
+        var sorted = rows.Cast<SortRow>().ToList();
+        sorted.Sort((left, right) =>
+        {
+            for (var i = 0; i < ascending.Length; i++)
+            {
+                var comparison = CompareObjects(left.Keys[i], right.Keys[i]);
+                if (comparison != 0) return ascending[i] ? comparison : -comparison;
+            }
+            return left.Index.CompareTo(right.Index);
+        });
+        return sorted.Select(row => row.Value!).ToList();
+    }
+
+    /// <summary>复制查询行并添加一个连接范围变量。</summary>
+    public static object AddRowBinding(object? source, string primaryName, string name, LangValueType value)
+    {
+        var row = new QueryRow();
+        if (source is QueryRow existing)
+        {
+            foreach (var (key, item) in existing.Bindings) row.Bindings[key] = item;
+        }
+        else
+        {
+            row.Bindings[primaryName] = ConvertToLangValue(source);
+        }
+        row.Bindings[name] = value;
+        return row;
+    }
+
+    /// <summary>获取当前查询行的范围变量，尚未连接的源值作为主范围变量。</summary>
+    public static LangValueType GetRowBinding(object? source, string name, bool primary)
+    {
+        if (source is QueryRow row && row.Bindings.TryGetValue(name, out var value)) return value;
+        return primary ? ConvertToLangValue(source) : new NullLangValue();
+    }
+
     /// <summary>
     /// 将 object 转换为 LangValueType
     /// </summary>
@@ -701,7 +795,7 @@ public static class LinqCompilerHelper
             string strVal => new StringLangValue(strVal),
             bool boolVal => new BoolLangValue(boolVal),
             char charVal => new CharLangValue(charVal),
-            _ => new IntLangValue(0) // 默认值
+            _ => Old8Lang.InstanceMethods.Core.IlValueBridge.Wrap(obj)
         };
     }
 
@@ -762,6 +856,11 @@ public static class LinqCompilerHelper
         if (a == null && b == null) return 0;
         if (a == null) return -1;
         if (b == null) return 1;
+
+        if (a is string leftString && b is string rightString)
+            return string.CompareOrdinal(leftString, rightString);
+        if (a is int or double && b is int or double)
+            return Convert.ToDouble(a).CompareTo(Convert.ToDouble(b));
 
         // 尝试使用 IComparable
         if (a is IComparable comparableA)

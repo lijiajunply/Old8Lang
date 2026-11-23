@@ -96,16 +96,12 @@ public class LangListExceptMethod : BaseLangListMethod, IIlNativeValueInstanceMe
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is ILangList other)
-        {
-            return ExceptHelper(langList, other);
-        }
-
-        if (instance is List<object?> list && arguments[0] is List<object?> otherList)
-        {
-            return list.Except(otherList).ToList();
-        }
-
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口或为 List<object?> 类型");
+        var other = GetItemsForVM(arguments[0]);
+        var result = new List<object?>();
+        foreach (var item in GetItemsForVM(instance))
+            if (!other.Any(value => VmItemsEqual(value, item)) &&
+                !result.Any(value => VmItemsEqual(value, item)))
+                result.Add(item);
+        return result;
     }
 }

@@ -226,6 +226,9 @@ public partial class PrimaryParser
                 // 检查右括号后是否还有内容，且在同一行，且不是分号
                 if (nextToken.Type != LangTokenType.Semicolon &&
                     nextToken.Type != LangTokenType.EndOfFile &&
+                    nextToken.Type != LangTokenType.RightParen &&
+                    nextToken.Type != LangTokenType.Comma &&
+                    nextToken.Type != LangTokenType.Assignment &&
                     nextToken.Line == rightParenLine)
                 {
                     // 构建参数列表字符串用于错误消息

@@ -15,6 +15,175 @@ namespace Old8Lang.Tests.Compiler.Linq;
 public class LinqJoinWhereTests
 {
     [Fact]
+    public void GroupBy_ProducesKeysAndValues()
+    {
+        const string code = @"
+            numbers <- {1, 2, 1, 3}
+            result <- from x in numbers group x by x
+            Assert.Equal(3, result.Count())
+            Assert.Equal(1, result[0][""Key""])
+            Assert.Equal(""[1, 1]"", result[0][""Values""].ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void GroupBy_UsesKeyAndElementExpressions()
+    {
+        const string code = @"
+            numbers <- {1, 2, 3, 4}
+            result <- from x in numbers group x * 2 by x % 2
+            Assert.Equal(2, result.Count())
+            Assert.Equal(1, result[0][""Key""])
+            Assert.Equal(""[2, 6]"", result[0][""Values""].ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void GroupContinuation_SelectsGroupKeys()
+    {
+        const string code = @"
+            numbers <- {1, 2, 1, 3}
+            result <- from x in numbers group x by x into g select g[""Key""]
+            Assert.Equal(""[1, 2, 3]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void SelectContinuation_BindsEachProjectedValue()
+    {
+        const string code = @"
+            numbers <- {1, 2, 3}
+            result <- from x in numbers select x into y where y > 1 select y
+            Assert.Equal(""[2, 3]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void SelectContinuation_OrdersAndFiltersProjectedValues()
+    {
+        const string code = @"
+            numbers <- {3, 1, 2}
+            result <- from x in numbers select x into y orderby y descending where y > 1 select y
+            Assert.Equal(""[3, 2]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void SelectContinuation_LetBindingIsPerRow()
+    {
+        const string code = @"
+            numbers <- {1, 2, 3}
+            result <- from x in numbers select x into y let doubled <- y * 2 where doubled > 2 select doubled
+            Assert.Equal(""[4, 6]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void JoinThenWhere_BindsEachMatchingInnerValue()
+    {
+        const string code = @"
+            left <- {1, 2, 3, 4}
+            right <- {2, 3, 4}
+            result <- from x in left join y in right on x == y where y > 2 select x
+            Assert.Equal(""[3, 4]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void GroupJoin_SelectsEachMatchingGroup()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            right <- {1, 1, 2, 2, 2, 3}
+            result <- from x in left join y in right on x == y into g select g
+            Assert.Equal(""[[1, 1], [2, 2, 2], [3]]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void MultipleJoins_PreserveEarlierBindingsAndDuplicates()
+    {
+        const string code = @"
+            left <- {1, 2}
+            middle <- {1, 1, 2}
+            right <- {1, 2}
+            result <- from x in left join y in middle on x == y join z in right on y == z where z > 0 select y
+            Assert.Equal(""[1, 1, 2]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void GroupJoin_PreservesEmptyGroups()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            right <- {1, 1, 3}
+            result <- from x in left join y in right on x == y into g select g
+            Assert.Equal(""[[1, 1], [], [3]]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void JoinAndLet_PreserveValuesForEachRow()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            right <- {1, 2, 3}
+            result <- from x in left join y in right on x == y let doubled <- y * 2 where doubled > 2 select doubled
+            Assert.Equal(""[4, 6]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void JoinThenOrderByThenWhere_SortsByInnerKey()
+    {
+        const string code = @"
+            left <- {2, 1, 3}
+            right <- {1, 2, 3}
+            result <- from x in left join y in right on x == y orderby y descending where y > 1 select x
+            Assert.Equal(""[3, 2]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    public void JoinProjection_CanComputeWithInnerValue()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            right <- {1, 2, 3}
+            result <- from x in left join y in right on x == y select y * 2
+            Assert.Equal(""[2, 4, 6]"", result.ToStr())
+        ";
+        CompileAndRun(code);
+    }
+    [Fact]
     public void JoinThenWhere_FiltersByOuterVariable()
     {
         const string code = @"

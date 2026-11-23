@@ -735,6 +735,9 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         return true;
     }
 
+    public Type? GetVariableType(string name) =>
+        VariableFields.TryGetValue(name, out var field) ? field.FieldType : null;
+
     /// <summary>
     /// 存储变量（到字段）
     /// </summary>

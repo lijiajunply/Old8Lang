@@ -87,28 +87,22 @@ public partial class VirtualMachine
                     string[] namedArgNames = (string[])operands[3];
 
                     // 从栈中弹出参数 (位置参数 + 命名参数值)
-                    var positionalArgs = new object?[positionalCount];
-                    for (int i = positionalCount - 1; i >= 0; i--)
-                    {
-                        positionalArgs[i] = _stack.Pop();
-                    }
-
                     var namedArgValues = new object?[namedCount];
                     for (int i = namedCount - 1; i >= 0; i--)
                     {
                         namedArgValues[i] = _stack.Pop();
                     }
 
-                    // 原生函数暂时不支持命名参数重排,直接按顺序传递
-                    // TODO: 如果需要支持原生函数的命名参数,需要获取原生函数的参数信息
-                    var args = new object?[positionalCount + namedCount];
-                    Array.Copy(positionalArgs, 0, args, 0, positionalCount);
-                    Array.Copy(namedArgValues, 0, args, positionalCount, namedCount);
+                    var positionalArgs = new object?[positionalCount];
+                    for (int i = positionalCount - 1; i >= 0; i--)
+                    {
+                        positionalArgs[i] = _stack.Pop();
+                    }
 
                     // 调用原生函数
                     // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
                     // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
-                    _stack.Push(CallNativeFunction(funcName, args));
+                    _stack.Push(CallNamedNativeFunction(funcName, positionalArgs, namedArgNames, namedArgValues));
                 }
             }
                 break;

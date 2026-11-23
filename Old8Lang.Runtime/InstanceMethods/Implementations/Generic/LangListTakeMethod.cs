@@ -71,17 +71,8 @@ public class LangListTakeMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is int count)
-        {
-            return new ListLangValue(TakeHelper((LangValueType)langList, new IntLangValue(count))
-                .Select(IlValueBridge.Wrap).ToList());
-        }
-
-        if (instance is List<object?> list && arguments[0] is int cnt)
-        {
-            return list.Take(cnt).ToList();
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口或为 List<object?> 类型，当前类型：{instance?.GetType().Name}");
+        if (arguments[0] is not int count)
+            throw new ArgumentException("Take 的参数必须是整数");
+        return GetItemsForVM(instance).Take(count).ToList();
     }
 }

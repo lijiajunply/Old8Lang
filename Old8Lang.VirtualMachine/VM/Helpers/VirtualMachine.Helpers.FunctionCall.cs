@@ -68,6 +68,26 @@ public partial class VirtualMachine
         // 处理特殊的辅助函数（不在全局函数注册表中）
         switch (funcName)
         {
+            case "__tuple_destructure_get":
+            {
+                var source = args[0];
+                var index = (int)args[1]!;
+                object?[]? elements = null;
+                if (source != null && TupleElements.TryGetValue(source, out var tupleItems))
+                    elements = tupleItems;
+                else if (source is ILangList langList)
+                    elements = langList.GetItems().Cast<object?>().ToArray();
+                else if (source is IList list)
+                    elements = list.Cast<object?>().ToArray();
+                else if (source is System.Runtime.CompilerServices.ITuple tupleValue)
+                    elements = Enumerable.Range(0, tupleValue.Length).Select(i => tupleValue[i]).ToArray();
+                if (elements is null)
+                    throw new TypeError(new SourcePosition(), "元组解构赋值右侧必须是可索引的集合");
+                if (index >= elements.Length)
+                    throw new InvalidOperationError(new SourcePosition(), $"元组解构赋值索引 {index} 超出范围");
+                return elements[index];
+            }
+
             case "System.String::Concat":
             {
                 // 字符串拼接/插值：按语言显示规则转换（bool -> true、列表 -> [1, 2]、
@@ -254,6 +274,64 @@ public partial class VirtualMachine
 
             default:
                 throw new MethodNotFoundError(new SourcePosition(), funcName);
+        }
+    }
+
+    /// <summary>按各重载声明的参数名绑定原生全局函数调用。</summary>
+    private object? CallNamedNativeFunction(string name, object?[] positional, string[] names, object?[] values)
+    {
+        var group = GlobalFunctionRegistry.Instance.GetOverloadGroup(name);
+        var candidates = new List<(IGlobalFunction Function, object?[] Arguments, int Score)>();
+        if (group != null && names.Length == values.Length)
+        {
+            foreach (var function in group.Overloads)
+            {
+                var parameterNames = function.ParameterNames;
+                var count = positional.Length + names.Length;
+                if (parameterNames == null || count < function.MinParameterCount ||
+                    (function.MaxParameterCount >= 0 && count > function.MaxParameterCount) ||
+                    count > parameterNames.Length)
+                    continue;
+
+                var args = new object?[count];
+                var filled = new bool[count];
+                Array.Copy(positional, args, positional.Length);
+                Array.Fill(filled, true, 0, positional.Length);
+                var valid = true;
+                for (var i = 0; i < names.Length; i++)
+                {
+                    var index = Array.IndexOf(parameterNames, names[i]);
+                    if (index < 0 || index >= count || filled[index])
+                    {
+                        valid = false;
+                        break;
+                    }
+                    args[index] = values[i];
+                    filled[index] = true;
+                }
+                if (!valid || filled.Any(value => !value))
+                    continue;
+
+                var types = args.Select(OverloadResolver.GetRuntimeValueType).ToList();
+                var score = OverloadResolver.CalculateTotalMatchScore(function, types);
+                if (score >= 0)
+                    candidates.Add((function, args, score));
+            }
+        }
+
+        if (candidates.Count == 0)
+            throw new ArgumentError(new SourcePosition(), $"函数 {name} 的命名参数无效、重复或缺少必需参数");
+
+        var selected = candidates.OrderByDescending(candidate => candidate.Score).First();
+        try
+        {
+            return selected.Function.ExecuteInVM(selected.Arguments);
+        }
+        catch (Old8Exception) { throw; }
+        catch (VmException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationError(new SourcePosition(), $"调用全局函数 {name} 时发生错误: {ex.Message}");
         }
     }
 

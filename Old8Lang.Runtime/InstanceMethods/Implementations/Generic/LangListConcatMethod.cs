@@ -70,17 +70,6 @@ public class LangListConcatMethod : BaseLangListMethod, IIlNativeValueInstanceMe
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is ILangList other)
-        {
-            var items = langList.GetItems().Concat(other.GetItems()).ToList();
-            return new ListLangValue(items);
-        }
-
-        if (instance is List<object?> list && arguments[0] is List<object?> otherList)
-        {
-            return list.Concat(otherList).ToList();
-        }
-
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口或为 List<object?> 类型");
+        return GetItemsForVM(instance).Concat(GetItemsForVM(arguments[0])).ToList();
     }
 }

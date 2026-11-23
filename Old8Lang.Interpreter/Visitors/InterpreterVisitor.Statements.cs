@@ -471,18 +471,32 @@ public partial class InterpreterVisitor
         };
         if (tuplePattern is not null)
         {
-            if (result is not ILangList values)
-                throw new TypeError(node, "元组解构赋值右侧必须是可索引的集合");
-
-            var items = values.GetItems().ToList();
-            for (var i = 0; i < tuplePattern.Count; i++)
+            void AssignPattern(IReadOnlyList<LangExpression> pattern, LangValueType value)
             {
-                if (tuplePattern[i] is not LangId id)
-                    throw new InvalidOperationError(node, "元组解构赋值只支持变量名");
-                if (i >= items.Count)
-                    throw new InvalidOperationError(node, $"元组解构赋值索引 {i} 超出范围");
-                manager.Set(id, items[i]);
+                if (value is not ILangList values)
+                    throw new TypeError(node, "元组解构赋值右侧必须是可索引的集合");
+                var items = values.GetItems().ToList();
+                for (var i = 0; i < pattern.Count; i++)
+                {
+                    if (i >= items.Count)
+                        throw new InvalidOperationError(node, $"元组解构赋值索引 {i} 超出范围");
+                    switch (pattern[i])
+                    {
+                        case LangId id:
+                            manager.Set(id, items[i]);
+                            break;
+                        case TupleLiteralExpression nested:
+                            AssignPattern(nested.Elements, items[i]);
+                            break;
+                        case TupleLangValue nested:
+                            AssignPattern(nested.Elements, items[i]);
+                            break;
+                        default:
+                            throw new InvalidOperationError(node, "元组解构赋值只支持变量名和嵌套元组");
+                    }
+                }
             }
+            AssignPattern(tuplePattern, result);
             return new VoidLangValue();
         }
 

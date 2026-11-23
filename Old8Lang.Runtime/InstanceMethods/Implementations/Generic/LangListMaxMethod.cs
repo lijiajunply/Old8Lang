@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
@@ -105,11 +106,7 @@ public class LangListMaxMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
-        {
-            return MaxHelper(langList);
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        var list = new ListLangValue(GetItemsForVM(instance).Select(IlValueBridge.Wrap).ToList());
+        return IlValueBridge.Unwrap(ExecuteInternal(list, [], new VariateManager(), default));
     }
 }

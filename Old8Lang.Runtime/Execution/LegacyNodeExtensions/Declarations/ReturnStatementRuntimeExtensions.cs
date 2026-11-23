@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
 
 namespace Old8Lang.AST.Statement;
 
@@ -12,17 +13,22 @@ internal static class ReturnStatementRuntimeExtensions
     /// </summary>
     internal static bool IsBasicTypeConversionAllowed(Type expected, Type actual)
     {
+        if (NeedsRuntimeConversion(expected, actual))
+            return true;
         // 数值类型之间的转换
         var numericTypes = new[] { typeof(int), typeof(long), typeof(double), typeof(float), typeof(short), typeof(byte) };
         if (numericTypes.Contains(expected) && numericTypes.Contains(actual))
             return true;
 
-        // 字符串转换
-        if (expected == typeof(string))
-            return true;
-
         return false;
     }
+
+    internal static bool NeedsRuntimeConversion(Type expected, Type actual) =>
+        expected != actual && (expected == typeof(string) || expected == typeof(int) ||
+                               expected == typeof(double) || expected == typeof(bool)) &&
+        (actual == typeof(object) || typeof(LangValueType).IsAssignableFrom(actual) ||
+         expected == typeof(string) || actual == typeof(string) ||
+         (expected == typeof(bool) && actual == typeof(int)));
 
     internal static bool IsNumericType(Type type) => type == typeof(int) || type == typeof(double) ||
                                                      type == typeof(float) || type == typeof(long) ||

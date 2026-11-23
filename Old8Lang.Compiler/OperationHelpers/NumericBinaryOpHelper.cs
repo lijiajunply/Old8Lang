@@ -14,6 +14,27 @@ namespace Old8Lang.AST.Expression.OperationHelpers;
 /// </summary>
 internal static class NumericBinaryOpHelper
 {
+    private static bool TryEmitLanguageBinary(LangExpression? left, LangExpression? right,
+        ILGenerator il, LocalManager local, Type? leftType, Type? rightType, string method)
+    {
+        if (!(leftType != null && typeof(LangValueType).IsAssignableFrom(leftType)) &&
+            !(rightType != null && typeof(LangValueType).IsAssignableFrom(rightType)))
+            return false;
+
+        void EmitWrapped(LangExpression? expression, Type? type)
+        {
+            expression!.Accept(RuntimeVisitors.CreateCompiler(il, local));
+            if (type != null && typeof(LangValueType).IsAssignableFrom(type)) return;
+            if (type is { IsValueType: true }) il.Emit(OpCodes.Box, type);
+            il.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
+                .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.Wrap))!);
+        }
+        EmitWrapped(left, leftType);
+        EmitWrapped(right, rightType);
+        il.Emit(OpCodes.Callvirt, typeof(LangValueType).GetMethod(method, [typeof(LangValueType)])!);
+        return true;
+    }
+
     /// <summary>
     /// 加载左右操作数并进行类型转换
     /// </summary>
@@ -125,6 +146,9 @@ internal static class NumericBinaryOpHelper
             return typeof(object);
         }
 
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Plus)))
+            return typeof(LangValueType);
+
         // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
@@ -187,6 +211,9 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Callvirt, subMethod);
             return typeof(object);
         }
+
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Minus)))
+            return typeof(LangValueType);
 
         // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
@@ -251,6 +278,9 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Callvirt, mulMethod);
             return typeof(object);
         }
+
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Times)))
+            return typeof(LangValueType);
 
         // 非数值类型不能做乘法：以前直接发 mul，会在运行时对引用做整数乘法，
         // 得到无意义的结果（"hello" * 2 -> 1560537200）。与 VM 一致改为运行期错误。
@@ -359,6 +389,9 @@ internal static class NumericBinaryOpHelper
             return typeof(object);
         }
 
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Divide)))
+            return typeof(LangValueType);
+
         // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
@@ -422,6 +455,9 @@ internal static class NumericBinaryOpHelper
             return typeof(object);
         }
 
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Mod)))
+            return typeof(LangValueType);
+
         // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)
         {
@@ -484,6 +520,9 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Callvirt, langPowMethod);
             return typeof(object);
         }
+
+        if (TryEmitLanguageBinary(left, right, ilGenerator, local, leftType, rightType, nameof(LangValueType.Power)))
+            return typeof(LangValueType);
 
         // 检查是否是 AnyLangValue（解释器模式）运算符重载
         if (leftType == typeof(AnyLangValue) || leftType?.IsSubclassOf(typeof(AnyLangValue)) == true)

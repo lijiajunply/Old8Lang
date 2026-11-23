@@ -1625,7 +1625,13 @@ public partial class CompilerVisitor
                 ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetTupleItem))!);
             }
         }
-        else if (listType == typeof(object))
+        else if (typeof(ILangList).IsAssignableFrom(listType) && listType != typeof(DictionaryLangValue))
+        {
+            node.ListId.Accept(this);
+            node.EmitIntIndex(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetObjectItem))!);
+        }
+        else if (listType == typeof(object) || listType == typeof(LangValueType))
         {
             // 静态类型为 object：运行期按字典 / 列表 / 数组 / 元组 / 字符串分派。
             node.ListId.Accept(this);

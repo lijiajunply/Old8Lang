@@ -1,4 +1,6 @@
 using Old8Lang.Error;
+using Old8Lang.AST.Statement;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.InstanceMethods.Core;
 
@@ -11,6 +13,23 @@ namespace Old8Lang.InstanceMethods.Core;
 /// </remarks>
 public static class IlTypeErrors
 {
+    /// <summary>按解释器的返回值规则转换运行期值，失败时抛 TYPE_ERROR。</summary>
+    public static object? ConvertReturn(object? value, Type targetType)
+    {
+        var wrapped = IlValueBridge.Wrap(value);
+        var expected = TypeName(targetType);
+        var converted = TypeChecker.ValidateAndConvertReturnType(expected, wrapped,
+            new ReturnStatement(wrapped), "<IL>");
+        var result = IlValueBridge.Unwrap(converted);
+
+        // 类型兼容性允许整数用于 double；CLR 返回槽仍需要 double 的装箱值。
+        if (targetType == typeof(double) && result is int integer)
+            return (double)integer;
+        if (targetType == typeof(int) && result is double number)
+            return (int)number;
+        return result;
+    }
+
     /// <summary>把 CLR 类型映射成语言层类型名（用于错误消息）。</summary>
     public static string TypeName(Type? type) => type switch
     {

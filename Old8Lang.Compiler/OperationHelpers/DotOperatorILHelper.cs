@@ -1550,7 +1550,7 @@ public static class DotOperatorILHelper
 
         if (methodName == "ToStr" && arguments.Length == 0)
         {
-            return receiver.ToString();
+            return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(receiver);
         }
 
         if (receiver is IDictionary dictionary &&

@@ -83,16 +83,10 @@ public class LangListDistinctMethod : BaseLangListMethod, IIlNativeValueInstance
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
-        {
-            return new ListLangValue(DistinctHelper((LangValueType)langList).Select(IlValueBridge.Wrap).ToList());
-        }
-
-        if (instance is List<object?> list)
-        {
-            return list.Distinct().ToList();
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口或为 List<object?> 类型，当前类型：{instance?.GetType().Name}");
+        var result = new List<object?>();
+        foreach (var item in GetItemsForVM(instance))
+            if (!result.Any(value => VmItemsEqual(value, item)))
+                result.Add(item);
+        return result;
     }
 }

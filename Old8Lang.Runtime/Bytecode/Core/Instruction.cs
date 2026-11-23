@@ -101,6 +101,13 @@ public class Instruction(OpCode opCode, object? operand = null)
                     writer.Write((byte)4);
                     writer.Write(stringItem);
                 }
+                else if (item is string[] stringItems)
+                {
+                    writer.Write((byte)7);
+                    writer.Write(stringItems.Length);
+                    foreach (var value in stringItems)
+                        writer.Write(value);
+                }
                 else
                 {
                     throw new NotSupportedException($"不支持的数组元素类型: {item.GetType()}");
@@ -152,11 +159,21 @@ public class Instruction(OpCode opCode, object? operand = null)
                 0 => null!,
                 1 => reader.ReadInt32(),
                 4 => reader.ReadString(),
+                7 => ReadStringArray(reader),
                 _ => throw new InvalidOperationException($"未知的数组元素类型: {elementType}")
             };
         }
 
         return array;
+    }
+
+    private static string[] ReadStringArray(BinaryReader reader)
+    {
+        var length = reader.ReadInt32();
+        var values = new string[length];
+        for (var i = 0; i < length; i++)
+            values[i] = reader.ReadString();
+        return values;
     }
 
     public override string ToString()

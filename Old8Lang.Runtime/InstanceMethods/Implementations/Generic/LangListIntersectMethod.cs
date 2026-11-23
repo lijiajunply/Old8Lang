@@ -96,22 +96,12 @@ public class LangListIntersectMethod : BaseLangListMethod, IIlNativeValueInstanc
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is ILangList other)
-        {
-            return IntersectHelper(langList, other);
-        }
-
-        if (instance is List<object?> list && arguments[0] is List<object?> otherList)
-        {
-            return list.Intersect(otherList).ToList();
-        }
-
-        // 支持 object[] 类型
-        if (instance is object?[] array && arguments[0] is object?[] otherArray)
-        {
-            return array.Intersect(otherArray).ToArray();
-        }
-
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口、为 List<object?> 类型或为数组类型");
+        var other = GetItemsForVM(arguments[0]);
+        var result = new List<object?>();
+        foreach (var item in GetItemsForVM(instance))
+            if (other.Any(value => VmItemsEqual(value, item)) &&
+                !result.Any(value => VmItemsEqual(value, item)))
+                result.Add(item);
+        return result;
     }
 }

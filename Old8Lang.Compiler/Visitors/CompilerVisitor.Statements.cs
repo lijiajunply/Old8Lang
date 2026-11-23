@@ -434,6 +434,84 @@ public partial class CompilerVisitor
         return false;
     }
 
+    private void EmitDestructuredStore(string name, Type valueType)
+    {
+        // 先保存栈顶元素，后续写入闭包或字段需要先加载接收者。
+        var value = ilGenerator.DeclareLocal(valueType);
+        ilGenerator.Emit(OpCodes.Stloc, value);
+
+        void LoadAs(Type targetType)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, value);
+            if (valueType == targetType) return;
+            if (!targetType.IsValueType && valueType.IsValueType && targetType.IsAssignableFrom(valueType))
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            else if (valueType == typeof(object) && targetType.IsValueType)
+                ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+            else if (!valueType.IsValueType && !targetType.IsValueType && !targetType.IsAssignableFrom(valueType))
+                ilGenerator.Emit(OpCodes.Castclass, targetType);
+            else if (targetType == typeof(double) && valueType == typeof(int))
+                ilGenerator.Emit(OpCodes.Conv_R8);
+            else if (valueType != targetType && !targetType.IsAssignableFrom(valueType))
+                throw new InvalidOperationException($"无法将 {valueType.Name} 赋给 {name}");
+        }
+
+        if (local.AsyncStateMachineGenerator is { } asyncStateMachine)
+        {
+            var fieldType = asyncStateMachine.GetVariableType(name);
+            if (fieldType is null && local.Globals is { } asyncGlobals && asyncGlobals.IsSlot(name))
+            {
+                ilGenerator.Emit(OpCodes.Ldloc, value);
+                RuntimeGlobals.EmitStore(ilGenerator, name, asyncGlobals.GetType(name), valueType);
+                return;
+            }
+
+            fieldType ??= valueType;
+            local.DefineVariable(ilGenerator, name, fieldType);
+            LoadAs(fieldType);
+            asyncStateMachine.StoreVariable(ilGenerator, name);
+            return;
+        }
+
+        if (local.TryGetCapturedLocal(name, out var captured))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            LoadAs(typeof(object));
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+            return;
+        }
+
+        if (!local.LocalVar.ContainsKey(name) && !local.ArgumentIndices.ContainsKey(name) &&
+            local.FieldVar.TryGetValue(name, out var field))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            LoadAs(field.FieldType);
+            ilGenerator.Emit(OpCodes.Stfld, field);
+            return;
+        }
+
+        if (local.ArgumentIndices.TryGetValue(name, out var argument))
+        {
+            LoadAs(local.LocalVarTypes.GetValueOrDefault(name, typeof(object)));
+            ilGenerator.Emit(OpCodes.Starg, argument);
+            return;
+        }
+
+        if (!local.LocalVar.ContainsKey(name) && local.Globals is { } globals &&
+            (globals.IsSlot(name) || (!local.IsTopLevelScope && globals.IsGlobal(name))))
+        {
+            globals.Promote(name);
+            ilGenerator.Emit(OpCodes.Ldloc, value);
+            RuntimeGlobals.EmitStore(ilGenerator, name, globals.GetType(name), valueType);
+            return;
+        }
+
+        var target = local.GetOrCreateLocalVar(ilGenerator, name, valueType);
+        LoadAs(target.LocalType);
+        ilGenerator.Emit(OpCodes.Stloc, target);
+    }
+
     public object? VisitSetStatement(SetStatement node)
     {
 
@@ -446,9 +524,44 @@ public partial class CompilerVisitor
         if (tuplePattern is not null)
         {
             var tupleType = node.Value.Accept(new TypeInferenceVisitor(local));
-            if (tupleType is null || !tupleType.IsValueType ||
+            if (tuplePattern.Any(element => element is TupleLiteralExpression or TupleLangValue) ||
+                tupleType is null || !tupleType.IsValueType ||
                 !typeof(System.Runtime.CompilerServices.ITuple).IsAssignableFrom(tupleType))
-                throw new InvalidOperationError(node, "IL 元组解构赋值右侧必须是元组");
+            {
+                node.Value.Accept(this);
+                if (tupleType?.IsValueType == true)
+                    ilGenerator.Emit(OpCodes.Box, tupleType);
+                var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+                ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+                void EmitPattern(IReadOnlyList<LangExpression> pattern, LocalBuilder source)
+                {
+                    for (var i = 0; i < pattern.Count; i++)
+                    {
+                        ilGenerator.Emit(OpCodes.Ldloc, source);
+                        ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                        ilGenerator.Emit(OpCodes.Call, typeof(IlIndexHelper).GetMethod(nameof(IlIndexHelper.GetDestructuringItem))!);
+                        if (pattern[i] is LangId id)
+                        {
+                            EmitDestructuredStore(id.IdName, typeof(object));
+                        }
+                        else if (pattern[i] is TupleLiteralExpression or TupleLangValue)
+                        {
+                            var nested = pattern[i] is TupleLiteralExpression syntax
+                                ? syntax.Elements
+                                : ((TupleLangValue)pattern[i]).Elements;
+                            var nestedLocal = ilGenerator.DeclareLocal(typeof(object));
+                            ilGenerator.Emit(OpCodes.Stloc, nestedLocal);
+                            EmitPattern(nested, nestedLocal);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationError(node, "元组解构赋值只支持变量名和嵌套元组");
+                        }
+                    }
+                }
+                EmitPattern(tuplePattern, valueLocal);
+                return null;
+            }
 
             node.Value.Accept(this);
             var tupleLocal = ilGenerator.DeclareLocal(tupleType);
@@ -474,12 +587,7 @@ public partial class CompilerVisitor
                 var field = currentType.GetField($"Item{index + 1}") ??
                             throw new InvalidOperationError(node, $"元组解构赋值索引 {i} 超出范围");
                 ilGenerator.Emit(OpCodes.Ldfld, field);
-                var target = local.GetOrCreateLocalVar(ilGenerator, id.IdName, field.FieldType);
-                if (target.LocalType == typeof(object) && field.FieldType.IsValueType)
-                    ilGenerator.Emit(OpCodes.Box, field.FieldType);
-                else if (target.LocalType != field.FieldType && !target.LocalType.IsAssignableFrom(field.FieldType))
-                    throw new InvalidOperationError(node, $"无法将 {field.FieldType.Name} 赋给 {id.IdName}");
-                ilGenerator.Emit(OpCodes.Stloc, target);
+                EmitDestructuredStore(id.IdName, field.FieldType);
             }
             return null;
         }
@@ -1244,6 +1352,26 @@ public partial class CompilerVisitor
     /// <summary>
     /// 访问 ReturnStatement 节点（编译器）
     /// </summary>
+    private void EmitReturnConversion(Type expected, Type actual)
+    {
+        if (ReturnStatementRuntimeExtensions.NeedsRuntimeConversion(expected, actual))
+        {
+            if (actual.IsValueType) ilGenerator.Emit(OpCodes.Box, actual);
+            ilGenerator.Emit(OpCodes.Ldtoken, expected);
+            ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+            ilGenerator.Emit(OpCodes.Call, typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ConvertReturn))!);
+            ilGenerator.Emit(expected.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, expected);
+        }
+        else if (expected.IsValueType && actual == typeof(object))
+            ilGenerator.Emit(OpCodes.Unbox_Any, expected);
+        else if (!expected.IsValueType && actual.IsValueType)
+            ilGenerator.Emit(OpCodes.Box, actual);
+        else if (ReturnStatementRuntimeExtensions.IsNumericType(expected) && ReturnStatementRuntimeExtensions.IsNumericType(actual))
+            ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, expected);
+        else if (!expected.IsValueType && !actual.IsValueType)
+            ilGenerator.Emit(OpCodes.Castclass, expected);
+    }
+
     public object? VisitReturnStatement(ReturnStatement node)
     {
 
@@ -1330,18 +1458,9 @@ public partial class CompilerVisitor
                 var returnValueType = local.ReturnValueLocal.LocalType;
 
                 // 如果返回表达式的类型与返回值局部变量的类型不匹配，进行类型转换
-                if (returnType != returnValueType)
+                if (!runtimeTypeErrorEmitted && returnType != null && returnType != returnValueType)
                 {
-                    if (returnValueType.IsValueType && returnType == typeof(object))
-                    {
-                        // object 到值类型，需要拆箱
-                        ilGenerator.Emit(OpCodes.Unbox_Any, returnValueType);
-                    }
-                    else if (!returnValueType.IsValueType && returnType!.IsValueType)
-                    {
-                        // 值类型到引用类型，需要装箱
-                        ilGenerator.Emit(OpCodes.Box, returnType);
-                    }
+                    EmitReturnConversion(returnValueType, returnType);
                 }
 
                 // 存储返回值到局部变量
@@ -1364,24 +1483,9 @@ public partial class CompilerVisitor
             if (local.ReturnValueLocal is not null)
             {
                 var expectedReturnType = local.ReturnValueLocal.LocalType;
-                if (returnType != null && returnType != expectedReturnType)
+                if (!runtimeTypeErrorEmitted && returnType != null && returnType != expectedReturnType)
                 {
-                    if (expectedReturnType.IsValueType && returnType == typeof(object))
-                    {
-                        ilGenerator.Emit(OpCodes.Unbox_Any, expectedReturnType);
-                    }
-                    else if (!expectedReturnType.IsValueType && returnType.IsValueType)
-                    {
-                        ilGenerator.Emit(OpCodes.Box, returnType);
-                    }
-                    else if (ReturnStatementRuntimeExtensions.IsNumericType(expectedReturnType) && ReturnStatementRuntimeExtensions.IsNumericType(returnType))
-                    {
-                        ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, expectedReturnType);
-                    }
-                    else if (!expectedReturnType.IsValueType && !returnType.IsValueType)
-                    {
-                        ilGenerator.Emit(OpCodes.Castclass, expectedReturnType);
-                    }
+                    EmitReturnConversion(expectedReturnType, returnType);
                 }
             }
 

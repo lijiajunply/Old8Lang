@@ -66,19 +66,8 @@ public class LangListReverseMethod : BaseLangListMethod, IIlNativeValueInstanceM
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
-        {
-            return new ListLangValue(ReverseHelper((LangValueType)langList).Select(IlValueBridge.Wrap).ToList());
-        }
-
-        // 兼容 VM 模式下的 List<object?>
-        if (instance is List<object?> list)
-        {
-            var reversed = new List<object?>(list);
-            reversed.Reverse();
-            return reversed;
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口或为 List<object?> 类型，当前类型：{instance?.GetType().Name}");
+        var items = GetItemsForVM(instance).ToList();
+        items.Reverse();
+        return items;
     }
 }

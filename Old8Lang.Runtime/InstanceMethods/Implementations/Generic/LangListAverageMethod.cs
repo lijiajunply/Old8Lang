@@ -99,11 +99,7 @@ public class LangListAverageMethod : BaseLangListMethod, IIlNativeValueInstanceM
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList)
-        {
-            return AverageHelper(langList);
-        }
-
-        throw new ArgumentException($"实例必须实现 ILangList 接口，当前类型：{instance?.GetType().Name}");
+        var list = new ListLangValue(GetItemsForVM(instance).Select(IlValueBridge.Wrap).ToList());
+        return IlValueBridge.Unwrap(ExecuteInternal(list, [], new VariateManager(), default));
     }
 }

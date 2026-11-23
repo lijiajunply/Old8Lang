@@ -616,6 +616,18 @@ public class PrimaryParserTests
 
     #region 元组测试
 
+    [Fact]
+    public void ParseTuple_NestedAssignmentPattern_PreservesStructure()
+    {
+        const string code = "(a, (b, c)) <- (1, (2, 3))";
+        var parser = new LangParser.LangParser(LangInterpreter.Tokenize(code), code);
+        var statement = Assert.IsType<SetStatement>(parser.ParseProgram()[0]);
+        var pattern = Assert.IsType<TupleLiteralExpression>(statement.LeftExpression);
+        Assert.IsType<LangId>(pattern.Elements[0]);
+        var nested = Assert.IsType<TupleLiteralExpression>(pattern.Elements[1]);
+        Assert.Equal(2, nested.Elements.Count);
+    }
+
     /// <summary>
     /// 测试简单元组 - (1, 2)
     /// </summary>

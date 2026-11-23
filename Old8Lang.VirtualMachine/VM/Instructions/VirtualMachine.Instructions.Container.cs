@@ -9,6 +9,10 @@ namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {
+    // VM 元组历史上使用右嵌套 Tuple 表示多元素元组；记录源元组的直接元素，
+    // 才能区分 (1, 2, 3) 与 (1, (2, 3))。弱键避免延长元组生命周期。
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<object, object?[]> TupleElements = new();
+
     /// <summary>
     /// 把可能为负的下标换算成实际下标并做越界检查
     /// （与解释器一致：<c>-1</c> 表示最后一个元素）。
@@ -68,17 +72,18 @@ public partial class VirtualMachine
                     elements[i] = _stack.Pop();
                 }
 
+                object tuple;
                 if (count == 0)
                 {
-                    _stack.Push(new Tuple<object?, object?>(null, null));
+                    tuple = new Tuple<object?, object?>(null, null);
                 }
                 else if (count == 1)
                 {
-                    _stack.Push(new Tuple<object?, object?>(elements[0], null));
+                    tuple = new Tuple<object?, object?>(elements[0], null);
                 }
                 else if (count == 2)
                 {
-                    _stack.Push(new Tuple<object?, object?>(elements[0], elements[1]));
+                    tuple = new Tuple<object?, object?>(elements[0], elements[1]);
                 }
                 else
                 {
@@ -91,8 +96,10 @@ public partial class VirtualMachine
                         current = new Tuple<object?, object?>(elements[i], current);
                     }
 
-                    _stack.Push(current);
+                    tuple = current;
                 }
+                TupleElements.Add(tuple, elements);
+                _stack.Push(tuple);
             }
                 break;
 

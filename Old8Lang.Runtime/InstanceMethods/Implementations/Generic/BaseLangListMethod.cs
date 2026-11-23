@@ -79,6 +79,10 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
             $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
     }
 
+    /// <summary>按语言值的相等语义比较 VM 集合元素。</summary>
+    protected static bool VmItemsEqual(object? left, object? right) =>
+        ReferenceEquals(left, right) || IlValueBridge.Wrap(left).Equal(IlValueBridge.Wrap(right));
+
     /// <summary>
     /// 从 VM 模式下的实例获取长度（支持 object[], List<object?>, ILangList, Tuple）
     /// </summary>

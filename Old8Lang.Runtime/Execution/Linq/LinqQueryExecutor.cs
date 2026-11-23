@@ -38,6 +38,7 @@ public class LinqQueryExecutor(VariateManager manager)
         // 使用统一的迭代器处理所有子句
         var intermediateResults = new List<(object? item, Dictionary<string, LangValueType> letVariables)>();
         var result = new List<object?>();
+        var groups = new List<(LangValueType Key, List<LangValueType> Values)>();
         var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
 
         foreach (var item in dataSource)
@@ -96,10 +97,9 @@ public class LinqQueryExecutor(VariateManager manager)
                             var projectedValue = selectClause.Projection.Accept(RuntimeVisitors.CreateInterpreter(manager));
                             result.Add(ConvertFromLangValue(projectedValue));
                         }
-                        else if (linqExpr.TerminationClause is GroupByClause)
+                        else if (linqExpr.TerminationClause is GroupByClause groupBy)
                         {
-                            // GroupBy 需要特殊处理，稍后实现
-                            result.Add(item);
+                            AddGroupValue(groups, groupBy);
                         }
                     }
                 }
@@ -142,10 +142,9 @@ public class LinqQueryExecutor(VariateManager manager)
                         var projectedValue = selectClause.Projection.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         result.Add(ConvertFromLangValue(projectedValue));
                     }
-                    else if (linqExpr.TerminationClause is GroupByClause)
+                    else if (linqExpr.TerminationClause is GroupByClause groupBy)
                     {
-                        // GroupBy 需要特殊处理，稍后实现
-                        result.Add(item);
+                        AddGroupValue(groups, groupBy);
                     }
                 }
                 finally
@@ -155,6 +154,9 @@ public class LinqQueryExecutor(VariateManager manager)
                 }
             }
         }
+
+        if (linqExpr.TerminationClause is GroupByClause)
+            result = CreateGroupResults(groups);
 
         // 处理查询延续（into）
         if (linqExpr.Continuation is not null)
@@ -172,6 +174,7 @@ public class LinqQueryExecutor(VariateManager manager)
     internal LangValueType ExecuteQueryWithJoin(LinqExpression linqExpr, IEnumerable dataSource)
     {
         var result = new List<object?>();
+        var groups = new List<(LangValueType Key, List<LangValueType> Values)>();
         var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
 
         // 将数据源转换为列表以便多次遍历
@@ -365,9 +368,9 @@ public class LinqQueryExecutor(VariateManager manager)
                             var projectedValue = selectClause.Projection.Accept(RuntimeVisitors.CreateInterpreter(manager));
                             result.Add(ConvertFromLangValue(projectedValue));
                         }
-                        else if (linqExpr.TerminationClause is GroupByClause)
+                        else if (linqExpr.TerminationClause is GroupByClause groupBy)
                         {
-                            result.Add(currentItem);
+                            AddGroupValue(groups, groupBy);
                         }
                     }
                 }
@@ -379,6 +382,9 @@ public class LinqQueryExecutor(VariateManager manager)
             }
         }
 
+        if (linqExpr.TerminationClause is GroupByClause)
+            result = CreateGroupResults(groups);
+
         // 处理查询延续（into）
         if (linqExpr.Continuation is not null)
         {
@@ -386,6 +392,35 @@ public class LinqQueryExecutor(VariateManager manager)
         }
 
         return ConvertToLangList(result);
+    }
+
+    private void AddGroupValue(List<(LangValueType Key, List<LangValueType> Values)> groups, GroupByClause clause)
+    {
+        var visitor = RuntimeVisitors.CreateInterpreter(manager);
+        var key = clause.KeyExpression.Accept(visitor);
+        var element = clause.ElementExpression.Accept(visitor);
+        var index = groups.FindIndex(group => group.Key.Equal(key));
+        if (index < 0)
+        {
+            groups.Add((key, [element]));
+            return;
+        }
+        groups[index].Values.Add(element);
+    }
+
+    private List<object?> CreateGroupResults(List<(LangValueType Key, List<LangValueType> Values)> groups)
+    {
+        var results = new List<object?>();
+        foreach (var (key, values) in groups)
+        {
+            var group = new DictionaryLangValue([
+                new KeyValuePair<LangExpression, LangExpression>(new StringLangValue("Key"), key),
+                new KeyValuePair<LangExpression, LangExpression>(new StringLangValue("Values"), new ListLangValue(values))
+            ]);
+            group.Accept(RuntimeVisitors.CreateInterpreter(manager));
+            results.Add(group);
+        }
+        return results;
     }
 
     /// <summary>
@@ -946,21 +981,13 @@ public class LinqQueryExecutor(VariateManager manager)
     /// </summary>
     internal IEnumerable ExecuteContinuation(QueryContinuation continuation, IEnumerable source)
     {
-        // 设置延续变量
-        var continuationId = new LangId(continuation.Variable);
-        manager.Set(continuationId, ConvertToLangValue(source));
-
-        // 执行延续后的查询体
-        IEnumerable result = source;
-        foreach (var clause in continuation.BodyClauses)
-        {
-            result = ExecuteBodyClause(clause, result, continuation.Variable);
-        }
-
-        // 执行终止子句
-        result = ExecuteTerminationClause(continuation.TerminationClause, result, continuation.Variable);
-
-        return result;
+        // 延续是以先前结果为输入的新查询；复用逐元素 let/where/select 管线，
+        // 避免 let 变量只保留最后一次求值。
+        var input = ConvertToLangList(source);
+        var query = new LinqExpression(new FromClause(continuation.Variable, input),
+            continuation.BodyClauses, continuation.TerminationClause);
+        var result = ExecuteQuery(query);
+        return ConvertToEnumerable(result);
     }
 
     /// <summary>

@@ -1320,8 +1320,8 @@ return node.Value.GetType();
         {
             return typeof(List<object>);
         }
-        // LINQ 查询返回 IEnumerable<T>
-        return typeof(System.Collections.IEnumerable);
+        // 非流式 IL 路径最终调用 ConvertToListLangValue。
+        return typeof(ListLangValue);
     
     
     }

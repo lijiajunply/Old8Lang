@@ -354,40 +354,39 @@ public partial class BytecodeVisitor
                     ? syntax.Elements
                     : ((TupleLangValue)leftExpr).Elements;
                 
-                for (int i = 0; i < elements.Count; i++)
+                void EmitPattern(IReadOnlyList<LangExpression> pattern, int sourceLocal)
                 {
-                    var element = elements[i];
-                    if (element is LangId id)
+                    for (int i = 0; i < pattern.Count; i++)
                     {
-                        // 提取第 i 个元素
-                        // 注意：LoadConst 的操作数是常量池下标，必须先把下标值本身放入常量池
-                        Emit(OpCode.LoadLocal, tupleLocalIndex);
+                        Emit(OpCode.LoadLocal, sourceLocal);
                         Emit(OpCode.LoadConst, _compiler.AddConstant(i));
-                        Emit(OpCode.GetIndex);
-                        
-                        // 赋值给变量
-                        string elementName = id.IdName;
-                        if (_compiler.IsLocalVariable(elementName))
+                        Emit(OpCode.CallNative, new object[] { 2, "__tuple_destructure_get" });
+                        if (pattern[i] is LangId id)
                         {
-                            Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(elementName));
+                            string name = id.IdName;
+                            if (_compiler.IsLocalVariable(name))
+                                Emit(OpCode.StoreLocal, _compiler.GetLocalIndex(name));
+                            else if (_compiler.IsGlobalVariable(name))
+                                Emit(OpCode.StoreGlobal, name);
+                            else
+                                Emit(OpCode.StoreLocal, _compiler.DeclareLocalVariable(name));
                         }
-                        else if (_compiler.IsGlobalVariable(elementName))
+                        else if (pattern[i] is TupleLiteralExpression or TupleLangValue)
                         {
-                            Emit(OpCode.StoreGlobal, elementName);
+                            var nested = pattern[i] is TupleLiteralExpression syntaxPattern
+                                ? syntaxPattern.Elements
+                                : ((TupleLangValue)pattern[i]).Elements;
+                            int nestedLocal = _compiler.AllocateLocal("<temp_nested_destruct>");
+                            Emit(OpCode.StoreLocal, nestedLocal);
+                            EmitPattern(nested, nestedLocal);
+                            _compiler.FreeLocal(nestedLocal);
                         }
                         else
-                        {
-                            int newLocal = _compiler.DeclareLocalVariable(elementName);
-                            Emit(OpCode.StoreLocal, newLocal);
-                        }
-                    }
-                    else
-                    {
-                        // 不支持嵌套解构赋值 (a, (b, c)) <- ... 目前仅支持单层
-                         throw new NotSupportedException($"字节码模式下元组解构仅支持变量名，不支持: {element.GetType().Name}");
+                            throw new NotSupportedException("元组解构赋值只支持变量名和嵌套元组");
                     }
                 }
-                
+                EmitPattern(elements, tupleLocalIndex);
+
                 // 清理临时变量
                 _compiler.FreeLocal(tupleLocalIndex);
             }

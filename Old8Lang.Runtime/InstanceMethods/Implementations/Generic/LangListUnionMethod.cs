@@ -92,16 +92,10 @@ public class LangListUnionMethod : BaseLangListMethod, IIlNativeValueInstanceMet
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is ILangList langList && arguments[0] is ILangList other)
-        {
-            return UnionHelper(langList, other);
-        }
-
-        if (instance is List<object?> list && arguments[0] is List<object?> otherList)
-        {
-            return list.Union(otherList).ToList();
-        }
-
-        throw new ArgumentException($"实例和参数必须实现 ILangList 接口或为 List<object?> 类型");
+        var items = GetItemsForVM(instance).ToList();
+        foreach (var item in GetItemsForVM(arguments[0]))
+            if (!items.Any(existing => VmItemsEqual(existing, item)))
+                items.Add(item);
+        return items;
     }
 }

@@ -9,6 +9,79 @@ namespace Old8Lang.Tests.VirtualMachine.Functions;
 public class VMNamedArgumentsTests
 {
     [Fact]
+    public void NativeNamedArguments_AreBoundByNameWithPositionalArguments()
+    {
+        const string code = @"
+            channel <- ChannelCreate()
+            ChannelSend(value: 42, channelId: channel)
+            first <- ChannelReceive(channelId: channel)
+            ChannelSend(channel, value: 77)
+            second <- ChannelReceive(channel)
+            ChannelClose(channel)
+        ";
+        var vm = new VM(CompileHelper.CompileToBytecode(code));
+        try
+        {
+            vm.Execute();
+            Assert.Equal(42, vm.GetGlobalVariable("first"));
+            Assert.Equal(77, vm.GetGlobalVariable("second"));
+        }
+        finally
+        {
+            if (vm.GetGlobalVariable("channel") is int channel)
+                Old8Lang.Concurrency.ResourceManager.DisposeChannel(channel);
+        }
+    }
+
+    [Fact]
+    public void NativeNamedArguments_SurviveBytecodeSerialization()
+    {
+        var bytecode = CompileHelper.CompileToBytecode("sem <- SemaphoreCreate(maxCount: 2, initialCount: 1)");
+        var path = Path.Combine(Path.GetTempPath(), $"o8named_{Guid.NewGuid():N}.o8bc");
+        VM? vm = null;
+        try
+        {
+            bytecode.SaveToFile(path);
+            vm = new VM(Old8Lang.Bytecode.BytecodeFile.LoadFromFile(path));
+            vm.Execute();
+            Assert.IsType<int>(vm.GetGlobalVariable("sem"));
+        }
+        finally
+        {
+            if (vm?.GetGlobalVariable("sem") is int semaphore)
+                Old8Lang.Concurrency.ResourceManager.DisposeSemaphore(semaphore);
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void UserNamedArguments_SurviveBytecodeSerialization()
+    {
+        const string code = "func subtract(x:int, y:int) -> int { return x - y } result <- subtract(y: 3, x: 10)";
+        var bytecode = CompileHelper.CompileToBytecode(code);
+        var path = Path.Combine(Path.GetTempPath(), $"o8named_{Guid.NewGuid():N}.o8bc");
+        try
+        {
+            bytecode.SaveToFile(path);
+            var vm = new VM(Old8Lang.Bytecode.BytecodeFile.LoadFromFile(path));
+            vm.Execute();
+            Assert.Equal(7, vm.GetGlobalVariable("result"));
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Theory]
+    [InlineData("SemaphoreCreate(1, initialCount: 1)")]
+    [InlineData("SemaphoreCreate(initialCount: 1, unknown: 1)")]
+    [InlineData("SemaphoreCreate(initialCount: 1, initialCount: 1)")]
+    [InlineData("SemaphoreCreate(maxCount: 1)")]
+    public void NativeNamedArguments_InvalidBindingThrowsArgumentError(string call)
+    {
+        var vm = new VM(CompileHelper.CompileToBytecode(call));
+        Assert.Throws<Old8Lang.Error.ArgumentError>(() => vm.Execute());
+    }
+
+    [Fact]
     public void NamedArguments_EmitsFunctionIndexOperand_AndExecutes()
     {
         var code = @"
