@@ -85,7 +85,11 @@ internal static class SetStatementRuntimeExtensions
         }
 
         // 先求值：部分节点（如一元运算）只有在 LoadIlValue 之后才会缓存真实类型。
-        Type valueType;
+        // 注意区分「栈上实际类型 stackType」与「槽位目标类型 targetType」：
+        // 带类型注解（如 result:int <- decorated()）时，栈上可能是 object，必须按真实栈类型交给 EmitStore，
+        // 否则会把已装箱的引用直接当作 int32 再次 box，写入垃圾整数。
+        Type stackType;
+        Type targetType;
 
         // 空花括号在语法层默认是列表；显式 dict 注解仍需生成真正的空字典。
         if ((node.Value is ListLiteralExpression { Elements.Count: 0 } or ListLangValue { Value.Count: 0, Values.Count: 0 }) &&
@@ -94,21 +98,24 @@ internal static class SetStatementRuntimeExtensions
              node.Id.AssumptionType.Equals("dictionary", StringComparison.OrdinalIgnoreCase)))
         {
             new DictionaryLangValue(position: node.Value.Position).Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            valueType = typeof(Dictionary<object, object>);
+            stackType = typeof(Dictionary<object, object>);
+            targetType = stackType;
         }
         else
         {
             node.Value.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            valueType = node.ComputeGlobalValueType(local);
+            var inferred = node.Value.Accept(new TypeInferenceVisitor(local));
+            stackType = inferred is null || inferred == typeof(void) ? typeof(object) : inferred;
+            targetType = node.ComputeGlobalValueType(local);
         }
 
         var slotType = globals.GetType(name);
         if (slotType == typeof(object) || slotType == typeof(void))
         {
-            slotType = valueType;
+            slotType = targetType;
             globals.Types[name] = slotType;
         }
-        else if (slotType != valueType && !slotType.IsAssignableFrom(valueType))
+        else if (slotType != targetType && !slotType.IsAssignableFrom(targetType))
         {
             // 同名变量在不同路径上类型不一致（如函数内 double、顶层 Join 结果是语言值）：
             // 槽位退化为 object，避免把值强转成槽位类型。
@@ -117,7 +124,7 @@ internal static class SetStatementRuntimeExtensions
         }
 
         local.LocalVarTypes[name] = slotType;
-        RuntimeGlobals.EmitStore(ilGenerator, name, slotType, valueType);
+        RuntimeGlobals.EmitStore(ilGenerator, name, slotType, stackType);
         return true;
     }
 }

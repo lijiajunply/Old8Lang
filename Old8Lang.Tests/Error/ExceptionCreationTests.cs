@@ -34,8 +34,8 @@ public class ExceptionCreationTests
         // Assert
         Assert.Contains("INVALID_OPERATION_ERROR", exception.Message);
         Assert.Contains("1", exception.Message);
-        Assert.Contains("10", exception.Message);
-        Assert.Contains("test.old8", exception.Message);
+        Assert.Contains("11", exception.Message); // SourcePosition.Column 为 0 起始，ToString 展示 1 起始列号
+        Assert.Contains("test.old8(1:11)", exception.Message);
     }
     
     [Fact]

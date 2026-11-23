@@ -957,11 +957,13 @@ public partial class CompilerVisitor
         // 装饰器应用后的函数体是解释器里构造的 wrapper 闭包（自由变量不在当前
         // IL 作用域），直接编译会解析不到被装饰函数。这里改为生成转发委托：
         // 运行期按名字调用解释器管理器里已装饰好的函数。
+        // 装饰器可以改变返回值类型（例如 int -> string），因此非 void 转发委托统一返回 object。
         if (node.GetFuncValue().Decorators is { Count: > 0 })
         {
+            var forwarderReturnType = returnType == typeof(void) ? typeof(void) : typeof(object);
             var forwarder = new DynamicMethod(
                 methodName,
-                returnType,
+                forwarderReturnType,
                 parameterTypes!,
                 true);
 
@@ -985,17 +987,9 @@ public partial class CompilerVisitor
             forwarderIl.Emit(OpCodes.Call,
                 typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.InvokeByName))!);
 
-            if (returnType == typeof(void))
+            if (forwarderReturnType == typeof(void))
             {
                 forwarderIl.Emit(OpCodes.Pop);
-            }
-            else if (returnType.IsValueType)
-            {
-                forwarderIl.Emit(OpCodes.Unbox_Any, returnType);
-            }
-            else if (returnType != typeof(object))
-            {
-                forwarderIl.Emit(OpCodes.Castclass, returnType);
             }
 
             forwarderIl.Emit(OpCodes.Ret);

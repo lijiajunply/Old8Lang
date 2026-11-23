@@ -90,7 +90,7 @@ public static class IlRuntimeFunctions
         {
             named.Add(new NamedArgument(
                 namedArgumentNames[index],
-                IlValueBridge.Wrap(namedArgumentValues[index])));
+                WrapArgument(namedArgumentValues[index])));
         }
 
         var instance = new Instance(new LangId(name), positional, named);

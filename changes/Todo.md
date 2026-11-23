@@ -40,10 +40,10 @@
   装饰器缓存/闭包/计数器用例全部通过（装饰器两组 10 → 3 失败）。
   见 change（`2026-11-18-装饰器顶层变量/test.md`）。
 
-- [ ] **装饰器可以改变返回类型（IL 不支持）**：转发委托按原注解返回；若装饰器把 int
-  改成 string，调用点仍按 int 处理而 cast 失败。试过让转发委托统一返回 object，
-  但调用点静态推断仍是 int，会把装箱对象写进 int 槽（得到垃圾整数），已回退。
-  需要让调用点对被装饰函数的返回类型也按 object 推断，属较大的类型系统改动。
+- [x] **装饰器可以改变返回类型（IL 支持）**：2026-11-23 将非 void 装饰器转发委托统一改为返回
+  `object`，并修正 `SetStatementRuntimeExtensions.TryEmitGlobalStore` 用类型注解冒充栈类型
+  导致对已装箱对象再次 `box` 产出垃圾整数的问题；`DecoratorCompilerTests` /
+  `DecoratorInterpreterTests` 剩余 3 项全部转通过。
 - [x] **动态结果循环回写**：`CoerceDynamic` 转换后写回原槽位，`reduce3` 中间值与
   解释器一致，`HigherOrderTests.ReduceFunction` 通过。object 算术和整数溢出仍是独立缺口。
 - [x] **EdgeCases 组边界用例**：20 项失败中大多数是旧语法（`for ... to`、`case ->`、
@@ -52,9 +52,9 @@
   语言值写入原生字段先解包（否则读回垃圾整数）、`&&`/`||` 的非 bool 操作数运行期
   报 TYPE_ERROR。`Compiler.EdgeCases` 20 → 0。
 
-- [ ] **解释器模块导入用例偶发失败**：`Interpreter.Modules.AdvancedImport.ConditionalImportTests`
-  的复杂条件导入用例单独复跑仍失败（2 例），与 IL 无关（本轮只改编译器与测试），
-  疑似测试环境/临时目录或顺序依赖，需单独排查。
+- [x] **解释器模块导入用例失败**：2026-11-23 查明 `ConditionalImportTests.Import_ConditionalWithComplexExpression_ShouldEvaluateExpression`
+  并非环境/顺序抖动，而是字符串比较改为字典序后 `"1.5" < "2.0"` 由 `false` 变为 `true`，
+  原用例断言停留在旧的长度比较分支；已修正期望，`ConditionalImportTests` 全通过。
 
 - [ ] **模式差异记录（EdgeCases 相关）**：私有成员访问/未声明变量/未知方法在 IL 是
   编译期错误、解释器是运行期错误、VM 对私有字段甚至静默放行；`.Match` 不是字符串
@@ -71,13 +71,12 @@
 - [x] **AwaitTests 顶层调用缺少 await**：`finalResults <- testAwaitInLoop()` 拿到的是
   Task/AsyncStateMachineBox。补 await 后 `AwaitTests` 0 失败，Async 26 → 21。
 
-- [ ] **async 函数访问顶层全局变量会崩溃（已回退实验）**：让 async 函数体的
-  LocalManager 继承 Globals、并允许 VisitLangId 回退到全局槽位后，批量运行
-  `AsyncStateMachineResume/finally/using` 用例出现测试进程栈溢出（单独运行通过）。
-  已完整回退；若要支持 async 访问/写顶层变量，需要独立设计状态机 + 全局槽位同步，
-  并先保证批量运行不崩溃。
+- [x] **async 函数访问顶层全局变量**：已在 `2026-11-22-IL异步失败清理` 阶段 3 通过
+  `RuntimeGlobals` 改用 `AsyncLocal` 解决（见下文「IL 异步剩余失败」条目）。
 
-- [ ] 继续拆分异步 26 项失败；函数剩余 13 项（装饰器 10、命名实参 3）与边界值 20 项。
+- [ ] 继续处理 `Compiler.Async` 剩余 6 项（`Task.WaitAll`/`WaitAny`/`Completed` 3 项、
+  `catch`/`finally` 内 await 2 项、IL `async for-in` / 异步生成器 1 项）；
+  `Compiler.Functions`（166 通过、0 失败、12 跳过）与 `Compiler.EdgeCases`（0 失败）已清零。
   既有测试基线已过期的条目以下方复核说明为准。
 
 ## IL 模式与跨模式缺陷
@@ -240,7 +239,9 @@
 
 ## 测试与工程问题
 
-- [ ] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-13 Core 诊断与预处理器迁移回归中，`SourcePosition(1, 10)` 的面向用户展示列为 1 起始，而测试仍要求异常文本包含 `10`，导致 53 项中唯一失败。与程序集迁移无关；应统一测试期望与 `SourcePosition.ToString()` 的列号约定。见 Core 诊断与预处理报告（`2026-11-13-16-35-Core诊断与预处理拆分测试.md`）。2026-11-18 定向复测仍因异常文本不含 `10` 失败。
+- [x] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-23 已按 `SourcePosition.ToString()` 1 起始列号约定更新为断言 `11` / `test.old8(1:11)`，`Error.ExceptionCreationTests` 15 项全通过。
+
+- [ ] **`ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections` 失败**：2026-11-23 跑 Architecture 回归时发现，异步状态机分析器已拒绝「表达式内部的 await（挂起时求值栈非空）」，导致该用例抛 `CompilerException`。与本轮改动无关，待按当前异步限制更新用例。
 
 - [x] **IL 数组回归失败已关闭**：`Len` 残留栈值与集合 `+` 拼接已分别修复，见
   [动态长度报告](2026-11-14-IL-Len动态长度/test.md) 与
@@ -702,10 +703,12 @@
 - [x] **纯位置调用缺参数的编译期校验**：`test()` 缺少必需参数现在在编译期抛
   `ArgumentError`（`NamedArguments_AllParametersMissing` 通过）。
 
-- [ ] **类方法命名实参 + 高阶函数命名 lambda**：`obj.method(x: 1)` 的 Dot 路径未重排
-  （生成方法没有参数名可查，需要编译器侧维护「方法 → 形参名」映射）；
-  命名实参里传 lambda 已改用 `WrapFunction` 并修正 `IlDelegateFuncLangValue` 的形参
-  列表，但解释器随后把匿名包装函数判为 void 返回值，仍报类型不匹配（待继续）。
+- [x] **类方法命名实参 + 高阶函数命名 lambda**：2026-11-23 修复：
+  `ClassInitRuntimeExtensions.DefineMethodInternal` 通过 `MethodBuilder.DefineParameter`
+  把形参名写入 CLR 元数据，`DotOperatorILHelper` 与 `TypeInferenceVisitor` 补齐类方法
+  命名实参重排与返回类型推断；`IlRuntimeFunctions.InvokeInstance` 命名实参改用
+  `WrapArgument`，且 `IlDelegateFuncLangValue.Accept` 在解释器求值时返回自身避免被
+  `VisitFuncLangValue` 克隆成空函数体。`Compiler.Functions.NamedArguments*` 全通过。
 
 
 - [ ] **IL 动态调用结果循环回写（工作区修复待验收）**：原来 `r <- fn(r, item)`

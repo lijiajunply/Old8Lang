@@ -522,6 +522,15 @@ public static partial class ClassInitRuntimeExtensions
             returnType,
             parameterTypes.ToArray());
 
+        // 把形参名写入 CLR 元数据，使类方法调用的命名实参能按参数名重排。
+        if (funcValue.Ids is not null)
+        {
+            for (var i = 0; i < funcValue.Ids.Count; i++)
+            {
+                methodBuilder.DefineParameter(i + 1, ParameterAttributes.None, funcValue.Ids[i].IdName);
+            }
+        }
+
         // 创建方法的IL生成器
         var methodIl = methodBuilder.GetILGenerator();
 

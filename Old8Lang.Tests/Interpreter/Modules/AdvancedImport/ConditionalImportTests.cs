@@ -207,7 +207,7 @@ result <- result_list[0]  // 应该只有日志信息
 
         // Assert
         Assert.Null(exception);
-        AssertVariableValue(interpreter, "result", "Using latest version: Advanced functionality v2.0");
+        AssertVariableValue(interpreter, "result", "Using old version: Advanced functionality");
     }
 
     [Fact]

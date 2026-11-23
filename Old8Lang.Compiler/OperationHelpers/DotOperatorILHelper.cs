@@ -876,6 +876,12 @@ public static class DotOperatorILHelper
             return bridgeReturnType;
         }
 
+        // 带命名实参的实例方法调用：按 CLR 方法形参名重排实参后再发射调用。
+        if (leftType is not null && instance.NamedArgs is { Count: > 0 })
+        {
+            return GenerateNamedArgumentInstanceMethodCall(left!, instance, ilGenerator, local, leftType, operation);
+        }
+
         // 如果实例方法注册表中没有找到，继续使用原有的逻辑
         left!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var types = new List<Type>();
@@ -1072,6 +1078,94 @@ public static class DotOperatorILHelper
         // 对于实例方法使用 Callvirt，对于静态方法（包括扩展方法）使用 Call
         ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
 
+        return m.ReturnType;
+    }
+
+    /// <summary>
+    /// 处理带命名实参的普通实例方法调用（如 <c>calc.compute(op: "add", y: 15, x: 25)</c>）。
+    /// </summary>
+    private static Type GenerateNamedArgumentInstanceMethodCall(
+        LangExpression left,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        Type leftType,
+        Operation operation)
+    {
+        var namedArgs = instance.NamedArgs!;
+        var totalArgs = instance.Ids.Count + namedArgs.Count;
+
+        // 先按名字与参数总数找候选方法；若有重载，优先所有命名参数名都匹配的那个。
+        var candidates = leftType.GetMethods()
+            .Where(method => method.Name == instance.Id.IdName)
+            .ToList();
+
+        var m = candidates.FirstOrDefault(method =>
+                {
+                    var ps = method.GetParameters();
+                    return ps.Length == totalArgs &&
+                           namedArgs.All(na => ps.Any(p => p.Name == na.Name));
+                })
+                ?? candidates.FirstOrDefault(method => method.GetParameters().Length == totalArgs);
+
+        if (m is null)
+        {
+            throw new InvalidOperationError(operation, $"方法 '{instance.Id.IdName}' 未找到",
+                $"无法在类型 '{leftType.Name}' 中找到接受 {totalArgs} 个参数的方法 '{instance.Id.IdName}'");
+        }
+
+        var parameters = m.GetParameters();
+        var reordered = new LangExpression?[parameters.Length];
+        for (var i = 0; i < instance.Ids.Count; i++)
+        {
+            reordered[i] = instance.Ids[i];
+        }
+
+        var seenNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var namedArg in namedArgs)
+        {
+            if (!seenNames.Add(namedArg.Name))
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"方法 '{instance.Id.IdName}' 的命名参数 '{namedArg.Name}' 重复");
+            }
+
+            var paramIndex = Array.FindIndex(parameters, p => p.Name == namedArg.Name);
+            if (paramIndex < 0)
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"方法 '{instance.Id.IdName}' 没有名为 '{namedArg.Name}' 的参数");
+            }
+
+            if (reordered[paramIndex] is not null)
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"方法 '{instance.Id.IdName}' 的参数 '{namedArg.Name}' 已由位置参数提供");
+            }
+
+            reordered[paramIndex] = namedArg.Value;
+        }
+
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            if (reordered[i] is null)
+            {
+                throw new ArgumentError(operation.Position,
+                    $"方法 '{instance.Id.IdName}' 缺少必需参数 '{parameters[i].Name ?? $"arg{i}"}'");
+            }
+        }
+
+        left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var argTypes = new List<Type>(parameters.Length);
+        foreach (var expr in reordered)
+        {
+            expr!.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var argType = expr.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            argTypes.Add(argType);
+        }
+
+        EmitInstanceArgumentConversions(ilGenerator, m, argTypes);
+        ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
         return m.ReturnType;
     }
 

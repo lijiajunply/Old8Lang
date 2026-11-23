@@ -477,6 +477,18 @@ internal sealed class IlDelegateFuncLangValue(Delegate function)
                 new LangId(parameter.Name ?? $"arg{index}"))
             .ToList();
     }
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        // IlDelegateFuncLangValue 已经是求值完成的运行时函数值；
+        // 解释器求值实参时直接返回自身，避免被 VisitFuncLangValue 克隆成空函数体的 FuncLangValue。
+        if (typeof(TResult) == typeof(LangValueType))
+        {
+            return (TResult)(object)this;
+        }
+
+        return base.Accept(visitor);
+    }
+
     public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         var arguments = ids.Select(id => IlValueBridge.Unwrap(id.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc)))).ToArray();

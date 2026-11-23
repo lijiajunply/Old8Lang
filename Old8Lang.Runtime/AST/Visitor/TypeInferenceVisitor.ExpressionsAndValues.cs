@@ -575,8 +575,24 @@ public partial class TypeInferenceVisitor
             // NotSupportedException: The invoked member is not supported before the type is created）。
             if (leftType is not null && leftType is not TypeBuilder)
             {
-                var paramTypes = instance.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToArray();
-                var method = leftType.GetMethod(instance.Id.IdName, paramTypes);
+                MethodInfo? method;
+                if (instance.NamedArgs is { Count: > 0 })
+                {
+                    var totalArgCount = instance.Ids.Count + instance.NamedArgs.Count;
+                    method = leftType.GetMethods().FirstOrDefault(m =>
+                                 m.Name == instance.Id.IdName &&
+                                 m.GetParameters().Length == totalArgCount &&
+                                 instance.NamedArgs.All(na => m.GetParameters().Any(p => p.Name == na.Name)))
+                             ?? leftType.GetMethods().FirstOrDefault(m =>
+                                 m.Name == instance.Id.IdName &&
+                                 m.GetParameters().Length == totalArgCount);
+                }
+                else
+                {
+                    var paramTypes = instance.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToArray();
+                    method = leftType.GetMethod(instance.Id.IdName, paramTypes);
+                }
+
                 if (method is not null)
                 {
                     return method.ReturnType;
