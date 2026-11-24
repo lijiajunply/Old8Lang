@@ -12,6 +12,28 @@ public partial class BytecodeVisitor
     public Instruction? VisitLinqExpression(LinqExpression node)
     {
         MarkPosition(node);
+        // 数据源在外层作用域求值；查询范围变量在独立作用域中遮蔽同名变量。
+        node.FromClause.DataSource.Accept(this);
+        var sourceName = $"<linq_source_{Guid.NewGuid():N}>";
+        var sourceLocal = _compiler.AllocateLocal(sourceName);
+        Emit(OpCode.StoreLocal, sourceLocal);
+        _compiler.EnterScope();
+        try
+        {
+            var scoped = new LinqExpression(
+                new FromClause(node.FromClause.RangeVariable, new LangId(sourceName)),
+                node.BodyClauses, node.TerminationClause, node.Continuation, node.Position);
+            return EmitLinqExpression(scoped);
+        }
+        finally
+        {
+            _compiler.LeaveScope();
+            _compiler.FreeLocal(sourceLocal);
+        }
+    }
+
+    private Instruction? EmitLinqExpression(LinqExpression node)
+    {
         // 检查是否有 Join 子句
         var hasJoin = node.BodyClauses.Any(c => c is JoinClause);
 
@@ -130,7 +152,23 @@ public partial class BytecodeVisitor
             _compiler.FreeLocal(letVar);
         }
 
+        EmitLinqContinuation(node);
+
         return null;
+    }
+
+    private void EmitLinqContinuation(LinqExpression node)
+    {
+        if (node.Continuation is not { } continuation) return;
+        // 栈顶为上一阶段结果；将其作为新查询的数据源逐元素处理。
+        var temporaryName = $"<linq_continuation_{Guid.NewGuid():N}>";
+        var temporary = _compiler.AllocateLocal(temporaryName);
+        Emit(OpCode.StoreLocal, temporary);
+        var next = new LinqExpression(
+            new FromClause(continuation.Variable, new LangId(temporaryName)),
+            continuation.BodyClauses, continuation.TerminationClause);
+        VisitLinqExpression(next);
+        _compiler.FreeLocal(temporary);
     }
 
     /// <summary>
@@ -189,6 +227,13 @@ public partial class BytecodeVisitor
 
         foreach (var joinClause in joinClauses)
         {
+            // 在声明内层变量之前求值数据源，允许 `join y in y` 引用外层 y。
+            joinClause.InnerDataSource.Accept(this);
+            Emit(OpCode.GetIterator);
+            int innerIteratorLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, innerIteratorLocal);
+            innerIteratorLocals.Add(innerIteratorLocal);
+
             if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
             {
                 // Group Join: 创建一个列表来收集匹配的内部元素
@@ -201,13 +246,6 @@ public partial class BytecodeVisitor
             // 为内部范围变量分配局部变量槽
             int innerRangeVarLocal = _compiler.AllocateLocal(joinClause.RangeVariable);
             innerRangeVarLocals[joinClause.RangeVariable] = innerRangeVarLocal;
-
-            // 获取内部数据源的迭代器
-            joinClause.InnerDataSource.Accept(this);
-            Emit(OpCode.GetIterator);
-            int innerIteratorLocal = _compiler.AllocateLocal();
-            Emit(OpCode.StoreLocal, innerIteratorLocal);
-            innerIteratorLocals.Add(innerIteratorLocal);
 
             // 内部循环开始
             int innerLoopStartPos = GetCurrentPosition();
@@ -375,6 +413,8 @@ public partial class BytecodeVisitor
         {
             _compiler.FreeLocal(local);
         }
+
+        EmitLinqContinuation(node);
 
         return null;
     }

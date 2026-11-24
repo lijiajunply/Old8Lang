@@ -15,6 +15,22 @@ namespace Old8Lang.Tests.Compiler.Linq;
 public class LinqJoinWhereTests
 {
     [Fact]
+    public void GroupBy_NullKeyKeepsAllValues()
+    {
+        const string code = @"
+            numbers <- {1, 2}
+            result <- from x in numbers group x by null
+            Assert.Equal(1, result.Count())
+            Assert.Equal(null, result[0][""Key""])
+            Assert.Equal(""[1, 2]"", result[0][""Values""].ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
     public void GroupBy_ProducesKeysAndValues()
     {
         const string code = @"
@@ -57,6 +73,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -66,6 +83,38 @@ public class LinqJoinWhereTests
             numbers <- {1, 2, 3}
             result <- from x in numbers select x into y where y > 1 select y
             Assert.Equal(""[2, 3]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void SelectContinuation_DoesNotOverwriteOuterVariable()
+    {
+        const string code = @"
+            y <- 99
+            numbers <- {1, 2, 3}
+            result <- from x in numbers select x into y where y > 1 select y
+            Assert.Equal(""[2, 3]"", result.ToStr())
+            Assert.Equal(99, y)
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void QueryLet_DoesNotOverwriteOuterVariable()
+    {
+        const string code = @"
+            doubled <- 99
+            numbers <- {1, 2, 3}
+            result <- from x in numbers let doubled <- x * 2 select doubled
+            Assert.Equal(""[2, 4, 6]"", result.ToStr())
+            Assert.Equal(99, doubled)
         ";
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
@@ -84,6 +133,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -97,6 +147,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -109,6 +160,36 @@ public class LinqJoinWhereTests
             Assert.Equal(""[3, 4]"", result.ToStr())
         ";
         CompileAndRun(code);
+    }
+
+    [Fact]
+    public void JoinSource_CanUseOuterVariableWithSameName()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            y <- {2, 3}
+            result <- from x in left join y in y on x == y select y
+            Assert.Equal(""[2, 3]"", result.ToStr())
+            Assert.Equal(""[2, 3]"", y.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+    }
+
+    [Fact]
+    public void JoinSource_CanDependOnCurrentOuterValue()
+    {
+        const string code = @"
+            rows <- {{1, 2}, {1, 3}}
+            result <- from x in rows join y in x on 1 == y select y
+            Assert.Equal(""[1, 1]"", result.ToStr())
+        ";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+        CompileAndRun(code);
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]

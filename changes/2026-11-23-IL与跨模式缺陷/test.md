@@ -49,3 +49,14 @@
 - 增加连续连接、重复匹配、空分组、连接后 let、内层值参与投影，以及连接后按内层键排序再过滤的回归。非流式排序现计算各排序表达式并稳定排序；范围变量乘法通过语言值运算。
 - `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --no-restore --filter 'FullyQualifiedName~Compiler.Linq|FullyQualifiedName~Compiler.Expressions' --verbosity quiet`：300 通过、1 跳过、0 失败。
 - 分组终止、查询延续、关联内层数据源等其他查询路径尚未逐项复核，待办保持未完成。
+
+## LINQ 分组、延续与作用域（2026-11-24）
+
+- 解释器的 `group ... by` 原先返回未分组的输入，现按键聚合并产生包含 `Key`、`Values` 的分组；IL 的分组表达式、动态索引及集合显示也已修正。基础分组、计算键/元素和 null 键在三模式执行通过。
+- `select/group ... into` 的范围变量现逐元素绑定；解释器的延续 `let` 原先复用最后一行，VM 原先忽略延续，均已修复。覆盖过滤、排序、let、分组键投影和同名外层变量。
+- 增加查询作用域隔离；`join y in y` 仍可读取外层数据源。关联内层源按当前外层行求值，原先 IL 生成无效程序；三模式回归通过。
+- 定向测试 `--filter 'FullyQualifiedName~Compiler.Linq.LinqJoinWhereTests'`：21 通过、0 失败。
+- `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --no-build --filter 'FullyQualifiedName~Compiler.Linq|FullyQualifiedName~Interpreter.Linq|FullyQualifiedName~VirtualMachine.Linq|FullyQualifiedName~Compiler.Expressions|FullyQualifiedName~Compiler.Collections' --verbosity quiet`：590 通过、4 跳过、0 失败。
+- 尚未完成复杂查询组合与 VM 排序键语义的全面核对；不关闭 LINQ 待办。
+- 查询作用域变更后执行 `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --no-build --filter 'FullyQualifiedName~Old8Lang.Tests.Architecture' --verbosity quiet`：72 通过、1 失败；失败为已有待办 `ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections`（现有表达式内 await 限制），单项复跑同样失败。
+- 再补充 `let` 与外层同名变量的隔离：解释器修复前把外层值由 99 改为 6，修复后三模式通过；相关套件重跑 591 通过、4 跳过。再次运行 Architecture 为 72 通过、1 失败，仍是上述既有 await 用例。

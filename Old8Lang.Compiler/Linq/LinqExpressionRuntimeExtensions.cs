@@ -21,23 +21,67 @@ internal static partial class LinqExpressionRuntimeExtensions
         // 2. 转换为 IEnumerable
         node.ConvertToEnumerable(ilGenerator);
 
-        // 3. 处理查询体子句（where, orderby, let, join 等）
-        foreach (var clause in node.BodyClauses)
+        node.WithLinqScope(ilGenerator, local, () =>
         {
-            node.GenerateClauseIL(clause, ilGenerator, local);
-        }
+            // 3. 处理查询体子句（where, orderby, let, join 等）
+            foreach (var clause in node.BodyClauses)
+                node.GenerateClauseIL(clause, ilGenerator, local);
 
-        // 4. 处理终止子句（select 或 group）
-        node.GenerateTerminationClauseIL(node.TerminationClause, ilGenerator, local);
+            // 4. 处理终止子句（select 或 group）
+            node.GenerateTerminationClauseIL(node.TerminationClause, ilGenerator, local);
 
-        // 5. 处理查询延续（into 子句）
-        if (node.Continuation != null)
+            // 5. 处理查询延续（into 子句）
+            if (node.Continuation != null)
+                node.GenerateContinuationIL(node.Continuation, ilGenerator, local);
+
+            // 6. 转换结果为 ListLangValue
+            node.ConvertToListLangValue(ilGenerator, local);
+        });
+    }
+
+    private static void WithLinqScope(this LinqExpression node, ILGenerator il, LocalManager local, Action generate)
+    {
+        var names = node.BodyClauses.SelectMany(clause => clause switch
         {
-            node.GenerateContinuationIL(node.Continuation, ilGenerator, local);
+            LetClause let => new[] { let.Variable },
+            JoinClause join when join.GroupVariable != null => new[] { join.RangeVariable, join.GroupVariable },
+            JoinClause join => new[] { join.RangeVariable },
+            _ => Array.Empty<string>()
+        }).Prepend(node.FromClause.RangeVariable).Distinct(StringComparer.Ordinal).ToArray();
+        var oldLocals = names.ToDictionary(name => name, local.GetLocalVar);
+        var oldTypes = names.Where(local.LocalVarTypes.ContainsKey).ToDictionary(name => name, name => local.LocalVarTypes[name]);
+        var oldFields = names.Where(local.FieldVar.ContainsKey).ToDictionary(name => name, name => local.FieldVar[name]);
+        var oldCaptures = names.Where(local.CapturedLocals.ContainsKey).ToDictionary(name => name, name => local.CapturedLocals[name]);
+        var oldStatics = names.Where(local.GlobalStaticClasses.ContainsKey).ToDictionary(name => name, name => local.GlobalStaticClasses[name]);
+        try
+        {
+            BindLinqVariable(il, local, node.FromClause.RangeVariable);
+            generate();
         }
+        finally
+        {
+            foreach (var name in names)
+            {
+                if (oldLocals[name] is { } previous) local.AddLocalVar(name, previous);
+                else local.RemoveLocalVar(name);
+                if (oldTypes.TryGetValue(name, out var type)) local.LocalVarTypes[name] = type;
+                else local.LocalVarTypes.Remove(name);
+                if (oldFields.TryGetValue(name, out var field)) local.FieldVar[name] = field;
+                if (oldCaptures.TryGetValue(name, out var captured)) local.CapturedLocals[name] = captured;
+                if (oldStatics.TryGetValue(name, out var staticValue)) local.GlobalStaticClasses[name] = staticValue;
+            }
+        }
+    }
 
-        // 6. 转换结果为 ListLangValue
-        node.ConvertToListLangValue(ilGenerator, local);
+    private static LocalBuilder BindLinqVariable(ILGenerator il, LocalManager local, string name)
+    {
+        local.FieldVar.Remove(name);
+        local.CapturedLocals.Remove(name);
+        local.GlobalStaticClasses.Remove(name);
+        local.LocalVarTypes[name] = typeof(LangValueType);
+        var slot = il.DeclareLocal(typeof(LangValueType));
+        local.AddLocalVar(name, slot);
+        return slot;
     }
     /// <summary>
     /// 将值转换为 IEnumerable

@@ -8,6 +8,8 @@ namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {
+    private static readonly object NullGroupKey = new();
+
     /// <summary>
     /// 执行迭代器操作指令
     /// </summary>
@@ -217,13 +219,14 @@ public partial class VirtualMachine
                 }
 
                 // 如果键不存在,创建新的列表
-                if (!groupDict.ContainsKey(key!))
+                var actualKey = key ?? NullGroupKey;
+                if (!groupDict.ContainsKey(actualKey))
                 {
-                    groupDict[key!] = [];
+                    groupDict[actualKey] = [];
                 }
 
                 // 将元素添加到对应键的列表中
-                groupDict[key!].Add(element);
+                groupDict[actualKey].Add(element);
 
                 // 注意: 不需要将字典重新压栈,因为字典是引用类型,修改会直接反映到原对象
             }
@@ -247,7 +250,7 @@ public partial class VirtualMachine
                     // 创建一个分组对象,包含 Key 和 Values
                     var group = new Dictionary<string, object?>
                     {
-                        ["Key"] = kvp.Key,
+                        ["Key"] = ReferenceEquals(kvp.Key, NullGroupKey) ? null : kvp.Key,
                         ["Values"] = kvp.Value
                     };
                     resultList.Add(group);

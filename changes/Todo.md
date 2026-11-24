@@ -201,7 +201,8 @@
   `join ... into g` 的分组结果也与解释器不一致（`[[3],[3],[3]]` vs `[[1, 1], [2, 2, 2], [3]]`）。
   需要让 join 生成「配对行」并让后续子句按当前配对求值。见 change
   （`2026-11-15-IL-LINQ-where无效IL/test.md` §5）。
-  2026-11-23：连接结果已按行保存范围变量，历史 `join ... where y` 与 `join ... into g` 复现通过；新增连续连接、重复匹配、空分组、连接后 let 和按内层键排序回归。分组、查询延续及关联内层数据源仍待复核，见 `2026-11-23-IL与跨模式缺陷/test.md`。
+  2026-11-23：连接结果已按行保存范围变量，历史 `join ... where y` 与 `join ... into g` 复现通过；新增连续连接、重复匹配、空分组、连接后 let 和按内层键排序回归。
+  2026-11-24：补齐基础分组、空键、`select/group ... into` 延续、同名变量作用域及关联内层数据源的三模式回归；复杂组合和 VM 排序键语义仍待复核。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 测试报告（`2026-11-11-08-49-IL-select回归测试.md`）。
 
@@ -242,6 +243,7 @@
 - [x] **`ExceptionCreationTests.RuntimeError_Message_ContainsErrorCodeAndPosition` 的列号断言过时**：2026-11-23 已按 `SourcePosition.ToString()` 1 起始列号约定更新为断言 `11` / `test.old8(1:11)`，`Error.ExceptionCreationTests` 15 项全通过。
 
 - [ ] **`ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections` 失败**：2026-11-23 跑 Architecture 回归时发现，异步状态机分析器已拒绝「表达式内部的 await（挂起时求值栈非空）」，导致该用例抛 `CompilerException`。与本轮改动无关，待按当前异步限制更新用例。
+  2026-11-24 查询作用域改动后重跑 Architecture：72 通过、1 失败，失败仍为此项；单项复跑同样失败。
 
 - [x] **IL 数组回归失败已关闭**：`Len` 残留栈值与集合 `+` 拼接已分别修复，见
   [动态长度报告](2026-11-14-IL-Len动态长度/test.md) 与

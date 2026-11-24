@@ -23,6 +23,20 @@ public class LinqQueryExecutor(VariateManager manager)
         var sourceValue = linqExpr.FromClause.DataSource.Accept(RuntimeVisitors.CreateInterpreter(manager));
         var dataSource = ConvertToEnumerable(sourceValue);
 
+        manager.AddChildren();
+        try
+        {
+            return ExecuteQueryInScope(linqExpr, dataSource);
+        }
+        finally
+        {
+            manager.RemoveChildren();
+        }
+    }
+
+    private LangValueType ExecuteQueryInScope(LinqExpression linqExpr, IEnumerable dataSource)
+    {
+
         // 检查是否有 OrderBy 子句
         var hasOrderBy = linqExpr.BodyClauses.Any(c => c is OrderByClause);
 
@@ -45,7 +59,7 @@ public class LinqQueryExecutor(VariateManager manager)
         {
             // 设置范围变量
             var oldRangeValue = manager.GetValue(rangeLangId);
-            manager.Set(rangeLangId, ConvertToLangValue(item));
+            manager.SetLocal(rangeLangId, ConvertToLangValue(item));
 
             try
             {
@@ -61,7 +75,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         // 计算并设置 let 变量
                         var letValue = letClause.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         var letId = new LangId(letClause.Variable);
-                        manager.Set(letId, letValue);
+                        manager.SetLocal(letId, letValue);
                         letVariables[letClause.Variable] = letValue;
                     }
                     else if (clause is WhereClause whereClause)
@@ -126,14 +140,14 @@ public class LinqQueryExecutor(VariateManager manager)
             foreach (var (item, letVariables) in sortedResults)
             {
                 var oldRangeValue = manager.GetValue(rangeLangId);
-                manager.Set(rangeLangId, ConvertToLangValue(item));
+                manager.SetLocal(rangeLangId, ConvertToLangValue(item));
 
                 try
                 {
                     // 恢复 let 变量
                     foreach (var (varName, varValue) in letVariables)
                     {
-                        manager.Set(new LangId(varName), varValue);
+                        manager.SetLocal(new LangId(varName), varValue);
                     }
 
                     // 执行 select
@@ -184,8 +198,8 @@ public class LinqQueryExecutor(VariateManager manager)
         foreach (var outerItem in sourceList)
         {
             // 设置外部范围变量
-            var oldOuterValue = manager.GetValue(rangeLangId);
-            manager.Set(rangeLangId, ConvertToLangValue(outerItem));
+            manager.AddChildren();
+            manager.SetLocal(rangeLangId, ConvertToLangValue(outerItem));
 
             try
             {
@@ -222,7 +236,7 @@ public class LinqQueryExecutor(VariateManager manager)
                             foreach (var innerItem in innerSource)
                             {
                                 var oldInnerValue = manager.GetValue(innerRangeLangId);
-                                manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+                                manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
 
                                 try
                                 {
@@ -243,7 +257,7 @@ public class LinqQueryExecutor(VariateManager manager)
 
                             // 设置分组变量
                             var groupLangId = new LangId(joinClause.GroupVariable);
-                            manager.Set(groupLangId, new ListLangValue(matchingInnerItems));
+                            manager.SetLocal(groupLangId, new ListLangValue(matchingInnerItems));
 
                             // 保留当前项（分组变量已设置）
                             foreach (var currentItem in currentItems)
@@ -261,7 +275,7 @@ public class LinqQueryExecutor(VariateManager manager)
                             foreach (var innerItem in innerSource)
                             {
                                 var oldInnerValue = manager.GetValue(innerRangeLangId);
-                                manager.Set(innerRangeLangId, ConvertToLangValue(innerItem));
+                                manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
 
                                 try
                                 {
@@ -301,7 +315,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     {
                         var letValue = letClause.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
                         var letId = new LangId(letClause.Variable);
-                        manager.Set(letId, letValue);
+                        manager.SetLocal(letId, letValue);
                         letVariables[letClause.Variable] = letValue;
                     }
                     else if (clause is WhereClause whereClause)
@@ -315,7 +329,7 @@ public class LinqQueryExecutor(VariateManager manager)
                             foreach (var (varName, varValue) in currentItem)
                             {
                                 if (varValue is not null)
-                                    manager.Set(new LangId(varName), ConvertToLangValue(varValue));
+                                    manager.SetLocal(new LangId(varName), ConvertToLangValue(varValue));
                             }
 
                             var conditionResult = whereClause.Condition.Accept(RuntimeVisitors.CreateInterpreter(manager));
@@ -348,11 +362,11 @@ public class LinqQueryExecutor(VariateManager manager)
                                 // 特殊处理 List<LangValueType>（group join 的分组变量）
                                 if (varValue is List<LangValueType> listValue)
                                 {
-                                    manager.Set(new LangId(varName), new ListLangValue(listValue));
+                                    manager.SetLocal(new LangId(varName), new ListLangValue(listValue));
                                 }
                                 else
                                 {
-                                    manager.Set(new LangId(varName), ConvertToLangValue(varValue));
+                                    manager.SetLocal(new LangId(varName), ConvertToLangValue(varValue));
                                 }
                             }
                         }
@@ -377,8 +391,7 @@ public class LinqQueryExecutor(VariateManager manager)
             }
             finally
             {
-                if (oldOuterValue is not null)
-                    manager.Set(rangeLangId, oldOuterValue);
+                manager.RemoveChildren();
             }
         }
 
@@ -452,7 +465,7 @@ public class LinqQueryExecutor(VariateManager manager)
                     // 恢复 let 变量
                     foreach (var (varName, varValue) in letVariables)
                     {
-                        manager.Set(new LangId(varName), varValue);
+                        manager.SetLocal(new LangId(varName), varValue);
                     }
 
                     var keyValue = firstOrdering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));

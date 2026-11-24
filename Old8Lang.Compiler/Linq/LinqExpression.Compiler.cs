@@ -228,7 +228,6 @@ internal static partial class LinqExpressionRuntimeExtensions
 
         // 预先声明循环内使用的局部变量
         var currentLocal = ilGenerator.DeclareLocal(typeof(object));
-        var letVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, letClause.Variable);
         var rangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
 
         // 循环标签
@@ -256,6 +255,7 @@ internal static partial class LinqExpressionRuntimeExtensions
         var letType = letClause.Expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (letType.IsValueType) ilGenerator.Emit(OpCodes.Box, letType);
         node.GenerateConvertToLangValue(ilGenerator);
+        var letVarLocal = BindLinqVariable(ilGenerator, local, letClause.Variable);
         ilGenerator.Emit(OpCodes.Stloc, letVarLocal);
 
         // 添加当前元素到结果列表
@@ -386,35 +386,6 @@ internal static partial class LinqExpressionRuntimeExtensions
         ilGenerator.Emit(OpCodes.Br, copyOuterLoopStart);
         ilGenerator.MarkLabel(copyOuterLoopEnd);
 
-        // 加载内部数据源
-        joinClause.InnerDataSource.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        ConvertToEnumerableStatic(ilGenerator);
-
-        // 将内部数据源复制到列表
-        var innerSourceLocal = ilGenerator.DeclareLocal(typeof(List<object>));
-        ilGenerator.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
-        ilGenerator.Emit(OpCodes.Stloc, innerSourceLocal);
-
-        var innerEnumeratorLocal = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerable).GetMethod("GetEnumerator")!);
-        ilGenerator.Emit(OpCodes.Stloc, innerEnumeratorLocal);
-
-        var copyInnerLoopStart = ilGenerator.DefineLabel();
-        var copyInnerLoopEnd = ilGenerator.DefineLabel();
-
-        ilGenerator.MarkLabel(copyInnerLoopStart);
-        ilGenerator.Emit(OpCodes.Ldloc, innerEnumeratorLocal);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetMethod("MoveNext")!);
-        ilGenerator.Emit(OpCodes.Brfalse, copyInnerLoopEnd);
-
-        ilGenerator.Emit(OpCodes.Ldloc, innerSourceLocal);
-        ilGenerator.Emit(OpCodes.Ldloc, innerEnumeratorLocal);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetProperty("Current")!.GetMethod!);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
-
-        ilGenerator.Emit(OpCodes.Br, copyInnerLoopStart);
-        ilGenerator.MarkLabel(copyInnerLoopEnd);
-
         // 创建结果列表
         var resultLocal = ilGenerator.DeclareLocal(typeof(List<object>));
         ilGenerator.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
@@ -422,7 +393,6 @@ internal static partial class LinqExpressionRuntimeExtensions
 
         // 获取或创建范围变量
         var outerRangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, node.FromClause.RangeVariable);
-        var innerRangeVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, joinClause.RangeVariable);
 
         // 预先声明循环内使用的局部变量（避免在循环内重复声明）
         var outerIndexLocal = ilGenerator.DeclareLocal(typeof(int));
@@ -454,10 +424,40 @@ internal static partial class LinqExpressionRuntimeExtensions
         // 设置外部范围变量
         node.EmitBindRow(ilGenerator, local, outerItemLocal, joinClause);
 
+        // 加载内部数据源
+        joinClause.InnerDataSource.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConvertToEnumerableStatic(ilGenerator);
+
+        // 将内部数据源复制到列表
+        var innerSourceLocal = ilGenerator.DeclareLocal(typeof(List<object>));
+        ilGenerator.Emit(OpCodes.Newobj, typeof(List<object>).GetConstructor(Type.EmptyTypes)!);
+        ilGenerator.Emit(OpCodes.Stloc, innerSourceLocal);
+
+        var innerEnumeratorLocal = ilGenerator.DeclareLocal(typeof(IEnumerator));
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerable).GetMethod("GetEnumerator")!);
+        ilGenerator.Emit(OpCodes.Stloc, innerEnumeratorLocal);
+
+        var copyInnerLoopStart = ilGenerator.DefineLabel();
+        var copyInnerLoopEnd = ilGenerator.DefineLabel();
+
+        ilGenerator.MarkLabel(copyInnerLoopStart);
+        ilGenerator.Emit(OpCodes.Ldloc, innerEnumeratorLocal);
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetMethod("MoveNext")!);
+        ilGenerator.Emit(OpCodes.Brfalse, copyInnerLoopEnd);
+
+        ilGenerator.Emit(OpCodes.Ldloc, innerSourceLocal);
+        ilGenerator.Emit(OpCodes.Ldloc, innerEnumeratorLocal);
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(IEnumerator).GetProperty("Current")!.GetMethod!);
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(List<object>).GetMethod("Add")!);
+
+        ilGenerator.Emit(OpCodes.Br, copyInnerLoopStart);
+        ilGenerator.MarkLabel(copyInnerLoopEnd);
+
         // 计算外部键
         joinClause.OuterKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        node.GenerateConvertFromLangValue(ilGenerator);
+        node.EmitUnwrapQueryExpression(joinClause.OuterKeyExpression, ilGenerator, local);
         ilGenerator.Emit(OpCodes.Stloc, outerKeyLocal);
+        var innerRangeVarLocal = BindLinqVariable(ilGenerator, local, joinClause.RangeVariable);
 
         if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
         {
@@ -491,7 +491,7 @@ internal static partial class LinqExpressionRuntimeExtensions
 
             // 计算内部键
             joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            node.GenerateConvertFromLangValue(ilGenerator);
+            node.EmitUnwrapQueryExpression(joinClause.InnerKeyExpression, ilGenerator, local);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
             // 比较键
@@ -518,7 +518,7 @@ internal static partial class LinqExpressionRuntimeExtensions
             ilGenerator.MarkLabel(innerLoopEnd);
 
             // 设置分组变量
-            var groupVarLocal = node.GetOrCreateRangeVariable(ilGenerator, local, joinClause.GroupVariable);
+            var groupVarLocal = BindLinqVariable(ilGenerator, local, joinClause.GroupVariable);
             ilGenerator.Emit(OpCodes.Ldloc, matchingItemsLocal);
             ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToListLangValue")!);
             ilGenerator.Emit(OpCodes.Stloc, groupVarLocal);
@@ -559,7 +559,7 @@ internal static partial class LinqExpressionRuntimeExtensions
 
             // 计算内部键
             joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            node.GenerateConvertFromLangValue(ilGenerator);
+            node.EmitUnwrapQueryExpression(joinClause.InnerKeyExpression, ilGenerator, local);
             ilGenerator.Emit(OpCodes.Stloc, innerKeyLocal);
 
             // 比较键
@@ -614,14 +614,12 @@ internal static partial class LinqExpressionRuntimeExtensions
             new FromClause(continuation.Variable, node.FromClause.DataSource),
             continuation.BodyClauses, continuation.TerminationClause);
 
-        // 处理延续后的查询体子句
-        foreach (var clause in continuation.BodyClauses)
+        continuationNode.WithLinqScope(ilGenerator, local, () =>
         {
-            continuationNode.GenerateClauseIL(clause, ilGenerator, local);
-        }
-
-        // 处理延续后的终止子句
-        continuationNode.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
+            foreach (var clause in continuation.BodyClauses)
+                continuationNode.GenerateClauseIL(clause, ilGenerator, local);
+            continuationNode.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
+        });
     }
 
     /// <summary>
@@ -631,6 +629,15 @@ internal static partial class LinqExpressionRuntimeExtensions
     {
         // 调用辅助方法进行转换
         ilGenerator.Emit(OpCodes.Call, typeof(LinqCompilerHelper).GetMethod("ConvertToEnumerable")!);
+    }
+
+    private static void EmitUnwrapQueryExpression(this LinqExpression node, LangExpression expression,
+        ILGenerator il, LocalManager local)
+    {
+        var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+        if (type.IsValueType) il.Emit(OpCodes.Box, type);
+        il.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
     }
 
     private static void EmitBindRow(this LinqExpression node, ILGenerator ilGenerator, LocalManager local,
@@ -727,6 +734,7 @@ internal static partial class LinqExpressionRuntimeExtensions
 /// </summary>
 public static class LinqCompilerHelper
 {
+    private static readonly object NullGroupKey = new();
     private sealed class QueryRow
     {
         public readonly Dictionary<string, LangValueType> Bindings = new(StringComparer.Ordinal);
@@ -882,13 +890,14 @@ public static class LinqCompilerHelper
     /// <summary>
     /// 添加元素到分组字典
     /// </summary>
-    public static void AddToGroup(Dictionary<object, List<object>> groupDict, object key, object element)
+    public static void AddToGroup(Dictionary<object, List<object>> groupDict, object? key, object element)
     {
-        if (!groupDict.ContainsKey(key))
+        var actualKey = key ?? NullGroupKey;
+        if (!groupDict.ContainsKey(actualKey))
         {
-            groupDict[key] = new List<object>();
+            groupDict[actualKey] = new List<object>();
         }
-        groupDict[key].Add(element);
+        groupDict[actualKey].Add(element);
     }
 
     /// <summary>
@@ -901,7 +910,7 @@ public static class LinqCompilerHelper
         {
             var group = new Dictionary<string, object?>
             {
-                ["Key"] = kvp.Key,
+                ["Key"] = ReferenceEquals(kvp.Key, NullGroupKey) ? null : kvp.Key,
                 ["Values"] = kvp.Value
             };
             result.Add(group);
@@ -948,7 +957,7 @@ public static class LinqCompilerHelper
     /// <summary>
     /// 将 LangValueType 转换为 IEnumerable
     /// </summary>
-    public static IEnumerable ConvertToEnumerable(LangValueType value)
+    public static IEnumerable ConvertToEnumerable(object? value)
     {
         if (value is ILangList langList)
         {
@@ -965,6 +974,6 @@ public static class LinqCompilerHelper
             return enumerable;
         }
 
-        throw new InvalidOperationException($"无法将类型 {value.GetType().Name} 转换为 IEnumerable");
+        throw new InvalidOperationException($"无法将类型 {value?.GetType().Name ?? "null"} 转换为 IEnumerable");
     }
 }
