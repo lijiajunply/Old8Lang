@@ -282,6 +282,7 @@
 | `ToStr` / `ToInt` / `ToDouble` / `ToBool` | ✅ | ✅ | ✅ | |
 | 集合方法（`Add` `Remove` `Count` 等） | ✅ | ✅ | ✅ | 元组 `.Count()` 自 2026-10-10 起可用 |
 | 字符串方法（`Length` `ToUpper` `Split` 等） | ✅ | ✅ | ✅ | |
+| `JsonSerialize` / `json` | ✅ | ❌ | ✅ | VM 支持类实例字段、嵌套字典、列表、数组和标量。 |
 | 反射函数与 `TypeLangValue` 实例方法 | ✅ | ✅ | ✅ | 虚拟机下 9 个类型值方法自 2026-10-10 起可用；IL 的 `CreateInstance` / `GetField` / `SetField` / `InvokeMethod` 自 2026-11-15 起对原生对象可用；`TypeOf` / `GetType` 见 [API_REFERENCE.md](./API_REFERENCE.md#24-反射) |
 
 ### 15. 类型系统

@@ -80,7 +80,7 @@
 
 - [x] **VM 中字典转导入的类后调用实例方法失败**：2026-11-27 修复，`a <- a as Test` 后执行 `a.Add()` 得到 `4`。见 [验证记录](2026-11-27-VM字典转类/test.md)。
 
-- [ ] **VM 的 `JsonSerialize` 输出为空**：2026-11-27 验证 `Old8Lang.App/Ex/init.old8` 时，`Json(test)` 打印空行。当前 VM 实现返回空字符串。
+- [x] **VM 的 `JsonSerialize` 输出为空**：2026-11-27 修复，`Old8Lang.App/Ex/init.old8` 中的 `Json(test)` 输出包含 `a` 和 `b` 的 JSON 对象。
 
 - [x] **IL 比较运算装箱顺序错误导致测试进程崩溃**：`object` 与数值混合比较时先把两个操作数都压栈、
   再统一 `box`，`box` 只作用于栈顶，因此「数值在左、`object` 在右」（如

@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Globalization;
 using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
@@ -7,6 +9,7 @@ using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ValueFunctions;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
@@ -103,8 +106,51 @@ public sealed class JsonSerializeFunction : BaseGlobalFunction
 
     protected override object ExecuteInVMInternal(object?[] arguments)
     {
-        // VM 模式下不支持 JSON 序列化,返回空字符串
-        return "";
+        try
+        {
+            return JsonSerializer.Serialize(ToVmJsonValue(arguments[0], depth: 0), DefaultOptions);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException or ArgumentException or Old8Exception)
+        {
+            var reason = ex is Old8Exception error ? error.OriginalMessage : ex.Message;
+            throw new InvalidOperationError(default(SourcePosition), $"JSON序列化失败: {reason}");
+        }
+    }
+
+    private static object? ToVmJsonValue(object? value, int depth)
+    {
+        // 与 System.Text.Json 的默认深度限制一致，也能在投影阶段截断循环引用。
+        if (depth > 64)
+            throw new JsonException("JSON 对象嵌套过深或包含循环引用");
+
+        return value switch
+        {
+            BytecodeObjectInstance instance => ToVmJsonValue(instance.Fields, depth),
+            AnyLangValue instance => ToVmJsonValue(instance.InstanceData, depth),
+            IDictionary dictionary => ToVmJsonObject(
+                dictionary.Keys.Cast<object>().Select(key => ((object?)key, dictionary[key])), depth),
+            DictionaryLangValue dictionary => ToVmJsonObject(
+                dictionary.Value.Select(entry => ((object?)entry.Key, (object?)entry.Value)), depth),
+            IList list => list.Cast<object?>().Select(item => ToVmJsonValue(item, depth + 1)).ToArray(),
+            ILangList list => list.GetItems().Select(item => ToVmJsonValue(item, depth + 1)).ToArray(),
+            EnumLangValue enumValue => enumValue.Value,
+            LangValueType langValue => ToVmJsonValue(langValue.GetValue(), depth + 1),
+            _ => value
+        };
+    }
+
+    private static Dictionary<string, object?> ToVmJsonObject(
+        IEnumerable<(object? Key, object? Value)> entries, int depth)
+    {
+        var result = new Dictionary<string, object?>();
+        foreach (var (key, value) in entries)
+        {
+            var name = key is LangValueType langKey
+                ? langKey.ToDisplayString()
+                : Convert.ToString(key, CultureInfo.InvariantCulture) ?? "";
+            result[name] = ToVmJsonValue(value, depth + 1);
+        }
+        return result;
     }
 }
 
