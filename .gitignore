@@ -29,3 +29,5 @@ TestResults/
 BenchmarkDotNet.Artifacts/
 *.swp
 *.tmp
+
+/Library
