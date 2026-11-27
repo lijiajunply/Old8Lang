@@ -24,6 +24,9 @@ public sealed class IndexedFile
     /// <summary>顶层符号表（函数、类、全局变量）</summary>
     public required Dictionary<string, SymbolInfo> Symbols { get; init; }
 
+    /// <summary>词法作用域树根结点（供跨文件分析与作用域过滤使用）</summary>
+    public SymbolScope? RootScope { get; init; }
+
     /// <summary>该快照是否来自已打开（可能未保存）的编辑器文档</summary>
     public bool IsOpen { get; init; }
 
@@ -416,6 +419,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
     {
         List<LangToken> tokens = [];
         Dictionary<string, SymbolInfo> symbols = new();
+        SymbolScope? rootScope = null;
         var parsed = false;
 
         try
@@ -434,7 +438,8 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
                 var parser = new LangParser.LangParser(tokens, text, uri);
                 var ast = parser.ParseProgram();
                 var builder = new SymbolTableBuilder(uri, tokens, text);
-                symbols = builder.Build(ast);
+                rootScope = builder.BuildWithScope(ast);
+                symbols = rootScope.Symbols;
                 parsed = true;
             }
             catch
@@ -450,6 +455,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
             Text = text,
             Tokens = tokens,
             Symbols = symbols,
+            RootScope = rootScope,
             Parsed = parsed,
             LastWriteUtc = lastWriteUtc,
             Length = length
@@ -476,6 +482,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
             Text = document.Text,
             Tokens = document.Tokens ?? [],
             Symbols = document.SymbolTable ?? new Dictionary<string, SymbolInfo>(),
+            RootScope = document.RootScope,
             IsOpen = true,
             Parsed = document.Ast != null
         };

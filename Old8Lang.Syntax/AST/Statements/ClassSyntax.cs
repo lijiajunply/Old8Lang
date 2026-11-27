@@ -20,10 +20,14 @@ public sealed class ClassSyntax(
     List<GenericParameter>? genericParameters = null,
     List<string>? parentGenericTypeParameters = null,
     DocCommentInfo? docComment = null,
-    SourcePosition position = default) : IOldLangTree
+    SourcePosition position = default,
+    SourcePosition namePosition = default) : IOldLangTree
 {
     /// <summary>类名。</summary>
     public string ClassName { get; } = className;
+
+    /// <summary>类名标识符的源码位置（未提供时回退到声明起始位置）。</summary>
+    public SourcePosition NamePosition { get; } = namePosition.Line > 0 ? namePosition : position;
 
     /// <summary>类体（字段、方法、嵌套类等声明）。</summary>
     public BlockStatement Body { get; } = body;

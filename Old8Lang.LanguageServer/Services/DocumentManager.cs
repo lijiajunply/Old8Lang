@@ -12,6 +12,16 @@ namespace Old8Lang.LanguageServer.Services;
 public class DocumentManager
 {
     private readonly ConcurrentDictionary<string, DocumentParseResult> Documents = new();
+    private WorkspaceIndex? _workspaceIndex;
+
+    /// <summary>绑定工作区索引以启用跨文件语义分析</summary>
+    public void AttachWorkspaceIndex(WorkspaceIndex? workspaceIndex)
+    {
+        _workspaceIndex = workspaceIndex;
+    }
+
+    /// <summary>当前绑定的工作区索引（未绑定时为 null）</summary>
+    public WorkspaceIndex? WorkspaceIndex => _workspaceIndex;
 
     /// <summary>
     /// 是否启用调试模式
@@ -81,8 +91,11 @@ public class DocumentManager
             var ast = parser.ParseProgram();
             result.Ast = ast;
 
-            // 构建符号表
-            result.SymbolTable = BuildSymbolTable(ast, uri, tokens, text);
+            // 构建词法作用域树与顶层符号表
+            var builder = new SymbolTableBuilder(uri, tokens, text);
+            var rootScope = builder.BuildWithScope(ast);
+            result.RootScope = rootScope;
+            result.SymbolTable = rootScope.Symbols;
 
             // 语义分析
             PerformSemanticAnalysis(result);
@@ -133,12 +146,9 @@ public class DocumentManager
     {
         try
         {
-            var analyzer = new SemanticAnalyzer(result);
+            var analyzer = new SemanticAnalyzer(result, _workspaceIndex);
             var semanticDiagnostics = analyzer.Analyze();
             result.Diagnostics.AddRange(semanticDiagnostics);
-
-            // 检查重复定义
-            analyzer.CheckDuplicateDefinitions();
         }
         catch
         {

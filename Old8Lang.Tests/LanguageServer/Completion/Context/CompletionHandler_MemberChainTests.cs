@@ -89,7 +89,7 @@ class Nested {
 
 func main() -> void {
     outer <- Outer()
-    result <- outer.inner.$1nested.getValue()
+    result <- outer.inner.nested.getValue()
 }
 ";
         var uri = "file:///test.old8";
@@ -100,7 +100,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(25, 14)
+            Position = new Position(23, 33) // outer.inner.nested.|getValue()
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -117,7 +117,7 @@ func main() -> void {
         }
     }
 
-    [Fact(Skip = "成员链类型推断功能尚未完全实现")]
+    [Fact]
     public async Task ChainOfPropertyAccess_ShouldComplete()
     {
         var code = @"class A {
@@ -151,7 +151,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(22, 20) // obj.b. 之后（点号后面）- 第23行(0-based为22)
+            Position = new Position(20, 20) // 第21行(0-based为20): result <- obj.b.|c.value
         };
 
         var result = await handler.Handle(request, CancellationToken.None);

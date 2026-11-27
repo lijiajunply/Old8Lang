@@ -61,15 +61,13 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
     {
         try
         {
-            // 解析导入的模块路径
-            var importPath = importStatement.ToString();
+            if (importStatement.IsDynamicImport)
+            {
+                return null;
+            }
 
-            // 提取 import 语句中的模块名
-            // 支持多种导入语法:
-            // import "module"
-            // import { ... } from "module"
-            // import ... from "module"
-            var moduleName = ExtractModuleName(importPath);
+            // 直接从 AST 读取模块名（兼容 import "OS"、import OS、import { a } from "OS"）
+            var moduleName = importStatement.ImportString;
             if (string.IsNullOrEmpty(moduleName))
             {
                 return null;
@@ -82,7 +80,7 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
                 return null;
             }
 
-            // 查找模块名在源代码中的位置
+            // 直接从 AST 精确位置构建链接范围
             var range = FindImportRange(importStatement, moduleName);
             if (range == null)
             {
@@ -93,7 +91,7 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
             return new DocumentLink
             {
                 Range = range,
-                Target = DocumentUri.From(resolvedPath),
+                Target = DocumentUri.FromFileSystemPath(resolvedPath),
                 Tooltip = $"跳转到 {moduleName}"
             };
         }
@@ -102,26 +100,6 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
             // 如果解析失败，返回 null
             return null;
         }
-    }
-
-    /// <summary>
-    /// 从 import 语句中提取模块名
-    /// </summary>
-    private string? ExtractModuleName(string importStatement)
-    {
-        // 匹配引号中的模块名
-        // import "module"
-        // import { ... } from "module"
-        var match = System.Text.RegularExpressions.Regex.Match(
-            importStatement,
-            @"""([^""]+)""");
-
-        if (match.Success)
-        {
-            return match.Groups[1].Value;
-        }
-
-        return null;
     }
 
     /// <summary>
@@ -291,26 +269,27 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
     }
 
     /// <summary>
-    /// 查找 import 语句中模块名的范围
+    /// 直接从 AST 的 ModuleNamePosition 计算 import 语句中模块名的精确范围
     /// </summary>
-    private OmniSharp.Extensions.LanguageServer.Protocol.Models.Range? FindImportRange(
+    private static OmniSharp.Extensions.LanguageServer.Protocol.Models.Range? FindImportRange(
         ImportStatement importStatement,
         string moduleName)
     {
-        // 从 import 语句的位置开始查找
+        var pos = importStatement.ModuleNamePosition;
+        if (pos.Line <= 0)
+        {
+            return null;
+        }
+
         // SourcePosition 的行号是 1-based、列号是 0-based，LSP Position 两者都是 0-based
-        var line = importStatement.Position.Line - 1;
-        var column = importStatement.Position.Column;
+        var line = pos.Line - 1;
+        var column = Math.Max(0, pos.Column);
+        var length = importStatement.IsQuotedModuleName ? moduleName.Length + 2 : moduleName.Length;
 
-        // import 语句的模块名通常在引号中
-        // 这里简化处理，假设从语句开始后的某个位置
-        // 实际位置需要通过 tokens 精确定位
-
-        // 默认返回一个估算的范围
         return new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
         {
             Start = new Position(line, column),
-            End = new Position(line, column + moduleName.Length + 2) // 加上引号
+            End = new Position(line, column + length)
         };
     }
 }

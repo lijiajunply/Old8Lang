@@ -66,8 +66,8 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager, WorkspaceIn
                     symbols.Add(workspaceSymbol);
                 }
 
-                // 如果是类，检查其成员（即使类本身不匹配查询，成员仍可能匹配）
-                if (symbolInfo.Kind == SymbolKind.Class)
+                // 如果是类、接口或枚举，检查其成员（即使容器本身不匹配查询，成员仍可能匹配）
+                if (symbolInfo.Kind is SymbolKind.Class or SymbolKind.Interface or SymbolKind.Enum)
                 {
                     foreach (var (memberName, memberInfo) in symbolInfo.Members)
                     {
@@ -132,8 +132,13 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager, WorkspaceIn
             SymbolKind.Class => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Class,
             SymbolKind.Method => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Method,
             SymbolKind.Property => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Property,
+            SymbolKind.Field => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Field,
             SymbolKind.Parameter => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Variable,
             SymbolKind.Constant => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Constant,
+            SymbolKind.Enum => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Enum,
+            SymbolKind.EnumMember => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.EnumMember,
+            SymbolKind.Interface => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Interface,
+            SymbolKind.Module => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Module,
             _ => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Variable
         };
     }

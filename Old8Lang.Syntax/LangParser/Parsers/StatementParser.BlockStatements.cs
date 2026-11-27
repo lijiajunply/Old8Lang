@@ -15,6 +15,7 @@ public partial class StatementParser
         // 处理大括号包围的块
         if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
+            var openBracePos = CreateSourcePosition(CurrentToken);
             Expect(LangTokenType.LeftBrace);
             var statements = new List<IOldLangTree>();
 
@@ -56,8 +57,9 @@ public partial class StatementParser
                 }
             }
 
+            var closeBracePos = CreateSourcePosition(CurrentToken);
             Expect(LangTokenType.RightBrace);
-            return new BlockStatement(statements);
+            return new BlockStatement(statements, openBracePos, closeBracePos);
         }
 
         // 处理单个语句 - 没有大括号的情况
@@ -69,7 +71,7 @@ public partial class StatementParser
             // 解析单个语句
             var statement = ParseStatement();
             // 返回包含这个语句的BlockStatement
-            return new BlockStatement([statement]);
+            return new BlockStatement([statement], statement.Position, statement.Position);
         }
         catch (SyntaxError)
         {
@@ -86,6 +88,7 @@ public partial class StatementParser
 
     public TryStatement ParseTryStatement()
     {
+        var tryPosition = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Try);
 
         // 解析try块
@@ -110,6 +113,7 @@ public partial class StatementParser
                 // 解析异常类型（如果有）
                 if (CurrentToken.Type == LangTokenType.Identifier)
                 {
+                    var firstIdentPos = CreateSourcePosition(CurrentToken);
                     exceptionType = CurrentToken.Value;
                     CurrentIndex++;
 
@@ -124,7 +128,7 @@ public partial class StatementParser
                         if (!string.IsNullOrEmpty(exceptionType) && !exceptionType.Contains("Exception") && 
                             !(exceptionType.Length > 0 && char.IsUpper(exceptionType[0])))
                         {
-                            exceptionVar = new LangId(exceptionType, position: CreateSourcePosition(CurrentToken));
+                            exceptionVar = new LangId(exceptionType, position: firstIdentPos);
                             exceptionType = null;
                         }
                     }
@@ -153,26 +157,33 @@ public partial class StatementParser
             Expect(LangTokenType.Finally);
             // 直接解析finally块，不使用ParseBlock，避免finally被视为单独的语句
             var statements = new List<IOldLangTree>();
+            SourcePosition finallyStart;
+            SourcePosition finallyEnd;
             if (CurrentToken.Type == LangTokenType.LeftBrace)
             {
+                finallyStart = CreateSourcePosition(CurrentToken);
                 CurrentIndex++;
                 while (CurrentToken.Type != LangTokenType.RightBrace)
                 {
                     statements.Add(ParseStatement());
                 }
 
+                finallyEnd = CreateSourcePosition(CurrentToken);
                 CurrentIndex++;
             }
             else
             {
-                statements.Add(ParseStatement());
+                var stmt = ParseStatement();
+                finallyStart = stmt.Position;
+                finallyEnd = stmt.Position;
+                statements.Add(stmt);
             }
 
-            finallyBlock = new BlockStatement(statements);
+            finallyBlock = new BlockStatement(statements, finallyStart, finallyEnd);
         }
 
         // 创建TryStatement对象
-        return new TryStatement(tryBlock, catchBlocks, finallyBlock, CreateSourcePosition(CurrentToken));
+        return new TryStatement(tryBlock, catchBlocks, finallyBlock, tryPosition);
     }
 
     /// <summary>

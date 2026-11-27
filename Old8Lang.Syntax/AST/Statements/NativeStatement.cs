@@ -53,6 +53,9 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// </summary>
     public readonly string? ClassAlias;
 
+    /// <summary>导入符号名称在源码中的位置。</summary>
+    public SourcePosition NamePosition { get; }
+
     /// <summary>
     /// 构造函数：导入单个方法
     /// </summary>
@@ -60,7 +63,15 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="className">类名称</param>
     /// <param name="methodName">方法名称</param>
     /// <param name="nativeName">原生方法别名</param>
-    public NativeStatement(string dllName, string className, string methodName, string nativeName)
+    /// <param name="position">语句位置</param>
+    /// <param name="namePosition">符号名位置</param>
+    public NativeStatement(
+        string dllName,
+        string className,
+        string methodName,
+        string nativeName,
+        SourcePosition position = default,
+        SourcePosition namePosition = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
@@ -68,6 +79,7 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
         NativeName = nativeName;
         ImportAll = false;
         MethodList = null;
+        NamePosition = namePosition.Line > 0 ? namePosition : position;
     }
 
     /// <summary>
@@ -77,8 +89,17 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="className">类名称</param>
     /// <param name="methodName">方法名称</param>
     /// <param name="nativeName">原生方法别名</param>
-    /// <param name="a">函数初始化对象</param>
-    public NativeStatement(string dllName, string className, string methodName, string nativeName, FunctionSyntax function)
+    /// <param name="function">函数语法模型</param>
+    /// <param name="position">语句位置</param>
+    /// <param name="namePosition">符号名位置</param>
+    public NativeStatement(
+        string dllName,
+        string className,
+        string methodName,
+        string nativeName,
+        FunctionSyntax function,
+        SourcePosition position = default,
+        SourcePosition namePosition = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
@@ -87,6 +108,7 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
         Function = function;
         ImportAll = false;
         MethodList = null;
+        NamePosition = namePosition.Line > 0 ? namePosition : position;
     }
 
     /// <summary>
@@ -95,13 +117,21 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="dllName">DLL名称</param>
     /// <param name="className">类名称</param>
     /// <param name="name">导入名称</param>
-    public NativeStatement(string dllName, string className, string name = "")
+    /// <param name="position">语句位置</param>
+    /// <param name="namePosition">符号名位置</param>
+    public NativeStatement(
+        string dllName,
+        string className,
+        string name = "",
+        SourcePosition position = default,
+        SourcePosition namePosition = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
         Name = name;
         ImportAll = false;
         MethodList = null;
+        NamePosition = namePosition.Line > 0 ? namePosition : position;
     }
 
     /// <summary>
@@ -110,12 +140,14 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="dllName">DLL名称</param>
     /// <param name="className">类名称</param>
     /// <param name="importAll">是否导入所有方法</param>
-    public NativeStatement(string dllName, string className, bool importAll)
+    /// <param name="position">语句位置</param>
+    public NativeStatement(string dllName, string className, bool importAll, SourcePosition position = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
         ImportAll = importAll;
         MethodList = null;
+        NamePosition = position;
     }
 
     /// <summary>
@@ -124,12 +156,14 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="dllName">DLL名称</param>
     /// <param name="className">类名称</param>
     /// <param name="methodList">要导入的方法列表</param>
-    public NativeStatement(string dllName, string className, List<string> methodList)
+    /// <param name="position">语句位置</param>
+    public NativeStatement(string dllName, string className, List<string> methodList, SourcePosition position = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
         MethodList = methodList;
         ImportAll = false;
+        NamePosition = position;
     }
 
     /// <summary>
@@ -139,13 +173,22 @@ public partial class NativeStatement : OldStatement, IBlockDeclaration
     /// <param name="className">类名称</param>
     /// <param name="classAlias">类别名</param>
     /// <param name="isAliasImport">是否为别名导入</param>
-    public NativeStatement(string dllName, string className, string classAlias, bool isAliasImport)
+    /// <param name="position">语句位置</param>
+    /// <param name="namePosition">符号名位置</param>
+    public NativeStatement(
+        string dllName,
+        string className,
+        string classAlias,
+        bool isAliasImport,
+        SourcePosition position = default,
+        SourcePosition namePosition = default) : base(position)
     {
         DllName = dllName;
         ClassName = className;
         ClassAlias = classAlias;
         ImportAll = false;
         MethodList = null;
+        NamePosition = namePosition.Line > 0 ? namePosition : position;
     }
 
     /// <summary>

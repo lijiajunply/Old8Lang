@@ -36,8 +36,9 @@ public class RenameHandler(DocumentManager documentManager, WorkspaceIndex? work
 
         var line = (int)request.Position.Line;
         var column = (int)request.Position.Character;
+        var effectiveWorkspace = workspaceIndex ?? _documentManager.WorkspaceIndex;
 
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column, effectiveWorkspace);
         var symbolName = symbol?.Name ?? SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
 
         if (symbolName == null)
@@ -45,13 +46,14 @@ public class RenameHandler(DocumentManager documentManager, WorkspaceIndex? work
             return Task.FromResult<WorkspaceEdit?>(null);
         }
 
-        // 顶层符号跨文件重命名；成员/参数保持文件内作用域，避免误改其他文件的同名局部符号
-        if (workspaceIndex != null &&
-            workspaceIndex.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
+        // 顶层符号跨文件重命名；局部变量/成员/参数保持作用域内精确重命名，避免误改同名符号
+        if (effectiveWorkspace != null &&
+            (symbol == null || symbol.IsTopLevel) &&
+            effectiveWorkspace.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
             workspaceSymbol != null && definitionFile != null &&
             (symbol == null || ReferencesHandler.IsSameDefinition(symbol, workspaceSymbol)))
         {
-            var grouped = workspaceIndex.FindRenameLocations(symbolName, definitionFile.Uri);
+            var grouped = effectiveWorkspace.FindRenameLocations(symbolName, definitionFile.Uri);
             if (grouped.Count == 0)
             {
                 return Task.FromResult<WorkspaceEdit?>(null);
@@ -79,7 +81,7 @@ public class RenameHandler(DocumentManager documentManager, WorkspaceIndex? work
             return Task.FromResult<WorkspaceEdit?>(null);
         }
 
-        var references = SymbolFinder.FindReferences(document, symbol.Name);
+        var references = SymbolFinder.FindScopedReferences(document, symbol, effectiveWorkspace);
         if (references.Count == 0)
         {
             return Task.FromResult<WorkspaceEdit?>(null);

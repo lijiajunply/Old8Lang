@@ -22,6 +22,8 @@ public partial class StatementParser
         var isDynamic = false;
         LangExpression? dynamicModuleExpression = null;
         string moduleName;
+        SourcePosition moduleNamePosition = default;
+        var isQuotedModuleName = false;
 
         // 检查导入修饰符：lazy import 或 dynamic import
         if (CurrentToken.Type == LangTokenType.Lazy)
@@ -50,9 +52,11 @@ public partial class StatementParser
             Expect(LangTokenType.From);
 
             // 解析模块名
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
             if (CurrentToken.Type == LangTokenType.String)
             {
                 moduleName = CurrentToken.Value;
+                isQuotedModuleName = true;
                 Expect(LangTokenType.String);
             }
             else
@@ -98,9 +102,11 @@ public partial class StatementParser
             Expect(LangTokenType.From);
 
             // 解析模块名
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
             if (CurrentToken.Type == LangTokenType.String)
             {
                 moduleName = CurrentToken.Value;
+                isQuotedModuleName = true;
                 Expect(LangTokenType.String);
             }
             else
@@ -112,6 +118,8 @@ public partial class StatementParser
         else if (isDynamic && CurrentToken.Type == LangTokenType.String)
         {
             // 动态导入：字符串字面量应该创建为动态表达式
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
+            isQuotedModuleName = true;
             dynamicModuleExpression = new ScalarLiteralExpression(LiteralSyntax.String(CurrentToken.Value,
                 new SourcePosition(CurrentToken.Line, CurrentToken.Column)));
             Expect(LangTokenType.String); // 消耗字符串
@@ -120,6 +128,7 @@ public partial class StatementParser
         else if (isDynamic && CurrentToken.Type == LangTokenType.Identifier)
         {
             // 动态导入：创建标识符表达式，避免在解析阶段调用表达式解析器
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
             dynamicModuleExpression = new LangId(CurrentToken.Value, "", null,
                 position: new SourcePosition(CurrentToken.Line, CurrentToken.Column));
             Expect(LangTokenType.Identifier); // 消耗标识符
@@ -128,6 +137,7 @@ public partial class StatementParser
         else if (isDynamic)
         {
             // 动态导入：解析模块名表达式（复杂表达式）
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
             dynamicModuleExpression ??= expressionParser.ParseExpression();
             moduleName = "__dynamic_module__";
         }
@@ -178,9 +188,11 @@ public partial class StatementParser
                 Expect(LangTokenType.From);
 
                 // 解析模块名
+                moduleNamePosition = CreateSourcePosition(CurrentToken);
                 if (CurrentToken.Type == LangTokenType.String)
                 {
                     moduleName = CurrentToken.Value;
+                    isQuotedModuleName = true;
                     Expect(LangTokenType.String);
                 }
                 else
@@ -194,6 +206,7 @@ public partial class StatementParser
                 // 这是传统导入：import module
                 // 回退第一个标识符作为模块名
                 CurrentIndex = savedIndex;
+                moduleNamePosition = CreateSourcePosition(CurrentToken);
                 moduleName = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
             }
@@ -201,6 +214,8 @@ public partial class StatementParser
         else if (CurrentToken.Type == LangTokenType.String)
         {
             // 传统导入：import "module"
+            moduleNamePosition = CreateSourcePosition(CurrentToken);
+            isQuotedModuleName = true;
             moduleName = CurrentToken.Value;
             Expect(LangTokenType.String);
         }
@@ -211,15 +226,17 @@ public partial class StatementParser
 
         // 检查是否有模块别名：as alias
         string? moduleAlias = null;
+        SourcePosition moduleAliasPosition = default;
         if (CurrentToken.Type == LangTokenType.As)
         {
             Expect(LangTokenType.As);
+            moduleAliasPosition = CreateSourcePosition(CurrentToken);
             moduleAlias = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
         }
 
         return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective,
-            isDynamic, dynamicModuleExpression);
+            isDynamic, dynamicModuleExpression, moduleNamePosition, moduleAliasPosition, isQuotedModuleName);
     }
 
     /// <summary>
@@ -231,6 +248,7 @@ public partial class StatementParser
 
     public NativeStatement ParseNativeStatement()
     {
+        var externPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
@@ -241,7 +259,7 @@ public partial class StatementParser
         if (CurrentToken.Type == LangTokenType.Star)
         {
             Expect(LangTokenType.Star);
-            return new NativeStatement(dllName, className, importAll: true);
+            return new NativeStatement(dllName, className, importAll: true, position: externPos);
         }
 
         // 检查是否是选择性导入多个方法：extern "DllName" ClassName { Method1, Method2 }
@@ -277,20 +295,22 @@ public partial class StatementParser
                 throw CreateSyntaxError("批量导入的方法列表不能为空");
             }
 
-            return new NativeStatement(dllName, className, methodList);
+            return new NativeStatement(dllName, className, methodList, externPos);
         }
 
         // 原有的单个方法导入：extern "DllName" ClassName MethodName Alias?
+        var namePos = CreateSourcePosition(CurrentToken);
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         var alias = "";
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
+            namePos = CreateSourcePosition(CurrentToken);
             alias = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
         }
 
-        return new NativeStatement(dllName, className, methodName, alias);
+        return new NativeStatement(dllName, className, methodName, alias, externPos, namePos);
     }
 
     /// <summary>
@@ -300,15 +320,17 @@ public partial class StatementParser
 
     public NativeStatement ParseNativeStatic()
     {
+        var externPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.Arrow);
+        var namePos = CreateSourcePosition(CurrentToken);
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.String);
-        return new NativeStatement(dllName, className, methodName);
+        return new NativeStatement(dllName, className, methodName, externPos, namePos);
     }
 
     /// <summary>
@@ -318,9 +340,11 @@ public partial class StatementParser
 
     public NativeStatement ParseNativeClass()
     {
+        var externPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Extern);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
+        var classPos = CreateSourcePosition(CurrentToken);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -328,11 +352,12 @@ public partial class StatementParser
         if (CurrentToken.Type == LangTokenType.As)
         {
             Expect(LangTokenType.As);
+            var aliasPos = CreateSourcePosition(CurrentToken);
             var alias = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
-            return new NativeStatement(dllName, className, alias, isAliasImport: true);
+            return new NativeStatement(dllName, className, alias, isAliasImport: true, position: externPos, namePosition: aliasPos);
         }
 
-        return new NativeStatement(dllName, className);
+        return new NativeStatement(dllName, className, position: externPos, namePosition: classPos);
     }
 }

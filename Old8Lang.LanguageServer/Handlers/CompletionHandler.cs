@@ -9,7 +9,7 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 自动补全处理器
 /// </summary>
-public class CompletionHandler(DocumentManager documentManager) : ICompletionHandler
+public class CompletionHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : ICompletionHandler
 {
     public CompletionRegistrationOptions GetRegistrationOptions(
         CompletionCapability capability,
@@ -30,37 +30,19 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
         var uri = request.TextDocument.Uri.ToString();
         var document = documentManager.GetDocument(uri);
-
-        Console.WriteLine($"[CompletionHandler] Requested URI: {uri}");
-        Console.WriteLine($"[CompletionHandler] Document is null: {document == null}");
-        if (document != null)
-        {
-            Console.WriteLine($"[CompletionHandler] SymbolTable is null: {document.SymbolTable == null}");
-            if (document.SymbolTable != null)
-            {
-                Console.WriteLine($"[CompletionHandler] SymbolTable count: {document.SymbolTable.Count}");
-            }
-        }
+        var effectiveWorkspace = workspaceIndex ?? documentManager.WorkspaceIndex;
 
         var completionItems = new List<CompletionItem>();
 
-        // 检查是否是成员访问补全（obj.）
-        Console.WriteLine($"[CompletionHandler] Checking member access completion...");
+        // 检查是否是成员访问补全（obj. / ClassName. / this. / super. / a.b().）
         if (document?.Tokens != null && document.SymbolTable != null)
         {
-            Console.WriteLine($"[CompletionHandler] Calling GetMemberCompletions...");
-            var memberCompletions = GetMemberCompletions(document, request.Position);
-            Console.WriteLine($"[CompletionHandler] GetMemberCompletions returned: {memberCompletions?.Count ?? 0} items");
+            var memberCompletions = GetMemberCompletions(document, request.Position, effectiveWorkspace);
             if (memberCompletions != null && memberCompletions.Any())
             {
-                Console.WriteLine($"[CompletionHandler] Returning member completions only");
                 // 如果是成员访问，只返回成员补全
                 return Task.FromResult(new CompletionList(memberCompletions, isIncomplete: false));
             }
-        }
-        else
-        {
-            Console.WriteLine($"[CompletionHandler] Skipping member completion (Tokens={document?.Tokens != null}, SymbolTable={document?.SymbolTable != null})");
         }
 
         // 添加关键字补全
@@ -75,22 +57,21 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
         // 添加内置函数补全（所有70+个全局函数）
         completionItems.AddRange(GetBuiltInFunctionCompletions());
 
-        // 添加符号补全（使用作用域感知）
+        // 添加符号补全（使用词法作用域链感知）
         if (document?.SymbolTable != null && document.Ast != null)
         {
-            // 使用作用域分析器获取当前位置可见的符号
-            var scopeAnalyzer = new ScopeAnalyzer(document.Ast, request.Position, document.SymbolTable, uri);
+            var scopeAnalyzer = new ScopeAnalyzer(
+                document.Ast,
+                request.Position,
+                document.SymbolTable,
+                uri,
+                document.RootScope,
+                effectiveWorkspace);
             var visibleSymbols = scopeAnalyzer.GetVisibleSymbols();
-
-            Console.WriteLine($"[CompletionHandler] Visible symbols count: {visibleSymbols.Count}");
 
             // 将符号转换为补全项
             var symbolCompletions = ConvertSymbolsToCompletionItems(visibleSymbols);
             completionItems.AddRange(symbolCompletions);
-        }
-        else
-        {
-            Console.WriteLine($"[CompletionHandler] Skipping symbol completions (document, SymbolTable, or Ast is null)");
         }
 
         // 智能排序：设置排序优先级
@@ -100,42 +81,47 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
     }
 
     /// <summary>
-    /// 获取成员补全（obj. 后面的补全）
-    /// 支持成员链：obj.getB().getC().
+    /// 获取成员补全（obj. / ClassName. / this. / super. 后面的补全）
+    /// 支持继承链成员、Mixin/接口成员、静态成员区分与多级成员链。
     /// </summary>
     private static List<CompletionItem>? GetMemberCompletions(
         Models.DocumentParseResult document,
-        Position position)
+        Position position,
+        WorkspaceIndex? workspaceIndex)
     {
-        var tokens = document.Tokens!;
-        var symbolTable = document.SymbolTable!;
+        var analyzer = new MemberChainAnalyzer(document, position, workspaceIndex);
+        var chain = analyzer.AnalyzeChainWithContext();
 
-        Console.WriteLine($"[GetMemberCompletions] Analyzing member chain at position Line={position.Line}, Column={position.Character}");
-
-        // 使用成员链分析器来推断类型
-        var analyzer = new MemberChainAnalyzer(tokens, symbolTable, position);
-        var classSymbol = analyzer.AnalyzeChain();
-
-        if (classSymbol == null)
+        if (chain == null)
         {
-            Console.WriteLine($"[GetMemberCompletions] Failed to analyze member chain");
             return null;
         }
 
-        Console.WriteLine($"[GetMemberCompletions] Found class '{classSymbol.Name}' with {classSymbol.Members.Count} members");
+        var accessLevel = TypeResolver.GetAccessLevel(
+            chain.EnclosingClass,
+            chain.TargetType,
+            document.SymbolTable,
+            workspaceIndex,
+            document.Uri);
 
-        // 过滤成员：从类外部访问时，只显示公共成员
-        // TODO: 未来可以根据访问位置（类内部/外部）来决定是否显示私有成员
-        var accessibleMembers = classSymbol.Members.Values
-            .Where(member => member.AccessModifier == Models.AccessModifier.Public)
-            .ToList();
+        // super. 只能访问基类的 public 与 protected 成员（不能访问基类 private）
+        if (chain.IsSuperAccess && accessLevel == MemberAccessLevel.Private)
+        {
+            accessLevel = MemberAccessLevel.Protected;
+        }
 
-        Console.WriteLine($"[GetMemberCompletions] Accessible members: {accessibleMembers.Count}");
+        var accessibleMembers = TypeResolver.GetAllMembers(
+            chain.TargetType,
+            document.SymbolTable,
+            workspaceIndex,
+            staticOnly: chain.IsStaticAccess,
+            accessLevel: accessLevel,
+            preferredUri: document.Uri);
 
         // 返回类的可访问成员
         return accessibleMembers.Select(member =>
         {
-            // 构建访问修饰符信息
+            // 构建访问修饰符与继承来源信息
             var modifiers = new List<string>();
             if (member.AccessModifier != Models.AccessModifier.Public)
             {
@@ -144,6 +130,10 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             if (member.IsStatic)
             {
                 modifiers.Add("static");
+            }
+            if (member.Parent != null && member.Parent.Name != chain.TargetType.Name)
+            {
+                modifiers.Add($"from {member.Parent.Name}");
             }
 
             var labelDetails = modifiers.Count > 0
@@ -612,6 +602,10 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
             Models.SymbolKind.Constant => CompletionItemKind.Constant,
             Models.SymbolKind.Field => CompletionItemKind.Field,
             Models.SymbolKind.Keyword => CompletionItemKind.Keyword,
+            Models.SymbolKind.Enum => CompletionItemKind.Enum,
+            Models.SymbolKind.EnumMember => CompletionItemKind.EnumMember,
+            Models.SymbolKind.Interface => CompletionItemKind.Interface,
+            Models.SymbolKind.Module => CompletionItemKind.Module,
             _ => CompletionItemKind.Text
         };
     }

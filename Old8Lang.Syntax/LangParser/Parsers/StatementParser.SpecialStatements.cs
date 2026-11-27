@@ -23,6 +23,7 @@ public partial class StatementParser
             throw CreateSyntaxError($"枚举定义需要枚举名称，但得到 {CurrentToken.Type}");
         }
 
+        var enumNamePos = CreateSourcePosition(CurrentToken);
         var enumName = CurrentToken.Value;
         CurrentIndex++;
 
@@ -36,7 +37,7 @@ public partial class StatementParser
         if (CurrentToken.Type == LangTokenType.RightBrace)
         {
             CurrentIndex++;
-            return new EnumInit(enumName, members, startPos);
+            return new EnumInit(enumName, members, startPos, enumNamePos);
         }
 
         // 解析第一个成员
@@ -81,7 +82,7 @@ public partial class StatementParser
         // 消费右花括号
         Expect(LangTokenType.RightBrace);
 
-        return new EnumInit(enumName, members, startPos);
+        return new EnumInit(enumName, members, startPos, enumNamePos);
     }
 
 
@@ -91,6 +92,7 @@ public partial class StatementParser
         Expect(LangTokenType.Using);
 
         string? variableName = null;
+        SourcePosition variablePosition = default;
         LangExpression resourceExpression;
 
         // 检查是否是变量声明形式: using varName <- expr
@@ -100,6 +102,7 @@ public partial class StatementParser
             if (nextToken.Type == LangTokenType.Assignment)
             {
                 // using varName <- expr { ... }
+                variablePosition = CreateSourcePosition(CurrentToken);
                 variableName = CurrentToken.Value;
                 CurrentIndex++; // 消费标识符
                 Expect(LangTokenType.Assignment); // 消费 <-
@@ -120,7 +123,7 @@ public partial class StatementParser
         // 解析 using 块（ParseBlock 会自己处理花括号）
         var blockStatement = ParseBlock();
 
-        return new UsingStatement(variableName, resourceExpression, blockStatement, startPos);
+        return new UsingStatement(variableName, resourceExpression, blockStatement, startPos, variablePosition);
     }
 
     /// <summary>
@@ -253,6 +256,7 @@ public partial class StatementParser
 
     public ExternStatement ParseExternStatement()
     {
+        var externPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Extern);
 
         // 解析 DLL 名称
@@ -320,7 +324,7 @@ public partial class StatementParser
         // 自动检测 extern 类型
         var externType = ExternStatement.DetectExternType(dllName);
 
-        return new ExternStatement(dllName, functions, defaultCallingConvention, externType);
+        return new ExternStatement(dllName, functions, defaultCallingConvention, externType, externPos);
     }
 
     /// <summary>
@@ -349,9 +353,11 @@ public partial class StatementParser
         }
 
         // 期望 func 关键字
+        var funcStartPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Func);
 
         // 解析函数名
+        var funcNamePos = CreateSourcePosition(CurrentToken);
         var functionName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -372,21 +378,23 @@ public partial class StatementParser
         }
 
         // 创建函数签名（使用 FuncInit 来存储签名信息）
-        var funcName = new LangId(functionName, returnType);
+        var funcName = new LangId(functionName, returnType, position: funcNamePos);
         var funcSyntax = new FunctionSyntax(funcName, parameters, new BlockStatement(new List<IOldLangTree>()),
-            null, null, null, isAsync: false);
-        var funcSignature = new FuncInit(funcSyntax);
+            null, null, null, isAsync: false, funcStartPos);
+        var funcSignature = new FuncInit(funcSyntax, funcStartPos);
 
         // 解析可选的别名
         string? alias = null;
+        var declNamePos = funcNamePos;
         if (CurrentToken.Type == LangTokenType.As)
         {
             Expect(LangTokenType.As);
+            declNamePos = CreateSourcePosition(CurrentToken);
             alias = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
         }
 
-        return new ExternFunctionDeclaration(functionName, funcSignature, alias, callingConvention);
+        return new ExternFunctionDeclaration(functionName, funcSignature, alias, callingConvention, declNamePos);
     }
 
     /// <summary>

@@ -221,11 +221,14 @@ public partial class StatementParser
 
     public SetStatement ParsePlusPlus()
     {
+        var idPos = CreateSourcePosition(CurrentToken);
         var identifier = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.PlusPlus);
-        return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), LangTokenType.Plus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, default))));
+        return new SetStatement(new LangId(identifier, position: idPos),
+            new Operation(new LangId(identifier, position: idPos), LangTokenType.Plus,
+                new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, idPos)), idPos),
+            idPos);
     }
 
     /// <summary>
@@ -234,10 +237,13 @@ public partial class StatementParser
     /// <returns>i--运算</returns>
     public SetStatement ParseMinusMinus()
     {
+        var idPos = CreateSourcePosition(CurrentToken);
         var identifier = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.MinusMinus);
-        return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), LangTokenType.Minus, new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, default))));
+        return new SetStatement(new LangId(identifier, position: idPos),
+            new Operation(new LangId(identifier, position: idPos), LangTokenType.Minus,
+                new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 1, idPos)), idPos),
+            idPos);
     }
 }

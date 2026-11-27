@@ -23,15 +23,15 @@ public class DocumentHighlightHandler(DocumentManager documentManager) : Documen
         var line = (int)request.Position.Line;
         var column = (int)request.Position.Character;
 
-        // 查找光标位置的符号
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        // 查找光标位置的符号（作用域感知）
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column, documentManager.WorkspaceIndex);
         if (symbol == null)
         {
             return Task.FromResult<DocumentHighlightContainer?>(null);
         }
 
-        // 查找符号的所有引用
-        var references = SymbolFinder.FindReferences(document, symbol.Name);
+        // 查找符号在作用域内的精确引用（不误伤被遮蔽或不同作用域的同名符号）
+        var references = SymbolFinder.FindScopedReferences(document, symbol, documentManager.WorkspaceIndex);
 
         // 将引用转换为高亮
         var highlights = new List<DocumentHighlight>();

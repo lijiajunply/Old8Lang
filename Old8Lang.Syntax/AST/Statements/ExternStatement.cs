@@ -9,12 +9,18 @@ public class ExternFunctionDeclaration(
     string functionName,
     FuncInit? functionSignature = null,
     string? alias = null,
-    CallingConventionType callingConvention = CallingConventionType.Cdecl)
+    CallingConventionType callingConvention = CallingConventionType.Cdecl,
+    SourcePosition namePosition = default)
 {
     /// <summary>
     /// 函数名称
     /// </summary>
     public string FunctionName { get; } = functionName;
+
+    /// <summary>
+    /// 声明名（别名优先，否则函数名）在源码中的位置
+    /// </summary>
+    public SourcePosition NamePosition { get; } = namePosition;
 
     /// <summary>
     /// 参数列表（FuncInit 包含参数类型信息）
@@ -158,7 +164,8 @@ public partial class ExternStatement : OldStatement, IBlockDeclaration
         string dllName,
         List<ExternFunctionDeclaration> functions,
         CallingConventionType defaultCallingConvention = CallingConventionType.Cdecl,
-        ExternType externType = ExternType.NativeDll)
+        ExternType externType = ExternType.NativeDll,
+        SourcePosition position = default) : base(position)
     {
         _dllName = dllName;
         _functions = functions;

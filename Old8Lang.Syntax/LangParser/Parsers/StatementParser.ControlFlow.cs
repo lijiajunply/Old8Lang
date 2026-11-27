@@ -63,9 +63,10 @@ public partial class StatementParser
         var identifiers = new List<LangId>();
         while (true)
         {
+            var idPos = CreateSourcePosition(CurrentToken);
             var identifier = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
-            identifiers.Add(new LangId(identifier));
+            identifiers.Add(new LangId(identifier, position: idPos));
 
             if (CurrentToken.Type != LangTokenType.Comma)
                 break;
@@ -100,9 +101,10 @@ public partial class StatementParser
         var identifiers = new List<LangId>();
         while (true)
         {
+            var idPos = CreateSourcePosition(CurrentToken);
             var identifier = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
-            identifiers.Add(new LangId(identifier));
+            identifiers.Add(new LangId(identifier, position: idPos));
 
             if (CurrentToken.Type != LangTokenType.Comma)
                 break;
@@ -142,6 +144,7 @@ public partial class StatementParser
 
     public SwitchStatement ParseSwitchStatement()
     {
+        var switchPos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.Switch);
         var expression = expressionParser.ParseExpression();
         Expect(LangTokenType.LeftBrace);
@@ -159,7 +162,7 @@ public partial class StatementParser
         }
 
         Expect(LangTokenType.RightBrace);
-        return new SwitchStatement(expression, cases, defaultBlock);
+        return new SwitchStatement(expression, cases, defaultBlock, switchPos);
     }
 
     // caseBlock = "case" expression block ;

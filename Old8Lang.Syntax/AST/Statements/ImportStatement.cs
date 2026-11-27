@@ -24,9 +24,20 @@ public partial class ImportStatement(
     bool isLazy = false,
     bool isSelective = false,
     bool isDynamic = false,
-    LangExpression? dynamicModuleExpression = null
+    LangExpression? dynamicModuleExpression = null,
+    SourcePosition moduleNamePosition = default,
+    SourcePosition moduleAliasPosition = default,
+    bool isQuotedModuleName = false
 ) : OldStatement(position), IBlockImportDeclaration
 {
+    /// <summary>模块名 token 的源码位置。</summary>
+    public SourcePosition ModuleNamePosition { get; } = moduleNamePosition.Line > 0 ? moduleNamePosition : position;
+
+    /// <summary>模块别名 token 的源码位置。</summary>
+    public SourcePosition ModuleAliasPosition { get; } = moduleAliasPosition.Line > 0 ? moduleAliasPosition : position;
+
+    /// <summary>模块名在源码中是否带引号（例如 <c>"math"</c>）。</summary>
+    public bool IsQuotedModuleName { get; } = isQuotedModuleName;
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>

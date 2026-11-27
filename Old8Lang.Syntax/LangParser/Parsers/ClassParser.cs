@@ -49,6 +49,7 @@ public class ClassParser(
             throw new InvalidOperationException("Expected class or mixin keyword");
         }
 
+        var classNamePosition = CreateSourcePosition(CurrentToken);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -180,7 +181,8 @@ public class ClassParser(
             genericParameters: genericParameters,
             parentGenericTypeParameters: parentGenericTypeParameters,
             docComment: docComment,
-            position: startPosition);
+            position: startPosition,
+            namePosition: classNamePosition);
 
         return new ClassInit(classSyntax, startPosition);
     }
@@ -203,6 +205,7 @@ public class ClassParser(
             throw new InvalidOperationException("Expected interface keyword");
         }
 
+        var interfaceNamePosition = CreateSourcePosition(CurrentToken);
         var interfaceName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -258,7 +261,8 @@ public class ClassParser(
             isAbstract: false,
             genericParameters: genericParameters,
             docComment: docComment,
-            position: startPosition);
+            position: startPosition,
+            namePosition: interfaceNamePosition);
 
         return new ClassInit(classSyntax, startPosition);
     }
@@ -308,6 +312,7 @@ public class ClassParser(
     /// <exception cref="Exception">期望声明或函数声明</exception>
     public BlockStatement ParseClassBlock()
     {
+        var openBracePos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.LeftBrace);
         var statements = new List<IOldLangTree>();
         while (CurrentToken.Type != LangTokenType.RightBrace)
@@ -427,7 +432,7 @@ public class ClassParser(
                         case FuncInit funcInit when funcInit.Syntax.Id is not null:
                             // 带有修饰符的类函数声明
                             var memberId2 = new ClassMemberId(funcInit.Syntax.Id!.IdName,
-                                funcInit.Syntax.Id.AssumptionType, modifiers, funcInit.Position);
+                                funcInit.Syntax.Id.AssumptionType, modifiers, funcInit.Syntax.Id.Position);
                             classMemberStatement =
                                 new ClassFuncInitStatement(memberId2, funcInit.Syntax, funcInit.Position);
                             break;
@@ -457,8 +462,9 @@ public class ClassParser(
             }
         }
 
+        var closeBracePos = CreateSourcePosition(CurrentToken);
         Expect(LangTokenType.RightBrace);
-        return new BlockStatement(statements);
+        return new BlockStatement(statements, openBracePos, closeBracePos);
     }
 
     /// <summary>
@@ -561,6 +567,7 @@ public class ClassParser(
             throw CreateSyntaxError($"期望方法名，但得到 {CurrentToken.Type}");
         }
 
+        var methodNamePosition = CreateSourcePosition(CurrentToken);
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -644,7 +651,7 @@ public class ClassParser(
         }
 
         // 创建抽象方法的语法模型（没有方法体）
-        var methodId = new LangId(methodName, returnType, position: position);
+        var methodId = new LangId(methodName, returnType, position: methodNamePosition);
         var functionSyntax = new FunctionSyntax(
             methodId,
             parameters,
@@ -656,7 +663,7 @@ public class ClassParser(
             position);
 
         // 创建类成员ID
-        var memberId = new ClassMemberId(methodName, returnType, modifiers, position);
+        var memberId = new ClassMemberId(methodName, returnType, modifiers, methodNamePosition);
 
         // 创建抽象方法声明
         return new ClassFuncInitStatement(memberId, functionSyntax, position);

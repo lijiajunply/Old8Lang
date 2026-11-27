@@ -73,6 +73,52 @@ public class SymbolInfo
     /// 存储调用此函数/方法的其他函数的名称和位置
     /// </summary>
     public List<CallSite> CalledBy { get; set; } = [];
+
+    /// <summary>
+    /// 声明该符号所在的词法作用域（为空或 Global 表示顶层符号）
+    /// </summary>
+    public SymbolScope? DeclaringScope { get; set; }
+
+    /// <summary>
+    /// 是否为顶层全局符号
+    /// </summary>
+    public bool IsTopLevel => DeclaringScope == null || DeclaringScope.Kind == ScopeKind.Global;
+
+    /// <summary>
+    /// 父类名称（仅对类有效）
+    /// </summary>
+    public string? BaseClassName { get; set; }
+
+    /// <summary>
+    /// 实现的接口名称列表（对接口而言为父接口列表）
+    /// </summary>
+    public List<string> InterfaceNames { get; set; } = [];
+
+    /// <summary>
+    /// 混入的 Mixin 名称列表
+    /// </summary>
+    public List<string> MixinNames { get; set; } = [];
+
+    /// <summary>是否为接口声明</summary>
+    public bool IsInterface { get; set; }
+
+    /// <summary>是否为抽象类</summary>
+    public bool IsAbstract { get; set; }
+
+    /// <summary>是否为 Mixin 声明</summary>
+    public bool IsMixin { get; set; }
+
+    /// <summary>变量/字段/参数是否带有显式类型注解（用于区分显式注解类型不匹配诊断）</summary>
+    public bool HasExplicitTypeAnnotation { get; set; }
+
+    /// <summary>泛型参数名列表（仅对泛型类/泛型函数有效）</summary>
+    public List<string> GenericParameters { get; set; } = [];
+
+    /// <summary>参数是否有默认值（仅对 Parameter 有效）</summary>
+    public bool HasDefaultValue { get; set; }
+
+    /// <summary>参数是否为 params 可变参数（仅对 Parameter 有效）</summary>
+    public bool IsParams { get; set; }
 }
 
 /// <summary>
@@ -104,7 +150,11 @@ public enum SymbolKind
     Parameter,
     Constant,
     Field,
-    Keyword
+    Keyword,
+    Enum,
+    EnumMember,
+    Interface,
+    Module
 }
 
 /// <summary>

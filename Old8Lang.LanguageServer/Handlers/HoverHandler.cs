@@ -8,7 +8,7 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 悬停提示处理器
 /// </summary>
-public class HoverHandler(DocumentManager documentManager) : IHoverHandler
+public class HoverHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null) : IHoverHandler
 {
     public HoverRegistrationOptions GetRegistrationOptions(
         HoverCapability capability,
@@ -30,10 +30,21 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
             return Task.FromResult<Hover?>(null);
         }
 
-        // 查找光标位置的符号
+        // 查找光标位置的符号（作用域感知 + 继承/成员链 + 跨文件回退）
         var line = request.Position.Line;
         var column = request.Position.Character;
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var effectiveWorkspace = workspaceIndex ?? documentManager.WorkspaceIndex;
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column, effectiveWorkspace);
+
+        if (symbol == null && effectiveWorkspace != null)
+        {
+            var name = SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
+            if (name != null &&
+                effectiveWorkspace.TryResolveSymbol(name, uri, out var workspaceSymbol, out _))
+            {
+                symbol = workspaceSymbol;
+            }
+        }
         
         // Debug: 调试悬停查找
         System.Diagnostics.Debug.WriteLine($"Hover请求: Line={line}, Column={column}");
@@ -84,10 +95,10 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
         string displayType;
         if (!string.IsNullOrEmpty(symbol.Type))
         {
-            // 对于变量，显示 "变量名: 类型" 的格式
-            displayType = symbol.Kind == Models.SymbolKind.Variable ? $"{symbol.Name}: {symbol.Type}" :
-                // 对于函数、类、方法等，Type字段已经包含完整签名，直接使用
-                symbol.Type;
+            // 对于变量和参数，显示 "名称: 类型" 的格式
+            displayType = symbol.Kind is Models.SymbolKind.Variable or Models.SymbolKind.Parameter
+                ? $"{symbol.Name}: {symbol.Type}"
+                : symbol.Type;
         }
         else
         {
@@ -97,10 +108,31 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
                 Models.SymbolKind.Variable => $"var {symbol.Name}",
                 Models.SymbolKind.Function => $"func {symbol.Name}",
                 Models.SymbolKind.Class => $"class {symbol.Name}",
+                Models.SymbolKind.Interface => $"interface {symbol.Name}",
+                Models.SymbolKind.Enum => $"enum {symbol.Name}",
                 Models.SymbolKind.Method => $"func {symbol.Name}",
                 Models.SymbolKind.Property => $"{symbol.Name}",
                 _ => symbol.Name
             };
+        }
+
+        if (symbol.Kind is Models.SymbolKind.Class or Models.SymbolKind.Interface)
+        {
+            if (!string.IsNullOrEmpty(symbol.BaseClassName))
+            {
+                displayType += $" extends {symbol.BaseClassName}";
+            }
+
+            if (symbol.InterfaceNames.Count > 0)
+            {
+                var kw = symbol.IsInterface ? "extends" : "implements";
+                displayType += $" {kw} {string.Join(", ", symbol.InterfaceNames)}";
+            }
+
+            if (symbol.MixinNames.Count > 0)
+            {
+                displayType += $" with {string.Join(", ", symbol.MixinNames)}";
+            }
         }
 
         // 添加类型签名

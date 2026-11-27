@@ -33,16 +33,17 @@ public class DefinitionHandler(DocumentManager documentManager, WorkspaceIndex? 
 
         var line = (int)request.Position.Line;
         var column = (int)request.Position.Character;
+        var effectiveWorkspace = workspaceIndex ?? documentManager.WorkspaceIndex;
 
-        // 先在本文件符号表中查找
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        // 先在本文件词法作用域链及成员链中查找
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column, effectiveWorkspace);
 
         if (symbol == null)
         {
             // 本文件未声明该标识符时，尝试通过工作区索引解析到其他文件的顶层符号
             var name = SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
-            if (name != null && workspaceIndex != null &&
-                workspaceIndex.TryResolveSymbol(name, uri, out var workspaceSymbol, out _) &&
+            if (name != null && effectiveWorkspace != null &&
+                effectiveWorkspace.TryResolveSymbol(name, uri, out var workspaceSymbol, out _) &&
                 workspaceSymbol != null)
             {
                 symbol = workspaceSymbol;
@@ -95,8 +96,9 @@ public class ReferencesHandler(DocumentManager documentManager, WorkspaceIndex? 
 
         var line = (int)request.Position.Line;
         var column = (int)request.Position.Character;
+        var effectiveWorkspace = workspaceIndex ?? documentManager.WorkspaceIndex;
 
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column, effectiveWorkspace);
         var symbolName = symbol?.Name ?? SymbolFinder.FindIdentifierNameAtPosition(document, line, column);
 
         if (symbolName == null)
@@ -104,13 +106,14 @@ public class ReferencesHandler(DocumentManager documentManager, WorkspaceIndex? 
             return Task.FromResult<LocationContainer?>(new LocationContainer());
         }
 
-        // 顶层符号（函数、类、全局变量）跨文件查找；成员与参数保持文件内作用域
-        if (workspaceIndex != null &&
-            workspaceIndex.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
+        // 顶层符号（函数、类、全局变量）跨文件查找；局部变量、成员与参数保持作用域内精确查找
+        if (effectiveWorkspace != null &&
+            (symbol == null || symbol.IsTopLevel) &&
+            effectiveWorkspace.TryResolveSymbol(symbolName, uri, out var workspaceSymbol, out var definitionFile) &&
             workspaceSymbol != null && definitionFile != null &&
             (symbol == null || IsSameDefinition(symbol, workspaceSymbol)))
         {
-            var workspaceReferences = workspaceIndex.FindReferences(symbolName, definitionFile.Uri);
+            var workspaceReferences = effectiveWorkspace.FindReferences(symbolName, definitionFile.Uri);
             return Task.FromResult<LocationContainer?>(
                 new LocationContainer(BuildLocations(workspaceReferences, workspaceSymbol.Location,
                     request.Context.IncludeDeclaration)));
@@ -121,7 +124,7 @@ public class ReferencesHandler(DocumentManager documentManager, WorkspaceIndex? 
             return Task.FromResult<LocationContainer?>(new LocationContainer());
         }
 
-        var references = SymbolFinder.FindReferences(document, symbol.Name);
+        var references = SymbolFinder.FindScopedReferences(document, symbol, effectiveWorkspace);
         return Task.FromResult<LocationContainer?>(
             new LocationContainer(BuildLocations(references, symbol.Location, request.Context.IncludeDeclaration)));
     }

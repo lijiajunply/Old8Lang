@@ -10,7 +10,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 签名帮助处理器 - 提供函数参数提示
 /// </summary>
-public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureHelpHandler
+public class SignatureHelpHandler(DocumentManager documentManager, WorkspaceIndex? workspaceIndex = null)
+    : ISignatureHelpHandler
 {
     public SignatureHelpRegistrationOptions GetRegistrationOptions(
         SignatureHelpCapability capability,
@@ -37,7 +38,7 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
         var line = request.Position.Line + 1; // LSP 行号从 0 开始，token 行号从 1 开始
         var column = request.Position.Character; // 两者的列号都是 0 起始，无需转换
 
-        // 查找当前光标所在的函数调用
+        // 查找当前光标所在的函数或方法调用
         var functionCall = FindFunctionCall(document, line, column);
 
         if (functionCall == null)
@@ -45,8 +46,10 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
             return Task.FromResult<SignatureHelp?>(null);
         }
 
-        // 查找函数符号
-        if (!document.SymbolTable.TryGetValue(functionCall.FunctionName, out var functionSymbol))
+        var effectiveWorkspace = workspaceIndex ?? documentManager.WorkspaceIndex;
+        var functionSymbol = ResolveCallableSymbol(document, functionCall, effectiveWorkspace);
+
+        if (functionSymbol == null)
         {
             // 检查全局函数（支持重载）
             var globalSignatures = GetGlobalFunctionSignatures(functionCall.FunctionName);
@@ -63,6 +66,17 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
             return Task.FromResult<SignatureHelp?>(null);
         }
 
+        // 如果是类构造调用，优先使用 init 构造函数签名
+        if (functionSymbol.Kind == Models.SymbolKind.Class)
+        {
+            var initFound = TypeResolver.FindMember(
+                functionSymbol, "init", document.SymbolTable, effectiveWorkspace, document.Uri);
+            if (initFound != null)
+            {
+                functionSymbol = initFound.Value.Member;
+            }
+        }
+
         // 构建函数签名
         var signature = BuildSignatureInformation(functionSymbol);
 
@@ -74,6 +88,52 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
         };
 
         return Task.FromResult<SignatureHelp?>(signatureHelp);
+    }
+
+    private static Models.SymbolInfo? ResolveCallableSymbol(
+        Models.DocumentParseResult document,
+        FunctionCallContext call,
+        WorkspaceIndex? workspaceIndex)
+    {
+        var tokens = document.Tokens!;
+        var nameIndex = call.NameTokenIndex;
+
+        // 成员方法调用（obj.method( / Class.staticMethod( / this.method( / super.method(）
+        if (nameIndex > 1 && tokens[nameIndex - 1].Type == LangTokenType.Dot)
+        {
+            var analyzer = new MemberChainAnalyzer(document, new Position(call.Line - 1, call.Column), workspaceIndex);
+            var chain = analyzer.AnalyzeChainAtDotIndex(nameIndex - 1);
+            if (chain != null)
+            {
+                var found = TypeResolver.FindMember(
+                    chain.TargetType, call.FunctionName, document.SymbolTable, workspaceIndex, document.Uri);
+                if (found != null)
+                {
+                    return found.Value.Member;
+                }
+            }
+        }
+
+        // 作用域链查找
+        var scoped = document.RootScope?.FindInnermostScope(call.Line - 1, call.Column)
+            .Resolve(call.FunctionName, call.Line - 1, call.Column);
+        if (scoped != null)
+        {
+            return scoped;
+        }
+
+        if (document.SymbolTable!.TryGetValue(call.FunctionName, out var local))
+        {
+            return local;
+        }
+
+        if (workspaceIndex != null &&
+            workspaceIndex.TryResolveSymbol(call.FunctionName, document.Uri, out var remote, out _))
+        {
+            return remote;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -115,6 +175,7 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
         // 向前查找最近的左括号和函数名
         int parenDepth = 0;
         string? functionName = null;
+        int nameTokenIndex = -1;
         int parameterIndex = 0;
         int commaCount = 0;
 
@@ -134,6 +195,7 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
                     if (i > 0 && tokens[i - 1].Type == LangTokenType.Identifier)
                     {
                         functionName = tokens[i - 1].Value;
+                        nameTokenIndex = i - 1;
                         parameterIndex = commaCount;
                         break;
                     }
@@ -157,7 +219,10 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
         return new FunctionCallContext
         {
             FunctionName = functionName,
-            CurrentParameterIndex = parameterIndex
+            CurrentParameterIndex = parameterIndex,
+            NameTokenIndex = nameTokenIndex,
+            Line = line,
+            Column = column
         };
     }
 
@@ -272,5 +337,8 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
     {
         public required string FunctionName { get; set; }
         public int CurrentParameterIndex { get; set; }
+        public int NameTokenIndex { get; set; }
+        public int Line { get; set; }
+        public int Column { get; set; }
     }
 }

@@ -150,7 +150,7 @@ func test() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(6, 10)
+            Position = new Position(2, 4) // 位于 func process 函数体内，可见参数 value1 / value2
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -756,7 +756,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(10, 4)
+            Position = new Position(3, 4) // 位于 func main 函数体内 PrintLine(message) 行
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -788,7 +788,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(6, 4)
+            Position = new Position(4, 4) // 位于 func main 函数体内 PrintLine(count.ToStr()) 行
         };
 
         var result = await handler.Handle(request, CancellationToken.None);

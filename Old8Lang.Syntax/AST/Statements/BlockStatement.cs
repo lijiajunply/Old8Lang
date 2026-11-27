@@ -16,10 +16,17 @@ public partial class BlockStatement : OldStatement
 
     public override int Count => OtherStatements.Count;
 
+    /// <summary>块结束位置（通常为右花括号或最后一条语句的位置）。</summary>
+    public SourcePosition EndPosition { get; }
+
     public int Total => ImportStatements.Count + OtherStatements.Count;
 
-    public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
+    public BlockStatement(
+        IEnumerable<IOldLangTree> statements,
+        SourcePosition position = default,
+        SourcePosition endPosition = default) : base(position)
     {
+        EndPosition = endPosition;
         // 遍历所有语句
         foreach (var statement in statements.OfType<OldStatement>())
         {

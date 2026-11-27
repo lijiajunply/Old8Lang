@@ -1,6 +1,15 @@
+using MediatR;
+using Moq;
 using Old8Lang.LanguageServer.Handlers;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Services;
+using OmniSharp.Extensions.LanguageServer.Protocol;
+using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server;
+using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;
+using DiagnosticSeverity = Old8Lang.LanguageServer.Models.DiagnosticSeverity;
 
 namespace Old8Lang.Tests.LanguageServer.Handlers.Sync;
 
@@ -181,5 +190,75 @@ class TestClass {
         // Act & Assert - Verify handler has expected properties
         // Note: The actual handler properties would depend on the LSP implementation
         Assert.NotNull(handler);
+        Assert.Equal(TextDocumentSyncKind.Full, handler.Change);
+    }
+
+    [Fact]
+    public async Task TestDidOpenChangeSaveClose_PublishesDiagnosticsAndUpdatesState()
+    {
+        var documentManager = new DocumentManager();
+        var published = new List<PublishDiagnosticsParams>();
+
+        var textDocument = new Mock<ITextDocumentLanguageServer>();
+        textDocument
+            .Setup(x => x.SendNotification(It.IsAny<IRequest>()))
+            .Callback<IRequest>(req =>
+            {
+                if (req is PublishDiagnosticsParams p)
+                {
+                    published.Add(p);
+                }
+            });
+
+        var facade = new Mock<ILanguageServerFacade>();
+        facade.SetupGet(x => x.TextDocument).Returns(textDocument.Object);
+
+        var handler = new TextDocumentSyncHandler(documentManager, facade.Object);
+        var uri = DocumentUri.From("file:///sync-lifecycle.old8");
+
+        // Attributes & Registration options
+        var attrs = handler.GetTextDocumentAttributes(uri);
+        Assert.Equal("old8lang", attrs.LanguageId);
+        Assert.NotNull(handler.GetRegistrationOptions(new TextSynchronizationCapability(), new ClientCapabilities()));
+
+        // DidOpen with an undefined symbol error
+        await handler.Handle(new DidOpenTextDocumentParams
+        {
+            TextDocument = new TextDocumentItem
+            {
+                Uri = uri,
+                LanguageId = "old8lang",
+                Version = 1,
+                Text = "x <- missingSymbol\n"
+            }
+        }, CancellationToken.None);
+
+        Assert.Single(published);
+        Assert.Contains(published[0].Diagnostics, d => d.Message.Contains("missingSymbol"));
+
+        // DidChange fixes the code -> diagnostics clear
+        await handler.Handle(new DidChangeTextDocumentParams
+        {
+            TextDocument = new OptionalVersionedTextDocumentIdentifier { Uri = uri, Version = 2 },
+            ContentChanges = new Container<TextDocumentContentChangeEvent>(
+                new TextDocumentContentChangeEvent { Text = "x <- 42\nPrintLine(x)\n" })
+        }, CancellationToken.None);
+
+        Assert.Equal(2, published.Count);
+        Assert.Empty(published[1].Diagnostics);
+
+        // DidSave
+        await handler.Handle(new DidSaveTextDocumentParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = uri }
+        }, CancellationToken.None);
+        Assert.NotNull(documentManager.GetDocument(uri.ToString()));
+
+        // DidClose removes document
+        await handler.Handle(new DidCloseTextDocumentParams
+        {
+            TextDocument = new TextDocumentIdentifier { Uri = uri }
+        }, CancellationToken.None);
+        Assert.Null(documentManager.GetDocument(uri.ToString()));
     }
 }

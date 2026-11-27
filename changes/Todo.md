@@ -1115,12 +1115,11 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 
 ### P0：可靠性与已有能力完善
 
-- [ ] 为所有已注册 Handler 补齐稳定的单元测试和协议级测试（新增的 CodeLens / SelectionRange /
-      InlayHint / WorkspaceIndex 已有单元测试，其余 Handler 仍需体系化回归）。
-- [ ] 为符号表引入作用域链，正确处理局部变量、变量遮蔽和同名符号。
-- [ ] 完善成员访问的类型推断，覆盖继承成员和静态成员补全。
-- [ ] 改善诊断：类型不匹配、未使用变量、成员不存在，以及跨文件语义分析。
-- [ ] 评估并逐步替换 token-based location workaround；Parser 修复后保留回归测试再移除。
+- [x] 为所有已注册 Handler 补齐稳定的单元测试和协议级测试（已补齐 `DebugProfilerHandlersTests`、`ScopedReferencesHandlerTests`、`TextDocumentSyncHandlerTests` 及基于 `Pipe` + JSON-RPC 2.0 覆盖全部 26 个注册 Handler 的 `LspProtocolEndToEndTests`，详见 `changes/2026-11-26-LSP-P0可靠性和能力完善/test.md`）。
+- [x] 为符号表引入作用域链，正确处理局部变量、变量遮蔽和同名符号（新增 `SymbolScope` 词法作用域树，接入全部导航/补全/悬停/引用/重命名/高亮/语义令牌 Handler，并新增 `ScopeChainTests`）。
+- [x] 完善成员访问的类型推断，覆盖继承成员和静态成员补全（新增 `TypeResolver`，升级 `MemberChainAnalyzer` / `CompletionHandler` / `SignatureHelpHandler` 支持多级继承、Mixin、接口、`this`/`super`、静态成员、多级属性/方法链与跨文件类，并新增 `MemberTypeInferenceTests`）。
+- [x] 改善诊断：类型不匹配、未使用变量、成员不存在，以及跨文件语义分析（重构 `SemanticAnalyzer` 为 AST + `RootScope` + `WorkspaceIndex` 驱动并接入 `Program.cs`/`DocumentManager`，扩充 `SemanticAnalyzerTests`）。
+- [x] 评估并逐步替换 token-based location workaround；Parser 修复后保留回归测试再移除（已修复 `LangToken`、`ClassParser`、`StatementParser`、`LangParser` 及相关 AST 节点位置，移除 `SymbolTableBuilder` 的 token 扫描变通与 `DocumentLinkHandler` 正则变通，保留 `PositionBasisTests` 回归）。
 
 ### P1：尚未实现的 LSP 能力
 

@@ -11,12 +11,16 @@ namespace Old8Lang.AST.Statement;
 public partial class EnumInit(
     string enumName,
     List<(string name, LangExpression? value)> members,
-    SourcePosition position = default) : OldStatement(position)
+    SourcePosition position = default,
+    SourcePosition namePosition = default) : OldStatement(position)
 {
     /// <summary>
     /// 枚举名称
     /// </summary>
     internal readonly string _enumName = enumName;
+
+    /// <summary>枚举名称标识符的源码位置。</summary>
+    public SourcePosition NamePosition { get; } = namePosition.Line > 0 ? namePosition : position;
 
     /// <summary>
     /// 枚举成员列表（成员名和可选的显式值）

@@ -13,12 +13,16 @@ public partial class UsingStatement(
     string? variableName,
     LangExpression resourceExpression,
     BlockStatement blockStatement,
-    SourcePosition position = default) : OldStatement(position)
+    SourcePosition position = default,
+    SourcePosition variablePosition = default) : OldStatement(position)
 {
     /// <summary>
     /// 获取变量名（可能为null）
     /// </summary>
     public string? VariableName => variableName;
+
+    /// <summary>资源变量标识符的源码位置（未提供时回退到语句起始位置）。</summary>
+    public SourcePosition VariablePosition { get; } = variablePosition.Line > 0 ? variablePosition : position;
 
     /// <summary>
     /// 获取资源表达式

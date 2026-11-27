@@ -28,7 +28,7 @@ public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 4)
+            Position = new Position(3, 19)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -92,7 +92,7 @@ public class CompletionHandler_ExpressionsTests(ITestOutputHelper output)
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 4)
+            Position = new Position(3, 19)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -169,7 +169,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(3, 4)
+            Position = new Position(2, 15)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -199,7 +199,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(3, 4)
+            Position = new Position(2, 12)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -228,7 +228,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 4)
+            Position = new Position(3, 17)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -258,7 +258,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(3, 4)
+            Position = new Position(2, 12)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -288,7 +288,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 4)
+            Position = new Position(3, 20)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -317,7 +317,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(3, 4)
+            Position = new Position(2, 14)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -430,7 +430,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(5, 4)
+            Position = new Position(4, 15)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -493,7 +493,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(3, 4)
+            Position = new Position(2, 13)
         };
 
         var result = await handler.Handle(request, CancellationToken.None);

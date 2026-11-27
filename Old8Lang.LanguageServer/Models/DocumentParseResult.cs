@@ -29,9 +29,14 @@ public class DocumentParseResult
     public BlockStatement? Ast { get; set; }
 
     /// <summary>
-    /// 符号表
+    /// 顶层符号表（保持向后兼容，仅包含全局作用域符号）
     /// </summary>
     public Dictionary<string, SymbolInfo>? SymbolTable { get; set; }
+
+    /// <summary>
+    /// 词法作用域树根结点（全局作用域，包含嵌套的函数、类、方法、块作用域）
+    /// </summary>
+    public SymbolScope? RootScope { get; set; }
 
     /// <summary>
     /// 诊断信息列表

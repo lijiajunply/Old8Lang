@@ -26,7 +26,7 @@ public class CompletionHandler_GenericsTests(ITestOutputHelper output)
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(2, 4)
+            Position = new Position(1, 4) // return value 所在行（位于泛型函数体内）
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -242,7 +242,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(2, 4)
+            Position = new Position(1, 4) // return items 所在行（位于泛型函数体内）
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -255,7 +255,7 @@ func main() -> void {
         output.WriteLine($"Found {items.Count} items");
     }
 
-    [Fact(Skip = "局部变量补全功能尚未完全实现")]
+    [Fact]
     public async Task NullableTypeParameter_ShouldComplete()
     {
         var code = @"class Box<T?> {
@@ -271,8 +271,9 @@ func main() -> void {
 }
 
 func main() -> void {
-    box <- new Box(123)
-    box2 <- new Box(null)
+    box <- Box(123)
+    box2 <- Box(null)
+    PrintLine(box2.ToStr())
 }
 ";
         var uri = "file:///test.old8";
@@ -283,7 +284,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(15, 4) // 在 box2 <- new Box(null) 之后
+            Position = new Position(15, 4) // 位于 func main 函数体内 box2 声明之后
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -339,7 +340,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(29, 17)
+            Position = new Position(27, 19) // value <- stack.|peek()
         };
 
         var result = await handler.Handle(request, CancellationToken.None);
@@ -384,7 +385,7 @@ func main() -> void {
         var request = new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(11, 4)
+            Position = new Position(10, 4) // 位于 func main 函数体内 list 声明行
         };
 
         var result = await handler.Handle(request, CancellationToken.None);

@@ -233,18 +233,26 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
             return (Array.IndexOf(TokenTypes, SemanticTokenType.Variable), modifiers.ToArray());
         }
 
+        // 优先通过词法作用域链与成员链定位符号（准确区分参数、局部遮蔽变量、继承成员等）
+        var scoped = SymbolFinder.FindSymbolAtPosition(
+            document, token.Line - 1, token.Column, documentManager.WorkspaceIndex);
+        if (scoped != null)
+        {
+            return ClassifySymbol(scoped, modifiers);
+        }
+
         var symbolName = token.Value;
 
-        // 先在符号表中查找
+        // 回退到顶层符号表
         if (document.SymbolTable.TryGetValue(symbolName, out var symbol))
         {
             return ClassifySymbol(symbol, modifiers);
         }
 
-        // 如果没找到，可能是成员访问，查找所有类的成员
+        // 回退查找所有类的成员
         foreach (var kvp in document.SymbolTable)
         {
-            if (kvp.Value.Kind == Models.SymbolKind.Class)
+            if (TypeResolver.IsTypeSymbol(kvp.Value))
             {
                 if (kvp.Value.Members.TryGetValue(symbolName, out var memberSymbol))
                 {
@@ -276,6 +284,17 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Class), modifiers.ToArray());
 
+            case Models.SymbolKind.Interface:
+                modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
+                return (Array.IndexOf(TokenTypes, SemanticTokenType.Interface), modifiers.ToArray());
+
+            case Models.SymbolKind.Enum:
+                modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
+                return (Array.IndexOf(TokenTypes, SemanticTokenType.Enum), modifiers.ToArray());
+
+            case Models.SymbolKind.EnumMember:
+                return (Array.IndexOf(TokenTypes, SemanticTokenType.EnumMember), modifiers.ToArray());
+
             case Models.SymbolKind.Function:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Declaration));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Function), modifiers.ToArray());
@@ -285,6 +304,7 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Method), modifiers.ToArray());
 
             case Models.SymbolKind.Property:
+            case Models.SymbolKind.Field:
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Property), modifiers.ToArray());
 
             case Models.SymbolKind.Parameter:
@@ -296,6 +316,9 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
             case Models.SymbolKind.Constant:
                 modifiers.Add(new SemanticTokenModifier(SemanticTokenModifier.Readonly));
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Variable), modifiers.ToArray());
+
+            case Models.SymbolKind.Module:
+                return (Array.IndexOf(TokenTypes, SemanticTokenType.Namespace), modifiers.ToArray());
 
             default:
                 return (Array.IndexOf(TokenTypes, SemanticTokenType.Variable), modifiers.ToArray());

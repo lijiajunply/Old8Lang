@@ -274,6 +274,8 @@ public static class LangTokenizer
 
             if (code[i] == '"')
             {
+                var startLine = line;
+                var startColumn = i - column;
                 var stringBuilder = new StringBuilder(256);
 
                 i++;
@@ -370,13 +372,15 @@ public static class LangTokenizer
                 }
 
                 var stringValue = stringBuilder.ToString();
-                tokens.Add(new LangToken(stringValue, LangTokenType.String, line, i - column));
+                tokens.Add(new LangToken(stringValue, LangTokenType.String, startLine, startColumn));
                 continue;
             }
 
             // 处理字符字面量 'c'
             if (code[i] == '\'')
             {
+                var startLine = line;
+                var startColumn = i - column;
                 var charBuilder = new StringBuilder(64);
 
                 i++;
@@ -471,7 +475,7 @@ public static class LangTokenizer
 
                 // 为字符token添加单引号以保持格式一致性
                 var charValue = charBuilder.ToString();
-                tokens.Add(new LangToken($"'{charValue}'", LangTokenType.Char, line, i - column));
+                tokens.Add(new LangToken($"'{charValue}'", LangTokenType.Char, startLine, startColumn));
                 continue;
             }
 

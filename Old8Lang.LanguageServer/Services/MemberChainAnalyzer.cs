@@ -1,135 +1,233 @@
 using Old8Lang.LangParser;
+using Old8Lang.LanguageServer.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SymbolInfo = Old8Lang.LanguageServer.Models.SymbolInfo;
 using SymbolKind = Old8Lang.LanguageServer.Models.SymbolKind;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace Old8Lang.LanguageServer.Services;
 
 /// <summary>
-/// 成员链分析器 - 负责解析和推断成员访问链的类型
-/// 例如: obj.getB().getC().getValue()
+/// 成员链分析结果：包含最终目标类型、是否为通过类名发起的静态访问、是否为 super 访问，以及调用点所在的类上下文。
+/// </summary>
+public sealed record MemberChainResult(
+    SymbolInfo TargetType,
+    bool IsStaticAccess,
+    SymbolInfo? EnclosingClass,
+    bool IsSuperAccess = false);
+
+/// <summary>
+/// 成员链分析器 - 负责解析和推断成员访问链的类型。
+/// 支持多级属性链、方法调用链、继承/Mixin/接口成员、静态访问、this/super 及作用域内局部变量与参数。
 /// </summary>
 public class MemberChainAnalyzer(
     List<LangToken> tokens,
     Dictionary<string, SymbolInfo> symbolTable,
-    Position position)
+    Position position,
+    SymbolScope? rootScope = null,
+    WorkspaceIndex? workspaceIndex = null,
+    string? documentUri = null)
 {
+    public MemberChainAnalyzer(
+        DocumentParseResult document,
+        Position position,
+        WorkspaceIndex? workspaceIndex = null)
+        : this(
+            document.Tokens ?? [],
+            document.SymbolTable ?? new Dictionary<string, SymbolInfo>(),
+            position,
+            document.RootScope,
+            workspaceIndex,
+            document.Uri)
+    {
+    }
+
     /// <summary>
-    /// 分析光标位置的成员链并返回最终类型
+    /// 分析光标位置的成员链并返回最终类型符号（向后兼容入口）。
     /// </summary>
-    public SymbolInfo? AnalyzeChain()
+    public SymbolInfo? AnalyzeChain() => AnalyzeChainDetailed()?.TargetType;
+
+    /// <summary>
+    /// 分析光标位置的成员链并返回完整上下文（与 <see cref="AnalyzeChainDetailed"/> 等价）。
+    /// </summary>
+    public MemberChainResult? AnalyzeChainWithContext() => AnalyzeChainDetailed();
+
+    /// <summary>
+    /// 分析以指定点号索引结尾的成员链并返回完整上下文。
+    /// </summary>
+    public MemberChainResult? AnalyzeChainAtDotIndex(int dotIndex)
+    {
+        if (dotIndex < 0 || dotIndex >= tokens.Count || tokens[dotIndex].Type != LangTokenType.Dot)
+        {
+            return null;
+        }
+
+        var chainTokens = ExtractChainTokens(dotIndex);
+        if (chainTokens.Count == 0)
+        {
+            return null;
+        }
+
+        var dotToken = tokens[dotIndex];
+        return InferChainType(chainTokens, dotToken.Line - 1, dotToken.Column);
+    }
+
+    /// <summary>
+    /// 分析光标位置的成员链并返回完整上下文（目标类型、静态访问标记、所在类）。
+    /// </summary>
+    public MemberChainResult? AnalyzeChainDetailed()
     {
         var line = position.Line + 1; // LSP 行号从 0 开始，token 行号从 1 开始
         var column = position.Character; // 两者的列号都是 0 起始，无需转换
 
-        Console.WriteLine($"[MemberChainAnalyzer] Analyzing chain at Line={line}, Column={column}");
-
-        // 1. 找到光标位置的点号
         var dotIndex = FindDotAtPosition(line, column);
         if (dotIndex == -1)
         {
-            Console.WriteLine($"[MemberChainAnalyzer] No dot found at position");
             return null;
         }
 
-        Console.WriteLine($"[MemberChainAnalyzer] Found dot at token index {dotIndex}");
-
-        // 2. 向前回溯，找到完整的成员链
-        var chainTokens = ExtractChainTokens(dotIndex);
-        if (chainTokens.Count == 0)
-        {
-            Console.WriteLine($"[MemberChainAnalyzer] Failed to extract chain tokens");
-            return null;
-        }
-
-        Console.WriteLine($"[MemberChainAnalyzer] Extracted {chainTokens.Count} chain tokens");
-        foreach (var token in chainTokens)
-        {
-            Console.WriteLine($"[MemberChainAnalyzer]   Token: '{token.Value}' Type={token.Type}");
-        }
-
-        // 3. 逐步推断链中每个部分的类型
-        var finalType = InferChainType(chainTokens);
-
-        if (finalType != null)
-        {
-            Console.WriteLine($"[MemberChainAnalyzer] Final type inferred: {finalType.Name}");
-        }
-        else
-        {
-            Console.WriteLine($"[MemberChainAnalyzer] Failed to infer type");
-        }
-
-        return finalType;
+        return AnalyzeChainAtDotIndex(dotIndex);
     }
 
     /// <summary>
-    /// 找到光标位置之前最近的点号 token 索引
+    /// 找到光标位置之前最近且与光标相连的点号 token 索引。
     /// </summary>
     private int FindDotAtPosition(int line, int column)
     {
-        Console.WriteLine($"[FindDotAtPosition] Searching for dot before Line={line}, Column={column}");
-        Console.WriteLine($"[FindDotAtPosition] Total tokens: {tokens.Count}");
-
-        // 打印光标附近的 tokens 以便调试
-        Console.WriteLine($"[FindDotAtPosition] Tokens around cursor:");
-        for (int j = Math.Max(0, tokens.Count - 30); j < tokens.Count; j++)
-        {
-            var t = tokens[j];
-            Console.WriteLine($"[FindDotAtPosition]   [{j}] '{t.Value}' Type={t.Type} Line={t.Line} Column={t.Column}");
-        }
-
-        // 从后向前查找，找到光标位置之前或所在位置的最近一个点号
+        // 从后向前查找光标位置之前或所在位置的最近 token（严格大于 column 才跳过，使光标位于 '.' 上也能命中）
+        var cursorTokenIndex = -1;
         for (int i = tokens.Count - 1; i >= 0; i--)
         {
             var token = tokens[i];
-
-            // 如果 token 在光标位置之后，跳过
-            // 注意：column 是 0 起始的光标列，光标停在点号右侧一格时 token.Column == column - 1，
-            // 仍然会走到下面的点号分支，因此点号和紧随其后的位置都能被识别
             if (token.Line > line || (token.Line == line && token.Column > column))
             {
-                Console.WriteLine($"[FindDotAtPosition] Skipping token at/after cursor: {token.Value} at Line={token.Line}, Column={token.Column}");
                 continue;
             }
 
-            // 如果找到点号
-            if (token.Type == LangTokenType.Dot)
+            cursorTokenIndex = i;
+            break;
+        }
+
+        if (cursorTokenIndex < 0)
+        {
+            return -1;
+        }
+
+        // 1. 光标就在点号上或紧跟在点号后面：obj.|
+        if (tokens[cursorTokenIndex].Type == LangTokenType.Dot && tokens[cursorTokenIndex].Line == line)
+        {
+            return cursorTokenIndex;
+        }
+
+        // 2. 光标正在同一行输入成员名前缀：obj.get| 或 obj.$1get
+        if (tokens[cursorTokenIndex].Line == line)
+        {
+            if (tokens[cursorTokenIndex].Type == LangTokenType.Identifier && cursorTokenIndex > 0)
             {
-                Console.WriteLine($"[FindDotAtPosition] Found dot at index {i}, Line={token.Line}, Column={token.Column}");
-                return i;
+                var prev = SkipTestMarkersBackward(cursorTokenIndex - 1);
+                if (prev >= 0 && tokens[prev].Type == LangTokenType.Dot && tokens[prev].Line == line)
+                {
+                    return prev;
+                }
+            }
+
+            if (IsTestMarkerToken(cursorTokenIndex))
+            {
+                var prev = SkipTestMarkersBackward(cursorTokenIndex);
+                if (prev >= 0 && tokens[prev].Type == LangTokenType.Dot && tokens[prev].Line == line)
+                {
+                    return prev;
+                }
+            }
+
+            // 同行直接紧跟在点号后方的调用（如 obj.$1getValue()）
+            for (int i = cursorTokenIndex; i >= 0 && tokens[i].Line == line; i--)
+            {
+                if (tokens[i].Type == LangTokenType.Dot)
+                {
+                    return i;
+                }
             }
         }
 
-        Console.WriteLine($"[FindDotAtPosition] No dot found");
+        // 3. 兼容带 $1 占位标记的历史补全测试（光标行号可能落在源码末尾之后）
+        for (int i = cursorTokenIndex; i >= 1; i--)
+        {
+            if (tokens[i].Type == LangTokenType.Dollar && tokens[i - 1].Type == LangTokenType.Dot)
+            {
+                return i - 1;
+            }
+        }
+
         return -1;
     }
 
+    private int SkipTestMarkersBackward(int index)
+    {
+        while (index >= 0 && IsTestMarkerToken(index))
+        {
+            index--;
+        }
+
+        return index;
+    }
+
+    private bool IsTestMarkerToken(int index)
+    {
+        var token = tokens[index];
+        return token.Type == LangTokenType.Dollar ||
+               (token.Type == LangTokenType.Number && index > 0 && tokens[index - 1].Type == LangTokenType.Dollar);
+    }
+
     /// <summary>
-    /// 提取成员链的所有 token（从起点到光标处的点号）
+    /// 提取成员链的所有 token（从起点到目标点号）。
     /// 例如: obj.getB().getC(). 会提取 [obj, ., getB, (, ), ., getC, (, ), .]
-    /// 跳过测试标记（$和数字）
     /// </summary>
     private List<LangToken> ExtractChainTokens(int dotIndex)
     {
         var chainTokens = new List<LangToken>();
         var currentIndex = dotIndex;
+        var parenDepth = 0;
 
-        // 向前回溯找到链的起点
         while (currentIndex >= 0)
         {
             var token = tokens[currentIndex];
 
-            // 跳过测试标记（$1, $2 等）
-            if (token.Type == LangTokenType.Dollar ||
-                (token.Type == LangTokenType.Number && currentIndex > 0 &&
-                 tokens[currentIndex - 1].Type == LangTokenType.Dollar))
+            if (IsTestMarkerToken(currentIndex))
             {
                 currentIndex--;
                 continue;
             }
 
-            // 如果遇到不属于链的 token，停止
+            if (token.Type == LangTokenType.RightParen)
+            {
+                parenDepth++;
+                chainTokens.Insert(0, token);
+                currentIndex--;
+                continue;
+            }
+
+            if (token.Type == LangTokenType.LeftParen)
+            {
+                if (parenDepth == 0)
+                {
+                    // 到达包围整个表达式的左括号，例如 getFullName(p.name) 中的 '('
+                    break;
+                }
+
+                parenDepth--;
+                chainTokens.Insert(0, token);
+                currentIndex--;
+                continue;
+            }
+
+            if (parenDepth > 0)
+            {
+                // 括号内参数列表原样保留
+                chainTokens.Insert(0, token);
+                currentIndex--;
+                continue;
+            }
+
             if (!IsChainToken(token.Type))
             {
                 break;
@@ -138,36 +236,10 @@ public class MemberChainAnalyzer(
             chainTokens.Insert(0, token);
             currentIndex--;
 
-            // 如果是标识符且前面不是点号，说明到达链的起点
-            if (token.Type == LangTokenType.Identifier)
+            if (token.Type is LangTokenType.Identifier or LangTokenType.This or LangTokenType.Super)
             {
-                // 检查前面的 token（跳过可能的测试标记）
-                int prevIndex = currentIndex;
-                while (prevIndex >= 0)
-                {
-                    var prevToken = tokens[prevIndex];
-
-                    // 跳过测试标记
-                    if (prevToken.Type == LangTokenType.Dollar ||
-                        (prevToken.Type == LangTokenType.Number && prevIndex > 0 &&
-                         tokens[prevIndex - 1].Type == LangTokenType.Dollar))
-                    {
-                        prevIndex--;
-                        continue;
-                    }
-
-                    // 如果前面不是点号，到达链的起点
-                    if (prevToken.Type != LangTokenType.Dot)
-                    {
-                        return chainTokens;
-                    }
-
-                    // 前面是点号，继续向前
-                    break;
-                }
-
-                // 如果没有更多 token 了，也返回
-                if (prevIndex < 0)
+                var prevIndex = SkipTestMarkersBackward(currentIndex);
+                if (prevIndex < 0 || tokens[prevIndex].Type != LangTokenType.Dot)
                 {
                     return chainTokens;
                 }
@@ -177,226 +249,248 @@ public class MemberChainAnalyzer(
         return chainTokens;
     }
 
-    /// <summary>
-    /// 判断 token 是否属于成员链
-    /// </summary>
-    private bool IsChainToken(LangTokenType type)
+    private static bool IsChainToken(LangTokenType type)
     {
-        return type == LangTokenType.Identifier ||
-               type == LangTokenType.Dot ||
-               type == LangTokenType.LeftParen ||
-               type == LangTokenType.RightParen ||
-               type == LangTokenType.Comma ||
-               type == LangTokenType.String ||
-               type == LangTokenType.Number ||
-               type == LangTokenType.True ||
-               type == LangTokenType.False;
+        return type is LangTokenType.Identifier
+            or LangTokenType.This
+            or LangTokenType.Super
+            or LangTokenType.Dot
+            or LangTokenType.LeftParen
+            or LangTokenType.RightParen
+            or LangTokenType.Comma
+            or LangTokenType.String
+            or LangTokenType.Number
+            or LangTokenType.True
+            or LangTokenType.False;
     }
 
-    /// <summary>
-    /// 推断成员链的类型
-    /// 例如: obj.getB().getC()
-    /// - obj 是 A 类型
-    /// - getB() 返回 B 类型
-    /// - getC() 返回 C 类型
-    /// </summary>
-    private SymbolInfo? InferChainType(List<LangToken> chainTokens)
+    private MemberChainResult? InferChainType(List<LangToken> chainTokens, int scopeLine, int scopeColumn)
     {
         if (chainTokens.Count == 0)
         {
             return null;
         }
 
-        // 1. 第一个 token 必须是标识符（变量名或类名）
+        var scope = rootScope?.FindInnermostScope(scopeLine, scopeColumn);
+        var enclosingClass = scope?.FindEnclosingClass();
+
+        SymbolInfo? currentType;
+        bool isStaticAccess = false;
+        bool isSuperAccess = false;
+        int nextIndex = 1;
+
         var firstToken = chainTokens[0];
-        if (firstToken.Type != LangTokenType.Identifier)
+        if (firstToken.Type == LangTokenType.This)
         {
-            Console.WriteLine($"[InferChainType] First token is not identifier: {firstToken.Type}");
+            currentType = enclosingClass;
+            if (currentType == null)
+            {
+                return null;
+            }
+        }
+        else if (firstToken.Type == LangTokenType.Super)
+        {
+            if (enclosingClass == null || string.IsNullOrEmpty(enclosingClass.BaseClassName))
+            {
+                return null;
+            }
+
+            currentType = TypeResolver.ResolveTypeSymbol(
+                enclosingClass.BaseClassName, symbolTable, workspaceIndex, documentUri);
+            if (currentType == null)
+            {
+                return null;
+            }
+
+            isSuperAccess = true;
+        }
+        else if (firstToken.Type == LangTokenType.Identifier)
+        {
+            var rootName = firstToken.Value;
+            var rootSymbol = ResolveRootSymbol(rootName, scope, scopeLine, scopeColumn);
+            if (rootSymbol == null)
+            {
+                return null;
+            }
+
+            var isRootCall = nextIndex < chainTokens.Count && chainTokens[nextIndex].Type == LangTokenType.LeftParen;
+            if (isRootCall)
+            {
+                nextIndex = SkipMethodArguments(chainTokens, nextIndex);
+                if (TypeResolver.IsTypeDeclaration(rootSymbol))
+                {
+                    // 构造函数调用：User().
+                    currentType = rootSymbol;
+                    isStaticAccess = false;
+                }
+                else if (rootSymbol.Kind is SymbolKind.Function or SymbolKind.Method)
+                {
+                    var retType = TypeResolver.ExtractRawReturnType(rootSymbol.Type);
+                    currentType = TypeResolver.ResolveTypeSymbol(retType, symbolTable, workspaceIndex, documentUri);
+                    isStaticAccess = false;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else if (TypeResolver.IsTypeDeclaration(rootSymbol))
+            {
+                // 直接通过类名/枚举名访问静态成员：MathUtil.
+                currentType = rootSymbol;
+                isStaticAccess = true;
+            }
+            else
+            {
+                currentType = GetSymbolType(rootSymbol);
+                isStaticAccess = false;
+            }
+
+            if (currentType == null)
+            {
+                return null;
+            }
+        }
+        else
+        {
             return null;
         }
 
-        var objectName = firstToken.Value;
-        if (!symbolTable.TryGetValue(objectName, out var currentSymbol))
-        {
-            Console.WriteLine($"[InferChainType] Symbol '{objectName}' not found in symbol table");
-            return null;
-        }
-
-        Console.WriteLine($"[InferChainType] Starting with symbol '{objectName}' (Kind={currentSymbol.Kind}, Type={currentSymbol.Type})");
-
-        // 2. 获取当前对象的类型
-        var currentType = GetSymbolType(currentSymbol);
-        if (currentType == null)
-        {
-            Console.WriteLine($"[InferChainType] Failed to get type for '{objectName}'");
-            return null;
-        }
-
-        Console.WriteLine($"[InferChainType] Initial type: {currentType.Name}");
-
-        // 3. 遍历链中的每个成员访问
-        int i = 1; // 跳过第一个标识符
+        // 逐步遍历成员访问链
+        int i = nextIndex;
         while (i < chainTokens.Count)
         {
             var token = chainTokens[i];
-
-            // 跳过点号
             if (token.Type == LangTokenType.Dot)
             {
                 i++;
                 continue;
             }
 
-            // 处理成员访问
             if (token.Type == LangTokenType.Identifier)
             {
                 var memberName = token.Value;
-                Console.WriteLine($"[InferChainType] Accessing member '{memberName}' on type '{currentType.Name}'");
-
-                // 查找成员
-                if (!currentType.Members.TryGetValue(memberName, out var member))
+                var resolvedMember = TypeResolver.FindMember(
+                    currentType, memberName, symbolTable, workspaceIndex, documentUri);
+                if (resolvedMember == null)
                 {
-                    Console.WriteLine($"[InferChainType] Member '{memberName}' not found in type '{currentType.Name}'");
                     return null;
                 }
 
-                Console.WriteLine($"[InferChainType] Found member '{memberName}' (Kind={member.Kind}, Type={member.Type})");
-
-                // 检查下一个 token 是否是括号（方法调用）
+                var member = resolvedMember.Value.Member;
                 bool isMethodCall = i + 1 < chainTokens.Count &&
-                                   chainTokens[i + 1].Type == LangTokenType.LeftParen;
+                                    chainTokens[i + 1].Type == LangTokenType.LeftParen;
 
                 if (isMethodCall)
                 {
-                    // 方法调用：跳过参数列表
                     i = SkipMethodArguments(chainTokens, i + 1);
-
-                    // 获取方法的返回类型（从签名中提取）
-                    var returnType = ExtractReturnType(member.Type);
+                    var returnType = TypeResolver.ExtractRawReturnType(member.Type);
                     if (string.IsNullOrEmpty(returnType) || returnType == "void")
                     {
-                        Console.WriteLine($"[InferChainType] Method '{memberName}' returns void or has no return type");
                         return null;
                     }
 
-                    // 查找返回类型的符号
-                    if (!symbolTable.TryGetValue(returnType, out currentType))
+                    currentType = TypeResolver.ResolveTypeSymbol(returnType, symbolTable, workspaceIndex, documentUri);
+                    if (currentType == null)
                     {
-                        Console.WriteLine($"[InferChainType] Return type '{returnType}' not found in symbol table");
                         return null;
                     }
 
-                    Console.WriteLine($"[InferChainType] Method '{memberName}' returns type '{currentType.Name}'");
+                    isStaticAccess = false;
+                    isSuperAccess = false;
                 }
                 else
                 {
-                    // 属性访问（也可能从签名中提取类型）
-                    var propertyType = ExtractReturnType(member.Type);
+                    var propertyType = TypeResolver.ExtractRawReturnType(member.Type);
                     if (string.IsNullOrEmpty(propertyType))
                     {
-                        Console.WriteLine($"[InferChainType] Property '{memberName}' has no type");
                         return null;
                     }
 
-                    // 查找属性类型的符号
-                    if (!symbolTable.TryGetValue(propertyType, out currentType))
+                    currentType = TypeResolver.ResolveTypeSymbol(propertyType, symbolTable, workspaceIndex, documentUri);
+                    if (currentType == null)
                     {
-                        Console.WriteLine($"[InferChainType] Property type '{propertyType}' not found in symbol table");
                         return null;
                     }
 
-                    Console.WriteLine($"[InferChainType] Property '{memberName}' has type '{currentType.Name}'");
+                    isStaticAccess = false;
+                    isSuperAccess = false;
+                    i++;
                 }
-
-                i++;
             }
             else
             {
-                Console.WriteLine($"[InferChainType] Unexpected token type: {token.Type}");
                 i++;
             }
         }
 
-        return currentType;
+        return new MemberChainResult(currentType, isStaticAccess, enclosingClass, isSuperAccess);
     }
 
-    /// <summary>
-    /// 跳过方法调用的参数列表
-    /// </summary>
-    private int SkipMethodArguments(List<LangToken> tokens, int startIndex)
+    private SymbolInfo? ResolveRootSymbol(string name, SymbolScope? scope, int scopeLine, int scopeColumn)
     {
-        if (startIndex >= tokens.Count || tokens[startIndex].Type != LangTokenType.LeftParen)
+        if (scope != null)
+        {
+            var scoped = scope.Resolve(name, scopeLine, scopeColumn);
+            if (scoped != null)
+            {
+                return scoped;
+            }
+        }
+
+        if (symbolTable.TryGetValue(name, out var local))
+        {
+            return local;
+        }
+
+        if (workspaceIndex != null &&
+            workspaceIndex.TryResolveSymbol(name, documentUri, out var wsSymbol, out _) &&
+            wsSymbol != null)
+        {
+            return wsSymbol;
+        }
+
+        return null;
+    }
+
+    private static int SkipMethodArguments(List<LangToken> chainTokens, int startIndex)
+    {
+        if (startIndex >= chainTokens.Count || chainTokens[startIndex].Type != LangTokenType.LeftParen)
         {
             return startIndex;
         }
 
         int depth = 1;
         int i = startIndex + 1;
-
-        while (i < tokens.Count && depth > 0)
+        while (i < chainTokens.Count && depth > 0)
         {
-            if (tokens[i].Type == LangTokenType.LeftParen)
+            if (chainTokens[i].Type == LangTokenType.LeftParen)
             {
                 depth++;
             }
-            else if (tokens[i].Type == LangTokenType.RightParen)
+            else if (chainTokens[i].Type == LangTokenType.RightParen)
             {
                 depth--;
             }
+
             i++;
         }
 
         return i;
     }
 
-    /// <summary>
-    /// 获取符号的类型信息
-    /// </summary>
     private SymbolInfo? GetSymbolType(SymbolInfo symbol)
     {
-        if (symbol.Kind == SymbolKind.Class)
+        if (TypeResolver.IsTypeDeclaration(symbol))
         {
-            // 符号本身就是类
             return symbol;
         }
-        else if (symbol.Kind == SymbolKind.Variable && !string.IsNullOrEmpty(symbol.Type))
+
+        if (!string.IsNullOrEmpty(symbol.Type))
         {
-            // 变量：查找其类型
-            if (symbolTable.TryGetValue(symbol.Type, out var typeSymbol) &&
-                typeSymbol.Kind == SymbolKind.Class)
-            {
-                return typeSymbol;
-            }
+            return TypeResolver.ResolveTypeSymbol(symbol.Type, symbolTable, workspaceIndex, documentUri);
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// 从方法签名中提取返回类型
-    /// 例如：
-    /// - "func getB() -> B" => "B"
-    /// - "func getValue() -> int" => "int"
-    /// - "B" => "B"
-    /// </summary>
-    private string? ExtractReturnType(string? typeOrSignature)
-    {
-        if (string.IsNullOrEmpty(typeOrSignature))
-        {
-            return null;
-        }
-
-        // 如果包含 "->", 这是一个方法签名
-        var arrowIndex = typeOrSignature.IndexOf("->");
-        if (arrowIndex != -1)
-        {
-            // 提取箭头后的返回类型
-            var returnType = typeOrSignature.Substring(arrowIndex + 2).Trim();
-            Console.WriteLine($"[ExtractReturnType] Extracted '{returnType}' from '{typeOrSignature}'");
-            return returnType;
-        }
-
-        // 否则直接返回类型字符串
-        return typeOrSignature;
     }
 }

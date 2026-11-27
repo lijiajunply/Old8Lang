@@ -64,9 +64,11 @@ class Program
                 .WithHandler<DebugControlHandler>()
         );
 
-        // 初始化完成后设置工作区索引根目录，并在工作区文件夹变化时刷新
+        // 初始化完成后设置工作区索引根目录，绑定到 DocumentManager，并在工作区文件夹变化时刷新
         await server.WasStarted;
         var workspaceIndex = server.Services.GetRequiredService<WorkspaceIndex>();
+        var documentManager = server.Services.GetRequiredService<DocumentManager>();
+        documentManager.AttachWorkspaceIndex(workspaceIndex);
         workspaceIndex.SetRoots(ResolveWorkspaceRoots(server));
         server.WorkspaceFolderManager.WorkspaceFolders.Subscribe(
             new WorkspaceFolderObserver(workspaceIndex));

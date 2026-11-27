@@ -88,8 +88,13 @@ public class DocumentSymbolHandler(DocumentManager documentManager) : IDocumentS
             Models.SymbolKind.Class => SymbolKind.Class,
             Models.SymbolKind.Method => SymbolKind.Method,
             Models.SymbolKind.Property => SymbolKind.Property,
+            Models.SymbolKind.Field => SymbolKind.Field,
             Models.SymbolKind.Parameter => SymbolKind.Variable,
             Models.SymbolKind.Constant => SymbolKind.Constant,
+            Models.SymbolKind.Enum => SymbolKind.Enum,
+            Models.SymbolKind.EnumMember => SymbolKind.EnumMember,
+            Models.SymbolKind.Interface => SymbolKind.Interface,
+            Models.SymbolKind.Module => SymbolKind.Module,
             _ => SymbolKind.Variable
         };
     }

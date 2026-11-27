@@ -223,6 +223,133 @@ public class PositionBasisTests(ITestOutputHelper o)
         Assert.Equal(expectedColumn, range.Start.Character);
     }
 
+    [Fact]
+    public void SymbolTableBuilder_WithoutTokens_UsesAccurateAstPositions()
+    {
+        var code =
+            "class Person {\n" +
+            "    public name: string <- \"Alice\"\n" +
+            "    public func greet(prefix: string) -> string {\n" +
+            "        return prefix + this.name\n" +
+            "    }\n" +
+            "}\n" +
+            "async func loadData(id: int) -> int {\n" +
+            "    return id\n" +
+            "}\n" +
+            "typedVar: int <- 42\n";
+
+        var tokens = LangTokenizer.Tokenize(code);
+        var ast = new LangParser.LangParser(tokens, code, Uri).ParseProgram();
+        var lines = Lines(code);
+
+        // 显式传入 tokens = null，验证位置完全来自 AST 而非 token 扫描变通
+        var builder = new SymbolTableBuilder(Uri, tokens: null);
+        var symbols = builder.Build(ast);
+
+        var person = symbols["Person"];
+        Assert.Equal(0, person.Location.Line);
+        Assert.Equal(lines[0].IndexOf("Person", StringComparison.Ordinal), person.Location.Column);
+        Assert.Equal(person.Location.Column + "Person".Length, person.Location.EndColumn);
+
+        var nameProp = person.Members["name"];
+        Assert.Equal(1, nameProp.Location.Line);
+        Assert.Equal(lines[1].IndexOf("name", StringComparison.Ordinal), nameProp.Location.Column);
+
+        var greetMethod = person.Members["greet"];
+        Assert.Equal(2, greetMethod.Location.Line);
+        Assert.Equal(lines[2].IndexOf("greet", StringComparison.Ordinal), greetMethod.Location.Column);
+
+        var prefixParam = greetMethod.Parameters.Single(p => p.Name == "prefix");
+        Assert.Equal(2, prefixParam.Location.Line);
+        Assert.Equal(lines[2].IndexOf("prefix", StringComparison.Ordinal), prefixParam.Location.Column);
+
+        var loadData = symbols["loadData"];
+        Assert.Equal(6, loadData.Location.Line);
+        Assert.Equal(lines[6].IndexOf("loadData", StringComparison.Ordinal), loadData.Location.Column);
+
+        var typedVar = symbols["typedVar"];
+        Assert.Equal(9, typedVar.Location.Line);
+        Assert.Equal(0, typedVar.Location.Column);
+        Assert.Equal("typedVar".Length, typedVar.Location.EndColumn);
+    }
+
+    [Fact]
+    public void Parser_RecordsBlockEndPositionsAndControlFlowBindingPositions()
+    {
+        var code =
+            "func demo() -> void {\n" +
+            "    for item in [1, 2] {\n" +
+            "        try {\n" +
+            "            PrintLine(item)\n" +
+            "        } catch (err) {\n" +
+            "            PrintLine(err)\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n" +
+            "enum Color {\n" +
+            "    Red,\n" +
+            "    Blue\n" +
+            "}\n";
+
+        var tokens = LangTokenizer.Tokenize(code);
+        var ast = new LangParser.LangParser(tokens, code, Uri).ParseProgram();
+        var lines = Lines(code);
+
+        var funcInit = ast.ImportStatements.OfType<Old8Lang.AST.Statement.FuncInit>().Single();
+        Assert.Equal(1, funcInit.Body.Position.Line);
+        Assert.Equal(9, funcInit.Body.EndPosition.Line);
+
+        var forIn = funcInit.Body.OtherStatements.OfType<Old8Lang.AST.Statement.ForInStatement>().Single();
+        Assert.Equal(2, forIn.Id.Position.Line);
+        Assert.Equal(lines[1].IndexOf("item", StringComparison.Ordinal), forIn.Id.Position.Column);
+
+        var tryStmt = ((Old8Lang.AST.Statement.BlockStatement)forIn.Body).OtherStatements
+            .OfType<Old8Lang.AST.Statement.TryStatement>().Single();
+        Assert.Equal(3, tryStmt.Position.Line);
+        var catchVar = tryStmt.CatchBlocks.Single().exceptionVar!;
+        Assert.Equal(5, catchVar.Position.Line);
+        Assert.Equal(lines[4].IndexOf("err", StringComparison.Ordinal), catchVar.Position.Column);
+
+        var enumInit = ast.OtherStatements.OfType<Old8Lang.AST.Statement.EnumInit>().Single();
+        Assert.Equal(10, enumInit.NamePosition.Line);
+        Assert.Equal(lines[9].IndexOf("Color", StringComparison.Ordinal), enumInit.NamePosition.Column);
+    }
+
+    [Fact]
+    public async Task DocumentLinkHandler_UsesExactImportModulePositionFromAst()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "old8lang-doclink-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var helperPath = Path.Combine(root, "helper.old8");
+            var mainPath = Path.Combine(root, "main.old8");
+            File.WriteAllText(helperPath, "func hi() -> void {}\n");
+            var code = "import \"./helper.old8\"\n";
+            File.WriteAllText(mainPath, code);
+
+            var mainUri = DocumentUri.FromFileSystemPath(mainPath).ToString();
+            var documentManager = new DocumentManager();
+            documentManager.UpdateDocument(mainUri, code);
+
+            var handler = new DocumentLinkHandler(documentManager);
+            var links = (await handler.Handle(new DocumentLinkParams
+            {
+                TextDocument = new TextDocumentIdentifier { Uri = DocumentUri.From(mainUri) }
+            }, CancellationToken.None))!.ToList();
+
+            var link = Assert.Single(links);
+            Assert.Equal(0, link.Range.Start.Line);
+            Assert.Equal(code.IndexOf("\"./helper.old8\"", StringComparison.Ordinal), link.Range.Start.Character);
+            Assert.Equal(link.Range.Start.Character + "\"./helper.old8\"".Length, link.Range.End.Character);
+            Assert.Equal(DocumentUri.FromFileSystemPath(helperPath), link.Target);
+        }
+        finally
+        {
+            try { Directory.Delete(root, recursive: true); } catch { }
+        }
+    }
+
     private static void AssertLocation(SourceLocation location, string label, string[] source, List<string> seen)
     {
         Assert.InRange(location.Line, 0, source.Length - 1);

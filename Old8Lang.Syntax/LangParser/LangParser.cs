@@ -174,7 +174,16 @@ public class LangParser
             }
 
             // 返回包含所有语句的块语句
-            return new BlockStatement(statements);
+            SourcePosition startPos = default;
+            SourcePosition endPos = default;
+            if (_context.Tokens.Count > 0)
+            {
+                var first = _context.Tokens[0];
+                var last = _context.Tokens[^1];
+                startPos = new SourcePosition(first.Line, first.Column, _context.FileName, first.Value);
+                endPos = new SourcePosition(last.Line, last.Column + Math.Max(1, last.Value.Length), _context.FileName, last.Value);
+            }
+            return new BlockStatement(statements, startPos, endPos);
         }
         catch (SyntaxError)
         {

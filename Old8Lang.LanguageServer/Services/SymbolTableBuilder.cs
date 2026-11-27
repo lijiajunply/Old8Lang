@@ -9,73 +9,140 @@ using Old8Lang.LangParser;
 namespace Old8Lang.LanguageServer.Services;
 
 /// <summary>
-/// 符号表构建器 - 遍历AST构建符号表
+/// 符号表构建器 - 遍历 AST 构建带词法作用域链的符号表。
+/// 顶层 <see cref="Build"/> 仅返回全局作用域符号，局部符号全部挂载在 <see cref="RootScope"/> 的子作用域树中。
 /// </summary>
 public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, string? sourceCode = null)
 {
-    private readonly Dictionary<string, SymbolInfo> _symbolTable = new();
     private readonly List<LangToken>? _tokens = tokens;
     private readonly string? _sourceCode = sourceCode;
 
-    // 当前正在处理的类的 token 范围（用于在类内查找成员文档注释）
+    // 当前正在处理的类的 token 范围（用于在类内查找字段文档注释）
     private int _currentClassStartTokenIndex = -1;
     private int _currentClassEndTokenIndex = -1;
 
+    /// <summary>构建完成后的全局词法作用域根结点</summary>
+    public SymbolScope? RootScope { get; private set; }
+
     /// <summary>
-    /// 构建符号表
+    /// 构建符号表与词法作用域树，返回顶层全局符号字典（保持向后兼容）。
     /// </summary>
-    public Dictionary<string, SymbolInfo> Build(BlockStatement ast)
+    public Dictionary<string, SymbolInfo> Build(BlockStatement ast) => BuildWithScope(ast).Symbols;
+
+    /// <summary>
+    /// 构建并返回词法作用域树根结点（包含全局符号表与所有嵌套子作用域）。
+    /// </summary>
+    public SymbolScope BuildWithScope(BlockStatement ast)
     {
-        _symbolTable.Clear();
-        VisitBlockStatement(ast);
-        return _symbolTable;
+        var globalRange = new SourceLocation
+        {
+            Uri = uri,
+            Line = 0,
+            Column = 0,
+            EndLine = int.MaxValue,
+            EndColumn = int.MaxValue
+        };
+
+        RootScope = new SymbolScope
+        {
+            Kind = ScopeKind.Global,
+            Parent = null,
+            Range = globalRange
+        };
+
+        VisitBlockStatement(ast, RootScope);
+        return RootScope;
     }
 
     /// <summary>
-    /// 访问块语句
+    /// 访问块语句（在指定作用域中处理声明与语句）
     /// </summary>
-    private void VisitBlockStatement(BlockStatement block)
+    private void VisitBlockStatement(BlockStatement block, SymbolScope scope)
     {
-        // 访问 import 语句（包括函数、类声明）
+        // 先注册函数、类、导入等声明，确保同作用域内支持前向引用与类型解析
         foreach (var statement in block.ImportStatements)
         {
-            VisitStatement(statement);
+            VisitStatement(statement, scope);
         }
 
-        // 访问其他语句（包括变量声明）
         foreach (var statement in block.OtherStatements)
         {
-            VisitStatement(statement);
+            VisitStatement(statement, scope);
         }
     }
 
     /// <summary>
     /// 访问单个语句
     /// </summary>
-    private void VisitStatement(IOldLangTree statement)
+    private void VisitStatement(IOldLangTree statement, SymbolScope scope)
     {
         switch (statement)
         {
             case FuncInit funcInit:
-                VisitFunction(funcInit);
+                VisitFunction(funcInit, scope);
                 break;
             case AsyncFuncInit asyncFuncInit:
-                VisitAsyncFunction(asyncFuncInit);
+                VisitAsyncFunction(asyncFuncInit, scope);
                 break;
             case ClassInit classInit:
-                VisitClass(classInit);
+                VisitClass(classInit, scope);
+                break;
+            case EnumInit enumInit:
+                VisitEnum(enumInit, scope);
                 break;
             case SetStatement setStatement:
-                VisitVariable(setStatement);
+                VisitVariable(setStatement, scope);
                 break;
             case NativeStatement nativeStatement:
-                VisitNativeStatement(nativeStatement);
+                VisitNativeStatement(nativeStatement, scope);
                 break;
             case ExternStatement externStatement:
-                VisitExternStatement(externStatement);
+                VisitExternStatement(externStatement, scope);
                 break;
             case ImportStatement importStatement:
-                VisitImportStatement(importStatement);
+                VisitImportStatement(importStatement, scope);
+                break;
+            case IfStatement ifStatement:
+                VisitIfStatement(ifStatement, scope);
+                break;
+            case WhileStatement whileStatement:
+                VisitWhileStatement(whileStatement, scope);
+                break;
+            case ForStatement forStatement:
+                VisitForStatement(forStatement, scope);
+                break;
+            case ForInStatement forInStatement:
+                VisitForInStatement(forInStatement, scope);
+                break;
+            case AsyncForInStatement asyncForInStatement:
+                VisitAsyncForInStatement(asyncForInStatement, scope);
+                break;
+            case TryStatement tryStatement:
+                VisitTryStatement(tryStatement, scope);
+                break;
+            case UsingStatement usingStatement:
+                VisitUsingStatement(usingStatement, scope);
+                break;
+            case SwitchStatement switchStatement:
+                VisitSwitchStatement(switchStatement, scope);
+                break;
+            case SelectStatement selectStatement:
+                VisitSelectStatement(selectStatement, scope);
+                break;
+            case DeferStatement deferStatement:
+                VisitStatement(deferStatement.Statement, scope);
+                break;
+            case BlockStatement nestedBlock:
+            {
+                var childScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(nestedBlock, nestedBlock.Position));
+                VisitBlockStatement(nestedBlock, childScope);
+                break;
+            }
+            case ReturnStatement returnStatement:
+                VisitExpressionForNestedScopes(returnStatement.Expression, scope);
+                break;
+            case FuncRunStatement funcRunStatement:
+                VisitExpressionForNestedScopes(funcRunStatement.Expression, scope);
                 break;
         }
     }
@@ -83,39 +150,23 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// <summary>
     /// 访问函数声明
     /// </summary>
-    private void VisitFunction(FuncInit funcInit)
+    private void VisitFunction(FuncInit funcInit, SymbolScope parentScope)
     {
-        var funcValue = funcInit.GetFuncValue();
-        if (funcValue.Id == null) return; // 跳过Lambda
+        var syntax = funcInit.Syntax;
+        if (syntax.Id == null) return; // 跳过 Lambda
 
-        var funcName = funcValue.Id.IdName;
+        var funcName = syntax.Id.IdName;
+        var location = CreateLocation(syntax.Id.Position, funcName.Length, funcInit.Position);
 
-        // 尝试从 token 列表中查找位置
-        var tokenLocation = FindSymbolLocationFromTokens(funcName, LangTokenType.Func);
-        var location = tokenLocation ?? new SourceLocation
-        {
-            Uri = uri,
-            Line = funcInit.Position.Line - 1,
-            Column = funcInit.Position.Column,
-            EndLine = funcInit.Position.Line - 1,
-            EndColumn = funcInit.Position.Column + funcName.Length
-        };
-
-        // 构建函数签名
-        var paramList = funcValue.Ids != null
+        var paramList = syntax.Parameters.Count > 0
             ? string.Join(", ",
-                funcValue.Ids.Select(p =>
+                syntax.Parameters.Select(p =>
                     $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
             : "";
-        var returnType = funcValue.Id.AssumptionType ?? "void";
+        var returnType = string.IsNullOrEmpty(syntax.Id.AssumptionType) ? "void" : syntax.Id.AssumptionType;
         var funcSignature = $"func {funcName}({paramList}) -> {returnType}";
 
-        // 提取文档注释
-        string? documentation = null;
-        if (funcValue.DocComment != null)
-        {
-            documentation = FormatDocComment(funcValue.DocComment);
-        }
+        var documentation = syntax.DocComment != null ? FormatDocComment(syntax.DocComment) : null;
 
         var funcSymbol = new SymbolInfo
         {
@@ -123,81 +174,60 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Kind = SymbolKind.Function,
             Type = funcSignature,
             Location = location,
-            Documentation = documentation
+            Documentation = documentation,
+            HasExplicitTypeAnnotation = !string.IsNullOrEmpty(syntax.Id.AssumptionType),
+            GenericParameters = syntax.GenericParameters?.Select(g => g.Name).ToList() ?? []
         };
 
-        // 添加函数参数到符号的参数列表
-        if (funcValue.Ids != null)
+        parentScope.Declare(funcSymbol);
+
+        // 为函数体创建独立词法作用域（涵盖声明行到右花括号，保证参数和函数体均落入该作用域）
+        var funcScope = CreateChildScope(
+            ScopeKind.Function,
+            parentScope,
+            CreateDeclarationBlockRange(funcInit.Position, syntax.Body),
+            ownerSymbol: funcSymbol);
+
+        foreach (var param in syntax.Parameters)
         {
-            foreach (var param in funcValue.Ids)
+            var paramLocation = CreateLocation(param.Position, param.IdName.Length, funcInit.Position);
+            var paramSymbol = new SymbolInfo
             {
-                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
-                if (paramLocation == null)
-                {
-                    paramLocation = new SourceLocation
-                    {
-                        Uri = uri,
-                        Line = param.Position.Line - 1,
-                        Column = param.Position.Column,
-                        EndLine = param.Position.Line - 1,
-                        EndColumn = param.Position.Column + param.IdName.Length
-                    };
-                }
+                Name = param.IdName,
+                Kind = SymbolKind.Parameter,
+                Type = string.IsNullOrEmpty(param.AssumptionType) ? "var" : param.AssumptionType,
+                Location = paramLocation,
+                Parent = funcSymbol,
+                HasExplicitTypeAnnotation = !string.IsNullOrEmpty(param.AssumptionType)
+            };
 
-                var paramSymbol = new SymbolInfo
-                {
-                    Name = param.IdName,
-                    Kind = SymbolKind.Parameter,
-                    Type = param.AssumptionType ?? "var",
-                    Location = paramLocation,
-                    Parent = funcSymbol
-                };
-
-                funcSymbol.Parameters.Add(paramSymbol);
-            }
+            funcSymbol.Parameters.Add(paramSymbol);
+            funcScope.Declare(paramSymbol);
         }
 
-        _symbolTable[funcName] = funcSymbol;
-
-        // 访问函数体中的局部变量
-        VisitBlockStatement(funcValue.BlockStatement);
+        VisitBlockStatement(syntax.Body, funcScope);
     }
 
     /// <summary>
     /// 访问异步函数声明
     /// </summary>
-    private void VisitAsyncFunction(AsyncFuncInit asyncFuncInit)
+    private void VisitAsyncFunction(AsyncFuncInit asyncFuncInit, SymbolScope parentScope)
     {
-        var funcValue = asyncFuncInit.GetAsyncFuncValue();
-        if (funcValue.Id == null) return;
+        var syntax = asyncFuncInit.Syntax;
+        if (syntax.Id == null) return;
 
-        var funcName = funcValue.Id.IdName;
+        var funcName = syntax.Id.IdName;
+        var location = CreateLocation(syntax.Id.Position, funcName.Length, asyncFuncInit.Position);
 
-        // 尝试从 token 列表中查找位置
-        var tokenLocation = FindSymbolLocationFromTokens(funcName, LangTokenType.Func);
-        var location = tokenLocation ?? new SourceLocation
-        {
-            Uri = uri,
-            Line = asyncFuncInit.Position.Line - 1,
-            Column = asyncFuncInit.Position.Column,
-            EndLine = asyncFuncInit.Position.Line - 1,
-            EndColumn = asyncFuncInit.Position.Column + funcName.Length
-        };
-
-        var paramList = funcValue.Ids != null
+        var paramList = syntax.Parameters.Count > 0
             ? string.Join(", ",
-                funcValue.Ids.Select(p =>
+                syntax.Parameters.Select(p =>
                     $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
             : "";
-        var returnType = funcValue.Id.AssumptionType ?? "void";
+        var returnType = string.IsNullOrEmpty(syntax.Id.AssumptionType) ? "void" : syntax.Id.AssumptionType;
         var funcSignature = $"async func {funcName}({paramList}) -> {returnType}";
 
-        // 提取文档注释
-        string? documentation = null;
-        if (funcValue.DocComment != null)
-        {
-            documentation = FormatDocComment(funcValue.DocComment);
-        }
+        var documentation = syntax.DocComment != null ? FormatDocComment(syntax.DocComment) : null;
 
         var asyncFuncSymbol = new SymbolInfo
         {
@@ -205,135 +235,174 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Kind = SymbolKind.Function,
             Type = funcSignature,
             Location = location,
-            Documentation = documentation
+            Documentation = documentation,
+            HasExplicitTypeAnnotation = !string.IsNullOrEmpty(syntax.Id.AssumptionType),
+            GenericParameters = syntax.GenericParameters?.Select(g => g.Name).ToList() ?? []
         };
 
-        // 添加函数参数到符号的参数列表
-        if (funcValue.Ids != null)
+        parentScope.Declare(asyncFuncSymbol);
+
+        // 异步函数同样拥有独立的词法作用域，局部变量不污染顶层符号表
+        var funcScope = CreateChildScope(
+            ScopeKind.Function,
+            parentScope,
+            CreateDeclarationBlockRange(asyncFuncInit.Position, syntax.Body),
+            ownerSymbol: asyncFuncSymbol);
+
+        foreach (var param in syntax.Parameters)
         {
-            foreach (var param in funcValue.Ids)
+            var paramLocation = CreateLocation(param.Position, param.IdName.Length, asyncFuncInit.Position);
+            var paramSymbol = new SymbolInfo
             {
-                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
-                if (paramLocation == null)
-                {
-                    paramLocation = new SourceLocation
-                    {
-                        Uri = uri,
-                        Line = param.Position.Line - 1,
-                        Column = param.Position.Column,
-                        EndLine = param.Position.Line - 1,
-                        EndColumn = param.Position.Column + param.IdName.Length
-                    };
-                }
+                Name = param.IdName,
+                Kind = SymbolKind.Parameter,
+                Type = string.IsNullOrEmpty(param.AssumptionType) ? "var" : param.AssumptionType,
+                Location = paramLocation,
+                Parent = asyncFuncSymbol,
+                HasExplicitTypeAnnotation = !string.IsNullOrEmpty(param.AssumptionType)
+            };
 
-                var paramSymbol = new SymbolInfo
-                {
-                    Name = param.IdName,
-                    Kind = SymbolKind.Parameter,
-                    Type = param.AssumptionType ?? "var",
-                    Location = paramLocation,
-                    Parent = asyncFuncSymbol
-                };
-
-                asyncFuncSymbol.Parameters.Add(paramSymbol);
-            }
+            asyncFuncSymbol.Parameters.Add(paramSymbol);
+            funcScope.Declare(paramSymbol);
         }
 
-        _symbolTable[funcName] = asyncFuncSymbol;
-
-        // 注意：异步函数的 BlockStatement 是 internal 的，且函数体内的局部变量不应该被添加到全局符号表
+        VisitBlockStatement(syntax.Body, funcScope);
     }
 
     /// <summary>
-    /// 访问类声明
+    /// 访问类 / 接口 / Mixin 声明
     /// </summary>
-    private void VisitClass(ClassInit classInit)
+    private void VisitClass(ClassInit classInit, SymbolScope parentScope)
     {
+        var syntax = classInit.Syntax;
         var typeTemplate = classInit.GetTypeTemplate();
-        var className = typeTemplate.ClassName;
+        var className = syntax.ClassName;
+        var location = CreateLocation(syntax.NamePosition, className.Length, classInit.Position);
 
-        // 尝试从 token 列表中查找位置和类的 token 范围
-        var tokenLocation = FindSymbolLocationFromTokens(className, LangTokenType.Class);
-        var location = tokenLocation ?? new SourceLocation
-        {
-            Uri = uri,
-            Line = classInit.Position.Line - 1,
-            Column = classInit.Position.Column,
-            EndLine = classInit.Position.Line - 1,
-            EndColumn = classInit.Position.Column + className.Length
-        };
-
-        // 设置当前类的 token 范围
         FindClassTokenRange(className);
 
-        // 提取类文档注释
-        string? documentation = null;
-        if (typeTemplate.DocComment != null)
-        {
-            documentation = FormatDocComment(typeTemplate.DocComment);
-        }
+        var documentation = syntax.DocComment != null ? FormatDocComment(syntax.DocComment) : null;
+        var prefix = syntax.IsInterface ? "interface" : syntax.IsMixin ? "mixin" : "class";
 
         var classSymbol = new SymbolInfo
         {
             Name = className,
-            Kind = SymbolKind.Class,
-            Type = $"class {className}",
+            Kind = syntax.IsInterface ? SymbolKind.Interface : SymbolKind.Class,
+            Type = $"{prefix} {className}",
             Location = location,
-            Documentation = documentation
+            Documentation = documentation,
+            BaseClassName = syntax.ParentClassName,
+            InterfaceNames = [.. syntax.ImplementsNames],
+            MixinNames = [.. syntax.MixinNames],
+            IsInterface = syntax.IsInterface,
+            IsAbstract = syntax.IsAbstract,
+            IsMixin = syntax.IsMixin,
+            GenericParameters = syntax.GenericParameters?.Select(g => g.Name).ToList() ?? []
         };
 
-        _symbolTable[className] = classSymbol;
+        parentScope.Declare(classSymbol);
 
-        // 访问类的成员（方法、属性）
-        VisitClassMembers(classSymbol, typeTemplate);
+        var classScope = CreateChildScope(
+            ScopeKind.Class,
+            parentScope,
+            CreateDeclarationBlockRange(classInit.Position, syntax.Body),
+            ownerSymbol: classSymbol);
 
-        // 重置类的 token 范围
+        VisitClassMembers(classSymbol, typeTemplate, classScope);
+
         _currentClassStartTokenIndex = -1;
         _currentClassEndTokenIndex = -1;
     }
 
     /// <summary>
-    /// 访问类的成员（方法和属性）
+    /// 访问类的成员（方法和属性）并为其方法建立独立方法作用域
     /// </summary>
-    private void VisitClassMembers(SymbolInfo classSymbol, TypeTemplate typeTemplate)
+    private void VisitClassMembers(SymbolInfo classSymbol, TypeTemplate typeTemplate, SymbolScope classScope)
     {
-        // 访问实例成员
+        // 第一遍：先注册所有字段和属性，以便方法体内部引用字段时即可获取准确类型
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberExpr is not FuncLangValue && memberExpr is not MethodOverloadList)
+            {
+                var prop = CreatePropertySymbol(memberId, memberExpr, isStatic: false, classScope);
+                prop.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = prop;
+                classScope.Declare(prop);
+            }
+        }
+
+        foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
+        {
+            if (memberExpr is not FuncLangValue && memberExpr is not MethodOverloadList)
+            {
+                var prop = CreatePropertySymbol(memberId, memberExpr, isStatic: true, classScope);
+                prop.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = prop;
+                classScope.Declare(prop);
+            }
+        }
+
+        // 第二遍：注册实例方法与静态方法并遍历方法体作用域
         foreach (var (memberId, memberExpr) in typeTemplate.Variates)
         {
             if (memberExpr is FuncLangValue funcValue)
             {
-                // 方法
-                var memberSymbol = CreateMethodSymbol(memberId, funcValue, isStatic: false);
-                memberSymbol.Parent = classSymbol;
-                classSymbol.Members[memberId.IdName] = memberSymbol;
+                RegisterMethod(classSymbol, classScope, memberId, funcValue, isStatic: false);
             }
-            else
+            else if (memberExpr is MethodOverloadList overloads && overloads.Overloads.Count > 0)
             {
-                // 属性/字段
-                var memberSymbol = CreatePropertySymbol(memberId, memberExpr, isStatic: false);
-                memberSymbol.Parent = classSymbol;
-                classSymbol.Members[memberId.IdName] = memberSymbol;
+                foreach (var overload in overloads.Overloads)
+                {
+                    RegisterMethod(classSymbol, classScope, memberId, overload, isStatic: false);
+                }
             }
         }
 
-        // 访问静态成员
         foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
         {
             if (memberExpr is FuncLangValue funcValue)
             {
-                // 静态方法
-                var memberSymbol = CreateMethodSymbol(memberId, funcValue, isStatic: true);
-                memberSymbol.Parent = classSymbol;
-                classSymbol.Members[memberId.IdName] = memberSymbol;
+                RegisterMethod(classSymbol, classScope, memberId, funcValue, isStatic: true);
             }
-            else
+            else if (memberExpr is MethodOverloadList overloads && overloads.Overloads.Count > 0)
             {
-                // 静态属性/字段
-                var memberSymbol = CreatePropertySymbol(memberId, memberExpr, isStatic: true);
-                memberSymbol.Parent = classSymbol;
-                classSymbol.Members[memberId.IdName] = memberSymbol;
+                foreach (var overload in overloads.Overloads)
+                {
+                    RegisterMethod(classSymbol, classScope, memberId, overload, isStatic: true);
+                }
             }
         }
+    }
+
+    private void RegisterMethod(
+        SymbolInfo classSymbol,
+        SymbolScope classScope,
+        ClassMemberId memberId,
+        FuncLangValue funcValue,
+        bool isStatic)
+    {
+        var methodSymbol = CreateMethodSymbol(memberId, funcValue, isStatic);
+        methodSymbol.Parent = classSymbol;
+        classSymbol.Members[memberId.IdName] = methodSymbol;
+        classScope.Declare(methodSymbol);
+
+        if (funcValue.BlockStatement == null)
+        {
+            return;
+        }
+
+        var methodScope = CreateChildScope(
+            ScopeKind.Method,
+            classScope,
+            CreateDeclarationBlockRange(funcValue.Position, funcValue.BlockStatement),
+            ownerSymbol: methodSymbol);
+
+        foreach (var paramSymbol in methodSymbol.Parameters)
+        {
+            methodScope.Declare(paramSymbol);
+        }
+
+        VisitBlockStatement(funcValue.BlockStatement, methodScope);
     }
 
     /// <summary>
@@ -342,29 +411,18 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     private SymbolInfo CreateMethodSymbol(ClassMemberId memberId, FuncLangValue funcValue, bool isStatic)
     {
         var methodName = memberId.IdName;
+        var methodNamePos = funcValue.Id?.Position.Line > 0 ? funcValue.Id.Position : memberId.Position;
+        var location = CreateLocation(methodNamePos, methodName.Length, funcValue.Position);
 
-        // 查找方法定义位置
-        var tokenLocation = FindSymbolLocationFromTokens(methodName, LangTokenType.Func);
-        var location = tokenLocation ?? new SourceLocation
-        {
-            Uri = uri,
-            Line = funcValue.Position.Line - 1,
-            Column = funcValue.Position.Column,
-            EndLine = funcValue.Position.Line - 1,
-            EndColumn = funcValue.Position.Column + methodName.Length
-        };
-
-        // 构建方法签名
         var paramList = funcValue.Ids != null
             ? string.Join(", ",
                 funcValue.Ids.Select(p =>
                     $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
             : "";
-        var returnType = funcValue.Id?.AssumptionType ?? "void";
+        var returnType = string.IsNullOrEmpty(funcValue.Id?.AssumptionType) ? "void" : funcValue.Id!.AssumptionType;
         var staticKeyword = isStatic ? "static " : "";
         var methodSignature = $"{staticKeyword}func {methodName}({paramList}) -> {returnType}";
 
-        // 提取方法文档注释
         string? documentation = null;
         if (funcValue.DocComment != null)
         {
@@ -372,7 +430,6 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         }
         else
         {
-            // 如果函数值没有文档注释，尝试从 tokens 中查找
             var docComment = FindDocCommentForMember(methodName);
             if (docComment != null)
             {
@@ -380,7 +437,6 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             }
         }
 
-        // 确定访问修饰符
         var accessModifier = AccessModifier.Public;
         if (memberId.HasModifier(AccessModifierType.Private))
             accessModifier = AccessModifier.Private;
@@ -395,34 +451,25 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Location = location,
             Documentation = documentation,
             AccessModifier = accessModifier,
-            IsStatic = isStatic
+            IsStatic = isStatic,
+            HasExplicitTypeAnnotation = !string.IsNullOrEmpty(funcValue.Id?.AssumptionType),
+            GenericParameters = funcValue.GenericParameters?.Select(g => g.Name).ToList() ?? []
         };
 
-        // 添加方法参数到符号的参数列表
         if (funcValue.Ids != null)
         {
             foreach (var param in funcValue.Ids)
             {
-                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
-                if (paramLocation == null)
-                {
-                    paramLocation = new SourceLocation
-                    {
-                        Uri = uri,
-                        Line = param.Position.Line - 1,
-                        Column = param.Position.Column,
-                        EndLine = param.Position.Line - 1,
-                        EndColumn = param.Position.Column + param.IdName.Length
-                    };
-                }
+                var paramLocation = CreateLocation(param.Position, param.IdName.Length, funcValue.Position);
 
                 var paramSymbol = new SymbolInfo
                 {
                     Name = param.IdName,
                     Kind = SymbolKind.Parameter,
-                    Type = param.AssumptionType ?? "var",
+                    Type = string.IsNullOrEmpty(param.AssumptionType) ? "var" : param.AssumptionType,
                     Location = paramLocation,
-                    Parent = methodSymbol
+                    Parent = methodSymbol,
+                    HasExplicitTypeAnnotation = !string.IsNullOrEmpty(param.AssumptionType)
                 };
 
                 methodSymbol.Parameters.Add(paramSymbol);
@@ -433,32 +480,38 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     }
 
     /// <summary>
-    /// 创建属性符号信息
+    /// 创建属性符号信息（支持无显式注解时从初始化表达式推断类型）
     /// </summary>
-    private SymbolInfo CreatePropertySymbol(ClassMemberId memberId, LangExpression memberExpr, bool isStatic)
+    private SymbolInfo CreatePropertySymbol(
+        ClassMemberId memberId,
+        LangExpression memberExpr,
+        bool isStatic,
+        SymbolScope classScope)
     {
         var propertyName = memberId.IdName;
+        var location = CreateLocation(memberId.Position, propertyName.Length, memberExpr.Position);
 
-        var location = new SourceLocation
+        var hasExplicit = !string.IsNullOrEmpty(memberId.AssumptionType);
+        var propertyType = hasExplicit ? memberId.AssumptionType : null;
+
+        if (string.IsNullOrEmpty(propertyType))
         {
-            Uri = uri,
-            Line = memberExpr.Position.Line - 1,
-            Column = memberExpr.Position.Column,
-            EndLine = memberExpr.Position.Line - 1,
-            EndColumn = memberExpr.Position.Column + propertyName.Length
-        };
+            var inferred = TypeResolver.InferExpressionType(memberExpr, classScope, RootScope?.Symbols);
+            if (!string.IsNullOrEmpty(inferred) && inferred != "null")
+            {
+                propertyType = inferred;
+            }
+        }
 
-        var propertyType = memberId.AssumptionType ?? "var";
+        propertyType ??= "var";
         var staticKeyword = isStatic ? "static " : "";
 
-        // 确定访问修饰符
         var accessModifier = AccessModifier.Public;
         if (memberId.HasModifier(AccessModifierType.Private))
             accessModifier = AccessModifier.Private;
         else if (memberId.HasModifier(AccessModifierType.Protected))
             accessModifier = AccessModifier.Protected;
 
-        // 提取属性文档注释
         string? documentation = null;
         var docComment = FindDocCommentForMember(propertyName);
         if (docComment != null)
@@ -474,219 +527,415 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Location = location,
             Documentation = documentation,
             AccessModifier = accessModifier,
-            IsStatic = isStatic
+            IsStatic = isStatic,
+            HasExplicitTypeAnnotation = hasExplicit
         };
     }
 
     /// <summary>
-    /// 访问变量声明
+    /// 访问枚举声明
     /// </summary>
-    private void VisitVariable(SetStatement setStatement)
+    private void VisitEnum(EnumInit enumInit, SymbolScope scope)
     {
-        if (setStatement.Id == null) return;
+        var enumName = enumInit.EnumName;
+        var location = CreateLocation(enumInit.NamePosition, enumName.Length, enumInit.Position);
 
-        var varName = setStatement.Id.IdName;
-
-        // 尝试从 token 列表中查找变量的位置
-        var tokenLocation = FindVariableLocationFromTokens(varName);
-        var location = tokenLocation ?? new SourceLocation
+        var enumSymbol = new SymbolInfo
         {
-            Uri = uri,
-            Line = setStatement.Position.Line - 1,
-            Column = setStatement.Position.Column,
-            EndLine = setStatement.Position.Line - 1,
-            EndColumn = setStatement.Position.Column
+            Name = enumName,
+            Kind = SymbolKind.Enum,
+            Type = $"enum {enumName}",
+            Location = location
         };
 
-        // 尝试推断类型
-        var varType = setStatement.Id.AssumptionType;
-
-        // 如果没有显式类型标注，尝试从赋值表达式推断
-        if (string.IsNullOrEmpty(varType) && setStatement.Value != null)
+        foreach (var (memberName, _) in enumInit.Members)
         {
-            varType = InferTypeFromExpression(setStatement.Value);
+            var memberSymbol = new SymbolInfo
+            {
+                Name = memberName,
+                Kind = SymbolKind.EnumMember,
+                Type = enumName,
+                Location = location,
+                Parent = enumSymbol,
+                IsStatic = true,
+                AccessModifier = AccessModifier.Public
+            };
+            enumSymbol.Members[memberName] = memberSymbol;
         }
 
-        // 如果仍然无法推断，使用 "any"
+        scope.Declare(enumSymbol);
+    }
+
+    /// <summary>
+    /// 访问变量赋值/声明语句
+    /// </summary>
+    private void VisitVariable(SetStatement setStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(setStatement.Value, scope);
+
+        if (setStatement.Id == null || string.IsNullOrEmpty(setStatement.Id.IdName))
+        {
+            return;
+        }
+
+        var varName = setStatement.Id.IdName;
+        var hasExplicitType = !string.IsNullOrEmpty(setStatement.Id.AssumptionType);
+
+        // 若未带新类型注解且当前函数作用域链内已存在该变量/参数，视为重新赋值而非重新声明
+        if (!hasExplicitType)
+        {
+            var existing = scope.ResolveInCurrentFunction(varName);
+            if (existing != null)
+            {
+                // 如果原变量类型尚未定型（any/var），可借此次赋值补充推断类型
+                if (TypeResolver.IsDynamicType(existing.Type) && setStatement.Value != null)
+                {
+                    var refined = TypeResolver.InferExpressionType(setStatement.Value, scope, RootScope?.Symbols);
+                    if (!string.IsNullOrEmpty(refined) && refined != "null")
+                    {
+                        existing.Type = refined;
+                    }
+                }
+                return;
+            }
+        }
+
+        var location = CreateLocation(setStatement.Id.Position, varName.Length, setStatement.Position);
+
+        var varType = hasExplicitType ? setStatement.Id.AssumptionType : null;
+        if (string.IsNullOrEmpty(varType) && setStatement.Value != null)
+        {
+            varType = TypeResolver.InferExpressionType(setStatement.Value, scope, RootScope?.Symbols);
+        }
+
         varType ??= "any";
 
-        _symbolTable[varName] = new SymbolInfo
+        var varSymbol = new SymbolInfo
         {
             Name = varName,
             Kind = SymbolKind.Variable,
             Type = varType,
-            Location = location
+            Location = location,
+            HasExplicitTypeAnnotation = hasExplicitType
         };
+
+        // 显式类型注解在同一作用域重复声明时记入重复检查；无注解的顶层重赋上面已过滤
+        scope.Declare(varSymbol, recordDuplicateCheck: hasExplicitType);
+    }
+
+    private void VisitIfStatement(IfStatement ifStatement, SymbolScope scope)
+    {
+        foreach (var child in ifStatement.Children)
+        {
+            VisitExpressionForNestedScopes(child.Condition, scope);
+            if (child.Block is BlockStatement childBlock)
+            {
+                var blockScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(childBlock, child.Position));
+                VisitBlockStatement(childBlock, blockScope);
+            }
+            else
+            {
+                VisitStatement(child.Block, scope);
+            }
+        }
+
+        if (ifStatement.ElseBlock != null)
+        {
+            var elseScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(ifStatement.ElseBlock, ifStatement.Position));
+            VisitBlockStatement(ifStatement.ElseBlock, elseScope);
+        }
+    }
+
+    private void VisitWhileStatement(WhileStatement whileStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(whileStatement.Condition, scope);
+        if (whileStatement.Block is BlockStatement whileBlock)
+        {
+            var blockScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(whileBlock, whileStatement.Position));
+            VisitBlockStatement(whileBlock, blockScope);
+        }
+        else
+        {
+            VisitStatement(whileStatement.Block, scope);
+        }
+    }
+
+    private void VisitForStatement(ForStatement forStatement, SymbolScope scope)
+    {
+        var loopScope = CreateChildScope(ScopeKind.Loop, scope, CreateDeclarationBlockRange(forStatement.Position, forStatement.Block));
+
+        // C 风格 for 循环初始化变量始终在循环作用域内独立声明（遮蔽外层同名变量）
+        if (forStatement.Init?.Id != null && !string.IsNullOrEmpty(forStatement.Init.Id.IdName))
+        {
+            var id = forStatement.Init.Id;
+            var hasExplicit = !string.IsNullOrEmpty(id.AssumptionType);
+            var varType = hasExplicit
+                ? id.AssumptionType
+                : TypeResolver.InferExpressionType(forStatement.Init.Value, scope, RootScope?.Symbols) ?? "any";
+
+            loopScope.Declare(new SymbolInfo
+            {
+                Name = id.IdName,
+                Kind = SymbolKind.Variable,
+                Type = varType,
+                Location = CreateLocation(id.Position, id.IdName.Length, forStatement.Init.Position),
+                HasExplicitTypeAnnotation = hasExplicit
+            });
+        }
+
+        VisitExpressionForNestedScopes(forStatement.Condition, loopScope);
+        VisitBlockStatement(forStatement.Block, loopScope);
+    }
+
+    private void VisitForInStatement(ForInStatement forInStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(forInStatement.Expression, scope);
+
+        var bodyBlock = forInStatement.Body as BlockStatement;
+        var range = bodyBlock != null
+            ? CreateDeclarationBlockRange(forInStatement.Position, bodyBlock)
+            : CreateLocation(forInStatement.Position, 3);
+        var loopScope = CreateChildScope(ScopeKind.Loop, scope, range);
+
+        foreach (var id in forInStatement.Ids)
+        {
+            if (string.IsNullOrEmpty(id.IdName)) continue;
+            loopScope.Declare(new SymbolInfo
+            {
+                Name = id.IdName,
+                Kind = SymbolKind.Variable,
+                Type = string.IsNullOrEmpty(id.AssumptionType) ? "any" : id.AssumptionType,
+                Location = CreateLocation(id.Position, id.IdName.Length, forInStatement.Position),
+                HasExplicitTypeAnnotation = !string.IsNullOrEmpty(id.AssumptionType)
+            });
+        }
+
+        if (bodyBlock != null)
+        {
+            VisitBlockStatement(bodyBlock, loopScope);
+        }
+        else
+        {
+            VisitStatement(forInStatement.Body, loopScope);
+        }
+    }
+
+    private void VisitAsyncForInStatement(AsyncForInStatement asyncForInStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(asyncForInStatement.Expression, scope);
+
+        var bodyBlock = asyncForInStatement.Body as BlockStatement;
+        var range = bodyBlock != null
+            ? CreateDeclarationBlockRange(asyncForInStatement.Position, bodyBlock)
+            : CreateLocation(asyncForInStatement.Position, 5);
+        var loopScope = CreateChildScope(ScopeKind.Loop, scope, range);
+
+        foreach (var id in asyncForInStatement.Ids)
+        {
+            if (string.IsNullOrEmpty(id.IdName)) continue;
+            loopScope.Declare(new SymbolInfo
+            {
+                Name = id.IdName,
+                Kind = SymbolKind.Variable,
+                Type = string.IsNullOrEmpty(id.AssumptionType) ? "any" : id.AssumptionType,
+                Location = CreateLocation(id.Position, id.IdName.Length, asyncForInStatement.Position),
+                HasExplicitTypeAnnotation = !string.IsNullOrEmpty(id.AssumptionType)
+            });
+        }
+
+        if (bodyBlock != null)
+        {
+            VisitBlockStatement(bodyBlock, loopScope);
+        }
+        else
+        {
+            VisitStatement(asyncForInStatement.Body, loopScope);
+        }
+    }
+
+    private void VisitTryStatement(TryStatement tryStatement, SymbolScope scope)
+    {
+        var tryScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(tryStatement.TryBlock, tryStatement.Position));
+        VisitBlockStatement(tryStatement.TryBlock, tryScope);
+
+        foreach (var (exceptionType, exceptionVar, filter, catchBlock) in tryStatement.CatchBlocks)
+        {
+            var startPos = exceptionVar is { Position.Line: > 0 } ? exceptionVar.Position : catchBlock.Position;
+            var catchScope = CreateChildScope(ScopeKind.Catch, scope, CreateDeclarationBlockRange(startPos, catchBlock));
+
+            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                catchScope.Declare(new SymbolInfo
+                {
+                    Name = exceptionVar.IdName,
+                    Kind = SymbolKind.Variable,
+                    Type = string.IsNullOrEmpty(exceptionType) ? "Exception" : exceptionType,
+                    Location = CreateLocation(exceptionVar.Position, exceptionVar.IdName.Length, catchBlock.Position),
+                    HasExplicitTypeAnnotation = !string.IsNullOrEmpty(exceptionType)
+                });
+            }
+
+            VisitExpressionForNestedScopes(filter, catchScope);
+            VisitBlockStatement(catchBlock, catchScope);
+        }
+
+        if (tryStatement.FinallyBlock != null)
+        {
+            var finallyScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(tryStatement.FinallyBlock, tryStatement.Position));
+            VisitBlockStatement(tryStatement.FinallyBlock, finallyScope);
+        }
+    }
+
+    private void VisitUsingStatement(UsingStatement usingStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(usingStatement.ResourceExpression, scope);
+        var usingScope = CreateChildScope(
+            ScopeKind.Using,
+            scope,
+            CreateDeclarationBlockRange(usingStatement.Position, usingStatement.BlockStatement));
+
+        if (!string.IsNullOrEmpty(usingStatement.VariableName))
+        {
+            var resourceType = TypeResolver.InferExpressionType(usingStatement.ResourceExpression, scope, RootScope?.Symbols) ?? "any";
+            usingScope.Declare(new SymbolInfo
+            {
+                Name = usingStatement.VariableName,
+                Kind = SymbolKind.Variable,
+                Type = resourceType,
+                Location = CreateLocation(usingStatement.VariablePosition, usingStatement.VariableName.Length, usingStatement.Position)
+            });
+        }
+
+        VisitBlockStatement(usingStatement.BlockStatement, usingScope);
+    }
+
+    private void VisitSwitchStatement(SwitchStatement switchStatement, SymbolScope scope)
+    {
+        VisitExpressionForNestedScopes(switchStatement.SwitchExpression, scope);
+
+        foreach (var caseStmt in switchStatement.SwitchCaseList)
+        {
+            VisitExpressionForNestedScopes(caseStmt.Expression, scope);
+            var caseScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(caseStmt.BlockStatement, caseStmt.Position));
+            VisitBlockStatement(caseStmt.BlockStatement, caseScope);
+        }
+
+        if (switchStatement.DefaultBlockStatement != null)
+        {
+            var defaultScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(switchStatement.DefaultBlockStatement, switchStatement.Position));
+            VisitBlockStatement(switchStatement.DefaultBlockStatement, defaultScope);
+        }
+    }
+
+    private void VisitSelectStatement(SelectStatement selectStatement, SymbolScope scope)
+    {
+        foreach (var selectCase in selectStatement.Cases)
+        {
+            VisitExpressionForNestedScopes(selectCase.ChannelExpression, scope);
+            VisitExpressionForNestedScopes(selectCase.SendValueExpression, scope);
+
+            var caseScope = CreateChildScope(ScopeKind.Block, scope, CreateDeclarationBlockRange(selectCase.Position, selectCase.BlockStatement));
+            if (!string.IsNullOrEmpty(selectCase.VariableName))
+            {
+                caseScope.Declare(new SymbolInfo
+                {
+                    Name = selectCase.VariableName,
+                    Kind = SymbolKind.Variable,
+                    Type = "any",
+                    Location = CreateLocation(selectCase.Position, selectCase.VariableName.Length)
+                });
+            }
+
+            VisitBlockStatement(selectCase.BlockStatement, caseScope);
+        }
+
+        if (selectStatement.DefaultCase != null)
+        {
+            var defaultScope = CreateChildScope(ScopeKind.Block, scope, CreateBlockRange(selectStatement.DefaultCase, selectStatement.Position));
+            VisitBlockStatement(selectStatement.DefaultCase, defaultScope);
+        }
     }
 
     /// <summary>
-    /// 从表达式推断类型
+    /// 在表达式中递归发现 Lambda 表达式并建立对应的词法作用域。
     /// </summary>
-    private string? InferTypeFromExpression(LangExpression expr)
+    private void VisitExpressionForNestedScopes(LangExpression? expr, SymbolScope scope)
     {
+        if (expr == null) return;
+
         switch (expr)
         {
-            // 泛型实例化表达式 Stack<string>()
-            case GenericInstanceExpression genericInstance:
-                // 获取基础类型名称（忽略泛型参数）
-                if (genericInstance.BaseExpression is LangId baseId)
+            case LambdaExpression lambda:
+            {
+                var lambdaScope = CreateChildScope(
+                    ScopeKind.Lambda,
+                    scope,
+                    CreateDeclarationBlockRange(lambda.Position, lambda.Body));
+
+                foreach (var param in lambda.Parameters)
                 {
-                    var genericClassName = baseId.IdName;
-                    return genericClassName;
+                    lambdaScope.Declare(new SymbolInfo
+                    {
+                        Name = param.IdName,
+                        Kind = SymbolKind.Parameter,
+                        Type = string.IsNullOrEmpty(param.AssumptionType) ? "var" : param.AssumptionType,
+                        Location = CreateLocation(param.Position, param.IdName.Length, lambda.Position),
+                        HasExplicitTypeAnnotation = !string.IsNullOrEmpty(param.AssumptionType)
+                    });
                 }
+
+                VisitBlockStatement(lambda.Body, lambdaScope);
                 break;
-
-            // 实例化表达式 User()
-            case Instance instance:
-                // Instance 表达式用于类构造函数调用
-                return instance.Id.IdName;
-
-            // 简单调用语法（解析器对 User() 的产出）
+            }
+            case Operation op:
+                VisitExpressionForNestedScopes(op.Left, scope);
+                VisitExpressionForNestedScopes(op.Right, scope);
+                break;
             case CallExpression call:
-                return call.Id.IdName;
-
-            // 操作表达式 - 处理成员方法调用：outer.createInner()
-            case Operation { Opera: LangTokenType.Dot } dotOp:
-                // 成员方法调用：Operation(Dot, objectId, Instance/CallExpression(methodName()))
-                if (dotOp is { Left: LangId objectId, Right: Instance or CallExpression })
-                {
-                    // 获取对象的类型
-                    if (_symbolTable.TryGetValue(objectId.IdName, out var objectSymbol))
-                    {
-                        // 查找对象类型对应的类
-                        if (!string.IsNullOrEmpty(objectSymbol.Type) &&
-                            _symbolTable.TryGetValue(objectSymbol.Type, out var classSymbol) &&
-                            classSymbol.Kind == SymbolKind.Class)
-                        {
-                            // 查找方法
-                            var memberName = dotOp.Right switch
-                            {
-                                Instance methodCall => methodCall.Id.IdName,
-                                CallExpression methodCall => methodCall.Id.IdName,
-                                _ => ""
-                            };
-                            if (classSymbol.Members.TryGetValue(memberName, out var memberSymbol) &&
-                                memberSymbol.Kind == SymbolKind.Method)
-                            {
-                                // 从方法签名中提取返回类型
-                                var returnType = ExtractReturnTypeFromSignature(memberSymbol.Type);
-                                return returnType;
-                            }
-                        }
-                    }
-                }
+                foreach (var arg in call.Arguments) VisitExpressionForNestedScopes(arg, scope);
+                foreach (var named in call.NamedArguments) VisitExpressionForNestedScopes(named.Value, scope);
                 break;
-
-            // 函数调用表达式 User()
+            case Instance inst:
+                foreach (var arg in inst.Ids) VisitExpressionForNestedScopes(arg, scope);
+                foreach (var named in inst.NamedArgs) VisitExpressionForNestedScopes(named.Value, scope);
+                break;
             case FunctionCallExpression funcCall:
-                // 检查函数表达式是否是成员访问 (outer.createInner())
-                // 成员访问会被解析为 Operation(Dot)，left 是对象，right 是方法名
-                if (funcCall.FunctionExpression is Operation { Opera: LangTokenType.Dot, Left: LangId objectId2, Right: LangId methodId2 })
-                {
-                    // 获取对象的类型
-                    if (_symbolTable.TryGetValue(objectId2.IdName, out var objectSymbol2))
-                    {
-                        // 查找对象类型对应的类
-                        if (!string.IsNullOrEmpty(objectSymbol2.Type) &&
-                            _symbolTable.TryGetValue(objectSymbol2.Type, out var classSymbol2) &&
-                            classSymbol2.Kind == SymbolKind.Class)
-                        {
-                            // 查找方法
-                            var memberName2 = methodId2.IdName;
-                            if (classSymbol2.Members.TryGetValue(memberName2, out var memberSymbol2) &&
-                                memberSymbol2.Kind == SymbolKind.Method)
-                            {
-                                // 从方法签名中提取返回类型
-                                var returnType2 = ExtractReturnTypeFromSignature(memberSymbol2.Type);
-                                return returnType2;
-                            }
-                        }
-                    }
-                }
-                // 检查函数表达式是否是一个标识符
-                else if (funcCall.FunctionExpression is LangId funcId)
-                {
-                    var funcName = funcId.IdName;
-                    // 如果函数名首字母大写，很可能是类构造函数调用
-                    if (!string.IsNullOrEmpty(funcName) && char.IsUpper(funcName[0]))
-                    {
-                        return funcName;
-                    }
-
-                    // 尝试从符号表查找函数的返回类型
-                    if (_symbolTable.TryGetValue(funcName, out var funcSymbol) &&
-                        funcSymbol.Kind == SymbolKind.Function)
-                    {
-                        var returnType = ExtractReturnTypeFromSignature(funcSymbol.Type);
-                        return returnType;
-                    }
-                }
+                VisitExpressionForNestedScopes(funcCall.FunctionExpression, scope);
+                foreach (var arg in funcCall.Arguments) VisitExpressionForNestedScopes(arg, scope);
                 break;
-
-            // 字符串字面量
-            case StringLangValue:
-                return "string";
-
-            // 整数字面量
-            case IntLangValue:
-                return "int";
-
-            // 浮点数字面量
-            case DoubleLangValue:
-                return "double";
-
-            // 布尔字面量
-            case BoolLangValue:
-                return "bool";
-
-            // 标识符 - 从符号表查找
-            case LangId langId:
-                if (_symbolTable.TryGetValue(langId.IdName, out var refSymbol))
-                {
-                    return refSymbol.Type;
-                }
+            case TernaryExpression ternary:
+                VisitExpressionForNestedScopes(ternary.Condition, scope);
+                VisitExpressionForNestedScopes(ternary.TrueExpression, scope);
+                VisitExpressionForNestedScopes(ternary.FalseExpression, scope);
+                break;
+            case AwaitExpression awaitExpr:
+                VisitExpressionForNestedScopes(awaitExpr.Expression, scope);
+                break;
+            case ListLiteralExpression listLit:
+                foreach (var el in listLit.Elements) VisitExpressionForNestedScopes(el, scope);
+                break;
+            case ArrayLiteralExpression arrLit:
+                foreach (var el in arrLit.Elements) VisitExpressionForNestedScopes(el, scope);
+                break;
+            case TupleLiteralExpression tupleLit:
+                foreach (var el in tupleLit.Elements) VisitExpressionForNestedScopes(el, scope);
                 break;
         }
-
-        return null;
     }
 
     /// <summary>
-    /// 从函数/方法签名中提取返回类型
+    /// 格式化文档注释为 Markdown
     /// </summary>
-    /// <param name="signature">函数签名，格式如 "func name(params) -> returnType"</param>
-    /// <returns>返回类型，如果无法解析则返回 null</returns>
-    private string? ExtractReturnTypeFromSignature(string? signature)
-    {
-        if (string.IsNullOrEmpty(signature))
-            return null;
-
-        // 查找 " -> " 后的返回类型
-        var arrowIndex = signature.IndexOf(" -> ", StringComparison.Ordinal);
-        if (arrowIndex >= 0)
-        {
-            var returnType = signature.Substring(arrowIndex + 4).Trim();
-            return returnType;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// 格式化文档注释为Markdown
-    /// </summary>
-    private string FormatDocComment(DocCommentInfo docComment)
+    private static string FormatDocComment(DocCommentInfo docComment)
     {
         var lines = new List<string>();
 
-        // 摘要
         if (!string.IsNullOrEmpty(docComment.Summary))
         {
             lines.Add(docComment.Summary);
             lines.Add("");
         }
 
-        // 参数
         if (docComment.Parameters.Count > 0)
         {
             lines.Add("**参数:**");
@@ -709,7 +958,6 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             lines.Add("");
         }
 
-        // 返回值
         if (docComment.Returns != null)
         {
             var returnLine = "**返回:**";
@@ -727,7 +975,6 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             lines.Add("");
         }
 
-        // 异常
         if (docComment.Throws.Count > 0)
         {
             lines.Add("**异常:**");
@@ -745,7 +992,6 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             lines.Add("");
         }
 
-        // 示例
         if (docComment.Examples.Count > 0)
         {
             lines.Add("**示例:**");
@@ -760,214 +1006,146 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         return string.Join("\n", lines);
     }
 
-    /// <summary>
-    /// 从 token 列表中查找符号的定义位置
-    /// </summary>
-    private SourceLocation? FindSymbolLocationFromTokens(string symbolName, LangTokenType expectedTokenType)
+    private SymbolScope CreateChildScope(
+        ScopeKind kind,
+        SymbolScope parent,
+        SourceLocation range,
+        SymbolInfo? ownerSymbol = null)
     {
-        if (_tokens == null) return null;
-
-        // 查找符号对应的 token
-        // 对于函数和类，我们查找 func/class/async 关键字后面的标识符
-        for (int i = 0; i < _tokens.Count; i++)
+        var child = new SymbolScope
         {
-            var token = _tokens[i];
+            Kind = kind,
+            Parent = parent,
+            Range = range,
+            OwnerSymbol = ownerSymbol
+        };
+        parent.Children.Add(child);
+        return child;
+    }
 
-            // 检查是否是我们要找的标识符
-            if (token.Type == LangTokenType.Identifier && token.Value == symbolName)
+    private SourceLocation CreateBlockRange(BlockStatement block, SourcePosition fallbackStart)
+    {
+        var start = block.Position.Line > 0 ? block.Position : fallbackStart;
+        var end = block.EndPosition.Line > 0 ? block.EndPosition : ComputeFallbackEndPosition(block, start);
+
+        var startLine = Math.Max(0, start.Line - 1);
+        var startCol = Math.Max(0, start.Column);
+        var endLine = Math.Max(startLine, end.Line - 1);
+        var endCol = end.Line > 0 ? Math.Max(0, end.Column) + 1 : int.MaxValue;
+
+        if (endLine == startLine && endCol < startCol)
+        {
+            endCol = int.MaxValue;
+        }
+
+        return new SourceLocation
+        {
+            Uri = uri,
+            Line = startLine,
+            Column = startCol,
+            EndLine = endLine,
+            EndColumn = endCol
+        };
+    }
+
+    private SourceLocation CreateDeclarationBlockRange(SourcePosition declStart, BlockStatement block)
+    {
+        var start = declStart.Line > 0 ? declStart : block.Position;
+        var end = block.EndPosition.Line > 0 ? block.EndPosition : ComputeFallbackEndPosition(block, start);
+
+        var startLine = Math.Max(0, start.Line - 1);
+        var startCol = Math.Max(0, start.Column);
+        var endLine = Math.Max(startLine, end.Line - 1);
+        var endCol = end.Line > 0 ? Math.Max(0, end.Column) + 1 : int.MaxValue;
+
+        if (endLine == startLine && endCol < startCol)
+        {
+            endCol = int.MaxValue;
+        }
+
+        return new SourceLocation
+        {
+            Uri = uri,
+            Line = startLine,
+            Column = startCol,
+            EndLine = endLine,
+            EndColumn = endCol
+        };
+    }
+
+    private static SourcePosition ComputeFallbackEndPosition(BlockStatement block, SourcePosition fallbackStart)
+    {
+        var maxPos = fallbackStart;
+        foreach (var stmt in block.ImportStatements.Concat(block.OtherStatements))
+        {
+            if (stmt.Position.Line > maxPos.Line ||
+                (stmt.Position.Line == maxPos.Line && stmt.Position.Column > maxPos.Column))
             {
-                // 向前查看是否有 func/class/async 关键字
-                if (i > 0)
-                {
-                    var prevToken = _tokens[i - 1];
-                    bool isDefinition = false;
-
-                    // 检查是否是函数定义
-                    if (expectedTokenType == LangTokenType.Func && prevToken.Type == LangTokenType.Func)
-                    {
-                        isDefinition = true;
-                    }
-                    // 检查是否是异步函数定义
-                    else if (expectedTokenType == LangTokenType.Func && prevToken.Type == LangTokenType.Async)
-                    {
-                        // async func 的情况，定义从 async 关键字开始
-                        isDefinition = true;
-                    }
-                    // 检查是否是类定义
-                    else if (expectedTokenType == LangTokenType.Class && prevToken.Type == LangTokenType.Class)
-                    {
-                        isDefinition = true;
-                    }
-
-                    if (isDefinition)
-                    {
-                        // 使用 token 的实际位置
-                        // 注意：词法分析器的行号是 1-based，列号是 0-based
-                        var line = token.Line - 1; // 转换为 0-based
-                        var column = token.Column; // 列号已经是 0-based，不需要转换
-
-                        return new SourceLocation
-                        {
-                            Uri = uri,
-                            Line = line,
-                            Column = column,
-                            EndLine = line,
-                            EndColumn = column + symbolName.Length
-                        };
-                    }
-                }
+                maxPos = stmt.Position;
             }
         }
 
-        return null;
+        return maxPos;
     }
 
     /// <summary>
-    /// 在指定行中查找符号的列位置
+    /// 根据 AST 的 SourcePosition 构建 0-based LSP SourceLocation。
     /// </summary>
-    private int FindColumnInLine(int line, string symbolName, LangTokenType tokenType)
+    private SourceLocation CreateLocation(SourcePosition primary, int length, SourcePosition fallback = default)
     {
-        if (_sourceCode == null) return 0;
+        var pos = primary.Line > 0 ? primary : fallback;
+        var line = Math.Max(0, pos.Line - 1);
+        var column = Math.Max(0, pos.Column);
 
-        // 将源代码按行分割
-        var lines = _sourceCode.Split('\n');
-        if (line < 0 || line >= lines.Length) return 0;
-
-        var lineText = lines[line];
-
-        // 查找符号名称在该行中的位置
-        var index = lineText.IndexOf(symbolName, StringComparison.Ordinal);
-
-        // 确保找到的是标识符，而不是其他地方的子字符串
-        // 简化处理：返回第一次出现的位置
-        return index >= 0 ? index : 0;
-    }
-
-    /// <summary>
-    /// 从 token 列表中查找变量的定义位置
-    /// </summary>
-    private SourceLocation? FindVariableLocationFromTokens(string varName)
-    {
-        if (_tokens == null) return null;
-
-        // 查找变量定义位置
-        // 变量定义的模式是: identifier <- expression
-        for (int i = 0; i < _tokens.Count - 1; i++)
+        return new SourceLocation
         {
-            var token = _tokens[i];
-            var nextToken = _tokens[i + 1];
-
-            // 检查是否是变量定义模式 (identifier <- ...)
-            if (token.Type == LangTokenType.Identifier &&
-                token.Value == varName &&
-                nextToken.Type == LangTokenType.Assignment) // <- 运算符
-            {
-                // 使用 token 的实际位置
-                // 注意：词法分析器的行号是 1-based，列号是 0-based
-                var line = token.Line - 1; // 转换为 0-based
-                var column = token.Column; // 列号已经是 0-based，不需要转换
-
-                return new SourceLocation
-                {
-                    Uri = uri,
-                    Line = line,
-                    Column = column,
-                    EndLine = line,
-                    EndColumn = column + varName.Length
-                };
-            }
-        }
-
-        return null;
+            Uri = uri,
+            Line = line,
+            Column = column,
+            EndLine = line,
+            EndColumn = column + Math.Max(0, length)
+        };
     }
 
     /// <summary>
-    /// 在指定行中查找变量的列位置
-    /// </summary>
-    private int FindColumnInLineForVariable(int line, string varName)
-    {
-        if (_sourceCode == null) return 0;
-
-        // 将源代码按行分割
-        var lines = _sourceCode.Split('\n');
-        if (line < 0 || line >= lines.Length) return 0;
-
-        var lineText = lines[line];
-
-        // 查找变量名在该行中的位置
-        // 确保找到的是变量定义(后面跟着 <-)
-        var index = lineText.IndexOf(varName, StringComparison.Ordinal);
-        if (index >= 0)
-        {
-            // 简单验证:检查后面是否有 <-
-            var afterVar = index + varName.Length;
-            if (afterVar < lineText.Length && lineText.Substring(afterVar).TrimStart().StartsWith("<-"))
-            {
-                return index;
-            }
-        }
-
-        return 0;
-    }
-
-    /// <summary>
-    /// 从 tokens 中查找成员的文档注释
+    /// 从 tokens 中查找成员的文档注释（类字段 AST 暂未挂 DocCommentInfo）
     /// </summary>
     private DocCommentInfo? FindDocCommentForMember(string memberName)
     {
         if (_tokens == null) return null;
 
-        // 确定搜索范围
         int startIndex = _currentClassStartTokenIndex >= 0 ? _currentClassStartTokenIndex : 0;
         int endIndex = _currentClassEndTokenIndex >= 0 ? _currentClassEndTokenIndex : _tokens.Count;
 
-        // 在指定范围内查找成员名称对应的标识符 token
         for (int i = startIndex; i < endIndex; i++)
         {
             var token = _tokens[i];
-
-            // 找到成员名称
             if (token.Type == LangTokenType.Identifier && token.Value == memberName)
             {
-                // 检查是否是成员定义（后面跟着 :、<-、( 或换行）
                 bool isMemberDefinition = false;
                 if (i + 1 < endIndex)
                 {
                     var nextToken = _tokens[i + 1];
-                    if (nextToken.Type == LangTokenType.Colon || // 类型注解
-                        nextToken.Type == LangTokenType.Assignment || // 赋值
-                        nextToken.Type == LangTokenType.LeftParen) // 函数
+                    if (nextToken.Type is LangTokenType.Colon or LangTokenType.Assignment or LangTokenType.LeftParen)
                     {
                         isMemberDefinition = true;
                     }
                 }
 
-                if (!isMemberDefinition)
-                {
-                    continue; // 这不是成员定义，跳过
-                }
+                if (!isMemberDefinition) continue;
 
-                // 向前查找文档注释
                 var docCommentTokens = new List<LangToken>();
                 var searchIndex = i - 1;
-
-                // 跳过修饰符 (public, private, static等)
                 while (searchIndex >= startIndex)
                 {
                     var prevToken = _tokens[searchIndex];
-
-                    // 如果是修饰符，继续向前查找
-                    if (prevToken.Type == LangTokenType.Public ||
-                        prevToken.Type == LangTokenType.Private ||
-                        prevToken.Type == LangTokenType.Protected ||
-                        prevToken.Type == LangTokenType.Static ||
-                        prevToken.Type == LangTokenType.Func) // func 关键字
+                    if (prevToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected
+                        or LangTokenType.Static or LangTokenType.Func)
                     {
                         searchIndex--;
                         continue;
                     }
 
-                    // 如果是文档注释，收集它
                     if (prevToken.Type == LangTokenType.DocComment)
                     {
                         docCommentTokens.Insert(0, prevToken);
@@ -975,19 +1153,15 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                         continue;
                     }
 
-                    // 遇到其他 token，停止搜索
                     break;
                 }
 
-                // 如果找到文档注释，解析并返回
                 if (docCommentTokens.Count > 0)
                 {
-                    var docCommentLines = docCommentTokens.Select(t => t.Value).ToArray();
-                    var rawComment = string.Join("\n", docCommentLines);
+                    var rawComment = string.Join("\n", docCommentTokens.Select(t => t.Value));
                     return DocCommentParser.Parse(rawComment);
                 }
 
-                // 如果找到成员定义但没有文档注释，返回 null
                 return null;
             }
         }
@@ -996,7 +1170,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     }
 
     /// <summary>
-    /// 查找类的 token 范围（从 class 关键字到右花括号）
+    /// 查找类的 token 范围（仅供成员文档注释收集使用）
     /// </summary>
     private void FindClassTokenRange(string className)
     {
@@ -1007,19 +1181,16 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             return;
         }
 
-        // 查找 class 关键字后跟类名的位置
         for (int i = 0; i < _tokens.Count - 1; i++)
         {
-            if (_tokens[i].Type == LangTokenType.Class &&
+            if (_tokens[i].Type is LangTokenType.Class or LangTokenType.Interface or LangTokenType.Mixin &&
                 _tokens[i + 1].Type == LangTokenType.Identifier &&
                 _tokens[i + 1].Value == className)
             {
                 _currentClassStartTokenIndex = i;
 
-                // 查找对应的右花括号
                 int braceCount = 0;
                 bool foundLeftBrace = false;
-
                 for (int j = i + 2; j < _tokens.Count; j++)
                 {
                     if (_tokens[j].Type == LangTokenType.LeftBrace)
@@ -1038,13 +1209,11 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     }
                 }
 
-                // 如果没找到匹配的右花括号，设置为文件末尾
                 _currentClassEndTokenIndex = _tokens.Count;
                 return;
             }
         }
 
-        // 没找到类定义，使用默认值
         _currentClassStartTokenIndex = -1;
         _currentClassEndTokenIndex = -1;
     }
@@ -1052,39 +1221,26 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// <summary>
     /// 访问 native 函数声明
     /// </summary>
-    private void VisitNativeStatement(NativeStatement nativeStatement)
+    private void VisitNativeStatement(NativeStatement nativeStatement, SymbolScope scope)
     {
-        // native 语句可以导入函数、类或方法
-        // 我们需要从 NativeStatement 的内部字段中提取信息
-        // 由于这些字段是私有的，我们需要通过反射或其他方式获取
+        var methodName = nativeStatement.MethodName;
+        var nativeName = nativeStatement.NativeName;
+        var funcSyntax = nativeStatement.Function;
+        var className = nativeStatement.ClassName;
 
-        // 使用反射获取私有字段
-        var type = nativeStatement.GetType();
-        var methodNameField = type.GetField("MethodName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var nativeNameField = type.GetField("NativeName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var funcValueField = type.GetField("FuncValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var classNameField = type.GetField("ClassName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        var methodName = methodNameField?.GetValue(nativeStatement) as string;
-        var nativeName = nativeNameField?.GetValue(nativeStatement) as string;
-        var funcValue = funcValueField?.GetValue(nativeStatement) as FuncLangValue;
-        var className = classNameField?.GetValue(nativeStatement) as string;
-
-        // 如果有方法名，说明这是一个 native 函数导入
         if (!string.IsNullOrEmpty(methodName))
         {
             var functionName = !string.IsNullOrEmpty(nativeName) ? nativeName : methodName;
 
-            // 构建函数签名
             string funcSignature;
-            if (funcValue?.Id != null)
+            if (funcSyntax?.Id != null)
             {
-                var paramList = funcValue.Ids != null
+                var paramList = funcSyntax.Parameters.Count > 0
                     ? string.Join(", ",
-                        funcValue.Ids.Select(p =>
+                        funcSyntax.Parameters.Select(p =>
                             $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
                     : "";
-                var returnType = funcValue.Id.AssumptionType ?? "void";
+                var returnType = string.IsNullOrEmpty(funcSyntax.Id.AssumptionType) ? "void" : funcSyntax.Id.AssumptionType;
                 funcSignature = $"native func {functionName}({paramList}) -> {returnType}";
             }
             else
@@ -1092,110 +1248,110 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 funcSignature = $"native func {functionName}(...)";
             }
 
-            var location = new SourceLocation
-            {
-                Uri = uri,
-                Line = nativeStatement.Position.Line - 1,
-                Column = nativeStatement.Position.Column,
-                EndLine = nativeStatement.Position.Line - 1,
-                EndColumn = nativeStatement.Position.Column + functionName.Length
-            };
+            var location = CreateLocation(nativeStatement.NamePosition, functionName.Length, nativeStatement.Position);
 
-            _symbolTable[functionName] = new SymbolInfo
+            scope.Declare(new SymbolInfo
             {
                 Name = functionName,
                 Kind = SymbolKind.Function,
                 Type = funcSignature,
                 Location = location,
                 Documentation = $"Native function from {className}"
-            };
+            });
+        }
+        else if (!string.IsNullOrEmpty(nativeStatement.ClassAlias) || !string.IsNullOrEmpty(nativeStatement.ClassName))
+        {
+            var name = !string.IsNullOrEmpty(nativeStatement.ClassAlias)
+                ? nativeStatement.ClassAlias
+                : nativeStatement.ClassName;
+            var location = CreateLocation(nativeStatement.NamePosition, name.Length, nativeStatement.Position);
+            scope.Declare(new SymbolInfo
+            {
+                Name = name,
+                Kind = SymbolKind.Class,
+                Type = $"native class {nativeStatement.ClassName}",
+                Location = location,
+                Documentation = $"Native class from {nativeStatement.DllName}"
+            });
         }
     }
 
     /// <summary>
     /// 访问 extern 语句
     /// </summary>
-    private void VisitExternStatement(ExternStatement externStatement)
+    private void VisitExternStatement(ExternStatement externStatement, SymbolScope scope)
     {
-        // extern 语句声明外部函数或变量
-        // 使用反射获取私有字段
-        var type = externStatement.GetType();
-        var functionsField = type.GetField("_functions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        if (functionsField?.GetValue(externStatement) is List<ExternFunctionDeclaration> functions)
+        foreach (var func in externStatement.Functions)
         {
-            foreach (var func in functions)
+            var functionName = func.Alias ?? func.FunctionName;
+
+            string funcSignature;
+            var paramSymbols = new List<SymbolInfo>();
+            if (func.FunctionSignature != null)
             {
-                var functionName = func.Alias ?? func.FunctionName;
+                var funcSyntax = func.FunctionSignature.Syntax;
+                var paramList = funcSyntax.Parameters.Count > 0
+                    ? string.Join(", ",
+                        funcSyntax.Parameters.Select(p =>
+                            $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
+                    : "";
+                var returnType = string.IsNullOrEmpty(funcSyntax.Id?.AssumptionType) ? "void" : funcSyntax.Id!.AssumptionType;
+                funcSignature = $"extern func {functionName}({paramList}) -> {returnType}";
 
-                // 构建函数签名
-                string funcSignature;
-                if (func.FunctionSignature != null)
+                foreach (var p in funcSyntax.Parameters)
                 {
-                    var funcValue = func.FunctionSignature.GetFuncValue();
-                    var paramList = funcValue.Ids != null
-                        ? string.Join(", ",
-                            funcValue.Ids.Select(p =>
-                                $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
-                        : "";
-                    var returnType = funcValue.Id?.AssumptionType ?? "void";
-                    funcSignature = $"extern func {functionName}({paramList}) -> {returnType}";
+                    paramSymbols.Add(new SymbolInfo
+                    {
+                        Name = p.IdName,
+                        Kind = SymbolKind.Parameter,
+                        Type = string.IsNullOrEmpty(p.AssumptionType) ? "var" : p.AssumptionType,
+                        Location = CreateLocation(p.Position, p.IdName.Length, externStatement.Position),
+                        HasExplicitTypeAnnotation = !string.IsNullOrEmpty(p.AssumptionType)
+                    });
                 }
-                else
-                {
-                    funcSignature = $"extern func {functionName}(...)";
-                }
-
-                var location = new SourceLocation
-                {
-                    Uri = uri,
-                    Line = externStatement.Position.Line - 1,
-                    Column = externStatement.Position.Column,
-                    EndLine = externStatement.Position.Line - 1,
-                    EndColumn = externStatement.Position.Column + functionName.Length
-                };
-
-                _symbolTable[functionName] = new SymbolInfo
-                {
-                    Name = functionName,
-                    Kind = SymbolKind.Function,
-                    Type = funcSignature,
-                    Location = location,
-                    Documentation = "External function"
-                };
             }
+            else
+            {
+                funcSignature = $"extern func {functionName}(...)";
+            }
+
+            var location = CreateLocation(func.NamePosition, functionName.Length, externStatement.Position);
+
+            var symbol = new SymbolInfo
+            {
+                Name = functionName,
+                Kind = SymbolKind.Function,
+                Type = funcSignature,
+                Location = location,
+                Documentation = "External function",
+                Parameters = paramSymbols
+            };
+            foreach (var p in paramSymbols) p.Parent = symbol;
+
+            scope.Declare(symbol);
         }
     }
 
     /// <summary>
     /// 访问 import 语句
     /// </summary>
-    private void VisitImportStatement(ImportStatement importStatement)
+    private void VisitImportStatement(ImportStatement importStatement, SymbolScope scope)
     {
-        // import 语句可能有别名
         var moduleAlias = importStatement.GetModuleAlias();
         var importString = importStatement.GetImportString();
 
-        // 如果有模块别名，添加到符号表
         if (!string.IsNullOrEmpty(moduleAlias))
         {
-            var location = new SourceLocation
-            {
-                Uri = uri,
-                Line = importStatement.Position.Line - 1,
-                Column = importStatement.Position.Column,
-                EndLine = importStatement.Position.Line - 1,
-                EndColumn = importStatement.Position.Column + moduleAlias.Length
-            };
+            var location = CreateLocation(importStatement.ModuleAliasPosition, moduleAlias.Length, importStatement.Position);
 
-            _symbolTable[moduleAlias] = new SymbolInfo
+            scope.Declare(new SymbolInfo
             {
                 Name = moduleAlias,
-                Kind = SymbolKind.Variable, // 模块作为变量
+                Kind = SymbolKind.Variable,
                 Type = "module",
                 Location = location,
                 Documentation = $"Imported module: {importString}"
-            };
+            });
         }
     }
 }
