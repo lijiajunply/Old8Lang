@@ -653,4 +653,133 @@ statusDouble <- status as double
     }
 
     #endregion
+
+    #region 增强测试（标志位组合、转换与成员元数据行为）
+
+    /// <summary>
+    /// 测试 2 的幂标志位枚举声明、常量表达式初始化与标志组合检测
+    /// </summary>
+    [Fact]
+    public void EnumFlags_PowerOfTwoValuesAndCombinations_WorkCorrectly()
+    {
+        var code = @"
+enum Permission {
+    None <- 0,
+    Read <- 1,
+    Write <- 2,
+    Execute <- 4,
+    ReadWrite <- 1 + 2,
+    All <- 1 + 2 + 4
+}
+
+func hasFlag(mask:int, flag:int) -> bool {
+    return (mask / flag) % 2 == 1
+}
+
+combined <- (Permission.Read as int) + (Permission.Execute as int)
+hasRead <- hasFlag(combined, Permission.Read as int)
+hasWrite <- hasFlag(combined, Permission.Write as int)
+hasExec <- hasFlag(combined, Permission.Execute as int)
+allMatchesSum <- (Permission.All as int) == ((Permission.Read as int) + (Permission.Write as int) + (Permission.Execute as int))
+rwValue <- Permission.ReadWrite as int
+";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+
+        Assert.Equal(5, Assert.IsType<IntLangValue>(interpreter.Manager.GetValue(new LangId("combined"))).Value);
+        Assert.True(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasRead"))).Value);
+        Assert.False(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasWrite"))).Value);
+        Assert.True(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("hasExec"))).Value);
+        Assert.True(Assert.IsType<BoolLangValue>(interpreter.Manager.GetValue(new LangId("allMatchesSum"))).Value);
+        Assert.Equal(3, Assert.IsType<IntLangValue>(interpreter.Manager.GetValue(new LangId("rwValue"))).Value);
+    }
+
+    /// <summary>
+    /// 测试枚举成员名称转换（as string）、EnumLangValue 元数据与 EnumTemplate 方法
+    /// </summary>
+    [Fact]
+    public void EnumMetadata_AsStringAndRuntimeProperties_ExposeEnumAndMemberNames()
+    {
+        var code = @"
+enum Color {
+    Red <- 10,
+    Green <- 20,
+    Blue <- 30
+}
+
+c <- Color.Green
+memberName <- c as string
+numericStr <- c.ToStr()
+asInt <- c as int
+asDouble <- c as double
+";
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+
+        Assert.Equal("Green", Assert.IsType<StringLangValue>(interpreter.Manager.GetValue(new LangId("memberName"))).Value);
+        Assert.Equal("20", Assert.IsType<StringLangValue>(interpreter.Manager.GetValue(new LangId("numericStr"))).Value);
+        Assert.Equal(20, Assert.IsType<IntLangValue>(interpreter.Manager.GetValue(new LangId("asInt"))).Value);
+        Assert.Equal(20.0, Assert.IsType<DoubleLangValue>(interpreter.Manager.GetValue(new LangId("asDouble"))).Value);
+
+        var enumVal = Assert.IsType<EnumLangValue>(interpreter.Manager.GetValue(new LangId("c")));
+        Assert.Equal("Color", enumVal.EnumTypeName);
+        Assert.Equal("Green", enumVal.MemberName);
+        Assert.Equal(20, enumVal.Value);
+        Assert.Equal("Color.Green", enumVal.GetFullName());
+
+        var template = Assert.IsType<Old8Lang.AST.Expression.AnyValues.EnumTemplate>(
+            interpreter.Manager.GetAny(new LangId("Color")));
+        Assert.True(template.HasMember("Red"));
+        Assert.False(template.HasMember("Yellow"));
+    }
+
+    /// <summary>
+    /// 测试不同枚举类型之间的相等与大小比较语义
+    /// </summary>
+    [Fact]
+    public void EnumComparison_DifferentEnumTypes_EqualIsFalseAndOrderingThrows()
+    {
+        var equalCode = @"
+enum First { A <- 1 }
+enum Second { B <- 1 }
+sameEnumEq <- First.A == First.A
+diffEnumEq <- First.A == Second.B
+diffEnumNeq <- First.A != Second.B
+";
+        var interp1 = new LangInterpreter();
+        interp1.Build(equalCode).Run(interp1.Manager);
+
+        Assert.True(Assert.IsType<BoolLangValue>(interp1.Manager.GetValue(new LangId("sameEnumEq"))).Value);
+        Assert.False(Assert.IsType<BoolLangValue>(interp1.Manager.GetValue(new LangId("diffEnumEq"))).Value);
+        Assert.True(Assert.IsType<BoolLangValue>(interp1.Manager.GetValue(new LangId("diffEnumNeq"))).Value);
+
+        var orderCode = @"
+enum First { A <- 1 }
+enum Second { B <- 2 }
+a <- First.A
+b <- Second.B
+cmp <- a < b
+";
+        var interp2 = new LangInterpreter();
+        var ast = interp2.Build(orderCode);
+        Assert.Throws<InvalidOperationError>(() => ast.Run(interp2.Manager));
+    }
+
+    /// <summary>
+    /// 测试直接对枚举类型调用静态方法会报明确错误（当前 EnumTemplate 仅支持成员访问）
+    /// </summary>
+    [Fact]
+    public void EnumTemplate_StaticMethodCall_ThrowsInvalidOperationError()
+    {
+        var code = @"
+enum Color { Red, Green }
+vals <- Color.GetValues()
+";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+
+        Assert.Throws<InvalidOperationError>(() => ast.Run(interpreter.Manager));
+    }
+
+    #endregion
 }

@@ -627,6 +627,16 @@
   改成 `public static` 后三种模式一致。属解释器侧静态成员可见性缺口。
   见 change（`2026-11-14-IL静态字段初值/test.md` §5.1）。
 
+- [ ] **解释器三层及以上继承中连续 `super` 调用导致栈溢出**：2026-11-27 补测发现，`SuperProxy.GetDirectParentMetadata()` 始终读取 `currentInstance.Metadata.ParentClassName`（而非当前执行方法所属类的父类），当 `Level3` 调 `super.method()`/`super.init()` 进入 `Level2` 后，`Level2` 再调 `super` 仍解析到 `Level2` 自身，触发无限递归与 `StackOverflowException`。见 `2026-11-27-解释器测试覆盖复核/test.md`。
+
+- [ ] **解释器集合/元组字面量按 AST 节点复用单一可变实例**：2026-11-27 补测发现，`InterpreterVisitor.SyntaxAdapters.cs` 对 `TupleLiteralExpression`/`DictionaryLiteralExpression`/`ListLiteralExpression`/`ArrayLiteralExpression` 缓存单一实例，且 `VisitTupleLangValue`/`VisitDictionaryLangValue` 原地 `Clear()` 覆写，导致循环或 LINQ 中 `group ... by (a, b)` 所有分组塌缩为 1 组、`select { "k": v }` 所有元素指向最后一次迭代的字典。见 `2026-11-27-解释器测试覆盖复核/test.md`。
+
+- [ ] **解释器 `import "mod" as alias` 在调用者当前作用域执行模块体**：2026-11-27 补测发现，`ModuleSystemService.HandleLocalModuleImport` 对带别名/普通导入未隔离模块作用域，两个别名模块若定义同名顶层变量（如 `offset`），后导入的模块会覆盖前一个模块的变量，导致先导入模块的函数读到错误值。见 `2026-11-27-解释器测试覆盖复核/test.md`。
+
+- [ ] **解释器 `MaxRecursionDepth = 1000` 高于托管线程栈容量**：2026-11-27 补测发现，每次 Old8Lang 递归调用占用多层 CLR 栈帧，无限递归在触达 `VariateManager.RecursionDepth > 1000` 守卫前即触发不可捕获的 `StackOverflowException`。见 `2026-11-27-解释器测试覆盖复核/test.md`。
+
+- [ ] **解释器补测暴露的若干边角缺口（2026-11-27）**：调用非函数值（如 `num <- 42; num(1)`）未抛错；`LinqParser.ParseQueryContinuation` 仅支持单层 `into`（不支持链式 `into ... into ...`）；`GenericConstraintValidator.ValidateTypeParameterConstraint`（`where T: U`）未结合 `VariateManager` 解析用户类继承；`EnumLangValue + EnumLangValue` 报 `不支持整数与类型 'EnumLangValue' 的加法操作`。见 `2026-11-27-解释器测试覆盖复核/test.md`。
+
 - [x] **虚拟机不支持集合字面量作为字段初值**：`BytecodeCompiler.EvaluateConstantExpression`
   现在递归求值列表/数组/字典字面量（`List<object?>` / `object[]` / `Dictionary<object,object>`），
   `class C { public items <- {1,2,3} }` 在 `-vm` 下可用；新增 1 项 VM 回归。
@@ -941,79 +951,67 @@
 
 ## 解释器测试覆盖待复核
 
-以下保留历史清单提出的场景，2026-11-18 未逐项审计覆盖；原来按 14 个专用文件名判断的缺口不能代替场景核对，补测前先查现有测试。
+2026-11-27 已逐项核对实现与现有覆盖并补齐全部 10 类场景（15 个解释器测试类共 134 通过、0 失败，其中新增 114 项用例），实测记录与过程中发现的解释器实现缺口见 [测试报告](2026-11-27-解释器测试覆盖复核/test.md)。
 
 ### 1. 线程同步与并发原语测试 (Threading/)
 
 **优先级**: 中高
 
-`ThreadTests.cs` 覆盖了线程本身，但语法文档 §8.4 列出的并发原语在解释器侧没有测试。
+`ThreadTests.cs` 覆盖了线程本身，2026-11-27 已补齐解释器侧线程同步与 7 类并发原语测试（连续 3 次运行 18/18 稳定通过）。
 
-- [ ] `ThreadSynchronizationTests.cs` - 线程同步测试
-  - 多线程访问共享资源
-  - 锁与临界区行为
-  - 同步顺序与竞态场景
+- [x] `ThreadSynchronizationTests.cs` - 线程同步测试（7 项）
+  - 多线程访问共享资源（`Lock` / `LockedVariableLangValue`）
+  - 锁与临界区行为（`Mutex`）
+  - 同步顺序与协调场景（`CountDownLatch` / `Channel` / `CyclicBarrier`）
 
-- [ ] `ConcurrentPrimitiveTests.cs` - 并发原语测试
-  - Mutex（互斥锁）加锁/释放
-  - Semaphore（信号量）计数与等待
-  - AtomicInt（原子整数）并发自增
-  - Channel（通道）收发
-  - ReadWriteLock（读写锁）、CountDownLatch（倒计时锁）、CyclicBarrier（循环栅栏）
+- [x] `ConcurrentPrimitiveTests.cs` - 并发原语测试（11 项）
+  - Mutex（互斥锁）加锁/释放/超时竞争
+  - Semaphore（信号量）计数与并发上限
+  - AtomicInt（原子整数）全操作与并发自增
+  - Channel（通道）无界/有界收发与超时
+  - ReadWriteLock（读写锁）、CountDownLatch（倒计时锁）、CyclicBarrier（循环栅栏）及并发工具函数
 
 **AST 节点支持**: `LockedVariableLangValue`, `ThreadStaticMethodWrapper`
 
-### 2. .NET 托管方法绑定测试 (Integration/)
+### 2. .NET 托管方法绑定测试 (Modules/Extern/)
 
 **优先级**: 中高
 
 绑定 C# 方法原本写作 `native func ... from ...`，解析器现已统一为 `extern`，`native` 关键字不再存在
-（见 `LangParser/Parsers/StatementParser.ImportAndNative.cs`，其中 `Expect(LangTokenType.Extern)`）。
-`Modules/Extern/` 下已覆盖 C/C++ P/Invoke（`NativeDllExternTests.cs`）、Python（`PythonExternTests.cs`）、
-JavaScript（`JavaScriptExternTests.cs`），但语法文档 §5.15 的 .NET 托管程序集形式（`"C#:"` / `"cs:"` /
-`"csharp:"` / `"dotnetdll:"` 前缀）在解释器侧仍无测试。
+（见 `LangParser/Parsers/StatementParser.SpecialStatements.cs`）。
+2026-11-27 已在 `Modules/Extern/` 下与 `NativeDllExternTests.cs` 等并列补齐托管 DLL 导入测试。
 
-- [ ] `ManagedDllExternTests.cs` - .NET 托管 DLL 导入测试
+- [x] `ManagedDllExternTests.cs` - .NET 托管 DLL 导入测试（9 项）
   - 方法块导入：`extern "C#:System" Math { func Pow(x:double, y:double) -> double, ... }`
   - 单个方法导入：`extern "C#:System" Math func Pow(x:double, y:double) -> double`
   - 带别名的导入：`func Pow(x:double, y:double) -> double as Power`
-  - 导入自定义 DLL：`extern "dotnetdll:MyLibrary.dll" MyMathClass { ... }`（需准备测试程序集）
+  - 导入自定义 DLL：`extern "dotnetdll:<assemblyPath>" ManagedDllExternTestHelper { ... }`
   - 命名参数调用：`Pow(y: 3.0, x: 2.0)`
-  - 程序集不存在时的异常处理（实测报 `IMPORT_ERROR`）
+  - 程序集/类型/方法不存在时的异常处理（`ImportError` / `InvalidOperationError`）
   - `cs:` / `csharp:` 前缀与 `C#:` 的等价性
 
-> 已实测（2026-10-09，解释模式）：上述 `{ func ... }` 块、单个 `func`、`as` 别名、命名参数四种写法均可用；
+> 已实测（2026-10-09，解释模式；2026-11-27 纳入单测）：上述 `{ func ... }` 块、单个 `func`、`as` 别名、命名参数四种写法均可用；
 > 而 `extern "C#:System" Math *` 和 `extern "C#:System" Math as SysMath` 会报
 > `语法错误：缺少 'func' 关键字`——这两种写法属于 `NativeStatement` 解析路径，带 `C#:` 等托管前缀时走的是
-> `ParseExternStatement`，因此写用例时不要照搬 §5.14.2/§5.14.4 的 `*`、`as` 示例（语法文档 §5.14 的复核说明
-> 也已记录同类示例问题）。
+> `ParseExternStatement`。
 
 **AST 节点支持**: `NativeStatement`, `NativeAnyLangValue`, `NativeStaticAny`
-
-**示例测试场景**:
-```old8
-extern "C#:System" Math {
-    func Pow(x:double, y:double) -> double,
-    func Sqrt(x:double) -> double
-}
-result <- Pow(2.0, 10.0)
-```
 
 ### 3. 模块命名空间与重载测试 (Modules/)
 
 **优先级**: 中
 
-`Modules/AdvancedImport/` 已覆盖条件导入、动态导入、惰性导入，但命名空间隔离与模块重载仍无测试。
+2026-11-27 已在 `Modules/Namespace/` 与 `Modules/Reload/` 补齐命名空间与缓存/热重载测试（核对中发现的别名导入共享作用域变量覆盖问题已另记上方缺口）。
 
-- [ ] `ModuleNamespaceTests.cs` - 模块命名空间测试
+- [x] `ModuleNamespaceTests.cs` - 模块命名空间测试（5 项）
   - 模块命名空间隔离
-  - 跨模块符号访问
-  - 模块符号冲突处理
+  - 跨模块符号访问（函数、常量、类）
+  - 模块符号冲突处理（别名消歧、提升导入覆盖、模块闭包作用域）
 
-- [ ] `ModuleReloadTests.cs` - 模块重载测试
-  - 模块热重载
-  - 模块缓存管理
-  - 模块依赖更新
+- [x] `ModuleReloadTests.cs` - 模块重载测试（4 项）
+  - 模块热重载（磁盘文件修改 + 清缓存后加载新实现）
+  - 模块缓存管理（`CacheManager` / `ModuleLoader` 命中、绕过、单项/全量清理）
+  - 模块依赖更新与单次运行重复导入不重复执行副作用
 
 **AST 节点支持**: `UnifiedModule`, `ImportInfo`, `LazySymbolProxy`
 
@@ -1021,18 +1019,17 @@ result <- Pow(2.0, 10.0)
 
 **优先级**: 中低
 
-`ListAdvancedMethodsTests.cs` 覆盖的是 `List.GroupBy` 方法形式，`LinqJoinTests.cs` 中带 `into g` 的用例只有一条；
-查询语法 `group x by ...` 在解释器侧尚无执行用例（解析器侧有 `Parser/Linq/LinqAdvancedParsingTests.cs`）。
+2026-11-27 已补齐查询语法 `group by` 与 `into` 延续执行测试（核对中发现的字面量集合/元组 AST 缓存复用及不支持链式多段 `into` 问题已另记上方缺口）。
 
-- [ ] `LinqGroupByTests.cs` - 查询语法 group by 测试
-  - `group x by <key>` 基础用法
+- [x] `LinqGroupByTests.cs` - 查询语法 group by 测试（6 项）
+  - `group x by <key>` 基础用法与元素投影
   - 分组后聚合（Count / Sum / Max）
-  - 多键分组
-  - 分组后过滤
+  - 多键复合分组
+  - 分组前后过滤与空数据源
 
-- [ ] `LinqQueryContinuationTests.cs` - 查询延续测试
-  - `into` 关键字用法
-  - 查询延续链式调用
+- [x] `LinqQueryContinuationTests.cs` - 查询延续测试（5 项）
+  - `select ... into` 与 `group ... by ... into` 用法
+  - 延续中的 `let` / `where` / `orderby` / `group by`、二段查询链与作用域不泄漏
 
 **AST 节点支持**: `GroupByClause`, `QueryContinuation`
 
@@ -1040,13 +1037,13 @@ result <- Pow(2.0, 10.0)
 
 **优先级**: 中低
 
-`super` 目前只在 `MemberAccessTests.cs`、`MixinTests.cs` 中顺带出现，没有专门用例。
+2026-11-27 已补齐专用 `SuperExpressionTests.cs`（核对中发现的三层及以上连续 `super` 调用栈溢出已另记上方缺口）。
 
-- [ ] `SuperExpressionTests.cs` - super 关键字测试
-  - super 调用父类方法
+- [x] `SuperExpressionTests.cs` - super 关键字测试（7 项）
+  - super 调用父类方法（含重写与重载）
   - super 访问父类字段
-  - super 在构造函数中的使用
-  - super 链式调用
+  - super 在构造函数中的使用（`super.init` / `super.ParentClass` / 无构造父类）
+  - super 返回值链式调用、继承祖类方法及错误场景（无父类 / 成员不存在）
 
 **AST 节点支持**: `SuperExpression`, `SuperProxy`
 
@@ -1054,21 +1051,22 @@ result <- Pow(2.0, 10.0)
 
 **优先级**: 中
 
-`EdgeCases/TypeErrorsTests.cs` 已覆盖常见的类型不匹配运算，以下场景仍缺测试。
+2026-11-27 已补齐解析错误、运行时类型/越界错误及循环引用与递归深度测试（核对中发现的 `MaxRecursionDepth = 1000` 高于托管栈及调用非函数值不报错已另记上方缺口）。
 
-- [ ] `ParserErrorTests.cs` - 解析器错误测试
-  - 语法错误恢复
-  - 不完整语句处理
-  - 错误提示信息准确性
+- [x] `ParserErrorTests.cs` - 解析器错误测试（12 项）
+  - 不完整语句与非法语法处理
+  - 错误提示信息与行号位置准确性
+  - 错误后同解释器实例继续解析合法代码
 
-- [ ] `RuntimeTypeErrorTests.cs` - 运行时类型错误测试
-  - 空引用错误
-  - 越界访问错误
+- [x] `RuntimeTypeErrorTests.cs` - 运行时类型错误测试（16 项）
+  - 空引用错误（成员/方法/索引/算术）
+  - 越界访问错误（数组/列表/字符串/元组正负越界及原始负下标消息）
+  - 类型转换、未定义函数调用与实参类型/数量不匹配
 
-- [ ] `CircularReferenceTests.cs` - 循环引用测试
-  - 数据结构循环引用
-  - 函数递归深度
-  - 类实例循环引用
+- [x] `CircularReferenceTests.cs` - 循环引用测试（8 项）
+  - 数据结构循环引用（自引用/互引用列表与字典）
+  - 函数递归深度（合法递归、相互递归与触发 `MaxRecursionDepth` 守卫）
+  - 类实例循环引用（自引用节点与双节点环遍历及断环）
 
 > 注：`Modules/ErrorHandling/CircularDependencyTests.cs` 测的是模块循环依赖，与此处的数据结构循环引用不是同一类场景。
 
@@ -1076,13 +1074,12 @@ result <- Pow(2.0, 10.0)
 
 **优先级**: 中低
 
-AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLangValue` 等节点，解释器侧无测试。
+2026-11-27 已补齐 `Assert`、`TestRunner`、`Mock`（`MockLibClassLangValue`）全部内置测试工具类的解释模式测试。
 
-- [ ] `TestUtilitiesTests.cs` - 测试工具类测试
-  - Assert 类用法
-  - TestRunner 类用法
-  - MockLib 类用法
-  - 测试辅助功能
+- [x] `TestUtilitiesTests.cs` - 测试工具类测试（8 项）
+  - Assert 类用法（相等/布尔/空值/比较/字符串/集合/异常/类型断言与自定义错误消息）
+  - TestRunner 类用法（`Describe`/`It`/`Test`/`RunTest`/`RunAll`/`GetStatistics`/`Clear`）
+  - Mock 类用法（`CreateMock`/`CreateMockWithReturns`/`CreateStub`/`CreateSpy`/`RecordCall`/`Call`/`Verify*`/`Reset`）
 
 **AST 节点支持**: `AssertClassLangValue`, `TestRunnerClassLangValue`, `MockLibClassLangValue`
 
@@ -1090,13 +1087,13 @@ AST 中有 `MockLibClassLangValue`, `TestRunnerClassLangValue`, `AssertClassLang
 
 **优先级**: 中
 
-AST 中有 `TypeTemplate` 节点，用于类型参数和泛型。
+2026-11-27 已补齐 `TypeTemplateTests.cs`（核对中发现的 `where T: U` 未解析用户类继承问题已另记上方缺口）。
 
-- [ ] `TypeTemplateTests.cs` - 类型模板测试
-  - 泛型类型参数
-  - 类型约束
+- [x] `TypeTemplateTests.cs` - 类型模板测试（8 项）
+  - 泛型类型参数、`TypeTemplate` 元数据与泛型继承
+  - 类型约束（`new()` / `class` / `struct` / 接口与基类 / `where T: U` 及违约拒绝）
   - 类型参数推断
-  - 嵌套泛型类型
+  - 嵌套泛型类型（`Box<Box<int>>`、`Pair<Box<int>, Box<string>>`、`Box<list<int>>`）
 
 **AST 节点支持**: `TypeTemplate`, `GenericParameter`, `GenericInstanceExpression`
 
@@ -1104,12 +1101,12 @@ AST 中有 `TypeTemplate` 节点，用于类型参数和泛型。
 
 **优先级**: 低
 
-AST 中有 `ConstantLangValue` 节点，用于常量折叠。
+经 2026-11-27 源码核实：`ConstantLangValue` 是模块通配符导出常量时使用的 `ImportInfo` 包装类（`SymbolExtractor.WrapConstantsAsImportInfo`），并非常量折叠 AST 节点；解释器当前无独立 AST 常量折叠优化遍。已按实际实现补齐测试。
 
-- [ ] `ConstantFoldingTests.cs` - 常量折叠测试
-  - 编译时常量计算
-  - 常量表达式优化
-  - 常量传播
+- [x] `ConstantFoldingTests.cs` - 常量表达式与 `ConstantLangValue` 测试（4 项）
+  - 常量算术/布尔/字符串表达式求值
+  - `:const` 常量声明不可变性与跨表达式/函数/循环传播
+  - `ConstantLangValue` 包装属性及 `import * from "..."` 模块常量导出
 
 **AST 节点支持**: `ConstantLangValue`
 
@@ -1117,11 +1114,11 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 
 **优先级**: 低
 
-`EnumTests.cs` 已覆盖声明、取值、比较、switch，但以下场景仍缺：
+经 2026-11-27 源码核实：Old8Lang 无按位运算符，`EnumTemplate` 仅支持成员访问。已在 `EnumTests.cs` 中按当前实现补充 4 项增强用例（共 24 项通过）。
 
-- [ ] 在现有 `EnumTests.cs` 中补充：
-  - 枚举标志位组合
-  - 枚举方法和属性
+- [x] 在现有 `EnumTests.cs` 中补充（新增 4 项，共 24 项）：
+  - 枚举 2 的幂标志位声明、常量表达式初始化与标志组合检测
+  - 枚举 `as string` 成员名转换、`EnumLangValue` 运行时属性、`EnumTemplate.HasMember`、跨枚举比较与静态方法调用报错
 
 **AST 节点支持**: `EnumInit`, `EnumTemplate`
 
