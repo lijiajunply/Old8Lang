@@ -405,3 +405,34 @@ public class DebugControlHandler(DebugProfilerService service, ILogger<DebugCont
         }
     }
 }
+
+/// <summary>
+/// 更新调试变量快照命令（将 DAP 暂停帧变量同步到 LSP Inline Values）
+/// </summary>
+[Method("old8lang/updateDebugSnapshot")]
+public interface IUpdateDebugSnapshotHandler : IJsonRpcRequestHandler<UpdateDebugSnapshotRequest, bool> { }
+
+public class UpdateDebugSnapshotHandler(DebugProfilerService service) : IUpdateDebugSnapshotHandler
+{
+    public Task<bool> Handle(UpdateDebugSnapshotRequest request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Uri))
+        {
+            return Task.FromResult(false);
+        }
+
+        if (request.Clear)
+        {
+            service.ClearVariableSnapshot(request.Uri);
+            return Task.FromResult(true);
+        }
+
+        service.UpdateVariableSnapshot(
+            request.Uri,
+            request.FrameId,
+            request.StoppedLine,
+            request.Variables ?? new Dictionary<string, string>());
+
+        return Task.FromResult(true);
+    }
+}

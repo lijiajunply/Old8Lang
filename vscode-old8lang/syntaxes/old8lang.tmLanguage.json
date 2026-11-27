@@ -3,21 +3,116 @@
   "name": "Old8Lang",
   "scopeName": "source.old8lang",
   "patterns": [
+    { "include": "#directives" },
     { "include": "#comments" },
-    { "include": "#keywords" },
+    { "include": "#decorators" },
     { "include": "#strings" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
     { "include": "#numbers" },
     { "include": "#operators" },
+    { "include": "#generics" },
     { "include": "#functions" },
-    { "include": "#types" },
-    { "include": "#constants" }
+    { "include": "#nested-structures" }
   ],
   "repository": {
+    "directives": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.header.old8lang",
+          "match": "^\\s*(#!)([a-zA-Z_][a-zA-Z0-9_-]*)\\b(.*)$",
+          "captures": {
+            "1": { "name": "punctuation.definition.directive.old8lang" },
+            "2": { "name": "keyword.control.directive.old8lang" },
+            "3": { "name": "string.unquoted.directive.old8lang" }
+          }
+        },
+        {
+          "name": "meta.preprocessor.old8lang",
+          "match": "^\\s*(#\\s*(?:if|elif|else|endif|define|undef|warning|error|region|endregion))\\b(.*)$",
+          "captures": {
+            "1": { "name": "keyword.control.directive.old8lang" },
+            "2": { "name": "entity.name.other.preprocessor.old8lang" }
+          }
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
+          "name": "comment.line.documentation.old8lang",
+          "begin": "///",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.documentation.old8lang" }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "meta.documentation.tag.javadoc.old8lang",
+              "match": "(@(?:param|throws|exception|see))\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+              "captures": {
+                "1": { "name": "storage.type.class.jsdoc.old8lang" },
+                "2": { "name": "variable.parameter.documentation.old8lang" }
+              }
+            },
+            {
+              "name": "storage.type.class.jsdoc.old8lang",
+              "match": "@(?:returns?|example|deprecated|author|since|note|todo)\\b"
+            },
+            {
+              "name": "meta.documentation.tag.sphinx.old8lang",
+              "match": "(:(?:param|type|raises))\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(:)",
+              "captures": {
+                "1": { "name": "storage.type.class.jsdoc.old8lang" },
+                "2": { "name": "variable.parameter.documentation.old8lang" },
+                "3": { "name": "punctuation.separator.documentation.old8lang" }
+              }
+            },
+            {
+              "name": "storage.type.class.jsdoc.old8lang",
+              "match": ":(?:returns?|rtype):"
+            },
+            {
+              "name": "keyword.other.documentation.section.old8lang",
+              "match": "\\b(?:Args|Arguments|Parameters|Returns?|Raises|Throws|Examples?):|(?:参数|返回|异常|错误|抛出|示例)[：:]"
+            },
+            {
+              "name": "markup.inline.raw.string.old8lang",
+              "match": "`[^`]+`"
+            }
+          ]
+        },
+        {
           "name": "comment.line.double-slash.old8lang",
-          "match": "//.*$"
+          "begin": "//",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.old8lang" }
+          },
+          "end": "$"
+        },
+        {
+          "name": "comment.block.old8lang",
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.begin.old8lang" }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.comment.end.old8lang" }
+          }
+        }
+      ]
+    },
+    "decorators": {
+      "patterns": [
+        {
+          "name": "meta.decorator.old8lang",
+          "match": "(@)([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "punctuation.definition.decorator.old8lang" },
+            "2": { "name": "entity.name.function.decorator.old8lang" }
+          }
         }
       ]
     },
@@ -29,14 +124,18 @@
         },
         {
           "name": "keyword.other.old8lang",
-          "match": "\\b(func|class|interface|enum|import|from|native|extern|async|await|extends|implements|mixin|with|super|select|where|orderby|ascending|descending|group|by|join|on|into|let|params)\\b"
+          "match": "\\b(func|class|interface|enum|extension|import|from|native|extern|async|await|extends|implements|mixin|with|where|new|struct|select|where|orderby|ascending|descending|group|by|join|on|into|let|params)\\b"
+        },
+        {
+          "name": "variable.language.old8lang",
+          "match": "\\b(this|super)\\b"
         },
         {
           "name": "storage.modifier.old8lang",
           "match": "\\b(public|private|protected|static|const|abstract|lazy|dynamic)\\b"
         },
         {
-          "name": "keyword.operator.old8lang",
+          "name": "keyword.operator.word.old8lang",
           "match": "\\b(as|is|not|and|or|xor)\\b"
         }
       ]
@@ -44,19 +143,38 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.old8lang",
+          "name": "string.interpolated.double.old8lang",
           "begin": "\\$\"",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.template.begin.old8lang" }
+          },
           "end": "\"",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.template.end.old8lang" }
+          },
           "patterns": [
             {
-              "name": "constant.character.escape.old8lang",
-              "match": "\\\\."
+              "name": "constant.character.escape.brace.old8lang",
+              "match": "\\{\\{|\\}\\}"
             },
             {
-              "name": "meta.embedded.line.old8lang",
+              "name": "constant.character.escape.old8lang",
+              "match": "\\\\(?:[ntr\\\\\"'0abfv]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|.)"
+            },
+            {
+              "name": "meta.embedded.expression.old8lang",
               "begin": "\\{",
-              "end": "\\}",
+              "beginCaptures": {
+                "0": { "name": "punctuation.section.interpolation.begin.old8lang" }
+              },
+              "end": "(?:(:)[^{}\"]+)?(\\})",
+              "endCaptures": {
+                "1": { "name": "punctuation.separator.format.old8lang" },
+                "2": { "name": "punctuation.section.interpolation.end.old8lang" }
+              },
+              "contentName": "source.old8lang.embedded",
               "patterns": [
+                { "include": "#interpolation-nested-braces" },
                 { "include": "$self" }
               ]
             }
@@ -65,23 +183,123 @@
         {
           "name": "string.quoted.double.old8lang",
           "begin": "\"",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.old8lang" }
+          },
           "end": "\"",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.old8lang" }
+          },
           "patterns": [
             {
               "name": "constant.character.escape.old8lang",
-              "match": "\\\\."
+              "match": "\\\\(?:[ntr\\\\\"'0abfv]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|.)"
             }
           ]
         },
         {
           "name": "string.quoted.single.old8lang",
           "begin": "'",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.old8lang" }
+          },
           "end": "'",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.old8lang" }
+          },
           "patterns": [
             {
               "name": "constant.character.escape.old8lang",
-              "match": "\\\\."
+              "match": "\\\\(?:[ntr\\\\\"'0abfv]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|.)"
             }
+          ]
+        }
+      ]
+    },
+    "interpolation-nested-braces": {
+      "name": "meta.brace.curly.nested.old8lang",
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.braces.begin.old8lang" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.braces.end.old8lang" }
+      },
+      "patterns": [
+        { "include": "#interpolation-nested-braces" },
+        { "include": "$self" }
+      ]
+    },
+    "generics": {
+      "patterns": [
+        {
+          "name": "meta.generic.old8lang",
+          "begin": "(?<=\\b[A-Za-z_][A-Za-z0-9_]*)<(?=[A-Za-z_][A-Za-z0-9_\\s,<>?&|]*>)",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.typeparameters.begin.old8lang" }
+          },
+          "end": ">",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.typeparameters.end.old8lang" }
+          },
+          "patterns": [
+            { "include": "#generics" },
+            { "include": "#types" },
+            {
+              "name": "entity.name.type.parameter.old8lang",
+              "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+            },
+            {
+              "name": "keyword.operator.type.old8lang",
+              "match": "[|&?,:]"
+            }
+          ]
+        }
+      ]
+    },
+    "nested-structures": {
+      "patterns": [
+        {
+          "name": "meta.block.old8lang",
+          "begin": "\\{",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.block.begin.old8lang" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.old8lang" }
+          },
+          "patterns": [
+            { "include": "$self" }
+          ]
+        },
+        {
+          "name": "meta.bracket.square.old8lang",
+          "begin": "\\[",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.brackets.begin.old8lang" }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.brackets.end.old8lang" }
+          },
+          "patterns": [
+            { "include": "$self" }
+          ]
+        },
+        {
+          "name": "meta.group.old8lang",
+          "begin": "\\(",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.parens.begin.old8lang" }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.parens.end.old8lang" }
+          },
+          "patterns": [
+            { "include": "$self" }
           ]
         }
       ]
@@ -89,8 +307,16 @@
     "numbers": {
       "patterns": [
         {
+          "name": "constant.numeric.hex.old8lang",
+          "match": "\\b0[xX][0-9a-fA-F_]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.old8lang",
+          "match": "\\b0[bB][01_]+\\b"
+        },
+        {
           "name": "constant.numeric.old8lang",
-          "match": "\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?\\b"
+          "match": "\\b\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?\\b"
         }
       ]
     },
@@ -98,23 +324,35 @@
       "patterns": [
         {
           "name": "keyword.operator.assignment.old8lang",
-          "match": "<-"
+          "match": "<-|\\+=|-=|\\*=|/=|%="
+        },
+        {
+          "name": "keyword.operator.pipeline.old8lang",
+          "match": "\\|>|\\?\\?|\\?\\."
+        },
+        {
+          "name": "keyword.operator.range.old8lang",
+          "match": "~"
         },
         {
           "name": "keyword.operator.comparison.old8lang",
-          "match": "(==|!=|<=|>=|<|>)"
+          "match": "==|!=|<=|>=|<|>"
         },
         {
           "name": "keyword.operator.logical.old8lang",
-          "match": "(&&|\\|\\||!)"
+          "match": "&&|\\|\\||!"
         },
         {
           "name": "keyword.operator.arithmetic.old8lang",
-          "match": "(\\+|-|\\*|/|%)"
+          "match": "\\+\\+|--|\\*\\*|\\+|-|\\*|/|%|\\^"
+        },
+        {
+          "name": "keyword.operator.bitwise.old8lang",
+          "match": "\\||&"
         },
         {
           "name": "keyword.operator.old8lang",
-          "match": "(->|\\.|\\:|,|;)"
+          "match": "->|\\.|\\:|,|;|\\?"
         }
       ]
     },
@@ -122,7 +360,7 @@
       "patterns": [
         {
           "name": "entity.name.function.old8lang",
-          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()"
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=(?:<[^<>]*>)?\\s*\\()"
         }
       ]
     },
@@ -130,7 +368,7 @@
       "patterns": [
         {
           "name": "support.type.old8lang",
-          "match": "\\b(int|double|string|bool|char|void|var)\\b"
+          "match": "\\b(int|double|string|bool|char|void|var|any|object|list|array|dict|dictionary|tuple|function|task)\\b"
         }
       ]
     },

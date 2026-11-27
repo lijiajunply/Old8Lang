@@ -16,6 +16,7 @@ public static class SelectionRangeBuilder
     public static Container<SelectionRange> Build(DocumentParseResult document, IEnumerable<Position> positions)
     {
         var tokens = document.Tokens ?? [];
+        var tokenIndex = document.TokenIndex;
         var bracketPairs = BuildBracketPairs(tokens);
         var statements = BuildStatementSpans(tokens);
         var documentEnd = GetDocumentEnd(document.Text);
@@ -30,19 +31,19 @@ public static class SelectionRangeBuilder
 
             var candidates = new List<Span>();
 
-            var token = SymbolFinder.FindTokenAtPosition(tokens, line, character, document.Text);
+            var token = tokenIndex.FindTokenAtPosition(line, character)?.Token;
             Span? tokenSpan = token != null ? TokenSpan(token.Value) : null;
 
             candidates.AddRange(bracketPairs.Where(span => span.ContainsPosition(line, character)));
             candidates.AddRange(statements.Where(span => span.ContainsPosition(line, character)));
 
-            var lineSpan = GetLineSpan(tokens, document.Text, line);
+            var lineSpan = GetLineSpan(tokens, tokenIndex, line);
             if (lineSpan != null)
             {
                 candidates.Add(lineSpan.Value);
             }
 
-            candidates.AddRange(BuildDeclarationSpans(tokens, bracketPairs, line, character));
+            candidates.AddRange(BuildDeclarationSpans(tokens, tokenIndex, bracketPairs, line, character));
             candidates.Add(documentSpan);
 
             result.Add(BuildChain(line, character, tokenSpan, candidates));
@@ -110,19 +111,30 @@ public static class SelectionRangeBuilder
         return new Span(line, token.Column, line, token.Column + token.Value.Length);
     }
 
-    private static Span? GetLineSpan(List<LangToken> tokens, string text, int line)
+    private static Span? GetLineSpan(List<LangToken> tokens, TokenLineIndex tokenIndex, int line)
     {
-        var lineTokens = tokens.Where(token => token.Line - 1 == line).ToList();
+        if (tokenIndex.IsMonotonic)
+        {
+            var slice = tokenIndex.GetLineSlice(line);
+            if (slice.Count == 0)
+            {
+                return null;
+            }
 
-        if (lineTokens.Count == 0)
+            var first = tokens[slice.StartIndex];
+            var last = tokens[slice.StartIndex + slice.Count - 1];
+            return new Span(line, first.Column, line, last.Column + last.Value.Length);
+        }
+
+        var indices = tokenIndex.EnumerateLineTokenIndices(line).ToList();
+        if (indices.Count == 0)
         {
             return null;
         }
 
-        var start = lineTokens[0].Column;
-        var last = lineTokens[^1];
-        var end = last.Column + last.Value.Length;
-        return new Span(line, start, line, end);
+        var firstToken = tokens[indices[0]];
+        var lastToken = tokens[indices[^1]];
+        return new Span(line, firstToken.Column, line, lastToken.Column + lastToken.Value.Length);
     }
 
     /// <summary>构建括号配对范围（圆括号、方括号、花括号）</summary>
@@ -169,6 +181,7 @@ public static class SelectionRangeBuilder
     /// </summary>
     private static IEnumerable<Span> BuildDeclarationSpans(
         List<LangToken> tokens,
+        TokenLineIndex tokenIndex,
         List<Span> bracketPairs,
         int line,
         int character)
@@ -180,7 +193,7 @@ public static class SelectionRangeBuilder
                 continue;
             }
 
-            var openIndex = FindTokenIndex(tokens, pair.StartLine, pair.StartChar);
+            var openIndex = tokenIndex.FindTokenIndexAtExactStart(pair.StartLine, pair.StartChar);
             if (openIndex < 0 || tokens[openIndex].Type != LangTokenType.LeftBrace)
             {
                 continue;
@@ -199,19 +212,6 @@ public static class SelectionRangeBuilder
                 pair.EndLine,
                 pair.EndChar);
         }
-    }
-
-    private static int FindTokenIndex(List<LangToken> tokens, int line, int column)
-    {
-        for (var i = 0; i < tokens.Count; i++)
-        {
-            if (tokens[i].Line - 1 == line && tokens[i].Column == column)
-            {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     private static int FindDeclarationKeywordIndex(List<LangToken> tokens, int openBraceIndex)

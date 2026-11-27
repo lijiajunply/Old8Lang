@@ -121,6 +121,10 @@
         "title": "Old8Lang: 运行当前文件"
       },
       {
+        "command": "old8lang.debugFile",
+        "title": "Old8Lang: 调试当前文件"
+      },
+      {
         "command": "old8lang.checkFile",
         "title": "Old8Lang: 语法检查当前文件"
       },
@@ -131,6 +135,81 @@
       {
         "command": "old8lang.showReferences",
         "title": "Old8Lang: 显示引用"
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "old8lang"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "old8lang",
+        "label": "Old8Lang Debugger",
+        "languages": [
+          "old8lang"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "要调试的 .old8 源文件路径",
+                "default": "${file}"
+              },
+              "cwd": {
+                "type": "string",
+                "description": "工作目录",
+                "default": "${workspaceFolder}"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "传递给目标脚本的命令行参数",
+                "default": []
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "启动后是否在第一条可执行语句处暂停",
+                "default": false
+              },
+              "noDebug": {
+                "type": "boolean",
+                "description": "以非调试模式直接运行",
+                "default": false
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "old8lang",
+            "request": "launch",
+            "name": "Old8Lang: 调试当前文件",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Old8Lang: Launch",
+            "description": "使用 VM 调试器启动并调试 Old8Lang 文件",
+            "body": {
+              "type": "old8lang",
+              "request": "launch",
+              "name": "Old8Lang: 调试当前文件",
+              "program": "^\"\\${file}\"",
+              "cwd": "^\"\\${workspaceFolder}\"",
+              "stopOnEntry": false
+            }
+          }
+        ]
       }
     ],
     "menus": {
@@ -147,9 +226,14 @@
           "group": "navigation@1"
         },
         {
-          "command": "old8lang.checkFile",
+          "command": "old8lang.debugFile",
           "when": "editorLangId == old8lang",
           "group": "navigation@2"
+        },
+        {
+          "command": "old8lang.checkFile",
+          "when": "editorLangId == old8lang",
+          "group": "navigation@3"
         }
       ]
     },
@@ -191,6 +275,7 @@
     "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node18 --external:vscode --outfile=out/extension.js --sourcemap",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
+    "test": "node test/run-tests.js",
     "package:vsix": "npm run prepare:server && vsce package --no-dependencies",
     "prepare:server": "dotnet publish ../Old8Lang.LanguageServer/Old8Lang.LanguageServer.csproj -c Release -o server --nologo"
   },

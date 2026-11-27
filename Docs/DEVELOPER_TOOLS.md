@@ -118,10 +118,12 @@ person.sayHello()
 
 Language Server 是一个独立的进程，负责提供语言智能功能：
 
-- **文档管理 (DocumentManager)**: 管理打开的文档，维护解析结果和符号表
-- **文档同步 (TextDocumentSyncHandler)**: 处理文档打开、修改、保存、关闭事件
-- **自动补全 (CompletionHandler)**: 提供关键字和符号的智能补全
+- **文档管理 (DocumentManager)**: 管理打开的文档，维护解析结果、按行 Token 索引（`TokenLineIndex`）与符号表；支持语法错误时的悬空 `.` 容错恢复
+- **文档同步与防抖诊断 (TextDocumentSyncHandler / DiagnosticsScheduler)**: 处理文档打开、修改、保存、关闭事件，对 `didChange` 执行按 URI 的防抖合并与后台解析
+- **自动补全 (CompletionHandler)**: 提供关键字、代码片段、内置函数、词法作用域符号与成员链智能补全（按访问位置严格区分 `public` / `protected` / `private` 与静态成员）
 - **跳转定义 / 查找引用 / 重命名**: 顶层符号可跨文件，成员与参数在文件内
+- **调用层次与类型层次 (CallHierarchyHandler / TypeHierarchyHandler)**: 支持单文件与跨文件的调用方/被调方追踪，以及类继承（`extends`）、接口实现（`implements`）与混入（`with`）层次浏览
+- **内联变量值 (InlineValuesHandler)**: 实现 LSP 3.17 `textDocument/inlineValue`，在调试暂停时联动 DAP 映射及 `old8lang/updateDebugSnapshot` 变量快照
 - **工作区索引 (WorkspaceIndex)**: 扫描工作区中的 `.old8` 文件并缓存解析结果
 - **代码镜头 (CodeLensHandler)**: 在函数、类、方法上显示引用数量
 - **选择范围 (SelectionRangeHandler)**: token → 括号表达式 → 语句 → 声明块 → 文档
@@ -307,21 +309,19 @@ code --install-extension old8lang-0.1.0.vsix
 
 ##### 当前已实现的功能
 
-- ✅ 语法高亮、代码片段
-- ✅ 文档同步、实时错误诊断（可按级别过滤）
-- ✅ 智能补全、签名帮助、文档符号
+- ✅ 语法高亮（含 `///` 文档注释标签、字符串插值转义/嵌套花括号、预编译指令、装饰器与泛型嵌套）、代码片段
+- ✅ 文档同步、实时错误诊断（按 URI 防抖后台执行、可按级别过滤）
+- ✅ 智能补全（含词法作用域、继承成员链与按访问位置过滤的私有/受保护成员）、签名帮助、文档符号
 - ✅ 跳转定义、查找引用、重命名（顶层符号跨文件）
+- ✅ 调用层次结构（Call Hierarchy）与类型层次结构（Type Hierarchy，支持跨文件）
 - ✅ 悬停提示、文档高亮、折叠范围、语义高亮、文档链接
-- ✅ 代码镜头、选择范围、参数名内联提示
-- ✅ 任务支持、命令与配置校验、VSIX 打包
+- ✅ 代码镜头、选择范围、参数名内联提示（Inlay Hints）、调试内联变量值（Inline Values）
+- ✅ Debug Adapter（`Old8Lang.App --dap` 与 VS Code `debuggers` 贡献点，支持断点、条件断点、函数断点、按行单步、调用栈、变量与表达式求值）
+- ✅ 任务支持、命令与配置校验、VSIX 打包、无头 Client↔Server / DAP / Grammar 端到端测试（`npm test`）
 
-##### 待完善的功能
+##### 后续演进方向
 
-- ⏳ Debug Adapter（DAP）：需要运行时提供 `--dap` 模式或等价协议
-- ⏳ Inline Values：需要暂停中的调试变量快照
-- ⏳ Call Hierarchy / Type Hierarchy
-- ⏳ 作用域链、成员访问类型推断、诊断增强
-- ⏳ 实时诊断防抖与大文件性能基线
+- ⏳ 扩展更多调试模式支持（IL 模式调试、远程调试与图形化内存/性能监控）
 
 #### 贡献指南
 

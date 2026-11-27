@@ -20,6 +20,9 @@ public class Breakpoint
     /// <summary>限定函数名（null 表示任意函数，按指令偏移命中）</summary>
     public string? FunctionName { get; set; }
 
+    /// <summary>条件表达式（非空时仅条件求值为真才暂停）</summary>
+    public string? Condition { get; set; }
+
     /// <summary>是否启用</summary>
     public bool Enabled { get; set; } = true;
 

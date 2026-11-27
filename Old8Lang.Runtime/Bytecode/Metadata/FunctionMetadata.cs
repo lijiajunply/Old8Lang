@@ -52,6 +52,9 @@ public class FunctionMetadata
     /// <summary>局部变量数量</summary>
     public int LocalCount { get; set; }
 
+    /// <summary>运行期调试用：局部变量槽位索引 → 源码变量名映射（不写入 .o8c 二进制格式）</summary>
+    public Dictionary<int, string> LocalVariableNames { get; } = new();
+
     /// <summary>最大栈深度</summary>
     public int MaxStackSize { get; set; }
 

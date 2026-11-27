@@ -64,11 +64,17 @@ dotnet run --project Old8Lang.App -- -vm <文件路径>
 ```
 
 ### 5. 调试模式 (Debug Mode)
-启用调试输出，查看详细的执行日志。
+启用调试输出，查看详细的执行日志，或以标准 Debug Adapter Protocol (DAP) 模式启动虚拟机调试适配器供 VS Code 等编辑器连接：
 
 ```bash
-# 配合其他模式使用，添加 -d 参数
+# 配合其他模式使用，添加 -d 参数查看详细调试日志
 dotnet run --project Old8Lang.App -- -f scripts/test.old8 -d
+
+# 以虚拟机交互式终端调试会话运行
+dotnet run --project Old8Lang.App -- -vm scripts/test.old8 --debug-session --break 10
+
+# 以标准 DAP 模式（stdio）启动 VM 调试适配器
+dotnet run --project Old8Lang.App -- --dap
 ```
 
 ## 执行模式对比 (Execution Modes Comparison)

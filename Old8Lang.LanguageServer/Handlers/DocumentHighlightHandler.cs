@@ -91,29 +91,14 @@ public class DocumentHighlightHandler(DocumentManager documentManager) : Documen
             return DocumentHighlightKind.Read;
         }
 
-        // 查找对应位置的 token
-        // Token 的行号是 1-based，列号是 0-based
-        // SourceLocation 的行号和列号都是 0-based
-        var tokenLine = location.Line + 1; // 转换为 1-based
-        var tokenColumn = location.Column; // 列号已经是 0-based，不需要转换
-
-        for (int i = 0; i < document.Tokens.Count; i++)
+        // 通过按行索引 O(1) 定位对应位置的 token
+        var index = document.TokenIndex.FindTokenIndexAtExactStart(location.Line, location.Column);
+        if (index >= 0 && index + 1 < document.Tokens.Count)
         {
-            var token = document.Tokens[i];
-            if (token.Line == tokenLine && token.Column == tokenColumn)
+            var nextToken = document.Tokens[index + 1];
+            if (nextToken.Type == LangTokenType.Assignment) // <-
             {
-                // 检查下一个 token 是否是赋值运算符
-                if (i + 1 < document.Tokens.Count)
-                {
-                    var nextToken = document.Tokens[i + 1];
-                    if (nextToken.Type == LangTokenType.Assignment) // <-
-                    {
-                        return DocumentHighlightKind.Write;
-                    }
-                }
-
-                // 默认为读取
-                return DocumentHighlightKind.Read;
+                return DocumentHighlightKind.Write;
             }
         }
 

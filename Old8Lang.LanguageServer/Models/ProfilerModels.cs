@@ -355,3 +355,24 @@ public class HotFunctionInfo
     /// </summary>
     public double AverageTimeMs { get; set; }
 }
+
+/// <summary>
+/// 更新调试变量快照请求（由 DAP 跟踪器或调试前端在暂停/继续/结束时推送）
+/// </summary>
+public class UpdateDebugSnapshotRequest : IRequest<bool>
+{
+    /// <summary>文档 URI</summary>
+    public required string Uri { get; set; }
+
+    /// <summary>当前暂停的栈帧 ID</summary>
+    public int FrameId { get; set; } = 1;
+
+    /// <summary>暂停位置的 0-based 行号</summary>
+    public int StoppedLine { get; set; }
+
+    /// <summary>当前帧可见变量名 → 格式化值的映射</summary>
+    public Dictionary<string, string>? Variables { get; set; }
+
+    /// <summary>为 true 时清除该文档的调试变量快照</summary>
+    public bool Clear { get; set; }
+}

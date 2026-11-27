@@ -38,9 +38,9 @@ public class CompletionHandler(DocumentManager documentManager, WorkspaceIndex? 
         if (document?.Tokens != null && document.SymbolTable != null)
         {
             var memberCompletions = GetMemberCompletions(document, request.Position, effectiveWorkspace);
-            if (memberCompletions != null && memberCompletions.Any())
+            if (memberCompletions != null)
             {
-                // 如果是成员访问，只返回成员补全
+                // 确认处于成员访问位置时，即便因可见性过滤没有可访问成员也不回退到全局关键字补全
                 return Task.FromResult(new CompletionList(memberCompletions, isIncomplete: false));
             }
         }

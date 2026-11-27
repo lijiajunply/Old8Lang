@@ -11,11 +11,22 @@ using Range = OmniSharp.Extensions.LanguageServer.Protocol.Models.Range;
 namespace Old8Lang.LanguageServer.Handlers;
 
 /// <summary>
-/// 文档同步处理器
+/// 文档同步处理器（支持 didChange 实时诊断防抖与后台执行）
 /// </summary>
-public class TextDocumentSyncHandler(DocumentManager documentManager, ILanguageServerFacade languageServer)
+public class TextDocumentSyncHandler(
+    DocumentManager documentManager,
+    ILanguageServerFacade? languageServer,
+    DiagnosticsScheduler? diagnosticsScheduler = null)
     : ITextDocumentSyncHandler
 {
+    private readonly DiagnosticsScheduler _diagnosticsScheduler = diagnosticsScheduler ?? new DiagnosticsScheduler(
+        documentManager,
+        new DiagnosticsSchedulerOptions
+        {
+            DebounceDelay = TimeSpan.Zero,
+            RunInBackground = false
+        });
+
     public TextDocumentSyncKind Change => TextDocumentSyncKind.Full;
 
     public TextDocumentChangeRegistrationOptions GetRegistrationOptions(
@@ -72,37 +83,49 @@ public class TextDocumentSyncHandler(DocumentManager documentManager, ILanguageS
         var uri = request.TextDocument.Uri.ToString();
         var text = request.TextDocument.Text;
 
-        var result = documentManager.UpdateDocument(uri, text);
-        PublishDiagnostics(uri, result);
-
+        _diagnosticsScheduler.FlushNow(uri, text, PublishDiagnostics, cancellationToken);
         return Unit.Task;
     }
 
-    public Task<Unit> Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DidChangeTextDocumentParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
         var text = request.ContentChanges.FirstOrDefault()?.Text ?? "";
 
-        var result = documentManager.UpdateDocument(uri, text);
-        PublishDiagnostics(uri, result);
+        await _diagnosticsScheduler
+            .ScheduleAsync(uri, text, PublishDiagnostics, cancellationToken)
+            .ConfigureAwait(false);
 
-        return Unit.Task;
+        return Unit.Value;
     }
 
     public Task<Unit> Handle(DidSaveTextDocumentParams request, CancellationToken cancellationToken)
     {
+        var uri = request.TextDocument.Uri.ToString();
+        if (documentManager.HasPendingUpdate(uri))
+        {
+            _diagnosticsScheduler.FlushNow(uri, request.Text, PublishDiagnostics, cancellationToken);
+        }
+
         return Unit.Task;
     }
 
     public Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
+        _diagnosticsScheduler.Cancel(uri);
         documentManager.CloseDocument(uri);
+        ClearDiagnostics(uri);
         return Unit.Task;
     }
 
     private void PublishDiagnostics(string uri, Models.DocumentParseResult result)
     {
+        if (languageServer == null)
+        {
+            return;
+        }
+
         var diagnostics = result.Diagnostics.Select(d => new Diagnostic
         {
             Severity = ConvertSeverity(d.Severity),
@@ -118,6 +141,20 @@ public class TextDocumentSyncHandler(DocumentManager documentManager, ILanguageS
         {
             Uri = DocumentUri.From(uri),
             Diagnostics = new Container<Diagnostic>(diagnostics)
+        });
+    }
+
+    private void ClearDiagnostics(string uri)
+    {
+        if (languageServer == null)
+        {
+            return;
+        }
+
+        languageServer.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
+        {
+            Uri = DocumentUri.From(uri),
+            Diagnostics = new Container<Diagnostic>()
         });
     }
 

@@ -710,7 +710,16 @@ public class BytecodeCompiler : IBytecodeCompiler
 
     public int DeclareLocalVariable(string name, string type = "")
     {
-        return _scopes.Peek().DeclareLocal(name, type);
+        var index = _scopes.Peek().DeclareLocal(name, type);
+        if (_currentFunction != null &&
+            !string.IsNullOrEmpty(name) &&
+            !name.StartsWith('<') &&
+            !name.StartsWith('$'))
+        {
+            _currentFunction.LocalVariableNames[index] = name;
+        }
+
+        return index;
     }
 
     public bool IsLocalVariable(string name)

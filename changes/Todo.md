@@ -1123,27 +1123,25 @@ AST 中有 `ConstantLangValue` 节点，用于常量折叠。
 
 ### P1：尚未实现的 LSP 能力
 
-- [ ] 实现 Inline Values，并与可用的调试运行时状态建立协议映射（依赖 DAP 或变量快照）。
-- [ ] 实现 Call Hierarchy / Type Hierarchy（OmniSharp 0.19.9 提供协议 API）。
+- [x] 实现 Inline Values，并与可用的调试运行时状态建立协议映射（新增 `InlineValuesHandler` 实现 LSP 3.17 `textDocument/inlineValue`，支持标准 DAP `InlineValueVariableLookup` / `InlineValueEvaluatableExpression` 映射及经 `old8lang/updateDebugSnapshot` 同步的暂停变量快照 `InlineValueText`，详见 `changes/2026-11-27-LSP与VSCode扩展完善/test.md`）。
+- [x] 实现 Call Hierarchy / Type Hierarchy（基于 OmniSharp 0.19.9 实现 `CallHierarchyHandler` 与 `TypeHierarchyHandler`，在 `SymbolTableBuilder` 提取函数/方法/顶层调用点，支持单文件与跨文件继承/接口/Mixin 查询，已注册并补齐单测、协议测试与文档）。
 
 实现新 Handler 时需要同时完成：协议注册、能力声明（如需要）、单元测试、集成测试和文档更新。
 
 ### P2：性能与工程质量
 
-- [ ] 为 token 按行建立索引，降低位置查找的线性扫描成本。
-- [ ] 为实时诊断增加防抖和后台执行，避免大文件编辑卡顿。
-- [ ] 增加 Language Client ↔ Language Server 的端到端测试。
-- [ ] 增加大文件和实时诊断延迟的性能基线。
+- [x] 为 token 按行建立索引，降低位置查找的线性扫描成本（新增 `TokenLineIndex` 并接入 `DocumentParseResult`、`SymbolFinder`、`MemberChainAnalyzer`、`SelectionRangeBuilder`、`SignatureHelpHandler`、`InlayHintHandler` 与 `DocumentHighlightHandler`，5000 行实测加速 382x）。
+- [x] 为实时诊断增加防抖和后台执行，避免大文件编辑卡顿（新增 `DiagnosticsScheduler` 与 `DocumentManager` 暂存/按需解析机制，接入 `TextDocumentSyncHandler` 与 `Program.cs`，15 次连续编辑合并为 1 次后台发布且不阻塞补全/导航）。
+- [x] 增加 Language Client ↔ Language Server 的端到端测试（新增 C# 子进程级 `LspClientServerProcessEndToEndTests` 与 `vscode-old8lang/test/run-tests.js` 基于 `vscode-jsonrpc` 的真实 stdio Client↔Server 与 DAP 端到端测试）。
+- [x] 增加大文件和实时诊断延迟的性能基线（新增 `LspPerformanceBaselineTests`，覆盖 1000/2000/5000 行大文件解析、索引查找与防抖延迟的 `PerformanceSmoke` 与 `Performance` 双档基线）。
 
 ### 尚未完成
 
-- [ ] 实现 Debug Adapter；当前扩展没有 `debugAdapter.ts`、调试贡献点或 DAP 配置。
-      运行时目前只有 VM 的交互式终端调试器（`-vm --debug-session`）和 LSP 自定义调试请求，
-      需要先确定 DAP 与运行时的对接方式（建议新增一个 `--dap` 模式），再实现适配器。
-- [ ] 语法高亮的字符串插值、文档注释和嵌套结构可作为独立的 grammar 改进项。
+- [x] 实现 Debug Adapter（运行时新增 `VmDapServer` 与 `Old8Lang.App --dap` 命令，支持行/函数/条件断点、按行单步、调用栈、局部/全局变量与对象字段查看、表达式求值；扩展新增 `vscode-old8lang/src/debugAdapter.ts`、`debuggers`/`breakpoints`/`old8lang.debugFile` 贡献点及 DAP→LSP 变量快照跟踪器）。
+- [x] 语法高亮的字符串插值、文档注释和嵌套结构改进（升级 `vscode-old8lang/syntaxes/old8lang.tmLanguage.json`，支持 `///` 多风格文档注释标签、插值 `{{`/`}}` 转义与嵌套花括号、文件头/预编译指令、装饰器与泛型/括号嵌套，并纳入 `npm test` 校验）。
 
-- [ ] **私有成员补全**：按访问位置决定是否展示私有成员（`CompletionHandler.cs` 中的 TODO）。
-- [ ] **补全测试**：核查泛型、表达式、Extern、预处理指令、联合/交叉类型及成员链、类型推断和文档注释的覆盖；评估并发、性能和模糊测试。参考 `Old8Lang.Tests/LanguageServer/Docs/` 中的测试计划。
+- [x] **私有成员补全**：核验并完善外部、本类 `this`/同类实例、子类 `this`/`super`、静态类名与方法内裸名称的 `private`/`protected`/`public` 可见性过滤，修复空可访问成员列表回退到全局补全及悬空 `.` 语法错误丢失符号表的问题，新增 `CompletionHandler_PrivateMemberTests`。
+- [x] **补全测试**：新增 `CompletionHandler_PrivateMemberTests`、`CompletionHandler_AdvancedCoverageTests`（泛型、表达式、Extern、文件头指令、联合/交叉类型、多级成员链、类型推断与文档注释）及 `CompletionHandler_StressAndFuzzTests`（多线程并发与确定性模糊测试），并启用 `CompletionHandler_ContextAwareTests` 私有成员断言。
 
 ## 长期研究与调试方向
 

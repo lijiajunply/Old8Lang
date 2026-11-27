@@ -25,7 +25,8 @@ public class MemberChainAnalyzer(
     Position position,
     SymbolScope? rootScope = null,
     WorkspaceIndex? workspaceIndex = null,
-    string? documentUri = null)
+    string? documentUri = null,
+    TokenLineIndex? tokenIndex = null)
 {
     public MemberChainAnalyzer(
         DocumentParseResult document,
@@ -37,7 +38,8 @@ public class MemberChainAnalyzer(
             position,
             document.RootScope,
             workspaceIndex,
-            document.Uri)
+            document.Uri,
+            document.TokenIndex)
     {
     }
 
@@ -93,18 +95,26 @@ public class MemberChainAnalyzer(
     /// </summary>
     private int FindDotAtPosition(int line, int column)
     {
-        // 从后向前查找光标位置之前或所在位置的最近 token（严格大于 column 才跳过，使光标位于 '.' 上也能命中）
-        var cursorTokenIndex = -1;
-        for (int i = tokens.Count - 1; i >= 0; i--)
+        // 优先通过按行索引 O(1) 定位光标之前最近的 token，回退到线性扫描（手工传入 List<LangToken> 时）
+        int cursorTokenIndex;
+        if (tokenIndex != null)
         {
-            var token = tokens[i];
-            if (token.Line > line || (token.Line == line && token.Column > column))
+            cursorTokenIndex = tokenIndex.FindLastTokenAtOrBefore(line - 1, column);
+        }
+        else
+        {
+            cursorTokenIndex = -1;
+            for (int i = tokens.Count - 1; i >= 0; i--)
             {
-                continue;
-            }
+                var token = tokens[i];
+                if (token.Line > line || (token.Line == line && token.Column > column))
+                {
+                    continue;
+                }
 
-            cursorTokenIndex = i;
-            break;
+                cursorTokenIndex = i;
+                break;
+            }
         }
 
         if (cursorTokenIndex < 0)

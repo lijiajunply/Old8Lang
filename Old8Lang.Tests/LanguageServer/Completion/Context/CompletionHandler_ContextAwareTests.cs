@@ -198,11 +198,11 @@ func main() -> void {
         var items = result.Items.ToList();
 
         var getDataMethod = items.FirstOrDefault(i => i.Label == "getData");
-        // 私有成员 data 不应该在类外部补全中显示
-        // var secretField = items.FirstOrDefault(i => i.Label == "data");
+        var secretField = items.FirstOrDefault(i => i.Label == "data");
 
         Assert.NotNull(getDataMethod);
-        // Assert.NotNull(secretField);
+        // 私有成员 data 不应该在类外部补全中显示
+        Assert.Null(secretField);
 
         Assert.DoesNotContain(items, i => i.Label == "Test");
         Assert.DoesNotContain(items, i => i.Label == "obj");

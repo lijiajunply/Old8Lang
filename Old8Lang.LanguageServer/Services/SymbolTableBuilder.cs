@@ -24,6 +24,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     /// <summary>构建完成后的全局词法作用域根结点</summary>
     public SymbolScope? RootScope { get; private set; }
 
+    /// <summary>顶层脚本作用域中的直接调用点列表（供 Call Hierarchy 使用）</summary>
+    public List<CallSite> TopLevelCalls { get; } = [];
+
     /// <summary>
     /// 构建符号表与词法作用域树，返回顶层全局符号字典（保持向后兼容）。
     /// </summary>
@@ -888,19 +891,53 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 break;
             }
             case Operation op:
-                VisitExpressionForNestedScopes(op.Left, scope);
-                VisitExpressionForNestedScopes(op.Right, scope);
+                if (op.Opera == LangTokenType.Dot)
+                {
+                    VisitExpressionForNestedScopes(op.Left, scope);
+
+                    var receiverName = ExtractReceiverName(op.Left);
+                    if (op.Right is CallExpression memberCall)
+                    {
+                        RecordCallSite(scope, memberCall.Id.IdName, memberCall.Id.Position, memberCall.Position, receiverName, isMemberCall: true);
+                        foreach (var arg in memberCall.Arguments) VisitExpressionForNestedScopes(arg, scope);
+                        foreach (var named in memberCall.NamedArguments) VisitExpressionForNestedScopes(named.Value, scope);
+                    }
+                    else if (op.Right is Instance memberInst)
+                    {
+                        RecordCallSite(scope, memberInst.Id.IdName, memberInst.Id.Position, memberInst.Position, receiverName, isMemberCall: true);
+                        foreach (var arg in memberInst.Ids) VisitExpressionForNestedScopes(arg, scope);
+                        foreach (var named in memberInst.NamedArgs) VisitExpressionForNestedScopes(named.Value, scope);
+                    }
+                    else
+                    {
+                        VisitExpressionForNestedScopes(op.Right, scope);
+                    }
+                }
+                else
+                {
+                    VisitExpressionForNestedScopes(op.Left, scope);
+                    VisitExpressionForNestedScopes(op.Right, scope);
+                }
                 break;
             case CallExpression call:
+                RecordCallSite(scope, call.Id.IdName, call.Id.Position, call.Position, receiverName: null, isMemberCall: false);
                 foreach (var arg in call.Arguments) VisitExpressionForNestedScopes(arg, scope);
                 foreach (var named in call.NamedArguments) VisitExpressionForNestedScopes(named.Value, scope);
                 break;
             case Instance inst:
+                RecordCallSite(scope, inst.Id.IdName, inst.Id.Position, inst.Position, receiverName: null, isMemberCall: false);
                 foreach (var arg in inst.Ids) VisitExpressionForNestedScopes(arg, scope);
                 foreach (var named in inst.NamedArgs) VisitExpressionForNestedScopes(named.Value, scope);
                 break;
             case FunctionCallExpression funcCall:
-                VisitExpressionForNestedScopes(funcCall.FunctionExpression, scope);
+                if (funcCall.FunctionExpression is LangId fnId)
+                {
+                    RecordCallSite(scope, fnId.IdName, fnId.Position, funcCall.Position, receiverName: null, isMemberCall: false);
+                }
+                else
+                {
+                    VisitExpressionForNestedScopes(funcCall.FunctionExpression, scope);
+                }
                 foreach (var arg in funcCall.Arguments) VisitExpressionForNestedScopes(arg, scope);
                 break;
             case TernaryExpression ternary:
@@ -921,6 +958,65 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 foreach (var el in tupleLit.Elements) VisitExpressionForNestedScopes(el, scope);
                 break;
         }
+    }
+
+    private void RecordCallSite(
+        SymbolScope scope,
+        string symbolName,
+        SourcePosition idPosition,
+        SourcePosition fallbackPosition,
+        string? receiverName,
+        bool isMemberCall)
+    {
+        if (string.IsNullOrEmpty(symbolName))
+        {
+            return;
+        }
+
+        var callSite = new CallSite
+        {
+            SymbolName = symbolName,
+            Location = CreateLocation(idPosition, symbolName.Length, fallbackPosition),
+            ReceiverName = receiverName,
+            IsMemberCall = isMemberCall
+        };
+
+        var owner = FindEnclosingCallableOwner(scope);
+        if (owner != null)
+        {
+            owner.Calls.Add(callSite);
+        }
+        else
+        {
+            TopLevelCalls.Add(callSite);
+        }
+    }
+
+    private static SymbolInfo? FindEnclosingCallableOwner(SymbolScope scope)
+    {
+        var current = scope;
+        while (current != null)
+        {
+            if (current.Kind is ScopeKind.Function or ScopeKind.Method && current.OwnerSymbol != null)
+            {
+                return current.OwnerSymbol;
+            }
+
+            current = current.Parent;
+        }
+
+        return null;
+    }
+
+    private static string? ExtractReceiverName(LangExpression? receiver)
+    {
+        return receiver switch
+        {
+            LangId id => id.IdName,
+            ThisExpression => "this",
+            SuperExpression => "super",
+            _ => null
+        };
     }
 
     /// <summary>

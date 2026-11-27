@@ -25,13 +25,13 @@ public class SymbolFinder
             return null;
         }
 
-        var tokenAtPosition = FindTokenAtPosition(document.Tokens, line, column, document.Text);
-        if (tokenAtPosition == null)
+        var tokenMatch = document.TokenIndex.FindTokenAtPosition(line, column);
+        if (tokenMatch == null)
         {
             return null;
         }
 
-        var token = tokenAtPosition.Value;
+        var (token, tokenIndex) = tokenMatch.Value;
         var scope = document.RootScope?.FindInnermostScope(line, column);
 
         // 支持对 this / super 悬停与跳转
@@ -58,25 +58,16 @@ public class SymbolFinder
         }
 
         var symbolName = token.Value;
-        var tokenIndex = FindTokenIndex(document.Tokens, token);
-        if (tokenIndex == -1)
-        {
-            return null;
-        }
 
         // 1. 成员访问（obj.member、this.member、super.member、ClassName.staticMember、a.b.c）
         if (tokenIndex > 0 && document.Tokens[tokenIndex - 1].Type == LangTokenType.Dot)
         {
-            var dotToken = document.Tokens[tokenIndex - 1];
             var chainAnalyzer = new MemberChainAnalyzer(
-                document.Tokens,
-                document.SymbolTable,
-                new Position(dotToken.Line - 1, dotToken.Column + 1),
-                document.RootScope,
-                workspaceIndex,
-                document.Uri);
+                document,
+                new Position(token.Line - 1, token.Column),
+                workspaceIndex);
 
-            var chainResult = chainAnalyzer.AnalyzeChainDetailed();
+            var chainResult = chainAnalyzer.AnalyzeChainAtDotIndex(tokenIndex - 1);
             if (chainResult != null)
             {
                 var resolvedMember = TypeResolver.FindMember(
@@ -296,6 +287,14 @@ public class SymbolFinder
     }
 
     /// <summary>
+    /// 根据 LSP 位置查找 token（行列号均从 0 开始，使用文档按行索引实现 O(1) 行定位）。
+    /// </summary>
+    public static LangToken? FindTokenAtPosition(DocumentParseResult document, int line, int column)
+    {
+        return document.TokenIndex.FindTokenAtPosition(line, column)?.Token;
+    }
+
+    /// <summary>
     /// 根据 LSP 位置查找 token（行列号均从 0 开始）
     /// </summary>
     public static LangToken? FindTokenAtPosition(List<LangToken> tokens, int line, int column, string? sourceCode = null)
@@ -328,7 +327,7 @@ public class SymbolFinder
             return null;
         }
 
-        var token = FindTokenAtPosition(document.Tokens, line, column, document.Text);
+        var token = FindTokenAtPosition(document, line, column);
         return token is { Type: LangTokenType.Identifier } ? token.Value.Value : null;
     }
 

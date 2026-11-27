@@ -109,7 +109,10 @@ public class LspProtocolEndToEndTests : IAsyncLifetime
                 .WithHandler<CodeLensHandler>()
                 .WithHandler<SelectionRangeHandler>()
                 .WithHandler<InlayHintHandler>()
-                // 全部 8 个自定义 Debug & Profiler Handler（与 Program.cs 保持一致）
+                .WithHandler<InlineValuesHandler>()
+                .WithHandler<CallHierarchyHandler>()
+                .WithHandler<TypeHierarchyHandler>()
+                // 全部 9 个自定义 Debug & Profiler Handler（与 Program.cs 保持一致）
                 .WithHandler<StartProfilingHandler>()
                 .WithHandler<StopProfilingHandler>()
                 .WithHandler<GetProfilingStatusHandler>()
@@ -117,7 +120,8 @@ public class LspProtocolEndToEndTests : IAsyncLifetime
                 .WithHandler<StopDebuggingHandler>()
                 .WithHandler<AddBreakpointHandler>()
                 .WithHandler<RemoveBreakpointHandler>()
-                .WithHandler<DebugControlHandler>());
+                .WithHandler<DebugControlHandler>()
+                .WithHandler<UpdateDebugSnapshotHandler>());
 
         _client = new LspJsonRpcHarness(_clientToServer.Writer, _serverToClient.Reader);
 
@@ -147,7 +151,10 @@ public class LspProtocolEndToEndTests : IAsyncLifetime
                     ["documentLink"] = new JObject { ["dynamicRegistration"] = false },
                     ["codeLens"] = new JObject { ["dynamicRegistration"] = false },
                     ["selectionRange"] = new JObject { ["dynamicRegistration"] = false },
-                    ["inlayHint"] = new JObject { ["dynamicRegistration"] = false }
+                    ["inlayHint"] = new JObject { ["dynamicRegistration"] = false },
+                    ["inlineValue"] = new JObject { ["dynamicRegistration"] = false },
+                    ["callHierarchy"] = new JObject { ["dynamicRegistration"] = false },
+                    ["typeHierarchy"] = new JObject { ["dynamicRegistration"] = false }
                 },
                 ["workspace"] = new JObject
                 {
@@ -451,6 +458,83 @@ public class LspProtocolEndToEndTests : IAsyncLifetime
             ["uri"] = _mainUri
         });
         Assert.False(dbgStopped!["isDebugging"]!.Value<bool>());
+
+        // Call Hierarchy: prepare + incomingCalls + outgoingCalls (compute at line 16)
+        var callPrep = await _client.SendRequestAsync("textDocument/prepareCallHierarchy", new JObject
+        {
+            ["textDocument"] = new JObject { ["uri"] = _mainUri },
+            ["position"] = new JObject { ["line"] = 16, ["character"] = 6 }
+        });
+        var callItems = Assert.IsType<JArray>(callPrep);
+        Assert.Single(callItems);
+        Assert.Equal("compute", callItems[0]!["name"]!.Value<string>());
+
+        var incomingCalls = await _client.SendRequestAsync("callHierarchy/incomingCalls", new JObject
+        {
+            ["item"] = callItems[0]
+        });
+        Assert.NotEmpty(Assert.IsType<JArray>(incomingCalls));
+
+        var outgoingCalls = await _client.SendRequestAsync("callHierarchy/outgoingCalls", new JObject
+        {
+            ["item"] = callItems[0]
+        });
+        Assert.IsType<JArray>(outgoingCalls);
+
+        // Type Hierarchy: prepare + supertypes + subtypes (Dog at line 10)
+        var typePrep = await _client.SendRequestAsync("textDocument/prepareTypeHierarchy", new JObject
+        {
+            ["textDocument"] = new JObject { ["uri"] = _mainUri },
+            ["position"] = new JObject { ["line"] = 10, ["character"] = 7 }
+        });
+        var typeItems = Assert.IsType<JArray>(typePrep);
+        Assert.Single(typeItems);
+        Assert.Equal("Dog", typeItems[0]!["name"]!.Value<string>());
+
+        var supers = await _client.SendRequestAsync("typeHierarchy/supertypes", new JObject
+        {
+            ["item"] = typeItems[0]
+        });
+        var superArr = Assert.IsType<JArray>(supers);
+        Assert.Contains(superArr, s => s["name"]?.Value<string>() == "Animal");
+
+        var animalItem = superArr.First(s => s["name"]?.Value<string>() == "Animal");
+        var subs = await _client.SendRequestAsync("typeHierarchy/subtypes", new JObject
+        {
+            ["item"] = animalItem
+        });
+        Assert.Contains(Assert.IsType<JArray>(subs), s => s["name"]?.Value<string>() == "Dog");
+
+        // Inline Values + old8lang/updateDebugSnapshot
+        var snapUpdated = await _client.SendRequestAsync("old8lang/updateDebugSnapshot", new JObject
+        {
+            ["uri"] = _mainUri,
+            ["frameId"] = 1,
+            ["stoppedLine"] = 18,
+            ["variables"] = new JObject { ["a"] = "1", ["b"] = "2", ["sum"] = "3" }
+        });
+        Assert.True(snapUpdated!.Value<bool>());
+
+        var inlineValues = await _client.SendRequestAsync("textDocument/inlineValue", new JObject
+        {
+            ["textDocument"] = new JObject { ["uri"] = _mainUri },
+            ["range"] = new JObject
+            {
+                ["start"] = new JObject { ["line"] = 16, ["character"] = 0 },
+                ["end"] = new JObject { ["line"] = 19, ["character"] = 0 }
+            },
+            ["context"] = new JObject
+            {
+                ["frameId"] = 1,
+                ["stoppedLocation"] = new JObject
+                {
+                    ["start"] = new JObject { ["line"] = 18, ["character"] = 0 },
+                    ["end"] = new JObject { ["line"] = 18, ["character"] = 20 }
+                }
+            }
+        });
+        var inlineArr = Assert.IsType<JArray>(inlineValues);
+        Assert.Contains(inlineArr, iv => iv["text"]?.Value<string>() == "sum = 3");
 
         // textDocument/didChange 修复错误 -> 推送清空后的诊断
         await _client.SendNotificationAsync("textDocument/didChange", new JObject

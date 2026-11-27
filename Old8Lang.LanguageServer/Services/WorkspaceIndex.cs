@@ -27,6 +27,9 @@ public sealed class IndexedFile
     /// <summary>词法作用域树根结点（供跨文件分析与作用域过滤使用）</summary>
     public SymbolScope? RootScope { get; init; }
 
+    /// <summary>顶层脚本作用域中的直接调用点列表（供跨文件 Call Hierarchy 使用）</summary>
+    public List<CallSite> TopLevelCalls { get; init; } = [];
+
     /// <summary>该快照是否来自已打开（可能未保存）的编辑器文档</summary>
     public bool IsOpen { get; init; }
 
@@ -420,6 +423,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
         List<LangToken> tokens = [];
         Dictionary<string, SymbolInfo> symbols = new();
         SymbolScope? rootScope = null;
+        List<CallSite> topLevelCalls = [];
         var parsed = false;
 
         try
@@ -440,6 +444,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
                 var builder = new SymbolTableBuilder(uri, tokens, text);
                 rootScope = builder.BuildWithScope(ast);
                 symbols = rootScope.Symbols;
+                topLevelCalls = builder.TopLevelCalls;
                 parsed = true;
             }
             catch
@@ -456,6 +461,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
             Tokens = tokens,
             Symbols = symbols,
             RootScope = rootScope,
+            TopLevelCalls = topLevelCalls,
             Parsed = parsed,
             LastWriteUtc = lastWriteUtc,
             Length = length
@@ -483,6 +489,7 @@ public sealed class WorkspaceIndex(DocumentManager documentManager)
             Tokens = document.Tokens ?? [],
             Symbols = document.SymbolTable ?? new Dictionary<string, SymbolInfo>(),
             RootScope = document.RootScope,
+            TopLevelCalls = document.TopLevelCalls,
             IsOpen = true,
             Parsed = document.Ast != null
         };

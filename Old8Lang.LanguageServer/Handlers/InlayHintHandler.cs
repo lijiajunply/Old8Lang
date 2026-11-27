@@ -31,7 +31,12 @@ public class InlayHintHandler(DocumentManager documentManager, WorkspaceIndex? w
         var tokens = document.Tokens;
         var resolved = new Dictionary<string, List<SymbolInfo>?>(StringComparer.Ordinal);
 
-        for (var i = 0; i < tokens.Count; i++)
+        // 使用按行索引仅扫描请求范围附近行（向前预留少量行以覆盖跨行调用名）
+        var startLine = Math.Max(0, (int)request.Range.Start.Line - 8);
+        var endLine = (int)request.Range.End.Line;
+        var (startIdx, endIdx) = document.TokenIndex.GetTokenRangeForLines(startLine, endLine);
+
+        for (var i = startIdx; i < endIdx; i++)
         {
             var token = tokens[i];
             if (token.Type != LangTokenType.Identifier ||

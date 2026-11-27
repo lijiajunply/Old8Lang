@@ -13,6 +13,7 @@ public class DebugProfilerService
 {
     private readonly ConcurrentDictionary<string, DebugSession> _debugSessions = new();
     private readonly ConcurrentDictionary<string, ProfilerSession> _profilerSessions = new();
+    private readonly ConcurrentDictionary<string, DebugVariableSnapshot> _variableSnapshots = new(StringComparer.Ordinal);
     private readonly Lock _lockObject = new();
 
     /// <summary>
@@ -166,6 +167,64 @@ public class DebugProfilerService
     }
 
     /// <summary>
+    /// 更新指定文档的暂停态调试变量快照（供 Inline Values 读取）。
+    /// </summary>
+    public void UpdateVariableSnapshot(
+        string uri,
+        int frameId,
+        int stoppedLine,
+        IReadOnlyDictionary<string, string> variables)
+    {
+        var copy = new Dictionary<string, string>(variables, StringComparer.Ordinal);
+        _variableSnapshots[uri] = new DebugVariableSnapshot
+        {
+            Uri = uri,
+            FrameId = frameId,
+            StoppedLine = stoppedLine,
+            Variables = copy,
+            UpdatedAtUtc = DateTime.UtcNow
+        };
+    }
+
+    /// <summary>清除指定文档的调试变量快照</summary>
+    public void ClearVariableSnapshot(string uri)
+    {
+        _variableSnapshots.TryRemove(uri, out _);
+    }
+
+    /// <summary>
+    /// 获取指定文档的调试变量快照；优先返回外部 DAP 推送的快照，否则尝试从 LSP 调试会话当前栈帧读取。
+    /// </summary>
+    public DebugVariableSnapshot? GetVariableSnapshot(string uri, int? frameId = null)
+    {
+        if (_variableSnapshots.TryGetValue(uri, out var snapshot))
+        {
+            if (frameId == null || frameId <= 0 || snapshot.FrameId == frameId)
+            {
+                return snapshot;
+            }
+        }
+
+        if (_debugSessions.TryGetValue(uri, out var session))
+        {
+            var frame = session.Debugger.CallStack.CurrentFrame;
+            if (frame != null && frame.LocalVariables.Count > 0)
+            {
+                return new DebugVariableSnapshot
+                {
+                    Uri = uri,
+                    FrameId = frameId ?? 1,
+                    StoppedLine = Math.Max(0, frame.Line - 1),
+                    Variables = new Dictionary<string, string>(frame.LocalVariables, StringComparer.Ordinal),
+                    UpdatedAtUtc = DateTime.UtcNow
+                };
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 清除所有会话
     /// </summary>
     public void ClearAllSessions()
@@ -181,8 +240,22 @@ public class DebugProfilerService
             {
                 StopProfilingSession(uri);
             }
+
+            _variableSnapshots.Clear();
         }
     }
+}
+
+/// <summary>
+/// 暂停态调试变量快照（由 DAP 跟踪器或调试会话写入，供 InlineValuesHandler 渲染）
+/// </summary>
+public sealed class DebugVariableSnapshot
+{
+    public required string Uri { get; init; }
+    public required int FrameId { get; init; }
+    public required int StoppedLine { get; init; }
+    public required IReadOnlyDictionary<string, string> Variables { get; init; }
+    public DateTime UpdatedAtUtc { get; init; }
 }
 
 /// <summary>

@@ -95,7 +95,7 @@ public partial class VirtualMachine
 
         // frame.IP 在取指后已经自增，指令下标要减一
         int instructionOffset = frame.IP - 1;
-        if (!debugger.ShouldPauseBeforeInstruction(frame.Function.Name, instructionOffset))
+        if (!debugger.ShouldPauseBeforeInstruction(frame.Function.Name, instructionOffset, instruction.LineNumber))
         {
             return;
         }
@@ -119,7 +119,7 @@ public partial class VirtualMachine
     /// 而当前编译器只在部分路径填充它；直接按指令自带的 <see cref="Instruction.LineNumber"/>
     /// 建立断点更可靠。扫描所有函数，命中位置按函数名限定。
     /// </remarks>
-    public IReadOnlyList<int> AddBreakpointsAtLine(int sourceLine)
+    public IReadOnlyList<int> AddBreakpointsAtLine(int sourceLine, string? condition = null)
     {
         var debugger = Debugger ?? throw new InvalidOperationException("调试器未启用");
         var offsets = new List<int>();
@@ -134,7 +134,7 @@ public partial class VirtualMachine
                 var line = function.Instructions[i].LineNumber;
                 if (line == sourceLine && previousLine != sourceLine)
                 {
-                    debugger.AddFunctionBreakpoint(function.Name, i);
+                    debugger.AddFunctionBreakpoint(function.Name, i, condition, sourceLine);
                     offsets.Add(i);
                 }
 
@@ -145,7 +145,62 @@ public partial class VirtualMachine
         return offsets;
     }
 
-    /// <summary>当前帧的局部变量与参数快照（供调试器 REPL 使用）</summary>
+    /// <summary>按函数名在函数首条指令上设置函数断点，返回是否命中函数定义</summary>
+    public bool AddFunctionEntryBreakpoint(string functionName, string? condition = null)
+    {
+        var debugger = Debugger ?? throw new InvalidOperationException("调试器未启用");
+        var matched = false;
+        foreach (var function in _bytecodeFile.Functions)
+        {
+            if (string.Equals(function.Name, functionName, StringComparison.Ordinal) &&
+                function.Instructions.Count > 0)
+            {
+                debugger.AddFunctionBreakpoint(function.Name, 0, condition, line: 0);
+                matched = true;
+            }
+        }
+
+        return matched;
+    }
+
+    /// <summary>获取当前执行线程的实时调用栈帧（栈顶在前）</summary>
+    public IReadOnlyList<CallFrame> GetLiveCallStackFrames()
+    {
+        return _callStack.ToArray();
+    }
+
+    /// <summary>获取当前虚拟机的用户全局变量快照（供 DAP Globals 作用域使用）</summary>
+    public IReadOnlyDictionary<string, object?> GetGlobalVariables()
+    {
+        var result = new Dictionary<string, object?>(StringComparer.Ordinal);
+        foreach (var name in _bytecodeFile.GlobalVariables)
+        {
+            if (_globals.TryGetValue(name, out var slot))
+            {
+                result[name] = slot.Value;
+            }
+        }
+
+        // 补充运行期写入但未在编译期列出的普通全局变量（跳过函数/类元数据）
+        foreach (var (name, slot) in _globals)
+        {
+            if (result.ContainsKey(name))
+            {
+                continue;
+            }
+
+            if (slot.Value is Metadata.ClassMetadata or Metadata.FunctionMetadata)
+            {
+                continue;
+            }
+
+            result[name] = slot.Value;
+        }
+
+        return result;
+    }
+
+    /// <summary>当前帧的局部变量与参数快照（供调试器 REPL 与 DAP 使用）</summary>
     public static IReadOnlyDictionary<string, object?> GetFrameVariables(CallFrame frame)
     {
         var result = new Dictionary<string, object?>(StringComparer.Ordinal);
@@ -153,6 +208,14 @@ public partial class VirtualMachine
         for (int i = 0; i < parameters.Count && i < frame.Locals.Length; i++)
         {
             result[parameters[i]] = frame.Locals[i];
+        }
+
+        foreach (var (index, name) in frame.Function.LocalVariableNames)
+        {
+            if (index >= 0 && index < frame.Locals.Length && index < frame.LocalCount)
+            {
+                result[name] = frame.Locals[index];
+            }
         }
 
         return result;

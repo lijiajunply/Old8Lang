@@ -135,6 +135,16 @@ public class CallSite
     /// 调用发生的位置
     /// </summary>
     public required SourceLocation Location { get; set; }
+
+    /// <summary>
+    /// 成员调用的接收者名称（如 `obj.foo()` 中的 `obj`、`this`、`super` 或类名；普通函数调用为 null）
+    /// </summary>
+    public string? ReceiverName { get; set; }
+
+    /// <summary>
+    /// 是否为成员调用（通过 `.` 访问）
+    /// </summary>
+    public bool IsMemberCall { get; set; }
 }
 
 /// <summary>

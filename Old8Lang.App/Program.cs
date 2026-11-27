@@ -170,6 +170,7 @@ public abstract class Program
         CommandRegistry.Register(new DebugStartCommand());
         CommandRegistry.Register(new DebugBreakpointCommand());
         CommandRegistry.Register(new DebugControlCommand());
+        CommandRegistry.Register(new DapCommand());
 
         // 性能分析命令
         CommandRegistry.Register(new ProfileCommand());

@@ -37,6 +37,15 @@ public class VMDebugger
     /// <summary>单步执行开始时的调用栈深度</summary>
     private int _stepStartDepth;
 
+    /// <summary>按行单步时的起始行号（null 表示指令级单步）</summary>
+    private int? _stepOriginLine;
+
+    /// <summary>条件断点求值回调（由宿主如 DAP 注入）</summary>
+    public Func<string, bool>? ConditionEvaluator { get; set; }
+
+    /// <summary>最近一次触发暂停的原因（breakpoint / step / entry / pause）</summary>
+    public string LastStopReason { get; private set; } = "step";
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -97,13 +106,19 @@ public class VMDebugger
     /// 指令下标在每个函数内都从 0 开始，只按 offset 建断点会在别的函数里误命中；
     /// 指定 <paramref name="functionName"/> 后只在同名函数内命中。
     /// </remarks>
-    public Breakpoint AddFunctionBreakpoint(string? functionName, int instructionOffset)
+    public Breakpoint AddFunctionBreakpoint(
+        string? functionName,
+        int instructionOffset,
+        string? condition = null,
+        int line = 0)
     {
         var breakpoint = new Breakpoint
         {
             Id = _nextBreakpointId++,
             FunctionName = functionName,
             InstructionOffset = instructionOffset,
+            Condition = string.IsNullOrWhiteSpace(condition) ? null : condition.Trim(),
+            Line = line,
             Enabled = true
         };
 
@@ -114,13 +129,43 @@ public class VMDebugger
             if (location != null)
             {
                 breakpoint.FilePath = location.FilePath;
-                breakpoint.Line = location.Line;
+                if (breakpoint.Line == 0)
+                {
+                    breakpoint.Line = location.Line;
+                }
             }
         }
 
         _breakpoints[breakpoint.Id] = breakpoint;
 
         return breakpoint;
+    }
+
+    /// <summary>清除所有断点</summary>
+    public void ClearBreakpoints()
+    {
+        _breakpoints.Clear();
+        _breakpointsByLocation.Clear();
+    }
+
+    /// <summary>仅清除所有行断点（保留按函数入口 offset == 0 且 line == 0 注册的函数断点）</summary>
+    public void ClearLineBreakpoints()
+    {
+        var toRemove = _breakpoints.Values.Where(b => b.Line > 0).Select(b => b.Id).ToList();
+        foreach (var id in toRemove)
+        {
+            RemoveBreakpoint(id);
+        }
+    }
+
+    /// <summary>仅清除所有函数入口断点</summary>
+    public void ClearFunctionBreakpoints()
+    {
+        var toRemove = _breakpoints.Values.Where(b => b.Line == 0 && b.FunctionName != null).Select(b => b.Id).ToList();
+        foreach (var id in toRemove)
+        {
+            RemoveBreakpoint(id);
+        }
     }
 
     /// <summary>
@@ -231,29 +276,42 @@ public class VMDebugger
         if (!Enabled) return;
 
         State = DebuggerState.Paused;
+        LastStopReason = "pause";
+    }
+
+    /// <summary>在入口处暂停（用于 DAP stopOnEntry）</summary>
+    public void PauseOnEntry()
+    {
+        if (!Enabled) return;
+
+        State = DebuggerState.Paused;
+        LastStopReason = "entry";
     }
 
     /// <summary>
-    /// 单步执行（跳过函数调用）
+    /// 单步执行（跳过函数调用；传入 currentLine 时按源码行单步，否则按字节码指令单步）
     /// </summary>
-    public void StepOver()
+    public void StepOver(int? currentLine = null)
     {
         if (!Enabled) return;
 
         State = DebuggerState.Stepping;
         _stepMode = StepMode.Over;
         _stepStartDepth = _callStack.Count;
+        _stepOriginLine = currentLine;
     }
 
     /// <summary>
-    /// 单步进入（进入函数调用）
+    /// 单步进入（进入函数调用；传入 currentLine 时按源码行单步，否则按字节码指令单步）
     /// </summary>
-    public void StepInto()
+    public void StepInto(int? currentLine = null)
     {
         if (!Enabled) return;
 
         State = DebuggerState.Stepping;
         _stepMode = StepMode.Into;
+        _stepStartDepth = _callStack.Count;
+        _stepOriginLine = currentLine;
     }
 
     /// <summary>
@@ -266,6 +324,7 @@ public class VMDebugger
         State = DebuggerState.Stepping;
         _stepMode = StepMode.Out;
         _stepStartDepth = _callStack.Count;
+        _stepOriginLine = null;
     }
 
     /// <summary>
@@ -291,10 +350,10 @@ public class VMDebugger
         ShouldPauseBeforeInstruction(null, instructionOffset);
 
     /// <summary>
-    /// 在执行指令前检查是否应该暂停（限定函数名）
+    /// 在执行指令前检查是否应该暂停（限定函数名与可选源码行号）
     /// </summary>
     /// <returns>是否应该暂停执行</returns>
-    public bool ShouldPauseBeforeInstruction(string? functionName, int instructionOffset)
+    public bool ShouldPauseBeforeInstruction(string? functionName, int instructionOffset, int? currentLine = null)
     {
         if (!Enabled) return false;
 
@@ -303,19 +362,25 @@ public class VMDebugger
         // 检查断点
         if (HasBreakpoint(functionName, instructionOffset))
         {
-            // 更新断点命中次数
             foreach (var breakpoint in _breakpoints.Values)
             {
                 if (breakpoint.Enabled && breakpoint.InstructionOffset == instructionOffset &&
                     (breakpoint.FunctionName is null || breakpoint.FunctionName == functionName))
                 {
+                    if (!string.IsNullOrEmpty(breakpoint.Condition) && ConditionEvaluator != null)
+                    {
+                        if (!ConditionEvaluator(breakpoint.Condition))
+                        {
+                            continue;
+                        }
+                    }
+
                     breakpoint.HitCount++;
-                    break;
+                    State = DebuggerState.Paused;
+                    LastStopReason = "breakpoint";
+                    return true;
                 }
             }
-
-            State = DebuggerState.Paused;
-            return true;
         }
 
         // 检查单步执行
@@ -323,9 +388,15 @@ public class VMDebugger
         {
             bool shouldPause = _stepMode switch
             {
-                StepMode.Into => true, // 总是暂停
-                StepMode.Over => _callStack.Count <= _stepStartDepth, // 只在相同或更浅的调用栈深度暂停
-                StepMode.Out => _callStack.Count < _stepStartDepth, // 只在更浅的调用栈深度暂停
+                StepMode.Into => _stepOriginLine == null
+                    ? true
+                    : (_callStack.Count != _stepStartDepth ||
+                       (currentLine is > 0 && currentLine != _stepOriginLine)),
+                StepMode.Over => _stepOriginLine == null
+                    ? _callStack.Count <= _stepStartDepth
+                    : (_callStack.Count < _stepStartDepth ||
+                       (_callStack.Count == _stepStartDepth && currentLine is > 0 && currentLine != _stepOriginLine)),
+                StepMode.Out => _callStack.Count < _stepStartDepth,
                 _ => false
             };
 
@@ -333,6 +404,8 @@ public class VMDebugger
             {
                 State = DebuggerState.Paused;
                 _stepMode = StepMode.None;
+                _stepOriginLine = null;
+                LastStopReason = "step";
                 return true;
             }
         }

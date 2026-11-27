@@ -8,6 +8,11 @@ import {
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient/node';
+import {
+    Old8LangDebugAdapterDescriptorFactory,
+    Old8LangDebugAdapterTrackerFactory,
+    Old8LangDebugConfigurationProvider
+} from './debugAdapter';
 
 type CompilerMode = 'interpreter' | 'il' | 'vm' | 'check';
 
@@ -73,8 +78,12 @@ export function activate(context: vscode.ExtensionContext): void {
         }),
         vscode.commands.registerCommand('old8lang.showReferences', showReferences),
         vscode.commands.registerCommand('old8lang.runFile', () => runActiveFile()),
+        vscode.commands.registerCommand('old8lang.debugFile', () => debugActiveFile()),
         vscode.commands.registerCommand('old8lang.checkFile', () => runActiveFile('check')),
-        vscode.commands.registerCommand('old8lang.restartLanguageServer', restartClient)
+        vscode.commands.registerCommand('old8lang.restartLanguageServer', restartClient),
+        vscode.debug.registerDebugConfigurationProvider('old8lang', new Old8LangDebugConfigurationProvider()),
+        vscode.debug.registerDebugAdapterDescriptorFactory('old8lang', new Old8LangDebugAdapterDescriptorFactory(context)),
+        vscode.debug.registerDebugAdapterTrackerFactory('old8lang', new Old8LangDebugAdapterTrackerFactory(() => client))
     );
 
     taskProvider = new Old8LangTaskProvider();
@@ -349,6 +358,27 @@ async function runActiveFile(forceMode?: CompilerMode): Promise<void> {
     });
 
     await vscode.tasks.executeTask(task);
+}
+
+async function debugActiveFile(): Promise<void> {
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'old8lang') {
+        void vscode.window.showWarningMessage('请先打开一个 .old8 文件。');
+        return;
+    }
+
+    await editor.document.save();
+
+    const folder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+    await vscode.debug.startDebugging(folder, {
+        type: 'old8lang',
+        name: 'Old8Lang: 调试当前文件',
+        request: 'launch',
+        program: editor.document.uri.fsPath,
+        cwd: folder?.uri.fsPath ?? path.dirname(editor.document.uri.fsPath),
+        stopOnEntry: false
+    });
 }
 
 function getConfiguredMode(): CompilerMode {

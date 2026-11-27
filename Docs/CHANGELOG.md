@@ -9,6 +9,16 @@
 
 ---
 
+## 2026-11-27
+
+**API**
+
+- `Old8Lang.App` 新增 `--dap` 模式，通过标准 Debug Adapter Protocol（stdio）提供虚拟机断点、条件断点、函数断点、按行单步、调用栈、局部/全局变量查看与表达式求值。
+- Language Server 新增 Call Hierarchy、Type Hierarchy 与 Inline Values（支持通过 `old8lang/updateDebugSnapshot` 同步调试变量快照），成员补全按访问位置过滤私有/受保护成员。
+- VS Code 扩展新增 `old8lang` 调试配置（`launch`）与「Old8Lang: 调试当前文件」命令。
+
+---
+
 ## 2026-11-24
 
 **语法 / 语义**

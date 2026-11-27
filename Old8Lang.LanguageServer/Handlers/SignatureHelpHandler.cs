@@ -142,21 +142,7 @@ public class SignatureHelpHandler(DocumentManager documentManager, WorkspaceInde
     private FunctionCallContext? FindFunctionCall(Models.DocumentParseResult document, int line, int column)
     {
         var tokens = document.Tokens!;
-        int currentIndex = -1;
-
-        // 找到光标位置的 token 索引
-        for (int i = 0; i < tokens.Count; i++)
-        {
-            var token = tokens[i];
-            if (token.Line == line && token.Column <= column)
-            {
-                currentIndex = i;
-            }
-            else if (token.Line > line)
-            {
-                break;
-            }
-        }
+        int currentIndex = document.TokenIndex.FindLastTokenAtOrBefore(line - 1, column);
 
         if (currentIndex < 0)
         {
