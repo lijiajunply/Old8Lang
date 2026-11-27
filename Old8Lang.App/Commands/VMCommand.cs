@@ -135,7 +135,8 @@ public class VMCommand : ICommand
 
             // 执行字节码
             stopwatch.Restart();
-            var vm = new VirtualMachine(bytecodeFile);
+            var scriptDirectory = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            var vm = new VirtualMachine(bytecodeFile, scriptDirectory);
 
             if (disassemble)
             {

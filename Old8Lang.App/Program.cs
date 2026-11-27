@@ -40,7 +40,7 @@ public abstract class Program
             args =
             [
                 "-vm",
-                "C:\\Projects\\RiderProjects\\Old8Lang\\test_langlist_conversions.old8"
+                "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Ex/init.old8"
             ];
         }
 #endif

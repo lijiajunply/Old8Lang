@@ -78,6 +78,8 @@
 
 以下条目来自历史复现，尚未逐项重跑。报告见 IL 缺陷验证（`2026-10-23-23-30-IL模式缺陷修复验证.md`）、跨模式语义修复（`2026-10-24-00-30-P1跨模式语义修复测试.md`） 和 VM 残留修复（`2026-10-24-09-45-P2虚拟机模式残留修复测试.md`）。
 
+- [ ] **VM 中字典转导入的类后调用实例方法失败**：2026-11-27 验证 `Old8Lang.App/Ex/init.old8` 的本地模块导入时，`a <- a as Test` 后执行 `a.Add()` 进入字典方法分派，报「Add 方法需要至少 2 个参数，但只提供了 0 个」。
+
 - [x] **IL 比较运算装箱顺序错误导致测试进程崩溃**：`object` 与数值混合比较时先把两个操作数都压栈、
   再统一 `box`，`box` 只作用于栈顶，因此「数值在左、`object` 在右」（如
   `i >= this.data.Count()`，`data` 是未标注的空集合字段）会把右侧 `object` 装箱、左侧整数保持未装箱，
@@ -244,6 +246,8 @@
 
 - [ ] **`ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections` 失败**：2026-11-23 跑 Architecture 回归时发现，异步状态机分析器已拒绝「表达式内部的 await（挂起时求值栈非空）」，导致该用例抛 `CompilerException`。与本轮改动无关，待按当前异步限制更新用例。
   2026-11-24 查询作用域改动后重跑 Architecture：72 通过、1 失败，失败仍为此项；单项复跑同样失败。
+
+- [ ] **默认档失败基线待复核（2026-11-27）**：验证 VM 本地导入时，默认档超过 30 秒无新输出后中止，中止前输出 43 条失败。涉及 `ScalarLiteralExpressionTests`、`ErrorPropagationTests`、`DecoratorInterpreterTests`、两组 `NamedArguments*Tests`、`EndToEndTests`、`InterpreterIntegrationTests`、`ConditionalImportTests`、`LoopTests`、`SelectStatementTests`、`UsingStatementTests`、`ThreadTests`、`IntersectionTypesInterpreterTests` 和 `EdgeCaseTests`。其中继承场景的异常传播用例收到 CLR 的 `invalid program`，部分 `EdgeCaseTests` 仍断言旧的语法节点类型。VM 模块测试隔离运行 10 项全通过。
 
 - [x] **IL 数组回归失败已关闭**：`Len` 残留栈值与集合 `+` 拼接已分别修复，见
   [动态长度报告](2026-11-14-IL-Len动态长度/test.md) 与
